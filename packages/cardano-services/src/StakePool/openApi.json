@@ -108,6 +108,51 @@
           }
         }
       },
+      "EpochRewards": {
+        "type": "object",
+        "required": [
+          "activeStake",
+          "epochLength",
+          "epochNo",
+          "leaderRewards",
+          "memberActiveStake",
+          "memberRewards",
+          "pledge",
+          "rewards"
+        ],
+        "properties": {
+          "activeStake": {
+            "$ref": "#/components/schemas/BigInt"
+          },
+          "epoch": {
+            "type": "number"
+          },
+          "epochLength": {
+            "type": "number"
+          },
+          "epochNo": {
+            "type": "number"
+          },
+          "leaderRewards": {
+            "$ref": "#/components/schemas/BigInt"
+          },
+          "memberActiveStake": {
+            "$ref": "#/components/schemas/BigInt"
+          },
+          "memberROI": {
+            "type": "number"
+          },
+          "memberRewards": {
+            "$ref": "#/components/schemas/BigInt"
+          },
+          "pledge": {
+            "$ref": "#/components/schemas/BigInt"
+          },
+          "rewards": {
+            "$ref": "#/components/schemas/BigInt"
+          }
+        }
+      },
       "StakePoolStats": {
         "type": "object",
         "properties": {
@@ -136,6 +181,12 @@
         ],
         "type": "object",
         "properties": {
+          "epochRewards": {
+            "type": "boolean"
+          },
+          "epochsLength": {
+            "type": "number"
+          },
           "filters": {
             "$ref": "#/components/schemas/SearchStakePoolRequest_filters"
           },
@@ -182,29 +233,32 @@
         ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string"
-          },
-          "rewardAccount": {
-            "type": "string"
-          },
-          "pledge": {
-            "$ref": "#/components/schemas/BigInt"
-          },
           "cost": {
             "$ref": "#/components/schemas/BigInt"
+          },
+          "epochRewards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EpochRewards"
+            }
+          },
+          "hexId": {
+            "type": "string"
           },
           "margin": {
             "$ref": "#/components/schemas/Fraction"
           },
+          "metadata": {
+            "$ref": "#/components/schemas/StakePoolMetadata"
+          },
           "metadataJson": {
             "$ref": "#/components/schemas/MetadataJson"
           },
-          "relays": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/StakePoolRelay"
-            }
+          "metrics": {
+            "$ref": "#/components/schemas/StakePoolMetrics"
+          },
+          "id": {
+            "type": "string"
           },
           "owners": {
             "type": "array",
@@ -212,20 +266,23 @@
               "type": "string"
             }
           },
-          "vrf": {
+          "pledge": {
+            "$ref": "#/components/schemas/BigInt"
+          },
+          "relays": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StakePoolRelay"
+            }
+          },
+          "rewardAccount": {
             "type": "string"
-          },
-          "metadata": {
-            "$ref": "#/components/schemas/StakePoolMetadata"
-          },
-          "hexId": {
-            "type": "string"
-          },
-          "metrics": {
-            "$ref": "#/components/schemas/StakePoolMetrics"
           },
           "status": {
             "$ref": "#/components/schemas/StakePoolStatus"
+          },
+          "vrf": {
+            "type": "string"
           }
         }
       },
@@ -302,10 +359,11 @@
       "StakePoolMetrics": {
         "type": "object",
         "required": [
-          "apy",
           "blocksCreated",
           "delegators",
+          "lastRos",
           "livePledge",
+          "ros",
           "saturation",
           "size",
           "stake"
@@ -328,8 +386,30 @@
           "delegators": {
             "type": "number"
           },
+          "lastRos": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Undefined"
+              },
+              {
+                "type": "number",
+                "nullable": true
+              }
+            ]
+          },
           "livePledge": {
             "$ref": "#/components/schemas/BigInt"
+          },
+          "ros": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Undefined"
+              },
+              {
+                "type": "number",
+                "nullable": true
+              }
+            ]
           },
           "saturation": {
             "type": "number"

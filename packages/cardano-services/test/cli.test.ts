@@ -184,12 +184,14 @@ describe.skip('CLI', () => {
   let postgresConnectionStringHandle: string;
   let postgresConnectionStringProjection: string;
   let postgresConnectionStringStakePool: string;
+  let postgresConnectionStringAsset: string;
 
   beforeAll(() => {
     postgresConnectionString = process.env.POSTGRES_CONNECTION_STRING_DB_SYNC!;
     postgresConnectionStringHandle = process.env.POSTGRES_CONNECTION_STRING_HANDLE!;
     postgresConnectionStringProjection = process.env.POSTGRES_CONNECTION_STRING_PROJECTION!;
     postgresConnectionStringStakePool = process.env.POSTGRES_CONNECTION_STRING_STAKE_POOL!;
+    postgresConnectionStringAsset = process.env.POSTGRES_CONNECTION_STRING_ASSET!;
   });
 
   describe('start-provider-server', () => {
@@ -2151,65 +2153,99 @@ describe.skip('CLI', () => {
         });
 
         describe('asset provider server', () => {
-          it('starts with connection string', async () => {
-            proc = withLogging(
-              fork(
-                exePath,
-                [
-                  ...baseArgs,
-                  '--api-url',
-                  apiUrl,
-                  '--postgres-connection-string-asset',
-                  postgresConnectionStringHandle,
-                  '--use-typeorm-asset-provider',
-                  'true',
-                  '--service-names',
-                  ServiceNames.Asset
-                ],
-                { env: {}, stdio: 'pipe' }
-              )
-            );
-            await serverStarted(apiUrl);
-            const headers = { 'Content-Type': 'application/json' };
-            const res = await axios.post(`${apiUrl}${services.asset.versionPath}/${ServiceNames.Asset}/health`, {
-              headers
-            });
-            expect(res.status).toBe(200);
+          let conn: ReturnType<typeof connString.parse>;
+
+          beforeEach(() => {
+            conn = connString.parse(postgresConnectionStringAsset);
           });
 
-          it('starts with granular connection parameters', async () => {
-            const conn = connString.parse(postgresConnectionStringHandle);
-            proc = withLogging(
-              fork(
-                exePath,
-                [
-                  ...baseArgs,
-                  '--api-url',
-                  apiUrl,
-                  '--postgres-host-asset',
-                  conn.host!,
-                  '--postgres-port-asset',
-                  conn.port!,
-                  '--postgres-db-asset',
-                  conn.database!,
-                  '--postgres-user-asset',
-                  conn.user!,
-                  '--postgres-password-asset',
-                  conn.password!,
-                  '--use-typeorm-asset-provider',
-                  'true',
-                  '--service-names',
-                  ServiceNames.Asset
-                ],
-                { env: {}, stdio: 'pipe' }
-              )
-            );
-            await serverStarted(apiUrl);
-            const headers = { 'Content-Type': 'application/json' };
-            const res = await axios.post(`${apiUrl}${services.asset.versionPath}/${ServiceNames.Asset}/health`, {
-              headers
+          describe('with cli arguments', () => {
+            it('starts with connection string', async () => {
+              proc = withLogging(
+                fork(
+                  exePath,
+                  [
+                    ...baseArgs,
+                    '--api-url',
+                    apiUrl,
+                    '--postgres-connection-string-asset',
+                    postgresConnectionStringAsset,
+                    '--use-typeorm-asset-provider',
+                    'true',
+                    '--service-names',
+                    ServiceNames.Asset
+                  ],
+                  { env: {}, stdio: 'pipe' }
+                )
+              );
+              await serverStarted(apiUrl);
+              const headers = { 'Content-Type': 'application/json' };
+              const res = await axios.post(`${apiUrl}${services.asset.versionPath}/${ServiceNames.Asset}/health`, {
+                headers
+              });
+              expect(res.status).toBe(200);
             });
-            expect(res.status).toBe(200);
+
+            it('starts with granular connection parameters', async () => {
+              proc = withLogging(
+                fork(
+                  exePath,
+                  [
+                    ...baseArgs,
+                    '--api-url',
+                    apiUrl,
+                    '--postgres-host-asset',
+                    conn.host!,
+                    '--postgres-port-asset',
+                    conn.port!,
+                    '--postgres-db-asset',
+                    conn.database!,
+                    '--postgres-user-asset',
+                    conn.user!,
+                    '--postgres-password-asset',
+                    conn.password!,
+                    '--use-typeorm-asset-provider',
+                    'true',
+                    '--service-names',
+                    ServiceNames.Asset
+                  ],
+                  { env: {}, stdio: 'pipe' }
+                )
+              );
+              await serverStarted(apiUrl);
+              const headers = { 'Content-Type': 'application/json' };
+              const res = await axios.post(`${apiUrl}${services.asset.versionPath}/${ServiceNames.Asset}/health`, {
+                headers
+              });
+              expect(res.status).toBe(200);
+            });
+          });
+
+          describe('with env variables', () => {
+            it('starts with granular connection parameters', async () => {
+              proc = withLogging(
+                fork(exePath, ['start-provider-server'], {
+                  env: {
+                    API_URL: apiUrl,
+                    LOGGER_MIN_SEVERITY: 'error',
+                    POSTGRES_DB_ASSET: conn.database!,
+                    POSTGRES_HOST_ASSET: conn.host!,
+                    POSTGRES_PASSWORD_ASSET: conn.password!,
+                    POSTGRES_PORT_ASSET: conn.port!,
+                    POSTGRES_USER_ASSET: conn.user!,
+                    SERVICE_NAMES: ServiceNames.Asset,
+                    USE_TYPEORM_ASSET_PROVIDER: 'true'
+                  },
+                  stdio: 'pipe'
+                })
+              );
+              await serverStarted(apiUrl);
+              const headers = { 'Content-Type': 'application/json' };
+              const res = await axios.post(`${apiUrl}${services.asset.versionPath}/${ServiceNames.Asset}/health`, {
+                headers
+              });
+              expect(res.status).toBe(200);
+            });
           });
         });
       });
@@ -2700,6 +2736,37 @@ describe.skip('CLI', () => {
         true
       );
       proc.stderr!.on('data', (data) => expect(data.toString()).toContain('[ERR_INVALID_URL]'));
+      proc.on('exit', (code) => {
+        expect(code).toBe(1);
+        done();
+      });
+    });
+
+    it('exits with code 1 with an invalid SCHEDULES path', (done) => {
+      expect.assertions(2);
+      proc = withLogging(
+        fork(
+          exePath,
+          [
+            ...commonArgs,
+            '--queues',
+            'pool-metadata',
+            '--postgres-connection-string-db-sync',
+            postgresConnectionString,
+            '--postgres-connection-string-stake-pool',
+            postgresConnectionStringStakePool,
+            '--stake-pool-provider-url',
+            'http://localhost:4000/stake-pool',
+            '--schedules',
+            'does_not_exist'
+          ],
+          { env: {}, stdio: 'pipe' }
+        ),
+        true
+      );
+      proc.stderr!.on('data', (data) =>
+        expect(data.toString()).toContain('Error: File does not exist: does_not_exist')
+      );
       proc.on('exit', (code) => {
         expect(code).toBe(1);
         done();

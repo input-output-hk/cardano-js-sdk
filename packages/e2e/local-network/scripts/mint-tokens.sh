@@ -3,6 +3,8 @@
 # This script mint native tokens to genesis address
 set -euo pipefail
 
+source $(dirname $0)/common.sh
+
 here="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
 root="$(cd "$here/.." && pwd)"
 cd "$root"
@@ -22,24 +24,6 @@ while [ ! -S "$CARDANO_NODE_SOCKET_PATH" ]; do
   echo "mint-tokens.sh: CARDANO_NODE_SOCKET_PATH: $CARDANO_NODE_SOCKET_PATH file doesn't exist, waiting..."
   sleep 2
 done
-
-wait_tx_complete() {
-  utxo_to_check="$1"
-  timeout=0
-  max_timeout=10
-  while [ $timeout -lt $max_timeout ]; do
-    output=$(cardano-cli query utxo --tx-in "${utxo_to_check}" --testnet-magic 888)
-    line_count=$(echo "$output" | awk 'END {print NR}')
-    if [ $line_count -eq 2 ]; then
-      echo "Transaction completed"
-      return 0
-    fi
-    timeout=$((timeout + 1))
-    sleep 1
-  done
-  echo "Timeout: Transaction not completed in 10 sec."
-  return 1
-}
 
 echo "Create Mary-era minting policy"
 cat >network-files/utxo-keys/minting-policy.json <<EOL

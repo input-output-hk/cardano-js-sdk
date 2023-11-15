@@ -57,6 +57,10 @@ services:
     volumes:
       - ./local-network/config/network:/config
 
+  cardano-submit-api:
+    volumes:
+      - ./local-network/config/network:/config
+
   handle-projector:
     environment:
       HANDLE_POLICY_IDS_FILE: /sdk-ipc/handle_policy_ids

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source $(dirname $0)/common.sh
+
 handleNames=("HelloHandle" "TestHandle" "DoubleHandle")
 handleHexes=("48656c6c6f48616e646c65" "5465737448616e646c65" "446f75626c6548616e646c65")
 
@@ -45,24 +47,6 @@ cat >network-files/utxo-keys/handles-metadata.json <<EOL
   }
 }}
 EOL
-
-wait_tx_complete() {
-  utxo_to_check="$1"
-  timeout=0
-  max_timeout=10
-  while [ $timeout -lt $max_timeout ]; do
-    output=$(cardano-cli query utxo --tx-in "${utxo_to_check}" --testnet-magic 888)
-    line_count=$(echo "$output" | awk 'END {print NR}')
-    if [ $line_count -eq 2 ]; then
-      echo "Transaction completed"
-      return 0
-    fi
-    timeout=$((timeout + 1))
-    sleep 1
-  done
-  echo "Timeout: Transaction not completed in 10 sec."
-  return 1
-}
 
 echo $policyid >/sdk-ipc/handle_policy_ids
 destAddr="addr_test1qr0c3frkem9cqn5f73dnvqpena27k2fgqew6wct9eaka03agfwkvzr0zyq7nqvcj24zehrshx63zzdxv24x3a4tcnfeq9zwmn7"

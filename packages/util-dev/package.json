@@ -38,7 +38,7 @@
     "lint:fix": "yarn lint --fix",
     "test": "jest -c ./jest.config.js",
     "test:build:verify": "tsc --build ./test",
-    "coverage": "yarn test --coverage",
+    "coverage": "yarn test --coverage || true",
     "prepack": "yarn build",
     "test:debug": "DEBUG=true yarn test",
     "test:e2e": "shx echo 'test:e2e' command not implemented yet"

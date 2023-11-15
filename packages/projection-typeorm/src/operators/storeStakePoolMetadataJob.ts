@@ -1,11 +1,13 @@
 import { ChainSyncEventType } from '@cardano-sdk/core';
 import { Mappers } from '@cardano-sdk/projection';
-import { STAKE_POOL_METADATA_QUEUE, StakePoolMetadataJob } from '../pgBoss';
+import { STAKE_POOL_METADATA_QUEUE, StakePoolMetadataJob, defaultJobOptions } from '../pgBoss';
 import { WithPgBoss } from './withTypeormTransaction';
 import { certificatePointerToId, typeormOperator } from './util';
 
 export const storeStakePoolMetadataJob = typeormOperator<Mappers.WithStakePools & WithPgBoss>(
-  async ({ eventType, stakePools, pgBoss, block: { header } }) => {
+  async ({ block: { header }, eventType, pgBoss, stakePools }) => {
+    const { slot } = header;
+
     if (eventType === ChainSyncEventType.RollBackward) {
       // Tasks are automatically deleted via slot cascade (referencing Block.slot)
       return;
@@ -20,11 +22,7 @@ export const storeStakePoolMetadataJob = typeormOperator<Mappers.WithStakePools 
         })
       );
     for (const task of tasks) {
-      await pgBoss.send(STAKE_POOL_METADATA_QUEUE, task, {
-        retryDelay: 6 * 3600, // 6 hours
-        retryLimit: 1_000_000, // retry forever
-        slot: header.slot
-      });
+      await pgBoss.send(STAKE_POOL_METADATA_QUEUE, task, { ...defaultJobOptions, slot });
     }
   }
 );

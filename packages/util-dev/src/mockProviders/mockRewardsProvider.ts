@@ -45,7 +45,9 @@ export const generateStakePools = (qty: number): Cardano.StakePool[] =>
       apy: Percent(0),
       blocksCreated: 0,
       delegators: 1,
+      lastRos: Percent(0),
       livePledge: 495_463_149n,
+      ros: Percent(0),
       saturation: Percent(0.000_035_552_103_558_591_88),
       size: {
         active: Percent(1),

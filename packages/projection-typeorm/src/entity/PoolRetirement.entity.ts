@@ -9,11 +9,17 @@ export class PoolRetirementEntity {
   /** Computed from certificate pointer. Can be used to sort pool retirements. */
   @PrimaryColumn(BigIntColumnOptions)
   id?: bigint;
+
   @Column()
   retireAtEpoch?: Cardano.EpochNo;
+
   @ManyToOne(() => StakePoolEntity, (stakePool) => stakePool.retirements, OnDeleteCascadeRelationOptions)
   @JoinColumn()
   stakePool?: StakePoolEntity;
+
+  @Column()
+  blockSlot?: Cardano.Slot;
+
   @ManyToOne(() => BlockEntity, OnDeleteCascadeRelationOptions)
   @JoinColumn()
   block?: BlockEntity;

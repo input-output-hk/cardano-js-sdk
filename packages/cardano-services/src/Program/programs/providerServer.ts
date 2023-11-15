@@ -21,7 +21,7 @@ import { HandleHttpService, TypeOrmHandleProvider } from '../../Handle';
 import { HandlePolicyIdsOptionDescriptions, handlePolicyIdsFromFile } from '../options/policyIds';
 import { HttpServer, HttpServerConfig, HttpService, getListen } from '../../Http';
 import { InMemoryCache, NoCache } from '../../InMemoryCache';
-import { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
+import { KoraLabsHandleProvider, TxSubmitApiProvider } from '@cardano-sdk/cardano-services-client';
 import { Logger } from 'ts-log';
 import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from '../errors';
 import { NodeTxSubmitProvider, TxSubmitHttpService } from '../../TxSubmit';
@@ -134,10 +134,11 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
   }, ServiceNames.StakePool);
 
   const getTypeormStakePoolProvider = withTypeOrmProvider('StakePool', (connectionConfig$) => {
-    const entities = getEntities(['currentPoolMetrics', 'poolMetadata']);
+    const entities = getEntities(['currentPoolMetrics', 'poolDelisted', 'poolMetadata', 'poolRewards']);
+    const { lastRosEpochs, paginationPageSizeLimit } = args;
 
     return new TypeormStakePoolProvider(
-      { paginationPageSizeLimit: args.paginationPageSizeLimit! },
+      { lastRosEpochs, paginationPageSizeLimit: paginationPageSizeLimit! },
       { connectionConfig$, entities, logger }
     );
   });
@@ -191,6 +192,15 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     }
 
     return sharedHandleProvider;
+  };
+
+  const getSubmitApiProvider = () => {
+    const { submitApiUrl } = args;
+
+    if (!submitApiUrl)
+      throw new MissingProgramOption(ServiceNames.TxSubmit, ProviderServerOptionDescriptions.SubmitApiUrl);
+
+    return new TxSubmitApiProvider(submitApiUrl, logger);
   };
 
   const getTypeormAssetProvider = withTypeOrmProvider('Asset', (connectionConfig$) => {
@@ -304,7 +314,9 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       ServiceNames.NetworkInfo
     ),
     [ServiceNames.TxSubmit]: async () => {
-      const txSubmitProvider = args.useQueue
+      const txSubmitProvider = args.useSubmitApi
+        ? getSubmitApiProvider()
+        : args.useQueue
         ? await getRabbitMqTxSubmitProvider(dnsResolver, logger, args)
         : new NodeTxSubmitProvider({
             cardanoNode: getOgmiosObservableCardanoNode(dnsResolver, logger, args),

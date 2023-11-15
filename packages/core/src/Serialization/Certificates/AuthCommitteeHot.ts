@@ -68,10 +68,7 @@ export class AuthCommitteeHot {
     const length = reader.readStartArray();
 
     if (length !== 3)
-      throw new InvalidArgumentError(
-        'cbor',
-        `Expected an array of ${EMBEDDED_GROUP_SIZE} elements, but got an array of ${length} elements`
-      );
+      throw new InvalidArgumentError('cbor', `Expected an array of 3 elements, but got an array of ${length} elements`);
 
     const kind = Number(reader.readInt());
 

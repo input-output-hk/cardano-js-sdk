@@ -16,3 +16,9 @@ export class StakePoolMetadataServiceError<InnerError = unknown> extends Composa
     super(formatErrorMessage(reason, detail), innerError);
   }
 }
+
+export class SmashStakePoolDelistedServiceError<InnerError = unknown> extends ComposableError<InnerError> {
+  constructor(innerError?: InnerError, public detail?: string) {
+    super(formatErrorMessage('FAILED_TO_FETCH_DELISTED_POOLS', detail), innerError);
+  }
+}

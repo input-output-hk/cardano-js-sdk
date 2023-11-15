@@ -16,10 +16,10 @@ import { Observable } from 'rxjs';
 import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 import { Pool } from 'pg';
 import { PoolInfo, TypeormStakePoolFixtureBuilder } from './fitxures/TypeormFixtureBuilder';
+import { emptyDbData, ingestDbData, servicesWithVersionPath as services, sleep } from '../../util';
 import { getPort } from 'get-port-please';
 import { isNotNil } from '@cardano-sdk/util';
 import { logger } from '@cardano-sdk/util-dev';
-import { servicesWithVersionPath as services, sleep } from '../../util';
 import axios from 'axios';
 import lowerCase from 'lodash/lowerCase';
 
@@ -83,7 +83,9 @@ describe('TypeormStakePoolProvider', () => {
   let poolsInfoWithMetricsFiltered: PoolInfo[];
 
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
-  const entities = getEntities(['currentPoolMetrics', 'poolMetadata']);
+  const entities = getEntities(['currentPoolMetrics', 'poolMetadata', 'poolDelisted']);
+  const delisted_id = Cardano.PoolId('pool1vj30jr7wn83dzn928qk6fx34h3d3f3cesr47j5ymeumf65wdw9x');
+  const db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING_STAKE_POOL });
 
   beforeAll(async () => {
     port = await getPort();
@@ -94,10 +96,12 @@ describe('TypeormStakePoolProvider', () => {
     connectionConfig$ = getConnectionConfig(dnsResolver, 'projector', 'StakePool', {
       postgresConnectionStringStakePool: process.env.POSTGRES_CONNECTION_STRING_STAKE_POOL!
     });
-    fixtureBuilder = new TypeormStakePoolFixtureBuilder(
-      new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING_STAKE_POOL }),
-      logger
-    );
+
+    // data prep
+    // ingesting delist before building the fixture
+    await ingestDbData(db, 'pool_delisted', ['stake_pool_id'], [delisted_id]);
+
+    fixtureBuilder = new TypeormStakePoolFixtureBuilder(db, logger);
     poolsInfo = await fixtureBuilder.getPools(1000, ['active', 'activating', 'retired', 'retiring']);
     poolsInfoWithMeta = poolsInfo.filter((pool) => isNotNil(pool.metadataUrl));
     poolsInfoWithMetrics = poolsInfo.filter((pool) => isNotNil(pool.saturation));
@@ -130,13 +134,19 @@ describe('TypeormStakePoolProvider', () => {
     poolsInfoWithMetricsFiltered = poolsInfoWithMetrics.filter(applyFilter);
   });
 
+  afterAll(async () => {
+    // data cleanse
+    await emptyDbData(db, 'pool_delisted');
+    await db.end();
+  });
+
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('healthy state', () => {
     describe('with TypeormStakePoolProvider', () => {
       beforeAll(async () => {
         provider = stakePoolHttpProvider(clientConfig);
         stakePoolProvider = new TypeormStakePoolProvider(
-          { paginationPageSizeLimit: pagination.limit },
+          { lastRosEpochs: 10, paginationPageSizeLimit: pagination.limit },
           { connectionConfig$, entities, logger }
         );
         service = new StakePoolHttpService({ logger, stakePoolProvider });
@@ -152,11 +162,9 @@ describe('TypeormStakePoolProvider', () => {
       describe('/health', () => {
         it('forwards the stakePoolProvider health response with provider client', async () => {
           // required a delay to determine TypeormProvider's healthCheck as healthy when subscribes to observable data source
-          const response = await provider.healthCheck();
-          expect(response).toEqual({ ok: false, reason: 'not started' });
           while (!(await provider.healthCheck()).ok) await sleep(10);
-          const response2 = await provider.healthCheck();
-          expect(response2).toEqual({ ok: true });
+          const response = await provider.healthCheck();
+          expect(response).toEqual({ ok: true });
         });
       });
 
@@ -244,6 +252,26 @@ describe('TypeormStakePoolProvider', () => {
           });
         });
 
+        it('response is an array of stake pools excluding delisted pool', async () => {
+          const options: QueryStakePoolsArgs = {
+            filters: {
+              identifier: {
+                _condition: 'or',
+                values: [{ id: poolsInfo[0].id }, { id: poolsInfo[1].id }, { id: delisted_id }]
+              }
+            },
+            pagination
+          };
+          const response = await provider.queryStakePools(options);
+
+          expect(() => Cardano.PoolId(poolsInfo[0].id as unknown as string)).not.toThrow();
+          expect(() => Cardano.PoolIdHex(response.pageResults[0].hexId as unknown as string)).not.toThrow();
+          expect(() => Cardano.VrfVkHex(response.pageResults[0].vrf as unknown as string)).not.toThrow();
+
+          expect(response.pageResults).toHaveLength(2);
+          expect(response.totalResultCount).toEqual(2);
+        });
+
         it('response is an array of stake pools', async () => {
           const options: QueryStakePoolsArgs = {
             filters: {
@@ -254,6 +282,7 @@ describe('TypeormStakePoolProvider', () => {
             },
             pagination
           };
+
           const response = await provider.queryStakePools(options);
 
           expect(() => Cardano.PoolId(poolsInfo[0].id as unknown as string)).not.toThrow();
@@ -704,31 +733,56 @@ describe('TypeormStakePoolProvider', () => {
             });
           });
 
-          describe('sort by apy', () => {
-            it('desc order', async () => {
-              const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'apy'));
-              expect(response.pageResults[0].metrics?.apy).toEqual(poolsInfoWithMetrics[6].apy);
-              expect(response.pageResults[response.pageResults.length - 1].metrics?.apy).toEqual(
-                poolsInfoWithMetrics[1].apy
+          it('sort by apy', () =>
+            expect(provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'apy'))).rejects.toThrow(
+              'TypeormStakePoolProvider do not support sort by APY'
+            ));
+
+          describe('sort by lastRos', () => {
+            let expectedLastRos: { max: number; min: number };
+
+            beforeAll(() => {
+              expectedLastRos = poolsInfoWithMetrics.reduce(
+                (result, current) => ({
+                  max: Math.max(result.max, current.lastRos === undefined ? 0 : current.lastRos),
+                  min: Math.min(result.min, current.lastRos === undefined ? 100 : current.lastRos)
+                }),
+                { max: 0, min: 100 }
               );
+            });
+
+            it('desc order', async () => {
+              const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'lastRos'));
+              expect(response.pageResults[0].metrics?.lastRos).toEqual(expectedLastRos.max);
             });
 
             it('asc order', async () => {
-              const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'apy'));
-              expect(response.pageResults[0].metrics?.apy).toEqual(poolsInfoWithMetrics[2].apy);
-              expect(response.pageResults[response.pageResults.length - 1].metrics?.apy).toEqual(
-                poolsInfoWithMetrics[0].apy
+              const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'lastRos'));
+              expect(response.pageResults[0].metrics?.lastRos).toEqual(expectedLastRos.min);
+            });
+          });
+
+          describe('sort by ros', () => {
+            let expectedRos: { max: number; min: number };
+
+            beforeAll(() => {
+              expectedRos = poolsInfoWithMetrics.reduce(
+                (result, current) => ({
+                  max: Math.max(result.max, current.ros === undefined ? 0 : current.ros),
+                  min: Math.min(result.min, current.ros === undefined ? 100 : current.ros)
+                }),
+                { max: 0, min: 100 }
               );
             });
 
-            it('with applied filters', async () => {
-              const response = await provider.queryStakePools(
-                setSortCondition(setFilterCondition(filterArgs, 'or'), 'asc', 'apy')
-              );
-              expect(response.pageResults[0].metrics?.apy).toEqual(poolsInfoWithMetrics[2].apy);
-              expect(response.pageResults[response.totalResultCount - 1].metrics?.apy).toEqual(
-                poolsInfoWithMetrics[0].apy
-              );
+            it('desc order', async () => {
+              const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'ros'));
+              expect(response.pageResults[0].metrics?.ros).toEqual(expectedRos.max);
+            });
+
+            it('asc order', async () => {
+              const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'ros'));
+              expect(response.pageResults[0].metrics?.ros).toEqual(expectedRos.min);
             });
           });
         });

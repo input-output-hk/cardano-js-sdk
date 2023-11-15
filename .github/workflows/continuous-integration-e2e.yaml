@@ -67,10 +67,6 @@ jobs:
           OGMIOS_URL: 'ws://cardano-node-ogmios:1340'
           POSTGRES_PORT: '5435'
 
-      - name: Dump docker logs on failure
-        if: failure()
-        uses: jwalton/gh-docker-logs@v2
-
       - name: Wait for some epochs
         run: |
           yarn workspace @cardano-sdk/e2e wait-for-network
@@ -91,3 +87,7 @@ jobs:
           yarn workspace @cardano-sdk/e2e test:providers -t StakePoolProvider
         env:
           STAKE_POOL_PROVIDER_URL: 'http://localhost:4010/'
+
+      - name: Dump docker logs
+        if: ${{ cancelled() || failure() }}
+        uses: jwalton/gh-docker-logs@v2

@@ -64,29 +64,15 @@
   "TracingVerbosity": "NormalVerbosity",
   "TurnOnLogMetrics": true,
   "TurnOnLogging": true,
-  "defaultBackends": [
-    "KatipBK"
-  ],
-  "defaultScribes": [
-    [
-      "StdoutSK",
-      "stdout"
-    ]
-  ],
+  "defaultBackends": ["KatipBK"],
+  "defaultScribes": [["StdoutSK", "stdout"]],
   "hasEKG": 12788,
-  "hasPrometheus": [
-    "127.0.0.1",
-    12798
-  ],
+  "hasPrometheus": ["127.0.0.1", 12798],
   "minSeverity": "Info",
   "options": {
     "mapBackends": {
-      "cardano.node.metrics": [
-        "EKGViewBK"
-      ],
-      "cardano.node.resources": [
-        "EKGViewBK"
-      ]
+      "cardano.node.metrics": ["EKGViewBK"],
+      "cardano.node.resources": ["EKGViewBK"]
     },
     "mapSubtrace": {
       "cardano.node.metrics": {
@@ -99,9 +85,7 @@
     "rpLogLimitBytes": 5000000,
     "rpMaxAgeHours": 24
   },
-  "setupBackends": [
-    "KatipBK"
-  ],
+  "setupBackends": ["KatipBK"],
   "setupScribes": [
     {
       "scFormat": "ScText",

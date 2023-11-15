@@ -24,7 +24,7 @@ const trezorTxTransformer = async (
     certificates: mapCerts(body.certificates ?? [], context),
     fee: body.fee.toString(),
     inputs,
-    mint: mapTokenMap(body.mint),
+    mint: mapTokenMap(body.mint, true),
     networkId: context.chainId.networkId,
     outputs: mapTxOuts(body.outputs, context),
     protocolMagic: context.chainId.networkMagic,

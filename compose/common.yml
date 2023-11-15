@@ -64,13 +64,16 @@ x-provider-server-environment: &provider-server-environment
   ENABLE_METRICS: ${ENABLE_METRICS:-false}
   EPOCH_POLL_INTERVAL: ${EPOCH_POLL_INTERVAL:-500}
   SERVICE_NAMES: ${SERVICE_NAMES:-asset,chain-history,handle,network-info,rewards,stake-pool,tx-submit,utxo}
+  SUBMIT_API_URL: ${SUBMIT_API_URL:-http://cardano-submit-api:8090/}
   USE_BLOCKFROST: ${USE_BLOCKFROST:-false}
   USE_QUEUE: ${USE_QUEUE:-false}
+  USE_SUBMIT_API: ${USE_SUBMIT_API:-true}
 
 x-sdk-environment: &sdk-environment
   LOGGER_MIN_SEVERITY: ${LOGGER_MIN_SEVERITY:-info}
+  NETWORK_INFO_PROVIDER_URL: http://provider-server:3000/
   OGMIOS_URL: ws://cardano-node-ogmios:1337
-  POSTGRES_DB_FILE_ASSET: /run/secrets/postgres_db_handle
+  POSTGRES_DB_FILE_ASSET: /run/secrets/postgres_db_asset
   POSTGRES_DB_FILE_DB_SYNC: /run/secrets/postgres_db_db_sync
   POSTGRES_DB_FILE_HANDLE: /run/secrets/postgres_db_handle
   POSTGRES_DB_FILE_STAKE_POOL: /run/secrets/postgres_db_stake_pool
@@ -148,6 +151,18 @@ services:
       - node-db:/db
       - node-ipc:/ipc
 
+  cardano-submit-api:
+    command: --config /config/cardano-submit-api/config.json --listen-address 0.0.0.0 --socket-path /ipc/node.socket $SUBMIT_API_ARGS
+    depends_on:
+      cardano-node-ogmios:
+        condition: service_healthy
+    image: inputoutput/cardano-submit-api:${CARDANO_NODE_VERSION:-1.35.5}
+    ports:
+      - 8090:8090
+    restart: on-failure
+    volumes:
+      - node-ipc:/ipc
+
   pg-boss-worker:
     <<:
       - *from-sdk
@@ -164,7 +179,7 @@ services:
     environment:
       <<: *sdk-environment
       API_URL: http://0.0.0.0:3003
-      QUEUES: ${QUEUES:-pool-metadata,pool-metrics}
+      QUEUES: ${QUEUES:-pool-delist-schedule,pool-metadata,pool-metrics,pool-rewards}
       STAKE_POOL_PROVIDER_URL: http://provider-server:3000/
       METADATA_FETCH_MODE: ${METADATA_FETCH_MODE:-direct}
       SMASH_URL: ${SMASH_URL:-http://cardano-smash:3100/api/v1}
@@ -249,7 +264,7 @@ services:
         - *projector-environment
         - *sdk-environment
       POSTGRES_DB_FILE: /run/secrets/postgres_db_stake_pool
-      PROJECTION_NAMES: stake-pool,stake-pool-metadata-job,stake-pool-metrics-job
+      PROJECTION_NAMES: stake-pool,stake-pool-metadata-job,stake-pool-metrics-job,stake-pool-rewards-job
     healthcheck:
       test:
         [

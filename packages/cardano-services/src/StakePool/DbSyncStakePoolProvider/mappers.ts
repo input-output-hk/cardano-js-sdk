@@ -248,8 +248,10 @@ export const mapPoolMetrics = (poolMetricsModel: PoolMetricsModel): PoolMetrics 
     activeStakePercentage: Percent(Number(poolMetricsModel.active_stake_percentage)),
     blocksCreated: poolMetricsModel.blocks_created,
     delegators: poolMetricsModel.delegators,
+    lastRos: Percent(0),
     livePledge: BigInt(poolMetricsModel.live_pledge),
     liveStake: BigInt(poolMetricsModel.live_stake),
+    ros: Percent(0),
     saturation: Percent(Number.parseFloat(poolMetricsModel.saturation))
   }
 });

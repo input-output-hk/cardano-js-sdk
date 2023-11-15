@@ -1,4 +1,4 @@
-import { PoolAPYSortFields, PoolDataSortFields, PoolMetricsSortFields } from '@cardano-sdk/core';
+import { PoolAPYSortFields, PoolDataSortFields, PoolMetricsSortFields, PoolROSSortFields } from '@cardano-sdk/core';
 import { PoolSortType } from '../../../src';
 import { getStakePoolSortType } from '../../../src/StakePool/DbSyncStakePoolProvider/util';
 
@@ -11,6 +11,9 @@ describe('getStakePoolSortType', () => {
   });
   it('returns apy for PoolAPYSortFields', () => {
     for (const field of PoolAPYSortFields) expect(getStakePoolSortType(field)).toEqual<PoolSortType>('apy');
+  });
+  it('returns ros for PoolROSSortFields', () => {
+    for (const field of PoolROSSortFields) expect(getStakePoolSortType(field)).toEqual<PoolSortType>('ros');
   });
   it('throws an error if field is not valid', () => {
     expect(() => getStakePoolSortType('other')).toThrow('Invalid sort field');

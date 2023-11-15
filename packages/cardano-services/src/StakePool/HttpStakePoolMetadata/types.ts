@@ -94,3 +94,7 @@ export type StakePoolMetadataResponse = {
   metadata: Cardano.StakePoolMetadata | undefined;
   errors: CustomError[];
 };
+
+export type SmashDelistedResponse = {
+  poolId: string;
+};

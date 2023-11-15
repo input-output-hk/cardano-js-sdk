@@ -118,9 +118,11 @@ describe('PgBossHttpService', () => {
     service = new PgBossHttpService(
       {
         apiUrl: new URL('http://unused/'),
+        lastRosEpochs: 10,
         metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
         parallelJobs: 3,
-        queues: []
+        queues: [],
+        schedules: []
       },
       { connectionConfig$, db, logger }
     );
@@ -149,9 +151,11 @@ describe('PgBossHttpService', () => {
     service = new PgBossHttpService(
       {
         apiUrl: new URL('http://unused/'),
+        lastRosEpochs: 10,
         metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
         parallelJobs: 3,
-        queues: [STAKE_POOL_METADATA_QUEUE]
+        queues: [STAKE_POOL_METADATA_QUEUE],
+        schedules: []
       },
       { connectionConfig$: config$, db, logger }
     );

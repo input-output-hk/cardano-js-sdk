@@ -11,8 +11,17 @@ import { v4 } from 'uuid';
 import Attorney from 'pg-boss/src/attorney';
 import PgBoss, { SendOptions } from 'pg-boss';
 
+export const POOL_DELIST_SCHEDULE = 'pool-delist-schedule';
 export const STAKE_POOL_METADATA_QUEUE = 'pool-metadata';
 export const STAKE_POOL_METRICS_UPDATE = 'pool-metrics';
+export const STAKE_POOL_REWARDS = 'pool-rewards';
+
+export const availableQueues = [
+  POOL_DELIST_SCHEDULE,
+  STAKE_POOL_METADATA_QUEUE,
+  STAKE_POOL_METRICS_UPDATE,
+  STAKE_POOL_REWARDS
+] as const;
 
 export interface PgBossExtension {
   send: <T extends object>(
@@ -24,6 +33,7 @@ export interface PgBossExtension {
 
 export interface StakePoolMetricsUpdateJob {
   slot: Cardano.Slot;
+  outdatedSlot?: Cardano.Slot;
 }
 
 export interface StakePoolMetadataJob {
@@ -32,6 +42,15 @@ export interface StakePoolMetadataJob {
   poolId: Cardano.PoolId;
   metadataJson: NonNullable<Cardano.StakePool['metadataJson']>;
 }
+
+export interface StakePoolRewardsJob {
+  epochNo: Cardano.EpochNo;
+}
+
+export const defaultJobOptions: SendOptions = {
+  retryDelay: 6 * 3600, // 6 hours
+  retryLimit: 1_000_000 // retry forever
+};
 
 class BossDb {
   constructor(private queryRunner: QueryRunner | null, private logger: Logger, private dataSource?: DataSource) {}

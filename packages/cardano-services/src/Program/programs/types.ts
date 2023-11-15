@@ -29,32 +29,36 @@ export enum ServiceNames {
 }
 
 export const POOLS_METRICS_INTERVAL_DEFAULT = 1000;
+export const POOLS_METRICS_OUTDATED_INTERVAL_DEFAULT = 100;
 
 export enum ProjectorOptionDescriptions {
   BlocksBufferLength = 'Chain sync event (blocks) buffer length',
   DropSchema = 'Drop and recreate database schema to project from origin',
   DryRun = 'Initialize the projection, but do not start it',
   ExitAtBlockNo = 'Exit after processing this block. Intended for benchmark testing',
-  PoolsMetricsInterval = 'Interval between two stake pools metrics jobs in number of blocks',
+  PoolsMetricsInterval = 'Interval in number of blocks between two stake pools metrics jobs to update all metrics',
+  PoolsMetricsOutdatedInterval = 'Interval in number of blocks between two stake pools metrics jobs to update only outdated metrics',
   Synchronize = 'Synchronize the schema from the models'
 }
 
 export enum ProviderServerOptionDescriptions {
+  AllowedOrigins = 'List of allowed CORS origins separated by comma',
+  AssetCacheTtl = 'Asset info and NFT Metadata cache TTL in seconds (600 by default)',
   CardanoNodeConfigPath = 'Cardano node config path',
   DbCacheTtl = 'Cache TTL in seconds between 60 and 172800 (two days), an option for database related operations',
-  AllowedOrigins = 'List of allowed CORS origins separated by comma',
   DisableDbCache = 'Disable DB cache',
   DisableStakePoolMetricApy = 'Omit this metric for improved query performance',
   EpochPollInterval = 'Epoch poll interval',
-  AssetCacheTtl = 'Asset info and NFT Metadata cache TTL in seconds (600 by default)',
+  HandleProviderServerUrl = 'URL for the Handle provider server',
+  PaginationPageSizeLimit = 'Pagination page size limit shared across all providers',
+  SubmitApiUrl = 'cardano-submit-api URL',
   TokenMetadataCacheTtl = 'Token Metadata API cache TTL in seconds',
   TokenMetadataServerUrl = 'Token Metadata API server URL',
   UseTypeOrmStakePoolProvider = 'Enables the TypeORM Stake Pool Provider',
   UseBlockfrost = 'Enables Blockfrost cached data DB',
   UseKoraLabsProvider = 'Use the KoraLabs handle provider',
   UseQueue = 'Enables RabbitMQ',
-  PaginationPageSizeLimit = 'Pagination page size limit shared across all providers',
-  HandleProviderServerUrl = 'URL for the Handle provider server',
+  UseSubmitApi = 'Use cardano-submit-api provider',
   UseTypeormAssetProvider = 'Use the TypeORM Asset Provider (default is db-sync)'
 }
 
@@ -68,22 +72,24 @@ export type ProviderServerArgs = CommonProgramOptions &
   RabbitMqProgramOptions &
   StakePoolMetadataProgramOptions & {
     allowedOrigins?: string[];
+    assetCacheTTL?: Seconds;
     cardanoNodeConfigPath?: string;
+    dbCacheTtl: Seconds | 0;
     disableDbCache?: boolean;
     disableStakePoolMetricApy?: boolean;
+    epochPollInterval: number;
+    handleProviderServerUrl?: string;
     healthCheckCacheTtl: Seconds;
-    assetCacheTTL?: Seconds;
+    paginationPageSizeLimit?: number;
+    serviceNames: ServiceNames[];
+    submitApiUrl?: URL;
     tokenMetadataCacheTTL?: Seconds;
     tokenMetadataServerUrl?: string;
     tokenMetadataRequestTimeout?: Milliseconds;
-    epochPollInterval: number;
-    dbCacheTtl: Seconds | 0;
     useBlockfrost?: boolean;
     useKoraLabs?: boolean;
-    useTypeormAssetProvider?: boolean;
     useQueue?: boolean;
+    useSubmitApi?: boolean;
+    useTypeormAssetProvider?: boolean;
     useTypeormStakePoolProvider?: boolean;
-    paginationPageSizeLimit?: number;
-    serviceNames: ServiceNames[];
-    handleProviderServerUrl?: string;
   };

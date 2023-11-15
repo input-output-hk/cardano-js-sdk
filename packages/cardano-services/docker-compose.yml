@@ -20,6 +20,10 @@ services:
     volumes:
       - ./config/network/${NETWORK:-mainnet}:/config
 
+  cardano-submit-api:
+    volumes:
+      - ./config/network/${NETWORK:-mainnet}:/config
+
   blockfrost-worker:
     <<: *logging
     build:

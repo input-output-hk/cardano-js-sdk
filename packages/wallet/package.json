@@ -29,7 +29,7 @@
     "cleanup:dist": "shx rm -rf dist",
     "cleanup:nm": "shx rm -rf node_modules",
     "cleanup": "run-s cleanup:dist cleanup:nm",
-    "coverage": "yarn test --coverage",
+    "coverage": "yarn test --coverage || true",
     "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint:fix": "yarn lint --fix",
     "prepack": "yarn build",

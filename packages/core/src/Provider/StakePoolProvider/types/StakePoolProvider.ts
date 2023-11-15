@@ -17,26 +17,52 @@ export type FilterIdentifiers = Partial<
 >;
 
 export interface MultipleChoiceSearchFilter<T> {
-  /** Defaults to 'or' */
+  /** Defaults to `'or'`. */
   _condition?: FilterCondition;
   values: T[];
 }
 
+/** The StakePoolProvider.queryStakePools call arguments. */
 export interface QueryStakePoolsArgs {
-  /** Will return all stake pools sorted by name ascending if not specified */
+  /** Will return all stake pools sorted by name ascending if not specified. */
   sort?: StakePoolSortOptions;
-  /** Will fetch all stake pools if not specified */
+
+  /** Will fetch all stake pools if not specified. */
   filters?: {
-    /** Defaults to 'and' */
+    /** Defaults to `'and'`. */
     _condition?: FilterCondition;
-    /** Will return results for partial matches */
+
+    /** Will return results for partial matches. */
     identifier?: MultipleChoiceSearchFilter<FilterIdentifiers>;
+
+    /** If provided, returns all the pools which live stake meets / do not meets the pledge. */
     pledgeMet?: boolean;
+
+    /** If provided, returns all the pools in any of the given status. */
     status?: Cardano.StakePoolStatus[];
   };
-  /** Used for APY metric computation. It will take 3 epochs back if not specified */
+
+  /**
+   * Used for APY metric computation. It will take 3 epochs back if not specified.
+   *
+   * @deprecated Use `epochsLength` instead
+   */
   apyEpochsBackLimit?: number;
-  /** Will return all stake pools matching the query if not specified */
+
+  /** If not `true`, `StakePool.rewardHistory` is `undefined`. */
+  epochRewards?: boolean;
+
+  /**
+   * Controls the `StakePool.rewardHistory` and `StakePoolMetrics.lastRos` properties of the response.
+   *
+   * If `undefined`, `StakePool.rewardHistory` contains last `LAST_ROS_EPOCHS` elements and
+   * `StakePoolMetrics.lastRos` is the **ROS in** `LAST_ROS_EPOCHS` **epochs** of the stake pool; otherwise
+   * `StakePool.rewardHistory` contains the requested history and `StakePoolMetrics.ros` is
+   * the **ROS in the requested time interval**.
+   */
+  epochsLength?: number;
+
+  /** The configuration for paged result. */
   pagination: PaginationArgs;
 }
 
@@ -56,6 +82,7 @@ export interface StakePoolProvider extends Provider {
    * @throws ProviderError
    */
   queryStakePools: (args: QueryStakePoolsArgs) => Promise<Paginated<Cardano.StakePool>>;
+
   /**
    * @returns {StakePoolStats} Stake pool stats
    */

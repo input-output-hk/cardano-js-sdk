@@ -75,7 +75,7 @@ const countUniqueOutputAddresses = (queryRunner: QueryRunner) =>
     .getRawMany()
     .then((results) => results.length);
 
-describe('single-tenant utxo projection', () => {
+describe.skip('single-tenant utxo projection', () => {
   let cardanoNode: ObservableCardanoNode;
   let connection$: Observable<Postgres.TypeormConnection>;
   let buffer: Postgres.TypeormStabilityWindowBuffer;

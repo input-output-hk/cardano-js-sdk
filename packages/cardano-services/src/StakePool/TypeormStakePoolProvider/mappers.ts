@@ -33,7 +33,8 @@ export type PoolModel = {
   metrics_live_size: string;
   metrics_live_saturation: string;
   metrics_live_pledge: string;
-  metrics_apy: string | null;
+  metrics_ros: string | null;
+  metrics_last_ros: string | null;
   total_count: string;
 };
 
@@ -84,42 +85,24 @@ const mapMetadata = ({
   }
 };
 
-// Following our generated db snapshot - we could have a stake pool with no associated metrics in the projection db, however Cardano.StakePool.metrics is a required
-const defaultMetrics: Cardano.StakePoolMetrics = {
-  apy: undefined,
-  blocksCreated: 0,
-  delegators: 0,
-  livePledge: 0n,
-  saturation: Percent(0),
+// eslint-disable-next-line complexity
+const mapMetrics = (pool: PoolModel): Cardano.StakePoolMetrics => ({
+  apy: pool.metrics_last_ros ? Percent(Number.parseFloat(pool.metrics_last_ros)) : undefined,
+  blocksCreated: pool.metrics_minted_blocks || 0,
+  delegators: pool.metrics_live_delegators || 0,
+  lastRos: Percent(Number.parseFloat(pool.metrics_last_ros || '0')),
+  livePledge: BigInt(pool.metrics_live_pledge || 0n),
+  ros: Percent(Number.parseFloat(pool.metrics_ros || '0')),
+  saturation: Percent(Number.parseFloat(pool.metrics_live_saturation || '0')),
   size: {
-    active: Percent(0),
-    live: Percent(0)
+    active: Percent(Number.parseFloat(pool.metrics_active_size || '0')),
+    live: Percent(Number.parseFloat(pool.metrics_live_size || '0'))
   },
   stake: {
-    active: 0n,
-    live: 0n
+    active: BigInt(pool.metrics_active_stake || 0),
+    live: BigInt(pool.metrics_live_stake || 0)
   }
-};
-
-const mapMetrics = (pool: PoolModel): Cardano.StakePoolMetrics => {
-  if (pool.metrics_live_pledge === null) return defaultMetrics;
-
-  return {
-    apy: pool.metrics_apy ? Percent(Number.parseFloat(pool.metrics_apy)) : undefined,
-    blocksCreated: pool.metrics_minted_blocks,
-    delegators: pool.metrics_live_delegators,
-    livePledge: BigInt(pool.metrics_live_pledge),
-    saturation: Percent(Number.parseFloat(pool.metrics_live_saturation)),
-    size: {
-      active: Percent(Number.parseFloat(pool.metrics_active_size)),
-      live: Percent(Number.parseFloat(pool.metrics_live_size))
-    },
-    stake: {
-      active: BigInt(pool.metrics_active_stake),
-      live: BigInt(pool.metrics_live_stake)
-    }
-  };
-};
+});
 
 export const mapStakePoolsResult = (rawResult: PoolModel[]): Paginated<Cardano.StakePool> => {
   const pageResults: Cardano.StakePool[] = rawResult.map((poolModel) => ({

@@ -15,6 +15,8 @@ export type PoolInfo = {
   cost: string;
   saturation: number;
   apy?: number;
+  lastRos?: number;
+  ros?: number;
 };
 
 export type PoolFixtureModel = {
@@ -25,7 +27,8 @@ export type PoolFixtureModel = {
   metadata_url: string;
   cost: string;
   live_saturation: string;
-  apy?: string;
+  ros?: string;
+  last_ros?: string;
 };
 
 export class TypeormStakePoolFixtureBuilder {
@@ -51,12 +54,13 @@ export class TypeormStakePoolFixtureBuilder {
       this.#logger.warn(`${desiredQty} pools desired, only ${resultsQty} results found`);
     }
 
-    return result.rows.map(({ id, status, name, ticker, cost, apy, live_saturation, metadata_url }) => ({
-      apy: typeof apy === 'string' ? Number.parseFloat(apy) : undefined,
+    return result.rows.map(({ id, status, name, ticker, cost, ros, last_ros, live_saturation, metadata_url }) => ({
       cost,
       id: id as unknown as Cardano.PoolId,
+      lastRos: typeof last_ros === 'string' ? Number.parseFloat(last_ros) : undefined,
       metadataUrl: metadata_url,
       name,
+      ros: typeof ros === 'string' ? Number.parseFloat(ros) : undefined,
       saturation: Number.parseFloat(live_saturation),
       status,
       ticker

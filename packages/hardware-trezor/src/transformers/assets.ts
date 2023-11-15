@@ -12,7 +12,7 @@ const comparePolicyIdCanonically = (a: Trezor.CardanoAssetGroup, b: Trezor.Carda
   // PolicyId is always of the same length
   a.policyId > b.policyId ? 1 : -1;
 
-const tokenMapToAssetGroup = (tokenMap: Cardano.TokenMap): Trezor.CardanoAssetGroup[] => {
+const tokenMapToAssetGroup = (tokenMap: Cardano.TokenMap, isMint: boolean): Trezor.CardanoAssetGroup[] => {
   const map = new Map<string, Array<Trezor.CardanoToken>>();
 
   for (const [key, value] of tokenMap.entries()) {
@@ -22,8 +22,8 @@ const tokenMapToAssetGroup = (tokenMap: Cardano.TokenMap): Trezor.CardanoAssetGr
     if (!map.has(policyId)) map.set(policyId, []);
 
     map.get(policyId)!.push({
-      amount: value.toString(),
-      assetNameBytes: assetName
+      assetNameBytes: assetName,
+      ...(isMint ? { mintAmount: value.toString() } : { amount: value.toString() })
     });
   }
 
@@ -41,5 +41,5 @@ const tokenMapToAssetGroup = (tokenMap: Cardano.TokenMap): Trezor.CardanoAssetGr
   return tokenMapAssetsGroup;
 };
 
-export const mapTokenMap = (tokenMap: Cardano.TokenMap | undefined) =>
-  tokenMap ? tokenMapToAssetGroup(tokenMap) : undefined;
+export const mapTokenMap = (tokenMap: Cardano.TokenMap | undefined, isMint = false) =>
+  tokenMap ? tokenMapToAssetGroup(tokenMap, isMint) : undefined;

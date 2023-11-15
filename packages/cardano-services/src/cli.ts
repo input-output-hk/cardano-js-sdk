@@ -21,6 +21,7 @@ import {
   PG_BOSS_WORKER_API_URL_DEFAULT,
   POLLING_CYCLE_DEFAULT,
   POOLS_METRICS_INTERVAL_DEFAULT,
+  POOLS_METRICS_OUTDATED_INTERVAL_DEFAULT,
   PROJECTOR_API_URL_DEFAULT,
   PROVIDER_SERVER_API_URL_DEFAULT,
   PgBossWorkerArgs,
@@ -68,6 +69,7 @@ import { HttpServer } from './Http';
 import { PgBossQueue, isValidQueue } from './PgBoss';
 import { ProjectionName } from './Projection';
 import { dbCacheValidator } from './util/validators';
+import { readScheduleConfig } from './util/schedule';
 import fs from 'fs';
 import onDeath from 'death';
 import path from 'path';
@@ -157,6 +159,13 @@ addOptions(withCommonOptions(projectorWithArgs, PROJECTOR_API_URL_DEFAULT), [
     POOLS_METRICS_INTERVAL_DEFAULT
   ),
   newOption(
+    '--pools-metrics-outdated-interval <poolsMetricsOutdatedInterval>',
+    ProjectorOptionDescriptions.PoolsMetricsOutdatedInterval,
+    'POOLS_METRICS_OUTDATED_INTERVAL',
+    (interval) => Number.parseInt(interval, 10),
+    POOLS_METRICS_OUTDATED_INTERVAL_DEFAULT
+  ),
+  newOption(
     '--projection-names <projectionNames>',
     `List of projections to start: ${Object.values(ProjectionName).toString()}`,
     'PROJECTION_NAMES',
@@ -241,6 +250,12 @@ addOptions(withOgmiosOptions(withRabbitMqOptions(withHandlePolicyIdsOptions(prov
     EPOCH_POLL_INTERVAL_DEFAULT
   ),
   newOption(
+    '--submit-api-url <submitApiUrl>',
+    ProviderServerOptionDescriptions.SubmitApiUrl,
+    'SUBMIT_API_URL',
+    (url) => new URL(url)
+  ),
+  newOption(
     '--token-metadata-server-url <tokenMetadataServerUrl>',
     ProviderServerOptionDescriptions.TokenMetadataServerUrl,
     'TOKEN_METADATA_SERVER_URL',
@@ -316,6 +331,13 @@ addOptions(withOgmiosOptions(withRabbitMqOptions(withHandlePolicyIdsOptions(prov
     'HANDLE_PROVIDER_SERVER_URL',
     (serverUrl: string) => serverUrl,
     HANDLE_PROVIDER_SERVER_URL_DEFAULT
+  ),
+  newOption(
+    '--use-submit-api <true/false>',
+    ProviderServerOptionDescriptions.UseSubmitApi,
+    'USE_SUBMIT_API',
+    (value) => stringOptionToBoolean(value, Programs.ProviderServer, ProviderServerOptionDescriptions.UseSubmitApi),
+    false
   ),
   newOption(
     '--use-typeorm-asset-provider <true/false>',
@@ -457,7 +479,17 @@ addOptions(
       for (const queue of queuesArray) if (!isValidQueue(queue)) throw new Error(`Unknown queue name: '${queue}'`);
 
       return queuesArray;
-    }).makeOptionMandatory()
+    }).makeOptionMandatory(),
+    newOption(
+      '--schedules <schedules>',
+      PgBossWorkerOptionDescriptions.Queues,
+      'SCHEDULES',
+      (schedules) => {
+        if (!fs.existsSync(schedules)) throw new Error(`File does not exist: ${schedules}`);
+        return readScheduleConfig(schedules);
+      },
+      []
+    )
   ]
 ).action(async (args: PgBossWorkerArgs) =>
   runServer('pg-boss worker', () =>

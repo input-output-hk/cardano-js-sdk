@@ -9,9 +9,11 @@ import {
   HandleMetadataEntity,
   NftMetadataEntity,
   OutputEntity,
+  PoolDelistedEntity,
   PoolMetadataEntity,
   PoolRegistrationEntity,
   PoolRetirementEntity,
+  PoolRewardsEntity,
   StakeKeyRegistrationEntity,
   StakePoolEntity,
   TokensEntity,
@@ -24,25 +26,27 @@ import {
   storeNftMetadata,
   storeStakeKeyRegistrations,
   storeStakePoolMetadataJob,
+  storeStakePoolRewardsJob,
   storeStakePools,
   storeUtxo
 } from '@cardano-sdk/projection-typeorm';
 import { Cardano } from '@cardano-sdk/core';
 import { Mappers as Mapper } from '@cardano-sdk/projection';
-import { POOLS_METRICS_INTERVAL_DEFAULT } from '../Program/programs/types';
+import { POOLS_METRICS_INTERVAL_DEFAULT, POOLS_METRICS_OUTDATED_INTERVAL_DEFAULT } from '../Program/programs/types';
 import { Sorter } from '@hapi/topo';
 import { WithLogger } from '@cardano-sdk/util';
 import { passthrough } from '@cardano-sdk/util-rxjs';
 
 /** Used as mount segments, so must be URL-friendly */
 export enum ProjectionName {
+  Address = 'address',
   Asset = 'asset',
   Handle = 'handle',
   StakePool = 'stake-pool',
   StakePoolMetadataJob = 'stake-pool-metadata-job',
   StakePoolMetricsJob = 'stake-pool-metrics-job',
-  UTXO = 'utxo',
-  Address = 'address'
+  StakePoolRewardsJob = 'stake-pool-rewards-job',
+  UTXO = 'utxo'
 }
 
 export interface ProjectionOptions {
@@ -100,9 +104,13 @@ export const storeOperators = {
   storeHandleMetadata: storeHandleMetadata(),
   storeHandles: storeHandles(),
   storeNftMetadata: storeNftMetadata(),
-  storePoolMetricsUpdateJob: createStorePoolMetricsUpdateJob(POOLS_METRICS_INTERVAL_DEFAULT)(),
+  storePoolMetricsUpdateJob: createStorePoolMetricsUpdateJob(
+    POOLS_METRICS_INTERVAL_DEFAULT,
+    POOLS_METRICS_OUTDATED_INTERVAL_DEFAULT
+  )(),
   storeStakeKeyRegistrations: storeStakeKeyRegistrations(),
   storeStakePoolMetadataJob: storeStakePoolMetadataJob(),
+  storeStakePoolRewardsJob: storeStakePoolRewardsJob(),
   storeStakePools: storeStakePools(),
   storeUtxo: storeUtxo()
 };
@@ -120,9 +128,11 @@ const entities = {
   handleMetadata: HandleMetadataEntity,
   nftMetadata: NftMetadataEntity,
   output: OutputEntity,
+  poolDelisted: PoolDelistedEntity,
   poolMetadata: PoolMetadataEntity,
   poolRegistration: PoolRegistrationEntity,
   poolRetirement: PoolRetirementEntity,
+  poolRewards: PoolRewardsEntity,
   stakeKeyRegistration: StakeKeyRegistrationEntity,
   stakePool: StakePoolEntity,
   tokens: TokensEntity
@@ -141,8 +151,11 @@ const storeEntities: Partial<Record<StoreName, EntityName[]>> = {
   storeNftMetadata: ['asset'],
   storePoolMetricsUpdateJob: ['stakePool', 'currentPoolMetrics', 'poolMetadata'],
   storeStakeKeyRegistrations: ['block', 'stakeKeyRegistration'],
+  // 'stake-pool' projection requires it, but `storeStakePools` does not.
+  // at the time of writing there was no way to specify a direct projection->entity dependency.
   storeStakePoolMetadataJob: ['stakePool', 'currentPoolMetrics', 'poolMetadata'],
-  storeStakePools: ['stakePool', 'currentPoolMetrics', 'poolMetadata'],
+  storeStakePoolRewardsJob: ['poolRewards', 'stakePool'],
+  storeStakePools: ['stakePool', 'currentPoolMetrics', 'poolMetadata', 'poolDelisted'],
   storeUtxo: ['tokens', 'output']
 };
 
@@ -154,6 +167,7 @@ const entityInterDependencies: Partial<Record<EntityName, EntityName[]>> = {
   handle: ['asset'],
   handleMetadata: ['output'],
   output: ['block', 'tokens'],
+  poolDelisted: ['stakePool'],
   poolMetadata: ['stakePool'],
   poolRegistration: ['block'],
   poolRetirement: ['block'],
@@ -214,19 +228,21 @@ const storeInterDependencies: Partial<Record<StoreName, StoreName[]>> = {
   storeNftMetadata: ['storeAssets'],
   storePoolMetricsUpdateJob: ['storeBlock'],
   storeStakePoolMetadataJob: ['storeBlock'],
+  storeStakePoolRewardsJob: ['storeBlock'],
   storeStakePools: ['storeBlock'],
   storeUtxo: ['storeBlock', 'storeAssets']
 };
 
 const projectionStoreDependencies: Record<ProjectionName, StoreName[]> = {
   address: ['storeAddresses'],
-  asset: ['storeAssets'],
+  asset: ['storeAssets', 'storeNftMetadata'],
   // TODO: remove storeNftMetadata when TypeormAssetProvider tests
   // are updated to use 'asset' database instead of a handle database
   handle: ['storeHandles', 'storeHandleMetadata', 'storeNftMetadata'],
   'stake-pool': ['storeStakePools'],
   'stake-pool-metadata-job': ['storeStakePoolMetadataJob'],
   'stake-pool-metrics-job': ['storePoolMetricsUpdateJob'],
+  'stake-pool-rewards-job': ['storeStakePoolRewardsJob'],
   utxo: ['storeUtxo']
 };
 

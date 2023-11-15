@@ -14,7 +14,8 @@ export const PG_BOSS_WORKER_API_URL_DEFAULT = new URL('http://localhost:3003');
 
 export enum PgBossWorkerOptionDescriptions {
   ParallelJobs = 'Parallel jobs to run',
-  Queues = 'Comma separated queue names'
+  Queues = 'Comma separated queue names',
+  Schedules = 'File path for schedules configurations'
 }
 
 export interface LoadPgBossWorkerDependencies {
