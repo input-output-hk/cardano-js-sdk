@@ -25,17 +25,20 @@ import {
   TxTokenMap,
   VoteDelegationCertModel,
   VoteRegistrationDelegationCertModel,
+  VotingProceduresModel,
   WithCertIndex,
   WithCertType,
   WithdrawalModel
 } from './types';
 import { Cardano } from '@cardano-sdk/core';
 import { DB_MAX_SAFE_INTEGER, findTxsByAddresses } from './queries';
+import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { Logger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
 import { Range, hexStringToBuffer } from '@cardano-sdk/util';
 import { extractCompoundCertificates } from './util';
 import {
+  mapAnchor,
   mapCertificate,
   mapRedeemer,
   mapTxId,
@@ -47,6 +50,46 @@ import {
 } from './mappers';
 import omit from 'lodash/omit';
 import orderBy from 'lodash/orderBy';
+
+const { CredentialType, VoterType } = Cardano;
+
+const getVoter = (
+  txId: Cardano.TransactionId,
+  { committee_voter, drep_has_script, drep_voter, pool_voter, voter_role }: VotingProceduresModel
+): Cardano.Voter => {
+  let hash: Hash28ByteBase16;
+
+  switch (voter_role) {
+    case 'ConstitutionalCommittee':
+      if (!(committee_voter instanceof Buffer)) throw new Error(`Unexpected committee_voter for tx "${txId}"`);
+
+      hash = committee_voter.toString('hex') as Hash28ByteBase16;
+
+      // With current db-sync version it is not possible to distinguish type between
+      // CredentialType.ScriptHash and CredentialType.KeyHash
+      // Once https://github.com/input-output-hk/cardano-db-sync/issues/1571 it will be included in db-sync
+      // we should probably improve the query and following statement as well
+      return { __typename: VoterType.ccHotKeyHash, credential: { hash, type: CredentialType.KeyHash } };
+
+    case 'DRep':
+      if (!(drep_voter instanceof Buffer)) throw new Error(`Unexpected drep_voter for tx "${txId}"`);
+
+      hash = drep_voter.toString('hex') as Hash28ByteBase16;
+
+      return drep_has_script
+        ? { __typename: VoterType.dRepScriptHash, credential: { hash, type: CredentialType.ScriptHash } }
+        : { __typename: VoterType.dRepKeyHash, credential: { hash, type: CredentialType.KeyHash } };
+
+    case 'SPO':
+      if (!(pool_voter instanceof Buffer)) throw new Error(`Unexpected pool_voter for tx "${txId}"`);
+
+      hash = pool_voter.toString('hex') as Hash28ByteBase16;
+
+      return { __typename: VoterType.stakePoolKeyHash, credential: { hash, type: CredentialType.KeyHash } };
+  }
+
+  throw new Error(`Unknown voter_role "${voter_role}" for tx "${txId}"`);
+};
 
 export class ChainHistoryBuilder {
   #db: Pool;
@@ -142,6 +185,51 @@ export class ChainHistoryBuilder {
       redeemerMap.set(txId, [...currentRedeemers, mapRedeemer(redeemer)]);
     }
     return redeemerMap;
+  }
+
+  public async queryVotingProceduresByIds(ids: string[]): Promise<TransactionDataMap<Cardano.VotingProcedures>> {
+    const { rows } = await this.#db.query<VotingProceduresModel>({
+      name: 'voting_procedures',
+      text: Queries.findVotingProceduresByTxIds,
+      values: [ids]
+    });
+
+    const result = new Map<Cardano.TransactionId, Cardano.VotingProcedures>();
+
+    for (const row of rows) {
+      const { data_hash, governance_action_index, governance_action_tx_id, tx_id, url, vote } = row;
+      const txId = tx_id.toString('hex') as Cardano.TransactionId;
+      const voter = getVoter(txId, row);
+
+      const procedures = (() => {
+        const value = result.get(txId);
+        if (value) return value;
+        const empty: Cardano.VotingProcedures = [];
+        result.set(txId, empty);
+        return empty;
+      })();
+
+      const procedure = (() => {
+        const value = procedures.find(
+          ({ voter: { __typename, credential } }) =>
+            __typename === voter.__typename && credential.hash === voter.credential.hash
+        );
+        if (value) return value;
+        const newProcedure: Cardano.VotingProcedures[number] = { voter, votes: [] };
+        procedures.push(newProcedure);
+        return newProcedure;
+      })();
+
+      procedure.votes.push({
+        actionId: {
+          actionIndex: governance_action_index,
+          id: governance_action_tx_id.toString('hex') as Cardano.TransactionId
+        },
+        votingProcedure: { anchor: data_hash ? mapAnchor(url, data_hash.toString('hex')) : null, vote }
+      });
+    }
+
+    return result;
   }
 
   public async queryCertificatesByIds(ids: string[]): Promise<TransactionDataMap<Cardano.Certificate[]>> {

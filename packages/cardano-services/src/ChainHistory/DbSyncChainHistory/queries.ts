@@ -173,13 +173,40 @@ export const findRedeemersByTxIds = `
 	WHERE tx.id = ANY($1)
 	ORDER BY redeemer.id ASC`;
 
+export const findVotingProceduresByTxIds = `
+	SELECT
+		tx.hash AS tx_id,
+		voter_role,
+		committee_voter,
+		dh.raw AS drep_voter,
+		dh.has_script AS drep_has_script,
+		ph.hash_raw as pool_voter,
+		tx2.hash AS governance_action_tx_id,
+		ga.index::INTEGER AS governance_action_index,
+		CASE
+			WHEN vote = 'No' THEN 0
+			WHEN vote = 'Yes' THEN 1
+			WHEN vote = 'Abstain' THEN 2
+		END AS vote,
+		va.url,
+		va.data_hash
+	FROM tx
+	JOIN voting_procedure AS vp ON vp.tx_id = tx.id
+	JOIN governance_action AS ga ON governance_action_id = ga.id
+	JOIN tx AS tx2 ON ga.tx_id = tx2.id
+	LEFT JOIN drep_hash AS dh ON drep_voter = dh.id
+	LEFT JOIN pool_hash AS ph ON pool_voter = ph.id
+	LEFT JOIN voting_anchor AS va ON vp.voting_anchor_id = va.id
+	WHERE tx.id = ANY($1)
+	ORDER BY vp.index`;
+
 export const findPoolRetireCertsTxIds = `
-	SELECT 
+	SELECT
 		cert.cert_index AS cert_index,
 		cert.retiring_epoch AS retiring_epoch,
 		pool."view" AS pool_id,
 		tx.hash AS tx_id
-	FROM tx 
+	FROM tx
 	JOIN pool_retire AS cert ON cert.announced_tx_id = tx.id
 	JOIN pool_hash AS pool ON pool.id = cert.hash_id
 	WHERE tx.id = ANY($1)

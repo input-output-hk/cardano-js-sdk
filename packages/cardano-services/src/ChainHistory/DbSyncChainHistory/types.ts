@@ -102,6 +102,24 @@ export interface RedeemerModel {
   tx_id: Buffer;
 }
 
+type VoterRole = 'ConstitutionalCommittee' | 'DRep' | 'SPO';
+
+export interface VotingProceduresModel {
+  tx_id: Buffer;
+  voter_role: VoterRole;
+  drep_voter: Buffer | null;
+  committee_voter: Buffer | null;
+  pool_voter: Buffer | null;
+  governance_action_tx_id: Buffer;
+  governance_action_index: number;
+  drep_hash_raw: string;
+  drep_has_script: boolean;
+  pool_hash_hash_raw: string;
+  vote: Cardano.Vote;
+  url: string;
+  data_hash: Buffer | null;
+}
+
 export interface CertificateModel {
   cert_index: number;
   tx_id: Buffer;
