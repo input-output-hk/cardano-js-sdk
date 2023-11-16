@@ -65,7 +65,9 @@ describe('injectGlobal', () => {
         'apiVersion',
         'supportedExtensions',
         'icon',
-        'name'
+        'name',
+        'enable',
+        'isEnabled'
       ]);
       expect(window.cardano['another-obj']).toBe(anotherObj);
     });

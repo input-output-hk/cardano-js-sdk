@@ -120,6 +120,8 @@ export class Cip30Wallet {
     this.#api = api;
     this.#logger = logger;
     this.#authenticator = authenticator;
+    this.enable = this.enable.bind(this);
+    this.isEnabled = this.isEnabled.bind(this);
   }
 
   #validateExtensions(extensions: WalletApiExtension[] = []): void {
