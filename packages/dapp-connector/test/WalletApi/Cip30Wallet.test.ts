@@ -41,6 +41,16 @@ describe('Wallet', () => {
     expect(typeof wallet.enable).toBe('function');
   });
 
+  it('should return initial api as plain javascript object', () => {
+    // Verbose to enable easy detection of which are missing
+    expect(wallet.hasOwnProperty('apiVersion')).toBe(true);
+    expect(wallet.hasOwnProperty('enable')).toBe(true);
+    expect(wallet.hasOwnProperty('icon')).toBe(true);
+    expect(wallet.hasOwnProperty('isEnabled')).toBe(true);
+    expect(wallet.hasOwnProperty('name')).toBe(true);
+    expect(wallet.hasOwnProperty('supportedExtensions')).toBe(true);
+  });
+
   describe('enable', () => {
     test('no extensions', async () => {
       expect(await wallet.isEnabled()).toBe(false);
