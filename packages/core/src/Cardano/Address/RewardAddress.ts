@@ -35,7 +35,7 @@ export class RewardAddress {
   static fromCredentials(networkId: NetworkId, payment: Credential): RewardAddress {
     let type = AddressType.RewardKey;
 
-    if (payment.type === CredentialType.ScriptHash) type &= 0b0001;
+    if (payment.type === CredentialType.ScriptHash) type |= 0b0001;
 
     return new RewardAddress({
       networkId,
