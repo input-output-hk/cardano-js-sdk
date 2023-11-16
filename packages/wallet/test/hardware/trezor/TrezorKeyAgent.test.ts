@@ -3,6 +3,7 @@ import { AddressType, CommunicationType, SerializableTrezorKeyAgentData, util } 
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import { PersonalWallet, setupWallet } from '../../../src';
 import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
@@ -69,6 +70,11 @@ describe('TrezorKeyAgent', () => {
 
   describe('sign transaction', () => {
     const poolId = Cardano.PoolId('pool1ev8vy6fyj7693ergzty2t0azjvw35tvkt2vcjwpgajqs7z6u2vn');
+    const scriptReference: Cardano.PlutusScript = {
+      __type: Cardano.ScriptType.Plutus,
+      bytes: HexBlob('b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450'),
+      version: Cardano.PlutusLanguageVersion.V1
+    };
     const outputs = {
       outputWithAssets: {
         address: Cardano.PaymentAddress(
@@ -97,6 +103,14 @@ describe('TrezorKeyAgent', () => {
           'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w'
         ),
         datum: 123n,
+        value: { coins: 11_111_111n }
+      },
+      simpleOutputWithReferenceScript: {
+        address: Cardano.PaymentAddress(
+          'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w'
+        ),
+        datumHash: Hash32ByteBase16('b6eb57092c330973b23784ac39426921eebd8376343409c03f613fa1a2017126'),
+        scriptReference,
         value: { coins: 11_111_111n }
       }
     };
@@ -286,6 +300,19 @@ describe('TrezorKeyAgent', () => {
     it('successfully signs simple transaction with inline datum', async () => {
       props = {
         outputs: new Set<Cardano.TxOut>([outputs.simpleOutputWithInlineDatum])
+      };
+      txInternals = await wallet.initializeTx(props);
+
+      const signatures = await keyAgent.signTransaction({
+        body: txInternals.body,
+        hash: txInternals.hash
+      });
+      expect(signatures.size).toBe(2);
+    });
+
+    it('successfully signs simple transaction with reference script', async () => {
+      props = {
+        outputs: new Set<Cardano.TxOut>([outputs.simpleOutputWithReferenceScript])
       };
       txInternals = await wallet.initializeTx(props);
 
