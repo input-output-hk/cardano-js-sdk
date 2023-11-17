@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { BigIntMath } from '@cardano-sdk/util';
 import {
   BlockModel,
@@ -147,10 +148,15 @@ export const mapCertificate = (
   if (isStakeCertModel(certModel))
     return {
       __typename: certModel.registration
-        ? Cardano.CertificateType.StakeKeyRegistration
-        : Cardano.CertificateType.StakeKeyDeregistration,
+        ? Cardano.CertificateType.StakeRegistration
+        : Cardano.CertificateType.StakeDeregistration,
       cert_index: certModel.cert_index,
-      stakeKeyHash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(certModel.address))
+      stakeCredential: {
+        hash: Cardano.RewardAccount.toHash(
+          Cardano.RewardAccount(certModel.address)
+        ) as unknown as Crypto.Hash28ByteBase16,
+        type: Cardano.CredentialType.KeyHash
+      }
     } as WithCertIndex<Cardano.StakeAddressCertificate>;
 
   if (isDelegationCertModel(certModel))
@@ -158,7 +164,12 @@ export const mapCertificate = (
       __typename: Cardano.CertificateType.StakeDelegation,
       cert_index: certModel.cert_index,
       poolId: certModel.pool_id as unknown as Cardano.PoolId,
-      stakeKeyHash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(certModel.address))
+      stakeCredential: {
+        hash: Cardano.RewardAccount.toHash(
+          Cardano.RewardAccount(certModel.address)
+        ) as unknown as Crypto.Hash28ByteBase16,
+        type: Cardano.CredentialType.KeyHash
+      }
     } as WithCertIndex<Cardano.StakeDelegationCertificate>;
 
   return null;

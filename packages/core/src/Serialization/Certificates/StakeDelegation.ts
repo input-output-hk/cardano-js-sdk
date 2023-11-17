@@ -113,8 +113,8 @@ export class StakeDelegation {
   toCore(): Cardano.StakeDelegationCertificate {
     return {
       __typename: Cardano.CertificateType.StakeDelegation,
-      poolId: Cardano.PoolId.fromKeyHash(this.#poolKeyHash), // TODO: Core type does not support script hash as credential, fix?;
-      stakeKeyHash: Crypto.Ed25519KeyHashHex(this.#credential.hash)
+      poolId: Cardano.PoolId.fromKeyHash(this.#poolKeyHash),
+      stakeCredential: this.#credential
     };
   }
 
@@ -124,10 +124,7 @@ export class StakeDelegation {
    * @param cert core StakeDelegationCertificate object.
    */
   static fromCore(cert: Cardano.StakeDelegationCertificate) {
-    return new StakeDelegation(
-      { hash: Crypto.Hash28ByteBase16(cert.stakeKeyHash), type: Cardano.CredentialType.KeyHash },
-      Cardano.PoolId.toKeyHash(cert.poolId)
-    ); // TODO: Core type does not support script hash as credential, fix?
+    return new StakeDelegation(cert.stakeCredential, Cardano.PoolId.toKeyHash(cert.poolId));
   }
 
   /**

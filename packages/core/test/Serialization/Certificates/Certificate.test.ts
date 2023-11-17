@@ -49,8 +49,11 @@ describe('Certificate', () => {
 
     it('can decode StakeRegistration from Core', () => {
       const core: Cardano.StakeAddressCertificate = {
-        __typename: Cardano.CertificateType.StakeKeyRegistration,
-        stakeKeyHash: Crypto.Ed25519KeyHashHex('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f')
+        __typename: Cardano.CertificateType.StakeRegistration,
+        stakeCredential: {
+          hash: Crypto.Hash28ByteBase16('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f'),
+          type: Cardano.CredentialType.KeyHash
+        }
       };
 
       const certificate = Certificate.fromCore(core);
@@ -69,8 +72,11 @@ describe('Certificate', () => {
 
     it('can encode StakeRegistration to CBOR', () => {
       const core: Cardano.StakeAddressCertificate = {
-        __typename: Cardano.CertificateType.StakeKeyRegistration,
-        stakeKeyHash: Crypto.Ed25519KeyHashHex('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f')
+        __typename: Cardano.CertificateType.StakeRegistration,
+        stakeCredential: {
+          hash: Crypto.Hash28ByteBase16('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f'),
+          type: Cardano.CredentialType.KeyHash
+        }
       };
 
       const certificate = Certificate.fromCore(core);
@@ -84,8 +90,11 @@ describe('Certificate', () => {
       const certificate = Certificate.fromCbor(cbor);
 
       expect(certificate.toCore()).toEqual({
-        __typename: Cardano.CertificateType.StakeKeyRegistration,
-        stakeKeyHash: Crypto.Ed25519KeyHashHex('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f')
+        __typename: Cardano.CertificateType.StakeRegistration,
+        stakeCredential: {
+          hash: Crypto.Hash28ByteBase16('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f'),
+          type: Cardano.CredentialType.KeyHash
+        }
       });
     });
   });
@@ -110,8 +119,11 @@ describe('Certificate', () => {
 
     it('can decode StakeDeregistration from Core', () => {
       const core: Cardano.StakeAddressCertificate = {
-        __typename: Cardano.CertificateType.StakeKeyDeregistration,
-        stakeKeyHash: Crypto.Ed25519KeyHashHex('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f')
+        __typename: Cardano.CertificateType.StakeDeregistration,
+        stakeCredential: {
+          hash: Crypto.Hash28ByteBase16('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f'),
+          type: Cardano.CredentialType.KeyHash
+        }
       };
 
       const certificate = Certificate.fromCore(core);
@@ -130,8 +142,11 @@ describe('Certificate', () => {
 
     it('can encode StakeDeregistration to CBOR', () => {
       const core: Cardano.StakeAddressCertificate = {
-        __typename: Cardano.CertificateType.StakeKeyDeregistration,
-        stakeKeyHash: Crypto.Ed25519KeyHashHex('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f')
+        __typename: Cardano.CertificateType.StakeDeregistration,
+        stakeCredential: {
+          hash: Crypto.Hash28ByteBase16('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f'),
+          type: Cardano.CredentialType.KeyHash
+        }
       };
 
       const certificate = Certificate.fromCore(core);
@@ -145,8 +160,11 @@ describe('Certificate', () => {
       const certificate = Certificate.fromCbor(cbor);
 
       expect(certificate.toCore()).toEqual({
-        __typename: Cardano.CertificateType.StakeKeyDeregistration,
-        stakeKeyHash: Crypto.Ed25519KeyHashHex('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f')
+        __typename: Cardano.CertificateType.StakeDeregistration,
+        stakeCredential: {
+          hash: Crypto.Hash28ByteBase16('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f'),
+          type: Cardano.CredentialType.KeyHash
+        }
       });
     });
   });
@@ -175,7 +193,10 @@ describe('Certificate', () => {
       const core: Cardano.StakeDelegationCertificate = {
         __typename: Cardano.CertificateType.StakeDelegation,
         poolId: Cardano.PoolId('pool1mpgg03jxj52qwxvvy7cmj58a96vl9pvxcqqvuw0kumheygxmn34'),
-        stakeKeyHash: Crypto.Ed25519KeyHashHex('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f')
+        stakeCredential: {
+          hash: Crypto.Hash28ByteBase16('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f'),
+          type: Cardano.CredentialType.KeyHash
+        }
       };
 
       const certificate = Certificate.fromCore(core);
@@ -196,7 +217,10 @@ describe('Certificate', () => {
       const core: Cardano.StakeDelegationCertificate = {
         __typename: Cardano.CertificateType.StakeDelegation,
         poolId: Cardano.PoolId('pool1mpgg03jxj52qwxvvy7cmj58a96vl9pvxcqqvuw0kumheygxmn34'),
-        stakeKeyHash: Crypto.Ed25519KeyHashHex('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f')
+        stakeCredential: {
+          hash: Crypto.Hash28ByteBase16('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f'),
+          type: Cardano.CredentialType.KeyHash
+        }
       };
 
       const certificate = Certificate.fromCore(core);
@@ -216,7 +240,10 @@ describe('Certificate', () => {
       expect(certificate.toCore()).toEqual({
         __typename: Cardano.CertificateType.StakeDelegation,
         poolId: Cardano.PoolId('pool1mpgg03jxj52qwxvvy7cmj58a96vl9pvxcqqvuw0kumheygxmn34'),
-        stakeKeyHash: Crypto.Ed25519KeyHashHex('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f')
+        stakeCredential: {
+          hash: Crypto.Hash28ByteBase16('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f'),
+          type: Cardano.CredentialType.KeyHash
+        }
       });
     });
   });

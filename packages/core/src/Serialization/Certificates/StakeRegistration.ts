@@ -2,7 +2,6 @@ import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborWriter } from '../CBOR';
 import { CertificateKind } from './CertificateKind';
-import { CredentialType } from '../../Cardano';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
 const EMBEDDED_GROUP_SIZE = 2;
@@ -105,8 +104,8 @@ export class StakeRegistration {
    */
   toCore(): Cardano.StakeAddressCertificate {
     return {
-      __typename: Cardano.CertificateType.StakeKeyRegistration,
-      stakeKeyHash: Crypto.Ed25519KeyHashHex(this.#credential.hash) // TODO: Core type does not support script hash as credential, fix?
+      __typename: Cardano.CertificateType.StakeRegistration,
+      stakeCredential: this.#credential
     };
   }
 
@@ -116,7 +115,7 @@ export class StakeRegistration {
    * @param cert core StakeAddressCertificate object.
    */
   static fromCore(cert: Cardano.StakeAddressCertificate) {
-    return new StakeRegistration({ hash: Crypto.Hash28ByteBase16(cert.stakeKeyHash), type: CredentialType.KeyHash }); // TODO: Core type does not support script hash as credential, fix?
+    return new StakeRegistration(cert.stakeCredential);
   }
 
   /**

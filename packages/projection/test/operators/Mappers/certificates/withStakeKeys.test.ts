@@ -12,15 +12,21 @@ describe('withStakeKeys', () => {
         certificates: [
           {
             certificate: {
-              __typename: Cardano.CertificateType.StakeKeyRegistration,
-              stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
+              __typename: Cardano.CertificateType.StakeRegistration,
+              stakeCredential: {
+                hash: Crypto.Hash28ByteBase16('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b'),
+                type: Cardano.CredentialType.KeyHash
+              }
             },
             pointer: {} as Cardano.Pointer
           },
           {
             certificate: {
-              __typename: Cardano.CertificateType.StakeKeyDeregistration,
-              stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857c')
+              __typename: Cardano.CertificateType.StakeDeregistration,
+              stakeCredential: {
+                hash: Crypto.Hash28ByteBase16('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857c'),
+                type: Cardano.CredentialType.KeyHash
+              }
             },
             pointer: {} as Cardano.Pointer
           }
@@ -40,15 +46,21 @@ describe('withStakeKeys', () => {
         certificates: [
           {
             certificate: {
-              __typename: Cardano.CertificateType.StakeKeyRegistration,
-              stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
+              __typename: Cardano.CertificateType.StakeRegistration,
+              stakeCredential: {
+                hash: Crypto.Hash28ByteBase16('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b'),
+                type: Cardano.CredentialType.KeyHash
+              }
             },
             pointer: {} as Cardano.Pointer
           },
           {
             certificate: {
-              __typename: Cardano.CertificateType.StakeKeyDeregistration,
-              stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857c')
+              __typename: Cardano.CertificateType.StakeDeregistration,
+              stakeCredential: {
+                hash: Crypto.Hash28ByteBase16('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857c'),
+                type: Cardano.CredentialType.KeyHash
+              }
             },
             pointer: {} as Cardano.Pointer
           }
@@ -68,15 +80,21 @@ describe('withStakeKeys', () => {
         certificates: [
           {
             certificate: {
-              __typename: Cardano.CertificateType.StakeKeyRegistration,
-              stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
+              __typename: Cardano.CertificateType.StakeRegistration,
+              stakeCredential: {
+                hash: Crypto.Hash28ByteBase16('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b'),
+                type: Cardano.CredentialType.KeyHash
+              }
             },
             pointer: {} as Cardano.Pointer
           },
           {
             certificate: {
-              __typename: Cardano.CertificateType.StakeKeyDeregistration,
-              stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
+              __typename: Cardano.CertificateType.StakeDeregistration,
+              stakeCredential: {
+                hash: Crypto.Hash28ByteBase16('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b'),
+                type: Cardano.CredentialType.KeyHash
+              }
             },
             pointer: {} as Cardano.Pointer
           }
@@ -95,15 +113,21 @@ describe('withStakeKeys', () => {
         certificates: [
           {
             certificate: {
-              __typename: Cardano.CertificateType.StakeKeyDeregistration,
-              stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
+              __typename: Cardano.CertificateType.StakeDeregistration,
+              stakeCredential: {
+                hash: Crypto.Hash28ByteBase16('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b'),
+                type: Cardano.CredentialType.KeyHash
+              }
             },
             pointer: {} as Cardano.Pointer
           },
           {
             certificate: {
-              __typename: Cardano.CertificateType.StakeKeyRegistration,
-              stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
+              __typename: Cardano.CertificateType.StakeRegistration,
+              stakeCredential: {
+                hash: Crypto.Hash28ByteBase16('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b'),
+                type: Cardano.CredentialType.KeyHash
+              }
             },
             pointer: {} as Cardano.Pointer
           }

@@ -1,5 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Cardano from '../../../src/Cardano';
+import * as Crypto from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 import { Unregistration } from '../../../src/Serialization';
 
@@ -8,7 +9,10 @@ const cbor = HexBlob('83088200581c0000000000000000000000000000000000000000000000
 const core = {
   __typename: 'UnRegistrationCertificate',
   deposit: 0n,
-  stakeKeyHash: '00000000000000000000000000000000000000000000000000000000'
+  stakeCredential: {
+    hash: Crypto.Hash28ByteBase16('00000000000000000000000000000000000000000000000000000000'),
+    type: Cardano.CredentialType.KeyHash
+  }
 } as Cardano.NewStakeAddressCertificate;
 
 describe('Unregistration', () => {

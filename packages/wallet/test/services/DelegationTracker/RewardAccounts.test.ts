@@ -2,6 +2,7 @@
 /* eslint-disable no-multi-spaces */
 /* eslint-disable prettier/prettier */
 /* eslint-disable sonarjs/no-duplicate-string */
+import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
 import { EMPTY, Observable, firstValueFrom, of } from 'rxjs';
 import { InMemoryStakePoolsStore, KeyValueStore } from '../../../src/persistence';
@@ -91,7 +92,7 @@ describe('RewardAccounts', () => {
   test('getStakePoolIdAtEpoch ', () => {
     const transactions = [
       {
-        certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration } as Cardano.StakeAddressCertificate],
+        certificates: [{ __typename: Cardano.CertificateType.StakeRegistration } as Cardano.StakeAddressCertificate],
         epoch: Cardano.EpochNo(100)
       },
       {
@@ -102,7 +103,7 @@ describe('RewardAccounts', () => {
       },
       {
         certificates: [
-          { __typename: Cardano.CertificateType.StakeKeyDeregistration } as Cardano.StakeAddressCertificate
+          { __typename: Cardano.CertificateType.StakeDeregistration } as Cardano.StakeAddressCertificate
         ],
         epoch: Cardano.EpochNo(102)
       },
@@ -131,7 +132,11 @@ describe('RewardAccounts', () => {
             tx: {
               body: {
                 certificates: [{
-                  __typename: Cardano.CertificateType.StakeKeyRegistration, stakeKeyHash
+                  __typename: Cardano.CertificateType.StakeRegistration,
+                  stakeCredential: {
+                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+                    type: Cardano.CredentialType.KeyHash
+                  }
                 }]
               }
             }
@@ -142,7 +147,11 @@ describe('RewardAccounts', () => {
             tx: {
               body: {
                 certificates: [{
-                  __typename: Cardano.CertificateType.StakeKeyRegistration, stakeKeyHash
+                  __typename: Cardano.CertificateType.StakeRegistration,
+                  stakeCredential: {
+                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+                    type: Cardano.CredentialType.KeyHash
+                  }
                 }]
               }
             }
@@ -151,7 +160,11 @@ describe('RewardAccounts', () => {
             tx: {
               body: {
                 certificates: [{
-                  __typename: Cardano.CertificateType.StakeKeyDeregistration, stakeKeyHash
+                  __typename: Cardano.CertificateType.StakeDeregistration,
+                  stakeCredential: {
+                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+                    type: Cardano.CredentialType.KeyHash
+                  }
                 }]
               }
             }
@@ -163,7 +176,11 @@ describe('RewardAccounts', () => {
         b: [
           {
             body: {
-              certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, stakeKeyHash }]
+              certificates: [{ __typename: Cardano.CertificateType.StakeRegistration,
+                stakeCredential: {
+                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+                  type: Cardano.CredentialType.KeyHash
+                } }]
             } as Cardano.TxBody,
             cbor: dummyCbor,
             id: txId1
@@ -172,7 +189,11 @@ describe('RewardAccounts', () => {
         c: [
           {
             body: {
-              certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, stakeKeyHash }]
+              certificates: [{ __typename: Cardano.CertificateType.StakeDeregistration,
+                stakeCredential: {
+                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+                  type: Cardano.CredentialType.KeyHash
+                } }]
             } as Cardano.TxBody,
             cbor: dummyCbor,
             id: txId2
@@ -368,7 +389,7 @@ describe('RewardAccounts', () => {
             a: [
               {
                 certificates: [
-                  { __typename: Cardano.CertificateType.StakeKeyRegistration } as Cardano.StakeAddressCertificate,
+                  { __typename: Cardano.CertificateType.StakeRegistration } as Cardano.StakeAddressCertificate,
                   {
                     __typename: Cardano.CertificateType.StakeDelegation,
                     poolId: poolId1

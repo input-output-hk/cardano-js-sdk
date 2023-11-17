@@ -483,11 +483,17 @@ Object {
           Object {
             "__typename": "StakeDelegationCertificate",
             "poolId": "pool15erywju02scjv9gxkmp885c8catf5n4ke9459h2299fq57u9c3e",
-            "stakeKeyHash": "f2f6381fa7a3dcc144939b47dffb7dad677856dfbbee4c4b7e426049",
+            "stakeCredential": Object {
+              "hash": "f2f6381fa7a3dcc144939b47dffb7dad677856dfbbee4c4b7e426049",
+              "type": 0,
+            },
           },
           Object {
-            "__typename": "StakeKeyDeregistrationCertificate",
-            "stakeKeyHash": "f2f6381fa7a3dcc144939b47dffb7dad677856dfbbee4c4b7e426049",
+            "__typename": "StakeDeregistrationCertificate",
+            "stakeCredential": Object {
+              "hash": "f2f6381fa7a3dcc144939b47dffb7dad677856dfbbee4c4b7e426049",
+              "type": 0,
+            },
           },
           Object {
             "__typename": "PoolRetirementCertificate",
@@ -599,8 +605,11 @@ Object {
         "auxiliaryDataHash": undefined,
         "certificates": Array [
           Object {
-            "__typename": "StakeKeyRegistrationCertificate",
-            "stakeKeyHash": "b5ae663aaea8e500157bdf4baafd6f5ba0ce5759f7cd4101fc132f54",
+            "__typename": "StakeRegistrationCertificate",
+            "stakeCredential": Object {
+              "hash": "b5ae663aaea8e500157bdf4baafd6f5ba0ce5759f7cd4101fc132f54",
+              "type": 0,
+            },
           },
           Object {
             "__typename": "GenesisKeyDelegationCertificate",

@@ -25,7 +25,7 @@ import {
   WithdrawalModel
 } from '../../../src/ChainHistory/DbSyncChainHistory/types';
 import { Cardano } from '@cardano-sdk/core';
-import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { Hash28ByteBase16, Hash32ByteBase16 } from '@cardano-sdk/crypto';
 
 const blockHash = '7a48b034645f51743550bbaf81f8a14771e58856e031eb63844738ca8ad72298';
 const poolId = 'pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh';
@@ -253,14 +253,24 @@ describe('chain history mappers', () => {
         registration: false
       } as WithCertType<StakeCertModel>);
       expect(registrationResult).toEqual<WithCertIndex<Cardano.StakeAddressCertificate>>({
-        __typename: Cardano.CertificateType.StakeKeyRegistration,
+        __typename: Cardano.CertificateType.StakeRegistration,
         cert_index: 0,
-        stakeKeyHash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))
+        stakeCredential: {
+          hash: Hash28ByteBase16.fromEd25519KeyHashHex(
+            Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))
+          ),
+          type: Cardano.CredentialType.KeyHash
+        }
       });
       expect(deregistrationResult).toEqual<WithCertIndex<Cardano.StakeAddressCertificate>>({
-        __typename: Cardano.CertificateType.StakeKeyDeregistration,
+        __typename: Cardano.CertificateType.StakeDeregistration,
         cert_index: 0,
-        stakeKeyHash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))
+        stakeCredential: {
+          hash: Hash28ByteBase16.fromEd25519KeyHashHex(
+            Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))
+          ),
+          type: Cardano.CredentialType.KeyHash
+        }
       });
     });
     test('map DelegationCertModel to Cardano.StakeDelegationCertificate', () => {
@@ -274,7 +284,12 @@ describe('chain history mappers', () => {
         __typename: Cardano.CertificateType.StakeDelegation,
         cert_index: 0,
         poolId: Cardano.PoolId(poolId),
-        stakeKeyHash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))
+        stakeCredential: {
+          hash: Hash28ByteBase16.fromEd25519KeyHashHex(
+            Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))
+          ),
+          type: Cardano.CredentialType.KeyHash
+        }
       });
     });
   });
@@ -321,8 +336,13 @@ describe('chain history mappers', () => {
 
     const certificates: Cardano.Certificate[] = [
       {
-        __typename: Cardano.CertificateType.StakeKeyRegistration,
-        stakeKeyHash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))
+        __typename: Cardano.CertificateType.StakeRegistration,
+        stakeCredential: {
+          hash: Hash28ByteBase16.fromEd25519KeyHashHex(
+            Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))
+          ),
+          type: Cardano.CredentialType.KeyHash
+        }
       }
     ];
 

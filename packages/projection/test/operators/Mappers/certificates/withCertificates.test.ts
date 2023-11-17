@@ -23,9 +23,9 @@ const createEvent = (
   } as RollForwardEvent);
 
 const certificates = [
-  [{ __typename: Cardano.CertificateType.StakeKeyRegistration }] as Cardano.Certificate[],
+  [{ __typename: Cardano.CertificateType.StakeRegistration }] as Cardano.Certificate[],
   [
-    { __typename: Cardano.CertificateType.StakeKeyDeregistration },
+    { __typename: Cardano.CertificateType.StakeDeregistration },
     { __typename: Cardano.CertificateType.GenesisKeyDelegation }
   ] as Cardano.Certificate[]
 ];

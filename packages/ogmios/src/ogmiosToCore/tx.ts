@@ -76,19 +76,28 @@ const mapCertificate = (certificate: Schema.Certificate): Cardano.Certificate =>
     return {
       __typename: Cardano.CertificateType.StakeDelegation,
       poolId: Cardano.PoolId(certificate.stakeDelegation.delegatee),
-      stakeKeyHash: Crypto.Ed25519KeyHashHex(certificate.stakeDelegation.delegator)
+      stakeCredential: {
+        hash: Crypto.Hash28ByteBase16(certificate.stakeDelegation.delegator),
+        type: Cardano.CredentialType.KeyHash
+      }
     };
   }
   if ('stakeKeyRegistration' in certificate) {
     return {
-      __typename: Cardano.CertificateType.StakeKeyRegistration,
-      stakeKeyHash: Crypto.Ed25519KeyHashHex(certificate.stakeKeyRegistration)
+      __typename: Cardano.CertificateType.StakeRegistration,
+      stakeCredential: {
+        hash: Crypto.Hash28ByteBase16(certificate.stakeKeyRegistration),
+        type: Cardano.CredentialType.KeyHash
+      }
     };
   }
   if ('stakeKeyDeregistration' in certificate) {
     return {
-      __typename: Cardano.CertificateType.StakeKeyDeregistration,
-      stakeKeyHash: Crypto.Ed25519KeyHashHex(certificate.stakeKeyDeregistration)
+      __typename: Cardano.CertificateType.StakeDeregistration,
+      stakeCredential: {
+        hash: Crypto.Hash28ByteBase16(certificate.stakeKeyDeregistration),
+        type: Cardano.CredentialType.KeyHash
+      }
     };
   }
   if ('poolRegistration' in certificate) {

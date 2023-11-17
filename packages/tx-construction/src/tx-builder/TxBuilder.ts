@@ -381,7 +381,7 @@ export class GenericTxBuilder implements TxBuilder {
       const rewardAccount = availableRewardAccounts.pop()!;
       this.#logger.debug(`Building delegation certificate for ${newPoolId} ${rewardAccount}`);
       if (rewardAccount.keyStatus !== Cardano.StakeKeyStatus.Registered) {
-        certificates.push(Cardano.createStakeKeyRegistrationCert(rewardAccount.address));
+        certificates.push(Cardano.createStakeRegistrationCert(rewardAccount.address));
       }
       certificates.push(Cardano.createDelegationCert(rewardAccount.address, newPoolId));
       rewardAccountsWithWeights.set(rewardAccount.address, weight);
@@ -391,7 +391,7 @@ export class GenericTxBuilder implements TxBuilder {
     this.#logger.debug(`De-registering ${availableRewardAccounts.length} stake keys`);
     for (const rewardAccount of availableRewardAccounts) {
       if (rewardAccount.keyStatus === Cardano.StakeKeyStatus.Registered) {
-        certificates.push(Cardano.createStakeKeyDeregistrationCert(rewardAccount.address));
+        certificates.push(Cardano.createStakeDeregistrationCert(rewardAccount.address));
       }
     }
     this.partialTxBody = { ...this.partialTxBody, certificates };

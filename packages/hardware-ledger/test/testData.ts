@@ -4,6 +4,10 @@ import { Base64Blob, HexBlob } from '@cardano-sdk/util';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 export const rewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
 export const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
+export const stakeCredential = {
+  hash: stakeKeyHash as unknown as Crypto.Hash28ByteBase16,
+  type: Cardano.CredentialType.KeyHash
+};
 export const paymentAddress = Cardano.PaymentAddress(
   'addr1qxdtr6wjx3kr7jlrvrfzhrh8w44qx9krcxhvu3e79zr7497tpmpxjfyhk3vwg6qjezjmlg5nr5dzm9j6nxyns28vsy8stu5lh6'
 );

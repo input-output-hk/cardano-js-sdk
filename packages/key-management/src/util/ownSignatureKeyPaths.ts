@@ -55,9 +55,13 @@ const checkStakeKeyHashCertificate = (
     case Cardano.CertificateType.VoteRegistrationDelegation:
     case Cardano.CertificateType.StakeVoteRegistrationDelegation:
     case Cardano.CertificateType.Unregistration:
-    case Cardano.CertificateType.StakeKeyDeregistration:
+    case Cardano.CertificateType.StakeDeregistration:
     case Cardano.CertificateType.StakeDelegation: {
-      const account = accounts.find((acct) => acct.stakeKeyHash === certificate.stakeKeyHash);
+      const account = accounts.find(
+        (acct) =>
+          certificate.stakeCredential.type === Cardano.CredentialType.KeyHash &&
+          acct.stakeKeyHash === (certificate.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex)
+      );
       if (account) {
         signatureCheck.derivationPaths = [account.derivationPath];
       } else {
@@ -152,7 +156,7 @@ export const checkStakeCredentialCertificates = (
     signatureCheck.requiresForeignSignatures ||= mirCheck.requiresForeignSignatures;
     signatureCheck.derivationPaths.push(...mirCheck.derivationPaths);
 
-    // StakeKeyRegistration and GenesisKeyDelegation do not require signing
+    // StakeRegistration and GenesisKeyDelegation do not require signing
   }
 
   signatureCheck.derivationPaths = uniqWith(signatureCheck.derivationPaths, isEqual);

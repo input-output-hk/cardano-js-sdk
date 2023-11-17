@@ -420,8 +420,10 @@ describe('LedgerKeyAgent', () => {
                 {
                   __typename: Cardano.CertificateType.StakeDelegation,
                   poolId,
-                  stakeKeyHash:
-                    '00000000000000000000000000000000000000000000000000000000' as unknown as Crypto.Ed25519KeyHashHex
+                  stakeCredential: {
+                    hash: '00000000000000000000000000000000000000000000000000000000' as unknown as Crypto.Hash28ByteBase16,
+                    type: Cardano.CredentialType.KeyHash
+                  }
                 }
               ],
               fee: 10n,

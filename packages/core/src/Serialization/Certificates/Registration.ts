@@ -118,7 +118,7 @@ export class Registration {
     return {
       __typename: Cardano.CertificateType.Registration,
       deposit: this.#deposit,
-      stakeKeyHash: Crypto.Ed25519KeyHashHex(this.#credential.hash)
+      stakeCredential: this.#credential
     };
   }
 
@@ -128,10 +128,7 @@ export class Registration {
    * @param cert core StakeAddressCertificate object.
    */
   static fromCore(cert: Cardano.NewStakeAddressCertificate) {
-    return new Registration(
-      { hash: Crypto.Hash28ByteBase16(cert.stakeKeyHash), type: Cardano.CredentialType.KeyHash },
-      cert.deposit
-    );
+    return new Registration(cert.stakeCredential, cert.deposit);
   }
 
   /**

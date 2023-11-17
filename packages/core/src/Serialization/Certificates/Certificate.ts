@@ -295,10 +295,10 @@ export class Certificate {
     let cert: Certificate;
 
     switch (certificate.__typename) {
-      case Cardano.CertificateType.StakeKeyRegistration:
+      case Cardano.CertificateType.StakeRegistration:
         cert = Certificate.newStakeRegistration(StakeRegistration.fromCore(certificate));
         break;
-      case Cardano.CertificateType.StakeKeyDeregistration:
+      case Cardano.CertificateType.StakeDeregistration:
         cert = Certificate.newStakeDeregistration(StakeDeregistration.fromCore(certificate));
         break;
       case Cardano.CertificateType.StakeDelegation:

@@ -10,8 +10,11 @@
             "body": {
               "certificates": [
                 {
-                  "__typename": "StakeKeyRegistrationCertificate",
-                  "stakeKeyHash": "e0a76f244a3713cca96055cc819939676f81bd022bbc8da593e979ab"
+                  "__typename": "StakeRegistrationCertificate",
+                  "stakeCredential": {
+                    "hash": "e0a76f244a3713cca96055cc819939676f81bd022bbc8da593e979ab",
+                    "type": 0
+                  }
                 }
               ],
               "collaterals": [],
@@ -443,8 +446,11 @@
             "body": {
               "certificates": [
                 {
-                  "__typename": "StakeKeyDeregistrationCertificate",
-                  "stakeKeyHash": "e0a76f244a3713cca96055cc819939676f81bd022bbc8da593e979ab"
+                  "__typename": "StakeDeregistrationCertificate",
+                  "stakeCredential": {
+                    "hash": "e0a76f244a3713cca96055cc819939676f81bd022bbc8da593e979ab",
+                    "type": 0
+                  }
                 }
               ],
               "collaterals": [],
@@ -598,8 +604,11 @@
             "body": {
               "certificates": [
                 {
-                  "__typename": "StakeKeyDeregistrationCertificate",
-                  "stakeKeyHash": "e0a76f244a3713cca96055cc819939676f81bd022bbc8da593e979ab"
+                  "__typename": "StakeDeregistrationCertificate",
+                  "stakeCredential": {
+                    "hash": "e0a76f244a3713cca96055cc819939676f81bd022bbc8da593e979ab",
+                    "type": 0
+                  }
                 }
               ],
               "collaterals": [],
@@ -4096,8 +4105,11 @@
             "body": {
               "certificates": [
                 {
-                  "__typename": "StakeKeyRegistrationCertificate",
-                  "stakeKeyHash": "3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b"
+                  "__typename": "StakeRegistrationCertificate",
+                  "stakeCredential": {
+                    "hash": "3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b",
+                    "type": 0
+                  }
                 }
               ],
               "collaterals": [],
@@ -4226,8 +4238,11 @@
             "body": {
               "certificates": [
                 {
-                  "__typename": "StakeKeyRegistrationCertificate",
-                  "stakeKeyHash": "3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b"
+                  "__typename": "StakeRegistrationCertificate",
+                  "stakeCredential": {
+                    "hash": "3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b",
+                    "type": 0
+                  }
                 }
               ],
               "collaterals": [],

@@ -1,4 +1,5 @@
 /* eslint-disable unicorn/no-useless-undefined */
+import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { InMemoryRewardsHistoryStore } from '../../../src/persistence';
 import {
@@ -53,14 +54,19 @@ describe('RewardsHistory', () => {
               {
                 epoch: Cardano.EpochNo(0),
                 tx: createStubTxWithCertificates([
-                  { __typename: Cardano.CertificateType.StakeKeyDeregistration } as Cardano.Certificate
+                  { __typename: Cardano.CertificateType.StakeDeregistration } as Cardano.Certificate
                 ])
               },
               {
                 epoch,
                 tx: createStubTxWithCertificates(
                   [{ __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate],
-                  { stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount) }
+                  {
+                    stakeCredential: {
+                      hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                      type: Cardano.CredentialType.KeyHash
+                    }
+                  }
                 )
               }
             ]
@@ -100,14 +106,24 @@ describe('RewardsHistory', () => {
                 epoch: Cardano.EpochNo(0),
                 tx: createStubTxWithCertificates(
                   [{ __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate],
-                  { stakeKeyHash: '' }
+                  {
+                    stakeCredential: {
+                      hash: Crypto.Hash28ByteBase16('00000000000000000000000000000000000000000000000000000000'),
+                      type: Cardano.CredentialType.KeyHash
+                    }
+                  }
                 )
               },
               {
                 epoch,
                 tx: createStubTxWithCertificates(
                   [{ __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate],
-                  { stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount) }
+                  {
+                    stakeCredential: {
+                      hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                      type: Cardano.CredentialType.KeyHash
+                    }
+                  }
                 )
               }
             ]

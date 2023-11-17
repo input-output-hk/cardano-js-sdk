@@ -23,7 +23,10 @@ describe('StakeDelegation', () => {
     const core: Cardano.StakeDelegationCertificate = {
       __typename: Cardano.CertificateType.StakeDelegation,
       poolId: Cardano.PoolId('pool1mpgg03jxj52qwxvvy7cmj58a96vl9pvxcqqvuw0kumheygxmn34'),
-      stakeKeyHash: Crypto.Ed25519KeyHashHex('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f')
+      stakeCredential: {
+        hash: Crypto.Hash28ByteBase16('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f'),
+        type: Cardano.CredentialType.KeyHash
+      }
     };
 
     const certificate = StakeDelegation.fromCore(core);
@@ -38,7 +41,10 @@ describe('StakeDelegation', () => {
     const core: Cardano.StakeDelegationCertificate = {
       __typename: Cardano.CertificateType.StakeDelegation,
       poolId: Cardano.PoolId('pool1mpgg03jxj52qwxvvy7cmj58a96vl9pvxcqqvuw0kumheygxmn34'),
-      stakeKeyHash: Crypto.Ed25519KeyHashHex('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f')
+      stakeCredential: {
+        hash: Crypto.Hash28ByteBase16('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f'),
+        type: Cardano.CredentialType.KeyHash
+      }
     };
 
     const certificate = StakeDelegation.fromCore(core);
@@ -58,7 +64,10 @@ describe('StakeDelegation', () => {
     expect(certificate.toCore()).toEqual({
       __typename: Cardano.CertificateType.StakeDelegation,
       poolId: Cardano.PoolId('pool1mpgg03jxj52qwxvvy7cmj58a96vl9pvxcqqvuw0kumheygxmn34'),
-      stakeKeyHash: Crypto.Ed25519KeyHashHex('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f')
+      stakeCredential: {
+        hash: Crypto.Hash28ByteBase16('cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f'),
+        type: Cardano.CredentialType.KeyHash
+      }
     });
   });
 });

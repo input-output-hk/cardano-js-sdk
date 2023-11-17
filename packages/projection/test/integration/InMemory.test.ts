@@ -124,7 +124,13 @@ describe('integration/InMemory', () => {
                 {
                   body: {
                     certificates: [
-                      { __typename: Cardano.CertificateType.StakeKeyRegistration, stakeKeyHash: rolledBackKey }
+                      {
+                        __typename: Cardano.CertificateType.StakeRegistration,
+                        stakeCredential: {
+                          hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(rolledBackKey),
+                          type: Cardano.CredentialType.KeyHash
+                        }
+                      }
                     ]
                   }
                 } as Cardano.Tx

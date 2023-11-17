@@ -181,15 +181,19 @@ describe('TrezorKeyAgent', () => {
 
     it('successfully signs stake registration and delegation transaction', async () => {
       const rewardAccount = keyAgent.knownAddresses[0].rewardAccount;
-      const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
+      const stakeCredential = {
+        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+        type: Cardano.CredentialType.KeyHash
+      };
+
       const stakeRegistrationCert = {
-        __typename: Cardano.CertificateType.StakeKeyRegistration,
-        stakeKeyHash
+        __typename: Cardano.CertificateType.StakeRegistration,
+        stakeCredential
       } as Cardano.StakeAddressCertificate;
       const stakeDelegationCert = {
         __typename: Cardano.CertificateType.StakeDelegation,
         poolId,
-        stakeKeyHash
+        stakeCredential
       } as Cardano.StakeDelegationCertificate;
 
       props = {
@@ -207,10 +211,14 @@ describe('TrezorKeyAgent', () => {
 
     it('successfully signs stake deregistration transaction', async () => {
       const rewardAccount = keyAgent.knownAddresses[0].rewardAccount;
-      const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
+      const stakeCredential = {
+        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+        type: Cardano.CredentialType.KeyHash
+      };
+
       const stakeDeregistrationCert = {
-        __typename: Cardano.CertificateType.StakeKeyDeregistration,
-        stakeKeyHash
+        __typename: Cardano.CertificateType.StakeDeregistration,
+        stakeCredential
       } as Cardano.StakeAddressCertificate;
 
       props = {

@@ -35,7 +35,7 @@ type TxInspector<T extends Inspectors> = (tx: HydratedTx) => {
 // Inspection result types
 export type SendReceiveValueInspection = Value;
 export type DelegationInspection = StakeDelegationCertificate[];
-export type StakeKeyRegistrationInspection = StakeAddressCertificate[];
+export type StakeRegistrationInspection = StakeAddressCertificate[];
 export type PoolRegistrationInspection = PoolRegistrationCertificate[];
 export type PoolRetirementInspection = PoolRetirementCertificate[];
 
@@ -70,7 +70,7 @@ export type TotalAddressInputsValueInspector = (
 ) => Inspector<SendReceiveValueInspection>;
 export type SendReceiveValueInspector = (ownAddresses: PaymentAddress[]) => Inspector<SendReceiveValueInspection>;
 export type DelegationInspector = Inspector<DelegationInspection>;
-export type StakeKeyRegistrationInspector = Inspector<StakeKeyRegistrationInspection>;
+export type StakeRegistrationInspector = Inspector<StakeRegistrationInspection>;
 export type WithdrawalInspector = Inspector<WithdrawalInspection>;
 export type SignedCertificatesInspector = (
   rewardAccounts: RewardAccount[],
@@ -121,7 +121,6 @@ export const totalAddressOutputsValueInspector: SendReceiveValueInspector = (own
 export const signedCertificatesInspector: SignedCertificatesInspector =
   (rewardAccounts: RewardAccount[], certificateTypes?: CertificateType[]) => (tx) => {
     if (!tx.body.certificates || tx.body.certificates.length === 0) return [];
-    const stakeKeyHashes = rewardAccounts?.map((account) => RewardAccount.toHash(account));
     const certificates = certificateTypes
       ? tx.body.certificates?.filter((certificate) => certificateTypes.includes(certificate.__typename))
       : tx.body.certificates;
@@ -132,7 +131,6 @@ export const signedCertificatesInspector: SignedCertificatesInspector =
         return rewardAccounts.some((account) => RewardAccount.toHash(account) === credHash);
       }
 
-      if ('stakeKeyHash' in certificate) return stakeKeyHashes.includes(certificate.stakeKeyHash);
       if ('poolParameters' in certificate) return rewardAccounts.includes(certificate.poolParameters.rewardAccount);
       return false;
     });
@@ -200,11 +198,7 @@ export const valueReceivedInspector: TotalAddressInputsValueInspector = (ownAddr
  */
 const certificateInspector =
   <
-    T extends
-      | DelegationInspection
-      | StakeKeyRegistrationInspection
-      | PoolRegistrationInspection
-      | PoolRetirementInspection
+    T extends DelegationInspection | StakeRegistrationInspection | PoolRegistrationInspection | PoolRetirementInspection
   >(
     type: CertificateType
   ): Inspector<T> =>
@@ -225,19 +219,19 @@ export const delegationInspector: DelegationInspector = certificateInspector<Del
  * Inspects a transaction for a stake key deregistration certificate.
  *
  * @param {HydratedTx} tx transaction to inspect
- * @returns {StakeKeyRegistrationInspection} array of stake key deregistration certificates
+ * @returns {StakeRegistrationInspection} array of stake key deregistration certificates
  */
-export const stakeKeyDeregistrationInspector: StakeKeyRegistrationInspector =
-  certificateInspector<StakeKeyRegistrationInspection>(CertificateType.StakeKeyDeregistration);
+export const stakeKeyDeregistrationInspector: StakeRegistrationInspector =
+  certificateInspector<StakeRegistrationInspection>(CertificateType.StakeDeregistration);
 
 /**
  * Inspects a transaction for a stake key registration certificate.
  *
  * @param {HydratedTx} tx transaction to inspect
- * @returns {StakeKeyRegistrationInspection} array of stake key registration certificates
+ * @returns {StakeRegistrationInspection} array of stake key registration certificates
  */
-export const stakeKeyRegistrationInspector: StakeKeyRegistrationInspector =
-  certificateInspector<StakeKeyRegistrationInspection>(CertificateType.StakeKeyRegistration);
+export const stakeKeyRegistrationInspector: StakeRegistrationInspector =
+  certificateInspector<StakeRegistrationInspection>(CertificateType.StakeRegistration);
 
 /**
  * Inspects a transaction for pool registration certificates.

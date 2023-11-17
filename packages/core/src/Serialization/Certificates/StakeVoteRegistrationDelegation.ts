@@ -132,7 +132,7 @@ export class StakeVoteRegistrationDelegation {
       dRep: this.#dRep.toCore(),
       deposit: this.#deposit,
       poolId: Cardano.PoolId.fromKeyHash(this.#poolKeyHash),
-      stakeKeyHash: this.#credential.hash as unknown as Crypto.Ed25519KeyHashHex
+      stakeCredential: this.#credential
     };
   }
 
@@ -143,7 +143,7 @@ export class StakeVoteRegistrationDelegation {
    */
   static fromCore(deleg: Cardano.StakeVoteRegistrationDelegationCertificate) {
     return new StakeVoteRegistrationDelegation(
-      { hash: Crypto.Hash28ByteBase16(deleg.stakeKeyHash), type: Cardano.CredentialType.KeyHash },
+      deleg.stakeCredential,
       deleg.deposit,
       DRep.fromCore(deleg.dRep),
       Cardano.PoolId.toKeyHash(deleg.poolId)
