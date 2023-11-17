@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.2-patch.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.11.1...@cardano-sdk/dapp-connector@0.11.2-patch.0) (2023-11-17)
+
+### Bug Fixes
+
+* **dapp-connector:** re-implement plain javascript object initial cip-30 api ([051a8b9](https://github.com/input-output-hk/cardano-js-sdk/commit/051a8b9e669f30bfb6b4814d261cf29e3c68aca2))
+
 ## [0.11.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.11.0...@cardano-sdk/dapp-connector@0.11.1) (2023-10-09)
 
 **Note:** Version bump only for package @cardano-sdk/dapp-connector
