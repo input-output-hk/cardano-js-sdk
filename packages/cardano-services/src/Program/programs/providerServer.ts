@@ -35,7 +35,7 @@ import { TypeormAssetProvider } from '../../Asset/TypeormAssetProvider';
 import { TypeormStakePoolProvider } from '../../StakePool/TypeormStakePoolProvider/TypeormStakePoolProvider';
 import { createDbSyncMetadataService } from '../../Metadata';
 import { createLogger } from 'bunyan';
-import { getConnectionConfig, getOgmiosTxSubmitProvider, getRabbitMqTxSubmitProvider } from '../services';
+import { getConnectionConfig, getOgmiosTxSubmitProvider } from '../services';
 import { getEntities } from '../../Projection/prepareTypeormProjection';
 import { isNotNil } from '@cardano-sdk/util';
 import memoize from 'lodash/memoize';
@@ -48,7 +48,6 @@ export const PAGINATION_PAGE_SIZE_LIMIT_DEFAULT = 25;
 export const PAGINATION_PAGE_SIZE_LIMIT_ASSETS = 300;
 export const USE_BLOCKFROST_DEFAULT = false;
 export const USE_TYPEORM_STAKE_POOL_PROVIDER_DEFAULT = false;
-export const USE_QUEUE_DEFAULT = false;
 export const HANDLE_PROVIDER_SERVER_URL_DEFAULT = '';
 export const USE_TYPEORM_ASSET_PROVIDER_DEFAULT = false;
 
@@ -316,8 +315,6 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     [ServiceNames.TxSubmit]: async () => {
       const txSubmitProvider = args.useSubmitApi
         ? getSubmitApiProvider()
-        : args.useQueue
-        ? await getRabbitMqTxSubmitProvider(dnsResolver, logger, args)
         : await getOgmiosTxSubmitProvider(dnsResolver, logger, args, await getHandleProvider());
       return new TxSubmitHttpService({ logger, txSubmitProvider });
     }

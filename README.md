@@ -121,6 +121,12 @@ for you.
 nix run .#config-update
 ```
 
+## Attic
+
+Previously supported features, no longer supported, but packed with a reference branch.
+
+- [RabbitMQ tx-submit provider and worker](https://github.com/input-output-hk/cardano-js-sdk/tree/rabbitmq-tx-submit-provider-and-worker)
+
 ## Distribute
 
 ### Pack

@@ -4,7 +4,6 @@ import {
   DEFAULT_HEALTH_CHECK_CACHE_TTL,
   OgmiosOptionDescriptions,
   PostgresOptionDescriptions,
-  RabbitMqOptionDescriptions,
   StakePoolMetadataFetchMode
 } from '../../../src/Program/options';
 import { EPOCH_POLL_INTERVAL_DEFAULT, listenPromise, serverClosePromise } from '../../../src/util';
@@ -55,8 +54,6 @@ describe('HTTP Server', () => {
   let ogmiosServer: http.Server;
   let serviceDiscoveryBackoffFactor: number;
   let serviceDiscoveryTimeout: number;
-  let rabbitmqSrvServiceName: string;
-  let rabbitmqUrl: URL;
 
   beforeEach(async () => {
     apiUrl = new URL(`http://localhost:${await getRandomPort()}`);
@@ -72,8 +69,6 @@ describe('HTTP Server', () => {
     ogmiosSrvServiceName = process.env.OGMIOS_SRV_SERVICE_NAME!;
     serviceDiscoveryBackoffFactor = SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT;
     serviceDiscoveryTimeout = SERVICE_DISCOVERY_TIMEOUT_DEFAULT;
-    rabbitmqUrl = new URL(process.env.RABBITMQ_URL!);
-    rabbitmqSrvServiceName = process.env.RABBITMQ_SRV_SERVICE_NAME!;
     dbCacheTtl = DB_CACHE_TTL_DEFAULT;
     healthCheckCacheTtl = DEFAULT_HEALTH_CHECK_CACHE_TTL;
     epochPollInterval = EPOCH_POLL_INTERVAL_DEFAULT;
@@ -248,83 +243,6 @@ describe('HTTP Server', () => {
             })
         ).rejects.toThrow(
           new MissingCardanoNodeOption([OgmiosOptionDescriptions.Url, OgmiosOptionDescriptions.SrvServiceName])
-        );
-      });
-    });
-
-    describe('rabbitmq-dependent services', () => {
-      it('loads the nominated HTTP service and server with service discovery', async () => {
-        httpServer = await loadProviderServer({
-          apiUrl,
-          cardanoNodeConfigPath,
-          dbCacheTtl,
-          epochPollInterval,
-          handlePolicyIds: [],
-          healthCheckCacheTtl,
-          metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
-          ogmiosSrvServiceName,
-
-          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-          // postgresConnectionStringDbSync,
-          rabbitmqSrvServiceName,
-          serviceDiscoveryBackoffFactor,
-          serviceDiscoveryTimeout,
-          serviceNames: [ServiceNames.TxSubmit],
-          useQueue: true
-        });
-
-        expect(httpServer).toBeInstanceOf(HttpServer);
-      });
-
-      it('loads the nominated Provider server and service discovery takes preference over url if both are provided', async () => {
-        httpServer = await loadProviderServer({
-          apiUrl,
-          cardanoNodeConfigPath,
-          dbCacheTtl,
-          epochPollInterval,
-          handlePolicyIds: [],
-          healthCheckCacheTtl,
-          metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
-          ogmiosSrvServiceName,
-
-          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-          // postgresConnectionStringDbSync,
-          rabbitmqSrvServiceName,
-          rabbitmqUrl,
-          serviceDiscoveryBackoffFactor,
-          serviceDiscoveryTimeout,
-          serviceNames: [ServiceNames.TxSubmit],
-          useQueue: true
-        });
-
-        expect(httpServer).toBeInstanceOf(HttpServer);
-      });
-
-      it('throws if a service is nominated without providing rabbitmq url nor service discovery name', async () => {
-        await expect(
-          async () =>
-            await loadProviderServer({
-              apiUrl,
-              cardanoNodeConfigPath,
-              dbCacheTtl,
-              epochPollInterval,
-              handlePolicyIds: [],
-              healthCheckCacheTtl,
-              metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
-              ogmiosSrvServiceName,
-
-              ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-              // postgresConnectionStringDbSync,
-              serviceDiscoveryBackoffFactor,
-              serviceDiscoveryTimeout,
-              serviceNames: [ServiceNames.TxSubmit],
-              useQueue: true
-            })
-        ).rejects.toThrow(
-          new MissingProgramOption(ServiceNames.TxSubmit, [
-            RabbitMqOptionDescriptions.Url,
-            RabbitMqOptionDescriptions.SrvServiceName
-          ])
         );
       });
     });

@@ -2,7 +2,6 @@ import {
   CommonProgramOptions,
   OgmiosProgramOptions,
   PosgresProgramOptions,
-  RabbitMqProgramOptions,
   StakePoolMetadataProgramOptions
 } from '../options';
 import { HandlePolicyIdsProgramOptions } from '../options/policyIds';
@@ -12,7 +11,6 @@ import { Milliseconds, Seconds } from '@cardano-sdk/core';
 export enum Programs {
   BlockfrostWorker = 'Blockfrost worker',
   ProviderServer = 'Provider server',
-  RabbitmqWorker = 'RabbitMQ worker',
   Projector = 'Projector'
 }
 
@@ -57,7 +55,6 @@ export enum ProviderServerOptionDescriptions {
   UseTypeOrmStakePoolProvider = 'Enables the TypeORM Stake Pool Provider',
   UseBlockfrost = 'Enables Blockfrost cached data DB',
   UseKoraLabsProvider = 'Use the KoraLabs handle provider',
-  UseQueue = 'Enables RabbitMQ',
   UseSubmitApi = 'Use cardano-submit-api provider',
   UseTypeormAssetProvider = 'Use the TypeORM Asset Provider (default is db-sync)'
 }
@@ -69,7 +66,6 @@ export type ProviderServerArgs = CommonProgramOptions &
   PosgresProgramOptions<'Asset'> &
   OgmiosProgramOptions &
   HandlePolicyIdsProgramOptions &
-  RabbitMqProgramOptions &
   StakePoolMetadataProgramOptions & {
     allowedOrigins?: string[];
     assetCacheTTL?: Seconds;
@@ -88,7 +84,6 @@ export type ProviderServerArgs = CommonProgramOptions &
     tokenMetadataRequestTimeout?: Milliseconds;
     useBlockfrost?: boolean;
     useKoraLabs?: boolean;
-    useQueue?: boolean;
     useSubmitApi?: boolean;
     useTypeormAssetProvider?: boolean;
     useTypeormStakePoolProvider?: boolean;

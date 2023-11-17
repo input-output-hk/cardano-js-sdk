@@ -5,17 +5,6 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"@acuminous/bitsyntax@npm:^0.1.2":
-  version: 0.1.2
-  resolution: "@acuminous/bitsyntax@npm:0.1.2"
-  dependencies:
-    buffer-more-ints: ~1.0.0
-    debug: ^4.3.4
-    safe-buffer: ~5.1.2
-  checksum: d2f9f30dfc8ddb10673e4780fa997fbe43fe3b6cd996b9930803d1b3c5db42fd964f9dab225f9e1cc06a2a22832b5a04e37076f2d283365768c7bd9718642db4
-  languageName: node
-  linkType: hard
-
 "@ampproject/remapping@npm:^2.1.0":
   version: 2.2.0
   resolution: "@ampproject/remapping@npm:2.2.0"
@@ -3143,7 +3132,6 @@ __metadata:
     "@cardano-sdk/util-dev": "workspace:~"
     "@cardano-sdk/util-rxjs": "workspace:~"
     "@hapi/topo": ^6.0.2
-    "@types/amqplib": ^0.8.2
     "@types/bunyan": ^1.8.8
     "@types/cors": ^2.8.13
     "@types/death": ^1.1.2
@@ -3153,7 +3141,6 @@ __metadata:
     "@types/lodash": ^4.14.182
     "@types/pg": ^8.6.5
     "@types/wait-on": ^5.3.1
-    amqplib: ^0.10.0
     axios: ^0.27.2
     axios-mock-adapter: ^1.20.0
     backoff-rxjs: ^7.0.0
@@ -6229,16 +6216,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/amqplib@npm:^0.8.2":
-  version: 0.8.2
-  resolution: "@types/amqplib@npm:0.8.2"
-  dependencies:
-    "@types/bluebird": "*"
-    "@types/node": "*"
-  checksum: 8b30e22cf890631637ad40fa8eda3323d3ca156c18f23a59c10befd96beab0c046f3f7c2c0a196fc36a669d848b09999ca1f5a0fa2620009656f028667e2bdb8
-  languageName: node
-  linkType: hard
-
 "@types/aria-query@npm:^5.0.0":
   version: 5.0.1
   resolution: "@types/aria-query@npm:5.0.1"
@@ -6291,13 +6268,6 @@ __metadata:
   version: 2.1.0
   resolution: "@types/blake2b@npm:2.1.0"
   checksum: daff30373c3ed7624a15c95d320a7f68fcb42dd1b1a8609304bada0b9b322367f200a15b65c60c4048f94c23338742a1afd8d38ccf822bad538fcf010cab02da
-  languageName: node
-  linkType: hard
-
-"@types/bluebird@npm:*":
-  version: 3.5.37
-  resolution: "@types/bluebird@npm:3.5.37"
-  checksum: 851a2eca0ae2daa422d4bcea5f8f659a673fcff5f51d18997ffb19bb9e54b64800301b167613d9cbbebaa8fdfd2433f0f9f8bb39267efd7b6898011aedcc944d
   languageName: node
   linkType: hard
 
@@ -8201,18 +8171,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"amqplib@npm:^0.10.0":
-  version: 0.10.3
-  resolution: "amqplib@npm:0.10.3"
-  dependencies:
-    "@acuminous/bitsyntax": ^0.1.2
-    buffer-more-ints: ~1.0.0
-    readable-stream: 1.x >=1.1.9
-    url-parse: ~1.5.10
-  checksum: 999f0fae748fd29d4d4ec1067c389ecb8cb03f9c060f854a4cab757e911e9690da643419553b0291ec45693996a959b87ec87ae7e72268b818be0e284e60da7a
-  languageName: node
-  linkType: hard
-
 "ansi-colors@npm:4.1.1":
   version: 4.1.1
   resolution: "ansi-colors@npm:4.1.1"
@@ -9620,13 +9578,6 @@ __metadata:
   version: 1.1.2
   resolution: "buffer-from@npm:1.1.2"
   checksum: 0448524a562b37d4d7ed9efd91685a5b77a50672c556ea254ac9a6d30e3403a517d8981f10e565db24e8339413b43c97ca2951f10e399c6125a0d8911f5679bb
-  languageName: node
-  linkType: hard
-
-"buffer-more-ints@npm:~1.0.0":
-  version: 1.0.0
-  resolution: "buffer-more-ints@npm:1.0.0"
-  checksum: f6e88dade08a6d36f32d5f3ece141583a4f61d6c36970b16f4699bd00cfe95d4015525c2a741cf46eb918acfd61cac95683fb995189fd65c13b14949c90bfe75
   languageName: node
   linkType: hard
 
@@ -21586,7 +21537,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"readable-stream@npm:1.1.14, readable-stream@npm:1.1.x, readable-stream@npm:1.x >=1.1.9, readable-stream@npm:^1.0.33":
+"readable-stream@npm:1.1.14, readable-stream@npm:1.1.x, readable-stream@npm:^1.0.33":
   version: 1.1.14
   resolution: "readable-stream@npm:1.1.14"
   dependencies:
@@ -22297,7 +22248,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"safe-buffer@npm:5.1.2, safe-buffer@npm:~5.1.0, safe-buffer@npm:~5.1.1, safe-buffer@npm:~5.1.2":
+"safe-buffer@npm:5.1.2, safe-buffer@npm:~5.1.0, safe-buffer@npm:~5.1.1":
   version: 5.1.2
   resolution: "safe-buffer@npm:5.1.2"
   checksum: f2f1f7943ca44a594893a852894055cf619c1fbcb611237fc39e461ae751187e7baf4dc391a72125e0ac4fb2d8c5c0b3c71529622e6a58f46b960211e704903c
@@ -24831,7 +24782,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"url-parse@npm:^1.5.3, url-parse@npm:~1.5.10":
+"url-parse@npm:^1.5.3":
   version: 1.5.10
   resolution: "url-parse@npm:1.5.10"
   dependencies:
