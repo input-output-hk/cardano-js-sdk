@@ -21,12 +21,12 @@
   "sideEffects": false,
   "license": "Apache-2.0",
   "scripts": {
-    "build:cjs": "tsc --build src && shx chmod +x ./dist/cjs/cli.js",
+    "build:cjs": "tsc --build src && chmod +x ./dist/cjs/cli.js",
     "build:copy-assets": "bash ./copy-assets.sh",
     "build": "run-s build:cjs build:copy-assets",
     "build:test-db": "./test/jest-setup/rebuild-test-db.sh",
-    "cleanup:dist": "shx rm -rf dist",
-    "cleanup:nm": "shx rm -rf node_modules",
+    "cleanup:dist": "rm -rf dist",
+    "cleanup:nm": "rm -rf node_modules",
     "cleanup": "run-s cleanup:dist cleanup:nm",
     "cli": "ts-node --transpile-only src/cli.ts",
     "compose:up": "docker compose --env-file environments/.env.$NETWORK -p cardano-services-$NETWORK -f docker-compose.yml -f ../../compose/common.yml -f ../../compose/pg-agent.yml ${FILES:-} up",
@@ -50,9 +50,9 @@
     "test": "jest --runInBand -c ./jest.config.js",
     "test:build:verify": "tsc --build ./test",
     "test:debug": "DEBUG=true yarn test",
-    "test:e2e": "shx echo 'test:e2e' command not implemented yet",
+    "test:e2e": "echo 'test:e2e' command not implemented yet",
     "test:load": "jest -c ./load.jest.config.js --runInBand",
-    "tscNoEmit": "shx echo typescript --noEmit command not implemented yet"
+    "tscNoEmit": "echo typescript --noEmit command not implemented yet"
   },
   "devDependencies": {
     "@cardano-ogmios/client": "5.6.0",
@@ -78,7 +78,6 @@
     "json-bigint-patch": "^0.0.8",
     "madge": "^5.0.1",
     "npm-run-all": "^4.1.5",
-    "shx": "^0.3.3",
     "ts-jest": "^28.0.7",
     "ts-node": "^10.0.0",
     "typescript": "^4.7.4",

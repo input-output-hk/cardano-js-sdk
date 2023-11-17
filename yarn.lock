@@ -3109,7 +3109,6 @@ __metadata:
     json-bigint: ~1.0.0
     madge: ^5.0.1
     npm-run-all: ^4.1.5
-    shx: ^0.3.3
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
     typescript: ^4.7.4
@@ -3179,7 +3178,6 @@ __metadata:
     prom-client: ^14.0.1
     reflect-metadata: ~0.1.13
     rxjs: ^7.4.0
-    shx: ^0.3.3
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
@@ -3211,7 +3209,6 @@ __metadata:
     lodash: ^4.17.21
     madge: ^5.0.1
     npm-run-all: ^4.1.5
-    shx: ^0.3.3
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
@@ -3247,7 +3244,6 @@ __metadata:
     npm: ^9.3.0
     npm-run-all: ^4.1.5
     pbkdf2: ^3.1.2
-    shx: ^0.3.3
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
@@ -3281,7 +3277,6 @@ __metadata:
     madge: ^5.0.1
     mock-browser: ^0.92.14
     npm-run-all: ^4.1.5
-    shx: ^0.3.3
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
@@ -3372,7 +3367,6 @@ __metadata:
     pg: ^8.7.3
     readable-stream: ^3.6.0
     rxjs: ^7.4.0
-    shx: ^0.3.3
     source-map-loader: ^4.0.1
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
@@ -3419,7 +3413,6 @@ __metadata:
     npm-run-all: ^4.1.5
     object-hash: ^2.2.0
     pkg: ^5.3.0
-    shx: ^0.3.3
     ts-jest: ^28.0.7
     ts-log: ^2.2.3
     typescript: ^4.7.4
@@ -3441,7 +3434,6 @@ __metadata:
     jest: ^28.1.3
     madge: ^5.0.1
     npm-run-all: ^4.1.5
-    shx: ^0.3.3
     ts-jest: ^28.0.7
     ts-log: 2.2.4
     typescript: ^4.7.4
@@ -3467,7 +3459,6 @@ __metadata:
     jest: ^28.1.3
     madge: ^5.0.1
     npm-run-all: ^4.1.5
-    shx: ^0.3.3
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: 2.2.4
@@ -3491,7 +3482,6 @@ __metadata:
     lodash: ^4.17.21
     madge: ^5.0.1
     npm-run-all: ^4.1.5
-    shx: ^0.3.3
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: 2.2.4
@@ -3515,7 +3505,6 @@ __metadata:
     lodash: ^4.17.21
     madge: ^5.0.1
     npm-run-all: ^4.1.5
-    shx: ^0.3.3
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     typescript: ^4.7.4
@@ -3546,7 +3535,6 @@ __metadata:
     npm-run-all: ^4.1.5
     pbkdf2: ^3.1.2
     rxjs: ^7.4.0
-    shx: ^0.3.3
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: 2.2.4
@@ -3579,7 +3567,6 @@ __metadata:
     nanoid: ^3.1.31
     npm-run-all: ^4.1.5
     rxjs: ^7.4.0
-    shx: ^0.3.3
     ts-jest: ^28.0.7
     ts-log: ^2.2.3
     typescript: ^4.7.4
@@ -3607,7 +3594,6 @@ __metadata:
     pg-boss: 8.4.2
     reflect-metadata: ^0.1.13
     rxjs: ^7.4.0
-    shx: ^0.3.3
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
     typeorm: ^0.3.15
@@ -3632,7 +3618,6 @@ __metadata:
     madge: ^5.0.1
     npm-run-all: ^4.1.5
     rxjs: ^7.4.0
-    shx: ^0.3.3
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
@@ -3660,7 +3645,6 @@ __metadata:
     npm: ^9.3.0
     npm-run-all: ^4.1.5
     rxjs: ^7.4.0
-    shx: ^0.3.3
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
@@ -3691,7 +3675,6 @@ __metadata:
     madge: ^5.0.1
     npm-run-all: ^4.1.5
     rxjs: ^7.4.0
-    shx: ^0.3.3
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
     typescript: ^4.7.4
@@ -3710,7 +3693,6 @@ __metadata:
     madge: ^5.0.1
     npm-run-all: ^4.1.5
     rxjs: ^7.4.0
-    shx: ^0.3.3
     ts-jest: ^28.0.7
     typescript: ^4.7.4
   languageName: unknown
@@ -3728,7 +3710,6 @@ __metadata:
     madge: ^5.0.1
     npm-run-all: ^4.1.5
     serialize-error: ^8
-    shx: ^0.3.3
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
@@ -3773,7 +3754,6 @@ __metadata:
     npm-run-all: ^4.1.5
     pouchdb: ^7.3.0
     rxjs: ^7.4.0
-    shx: ^0.3.3
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.3
@@ -3807,7 +3787,6 @@ __metadata:
     npm-run-all: ^4.1.5
     readable-stream: ^3.6.0
     rxjs: ^7.4.0
-    shx: ^0.3.3
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.3
@@ -9940,7 +9919,6 @@ __metadata:
     node-gyp: ^9.1.0
     npm-run-all: ^4.1.5
     prettier: ^2.3.2
-    shx: ^0.3.3
     ts-jest: ^28.0.7
     ts-node: ^10.0.0
     ts-node-dev: ^1.1.8
@@ -14343,7 +14321,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^7.0.0, glob@npm:^7.1.3, glob@npm:^7.1.4, glob@npm:^7.1.6, glob@npm:^7.2.0":
+"glob@npm:^7.1.3, glob@npm:^7.1.4, glob@npm:^7.1.6, glob@npm:^7.2.0":
   version: 7.2.3
   resolution: "glob@npm:7.2.3"
   dependencies:
@@ -15233,13 +15211,6 @@ __metadata:
     has: ^1.0.3
     side-channel: ^1.0.4
   checksum: 1944f92e981e47aebc98a88ff0db579fd90543d937806104d0b96557b10c1f170c51fb777b97740a8b6ddeec585fca8c39ae99fd08a8e058dfc8ab70937238bf
-  languageName: node
-  linkType: hard
-
-"interpret@npm:^1.0.0":
-  version: 1.4.0
-  resolution: "interpret@npm:1.4.0"
-  checksum: 2e5f51268b5941e4a17e4ef0575bc91ed0ab5f8515e3cf77486f7c14d13f3010df9c0959f37063dcc96e78d12dc6b0bb1b9e111cdfe69771f4656d2993d36155
   languageName: node
   linkType: hard
 
@@ -21638,15 +21609,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rechoir@npm:^0.6.2":
-  version: 0.6.2
-  resolution: "rechoir@npm:0.6.2"
-  dependencies:
-    resolve: ^1.1.6
-  checksum: fe76bf9c21875ac16e235defedd7cbd34f333c02a92546142b7911a0f7c7059d2e16f441fe6fb9ae203f459c05a31b2bcf26202896d89e390eda7514d5d2702b
-  languageName: node
-  linkType: hard
-
 "rechoir@npm:^0.7.0":
   version: 0.7.1
   resolution: "rechoir@npm:0.7.1"
@@ -21950,7 +21912,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resolve@npm:^1.0.0, resolve@npm:^1.1.6, resolve@npm:^1.10.0, resolve@npm:^1.12.0, resolve@npm:^1.14.2, resolve@npm:^1.20.0, resolve@npm:^1.21.0, resolve@npm:^1.22.0, resolve@npm:^1.9.0":
+"resolve@npm:^1.0.0, resolve@npm:^1.10.0, resolve@npm:^1.12.0, resolve@npm:^1.14.2, resolve@npm:^1.20.0, resolve@npm:^1.21.0, resolve@npm:^1.22.0, resolve@npm:^1.9.0":
   version: 1.22.1
   resolution: "resolve@npm:1.22.1"
   dependencies:
@@ -21976,7 +21938,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resolve@patch:resolve@^1.0.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.1.6#~builtin<compat/resolve>, resolve@patch:resolve@^1.10.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.12.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.14.2#~builtin<compat/resolve>, resolve@patch:resolve@^1.20.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.21.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.22.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.9.0#~builtin<compat/resolve>":
+"resolve@patch:resolve@^1.0.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.10.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.12.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.14.2#~builtin<compat/resolve>, resolve@patch:resolve@^1.20.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.21.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.22.0#~builtin<compat/resolve>, resolve@patch:resolve@^1.9.0#~builtin<compat/resolve>":
   version: 1.22.1
   resolution: "resolve@patch:resolve@npm%3A1.22.1#~builtin<compat/resolve>::version=1.22.1&hash=07638b"
   dependencies:
@@ -22567,19 +22529,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"shelljs@npm:^0.8.5":
-  version: 0.8.5
-  resolution: "shelljs@npm:0.8.5"
-  dependencies:
-    glob: ^7.0.0
-    interpret: ^1.0.0
-    rechoir: ^0.6.2
-  bin:
-    shjs: bin/shjs
-  checksum: 7babc46f732a98f4c054ec1f048b55b9149b98aa2da32f6cf9844c434b43c6251efebd6eec120937bd0999e13811ebd45efe17410edb3ca938f82f9381302748
-  languageName: node
-  linkType: hard
-
 "shiki@npm:^0.12.1":
   version: 0.12.1
   resolution: "shiki@npm:0.12.1"
@@ -22588,18 +22537,6 @@ __metadata:
     vscode-oniguruma: ^1.7.0
     vscode-textmate: ^8.0.0
   checksum: a5d78a79d282f5c5168786980c66e82f075e91fa015097456486624fc5775688d685ad9b1972b0617d7f1ef50927d21b61dca476247a6f6c6b7042046e89a979
-  languageName: node
-  linkType: hard
-
-"shx@npm:^0.3.3":
-  version: 0.3.4
-  resolution: "shx@npm:0.3.4"
-  dependencies:
-    minimist: ^1.2.3
-    shelljs: ^0.8.5
-  bin:
-    shx: lib/cli.js
-  checksum: 0aa168bfddc11e3fe8943cce2e0d2d8514a560bd58cf2b835b4351ba03f46068f7d88286c2627f4b85604e81952154c43746369fb3f0d60df0e3b511f465e5b8
   languageName: node
   linkType: hard
 
