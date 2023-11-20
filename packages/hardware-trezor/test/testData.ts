@@ -56,6 +56,36 @@ export const txOutToOwnedAddress: Cardano.TxOut = {
   }
 };
 
+export const txOutWithDatumHash: Cardano.TxOut = {
+  address: Cardano.PaymentAddress(
+    'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+  ),
+  datumHash: Crypto.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
+  value: {
+    coins: 10n
+  }
+};
+
+export const txOutWithDatumHashAndOwnedAddress: Cardano.TxOut = {
+  ...txOutToOwnedAddress,
+  datumHash: Crypto.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
+};
+
+export const txOutWithInlineDatum: Cardano.TxOut = {
+  address: Cardano.PaymentAddress(
+    'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+  ),
+  datum: 123n,
+  value: {
+    coins: 10n
+  }
+};
+
+export const txOutWithInlineDatumAndOwnedAddress: Cardano.TxOut = {
+  ...txOutToOwnedAddress,
+  datum: 123n
+};
+
 export const rewardKey = 'stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr';
 export const rewardScript = 'stake178phkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gtcccycj5';
 export const rewardAccount = Cardano.RewardAccount(rewardKey);
@@ -188,7 +218,7 @@ export const txBody: Cardano.TxBody = {
   fee: 10n,
   inputs: [txIn],
   mint: mintTokenMap,
-  outputs: [txOutWithAssets, txOutWithAssetsToOwnedAddress],
+  outputs: [txOutWithAssets, txOutWithAssetsToOwnedAddress, txOutWithDatumHash],
   validityInterval: {
     invalidBefore: Cardano.Slot(100),
     invalidHereafter: Cardano.Slot(1000)

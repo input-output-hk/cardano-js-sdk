@@ -36,7 +36,8 @@ describe('tx', () => {
           {
             address:
               'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
-            amount: '10'
+            amount: '10',
+            format: Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY
           }
         ],
         protocolMagic: 999,
@@ -98,6 +99,7 @@ describe('tx', () => {
             address:
               'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
             amount: '10',
+            format: Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY,
             tokenBundle: [
               {
                 policyId: '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740',
@@ -139,6 +141,7 @@ describe('tx', () => {
               stakingPath: knownAddressStakeKeyPath
             },
             amount: '10',
+            format: Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY,
             tokenBundle: [
               {
                 policyId: '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740',
@@ -172,6 +175,13 @@ describe('tx', () => {
                 ]
               }
             ]
+          },
+          {
+            address:
+              'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
+            amount: '10',
+            datumHash: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5',
+            format: Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY
           }
         ],
         protocolMagic: 999,

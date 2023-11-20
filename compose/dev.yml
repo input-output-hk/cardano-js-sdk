@@ -32,7 +32,3 @@ services:
   handle-provider-server:
     volumes:
       - ../..:/app
-
-  worker:
-    volumes:
-      - ../..:/app

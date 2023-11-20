@@ -2,6 +2,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, CommunicationType, SerializableTrezorKeyAgentData, util } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import { PersonalWallet, setupWallet } from '../../../src';
 import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
@@ -82,6 +83,20 @@ describe('TrezorKeyAgent', () => {
         address: Cardano.PaymentAddress(
           'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w'
         ),
+        value: { coins: 11_111_111n }
+      },
+      simpleOutputWithDatumHash: {
+        address: Cardano.PaymentAddress(
+          'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w'
+        ),
+        datumHash: Hash32ByteBase16('b6eb57092c330973b23784ac39426921eebd8376343409c03f613fa1a2017126'),
+        value: { coins: 11_111_111n }
+      },
+      simpleOutputWithInlineDatum: {
+        address: Cardano.PaymentAddress(
+          'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w'
+        ),
+        datum: 123n,
         value: { coins: 11_111_111n }
       }
     };
@@ -253,6 +268,32 @@ describe('TrezorKeyAgent', () => {
           hash: 'non-matching' as unknown as Cardano.TransactionId
         })
       ).rejects.toThrow();
+    });
+
+    it('successfully signs simple transaction with datum hash', async () => {
+      props = {
+        outputs: new Set<Cardano.TxOut>([outputs.simpleOutputWithDatumHash])
+      };
+      txInternals = await wallet.initializeTx(props);
+
+      const signatures = await keyAgent.signTransaction({
+        body: txInternals.body,
+        hash: txInternals.hash
+      });
+      expect(signatures.size).toBe(2);
+    });
+
+    it('successfully signs simple transaction with inline datum', async () => {
+      props = {
+        outputs: new Set<Cardano.TxOut>([outputs.simpleOutputWithInlineDatum])
+      };
+      txInternals = await wallet.initializeTx(props);
+
+      const signatures = await keyAgent.signTransaction({
+        body: txInternals.body,
+        hash: txInternals.hash
+      });
+      expect(signatures.size).toBe(2);
     });
   });
 

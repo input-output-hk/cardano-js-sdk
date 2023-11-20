@@ -1,9 +1,8 @@
 # Cardano JS SDK | Cardano GraphQL Services
 
 Libraries and program entrypoints for services to facilitate remote data and submit access using
-[Provider] interfaces over HTTP, with _optional_ queue-based transaction submission; The
-[TxSubmitHttpService] can be configured to submit directly via [Ogmios], or via a [RabbitMQ] broker,
-with one or more workers handling submission and response job creation. Data is sourced from
+[Provider] interfaces over HTTP; The [TxSubmitHttpService] can be configured to submit via [Ogmios]
+or via [submit-api]. Data is sourced from
 [Cardano DB Sync], the local [Cardano Node] via [Ogmios] Local State Queries, genesis files, and
 remote sources.
 
@@ -11,7 +10,7 @@ remote sources.
 
 - [CLI] with configuration via command line arguments or environment variables and _optional_ loading of secrets from disk.
 - Service port discovery via DNS resolution, or static configuration.
-- Fault-tolerant transaction submission via persistent queue, or direct submission.
+- Fault-tolerant transaction submission.
 - _Optional_ [Prometheus] metrics available at `/metrics`
 - Data sourced from Cardano DB Sync PostgreSQL, Local State Queries, genesis files, and remote
   sources.
@@ -19,7 +18,7 @@ remote sources.
 ## Services
 
 The services require instances of [Cardano Node] and [Ogmios] as a minimum, with
-[Cardano DB Sync] and [RabbitMQ] dependent on the run command. Please refer to
+[Cardano DB Sync] dependent on the run command. Please refer to
 [docker-compose.json](./docker-compose.yml) for the current supported version of each service
 dependency.
 
@@ -27,11 +26,6 @@ dependency.
 
 The Provider server can be started with one or more services by name, segmented by URL path.
 Run the [CLI] with `start-provider-server --help` to see the full list of options.
-
-### Worker
-
-A worker must be started when opting for queue-based transaction submission.
-Run the [CLI] with `start-worker --help` to see the full list of options.
 
 ## Examples
 
@@ -67,13 +61,10 @@ OGMIOS_URL=ws://localhost:1338 \
 ./dist/cjs/cli.js start-provider-server
 ```
 
-#### All Providers | Service Discovery | Queued Tx Submission | Metrics
+#### All Providers | Service Discovery | Metrics
 
 - The server will expose all [Provider] HTTP services
-- Transactions will be queued by the HTTP service, with the worker completing the
-  submission. The HTTP service receives the submission result via a dedicated channel to
-  complete the HTTP request.
-- Ports for [Ogmios], [PostgreSQL], and [RabbitMQ], discovered using DNS resolution.
+- Ports for [Ogmios] and [PostgreSQL], discovered using DNS resolution.
 - HTTP API exposed using a custom API URL
 - Prometheus metrics exporter enabled at http://localhost:6000/metrics
 
@@ -90,8 +81,6 @@ OGMIOS_URL=ws://localhost:1338 \
     --postgres-user-db-sync somePgUser \
     --postgres-password-db-sync somePassword \
     --ogmios-srv-service-name  some-domain-for-ogmios \
-    --rabbitmq-srv-service-name some-domain-for-rabbitmq \
-    --use-queue \
     asset chain-history stake-pool tx-submit network-info utxo rewards
 ```
 
@@ -107,8 +96,6 @@ POSTGRES_DB_DB_SYNC=someDbName \
 POSTGRES_USER_DB_SYNC=someUser \
 POSTGRES_PASSWORD_DB_SYNC=somePassword \
 OGMIOS_SRV_SERVICE_NAME=some-domain-for-ogmios \
-RABBITMQ_SRV_SERVICE_NAME=some-domain-for-rabbitmq \
-USE_QUEUE=true \
 ./dist/cjs/cli.js start-provider-server
 ```
 
@@ -117,15 +104,13 @@ USE_QUEUE=true \
 ```bash
 ./dist/cjs/cli.js \
   start-worker \
-    --ogmios-srv-service-name  some-domain-for-ogmios \
-    --rabbitmq-srv-service-name some-domain-for-rabbitmq
+    --ogmios-srv-service-name  some-domain-for-ogmios
 ```
 
 **`start-worker` using env variables:**
 
 ```bash
 OGMIOS_SRV_SERVICE_NAME=some-domain-for-ogmios \
-RABBITMQ_SRV_SERVICE_NAME=some-domain-for-rabbitmq \
 ./dist/cjs/cli.js start-worker
 ```
 
@@ -204,5 +189,5 @@ See [code coverage report]
 [postgresql]: https://www.postgresql.org/
 [prometheus]: https://prometheus.io/
 [provider]: ../core/src/Provider
-[rabbitmq]: https://www.rabbitmq.com/
+[submit-api]: https://github.com/input-output-hk/cardano-node/tree/master/cardano-submit-api
 [txsubmithttpservice]: ./src/TxSubmit/TxSubmitHttpService.ts
