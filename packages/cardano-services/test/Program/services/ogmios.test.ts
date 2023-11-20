@@ -55,8 +55,6 @@ jest.mock('dns', () => ({
         return [{ name: 'localhost', port: 5433, priority: 6, weight: 5 }];
       if (serviceName === process.env.OGMIOS_SRV_SERVICE_NAME)
         return [{ name: 'localhost', port: 1337, priority: 6, weight: 5 }];
-      if (serviceName === process.env.RABBITMQ_SRV_SERVICE_NAME)
-        return [{ name: 'localhost', port: 5672, priority: 6, weight: 5 }];
       return [];
     }
   }

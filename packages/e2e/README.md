@@ -184,35 +184,6 @@ Then to run the local network tests, run:
 $ yarn workspace @cardano-sdk/e2e test:local-network
 ```
 
-## RabbitMQ Load Testing
-
-**RabbitMQ** end to end load tests. Please note that this requires an _Ogmios_ server for submitting the txs.
-The default configuration matches the **local-network** host mapping (just leaving the `.env` file untouched)
-or we can configure the test to run against another system.
-
-```
-# Required by test:load-testing
-OGMIOS_URL=ws://localhost:1340
-TX_SUBMIT_HTTP_URL=http://localhost:3456/tx-submit
-TRANSACTIONS_NUMBER=10
-START_LOCAL_HTTP_SERVER=true
-WORKER_PARALLEL_TRANSACTION=3
-```
-
-> :information_source: Ensure the configured wallet has sufficient funds for the test transactions (see [here](#generate_wallet)).
-
-Before executing the test, start the _local-network_:
-
-```bash
-$ yarn workspace @cardano-sdk/e2e test:local-network
-```
-
-To execute the test:
-
-```bash
-$ yarn workspace @cardano-sdk/e2e test:load-testing
-```
-
 ## Wallet
 
 The wallet end-to-end tests showcase the use of different providers to create, sign, send and keep track of transactions on the blockchain, query assets and their metadata, delegate to pools and keep track of rewards (among others):

@@ -66,7 +66,6 @@ x-provider-server-environment: &provider-server-environment
   SERVICE_NAMES: ${SERVICE_NAMES:-asset,chain-history,handle,network-info,rewards,stake-pool,tx-submit,utxo}
   SUBMIT_API_URL: ${SUBMIT_API_URL:-http://cardano-submit-api:8090/}
   USE_BLOCKFROST: ${USE_BLOCKFROST:-false}
-  USE_QUEUE: ${USE_QUEUE:-false}
   USE_SUBMIT_API: ${USE_SUBMIT_API:-true}
 
 x-sdk-environment: &sdk-environment
@@ -94,7 +93,6 @@ x-sdk-environment: &sdk-environment
   POSTGRES_USER_FILE_DB_SYNC: /run/secrets/postgres_user
   POSTGRES_USER_FILE_HANDLE: /run/secrets/postgres_user
   POSTGRES_USER_FILE_STAKE_POOL: /run/secrets/postgres_user
-  RABBITMQ_URL: amqp://rabbitmq:5672
 
 services:
   cardano-db-sync:
@@ -330,40 +328,6 @@ services:
     ports:
       - ${HANDLE_API_PORT:-4011}:3000
 
-  rabbitmq:
-    <<: *logging
-    healthcheck:
-      test: rabbitmq-diagnostics -q ping
-      interval: 30s
-      timeout: 30s
-      retries: 200
-    image: rabbitmq:3.10-management
-    ports:
-      # HTTP management API
-      - 15672:15672
-    restart: on-failure
-    volumes:
-      - rabbitmq-db:/var/lib/rabbitmq/mnesia
-
-  worker:
-    <<:
-      - *from-sdk
-      - *logging
-    build:
-      context: ../../
-      target: worker
-    depends_on:
-      cardano-node-ogmios:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    environment:
-      <<: *sdk-environment
-      PARALLEL: ${PARALLEL:-false}
-      PARALLEL_TX: ${PARALLEL_TX:-3}
-      POLLING_CYCLE: ${POLLING_CYCLE:-500}
-    restart: on-failure
-
 secrets:
   # Replicates the db-sync secret for historical reasons.
   # When the SDK was using only one database (the db-sync one) the only secret for database name used was this one
@@ -392,4 +356,3 @@ volumes:
   db-sync-data:
   node-db:
   node-ipc:
-  rabbitmq-db:

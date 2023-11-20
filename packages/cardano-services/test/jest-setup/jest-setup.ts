@@ -1,5 +1,4 @@
 import { DockerUtil } from '@cardano-sdk/util-dev';
-import { RabbitMQContainer } from '../TxSubmit/rabbitmq/docker';
 import { parse } from 'pg-connection-string';
 import dotenv from 'dotenv';
 import path from 'path';
@@ -24,9 +23,4 @@ module.exports = async () => {
     [`${path.join(__dirname, 'snapshots')}:/docker-entrypoint-initdb.d`],
     'dump_check'
   );
-
-  const container = new RabbitMQContainer();
-
-  await container.start();
-  await container.save();
 };

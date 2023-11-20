@@ -5,13 +5,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Asset } from '@cardano-sdk/core';
 import { AssetData, AssetFixtureBuilder, AssetWith } from './Asset/fixtures/FixtureBuilder';
-import { BAD_CONNECTION_URL } from './TxSubmit/rabbitmq/utils';
 import { ChildProcess, fork } from 'child_process';
 import { LedgerTipModel, findLedgerTip } from '../src/util/DbSyncProvider';
 import { Ogmios } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { ProjectionName, ServerMetadata, ServiceNames } from '../src';
-import { RabbitMQContainer } from './TxSubmit/rabbitmq/docker';
 import {
   baseVersionPath,
   createHealthyMockOgmiosServer,
@@ -180,7 +178,6 @@ const HANDLE_POLICY_IDS = 'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0f
 const HANDLE_PROVIDER_SERVER_URL = 'http://localhost:3000';
 
 describe('CLI', () => {
-  const container = new RabbitMQContainer();
   let db: Pool;
   let fixtureBuilder: AssetFixtureBuilder;
   let lastBlock: LedgerTipModel;
@@ -203,10 +200,8 @@ describe('CLI', () => {
     let apiUrl: string;
     let ogmiosServer: http.Server;
     let proc: ChildProcess;
-    let rabbitmqUrl: URL;
 
     beforeAll(async () => {
-      ({ rabbitmqUrl } = await container.load());
       db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC, max: 1, min: 1 });
       fixtureBuilder = new AssetFixtureBuilder(db, logger);
       lastBlock = (await db!.query<LedgerTipModel>(findLedgerTip)).rows[0];
@@ -254,7 +249,6 @@ describe('CLI', () => {
       let postgresHost: string;
       let postgresPort: string;
       let ogmiosSrvServiceName: string;
-      let rabbitmqSrvServiceName: string;
 
       beforeAll(async () => {
         ogmiosPort = await getRandomPort();
@@ -271,7 +265,6 @@ describe('CLI', () => {
         postgresPort = process.env.POSTGRES_PORT_DB_SYNC!;
         postgresSslCaFile = process.env.POSTGRES_SSL_CA_FILE_DB_SYNC!;
         ogmiosSrvServiceName = process.env.OGMIOS_SRV_SERVICE_NAME!;
-        rabbitmqSrvServiceName = process.env.RABBITMQ_SRV_SERVICE_NAME!;
         dbCacheTtl = process.env.DB_CACHE_TTL!;
       });
 
@@ -1502,8 +1495,7 @@ describe('CLI', () => {
                     HANDLE_PROVIDER_SERVER_URL,
                     LOGGER_MIN_SEVERITY: 'error',
                     POSTGRES_CONNECTION_STRING_HANDLE: postgresConnectionStringHandle,
-                    SERVICE_NAMES: ServiceNames.TxSubmit,
-                    USE_QUEUE: 'false'
+                    SERVICE_NAMES: ServiceNames.TxSubmit
                   },
                   stdio: 'pipe'
                 })
@@ -1930,138 +1922,6 @@ describe('CLI', () => {
 
               const { tokenMetadata } = fromSerializableObject<Asset.AssetInfo>(res.data);
               expect(tokenMetadata).toBeNull();
-            });
-          });
-        });
-
-        describe('specifying a RabbitMQ-dependent service', () => {
-          describe('with RabbitMQ and explicit URL', () => {
-            it('exposes a HTTP server with healthy state when using CLI options', async () => {
-              proc = withLogging(
-                fork(
-                  exePath,
-                  [
-                    ...baseArgs,
-                    '--api-url',
-                    apiUrl,
-                    '--handle-policy-ids',
-                    HANDLE_POLICY_IDS,
-                    '--handle-provider-server-url',
-                    HANDLE_PROVIDER_SERVER_URL,
-                    '--use-queue',
-                    'true',
-                    '--rabbitmq-url',
-                    rabbitmqUrl.toString(),
-                    ServiceNames.TxSubmit
-                  ],
-                  {
-                    env: {},
-                    stdio: 'pipe'
-                  }
-                )
-              );
-              await assertServiceHealthy(apiUrl, services.txSubmit, lastBlock, { usedQueue: true });
-            });
-
-            it('exposes a HTTP server with healthy state when using env variables', async () => {
-              proc = withLogging(
-                fork(exePath, ['start-provider-server'], {
-                  env: {
-                    API_URL: apiUrl,
-                    HANDLE_POLICY_IDS,
-                    HANDLE_PROVIDER_SERVER_URL,
-                    LOGGER_MIN_SEVERITY: 'error',
-                    RABBITMQ_URL: rabbitmqUrl.toString(),
-                    SERVICE_NAMES: ServiceNames.TxSubmit,
-                    USE_QUEUE: 'true'
-                  },
-                  stdio: 'pipe'
-                })
-              );
-              await assertServiceHealthy(apiUrl, services.txSubmit, lastBlock, { usedQueue: true });
-            });
-          });
-
-          describe('with service discovery', () => {
-            it('tx-submit throws DNS SRV error and exits with code 1 when using CLI options', (done) => {
-              callCliAndAssertExit(
-                {
-                  args: [
-                    '--handle-policy-ids',
-                    HANDLE_POLICY_IDS,
-                    '--handle-provider-server-url',
-                    HANDLE_PROVIDER_SERVER_URL,
-                    '--use-queue',
-                    'true',
-                    '--rabbitmq-srv-service-name',
-                    rabbitmqSrvServiceName,
-                    '--service-discovery-timeout',
-                    '1000',
-                    '--service-names',
-                    ServiceNames.TxSubmit
-                  ],
-                  dataMatchOnError: DNS_SERVER_NOT_REACHABLE_ERROR
-                },
-                done
-              );
-            });
-
-            it('tx-submit throws DNS SRV error and exits with code 1 when using env variables', (done) => {
-              callCliAndAssertExit(
-                {
-                  dataMatchOnError: DNS_SERVER_NOT_REACHABLE_ERROR,
-                  env: {
-                    API_URL: apiUrl,
-                    HANDLE_POLICY_IDS,
-                    HANDLE_PROVIDER_SERVER_URL,
-                    RABBITMQ_SRV_SERVICE_NAME: rabbitmqSrvServiceName,
-                    SERVICE_DISCOVERY_TIMEOUT: '1000',
-                    SERVICE_NAMES: ServiceNames.TxSubmit,
-                    USE_QUEUE: 'true'
-                  }
-                },
-                done
-              );
-            });
-          });
-
-          describe('with providing both RabbitMQ URL and SRV service name', () => {
-            it('tx-submit throws a CLI validation error and exits with code 1 whens use CLI options', (done) => {
-              callCliAndAssertExit(
-                {
-                  args: [
-                    '--use-queue',
-                    'true',
-                    '--rabbitmq-srv-service-name',
-                    rabbitmqSrvServiceName,
-                    '--rabbitmq-url',
-                    rabbitmqUrl.toString(),
-                    '--service-discovery-timeout',
-                    '1000',
-                    '--service-names',
-                    ServiceNames.TxSubmit
-                  ],
-                  dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
-                },
-                done
-              );
-            });
-
-            it('tx-submit throws a CLI validation error and exits with code 1 when using env variables', (done) => {
-              callCliAndAssertExit(
-                {
-                  dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
-                  env: {
-                    API_URL: apiUrl,
-                    RABBITMQ_SRV_SERVICE_NAME: rabbitmqSrvServiceName,
-                    RABBITMQ_URL: rabbitmqUrl.toString(),
-                    SERVICE_DISCOVERY_TIMEOUT: '1000',
-                    SERVICE_NAMES: ServiceNames.TxSubmit,
-                    USE_QUEUE: 'true'
-                  }
-                },
-                done
-              );
             });
           });
         });
@@ -2774,245 +2634,6 @@ describe('CLI', () => {
       proc.on('exit', (code) => {
         expect(code).toBe(1);
         done();
-      });
-    });
-  });
-
-  describe('start-worker', () => {
-    let commonArgs: string[];
-    let commonArgsWithServiceDiscovery: string[];
-    let commonEnv: Record<string, string>;
-    let commonEnvWithServiceDiscovery: Record<string, string>;
-    let hook: () => void;
-    let hookPromise: Promise<void>;
-    let ogmiosServer: http.Server;
-    let proc: ChildProcess;
-    let rabbitmqUrl: URL;
-    let rabbitmqSrvServiceName: string;
-    let ogmiosSrvServiceName: string;
-
-    const resetHook = () => (hook = jest.fn());
-
-    beforeAll(async () => {
-      ({ rabbitmqUrl } = await container.load());
-      resetHook();
-      const port = await getRandomPort();
-      const ogmiosConnection = Ogmios.createConnectionObject({ port });
-      ogmiosServer = createHealthyMockOgmiosServer(() => hook());
-      rabbitmqSrvServiceName = process.env.RABBITMQ_SRV_SERVICE_NAME!;
-      ogmiosSrvServiceName = process.env.OGMIOS_SRV_SERVICE_NAME!;
-      await listenPromise(ogmiosServer, { port });
-      await ogmiosServerReady(ogmiosConnection);
-      commonArgs = [
-        'start-worker',
-        '--logger-min-severity',
-        'error',
-        '--ogmios-url',
-        ogmiosConnection.address.webSocket,
-        '--rabbitmq-url',
-        rabbitmqUrl.toString()
-      ];
-      commonArgsWithServiceDiscovery = [
-        'start-worker',
-        '--logger-min-severity',
-        'error',
-        '--rabbitmq-srv-service-name',
-        rabbitmqSrvServiceName,
-        '--ogmios-srv-service-name',
-        ogmiosSrvServiceName,
-        '--service-discovery-timeout',
-        '1000'
-      ];
-      commonEnv = {
-        LOGGER_MIN_SEVERITY: 'error',
-        OGMIOS_URL: ogmiosConnection.address.webSocket,
-        RABBITMQ_URL: rabbitmqUrl.toString()
-      };
-      commonEnvWithServiceDiscovery = {
-        LOGGER_MIN_SEVERITY: 'error',
-        OGMIOS_SRV_SERVICE_NAME: ogmiosSrvServiceName,
-        RABBITMQ_SRV_SERVICE_NAME: rabbitmqSrvServiceName,
-        SERVICE_DISCOVERY_TIMEOUT: '1000'
-      };
-    });
-
-    afterAll(async () => await serverClosePromise(ogmiosServer));
-
-    beforeEach(async () => {
-      await container.removeQueues();
-    });
-
-    afterEach((done) => {
-      resetHook();
-      if (proc?.kill()) proc.on('close', () => done());
-      else done();
-    });
-
-    // Tests without any assertion fail if they get timeout
-    describe('cli:start-worker with a working RabbitMQ server', () => {
-      describe('transaction are actually submitted', () => {
-        it('submits transactions using CLI options', async () => {
-          hookPromise = new Promise((resolve) => (hook = resolve));
-          proc = withLogging(fork(exePath, commonArgs, { env: {}, stdio: 'pipe' }));
-          await Promise.all([hookPromise, container.enqueueTx(logger)]);
-        });
-
-        it('submits transactions using env variables', async () => {
-          hookPromise = new Promise((resolve) => (hook = resolve));
-          proc = withLogging(fork(exePath, ['start-worker'], { env: commonEnv, stdio: 'pipe' }));
-          await Promise.all([hookPromise, container.enqueueTx(logger)]);
-        });
-      });
-
-      describe('parallel option', () => {
-        describe('without parallel option', () => {
-          it('starts in serial mode', (done) => {
-            proc = withLogging(fork(exePath, commonArgs, { env: {}, stdio: 'pipe' }));
-            proc.stdout!.on('data', (data) => (data.toString().match('serial mode') ? done() : null));
-          });
-
-          it('starts in serial mode', (done) => {
-            proc = withLogging(fork(exePath, ['start-worker'], { env: commonEnv, stdio: 'pipe' }));
-            proc.stdout!.on('data', (data) => (data.toString().match('serial mode') ? done() : null));
-          });
-        });
-
-        describe('with bad parallel option', () => {
-          it('exits with code 1 using CLI options', (done) => {
-            expect.assertions(2);
-            proc = withLogging(fork(exePath, [...commonArgs, '--parallel', 'test'], { env: {}, stdio: 'pipe' }), true);
-            proc.stderr!.on('data', (data) =>
-              expect(data.toString()).toMatch('RabbitMQ worker requires a valid Parallel mode')
-            );
-            proc.on('exit', (code) => {
-              expect(code).toBe(1);
-              done();
-            });
-          });
-
-          it('exits with code 1 using env variables', (done) => {
-            expect.assertions(2);
-            proc = withLogging(
-              fork(exePath, ['start-worker'], { env: { ...commonEnv, PARALLEL: 'test' }, stdio: 'pipe' }),
-              true
-            );
-            proc.stderr!.on('data', (data) =>
-              expect(data.toString()).toMatch('RabbitMQ worker requires a valid Parallel mode')
-            );
-            proc.on('exit', (code) => {
-              expect(code).toBe(1);
-              done();
-            });
-          });
-        });
-
-        describe('with parallel option set to false', () => {
-          it('worker starts in serial mode using CLI options', (done) => {
-            proc = withLogging(fork(exePath, [...commonArgs, '--parallel', 'false'], { env: {}, stdio: 'pipe' }));
-            proc.stdout!.on('data', (data) => (data.toString().match('serial mode') ? done() : null));
-          });
-
-          it('worker starts in serial mode using env variables', (done) => {
-            proc = withLogging(
-              fork(exePath, ['start-worker'], { env: { ...commonEnv, PARALLEL: 'false' }, stdio: 'pipe' })
-            );
-            proc.stdout!.on('data', (data) => (data.toString().match('serial mode') ? done() : null));
-          });
-        });
-
-        describe('with parallel option set to true', () => {
-          it('worker starts in parallel mode using CLI options', (done) => {
-            proc = withLogging(fork(exePath, [...commonArgs, '--parallel', 'true'], { env: {}, stdio: 'pipe' }));
-            proc.stdout!.on('data', (data) => (data.toString().match('parallel mode') ? done() : null));
-          });
-
-          it('worker starts in parallel mode using env variables', (done) => {
-            proc = withLogging(
-              fork(exePath, ['start-worker'], { env: { ...commonEnv, PARALLEL: 'true' }, stdio: 'pipe' })
-            );
-            proc.stdout!.on('data', (data) => (data.toString().match('parallel mode') ? done() : null));
-          });
-        });
-
-        describe('default parallel option value', () => {
-          it('worker starts in parallel mode using CLI options', (done) => {
-            proc = withLogging(fork(exePath, [...commonArgs, '--parallel', 'true'], { env: {}, stdio: 'pipe' }));
-            proc.stdout!.on('data', (data) => (data.toString().match('parallel mode') ? done() : null));
-          });
-        });
-      });
-    });
-
-    describe('without a working RabbitMQ server handles a connection error event', () => {
-      it('exits with code 1 using CLI options', (done) => {
-        expect.assertions(2);
-        proc = withLogging(
-          fork(exePath, [...commonArgs, '--rabbitmq-url', BAD_CONNECTION_URL.toString()], {
-            env: {},
-            stdio: 'pipe'
-          }),
-          true
-        );
-
-        proc.stderr!.on('data', (data) => {
-          expect(data.toString()).toMatch('CONNECTION_FAILURE');
-        });
-        proc.on('exit', (code) => {
-          expect(code).toBe(1);
-          done();
-        });
-      });
-
-      it('exits with code 1 using env variables', (done) => {
-        expect.assertions(2);
-        proc = withLogging(
-          fork(exePath, ['start-worker'], {
-            env: { ...commonEnv, RABBITMQ_URL: BAD_CONNECTION_URL.toString() },
-            stdio: 'pipe'
-          }),
-          true
-        );
-
-        proc.stderr!.on('data', (data) => {
-          expect(data.toString()).toMatch('CONNECTION_FAILURE');
-        });
-        proc.on('exit', (code) => {
-          expect(code).toBe(1);
-          done();
-        });
-      });
-    });
-
-    describe('with service discovery', () => {
-      it('throws DNS SRV error and exits with code 1 using CLI options', (done) => {
-        expect.assertions(2);
-        proc = withLogging(fork(exePath, commonArgsWithServiceDiscovery, { env: {}, stdio: 'pipe' }), true);
-
-        proc.stderr!.on('data', (data) => {
-          expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
-        });
-
-        proc.on('exit', (code) => {
-          expect(code).toBe(1);
-          done();
-        });
-      });
-
-      it('throws DNS SRV error and exits with code 1 using env variables', (done) => {
-        expect.assertions(2);
-        proc = withLogging(
-          fork(exePath, ['start-worker'], { env: commonEnvWithServiceDiscovery, stdio: 'pipe' }),
-          true
-        );
-
-        proc.stderr!.on('data', (data) => {
-          expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
-        });
-
-        proc.on('exit', (code) => {
-          expect(code).toBe(1);
-          done();
-        });
       });
     });
   });

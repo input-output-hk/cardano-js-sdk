@@ -16,10 +16,7 @@ import {
   HANDLE_PROVIDER_SERVER_URL_DEFAULT,
   PAGINATION_PAGE_SIZE_LIMIT_DEFAULT,
   PARALLEL_JOBS_DEFAULT,
-  PARALLEL_MODE_DEFAULT,
-  PARALLEL_TXS_DEFAULT,
   PG_BOSS_WORKER_API_URL_DEFAULT,
-  POLLING_CYCLE_DEFAULT,
   POOLS_METRICS_INTERVAL_DEFAULT,
   POOLS_METRICS_OUTDATED_INTERVAL_DEFAULT,
   PROJECTOR_API_URL_DEFAULT,
@@ -33,17 +30,12 @@ import {
   ProviderServerOptionDescriptions,
   SCAN_INTERVAL_DEFAULT,
   ServiceNames,
-  TX_WORKER_API_URL_DEFAULT,
-  TxWorkerArgs,
-  TxWorkerOptionDescriptions,
   USE_BLOCKFROST_DEFAULT,
-  USE_QUEUE_DEFAULT,
   USE_TYPEORM_ASSET_PROVIDER_DEFAULT,
   USE_TYPEORM_STAKE_POOL_PROVIDER_DEFAULT,
   addOptions,
   availableNetworks,
   connectionStringFromArgs,
-  loadAndStartTxWorker,
   loadBlockfrostWorker,
   loadPgBossWorker,
   loadProjector,
@@ -54,7 +46,6 @@ import {
   withHandlePolicyIdsOptions,
   withOgmiosOptions,
   withPostgresOptions,
-  withRabbitMqOptions,
   withStakePoolMetadataOptions
 } from './Program';
 import { Command } from 'commander';
@@ -196,7 +187,7 @@ const providerServer = program
 const providerServerWithPostgres = withPostgresOptions(providerServer, ['Asset', 'DbSync', 'Handle', 'StakePool']);
 const providerServerWithCommon = withCommonOptions(providerServerWithPostgres, PROVIDER_SERVER_API_URL_DEFAULT);
 
-addOptions(withOgmiosOptions(withRabbitMqOptions(withHandlePolicyIdsOptions(providerServerWithCommon))), [
+addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon)), [
   newOption(
     '--service-names <serviceNames>',
     `List of services to attach: ${Object.values(ServiceNames).toString()}`,
@@ -312,13 +303,6 @@ addOptions(withOgmiosOptions(withRabbitMqOptions(withHandlePolicyIdsOptions(prov
     false
   ),
   newOption(
-    '--use-queue <true/false>',
-    ProviderServerOptionDescriptions.UseQueue,
-    'USE_QUEUE',
-    (useQueue) => stringOptionToBoolean(useQueue, Programs.ProviderServer, ProviderServerOptionDescriptions.UseQueue),
-    USE_QUEUE_DEFAULT
-  ),
-  newOption(
     '--pagination-page-size-limit <paginationPageSizeLimit>',
     ProviderServerOptionDescriptions.PaginationPageSizeLimit,
     'PAGINATION_PAGE_SIZE_LIMIT',
@@ -363,39 +347,6 @@ addOptions(withOgmiosOptions(withRabbitMqOptions(withHandlePolicyIdsOptions(prov
     })
   )
 );
-
-const rabbitMQ = program.command('start-worker').description('Start RabbitMQ worker');
-
-addOptions(withCommonOptions(withOgmiosOptions(withRabbitMqOptions(rabbitMQ)), TX_WORKER_API_URL_DEFAULT), [
-  newOption(
-    '--parallel <true/false>',
-    TxWorkerOptionDescriptions.Parallel,
-    'PARALLEL',
-    (parallel) => stringOptionToBoolean(parallel, Programs.RabbitmqWorker, TxWorkerOptionDescriptions.Parallel),
-    PARALLEL_MODE_DEFAULT
-  ),
-  newOption(
-    '--parallel-txs <parallelTxs>',
-    TxWorkerOptionDescriptions.ParallelTxs,
-    'PARALLEL_TXS',
-    (parallelTxs) => Number.parseInt(parallelTxs, 10),
-    PARALLEL_TXS_DEFAULT
-  ),
-  newOption(
-    '--polling-cycle <pollingCycle>',
-    TxWorkerOptionDescriptions.PollingCycle,
-    'POLLING_CYCLE',
-    (pollingCycle) => Number.parseInt(pollingCycle, 10),
-    POLLING_CYCLE_DEFAULT
-  )
-]).action(async (args: TxWorkerArgs) => {
-  process.stdout.write(`RabbitMQ transactions worker: ${args.parallel ? 'parallel' : 'serial'} mode\n`);
-  const txWorker = await loadAndStartTxWorker(args);
-  onDeath(async () => {
-    await txWorker.shutdown();
-    process.exit(1);
-  });
-});
 
 const blockfrost = program.command('start-blockfrost-worker').description('Start the Blockfrost worker');
 

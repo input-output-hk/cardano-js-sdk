@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# TODO: run this with 'shx' or replace this with some cross-platform script
-
 # TODO: uncomment esm lines when ESM builds are enabled for this package
 
 cp ./package.json ./dist/cjs/original-package.json
