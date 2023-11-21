@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { PersonalWallet, TransactionFailure } from '../../src';
 import { createWallet } from './util';
@@ -82,8 +83,11 @@ describe('integration/withdrawal', () => {
     const txInternals = await wallet.initializeTx({
       certificates: [
         {
-          __typename: Cardano.CertificateType.StakeKeyDeregistration,
-          stakeKeyHash: Cardano.RewardAccount.toHash(accounts[0])
+          __typename: Cardano.CertificateType.StakeDeregistration,
+          stakeCredential: {
+            hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(accounts[0])),
+            type: Cardano.CredentialType.KeyHash
+          }
         }
       ],
       outputs: new Set() // In a real transaction you would probably want to have some outputs

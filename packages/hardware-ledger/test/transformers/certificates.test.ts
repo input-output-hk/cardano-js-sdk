@@ -7,7 +7,7 @@ import {
   poolId,
   poolId2,
   poolParameters,
-  stakeKeyHash
+  stakeCredential
 } from '../testData';
 import { Cardano } from '@cardano-sdk/core';
 import { CardanoKeyConst, KeyRole, util } from '@cardano-sdk/key-management';
@@ -26,8 +26,8 @@ describe('certificates', () => {
       const ledgerCerts = mapCerts(
         [
           {
-            __typename: Cardano.CertificateType.StakeKeyRegistration,
-            stakeKeyHash
+            __typename: Cardano.CertificateType.StakeRegistration,
+            stakeCredential
           }
         ],
         CONTEXT_WITHOUT_KNOWN_ADDRESSES
@@ -50,8 +50,8 @@ describe('certificates', () => {
       const ledgerCerts = mapCerts(
         [
           {
-            __typename: Cardano.CertificateType.StakeKeyRegistration,
-            stakeKeyHash
+            __typename: Cardano.CertificateType.StakeRegistration,
+            stakeCredential
           }
         ],
         CONTEXT_WITH_KNOWN_ADDRESSES
@@ -80,8 +80,8 @@ describe('certificates', () => {
       const ledgerCerts = mapCerts(
         [
           {
-            __typename: Cardano.CertificateType.StakeKeyDeregistration,
-            stakeKeyHash
+            __typename: Cardano.CertificateType.StakeDeregistration,
+            stakeCredential
           }
         ],
         CONTEXT_WITHOUT_KNOWN_ADDRESSES
@@ -104,8 +104,8 @@ describe('certificates', () => {
       const ledgerCerts = mapCerts(
         [
           {
-            __typename: Cardano.CertificateType.StakeKeyDeregistration,
-            stakeKeyHash
+            __typename: Cardano.CertificateType.StakeDeregistration,
+            stakeCredential
           }
         ],
         CONTEXT_WITH_KNOWN_ADDRESSES
@@ -344,7 +344,7 @@ describe('certificates', () => {
           {
             __typename: Cardano.CertificateType.StakeDelegation,
             poolId: poolId2,
-            stakeKeyHash
+            stakeCredential
           }
         ],
         CONTEXT_WITHOUT_KNOWN_ADDRESSES
@@ -370,7 +370,7 @@ describe('certificates', () => {
           {
             __typename: Cardano.CertificateType.StakeDelegation,
             poolId: poolId2,
-            stakeKeyHash
+            stakeCredential
           }
         ],
         CONTEXT_WITH_KNOWN_ADDRESSES

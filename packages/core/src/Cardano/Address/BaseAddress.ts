@@ -42,9 +42,9 @@ export class BaseAddress {
   static fromCredentials(networkId: NetworkId, payment: Credential, stake: Credential): BaseAddress {
     let type = AddressType.BasePaymentKeyStakeKey;
 
-    if (payment.type === CredentialType.ScriptHash) type &= 0b0001;
+    if (payment.type === CredentialType.ScriptHash) type |= 0b0001;
 
-    if (stake.type === CredentialType.ScriptHash) type &= 0b0010;
+    if (stake.type === CredentialType.ScriptHash) type |= 0b0010;
 
     return new BaseAddress({
       delegationPart: stake,

@@ -1,6 +1,7 @@
 import * as AssetId from '../assetId';
+import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, Paginated } from '@cardano-sdk/core';
-import { currentEpoch, handleAssetId, ledgerTip, stakeKeyHash } from './mockData';
+import { currentEpoch, handleAssetId, ledgerTip, stakeCredential } from './mockData';
 import { somePartialStakePools } from '../createStubStakePoolProvider';
 import delay from 'delay';
 
@@ -57,13 +58,13 @@ export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
       body: {
         certificates: [
           {
-            __typename: Cardano.CertificateType.StakeKeyRegistration,
-            stakeKeyHash
+            __typename: Cardano.CertificateType.StakeRegistration,
+            stakeCredential
           },
           {
             __typename: Cardano.CertificateType.StakeDelegation,
             poolId: somePartialStakePools[0].id,
-            stakeKeyHash
+            stakeCredential
           }
         ],
         fee: 200_000n,
@@ -180,10 +181,13 @@ const queryTransactions = ({ rewardAccount }: { rewardAccount?: Cardano.RewardAc
             body: {
               ...tx.body,
               certificates: tx.body.certificates?.map((certificate) =>
-                'stakeKeyHash' in certificate
+                'stakeCredential' in certificate
                   ? {
                       ...certificate,
-                      stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                      stakeCredential: {
+                        hash: Cardano.RewardAccount.toHash(rewardAccount) as unknown as Crypto.Hash28ByteBase16,
+                        type: Cardano.CredentialType.KeyHash
+                      }
                     }
                   : certificate
               )

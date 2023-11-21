@@ -92,6 +92,10 @@ export const rewardAccount = Cardano.RewardAccount(rewardKey);
 export const rewardAddress = Cardano.Address.fromBech32(rewardAccount)?.asReward();
 export const rewardAccountWithPaymentScriptCredential = Cardano.RewardAccount(rewardScript);
 export const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
+export const stakeCredential = {
+  hash: stakeKeyHash as unknown as Crypto.Hash28ByteBase16,
+  type: Cardano.CredentialType.KeyHash
+};
 export const stakeScriptHash = Cardano.RewardAccount.toHash(rewardAccountWithPaymentScriptCredential);
 export const knownAddressKeyPath = [2_147_485_500, 2_147_485_463, 2_147_483_648, 1, 0];
 export const knownAddressStakeKeyPath = [2_147_485_500, 2_147_485_463, 2_147_483_648, 2, 0];
@@ -168,19 +172,19 @@ export const coreWithdrawalWithScriptHashCredential = {
 };
 
 export const stakeRegistrationCertificate = {
-  __typename: Cardano.CertificateType.StakeKeyRegistration,
-  stakeKeyHash
+  __typename: Cardano.CertificateType.StakeRegistration,
+  stakeCredential
 } as Cardano.StakeAddressCertificate;
 
 export const stakeDeregistrationCertificate = {
-  __typename: Cardano.CertificateType.StakeKeyDeregistration,
-  stakeKeyHash
+  __typename: Cardano.CertificateType.StakeDeregistration,
+  stakeCredential
 } as Cardano.StakeAddressCertificate;
 
 export const stakeDelegationCertificate = {
   __typename: Cardano.CertificateType.StakeDelegation,
   poolId: poolId2,
-  stakeKeyHash
+  stakeCredential
 } as Cardano.StakeDelegationCertificate;
 
 export const poolRegistrationCertificate = {

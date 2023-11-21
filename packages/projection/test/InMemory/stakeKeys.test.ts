@@ -8,8 +8,8 @@ describe('InMemory.storeStakeKeys', () => {
     const store = InMemory.createStore();
     const project = async (
       eventType: ChainSyncEventType,
-      register: Crypto.Ed25519KeyHashHex[],
-      deregister: Crypto.Ed25519KeyHashHex[]
+      register: Crypto.Hash28ByteBase16[],
+      deregister: Crypto.Hash28ByteBase16[]
     ) => {
       await firstValueFrom(
         InMemory.storeStakeKeys()(
@@ -26,31 +26,31 @@ describe('InMemory.storeStakeKeys', () => {
     };
     await project(
       ChainSyncEventType.RollForward,
-      [Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')],
+      [Crypto.Hash28ByteBase16('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')],
       []
     );
     await project(
       ChainSyncEventType.RollForward,
-      [Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857c')],
+      [Crypto.Hash28ByteBase16('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857c')],
       []
     );
     expect(store.stakeKeys.size).toBe(2);
     await project(
       ChainSyncEventType.RollForward,
       [],
-      [Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857c')]
+      [Crypto.Hash28ByteBase16('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857c')]
     );
     expect(store.stakeKeys.size).toBe(1);
     await project(
       ChainSyncEventType.RollBackward,
-      [Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')],
+      [Crypto.Hash28ByteBase16('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')],
       []
     );
     expect(store.stakeKeys.size).toBe(0);
     await project(
       ChainSyncEventType.RollBackward,
       [],
-      [Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')]
+      [Crypto.Hash28ByteBase16('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')]
     );
     expect(store.stakeKeys.size).toBe(1);
   });

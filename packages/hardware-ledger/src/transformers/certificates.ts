@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Cardano } from '@cardano-sdk/core';
 import { InvalidArgumentError, Transform } from '@cardano-sdk/util';
@@ -19,7 +20,9 @@ const getStakeAddressCertificate = (
   type: StakeKeyCertificateType
 ): StakeKeyCertificate => {
   const knownAddress = context?.knownAddresses.find(
-    (address) => Cardano.RewardAccount.toHash(address.rewardAccount) === certificate.stakeKeyHash
+    (address) =>
+      Cardano.RewardAccount.toHash(address.rewardAccount) ===
+      (certificate.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex)
   );
 
   const rewardAddress = knownAddress ? Cardano.Address.fromBech32(knownAddress.rewardAccount)?.asReward() : null;
@@ -38,7 +41,7 @@ const getStakeAddressCertificate = (
             type: Ledger.StakeCredentialParamsType.KEY_PATH
           }
         : {
-            keyHashHex: certificate.stakeKeyHash,
+            keyHashHex: certificate.stakeCredential.hash,
             type: Ledger.StakeCredentialParamsType.KEY_HASH
           };
       break;
@@ -46,7 +49,7 @@ const getStakeAddressCertificate = (
     case Cardano.CredentialType.ScriptHash:
     default: {
       credential = {
-        scriptHashHex: certificate.stakeKeyHash,
+        scriptHashHex: certificate.stakeCredential.hash,
         type: Ledger.StakeCredentialParamsType.SCRIPT_HASH
       };
     }
@@ -67,7 +70,9 @@ export const stakeDelegationCertificate: Transform<
 > = (certificate, context): Ledger.Certificate => {
   const poolIdKeyHash = Cardano.PoolId.toKeyHash(certificate.poolId);
   const knownAddress = context?.knownAddresses.find(
-    (address) => Cardano.RewardAccount.toHash(address.rewardAccount) === certificate.stakeKeyHash
+    (address) =>
+      Cardano.RewardAccount.toHash(address.rewardAccount) ===
+      (certificate.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex)
   );
   const rewardAddress = knownAddress ? Cardano.Address.fromBech32(knownAddress.rewardAccount)?.asReward() : null;
 
@@ -87,7 +92,7 @@ export const stakeDelegationCertificate: Transform<
             type: Ledger.StakeCredentialParamsType.KEY_PATH
           }
         : {
-            keyHashHex: certificate.stakeKeyHash,
+            keyHashHex: certificate.stakeCredential.hash,
             type: Ledger.StakeCredentialParamsType.KEY_HASH
           };
       break;
@@ -95,7 +100,7 @@ export const stakeDelegationCertificate: Transform<
     case Cardano.CredentialType.ScriptHash:
     default: {
       credential = {
-        scriptHashHex: certificate.stakeKeyHash,
+        scriptHashHex: certificate.stakeCredential.hash,
         type: Ledger.StakeCredentialParamsType.SCRIPT_HASH
       };
     }
@@ -242,9 +247,9 @@ const poolRetirementCertificate: Transform<
 
 const toCert = (cert: Cardano.Certificate, context: LedgerTxTransformerContext) => {
   switch (cert.__typename) {
-    case Cardano.CertificateType.StakeKeyRegistration:
+    case Cardano.CertificateType.StakeRegistration:
       return getStakeAddressCertificate(cert, context, Ledger.CertificateType.STAKE_REGISTRATION);
-    case Cardano.CertificateType.StakeKeyDeregistration:
+    case Cardano.CertificateType.StakeDeregistration:
       return getStakeAddressCertificate(cert, context, Ledger.CertificateType.STAKE_DEREGISTRATION);
     case Cardano.CertificateType.StakeDelegation:
       return stakeDelegationCertificate(cert, context);

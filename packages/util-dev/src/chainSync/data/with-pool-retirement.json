@@ -46,7 +46,10 @@
                 {
                   "__typename": "StakeDelegationCertificate",
                   "poolId": "pool1n3s8unkvmre59uzt4ned0903f9q2p8dhscw5v9eeyc0sw0m439t",
-                  "stakeKeyHash": "dcb10cd4e761c827dbf0dfb92e91358c2f5f811203bb5080819e2103"
+                  "stakeCredential": {
+                    "hash": "dcb10cd4e761c827dbf0dfb92e91358c2f5f811203bb5080819e2103",
+                    "type": 0
+                  }
                 }
               ],
               "collaterals": [],
@@ -339,7 +342,10 @@
                 {
                   "__typename": "StakeDelegationCertificate",
                   "poolId": "pool1n3s8unkvmre59uzt4ned0903f9q2p8dhscw5v9eeyc0sw0m439t",
-                  "stakeKeyHash": "0529bf3474dba38d888d7301f4a6e456812cc6175d57fb0b514aa911"
+                  "stakeCredential": {
+                    "hash": "0529bf3474dba38d888d7301f4a6e456812cc6175d57fb0b514aa911",
+                    "type": 0
+                  }
                 }
               ],
               "collaterals": [],
@@ -1737,7 +1743,10 @@
                 {
                   "__typename": "StakeDelegationCertificate",
                   "poolId": "pool1n3s8unkvmre59uzt4ned0903f9q2p8dhscw5v9eeyc0sw0m439t",
-                  "stakeKeyHash": "dcb10cd4e761c827dbf0dfb92e91358c2f5f811203bb5080819e2103"
+                  "stakeCredential": {
+                    "hash": "dcb10cd4e761c827dbf0dfb92e91358c2f5f811203bb5080819e2103",
+                    "type": 0
+                  }
                 }
               ],
               "collaterals": [],
@@ -2018,7 +2027,10 @@
                 {
                   "__typename": "StakeDelegationCertificate",
                   "poolId": "pool1n3s8unkvmre59uzt4ned0903f9q2p8dhscw5v9eeyc0sw0m439t",
-                  "stakeKeyHash": "dcb10cd4e761c827dbf0dfb92e91358c2f5f811203bb5080819e2103"
+                  "stakeCredential": {
+                    "hash": "dcb10cd4e761c827dbf0dfb92e91358c2f5f811203bb5080819e2103",
+                    "type": 0
+                  }
                 }
               ],
               "collaterals": [],
@@ -2135,8 +2147,11 @@
             "body": {
               "certificates": [
                 {
-                  "__typename": "StakeKeyRegistrationCertificate",
-                  "stakeKeyHash": "4e25df68ddb210e2233fb0102aa6384571046fa3b163ae5a04cfadac"
+                  "__typename": "StakeRegistrationCertificate",
+                  "stakeCredential": {
+                    "hash": "4e25df68ddb210e2233fb0102aa6384571046fa3b163ae5a04cfadac",
+                    "type": 0
+                  }
                 },
                 {
                   "__typename": "PoolRegistrationCertificate",
@@ -2176,7 +2191,10 @@
                 {
                   "__typename": "StakeDelegationCertificate",
                   "poolId": "pool12pq2rzx8d7ern46udp6xrn0e0jaqt9hes9gs85hstp0egvfnf9q",
-                  "stakeKeyHash": "4e25df68ddb210e2233fb0102aa6384571046fa3b163ae5a04cfadac"
+                  "stakeCredential": {
+                    "hash": "4e25df68ddb210e2233fb0102aa6384571046fa3b163ae5a04cfadac",
+                    "type": 0
+                  }
                 }
               ],
               "collaterals": [],
@@ -3780,8 +3798,11 @@
             "body": {
               "certificates": [
                 {
-                  "__typename": "StakeKeyRegistrationCertificate",
-                  "stakeKeyHash": "f2f6381fa7a3dcc144939b47dffb7dad677856dfbbee4c4b7e426049"
+                  "__typename": "StakeRegistrationCertificate",
+                  "stakeCredential": {
+                    "hash": "f2f6381fa7a3dcc144939b47dffb7dad677856dfbbee4c4b7e426049",
+                    "type": 0
+                  }
                 },
                 {
                   "__typename": "PoolRegistrationCertificate",
@@ -3821,7 +3842,10 @@
                 {
                   "__typename": "StakeDelegationCertificate",
                   "poolId": "pool1ml3j87d8n3u8czhej8pxfmnpmdt7jgqyv7kraqdvnx9lztt6xrt",
-                  "stakeKeyHash": "f2f6381fa7a3dcc144939b47dffb7dad677856dfbbee4c4b7e426049"
+                  "stakeCredential": {
+                    "hash": "f2f6381fa7a3dcc144939b47dffb7dad677856dfbbee4c4b7e426049",
+                    "type": 0
+                  }
                 }
               ],
               "collaterals": [],

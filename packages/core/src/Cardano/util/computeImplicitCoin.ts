@@ -22,7 +22,7 @@ export const computeImplicitCoin = (
   const deposit = BigIntMath.sum(
     certificates?.map(
       (cert) =>
-        (cert.__typename === CertificateType.StakeKeyRegistration && stakeKeyDepositBigint) ||
+        (cert.__typename === CertificateType.StakeRegistration && stakeKeyDepositBigint) ||
         (cert.__typename === CertificateType.PoolRegistration && poolDepositBigint) ||
         0n
     ) || []
@@ -31,7 +31,7 @@ export const computeImplicitCoin = (
   const reclaimTotal = BigIntMath.sum(
     certificates?.map(
       (cert) =>
-        (cert.__typename === CertificateType.StakeKeyDeregistration && stakeKeyDepositBigint) ||
+        (cert.__typename === CertificateType.StakeDeregistration && stakeKeyDepositBigint) ||
         (cert.__typename === CertificateType.PoolRetirement && poolDepositBigint) ||
         0n
     ) || []

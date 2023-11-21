@@ -30,13 +30,13 @@ describe('storeStakeKeys', () => {
 
   it('inserts and deletes rows based on event', async () => {
     await processEvent({
-      del: [] as Crypto.Ed25519KeyHashHex[],
-      insert: [Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')]
+      del: [] as Crypto.Hash28ByteBase16[],
+      insert: [Crypto.Hash28ByteBase16('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')]
     });
     expect(await queryRunner.manager.count(StakeKeyEntity)).toBe(1);
     await processEvent({
-      del: [Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')],
-      insert: [] as Crypto.Ed25519KeyHashHex[]
+      del: [Crypto.Hash28ByteBase16('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')],
+      insert: [] as Crypto.Hash28ByteBase16[]
     });
     expect(await queryRunner.manager.count(StakeKeyEntity)).toBe(0);
   });

@@ -5,8 +5,8 @@ import { unifiedProjectorOperator } from '../../utils';
 
 export interface WithStakeKeys {
   stakeKeys: {
-    insert: Crypto.Ed25519KeyHashHex[];
-    del: Crypto.Ed25519KeyHashHex[];
+    insert: Crypto.Hash28ByteBase16[];
+    del: Crypto.Hash28ByteBase16[];
   };
 }
 
@@ -21,22 +21,22 @@ export interface WithStakeKeys {
  * ignoring **when** they were registered or unregistered.
  */
 export const withStakeKeys = unifiedProjectorOperator<WithCertificates, WithStakeKeys>((evt) => {
-  const register = new Set<Crypto.Ed25519KeyHashHex>();
-  const deregister = new Set<Crypto.Ed25519KeyHashHex>();
+  const register = new Set<Crypto.Hash28ByteBase16>();
+  const deregister = new Set<Crypto.Hash28ByteBase16>();
   for (const { certificate } of evt.certificates) {
     switch (certificate.__typename) {
-      case Cardano.CertificateType.StakeKeyRegistration:
-        if (deregister.has(certificate.stakeKeyHash)) {
-          deregister.delete(certificate.stakeKeyHash);
+      case Cardano.CertificateType.StakeRegistration:
+        if (deregister.has(certificate.stakeCredential.hash)) {
+          deregister.delete(certificate.stakeCredential.hash);
         } else {
-          register.add(certificate.stakeKeyHash);
+          register.add(certificate.stakeCredential.hash);
         }
         break;
-      case Cardano.CertificateType.StakeKeyDeregistration:
-        if (register.has(certificate.stakeKeyHash)) {
-          register.delete(certificate.stakeKeyHash);
+      case Cardano.CertificateType.StakeDeregistration:
+        if (register.has(certificate.stakeCredential.hash)) {
+          register.delete(certificate.stakeCredential.hash);
         } else {
-          deregister.add(certificate.stakeKeyHash);
+          deregister.add(certificate.stakeCredential.hash);
         }
         break;
     }

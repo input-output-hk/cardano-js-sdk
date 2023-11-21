@@ -19,10 +19,10 @@ export const withStakeKeyRegistrations = unifiedProjectorOperator<WithCertificat
     ...evt,
     stakeKeyRegistrations: evt.certificates
       .map(({ pointer, certificate }): StakeKeyRegistration | null => {
-        if (certificate.__typename === Cardano.CertificateType.StakeKeyRegistration) {
+        if (certificate.__typename === Cardano.CertificateType.StakeRegistration) {
           return {
             pointer,
-            stakeKeyHash: certificate.stakeKeyHash
+            stakeKeyHash: certificate.stakeCredential.hash as unknown as Ed25519KeyHashHex
           };
         }
         return null;

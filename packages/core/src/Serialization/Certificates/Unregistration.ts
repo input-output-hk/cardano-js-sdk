@@ -116,7 +116,7 @@ export class Unregistration {
     return {
       __typename: Cardano.CertificateType.Unregistration,
       deposit: this.#deposit,
-      stakeKeyHash: Crypto.Ed25519KeyHashHex(this.#credential.hash)
+      stakeCredential: this.#credential
     };
   }
 
@@ -126,10 +126,7 @@ export class Unregistration {
    * @param cert core StakeAddressCertificate object.
    */
   static fromCore(cert: Cardano.NewStakeAddressCertificate) {
-    return new Unregistration(
-      { hash: Crypto.Hash28ByteBase16(cert.stakeKeyHash), type: Cardano.CredentialType.KeyHash },
-      cert.deposit
-    );
+    return new Unregistration(cert.stakeCredential, cert.deposit);
   }
 
   /**

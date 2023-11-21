@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { Ed25519KeyHashHex, Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { Hash28ByteBase16, Hash32ByteBase16 } from '@cardano-sdk/crypto';
 
 import merge from 'lodash/merge';
 
@@ -100,7 +100,10 @@ export const withAuxiliaryData: Cardano.HydratedTx = merge(withAssets, {
 export const delegationCertificate: Cardano.StakeDelegationCertificate = {
   __typename: Cardano.CertificateType.StakeDelegation,
   poolId: Cardano.PoolId('pool1cjm567pd9eqj7wlpuq2mnsasw2upewq0tchg4n8gktq5k7eepvr'),
-  stakeKeyHash: Ed25519KeyHashHex('f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80')
+  stakeCredential: {
+    hash: Hash28ByteBase16('f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80'),
+    type: Cardano.CredentialType.KeyHash
+  }
 };
 
 export const collateralInputs = [
@@ -216,7 +219,10 @@ export const withdrawal = {
 export const certificate = {
   __typename: 'StakeDelegationCertificate',
   poolId: 'pool19yv4rswp06fdnwg5zq0uk876gttewt86kytqrlt3ermnq3reky0',
-  stakeKeyHash: '9394c5bb6bc96115c9dc4468d020a99abff4aa2deda81b4bc6665bea'
+  stakeCredential: {
+    hash: '9394c5bb6bc96115c9dc4468d020a99abff4aa2deda81b4bc6665bea',
+    type: 0
+  }
 };
 
 export const redeemer = {

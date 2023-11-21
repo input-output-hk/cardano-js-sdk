@@ -1,5 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Cardano from '../../../src/Cardano';
+import * as Crypto from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 import { StakeVoteRegistrationDelegation } from '../../../src/Serialization';
 
@@ -15,7 +16,10 @@ const core = {
   },
   deposit: 0n,
   poolId: 'pool1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq8a7a2d',
-  stakeKeyHash: '00000000000000000000000000000000000000000000000000000000'
+  stakeCredential: {
+    hash: Crypto.Hash28ByteBase16('00000000000000000000000000000000000000000000000000000000'),
+    type: Cardano.CredentialType.KeyHash
+  }
 } as Cardano.StakeVoteRegistrationDelegationCertificate;
 
 describe('StakeVoteRegistrationDelegation', () => {

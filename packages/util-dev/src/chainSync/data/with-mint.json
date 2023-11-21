@@ -371,7 +371,10 @@
                 {
                   "__typename": "StakeDelegationCertificate",
                   "poolId": "pool1xpr3e4gt8knxq82hpc30a3xa5j0pgwz3c9v5xjdrtuf66ez3m8u",
-                  "stakeKeyHash": "489afd7951769c2f0c6a306c4ed07f1166e3944f563aae38a658241f"
+                  "stakeCredential": {
+                    "hash": "489afd7951769c2f0c6a306c4ed07f1166e3944f563aae38a658241f",
+                    "type": 0
+                  }
                 }
               ],
               "collaterals": [],
