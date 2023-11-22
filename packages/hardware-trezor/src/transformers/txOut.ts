@@ -1,7 +1,7 @@
 import * as Trezor from '@trezor/connect';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { GroupedAddress, util } from '@cardano-sdk/key-management';
-import { InvalidArgumentError, Transform } from '@cardano-sdk/util';
+import { HexBlob, InvalidArgumentError, Transform } from '@cardano-sdk/util';
 import { TrezorTxOutputDestination, TrezorTxTransformerContext } from '../types';
 import { mapTokenMap } from './assets';
 
@@ -29,6 +29,14 @@ const toDestination: Transform<Cardano.TxOut, TrezorTxOutputDestination, TrezorT
       stakingPath
     }
   };
+};
+
+const getScriptHex = (output: Serialization.TransactionOutput): HexBlob | null => {
+  const scriptRef = output.scriptRef();
+
+  if (!scriptRef) return null;
+
+  return scriptRef.toCbor();
 };
 
 /**
@@ -65,6 +73,7 @@ const getInlineDatum = (datum: Cardano.PlutusData): string => Serialization.Plut
 export const toTxOut = (txOut: Cardano.TxOut, context: TrezorTxTransformerContext): Trezor.CardanoOutput => {
   const destination = toDestination(txOut, context);
   const output = Serialization.TransactionOutput.fromCore(txOut);
+  const referenceScriptHex = getScriptHex(output);
 
   const trezorTxOut = isBabbage(output)
     ? {
@@ -74,6 +83,7 @@ export const toTxOut = (txOut: Cardano.TxOut, context: TrezorTxTransformerContex
           : txOut.datum
           ? { inlineDatum: getInlineDatum(txOut.datum) }
           : undefined),
+        ...(referenceScriptHex && { referenceScript: referenceScriptHex }),
         amount: txOut.value.coins.toString(),
         format: Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE
       }

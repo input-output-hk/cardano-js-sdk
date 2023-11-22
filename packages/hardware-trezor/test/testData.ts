@@ -1,6 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, GroupedAddress, KeyRole } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
+import { HexBlob } from '@cardano-sdk/util';
 
 export const mintTokenMap = new Map([
   [Cardano.AssetId('2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740'), 20n],
@@ -84,6 +85,30 @@ export const txOutWithInlineDatum: Cardano.TxOut = {
 export const txOutWithInlineDatumAndOwnedAddress: Cardano.TxOut = {
   ...txOutToOwnedAddress,
   datum: 123n
+};
+
+export const txOutWithReferenceScriptAndDatumHash: Cardano.TxOut = {
+  address: paymentAddress,
+  datumHash: Crypto.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
+  scriptReference: {
+    __type: Cardano.ScriptType.Plutus,
+    bytes: HexBlob('b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450'),
+    version: Cardano.PlutusLanguageVersion.V1
+  },
+  value: { coins: 10n }
+};
+
+export const txOutWithReferenceScriptAndInlineDatum: Cardano.TxOut = {
+  address: paymentAddress,
+  datum: 123n,
+  scriptReference: {
+    __type: Cardano.ScriptType.Plutus,
+    bytes: HexBlob('b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450'),
+    version: Cardano.PlutusLanguageVersion.V1
+  },
+  value: {
+    coins: 10n
+  }
 };
 
 export const rewardKey = 'stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr';
@@ -223,6 +248,21 @@ export const txBody: Cardano.TxBody = {
   inputs: [txIn],
   mint: mintTokenMap,
   outputs: [txOutWithAssets, txOutWithAssetsToOwnedAddress, txOutWithDatumHash],
+  referenceInputs: [txIn],
+  validityInterval: {
+    invalidBefore: Cardano.Slot(100),
+    invalidHereafter: Cardano.Slot(1000)
+  },
+  withdrawals: [coreWithdrawalWithKeyHashCredential]
+};
+
+export const babbageTxBodyWithScripts: Cardano.TxBody = {
+  auxiliaryDataHash,
+  certificates: [stakeDelegationCertificate],
+  fee: 10n,
+  inputs: [txIn],
+  mint: mintTokenMap,
+  outputs: [txOutWithReferenceScriptAndDatumHash, txOutWithReferenceScriptAndInlineDatum],
   validityInterval: {
     invalidBefore: Cardano.Slot(100),
     invalidHereafter: Cardano.Slot(1000)
