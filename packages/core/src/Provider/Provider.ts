@@ -3,7 +3,7 @@ import { Cardano } from '..';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Logger } from 'ts-log';
 import { Percent } from '@cardano-sdk/util';
-import { Tip } from '@cardano-ogmios/schema';
+import { Tip } from '../Cardano';
 
 export type HealthCheckResponse = {
   ok: boolean;
