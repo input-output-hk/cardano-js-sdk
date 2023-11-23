@@ -1,4 +1,4 @@
-import { Cardano, CardanoNodeErrors, Reward, TxCBOR } from '@cardano-sdk/core';
+import { Cardano, Reward, TxCBOR } from '@cardano-sdk/core';
 import { GroupedAddress, util } from '@cardano-sdk/key-management';
 import { Observable } from 'rxjs';
 import { Percent } from '@cardano-sdk/util';
@@ -65,7 +65,7 @@ export interface OutgoingTx {
 
 export interface FailedTx extends OutgoingTx {
   reason: TransactionFailure;
-  error?: CardanoNodeErrors.TxSubmissionError;
+  error?: unknown;
 }
 
 export interface OutgoingOnChainTx extends OutgoingTx {

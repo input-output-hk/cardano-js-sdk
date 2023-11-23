@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Cardano,
-  CardanoNodeErrors,
   HealthCheckResponse,
+  OutsideOfValidityIntervalData,
   ProviderError,
   ProviderFailure,
   SubmitTxArgs,
+  TxSubmissionError,
+  TxSubmissionErrorCode,
   TxSubmitProvider,
   deserializeTx
 } from '@cardano-sdk/core';
@@ -56,19 +58,23 @@ export class SmartTxSubmitProvider implements TxSubmitProvider {
 
     const onlineAndWithinValidityInterval$ = combineLatest([this.#connectionStatus$, this.#tip$]).pipe(
       tap(([_, { slot }]) => {
-        if (slot >= (validityInterval?.invalidHereafter || Number.POSITIVE_INFINITY))
+        if (slot >= (validityInterval?.invalidHereafter || Number.POSITIVE_INFINITY)) {
+          const data: OutsideOfValidityIntervalData = {
+            currentSlot: slot,
+            validityInterval: {
+              invalidBefore: validityInterval?.invalidBefore,
+              invalidHereafter: validityInterval?.invalidHereafter
+            }
+          };
           throw new ProviderError(
             ProviderFailure.BadRequest,
-            new CardanoNodeErrors.TxSubmissionErrors.OutsideOfValidityIntervalError({
-              outsideOfValidityInterval: {
-                currentSlot: slot,
-                interval: {
-                  invalidBefore: validityInterval?.invalidBefore || null,
-                  invalidHereafter: validityInterval?.invalidHereafter || null
-                }
-              }
-            })
+            new TxSubmissionError(
+              TxSubmissionErrorCode.OutsideOfValidityInterval,
+              data,
+              'Not submitting transaction due to validity interval'
+            )
           );
+        }
       }),
       filter(
         ([connectionStatus, { slot }]) =>
@@ -83,9 +89,7 @@ export class SmartTxSubmitProvider implements TxSubmitProvider {
           ...this.#retryBackoffConfig,
           shouldRetry: (error) =>
             error instanceof ProviderError &&
-            [ProviderFailure.Unhealthy, ProviderFailure.ConnectionFailure, ProviderFailure.Unknown].includes(
-              error.reason
-            )
+            [ProviderFailure.Unhealthy, ProviderFailure.ConnectionFailure].includes(error.reason)
         })
       )
     );

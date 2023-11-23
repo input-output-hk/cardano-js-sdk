@@ -43,7 +43,7 @@ import {
 import {
   AssetProvider,
   Cardano,
-  CardanoNodeErrors,
+  CardanoNodeUtil,
   ChainHistoryProvider,
   EpochInfo,
   EraSummary,
@@ -578,13 +578,11 @@ export class PersonalWallet implements ObservableWallet {
       if (
         mightBeAlreadySubmitted &&
         error instanceof ProviderError &&
-        // This could be improved by further parsing the error and:
-        // - checking if ValueNotConservedError produced === 0 (all utxos invalid)
-        // - check if UnknownOrIncompleteWithdrawalsError available withdrawal amount === wallet's reward acc balance
-        (error.innerError instanceof CardanoNodeErrors.TxSubmissionErrors.ValueNotConservedError ||
-          error.innerError instanceof CardanoNodeErrors.TxSubmissionErrors.UnknownOrIncompleteWithdrawalsError ||
-          error.innerError instanceof CardanoNodeErrors.TxSubmissionErrors.CollectErrorsError ||
-          error.innerError instanceof CardanoNodeErrors.TxSubmissionErrors.BadInputsError)
+        // Review: not sure if those 2 errors cover the original ones: there is no longer a CollectErrorsError or BadInputsError
+        ((CardanoNodeUtil.isValueNotConservedError(error.innerError) && error.innerError.data.produced.coins === 0n) ||
+          // TODO: check if IncompleteWithdrawals available withdrawal amount === wallet's reward acc balance?
+          // Not sure what the 'Withdrawals' in error data is exactly: value being withdrawed, or reward acc balance
+          CardanoNodeUtil.isIncompleteWithdrawalsError(error.innerError))
       ) {
         this.#logger.debug(
           `Transaction ${outgoingTx.id} failed with ${error.innerError}, but it appears to be already submitted...`
@@ -593,7 +591,7 @@ export class PersonalWallet implements ObservableWallet {
         return outgoingTx.id;
       }
       this.#newTransactions.failedToSubmit$.next({
-        error: error as CardanoNodeErrors.TxSubmissionError,
+        error,
         reason: TransactionFailure.FailedToSubmit,
         ...outgoingTx
       });

@@ -1,4 +1,11 @@
-import { CardanoNodeErrors, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import {
+  GeneralCardanoNodeError,
+  GeneralCardanoNodeErrorCode,
+  ProviderError,
+  ProviderFailure,
+  TxSubmissionError,
+  TxSubmissionErrorCode
+} from '@cardano-sdk/core';
 import { bufferToHexString } from '@cardano-sdk/util';
 import { config } from '../util';
 import { handleProviderMocks } from '@cardano-sdk/util-dev';
@@ -53,10 +60,16 @@ describe('txSubmitHttpProvider', () => {
 
       describe('errors', () => {
         const testError =
-          (bodyError: Error, providerFailure: ProviderFailure, providerErrorType: unknown) => async () => {
+          (
+            bodyError: Error | null,
+            providerFailure: ProviderFailure,
+            providerErrorType: unknown,
+            reason?: ProviderFailure
+          ) =>
+          async () => {
             try {
               axiosMock.onPost().replyOnce(() => {
-                throw handleProviderMocks.axiosError(bodyError);
+                throw handleProviderMocks.axiosError(bodyError, reason);
               });
               const provider = txSubmitHttpProvider(config);
               await provider.submitTx({ signedTransaction: emptyUintArrayAsHexString });
@@ -64,8 +77,7 @@ describe('txSubmitHttpProvider', () => {
             } catch (error) {
               if (error instanceof ProviderError) {
                 expect(error.reason).toBe(providerFailure);
-                const innerError = error.innerError as CardanoNodeErrors.TxSubmissionError;
-                expect(innerError).toBeInstanceOf(providerErrorType);
+                expect(error.innerError).toBeInstanceOf(providerErrorType);
               } else {
                 throw new TypeError('Expected ProviderError');
               }
@@ -75,21 +87,33 @@ describe('txSubmitHttpProvider', () => {
         it(
           'rehydrates errors',
           testError(
-            new CardanoNodeErrors.TxSubmissionErrors.BadInputsError({ badInputs: [] }),
+            new TxSubmissionError(TxSubmissionErrorCode.EmptyInputSet, null, ''),
             ProviderFailure.BadRequest,
-            CardanoNodeErrors.TxSubmissionErrors.BadInputsError
+            TxSubmissionError
           )
         );
 
         it(
           'maps unrecognized errors to UnknownTxSubmissionError',
-          testError(new Error('Unknown error'), ProviderFailure.Unknown, CardanoNodeErrors.UnknownTxSubmissionError)
+          testError(new Error('Unknown error'), ProviderFailure.Unknown, GeneralCardanoNodeError)
+        );
+
+        it(
+          'uses reason to determine ProviderFailure type when innerError is missing',
+          testError(null, ProviderFailure.BadRequest, ProviderError)
+        );
+
+        it(
+          'non-providerError reason is mapped to ProviderFailure.Unknown when innerError is missing',
+          testError(null, ProviderFailure.Unknown, ProviderError, 'invalidReason' as ProviderFailure)
         );
 
         it('does not re-wrap UnknownTxSubmissionError', async () => {
           expect.assertions(3);
           axiosMock.onPost().replyOnce(() => {
-            throw handleProviderMocks.axiosError(new CardanoNodeErrors.UnknownTxSubmissionError('Unknown error'));
+            throw handleProviderMocks.axiosError(
+              new GeneralCardanoNodeError(GeneralCardanoNodeErrorCode.Unknown, null, '')
+            );
           });
           const provider = txSubmitHttpProvider(config);
           try {
@@ -97,8 +121,8 @@ describe('txSubmitHttpProvider', () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } catch (error: any) {
             expect(error).toBeInstanceOf(ProviderError);
-            expect(error.innerError).toBeInstanceOf(CardanoNodeErrors.UnknownTxSubmissionError);
-            expect(error.innerError.innerError.name).not.toBe(CardanoNodeErrors.UnknownTxSubmissionError.name);
+            expect(error.innerError).toBeInstanceOf(GeneralCardanoNodeError);
+            expect(error.innerError.innerError).toBeUndefined();
           }
         });
       });

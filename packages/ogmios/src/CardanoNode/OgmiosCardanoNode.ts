@@ -1,8 +1,8 @@
+import * as CardanoNodeUtil from './errorUtils';
 import {
   Cardano,
   CardanoNode,
   CardanoNodeErrors,
-  CardanoNodeUtil,
   EraSummary,
   HealthCheckResponse,
   StakeDistribution

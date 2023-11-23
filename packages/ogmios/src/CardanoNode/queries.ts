@@ -1,4 +1,5 @@
-import { CardanoNodeErrors, CardanoNodeUtil } from '@cardano-sdk/core';
+import * as CardanoNodeUtil from './errorUtils';
+import { CardanoNodeErrors } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { StateQueryClient } from '@cardano-ogmios/client/dist/StateQuery';
 import { eraSummary, genesis } from '../ogmiosToCore';
