@@ -4,6 +4,7 @@ import { Assets, FinalizeTxProps, PersonalWallet } from '@cardano-sdk/wallet';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
 import {
+  bip32Ed25519Factory,
   burnTokens,
   createStandaloneKeyAgent,
   firstValueFromTimed,
@@ -60,7 +61,7 @@ describe('PersonalWallet.assets/nft', () => {
     const keyAgent = await createStandaloneKeyAgent(
       env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
       genesis,
-      await wallet.keyAgent.getBip32Ed25519()
+      await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger)
     );
 
     const derivationPath = {

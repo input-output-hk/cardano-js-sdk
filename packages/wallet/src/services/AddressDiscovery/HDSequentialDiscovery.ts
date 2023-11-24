@@ -1,4 +1,4 @@
-import { AccountAddressDerivationPath, AddressType, AsyncKeyAgent, GroupedAddress } from '@cardano-sdk/key-management';
+import { AccountAddressDerivationPath, AddressType, GroupedAddress, util } from '@cardano-sdk/key-management';
 import { AddressDiscovery } from '../types';
 import { ChainHistoryProvider } from '@cardano-sdk/core';
 import uniqBy from 'lodash/uniqBy';
@@ -26,14 +26,14 @@ const addressHasTx = async (address: GroupedAddress, chainHistoryProvider: Chain
 /**
  * Search for all base addresses composed with the given payment and stake credentials.
  *
- * @param keyAgent The key agent controlling the root key to be used to derive the addresses to be discovered.
+ * @param manager The address manager to be used to derive the addresses to be discovered.
  * @param chainHistoryProvider The chain history provider.
  * @param lookAheadCount Number down the derivation chain to be searched for.
  * @param getDeriveAddressArgs Callback that retrieves the derivation path arguments.
  * @returns A promise that will be resolved into a GroupedAddress list containing the discovered addresses.
  */
 const discoverAddresses = async (
-  keyAgent: AsyncKeyAgent,
+  manager: util.Bip32Ed25519AddressManager,
   chainHistoryProvider: ChainHistoryProvider,
   lookAheadCount: number,
   getDeriveAddressArgs: (
@@ -52,13 +52,13 @@ const discoverAddresses = async (
     const externalAddressArgs = getDeriveAddressArgs(currentIndex, AddressType.External);
     const internalAddressArgs = getDeriveAddressArgs(currentIndex, AddressType.Internal);
 
-    const externalAddress = await keyAgent.deriveAddress(
+    const externalAddress = await manager.deriveAddress(
       externalAddressArgs.paymentKeyDerivationPath,
       externalAddressArgs.stakeKeyDerivationIndex,
       true
     );
 
-    const internalAddress = await keyAgent.deriveAddress(
+    const internalAddress = await manager.deriveAddress(
       internalAddressArgs.paymentKeyDerivationPath,
       internalAddressArgs.stakeKeyDerivationIndex,
       true
@@ -111,18 +111,18 @@ export class HDSequentialDiscovery implements AddressDiscovery {
    * This method performs a look-ahead search of 'n' addresses in the HD wallet using the chain history and
    * the given key agent. The discovered addresses are returned as a list.
    *
-   * @param keyAgent The key agent controlling the root key to be used to derive the addresses to be discovered.
+   * @param manager The address manager be used to derive the addresses to be discovered.
    * @returns A promise that will be resolved into a GroupedAddress list containing the discovered addresses.
    */
-  public async discover(keyAgent: AsyncKeyAgent): Promise<GroupedAddress[]> {
-    const firstAddresses = [await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0, true)];
-    const firstInternalAddress = await keyAgent.deriveAddress({ index: 0, type: AddressType.Internal }, 0, true);
+  public async discover(manager: util.Bip32Ed25519AddressManager): Promise<GroupedAddress[]> {
+    const firstAddresses = [await manager.deriveAddress({ index: 0, type: AddressType.External }, 0, true)];
+    const firstInternalAddress = await manager.deriveAddress({ index: 0, type: AddressType.Internal }, 0, true);
     if (await addressHasTx(firstInternalAddress, this.#chainHistoryProvider)) {
       firstAddresses.push(firstInternalAddress);
     }
 
     const stakeKeyAddresses = await discoverAddresses(
-      keyAgent,
+      manager,
       this.#chainHistoryProvider,
       STAKE_KEY_INDEX_LOOKAHEAD,
       (currentIndex, type) => ({
@@ -136,7 +136,7 @@ export class HDSequentialDiscovery implements AddressDiscovery {
     );
 
     const paymentKeyAddresses = await discoverAddresses(
-      keyAgent,
+      manager,
       this.#chainHistoryProvider,
       this.#lookAheadCount,
       (currentIndex, type) => ({
@@ -154,7 +154,7 @@ export class HDSequentialDiscovery implements AddressDiscovery {
     // We need to make sure the addresses are sorted since the wallet assumes that the first address
     // in the list is the change address (payment cred 0 and stake cred 0).
     addresses.sort((a, b) => a.index - b.index || a.stakeKeyDerivationPath!.index - b.stakeKeyDerivationPath!.index);
-    await keyAgent.setKnownAddresses(addresses);
+    await manager.setKnownAddresses(addresses);
 
     return addresses;
   }

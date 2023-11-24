@@ -1,5 +1,5 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { AddressType } from '@cardano-sdk/key-management';
+import { AddressType, util } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { GenericTxBuilder, OutputValidation } from '../../src';
 import { StubKeyAgent, mockProviders as mocks } from '@cardano-sdk/util-dev';
@@ -34,12 +34,14 @@ describe('TxBuilder bootstrap', () => {
     const outputValidator = {
       validateOutput: jest.fn().mockResolvedValue({ coinMissing: 0n } as OutputValidation)
     };
+
     const builderParams = {
+      addressManager: util.createBip32Ed25519AddressManager(keyAgent),
       inputResolver,
-      keyAgent,
       logger: dummyLogger,
       outputValidator,
-      txBuilderProviders
+      txBuilderProviders,
+      witnesser: util.createBip32Ed25519Witnesser(keyAgent)
     };
     const txBuilder = new GenericTxBuilder(builderParams);
 

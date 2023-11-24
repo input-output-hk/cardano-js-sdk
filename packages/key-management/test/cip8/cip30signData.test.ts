@@ -1,5 +1,13 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, AsyncKeyAgent, GroupedAddress, KeyAgent, KeyRole, cip8 } from '../../src';
+import {
+  AddressType,
+  AsyncKeyAgent,
+  GroupedAddress,
+  KeyAgent,
+  util as KeyManagementUtil,
+  KeyRole,
+  cip8
+} from '../../src';
 import { COSEKey, COSESign1, SigStructure } from '@emurgo/cardano-message-signing-nodejs';
 import { Cardano, util } from '@cardano-sdk/core';
 import { CoseLabel } from '../../src/cip8/util';
@@ -22,9 +30,10 @@ describe('cip30signData', () => {
 
   const signAndDecode = async (signWith: Cardano.PaymentAddress | Cardano.RewardAccount) => {
     const dataSignature = await cip8.cip30signData({
-      keyAgent: asyncKeyAgent,
+      addressManager: KeyManagementUtil.createBip32Ed25519AddressManager(asyncKeyAgent),
       payload: HexBlob('abc123'),
-      signWith
+      signWith,
+      witnesser: KeyManagementUtil.createBip32Ed25519Witnesser(asyncKeyAgent)
     });
 
     const coseKey = COSEKey.from_bytes(Buffer.from(dataSignature.key, 'hex'));

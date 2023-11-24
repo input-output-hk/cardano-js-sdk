@@ -11,7 +11,7 @@ import {
   PollingConfig,
   setupWallet
 } from '../../src';
-import { AddressType, AsyncKeyAgent, GroupedAddress } from '@cardano-sdk/key-management';
+import { AddressType, AsyncKeyAgent, GroupedAddress, util } from '@cardano-sdk/key-management';
 import {
   AssetId,
   createStubStakePoolProvider,
@@ -75,13 +75,13 @@ export class MockAddressDiscovery implements AddressDiscovery {
     this.#resolveAfterAttempts = resolveAfterAttempts;
   }
 
-  public async discover(keyAgent: AsyncKeyAgent): Promise<GroupedAddress[]> {
+  public async discover(addressManager: util.Bip32Ed25519AddressManager): Promise<GroupedAddress[]> {
     if (this.#currentAttempt <= this.#resolveAfterAttempts) {
       ++this.#currentAttempt;
       throw new Error('An error occurred during the discovery process.');
     }
 
-    await keyAgent.setKnownAddresses(this.#addresses);
+    await addressManager.setKnownAddresses(this.#addresses);
     return this.#addresses;
   }
 }
@@ -132,18 +132,19 @@ const createWallet = async (props: CreateWalletProps) => {
         { name, polling: props.pollingConfig },
         {
           addressDiscovery: props?.addressDiscovery,
+          addressManager: util.createBip32Ed25519AddressManager(keyAgent),
           assetProvider,
           chainHistoryProvider,
           connectionStatusTracker$,
           handleProvider,
-          keyAgent,
           logger,
           networkInfoProvider,
           rewardsProvider,
           stakePoolProvider,
           stores: props.stores,
           txSubmitProvider,
-          utxoProvider
+          utxoProvider,
+          witnesser: util.createBip32Ed25519Witnesser(keyAgent)
         }
       );
     },
@@ -158,7 +159,8 @@ const assertWalletProperties = async (
   expectedRewardsHistory = flatten([...mocks.rewardsHistory.values()]),
   expectHandles?: boolean
 ) => {
-  expect(wallet.keyAgent).toBeTruthy();
+  expect(wallet.addressManager).toBeTruthy();
+  expect(wallet.witnesser).toBeTruthy();
   // name
   expect(wallet.name).toBe(name);
   // utxo

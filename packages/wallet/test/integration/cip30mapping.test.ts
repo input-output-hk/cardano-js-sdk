@@ -12,7 +12,7 @@ import {
   TxSignError,
   WalletApi
 } from '@cardano-sdk/dapp-connector';
-import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
+import { AddressType, GroupedAddress, util } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { CallbackConfirmation, GetCollateralCallbackParams } from '../../src/cip30';
 import { Cardano, CardanoNodeErrors, Serialization, TxCBOR, coalesceValueQuantities } from '@cardano-sdk/core';
@@ -683,15 +683,16 @@ describe('cip30', () => {
             new PersonalWallet(
               { name: 'Test Wallet' },
               {
+                addressManager: util.createBip32Ed25519AddressManager(keyAgent),
                 assetProvider,
                 chainHistoryProvider,
-                keyAgent,
                 logger,
                 networkInfoProvider,
                 rewardsProvider,
                 stakePoolProvider,
                 txSubmitProvider,
-                utxoProvider
+                utxoProvider,
+                witnesser: util.createBip32Ed25519Witnesser(keyAgent)
               }
             ),
           logger

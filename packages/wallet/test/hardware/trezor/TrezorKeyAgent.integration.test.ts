@@ -28,15 +28,16 @@ const createWallet = async (keyAgent: KeyAgent) => {
   return new PersonalWallet(
     { name: 'Wallet1' },
     {
+      addressManager: util.createBip32Ed25519AddressManager(asyncKeyAgent),
       assetProvider,
       chainHistoryProvider,
-      keyAgent: asyncKeyAgent,
       logger,
       networkInfoProvider,
       rewardsProvider,
       stakePoolProvider,
       txSubmitProvider,
-      utxoProvider
+      utxoProvider,
+      witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)
     }
   );
 };

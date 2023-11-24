@@ -18,7 +18,7 @@ import { Shutdown } from '@cardano-sdk/util';
 
 export type Assets = Map<Cardano.AssetId, Asset.AssetInfo>;
 
-export type SignDataProps = Omit<cip8.Cip30SignDataRequest, 'keyAgent'>;
+export type SignDataProps = Omit<cip8.Cip30SignDataRequest, 'addressManager' | 'witnesser'>;
 
 export interface SyncStatus extends Shutdown {
   /**

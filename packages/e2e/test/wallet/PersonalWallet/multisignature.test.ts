@@ -4,6 +4,7 @@ import { FinalizeTxProps, PersonalWallet } from '@cardano-sdk/wallet';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { KeyRole, util } from '@cardano-sdk/key-management';
 import {
+  bip32Ed25519Factory,
   burnTokens,
   createStandaloneKeyAgent,
   getEnv,
@@ -34,15 +35,16 @@ describe('PersonalWallet/multisignature', () => {
 
     const genesis = await firstValueFrom(wallet.genesisParameters$);
 
+    const bip32Ed25519 = await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger);
     const aliceKeyAgent = await createStandaloneKeyAgent(
       env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
       genesis,
-      await wallet.keyAgent.getBip32Ed25519()
+      bip32Ed25519
     );
     const bobKeyAgent = await createStandaloneKeyAgent(
       env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
       genesis,
-      await wallet.keyAgent.getBip32Ed25519()
+      bip32Ed25519
     );
 
     const aliceDerivationPath = {

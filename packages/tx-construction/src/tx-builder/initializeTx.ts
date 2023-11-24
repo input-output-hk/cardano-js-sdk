@@ -11,13 +11,13 @@ import { firstValueFrom } from 'rxjs';
 
 export const initializeTx = async (
   props: InitializeTxProps,
-  { txBuilderProviders, inputSelector, inputResolver, keyAgent, logger }: TxBuilderDependencies
+  { txBuilderProviders, inputSelector, inputResolver, addressManager, witnesser, logger }: TxBuilderDependencies
 ): Promise<InitializeTxResult> => {
   const [tip, genesisParameters, protocolParameters, addresses, rewardAccounts, utxo] = await Promise.all([
     txBuilderProviders.tip(),
     txBuilderProviders.genesisParameters(),
     txBuilderProviders.protocolParameters(),
-    firstValueFrom(keyAgent.knownAddresses$),
+    firstValueFrom(addressManager.knownAddresses$),
     txBuilderProviders.rewardAccounts(),
     txBuilderProviders.utxoAvailable()
   ]);
@@ -25,7 +25,7 @@ export const initializeTx = async (
   inputSelector =
     inputSelector ??
     roundRobinRandomImprove({
-      changeAddressResolver: new StaticChangeAddressResolver(() => firstValueFrom(keyAgent.knownAddresses$))
+      changeAddressResolver: new StaticChangeAddressResolver(() => firstValueFrom(addressManager.knownAddresses$))
     });
 
   const validityInterval = ensureValidityInterval(tip.slot, genesisParameters, props.options?.validityInterval);
@@ -63,7 +63,7 @@ export const initializeTx = async (
           signingOptions: props.signingOptions,
           witness: props.witness
         },
-        { inputResolver, keyAgent },
+        { addressManager, inputResolver, witnesser },
         true
       );
       return tx;

@@ -5,3 +5,5 @@ export * from './ownSignatureKeyPaths';
 export * from './stubSignTransaction';
 export * from './KeyAgentTransactionSigner';
 export * from './ensureStakeKeys';
+export * from './createAddressManager';
+export * from './createWitnesser';

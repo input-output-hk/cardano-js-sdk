@@ -26,7 +26,11 @@ describe('ensureStakeKeys', () => {
   });
 
   it('can derive one stake key', async () => {
-    const newRewardAccounts = await util.ensureStakeKeys({ count: 1, keyAgent, logger });
+    const newRewardAccounts = await util.ensureStakeKeys({
+      addressManager: util.createBip32Ed25519AddressManager(keyAgent),
+      count: 1,
+      logger
+    });
     const knownAddresses = await firstValueFrom(keyAgent.knownAddresses$);
     expect(knownAddresses.length).toBe(1);
     expect(knownAddresses.map(({ rewardAccount }) => rewardAccount)).toEqual(newRewardAccounts);
@@ -36,7 +40,11 @@ describe('ensureStakeKeys', () => {
     await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0);
     await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 1);
 
-    await util.ensureStakeKeys({ count: 2, keyAgent, logger });
+    await util.ensureStakeKeys({
+      addressManager: util.createBip32Ed25519AddressManager(keyAgent),
+      count: 2,
+      logger
+    });
 
     const knownAddresses = await firstValueFrom(keyAgent.knownAddresses$);
     expect(knownAddresses.length).toBe(2);
@@ -46,7 +54,7 @@ describe('ensureStakeKeys', () => {
     await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0);
     await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 2);
 
-    await util.ensureStakeKeys({ count: 4, keyAgent, logger });
+    await util.ensureStakeKeys({ addressManager: util.createBip32Ed25519AddressManager(keyAgent), count: 4, logger });
 
     const knownAddresses = await firstValueFrom(keyAgent.knownAddresses$);
     const stakeKeyIndices = knownAddresses.map(({ stakeKeyDerivationPath }) => stakeKeyDerivationPath?.index).sort();
@@ -57,7 +65,12 @@ describe('ensureStakeKeys', () => {
     await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0);
     await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 2);
 
-    await util.ensureStakeKeys({ count: 4, keyAgent, logger, paymentKeyIndex: 1 });
+    await util.ensureStakeKeys({
+      addressManager: util.createBip32Ed25519AddressManager(keyAgent),
+      count: 4,
+      logger,
+      paymentKeyIndex: 1
+    });
 
     const stakeKeyIndicesPaymentKey1 = (await firstValueFrom(keyAgent.knownAddresses$))
       .filter(({ index }) => index === 1)
@@ -67,7 +80,7 @@ describe('ensureStakeKeys', () => {
 
   it('can handle request of 0 stake keys', async () => {
     await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0);
-    await util.ensureStakeKeys({ count: 0, keyAgent, logger });
+    await util.ensureStakeKeys({ addressManager: util.createBip32Ed25519AddressManager(keyAgent), count: 0, logger });
 
     const knownAddresses = await firstValueFrom(keyAgent.knownAddresses$);
     expect(knownAddresses.length).toBe(1);
@@ -75,7 +88,9 @@ describe('ensureStakeKeys', () => {
 
   it('returns all reward accounts', async () => {
     await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0);
-    await expect(util.ensureStakeKeys({ count: 2, keyAgent, logger })).resolves.toHaveLength(2);
+    await expect(
+      util.ensureStakeKeys({ addressManager: util.createBip32Ed25519AddressManager(keyAgent), count: 2, logger })
+    ).resolves.toHaveLength(2);
   });
 
   it('takes into account addresses with multiple stake keys and payment keys', async () => {
@@ -86,7 +101,7 @@ describe('ensureStakeKeys', () => {
       keyAgent.deriveAddress({ index: 1, type: AddressType.External }, 2)
     ]);
 
-    await util.ensureStakeKeys({ count: 5, keyAgent, logger });
+    await util.ensureStakeKeys({ addressManager: util.createBip32Ed25519AddressManager(keyAgent), count: 5, logger });
     const knownAddresses = await firstValueFrom(keyAgent.knownAddresses$);
     expect(knownAddresses.length).toBe(6);
 

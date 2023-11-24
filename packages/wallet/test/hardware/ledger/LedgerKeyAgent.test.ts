@@ -44,15 +44,16 @@ describe('LedgerKeyAgent', () => {
         return new PersonalWallet(
           { name: 'HW Wallet' },
           {
+            addressManager: util.createBip32Ed25519AddressManager(asyncKeyAgent),
             assetProvider,
             chainHistoryProvider,
-            keyAgent: asyncKeyAgent,
             logger,
             networkInfoProvider,
             rewardsProvider,
             stakePoolProvider,
             txSubmitProvider,
-            utxoProvider
+            utxoProvider,
+            witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)
           }
         );
       },
