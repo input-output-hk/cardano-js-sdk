@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/consistent-function-scoping */
 import { PouchDbCollectionStore, PouchDbDocumentStore, PouchDbKeyValueStore } from '../../src/persistence';
 import { assertCompletesWithoutEmitting } from './util';
-import { combineLatest, firstValueFrom, mergeMap, timer } from 'rxjs';
+import { combineLatest, firstValueFrom, mergeMap, share, take, timer, toArray } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import PouchDB from 'pouchdb';
 
@@ -97,6 +97,25 @@ describe('pouchDbStores', () => {
     });
 
     it.todo('setAll completes without emitting on any PouchDb error');
+
+    describe('observeAll', () => {
+      it('emits an empty array when collection is empty', async () => {
+        await expect(firstValueFrom(store1.observeAll())).resolves.toEqual([]);
+      });
+      it('emits all items upon subscription', async () => {
+        await firstValueFrom(store1.setAll([doc1, doc2]));
+        await expect(firstValueFrom(store1.observeAll())).resolves.toEqual([doc1, doc2]);
+      });
+      it('emits updated items when setAll is called after subscription', async () => {
+        await firstValueFrom(store1.setAll([doc1]));
+        const observe$ = store1.observeAll().pipe(share());
+        const firstEmission = firstValueFrom(observe$);
+        const twoEmissions = firstValueFrom(observe$.pipe(take(2), toArray()));
+        await firstEmission;
+        await firstValueFrom(store1.setAll([doc1, doc2]));
+        await expect(twoEmissions).resolves.toEqual([[doc1], [doc1, doc2]]);
+      });
+    });
   });
 
   describe('PouchDbKeyValueStore', () => {

@@ -16,6 +16,11 @@ export interface Destroyable {
 
 export interface CollectionStore<T> extends Destroyable {
   /**
+   * Similar to getAll, but does not complete. Instead, emits every time the collection is updated (via this store object).
+   * Emits empty array when no documents are stored.
+   */
+  observeAll(): Observable<T[]>;
+  /**
    * Get all stored documents.
    *
    * @returns {Observable}
@@ -54,7 +59,7 @@ export interface DocumentStore<T> extends Destroyable {
 
 export type KeyValueCollection<K, V> = { key: K; value: V };
 // getAll is not currently used anywhere for this type of store
-export interface KeyValueStore<K, V> extends Omit<CollectionStore<KeyValueCollection<K, V>>, 'getAll'> {
+export interface KeyValueStore<K, V> extends Omit<CollectionStore<KeyValueCollection<K, V>>, 'getAll' | 'observeAll'> {
   /**
    * Get the stored documents by keys.
    *
