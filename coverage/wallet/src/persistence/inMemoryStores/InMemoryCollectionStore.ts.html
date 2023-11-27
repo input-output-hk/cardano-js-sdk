@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>11/11</span>
+                <span class='fraction'>18/18</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>10/10</span>
+                <span class='fraction'>17/17</span>
             </div>
         
             
@@ -84,34 +84,70 @@
 <a name='L19'></a><a href='#L19'>19</a>
 <a name='L20'></a><a href='#L20'>20</a>
 <a name='L21'></a><a href='#L21'>21</a>
-<a name='L22'></a><a href='#L22'>22</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">39x</span>
 <span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">39x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">39x</span>
-<span class="cline-any cline-yes">567x</span>
+<span class="cline-any cline-yes">570x</span>
+<span class="cline-any cline-yes">570x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">275x</span>
-<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">570x</span>
+<span class="cline-any cline-yes">570x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">278x</span>
-<span class="cline-any cline-yes">276x</span>
-<span class="cline-any cline-yes">276x</span>
+<span class="cline-any cline-yes">17x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">281x</span>
+<span class="cline-any cline-yes">279x</span>
+<span class="cline-any cline-yes">279x</span>
+<span class="cline-any cline-yes">279x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/* eslint-disable brace-style */
 import { CollectionStore } from '../types';
-import { EMPTY, Observable, of } from 'rxjs';
+import { EMPTY, Observable, Subject, of } from 'rxjs';
 import { InMemoryStore } from './InMemoryStore';
+import { observeAll } from '../util';
 &nbsp;
 export class InMemoryCollectionStore&lt;T&gt; extends InMemoryStore implements CollectionStore&lt;T&gt; {
+  readonly #updates$ = new Subject&lt;T[]&gt;();
   protected docs: T[] = [];
+  observeAll: CollectionStore&lt;T&gt;['observeAll'];
+&nbsp;
+  constructor() {
+    super();
+    this.observeAll = observeAll(this, this.#updates$);
+  }
 &nbsp;
   getAll(): Observable&lt;T[]&gt; {
     if (this.docs.length === 0 || this.destroyed) return EMPTY;
@@ -121,9 +157,15 @@ export class InMemoryCollectionStore&lt;T&gt; extends InMemoryStore implements C
   setAll(docs: T[]): Observable&lt;void&gt; {
     if (!this.destroyed) {
       this.docs = docs;
+      this.#updates$.next(this.docs);
       return of(void 0);
     }
     return EMPTY;
+  }
+&nbsp;
+  destroy(): Observable&lt;void&gt; {
+    this.#updates$.complete();
+    return super.destroy();
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -133,7 +175,7 @@ export class InMemoryCollectionStore&lt;T&gt; extends InMemoryStore implements C
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-11-27T10:10:15.529Z
+                at 2023-11-27T11:56:54.164Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
