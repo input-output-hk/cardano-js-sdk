@@ -18,7 +18,7 @@ import {
   InMemoryUtxoStore
 } from '../../src/persistence';
 import { assertCompletesWithoutEmitting } from './util';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, share, take, toArray } from 'rxjs';
 
 describe('inMemoryStores', () => {
   describe('InMemoryDocumentStore', () => {
@@ -53,6 +53,28 @@ describe('inMemoryStores', () => {
       await firstValueFrom(store.destroy());
       await assertCompletesWithoutEmitting(store.getAll());
       await assertCompletesWithoutEmitting(store.setAll(docs));
+    });
+    describe('observeAll', () => {
+      it('emits an empty array when collection is empty', async () => {
+        const store = new InMemoryCollectionStore();
+        await expect(firstValueFrom(store.observeAll())).resolves.toEqual([]);
+      });
+      it('emits all items upon subscription', async () => {
+        const store = new InMemoryCollectionStore();
+        await firstValueFrom(store.setAll(docs));
+        await expect(firstValueFrom(store.observeAll())).resolves.toEqual(docs);
+      });
+      it('emits updated items when setAll is called after subscription', async () => {
+        const updatedDocs = [...docs, { c: 'd' }];
+        const store = new InMemoryCollectionStore();
+        await firstValueFrom(store.setAll(docs));
+        const observe$ = store.observeAll().pipe(share());
+        const firstEmission = firstValueFrom(observe$);
+        const twoEmissions = firstValueFrom(observe$.pipe(take(2), toArray()));
+        await firstEmission;
+        await firstValueFrom(store.setAll(updatedDocs));
+        await expect(twoEmissions).resolves.toEqual([docs, updatedDocs]);
+      });
     });
   });
 

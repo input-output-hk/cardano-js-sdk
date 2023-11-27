@@ -1,8 +1,8 @@
 import * as Bip32KeyDerivation from './Bip32KeyDerivation';
-import { Bip32PublicKeyHex } from '../hexTypes';
+import { BIP32_PUBLIC_KEY_HASH_LENGTH, Bip32PublicKeyHashHex, Bip32PublicKeyHex } from '../hexTypes';
 import { ED25519_PUBLIC_KEY_LENGTH, Ed25519PublicKey } from '../Ed25519e';
 import { InvalidArgumentError } from '@cardano-sdk/util';
-import { ready } from 'libsodium-wrappers-sumo';
+import { crypto_generichash, ready } from 'libsodium-wrappers-sumo';
 
 export const BIP32_ED25519_PUBLIC_KEY_LENGTH = 64;
 
@@ -75,5 +75,12 @@ export class Bip32PublicKey {
   /** Gets the Bip32PublicKey as a hex string. */
   hex(): Bip32PublicKeyHex {
     return Bip32PublicKeyHex(Buffer.from(this.#key).toString('hex'));
+  }
+
+  /** Gets the blake2 hash of the key. */
+  async hash(): Promise<Bip32PublicKeyHashHex> {
+    await ready;
+    const hash = crypto_generichash(BIP32_PUBLIC_KEY_HASH_LENGTH, this.#key);
+    return Bip32PublicKeyHashHex(Buffer.from(hash).toString('hex'));
   }
 }
