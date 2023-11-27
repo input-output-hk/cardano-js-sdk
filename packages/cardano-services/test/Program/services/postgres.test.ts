@@ -233,6 +233,7 @@ describe('Service dependency abstractions', () => {
       const result = await provider!.query(HEALTH_CHECK_QUERY);
       expect(result.rowCount).toBeTruthy();
       expect(dnsResolverMock).toBeCalledTimes(3);
+      await provider!.end();
     });
 
     it('should execute a provider operation without to intercept it', async () => {
