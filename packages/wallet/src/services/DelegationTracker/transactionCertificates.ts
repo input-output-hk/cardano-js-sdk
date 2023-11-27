@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, createTxInspector, signedCertificatesInspector } from '@cardano-sdk/core';
 import { Observable, combineLatest, distinctUntilChanged, map } from 'rxjs';
 import { isNotNil } from '@cardano-sdk/util';
@@ -5,8 +6,8 @@ import { transactionsEquals } from '../util/equals';
 import last from 'lodash/last';
 
 export const RegAndDeregCertificateTypes = [
-  Cardano.CertificateType.StakeKeyRegistration,
-  Cardano.CertificateType.StakeKeyDeregistration
+  Cardano.CertificateType.StakeRegistration,
+  Cardano.CertificateType.StakeDeregistration
 ];
 
 export const stakeKeyCertficates = (certificates?: Cardano.Certificate[]) =>
@@ -19,16 +20,18 @@ export const includesAnyCertificate = (haystack: Cardano.Certificate[], needle: 
 
 export const isLastStakeKeyCertOfType = (
   transactionsCertificates: Cardano.Certificate[][],
-  certType: Cardano.CertificateType.StakeKeyRegistration | Cardano.CertificateType.StakeKeyDeregistration,
+  certType: Cardano.CertificateType.StakeRegistration | Cardano.CertificateType.StakeDeregistration,
   rewardAccount?: Cardano.RewardAccount
 ) => {
-  const stakeKeyHash = rewardAccount ? Cardano.RewardAccount.toHash(rewardAccount) : null;
+  const stakeKeyHash = rewardAccount
+    ? Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount))
+    : null;
   const lastRegOrDereg = last(
     transactionsCertificates
       .map((certificates) => {
         const allStakeKeyCertificates = stakeKeyCertficates(certificates);
         const addressStakeKeyCertificates = stakeKeyHash
-          ? allStakeKeyCertificates.filter(({ stakeKeyHash: certStakeKeyHash }) => stakeKeyHash === certStakeKeyHash)
+          ? allStakeKeyCertificates.filter(({ stakeCredential: certStakeCred }) => stakeKeyHash === certStakeCred.hash)
           : allStakeKeyCertificates;
         return last(addressStakeKeyCertificates);
       })

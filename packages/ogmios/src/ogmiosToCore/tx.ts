@@ -70,23 +70,35 @@ const mapCertificate = (certificate: Schema.Certificate): Cardano.Certificate =>
           ({
             __typename: Cardano.CertificateType.StakeDelegation,
             poolId: Cardano.PoolId(certificate.stakePool.id),
-            stakeKeyHash: Crypto.Ed25519KeyHashHex(certificate.credential)
+            stakeCredential: {
+              hash: Crypto.Hash28ByteBase16(certificate.credential),
+              type: Cardano.CredentialType.KeyHash
+            }
           } as Cardano.StakeDelegationCertificate)
         : ({
             __typename: Cardano.CertificateType.VoteDelegation,
-            stakeKeyHash: Crypto.Ed25519KeyHashHex(certificate.credential)
+            stakeCredential: {
+              hash: Crypto.Hash28ByteBase16(certificate.credential),
+              type: Cardano.CredentialType.KeyHash
+            }
             // TODO: Conway `certificate.delegateRepresentative`
           } as Cardano.VoteDelegationCertificate);
     case 'stakeCredentialRegistration':
       return {
-        __typename: Cardano.CertificateType.StakeKeyRegistration,
-        stakeKeyHash: Crypto.Ed25519KeyHashHex(certificate.credential)
+        __typename: Cardano.CertificateType.StakeRegistration,
+        stakeCredential: {
+          hash: Crypto.Hash28ByteBase16(certificate.credential),
+          type: Cardano.CredentialType.KeyHash
+        }
         // TODO: Conway `certificate.deposit`
       };
     case 'stakeCredentialDeregistration':
       return {
-        __typename: Cardano.CertificateType.StakeKeyDeregistration,
-        stakeKeyHash: Crypto.Ed25519KeyHashHex(certificate.credential)
+        __typename: Cardano.CertificateType.StakeDeregistration,
+        stakeCredential: {
+          hash: Crypto.Hash28ByteBase16(certificate.credential),
+          type: Cardano.CredentialType.KeyHash
+        }
         // TODO: Conway `certificate.deposit`
       };
     case 'stakePoolRegistration':

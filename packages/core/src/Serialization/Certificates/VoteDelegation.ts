@@ -110,7 +110,7 @@ export class VoteDelegation {
     return {
       __typename: CertificateType.VoteDelegation,
       dRep: this.#dRep.toCore(),
-      stakeKeyHash: this.#credential.hash as unknown as Crypto.Ed25519KeyHashHex
+      stakeCredential: this.#credential
     };
   }
 
@@ -120,10 +120,7 @@ export class VoteDelegation {
    * @param deleg core VoteDelegationCertificate object.
    */
   static fromCore(deleg: Cardano.VoteDelegationCertificate) {
-    return new VoteDelegation(
-      { hash: Crypto.Hash28ByteBase16(deleg.stakeKeyHash), type: Cardano.CredentialType.KeyHash },
-      DRep.fromCore(deleg.dRep)
-    );
+    return new VoteDelegation(deleg.stakeCredential, DRep.fromCore(deleg.dRep));
   }
 
   /**

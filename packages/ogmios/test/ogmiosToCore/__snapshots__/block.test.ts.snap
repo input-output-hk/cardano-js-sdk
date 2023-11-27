@@ -9,8 +9,11 @@ Object {
         "auxiliaryDataHash": undefined,
         "certificates": Array [
           Object {
-            "__typename": "StakeKeyDeregistrationCertificate",
-            "stakeKeyHash": "c568341dc347876c1c79e07de3e76265560bca4bb9e6af9f36e40923",
+            "__typename": "StakeDeregistrationCertificate",
+            "stakeCredential": Object {
+              "hash": "c568341dc347876c1c79e07de3e76265560bca4bb9e6af9f36e40923",
+              "type": 0,
+            },
           },
         ],
         "collaterals": undefined,
@@ -781,8 +784,11 @@ Object {
         "auxiliaryDataHash": undefined,
         "certificates": Array [
           Object {
-            "__typename": "StakeKeyRegistrationCertificate",
-            "stakeKeyHash": "968d1021ebd7178e1fb0e79676982825cabc779b653e1234d58ce3c6",
+            "__typename": "StakeRegistrationCertificate",
+            "stakeCredential": Object {
+              "hash": "968d1021ebd7178e1fb0e79676982825cabc779b653e1234d58ce3c6",
+              "type": 0,
+            },
           },
           Object {
             "__typename": "PoolRegistrationCertificate",
@@ -812,11 +818,17 @@ Object {
           Object {
             "__typename": "StakeDelegationCertificate",
             "poolId": "pool1547tew8vmuj0g6vj3k5jfddudextcw6hsk2hwgg6pkhk7lwphe6",
-            "stakeKeyHash": "968d1021ebd7178e1fb0e79676982825cabc779b653e1234d58ce3c6",
+            "stakeCredential": Object {
+              "hash": "968d1021ebd7178e1fb0e79676982825cabc779b653e1234d58ce3c6",
+              "type": 0,
+            },
           },
           Object {
-            "__typename": "StakeKeyRegistrationCertificate",
-            "stakeKeyHash": "f130204b518f70c19995449e3737eded3d9ffc31cb50ec0e45010ba3",
+            "__typename": "StakeRegistrationCertificate",
+            "stakeCredential": Object {
+              "hash": "f130204b518f70c19995449e3737eded3d9ffc31cb50ec0e45010ba3",
+              "type": 0,
+            },
           },
           Object {
             "__typename": "PoolRegistrationCertificate",
@@ -846,11 +858,17 @@ Object {
           Object {
             "__typename": "StakeDelegationCertificate",
             "poolId": "pool174mw7e20768e8vj4fn8y6p536n8rkzswsapwtwn354dckpjqzr8",
-            "stakeKeyHash": "f130204b518f70c19995449e3737eded3d9ffc31cb50ec0e45010ba3",
+            "stakeCredential": Object {
+              "hash": "f130204b518f70c19995449e3737eded3d9ffc31cb50ec0e45010ba3",
+              "type": 0,
+            },
           },
           Object {
-            "__typename": "StakeKeyRegistrationCertificate",
-            "stakeKeyHash": "392ae9e068e55e8b5c27acc58b0bab8ea568c0aae2f6fc49be23a7ad",
+            "__typename": "StakeRegistrationCertificate",
+            "stakeCredential": Object {
+              "hash": "392ae9e068e55e8b5c27acc58b0bab8ea568c0aae2f6fc49be23a7ad",
+              "type": 0,
+            },
           },
           Object {
             "__typename": "PoolRegistrationCertificate",
@@ -880,7 +898,10 @@ Object {
           Object {
             "__typename": "StakeDelegationCertificate",
             "poolId": "pool1z22x50lqsrwent6en0llzzs9e577rx7n3mv9kfw7udwa2rf42fa",
-            "stakeKeyHash": "392ae9e068e55e8b5c27acc58b0bab8ea568c0aae2f6fc49be23a7ad",
+            "stakeCredential": Object {
+              "hash": "392ae9e068e55e8b5c27acc58b0bab8ea568c0aae2f6fc49be23a7ad",
+              "type": 0,
+            },
           },
         ],
         "collaterals": undefined,

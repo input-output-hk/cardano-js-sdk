@@ -79,8 +79,8 @@ const hasDelegationCert = (certificates: Array<Cardano.Certificate> | undefined)
 
     switch (cert.__typename) {
       case Cardano.CertificateType.StakeDelegation:
-      case Cardano.CertificateType.StakeKeyRegistration:
-      case Cardano.CertificateType.StakeKeyDeregistration:
+      case Cardano.CertificateType.StakeRegistration:
+      case Cardano.CertificateType.StakeDeregistration:
         hasCert = true;
         break;
       default:
@@ -155,8 +155,8 @@ export const createDelegationTracker = ({
     slotEpochCalc$,
     [
       Cardano.CertificateType.StakeDelegation,
-      Cardano.CertificateType.StakeKeyRegistration,
-      Cardano.CertificateType.StakeKeyDeregistration
+      Cardano.CertificateType.StakeRegistration,
+      Cardano.CertificateType.StakeDeregistration
     ]
   ).pipe(tap((transactionsWithEpochs) => logger.debug(`Found ${transactionsWithEpochs.length} staking transactions`)));
 

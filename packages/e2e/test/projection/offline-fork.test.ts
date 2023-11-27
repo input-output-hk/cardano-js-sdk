@@ -28,7 +28,7 @@ import { ReconnectionConfig } from '@cardano-sdk/util-rxjs';
 import { createDatabase } from 'typeorm-extension';
 import { getEnv } from '../../src';
 
-const dataWithStakeKeyDeregistration = chainSyncData(ChainSyncDataSet.WithStakeKeyDeregistration);
+const dataWithStakeDeregistration = chainSyncData(ChainSyncDataSet.WithStakeKeyDeregistration);
 
 const ogmiosConnectionConfig = ((): ConnectionConfig => {
   const { OGMIOS_URL } = getEnv(['OGMIOS_URL']);
@@ -67,22 +67,22 @@ const createForkProjectionSource = (
   // eslint-disable-next-line sort-keys-fix/sort-keys-fix
   findIntersect: (points) => {
     const intersectionPoint = points[0] as Point;
-    const someEventsWithStakeKeyRegistration = dataWithStakeKeyDeregistration.allEvents
+    const someEventsWithStakeRegistration = dataWithStakeDeregistration.allEvents
       .filter(
         (evt): evt is Omit<ChainSyncRollForward, 'requestNext'> =>
           evt.eventType === ChainSyncEventType.RollForward &&
           evt.block.body.some((tx) =>
-            tx.body.certificates?.some((cert) => cert.__typename === Cardano.CertificateType.StakeKeyRegistration)
+            tx.body.certificates?.some((cert) => cert.__typename === Cardano.CertificateType.StakeRegistration)
           )
       )
       .slice(0, 2);
     return of({
       chainSync$: new Observable<ChainSyncEvent>((subscriber) => {
-        const events = [...someEventsWithStakeKeyRegistration];
+        const events = [...someEventsWithStakeRegistration];
         const next = () => {
           const nextEvt = events.shift();
           if (nextEvt) {
-            const blockOffset = someEventsWithStakeKeyRegistration.length - events.length;
+            const blockOffset = someEventsWithStakeRegistration.length - events.length;
             const slot = Cardano.Slot(intersectionPoint.slot + blockOffset * 20);
             const blockNo = Cardano.BlockNo(lastEvt.block.header.blockNo + blockOffset);
             subscriber.next({
@@ -105,7 +105,7 @@ const createForkProjectionSource = (
       }),
       intersection: {
         point: intersectionPoint,
-        tip: someEventsWithStakeKeyRegistration[someEventsWithStakeKeyRegistration.length - 1].tip
+        tip: someEventsWithStakeRegistration[someEventsWithStakeRegistration.length - 1].tip
       }
     });
   },

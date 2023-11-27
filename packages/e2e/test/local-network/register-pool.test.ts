@@ -12,6 +12,7 @@ import {
 } from '../../src';
 import { logger } from '@cardano-sdk/util-dev';
 
+import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, KeyRole } from '@cardano-sdk/key-management';
 import { firstValueFrom } from 'rxjs';
 
@@ -117,13 +118,17 @@ describe('local-network/register-pool', () => {
 
     const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
     const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccounts[0].address);
+    const stakeCredential = {
+      hash: stakeKeyHash as unknown as Crypto.Hash28ByteBase16,
+      type: Cardano.CredentialType.KeyHash
+    };
 
     await submitCertificate(registrationCert, wallet1);
 
     // Register stake key.
     const registerStakeKey: Cardano.StakeAddressCertificate = {
-      __typename: Cardano.CertificateType.StakeKeyRegistration,
-      stakeKeyHash
+      __typename: Cardano.CertificateType.StakeRegistration,
+      stakeCredential
     };
 
     await submitCertificate(registerStakeKey, wallet1);
@@ -132,7 +137,7 @@ describe('local-network/register-pool', () => {
     const delegationCert: Cardano.StakeDelegationCertificate = {
       __typename: Cardano.CertificateType.StakeDelegation,
       poolId,
-      stakeKeyHash
+      stakeCredential
     };
 
     await submitCertificate(delegationCert, wallet1);
@@ -202,13 +207,17 @@ describe('local-network/register-pool', () => {
 
     const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
     const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccounts[0].address);
+    const stakeCredential = {
+      hash: stakeKeyHash as unknown as Crypto.Hash28ByteBase16,
+      type: Cardano.CredentialType.KeyHash
+    };
 
     await submitCertificate(registrationCert, wallet2);
 
     // Register stake key.
     const registerStakeKey: Cardano.StakeAddressCertificate = {
-      __typename: Cardano.CertificateType.StakeKeyRegistration,
-      stakeKeyHash
+      __typename: Cardano.CertificateType.StakeRegistration,
+      stakeCredential
     };
 
     await submitCertificate(registerStakeKey, wallet2);
@@ -217,7 +226,7 @@ describe('local-network/register-pool', () => {
     const delegationCert: Cardano.StakeDelegationCertificate = {
       __typename: Cardano.CertificateType.StakeDelegation,
       poolId,
-      stakeKeyHash
+      stakeCredential
     };
 
     await submitCertificate(delegationCert, wallet2);

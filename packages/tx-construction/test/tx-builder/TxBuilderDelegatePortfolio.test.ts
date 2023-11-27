@@ -156,13 +156,23 @@ describe('TxBuilder/delegatePortfolio', () => {
 
       expect(tx.body.certificates?.length).toBe(2);
       expect(tx.body.certificates).toContainEqual<Cardano.Certificate>({
-        __typename: Cardano.CertificateType.StakeKeyRegistration,
-        stakeKeyHash: Cardano.RewardAccount.toHash(groupedAddresses[0].rewardAccount)
+        __typename: Cardano.CertificateType.StakeRegistration,
+        stakeCredential: {
+          hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(
+            Cardano.RewardAccount.toHash(groupedAddresses[0].rewardAccount)
+          ),
+          type: Cardano.CredentialType.KeyHash
+        }
       });
       expect(tx.body.certificates).toContainEqual({
         __typename: Cardano.CertificateType.StakeDelegation,
         poolId: poolIds[0],
-        stakeKeyHash: Cardano.RewardAccount.toHash(groupedAddresses[0].rewardAccount)
+        stakeCredential: {
+          hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(
+            Cardano.RewardAccount.toHash(groupedAddresses[0].rewardAccount)
+          ),
+          type: Cardano.CredentialType.KeyHash
+        }
       });
 
       expect(GreedyInputSelector).not.toHaveBeenCalled();
@@ -250,13 +260,13 @@ describe('TxBuilder/delegatePortfolio', () => {
       it('adds delegation certificates', () => {
         expect(tx.body.certificates?.length).toBe(4);
         expect(tx.body.certificates).toContainEqual<Cardano.Certificate>(
-          Cardano.createStakeKeyRegistrationCert(groupedAddresses[0].rewardAccount)
+          Cardano.createStakeRegistrationCert(groupedAddresses[0].rewardAccount)
         );
         expect(tx.body.certificates).toContainEqual(
           Cardano.createDelegationCert(groupedAddresses[0].rewardAccount, poolIds[0])
         );
         expect(tx.body.certificates).toContainEqual(
-          Cardano.createStakeKeyRegistrationCert(groupedAddresses[1].rewardAccount)
+          Cardano.createStakeRegistrationCert(groupedAddresses[1].rewardAccount)
         );
         expect(tx.body.certificates).toContainEqual(
           Cardano.createDelegationCert(groupedAddresses[1].rewardAccount, poolIds[1])
@@ -317,10 +327,10 @@ describe('TxBuilder/delegatePortfolio', () => {
       const tx = await txBuilder.delegatePortfolio(null).build().inspect();
       expect(tx.body.certificates?.length).toBe(2);
       expect(tx.body.certificates).toContainEqual(
-        Cardano.createStakeKeyDeregistrationCert(groupedAddresses[0].rewardAccount)
+        Cardano.createStakeDeregistrationCert(groupedAddresses[0].rewardAccount)
       );
       expect(tx.body.certificates).toContainEqual(
-        Cardano.createStakeKeyDeregistrationCert(groupedAddresses[1].rewardAccount)
+        Cardano.createStakeDeregistrationCert(groupedAddresses[1].rewardAccount)
       );
 
       expect(GreedyInputSelector).toHaveBeenCalled();
@@ -408,7 +418,7 @@ describe('TxBuilder/delegatePortfolio', () => {
 
       expect(tx.body.certificates?.length).toBe(1);
       expect(tx.body.certificates![0]).toEqual(
-        Cardano.createStakeKeyDeregistrationCert(groupedAddresses[0].rewardAccount)
+        Cardano.createStakeDeregistrationCert(groupedAddresses[0].rewardAccount)
       );
 
       await expectGreedyInputSelectorWith(new Map([[groupedAddresses[1].address, 1]]));
@@ -431,7 +441,7 @@ describe('TxBuilder/delegatePortfolio', () => {
       const rewardAccounts = await txBuilderProviders.rewardAccounts();
 
       expect(tx.body.certificates).toEqual([
-        Cardano.createStakeKeyRegistrationCert(rewardAccounts[2].address),
+        Cardano.createStakeRegistrationCert(rewardAccounts[2].address),
         Cardano.createDelegationCert(rewardAccounts[2].address, poolIds[2])
       ]);
     });
@@ -500,7 +510,7 @@ describe('TxBuilder/delegatePortfolio', () => {
         Cardano.createDelegationCert(groupedAddresses[0].rewardAccount, poolIds[2])
       );
       expect(tx.body.certificates).toContainEqual(
-        Cardano.createStakeKeyDeregistrationCert(groupedAddresses[1].rewardAccount)
+        Cardano.createStakeDeregistrationCert(groupedAddresses[1].rewardAccount)
       );
 
       await expectGreedyInputSelectorWith(new Map([[groupedAddresses[0].address, 5]]));
@@ -530,7 +540,7 @@ describe('TxBuilder/delegatePortfolio', () => {
 
       const certs = tx.body.certificates;
       expect(certs?.length).toBe(2);
-      expect((certs![1] as Cardano.StakeDelegationCertificate).stakeKeyHash).toEqual(firstStakeKeyHash);
+      expect((certs![1] as Cardano.StakeDelegationCertificate).stakeCredential.hash).toEqual(firstStakeKeyHash);
     });
 
     it('uses first one when all stake keys are registered', async () => {
@@ -550,7 +560,7 @@ describe('TxBuilder/delegatePortfolio', () => {
       expect(certs.length).toBe(2);
       expect(certs).toEqual<Cardano.Certificate[]>([
         Cardano.createDelegationCert(groupedAddresses[0].rewardAccount, poolIds[0]),
-        Cardano.createStakeKeyDeregistrationCert(groupedAddresses[1].rewardAccount)
+        Cardano.createStakeDeregistrationCert(groupedAddresses[1].rewardAccount)
       ]);
     });
 
@@ -581,8 +591,8 @@ describe('TxBuilder/delegatePortfolio', () => {
 
       const certs = tx.body.certificates as Cardano.StakeDelegationCertificate[];
       expect(certs.length).toBe(2);
-      expect(certs[0].stakeKeyHash).toEqual(firstStakeKeyHash);
-      expect(certs[1].stakeKeyHash).toEqual(secondStakeKeyHash);
+      expect(certs[0].stakeCredential.hash).toEqual(firstStakeKeyHash);
+      expect(certs[1].stakeCredential.hash).toEqual(secondStakeKeyHash);
     });
 
     it('uses registered stake keys over unregistered ones', async () => {
@@ -602,7 +612,7 @@ describe('TxBuilder/delegatePortfolio', () => {
 
       const certs = tx.body.certificates as Cardano.StakeDelegationCertificate[];
       expect(certs.length).toBe(1);
-      expect(certs[0].stakeKeyHash).toEqual(secondStakeKeyHash);
+      expect(certs[0].stakeCredential.hash).toEqual(secondStakeKeyHash);
     });
 
     it('reuses delegated stake keys instead of registering new ones', async () => {
@@ -622,7 +632,7 @@ describe('TxBuilder/delegatePortfolio', () => {
       expect(certs.length).toBe(2);
       expect(certs).toEqual<Cardano.Certificate[]>([
         Cardano.createDelegationCert(groupedAddresses[1].rewardAccount, poolIds[0]),
-        Cardano.createStakeKeyDeregistrationCert(groupedAddresses[0].rewardAccount)
+        Cardano.createStakeDeregistrationCert(groupedAddresses[0].rewardAccount)
       ]);
     });
 
@@ -643,7 +653,7 @@ describe('TxBuilder/delegatePortfolio', () => {
       expect(certs.length).toBe(2);
       expect(certs).toEqual<Cardano.Certificate[]>([
         Cardano.createDelegationCert(groupedAddresses[1].rewardAccount, poolIds[0]),
-        Cardano.createStakeKeyDeregistrationCert(groupedAddresses[0].rewardAccount)
+        Cardano.createStakeDeregistrationCert(groupedAddresses[0].rewardAccount)
       ]);
 
       const metadata = tx.auxiliaryData!.blob!.get(Cardano.DelegationMetadataLabel);

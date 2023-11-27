@@ -104,8 +104,8 @@ export class StakeDeregistration {
    */
   toCore(): Cardano.StakeAddressCertificate {
     return {
-      __typename: Cardano.CertificateType.StakeKeyDeregistration,
-      stakeKeyHash: Crypto.Ed25519KeyHashHex(this.#credential.hash) // TODO: Core type does not support script hash as credential, fix?
+      __typename: Cardano.CertificateType.StakeDeregistration,
+      stakeCredential: this.#credential
     };
   }
 
@@ -115,10 +115,7 @@ export class StakeDeregistration {
    * @param cert core StakeAddressCertificate object.
    */
   static fromCore(cert: Cardano.StakeAddressCertificate) {
-    return new StakeDeregistration({
-      hash: Crypto.Hash28ByteBase16(cert.stakeKeyHash), // TODO: Core type does not support script hash as credential, fix?
-      type: Cardano.CredentialType.KeyHash
-    });
+    return new StakeDeregistration(cert.stakeCredential);
   }
 
   /**

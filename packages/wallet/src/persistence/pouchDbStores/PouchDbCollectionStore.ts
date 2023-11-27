@@ -1,8 +1,9 @@
 /* eslint-disable promise/always-return */
 import { CollectionStore } from '../types';
-import { EMPTY, Observable, from } from 'rxjs';
+import { EMPTY, Observable, Subject, from } from 'rxjs';
 import { Logger } from 'ts-log';
 import { PouchDbStore } from './PouchDbStore';
+import { observeAll } from '../util';
 import { sanitizePouchDbDoc } from './util';
 
 export type ComputePouchDbDocId<T> = (doc: T) => string;
@@ -15,6 +16,9 @@ export interface PouchDbCollectionStoreProps<T> {
 /** PouchDB database that implements CollectionStore. Supports sorting by custom document _id */
 export class PouchDbCollectionStore<T extends {}> extends PouchDbStore<T> implements CollectionStore<T> {
   readonly #computeDocId: ComputePouchDbDocId<T> | undefined;
+  readonly #updates$ = new Subject<T[]>();
+
+  observeAll: CollectionStore<T>['observeAll'];
 
   /**
    * @param props store properties
@@ -25,6 +29,7 @@ export class PouchDbCollectionStore<T extends {}> extends PouchDbStore<T> implem
   constructor({ dbName, computeDocId }: PouchDbCollectionStoreProps<T>, logger: Logger) {
     // Using a db per collection
     super(dbName, logger);
+    this.observeAll = observeAll(this, this.#updates$);
     this.#computeDocId = computeDocId;
   }
 
@@ -54,10 +59,16 @@ export class PouchDbCollectionStore<T extends {}> extends PouchDbStore<T> implem
               _id: this.#computeDocId?.(doc)
             }))
           );
+          this.#updates$.next(docs);
         } catch (error) {
           this.logger.error(`PouchDbCollectionStore(${this.dbName}): failed to setAll`, docs, error);
         }
       }))
     );
+  }
+
+  destroy(): Observable<void> {
+    this.#updates$.complete();
+    return super.destroy();
   }
 }

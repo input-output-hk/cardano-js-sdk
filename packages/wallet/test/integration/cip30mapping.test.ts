@@ -724,8 +724,11 @@ describe('cip30', () => {
         const props = {
           certificates: [
             {
-              __typename: Cardano.CertificateType.StakeKeyDeregistration,
-              stakeKeyHash: mocks.stakeKeyHash
+              __typename: Cardano.CertificateType.StakeDeregistration,
+              stakeCredential: {
+                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(mocks.stakeKeyHash),
+                type: Cardano.CredentialType.KeyHash
+              }
             } as Cardano.StakeAddressCertificate
           ],
           collaterals: new Set([mockUtxo[2][0]]),
@@ -848,7 +851,10 @@ describe('cip30', () => {
             {
               __typename: Cardano.CertificateType.StakeDelegation,
               poolId: Cardano.PoolId.fromKeyHash(foreignRewardAccountHash),
-              stakeKeyHash: foreignRewardAccountHash
+              stakeCredential: {
+                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+                type: Cardano.CredentialType.KeyHash
+              }
             } as Cardano.StakeDelegationCertificate,
             ...tx.body.certificates!
           ];
@@ -922,7 +928,10 @@ describe('cip30', () => {
             {
               __typename: Cardano.CertificateType.StakeDelegation,
               poolId: Cardano.PoolId.fromKeyHash(foreignRewardAccountHash),
-              stakeKeyHash: foreignRewardAccountHash
+              stakeCredential: {
+                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+                type: Cardano.CredentialType.KeyHash
+              }
             } as Cardano.StakeDelegationCertificate,
             ...tx.body.certificates!
           ];

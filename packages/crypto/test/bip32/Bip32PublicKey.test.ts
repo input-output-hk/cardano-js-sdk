@@ -47,4 +47,10 @@ describe('Bip32PublicKey', () => {
       expect(rawKey.hex()).toBe(vector.ed25519eVector.publicKey);
     }
   });
+
+  it('can compute Blake2b hash of a bip32 public key', async () => {
+    const publicKey = Crypto.Bip32PublicKey.fromHex(Crypto.Bip32PublicKeyHex(extendedVectors[0].publicKey));
+    const hash = await publicKey.hash();
+    expect(typeof hash).toBe('string');
+  });
 });

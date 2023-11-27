@@ -1,13 +1,14 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Anchor, DelegateRepresentative } from './Governance';
-import { Credential, RewardAccount } from '../Address';
+import { Credential, CredentialType, RewardAccount } from '../Address';
 import { EpochNo } from './Block';
+import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { Lovelace } from './Value';
 import { PoolId, PoolParameters } from './StakePool';
 
 export enum CertificateType {
-  StakeKeyRegistration = 'StakeKeyRegistrationCertificate',
-  StakeKeyDeregistration = 'StakeKeyDeregistrationCertificate',
+  StakeRegistration = 'StakeRegistrationCertificate',
+  StakeDeregistration = 'StakeDeregistrationCertificate',
   PoolRegistration = 'PoolRegistrationCertificate',
   PoolRetirement = 'PoolRetirementCertificate',
   StakeDelegation = 'StakeDelegationCertificate',
@@ -15,8 +16,8 @@ export enum CertificateType {
   GenesisKeyDelegation = 'GenesisKeyDelegationCertificate', // deprecated in conway
 
   // Conway Era Certs
-  Registration = 'RegistrationCertificate', // Replaces StakeKeyRegistration in post-conway era
-  Unregistration = 'UnRegistrationCertificate', // Replaces StakeKeyDeregistration in post-conway era
+  Registration = 'RegistrationCertificate', // Replaces StakeRegistration in post-conway era
+  Unregistration = 'UnRegistrationCertificate', // Replaces StakeDeregistration in post-conway era
   VoteDelegation = 'VoteDelegationCertificate',
   StakeVoteDelegation = 'StakeVoteDelegationCertificate',
   StakeRegistrationDelegation = 'StakeRegistrationDelegateCertificate', // delegate or delegation??
@@ -34,41 +35,41 @@ export enum CertificateType {
 // Conway Certificates
 export interface NewStakeAddressCertificate {
   __typename: CertificateType.Registration | CertificateType.Unregistration;
-  stakeKeyHash: Crypto.Ed25519KeyHashHex;
+  stakeCredential: Credential;
   deposit: Lovelace;
 }
 
 // Delegation
 export interface VoteDelegationCertificate {
   __typename: CertificateType.VoteDelegation;
-  stakeKeyHash: Crypto.Ed25519KeyHashHex;
+  stakeCredential: Credential;
   dRep: DelegateRepresentative;
 }
 
 export interface StakeVoteDelegationCertificate {
   __typename: CertificateType.StakeVoteDelegation;
-  stakeKeyHash: Crypto.Ed25519KeyHashHex;
+  stakeCredential: Credential;
   poolId: PoolId;
   dRep: DelegateRepresentative;
 }
 
 export interface StakeRegistrationDelegationCertificate {
   __typename: CertificateType.StakeRegistrationDelegation;
-  stakeKeyHash: Crypto.Ed25519KeyHashHex;
+  stakeCredential: Credential;
   poolId: PoolId;
   deposit: Lovelace;
 }
 
 export interface VoteRegistrationDelegationCertificate {
   __typename: CertificateType.VoteRegistrationDelegation;
-  stakeKeyHash: Crypto.Ed25519KeyHashHex;
+  stakeCredential: Credential;
   dRep: DelegateRepresentative;
   deposit: Lovelace;
 }
 
 export interface StakeVoteRegistrationDelegationCertificate {
   __typename: CertificateType.StakeVoteRegistrationDelegation;
-  stakeKeyHash: Crypto.Ed25519KeyHashHex;
+  stakeCredential: Credential;
   poolId: PoolId;
   dRep: DelegateRepresentative;
   deposit: Lovelace;
@@ -117,8 +118,8 @@ export interface RetireCcCertificate {
 
 /** To be deprecated in the Era after conway replaced by <NewStakeAddressCertificate> */
 export interface StakeAddressCertificate {
-  __typename: CertificateType.StakeKeyRegistration | CertificateType.StakeKeyDeregistration;
-  stakeKeyHash: Crypto.Ed25519KeyHashHex;
+  __typename: CertificateType.StakeRegistration | CertificateType.StakeDeregistration;
+  stakeCredential: Credential;
 }
 
 export interface PoolRegistrationCertificate {
@@ -134,7 +135,7 @@ export interface PoolRetirementCertificate {
 
 export interface StakeDelegationCertificate {
   __typename: CertificateType.StakeDelegation;
-  stakeKeyHash: Crypto.Ed25519KeyHashHex;
+  stakeCredential: Credential;
   poolId: PoolId;
 }
 
@@ -191,9 +192,12 @@ export type Certificate =
  *
  * @param rewardAccount The reward account to be registered.
  */
-export const createStakeKeyRegistrationCert = (rewardAccount: RewardAccount): Certificate => ({
-  __typename: CertificateType.StakeKeyRegistration,
-  stakeKeyHash: RewardAccount.toHash(rewardAccount)
+export const createStakeRegistrationCert = (rewardAccount: RewardAccount): Certificate => ({
+  __typename: CertificateType.StakeRegistration,
+  stakeCredential: {
+    hash: Hash28ByteBase16.fromEd25519KeyHashHex(RewardAccount.toHash(rewardAccount)),
+    type: CredentialType.KeyHash
+  }
 });
 
 /**
@@ -201,9 +205,12 @@ export const createStakeKeyRegistrationCert = (rewardAccount: RewardAccount): Ce
  *
  * @param rewardAccount The reward account to be de-registered.
  */
-export const createStakeKeyDeregistrationCert = (rewardAccount: RewardAccount): Certificate => ({
-  __typename: CertificateType.StakeKeyDeregistration,
-  stakeKeyHash: RewardAccount.toHash(rewardAccount)
+export const createStakeDeregistrationCert = (rewardAccount: RewardAccount): Certificate => ({
+  __typename: CertificateType.StakeDeregistration,
+  stakeCredential: {
+    hash: Hash28ByteBase16.fromEd25519KeyHashHex(RewardAccount.toHash(rewardAccount)),
+    type: CredentialType.KeyHash
+  }
 });
 
 /**
@@ -215,5 +222,8 @@ export const createStakeKeyDeregistrationCert = (rewardAccount: RewardAccount): 
 export const createDelegationCert = (rewardAccount: RewardAccount, poolId: PoolId): Certificate => ({
   __typename: CertificateType.StakeDelegation,
   poolId,
-  stakeKeyHash: RewardAccount.toHash(rewardAccount)
+  stakeCredential: {
+    hash: Hash28ByteBase16.fromEd25519KeyHashHex(RewardAccount.toHash(rewardAccount)),
+    type: CredentialType.KeyHash
+  }
 });

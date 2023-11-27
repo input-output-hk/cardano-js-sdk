@@ -1,4 +1,5 @@
 import * as AssetIds from '../AssetId';
+import * as Crypto from '@cardano-sdk/crypto';
 import {
   AssetFingerprint,
   AssetId,
@@ -7,6 +8,7 @@ import {
   BlockNo,
   Certificate,
   CertificateType,
+  CredentialType,
   EpochNo,
   HydratedTx,
   HydratedTxIn,
@@ -59,15 +61,19 @@ describe('txInspector', () => {
   );
   const rewardAccount = RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
   const stakeKeyHash = RewardAccount.toHash(rewardAccount);
+  const stakeCredential = {
+    hash: stakeKeyHash as unknown as Crypto.Hash28ByteBase16,
+    type: CredentialType.KeyHash
+  };
   const poolId = PoolId('pool1euf2nh92ehqfw7rpd4s9qgq34z8dg4pvfqhjmhggmzk95gcd402');
   const delegationCert: StakeDelegationCertificate = {
     __typename: CertificateType.StakeDelegation,
     poolId,
-    stakeKeyHash
+    stakeCredential
   };
   const keyRegistrationCert: StakeAddressCertificate = {
-    __typename: CertificateType.StakeKeyRegistration,
-    stakeKeyHash
+    __typename: CertificateType.StakeRegistration,
+    stakeCredential
   };
   const poolRegistrationCert: PoolRegistrationCertificate = {
     __typename: CertificateType.PoolRegistration,
@@ -100,8 +106,8 @@ describe('txInspector', () => {
     poolId
   };
   const keyDeregistrationCert: StakeAddressCertificate = {
-    __typename: CertificateType.StakeKeyDeregistration,
-    stakeKeyHash
+    __typename: CertificateType.StakeDeregistration,
+    stakeCredential
   };
   const withdrawals: Withdrawal[] = [
     {
@@ -409,7 +415,7 @@ describe('txInspector', () => {
         const inspectTx = createTxInspector({ delegation: delegationInspector });
         const txProperties = inspectTx(tx);
 
-        expect(txProperties.delegation[0].stakeKeyHash).toEqual(delegationCert.stakeKeyHash);
+        expect(txProperties.delegation[0].stakeCredential).toEqual(delegationCert.stakeCredential);
         expect(txProperties.delegation[0].poolId).toEqual(delegationCert.poolId);
       }
     );
@@ -435,7 +441,7 @@ describe('txInspector', () => {
 
         const txProperties = inspectTx(tx);
 
-        expect(txProperties.stakeKeyRegistration[0].stakeKeyHash).toEqual(keyRegistrationCert.stakeKeyHash);
+        expect(txProperties.stakeKeyRegistration[0].stakeCredential).toEqual(keyRegistrationCert.stakeCredential);
       }
     );
 
@@ -462,7 +468,7 @@ describe('txInspector', () => {
           stakeKeyDeregistration: stakeKeyDeregistrationInspector
         });
         const txProperties = inspectTx(tx);
-        expect(txProperties.stakeKeyDeregistration[0].stakeKeyHash).toEqual(keyDeregistrationCert.stakeKeyHash);
+        expect(txProperties.stakeKeyDeregistration[0].stakeCredential).toEqual(keyDeregistrationCert.stakeCredential);
       }
     );
 
@@ -563,7 +569,13 @@ describe('txInspector', () => {
       'a transaction with some certificates signed with any of the provided reward accounts' +
         ' and some signed with other produces an inspection containing only the former',
       () => {
-        const otherCert = { ...delegationCert, stakeKeyHash: '' as unknown as Ed25519KeyHashHex };
+        const otherCert = {
+          ...delegationCert,
+          stakeCredential: {
+            hash: '00000000000000000000000000000000000000000000000000000000' as unknown as Crypto.Hash28ByteBase16,
+            type: CredentialType.KeyHash
+          }
+        };
         const tx = buildMockTx({ certificates: [delegationCert, otherCert] });
         const inspectTx = createTxInspector({ signedCertificates: signedCertificatesInspector([rewardAccount]) });
         const txProperties = inspectTx(tx);
@@ -577,7 +589,7 @@ describe('txInspector', () => {
       () => {
         const tx = buildMockTx({ certificates: [delegationCert, keyRegistrationCert] });
         const inspectTx = createTxInspector({
-          signedCertificates: signedCertificatesInspector([rewardAccount], [CertificateType.StakeKeyRegistration])
+          signedCertificates: signedCertificatesInspector([rewardAccount], [CertificateType.StakeRegistration])
         });
         const txProperties = inspectTx(tx);
         expect(txProperties.signedCertificates).toEqual([keyRegistrationCert]);

@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, ChainHistoryProvider, metadatum } from '@cardano-sdk/core';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TransactionsTracker, createDelegationPortfolioTracker } from '../../../src/services';
@@ -44,8 +45,11 @@ describe('DelegationTracker', () => {
         const transactions = [
           createStubTxWithCertificates([
             {
-              __typename: Cardano.CertificateType.StakeKeyRegistration,
-              stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+              __typename: Cardano.CertificateType.StakeRegistration,
+              stakeCredential: {
+                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                type: Cardano.CredentialType.KeyHash
+              }
             }
           ]),
           createStubTxWithCertificates([
@@ -54,14 +58,20 @@ describe('DelegationTracker', () => {
             } as Cardano.Certificate,
             {
               __typename: Cardano.CertificateType.StakeDelegation,
-              stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+              stakeCredential: {
+                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                type: Cardano.CredentialType.KeyHash
+              }
             } as Cardano.Certificate
           ]),
           createStubTxWithCertificates(),
           createStubTxWithCertificates([
             {
-              __typename: Cardano.CertificateType.StakeKeyDeregistration,
-              stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+              __typename: Cardano.CertificateType.StakeDeregistration,
+              stakeCredential: {
+                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                type: Cardano.CredentialType.KeyHash
+              }
             }
           ])
         ];
@@ -80,7 +90,7 @@ describe('DelegationTracker', () => {
           } as unknown as TransactionsTracker,
           rewardAccounts$,
           slotEpochCalc$,
-          [Cardano.CertificateType.StakeDelegation, Cardano.CertificateType.StakeKeyDeregistration]
+          [Cardano.CertificateType.StakeDelegation, Cardano.CertificateType.StakeDeregistration]
         );
         expectObservable(target$).toBe('-a', {
           a: [
@@ -95,7 +105,7 @@ describe('DelegationTracker', () => {
         const rewardAccount = Cardano.RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv');
         const transactions = [
           createStubTxWithCertificates([
-            { __typename: Cardano.CertificateType.StakeKeyRegistration } as Cardano.Certificate
+            { __typename: Cardano.CertificateType.StakeRegistration } as Cardano.Certificate
           ]),
           createStubTxWithCertificates([
             { __typename: Cardano.CertificateType.PoolRetirement } as Cardano.Certificate,
@@ -103,7 +113,7 @@ describe('DelegationTracker', () => {
           ]),
           createStubTxWithCertificates(),
           createStubTxWithCertificates([
-            { __typename: Cardano.CertificateType.StakeKeyDeregistration } as Cardano.Certificate
+            { __typename: Cardano.CertificateType.StakeDeregistration } as Cardano.Certificate
           ])
         ];
         const slotEpochCalc = jest.fn().mockReturnValueOnce(284).mockReturnValueOnce(285);
@@ -120,7 +130,7 @@ describe('DelegationTracker', () => {
           } as unknown as TransactionsTracker,
           rewardAccounts$,
           slotEpochCalc$,
-          [Cardano.CertificateType.StakeDelegation, Cardano.CertificateType.StakeKeyDeregistration]
+          [Cardano.CertificateType.StakeDelegation, Cardano.CertificateType.StakeDeregistration]
         );
         expectObservable(target$).toBe('-a', {
           a: []
@@ -179,24 +189,33 @@ describe('DelegationTracker', () => {
           a: [
             createStubTxWithSlot(284, [
               {
-                __typename: Cardano.CertificateType.StakeKeyRegistration,
-                stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                __typename: Cardano.CertificateType.StakeRegistration,
+                stakeCredential: {
+                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                  type: Cardano.CredentialType.KeyHash
+                }
               }
             ])
           ],
           b: [
             createStubTxWithSlot(284, [
               {
-                __typename: Cardano.CertificateType.StakeKeyRegistration,
-                stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                __typename: Cardano.CertificateType.StakeRegistration,
+                stakeCredential: {
+                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                  type: Cardano.CredentialType.KeyHash
+                }
               }
             ]),
             createStubTxWithSlot(
               285,
               [
                 {
-                  __typename: Cardano.CertificateType.StakeKeyRegistration,
-                  stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                  __typename: Cardano.CertificateType.StakeRegistration,
+                  stakeCredential: {
+                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                    type: Cardano.CredentialType.KeyHash
+                  }
                 }
               ],
               {
@@ -207,16 +226,22 @@ describe('DelegationTracker', () => {
           c: [
             createStubTxWithSlot(284, [
               {
-                __typename: Cardano.CertificateType.StakeKeyRegistration,
-                stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                __typename: Cardano.CertificateType.StakeRegistration,
+                stakeCredential: {
+                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                  type: Cardano.CredentialType.KeyHash
+                }
               }
             ]),
             createStubTxWithSlot(
               285,
               [
                 {
-                  __typename: Cardano.CertificateType.StakeKeyRegistration,
-                  stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                  __typename: Cardano.CertificateType.StakeRegistration,
+                  stakeCredential: {
+                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                    type: Cardano.CredentialType.KeyHash
+                  }
                 }
               ],
               {
@@ -225,24 +250,33 @@ describe('DelegationTracker', () => {
             ),
             createStubTxWithSlot(286, [
               {
-                __typename: Cardano.CertificateType.StakeKeyRegistration,
-                stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                __typename: Cardano.CertificateType.StakeRegistration,
+                stakeCredential: {
+                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                  type: Cardano.CredentialType.KeyHash
+                }
               }
             ])
           ],
           d: [
             createStubTxWithSlot(284, [
               {
-                __typename: Cardano.CertificateType.StakeKeyRegistration,
-                stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                __typename: Cardano.CertificateType.StakeRegistration,
+                stakeCredential: {
+                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                  type: Cardano.CredentialType.KeyHash
+                }
               }
             ]),
             createStubTxWithSlot(
               285,
               [
                 {
-                  __typename: Cardano.CertificateType.StakeKeyRegistration,
-                  stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                  __typename: Cardano.CertificateType.StakeRegistration,
+                  stakeCredential: {
+                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                    type: Cardano.CredentialType.KeyHash
+                  }
                 }
               ],
               {
@@ -251,16 +285,22 @@ describe('DelegationTracker', () => {
             ),
             createStubTxWithSlot(286, [
               {
-                __typename: Cardano.CertificateType.StakeKeyRegistration,
-                stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                __typename: Cardano.CertificateType.StakeRegistration,
+                stakeCredential: {
+                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                  type: Cardano.CredentialType.KeyHash
+                }
               }
             ]),
             createStubTxWithSlot(
               287,
               [
                 {
-                  __typename: Cardano.CertificateType.StakeKeyRegistration,
-                  stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                  __typename: Cardano.CertificateType.StakeRegistration,
+                  stakeCredential: {
+                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                    type: Cardano.CredentialType.KeyHash
+                  }
                 }
               ],
               {
@@ -291,8 +331,11 @@ describe('DelegationTracker', () => {
               284,
               [
                 {
-                  __typename: Cardano.CertificateType.StakeKeyRegistration,
-                  stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                  __typename: Cardano.CertificateType.StakeRegistration,
+                  stakeCredential: {
+                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                    type: Cardano.CredentialType.KeyHash
+                  }
                 }
               ],
               {
@@ -303,8 +346,11 @@ describe('DelegationTracker', () => {
           b: [
             createStubTxWithSlot(286, [
               {
-                __typename: Cardano.CertificateType.StakeKeyRegistration,
-                stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                __typename: Cardano.CertificateType.StakeRegistration,
+                stakeCredential: {
+                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                  type: Cardano.CredentialType.KeyHash
+                }
               }
             ])
           ]
@@ -329,8 +375,11 @@ describe('DelegationTracker', () => {
               284,
               [
                 {
-                  __typename: Cardano.CertificateType.StakeKeyRegistration,
-                  stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                  __typename: Cardano.CertificateType.StakeRegistration,
+                  stakeCredential: {
+                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                    type: Cardano.CredentialType.KeyHash
+                  }
                 }
               ],
               {

@@ -3,7 +3,7 @@ import { Cardano } from '@cardano-sdk/core';
 import { GroupedAddress } from '@cardano-sdk/key-management';
 import { TrezorTxTransformerContext } from '../types';
 import { mapAdditionalWitnessRequests } from './additionalWitnessRequests';
-import { mapAuxiliaryData, mapCerts, mapTxIns, mapTxOuts, mapWithdrawals } from './';
+import { mapAuxiliaryData, mapCerts, mapTxIns, mapTxOuts, mapWithdrawals, toTxOut } from './';
 import { mapTokenMap } from './assets';
 
 /**
@@ -22,12 +22,16 @@ const trezorTxTransformer = async (
     additionalWitnessRequests: mapAdditionalWitnessRequests(inputs, context),
     auxiliaryData: body.auxiliaryDataHash ? mapAuxiliaryData(body.auxiliaryDataHash) : undefined,
     certificates: mapCerts(body.certificates ?? [], context),
+    collateralInputs: body.collaterals ? await mapTxIns(body.collaterals, context) : undefined,
+    collateralReturn: body.collateralReturn ? toTxOut(body.collateralReturn, context) : undefined,
     fee: body.fee.toString(),
     inputs,
     mint: mapTokenMap(body.mint, true),
     networkId: context.chainId.networkId,
     outputs: mapTxOuts(body.outputs, context),
     protocolMagic: context.chainId.networkMagic,
+    referenceInputs: body.referenceInputs ? await mapTxIns(body.referenceInputs, context) : undefined,
+    totalCollateral: body.totalCollateral ? body.totalCollateral.toString() : undefined,
     ttl: body.validityInterval?.invalidHereafter?.toString(),
     validityIntervalStart: body.validityInterval?.invalidBefore?.toString(),
     withdrawals: mapWithdrawals(body.withdrawals ?? [], context)

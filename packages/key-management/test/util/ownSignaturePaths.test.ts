@@ -9,6 +9,11 @@ export const stakeKeyPath = {
   role: KeyRole.Stake
 };
 
+const toStakeCredential = (stakeKeyHash: Crypto.Ed25519KeyHashHex): Cardano.Credential => ({
+  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+  type: Cardano.CredentialType.KeyHash
+});
+
 const createGroupedAddress = (
   address: Cardano.PaymentAddress,
   rewardAccount: Cardano.RewardAccount,
@@ -36,7 +41,16 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
   );
 
   const ownStakeKeyHash = Cardano.RewardAccount.toHash(ownRewardAccount);
+  const ownStakeCredential = {
+    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(ownStakeKeyHash),
+    type: Cardano.CredentialType.KeyHash
+  };
+
   const otherStakeKeyHash = Cardano.RewardAccount.toHash(otherRewardAccount);
+  const otherStakeCredential = {
+    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(otherStakeKeyHash),
+    type: Cardano.CredentialType.KeyHash
+  };
 
   let dRepPublicKey: Crypto.Ed25519PublicKeyHex;
   let dRepKeyHash: Crypto.Ed25519KeyHashHex;
@@ -74,11 +88,11 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
   });
 
   it(
-    'does not return stake key derivation path when a StakeKeyRegistration' +
+    'does not return stake key derivation path when a StakeRegistration' +
       ' certificate with the wallet stake key hash is present',
     async () => {
       const txBody = {
-        certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, stakeKeyHash: ownStakeKeyHash }],
+        certificates: [{ __typename: Cardano.CertificateType.StakeRegistration, stakeCredential: ownStakeCredential }],
         inputs: [{}, {}, {}]
       } as Cardano.TxBody;
       const resolveInput = jest
@@ -102,7 +116,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
         certificates: [
           {
             __typename: Cardano.CertificateType.Registration,
-            stakeKeyHash: ownStakeKeyHash
+            stakeCredential: ownStakeCredential
           } as Cardano.NewStakeAddressCertificate
         ],
         inputs: [{}, {}, {}]
@@ -125,11 +139,13 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
   );
 
   it(
-    'returns stake key derivation path when a StakeKeyDeregistration' +
+    'returns stake key derivation path when a StakeDeregistration' +
       ' certificate with the wallet stake key hash is present',
     async () => {
       const txBody = {
-        certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, stakeKeyHash: ownStakeKeyHash }],
+        certificates: [
+          { __typename: Cardano.CertificateType.StakeDeregistration, stakeCredential: ownStakeCredential }
+        ],
         inputs: [{}, {}, {}]
       } as Cardano.TxBody;
       const resolveInput = jest
@@ -154,7 +170,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       ' certificate with the wallet stake key hash is present',
     async () => {
       const txBody = {
-        certificates: [{ __typename: Cardano.CertificateType.StakeDelegation, stakeKeyHash: ownStakeKeyHash }],
+        certificates: [{ __typename: Cardano.CertificateType.StakeDelegation, stakeCredential: ownStakeCredential }],
         inputs: [{}, {}, {}]
       } as Cardano.TxBody;
       const resolveInput = jest
@@ -178,8 +194,8 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
   it('returns stake key derivation path when at least one certificate with the wallet stake key hash is present', async () => {
     const txBody = {
       certificates: [
-        { __typename: Cardano.CertificateType.StakeDelegation, stakeKeyHash: ownStakeKeyHash },
-        { __typename: Cardano.CertificateType.StakeKeyDeregistration, stakeKeyHash: otherStakeKeyHash }
+        { __typename: Cardano.CertificateType.StakeDelegation, stakeCredential: ownStakeCredential },
+        { __typename: Cardano.CertificateType.StakeDeregistration, stakeCredential: otherStakeCredential }
       ],
       inputs: [{}, {}, {}]
     } as Cardano.TxBody;
@@ -307,23 +323,23 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
   it('does not return derivation paths when all certificates and voting procedures are foreign', async () => {
     const txBody = {
       certificates: [
-        { __typename: Cardano.CertificateType.StakeKeyRegistration, stakeKeyHash: otherStakeKeyHash },
-        { __typename: Cardano.CertificateType.Registration, stakeKeyHash: otherStakeKeyHash },
-        { __typename: Cardano.CertificateType.VoteDelegation, stakeKeyHash: otherStakeKeyHash },
-        { __typename: Cardano.CertificateType.StakeVoteDelegation, stakeKeyHash: otherStakeKeyHash },
+        { __typename: Cardano.CertificateType.StakeRegistration, stakeCredential: otherStakeCredential },
+        { __typename: Cardano.CertificateType.Registration, stakeCredential: otherStakeCredential },
+        { __typename: Cardano.CertificateType.VoteDelegation, stakeCredential: otherStakeCredential },
+        { __typename: Cardano.CertificateType.StakeVoteDelegation, stakeCredential: otherStakeCredential },
         {
           __typename: Cardano.CertificateType.StakeRegistrationDelegation,
-          stakeKeyHash: otherStakeKeyHash
+          stakeCredential: otherStakeCredential
         },
         {
           __typename: Cardano.CertificateType.VoteRegistrationDelegation,
-          stakeKeyHash: otherStakeKeyHash
+          stakeCredential: otherStakeCredential
         },
         {
           __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
-          stakeKeyHash: otherStakeKeyHash
+          stakeCredential: otherStakeCredential
         },
-        { __typename: Cardano.CertificateType.Unregistration, otherStakeKeyHash },
+        { __typename: Cardano.CertificateType.Unregistration, stakeCredential: otherStakeCredential },
         {
           __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
           dRepCredential: {
@@ -471,21 +487,30 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
     it('is returned for certificates with the wallet stake key hash', async () => {
       const txBody = {
         certificates: [
-          { __typename: Cardano.CertificateType.VoteDelegation, stakeKeyHash: rewardAccounts[0].stakeKeyHash },
-          { __typename: Cardano.CertificateType.StakeVoteDelegation, stakeKeyHash: rewardAccounts[1].stakeKeyHash },
+          {
+            __typename: Cardano.CertificateType.VoteDelegation,
+            stakeCredential: toStakeCredential(rewardAccounts[0].stakeKeyHash)
+          },
+          {
+            __typename: Cardano.CertificateType.StakeVoteDelegation,
+            stakeCredential: toStakeCredential(rewardAccounts[1].stakeKeyHash)
+          },
           {
             __typename: Cardano.CertificateType.StakeRegistrationDelegation,
-            stakeKeyHash: rewardAccounts[2].stakeKeyHash
+            stakeCredential: toStakeCredential(rewardAccounts[2].stakeKeyHash)
           },
           {
             __typename: Cardano.CertificateType.VoteRegistrationDelegation,
-            stakeKeyHash: rewardAccounts[3].stakeKeyHash
+            stakeCredential: toStakeCredential(rewardAccounts[3].stakeKeyHash)
           },
           {
             __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
-            stakeKeyHash: rewardAccounts[4].stakeKeyHash
+            stakeCredential: toStakeCredential(rewardAccounts[4].stakeKeyHash)
           },
-          { __typename: Cardano.CertificateType.Unregistration, stakeKeyHash: rewardAccounts[5].stakeKeyHash }
+          {
+            __typename: Cardano.CertificateType.Unregistration,
+            stakeCredential: toStakeCredential(rewardAccounts[5].stakeKeyHash)
+          }
         ],
         inputs: [{}, {}, {}]
       } as Cardano.TxBody;
@@ -507,8 +532,14 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
     it('duplicates are removed when multiple certificates use the wallet stake key hash', async () => {
       const txBody = {
         certificates: [
-          { __typename: Cardano.CertificateType.VoteDelegation, stakeKeyHash: rewardAccounts[0].stakeKeyHash },
-          { __typename: Cardano.CertificateType.StakeVoteDelegation, stakeKeyHash: rewardAccounts[0].stakeKeyHash }
+          {
+            __typename: Cardano.CertificateType.VoteDelegation,
+            stakeCredential: toStakeCredential(rewardAccounts[0].stakeKeyHash)
+          },
+          {
+            __typename: Cardano.CertificateType.StakeVoteDelegation,
+            stakeCredential: toStakeCredential(rewardAccounts[0].stakeKeyHash)
+          }
         ],
         inputs: [{}, {}, {}]
       } as Cardano.TxBody;

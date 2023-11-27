@@ -36,6 +36,12 @@ describe('HexTypes', () => {
     ).not.toThrow();
   });
 
+  it('Bip32PublicKeyHashHex() accepts a valid public key hash hex string', () => {
+    expect(() =>
+      Crypto.Bip32PublicKeyHashHex('6199186adb51974690d7247d2646097d2c62763b767b528816fb7edc')
+    ).not.toThrow();
+  });
+
   it('Bip32PrivateKeyHex() accepts a valid public key hex string', () => {
     expect(() =>
       Crypto.Bip32PrivateKeyHex(

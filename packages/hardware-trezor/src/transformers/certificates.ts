@@ -66,7 +66,10 @@ const getStakeAddressCertificate = (
   context: TrezorTxTransformerContext,
   type: StakeKeyCertificateType
 ): TrezorStakeKeyCertificate => {
-  const credentials = getCertCredentials(certificate.stakeKeyHash, context.knownAddresses);
+  const credentials = getCertCredentials(
+    certificate.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex,
+    context.knownAddresses
+  );
   return {
     ...credentials,
     type
@@ -78,7 +81,10 @@ const getStakeDelegationCertificate = (
   context: TrezorTxTransformerContext
 ): TrezorDelegationCertificate => {
   const poolIdKeyHash = Cardano.PoolId.toKeyHash(certificate.poolId);
-  const credentials = getCertCredentials(certificate.stakeKeyHash, context.knownAddresses);
+  const credentials = getCertCredentials(
+    certificate.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex,
+    context.knownAddresses
+  );
   return {
     ...credentials,
     pool: poolIdKeyHash,
@@ -153,9 +159,9 @@ export const getPoolRegistrationCertificate = (
 
 const toCert = (cert: Cardano.Certificate, context: TrezorTxTransformerContext) => {
   switch (cert.__typename) {
-    case Cardano.CertificateType.StakeKeyRegistration:
+    case Cardano.CertificateType.StakeRegistration:
       return getStakeAddressCertificate(cert, context, Trezor.PROTO.CardanoCertificateType.STAKE_REGISTRATION);
-    case Cardano.CertificateType.StakeKeyDeregistration:
+    case Cardano.CertificateType.StakeDeregistration:
       return getStakeAddressCertificate(cert, context, Trezor.PROTO.CardanoCertificateType.STAKE_DEREGISTRATION);
     case Cardano.CertificateType.StakeDelegation:
       return getStakeDelegationCertificate(cert, context);

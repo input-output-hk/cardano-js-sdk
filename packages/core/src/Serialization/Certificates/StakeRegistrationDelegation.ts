@@ -115,7 +115,7 @@ export class StakeRegistrationDelegation {
       __typename: CertificateType.StakeRegistrationDelegation,
       deposit: this.#deposit,
       poolId: Cardano.PoolId.fromKeyHash(this.#poolKeyHash),
-      stakeKeyHash: this.#credential.hash as unknown as Crypto.Ed25519KeyHashHex
+      stakeCredential: this.#credential
     };
   }
 
@@ -126,7 +126,7 @@ export class StakeRegistrationDelegation {
    */
   static fromCore(deleg: Cardano.StakeRegistrationDelegationCertificate) {
     return new StakeRegistrationDelegation(
-      { hash: Crypto.Hash28ByteBase16(deleg.stakeKeyHash), type: Cardano.CredentialType.KeyHash },
+      deleg.stakeCredential,
       deleg.deposit,
       Cardano.PoolId.toKeyHash(deleg.poolId)
     );
