@@ -269,3 +269,16 @@ export const babbageTxBodyWithScripts: Cardano.TxBody = {
   },
   withdrawals: [coreWithdrawalWithKeyHashCredential]
 };
+
+export const txBodyWithCollaterals = {
+  ...minValidTxBody,
+  collateralReturn: txOut,
+  collaterals: [txIn]
+};
+
+export const plutusTxWithBabbage = {
+  ...babbageTxBodyWithScripts,
+  collateralReturn: txOut,
+  collaterals: [txIn],
+  totalCollateral: 1000n
+};
