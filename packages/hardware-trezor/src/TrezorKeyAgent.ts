@@ -153,6 +153,13 @@ export class TrezorKeyAgent extends KeyAgentBase {
       }
     }
 
+    // Represents a transaction that includes Plutus script evaluation (e.g. spending from a script address). We will
+    // also flag any transaction with required extra signers as a plutus transaction, since ordinary transactions requires
+    // all inputs to be provided by the wallet
+    if (tx.collateralInputs || tx.requiredSigners) {
+      return Trezor.PROTO.CardanoTxSigningMode.PLUTUS_TRANSACTION;
+    }
+
     // Represents an ordinary user transaction transferring funds.
     return Trezor.PROTO.CardanoTxSigningMode.ORDINARY_TRANSACTION;
   }
