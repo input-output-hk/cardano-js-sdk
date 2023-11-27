@@ -2,6 +2,7 @@ import { Cardano, NotImplementedError, ProviderError, ProviderFailure } from '@c
 import { DataMocks } from '../data-mocks';
 import { DataSource } from 'typeorm';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { Pool } from 'pg';
 import { PoolMetadataEntity, PoolRegistrationEntity } from '@cardano-sdk/projection-typeorm';
 import { StakePoolMetadataFetchMode } from '../../src/Program/options';
 import {
@@ -17,11 +18,12 @@ describe('stakePoolMetadataHandler', () => {
   const vrf = 'test_vfr';
 
   let dataSource: DataSource;
+  let db: Pool;
 
   beforeAll(async () => {
     const testData = await initHandlerTest();
     const { block, stakePool } = testData;
-    ({ dataSource } = testData);
+    ({ dataSource, db } = testData);
 
     const registrationRepos = dataSource.getRepository(PoolRegistrationEntity);
     const registration1 = {
@@ -46,6 +48,8 @@ describe('stakePoolMetadataHandler', () => {
     await registrationRepos.insert(registration1);
     await registrationRepos.insert(registration2);
   });
+
+  afterAll(() => Promise.all([db.end(), dataSource.destroy()]));
 
   describe('isUpdateOutdated', () => {
     it('returns true if there is a newer pool update', async () => {
@@ -108,6 +112,7 @@ describe('stakePoolMetadataHandler', () => {
       expect(await metadataRepos.find({ where: { poolUpdate } })).toEqual([]);
     });
   });
+
   describe('attachExtendedMetadata', () => {
     const metadata = {
       description: 'description',

@@ -94,6 +94,8 @@ describe('HttpServer', () => {
     provider = new DbSyncUtxoProvider({ cache, cardanoNode, dbPools, logger });
   });
 
+  afterAll(() => Promise.all([dbPools.healthCheck.end(), dbPools.main.end()]));
+
   describe('initialize', () => {
     afterEach(() => httpServer.shutdown());
     it('initializes the express application', async () => {
