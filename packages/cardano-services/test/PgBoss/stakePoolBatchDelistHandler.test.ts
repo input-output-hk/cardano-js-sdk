@@ -1,4 +1,5 @@
 import { DataSource } from 'typeorm';
+import { Pool } from 'pg';
 import { PoolDelistedEntity } from '@cardano-sdk/projection-typeorm';
 import { WorkerHandlerFactoryOptions } from '../../src/PgBoss';
 import { createSmashStakePoolDelistedService } from '../../src/StakePool/HttpStakePoolMetadata/SmashStakePoolDelistedService';
@@ -10,11 +11,16 @@ jest.mock('../../src/StakePool/HttpStakePoolMetadata/SmashStakePoolDelistedServi
 
 describe('stakePoolBatchDelistHandler', () => {
   let dataSource: DataSource;
+  let db: Pool;
 
   beforeAll(async () => {
     const testData = await initHandlerTest();
-    dataSource = testData.dataSource;
+
+    ({ dataSource, db } = testData);
   });
+
+  afterAll(() => Promise.all([db.end(), dataSource.destroy()]));
+
   it('contain latest delisted pools only', async () => {
     // Padded by spaces because pool id length is fixed to 56 chars
     const expected = ['pool1', 'pool2', 'pool3'].map((p) => p.padEnd(56, ' '));

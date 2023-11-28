@@ -55,5 +55,5 @@ export const initHandlerTest = async () => {
   await blockRepos.insert(block);
   await poolRepos.insert(stakePool);
 
-  return { block, dataSource, stakePool };
+  return { block, dataSource, db, stakePool };
 };
