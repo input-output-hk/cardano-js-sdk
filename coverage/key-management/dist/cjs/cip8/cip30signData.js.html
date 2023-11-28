@@ -243,10 +243,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cip30signData = exports.Cip30DataSignError = exports.Cip30DataSignErrorCode = void 0;
 const cardano_message_signing_nodejs_1 = require("@emurgo/cardano-message-signing-nodejs");
+const util_1 = require("../util");
 const core_1 = require("@cardano-sdk/core");
-const util_1 = require("@cardano-sdk/util");
-const util_2 = require("./util");
-const util_3 = require("../util");
+const util_2 = require("@cardano-sdk/util");
+const util_3 = require("./util");
 const rxjs_1 = require("rxjs");
 var Cip30DataSignErrorCode;
 (function (Cip30DataSignErrorCode) {
@@ -254,7 +254,7 @@ var Cip30DataSignErrorCode;
     Cip30DataSignErrorCode[Cip30DataSignErrorCode["AddressNotPK"] = 2] = "AddressNotPK";
     Cip30DataSignErrorCode[Cip30DataSignErrorCode["UserDeclined"] = 3] = "UserDeclined";
 })(Cip30DataSignErrorCode = exports.Cip30DataSignErrorCode || (exports.Cip30DataSignErrorCode = {}));
-class Cip30DataSignError extends util_1.ComposableError {
+class Cip30DataSignError extends util_2.ComposableError {
 <span class="fstat-no" title="function not covered" >    co</span>nstructor(code, info, innerError) {
 <span class="cstat-no" title="statement not covered" >        super(`DataSignError code: ${code}`, innerError);</span>
 <span class="cstat-no" title="statement not covered" >        this.code = code;</span>
@@ -269,17 +269,17 @@ const getAddressBytes = <span class="fstat-no" title="function not covered" >(s<
     }
 <span class="cstat-no" title="statement not covered" >    return Buffer.from(address.toBytes(), 'hex');</span>
 };
-const getDerivationPath = <span class="fstat-no" title="function not covered" >as</span>ync (signWith, keyAgent) =&gt; {
+const getDerivationPath = <span class="fstat-no" title="function not covered" >as</span>ync (signWith, addressManager) =&gt; {
 <span class="cstat-no" title="statement not covered" >    if (core_1.Cardano.DRepID.isValid(signWith)) {</span>
-<span class="cstat-no" title="statement not covered" >        return util_3.DREP_KEY_DERIVATION_PATH;</span>
+<span class="cstat-no" title="statement not covered" >        return util_1.DREP_KEY_DERIVATION_PATH;</span>
     }
     const isRewardAccount = <span class="cstat-no" title="statement not covered" >signWith.startsWith('stake');</span>
-    const knownAddresses = <span class="cstat-no" title="statement not covered" >await (0, rxjs_1.firstValueFrom)(keyAgent.knownAddresses$.pipe((0, rxjs_1.filter)(<span class="fstat-no" title="function not covered" >(a</span>ddresses) =&gt; <span class="cstat-no" title="statement not covered" >addresses.length &gt; 0)</span>));</span>
+    const knownAddresses = <span class="cstat-no" title="statement not covered" >await (0, rxjs_1.firstValueFrom)(addressManager.knownAddresses$.pipe((0, rxjs_1.filter)(<span class="fstat-no" title="function not covered" >(a</span>ddresses) =&gt; <span class="cstat-no" title="statement not covered" >addresses.length &gt; 0)</span>));</span>
 <span class="cstat-no" title="statement not covered" >    if (isRewardAccount) {</span>
         const knownRewardAddress = <span class="cstat-no" title="statement not covered" >knownAddresses.find(<span class="fstat-no" title="function not covered" >({</span> rewardAccount }) =&gt; <span class="cstat-no" title="statement not covered" >rewardAccount === signWith)</span>;</span>
 <span class="cstat-no" title="statement not covered" >        if (!knownRewardAddress)</span>
 <span class="cstat-no" title="statement not covered" >            throw new Cip30DataSignError(Cip30DataSignErrorCode.ProofGeneration, 'Unknown reward address');</span>
-<span class="cstat-no" title="statement not covered" >        return knownRewardAddress.stakeKeyDerivationPath || util_3.STAKE_KEY_DERIVATION_PATH;</span>
+<span class="cstat-no" title="statement not covered" >        return knownRewardAddress.stakeKeyDerivationPath || util_1.STAKE_KEY_DERIVATION_PATH;</span>
     }
     const knownAddress = <span class="cstat-no" title="statement not covered" >knownAddresses.find(<span class="fstat-no" title="function not covered" >({</span> address }) =&gt; <span class="cstat-no" title="statement not covered" >address === signWith)</span>;</span>
 <span class="cstat-no" title="statement not covered" >    if (!knownAddress) {</span>
@@ -290,13 +290,13 @@ const getDerivationPath = <span class="fstat-no" title="function not covered" >a
 const createSigStructureHeaders = <span class="fstat-no" title="function not covered" >(a</span>ddressBytes) =&gt; {
     const protectedHeaders = <span class="cstat-no" title="statement not covered" >cardano_message_signing_nodejs_1.HeaderMap.new();</span>
 <span class="cstat-no" title="statement not covered" >    protectedHeaders.set_key_id(addressBytes);</span>
-<span class="cstat-no" title="statement not covered" >    protectedHeaders.set_header(util_2.CoseLabel.address, cardano_message_signing_nodejs_1.CBORValue.new_bytes(addressBytes));</span>
+<span class="cstat-no" title="statement not covered" >    protectedHeaders.set_header(util_3.CoseLabel.address, cardano_message_signing_nodejs_1.CBORValue.new_bytes(addressBytes));</span>
 <span class="cstat-no" title="statement not covered" >    protectedHeaders.set_algorithm_id(cardano_message_signing_nodejs_1.Label.from_algorithm_id(cardano_message_signing_nodejs_1.AlgorithmId.EdDSA));</span>
 <span class="cstat-no" title="statement not covered" >    return protectedHeaders;</span>
 };
-const signSigStructure = <span class="fstat-no" title="function not covered" >(k</span>eyAgent, derivationPath, sigStructure) =&gt; {
+const signSigStructure = <span class="fstat-no" title="function not covered" >(w</span>itnesser, derivationPath, sigStructure) =&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
-<span class="cstat-no" title="statement not covered" >        return keyAgent.signBlob(derivationPath, core_1.util.bytesToHex(sigStructure.to_bytes()));</span>
+<span class="cstat-no" title="statement not covered" >        return witnesser.signBlob(derivationPath, core_1.util.bytesToHex(sigStructure.to_bytes()));</span>
     }
     catch (error) {
 <span class="cstat-no" title="statement not covered" >        throw new Cip30DataSignError(Cip30DataSignErrorCode.UserDeclined, 'Failed to sign', error);</span>
@@ -306,19 +306,19 @@ const createCoseKey = <span class="fstat-no" title="function not covered" >(a</s
     const coseKey = <span class="cstat-no" title="statement not covered" >cardano_message_signing_nodejs_1.COSEKey.new(cardano_message_signing_nodejs_1.Label.from_key_type(cardano_message_signing_nodejs_1.KeyType.OKP));</span>
 <span class="cstat-no" title="statement not covered" >    coseKey.set_key_id(addressBytes);</span>
 <span class="cstat-no" title="statement not covered" >    coseKey.set_algorithm_id(cardano_message_signing_nodejs_1.Label.from_algorithm_id(cardano_message_signing_nodejs_1.AlgorithmId.EdDSA));</span>
-<span class="cstat-no" title="statement not covered" >    coseKey.set_header(util_2.CoseLabel.crv, cardano_message_signing_nodejs_1.CBORValue.from_label(cardano_message_signing_nodejs_1.Label.from_curve_type(cardano_message_signing_nodejs_1.CurveType.Ed25519)));</span>
-<span class="cstat-no" title="statement not covered" >    coseKey.set_header(util_2.CoseLabel.x, cardano_message_signing_nodejs_1.CBORValue.new_bytes(Buffer.from(publicKey, 'hex')));</span>
+<span class="cstat-no" title="statement not covered" >    coseKey.set_header(util_3.CoseLabel.crv, cardano_message_signing_nodejs_1.CBORValue.from_label(cardano_message_signing_nodejs_1.Label.from_curve_type(cardano_message_signing_nodejs_1.CurveType.Ed25519)));</span>
+<span class="cstat-no" title="statement not covered" >    coseKey.set_header(util_3.CoseLabel.x, cardano_message_signing_nodejs_1.CBORValue.new_bytes(Buffer.from(publicKey, 'hex')));</span>
 <span class="cstat-no" title="statement not covered" >    return coseKey;</span>
 };
-const cip30signData = <span class="fstat-no" title="function not covered" >as</span>ync ({ keyAgent, signWith, payload }) =&gt; {
+const cip30signData = <span class="fstat-no" title="function not covered" >as</span>ync ({ addressManager, witnesser, signWith, payload }) =&gt; {
 <span class="cstat-no" title="statement not covered" >    if (core_1.Cardano.DRepID.isValid(signWith) &amp;&amp; !core_1.Cardano.DRepID.canSign(signWith)) {</span>
 <span class="cstat-no" title="statement not covered" >        throw new Cip30DataSignError(Cip30DataSignErrorCode.AddressNotPK, 'Invalid address');</span>
     }
     const addressBytes = <span class="cstat-no" title="statement not covered" >getAddressBytes(signWith);</span>
-    const derivationPath = <span class="cstat-no" title="statement not covered" >await getDerivationPath(signWith, keyAgent);</span>
+    const derivationPath = <span class="cstat-no" title="statement not covered" >await getDerivationPath(signWith, addressManager);</span>
     const builder = <span class="cstat-no" title="statement not covered" >cardano_message_signing_nodejs_1.COSESign1Builder.new(cardano_message_signing_nodejs_1.Headers.new(cardano_message_signing_nodejs_1.ProtectedHeaderMap.new(createSigStructureHeaders(addressBytes)), cardano_message_signing_nodejs_1.HeaderMap.new()), Buffer.from(payload, 'hex'), false);</span>
     const sigStructure = <span class="cstat-no" title="statement not covered" >builder.make_data_to_sign();</span>
-    const { signature, publicKey } = <span class="cstat-no" title="statement not covered" >await signSigStructure(keyAgent, derivationPath, sigStructure);</span>
+    const { signature, publicKey } = <span class="cstat-no" title="statement not covered" >await signSigStructure(witnesser, derivationPath, sigStructure);</span>
     const coseSign1 = <span class="cstat-no" title="statement not covered" >builder.build(Buffer.from(signature, 'hex'));</span>
     const coseKey = <span class="cstat-no" title="statement not covered" >createCoseKey(addressBytes, publicKey);</span>
 <span class="cstat-no" title="statement not covered" >    return {</span>
@@ -334,7 +334,7 @@ exports.cip30signData = cip30signData;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-11-28T09:30:00.905Z
+                at 2023-11-28T15:08:31.261Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
