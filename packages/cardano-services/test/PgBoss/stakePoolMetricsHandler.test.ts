@@ -2,6 +2,7 @@ import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
 import { CurrentPoolMetricsEntity, StakePoolEntity } from '@cardano-sdk/projection-typeorm';
 import { DataSource } from 'typeorm';
 import { Percent } from '@cardano-sdk/util';
+import { Pool } from 'pg';
 import { Repository } from 'typeorm/repository/Repository';
 import { getPoolIdsToUpdate, savePoolMetrics } from '../../src/PgBoss/stakePoolMetricsHandler';
 import { initHandlerTest, poolId } from './util';
@@ -9,6 +10,7 @@ import { logger } from '@cardano-sdk/util-dev';
 
 describe('stakePoolMetricsHandler', () => {
   let dataSource: DataSource;
+  let db: Pool;
   let metricsRepos: Repository<CurrentPoolMetricsEntity>;
   const metrics: Cardano.StakePoolMetrics = {
     blocksCreated: 23,
@@ -23,10 +25,12 @@ describe('stakePoolMetricsHandler', () => {
 
   beforeAll(async () => {
     const testData = await initHandlerTest();
-    ({ dataSource } = testData);
+    ({ dataSource, db } = testData);
 
     metricsRepos = dataSource.getRepository(CurrentPoolMetricsEntity);
   });
+
+  afterAll(() => Promise.all([db.end(), dataSource.destroy()]));
 
   describe('getPoolIdsToUpdate', () => {
     const partialOptions = {
