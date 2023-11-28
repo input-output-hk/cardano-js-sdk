@@ -1,11 +1,12 @@
-import { AddressType, AsyncKeyAgent, KeyRole } from '../types';
+import { AddressType, KeyRole } from '../types';
+import { Bip32Ed25519AddressManager } from './createAddressManager';
 import { Cardano } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { firstValueFrom } from 'rxjs';
 
 export interface EnsureStakeKeysParams {
   /** Key agent to use */
-  keyAgent: AsyncKeyAgent;
+  addressManager: Bip32Ed25519AddressManager;
   /** Requested number of stake keys */
   count: number;
   /** The payment key index to use when more stake keys are needed */
@@ -15,12 +16,12 @@ export interface EnsureStakeKeysParams {
 
 /** Given a count, checks if enough stake keys exist and derives more if needed. Returns all reward accounts */
 export const ensureStakeKeys = async ({
-  keyAgent,
+  addressManager,
   count,
   logger,
   paymentKeyIndex: index = 0
 }: EnsureStakeKeysParams): Promise<Cardano.RewardAccount[]> => {
-  const knownAddresses = await firstValueFrom(keyAgent.knownAddresses$);
+  const knownAddresses = await firstValueFrom(addressManager.knownAddresses$);
   const stakeKeys = new Map(
     knownAddresses
       .filter(
@@ -35,7 +36,7 @@ export const ensureStakeKeys = async ({
   // Need more stake keys for the portfolio
   for (let stakeKeyIdx = 0; stakeKeys.size < count; stakeKeyIdx++) {
     if (!stakeKeys.has(stakeKeyIdx)) {
-      const address = await keyAgent.deriveAddress({ index, type: AddressType.External }, stakeKeyIdx);
+      const address = await addressManager.deriveAddress({ index, type: AddressType.External }, stakeKeyIdx);
       logger.debug(
         `No derivation with stake key index ${stakeKeyIdx} exists. Derived a new stake key ${address.rewardAccount}.`
       );

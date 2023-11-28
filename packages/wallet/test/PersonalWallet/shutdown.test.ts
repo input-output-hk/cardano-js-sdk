@@ -1,7 +1,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
+import { AddressType, GroupedAddress, util } from '@cardano-sdk/key-management';
 import {
   AssetId,
   createStubStakePoolProvider,
@@ -79,17 +79,18 @@ const createWallet = async (
       return new PersonalWallet(
         { name, polling: pollingConfig },
         {
+          addressManager: util.createBip32Ed25519AddressManager(keyAgent),
           assetProvider,
           chainHistoryProvider,
           connectionStatusTracker$,
-          keyAgent,
           logger,
           networkInfoProvider,
           rewardsProvider,
           stakePoolProvider,
           stores,
           txSubmitProvider,
-          utxoProvider
+          utxoProvider,
+          witnesser: util.createBip32Ed25519Witnesser(keyAgent)
         }
       );
     },
@@ -103,7 +104,8 @@ const assertWalletProperties = async (
   expectedDelegateeId: Cardano.PoolId | undefined,
   expectedRewardsHistory = flatten([...mocks.rewardsHistory.values()])
 ) => {
-  expect(wallet.keyAgent).toBeTruthy();
+  expect(wallet.addressManager).toBeTruthy();
+  expect(wallet.witnesser).toBeTruthy();
   // name
   expect(wallet.name).toBe(name);
   // utxo

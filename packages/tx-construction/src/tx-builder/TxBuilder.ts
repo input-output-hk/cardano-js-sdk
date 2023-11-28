@@ -27,7 +27,7 @@ import { Logger } from 'ts-log';
 import { OutputBuilderValidator, TxOutputBuilder } from './OutputBuilder';
 import { RewardAccountWithPoolId } from '../types';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
-import { contextLogger, deepEquals, patchObject } from '@cardano-sdk/util';
+import { contextLogger, deepEquals } from '@cardano-sdk/util';
 import { createOutputValidator } from '../output-validation';
 import { filter, firstValueFrom, lastValueFrom } from 'rxjs';
 import { finalizeTx } from './finalizeTx';
@@ -104,12 +104,7 @@ export class GenericTxBuilder implements TxBuilder {
       createOutputValidator({
         protocolParameters: dependencies.txBuilderProviders.protocolParameters
       });
-    this.#dependencies = {
-      ...dependencies,
-      keyAgent: patchObject(dependencies.keyAgent, {
-        knownAddresses$: dependencies.keyAgent.knownAddresses$.pipe(filter((addresses) => addresses.length > 0))
-      })
-    };
+    this.#dependencies = dependencies;
     this.#logger = dependencies.logger;
     this.#handleProvider = dependencies.handleProvider;
     this.#handleResolutions = [];
@@ -204,7 +199,9 @@ export class GenericTxBuilder implements TxBuilder {
             await this.#validateOutputs();
             // Take a snapshot of returned properties,
             // so that they don't change while `initializeTx` is resolving
-            const ownAddresses = await firstValueFrom(this.#dependencies.keyAgent.knownAddresses$);
+            const ownAddresses = await firstValueFrom(
+              this.#dependencies.addressManager.knownAddresses$.pipe(filter((addresses) => addresses.length > 0))
+            );
             const registeredRewardAccounts = (await this.#dependencies.txBuilderProviders.rewardAccounts()).filter(
               (acct) =>
                 acct.keyStatus === Cardano.StakeKeyStatus.Registered ||
@@ -230,7 +227,7 @@ export class GenericTxBuilder implements TxBuilder {
               // If the wallet is currently delegating to several pools, and all delegations are being removed,
               // then the funds will be concentrated back into a single address.
               if (rewardAccountsWithWeights.size === 0) {
-                const firstAddress = await this.#dependencies.keyAgent.deriveAddress(
+                const firstAddress = await this.#dependencies.addressManager.deriveAddress(
                   { index: 0, type: AddressType.External },
                   0
                 );
@@ -302,8 +299,8 @@ export class GenericTxBuilder implements TxBuilder {
     let newRewardAccounts: Cardano.RewardAccount[] = [];
     if (this.#requestedPortfolio) {
       newRewardAccounts = await util.ensureStakeKeys({
+        addressManager: this.#dependencies.addressManager,
         count: this.#requestedPortfolio.length,
-        keyAgent: this.#dependencies.keyAgent,
         logger: contextLogger(this.#logger, 'getOrCreateRewardAccounts')
       });
     }

@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
+import { AddressType, GroupedAddress, util as KeyManagementUtil } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import {
   PersonalWallet,
@@ -113,15 +113,16 @@ describe('WalletUtil', () => {
           new PersonalWallet(
             { name: 'Test Wallet' },
             {
+              addressManager: KeyManagementUtil.createBip32Ed25519AddressManager(keyAgent),
               assetProvider,
               chainHistoryProvider,
-              keyAgent,
               logger,
               networkInfoProvider,
               rewardsProvider,
               stakePoolProvider,
               txSubmitProvider,
-              utxoProvider
+              utxoProvider,
+              witnesser: KeyManagementUtil.createBip32Ed25519Witnesser(keyAgent)
             }
           ),
         logger

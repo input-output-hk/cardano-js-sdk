@@ -3,6 +3,7 @@ import { Cardano } from '@cardano-sdk/core';
 import {
   KeyAgentFactoryProps,
   TestWallet,
+  bip32Ed25519Factory,
   getEnv,
   getWallet,
   submitCertificate,
@@ -41,6 +42,7 @@ const wallet2Params: KeyAgentFactoryProps = {
 describe('local-network/register-pool', () => {
   let wallet1: TestWallet;
   let wallet2: TestWallet;
+  let bip32Ed25519: Crypto.Bip32Ed25519;
 
   beforeAll(async () => {
     jest.setTimeout(180_000);
@@ -64,6 +66,7 @@ describe('local-network/register-pool', () => {
 
     await waitForWalletStateSettle(wallet1.wallet);
     await waitForWalletStateSettle(wallet2.wallet);
+    bip32Ed25519 = await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger);
   });
 
   afterAll(() => {
@@ -76,18 +79,17 @@ describe('local-network/register-pool', () => {
 
     await walletReady(wallet);
 
-    const poolKeyAgent = wallet.keyAgent;
+    const poolAddressManager = wallet.addressManager;
 
-    const poolPubKey = await poolKeyAgent.derivePublicKey({
+    const poolPubKey = await poolAddressManager.derivePublicKey({
       index: 0,
       role: KeyRole.External
     });
 
-    const bip32Ed25519 = await poolKeyAgent.getBip32Ed25519();
     const poolKeyHash = await bip32Ed25519.getPubKeyHash(poolPubKey);
     const poolId = Cardano.PoolId.fromKeyHash(poolKeyHash);
     const poolRewardAccount = (
-      await poolKeyAgent.deriveAddress(
+      await poolAddressManager.deriveAddress(
         {
           index: 0,
           type: AddressType.External
@@ -165,18 +167,17 @@ describe('local-network/register-pool', () => {
 
     await walletReady(wallet);
 
-    const poolKeyAgent = wallet.keyAgent;
+    const poolAddressManager = wallet.addressManager;
 
-    const poolPubKey = await poolKeyAgent.derivePublicKey({
+    const poolPubKey = await poolAddressManager.derivePublicKey({
       index: 0,
       role: KeyRole.External
     });
 
-    const bip32Ed25519 = await poolKeyAgent.getBip32Ed25519();
     const poolKeyHash = await bip32Ed25519.getPubKeyHash(poolPubKey);
     const poolId = Cardano.PoolId.fromKeyHash(poolKeyHash);
     const poolRewardAccount = (
-      await poolKeyAgent.deriveAddress(
+      await poolAddressManager.deriveAddress(
         {
           index: 0,
           type: AddressType.External

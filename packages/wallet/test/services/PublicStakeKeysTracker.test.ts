@@ -1,4 +1,4 @@
-import { AccountKeyDerivationPath, AsyncKeyAgent, GroupedAddress, KeyRole } from '@cardano-sdk/key-management';
+import { AccountKeyDerivationPath, AsyncKeyAgent, GroupedAddress, KeyRole, util } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet } from '../../src';
 import { PubStakeKeyAndStatus, createPublicStakeKeysTracker } from '../../src/services/PublicStakeKeysTracker';
@@ -77,8 +77,8 @@ describe('PublicStakeKeysTracker', () => {
     const rewardAccounts$ = of([]);
 
     const stakePubKeys$ = createPublicStakeKeysTracker({
+      addressManager: util.createBip32Ed25519AddressManager(keyAgent),
       addresses$,
-      keyAgent,
       rewardAccounts$
     });
 
@@ -91,8 +91,8 @@ describe('PublicStakeKeysTracker', () => {
     const rewardAccounts$ = of(rewardAccounts);
 
     const stakePubKeys$ = createPublicStakeKeysTracker({
+      addressManager: util.createBip32Ed25519AddressManager(keyAgent),
       addresses$,
-      keyAgent,
       rewardAccounts$
     });
 
@@ -117,8 +117,8 @@ describe('PublicStakeKeysTracker', () => {
     const rewardAccounts$ = of(rewardAccounts);
 
     const stakePubKeys$ = createPublicStakeKeysTracker({
+      addressManager: util.createBip32Ed25519AddressManager(keyAgent),
       addresses$,
-      keyAgent,
       rewardAccounts$
     });
 
@@ -136,8 +136,8 @@ describe('PublicStakeKeysTracker', () => {
     const rewardAccounts$ = from([[rewardAccounts[0]], rewardAccounts]);
 
     const stakePubKeys$ = createPublicStakeKeysTracker({
+      addressManager: util.createBip32Ed25519AddressManager(keyAgent),
       addresses$,
-      keyAgent,
       rewardAccounts$
     });
 
@@ -157,8 +157,8 @@ describe('PublicStakeKeysTracker', () => {
     const rewardAccounts$ = of(rewardAccounts);
 
     const stakePubKeys$ = createPublicStakeKeysTracker({
+      addressManager: util.createBip32Ed25519AddressManager(keyAgent),
       addresses$,
-      keyAgent,
       rewardAccounts$
     });
 
@@ -180,8 +180,8 @@ describe('PublicStakeKeysTracker', () => {
     );
 
     const stakePubKeys$ = createPublicStakeKeysTracker({
+      addressManager: util.createBip32Ed25519AddressManager(keyAgent),
       addresses$,
-      keyAgent,
       rewardAccounts$
     });
 

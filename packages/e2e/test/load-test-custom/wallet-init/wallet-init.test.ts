@@ -26,6 +26,7 @@ import {
   waitForWalletStateSettle,
   walletVariables
 } from '../../../src';
+import { util } from '@cardano-sdk/key-management';
 
 // Example call that creates 5000 wallets in 10 minutes:
 // VIRTUAL_USERS_GENERATE_DURATION=600 VIRTUAL_USERS_COUNT=5000 yarn load-test-custom:wallet-init
@@ -84,7 +85,15 @@ const createWallet = async (accountIndex: number): Promise<PersonalWallet> => {
   measurementUtil.addMeasureMarker(MeasureTarget.keyAgent, accountIndex);
 
   measurementUtil.addStartMarker(MeasureTarget.wallet, accountIndex);
-  const wallet = new PersonalWallet({ name: `Wallet ${accountIndex}` }, { ...providers, keyAgent, logger });
+  const wallet = new PersonalWallet(
+    { name: `Wallet ${accountIndex}` },
+    {
+      ...providers,
+      addressManager: util.createBip32Ed25519AddressManager(keyAgent),
+      logger,
+      witnesser: util.createBip32Ed25519Witnesser(keyAgent)
+    }
+  );
   walletUtil.initialize(wallet);
   return wallet;
 };

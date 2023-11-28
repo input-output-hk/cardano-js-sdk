@@ -4,6 +4,7 @@ import { WalletStores } from '../../src/persistence';
 import { createStubStakePoolProvider, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
 import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
+import { util } from '@cardano-sdk/key-management';
 
 const {
   mockAssetProvider,
@@ -39,9 +40,10 @@ export const createWallet = async (stores?: WalletStores, providers: Providers =
         {
           ...createDefaultProviders(),
           ...providers,
-          keyAgent,
+          addressManager: util.createBip32Ed25519AddressManager(keyAgent),
           logger,
-          stores
+          stores,
+          witnesser: util.createBip32Ed25519Witnesser(keyAgent)
         }
       ),
     logger

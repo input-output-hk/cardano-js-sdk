@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/consistent-destructuring, sonarjs/no-duplicate-string, @typescript-eslint/no-floating-promises, promise/no-nesting, promise/always-return */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, AsyncKeyAgent, GroupedAddress } from '@cardano-sdk/key-management';
+import { AddressType, AsyncKeyAgent, GroupedAddress, util } from '@cardano-sdk/key-management';
 import { AssetId, StubKeyAgent, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BehaviorSubject, Subscription, firstValueFrom, skip } from 'rxjs';
 import { Cardano, CardanoNodeErrors, ProviderError, ProviderFailure, TxCBOR } from '@cardano-sdk/core';
@@ -83,16 +83,17 @@ describe('PersonalWallet methods', () => {
         new PersonalWallet(
           { name: 'Test Wallet' },
           {
+            addressManager: util.createBip32Ed25519AddressManager(keyAgent),
             assetProvider,
             chainHistoryProvider,
             handleProvider,
-            keyAgent,
             logger,
             networkInfoProvider,
             rewardsProvider,
             stakePoolProvider,
             txSubmitProvider,
-            utxoProvider
+            utxoProvider,
+            witnesser: util.createBip32Ed25519Witnesser(keyAgent)
           }
         ),
       logger
@@ -226,16 +227,17 @@ describe('PersonalWallet methods', () => {
           new PersonalWallet(
             { name: 'Stub Wallet' },
             {
+              addressManager: util.createBip32Ed25519AddressManager(keyAgent),
               assetProvider: mocks.mockAssetProvider(),
               chainHistoryProvider: mockChainHistoryProvider(),
               handleProvider: mocks.mockHandleProvider(),
-              keyAgent,
               logger,
               networkInfoProvider: mocks.mockNetworkInfoProvider(),
               rewardsProvider: mockRewardsProvider(),
               stakePoolProvider: createStubStakePoolProvider(),
               txSubmitProvider: mocks.mockTxSubmitProvider(),
-              utxoProvider: mocks.mockUtxoProvider()
+              utxoProvider: mocks.mockUtxoProvider(),
+              witnesser: util.createBip32Ed25519Witnesser(keyAgent)
             }
           ),
         logger
@@ -542,15 +544,16 @@ describe('PersonalWallet methods', () => {
         new PersonalWallet(
           { name: 'Test Wallet' },
           {
+            addressManager: util.createBip32Ed25519AddressManager(keyAgent),
             assetProvider: mocks.mockAssetProvider(),
             chainHistoryProvider: mockChainHistoryProvider(),
-            keyAgent,
             logger,
             networkInfoProvider: mocks.mockNetworkInfoProvider(),
             rewardsProvider: mockRewardsProvider(),
             stakePoolProvider: mocks.mockStakePoolsProvider(),
             txSubmitProvider: mocks.mockTxSubmitProvider(),
-            utxoProvider: mocks.mockUtxoProvider()
+            utxoProvider: mocks.mockUtxoProvider(),
+            witnesser: util.createBip32Ed25519Witnesser(keyAgent)
           }
         ),
       logger
