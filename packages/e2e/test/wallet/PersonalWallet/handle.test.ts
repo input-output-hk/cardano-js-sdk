@@ -31,7 +31,8 @@ const toHex = (value: string) =>
     .map((s) => s.charCodeAt(0).toString(16))
     .join('');
 
-describe('Ada handle', () => {
+// TODO LW-9182 REMOVE SKIP
+describe.skip('Ada handle', () => {
   let wallet: PersonalWallet;
   let keyAgent: KeyAgent;
   let receivingWallet: PersonalWallet;

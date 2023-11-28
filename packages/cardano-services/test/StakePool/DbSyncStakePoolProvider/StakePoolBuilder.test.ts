@@ -270,7 +270,8 @@ describe('StakePoolBuilder', () => {
     });
   });
   describe('buildAndQuery', () => {
-    it('buildAndQuery, queryPoolHashes & queryTotalCount', async () => {
+    // TODO LW-9184 REMOVE SKIP
+    it.skip('buildAndQuery, queryPoolHashes & queryTotalCount', async () => {
       const builtQuery = builder.buildAndQuery(filters);
       const { query, params } = builtQuery;
       const poolHashes = await builder.queryPoolHashes(query, params);

@@ -54,8 +54,7 @@ utxo=$(cardano-cli query utxo --address "$addr" --testnet-magic 888 | awk 'NR ==
 
 tokenList="1 ${policyid}.${handleHexes[0]}+1 ${policyid}.${handleHexes[1]}+2 ${policyid}.${handleHexes[2]}"
 
-cardano-cli transaction build \
-  --babbage-era \
+cardano-cli conway transaction build \
   --change-address "$addr" \
   --tx-in "$utxo" \
   --tx-out "$destAddr"+10000000+"$tokenList" \
@@ -118,8 +117,7 @@ cat >network-files/utxo-keys/handles68-datum.json <<EOL
 EOL
 #               (222)handle68 -> 283232322968616e646c653638
 handle68tokenList="1 ${policyid}.283232322968616e646c653638"
-cardano-cli transaction build \
-  --babbage-era \
+cardano-cli conway transaction build \
   --change-address "$addr" \
   --tx-in "$utxo" \
   --tx-out "$destAddr"+10000000+"$handle68tokenList" \

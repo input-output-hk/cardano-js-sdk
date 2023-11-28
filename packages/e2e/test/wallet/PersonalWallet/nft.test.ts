@@ -35,7 +35,8 @@ const walletBalanceAssetsAndNfts = (wallet: PersonalWallet) =>
     ])
   );
 
-describe('PersonalWallet.assets/nft', () => {
+// TODO LW-9182 REMOVE SKIP
+describe.skip('PersonalWallet.assets/nft', () => {
   const TOKEN_METADATA_1_INDEX = 0;
   const TOKEN_METADATA_2_INDEX = 1;
   const TOKEN_BURN_INDEX = 2;

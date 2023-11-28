@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # This funds a set of fixed addresses to be used during testing.
+
 set -euo pipefail
 
 source $(dirname $0)/common.sh
@@ -36,8 +37,7 @@ walletAddr5="addr_test1qr0c3frkem9cqn5f73dnvqpena27k2fgqew6wct9eaka03agfwkvzr0zy
 # Spend the first UTxO
 utxo=$(cardano-cli query utxo --address "$genesisAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
 
-cardano-cli transaction build \
-  --babbage-era \
+cardano-cli conway transaction build \
   --change-address "$genesisAddr" \
   --tx-in "$utxo" \
   --tx-out "$walletAddr1"+"$AMOUNT_PER_WALLET" \

@@ -76,8 +76,7 @@ updatePool() {
   currentBalance=$(getAddressBalance "$stakeAddr")
   utxo=$(cardano-cli query utxo --address "$genesisAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
 
-  cardano-cli transaction build \
-    --babbage-era \
+  cardano-cli conway transaction build \
     --change-address "$genesisAddr" \
     --tx-in "$utxo" \
     --tx-out "$stakeAddr"+"$POOL_OWNER_STAKE" \
@@ -215,7 +214,7 @@ updatePool() {
   currentBalance=$(getAddressBalance "$paymentAddr")
 
   # create pool delegation certificate
-  cardano-cli stake-address delegation-certificate \
+  cardano-cli conway stake-address stake-delegation-certificate \
     --stake-verification-key-file "$delegatorStakeKey" \
     --stake-pool-id "$POOL_ID" \
     --out-file deleg.cert
