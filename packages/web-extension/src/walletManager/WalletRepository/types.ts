@@ -1,5 +1,6 @@
 import { Bip32PublicKeyHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
+import { HexBlob } from '@cardano-sdk/util';
 import { Observable } from 'rxjs';
 
 export enum WalletType {
@@ -24,10 +25,21 @@ export type Bip32WalletAccount<Metadata extends {}> = {
 };
 
 export type Bip32Wallet<Metadata extends {}> = {
-  type: WalletType.InMemory | WalletType.Ledger | WalletType.Trezor;
   walletId: WalletId;
   extendedAccountPublicKey: Bip32PublicKeyHex;
   accounts: Bip32WalletAccount<Metadata>[];
+};
+
+export type HardwareWallet<Metadata extends {}> = Bip32Wallet<Metadata> & {
+  type: WalletType.Ledger | WalletType.Trezor;
+};
+
+export type InMemoryWallet<Metadata extends {}> = Bip32Wallet<Metadata> & {
+  type: WalletType.InMemory;
+  encryptedSecrets: {
+    entropy: HexBlob;
+    rootPrivateKeyBytes: HexBlob;
+  };
 };
 
 export type ScriptWallet<Metadata extends {}> = {
@@ -38,7 +50,10 @@ export type ScriptWallet<Metadata extends {}> = {
   script: Cardano.Script;
 };
 
-export type AnyWallet<Metadata extends {}> = Bip32Wallet<Metadata> | ScriptWallet<Metadata>;
+export type AnyWallet<Metadata extends {}> =
+  | HardwareWallet<Metadata>
+  | InMemoryWallet<Metadata>
+  | ScriptWallet<Metadata>;
 
 export type AddAccountProps<Metadata extends {}> = {
   walletId: WalletId;
@@ -53,7 +68,8 @@ export type UpdateMetadataProps<Metadata extends {}, ID extends AccountId | Wall
 };
 
 export type AddWalletProps<Metadata extends {}> =
-  | Omit<Bip32Wallet<Metadata>, 'walletId' | 'accounts'>
+  | Omit<HardwareWallet<Metadata>, 'walletId' | 'accounts'>
+  | Omit<InMemoryWallet<Metadata>, 'walletId' | 'accounts'>
   | Omit<ScriptWallet<Metadata>, 'walletId'>;
 
 export interface WalletRepositoryApi<Metadata extends {}> {
