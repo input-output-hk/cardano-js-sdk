@@ -770,4 +770,107 @@ describe('Certificate', () => {
       });
     });
   });
+
+  describe('StakeVoteDelegation', () => {
+    it('can decode StakeVoteDelegation from CBOR', () => {
+      const cbor = HexBlob(
+        '840a8200581c00000000000000000000000000000000000000000000000000000000581c000000000000000000000000000000000000000000000000000000008200581c00000000000000000000000000000000000000000000000000000000'
+      );
+
+      const certificate = Certificate.fromCbor(cbor);
+
+      expect(certificate.asMoveInstantaneousRewardsCert()).toBeUndefined();
+      expect(certificate.asPoolRetirement()).toBeUndefined();
+      expect(certificate.asPoolRegistration()).toBeUndefined();
+      expect(certificate.asStakeRegistration()).toBeUndefined();
+      expect(certificate.asStakeDeregistration()).toBeUndefined();
+      expect(certificate.asStakeDelegation()).toBeUndefined();
+      expect(certificate.asStakeVoteDelegationCert()!.drep().toKeyHash()).toEqual(
+        '00000000000000000000000000000000000000000000000000000000'
+      );
+      expect(certificate.asStakeVoteDelegationCert()!.stakeCredential().hash).toEqual(
+        '00000000000000000000000000000000000000000000000000000000'
+      );
+      expect(certificate.asStakeVoteDelegationCert()!.poolKeyHash()).toEqual(
+        '00000000000000000000000000000000000000000000000000000000'
+      );
+    });
+
+    it('can decode StakeVoteDelegation from Core', () => {
+      const core: Cardano.StakeVoteDelegationCertificate = {
+        __typename: Cardano.CertificateType.StakeVoteDelegation,
+        dRep: {
+          hash: '00000000000000000000000000000000000000000000000000000000',
+          type: 0
+        },
+        poolId: 'pool1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq8a7a2d',
+        stakeCredential: {
+          hash: Crypto.Hash28ByteBase16('00000000000000000000000000000000000000000000000000000000'),
+          type: Cardano.CredentialType.KeyHash
+        }
+      } as Cardano.StakeVoteDelegationCertificate;
+
+      const certificate = Certificate.fromCore(core);
+
+      expect(certificate.asMoveInstantaneousRewardsCert()).toBeUndefined();
+      expect(certificate.asPoolRetirement()).toBeUndefined();
+      expect(certificate.asPoolRegistration()).toBeUndefined();
+      expect(certificate.asStakeRegistration()).toBeUndefined();
+      expect(certificate.asStakeDeregistration()).toBeUndefined();
+      expect(certificate.asStakeDelegation()).toBeUndefined();
+      expect(certificate.asStakeVoteDelegationCert()!.drep().toCore()).toEqual({
+        hash: '00000000000000000000000000000000000000000000000000000000',
+        type: 0
+      });
+      expect(certificate.asStakeVoteDelegationCert()!.stakeCredential()).toEqual({
+        hash: '00000000000000000000000000000000000000000000000000000000',
+        type: 0
+      });
+      expect(certificate.asStakeVoteDelegationCert()!.poolKeyHash()).toEqual(
+        '00000000000000000000000000000000000000000000000000000000'
+      );
+    });
+
+    it('can encode StakeVoteDelegation to CBOR', () => {
+      const core: Cardano.StakeVoteDelegationCertificate = {
+        __typename: Cardano.CertificateType.StakeVoteDelegation,
+        dRep: {
+          hash: '00000000000000000000000000000000000000000000000000000000',
+          type: 0
+        },
+        poolId: 'pool1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq8a7a2d',
+        stakeCredential: {
+          hash: Crypto.Hash28ByteBase16('00000000000000000000000000000000000000000000000000000000'),
+          type: Cardano.CredentialType.KeyHash
+        }
+      } as Cardano.StakeVoteDelegationCertificate;
+
+      const certificate = Certificate.fromCore(core);
+
+      expect(certificate.toCbor()).toEqual(
+        '840a8200581c00000000000000000000000000000000000000000000000000000000581c000000000000000000000000000000000000000000000000000000008200581c00000000000000000000000000000000000000000000000000000000'
+      );
+    });
+
+    it('can encode StakeVoteDelegation to Core', () => {
+      const cbor = HexBlob(
+        '840a8200581c00000000000000000000000000000000000000000000000000000000581c000000000000000000000000000000000000000000000000000000008200581c00000000000000000000000000000000000000000000000000000000'
+      );
+
+      const certificate = Certificate.fromCbor(cbor);
+
+      expect(certificate.toCore()).toEqual({
+        __typename: Cardano.CertificateType.StakeVoteDelegation,
+        dRep: {
+          hash: '00000000000000000000000000000000000000000000000000000000',
+          type: 0
+        },
+        poolId: 'pool1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq8a7a2d',
+        stakeCredential: {
+          hash: Crypto.Hash28ByteBase16('00000000000000000000000000000000000000000000000000000000'),
+          type: Cardano.CredentialType.KeyHash
+        }
+      });
+    });
+  });
 });
