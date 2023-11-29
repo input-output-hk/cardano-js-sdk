@@ -365,7 +365,16 @@ export const getWallet = async (props: GetWalletProps) => {
       ? () => Promise.resolve(keyAgent)
       : await keyManagementFactory.create(env.KEY_MANAGEMENT_PROVIDER, keyManagementParams, logger),
     createWallet: async (asyncKeyAgent: AsyncKeyAgent) =>
-      new PersonalWallet({ name, polling }, { ...providers, keyAgent: asyncKeyAgent, logger, stores }),
+      new PersonalWallet(
+        { name, polling },
+        {
+          ...providers,
+          addressManager: util.createBip32Ed25519AddressManager(asyncKeyAgent),
+          logger,
+          stores,
+          witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)
+        }
+      ),
     logger
   });
 

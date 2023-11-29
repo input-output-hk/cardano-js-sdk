@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.6.0...@cardano-sdk/projection-typeorm@0.7.0) (2023-11-29)
+
+### ⚠ BREAKING CHANGES
+
+* stake registration and deregistration certificates now take a Credential instead of key hash
+
+### Features
+
+* add support for only updating outdated pool metrics at a given interval ([64f67d6](https://github.com/input-output-hk/cardano-js-sdk/commit/64f67d6bcf6d0973fb0319a51ab9267a3fd16ee3))
+* create PoolDelistedEntity and database migration ([650bef2](https://github.com/input-output-hk/cardano-js-sdk/commit/650bef2c4fdd7e35052f316710f51ac6b3a2e0af))
+* **projection-typeorm:** add stake pool rewards store ([bab242b](https://github.com/input-output-hk/cardano-js-sdk/commit/bab242b71192e904f4805b60c80ec5455bc23ecc))
+* stake registration and deregistration certificates now take a Credential instead of key hash ([49612f0](https://github.com/input-output-hk/cardano-js-sdk/commit/49612f0f313f357e7e2a7eed406852cbd2bb3dec))
+
 ## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.5.3...@cardano-sdk/projection-typeorm@0.6.0) (2023-10-19)
 
 ### ⚠ BREAKING CHANGES

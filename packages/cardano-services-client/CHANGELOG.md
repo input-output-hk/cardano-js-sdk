@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.14.4...@cardano-sdk/cardano-services-client@0.15.0) (2023-11-29)
+
+### ⚠ BREAKING CHANGES
+
+* stake registration and deregistration certificates now take a Credential instead of key hash
+
+### Features
+
+* **cardano-services-client:** add tx submit api provider ([876f651](https://github.com/input-output-hk/cardano-js-sdk/commit/876f651a009b8fcb15ebf2e891c79602985c4419))
+* stake registration and deregistration certificates now take a Credential instead of key hash ([49612f0](https://github.com/input-output-hk/cardano-js-sdk/commit/49612f0f313f357e7e2a7eed406852cbd2bb3dec))
+
 ## [0.14.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.14.3...@cardano-sdk/cardano-services-client@0.14.4) (2023-10-19)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services-client

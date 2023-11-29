@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.22.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.21.0...@cardano-sdk/core@0.22.0) (2023-11-29)
+
+### ⚠ BREAKING CHANGES
+
+* stake registration and deregistration certificates now take a Credential instead of key hash
+* **core:** remove unused type EpochSlots
+* **core:** deprecate QueryStakePoolsArgs.apyEpochsBackLimit
+- deprecate StakePoolMetrics.apy
+- deprecate and make optional StakePoolMetrics.epoch
+- deprecate and make optional StakePoolMetrics.memberROI
+
+### Features
+
+* **core:** add era summary to epoch slots calc return value ([44f2216](https://github.com/input-output-hk/cardano-js-sdk/commit/44f22168d824e5d0fcbb4ab7fa4af92dd1655d0d))
+* **core:** update serialization for resign committee cold certificate ([1ecd4a3](https://github.com/input-output-hk/cardano-js-sdk/commit/1ecd4a3daf2ec4e2e485c363c9ba56373e8eaebc))
+* stake registration and deregistration certificates now take a Credential instead of key hash ([49612f0](https://github.com/input-output-hk/cardano-js-sdk/commit/49612f0f313f357e7e2a7eed406852cbd2bb3dec))
+
+### Bug Fixes
+
+* **core:** fix invalid serialization of stakeVoteDelegation certificate ([cebf485](https://github.com/input-output-hk/cardano-js-sdk/commit/cebf485122b76631219919a06262939546841606))
+* **core:** script hash credentials are now encoded correctly when converted to addresses ([af8743b](https://github.com/input-output-hk/cardano-js-sdk/commit/af8743bca368fb37242055962c38229ecc5772b0))
+* **core:** update length argument errors for certificate serialization ([866d81c](https://github.com/input-output-hk/cardano-js-sdk/commit/866d81c3b44f5440e6e52a2d5fbafb7edc20cb28))
+
+### Code Refactoring
+
+* **core:** prepare the types for typeorm stake pool provider with ros interface ([ff2d9ca](https://github.com/input-output-hk/cardano-js-sdk/commit/ff2d9ca4e47f928b737826d7135bab39f21170df))
+
 ## [0.21.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.20.1...@cardano-sdk/core@0.21.0) (2023-10-09)
 
 ### ⚠ BREAKING CHANGES

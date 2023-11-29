@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.25.0...@cardano-sdk/e2e@0.26.0) (2023-11-29)
+
+### ⚠ BREAKING CHANGES
+
+* personal wallet now takes a Bip32 address manager and a witnesser instead of key agent
+* stake registration and deregistration certificates now take a Credential instead of key hash
+
+### Features
+
+* implement ros in typeorm stake pool provider ([be83024](https://github.com/input-output-hk/cardano-js-sdk/commit/be83024e4e5d0994adaa5548d33a8478d61d4c7d))
+* personal wallet now takes a Bip32 address manager and a witnesser instead of key agent ([8308bf1](https://github.com/input-output-hk/cardano-js-sdk/commit/8308bf1876fd5a0bee215ea598a87ef08bd2f15f))
+* stake registration and deregistration certificates now take a Credential instead of key hash ([49612f0](https://github.com/input-output-hk/cardano-js-sdk/commit/49612f0f313f357e7e2a7eed406852cbd2bb3dec))
+
 ## [0.25.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.24.0...@cardano-sdk/e2e@0.25.0) (2023-10-19)
 
 ### ⚠ BREAKING CHANGES

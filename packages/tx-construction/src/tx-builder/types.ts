@@ -3,7 +3,13 @@ import { CustomError } from 'ts-custom-error';
 
 import { InputSelectionError, InputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
 
-import { AsyncKeyAgent, GroupedAddress, SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
+import {
+  GroupedAddress,
+  SignTransactionOptions,
+  TransactionSigner,
+  Witnesser,
+  util
+} from '@cardano-sdk/key-management';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { InitializeTxWitness, TxBuilderProviders } from '../types';
 import { Logger } from 'ts-log';
@@ -264,11 +270,12 @@ export interface TxBuilder {
 export interface TxBuilderDependencies {
   inputSelector?: InputSelector;
   inputResolver: Cardano.InputResolver;
-  keyAgent: AsyncKeyAgent;
+  addressManager: util.Bip32Ed25519AddressManager;
+  witnesser: Witnesser;
   txBuilderProviders: TxBuilderProviders;
   logger: Logger;
   outputValidator?: OutputBuilderValidator;
   handleProvider?: HandleProvider;
 }
 
-export type FinalizeTxDependencies = Pick<TxBuilderDependencies, 'inputResolver' | 'keyAgent'>;
+export type FinalizeTxDependencies = Pick<TxBuilderDependencies, 'inputResolver' | 'addressManager' | 'witnesser'>;

@@ -1,8 +1,10 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, KeyRole } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import {
   KeyAgentFactoryProps,
   TestWallet,
+  bip32Ed25519Factory,
   getEnv,
   getTxConfirmationEpoch,
   getWallet,
@@ -23,6 +25,7 @@ const vrf = Cardano.VrfVkHex('2ee5a4c423224bb9c42107fc18a60556d6a83cec1d9dd37a71
 describe('cache invalidation', () => {
   let testProviderServer: Docker.Container;
   let wallet1: TestWallet;
+  let bip32Ed25519: Crypto.Bip32Ed25519;
 
   beforeAll(async () => {
     const port = await getRandomPort();
@@ -90,6 +93,7 @@ describe('cache invalidation', () => {
     });
 
     await waitForWalletStateSettle(wallet1.wallet);
+    bip32Ed25519 = await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger);
   });
 
   afterAll(async () => {
@@ -103,18 +107,17 @@ describe('cache invalidation', () => {
 
     await walletReady(wallet);
 
-    const poolKeyAgent = wallet.keyAgent;
+    const poolAddressManager = wallet.addressManager;
 
-    const poolPubKey = await poolKeyAgent.derivePublicKey({
+    const poolPubKey = await poolAddressManager.derivePublicKey({
       index: 0,
       role: KeyRole.External
     });
 
-    const bip32Ed25519 = await poolKeyAgent.getBip32Ed25519();
     const poolKeyHash = await bip32Ed25519.getPubKeyHash(poolPubKey);
     const poolId = Cardano.PoolId.fromKeyHash(poolKeyHash);
     const poolRewardAccount = (
-      await poolKeyAgent.deriveAddress(
+      await poolAddressManager.deriveAddress(
         {
           index: 0,
           type: AddressType.External

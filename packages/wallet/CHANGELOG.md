@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.25.1...@cardano-sdk/wallet@0.26.0) (2023-11-29)
+
+### ⚠ BREAKING CHANGES
+
+* personal wallet now takes a Bip32 address manager and a witnesser instead of key agent
+* stake registration and deregistration certificates now take a Credential instead of key hash
+
+### Features
+
+* **hardware-trezor:** add collaterals to trezor mappers ([91a0f34](https://github.com/input-output-hk/cardano-js-sdk/commit/91a0f341e1013e291752c0e7e6e45215122ce0d4))
+* **hardware-trezor:** add reference inputs and script to trezor mappers ([26a96ab](https://github.com/input-output-hk/cardano-js-sdk/commit/26a96ab9fb708c2f168df512d397cc60f77e9851))
+* personal wallet now takes a Bip32 address manager and a witnesser instead of key agent ([8308bf1](https://github.com/input-output-hk/cardano-js-sdk/commit/8308bf1876fd5a0bee215ea598a87ef08bd2f15f))
+* stake registration and deregistration certificates now take a Credential instead of key hash ([49612f0](https://github.com/input-output-hk/cardano-js-sdk/commit/49612f0f313f357e7e2a7eed406852cbd2bb3dec))
+* **wallet:** add CollectionStore.observeAll ([ac4221f](https://github.com/input-output-hk/cardano-js-sdk/commit/ac4221f76a8a24498413d247c1d380ef298239e7))
+
 ## [0.25.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.25.0...@cardano-sdk/wallet@0.25.1) (2023-10-19)
 
 ### Features

@@ -174,7 +174,7 @@ export class Certificate {
         certificate = Certificate.newVoteDelegationCert(VoteDelegation.fromCbor(cbor));
         break;
       case CertificateKind.StakeVoteDelegation:
-        certificate = Certificate.newStakeDelegation(StakeDelegation.fromCbor(cbor));
+        certificate = Certificate.newStakeVoteDelegationCert(StakeVoteDelegation.fromCbor(cbor));
         break;
       case CertificateKind.StakeRegistrationDelegation:
         certificate = Certificate.newStakeRegistrationDelegationCert(StakeRegistrationDelegation.fromCbor(cbor));

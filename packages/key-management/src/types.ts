@@ -201,3 +201,34 @@ export interface TransactionSigner {
    */
   sign(tx: Cardano.TxBodyWithHash): Promise<TransactionSignerResult>;
 }
+
+export type WitnessOptions = SignTransactionOptions;
+
+/** Interface for an entity capable of generating witness data for a transaction. */
+export interface Witnesser {
+  /**
+   * Generates the witness data for a given transaction.
+   *
+   * @param txInternals The transaction body along with its hash for which the witness data is to be generated.
+   * @param options Optional additional parameters that may influence how the witness data is generated.
+   * @returns A promise that resolves to the generated witness data for the transaction.
+   */
+  witness(txInternals: Cardano.TxBodyWithHash, options?: WitnessOptions): Promise<Cardano.Witness>;
+
+  /**
+   * @throws AuthenticationError
+   */
+  signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult>;
+}
+
+/** Interface for managing blockchain addresses. */
+export interface AddressManager {
+  knownAddresses$: Observable<GroupedAddress[]>;
+
+  /**
+   * Sets or updates the list of known addresses managed by this instance.
+   *
+   * @param addresses An array of grouped addresses to be managed.
+   */
+  setKnownAddresses(addresses: GroupedAddress[]): Promise<void>;
+}

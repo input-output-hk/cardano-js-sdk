@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.14.2...@cardano-sdk/tx-construction@0.15.0) (2023-11-29)
+
+### ⚠ BREAKING CHANGES
+
+* personal wallet now takes a Bip32 address manager and a witnesser instead of key agent
+* stake registration and deregistration certificates now take a Credential instead of key hash
+
+### Features
+
+* personal wallet now takes a Bip32 address manager and a witnesser instead of key agent ([8308bf1](https://github.com/input-output-hk/cardano-js-sdk/commit/8308bf1876fd5a0bee215ea598a87ef08bd2f15f))
+* stake registration and deregistration certificates now take a Credential instead of key hash ([49612f0](https://github.com/input-output-hk/cardano-js-sdk/commit/49612f0f313f357e7e2a7eed406852cbd2bb3dec))
+
+### Bug Fixes
+
+* **tx-construction:** txBuilder now properly redistributes all outputs to first address after de-registration of all stake keys ([a8b8ea7](https://github.com/input-output-hk/cardano-js-sdk/commit/a8b8ea7b54bbba65d8a0750a9c411468018c8725))
+
 ## [0.14.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.14.1...@cardano-sdk/tx-construction@0.14.2) (2023-10-19)
 
 **Note:** Version bump only for package @cardano-sdk/tx-construction

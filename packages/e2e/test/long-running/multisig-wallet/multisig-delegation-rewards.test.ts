@@ -6,7 +6,15 @@ import { MultiSigWallet } from './MultiSigWallet';
 import { Observable, filter, firstValueFrom, map, take } from 'rxjs';
 import { PersonalWallet } from '@cardano-sdk/wallet';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
-import { createStandaloneKeyAgent, getEnv, getWallet, waitForEpoch, walletReady, walletVariables } from '../../../src';
+import {
+  bip32Ed25519Factory,
+  createStandaloneKeyAgent,
+  getEnv,
+  getWallet,
+  waitForEpoch,
+  walletReady,
+  walletVariables
+} from '../../../src';
 import { isNotNil } from '@cardano-sdk/util';
 import { logger } from '@cardano-sdk/util-dev';
 
@@ -52,14 +60,10 @@ const fundMultiSigWallet = async (sendingWallet: PersonalWallet, address: Cardan
   await sendingWallet.submitTx(signedTx);
 };
 
-const getKeyAgent = async (mnemonics: string, faucetWallet: PersonalWallet) => {
+const getKeyAgent = async (mnemonics: string, faucetWallet: PersonalWallet, bip32Ed25519: Crypto.Bip32Ed25519) => {
   const genesis = await firstValueFrom(faucetWallet.genesisParameters$);
 
-  const keyAgent = await createStandaloneKeyAgent(
-    mnemonics.split(' '),
-    genesis,
-    await faucetWallet.keyAgent.getBip32Ed25519()
-  );
+  const keyAgent = await createStandaloneKeyAgent(mnemonics.split(' '), genesis, bip32Ed25519);
 
   const pubKey = await keyAgent.derivePublicKey(DERIVATION_PATH);
 
@@ -139,9 +143,15 @@ describe('multi signature wallet', () => {
 
   beforeAll(async () => {
     await initializeFaucet();
-    ({ keyAgent: aliceKeyAgent, pubKey: alicePubKey } = await getKeyAgent(aliceMnemonics, faucetWallet));
-    ({ keyAgent: bobKeyAgent, pubKey: bobPubKey } = await getKeyAgent(bobMnemonics, faucetWallet));
-    ({ keyAgent: charlotteKeyAgent, pubKey: charlottePubKey } = await getKeyAgent(charlotteMnemonics, faucetWallet));
+    const bip32Ed25519 = await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger);
+
+    ({ keyAgent: aliceKeyAgent, pubKey: alicePubKey } = await getKeyAgent(aliceMnemonics, faucetWallet, bip32Ed25519));
+    ({ keyAgent: bobKeyAgent, pubKey: bobPubKey } = await getKeyAgent(bobMnemonics, faucetWallet, bip32Ed25519));
+    ({ keyAgent: charlotteKeyAgent, pubKey: charlottePubKey } = await getKeyAgent(
+      charlotteMnemonics,
+      faucetWallet,
+      bip32Ed25519
+    ));
 
     faucetAddress = (await firstValueFrom(faucetWallet.addresses$))[0].address;
 

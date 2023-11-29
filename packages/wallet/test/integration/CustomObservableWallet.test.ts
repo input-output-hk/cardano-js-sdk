@@ -2,7 +2,7 @@
 /* eslint-disable sonarjs/no-extra-arguments */
 /* eslint-disable unicorn/consistent-function-scoping */
 import { Cardano, Serialization } from '@cardano-sdk/core';
-import { GroupedAddress } from '@cardano-sdk/key-management';
+import { GroupedAddress, util } from '@cardano-sdk/key-management';
 import { ObservableWallet, PersonalWallet } from '../../src';
 import {
   OutputValidator,
@@ -43,15 +43,16 @@ describe('CustomObservableWallet', () => {
       const extensionWallet: LaceObservableWallet = new PersonalWallet(
         { name: 'Extension Wallet' },
         {
+          addressManager: util.createBip32Ed25519AddressManager(await testAsyncKeyAgent()),
           assetProvider: mocks.mockAssetProvider(),
           chainHistoryProvider: mocks.mockChainHistoryProvider(),
-          keyAgent: await testAsyncKeyAgent(),
           logger,
           networkInfoProvider: mocks.mockNetworkInfoProvider(),
           rewardsProvider: mocks.mockRewardsProvider(),
           stakePoolProvider: createStubStakePoolProvider(),
           txSubmitProvider: mocks.mockTxSubmitProvider(),
-          utxoProvider: mocks.mockUtxoProvider()
+          utxoProvider: mocks.mockUtxoProvider(),
+          witnesser: util.createBip32Ed25519Witnesser(await testAsyncKeyAgent())
         }
       );
       extensionWallet;

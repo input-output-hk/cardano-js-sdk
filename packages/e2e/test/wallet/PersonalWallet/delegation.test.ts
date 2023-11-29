@@ -1,10 +1,12 @@
 /* eslint-disable max-statements */
+import * as Crypto from '@cardano-sdk/crypto';
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet, PersonalWallet } from '@cardano-sdk/wallet';
 import {
   TX_TIMEOUT_DEFAULT,
   TestWallet,
+  bip32Ed25519Factory,
   firstValueFromTimed,
   getEnv,
   getWallet,
@@ -27,6 +29,7 @@ const getWalletStateSnapshot = async (wallet: ObservableWallet) => {
   const utxoTotal = await firstValueFrom(wallet.utxo.total$);
   const utxoAvailable = await firstValueFrom(wallet.utxo.available$);
   const rewardsBalance = await firstValueFrom(wallet.balance.rewardAccounts.rewards$);
+
   return {
     balance: { available: balanceAvailable, deposit, total: balanceTotal },
     epoch: epoch.epochNo,
@@ -54,6 +57,7 @@ const waitForTx = async (wallet: ObservableWallet, hash: Cardano.TransactionId) 
 describe('PersonalWallet/delegation', () => {
   let wallet1: TestWallet;
   let wallet2: TestWallet;
+  let bip32Ed25519: Crypto.Bip32Ed25519;
 
   beforeAll(async () => {
     jest.setTimeout(180_000);
@@ -61,6 +65,7 @@ describe('PersonalWallet/delegation', () => {
     wallet2 = await getWallet({ env, idx: 1, logger, name: 'Test Wallet 2', polling: { interval: 500 } });
 
     await Promise.all([waitForWalletStateSettle(wallet1.wallet), waitForWalletStateSettle(wallet2.wallet)]);
+    bip32Ed25519 = await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger);
   });
 
   afterAll(() => {
@@ -164,9 +169,7 @@ describe('PersonalWallet/delegation', () => {
       expect(tx1ConfirmedState.rewardAccount.delegatee?.currentEpoch?.id).toEqual(poolId);
     }
 
-    const stakeKeyHash = await (
-      await sourceWallet.keyAgent.getBip32Ed25519()
-    ).getPubKeyHash(tx1ConfirmedState.publicStakeKey.publicStakeKey);
+    const stakeKeyHash = await bip32Ed25519.getPubKeyHash(tx1ConfirmedState.publicStakeKey.publicStakeKey);
     expect(stakeKeyHash).toEqual(Cardano.RewardAccount.toHash(tx1ConfirmedState.rewardAccount.address));
     expect(tx1ConfirmedState.publicStakeKey.keyStatus).toBe(Cardano.StakeKeyStatus.Registered);
 

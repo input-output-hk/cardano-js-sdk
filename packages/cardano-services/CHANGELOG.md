@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.23.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.22.0...@cardano-sdk/cardano-services@0.23.0) (2023-11-29)
+
+### ⚠ BREAKING CHANGES
+
+* stake registration and deregistration certificates now take a Credential instead of key hash
+
+### Features
+
+* add support for only updating outdated pool metrics at a given interval ([64f67d6](https://github.com/input-output-hk/cardano-js-sdk/commit/64f67d6bcf6d0973fb0319a51ab9267a3fd16ee3))
+* **cardano-services:** implement schedules and added stakepool delist worker schedule ([b30eb6b](https://github.com/input-output-hk/cardano-js-sdk/commit/b30eb6bdd0dbee50972c67f4b9a1b6370e1862b9))
+* **cardano-services:** implement tx submit api ([f76ebdd](https://github.com/input-output-hk/cardano-js-sdk/commit/f76ebdd6930a310d68128497a1b93b589ff1b071))
+* **cardano-services:** integrate the stake pool rewards store in the projector ([501174c](https://github.com/input-output-hk/cardano-js-sdk/commit/501174c4133904988469db941e6ff4a5de1b9d34))
+* **cardano-services:** update NFT metadata and Asset test with Asset db ([27b4323](https://github.com/input-output-hk/cardano-js-sdk/commit/27b4323c4d515f819d463ded5712047112e77759))
+* create PoolDelistedEntity and database migration ([650bef2](https://github.com/input-output-hk/cardano-js-sdk/commit/650bef2c4fdd7e35052f316710f51ac6b3a2e0af))
+* implement ros in typeorm stake pool provider ([be83024](https://github.com/input-output-hk/cardano-js-sdk/commit/be83024e4e5d0994adaa5548d33a8478d61d4c7d))
+* **projection-typeorm:** add stake pool rewards store ([bab242b](https://github.com/input-output-hk/cardano-js-sdk/commit/bab242b71192e904f4805b60c80ec5455bc23ecc))
+* stake registration and deregistration certificates now take a Credential instead of key hash ([49612f0](https://github.com/input-output-hk/cardano-js-sdk/commit/49612f0f313f357e7e2a7eed406852cbd2bb3dec))
+* update cli.test to work with Asset db ([7b5265e](https://github.com/input-output-hk/cardano-js-sdk/commit/7b5265e7320d68d652511dcb431de9b45ef73edd))
+
+### Bug Fixes
+
+* **cardano-services:** asset provider can be started with POSTGRES_HOST ([1603cfd](https://github.com/input-output-hk/cardano-js-sdk/commit/1603cfd318a2e5a10f5a43665b74f6ac1bb8fb22))
+* **cardano-services:** return active stake from previous epoch insted ([12fa427](https://github.com/input-output-hk/cardano-js-sdk/commit/12fa42767e506a7a498aa041c0fa1fe214a86454))
+
 ## [0.22.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.21.1...@cardano-sdk/cardano-services@0.22.0) (2023-10-19)
 
 ### ⚠ BREAKING CHANGES

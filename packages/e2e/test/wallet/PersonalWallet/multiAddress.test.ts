@@ -3,6 +3,7 @@ import { AddressType, GroupedAddress, util } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import {
   KeyAgentFactoryProps,
+  bip32Ed25519Factory,
   createStandaloneKeyAgent,
   firstValueFromTimed,
   getWallet,
@@ -42,7 +43,7 @@ describe('PersonalWallet/multiAddress', () => {
     const multiAddressKeyAgent = await createStandaloneKeyAgent(
       mnemonics,
       genesis,
-      await wallet.keyAgent.getBip32Ed25519()
+      await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger)
     );
 
     let txBuilder = wallet.createTxBuilder();

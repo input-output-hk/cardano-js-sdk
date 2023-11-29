@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.6.1...@cardano-sdk/hardware-ledger@0.7.0) (2023-11-29)
+
+### ⚠ BREAKING CHANGES
+
+* stake registration and deregistration certificates now take a Credential instead of key hash
+
+### Features
+
+* stake registration and deregistration certificates now take a Credential instead of key hash ([49612f0](https://github.com/input-output-hk/cardano-js-sdk/commit/49612f0f313f357e7e2a7eed406852cbd2bb3dec))
+
 ## [0.6.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.6.0...@cardano-sdk/hardware-ledger@0.6.1) (2023-10-19)
 
 **Note:** Version bump only for package @cardano-sdk/hardware-ledger

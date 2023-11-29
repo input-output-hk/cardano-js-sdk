@@ -1,4 +1,4 @@
-import { AddressType, AsyncKeyAgent, KeyRole } from '@cardano-sdk/key-management';
+import { AddressType, AsyncKeyAgent, KeyRole, util } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { HDSequentialDiscovery } from '../../../src';
 import {
@@ -33,7 +33,7 @@ describe('HDSequentialDiscovery', () => {
       25
     );
 
-    const addresses = await discovery.discover(mockKeyAgent);
+    const addresses = await discovery.discover(util.createBip32Ed25519AddressManager(mockKeyAgent));
 
     expect(addresses.length).toEqual(5);
     expect(addresses[0]).toEqual({
@@ -108,7 +108,7 @@ describe('HDSequentialDiscovery', () => {
 
   it('derives exactly 1 address when no used addresses are found', async () => {
     const discovery = new HDSequentialDiscovery(mockAlwaysEmptyChainHistoryProvider, 25);
-    const addresses = await discovery.discover(mockKeyAgent);
+    const addresses = await discovery.discover(util.createBip32Ed25519AddressManager(mockKeyAgent));
     expect(addresses).toHaveLength(1);
     expect(await firstValueFrom(mockKeyAgent.knownAddresses$)).toHaveLength(1);
   });
@@ -130,7 +130,7 @@ describe('HDSequentialDiscovery', () => {
       25
     );
 
-    const addresses = await discovery.discover(mockKeyAgent);
+    const addresses = await discovery.discover(util.createBip32Ed25519AddressManager(mockKeyAgent));
 
     // 5 payment key + 4 stake keys combined with payment index 0 (the first address overlaps in both sets).
     expect(addresses.length).toEqual(8);
@@ -158,7 +158,7 @@ describe('HDSequentialDiscovery', () => {
   it('return all discovered addresses', async () => {
     const discovery = new HDSequentialDiscovery(mockChainHistoryProvider, 25);
 
-    const addresses = await discovery.discover(mockKeyAgent);
+    const addresses = await discovery.discover(util.createBip32Ed25519AddressManager(mockKeyAgent));
 
     expect(addresses.length).toEqual(50);
 
@@ -213,7 +213,7 @@ describe('HDSequentialDiscovery', () => {
     await mockKeyAgent.setKnownAddresses([knownAddress]);
 
     const discovery = new HDSequentialDiscovery(mockAlwaysFailChainHistoryProvider, 25);
-    await expect(discovery.discover(mockKeyAgent)).rejects.toThrow();
+    await expect(discovery.discover(util.createBip32Ed25519AddressManager(mockKeyAgent))).rejects.toThrow();
 
     const knownAddresses = await firstValueFrom(mockKeyAgent.knownAddresses$);
     expect(knownAddresses).toEqual([knownAddress]);

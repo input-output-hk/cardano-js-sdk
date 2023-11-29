@@ -91,12 +91,14 @@ describe('GenericTxBuilder', () => {
       validateOutput: jest.fn().mockResolvedValue({ coinMissing: 0n } as OutputValidation)
     };
 
+    const asyncKeyAgent = util.createAsyncKeyAgent(keyAgent);
     const builderParams = {
+      addressManager: util.createBip32Ed25519AddressManager(asyncKeyAgent),
       inputResolver,
-      keyAgent: util.createAsyncKeyAgent(keyAgent),
       logger: dummyLogger,
       outputValidator,
-      txBuilderProviders
+      txBuilderProviders,
+      witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)
     };
 
     txBuilder = new GenericTxBuilder({

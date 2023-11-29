@@ -65,7 +65,6 @@ import {
   SyncStatus,
   WalletNetworkInfoProvider
 } from '../types';
-import { AsyncKeyAgent, GroupedAddress, cip8, util as keyManagementUtil } from '@cardano-sdk/key-management';
 import { BehaviorObservable, TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import {
   BehaviorSubject,
@@ -98,6 +97,7 @@ import {
   finalizeTx,
   initializeTx
 } from '@cardano-sdk/tx-construction';
+import { GroupedAddress, Witnesser, cip8, util as keyManagementUtil } from '@cardano-sdk/key-management';
 import { Logger } from 'ts-log';
 import { PubStakeKeyAndStatus, createPublicStakeKeysTracker } from '../services/PublicStakeKeysTracker';
 import { RetryBackoffConfig } from 'backoff-rxjs';
@@ -114,7 +114,8 @@ export interface PersonalWalletProps {
 }
 
 export interface PersonalWalletDependencies {
-  readonly keyAgent: AsyncKeyAgent;
+  readonly witnesser: Witnesser;
+  readonly addressManager: keyManagementUtil.Bip32Ed25519AddressManager;
   readonly txSubmitProvider: TxSubmitProvider;
   readonly stakePoolProvider: StakePoolProvider;
   readonly assetProvider: AssetProvider;
@@ -199,7 +200,8 @@ export class PersonalWallet implements ObservableWallet {
   #addressDiscovery: AddressDiscovery;
   #submittingPromises: Partial<Record<Cardano.TransactionId, Promise<Cardano.TransactionId>>> = {};
 
-  readonly keyAgent: AsyncKeyAgent;
+  readonly witnesser: Witnesser;
+  readonly addressManager: keyManagementUtil.Bip32Ed25519AddressManager;
   readonly currentEpoch$: TrackerSubject<EpochInfo>;
   readonly txSubmitProvider: TxSubmitProvider;
   readonly utxoProvider: TrackedUtxoProvider;
@@ -245,7 +247,8 @@ export class PersonalWallet implements ObservableWallet {
     {
       txSubmitProvider,
       stakePoolProvider,
-      keyAgent,
+      witnesser,
+      addressManager,
       assetProvider,
       handleProvider,
       networkInfoProvider,
@@ -284,7 +287,8 @@ export class PersonalWallet implements ObservableWallet {
       { consideredOutOfSyncAfter }
     );
 
-    this.keyAgent = keyAgent;
+    this.addressManager = addressManager;
+    this.witnesser = witnesser;
 
     this.fatalError$ = new Subject();
 
@@ -299,7 +303,7 @@ export class PersonalWallet implements ObservableWallet {
     this.addresses$ = new TrackerSubject<GroupedAddress[]>(
       concat(
         stores.addresses.get(),
-        keyAgent.knownAddresses$.pipe(
+        this.addressManager.knownAddresses$.pipe(
           distinctUntilChanged(groupedAddressesEquals),
           tap(
             // derive addresses if none available
@@ -311,7 +315,7 @@ export class PersonalWallet implements ObservableWallet {
                   coldObservableProvider({
                     cancel$,
                     onFatalError,
-                    provider: () => this.#addressDiscovery.discover(keyAgent),
+                    provider: () => this.#addressDiscovery.discover(this.addressManager),
                     retryBackoffConfig
                   })
                 ).catch(() => this.#logger.error('Failed to complete the address discovery process'));
@@ -452,7 +456,7 @@ export class PersonalWallet implements ObservableWallet {
     this.delegation = createDelegationTracker({
       epoch$,
       eraSummaries$,
-      knownAddresses$: this.keyAgent.knownAddresses$,
+      knownAddresses$: this.addressManager.knownAddresses$,
       logger: contextLogger(this.#logger, 'delegation'),
       onFatalError,
       retryBackoffConfig,
@@ -481,8 +485,8 @@ export class PersonalWallet implements ObservableWallet {
         });
 
     this.publicStakeKeys$ = createPublicStakeKeysTracker({
+      addressManager: this.addressManager,
       addresses$: this.addresses$,
-      keyAgent: this.keyAgent,
       rewardAccounts$: this.delegation.rewardAccounts$
     });
 
@@ -535,7 +539,7 @@ export class PersonalWallet implements ObservableWallet {
     const { tx: signedTx } = await finalizeTx(
       tx,
       { ...rest, ownAddresses: await firstValueFrom(this.addresses$) },
-      { inputResolver: this.util, keyAgent: this.keyAgent },
+      { addressManager: this.addressManager, inputResolver: this.util, witnesser: this.witnesser },
       stubSign
     );
     return signedTx;
@@ -620,7 +624,14 @@ export class PersonalWallet implements ObservableWallet {
   }
 
   signData(props: SignDataProps): Promise<Cip30DataSignature> {
-    return cip8.cip30signData({ keyAgent: this.keyAgent, ...props });
+    return cip8.cip30signData({
+      // TODO: signData probably needs to be refactored out of the wallet and supported as a stand alone util
+      // as this operation doesnt require any of the wallet state. Also this operation can only be performed
+      // by Bip32Ed25519 type of wallets.
+      addressManager: this.addressManager,
+      witnesser: this.witnesser as keyManagementUtil.Bip32Ed25519Witnesser,
+      ...props
+    });
   }
   sync() {
     this.#tip$.sync();
@@ -640,7 +651,7 @@ export class PersonalWallet implements ObservableWallet {
     this.utxoProvider.stats.shutdown();
     this.rewardsProvider.stats.shutdown();
     this.chainHistoryProvider.stats.shutdown();
-    this.keyAgent.shutdown();
+    this.addressManager.shutdown();
     this.currentEpoch$.complete();
     this.delegation.shutdown();
     this.assetInfo$.complete();
@@ -675,10 +686,10 @@ export class PersonalWallet implements ObservableWallet {
    */
   getTxBuilderDependencies(): TxBuilderDependencies {
     return {
+      addressManager: this.addressManager,
       handleProvider: this.handleProvider,
       inputResolver: this.util,
       inputSelector: this.#inputSelector,
-      keyAgent: this.keyAgent,
       logger: this.#logger,
       outputValidator: this.util,
       txBuilderProviders: {
@@ -687,7 +698,8 @@ export class PersonalWallet implements ObservableWallet {
         rewardAccounts: () => this.#firstValueFromSettled(this.delegation.rewardAccounts$),
         tip: () => this.#firstValueFromSettled(this.tip$),
         utxoAvailable: () => this.#firstValueFromSettled(this.utxo.available$)
-      }
+      },
+      witnesser: this.witnesser
     };
   }
 
@@ -708,7 +720,7 @@ export class PersonalWallet implements ObservableWallet {
   async getPubDRepKey(): Promise<Ed25519PublicKeyHex> {
     if (!this.drepPubKey) {
       try {
-        this.drepPubKey = await this.keyAgent.derivePublicKey(keyManagementUtil.DREP_KEY_DERIVATION_PATH);
+        this.drepPubKey = await this.addressManager.derivePublicKey(keyManagementUtil.DREP_KEY_DERIVATION_PATH);
       } catch (error) {
         this.#logger.error(error);
         throw error;

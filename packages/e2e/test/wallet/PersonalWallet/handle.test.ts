@@ -3,6 +3,7 @@ import { Cardano, metadatum } from '@cardano-sdk/core';
 import { KeyAgent, TransactionSigner } from '@cardano-sdk/key-management';
 import { PersonalWallet } from '@cardano-sdk/wallet';
 import {
+  bip32Ed25519Factory,
   burnTokens,
   coinsRequiredByHandleMint,
   createHandleMetadata,
@@ -50,7 +51,7 @@ describe.skip('Ada handle', () => {
     keyAgent = await createStandaloneKeyAgent(
       env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
       await firstValueFrom(wallet.genesisParameters$),
-      await wallet.keyAgent.getBip32Ed25519()
+      await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger)
     );
     ({ policyScript, policySigner, policyId } = await createHandlePolicy(keyAgent));
     const handleProviderPolicyId = await getHandlePolicyId(

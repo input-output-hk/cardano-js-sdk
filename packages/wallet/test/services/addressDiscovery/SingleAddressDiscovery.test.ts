@@ -1,4 +1,4 @@
-import { AsyncKeyAgent, KeyRole } from '@cardano-sdk/key-management';
+import { AsyncKeyAgent, KeyRole, util } from '@cardano-sdk/key-management';
 import { SingleAddressDiscovery } from '../../../src';
 import { prepareMockKeyAgentWithData } from './mockData';
 
@@ -12,7 +12,7 @@ describe('SingleAddressDiscovery', () => {
   it('return the first derived address', async () => {
     const discovery = new SingleAddressDiscovery();
 
-    const addresses = await discovery.discover(mockKeyAgent);
+    const addresses = await discovery.discover(util.createBip32Ed25519AddressManager(mockKeyAgent));
 
     expect(addresses.length).toEqual(1);
     expect(addresses[0]).toEqual({
