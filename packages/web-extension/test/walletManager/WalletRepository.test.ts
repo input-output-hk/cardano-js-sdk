@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Bip32PublicKeyHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { Cardano, Serialization } from '@cardano-sdk/core';
-import { WalletConflictError, WalletRepository, WalletRepositoryDependencies, WalletType } from '../../src';
+import { WalletConflictError, WalletId, WalletRepository, WalletRepositoryDependencies, WalletType } from '../../src';
 import { firstValueFrom, of } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 import pick from 'lodash/pick';
@@ -32,6 +32,12 @@ const createTrezorWalletProps = {
 
 const createScriptWalletProps = {
   metadata: { friendlyName: 'Treasury' },
+  ownSigners: [
+    {
+      accountId: storedLedgerWallet.accounts[0].accountId,
+      walletId: storedLedgerWallet.walletId
+    }
+  ],
   script: {
     __type: Cardano.ScriptType.Native,
     kind: Cardano.NativeScriptKind.RequireTimeBefore,
@@ -90,6 +96,34 @@ describe('WalletRepository', () => {
         repository.addWallet(pick(storedLedgerWallet, ['type', 'extendedAccountPublicKey']))
       ).rejects.toThrowError(WalletConflictError);
       expect(store.setAll).not.toBeCalled();
+    });
+
+    it('rejects with WalletConflictError when ownSigners wallet does not exist', async () => {
+      await expect(
+        repository.addWallet({
+          ...createScriptWalletProps,
+          ownSigners: [
+            {
+              accountId: createScriptWalletProps.ownSigners[0].accountId,
+              walletId: 'does not exist' as WalletId
+            }
+          ]
+        })
+      ).rejects.toThrowError(WalletConflictError);
+    });
+
+    it('rejects with WalletConflictError when ownSigners account does not exist', async () => {
+      await expect(
+        repository.addWallet({
+          ...createScriptWalletProps,
+          ownSigners: [
+            {
+              accountId: 'does not exist',
+              walletId: createScriptWalletProps.ownSigners[0].walletId
+            }
+          ]
+        })
+      ).rejects.toThrowError(WalletConflictError);
     });
 
     it('computes and returns WalletId for bip32 wallets', async () => {
@@ -222,6 +256,13 @@ describe('WalletRepository', () => {
       );
       expect(store.setAll).not.toBeCalled();
     });
+
+    it('rejects with WalletConflictError when trying to remove wallet referenced by script wallet', async () => {
+      store.observeAll.mockReturnValueOnce(of([storedLedgerWallet, storedScriptWallet]));
+      await expect(repository.removeWallet(storedScriptWallet.ownSigners[0].walletId)).rejects.toThrowError(
+        WalletConflictError
+      );
+    });
   });
 
   describe('removeAccount', () => {
@@ -241,6 +282,13 @@ describe('WalletRepository', () => {
         WalletConflictError
       );
       expect(store.setAll).not.toBeCalled();
+    });
+
+    it('rejects with WalletConflictError when trying to remove account referenced by script wallet', async () => {
+      store.observeAll.mockReturnValueOnce(of([storedLedgerWallet, storedScriptWallet]));
+      await expect(repository.removeAccount(storedScriptWallet.ownSigners[0].accountId)).rejects.toThrowError(
+        WalletConflictError
+      );
     });
   });
 });

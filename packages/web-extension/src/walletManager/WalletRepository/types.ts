@@ -42,12 +42,18 @@ export type InMemoryWallet<Metadata extends {}> = Bip32Wallet<Metadata> & {
   };
 };
 
+export type OwnSignerAccount = {
+  walletId: WalletId;
+  accountId: AccountId;
+};
+
 export type ScriptWallet<Metadata extends {}> = {
   type: WalletType.Script;
   walletId: WalletId;
   /** e.g. account name, picture */
   metadata: Metadata;
   script: Cardano.Script;
+  ownSigners: OwnSignerAccount[];
 };
 
 export type AnyWallet<Metadata extends {}> =

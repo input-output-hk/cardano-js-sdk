@@ -62,6 +62,22 @@ export class WalletRepository<AccountMetadata extends {}> implements WalletRepos
           if (wallets.some((wallet) => wallet.walletId === walletId)) {
             throw new WalletConflictError(`Wallet '${walletId}' already exists`);
           }
+          if (props.type === WalletType.Script) {
+            for (const ownSigner of props.ownSigners) {
+              if (
+                !wallets.some(
+                  (wallet) =>
+                    wallet.walletId === ownSigner.walletId &&
+                    wallet.type !== WalletType.Script &&
+                    wallet.accounts.some((account) => account.accountId === ownSigner.accountId)
+                )
+              ) {
+                throw new WalletConflictError(
+                  `Wallet or account does not exist: ${ownSigner.walletId}/${ownSigner.accountId}`
+                );
+              }
+            }
+          }
           return this.#store.setAll([
             ...wallets,
             props.type === WalletType.Script ? { ...props, walletId } : { ...props, accounts: [], walletId }
@@ -156,6 +172,13 @@ export class WalletRepository<AccountMetadata extends {}> implements WalletRepos
           if (!bip32Account) {
             throw new WalletConflictError(`Account '${accountId}' does not exist`);
           }
+          const dependentWallet = wallets.find(
+            (wallet) =>
+              wallet.type === WalletType.Script && wallet.ownSigners.some((signer) => signer.accountId === accountId)
+          );
+          if (dependentWallet) {
+            throw new WalletConflictError(`Wallet '${dependentWallet.walletId}' depends on account '${accountId}'`);
+          }
           return this.#store.setAll(
             cloneSplice(wallets, bip32Account.walletIndex, 1, {
               ...bip32Account.wallet,
@@ -176,6 +199,13 @@ export class WalletRepository<AccountMetadata extends {}> implements WalletRepos
           const walletIndex = wallets.findIndex((w) => w.walletId === walletId);
           if (walletIndex < 0) {
             throw new WalletConflictError(`Wallet '${walletId}' does not exist`);
+          }
+          const dependentWallet = wallets.find(
+            (wallet) =>
+              wallet.type === WalletType.Script && wallet.ownSigners.some((signer) => signer.walletId === walletId)
+          );
+          if (dependentWallet) {
+            throw new WalletConflictError(`Wallet '${dependentWallet.walletId}' depends on wallet '${walletId}'`);
           }
           return this.#store.setAll(cloneSplice(wallets, walletIndex, 1));
         }),
