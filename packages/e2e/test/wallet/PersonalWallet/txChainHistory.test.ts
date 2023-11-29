@@ -1,3 +1,4 @@
+import { Cardano, CardanoNodeUtil, ProviderError } from '@cardano-sdk/core';
 import { PersonalWallet } from '@cardano-sdk/wallet';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { getEnv, getWallet, normalizeTxBody, walletReady, walletVariables } from '../../../src';
@@ -8,16 +9,10 @@ const env = getEnv(walletVariables);
 
 describe('PersonalWallet/txChainHistory', () => {
   let wallet: PersonalWallet;
+  let signedTx: Cardano.Tx<Cardano.TxBody>;
 
   beforeEach(async () => {
     ({ wallet } = await getWallet({ env, logger, name: 'Sending Wallet', polling: { interval: 50 } }));
-  });
-
-  afterEach(() => {
-    wallet.shutdown();
-  });
-
-  it('submit a transaction and find it in chain history', async () => {
     const tAdaToSend = 10_000_000n;
     // Make sure the wallet has sufficient funds to run this test
     await walletReady(wallet, tAdaToSend);
@@ -32,7 +27,7 @@ describe('PersonalWallet/txChainHistory', () => {
     // Send 10 tADA to the same wallet.
     const txBuilder = wallet.createTxBuilder();
     const txOutput = await txBuilder.buildOutput().address(receivingAddress).coin(tAdaToSend).build();
-    const { tx: signedTx } = await txBuilder.addOutput(txOutput).build().sign();
+    signedTx = (await txBuilder.addOutput(txOutput).build().sign()).tx;
     await wallet.submitTx(signedTx);
 
     logger.info(
@@ -42,7 +37,13 @@ describe('PersonalWallet/txChainHistory', () => {
         signedTx.body.outputs.map((txOut) => [txOut.address, Number.parseInt(txOut.value.coins.toString())])
       )}.`
     );
+  });
 
+  afterEach(() => {
+    wallet.shutdown();
+  });
+
+  it('submit a transaction and find it in chain history', async () => {
     // Search chain history to see if the transaction is there.
     const txFoundInHistory = await firstValueFrom(
       wallet.transactions.history$.pipe(
@@ -58,5 +59,26 @@ describe('PersonalWallet/txChainHistory', () => {
     expect(txFoundInHistory).toBeDefined();
     expect(txFoundInHistory.id).toEqual(signedTx.id);
     expect(normalizeTxBody(txFoundInHistory.body)).toEqual(normalizeTxBody(signedTx.body));
+  });
+
+  it('can detect a ValueNotConserved error', async () => {
+    expect.assertions(1);
+    // Search chain history to see if the transaction is there.
+    await firstValueFrom(
+      wallet.transactions.history$.pipe(
+        map((txs) => txs.find((tx) => tx.id === signedTx.id)),
+        filter(isNotNil),
+        take(1)
+      )
+    );
+
+    try {
+      // Submit the same transaction again.
+      await wallet.submitTx(signedTx);
+    } catch (error) {
+      if (error instanceof ProviderError) {
+        expect(CardanoNodeUtil.isValueNotConservedError(error?.innerError)).toBeTruthy();
+      }
+    }
   });
 });
