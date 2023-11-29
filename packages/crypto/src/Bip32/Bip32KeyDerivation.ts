@@ -1,5 +1,7 @@
-import { BN } from 'bn.js';
+/* eslint-disable no-bitwise */
+/* eslint-disable unicorn/number-literal-case */
 import { InvalidArgumentError } from '@cardano-sdk/util';
+import { add256bits, add28Mul8 } from './arithmetic';
 import {
   crypto_auth_hmacsha512,
   crypto_core_ed25519_add,
@@ -65,39 +67,14 @@ const deriveSoft = (index: number, scalar: Buffer, chainCode: Buffer): { zMac: U
 };
 
 /**
- * Adds the left hand side to 28 bytes of the right hand side and multiplies the result by 8.
- *
- * @param lhs Left hand side Little-Endian big number.
- * @param rhs Right hand side Little-Endian big number.
- */
-const truc28Mul8 = (lhs: Uint8Array, rhs: Uint8Array): Buffer =>
-  new BN(lhs, 16, 'le').add(new BN(rhs.slice(0, 28), 16, 'le').mul(new BN(8))).toArrayLike(Buffer, 'le', 32);
-
-/**
  * Computes `(8 * sk[:28])*G` where `sk` is a little-endian encoded int and `G` is the curve's base point.
  *
  * @param sk The secret key.
  */
 const pointOfTrunc28Mul8 = (sk: Uint8Array) => {
-  const left = new BN(sk.slice(0, 28), 16, 'le').mul(new BN(8)).toArrayLike(Buffer, 'le', 32);
+  const scalar = add28Mul8(new Uint8Array(32).fill(0), sk);
 
-  return crypto_scalarmult_ed25519_base_noclamp(left);
-};
-
-/**
- * Adds the left hand side to the right hand side.
- *
- * @param lhs Left hand side Little-Endian big number.
- * @param rhs Right hand side Little-Endian big number.
- */
-const add = (lhs: Uint8Array, rhs: Uint8Array): Buffer => {
-  let r = new BN(lhs, 16, 'le').add(new BN(rhs, 16, 'le')).toArrayLike(Buffer, 'le').subarray(0, 32);
-
-  if (r.length !== 32) {
-    r = Buffer.from(r.toString('hex').padEnd(32, '0'), 'hex');
-  }
-
-  return r;
+  return crypto_scalarmult_ed25519_base_noclamp(scalar);
 };
 
 /**
@@ -135,8 +112,8 @@ export const derivePrivate = (key: Buffer, index: number): Buffer => {
   const zl = zMac.slice(0, 32);
   const zr = zMac.slice(32, 64);
 
-  const left = truc28Mul8(kl, zl);
-  const right = add(kr, zr);
+  const left = add28Mul8(kl, zl);
+  const right = add256bits(kr, zr);
 
   return Buffer.concat([left, right, chainCode]);
 };

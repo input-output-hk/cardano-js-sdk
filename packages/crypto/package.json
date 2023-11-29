@@ -41,7 +41,6 @@
     "@cardano-ogmios/schema": "5.6.0",
     "@dcspark/cardano-multiplatform-lib-nodejs": "^3.1.1",
     "@types/blake2b": "^2.1.0",
-    "@types/bn.js": "^5.1.1",
     "@types/libsodium-wrappers-sumo": "^0.7.5",
     "@types/lodash": "^4.14.182",
     "eslint": "^7.32.0",
@@ -70,7 +69,6 @@
   "dependencies": {
     "@cardano-sdk/util": "workspace:~",
     "blake2b": "^2.1.4",
-    "bn.js": "^5.2.1",
     "i": "^0.3.7",
     "libsodium-wrappers-sumo": "^0.7.5",
     "lodash": "^4.17.21",
