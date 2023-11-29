@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.16.3...@cardano-sdk/web-extension@0.16.4) (2023-11-29)
+
+### Features
+
+* **web-extension:** add WalletRepository ([945c4f6](https://github.com/input-output-hk/cardano-js-sdk/commit/945c4f62cc538354d3ba70cb28e7cf8c3a884cb0))
+
 ## [0.16.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.16.2...@cardano-sdk/web-extension@0.16.3) (2023-10-19)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension

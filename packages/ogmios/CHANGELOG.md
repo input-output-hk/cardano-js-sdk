@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.14.0...@cardano-sdk/ogmios@0.15.0) (2023-11-29)
+
+### ⚠ BREAKING CHANGES
+
+* stake registration and deregistration certificates now take a Credential instead of key hash
+
+### Features
+
+* stake registration and deregistration certificates now take a Credential instead of key hash ([49612f0](https://github.com/input-output-hk/cardano-js-sdk/commit/49612f0f313f357e7e2a7eed406852cbd2bb3dec))
+
+### Bug Fixes
+
+* **ogmios:** don't parse alonzo datum hashes as inline datums ([2be3c78](https://github.com/input-output-hk/cardano-js-sdk/commit/2be3c78cd7c06934f934b94dfa1e00b92775a793))
+
 ## [0.14.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.13.3...@cardano-sdk/ogmios@0.14.0) (2023-10-19)
 
 ### ⚠ BREAKING CHANGES

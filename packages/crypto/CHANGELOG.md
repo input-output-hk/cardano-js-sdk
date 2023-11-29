@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.1.15...@cardano-sdk/crypto@0.1.16) (2023-11-29)
+
+### Features
+
+* **crypto:** add Bip32PublicKeyHex and Bip32PublicKey.hash() ([279d0e5](https://github.com/input-output-hk/cardano-js-sdk/commit/279d0e503334bb4bcfaead2a8521f8993d74dbb2))
+
 ## [0.1.15](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.1.14...@cardano-sdk/crypto@0.1.15) (2023-09-29)
 
 **Note:** Version bump only for package @cardano-sdk/crypto
