@@ -1,14 +1,5 @@
-import {
-  AccountId,
-  AddAccountProps,
-  AddWalletProps,
-  AnyWallet,
-  ScriptWallet,
-  UpdateMetadataProps,
-  WalletId,
-  WalletRepositoryApi,
-  WalletType
-} from './types';
+import { AccountId, AnyWallet, ScriptWallet, WalletId, WalletType } from '../types';
+import { AddAccountProps, AddWalletProps, UpdateMetadataProps, WalletRepositoryApi } from './types';
 import { Bip32PublicKey, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { Logger } from 'ts-log';
 import { Observable, defer, firstValueFrom, map, shareReplay, switchMap } from 'rxjs';

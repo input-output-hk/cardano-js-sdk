@@ -4,3 +4,4 @@ export * from './walletManagerUi';
 export * from './walletManagerWorker';
 export * from './WalletRepository';
 export * from './errors';
+export * from './types';
