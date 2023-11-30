@@ -4,3 +4,4 @@ export * from './txOut';
 export * from './withdrawals';
 export * from './certificates';
 export * from './auxiliaryData';
+export * from './requiredSigners';

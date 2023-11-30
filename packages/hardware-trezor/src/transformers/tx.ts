@@ -3,7 +3,7 @@ import { Cardano } from '@cardano-sdk/core';
 import { GroupedAddress } from '@cardano-sdk/key-management';
 import { TrezorTxTransformerContext } from '../types';
 import { mapAdditionalWitnessRequests } from './additionalWitnessRequests';
-import { mapAuxiliaryData, mapCerts, mapTxIns, mapTxOuts, mapWithdrawals, toTxOut } from './';
+import { mapAuxiliaryData, mapCerts, mapRequiredSigners, mapTxIns, mapTxOuts, mapWithdrawals, toTxOut } from './';
 import { mapTokenMap } from './assets';
 
 /**
@@ -31,6 +31,9 @@ const trezorTxTransformer = async (
     outputs: mapTxOuts(body.outputs, context),
     protocolMagic: context.chainId.networkMagic,
     referenceInputs: body.referenceInputs ? await mapTxIns(body.referenceInputs, context) : undefined,
+    requiredSigners: body.requiredExtraSignatures
+      ? mapRequiredSigners(body.requiredExtraSignatures, context)
+      : undefined,
     totalCollateral: body.totalCollateral ? body.totalCollateral.toString() : undefined,
     ttl: body.validityInterval?.invalidHereafter?.toString(),
     validityIntervalStart: body.validityInterval?.invalidBefore?.toString(),
