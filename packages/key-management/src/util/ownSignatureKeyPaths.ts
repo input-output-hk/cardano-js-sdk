@@ -54,6 +54,7 @@ const checkStakeKeyHashCertificate = (
     case Cardano.CertificateType.StakeRegistrationDelegation:
     case Cardano.CertificateType.VoteRegistrationDelegation:
     case Cardano.CertificateType.StakeVoteRegistrationDelegation:
+    case Cardano.CertificateType.Registration:
     case Cardano.CertificateType.Unregistration:
     case Cardano.CertificateType.StakeDeregistration:
     case Cardano.CertificateType.StakeDelegation: {

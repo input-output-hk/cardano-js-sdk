@@ -69,17 +69,22 @@ describe('SmartTxSubmitProvider', () => {
       it('re-submits transactions that failed to submit due to a recoverable provider failure', async () => {
         underlyingProvider.submitTx
           .mockRejectedValueOnce(new ProviderError(ProviderFailure.ConnectionFailure))
-          .mockRejectedValueOnce(new ProviderError(ProviderFailure.Unhealthy))
-          .mockRejectedValueOnce(new ProviderError(ProviderFailure.Unknown));
+          .mockRejectedValueOnce(new ProviderError(ProviderFailure.Unhealthy));
         await provider.submitTx({ signedTransaction: txWithValidityIntervalHex });
-        expect(underlyingProvider.submitTx).toBeCalledTimes(4);
+        expect(underlyingProvider.submitTx).toBeCalledTimes(3);
       });
 
       it('rejects with any non-recoverable provider error', async () => {
-        const error = new ProviderError(ProviderFailure.BadRequest);
-        underlyingProvider.submitTx.mockRejectedValueOnce(error);
-        await expect(provider.submitTx({ signedTransaction: txWithValidityIntervalHex })).rejects.toThrowError(error);
-        expect(underlyingProvider.submitTx).toBeCalledTimes(1);
+        const errorBadRequest = new ProviderError(ProviderFailure.BadRequest);
+        const errorUnknown = new ProviderError(ProviderFailure.Unknown);
+        underlyingProvider.submitTx.mockRejectedValueOnce(errorBadRequest).mockRejectedValueOnce(errorUnknown);
+        await expect(provider.submitTx({ signedTransaction: txWithValidityIntervalHex })).rejects.toThrowError(
+          errorBadRequest
+        );
+        await expect(provider.submitTx({ signedTransaction: txWithValidityIntervalHex })).rejects.toThrowError(
+          errorUnknown
+        );
+        expect(underlyingProvider.submitTx).toBeCalledTimes(2);
       });
     });
 

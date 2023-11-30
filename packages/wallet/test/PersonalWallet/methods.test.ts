@@ -3,7 +3,15 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, AsyncKeyAgent, GroupedAddress, util } from '@cardano-sdk/key-management';
 import { AssetId, StubKeyAgent, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BehaviorSubject, Subscription, firstValueFrom, skip } from 'rxjs';
-import { Cardano, CardanoNodeErrors, ProviderError, ProviderFailure, TxCBOR } from '@cardano-sdk/core';
+import {
+  Cardano,
+  ProviderError,
+  ProviderFailure,
+  TxCBOR,
+  TxSubmissionError,
+  TxSubmissionErrorCode,
+  ValueNotConservedData
+} from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import { PersonalWallet, TxInFlight, setupWallet } from '../../src';
@@ -323,9 +331,11 @@ describe('PersonalWallet methods', () => {
     describe('submitTx', () => {
       const valueNotConservedError = new ProviderError(
         ProviderFailure.BadRequest,
-        new CardanoNodeErrors.TxSubmissionErrors.ValueNotConservedError({
-          valueNotConserved: { consumed: 2, produced: 1 }
-        })
+        new TxSubmissionError<ValueNotConservedData>(
+          TxSubmissionErrorCode.ValueNotConserved,
+          { consumed: { coins: 2n }, produced: { coins: 0n } },
+          'Value not conserved'
+        )
       );
 
       it('resolves on success', async () => {

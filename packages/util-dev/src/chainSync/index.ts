@@ -1,6 +1,7 @@
 import {
   Cardano,
-  CardanoNodeErrors,
+  ChainSyncError,
+  ChainSyncErrorCode,
   ChainSyncEvent,
   ChainSyncEventType,
   ChainSyncRollBackward,
@@ -37,8 +38,11 @@ const intersect = (events: ChainSyncData['body'], points: PointOrOrigin[]) => {
   const blockPoints = points.filter((point): point is Point => point !== 'origin');
   if (blockPoints.length === 0) {
     if (points.length === 0) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      throw new CardanoNodeErrors.CardanoClientErrors.IntersectionNotFoundError(points as any[]);
+      throw new ChainSyncError(
+        ChainSyncErrorCode.IntersectionNotFound,
+        { points, tip: events[0].tip },
+        'Intersection not found'
+      );
     }
     return {
       events,
@@ -83,8 +87,12 @@ const intersect = (events: ChainSyncData['body'], points: PointOrOrigin[]) => {
       }
     };
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  throw new CardanoNodeErrors.CardanoClientErrors.IntersectionNotFoundError(points as any[]);
+
+  throw new ChainSyncError(
+    ChainSyncErrorCode.IntersectionNotFound,
+    { points, tip: events[0].tip },
+    'Intersection not found'
+  );
 };
 
 export enum ChainSyncDataSet {

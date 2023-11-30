@@ -1,5 +1,5 @@
 import {
-  Cardano,
+  CardanoNodeUtil,
   ProviderError,
   ProviderFailure,
   TxSubmitProvider,
@@ -47,7 +47,7 @@ export class TxSubmitHttpService extends HttpService {
           if (!isHealthy) {
             return HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, firstError), 503);
           }
-          if (Cardano.util.asTxSubmissionError(error)) {
+          if (CardanoNodeUtil.asTxSubmissionError(error)) {
             return HttpServer.sendJSON(res, new ProviderError(ProviderFailure.BadRequest, firstError), 400);
           }
           return HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unknown, firstError), 500);

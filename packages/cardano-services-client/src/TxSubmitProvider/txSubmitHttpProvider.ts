@@ -1,11 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  CardanoNodeErrors,
+  CardanoNodeUtil,
+  GeneralCardanoNodeError,
+  GeneralCardanoNodeErrorCode,
   HandleOwnerChangeError,
   HttpProviderConfigPaths,
   ProviderError,
   ProviderFailure,
-  TxSubmitProvider
+  TxSubmissionError,
+  TxSubmissionErrorCode,
+  TxSubmitProvider,
+  reasonToProviderFailure
 } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
 import { apiVersion } from '../version';
@@ -17,23 +22,41 @@ const paths: HttpProviderConfigPaths<TxSubmitProvider> = {
   submitTx: '/submit'
 };
 
-const toTxSubmissionError = (error: any): CardanoNodeErrors.TxSubmissionError | null => {
-  if (typeof error === 'object' && typeof error?.name === 'string' && typeof error?.message === 'string') {
-    const rawError = error as CardanoNodeErrors.TxSubmissionError;
+/**
+ * Takes an unknown error param.
+ * Returns an instance of TxSubmissionError or GeneralCardanoNodeError from the error if the error
+ * is an object, with an undefined or valid TxSubmissionError or GeneralCardanoNodeError code, and
+ * a string message.
+ * Returns null otherwise.
+ */
+const toTxSubmissionError = (error: any): TxSubmissionError | GeneralCardanoNodeError | null => {
+  if (typeof error === 'object' && error !== null && typeof error?.message === 'string') {
+    if (CardanoNodeUtil.isTxSubmissionErrorCode(error.code)) {
+      return Object.setPrototypeOf(error, TxSubmissionError.prototype);
+    }
 
-    const txSubmissionErrorName = rawError.name as keyof typeof CardanoNodeErrors.TxSubmissionErrors;
-    const ErrorClass = CardanoNodeErrors.TxSubmissionErrors[txSubmissionErrorName];
-    if (ErrorClass) {
-      Object.setPrototypeOf(error, ErrorClass.prototype);
-      return error;
+    if (CardanoNodeUtil.isGeneralCardanoNodeErrorCode(error.code)) {
+      return error instanceof GeneralCardanoNodeError
+        ? error
+        : new GeneralCardanoNodeError(error.code, error.data || null, error.message);
     }
-    if (rawError.name === CardanoNodeErrors.UnknownTxSubmissionError.name) {
-      Object.setPrototypeOf(error, CardanoNodeErrors.UnknownTxSubmissionError.prototype);
-      return error;
+
+    if (error.code === undefined || error.code === null) {
+      return new GeneralCardanoNodeError(GeneralCardanoNodeErrorCode.Unknown, error?.data || null, error.message);
     }
-    return new CardanoNodeErrors.UnknownTxSubmissionError(error);
   }
   return null;
+};
+
+const codeToProviderFailure = (code: GeneralCardanoNodeErrorCode | TxSubmissionErrorCode) => {
+  switch (code) {
+    case GeneralCardanoNodeErrorCode.Unknown:
+      return ProviderFailure.Unknown;
+    case GeneralCardanoNodeErrorCode.ServerNotReady:
+      return ProviderFailure.ServerUnavailable;
+    default:
+      return ProviderFailure.BadRequest;
+  }
 };
 
 /**
@@ -55,18 +78,19 @@ export const txSubmitHttpProvider = (config: CreateHttpProviderConfig<TxSubmitPr
         }
         case 'submitTx': {
           if (typeof error === 'object' && typeof error.innerError === 'object') {
+            // Ogmios errors have inner error. Parse that to get the real error
             const txSubmissionError = toTxSubmissionError(error.innerError);
             if (txSubmissionError) {
-              const failure =
-                txSubmissionError instanceof CardanoNodeErrors.UnknownTxSubmissionError
-                  ? ProviderFailure.Unknown
-                  : ProviderFailure.BadRequest;
-              throw new ProviderError(failure, txSubmissionError);
+              throw new ProviderError(codeToProviderFailure(txSubmissionError.code), txSubmissionError);
             }
 
             if (error.name === 'HandleOwnerChangeError') {
               Object.setPrototypeOf(error, HandleOwnerChangeError);
             }
+          }
+          // No inner error. Use the outer reason to determine the error type.
+          if (error.reason && typeof error.reason === 'string') {
+            throw new ProviderError(reasonToProviderFailure(error.reason), error);
           }
         }
       }

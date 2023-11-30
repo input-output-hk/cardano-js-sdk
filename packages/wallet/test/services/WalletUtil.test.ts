@@ -278,7 +278,7 @@ describe('WalletUtil', () => {
             __typename: Cardano.CertificateType.Registration,
             // using foreign intentionally because registration is not signed so it should be accepted
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(mocks.stakeKeyHash),
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.NewStakeAddressCertificate,

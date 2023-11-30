@@ -22,6 +22,7 @@ import { OgmiosCardanoNode } from '../../CardanoNode';
 import { RunnableModule, contextLogger, isNotNil } from '@cardano-sdk/util';
 import { TxSubmissionClient, createTxSubmissionClient } from '../../Ogmios/TxSubmissionClient';
 import { createInteractionContextWithLogger } from '../../util';
+import { mapOgmiosTxSubmitError } from './errorMapper';
 
 /**
  * Connect to an [Ogmios](https://ogmios.dev/) instance
@@ -80,7 +81,10 @@ export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitPr
       const id = await this.#txSubmissionClient.submitTx(signedTransaction);
       this.#logger.info(`Submitted ${id}`);
     } catch (error) {
-      throw Cardano.util.asTxSubmissionError(error) || new CardanoNodeErrors.UnknownTxSubmissionError(error);
+      const txSubmitErr =
+        Cardano.util.asTxSubmissionError(error) || new CardanoNodeErrors.UnknownTxSubmissionError(error);
+
+      throw mapOgmiosTxSubmitError(txSubmitErr);
     }
   }
 
