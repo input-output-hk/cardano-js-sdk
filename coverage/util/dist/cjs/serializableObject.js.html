@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">20.54% </span>
+                <span class="strong">21.51% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>15/73</span>
+                <span class='fraction'>17/79</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">11.53% </span>
+                <span class="strong">9.67% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>6/52</span>
+                <span class='fraction'>6/62</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">6.66% </span>
+                <span class="strong">5.88% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/15</span>
+                <span class='fraction'>1/17</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">23.07% </span>
+                <span class="strong">24.63% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>15/65</span>
+                <span class='fraction'>17/69</span>
             </div>
         
             
@@ -172,7 +172,12 @@
 <a name='L107'></a><a href='#L107'>107</a>
 <a name='L108'></a><a href='#L108'>108</a>
 <a name='L109'></a><a href='#L109'>109</a>
-<a name='L110'></a><a href='#L110'>110</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -185,6 +190,8 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -205,6 +212,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -293,6 +303,8 @@ const PLAIN_TYPES = new Set(['boolean', 'number', 'string']);
 const defaultGetErrorPrototype = <span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >Error.prototype;</span>
 const defaultTransformKey = <span class="fstat-no" title="function not covered" >(k</span>ey) =&gt; <span class="cstat-no" title="statement not covered" >key;</span>
 const defaultTransformationTypeKey = '__type';
+const hasInnerError = <span class="fstat-no" title="function not covered" >(e</span>rror) =&gt; <span class="cstat-no" title="statement not covered" >error !== null &amp;&amp; typeof error === 'object' &amp;&amp; 'innerError' in error;</span>
+const innerErrorHasData = <span class="fstat-no" title="function not covered" >(i</span>nnerError) =&gt; <span class="cstat-no" title="statement not covered" >typeof innerError === 'object' &amp;&amp; innerError !== null &amp;&amp; 'data' in innerError;</span>
 const toSerializableObject = <span class="fstat-no" title="function not covered" >(o</span>bj, options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> =&gt; {
 <span class="cstat-no" title="statement not covered" >    if (PLAIN_TYPES.has(typeof obj))</span>
 <span class="cstat-no" title="statement not covered" >        return obj;</span>
@@ -314,6 +326,9 @@ const toSerializableObject = <span class="fstat-no" title="function not covered"
 <span class="cstat-no" title="statement not covered" >            return { [transformationTypeKey]: 'Buffer', value };</span>
         }
 <span class="cstat-no" title="statement not covered" >        if (obj instanceof Error) {</span>
+<span class="cstat-no" title="statement not covered" >            if (hasInnerError(obj) &amp;&amp; innerErrorHasData(obj.innerError)) {</span>
+<span class="cstat-no" title="statement not covered" >                obj.innerError.data = (0, exports.toSerializableObject)(obj.innerError.data);</span>
+            }
 <span class="cstat-no" title="statement not covered" >            return {</span>
                 [transformationTypeKey]: 'Error',
                 value: (0, serialize_error_1.serializeError)(obj)
@@ -397,7 +412,7 @@ exports.fromSerializableObject = fromSerializableObject;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-11-28T15:10:43.714Z
+                at 2023-11-30T10:10:18.782Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
