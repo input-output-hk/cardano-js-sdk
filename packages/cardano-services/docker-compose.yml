@@ -12,7 +12,7 @@ x-sdk-environment: &sdk-environment
 
 services:
   cardano-node-ogmios:
-    image: cardanosolutions/cardano-node-ogmios:v${OGMIOS_VERSION:-6.0.0-rc5}_${CARDANO_NODE_VERSION:-8.7.0-pre}
+    image: cardanosolutions/cardano-node-ogmios:v${OGMIOS_VERSION:-6.0.0-rc5}_${CARDANO_NODE_VERSION:-8.7.1-pre}
     volumes:
       - ./config/network/${NETWORK:-mainnet}:/config
 

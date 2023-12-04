@@ -154,7 +154,7 @@ services:
     depends_on:
       cardano-node-ogmios:
         condition: service_healthy
-    image: ghcr.io/input-output-hk/cardano-submit-api:${CARDANO_NODE_VERSION:-8.7.0-pre}
+    image: ghcr.io/input-output-hk/cardano-submit-api:${CARDANO_NODE_VERSION:-8.7.1-pre}
     ports:
       - 8090:8090
     restart: on-failure
