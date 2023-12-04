@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.15.0...@cardano-sdk/key-management@0.15.1) (2023-12-04)
+
+### Features
+
+* **key-management:** sign conway stake key registration certificates ([63b8a1d](https://github.com/input-output-hk/cardano-js-sdk/commit/63b8a1df2888f27a2f9078f8554b38af5f91d8c9))
+
 ## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.14.0...@cardano-sdk/key-management@0.15.0) (2023-11-29)
 
 ### ⚠ BREAKING CHANGES

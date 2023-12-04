@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.3.0...@cardano-sdk/hardware-trezor@0.3.1) (2023-12-04)
+
+### Features
+
+* **hardware-trezor:** add required signers to hw trezor mappers ([d89b05b](https://github.com/input-output-hk/cardano-js-sdk/commit/d89b05be33533be1c8782b4f394686d64237f808))
+
 ## [0.3.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.2.1...@cardano-sdk/hardware-trezor@0.3.0) (2023-11-29)
 
 ### ⚠ BREAKING CHANGES
