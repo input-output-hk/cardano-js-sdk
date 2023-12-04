@@ -420,6 +420,11 @@ describe('tx', () => {
           }
         ],
         protocolMagic: 999,
+        requiredSigners: [
+          {
+            keyHash: '6199186adb51974690d7247d2646097d2c62763b16fb7ed3f9f55d39'
+          }
+        ],
         totalCollateral: '1000',
         ttl: '1000',
         validityIntervalStart: '100',

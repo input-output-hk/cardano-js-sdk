@@ -10,7 +10,6 @@ import {
   TxSubmissionError,
   TxSubmissionErrorCode
 } from '../../../src';
-
 const unknownCardanoNodeError = (message: string) =>
   new GeneralCardanoNodeError(GeneralCardanoNodeErrorCode.Unknown, message, 'Unknown Cardano node error, see "data"');
 const stateQueryError = new StateQueryError(StateQueryErrorCode.UnavailableInCurrentEra, null, 'Query unavailable');

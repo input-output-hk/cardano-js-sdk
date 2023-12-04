@@ -1,4 +1,4 @@
-// Runtime dependency: `yarn preprod:up cardano-node-ogmios postgres` (can be any network)
+// Runtime dependency: `yarn preprod:up cardano-node ogmios postgres` (can be any network)
 /* eslint-disable import/no-extraneous-dependencies */
 const { Bootstrap, Mappers, requestNext, logProjectionProgress } = require('@cardano-sdk/projection');
 const {
