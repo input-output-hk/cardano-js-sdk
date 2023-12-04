@@ -8,8 +8,12 @@ x-logging: &logging
       max-file: '20'
 
 services:
-  cardano-node-ogmios:
-    image: cardanosolutions/cardano-node-ogmios:v${OGMIOS_VERSION:-5.6.0}_${CARDANO_NODE_VERSION:-1.35.5}-${NETWORK:-mainnet}
+  cardano-node:
+    volumes:
+      - ./config/network/${NETWORK:-mainnet}/cardano-node:/config
+      - ./config/network/${NETWORK:-mainnet}/genesis:/genesis
+
+  ogmios:
     volumes:
       - ./config/network/${NETWORK:-mainnet}:/config
 
