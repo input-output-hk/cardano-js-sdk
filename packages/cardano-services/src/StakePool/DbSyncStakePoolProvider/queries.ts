@@ -554,7 +554,7 @@ export const STATUS_QUERY = {
 export const IDENTIFIER_QUERY = {
   JOIN_CLAUSE: {
     OFFLINE_METADATA: `
-    LEFT JOIN pool_offline_data pod
+    LEFT JOIN off_chain_pool_data pod
       ON pod.pool_id = ph.id
     `,
     POOL_UPDATE: `
@@ -601,7 +601,7 @@ JOIN stake_address sa ON
   sa.id = pu.reward_addr_id
 LEFT JOIN pool_metadata_ref metadata
   ON metadata.id = pu.meta_id
-LEFT JOIN pool_offline_data pod
+LEFT JOIN off_chain_pool_data pod
   ON metadata.id = pod.pmr_id
 WHERE pu.id = ANY($1)
 `;
@@ -625,7 +625,7 @@ JOIN pool_hash ph ON
   ph.id = pu.hash_id
 LEFT JOIN pool_metadata_ref metadata
   ON metadata.id = pu.meta_id
-LEFT JOIN pool_offline_data pod
+LEFT JOIN off_chain_pool_data pod
   ON metadata.id = pod.pmr_id
 WHERE pu.id = ANY($1)
 `;
@@ -840,7 +840,7 @@ JOIN pool_updates pu ON
   pu.hash_id = ph.id`,
   identifier: {
     JOIN: `
-LEFT JOIN pool_offline_data pod ON
+LEFT JOIN off_chain_pool_data pod ON
   pmr_id = meta_id`
   },
   identifierOrPledge: {
