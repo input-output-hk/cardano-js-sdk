@@ -7,25 +7,32 @@ import { createTransactionInternals } from '../createTransactionInternals';
 import { defaultSelectionConstraints } from '../input-selection';
 import { ensureValidityInterval } from '../ensureValidityInterval';
 import { finalizeTx } from './finalizeTx';
-import { firstValueFrom } from 'rxjs';
+import { util } from '@cardano-sdk/key-management';
 
 export const initializeTx = async (
   props: InitializeTxProps,
-  { txBuilderProviders, inputSelector, inputResolver, addressManager, witnesser, logger }: TxBuilderDependencies
+  {
+    txBuilderProviders,
+    inputSelector,
+    inputResolver,
+    bip32Account: addressManager,
+    witnesser,
+    logger
+  }: TxBuilderDependencies
 ): Promise<InitializeTxResult> => {
-  const [tip, genesisParameters, protocolParameters, addresses, rewardAccounts, utxo] = await Promise.all([
+  const [tip, genesisParameters, protocolParameters, rewardAccounts, utxo, addresses] = await Promise.all([
     txBuilderProviders.tip(),
     txBuilderProviders.genesisParameters(),
     txBuilderProviders.protocolParameters(),
-    firstValueFrom(addressManager.knownAddresses$),
     txBuilderProviders.rewardAccounts(),
-    txBuilderProviders.utxoAvailable()
+    txBuilderProviders.utxoAvailable(),
+    txBuilderProviders.addresses.get()
   ]);
 
   inputSelector =
     inputSelector ??
     roundRobinRandomImprove({
-      changeAddressResolver: new StaticChangeAddressResolver(() => firstValueFrom(addressManager.knownAddresses$))
+      changeAddressResolver: new StaticChangeAddressResolver(async () => addresses)
     });
 
   const validityInterval = ensureValidityInterval(tip.slot, genesisParameters, props.options?.validityInterval);
@@ -59,11 +66,14 @@ export const initializeTx = async (
         {
           auxiliaryData: props.auxiliaryData,
           handleResolutions: props.handleResolutions ?? [],
-          ownAddresses: addresses,
+          signingContext: {
+            knownAddresses: addresses,
+            txInKeyPathMap: await util.createTxInKeyPathMap(unsignedTx.body, addresses, inputResolver)
+          },
           signingOptions: props.signingOptions,
           witness: props.witness
         },
-        { addressManager, inputResolver, witnesser },
+        { bip32Account: addressManager, witnesser },
         true
       );
       return tx;

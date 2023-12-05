@@ -9,6 +9,7 @@ import {
   KeyPair,
   SerializableInMemoryKeyAgentData,
   SignBlobResult,
+  SignTransactionContext,
   SignTransactionOptions
 } from './types';
 import { Cardano } from '@cardano-sdk/core';
@@ -113,8 +114,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
         chainId,
         encryptedRootPrivateKeyBytes: [...encryptedRootPrivateKey],
         extendedAccountPublicKey,
-        getPassphrase,
-        knownAddresses: []
+        getPassphrase
       },
       dependencies
     );
@@ -122,14 +122,15 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
 
   async signTransaction(
     { body, hash }: Cardano.TxBodyWithHash,
-    { additionalKeyPaths = [] }: SignTransactionOptions | undefined = {}
+    { txInKeyPathMap, knownAddresses }: SignTransactionContext,
+    { additionalKeyPaths = [] }: SignTransactionOptions = {}
   ): Promise<Cardano.Signatures> {
     // Possible optimization is casting strings to OpaqueString types directly and skipping validation
     const blob = HexBlob(hash);
     const dRepKeyHash = (
       await Crypto.Ed25519PublicKey.fromHex(await this.derivePublicKey(DREP_KEY_DERIVATION_PATH)).hash()
     ).hex();
-    const derivationPaths = await ownSignatureKeyPaths(body, this.knownAddresses, this.inputResolver, dRepKeyHash);
+    const derivationPaths = ownSignatureKeyPaths(body, knownAddresses, txInKeyPathMap, dRepKeyHash);
     const keyPaths = uniqBy([...derivationPaths, ...additionalKeyPaths], ({ role, index }) => `${role}.${index}`);
     // TODO:
     // if (keyPaths.length === 0) {

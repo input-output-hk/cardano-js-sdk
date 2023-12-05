@@ -41,42 +41,6 @@ export const createWalletUtil = (context: WalletUtilContext) => ({
 
 export type WalletUtil = ReturnType<typeof createWalletUtil>;
 
-type SetWalletUtilContext = (context: WalletUtilContext) => void;
-
-/**
- * Creates a WalletUtil that has an additional function to `initialize` by setting the context.
- * Calls to WalletUtil functions will only resolve after initializing.
- *
- * @returns common wallet utility functions that are aware of wallet state and computes useful things
- */
-export const createLazyWalletUtil = (): WalletUtil & { initialize: SetWalletUtilContext } => {
-  let initialize: SetWalletUtilContext;
-  const resolverReady = new Promise((resolve: SetWalletUtilContext) => (initialize = resolve)).then(createWalletUtil);
-  return {
-    initialize: initialize!,
-    async resolveInput(input) {
-      const resolver = await resolverReady;
-      return resolver.resolveInput(input);
-    },
-    async validateOutput(output) {
-      const resolver = await resolverReady;
-      return resolver.validateOutput(output);
-    },
-    async validateOutputs(outputs) {
-      const resolver = await resolverReady;
-      return resolver.validateOutputs(outputs);
-    },
-    async validateValue(value) {
-      const resolver = await resolverReady;
-      return resolver.validateValue(value);
-    },
-    async validateValues(values) {
-      const resolver = await resolverReady;
-      return resolver.validateValues(values);
-    }
-  };
-};
-
 /** All transaction inputs and collaterals must come from our utxo set */
 const hasForeignInputs = (
   { body: { inputs, collaterals = [] } }: { body: Pick<Cardano.TxBody, 'inputs' | 'collaterals'> },

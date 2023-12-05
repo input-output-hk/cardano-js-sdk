@@ -90,7 +90,8 @@ export const mint = async (
   txMetadatum: Cardano.Metadatum,
   datum?: Cardano.PlutusData
 ) => {
-  const [{ address }] = await firstValueFrom(wallet.addresses$);
+  const knownAddresses = await firstValueFrom(wallet.addresses$);
+  const [{ address }] = knownAddresses;
   const { policyScript, policySigner } = await createHandlePolicy(keyAgent);
 
   const auxiliaryData = {

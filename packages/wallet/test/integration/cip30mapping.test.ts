@@ -12,7 +12,7 @@ import {
   TxSignError,
   WalletApi
 } from '@cardano-sdk/dapp-connector';
-import { AddressType, GroupedAddress, util } from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { CallbackConfirmation, GetCollateralCallbackParams } from '../../src/cip30';
 import {
@@ -27,7 +27,7 @@ import {
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
-import { PersonalWallet, cip30, setupWallet } from '../../src';
+import { PersonalWallet, cip30 } from '../../src';
 import { Providers, createWallet } from './util';
 import { buildDRepIDFromDRepKey, waitForWalletStateSettle } from '../util';
 import { firstValueFrom, of } from 'rxjs';
@@ -576,33 +576,38 @@ describe('cip30', () => {
     });
 
     describe('confirmation callbacks', () => {
+      let address: Cardano.PaymentAddress;
+
+      beforeEach(async () => {
+        address = (await firstValueFrom(wallet.addresses$))[0].address;
+      });
+
       describe('signData', () => {
         const payload = 'abc123';
 
         test('resolves true', async () => {
           confirmationCallback.signData = jest.fn().mockResolvedValueOnce(true);
-          await expect(api.signData(wallet.addresses$.value![0].address, payload)).resolves.not.toThrow();
+          await expect(api.signData(address, payload)).resolves.not.toThrow();
         });
 
         test('resolves false', async () => {
           confirmationCallback.signData = jest.fn().mockResolvedValueOnce(false);
-          await expect(api.signData(wallet.addresses$.value![0].address, payload)).rejects.toThrowError(DataSignError);
+          await expect(api.signData(address, payload)).rejects.toThrowError(DataSignError);
         });
 
         test('rejects', async () => {
           confirmationCallback.signData = jest.fn().mockRejectedValue(1);
-          await expect(api.signData(wallet.addresses$.value![0].address, payload)).rejects.toThrowError(DataSignError);
+          await expect(api.signData(address, payload)).rejects.toThrowError(DataSignError);
         });
 
         test('gets the Cardano.Address equivalent of the hex address', async () => {
           confirmationCallback.signData = jest.fn().mockResolvedValueOnce(true);
 
-          const expectedAddr = wallet.addresses$.value![0].address;
-          const hexAddr = Cardano.Address.fromBech32(expectedAddr).toBytes();
+          const hexAddr = Cardano.Address.fromBech32(address).toBytes();
 
           await api.signData(hexAddr, payload);
           expect(confirmationCallback.signData).toHaveBeenCalledWith(
-            expect.objectContaining({ data: expect.objectContaining({ addr: expectedAddr }) })
+            expect.objectContaining({ data: expect.objectContaining({ addr: address }) })
           );
         });
       });
@@ -685,31 +690,24 @@ describe('cip30', () => {
           stakeKeyDerivationPath,
           type: AddressType.External
         };
-        ({ wallet: mockWallet } = await setupWallet({
-          bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
-          createKeyAgent: async (dependencies) => {
-            const asyncKeyAgent = await testAsyncKeyAgent([groupedAddress], dependencies);
-            asyncKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
-            return asyncKeyAgent;
-          },
-          createWallet: async (keyAgent) =>
-            new PersonalWallet(
-              { name: 'Test Wallet' },
-              {
-                addressManager: util.createBip32Ed25519AddressManager(keyAgent),
-                assetProvider,
-                chainHistoryProvider,
-                logger,
-                networkInfoProvider,
-                rewardsProvider,
-                stakePoolProvider,
-                txSubmitProvider,
-                utxoProvider,
-                witnesser: util.createBip32Ed25519Witnesser(keyAgent)
-              }
-            ),
-          logger
-        }));
+        const asyncKeyAgent = await testAsyncKeyAgent();
+        const bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
+        bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
+        mockWallet = new PersonalWallet(
+          { name: 'Test Wallet' },
+          {
+            assetProvider,
+            bip32Account,
+            chainHistoryProvider,
+            logger,
+            networkInfoProvider,
+            rewardsProvider,
+            stakePoolProvider,
+            txSubmitProvider,
+            utxoProvider,
+            witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)
+          }
+        );
 
         await waitForWalletStateSettle(mockWallet);
         mockApi = cip30.createWalletApi(

@@ -1,14 +1,11 @@
 import { Cardano } from '@cardano-sdk/core';
-import { GroupedAddress, InMemoryKeyAgent, KeyAgentDependencies, util } from '../../src';
+import { InMemoryKeyAgent, KeyAgentDependencies, util } from '../../src';
 import { mockKeyAgentDependencies } from './mockKeyAgentDependencies';
 
 export const getPassphrase = jest.fn(async () => Buffer.from('password'));
 
-export const testKeyAgent = async (
-  addresses?: GroupedAddress[],
-  dependencies: KeyAgentDependencies | undefined = mockKeyAgentDependencies()
-) => {
-  const keyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
+export const testKeyAgent = async (dependencies: KeyAgentDependencies | undefined = mockKeyAgentDependencies()) =>
+  InMemoryKeyAgent.fromBip39MnemonicWords(
     {
       chainId: Cardano.ChainIds.Preview,
       getPassphrase,
@@ -16,15 +13,9 @@ export const testKeyAgent = async (
     },
     dependencies
   );
-  if (addresses) {
-    keyAgent.knownAddresses.push(...addresses);
-  }
-  return keyAgent;
-};
 
 export const testAsyncKeyAgent = async (
-  addresses?: GroupedAddress[],
   dependencies: KeyAgentDependencies | undefined = mockKeyAgentDependencies(),
-  keyAgentReady = testKeyAgent(addresses, dependencies),
+  keyAgentReady = testKeyAgent(dependencies),
   shutdownSpy?: () => void
 ) => util.createAsyncKeyAgent(await keyAgentReady, shutdownSpy);

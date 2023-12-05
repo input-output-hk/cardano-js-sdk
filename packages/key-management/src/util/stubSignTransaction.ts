@@ -1,6 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
-import { GroupedAddress, SignTransactionOptions, TransactionSigner } from '../types';
+import { SignTransactionContext, SignTransactionOptions, TransactionSigner } from '../types';
 import { deepEquals } from '@cardano-sdk/util';
 import { ownSignatureKeyPaths } from './ownSignatureKeyPaths';
 
@@ -11,29 +11,26 @@ const randomPublicKey = () => Crypto.Ed25519PublicKeyHex(Array.from({ length: 64
 
 export interface StubSignTransactionProps {
   txBody: Cardano.TxBody;
-  knownAddresses: GroupedAddress[];
-  inputResolver: Cardano.InputResolver;
   extraSigners?: TransactionSigner[];
   dRepPublicKey: Crypto.Ed25519PublicKeyHex;
+  context: SignTransactionContext;
   signTransactionOptions?: SignTransactionOptions;
 }
 
 export const stubSignTransaction = async ({
   txBody,
-  knownAddresses,
-  inputResolver,
   extraSigners,
   dRepPublicKey,
-  signTransactionOptions = { additionalKeyPaths: [] }
+  context: { knownAddresses, txInKeyPathMap },
+  signTransactionOptions: { additionalKeyPaths = [] } = {}
 }: StubSignTransactionProps): Promise<Cardano.Signatures> => {
-  const { additionalKeyPaths = [] } = signTransactionOptions;
   const mockSignature = Crypto.Ed25519SignatureHex(
     // eslint-disable-next-line max-len
     'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
   );
   const dRepKeyHash = (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex();
   const signatureKeyPaths = uniqWith(
-    [...(await ownSignatureKeyPaths(txBody, knownAddresses, inputResolver, dRepKeyHash)), ...additionalKeyPaths],
+    [...ownSignatureKeyPaths(txBody, knownAddresses, txInKeyPathMap, dRepKeyHash), ...additionalKeyPaths],
     deepEquals
   );
 

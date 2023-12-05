@@ -1,10 +1,9 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AccountKeyDerivationPath, GroupedAddress } from '../types';
+import { AccountKeyDerivationPath, GroupedAddress, TxInId, TxInKeyPathMap } from '../types';
 import { Cardano } from '@cardano-sdk/core';
 import { DREP_KEY_DERIVATION_PATH } from './key';
 import { isNotNil } from '@cardano-sdk/util';
 import isEqual from 'lodash/isEqual';
-import uniq from 'lodash/uniq';
 import uniqBy from 'lodash/uniqBy';
 import uniqWith from 'lodash/uniqWith';
 
@@ -327,32 +326,41 @@ export const getDRepCredentialKeyPaths = ({
   return signature;
 };
 
+// TODO: test
+export const createTxInKeyPathMap = async (
+  txBody: Cardano.TxBody,
+  knownAddresses: GroupedAddress[],
+  inputResolver: Cardano.InputResolver
+) => {
+  const result: TxInKeyPathMap = {};
+  const txInputs = [...txBody.inputs, ...(txBody.collaterals ? txBody.collaterals : [])];
+  await Promise.all(
+    txInputs.map(async (txIn) => {
+      const resolution = await inputResolver.resolveInput(txIn);
+      if (!resolution) return;
+      const ownAddress = knownAddresses.find(({ address }) => address === resolution.address);
+      if (!ownAddress) return;
+      result[TxInId(txIn)] = { index: ownAddress.index, role: Number(ownAddress.type) };
+    })
+  );
+
+  return result;
+};
+
 /**
  * Assumes that a single stake key is used for all addresses (index=0)
  *
  * @returns {AccountKeyDerivationPath[]} derivation paths for keys to sign transaction with
  */
-export const ownSignatureKeyPaths = async (
+export const ownSignatureKeyPaths = (
   txBody: Cardano.TxBody,
   knownAddresses: GroupedAddress[],
-  inputResolver: Cardano.InputResolver,
+  txInKeyPathMap: TxInKeyPathMap,
   dRepKeyHash?: Crypto.Ed25519KeyHashHex
-): Promise<AccountKeyDerivationPath[]> => {
-  const txInputs = [...txBody.inputs, ...(txBody.collaterals ? txBody.collaterals : [])];
-  const paymentKeyPaths = uniq(
-    (
-      await Promise.all(
-        txInputs.map(async (input) => {
-          const resolution = await inputResolver.resolveInput(input);
-          if (!resolution) return null;
-          return knownAddresses.find(({ address }) => address === resolution.address);
-        })
-      )
-    ).filter(isNotNil)
-  ).map(({ type, index }) => ({ index, role: Number(type) }));
-
+): AccountKeyDerivationPath[] => {
   // TODO: add `proposal_procedure` witnesses.
 
+  const paymentKeyPaths = Object.values(txInKeyPathMap).filter(isNotNil);
   return uniqWith(
     [
       ...paymentKeyPaths,

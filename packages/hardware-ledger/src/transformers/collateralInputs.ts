@@ -3,7 +3,7 @@ import { Cardano } from '@cardano-sdk/core';
 import { LedgerTxTransformerContext } from '../types';
 import { mapTxIns } from './txIn';
 
-export const mapCollateralTxIns = async (
+export const mapCollateralTxIns = (
   collateralTxIns: Cardano.TxIn[] | undefined,
   context: LedgerTxTransformerContext
-): Promise<Ledger.TxInput[] | null> => (collateralTxIns ? await mapTxIns(collateralTxIns, context) : null);
+): Ledger.TxInput[] | null => (collateralTxIns ? mapTxIns(collateralTxIns, context) : null);

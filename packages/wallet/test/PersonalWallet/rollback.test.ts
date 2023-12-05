@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, GroupedAddress, util } from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
 import {
   Cardano,
   ChainHistoryProvider,
@@ -8,7 +8,7 @@ import {
   TxSubmitProvider,
   UtxoProvider
 } from '@cardano-sdk/core';
-import { ConnectionStatusTracker, PersonalWallet, PollingConfig, setupWallet } from '../../src';
+import { ConnectionStatusTracker, PersonalWallet, PollingConfig, SingleAddressDiscovery } from '../../src';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';
@@ -30,55 +30,47 @@ interface Providers {
 }
 
 const createWallet = async (stores: WalletStores, providers: Providers, pollingConfig?: PollingConfig) => {
-  const { wallet } = await setupWallet({
-    bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
-    createKeyAgent: async (dependencies) => {
-      const groupedAddress: GroupedAddress = {
-        accountIndex: 0,
-        address,
-        index: 0,
-        networkId: Cardano.NetworkId.Testnet,
-        rewardAccount,
-        stakeKeyDerivationPath,
-        type: AddressType.External
-      };
-      const asyncKeyAgent = await testAsyncKeyAgent([groupedAddress], dependencies);
-      asyncKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
-      return asyncKeyAgent;
-    },
-    createWallet: async (keyAgent) => {
-      const {
-        txSubmitProvider,
-        rewardsProvider,
-        utxoProvider,
-        chainHistoryProvider,
-        networkInfoProvider,
-        connectionStatusTracker$
-      } = providers;
-      const assetProvider = mocks.mockAssetProvider();
-      const stakePoolProvider = createStubStakePoolProvider();
+  const groupedAddress: GroupedAddress = {
+    accountIndex: 0,
+    address,
+    index: 0,
+    networkId: Cardano.NetworkId.Testnet,
+    rewardAccount,
+    stakeKeyDerivationPath,
+    type: AddressType.External
+  };
+  const asyncKeyAgent = await testAsyncKeyAgent();
+  const bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
+  bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
+  const {
+    txSubmitProvider,
+    rewardsProvider,
+    utxoProvider,
+    chainHistoryProvider,
+    networkInfoProvider,
+    connectionStatusTracker$
+  } = providers;
+  const assetProvider = mocks.mockAssetProvider();
+  const stakePoolProvider = createStubStakePoolProvider();
 
-      return new PersonalWallet(
-        { name, polling: pollingConfig },
-        {
-          addressManager: util.createBip32Ed25519AddressManager(keyAgent),
-          assetProvider,
-          chainHistoryProvider,
-          connectionStatusTracker$,
-          logger,
-          networkInfoProvider,
-          rewardsProvider,
-          stakePoolProvider,
-          stores,
-          txSubmitProvider,
-          utxoProvider,
-          witnesser: util.createBip32Ed25519Witnesser(keyAgent)
-        }
-      );
-    },
-    logger
-  });
-  return wallet;
+  return new PersonalWallet(
+    { name, polling: pollingConfig },
+    {
+      addressDiscovery: new SingleAddressDiscovery(),
+      assetProvider,
+      bip32Account,
+      chainHistoryProvider,
+      connectionStatusTracker$,
+      logger,
+      networkInfoProvider,
+      rewardsProvider,
+      stakePoolProvider,
+      stores,
+      txSubmitProvider,
+      utxoProvider,
+      witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)
+    }
+  );
 };
 
 const txOut: Cardano.TxOut = {

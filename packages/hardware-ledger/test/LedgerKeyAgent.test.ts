@@ -364,6 +364,10 @@ describe('LedgerKeyAgent', () => {
   describe('Unsupported Transaction Errors', () => {
     let keyAgentMock: LedgerKeyAgent;
     const txId = '0000000000000000000000000000000000000000000000000000000000000000' as unknown as Cardano.TransactionId;
+    const noAddressesOptions = {
+      knownAddresses: [],
+      txInKeyPathMap: {}
+    };
 
     beforeAll(() => {
       LedgerKeyAgent.checkDeviceConnection = async () => new Ada(new Transport());
@@ -373,15 +377,12 @@ describe('LedgerKeyAgent', () => {
           accountIndex: 0,
           chainId: Cardano.ChainIds.Preview,
           communicationType: CommunicationType.Node,
-          extendedAccountPublicKey:
-            '0000000000000000000000000000000000000000000000000000000000000000' as unknown as Crypto.Bip32PublicKeyHex,
-          knownAddresses: []
+          extendedAccountPublicKey: Crypto.Bip32PublicKeyHex(
+            '00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+          )
         },
         {
           bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
-          inputResolver: {
-            resolveInput: jest.fn().mockResolvedValue(null)
-          },
           logger: dummyLogger
         }
       );
@@ -392,20 +393,23 @@ describe('LedgerKeyAgent', () => {
 
       await expect(
         async () =>
-          await keyAgentMock.signTransaction({
-            body: {
-              certificates: [
-                {
-                  __typename: Cardano.CertificateType.PoolRegistration,
-                  poolParameters
-                }
-              ],
-              fee: 10n,
-              inputs: [txIn],
-              outputs: [pureAdaTxOut]
+          await keyAgentMock.signTransaction(
+            {
+              body: {
+                certificates: [
+                  {
+                    __typename: Cardano.CertificateType.PoolRegistration,
+                    poolParameters
+                  }
+                ],
+                fee: 10n,
+                inputs: [txIn],
+                outputs: [pureAdaTxOut]
+              },
+              hash: txId
             },
-            hash: txId
-          })
+            noAddressesOptions
+          )
       ).rejects.toThrow(InvalidDataReason.SIGN_MODE_ORDINARY__POOL_REGISTRATION_NOT_ALLOWED);
     });
 
@@ -414,24 +418,27 @@ describe('LedgerKeyAgent', () => {
 
       await expect(
         async () =>
-          await keyAgentMock.signTransaction({
-            body: {
-              certificates: [
-                {
-                  __typename: Cardano.CertificateType.StakeDelegation,
-                  poolId,
-                  stakeCredential: {
-                    hash: '00000000000000000000000000000000000000000000000000000000' as unknown as Crypto.Hash28ByteBase16,
-                    type: Cardano.CredentialType.KeyHash
+          await keyAgentMock.signTransaction(
+            {
+              body: {
+                certificates: [
+                  {
+                    __typename: Cardano.CertificateType.StakeDelegation,
+                    poolId,
+                    stakeCredential: {
+                      hash: '00000000000000000000000000000000000000000000000000000000' as unknown as Crypto.Hash28ByteBase16,
+                      type: Cardano.CredentialType.KeyHash
+                    }
                   }
-                }
-              ],
-              fee: 10n,
-              inputs: [txIn],
-              outputs: [pureAdaTxOut]
+                ],
+                fee: 10n,
+                inputs: [txIn],
+                outputs: [pureAdaTxOut]
+              },
+              hash: txId
             },
-            hash: txId
-          })
+            noAddressesOptions
+          )
       ).rejects.toThrow(InvalidDataReason.SIGN_MODE_ORDINARY__CERTIFICATE_STAKE_CREDENTIAL_ONLY_AS_PATH);
     });
 
@@ -440,22 +447,25 @@ describe('LedgerKeyAgent', () => {
 
       await expect(
         async () =>
-          await keyAgentMock.signTransaction({
-            body: {
-              fee: 10n,
-              inputs: [txIn],
-              outputs: [pureAdaTxOut],
-              withdrawals: [
-                {
-                  quantity: 5n,
-                  stakeAddress: Cardano.RewardAccount(
-                    'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'
-                  )
-                }
-              ]
+          await keyAgentMock.signTransaction(
+            {
+              body: {
+                fee: 10n,
+                inputs: [txIn],
+                outputs: [pureAdaTxOut],
+                withdrawals: [
+                  {
+                    quantity: 5n,
+                    stakeAddress: Cardano.RewardAccount(
+                      'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'
+                    )
+                  }
+                ]
+              },
+              hash: txId
             },
-            hash: txId
-          })
+            noAddressesOptions
+          )
       ).rejects.toThrow(InvalidDataReason.SIGN_MODE_ORDINARY__WITHDRAWAL_ONLY_AS_PATH);
     });
 
@@ -464,15 +474,18 @@ describe('LedgerKeyAgent', () => {
 
       await expect(
         async () =>
-          await keyAgentMock.signTransaction({
-            body: {
-              collaterals: [{ ...txIn, index: txIn.index + 1 }],
-              fee: 10n,
-              inputs: [txIn],
-              outputs: [pureAdaTxOut]
+          await keyAgentMock.signTransaction(
+            {
+              body: {
+                collaterals: [{ ...txIn, index: txIn.index + 1 }],
+                fee: 10n,
+                inputs: [txIn],
+                outputs: [pureAdaTxOut]
+              },
+              hash: txId
             },
-            hash: txId
-          })
+            noAddressesOptions
+          )
       ).rejects.toThrow(InvalidDataReason.SIGN_MODE_ORDINARY__COLLATERAL_INPUTS_NOT_ALLOWED);
     });
 
@@ -481,15 +494,18 @@ describe('LedgerKeyAgent', () => {
 
       await expect(
         async () =>
-          await keyAgentMock.signTransaction({
-            body: {
-              collateralReturn: pureAdaTxOut,
-              fee: 10n,
-              inputs: [txIn],
-              outputs: [pureAdaTxOut]
+          await keyAgentMock.signTransaction(
+            {
+              body: {
+                collateralReturn: pureAdaTxOut,
+                fee: 10n,
+                inputs: [txIn],
+                outputs: [pureAdaTxOut]
+              },
+              hash: txId
             },
-            hash: txId
-          })
+            noAddressesOptions
+          )
       ).rejects.toThrow(InvalidDataReason.SIGN_MODE_ORDINARY__COLLATERAL_OUTPUT_NOT_ALLOWED);
     });
 
@@ -498,15 +514,18 @@ describe('LedgerKeyAgent', () => {
 
       await expect(
         async () =>
-          await keyAgentMock.signTransaction({
-            body: {
-              fee: 10n,
-              inputs: [txIn],
-              outputs: [pureAdaTxOut],
-              totalCollateral: 10n
+          await keyAgentMock.signTransaction(
+            {
+              body: {
+                fee: 10n,
+                inputs: [txIn],
+                outputs: [pureAdaTxOut],
+                totalCollateral: 10n
+              },
+              hash: txId
             },
-            hash: txId
-          })
+            noAddressesOptions
+          )
       ).rejects.toThrow(InvalidDataReason.SIGN_MODE_ORDINARY__TOTAL_COLLATERAL_NOT_ALLOWED);
     });
 
@@ -515,15 +534,18 @@ describe('LedgerKeyAgent', () => {
 
       await expect(
         async () =>
-          await keyAgentMock.signTransaction({
-            body: {
-              fee: 10n,
-              inputs: [txIn],
-              outputs: [pureAdaTxOut],
-              referenceInputs: [txIn]
+          await keyAgentMock.signTransaction(
+            {
+              body: {
+                fee: 10n,
+                inputs: [txIn],
+                outputs: [pureAdaTxOut],
+                referenceInputs: [txIn]
+              },
+              hash: txId
             },
-            hash: txId
-          })
+            noAddressesOptions
+          )
       ).rejects.toThrow(InvalidDataReason.SIGN_MODE_ORDINARY__REFERENCE_INPUTS_NOT_ALLOWED);
     });
 
@@ -532,20 +554,23 @@ describe('LedgerKeyAgent', () => {
 
       await expect(
         async () =>
-          await keyAgentMock.signTransaction({
-            body: {
-              certificates: [
-                {
-                  __typename: Cardano.CertificateType.PoolRegistration,
-                  poolParameters
-                }
-              ],
-              fee: 10n,
-              inputs: [txIn],
-              outputs: [pureAdaTxOut]
+          await keyAgentMock.signTransaction(
+            {
+              body: {
+                certificates: [
+                  {
+                    __typename: Cardano.CertificateType.PoolRegistration,
+                    poolParameters
+                  }
+                ],
+                fee: 10n,
+                inputs: [txIn],
+                outputs: [pureAdaTxOut]
+              },
+              hash: txId
             },
-            hash: txId
-          })
+            noAddressesOptions
+          )
       ).rejects.toThrow(InvalidDataReason.SIGN_MODE_MULTISIG__POOL_REGISTRATION_NOT_ALLOWED);
     });
 
@@ -554,15 +579,18 @@ describe('LedgerKeyAgent', () => {
 
       await expect(
         async () =>
-          await keyAgentMock.signTransaction({
-            body: {
-              collaterals: [{ ...txIn, index: txIn.index + 1 }],
-              fee: 10n,
-              inputs: [txIn],
-              outputs: [pureAdaTxOut]
+          await keyAgentMock.signTransaction(
+            {
+              body: {
+                collaterals: [{ ...txIn, index: txIn.index + 1 }],
+                fee: 10n,
+                inputs: [txIn],
+                outputs: [pureAdaTxOut]
+              },
+              hash: txId
             },
-            hash: txId
-          })
+            noAddressesOptions
+          )
       ).rejects.toThrow(InvalidDataReason.SIGN_MODE_MULTISIG__COLLATERAL_INPUTS_NOT_ALLOWED);
     });
 
@@ -571,15 +599,18 @@ describe('LedgerKeyAgent', () => {
 
       await expect(
         async () =>
-          await keyAgentMock.signTransaction({
-            body: {
-              collateralReturn: pureAdaTxOut,
-              fee: 10n,
-              inputs: [txIn],
-              outputs: [pureAdaTxOut]
+          await keyAgentMock.signTransaction(
+            {
+              body: {
+                collateralReturn: pureAdaTxOut,
+                fee: 10n,
+                inputs: [txIn],
+                outputs: [pureAdaTxOut]
+              },
+              hash: txId
             },
-            hash: txId
-          })
+            noAddressesOptions
+          )
       ).rejects.toThrow(InvalidDataReason.SIGN_MODE_MULTISIG__COLLATERAL_OUTPUT_NOT_ALLOWED);
     });
 
@@ -588,15 +619,18 @@ describe('LedgerKeyAgent', () => {
 
       await expect(
         async () =>
-          await keyAgentMock.signTransaction({
-            body: {
-              fee: 10n,
-              inputs: [txIn],
-              outputs: [pureAdaTxOut],
-              totalCollateral: 10n
+          await keyAgentMock.signTransaction(
+            {
+              body: {
+                fee: 10n,
+                inputs: [txIn],
+                outputs: [pureAdaTxOut],
+                totalCollateral: 10n
+              },
+              hash: txId
             },
-            hash: txId
-          })
+            noAddressesOptions
+          )
       ).rejects.toThrow(InvalidDataReason.SIGN_MODE_MULTISIG__TOTAL_COLLATERAL_NOT_ALLOWED);
     });
 
@@ -605,15 +639,18 @@ describe('LedgerKeyAgent', () => {
 
       await expect(
         async () =>
-          await keyAgentMock.signTransaction({
-            body: {
-              fee: 10n,
-              inputs: [txIn],
-              outputs: [pureAdaTxOut],
-              referenceInputs: [txIn]
+          await keyAgentMock.signTransaction(
+            {
+              body: {
+                fee: 10n,
+                inputs: [txIn],
+                outputs: [pureAdaTxOut],
+                referenceInputs: [txIn]
+              },
+              hash: txId
             },
-            hash: txId
-          })
+            noAddressesOptions
+          )
       ).rejects.toThrow(InvalidDataReason.SIGN_MODE_MULTISIG__REFERENCE_INPUTS_NOT_ALLOWED);
     });
 
@@ -622,20 +659,23 @@ describe('LedgerKeyAgent', () => {
 
       await expect(
         async () =>
-          await keyAgentMock.signTransaction({
-            body: {
-              certificates: [
-                {
-                  __typename: Cardano.CertificateType.PoolRegistration,
-                  poolParameters
-                }
-              ],
-              fee: 10n,
-              inputs: [txIn],
-              outputs: [pureAdaTxOut]
+          await keyAgentMock.signTransaction(
+            {
+              body: {
+                certificates: [
+                  {
+                    __typename: Cardano.CertificateType.PoolRegistration,
+                    poolParameters
+                  }
+                ],
+                fee: 10n,
+                inputs: [txIn],
+                outputs: [pureAdaTxOut]
+              },
+              hash: txId
             },
-            hash: txId
-          })
+            noAddressesOptions
+          )
       ).rejects.toThrow(InvalidDataReason.SIGN_MODE_PLUTUS__POOL_REGISTRATION_NOT_ALLOWED);
     });
 
@@ -644,20 +684,23 @@ describe('LedgerKeyAgent', () => {
 
       await expect(
         async () =>
-          await keyAgentMock.signTransaction({
-            body: {
-              certificates: [
-                {
-                  __typename: Cardano.CertificateType.PoolRegistration,
-                  poolParameters
-                }
-              ],
-              fee: 10n,
-              inputs: [txIn],
-              outputs: [txOutWithDatum]
+          await keyAgentMock.signTransaction(
+            {
+              body: {
+                certificates: [
+                  {
+                    __typename: Cardano.CertificateType.PoolRegistration,
+                    poolParameters
+                  }
+                ],
+                fee: 10n,
+                inputs: [txIn],
+                outputs: [txOutWithDatum]
+              },
+              hash: txId
             },
-            hash: txId
-          })
+            noAddressesOptions
+          )
       ).rejects.toThrow(InvalidDataReason.SIGN_MODE_POOL_OWNER__DATUM_NOT_ALLOWED);
     });
 
@@ -666,21 +709,24 @@ describe('LedgerKeyAgent', () => {
 
       await expect(
         async () =>
-          await keyAgentMock.signTransaction({
-            body: {
-              certificates: [
-                {
-                  __typename: Cardano.CertificateType.PoolRegistration,
-                  poolParameters
-                }
-              ],
-              fee: 10n,
-              inputs: [txIn],
-              outputs: [pureAdaTxOut],
-              referenceInputs: [txIn]
+          await keyAgentMock.signTransaction(
+            {
+              body: {
+                certificates: [
+                  {
+                    __typename: Cardano.CertificateType.PoolRegistration,
+                    poolParameters
+                  }
+                ],
+                fee: 10n,
+                inputs: [txIn],
+                outputs: [pureAdaTxOut],
+                referenceInputs: [txIn]
+              },
+              hash: txId
             },
-            hash: txId
-          })
+            noAddressesOptions
+          )
       ).rejects.toThrow(InvalidDataReason.SIGN_MODE_POOL_OWNER__SINGLE_DEVICE_OWNER_REQUIRED);
     });
 
@@ -689,24 +735,27 @@ describe('LedgerKeyAgent', () => {
 
       await expect(
         async () =>
-          await keyAgentMock.signTransaction({
-            body: {
-              certificates: [
-                {
-                  __typename: Cardano.CertificateType.PoolRegistration,
-                  poolParameters
-                },
-                {
-                  __typename: Cardano.CertificateType.PoolRegistration,
-                  poolParameters
-                }
-              ],
-              fee: 10n,
-              inputs: [txIn],
-              outputs: [pureAdaTxOut]
+          await keyAgentMock.signTransaction(
+            {
+              body: {
+                certificates: [
+                  {
+                    __typename: Cardano.CertificateType.PoolRegistration,
+                    poolParameters
+                  },
+                  {
+                    __typename: Cardano.CertificateType.PoolRegistration,
+                    poolParameters
+                  }
+                ],
+                fee: 10n,
+                inputs: [txIn],
+                outputs: [pureAdaTxOut]
+              },
+              hash: txId
             },
-            hash: txId
-          })
+            noAddressesOptions
+          )
       ).rejects.toThrow(InvalidDataReason.SIGN_MODE_POOL_OWNER__SINGLE_POOL_REG_CERTIFICATE_REQUIRED);
     });
 
@@ -715,20 +764,23 @@ describe('LedgerKeyAgent', () => {
 
       await expect(
         async () =>
-          await keyAgentMock.signTransaction({
-            body: {
-              certificates: [
-                {
-                  __typename: Cardano.CertificateType.PoolRegistration,
-                  poolParameters
-                }
-              ],
-              fee: 10n,
-              inputs: [txIn],
-              outputs: [txOutWithDatum]
+          await keyAgentMock.signTransaction(
+            {
+              body: {
+                certificates: [
+                  {
+                    __typename: Cardano.CertificateType.PoolRegistration,
+                    poolParameters
+                  }
+                ],
+                fee: 10n,
+                inputs: [txIn],
+                outputs: [txOutWithDatum]
+              },
+              hash: txId
             },
-            hash: txId
-          })
+            noAddressesOptions
+          )
       ).rejects.toThrow(InvalidDataReason.SIGN_MODE_POOL_OPERATOR__DATUM_NOT_ALLOWED);
     });
 
@@ -737,24 +789,27 @@ describe('LedgerKeyAgent', () => {
 
       await expect(
         async () =>
-          await keyAgentMock.signTransaction({
-            body: {
-              certificates: [
-                {
-                  __typename: Cardano.CertificateType.PoolRegistration,
-                  poolParameters
-                },
-                {
-                  __typename: Cardano.CertificateType.PoolRegistration,
-                  poolParameters
-                }
-              ],
-              fee: 10n,
-              inputs: [txIn],
-              outputs: [pureAdaTxOut]
+          await keyAgentMock.signTransaction(
+            {
+              body: {
+                certificates: [
+                  {
+                    __typename: Cardano.CertificateType.PoolRegistration,
+                    poolParameters
+                  },
+                  {
+                    __typename: Cardano.CertificateType.PoolRegistration,
+                    poolParameters
+                  }
+                ],
+                fee: 10n,
+                inputs: [txIn],
+                outputs: [pureAdaTxOut]
+              },
+              hash: txId
             },
-            hash: txId
-          })
+            noAddressesOptions
+          )
       ).rejects.toThrow(InvalidDataReason.SIGN_MODE_POOL_OPERATOR__SINGLE_POOL_REG_CERTIFICATE_REQUIRED);
     });
   });

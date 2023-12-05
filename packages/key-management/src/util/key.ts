@@ -39,6 +39,17 @@ export const deriveAccountPrivateKey = async ({
     harden(accountIndex)
   ]);
 
+// TODO: test
+/**
+ * Constructs the hardened derivation path for the specified
+ * account key of an HD wallet as specified in CIP 1852
+ * https://cips.cardano.org/cips/cip1852/
+ */
+export const accountKeyDerivationPathToBip32Path = (
+  accountIndex: number,
+  { index, role }: AccountKeyDerivationPath
+): BIP32Path => [harden(CardanoKeyConst.PURPOSE), harden(CardanoKeyConst.COIN_TYPE), harden(accountIndex), role, index];
+
 /**
  * Constructs the hardened derivation path of the payment key for the
  * given grouped address of an HD wallet as specified in CIP 1852

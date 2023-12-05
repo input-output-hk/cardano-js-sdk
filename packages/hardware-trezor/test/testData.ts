@@ -2,6 +2,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, GroupedAddress, KeyRole } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
+import { TrezorTxTransformerContext } from '../src';
 
 export const mintTokenMap = new Map([
   [Cardano.AssetId('2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740'), 20n],
@@ -151,6 +152,8 @@ export const knownAddress: GroupedAddress = {
   type: AddressType.Internal
 };
 
+export const knownAddressPaymentKeyPath = { index: knownAddress.index, role: Number(knownAddress.type) };
+
 export const knownAddressWithoutStakingPath: GroupedAddress = {
   accountIndex: 0,
   address: paymentAddress,
@@ -160,31 +163,34 @@ export const knownAddressWithoutStakingPath: GroupedAddress = {
   type: AddressType.Internal
 };
 
-export const contextWithKnownAddresses = {
+export const contextWithKnownAddresses: TrezorTxTransformerContext = {
+  accountIndex: 0,
   chainId: {
     networkId: Cardano.NetworkId.Testnet,
     networkMagic: 999
   },
-  inputResolver: { resolveInput: () => Promise.resolve(txOutToOwnedAddress) },
-  knownAddresses: [knownAddress]
+  knownAddresses: [knownAddress],
+  txInKeyPathMap: {}
 };
 
-export const contextWithKnownAddressesWithoutStakingCredentials = {
+export const contextWithKnownAddressesWithoutStakingCredentials: TrezorTxTransformerContext = {
+  accountIndex: 0,
   chainId: {
     networkId: Cardano.NetworkId.Testnet,
     networkMagic: 999
   },
-  inputResolver: { resolveInput: () => Promise.resolve(txOutToOwnedAddress) },
-  knownAddresses: [knownAddressWithoutStakingPath]
+  knownAddresses: [knownAddressWithoutStakingPath],
+  txInKeyPathMap: {}
 };
 
-export const contextWithoutKnownAddresses = {
+export const contextWithoutKnownAddresses: TrezorTxTransformerContext = {
+  accountIndex: 0,
   chainId: {
     networkId: Cardano.NetworkId.Testnet,
     networkMagic: 999
   },
-  inputResolver: { resolveInput: () => Promise.resolve(null) },
-  knownAddresses: []
+  knownAddresses: [],
+  txInKeyPathMap: {}
 };
 
 export const coreWithdrawalWithKeyHashCredential = {

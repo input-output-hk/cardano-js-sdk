@@ -1,6 +1,8 @@
+import { TxInId } from '@cardano-sdk/key-management';
 import {
   contextWithKnownAddresses,
   knownAddressKeyPath,
+  knownAddressPaymentKeyPath,
   knownAddressStakeKeyPath,
   rewardAddress,
   txIn
@@ -10,7 +12,12 @@ import { resolvePaymentKeyPathForTxIn, resolveStakeKeyPath } from '../../src';
 describe('key-paths', () => {
   describe('resolvePaymentKeyPathForTxIn', () => {
     it('returns the payment key path for a known address', async () => {
-      expect(await resolvePaymentKeyPathForTxIn(txIn, contextWithKnownAddresses)).toEqual(knownAddressKeyPath);
+      expect(
+        resolvePaymentKeyPathForTxIn(txIn, {
+          ...contextWithKnownAddresses,
+          txInKeyPathMap: { [TxInId(txIn)]: knownAddressPaymentKeyPath }
+        })
+      ).toEqual(knownAddressKeyPath);
     });
   });
   describe('resolveStakeKeyPath', () => {

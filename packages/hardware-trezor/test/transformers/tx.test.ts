@@ -1,10 +1,11 @@
 import * as Trezor from '@trezor/connect';
-import { CardanoKeyConst, util } from '@cardano-sdk/key-management';
+import { CardanoKeyConst, TxInId, util } from '@cardano-sdk/key-management';
 import {
   babbageTxBodyWithScripts,
   contextWithKnownAddresses,
   contextWithoutKnownAddresses,
   knownAddressKeyPath,
+  knownAddressPaymentKeyPath,
   knownAddressStakeKeyPath,
   minValidTxBody,
   plutusTxWithBabbage,
@@ -16,9 +17,9 @@ import { txToTrezor } from '../../src/transformers/tx';
 
 describe('tx', () => {
   describe('txToTrezor', () => {
-    test('can map min valid transaction', async () => {
+    test('can map min valid transaction', () => {
       expect(
-        await txToTrezor({
+        txToTrezor({
           ...contextWithoutKnownAddresses,
           cardanoTxBody: minValidTxBody
         })
@@ -50,11 +51,12 @@ describe('tx', () => {
       });
     });
 
-    test('can map transaction without scripts', async () => {
+    test('can map transaction without scripts', () => {
       expect(
-        await txToTrezor({
+        txToTrezor({
           ...contextWithKnownAddresses,
-          cardanoTxBody: txBody
+          cardanoTxBody: txBody,
+          txInKeyPathMap: { [TxInId(txBody.inputs[0])]: knownAddressPaymentKeyPath }
         })
       ).toEqual({
         additionalWitnessRequests: [
@@ -206,11 +208,14 @@ describe('tx', () => {
       });
     });
 
-    test('can map babbage transaction with scripts', async () => {
+    test('can map babbage transaction with scripts', () => {
       expect(
-        await txToTrezor({
+        txToTrezor({
           ...contextWithKnownAddresses,
-          cardanoTxBody: babbageTxBodyWithScripts
+          cardanoTxBody: babbageTxBodyWithScripts,
+          txInKeyPathMap: {
+            [TxInId(babbageTxBodyWithScripts.inputs[0])]: knownAddressPaymentKeyPath
+          }
         })
       ).toEqual({
         additionalWitnessRequests: [
@@ -289,9 +294,9 @@ describe('tx', () => {
       });
     });
 
-    test('can map transaction with collaterals', async () => {
+    test('can map transaction with collaterals', () => {
       expect(
-        await txToTrezor({
+        txToTrezor({
           ...contextWithoutKnownAddresses,
           cardanoTxBody: txBodyWithCollaterals
         })
@@ -335,15 +340,25 @@ describe('tx', () => {
       });
     });
 
-    test('can map plutus transaction with babbage elements', async () => {
+    test('can map plutus transaction with babbage elements', () => {
       expect(
-        await txToTrezor({
+        txToTrezor({
           ...contextWithKnownAddresses,
-          cardanoTxBody: plutusTxWithBabbage
+          cardanoTxBody: plutusTxWithBabbage,
+          txInKeyPathMap: {
+            [TxInId(plutusTxWithBabbage.inputs[0])]: knownAddressPaymentKeyPath,
+            [TxInId(plutusTxWithBabbage.collaterals[0])]: knownAddressPaymentKeyPath
+          }
         })
       ).toEqual({
         additionalWitnessRequests: [
-          [2_147_485_500, 2_147_485_463, 2_147_483_648, 1, 0], // payment key path
+          [
+            2_147_485_500,
+            2_147_485_463,
+            2_147_483_648,
+            knownAddressPaymentKeyPath.role,
+            knownAddressPaymentKeyPath.index
+          ],
           [2_147_485_500, 2_147_485_463, 2_147_483_648, 2, 0] // reward account key path
         ],
         auxiliaryData: {
