@@ -36,6 +36,8 @@ export type InMemoryWallet<Metadata extends {}> = Bip32Wallet<Metadata> & {
   };
 };
 
+export type AnyBip32Wallet<WalletMetadata extends {}> = HardwareWallet<WalletMetadata> | InMemoryWallet<WalletMetadata>;
+
 export type OwnSignerAccount = {
   walletId: WalletId;
   accountIndex: number;
