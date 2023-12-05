@@ -29,7 +29,7 @@
     "tscNoEmit": "echo typescript --noEmit command not implemented yet",
     "cleanup:dist": "rm -rf dist",
     "cleanup:nm": "rm -rf node_modules",
-    "cleanup": "run-s cleanup:dist cleanup:nm",
+    "cleanup": "rm -rf dist node_modules",
     "cli": "ts-node --transpile-only ./src/index.ts",
     "dev": "API_PORT=3000 OGMIOS_HOST=localhost OGMIOS_PORT=1337 ts-node-dev ./src/index.ts",
     "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
