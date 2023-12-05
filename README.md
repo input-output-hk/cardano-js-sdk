@@ -126,6 +126,7 @@ nix run .#config-update
 Previously supported features, no longer supported, but packed with a reference branch.
 
 - [RabbitMQ tx-submit provider and worker](https://github.com/input-output-hk/cardano-js-sdk/tree/rabbitmq-tx-submit-provider-and-worker)
+- [Custom load tests with artillery](https://github.com/input-output-hk/cardano-js-sdk/tree/attic/artillery)
 
 ## Distribute
 

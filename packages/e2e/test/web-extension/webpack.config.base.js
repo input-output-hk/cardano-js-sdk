@@ -71,6 +71,7 @@ module.exports = {
       extensions: ['.ts', '.js'],
       fallback: {
         buffer: require.resolve('buffer/'),
+        crypto: require.resolve('crypto-browserify'),
         events: require.resolve('events/'),
         fs: false,
         'get-port-please': false,
@@ -79,8 +80,8 @@ module.exports = {
         os: false,
         path: false,
         perf_hooks: false,
-        crypto: require.resolve('crypto-browserify'),
         stream: require.resolve('readable-stream'),
+        url: false,
         util: require.resolve('util/')
       }
     },

@@ -17,8 +17,6 @@
     "./test/web-extension/extension/**/*.ts"
   ],
   "scripts": {
-    "artillery:stake-pool-query": "WORKERS=1 node -r ts-node/register ../../node_modules/.bin/artillery run test/artillery/StakePoolSearch.yml",
-    "artillery:wallet-restoration": "WORKERS=1 node -r ts-node/register ../../node_modules/.bin/artillery run --dotenv ./.env test/artillery/wallet-restoration/WalletRestoration.yml",
     "load-test-custom:stake-pool-query": "ts-node test/load-test-custom/stake-pool-search/stake-pool-search.test.ts",
     "load-test-custom:wallet-init": "ts-node test/load-test-custom/wallet-init/wallet-init.test.ts",
     "load-test-custom:wallet-restoration": "ts-node test/load-test-custom/wallet-restoration/wallet-restoration.test.ts",
@@ -145,7 +143,6 @@
     "@wdio/mocha-framework": "^7.19.5",
     "@wdio/spec-reporter": "^7.19.5",
     "@wdio/static-server-service": "^7.19.5",
-    "artillery": "^2.0.0-35",
     "babel-loader": "^8.2.5",
     "blake2b-no-wasm": "2.1.4",
     "buffer": "^6.0.3",
