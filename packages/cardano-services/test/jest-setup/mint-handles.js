@@ -13,15 +13,20 @@ const { logger } = require('@cardano-sdk/util-dev');
 const path = require('path');
 
 (async () => {
-  const wallet = (await getWallet({ env, idx: 0, logger, name: 'Handle Init Wallet', polling: { interval: 50 } }))
-    .wallet;
+  const { wallet, asyncKeyAgent } = await getWallet({
+    env,
+    idx: 0,
+    logger,
+    name: 'Handle Init Wallet',
+    polling: { interval: 50 }
+  });
   logger.info('Waiting for walletReady');
   await walletReady(wallet, coinsRequiredByHandleMint + 10_000_000n);
 
   const keyAgent = await createStandaloneKeyAgent(
     env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
     await firstValueFrom(wallet.genesisParameters$),
-    await wallet.keyAgent.getBip32Ed25519()
+    await asyncKeyAgent.getBip32Ed25519()
   );
 
   const policyId = await getHandlePolicyId(path.join(pathToE2ePackage, 'local-network', 'sdk-ipc'));

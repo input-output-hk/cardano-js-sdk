@@ -1,6 +1,7 @@
 import { Cardano, ProviderError, ProviderFailure, SubmitTxArgs, TxBodyCBOR, TxSubmitProvider } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { hexStringToBuffer } from '@cardano-sdk/util';
+import { mapCardanoTxSubmitError } from './cardanoTxSubmitErrorMapper';
 import axios, { AxiosInstance } from 'axios';
 
 export class TxSubmitApiProvider implements TxSubmitProvider {
@@ -42,7 +43,7 @@ export class TxSubmitApiProvider implements TxSubmitProvider {
 
         if (typeof status === 'number' && status >= 400 && status < 500) this.#healthStatus = true;
 
-        throw new ProviderError(ProviderFailure.BadRequest, null, data as string);
+        throw new ProviderError(ProviderFailure.BadRequest, mapCardanoTxSubmitError(data), data as string);
       }
 
       throw new ProviderError(ProviderFailure.Unknown, error, 'submitting tx');

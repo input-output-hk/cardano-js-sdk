@@ -42,7 +42,7 @@
   "TraceLocalRootPeers": true,
   "TraceLocalTxSubmissionProtocol": false,
   "TraceLocalTxSubmissionServer": false,
-  "TraceMempool": true,
+  "TraceMempool": false,
   "TraceMux": false,
   "TracePeerSelection": true,
   "TracePeerSelectionActions": true,

@@ -10,7 +10,7 @@ const preventOgmiosStartFile = path.join(__dirname, '..', '..', 'local-network',
 
 const docker = new Dockerode();
 
-const ogmiosContainer = docker.getContainer('local-network-e2e-cardano-node-ogmios-1');
+const ogmiosContainer = docker.getContainer('local-network-e2e-ogmios-1');
 const stakePoolProjectorContainer = docker.getContainer('local-network-e2e-stake-pool-projector-1');
 
 const createPrevent = async () => {

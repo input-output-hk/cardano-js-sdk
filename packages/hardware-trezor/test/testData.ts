@@ -122,6 +122,7 @@ export const stakeCredential = {
   type: Cardano.CredentialType.KeyHash
 };
 export const stakeScriptHash = Cardano.RewardAccount.toHash(rewardAccountWithPaymentScriptCredential);
+export const paymentHash = Crypto.Ed25519KeyHashHex('9ab1e9d2346c3f4be360d22b8ee7756a0316c3c1aece473e2887ea97');
 export const knownAddressKeyPath = [2_147_485_500, 2_147_485_463, 2_147_483_648, 1, 0];
 export const knownAddressStakeKeyPath = [2_147_485_500, 2_147_485_463, 2_147_483_648, 2, 0];
 export const poolId = Cardano.PoolId('pool1ev8vy6fyj7693ergzty2t0azjvw35tvkt2vcjwpgajqs7z6u2vn');
@@ -280,5 +281,6 @@ export const plutusTxWithBabbage = {
   ...babbageTxBodyWithScripts,
   collateralReturn: txOut,
   collaterals: [txIn],
+  requiredExtraSignatures: [Crypto.Ed25519KeyHashHex('6199186adb51974690d7247d2646097d2c62763b16fb7ed3f9f55d39')],
   totalCollateral: 1000n
 };

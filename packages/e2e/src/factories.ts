@@ -359,7 +359,7 @@ export const getWallet = async (props: GetWalletProps) => {
   const keyManagementParams = { ...envKeyParams, ...(idx === undefined ? {} : { accountIndex: idx }) };
 
   const bip32Ed25519 = await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger);
-  const { wallet } = await setupWallet({
+  const { wallet, keyAgent: walletKeyAgent } = await setupWallet({
     bip32Ed25519,
     createKeyAgent: keyAgent
       ? () => Promise.resolve(keyAgent)
@@ -385,7 +385,11 @@ export const getWallet = async (props: GetWalletProps) => {
     polling?.maxInterval ||
     (polling?.interval && polling.interval * DEFAULT_POLLING_CONFIG.maxIntervalMultiplier) ||
     DEFAULT_POLLING_CONFIG.maxInterval;
-  return { providers, wallet: patchInitializeTxToRespectEpochBoundary(wallet, maxInterval) };
+  return {
+    asyncKeyAgent: walletKeyAgent,
+    providers,
+    wallet: patchInitializeTxToRespectEpochBoundary(wallet, maxInterval)
+  };
 };
 
 export type TestWallet = Awaited<ReturnType<typeof getWallet>>;

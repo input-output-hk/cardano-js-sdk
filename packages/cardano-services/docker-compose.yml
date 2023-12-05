@@ -11,8 +11,12 @@ x-sdk-environment: &sdk-environment
   HANDLE_POLICY_IDS: ${HANDLE_POLICY_IDS:-f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a}
 
 services:
-  cardano-node-ogmios:
-    image: cardanosolutions/cardano-node-ogmios:v${OGMIOS_VERSION:-6.0.0-rc5}_${CARDANO_NODE_VERSION:-8.6.0-pre}
+  cardano-node:
+    volumes:
+      - ./config/network/${NETWORK:-mainnet}/cardano-node:/config
+      - ./config/network/${NETWORK:-mainnet}/genesis:/genesis
+
+  ogmios:
     volumes:
       - ./config/network/${NETWORK:-mainnet}:/config
 
