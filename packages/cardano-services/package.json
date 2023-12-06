@@ -27,7 +27,7 @@
     "build:test-db": "./test/jest-setup/rebuild-test-db.sh",
     "cleanup:dist": "rm -rf dist",
     "cleanup:nm": "rm -rf node_modules",
-    "cleanup": "run-s cleanup:dist cleanup:nm",
+    "cleanup": "rm -rf dist node_modules",
     "cli": "ts-node --transpile-only src/cli.ts",
     "compose:up": "docker compose --env-file environments/.env.$NETWORK -p cardano-services-$NETWORK -f docker-compose.yml -f ../../compose/common.yml -f ../../compose/pg-agent.yml ${FILES:-} up",
     "compose:down": "docker compose -p cardano-services-$NETWORK -f docker-compose.yml -f ../../compose/common.yml -f ../../compose/pg-agent.yml down -t 120",

@@ -733,11 +733,6 @@ describe('TypeormStakePoolProvider', () => {
             });
           });
 
-          it('sort by apy', () =>
-            expect(provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'apy'))).rejects.toThrow(
-              'TypeormStakePoolProvider do not support sort by APY'
-            ));
-
           describe('sort by lastRos', () => {
             let expectedLastRos: { max: number; min: number };
 
@@ -762,7 +757,7 @@ describe('TypeormStakePoolProvider', () => {
             });
           });
 
-          describe('sort by ros', () => {
+          describe.each(['apy', 'ros'] as const)('sort by %s', (field) => {
             let expectedRos: { max: number; min: number };
 
             beforeAll(() => {
@@ -776,12 +771,12 @@ describe('TypeormStakePoolProvider', () => {
             });
 
             it('desc order', async () => {
-              const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'ros'));
+              const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', field));
               expect(response.pageResults[0].metrics?.ros).toEqual(expectedRos.max);
             });
 
             it('asc order', async () => {
-              const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'ros'));
+              const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', field));
               expect(response.pageResults[0].metrics?.ros).toEqual(expectedRos.min);
             });
           });
