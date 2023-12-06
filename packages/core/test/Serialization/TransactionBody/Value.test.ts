@@ -1,12 +1,16 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Cardano from '../../../src/Cardano';
+import { CborContentException, Value } from '../../../src/Serialization';
 import { HexBlob } from '@cardano-sdk/util';
-import { Value } from '../../../src/Serialization';
 
 // Test data used in the following tests was generated with the cardano-serialization-lib
 
 const cbor = HexBlob(
   '821a000f4240a2581c00000000000000000000000000000000000000000000000000000000a3443031323218644433343536186344404142420a581c11111111111111111111111111111111111111111111111111111111a3443031323218644433343536186344404142420a'
+);
+
+const cborWithNegativeCoin = HexBlob(
+  '823a000f423fa2581c00000000000000000000000000000000000000000000000000000000a3443031323218644433343536186344404142420a581c11111111111111111111111111111111111111111111111111111111a3443031323218644433343536186344404142420a'
 );
 
 const unsortedCore = {
@@ -90,5 +94,9 @@ describe('Value', () => {
   it('can encode Value with only lovelace to Core', () => {
     const interval = Value.fromCbor(onlyLovelaceCbor);
     expect(interval.toCore()).toEqual(onlyLovelaceCore);
+  });
+
+  it('can throws if Value CBOR contains negative numbers', () => {
+    expect(() => Value.fromCbor(cborWithNegativeCoin)).toThrow(CborContentException);
   });
 });
