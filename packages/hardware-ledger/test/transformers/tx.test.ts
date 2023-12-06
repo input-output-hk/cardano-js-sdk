@@ -1,12 +1,22 @@
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { CONTEXT_WITH_KNOWN_ADDRESSES, babbageTxWithoutScript, tx } from '../testData';
-import { CardanoKeyConst, util } from '@cardano-sdk/key-management';
+import { CardanoKeyConst, TxInId, util } from '@cardano-sdk/key-management';
 import { toLedgerTx } from '../../src';
 
 describe('tx', () => {
   describe('toLedgerTx', () => {
     test('can map a transaction with scripts', async () => {
-      expect(await toLedgerTx(tx.body, CONTEXT_WITH_KNOWN_ADDRESSES)).toEqual({
+      const paymentKeyPath = { index: 0, role: 1 };
+      const stakeKeyPath = { index: 0, role: 2 };
+      expect(
+        await toLedgerTx(tx.body, {
+          ...CONTEXT_WITH_KNOWN_ADDRESSES,
+          txInKeyPathMap: {
+            [TxInId(tx.body.inputs[0])]: paymentKeyPath,
+            [TxInId(tx.body.collaterals![0])]: paymentKeyPath
+          }
+        })
+      ).toEqual({
         auxiliaryData: {
           params: {
             hashHex: '2ceb364d93225b4a0f004a0975a13eb50c3cc6348474b4fe9121f8dc72ca0cfa'
@@ -19,9 +29,9 @@ describe('tx', () => {
               poolKeyPath: [
                 util.harden(CardanoKeyConst.PURPOSE),
                 util.harden(CardanoKeyConst.COIN_TYPE),
-                util.harden(0),
-                2,
-                0
+                util.harden(CONTEXT_WITH_KNOWN_ADDRESSES.accountIndex),
+                stakeKeyPath.role,
+                stakeKeyPath.index
               ],
               retirementEpoch: 500
             },
@@ -31,7 +41,13 @@ describe('tx', () => {
         collateralInputs: [
           {
             outputIndex: 1,
-            path: [util.harden(CardanoKeyConst.PURPOSE), util.harden(CardanoKeyConst.COIN_TYPE), util.harden(0), 1, 0],
+            path: [
+              util.harden(CardanoKeyConst.PURPOSE),
+              util.harden(CardanoKeyConst.COIN_TYPE),
+              util.harden(CONTEXT_WITH_KNOWN_ADDRESSES.accountIndex),
+              paymentKeyPath.role,
+              paymentKeyPath.index
+            ],
             txHashHex: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'
           }
         ],
@@ -41,7 +57,13 @@ describe('tx', () => {
         inputs: [
           {
             outputIndex: 0,
-            path: [util.harden(CardanoKeyConst.PURPOSE), util.harden(CardanoKeyConst.COIN_TYPE), util.harden(0), 1, 0],
+            path: [
+              util.harden(CardanoKeyConst.PURPOSE),
+              util.harden(CardanoKeyConst.COIN_TYPE),
+              util.harden(CONTEXT_WITH_KNOWN_ADDRESSES.accountIndex),
+              paymentKeyPath.role,
+              paymentKeyPath.index
+            ],
             txHashHex: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'
           }
         ],
@@ -152,7 +174,15 @@ describe('tx', () => {
     });
 
     test('can map a transaction without scripts', async () => {
-      expect(await toLedgerTx(babbageTxWithoutScript.body, CONTEXT_WITH_KNOWN_ADDRESSES)).toEqual({
+      const paymentKeyPath = { index: 0, role: 1 };
+      expect(
+        await toLedgerTx(babbageTxWithoutScript.body, {
+          ...CONTEXT_WITH_KNOWN_ADDRESSES,
+          txInKeyPathMap: {
+            [TxInId(babbageTxWithoutScript.body.inputs[0])]: paymentKeyPath
+          }
+        })
+      ).toEqual({
         auxiliaryData: null,
         certificates: null,
         collateralInputs: null,
@@ -162,7 +192,13 @@ describe('tx', () => {
         inputs: [
           {
             outputIndex: 0,
-            path: [util.harden(CardanoKeyConst.PURPOSE), util.harden(CardanoKeyConst.COIN_TYPE), util.harden(0), 1, 0],
+            path: [
+              util.harden(CardanoKeyConst.PURPOSE),
+              util.harden(CardanoKeyConst.COIN_TYPE),
+              util.harden(CONTEXT_WITH_KNOWN_ADDRESSES.accountIndex),
+              paymentKeyPath.role,
+              paymentKeyPath.index
+            ],
             txHashHex: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'
           }
         ],

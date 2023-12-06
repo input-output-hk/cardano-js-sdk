@@ -1,64 +1,61 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, CommunicationType, SerializableLedgerKeyAgentData, util } from '@cardano-sdk/key-management';
+import {
+  AddressType,
+  Bip32Account,
+  CommunicationType,
+  SerializableLedgerKeyAgentData,
+  util
+} from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import { LedgerKeyAgent, LedgerTransportType } from '@cardano-sdk/hardware-ledger';
-import { PersonalWallet, setupWallet } from '../../../src';
+import { PersonalWallet } from '../../../src';
+import { firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import { mockKeyAgentDependencies } from '../../../../key-management/test/mocks';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 describe('LedgerKeyAgent', () => {
-  let keyAgent: LedgerKeyAgent;
+  let ledgerKeyAgent: LedgerKeyAgent;
   let txSubmitProvider: mocks.TxSubmitProviderStub;
   let wallet: PersonalWallet;
 
   beforeAll(async () => {
     txSubmitProvider = mocks.mockTxSubmitProvider();
-    ({ keyAgent, wallet } = await setupWallet({
-      bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
-      createKeyAgent: async (dependencies) =>
-        await LedgerKeyAgent.createWithDevice(
-          {
-            chainId: Cardano.ChainIds.Preprod,
-            communicationType: CommunicationType.Node
-          },
-          dependencies
-        ),
-      createWallet: async (ledgerKeyAgent) => {
-        const { address, rewardAccount } = await ledgerKeyAgent.deriveAddress(
-          { index: 0, type: AddressType.External },
-          0
-        );
-        const assetProvider = mocks.mockAssetProvider();
-        const stakePoolProvider = createStubStakePoolProvider();
-        const networkInfoProvider = mocks.mockNetworkInfoProvider();
-        const utxoProvider = mocks.mockUtxoProvider({ address });
-        const rewardsProvider = mocks.mockRewardsProvider({ rewardAccount });
-        const chainHistoryProvider = mocks.mockChainHistoryProvider({ rewardAccount });
-        const asyncKeyAgent = util.createAsyncKeyAgent(ledgerKeyAgent);
-        return new PersonalWallet(
-          { name: 'HW Wallet' },
-          {
-            addressManager: util.createBip32Ed25519AddressManager(asyncKeyAgent),
-            assetProvider,
-            chainHistoryProvider,
-            logger,
-            networkInfoProvider,
-            rewardsProvider,
-            stakePoolProvider,
-            txSubmitProvider,
-            utxoProvider,
-            witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)
-          }
-        );
+    ledgerKeyAgent = await LedgerKeyAgent.createWithDevice(
+      {
+        chainId: Cardano.ChainIds.Preprod,
+        communicationType: CommunicationType.Node
       },
-      logger
-    }));
+      { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), logger }
+    );
+    const { address, rewardAccount } = await ledgerKeyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0);
+    const assetProvider = mocks.mockAssetProvider();
+    const stakePoolProvider = createStubStakePoolProvider();
+    const networkInfoProvider = mocks.mockNetworkInfoProvider();
+    const utxoProvider = mocks.mockUtxoProvider({ address });
+    const rewardsProvider = mocks.mockRewardsProvider({ rewardAccount });
+    const chainHistoryProvider = mocks.mockChainHistoryProvider({ rewardAccount });
+    const asyncKeyAgent = util.createAsyncKeyAgent(ledgerKeyAgent);
+    wallet = new PersonalWallet(
+      { name: 'HW Wallet' },
+      {
+        assetProvider,
+        bip32Account: await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent),
+        chainHistoryProvider,
+        logger,
+        networkInfoProvider,
+        rewardsProvider,
+        stakePoolProvider,
+        txSubmitProvider,
+        utxoProvider,
+        witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)
+      }
+    );
   });
 
   afterAll(() => wallet.shutdown());
@@ -69,33 +66,29 @@ describe('LedgerKeyAgent', () => {
         accountIndex: 5,
         chainId: Cardano.ChainIds.Preprod,
         communicationType: CommunicationType.Node,
-        deviceConnection: keyAgent.deviceConnection
+        deviceConnection: ledgerKeyAgent.deviceConnection
       },
       mockKeyAgentDependencies()
     );
     expect(ledgerKeyAgentWithRandomIndex).toBeInstanceOf(LedgerKeyAgent);
     expect(ledgerKeyAgentWithRandomIndex.accountIndex).toEqual(5);
-    expect(ledgerKeyAgentWithRandomIndex.extendedAccountPublicKey).not.toEqual(keyAgent.extendedAccountPublicKey);
+    expect(ledgerKeyAgentWithRandomIndex.extendedAccountPublicKey).not.toEqual(ledgerKeyAgent.extendedAccountPublicKey);
   });
 
   test('__typename', () => {
-    expect(typeof keyAgent.serializableData.__typename).toBe('string');
+    expect(typeof ledgerKeyAgent.serializableData.__typename).toBe('string');
   });
 
   test('chainId', () => {
-    expect(keyAgent.chainId).toBe(Cardano.ChainIds.Preprod);
+    expect(ledgerKeyAgent.chainId).toBe(Cardano.ChainIds.Preprod);
   });
 
   test('accountIndex', () => {
-    expect(typeof keyAgent.accountIndex).toBe('number');
-  });
-
-  test('knownAddresses', () => {
-    expect(Array.isArray(keyAgent.knownAddresses)).toBe(true);
+    expect(typeof ledgerKeyAgent.accountIndex).toBe('number');
   });
 
   test('extendedAccountPublicKey', () => {
-    expect(typeof keyAgent.extendedAccountPublicKey).toBe('string');
+    expect(typeof ledgerKeyAgent.extendedAccountPublicKey).toBe('string');
   });
 
   describe('signTransaction', () => {
@@ -135,16 +128,21 @@ describe('LedgerKeyAgent', () => {
     });
 
     it('successfully signs a transaction with assets and validity interval', async () => {
-      const signatures = await keyAgent.signTransaction(txInternals);
+      const {
+        witness: { signatures }
+      } = await wallet.finalizeTx({ tx: txInternals });
       expect(signatures.size).toBe(2);
     });
 
     it('throws if signed transaction hash doesnt match hash computed by the wallet', async () => {
       await expect(
-        keyAgent.signTransaction({
-          ...txInternals,
-          hash: 'non-matching' as unknown as Cardano.TransactionId
-        })
+        ledgerKeyAgent.signTransaction(
+          {
+            ...txInternals,
+            hash: 'non-matching' as unknown as Cardano.TransactionId
+          },
+          { knownAddresses: await firstValueFrom(wallet.addresses$), txInKeyPathMap: {} }
+        )
       ).rejects.toThrow();
     });
 
@@ -215,7 +213,9 @@ describe('LedgerKeyAgent', () => {
 
       const unsignedTx = await wallet.initializeTx(txProps);
 
-      const signatures = await keyAgent.signTransaction(unsignedTx);
+      const {
+        witness: { signatures }
+      } = await wallet.finalizeTx({ tx: unsignedTx });
       expect(signatures.size).toBe(2);
     });
   });
@@ -225,8 +225,8 @@ describe('LedgerKeyAgent', () => {
     beforeAll(async () => {
       transportSpy = jest.spyOn(LedgerKeyAgent, 'createTransport');
 
-      if (keyAgent.deviceConnection) {
-        await keyAgent.deviceConnection.transport.close();
+      if (ledgerKeyAgent.deviceConnection) {
+        await ledgerKeyAgent.deviceConnection.transport.close();
         LedgerKeyAgent.deviceConnections = [];
       }
     });
@@ -272,8 +272,8 @@ describe('LedgerKeyAgent', () => {
   describe('establish, check and re-establish device connection', () => {
     let deviceConnection: DeviceConnection;
     beforeAll(async () => {
-      if (keyAgent.deviceConnection) {
-        await keyAgent.deviceConnection.transport.close();
+      if (ledgerKeyAgent.deviceConnection) {
+        await ledgerKeyAgent.deviceConnection.transport.close();
       }
       deviceConnection = await LedgerKeyAgent.establishDeviceConnection(CommunicationType.Node);
     });
@@ -319,14 +319,13 @@ describe('LedgerKeyAgent', () => {
     let serializableData: SerializableLedgerKeyAgentData;
 
     beforeEach(() => {
-      serializableData = keyAgent.serializableData as SerializableLedgerKeyAgentData;
+      serializableData = ledgerKeyAgent.serializableData as SerializableLedgerKeyAgentData;
     });
 
     it('all fields are of correct types', () => {
       expect(typeof serializableData.__typename).toBe('string');
       expect(typeof serializableData.accountIndex).toBe('number');
       expect(typeof serializableData.chainId).toBe('object');
-      expect(Array.isArray(serializableData.knownAddresses)).toBe(true);
       expect(typeof serializableData.extendedAccountPublicKey).toBe('string');
       expect(typeof serializableData.communicationType).toBe('string');
     });

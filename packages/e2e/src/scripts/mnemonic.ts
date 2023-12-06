@@ -18,7 +18,6 @@ import { localNetworkChainId } from '../util';
     },
     {
       bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
-      inputResolver: { resolveInput: async () => null },
       logger: console
     }
   );

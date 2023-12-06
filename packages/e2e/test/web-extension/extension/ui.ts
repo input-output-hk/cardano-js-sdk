@@ -21,13 +21,13 @@ import {
   userPromptServiceChannel,
   walletName
 } from './const';
-import { bip32Ed25519Factory, keyManagementFactory } from '../../../src';
+import { keyManagementFactory } from '../../../src';
 
 import { Cardano } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
+import { SodiumBip32Ed25519 } from '@cardano-sdk/crypto';
 import { combineLatest, firstValueFrom, of } from 'rxjs';
 import { runtime } from 'webextension-polyfill';
-import { setupWallet } from '@cardano-sdk/wallet';
 
 const delegationConfig = {
   count: 3,
@@ -223,23 +223,16 @@ wallet.delegation.distribution$.subscribe((delegationDistrib) => {
 const createWallet = async (accountIndex: number) => {
   clearWalletValues();
 
-  // setupWallet call is required to provide context (InputResolver) to the key agent
-  const { keyAgent } = await setupWallet({
-    bip32Ed25519: await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger),
-    createKeyAgent: async (dependencies) =>
-      (
-        await keyManagementFactory.create(
-          env.KEY_MANAGEMENT_PROVIDER,
-          {
-            ...env.KEY_MANAGEMENT_PARAMS,
-            accountIndex
-          },
-          logger
-        )
-      )(dependencies),
-    createWallet: async () => wallet,
-    logger
-  });
+  const keyAgent = await (
+    await keyManagementFactory.create(
+      env.KEY_MANAGEMENT_PROVIDER,
+      {
+        ...env.KEY_MANAGEMENT_PARAMS,
+        accountIndex
+      },
+      logger
+    )
+  )({ bip32Ed25519: new SodiumBip32Ed25519(), logger });
 
   await walletManager.destroy();
   await walletManager.activate({ keyAgent, observableWalletName: getObservableWalletName(accountIndex) });

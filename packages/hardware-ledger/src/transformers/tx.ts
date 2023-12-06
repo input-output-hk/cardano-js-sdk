@@ -16,18 +16,18 @@ import { mapWithdrawals } from './withdrawals';
 export const LedgerTxTransformer: Transformer<Cardano.TxBody, Ledger.Transaction, LedgerTxTransformerContext> = {
   auxiliaryData: ({ auxiliaryDataHash }) => mapAuxiliaryData(auxiliaryDataHash),
   certificates: ({ certificates }, context) => mapCerts(certificates, context!),
-  collateralInputs: async ({ collaterals }, context) => mapCollateralTxIns(collaterals, context!),
+  collateralInputs: ({ collaterals }, context) => mapCollateralTxIns(collaterals, context!),
   collateralOutput: ({ collateralReturn }, context) => mapCollateralTxOut(collateralReturn, context!),
   fee: ({ fee }) => fee,
   includeNetworkId: ({ networkId }) => !!networkId,
-  inputs: async ({ inputs }, context) => await mapTxIns(inputs, context!),
+  inputs: ({ inputs }, context) => mapTxIns(inputs, context!),
   mint: ({ mint }) => mapTokenMap(mint),
   network: (_, context) => ({
     networkId: context!.chainId.networkId,
     protocolMagic: context!.chainId.networkMagic
   }),
-  outputs: async ({ outputs }, context) => mapTxOuts(outputs, context!),
-  referenceInputs: async ({ referenceInputs }) => mapReferenceInputs(referenceInputs),
+  outputs: ({ outputs }, context) => mapTxOuts(outputs, context!),
+  referenceInputs: ({ referenceInputs }) => mapReferenceInputs(referenceInputs),
   requiredSigners: ({ requiredExtraSignatures }, context) => mapRequiredSigners(requiredExtraSignatures, context!),
   scriptDataHashHex: ({ scriptIntegrityHash }) => scriptIntegrityHash?.toString(),
   totalCollateral: ({ totalCollateral }) => totalCollateral,

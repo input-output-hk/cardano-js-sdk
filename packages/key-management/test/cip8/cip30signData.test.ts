@@ -24,13 +24,16 @@ describe('cip30signData', () => {
   beforeAll(async () => {
     const keyAgentReady = testKeyAgent();
     keyAgent = await keyAgentReady;
-    asyncKeyAgent = await testAsyncKeyAgent(undefined, undefined, keyAgentReady);
+    asyncKeyAgent = await testAsyncKeyAgent(undefined, keyAgentReady);
     address = await asyncKeyAgent.deriveAddress(addressDerivationPath, 0);
   });
 
-  const signAndDecode = async (signWith: Cardano.PaymentAddress | Cardano.RewardAccount) => {
+  const signAndDecode = async (
+    signWith: Cardano.PaymentAddress | Cardano.RewardAccount,
+    knownAddresses: GroupedAddress[]
+  ) => {
     const dataSignature = await cip8.cip30signData({
-      addressManager: KeyManagementUtil.createBip32Ed25519AddressManager(asyncKeyAgent),
+      knownAddresses,
       payload: HexBlob('abc123'),
       signWith,
       witnesser: KeyManagementUtil.createBip32Ed25519Witnesser(asyncKeyAgent)
@@ -60,7 +63,7 @@ describe('cip30signData', () => {
 
   it('supports sign with payment address', async () => {
     const signWith = address.address;
-    const { signedData, publicKeyHex } = await signAndDecode(signWith);
+    const { signedData, publicKeyHex } = await signAndDecode(signWith, [address]);
 
     testAddressHeader(signedData, signWith);
 
@@ -74,7 +77,7 @@ describe('cip30signData', () => {
 
   it('supports signing with reward account', async () => {
     const signWith = address.rewardAccount;
-    const { signedData, publicKeyHex } = await signAndDecode(signWith);
+    const { signedData, publicKeyHex } = await signAndDecode(signWith, [address]);
 
     testAddressHeader(signedData, signWith);
 
@@ -88,7 +91,7 @@ describe('cip30signData', () => {
 
   it('signature can be verified', async () => {
     const signWith = address.address;
-    const { coseSign1, publicKeyHex, signedData } = await signAndDecode(signWith);
+    const { coseSign1, publicKeyHex, signedData } = await signAndDecode(signWith, [address]);
     const signedDataBytes = HexBlob.fromBytes(signedData.to_bytes());
     const signatureBytes = HexBlob.fromBytes(coseSign1.signature()) as unknown as Crypto.Ed25519SignatureHex;
     expect(

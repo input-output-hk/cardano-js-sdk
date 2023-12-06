@@ -1,4 +1,11 @@
-import { AccountKeyDerivationPath, AsyncKeyAgent, SignBlobResult, WitnessOptions, Witnesser } from '../types';
+import {
+  AccountKeyDerivationPath,
+  AsyncKeyAgent,
+  SignBlobResult,
+  SignTransactionContext,
+  WitnessOptions,
+  Witnesser
+} from '../types';
 import { Cardano } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 
@@ -10,8 +17,12 @@ export class Bip32Ed25519Witnesser implements Witnesser {
     this.#keyAgent = keyAgent;
   }
 
-  async witness(txInternals: Cardano.TxBodyWithHash, options?: WitnessOptions): Promise<Cardano.Witness> {
-    return { signatures: await this.#keyAgent.signTransaction(txInternals, options) };
+  async witness(
+    txInternals: Cardano.TxBodyWithHash,
+    context: SignTransactionContext,
+    options: WitnessOptions
+  ): Promise<Cardano.Witness> {
+    return { signatures: await this.#keyAgent.signTransaction(txInternals, context, options) };
   }
 
   async signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult> {

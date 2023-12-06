@@ -3,8 +3,9 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import {
   AddressType,
+  Bip32Account,
+  GroupedAddress,
   InMemoryKeyAgent,
-  KeyRole,
   SignTransactionOptions,
   TransactionSigner,
   util
@@ -51,6 +52,7 @@ describe('GenericTxBuilder', () => {
   let output: Cardano.TxOut;
   let output2: Cardano.TxOut;
   let inputResolver: Cardano.InputResolver;
+  let knownAddresses: GroupedAddress[];
 
   beforeEach(async () => {
     output = mocks.utxo[0][1];
@@ -68,13 +70,22 @@ describe('GenericTxBuilder', () => {
         getPassphrase: async () => Buffer.from('passphrase'),
         mnemonicWords: util.generateMnemonicWords()
       },
-      { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), inputResolver, logger: dummyLogger }
+      { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), logger: dummyLogger }
     );
-    await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0);
-    keyAgent.knownAddresses[0].address = mocks.utxo[0][1].address;
-    keyAgent.knownAddresses[0].rewardAccount = rewardAccount;
+
+    knownAddresses = [
+      {
+        ...(await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0)),
+        address: mocks.utxo[0][1].address,
+        rewardAccount
+      }
+    ];
 
     txBuilderProviders = {
+      addresses: {
+        add: jest.fn().mockImplementation(async (...newAddresses) => knownAddresses.push(...newAddresses)),
+        get: jest.fn().mockResolvedValue(knownAddresses)
+      },
       genesisParameters: jest.fn().mockResolvedValue(mocks.genesisParameters),
       protocolParameters: jest.fn().mockResolvedValue(mocks.protocolParameters),
       rewardAccounts: jest.fn().mockResolvedValue([
@@ -93,7 +104,7 @@ describe('GenericTxBuilder', () => {
 
     const asyncKeyAgent = util.createAsyncKeyAgent(keyAgent);
     const builderParams = {
-      addressManager: util.createBip32Ed25519AddressManager(asyncKeyAgent),
+      bip32Account: await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent),
       inputResolver,
       logger: dummyLogger,
       outputValidator,
@@ -239,7 +250,7 @@ describe('GenericTxBuilder', () => {
     let signingOptions: SignTransactionOptions;
 
     beforeEach(() => {
-      signingOptions = { additionalKeyPaths: [{ index: 0, role: KeyRole.Internal }] };
+      signingOptions = { additionalKeyPaths: [{ index: 1, role: 1 }] };
     });
 
     it('can setSigningOptions without mutating signingOptions', () => {

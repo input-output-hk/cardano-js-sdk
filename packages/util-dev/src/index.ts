@@ -11,7 +11,6 @@ export * from './createStubObservable';
 export * from './createGenericMockServer';
 export * from './dataGeneration';
 export * from './eraSummaries';
-export * from './StubKeyAgent';
 export * as mockProviders from './mockProviders';
 export * as handleProviderMocks from './handleProvider';
 export * as cip19TestVectors from './Cip19TestVectors';

@@ -1,5 +1,11 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, GroupedAddress, InMemoryKeyAgent, KeyRole } from '@cardano-sdk/key-management';
+import {
+  AccountKeyDerivationPath,
+  AddressType,
+  GroupedAddress,
+  InMemoryKeyAgent,
+  KeyRole
+} from '@cardano-sdk/key-management';
 import {
   Cardano,
   ChainHistoryProvider,
@@ -25,7 +31,7 @@ const randomPublicKey = () => Crypto.Ed25519PublicKeyHex(Array.from({ length: 64
 const DUMMY_HEX_BYTES =
   'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
-const DERIVATION_PATH = {
+const DERIVATION_PATH: AccountKeyDerivationPath = {
   index: 0,
   role: KeyRole.External
 };
@@ -209,6 +215,7 @@ export class MultiSigWallet {
         body: multiSigTx.getTransaction().body,
         hash: multiSigTx.getTransaction().id
       },
+      { knownAddresses: [this.#address], txInKeyPathMap: {} },
       { additionalKeyPaths: [DERIVATION_PATH] }
     );
 

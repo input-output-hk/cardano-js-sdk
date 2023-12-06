@@ -1,4 +1,4 @@
-import { AccountKeyDerivationPath, AsyncKeyAgent, GroupedAddress, KeyRole, util } from '@cardano-sdk/key-management';
+import { AccountKeyDerivationPath, Bip32Account, GroupedAddress, KeyRole } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet } from '../../src';
 import { PubStakeKeyAndStatus, createPublicStakeKeysTracker } from '../../src/services/PublicStakeKeysTracker';
@@ -8,7 +8,7 @@ import { mockProviders as mocks } from '@cardano-sdk/util-dev';
 describe('PublicStakeKeysTracker', () => {
   let addresses: GroupedAddress[];
   let rewardAccounts: Cardano.RewardAccountInfo[];
-  let keyAgent: AsyncKeyAgent;
+  let bip32Account: Bip32Account;
   let derivePublicKey: jest.Mock;
 
   /** Assert multiple emissions from stakePubKey$ */
@@ -21,7 +21,7 @@ describe('PublicStakeKeysTracker', () => {
     expect(publicKeyEmissions).toEqual(expectedEmissions);
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     addresses = [
       {
         rewardAccount: mocks.rewardAccount,
@@ -64,12 +64,16 @@ describe('PublicStakeKeysTracker', () => {
       }
     ];
 
-    derivePublicKey = jest
+    derivePublicKey = derivePublicKey = jest
       .fn()
-      .mockImplementation((path: AccountKeyDerivationPath) => Promise.resolve(`abc-${path.index}`));
-    keyAgent = {
-      derivePublicKey
-    } as unknown as AsyncKeyAgent;
+      .mockImplementation((path: AccountKeyDerivationPath) => Promise.resolve({ hex: () => `abc-${path.index}` }));
+    bip32Account = {
+      accountIndex: 0,
+      chainId: Cardano.ChainIds.Preview,
+      deriveAddress: jest.fn(),
+      derivePublicKey,
+      extendedAccountPublicKey: '' as unknown
+    } as Bip32Account;
   });
 
   it('empty array when there are no reward accounts', async () => {
@@ -77,8 +81,8 @@ describe('PublicStakeKeysTracker', () => {
     const rewardAccounts$ = of([]);
 
     const stakePubKeys$ = createPublicStakeKeysTracker({
-      addressManager: util.createBip32Ed25519AddressManager(keyAgent),
       addresses$,
+      bip32Account,
       rewardAccounts$
     });
 
@@ -91,8 +95,8 @@ describe('PublicStakeKeysTracker', () => {
     const rewardAccounts$ = of(rewardAccounts);
 
     const stakePubKeys$ = createPublicStakeKeysTracker({
-      addressManager: util.createBip32Ed25519AddressManager(keyAgent),
       addresses$,
+      bip32Account,
       rewardAccounts$
     });
 
@@ -117,8 +121,8 @@ describe('PublicStakeKeysTracker', () => {
     const rewardAccounts$ = of(rewardAccounts);
 
     const stakePubKeys$ = createPublicStakeKeysTracker({
-      addressManager: util.createBip32Ed25519AddressManager(keyAgent),
       addresses$,
+      bip32Account,
       rewardAccounts$
     });
 
@@ -136,8 +140,8 @@ describe('PublicStakeKeysTracker', () => {
     const rewardAccounts$ = from([[rewardAccounts[0]], rewardAccounts]);
 
     const stakePubKeys$ = createPublicStakeKeysTracker({
-      addressManager: util.createBip32Ed25519AddressManager(keyAgent),
       addresses$,
+      bip32Account,
       rewardAccounts$
     });
 
@@ -157,8 +161,8 @@ describe('PublicStakeKeysTracker', () => {
     const rewardAccounts$ = of(rewardAccounts);
 
     const stakePubKeys$ = createPublicStakeKeysTracker({
-      addressManager: util.createBip32Ed25519AddressManager(keyAgent),
       addresses$,
+      bip32Account,
       rewardAccounts$
     });
 
@@ -180,8 +184,8 @@ describe('PublicStakeKeysTracker', () => {
     );
 
     const stakePubKeys$ = createPublicStakeKeysTracker({
-      addressManager: util.createBip32Ed25519AddressManager(keyAgent),
       addresses$,
+      bip32Account,
       rewardAccounts$
     });
 

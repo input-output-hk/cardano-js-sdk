@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, GroupedAddress, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, GroupedAddress, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import {
   GenericTxBuilder,
@@ -48,18 +48,22 @@ const inputResolver: Cardano.InputResolver = {
 
 const createTxBuilder = async ({
   stakeKeyDelegations,
+  numAddresses = stakeKeyDelegations.length,
   useMultiplePaymentKeys = false,
   rewardAccounts,
   keyAgent
 }: {
   stakeKeyDelegations: { keyStatus: Cardano.StakeKeyStatus; poolId?: Cardano.PoolId }[];
+  numAddresses?: number;
   useMultiplePaymentKeys?: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   rewardAccounts?: any;
   keyAgent: InMemoryKeyAgent;
 }) => {
   let groupedAddresses = await Promise.all(
-    stakeKeyDelegations.map(async (_, idx) => keyAgent.deriveAddress({ index: 0, type: AddressType.External }, idx))
+    Array.from({ length: numAddresses }).map(async (_, idx) =>
+      keyAgent.deriveAddress({ index: 0, type: AddressType.External }, idx)
+    )
   );
 
   // Simulate an HD wallet where a each stake key partitions 2 payment keys (2 addresses per stake key)
@@ -71,6 +75,10 @@ const createTxBuilder = async ({
   }
 
   const txBuilderProviders: jest.Mocked<TxBuilderProviders> = {
+    addresses: {
+      add: jest.fn().mockImplementation((...addreses) => groupedAddresses.push(...addreses)),
+      get: jest.fn().mockResolvedValue(groupedAddresses)
+    },
     genesisParameters: jest.fn().mockResolvedValue(mocks.genesisParameters),
     protocolParameters: jest.fn().mockResolvedValue(mocks.protocolParameters),
     rewardAccounts:
@@ -78,7 +86,7 @@ const createTxBuilder = async ({
       jest.fn().mockImplementation(() =>
         Promise.resolve(
           // There can be multiple addresses with the same reward account. Extract the uniq reward accounts
-          uniqBy(keyAgent.knownAddresses, ({ rewardAccount }) => rewardAccount)
+          uniqBy(groupedAddresses, ({ rewardAccount }) => rewardAccount)
             // Create mock stakeKey/delegation status for each reward account according to the requested stakeKeyDelegations.
             // This would normally be done by the wallet.delegation.rewardAccounts
             .map<RewardAccountWithPoolId>(({ rewardAccount: address }, index) => {
@@ -102,7 +110,7 @@ const createTxBuilder = async ({
   return {
     groupedAddresses,
     txBuilder: new GenericTxBuilder({
-      addressManager: util.createBip32Ed25519AddressManager(asyncKeyAgent),
+      bip32Account: await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent),
       inputResolver,
       logger: dummyLogger,
       outputValidator,
@@ -131,7 +139,7 @@ describe('TxBuilder/delegatePortfolio', () => {
         getPassphrase: async () => Buffer.from('passphrase'),
         mnemonicWords: util.generateMnemonicWords()
       },
-      { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), inputResolver, logger: dummyLogger }
+      { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), logger: dummyLogger }
     );
   });
 
@@ -666,23 +674,24 @@ describe('TxBuilder/delegatePortfolio', () => {
   describe('rewardAccount syncing', () => {
     const normalRewardAccountsCalls = 3;
     it('can wait for delayed key agent stake keys', async () => {
-      await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0);
+      const address = await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0);
       const rewardAccountsProvider = jest
         .fn()
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([])
         .mockImplementation(() =>
-          Promise.resolve(
-            keyAgent.knownAddresses.map<RewardAccountWithPoolId>(({ rewardAccount: address }) => ({
-              address,
+          Promise.resolve([
+            {
+              address: address.rewardAccount,
               keyStatus: Cardano.StakeKeyStatus.Unregistered,
               rewardBalance: mocks.rewardAccountBalance
-            }))
-          )
+            }
+          ])
         );
       const txBuilderFactory = await createTxBuilder({
         keyAgent,
+        numAddresses: 1,
         rewardAccounts: rewardAccountsProvider,
         stakeKeyDelegations: []
       });
