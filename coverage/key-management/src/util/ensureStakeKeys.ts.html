@@ -111,30 +111,47 @@
 <a name='L46'></a><a href='#L46'>46</a>
 <a name='L47'></a><a href='#L47'>47</a>
 <a name='L48'></a><a href='#L48'>48</a>
-<a name='L49'></a><a href='#L49'>49</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">11x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -147,10 +164,12 @@
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
@@ -159,15 +178,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { AddressType, KeyRole } from '../types';
-import { Bip32Ed25519AddressManager } from './createAddressManager';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { AddressType, GroupedAddress, KeyRole } from '../types';
+import { Bip32Account } from '../Bip32Account';
 import { Cardano } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { firstValueFrom } from 'rxjs';
 &nbsp;
 export interface EnsureStakeKeysParams {
   /** Key agent to use */
-  addressManager: Bip32Ed25519AddressManager;
+  bip32Account: Bip32Account;
+  /** Look for existing stake keys used in those addresses */
+  knownAddresses: GroupedAddress[];
   /** Requested number of stake keys */
   count: number;
   /** The payment key index to use when more stake keys are needed */
@@ -175,14 +198,19 @@ export interface EnsureStakeKeysParams {
   logger: Logger;
 }
 &nbsp;
-/** Given a count, checks if enough stake keys exist and derives more if needed. Returns all reward accounts */
+export type EnsureStakeKeysResult = {
+  rewardAccounts: Cardano.RewardAccount[];
+  newAddresses: GroupedAddress[];
+};
+&nbsp;
+/** Given a count, checks if enough stake keys exist and derives more if needed. Returns all reward accounts and new addresses */
 export const ensureStakeKeys = async ({
-  addressManager,
+  bip32Account,
+  knownAddresses,
   count,
   logger,
   paymentKeyIndex: index = 0
-}: EnsureStakeKeysParams): Promise&lt;Cardano.RewardAccount[]&gt; =&gt; {
-  const knownAddresses = await firstValueFrom(addressManager.knownAddresses$);
+}: EnsureStakeKeysParams): Promise&lt;EnsureStakeKeysResult&gt; =&gt; {
   const stakeKeys = new Map(
     knownAddresses
       .filter(
@@ -195,9 +223,11 @@ export const ensureStakeKeys = async ({
   logger.debug(`Stake keys requested: ${count}; got ${stakeKeys.size}`);
 &nbsp;
   // Need more stake keys for the portfolio
+  const newAddresses: GroupedAddress[] = [];
   for (let stakeKeyIdx = 0; stakeKeys.size &lt; count; stakeKeyIdx++) {
     if (!stakeKeys.has(stakeKeyIdx)) {
-      const address = await addressManager.deriveAddress({ index, type: AddressType.External }, stakeKeyIdx);
+      const address = await bip32Account.deriveAddress({ index, type: AddressType.External }, stakeKeyIdx);
+      newAddresses.push(address);
       logger.debug(
         `No derivation with stake key index ${stakeKeyIdx} exists. Derived a new stake key ${address.rewardAccount}.`
       );
@@ -205,7 +235,10 @@ export const ensureStakeKeys = async ({
     }
   }
 &nbsp;
-  return [...stakeKeys.values()];
+  return {
+    newAddresses,
+    rewardAccounts: [...stakeKeys.values()]
+  };
 };
 &nbsp;</pre></td></tr></table></pre>
 
@@ -214,7 +247,7 @@ export const ensureStakeKeys = async ({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-12-04T15:55:27.137Z
+                at 2023-12-06T16:23:49.497Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
