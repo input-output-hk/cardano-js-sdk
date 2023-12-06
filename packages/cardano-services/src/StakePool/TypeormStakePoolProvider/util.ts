@@ -3,8 +3,6 @@
 import {
   Cardano,
   FilterCondition,
-  ProviderError,
-  ProviderFailure,
   QueryStakePoolsArgs,
   SortField,
   SortOrder,
@@ -51,7 +49,7 @@ export const stakePoolSearchSelection = [
 ];
 
 export const sortSelectionMap: { [key in SortField]: string } = {
-  apy: 'metrics_apy',
+  apy: 'metrics_ros',
   cost: 'params.cost',
   lastRos: 'metrics_last_ros',
   name: 'metadata.name',
@@ -63,32 +61,14 @@ export const nullsInSort = 'NULLS LAST';
 
 export const stakePoolSearchTotalCount = 'count(*) over () as total_count';
 
-export const getSortOptions = (
-  sort?: StakePoolSortOptions,
-  defaultField: SortField = 'name',
-  defaultOrder: SortOrder = 'asc'
-) => {
-  if (!sort) {
-    sort = { field: defaultField, order: defaultOrder };
-  }
-  if (sort.field === 'name') {
-    return {
-      field: `lower(${sortSelectionMap[sort.field as SortField]})`,
-      order: sort.order.toUpperCase() as Uppercase<SortOrder>
-    };
-  }
+const defaultSortOption = { field: 'name', order: 'asc' } as const;
 
-  if (sort.field === 'apy')
-    throw new ProviderError(
-      ProviderFailure.NotImplemented,
-      null,
-      'TypeormStakePoolProvider do not support sort by APY'
-    );
+export const getSortOptions = (sort: StakePoolSortOptions = defaultSortOption) => {
+  const order = sort.order.toUpperCase() as Uppercase<SortOrder>;
 
-  return {
-    field: sortSelectionMap[sort.field as SortField],
-    order: sort.order.toUpperCase() as Uppercase<SortOrder>
-  };
+  if (sort.field === 'name') return { field: `lower(${sortSelectionMap[sort.field]})`, order };
+
+  return { field: sortSelectionMap[sort.field], order };
 };
 
 export const getFilterCondition = (condition?: FilterCondition, defaultCondition: Uppercase<FilterCondition> = 'OR') =>

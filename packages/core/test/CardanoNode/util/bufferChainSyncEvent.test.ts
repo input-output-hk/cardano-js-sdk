@@ -144,23 +144,23 @@ describe('bufferChainSyncEvent', () => {
   });
 
   const produceAndConsume = async () => {
-    await sleep(10);
+    await sleep(50);
     producer.produceTill(2);
-    await sleep(10);
+    await sleep(50);
     consumer.consumeTill(1);
-    await sleep(10);
+    await sleep(50);
     producer.produceTill(4);
-    await sleep(10);
+    await sleep(50);
     consumer.consumeTill(2);
-    await sleep(10);
+    await sleep(50);
     producer.produceTill(8);
-    await sleep(10);
+    await sleep(50);
     consumer.consumeTill(3);
-    await sleep(10);
+    await sleep(50);
     producer.produceTill(16);
-    await sleep(40);
+    await sleep(50);
     consumer.consumeTill(4);
-    await sleep(10);
+    await sleep(50);
   };
 
   describe('without buffer', () => {
@@ -221,13 +221,13 @@ describe('bufferChainSyncEvent', () => {
     });
 
     it('producer complete is correctly propagated with buffer empty', async () => {
-      await sleep(10);
+      await sleep(50);
       producer.produceTill(2);
-      await sleep(10);
+      await sleep(50);
       consumer.consumeTill(2);
-      await sleep(10);
+      await sleep(50);
       producer.requestComplete();
-      await sleep(10);
+      await sleep(50);
       expect(events).toEqual([
         'Produced 1',
         'Got 1',
@@ -241,12 +241,12 @@ describe('bufferChainSyncEvent', () => {
     });
 
     it('producer complete is correctly propagated with buffer not empty', async () => {
-      await sleep(10);
+      await sleep(50);
       producer.produceTill(2);
       producer.requestComplete();
-      await sleep(10);
+      await sleep(50);
       consumer.consumeTill(2);
-      await sleep(10);
+      await sleep(50);
       expect(events).toEqual([
         'Produced 1',
         'Got 1',
@@ -260,13 +260,13 @@ describe('bufferChainSyncEvent', () => {
     });
 
     it('producer error is correctly propagated with buffer empty', async () => {
-      await sleep(10);
+      await sleep(50);
       producer.produceTill(2);
-      await sleep(10);
+      await sleep(50);
       consumer.consumeTill(2);
-      await sleep(10);
+      await sleep(50);
       producer.requestError('test error');
-      await sleep(10);
+      await sleep(50);
       expect(events).toEqual([
         'Produced 1',
         'Got 1',
@@ -280,12 +280,12 @@ describe('bufferChainSyncEvent', () => {
     });
 
     it('producer error is correctly propagated with buffer not empty', async () => {
-      await sleep(10);
+      await sleep(50);
       producer.produceTill(2);
       producer.requestError('test error');
-      await sleep(10);
+      await sleep(50);
       consumer.consumeTill(2);
-      await sleep(10);
+      await sleep(50);
       expect(events).toEqual([
         'Produced 1',
         'Got 1',

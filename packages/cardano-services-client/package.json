@@ -29,7 +29,7 @@
     "cleanup:dist": "rm -rf dist",
     "circular-deps:check": "madge --circular dist/cjs",
     "cleanup:nm": "rm -rf node_modules",
-    "cleanup": "run-s cleanup:dist cleanup:nm",
+    "cleanup": "rm -rf dist node_modules",
     "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint:fix": "yarn lint --fix",
     "test": "yarn build:version && jest -c ./jest.config.js",

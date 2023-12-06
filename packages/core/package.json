@@ -27,7 +27,7 @@
     "tscNoEmit": "echo typescript --noEmit command not implemented yet",
     "cleanup:dist": "rm -rf dist",
     "cleanup:nm": "rm -rf node_modules",
-    "cleanup": "run-s cleanup:dist cleanup:nm",
+    "cleanup": "rm -rf dist node_modules",
     "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint:fix": "yarn lint --fix",
     "test": "jest -c ./jest.config.js",

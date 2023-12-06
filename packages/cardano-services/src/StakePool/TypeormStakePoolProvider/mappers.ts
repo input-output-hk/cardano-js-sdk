@@ -87,7 +87,7 @@ const mapMetadata = ({
 
 // eslint-disable-next-line complexity
 const mapMetrics = (pool: PoolModel): Cardano.StakePoolMetrics => ({
-  apy: pool.metrics_last_ros ? Percent(Number.parseFloat(pool.metrics_last_ros)) : undefined,
+  apy: Percent(Number.parseFloat(pool.metrics_last_ros || '0')),
   blocksCreated: pool.metrics_minted_blocks || 0,
   delegators: pool.metrics_live_delegators || 0,
   lastRos: Percent(Number.parseFloat(pool.metrics_last_ros || '0')),
