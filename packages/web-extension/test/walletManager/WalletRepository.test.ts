@@ -1,7 +1,14 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Bip32PublicKeyHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { Cardano, Serialization } from '@cardano-sdk/core';
-import { WalletConflictError, WalletId, WalletRepository, WalletRepositoryDependencies, WalletType } from '../../src';
+import {
+  UpdateMetadataProps,
+  WalletConflictError,
+  WalletId,
+  WalletRepository,
+  WalletRepositoryDependencies,
+  WalletType
+} from '../../src';
 import { firstValueFrom, of } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 import pick from 'lodash/pick';
@@ -11,7 +18,6 @@ type WalletMetadata = { friendlyName: string };
 const storedLedgerWallet = {
   accounts: [
     {
-      accountId: 'f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80-0',
       accountIndex: 0,
       metadata: { friendlyName: 'My Ledger Wallet' }
     }
@@ -34,7 +40,7 @@ const createScriptWalletProps = {
   metadata: { friendlyName: 'Treasury' },
   ownSigners: [
     {
-      accountId: storedLedgerWallet.accounts[0].accountId,
+      accountIndex: storedLedgerWallet.accounts[0].accountIndex,
       walletId: storedLedgerWallet.walletId
     }
   ],
@@ -104,7 +110,7 @@ describe('WalletRepository', () => {
           ...createScriptWalletProps,
           ownSigners: [
             {
-              accountId: createScriptWalletProps.ownSigners[0].accountId,
+              accountIndex: createScriptWalletProps.ownSigners[0].accountIndex,
               walletId: 'does not exist' as WalletId
             }
           ]
@@ -118,7 +124,7 @@ describe('WalletRepository', () => {
           ...createScriptWalletProps,
           ownSigners: [
             {
-              accountId: 'does not exist',
+              accountIndex: 999_999_999,
               walletId: createScriptWalletProps.ownSigners[0].walletId
             }
           ]
@@ -141,19 +147,12 @@ describe('WalletRepository', () => {
         accountIndex: storedLedgerWallet.accounts[storedLedgerWallet.accounts.length - 1].accountIndex + 1,
         metadata: { friendlyName: 'Next account' }
       };
-      await expect(
-        repository.addAccount({ ...accountProps, walletId: storedLedgerWallet.walletId })
-      ).resolves.toContain(storedLedgerWallet.walletId);
+      const props = { ...accountProps, walletId: storedLedgerWallet.walletId };
+      await expect(repository.addAccount(props)).resolves.toEqual(props);
       expect(store.setAll).toBeCalledWith([
         {
           ...storedLedgerWallet,
-          accounts: [
-            ...storedLedgerWallet.accounts,
-            {
-              ...accountProps,
-              accountId: expect.stringContaining(storedLedgerWallet.walletId)
-            }
-          ]
+          accounts: [...storedLedgerWallet.accounts, accountProps]
         }
       ]);
     });
@@ -197,13 +196,12 @@ describe('WalletRepository', () => {
     const newMetadata = { friendlyName: 'New name' };
 
     it('updates metadata of an existing bip32 account', async () => {
-      const accountId = storedLedgerWallet.accounts[0].accountId;
-      await expect(
-        repository.updateMetadata({
-          metadata: newMetadata,
-          target: accountId
-        })
-      ).resolves.toBe(accountId);
+      const props: UpdateMetadataProps<WalletMetadata> = {
+        accountIndex: storedLedgerWallet.accounts[0].accountIndex,
+        metadata: newMetadata,
+        walletId: storedLedgerWallet.walletId
+      };
+      await expect(repository.updateMetadata(props)).resolves.toEqual(props);
       expect(store.setAll).toBeCalledWith([
         {
           ...storedLedgerWallet,
@@ -219,12 +217,11 @@ describe('WalletRepository', () => {
 
     it('updates metadata of an existing script wallet', async () => {
       store.observeAll.mockReturnValueOnce(of([storedScriptWallet]));
-      await expect(
-        repository.updateMetadata({
-          metadata: newMetadata,
-          target: storedScriptWallet.walletId
-        })
-      ).resolves.toBe(storedScriptWallet.walletId);
+      const props: UpdateMetadataProps<WalletMetadata> = {
+        metadata: newMetadata,
+        walletId: storedScriptWallet.walletId
+      };
+      await expect(repository.updateMetadata(props)).resolves.toEqual(props);
       expect(store.setAll).toBeCalledWith([
         {
           ...storedScriptWallet,
@@ -237,7 +234,14 @@ describe('WalletRepository', () => {
       await expect(
         repository.updateMetadata({
           metadata: newMetadata,
-          target: 'does not exist'
+          walletId: 'does not exist' as Hash28ByteBase16
+        })
+      ).rejects.toThrowError(WalletConflictError);
+      await expect(
+        repository.updateMetadata({
+          accountIndex: 999_999_999,
+          metadata: newMetadata,
+          walletId: storedScriptWallet.walletId
         })
       ).rejects.toThrowError(WalletConflictError);
       expect(store.setAll).not.toBeCalled();
@@ -266,9 +270,12 @@ describe('WalletRepository', () => {
   });
 
   describe('removeAccount', () => {
-    it('removes account with specified id', async () => {
-      const accountId = storedLedgerWallet.accounts[0].accountId;
-      await expect(repository.removeAccount(accountId)).resolves.toBe(accountId);
+    it('removes account with specified index', async () => {
+      const props = {
+        accountIndex: storedLedgerWallet.accounts[0].accountIndex,
+        walletId: storedLedgerWallet.walletId
+      };
+      await expect(repository.removeAccount(props)).resolves.toEqual(props);
       expect(store.setAll).toBeCalledWith([
         {
           ...storedLedgerWallet,
@@ -277,18 +284,24 @@ describe('WalletRepository', () => {
       ]);
     });
 
-    it('rejects with WalletConflictError when wallet is not found', async () => {
-      await expect(repository.removeAccount('doesnt exist' as Hash28ByteBase16)).rejects.toThrowError(
-        WalletConflictError
-      );
+    it('rejects with WalletConflictError when account is not found', async () => {
+      await expect(
+        repository.removeAccount({ accountIndex: 0, walletId: 'doesnt exist' as Hash28ByteBase16 })
+      ).rejects.toThrowError(WalletConflictError);
+      await expect(
+        repository.removeAccount({ accountIndex: 999_999_999, walletId: storedLedgerWallet.walletId })
+      ).rejects.toThrowError(WalletConflictError);
       expect(store.setAll).not.toBeCalled();
     });
 
     it('rejects with WalletConflictError when trying to remove account referenced by script wallet', async () => {
       store.observeAll.mockReturnValueOnce(of([storedLedgerWallet, storedScriptWallet]));
-      await expect(repository.removeAccount(storedScriptWallet.ownSigners[0].accountId)).rejects.toThrowError(
-        WalletConflictError
-      );
+      await expect(
+        repository.removeAccount({
+          accountIndex: storedScriptWallet.ownSigners[0].accountIndex,
+          walletId: storedLedgerWallet.walletId
+        })
+      ).rejects.toThrowError(WalletConflictError);
     });
   });
 });

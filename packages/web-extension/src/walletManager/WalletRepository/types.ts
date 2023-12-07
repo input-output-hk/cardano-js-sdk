@@ -1,5 +1,11 @@
-import { AccountId, AnyWallet, HardwareWallet, InMemoryWallet, ScriptWallet, WalletId } from '../types';
+import { AnyWallet, HardwareWallet, InMemoryWallet, ScriptWallet, WalletId } from '../types';
 import { Observable } from 'rxjs';
+
+export type RemoveAccountProps = {
+  walletId: WalletId;
+  /** account' in cip1852 */
+  accountIndex: number;
+};
 
 export type AddAccountProps<Metadata extends {}> = {
   walletId: WalletId;
@@ -8,8 +14,10 @@ export type AddAccountProps<Metadata extends {}> = {
   metadata: Metadata;
 };
 
-export type UpdateMetadataProps<Metadata extends {}, ID extends AccountId | WalletId> = {
-  target: ID;
+export type UpdateMetadataProps<Metadata extends {}> = {
+  walletId: WalletId;
+  /** account' in cip1852; must be specified for bip32 wallets */
+  accountIndex?: number;
   metadata: Metadata;
 };
 
@@ -31,13 +39,13 @@ export interface WalletRepositoryApi<Metadata extends {}> {
    * - wallet with provided `walletId` is not found
    * - account already exists for this wallet
    */
-  addAccount(props: AddAccountProps<Metadata>): Promise<AccountId>;
+  addAccount(props: AddAccountProps<Metadata>): Promise<AddAccountProps<Metadata>>;
 
-  /** Rejects with WalletConflictError when wallet or account with specified id is not found */
-  updateMetadata<ID extends WalletId | AccountId>(props: UpdateMetadataProps<Metadata, ID>): Promise<ID>;
+  /** Rejects with WalletConflictError when wallet or account with specified index is not found */
+  updateMetadata(props: UpdateMetadataProps<Metadata>): Promise<UpdateMetadataProps<Metadata>>;
 
   /** Rejects with WalletConflictError when account is not found. */
-  removeAccount(accountId: AccountId): Promise<AccountId>;
+  removeAccount(props: RemoveAccountProps): Promise<RemoveAccountProps>;
 
   /** Rejects with WalletConflictError when wallet is not found. */
   removeWallet(walletId: WalletId): Promise<WalletId>;

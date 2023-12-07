@@ -12,12 +12,7 @@ export enum WalletType {
 /** For BIP-32 wallets: hash of extended account public key. For script wallets: script hash */
 export type WalletId = Hash28ByteBase16;
 
-/** walletId+accountIndex (only applicable for bip32 wallets) */
-export type AccountId = string;
-
 export type Bip32WalletAccount<Metadata extends {}> = {
-  accountId: AccountId;
-  /** account' in cip1852 */
   accountIndex: number;
   /** e.g. account name, picture */
   metadata: Metadata;
@@ -43,7 +38,7 @@ export type InMemoryWallet<Metadata extends {}> = Bip32Wallet<Metadata> & {
 
 export type OwnSignerAccount = {
   walletId: WalletId;
-  accountId: AccountId;
+  accountIndex: number;
 };
 
 export type ScriptWallet<Metadata extends {}> = {
