@@ -2,6 +2,9 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { HexBlob, OpaqueString, Shutdown } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
+import type { Runtime } from 'webextension-polyfill';
+
+export type MessageSender = Runtime.MessageSender;
 
 export interface SignBlobResult {
   publicKey: Crypto.Ed25519PublicKeyHex;
@@ -141,6 +144,7 @@ export interface SignTransactionOptions {
 export interface SignTransactionContext {
   txInKeyPathMap: TxInKeyPathMap;
   knownAddresses: GroupedAddress[];
+  sender?: MessageSender;
 }
 
 export interface KeyAgent {
@@ -231,5 +235,5 @@ export interface Witnesser {
   /**
    * @throws AuthenticationError
    */
-  signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult>;
+  signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob, sender?: MessageSender): Promise<SignBlobResult>;
 }

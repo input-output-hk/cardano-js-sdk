@@ -3525,6 +3525,7 @@ __metadata:
     "@trezor/connect-web": 9.0.11
     "@types/lodash": ^4.14.182
     "@types/pbkdf2": ^3.1.0
+    "@types/webextension-polyfill": ^0.8.0
     bip39: ^3.0.4
     chacha: ^2.1.0
     eslint: ^7.32.0

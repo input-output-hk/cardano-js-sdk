@@ -1,5 +1,5 @@
 import { RemoteApiPropertyType, consumeRemoteApi } from '@cardano-sdk/web-extension';
-import { RequestAccess } from '@cardano-sdk/dapp-connector';
+import { RequestAccess, senderOrigin } from '@cardano-sdk/dapp-connector';
 import { UserPromptService, logger } from '../util';
 import { ensureUiIsOpenAndLoaded } from './windowManager';
 import { runtime } from 'webextension-polyfill';
@@ -15,7 +15,9 @@ const userPromptService = consumeRemoteApi<UserPromptService>(
   { logger, runtime }
 );
 
-export const requestAccess: RequestAccess = async (origin) => {
+export const requestAccess: RequestAccess = async (sender) => {
+  const origin = senderOrigin(sender);
+  if (!origin) throw new Error('Invalid requestAccess request: unknown sender origin');
   await ensureUiIsOpenAndLoaded();
   return await userPromptService.allowOrigin(origin);
 };

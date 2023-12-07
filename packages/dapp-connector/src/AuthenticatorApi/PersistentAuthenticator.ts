@@ -1,6 +1,8 @@
 import { AuthenticatorApi, Origin, RequestAccess } from './types';
 import { Logger } from 'ts-log';
 import { PersistentAuthenticatorStorage } from './PersistentAuthenticatorStorage';
+import { Runtime } from 'webextension-polyfill';
+import { senderOrigin } from '../util';
 
 export interface PersistentAuhenticatorOptions {
   requestAccess: RequestAccess;
@@ -32,13 +34,18 @@ export class PersistentAuthenticator implements AuthenticatorApi {
     this.#originsReady = storage.get();
   }
 
-  async requestAccess(origin: Origin) {
+  async requestAccess(sender: Runtime.MessageSender) {
+    const origin = senderOrigin(sender);
+    if (!origin) {
+      this.#logger.warn('Invalid sender url', sender);
+      return false;
+    }
     const origins = await this.#originsReady;
     if (origins.includes(origin)) {
       return true;
     }
     try {
-      const accessGranted = await this.#requestAccess(origin);
+      const accessGranted = await this.#requestAccess(sender);
       if (accessGranted) {
         const newOrigins = [...origins, origin];
         if (await this.#store(newOrigins)) {
@@ -52,7 +59,12 @@ export class PersistentAuthenticator implements AuthenticatorApi {
     return false;
   }
 
-  async revokeAccess(origin: Origin) {
+  async revokeAccess(sender: Runtime.MessageSender) {
+    const origin = senderOrigin(sender);
+    if (!origin) {
+      this.#logger.warn('Invalid sender url', sender);
+      return false;
+    }
     const origins = await this.#originsReady;
     const idx = origins.indexOf(origin);
     if (idx >= 0) {
@@ -67,7 +79,8 @@ export class PersistentAuthenticator implements AuthenticatorApi {
     return false;
   }
 
-  async haveAccess(origin: Origin) {
+  async haveAccess(sender: Runtime.MessageSender) {
+    const origin = senderOrigin(sender);
     if (!origin) return false;
     const origins = await this.#originsReady;
     return origins.includes(origin);
