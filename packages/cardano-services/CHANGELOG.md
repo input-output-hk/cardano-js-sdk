@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.24.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.23.1...@cardano-sdk/cardano-services@0.24.0) (2023-12-07)
+
+### ⚠ BREAKING CHANGES
+
+* bump stake pool provider api version to 1.1.0
+
+### Bug Fixes
+
+* make type orm stake pool provider back compatible ([b007175](https://github.com/input-output-hk/cardano-js-sdk/commit/b007175502578daaaa738a5380fe0b68ce9d742e))
+
 ## [0.23.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.23.0...@cardano-sdk/cardano-services@0.23.1) (2023-12-04)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services
