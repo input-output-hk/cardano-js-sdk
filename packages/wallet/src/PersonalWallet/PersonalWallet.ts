@@ -205,6 +205,7 @@ export class PersonalWallet implements ObservableWallet {
   #failedFromReemitter$: Subject<FailedTx>;
   #trackedTxSubmitProvider: TrackedTxSubmitProvider;
   #addressTracker: AddressTracker;
+  #addressDiscovery: AddressDiscovery;
   #submittingPromises: Partial<Record<Cardano.TransactionId, Promise<Cardano.TransactionId>>> = {};
 
   readonly witnesser: Witnesser;
@@ -306,6 +307,7 @@ export class PersonalWallet implements ObservableWallet {
       filter((status) => status === ConnectionStatus.down)
     );
 
+    this.#addressDiscovery = addressDiscovery;
     this.#addressTracker = createAddressTracker({
       addressDiscovery$: coldObservableProvider({
         cancel$,
@@ -734,5 +736,15 @@ export class PersonalWallet implements ObservableWallet {
       }
     }
     return Promise.resolve(this.drepPubKey);
+  }
+
+  async discoverAddresses(): Promise<GroupedAddress[]> {
+    const addresses = await this.#addressDiscovery.discover(this.bip32Account);
+    const knownAddresses = await firstValueFrom(this.addresses$);
+    const newAddresses = addresses.filter(
+      ({ address }) => !knownAddresses.some((knownAddr) => knownAddr.address === address)
+    );
+    await firstValueFrom(this.#addressTracker.addAddresses(newAddresses));
+    return firstValueFrom(this.addresses$);
   }
 }

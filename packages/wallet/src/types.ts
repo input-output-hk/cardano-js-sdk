@@ -96,6 +96,14 @@ export interface ObservableWallet {
   /** Create a TxBuilder from this wallet */
   createTxBuilder(): TxBuilder;
 
+  /**
+   * Discover addresses that might have been created by other applications.
+   * This is run automatically when the wallet is first created.
+   *
+   * @returns Promise that resolves when discovery is complete, with an updated array of wallet addresses
+   */
+  discoverAddresses(): Promise<GroupedAddress[]>;
+
   shutdown(): void;
 }
 

@@ -1,5 +1,6 @@
 /* eslint-disable unicorn/consistent-destructuring, sonarjs/no-duplicate-string, @typescript-eslint/no-floating-promises, promise/no-nesting, promise/always-return */
 import * as Crypto from '@cardano-sdk/crypto';
+import { AddressDiscovery, PersonalWallet, TxInFlight } from '../../src';
 import { AddressType, Bip32Account, GroupedAddress, Witnesser, util } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BehaviorSubject, Subscription, firstValueFrom, skip } from 'rxjs';
@@ -18,7 +19,6 @@ import {
 } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
-import { PersonalWallet, TxInFlight } from '../../src';
 import { buildDRepIDFromDRepKey, toOutgoingTx, waitForWalletStateSettle } from '../util';
 import { getPassphrase, stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { dummyLogger as logger } from 'ts-log';
@@ -60,6 +60,15 @@ const promiseTimeout = (p: Promise<unknown>, timeout = 10): Promise<unknown> => 
 
 describe('PersonalWallet methods', () => {
   const address = mocks.utxo[0][0].address!;
+  const groupedAddress: GroupedAddress = {
+    accountIndex: 0,
+    address,
+    index: 0,
+    networkId: Cardano.NetworkId.Testnet,
+    rewardAccount: mocks.rewardAccount,
+    stakeKeyDerivationPath,
+    type: AddressType.External
+  };
   let txSubmitProvider: mocks.TxSubmitProviderStub;
   let networkInfoProvider: mocks.NetworkInfoProviderStub;
   let assetProvider: mocks.MockAssetProvider;
@@ -71,26 +80,19 @@ describe('PersonalWallet methods', () => {
   let utxoProvider: mocks.UtxoProviderStub;
   let witnesser: Witnesser;
   let bip32Account: Bip32Account;
+  let addressDiscovery: jest.Mocked<AddressDiscovery>;
 
   beforeEach(async () => {
     txSubmitProvider = mocks.mockTxSubmitProvider();
     networkInfoProvider = mocks.mockNetworkInfoProvider();
     utxoProvider = mocks.mockUtxoProvider();
-
     assetProvider = mocks.mockAssetProvider();
     stakePoolProvider = createStubStakePoolProvider();
     rewardsProvider = mockRewardsProvider();
     chainHistoryProvider = mockChainHistoryProvider();
     handleProvider = mocks.mockHandleProvider();
-    const groupedAddress: GroupedAddress = {
-      accountIndex: 0,
-      address,
-      index: 0,
-      networkId: Cardano.NetworkId.Testnet,
-      rewardAccount: mocks.rewardAccount,
-      stakeKeyDerivationPath,
-      type: AddressType.External
-    };
+    addressDiscovery = { discover: jest.fn().mockImplementation(async () => [groupedAddress]) };
+
     const asyncKeyAgent = await testAsyncKeyAgent();
     bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
     bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
@@ -98,6 +100,7 @@ describe('PersonalWallet methods', () => {
     wallet = new PersonalWallet(
       { name: 'Test Wallet' },
       {
+        addressDiscovery,
         assetProvider,
         bip32Account,
         chainHistoryProvider,
@@ -464,5 +467,23 @@ describe('PersonalWallet methods', () => {
     const response = await wallet.getPubDRepKey();
     expect(response).toBe('string');
     expect(bip32Account.derivePublicKey).toHaveBeenCalledTimes(3);
+  });
+
+  describe('discoverAddresses', () => {
+    it('discovers new addreses and emits them from addresses$', async () => {
+      const newAddresses: GroupedAddress[] = [
+        groupedAddress,
+        {
+          ...groupedAddress,
+          address: Cardano.PaymentAddress(
+            'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz'
+          ),
+          index: groupedAddress.index + 1
+        }
+      ];
+      addressDiscovery.discover.mockResolvedValueOnce(newAddresses);
+      await expect(wallet.discoverAddresses()).resolves.toEqual(newAddresses);
+      await expect(firstValueFrom(wallet.addresses$)).resolves.toEqual(newAddresses);
+    });
   });
 });
