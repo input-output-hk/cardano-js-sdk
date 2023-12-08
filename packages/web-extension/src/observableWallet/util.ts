@@ -101,6 +101,7 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
     rewardAccounts$: RemoteApiPropertyType.HotObservable,
     rewardsHistory$: RemoteApiPropertyType.HotObservable
   },
+  discoverAddresses: RemoteApiPropertyType.MethodReturningPromise,
   eraSummaries$: RemoteApiPropertyType.HotObservable,
   fatalError$: RemoteApiPropertyType.HotObservable,
   finalizeTx: RemoteApiPropertyType.MethodReturningPromise,
