@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.27.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.27.0...@cardano-sdk/wallet@0.27.1) (2023-12-08)
+
+### Features
+
+* add ObservableWallet.discoverAddreses ([efc4e50](https://github.com/input-output-hk/cardano-js-sdk/commit/efc4e5070ca261b3eec6c93d4ede26c0533d09ee)), closes [#1009](https://github.com/input-output-hk/cardano-js-sdk/issues/1009)
+
 ## [0.27.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.26.1...@cardano-sdk/wallet@0.27.0) (2023-12-07)
 
 ### ⚠ BREAKING CHANGES
