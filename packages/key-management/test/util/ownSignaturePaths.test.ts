@@ -495,11 +495,6 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
   });
 
   describe('DRep key derivation path', () => {
-    beforeEach(async () => {
-      dRepPublicKey = Crypto.Ed25519PublicKeyHex('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01');
-      dRepKeyHash = (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex();
-    });
-
     it('is returned for UnregisterDelegateRepresentative certificate with the wallet dRep key hash', async () => {
       const txBody = {
         certificates: [
@@ -539,13 +534,13 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       ]);
     });
 
-    it('is not returned with a DrepRegistration certificate', async () => {
+    it('is returned with a DrepRegistration certificate', async () => {
       const txBody = {
         certificates: [
           {
             __typename: Cardano.CertificateType.RegisterDelegateRepresentative,
             dRepCredential: {
-              hash: foreignDRepKeyHash,
+              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
               type: Cardano.CredentialType.KeyHash
             },
             deposit: 0n
@@ -554,7 +549,9 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
         inputs: [{}, {}, {}]
       } as Cardano.TxBody;
 
-      expect(util.ownSignatureKeyPaths(txBody, [knownAddress1], {}, dRepKeyHash)).toEqual([]);
+      expect(util.ownSignatureKeyPaths(txBody, [knownAddress1], {}, dRepKeyHash)).toEqual([
+        { index: 0, role: KeyRole.DRep }
+      ]);
     });
 
     it('is returned for DRep voter in voting procedures', async () => {
