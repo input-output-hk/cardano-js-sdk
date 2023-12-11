@@ -219,12 +219,22 @@ describe('PersonalWallet methods', () => {
       expect(getPassphrase).not.toBeCalled();
     });
 
-    it('finalizeTx', async () => {
-      const txInternals = await wallet.initializeTx(props);
-      const tx = await wallet.finalizeTx({ tx: txInternals });
-      expect(tx.body).toBe(txInternals.body);
-      expect(tx.id).toBe(txInternals.hash);
-      expect(tx.witness.signatures.size).toBe(2); // spending key and stake key for withdrawal
+    describe('finalizeTx', () => {
+      it('resolves with TransactionWitnessSet', async () => {
+        const txInternals = await wallet.initializeTx(props);
+        const tx = await wallet.finalizeTx({ tx: txInternals });
+        expect(tx.body).toBe(txInternals.body);
+        expect(tx.id).toBe(txInternals.hash);
+        expect(tx.witness.signatures.size).toBe(2); // spending key and stake key for withdrawal
+      });
+
+      it('passes through sender to witnesser', async () => {
+        const sender = { url: 'https://lace.io' };
+        const witnessSpy = jest.spyOn(witnesser, 'witness');
+        const txInternals = await wallet.initializeTx(props);
+        await wallet.finalizeTx({ sender, tx: txInternals });
+        expect(witnessSpy).toBeCalledWith(expect.anything(), expect.objectContaining({ sender }), void 0);
+      });
     });
 
     describe('submitTx', () => {
@@ -422,6 +432,13 @@ describe('PersonalWallet methods', () => {
         signWith: Cardano.DRepID('drep1vpzcgfrlgdh4fft0p0ju70czkxxkuknw0jjztl3x7aqgm9q3hqyaz')
       });
       expect(response).toHaveProperty('signature');
+    });
+
+    it('passes through sender to witnesser', async () => {
+      const sender = { url: 'https://lace.io' };
+      const signBlobSpy = jest.spyOn(witnesser, 'signBlob');
+      await wallet.signData({ payload: HexBlob('abc123'), sender, signWith: address });
+      expect(signBlobSpy).toBeCalledWith(expect.anything(), expect.anything(), sender);
     });
 
     test('rejects if bech32 DRepID is not a type 6 address', async () => {

@@ -9,8 +9,16 @@ import { walletName } from '../const';
 
 // this should come from remote api
 const confirmationCallback: walletCip30.CallbackConfirmation = {
-  signData: async () => true,
-  signTx: async () => true,
+  signData: async ({ sender }) => {
+    if (!sender) throw new Error('No sender context');
+    logger.info('signData request from', sender);
+    return true;
+  },
+  signTx: async ({ sender }) => {
+    if (!sender) throw new Error('No sender context');
+    logger.info('signTx request', sender);
+    return true;
+  },
   submitTx: async () => true
 };
 

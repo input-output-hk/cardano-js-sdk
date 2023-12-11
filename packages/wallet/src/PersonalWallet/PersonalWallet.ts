@@ -533,7 +533,7 @@ export class PersonalWallet implements ObservableWallet {
     return initializeTx(props, this.getTxBuilderDependencies());
   }
 
-  async finalizeTx({ tx, ...rest }: FinalizeTxProps, stubSign = false): Promise<Cardano.Tx> {
+  async finalizeTx({ tx, sender, ...rest }: FinalizeTxProps, stubSign = false): Promise<Cardano.Tx> {
     const knownAddresses = await firstValueFrom(this.addresses$);
     const { tx: signedTx } = await finalizeTx(
       tx,
@@ -541,6 +541,7 @@ export class PersonalWallet implements ObservableWallet {
         ...rest,
         signingContext: {
           knownAddresses,
+          sender,
           txInKeyPathMap: await util.createTxInKeyPathMap(tx.body, knownAddresses, this.util)
         }
       },

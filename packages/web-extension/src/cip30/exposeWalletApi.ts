@@ -1,14 +1,20 @@
-import { APIErrorCode, ApiError, AuthenticatorApi, WalletApi, WalletApiMethodNames } from '@cardano-sdk/dapp-connector';
+import {
+  APIErrorCode,
+  ApiError,
+  AuthenticatorApi,
+  WalletApi,
+  WalletApiMethodNames,
+  WithSenderContext
+} from '@cardano-sdk/dapp-connector';
 import {
   MessengerDependencies,
   RemoteApiMethod,
   RemoteApiProperties,
   RemoteApiPropertyType,
-  exposeApi,
-  senderOrigin
+  exposeApi
 } from '../messaging';
+import { cloneSender, walletApiChannel } from './util';
 import { of } from 'rxjs';
-import { walletApiChannel } from './util';
 
 export interface BackgroundWalletApiOptions {
   walletName: string;
@@ -16,7 +22,7 @@ export interface BackgroundWalletApiOptions {
 
 export interface BackgroundWalletDependencies extends MessengerDependencies {
   authenticator: AuthenticatorApi;
-  walletApi: WalletApi;
+  walletApi: WithSenderContext<WalletApi>;
 }
 
 // tested in e2e tests
@@ -34,9 +40,15 @@ export const exposeWalletApi = (
           {
             propType: RemoteApiPropertyType.MethodReturningPromise,
             requestOptions: {
+              transform: ({ method, args }, sender) => {
+                if (!sender) throw new Error('"sender" is undefined');
+                return {
+                  args: [{ sender: cloneSender(sender) }, ...args],
+                  method
+                };
+              },
               validate: async (_, sender) => {
-                const origin = sender && senderOrigin(sender);
-                const haveAccess = origin && (await dependencies.authenticator.haveAccess(origin));
+                const haveAccess = sender && (await dependencies.authenticator.haveAccess(cloneSender(sender)));
                 if (!haveAccess) {
                   throw new ApiError(APIErrorCode.Refused, 'Call cardano.{walletName}.enable() first');
                 }

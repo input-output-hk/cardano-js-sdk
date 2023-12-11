@@ -1,6 +1,7 @@
 import {
   AccountKeyDerivationPath,
   AsyncKeyAgent,
+  MessageSender,
   SignBlobResult,
   SignTransactionContext,
   WitnessOptions,
@@ -25,7 +26,11 @@ export class Bip32Ed25519Witnesser implements Witnesser {
     return { signatures: await this.#keyAgent.signTransaction(txInternals, context, options) };
   }
 
-  async signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult> {
+  async signBlob(
+    derivationPath: AccountKeyDerivationPath,
+    blob: HexBlob,
+    _sender?: MessageSender
+  ): Promise<SignBlobResult> {
     return this.#keyAgent.signBlob(derivationPath, blob);
   }
 }

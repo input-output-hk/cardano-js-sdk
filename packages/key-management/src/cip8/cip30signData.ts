@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AccountKeyDerivationPath, GroupedAddress, KeyRole } from '../types';
+import { AccountKeyDerivationPath, GroupedAddress, KeyRole, MessageSender } from '../types';
 import {
   AlgorithmId,
   CBORValue,
@@ -24,6 +24,7 @@ export interface Cip30SignDataRequest {
   witnesser: Bip32Ed25519Witnesser;
   signWith: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID;
   payload: HexBlob;
+  sender?: MessageSender;
 }
 
 export enum Cip30DataSignErrorCode {
@@ -87,10 +88,11 @@ const createSigStructureHeaders = (addressBytes: Uint8Array) => {
 const signSigStructure = (
   witnesser: Bip32Ed25519Witnesser,
   derivationPath: AccountKeyDerivationPath,
-  sigStructure: SigStructure
+  sigStructure: SigStructure,
+  sender?: MessageSender
 ) => {
   try {
-    return witnesser.signBlob(derivationPath, util.bytesToHex(sigStructure.to_bytes()));
+    return witnesser.signBlob(derivationPath, util.bytesToHex(sigStructure.to_bytes()), sender);
   } catch (error) {
     throw new Cip30DataSignError(Cip30DataSignErrorCode.UserDeclined, 'Failed to sign', error);
   }
@@ -115,7 +117,8 @@ export const cip30signData = async ({
   knownAddresses,
   witnesser,
   signWith,
-  payload
+  payload,
+  sender
 }: Cip30SignDataRequest): Promise<Cip30DataSignature> => {
   if (Cardano.DRepID.isValid(signWith) && !Cardano.DRepID.canSign(signWith)) {
     throw new Cip30DataSignError(Cip30DataSignErrorCode.AddressNotPK, 'Invalid address');
@@ -129,7 +132,7 @@ export const cip30signData = async ({
     false
   );
   const sigStructure = builder.make_data_to_sign();
-  const { signature, publicKey } = await signSigStructure(witnesser, derivationPath, sigStructure);
+  const { signature, publicKey } = await signSigStructure(witnesser, derivationPath, sigStructure, sender);
   const coseSign1 = builder.build(Buffer.from(signature, 'hex'));
 
   const coseKey = createCoseKey(addressBytes, publicKey);
