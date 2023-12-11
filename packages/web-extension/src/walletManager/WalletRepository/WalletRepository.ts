@@ -1,11 +1,10 @@
 import { AddAccountProps, AddWalletProps, RemoveAccountProps, UpdateMetadataProps, WalletRepositoryApi } from './types';
 import { AnyWallet, ScriptWallet, WalletId, WalletType } from '../types';
-import { Bip32PublicKey, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { Logger } from 'ts-log';
 import { Observable, defer, firstValueFrom, map, shareReplay, switchMap, take } from 'rxjs';
-import { Serialization } from '@cardano-sdk/core';
 import { WalletConflictError } from '../errors';
 import { contextLogger } from '@cardano-sdk/util';
+import { getWalletId } from '../util';
 import { storage } from '@cardano-sdk/wallet';
 
 export interface WalletRepositoryDependencies<AccountMetadata extends {}> {
@@ -58,10 +57,10 @@ export class WalletRepository<AccountMetadata extends {}> implements WalletRepos
 
   async addWallet(props: AddWalletProps<AccountMetadata>): Promise<WalletId> {
     this.#logger.debug('addWallet', props.type);
-    const walletId =
-      props.type === WalletType.Script
-        ? Serialization.Script.fromCore(props.script).hash()
-        : Hash28ByteBase16(await Bip32PublicKey.fromHex(props.extendedAccountPublicKey).hash());
+    const walletId = await getWalletId(
+      props.type === WalletType.Script ? props.script : props.extendedAccountPublicKey
+    );
+
     return firstValueFrom(
       this.#getWallets().pipe(
         switchMap((wallets) => {

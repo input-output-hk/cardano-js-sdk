@@ -1,4 +1,4 @@
-import { Bip32PublicKeyHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import { Bip32PublicKeyHex } from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 
@@ -10,7 +10,7 @@ export enum WalletType {
 }
 
 /** For BIP-32 wallets: hash of extended account public key. For script wallets: script hash */
-export type WalletId = Hash28ByteBase16;
+export type WalletId = string;
 
 export type Bip32WalletAccount<Metadata extends {}> = {
   accountIndex: number;

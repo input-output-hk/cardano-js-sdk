@@ -26,7 +26,7 @@ const storedLedgerWallet = {
     'ba4f80dea2632a17c99ae9d8b934abf02643db5426b889fef14709c85e294aa12ac1f1560a893ea7937c5bfbfdeab459b1a396f1174b9c5a673a640d01880c35'
   ),
   type: WalletType.Ledger as const,
-  walletId: Hash28ByteBase16('ad63f855e831d937457afc52a21a7f351137e4a9fff26c217817335a')
+  walletId: 'bc10b0e8fdff359b389822d98d4def22'
 };
 
 const createTrezorWalletProps = {
@@ -55,7 +55,7 @@ const createScriptWalletProps = {
 const storedScriptWallet = {
   ...createScriptWalletProps,
   metadata: { friendlyName: 'Shared' },
-  walletId: Serialization.Script.fromCore(createScriptWalletProps.script).hash()
+  walletId: Serialization.Script.fromCore(createScriptWalletProps.script).hash().slice(32)
 };
 
 describe('WalletRepository', () => {
@@ -133,11 +133,11 @@ describe('WalletRepository', () => {
     });
 
     it('computes and returns WalletId for bip32 wallets', async () => {
-      await expect(repository.addWallet(createTrezorWalletProps)).resolves.toHaveLength(56);
+      await expect(repository.addWallet(createTrezorWalletProps)).resolves.toHaveLength(32);
     });
 
     it('computes and returns WalletId for script wallets', async () => {
-      await expect(repository.addWallet(createScriptWalletProps)).resolves.toHaveLength(56);
+      await expect(repository.addWallet(createScriptWalletProps)).resolves.toHaveLength(32);
     });
   });
 
