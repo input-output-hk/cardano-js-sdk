@@ -20,6 +20,7 @@ export interface HandleResolution {
   backgroundImage?: Asset.Uri;
   profilePic?: Asset.Uri;
   resolvedAt?: Point;
+  parentHandle?: Handle;
 }
 
 export interface ResolveHandlesArgs {

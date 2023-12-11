@@ -48,6 +48,7 @@ export class TypeOrmHandleProvider extends TypeormProvider implements HandleProv
           cardanoAddress,
           handle,
           hasDatum,
+          parentHandle,
           policyId,
           defaultForPaymentCredential,
           defaultForStakeCredential,
@@ -77,6 +78,7 @@ export class TypeOrmHandleProvider extends TypeormProvider implements HandleProv
           handle: handle!,
           hasDatum: !!hasDatum,
           image: nftMetadataEntity?.image,
+          parentHandle: parentHandle?.handle,
           policyId: policyId!,
           profilePic: handleMetadataEntity?.profilePicImage || undefined,
           resolvedAt

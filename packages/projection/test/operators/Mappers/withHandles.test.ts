@@ -2,6 +2,7 @@ import { Asset, Cardano } from '@cardano-sdk/core';
 import { Buffer } from 'buffer';
 import { Mappers, ProjectionEvent } from '../../../src';
 import {
+  NFTSubHandleOutput,
   assetIdFromHandle,
   bobAddress,
   bobHandleOne,
@@ -11,13 +12,31 @@ import {
   maryAddress,
   maryHandleOne,
   referenceNftOutput,
-  userNftOutput
+  subhandleAssetName,
+  userNftOutput,
+  virtualHandleAssetName,
+  virtualSubHandleOutput
 } from './handleUtil';
 import { firstValueFrom, of } from 'rxjs';
 import { logger, mockProviders } from '@cardano-sdk/util-dev';
-import { withCIP67, withHandles, withUtxo } from '../../../src/operators/Mappers';
+import { withCIP67, withHandles, withMint, withUtxo } from '../../../src/operators/Mappers';
 
 type In = Mappers.WithMint & Mappers.WithCIP67 & Mappers.WithNftMetadata;
+
+const project = (tx: Cardano.OnChainTx) =>
+  firstValueFrom(
+    of({
+      block: {
+        body: [tx],
+        header: mockProviders.ledgerTip
+      }
+    } as ProjectionEvent).pipe(
+      withUtxo(),
+      withMint(),
+      withCIP67(),
+      withHandles({ policyIds: [handlePolicyId] }, logger)
+    )
+  );
 
 describe('withHandles', () => {
   it('sets "datum" property on the handle if utxo has datum', async () => {
@@ -246,17 +265,6 @@ describe('withHandles', () => {
   });
 
   describe('cip68', () => {
-    // eslint-disable-next-line unicorn/consistent-function-scoping
-    const project = (tx: Cardano.OnChainTx) =>
-      firstValueFrom(
-        of({
-          block: {
-            body: [tx],
-            header: mockProviders.ledgerTip
-          }
-        } as ProjectionEvent).pipe(withUtxo(), withCIP67(), withHandles({ policyIds: [handlePolicyId] }, logger))
-      );
-
     it('does not change ownership when only reference token is present', async () => {
       const { handles } = await project({
         body: { outputs: [referenceNftOutput] },
@@ -286,6 +294,63 @@ describe('withHandles', () => {
       expect(handles).toHaveLength(1);
       expect(handles[0].handle).toBe(maryHandleOne);
       expect(handles[0].latestOwnerAddress).toBe(maryAddress);
+    });
+  });
+
+  describe('subhandles', () => {
+    it('adds parentHandle data for virtual subhandles', async () => {
+      const { handles } = await project({
+        body: { outputs: [virtualSubHandleOutput] },
+        inputSource: Cardano.InputSource.inputs
+      } as Cardano.OnChainTx);
+
+      expect(handles).toHaveLength(1);
+
+      expect(handles[0].latestOwnerAddress).toBe(
+        'addr_test1qpadxfxylvy8p8wejlmt9wnesr2squgr524r77n7hz6yh3h34r3hjynmsy2cxpc04a6dkqxcsr29qfl7v9cmrd5mm89qqh563f'
+      );
+      expect(handles[0].parentHandle).toBe('handl');
+      expect(handles[0].handle).toBe('virtual@handl');
+    });
+
+    it('adds parentHandle data for NFT subhandles', async () => {
+      const { handles } = await project({
+        body: { outputs: [NFTSubHandleOutput] },
+        inputSource: Cardano.InputSource.inputs
+      } as Cardano.OnChainTx);
+
+      expect(handles).toHaveLength(1);
+
+      expect(handles[0].parentHandle).toBe('handl');
+      expect(handles[0].handle).toBe('sub@handl');
+    });
+
+    it('includes a handle with "null" address, when transaction burns a subhandle', async () => {
+      const { handles } = await project({
+        body: {
+          mint: new Map([[Cardano.AssetId.fromParts(handlePolicyId, subhandleAssetName), -1n]]),
+          outputs: [] as Cardano.TxOut[]
+        },
+        inputSource: Cardano.InputSource.inputs
+      } as Cardano.OnChainTx);
+
+      expect(handles.length).toBe(1);
+      expect(handles[0].latestOwnerAddress).toBeNull();
+      expect(handles[0].handle).toBe('sub@handl');
+    });
+
+    it('includes a handle with "null" address, when transaction burns a virtualSubhandle', async () => {
+      const { handles } = await project({
+        body: {
+          mint: new Map([[Cardano.AssetId.fromParts(handlePolicyId, virtualHandleAssetName), -1n]]),
+          outputs: [] as Cardano.TxOut[]
+        },
+        inputSource: Cardano.InputSource.inputs
+      } as Cardano.OnChainTx);
+
+      expect(handles.length).toBe(1);
+      expect(handles[0].latestOwnerAddress).toBeNull();
+      expect(handles[0].handle).toBe('virtual@handl');
     });
   });
 });
