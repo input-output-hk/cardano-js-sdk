@@ -2,7 +2,7 @@ import { AddAccountProps, AddWalletProps, RemoveAccountProps, UpdateMetadataProp
 import { AnyWallet, ScriptWallet, WalletId, WalletType } from '../types';
 import { Bip32PublicKey, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { Logger } from 'ts-log';
-import { Observable, defer, firstValueFrom, map, shareReplay, switchMap } from 'rxjs';
+import { Observable, defer, firstValueFrom, map, shareReplay, switchMap, take } from 'rxjs';
 import { Serialization } from '@cardano-sdk/core';
 import { WalletConflictError } from '../errors';
 import { contextLogger } from '@cardano-sdk/util';
@@ -48,6 +48,14 @@ export class WalletRepository<AccountMetadata extends {}> implements WalletRepos
     this.wallets$ = defer(() => store.observeAll()).pipe(shareReplay(1));
   }
 
+  #getWallets() {
+    return this.wallets$.pipe(
+      // `setAll` makes the store.observeAll source emit
+      // so the pipes are triggered twice otherwise
+      take(1)
+    );
+  }
+
   async addWallet(props: AddWalletProps<AccountMetadata>): Promise<WalletId> {
     this.#logger.debug('addWallet', props.type);
     const walletId =
@@ -55,7 +63,7 @@ export class WalletRepository<AccountMetadata extends {}> implements WalletRepos
         ? Serialization.Script.fromCore(props.script).hash()
         : Hash28ByteBase16(await Bip32PublicKey.fromHex(props.extendedAccountPublicKey).hash());
     return firstValueFrom(
-      this.wallets$.pipe(
+      this.#getWallets().pipe(
         switchMap((wallets) => {
           if (wallets.some((wallet) => wallet.walletId === walletId)) {
             throw new WalletConflictError(`Wallet '${walletId}' already exists`);
@@ -90,7 +98,7 @@ export class WalletRepository<AccountMetadata extends {}> implements WalletRepos
     const { walletId, accountIndex, metadata } = props;
     this.#logger.debug('addAccount', walletId, accountIndex, metadata);
     return firstValueFrom(
-      this.wallets$.pipe(
+      this.#getWallets().pipe(
         switchMap((wallets) => {
           const walletIndex = wallets.findIndex((w) => w.walletId === walletId);
           if (walletIndex < 0) {
@@ -126,7 +134,7 @@ export class WalletRepository<AccountMetadata extends {}> implements WalletRepos
     const { walletId, accountIndex, metadata } = props;
     this.#logger.debug('updateMetadata', walletId, accountIndex, metadata);
     return firstValueFrom(
-      this.wallets$.pipe(
+      this.#getWallets().pipe(
         switchMap((wallets) => {
           if (typeof accountIndex !== 'undefined') {
             const bip32Account = findAccount(wallets, walletId, accountIndex);
@@ -165,7 +173,7 @@ export class WalletRepository<AccountMetadata extends {}> implements WalletRepos
     const { walletId, accountIndex } = props;
     this.#logger.debug('removeAccount', walletId, accountIndex);
     return firstValueFrom(
-      this.wallets$.pipe(
+      this.#getWallets().pipe(
         switchMap((wallets) => {
           const bip32Account = findAccount(wallets, walletId, accountIndex);
           if (!bip32Account) {
@@ -196,7 +204,8 @@ export class WalletRepository<AccountMetadata extends {}> implements WalletRepos
   removeWallet(walletId: WalletId): Promise<WalletId> {
     this.#logger.debug('removeWallet', walletId);
     return firstValueFrom(
-      this.wallets$.pipe(
+      this.#getWallets().pipe(
+        take(1),
         switchMap((wallets) => {
           const walletIndex = wallets.findIndex((w) => w.walletId === walletId);
           if (walletIndex < 0) {

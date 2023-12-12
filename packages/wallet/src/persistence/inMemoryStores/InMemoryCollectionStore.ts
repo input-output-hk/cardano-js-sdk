@@ -1,6 +1,6 @@
 /* eslint-disable brace-style */
 import { CollectionStore } from '../types';
-import { EMPTY, Observable, Subject, of } from 'rxjs';
+import { EMPTY, Observable, Subject, delay, of, tap } from 'rxjs';
 import { InMemoryStore } from './InMemoryStore';
 import { observeAll } from '../util';
 
@@ -22,8 +22,13 @@ export class InMemoryCollectionStore<T> extends InMemoryStore implements Collect
   setAll(docs: T[]): Observable<void> {
     if (!this.destroyed) {
       this.docs = docs;
-      this.#updates$.next(this.docs);
-      return of(void 0);
+      return of(void 0).pipe(
+        // if setAll is called on 1st emission of observeAll,
+        // then this has to be asynchronous for observeAll to emit the 2nd item.
+        // any delay duration is ok: it's enough that this is called in the next tick
+        delay(1),
+        tap(() => this.#updates$.next(this.docs))
+      );
     }
     return EMPTY;
   }
