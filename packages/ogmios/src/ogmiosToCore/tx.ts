@@ -122,13 +122,13 @@ const mapCertificate = (certificate: Schema.Certificate): Cardano.Certificate =>
     case 'constitutionalCommitteeHotKeyRegistration':
       // TODO: Conway rest of fields
       return {
-        __typename: Cardano.CertificateType.RegisterCcHotKey
-      };
+        __typename: Cardano.CertificateType.AuthorizeCommitteeHot
+      } as Cardano.AuthorizeCommitteeHotCertificate;
     case 'constitutionalCommitteeRetirement':
       // TODO: Conway rest of fields
       return {
-        __typename: Cardano.CertificateType.RetireCc
-      };
+        __typename: Cardano.CertificateType.ResignCommitteeCold
+      } as Cardano.ResignCommitteeColdCertificate;
     case 'delegateRepresentativeRegistration':
       return {
         __typename: Cardano.CertificateType.RegisterDelegateRepresentative,
