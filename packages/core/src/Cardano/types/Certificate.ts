@@ -27,9 +27,7 @@ export enum CertificateType {
   ResignCommitteeCold = 'ResignCommitteeColdCertificate',
   RegisterDelegateRepresentative = 'RegisterDelegateRepresentativeCertificate',
   UnregisterDelegateRepresentative = 'UnregisterDelegateRepresentativeCertificate',
-  UpdateDelegateRepresentative = 'UpdateDelegateRepresentativeCertificate',
-  RegisterCcHotKey = 'RegisterCcHotKeyCertificate',
-  RetireCc = 'RetireCcCertificate'
+  UpdateDelegateRepresentative = 'UpdateDelegateRepresentativeCertificate'
 }
 
 // Conway Certificates
@@ -108,14 +106,6 @@ export interface UpdateDelegateRepresentativeCertificate {
   anchor: Anchor | null;
 }
 
-export interface RegisterCcHotKeyCertificate {
-  __typename: CertificateType.RegisterCcHotKey;
-}
-
-export interface RetireCcCertificate {
-  __typename: CertificateType.RetireCc;
-}
-
 /** To be deprecated in the Era after conway replaced by <NewStakeAddressCertificate> */
 export interface StakeAddressCertificate {
   __typename: CertificateType.StakeRegistration | CertificateType.StakeDeregistration;
@@ -183,9 +173,7 @@ export type Certificate =
   | ResignCommitteeColdCertificate
   | RegisterDelegateRepresentativeCertificate
   | UnRegisterDelegateRepresentativeCertificate
-  | UpdateDelegateRepresentativeCertificate
-  | RegisterCcHotKeyCertificate
-  | RetireCcCertificate;
+  | UpdateDelegateRepresentativeCertificate;
 
 /**
  * Creates a stake key registration certificate from a given reward account.
