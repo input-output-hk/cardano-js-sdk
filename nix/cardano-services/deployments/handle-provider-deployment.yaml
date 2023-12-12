@@ -89,11 +89,6 @@ spec:
       imagePullSecrets:
         - name: dockerconfigjson
       volumes:
-        - csi:
-            driver: csi.cert-manager.io
-            readOnly: true
-            volumeAttributes:
-              csi.cert-manager.io/issuer-kind: ClusterIssuer
-              csi.cert-manager.io/issuer-name: root-ca
-              csi.cert-manager.io/key-usages: client auth
-          name: tls
+        - name: tls
+          secret:
+            secretName: postgresql-server-cert
