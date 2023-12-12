@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.16.0...@cardano-sdk/key-management@0.17.0) (2023-12-12)
+
+### ⚠ BREAKING CHANGES
+
+* replace authenticator 'origin' argument to 'sender'
+- hoist 'senderOrigin' util to dapp-connector package
+
+### Features
+
+* track cip30 method call origin & update Authenticator api ([75c8af6](https://github.com/input-output-hk/cardano-js-sdk/commit/75c8af6aecc0ddcaeca153e8a3693d6e18edf60e))
+
 ## [0.16.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.15.1...@cardano-sdk/key-management@0.16.0) (2023-12-07)
 
 ### ⚠ BREAKING CHANGES
