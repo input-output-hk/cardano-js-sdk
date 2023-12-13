@@ -45,9 +45,11 @@ describe('transactionCertificates', () => {
         } as Cardano.Certificate)
       ]
     ];
-    expect(isLastStakeKeyCertOfType(certificates, Cardano.CertificateType.StakeRegistration)).toBe(false);
-    expect(isLastStakeKeyCertOfType(certificates, Cardano.CertificateType.StakeRegistration, rewardAccount)).toBe(true);
-    expect(isLastStakeKeyCertOfType(certificates, Cardano.CertificateType.StakeDeregistration)).toBe(true);
+    expect(isLastStakeKeyCertOfType(certificates, [Cardano.CertificateType.StakeRegistration])).toBe(false);
+    expect(isLastStakeKeyCertOfType(certificates, [Cardano.CertificateType.StakeRegistration], rewardAccount)).toBe(
+      true
+    );
+    expect(isLastStakeKeyCertOfType(certificates, [Cardano.CertificateType.StakeDeregistration])).toBe(true);
   });
 
   test('outgoingTransactionsWithCertificates', () => {
