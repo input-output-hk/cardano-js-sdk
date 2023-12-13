@@ -1,6 +1,7 @@
 import { Asset, Cardano, Handle } from '@cardano-sdk/core';
 import { CIP67Asset, CIP67Assets, WithCIP67 } from './withCIP67';
 import { FilterByPolicyIds } from './types';
+import { HexBlob } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { ProjectionOperator } from '../../types';
 import { assetNameToUTF8Handle } from './util';
@@ -19,6 +20,7 @@ export interface HandleOwnership {
   assetId: Cardano.AssetId;
   policyId: Cardano.PolicyId;
   datum?: Cardano.PlutusData;
+  parentHandle?: Handle;
 }
 
 export interface WithHandles {
@@ -27,13 +29,46 @@ export interface WithHandles {
 
 const assetIdToUTF8Handle = (assetId: Cardano.AssetId, cip67Asset: CIP67Asset | undefined) => {
   if (cip67Asset) {
-    if (cip67Asset.decoded.label === Asset.AssetNameLabelNum.UserNFT) {
+    if (
+      cip67Asset.decoded.label === Asset.AssetNameLabelNum.UserNFT ||
+      cip67Asset.decoded.label === Asset.AssetNameLabelNum.VirtualHandle
+    ) {
       return Cardano.AssetName.toUTF8(cip67Asset.decoded.content);
     }
     // Ignore all but UserNFT cip67 assets
     return null;
   }
   return assetNameToUTF8Handle(Cardano.AssetId.getAssetName(assetId));
+};
+
+const getHandleMetadata = (handleDataFields: Cardano.PlutusList, logger: Logger) => {
+  const data = handleDataFields.items[2];
+
+  if (Cardano.util.isPlutusMap(data)) {
+    return Cardano.util.tryConvertPlutusMapToUtf8Record(data, logger);
+  }
+};
+
+const getVirtualSubhandleOwnerAddress = (datum: HandleOwnership['datum'], logger: Logger) => {
+  if (datum && Cardano.util.isConstrPlutusData(datum)) {
+    const resolvedAddressEntry = getHandleMetadata(datum.fields, logger);
+
+    if (
+      resolvedAddressEntry?.resolved_addresses &&
+      Cardano.util.isPlutusMap(resolvedAddressEntry?.resolved_addresses)
+    ) {
+      const decodedResolvedAddresses = Cardano.util.tryConvertPlutusMapToUtf8Record(
+        resolvedAddressEntry.resolved_addresses,
+        logger
+      );
+
+      if (Cardano.util.isPlutusBoundedBytes(decodedResolvedAddresses.ada)) {
+        return Cardano.PaymentAddress(
+          Cardano.Address.fromBytes(HexBlob.fromBytes(decodedResolvedAddresses.ada)).toBech32()
+        );
+      }
+    }
+  }
 };
 
 const tryCreateHandleOwnership = (
@@ -47,14 +82,26 @@ const tryCreateHandleOwnership = (
   if (!policyIds.includes(policyId)) return;
   try {
     const cip67Asset = cip67Assets.byAssetId[assetId];
+
     const handle = assetIdToUTF8Handle(assetId, cip67Asset);
+    const subhandleProps: Partial<HandleOwnership> = {};
     if (handle) {
+      if (handle.includes('@')) {
+        subhandleProps.parentHandle = handle.split('@')[1];
+
+        if (cip67Asset?.decoded.label === Asset.AssetNameLabelNum.VirtualHandle) {
+          const virtualSubhandleOwnerAddress = getVirtualSubhandleOwnerAddress(txOut?.datum, logger);
+          subhandleProps.latestOwnerAddress = virtualSubhandleOwnerAddress || null;
+        }
+      }
+
       return {
         assetId,
         datum: txOut?.datum,
         handle,
         latestOwnerAddress: txOut?.address || null,
-        policyId
+        policyId,
+        ...subhandleProps
       };
     }
   } catch (error: unknown) {
@@ -117,6 +164,7 @@ export const withHandles =
           }),
           {} as Record<string, HandleOwnership>
         );
+
         return {
           ...evt,
           handles: [...Object.values(handleMap)]
