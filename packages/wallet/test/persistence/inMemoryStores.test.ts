@@ -18,7 +18,7 @@ import {
   InMemoryUtxoStore
 } from '../../src/persistence';
 import { assertCompletesWithoutEmitting } from './util';
-import { firstValueFrom, share, take, toArray } from 'rxjs';
+import { firstValueFrom, mergeMap, share, shareReplay, take, toArray } from 'rxjs';
 
 describe('inMemoryStores', () => {
   describe('InMemoryDocumentStore', () => {
@@ -74,6 +74,12 @@ describe('inMemoryStores', () => {
         await firstEmission;
         await firstValueFrom(store.setAll(updatedDocs));
         await expect(twoEmissions).resolves.toEqual([docs, updatedDocs]);
+      });
+      it('observeAll followed by immediate setAll does not skip 2nd emission', async () => {
+        const store = new InMemoryCollectionStore();
+        const items$ = store.observeAll().pipe(shareReplay(1));
+        await firstValueFrom(items$.pipe(mergeMap(() => store.setAll(docs))));
+        await expect(firstValueFrom(items$)).resolves.toEqual(docs);
       });
     });
   });
