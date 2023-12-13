@@ -357,12 +357,19 @@ describe('PersonalWallet load', () => {
     const stores = createInMemoryWalletStores();
     const rewardsProvider = mocks.mockRewardsProvider();
     const networkInfoProvider = mocks.mockNetworkInfoProvider();
+
+    let resolver: (() => void) | undefined;
+
     // Call to ledgerTip() has to return a different value every time,
     // or else wallet won't fetch any other data from the rest of the providers
-    networkInfoProvider.ledgerTip.mockImplementationOnce(
+    networkInfoProvider.ledgerTip.mockImplementation(
       (() => {
         let numCall = 0;
         return async (): Promise<Cardano.Tip> => {
+          if (resolver) {
+            resolver();
+            resolver = undefined;
+          }
           const blockNo = ++numCall;
           return {
             blockNo: Cardano.BlockNo(blockNo),
@@ -405,9 +412,10 @@ describe('PersonalWallet load', () => {
     expect(networkInfoProvider.ledgerTip).toHaveBeenCalledTimes(1);
 
     // settling from ledgerTip call that was triggered by connectionStatusTracker$.next(ConnectionStatus.up);
+    const promise = new Promise<void>((resolve) => (resolver = resolve));
     await waitForWalletStateSettle(wallet);
     // max interval should start here
-    await delay(ONCE_SETTLED_FETCH_AFTER + 1);
+    await promise;
     expect(networkInfoProvider.ledgerTip).toHaveBeenCalledTimes(2);
 
     // since we changed ledgerTip implementation to never resolve, wallet shouldn't get settled again
@@ -416,7 +424,7 @@ describe('PersonalWallet load', () => {
     // Don't need to add ONCE_SETTLED_FETCH_AFTER + 1
     // because it's already awaited in a delay above.
     // Failed once without "+ 1"
-    await delay(AUTO_TRIGGER_AFTER + 1);
+    await new Promise<void>((resolve) => (resolver = resolve));
     expect(networkInfoProvider.ledgerTip).toHaveBeenCalledTimes(3);
 
     // Auto interval tip$ trigger no longer works once offline
