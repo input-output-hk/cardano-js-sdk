@@ -349,6 +349,9 @@ describe('cip30', () => {
               amount: 5_000_000n,
               utxos: sortedUtxosWithLowCoins
             },
+            sender: {
+              url: 'https://lace.io'
+            },
             type: 'get_collateral'
           });
 
@@ -362,6 +365,9 @@ describe('cip30', () => {
             data: {
               amount: 5_000_000n,
               utxos: sortedUtxosWithLowCoins
+            },
+            sender: {
+              url: 'https://lace.io'
             },
             type: 'get_collateral'
           });
