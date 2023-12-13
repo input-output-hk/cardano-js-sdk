@@ -35,7 +35,6 @@ jest.mock('@cardano-sdk/util-rxjs', () => {
   };
 });
 
-
 describe('RewardAccounts', () => {
   const coldObservableProviderMock = coldObservableProvider as jest.MockedFunction<typeof coldObservableProvider>;
   const txId1 = Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000');
@@ -89,22 +88,23 @@ describe('RewardAccounts', () => {
     expect(store.getValues).toHaveBeenCalledWith([poolId1, poolId2]);
   });
 
-  test('getStakePoolIdAtEpoch ', () => {
+  test('getStakePoolIdAtEpoch', () => {
     const transactions = [
       {
         certificates: [{ __typename: Cardano.CertificateType.StakeRegistration } as Cardano.StakeAddressCertificate],
         epoch: Cardano.EpochNo(100)
       },
       {
-        certificates: [{
-          __typename: Cardano.CertificateType.StakeDelegation, poolId: poolId1
-        } as Cardano.StakeDelegationCertificate],
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.StakeDelegation,
+            poolId: poolId1
+          } as Cardano.StakeDelegationCertificate
+        ],
         epoch: Cardano.EpochNo(101)
       },
       {
-        certificates: [
-          { __typename: Cardano.CertificateType.StakeDeregistration } as Cardano.StakeAddressCertificate
-        ],
+        certificates: [{ __typename: Cardano.CertificateType.StakeDeregistration } as Cardano.StakeAddressCertificate],
         epoch: Cardano.EpochNo(102)
       },
       {
@@ -121,7 +121,107 @@ describe('RewardAccounts', () => {
     expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(106))).toBeUndefined();
   });
 
-  test('addressKeyStatuses ', () => {
+  test('getStakePoolIdAtEpoch Conway era', () => {
+    const transactions = [
+      {
+        certificates: [{ __typename: Cardano.CertificateType.Registration } as Cardano.NewStakeAddressCertificate],
+        epoch: Cardano.EpochNo(100)
+      },
+      {
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.StakeDelegation,
+            poolId: poolId1
+          } as Cardano.StakeDelegationCertificate
+        ],
+        epoch: Cardano.EpochNo(101)
+      },
+      // Unregister stake key
+      // Register stake key with vote_reg_deleg_cert
+      // Delegate to pool with stake_vote_deleg_cert
+      {
+        certificates: [{ __typename: Cardano.CertificateType.Unregistration } as Cardano.NewStakeAddressCertificate],
+        epoch: Cardano.EpochNo(102)
+      },
+      {
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.VoteRegistrationDelegation
+          } as Cardano.VoteRegistrationDelegationCertificate],
+        epoch: Cardano.EpochNo(103)
+      },
+      {
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.StakeVoteDelegation,
+            poolId: poolId2
+          } as Cardano.StakeVoteDelegationCertificate
+        ],
+        epoch: Cardano.EpochNo(104)
+      },
+      // Unregister stake key
+      // Register stake key and delegate with stake_reg_deleg_cert
+      {
+        certificates: [{ __typename: Cardano.CertificateType.Unregistration } as Cardano.NewStakeAddressCertificate],
+        epoch: Cardano.EpochNo(105)
+      },
+      {
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.StakeRegistrationDelegation,
+            poolId: poolId1
+          } as Cardano.StakeRegistrationDelegationCertificate],
+        epoch: Cardano.EpochNo(106)
+      },
+      // Unregister stake key
+      // Register stake key and delegate with stake_vote_reg_deleg_cert
+      {
+        certificates: [{ __typename: Cardano.CertificateType.Unregistration } as Cardano.NewStakeAddressCertificate],
+        epoch: Cardano.EpochNo(107)
+      },
+      {
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
+            poolId: poolId2
+          } as Cardano.StakeVoteRegistrationDelegationCertificate],
+        epoch: Cardano.EpochNo(108)
+      },
+      // Delegation ignored after stake key is unregistered
+      {
+        certificates: [{ __typename: Cardano.CertificateType.Unregistration } as Cardano.NewStakeAddressCertificate],
+        epoch: Cardano.EpochNo(109)
+      },
+      {
+        certificates: [
+          { __typename: Cardano.CertificateType.StakeDelegation, poolId: poolId1 } as Cardano.StakeDelegationCertificate
+        ],
+        epoch: Cardano.EpochNo(110)
+      }
+    ];
+    expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(102))).toBeUndefined();
+    expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(103))).toBeUndefined();
+    // PoolId is available 3 epochs after delegation
+    expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(104))).toBe(poolId1);
+    expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(105))).toBeUndefined();
+    // Stake key is registered and delegated using VoteRegistrationDelegationCertificate and StakeVoteDelegation
+    expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(107))).toBe(poolId2);
+    // Stake key is registered and delegated using StakeRegistrationDelegationCertificate
+    expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(109))).toBe(poolId1);
+    // Stake key is registered and delegated using StakeVoteRegistrationDelegationCertificate
+    expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(111))).toBe(poolId2);
+    // New delegation has no effect due to stake key being unregistered
+    expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(112))).toBeUndefined();
+    expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(113))).toBeUndefined();
+  });
+
+  test.each([
+    Cardano.CertificateType.Registration,
+    Cardano.CertificateType.StakeRegistration,
+    Cardano.CertificateType.StakeRegistrationDelegation,
+    Cardano.CertificateType.StakeVoteRegistrationDelegation,
+    Cardano.CertificateType.VoteRegistrationDelegation
+  ])('addressKeyStatuses %p', (registrationCertType) => {
     createTestScheduler().run(({ cold, expectObservable }) => {
       const rewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
       const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
@@ -131,13 +231,16 @@ describe('RewardAccounts', () => {
           {
             tx: {
               body: {
-                certificates: [{
-                  __typename: Cardano.CertificateType.StakeRegistration,
-                  stakeCredential: {
-                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
-                    type: Cardano.CredentialType.KeyHash
+                certificates: [
+                  {
+                    __typename: registrationCertType,
+                    deposit: 0n,
+                    stakeCredential: {
+                      hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+                      type: Cardano.CredentialType.KeyHash
+                    }
                   }
-                }]
+                ]
               }
             }
           } as TxWithEpoch
@@ -146,26 +249,32 @@ describe('RewardAccounts', () => {
           {
             tx: {
               body: {
-                certificates: [{
-                  __typename: Cardano.CertificateType.StakeRegistration,
-                  stakeCredential: {
-                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
-                    type: Cardano.CredentialType.KeyHash
+                certificates: [
+                  {
+                    __typename: registrationCertType,
+                    deposit: 0n,
+                    stakeCredential: {
+                      hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+                      type: Cardano.CredentialType.KeyHash
+                    }
                   }
-                }]
+                ]
               }
             }
           } as TxWithEpoch,
           {
             tx: {
               body: {
-                certificates: [{
-                  __typename: Cardano.CertificateType.StakeDeregistration,
-                  stakeCredential: {
-                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
-                    type: Cardano.CredentialType.KeyHash
+                certificates: [
+                  {
+                    __typename: Cardano.CertificateType.Unregistration,
+                    deposit: 0n,
+                    stakeCredential: {
+                      hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+                      type: Cardano.CredentialType.KeyHash
+                    }
                   }
-                }]
+                ]
               }
             }
           } as TxWithEpoch
@@ -176,11 +285,16 @@ describe('RewardAccounts', () => {
         b: [
           {
             body: {
-              certificates: [{ __typename: Cardano.CertificateType.StakeRegistration,
-                stakeCredential: {
-                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
-                  type: Cardano.CredentialType.KeyHash
-                } }]
+              certificates: [
+                {
+                  __typename: registrationCertType,
+                  deposit: 0n,
+                  stakeCredential: {
+                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+                    type: Cardano.CredentialType.KeyHash
+                  }
+                }
+              ]
             } as Cardano.TxBody,
             cbor: dummyCbor,
             id: txId1
@@ -189,11 +303,16 @@ describe('RewardAccounts', () => {
         c: [
           {
             body: {
-              certificates: [{ __typename: Cardano.CertificateType.StakeDeregistration,
-                stakeCredential: {
-                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
-                  type: Cardano.CredentialType.KeyHash
-                } }]
+              certificates: [
+                {
+                  __typename: Cardano.CertificateType.Unregistration,
+                  deposit: 0n,
+                  stakeCredential: {
+                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+                    type: Cardano.CredentialType.KeyHash
+                  }
+                }
+              ]
             } as Cardano.TxBody,
             cbor: dummyCbor,
             id: txId2
@@ -224,20 +343,26 @@ describe('RewardAccounts', () => {
         // even if more (unrelated) transactions get discovered on-chain
         const transactionsInFlight$ = hot<TxInFlight[]>('a-b--a--b-aaa', {
           a: [],
-          b: [{
-            body: {
-              withdrawals: [{
-                quantity: acc1PendingWithdrawalQty, stakeAddress: twoRewardAccounts[0]
-              } as Cardano.Withdrawal]
-            } as Cardano.TxBody,
-            cbor: dummyCbor,
-            id: txId1
-          }]
+          b: [
+            {
+              body: {
+                withdrawals: [
+                  {
+                    quantity: acc1PendingWithdrawalQty,
+                    stakeAddress: twoRewardAccounts[0]
+                  } as Cardano.Withdrawal
+                ]
+              } as Cardano.TxBody,
+              cbor: dummyCbor,
+              id: txId1
+            }
+          ]
         });
-        const rewardsProvider = () => hot('-a--b-a--b---a', {
-          a: [acc1Balance1, acc2Balance],
-          b: [acc1Balance2, acc2Balance]
-        });
+        const rewardsProvider = () =>
+          hot('-a--b-a--b---a', {
+            a: [acc1Balance1, acc2Balance],
+            b: [acc1Balance2, acc2Balance]
+          });
         const balancesStore = {
           getValues(_: Cardano.RewardAccount[]) {
             return cold('(a|)', { a: storedBalances }) as Observable<bigint[]>;
@@ -247,7 +372,10 @@ describe('RewardAccounts', () => {
           }
         } as KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>;
         const addressRewards$ = addressRewards(
-          twoRewardAccounts, transactionsInFlight$, rewardsProvider, balancesStore
+          twoRewardAccounts,
+          transactionsInFlight$,
+          rewardsProvider,
+          balancesStore
         );
         expectObservable(addressRewards$).toBe('abc-d-b-cd---b', {
           a: storedBalances,
@@ -266,15 +394,20 @@ describe('RewardAccounts', () => {
         const acc1PendingWithdrawalQty = 1_000_000n;
         const transactionsInFlightEmits: Record<string, TxInFlight[]> = {
           x: [],
-          y: [{
-            body: {
-              withdrawals: [{
-                quantity: acc1PendingWithdrawalQty, stakeAddress: twoRewardAccounts[0]
-              } as Cardano.Withdrawal]
-            } as Cardano.TxBody,
-            cbor: dummyCbor,
-            id: txId1
-          }]
+          y: [
+            {
+              body: {
+                withdrawals: [
+                  {
+                    quantity: acc1PendingWithdrawalQty,
+                    stakeAddress: twoRewardAccounts[0]
+                  } as Cardano.Withdrawal
+                ]
+              } as Cardano.TxBody,
+              cbor: dummyCbor,
+              id: txId1
+            }
+          ]
         };
         const rewardsProviderEmits = {
           a: [accBalance1],
@@ -294,7 +427,10 @@ describe('RewardAccounts', () => {
           }
         } as KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>;
         const addressRewards$ = addressRewards(
-          twoRewardAccounts, transactionsInFlight$, rewardsProvider, balancesStore
+          twoRewardAccounts,
+          transactionsInFlight$,
+          rewardsProvider,
+          balancesStore
         );
         expectObservable(addressRewards$).toBe(expectedFrames, {
           m: [accBalance1 - acc1PendingWithdrawalQty],
@@ -305,17 +441,18 @@ describe('RewardAccounts', () => {
     });
   });
 
-
   describe('fetchRewardsTrigger$', () => {
     it('emits every epoch and after making a transaction with withdrawals', () => {
       const rewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
       createTestScheduler().run(({ cold, expectObservable }) => {
         const onChainTx1: OutgoingOnChainTx = {
           body: {
-            withdrawals: [{
-              quantity: 3n,
-              stakeAddress: Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d')
-            }]
+            withdrawals: [
+              {
+                quantity: 3n,
+                stakeAddress: Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d')
+              }
+            ]
           } as Cardano.TxBody,
           cbor: dummyCbor,
           id: txId1,
@@ -327,14 +464,16 @@ describe('RewardAccounts', () => {
           id: txId2,
           slot: Cardano.Slot(2)
         };
-        const epoch$ = cold(      'a-b--', { a: Cardano.EpochNo(100), b: Cardano.EpochNo(101) });
+        const epoch$ = cold('a-b--', { a: Cardano.EpochNo(100), b: Cardano.EpochNo(101) });
         const txConfirmed$ = cold('-a--b', {
           a: onChainTx1,
           b: onChainTx2
         });
         const target$ = fetchRewardsTrigger$(epoch$, txConfirmed$, rewardAccount);
         expectObservable(target$).toBe('a-b-c', {
-          a: 100, b: 101, c: 5n
+          a: 100,
+          b: 101,
+          c: 5n
         });
       });
     });
@@ -359,12 +498,7 @@ describe('RewardAccounts', () => {
             a: 3n
           })
         );
-      const target$ = createRewardsProvider(
-        epoch$,
-        onChainTx$,
-        rewardsProvider,
-        config
-      )(twoRewardAccounts);
+      const target$ = createRewardsProvider(epoch$, onChainTx$, rewardsProvider, config)(twoRewardAccounts);
       expectObservable(target$).toBe('-ab-c', {
         a: [0n, 3n],
         b: [5n, 3n],
@@ -378,7 +512,7 @@ describe('RewardAccounts', () => {
   describe('createDelegateeTracker', () => {
     it('queries and maps stake pools for epoch, epoch+1 and epoch+2', () => {
       createTestScheduler().run(({ cold, expectObservable, flush }) => {
-        const epoch =  Cardano.EpochNo(currentEpoch.number);
+        const epoch = Cardano.EpochNo(currentEpoch.number);
         const epoch$ = cold('-a', { a: epoch });
         const stakePoolQueryResult = [{ id: poolId1 }, { id: poolId2 }];
         const stakePoolProvider = jest.fn().mockReturnValue(cold('-a', { a: stakePoolQueryResult }));

@@ -48,7 +48,7 @@ const firstDelegationEpoch$ = (transactions$: Observable<TxWithEpoch[]>, rewardA
     map((transactions) =>
       first(
         transactions.filter(
-          ({ tx }) => getCertificatesByType(tx, rewardAccounts, [Cardano.CertificateType.StakeDelegation]).length > 0
+          ({ tx }) => getCertificatesByType(tx, rewardAccounts, Cardano.StakeDelegationCertificateTypes).length > 0
         )
       )
     ),
