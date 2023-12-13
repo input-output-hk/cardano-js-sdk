@@ -21,13 +21,25 @@ import {
   WithdrawalModel
 } from './types';
 import { Cardano } from '@cardano-sdk/core';
-import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { Hash28ByteBase16, Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import {
+  isAuthorizeCommitteeHotCertModel,
+  // isAuthorizeCommitteeHotCertModel,
   isDelegationCertModel,
+  isDrepRegistrationCertModel,
+  isDrepUnregistrationCertModel,
   isMirCertModel,
   isPoolRegisterCertModel,
   isPoolRetireCertModel,
-  isStakeCertModel
+  isResignCommitteeColdCertModel,
+  // isResignCommitteeColdCertModel,
+  isStakeCertModel,
+  isStakeRegistrationDelegationCertModel,
+  isStakeVoteDelegationCertModel,
+  isStakeVoteRegistrationDelegationCertModel,
+  isUpdateDrepCertModel,
+  isVoteDelegationCertModel,
+  isVoteRegistrationDelegationCertModel
 } from './util';
 
 const addMultiAssetToTokenMap = (multiAsset: MultiAssetModel, tokenMap: Cardano.TokenMap): Cardano.TokenMap => {
@@ -115,8 +127,20 @@ export const mapRedeemer = (redeemerModel: RedeemerModel): Cardano.Redeemer => (
   purpose: redeemerModel.purpose as Cardano.RedeemerPurpose
 });
 
+export const mapAnchor = (anchorUrl: string, anchorDataHash: string): Cardano.Anchor | null => {
+  if (!!anchorUrl && !!anchorDataHash) {
+    return {
+      dataHash: anchorDataHash as Hash32ByteBase16,
+      url: anchorUrl
+    };
+  }
+  return null;
+};
+
+// eslint-disable-next-line complexity
 export const mapCertificate = (
   certModel: WithCertType<CertificateModel>
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): WithCertIndex<Cardano.Certificate> | null => {
   if (isPoolRetireCertModel(certModel))
     return {
@@ -148,16 +172,17 @@ export const mapCertificate = (
   if (isStakeCertModel(certModel))
     return {
       __typename: certModel.registration
-        ? Cardano.CertificateType.StakeRegistration
-        : Cardano.CertificateType.StakeDeregistration,
+        ? Cardano.CertificateType.Registration
+        : Cardano.CertificateType.Unregistration,
       cert_index: certModel.cert_index,
+      deposit: BigInt(certModel.deposit),
       stakeCredential: {
         hash: Cardano.RewardAccount.toHash(
           Cardano.RewardAccount(certModel.address)
         ) as unknown as Crypto.Hash28ByteBase16,
         type: Cardano.CredentialType.KeyHash
       }
-    } as WithCertIndex<Cardano.StakeAddressCertificate>;
+    } as WithCertIndex<Cardano.NewStakeAddressCertificate>;
 
   if (isDelegationCertModel(certModel))
     return {
@@ -171,6 +196,147 @@ export const mapCertificate = (
         type: Cardano.CredentialType.KeyHash
       }
     } as WithCertIndex<Cardano.StakeDelegationCertificate>;
+
+  if (isDrepRegistrationCertModel(certModel))
+    return {
+      __typename: Cardano.CertificateType.RegisterDelegateRepresentative,
+      anchor: mapAnchor(certModel.url, certModel.data_hash),
+      cert_index: certModel.cert_index,
+      dRepCredential: {
+        hash: certModel.drep_hash as Hash28ByteBase16,
+        type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
+      },
+      deposit: BigInt(certModel.deposit)
+    };
+
+  if (isDrepUnregistrationCertModel(certModel))
+    return {
+      __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
+      cert_index: certModel.cert_index,
+      dRepCredential: {
+        hash: certModel.drep_hash as Hash28ByteBase16,
+        type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
+      },
+      deposit: BigInt(certModel.deposit)
+    };
+
+  if (isUpdateDrepCertModel(certModel))
+    return {
+      __typename: Cardano.CertificateType.UpdateDelegateRepresentative,
+      anchor: mapAnchor(certModel.url, certModel.data_hash),
+      cert_index: certModel.cert_index,
+      dRepCredential: {
+        hash: certModel.drep_hash as Hash28ByteBase16,
+        type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
+      }
+    };
+
+  if (isVoteDelegationCertModel(certModel))
+    return {
+      __typename: Cardano.CertificateType.VoteDelegation,
+      cert_index: certModel.cert_index,
+      dRep: {
+        hash: certModel.drep_hash as Hash28ByteBase16,
+        type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
+      },
+      stakeCredential: {
+        hash: Cardano.RewardAccount.toHash(
+          Cardano.RewardAccount(certModel.address)
+        ) as unknown as Crypto.Hash28ByteBase16,
+        type: Cardano.CredentialType.KeyHash
+      }
+    };
+
+  if (isVoteRegistrationDelegationCertModel(certModel))
+    return {
+      __typename: Cardano.CertificateType.VoteRegistrationDelegation,
+      cert_index: certModel.cert_index,
+      dRep: {
+        hash: certModel.drep_hash as Hash28ByteBase16,
+        type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
+      },
+      deposit: BigInt(certModel.deposit),
+      stakeCredential: {
+        hash: Cardano.RewardAccount.toHash(
+          Cardano.RewardAccount(certModel.address)
+        ) as unknown as Crypto.Hash28ByteBase16,
+        type: Cardano.CredentialType.KeyHash
+      }
+    };
+
+  if (isStakeVoteDelegationCertModel(certModel))
+    return {
+      __typename: Cardano.CertificateType.StakeVoteDelegation,
+      cert_index: certModel.cert_index,
+      dRep: {
+        hash: certModel.drep_hash as Hash28ByteBase16,
+        type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
+      },
+      poolId: certModel.pool_id as unknown as Cardano.PoolId,
+      stakeCredential: {
+        hash: Cardano.RewardAccount.toHash(
+          Cardano.RewardAccount(certModel.address)
+        ) as unknown as Crypto.Hash28ByteBase16,
+        type: Cardano.CredentialType.KeyHash
+      }
+    };
+
+  if (isStakeRegistrationDelegationCertModel(certModel))
+    return {
+      __typename: Cardano.CertificateType.StakeRegistrationDelegation,
+      cert_index: certModel.cert_index,
+      deposit: BigInt(certModel.deposit),
+      poolId: certModel.pool_id as unknown as Cardano.PoolId,
+      stakeCredential: {
+        hash: Cardano.RewardAccount.toHash(
+          Cardano.RewardAccount(certModel.address)
+        ) as unknown as Crypto.Hash28ByteBase16,
+        type: Cardano.CredentialType.KeyHash
+      }
+    };
+
+  if (isStakeVoteRegistrationDelegationCertModel(certModel))
+    return {
+      __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
+      cert_index: certModel.cert_index,
+      dRep: {
+        hash: certModel.drep_hash as Hash28ByteBase16,
+        type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
+      },
+      deposit: BigInt(certModel.deposit),
+      poolId: certModel.pool_id as unknown as Cardano.PoolId,
+      stakeCredential: {
+        hash: Cardano.RewardAccount.toHash(
+          Cardano.RewardAccount(certModel.address)
+        ) as unknown as Crypto.Hash28ByteBase16,
+        type: Cardano.CredentialType.KeyHash
+      }
+    };
+
+  if (isAuthorizeCommitteeHotCertModel(certModel))
+    return {
+      __typename: Cardano.CertificateType.AuthorizeCommitteeHot,
+      cert_index: certModel.cert_index,
+      coldCredential: {
+        hash: certModel.cold_key.toString('hex') as unknown as Crypto.Hash28ByteBase16,
+        type: Cardano.CredentialType.KeyHash
+      },
+      hotCredential: {
+        hash: certModel.hot_key.toString('hex') as unknown as Crypto.Hash28ByteBase16,
+        type: Cardano.CredentialType.KeyHash
+      }
+    };
+
+  if (isResignCommitteeColdCertModel(certModel))
+    return {
+      __typename: Cardano.CertificateType.ResignCommitteeCold,
+      anchor: mapAnchor(certModel.url, certModel.data_hash),
+      cert_index: certModel.cert_index,
+      coldCredential: {
+        hash: certModel.cold_key.toString('hex') as unknown as Crypto.Hash28ByteBase16,
+        type: Cardano.CredentialType.KeyHash
+      }
+    };
 
   return null;
 };

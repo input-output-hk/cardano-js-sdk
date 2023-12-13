@@ -108,7 +108,24 @@ export interface CertificateModel {
 }
 export type WithCertIndex<T extends Cardano.Certificate> = T & { cert_index: number };
 export type WithCertType<T extends CertificateModel> = T & {
-  type: 'retire' | 'register' | 'mir' | 'stake' | 'delegation';
+  type:
+    | 'retire'
+    | 'register'
+    | 'mir'
+    | 'stake'
+    | 'delegation'
+    | 'registration'
+    | 'unregistration'
+    | 'voteDelegation'
+    | 'stakeVoteDelegation'
+    | 'stakeRegistrationDelegation'
+    | 'voteRegistrationDelegation'
+    | 'stakeVoteRegistrationDelegation'
+    | 'registerDrep'
+    | 'unregisterDrep'
+    | 'updateDrep'
+    | 'authorizeCommitteeHot'
+    | 'resignCommitteeCold';
 };
 
 export interface PoolRetireCertModel extends CertificateModel {
@@ -124,14 +141,46 @@ export interface MirCertModel extends CertificateModel {
   pot: 'reserve' | 'treasury';
   address: string;
 }
+
 export interface StakeCertModel extends CertificateModel {
   address: string;
+  deposit: string;
   registration: boolean;
 }
 
 export interface DelegationCertModel extends CertificateModel {
   address: string;
   pool_id: string;
+}
+
+export interface DrepCertModel extends CertificateModel {
+  has_script: boolean;
+  drep_hash: string;
+  url: string;
+  data_hash: string;
+  deposit: string;
+}
+
+export interface VoteDelegationCertModel extends CertificateModel {
+  has_script: boolean;
+  drep_hash: string;
+  address: string;
+}
+
+export type StakeVoteDelegationCertModel = DelegationCertModel & VoteDelegationCertModel;
+export type StakeRegistrationDelegationCertModel = StakeCertModel & DelegationCertModel;
+export type VoteRegistrationDelegationCertModel = StakeCertModel & VoteDelegationCertModel;
+export type StakeVoteRegistrationDelegationCertModel = StakeCertModel & DelegationCertModel & VoteDelegationCertModel;
+
+export interface AuthorizeCommitteeHotCertModel extends CertificateModel {
+  cold_key: Buffer;
+  hot_key: Buffer;
+}
+
+export interface ResignCommitteeColdCertModel extends CertificateModel {
+  cold_key: Buffer;
+  url: string;
+  data_hash: string;
 }
 
 export interface TxIdModel {

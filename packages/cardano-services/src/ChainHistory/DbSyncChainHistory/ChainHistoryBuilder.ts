@@ -1,14 +1,19 @@
 import * as Queries from './queries';
-import { Cardano } from '@cardano-sdk/core';
 import {
+  AuthorizeCommitteeHotCertModel,
   CertificateModel,
   DelegationCertModel,
+  DrepCertModel,
   MirCertModel,
   MultiAssetModel,
   PoolRegisterCertModel,
   PoolRetireCertModel,
   RedeemerModel,
+  ResignCommitteeColdCertModel,
   StakeCertModel,
+  StakeRegistrationDelegationCertModel,
+  StakeVoteDelegationCertModel,
+  StakeVoteRegistrationDelegationCertModel,
   TransactionDataMap,
   TxIdModel,
   TxInput,
@@ -18,14 +23,18 @@ import {
   TxOutput,
   TxOutputModel,
   TxTokenMap,
+  VoteDelegationCertModel,
+  VoteRegistrationDelegationCertModel,
   WithCertIndex,
   WithCertType,
   WithdrawalModel
 } from './types';
+import { Cardano } from '@cardano-sdk/core';
 import { DB_MAX_SAFE_INTEGER, findTxsByAddresses } from './queries';
 import { Logger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
 import { Range, hexStringToBuffer } from '@cardano-sdk/util';
+import { extractCompoundCertificates } from './util';
 import {
   mapCertificate,
   mapRedeemer,
@@ -137,39 +146,131 @@ export class ChainHistoryBuilder {
 
   public async queryCertificatesByIds(ids: string[]): Promise<TransactionDataMap<Cardano.Certificate[]>> {
     this.#logger.debug('About to find certificates for transactions with ids:', ids);
-    const poolRetireCerts: QueryResult<PoolRetireCertModel> = await this.#db.query({
-      name: 'pool_retire_certs_by_tx_ids',
-      text: Queries.findPoolRetireCertsTxIds,
-      values: [ids]
-    });
-    const poolRegisterCerts: QueryResult<PoolRegisterCertModel> = await this.#db.query({
-      name: 'pool_registration_certs_by_tx_ids',
-      text: Queries.findPoolRegisterCertsByTxIds,
-      values: [ids]
-    });
-    const mirCerts: QueryResult<MirCertModel> = await this.#db.query({
-      name: 'pool_mir_certs_by_tx_ids',
-      text: Queries.findMirCertsByTxIds,
-      values: [ids]
-    });
-    const stakeCerts: QueryResult<StakeCertModel> = await this.#db.query({
-      name: 'pool_stake_certs_by_tx_ids',
-      text: Queries.findStakeCertsByTxIds,
-      values: [ids]
-    });
-    const delegationCerts: QueryResult<DelegationCertModel> = await this.#db.query({
-      name: 'pool_delegation_certs_by_tx_ids',
-      text: Queries.findDelegationCertsByTxIds,
-      values: [ids]
-    });
+
+    const values = [ids];
+    const [
+      poolRetireCerts,
+      poolRegisterCerts,
+      mirCerts,
+      stakeCerts,
+      delegationCerts,
+      drepCerts,
+      voteDelegationCerts,
+      committeeRegistration,
+      committeeDeregistration
+    ] = await Promise.all([
+      this.#db.query<PoolRetireCertModel>({
+        name: 'pool_retire_certs_by_tx_ids',
+        text: Queries.findPoolRetireCertsTxIds,
+        values
+      }),
+      this.#db.query<PoolRegisterCertModel>({
+        name: 'pool_registration_certs_by_tx_ids',
+        text: Queries.findPoolRegisterCertsByTxIds,
+        values
+      }),
+      this.#db.query<MirCertModel>({ name: 'pool_mir_certs_by_tx_ids', text: Queries.findMirCertsByTxIds, values }),
+      this.#db.query<StakeCertModel>({
+        name: 'pool_stake_certs_by_tx_ids',
+        text: Queries.findStakeCertsByTxIds,
+        values
+      }),
+      this.#db.query<DelegationCertModel>({
+        name: 'pool_delegation_certs_by_tx_ids',
+        text: Queries.findDelegationCertsByTxIds,
+        values
+      }),
+      this.#db.query<DrepCertModel>({ name: 'drep_certs_by_tx_ids', text: Queries.findDrepCertsByTxIds, values }),
+      this.#db.query<VoteDelegationCertModel>({
+        name: 'vote_delegation_certs_by_tx_ids',
+        text: Queries.findVoteDelegationCertsByTxIds,
+        values
+      }),
+      this.#db.query<AuthorizeCommitteeHotCertModel>({
+        name: 'committee_register_by_tx_ids',
+        text: Queries.findCommitteeRegistrationByTxIds,
+        values
+      }),
+      this.#db.query<ResignCommitteeColdCertModel>({
+        name: 'committee_resign_by_tx_ids',
+        text: Queries.findCommitteeResignByTxIds,
+        values
+      })
+    ]);
+
+    let stakeCertsArr: StakeCertModel[];
+    let delegationCertsArr: DelegationCertModel[];
+    let voteDelegationCertsArr: VoteDelegationCertModel[];
+    let stakeVoteDelegationCertsArr: StakeVoteDelegationCertModel[];
+    let stakeRegistrationDelegationCertsArr: StakeRegistrationDelegationCertModel[];
+    let voteRegistrationDelegationCertsArr: VoteRegistrationDelegationCertModel[];
+    let stakeVoteRegistrationDelegationCertsArr: StakeVoteRegistrationDelegationCertModel[];
+
+    // eslint-disable-next-line prefer-const
+    [delegationCertsArr, stakeCertsArr, stakeRegistrationDelegationCertsArr] = extractCompoundCertificates(
+      delegationCerts.rows,
+      stakeCerts.rows
+    );
+    // eslint-disable-next-line prefer-const
+    [voteDelegationCertsArr, stakeRegistrationDelegationCertsArr, stakeVoteRegistrationDelegationCertsArr] =
+      extractCompoundCertificates(voteDelegationCerts.rows, stakeRegistrationDelegationCertsArr);
+    // eslint-disable-next-line prefer-const
+    [delegationCertsArr, voteDelegationCertsArr, stakeVoteDelegationCertsArr] = extractCompoundCertificates(
+      delegationCertsArr,
+      voteDelegationCertsArr
+    );
+    // eslint-disable-next-line prefer-const
+    [stakeCertsArr, voteDelegationCertsArr, voteRegistrationDelegationCertsArr] = extractCompoundCertificates(
+      stakeCertsArr,
+      voteDelegationCertsArr
+    );
 
     // There is currently no way to get GenesisKeyDelegationCertificate from db-sync
     const allCerts: WithCertType<CertificateModel>[] = [
       ...poolRetireCerts.rows.map((cert): WithCertType<PoolRetireCertModel> => ({ ...cert, type: 'retire' })),
       ...poolRegisterCerts.rows.map((cert): WithCertType<PoolRegisterCertModel> => ({ ...cert, type: 'register' })),
       ...mirCerts.rows.map((cert): WithCertType<MirCertModel> => ({ ...cert, type: 'mir' })),
-      ...stakeCerts.rows.map((cert): WithCertType<StakeCertModel> => ({ ...cert, type: 'stake' })),
-      ...delegationCerts.rows.map((cert): WithCertType<DelegationCertModel> => ({ ...cert, type: 'delegation' }))
+      ...stakeCertsArr.map((cert): WithCertType<StakeCertModel> => ({ ...cert, type: 'stake' })),
+      ...delegationCertsArr.map((cert): WithCertType<DelegationCertModel> => ({ ...cert, type: 'delegation' })),
+      ...drepCerts.rows.map(
+        (cert): WithCertType<DrepCertModel> => ({
+          ...cert,
+          type: cert.deposit === null ? 'updateDrep' : BigInt(cert.deposit) >= 0n ? 'registerDrep' : 'unregisterDrep'
+        })
+      ),
+      ...voteDelegationCertsArr.map(
+        (cert): WithCertType<VoteDelegationCertModel> => ({ ...cert, type: 'voteDelegation' })
+      ),
+      ...stakeVoteDelegationCertsArr.map(
+        (cert): WithCertType<StakeVoteDelegationCertModel> => ({ ...cert, type: 'stakeVoteDelegation' })
+      ),
+      ...stakeRegistrationDelegationCertsArr.map(
+        (cert): WithCertType<StakeRegistrationDelegationCertModel> => ({ ...cert, type: 'stakeRegistrationDelegation' })
+      ),
+      ...stakeVoteRegistrationDelegationCertsArr.map(
+        (cert): WithCertType<StakeVoteRegistrationDelegationCertModel> => ({
+          ...cert,
+          type: 'stakeVoteRegistrationDelegation'
+        })
+      ),
+      ...voteRegistrationDelegationCertsArr.map(
+        (cert): WithCertType<VoteRegistrationDelegationCertModel> => ({
+          ...cert,
+          type: 'voteRegistrationDelegation'
+        })
+      ),
+      ...committeeRegistration.rows.map(
+        (cert): WithCertType<AuthorizeCommitteeHotCertModel> => ({
+          ...cert,
+          type: 'authorizeCommitteeHot'
+        })
+      ),
+      ...committeeDeregistration.rows.map(
+        (cert): WithCertType<ResignCommitteeColdCertModel> => ({
+          ...cert,
+          type: 'resignCommitteeCold'
+        })
+      )
     ];
     if (allCerts.length === 0) return new Map();
 
