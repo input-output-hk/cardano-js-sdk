@@ -32,6 +32,7 @@ import path from 'path';
 
 const apiSpec = path.join(__dirname, 'openApi.json');
 const someServiceVersionPath = versionPathFromSpec(apiSpec);
+
 class SomeHttpService extends HttpService {
   shouldFail?: boolean;
   constructor(
@@ -153,6 +154,7 @@ describe('HttpServer', () => {
         { headers }
       );
     });
+
     it('correctly logs requests', async () => {
       const testLogger = createLogger({ record: true });
       const expectedBody = { bigint: 23n, check: 'ok', test: 42 };
@@ -214,6 +216,60 @@ describe('HttpServer', () => {
       expect(res.header).toBeCalledTimes(1);
     });
   });
+
+  describe('api version checks', () => {
+    let major: number;
+    let minor: number;
+    let patch: number;
+    beforeEach(async () => {
+      const v = someServiceVersionPath
+        .match(/v(\d+)\.(\d+)\.(\d+)/)!
+        .slice(1)
+        .map(Number);
+      major = v[0];
+      minor = v[1];
+      patch = v[2];
+
+      httpServer = new HttpServer(
+        { listen: { host: 'localhost', port } },
+        {
+          logger,
+          runnableDependencies: [cardanoNode],
+          services: [new SomeHttpService(ServiceNames.StakePool, provider, logger, express.Router(), () => {})]
+        }
+      );
+      await httpServer.initialize();
+      await httpServer.start();
+      await serverStarted(apiUrlBase);
+    });
+
+    afterEach(() => httpServer.shutdown());
+
+    it('accept smaller minor version', async () => {
+      serviceUrlBase = `http://localhost:${port}/v${major}.${minor - 1}.${patch}`;
+      await expect(
+        axios.post(`${serviceUrlBase}/${ServiceNames.StakePool}/echo`, {}, { headers })
+      ).resolves.toBeTruthy();
+    });
+
+    it('reject higher minor version', async () => {
+      serviceUrlBase = `http://localhost:${port}/v${major}.${minor + 1}.${patch}`;
+      await expect(axios.post(`${serviceUrlBase}/${ServiceNames.StakePool}/echo`, {}, { headers })).rejects.toThrow();
+    });
+
+    it('reject different major version', async () => {
+      serviceUrlBase = `http://localhost:${port}/v${major - 1}.${minor}.${patch}`;
+      await expect(axios.post(`${serviceUrlBase}/${ServiceNames.StakePool}/echo`, {}, { headers })).rejects.toThrow();
+    });
+
+    it('accept any patch version', async () => {
+      serviceUrlBase = `http://localhost:${port}/v${major}.${minor}.${patch + 1}`;
+      await expect(
+        axios.post(`${serviceUrlBase}/${ServiceNames.StakePool}/echo`, {}, { headers })
+      ).resolves.toBeTruthy();
+    });
+  });
+
   describe('start', () => {
     beforeEach(async () => {
       httpServer = new HttpServer(
