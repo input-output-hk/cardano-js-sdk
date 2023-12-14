@@ -50,7 +50,7 @@ COPY .yarn .yarn
 COPY .eslintrc.js .prettierrc .yarnrc.yml complete.eslintrc.js eslint.tsconfig.json package.json tsconfig.json yarn.lock yarn-project.nix ./
 
 FROM nodejs-builder as cardano-services-builder
-RUN yarn --immutable --inline-builds
+RUN yarn --immutable --inline-builds --mode=skip-build
 COPY packages packages
 RUN \
   echo "export const unused = 'unused';" > packages/e2e/src/index.ts &&\
