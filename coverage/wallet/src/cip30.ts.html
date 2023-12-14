@@ -649,7 +649,18 @@
 <a name='L584'></a><a href='#L584'>584</a>
 <a name='L585'></a><a href='#L585'>585</a>
 <a name='L586'></a><a href='#L586'>586</a>
-<a name='L587'></a><a href='#L587'>587</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">33x</span>
+<a name='L587'></a><a href='#L587'>587</a>
+<a name='L588'></a><a href='#L588'>588</a>
+<a name='L589'></a><a href='#L589'>589</a>
+<a name='L590'></a><a href='#L590'>590</a>
+<a name='L591'></a><a href='#L591'>591</a>
+<a name='L592'></a><a href='#L592'>592</a>
+<a name='L593'></a><a href='#L593'>593</a>
+<a name='L594'></a><a href='#L594'>594</a>
+<a name='L595'></a><a href='#L595'>595</a>
+<a name='L596'></a><a href='#L596'>596</a>
+<a name='L597'></a><a href='#L597'>597</a>
+<a name='L598'></a><a href='#L598'>598</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">33x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -686,6 +697,7 @@
 <span class="cline-any cline-yes">33x</span>
 <span class="cline-any cline-yes">33x</span>
 <span class="cline-any cline-yes">33x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -865,18 +877,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">33x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -957,6 +972,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -980,6 +996,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
@@ -1296,6 +1318,7 @@ export type SubmitTxCallbackParams = {
 &nbsp;
 // Optional callback
 export type GetCollateralCallbackParams = {
+  sender: MessageSender;
   type: Cip30ConfirmationCallbackType.GetCollateral;
   data: {
     amount: Cardano.Lovelace;
@@ -1445,6 +1468,7 @@ const getFilterAmount = (amount: Cbor): bigint =&gt; {
 /**
  * getCollateralCallback
  *
+ * @param sender The sender of the request
  * @param amount ADA collateral required in lovelaces
  * @param availableUtxos available UTxOs
  * @param callback Callback to execute to attempt setting new collateral
@@ -1452,6 +1476,7 @@ const getFilterAmount = (amount: Cbor): bigint =&gt; {
  * @returns Promise&lt;Cbor[]&gt; or null
  */
 const getCollateralCallback = async (
+  sender: MessageSender,
   amount: Cardano.Lovelace,
   availableUtxos: Cardano.Utxo[],
   callback: GetCollateralCallback,
@@ -1467,6 +1492,7 @@ const getCollateralCallback = async (
         amount,
         utxos: availableUtxosWithoutAssets
       },
+      sender,
       type: Cip30ConfirmationCallbackType.GetCollateral
     });
     return newCollateral.map((core) =&gt; Serialization.TransactionUnspentOutput.fromCore(core).toCbor());
@@ -1522,7 +1548,7 @@ const baseCip30WalletApi = (
   },
   // eslint-disable-next-line max-statements, sonarjs/cognitive-complexity,complexity
   getCollateral: async (
-    _: SenderContext,
+    { sender }: SenderContext,
     { amount = new Serialization.Value(MAX_COLLATERAL_AMOUNT).toCbor() }: { amount?: Cbor } = {}
   ): Promise&lt;
     Cbor[] | null
@@ -1537,6 +1563,7 @@ const baseCip30WalletApi = (
       if (available.length &gt; 0 &amp;&amp; !!confirmationCallback.getCollateral) {
         // available UTxOs could be set as collateral based on user preference
         return await getCollateralCallback(
+          sender,
           getFilterAmount(amount),
           available,
           confirmationCallback.getCollateral,
@@ -1565,7 +1592,13 @@ const baseCip30WalletApi = (
           // if no collateral available by amount in unspendables, return callback if provided to set unspendables and return in the callback
 &nbsp;
           if (available.length &gt; 0 &amp;&amp; !!confirmationCallback.getCollateral) {
-            return await getCollateralCallback(filterAmount, available, confirmationCallback.getCollateral, logger);
+            return await getCollateralCallback(
+              sender,
+              filterAmount,
+              available,
+              confirmationCallback.getCollateral,
+              logger
+            );
           }
 &nbsp;
           throw new ApiError(APIErrorCode.Refused, 'not enough coins in configured collateral UTxOs');
@@ -1828,7 +1861,7 @@ export const createWalletApi = (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-12-14T12:34:01.802Z
+                at 2023-12-14T13:27:30.197Z
             </div>
         <script src="../prettify.js"></script>
         <script>
