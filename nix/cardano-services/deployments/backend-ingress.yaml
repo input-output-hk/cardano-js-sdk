@@ -46,6 +46,13 @@ spec:
             pathType: Prefix
           - backend:
               service:
+                name: dev-preview-cardanojs-stake-pool-provider
+                port:
+                  name: http
+            path: /v1.1.0/stake-pool
+            pathType: Prefix
+          - backend:
+              service:
                 name: dev-preview-cardanojs-handle-provider
                 port:
                   name: http
