@@ -7,12 +7,17 @@ import last from 'lodash/last';
 
 export const RegAndDeregCertificateTypes = [
   Cardano.CertificateType.StakeRegistration,
-  Cardano.CertificateType.StakeDeregistration
-];
+  Cardano.CertificateType.StakeDeregistration,
+  Cardano.CertificateType.Registration,
+  Cardano.CertificateType.Unregistration
+] as const;
+
+export type RegAndDeregCertificateTypes = typeof RegAndDeregCertificateTypes[number];
 
 export const stakeKeyCertficates = (certificates?: Cardano.Certificate[]) =>
-  certificates?.filter((certificate): certificate is Cardano.StakeAddressCertificate =>
-    RegAndDeregCertificateTypes.includes(certificate.__typename)
+  certificates?.filter(
+    (certificate): certificate is Cardano.StakeAddressCertificate | Cardano.NewStakeAddressCertificate =>
+      RegAndDeregCertificateTypes.includes(certificate.__typename as RegAndDeregCertificateTypes)
   ) || [];
 
 export const includesAnyCertificate = (haystack: Cardano.Certificate[], needle: Cardano.CertificateType[]) =>
@@ -20,7 +25,7 @@ export const includesAnyCertificate = (haystack: Cardano.Certificate[], needle: 
 
 export const isLastStakeKeyCertOfType = (
   transactionsCertificates: Cardano.Certificate[][],
-  certType: Cardano.CertificateType.StakeRegistration | Cardano.CertificateType.StakeDeregistration,
+  certTypes: RegAndDeregCertificateTypes[],
   rewardAccount?: Cardano.RewardAccount
 ) => {
   const stakeKeyHash = rewardAccount
@@ -37,7 +42,7 @@ export const isLastStakeKeyCertOfType = (
       })
       .filter(isNotNil)
   );
-  return lastRegOrDereg?.__typename === certType;
+  return certTypes.includes(lastRegOrDereg?.__typename as RegAndDeregCertificateTypes);
 };
 
 export const transactionsWithCertificates = (

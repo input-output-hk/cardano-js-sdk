@@ -144,17 +144,17 @@ const getAccountsKeyStatus =
             }
           }) => certificates || []
         ),
-        Cardano.CertificateType.StakeRegistration,
+        [Cardano.CertificateType.StakeRegistration, Cardano.CertificateType.Registration],
         address
       );
       const isRegistering = isLastStakeKeyCertOfType(
         certificatesInFlight,
-        Cardano.CertificateType.StakeRegistration,
+        [Cardano.CertificateType.StakeRegistration, Cardano.CertificateType.Registration],
         address
       );
       const isUnregistering = isLastStakeKeyCertOfType(
         certificatesInFlight,
-        Cardano.CertificateType.StakeDeregistration,
+        [Cardano.CertificateType.StakeDeregistration, Cardano.CertificateType.Unregistration],
         address
       );
       return isRegistering
@@ -177,8 +177,14 @@ const accountCertificateTransactions = (
       transactions
         .map(({ tx, epoch }) => ({
           certificates: (tx.body.certificates || [])
-            .filter((cert): cert is Cardano.StakeDelegationCertificate | Cardano.StakeAddressCertificate =>
-              [...RegAndDeregCertificateTypes, Cardano.CertificateType.StakeDelegation].includes(cert.__typename)
+            .filter(
+              (
+                cert
+              ): cert is
+                | Cardano.StakeDelegationCertificate
+                | Cardano.StakeAddressCertificate
+                | Cardano.NewStakeAddressCertificate =>
+                [...RegAndDeregCertificateTypes, Cardano.CertificateType.StakeDelegation].includes(cert.__typename)
             )
             .filter((cert) => (cert.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex) === stakeKeyHash),
           epoch
@@ -196,7 +202,13 @@ export const getStakePoolIdAtEpoch = (transactions: TransactionsCertificates) =>
   const certificatesUpToEpoch = transactions
     .filter(({ epoch }) => epoch < atEpoch - 2)
     .map(({ certificates }) => certificates);
-  if (!isLastStakeKeyCertOfType(certificatesUpToEpoch, Cardano.CertificateType.StakeRegistration)) return;
+  if (
+    !isLastStakeKeyCertOfType(certificatesUpToEpoch, [
+      Cardano.CertificateType.StakeRegistration,
+      Cardano.CertificateType.Registration
+    ])
+  )
+    return;
   const delegationTxCertificates = findLast(certificatesUpToEpoch, (certs) =>
     includesAnyCertificate(certs, [Cardano.CertificateType.StakeDelegation])
   );

@@ -226,10 +226,13 @@ export const findStakeCertsByTxIds = `
 		cert.cert_index AS cert_index,
 		addr."view" AS address,
 		TRUE AS registration,
-		tx.hash AS tx_id
+		tx.hash AS tx_id,
+		epoch_param.key_deposit AS deposit
 	FROM tx
 	JOIN stake_registration AS cert ON cert.tx_id = tx.id
 	JOIN stake_address AS addr ON addr.id = cert.addr_id
+	JOIN block ON block_id = block.id
+	JOIN epoch_param ON block.epoch_no = epoch_param.epoch_no
 	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC)
 	UNION
@@ -237,10 +240,13 @@ export const findStakeCertsByTxIds = `
 		cert.cert_index AS cert_index,
 		addr."view" AS address,
 		FALSE AS registration,
-		tx.hash AS tx_id
+		tx.hash AS tx_id,
+		-epoch_param.key_deposit AS deposit
 	FROM tx
 	JOIN stake_deregistration AS cert ON cert.tx_id = tx.id
 	JOIN stake_address AS addr ON addr.id = cert.addr_id
+	JOIN block ON block_id = block.id
+	JOIN epoch_param ON block.epoch_no = epoch_param.epoch_no
 	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC)`;
 
@@ -254,6 +260,60 @@ export const findDelegationCertsByTxIds = `
 	JOIN delegation AS cert ON cert.tx_id = tx.id
 	JOIN pool_hash AS pool ON pool.id = cert.pool_hash_id
 	JOIN stake_address AS addr ON addr.id = cert.addr_id
+	WHERE tx.id = ANY($1)
+	ORDER BY tx.id ASC`;
+
+export const findDrepCertsByTxIds = `
+	SELECT
+		cert_index,
+		tx.hash AS tx_id,
+		has_script,
+		drep.view AS drep_hash,
+		url,
+		data_hash,
+		cert.deposit
+	FROM tx
+	JOIN drep_registration AS cert ON cert.tx_id = tx.id
+	JOIN drep_hash AS drep ON drep.id = cert.drep_hash_id
+	LEFT JOIN voting_anchor AS anchor ON anchor.id = voting_anchor_id
+	WHERE tx.id = ANY($1)
+	ORDER BY tx.id ASC`;
+
+export const findVoteDelegationCertsByTxIds = `
+	SELECT
+		cert_index,
+		tx.hash AS tx_id,
+		has_script,
+		drep.view AS drep_hash,
+		addr.view AS address
+	FROM tx
+	JOIN delegation_vote AS cert ON cert.tx_id = tx.id
+	JOIN drep_hash AS drep ON drep.id = cert.drep_hash_id
+	JOIN stake_address AS addr ON addr.id = cert.addr_id
+	WHERE tx.id = ANY($1)
+	ORDER BY tx.id ASC`;
+
+export const findCommitteeRegistrationByTxIds = `
+	SELECT
+		cert_index,
+		tx.hash AS tx_id,
+		cold_key,
+		hot_key
+	FROM tx
+	JOIN committee_registration AS cert ON cert.tx_id = tx.id
+	WHERE tx.id = ANY($1)
+	ORDER BY tx.id ASC`;
+
+export const findCommitteeResignByTxIds = `
+	SELECT
+		cert_index,
+		tx.hash AS tx_id,
+		cold_key,
+		url,
+		data_hash
+	FROM tx
+	JOIN committee_de_registration AS cert ON cert.tx_id = tx.id
+	LEFT JOIN voting_anchor AS anchor ON anchor.id = voting_anchor_id
 	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC`;
 

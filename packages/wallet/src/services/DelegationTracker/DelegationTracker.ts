@@ -81,6 +81,8 @@ const hasDelegationCert = (certificates: Array<Cardano.Certificate> | undefined)
       case Cardano.CertificateType.StakeDelegation:
       case Cardano.CertificateType.StakeRegistration:
       case Cardano.CertificateType.StakeDeregistration:
+      case Cardano.CertificateType.Registration:
+      case Cardano.CertificateType.Unregistration:
         hasCert = true;
         break;
       default:
@@ -156,7 +158,9 @@ export const createDelegationTracker = ({
     [
       Cardano.CertificateType.StakeDelegation,
       Cardano.CertificateType.StakeRegistration,
-      Cardano.CertificateType.StakeDeregistration
+      Cardano.CertificateType.StakeDeregistration,
+      Cardano.CertificateType.Registration,
+      Cardano.CertificateType.Unregistration
     ]
   ).pipe(tap((transactionsWithEpochs) => logger.debug(`Found ${transactionsWithEpochs.length} staking transactions`)));
 

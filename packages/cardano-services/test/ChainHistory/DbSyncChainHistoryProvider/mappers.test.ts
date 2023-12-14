@@ -244,6 +244,7 @@ describe('chain history mappers', () => {
       const stakeCert: WithCertType<StakeCertModel> = {
         ...baseCertModel,
         address: stakeAddress,
+        deposit: '0',
         registration: true,
         type: 'stake'
       };
@@ -252,9 +253,10 @@ describe('chain history mappers', () => {
         ...stakeCert,
         registration: false
       } as WithCertType<StakeCertModel>);
-      expect(registrationResult).toEqual<WithCertIndex<Cardano.StakeAddressCertificate>>({
-        __typename: Cardano.CertificateType.StakeRegistration,
+      expect(registrationResult).toEqual<WithCertIndex<Cardano.NewStakeAddressCertificate>>({
+        __typename: Cardano.CertificateType.Registration,
         cert_index: 0,
+        deposit: 0n,
         stakeCredential: {
           hash: Hash28ByteBase16.fromEd25519KeyHashHex(
             Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))
@@ -262,9 +264,10 @@ describe('chain history mappers', () => {
           type: Cardano.CredentialType.KeyHash
         }
       });
-      expect(deregistrationResult).toEqual<WithCertIndex<Cardano.StakeAddressCertificate>>({
-        __typename: Cardano.CertificateType.StakeDeregistration,
+      expect(deregistrationResult).toEqual<WithCertIndex<Cardano.NewStakeAddressCertificate>>({
+        __typename: Cardano.CertificateType.Unregistration,
         cert_index: 0,
+        deposit: 0n,
         stakeCredential: {
           hash: Hash28ByteBase16.fromEd25519KeyHashHex(
             Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))
