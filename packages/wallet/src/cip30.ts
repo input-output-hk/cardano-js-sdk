@@ -59,6 +59,7 @@ export type SubmitTxCallbackParams = {
 
 // Optional callback
 export type GetCollateralCallbackParams = {
+  sender: MessageSender;
   type: Cip30ConfirmationCallbackType.GetCollateral;
   data: {
     amount: Cardano.Lovelace;
@@ -208,6 +209,7 @@ const getFilterAmount = (amount: Cbor): bigint => {
 /**
  * getCollateralCallback
  *
+ * @param sender The sender of the request
  * @param amount ADA collateral required in lovelaces
  * @param availableUtxos available UTxOs
  * @param callback Callback to execute to attempt setting new collateral
@@ -215,6 +217,7 @@ const getFilterAmount = (amount: Cbor): bigint => {
  * @returns Promise<Cbor[]> or null
  */
 const getCollateralCallback = async (
+  sender: MessageSender,
   amount: Cardano.Lovelace,
   availableUtxos: Cardano.Utxo[],
   callback: GetCollateralCallback,
@@ -230,6 +233,7 @@ const getCollateralCallback = async (
         amount,
         utxos: availableUtxosWithoutAssets
       },
+      sender,
       type: Cip30ConfirmationCallbackType.GetCollateral
     });
     return newCollateral.map((core) => Serialization.TransactionUnspentOutput.fromCore(core).toCbor());
@@ -285,7 +289,7 @@ const baseCip30WalletApi = (
   },
   // eslint-disable-next-line max-statements, sonarjs/cognitive-complexity,complexity
   getCollateral: async (
-    _: SenderContext,
+    { sender }: SenderContext,
     { amount = new Serialization.Value(MAX_COLLATERAL_AMOUNT).toCbor() }: { amount?: Cbor } = {}
   ): Promise<
     Cbor[] | null
@@ -300,6 +304,7 @@ const baseCip30WalletApi = (
       if (available.length > 0 && !!confirmationCallback.getCollateral) {
         // available UTxOs could be set as collateral based on user preference
         return await getCollateralCallback(
+          sender,
           getFilterAmount(amount),
           available,
           confirmationCallback.getCollateral,
@@ -328,7 +333,13 @@ const baseCip30WalletApi = (
           // if no collateral available by amount in unspendables, return callback if provided to set unspendables and return in the callback
 
           if (available.length > 0 && !!confirmationCallback.getCollateral) {
-            return await getCollateralCallback(filterAmount, available, confirmationCallback.getCollateral, logger);
+            return await getCollateralCallback(
+              sender,
+              filterAmount,
+              available,
+              confirmationCallback.getCollateral,
+              logger
+            );
           }
 
           throw new ApiError(APIErrorCode.Refused, 'not enough coins in configured collateral UTxOs');
