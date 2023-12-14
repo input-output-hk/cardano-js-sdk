@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.23.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.22.2...@cardano-sdk/core@0.23.0) (2023-12-14)
+
+### ⚠ BREAKING CHANGES
+
+* **core:** remove duplicate RegisterCcHotKey and
+RetireCc certificates
+
+### Features
+
+* include minted assets in cip67 mapper to ensure minted assets can be collected in withHandles mapper ([8e1b834](https://github.com/input-output-hk/cardano-js-sdk/commit/8e1b834181e909d4cb4c8608a29392716ae5a4b8))
+* update Handle entity and HandleStore to save parent handles ([3fa3920](https://github.com/input-output-hk/cardano-js-sdk/commit/3fa3920088857d5019d732a036fc3a89b90d5ab3))
+
+### Code Refactoring
+
+* **core:** remove duplicate committee certificates ([20cfc0d](https://github.com/input-output-hk/cardano-js-sdk/commit/20cfc0d440e759cc62f641816291240ee915eebd))
+
 ## [0.22.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.22.1...@cardano-sdk/core@0.22.2) (2023-12-07)
 
 **Note:** Version bump only for package @cardano-sdk/core

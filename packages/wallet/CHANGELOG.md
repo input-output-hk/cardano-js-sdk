@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.28.0...@cardano-sdk/wallet@0.28.1) (2023-12-14)
+
+### Features
+
+* **wallet:** forward MessageSender to GetCollateralCallback ([da4ab32](https://github.com/input-output-hk/cardano-js-sdk/commit/da4ab32335846b4b12f5ecc283dcaf1ddc6b7224))
+
+### Bug Fixes
+
+* delay InMemoryCollectionStore observeAll emission after setAll ([51647eb](https://github.com/input-output-hk/cardano-js-sdk/commit/51647eb1ee64068422c46b1ec064c17404af1e8f))
+
 ## [0.28.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.27.1...@cardano-sdk/wallet@0.28.0) (2023-12-12)
 
 ### ⚠ BREAKING CHANGES
