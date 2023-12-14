@@ -61,6 +61,28 @@ export class HttpServer extends RunnableModule {
     return result;
   }
 
+  private checkReqVersion(version: string) {
+    const [major, minor] = version.split('.');
+    const versionRegex = new RegExp(`^${major}\\.(\\d+)\\.\\d+`);
+
+    return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+      const match = req.baseUrl.match(versionRegex);
+
+      if (match) {
+        const [requestMinor] = match.slice(1).map(Number);
+        if (requestMinor <= Number(minor)) {
+          return next();
+        }
+      }
+
+      return res
+        .status(400)
+        .send(
+          `Unsupported version at ${req.baseUrl}. Supported versions are between ${major}.0.* and ${major}.${minor}.*`
+        );
+    };
+  }
+
   protected async initializeImpl(): Promise<void> {
     this.app = express();
 
@@ -92,9 +114,10 @@ export class HttpServer extends RunnableModule {
     for (const service of this.#dependencies.services) {
       await service.initialize();
       const serviceVersionPath = service.apiVersionPath();
-      const serviceBaseUrl = path.join(serviceVersionPath, service.slug);
-      this.app.use(serviceBaseUrl, service.router);
-      this.logger.info(`Using ${serviceBaseUrl}`);
+      const majorVersion = serviceVersionPath.split('.')[0];
+      const serviceBaseUrlRegex = new RegExp(`^${majorVersion}\\.\\d+\\.\\d+\\/${service.slug}`);
+      this.app.use(serviceBaseUrlRegex, this.checkReqVersion(serviceVersionPath), service.router);
+      this.logger.info(`Using ${serviceBaseUrlRegex}. Version: ${serviceVersionPath}`);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
