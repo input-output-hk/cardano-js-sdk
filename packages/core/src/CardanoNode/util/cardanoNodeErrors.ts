@@ -14,8 +14,6 @@ import {
 } from '../types';
 import { isProductionEnvironment, stripStackTrace } from '@cardano-sdk/util';
 
-// TODO: test all new utils
-
 type InferObjectType<T> = T extends new (...args: any[]) => infer O ? O : never;
 
 const asSpecificCardanoNodeError =
