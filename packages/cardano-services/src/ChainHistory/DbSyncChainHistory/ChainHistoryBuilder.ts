@@ -8,6 +8,7 @@ import {
   MultiAssetModel,
   PoolRegisterCertModel,
   PoolRetireCertModel,
+  ProposalProcedureModel,
   RedeemerModel,
   ResignCommitteeColdCertModel,
   StakeCertModel,
@@ -51,7 +52,30 @@ import {
 import omit from 'lodash/omit';
 import orderBy from 'lodash/orderBy';
 
-const { CredentialType, VoterType } = Cardano;
+const { CredentialType, GovernanceActionType, VoterType } = Cardano;
+
+const getGovernanceAction = ({ description, type }: ProposalProcedureModel): Cardano.GovernanceAction => {
+  // Once db-sync includes https://github.com/input-output-hk/cardano-db-sync/issues/1553
+  // remove 'as Cardano.*' from return statements to get advantage from types
+  switch (type) {
+    case 'HardForkInitiation':
+      return { __typename: GovernanceActionType.hard_fork_initiation_action } as Cardano.HardForkInitiationAction;
+    case 'InfoAction':
+      return { __typename: GovernanceActionType.info_action };
+    case 'NewCommittee':
+      return { __typename: GovernanceActionType.update_committee } as Cardano.UpdateCommittee;
+    case 'NewConstitution':
+      return { __typename: GovernanceActionType.new_constitution } as Cardano.NewConstitution;
+    case 'NoConfidence':
+      return { __typename: GovernanceActionType.no_confidence } as Cardano.NoConfidence;
+    case 'ParameterChange':
+      return { __typename: GovernanceActionType.parameter_change_action } as Cardano.ParameterChangeAction;
+    case 'TreasuryWithdrawals':
+      return { __typename: GovernanceActionType.treasury_withdrawals_action } as Cardano.TreasuryWithdrawalsAction;
+  }
+
+  throw new Error(`Unknown GovernanceActionType '${type}' with description "${description}"`);
+};
 
 const getVoter = (
   txId: Cardano.TransactionId,
@@ -226,6 +250,40 @@ export class ChainHistoryBuilder {
           id: governance_action_tx_id.toString('hex') as Cardano.TransactionId
         },
         votingProcedure: { anchor: data_hash ? mapAnchor(url, data_hash.toString('hex')) : null, vote }
+      });
+    }
+
+    return result;
+  }
+
+  public async queryProposalProceduresByIds(ids: string[]): Promise<TransactionDataMap<Cardano.ProposalProcedure[]>> {
+    const { rows } = await this.#db.query<ProposalProcedureModel>({
+      name: 'proposal_procedures',
+      text: Queries.findProposalProceduresByTxIds,
+      values: [ids]
+    });
+
+    this.#logger.fatal(rows);
+
+    const result = new Map<Cardano.TransactionId, Cardano.ProposalProcedure[]>();
+
+    for (const row of rows) {
+      const { data_hash, deposit, tx_id, url, view } = row;
+      const txId = tx_id.toString('hex') as Cardano.TransactionId;
+
+      const actions = (() => {
+        const value = result.get(txId);
+        if (value) return value;
+        const empty: Cardano.ProposalProcedure[] = [];
+        result.set(txId, empty);
+        return empty;
+      })();
+
+      actions.push({
+        anchor: mapAnchor(url, data_hash.toString('hex'))!,
+        deposit: BigInt(deposit),
+        governanceAction: getGovernanceAction(row),
+        rewardAccount: Cardano.RewardAccount(view)
       });
     }
 
