@@ -198,6 +198,16 @@ const accountCertificateTransactions = (
 type ObservableType<O> = O extends Observable<infer T> ? T : unknown;
 type TransactionsCertificates = ObservableType<ReturnType<typeof accountCertificateTransactions>>;
 
+/**
+ * Check if the stake key was registered and is delegated, and return the pool ID.
+ * A stake key is considered delegated 3 epochs after the certificate was sent.
+ *
+ * @returns
+ *  - the stake pool ID that is delegated to at the given epoch.
+ *  - undefined if the stake key was not registered.
+ * Returns the stake pool ID that is delegated to at the given epoch.
+ * If the stake key was not registered, it returns undefined.
+ */
 export const getStakePoolIdAtEpoch = (transactions: TransactionsCertificates) => (atEpoch: Cardano.EpochNo) => {
   const certificatesUpToEpoch = transactions
     .filter(({ epoch }) => epoch < atEpoch - 2)

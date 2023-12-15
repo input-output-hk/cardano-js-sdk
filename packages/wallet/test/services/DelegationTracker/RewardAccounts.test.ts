@@ -149,8 +149,10 @@ describe('RewardAccounts', () => {
     ];
     expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(102))).toBeUndefined();
     expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(103))).toBeUndefined();
+    // PoolId is available 3 epochs after delegation
     expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(104))).toBe(poolId1);
     expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(105))).toBeUndefined();
+    // New delegation has no effect due to stake key being unregistered
     expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(106))).toBeUndefined();
   });
 
