@@ -3,16 +3,18 @@ import { AsyncKeyAgent } from '@cardano-sdk/key-management';
 
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { RemoteApiProperties, RemoteApiPropertyType } from '../messaging';
-import { WalletManagerApi, WalletManagerProps } from './walletManager.types';
+import { WalletManagerApi } from './walletManager.types';
 
-export const walletManagerChannel = (walletName: WalletManagerProps['walletName']) => `${walletName}-wallet-manager`;
-export const walletChannel = (walletName: WalletManagerProps['walletName']) =>
-  `${walletManagerChannel(walletName)}-wallet`;
+export const walletManagerChannel = (channelName: string) => `${channelName}-wallet-manager`;
+export const walletChannel = (channelName: string) => `${walletManagerChannel(channelName)}-wallet`;
+export const repositoryChannel = (channelName: string) => `${channelName}-wallet-repository`;
 
 export const walletManagerProperties: RemoteApiProperties<WalletManagerApi> = {
   activate: RemoteApiPropertyType.MethodReturningPromise,
+  activeWalletId$: RemoteApiPropertyType.HotObservable,
   deactivate: RemoteApiPropertyType.MethodReturningPromise,
-  destroy: RemoteApiPropertyType.MethodReturningPromise
+  destroyData: RemoteApiPropertyType.MethodReturningPromise,
+  switchNetwork: RemoteApiPropertyType.MethodReturningPromise
 };
 
 /**
@@ -64,3 +66,5 @@ export const getWalletId = async (
 
   return getKeyAgentWalletId(walletIdParam);
 };
+
+// Add create ID and parse ID {account index and the key)
