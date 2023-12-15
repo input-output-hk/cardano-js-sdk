@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { HexBlob, OpaqueString, Shutdown } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import type { Runtime } from 'webextension-polyfill';
@@ -222,12 +222,13 @@ export interface Witnesser {
   /**
    * Generates the witness data for a given transaction.
    *
-   * @param txInternals The transaction body along with its hash for which the witness data is to be generated.
+   * @param transaction The transaction along with its hash for which the witness data is to be generated.
+   * @param context The witness sign transaction context
    * @param options Optional additional parameters that may influence how the witness data is generated.
    * @returns A promise that resolves to the generated witness data for the transaction.
    */
   witness(
-    txInternals: Cardano.TxBodyWithHash,
+    transaction: Serialization.Transaction,
     context: SignTransactionContext,
     options?: WitnessOptions
   ): Promise<Cardano.Witness>;

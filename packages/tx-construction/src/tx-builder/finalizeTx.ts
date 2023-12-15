@@ -1,4 +1,4 @@
-import { Cardano, TxCBOR } from '@cardano-sdk/core';
+import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
 import { FinalizeTxDependencies, SignedTx, TxContext } from './types';
 import {
   SignTransactionContext,
@@ -15,7 +15,14 @@ const getSignatures = async (
   signingOptions?: SignTransactionOptions,
   extraSigners?: TransactionSigner[]
 ) => {
-  const { signatures } = await witnesser.witness(txInternals, signingContext, signingOptions);
+  const { signatures } = await witnesser.witness(
+    new Serialization.Transaction(
+      Serialization.TransactionBody.fromCore(txInternals.body),
+      new Serialization.TransactionWitnessSet()
+    ),
+    signingContext,
+    signingOptions
+  );
 
   if (extraSigners) {
     for (const extraSigner of extraSigners) {
