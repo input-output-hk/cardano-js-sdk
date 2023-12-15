@@ -24,7 +24,6 @@ import { Cardano } from '@cardano-sdk/core';
 import { Hash28ByteBase16, Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import {
   isAuthorizeCommitteeHotCertModel,
-  // isAuthorizeCommitteeHotCertModel,
   isDelegationCertModel,
   isDrepRegistrationCertModel,
   isDrepUnregistrationCertModel,
@@ -32,7 +31,6 @@ import {
   isPoolRegisterCertModel,
   isPoolRetireCertModel,
   isResignCommitteeColdCertModel,
-  // isResignCommitteeColdCertModel,
   isStakeCertModel,
   isStakeRegistrationDelegationCertModel,
   isStakeVoteDelegationCertModel,
@@ -351,11 +349,23 @@ interface TxAlonzoData {
   metadata?: Cardano.TxMetadata;
   collaterals?: Cardano.HydratedTxIn[];
   certificates?: Cardano.Certificate[];
+  votingProcedures?: Cardano.VotingProcedures;
 }
 
 export const mapTxAlonzo = (
   txModel: TxModel,
-  { inputSource, inputs, outputs, mint, withdrawals, redeemers, metadata, collaterals, certificates }: TxAlonzoData
+  {
+    certificates,
+    collaterals,
+    inputSource,
+    inputs,
+    metadata,
+    mint,
+    outputs,
+    redeemers,
+    votingProcedures,
+    withdrawals
+  }: TxAlonzoData
 ): Cardano.HydratedTx => ({
   auxiliaryData:
     metadata && metadata.size > 0
@@ -379,6 +389,7 @@ export const mapTxAlonzo = (
       invalidBefore: Cardano.Slot(Number(txModel.invalid_before)) || undefined,
       invalidHereafter: Cardano.Slot(Number(txModel.invalid_hereafter)) || undefined
     },
+    votingProcedures,
     withdrawals
   },
   id: txModel.id.toString('hex') as unknown as Cardano.TransactionId,
