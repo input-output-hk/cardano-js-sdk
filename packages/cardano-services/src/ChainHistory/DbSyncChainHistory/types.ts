@@ -120,6 +120,16 @@ export interface VotingProceduresModel {
   data_hash: Buffer | null;
 }
 
+export interface ProposalProcedureModel {
+  data_hash: Buffer;
+  deposit: string;
+  description: string;
+  tx_id: Buffer;
+  type: string;
+  url: string;
+  view: string;
+}
+
 export interface CertificateModel {
   cert_index: number;
   tx_id: Buffer;

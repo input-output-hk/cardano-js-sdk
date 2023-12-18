@@ -107,19 +107,30 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
     });
     if (txResults.rows.length === 0) return [];
 
-    const [inputs, outputs, mints, withdrawals, redeemers, metadata, collaterals, certificates, votingProcedures] =
-      await Promise.all([
-        this.#builder.queryTransactionInputsByIds(ids),
-        this.#builder.queryTransactionOutputsByIds(ids),
-        this.#builder.queryTxMintByIds(ids),
-        this.#builder.queryWithdrawalsByTxIds(ids),
-        this.#builder.queryRedeemersByIds(ids),
-        // Missing witness datums
-        this.#metadataService.queryTxMetadataByRecordIds(ids),
-        this.#builder.queryTransactionInputsByIds(ids, true),
-        this.#builder.queryCertificatesByIds(ids),
-        this.#builder.queryVotingProceduresByIds(ids)
-      ]);
+    const [
+      inputs,
+      outputs,
+      mints,
+      withdrawals,
+      redeemers,
+      metadata,
+      collaterals,
+      certificates,
+      votingProcedures,
+      proposalProcedures
+    ] = await Promise.all([
+      this.#builder.queryTransactionInputsByIds(ids),
+      this.#builder.queryTransactionOutputsByIds(ids),
+      this.#builder.queryTxMintByIds(ids),
+      this.#builder.queryWithdrawalsByTxIds(ids),
+      this.#builder.queryRedeemersByIds(ids),
+      // Missing witness datums
+      this.#metadataService.queryTxMetadataByRecordIds(ids),
+      this.#builder.queryTransactionInputsByIds(ids, true),
+      this.#builder.queryCertificatesByIds(ids),
+      this.#builder.queryVotingProceduresByIds(ids),
+      this.#builder.queryProposalProceduresByIds(ids)
+    ]);
 
     return txResults.rows.map((tx) => {
       const txId = tx.id.toString('hex') as unknown as Cardano.TransactionId;
@@ -138,6 +149,7 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
         metadata: metadata.get(txId),
         mint: mints.get(txId),
         outputs: txOutputs,
+        proposalProcedures: proposalProcedures.get(txId),
         redeemers: redeemers.get(txId),
         votingProcedures: votingProcedures.get(txId),
         withdrawals: withdrawals.get(txId)

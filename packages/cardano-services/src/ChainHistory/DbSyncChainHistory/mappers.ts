@@ -349,6 +349,7 @@ interface TxAlonzoData {
   metadata?: Cardano.TxMetadata;
   collaterals?: Cardano.HydratedTxIn[];
   certificates?: Cardano.Certificate[];
+  proposalProcedures?: Cardano.ProposalProcedure[];
   votingProcedures?: Cardano.VotingProcedures;
 }
 
@@ -362,6 +363,7 @@ export const mapTxAlonzo = (
     metadata,
     mint,
     outputs,
+    proposalProcedures,
     redeemers,
     votingProcedures,
     withdrawals
@@ -385,6 +387,7 @@ export const mapTxAlonzo = (
     inputs,
     mint,
     outputs,
+    proposalProcedures,
     validityInterval: {
       invalidBefore: Cardano.Slot(Number(txModel.invalid_before)) || undefined,
       invalidHereafter: Cardano.Slot(Number(txModel.invalid_hereafter)) || undefined

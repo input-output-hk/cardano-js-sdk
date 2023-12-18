@@ -200,6 +200,22 @@ export const findVotingProceduresByTxIds = `
 	WHERE tx.id = ANY($1)
 	ORDER BY vp.index`;
 
+export const findProposalProceduresByTxIds = `
+	SELECT
+		tx.hash AS tx_id,
+		ga.deposit,
+		ga.description,
+		ga.type,
+		va.url,
+		va.data_hash,
+		sa.view
+	FROM tx
+	JOIN governance_action AS ga ON tx.id = ga.tx_id
+	JOIN voting_anchor AS va ON voting_anchor_id = va.id
+	JOIN stake_address AS sa ON ga.return_address = sa.id
+	WHERE tx.id = ANY($1)
+	ORDER BY ga.index`;
+
 export const findPoolRetireCertsTxIds = `
 	SELECT
 		cert.cert_index AS cert_index,
