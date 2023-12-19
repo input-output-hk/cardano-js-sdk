@@ -74,7 +74,7 @@ yarn install && \
 yarn build
 ```
 
-`chromedriver` is installed by hand as it's version should match the globally installed version of Chrome.
+The web extension e2e tests uses [chromedriver](https://www.npmjs.com/package/chromedriver). `chromedriver` and your Chrome browser versions should match, if they don’t the driver will error. If you have issues, try running `yarn workspace @cardano-sdk/e2e remove chromedriver && yarn workspace @cardano-sdk/e2e add chromedriver` to reinstall the latest version.
 
 #### Run Tests
 
