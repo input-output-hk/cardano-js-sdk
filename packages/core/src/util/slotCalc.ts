@@ -70,7 +70,8 @@ export const createSlotEpochCalc: (eraSummaries: EraSummary[]) => (slotNo: Slot)
  * @returns {SlotTimeCalc} function that computes date/time of a given slot #
  */
 export const createSlotTimeCalc = (eraSummaries: EraSummary[]) => {
-  const eraSummariesDesc = orderBy(eraSummaries, ({ start }) => start.slot, 'desc');
+  const eraSummariesWithoutSkippedEras = Object.values(groupBy(eraSummaries, 'start.slot')).map(last) as EraSummary[];
+  const eraSummariesDesc = orderBy(eraSummariesWithoutSkippedEras, ({ start }) => start.slot, 'desc');
 
   /**
    * @throws EraSummaryError
@@ -132,13 +133,20 @@ const epochSlotsCalcImplementation = (epochNo: EpochNo, eraSummaries: EraSummary
   let eraSummaryIdx = 0;
   const maxEraSummaryIdx = eraSummaries.length - 1;
 
+  const checkNextEraSummary = () =>
+    eraSummaryIdx < maxEraSummaryIdx && atSlot >= eraSummaries[eraSummaryIdx + 1].start.slot;
+
+  const findNextEraSummary = () => {
+    while (checkNextEraSummary()) eraSummaryIdx++;
+  };
+
+  findNextEraSummary();
+
   while (atEpoch !== epochNo) {
     atSlot += eraSummaries[eraSummaryIdx].parameters.epochLength;
     atEpoch++;
 
-    if (eraSummaryIdx < maxEraSummaryIdx && atSlot >= eraSummaries[eraSummaryIdx + 1].start.slot) {
-      eraSummaryIdx++;
-    }
+    if (checkNextEraSummary()) findNextEraSummary();
   }
 
   const eraSummary = eraSummaries[eraSummaryIdx];
