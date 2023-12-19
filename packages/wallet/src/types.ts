@@ -51,6 +51,22 @@ export type FinalizeTxProps = Omit<TxContext, 'signingContext'> & {
 
 export type HandleInfo = HandleResolution & Asset.AssetInfo;
 
+export interface ScriptAddress {
+  networkId: Cardano.NetworkId;
+  address: Cardano.PaymentAddress;
+  rewardAccount: Cardano.RewardAccount;
+  scripts: {
+    payment: Cardano.NativeScript;
+    stake: Cardano.NativeScript;
+  };
+}
+
+export type WalletAddress = GroupedAddress | ScriptAddress;
+
+export const isScriptAddress = (address: WalletAddress): address is ScriptAddress => 'scripts' in address;
+
+export const isKeyHashAddress = (address: WalletAddress): address is GroupedAddress => !isScriptAddress(address);
+
 export interface ObservableWallet {
   readonly balance: BalanceTracker;
   readonly delegation: DelegationTracker;
@@ -61,7 +77,7 @@ export interface ObservableWallet {
   readonly eraSummaries$: Observable<EraSummary[]>;
   readonly currentEpoch$: Observable<EpochInfo>;
   readonly protocolParameters$: Observable<Cardano.ProtocolParameters>;
-  readonly addresses$: Observable<GroupedAddress[]>;
+  readonly addresses$: Observable<WalletAddress[]>;
   readonly publicStakeKeys$: Observable<PubStakeKeyAndStatus[]>;
   readonly handles$: Observable<HandleInfo[]>;
   /** All owned and historical assets */
@@ -103,7 +119,7 @@ export interface ObservableWallet {
    *
    * @returns Promise that resolves when discovery is complete, with an updated array of wallet addresses
    */
-  discoverAddresses(): Promise<GroupedAddress[]>;
+  discoverAddresses(): Promise<WalletAddress[]>;
 
   shutdown(): void;
 }
