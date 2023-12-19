@@ -344,6 +344,21 @@ describe('DelegationTracker', () => {
             )
           ],
           b: [
+            createStubTxWithSlot(
+              284,
+              [
+                {
+                  __typename: Cardano.CertificateType.StakeRegistration,
+                  stakeCredential: {
+                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                    type: Cardano.CredentialType.KeyHash
+                  }
+                }
+              ],
+              {
+                blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio)]])
+              }
+            ),
             createStubTxWithSlot(286, [
               {
                 __typename: Cardano.CertificateType.StakeRegistration,
