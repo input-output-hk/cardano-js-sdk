@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.23.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.23.0...@cardano-sdk/core@0.23.1) (2023-12-20)
+
+### Bug Fixes
+
+* **core:** take care of skipped eras in era summaries ([6fefbb1](https://github.com/input-output-hk/cardano-js-sdk/commit/6fefbb1d6c3497c44a789104be17e2c2df6c4c38))
+
 ## [0.23.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.22.2...@cardano-sdk/core@0.23.0) (2023-12-14)
 
 ### ⚠ BREAKING CHANGES

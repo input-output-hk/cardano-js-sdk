@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.16.2...@cardano-sdk/tx-construction@0.17.0) (2023-12-20)
+
+### ⚠ BREAKING CHANGES
+
+* Witnesser witness method now takes a complete serializable Transaction
+
+### Features
+
+* witnesser witness method now takes a complete serializable Transaction ([07a7305](https://github.com/input-output-hk/cardano-js-sdk/commit/07a730536ef9b0cd5a4760e143e35bdca4ce8d8d))
+
 ## [0.16.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.16.1...@cardano-sdk/tx-construction@0.16.2) (2023-12-14)
 
 **Note:** Version bump only for package @cardano-sdk/tx-construction

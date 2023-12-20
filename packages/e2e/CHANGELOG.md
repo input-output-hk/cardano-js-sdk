@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.29.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.28.1...@cardano-sdk/e2e@0.29.0) (2023-12-20)
+
+### ⚠ BREAKING CHANGES
+
+* Wallet manager activate method now takes an WalletManagerActivateProps object rather than just a wallet id
+- Wallet manager now takes signer manager api as a dependency
+- Wallet manager no longer exposes the observable wallet API, this now has to be done by application
+- Wallet manager destroy method was renamed destroyData and now will destroy any storage with the same wallet id
+
+### Features
+
+* rework WalletManager ([3e2fc6c](https://github.com/input-output-hk/cardano-js-sdk/commit/3e2fc6c79f0267672fe91732895c686a1a3eeb1f))
+
 ## [0.28.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.28.0...@cardano-sdk/e2e@0.28.1) (2023-12-14)
 
 ### Features
