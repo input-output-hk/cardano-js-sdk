@@ -198,7 +198,7 @@ const createHistoricalTransactionsTrackerSubject = (
     )
   );
 
-const newTransactions$ = (transactions$: Observable<Cardano.HydratedTx[]>) =>
+export const newTransactions$ = <T extends Pick<Cardano.Tx, 'id'>>(transactions$: Observable<T[]>) =>
   transactions$.pipe(
     take(1),
     map((transactions) => transactions.map(({ id }) => id)),
