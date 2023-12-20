@@ -109,6 +109,7 @@ export class SignerManager<WalletMetadata extends {}>
       const account = request.requestContext.wallet.accounts.find(
         ({ accountIndex }) => accountIndex === request.requestContext.accountIndex
       );
+
       if (!account) {
         return reject(new errors.ProofGenerationError(`Account not found: ${request.requestContext.accountIndex}`));
       }

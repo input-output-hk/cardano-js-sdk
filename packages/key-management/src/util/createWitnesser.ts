@@ -7,7 +7,7 @@ import {
   WitnessOptions,
   Witnesser
 } from '../types';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 
 /** A witnesser that uses a {@link KeyAgent} to generate witness data for a transaction. */
@@ -19,11 +19,20 @@ export class Bip32Ed25519Witnesser implements Witnesser {
   }
 
   async witness(
-    txInternals: Cardano.TxBodyWithHash,
+    tx: Serialization.Transaction,
     context: SignTransactionContext,
     options: WitnessOptions
   ): Promise<Cardano.Witness> {
-    return { signatures: await this.#keyAgent.signTransaction(txInternals, context, options) };
+    return {
+      signatures: await this.#keyAgent.signTransaction(
+        {
+          body: tx.body().toCore(),
+          hash: tx.getId()
+        },
+        context,
+        options
+      )
+    };
   }
 
   async signBlob(

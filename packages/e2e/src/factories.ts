@@ -30,6 +30,7 @@ import {
   CommunicationType,
   InMemoryKeyAgent,
   KeyAgentDependencies,
+  Witnesser,
   util
 } from '@cardano-sdk/key-management';
 import {
@@ -282,6 +283,7 @@ export type GetWalletProps = {
   stores?: storage.WalletStores;
   customKeyParams?: KeyAgentFactoryProps;
   keyAgent?: AsyncKeyAgent;
+  witnesser?: Witnesser;
 };
 
 /** Delays initializing tx when nearing the epoch boundary. Relies on system clock being accurate. */
@@ -307,7 +309,7 @@ const patchInitializeTxToRespectEpochBoundary = <T extends ObservableWallet>(
  * @returns an object containing the wallet and providers passed to it
  */
 export const getWallet = async (props: GetWalletProps) => {
-  const { env, idx, logger, name, polling, stores, customKeyParams, keyAgent } = props;
+  const { env, idx, logger, name, polling, stores, customKeyParams, keyAgent, witnesser } = props;
   const providers = {
     addressDiscovery: await addressDiscoveryFactory.create(
       env.ADDRESS_DISCOVERY,
@@ -365,7 +367,7 @@ export const getWallet = async (props: GetWalletProps) => {
       bip32Account,
       logger,
       stores,
-      witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)
+      witnesser: witnesser || util.createBip32Ed25519Witnesser(asyncKeyAgent)
     }
   );
 

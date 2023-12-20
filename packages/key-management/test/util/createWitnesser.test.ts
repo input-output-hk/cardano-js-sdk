@@ -1,5 +1,5 @@
 import { AsyncKeyAgent, SignBlobResult, Witnesser, util } from '../../src';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 
 describe('createBip32Ed25519Witnesser', () => {
@@ -24,14 +24,20 @@ describe('createBip32Ed25519Witnesser', () => {
   });
 
   it('signTransaction is unchanged', async () => {
+    const transaction = new Serialization.Transaction(
+      Serialization.TransactionBody.fromCore({ fee: 20_000n, inputs: [], outputs: [], validityInterval: {} }),
+      new Serialization.TransactionWitnessSet()
+    );
+
     const txInternals = {
-      body: { fee: 20_000n, inputs: [], outputs: [], validityInterval: {} } as Cardano.HydratedTxBody,
-      hash: Cardano.TransactionId('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec')
+      body: transaction.body().toCore(),
+      hash: Cardano.TransactionId('3643bb5fe745ba0532977f82ecf54699963c97adef2626f7c780225d218e9ba6')
     };
+
     const options = { knownAddresses: [], txInKeyPathMap: {} };
     const result = {} as Cardano.Signatures;
     asyncKeyAgent.signTransaction.mockResolvedValueOnce(result);
-    await expect(witnesser.witness(txInternals, options)).resolves.toEqual({ signatures: result });
+    await expect(witnesser.witness(transaction, options)).resolves.toEqual({ signatures: result });
     expect(asyncKeyAgent.signTransaction).toBeCalledWith(txInternals, options, void 0);
   });
 });

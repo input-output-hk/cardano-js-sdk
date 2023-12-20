@@ -35,3 +35,5 @@ export const disconnectPortTestObjProperties: RemoteApiProperties<DisconnectPort
 export const logger = console;
 
 export const env = getEnv(walletVariables);
+
+export type Metadata = { name: string };

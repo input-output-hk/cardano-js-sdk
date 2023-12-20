@@ -161,6 +161,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
   async #decryptRootPrivateKey(noCache?: true) {
     const passphrase = await getPassphraseRethrowTypedError(() => this.#getPassphrase(noCache));
     let decryptedRootKeyBytes: Uint8Array;
+
     try {
       decryptedRootKeyBytes = await emip3decrypt(
         new Uint8Array((this.serializableData as SerializableInMemoryKeyAgentData).encryptedRootPrivateKeyBytes),
