@@ -177,12 +177,21 @@ const updatePoolStatusWhere = async (
 ) => {
   if (where.firstRegisteredInEpoch < 0) return;
   const { minId, maxId } = computeCertificateIdRange(where.firstRegisteredInEpoch, dependencies.eraSummaries);
+  const subQuery =
+    newStatus === Cardano.StakePoolStatus.Active
+      ? `
+    WHERE sp.status='${where.currentStatus}' AND r1.id >= ${minId} AND r1.id <= ${maxId}
+    AND (sp.last_retirement_id IS NULL OR sp.last_retirement_id < r1.id)
+  `
+      : `
+    LEFT OUTER JOIN pool_registration r2 ON (sp.id = r2.stake_pool_id AND r1.id > r2.id)
+    WHERE r2.id IS NULL AND sp.status='${where.currentStatus}' AND r1.id >= ${minId} AND r1.id <= ${maxId}
+  `;
   const queryResult: Array<{ id: Cardano.PoolId }> = await dependencies.queryRunner.query(`
     SELECT sp.id
     FROM stake_pool sp
     JOIN pool_registration r1 ON (sp.id = r1.stake_pool_id)
-    LEFT OUTER JOIN pool_registration r2 ON (sp.id = r2.stake_pool_id AND r1.id > r2.id)
-    WHERE r2.id IS NULL AND sp.status='${where.currentStatus}' AND r1.id >= ${minId} AND r1.id <= ${maxId};
+    ${subQuery}
   `);
   if (queryResult.length > 0) {
     const stakePoolsRepository = dependencies.queryRunner.manager.getRepository(StakePoolEntity);

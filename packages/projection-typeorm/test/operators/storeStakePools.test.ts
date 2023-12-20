@@ -15,11 +15,12 @@ import {
   withTypeormTransaction
 } from '../../src';
 import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { Cardano, ChainSyncEventType, ObservableCardanoNode } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { connectionConfig$, initializeDataSource } from '../util';
 import { createProjectorContext, createProjectorTilFirst } from './util';
+import { lastValueFrom } from 'rxjs';
 
 describe('storeStakePools', () => {
   const data = chainSyncData(ChainSyncDataSet.WithPoolRetirement);
@@ -38,11 +39,11 @@ describe('storeStakePools', () => {
   let buffer: TypeormStabilityWindowBuffer;
   let tipTracker: TypeormTipTracker;
 
-  const project = () =>
+  const project = (cardanoNode: ObservableCardanoNode = data.cardanoNode) =>
     Bootstrap.fromCardanoNode({
       blocksBufferLength: 10,
       buffer,
-      cardanoNode: data.cardanoNode,
+      cardanoNode,
       logger,
       projectedTip$: tipTracker.tip$
     }).pipe(
@@ -81,6 +82,16 @@ describe('storeStakePools', () => {
   afterEach(async () => {
     await queryRunner.release();
     await dataSource.destroy();
+  });
+
+  describe('regression', () => {
+    it('activates a previously retired pool with several registrations', async () => {
+      await lastValueFrom(project(chainSyncData(ChainSyncDataSet.PreviewStakePoolProblem).cardanoNode));
+      const pool = await poolsRepo.findOne({
+        where: { id: Cardano.PoolId('pool1nk3uj4fdd6d42tx26y537xaejd76u6xyrn0ql8sr4r9tullk84y') }
+      });
+      expect(pool?.status).toBe(Cardano.StakePoolStatus.Active);
+    });
   });
 
   it('typeorm loads correctly typed properties', async () => {
