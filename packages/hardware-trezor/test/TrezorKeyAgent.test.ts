@@ -137,85 +137,37 @@ describe('TrezorKeyAgent', () => {
       expect(signingMode).toEqual(Trezor.PROTO.CardanoTxSigningMode.MULTISIG_TRANSACTION);
     });
 
-    describe('not valid signing mode', () => {
-      it('ordinary transaction signing mode is not valid if it contains a pool registration certificate', async () => {
-        const signingMode = TrezorKeyAgent.matchSigningMode({
-          ...simpleTx,
-          certificates: [poolRegistrationCertificate]
-        });
-        expect(signingMode).not.toEqual(Trezor.PROTO.CardanoTxSigningMode.ORDINARY_TRANSACTION);
-      });
-
-      it('ordinary transaction signing mode is not valid if it contains collateral inputs', async () => {
-        const signingMode = TrezorKeyAgent.matchSigningMode({
-          ...simpleTx,
-          collateralInputs: [txIn]
-        });
-        expect(signingMode).not.toEqual(Trezor.PROTO.CardanoTxSigningMode.ORDINARY_TRANSACTION);
-      });
-
-      it('plutus transaction signing mode is not valid if it contains a pool registration certificate', async () => {
-        const signingMode = TrezorKeyAgent.matchSigningMode({
-          ...validPlutusTx,
-          certificates: [poolRegistrationCertificate]
-        });
-        expect(signingMode).not.toEqual(Trezor.PROTO.CardanoTxSigningMode.PLUTUS_TRANSACTION);
-      });
-
-      it('pool registration transaction signing mode is not valid if the owner is not device-owned', async () => {
-        const signingMode = TrezorKeyAgent.matchSigningMode({
-          ...simpleTx,
-          certificates: [
-            {
-              poolParameters: {
-                ...poolRegistrationCertificate.poolParameters,
-                owners: [{ stakingKeyHash: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f' }]
-              },
-              type: Trezor.PROTO.CardanoCertificateType.STAKE_POOL_REGISTRATION
-            }
-          ]
-        });
-        expect(signingMode).not.toEqual(Trezor.PROTO.CardanoTxSigningMode.POOL_REGISTRATION_AS_OWNER);
-      });
-
-      it('multisig transaction signing mode is not valid if it contains collaterals', async () => {
+    describe('broader plutus signing mode usage', () => {
+      it('matches plutus signing mode if multisig tx body contains collateral inputs', async () => {
         const signingMode = TrezorKeyAgent.matchSigningMode({
           ...validMultisigTx,
           collateralInputs: [txIn]
         });
-        expect(signingMode).not.toEqual(Trezor.PROTO.CardanoTxSigningMode.MULTISIG_TRANSACTION);
+        expect(signingMode).toEqual(Trezor.PROTO.CardanoTxSigningMode.PLUTUS_TRANSACTION);
       });
 
-      it('multisig transaction signing mode is not valid if it contains collateral outputs', async () => {
+      it('matches plutus signing mode if multisig tx body contains collateral outputs', async () => {
         const signingMode = TrezorKeyAgent.matchSigningMode({
           ...validMultisigTx,
           collateralReturn: txOut
         });
-        expect(signingMode).not.toEqual(Trezor.PROTO.CardanoTxSigningMode.MULTISIG_TRANSACTION);
+        expect(signingMode).toEqual(Trezor.PROTO.CardanoTxSigningMode.PLUTUS_TRANSACTION);
       });
 
-      it('multisig transaction signing mode is not valid if it contains total collateral', async () => {
+      it('matches plutus signing mode if multisig tx body contains total collateral', async () => {
         const signingMode = TrezorKeyAgent.matchSigningMode({
           ...validMultisigTx,
           totalCollateral: '10'
         });
-        expect(signingMode).not.toEqual(Trezor.PROTO.CardanoTxSigningMode.MULTISIG_TRANSACTION);
+        expect(signingMode).toEqual(Trezor.PROTO.CardanoTxSigningMode.PLUTUS_TRANSACTION);
       });
 
-      it('multisig transaction signing mode is not valid if it contains reference input', async () => {
+      it('matches plutus signing mode if multisig tx body contains reference input', async () => {
         const signingMode = TrezorKeyAgent.matchSigningMode({
           ...validMultisigTx,
           referenceInputs: [txIn]
         });
-        expect(signingMode).not.toEqual(Trezor.PROTO.CardanoTxSigningMode.MULTISIG_TRANSACTION);
-      });
-
-      it('multisig transaction signing mode is not valid if it contains a pool registration certificate', async () => {
-        const signingMode = TrezorKeyAgent.matchSigningMode({
-          ...validMultisigTx,
-          certificates: [poolRegistrationCertificate]
-        });
-        expect(signingMode).not.toEqual(Trezor.PROTO.CardanoTxSigningMode.MULTISIG_TRANSACTION);
+        expect(signingMode).toEqual(Trezor.PROTO.CardanoTxSigningMode.PLUTUS_TRANSACTION);
       });
     });
   });

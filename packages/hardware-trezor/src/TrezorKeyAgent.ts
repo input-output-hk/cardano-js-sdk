@@ -187,7 +187,8 @@ export class TrezorKeyAgent extends KeyAgentBase {
       }
     }
 
-    if (tx.collateralInputs) {
+    /** Plutus signing mode has a broader usage e.g. multisig tx that contains referenceInputs is marked as plutus */
+    if (tx.collateralInputs || tx.collateralReturn || tx.totalCollateral || tx.referenceInputs) {
       return Trezor.PROTO.CardanoTxSigningMode.PLUTUS_TRANSACTION;
     }
 
