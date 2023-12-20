@@ -136,15 +136,67 @@ describe('RewardAccounts', () => {
         ],
         epoch: Cardano.EpochNo(101)
       },
+      // Unregister stake key
+      // Register stake key with vote_reg_deleg_cert
+      // Delegate to pool with stake_vote_deleg_cert
       {
         certificates: [{ __typename: Cardano.CertificateType.Unregistration } as Cardano.NewStakeAddressCertificate],
         epoch: Cardano.EpochNo(102)
       },
       {
         certificates: [
-          { __typename: Cardano.CertificateType.StakeDelegation, poolId: poolId2 } as Cardano.StakeDelegationCertificate
-        ],
+          {
+            __typename: Cardano.CertificateType.VoteRegistrationDelegation
+          } as Cardano.VoteRegistrationDelegationCertificate],
         epoch: Cardano.EpochNo(103)
+      },
+      {
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.StakeVoteDelegation,
+            poolId: poolId2
+          } as Cardano.StakeVoteDelegationCertificate
+        ],
+        epoch: Cardano.EpochNo(104)
+      },
+      // Unregister stake key
+      // Register stake key and delegate with stake_reg_deleg_cert
+      {
+        certificates: [{ __typename: Cardano.CertificateType.Unregistration } as Cardano.NewStakeAddressCertificate],
+        epoch: Cardano.EpochNo(105)
+      },
+      {
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.StakeRegistrationDelegation,
+            poolId: poolId1
+          } as Cardano.StakeRegistrationDelegationCertificate],
+        epoch: Cardano.EpochNo(106)
+      },
+      // Unregister stake key
+      // Register stake key and delegate with stake_vote_reg_deleg_cert
+      {
+        certificates: [{ __typename: Cardano.CertificateType.Unregistration } as Cardano.NewStakeAddressCertificate],
+        epoch: Cardano.EpochNo(107)
+      },
+      {
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
+            poolId: poolId2
+          } as Cardano.StakeVoteRegistrationDelegationCertificate],
+        epoch: Cardano.EpochNo(108)
+      },
+      // Delegation ignored after stake key is unregistered
+      {
+        certificates: [{ __typename: Cardano.CertificateType.Unregistration } as Cardano.NewStakeAddressCertificate],
+        epoch: Cardano.EpochNo(109)
+      },
+      {
+        certificates: [
+          { __typename: Cardano.CertificateType.StakeDelegation, poolId: poolId1 } as Cardano.StakeDelegationCertificate
+        ],
+        epoch: Cardano.EpochNo(110)
       }
     ];
     expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(102))).toBeUndefined();
@@ -152,11 +204,24 @@ describe('RewardAccounts', () => {
     // PoolId is available 3 epochs after delegation
     expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(104))).toBe(poolId1);
     expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(105))).toBeUndefined();
+    // Stake key is registered and delegated using VoteRegistrationDelegationCertificate and StakeVoteDelegation
+    expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(107))).toBe(poolId2);
+    // Stake key is registered and delegated using StakeRegistrationDelegationCertificate
+    expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(109))).toBe(poolId1);
+    // Stake key is registered and delegated using StakeVoteRegistrationDelegationCertificate
+    expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(111))).toBe(poolId2);
     // New delegation has no effect due to stake key being unregistered
-    expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(106))).toBeUndefined();
+    expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(112))).toBeUndefined();
+    expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(113))).toBeUndefined();
   });
 
-  test('addressKeyStatuses', () => {
+  test.each([
+    Cardano.CertificateType.Registration,
+    Cardano.CertificateType.StakeRegistration,
+    Cardano.CertificateType.StakeRegistrationDelegation,
+    Cardano.CertificateType.StakeVoteRegistrationDelegation,
+    Cardano.CertificateType.VoteRegistrationDelegation
+  ])('addressKeyStatuses %p', (registrationCertType) => {
     createTestScheduler().run(({ cold, expectObservable }) => {
       const rewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
       const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
@@ -168,110 +233,7 @@ describe('RewardAccounts', () => {
               body: {
                 certificates: [
                   {
-                    __typename: Cardano.CertificateType.StakeRegistration,
-                    stakeCredential: {
-                      hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
-                      type: Cardano.CredentialType.KeyHash
-                    }
-                  }
-                ]
-              }
-            }
-          } as TxWithEpoch
-        ],
-        c: [
-          {
-            tx: {
-              body: {
-                certificates: [
-                  {
-                    __typename: Cardano.CertificateType.StakeRegistration,
-                    stakeCredential: {
-                      hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
-                      type: Cardano.CredentialType.KeyHash
-                    }
-                  }
-                ]
-              }
-            }
-          } as TxWithEpoch,
-          {
-            tx: {
-              body: {
-                certificates: [
-                  {
-                    __typename: Cardano.CertificateType.StakeDeregistration,
-                    stakeCredential: {
-                      hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
-                      type: Cardano.CredentialType.KeyHash
-                    }
-                  }
-                ]
-              }
-            }
-          } as TxWithEpoch
-        ]
-      });
-      const transactionsInFlight$ = cold<TxInFlight[]>('abaca', {
-        a: [],
-        b: [
-          {
-            body: {
-              certificates: [
-                {
-                  __typename: Cardano.CertificateType.StakeRegistration,
-                  stakeCredential: {
-                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
-                    type: Cardano.CredentialType.KeyHash
-                  }
-                }
-              ]
-            } as Cardano.TxBody,
-            cbor: dummyCbor,
-            id: txId1
-          }
-        ],
-        c: [
-          {
-            body: {
-              certificates: [
-                {
-                  __typename: Cardano.CertificateType.StakeDeregistration,
-                  stakeCredential: {
-                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
-                    type: Cardano.CredentialType.KeyHash
-                  }
-                }
-              ]
-            } as Cardano.TxBody,
-            cbor: dummyCbor,
-            id: txId2
-          }
-        ]
-      });
-      const tracker$ = addressKeyStatuses([rewardAccount], transactions$, transactionsInFlight$);
-      expectObservable(tracker$).toBe('abcda', {
-        a: [Cardano.StakeKeyStatus.Unregistered],
-        b: [Cardano.StakeKeyStatus.Registering],
-        c: [Cardano.StakeKeyStatus.Registered],
-        d: [Cardano.StakeKeyStatus.Unregistering]
-      });
-    });
-  });
-
-  test('addressKeyStatuses Conway era', () => {
-    createTestScheduler().run(({ cold, expectObservable }) => {
-      const rewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
-      const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
-      const transactions$ = cold('a-b-c', {
-        a: [],
-        b: [
-          {
-            tx: {
-              body: {
-                certificates: [
-                  {
-                    __typename: Cardano.CertificateType.Registration,
+                    __typename: registrationCertType,
                     deposit: 0n,
                     stakeCredential: {
                       hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
@@ -289,7 +251,7 @@ describe('RewardAccounts', () => {
               body: {
                 certificates: [
                   {
-                    __typename: Cardano.CertificateType.Registration,
+                    __typename: registrationCertType,
                     deposit: 0n,
                     stakeCredential: {
                       hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
@@ -325,7 +287,7 @@ describe('RewardAccounts', () => {
             body: {
               certificates: [
                 {
-                  __typename: Cardano.CertificateType.Registration,
+                  __typename: registrationCertType,
                   deposit: 0n,
                   stakeCredential: {
                     hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
