@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/e2e",
-  "version": "0.26.0",
+  "version": "0.29.0",
   "description": "End to end tests for the cardano-js-sdk packages.",
   "engines": {
     "node": ">=16.20.2"
@@ -149,6 +149,7 @@
     "babel-loader": "^8.2.5",
     "blake2b-no-wasm": "2.1.4",
     "buffer": "^6.0.3",
+    "chromedriver": "^120.0.0",
     "copy-webpack-plugin": "^10.2.4",
     "crypto-browserify": "^3.12.0",
     "delay": "^5.0.0",

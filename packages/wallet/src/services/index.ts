@@ -16,3 +16,4 @@ export * from './KeyAgent';
 export * from './AddressDiscovery';
 export * from './HandlesTracker';
 export * from './ChangeAddress';
+export * from './AddressTracker';

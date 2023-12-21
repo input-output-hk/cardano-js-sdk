@@ -128,11 +128,11 @@ describe.skip('Ada handle', () => {
     await mintCIP25andCIP68Handles(wallet, keyAgent, policyId);
     let utxo = await firstValueFrom(wallet.balance.utxo.available$);
     let receivingUtxo = await firstValueFrom(receivingWallet.balance.utxo.available$);
-    expect(utxo.assets?.size).toEqual(3);
+    expect(utxo.assets?.size).toEqual(6);
     expect(receivingUtxo.assets).toBeUndefined();
     let handles = await firstValueFrom(wallet.handles$);
     let receivingHandles = await firstValueFrom(receivingWallet.handles$);
-    expect(handles.length).toEqual(2);
+    expect(handles.length).toEqual(4);
     expect(receivingHandles.length).toEqual(0);
 
     // send handle to another wallet
@@ -148,12 +148,12 @@ describe.skip('Ada handle', () => {
 
     utxo = await firstValueFrom(wallet.balance.utxo.available$);
     receivingUtxo = await firstValueFrom(receivingWallet.balance.utxo.available$);
-    expect(utxo.assets?.size).toEqual(2);
+    expect(utxo.assets?.size).toEqual(5);
     expect(receivingUtxo.assets?.size).toEqual(1);
     expect(receivingUtxo.assets?.keys().next().value).toEqual(cip25AssetIds[0]);
     handles = await firstValueFrom(wallet.handles$);
     receivingHandles = await firstValueFrom(receivingWallet.handles$);
-    expect(handles.length).toEqual(1);
+    expect(handles.length).toEqual(3);
     expect(receivingHandles.length).toEqual(1);
 
     // send ada using handle

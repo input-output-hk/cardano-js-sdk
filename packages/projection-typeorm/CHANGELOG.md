@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.7.4...@cardano-sdk/projection-typeorm@0.7.5) (2023-12-20)
+
+**Note:** Version bump only for package @cardano-sdk/projection-typeorm
+
+## [0.7.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.7.3...@cardano-sdk/projection-typeorm@0.7.4) (2023-12-14)
+
+### Features
+
+* update Handle entity and HandleStore to save parent handles ([3fa3920](https://github.com/input-output-hk/cardano-js-sdk/commit/3fa3920088857d5019d732a036fc3a89b90d5ab3))
+
+## [0.7.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.7.2...@cardano-sdk/projection-typeorm@0.7.3) (2023-12-12)
+
+**Note:** Version bump only for package @cardano-sdk/projection-typeorm
+
+## [0.7.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.7.1...@cardano-sdk/projection-typeorm@0.7.2) (2023-12-07)
+
+**Note:** Version bump only for package @cardano-sdk/projection-typeorm
+
+## [0.7.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.7.0...@cardano-sdk/projection-typeorm@0.7.1) (2023-12-04)
+
+**Note:** Version bump only for package @cardano-sdk/projection-typeorm
+
 ## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.6.0...@cardano-sdk/projection-typeorm@0.7.0) (2023-11-29)
 
 ### ⚠ BREAKING CHANGES

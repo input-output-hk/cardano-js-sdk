@@ -8,17 +8,20 @@ import {
   DataSignError,
   DataSignErrorCode,
   Paginate,
+  SenderContext,
   TxSendError,
   TxSendErrorCode,
   TxSignError,
   TxSignErrorCode,
   WalletApi,
-  WalletApiExtension
+  WalletApiExtension,
+  WithSenderContext
 } from '@cardano-sdk/dapp-connector';
 import { Cardano, Serialization, TxCBOR, coalesceValueQuantities } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
+import { MessageSender } from '@cardano-sdk/key-management';
 import { Observable, firstValueFrom, map } from 'rxjs';
 import { ObservableWallet } from './types';
 import { requiresForeignSignatures } from './services';
@@ -36,6 +39,7 @@ export enum Cip30ConfirmationCallbackType {
 
 export type SignDataCallbackParams = {
   type: Cip30ConfirmationCallbackType.SignData;
+  sender: MessageSender;
   data: {
     addr: Cardano.PaymentAddress | Cardano.DRepID;
     payload: HexBlob;
@@ -43,6 +47,7 @@ export type SignDataCallbackParams = {
 };
 
 export type SignTxCallbackParams = {
+  sender: MessageSender;
   type: Cip30ConfirmationCallbackType.SignTx;
   data: Cardano.Tx;
 };
@@ -54,6 +59,7 @@ export type SubmitTxCallbackParams = {
 
 // Optional callback
 export type GetCollateralCallbackParams = {
+  sender: MessageSender;
   type: Cip30ConfirmationCallbackType.GetCollateral;
   data: {
     amount: Cardano.Lovelace;
@@ -203,6 +209,7 @@ const getFilterAmount = (amount: Cbor): bigint => {
 /**
  * getCollateralCallback
  *
+ * @param sender The sender of the request
  * @param amount ADA collateral required in lovelaces
  * @param availableUtxos available UTxOs
  * @param callback Callback to execute to attempt setting new collateral
@@ -210,6 +217,7 @@ const getFilterAmount = (amount: Cbor): bigint => {
  * @returns Promise<Cbor[]> or null
  */
 const getCollateralCallback = async (
+  sender: MessageSender,
   amount: Cardano.Lovelace,
   availableUtxos: Cardano.Utxo[],
   callback: GetCollateralCallback,
@@ -225,6 +233,7 @@ const getCollateralCallback = async (
         amount,
         utxos: availableUtxosWithoutAssets
       },
+      sender,
       type: Cip30ConfirmationCallbackType.GetCollateral
     });
     return newCollateral.map((core) => Serialization.TransactionUnspentOutput.fromCore(core).toCbor());
@@ -279,9 +288,10 @@ const baseCip30WalletApi = (
     }
   },
   // eslint-disable-next-line max-statements, sonarjs/cognitive-complexity,complexity
-  getCollateral: async ({
-    amount = new Serialization.Value(MAX_COLLATERAL_AMOUNT).toCbor()
-  }: { amount?: Cbor } = {}): Promise<
+  getCollateral: async (
+    { sender }: SenderContext,
+    { amount = new Serialization.Value(MAX_COLLATERAL_AMOUNT).toCbor() }: { amount?: Cbor } = {}
+  ): Promise<
     Cbor[] | null
     // eslint-disable-next-line sonarjs/cognitive-complexity, max-statements
   > => {
@@ -294,6 +304,7 @@ const baseCip30WalletApi = (
       if (available.length > 0 && !!confirmationCallback.getCollateral) {
         // available UTxOs could be set as collateral based on user preference
         return await getCollateralCallback(
+          sender,
           getFilterAmount(amount),
           available,
           confirmationCallback.getCollateral,
@@ -322,7 +333,13 @@ const baseCip30WalletApi = (
           // if no collateral available by amount in unspendables, return callback if provided to set unspendables and return in the callback
 
           if (available.length > 0 && !!confirmationCallback.getCollateral) {
-            return await getCollateralCallback(filterAmount, available, confirmationCallback.getCollateral, logger);
+            return await getCollateralCallback(
+              sender,
+              filterAmount,
+              available,
+              confirmationCallback.getCollateral,
+              logger
+            );
           }
 
           throw new ApiError(APIErrorCode.Refused, 'not enough coins in configured collateral UTxOs');
@@ -371,7 +388,7 @@ const baseCip30WalletApi = (
     logger.debug('getting unused addresses');
     return Promise.resolve([]);
   },
-  getUsedAddresses: async (_paginate?: Paginate): Promise<Cbor[]> => {
+  getUsedAddresses: async (): Promise<Cbor[]> => {
     logger.debug('getting used addresses');
 
     const wallet = await firstValueFrom(wallet$);
@@ -383,7 +400,7 @@ const baseCip30WalletApi = (
       return addresses.map((groupAddresses) => cardanoAddressToCbor(groupAddresses.address));
     }
   },
-  getUtxos: async (amount?: Cbor, paginate?: Paginate): Promise<Cbor[] | null> => {
+  getUtxos: async (_: SenderContext, amount?: Cbor, paginate?: Paginate): Promise<Cbor[] | null> => {
     const scope = new ManagedFreeableScope();
     try {
       const wallet = await firstValueFrom(wallet$);
@@ -402,6 +419,7 @@ const baseCip30WalletApi = (
     }
   },
   signData: async (
+    { sender }: SenderContext,
     addr: Cardano.PaymentAddress | Cardano.DRepID | Bytes,
     payload: Bytes
   ): Promise<Cip30DataSignature> => {
@@ -415,6 +433,7 @@ const baseCip30WalletApi = (
           addr: signWith,
           payload: hexBlobPayload
         },
+        sender,
         type: Cip30ConfirmationCallbackType.SignData
       })
       .catch((error) => mapCallbackFailure(error, logger));
@@ -423,13 +442,14 @@ const baseCip30WalletApi = (
       const wallet = await firstValueFrom(wallet$);
       return wallet.signData({
         payload: hexBlobPayload,
+        sender,
         signWith
       });
     }
     logger.debug('sign data declined');
     throw new DataSignError(DataSignErrorCode.UserDeclined, 'user declined signing');
   },
-  signTx: async (tx: Cbor, partialSign?: Boolean): Promise<Cbor> => {
+  signTx: async ({ sender }: SenderContext, tx: Cbor, partialSign?: Boolean): Promise<Cbor> => {
     const scope = new ManagedFreeableScope();
     logger.debug('signTx');
     const txDecoded = Serialization.Transaction.fromCbor(TxCBOR(tx));
@@ -439,6 +459,7 @@ const baseCip30WalletApi = (
     const shouldProceed = await confirmationCallback
       .signTx({
         data: coreTx,
+        sender,
         type: Cip30ConfirmationCallbackType.SignTx
       })
       .catch((error) => mapCallbackFailure(error, logger));
@@ -455,7 +476,7 @@ const baseCip30WalletApi = (
           );
         const {
           witness: { signatures }
-        } = await wallet.finalizeTx({ tx: { ...coreTx, hash } });
+        } = await wallet.finalizeTx({ sender, tx: { ...coreTx, hash } });
 
         // If partialSign is true, the wallet only tries to sign what it can. However, if
         // signatures size is 0 then throw.
@@ -484,7 +505,7 @@ const baseCip30WalletApi = (
       throw new TxSignError(TxSignErrorCode.UserDeclined, 'user declined signing tx');
     }
   },
-  submitTx: async (input: Cbor): Promise<string> => {
+  submitTx: async (_: SenderContext, input: Cbor): Promise<string> => {
     logger.debug('submitting tx');
     const { cbor, tx } = processTxInput(input);
     const shouldProceed = await confirmationCallback
@@ -570,7 +591,7 @@ export const createWalletApi = (
   wallet$: Observable<ObservableWallet>,
   confirmationCallback: CallbackConfirmation,
   { logger }: Cip30WalletDependencies
-): WalletApi => ({
+): WithSenderContext<WalletApi> => ({
   ...baseCip30WalletApi(wallet$, confirmationCallback, { logger }),
   ...extendedCip95WalletApi(wallet$, { logger })
 });

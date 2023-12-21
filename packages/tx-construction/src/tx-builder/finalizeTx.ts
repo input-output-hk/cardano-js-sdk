@@ -1,23 +1,28 @@
-import { Cardano, TxCBOR } from '@cardano-sdk/core';
+import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
 import { FinalizeTxDependencies, SignedTx, TxContext } from './types';
 import {
+  SignTransactionContext,
   SignTransactionOptions,
   TransactionSigner,
   Witnesser,
   util as keyManagementUtil
 } from '@cardano-sdk/key-management';
-import { filter, firstValueFrom } from 'rxjs';
 
 const getSignatures = async (
-  addressManager: keyManagementUtil.Bip32Ed25519AddressManager,
   witnesser: Witnesser,
   txInternals: Cardano.TxBodyWithHash,
-  extraSigners?: TransactionSigner[],
-  signingOptions?: SignTransactionOptions
+  signingContext: SignTransactionContext,
+  signingOptions?: SignTransactionOptions,
+  extraSigners?: TransactionSigner[]
 ) => {
-  // Wait until the async key agent has at least one known addresses.
-  await firstValueFrom(addressManager.knownAddresses$.pipe(filter((addresses) => addresses.length > 0)));
-  const { signatures } = await witnesser.witness(txInternals, signingOptions);
+  const { signatures } = await witnesser.witness(
+    new Serialization.Transaction(
+      Serialization.TransactionBody.fromCore(txInternals.body),
+      new Serialization.TransactionWitnessSet()
+    ),
+    signingContext,
+    signingOptions
+  );
 
   if (extraSigners) {
     for (const extraSigner of extraSigners) {
@@ -31,20 +36,19 @@ const getSignatures = async (
 
 export const finalizeTx = async (
   tx: Cardano.TxBodyWithHash,
-  { ownAddresses, witness, signingOptions, auxiliaryData, isValid, handleResolutions }: TxContext,
-  { inputResolver, addressManager, witnesser }: FinalizeTxDependencies,
+  { witness, signingOptions, signingContext, auxiliaryData, isValid, handleResolutions }: TxContext,
+  { bip32Account: addressManager, witnesser }: FinalizeTxDependencies,
   stubSign = false
 ): Promise<SignedTx> => {
   const signatures = stubSign
     ? await keyManagementUtil.stubSignTransaction({
-        dRepPublicKey: await addressManager.derivePublicKey(keyManagementUtil.DREP_KEY_DERIVATION_PATH),
+        context: signingContext,
+        dRepPublicKey: (await addressManager.derivePublicKey(keyManagementUtil.DREP_KEY_DERIVATION_PATH)).hex(),
         extraSigners: witness?.extraSigners,
-        inputResolver,
-        knownAddresses: ownAddresses,
         signTransactionOptions: signingOptions,
         txBody: tx.body
       })
-    : await getSignatures(addressManager, witnesser, tx, witness?.extraSigners, signingOptions);
+    : await getSignatures(witnesser, tx, signingContext, signingOptions, witness?.extraSigners);
 
   const transaction = {
     auxiliaryData,

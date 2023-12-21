@@ -10,7 +10,6 @@ import {
   PersonalWallet,
   PollingConfig,
   SingleAddressDiscovery,
-  setupWallet,
   storage
 } from '@cardano-sdk/wallet';
 import {
@@ -27,9 +26,11 @@ import {
 } from '@cardano-sdk/core';
 import {
   AsyncKeyAgent,
+  Bip32Account,
   CommunicationType,
   InMemoryKeyAgent,
   KeyAgentDependencies,
+  Witnesser,
   util
 } from '@cardano-sdk/key-management';
 import {
@@ -292,6 +293,7 @@ export type GetWalletProps = {
   stores?: storage.WalletStores;
   customKeyParams?: KeyAgentFactoryProps;
   keyAgent?: AsyncKeyAgent;
+  witnesser?: Witnesser;
 };
 
 /** Delays initializing tx when nearing the epoch boundary. Relies on system clock being accurate. */
@@ -317,7 +319,7 @@ const patchInitializeTxToRespectEpochBoundary = <T extends ObservableWallet>(
  * @returns an object containing the wallet and providers passed to it
  */
 export const getWallet = async (props: GetWalletProps) => {
-  const { env, idx, logger, name, polling, stores, customKeyParams, keyAgent } = props;
+  const { env, idx, logger, name, polling, stores, customKeyParams, keyAgent, witnesser } = props;
   const providers = {
     addressDiscovery: await addressDiscoveryFactory.create(
       env.ADDRESS_DISCOVERY,
@@ -359,24 +361,25 @@ export const getWallet = async (props: GetWalletProps) => {
   const keyManagementParams = { ...envKeyParams, ...(idx === undefined ? {} : { accountIndex: idx }) };
 
   const bip32Ed25519 = await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger);
-  const { wallet, keyAgent: walletKeyAgent } = await setupWallet({
-    bip32Ed25519,
-    createKeyAgent: keyAgent
-      ? () => Promise.resolve(keyAgent)
-      : await keyManagementFactory.create(env.KEY_MANAGEMENT_PROVIDER, keyManagementParams, logger),
-    createWallet: async (asyncKeyAgent: AsyncKeyAgent) =>
-      new PersonalWallet(
-        { name, polling },
-        {
-          ...providers,
-          addressManager: util.createBip32Ed25519AddressManager(asyncKeyAgent),
-          logger,
-          stores,
-          witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)
-        }
-      ),
-    logger
-  });
+  const asyncKeyAgent =
+    keyAgent ||
+    (await (
+      await keyManagementFactory.create(env.KEY_MANAGEMENT_PROVIDER, keyManagementParams, logger)
+    )({
+      bip32Ed25519,
+      logger
+    }));
+  const bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
+  const wallet = new PersonalWallet(
+    { name, polling },
+    {
+      ...providers,
+      bip32Account,
+      logger,
+      stores,
+      witnesser: witnesser || util.createBip32Ed25519Witnesser(asyncKeyAgent)
+    }
+  );
 
   const [{ address, rewardAccount }] = await firstValueFrom(wallet.addresses$);
   logger.info(`Created wallet "${wallet.name}": ${address}/${rewardAccount}`);
@@ -385,11 +388,7 @@ export const getWallet = async (props: GetWalletProps) => {
     polling?.maxInterval ||
     (polling?.interval && polling.interval * DEFAULT_POLLING_CONFIG.maxIntervalMultiplier) ||
     DEFAULT_POLLING_CONFIG.maxInterval;
-  return {
-    asyncKeyAgent: walletKeyAgent,
-    providers,
-    wallet: patchInitializeTxToRespectEpochBoundary(wallet, maxInterval)
-  };
+  return { bip32Account, providers, wallet: patchInitializeTxToRespectEpochBoundary(wallet, maxInterval) };
 };
 
 export type TestWallet = Awaited<ReturnType<typeof getWallet>>;

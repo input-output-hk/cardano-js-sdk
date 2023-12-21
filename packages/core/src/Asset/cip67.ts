@@ -12,7 +12,8 @@ export const AssetNameLabelNum = {
   ReferenceNFT: 100 as AssetNameLabel,
   UserFT: 333 as AssetNameLabel,
   UserNFT: 222 as AssetNameLabel,
-  UserRFT: 444 as AssetNameLabel
+  UserRFT: 444 as AssetNameLabel,
+  VirtualHandle: 0 as AssetNameLabel
 };
 
 export interface DecodedAssetName {

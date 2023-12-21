@@ -1,20 +1,10 @@
-import {
-  AccountId,
-  AddAccountProps,
-  AddWalletProps,
-  AnyWallet,
-  ScriptWallet,
-  UpdateMetadataProps,
-  WalletId,
-  WalletRepositoryApi,
-  WalletType
-} from './types';
-import { Bip32PublicKey, Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import { AddAccountProps, AddWalletProps, RemoveAccountProps, UpdateMetadataProps, WalletRepositoryApi } from './types';
+import { AnyWallet, ScriptWallet, WalletId, WalletType } from '../types';
 import { Logger } from 'ts-log';
-import { Observable, defer, firstValueFrom, map, shareReplay, switchMap } from 'rxjs';
-import { Serialization } from '@cardano-sdk/core';
+import { Observable, defer, firstValueFrom, map, shareReplay, switchMap, take } from 'rxjs';
 import { WalletConflictError } from '../errors';
-import { contextLogger, isNotNil } from '@cardano-sdk/util';
+import { contextLogger } from '@cardano-sdk/util';
+import { getWalletId } from '../util';
 import { storage } from '@cardano-sdk/wallet';
 
 export interface WalletRepositoryDependencies<AccountMetadata extends {}> {
@@ -28,16 +18,23 @@ const cloneSplice = <T>(array: T[], start: number, deleteCount: number, ...items
   ...array.slice(start + deleteCount)
 ];
 
-const findAccount = <AccountMetadata extends {}>(wallets: AnyWallet<AccountMetadata>[], accountId: AccountId) =>
-  wallets
-    .map((wallet, walletIndex) => {
-      if (wallet.type === WalletType.Script) return;
-      const accountIndex = wallet.accounts.findIndex((a) => a.accountId === accountId);
-      if (accountIndex < 0) return;
-      const account = wallet.accounts[accountIndex];
-      return { account, accountIndex, wallet, walletIndex };
-    })
-    .find(isNotNil);
+const findAccount = <AccountMetadata extends {}>(
+  wallets: AnyWallet<AccountMetadata>[],
+  walletId: WalletId,
+  accountIndex: number
+) => {
+  const walletIdx = wallets.findIndex((w) => w.walletId === walletId);
+  const wallet = wallets[walletIdx];
+  if (!wallet || wallet.type === WalletType.Script) return;
+  const accountIdx = wallet.accounts.findIndex((acc) => acc.accountIndex === accountIndex);
+  if (accountIdx < 0) return;
+  return {
+    account: wallet.accounts[accountIdx],
+    accountIdx,
+    wallet,
+    walletIdx
+  };
+};
 
 export class WalletRepository<AccountMetadata extends {}> implements WalletRepositoryApi<AccountMetadata> {
   readonly #logger: Logger;
@@ -50,17 +47,41 @@ export class WalletRepository<AccountMetadata extends {}> implements WalletRepos
     this.wallets$ = defer(() => store.observeAll()).pipe(shareReplay(1));
   }
 
+  #getWallets() {
+    return this.wallets$.pipe(
+      // `setAll` makes the store.observeAll source emit
+      // so the pipes are triggered twice otherwise
+      take(1)
+    );
+  }
+
   async addWallet(props: AddWalletProps<AccountMetadata>): Promise<WalletId> {
     this.#logger.debug('addWallet', props.type);
-    const walletId =
-      props.type === WalletType.Script
-        ? Serialization.Script.fromCore(props.script).hash()
-        : Hash28ByteBase16(await Bip32PublicKey.fromHex(props.extendedAccountPublicKey).hash());
+    const walletId = await getWalletId(
+      props.type === WalletType.Script ? props.script : props.extendedAccountPublicKey
+    );
+
     return firstValueFrom(
-      this.wallets$.pipe(
+      this.#getWallets().pipe(
         switchMap((wallets) => {
           if (wallets.some((wallet) => wallet.walletId === walletId)) {
             throw new WalletConflictError(`Wallet '${walletId}' already exists`);
+          }
+          if (props.type === WalletType.Script) {
+            for (const ownSigner of props.ownSigners) {
+              if (
+                !wallets.some(
+                  (wallet) =>
+                    wallet.walletId === ownSigner.walletId &&
+                    wallet.type !== WalletType.Script &&
+                    wallet.accounts.some((account) => account.accountIndex === ownSigner.accountIndex)
+                )
+              ) {
+                throw new WalletConflictError(
+                  `Wallet or account does not exist: ${ownSigner.walletId}/${ownSigner.accountIndex}`
+                );
+              }
+            }
           }
           return this.#store.setAll([
             ...wallets,
@@ -72,10 +93,11 @@ export class WalletRepository<AccountMetadata extends {}> implements WalletRepos
     );
   }
 
-  addAccount({ walletId, accountIndex, metadata }: AddAccountProps<AccountMetadata>): Promise<AccountId> {
+  addAccount(props: AddAccountProps<AccountMetadata>): Promise<AddAccountProps<AccountMetadata>> {
+    const { walletId, accountIndex, metadata } = props;
     this.#logger.debug('addAccount', walletId, accountIndex, metadata);
     return firstValueFrom(
-      this.wallets$.pipe(
+      this.#getWallets().pipe(
         switchMap((wallets) => {
           const walletIndex = wallets.findIndex((w) => w.walletId === walletId);
           if (walletIndex < 0) {
@@ -88,7 +110,6 @@ export class WalletRepository<AccountMetadata extends {}> implements WalletRepos
           if (wallet.accounts.some((acc) => acc.accountIndex === accountIndex)) {
             throw new WalletConflictError(`Account #${accountIndex} for wallet '${walletId}' already exists`);
           }
-          const accountId = `${walletId}-${accountIndex}`;
           return this.#store
             .setAll(
               cloneSplice(wallets, walletIndex, 1, {
@@ -96,33 +117,33 @@ export class WalletRepository<AccountMetadata extends {}> implements WalletRepos
                 accounts: [
                   ...wallet.accounts,
                   {
-                    accountId,
                     accountIndex,
                     metadata
                   }
                 ]
               })
             )
-            .pipe(map(() => accountId));
+            .pipe(map(() => props));
         })
       )
     );
   }
 
-  updateMetadata<ID extends AccountId | WalletId>({
-    target,
-    metadata
-  }: UpdateMetadataProps<AccountMetadata, ID>): Promise<ID> {
-    this.#logger.debug('updateMetadata', target, metadata);
+  updateMetadata(props: UpdateMetadataProps<AccountMetadata>): Promise<UpdateMetadataProps<AccountMetadata>> {
+    const { walletId, accountIndex, metadata } = props;
+    this.#logger.debug('updateMetadata', walletId, accountIndex, metadata);
     return firstValueFrom(
-      this.wallets$.pipe(
+      this.#getWallets().pipe(
         switchMap((wallets) => {
-          const bip32Account = findAccount(wallets, target);
-          if (bip32Account) {
+          if (typeof accountIndex !== 'undefined') {
+            const bip32Account = findAccount(wallets, walletId, accountIndex);
+            if (!bip32Account) {
+              throw new WalletConflictError(`Account not found: ${walletId}/${accountIndex}`);
+            }
             return this.#store.setAll(
-              cloneSplice(wallets, bip32Account.walletIndex, 1, {
+              cloneSplice(wallets, bip32Account.walletIdx, 1, {
                 ...bip32Account.wallet,
-                accounts: cloneSplice(bip32Account.wallet.accounts, bip32Account.accountIndex, 1, {
+                accounts: cloneSplice(bip32Account.wallet.accounts, bip32Account.accountIdx, 1, {
                   ...bip32Account.account,
                   metadata
                 })
@@ -130,7 +151,7 @@ export class WalletRepository<AccountMetadata extends {}> implements WalletRepos
             );
           }
           const scriptWalletIndex = wallets.findIndex(
-            (wallet) => wallet.walletId === target && wallet.type === WalletType.Script
+            (wallet) => wallet.walletId === walletId && wallet.type === WalletType.Script
           );
           if (scriptWalletIndex >= 0) {
             return this.#store.setAll(
@@ -140,30 +161,41 @@ export class WalletRepository<AccountMetadata extends {}> implements WalletRepos
               })
             );
           }
-          throw new WalletConflictError(`BIP32 AccountId or script WalletId not found: ${target}`);
+          throw new WalletConflictError(`Script wallet not found: ${walletId}`);
         }),
-        map(() => target)
+        map(() => props)
       )
     );
   }
 
-  removeAccount(accountId: AccountId): Promise<AccountId> {
-    this.#logger.debug('removeAccount', accountId);
+  removeAccount(props: RemoveAccountProps): Promise<RemoveAccountProps> {
+    const { walletId, accountIndex } = props;
+    this.#logger.debug('removeAccount', walletId, accountIndex);
     return firstValueFrom(
-      this.wallets$.pipe(
+      this.#getWallets().pipe(
         switchMap((wallets) => {
-          const bip32Account = findAccount(wallets, accountId);
+          const bip32Account = findAccount(wallets, walletId, accountIndex);
           if (!bip32Account) {
-            throw new WalletConflictError(`Account '${accountId}' does not exist`);
+            throw new WalletConflictError(`Account '${walletId}/${accountIndex}' does not exist`);
+          }
+          const dependentWallet = wallets.find(
+            (wallet) =>
+              wallet.type === WalletType.Script &&
+              wallet.ownSigners.some((signer) => signer.walletId === walletId && signer.accountIndex === accountIndex)
+          );
+          if (dependentWallet) {
+            throw new WalletConflictError(
+              `Wallet '${dependentWallet.walletId}' depends on account '${walletId}/${accountIndex}'`
+            );
           }
           return this.#store.setAll(
-            cloneSplice(wallets, bip32Account.walletIndex, 1, {
+            cloneSplice(wallets, bip32Account.walletIdx, 1, {
               ...bip32Account.wallet,
-              accounts: cloneSplice(bip32Account.wallet.accounts, bip32Account.accountIndex, 1)
+              accounts: cloneSplice(bip32Account.wallet.accounts, bip32Account.accountIdx, 1)
             })
           );
         }),
-        map(() => accountId)
+        map(() => props)
       )
     );
   }
@@ -171,11 +203,19 @@ export class WalletRepository<AccountMetadata extends {}> implements WalletRepos
   removeWallet(walletId: WalletId): Promise<WalletId> {
     this.#logger.debug('removeWallet', walletId);
     return firstValueFrom(
-      this.wallets$.pipe(
+      this.#getWallets().pipe(
+        take(1),
         switchMap((wallets) => {
           const walletIndex = wallets.findIndex((w) => w.walletId === walletId);
           if (walletIndex < 0) {
             throw new WalletConflictError(`Wallet '${walletId}' does not exist`);
+          }
+          const dependentWallet = wallets.find(
+            (wallet) =>
+              wallet.type === WalletType.Script && wallet.ownSigners.some((signer) => signer.walletId === walletId)
+          );
+          if (dependentWallet) {
+            throw new WalletConflictError(`Wallet '${dependentWallet.walletId}' depends on wallet '${walletId}'`);
           }
           return this.#store.setAll(cloneSplice(wallets, walletIndex, 1));
         }),

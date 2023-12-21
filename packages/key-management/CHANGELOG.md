@@ -3,6 +3,51 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.17.1...@cardano-sdk/key-management@0.18.0) (2023-12-20)
+
+### ⚠ BREAKING CHANGES
+
+* Witnesser witness method now takes a complete serializable Transaction
+
+### Features
+
+* witnesser witness method now takes a complete serializable Transaction ([07a7305](https://github.com/input-output-hk/cardano-js-sdk/commit/07a730536ef9b0cd5a4760e143e35bdca4ce8d8d))
+
+## [0.17.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.17.0...@cardano-sdk/key-management@0.17.1) (2023-12-14)
+
+**Note:** Version bump only for package @cardano-sdk/key-management
+
+## [0.17.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.16.0...@cardano-sdk/key-management@0.17.0) (2023-12-12)
+
+### ⚠ BREAKING CHANGES
+
+* replace authenticator 'origin' argument to 'sender'
+- hoist 'senderOrigin' util to dapp-connector package
+
+### Features
+
+* track cip30 method call origin & update Authenticator api ([75c8af6](https://github.com/input-output-hk/cardano-js-sdk/commit/75c8af6aecc0ddcaeca153e8a3693d6e18edf60e))
+
+## [0.16.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.15.1...@cardano-sdk/key-management@0.16.0) (2023-12-07)
+
+### ⚠ BREAKING CHANGES
+
+* remove KeyAgent.knownAddresses
+- remove AsyncKeyAgent.knownAddresses$
+- remove LazyWalletUtil and setupWallet utils
+- replace KeyAgent dependency on InputResolver with props passed to sign method
+- re-purpose AddressManager to Bip32Account: addresses are now stored only by the wallet
+
+### Code Refactoring
+
+* remove indirect KeyAgent dependency on ObservableWallet ([8dcfbc4](https://github.com/input-output-hk/cardano-js-sdk/commit/8dcfbc4ab339fcd8efc7d5f241a501eb210b58d4))
+
+## [0.15.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.15.0...@cardano-sdk/key-management@0.15.1) (2023-12-04)
+
+### Features
+
+* **key-management:** sign conway stake key registration certificates ([63b8a1d](https://github.com/input-output-hk/cardano-js-sdk/commit/63b8a1df2888f27a2f9078f8554b38af5f91d8c9))
+
 ## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.14.0...@cardano-sdk/key-management@0.15.0) (2023-11-29)
 
 ### ⚠ BREAKING CHANGES

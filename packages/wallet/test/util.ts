@@ -1,11 +1,11 @@
-/* eslint-disable func-style */
-/* eslint-disable jsdoc/require-jsdoc */
-
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, TxCBOR } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
+import { InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
 import { Observable, catchError, filter, firstValueFrom, throwError, timeout } from 'rxjs';
 import { ObservableWallet, OutgoingTx } from '../src';
+import { SodiumBip32Ed25519 } from '@cardano-sdk/crypto';
+import { logger } from '@cardano-sdk/util-dev';
 
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;
@@ -58,3 +58,18 @@ export const buildDRepIDFromDRepKey = (
   });
   return HexBlob.toTypedBech32<Cardano.DRepID>('drep', HexBlob.fromBytes(paymentAddress));
 };
+
+export const createAsyncKeyAgent = async () =>
+  util.createAsyncKeyAgent(
+    await InMemoryKeyAgent.fromBip39MnemonicWords(
+      {
+        chainId: Cardano.ChainIds.Preview,
+        getPassphrase: async () => Buffer.from([]),
+        mnemonicWords: util.generateMnemonicWords()
+      },
+      {
+        bip32Ed25519: new SodiumBip32Ed25519(),
+        logger
+      }
+    )
+  );

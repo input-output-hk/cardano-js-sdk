@@ -3,7 +3,7 @@ import { AddressesModel, WalletVars } from './types';
 import { Cardano } from '@cardano-sdk/core';
 import { FunctionHook } from '../artillery';
 import { Pool } from 'pg';
-import { StubKeyAgent, getEnv, getWallet, waitForWalletStateSettle, walletVariables } from '../../../src';
+import { createMockKeyAgent, getEnv, getWallet, waitForWalletStateSettle, walletVariables } from '../../../src';
 import { findAddressesWithRegisteredStakeKey } from './queries';
 import { logger } from '@cardano-sdk/util-dev';
 
@@ -89,7 +89,7 @@ export const walletRestoration: FunctionHook<WalletVars> = async ({ vars, _uid }
 
   try {
     // Creates Stub KeyAgent
-    const keyAgent = util.createAsyncKeyAgent(new StubKeyAgent(currentAddress));
+    const keyAgent = util.createAsyncKeyAgent(createMockKeyAgent([currentAddress]));
 
     // Start to measure wallet restoration time
     const startedAt = Date.now();

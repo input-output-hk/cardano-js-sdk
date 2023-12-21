@@ -1,7 +1,5 @@
 /* eslint-disable unicorn/consistent-destructuring */
 /* eslint-disable max-statements */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import * as Crypto from '@cardano-sdk/crypto';
 import {
   AddressDiscovery,
   ConnectionStatus,
@@ -9,9 +7,9 @@ import {
   ObservableWallet,
   PersonalWallet,
   PollingConfig,
-  setupWallet
+  SingleAddressDiscovery
 } from '../../src';
-import { AddressType, AsyncKeyAgent, GroupedAddress, util } from '@cardano-sdk/key-management';
+import { AddressType, AsyncKeyAgent, Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
 import {
   AssetId,
   createStubStakePoolProvider,
@@ -34,7 +32,6 @@ import { InvalidStringError } from '@cardano-sdk/util';
 import { ReplaySubject, firstValueFrom } from 'rxjs';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import { dummyLogger as logger } from 'ts-log';
-import { prepareMockKeyAgentWithData } from '../services/addressDiscovery/mockData';
 import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { waitForWalletStateSettle } from '../util';
 import delay from 'delay';
@@ -55,7 +52,6 @@ const name = 'Test Wallet';
 const address = mocks.utxo[0][0].address!;
 const rewardAccount = mocks.rewardAccount;
 
-const bip32Ed25519 = new Crypto.SodiumBip32Ed25519();
 interface Providers {
   rewardsProvider: RewardsProvider;
   utxoProvider: UtxoProvider;
@@ -75,13 +71,12 @@ export class MockAddressDiscovery implements AddressDiscovery {
     this.#resolveAfterAttempts = resolveAfterAttempts;
   }
 
-  public async discover(addressManager: util.Bip32Ed25519AddressManager): Promise<GroupedAddress[]> {
+  public async discover(): Promise<GroupedAddress[]> {
     if (this.#currentAttempt <= this.#resolveAfterAttempts) {
       ++this.#currentAttempt;
       throw new Error('An error occurred during the discovery process.');
     }
 
-    await addressManager.setKnownAddresses(this.#addresses);
     return this.#addresses;
   }
 }
@@ -96,61 +91,52 @@ type CreateWalletProps = {
 };
 
 const createWallet = async (props: CreateWalletProps) => {
-  const { wallet } = await setupWallet({
-    bip32Ed25519,
-    createKeyAgent: async (dependencies) => {
-      const groupedAddress: GroupedAddress = {
-        accountIndex: 0,
-        address,
-        index: 0,
-        networkId: Cardano.NetworkId.Testnet,
-        rewardAccount,
-        stakeKeyDerivationPath,
-        type: AddressType.External
-      };
+  const groupedAddress: GroupedAddress = {
+    accountIndex: 0,
+    address,
+    index: 0,
+    networkId: Cardano.NetworkId.Testnet,
+    rewardAccount,
+    stakeKeyDerivationPath,
+    type: AddressType.External
+  };
 
-      if (props.asyncKeyAgent) return props.asyncKeyAgent;
+  const asyncKeyAgent = props.asyncKeyAgent || (await testAsyncKeyAgent());
 
-      const asyncKeyAgent = await testAsyncKeyAgent([groupedAddress], dependencies);
-      asyncKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
-      return asyncKeyAgent;
-    },
-    createWallet: async (keyAgent) => {
-      const {
-        rewardsProvider,
-        utxoProvider,
-        chainHistoryProvider,
-        handleProvider,
-        networkInfoProvider,
-        connectionStatusTracker$
-      } = props.providers;
-      const txSubmitProvider = mocks.mockTxSubmitProvider();
-      const assetProvider = mocks.mockAssetProvider();
-      const stakePoolProvider = createStubStakePoolProvider();
+  const {
+    rewardsProvider,
+    utxoProvider,
+    chainHistoryProvider,
+    handleProvider,
+    networkInfoProvider,
+    connectionStatusTracker$
+  } = props.providers;
+  const txSubmitProvider = mocks.mockTxSubmitProvider();
+  const assetProvider = mocks.mockAssetProvider();
+  const stakePoolProvider = createStubStakePoolProvider();
 
-      return new PersonalWallet(
-        { name, polling: props.pollingConfig },
-        {
-          addressDiscovery: props?.addressDiscovery,
-          addressManager: util.createBip32Ed25519AddressManager(keyAgent),
-          assetProvider,
-          chainHistoryProvider,
-          connectionStatusTracker$,
-          handleProvider,
-          logger,
-          networkInfoProvider,
-          rewardsProvider,
-          stakePoolProvider,
-          stores: props.stores,
-          txSubmitProvider,
-          utxoProvider,
-          witnesser: util.createBip32Ed25519Witnesser(keyAgent)
-        }
-      );
-    },
-    logger
-  });
-  return wallet;
+  const bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
+  bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
+
+  return new PersonalWallet(
+    { name, polling: props.pollingConfig },
+    {
+      addressDiscovery: props?.addressDiscovery,
+      assetProvider,
+      bip32Account,
+      chainHistoryProvider,
+      connectionStatusTracker$,
+      handleProvider,
+      logger,
+      networkInfoProvider,
+      rewardsProvider,
+      stakePoolProvider,
+      stores: props.stores,
+      txSubmitProvider,
+      utxoProvider,
+      witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)
+    }
+  );
 };
 
 const assertWalletProperties = async (
@@ -159,10 +145,14 @@ const assertWalletProperties = async (
   expectedRewardsHistory = flatten([...mocks.rewardsHistory.values()]),
   expectHandles?: boolean
 ) => {
-  expect(wallet.addressManager).toBeTruthy();
+  expect(wallet.bip32Account).toBeTruthy();
   expect(wallet.witnesser).toBeTruthy();
   // name
   expect(wallet.name).toBe(name);
+  // addresses$
+  const addresses = await firstValueFrom(wallet.addresses$);
+  expect(addresses[0].address).toEqual(address);
+  expect(addresses[0].rewardAccount).toEqual(rewardAccount);
   // utxo
   const utxoAvailable = await firstValueFrom(wallet.utxo.available$);
   const utxoTotal = await firstValueFrom(wallet.utxo.total$);
@@ -195,10 +185,6 @@ const assertWalletProperties = async (
   expect(rewardAccounts[0].address).toBe(rewardAccount);
   expect(rewardAccounts[0].delegatee?.nextNextEpoch?.id).toEqual(expectedDelegateeId);
   expect(rewardAccounts[0].rewardBalance).toBe(mocks.rewardAccountBalance);
-  // addresses$
-  const addresses = await firstValueFrom(wallet.addresses$);
-  expect(addresses[0].address).toEqual(address);
-  expect(addresses[0].rewardAccount).toEqual(rewardAccount);
   // assets$
   expect(await firstValueFrom(wallet.assetInfo$)).toEqual(
     new Map([
@@ -347,9 +333,10 @@ describe('PersonalWallet load', () => {
     const txsWithNoCertificates = queryTransactionsResult.pageResults.filter((tx) => !tx.body.certificates);
     chainHistoryProvider.transactionsByAddresses = jest.fn().mockResolvedValueOnce({
       pageResults: txsWithNoCertificates,
-      totalResultCount: 1
+      totalResultCount: txsWithNoCertificates.length
     });
     const wallet = await createWallet({
+      addressDiscovery: new SingleAddressDiscovery(),
       providers: {
         chainHistoryProvider,
         networkInfoProvider,
@@ -358,7 +345,6 @@ describe('PersonalWallet load', () => {
       },
       stores
     });
-    // eslint-disable-next-line unicorn/no-useless-undefined
     await assertWalletProperties(wallet, undefined, []);
     await waitForWalletStateSettle(wallet);
     wallet.shutdown();
@@ -510,7 +496,6 @@ describe('PersonalWallet.AddressDiscovery', () => {
 
     const wallet = await createWallet({
       addressDiscovery: new MockAddressDiscovery([testValue], 2),
-      asyncKeyAgent: prepareMockKeyAgentWithData(),
       providers: {
         chainHistoryProvider: mocks.mockChainHistoryProvider(),
         networkInfoProvider: mocks.mockNetworkInfoProvider(),

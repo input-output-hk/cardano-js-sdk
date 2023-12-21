@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/consistent-function-scoping */
 import { PouchDbCollectionStore, PouchDbDocumentStore, PouchDbKeyValueStore } from '../../src/persistence';
 import { assertCompletesWithoutEmitting } from './util';
-import { combineLatest, firstValueFrom, mergeMap, share, take, timer, toArray } from 'rxjs';
+import { combineLatest, firstValueFrom, mergeMap, share, shareReplay, take, timer, toArray } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import PouchDB from 'pouchdb';
 
@@ -114,6 +114,11 @@ describe('pouchDbStores', () => {
         await firstEmission;
         await firstValueFrom(store1.setAll([doc1, doc2]));
         await expect(twoEmissions).resolves.toEqual([[doc1], [doc1, doc2]]);
+      });
+      it('observeAll followed by immediate setAll does not skip 2nd emission', async () => {
+        const items$ = store1.observeAll().pipe(shareReplay(1));
+        await firstValueFrom(items$.pipe(mergeMap(() => store1.setAll([doc1]))));
+        await expect(firstValueFrom(items$)).resolves.toEqual([doc1]);
       });
     });
   });

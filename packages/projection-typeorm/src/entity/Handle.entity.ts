@@ -1,6 +1,6 @@
 import { AssetEntity } from './Asset.entity';
 import { Cardano, Handle } from '@cardano-sdk/core';
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class HandleEntity {
@@ -21,4 +21,7 @@ export class HandleEntity {
   @Column('varchar', { nullable: true })
   /** `null` when cardanoAddress === `null` */
   defaultForPaymentCredential?: Handle | null;
+  @ManyToOne(() => HandleEntity, { nullable: true, onDelete: 'CASCADE' })
+  @JoinColumn()
+  parentHandle?: HandleEntity;
 }

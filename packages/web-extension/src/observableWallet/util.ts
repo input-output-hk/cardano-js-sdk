@@ -1,6 +1,7 @@
 import { ObservableWallet } from '@cardano-sdk/wallet';
 import { OutputBuilder, TxBuilder } from '@cardano-sdk/tx-construction';
 import { RemoteApiProperties, RemoteApiPropertyType } from '../messaging';
+import { WalletRepository } from '../walletManager';
 
 export const observableWalletChannel = (walletName: string) => `${walletName}$`;
 
@@ -101,6 +102,7 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
     rewardAccounts$: RemoteApiPropertyType.HotObservable,
     rewardsHistory$: RemoteApiPropertyType.HotObservable
   },
+  discoverAddresses: RemoteApiPropertyType.MethodReturningPromise,
   eraSummaries$: RemoteApiPropertyType.HotObservable,
   fatalError$: RemoteApiPropertyType.HotObservable,
   finalizeTx: RemoteApiPropertyType.MethodReturningPromise,
@@ -136,4 +138,14 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
     total$: RemoteApiPropertyType.HotObservable,
     unspendable$: RemoteApiPropertyType.HotObservable
   }
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const walletRepositoryProperties: RemoteApiProperties<WalletRepository<any>> = {
+  addAccount: RemoteApiPropertyType.MethodReturningPromise,
+  addWallet: RemoteApiPropertyType.MethodReturningPromise,
+  removeAccount: RemoteApiPropertyType.MethodReturningPromise,
+  removeWallet: RemoteApiPropertyType.MethodReturningPromise,
+  updateMetadata: RemoteApiPropertyType.MethodReturningPromise,
+  wallets$: RemoteApiPropertyType.HotObservable
 };

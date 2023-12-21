@@ -10,7 +10,7 @@ import {
 import { BalanceTracker, DelegationTracker, TransactionsTracker, UtxoTracker } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
-import { GroupedAddress, cip8 } from '@cardano-sdk/key-management';
+import { GroupedAddress, MessageSender, SignTransactionOptions, cip8 } from '@cardano-sdk/key-management';
 import { InitializeTxProps, InitializeTxResult, SignedTx, TxBuilder, TxContext } from '@cardano-sdk/tx-construction';
 import { Observable } from 'rxjs';
 import { PubStakeKeyAndStatus } from './services/PublicStakeKeysTracker';
@@ -18,7 +18,7 @@ import { Shutdown } from '@cardano-sdk/util';
 
 export type Assets = Map<Cardano.AssetId, Asset.AssetInfo>;
 
-export type SignDataProps = Omit<cip8.Cip30SignDataRequest, 'addressManager' | 'witnesser'>;
+export type SignDataProps = Omit<cip8.Cip30SignDataRequest, 'knownAddresses' | 'witnesser'>;
 
 export interface SyncStatus extends Shutdown {
   /**
@@ -43,8 +43,10 @@ export interface SyncStatus extends Shutdown {
   isSettled$: Observable<boolean>;
 }
 
-export type FinalizeTxProps = Omit<TxContext, 'ownAddresses'> & {
+export type FinalizeTxProps = Omit<TxContext, 'signingContext'> & {
   tx: Cardano.TxBodyWithHash;
+  signingOptions?: SignTransactionOptions;
+  sender?: MessageSender;
 };
 
 export type HandleInfo = HandleResolution & Asset.AssetInfo;
@@ -94,6 +96,14 @@ export interface ObservableWallet {
 
   /** Create a TxBuilder from this wallet */
   createTxBuilder(): TxBuilder;
+
+  /**
+   * Discover addresses that might have been created by other applications.
+   * This is run automatically when the wallet is first created.
+   *
+   * @returns Promise that resolves when discovery is complete, with an updated array of wallet addresses
+   */
+  discoverAddresses(): Promise<GroupedAddress[]>;
 
   shutdown(): void;
 }

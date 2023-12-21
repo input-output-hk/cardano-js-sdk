@@ -11,6 +11,7 @@ const {
 const { firstValueFrom } = require('rxjs');
 const { logger } = require('@cardano-sdk/util-dev');
 const path = require('path');
+const { SodiumBip32Ed25519 } = require('@cardano-sdk/crypto');
 
 (async () => {
   const { wallet, asyncKeyAgent } = await getWallet({
@@ -26,7 +27,7 @@ const path = require('path');
   const keyAgent = await createStandaloneKeyAgent(
     env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
     await firstValueFrom(wallet.genesisParameters$),
-    await asyncKeyAgent.getBip32Ed25519()
+    new SodiumBip32Ed25519()
   );
 
   const policyId = await getHandlePolicyId(path.join(pathToE2ePackage, 'local-network', 'sdk-ipc'));

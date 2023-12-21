@@ -1,6 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
+import { Cardano } from '@cardano-sdk/core';
 import {
-  AddressType,
   CommunicationType,
   GetPassphrase,
   KeyAgentDependencies,
@@ -8,10 +8,8 @@ import {
   SerializableInMemoryKeyAgentData,
   SerializableLedgerKeyAgentData,
   SerializableTrezorKeyAgentData,
-  errors,
-  util
+  errors
 } from '@cardano-sdk/key-management';
-import { Cardano } from '@cardano-sdk/core';
 
 import { dummyLogger } from 'ts-log';
 import { restoreKeyAgent } from '../../../src';
@@ -19,7 +17,6 @@ import { restoreKeyAgent } from '../../../src';
 describe('KeyManagement/restoreKeyAgent', () => {
   const dependencies: KeyAgentDependencies = {
     bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
-    inputResolver: { resolveInput: jest.fn() },
     logger: dummyLogger
   };
 
@@ -34,72 +31,24 @@ describe('KeyManagement/restoreKeyAgent', () => {
       87, 78, 204, 222, 109, 3, 239, 117
     ];
 
-    const address = Cardano.PaymentAddress(
-      'addr1qx52knza2h5x090n4a5r7yraz3pwcamk9ppvuh7e26nfks7pnmhxqavtqy02zezklh27jt9r6z62sav3mugappdc7xnskxy2pn'
-    );
-
     const extendedAccountPublicKey = Crypto.Bip32PublicKeyHex(
       // eslint-disable-next-line max-len
       '6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d396199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39'
     );
-
-    const rewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
-
-    const inMemoryKeyAgentDataWithoutStakeDerivationPath: SerializableInMemoryKeyAgentData = {
-      __typename: KeyAgentType.InMemory,
-      accountIndex: 0,
-      chainId: Cardano.ChainIds.Preview,
-      encryptedRootPrivateKeyBytes,
-      extendedAccountPublicKey,
-      knownAddresses: [
-        {
-          accountIndex: 0,
-          address,
-          index: 0,
-          networkId: Cardano.NetworkId.Mainnet,
-          rewardAccount,
-          type: AddressType.External
-        }
-      ]
-    };
 
     const inMemoryKeyAgentData: SerializableInMemoryKeyAgentData = {
       __typename: KeyAgentType.InMemory,
       accountIndex: 0,
       chainId: Cardano.ChainIds.Preview,
       encryptedRootPrivateKeyBytes,
-      extendedAccountPublicKey,
-      knownAddresses: [
-        {
-          accountIndex: 0,
-          address,
-          index: 0,
-          networkId: Cardano.NetworkId.Mainnet,
-          rewardAccount,
-          stakeKeyDerivationPath: util.STAKE_KEY_DERIVATION_PATH,
-          type: AddressType.External
-        }
-      ]
+      extendedAccountPublicKey
     };
     // eslint-disable-next-line unicorn/consistent-function-scoping
     const getPassphrase: GetPassphrase = async () => Buffer.from('password');
 
-    it('assumes default stakeKeyDerivationPath if not present in serializable data', async () => {
-      expect.assertions(1);
-      const keyAgent = await restoreKeyAgent(
-        inMemoryKeyAgentDataWithoutStakeDerivationPath,
-        dependencies,
-        getPassphrase
-      );
-
-      for (const knownAddress of keyAgent.knownAddresses) {
-        expect(knownAddress.stakeKeyDerivationPath).toBe(util.STAKE_KEY_DERIVATION_PATH);
-      }
-    });
-
     it('can restore key manager from valid data and passphrase', async () => {
       const keyAgent = await restoreKeyAgent(inMemoryKeyAgentData, dependencies, getPassphrase);
-      expect(keyAgent.knownAddresses).toEqual(inMemoryKeyAgentData.knownAddresses);
+      expect(keyAgent.extendedAccountPublicKey).toEqual(inMemoryKeyAgentData.extendedAccountPublicKey);
     });
 
     it('throws when attempting to restore key manager from valid data and no passphrase', async () => {
@@ -127,25 +76,12 @@ describe('KeyManagement/restoreKeyAgent', () => {
       extendedAccountPublicKey: Crypto.Bip32PublicKeyHex(
         // eslint-disable-next-line max-len
         'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
-      ),
-      knownAddresses: [
-        {
-          accountIndex: 0,
-          address: Cardano.PaymentAddress(
-            'addr1qx52knza2h5x090n4a5r7yraz3pwcamk9ppvuh7e26nfks7pnmhxqavtqy02zezklh27jt9r6z62sav3mugappdc7xnskxy2pn'
-          ),
-          index: 0,
-          networkId: Cardano.NetworkId.Mainnet,
-          rewardAccount: Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr'),
-          stakeKeyDerivationPath: util.STAKE_KEY_DERIVATION_PATH,
-          type: AddressType.External
-        }
-      ]
+      )
     };
 
     it('can restore key manager from valid data', async () => {
       const keyAgent = await restoreKeyAgent(ledgerKeyAgentData, dependencies);
-      expect(keyAgent.knownAddresses).toEqual(ledgerKeyAgentData.knownAddresses);
+      expect(keyAgent.extendedAccountPublicKey).toEqual(ledgerKeyAgentData.extendedAccountPublicKey);
     });
   });
 
@@ -158,19 +94,6 @@ describe('KeyManagement/restoreKeyAgent', () => {
         // eslint-disable-next-line max-len
         'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
       ),
-      knownAddresses: [
-        {
-          accountIndex: 0,
-          address: Cardano.PaymentAddress(
-            'addr1qx52knza2h5x090n4a5r7yraz3pwcamk9ppvuh7e26nfks7pnmhxqavtqy02zezklh27jt9r6z62sav3mugappdc7xnskxy2pn'
-          ),
-          index: 0,
-          networkId: Cardano.NetworkId.Mainnet,
-          rewardAccount: Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr'),
-          stakeKeyDerivationPath: util.STAKE_KEY_DERIVATION_PATH,
-          type: AddressType.External
-        }
-      ],
       trezorConfig: {
         communicationType: CommunicationType.Node,
         manifest: {
@@ -182,7 +105,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
 
     it('can restore key manager from valid data', async () => {
       const keyAgent = await restoreKeyAgent(trezorKeyAgentData, dependencies);
-      expect(keyAgent.knownAddresses).toEqual(trezorKeyAgentData.knownAddresses);
+      expect(keyAgent.extendedAccountPublicKey).toEqual(trezorKeyAgentData.extendedAccountPublicKey);
     });
   });
 

@@ -9,25 +9,36 @@ import {
 } from './util';
 import {
   RemoteApiPropertyType,
-  WalletManagerUi,
+  SignerManager,
+  WalletType,
   consumeRemoteApi,
   consumeSupplyDistributionTracker,
-  exposeApi
+  createKeyAgentFactory,
+  exposeApi,
+  exposeSignerManagerApi,
+  observableWalletProperties,
+  repositoryChannel,
+  walletChannel,
+  walletManagerChannel,
+  walletManagerProperties,
+  walletRepositoryProperties
 } from '@cardano-sdk/web-extension';
-import {
-  adaPriceServiceChannel,
-  getObservableWalletName,
-  selectors,
-  userPromptServiceChannel,
-  walletName
-} from './const';
-import { bip32Ed25519Factory, keyManagementFactory } from '../../../src';
+import { adaPriceServiceChannel, selectors, userPromptServiceChannel, walletName } from './const';
 
+import * as Crypto from '@cardano-sdk/crypto';
+import { Buffer } from 'buffer';
 import { Cardano } from '@cardano-sdk/core';
+import {
+  CommunicationType,
+  InMemoryKeyAgent,
+  SerializableInMemoryKeyAgentData,
+  emip3encrypt,
+  util
+} from '@cardano-sdk/key-management';
 import { HexBlob } from '@cardano-sdk/util';
-import { combineLatest, firstValueFrom, of } from 'rxjs';
+import { SodiumBip32Ed25519 } from '@cardano-sdk/crypto';
+import { combineLatest, firstValueFrom, merge, of } from 'rxjs';
 import { runtime } from 'webextension-polyfill';
-import { setupWallet } from '@cardano-sdk/wallet';
 
 const delegationConfig = {
   count: 3,
@@ -156,7 +167,9 @@ const clearWalletValues = (): void => {
 };
 
 const destroyWallet = async (): Promise<void> => {
-  await walletManager.destroy();
+  await walletManager.deactivate();
+  const activeWalletId = await firstValueFrom(walletManager.activeWalletId$);
+  await walletManager.destroyData(activeWalletId.walletId, env.KEY_MANAGEMENT_PARAMS.chainId);
   clearWalletValues();
 };
 
@@ -198,10 +211,64 @@ const cleanupMultidelegationInfo = (multiDelegationDiv: Element) => {
   }
 };
 
-const walletManager = new WalletManagerUi({ walletName }, { logger, runtime });
+const signerManager = new SignerManager(
+  {
+    hwOptions: {
+      communicationType: CommunicationType.Web,
+      manifest: {
+        appUrl: 'https://web-extension.app',
+        email: 'e2e@web-extension.app'
+      }
+    }
+  },
+  {
+    keyAgentFactory: createKeyAgentFactory({
+      bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
+      logger
+    })
+  }
+);
+
+const passphraseByteArray = Uint8Array.from(
+  env.KEY_MANAGEMENT_PARAMS.passphrase.split('').map((letter) => letter.charCodeAt(0))
+);
+merge(signerManager.signDataRequest$, signerManager.transactionWitnessRequest$).subscribe((req) => {
+  logger.info('Sign request', req);
+  if (req.walletType === WalletType.InMemory) {
+    void req.sign(new Uint8Array(passphraseByteArray));
+  } else {
+    void req.sign();
+  }
+  logger.info('Signed', req);
+});
+
+// Setup
+
+// Expose local objects.
+exposeSignerManagerApi(
+  {
+    signerManager
+  },
+  { logger, runtime }
+);
+
+// Consume remote objects.
+const walletManager = consumeRemoteApi(
+  { baseChannel: walletManagerChannel(walletName), properties: walletManagerProperties },
+  { logger, runtime }
+);
+
+const repository = consumeRemoteApi(
+  { baseChannel: repositoryChannel(walletName), properties: walletRepositoryProperties },
+  { logger, runtime }
+);
+
 // Wallet object does not change when wallets are activated/deactivated.
 // Instead, it's observable properties emit from the currently active wallet.
-const wallet = walletManager.wallet;
+const wallet = consumeRemoteApi(
+  { baseChannel: walletChannel(walletName), properties: observableWalletProperties },
+  { logger, runtime }
+);
 
 // Wallet can be subscribed can be used even before it is actually created.
 wallet.addresses$.subscribe(([{ address, rewardAccount }]) => setAddresses({ address, stakeAddress: rewardAccount }));
@@ -220,37 +287,71 @@ wallet.delegation.distribution$.subscribe((delegationDistrib) => {
   }
 });
 
-const createWallet = async (accountIndex: number) => {
-  clearWalletValues();
+const createWalletIfNotExistsAndActivate = async (accountIndex: number) => {
+  const wallets = await firstValueFrom(repository.wallets$);
+  let walletId = wallets.find(
+    (w) => w.type !== WalletType.Script && w.accounts.some((a) => a.accountIndex === accountIndex)
+  )?.walletId;
+  if (!walletId) {
+    logger.log('creating wallet');
+    clearWalletValues();
+    const bip32Ed25519 = new SodiumBip32Ed25519();
+    const mnemonicWords = env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' ');
+    const passphrase = new Uint8Array(passphraseByteArray);
+    const keyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
+      {
+        accountIndex,
+        chainId: env.KEY_MANAGEMENT_PARAMS.chainId,
+        getPassphrase: async () => passphrase,
+        mnemonicWords
+      },
+      { bip32Ed25519, logger }
+    );
+    const encryptedRootPrivateKey = (keyAgent.serializableData as SerializableInMemoryKeyAgentData)
+      .encryptedRootPrivateKeyBytes;
 
-  // setupWallet call is required to provide context (InputResolver) to the key agent
-  const { keyAgent } = await setupWallet({
-    bip32Ed25519: await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger),
-    createKeyAgent: async (dependencies) =>
-      (
-        await keyManagementFactory.create(
-          env.KEY_MANAGEMENT_PROVIDER,
-          {
-            ...env.KEY_MANAGEMENT_PARAMS,
-            accountIndex
-          },
-          logger
-        )
-      )(dependencies),
-    createWallet: async () => wallet,
-    logger
+    const entropy = Buffer.from(util.mnemonicWordsToEntropy(mnemonicWords), 'hex');
+    const encryptedEntropy = await emip3encrypt(entropy, passphraseByteArray);
+
+    logger.log('adding to repository wallet');
+    // Add wallet to the repository.
+    walletId = await repository.addWallet({
+      encryptedSecrets: {
+        entropy: HexBlob.fromBytes(encryptedEntropy),
+        rootPrivateKeyBytes: HexBlob.fromBytes(new Uint8Array(encryptedRootPrivateKey))
+      },
+      extendedAccountPublicKey: keyAgent.serializableData.extendedAccountPublicKey,
+      type: WalletType.InMemory
+    });
+    await repository.addAccount({
+      accountIndex,
+      metadata: { name: `wallet-${accountIndex}` },
+      walletId
+    });
+
+    logger.log(`Wallet added: ${walletId}`);
+  } else {
+    logger.info(`Wallet with accountIndex ${accountIndex} already exists`);
+  }
+
+  // await walletManager.destroy();
+  await walletManager.activate({
+    accountIndex,
+    chainId: env.KEY_MANAGEMENT_PARAMS.chainId,
+    walletId
   });
-
-  await walletManager.destroy();
-  await walletManager.activate({ keyAgent, observableWalletName: getObservableWalletName(accountIndex) });
 
   // Same wallet object will return different names, based on which wallet is active
   // Calling this method before any wallet is active, will resolve only once a wallet becomes active
   setName(await wallet.getName());
 };
 
-document.querySelector(selectors.btnActivateWallet1)!.addEventListener('click', async () => await createWallet(0));
-document.querySelector(selectors.btnActivateWallet2)!.addEventListener('click', async () => await createWallet(1));
+document
+  .querySelector(selectors.btnActivateWallet1)!
+  .addEventListener('click', async () => await createWalletIfNotExistsAndActivate(0));
+document
+  .querySelector(selectors.btnActivateWallet2)!
+  .addEventListener('click', async () => await createWalletIfNotExistsAndActivate(1));
 document.querySelector(selectors.deactivateWallet)!.addEventListener('click', async () => await deactivateWallet());
 document.querySelector(selectors.destroyWallet)!.addEventListener('click', async () => await destroyWallet());
 document.querySelector(selectors.btnDelegate)!.addEventListener('click', async () => {
@@ -260,7 +361,10 @@ document.querySelector(selectors.btnDelegate)!.addEventListener('click', async (
 });
 
 document.querySelector(selectors.btnSignAndBuildTx)!.addEventListener('click', async () => {
+  logger.info('Building transaction');
   const [{ address: ownAddress }] = await firstValueFrom(wallet.addresses$);
+  logger.info(`Address: ${ownAddress}`);
+
   const builtTx = wallet
     .createTxBuilder()
     .addOutput({

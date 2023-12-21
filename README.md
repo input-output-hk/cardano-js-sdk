@@ -74,7 +74,7 @@ yarn install && \
 yarn build
 ```
 
-`chromedriver` is installed by hand as it's version should match the globally installed version of Chrome.
+The web extension e2e tests uses [chromedriver](https://www.npmjs.com/package/chromedriver). `chromedriver` and your Chrome browser versions should match, if they don’t the driver will error. If you have issues, try running `yarn workspace @cardano-sdk/e2e remove chromedriver && yarn workspace @cardano-sdk/e2e add chromedriver` to reinstall the latest version.
 
 #### Run Tests
 
@@ -125,7 +125,7 @@ nix run .#config-update
 
 Previously supported features, no longer supported, but packed with a reference branch.
 
-- [RabbitMQ tx-submit provider and worker](https://github.com/input-output-hk/cardano-js-sdk/tree/rabbitmq-tx-submit-provider-and-worker)
+- [RabbitMQ tx-submit provider and worker](https://github.com/input-output-hk/cardano-js-sdk/tree/attic/rabbitmq)
 
 ## Distribute
 
@@ -150,6 +150,10 @@ yarn docs
 <p align="center">
   <a href="https://input-output-hk.github.io/cardano-js-sdk">:book: Documentation</a>
 </p>
+
+### Possible issues
+
+- `yarn build --mode=skip-build` [in Docker image](https://github.com/input-output-hk/cardano-js-sdk/pull/1024)
 
 [img_src_post-integration]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/post_integration.yml/badge.svg
 [workflow_post-integration]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/post_integration.yml

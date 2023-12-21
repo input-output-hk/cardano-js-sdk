@@ -1,12 +1,13 @@
-import { AddressType, KeyRole } from '../types';
-import { Bip32Ed25519AddressManager } from './createAddressManager';
+import { AddressType, GroupedAddress, KeyRole } from '../types';
+import { Bip32Account } from '../Bip32Account';
 import { Cardano } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { firstValueFrom } from 'rxjs';
 
 export interface EnsureStakeKeysParams {
   /** Key agent to use */
-  addressManager: Bip32Ed25519AddressManager;
+  bip32Account: Bip32Account;
+  /** Look for existing stake keys used in those addresses */
+  knownAddresses: GroupedAddress[];
   /** Requested number of stake keys */
   count: number;
   /** The payment key index to use when more stake keys are needed */
@@ -14,14 +15,19 @@ export interface EnsureStakeKeysParams {
   logger: Logger;
 }
 
-/** Given a count, checks if enough stake keys exist and derives more if needed. Returns all reward accounts */
+export type EnsureStakeKeysResult = {
+  rewardAccounts: Cardano.RewardAccount[];
+  newAddresses: GroupedAddress[];
+};
+
+/** Given a count, checks if enough stake keys exist and derives more if needed. Returns all reward accounts and new addresses */
 export const ensureStakeKeys = async ({
-  addressManager,
+  bip32Account,
+  knownAddresses,
   count,
   logger,
   paymentKeyIndex: index = 0
-}: EnsureStakeKeysParams): Promise<Cardano.RewardAccount[]> => {
-  const knownAddresses = await firstValueFrom(addressManager.knownAddresses$);
+}: EnsureStakeKeysParams): Promise<EnsureStakeKeysResult> => {
   const stakeKeys = new Map(
     knownAddresses
       .filter(
@@ -34,9 +40,11 @@ export const ensureStakeKeys = async ({
   logger.debug(`Stake keys requested: ${count}; got ${stakeKeys.size}`);
 
   // Need more stake keys for the portfolio
+  const newAddresses: GroupedAddress[] = [];
   for (let stakeKeyIdx = 0; stakeKeys.size < count; stakeKeyIdx++) {
     if (!stakeKeys.has(stakeKeyIdx)) {
-      const address = await addressManager.deriveAddress({ index, type: AddressType.External }, stakeKeyIdx);
+      const address = await bip32Account.deriveAddress({ index, type: AddressType.External }, stakeKeyIdx);
+      newAddresses.push(address);
       logger.debug(
         `No derivation with stake key index ${stakeKeyIdx} exists. Derived a new stake key ${address.rewardAccount}.`
       );
@@ -44,5 +52,8 @@ export const ensureStakeKeys = async ({
     }
   }
 
-  return [...stakeKeys.values()];
+  return {
+    newAddresses,
+    rewardAccounts: [...stakeKeys.values()]
+  };
 };

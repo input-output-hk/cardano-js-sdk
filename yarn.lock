@@ -3221,11 +3221,9 @@ __metadata:
     "@cardano-sdk/util": "workspace:~"
     "@dcspark/cardano-multiplatform-lib-nodejs": ^3.1.1
     "@types/blake2b": ^2.1.0
-    "@types/bn.js": ^5.1.1
     "@types/libsodium-wrappers-sumo": ^0.7.5
     "@types/lodash": ^4.14.182
     blake2b: ^2.1.4
-    bn.js: ^5.2.1
     eslint: ^7.32.0
     i: ^0.3.7
     jest: ^28.1.3
@@ -3330,6 +3328,7 @@ __metadata:
     buffer: ^6.0.3
     bunyan: ^1.8.15
     chalk: 4.1.2
+    chromedriver: ^120.0.0
     cli-spinners: ^2.9.0
     convict: ^6.2.4
     copy-webpack-plugin: ^10.2.4
@@ -3516,6 +3515,7 @@ __metadata:
     "@trezor/connect-web": 9.0.11
     "@types/lodash": ^4.14.182
     "@types/pbkdf2": ^3.1.0
+    "@types/webextension-polyfill": ^0.8.0
     bip39: ^3.0.4
     chacha: ^2.1.0
     eslint: ^7.32.0
@@ -3761,6 +3761,8 @@ __metadata:
     "@cardano-sdk/core": "workspace:~"
     "@cardano-sdk/crypto": "workspace:~"
     "@cardano-sdk/dapp-connector": "workspace:~"
+    "@cardano-sdk/hardware-ledger": "workspace:~"
+    "@cardano-sdk/hardware-trezor": "workspace:~"
     "@cardano-sdk/key-management": "workspace:~"
     "@cardano-sdk/tx-construction": "workspace:~"
     "@cardano-sdk/util": "workspace:~"
@@ -5913,6 +5915,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@testim/chrome-version@npm:^1.1.4":
+  version: 1.1.4
+  resolution: "@testim/chrome-version@npm:1.1.4"
+  checksum: 63817db694ab4a49d240217063a30dc2aac9799561132b51da97699207c47cb3355ae043ad1f8b15b770447834cbf36202133641b078f3944d0a502435b40827
+  languageName: node
+  linkType: hard
+
 "@tootallnate/once@npm:1":
   version: 1.1.2
   resolution: "@tootallnate/once@npm:1.1.2"
@@ -6180,15 +6189,6 @@ __metadata:
   version: 2.1.0
   resolution: "@types/blake2b@npm:2.1.0"
   checksum: daff30373c3ed7624a15c95d320a7f68fcb42dd1b1a8609304bada0b9b322367f200a15b65c60c4048f94c23338742a1afd8d38ccf822bad538fcf010cab02da
-  languageName: node
-  linkType: hard
-
-"@types/bn.js@npm:^5.1.1":
-  version: 5.1.1
-  resolution: "@types/bn.js@npm:5.1.1"
-  dependencies:
-    "@types/node": "*"
-  checksum: e50ed2dd3abe997e047caf90e0352c71e54fc388679735217978b4ceb7e336e51477791b715f49fd77195ac26dd296c7bad08a3be9750e235f9b2e1edb1b51c2
   languageName: node
   linkType: hard
 
@@ -8748,6 +8748,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios@npm:^1.6.0":
+  version: 1.6.2
+  resolution: "axios@npm:1.6.2"
+  dependencies:
+    follow-redirects: ^1.15.0
+    form-data: ^4.0.0
+    proxy-from-env: ^1.1.0
+  checksum: 4a7429e2b784be0f2902ca2680964391eae7236faa3967715f30ea45464b98ae3f1c6f631303b13dfe721b17126b01f486c7644b9ef276bfc63112db9fd379f8
+  languageName: node
+  linkType: hard
+
 "b4a@npm:^1.0.1":
   version: 1.6.1
   resolution: "b4a@npm:1.6.1"
@@ -10050,6 +10061,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"chromedriver@npm:^120.0.0":
+  version: 120.0.0
+  resolution: "chromedriver@npm:120.0.0"
+  dependencies:
+    "@testim/chrome-version": ^1.1.4
+    axios: ^1.6.0
+    compare-versions: ^6.1.0
+    extract-zip: ^2.0.1
+    https-proxy-agent: ^5.0.1
+    proxy-from-env: ^1.1.0
+    tcp-port-used: ^1.0.2
+  bin:
+    chromedriver: bin/chromedriver
+  checksum: 05274ca045396696a05d26508850cd760cda9cc19658b0c737ea8ceb642691c8fad6e56a3a9c13e206907df2b6c60234d8c5f210172b608e9083e400b64cae2d
+  languageName: node
+  linkType: hard
+
 "ci-info@npm:^2.0.0":
   version: 2.0.0
   resolution: "ci-info@npm:2.0.0"
@@ -10541,6 +10569,13 @@ __metadata:
     array-ify: ^1.0.0
     dot-prop: ^5.1.0
   checksum: fb71d70632baa1e93283cf9d80f30ac97f003aabee026e0b4426c9716678079ef5fea7519b84d012cbed938c476493866a38a79760564a9e21ae9433e40e6f0d
+  languageName: node
+  linkType: hard
+
+"compare-versions@npm:^6.1.0":
+  version: 6.1.0
+  resolution: "compare-versions@npm:6.1.0"
+  checksum: d4e2a45706a023d8d0b6680338b66b79e20bd02d1947f0ac6531dab634cbed89fa373b3f03d503c5e489761194258d6e1bae67a07f88b1efc61648454f2d47e7
   languageName: node
   linkType: hard
 
@@ -13153,7 +13188,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"extract-zip@npm:2.0.1":
+"extract-zip@npm:2.0.1, extract-zip@npm:^2.0.1":
   version: 2.0.1
   resolution: "extract-zip@npm:2.0.1"
   dependencies:
@@ -13591,6 +13626,16 @@ __metadata:
     debug:
       optional: true
   checksum: faa66059b66358ba65c234c2f2a37fcec029dc22775f35d9ad6abac56003268baf41e55f9ee645957b32c7d9f62baf1f0b906e68267276f54ec4b4c597c2b190
+  languageName: node
+  linkType: hard
+
+"follow-redirects@npm:^1.15.0":
+  version: 1.15.3
+  resolution: "follow-redirects@npm:1.15.3"
+  peerDependenciesMeta:
+    debug:
+      optional: true
+  checksum: 584da22ec5420c837bd096559ebfb8fe69d82512d5585004e36a3b4a6ef6d5905780e0c74508c7b72f907d1fa2b7bd339e613859e9c304d0dc96af2027fd0231
   languageName: node
   linkType: hard
 
@@ -14775,7 +14820,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"https-proxy-agent@npm:5, https-proxy-agent@npm:5.0.1, https-proxy-agent@npm:^5.0.0":
+"https-proxy-agent@npm:5, https-proxy-agent@npm:5.0.1, https-proxy-agent@npm:^5.0.0, https-proxy-agent@npm:^5.0.1":
   version: 5.0.1
   resolution: "https-proxy-agent@npm:5.0.1"
   dependencies:
@@ -20993,7 +21038,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"proxy-from-env@npm:1.1.0, proxy-from-env@npm:^1.0.0":
+"proxy-from-env@npm:1.1.0, proxy-from-env@npm:^1.0.0, proxy-from-env@npm:^1.1.0":
   version: 1.1.0
   resolution: "proxy-from-env@npm:1.1.0"
   checksum: ed7fcc2ba0a33404958e34d95d18638249a68c430e30fcb6c478497d72739ba64ce9810a24f53a7d921d0c065e5b78e3822759800698167256b04659366ca4d4
@@ -23430,7 +23475,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tcp-port-used@npm:^1.0.1":
+"tcp-port-used@npm:^1.0.1, tcp-port-used@npm:^1.0.2":
   version: 1.0.2
   resolution: "tcp-port-used@npm:1.0.2"
   dependencies:

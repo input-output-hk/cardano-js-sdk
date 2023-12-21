@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.12.1...@cardano-sdk/dapp-connector@0.12.2) (2023-12-20)
+
+**Note:** Version bump only for package @cardano-sdk/dapp-connector
+
+## [0.12.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.12.0...@cardano-sdk/dapp-connector@0.12.1) (2023-12-14)
+
+**Note:** Version bump only for package @cardano-sdk/dapp-connector
+
+## [0.12.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.11.4...@cardano-sdk/dapp-connector@0.12.0) (2023-12-12)
+
+### ⚠ BREAKING CHANGES
+
+* replace authenticator 'origin' argument to 'sender'
+- hoist 'senderOrigin' util to dapp-connector package
+
+### Features
+
+* track cip30 method call origin & update Authenticator api ([75c8af6](https://github.com/input-output-hk/cardano-js-sdk/commit/75c8af6aecc0ddcaeca153e8a3693d6e18edf60e))
+
+## [0.11.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.11.3...@cardano-sdk/dapp-connector@0.11.4) (2023-12-07)
+
+**Note:** Version bump only for package @cardano-sdk/dapp-connector
+
+## [0.11.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.11.2...@cardano-sdk/dapp-connector@0.11.3) (2023-12-04)
+
+**Note:** Version bump only for package @cardano-sdk/dapp-connector
+
 ## [0.11.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.11.1...@cardano-sdk/dapp-connector@0.11.2) (2023-11-29)
 
 ### Bug Fixes
