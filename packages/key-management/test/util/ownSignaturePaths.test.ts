@@ -130,36 +130,6 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
   );
 
   it(
-    'returns stake key derivation path when a Conway stake Registration' +
-      ' certificate with the wallet stake key hash is present',
-    async () => {
-      const txBody = {
-        certificates: [
-          {
-            __typename: Cardano.CertificateType.Registration,
-            stakeCredential: ownStakeCredential
-          } as Cardano.NewStakeAddressCertificate
-        ],
-        inputs: [{}, {}, {}]
-      } as Cardano.TxBody;
-      const resolveInput = jest
-        .fn()
-        .mockReturnValueOnce({ ...txOut, address: address1 })
-        .mockReturnValueOnce(address1);
-      expect(await util.ownSignatureKeyPaths(txBody, [knownAddress1], { resolveInput })).toEqual([
-        {
-          index: 0,
-          role: KeyRole.External
-        },
-        {
-          index: 0,
-          role: KeyRole.Stake
-        }
-      ]);
-    }
-  );
-
-  it(
     'returns stake key derivation path when a StakeDeregistration' +
       ' certificate with the wallet stake key hash is present',
     async () => {

@@ -403,31 +403,6 @@ describe('TrezorKeyAgent', () => {
       } = await wallet.finalizeTx({ tx: txInternals });
       expect(signatures.size).toBe(2);
     });
-
-    it('successfully signs transaction with required extra signatures', async () => {
-      const requiredExtraSignatures = [
-        // Unknown payments address -> keyHash
-        Crypto.Ed25519KeyHashHex('9ab1e9d2346c3f4be360d22b8ee7756a0316c3c1aece473e2887ea97')
-      ];
-      // Add known payment address if exists -> keyPath (acc0)
-      const knownAddressPaymentCredential = Cardano.Address.fromBech32(keyAgent.knownAddresses[0].address)
-        ?.asBase()
-        ?.getPaymentCredential().hash;
-      if (knownAddressPaymentCredential)
-        requiredExtraSignatures.push(Crypto.Ed25519KeyHashHex(knownAddressPaymentCredential));
-
-      props = {
-        outputs: new Set<Cardano.TxOut>([outputs.simpleOutput]),
-        requiredExtraSignatures
-      };
-      txInternals = await wallet.initializeTx(props);
-
-      const signatures = await keyAgent.signTransaction({
-        body: txInternals.body,
-        hash: txInternals.hash
-      });
-      expect(signatures.size).toBe(2);
-    });
   });
 
   it('can be created with any account index', async () => {

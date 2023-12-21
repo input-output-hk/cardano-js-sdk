@@ -1,4 +1,3 @@
-import * as CardanoNodeUtil from './errorUtils';
 import {
   Cardano,
   CardanoNode,
