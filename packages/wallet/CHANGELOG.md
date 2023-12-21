@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.29.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.28.2...@cardano-sdk/wallet@0.29.0) (2023-12-21)
+
+### ⚠ BREAKING CHANGES
+
+* **wallet:** ObservableWallet addresses$ observable now emits WalletAddress array instead of GroupedAddress array
+
+### Features
+
+* **wallet:** addresses$ observable now emits WalletAddress array instead of GroupedAddress array ([5704dae](https://github.com/input-output-hk/cardano-js-sdk/commit/5704dae7e173c8d10f04b23279b474c5a350eb5a))
+* **wallet:** export newTransactions$ util ([83451ac](https://github.com/input-output-hk/cardano-js-sdk/commit/83451acf0327d995fc1bc33ca7c32f135e225b39))
+* **wallet:** re-fetch CIP-68 nft metadata ([3d2a89a](https://github.com/input-output-hk/cardano-js-sdk/commit/3d2a89a41b1ccdbed76c0d883ac5f0b172dc48bd))
+
 ## [0.28.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.28.1...@cardano-sdk/wallet@0.28.2) (2023-12-20)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
