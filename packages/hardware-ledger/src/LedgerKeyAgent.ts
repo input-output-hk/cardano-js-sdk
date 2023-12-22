@@ -104,6 +104,7 @@ const isMultiSig = (tx: Transaction): boolean => {
   const result = false;
 
   const allThirdPartyInputs = !tx.inputs.some((input) => input.path !== null);
+  // Ledger doesn't allow change outputs to address controlled by your keys and instead you have to use script address for change out
   const allThirdPartyOutputs = !tx.outputs.some((out) => out.destination.type !== TxOutputDestinationType.THIRD_PARTY);
 
   if (
@@ -346,10 +347,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
       }
     }
 
-    // Represents a transaction that includes Plutus script evaluation (e.g. spending from a script address). We will
-    // also flag any transaction with required extra signers as a plutus transaction, since ordinary transactions requires
-    // all inputs to be provided by the wallet
-    if (tx.collateralInputs || tx.requiredSigners) {
+    if (tx.collateralInputs) {
       return TransactionSigningMode.PLUTUS_TRANSACTION;
     }
 

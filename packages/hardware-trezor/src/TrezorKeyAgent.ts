@@ -46,6 +46,36 @@ export type TrezorConnectInstanceType = typeof TrezorConnectNode | typeof Trezor
 const getTrezorConnect = (communicationType: CommunicationType): TrezorConnectInstanceType =>
   communicationType === CommunicationType.Node ? TrezorConnectNode : TrezorConnectWeb;
 
+const stakeCredentialCert = (certificateType: Trezor.PROTO.CardanoCertificateType): boolean =>
+  certificateType === Trezor.PROTO.CardanoCertificateType.STAKE_REGISTRATION ||
+  certificateType === Trezor.PROTO.CardanoCertificateType.STAKE_DEREGISTRATION ||
+  certificateType === Trezor.PROTO.CardanoCertificateType.STAKE_DELEGATION;
+
+const containsOnlyScriptHashCredentials = (tx: Omit<Trezor.CardanoSignTransaction, 'signingMode'>): boolean => {
+  if (tx.certificates) {
+    for (const cert of tx.certificates) {
+      if (!stakeCredentialCert(cert.type) || !cert.scriptHash) return false;
+    }
+  }
+  return !tx.withdrawals?.some((withdrawal) => !withdrawal.scriptHash);
+};
+
+const isMultiSig = (tx: Omit<Trezor.CardanoSignTransaction, 'signingMode'>): boolean => {
+  const allThirdPartyInputs = !tx.inputs.some((input) => input.path);
+  // Trezor doesn't allow change outputs to address controlled by your keys and instead you have to use script address for change out
+  const allThirdPartyOutputs = !tx.outputs.some((out) => 'addressParameters' in out);
+
+  return (
+    allThirdPartyInputs &&
+    allThirdPartyOutputs &&
+    !tx.collateralInputs &&
+    !tx.collateralReturn &&
+    !tx.totalCollateral &&
+    !tx.referenceInputs &&
+    containsOnlyScriptHashCredentials(tx)
+  );
+};
+
 export class TrezorKeyAgent extends KeyAgentBase {
   readonly isTrezorInitialized: Promise<boolean>;
   readonly #communicationType: CommunicationType;
@@ -140,8 +170,12 @@ export class TrezorKeyAgent extends KeyAgentBase {
     );
   }
 
-  /** Gets the mode in which we want to sign the transaction. */
-  static getSigningMode(tx: Omit<Trezor.CardanoSignTransaction, 'signingMode'>): Trezor.PROTO.CardanoTxSigningMode {
+  /**
+   * Gets the mode in which we want to sign the transaction.
+   * This function will always return the first matching type depending on the provided data
+   * Data is further checked on the Trezor side
+   */
+  static matchSigningMode(tx: Omit<Trezor.CardanoSignTransaction, 'signingMode'>): Trezor.PROTO.CardanoTxSigningMode {
     if (tx.certificates) {
       for (const cert of tx.certificates) {
         // Represents pool registration from the perspective of a pool owner.
@@ -153,11 +187,15 @@ export class TrezorKeyAgent extends KeyAgentBase {
       }
     }
 
-    // Represents a transaction that includes Plutus script evaluation (e.g. spending from a script address). We will
-    // also flag any transaction with required extra signers as a plutus transaction, since ordinary transactions requires
-    // all inputs to be provided by the wallet
-    if (tx.collateralInputs || tx.requiredSigners) {
+    /** Plutus signing mode has a broader usage e.g. multisig tx that contains referenceInputs is marked as plutus */
+    if (tx.collateralInputs || tx.collateralReturn || tx.totalCollateral || tx.referenceInputs) {
       return Trezor.PROTO.CardanoTxSigningMode.PLUTUS_TRANSACTION;
+    }
+
+    // Represents a transaction controlled by native scripts.
+    // Like an ordinary transaction, but stake credentials and all similar elements are given as script hashes
+    if (isMultiSig(tx)) {
+      return Trezor.PROTO.CardanoTxSigningMode.MULTISIG_TRANSACTION;
     }
 
     // Represents an ordinary user transaction transferring funds.
@@ -178,7 +216,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
         txInKeyPathMap
       });
 
-      const signingMode = TrezorKeyAgent.getSigningMode(trezorTxData);
+      const signingMode = TrezorKeyAgent.matchSigningMode(trezorTxData);
 
       const trezorConnect = getTrezorConnect(this.#communicationType);
       const result = await trezorConnect.cardanoSignTransaction({
