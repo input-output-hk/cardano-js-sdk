@@ -239,6 +239,10 @@ describe('WalletManagerWorker', () => {
       await expect(
         firstValueFrom(walletManager.activeWallet$.pipe(filter(isNotNil)).pipe(timeout({ first: 50 })))
       ).rejects.toThrowError(TimeoutError);
+
+      await expect(
+        firstValueFrom(walletManager.activeWalletId$.pipe(filter(isNotNil)).pipe(timeout({ first: 50 })))
+      ).rejects.toThrowError(TimeoutError);
     });
 
     it('activates last activated wallet', async () => {
@@ -265,7 +269,7 @@ describe('WalletManagerWorker', () => {
         chainId: chain,
         accountIndex,
         provider
-      } = await firstValueFrom(walletManager.activeWalletId$);
+      } = await firstValueFrom(walletManager.activeWalletId$.pipe(filter(isNotNil)));
 
       expect(id).toEqual('da7b4795b11a79116eb5232c83d2c862');
       expect(accountIndex).toEqual(0);
@@ -294,7 +298,11 @@ describe('WalletManagerWorker', () => {
   describe('switchNetwork', () => {
     it('switches the network but keeps the same wallet id and account index', async () => {
       await walletManager.activate({ accountIndex: 0, chainId, walletId });
-      const { walletId: id, chainId: chain, accountIndex } = await firstValueFrom(walletManager.activeWalletId$);
+      const {
+        walletId: id,
+        chainId: chain,
+        accountIndex
+      } = await firstValueFrom(walletManager.activeWalletId$.pipe(filter(isNotNil)));
       const newChainId = { networkId: Cardano.NetworkId.Testnet, networkMagic: 999 };
 
       expect(id).toEqual(walletId);
@@ -307,7 +315,7 @@ describe('WalletManagerWorker', () => {
         walletId: idUpdated,
         chainId: chainUpdated,
         accountIndex: accountIndexUpdated
-      } = await firstValueFrom(walletManager.activeWalletId$);
+      } = await firstValueFrom(walletManager.activeWalletId$.pipe(filter(isNotNil)));
 
       expect(idUpdated).toEqual(walletId);
       expect(accountIndexUpdated).toEqual(0);
