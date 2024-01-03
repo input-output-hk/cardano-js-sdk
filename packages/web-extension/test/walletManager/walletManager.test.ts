@@ -231,6 +231,11 @@ describe('WalletManagerWorker', () => {
       await walletManager.activate({ accountIndex: 0, chainId, walletId });
       expect(walletFactoryCreate).toHaveBeenCalledTimes(1);
     });
+
+    it('compares the chainId using deepEquals', async () => {
+      await walletManager.activate({ accountIndex: 0, chainId: { ...chainId }, walletId });
+      expect(walletFactoryCreate).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('initialize', () => {

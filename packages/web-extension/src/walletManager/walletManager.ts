@@ -8,7 +8,7 @@ import {
 import { AnyBip32Wallet, AnyWallet, WalletId, WalletType } from './types';
 import { BehaviorSubject, ReplaySubject, firstValueFrom, lastValueFrom } from 'rxjs';
 import { Cardano, Serialization } from '@cardano-sdk/core';
-import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import { HexBlob, InvalidArgumentError, deepEquals } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { MessengerDependencies } from '../messaging';
 import { ObservableWallet, storage } from '@cardano-sdk/wallet';
@@ -184,7 +184,7 @@ export class WalletManager<Metadata extends { name: string }> implements WalletM
     return (
       this.#activeWalletProps?.walletId === walletProps.walletId &&
       this.#activeWalletProps?.accountIndex === walletProps.accountIndex &&
-      this.#activeWalletProps?.chainId === walletProps.chainId
+      deepEquals(this.#activeWalletProps?.chainId, walletProps.chainId)
     );
   }
 
