@@ -35,9 +35,9 @@ import {
   emip3encrypt,
   util
 } from '@cardano-sdk/key-management';
-import { HexBlob } from '@cardano-sdk/util';
+import { HexBlob, isNotNil } from '@cardano-sdk/util';
 import { SodiumBip32Ed25519 } from '@cardano-sdk/crypto';
-import { combineLatest, firstValueFrom, merge, of } from 'rxjs';
+import { combineLatest, filter, firstValueFrom, merge, of } from 'rxjs';
 import { runtime } from 'webextension-polyfill';
 
 const delegationConfig = {
@@ -168,7 +168,7 @@ const clearWalletValues = (): void => {
 
 const destroyWallet = async (): Promise<void> => {
   await walletManager.deactivate();
-  const activeWalletId = await firstValueFrom(walletManager.activeWalletId$);
+  const activeWalletId = await firstValueFrom(walletManager.activeWalletId$.pipe(filter(isNotNil)));
   await walletManager.destroyData(activeWalletId.walletId, env.KEY_MANAGEMENT_PARAMS.chainId);
   clearWalletValues();
 };
