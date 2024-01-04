@@ -25,7 +25,7 @@ describe('SignerManager', () => {
       }
     ],
     encryptedSecrets: {
-      entropy: HexBlob('abc'),
+      keyMaterial: HexBlob('abc'),
       rootPrivateKeyBytes: HexBlob('123')
     },
     extendedAccountPublicKey: Bip32PublicKeyHex(

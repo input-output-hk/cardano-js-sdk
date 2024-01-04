@@ -32,8 +32,7 @@ import {
   CommunicationType,
   InMemoryKeyAgent,
   SerializableInMemoryKeyAgentData,
-  emip3encrypt,
-  util
+  emip3encrypt
 } from '@cardano-sdk/key-management';
 import { HexBlob, isNotNil } from '@cardano-sdk/util';
 import { SodiumBip32Ed25519 } from '@cardano-sdk/crypto';
@@ -297,6 +296,7 @@ const createWalletIfNotExistsAndActivate = async (accountIndex: number) => {
     clearWalletValues();
     const bip32Ed25519 = new SodiumBip32Ed25519();
     const mnemonicWords = env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' ');
+    const encryptedMnemonic = await emip3encrypt(Buffer.from(env.KEY_MANAGEMENT_PARAMS.mnemonic), passphraseByteArray);
     const passphrase = new Uint8Array(passphraseByteArray);
     const keyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
       {
@@ -310,14 +310,11 @@ const createWalletIfNotExistsAndActivate = async (accountIndex: number) => {
     const encryptedRootPrivateKey = (keyAgent.serializableData as SerializableInMemoryKeyAgentData)
       .encryptedRootPrivateKeyBytes;
 
-    const entropy = Buffer.from(util.mnemonicWordsToEntropy(mnemonicWords), 'hex');
-    const encryptedEntropy = await emip3encrypt(entropy, passphraseByteArray);
-
     logger.log('adding to repository wallet');
     // Add wallet to the repository.
     walletId = await repository.addWallet({
       encryptedSecrets: {
-        entropy: HexBlob.fromBytes(encryptedEntropy),
+        keyMaterial: HexBlob.fromBytes(encryptedMnemonic),
         rootPrivateKeyBytes: HexBlob.fromBytes(new Uint8Array(encryptedRootPrivateKey))
       },
       extendedAccountPublicKey: keyAgent.serializableData.extendedAccountPublicKey,
