@@ -68,7 +68,7 @@ describe('WalletManagerWorker', () => {
   const runtime: MinimalRuntime = { connect: jest.fn(), onConnect: jest.fn() as any };
   const walletProps: AddWalletProps<{}> = {
     encryptedSecrets: {
-      entropy: HexBlob('f07e8b397c93a16c06f83c8f0c1a1866477c6090926445fc0cb1201228ace6e9'),
+      keyMaterial: HexBlob('f07e8b397c93a16c06f83c8f0c1a1866477c6090926445fc0cb1201228ace6e9'),
       rootPrivateKeyBytes: HexBlob(
         '3809937b61bd4f180a1e9bd15237e7bc20e36b9037dd95ef60d84f6004758250' +
           'a22e1bfc0d81e9adb7760bcba7f5214416b3e9f27c8d58794a3a7fead2d5b695' +
