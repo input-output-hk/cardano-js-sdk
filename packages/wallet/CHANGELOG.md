@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.29.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.29.0...@cardano-sdk/wallet@0.29.1) (2024-01-05)
+
+### Features
+
+* **hardware-trezor:** introduce hw trezor multisig signing mode ([5f77781](https://github.com/input-output-hk/cardano-js-sdk/commit/5f777819775f81ae043343de6613fe0ecb5106ce))
+
 ## [0.29.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.28.2...@cardano-sdk/wallet@0.29.0) (2023-12-21)
 
 ### ⚠ BREAKING CHANGES
