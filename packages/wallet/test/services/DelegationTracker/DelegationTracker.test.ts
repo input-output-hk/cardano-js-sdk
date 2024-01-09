@@ -211,7 +211,8 @@ describe('DelegationTracker', () => {
               285,
               [
                 {
-                  __typename: Cardano.CertificateType.StakeRegistration,
+                  __typename: Cardano.CertificateType.Registration,
+                  deposit: 2_000_000n,
                   stakeCredential: {
                     hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
                     type: Cardano.CredentialType.KeyHash
@@ -237,7 +238,8 @@ describe('DelegationTracker', () => {
               285,
               [
                 {
-                  __typename: Cardano.CertificateType.StakeRegistration,
+                  __typename: Cardano.CertificateType.Registration,
+                  deposit: 2_000_000n,
                   stakeCredential: {
                     hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
                     type: Cardano.CredentialType.KeyHash
@@ -272,7 +274,8 @@ describe('DelegationTracker', () => {
               285,
               [
                 {
-                  __typename: Cardano.CertificateType.StakeRegistration,
+                  __typename: Cardano.CertificateType.Registration,
+                  deposit: 2_000_000n,
                   stakeCredential: {
                     hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
                     type: Cardano.CredentialType.KeyHash
@@ -296,7 +299,11 @@ describe('DelegationTracker', () => {
               287,
               [
                 {
-                  __typename: Cardano.CertificateType.StakeRegistration,
+                  __typename: Cardano.CertificateType.VoteRegistrationDelegation,
+                  dRep: {
+                    __typename: 'AlwaysAbstain'
+                  },
+                  deposit: 2_000_000n,
                   stakeCredential: {
                     hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
                     type: Cardano.CredentialType.KeyHash
@@ -344,9 +351,29 @@ describe('DelegationTracker', () => {
             )
           ],
           b: [
+            createStubTxWithSlot(
+              284,
+              [
+                {
+                  __typename: Cardano.CertificateType.StakeRegistration,
+                  stakeCredential: {
+                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                    type: Cardano.CredentialType.KeyHash
+                  }
+                }
+              ],
+              {
+                blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio)]])
+              }
+            ),
             createStubTxWithSlot(286, [
               {
-                __typename: Cardano.CertificateType.StakeRegistration,
+                __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
+                dRep: {
+                  __typename: 'AlwaysAbstain'
+                },
+                deposit: 2_000_000n,
+                poolId: 'abc' as Cardano.PoolId,
                 stakeCredential: {
                   hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
                   type: Cardano.CredentialType.KeyHash
@@ -375,7 +402,12 @@ describe('DelegationTracker', () => {
               284,
               [
                 {
-                  __typename: Cardano.CertificateType.StakeRegistration,
+                  __typename: Cardano.CertificateType.StakeVoteDelegation,
+                  dRep: {
+                    __typename: 'AlwaysAbstain'
+                  },
+                  poolId: 'abc' as Cardano.PoolId,
+
                   stakeCredential: {
                     hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
                     type: Cardano.CredentialType.KeyHash
@@ -388,6 +420,21 @@ describe('DelegationTracker', () => {
             )
           ],
           b: [
+            createStubTxWithSlot(
+              284,
+              [
+                {
+                  __typename: Cardano.CertificateType.StakeRegistration,
+                  stakeCredential: {
+                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                    type: Cardano.CredentialType.KeyHash
+                  }
+                }
+              ],
+              {
+                blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio)]])
+              }
+            ),
             createStubTxWithSlot(289, undefined, {
               blob: new Map([
                 [Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolioChangeWeights)]
