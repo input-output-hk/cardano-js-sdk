@@ -68,7 +68,7 @@ describe('WalletManagerWorker', () => {
   const runtime: MinimalRuntime = { connect: jest.fn(), onConnect: jest.fn() as any };
   const walletProps: AddWalletProps<{}> = {
     encryptedSecrets: {
-      entropy: HexBlob('f07e8b397c93a16c06f83c8f0c1a1866477c6090926445fc0cb1201228ace6e9'),
+      keyMaterial: HexBlob('f07e8b397c93a16c06f83c8f0c1a1866477c6090926445fc0cb1201228ace6e9'),
       rootPrivateKeyBytes: HexBlob(
         '3809937b61bd4f180a1e9bd15237e7bc20e36b9037dd95ef60d84f6004758250' +
           'a22e1bfc0d81e9adb7760bcba7f5214416b3e9f27c8d58794a3a7fead2d5b695' +
@@ -231,6 +231,11 @@ describe('WalletManagerWorker', () => {
       await walletManager.activate({ accountIndex: 0, chainId, walletId });
       expect(walletFactoryCreate).toHaveBeenCalledTimes(1);
     });
+
+    it('compares the chainId using deepEquals', async () => {
+      await walletManager.activate({ accountIndex: 0, chainId: { ...chainId }, walletId });
+      expect(walletFactoryCreate).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('initialize', () => {
@@ -238,6 +243,10 @@ describe('WalletManagerWorker', () => {
       await walletManager.initialize();
       await expect(
         firstValueFrom(walletManager.activeWallet$.pipe(filter(isNotNil)).pipe(timeout({ first: 50 })))
+      ).rejects.toThrowError(TimeoutError);
+
+      await expect(
+        firstValueFrom(walletManager.activeWalletId$.pipe(filter(isNotNil)).pipe(timeout({ first: 50 })))
       ).rejects.toThrowError(TimeoutError);
     });
 
@@ -265,7 +274,7 @@ describe('WalletManagerWorker', () => {
         chainId: chain,
         accountIndex,
         provider
-      } = await firstValueFrom(walletManager.activeWalletId$);
+      } = await firstValueFrom(walletManager.activeWalletId$.pipe(filter(isNotNil)));
 
       expect(id).toEqual('da7b4795b11a79116eb5232c83d2c862');
       expect(accountIndex).toEqual(0);
@@ -294,7 +303,11 @@ describe('WalletManagerWorker', () => {
   describe('switchNetwork', () => {
     it('switches the network but keeps the same wallet id and account index', async () => {
       await walletManager.activate({ accountIndex: 0, chainId, walletId });
-      const { walletId: id, chainId: chain, accountIndex } = await firstValueFrom(walletManager.activeWalletId$);
+      const {
+        walletId: id,
+        chainId: chain,
+        accountIndex
+      } = await firstValueFrom(walletManager.activeWalletId$.pipe(filter(isNotNil)));
       const newChainId = { networkId: Cardano.NetworkId.Testnet, networkMagic: 999 };
 
       expect(id).toEqual(walletId);
@@ -307,7 +320,7 @@ describe('WalletManagerWorker', () => {
         walletId: idUpdated,
         chainId: chainUpdated,
         accountIndex: accountIndexUpdated
-      } = await firstValueFrom(walletManager.activeWalletId$);
+      } = await firstValueFrom(walletManager.activeWalletId$.pipe(filter(isNotNil)));
 
       expect(idUpdated).toEqual(walletId);
       expect(accountIndexUpdated).toEqual(0);

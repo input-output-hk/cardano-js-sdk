@@ -21,15 +21,28 @@ export type RequestBase<WalletMetadata extends {}> = {
   reject(reason: string): Promise<void>;
 };
 
+export type SignOptions = {
+  /**
+   * if `true`,
+   * - underlying KeyAgent errors from this call will not be propagated back to the wallet via SignerManagerSignApi
+   * - SignerManager expects user to either retry the call to `sign` or call `reject` manually
+   */
+  willRetryOnFailure?: boolean;
+};
+
 type SignRequestInMemory<R> = {
   walletType: WalletType.InMemory;
-  sign(passphrase: Uint8Array): Promise<R>;
+  sign(passphrase: Uint8Array, options?: SignOptions): Promise<R>;
 };
 
 type SignRequestHardware<R> = {
   walletType: WalletType.Trezor | WalletType.Ledger;
-  /** Must be called from user gesture when running in web environments */
-  sign(): Promise<R>;
+  /**
+   * Must be called from user gesture when running in web environments
+   *
+   * @param noReject if `true`, underlying KeyAgent errors will not be propagated back to the wallet via SignerManagerSignApi
+   */
+  sign(options?: SignOptions): Promise<R>;
 };
 
 export type SignRequest<R> = SignRequestHardware<R> | SignRequestInMemory<R>;

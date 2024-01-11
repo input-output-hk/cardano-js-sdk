@@ -1,5 +1,6 @@
 /* eslint-disable brace-style */
 import { Cardano, Serialization } from '@cardano-sdk/core';
+import { CustomError } from 'ts-custom-error';
 import { InMemoryWallet, WalletType } from '../types';
 import { KeyAgent, SignBlobResult, TrezorConfig, errors } from '@cardano-sdk/key-management';
 import { KeyAgentFactory } from './KeyAgentFactory';
@@ -8,6 +9,7 @@ import {
   RequestContext,
   SignDataProps,
   SignDataRequest,
+  SignOptions,
   SignRequest,
   SignTransactionProps,
   SignerManagerConfirmationApi,
@@ -26,6 +28,16 @@ export type SignerManagerDependencies = {
   keyAgentFactory: KeyAgentFactory;
 };
 
+class NoRejectError extends CustomError {
+  constructor(public actualError: unknown) {
+    super();
+  }
+}
+const throwMaybeWrappedWithNoRejectError = (error: unknown, options?: SignOptions): never => {
+  if (options?.willRetryOnFailure) throw new NoRejectError(error);
+  throw error;
+};
+
 const clearPassphrase = (passphrase: Uint8Array) => {
   for (let i = 0; i < passphrase.length; i++) {
     passphrase[i] = 0;
@@ -38,10 +50,14 @@ const bubbleResolveReject = async <R>(
   reject: (error: unknown) => void
 ): Promise<R> => {
   try {
-    const result = action();
+    const result = await action();
     resolve(result);
     return result;
   } catch (error) {
+    if (error instanceof NoRejectError) {
+      throw error.actualError;
+    }
+
     reject(error);
     throw error;
   }
@@ -122,7 +138,7 @@ export class SignerManager<WalletMetadata extends {}>
         request.walletType === WalletType.InMemory
           ? ({
               ...commonRequestProps,
-              sign: async (passphrase: Uint8Array) =>
+              sign: async (passphrase: Uint8Array, options?: SignOptions) =>
                 bubbleResolveReject(
                   async () => {
                     const wallet = request.requestContext.wallet as InMemoryWallet<WalletMetadata>;
@@ -142,7 +158,7 @@ export class SignerManager<WalletMetadata extends {}>
                       return result;
                     } catch (error) {
                       clearPassphrase(passphrase);
-                      throw error;
+                      return throwMaybeWrappedWithNoRejectError(error, options);
                     }
                   },
                   resolve,
@@ -154,7 +170,7 @@ export class SignerManager<WalletMetadata extends {}>
               ...commonRequestProps,
               sign: async (): Promise<R> =>
                 bubbleResolveReject(
-                  async () =>
+                  async (options?: SignOptions) =>
                     sign(
                       request.walletType === WalletType.Ledger
                         ? this.#keyAgentFactory.Ledger({
@@ -169,7 +185,7 @@ export class SignerManager<WalletMetadata extends {}>
                             extendedAccountPublicKey: request.requestContext.wallet.extendedAccountPublicKey,
                             trezorConfig: this.#hwOptions
                           })
-                    ),
+                    ).catch((error) => throwMaybeWrappedWithNoRejectError(error, options)),
                   resolve,
                   reject
                 ),

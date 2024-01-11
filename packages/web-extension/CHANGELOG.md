@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.20.1...@cardano-sdk/web-extension@0.21.0) (2024-01-05)
+
+### ⚠ BREAKING CHANGES
+
+* wallet repository InMemoryWallet entropy field renamed to keyMaterial
+
+### Features
+
+* **web-extension:** add willRetryOnFailure sign option to SignerManager ([7a1bac8](https://github.com/input-output-hk/cardano-js-sdk/commit/7a1bac81b1aeffdeaa8efac8de1059cd03393065))
+
+### Bug Fixes
+
+* **web-extension:** wallet manager now deepEquals the chainId when comparing the active wallet props ([74e9ac1](https://github.com/input-output-hk/cardano-js-sdk/commit/74e9ac1101e5337b60d9be2656b0d6b31a2d63b7))
+* **web-extension:** wallet manager will not emit null from activeWalletId$ ([d94b49a](https://github.com/input-output-hk/cardano-js-sdk/commit/d94b49a987ec0e7d50060365cd03f40d63debc8e))
+
+### Code Refactoring
+
+* entropy field in InMemoryWallet renamed to keyMaterial. ([d8b5c72](https://github.com/input-output-hk/cardano-js-sdk/commit/d8b5c72de96a24b84b62f558af952090b53209f3))
+
+## [0.20.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.20.0...@cardano-sdk/web-extension@0.20.1) (2023-12-21)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
 ## [0.20.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.19.0...@cardano-sdk/web-extension@0.20.0) (2023-12-20)
 
 ### ⚠ BREAKING CHANGES

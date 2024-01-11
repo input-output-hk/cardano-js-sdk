@@ -290,6 +290,10 @@ describe('TrezorKeyAgent', () => {
     });
 
     it('throws if signed transaction hash doesnt match hash computed by the wallet', async () => {
+      props = {
+        outputs: new Set<Cardano.TxOut>([outputs.simpleOutput])
+      };
+      txInternals = await wallet.initializeTx(props);
       await expect(
         trezorKeyAgent.signTransaction(
           {

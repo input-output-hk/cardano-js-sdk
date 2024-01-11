@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.30.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.29.1...@cardano-sdk/e2e@0.30.0) (2024-01-05)
+
+### ⚠ BREAKING CHANGES
+
+* wallet repository InMemoryWallet entropy field renamed to keyMaterial
+
+### Bug Fixes
+
+* **web-extension:** wallet manager will not emit null from activeWalletId$ ([d94b49a](https://github.com/input-output-hk/cardano-js-sdk/commit/d94b49a987ec0e7d50060365cd03f40d63debc8e))
+
+### Code Refactoring
+
+* entropy field in InMemoryWallet renamed to keyMaterial. ([d8b5c72](https://github.com/input-output-hk/cardano-js-sdk/commit/d8b5c72de96a24b84b62f558af952090b53209f3))
+
+## [0.29.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.29.0...@cardano-sdk/e2e@0.29.1) (2023-12-21)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
 ## [0.29.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.28.1...@cardano-sdk/e2e@0.29.0) (2023-12-20)
 
 ### ⚠ BREAKING CHANGES

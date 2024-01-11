@@ -25,7 +25,7 @@ describe('SignerManager', () => {
       }
     ],
     encryptedSecrets: {
-      entropy: HexBlob('abc'),
+      keyMaterial: HexBlob('abc'),
       rootPrivateKeyBytes: HexBlob('123')
     },
     extendedAccountPublicKey: Bip32PublicKeyHex(
@@ -124,6 +124,32 @@ describe('SignerManager', () => {
       await expect(signed).rejects.toThrow(error);
       expect(passphrase).toEqual(new Uint8Array([0, 0, 0]));
     });
+
+    describe('willRetryOnFailure=true', () => {
+      it('does not resolve to original caller until successful signing', async () => {
+        const error = new Error('invalid passphrase, please retry');
+        keyAgent.signTransaction.mockRejectedValueOnce(error).mockResolvedValueOnce(signatures);
+        const reqEmitted = firstValueFrom(signerManager.transactionWitnessRequest$);
+        const signed = signerManager.signTransaction({ signContext, tx }, requestContext);
+        const req = await reqEmitted;
+        await expect(req.sign(passphrase, { willRetryOnFailure: true })).rejects.toThrow(error);
+        await expect(req.sign(passphrase, { willRetryOnFailure: true })).resolves.toEqual(signatures);
+        await expect(signed).resolves.toEqual(signatures);
+        expect(passphrase).toEqual(new Uint8Array([0, 0, 0]));
+      });
+
+      it('does not reject to original caller until explicit rejection', async () => {
+        const error = new Error('invalid passphrase, call reject if dont want to sign again');
+        keyAgent.signTransaction.mockRejectedValueOnce(error).mockResolvedValueOnce(signatures);
+        const reqEmitted = firstValueFrom(signerManager.transactionWitnessRequest$);
+        const signed = signerManager.signTransaction({ signContext, tx }, requestContext);
+        const req = await reqEmitted;
+        await expect(req.sign(passphrase, { willRetryOnFailure: true })).rejects.toThrow(error);
+        await req.reject('forgot password');
+        await expect(signed).rejects.toThrowError(errors.AuthenticationError);
+        expect(passphrase).toEqual(new Uint8Array([0, 0, 0]));
+      });
+    });
   });
 
   describe('signData', () => {
@@ -178,6 +204,32 @@ describe('SignerManager', () => {
       await expect(req.sign(passphrase)).rejects.toThrow(error);
       await expect(signed).rejects.toThrow(error);
       expect(passphrase).toEqual(new Uint8Array([0, 0, 0]));
+    });
+
+    describe('willRetryOnFailure=true', () => {
+      it('does not resolve to original caller until successful signing', async () => {
+        const error = new Error('invalid passphrase, please retry');
+        keyAgent.signBlob.mockRejectedValueOnce(error).mockResolvedValueOnce(signResult);
+        const reqEmitted = firstValueFrom(signerManager.signDataRequest$);
+        const signed = signerManager.signData({ blob, derivationPath, signContext }, requestContext);
+        const req = await reqEmitted;
+        await expect(req.sign(passphrase, { willRetryOnFailure: true })).rejects.toThrow(error);
+        await expect(req.sign(passphrase, { willRetryOnFailure: true })).resolves.toEqual(signResult);
+        await expect(signed).resolves.toEqual(signResult);
+        expect(passphrase).toEqual(new Uint8Array([0, 0, 0]));
+      });
+
+      it('does not reject to original caller until explicit rejection', async () => {
+        const error = new Error('invalid passphrase, call reject if dont want to sign again');
+        keyAgent.signBlob.mockRejectedValueOnce(error);
+        const reqEmitted = firstValueFrom(signerManager.signDataRequest$);
+        const signed = signerManager.signData({ blob, derivationPath, signContext }, requestContext);
+        const req = await reqEmitted;
+        await expect(req.sign(passphrase, { willRetryOnFailure: true })).rejects.toThrow(error);
+        await req.reject('forgot password');
+        await expect(signed).rejects.toThrowError(errors.AuthenticationError);
+        expect(passphrase).toEqual(new Uint8Array([0, 0, 0]));
+      });
     });
   });
 });

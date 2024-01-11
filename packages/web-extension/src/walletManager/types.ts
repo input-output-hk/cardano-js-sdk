@@ -31,7 +31,12 @@ export type HardwareWallet<Metadata extends {}> = Bip32Wallet<Metadata> & {
 export type InMemoryWallet<Metadata extends {}> = Bip32Wallet<Metadata> & {
   type: WalletType.InMemory;
   encryptedSecrets: {
-    entropy: HexBlob;
+    /**
+     * The key material is derived by concatenating the mnemonic words (separated by spaces) into a single string.
+     * This concatenated string is then encrypted using the 'emip3encrypt' method. The resulting
+     * encrypted data is encoded as a hexadecimal string.
+     */
+    keyMaterial: HexBlob;
     rootPrivateKeyBytes: HexBlob;
   };
 };

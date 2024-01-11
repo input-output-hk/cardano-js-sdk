@@ -6,7 +6,7 @@ import {
   Witnesser
 } from '@cardano-sdk/key-management';
 import { AnyBip32Wallet, AnyWallet, WalletId, WalletType } from './types';
-import { BehaviorSubject, Observable, ReplaySubject, distinctUntilChanged, firstValueFrom, lastValueFrom } from 'rxjs';
+import { BehaviorSubject, ReplaySubject, firstValueFrom, lastValueFrom } from 'rxjs';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { HexBlob, InvalidArgumentError, deepEquals } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
@@ -55,7 +55,7 @@ export interface WalletManagerDependencies<Metadata extends { name: string }> {
  * Keeps track of created stores and reuses them when a wallet is reactivated.
  */
 export class WalletManager<Metadata extends { name: string }> implements WalletManagerApi {
-  activeWalletId$: Observable<WalletManagerActivateProps>;
+  activeWalletId$ = new ReplaySubject<WalletManagerActivateProps | null>(1);
   activeWallet$ = new BehaviorSubject<ObservableWallet | null>(null);
 
   #activeWalletProps: WalletManagerActivateProps | null = null;
@@ -67,7 +67,6 @@ export class WalletManager<Metadata extends { name: string }> implements WalletM
   #logger: Logger;
   #managerStorageKey: string;
   #managerStorage: Storage.StorageArea;
-  #activeWalletId$ = new ReplaySubject<WalletManagerActivateProps>(1);
 
   constructor(
     { name }: WalletManagerProps,
@@ -81,8 +80,6 @@ export class WalletManager<Metadata extends { name: string }> implements WalletM
     }: MessengerDependencies & WalletManagerDependencies<Metadata>
   ) {
     this.#walletRepository = walletRepository;
-
-    this.activeWalletId$ = this.#activeWalletId$.pipe(distinctUntilChanged(deepEquals));
 
     this.#walletFactory = walletFactory;
     this.#managerStorageKey = `${name}-active-wallet`;
@@ -108,7 +105,10 @@ export class WalletManager<Metadata extends { name: string }> implements WalletM
   async initialize() {
     const { [this.#managerStorageKey]: lastActivateProps } = await this.#managerStorage.get(this.#managerStorageKey);
 
-    if (!lastActivateProps) return;
+    if (!lastActivateProps) {
+      this.activeWalletId$.next(null);
+      return;
+    }
 
     return this.activate(lastActivateProps);
   }
@@ -149,7 +149,7 @@ export class WalletManager<Metadata extends { name: string }> implements WalletM
 
     this.activeWallet$.next(wallet);
 
-    this.#activeWalletId$.next(props);
+    this.activeWalletId$.next(props);
   }
 
   /** Deactivate wallet. Wallet observable properties will emit only after a new wallet is {@link activate}ed. */
@@ -184,7 +184,7 @@ export class WalletManager<Metadata extends { name: string }> implements WalletM
     return (
       this.#activeWalletProps?.walletId === walletProps.walletId &&
       this.#activeWalletProps?.accountIndex === walletProps.accountIndex &&
-      this.#activeWalletProps?.chainId === walletProps.chainId
+      deepEquals(this.#activeWalletProps?.chainId, walletProps.chainId)
     );
   }
 
@@ -284,7 +284,6 @@ export class WalletManager<Metadata extends { name: string }> implements WalletM
     accountIndex?: number
   ): Witnesser {
     let witnesser;
-    this.#logger.error(wallet);
     switch (wallet.type) {
       case WalletType.InMemory:
       case WalletType.Ledger:

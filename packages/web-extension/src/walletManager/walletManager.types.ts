@@ -50,7 +50,7 @@ export interface WalletManagerActivateProps<P extends string | number = string, 
 }
 
 export interface WalletManagerApi {
-  activeWalletId$: Observable<WalletManagerActivateProps>;
+  activeWalletId$: Observable<WalletManagerActivateProps | null>;
 
   /**
    * Create and activate a new ObservableWallet.

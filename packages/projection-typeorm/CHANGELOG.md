@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.7.6...@cardano-sdk/projection-typeorm@0.7.7) (2024-01-05)
+
+**Note:** Version bump only for package @cardano-sdk/projection-typeorm
+
+## [0.7.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.7.5...@cardano-sdk/projection-typeorm@0.7.6) (2023-12-21)
+
+### Bug Fixes
+
+* **projection-typeorm:** fix the query to get activating stake pools which must be updated to active ([d64d2b2](https://github.com/input-output-hk/cardano-js-sdk/commit/d64d2b2bafad4eaca454fa880173ac60332e4985))
+
 ## [0.7.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.7.4...@cardano-sdk/projection-typeorm@0.7.5) (2023-12-20)
 
 **Note:** Version bump only for package @cardano-sdk/projection-typeorm
