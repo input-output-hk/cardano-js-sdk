@@ -201,10 +201,10 @@ export const txOut = {
   address:
     // eslint-disable-next-line max-len
     'addr_test1qpv5muwgjmmtqh2ta0kq9pmz0nurg9kmw7dryueqt57mncynjnzmk67fvy2unhzydrgzp2v6hl625t0d4qd5h3nxt04qu0ww7k',
-  datumHash: undefined,
+  // datumHash: undefined,
   index: 0,
   txId: '59f3ea1bb67b39447aad523f35daa1950c833472bf9232b6c0abac968f45bad9',
-  value: { assets: undefined, coins: 3_061_089_499_500n }
+  value: { /* assets: undefined,*/ coins: 3_061_089_499_500n }
 };
 
 export const txTokenMap = new Map<string, bigint>([
