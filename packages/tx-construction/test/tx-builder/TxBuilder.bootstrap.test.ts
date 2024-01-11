@@ -1,24 +1,46 @@
-/* eslint-disable sonarjs/no-duplicate-string */
-import { AddressType, util } from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
-import { GenericTxBuilder, OutputValidation } from '../../src';
-import { StubKeyAgent, mockProviders as mocks } from '@cardano-sdk/util-dev';
+import { GenericTxBuilder, OutputValidation, TxBuilderProviders } from '../../src';
+import { SodiumBip32Ed25519 } from '@cardano-sdk/crypto';
 import { dummyLogger } from 'ts-log';
-import delay from 'delay';
+import { logger, mockProviders as mocks } from '@cardano-sdk/util-dev';
 
 describe('TxBuilder bootstrap', () => {
-  it('awaits for non-empty knownAddresses$', async () => {
+  it('awaits for non-empty knownAddresses', async () => {
     // Initialize the TxBuilder
     const output = mocks.utxo[0][1];
     const rewardAccount = mocks.rewardAccount;
+    const knownAddresses = [
+      {
+        accountIndex: 0,
+        address: mocks.utxo[0][1].address,
+        index: 0,
+        networkId: Cardano.NetworkId.Testnet,
+        rewardAccount,
+        type: AddressType.External
+      }
+    ];
     const inputResolver: Cardano.InputResolver = {
       resolveInput: async (txIn) =>
         mocks.utxo.find(
           ([hydratedTxIn]) => txIn.txId === hydratedTxIn.txId && txIn.index === hydratedTxIn.index
         )?.[1] || null
     };
-    const keyAgent = new StubKeyAgent(inputResolver);
-    const txBuilderProviders = {
+    const keyAgent = util.createAsyncKeyAgent(
+      await InMemoryKeyAgent.fromBip39MnemonicWords(
+        {
+          chainId: Cardano.ChainIds.Preview,
+          getPassphrase: async () => Buffer.from([]),
+          mnemonicWords: util.generateMnemonicWords()
+        },
+        { bip32Ed25519: new SodiumBip32Ed25519(), logger }
+      )
+    );
+    const txBuilderProviders: jest.Mocked<TxBuilderProviders> = {
+      addresses: {
+        add: jest.fn(),
+        get: jest.fn().mockResolvedValue(knownAddresses)
+      },
       genesisParameters: jest.fn().mockResolvedValue(mocks.genesisParameters),
       protocolParameters: jest.fn().mockResolvedValue(mocks.protocolParameters),
       rewardAccounts: jest.fn().mockResolvedValue([
@@ -36,7 +58,7 @@ describe('TxBuilder bootstrap', () => {
     };
 
     const builderParams = {
-      addressManager: util.createBip32Ed25519AddressManager(keyAgent),
+      bip32Account: await Bip32Account.fromAsyncKeyAgent(keyAgent),
       inputResolver,
       logger: dummyLogger,
       outputValidator,
@@ -47,20 +69,6 @@ describe('TxBuilder bootstrap', () => {
 
     // Build and sign a tx
     const signedTxReady = txBuilder.addOutput(output).build().sign();
-    await delay(1);
-    // keyAgent knownAddresses are initially [],
-    // but then eventually resolves to some addresses
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    keyAgent.setKnownAddresses([
-      {
-        accountIndex: 0,
-        address: mocks.utxo[0][1].address,
-        index: 0,
-        networkId: Cardano.NetworkId.Testnet,
-        rewardAccount: mocks.rewardAccount,
-        type: AddressType.External
-      }
-    ]);
     const signedTx = await signedTxReady;
     expect(signedTx.tx.witness.signatures.size).toBe(1);
   });

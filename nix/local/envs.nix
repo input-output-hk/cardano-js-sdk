@@ -32,6 +32,14 @@ in {
   main = mkShell {
     name = "Cardano JS SDK Local Env";
     imports = [formattingModule];
+
+    env = with inputs.nixpkgs; [
+      {
+        name = "LD_LIBRARY_PATH";
+        value = lib.makeLibraryPath [udev];
+      }
+    ];
+
     commands = [
       {package = std;}
       {package = yarn;}

@@ -6,8 +6,10 @@ import {
   KeyAgent,
   util as KeyManagementUtil,
   KeyRole,
+  MessageSender,
   cip8
 } from '../../src';
+import { Bip32Ed25519Witnesser } from '../../src/util';
 import { COSEKey, COSESign1, SigStructure } from '@emurgo/cardano-message-signing-nodejs';
 import { Cardano, util } from '@cardano-sdk/core';
 import { CoseLabel } from '../../src/cip8/util';
@@ -17,6 +19,7 @@ import { testAsyncKeyAgent, testKeyAgent } from '../mocks';
 describe('cip30signData', () => {
   const addressDerivationPath = { index: 0, type: AddressType.External };
   let keyAgent: KeyAgent;
+  let witnesser: Bip32Ed25519Witnesser;
   let asyncKeyAgent: AsyncKeyAgent;
   let address: GroupedAddress;
   const cryptoProvider = new Crypto.SodiumBip32Ed25519();
@@ -24,16 +27,22 @@ describe('cip30signData', () => {
   beforeAll(async () => {
     const keyAgentReady = testKeyAgent();
     keyAgent = await keyAgentReady;
-    asyncKeyAgent = await testAsyncKeyAgent(undefined, undefined, keyAgentReady);
+    asyncKeyAgent = await testAsyncKeyAgent(undefined, keyAgentReady);
     address = await asyncKeyAgent.deriveAddress(addressDerivationPath, 0);
+    witnesser = KeyManagementUtil.createBip32Ed25519Witnesser(asyncKeyAgent);
   });
 
-  const signAndDecode = async (signWith: Cardano.PaymentAddress | Cardano.RewardAccount) => {
+  const signAndDecode = async (
+    signWith: Cardano.PaymentAddress | Cardano.RewardAccount,
+    knownAddresses: GroupedAddress[],
+    sender?: MessageSender
+  ) => {
     const dataSignature = await cip8.cip30signData({
-      addressManager: KeyManagementUtil.createBip32Ed25519AddressManager(asyncKeyAgent),
+      knownAddresses,
       payload: HexBlob('abc123'),
+      sender,
       signWith,
-      witnesser: KeyManagementUtil.createBip32Ed25519Witnesser(asyncKeyAgent)
+      witnesser
     });
 
     const coseKey = COSEKey.from_bytes(Buffer.from(dataSignature.key, 'hex'));
@@ -60,7 +69,7 @@ describe('cip30signData', () => {
 
   it('supports sign with payment address', async () => {
     const signWith = address.address;
-    const { signedData, publicKeyHex } = await signAndDecode(signWith);
+    const { signedData, publicKeyHex } = await signAndDecode(signWith, [address]);
 
     testAddressHeader(signedData, signWith);
 
@@ -74,7 +83,7 @@ describe('cip30signData', () => {
 
   it('supports signing with reward account', async () => {
     const signWith = address.rewardAccount;
-    const { signedData, publicKeyHex } = await signAndDecode(signWith);
+    const { signedData, publicKeyHex } = await signAndDecode(signWith, [address]);
 
     testAddressHeader(signedData, signWith);
 
@@ -88,7 +97,7 @@ describe('cip30signData', () => {
 
   it('signature can be verified', async () => {
     const signWith = address.address;
-    const { coseSign1, publicKeyHex, signedData } = await signAndDecode(signWith);
+    const { coseSign1, publicKeyHex, signedData } = await signAndDecode(signWith, [address]);
     const signedDataBytes = HexBlob.fromBytes(signedData.to_bytes());
     const signatureBytes = HexBlob.fromBytes(coseSign1.signature()) as unknown as Crypto.Ed25519SignatureHex;
     expect(
@@ -98,5 +107,12 @@ describe('cip30signData', () => {
         publicKeyHex as unknown as Crypto.Ed25519PublicKeyHex
       )
     ).toBe(true);
+  });
+
+  it('passes through sender to witnesser', async () => {
+    const signBlobSpy = jest.spyOn(witnesser, 'signBlob');
+    const sender = { url: 'https://lace.io' };
+    await signAndDecode(address.address, [address], sender);
+    expect(signBlobSpy).toBeCalledWith(expect.anything(), expect.anything(), sender);
   });
 });

@@ -29,11 +29,12 @@ import { RewardAccountWithPoolId } from '../types';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { contextLogger, deepEquals } from '@cardano-sdk/util';
 import { createOutputValidator } from '../output-validation';
-import { filter, firstValueFrom, lastValueFrom } from 'rxjs';
 import { finalizeTx } from './finalizeTx';
 import { initializeTx } from './initializeTx';
+import { lastValueFrom } from 'rxjs';
 import minBy from 'lodash/minBy';
 import omit from 'lodash/omit';
+import uniq from 'lodash/uniq';
 
 type BuiltTx = {
   tx: Cardano.TxBodyWithHash;
@@ -74,10 +75,14 @@ class LazyTxSigner implements UnsignedTx {
   async inspect(): Promise<TxInspection> {
     const {
       tx,
-      ctx: { ownAddresses, auxiliaryData, handleResolutions },
+      ctx: {
+        signingContext: { knownAddresses },
+        auxiliaryData,
+        handleResolutions
+      },
       inputSelection
     } = await this.#build();
-    return { ...tx, auxiliaryData, handleResolutions, inputSelection, ownAddresses };
+    return { ...tx, auxiliaryData, handleResolutions, inputSelection, ownAddresses: knownAddresses };
   }
 
   async sign(): Promise<SignedTx> {
@@ -199,9 +204,7 @@ export class GenericTxBuilder implements TxBuilder {
             await this.#validateOutputs();
             // Take a snapshot of returned properties,
             // so that they don't change while `initializeTx` is resolving
-            const ownAddresses = await firstValueFrom(
-              this.#dependencies.addressManager.knownAddresses$.pipe(filter((addresses) => addresses.length > 0))
-            );
+            const ownAddresses = await this.#dependencies.txBuilderProviders.addresses.get();
             const registeredRewardAccounts = (await this.#dependencies.txBuilderProviders.rewardAccounts()).filter(
               (acct) =>
                 acct.keyStatus === Cardano.StakeKeyStatus.Registered ||
@@ -209,7 +212,7 @@ export class GenericTxBuilder implements TxBuilder {
             );
             const auxiliaryData = this.partialAuxiliaryData && { ...this.partialAuxiliaryData };
             const extraSigners = this.partialExtraSigners && [...this.partialExtraSigners];
-            const signingOptions = this.partialSigningOptions && { ...this.partialSigningOptions };
+            const partialSigningOptions = this.partialSigningOptions && { ...this.partialSigningOptions };
 
             if (this.partialAuxiliaryData) {
               this.partialTxBody.auxiliaryDataHash = Cardano.computeAuxiliaryDataHash(this.partialAuxiliaryData);
@@ -227,7 +230,7 @@ export class GenericTxBuilder implements TxBuilder {
               // If the wallet is currently delegating to several pools, and all delegations are being removed,
               // then the funds will be concentrated back into a single address.
               if (rewardAccountsWithWeights.size === 0) {
-                const firstAddress = await this.#dependencies.addressManager.deriveAddress(
+                const firstAddress = await this.#dependencies.bip32Account.deriveAddress(
                   { index: 0, type: AddressType.External },
                   0
                 );
@@ -249,7 +252,7 @@ export class GenericTxBuilder implements TxBuilder {
                 certificates: this.partialTxBody.certificates,
                 handleResolutions: this.#handleResolutions,
                 outputs: new Set(this.partialTxBody.outputs || []),
-                signingOptions,
+                signingOptions: partialSigningOptions,
                 witness: { extraSigners }
               },
               dependencies
@@ -259,7 +262,11 @@ export class GenericTxBuilder implements TxBuilder {
                 auxiliaryData,
                 handleResolutions: this.#handleResolutions,
                 ownAddresses,
-                signingOptions,
+                signingContext: {
+                  knownAddresses: ownAddresses,
+                  txInKeyPathMap: await util.createTxInKeyPathMap(body, ownAddresses, this.#dependencies.inputResolver)
+                },
+                signingOptions: partialSigningOptions,
                 witness: { extraSigners }
               },
               inputSelection,
@@ -296,18 +303,22 @@ export class GenericTxBuilder implements TxBuilder {
   }
 
   async #getOrCreateRewardAccounts(): Promise<RewardAccountWithPoolId[]> {
-    let newRewardAccounts: Cardano.RewardAccount[] = [];
+    let allRewardAccounts: Cardano.RewardAccount[] = [];
     if (this.#requestedPortfolio) {
-      newRewardAccounts = await util.ensureStakeKeys({
-        addressManager: this.#dependencies.addressManager,
+      const knownAddresses = await this.#dependencies.txBuilderProviders.addresses.get();
+      const { newAddresses } = await util.ensureStakeKeys({
+        bip32Account: this.#dependencies.bip32Account,
         count: this.#requestedPortfolio.length,
+        knownAddresses,
         logger: contextLogger(this.#logger, 'getOrCreateRewardAccounts')
       });
+      await this.#dependencies.txBuilderProviders.addresses.add(...newAddresses);
+      allRewardAccounts = uniq([...knownAddresses, ...newAddresses]).map(({ rewardAccount }) => rewardAccount);
     }
 
     const rewardAccounts$ = coldObservableProvider({
       pollUntil: (rewardAccounts) =>
-        newRewardAccounts.every((newAccount) => rewardAccounts.some((acct) => acct.address === newAccount)),
+        allRewardAccounts.every((newAccount) => rewardAccounts.some((acct) => acct.address === newAccount)),
       provider: this.#dependencies.txBuilderProviders.rewardAccounts,
       retryBackoffConfig: { initialInterval: 10, maxInterval: 100, maxRetries: 10 }
     });
@@ -315,7 +326,7 @@ export class GenericTxBuilder implements TxBuilder {
     try {
       return await lastValueFrom(rewardAccounts$);
     } catch {
-      throw new OutOfSyncRewardAccounts(newRewardAccounts);
+      throw new OutOfSyncRewardAccounts(allRewardAccounts);
     }
   }
 
@@ -431,7 +442,7 @@ export class GenericTxBuilder implements TxBuilder {
           ({ index }) => index
         );
         if (!address) {
-          throw new Error(`Could not find any keyAgent address associated with ${rewardAccount}.`);
+          throw new Error(`Could not find any address associated with ${rewardAccount}.`);
         }
         return [address.address, weight];
       })

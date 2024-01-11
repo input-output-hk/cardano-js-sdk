@@ -9,7 +9,8 @@ import {
   TransactionFailure,
   TxInFlight,
   createAddressTransactionsProvider,
-  createTransactionsTracker
+  createTransactionsTracker,
+  newTransactions$
 } from '../../src';
 import { InMemoryInFlightTransactionsStore, InMemoryTransactionsStore, WalletStores } from '../../src/persistence';
 import { NEVER, bufferCount, firstValueFrom, map, of } from 'rxjs';
@@ -27,6 +28,23 @@ const {
 
 describe('TransactionsTracker', () => {
   const logger = dummyLogger;
+
+  describe('newTransactions$', () => {
+    it('considers transactions from 1st emission as old and emits only new transactions', () => {
+      createTestScheduler().run(({ hot, expectObservable }) => {
+        const history$ = hot('a-b', {
+          a: [{ id: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000') }],
+          b: [
+            { id: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000') },
+            { id: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000001') }
+          ]
+        });
+        expectObservable(newTransactions$(history$)).toBe('--b', {
+          b: { id: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000001') }
+        });
+      });
+    });
+  });
 
   describe('createAddressTransactionsProvider', () => {
     let store: InMemoryTransactionsStore;

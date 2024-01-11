@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.6.7...@cardano-sdk/util-rxjs@0.6.8) (2024-01-05)
+
+**Note:** Version bump only for package @cardano-sdk/util-rxjs
+
+## [0.6.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.6.6...@cardano-sdk/util-rxjs@0.6.7) (2023-12-21)
+
+**Note:** Version bump only for package @cardano-sdk/util-rxjs
+
+## [0.6.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.6.5...@cardano-sdk/util-rxjs@0.6.6) (2023-12-20)
+
+**Note:** Version bump only for package @cardano-sdk/util-rxjs
+
+## [0.6.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.6.4...@cardano-sdk/util-rxjs@0.6.5) (2023-12-14)
+
+**Note:** Version bump only for package @cardano-sdk/util-rxjs
+
+## [0.6.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.6.3...@cardano-sdk/util-rxjs@0.6.4) (2023-12-12)
+
+**Note:** Version bump only for package @cardano-sdk/util-rxjs
+
+## [0.6.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.6.2...@cardano-sdk/util-rxjs@0.6.3) (2023-12-07)
+
+**Note:** Version bump only for package @cardano-sdk/util-rxjs
+
+## [0.6.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.6.1...@cardano-sdk/util-rxjs@0.6.2) (2023-12-04)
+
+**Note:** Version bump only for package @cardano-sdk/util-rxjs
+
 ## [0.6.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.6.0...@cardano-sdk/util-rxjs@0.6.1) (2023-11-29)
 
 **Note:** Version bump only for package @cardano-sdk/util-rxjs

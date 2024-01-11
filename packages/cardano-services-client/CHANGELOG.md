@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.16.4...@cardano-sdk/cardano-services-client@0.16.5) (2024-01-05)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services-client
+
+## [0.16.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.16.3...@cardano-sdk/cardano-services-client@0.16.4) (2023-12-21)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services-client
+
+## [0.16.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.16.2...@cardano-sdk/cardano-services-client@0.16.3) (2023-12-20)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services-client
+
+## [0.16.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.16.1...@cardano-sdk/cardano-services-client@0.16.2) (2023-12-14)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services-client
+
+## [0.16.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.16.0...@cardano-sdk/cardano-services-client@0.16.1) (2023-12-12)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services-client
+
+## [0.16.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.15.1...@cardano-sdk/cardano-services-client@0.16.0) (2023-12-07)
+
+### ⚠ BREAKING CHANGES
+
+* bump stake pool provider api version to 1.1.0
+
+### Bug Fixes
+
+* make type orm stake pool provider back compatible ([b007175](https://github.com/input-output-hk/cardano-js-sdk/commit/b007175502578daaaa738a5380fe0b68ce9d742e))
+
+## [0.15.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.15.0...@cardano-sdk/cardano-services-client@0.15.1) (2023-12-04)
+
+### Features
+
+* **cardano-services-client:** map submit-api errors to new error types ([d1e16bf](https://github.com/input-output-hk/cardano-js-sdk/commit/d1e16bf384bcc1807c1e4a80f99f19ae2d38fd21))
+
 ## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.14.4...@cardano-sdk/cardano-services-client@0.15.0) (2023-11-29)
 
 ### ⚠ BREAKING CHANGES

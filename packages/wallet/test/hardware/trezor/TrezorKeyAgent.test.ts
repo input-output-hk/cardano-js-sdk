@@ -1,19 +1,27 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, CommunicationType, SerializableTrezorKeyAgentData, util } from '@cardano-sdk/key-management';
+import {
+  AddressType,
+  Bip32Account,
+  CommunicationType,
+  SerializableTrezorKeyAgentData,
+  util
+} from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
-import { PersonalWallet, setupWallet } from '../../../src';
+import { PersonalWallet } from '../../../src';
 import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
+import { firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import { mockKeyAgentDependencies } from '../../../../key-management/test/mocks';
 
 describe('TrezorKeyAgent', () => {
   let wallet: PersonalWallet;
-  let keyAgent: TrezorKeyAgent;
+  let trezorKeyAgent: TrezorKeyAgent;
   let txSubmitProvider: mocks.TxSubmitProviderStub;
+  let address: Cardano.PaymentAddress;
 
   const trezorConfig = {
     communicationType: CommunicationType.Node,
@@ -25,46 +33,38 @@ describe('TrezorKeyAgent', () => {
 
   beforeAll(async () => {
     txSubmitProvider = mocks.mockTxSubmitProvider();
-    ({ keyAgent, wallet } = await setupWallet({
-      bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
-      createKeyAgent: async (dependencies) =>
-        await TrezorKeyAgent.createWithDevice(
-          {
-            chainId: Cardano.ChainIds.Preprod,
-            trezorConfig
-          },
-          dependencies
-        ),
-      createWallet: async (trezorKeyAgent) => {
-        const { address, rewardAccount } = await trezorKeyAgent.deriveAddress(
-          { index: 0, type: AddressType.External },
-          0
-        );
-        const assetProvider = mocks.mockAssetProvider();
-        const stakePoolProvider = createStubStakePoolProvider();
-        const networkInfoProvider = mocks.mockNetworkInfoProvider();
-        const utxoProvider = mocks.mockUtxoProvider({ address });
-        const rewardsProvider = mocks.mockRewardsProvider({ rewardAccount });
-        const chainHistoryProvider = mocks.mockChainHistoryProvider({ rewardAccount });
-        const asyncKeyAgent = util.createAsyncKeyAgent(trezorKeyAgent);
-        return new PersonalWallet(
-          { name: 'HW Wallet' },
-          {
-            addressManager: util.createBip32Ed25519AddressManager(asyncKeyAgent),
-            assetProvider,
-            chainHistoryProvider,
-            logger,
-            networkInfoProvider,
-            rewardsProvider,
-            stakePoolProvider,
-            txSubmitProvider,
-            utxoProvider,
-            witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)
-          }
-        );
+    trezorKeyAgent = await TrezorKeyAgent.createWithDevice(
+      {
+        chainId: Cardano.ChainIds.Preprod,
+        trezorConfig
       },
-      logger
-    }));
+      { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), logger }
+    );
+    const groupedAddress = await trezorKeyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0);
+    address = groupedAddress.address;
+    const rewardAccount = groupedAddress.rewardAccount;
+    const assetProvider = mocks.mockAssetProvider();
+    const stakePoolProvider = createStubStakePoolProvider();
+    const networkInfoProvider = mocks.mockNetworkInfoProvider();
+    const utxoProvider = mocks.mockUtxoProvider({ address });
+    const rewardsProvider = mocks.mockRewardsProvider({ rewardAccount });
+    const chainHistoryProvider = mocks.mockChainHistoryProvider({ rewardAccount });
+    const asyncKeyAgent = util.createAsyncKeyAgent(trezorKeyAgent);
+    wallet = new PersonalWallet(
+      { name: 'HW Wallet' },
+      {
+        assetProvider,
+        bip32Account: await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent),
+        chainHistoryProvider,
+        logger,
+        networkInfoProvider,
+        rewardsProvider,
+        stakePoolProvider,
+        txSubmitProvider,
+        utxoProvider,
+        witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)
+      }
+    );
   });
 
   afterAll(() => wallet.shutdown());
@@ -127,9 +127,13 @@ describe('TrezorKeyAgent', () => {
         value: { coins: 11_111_111n }
       }
     };
-
+    let rewardAccount: Cardano.RewardAccount;
     let props: InitializeTxProps;
     let txInternals: InitializeTxResult;
+
+    beforeEach(async () => {
+      rewardAccount = (await firstValueFrom(wallet.addresses$))[0].rewardAccount;
+    });
 
     it('successfully signs simple transaction', async () => {
       props = {
@@ -137,10 +141,9 @@ describe('TrezorKeyAgent', () => {
       };
       txInternals = await wallet.initializeTx(props);
 
-      const signatures = await keyAgent.signTransaction({
-        body: txInternals.body,
-        hash: txInternals.hash
-      });
+      const {
+        witness: { signatures }
+      } = await wallet.finalizeTx({ tx: txInternals });
       expect(signatures.size).toBe(2);
     });
 
@@ -150,10 +153,9 @@ describe('TrezorKeyAgent', () => {
       };
       txInternals = await wallet.initializeTx(props);
 
-      const signatures = await keyAgent.signTransaction({
-        body: txInternals.body,
-        hash: txInternals.hash
-      });
+      const {
+        witness: { signatures }
+      } = await wallet.finalizeTx({ tx: txInternals });
       expect(signatures.size).toBe(2);
     });
 
@@ -164,10 +166,9 @@ describe('TrezorKeyAgent', () => {
       };
       txInternals = await wallet.initializeTx(props);
 
-      const signatures = await keyAgent.signTransaction({
-        body: txInternals.body,
-        hash: txInternals.hash
-      });
+      const {
+        witness: { signatures }
+      } = await wallet.finalizeTx({ tx: txInternals });
       expect(signatures.size).toBe(2);
     });
 
@@ -183,10 +184,9 @@ describe('TrezorKeyAgent', () => {
       };
       txInternals = await wallet.initializeTx(props);
 
-      const signatures = await keyAgent.signTransaction({
-        body: txInternals.body,
-        hash: txInternals.hash
-      });
+      const {
+        witness: { signatures }
+      } = await wallet.finalizeTx({ tx: txInternals });
       expect(signatures.size).toBe(2);
     });
 
@@ -199,15 +199,13 @@ describe('TrezorKeyAgent', () => {
       };
       txInternals = await wallet.initializeTx(props);
 
-      const signatures = await keyAgent.signTransaction({
-        body: txInternals.body,
-        hash: txInternals.hash
-      });
+      const {
+        witness: { signatures }
+      } = await wallet.finalizeTx({ tx: txInternals });
       expect(signatures.size).toBe(2);
     });
 
     it('successfully signs stake registration and delegation transaction', async () => {
-      const rewardAccount = keyAgent.knownAddresses[0].rewardAccount;
       const stakeCredential = {
         hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
         type: Cardano.CredentialType.KeyHash
@@ -229,15 +227,13 @@ describe('TrezorKeyAgent', () => {
       };
       txInternals = await wallet.initializeTx(props);
 
-      const signatures = await keyAgent.signTransaction({
-        body: txInternals.body,
-        hash: txInternals.hash
-      });
+      const {
+        witness: { signatures }
+      } = await wallet.finalizeTx({ tx: txInternals });
       expect(signatures.size).toBe(2);
     });
 
     it('successfully signs stake deregistration transaction', async () => {
-      const rewardAccount = keyAgent.knownAddresses[0].rewardAccount;
       const stakeCredential = {
         hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
         type: Cardano.CredentialType.KeyHash
@@ -254,15 +250,13 @@ describe('TrezorKeyAgent', () => {
       };
       txInternals = await wallet.initializeTx(props);
 
-      const signatures = await keyAgent.signTransaction({
-        body: txInternals.body,
-        hash: txInternals.hash
-      });
+      const {
+        witness: { signatures }
+      } = await wallet.finalizeTx({ tx: txInternals });
       expect(signatures.size).toBe(2);
     });
 
     it.skip('successfully signs pool registration transaction', async () => {
-      const rewardAccount = keyAgent.knownAddresses[0].rewardAccount;
       const poolRewardAcc = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
       const metadataJson = {
         hash: Crypto.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
@@ -289,19 +283,25 @@ describe('TrezorKeyAgent', () => {
       };
       txInternals = await wallet.initializeTx(props);
 
-      const signatures = await keyAgent.signTransaction({
-        body: txInternals.body,
-        hash: txInternals.hash
-      });
+      const {
+        witness: { signatures }
+      } = await wallet.finalizeTx({ tx: txInternals });
       expect(signatures.size).toBe(2);
     });
 
     it('throws if signed transaction hash doesnt match hash computed by the wallet', async () => {
+      props = {
+        outputs: new Set<Cardano.TxOut>([outputs.simpleOutput])
+      };
+      txInternals = await wallet.initializeTx(props);
       await expect(
-        keyAgent.signTransaction({
-          body: txInternals.body,
-          hash: 'non-matching' as unknown as Cardano.TransactionId
-        })
+        trezorKeyAgent.signTransaction(
+          {
+            body: txInternals.body,
+            hash: 'non-matching' as unknown as Cardano.TransactionId
+          },
+          { knownAddresses: await firstValueFrom(wallet.addresses$), txInKeyPathMap: {} }
+        )
       ).rejects.toThrow();
     });
 
@@ -311,10 +311,9 @@ describe('TrezorKeyAgent', () => {
       };
       txInternals = await wallet.initializeTx(props);
 
-      const signatures = await keyAgent.signTransaction({
-        body: txInternals.body,
-        hash: txInternals.hash
-      });
+      const {
+        witness: { signatures }
+      } = await wallet.finalizeTx({ tx: txInternals });
       expect(signatures.size).toBe(2);
     });
 
@@ -324,10 +323,9 @@ describe('TrezorKeyAgent', () => {
       };
       txInternals = await wallet.initializeTx(props);
 
-      const signatures = await keyAgent.signTransaction({
-        body: txInternals.body,
-        hash: txInternals.hash
-      });
+      const {
+        witness: { signatures }
+      } = await wallet.finalizeTx({ tx: txInternals });
       expect(signatures.size).toBe(2);
     });
 
@@ -337,10 +335,9 @@ describe('TrezorKeyAgent', () => {
       };
       txInternals = await wallet.initializeTx(props);
 
-      const signatures = await keyAgent.signTransaction({
-        body: txInternals.body,
-        hash: txInternals.hash
-      });
+      const {
+        witness: { signatures }
+      } = await wallet.finalizeTx({ tx: txInternals });
       expect(signatures.size).toBe(2);
     });
 
@@ -351,10 +348,9 @@ describe('TrezorKeyAgent', () => {
       };
       txInternals = await wallet.initializeTx(props);
 
-      const signatures = await keyAgent.signTransaction({
-        body: txInternals.body,
-        hash: txInternals.hash
-      });
+      const {
+        witness: { signatures }
+      } = await wallet.finalizeTx({ tx: txInternals });
       expect(signatures.size).toBe(2);
     });
 
@@ -384,10 +380,9 @@ describe('TrezorKeyAgent', () => {
 
       txInternals = await wallet.initializeTx(txProps);
 
-      const signatures = await keyAgent.signTransaction({
-        body: txInternals.body,
-        hash: txInternals.hash
-      });
+      const {
+        witness: { signatures }
+      } = await wallet.finalizeTx({ tx: txInternals });
       expect(signatures.size).toBe(2);
     });
 
@@ -397,9 +392,7 @@ describe('TrezorKeyAgent', () => {
         Crypto.Ed25519KeyHashHex('9ab1e9d2346c3f4be360d22b8ee7756a0316c3c1aece473e2887ea97')
       ];
       // Add known payment address if exists -> keyPath (acc0)
-      const knownAddressPaymentCredential = Cardano.Address.fromBech32(keyAgent.knownAddresses[0].address)
-        ?.asBase()
-        ?.getPaymentCredential().hash;
+      const knownAddressPaymentCredential = Cardano.Address.fromBech32(address)?.asBase()?.getPaymentCredential().hash;
       if (knownAddressPaymentCredential)
         requiredExtraSignatures.push(Crypto.Ed25519KeyHashHex(knownAddressPaymentCredential));
 
@@ -409,10 +402,9 @@ describe('TrezorKeyAgent', () => {
       };
       txInternals = await wallet.initializeTx(props);
 
-      const signatures = await keyAgent.signTransaction({
-        body: txInternals.body,
-        hash: txInternals.hash
-      });
+      const {
+        witness: { signatures }
+      } = await wallet.finalizeTx({ tx: txInternals });
       expect(signatures.size).toBe(2);
     });
   });
@@ -428,34 +420,30 @@ describe('TrezorKeyAgent', () => {
     );
     expect(trezorKeyAgentWithRandomIndex).toBeInstanceOf(TrezorKeyAgent);
     expect(trezorKeyAgentWithRandomIndex.accountIndex).toEqual(5);
-    expect(trezorKeyAgentWithRandomIndex.extendedAccountPublicKey).not.toEqual(keyAgent.extendedAccountPublicKey);
+    expect(trezorKeyAgentWithRandomIndex.extendedAccountPublicKey).not.toEqual(trezorKeyAgent.extendedAccountPublicKey);
   });
 
   test('__typename', () => {
-    expect(typeof keyAgent.serializableData.__typename).toBe('string');
+    expect(typeof trezorKeyAgent.serializableData.__typename).toBe('string');
   });
 
   test('chainId', () => {
-    expect(keyAgent.chainId).toBe(Cardano.ChainIds.Preprod);
+    expect(trezorKeyAgent.chainId).toBe(Cardano.ChainIds.Preprod);
   });
 
   test('accountIndex', () => {
-    expect(typeof keyAgent.accountIndex).toBe('number');
-  });
-
-  test('knownAddresses', () => {
-    expect(Array.isArray(keyAgent.knownAddresses)).toBe(true);
+    expect(typeof trezorKeyAgent.accountIndex).toBe('number');
   });
 
   test('extendedAccountPublicKey', () => {
-    expect(typeof keyAgent.extendedAccountPublicKey).toBe('string');
+    expect(typeof trezorKeyAgent.extendedAccountPublicKey).toBe('string');
   });
 
   describe('serializableData', () => {
     let serializableData: SerializableTrezorKeyAgentData;
 
     beforeEach(() => {
-      serializableData = keyAgent.serializableData as SerializableTrezorKeyAgentData;
+      serializableData = trezorKeyAgent.serializableData as SerializableTrezorKeyAgentData;
     });
 
     it('all fields are of correct types', () => {
@@ -463,7 +451,6 @@ describe('TrezorKeyAgent', () => {
       expect(typeof serializableData.accountIndex).toBe('number');
       expect(typeof serializableData.chainId).toBe('object');
       expect(typeof serializableData.extendedAccountPublicKey).toBe('string');
-      expect(Array.isArray(serializableData.knownAddresses)).toBe(true);
     });
 
     it('is serializable', () => {

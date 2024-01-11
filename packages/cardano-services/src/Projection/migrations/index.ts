@@ -8,6 +8,7 @@ import { FkPoolRegistrationMigration1682519108369 } from './1682519108369-fk-poo
 import { FkPoolRetirementMigration1682519108370 } from './1682519108370-fk-pool-retirement';
 import { HandleDefaultMigrations1693830294136 } from './1693830294136-handle-default-columns';
 import { HandleMetadataTableMigrations1693490983715 } from './1693490983715-handle-metadata-table';
+import { HandleParentMigration1700556589063 } from './1700556589063-handle-parent';
 import { HandleTableMigration1686138943349 } from './1686138943349-handle-table';
 import { NftMetadataTableMigration1690269355640 } from './1690269355640-nft-metadata-table';
 import { OutputTableMigration1682519108367 } from './1682519108367-output-table';
@@ -49,5 +50,6 @@ export const migrations: ProjectionMigration[] = [
   HandleDefaultMigrations1693830294136,
   PoolDelistedTableMigration1695899010515,
   CurrentStakePollMetricsAttributesMigrations1698174358997,
-  PoolRewardsTableMigrations1698175956871
+  PoolRewardsTableMigrations1698175956871,
+  HandleParentMigration1700556589063
 ];

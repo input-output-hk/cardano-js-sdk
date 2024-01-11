@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.17.1...@cardano-sdk/tx-construction@0.17.2) (2024-01-05)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
+## [0.17.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.17.0...@cardano-sdk/tx-construction@0.17.1) (2023-12-21)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
+## [0.17.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.16.2...@cardano-sdk/tx-construction@0.17.0) (2023-12-20)
+
+### ⚠ BREAKING CHANGES
+
+* Witnesser witness method now takes a complete serializable Transaction
+
+### Features
+
+* witnesser witness method now takes a complete serializable Transaction ([07a7305](https://github.com/input-output-hk/cardano-js-sdk/commit/07a730536ef9b0cd5a4760e143e35bdca4ce8d8d))
+
+## [0.16.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.16.1...@cardano-sdk/tx-construction@0.16.2) (2023-12-14)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
+## [0.16.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.16.0...@cardano-sdk/tx-construction@0.16.1) (2023-12-12)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
+## [0.16.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.15.1...@cardano-sdk/tx-construction@0.16.0) (2023-12-07)
+
+### ⚠ BREAKING CHANGES
+
+* remove KeyAgent.knownAddresses
+- remove AsyncKeyAgent.knownAddresses$
+- remove LazyWalletUtil and setupWallet utils
+- replace KeyAgent dependency on InputResolver with props passed to sign method
+- re-purpose AddressManager to Bip32Account: addresses are now stored only by the wallet
+
+### Code Refactoring
+
+* remove indirect KeyAgent dependency on ObservableWallet ([8dcfbc4](https://github.com/input-output-hk/cardano-js-sdk/commit/8dcfbc4ab339fcd8efc7d5f241a501eb210b58d4))
+
+## [0.15.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.15.0...@cardano-sdk/tx-construction@0.15.1) (2023-12-04)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
 ## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.14.2...@cardano-sdk/tx-construction@0.15.0) (2023-11-29)
 
 ### ⚠ BREAKING CHANGES

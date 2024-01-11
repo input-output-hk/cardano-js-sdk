@@ -1,9 +1,9 @@
 /* eslint-disable no-bitwise */
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
-import { util as KeyManagementUtil } from '@cardano-sdk/key-management';
+import { GroupedAddress, util as KeyManagementUtil } from '@cardano-sdk/key-management';
 import { Observable, firstValueFrom } from 'rxjs';
-import { ObservableWallet } from '../types';
+import { ObservableWallet, ScriptAddress, isScriptAddress } from '../types';
 import { ProtocolParametersRequiredByOutputValidator, createOutputValidator } from '@cardano-sdk/tx-construction';
 import { txInEquals } from './util';
 import uniqBy from 'lodash/uniqBy';
@@ -41,42 +41,6 @@ export const createWalletUtil = (context: WalletUtilContext) => ({
 
 export type WalletUtil = ReturnType<typeof createWalletUtil>;
 
-type SetWalletUtilContext = (context: WalletUtilContext) => void;
-
-/**
- * Creates a WalletUtil that has an additional function to `initialize` by setting the context.
- * Calls to WalletUtil functions will only resolve after initializing.
- *
- * @returns common wallet utility functions that are aware of wallet state and computes useful things
- */
-export const createLazyWalletUtil = (): WalletUtil & { initialize: SetWalletUtilContext } => {
-  let initialize: SetWalletUtilContext;
-  const resolverReady = new Promise((resolve: SetWalletUtilContext) => (initialize = resolve)).then(createWalletUtil);
-  return {
-    initialize: initialize!,
-    async resolveInput(input) {
-      const resolver = await resolverReady;
-      return resolver.resolveInput(input);
-    },
-    async validateOutput(output) {
-      const resolver = await resolverReady;
-      return resolver.validateOutput(output);
-    },
-    async validateOutputs(outputs) {
-      const resolver = await resolverReady;
-      return resolver.validateOutputs(outputs);
-    },
-    async validateValue(value) {
-      const resolver = await resolverReady;
-      return resolver.validateValue(value);
-    },
-    async validateValues(values) {
-      const resolver = await resolverReady;
-      return resolver.validateValues(values);
-    }
-  };
-};
-
 /** All transaction inputs and collaterals must come from our utxo set */
 const hasForeignInputs = (
   { body: { inputs, collaterals = [] } }: { body: Pick<Cardano.TxBody, 'inputs' | 'collaterals'> },
@@ -90,6 +54,117 @@ const hasCommitteeCertificates = ({ certificates }: Cardano.TxBody) =>
       certificate.__typename === Cardano.CertificateType.AuthorizeCommitteeHot ||
       certificate.__typename === Cardano.CertificateType.ResignCommitteeCold
   );
+
+/**
+ * Gets whether the given transaction has certificates that require a witness that can not be provided by the script wallet.
+ *
+ * @param rewardAccount The reward account of the script wallet.
+ * @param certificates The certificates to inspect.
+ */
+// eslint-disable-next-line complexity
+const scriptWalletHasForeignCertificates = (
+  rewardAccount: Cardano.RewardAccount,
+  certificates?: Cardano.Certificate[]
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+) => {
+  if (!certificates) {
+    return false;
+  }
+
+  const scriptHash = Cardano.RewardAccount.toHash(rewardAccount) as unknown as Crypto.Hash28ByteBase16;
+  for (const certificate of certificates) {
+    switch (certificate.__typename) {
+      case Cardano.CertificateType.Registration:
+      case Cardano.CertificateType.StakeRegistration:
+      case Cardano.CertificateType.GenesisKeyDelegation:
+        continue; // Doesnt require signature.
+      case Cardano.CertificateType.StakeDeregistration:
+      case Cardano.CertificateType.StakeDelegation:
+      case Cardano.CertificateType.Unregistration:
+      case Cardano.CertificateType.VoteDelegation:
+      case Cardano.CertificateType.StakeVoteDelegation:
+      case Cardano.CertificateType.StakeRegistrationDelegation:
+      case Cardano.CertificateType.VoteRegistrationDelegation:
+      case Cardano.CertificateType.MIR:
+      case Cardano.CertificateType.StakeVoteRegistrationDelegation: {
+        if (
+          !certificate.stakeCredential ||
+          certificate.stakeCredential.type !== Cardano.CredentialType.ScriptHash ||
+          certificate.stakeCredential.hash !== scriptHash
+        ) {
+          return true;
+        }
+
+        break;
+      }
+      case Cardano.CertificateType.PoolRegistration: {
+        const account = certificate.poolParameters.owners.find((acct) => acct === rewardAccount);
+
+        if (!account) {
+          return true;
+        }
+
+        break;
+      }
+      case Cardano.CertificateType.PoolRetirement:
+        {
+          const poolId = Cardano.PoolId.fromKeyHash(Cardano.RewardAccount.toHash(rewardAccount));
+          if (certificate.poolId !== poolId) {
+            return true;
+          }
+        }
+        break;
+      case Cardano.CertificateType.RegisterDelegateRepresentative:
+      case Cardano.CertificateType.UnregisterDelegateRepresentative:
+      case Cardano.CertificateType.UpdateDelegateRepresentative:
+        if (
+          !certificate.dRepCredential ||
+          certificate.dRepCredential.type !== Cardano.CredentialType.ScriptHash ||
+          certificate.dRepCredential.hash !== scriptHash
+        ) {
+          return true;
+        }
+        break;
+      case Cardano.CertificateType.AuthorizeCommitteeHot:
+      case Cardano.CertificateType.ResignCommitteeCold:
+        return true;
+    }
+  }
+
+  return false;
+};
+
+/**
+ * Until CIP-095 supports script credential for dReps, we cant witness any voting procedures as the only
+ * voter type for this type of wallet is DrepScriptHashVoter
+ */
+const scriptWalletHasForeignVotingProcedures = (
+  rewardAccount: Cardano.RewardAccount,
+  votingProcedures?: Cardano.VotingProcedures
+) => {
+  if (!votingProcedures) {
+    return false;
+  }
+
+  for (const procedure of votingProcedures) {
+    switch (procedure.voter.__typename) {
+      case Cardano.VoterType.ccHotKeyHash:
+      case Cardano.VoterType.ccHotScriptHash:
+      case Cardano.VoterType.stakePoolKeyHash:
+      case Cardano.VoterType.dRepKeyHash:
+        return true;
+      case Cardano.VoterType.dRepScriptHash: {
+        const scriptHash = Cardano.RewardAccount.toHash(rewardAccount) as unknown as Crypto.Hash28ByteBase16;
+
+        if (procedure.voter.credential.hash !== scriptHash) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+};
+
 /**
  * Gets whether the given TX requires signatures that can not be provided by the given wallet.
  *
@@ -100,7 +175,22 @@ const hasCommitteeCertificates = ({ certificates }: Cardano.TxBody) =>
 export const requiresForeignSignatures = async (tx: Cardano.Tx, wallet: ObservableWallet): Promise<boolean> => {
   const utxoSet = await firstValueFrom(wallet.utxo.total$);
   const knownAddresses = await firstValueFrom(wallet.addresses$);
-  const uniqueAccounts: KeyManagementUtil.StakeKeySignerData[] = uniqBy(knownAddresses, 'rewardAccount')
+  const isScriptWallet = knownAddresses.some((address) => isScriptAddress(address));
+
+  if (isScriptWallet) {
+    const scriptAddresses = knownAddresses.map((address) => address as ScriptAddress);
+
+    // Script addresses have a single payment credential and stake credential.
+    return (
+      hasForeignInputs(tx, utxoSet) ||
+      scriptWalletHasForeignCertificates(scriptAddresses[0].rewardAccount, tx.body.certificates) ||
+      scriptWalletHasForeignVotingProcedures(scriptAddresses[0].rewardAccount, tx.body.votingProcedures)
+    );
+  }
+
+  const keyHashAddresses = knownAddresses.map((address) => address as GroupedAddress);
+
+  const uniqueAccounts: KeyManagementUtil.StakeKeySignerData[] = uniqBy(keyHashAddresses, 'rewardAccount')
     .map((groupedAddress) => {
       const stakeKeyHash = Cardano.RewardAccount.toHash(groupedAddress.rewardAccount);
       return {
@@ -118,7 +208,7 @@ export const requiresForeignSignatures = async (tx: Cardano.Tx, wallet: Observab
     hasForeignInputs(tx, utxoSet) ||
     KeyManagementUtil.checkStakeCredentialCertificates(uniqueAccounts, tx.body).requiresForeignSignatures ||
     KeyManagementUtil.getDRepCredentialKeyPaths({ dRepKeyHash, txBody: tx.body }).requiresForeignSignatures ||
-    KeyManagementUtil.getVotingProcedureKeyPaths({ dRepKeyHash, groupedAddresses: knownAddresses, txBody: tx.body })
+    KeyManagementUtil.getVotingProcedureKeyPaths({ dRepKeyHash, groupedAddresses: keyHashAddresses, txBody: tx.body })
       .requiresForeignSignatures ||
     hasCommitteeCertificates(tx.body)
   );

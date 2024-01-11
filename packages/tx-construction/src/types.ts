@@ -1,7 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, HandleResolution } from '@cardano-sdk/core';
+import { GroupedAddress, SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 import { SelectionSkeleton } from '@cardano-sdk/input-selection';
-import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 
 import { MinimumCoinQuantityPerOutput } from './output-validation';
 
@@ -11,12 +11,23 @@ export type RewardAccountWithPoolId = Omit<Cardano.RewardAccountInfo, 'delegatee
   delegatee?: { nextNextEpoch?: { id: Cardano.PoolId } };
 };
 
+export interface AddressesProvider {
+  get: () => Promise<GroupedAddress[]>;
+  /**
+   * When TxBuilder derives new addresses, it notifies the wallet via this method.
+   *
+   * @returns Updated wallet addresses (including old ones)
+   */
+  add: (...addresses: GroupedAddress[]) => Promise<GroupedAddress[]>;
+}
+
 export interface TxBuilderProviders {
   tip: () => Promise<Cardano.Tip>;
   protocolParameters: () => Promise<Cardano.ProtocolParameters>;
   genesisParameters: () => Promise<Cardano.CompactGenesis>;
   rewardAccounts: () => Promise<RewardAccountWithPoolId[]>;
   utxoAvailable: () => Promise<Cardano.Utxo[]>;
+  addresses: AddressesProvider;
 }
 
 export type InitializeTxWitness = Partial<Cardano.Witness> & { extraSigners?: TransactionSigner[] };
@@ -33,7 +44,7 @@ export interface InitializeTxProps {
   requiredExtraSignatures?: Crypto.Ed25519KeyHashHex[];
   auxiliaryData?: Cardano.AuxiliaryData;
   witness?: InitializeTxWitness;
-  signingOptions?: SignTransactionOptions;
+  signingOptions?: Pick<SignTransactionOptions, 'additionalKeyPaths'>;
   handleResolutions?: HandleResolution[];
 }
 

@@ -15,6 +15,27 @@ const handleDatum = Serialization.PlutusData.fromCbor(
   )
 ).toCore();
 
+const handlDatum = Serialization.PlutusData.fromCbor(
+  HexBlob(
+    // https://preview.cexplorer.io/datum/ff1a404ece117cc4482d26b072e30b5a6b3cd055a22debda3f90d704957e273a
+    'd8799faa446e616d654524686e646c45696d6167655838697066733a2f2f7a623272685a6a4c4a545838615a6d4a7a42424862366b7535446d6e6650674d47375a6d73627162317366736356365970496d65646961547970654a696d6167652f6a706567426f6700496f675f6e756d626572004672617269747946636f6d6d6f6e466c656e677468044a63686172616374657273476c657474657273516e756d657269635f6d6f64696669657273404776657273696f6e0101af4e7374616e646172645f696d6167655838697066733a2f2f7a623272685a6a4c4a545838615a6d4a7a42424862366b7535446d6e6650674d47375a6d7362716231736673635636597046706f7274616c404864657369676e65724047736f6369616c73404676656e646f72404764656661756c7400536c6173745f7570646174655f61646472657373583900f541f0822d4794e6d1ddc3c0d5e932585bfcce2d869b1c2ee05b1dc7c37bace64b57b50a044bbafa593811a6f49c9d8d8c0b187932e2df404c76616c6964617465645f6279581c4da965a049dfd15ed1ee19fba6e2974a0b79fc416dd1796a1f97f5e14a696d6167655f68617368584032646465376163633062376532333931626633326133646537643566313763356365663231633336626432333564636663643738376463663439656661363339537374616e646172645f696d6167655f686173685840326464653761636330623765323339316266333261336465376435663137633563656632316333366264323335646366636437383764636634396566613633394b7376675f76657273696f6e45322e302e314c6167726565645f7465726d7340546d6967726174655f7369675f72657175697265640045747269616c00446e73667700ff'
+  )
+).toCore();
+
+const subhandlDatum = Serialization.PlutusData.fromCbor(
+  HexBlob(
+    // https://preview.cexplorer.io/datum/29294f077464c36e67b304ad22547fb3dfa946623b0b2cbae8acea7fb299353c
+    'd8799faa446e616d65492473756240686e646c45696d6167655838697066733a2f2f7a6232726862426e7a6e4e48716748624a58786d71596a47714663377947314a444e6741664d3534726472455032776366496d65646961547970654a696d6167652f6a706567426f6700496f675f6e756d6265720046726172697479456261736963466c656e677468084a63686172616374657273476c657474657273516e756d657269635f6d6f64696669657273404776657273696f6e0101af4e7374616e646172645f696d6167655838697066733a2f2f7a6232726862426e7a6e4e48716748624a58786d71596a47714663377947314a444e6741664d353472647245503277636646706f7274616c404864657369676e65724047736f6369616c73404676656e646f72404764656661756c7400536c6173745f7570646174655f61646472657373583900f541f0822d4794e6d1ddc3c0d5e932585bfcce2d869b1c2ee05b1dc7c37bace64b57b50a044bbafa593811a6f49c9d8d8c0b187932e2df404c76616c6964617465645f6279581c4da965a049dfd15ed1ee19fba6e2974a0b79fc416dd1796a1f97f5e14a696d6167655f68617368584034333831373362613630333931353466646232643137383763363765633636333863393462643331633835336630643964356166343365626462313864623934537374616e646172645f696d6167655f686173685840343338313733626136303339313534666462326431373837633637656336363338633934626433316338353366306439643561663433656264623138646239344b7376675f76657273696f6e45322e302e314c6167726565645f7465726d7340546d6967726174655f7369675f72657175697265640045747269616c00446e73667700ff'
+  )
+).toCore();
+
+const virtualhandlDatum = Serialization.PlutusData.fromCbor(
+  HexBlob(
+    // https://preview.cexplorer.io/datum/e87d179ddf8ca2365fdb342101cc0f94f525d5e2ae2cb94085f28b84641c97e8
+    'd8799faf446e616d654d247669727475616c40686e646c45696d6167655838697066733a2f2f7a623272686b52636a5471546e5a387462704635485a474e4c4e355473324554633558477039576264614b415134335472496d65646961547970654a696d6167652f6a706567426f6700496f675f6e756d6265720046726172697479456261736963466c656e6774680c4a63686172616374657273476c657474657273516e756d657269635f6d6f64696669657273404a7375625f7261726974794562617369634a7375625f6c656e677468074e7375625f63686172616374657273476c657474657273557375625f6e756d657269635f6d6f64696669657273404b68616e646c655f74797065517669727475616c5f73756268616e646c654776657273696f6e0101a94e7374616e646172645f696d6167655838697066733a2f2f7a623272686b52636a5471546e5a387462704635485a474e4c4e355473324554633558477039576264614b41513433547246706f7274616c404864657369676e65724047736f6369616c73404676656e646f72404764656661756c7400536c6173745f7570646174655f616464726573735839007ad324c4fb08709dd997f6b2ba7980d5007103a2aa3f7a7eb8b44bc6f1a8e379127b811583070faf74db00d880d45027fe6171b1b69bd9ca4c76616c6964617465645f6279581c4da965a049dfd15ed1ee19fba6e2974a0b79fc416dd1796a1f97f5e1527265736f6c7665645f616464726573736573a1436164615839007ad324c4fb08709dd997f6b2ba7980d5007103a2aa3f7a7eb8b44bc6f1a8e379127b811583070faf74db00d880d45027fe6171b1b69bd9caff'
+  )
+).toCore();
+
 export type HandleMetadata = {
   [policyId: string]: {
     [handleName: string]: {
@@ -72,7 +93,7 @@ export const createHandlePolicy = async (keyAgent: KeyAgent) => {
   return { policyId, policyScript, policySigner };
 };
 
-export const handleNames: Handle[] = ['handle1', 'handle2'];
+export const handleNames: Handle[] = ['handle1', 'handle2', 'handl', 'sub@handl', 'virtual@handl'];
 
 export const getHandlePolicyId = async (pathToSdkIpc: string): Promise<Cardano.PolicyId> => {
   const handleProviderPolicyId = (await readFile(path.join(pathToSdkIpc, 'handle_policy_ids')))
@@ -88,28 +109,35 @@ export const mint = async (
   keyAgent: KeyAgent,
   tokens: Cardano.TokenMap,
   txMetadatum: Cardano.Metadatum,
-  datum?: Cardano.PlutusData
+  datum?: Cardano.PlutusData,
+  isNFTHandle = true
+  // eslint-disable-next-line max-params
 ) => {
-  const [{ address }] = await firstValueFrom(wallet.addresses$);
+  const knownAddresses = await firstValueFrom(wallet.addresses$);
+  const [{ address }] = knownAddresses;
   const { policyScript, policySigner } = await createHandlePolicy(keyAgent);
 
   const auxiliaryData = {
     blob: new Map([[721n, txMetadatum]])
   };
 
+  const outputs: Set<Cardano.TxOut> = new Set();
+
+  if (isNFTHandle) {
+    outputs.add({
+      address,
+      datum,
+      value: {
+        assets: tokens,
+        coins: coinsRequiredByHandleMint
+      }
+    });
+  }
+
   const txProps: InitializeTxProps = {
     auxiliaryData,
     mint: tokens,
-    outputs: new Set([
-      {
-        address,
-        datum,
-        value: {
-          assets: tokens,
-          coins: coinsRequiredByHandleMint
-        }
-      }
-    ]),
+    outputs,
     witness: { extraSigners: [policySigner], scripts: [policyScript] }
   };
 
@@ -130,7 +158,7 @@ export const mintCIP25andCIP68Handles = async (
   keyAgent: KeyAgent,
   policyId: Cardano.PolicyId
 ) => {
-  const [cip25handle, cip68handle] = handleNames;
+  const [cip25handle, cip68handle, parentHandle, subHandle, virtualHandle] = handleNames;
   const decodedCIP68HandleAssetName = Cardano.AssetName(util.utf8ToHex(cip68handle));
   const cip68UserTokenAssetId = Cardano.AssetId.fromParts(
     policyId,
@@ -140,6 +168,25 @@ export const mintCIP25andCIP68Handles = async (
     policyId,
     Asset.AssetNameLabel.encode(decodedCIP68HandleAssetName, Asset.AssetNameLabelNum.ReferenceNFT)
   );
+
+  const decodedParentHandleAssetName = Cardano.AssetName(util.utf8ToHex(parentHandle));
+  const cip68ParentHandleAssetId = Cardano.AssetId.fromParts(
+    policyId,
+    Asset.AssetNameLabel.encode(decodedParentHandleAssetName, Asset.AssetNameLabelNum.UserNFT)
+  );
+
+  const decodedSubHandleAssetName = Cardano.AssetName(util.utf8ToHex(subHandle));
+  const cip68SubHandleAssetId = Cardano.AssetId.fromParts(
+    policyId,
+    Asset.AssetNameLabel.encode(decodedSubHandleAssetName, Asset.AssetNameLabelNum.UserNFT)
+  );
+
+  const decodedVirtualHandleAssetName = Cardano.AssetName(util.utf8ToHex(virtualHandle));
+  const cip68VirtualHandleAssetId = Cardano.AssetId.fromParts(
+    policyId,
+    Asset.AssetNameLabel.encode(decodedVirtualHandleAssetName, Asset.AssetNameLabelNum.VirtualHandle)
+  );
+
   const cip25AssetId = Cardano.AssetId.fromParts(policyId, Cardano.AssetName(util.utf8ToHex(cip25handle)));
   const tokens = new Map([
     [cip25AssetId, 1n],
@@ -148,4 +195,19 @@ export const mintCIP25andCIP68Handles = async (
   ]);
   const txMetadatum = metadatum.jsonToMetadatum(createHandleMetadata(policyId, [cip25handle]));
   await mint(wallet, keyAgent, tokens, txMetadatum, handleDatum);
+
+  const parentHandleTxMetadatum = metadatum.jsonToMetadatum(createHandleMetadata(policyId, [parentHandle]));
+  const subHandleTxMetadatum = metadatum.jsonToMetadatum(createHandleMetadata(policyId, [subHandle]));
+  const virtualHandleTxMetadatum = metadatum.jsonToMetadatum(createHandleMetadata(policyId, [virtualHandle]));
+
+  await mint(wallet, keyAgent, new Map([[cip68ParentHandleAssetId, 1n]]), parentHandleTxMetadatum, handlDatum);
+  await mint(wallet, keyAgent, new Map([[cip68SubHandleAssetId, 1n]]), subHandleTxMetadatum, subhandlDatum);
+  await mint(
+    wallet,
+    keyAgent,
+    new Map([[cip68VirtualHandleAssetId, 1n]]),
+    virtualHandleTxMetadatum,
+    virtualhandlDatum,
+    false
+  );
 };

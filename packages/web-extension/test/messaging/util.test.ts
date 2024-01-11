@@ -9,8 +9,7 @@ import {
   isRequest,
   isRequestMessage,
   isResponseMessage,
-  newMessageId,
-  senderOrigin
+  newMessageId
 } from '../../src';
 
 describe('messaging/util', () => {
@@ -69,15 +68,6 @@ describe('messaging/util', () => {
   describe('messageId', () => {
     it('returns a different random ID on each call', () => {
       expect(newMessageId()).not.toEqual(newMessageId());
-    });
-  });
-  describe('senderOrigin', () => {
-    it('returns null when origin url is not present', () => {
-      expect(senderOrigin()).toBe(null);
-      expect(senderOrigin({ id: 'id' })).toBe(null);
-    });
-    it('returns origin url it is present', () => {
-      expect(senderOrigin({ url: 'http://origin' })).toBe('http://origin');
     });
   });
 });

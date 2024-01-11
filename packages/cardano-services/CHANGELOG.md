@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.24.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.24.4...@cardano-sdk/cardano-services@0.24.5) (2024-01-05)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services
+
+## [0.24.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.24.3...@cardano-sdk/cardano-services@0.24.4) (2023-12-21)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services
+
+## [0.24.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.24.2...@cardano-sdk/cardano-services@0.24.3) (2023-12-20)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services
+
+## [0.24.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.24.1...@cardano-sdk/cardano-services@0.24.2) (2023-12-14)
+
+### Features
+
+* **cardano-sevices:** allow api compatible version requests ([14184e2](https://github.com/input-output-hk/cardano-js-sdk/commit/14184e2b003a6d58f1088b26de0e932a6646535a))
+* include minted assets in cip67 mapper to ensure minted assets can be collected in withHandles mapper ([8e1b834](https://github.com/input-output-hk/cardano-js-sdk/commit/8e1b834181e909d4cb4c8608a29392716ae5a4b8))
+* update Handle entity and HandleStore to save parent handles ([3fa3920](https://github.com/input-output-hk/cardano-js-sdk/commit/3fa3920088857d5019d732a036fc3a89b90d5ab3))
+
+## [0.24.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.24.0...@cardano-sdk/cardano-services@0.24.1) (2023-12-12)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services
+
+## [0.24.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.23.1...@cardano-sdk/cardano-services@0.24.0) (2023-12-07)
+
+### ⚠ BREAKING CHANGES
+
+* bump stake pool provider api version to 1.1.0
+
+### Bug Fixes
+
+* make type orm stake pool provider back compatible ([b007175](https://github.com/input-output-hk/cardano-js-sdk/commit/b007175502578daaaa738a5380fe0b68ce9d742e))
+
+## [0.23.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.23.0...@cardano-sdk/cardano-services@0.23.1) (2023-12-04)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services
+
 ## [0.23.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.22.0...@cardano-sdk/cardano-services@0.23.0) (2023-11-29)
 
 ### ⚠ BREAKING CHANGES

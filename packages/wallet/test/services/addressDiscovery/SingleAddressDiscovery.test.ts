@@ -1,26 +1,21 @@
-import { AsyncKeyAgent, KeyRole, util } from '@cardano-sdk/key-management';
+import { Bip32Account, KeyRole } from '@cardano-sdk/key-management';
 import { SingleAddressDiscovery } from '../../../src';
-import { prepareMockKeyAgentWithData } from './mockData';
+import { createAsyncKeyAgent } from '../../util';
 
 describe('SingleAddressDiscovery', () => {
-  let mockKeyAgent: AsyncKeyAgent;
-
-  beforeEach(() => {
-    mockKeyAgent = prepareMockKeyAgentWithData();
-  });
-
   it('return the first derived address', async () => {
+    const bip32Account = await Bip32Account.fromAsyncKeyAgent(await createAsyncKeyAgent());
     const discovery = new SingleAddressDiscovery();
 
-    const addresses = await discovery.discover(util.createBip32Ed25519AddressManager(mockKeyAgent));
+    const addresses = await discovery.discover(bip32Account);
 
     expect(addresses.length).toEqual(1);
     expect(addresses[0]).toEqual({
       accountIndex: 0,
-      address: 'testAddress_0_0_0',
+      address: expect.stringContaining('addr'),
       index: 0,
       networkId: 0,
-      rewardAccount: 'testStakeAddress_0',
+      rewardAccount: expect.stringContaining('stake'),
       stakeKeyDerivationPath: { index: 0, role: KeyRole.Stake },
       type: 0
     });

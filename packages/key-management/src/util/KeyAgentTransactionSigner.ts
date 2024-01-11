@@ -28,9 +28,16 @@ export class KeyAgentTransactionSigner implements TransactionSigner {
    * @returns A Ed25519 transaction signature.
    */
   async sign(tx: Cardano.TxBodyWithHash): Promise<TransactionSignerResult> {
-    const signatures: Cardano.Signatures = await this.#keyAgent.signTransaction(tx, {
-      additionalKeyPaths: [this.#account]
-    });
+    const signatures: Cardano.Signatures = await this.#keyAgent.signTransaction(
+      tx,
+      {
+        knownAddresses: [],
+        txInKeyPathMap: {}
+      },
+      {
+        additionalKeyPaths: [this.#account]
+      }
+    );
 
     if (signatures.size !== EXPECTED_SIG_NUM)
       throw new ProofGenerationError(

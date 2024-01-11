@@ -8,10 +8,23 @@ const validHandles = [
   'test.handle',
   'test-handle-123',
   'test-handle-123.456',
-  'handle_name'
+  'handle_name',
+  'handle_name',
+  '@alice',
+  'test-@handle'
 ];
 
-const invalidHandles = ['bob!', '$wallet', 'alice@', 'test*handle#2', 'lace&bob', 'ada%1_test'];
+const invalidHandles = [
+  'bob!',
+  '$wallet',
+  'alice@',
+  'test*handle#2',
+  'lace&bob',
+  'ada%1_test',
+  'lace ',
+  'wallet ',
+  'sub@sub@handle'
+];
 
 describe('isValidHandle', () => {
   test('returns false for empty string', () => {

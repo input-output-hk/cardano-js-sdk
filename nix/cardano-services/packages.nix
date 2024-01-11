@@ -42,6 +42,25 @@ in {
         runHook postInstall
       '';
     });
+
+    chromedriverVersion = builtins.unsafeDiscardStringContext (builtins.readFile (
+      project.overrideAttrs (oldAttrs: {
+        name = "chromedriver-version";
+        buildInputs = oldAttrs.buildInputs ++ [ nixpkgs.unzip ];
+        buildPhase = "";
+        preConfigure = ''
+          unzip .yarn/cache/chromedriver-*.zip
+          cat node_modules/chromedriver/lib/chromedriver.js \
+            | grep -E '^\s*const version' | grep -Eo '[0-9]+(\.[0-9]+)+' \
+            | tr -d '\n' >$out
+          exit 0
+        '';
+      })));
+    chromedriver = nixpkgs.fetchurl {
+      name = "chromedriver-bin-${chromedriverVersion}.zip";  # Note: triggers hash check on version changes.
+      url = "https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/${chromedriverVersion}/linux64/chromedriver-linux64.zip";
+      hash = "sha256-X8bia1BaLQm5WKn5vdShpQ4A7sPNZ8lgmeXoYj2earc=";
+    };
   in
     project.overrideAttrs (oldAttrs: {
       # A bunch of deps build binaries using node-gyp that requires Python
@@ -49,6 +68,7 @@ in {
       # playwright build fixes
       PLAYWRIGHT_BROWSERS_PATH = nixpkgs.playwright-driver.browsers;
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = 1;
+      CHROMEDRIVER_FILEPATH = chromedriver;
       # node-hid uses pkg-config to find sources
       buildInputs = oldAttrs.buildInputs ++ [nixpkgs.pkg-config nixpkgs.libusb1];
       # run actual build

@@ -6,10 +6,11 @@ import path from 'path';
 dotenv.config({ path: path.join(__dirname, '../../../.env') });
 
 import { Logger } from 'ts-log';
-import { PersonalWallet, createLazyWalletUtil } from '@cardano-sdk/wallet';
+import { PersonalWallet } from '@cardano-sdk/wallet';
 import { bufferCount, bufferTime, from, mergeAll, tap } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 
+import { Bip32Account, util } from '@cardano-sdk/key-management';
 import {
   MeasurementUtil,
   assetProviderFactory,
@@ -26,7 +27,6 @@ import {
   waitForWalletStateSettle,
   walletVariables
 } from '../../../src';
-import { util } from '@cardano-sdk/key-management';
 
 // Example call that creates 5000 wallets in 10 minutes:
 // VIRTUAL_USERS_GENERATE_DURATION=600 VIRTUAL_USERS_COUNT=5000 yarn load-test-custom:wallet-init
@@ -73,29 +73,26 @@ const getKeyAgent = async (accountIndex: number) => {
     logger
   );
   const bip32Ed25519 = await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger);
-  const walletUtil = createLazyWalletUtil();
-  const keyAgent = await createKeyAgent({ bip32Ed25519, inputResolver: walletUtil, logger });
-  return { keyAgent, walletUtil };
+  const keyAgent = await createKeyAgent({ bip32Ed25519, logger });
+  return { keyAgent };
 };
 
 const createWallet = async (accountIndex: number): Promise<PersonalWallet> => {
   measurementUtil.addStartMarker(MeasureTarget.keyAgent, accountIndex);
   const providers = await getProviders();
-  const { keyAgent, walletUtil } = await getKeyAgent(accountIndex);
+  const { keyAgent } = await getKeyAgent(accountIndex);
   measurementUtil.addMeasureMarker(MeasureTarget.keyAgent, accountIndex);
 
   measurementUtil.addStartMarker(MeasureTarget.wallet, accountIndex);
-  const wallet = new PersonalWallet(
+  return new PersonalWallet(
     { name: `Wallet ${accountIndex}` },
     {
       ...providers,
-      addressManager: util.createBip32Ed25519AddressManager(keyAgent),
+      bip32Account: await Bip32Account.fromAsyncKeyAgent(keyAgent),
       logger,
       witnesser: util.createBip32Ed25519Witnesser(keyAgent)
     }
   );
-  walletUtil.initialize(wallet);
-  return wallet;
 };
 
 const initWallet = async (idx: number) => {

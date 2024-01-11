@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/web-extension",
-  "version": "0.16.4",
+  "version": "0.21.0",
   "description": "Web extension wallet utilities",
   "engines": {
     "node": ">=16.20.2"
@@ -56,6 +56,8 @@
     "@cardano-sdk/core": "workspace:~",
     "@cardano-sdk/crypto": "workspace:~",
     "@cardano-sdk/dapp-connector": "workspace:~",
+    "@cardano-sdk/hardware-ledger": "workspace:~",
+    "@cardano-sdk/hardware-trezor": "workspace:~",
     "@cardano-sdk/key-management": "workspace:~",
     "@cardano-sdk/tx-construction": "workspace:~",
     "@cardano-sdk/util": "workspace:~",

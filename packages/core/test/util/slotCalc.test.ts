@@ -14,6 +14,7 @@ import {
   createSlotTimeCalc,
   epochSlotsCalc
 } from '../../src';
+import { fromSerializableObject } from '@cardano-sdk/util';
 
 import merge from 'lodash/merge';
 
@@ -63,9 +64,63 @@ const preprodEraSummaries: EraSummary[] = [
   }
 ];
 
+// Produced on 2023-12-19
+export const previewEraSummaries = fromSerializableObject<EraSummary[]>([
+  {
+    parameters: { epochLength: 4320, slotLength: 20_000 },
+    start: { slot: 0, time: { __type: 'Date', value: 1_666_656_000_000 } }
+  },
+  {
+    parameters: { epochLength: 86_400, slotLength: 1000 },
+    start: { slot: 0, time: { __type: 'Date', value: 1_666_656_000_000 } }
+  },
+  {
+    parameters: { epochLength: 86_400, slotLength: 1000 },
+    start: { slot: 0, time: { __type: 'Date', value: 1_666_656_000_000 } }
+  },
+  {
+    parameters: { epochLength: 86_400, slotLength: 1000 },
+    start: { slot: 0, time: { __type: 'Date', value: 1_666_656_000_000 } }
+  },
+  {
+    parameters: { epochLength: 86_400, slotLength: 1000 },
+    start: { slot: 0, time: { __type: 'Date', value: 1_666_656_000_000 } }
+  },
+  {
+    parameters: { epochLength: 86_400, slotLength: 1000 },
+    start: { slot: 259_200, time: { __type: 'Date', value: 1_666_915_200_000 } }
+  }
+]);
+
 const SomeByronSlot = Cardano.Slot(1_209_592);
 
 describe('slotCalc utils', () => {
+  describe('preview', () => {
+    // following test data is taken from last block of epoch 418
+    // https://preview.cexplorer.io/block/b25f4238b9d9d70a2942d277baf2312cc0562990e38b2ce5888861454e05e6c4
+    const testEpoch = Cardano.EpochNo(418);
+    const testSlot = Cardano.Slot(36_201_583);
+    const testDate = new Date('2023-12-17T23:59:43Z');
+    it('epochSlotsCalc correctly computes last slot of epoch 418', () => {
+      const range = epochSlotsCalc(testEpoch, previewEraSummaries);
+      expect(range.lastSlot).toBeGreaterThanOrEqual(testSlot);
+    });
+    it('slotEpochCalc correctly computes epoch 418 from its last slot', () => {
+      const slotEpochCalc = createSlotEpochCalc(previewEraSummaries);
+      expect(slotEpochCalc(testSlot)).toEqual(testEpoch);
+    });
+    it('slotTimeCalc correctly computes the time last slot of epoch 418', () => {
+      const slotTimeCalc = createSlotTimeCalc(previewEraSummaries);
+      expect(slotTimeCalc(testSlot)).toEqual(testDate);
+    });
+    it('slotEpochInfoCalc correctly computes info for last slot of epoch 418', () => {
+      const slotEpochInfoCalc = createSlotEpochInfoCalc(previewEraSummaries);
+      const result = slotEpochInfoCalc(testSlot);
+      expect(result.epochNo).toEqual(testEpoch);
+      expect(result.lastSlot.date.getTime()).toBeGreaterThanOrEqual(testDate.getTime());
+      expect(result.lastSlot.slot).toBeGreaterThanOrEqual(testSlot);
+    });
+  });
   describe('epochStartCalc', () => {
     describe('preprod', () => {
       it('correctly computes 1st slot of the 0th epoch', () => {

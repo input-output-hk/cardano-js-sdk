@@ -4,10 +4,10 @@ import {
   RemoteApiMethod,
   RemoteApiProperties,
   RemoteApiPropertyType,
-  exposeApi,
-  senderOrigin
+  exposeApi
 } from '../messaging';
 import { RemoteAuthenticatorMethodNames } from './consumeRemoteAuthenticatorApi';
+import { cloneSender } from './util';
 import { of } from 'rxjs';
 
 export interface ExposeAuthenticatorApiOptions {
@@ -35,10 +35,13 @@ export const exposeAuthenticatorApi = (
           {
             propType: RemoteApiPropertyType.MethodReturningPromise,
             requestOptions: {
-              transform: ({ method }, sender) => ({
-                args: [senderOrigin(sender)],
-                method
-              })
+              transform: ({ method }, sender) => {
+                if (!sender) throw new Error('Unknown sender');
+                return {
+                  args: [cloneSender(sender)],
+                  method
+                };
+              }
             }
           } as RemoteApiMethod
         ])

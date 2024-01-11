@@ -1,6 +1,6 @@
-import { AsyncKeyAgent } from '@cardano-sdk/key-management';
 import { Cardano, ChainHistoryProvider, EraSummary, SlotEpochCalc, createSlotEpochCalc } from '@cardano-sdk/core';
 import { DelegationTracker, TransactionsTracker, UtxoTracker } from '../types';
+import { GroupedAddress } from '@cardano-sdk/key-management';
 import { Logger } from 'ts-log';
 import { Observable, combineLatest, map, tap } from 'rxjs';
 import {
@@ -48,7 +48,7 @@ export interface DelegationTrackerProps {
   transactionsTracker: TransactionsTracker;
   retryBackoffConfig: RetryBackoffConfig;
   utxoTracker: UtxoTracker;
-  knownAddresses$: AsyncKeyAgent['knownAddresses$'];
+  knownAddresses$: Observable<GroupedAddress[]>;
   stores: WalletStores;
   internals?: {
     queryStakePoolsProvider?: ObservableStakePoolProvider;

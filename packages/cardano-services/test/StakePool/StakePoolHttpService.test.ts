@@ -529,13 +529,13 @@ describe('StakePoolHttpService', () => {
             ];
             const req: QueryStakePoolsArgs = {
               filters: {
-                identifier: { values }
+                identifier: { _condition: 'and', values }
               },
               pagination
             };
             const reqWithInsensitiveValues: QueryStakePoolsArgs = {
               filters: {
-                identifier: { values: insensitiveValues }
+                identifier: { _condition: 'and', values: insensitiveValues }
               },
               pagination
             };
@@ -562,9 +562,10 @@ describe('StakePoolHttpService', () => {
             expect(response).toEqual(responseCached);
             expect(responseWithOrCondition).toEqual(responseCached);
 
-            expect(response.pageResults[0]?.metadata?.name).toEqual(poolsInfo[0].name);
-            expect(response.pageResults[0]?.metadata?.ticker).toEqual(poolsInfo[0].ticker);
-            expect(response.pageResults[0]?.id).toEqual(poolsInfo[0].id);
+            const responseById = response.pageResults.find((pool) => pool.id === poolsInfo[0].id);
+            expect(responseById?.metadata?.name).toEqual(poolsInfo[0].name);
+            expect(responseById?.metadata?.ticker).toEqual(poolsInfo[0].ticker);
+            expect(responseById?.id).toEqual(poolsInfo[0].id);
           });
           it('stake pools do not match identifier filter', async () => {
             const req = {

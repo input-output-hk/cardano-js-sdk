@@ -50,6 +50,8 @@ COPY .yarn .yarn
 COPY .eslintrc.js .prettierrc .yarnrc.yml complete.eslintrc.js eslint.tsconfig.json package.json tsconfig.json yarn.lock yarn-project.nix ./
 
 FROM nodejs-builder as cardano-services-builder
+# NOTE: Pay attention to --mode=skip-build
+# For details: https://github.com/input-output-hk/cardano-js-sdk/pull/1024
 RUN yarn --immutable --inline-builds --mode=skip-build
 COPY packages packages
 RUN \

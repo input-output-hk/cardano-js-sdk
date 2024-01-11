@@ -62,6 +62,19 @@ describe('TypeOrmHandleProvider', () => {
     });
   });
 
+  describe('resolve sub-handles', () => {
+    it('fetches parent handle of virtual subhandle', async () => {
+      const resolution = await provider.resolveHandles({ handles: ['virtual@handl'] });
+      expect(resolution[0]?.parentHandle).toBe('handl');
+      expect(resolution[0]?.cardanoAddress?.startsWith('addr')).toBe(true);
+    });
+    it('fetches parent handle of NFT subhandle', async () => {
+      const resolution = await provider.resolveHandles({ handles: ['sub@handl'] });
+      expect(resolution[0]?.parentHandle).toBe('handl');
+      expect(resolution[0]?.cardanoAddress?.startsWith('addr')).toBe(true);
+    });
+  });
+
   // Test data is sourced from the test database snapshot
   // packages/cardano-services/test/jest-setup/snapshots/handle.sql
   it('fetches all distinct policy ids', async () => {

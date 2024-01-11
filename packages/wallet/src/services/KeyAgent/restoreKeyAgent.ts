@@ -3,7 +3,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import {
   GetPassphrase,
-  GroupedAddress,
   InMemoryKeyAgent,
   KeyAgent,
   KeyAgentDependencies,
@@ -12,8 +11,7 @@ import {
   SerializableKeyAgentData,
   SerializableLedgerKeyAgentData,
   SerializableTrezorKeyAgentData,
-  errors,
-  util
+  errors
 } from '@cardano-sdk/key-management';
 import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
 import { Logger } from 'ts-log';
@@ -42,11 +40,7 @@ const migrateSerializableData = <T extends SerializableKeyAgentData>(data: any, 
                 return Cardano.ChainIds.Preprod;
               })()
       };
-    })(),
-  knownAddresses: data.knownAddresses.map((address: GroupedAddress) => ({
-    ...address,
-    stakeKeyDerivationPath: address.stakeKeyDerivationPath || util.STAKE_KEY_DERIVATION_PATH
-  }))
+    })()
 });
 
 export function restoreKeyAgent(

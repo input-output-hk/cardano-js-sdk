@@ -10,7 +10,7 @@ import {
 import { BalanceTracker, DelegationTracker, TransactionsTracker, UtxoTracker } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
-import { GroupedAddress, cip8 } from '@cardano-sdk/key-management';
+import { GroupedAddress, MessageSender, SignTransactionOptions, cip8 } from '@cardano-sdk/key-management';
 import { InitializeTxProps, InitializeTxResult, SignedTx, TxBuilder, TxContext } from '@cardano-sdk/tx-construction';
 import { Observable } from 'rxjs';
 import { PubStakeKeyAndStatus } from './services/PublicStakeKeysTracker';
@@ -18,7 +18,7 @@ import { Shutdown } from '@cardano-sdk/util';
 
 export type Assets = Map<Cardano.AssetId, Asset.AssetInfo>;
 
-export type SignDataProps = Omit<cip8.Cip30SignDataRequest, 'addressManager' | 'witnesser'>;
+export type SignDataProps = Omit<cip8.Cip30SignDataRequest, 'knownAddresses' | 'witnesser'>;
 
 export interface SyncStatus extends Shutdown {
   /**
@@ -43,11 +43,29 @@ export interface SyncStatus extends Shutdown {
   isSettled$: Observable<boolean>;
 }
 
-export type FinalizeTxProps = Omit<TxContext, 'ownAddresses'> & {
+export type FinalizeTxProps = Omit<TxContext, 'signingContext'> & {
   tx: Cardano.TxBodyWithHash;
+  signingOptions?: SignTransactionOptions;
+  sender?: MessageSender;
 };
 
 export type HandleInfo = HandleResolution & Asset.AssetInfo;
+
+export interface ScriptAddress {
+  networkId: Cardano.NetworkId;
+  address: Cardano.PaymentAddress;
+  rewardAccount: Cardano.RewardAccount;
+  scripts: {
+    payment: Cardano.NativeScript;
+    stake: Cardano.NativeScript;
+  };
+}
+
+export type WalletAddress = GroupedAddress | ScriptAddress;
+
+export const isScriptAddress = (address: WalletAddress): address is ScriptAddress => 'scripts' in address;
+
+export const isKeyHashAddress = (address: WalletAddress): address is GroupedAddress => !isScriptAddress(address);
 
 export interface ObservableWallet {
   readonly balance: BalanceTracker;
@@ -59,7 +77,7 @@ export interface ObservableWallet {
   readonly eraSummaries$: Observable<EraSummary[]>;
   readonly currentEpoch$: Observable<EpochInfo>;
   readonly protocolParameters$: Observable<Cardano.ProtocolParameters>;
-  readonly addresses$: Observable<GroupedAddress[]>;
+  readonly addresses$: Observable<WalletAddress[]>;
   readonly publicStakeKeys$: Observable<PubStakeKeyAndStatus[]>;
   readonly handles$: Observable<HandleInfo[]>;
   /** All owned and historical assets */
@@ -94,6 +112,14 @@ export interface ObservableWallet {
 
   /** Create a TxBuilder from this wallet */
   createTxBuilder(): TxBuilder;
+
+  /**
+   * Discover addresses that might have been created by other applications.
+   * This is run automatically when the wallet is first created.
+   *
+   * @returns Promise that resolves when discovery is complete, with an updated array of wallet addresses
+   */
+  discoverAddresses(): Promise<WalletAddress[]>;
 
   shutdown(): void;
 }

@@ -1,10 +1,9 @@
-import * as Crypto from '@cardano-sdk/crypto';
-import { PersonalWallet, setupWallet } from '../../src';
+import { Bip32Account, util } from '@cardano-sdk/key-management';
+import { PersonalWallet } from '../../src';
 import { WalletStores } from '../../src/persistence';
 import { createStubStakePoolProvider, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
 import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
-import { util } from '@cardano-sdk/key-management';
 
 const {
   mockAssetProvider,
@@ -30,21 +29,18 @@ export type Providers = {
   [k in keyof RequiredProviders]?: RequiredProviders[k];
 };
 
-export const createWallet = async (stores?: WalletStores, providers: Providers = {}) =>
-  await setupWallet({
-    bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
-    createKeyAgent: (dependencies) => testAsyncKeyAgent(undefined, dependencies),
-    createWallet: async (keyAgent) =>
-      new PersonalWallet(
-        { name: 'Test Wallet' },
-        {
-          ...createDefaultProviders(),
-          ...providers,
-          addressManager: util.createBip32Ed25519AddressManager(keyAgent),
-          logger,
-          stores,
-          witnesser: util.createBip32Ed25519Witnesser(keyAgent)
-        }
-      ),
-    logger
-  });
+export const createWallet = async (stores?: WalletStores, providers: Providers = {}) => {
+  const keyAgent = await testAsyncKeyAgent();
+  const wallet = new PersonalWallet(
+    { name: 'Test Wallet' },
+    {
+      ...createDefaultProviders(),
+      ...providers,
+      bip32Account: await Bip32Account.fromAsyncKeyAgent(keyAgent),
+      logger,
+      stores,
+      witnesser: util.createBip32Ed25519Witnesser(keyAgent)
+    }
+  );
+  return { keyAgent, wallet };
+};
