@@ -1,7 +1,7 @@
 import {
   AccountKeyDerivationPath,
-  MessageSender,
   SignBlobResult,
+  SignDataContext,
   SignTransactionContext,
   SignTransactionOptions
 } from '@cardano-sdk/key-management';
@@ -51,8 +51,6 @@ export type TransactionWitnessRequest<WalletMetadata extends {}> = RequestBase<W
   transaction: Serialization.Transaction;
   signContext: SignTransactionContext;
 } & SignRequest<Cardano.Signatures>;
-
-export type SignDataContext = { sender?: MessageSender };
 
 export type SignDataProps = {
   derivationPath: AccountKeyDerivationPath;

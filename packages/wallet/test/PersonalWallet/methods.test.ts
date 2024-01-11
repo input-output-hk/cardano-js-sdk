@@ -233,6 +233,7 @@ describe('PersonalWallet methods', () => {
         const witnessSpy = jest.spyOn(witnesser, 'witness');
         const txInternals = await wallet.initializeTx(props);
         await wallet.finalizeTx({ sender, tx: txInternals });
+
         expect(witnessSpy).toBeCalledWith(expect.anything(), expect.objectContaining({ sender }), void 0);
       });
     });
@@ -434,11 +435,11 @@ describe('PersonalWallet methods', () => {
       expect(response).toHaveProperty('signature');
     });
 
-    it('passes through sender to witnesser', async () => {
+    it('passes through context to witnesser', async () => {
       const sender = { url: 'https://lace.io' };
       const signBlobSpy = jest.spyOn(witnesser, 'signBlob');
       await wallet.signData({ payload: HexBlob('abc123'), sender, signWith: address });
-      expect(signBlobSpy).toBeCalledWith(expect.anything(), expect.anything(), sender);
+      expect(signBlobSpy).toBeCalledWith(expect.anything(), expect.anything(), { address, sender });
     });
 
     test('rejects if bech32 DRepID is not a type 6 address', async () => {
