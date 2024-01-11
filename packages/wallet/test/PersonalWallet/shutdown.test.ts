@@ -1,7 +1,6 @@
 /* eslint-disable max-statements */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, GroupedAddress, util } from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
 import {
   AssetId,
   createStubStakePoolProvider,
@@ -21,8 +20,7 @@ import {
   PersonalWallet,
   PollingConfig,
   TxSubmitProviderStats,
-  WalletNetworkInfoProviderStats,
-  setupWallet
+  WalletNetworkInfoProviderStats
 } from '../../src';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import { firstValueFrom } from 'rxjs';
@@ -42,61 +40,42 @@ interface Providers {
   connectionStatusTracker$?: ConnectionStatusTracker;
 }
 
-const createWallet = async (
-  stores: WalletStores,
-  providers: Providers,
-  shutdownSpy?: () => void,
-  pollingConfig?: PollingConfig
-) => {
-  const { wallet } = await setupWallet({
-    bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
-    createKeyAgent: async (dependencies) => {
-      const groupedAddress: GroupedAddress = {
-        accountIndex: 0,
-        address,
-        index: 0,
-        networkId: Cardano.NetworkId.Testnet,
-        rewardAccount,
-        stakeKeyDerivationPath,
-        type: AddressType.External
-      };
-      const asyncKeyAgent = await testAsyncKeyAgent(
-        [groupedAddress],
-        dependencies,
-        testKeyAgent([groupedAddress], dependencies),
-        shutdownSpy
-      );
-      asyncKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
-      return asyncKeyAgent;
-    },
-    createWallet: async (keyAgent) => {
-      const { rewardsProvider, utxoProvider, chainHistoryProvider, networkInfoProvider, connectionStatusTracker$ } =
-        providers;
-      const txSubmitProvider = mocks.mockTxSubmitProvider();
-      const assetProvider = mocks.mockAssetProvider();
-      const stakePoolProvider = createStubStakePoolProvider();
+const createWallet = async (stores: WalletStores, providers: Providers, pollingConfig?: PollingConfig) => {
+  const groupedAddress: GroupedAddress = {
+    accountIndex: 0,
+    address,
+    index: 0,
+    networkId: Cardano.NetworkId.Testnet,
+    rewardAccount,
+    stakeKeyDerivationPath,
+    type: AddressType.External
+  };
+  const asyncKeyAgent = await testAsyncKeyAgent(undefined, testKeyAgent());
+  const bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
+  bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
+  const { rewardsProvider, utxoProvider, chainHistoryProvider, networkInfoProvider, connectionStatusTracker$ } =
+    providers;
+  const txSubmitProvider = mocks.mockTxSubmitProvider();
+  const assetProvider = mocks.mockAssetProvider();
+  const stakePoolProvider = createStubStakePoolProvider();
 
-      return new PersonalWallet(
-        { name, polling: pollingConfig },
-        {
-          addressManager: util.createBip32Ed25519AddressManager(keyAgent),
-          assetProvider,
-          chainHistoryProvider,
-          connectionStatusTracker$,
-          logger,
-          networkInfoProvider,
-          rewardsProvider,
-          stakePoolProvider,
-          stores,
-          txSubmitProvider,
-          utxoProvider,
-          witnesser: util.createBip32Ed25519Witnesser(keyAgent)
-        }
-      );
-    },
-    logger
-  });
-  return wallet;
+  return new PersonalWallet(
+    { name, polling: pollingConfig },
+    {
+      assetProvider,
+      bip32Account,
+      chainHistoryProvider,
+      connectionStatusTracker$,
+      logger,
+      networkInfoProvider,
+      rewardsProvider,
+      stakePoolProvider,
+      stores,
+      txSubmitProvider,
+      utxoProvider,
+      witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)
+    }
+  );
 };
 
 const assertWalletProperties = async (
@@ -104,7 +83,7 @@ const assertWalletProperties = async (
   expectedDelegateeId: Cardano.PoolId | undefined,
   expectedRewardsHistory = flatten([...mocks.rewardsHistory.values()])
 ) => {
-  expect(wallet.addressManager).toBeTruthy();
+  expect(wallet.bip32Account).toBeTruthy();
   expect(wallet.witnesser).toBeTruthy();
   // name
   expect(wallet.name).toBe(name);
@@ -170,7 +149,6 @@ describe('PersonalWallet shutdown', () => {
   });
 
   it('completes all wallet Subjects', async () => {
-    let isKeyAgentShutdown = false;
     let isCurrentEpoch$Completed = false;
     let tip$Completed = false;
     let eraSummaries$Completed = false;
@@ -180,18 +158,12 @@ describe('PersonalWallet shutdown', () => {
     let assets$Completed = false;
 
     const stores = createInMemoryWalletStores();
-    const wallet1 = await createWallet(
-      stores,
-      {
-        chainHistoryProvider: mocks.mockChainHistoryProvider(),
-        networkInfoProvider: mocks.mockNetworkInfoProvider(),
-        rewardsProvider: mocks.mockRewardsProvider(),
-        utxoProvider: mocks.mockUtxoProvider()
-      },
-      () => {
-        isKeyAgentShutdown = true;
-      }
-    );
+    const wallet1 = await createWallet(stores, {
+      chainHistoryProvider: mocks.mockChainHistoryProvider(),
+      networkInfoProvider: mocks.mockNetworkInfoProvider(),
+      rewardsProvider: mocks.mockRewardsProvider(),
+      utxoProvider: mocks.mockUtxoProvider()
+    });
 
     // Verify all observables have completed.
     wallet1.currentEpoch$.subscribe({
@@ -264,7 +236,6 @@ describe('PersonalWallet shutdown', () => {
     expect(txSubmitProviderStats).toHaveBeenCalledTimes(1);
     expect(utxoProviderStats).toHaveBeenCalledTimes(1);
     expect(walletNetworkInfoProviderStats).toHaveBeenCalledTimes(1);
-    expect(isKeyAgentShutdown).toBeTruthy();
     expect(isCurrentEpoch$Completed).toBeTruthy();
     expect(tip$Completed).toBeTruthy();
     expect(eraSummaries$Completed).toBeTruthy();

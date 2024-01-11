@@ -10,10 +10,10 @@ import {
   KeyAgentType,
   SerializableLedgerKeyAgentData,
   SignBlobResult,
+  SignTransactionContext,
   errors
 } from '@cardano-sdk/key-management';
 import { LedgerTransportType } from './types';
-import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { str_to_path } from '@cardano-foundation/ledgerjs-hw-app-cardano/dist/utils/address';
 import { toLedgerTx } from './transformers';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
@@ -316,8 +316,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
         chainId,
         communicationType,
         deviceConnection: activeDeviceConnection,
-        extendedAccountPublicKey,
-        knownAddresses: []
+        extendedAccountPublicKey
       },
       dependencies
     );
@@ -365,13 +364,16 @@ export class LedgerKeyAgent extends KeyAgentBase {
   }
 
   // TODO: Allow additional key paths
-  async signTransaction({ body, hash }: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
-    const scope = new ManagedFreeableScope();
+  async signTransaction(
+    { body, hash }: Cardano.TxBodyWithHash,
+    { knownAddresses, txInKeyPathMap }: SignTransactionContext
+  ): Promise<Cardano.Signatures> {
     try {
       const ledgerTxData = await toLedgerTx(body, {
+        accountIndex: this.accountIndex,
         chainId: this.chainId,
-        inputResolver: this.inputResolver,
-        knownAddresses: this.knownAddresses
+        knownAddresses,
+        txInKeyPathMap
       });
 
       const deviceConnection = await LedgerKeyAgent.checkDeviceConnection(
@@ -407,8 +409,6 @@ export class LedgerKeyAgent extends KeyAgentBase {
         throw new errors.AuthenticationError('Transaction signing aborted', error);
       }
       throw transportTypedError(error);
-    } finally {
-      scope.dispose();
     }
   }
 

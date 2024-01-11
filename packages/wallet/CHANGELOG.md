@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.28.1...@cardano-sdk/wallet@0.28.2) (2023-12-20)
+
+**Note:** Version bump only for package @cardano-sdk/wallet
+
+## [0.28.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.28.0...@cardano-sdk/wallet@0.28.1) (2023-12-14)
+
+### Features
+
+* **wallet:** forward MessageSender to GetCollateralCallback ([da4ab32](https://github.com/input-output-hk/cardano-js-sdk/commit/da4ab32335846b4b12f5ecc283dcaf1ddc6b7224))
+
+### Bug Fixes
+
+* delay InMemoryCollectionStore observeAll emission after setAll ([51647eb](https://github.com/input-output-hk/cardano-js-sdk/commit/51647eb1ee64068422c46b1ec064c17404af1e8f))
+
+## [0.28.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.27.1...@cardano-sdk/wallet@0.28.0) (2023-12-12)
+
+### ⚠ BREAKING CHANGES
+
+* replace authenticator 'origin' argument to 'sender'
+- hoist 'senderOrigin' util to dapp-connector package
+
+### Features
+
+* track cip30 method call origin & update Authenticator api ([75c8af6](https://github.com/input-output-hk/cardano-js-sdk/commit/75c8af6aecc0ddcaeca153e8a3693d6e18edf60e))
+
+## [0.27.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.27.0...@cardano-sdk/wallet@0.27.1) (2023-12-08)
+
+### Features
+
+* add ObservableWallet.discoverAddreses ([efc4e50](https://github.com/input-output-hk/cardano-js-sdk/commit/efc4e5070ca261b3eec6c93d4ede26c0533d09ee)), closes [#1009](https://github.com/input-output-hk/cardano-js-sdk/issues/1009)
+
+## [0.27.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.26.1...@cardano-sdk/wallet@0.27.0) (2023-12-07)
+
+### ⚠ BREAKING CHANGES
+
+* remove KeyAgent.knownAddresses
+- remove AsyncKeyAgent.knownAddresses$
+- remove LazyWalletUtil and setupWallet utils
+- replace KeyAgent dependency on InputResolver with props passed to sign method
+- re-purpose AddressManager to Bip32Account: addresses are now stored only by the wallet
+
+### Code Refactoring
+
+* remove indirect KeyAgent dependency on ObservableWallet ([8dcfbc4](https://github.com/input-output-hk/cardano-js-sdk/commit/8dcfbc4ab339fcd8efc7d5f241a501eb210b58d4))
+
+## [0.26.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.26.0...@cardano-sdk/wallet@0.26.1) (2023-12-04)
+
+### Features
+
+* **hardware-trezor:** add required signers to hw trezor mappers ([d89b05b](https://github.com/input-output-hk/cardano-js-sdk/commit/d89b05be33533be1c8782b4f394686d64237f808))
+* **wallet:** no produced coins is pre-ogmios6 ([f34f0ad](https://github.com/input-output-hk/cardano-js-sdk/commit/f34f0ad2d25578bf83d30af7df4589109b87fff3))
+
 ## [0.26.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.25.1...@cardano-sdk/wallet@0.26.0) (2023-11-29)
 
 ### ⚠ BREAKING CHANGES

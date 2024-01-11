@@ -42,6 +42,12 @@ in {
         runHook postInstall
       '';
     });
+
+    chromedriverVersion = "120.0.6099.71";
+    chromedriver = nixpkgs.fetchurl {
+      url = "https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/${chromedriverVersion}/linux64/chromedriver-linux64.zip";
+      hash = "sha256-X8bia1BaLQm5WKn5vdShpQ4A7sPNZ8lgmeXoYj2earc=";
+    };
   in
     project.overrideAttrs (oldAttrs: {
       # A bunch of deps build binaries using node-gyp that requires Python
@@ -49,6 +55,7 @@ in {
       # playwright build fixes
       PLAYWRIGHT_BROWSERS_PATH = nixpkgs.playwright-driver.browsers;
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = 1;
+      CHROMEDRIVER_FILEPATH = chromedriver;
       # node-hid uses pkg-config to find sources
       buildInputs = oldAttrs.buildInputs ++ [nixpkgs.pkg-config nixpkgs.libusb1];
       # run actual build

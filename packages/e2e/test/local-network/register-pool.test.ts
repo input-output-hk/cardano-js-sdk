@@ -79,17 +79,15 @@ describe('local-network/register-pool', () => {
 
     await walletReady(wallet);
 
-    const poolAddressManager = wallet.addressManager;
-
-    const poolPubKey = await poolAddressManager.derivePublicKey({
+    const poolPubKey = await wallet1.bip32Account.derivePublicKey({
       index: 0,
       role: KeyRole.External
     });
 
-    const poolKeyHash = await bip32Ed25519.getPubKeyHash(poolPubKey);
+    const poolKeyHash = await bip32Ed25519.getPubKeyHash(poolPubKey.hex());
     const poolId = Cardano.PoolId.fromKeyHash(poolKeyHash);
     const poolRewardAccount = (
-      await poolAddressManager.deriveAddress(
+      await wallet1.bip32Account.deriveAddress(
         {
           index: 0,
           type: AddressType.External
@@ -167,17 +165,15 @@ describe('local-network/register-pool', () => {
 
     await walletReady(wallet);
 
-    const poolAddressManager = wallet.addressManager;
-
-    const poolPubKey = await poolAddressManager.derivePublicKey({
+    const poolPubKey = await wallet2.bip32Account.derivePublicKey({
       index: 0,
       role: KeyRole.External
     });
 
-    const poolKeyHash = await bip32Ed25519.getPubKeyHash(poolPubKey);
+    const poolKeyHash = await bip32Ed25519.getPubKeyHash(poolPubKey.hex());
     const poolId = Cardano.PoolId.fromKeyHash(poolKeyHash);
     const poolRewardAccount = (
-      await poolAddressManager.deriveAddress(
+      await wallet2.bip32Account.deriveAddress(
         {
           index: 0,
           type: AddressType.External

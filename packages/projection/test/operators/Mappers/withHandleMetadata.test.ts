@@ -22,8 +22,8 @@ const project = (tx: Cardano.OnChainTx) =>
       }
     } as ProjectionEvent).pipe(
       withUtxo(),
-      withCIP67(),
       withMint(),
+      withCIP67(),
       withNftMetadata({ logger }),
       withHandleMetadata({ policyIds: [handlePolicyId] }, logger)
     )

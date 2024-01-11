@@ -6,7 +6,7 @@ dotenv.config({ path: path.join(__dirname, '../../../.env') });
 import { Cardano } from '@cardano-sdk/core';
 import { GroupedAddress, util } from '@cardano-sdk/key-management';
 import { Logger } from 'ts-log';
-import { MINUTE, StubKeyAgent, getEnv, getWallet, waitForWalletStateSettle, walletVariables } from '../../../src';
+import { MINUTE, createMockKeyAgent, getEnv, getWallet, waitForWalletStateSettle, walletVariables } from '../../../src';
 import { PersonalWallet } from '@cardano-sdk/wallet';
 import { logger } from '@cardano-sdk/util-dev';
 import { mapToGroupedAddress } from '../../artillery/wallet-restoration/WalletRestoration';
@@ -41,7 +41,7 @@ const initWallets = async (walletsNum: number, addresses: GroupedAddress[]): Pro
   for (let i = 0; i < walletsNum; i++) {
     currentAddress = addresses[i];
     testLogger.info('  address:', currentAddress.address);
-    const keyAgent = util.createAsyncKeyAgent(new StubKeyAgent(currentAddress));
+    const keyAgent = util.createAsyncKeyAgent(createMockKeyAgent([currentAddress]));
     const { wallet } = await getWallet({
       env,
       idx: 0,

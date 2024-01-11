@@ -8,15 +8,15 @@ import { resolvePaymentKeyPathForTxIn } from './keyPaths';
  * Transforms the given Cardano input transaction to the Trezor
  * input transaction format using the given trezor input resolver.
  */
-export const toTrezorTxIn: Transform<Cardano.TxIn, Promise<Trezor.CardanoInput>, TrezorTxTransformerContext> = async (
+export const toTrezorTxIn: Transform<Cardano.TxIn, Trezor.CardanoInput, TrezorTxTransformerContext> = (
   txIn,
   context?
 ) => {
-  const path = await resolvePaymentKeyPathForTxIn(txIn, context);
+  const path = resolvePaymentKeyPathForTxIn(txIn, context);
   return {
+    path,
     prev_hash: txIn.txId,
-    prev_index: txIn.index,
-    ...(path ? { path } : {}) // optional destructuring of path
+    prev_index: txIn.index
   };
 };
 
@@ -25,7 +25,5 @@ export const toTrezorTxIn: Transform<Cardano.TxIn, Promise<Trezor.CardanoInput>,
  * an array of trezor Cardano transaction inputs using the
  * given context.
  */
-export const mapTxIns = async (
-  txIns: Cardano.TxIn[],
-  context: TrezorTxTransformerContext
-): Promise<Trezor.CardanoInput[]> => Promise.all(txIns.map((txIn) => toTrezorTxIn(txIn, context)));
+export const mapTxIns = (txIns: Cardano.TxIn[], context: TrezorTxTransformerContext): Trezor.CardanoInput[] =>
+  txIns.map((txIn) => toTrezorTxIn(txIn, context));

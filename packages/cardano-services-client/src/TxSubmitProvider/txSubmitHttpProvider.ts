@@ -32,7 +32,7 @@ const paths: HttpProviderConfigPaths<TxSubmitProvider> = {
 const toTxSubmissionError = (error: any): TxSubmissionError | GeneralCardanoNodeError | null => {
   if (typeof error === 'object' && error !== null && typeof error?.message === 'string') {
     if (CardanoNodeUtil.isTxSubmissionErrorCode(error.code)) {
-      return Object.setPrototypeOf(error, TxSubmissionError.prototype);
+      return new TxSubmissionError(error.code, error.data, error.message);
     }
 
     if (CardanoNodeUtil.isGeneralCardanoNodeErrorCode(error.code)) {

@@ -1,51 +1,43 @@
-import * as Crypto from '@cardano-sdk/crypto';
-import { AsyncKeyAgent, InMemoryKeyAgent, Witnesser, util } from '../../src';
-import { Cardano } from '@cardano-sdk/core';
+import { AsyncKeyAgent, SignBlobResult, Witnesser, util } from '../../src';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
-import { dummyLogger } from 'ts-log';
 
 describe('createBip32Ed25519Witnesser', () => {
-  let asyncKeyAgent: AsyncKeyAgent;
+  let asyncKeyAgent: jest.Mocked<AsyncKeyAgent>;
   let witnesser: Witnesser;
-  let inputResolver: jest.Mocked<Cardano.InputResolver>;
 
   beforeEach(async () => {
-    const mnemonicWords = util.generateMnemonicWords();
-    const getPassphrase = jest.fn().mockResolvedValue(Buffer.from('password'));
-    inputResolver = { resolveInput: jest.fn() };
-    const keyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
-      {
-        chainId: Cardano.ChainIds.Preview,
-        getPassphrase,
-        mnemonicWords
-      },
-      { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), inputResolver, logger: dummyLogger }
-    );
-    asyncKeyAgent = util.createAsyncKeyAgent(keyAgent);
+    asyncKeyAgent = {
+      signBlob: jest.fn(),
+      signTransaction: jest.fn()
+    } as unknown as jest.Mocked<AsyncKeyAgent>;
     witnesser = util.createBip32Ed25519Witnesser(asyncKeyAgent);
   });
 
   it('signBlob is unchanged', async () => {
     const keyDerivationPath = { index: 0, role: 0 };
     const blob = HexBlob('abc123');
-
-    await expect(asyncKeyAgent.signBlob(keyDerivationPath, blob)).resolves.toEqual(
-      await witnesser.signBlob(keyDerivationPath, blob)
-    );
+    const result = {} as SignBlobResult;
+    asyncKeyAgent.signBlob.mockResolvedValueOnce(result);
+    await expect(witnesser.signBlob(keyDerivationPath, blob)).resolves.toBe(result);
+    expect(asyncKeyAgent.signBlob).toBeCalledWith(keyDerivationPath, blob);
   });
 
   it('signTransaction is unchanged', async () => {
-    inputResolver.resolveInput.mockResolvedValue(null);
+    const transaction = new Serialization.Transaction(
+      Serialization.TransactionBody.fromCore({ fee: 20_000n, inputs: [], outputs: [], validityInterval: {} }),
+      new Serialization.TransactionWitnessSet()
+    );
 
     const txInternals = {
-      body: { fee: 20_000n, inputs: [], outputs: [], validityInterval: {} } as Cardano.HydratedTxBody,
-      hash: Cardano.TransactionId('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec')
+      body: transaction.body().toCore(),
+      hash: Cardano.TransactionId('3643bb5fe745ba0532977f82ecf54699963c97adef2626f7c780225d218e9ba6')
     };
 
-    await expect(asyncKeyAgent.signTransaction(txInternals)).resolves.toEqual(
-      (
-        await witnesser.witness(txInternals)
-      ).signatures
-    );
+    const options = { knownAddresses: [], txInKeyPathMap: {} };
+    const result = {} as Cardano.Signatures;
+    asyncKeyAgent.signTransaction.mockResolvedValueOnce(result);
+    await expect(witnesser.witness(transaction, options)).resolves.toEqual({ signatures: result });
+    expect(asyncKeyAgent.signTransaction).toBeCalledWith(txInternals, options, void 0);
   });
 });

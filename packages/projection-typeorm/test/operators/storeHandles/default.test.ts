@@ -257,6 +257,7 @@ describe('storeHandles', () => {
             firstMintSlot: block.slot,
             handle: 'sameaddress',
             og: false,
+            parent_handle_handle: null,
             samePaymentCredential: true,
             sameStakeCredential: false
           },
@@ -264,6 +265,7 @@ describe('storeHandles', () => {
             firstMintSlot: block.slot,
             handle: 'samepayment',
             og: false,
+            parent_handle_handle: null,
             samePaymentCredential: true,
             sameStakeCredential: false
           },
@@ -271,6 +273,7 @@ describe('storeHandles', () => {
             firstMintSlot: block.slot,
             handle: 'samepayment2',
             og: false,
+            parent_handle_handle: null,
             samePaymentCredential: true,
             sameStakeCredential: false
           },
@@ -278,6 +281,7 @@ describe('storeHandles', () => {
             firstMintSlot: block.slot,
             handle: 'samepaymententerprise',
             og: false,
+            parent_handle_handle: null,
             samePaymentCredential: true,
             sameStakeCredential: false
           }
@@ -294,6 +298,7 @@ describe('storeHandles', () => {
             firstMintSlot: block.slot,
             handle: 'sameaddress',
             og: false,
+            parent_handle_handle: null,
             samePaymentCredential: true,
             sameStakeCredential: true
           },
@@ -301,6 +306,7 @@ describe('storeHandles', () => {
             firstMintSlot: block.slot,
             handle: 'samepayment',
             og: false,
+            parent_handle_handle: null,
             samePaymentCredential: true,
             sameStakeCredential: false
           },
@@ -308,6 +314,7 @@ describe('storeHandles', () => {
             firstMintSlot: block.slot,
             handle: 'samepayment2',
             og: false,
+            parent_handle_handle: null,
             samePaymentCredential: true,
             sameStakeCredential: false
           },
@@ -315,6 +322,7 @@ describe('storeHandles', () => {
             firstMintSlot: block.slot,
             handle: 'samepaymententerprise',
             og: false,
+            parent_handle_handle: null,
             samePaymentCredential: true,
             sameStakeCredential: false
           },
@@ -322,6 +330,7 @@ describe('storeHandles', () => {
             firstMintSlot: block.slot,
             handle: 'samestake',
             og: true,
+            parent_handle_handle: null,
             samePaymentCredential: false,
             sameStakeCredential: true
           }

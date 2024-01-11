@@ -1,6 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
+import { Runtime } from 'webextension-polyfill';
 
 /** A hex-encoded string of the corresponding bytes. */
 export type Bytes = string;
@@ -212,3 +213,10 @@ export interface CipExtensionApis {
 }
 
 export type Cip30WalletApiWithPossibleExtensions = Cip30WalletApi & Partial<CipExtensionApis>;
+
+export type SenderContext = { sender: Runtime.MessageSender };
+type FnWithSender<T> = T extends (...args: infer Args) => infer R ? (context: SenderContext, ...args: Args) => R : T;
+
+export type WithSenderContext<T> = {
+  [K in keyof T]: FnWithSender<T[K]>;
+};

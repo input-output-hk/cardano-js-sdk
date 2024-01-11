@@ -48,6 +48,7 @@ const getSupply = async (queryRunner: QueryRunner, assetId: Cardano.AssetId) => 
 export interface DefaultHandleParamsQueryResponse {
   handle: NonNullable<HandleEntity['handle']>;
   og: HandleMetadataEntity['og'];
+  parent_handle_handle?: HandleEntity['handle'] | null;
   sameStakeCredential: boolean;
   samePaymentCredential: boolean;
   firstMintSlot: Cardano.Slot;
@@ -90,7 +91,7 @@ export const queryHandlesByAddressCredentials = (
     .leftJoin('handle_metadata', 'm', 'm.handle=h.handle')
     .innerJoin('asset', 'asset', 'asset.id=h.asset_id')
     .select(
-      `h.handle, COALESCE(m.og, FALSE) as og,
+      `h.handle, h.parent_handle_handle, COALESCE(m.og, FALSE) as og,
       asset.first_mint_block_slot as "firstMintSlot",
       COALESCE((input_address.stake_credential_hash=a.stake_credential_hash), FALSE) as "sameStakeCredential",
       (input_address.payment_credential_hash=a.payment_credential_hash) as "samePaymentCredential"`
@@ -173,7 +174,7 @@ const getDefaultInWalletAndUpdateOtherHandles = async (
 const rollForward = async ({ handles, queryRunner, handleMetadata }: HandleEventParams) => {
   const handleRepository = queryRunner.manager.getRepository(HandleEntity);
 
-  for (const { assetId, handle, policyId, latestOwnerAddress, datum, totalSupply } of handles) {
+  for (const { assetId, handle, policyId, latestOwnerAddress, datum, totalSupply, parentHandle } of handles) {
     if (totalSupply === 1n) {
       // if !address then it's burning it, otherwise transferring
       const { cardanoAddress, hasDatum } = latestOwnerAddress
@@ -189,6 +190,7 @@ const rollForward = async ({ handles, queryRunner, handleMetadata }: HandleEvent
           cardanoAddress,
           handle,
           hasDatum,
+          parentHandle,
           policyId,
           ...defaultInWallet
         },

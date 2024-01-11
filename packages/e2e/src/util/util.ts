@@ -204,7 +204,8 @@ export const getTxConfirmationEpoch = async (wallet: PersonalWallet, tx: Cardano
  * @param wallet The wallet
  */
 export const submitCertificate = async (certificate: Cardano.Certificate, wallet: TestWallet) => {
-  const walletAddress = (await firstValueFrom(wallet.wallet.addresses$))[0].address;
+  const knownAddresses = await firstValueFrom(wallet.wallet.addresses$);
+  const walletAddress = knownAddresses[0].address;
   const txProps: InitializeTxProps = {
     certificates: [certificate],
     outputs: new Set([{ address: walletAddress, value: { coins: 3_000_000n } }])
@@ -238,7 +239,7 @@ export const createStandaloneKeyAgent = async (
       getPassphrase: async () => Buffer.from(''),
       mnemonicWords: mnemonics
     },
-    { bip32Ed25519, inputResolver: { resolveInput: async () => null }, logger }
+    { bip32Ed25519, logger }
   );
 
 /**

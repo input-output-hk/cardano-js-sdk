@@ -3,6 +3,77 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.20.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.19.0...@cardano-sdk/web-extension@0.20.0) (2023-12-20)
+
+### ⚠ BREAKING CHANGES
+
+* Wallet manager activate method now takes an WalletManagerActivateProps object rather than just a wallet id
+- Wallet manager now takes signer manager api as a dependency
+- Wallet manager no longer exposes the observable wallet API, this now has to be done by application
+- Wallet manager destroy method was renamed destroyData and now will destroy any storage with the same wallet id
+
+### Features
+
+* rework WalletManager ([3e2fc6c](https://github.com/input-output-hk/cardano-js-sdk/commit/3e2fc6c79f0267672fe91732895c686a1a3eeb1f))
+* **web-extension:** wallet id type changed to just string ([89f8a31](https://github.com/input-output-hk/cardano-js-sdk/commit/89f8a3189dd35136a95d6c697d1c6bf19291be0b))
+
+## [0.19.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.18.0...@cardano-sdk/web-extension@0.19.0) (2023-12-14)
+
+### ⚠ BREAKING CHANGES
+
+* **web-extension:** remove AccountId used in WalletRepository
+* **web-extension:** WalletRepository storage format change (add ownSigners)
+* **web-extension:** WalletRepository storage format change (add secrets)
+
+### Features
+
+* **web-extension:** add SignerManager ([6c7cc2d](https://github.com/input-output-hk/cardano-js-sdk/commit/6c7cc2deb53b83eadd965ab73abe9ffcdd512a4f))
+* **web-extension:** store dependency wallets for script wallets ([57cf407](https://github.com/input-output-hk/cardano-js-sdk/commit/57cf407fd92da85831c21bd9d63fb2bd45b17ec3))
+* **web-extension:** store encypted secrets for in-memory wallets ([b288e70](https://github.com/input-output-hk/cardano-js-sdk/commit/b288e7017b6bf97bf6548d6c5cd242e60868440d))
+
+### Bug Fixes
+
+* delay InMemoryCollectionStore observeAll emission after setAll ([51647eb](https://github.com/input-output-hk/cardano-js-sdk/commit/51647eb1ee64068422c46b1ec064c17404af1e8f))
+
+### Code Refactoring
+
+* **web-extension:** remove AccountId used in WalletRepository ([a3d3c17](https://github.com/input-output-hk/cardano-js-sdk/commit/a3d3c17ff5efb81fa5d259934f75138f99a61920))
+
+## [0.18.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.17.1...@cardano-sdk/web-extension@0.18.0) (2023-12-12)
+
+### ⚠ BREAKING CHANGES
+
+* replace authenticator 'origin' argument to 'sender'
+- hoist 'senderOrigin' util to dapp-connector package
+
+### Features
+
+* track cip30 method call origin & update Authenticator api ([75c8af6](https://github.com/input-output-hk/cardano-js-sdk/commit/75c8af6aecc0ddcaeca153e8a3693d6e18edf60e))
+
+## [0.17.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.17.0...@cardano-sdk/web-extension@0.17.1) (2023-12-08)
+
+### Features
+
+* add ObservableWallet.discoverAddreses ([efc4e50](https://github.com/input-output-hk/cardano-js-sdk/commit/efc4e5070ca261b3eec6c93d4ede26c0533d09ee)), closes [#1009](https://github.com/input-output-hk/cardano-js-sdk/issues/1009)
+
+## [0.17.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.16.5...@cardano-sdk/web-extension@0.17.0) (2023-12-07)
+
+### ⚠ BREAKING CHANGES
+
+* remove KeyAgent.knownAddresses
+- remove AsyncKeyAgent.knownAddresses$
+- remove LazyWalletUtil and setupWallet utils
+- replace KeyAgent dependency on InputResolver with props passed to sign method
+- re-purpose AddressManager to Bip32Account: addresses are now stored only by the wallet
+
+### Code Refactoring
+
+* remove indirect KeyAgent dependency on ObservableWallet ([8dcfbc4](https://github.com/input-output-hk/cardano-js-sdk/commit/8dcfbc4ab339fcd8efc7d5f241a501eb210b58d4))
+
+## [0.16.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.16.4...@cardano-sdk/web-extension@0.16.5) (2023-12-04)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
 ## [0.16.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.16.3...@cardano-sdk/web-extension@0.16.4) (2023-11-29)
 
 ### Features

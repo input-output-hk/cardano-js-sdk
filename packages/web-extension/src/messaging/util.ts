@@ -13,7 +13,6 @@ import {
   ResponseMessage
 } from './types';
 import { Logger } from 'ts-log';
-import { Runtime } from 'webextension-polyfill';
 import { v4 as uuidv4 } from 'uuid';
 
 const isRequestLike = (message: any): message is MethodRequest & Partial<Record<string, unknown>> =>
@@ -42,15 +41,6 @@ export const isCompletionMessage = (message: any): message is CompletionMessage 
 
 export const isEmitMessage = (message: any): message is EmitMessage =>
   looksLikeMessage(message) && message.hasOwnProperty('emit');
-
-export const senderOrigin = (sender?: Runtime.MessageSender): string | null => {
-  try {
-    const { origin } = new URL(sender?.url || 'throw');
-    return origin;
-  } catch {
-    return null;
-  }
-};
 
 export const newMessageId = uuidv4;
 

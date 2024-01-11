@@ -1,17 +1,16 @@
-import { Cardano, Handle, HandleProvider, HandleResolution, TxCBOR } from '@cardano-sdk/core';
-import { CustomError } from 'ts-custom-error';
-
-import { InputSelectionError, InputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
-
 import {
+  Bip32Account,
   GroupedAddress,
+  SignTransactionContext,
   SignTransactionOptions,
   TransactionSigner,
-  Witnesser,
-  util
+  Witnesser
 } from '@cardano-sdk/key-management';
+import { Cardano, Handle, HandleProvider, HandleResolution, TxCBOR } from '@cardano-sdk/core';
+import { CustomError } from 'ts-custom-error';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { InitializeTxWitness, TxBuilderProviders } from '../types';
+import { InputSelectionError, InputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { OutputBuilderValidator } from './OutputBuilder';
 import { OutputValidation } from '../output-validation';
@@ -137,8 +136,8 @@ export interface OutputBuilder {
 }
 
 export interface TxContext {
-  ownAddresses: GroupedAddress[];
   signingOptions?: SignTransactionOptions;
+  signingContext: SignTransactionContext;
   auxiliaryData?: Cardano.AuxiliaryData;
   witness?: InitializeTxWitness;
   isValid?: boolean;
@@ -146,8 +145,9 @@ export interface TxContext {
 }
 
 export type TxInspection = Cardano.TxBodyWithHash &
-  Pick<TxContext, 'ownAddresses' | 'auxiliaryData' | 'handleResolutions'> & {
+  Pick<TxContext, 'auxiliaryData' | 'handleResolutions'> & {
     inputSelection: SelectionSkeleton;
+    ownAddresses: GroupedAddress[];
   };
 
 export interface SignedTx {
@@ -270,7 +270,7 @@ export interface TxBuilder {
 export interface TxBuilderDependencies {
   inputSelector?: InputSelector;
   inputResolver: Cardano.InputResolver;
-  addressManager: util.Bip32Ed25519AddressManager;
+  bip32Account: Bip32Account;
   witnesser: Witnesser;
   txBuilderProviders: TxBuilderProviders;
   logger: Logger;
@@ -278,4 +278,4 @@ export interface TxBuilderDependencies {
   handleProvider?: HandleProvider;
 }
 
-export type FinalizeTxDependencies = Pick<TxBuilderDependencies, 'inputResolver' | 'addressManager' | 'witnesser'>;
+export type FinalizeTxDependencies = Pick<TxBuilderDependencies, 'bip32Account' | 'witnesser'>;

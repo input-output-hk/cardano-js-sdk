@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.29.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.28.1...@cardano-sdk/e2e@0.29.0) (2023-12-20)
+
+### ⚠ BREAKING CHANGES
+
+* Wallet manager activate method now takes an WalletManagerActivateProps object rather than just a wallet id
+- Wallet manager now takes signer manager api as a dependency
+- Wallet manager no longer exposes the observable wallet API, this now has to be done by application
+- Wallet manager destroy method was renamed destroyData and now will destroy any storage with the same wallet id
+
+### Features
+
+* rework WalletManager ([3e2fc6c](https://github.com/input-output-hk/cardano-js-sdk/commit/3e2fc6c79f0267672fe91732895c686a1a3eeb1f))
+
+## [0.28.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.28.0...@cardano-sdk/e2e@0.28.1) (2023-12-14)
+
+### Features
+
+* update Handle entity and HandleStore to save parent handles ([3fa3920](https://github.com/input-output-hk/cardano-js-sdk/commit/3fa3920088857d5019d732a036fc3a89b90d5ab3))
+
+## [0.28.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.27.1...@cardano-sdk/e2e@0.28.0) (2023-12-12)
+
+### ⚠ BREAKING CHANGES
+
+* replace authenticator 'origin' argument to 'sender'
+- hoist 'senderOrigin' util to dapp-connector package
+
+### Features
+
+* track cip30 method call origin & update Authenticator api ([75c8af6](https://github.com/input-output-hk/cardano-js-sdk/commit/75c8af6aecc0ddcaeca153e8a3693d6e18edf60e))
+
+## [0.27.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.27.0...@cardano-sdk/e2e@0.27.1) (2023-12-08)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
+## [0.27.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.26.1...@cardano-sdk/e2e@0.27.0) (2023-12-07)
+
+### ⚠ BREAKING CHANGES
+
+* remove KeyAgent.knownAddresses
+- remove AsyncKeyAgent.knownAddresses$
+- remove LazyWalletUtil and setupWallet utils
+- replace KeyAgent dependency on InputResolver with props passed to sign method
+- re-purpose AddressManager to Bip32Account: addresses are now stored only by the wallet
+
+### Code Refactoring
+
+* remove indirect KeyAgent dependency on ObservableWallet ([8dcfbc4](https://github.com/input-output-hk/cardano-js-sdk/commit/8dcfbc4ab339fcd8efc7d5f241a501eb210b58d4))
+
+## [0.26.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.26.0...@cardano-sdk/e2e@0.26.1) (2023-12-04)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
 ## [0.26.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.25.0...@cardano-sdk/e2e@0.26.0) (2023-11-29)
 
 ### ⚠ BREAKING CHANGES

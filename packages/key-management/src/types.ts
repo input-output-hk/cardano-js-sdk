@@ -1,8 +1,10 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano } from '@cardano-sdk/core';
-import { HexBlob, Shutdown } from '@cardano-sdk/util';
+import { Cardano, Serialization } from '@cardano-sdk/core';
+import { HexBlob, OpaqueString, Shutdown } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
-import { Observable } from 'rxjs';
+import type { Runtime } from 'webextension-polyfill';
+
+export type MessageSender = Runtime.MessageSender;
 
 export interface SignBlobResult {
   publicKey: Crypto.Ed25519PublicKeyHex;
@@ -58,7 +60,6 @@ export enum CommunicationType {
 }
 
 export interface KeyAgentDependencies {
-  inputResolver: Cardano.InputResolver;
   logger: Logger;
   bip32Ed25519: Crypto.Bip32Ed25519;
 }
@@ -91,7 +92,6 @@ export interface TrezorConfig {
 export interface SerializableKeyAgentDataBase {
   chainId: Cardano.ChainId;
   accountIndex: number;
-  knownAddresses: GroupedAddress[];
   extendedAccountPublicKey: Crypto.Bip32PublicKeyHex;
 }
 
@@ -130,16 +130,27 @@ export interface Ed25519KeyPair {
  */
 export type GetPassphrase = (noCache?: true) => Promise<Uint8Array>;
 
+export type TxInId = OpaqueString<'TxInId'>;
+export const TxInId = ({ txId, index }: Cardano.TxIn) => `${txId}_${index}` as TxInId;
+
+export type TxInKeyPathMap = Partial<Record<TxInId, AccountKeyDerivationPath>>;
+export type RewardAccountKeyPathMap = Partial<Record<Cardano.RewardAccount, AccountKeyDerivationPath>>;
+export type KeyHashKeyPathMap = Partial<Record<Crypto.Ed25519KeyHashHex, AccountKeyDerivationPath>>;
+
 export interface SignTransactionOptions {
   additionalKeyPaths?: AccountKeyDerivationPath[];
+}
+
+export interface SignTransactionContext {
+  txInKeyPathMap: TxInKeyPathMap;
+  knownAddresses: GroupedAddress[];
+  sender?: MessageSender;
 }
 
 export interface KeyAgent {
   get chainId(): Cardano.ChainId;
   get accountIndex(): number;
   get serializableData(): SerializableKeyAgentData;
-  get knownAddresses(): GroupedAddress[];
-  set knownAddresses(addresses: GroupedAddress[]);
   get extendedAccountPublicKey(): Crypto.Bip32PublicKeyHex;
   get bip32Ed25519(): Crypto.Bip32Ed25519;
 
@@ -150,7 +161,11 @@ export interface KeyAgent {
   /**
    * @throws AuthenticationError
    */
-  signTransaction(txInternals: Cardano.TxBodyWithHash, options?: SignTransactionOptions): Promise<Cardano.Signatures>;
+  signTransaction(
+    txInternals: Cardano.TxBodyWithHash,
+    context: SignTransactionContext,
+    options?: SignTransactionOptions
+  ): Promise<Cardano.Signatures>;
   /**
    * @throws AuthenticationError
    */
@@ -165,8 +180,7 @@ export interface KeyAgent {
    */
   deriveAddress(
     paymentKeyDerivationPath: AccountAddressDerivationPath,
-    stakeKeyDerivationIndex: number,
-    pure?: boolean
+    stakeKeyDerivationIndex: number
   ): Promise<GroupedAddress>;
   /**
    * @throws AuthenticationError
@@ -175,11 +189,10 @@ export interface KeyAgent {
 }
 
 export type AsyncKeyAgent = Pick<KeyAgent, 'deriveAddress' | 'derivePublicKey' | 'signBlob' | 'signTransaction'> & {
-  knownAddresses$: Observable<GroupedAddress[]>;
   getChainId(): Promise<Cardano.ChainId>;
   getBip32Ed25519(): Promise<Crypto.Bip32Ed25519>;
   getExtendedAccountPublicKey(): Promise<Crypto.Bip32PublicKeyHex>;
-  setKnownAddresses(addresses: GroupedAddress[]): Promise<void>;
+  getAccountIndex(): Promise<number>;
 } & Shutdown;
 
 /** The result of the transaction signer signing operation. */
@@ -209,26 +222,19 @@ export interface Witnesser {
   /**
    * Generates the witness data for a given transaction.
    *
-   * @param txInternals The transaction body along with its hash for which the witness data is to be generated.
+   * @param transaction The transaction along with its hash for which the witness data is to be generated.
+   * @param context The witness sign transaction context
    * @param options Optional additional parameters that may influence how the witness data is generated.
    * @returns A promise that resolves to the generated witness data for the transaction.
    */
-  witness(txInternals: Cardano.TxBodyWithHash, options?: WitnessOptions): Promise<Cardano.Witness>;
+  witness(
+    transaction: Serialization.Transaction,
+    context: SignTransactionContext,
+    options?: WitnessOptions
+  ): Promise<Cardano.Witness>;
 
   /**
    * @throws AuthenticationError
    */
-  signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult>;
-}
-
-/** Interface for managing blockchain addresses. */
-export interface AddressManager {
-  knownAddresses$: Observable<GroupedAddress[]>;
-
-  /**
-   * Sets or updates the list of known addresses managed by this instance.
-   *
-   * @param addresses An array of grouped addresses to be managed.
-   */
-  setKnownAddresses(addresses: GroupedAddress[]): Promise<void>;
+  signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob, sender?: MessageSender): Promise<SignBlobResult>;
 }

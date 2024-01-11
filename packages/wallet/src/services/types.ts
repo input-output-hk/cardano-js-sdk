@@ -1,5 +1,5 @@
+import { Bip32Account, GroupedAddress } from '@cardano-sdk/key-management';
 import { Cardano, Reward, TxCBOR } from '@cardano-sdk/core';
-import { GroupedAddress, util } from '@cardano-sdk/key-management';
 import { Observable } from 'rxjs';
 import { Percent } from '@cardano-sdk/util';
 import { SignedTx } from '@cardano-sdk/tx-construction';
@@ -44,7 +44,7 @@ export interface AddressDiscovery {
    * @param addressManager The address manager to be used to derive the addresses to be discovered.
    * @returns A promise that will be resolved into a GroupedAddress list containing the discovered addresses.
    */
-  discover(addressManager: util.Bip32Ed25519AddressManager): Promise<GroupedAddress[]>;
+  discover(addressManager: Bip32Account): Promise<GroupedAddress[]>;
 }
 
 export type Milliseconds = number;

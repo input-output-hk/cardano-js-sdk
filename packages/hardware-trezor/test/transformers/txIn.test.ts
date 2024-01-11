@@ -1,4 +1,11 @@
-import { contextWithKnownAddresses, contextWithoutKnownAddresses, knownAddressKeyPath, txIn } from '../testData';
+import { TxInId } from '@cardano-sdk/key-management';
+import {
+  contextWithKnownAddresses,
+  contextWithoutKnownAddresses,
+  knownAddressKeyPath,
+  knownAddressPaymentKeyPath,
+  txIn
+} from '../testData';
 import { mapTxIns, toTrezorTxIn } from '../../src';
 
 const expectedTrezorTxInWithKnownAddress = {
@@ -15,17 +22,23 @@ const expectedTrezorTxInWithoutKnownAddress = {
 describe('tx-inputs', () => {
   describe('toTrezorTxIn', () => {
     it('maps a simple tx input from an unknown third party address', async () => {
-      const mappedTrezorTxIn = await toTrezorTxIn(txIn, contextWithoutKnownAddresses);
+      const mappedTrezorTxIn = toTrezorTxIn(txIn, contextWithoutKnownAddresses);
       expect(mappedTrezorTxIn).toEqual(expectedTrezorTxInWithoutKnownAddress);
     });
     it('maps a simple tx input from a known address', async () => {
-      const mappedTrezorTxIn = await toTrezorTxIn(txIn, contextWithKnownAddresses);
+      const mappedTrezorTxIn = toTrezorTxIn(txIn, {
+        ...contextWithKnownAddresses,
+        txInKeyPathMap: { [TxInId(txIn)]: knownAddressPaymentKeyPath }
+      });
       expect(mappedTrezorTxIn).toEqual(expectedTrezorTxInWithKnownAddress);
     });
   });
   describe('mapTxIns', () => {
     it('can map a a set of TxIns', async () => {
-      const txIns = await mapTxIns([txIn, txIn, txIn], contextWithKnownAddresses);
+      const txIns = mapTxIns([txIn, txIn, txIn], {
+        ...contextWithKnownAddresses,
+        txInKeyPathMap: { [TxInId(txIn)]: knownAddressPaymentKeyPath }
+      });
       expect(txIns).toEqual([
         expectedTrezorTxInWithKnownAddress,
         expectedTrezorTxInWithKnownAddress,

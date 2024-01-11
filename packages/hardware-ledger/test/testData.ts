@@ -2,6 +2,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, KeyRole } from '@cardano-sdk/key-management';
 import { Base64Blob, HexBlob } from '@cardano-sdk/util';
 import { Cardano, Serialization } from '@cardano-sdk/core';
+import { LedgerTxTransformerContext } from '../src';
 export const rewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
 export const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
 export const stakeCredential = {
@@ -330,12 +331,12 @@ export const babbageTxWithoutScript: Cardano.Tx = {
   }
 };
 
-export const CONTEXT_WITH_KNOWN_ADDRESSES = {
+export const CONTEXT_WITH_KNOWN_ADDRESSES: LedgerTxTransformerContext = {
+  accountIndex: 0,
   chainId: {
     networkId: Cardano.NetworkId.Testnet,
     networkMagic: 999
   },
-  inputResolver: { resolveInput: () => Promise.resolve(txOutToOwnedAddress) },
   knownAddresses: [
     {
       accountIndex: 0,
@@ -349,14 +350,16 @@ export const CONTEXT_WITH_KNOWN_ADDRESSES = {
       },
       type: AddressType.Internal
     }
-  ]
+  ],
+  txInKeyPathMap: {}
 };
 
-export const CONTEXT_WITHOUT_KNOWN_ADDRESSES = {
+export const CONTEXT_WITHOUT_KNOWN_ADDRESSES: LedgerTxTransformerContext = {
+  accountIndex: 0,
   chainId: {
     networkId: Cardano.NetworkId.Testnet,
     networkMagic: 999
   },
-  inputResolver: { resolveInput: () => Promise.resolve(null) },
-  knownAddresses: []
+  knownAddresses: [],
+  txInKeyPathMap: {}
 };

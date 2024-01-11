@@ -10,6 +10,7 @@ import {
   KeyAgentType,
   SerializableTrezorKeyAgentData,
   SignBlobResult,
+  SignTransactionContext,
   TrezorConfig,
   errors,
   util
@@ -133,7 +134,6 @@ export class TrezorKeyAgent extends KeyAgentBase {
         chainId,
         extendedAccountPublicKey,
         isTrezorInitialized,
-        knownAddresses: [],
         trezorConfig
       },
       dependencies
@@ -164,14 +164,18 @@ export class TrezorKeyAgent extends KeyAgentBase {
     return Trezor.PROTO.CardanoTxSigningMode.ORDINARY_TRANSACTION;
   }
 
-  async signTransaction(tx: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
+  async signTransaction(
+    tx: Cardano.TxBodyWithHash,
+    { knownAddresses, txInKeyPathMap }: SignTransactionContext
+  ): Promise<Cardano.Signatures> {
     try {
       await this.isTrezorInitialized;
-      const trezorTxData = await txToTrezor({
+      const trezorTxData = txToTrezor({
+        accountIndex: this.accountIndex,
         cardanoTxBody: tx.body,
         chainId: this.chainId,
-        inputResolver: this.inputResolver,
-        knownAddresses: this.knownAddresses
+        knownAddresses,
+        txInKeyPathMap
       });
 
       const signingMode = TrezorKeyAgent.getSigningMode(trezorTxData);
@@ -183,9 +187,9 @@ export class TrezorKeyAgent extends KeyAgentBase {
       });
 
       const expectedPublicKeys = await Promise.all(
-        (
-          await util.ownSignatureKeyPaths(tx.body, this.knownAddresses, this.inputResolver)
-        ).map((derivationPath) => this.derivePublicKey(derivationPath))
+        util
+          .ownSignatureKeyPaths(tx.body, knownAddresses, txInKeyPathMap)
+          .map((derivationPath) => this.derivePublicKey(derivationPath))
       );
 
       if (!result.success) {

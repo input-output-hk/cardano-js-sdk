@@ -1,24 +1,27 @@
 /* eslint-disable unicorn/consistent-destructuring, sonarjs/no-duplicate-string, @typescript-eslint/no-floating-promises, promise/no-nesting, promise/always-return */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, AsyncKeyAgent, GroupedAddress, util } from '@cardano-sdk/key-management';
-import { AssetId, StubKeyAgent, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
+import { AddressDiscovery, PersonalWallet, TxInFlight } from '../../src';
+import { AddressType, Bip32Account, GroupedAddress, Witnesser, util } from '@cardano-sdk/key-management';
+import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BehaviorSubject, Subscription, firstValueFrom, skip } from 'rxjs';
 import {
   Cardano,
+  ChainHistoryProvider,
+  HandleProvider,
   ProviderError,
   ProviderFailure,
+  RewardsProvider,
+  StakePoolProvider,
   TxCBOR,
   TxSubmissionError,
   TxSubmissionErrorCode,
   ValueNotConservedData
 } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
-import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
-import { PersonalWallet, TxInFlight, setupWallet } from '../../src';
+import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { buildDRepIDFromDRepKey, toOutgoingTx, waitForWalletStateSettle } from '../util';
 import { getPassphrase, stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { dummyLogger as logger } from 'ts-log';
-import delay from 'delay';
 
 const { mockChainHistoryProvider, mockRewardsProvider, utxo } = mocks;
 
@@ -57,55 +60,61 @@ const promiseTimeout = (p: Promise<unknown>, timeout = 10): Promise<unknown> => 
 
 describe('PersonalWallet methods', () => {
   const address = mocks.utxo[0][0].address!;
+  const groupedAddress: GroupedAddress = {
+    accountIndex: 0,
+    address,
+    index: 0,
+    networkId: Cardano.NetworkId.Testnet,
+    rewardAccount: mocks.rewardAccount,
+    stakeKeyDerivationPath,
+    type: AddressType.External
+  };
   let txSubmitProvider: mocks.TxSubmitProviderStub;
   let networkInfoProvider: mocks.NetworkInfoProviderStub;
+  let assetProvider: mocks.MockAssetProvider;
+  let stakePoolProvider: StakePoolProvider;
+  let rewardsProvider: RewardsProvider;
+  let chainHistoryProvider: ChainHistoryProvider;
+  let handleProvider: HandleProvider;
   let wallet: PersonalWallet;
   let utxoProvider: mocks.UtxoProviderStub;
+  let witnesser: Witnesser;
+  let bip32Account: Bip32Account;
+  let addressDiscovery: jest.Mocked<AddressDiscovery>;
+
   beforeEach(async () => {
     txSubmitProvider = mocks.mockTxSubmitProvider();
     networkInfoProvider = mocks.mockNetworkInfoProvider();
     utxoProvider = mocks.mockUtxoProvider();
+    assetProvider = mocks.mockAssetProvider();
+    stakePoolProvider = createStubStakePoolProvider();
+    rewardsProvider = mockRewardsProvider();
+    chainHistoryProvider = mockChainHistoryProvider();
+    handleProvider = mocks.mockHandleProvider();
+    addressDiscovery = { discover: jest.fn().mockImplementation(async () => [groupedAddress]) };
 
-    const assetProvider = mocks.mockAssetProvider();
-    const stakePoolProvider = createStubStakePoolProvider();
-    const rewardsProvider = mockRewardsProvider();
-    const chainHistoryProvider = mockChainHistoryProvider();
-    const handleProvider = mocks.mockHandleProvider();
-    const groupedAddress: GroupedAddress = {
-      accountIndex: 0,
-      address,
-      index: 0,
-      networkId: Cardano.NetworkId.Testnet,
-      rewardAccount: mocks.rewardAccount,
-      stakeKeyDerivationPath,
-      type: AddressType.External
-    };
-    ({ wallet } = await setupWallet({
-      bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
-      createKeyAgent: async (dependencies) => {
-        const asyncKeyAgent = await testAsyncKeyAgent([groupedAddress], dependencies);
-        asyncKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
-        return asyncKeyAgent;
-      },
-      createWallet: async (keyAgent) =>
-        new PersonalWallet(
-          { name: 'Test Wallet' },
-          {
-            addressManager: util.createBip32Ed25519AddressManager(keyAgent),
-            assetProvider,
-            chainHistoryProvider,
-            handleProvider,
-            logger,
-            networkInfoProvider,
-            rewardsProvider,
-            stakePoolProvider,
-            txSubmitProvider,
-            utxoProvider,
-            witnesser: util.createBip32Ed25519Witnesser(keyAgent)
-          }
-        ),
-      logger
-    }));
+    const asyncKeyAgent = await testAsyncKeyAgent();
+    bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
+    bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
+    witnesser = util.createBip32Ed25519Witnesser(asyncKeyAgent);
+    wallet = new PersonalWallet(
+      { name: 'Test Wallet' },
+      {
+        addressDiscovery,
+        assetProvider,
+        bip32Account,
+        chainHistoryProvider,
+        handleProvider,
+        logger,
+        networkInfoProvider,
+        rewardsProvider,
+        stakePoolProvider,
+        txSubmitProvider,
+        utxoProvider,
+        witnesser
+      }
+    );
+
     await waitForWalletStateSettle(wallet);
   });
 
@@ -210,122 +219,22 @@ describe('PersonalWallet methods', () => {
       expect(getPassphrase).not.toBeCalled();
     });
 
-    it('finalizeTx', async () => {
-      const txInternals = await wallet.initializeTx(props);
-      const tx = await wallet.finalizeTx({ tx: txInternals });
-      expect(tx.body).toBe(txInternals.body);
-      expect(tx.id).toBe(txInternals.hash);
-      expect(tx.witness.signatures.size).toBe(2); // spending key and stake key for withdrawal
-    });
+    describe('finalizeTx', () => {
+      it('resolves with TransactionWitnessSet', async () => {
+        const txInternals = await wallet.initializeTx(props);
+        const tx = await wallet.finalizeTx({ tx: txInternals });
+        expect(tx.body).toBe(txInternals.body);
+        expect(tx.id).toBe(txInternals.hash);
+        expect(tx.witness.signatures.size).toBe(2); // spending key and stake key for withdrawal
+      });
 
-    it('finalizeTx awaits for non-empty knownAddresses$', (done) => {
-      const inputResolver: Cardano.InputResolver = {
-        resolveInput: async (txIn) =>
-          mocks.utxo.find(
-            ([hydratedTxIn]) => txIn.txId === hydratedTxIn.txId && txIn.index === hydratedTxIn.index
-          )?.[1] || null
-      };
-
-      const mockKeyAgent = new StubKeyAgent(inputResolver);
-
-      setupWallet({
-        bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
-        createKeyAgent: async () => mockKeyAgent,
-        createWallet: async (keyAgent) =>
-          new PersonalWallet(
-            { name: 'Stub Wallet' },
-            {
-              addressManager: util.createBip32Ed25519AddressManager(keyAgent),
-              assetProvider: mocks.mockAssetProvider(),
-              chainHistoryProvider: mockChainHistoryProvider(),
-              handleProvider: mocks.mockHandleProvider(),
-              logger,
-              networkInfoProvider: mocks.mockNetworkInfoProvider(),
-              rewardsProvider: mockRewardsProvider(),
-              stakePoolProvider: createStubStakePoolProvider(),
-              txSubmitProvider: mocks.mockTxSubmitProvider(),
-              utxoProvider: mocks.mockUtxoProvider(),
-              witnesser: util.createBip32Ed25519Witnesser(keyAgent)
-            }
-          ),
-        logger
-      })
-        .then(({ wallet: stubWallet }) => {
-          // We need to manually build the TX, since initialize waits for the wallet to settle. The bug happens because
-          // callers (I.E cip30.ts) can call finalize directly since they already have the tx built. Bypassing initialize.
-          const txInternals = {
-            body: {
-              collaterals: [utxo[2][0]],
-              fee: 194_805n,
-              inputs: [utxo[1][0]],
-              mint: new Map([
-                [AssetId.PXL, 5n],
-                [AssetId.TSLA, 20n]
-              ]),
-              outputs,
-              requiredExtraSignatures: [
-                Crypto.Ed25519KeyHashHex('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed5')
-              ],
-              scriptIntegrityHash: Crypto.Hash32ByteBase16(
-                '3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d'
-              ),
-              validityInterval: { invalidHereafter: 37_841_696 },
-              withdrawals: [
-                {
-                  quantity: 33_333n,
-                  stakeAddress: Cardano.RewardAccount(
-                    'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d'
-                  )
-                }
-              ]
-            },
-            hash: Cardano.TransactionId('c3690ddfe8175bcbda4c8d30ba990da057ffd39317e926a9ee24e1272f20fe9c'),
-            inputSelection: {
-              change: [
-                {
-                  address: Cardano.PaymentAddress(
-                    'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
-                  ),
-                  value: { coins: 1_596_110n }
-                }
-              ],
-              fee: 194_805n,
-              inputs: new Set<Cardano.HydratedTxIn>(),
-              outputs: []
-            }
-          } as unknown as InitializeTxResult;
-
-          // Finalize the TX first. Should only resolve if the key agent eventually discover some addresses.
-          // eslint-disable-next-line promise/catch-or-return
-          stubWallet
-            .finalizeTx({ tx: txInternals })
-            .then((tx) => {
-              expect(tx.body).toBe(txInternals.body);
-              expect(tx.id).toBe(txInternals.hash);
-              expect(tx.witness.signatures.size).toBe(1);
-
-              // eslint-disable-next-line promise/no-callback-in-promise
-              done();
-            })
-            .catch();
-
-          Promise.all([
-            delay(1),
-            mockKeyAgent.setKnownAddresses([
-              {
-                accountIndex: 0,
-                address: mocks.utxo[0][1].address,
-                index: 0,
-                networkId: Cardano.NetworkId.Testnet,
-                rewardAccount: mocks.rewardAccount,
-                type: AddressType.External
-              }
-            ])
-          ]).catch();
-
-          return wallet;
-        })
-        .catch();
+      it('passes through sender to witnesser', async () => {
+        const sender = { url: 'https://lace.io' };
+        const witnessSpy = jest.spyOn(witnesser, 'witness');
+        const txInternals = await wallet.initializeTx(props);
+        await wallet.finalizeTx({ sender, tx: txInternals });
+        expect(witnessSpy).toBeCalledWith(expect.anything(), expect.objectContaining({ sender }), void 0);
+      });
     });
 
     describe('submitTx', () => {
@@ -525,6 +434,13 @@ describe('PersonalWallet methods', () => {
       expect(response).toHaveProperty('signature');
     });
 
+    it('passes through sender to witnesser', async () => {
+      const sender = { url: 'https://lace.io' };
+      const signBlobSpy = jest.spyOn(witnesser, 'signBlob');
+      await wallet.signData({ payload: HexBlob('abc123'), sender, signWith: address });
+      expect(signBlobSpy).toBeCalledWith(expect.anything(), expect.anything(), sender);
+    });
+
     test('rejects if bech32 DRepID is not a type 6 address', async () => {
       const dRepKey = await wallet.getPubDRepKey();
       for (const type in Cardano.AddressType) {
@@ -542,39 +458,49 @@ describe('PersonalWallet methods', () => {
   });
 
   it('will retry deriving pubDrepKey if one does not exist', async () => {
-    let walletKeyAgent: AsyncKeyAgent;
-    ({ wallet, keyAgent: walletKeyAgent } = await setupWallet({
-      bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
-      createKeyAgent: async (dependencies) => {
-        const asyncKeyAgent = await testAsyncKeyAgent([], dependencies);
-        asyncKeyAgent.derivePublicKey = jest.fn().mockRejectedValueOnce('error').mockResolvedValue('string');
-        return asyncKeyAgent;
-      },
-      createWallet: async (keyAgent) =>
-        new PersonalWallet(
-          { name: 'Test Wallet' },
-          {
-            addressManager: util.createBip32Ed25519AddressManager(keyAgent),
-            assetProvider: mocks.mockAssetProvider(),
-            chainHistoryProvider: mockChainHistoryProvider(),
-            logger,
-            networkInfoProvider: mocks.mockNetworkInfoProvider(),
-            rewardsProvider: mockRewardsProvider(),
-            stakePoolProvider: mocks.mockStakePoolsProvider(),
-            txSubmitProvider: mocks.mockTxSubmitProvider(),
-            utxoProvider: mocks.mockUtxoProvider(),
-            witnesser: util.createBip32Ed25519Witnesser(keyAgent)
-          }
-        ),
-      logger
-    }));
+    wallet.shutdown();
+    bip32Account.derivePublicKey = jest
+      .fn()
+      .mockRejectedValueOnce('error')
+      .mockResolvedValue({ hex: () => 'string' });
+    wallet = new PersonalWallet(
+      { name: 'Test Wallet' },
+      {
+        assetProvider,
+        bip32Account,
+        chainHistoryProvider,
+        handleProvider,
+        logger,
+        networkInfoProvider,
+        rewardsProvider,
+        stakePoolProvider,
+        txSubmitProvider,
+        utxoProvider,
+        witnesser
+      }
+    );
     await waitForWalletStateSettle(wallet);
 
     const response = await wallet.getPubDRepKey();
-    expect(typeof response).toBe('string');
-    expect(walletKeyAgent.derivePublicKey).toHaveBeenCalledTimes(3);
+    expect(response).toBe('string');
+    expect(bip32Account.derivePublicKey).toHaveBeenCalledTimes(3);
+  });
 
-    wallet.shutdown();
-    walletKeyAgent.shutdown();
+  describe('discoverAddresses', () => {
+    it('discovers new addreses and emits them from addresses$', async () => {
+      const newAddresses: GroupedAddress[] = [
+        groupedAddress,
+        {
+          ...groupedAddress,
+          address: Cardano.PaymentAddress(
+            'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz'
+          ),
+          index: groupedAddress.index + 1
+        }
+      ];
+      addressDiscovery.discover.mockResolvedValueOnce(newAddresses);
+      await expect(wallet.discoverAddresses()).resolves.toEqual(newAddresses);
+      await expect(firstValueFrom(wallet.addresses$)).resolves.toEqual(newAddresses);
+    });
   });
 });

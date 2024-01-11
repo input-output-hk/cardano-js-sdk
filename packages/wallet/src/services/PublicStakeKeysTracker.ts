@@ -1,4 +1,4 @@
-import { AccountKeyDerivationPath, GroupedAddress, util } from '@cardano-sdk/key-management';
+import { AccountKeyDerivationPath, Bip32Account, GroupedAddress } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 import { Observable, defaultIfEmpty, distinctUntilChanged, forkJoin, from, map, mergeMap, switchMap } from 'rxjs';
@@ -8,7 +8,7 @@ import { deepEquals } from '@cardano-sdk/util';
 export interface CreatePubStakeKeysTrackerProps {
   addresses$: Observable<GroupedAddress[]>;
   rewardAccounts$: Observable<Cardano.RewardAccountInfo[]>;
-  addressManager: util.Bip32Ed25519AddressManager;
+  bip32Account: Bip32Account;
 }
 
 export interface PubStakeKeyAndStatus {
@@ -43,7 +43,7 @@ const withStakeKeyDerivationPaths =
 export const createPublicStakeKeysTracker = ({
   addresses$,
   rewardAccounts$,
-  addressManager
+  bip32Account: addressManager
 }: CreatePubStakeKeysTrackerProps) =>
   new TrackerSubject(
     rewardAccounts$.pipe(
@@ -52,7 +52,7 @@ export const createPublicStakeKeysTracker = ({
         forkJoin(
           derivationPathsAndStatus.map(({ stakeKeyDerivationPath, keyStatus }) =>
             from(addressManager.derivePublicKey(stakeKeyDerivationPath)).pipe(
-              map((publicStakeKey) => ({ keyStatus, publicStakeKey }))
+              map((publicStakeKey) => ({ keyStatus, publicStakeKey: publicStakeKey.hex() }))
             )
           )
         ).pipe(defaultIfEmpty([]))

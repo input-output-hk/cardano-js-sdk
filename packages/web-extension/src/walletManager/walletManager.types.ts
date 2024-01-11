@@ -1,18 +1,22 @@
-import { AsyncKeyAgent } from '@cardano-sdk/key-management';
+import { AnyWallet, WalletId } from './types';
+import { Cardano } from '@cardano-sdk/core';
+import { Observable } from 'rxjs';
 import { ObservableWallet, storage } from '@cardano-sdk/wallet';
+import { Witnesser } from '@cardano-sdk/key-management';
 
 export interface WalletManagerProps {
-  walletName: string;
+  name: string;
 }
 
 export interface WalletManagerActivateProps<P extends string | number = string, O = unknown> {
-  /** User given name for the observableWallet being activated */
-  observableWalletName: string;
-  /**
-   * Internal unique id calculated by {@link WalletManagerUi} based on the keyManager `chainId` and
-   * the root public key hash.
-   */
-  walletId: string;
+  /** The walletId of the wallet to activate */
+  walletId: WalletId;
+
+  accountIndex?: number;
+
+  /** The chainId of the network to activate the wallet in */
+  chainId: Cardano.ChainId;
+
   /**
    * `provider` could be used to pass the necessary information to construct providers for different networks.
    * Its value is passed to the {@link WalletFactory}, which is required to create {@link WalletManagerWorker}.
@@ -46,30 +50,46 @@ export interface WalletManagerActivateProps<P extends string | number = string, 
 }
 
 export interface WalletManagerApi {
+  activeWalletId$: Observable<WalletManagerActivateProps>;
+
   /**
    * Create and activate a new ObservableWallet.
    * Reuses the store if the wallet was previously deactivated but not destroyed.
    */
   activate(props: WalletManagerActivateProps): Promise<void>;
+
+  /**
+   * Switches the network of the active wallet.
+   *
+   * @param id The chain id of the network to switch to.
+   */
+  switchNetwork(id: Cardano.ChainId): Promise<void>;
+
   /**
    * Deactivate wallet. Wallet observable properties will emit only after a new wallet is {@link activate}ed.
    * The wallet store will be reused if the wallet is reactivated.
    */
   deactivate(): Promise<void>;
+
   /**
-   * Deactivates the active wallet and destroy its existing store,
-   * so that a future activation of the same wallet creates a new store.
+   * Destroy the specified store so that a future activation of the same wallet creates a new store.
+   *
+   * This method will destroy all stores for all accounts for the given ChainId.
+   *
+   * @param walletId The walletId of the wallet to destroy.
+   * @param chainId The chainId of the network to destroy the wallet in.
    */
-  destroy(): Promise<void>;
+  destroyData(walletId: WalletId, chainId: Cardano.ChainId): Promise<void>;
 }
 
-export interface WalletFactory {
+export interface WalletFactory<Metadata extends { name: string }> {
   create: (
     props: WalletManagerActivateProps,
-    dependencies: { keyAgent: AsyncKeyAgent; stores: storage.WalletStores }
+    wallet: AnyWallet<Metadata>,
+    dependencies: { witnesser: Witnesser; stores: storage.WalletStores }
   ) => Promise<ObservableWallet>;
 }
 
 export interface StoresFactory {
-  create: (props: Pick<WalletManagerActivateProps, 'walletId'>) => storage.WalletStores;
+  create: (props: { name: string }) => storage.WalletStores;
 }

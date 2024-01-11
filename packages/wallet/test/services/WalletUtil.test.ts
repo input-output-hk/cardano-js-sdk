@@ -1,20 +1,17 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, GroupedAddress, util as KeyManagementUtil } from '@cardano-sdk/key-management';
-import { Cardano } from '@cardano-sdk/core';
 import {
-  PersonalWallet,
-  WalletUtilContext,
-  createInputResolver,
-  createLazyWalletUtil,
-  requiresForeignSignatures,
-  setupWallet
-} from '../../src';
-import { ProtocolParametersRequiredByOutputValidator } from '@cardano-sdk/tx-construction';
+  AddressType,
+  Bip32Account,
+  GroupedAddress,
+  util as KeyManagementUtil,
+  KeyRole
+} from '@cardano-sdk/key-management';
+import { Cardano } from '@cardano-sdk/core';
+import { PersonalWallet, createInputResolver, requiresForeignSignatures } from '../../src';
+import { createAsyncKeyAgent, waitForWalletStateSettle } from '../util';
 import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
 import { of } from 'rxjs';
-import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
-import { waitForWalletStateSettle } from '../util';
 
 describe('WalletUtil', () => {
   describe('createInputResolver', () => {
@@ -53,21 +50,6 @@ describe('WalletUtil', () => {
     });
   });
 
-  describe('createLazyWalletUtil', () => {
-    it('awaits for "initialize" to be called before resolving call to any util', async () => {
-      const util = createLazyWalletUtil();
-      const resultPromise = util.validateValue({ coins: 2_000_000n });
-      util.initialize({
-        protocolParameters$: of<ProtocolParametersRequiredByOutputValidator>({
-          coinsPerUtxoByte: 4310,
-          maxValueSize: 90
-        })
-      } as WalletUtilContext);
-      const result = await resultPromise;
-      expect(result.coinMissing).toBe(0n);
-    });
-  });
-
   describe('requiresForeignSignatures', () => {
     const address = mocks.utxo[0][0].address!;
     let txSubmitProvider: mocks.TxSubmitProviderStub;
@@ -99,34 +81,30 @@ describe('WalletUtil', () => {
         index: 0,
         networkId: Cardano.NetworkId.Testnet,
         rewardAccount: mocks.rewardAccount,
-        stakeKeyDerivationPath,
+        stakeKeyDerivationPath: {
+          index: 0,
+          role: KeyRole.Stake
+        },
         type: AddressType.External
       };
-      ({ wallet } = await setupWallet({
-        bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
-        createKeyAgent: async (dependencies) => {
-          const asyncKeyAgent = await testAsyncKeyAgent([groupedAddress], dependencies);
-          asyncKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
-          return asyncKeyAgent;
-        },
-        createWallet: async (keyAgent) =>
-          new PersonalWallet(
-            { name: 'Test Wallet' },
-            {
-              addressManager: KeyManagementUtil.createBip32Ed25519AddressManager(keyAgent),
-              assetProvider,
-              chainHistoryProvider,
-              logger,
-              networkInfoProvider,
-              rewardsProvider,
-              stakePoolProvider,
-              txSubmitProvider,
-              utxoProvider,
-              witnesser: KeyManagementUtil.createBip32Ed25519Witnesser(keyAgent)
-            }
-          ),
-        logger
-      }));
+      const asyncKeyAgent = await createAsyncKeyAgent();
+      const bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
+      bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
+      wallet = new PersonalWallet(
+        { name: 'Test Wallet' },
+        {
+          assetProvider,
+          bip32Account,
+          chainHistoryProvider,
+          logger,
+          networkInfoProvider,
+          rewardsProvider,
+          stakePoolProvider,
+          txSubmitProvider,
+          utxoProvider,
+          witnesser: KeyManagementUtil.createBip32Ed25519Witnesser(asyncKeyAgent)
+        }
+      );
 
       await waitForWalletStateSettle(wallet);
 

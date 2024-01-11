@@ -9,7 +9,7 @@
     "unlimitedStorage"
   ],
   "content_security_policy": {
-    "extension_pages": "default-src 'self' http://localhost:3000; script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; connect-src data: http://localhost:8080 https://backend.live-preprod.eks.lw.iog.io https://api.coingecko.com http://167.235.156.245:4000 http://localhost:3000 ws://localhost:3000 wss://localhost:3000 http://localhost:4000 ws://localhost:4000 wss://localhost:4000 http://testnet-dev-backend.dev.lw.iog.io:80 http://localhost:4567 https://testnet-dev-backend.dev.lw.iog.io:443 https://preprod-api.v2.prod.lw.iog.io; style-src * 'unsafe-inline'; img-src * data:; font-src https://fonts.gstatic.com;"
+    "extension_pages": "default-src 'self' http://localhost:3000; script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; connect-src data: http://localhost:8080 https://backend.live-preprod.eks.lw.iog.io https://api.coingecko.com http://167.235.156.245:4000 http://localhost:3000 ws://localhost:3000 wss://localhost:3000 http://localhost:4011 ws://localhost:4011 wss://localhost:4011 http://localhost:4000 ws://localhost:4000 wss://localhost:4000 http://testnet-dev-backend.dev.lw.iog.io:80 http://localhost:4567 https://testnet-dev-backend.dev.lw.iog.io:443 https://preprod-api.v2.prod.lw.iog.io; style-src * 'unsafe-inline'; img-src * data:; font-src https://fonts.gstatic.com;"
   },
   "web_accessible_resources": [
     {
