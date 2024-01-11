@@ -1,8 +1,8 @@
 import {
   AccountKeyDerivationPath,
   AsyncKeyAgent,
-  MessageSender,
   SignBlobResult,
+  SignDataContext,
   SignTransactionContext,
   WitnessOptions,
   Witnesser
@@ -38,7 +38,7 @@ export class Bip32Ed25519Witnesser implements Witnesser {
   async signBlob(
     derivationPath: AccountKeyDerivationPath,
     blob: HexBlob,
-    _sender?: MessageSender
+    _context: SignDataContext
   ): Promise<SignBlobResult> {
     return this.#keyAgent.signBlob(derivationPath, blob);
   }

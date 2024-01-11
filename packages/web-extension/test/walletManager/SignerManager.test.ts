@@ -4,13 +4,14 @@ import {
   InMemoryKeyAgent,
   KeyRole,
   SignBlobResult,
+  SignDataContext,
   SignTransactionContext,
   errors
 } from '@cardano-sdk/key-management';
 import { Bip32PublicKeyHex, Ed25519PublicKeyHex, Ed25519SignatureHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { Cardano, TxCBOR } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
-import { InMemoryWallet, KeyAgentFactory, SignDataContext, SignerManager, WalletType } from '../../src';
+import { InMemoryWallet, KeyAgentFactory, SignerManager, WalletType } from '../../src';
 import { firstValueFrom } from 'rxjs';
 
 describe('SignerManager', () => {
@@ -180,8 +181,18 @@ describe('SignerManager', () => {
     it('signs with key agent when subscriber calls sign()', async () => {
       keyAgent.signBlob.mockResolvedValueOnce(signResult);
       const reqEmitted = firstValueFrom(signerManager.signDataRequest$);
-      const signed = signerManager.signData({ blob, derivationPath, signContext }, requestContext);
+      const context = { address: 'stubAddress' as Cardano.PaymentAddress, sender: { url: 'www.example.com' } };
+      const signed = signerManager.signData(
+        {
+          blob,
+          derivationPath,
+          signContext: context
+        },
+        requestContext
+      );
       const req = await reqEmitted;
+
+      expect(req.signContext).toEqual(context);
       await expect(req.sign(passphrase)).resolves.toEqual(signResult);
       await expect(signed).resolves.toEqual(signResult);
       expect(passphrase).toEqual(new Uint8Array([0, 0, 0]));

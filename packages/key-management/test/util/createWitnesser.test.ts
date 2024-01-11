@@ -19,7 +19,12 @@ describe('createBip32Ed25519Witnesser', () => {
     const blob = HexBlob('abc123');
     const result = {} as SignBlobResult;
     asyncKeyAgent.signBlob.mockResolvedValueOnce(result);
-    await expect(witnesser.signBlob(keyDerivationPath, blob)).resolves.toBe(result);
+    await expect(
+      witnesser.signBlob(keyDerivationPath, blob, {
+        address: 'stub' as Cardano.PaymentAddress,
+        sender: { url: 'some test' }
+      })
+    ).resolves.toBe(result);
     expect(asyncKeyAgent.signBlob).toBeCalledWith(keyDerivationPath, blob);
   });
 

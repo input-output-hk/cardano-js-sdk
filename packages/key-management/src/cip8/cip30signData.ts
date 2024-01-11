@@ -89,10 +89,11 @@ const signSigStructure = (
   witnesser: Bip32Ed25519Witnesser,
   derivationPath: AccountKeyDerivationPath,
   sigStructure: SigStructure,
+  address?: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID,
   sender?: MessageSender
 ) => {
   try {
-    return witnesser.signBlob(derivationPath, util.bytesToHex(sigStructure.to_bytes()), sender);
+    return witnesser.signBlob(derivationPath, util.bytesToHex(sigStructure.to_bytes()), { address, sender });
   } catch (error) {
     throw new Cip30DataSignError(Cip30DataSignErrorCode.UserDeclined, 'Failed to sign', error);
   }
@@ -132,7 +133,7 @@ export const cip30signData = async ({
     false
   );
   const sigStructure = builder.make_data_to_sign();
-  const { signature, publicKey } = await signSigStructure(witnesser, derivationPath, sigStructure, sender);
+  const { signature, publicKey } = await signSigStructure(witnesser, derivationPath, sigStructure, signWith, sender);
   const coseSign1 = builder.build(Buffer.from(signature, 'hex'));
 
   const coseKey = createCoseKey(addressBytes, publicKey);

@@ -113,6 +113,6 @@ describe('cip30signData', () => {
     const signBlobSpy = jest.spyOn(witnesser, 'signBlob');
     const sender = { url: 'https://lace.io' };
     await signAndDecode(address.address, [address], sender);
-    expect(signBlobSpy).toBeCalledWith(expect.anything(), expect.anything(), sender);
+    expect(signBlobSpy).toBeCalledWith(expect.anything(), expect.anything(), { address: address.address, sender });
   });
 });
