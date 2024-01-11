@@ -4044,17 +4044,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emurgo/cardano-serialization-lib-nodejs@npm:^10.2.0":
-  version: 10.2.0
-  resolution: "@emurgo/cardano-serialization-lib-nodejs@npm:10.2.0"
-  checksum: 4337c4b57d6c980ffa0263e9c4d1819deb25d4b70042524f4f61b24826e6aef5e316e0a29026bc53f423a2337013b33e201b18cd4abe5bc5591f3214dbeda244
-  languageName: node
-  linkType: hard
-
-"@emurgo/cardano-serialization-lib-nodejs@npm:^11.0.5":
-  version: 11.3.0
-  resolution: "@emurgo/cardano-serialization-lib-nodejs@npm:11.3.0"
-  checksum: 6126cc43d7ef9a09eb9be7476712ae5e2951a3fbec6be702bf2b3de3ae00de468e0c16dd3cb8b3d0d246824f3ec2347500a417c3819164c437d686cbf37e09bb
+"@emurgo/cardano-serialization-lib-nodejs@npm:^11.4.0":
+  version: 11.5.0
+  resolution: "@emurgo/cardano-serialization-lib-nodejs@npm:11.5.0"
+  checksum: f9e271704ef12eb018bc0a15b8c6f83c61db694a422674267be6c546a9a89dd8b200781aca3f97dd5bb4291b0c84f6c60177fcf7e550964188a4ed6a8efd0316
   languageName: node
   linkType: hard
 
@@ -6898,13 +6891,6 @@ __metadata:
   version: 12.20.55
   resolution: "@types/node@npm:12.20.55"
   checksum: e4f86785f4092706e0d3b0edff8dca5a13b45627e4b36700acd8dfe6ad53db71928c8dee914d4276c7fd3b6ccd829aa919811c9eb708a2c8e4c6eb3701178c37
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^14.11.8":
-  version: 14.18.37
-  resolution: "@types/node@npm:14.18.37"
-  checksum: d21e8c58ddd01ae069b196c2a4eaf9c9749e6666565349667334c60cfc119c1fa280234a8001157dd7ffe73501ce4f4940ca05f9d5c402c5abe78c8dca8376a6
   languageName: node
   linkType: hard
 
@@ -25881,7 +25867,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:7.5.9, ws@npm:^7.2.0, ws@npm:^7.4.2, ws@npm:^7.4.5, ws@npm:^7.4.6, ws@npm:^7.5.7":
+"ws@npm:7.5.9, ws@npm:^7.2.0, ws@npm:^7.4.5, ws@npm:^7.4.6, ws@npm:^7.5.7":
   version: 7.5.9
   resolution: "ws@npm:7.5.9"
   peerDependencies:
