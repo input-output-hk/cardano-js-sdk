@@ -44,7 +44,7 @@ const mapFees = (block: OgmiosBlockType): Cardano.Lovelace =>
   (block.transactions || [])
     .map(({ fee }) => fee)
     .filter(isNotNil)
-    .reduce((prev, { lovelace }) => prev + lovelace, 0n);
+    .reduce((prev, { ada: { lovelace } }) => prev + lovelace, 0n);
 
 const mapBlockHeader = (block: OgmiosBlockType) => ({
   blockNo: Cardano.BlockNo(mapBlockHeight(block)),

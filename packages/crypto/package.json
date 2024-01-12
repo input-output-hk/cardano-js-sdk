@@ -38,7 +38,7 @@
     "prepack": "yarn build"
   },
   "devDependencies": {
-    "@cardano-ogmios/schema": "6.0.0-rc5",
+    "@cardano-ogmios/schema": "6.0.0-latest",
     "@dcspark/cardano-multiplatform-lib-nodejs": "^3.1.1",
     "@types/blake2b": "^2.1.0",
     "@types/libsodium-wrappers-sumo": "^0.7.5",

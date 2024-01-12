@@ -144,13 +144,13 @@ export const mockShelleyBlock: Ogmios.Schema.Block = {
         {
           stakePool: {
             cost: {
-              lovelace: 500_000_000n
+              ada: { lovelace: 500_000_000n }
             },
             id: 'pool1547tew8vmuj0g6vj3k5jfddudextcw6hsk2hwgg6pkhk7lwphe6',
             margin: '1/1',
             owners: ['968d1021ebd7178e1fb0e79676982825cabc779b653e1234d58ce3c6'],
             pledge: {
-              lovelace: 100_000_000_000_000n
+              ada: { lovelace: 100_000_000_000_000n }
             },
             relays: [
               {
@@ -178,13 +178,13 @@ export const mockShelleyBlock: Ogmios.Schema.Block = {
         {
           stakePool: {
             cost: {
-              lovelace: 500_000_000n
+              ada: { lovelace: 500_000_000n }
             },
             id: 'pool174mw7e20768e8vj4fn8y6p536n8rkzswsapwtwn354dckpjqzr8',
             margin: '1/1',
             owners: ['f130204b518f70c19995449e3737eded3d9ffc31cb50ec0e45010ba3'],
             pledge: {
-              lovelace: 100_000_000_000_000n
+              ada: { lovelace: 100_000_000_000_000n }
             },
             relays: [
               {
@@ -212,13 +212,13 @@ export const mockShelleyBlock: Ogmios.Schema.Block = {
         {
           stakePool: {
             cost: {
-              lovelace: 500_000_000n
+              ada: { lovelace: 500_000_000n }
             },
             id: 'pool1z22x50lqsrwent6en0llzzs9e577rx7n3mv9kfw7udwa2rf42fa',
             margin: '1/1',
             owners: ['392ae9e068e55e8b5c27acc58b0bab8ea568c0aae2f6fc49be23a7ad'],
             pledge: {
-              lovelace: 100_000_000_000_000n
+              ada: { lovelace: 100_000_000_000_000n }
             },
             relays: [
               {
@@ -241,7 +241,7 @@ export const mockShelleyBlock: Ogmios.Schema.Block = {
         }
       ],
       fee: {
-        lovelace: 238_057n
+        ada: { lovelace: 238_057n }
       },
       id: 'a3d6f2627a56fe7921eeda546abfe164321881d41549b7f2fbf09ea0b718d758',
       inputs: [
@@ -378,7 +378,7 @@ export const mockAlonzoBlock: Ogmios.Schema.Block = {
     {
       cbor: '84a400818258200dd9b1dd89ff50c6907b3fd0385fde86f7c6877c2c9a95a9a9aa83b1cfead12800018182581d609e5614893238cf85e284c61ec56d5efd9f9cdc4863ba7e1bf00c2c7d1b006983fdc3fd39a3021a0003249d0682a7581c637f2e950b0fd8f8e3e811c5fbeb19e411e7a2bf37272b84b29c1a0ba10e820600581c8a4b77c4f534f8b8cc6f269e5ebb7ba77fa63a476e50e05e66d7051ca10e820600581cb00470cd193d67aac47c373602fccd4195aad3002c169b5570de1126a10e820600581cb260ffdb6eba541fcf18601923457307647dce807851b9d19da133aba10e820600581cced1599fd821a39593e00592e5292bd',
       fee: {
-        lovelace: 205_981n
+        ada: { lovelace: 205_981n }
       },
       id: 'cb9a4cdc0e6555b713d99dd2088180be7a36a6c64d89e32b710e7c3a5d366cf2',
       inputs: [
@@ -609,7 +609,7 @@ export const mockAllegraBlock: Ogmios.Schema.Block = {
     {
       cbor: '83a40081825820a00696a0c2d70c381a265a845e43c55e1d00f96b27c06defc015dc92eb20624000018182581d609e5614893238cf85e284c61ec56d5efd9f9cdc4863ba7e1bf00c2c7d1b006983fdc40382dd021a00032bd50682a7581c637f2e950b0fd8f8e3e811c5fbeb19e411e7a2bf37272b84b29c1a0ba20cd81e8200010e820400581c8a4b77c4f534f8b8cc6f269e5ebb7ba77fa63a476e50e05e66d7051ca20cd81e8200010e820400581cb00470cd193d67aac47c373602fccd4195aad3002c169b5570de1126a20cd81e8200010e820400581cb260ffdb6eba541fcf18601923457307647dce807851b9d19da133aba20cd81e8',
       fee: {
-        lovelace: 207_829n
+        ada: { lovelace: 207_829n }
       },
       id: '59f68ea73b95940d443dc516702d5e5deccac2429e4d974f464cc9b26292fd9c',
       inputs: [
@@ -894,7 +894,7 @@ export const mockMaryBlock: Ogmios.Schema.Block = {
     {
       cbor: '83a4008182582059f68ea73b95940d443dc516702d5e5deccac2429e4d974f464cc9b26292fd9c00018182581d609e5614893238cf85e284c61ec56d5efd9f9cdc4863ba7e1bf00c2c7d1b006983fdc4005e40021a0003249d0682a7581c637f2e950b0fd8f8e3e811c5fbeb19e411e7a2bf37272b84b29c1a0ba10e820500581c8a4b77c4f534f8b8cc6f269e5ebb7ba77fa63a476e50e05e66d7051ca10e820500581cb00470cd193d67aac47c373602fccd4195aad3002c169b5570de1126a10e820500581cb260ffdb6eba541fcf18601923457307647dce807851b9d19da133aba10e820500581cced1599fd821a39593e00592e5292bd',
       fee: {
-        lovelace: 205_981n
+        ada: { lovelace: 205_981n }
       },
       id: '0dd9b1dd89ff50c6907b3fd0385fde86f7c6877c2c9a95a9a9aa83b1cfead128',
       inputs: [
@@ -1123,7 +1123,7 @@ export const mockBabbageBlock: Ogmios.Schema.Block = {
         }
       ],
       fee: {
-        lovelace: 171_661n
+        ada: { lovelace: 171_661n }
       },
       id: '543dd5eb80eb34d4caabeb00f7137e9330d1c8afa890d367ef8bdfad24b7f321',
       inputs: [
@@ -1165,7 +1165,7 @@ export const mockBabbageBlock: Ogmios.Schema.Block = {
     {
       cbor: '84a60082825820458965adb212f57bbe3bf97ba0cc9caa142ce59f79be803332408e567b55b4af00825820458965adb212f57bbe3bf97ba0cc9caa142ce59f79be803332408e567b55b4af010182825839000abe35e91065a0b720ce503df5549a1231e4a3e39d8e495bd36701e78a02c5cb406e02d9582e168dc0ae4310b95e34d06d42227b516f4be7821a00118f32a1581ceb48b495393986032e8cef0b0a9b2ce64b3881e8a29347e169c7122ca14246541846825839000abe35e91065a0b720ce503df5549a1231e4a3e39d8e495bd36701e78a02c5cb406e02d9582e168dc0ae4310b95e34d06d42227b516f4be71b0000000241b50aa1021a0002c329031a00aac8010758203f5d7adf353de22cf1fc514aa911901c5fbd1b5ee3ed57950a6dc5a0fe1dbb2009a1581ceb48b495393986032e8cef0b0a9b2ce64b3881e8a29347e169c7122ca1424654381da2008282582047c7878b4737c1676d83422fb8f72eb66f1ecb7c94a3c9a7b93ccc0dec7e8f255840080a8bf5a6ffbdc521776fca3272290f243e441ffdbbd873e4dfa3f2466fa45e082176b3dbcd09f376eed9cc465fcf538520b2c58a487565e711ad158d2f1c07825820c92a58c6a3bd0d181122e6294bdaf00ba43cf65c65d7275ceb2388570be883d75840594bb85fed2bef13f2f573607831a69b7a5cce97ca6fed2a0026303e85f65a9d552fd6bbd77d10720110321e0aa8e5d1571fb2d38c848a7f4789e80f1751660101818200581c583dda8c51947fb1653150f3daa7c724637f099d77bc7759edc22a8ef5a1183a60',
       fee: {
-        lovelace: 181_033n
+        ada: { lovelace: 181_033n }
       },
       id: 'be69e4186eaf01fa31a1ad1b16780269f34dbab5d73dd34b8e785ed88e330e12',
       inputs: [
@@ -1248,7 +1248,7 @@ export const mockBabbageBlock: Ogmios.Schema.Block = {
     {
       cbor: '84a50082825820803f8599f482d6f4c84da3b095efb4667aa4506d442cf080125a1baa1d66085e0182582090f5bcb35b44d7f3f49ddb2907e0f916a86328eefe69bab9214bed9f5fad7487000182a200583900c8fd82eefa4f5090b3b8a80e5b9244a4656b0e4444066d5d0678004f241511e532f73ba0a4e25c6a659813e7492a0842a3698ac8d72a0983011a000f4240a200583900fb57816ce653a68eb8b3048de7d0451775b65790f0ad1f8c9a943c83241511e532f73ba0a4e25c6a659813e7492a0842a3698ac8d72a0983011a0019053a021a0002b385031a00aadf8f075820b93d8e428871a0b0e12c5c554653f515f50fe48dc5b55af7e3667e7d9661ea2ca1008282582021ccfef5d816ed98dbf00de037322303fda53e1a01a844f38444ba3eb6f6e9e45840634c8e2a38429b95e588732655c0513909b5415e7f736ba95c98c394b0fbdb9f1cf102d4230939db883226b7d850fc04b10101aec235686c1ad4da7b0765e6008258202cf1d6c8d41391e658e25dbc88638831d7af3254988bde4650e1c595c21214615840b81ebb6d1c2ec74a5c210e9656cb27732f084f653abfe01f56e3d5d39a87a47d933724684d753564274b32def9d923dd3885240265ae7ce87904efd80a563708f5d90103a100a10080',
       fee: {
-        lovelace: 177_029n
+        ada: { lovelace: 177_029n }
       },
       id: 'd95c45762d620b81a6eeeebacb86d2b6af4e00df2324f0b1bf14cf9d86b18c16',
       inputs: [
@@ -1326,7 +1326,7 @@ export const mockBabbageBlock: Ogmios.Schema.Block = {
           'd8799f581c0bfe875a7ae9db3c1b3827483ac6a1d02a7a93d3d26df00c7973aa47ff'
       },
       fee: {
-        lovelace: 367_282n
+        ada: { lovelace: 367_282n }
       },
       id: 'e8b1c72c0c3002f8d157dc94bb28d3f2ebb3839c859ef8a325c6feefb120e11b',
       inputs: [
@@ -1377,15 +1377,19 @@ export const mockBabbageBlock: Ogmios.Schema.Block = {
           }
         }
       ],
-      redeemers: {
-        'mint:0': {
+      redeemers: [
+        {
           executionUnits: {
             cpu: 226_632_481,
             memory: 769_094
           },
-          redeemer: 'd87980'
+          redeemer: 'd87980',
+          validator: {
+            index: 0,
+            purpose: 'mint'
+          }
         }
-      },
+      ],
       requiredExtraSignatories: ['f1eda47a5724f121fe27d208fb96c675db997cdb7ef6c7a3a75d1a1b'],
       scriptIntegrityHash: '86b2db419eb3ac0d6180255726b53900d26ea7c7eab5cd209607eb6d9ae5a136',
       scripts: {
@@ -1419,7 +1423,7 @@ export const mockBabbageBlock: Ogmios.Schema.Block = {
           'd8799f581c0bfe875a7ae9db3c1b3827483ac6a1d02a7a93d3d26df00c7973aa47ff'
       },
       fee: {
-        lovelace: 383_135n
+        ada: { lovelace: 383_135n }
       },
       id: '2c8ddb336af166f19bf609f259fa9217fc3c7fed76c576e13bde393c145e181f',
       inputs: [
@@ -1482,15 +1486,19 @@ export const mockBabbageBlock: Ogmios.Schema.Block = {
           }
         }
       ],
-      redeemers: {
-        'mint:0': {
+      redeemers: [
+        {
           executionUnits: {
             cpu: 265_573_006,
             memory: 905_186
           },
-          redeemer: 'd87980'
+          redeemer: 'd87980',
+          validator: {
+            index: 0,
+            purpose: 'mint'
+          }
         }
-      },
+      ],
       requiredExtraSignatories: ['f1eda47a5724f121fe27d208fb96c675db997cdb7ef6c7a3a75d1a1b'],
       scriptIntegrityHash: 'efa020e8985191676d8922ea1bb7f0134dda7008a9a02fa5d87d00363a9ae096',
       scripts: {
@@ -1512,7 +1520,7 @@ export const mockBabbageBlock: Ogmios.Schema.Block = {
     {
       cbor: '84a50083825820803f8599f482d6f4c84da3b095efb4667aa4506d442cf080125a1baa1d66085e0082582098d92512364c908d1866e5a23e73c3f2b5219d7f4963343565943823dfc9b3a60082582098d92512364c908d1866e5a23e73c3f2b5219d7f4963343565943823dfc9b3a6010182a200583900c8fd82eefa4f5090b3b8a80e5b9244a4656b0e4444066d5d0678004f241511e532f73ba0a4e25c6a659813e7492a0842a3698ac8d72a0983011a000f4240a2005839007ac8763b8be2c94c30ed70190a08c8376ef7ce2762c2d605082ae58c241511e532f73ba0a4e25c6a659813e7492a0842a3698ac8d72a0983011b0000000253451827021a0002cbc1031a00aadfcb075820b93d8e428871a0b0e12c5c554653f515f50fe48dc5b55af7e3667e7d9661ea2ca1008282582053b8509684715055c86ded21c00e6f7c9c2efa73a94959842a3fe91d6001e9325840cc35732a94c3f4521479942a07bdbf54f71062dd134fe66ff015a66ec74016b348782e4d2eafd99ae66cc7894249587622c4092090c841b439dfea558ff2190d8258202cf1d6c8d41391e658e25dbc88638831d7af3254988bde4650e1c595c21214615840f76fd79984cb7bbdeb5445c040aa873f60f1f3f56c71d3db77468261c864b8e745916bf519ae2e54453692dc2d1b0a0b1daf68ece63f084ac3b67d665637920df5d90103a100a10080',
       fee: {
-        lovelace: 183_233n
+        ada: { lovelace: 183_233n }
       },
       id: '5448314ba8c137b110f279c2b8869f88b77cce325cddf8aec64480708bd18915',
       inputs: [
@@ -1628,7 +1636,7 @@ export const mockBabbageBlockWithNftMetadata: Ogmios.Schema.Block = {
         }
       ],
       fee: {
-        lovelace: 168_713n
+        ada: { lovelace: 168_713n }
       },
       id: '3e942e2930be32561dbe1764bea4d1a1cebe28c087ba3fcc827f1dcea2c8b92e',
       inputs: [
@@ -1671,7 +1679,7 @@ export const mockBabbageBlockWithNftMetadata: Ogmios.Schema.Block = {
     {
       cbor: '84a60081825820017b0c21d858752eee8120da51e3397f8f5b4481ed35c802006e73393d63378b000181825839006f5a3e4acedf6b6941f2bc705e11392fe52ac8e063395324b16936e2505a4bd1f291535fbf768a6e6de59b39b18c3d158dc43d4cfc08771f821b000000025408ff27a1581ce2bab64ca481afc5a695b7db22fd0a7df4bf930158dfa652fb337999a15053554d4d49544157415244534465666901021a0002e4d9031a00ef646309a1581ce2bab64ca481afc5a695b7db22fd0a7df4bf930158dfa652fb337999a15053554d4d49544157415244534465666901075820b46ae643d61f636ee612f7740d7ff6990963d2b4e13',
       fee: {
-        lovelace: 189_657n
+        ada: { lovelace: 189_657n }
       },
       id: 'a86d5246c1e5ce7d66446d0a68355abe6622545d8ffe7dd832a062f6cde010bd',
       inputs: [
