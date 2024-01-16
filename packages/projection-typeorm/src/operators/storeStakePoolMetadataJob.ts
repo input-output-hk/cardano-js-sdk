@@ -4,14 +4,15 @@ import { STAKE_POOL_METADATA_QUEUE, StakePoolMetadataJob, defaultJobOptions } fr
 import { WithPgBoss } from './withTypeormTransaction';
 import { certificatePointerToId, typeormOperator } from './util';
 
-export const storeStakePoolMetadataJob = typeormOperator<Mappers.WithStakePools & WithPgBoss>(
-  async ({ block: { header }, eventType, pgBoss, stakePools }) => {
+export const createStoreStakePoolMetadataJob = (retryDelay = defaultJobOptions.retryDelay) =>
+  typeormOperator<Mappers.WithStakePools & WithPgBoss>(async ({ block: { header }, eventType, pgBoss, stakePools }) => {
     const { slot } = header;
 
     if (eventType === ChainSyncEventType.RollBackward) {
       // Tasks are automatically deleted via slot cascade (referencing Block.slot)
       return;
     }
+
     const tasks = stakePools.updates
       .filter(({ poolParameters: { metadataJson } }) => !!metadataJson)
       .map(
@@ -21,8 +22,7 @@ export const storeStakePoolMetadataJob = typeormOperator<Mappers.WithStakePools 
           poolRegistrationId: certificatePointerToId(source).toString()
         })
       );
-    for (const task of tasks) {
-      await pgBoss.send(STAKE_POOL_METADATA_QUEUE, task, { ...defaultJobOptions, slot });
-    }
-  }
-);
+
+    for (const task of tasks)
+      await pgBoss.send(STAKE_POOL_METADATA_QUEUE, task, { ...defaultJobOptions, retryDelay, slot });
+  });

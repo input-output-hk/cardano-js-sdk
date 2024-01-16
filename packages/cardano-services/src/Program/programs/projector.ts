@@ -12,7 +12,7 @@ import { MissingProgramOption, UnknownServiceName } from '../errors';
 import { ProjectionHttpService, ProjectionName, createTypeormProjection, storeOperators } from '../../Projection';
 import { SrvRecord } from 'dns';
 import { createLogger } from 'bunyan';
-import { createStorePoolMetricsUpdateJob } from '@cardano-sdk/projection-typeorm';
+import { createStorePoolMetricsUpdateJob, createStoreStakePoolMetadataJob } from '@cardano-sdk/projection-typeorm';
 import { getConnectionConfig, getOgmiosObservableCardanoNode } from '../services';
 
 export const BLOCKS_BUFFER_LENGTH_DEFAULT = 10;
@@ -26,6 +26,7 @@ export type ProjectorArgs = CommonProgramOptions &
     dropSchema: boolean;
     dryRun: boolean;
     exitAtBlockNo: Cardano.BlockNo;
+    metadataJobRetryDelay: number;
     poolsMetricsInterval: number;
     projectionNames: ProjectionName[];
     synchronize: boolean;
@@ -44,6 +45,7 @@ interface ProjectionMapFactoryOptions {
 const createProjectionHttpService = async (options: ProjectionMapFactoryOptions) => {
   const { args, dnsResolver, logger } = options;
   storeOperators.storePoolMetricsUpdateJob = createStorePoolMetricsUpdateJob(args.poolsMetricsInterval)();
+  storeOperators.storeStakePoolMetadataJob = createStoreStakePoolMetadataJob(args.metadataJobRetryDelay)();
   const cardanoNode = getOgmiosObservableCardanoNode(dnsResolver, logger, {
     ogmiosSrvServiceName: args.ogmiosSrvServiceName,
     ogmiosUrl: args.ogmiosUrl
