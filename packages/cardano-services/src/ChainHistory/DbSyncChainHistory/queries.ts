@@ -192,7 +192,7 @@ export const findVotingProceduresByTxIds = `
 		va.data_hash
 	FROM tx
 	JOIN voting_procedure AS vp ON vp.tx_id = tx.id
-	JOIN governance_action AS ga ON governance_action_id = ga.id
+	JOIN gov_action_proposal AS ga ON gov_action_proposal_id = ga.id
 	JOIN tx AS tx2 ON ga.tx_id = tx2.id
 	LEFT JOIN drep_hash AS dh ON drep_voter = dh.id
 	LEFT JOIN pool_hash AS ph ON pool_voter = ph.id
@@ -210,7 +210,7 @@ export const findProposalProceduresByTxIds = `
 		va.data_hash,
 		sa.view
 	FROM tx
-	JOIN governance_action AS ga ON tx.id = ga.tx_id
+	JOIN gov_action_proposal AS ga ON tx.id = ga.tx_id
 	JOIN voting_anchor AS va ON voting_anchor_id = va.id
 	JOIN stake_address AS sa ON ga.return_address = sa.id
 	WHERE tx.id = ANY($1)
