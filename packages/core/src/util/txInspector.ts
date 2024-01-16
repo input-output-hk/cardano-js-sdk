@@ -1,4 +1,3 @@
-import * as Cardano from '../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import {
   AssetFingerprint,
@@ -6,6 +5,7 @@ import {
   AssetName,
   Certificate,
   CertificateType,
+  HydratedTxIn,
   Lovelace,
   Metadatum,
   PolicyId,
@@ -17,17 +17,20 @@ import {
   StakeDelegationCertificate,
   TokenMap,
   Tx,
+  TxIn,
+  TxOut,
   Value
 } from '../Cardano/types';
 import { BigIntMath } from '@cardano-sdk/util';
+import { InputResolver, PaymentAddress, RewardAccount, isAddressWithin } from '../Cardano';
 import { coalesceValueQuantities } from './coalesceValueQuantities';
 import { nativeScriptPolicyId } from './nativeScript';
 import { removeNegativesFromTokenMap } from '../Asset/util';
 import { subtractValueQuantities } from './subtractValueQuantities';
 
-type Inspector<Inspection> = (tx: Tx) => Promise<Inspection>;
-type Inspectors = { [k: string]: Inspector<unknown> };
-type TxInspector<T extends Inspectors> = (tx: Tx) => Promise<{
+export type Inspector<Inspection> = (tx: Tx) => Promise<Inspection>;
+export type Inspectors = { [k: string]: Inspector<unknown> };
+export type TxInspector<T extends Inspectors> = (tx: Tx) => Promise<{
   [k in keyof T]: Awaited<ReturnType<T[k]>>;
 }>;
 
@@ -40,7 +43,7 @@ export type PoolRetirementInspection = PoolRetirementCertificate[];
 
 export type WithdrawalInspection = Lovelace;
 export interface SentInspection {
-  inputs: Cardano.HydratedTxIn[];
+  inputs: HydratedTxIn[];
   certificates: Certificate[];
 }
 export type SignedCertificatesInspection = Certificate[];
@@ -59,23 +62,21 @@ export type MetadataInspection = Metadatum;
 
 // Inspector types
 interface SentInspectorArgs {
-  addresses?: Cardano.PaymentAddress[];
-  rewardAccounts?: Cardano.RewardAccount[];
-  inputResolver: Cardano.InputResolver;
+  addresses?: PaymentAddress[];
+  rewardAccounts?: RewardAccount[];
+  inputResolver: InputResolver;
 }
 export type SentInspector = (args: SentInspectorArgs) => Inspector<SentInspection>;
 export type TotalAddressInputsValueInspector = (
-  ownAddresses: Cardano.PaymentAddress[],
-  inputResolver: Cardano.InputResolver
+  ownAddresses: PaymentAddress[],
+  inputResolver: InputResolver
 ) => Inspector<SendReceiveValueInspection>;
-export type SendReceiveValueInspector = (
-  ownAddresses: Cardano.PaymentAddress[]
-) => Inspector<SendReceiveValueInspection>;
+export type SendReceiveValueInspector = (ownAddresses: PaymentAddress[]) => Inspector<SendReceiveValueInspection>;
 export type DelegationInspector = Inspector<DelegationInspection>;
 export type StakeRegistrationInspector = Inspector<StakeRegistrationInspection>;
 export type WithdrawalInspector = Inspector<WithdrawalInspection>;
 export type SignedCertificatesInspector = (
-  rewardAccounts: Cardano.RewardAccount[],
+  rewardAccounts: RewardAccount[],
   certificateTypes?: CertificateType[]
 ) => Inspector<SignedCertificatesInspection>;
 export type AssetsMintedInspector = Inspector<AssetsMintedInspection>;
@@ -83,16 +84,11 @@ export type MetadataInspector = Inspector<MetadataInspection>;
 export type PoolRegistrationInspector = Inspector<PoolRegistrationInspection>;
 export type PoolRetirementInspector = Inspector<PoolRetirementInspection>;
 
-type ResolvedInput = {
-  id: Cardano.TransactionId;
-  index: number;
-  address: Cardano.PaymentAddress;
-  value: Value;
-};
+type ResolvedInput = TxIn & TxOut;
 
-type ResolutionResult = {
+export type ResolutionResult = {
   resolvedInputs: ResolvedInput[];
-  unresolvedInputs: Cardano.TxIn[];
+  unresolvedInputs: TxIn[];
 };
 
 /**
@@ -102,12 +98,9 @@ type ResolutionResult = {
  * @param inputResolver input resolver.
  * @returns {ResolutionResult} resolved and unresolved inputs.
  */
-const resolveInputs = async (
-  txIns: Cardano.TxIn[],
-  inputResolver: Cardano.InputResolver
-): Promise<ResolutionResult> => {
+export const resolveInputs = async (txIns: TxIn[], inputResolver: InputResolver): Promise<ResolutionResult> => {
   const resolvedInputs: ResolvedInput[] = [];
-  const unresolvedInputs: Cardano.TxIn[] = [];
+  const unresolvedInputs: TxIn[] = [];
 
   for (const input of txIns) {
     const resolvedInput = await inputResolver.resolveInput(input);
@@ -115,8 +108,8 @@ const resolveInputs = async (
     if (resolvedInput) {
       resolvedInputs.push({
         address: resolvedInput.address,
-        id: input.txId,
         index: input.index,
+        txId: input.txId,
         value: resolvedInput.value
       });
     } else {
@@ -136,13 +129,13 @@ const resolveInputs = async (
  *
  * @param ownAddresses own wallet's addresses
  * @param inputResolver input resolver.
- * @returns {Value} total value in inputs
+ * @returns total value in inputs
  */
 export const totalAddressInputsValueInspector: TotalAddressInputsValueInspector =
   (ownAddresses, inputResolver) => async (tx) => {
     const { resolvedInputs } = await resolveInputs(tx.body.inputs, inputResolver);
 
-    const receivedInputs = resolvedInputs.filter((input) => Cardano.isAddressWithin(ownAddresses)(input));
+    const receivedInputs = resolvedInputs.filter((input) => isAddressWithin(ownAddresses)(input));
     const receivedInputsValues = receivedInputs.map((input) => input.value);
 
     return coalesceValueQuantities(receivedInputsValues);
@@ -153,10 +146,10 @@ export const totalAddressInputsValueInspector: TotalAddressInputsValueInspector 
  * containing any of the provided addresses.
  *
  * @param ownAddresses own wallet's addresses
- * @returns {Value} total value in outputs
+ * @returns total value in outputs
  */
 export const totalAddressOutputsValueInspector: SendReceiveValueInspector = (ownAddresses) => async (tx) => {
-  const receivedOutputs = tx.body.outputs.filter((out) => Cardano.isAddressWithin(ownAddresses)(out));
+  const receivedOutputs = tx.body.outputs.filter((out) => isAddressWithin(ownAddresses)(out));
   return coalesceValueQuantities(receivedOutputs.map((output) => output.value));
 };
 
@@ -169,7 +162,7 @@ export const totalAddressOutputsValueInspector: SendReceiveValueInspector = (own
  */
 export const getCertificatesByType = (
   tx: Tx,
-  rewardAccounts: Cardano.RewardAccount[],
+  rewardAccounts: RewardAccount[],
   certificateTypes?: CertificateType[]
 ) => {
   if (!tx.body.certificates || tx.body.certificates.length === 0) return [];
@@ -180,7 +173,7 @@ export const getCertificatesByType = (
   return certificates.filter((certificate) => {
     if ('stakeCredential' in certificate && certificate.stakeCredential) {
       const credHash = Crypto.Ed25519KeyHashHex(certificate.stakeCredential.hash);
-      return rewardAccounts.some((account) => Cardano.RewardAccount.toHash(account) === credHash);
+      return rewardAccounts.some((account) => RewardAccount.toHash(account) === credHash);
     }
 
     if ('poolParameters' in certificate) return rewardAccounts.includes(certificate.poolParameters.rewardAccount);
@@ -193,29 +186,26 @@ export const getCertificatesByType = (
  * Is possible to specify the types of certificates to be taken into account
  *
  * @param rewardAccounts array of reward accounts that might have signed certificates
- * @param {CertificateType[]} [certificateTypes] certificates of these types will be checked. All if not provided
+ * @param [certificateTypes] certificates of these types will be checked. All if not provided
  */
 export const signedCertificatesInspector: SignedCertificatesInspector =
-  (rewardAccounts: Cardano.RewardAccount[], certificateTypes?: CertificateType[]) => async (tx) =>
+  (rewardAccounts: RewardAccount[], certificateTypes?: CertificateType[]) => async (tx) =>
     getCertificatesByType(tx, rewardAccounts, certificateTypes);
 
 /**
  * Inspects a transaction to see if any of the addresses provided are included in a transaction input
  * or if any of the rewards accounts are included in a certificate
- *
- * @param {SentInspectorArgs} args array of addresses and/or reward accounts
- * @returns {SentInspection} certificates and inputs that include the addresses or reward accounts
  */
 export const sentInspector: SentInspector =
   ({ addresses, rewardAccounts, inputResolver }) =>
   async (tx) => {
     const certificates = rewardAccounts?.length ? await signedCertificatesInspector(rewardAccounts)(tx) : [];
-    let inputs: Cardano.HydratedTxIn[] = [];
+    let inputs: HydratedTxIn[] = [];
 
     if (addresses) {
       const { resolvedInputs } = await resolveInputs(tx.body.inputs, inputResolver);
-      const sentInputs = resolvedInputs.filter((input) => Cardano.isAddressWithin(addresses)(input));
-      inputs = sentInputs.map((input) => ({ address: input.address, index: input.index, txId: input.id }));
+      const sentInputs = resolvedInputs.filter((input) => isAddressWithin(addresses)(input));
+      inputs = sentInputs.map((input) => ({ address: input.address, index: input.index, txId: input.txId }));
     }
 
     return {
@@ -229,7 +219,7 @@ export const sentInspector: SentInspector =
  *
  * @param ownAddresses own wallet's addresses
  * @param inputResolver input resolver.
- * @returns {Value} net value sent
+ * @returns net value sent
  */
 export const valueSentInspector: TotalAddressInputsValueInspector = (ownAddresses, inputResolver) => async (tx) => {
   let assets: TokenMap = new Map();
@@ -251,7 +241,7 @@ export const valueSentInspector: TotalAddressInputsValueInspector = (ownAddresse
  *
  * @param ownAddresses own wallet's addresses
  * @param inputResolver A list of historical transaction
- * @returns {Value} net value received
+ * @returns net value received
  */
 export const valueReceivedInspector: TotalAddressInputsValueInspector = (ownAddresses, inputResolver) => async (tx) => {
   let assets: TokenMap = new Map();
@@ -332,7 +322,7 @@ export const poolRetirementInspector: PoolRetirementInspector = certificateInspe
  * Inspects a transaction for withdrawals.
  *
  * @param  tx transaction to inspect
- * @returns {WithdrawalInspection} accumulated withdrawal quantities
+ * @returns accumulated withdrawal quantities
  */
 export const withdrawalInspector: WithdrawalInspector = async (tx) =>
   tx.body.withdrawals?.length ? BigIntMath.sum(tx.body.withdrawals.map(({ quantity }) => quantity)) : 0n;
