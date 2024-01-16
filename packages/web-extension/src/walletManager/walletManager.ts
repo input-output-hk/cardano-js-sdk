@@ -1,6 +1,6 @@
 import {
   AccountKeyDerivationPath,
-  MessageSender,
+  SignDataContext,
   SignTransactionContext,
   WitnessOptions,
   Witnesser
@@ -289,12 +289,12 @@ export class WalletManager<Metadata extends { name: string }> implements WalletM
       case WalletType.Ledger:
       case WalletType.Trezor:
         witnesser = {
-          signBlob: async (derivationPath: AccountKeyDerivationPath, blob: HexBlob, sender?: MessageSender) =>
+          signBlob: async (derivationPath: AccountKeyDerivationPath, blob: HexBlob, context: SignDataContext) =>
             await this.#signerManagerApi.signData(
               {
                 blob,
                 derivationPath,
-                signContext: { sender }
+                signContext: context
               },
               {
                 accountIndex: accountIndex!,

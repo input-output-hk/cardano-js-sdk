@@ -147,6 +147,11 @@ export interface SignTransactionContext {
   sender?: MessageSender;
 }
 
+export interface SignDataContext {
+  address?: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID;
+  sender?: MessageSender;
+}
+
 export interface KeyAgent {
   get chainId(): Cardano.ChainId;
   get accountIndex(): number;
@@ -236,5 +241,5 @@ export interface Witnesser {
   /**
    * @throws AuthenticationError
    */
-  signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob, sender?: MessageSender): Promise<SignBlobResult>;
+  signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob, context: SignDataContext): Promise<SignBlobResult>;
 }
