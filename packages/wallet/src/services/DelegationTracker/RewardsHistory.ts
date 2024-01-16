@@ -1,5 +1,5 @@
 import { BigIntMath, isNotNil } from '@cardano-sdk/util';
-import { Cardano, Reward, createTxInspector, signedCertificatesInspector } from '@cardano-sdk/core';
+import { Cardano, Reward, getCertificatesByType } from '@cardano-sdk/core';
 import { KeyValueStore } from '../../persistence';
 import { Logger } from 'ts-log';
 import { Observable, concat, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
@@ -47,12 +47,9 @@ const firstDelegationEpoch$ = (transactions$: Observable<TxWithEpoch[]>, rewardA
   transactions$.pipe(
     map((transactions) =>
       first(
-        transactions.filter(({ tx }) => {
-          const inspectTx = createTxInspector({
-            signedCertificates: signedCertificatesInspector(rewardAccounts, [Cardano.CertificateType.StakeDelegation])
-          });
-          return inspectTx(tx).signedCertificates.length > 0;
-        })
+        transactions.filter(
+          ({ tx }) => getCertificatesByType(tx, rewardAccounts, [Cardano.CertificateType.StakeDelegation]).length > 0
+        )
       )
     ),
     map((tx) => (isNotNil(tx) ? calcFirstDelegationEpoch(tx.epoch) : null)),

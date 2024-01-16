@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, createTxInspector, signedCertificatesInspector } from '@cardano-sdk/core';
+import { Cardano, getCertificatesByType } from '@cardano-sdk/core';
 import { Observable, combineLatest, distinctUntilChanged, map } from 'rxjs';
 import { isNotNil } from '@cardano-sdk/util';
 import { transactionsEquals } from '../util/equals';
@@ -47,12 +47,7 @@ export const transactionsWithCertificates = (
 ) =>
   combineLatest([transactions$, rewardAccounts$]).pipe(
     map(([transactions, rewardAccounts]) =>
-      transactions.filter((tx) => {
-        const inspectTx = createTxInspector({
-          signedCertificates: signedCertificatesInspector(rewardAccounts, certificateTypes)
-        });
-        return inspectTx(tx).signedCertificates.length > 0;
-      })
+      transactions.filter((tx) => getCertificatesByType(tx, rewardAccounts, certificateTypes).length > 0)
     ),
     distinctUntilChanged(transactionsEquals)
   );

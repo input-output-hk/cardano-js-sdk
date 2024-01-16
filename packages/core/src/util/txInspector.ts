@@ -1,3 +1,4 @@
+import * as Cardano from '../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import {
   AssetFingerprint,
@@ -5,8 +6,6 @@ import {
   AssetName,
   Certificate,
   CertificateType,
-  HydratedTx,
-  HydratedTxIn,
   Lovelace,
   Metadatum,
   PolicyId,
@@ -17,20 +16,20 @@ import {
   StakeAddressCertificate,
   StakeDelegationCertificate,
   TokenMap,
+  Tx,
   Value
 } from '../Cardano/types';
 import { BigIntMath } from '@cardano-sdk/util';
-import { PaymentAddress, RewardAccount, inputsWithAddresses, isAddressWithin } from '../Cardano';
 import { coalesceValueQuantities } from './coalesceValueQuantities';
 import { nativeScriptPolicyId } from './nativeScript';
 import { removeNegativesFromTokenMap } from '../Asset/util';
-import { resolveInputValue } from '../Cardano/util/resolveInputValue';
 import { subtractValueQuantities } from './subtractValueQuantities';
-type Inspector<Inspection> = (tx: HydratedTx) => Inspection;
+
+type Inspector<Inspection> = (tx: Tx) => Promise<Inspection>;
 type Inspectors = { [k: string]: Inspector<unknown> };
-type TxInspector<T extends Inspectors> = (tx: HydratedTx) => {
-  [k in keyof T]: ReturnType<T[k]>;
-};
+type TxInspector<T extends Inspectors> = (tx: Tx) => Promise<{
+  [k in keyof T]: Awaited<ReturnType<T[k]>>;
+}>;
 
 // Inspection result types
 export type SendReceiveValueInspection = Value;
@@ -41,7 +40,7 @@ export type PoolRetirementInspection = PoolRetirementCertificate[];
 
 export type WithdrawalInspection = Lovelace;
 export interface SentInspection {
-  inputs: HydratedTxIn[];
+  inputs: Cardano.HydratedTxIn[];
   certificates: Certificate[];
 }
 export type SignedCertificatesInspection = Certificate[];
@@ -60,20 +59,23 @@ export type MetadataInspection = Metadatum;
 
 // Inspector types
 interface SentInspectorArgs {
-  addresses?: PaymentAddress[];
-  rewardAccounts?: RewardAccount[];
+  addresses?: Cardano.PaymentAddress[];
+  rewardAccounts?: Cardano.RewardAccount[];
+  inputResolver: Cardano.InputResolver;
 }
 export type SentInspector = (args: SentInspectorArgs) => Inspector<SentInspection>;
 export type TotalAddressInputsValueInspector = (
-  ownAddresses: PaymentAddress[],
-  getHistoricalTxs: () => HydratedTx[]
+  ownAddresses: Cardano.PaymentAddress[],
+  inputResolver: Cardano.InputResolver
 ) => Inspector<SendReceiveValueInspection>;
-export type SendReceiveValueInspector = (ownAddresses: PaymentAddress[]) => Inspector<SendReceiveValueInspection>;
+export type SendReceiveValueInspector = (
+  ownAddresses: Cardano.PaymentAddress[]
+) => Inspector<SendReceiveValueInspection>;
 export type DelegationInspector = Inspector<DelegationInspection>;
 export type StakeRegistrationInspector = Inspector<StakeRegistrationInspection>;
 export type WithdrawalInspector = Inspector<WithdrawalInspection>;
 export type SignedCertificatesInspector = (
-  rewardAccounts: RewardAccount[],
+  rewardAccounts: Cardano.RewardAccount[],
   certificateTypes?: CertificateType[]
 ) => Inspector<SignedCertificatesInspection>;
 export type AssetsMintedInspector = Inspector<AssetsMintedInspection>;
@@ -81,20 +83,67 @@ export type MetadataInspector = Inspector<MetadataInspection>;
 export type PoolRegistrationInspector = Inspector<PoolRegistrationInspection>;
 export type PoolRetirementInspector = Inspector<PoolRetirementInspection>;
 
+type ResolvedInput = {
+  id: Cardano.TransactionId;
+  index: number;
+  address: Cardano.PaymentAddress;
+  value: Value;
+};
+
+type ResolutionResult = {
+  resolvedInputs: ResolvedInput[];
+  unresolvedInputs: Cardano.TxIn[];
+};
+
+/**
+ * Resolves the value and address of a transaction input.
+ *
+ * @param txIns transaction inputs toi be resolved.
+ * @param inputResolver input resolver.
+ * @returns {ResolutionResult} resolved and unresolved inputs.
+ */
+const resolveInputs = async (
+  txIns: Cardano.TxIn[],
+  inputResolver: Cardano.InputResolver
+): Promise<ResolutionResult> => {
+  const resolvedInputs: ResolvedInput[] = [];
+  const unresolvedInputs: Cardano.TxIn[] = [];
+
+  for (const input of txIns) {
+    const resolvedInput = await inputResolver.resolveInput(input);
+
+    if (resolvedInput) {
+      resolvedInputs.push({
+        address: resolvedInput.address,
+        id: input.txId,
+        index: input.index,
+        value: resolvedInput.value
+      });
+    } else {
+      unresolvedInputs.push(input);
+    }
+  }
+
+  return {
+    resolvedInputs,
+    unresolvedInputs
+  };
+};
+
 /**
  * Inspects a transaction for values (coins + assets) in inputs
  * containing any of the provided addresses.
  *
- * @param {PaymentAddress[]} ownAddresses own wallet's addresses
- * @param {() => HydratedTx[]} getHistoricalTxs wallet's historical transactions
+ * @param ownAddresses own wallet's addresses
+ * @param inputResolver input resolver.
  * @returns {Value} total value in inputs
  */
 export const totalAddressInputsValueInspector: TotalAddressInputsValueInspector =
-  (ownAddresses, getHistoricalTxs) => (tx) => {
-    const receivedInputs = tx.body.inputs.filter((input) => isAddressWithin(ownAddresses)(input));
-    const receivedInputsValues = receivedInputs
-      .map((input) => resolveInputValue(input, getHistoricalTxs()))
-      .filter((value): value is Value => !!value);
+  (ownAddresses, inputResolver) => async (tx) => {
+    const { resolvedInputs } = await resolveInputs(tx.body.inputs, inputResolver);
+
+    const receivedInputs = resolvedInputs.filter((input) => Cardano.isAddressWithin(ownAddresses)(input));
+    const receivedInputsValues = receivedInputs.map((input) => input.value);
 
     return coalesceValueQuantities(receivedInputsValues);
   };
@@ -103,38 +152,52 @@ export const totalAddressInputsValueInspector: TotalAddressInputsValueInspector 
  * Inspects a transaction for values (coins + assets) in outputs
  * containing any of the provided addresses.
  *
- * @param {PaymentAddress[]} ownAddresses own wallet's addresses
+ * @param ownAddresses own wallet's addresses
  * @returns {Value} total value in outputs
  */
-export const totalAddressOutputsValueInspector: SendReceiveValueInspector = (ownAddresses) => (tx) => {
-  const receivedOutputs = tx.body.outputs.filter((out) => isAddressWithin(ownAddresses)(out));
+export const totalAddressOutputsValueInspector: SendReceiveValueInspector = (ownAddresses) => async (tx) => {
+  const receivedOutputs = tx.body.outputs.filter((out) => Cardano.isAddressWithin(ownAddresses)(out));
   return coalesceValueQuantities(receivedOutputs.map((output) => output.value));
+};
+
+/**
+ * Gets all certificates on the transaction that match the given reward accounts and certificate types.
+ *
+ * @param tx transaction to inspect
+ * @param rewardAccounts reward accounts to match
+ * @param certificateTypes certificate types to match
+ */
+export const getCertificatesByType = (
+  tx: Tx,
+  rewardAccounts: Cardano.RewardAccount[],
+  certificateTypes?: CertificateType[]
+) => {
+  if (!tx.body.certificates || tx.body.certificates.length === 0) return [];
+  const certificates = certificateTypes
+    ? tx.body.certificates?.filter((certificate) => certificateTypes.includes(certificate.__typename))
+    : tx.body.certificates;
+
+  return certificates.filter((certificate) => {
+    if ('stakeCredential' in certificate && certificate.stakeCredential) {
+      const credHash = Crypto.Ed25519KeyHashHex(certificate.stakeCredential.hash);
+      return rewardAccounts.some((account) => Cardano.RewardAccount.toHash(account) === credHash);
+    }
+
+    if ('poolParameters' in certificate) return rewardAccounts.includes(certificate.poolParameters.rewardAccount);
+    return false;
+  });
 };
 
 /**
  * Inspects a transaction for certificates signed with the reward accounts provided.
  * Is possible to specify the types of certificates to be taken into account
  *
- * @param {RewardAccount[]} rewardAccounts array of reward accounts that might have signed certificates
+ * @param rewardAccounts array of reward accounts that might have signed certificates
  * @param {CertificateType[]} [certificateTypes] certificates of these types will be checked. All if not provided
  */
 export const signedCertificatesInspector: SignedCertificatesInspector =
-  (rewardAccounts: RewardAccount[], certificateTypes?: CertificateType[]) => (tx) => {
-    if (!tx.body.certificates || tx.body.certificates.length === 0) return [];
-    const certificates = certificateTypes
-      ? tx.body.certificates?.filter((certificate) => certificateTypes.includes(certificate.__typename))
-      : tx.body.certificates;
-
-    return certificates.filter((certificate) => {
-      if ('stakeCredential' in certificate && certificate.stakeCredential) {
-        const credHash = Crypto.Ed25519KeyHashHex(certificate.stakeCredential.hash);
-        return rewardAccounts.some((account) => RewardAccount.toHash(account) === credHash);
-      }
-
-      if ('poolParameters' in certificate) return rewardAccounts.includes(certificate.poolParameters.rewardAccount);
-      return false;
-    });
-  };
+  (rewardAccounts: Cardano.RewardAccount[], certificateTypes?: CertificateType[]) => async (tx) =>
+    getCertificatesByType(tx, rewardAccounts, certificateTypes);
 
 /**
  * Inspects a transaction to see if any of the addresses provided are included in a transaction input
@@ -144,24 +207,36 @@ export const signedCertificatesInspector: SignedCertificatesInspector =
  * @returns {SentInspection} certificates and inputs that include the addresses or reward accounts
  */
 export const sentInspector: SentInspector =
-  ({ addresses, rewardAccounts }) =>
-  (tx) => ({
-    certificates: rewardAccounts?.length ? signedCertificatesInspector(rewardAccounts)(tx) : [],
-    inputs: addresses?.length ? inputsWithAddresses(tx, addresses) : []
-  });
+  ({ addresses, rewardAccounts, inputResolver }) =>
+  async (tx) => {
+    const certificates = rewardAccounts?.length ? await signedCertificatesInspector(rewardAccounts)(tx) : [];
+    let inputs: Cardano.HydratedTxIn[] = [];
+
+    if (addresses) {
+      const { resolvedInputs } = await resolveInputs(tx.body.inputs, inputResolver);
+      const sentInputs = resolvedInputs.filter((input) => Cardano.isAddressWithin(addresses)(input));
+      inputs = sentInputs.map((input) => ({ address: input.address, index: input.index, txId: input.id }));
+    }
+
+    return {
+      certificates,
+      inputs
+    };
+  };
 
 /**
  * Inspects a transaction for net value (coins + assets) sent by the provided addresses.
  *
- * @param {PaymentAddress[]} ownAddresses own wallet's addresses
- * @param historicalTxs A list of historical transaction
+ * @param ownAddresses own wallet's addresses
+ * @param inputResolver input resolver.
  * @returns {Value} net value sent
  */
-export const valueSentInspector: TotalAddressInputsValueInspector = (ownAddresses, historicalTxs) => (tx) => {
+export const valueSentInspector: TotalAddressInputsValueInspector = (ownAddresses, inputResolver) => async (tx) => {
   let assets: TokenMap = new Map();
-  if (sentInspector({ addresses: ownAddresses })(tx).inputs.length === 0) return { coins: 0n };
-  const totalOutputValue = totalAddressOutputsValueInspector(ownAddresses)(tx);
-  const totalInputValue = totalAddressInputsValueInspector(ownAddresses, historicalTxs)(tx);
+  if ((await sentInspector({ addresses: ownAddresses, inputResolver })(tx)).inputs.length === 0) return { coins: 0n };
+
+  const totalOutputValue = await totalAddressOutputsValueInspector(ownAddresses)(tx);
+  const totalInputValue = await totalAddressInputsValueInspector(ownAddresses, inputResolver)(tx);
   const diff = subtractValueQuantities([totalInputValue, totalOutputValue]);
 
   if (diff.assets) assets = removeNegativesFromTokenMap(diff.assets);
@@ -174,14 +249,14 @@ export const valueSentInspector: TotalAddressInputsValueInspector = (ownAddresse
 /**
  * Inspects a transaction for net value (coins + assets) received by the provided addresses.
  *
- * @param {PaymentAddress[]} ownAddresses own wallet's addresses
- * @param historicalTxs A list of historical transaction
+ * @param ownAddresses own wallet's addresses
+ * @param inputResolver A list of historical transaction
  * @returns {Value} net value received
  */
-export const valueReceivedInspector: TotalAddressInputsValueInspector = (ownAddresses, historicalTxs) => (tx) => {
+export const valueReceivedInspector: TotalAddressInputsValueInspector = (ownAddresses, inputResolver) => async (tx) => {
   let assets: TokenMap = new Map();
-  const totalOutputValue = totalAddressOutputsValueInspector(ownAddresses)(tx);
-  const totalInputValue = totalAddressInputsValueInspector(ownAddresses, historicalTxs)(tx);
+  const totalOutputValue = await totalAddressOutputsValueInspector(ownAddresses)(tx);
+  const totalInputValue = await totalAddressInputsValueInspector(ownAddresses, inputResolver)(tx);
   const diff = subtractValueQuantities([totalOutputValue, totalInputValue]);
 
   if (diff.assets) assets = removeNegativesFromTokenMap(diff.assets);
@@ -202,13 +277,13 @@ const certificateInspector =
   >(
     type: CertificateType
   ): Inspector<T> =>
-  (tx) =>
+  async (tx) =>
     (tx.body.certificates?.filter((cert) => cert.__typename === type) as T) ?? [];
 
 /**
  * Inspects a transaction for a stake delegation certificate.
  *
- * @param {HydratedTx} tx transaction to inspect
+ * @param  tx transaction to inspect
  * @returns {DelegationInspection} array of delegation certificates
  */
 export const delegationInspector: DelegationInspector = certificateInspector<DelegationInspection>(
@@ -218,7 +293,7 @@ export const delegationInspector: DelegationInspector = certificateInspector<Del
 /**
  * Inspects a transaction for a stake key deregistration certificate.
  *
- * @param {HydratedTx} tx transaction to inspect
+ * @param  tx transaction to inspect
  * @returns {StakeRegistrationInspection} array of stake key deregistration certificates
  */
 export const stakeKeyDeregistrationInspector: StakeRegistrationInspector =
@@ -227,7 +302,7 @@ export const stakeKeyDeregistrationInspector: StakeRegistrationInspector =
 /**
  * Inspects a transaction for a stake key registration certificate.
  *
- * @param {HydratedTx} tx transaction to inspect
+ * @param  tx transaction to inspect
  * @returns {StakeRegistrationInspection} array of stake key registration certificates
  */
 export const stakeKeyRegistrationInspector: StakeRegistrationInspector =
@@ -236,7 +311,7 @@ export const stakeKeyRegistrationInspector: StakeRegistrationInspector =
 /**
  * Inspects a transaction for pool registration certificates.
  *
- * @param {HydratedTx} tx transaction to inspect.
+ * @param  tx transaction to inspect.
  * @returns {PoolRegistrationInspection} array of pool registration certificates.
  */
 export const poolRegistrationInspector: PoolRegistrationInspector = certificateInspector<PoolRegistrationInspection>(
@@ -246,7 +321,7 @@ export const poolRegistrationInspector: PoolRegistrationInspector = certificateI
 /**
  * Inspects a transaction for pool retirement certificates.
  *
- * @param {HydratedTx} tx transaction to inspect.
+ * @param  tx transaction to inspect.
  * @returns {PoolRetirementInspection} array of pool retirement certificates.
  */
 export const poolRetirementInspector: PoolRetirementInspector = certificateInspector<PoolRetirementInspection>(
@@ -256,10 +331,10 @@ export const poolRetirementInspector: PoolRetirementInspector = certificateInspe
 /**
  * Inspects a transaction for withdrawals.
  *
- * @param {HydratedTx} tx transaction to inspect
+ * @param  tx transaction to inspect
  * @returns {WithdrawalInspection} accumulated withdrawal quantities
  */
-export const withdrawalInspector: WithdrawalInspector = (tx) =>
+export const withdrawalInspector: WithdrawalInspector = async (tx) =>
   tx.body.withdrawals?.length ? BigIntMath.sum(tx.body.withdrawals.map(({ quantity }) => quantity)) : 0n;
 
 /**
@@ -280,7 +355,7 @@ export interface MatchQuantityCriteria {
  */
 export const mintInspector =
   (matchQuantityCriteria: MatchQuantityCriteria): AssetsMintedInspector =>
-  (tx) => {
+  async (tx) => {
     const assets: AssetsMintedInspection = [];
     const scriptMap = new Map();
 
@@ -332,9 +407,9 @@ export const assetsBurnedInspector: AssetsMintedInspector = mintInspector((quant
 /**
  * Inspects a transaction for its metadata.
  *
- * @param {HydratedTx} tx transaction to inspect.
+ * @param  tx transaction to inspect.
  */
-export const metadataInspector: MetadataInspector = (tx) => tx.auxiliaryData?.blob ?? new Map();
+export const metadataInspector: MetadataInspector = async (tx) => tx.auxiliaryData?.blob ?? new Map();
 
 /**
  * Returns a function to convert lower level transaction data to a higher level object, using the provided inspectors.
@@ -343,14 +418,16 @@ export const metadataInspector: MetadataInspector = (tx) => tx.auxiliaryData?.bl
  */
 export const createTxInspector =
   <T extends Inspectors>(inspectors: T): TxInspector<T> =>
-  (tx) =>
-    Object.keys(inspectors).reduce(
-      (result, key) => {
-        const inspector = inspectors[key];
-        result[key as keyof T] = inspector(tx) as ReturnType<T[keyof T]>;
-        return result;
-      },
-      {} as {
-        [k in keyof T]: ReturnType<T[k]>;
-      }
+  async (tx) => {
+    const results = await Promise.all(
+      Object.entries(inspectors).map(async ([key, inspector]) => {
+        const result = await inspector(tx);
+        return { key, result };
+      })
     );
+
+    return results.reduce((acc, { key, result }) => {
+      acc[key as keyof T] = result as Awaited<ReturnType<T[keyof T]>>;
+      return acc;
+    }, {} as { [K in keyof T]: Awaited<ReturnType<T[K]>> });
+  };
