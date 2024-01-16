@@ -97,6 +97,10 @@ services:
       - ./local-network/config/network:/config
       - sdk-ipc:/sdk-ipc
 
+  stake-pool-projector:
+    environment:
+      METADATA_JOB_RETRY_DELAY: 60
+
 volumes:
   sdk-ipc:
     driver: local
