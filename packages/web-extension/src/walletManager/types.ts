@@ -18,17 +18,24 @@ export type Bip32WalletAccount<Metadata extends {}> = {
   metadata: Metadata;
 };
 
-export type Bip32Wallet<Metadata extends {}> = {
+export type Bip32Wallet<WalletMetadata extends {}, AccountMetadata extends {}> = {
   walletId: WalletId;
   extendedAccountPublicKey: Bip32PublicKeyHex;
-  accounts: Bip32WalletAccount<Metadata>[];
+  metadata: WalletMetadata;
+  accounts: Bip32WalletAccount<AccountMetadata>[];
 };
 
-export type HardwareWallet<Metadata extends {}> = Bip32Wallet<Metadata> & {
+export type HardwareWallet<WalletMetadata extends {}, AccountMetadata extends {}> = Bip32Wallet<
+  WalletMetadata,
+  AccountMetadata
+> & {
   type: WalletType.Ledger | WalletType.Trezor;
 };
 
-export type InMemoryWallet<Metadata extends {}> = Bip32Wallet<Metadata> & {
+export type InMemoryWallet<WalletMetadata extends {}, AccountMetadata extends {}> = Bip32Wallet<
+  WalletMetadata,
+  AccountMetadata
+> & {
   type: WalletType.InMemory;
   encryptedSecrets: {
     /**
@@ -41,7 +48,9 @@ export type InMemoryWallet<Metadata extends {}> = Bip32Wallet<Metadata> & {
   };
 };
 
-export type AnyBip32Wallet<WalletMetadata extends {}> = HardwareWallet<WalletMetadata> | InMemoryWallet<WalletMetadata>;
+export type AnyBip32Wallet<WalletMetadata extends {}, AccountMetadata extends {}> =
+  | HardwareWallet<WalletMetadata, AccountMetadata>
+  | InMemoryWallet<WalletMetadata, AccountMetadata>;
 
 export type OwnSignerAccount = {
   walletId: WalletId;
@@ -57,7 +66,7 @@ export type ScriptWallet<Metadata extends {}> = {
   ownSigners: OwnSignerAccount[];
 };
 
-export type AnyWallet<Metadata extends {}> =
-  | HardwareWallet<Metadata>
-  | InMemoryWallet<Metadata>
-  | ScriptWallet<Metadata>;
+export type AnyWallet<WalletMetadata extends {}, AccountMetadata extends {}> =
+  | HardwareWallet<WalletMetadata, AccountMetadata>
+  | InMemoryWallet<WalletMetadata, AccountMetadata>
+  | ScriptWallet<WalletMetadata>;

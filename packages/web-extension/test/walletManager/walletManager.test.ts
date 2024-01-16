@@ -21,6 +21,9 @@ import { TimeoutError, filter, firstValueFrom, from, timeout } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 import pick from 'lodash/pick';
 
+type WalletMetadata = { name: string };
+type AccountMetadata = { name: string };
+
 jest.mock('../../src/messaging', () => {
   const originalModule = jest.requireActual('../../src/messaging');
   return {
@@ -62,11 +65,12 @@ describe('WalletManagerWorker', () => {
   let walletId: WalletId;
   let chainId: Cardano.ChainId;
   let managerStorage: Storage.StorageArea;
-  let walletManager: WalletManager<any>;
+  let walletManager: WalletManager<WalletMetadata, AccountMetadata>;
   let walletFactoryCreate: jest.Mock;
   let mockWallet: ObservableWallet;
   const runtime: MinimalRuntime = { connect: jest.fn(), onConnect: jest.fn() as any };
-  const walletProps: AddWalletProps<{}> = {
+
+  const walletProps: AddWalletProps<WalletMetadata, AccountMetadata> = {
     encryptedSecrets: {
       keyMaterial: HexBlob('f07e8b397c93a16c06f83c8f0c1a1866477c6090926445fc0cb1201228ace6e9'),
       rootPrivateKeyBytes: HexBlob(
@@ -76,6 +80,7 @@ describe('WalletManagerWorker', () => {
       )
     },
     extendedAccountPublicKey: pubKey,
+    metadata: { name: 'test' },
     type: WalletType.InMemory
   };
 
@@ -92,8 +97,8 @@ describe('WalletManagerWorker', () => {
 
   const createWalletManager = async (params?: { mockStorage?: Storage.StorageArea; destroyTracker?: string[] }) => {
     const signingCoordinatorApi = { shutdown: jest.fn(), signData: jest.fn(), signTransaction: jest.fn() };
-    const walletFactory: WalletFactory<{ name: string }> = { create: walletFactoryCreate };
-    const walletRepository = new WalletRepository<{ name: string }>({
+    const walletFactory: WalletFactory<WalletMetadata, AccountMetadata> = { create: walletFactoryCreate };
+    const walletRepository = new WalletRepository<WalletMetadata, AccountMetadata>({
       logger,
       store: new storage.InMemoryCollectionStore()
     });
@@ -103,7 +108,7 @@ describe('WalletManagerWorker', () => {
     for (let i = 0; i < 4; i++) {
       await walletRepository.addAccount({
         accountIndex: i,
-        metadata: { name: 'Wallet #0' },
+        metadata: { name: 'Account #0' },
         walletId: id
       });
     }
@@ -119,7 +124,7 @@ describe('WalletManagerWorker', () => {
       type: WalletType.Script
     });
 
-    return new WalletManager<{ name: string }>(
+    return new WalletManager<WalletMetadata, AccountMetadata>(
       { name: 'lace' },
       {
         logger,

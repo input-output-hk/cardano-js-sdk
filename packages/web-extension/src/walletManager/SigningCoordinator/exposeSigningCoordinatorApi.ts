@@ -5,7 +5,7 @@ import { signingCoordinatorApiChannel, signingCoordinatorApiProperties } from '.
 
 export interface ExposeSigningCoordinatorProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  signingCoordinator: SigningCoordinatorSignApi<any>;
+  signingCoordinator: SigningCoordinatorSignApi<any, any>;
 }
 
 export const exposeSigningCoordinatorApi = (

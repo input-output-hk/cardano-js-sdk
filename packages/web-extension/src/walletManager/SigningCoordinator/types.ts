@@ -10,14 +10,14 @@ import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { Observable } from 'rxjs';
 
-export type RequestContext<WalletMetadata extends {}> = {
-  wallet: AnyBip32Wallet<WalletMetadata>;
+export type RequestContext<WalletMetadata extends {}, AccountMetadata extends {}> = {
+  wallet: AnyBip32Wallet<WalletMetadata, AccountMetadata>;
   accountIndex: number;
   chainId: Cardano.ChainId;
 };
 
-export type RequestBase<WalletMetadata extends {}> = {
-  requestContext: RequestContext<WalletMetadata>;
+export type RequestBase<WalletMetadata extends {}, AccountMetadata extends {}> = {
+  requestContext: RequestContext<WalletMetadata, AccountMetadata>;
   reject(reason: string): Promise<void>;
 };
 
@@ -47,7 +47,10 @@ type SignRequestHardware<R> = {
 
 export type SignRequest<R> = SignRequestHardware<R> | SignRequestInMemory<R>;
 
-export type TransactionWitnessRequest<WalletMetadata extends {}> = RequestBase<WalletMetadata> & {
+export type TransactionWitnessRequest<WalletMetadata extends {}, AccountMetadata extends {}> = RequestBase<
+  WalletMetadata,
+  AccountMetadata
+> & {
   transaction: Serialization.Transaction;
   signContext: SignTransactionContext;
 } & SignRequest<Cardano.Signatures>;
@@ -58,7 +61,10 @@ export type SignDataProps = {
   signContext: SignDataContext;
 };
 
-export type SignDataRequest<WalletMetadata extends {}> = RequestBase<WalletMetadata> &
+export type SignDataRequest<WalletMetadata extends {}, AccountMetadata extends {}> = RequestBase<
+  WalletMetadata,
+  AccountMetadata
+> &
   SignDataProps &
   SignRequest<SignBlobResult>;
 
@@ -68,15 +74,18 @@ export type SignTransactionProps = {
   options?: SignTransactionOptions;
 };
 
-export interface SigningCoordinatorConfirmationApi<WalletMetadata extends {}> {
-  transactionWitnessRequest$: Observable<TransactionWitnessRequest<WalletMetadata>>;
-  signDataRequest$: Observable<SignDataRequest<WalletMetadata>>;
+export interface SigningCoordinatorConfirmationApi<WalletMetadata extends {}, AccountMetadata extends {}> {
+  transactionWitnessRequest$: Observable<TransactionWitnessRequest<WalletMetadata, AccountMetadata>>;
+  signDataRequest$: Observable<SignDataRequest<WalletMetadata, AccountMetadata>>;
 }
 
-export interface SigningCoordinatorSignApi<WalletMetadata extends {}> {
+export interface SigningCoordinatorSignApi<WalletMetadata extends {}, AccountMetadata extends {}> {
   signTransaction(
     props: SignTransactionProps,
-    requestContext: RequestContext<WalletMetadata>
+    requestContext: RequestContext<WalletMetadata, AccountMetadata>
   ): Promise<Cardano.Signatures>;
-  signData(props: SignDataProps, requestContext: RequestContext<WalletMetadata>): Promise<SignBlobResult>;
+  signData(
+    props: SignDataProps,
+    requestContext: RequestContext<WalletMetadata, AccountMetadata>
+  ): Promise<SignBlobResult>;
 }

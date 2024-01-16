@@ -62,11 +62,13 @@ const bubbleResolveReject = async <R>(
   }
 };
 
-export class SigningCoordinator<WalletMetadata extends {}>
-  implements SigningCoordinatorConfirmationApi<WalletMetadata>, SigningCoordinatorSignApi<WalletMetadata>
+export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata extends {}>
+  implements
+    SigningCoordinatorConfirmationApi<WalletMetadata, AccountMetadata>,
+    SigningCoordinatorSignApi<WalletMetadata, AccountMetadata>
 {
-  readonly transactionWitnessRequest$ = new Subject<TransactionWitnessRequest<WalletMetadata>>();
-  readonly signDataRequest$ = new Subject<SignDataRequest<WalletMetadata>>();
+  readonly transactionWitnessRequest$ = new Subject<TransactionWitnessRequest<WalletMetadata, AccountMetadata>>();
+  readonly signDataRequest$ = new Subject<SignDataRequest<WalletMetadata, AccountMetadata>>();
   readonly #hwOptions: HardwareKeyAgentOptions;
   readonly #keyAgentFactory: KeyAgentFactory;
 
@@ -77,7 +79,7 @@ export class SigningCoordinator<WalletMetadata extends {}>
 
   async signTransaction(
     { tx, signContext, options }: SignTransactionProps,
-    requestContext: RequestContext<WalletMetadata>
+    requestContext: RequestContext<WalletMetadata, AccountMetadata>
   ): Promise<Cardano.Signatures> {
     const transaction = Serialization.Transaction.fromCbor(tx);
     return this.#signRequest(
@@ -100,7 +102,10 @@ export class SigningCoordinator<WalletMetadata extends {}>
     );
   }
 
-  async signData(props: SignDataProps, requestContext: RequestContext<WalletMetadata>): Promise<SignBlobResult> {
+  async signData(
+    props: SignDataProps,
+    requestContext: RequestContext<WalletMetadata, AccountMetadata>
+  ): Promise<SignBlobResult> {
     return this.#signRequest(
       this.signDataRequest$,
       {
@@ -112,7 +117,7 @@ export class SigningCoordinator<WalletMetadata extends {}>
     );
   }
 
-  #signRequest<R, Req extends RequestBase<WalletMetadata> & SignRequest<R>>(
+  #signRequest<R, Req extends RequestBase<WalletMetadata, AccountMetadata> & SignRequest<R>>(
     emitter$: Subject<Req>,
     request: Omit<Req, 'reject' | 'sign'>,
     sign: (keyAgent: KeyAgent) => Promise<R>
@@ -140,7 +145,7 @@ export class SigningCoordinator<WalletMetadata extends {}>
               sign: async (passphrase: Uint8Array, options?: SignOptions) =>
                 bubbleResolveReject(
                   async () => {
-                    const wallet = request.requestContext.wallet as InMemoryWallet<WalletMetadata>;
+                    const wallet = request.requestContext.wallet as InMemoryWallet<WalletMetadata, AccountMetadata>;
                     try {
                       const result = await sign(
                         this.#keyAgentFactory.InMemory({
