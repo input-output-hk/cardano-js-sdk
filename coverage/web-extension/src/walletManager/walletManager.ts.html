@@ -392,7 +392,12 @@
 <a name='L327'></a><a href='#L327'>327</a>
 <a name='L328'></a><a href='#L328'>328</a>
 <a name='L329'></a><a href='#L329'>329</a>
-<a name='L330'></a><a href='#L330'>330</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -448,7 +453,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-yes">25x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -752,7 +762,7 @@ import { WalletRepository } from './WalletRepository';
  * @param wallet The wallet to check.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const isAnyBip32Wallet = (wallet: AnyWallet&lt;any&gt;): wallet is AnyBip32Wallet&lt;any&gt; =&gt;
+const isAnyBip32Wallet = (wallet: AnyWallet&lt;any, any&gt;): wallet is AnyBip32Wallet&lt;any, any&gt; =&gt;
   wallet.type === WalletType.InMemory || wallet.type === WalletType.Ledger || wallet.type === WalletType.Trezor;
 &nbsp;
 export const getWalletStoreId = (walletId: WalletId, chainId: Cardano.ChainId, accountIndex?: number): string =&gt; {
@@ -764,12 +774,15 @@ export const getWalletStoreId = (walletId: WalletId, chainId: Cardano.ChainId, a
   return `${chainId.networkId}-${chainId.networkMagic}-${walletId}`;
 };
 &nbsp;
-export interface WalletManagerDependencies&lt;Metadata extends { name: string }&gt; {
-  walletFactory: WalletFactory&lt;Metadata&gt;;
+export interface WalletManagerDependencies&lt;
+  WalletMetadata extends { name: string },
+  AccountMetadata extends { name: string }
+&gt; {
+  walletFactory: WalletFactory&lt;WalletMetadata, AccountMetadata&gt;;
   storesFactory: StoresFactory;
   managerStorage: Storage.StorageArea;
-  walletRepository: WalletRepository&lt;Metadata&gt;;
-  signingCoordinatorApi: SigningCoordinatorSignApi&lt;Metadata&gt;;
+  walletRepository: WalletRepository&lt;WalletMetadata, AccountMetadata&gt;;
+  signingCoordinatorApi: SigningCoordinatorSignApi&lt;WalletMetadata, AccountMetadata&gt;;
 }
 &nbsp;
 /**
@@ -777,16 +790,18 @@ export interface WalletManagerDependencies&lt;Metadata extends { name: string }&
  * Uses wallet and store factories to create wallets.
  * Keeps track of created stores and reuses them when a wallet is reactivated.
  */
-export class WalletManager&lt;Metadata extends { name: string }&gt; implements WalletManagerApi {
+export class WalletManager&lt;WalletMetadata extends { name: string }, AccountMetadata extends { name: string }&gt;
+  implements WalletManagerApi
+{
   activeWalletId$ = new ReplaySubject&lt;WalletManagerActivateProps | null&gt;(1);
   activeWallet$ = new BehaviorSubject&lt;ObservableWallet | null&gt;(null);
 &nbsp;
   #activeWalletProps: WalletManagerActivateProps | null = null;
   #walletStores = new Map&lt;string, storage.WalletStores&gt;();
-  #walletFactory: WalletFactory&lt;Metadata&gt;;
+  #walletFactory: WalletFactory&lt;WalletMetadata, AccountMetadata&gt;;
   #storesFactory: StoresFactory;
-  #walletRepository: WalletRepository&lt;Metadata&gt;;
-  #signingCoordinatorApi: SigningCoordinatorSignApi&lt;Metadata&gt;;
+  #walletRepository: WalletRepository&lt;WalletMetadata, AccountMetadata&gt;;
+  #signingCoordinatorApi: SigningCoordinatorSignApi&lt;WalletMetadata, AccountMetadata&gt;;
   #logger: Logger;
   #managerStorageKey: string;
   #managerStorage: Storage.StorageArea;
@@ -800,7 +815,7 @@ export class WalletManager&lt;Metadata extends { name: string }&gt; implements W
       managerStorage,
       walletRepository,
       signingCoordinatorApi
-    }: MessengerDependencies &amp; WalletManagerDependencies&lt;Metadata&gt;
+    }: MessengerDependencies &amp; WalletManagerDependencies&lt;WalletMetadata, AccountMetadata&gt;
   ) {
     this.#walletRepository = walletRepository;
 &nbsp;
@@ -1001,7 +1016,7 @@ export class WalletManager&lt;Metadata extends { name: string }&gt; implements W
    * @private
    */
   #buildWitnesser(
-    wallet: AnyWallet&lt;Metadata&gt;,
+    wallet: AnyWallet&lt;WalletMetadata, AccountMetadata&gt;,
     _walletId: WalletId,
     chainId: Cardano.ChainId,
     accountIndex?: number
@@ -1057,7 +1072,7 @@ export class WalletManager&lt;Metadata extends { name: string }&gt; implements W
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-01-17T17:01:12.109Z
+                at 2024-01-17T17:38:14.819Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

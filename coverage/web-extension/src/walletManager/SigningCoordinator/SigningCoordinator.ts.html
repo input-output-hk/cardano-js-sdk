@@ -260,8 +260,11 @@
 <a name='L195'></a><a href='#L195'>195</a>
 <a name='L196'></a><a href='#L196'>196</a>
 <a name='L197'></a><a href='#L197'>197</a>
-<a name='L198'></a><a href='#L198'>198</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
@@ -328,6 +331,8 @@
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-yes">15x</span>
@@ -364,6 +369,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -457,8 +465,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/* eslint-disable brace-style */
-import { Cardano, Serialization } from '@cardano-sdk/core';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Cardano, Serialization } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 import { InMemoryWallet, WalletType } from '../types';
 import { KeyAgent, SignBlobResult, TrezorConfig, errors } from '@cardano-sdk/key-management';
@@ -522,11 +529,13 @@ const bubbleResolveReject = async &lt;R&gt;(
   }
 };
 &nbsp;
-export class SigningCoordinator&lt;WalletMetadata extends {}&gt;
-  implements SigningCoordinatorConfirmationApi&lt;WalletMetadata&gt;, SigningCoordinatorSignApi&lt;WalletMetadata&gt;
+export class SigningCoordinator&lt;WalletMetadata extends {}, AccountMetadata extends {}&gt;
+  implements
+    SigningCoordinatorConfirmationApi&lt;WalletMetadata, AccountMetadata&gt;,
+    SigningCoordinatorSignApi&lt;WalletMetadata, AccountMetadata&gt;
 {
-  readonly transactionWitnessRequest$ = new Subject&lt;TransactionWitnessRequest&lt;WalletMetadata&gt;&gt;();
-  readonly signDataRequest$ = new Subject&lt;SignDataRequest&lt;WalletMetadata&gt;&gt;();
+  readonly transactionWitnessRequest$ = new Subject&lt;TransactionWitnessRequest&lt;WalletMetadata, AccountMetadata&gt;&gt;();
+  readonly signDataRequest$ = new Subject&lt;SignDataRequest&lt;WalletMetadata, AccountMetadata&gt;&gt;();
   readonly #hwOptions: HardwareKeyAgentOptions;
   readonly #keyAgentFactory: KeyAgentFactory;
 &nbsp;
@@ -537,7 +546,7 @@ export class SigningCoordinator&lt;WalletMetadata extends {}&gt;
 &nbsp;
   async signTransaction(
     { tx, signContext, options }: SignTransactionProps,
-    requestContext: RequestContext&lt;WalletMetadata&gt;
+    requestContext: RequestContext&lt;WalletMetadata, AccountMetadata&gt;
   ): Promise&lt;Cardano.Signatures&gt; {
     const transaction = Serialization.Transaction.fromCbor(tx);
     return this.#signRequest(
@@ -560,7 +569,10 @@ export class SigningCoordinator&lt;WalletMetadata extends {}&gt;
     );
   }
 &nbsp;
-  async signData(props: SignDataProps, requestContext: RequestContext&lt;WalletMetadata&gt;): Promise&lt;SignBlobResult&gt; {
+  async signData(
+    props: SignDataProps,
+    requestContext: RequestContext&lt;WalletMetadata, AccountMetadata&gt;
+  ): Promise&lt;SignBlobResult&gt; {
     return this.#signRequest(
       this.signDataRequest$,
       {
@@ -572,7 +584,7 @@ export class SigningCoordinator&lt;WalletMetadata extends {}&gt;
     );
   }
 &nbsp;
-  #signRequest&lt;R, Req extends RequestBase&lt;WalletMetadata&gt; &amp; SignRequest&lt;R&gt;&gt;(
+  #signRequest&lt;R, Req extends RequestBase&lt;WalletMetadata, AccountMetadata&gt; &amp; SignRequest&lt;R&gt;&gt;(
     emitter$: Subject&lt;Req&gt;,
     request: Omit&lt;Req, 'reject' | 'sign'&gt;,
     sign: (keyAgent: KeyAgent) =&gt; Promise&lt;R&gt;
@@ -600,7 +612,7 @@ export class SigningCoordinator&lt;WalletMetadata extends {}&gt;
               sign: async (passphrase: Uint8Array, options?: SignOptions) =&gt;
                 bubbleResolveReject(
                   async () =&gt; {
-                    const wallet = request.requestContext.wallet as InMemoryWallet&lt;WalletMetadata&gt;;
+                    const wallet = request.requestContext.wallet as InMemoryWallet&lt;WalletMetadata, AccountMetadata&gt;;
                     try {
                       const result = await sign(
                         this.#keyAgentFactory.InMemory({
@@ -661,7 +673,7 @@ export class SigningCoordinator&lt;WalletMetadata extends {}&gt;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-01-17T17:01:12.109Z
+                at 2024-01-17T17:38:14.819Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
