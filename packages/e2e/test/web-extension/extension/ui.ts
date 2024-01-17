@@ -318,6 +318,7 @@ const createWalletIfNotExistsAndActivate = async (accountIndex: number) => {
         rootPrivateKeyBytes: HexBlob.fromBytes(new Uint8Array(encryptedRootPrivateKey))
       },
       extendedAccountPublicKey: keyAgent.serializableData.extendedAccountPublicKey,
+      metadata: {},
       type: WalletType.InMemory
     });
     await repository.addAccount({

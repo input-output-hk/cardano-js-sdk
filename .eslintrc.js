@@ -22,6 +22,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
     // needed for inference from type guards
     '@typescript-eslint/no-var-requires': 0,
+    'brace-style': 0, // collides with prettier formatting
     // typescript checks return types
     camelcase: 0,
     'consistent-return': 0,

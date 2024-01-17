@@ -82,10 +82,10 @@ export interface WalletManagerApi {
   destroyData(walletId: WalletId, chainId: Cardano.ChainId): Promise<void>;
 }
 
-export interface WalletFactory<Metadata extends { name: string }> {
+export interface WalletFactory<WalletMetadata extends { name: string }, AccountMetadata extends { name: string }> {
   create: (
     props: WalletManagerActivateProps,
-    wallet: AnyWallet<Metadata>,
+    wallet: AnyWallet<WalletMetadata, AccountMetadata>,
     dependencies: { witnesser: Witnesser; stores: storage.WalletStores }
   ) => Promise<ObservableWallet>;
 }

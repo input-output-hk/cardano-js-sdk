@@ -141,11 +141,12 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const walletRepositoryProperties: RemoteApiProperties<WalletRepository<any>> = {
+export const walletRepositoryProperties: RemoteApiProperties<WalletRepository<any, any>> = {
   addAccount: RemoteApiPropertyType.MethodReturningPromise,
   addWallet: RemoteApiPropertyType.MethodReturningPromise,
   removeAccount: RemoteApiPropertyType.MethodReturningPromise,
   removeWallet: RemoteApiPropertyType.MethodReturningPromise,
-  updateMetadata: RemoteApiPropertyType.MethodReturningPromise,
+  updateAccountMetadata: RemoteApiPropertyType.MethodReturningPromise,
+  updateWalletMetadata: RemoteApiPropertyType.MethodReturningPromise,
   wallets$: RemoteApiPropertyType.HotObservable
 };

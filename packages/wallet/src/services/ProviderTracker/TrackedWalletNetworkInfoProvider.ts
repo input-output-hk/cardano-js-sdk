@@ -1,4 +1,3 @@
-/* eslint-disable brace-style */
 import { BehaviorSubject } from 'rxjs';
 import { CLEAN_FN_STATS, ProviderFnStats, ProviderTracker } from './ProviderTracker';
 import { WalletNetworkInfoProvider } from '../../types';

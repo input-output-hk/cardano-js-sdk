@@ -29,7 +29,7 @@ import { WalletRepository } from './WalletRepository';
  * @param wallet The wallet to check.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const isAnyBip32Wallet = (wallet: AnyWallet<any>): wallet is AnyBip32Wallet<any> =>
+const isAnyBip32Wallet = (wallet: AnyWallet<any, any>): wallet is AnyBip32Wallet<any, any> =>
   wallet.type === WalletType.InMemory || wallet.type === WalletType.Ledger || wallet.type === WalletType.Trezor;
 
 export const getWalletStoreId = (walletId: WalletId, chainId: Cardano.ChainId, accountIndex?: number): string => {
@@ -41,12 +41,15 @@ export const getWalletStoreId = (walletId: WalletId, chainId: Cardano.ChainId, a
   return `${chainId.networkId}-${chainId.networkMagic}-${walletId}`;
 };
 
-export interface WalletManagerDependencies<Metadata extends { name: string }> {
-  walletFactory: WalletFactory<Metadata>;
+export interface WalletManagerDependencies<
+  WalletMetadata extends { name: string },
+  AccountMetadata extends { name: string }
+> {
+  walletFactory: WalletFactory<WalletMetadata, AccountMetadata>;
   storesFactory: StoresFactory;
   managerStorage: Storage.StorageArea;
-  walletRepository: WalletRepository<Metadata>;
-  signingCoordinatorApi: SigningCoordinatorSignApi<Metadata>;
+  walletRepository: WalletRepository<WalletMetadata, AccountMetadata>;
+  signingCoordinatorApi: SigningCoordinatorSignApi<WalletMetadata, AccountMetadata>;
 }
 
 /**
@@ -54,16 +57,18 @@ export interface WalletManagerDependencies<Metadata extends { name: string }> {
  * Uses wallet and store factories to create wallets.
  * Keeps track of created stores and reuses them when a wallet is reactivated.
  */
-export class WalletManager<Metadata extends { name: string }> implements WalletManagerApi {
+export class WalletManager<WalletMetadata extends { name: string }, AccountMetadata extends { name: string }>
+  implements WalletManagerApi
+{
   activeWalletId$ = new ReplaySubject<WalletManagerActivateProps | null>(1);
   activeWallet$ = new BehaviorSubject<ObservableWallet | null>(null);
 
   #activeWalletProps: WalletManagerActivateProps | null = null;
   #walletStores = new Map<string, storage.WalletStores>();
-  #walletFactory: WalletFactory<Metadata>;
+  #walletFactory: WalletFactory<WalletMetadata, AccountMetadata>;
   #storesFactory: StoresFactory;
-  #walletRepository: WalletRepository<Metadata>;
-  #signingCoordinatorApi: SigningCoordinatorSignApi<Metadata>;
+  #walletRepository: WalletRepository<WalletMetadata, AccountMetadata>;
+  #signingCoordinatorApi: SigningCoordinatorSignApi<WalletMetadata, AccountMetadata>;
   #logger: Logger;
   #managerStorageKey: string;
   #managerStorage: Storage.StorageArea;
@@ -77,7 +82,7 @@ export class WalletManager<Metadata extends { name: string }> implements WalletM
       managerStorage,
       walletRepository,
       signingCoordinatorApi
-    }: MessengerDependencies & WalletManagerDependencies<Metadata>
+    }: MessengerDependencies & WalletManagerDependencies<WalletMetadata, AccountMetadata>
   ) {
     this.#walletRepository = walletRepository;
 
@@ -278,7 +283,7 @@ export class WalletManager<Metadata extends { name: string }> implements WalletM
    * @private
    */
   #buildWitnesser(
-    wallet: AnyWallet<Metadata>,
+    wallet: AnyWallet<WalletMetadata, AccountMetadata>,
     _walletId: WalletId,
     chainId: Cardano.ChainId,
     accountIndex?: number

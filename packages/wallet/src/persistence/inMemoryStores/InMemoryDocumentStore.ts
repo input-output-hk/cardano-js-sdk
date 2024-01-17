@@ -1,4 +1,3 @@
-/* eslint-disable brace-style */
 import { DocumentStore } from '../types';
 import { EMPTY, Observable, of } from 'rxjs';
 import { InMemoryStore } from './InMemoryStore';
