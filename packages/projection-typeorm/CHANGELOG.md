@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.7.7...@cardano-sdk/projection-typeorm@0.8.0) (2024-01-17)
+
+### ⚠ BREAKING CHANGES
+
+* add retry configuration to store stake pool metadata job
+
+### Features
+
+* add retry configuration to store stake pool metadata job ([90c4663](https://github.com/input-output-hk/cardano-js-sdk/commit/90c46632211c2fe3d5546650444d98e577a0278e))
+
 ## [0.7.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.7.6...@cardano-sdk/projection-typeorm@0.7.7) (2024-01-05)
 
 **Note:** Version bump only for package @cardano-sdk/projection-typeorm

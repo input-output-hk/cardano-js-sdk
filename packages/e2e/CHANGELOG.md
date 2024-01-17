@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.31.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.30.0...@cardano-sdk/e2e@0.31.0) (2024-01-17)
+
+### ⚠ BREAKING CHANGES
+
+* **web-extension:** add metadata to bip32 wallets
+- split WalletRepository.updateMetadata into 2 methods
+* SignerManager renamed as SignerCoordinator
+
+### Features
+
+* **web-extension:** handle wallet metadata in repository LW-9503 ([34d976b](https://github.com/input-output-hk/cardano-js-sdk/commit/34d976be41583b59c30c35ff620219eccc9128e4))
+
+### Code Refactoring
+
+* signerManager renamed as SignerCoordinator ([c7067db](https://github.com/input-output-hk/cardano-js-sdk/commit/c7067db06448570871fbc84af846ebd69c00533c))
+
 ## [0.30.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.29.1...@cardano-sdk/e2e@0.30.0) (2024-01-05)
 
 ### ⚠ BREAKING CHANGES

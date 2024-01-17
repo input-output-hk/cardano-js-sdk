@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.22.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.21.0...@cardano-sdk/web-extension@0.22.0) (2024-01-17)
+
+### ⚠ BREAKING CHANGES
+
+* **web-extension:** add metadata to bip32 wallets
+- split WalletRepository.updateMetadata into 2 methods
+* SignerManager renamed as SignerCoordinator
+* added a new type SignDataContext which has two optional fields, sender and address
+- sender field of Witnesser signBlob was replaced by a SignDataContext
+- sender field of SignerManager signData was replaced by a SignDataContext
+
+### Features
+
+* signerManager and Witnesser now propagate signData confirmation address ([544cc17](https://github.com/input-output-hk/cardano-js-sdk/commit/544cc17ce36da4f4bc186d3c19a4bc34ab67361e))
+* **web-extension:** handle wallet metadata in repository LW-9503 ([34d976b](https://github.com/input-output-hk/cardano-js-sdk/commit/34d976be41583b59c30c35ff620219eccc9128e4))
+
+### Code Refactoring
+
+* signerManager renamed as SignerCoordinator ([c7067db](https://github.com/input-output-hk/cardano-js-sdk/commit/c7067db06448570871fbc84af846ebd69c00533c))
+
 ## [0.21.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.20.1...@cardano-sdk/web-extension@0.21.0) (2024-01-05)
 
 ### ⚠ BREAKING CHANGES
