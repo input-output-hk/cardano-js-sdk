@@ -6,6 +6,7 @@ import {
 } from '../options';
 import { HandlePolicyIdsProgramOptions } from '../options/policyIds';
 import { Milliseconds, Seconds } from '@cardano-sdk/core';
+import { defaultJobOptions } from '@cardano-sdk/projection-typeorm';
 
 /** cardano-services programs */
 export enum Programs {
@@ -26,6 +27,7 @@ export enum ServiceNames {
   Utxo = 'utxo'
 }
 
+export const METADATA_JOB_RETRY_DELAY_DEFAULT = defaultJobOptions.retryDelay;
 export const POOLS_METRICS_INTERVAL_DEFAULT = 1000;
 export const POOLS_METRICS_OUTDATED_INTERVAL_DEFAULT = 100;
 
@@ -34,6 +36,7 @@ export enum ProjectorOptionDescriptions {
   DropSchema = 'Drop and recreate database schema to project from origin',
   DryRun = 'Initialize the projection, but do not start it',
   ExitAtBlockNo = 'Exit after processing this block. Intended for benchmark testing',
+  MetadataJobRetryDelay = 'Retry delay for metadata fetch job in seconds',
   PoolsMetricsInterval = 'Interval in number of blocks between two stake pools metrics jobs to update all metrics',
   PoolsMetricsOutdatedInterval = 'Interval in number of blocks between two stake pools metrics jobs to update only outdated metrics',
   Synchronize = 'Synchronize the schema from the models'
