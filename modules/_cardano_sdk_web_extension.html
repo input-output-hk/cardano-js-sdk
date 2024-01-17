@@ -16,15 +16,175 @@
 <li><a href="_cardano_sdk_web_extension.html">@cardano-sdk/web-extension</a></li></ul>
 <h1>Module @cardano-sdk/web-extension</h1></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/909489b/packages/web-extension/src/index.ts#L1">packages/web-extension/src/index.ts:1</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/b6bf85a/packages/web-extension/src/index.ts#L1">packages/web-extension/src/index.ts:1</a></li></ul></aside>
 <section class="tsd-panel-group">
 <section class="tsd-panel tsd-typography">
 <a href="#cardano-js-sdk--web-extension" id="cardano-js-sdk--web-extension" style="color: inherit; text-decoration: none;">
   <h1>Cardano JS SDK | web-extension</h1>
 </a>
-<p>Web extension wallet utilities</p>
-<p>e2e tests uses a pre-built <a href="https://github.com/input-output-hk/cardano-wallet-connector">example dapp</a> and pretends to be &quot;ccvault&quot; wallet</p>
-<p><img src="./web-extension.jpg" alt="web-extension setup"></p>
+
+<a href="#about-the-package-name" id="about-the-package-name" style="color: inherit; text-decoration: none;">
+  <h2>About the Package Name</h2>
+</a>
+<p><strong>Web-extension</strong> can refer to a “browser extension” or the Web-Extensions browser API; it was chosen because the package is coupled to this API.</p>
+
+<a href="#introduction" id="introduction" style="color: inherit; text-decoration: none;">
+  <h2>Introduction</h2>
+</a>
+<p>This document describes the utilization of the <strong>web-extension</strong> package in the construction of browser-based cryptocurrency wallets, detailing its architecture, components, and their interactions.</p>
+<p>In this document, we will cover:</p>
+<ul>
+<li><p><strong>System Overview:</strong> Providing a high-level perspective of the web-extension package and its role in wallet development.</p>
+</li>
+<li><p><strong>Component Descriptions:</strong> Delving into the details of the components within the web-extension package, including relevant components sourced from other packages within this SDK.</p>
+</li>
+<li><p><strong>Diagrams:</strong> Discussing how these components interact within the context of a web browser extension with visual representations to aid in understanding the structure and flow of interactions.</p>
+</li>
+</ul>
+
+<a href="#system-overview" id="system-overview" style="color: inherit; text-decoration: none;">
+  <h2>System Overview</h2>
+</a>
+<p>The <strong>web-extension</strong> package provides components for handling wallet management-related operations within the browser web extensions context. It brings together its own specialized components and further leverages additional elements from other SDK packages, notably the <strong>ObservableWallet</strong> interface from the &#39;wallet&#39; package and the <strong>Witnesser</strong> interface from the &#39;key-management’ package.</p>
+
+<a href="#components-from-the-web-extension-package" id="components-from-the-web-extension-package" style="color: inherit; text-decoration: none;">
+  <h3>Components from the web-extension Package</h3>
+</a>
+<ul>
+<li><p><strong>WalletManager:</strong> Manages the lifecycle of ObservableWallets, including activation and deactivation, and is responsible for creating Witnesser instances.</p>
+</li>
+<li><p><strong>WalletRepository:</strong> Handles the storage, retrieval, and management of wallet data within the extension environment.</p>
+</li>
+<li><p><strong>SigningCoordinator:</strong> Facilitates transaction and data signing.</p>
+</li>
+</ul>
+
+<a href="#components-from-the-39wallet39-package" id="components-from-the-39wallet39-package" style="color: inherit; text-decoration: none;">
+  <h3>Components from the &#39;wallet&#39; Package</h3>
+</a>
+<ul>
+<li><strong>ObservableWallet Interface:</strong> A comprehensive wallet management solution handling transactions, address management, balance tracking, and other wallet operations. Provides real-time observability of the wallet&#39;s state, essential for responsive user interfaces.</li>
+</ul>
+
+<a href="#component-from-the-39key-management39-package" id="component-from-the-39key-management39-package" style="color: inherit; text-decoration: none;">
+  <h3>Component from the &#39;key-management&#39; Package</h3>
+</a>
+<ul>
+<li><strong>Witnesser Interface:</strong> This Interface is an abstraction designed to decouple ObservableWallet implementations from the KeyAgent, facilitating transaction signing. This interface connects the SigningCoordinator with wallet functionalities and paves the way for implementing multi-signature and shared wallets.</li>
+</ul>
+
+<a href="#component-locations-service-worker-and-ui-script" id="component-locations-service-worker-and-ui-script" style="color: inherit; text-decoration: none;">
+  <h3>Component Locations: Service Worker and UI Script</h3>
+</a>
+<p>Within the web extension environment, components are strategically distributed across the service worker, UI and content script. The <strong>WalletManager</strong>, <strong>WalletRepository</strong>, and <strong>ObservableWallet</strong> instances reside in the service worker, while the <strong>SigningCoordinator</strong> is located in the UI script.</p>
+<p>The <strong>WalletManager</strong>, <strong>WalletRepository</strong>, and <strong>ObservableWallet</strong> instances are located in the service worker for performance, consistency, and security reasons; this also enables wallet connectivity via CIP-30 without the need for the wallet UI to remain open. This setup ensures a responsive user experience, as the service worker handles intensive tasks independently of the UI script, preventing any blocking. Additionally, browser wallets which feature both popup and full-screen UIs operating simultaneously, having these components in a single service worker provides a unified source of truth, ensuring consistency and synchronization between these different user interfaces.</p>
+<p>The <strong>WalletManager</strong> utilizes the <strong>SigningCoordinator</strong> (exposed from the UI script to the service worker) to create <strong>Witnesser</strong> instances, which are then provided to <strong>ObservableWallets</strong> upon their creation. Communication between the <strong>Witnesser</strong> in the service worker and the <strong>SigningCoordinator</strong> in the ui script is facilitated by the web extension&#39;s messaging system.</p>
+<p>Placing the <strong>SigningCoordinator</strong> in the UI script is required for hardware wallet interactions and user confirmations (device connection must be initiated via user gesture, as per default browsers security policy), allowing direct handling of sensitive operations like password entry and secret access.</p>
+<p>In-memory key agents could technically live in the service worker, but keeping them in UI context makes the design simpler (same for all types of wallets). It also has a security advantage when signing: it should reduce the amount of time that passphrase, which is sensitive data, is kept in-memory, as it doesn’t have to be passed to a different javascript context, as well as reduces attack surface as it doesn’t have to go through extension messaging API.</p>
+<p>This arrangement also ensures a safer, isolated environment for user prompts and transaction confirmations. As thus, the components of the wallet-extension are distributed among the service worker and the UI script as follows:</p>
+<p><img src="img/fig1.png" alt="Location of instances within the web extension"></p>
+
+<a href="#component-descriptions" id="component-descriptions" style="color: inherit; text-decoration: none;">
+  <h2>Component Descriptions</h2>
+</a>
+
+<a href="#signingcoordinator" id="signingcoordinator" style="color: inherit; text-decoration: none;">
+  <h3>SigningCoordinator</h3>
+</a>
+<p>The <strong>SigningCoordinator</strong> component operates within the UI script of the web extension, which is a strategic choice to leverage direct user interaction capabilities, especially important for operations involving hardware wallets.</p>
+<p>In essence, the <strong>SigningCoordinator</strong> is responsible for managing the signing of transactions and data. It is designed to handle various types of signing requests, including transaction witness requests and data signing requests. For instance, when a transaction needs to be signed, the <strong>SigningCoordinator</strong> takes the transaction details along with the context and options provided and processes them to generate the necessary signatures. This process may involve interactions with hardware wallets or user inputs, which are handled within the UI script environment.</p>
+<p>The <strong>SigningCoordinator</strong> also offers flexibility in handling different wallet types, such as InMemory, Ledger, and Trezor wallets. This flexibility is crucial for a web extension that aims to support a wide range of user preferences and hardware capabilities.</p>
+
+<a href="#walletmanager" id="walletmanager" style="color: inherit; text-decoration: none;">
+  <h3>WalletManager</h3>
+</a>
+<p>The <strong>WalletManager</strong> is responsible for orchestrating various wallet-related operations. It handles the lifecycle of wallets, including their creation, initialization, activation, deactivation, and switching of networks. These wallets are <strong>ObservableWallet</strong> instances, these instances provide real-time updates and states of the wallets, which include balance tracking, transaction histories, and more. The <strong>WalletManager</strong> effectively maintains a record of these instances, ensuring that the wallets are readily accessible.</p>
+<p>Another significant aspect of the <strong>WalletManager</strong> is its interaction with the <strong>SigningCoordinator</strong> via the creation of <strong>Witnesser</strong> instances. The <strong>WalletManager</strong> leverages the <strong>SigningCoordinator</strong>, which resides in the UI script, to facilitate the signing processes. It provides the necessary <strong>Witnesser</strong> instances to the <strong>ObservableWallets</strong>, enabling them to perform cryptographic operations like transaction signing.</p>
+<p>The <strong>Witnesser</strong> abstracts the validation of UTXO expenditures by managing various types of witnesses. For standard UTXOs, it generates cryptographic signatures. When dealing with script-controlled UTXOs, it supplies the necessary scripts and any additional components, such as datums and redeemers, required for transaction validation.</p>
+
+<a href="#walletrepository" id="walletrepository" style="color: inherit; text-decoration: none;">
+  <h3>WalletRepository</h3>
+</a>
+<p>The <strong>WalletRepository</strong> role is to manage the storage and retrieval of wallet data, acting as a centralized repository that ensures the integrity and accessibility of wallet information.</p>
+<p>The <strong>WalletRepository</strong> handles various operations related to wallet data management. This includes adding new wallets, updating wallet metadata, and removing wallets or accounts as needed.</p>
+<p>One of the key features of the <strong>WalletRepository</strong> is its ability to manage conflicts that may arise during data operations. For instance, when adding a new wallet, it checks for potential conflicts, such as existing wallets with the same identifier, to prevent data duplication or inconsistencies. This conflict management ensures that the wallet data within the repository remains consistent.</p>
+<p>The <strong>WalletRepository</strong> also handles account-related functionalities. It provides methods for adding new accounts to existing wallets, updating account metadata, and removing accounts.</p>
+
+<a href="#observablewallet" id="observablewallet" style="color: inherit; text-decoration: none;">
+  <h3>ObservableWallet</h3>
+</a>
+<p>The <strong>ObservableWallet</strong>, while not a direct component of the web-extension package, plays a pivotal role in this design and merits a brief overview due to its centrality in the system&#39;s architecture.</p>
+<p>The <strong>ObservableWallet</strong> is designed as a comprehensive interface that offers real-time observability of various wallet states and properties. This includes tracking the wallet&#39;s balance, delegation status, UTxO set, transaction history, and other critical data points. In addition to state tracking, the <strong>ObservableWallet</strong> provides essential functionalities like transaction building (via the GenericTxBuilder), data signing, and transaction submission.</p>
+
+<a href="#integration-and-communication-flow" id="integration-and-communication-flow" style="color: inherit; text-decoration: none;">
+  <h2>Integration and Communication Flow</h2>
+</a>
+<p>The web-extension package components interact across the UI script and the background script (service worker) of the web extension environment. The scripts communicate using message passing, which allows both service worker and UI scripts to listen for each other&#39;s messages and respond on the same channel. </p>
+
+<a href="#bootstrapping" id="bootstrapping" style="color: inherit; text-decoration: none;">
+  <h2>Bootstrapping</h2>
+</a>
+<p>When the web extension application starts, it creates the required instances in the appropriate places and exposes them via the web-extension messaging system.</p>
+
+<a href="#ui-script" id="ui-script" style="color: inherit; text-decoration: none;">
+  <h3>UI Script</h3>
+</a>
+<p>In the UI script the application creates the <strong>SigningCoordinator</strong> instance and exposes it to the service worker, the web-extension package exports an utility function to do so:</p>
+<pre><code class="language-javascript"><span class="hl-0">exposeApi</span><span class="hl-1">(</span><br/><span class="hl-1">    {</span><br/><span class="hl-1">      </span><span class="hl-5">api$:</span><span class="hl-1"> </span><span class="hl-0">of</span><span class="hl-1">(</span><span class="hl-5">signingCoordinator</span><span class="hl-1">),</span><br/><span class="hl-1">      </span><span class="hl-5">baseChannel:</span><span class="hl-1"> </span><span class="hl-5">signingCoordinatorApiChannel</span><span class="hl-1">,</span><br/><span class="hl-1">      </span><span class="hl-5">properties:</span><span class="hl-1"> </span><span class="hl-5">signingCoordinatorApiProperties</span><br/><span class="hl-1">    },</span><br/><span class="hl-1">    </span><span class="hl-5">dependencies</span><br/><span class="hl-1">  );</span><br/>
+</code></pre>
+<p>This function exposes the <strong>SigningCoordinator</strong> to the code running in the service worker. Additionally, the UI script must subscribe to the <strong>transactionWitnessRequest$</strong> and <strong>signDataRequest$</strong> observables of the <strong>SigningCoordinator</strong> so it can handle signing requests that are initiated by the <strong>ObservableWallet</strong> that lives in the service worker. This is an example on how the web extension application could start the <strong>SigningCoordinator</strong>:</p>
+<pre><code class="language-javascript"><span class="hl-5">ui</span><span class="hl-1">.</span><span class="hl-5">ts</span><br/><br/><span class="hl-11">// Instantiate the SigningCoordinator</span><br/><span class="hl-6">const</span><span class="hl-1"> </span><span class="hl-7">signingCoordinator</span><span class="hl-1"> = </span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-0">SigningCoordinator</span><span class="hl-1">(</span><br/><span class="hl-1">  {</span><br/><span class="hl-1">    </span><span class="hl-5">hwOptions:</span><span class="hl-1"> {</span><br/><span class="hl-1">      </span><span class="hl-5">communicationType:</span><span class="hl-1"> </span><span class="hl-5">CommunicationType</span><span class="hl-1">.</span><span class="hl-5">Web</span><span class="hl-1">,</span><br/><span class="hl-1">      </span><span class="hl-5">manifest:</span><span class="hl-1"> {</span><br/><span class="hl-1">        </span><span class="hl-5">appUrl:</span><span class="hl-1"> </span><span class="hl-3">&#39;https://web-extension.app&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">        </span><span class="hl-5">email:</span><span class="hl-1"> </span><span class="hl-3">&#39;e2e@web-extension.app&#39;</span><br/><span class="hl-1">      }</span><br/><span class="hl-1">    }</span><br/><span class="hl-1">  },</span><br/><span class="hl-1">  {</span><br/><span class="hl-1">    </span><span class="hl-5">keyAgentFactory:</span><span class="hl-1"> </span><span class="hl-0">createKeyAgentFactory</span><span class="hl-1">({</span><br/><span class="hl-1">      </span><span class="hl-5">bip32Ed25519:</span><span class="hl-1"> </span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-5">Crypto</span><span class="hl-1">.</span><span class="hl-0">SodiumBip32Ed25519</span><span class="hl-1">(),</span><br/><span class="hl-1">      </span><span class="hl-5">logger</span><br/><span class="hl-1">    })</span><br/><span class="hl-1">  }</span><br/><span class="hl-1">);</span><br/><br/><span class="hl-11">// Subscribe to sign request observables</span><br/><span class="hl-0">merge</span><span class="hl-1">(</span><span class="hl-5">signingCoordinator</span><span class="hl-1">.</span><span class="hl-5">signDataRequest$</span><span class="hl-1">, </span><span class="hl-5">signingCoordinator</span><span class="hl-1">.</span><span class="hl-5">transactionWitnessRequest$</span><span class="hl-1">).</span><span class="hl-0">subscribe</span><span class="hl-1">((</span><span class="hl-5">req</span><span class="hl-1">) </span><span class="hl-6">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-5">logger</span><span class="hl-1">.</span><span class="hl-0">info</span><span class="hl-1">(</span><span class="hl-3">&#39;Sign request&#39;</span><span class="hl-1">, </span><span class="hl-5">req</span><span class="hl-1">);</span><br/><span class="hl-1">  </span><span class="hl-9">if</span><span class="hl-1"> (</span><span class="hl-5">req</span><span class="hl-1">.</span><span class="hl-5">walletType</span><span class="hl-1"> === </span><span class="hl-5">WalletType</span><span class="hl-1">.</span><span class="hl-5">InMemory</span><span class="hl-1">) {</span><br/><span class="hl-1">    </span><span class="hl-6">void</span><span class="hl-1"> </span><span class="hl-5">req</span><span class="hl-1">.</span><span class="hl-0">sign</span><span class="hl-1">(</span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-0">Uint8Array</span><span class="hl-1">(</span><span class="hl-5">passphraseByteArray</span><span class="hl-1">));</span><br/><span class="hl-1">  } </span><span class="hl-9">else</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-6">void</span><span class="hl-1"> </span><span class="hl-5">req</span><span class="hl-1">.</span><span class="hl-0">sign</span><span class="hl-1">();</span><br/><span class="hl-1">  }</span><br/><span class="hl-1">  </span><span class="hl-5">logger</span><span class="hl-1">.</span><span class="hl-0">info</span><span class="hl-1">(</span><span class="hl-3">&#39;Signed&#39;</span><span class="hl-1">, </span><span class="hl-5">req</span><span class="hl-1">);</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-11">// Expose signer coordinator to service worker</span><br/><span class="hl-0">exposeSigningCoordinatorApi</span><span class="hl-1">(</span><br/><span class="hl-1">  {</span><br/><span class="hl-1">    </span><span class="hl-5">signingCoordinator</span><br/><span class="hl-1">  },</span><br/><span class="hl-1">  { </span><span class="hl-5">logger</span><span class="hl-1">, </span><span class="hl-5">runtime</span><span class="hl-1"> }</span><br/><span class="hl-1">);</span>
+</code></pre>
+<p>The UI script also creates proxy objects for the exposed instances from the service worker of the <strong>WalletRepository</strong>, <strong>WalletManager</strong> and <strong>ObservableWallet</strong>:</p>
+<pre><code class="language-javascript"><span class="hl-5">ui</span><span class="hl-1">.</span><span class="hl-5">ts</span><br/><br/><span class="hl-11">// Consume remote objects.</span><br/><span class="hl-6">const</span><span class="hl-1"> </span><span class="hl-7">walletManager</span><span class="hl-1"> = </span><span class="hl-0">consumeRemoteApi</span><span class="hl-1">(</span><br/><span class="hl-1">  { </span><span class="hl-5">baseChannel:</span><span class="hl-1"> </span><span class="hl-0">walletManagerChannel</span><span class="hl-1">(</span><span class="hl-5">walletName</span><span class="hl-1">), </span><span class="hl-5">properties:</span><span class="hl-1"> </span><span class="hl-5">walletManagerProperties</span><span class="hl-1"> },</span><br/><span class="hl-1">  { </span><span class="hl-5">logger</span><span class="hl-1">, </span><span class="hl-5">runtime</span><span class="hl-1"> }</span><br/><span class="hl-1">);</span><br/><br/><span class="hl-6">const</span><span class="hl-1"> </span><span class="hl-7">repository</span><span class="hl-1"> = </span><span class="hl-0">consumeRemoteApi</span><span class="hl-1">(</span><br/><span class="hl-1">  { </span><span class="hl-5">baseChannel:</span><span class="hl-1"> </span><span class="hl-0">repositoryChannel</span><span class="hl-1">(</span><span class="hl-5">walletName</span><span class="hl-1">), </span><span class="hl-5">properties:</span><span class="hl-1"> </span><span class="hl-5">walletRepositoryProperties</span><span class="hl-1"> },</span><br/><span class="hl-1">  { </span><span class="hl-5">logger</span><span class="hl-1">, </span><span class="hl-5">runtime</span><span class="hl-1"> }</span><br/><span class="hl-1">);</span><br/><br/><span class="hl-11">// This remote ObservableWallet object does not change when wallets are activated/deactivated. Instead, its observable properties emit from the currently active wallet.</span><br/><span class="hl-6">const</span><span class="hl-1"> </span><span class="hl-7">wallet</span><span class="hl-1"> = </span><span class="hl-0">consumeRemoteApi</span><span class="hl-1">(</span><br/><span class="hl-1">  { </span><span class="hl-5">baseChannel:</span><span class="hl-1"> </span><span class="hl-0">walletChannel</span><span class="hl-1">(</span><span class="hl-5">walletName</span><span class="hl-1">), </span><span class="hl-5">properties:</span><span class="hl-1"> </span><span class="hl-5">observableWalletProperties</span><span class="hl-1"> },</span><br/><span class="hl-1">  { </span><span class="hl-5">logger</span><span class="hl-1">, </span><span class="hl-5">runtime</span><span class="hl-1"> }</span><br/><span class="hl-1">);</span><br/>
+</code></pre>
+<p>The <strong>consumeRemoteApi</strong>, <strong>walletManagerChannel</strong>, <strong>repositoryChannel</strong> and <strong>walletChannel</strong> are all utility functions exported from the web-extension package.</p>
+
+<a href="#service-worker" id="service-worker" style="color: inherit; text-decoration: none;">
+  <h3>Service Worker</h3>
+</a>
+<p>In the service worker the application instantiates the <strong>WalletRepository</strong> and <strong>WalletManager</strong> and exposes them via the web-extension messaging system:</p>
+<pre><code class="language-javascript"><span class="hl-5">serviceWorker</span><span class="hl-1">.</span><span class="hl-5">ts</span><br/><br/><span class="hl-6">const</span><span class="hl-1"> </span><span class="hl-7">walletRepository</span><span class="hl-1"> = </span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-0">WalletRepository</span><span class="hl-1">&lt;</span><span class="hl-10">Metadata</span><span class="hl-1">&gt;({</span><br/><span class="hl-1">  </span><span class="hl-5">logger</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">store:</span><span class="hl-1"> </span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-5">storage</span><span class="hl-1">.</span><span class="hl-0">InMemoryCollectionStore</span><span class="hl-1">()</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-6">const</span><span class="hl-1"> </span><span class="hl-7">signingCoordinatorApi</span><span class="hl-1"> = </span><span class="hl-0">consumeRemoteApi</span><span class="hl-1">(</span><br/><span class="hl-1">  {</span><br/><span class="hl-1">    </span><span class="hl-5">baseChannel:</span><span class="hl-1"> </span><span class="hl-5">signingCoordinatorApiChannel</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-5">properties:</span><span class="hl-1"> </span><span class="hl-5">signingCoordinatorApiProperties</span><br/><span class="hl-1">  },</span><br/><span class="hl-1">  </span><span class="hl-5">dependencies</span><br/><span class="hl-1">);</span><br/><br/><br/><span class="hl-6">const</span><span class="hl-1"> </span><span class="hl-7">walletManager</span><span class="hl-1"> = </span><span class="hl-6">new</span><span class="hl-1"> </span><span class="hl-0">WalletManager</span><span class="hl-1">&lt;</span><span class="hl-10">Metadata</span><span class="hl-1">&gt;(</span><br/><span class="hl-1">  { </span><span class="hl-5">name:</span><span class="hl-1"> </span><span class="hl-5">walletName</span><span class="hl-1"> },</span><br/><span class="hl-1">  {</span><br/><span class="hl-1">    </span><span class="hl-5">logger</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-5">managerStorage:</span><span class="hl-1"> </span><span class="hl-5">WebExtensionStorage</span><span class="hl-1">.</span><span class="hl-5">local</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-5">runtime</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-5">signingCoordinatorApi</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-5">storesFactory</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-5">walletFactory</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-5">walletRepository</span><br/><span class="hl-1">  }</span><br/><span class="hl-1">);</span><br/><br/><span class="hl-0">exposeApi</span><span class="hl-1">(</span><br/><span class="hl-1">  {</span><br/><span class="hl-1">    </span><span class="hl-5">api$:</span><span class="hl-1"> </span><span class="hl-0">of</span><span class="hl-1">(</span><span class="hl-5">walletRepository</span><span class="hl-1">),</span><br/><span class="hl-1">    </span><span class="hl-5">baseChannel:</span><span class="hl-1"> </span><span class="hl-0">repositoryChannel</span><span class="hl-1">(</span><span class="hl-5">walletName</span><span class="hl-1">),</span><br/><span class="hl-1">    </span><span class="hl-5">properties:</span><span class="hl-1"> </span><span class="hl-5">walletRepositoryProperties</span><br/><span class="hl-1">  },</span><br/><span class="hl-1">  { </span><span class="hl-5">logger</span><span class="hl-1">, </span><span class="hl-5">runtime</span><span class="hl-1"> }</span><br/><span class="hl-1">);</span><br/><br/><span class="hl-0">exposeApi</span><span class="hl-1">(</span><br/><span class="hl-1">  {</span><br/><span class="hl-1">    </span><span class="hl-5">api$:</span><span class="hl-1"> </span><span class="hl-0">of</span><span class="hl-1">(</span><span class="hl-5">walletManager</span><span class="hl-1">),</span><br/><span class="hl-1">    </span><span class="hl-5">baseChannel:</span><span class="hl-1"> </span><span class="hl-0">walletManagerChannel</span><span class="hl-1">(</span><span class="hl-5">walletName</span><span class="hl-1">),</span><br/><span class="hl-1">    </span><span class="hl-5">properties:</span><span class="hl-1"> </span><span class="hl-5">walletManagerProperties</span><br/><span class="hl-1">  },</span><br/><span class="hl-1">  { </span><span class="hl-5">logger</span><span class="hl-1">, </span><span class="hl-5">runtime</span><span class="hl-1"> }</span><br/><span class="hl-1">);</span>
+</code></pre>
+<p>You will notice we created a proxy object of the <strong>SigningCoordinator</strong> in the service worker since the <strong>SigningCoordinator</strong> is a dependency of the <strong>WalletManager</strong>.</p>
+<p>Additionally we will expose the current active <strong>ObservableWallet</strong> to the UI script:</p>
+<pre><code class="language-javascript"><span class="hl-0">exposeApi</span><span class="hl-1">(</span><br/><span class="hl-1">  {</span><br/><span class="hl-1">    </span><span class="hl-5">api$:</span><span class="hl-1"> </span><span class="hl-5">walletManager</span><span class="hl-1">.</span><span class="hl-5">activeWallet$</span><span class="hl-1">.</span><span class="hl-0">asObservable</span><span class="hl-1">(),</span><br/><span class="hl-1">    </span><span class="hl-5">baseChannel:</span><span class="hl-1"> </span><span class="hl-0">walletChannel</span><span class="hl-1">(</span><span class="hl-5">walletName</span><span class="hl-1">),</span><br/><span class="hl-1">    </span><span class="hl-5">properties:</span><span class="hl-1"> </span><span class="hl-5">observableWalletProperties</span><br/><span class="hl-1">  },</span><br/><span class="hl-1">  { </span><span class="hl-5">logger</span><span class="hl-1">, </span><span class="hl-5">runtime</span><span class="hl-1"> }</span><br/><span class="hl-1">);</span>
+</code></pre>
+<p>This way the UI script can use this proxy object and subscribe to its observable properties and receive updates even after the wallet has been switched.</p>
+
+<a href="#diagrams" id="diagrams" style="color: inherit; text-decoration: none;">
+  <h2>Diagrams</h2>
+</a>
+
+<a href="#walletmanager-1" id="walletmanager-1" style="color: inherit; text-decoration: none;">
+  <h3>WalletManager</h3>
+</a>
+<p>The <strong>WalletManager</strong>, residing in the service worker, is responsible for instantiating <strong>ObservableWallets</strong> configured to track the given credentials, network and account (if applicable). </p>
+<p>When the UI scripts triggers a wallet switch, either by switching networks, accounts or even wallet credentials entirely, the <strong>WalletManager</strong> retrieves the requested wallet data from the <strong>WalletRepository</strong>, builds a new <strong>Witnesser</strong> using the <strong>SigningCoordinator</strong> (which is a proxy object from the UI script) and creates the new <strong>ObservableWallet</strong> instance, this new active wallet is emitted via the <strong>activeWallet$</strong> observable:</p>
+<p><img src="img/fig7.png" alt="UML Sequence diagram of the switching wallet use case"></p>
+
+<a href="#signingcoordinator-1" id="signingcoordinator-1" style="color: inherit; text-decoration: none;">
+  <h3>SigningCoordinator</h3>
+</a>
+<p>Upon receiving a signing request from the <strong>Witnesser</strong> managed by the <strong>ObservableWallet</strong> running in the service worker context, the <strong>SigningCoordinator</strong> issues a request in the UI script. This process involves interaction with hardware wallets if necessary, or the handling of user inputs for transaction confirmation.</p>
+<p>Once the signing process is complete, the <strong>SigningCoordinator</strong> sends the signatures back to the <strong>Witnesser</strong>:</p>
+<p><img src="img/fig8.png" alt="UML Sequence diagram of the sign request use case"></p>
+
+<a href="#walletrepository-1" id="walletrepository-1" style="color: inherit; text-decoration: none;">
+  <h3>WalletRepository</h3>
+</a>
+<p>The <strong>WalletRepository</strong>, also living in the service worker, functions independently, handling the storage and retrieval of wallet data. It does not directly participate in the communication flow for transaction signing but is essential for maintaining and providing access to wallet data. When the web extension application wishes to add new wallets or accounts It first registers the wallet data in the <strong>WalletRepository</strong> proxy object. Then uses the <strong>WalletManager</strong> proxy object to activate the registered wallet:</p>
+<p><img src="img/fig9.png" alt="UML Sequence diagram of the add new wallet and activate wallet"></p>
+
+<a href="#class-diagram" id="class-diagram" style="color: inherit; text-decoration: none;">
+  <h3>Class Diagram</h3>
+</a>
+<p><img src="img/fig10.png" alt="UML Class diagram of the relevant classes"></p>
+
+<a href="#activity-diagram" id="activity-diagram" style="color: inherit; text-decoration: none;">
+  <h3>Activity diagram</h3>
+</a>
+<p><img src="img/fig11.png" alt="UML Activity diagram of the relevant actions"></p>
 </section></section>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
