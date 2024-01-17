@@ -115,15 +115,31 @@ export const mapWithdrawal = (withdrawalModel: WithdrawalModel): Cardano.Withdra
 // Remove this and select the actual redeemer data from `redeemer_data` table.
 const stubRedeemerData = Buffer.from('not implemented');
 
-export const mapRedeemer = (redeemerModel: RedeemerModel): Cardano.Redeemer => ({
-  data: stubRedeemerData,
-  executionUnits: {
-    memory: Number(redeemerModel.unit_mem),
-    steps: Number(redeemerModel.unit_steps)
-  },
-  index: redeemerModel.index,
-  purpose: redeemerModel.purpose as Cardano.RedeemerPurpose
-});
+export const mapRedeemer = (redeemerModel: RedeemerModel): Cardano.Redeemer => {
+  let purpose: Cardano.RedeemerPurpose;
+  // It can be one of 'spend', 'mint', 'cert', 'reward'
+  switch (redeemerModel.purpose) {
+    case 'cert':
+      purpose = Cardano.RedeemerPurpose.certificate;
+      break;
+    case 'reward':
+      purpose = Cardano.RedeemerPurpose.withdrawal;
+      break;
+    default:
+      // spend or mint
+      purpose = redeemerModel.purpose as Cardano.RedeemerPurpose;
+  }
+
+  return {
+    data: stubRedeemerData,
+    executionUnits: {
+      memory: Number(redeemerModel.unit_mem),
+      steps: Number(redeemerModel.unit_steps)
+    },
+    index: redeemerModel.index,
+    purpose
+  };
+};
 
 export const mapAnchor = (anchorUrl: string, anchorDataHash: string): Cardano.Anchor | null => {
   if (!!anchorUrl && !!anchorDataHash) {
