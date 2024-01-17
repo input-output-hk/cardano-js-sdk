@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/walletManager/SignerManager/KeyAgentFactory.ts</title>
+    <title>Code coverage report for src/walletManager/SigningCoordinator/index.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../../prettify.css" />
     <link rel="stylesheet" href="../../../base.css" />
@@ -19,13 +19,13 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../../index.html">All files</a> / <a href="index.html">src/walletManager/SignerManager</a> KeyAgentFactory.ts</h1>
+        <h1><a href="../../../index.html">All files</a> / <a href="index.html">src/walletManager/SigningCoordinator</a> index.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">55.55% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>5/9</span>
+                <span class='fraction'>6/6</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>0/0</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">57.14% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>4/7</span>
+                <span class='fraction'>6/6</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -69,33 +69,18 @@
 <a name='L4'></a><a href='#L4'>4</a>
 <a name='L5'></a><a href='#L5'>5</a>
 <a name='L6'></a><a href='#L6'>6</a>
-<a name='L7'></a><a href='#L7'>7</a>
-<a name='L8'></a><a href='#L8'>8</a>
-<a name='L9'></a><a href='#L9'>9</a>
-<a name='L10'></a><a href='#L10'>10</a>
-<a name='L11'></a><a href='#L11'>11</a>
-<a name='L12'></a><a href='#L12'>12</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">5x</span>
+<a name='L7'></a><a href='#L7'>7</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { InMemoryKeyAgent, InMemoryKeyAgentProps, KeyAgentDependencies } from '@cardano-sdk/key-management';
-import { LedgerKeyAgent, LedgerKeyAgentProps } from '@cardano-sdk/hardware-ledger';
-import { TrezorKeyAgent, TrezorKeyAgentProps } from '@cardano-sdk/hardware-trezor';
-&nbsp;
-export const createKeyAgentFactory = <span class="fstat-no" title="function not covered" >(d</span>ependencies: KeyAgentDependencies) =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
-  InMemory: <span class="fstat-no" title="function not covered" >(p</span>rops: InMemoryKeyAgentProps) =&gt; <span class="cstat-no" title="statement not covered" >new InMemoryKeyAgent(props, dependencies),</span>
-  Ledger: <span class="fstat-no" title="function not covered" >(p</span>rops: LedgerKeyAgentProps) =&gt; <span class="cstat-no" title="statement not covered" >new LedgerKeyAgent(props, dependencies),</span>
-  Trezor: <span class="fstat-no" title="function not covered" >(p</span>rops: TrezorKeyAgentProps) =&gt; <span class="cstat-no" title="statement not covered" >new TrezorKeyAgent(props, dependencies)</span>
-});
-&nbsp;
-export type KeyAgentFactory = ReturnType&lt;typeof createKeyAgentFactory&gt;;
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export * from './types';
+export * from './SigningCoordinator';
+export * from './KeyAgentFactory';
+export * from './util';
+export * from './exposeSigningCoordinatorApi';
+export * from './consumeSigningCoordinatorApi';
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -103,7 +88,7 @@ export type KeyAgentFactory = ReturnType&lt;typeof createKeyAgentFactory&gt;;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-01-17T09:04:45.225Z
+                at 2024-01-17T12:55:53.008Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
