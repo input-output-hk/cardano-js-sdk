@@ -1,4 +1,3 @@
-/* eslint-disable brace-style */
 import { CollectionStore } from '../types';
 import { EMPTY, Observable, Subject, delay, of, tap } from 'rxjs';
 import { InMemoryStore } from './InMemoryStore';

@@ -1,4 +1,3 @@
-/* eslint-disable brace-style */
 import { BigIntColumnOptions, OnDeleteCascadeRelationOptions, UInt64ColumnOptions } from './util';
 import { BlockEntity } from './Block.entity';
 import { Cardano } from '@cardano-sdk/core';

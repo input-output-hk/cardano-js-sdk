@@ -1,4 +1,3 @@
-/* eslint-disable brace-style */
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 import { InMemoryWallet, WalletType } from '../types';
