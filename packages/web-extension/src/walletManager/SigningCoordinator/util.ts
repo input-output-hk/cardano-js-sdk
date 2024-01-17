@@ -1,10 +1,10 @@
 import { RemoteApiProperties, RemoteApiPropertyType } from '../../messaging';
-import { SignerManagerSignApi } from './types';
+import { SigningCoordinatorSignApi } from './types';
 
-export const signerManagerApiChannel = 'signerManager';
+export const signingCoordinatorApiChannel = 'signingCoordinator';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const signerManagerApiProperties: RemoteApiProperties<SignerManagerSignApi<any>> = {
+export const signingCoordinatorApiProperties: RemoteApiProperties<SigningCoordinatorSignApi<any>> = {
   signData: RemoteApiPropertyType.MethodReturningPromise,
   signTransaction: RemoteApiPropertyType.MethodReturningPromise
 };

@@ -24,8 +24,8 @@ export type RequestBase<WalletMetadata extends {}> = {
 export type SignOptions = {
   /**
    * if `true`,
-   * - underlying KeyAgent errors from this call will not be propagated back to the wallet via SignerManagerSignApi
-   * - SignerManager expects user to either retry the call to `sign` or call `reject` manually
+   * - underlying KeyAgent errors from this call will not be propagated back to the wallet via SigningCoordinatorSignApi
+   * - SigningCoordinator expects user to either retry the call to `sign` or call `reject` manually
    */
   willRetryOnFailure?: boolean;
 };
@@ -40,7 +40,7 @@ type SignRequestHardware<R> = {
   /**
    * Must be called from user gesture when running in web environments
    *
-   * @param noReject if `true`, underlying KeyAgent errors will not be propagated back to the wallet via SignerManagerSignApi
+   * @param noReject if `true`, underlying KeyAgent errors will not be propagated back to the wallet via SigningCoordinatorSignApi
    */
   sign(options?: SignOptions): Promise<R>;
 };
@@ -68,12 +68,12 @@ export type SignTransactionProps = {
   options?: SignTransactionOptions;
 };
 
-export interface SignerManagerConfirmationApi<WalletMetadata extends {}> {
+export interface SigningCoordinatorConfirmationApi<WalletMetadata extends {}> {
   transactionWitnessRequest$: Observable<TransactionWitnessRequest<WalletMetadata>>;
   signDataRequest$: Observable<SignDataRequest<WalletMetadata>>;
 }
 
-export interface SignerManagerSignApi<WalletMetadata extends {}> {
+export interface SigningCoordinatorSignApi<WalletMetadata extends {}> {
   signTransaction(
     props: SignTransactionProps,
     requestContext: RequestContext<WalletMetadata>

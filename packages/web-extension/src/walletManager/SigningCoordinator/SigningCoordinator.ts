@@ -12,19 +12,19 @@ import {
   SignOptions,
   SignRequest,
   SignTransactionProps,
-  SignerManagerConfirmationApi,
-  SignerManagerSignApi,
+  SigningCoordinatorConfirmationApi,
+  SigningCoordinatorSignApi,
   TransactionWitnessRequest
 } from './types';
 import { Subject } from 'rxjs';
 
 export type HardwareKeyAgentOptions = TrezorConfig;
 
-export type SignerManagerProps = {
+export type SigningCoordinatorProps = {
   hwOptions: HardwareKeyAgentOptions;
 };
 
-export type SignerManagerDependencies = {
+export type SigningCoordinatorDependencies = {
   keyAgentFactory: KeyAgentFactory;
 };
 
@@ -63,15 +63,15 @@ const bubbleResolveReject = async <R>(
   }
 };
 
-export class SignerManager<WalletMetadata extends {}>
-  implements SignerManagerConfirmationApi<WalletMetadata>, SignerManagerSignApi<WalletMetadata>
+export class SigningCoordinator<WalletMetadata extends {}>
+  implements SigningCoordinatorConfirmationApi<WalletMetadata>, SigningCoordinatorSignApi<WalletMetadata>
 {
   readonly transactionWitnessRequest$ = new Subject<TransactionWitnessRequest<WalletMetadata>>();
   readonly signDataRequest$ = new Subject<SignDataRequest<WalletMetadata>>();
   readonly #hwOptions: HardwareKeyAgentOptions;
   readonly #keyAgentFactory: KeyAgentFactory;
 
-  constructor(props: SignerManagerProps, { keyAgentFactory }: SignerManagerDependencies) {
+  constructor(props: SigningCoordinatorProps, { keyAgentFactory }: SigningCoordinatorDependencies) {
     this.#hwOptions = props.hwOptions;
     this.#keyAgentFactory = keyAgentFactory;
   }

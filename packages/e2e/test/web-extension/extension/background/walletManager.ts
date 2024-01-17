@@ -6,7 +6,7 @@ import {
   WalletManagerActivateProps,
   WalletRepository,
   WalletType,
-  consumeSignerManagerApi,
+  consumeSigningCoordinatorApi,
   exposeApi,
   observableWalletProperties,
   repositoryChannel,
@@ -94,7 +94,7 @@ const walletRepository = new WalletRepository<Metadata>({
   store: new storage.InMemoryCollectionStore()
 });
 
-const signerManagerApi = consumeSignerManagerApi({ logger, runtime });
+const signingCoordinatorApi = consumeSigningCoordinatorApi({ logger, runtime });
 
 const walletManager = new WalletManager<Metadata>(
   { name: walletName },
@@ -102,7 +102,7 @@ const walletManager = new WalletManager<Metadata>(
     logger,
     managerStorage: WebExtensionStorage.local,
     runtime,
-    signerManagerApi,
+    signingCoordinatorApi,
     storesFactory,
     walletFactory,
     walletRepository

@@ -9,13 +9,13 @@ import {
 } from './util';
 import {
   RemoteApiPropertyType,
-  SignerManager,
+  SigningCoordinator,
   WalletType,
   consumeRemoteApi,
   consumeSupplyDistributionTracker,
   createKeyAgentFactory,
   exposeApi,
-  exposeSignerManagerApi,
+  exposeSigningCoordinatorApi,
   observableWalletProperties,
   repositoryChannel,
   walletChannel,
@@ -210,7 +210,7 @@ const cleanupMultidelegationInfo = (multiDelegationDiv: Element) => {
   }
 };
 
-const signerManager = new SignerManager(
+const signingCoordinator = new SigningCoordinator(
   {
     hwOptions: {
       communicationType: CommunicationType.Web,
@@ -231,7 +231,7 @@ const signerManager = new SignerManager(
 const passphraseByteArray = Uint8Array.from(
   env.KEY_MANAGEMENT_PARAMS.passphrase.split('').map((letter) => letter.charCodeAt(0))
 );
-merge(signerManager.signDataRequest$, signerManager.transactionWitnessRequest$).subscribe((req) => {
+merge(signingCoordinator.signDataRequest$, signingCoordinator.transactionWitnessRequest$).subscribe((req) => {
   logger.info('Sign request', req);
   if (req.walletType === WalletType.InMemory) {
     void req.sign(new Uint8Array(passphraseByteArray));
@@ -244,9 +244,9 @@ merge(signerManager.signDataRequest$, signerManager.transactionWitnessRequest$).
 // Setup
 
 // Expose local objects.
-exposeSignerManagerApi(
+exposeSigningCoordinatorApi(
   {
-    signerManager
+    signingCoordinator
   },
   { logger, runtime }
 );

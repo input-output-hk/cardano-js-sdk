@@ -91,7 +91,7 @@ describe('WalletManagerWorker', () => {
   };
 
   const createWalletManager = async (params?: { mockStorage?: Storage.StorageArea; destroyTracker?: string[] }) => {
-    const signerManagerApi = { shutdown: jest.fn(), signData: jest.fn(), signTransaction: jest.fn() };
+    const signingCoordinatorApi = { shutdown: jest.fn(), signData: jest.fn(), signTransaction: jest.fn() };
     const walletFactory: WalletFactory<{ name: string }> = { create: walletFactoryCreate };
     const walletRepository = new WalletRepository<{ name: string }>({
       logger,
@@ -125,7 +125,7 @@ describe('WalletManagerWorker', () => {
         logger,
         managerStorage: params?.mockStorage ?? managerStorage,
         runtime,
-        signerManagerApi,
+        signingCoordinatorApi,
         storesFactory: {
           create: (props) =>
             ({

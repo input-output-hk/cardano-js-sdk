@@ -12,7 +12,7 @@ import { HexBlob, InvalidArgumentError, deepEquals } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { MessengerDependencies } from '../messaging';
 import { ObservableWallet, storage } from '@cardano-sdk/wallet';
-import { SignerManagerSignApi } from './SignerManager';
+import { SigningCoordinatorSignApi } from './SigningCoordinator';
 import { Storage } from 'webextension-polyfill';
 import {
   StoresFactory,
@@ -46,7 +46,7 @@ export interface WalletManagerDependencies<Metadata extends { name: string }> {
   storesFactory: StoresFactory;
   managerStorage: Storage.StorageArea;
   walletRepository: WalletRepository<Metadata>;
-  signerManagerApi: SignerManagerSignApi<Metadata>;
+  signingCoordinatorApi: SigningCoordinatorSignApi<Metadata>;
 }
 
 /**
@@ -63,7 +63,7 @@ export class WalletManager<Metadata extends { name: string }> implements WalletM
   #walletFactory: WalletFactory<Metadata>;
   #storesFactory: StoresFactory;
   #walletRepository: WalletRepository<Metadata>;
-  #signerManagerApi: SignerManagerSignApi<Metadata>;
+  #signingCoordinatorApi: SigningCoordinatorSignApi<Metadata>;
   #logger: Logger;
   #managerStorageKey: string;
   #managerStorage: Storage.StorageArea;
@@ -76,7 +76,7 @@ export class WalletManager<Metadata extends { name: string }> implements WalletM
       logger,
       managerStorage,
       walletRepository,
-      signerManagerApi
+      signingCoordinatorApi
     }: MessengerDependencies & WalletManagerDependencies<Metadata>
   ) {
     this.#walletRepository = walletRepository;
@@ -86,7 +86,7 @@ export class WalletManager<Metadata extends { name: string }> implements WalletM
     this.#managerStorage = managerStorage;
     this.#storesFactory = storesFactory;
     this.#logger = logger;
-    this.#signerManagerApi = signerManagerApi;
+    this.#signingCoordinatorApi = signingCoordinatorApi;
   }
 
   /**
@@ -290,7 +290,7 @@ export class WalletManager<Metadata extends { name: string }> implements WalletM
       case WalletType.Trezor:
         witnesser = {
           signBlob: async (derivationPath: AccountKeyDerivationPath, blob: HexBlob, context: SignDataContext) =>
-            await this.#signerManagerApi.signData(
+            await this.#signingCoordinatorApi.signData(
               {
                 blob,
                 derivationPath,
@@ -303,7 +303,7 @@ export class WalletManager<Metadata extends { name: string }> implements WalletM
               }
             ),
           witness: async (tx: Serialization.Transaction, context: SignTransactionContext, options?: WitnessOptions) => {
-            const signatures = await this.#signerManagerApi.signTransaction(
+            const signatures = await this.#signingCoordinatorApi.signTransaction(
               {
                 options,
                 signContext: context,
