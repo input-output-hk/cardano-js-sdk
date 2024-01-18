@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.18.1...@cardano-sdk/key-management@0.19.0) (2024-01-17)
+
+### ⚠ BREAKING CHANGES
+
+* added a new type SignDataContext which has two optional fields, sender and address
+- sender field of Witnesser signBlob was replaced by a SignDataContext
+- sender field of SignerManager signData was replaced by a SignDataContext
+
+### Features
+
+* signerManager and Witnesser now propagate signData confirmation address ([544cc17](https://github.com/input-output-hk/cardano-js-sdk/commit/544cc17ce36da4f4bc186d3c19a4bc34ab67361e))
+
 ## [0.18.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.18.0...@cardano-sdk/key-management@0.18.1) (2024-01-05)
 
 **Note:** Version bump only for package @cardano-sdk/key-management

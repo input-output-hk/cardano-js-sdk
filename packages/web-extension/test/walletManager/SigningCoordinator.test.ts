@@ -11,14 +11,14 @@ import {
 import { Bip32PublicKeyHex, Ed25519PublicKeyHex, Ed25519SignatureHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { Cardano, TxCBOR } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
-import { InMemoryWallet, KeyAgentFactory, SignerManager, WalletType } from '../../src';
+import { InMemoryWallet, KeyAgentFactory, SigningCoordinator, WalletType } from '../../src';
 import { firstValueFrom } from 'rxjs';
 
-describe('SignerManager', () => {
-  let signerManager: SignerManager<{}>;
+describe('SigningCoordinator', () => {
+  let signingCoordinator: SigningCoordinator<{}, {}>;
   let keyAgentFactory: jest.Mocked<KeyAgentFactory>;
   let keyAgent: jest.Mocked<InMemoryKeyAgent>;
-  const wallet: InMemoryWallet<{}> = {
+  const wallet: InMemoryWallet<{}, {}> = {
     accounts: [
       {
         accountIndex: 0,
@@ -32,6 +32,7 @@ describe('SignerManager', () => {
     extendedAccountPublicKey: Bip32PublicKeyHex(
       'ba4f80dea2632a17c99ae9d8b934abf02643db5426b889fef14709c85e294aa12ac1f1560a893ea7937c5bfbfdeab459b1a396f1174b9c5a673a640d01880c35'
     ),
+    metadata: {},
     type: WalletType.InMemory,
     walletId: Hash28ByteBase16('ad63f855e831d937457afc52a21a7f351137e4a9fff26c217817335a')
   };
@@ -50,7 +51,7 @@ describe('SignerManager', () => {
       Ledger: jest.fn(),
       Trezor: jest.fn()
     };
-    signerManager = new SignerManager(
+    signingCoordinator = new SigningCoordinator(
       {
         hwOptions: {
           communicationType: CommunicationType.Node,
@@ -78,12 +79,12 @@ describe('SignerManager', () => {
 
     it('rejects given invalid tx cbor', async () => {
       await expect(
-        signerManager.signTransaction({ signContext, tx: 'abc' as TxCBOR }, requestContext)
+        signingCoordinator.signTransaction({ signContext, tx: 'abc' as TxCBOR }, requestContext)
       ).rejects.toThrowError();
     });
 
     it('rejects with AuthenticationError when there is no subscriber', async () => {
-      await expect(signerManager.signTransaction({ signContext, tx }, requestContext)).rejects.toThrowError(
+      await expect(signingCoordinator.signTransaction({ signContext, tx }, requestContext)).rejects.toThrowError(
         errors.AuthenticationError
       );
     });
@@ -91,16 +92,16 @@ describe('SignerManager', () => {
     it('rejects with ProofGenerationError when account is not found', async () => {
       keyAgent.signTransaction.mockResolvedValueOnce(signatures);
       // subscribe to witness requests
-      void firstValueFrom(signerManager.transactionWitnessRequest$);
+      void firstValueFrom(signingCoordinator.transactionWitnessRequest$);
       await expect(
-        signerManager.signTransaction({ signContext, tx }, { ...requestContext, accountIndex: 999_999 })
+        signingCoordinator.signTransaction({ signContext, tx }, { ...requestContext, accountIndex: 999_999 })
       ).rejects.toThrowError(errors.ProofGenerationError);
     });
 
     it('signs with key agent when subscriber calls sign()', async () => {
       keyAgent.signTransaction.mockResolvedValueOnce(signatures);
-      const reqEmitted = firstValueFrom(signerManager.transactionWitnessRequest$);
-      const signed = signerManager.signTransaction({ signContext, tx }, requestContext);
+      const reqEmitted = firstValueFrom(signingCoordinator.transactionWitnessRequest$);
+      const signed = signingCoordinator.signTransaction({ signContext, tx }, requestContext);
       const req = await reqEmitted;
       await expect(req.sign(passphrase)).resolves.toEqual(signatures);
       await expect(signed).resolves.toEqual(signatures);
@@ -108,8 +109,8 @@ describe('SignerManager', () => {
     });
 
     it('rejects with AuthenticationError when subscriber calls reject()', async () => {
-      const reqEmitted = firstValueFrom(signerManager.transactionWitnessRequest$);
-      const signed = signerManager.signTransaction({ signContext, tx }, requestContext);
+      const reqEmitted = firstValueFrom(signingCoordinator.transactionWitnessRequest$);
+      const signed = signingCoordinator.signTransaction({ signContext, tx }, requestContext);
       const req = await reqEmitted;
       await req.reject("Don't want to");
       await expect(signed).rejects.toThrowError(errors.AuthenticationError);
@@ -118,8 +119,8 @@ describe('SignerManager', () => {
     it('rejects when key agent rejects', async () => {
       const error = new Error('invalid passphrase');
       keyAgent.signTransaction.mockRejectedValueOnce(error);
-      const reqEmitted = firstValueFrom(signerManager.transactionWitnessRequest$);
-      const signed = signerManager.signTransaction({ signContext, tx }, requestContext);
+      const reqEmitted = firstValueFrom(signingCoordinator.transactionWitnessRequest$);
+      const signed = signingCoordinator.signTransaction({ signContext, tx }, requestContext);
       const req = await reqEmitted;
       await expect(req.sign(passphrase)).rejects.toThrow(error);
       await expect(signed).rejects.toThrow(error);
@@ -130,8 +131,8 @@ describe('SignerManager', () => {
       it('does not resolve to original caller until successful signing', async () => {
         const error = new Error('invalid passphrase, please retry');
         keyAgent.signTransaction.mockRejectedValueOnce(error).mockResolvedValueOnce(signatures);
-        const reqEmitted = firstValueFrom(signerManager.transactionWitnessRequest$);
-        const signed = signerManager.signTransaction({ signContext, tx }, requestContext);
+        const reqEmitted = firstValueFrom(signingCoordinator.transactionWitnessRequest$);
+        const signed = signingCoordinator.signTransaction({ signContext, tx }, requestContext);
         const req = await reqEmitted;
         await expect(req.sign(passphrase, { willRetryOnFailure: true })).rejects.toThrow(error);
         await expect(req.sign(passphrase, { willRetryOnFailure: true })).resolves.toEqual(signatures);
@@ -142,8 +143,8 @@ describe('SignerManager', () => {
       it('does not reject to original caller until explicit rejection', async () => {
         const error = new Error('invalid passphrase, call reject if dont want to sign again');
         keyAgent.signTransaction.mockRejectedValueOnce(error).mockResolvedValueOnce(signatures);
-        const reqEmitted = firstValueFrom(signerManager.transactionWitnessRequest$);
-        const signed = signerManager.signTransaction({ signContext, tx }, requestContext);
+        const reqEmitted = firstValueFrom(signingCoordinator.transactionWitnessRequest$);
+        const signed = signingCoordinator.signTransaction({ signContext, tx }, requestContext);
         const req = await reqEmitted;
         await expect(req.sign(passphrase, { willRetryOnFailure: true })).rejects.toThrow(error);
         await req.reject('forgot password');
@@ -164,25 +165,25 @@ describe('SignerManager', () => {
 
     it('rejects with AuthenticationError when there is no subscriber', async () => {
       keyAgent.signBlob.mockResolvedValueOnce(signResult);
-      await expect(signerManager.signData({ blob, derivationPath, signContext }, requestContext)).rejects.toThrowError(
-        errors.AuthenticationError
-      );
+      await expect(
+        signingCoordinator.signData({ blob, derivationPath, signContext }, requestContext)
+      ).rejects.toThrowError(errors.AuthenticationError);
     });
 
     it('rejects with ProofGenerationError when account is not found', async () => {
       keyAgent.signBlob.mockResolvedValueOnce(signResult);
       // subscribe to witness requests
-      void firstValueFrom(signerManager.signDataRequest$);
+      void firstValueFrom(signingCoordinator.signDataRequest$);
       await expect(
-        signerManager.signData({ blob, derivationPath, signContext }, { ...requestContext, accountIndex: 999_999 })
+        signingCoordinator.signData({ blob, derivationPath, signContext }, { ...requestContext, accountIndex: 999_999 })
       ).rejects.toThrowError(errors.ProofGenerationError);
     });
 
     it('signs with key agent when subscriber calls sign()', async () => {
       keyAgent.signBlob.mockResolvedValueOnce(signResult);
-      const reqEmitted = firstValueFrom(signerManager.signDataRequest$);
+      const reqEmitted = firstValueFrom(signingCoordinator.signDataRequest$);
       const context = { address: 'stubAddress' as Cardano.PaymentAddress, sender: { url: 'www.example.com' } };
-      const signed = signerManager.signData(
+      const signed = signingCoordinator.signData(
         {
           blob,
           derivationPath,
@@ -199,8 +200,8 @@ describe('SignerManager', () => {
     });
 
     it('rejects with AuthenticationError when subscriber calls reject()', async () => {
-      const reqEmitted = firstValueFrom(signerManager.signDataRequest$);
-      const signed = signerManager.signData({ blob, derivationPath, signContext }, requestContext);
+      const reqEmitted = firstValueFrom(signingCoordinator.signDataRequest$);
+      const signed = signingCoordinator.signData({ blob, derivationPath, signContext }, requestContext);
       const req = await reqEmitted;
       await req.reject("Don't want to");
       await expect(signed).rejects.toThrowError(errors.AuthenticationError);
@@ -209,8 +210,8 @@ describe('SignerManager', () => {
     it('rejects when key agent rejects', async () => {
       const error = new errors.AuthenticationError('invalid passphrase');
       keyAgent.signBlob.mockRejectedValueOnce(error);
-      const reqEmitted = firstValueFrom(signerManager.signDataRequest$);
-      const signed = signerManager.signData({ blob, derivationPath, signContext }, requestContext);
+      const reqEmitted = firstValueFrom(signingCoordinator.signDataRequest$);
+      const signed = signingCoordinator.signData({ blob, derivationPath, signContext }, requestContext);
       const req = await reqEmitted;
       await expect(req.sign(passphrase)).rejects.toThrow(error);
       await expect(signed).rejects.toThrow(error);
@@ -221,8 +222,8 @@ describe('SignerManager', () => {
       it('does not resolve to original caller until successful signing', async () => {
         const error = new Error('invalid passphrase, please retry');
         keyAgent.signBlob.mockRejectedValueOnce(error).mockResolvedValueOnce(signResult);
-        const reqEmitted = firstValueFrom(signerManager.signDataRequest$);
-        const signed = signerManager.signData({ blob, derivationPath, signContext }, requestContext);
+        const reqEmitted = firstValueFrom(signingCoordinator.signDataRequest$);
+        const signed = signingCoordinator.signData({ blob, derivationPath, signContext }, requestContext);
         const req = await reqEmitted;
         await expect(req.sign(passphrase, { willRetryOnFailure: true })).rejects.toThrow(error);
         await expect(req.sign(passphrase, { willRetryOnFailure: true })).resolves.toEqual(signResult);
@@ -233,8 +234,8 @@ describe('SignerManager', () => {
       it('does not reject to original caller until explicit rejection', async () => {
         const error = new Error('invalid passphrase, call reject if dont want to sign again');
         keyAgent.signBlob.mockRejectedValueOnce(error);
-        const reqEmitted = firstValueFrom(signerManager.signDataRequest$);
-        const signed = signerManager.signData({ blob, derivationPath, signContext }, requestContext);
+        const reqEmitted = firstValueFrom(signingCoordinator.signDataRequest$);
+        const signed = signingCoordinator.signData({ blob, derivationPath, signContext }, requestContext);
         const req = await reqEmitted;
         await expect(req.sign(passphrase, { willRetryOnFailure: true })).rejects.toThrow(error);
         await req.reject('forgot password');

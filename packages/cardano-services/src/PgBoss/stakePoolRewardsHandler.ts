@@ -115,8 +115,10 @@ const checkPreviousEpochCompleted = async (dataSource: DataSource, epochNo: Card
   const queryRunner = dataSource.createQueryRunner();
 
   try {
+    const subQuery = (table: 'archive' | 'job') =>
+      `(SELECT COUNT(*) FROM pgboss.${table} WHERE name = $1 AND singletonkey = $2 AND state = $3)`;
     const result: { completed: string }[] = await queryRunner.query(
-      'SELECT COUNT(*) AS completed FROM pgboss.job WHERE name = $1 AND singletonkey = $2 AND state = $3',
+      `SELECT ${subQuery('archive')} + ${subQuery('job')} AS completed`,
       [STAKE_POOL_REWARDS, epochNo - 1, 'completed']
     );
 

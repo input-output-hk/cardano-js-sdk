@@ -14,6 +14,7 @@ import {
   DROP_SCHEMA_DEFAULT,
   DRY_RUN_DEFAULT,
   HANDLE_PROVIDER_SERVER_URL_DEFAULT,
+  METADATA_JOB_RETRY_DELAY_DEFAULT,
   PAGINATION_PAGE_SIZE_LIMIT_DEFAULT,
   PARALLEL_JOBS_DEFAULT,
   PG_BOSS_WORKER_API_URL_DEFAULT,
@@ -141,6 +142,13 @@ addOptions(withCommonOptions(projectorWithArgs, PROJECTOR_API_URL_DEFAULT), [
     'EXIT_AT_BLOCK_NO',
     (exitAtBlockNo) => (exitAtBlockNo ? Number.parseInt(exitAtBlockNo, 10) : 0),
     ''
+  ),
+  newOption(
+    '--metadata-job-retry-delay <metadataJobRetryDelay>',
+    ProjectorOptionDescriptions.MetadataJobRetryDelay,
+    'METADATA_JOB_RETRY_DELAY',
+    (metadataJobRetryDelay) => Number.parseInt(metadataJobRetryDelay, 10),
+    METADATA_JOB_RETRY_DELAY_DEFAULT
   ),
   newOption(
     '--pools-metrics-interval <poolsMetricsInterval>',

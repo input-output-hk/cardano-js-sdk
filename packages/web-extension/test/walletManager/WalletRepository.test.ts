@@ -1,38 +1,44 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Bip32PublicKeyHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { Cardano, Serialization } from '@cardano-sdk/core';
 import {
-  UpdateMetadataProps,
+  AddWalletProps,
+  HardwareWallet,
+  UpdateAccountMetadataProps,
+  UpdateWalletMetadataProps,
   WalletConflictError,
   WalletId,
   WalletRepository,
   WalletRepositoryDependencies,
   WalletType
 } from '../../src';
+import { Bip32PublicKeyHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { firstValueFrom, of } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 import pick from 'lodash/pick';
 
 type WalletMetadata = { friendlyName: string };
+type AccountMetadata = { friendlyName: string };
 
-const storedLedgerWallet = {
+const storedLedgerWallet: HardwareWallet<WalletMetadata, AccountMetadata> = {
   accounts: [
     {
       accountIndex: 0,
-      metadata: { friendlyName: 'My Ledger Wallet' }
+      metadata: { friendlyName: 'Account #0' }
     }
   ],
   extendedAccountPublicKey: Bip32PublicKeyHex(
     'ba4f80dea2632a17c99ae9d8b934abf02643db5426b889fef14709c85e294aa12ac1f1560a893ea7937c5bfbfdeab459b1a396f1174b9c5a673a640d01880c35'
   ),
+  metadata: { friendlyName: 'My Ledger Wallet' },
   type: WalletType.Ledger as const,
   walletId: 'bc10b0e8fdff359b389822d98d4def22'
 };
 
-const createTrezorWalletProps = {
+const createTrezorWalletProps: AddWalletProps<WalletMetadata, AccountMetadata> = {
   extendedAccountPublicKey: Bip32PublicKeyHex(
     'ca4f80dea2632a17c99ae9d8b934abf02643db5426b889fef14709c85e294aa12ac1f1560a893ea7937c5bfbfdeab459b1a396f1174b9c5a673a640d01880c35'
   ),
+  metadata: { friendlyName: 'My Trezor Wallet' },
   type: WalletType.Trezor as const
 };
 
@@ -59,14 +65,16 @@ const storedScriptWallet = {
 };
 
 describe('WalletRepository', () => {
-  let repository: WalletRepository<WalletMetadata>;
-  let store: jest.Mocked<WalletRepositoryDependencies<WalletMetadata>['store']>;
+  let repository: WalletRepository<WalletMetadata, AccountMetadata>;
+  let store: jest.Mocked<WalletRepositoryDependencies<WalletMetadata, AccountMetadata>['store']>;
 
   beforeEach(() => {
     store = {
-      observeAll: jest.fn() as jest.Mocked<WalletRepositoryDependencies<WalletMetadata>['store']>['observeAll'],
-      setAll: jest.fn() as jest.Mocked<WalletRepositoryDependencies<WalletMetadata>['store']>['setAll']
-    } as jest.Mocked<WalletRepositoryDependencies<WalletMetadata>['store']>;
+      observeAll: jest.fn() as jest.Mocked<
+        WalletRepositoryDependencies<WalletMetadata, AccountMetadata>['store']
+      >['observeAll'],
+      setAll: jest.fn() as jest.Mocked<WalletRepositoryDependencies<WalletMetadata, AccountMetadata>['store']>['setAll']
+    } as jest.Mocked<WalletRepositoryDependencies<WalletMetadata, AccountMetadata>['store']>;
     repository = new WalletRepository({ logger, store });
 
     store.observeAll.mockReturnValue(of([storedLedgerWallet]));
@@ -99,7 +107,7 @@ describe('WalletRepository', () => {
 
     it('rejects with WalletConflictError when wallet already exists', async () => {
       await expect(
-        repository.addWallet(pick(storedLedgerWallet, ['type', 'extendedAccountPublicKey']))
+        repository.addWallet(pick(storedLedgerWallet, ['metadata', 'type', 'extendedAccountPublicKey']))
       ).rejects.toThrowError(WalletConflictError);
       expect(store.setAll).not.toBeCalled();
     });
@@ -195,13 +203,27 @@ describe('WalletRepository', () => {
   describe('updateMetadata', () => {
     const newMetadata = { friendlyName: 'New name' };
 
+    it('updates metadata of an existing ledger wallet', async () => {
+      const props: UpdateWalletMetadataProps<WalletMetadata> = {
+        metadata: newMetadata,
+        walletId: storedLedgerWallet.walletId
+      };
+      await expect(repository.updateWalletMetadata(props)).resolves.toEqual(props);
+      expect(store.setAll).toBeCalledWith([
+        {
+          ...storedLedgerWallet,
+          metadata: newMetadata
+        }
+      ]);
+    });
+
     it('updates metadata of an existing bip32 account', async () => {
-      const props: UpdateMetadataProps<WalletMetadata> = {
+      const props: UpdateAccountMetadataProps<WalletMetadata> = {
         accountIndex: storedLedgerWallet.accounts[0].accountIndex,
         metadata: newMetadata,
         walletId: storedLedgerWallet.walletId
       };
-      await expect(repository.updateMetadata(props)).resolves.toEqual(props);
+      await expect(repository.updateAccountMetadata(props)).resolves.toEqual(props);
       expect(store.setAll).toBeCalledWith([
         {
           ...storedLedgerWallet,
@@ -217,11 +239,11 @@ describe('WalletRepository', () => {
 
     it('updates metadata of an existing script wallet', async () => {
       store.observeAll.mockReturnValueOnce(of([storedScriptWallet]));
-      const props: UpdateMetadataProps<WalletMetadata> = {
+      const props: UpdateWalletMetadataProps<WalletMetadata> = {
         metadata: newMetadata,
         walletId: storedScriptWallet.walletId
       };
-      await expect(repository.updateMetadata(props)).resolves.toEqual(props);
+      await expect(repository.updateWalletMetadata(props)).resolves.toEqual(props);
       expect(store.setAll).toBeCalledWith([
         {
           ...storedScriptWallet,
@@ -232,13 +254,13 @@ describe('WalletRepository', () => {
 
     it('rejects with WalletConflictError when a bip32 account or a script wallet with specified id is not found', async () => {
       await expect(
-        repository.updateMetadata({
+        repository.updateWalletMetadata({
           metadata: newMetadata,
           walletId: 'does not exist' as Hash28ByteBase16
         })
       ).rejects.toThrowError(WalletConflictError);
       await expect(
-        repository.updateMetadata({
+        repository.updateAccountMetadata({
           accountIndex: 999_999_999,
           metadata: newMetadata,
           walletId: storedScriptWallet.walletId

@@ -5,8 +5,8 @@ import {
   TypeormStabilityWindowBuffer,
   TypeormTipTracker,
   createObservableConnection,
+  createStoreStakePoolMetadataJob,
   storeBlock,
-  storeStakePoolMetadataJob,
   typeormTransactionCommit,
   withTypeormTransaction
 } from '../../src';
@@ -44,7 +44,7 @@ describe('storeStakePoolMetadataJob', () => {
         pgBoss: true
       }),
       storeBlock(),
-      storeStakePoolMetadataJob(),
+      createStoreStakePoolMetadataJob()(),
       buffer.storeBlockData(),
       typeormTransactionCommit()
     );

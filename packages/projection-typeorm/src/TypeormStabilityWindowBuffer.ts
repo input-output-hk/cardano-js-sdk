@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable brace-style */
 import { BlockDataEntity } from './entity';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { LessThan, QueryRunner } from 'typeorm';

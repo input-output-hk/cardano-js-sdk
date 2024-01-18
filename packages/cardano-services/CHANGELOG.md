@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.25.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.24.5...@cardano-sdk/cardano-services@0.25.0) (2024-01-17)
+
+### ⚠ BREAKING CHANGES
+
+* add retry configuration to store stake pool metadata job
+
+### Features
+
+* add retry configuration to store stake pool metadata job ([90c4663](https://github.com/input-output-hk/cardano-js-sdk/commit/90c46632211c2fe3d5546650444d98e577a0278e))
+
+### Bug Fixes
+
+* **cardano-services:** use pgboss.archive table to check computed epoch rewards ([b25d151](https://github.com/input-output-hk/cardano-js-sdk/commit/b25d151cb38c90b2c7e7366577a2523ff217e8dd))
+
 ## [0.24.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.24.4...@cardano-sdk/cardano-services@0.24.5) (2024-01-05)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services

@@ -6,7 +6,7 @@ import {
   WalletManagerActivateProps,
   WalletRepository,
   WalletType,
-  consumeSignerManagerApi,
+  consumeSigningCoordinatorApi,
   exposeApi,
   observableWalletProperties,
   repositoryChannel,
@@ -38,7 +38,7 @@ export interface WalletFactoryDependencies {
  * @param accountIndex The account index to get the name from.
  * @private
  */
-const getWalletName = (wallet: AnyWallet<Metadata>, accountIndex?: number): string => {
+const getWalletName = (wallet: AnyWallet<Metadata, Metadata>, accountIndex?: number): string => {
   let name = '';
   switch (wallet.type) {
     case WalletType.InMemory:
@@ -68,10 +68,10 @@ const getWalletName = (wallet: AnyWallet<Metadata>, accountIndex?: number): stri
  * to construct providers for different networks.
  * Please check its documentation for examples.
  */
-const walletFactory: WalletFactory<Metadata> = {
+const walletFactory: WalletFactory<Metadata, Metadata> = {
   create: async (
     props: WalletManagerActivateProps,
-    wallet: AnyWallet<Metadata>,
+    wallet: AnyWallet<Metadata, Metadata>,
     { witnesser, stores }: WalletFactoryDependencies
   ) =>
     (
@@ -89,20 +89,20 @@ const storesFactory: StoresFactory = {
   create: ({ name }) => storage.createPouchDbWalletStores(name, { logger })
 };
 
-const walletRepository = new WalletRepository<Metadata>({
+const walletRepository = new WalletRepository<Metadata, Metadata>({
   logger,
   store: new storage.InMemoryCollectionStore()
 });
 
-const signerManagerApi = consumeSignerManagerApi({ logger, runtime });
+const signingCoordinatorApi = consumeSigningCoordinatorApi({ logger, runtime });
 
-const walletManager = new WalletManager<Metadata>(
+const walletManager = new WalletManager<Metadata, Metadata>(
   { name: walletName },
   {
     logger,
     managerStorage: WebExtensionStorage.local,
     runtime,
-    signerManagerApi,
+    signingCoordinatorApi,
     storesFactory,
     walletFactory,
     walletRepository

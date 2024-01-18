@@ -40,6 +40,8 @@ spec:
               value: preview
             - name: OGMIOS_SRV_SERVICE_NAME
               value: dev-preview-cardano-stack.dev-preview.svc.cluster.local
+            - name: USE_BLOCKFROST
+              value: "true"
             - name: PAGINATION_PAGE_SIZE_LIMIT
               value: "5500"
             - name: POSTGRES_DB_DB_SYNC
@@ -68,8 +70,6 @@ spec:
               value: asset,chain-history,network-info,rewards,stake-pool,tx-submit,utxo
             - name: TOKEN_METADATA_SERVER_URL
               value: http://dev-preview-cardano-stack-metadata.dev-preview.svc.cluster.local
-            - name: USE_BLOCKFROST
-              value: "false"
             - name: USE_KORA_LABS
               value: "true"
           image: FIXME-ADD-LATEST-IMAGE-REFERENCE

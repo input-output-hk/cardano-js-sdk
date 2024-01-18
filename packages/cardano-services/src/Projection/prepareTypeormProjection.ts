@@ -18,6 +18,7 @@ import {
   StakePoolEntity,
   TokensEntity,
   createStorePoolMetricsUpdateJob,
+  createStoreStakePoolMetadataJob,
   storeAddresses,
   storeAssets,
   storeBlock,
@@ -25,7 +26,6 @@ import {
   storeHandles,
   storeNftMetadata,
   storeStakeKeyRegistrations,
-  storeStakePoolMetadataJob,
   storeStakePoolRewardsJob,
   storeStakePools,
   storeUtxo
@@ -109,7 +109,7 @@ export const storeOperators = {
     POOLS_METRICS_OUTDATED_INTERVAL_DEFAULT
   )(),
   storeStakeKeyRegistrations: storeStakeKeyRegistrations(),
-  storeStakePoolMetadataJob: storeStakePoolMetadataJob(),
+  storeStakePoolMetadataJob: createStoreStakePoolMetadataJob()(),
   storeStakePoolRewardsJob: storeStakePoolRewardsJob(),
   storeStakePools: storeStakePools(),
   storeUtxo: storeUtxo()

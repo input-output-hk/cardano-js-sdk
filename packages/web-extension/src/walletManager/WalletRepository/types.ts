@@ -14,23 +14,28 @@ export type AddAccountProps<Metadata extends {}> = {
   metadata: Metadata;
 };
 
-export type UpdateMetadataProps<Metadata extends {}> = {
+export type UpdateWalletMetadataProps<Metadata extends {}> = {
   walletId: WalletId;
-  /** account' in cip1852; must be specified for bip32 wallets */
-  accountIndex?: number;
   metadata: Metadata;
 };
 
-export type AddWalletProps<Metadata extends {}> =
-  | Omit<HardwareWallet<Metadata>, 'walletId' | 'accounts'>
-  | Omit<InMemoryWallet<Metadata>, 'walletId' | 'accounts'>
-  | Omit<ScriptWallet<Metadata>, 'walletId'>;
+export type UpdateAccountMetadataProps<Metadata extends {}> = {
+  /** account' in cip1852; must be specified for bip32 wallets */
+  walletId: WalletId;
+  accountIndex: number;
+  metadata: Metadata;
+};
 
-export interface WalletRepositoryApi<Metadata extends {}> {
-  wallets$: Observable<AnyWallet<Metadata>[]>;
+export type AddWalletProps<WalletMetadata extends {}, AccountMetadata extends {}> =
+  | Omit<HardwareWallet<WalletMetadata, AccountMetadata>, 'walletId' | 'accounts'>
+  | Omit<InMemoryWallet<WalletMetadata, AccountMetadata>, 'walletId' | 'accounts'>
+  | Omit<ScriptWallet<WalletMetadata>, 'walletId'>;
+
+export interface WalletRepositoryApi<WalletMetadata extends {}, AccountMetadata extends {}> {
+  wallets$: Observable<AnyWallet<WalletMetadata, AccountMetadata>[]>;
 
   /** Rejects with WalletConflictError when wallet already exists */
-  addWallet(props: AddWalletProps<Metadata>): Promise<WalletId>;
+  addWallet(props: AddWalletProps<WalletMetadata, AccountMetadata>): Promise<WalletId>;
 
   /**
    * Can be used to add a new account to an existing BIP32Wallet
@@ -39,10 +44,16 @@ export interface WalletRepositoryApi<Metadata extends {}> {
    * - wallet with provided `walletId` is not found
    * - account already exists for this wallet
    */
-  addAccount(props: AddAccountProps<Metadata>): Promise<AddAccountProps<Metadata>>;
+  addAccount(props: AddAccountProps<AccountMetadata>): Promise<AddAccountProps<AccountMetadata>>;
 
   /** Rejects with WalletConflictError when wallet or account with specified index is not found */
-  updateMetadata(props: UpdateMetadataProps<Metadata>): Promise<UpdateMetadataProps<Metadata>>;
+  updateWalletMetadata(
+    props: UpdateWalletMetadataProps<WalletMetadata>
+  ): Promise<UpdateWalletMetadataProps<WalletMetadata>>;
+
+  updateAccountMetadata(
+    props: UpdateWalletMetadataProps<AccountMetadata>
+  ): Promise<UpdateWalletMetadataProps<AccountMetadata>>;
 
   /** Rejects with WalletConflictError when account is not found. */
   removeAccount(props: RemoveAccountProps): Promise<RemoveAccountProps>;
