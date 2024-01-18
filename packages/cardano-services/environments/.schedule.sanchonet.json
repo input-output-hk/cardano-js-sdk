@@ -1,0 +1,10 @@
+{
+  "schedules": {
+    "list": [
+      {
+        "queue": "pool-delist-schedule",
+        "cron": "0 * * * *"
+      }
+    ]
+  }
+}
