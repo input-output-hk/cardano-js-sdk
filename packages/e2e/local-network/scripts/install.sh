@@ -16,7 +16,7 @@ clean() {
 }
 trap clean EXIT
 
-VERSION="8.7.1"
+VERSION="8.7.3"
 
 rm -rf bin
 mkdir -p bin

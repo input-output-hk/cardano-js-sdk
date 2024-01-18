@@ -5,7 +5,7 @@ FROM ubuntu:${UBUNTU_VERSION} as builder
 ENV DEBIAN_FRONTEND=nonintercative
 
 WORKDIR /build
-ARG CARDANO_NODE_BUILD_URL=https://github.com/input-output-hk/cardano-node/releases/download/8.7.1-pre/cardano-node-8.7.1-linux.tar.gz
+ARG CARDANO_NODE_BUILD_URL=https://github.com/input-output-hk/cardano-node/releases/download/8.7.3/cardano-node-8.7.3-linux.tar.gz
 RUN apt-get update -y && \
   apt-get install -y wget tar && \
   wget $CARDANO_NODE_BUILD_URL -O cardano-node.tar.gz && \

@@ -40,7 +40,7 @@ const mapRelay = (relay: Schema.Relay): Cardano.Relay => {
 const mapPoolParameters = (poolParameters: Schema.StakePool): Cardano.PoolParameters => {
   const rewardAccount = Cardano.RewardAccount(poolParameters.rewardAccount);
   return {
-    cost: poolParameters.cost.lovelace,
+    cost: poolParameters.cost.ada.lovelace,
     // TODO: consider just casting without validation for better performance
     id: Cardano.PoolId(poolParameters.id),
     margin: mapMargin(poolParameters.margin),
@@ -53,7 +53,7 @@ const mapPoolParameters = (poolParameters: Schema.StakePool): Cardano.PoolParame
     owners: poolParameters.owners.map((ownerKeyHash) =>
       Cardano.createRewardAccount(Crypto.Ed25519KeyHashHex(ownerKeyHash), Cardano.addressNetworkId(rewardAccount))
     ),
-    pledge: poolParameters.pledge.lovelace,
+    pledge: poolParameters.pledge.ada.lovelace,
     relays: poolParameters.relays.map(mapRelay),
     rewardAccount,
     vrf: Cardano.VrfVkHex(poolParameters.vrfVerificationKeyHash)
@@ -117,7 +117,7 @@ const mapCertificate = (certificate: Schema.Certificate): Cardano.Certificate =>
         __typename: Cardano.CertificateType.GenesisKeyDelegation,
         genesisDelegateHash: Crypto.Hash28ByteBase16(certificate.delegate.id),
         genesisHash: Crypto.Hash28ByteBase16(certificate.issuer.id),
-        vrfKeyHash: Crypto.Hash32ByteBase16(certificate.issuer.vrfVerificationKeyHash)
+        vrfKeyHash: Crypto.Hash32ByteBase16(certificate.delegate.vrfVerificationKeyHash)
       };
     case 'constitutionalCommitteeHotKeyRegistration':
       // TODO: Conway rest of fields
@@ -139,7 +139,7 @@ const mapCertificate = (certificate: Schema.Certificate): Cardano.Certificate =>
     case 'delegateRepresentativeRetirement':
       return {
         __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
-        deposit: certificate.deposit.lovelace
+        deposit: certificate.deposit.ada.lovelace
         // TODO: dRepCredential: certificate.delegateRepresentative.type
       } as unknown as Cardano.UnRegisterDelegateRepresentativeCertificate;
     case 'delegateRepresentativeUpdate':
@@ -256,15 +256,30 @@ const mapBootstrapWitness = (b: Schema.Signatory): Cardano.BootstrapWitness => (
   signature: Crypto.Ed25519SignatureHex(b.signature)
 });
 
-const mapRedeemer = (key: string, redeemer: Schema.Redeemer): Cardano.Redeemer => {
-  const purposeAndIndex = key.split(':');
+const mapRedeemer = (redeemer: Schema.Redeemer): Cardano.Redeemer => {
   const { memory, cpu: steps } = redeemer.executionUnits;
+
+  let purpose: Cardano.RedeemerPurpose;
+  switch (redeemer.validator.purpose) {
+    case 'spend':
+      purpose = Cardano.RedeemerPurpose.spend;
+      break;
+    case 'mint':
+      purpose = Cardano.RedeemerPurpose.mint;
+      break;
+    case 'publish':
+      purpose = Cardano.RedeemerPurpose.certificate;
+      break;
+    case 'withdraw':
+      purpose = Cardano.RedeemerPurpose.withdrawal;
+      break;
+  }
 
   return {
     data: Serialization.PlutusData.fromCbor(HexBlob(redeemer.redeemer)).toCore(),
     executionUnits: { memory, steps },
-    index: Number(purposeAndIndex[1]),
-    purpose: purposeAndIndex[0] as Cardano.RedeemerPurpose
+    index: redeemer.validator.index,
+    purpose
   };
 };
 
@@ -373,10 +388,17 @@ export const mapByronTxFee = ({ cbor }: Schema.Transaction) => {
 };
 
 export const mapWithdrawals = (withdrawals: Schema.Withdrawals): Cardano.Withdrawal[] =>
-  Object.entries(withdrawals).map(([key, { lovelace }]) => ({
-    quantity: lovelace,
-    stakeAddress: Cardano.RewardAccount(key)
-  }));
+  Object.entries(withdrawals).map(
+    ([
+      key,
+      {
+        ada: { lovelace }
+      }
+    ]) => ({
+      quantity: lovelace,
+      stakeAddress: Cardano.RewardAccount(key)
+    })
+  );
 
 const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
   const { auxiliaryData, auxiliaryDataHash } = mapAuxiliaryData(tx.metadata);
@@ -386,7 +408,7 @@ const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
       auxiliaryDataHash,
       certificates: tx.certificates?.map(mapCertificate),
       collaterals: tx.collaterals?.map(mapTxIn),
-      fee: tx.fee?.lovelace ?? mapByronTxFee(tx), // You were here. a common tx has fee but byron does not
+      fee: tx.fee?.ada.lovelace ?? mapByronTxFee(tx), // You were here. a common tx has fee but byron does not
       inputs: tx.inputs.map(mapTxIn),
       mint: mapMint(tx),
       outputs: tx.outputs.map(mapTxOut),
@@ -405,7 +427,7 @@ const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
         .filter((signatory) => signatory.addressAttributes || signatory.chainCode)
         .map(mapBootstrapWitness),
       ...(tx.datums && { datums: mapWitnessDatums({ datums: tx.datums }) }),
-      ...(tx.redeemers && { redeemers: Object.entries(tx.redeemers).map(([key, value]) => mapRedeemer(key, value)) }),
+      ...(tx.redeemers && { redeemers: tx.redeemers.map((redeemer) => mapRedeemer(redeemer)) }),
       // Removed `witness.scripts` from `OnChainTx`
       // https://github.com/input-output-hk/cardano-js-sdk/pull/927#discussion_r1352081210
       // ...(tx.scripts && { scripts: [...Object.values(tx.scripts).map(mapScript)] }),
