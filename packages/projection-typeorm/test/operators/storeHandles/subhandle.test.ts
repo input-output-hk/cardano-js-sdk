@@ -2,7 +2,7 @@ import { Asset, Cardano, Handle, Serialization } from '@cardano-sdk/core';
 import { HandleEntity } from '../../../src';
 import { HexBlob } from '@cardano-sdk/util';
 import { ProjectorContext, createProjectorContext } from '../util';
-import { QueryRunner } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { createMultiTxProjectionSource, entities, mapAndStore, policyId } from './util';
 import { firstValueFrom } from 'rxjs';
 import { initializeDataSource } from '../../util';
@@ -24,11 +24,13 @@ const handlDatum = Serialization.PlutusData.fromCbor(
 describe('subhandles', () => {
   let queryRunner: QueryRunner;
   let context: ProjectorContext;
+  let repository: Repository<HandleEntity>;
 
   beforeEach(async () => {
     const dataSource = await initializeDataSource({ entities });
     queryRunner = dataSource.createQueryRunner();
     context = createProjectorContext(entities);
+    repository = queryRunner.manager.getRepository(HandleEntity);
   });
 
   afterEach(async () => {
@@ -54,7 +56,6 @@ describe('subhandles', () => {
         Asset.AssetNameLabel.encode(handleAssetName(parentHandle), Asset.AssetNameLabelNum.UserNFT)
       );
 
-      const repository = queryRunner.manager.getRepository(HandleEntity);
       const source$ = createMultiTxProjectionSource([
         {
           body: {
@@ -132,7 +133,6 @@ describe('subhandles', () => {
 
       const bobAddress = Cardano.PaymentAddress('addr_test1wzlv9cslk9tcj0wpm9p5t6kajyt37ap5sc9rzkaxa9p67ys2ygypv');
 
-      const repository = queryRunner.manager.getRepository(HandleEntity);
       const source$ = createMultiTxProjectionSource([
         {
           body: {
@@ -217,7 +217,6 @@ describe('subhandles', () => {
         Asset.AssetNameLabel.encode(handleAssetName(parentHandle), Asset.AssetNameLabelNum.UserNFT)
       );
 
-      const repository = queryRunner.manager.getRepository(HandleEntity);
       const source$ = createMultiTxProjectionSource([
         {
           body: {
@@ -317,6 +316,40 @@ describe('subhandles', () => {
           policyId
         }
       });
+    });
+
+    it('does not store orphan subhandles', async () => {
+      const handle = 'orphan@doesntexist';
+      const handleAssetId = Cardano.AssetId.fromParts(
+        policyId,
+        Asset.AssetNameLabel.encode(
+          Cardano.AssetName(Buffer.from(handle).toString('hex')),
+          Asset.AssetNameLabelNum.UserNFT
+        )
+      );
+      const source$ = createMultiTxProjectionSource([
+        {
+          body: {
+            fee: 111n,
+            inputs: [],
+            mint: new Map([[handleAssetId, 1n]]),
+            outputs: [
+              {
+                address: maryAddress,
+                datum: handlDatum,
+                value: {
+                  assets: new Map([[handleAssetId, 1n]]),
+                  coins: 123n
+                }
+              }
+            ]
+          },
+          id: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000')
+        }
+      ]);
+
+      await firstValueFrom(source$.pipe(mapAndStore(context)));
+      expect(await repository.countBy({ handle })).toBe(0);
     });
   });
 });

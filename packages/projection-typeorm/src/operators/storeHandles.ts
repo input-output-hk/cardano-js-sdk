@@ -176,6 +176,10 @@ const rollForward = async ({ handles, queryRunner, handleMetadata }: HandleEvent
 
   for (const { assetId, handle, policyId, latestOwnerAddress, datum, totalSupply, parentHandle } of handles) {
     if (totalSupply === 1n) {
+      if (typeof parentHandle === 'string' && !(await handleRepository.exist({ where: { handle: parentHandle } }))) {
+        // Can't rely on (or catch) the error, because there is no easy way to resume a failed postgres transaction
+        return;
+      }
       // if !address then it's burning it, otherwise transferring
       const { cardanoAddress, hasDatum } = latestOwnerAddress
         ? { cardanoAddress: latestOwnerAddress, hasDatum: !!datum }
