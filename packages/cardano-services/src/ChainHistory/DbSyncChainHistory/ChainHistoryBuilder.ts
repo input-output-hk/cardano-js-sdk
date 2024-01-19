@@ -290,7 +290,7 @@ export class ChainHistoryBuilder {
     return result;
   }
 
-  public async queryCertificatesByIds(ids: string[]): Promise<TransactionDataMap<Cardano.Certificate[]>> {
+  public async queryCertificatesByIds(ids: string[]): Promise<TransactionDataMap<Cardano.CertificatePostConway[]>> {
     this.#logger.debug('About to find certificates for transactions with ids:', ids);
 
     const values = [ids];
@@ -420,7 +420,7 @@ export class ChainHistoryBuilder {
     ];
     if (allCerts.length === 0) return new Map();
 
-    const indexedCertsMap: TransactionDataMap<WithCertIndex<Cardano.Certificate>[]> = new Map();
+    const indexedCertsMap: TransactionDataMap<WithCertIndex<Cardano.CertificatePostConway>[]> = new Map();
     for (const cert of allCerts) {
       const txId = cert.tx_id.toString('hex') as unknown as Cardano.TransactionId;
       const currentCerts = indexedCertsMap.get(txId) ?? [];
@@ -428,11 +428,11 @@ export class ChainHistoryBuilder {
       if (newCert) indexedCertsMap.set(txId, [...currentCerts, newCert]);
     }
 
-    const certsMap: TransactionDataMap<Cardano.Certificate[]> = new Map();
+    const certsMap: TransactionDataMap<Cardano.CertificatePostConway[]> = new Map();
     for (const [txId] of indexedCertsMap) {
       const currentCerts = indexedCertsMap.get(txId) ?? [];
       const certs = orderBy(currentCerts, ['cert_index']).map(
-        (cert) => omit(cert, 'cert_index') as Cardano.Certificate
+        (cert) => omit(cert, 'cert_index') as Cardano.CertificatePostConway
       );
       certsMap.set(txId, certs);
     }

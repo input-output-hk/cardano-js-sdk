@@ -48,7 +48,7 @@ export const generateTxAlonzo = (qty: number): Cardano.HydratedTx[] =>
     }
   }));
 
-export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
+export const queryTransactionsResult: Paginated<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>> = {
   pageResults: [
     {
       blockHeader: {
@@ -58,7 +58,8 @@ export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
       body: {
         certificates: [
           {
-            __typename: Cardano.CertificateType.StakeRegistration,
+            __typename: Cardano.CertificateType.Registration,
+            deposit: 2_000_000n,
             stakeCredential
           },
           {

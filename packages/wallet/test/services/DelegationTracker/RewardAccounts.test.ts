@@ -91,7 +91,8 @@ describe('RewardAccounts', () => {
   test('getStakePoolIdAtEpoch', () => {
     const transactions = [
       {
-        certificates: [{ __typename: Cardano.CertificateType.StakeRegistration } as Cardano.StakeAddressCertificate],
+        certificates: [{ __typename: Cardano.CertificateType.Registration } as Cardano.NewStakeAddressCertificate],
+        deposit: 2_000_000n,
         epoch: Cardano.EpochNo(100)
       },
       {
@@ -104,7 +105,8 @@ describe('RewardAccounts', () => {
         epoch: Cardano.EpochNo(101)
       },
       {
-        certificates: [{ __typename: Cardano.CertificateType.StakeDeregistration } as Cardano.StakeAddressCertificate],
+        certificates: [{ __typename: Cardano.CertificateType.Unregistration } as Cardano.NewStakeAddressCertificate],
+        deposit: 2_000_000n,
         epoch: Cardano.EpochNo(102)
       },
       {
@@ -523,7 +525,7 @@ describe('RewardAccounts', () => {
             a: [
               {
                 certificates: [
-                  { __typename: Cardano.CertificateType.StakeRegistration } as Cardano.StakeAddressCertificate,
+                  { __typename: Cardano.CertificateType.Registration } as Cardano.NewStakeAddressCertificate,
                   {
                     __typename: Cardano.CertificateType.StakeDelegation,
                     poolId: poolId1

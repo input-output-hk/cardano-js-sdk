@@ -9,7 +9,9 @@ export const mockChainHistoryProvider: ChainHistoryProvider = {
   healthCheck: () => {
     throw new Error(NOT_IMPLEMENTED);
   },
-  transactionsByAddresses: (args: TransactionsByAddressesArgs): Promise<Paginated<Cardano.HydratedTx>> => {
+  transactionsByAddresses: (
+    args: TransactionsByAddressesArgs
+  ): Promise<Paginated<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>>> => {
     const address = args.addresses.length > 0 ? args.addresses[0] : undefined;
 
     // Only even payment indices and indices less than 100 will ''return' results.
@@ -22,13 +24,13 @@ export const mockChainHistoryProvider: ChainHistoryProvider = {
       const isStakeAddress = paymentIndex === 0 && stakeIndex > 0;
 
       return Promise.resolve({
-        pageResults: new Array<Cardano.HydratedTx>(),
+        pageResults: new Array<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>>(),
         totalResultCount: !isStakeAddress && isExternalAddress && isPaymentEven && paymentIndex < 100 ? 1 : 0
       });
     }
 
     return Promise.resolve({
-      pageResults: new Array<Cardano.HydratedTx>(),
+      pageResults: new Array<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>>(),
       totalResultCount: 0
     });
   },
@@ -44,18 +46,20 @@ export const createMockChainHistoryProvider = (addressesWithTx: Map<Cardano.Paym
   healthCheck: () => {
     throw new Error(NOT_IMPLEMENTED);
   },
-  transactionsByAddresses: (args: TransactionsByAddressesArgs): Promise<Paginated<Cardano.HydratedTx>> => {
+  transactionsByAddresses: (
+    args: TransactionsByAddressesArgs
+  ): Promise<Paginated<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>>> => {
     const address = args.addresses.length > 0 ? args.addresses[0] : undefined;
 
     if (address && addressesWithTx.has(address)) {
       return Promise.resolve({
-        pageResults: new Array<Cardano.HydratedTx>(),
+        pageResults: new Array<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>>(),
         totalResultCount: addressesWithTx.get(address)!
       });
     }
 
     return Promise.resolve({
-      pageResults: new Array<Cardano.HydratedTx>(),
+      pageResults: new Array<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>>(),
       totalResultCount: 0
     });
   },
@@ -71,7 +75,7 @@ export const mockAlwaysFailChainHistoryProvider: ChainHistoryProvider = {
   healthCheck: () => {
     throw new Error(NOT_IMPLEMENTED);
   },
-  transactionsByAddresses: (): Promise<Paginated<Cardano.HydratedTx>> => {
+  transactionsByAddresses: (): Promise<Paginated<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>>> => {
     throw new Error(NOT_IMPLEMENTED);
   },
   transactionsByHashes: () => {
@@ -86,7 +90,7 @@ export const mockAlwaysEmptyChainHistoryProvider: ChainHistoryProvider = {
   healthCheck: () => {
     throw new Error(NOT_IMPLEMENTED);
   },
-  transactionsByAddresses: async (): Promise<Paginated<Cardano.HydratedTx>> => ({
+  transactionsByAddresses: async (): Promise<Paginated<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>>> => ({
     pageResults: [],
     totalResultCount: 0
   }),

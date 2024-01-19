@@ -5,9 +5,10 @@ import { sameArrayItems } from '@cardano-sdk/util';
 
 export const tipEquals = (a: Cardano.Tip, b: Cardano.Tip) => a.hash === b.hash;
 
-export const txEquals = (a: Cardano.HydratedTx, b: Cardano.HydratedTx) => a.id === b.id;
+export const txEquals = <T extends Pick<Cardano.HydratedTx, 'id'> = Cardano.HydratedTx>(a: T, b: T) => a.id === b.id;
 
-export const transactionsEquals = (a: Cardano.HydratedTx[], b: Cardano.HydratedTx[]) => sameArrayItems(a, b, txEquals);
+export const transactionsEquals = <T extends Pick<Cardano.HydratedTx, 'id'> = Cardano.HydratedTx>(a: T[], b: T[]) =>
+  sameArrayItems(a, b, txEquals);
 
 export const txInEquals = (a: Cardano.TxIn, b: Cardano.TxIn) => a.txId === b.txId && a.index === b.index;
 

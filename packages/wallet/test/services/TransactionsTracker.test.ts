@@ -204,7 +204,7 @@ describe('TransactionsTracker', () => {
         const tip$ = hot<Cardano.Tip>('----|');
         const submitting$ = hot('-a--|', { a: outgoingTx });
         const pending$ = hot('--a-|', { a: outgoingTx });
-        const transactionsSource$ = hot<Cardano.HydratedTx[]>('a-bc|', {
+        const transactionsSource$ = hot<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>[]>('a-bc|', {
           a: [],
           b: [incomingTx],
           c: [incomingTx, submittedTx]
@@ -259,7 +259,7 @@ describe('TransactionsTracker', () => {
         const tip$ = hot<Cardano.Tip>('--ab-|', { a: tip1, b: tip2 });
         const submitting$ = hot('-a---|', { a: outgoingTx });
         const pending$ = hot('--a--|', { a: outgoingTx });
-        const transactionsSource$ = hot<Cardano.HydratedTx[]>('-----|');
+        const transactionsSource$ = hot<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>[]>('-----|');
         const failedSubscription = '--^---'; // regression: subscribing after submitting$ emits
         const transactionsTracker = createTransactionsTracker(
           {
@@ -307,7 +307,7 @@ describe('TransactionsTracker', () => {
         const submitting$ = hot('-a---|', { a: outgoingTx });
         const pending$ = hot('--a-a|', { a: outgoingTx }); // second emission must not re-add it to inFlight$
         const rollback$ = hot('---a-|', { a: { id: tx.body.inputs[0].txId } as Cardano.HydratedTx });
-        const transactionsSource$ = hot<Cardano.HydratedTx[]>('-----|');
+        const transactionsSource$ = hot<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>[]>('-----|');
         const transactionsTracker = createTransactionsTracker(
           {
             addresses$,
@@ -345,7 +345,7 @@ describe('TransactionsTracker', () => {
 
     it('emits phase 2 validation on-chain transactions as failed$', async () => {
       const outgoingTx = toOutgoingTx(queryTransactionsResult.pageResults[0]);
-      const phase2FailedTx: Cardano.HydratedTx = {
+      const phase2FailedTx: Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway> = {
         ...queryTransactionsResult.pageResults[0],
         inputSource: Cardano.InputSource.collaterals
       };
@@ -354,7 +354,7 @@ describe('TransactionsTracker', () => {
         const tip$ = hot<Cardano.Tip>('-----|');
         const submitting$ = cold('-a---|', { a: outgoingTx });
         const pending$ = cold('--a--|', { a: outgoingTx });
-        const transactionsSource$ = cold<Cardano.HydratedTx[]>('a--b-|', { a: [], b: [phase2FailedTx] });
+        const transactionsSource$ = cold<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>[]>('a--b-|', { a: [], b: [phase2FailedTx] });
         const failedToSubmit$ = hot<FailedTx>('-----|');
 
         const transactionsTracker = createTransactionsTracker(
@@ -395,7 +395,7 @@ describe('TransactionsTracker', () => {
         const tip$ = hot<Cardano.Tip>('----|');
         const submitting$ = cold('-a--|', { a: outgoingTx });
         const pending$ = cold('--a-|', { a: outgoingTx });
-        const transactionsSource$ = cold<Cardano.HydratedTx[]>('----|');
+        const transactionsSource$ = cold<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>[]>('----|');
         const failedToSubmit$ = hot<FailedTx>('---a|', {
           a: { reason: TransactionFailure.FailedToSubmit, ...outgoingTx }
         });
@@ -443,7 +443,7 @@ describe('TransactionsTracker', () => {
         const tip$ = hot<Cardano.Tip>('----|');
         const submitting$ = cold('-a--|', { a: outgoingTx });
         const pending$ = cold('--a-|', { a: outgoingTx });
-        const transactionsSource$ = cold<Cardano.HydratedTx[]>('----|');
+        const transactionsSource$ = cold<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>[]>('----|');
         const failedToSubmit$ = hot<FailedTx>('---a|', {
           a: { reason: TransactionFailure.FailedToSubmit, ...outgoingTx }
         });
@@ -489,7 +489,7 @@ describe('TransactionsTracker', () => {
         });
         const submitting$ = hot('-a-b--|', { a: outgoingTx, b: outgoingTx });
         const pending$ = hot('--a-b-|', { a: outgoingTx, b: outgoingTx });
-        const transactionsSource$ = hot<Cardano.HydratedTx[]>('-a---b|', {
+        const transactionsSource$ = hot<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>[]>('-a---b|', {
           a: [],
           b: [tx]
         });
@@ -543,7 +543,7 @@ describe('TransactionsTracker', () => {
         });
         const submitting$ = hot('-a-b--|', { a: outgoingTx, b: outgoingTx });
         const pending$ = hot<OutgoingTx>('------|');
-        const transactionsSource$ = hot<Cardano.HydratedTx[]>('a-----|', { a: [] });
+        const transactionsSource$ = hot<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>[]>('a-----|', { a: [] });
         const failedToSubmit$ = hot<FailedTx>('-----a|', {
           a: { reason: TransactionFailure.FailedToSubmit, ...outgoingTx }
         });
@@ -588,7 +588,7 @@ describe('TransactionsTracker', () => {
         const tip$ = hot<Cardano.Tip>('--a-|', { a: { slot: submittedAt } as Cardano.Tip });
         const submitting$ = hot('-a--|', { a: outgoingTx });
         const pending$ = hot('--a-|', { a: outgoingTx });
-        const transactionsSource$ = hot<Cardano.HydratedTx[]>('a--b|', {
+        const transactionsSource$ = hot<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>[]>('a--b|', {
           a: [],
           b: [tx]
         });
@@ -648,7 +648,7 @@ describe('TransactionsTracker', () => {
         const tip$ = hot<Cardano.Tip>('|');
         const submitting$ = hot('--a|', { a: outgoingTx });
         const pending$ = hot<OutgoingTx>('|');
-        const transactionsSource$ = hot<Cardano.HydratedTx[]>('|');
+        const transactionsSource$ = hot<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>[]>('|');
 
         const transactionsTracker = createTransactionsTracker(
           {
@@ -705,7 +705,7 @@ describe('TransactionsTracker', () => {
         const tip$ = hot<Cardano.Tip>('----|');
         const submitting$ = hot<OutgoingTx>('----|');
         const pending$ = hot<OutgoingTx>('----|');
-        const transactionsSource$ = hot<Cardano.HydratedTx[]>('a-bc|', {
+        const transactionsSource$ = hot<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>[]>('a-bc|', {
           a: [],
           b: [incomingTx],
           c: [incomingTx, storedInFlightTx]
@@ -767,7 +767,7 @@ describe('TransactionsTracker', () => {
         const pending$ = hot<OutgoingTx>('-----|');
         // The key of this test is that the 1st emission of transactions source already
         // contains the transaction that we loaded from inFlightTransactionsStore
-        const transactionsSource$ = hot<Cardano.HydratedTx[]>('----a|', {
+        const transactionsSource$ = hot<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>[]>('----a|', {
           a: [txToBeConfirmed]
         });
 
@@ -818,7 +818,7 @@ describe('TransactionsTracker', () => {
         body: { validityInterval: {} },
         // should remove storedInFlightTx from inFlight$ once discovered on-chain
         id: storedInFlightTx.id
-      } as Cardano.HydratedTx;
+      } as Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>;
 
       createTestScheduler().run(({ hot, expectObservable }) => {
         const storedInFlight$ = hot<TxInFlight[]>('-a|', {
@@ -831,7 +831,7 @@ describe('TransactionsTracker', () => {
         const tip$ = hot<Cardano.Tip>('-----|');
         const submitting$ = hot<OutgoingTx>('--a--|', { a: outgoingTx });
         const pending$ = hot<OutgoingTx>('-----|');
-        const transactionsSource$ = hot<Cardano.HydratedTx[]>('a---b|', {
+        const transactionsSource$ = hot<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>[]>('a---b|', {
           a: [],
           b: [incomingTx]
         });

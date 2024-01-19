@@ -11,8 +11,11 @@ import {
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { from, lastValueFrom, of, tap } from 'rxjs';
 
-const createTxWithValues = (values: Partial<Cardano.Value>[]): Cardano.HydratedTx =>
-  ({ body: { outputs: values.map((value) => ({ value })) }, id: generateRandomHexString(64) } as Cardano.HydratedTx);
+const createTxWithValues = (values: Partial<Cardano.Value>[]): Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway> =>
+  ({
+    body: { outputs: values.map((value) => ({ value })) },
+    id: generateRandomHexString(64)
+  } as Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>);
 
 const cip68AssetId = {
   referenceNFT: Cardano.AssetId.fromParts(

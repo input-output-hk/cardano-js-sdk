@@ -337,9 +337,10 @@ describe('chain history mappers', () => {
     const metadata: Cardano.TxMetadata = new Map([[1n, 'data']]);
     const inputSource = Cardano.InputSource.inputs;
 
-    const certificates: Cardano.Certificate[] = [
+    const certificates: Cardano.CertificateExclShelleyStake[] = [
       {
-        __typename: Cardano.CertificateType.StakeRegistration,
+        __typename: Cardano.CertificateType.Registration,
+        deposit: 2_000_000n,
         stakeCredential: {
           hash: Hash28ByteBase16.fromEd25519KeyHashHex(
             Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))

@@ -156,8 +156,7 @@ export interface GenesisKeyDelegationCertificate {
   vrfKeyHash: Crypto.Hash32ByteBase16;
 }
 
-export type Certificate =
-  | StakeAddressCertificate
+export type CertificatePostConway =
   | PoolRegistrationCertificate
   | PoolRetirementCertificate
   | StakeDelegationCertificate
@@ -174,6 +173,8 @@ export type Certificate =
   | RegisterDelegateRepresentativeCertificate
   | UnRegisterDelegateRepresentativeCertificate
   | UpdateDelegateRepresentativeCertificate;
+
+export type Certificate = CertificatePostConway | StakeAddressCertificate;
 
 /**
  * Creates a stake key registration certificate from a given reward account.

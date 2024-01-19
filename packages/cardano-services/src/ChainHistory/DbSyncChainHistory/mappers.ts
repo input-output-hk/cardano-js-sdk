@@ -155,7 +155,7 @@ export const mapAnchor = (anchorUrl: string, anchorDataHash: string): Cardano.An
 export const mapCertificate = (
   certModel: WithCertType<CertificateModel>
   // eslint-disable-next-line sonarjs/cognitive-complexity
-): WithCertIndex<Cardano.Certificate> | null => {
+): WithCertIndex<Cardano.CertificatePostConway> | null => {
   if (isPoolRetireCertModel(certModel))
     return {
       __typename: Cardano.CertificateType.PoolRetirement,
@@ -364,7 +364,7 @@ interface TxAlonzoData {
   redeemers?: Cardano.Redeemer[];
   metadata?: Cardano.TxMetadata;
   collaterals?: Cardano.HydratedTxIn[];
-  certificates?: Cardano.Certificate[];
+  certificates?: Cardano.CertificatePostConway[];
   proposalProcedures?: Cardano.ProposalProcedure[];
   votingProcedures?: Cardano.VotingProcedures;
 }
@@ -384,7 +384,7 @@ export const mapTxAlonzo = (
     votingProcedures,
     withdrawals
   }: TxAlonzoData
-): Cardano.HydratedTx => ({
+): Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway> => ({
   auxiliaryData:
     metadata && metadata.size > 0
       ? {

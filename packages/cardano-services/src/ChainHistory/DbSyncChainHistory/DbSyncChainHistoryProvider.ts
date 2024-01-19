@@ -51,7 +51,7 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
     addresses,
     pagination,
     blockRange
-  }: TransactionsByAddressesArgs): Promise<Paginated<Cardano.HydratedTx>> {
+  }: TransactionsByAddressesArgs): Promise<Paginated<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>>> {
     if (addresses.length > this.#paginationPageSizeLimit) {
       throw new ProviderError(
         ProviderFailure.BadRequest,
@@ -84,7 +84,9 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
     return { pageResults: totalResultCount ? await this.transactionsByIds(ids) : [], totalResultCount };
   }
 
-  public async transactionsByHashes({ ids }: TransactionsByIdsArgs): Promise<Cardano.HydratedTx[]> {
+  public async transactionsByHashes({
+    ids
+  }: TransactionsByIdsArgs): Promise<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>[]> {
     if (ids.length > this.#paginationPageSizeLimit) {
       throw new ProviderError(
         ProviderFailure.BadRequest,
@@ -98,7 +100,7 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
     return this.transactionsByIds(txRecordIds);
   }
 
-  private async transactionsByIds(ids: string[]): Promise<Cardano.HydratedTx[]> {
+  private async transactionsByIds(ids: string[]): Promise<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>[]> {
     this.logger.debug('About to find transactions with ids:', ids);
     const txResults: QueryResult<TxModel> = await this.dbPools.main.query({
       name: 'transactions_by_ids',

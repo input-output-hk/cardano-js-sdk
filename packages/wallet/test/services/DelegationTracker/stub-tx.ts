@@ -15,7 +15,7 @@ export const createStubTxWithCertificates = (
     body: {
       certificates: certificates?.map((cert) => ({ ...cert, ...commonCertProps }))
     }
-  } as Cardano.HydratedTx);
+  } as Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>);
 
 export const createStubTxWithEpoch = (
   epoch: number,

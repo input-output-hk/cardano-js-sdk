@@ -1,7 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AuxiliaryData } from './AuxiliaryData';
 import { Base64Blob, HexBlob, OpaqueString } from '@cardano-sdk/util';
-import { Certificate } from './Certificate';
+import { Certificate, CertificatePostConway } from './Certificate';
 import { ExUnits, Update, ValidityInterval } from './ProtocolParameters';
 import { HydratedTxIn, TxIn, TxOut } from './Utxo';
 import { Lovelace, TokenMap } from './Value';
@@ -80,6 +80,11 @@ export interface HydratedTxBody {
   donation?: Lovelace;
 }
 
+/** Does not contain legacy Stake registration/deregistration certificates */
+export interface HydratedTxBodyPostConway extends Omit<HydratedTxBody, 'certificates'> {
+  certificates?: CertificatePostConway[];
+}
+
 export interface TxBody extends Omit<HydratedTxBody, 'inputs' | 'collaterals' | 'referenceInputs'> {
   inputs: TxIn[];
   collaterals?: TxIn[];
@@ -153,10 +158,10 @@ export interface OnChainTx<TBody extends TxBody = TxBody>
   auxiliaryData?: Omit<AuxiliaryData, 'scripts'>;
 }
 
-export interface HydratedTx extends TxWithInputSource<HydratedTxBody> {
+export interface HydratedTx<TBody extends HydratedTxBody = HydratedTxBody> extends TxWithInputSource<TBody> {
   index: number;
   blockHeader: PartialBlockHeader;
-  body: HydratedTxBody;
+  body: TBody;
   txSize: number;
 }
 

@@ -19,14 +19,18 @@ export interface ChainHistoryProvider extends Provider {
    * @param {Range<Cardano.BlockNo>} [blockRange] transactions in specified block ranges (lower and upper bounds inclusive)
    * @returns {Cardano.HydratedTx[]} an array of transactions involving the addresses
    */
-  transactionsByAddresses: (args: TransactionsByAddressesArgs) => Promise<Paginated<Cardano.HydratedTx>>;
+  transactionsByAddresses: (
+    args: TransactionsByAddressesArgs
+  ) => Promise<Paginated<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>>>;
   /**
    * Gets the transactions matching the provided hashes.
    *
    * @param {Cardano.TransactionId[]} ids array of transaction ids
    * @returns {Cardano.HydratedTx[]} an array of transactions
    */
-  transactionsByHashes: (args: TransactionsByIdsArgs) => Promise<Cardano.HydratedTx[]>;
+  transactionsByHashes: (
+    args: TransactionsByIdsArgs
+  ) => Promise<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>[]>;
   /**
    * Gets the blocks matching the provided hashes.
    *

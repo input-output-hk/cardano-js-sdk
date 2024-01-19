@@ -20,7 +20,9 @@ export class PouchDbInFlightTransactionsStore extends PouchDbDocumentStore<TxInF
 export class PouchDbVolatileTransactionsStore extends PouchDbDocumentStore<OutgoingOnChainTx[]> {}
 export class PouchDbPolicyIdsStore extends PouchDbDocumentStore<Cardano.PolicyId[]> {}
 
-export class PouchDbTransactionsStore extends PouchDbCollectionStore<Cardano.HydratedTx> {}
+export class PouchDbTransactionsStore extends PouchDbCollectionStore<
+  Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>
+> {}
 export class PouchDbUtxoStore extends PouchDbCollectionStore<Cardano.Utxo> {}
 
 export class PouchDbRewardsHistoryStore extends PouchDbKeyValueStore<Cardano.RewardAccount, Reward[]> {}
