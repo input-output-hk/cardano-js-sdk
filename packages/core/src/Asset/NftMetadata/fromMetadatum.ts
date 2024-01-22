@@ -1,4 +1,5 @@
 import { AssetInfo } from '../types';
+import { AssetName } from '../../Cardano';
 import { Cardano } from '../..';
 import { ImageMediaType, MediaType, NftMetadata, NftMetadataFile, Uri } from './types';
 import { InvalidFileError } from './errors';
@@ -98,7 +99,9 @@ const getAssetMetadata = (policy: Cardano.MetadatumMap, assetName: Cardano.Asset
 /**
  * @param asset try to parse NftMetadata for this asset
  * @param metadata transaction metadata (see CIP-0025)
+ * @param logger logger to use
  */
+// eslint-disable-next-line complexity
 export const fromMetadatum = (
   asset: Pick<AssetInfo, 'policyId' | 'name'>,
   metadata: Cardano.TxMetadata | undefined,
@@ -112,13 +115,20 @@ export const fromMetadatum = (
   if (!policy) return null;
   const assetMetadata = getAssetMetadata(policy, asset.name);
   if (!assetMetadata) return null;
-  const name = asString(assetMetadata.get('name'));
+  const version = asString(policy.get('version')) || '1.0';
+  let name = asString(assetMetadata.get('name'));
   const image = metadatumToString(assetMetadata.get('image'));
   const assetId = Cardano.AssetId.fromParts(asset.policyId, asset.name);
+
+  if (version === '1.0' && !name) {
+    name = AssetName.toUTF8(asset.name);
+  }
+
   if (!name || !image) {
     logger.warn(missingFieldLogMessage(!name ? 'name' : 'image', assetId, true));
     return null;
   }
+
   const mediaType = asString(assetMetadata.get('mediaType'));
   const files = asMetadatumArray(assetMetadata.get('files'));
 
@@ -130,7 +140,7 @@ export const fromMetadatum = (
       mediaType: mediaType ? ImageMediaType(mediaType) : undefined,
       name,
       otherProperties: mapOtherProperties(assetMetadata, ['name', 'image', 'mediaType', 'description', 'files']),
-      version: asString(policy.get('version')) || '1.0'
+      version
     };
   } catch (error: unknown) {
     // Any error here means metadata was invalid
