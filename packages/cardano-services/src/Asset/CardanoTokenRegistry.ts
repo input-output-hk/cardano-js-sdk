@@ -7,7 +7,7 @@ import axios, { AxiosInstance } from 'axios';
 import pick from 'lodash/pick';
 
 export const DEFAULT_TOKEN_METADATA_CACHE_TTL = Seconds(10 * 60);
-export const DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT = Milliseconds(3 * 1000);
+export const DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT = Milliseconds(10 * 1000);
 export const DEFAULT_TOKEN_METADATA_SERVER_URL = 'https://tokens.cardano.org';
 
 interface NumberValue {
@@ -111,13 +111,15 @@ export class CardanoTokenRegistry implements TokenMetadataService {
     // All metadata was taken from cache
     if (assetIdsToRequest.length === 0) return tokenMetadata;
 
-    this.#logger.debug(`Fetching batch of ${assetIdsToRequest.length} assetIds`);
+    this.#logger.debug(`Fetching batch of ${assetIdsToRequest.length} tokens metadata`);
 
     try {
       const response = await this.#axiosClient.post<{ subjects: TokenMetadataServiceRecord[] }>('metadata/query', {
         properties: ['decimals', 'description', 'logo', 'name', 'ticker', 'url'],
         subjects: assetIdsToRequest
       });
+
+      this.#logger.debug('Tokens metadata fetched');
 
       for (const record of response.data.subjects) {
         try {
