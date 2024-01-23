@@ -176,21 +176,19 @@ export type Certificate =
   | UnRegisterDelegateRepresentativeCertificate
   | UpdateDelegateRepresentativeCertificate;
 
-export const StakeRegistrationCertificateTypes = [
-  CertificateType.StakeRegistration,
+export const PostConwayStakeRegistrationCertificateTypes = [
   CertificateType.Registration,
   CertificateType.VoteRegistrationDelegation,
   CertificateType.StakeRegistrationDelegation,
   CertificateType.StakeVoteRegistrationDelegation
 ] as const;
 
-export type StakeRegistrationCertificateTypes = typeof StakeRegistrationCertificateTypes[number];
+export const StakeRegistrationCertificateTypes = [
+  CertificateType.StakeRegistration,
+  ...PostConwayStakeRegistrationCertificateTypes
+] as const;
 
-export type StakeDelegationCertificateUnion =
-  | StakeDelegationCertificate
-  | StakeVoteDelegationCertificate
-  | StakeRegistrationDelegationCertificate
-  | StakeVoteRegistrationDelegationCertificate;
+export type StakeRegistrationCertificateTypes = typeof StakeRegistrationCertificateTypes[number];
 
 export const StakeDelegationCertificateTypes = [
   CertificateType.StakeDelegation,
@@ -200,13 +198,6 @@ export const StakeDelegationCertificateTypes = [
 ] as const;
 
 export type StakeDelegationCertificateTypes = typeof StakeDelegationCertificateTypes[number];
-
-export type RegAndDeregCertificateUnion =
-  | StakeAddressCertificate
-  | NewStakeAddressCertificate
-  | VoteRegistrationDelegationCertificate
-  | StakeRegistrationDelegationCertificate
-  | StakeVoteRegistrationDelegationCertificate;
 
 export const RegAndDeregCertificateTypes = [
   ...StakeRegistrationCertificateTypes,

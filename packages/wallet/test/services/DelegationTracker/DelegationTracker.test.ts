@@ -103,17 +103,35 @@ describe('DelegationTracker', () => {
     it('does not emit outgoing transactions with certificates not signed by the reward accounts', () => {
       createTestScheduler().run(({ cold, expectObservable }) => {
         const rewardAccount = Cardano.RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv');
+        const foreignRewardAccount = Cardano.RewardAccount(
+          'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d'
+        );
         const transactions = [
           createStubTxWithCertificates([
-            { __typename: Cardano.CertificateType.StakeRegistration } as Cardano.Certificate
+            {
+              __typename: Cardano.CertificateType.StakeRegistration,
+              stakeCredential: {
+                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(foreignRewardAccount))
+              }
+            } as Cardano.Certificate
           ]),
           createStubTxWithCertificates([
             { __typename: Cardano.CertificateType.PoolRetirement } as Cardano.Certificate,
-            { __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate
+            {
+              __typename: Cardano.CertificateType.StakeDelegation,
+              stakeCredential: {
+                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(foreignRewardAccount))
+              }
+            } as Cardano.Certificate
           ]),
           createStubTxWithCertificates(),
           createStubTxWithCertificates([
-            { __typename: Cardano.CertificateType.StakeDeregistration } as Cardano.Certificate
+            {
+              __typename: Cardano.CertificateType.StakeDeregistration,
+              stakeCredential: {
+                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(foreignRewardAccount))
+              }
+            } as Cardano.Certificate
           ])
         ];
         const slotEpochCalc = jest.fn().mockReturnValueOnce(284).mockReturnValueOnce(285);
