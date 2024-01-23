@@ -52,26 +52,99 @@ import {
 import omit from 'lodash/omit';
 import orderBy from 'lodash/orderBy';
 
-const { CredentialType, GovernanceActionType, VoterType } = Cardano;
+const {
+  CredentialType,
+  GovernanceActionType,
+  NetworkId: { Mainnet, Testnet },
+  RewardAccount,
+  VoterType
+} = Cardano;
 
-const getGovernanceAction = ({ description, type }: ProposalProcedureModel): Cardano.GovernanceAction => {
-  // Once db-sync includes https://github.com/input-output-hk/cardano-db-sync/issues/1553
-  // remove 'as Cardano.*' from return statements to get advantage from types
+type DbSyncCredential = { keyHash: Hash28ByteBase16; scriptHash: Hash28ByteBase16 };
+
+const credentialFromDbSync: (source: DbSyncCredential) => Cardano.Credential = ({ keyHash, scriptHash }) => ({
+  hash: keyHash || scriptHash,
+  type: keyHash ? CredentialType.KeyHash : CredentialType.ScriptHash
+});
+
+const mapWithdrawals: (source: [{ credential: DbSyncCredential; network: string }, number]) => {
+  rewardAccount: Cardano.RewardAccount;
+  coin: Cardano.Lovelace;
+} = ([{ credential, network }, coin]) => ({
+  // Due to https://github.com/IntersectMBO/cardano-db-sync/issues/1614
+  // this will be source of NOT CORRECT AMOUNT for amounts greater than
+  // Number.MAX_SAFE_INTEGER (most likely, never).
+  // In case such amount will be present in some networks before db-sync solve the
+  // issue, we need to query the amount from treasury_withdrawal table.
+  // In case the issue is solved before we need to touch this again, the next line
+  // will work as well and we just need to remove this comment.
+  coin: BigInt(coin),
+  rewardAccount: RewardAccount.fromCredential(
+    credentialFromDbSync(credential),
+    network === 'Mainnet' ? Mainnet : Testnet
+  )
+});
+
+// eslint-disable-next-line sonarjs/cognitive-complexity, complexity
+const getGovernanceAction = ({
+  denominator,
+  description,
+  numerator,
+  type
+}: ProposalProcedureModel): Cardano.GovernanceAction => {
+  const { contents } = JSON.parse(description);
+  const governanceActionId =
+    contents && contents[0] ? { actionIndex: contents[0].govActionIx, id: contents[0].txId } : null;
+
   switch (type) {
     case 'HardForkInitiation':
-      return { __typename: GovernanceActionType.hard_fork_initiation_action } as Cardano.HardForkInitiationAction;
+      return {
+        __typename: GovernanceActionType.hard_fork_initiation_action,
+        governanceActionId,
+        protocolVersion: contents[1]
+      };
+
     case 'InfoAction':
       return { __typename: GovernanceActionType.info_action };
+
     case 'NewCommittee':
-      return { __typename: GovernanceActionType.update_committee } as Cardano.UpdateCommittee;
+      // LW-9675
+      if (typeof contents[3] !== 'number') throw new Error('New db-sync version detected: ref LW-9675');
+
+      return {
+        __typename: GovernanceActionType.update_committee,
+        governanceActionId,
+        membersToBeAdded: new Set(
+          Object.entries(contents[2]).map(([key, value]) => ({
+            coldCredential: credentialFromDbSync(Object.fromEntries([key.split('-')])),
+            epoch: value as Cardano.EpochNo
+          }))
+        ),
+        membersToBeRemoved: new Set((contents[1] as DbSyncCredential[]).map(credentialFromDbSync)),
+        newQuorumThreshold: {
+          denominator: Number.parseInt(denominator!, 10),
+          numerator: Number.parseInt(numerator!, 10)
+        }
+      };
+
     case 'NewConstitution':
-      return { __typename: GovernanceActionType.new_constitution } as Cardano.NewConstitution;
+      return { __typename: GovernanceActionType.new_constitution, constitution: contents[1], governanceActionId };
+
     case 'NoConfidence':
-      return { __typename: GovernanceActionType.no_confidence } as Cardano.NoConfidence;
+      return { __typename: GovernanceActionType.no_confidence, governanceActionId };
+
     case 'ParameterChange':
-      return { __typename: GovernanceActionType.parameter_change_action } as Cardano.ParameterChangeAction;
+      return {
+        __typename: GovernanceActionType.parameter_change_action,
+        governanceActionId,
+        protocolParamUpdate: contents[1]
+      };
+
     case 'TreasuryWithdrawals':
-      return { __typename: GovernanceActionType.treasury_withdrawals_action } as Cardano.TreasuryWithdrawalsAction;
+      return {
+        __typename: GovernanceActionType.treasury_withdrawals_action,
+        withdrawals: new Set(contents.map(mapWithdrawals))
+      };
   }
 
   throw new Error(`Unknown GovernanceActionType '${type}' with description "${description}"`);
@@ -262,8 +335,6 @@ export class ChainHistoryBuilder {
       text: Queries.findProposalProceduresByTxIds,
       values: [ids]
     });
-
-    this.#logger.fatal(rows);
 
     const result = new Map<Cardano.TransactionId, Cardano.ProposalProcedure[]>();
 
