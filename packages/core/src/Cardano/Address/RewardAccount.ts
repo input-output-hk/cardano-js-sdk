@@ -1,4 +1,4 @@
-import { Address, CredentialType } from './Address';
+import { Address, Credential, CredentialType } from './Address';
 import { Ed25519KeyHashHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { NetworkId } from '../ChainId';
 import { OpaqueString, typedBech32 } from '@cardano-sdk/util';
@@ -14,6 +14,26 @@ export type RewardAccount = OpaqueString<'RewardAccount'>;
 export const RewardAccount = (value: string): RewardAccount => typedBech32(value, ['stake', 'stake_test'], 47);
 RewardAccount.toHash = (rewardAccount: RewardAccount): Ed25519KeyHashHex =>
   Ed25519KeyHashHex(Address.fromBech32(rewardAccount).asReward()!.getPaymentCredential().hash);
+
+/**
+ * Creates a reward account from a given credential and network id.
+ *
+ * @param credential The credential.
+ * @param networkId The network id.
+ */
+RewardAccount.fromCredential = (credential: Credential, networkId: NetworkId): RewardAccount =>
+  RewardAccount(
+    RewardAddress.fromCredentials(networkId, { hash: credential.hash, type: credential.type }).toAddress().toBech32()
+  );
+
+/**
+ * Returns the network id encoded in the given reward account.
+ *
+ * @param rewardAccount The reward account.
+ * @returns The network id.
+ */
+RewardAccount.toNetworkId = (rewardAccount: RewardAccount): NetworkId =>
+  Address.fromBech32(rewardAccount).asReward()!.toAddress().getNetworkId();
 
 /**
  * Creates a reward account from a given key hash and network id.
