@@ -337,7 +337,7 @@ describe('chain history mappers', () => {
     const metadata: Cardano.TxMetadata = new Map([[1n, 'data']]);
     const inputSource = Cardano.InputSource.inputs;
 
-    const certificates: Cardano.CertificateExclShelleyStake[] = [
+    const certificates: Cardano.CertificatePostConway[] = [
       {
         __typename: Cardano.CertificateType.Registration,
         deposit: 2_000_000n,

@@ -1,7 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
-import { isLastStakeKeyCertOfType, stakeKeyCertificates, transactionsWithCertificates } from '../../../src';
+import { lastStakeKeyCertOfType, stakeKeyCertificates, transactionsWithCertificates } from '../../../src';
 
 describe('transactionCertificates', () => {
   test('transactionStakeKeyCertficates', () => {
@@ -21,7 +21,7 @@ describe('transactionCertificates', () => {
     expect(certificates[1].__typename).toBe(Cardano.CertificateType.StakeDeregistration);
   });
 
-  test('isLastStakeKeyCertOfType', () => {
+  test('lastStakeKeyCertOfType', () => {
     const rewardAccount = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
     const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
     const stakeCredential = {
@@ -32,7 +32,8 @@ describe('transactionCertificates', () => {
     const certificates = [
       [
         {
-          __typename: Cardano.CertificateType.StakeRegistration,
+          __typename: Cardano.CertificateType.Registration,
+          deposit: 2_000_000n,
           stakeCredential
         } as Cardano.Certificate,
         {
@@ -43,7 +44,8 @@ describe('transactionCertificates', () => {
       [
         ({ __typename: Cardano.CertificateType.PoolRegistration } as Cardano.Certificate,
         {
-          __typename: Cardano.CertificateType.StakeDeregistration,
+          __typename: Cardano.CertificateType.Unregistration,
+          deposit: 2_000_000n,
           stakeCredential: {
             hash: Crypto.Hash28ByteBase16('00000000000000000000000000000000000000000000000000000000'),
             type: Cardano.CredentialType.KeyHash
@@ -51,11 +53,13 @@ describe('transactionCertificates', () => {
         } as Cardano.Certificate)
       ]
     ];
-    expect(isLastStakeKeyCertOfType(certificates, [Cardano.CertificateType.StakeRegistration])).toBe(false);
-    expect(isLastStakeKeyCertOfType(certificates, [Cardano.CertificateType.StakeRegistration], rewardAccount)).toBe(
-      true
+    expect(lastStakeKeyCertOfType(certificates, [Cardano.CertificateType.Registration])).toBeFalsy();
+    expect(lastStakeKeyCertOfType(certificates, [Cardano.CertificateType.Registration], rewardAccount)).toEqual(
+      expect.objectContaining({ __typename: Cardano.CertificateType.Registration, deposit: 2_000_000n })
     );
-    expect(isLastStakeKeyCertOfType(certificates, [Cardano.CertificateType.StakeDeregistration])).toBe(true);
+    expect(lastStakeKeyCertOfType(certificates, [Cardano.CertificateType.Unregistration])).toEqual(
+      expect.objectContaining({ __typename: Cardano.CertificateType.Unregistration, deposit: 2_000_000n })
+    );
   });
 
   test('outgoingTransactionsWithCertificates', () => {

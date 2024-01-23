@@ -219,7 +219,6 @@ describe('RewardAccounts', () => {
 
   test.each([
     Cardano.CertificateType.Registration,
-    Cardano.CertificateType.StakeRegistration,
     Cardano.CertificateType.StakeRegistrationDelegation,
     Cardano.CertificateType.StakeVoteRegistrationDelegation,
     Cardano.CertificateType.VoteRegistrationDelegation
@@ -323,10 +322,10 @@ describe('RewardAccounts', () => {
       });
       const tracker$ = addressKeyStatuses([rewardAccount], transactions$, transactionsInFlight$);
       expectObservable(tracker$).toBe('abcda', {
-        a: [Cardano.StakeKeyStatus.Unregistered],
-        b: [Cardano.StakeKeyStatus.Registering],
-        c: [Cardano.StakeKeyStatus.Registered],
-        d: [Cardano.StakeKeyStatus.Unregistering]
+        a: [{ keyStatus: Cardano.StakeKeyStatus.Unregistered }],
+        b: [{ keyStatus: Cardano.StakeKeyStatus.Registering }],
+        c: [{ deposit: 0n, keyStatus: Cardano.StakeKeyStatus.Registered }],
+        d: [{ keyStatus: Cardano.StakeKeyStatus.Unregistering }]
       });
     });
   });

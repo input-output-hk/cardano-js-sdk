@@ -54,7 +54,7 @@ export const stakeKeyCertificates = (certificates?: Cardano.Certificate[]) =>
 export const includesAnyCertificate = (haystack: Cardano.Certificate[], needle: readonly Cardano.CertificateType[]) =>
   haystack.some(({ __typename }) => needle.includes(__typename)) || false;
 
-export const isLastStakeKeyCertOfType = (
+export const lastStakeKeyCertOfType = (
   transactionsCertificates: Cardano.Certificate[][],
   certTypes: readonly RegAndDeregCertificateTypes[],
   rewardAccount?: Cardano.RewardAccount
@@ -73,11 +73,13 @@ export const isLastStakeKeyCertOfType = (
       })
       .filter(isNotNil)
   );
-  return certTypes.includes(lastRegOrDereg?.__typename as RegAndDeregCertificateTypes);
+  if (certTypes.includes(lastRegOrDereg?.__typename as RegAndDeregCertificateTypes)) {
+    return lastRegOrDereg;
+  }
 };
 
 export const transactionsWithCertificates = (
-  transactions$: Observable<Cardano.HydratedTx[]>,
+  transactions$: Observable<Cardano.HydratedTx<Cardano.HydratedTxBodyPostConway>[]>,
   rewardAccounts$: Observable<Cardano.RewardAccount[]>,
   certificateTypes: Cardano.CertificateType[]
 ) =>
