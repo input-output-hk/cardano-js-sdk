@@ -177,6 +177,7 @@ services:
     ports:
       - 8090:8090
     restart: on-failure
+    stop_signal: SIGINT
     volumes:
       - node-ipc:/ipc
 
