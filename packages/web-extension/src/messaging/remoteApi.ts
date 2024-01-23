@@ -41,13 +41,7 @@ import {
   tap,
   throwError
 } from 'rxjs';
-import {
-  GetErrorPrototype,
-  Shutdown,
-  fromSerializableObject,
-  isPromise,
-  toSerializableObject
-} from '@cardano-sdk/util';
+import { ErrorClass, Shutdown, fromSerializableObject, isPromise, toSerializableObject } from '@cardano-sdk/util';
 import { NotImplementedError } from '@cardano-sdk/core';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import {
@@ -70,10 +64,7 @@ export class RemoteApiShutdownError extends CustomError {
 
 const consumeMethod =
   (
-    {
-      propName,
-      getErrorPrototype
-    }: { propName: string; getErrorPrototype?: GetErrorPrototype; options?: MethodRequestOptions },
+    { propName, errorTypes }: { propName: string; errorTypes?: ErrorClass[]; options?: MethodRequestOptions },
     { messenger: { message$, postMessage, channel, disconnect$ } }: MessengerApiDependencies
   ) =>
   async (...args: unknown[]) => {
@@ -89,7 +80,7 @@ const consumeMethod =
       merge(
         postMessage(requestMessage).pipe(mergeMap(() => EMPTY)),
         message$.pipe(
-          map(({ data }) => fromSerializableObject(data, { getErrorPrototype })),
+          map(({ data }) => fromSerializableObject(data, { errorTypes })),
           filter(isResponseMessage),
           filter(({ messageId }) => messageId === requestMessage.messageId),
           map(({ response }) => response)
@@ -115,12 +106,12 @@ const consumeMethod =
 interface ConsumeFactoryProps<T> {
   method: string;
   apiProperties: RemoteApiProperties<T>;
-  getErrorPrototype: GetErrorPrototype | undefined;
+  errorTypes: ErrorClass[] | undefined;
 }
 
 const consumeFactory =
   <T>(
-    { method, apiProperties, getErrorPrototype }: ConsumeFactoryProps<T>,
+    { method, apiProperties, errorTypes }: ConsumeFactoryProps<T>,
     { logger, messenger, destructor }: ConsumeMessengerApiDependencies
   ) =>
   (...args: unknown[]) => {
@@ -136,7 +127,7 @@ const consumeFactory =
     // eslint-disable-next-line no-use-before-define
     const api = consumeMessengerRemoteApi(
       {
-        getErrorPrototype,
+        errorTypes,
         properties: apiProperties
       },
       {
@@ -168,7 +159,7 @@ const consumeFactory =
 
 /** Creates a proxy to a remote api object */
 export const consumeMessengerRemoteApi = <T extends object>(
-  { properties, getErrorPrototype }: ConsumeRemoteApiOptions<T>,
+  { properties, errorTypes }: ConsumeRemoteApiOptions<T>,
   { logger, messenger, destructor }: ConsumeMessengerApiDependencies
 ): T & Shutdown =>
   new Proxy<T & Shutdown>(
@@ -185,25 +176,25 @@ export const consumeMessengerRemoteApi = <T extends object>(
             switch (propMetadata.propType) {
               case RemoteApiPropertyType.MethodReturningPromise: {
                 return (receiver[prop] = consumeMethod(
-                  { getErrorPrototype, options: propMetadata.requestOptions, propName },
+                  { errorTypes, options: propMetadata.requestOptions, propName },
                   { logger, messenger }
                 ));
               }
               case RemoteApiPropertyType.ApiFactory: {
                 return (receiver[prop] = consumeFactory(
-                  { apiProperties: propMetadata.getApiProperties(), getErrorPrototype, method: propName },
+                  { apiProperties: propMetadata.getApiProperties(), errorTypes, method: propName },
                   { destructor, logger, messenger }
                 ));
               }
             }
           } else {
             return (receiver[prop] = consumeMessengerRemoteApi(
-              { getErrorPrototype, properties: propMetadata as any },
+              { errorTypes, properties: propMetadata as any },
               { destructor, logger, messenger: messenger.deriveChannel(propName) }
             ));
           }
         } else if (propMetadata === RemoteApiPropertyType.MethodReturningPromise) {
-          return (receiver[prop] = consumeMethod({ getErrorPrototype, propName }, { logger, messenger }));
+          return (receiver[prop] = consumeMethod({ errorTypes, propName }, { logger, messenger }));
         } else if (propMetadata === RemoteApiPropertyType.HotObservable) {
           const observableMessenger = messenger.deriveChannel(propName);
           const messageData$ = observableMessenger.message$.pipe(map(({ data }) => fromSerializableObject(data)));
