@@ -93,6 +93,7 @@ x-sdk-environment: &sdk-environment
   POSTGRES_USER_FILE_DB_SYNC: /run/secrets/postgres_user
   POSTGRES_USER_FILE_HANDLE: /run/secrets/postgres_user
   POSTGRES_USER_FILE_STAKE_POOL: /run/secrets/postgres_user
+  TOKEN_METADATA_SERVER_URL: https://metadata.world.dev.cardano.org
 
 services:
   cardano-db-sync:
