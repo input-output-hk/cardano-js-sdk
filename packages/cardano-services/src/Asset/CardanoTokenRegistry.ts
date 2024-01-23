@@ -119,7 +119,7 @@ export class CardanoTokenRegistry implements TokenMetadataService {
         subjects: assetIdsToRequest
       });
 
-      this.#logger.debug('Tokens metadata fetched');
+      this.#logger.debug(`Tokens metadata fetched: ${response.data.subjects.length}`);
 
       for (const record of response.data.subjects) {
         try {
