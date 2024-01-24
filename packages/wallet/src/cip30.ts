@@ -25,6 +25,7 @@ import { MessageSender } from '@cardano-sdk/key-management';
 import { Observable, firstValueFrom, map } from 'rxjs';
 import { ObservableWallet } from './types';
 import { requiresForeignSignatures } from './services';
+import uniq from 'lodash/uniq';
 
 export type Cip30WalletDependencies = {
   logger: Logger;
@@ -369,12 +370,13 @@ const baseCip30WalletApi = (
     logger.debug('getting reward addresses');
     try {
       const wallet = await firstValueFrom(wallet$);
-      const [{ rewardAccount }] = await firstValueFrom(wallet.addresses$);
+      const walletAddresses = await firstValueFrom(wallet.addresses$);
+      const rewardAccounts = uniq(walletAddresses.map((address) => address.rewardAccount));
 
-      if (!rewardAccount) {
+      if (!rewardAccounts || rewardAccounts.length === 0) {
         throw new ApiError(APIErrorCode.InternalError, 'could not get reward address');
       } else {
-        return [cardanoAddressToCbor(rewardAccount)];
+        return rewardAccounts.map((rewardAccount) => cardanoAddressToCbor(rewardAccount));
       }
     } catch (error) {
       logger.error(error);

@@ -35,6 +35,7 @@ import { buildDRepIDFromDRepKey, waitForWalletStateSettle } from '../util';
 import { firstValueFrom, of } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
+import uniq from 'lodash/uniq';
 
 const {
   mockChainHistoryProvider,
@@ -475,8 +476,11 @@ describe('cip30', () => {
           Cardano.Address.fromBytes(HexBlob(cipAddr)).toBech32()
         );
 
-        const [{ rewardAccount: walletRewardAccount }] = await firstValueFrom(wallet.addresses$);
-        expect(cipRewardAddresses).toEqual([walletRewardAccount]);
+        const walletAddresses = await firstValueFrom(wallet.addresses$);
+        const rewardAccounts = uniq(walletAddresses.map((address) => address.rewardAccount));
+        expect(rewardAccounts.length).toBeGreaterThanOrEqual(1);
+        expect(cipRewardAddresses).toEqual(rewardAccounts);
+        expect(cipRewardAddressesCbor.length).toEqual(rewardAccounts.length);
       });
 
       describe('api.signTx', () => {
