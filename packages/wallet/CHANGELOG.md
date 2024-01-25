@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.31.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.30.0...@cardano-sdk/wallet@0.31.0) (2024-01-25)
+
+### ⚠ BREAKING CHANGES
+
+* txInxpectors are now asynchronous
+- TotalAddressInputsValueInspector now takes an InputResolver instead of historical Txs
+
+### Features
+
+* txInxpectors are now asynchronous ([dc6e2ea](https://github.com/input-output-hk/cardano-js-sdk/commit/dc6e2ea5528b90cf9159a955b7a5e43ef6a1bf7a))
+
+### Bug Fixes
+
+* **core:** withdrawals canonical sorting by address bytes ([5bf0f9c](https://github.com/input-output-hk/cardano-js-sdk/commit/5bf0f9c8e11e4032d072cd6e51973647b8ebd9a0))
+* **wallet:** return all reward addresses for a given account ([3cfb5c3](https://github.com/input-output-hk/cardano-js-sdk/commit/3cfb5c3909cb3e2a074d0c25b1d797bb5de5f1e6))
+* **wallet:** use multiple queries to load large pouchdb collections ([d5b8eee](https://github.com/input-output-hk/cardano-js-sdk/commit/d5b8eeee5995389f65c6b33132ab0ef85e105c77))
+
 ## [0.30.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.29.1...@cardano-sdk/wallet@0.30.0) (2024-01-17)
 
 ### ⚠ BREAKING CHANGES

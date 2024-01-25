@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.12.13...@cardano-sdk/input-selection@0.12.14) (2024-01-25)
+
+### Features
+
+* **core:** added new inspectors to compute transaction summary and asset transfer ([2007534](https://github.com/input-output-hk/cardano-js-sdk/commit/20075341adfc3f4645dfcaccf4197ccb63758be5))
+
 ## [0.12.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.12.12...@cardano-sdk/input-selection@0.12.13) (2024-01-17)
 
 **Note:** Version bump only for package @cardano-sdk/input-selection

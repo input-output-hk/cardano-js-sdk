@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.14.5...@cardano-sdk/util@0.15.0) (2024-01-25)
+
+### ⚠ BREAKING CHANGES
+
+* replace fromSerializableObj getErrorPrototype with errorTypes
+
+### Code Refactoring
+
+* replace fromSerializableObj getErrorPrototype with errorTypes ([7a9770c](https://github.com/input-output-hk/cardano-js-sdk/commit/7a9770cc318a0149d2d623eca5c42e8c0699983e))
+
 ## [0.14.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.14.4...@cardano-sdk/util@0.14.5) (2023-12-07)
 
 **Note:** Version bump only for package @cardano-sdk/util
