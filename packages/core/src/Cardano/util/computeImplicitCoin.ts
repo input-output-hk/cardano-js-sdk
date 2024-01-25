@@ -1,5 +1,6 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable complexity */
+import * as Crypto from '@cardano-sdk/crypto';
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '../..';
 import { HydratedTxBody, Lovelace } from '../types';
@@ -75,7 +76,8 @@ const computeShellyDeposits = (
 
 const computeConwayDeposits = (
   certificates: Cardano.Certificate[],
-  rewardAccounts: Cardano.RewardAccount[]
+  rewardAccounts: Cardano.RewardAccount[],
+  dRepKeyHash?: Crypto.Ed25519KeyHashHex
 ): { deposit: Cardano.Lovelace; reclaimDeposit: Cardano.Lovelace } => {
   let deposit = 0n;
   let reclaimDeposit = 0n;
@@ -91,6 +93,18 @@ const computeConwayDeposits = (
       case Cardano.CertificateType.Unregistration:
         if (stakeCredentialInRewardAccounts(cert.stakeCredential, rewardAccounts)) reclaimDeposit += cert.deposit;
         break;
+      case Cardano.CertificateType.RegisterDelegateRepresentative:
+      case Cardano.CertificateType.UnregisterDelegateRepresentative:
+        if (
+          !dRepKeyHash ||
+          (cert.dRepCredential.type === Cardano.CredentialType.KeyHash &&
+            cert.dRepCredential.hash === Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash))
+        ) {
+          cert.__typename === Cardano.CertificateType.RegisterDelegateRepresentative
+            ? (deposit += cert.deposit)
+            : (reclaimDeposit += cert.deposit);
+        }
+        break;
     }
   }
 
@@ -104,7 +118,8 @@ const computeConwayDeposits = (
 const getTxDeposits = (
   { stakeKeyDeposit, poolDeposit }: Pick<Cardano.ProtocolParameters, 'stakeKeyDeposit' | 'poolDeposit'>,
   certificates: Cardano.Certificate[],
-  rewardAccounts: Cardano.RewardAccount[] = []
+  rewardAccounts: Cardano.RewardAccount[] = [],
+  dRepKeyHash?: Crypto.Ed25519KeyHashHex
 ): { deposit: Cardano.Lovelace; reclaimDeposit: Cardano.Lovelace } => {
   if (certificates.length === 0) return { deposit: 0n, reclaimDeposit: 0n };
 
@@ -114,7 +129,7 @@ const getTxDeposits = (
   };
 
   const shelleyDeposits = computeShellyDeposits(depositParams, certificates, rewardAccounts);
-  const conwayDeposits = computeConwayDeposits(certificates, rewardAccounts);
+  const conwayDeposits = computeConwayDeposits(certificates, rewardAccounts, dRepKeyHash);
 
   return {
     deposit: shelleyDeposits.deposit + conwayDeposits.deposit,
@@ -126,16 +141,28 @@ const getTxDeposits = (
  * Computes the implicit coin from the given transaction.
  * If rewardAccounts is provided, it will only count the deposits from
  * Certificates that belong to any of the reward accounts provided.
+ * If dRepKeyHash is provided, it will only count the deposits from Certificates
+ * that belong to the given dRep.
+ *
+ * Is used by the input selector, and by the util to compute transaction summary/display.
+ * The input selector doesn't filter by reward accounts because we are building the transaction
+ * internally, so we know all the certificates are ours.
+ * On the other hand, the transaction summary/display could receive a transaction from a dApp,
+ * and can have mixed certificates (foreign and ours), so we need the list of reward accounts and drepKeyHash
+ * to be able to distinguish the deposits that are going to our rewardAccounts from the ones that could
+ * potentially go to a different reward accounts that we dont control (same with reclaims).
  */
 export const computeImplicitCoin = (
   { stakeKeyDeposit, poolDeposit }: Pick<Cardano.ProtocolParameters, 'stakeKeyDeposit' | 'poolDeposit'>,
   { certificates, withdrawals }: Pick<HydratedTxBody, 'certificates' | 'withdrawals'>,
-  rewardAccounts?: Cardano.RewardAccount[]
+  rewardAccounts?: Cardano.RewardAccount[],
+  dRepKeyHash?: Crypto.Ed25519KeyHashHex
 ): ImplicitCoin => {
   const { deposit, reclaimDeposit } = getTxDeposits(
     { poolDeposit, stakeKeyDeposit },
     certificates ?? [],
-    rewardAccounts
+    rewardAccounts,
+    dRepKeyHash
   );
 
   const withdrawalsTotal = (withdrawals && BigIntMath.sum(withdrawals.map(({ quantity }) => quantity))) || 0n;
