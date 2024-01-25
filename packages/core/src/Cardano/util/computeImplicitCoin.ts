@@ -1,6 +1,8 @@
+/* eslint-disable sonarjs/cognitive-complexity */
+/* eslint-disable complexity */
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '../..';
-import { CertificateType, HydratedTxBody, Lovelace } from '../types';
+import { HydratedTxBody, Lovelace } from '../types';
 
 /** Implicit coin quantities used in the transaction */
 export interface ImplicitCoin {
@@ -16,15 +18,28 @@ export interface ImplicitCoin {
 
 type DepositProtocolParams = { stakeKeyDeposit: Cardano.Lovelace; poolDeposit: Cardano.Lovelace };
 
+const stakeCredentialInRewardAccounts = (
+  stakeCredential: Cardano.Credential,
+  rewardAccounts: Cardano.RewardAccount[]
+): boolean => {
+  // No reward accounts means accept any stake credential
+  if (rewardAccounts.length === 0) return true;
+  const networkId = Cardano.RewardAccount.toNetworkId(rewardAccounts[0]);
+  return rewardAccounts.includes(Cardano.RewardAccount.fromCredential(stakeCredential, networkId));
+};
+
 const computeShellyDeposits = (
   depositParams: DepositProtocolParams,
   certificates: Cardano.Certificate[],
-  rewardAccounts: Cardano.RewardAccount[],
-  poolIds: Set<Cardano.PoolId>,
-  networkId: Cardano.NetworkId
+  rewardAccounts: Cardano.RewardAccount[]
 ): { deposit: Cardano.Lovelace; reclaimDeposit: Cardano.Lovelace } => {
   let deposit = 0n;
   let reclaimDeposit = 0n;
+  const anyRewardAccount = rewardAccounts.length === 0;
+
+  const poolIds = new Set(
+    rewardAccounts.map((account) => Cardano.PoolId.fromKeyHash(Cardano.RewardAccount.toHash(account)))
+  );
 
   // TODO: For the case of deregistration (StakeDeregistration and PoolRetirement) the code here is not entirely correct
   // as we are assuming the current protocol parameters for the deposits where the same as the ones used when the certificates where issued.
@@ -34,19 +49,19 @@ const computeShellyDeposits = (
   for (const cert of certificates) {
     switch (cert.__typename) {
       case Cardano.CertificateType.StakeRegistration:
-        if (rewardAccounts.includes(Cardano.RewardAccount.fromCredential(cert.stakeCredential, networkId)))
+        if (stakeCredentialInRewardAccounts(cert.stakeCredential, rewardAccounts))
           deposit += depositParams.stakeKeyDeposit;
         break;
       case Cardano.CertificateType.StakeDeregistration:
-        if (rewardAccounts.includes(Cardano.RewardAccount.fromCredential(cert.stakeCredential, networkId)))
+        if (stakeCredentialInRewardAccounts(cert.stakeCredential, rewardAccounts))
           reclaimDeposit += depositParams.stakeKeyDeposit;
         break;
       case Cardano.CertificateType.PoolRegistration:
-        if (rewardAccounts.some((acct) => cert.poolParameters.owners.includes(acct)))
+        if (anyRewardAccount || rewardAccounts.some((acct) => cert.poolParameters.owners.includes(acct)))
           deposit += depositParams.poolDeposit;
         break;
       case Cardano.CertificateType.PoolRetirement: {
-        if (poolIds.has(cert.poolId)) reclaimDeposit += depositParams.poolDeposit;
+        if (anyRewardAccount || poolIds.has(cert.poolId)) reclaimDeposit += depositParams.poolDeposit;
         break;
       }
     }
@@ -60,8 +75,7 @@ const computeShellyDeposits = (
 
 const computeConwayDeposits = (
   certificates: Cardano.Certificate[],
-  rewardAccounts: Cardano.RewardAccount[],
-  networkId: Cardano.NetworkId
+  rewardAccounts: Cardano.RewardAccount[]
 ): { deposit: Cardano.Lovelace; reclaimDeposit: Cardano.Lovelace } => {
   let deposit = 0n;
   let reclaimDeposit = 0n;
@@ -72,12 +86,10 @@ const computeConwayDeposits = (
       case Cardano.CertificateType.StakeRegistrationDelegation:
       case Cardano.CertificateType.VoteRegistrationDelegation:
       case Cardano.CertificateType.StakeVoteRegistrationDelegation:
-        if (rewardAccounts.includes(Cardano.RewardAccount.fromCredential(cert.stakeCredential, networkId)))
-          deposit += cert.deposit;
+        if (stakeCredentialInRewardAccounts(cert.stakeCredential, rewardAccounts)) deposit += cert.deposit;
         break;
       case Cardano.CertificateType.Unregistration:
-        if (rewardAccounts.includes(Cardano.RewardAccount.fromCredential(cert.stakeCredential, networkId)))
-          reclaimDeposit += cert.deposit;
+        if (stakeCredentialInRewardAccounts(cert.stakeCredential, rewardAccounts)) reclaimDeposit += cert.deposit;
         break;
     }
   }
@@ -89,65 +101,25 @@ const computeConwayDeposits = (
 };
 
 /** Inspects a transaction for its deposits and returned deposits. */
-const getTxOwnDeposits = (
+const getTxDeposits = (
   { stakeKeyDeposit, poolDeposit }: Pick<Cardano.ProtocolParameters, 'stakeKeyDeposit' | 'poolDeposit'>,
   certificates: Cardano.Certificate[],
-  rewardAccounts: Cardano.RewardAccount[]
+  rewardAccounts: Cardano.RewardAccount[] = []
 ): { deposit: Cardano.Lovelace; reclaimDeposit: Cardano.Lovelace } => {
-  if (rewardAccounts.length === 0 || certificates.length === 0) return { deposit: 0n, reclaimDeposit: 0n };
-
-  const poolIds = new Set(
-    rewardAccounts
-      .map((account) => Cardano.RewardAccount.toHash(account))
-      .map((hash) => Cardano.PoolId.fromKeyHash(hash))
-  );
-
-  const networkId = Cardano.RewardAccount.toNetworkId(rewardAccounts[0]);
+  if (certificates.length === 0) return { deposit: 0n, reclaimDeposit: 0n };
 
   const depositParams = {
     poolDeposit: poolDeposit ? BigInt(poolDeposit) : 0n,
     stakeKeyDeposit: BigInt(stakeKeyDeposit)
   };
 
-  const shelleyDeposits = computeShellyDeposits(depositParams, certificates, rewardAccounts, poolIds, networkId);
-  const conwayDeposits = computeConwayDeposits(certificates, rewardAccounts, networkId);
+  const shelleyDeposits = computeShellyDeposits(depositParams, certificates, rewardAccounts);
+  const conwayDeposits = computeConwayDeposits(certificates, rewardAccounts);
 
   return {
     deposit: shelleyDeposits.deposit + conwayDeposits.deposit,
     reclaimDeposit: shelleyDeposits.reclaimDeposit + conwayDeposits.reclaimDeposit
   };
-};
-
-const getTxDeposits = (
-  { stakeKeyDeposit, poolDeposit }: Pick<Cardano.ProtocolParameters, 'stakeKeyDeposit' | 'poolDeposit'>,
-  certificates: Cardano.Certificate[]
-): { deposit: Lovelace; reclaimDeposit: Lovelace } => {
-  const stakeKeyDepositBigint = stakeKeyDeposit && BigInt(stakeKeyDeposit);
-  const poolDepositBigint = poolDeposit && BigInt(poolDeposit);
-  const deposit = BigIntMath.sum(
-    certificates.map(
-      (cert) =>
-        (cert.__typename === CertificateType.StakeRegistration && stakeKeyDepositBigint) ||
-        (cert.__typename === CertificateType.PoolRegistration && poolDepositBigint) ||
-        (cert.__typename === CertificateType.Unregistration && cert.deposit) ||
-        0n
-    ) || []
-  );
-  const reclaimTotal = BigIntMath.sum(
-    certificates.map(
-      // eslint-disable-next-line complexity
-      (cert) =>
-        (cert.__typename === CertificateType.StakeDeregistration && stakeKeyDepositBigint) ||
-        (cert.__typename === CertificateType.PoolRetirement && poolDepositBigint) ||
-        (cert.__typename === CertificateType.Registration && cert.deposit) ||
-        (cert.__typename === CertificateType.StakeRegistrationDelegation && cert.deposit) ||
-        (cert.__typename === CertificateType.VoteRegistrationDelegation && cert.deposit) ||
-        (cert.__typename === CertificateType.StakeVoteRegistrationDelegation && cert.deposit) ||
-        0n
-    ) || []
-  );
-
-  return { deposit, reclaimDeposit: reclaimTotal };
 };
 
 /**
@@ -160,9 +132,11 @@ export const computeImplicitCoin = (
   { certificates, withdrawals }: Pick<HydratedTxBody, 'certificates' | 'withdrawals'>,
   rewardAccounts?: Cardano.RewardAccount[]
 ): ImplicitCoin => {
-  const { deposit, reclaimDeposit } = rewardAccounts
-    ? getTxOwnDeposits({ poolDeposit, stakeKeyDeposit }, certificates ?? [], rewardAccounts)
-    : getTxDeposits({ poolDeposit, stakeKeyDeposit }, certificates ?? []);
+  const { deposit, reclaimDeposit } = getTxDeposits(
+    { poolDeposit, stakeKeyDeposit },
+    certificates ?? [],
+    rewardAccounts
+  );
 
   const withdrawalsTotal = (withdrawals && BigIntMath.sum(withdrawals.map(({ quantity }) => quantity))) || 0n;
 
