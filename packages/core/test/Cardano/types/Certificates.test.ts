@@ -36,6 +36,15 @@ describe('Certificate', () => {
         stakeCredential
       });
     });
+
+    it('can create a conway stake key de-registration certificate when deposit exists', () => {
+      const cert = createStakeDeregistrationCert(rewardAccount, 5n);
+      expect(cert).toEqual({
+        __typename: CertificateType.Unregistration,
+        deposit: 5n,
+        stakeCredential
+      } as Cardano.NewStakeAddressCertificate);
+    });
   });
 
   describe('createDelegationCert', () => {

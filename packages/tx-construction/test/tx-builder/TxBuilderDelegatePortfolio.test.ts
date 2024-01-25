@@ -53,7 +53,7 @@ const createTxBuilder = async ({
   rewardAccounts,
   keyAgent
 }: {
-  stakeKeyDelegations: { keyStatus: Cardano.StakeKeyStatus; poolId?: Cardano.PoolId }[];
+  stakeKeyDelegations: { keyStatus: Cardano.StakeKeyStatus; poolId?: Cardano.PoolId; deposit?: Cardano.Lovelace }[];
   numAddresses?: number;
   useMultiplePaymentKeys?: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -90,12 +90,13 @@ const createTxBuilder = async ({
             // Create mock stakeKey/delegation status for each reward account according to the requested stakeKeyDelegations.
             // This would normally be done by the wallet.delegation.rewardAccounts
             .map<RewardAccountWithPoolId>(({ rewardAccount: address }, index) => {
-              const { keyStatus, poolId } = stakeKeyDelegations[index] ?? {};
+              const { keyStatus, poolId, deposit } = stakeKeyDelegations[index] ?? {};
               return {
                 address,
                 keyStatus: keyStatus ?? Cardano.StakeKeyStatus.Unregistered,
                 rewardBalance: mocks.rewardAccountBalance,
-                ...(poolId ? { delegatee: { nextNextEpoch: { id: poolId } } } : undefined)
+                ...(poolId ? { delegatee: { nextNextEpoch: { id: poolId } } } : undefined),
+                ...(deposit && { deposit })
               };
             })
         )
@@ -302,13 +303,14 @@ describe('TxBuilder/delegatePortfolio', () => {
   describe('pre-existing multi-delegation on all stake keys', () => {
     let txBuilderProviders: jest.Mocked<TxBuilderProviders>;
     let nonDelegatingWalletTxBuilder: GenericTxBuilder;
+    const deposit = 5n;
 
     beforeEach(async () => {
       const txBuilderFactory = await createTxBuilder({
         keyAgent,
         stakeKeyDelegations: [
           { keyStatus: Cardano.StakeKeyStatus.Registered, poolId: poolIds[0] },
-          { keyStatus: Cardano.StakeKeyStatus.Registered, poolId: poolIds[1] }
+          { deposit, keyStatus: Cardano.StakeKeyStatus.Registered, poolId: poolIds[1] }
         ]
       });
       groupedAddresses = txBuilderFactory.groupedAddresses;
@@ -340,7 +342,7 @@ describe('TxBuilder/delegatePortfolio', () => {
         Cardano.createStakeDeregistrationCert(groupedAddresses[0].rewardAccount)
       );
       expect(tx.body.certificates).toContainEqual(
-        Cardano.createStakeDeregistrationCert(groupedAddresses[1].rewardAccount)
+        Cardano.createStakeDeregistrationCert(groupedAddresses[1].rewardAccount, deposit)
       );
 
       expect(GreedyInputSelector).toHaveBeenCalled();
