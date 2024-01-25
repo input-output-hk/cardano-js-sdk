@@ -194,13 +194,23 @@ export const createStakeRegistrationCert = (rewardAccount: RewardAccount): Certi
  *
  * @param rewardAccount The reward account to be de-registered.
  */
-export const createStakeDeregistrationCert = (rewardAccount: RewardAccount): Certificate => ({
-  __typename: CertificateType.StakeDeregistration,
-  stakeCredential: {
-    hash: Hash28ByteBase16.fromEd25519KeyHashHex(RewardAccount.toHash(rewardAccount)),
-    type: CredentialType.KeyHash
-  }
-});
+export const createStakeDeregistrationCert = (rewardAccount: RewardAccount, deposit?: Lovelace): Certificate =>
+  deposit === undefined
+    ? {
+        __typename: CertificateType.StakeDeregistration,
+        stakeCredential: {
+          hash: Hash28ByteBase16.fromEd25519KeyHashHex(RewardAccount.toHash(rewardAccount)),
+          type: CredentialType.KeyHash
+        }
+      }
+    : {
+        __typename: CertificateType.Unregistration,
+        deposit,
+        stakeCredential: {
+          hash: Hash28ByteBase16.fromEd25519KeyHashHex(RewardAccount.toHash(rewardAccount)),
+          type: CredentialType.KeyHash
+        }
+      };
 
 /**
  * Creates a delegation certificate from a given reward account and a pool id.
