@@ -44,6 +44,7 @@ import {
 import { ErrorClass, Shutdown, fromSerializableObject, isPromise, toSerializableObject } from '@cardano-sdk/util';
 import { NotImplementedError } from '@cardano-sdk/core';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
+import { WrongTargetError } from './errors';
 import {
   disabledApiMsg,
   isCompletionMessage,
@@ -80,10 +81,11 @@ const consumeMethod =
       merge(
         postMessage(requestMessage).pipe(mergeMap(() => EMPTY)),
         message$.pipe(
-          map(({ data }) => fromSerializableObject(data, { errorTypes })),
+          map(({ data }) => fromSerializableObject(data, { errorTypes: [...(errorTypes || []), WrongTargetError] })),
           filter(isResponseMessage),
           filter(({ messageId }) => messageId === requestMessage.messageId),
-          map(({ response }) => response)
+          map(({ response }) => response),
+          filter((response) => !(response instanceof WrongTargetError))
         ),
         disconnect$.pipe(
           filter((dc) => dc.remaining.length === 0),

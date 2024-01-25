@@ -11,6 +11,7 @@ export * from './runContentScriptMessageProxy';
 export * from './types';
 export * from './util';
 export * from './injectedRuntime';
+export * from './errors';
 
 export type BaseChannel = { baseChannel: ChannelName };
 
