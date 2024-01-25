@@ -11,7 +11,7 @@ import {
 import { Bip32PublicKeyHex, Ed25519PublicKeyHex, Ed25519SignatureHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { Cardano, TxCBOR } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
-import { InMemoryWallet, KeyAgentFactory, SigningCoordinator, WalletType } from '../../src';
+import { InMemoryWallet, KeyAgentFactory, SigningCoordinator, WalletType, WrongTargetError } from '../../src';
 import { firstValueFrom } from 'rxjs';
 
 describe('SigningCoordinator', () => {
@@ -85,7 +85,7 @@ describe('SigningCoordinator', () => {
 
     it('rejects with AuthenticationError when there is no subscriber', async () => {
       await expect(signingCoordinator.signTransaction({ signContext, tx }, requestContext)).rejects.toThrowError(
-        errors.AuthenticationError
+        WrongTargetError
       );
     });
 
@@ -167,7 +167,7 @@ describe('SigningCoordinator', () => {
       keyAgent.signBlob.mockResolvedValueOnce(signResult);
       await expect(
         signingCoordinator.signData({ blob, derivationPath, signContext }, requestContext)
-      ).rejects.toThrowError(errors.AuthenticationError);
+      ).rejects.toThrowError(WrongTargetError);
     });
 
     it('rejects with ProofGenerationError when account is not found', async () => {

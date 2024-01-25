@@ -36,10 +36,9 @@ export class PouchDbCollectionStore<T extends {}> extends PouchDbStore<T> implem
   getAll(): Observable<T[]> {
     if (this.destroyed) return EMPTY;
     return new Observable((observer) => {
-      this.db
-        .allDocs({ include_docs: true })
+      this.fetchAllDocs({ include_docs: true })
         .then((result) => {
-          const docs = result.rows.map(({ doc }) => sanitizePouchDbDoc(doc!));
+          const docs = result.map(({ doc }) => sanitizePouchDbDoc(doc!));
           if (docs.length > 0) observer.next(docs);
           observer.complete();
         })
