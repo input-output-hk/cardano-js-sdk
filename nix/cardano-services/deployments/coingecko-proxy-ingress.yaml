@@ -7,8 +7,10 @@ metadata:
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
-    external-dns.alpha.kubernetes.io/aws-region: eu-central-1
-    external-dns.alpha.kubernetes.io/set-identifier: eu-central-1-dev-preview-proxy
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:926093910549:certificate/f136a39b-3556-4ddf-85ac-ac5b7431dd34
+    alb.ingress.kubernetes.io/wafv2-acl-arn: arn:aws:wafv2:us-east-1:926093910549:regional/webacl/rate-limit/d4216c0e-b464-4383-953f-3262f4cd3cb6
+    external-dns.alpha.kubernetes.io/aws-region: us-east-1
+    external-dns.alpha.kubernetes.io/set-identifier: us-east-1-dev-preview-proxy
   labels:
     app: coingecko-proxy
     network: preview
@@ -17,7 +19,7 @@ metadata:
 spec:
   ingressClassName: alb
   rules:
-    - host: coingecko.dev-preview.eks.lw.iog.io
+    - host: coingecko.dev-preview.lw.iog.io
       http:
         paths:
           - backend:
@@ -36,4 +38,4 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - coingecko.dev-preview.eks.lw.iog.io
+        - coingecko.dev-preview.lw.iog.io
