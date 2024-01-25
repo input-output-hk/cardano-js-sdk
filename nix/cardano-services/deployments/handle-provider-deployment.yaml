@@ -40,12 +40,12 @@ spec:
             - name: POSTGRES_DB
               value: handle
             - name: POSTGRES_HOST
-              value: dev-preview-dbsync-db
+              value: dev-preview-postgresql
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
                   key: password
-                  name: handle-owner-user.dev-preview-dbsync-db.credentials.postgresql.acid.zalan.do
+                  name: handle-owner-user.dev-preview-postgresql.credentials.postgresql.acid.zalan.do
             - name: POSTGRES_POOL_MAX
               value: "10"
             - name: POSTGRES_PORT
@@ -58,7 +58,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: username
-                  name: handle-owner-user.dev-preview-dbsync-db.credentials.postgresql.acid.zalan.do
+                  name: handle-owner-user.dev-preview-postgresql.credentials.postgresql.acid.zalan.do
             - name: SERVICE_NAMES
               value: handle
             - name: USE_KORA_LABS

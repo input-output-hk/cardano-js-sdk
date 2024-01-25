@@ -34,19 +34,19 @@ spec:
             - name: POSTGRES_DB_STAKE_POOL
               value: stakepool
             - name: POSTGRES_HOST_DB_SYNC
-              value: dev-preview-dbsync-db
+              value: dev-preview-postgresql
             - name: POSTGRES_HOST_STAKE_POOL
-              value: dev-preview-dbsync-db
+              value: dev-preview-postgresql
             - name: POSTGRES_PASSWORD_DB_SYNC
               valueFrom:
                 secretKeyRef:
                   key: password
-                  name: cardano-owner-user.dev-preview-dbsync-db.credentials.postgresql.acid.zalan.do
+                  name: cardano-owner-user.dev-preview-postgresql.credentials.postgresql.acid.zalan.do
             - name: POSTGRES_PASSWORD_STAKE_POOL
               valueFrom:
                 secretKeyRef:
                   key: password
-                  name: stakepool-owner-user.dev-preview-dbsync-db.credentials.postgresql.acid.zalan.do
+                  name: stakepool-owner-user.dev-preview-postgresql.credentials.postgresql.acid.zalan.do
             - name: POSTGRES_POOL_MAX_DB_SYNC
               value: '5'
             - name: POSTGRES_POOL_MAX_STAKE_POOL
@@ -67,12 +67,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: username
-                  name: cardano-owner-user.dev-preview-dbsync-db.credentials.postgresql.acid.zalan.do
+                  name: cardano-owner-user.dev-preview-postgresql.credentials.postgresql.acid.zalan.do
             - name: POSTGRES_USER_STAKE_POOL
               valueFrom:
                 secretKeyRef:
                   key: username
-                  name: stakepool-owner-user.dev-preview-dbsync-db.credentials.postgresql.acid.zalan.do
+                  name: stakepool-owner-user.dev-preview-postgresql.credentials.postgresql.acid.zalan.do
             - name: QUEUES
               value: pool-delist-schedule,pool-metadata,pool-metrics,pool-rewards
             - name: SMASH_URL
