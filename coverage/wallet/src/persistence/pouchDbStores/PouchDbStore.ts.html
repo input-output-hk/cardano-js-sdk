@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">90% </span>
+                <span class="strong">91.42% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>27/30</span>
+                <span class='fraction'>32/35</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">85.71% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>6/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">90% </span>
+                <span class="strong">90.9% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>9/10</span>
+                <span class='fraction'>10/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">89.28% </span>
+                <span class="strong">90.9% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>25/28</span>
+                <span class='fraction'>30/33</span>
             </div>
         
             
@@ -137,9 +137,30 @@
 <a name='L72'></a><a href='#L72'>72</a>
 <a name='L73'></a><a href='#L73'>73</a>
 <a name='L74'></a><a href='#L74'>74</a>
-<a name='L75'></a><a href='#L75'>75</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">39x</span>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">39x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">39x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">39x</span>
@@ -190,6 +211,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">60x</span>
+<span class="cline-any cline-yes">60x</span>
+<span class="cline-any cline-yes">22x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">38x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-yes">14x</span>
@@ -216,6 +254,8 @@ import { Logger } from 'ts-log';
 import { toPouchDbDoc } from './util';
 import PouchDB from 'pouchdb';
 &nbsp;
+const FETCH_ALL_PAGE_SIZE = 100;
+&nbsp;
 export abstract class PouchDbStore&lt;T extends {}&gt; {
   destroyed = false;
   protected idle: Promise&lt;void&gt; = Promise.resolve();
@@ -232,9 +272,9 @@ export abstract class PouchDbStore&lt;T extends {}&gt; {
    * If you need to use this for other purposes, consider adding clear() or destroy() to stores interfaces.
    */
   async clearDB(): Promise&lt;void&gt; {
-    const docs = await this.db.allDocs();
+    const docs = await this.fetchAllDocs();
     await this.db.bulkDocs(
-      docs.rows.map(
+      docs.map(
         (row) =&gt;
           ({
             _deleted: true,
@@ -261,6 +301,23 @@ export abstract class PouchDbStore&lt;T extends {}&gt; {
   async #getRev(docId: string) {
     const existingDoc = await this.db.get(docId).catch(() =&gt; void 0);
     return existingDoc?._rev;
+  }
+&nbsp;
+  async fetchAllDocs(
+    options?: Omit&lt;Partial&lt;PouchDB.Core.AllDocsWithinRangeOptions&gt;, 'limit'&gt;
+  ): Promise&lt;PouchDB.Core.AllDocsResponse&lt;T&gt;['rows']&gt; {
+    const response = await this.db.allDocs({ ...options, limit: FETCH_ALL_PAGE_SIZE });
+    if (response &amp;&amp; response.rows.length &gt; 0) {
+      return [
+        ...response.rows,
+        ...(await this.fetchAllDocs({
+          ...options,
+          skip: 1,
+          startkey: response.rows[response.rows.length - 1].id
+        }))
+      ];
+    }
+    return response.rows || <span class="branch-1 cbranch-no" title="branch not covered" >[];</span>
   }
 &nbsp;
   protected forcePut(docId: string, doc: T) {
@@ -292,7 +349,7 @@ export abstract class PouchDbStore&lt;T extends {}&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-01-24T17:12:06.605Z
+                at 2024-01-25T14:12:26.834Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

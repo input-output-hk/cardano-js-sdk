@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">98.75% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>75/75</span>
+                <span class='fraction'>79/80</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>39/39</span>
+                <span class='fraction'>43/43</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">98.55% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>63/63</span>
+                <span class='fraction'>68/69</span>
             </div>
         
             
@@ -209,7 +209,22 @@
 <a name='L144'></a><a href='#L144'>144</a>
 <a name='L145'></a><a href='#L145'>145</a>
 <a name='L146'></a><a href='#L146'>146</a>
-<a name='L147'></a><a href='#L147'>147</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-yes">13x</span>
@@ -230,7 +245,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">45x</span>
 <span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -363,20 +393,35 @@ import transform from 'lodash/transform';
 const PLAIN_TYPES = new Set(['boolean', 'number', 'string']);
 &nbsp;
 export type TransformKey = (key: string) =&gt; string;
-export type GetErrorPrototype = (err: unknown) =&gt; typeof Error.prototype;
 &nbsp;
 export interface ToSerializableObjectOptions {
   transformationTypeKey?: string;
   serializeKey?: TransformKey;
 }
 &nbsp;
+export interface ClassOf&lt;T&gt; extends Function {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  new (...args: any[]): T;
+}
+export type ErrorClass = ClassOf&lt;Error&gt;;
+&nbsp;
 export interface FromSerializableObjectOptions {
   transformationTypeKey?: string;
   deserializeKey?: TransformKey;
-  getErrorPrototype?: GetErrorPrototype;
+  errorTypes?: ErrorClass[];
 }
 &nbsp;
-const defaultGetErrorPrototype: GetErrorPrototype = () =&gt; Error.prototype;
+const matchPrototype = (errorTypes: ErrorClass[], error: unknown) =&gt; {
+  if (typeof error === 'object' &amp;&amp; error !== null) {
+    for (let ErrorType of errorTypes) {
+      if ((error as Error).name === ErrorType.name) {
+        return ErrorType.prototype;
+      }
+<span class="cstat-no" title="statement not covered" >      ErrorType = Object.getPrototypeOf(ErrorType.prototype)?.constructor;</span>
+    }
+  }
+  return Error.prototype;
+};
 const defaultTransformKey: TransformKey = (key) =&gt; key;
 const defaultTransformationTypeKey = '__type';
 &nbsp;
@@ -461,7 +506,7 @@ const fromSerializableObjectUnknown = (obj: unknown, options: FromSerializableOb
     const {
       transformationTypeKey = defaultTransformationTypeKey,
       deserializeKey = defaultTransformKey,
-      getErrorPrototype = defaultGetErrorPrototype
+      errorTypes = []
     } = options;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const docAsAny = obj as any;
@@ -484,7 +529,7 @@ const fromSerializableObjectUnknown = (obj: unknown, options: FromSerializableOb
         );
       case 'Error': {
         const error = fromSerializableObjectUnknown(docAsAny.value, options);
-        return Object.setPrototypeOf(error, getErrorPrototype(error));
+        return Object.setPrototypeOf(error, matchPrototype(errorTypes, error));
       }
       default:
         return transform(
@@ -508,7 +553,7 @@ export const fromSerializableObject = &lt;T&gt;(serializableObject: unknown, opt
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-01-24T17:09:52.118Z
+                at 2024-01-25T14:10:15.346Z
             </div>
         <script src="../prettify.js"></script>
         <script>

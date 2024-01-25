@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">91.14% </span>
+                <span class="strong">91.23% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>175/192</span>
+                <span class='fraction'>177/194</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.33% </span>
+                <span class="strong">83.92% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>45/54</span>
+                <span class='fraction'>47/56</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.44% </span>
+                <span class="strong">93.54% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>57/61</span>
+                <span class='fraction'>58/62</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">91.32% </span>
+                <span class="strong">91.42% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>158/173</span>
+                <span class='fraction'>160/175</span>
             </div>
         
             
@@ -543,14 +543,7 @@
 <a name='L478'></a><a href='#L478'>478</a>
 <a name='L479'></a><a href='#L479'>479</a>
 <a name='L480'></a><a href='#L480'>480</a>
-<a name='L481'></a><a href='#L481'>481</a>
-<a name='L482'></a><a href='#L482'>482</a>
-<a name='L483'></a><a href='#L483'>483</a>
-<a name='L484'></a><a href='#L484'>484</a>
-<a name='L485'></a><a href='#L485'>485</a>
-<a name='L486'></a><a href='#L486'>486</a>
-<a name='L487'></a><a href='#L487'>487</a>
-<a name='L488'></a><a href='#L488'>488</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L481'></a><a href='#L481'>481</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -594,12 +587,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
@@ -625,9 +613,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -643,6 +628,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1080,15 +1066,10 @@ import {
   tap,
   throwError
 } from 'rxjs';
-import {
-  GetErrorPrototype,
-  Shutdown,
-  fromSerializableObject,
-  isPromise,
-  toSerializableObject
-} from '@cardano-sdk/util';
+import { ErrorClass, Shutdown, fromSerializableObject, isPromise, toSerializableObject } from '@cardano-sdk/util';
 import { NotImplementedError } from '@cardano-sdk/core';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
+import { WrongTargetError } from './errors';
 import {
   disabledApiMsg,
   isCompletionMessage,
@@ -1109,10 +1090,7 @@ export class RemoteApiShutdownError extends CustomError {
 &nbsp;
 const consumeMethod =
   (
-    {
-      propName,
-      getErrorPrototype
-    }: { propName: string; getErrorPrototype?: GetErrorPrototype; options?: MethodRequestOptions },
+    { propName, errorTypes }: { propName: string; errorTypes?: ErrorClass[]; options?: MethodRequestOptions },
     { messenger: { message$, postMessage, channel, disconnect$ } }: MessengerApiDependencies
   ) =&gt;
   async (...args: unknown[]) =&gt; {
@@ -1128,10 +1106,11 @@ const consumeMethod =
       merge(
         postMessage(requestMessage).pipe(mergeMap(() =&gt; EMPTY)),
         message$.pipe(
-          map(({ data }) =&gt; fromSerializableObject(data, { getErrorPrototype })),
+          map(({ data }) =&gt; fromSerializableObject(data, { errorTypes: [...(errorTypes || []), WrongTargetError] })),
           filter(isResponseMessage),
           filter(({ messageId }) =&gt; messageId === requestMessage.messageId),
-          map(({ response }) =&gt; response)
+          map(({ response }) =&gt; response),
+          filter((response) =&gt; !(response instanceof WrongTargetError))
         ),
         disconnect$.pipe(
           filter(<span class="fstat-no" title="function not covered" >(d</span>c) =&gt; <span class="cstat-no" title="statement not covered" >dc.remaining.length === 0)</span>,
@@ -1154,12 +1133,12 @@ const consumeMethod =
 interface ConsumeFactoryProps&lt;T&gt; {
   method: string;
   apiProperties: RemoteApiProperties&lt;T&gt;;
-  getErrorPrototype: GetErrorPrototype | undefined;
+  errorTypes: ErrorClass[] | undefined;
 }
 &nbsp;
 const consumeFactory =
   &lt;T&gt;(
-    { method, apiProperties, getErrorPrototype }: ConsumeFactoryProps&lt;T&gt;,
+    { method, apiProperties, errorTypes }: ConsumeFactoryProps&lt;T&gt;,
     { logger, messenger, destructor }: ConsumeMessengerApiDependencies
   ) =&gt;
   (...args: unknown[]) =&gt; {
@@ -1175,7 +1154,7 @@ const consumeFactory =
     // eslint-disable-next-line no-use-before-define
     const api = consumeMessengerRemoteApi(
       {
-        getErrorPrototype,
+        errorTypes,
         properties: apiProperties
       },
       {
@@ -1207,7 +1186,7 @@ const consumeFactory =
 &nbsp;
 /** Creates a proxy to a remote api object */
 export const consumeMessengerRemoteApi = &lt;T extends object&gt;(
-  { properties, getErrorPrototype }: ConsumeRemoteApiOptions&lt;T&gt;,
+  { properties, errorTypes }: ConsumeRemoteApiOptions&lt;T&gt;,
   { logger, messenger, destructor }: ConsumeMessengerApiDependencies
 ): T &amp; Shutdown =&gt;
   new Proxy&lt;T &amp; Shutdown&gt;(
@@ -1224,25 +1203,25 @@ export const consumeMessengerRemoteApi = &lt;T extends object&gt;(
             switch (propMetadata.propType) {
               case RemoteApiPropertyType.MethodReturningPromise: {
                 return (receiver[prop] = consumeMethod(
-                  { getErrorPrototype, options: propMetadata.requestOptions, propName },
+                  { errorTypes, options: propMetadata.requestOptions, propName },
                   { logger, messenger }
                 ));
               }
               case RemoteApiPropertyType.ApiFactory: {
                 return (receiver[prop] = consumeFactory(
-                  { apiProperties: propMetadata.getApiProperties(), getErrorPrototype, method: propName },
+                  { apiProperties: propMetadata.getApiProperties(), errorTypes, method: propName },
                   { destructor, logger, messenger }
                 ));
               }
             }
           } else {
             return (receiver[prop] = consumeMessengerRemoteApi(
-              { getErrorPrototype, properties: propMetadata as any },
+              { errorTypes, properties: propMetadata as any },
               { destructor, logger, messenger: messenger.deriveChannel(propName) }
             ));
           }
         } else if (propMetadata === RemoteApiPropertyType.MethodReturningPromise) {
-          return (receiver[prop] = consumeMethod({ getErrorPrototype, propName }, { logger, messenger }));
+          return (receiver[prop] = consumeMethod({ errorTypes, propName }, { logger, messenger }));
         } else if (propMetadata === RemoteApiPropertyType.HotObservable) {
           const observableMessenger = messenger.deriveChannel(propName);
           const messageData$ = observableMessenger.message$.pipe(map(({ data }) =&gt; fromSerializableObject(data)));
@@ -1531,7 +1510,7 @@ export const exposeMessengerApi = &lt;API extends object&gt;(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-01-24T17:12:43.360Z
+                at 2024-01-25T14:13:03.297Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
