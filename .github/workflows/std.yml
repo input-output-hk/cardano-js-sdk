@@ -2,6 +2,12 @@
 name: STD
 on:
   workflow_dispatch:
+    inputs:
+      deploy:
+        description: Deploy to dev-preview
+        type: boolean
+        required: true
+        default: false
   workflow_call:
   pull_request:
     branches:
@@ -171,7 +177,7 @@ jobs:
       url: https://backend.dev-preview.eks.lw.iog.io
     # Boolean input should be compared with string until https://github.com/actions/runner/issues/2238 resolved
     if: >
-      fromJSON(needs.discover.outputs.hits).deployments.apply != '{}' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+      fromJSON(needs.discover.outputs.hits).deployments.apply != '{}' && ((github.event_name == 'push' && github.ref == 'refs/heads/master') || inputs.deploy)
 
     strategy:
       matrix:
