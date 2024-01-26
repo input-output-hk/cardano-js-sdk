@@ -36,7 +36,7 @@ describe('Cardano.util.subtractValueQuantities', () => {
       ]),
       coins: 200n
     };
-    expect(subtractValueQuantities([q1, q1])).toEqual({ assets: undefined, coins: 0n });
+    expect(subtractValueQuantities([q1, q1])).toEqual({ assets: new Map(), coins: 0n });
   });
   it('returns negative quantities', () => {
     const q1: Cardano.Value = {

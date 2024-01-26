@@ -11,6 +11,7 @@ describe('NftMetadata.fromMetadatum', () => {
   const policyIdString = 'b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7';
   const assetImageIPFS = 'ipfs://QmWS6DgF8Ma8oooBn7CtD3ChHyzzMw5NXWfnDbVFTip8af';
   const assetImageHTTPS = 'https://tokens.cardano.org';
+  const ipfsUrl = 'ipfs://image';
 
   const asset = {
     name: AssetName(assetNameString),
@@ -18,12 +19,12 @@ describe('NftMetadata.fromMetadatum', () => {
   } as Asset.AssetInfo;
 
   const minimalMetadata = new Map([
-    ['image', 'ipfs://image'],
+    ['image', ipfsUrl],
     ['name', 'test nft']
   ]);
 
   const minimalConvertedMetadata = {
-    image: 'ipfs://image',
+    image: ipfsUrl,
     name: 'test nft',
     version: '1.0'
   };
@@ -249,6 +250,36 @@ describe('NftMetadata.fromMetadatum', () => {
     const metadatum = createMetadatumWithFiles([], base64DecodedImage);
     const result = Asset.NftMetadata.fromMetadatum(validAsset, metadatum, logger);
     expect(result?.image).toEqual(base64DecodedImage.join(''));
+  });
+
+  it('replaces the name field with the asset_name when name is missing', () => {
+    // Arrange
+    const assetNameUtf8 = 'Meld Bank Manager v1 1589';
+    const assetNameHex = Buffer.from(assetNameUtf8).toString('hex');
+    const missingNameMetadata = new Map([['image', ipfsUrl]]);
+
+    const metadata = {
+      image: ipfsUrl,
+      name: 'Meld Bank Manager v1 1589',
+      version: '1.0'
+    };
+
+    const metadatum: TxMetadata = new Map([
+      [721n, new Map([[policyIdString, new Map([[assetNameUtf8, missingNameMetadata]])]])]
+    ]);
+
+    // Act
+    const result = Asset.NftMetadata.fromMetadatum(
+      {
+        name: AssetName(assetNameHex),
+        policyId: PolicyId(policyIdString)
+      },
+      metadatum,
+      logger
+    );
+
+    // Assert
+    expect(result).toEqual(metadata);
   });
 
   it('supports CIP-0025 v2', () => {

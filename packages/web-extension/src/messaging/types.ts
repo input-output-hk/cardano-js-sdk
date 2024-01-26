@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { ErrorClass, Shutdown } from '@cardano-sdk/util';
 import { Events, Runtime } from 'webextension-polyfill';
-import { GetErrorPrototype, Shutdown } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { Observable } from 'rxjs';
 
@@ -144,7 +144,7 @@ export interface ExposeApiProps<API extends object> {
 
 export interface ConsumeRemoteApiOptions<T> {
   properties: RemoteApiProperties<T>;
-  getErrorPrototype?: GetErrorPrototype;
+  errorTypes?: ErrorClass[];
 }
 
 export interface DeriveChannelOptions {

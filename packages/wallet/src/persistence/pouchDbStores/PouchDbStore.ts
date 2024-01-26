@@ -3,6 +3,8 @@ import { Logger } from 'ts-log';
 import { toPouchDbDoc } from './util';
 import PouchDB from 'pouchdb';
 
+const FETCH_ALL_PAGE_SIZE = 100;
+
 export abstract class PouchDbStore<T extends {}> {
   destroyed = false;
   protected idle: Promise<void> = Promise.resolve();
@@ -19,9 +21,9 @@ export abstract class PouchDbStore<T extends {}> {
    * If you need to use this for other purposes, consider adding clear() or destroy() to stores interfaces.
    */
   async clearDB(): Promise<void> {
-    const docs = await this.db.allDocs();
+    const docs = await this.fetchAllDocs();
     await this.db.bulkDocs(
-      docs.rows.map(
+      docs.map(
         (row) =>
           ({
             _deleted: true,
@@ -48,6 +50,23 @@ export abstract class PouchDbStore<T extends {}> {
   async #getRev(docId: string) {
     const existingDoc = await this.db.get(docId).catch(() => void 0);
     return existingDoc?._rev;
+  }
+
+  async fetchAllDocs(
+    options?: Omit<Partial<PouchDB.Core.AllDocsWithinRangeOptions>, 'limit'>
+  ): Promise<PouchDB.Core.AllDocsResponse<T>['rows']> {
+    const response = await this.db.allDocs({ ...options, limit: FETCH_ALL_PAGE_SIZE });
+    if (response && response.rows.length > 0) {
+      return [
+        ...response.rows,
+        ...(await this.fetchAllDocs({
+          ...options,
+          skip: 1,
+          startkey: response.rows[response.rows.length - 1].id
+        }))
+      ];
+    }
+    return response.rows || [];
   }
 
   protected forcePut(docId: string, doc: T) {

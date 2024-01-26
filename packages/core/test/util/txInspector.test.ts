@@ -1,5 +1,7 @@
 import * as AssetIds from '../AssetId';
+import * as Cardano from '../../src/Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
+
 import {
   AssetFingerprint,
   AssetId,
@@ -50,6 +52,16 @@ import {
   withdrawalInspector
 } from '../../src';
 import { jsonToMetadatum } from '../../src/util/metadatum';
+
+const createMockInputResolver = (historicalTxs: HydratedTx[]): Cardano.InputResolver => ({
+  async resolveInput(input: Cardano.TxIn) {
+    const tx = historicalTxs.find((historicalTx) => historicalTx.id === input.txId);
+
+    if (!tx || tx.body.outputs.length <= input.index) return Promise.resolve(null);
+
+    return Promise.resolve(tx.body.outputs[input.index]);
+  }
+});
 
 // eslint-disable-next-line max-statements
 describe('txInspector', () => {
@@ -125,18 +137,21 @@ describe('txInspector', () => {
       body: {
         outputs: [
           {
+            address: sendingAddress,
             value: {
               assets: new Map([[AssetIds.TSLA, 5n]]),
               coins: 4_500_000n
             }
           },
           {
+            address: sendingAddress,
             value: {
               assets: new Map([[AssetIds.PXL, 15n]]),
               coins: 5_000_000n
             }
           },
           {
+            address: receivingAddress,
             value: {
               assets: new Map([[AssetIds.TSLA, 25n]]),
               coins: 2_000_000n
@@ -278,12 +293,12 @@ describe('txInspector', () => {
     } as HydratedTx);
 
   describe('transaction sent inspector', () => {
-    test('a transaction with inputs with provided addresses produces an inspection containing those inputs', () => {
+    test('a transaction with inputs with provided addresses produces an inspection containing those inputs', async () => {
       const tx = buildMockTx();
       const inspectTx = createTxInspector({
-        sent: sentInspector({ addresses: [sendingAddress] })
+        sent: sentInspector({ addresses: [sendingAddress], inputResolver: createMockInputResolver(historicalTxs) })
       });
-      const txProperties = inspectTx(tx);
+      const txProperties = await inspectTx(tx);
 
       expect(txProperties.sent.inputs).toEqual(tx.body.inputs);
       expect(txProperties.sent.certificates).toEqual([]);
@@ -292,12 +307,15 @@ describe('txInspector', () => {
     test(
       'a transaction with certificates including the reward account' +
         ' produces an inspection containing those certificates',
-      () => {
+      async () => {
         const tx = buildMockTx({ certificates: [delegationCert, keyRegistrationCert] });
         const inspectTx = createTxInspector({
-          sent: sentInspector({ rewardAccounts: [rewardAccount] })
+          sent: sentInspector({
+            inputResolver: createMockInputResolver(historicalTxs),
+            rewardAccounts: [rewardAccount]
+          })
         });
-        const txProperties = inspectTx(tx);
+        const txProperties = await inspectTx(tx);
 
         expect(txProperties.sent.inputs).toEqual([]);
         expect(txProperties.sent.certificates).toEqual([delegationCert, keyRegistrationCert]);
@@ -308,12 +326,16 @@ describe('txInspector', () => {
       'a transaction with certificates including the reward account' +
         ' and inputs containing provided addresses' +
         ' produces an inspection containing those certificates and inputs',
-      () => {
+      async () => {
         const tx = buildMockTx({ certificates: [delegationCert, keyRegistrationCert] });
         const inspectTx = createTxInspector({
-          sent: sentInspector({ addresses: [sendingAddress], rewardAccounts: [rewardAccount] })
+          sent: sentInspector({
+            addresses: [sendingAddress],
+            inputResolver: createMockInputResolver(historicalTxs),
+            rewardAccounts: [rewardAccount]
+          })
         });
-        const txProperties = inspectTx(tx);
+        const txProperties = await inspectTx(tx);
 
         expect(txProperties.sent.inputs).toEqual(tx.body.inputs);
         expect(txProperties.sent.certificates).toEqual([delegationCert, keyRegistrationCert]);
@@ -322,7 +344,7 @@ describe('txInspector', () => {
   });
 
   describe('total address inputs and outputs value inspector', () => {
-    test('adds total input and outputs values for an address', () => {
+    test('adds total input and outputs values for an address', async () => {
       const tx = buildMockTx({
         inputs: [
           {
@@ -343,10 +365,10 @@ describe('txInspector', () => {
         ]
       });
       const inspectTx = createTxInspector({
-        totalInputsValue: totalAddressInputsValueInspector([sendingAddress], () => historicalTxs),
+        totalInputsValue: totalAddressInputsValueInspector([sendingAddress], createMockInputResolver(historicalTxs)),
         totalOutputsValue: totalAddressOutputsValueInspector([receivingAddress])
       });
-      const txProperties = inspectTx(tx);
+      const txProperties = await inspectTx(tx);
       expect(txProperties.totalInputsValue).toEqual({
         assets: new Map([
           [AssetIds.TSLA, 5n],
@@ -365,7 +387,7 @@ describe('txInspector', () => {
   });
 
   describe('value sent and received inspectors', () => {
-    test('a transaction produces an inspection containing total net value sent and received', () => {
+    test('a transaction produces an inspection containing total net value sent and received', async () => {
       const tx = buildMockTx({
         inputs: [
           {
@@ -387,10 +409,10 @@ describe('txInspector', () => {
       });
 
       const inspectTx = createTxInspector({
-        valueReceived: valueReceivedInspector([receivingAddress], () => historicalTxs),
-        valueSent: valueSentInspector([sendingAddress], () => historicalTxs)
+        valueReceived: valueReceivedInspector([receivingAddress], createMockInputResolver(historicalTxs)),
+        valueSent: valueSentInspector([sendingAddress], createMockInputResolver(historicalTxs))
       });
-      const txProperties = inspectTx(tx);
+      const txProperties = await inspectTx(tx);
 
       expect(txProperties.valueSent).toEqual({
         assets: new Map([
@@ -410,20 +432,20 @@ describe('txInspector', () => {
     test(
       'a transaction containing delegations produces an inspection ' +
         'containing an array with the key hashes and pool ids',
-      () => {
+      async () => {
         const tx = buildMockTx({ certificates: [delegationCert] });
         const inspectTx = createTxInspector({ delegation: delegationInspector });
-        const txProperties = inspectTx(tx);
+        const txProperties = await inspectTx(tx);
 
         expect(txProperties.delegation[0].stakeCredential).toEqual(delegationCert.stakeCredential);
         expect(txProperties.delegation[0].poolId).toEqual(delegationCert.poolId);
       }
     );
 
-    test('a transaction with no delegations produces an inspection containing an empty array', () => {
+    test('a transaction with no delegations produces an inspection containing an empty array', async () => {
       const tx = buildMockTx({ certificates: [] });
       const inspectTx = createTxInspector({ delegation: delegationInspector });
-      const txProperties = inspectTx(tx);
+      const txProperties = await inspectTx(tx);
 
       expect(txProperties.delegation).toEqual([]);
     });
@@ -433,24 +455,24 @@ describe('txInspector', () => {
     test(
       'a transaction containing stake key registrations produces an inspection ' +
         'containing an array with the key hashes',
-      () => {
+      async () => {
         const tx = buildMockTx({ certificates: [keyRegistrationCert] });
         const inspectTx = createTxInspector({
           stakeKeyRegistration: stakeKeyRegistrationInspector
         });
 
-        const txProperties = inspectTx(tx);
+        const txProperties = await inspectTx(tx);
 
         expect(txProperties.stakeKeyRegistration[0].stakeCredential).toEqual(keyRegistrationCert.stakeCredential);
       }
     );
 
-    test('a transaction with no stake key registrations produces an inspection containing an empty array', () => {
+    test('a transaction with no stake key registrations produces an inspection containing an empty array', async () => {
       const tx = buildMockTx({ certificates: [] });
       const inspectTx = createTxInspector({
         stakeKeyRegistration: stakeKeyRegistrationInspector
       });
-      const txProperties = inspectTx(tx);
+      const txProperties = await inspectTx(tx);
 
       expect(txProperties.stakeKeyRegistration).toEqual([]);
     });
@@ -460,24 +482,24 @@ describe('txInspector', () => {
     test(
       'a transaction containing stake key deregistrations produces an inspection ' +
         'containing an array with the key hashes',
-      () => {
+      async () => {
         const tx = buildMockTx({
           certificates: [keyDeregistrationCert]
         });
         const inspectTx = createTxInspector({
           stakeKeyDeregistration: stakeKeyDeregistrationInspector
         });
-        const txProperties = inspectTx(tx);
+        const txProperties = await inspectTx(tx);
         expect(txProperties.stakeKeyDeregistration[0].stakeCredential).toEqual(keyDeregistrationCert.stakeCredential);
       }
     );
 
-    test('a transaction with no stake key deregistrations produces an inspection containing an empty array', () => {
+    test('a transaction with no stake key deregistrations produces an inspection containing an empty array', async () => {
       const tx = buildMockTx({ certificates: [] });
       const inspectTx = createTxInspector({
         stakeKeyDeregistration: stakeKeyDeregistrationInspector
       });
-      const txProperties = inspectTx(tx);
+      const txProperties = await inspectTx(tx);
 
       expect(txProperties.stakeKeyDeregistration).toEqual([]);
     });
@@ -487,24 +509,24 @@ describe('txInspector', () => {
     test(
       'a transaction containing pool registrations produces an inspection ' +
         'containing an array with the registration certificates',
-      () => {
+      async () => {
         const tx = buildMockTx({
           certificates: [poolRegistrationCert]
         });
         const inspectTx = createTxInspector({
           poolRegistration: poolRegistrationInspector
         });
-        const txProperties = inspectTx(tx);
+        const txProperties = await inspectTx(tx);
         expect(txProperties.poolRegistration[0]).toEqual(poolRegistrationCert);
       }
     );
 
-    test('a transaction with no pool registrations produces an inspection containing an empty array', () => {
+    test('a transaction with no pool registrations produces an inspection containing an empty array', async () => {
       const tx = buildMockTx({ certificates: [] });
       const inspectTx = createTxInspector({
         poolRegistration: poolRegistrationInspector
       });
-      const txProperties = inspectTx(tx);
+      const txProperties = await inspectTx(tx);
 
       expect(txProperties.poolRegistration).toEqual([]);
     });
@@ -514,41 +536,41 @@ describe('txInspector', () => {
     test(
       'a transaction containing pool retirements produces an inspection ' +
         'containing an array with the pool retirements certificates',
-      () => {
+      async () => {
         const tx = buildMockTx({
           certificates: [poolRetirementCert]
         });
         const inspectTx = createTxInspector({
           poolRetirement: poolRetirementInspector
         });
-        const txProperties = inspectTx(tx);
+        const txProperties = await inspectTx(tx);
         expect(txProperties.poolRetirement[0]).toEqual(poolRetirementCert);
       }
     );
 
-    test('a transaction with no pool retirements produces an inspection containing an empty array', () => {
+    test('a transaction with no pool retirements produces an inspection containing an empty array', async () => {
       const tx = buildMockTx({ certificates: [] });
       const inspectTx = createTxInspector({
         poolRetirement: poolRetirementInspector
       });
-      const txProperties = inspectTx(tx);
+      const txProperties = await inspectTx(tx);
 
       expect(txProperties.poolRetirement).toEqual([]);
     });
   });
 
   describe('withdrawal inspector', () => {
-    test('a transaction containing withdrawals produces an inspection containing the accumulated withdrawals', () => {
+    test('a transaction containing withdrawals produces an inspection containing the accumulated withdrawals', async () => {
       const tx = buildMockTx({ withdrawals });
       const inspectTx = createTxInspector({ totalWithdrawals: withdrawalInspector });
-      const txProperties = inspectTx(tx);
+      const txProperties = await inspectTx(tx);
       expect(txProperties.totalWithdrawals).toEqual(9_000_000n);
     });
 
-    test('a transaction with no withdrawals produces an inspection with total withdrawals equal to 0', () => {
+    test('a transaction with no withdrawals produces an inspection with total withdrawals equal to 0', async () => {
       const tx = buildMockTx({ withdrawals: [] });
       const inspectTx = createTxInspector({ totalWithdrawals: withdrawalInspector });
-      const txProperties = inspectTx(tx);
+      const txProperties = await inspectTx(tx);
       expect(txProperties.totalWithdrawals).toEqual(0n);
     });
   });
@@ -557,10 +579,10 @@ describe('txInspector', () => {
     test(
       'a transaction with certificates signed with any of the provided reward accounts' +
         ' produces an inspection containing those certificates',
-      () => {
+      async () => {
         const tx = buildMockTx({ certificates: [delegationCert, keyRegistrationCert] });
         const inspectTx = createTxInspector({ signedCertificates: signedCertificatesInspector([rewardAccount]) });
-        const txProperties = inspectTx(tx);
+        const txProperties = await inspectTx(tx);
         expect(txProperties.signedCertificates).toEqual([delegationCert, keyRegistrationCert]);
       }
     );
@@ -568,7 +590,7 @@ describe('txInspector', () => {
     test(
       'a transaction with some certificates signed with any of the provided reward accounts' +
         ' and some signed with other produces an inspection containing only the former',
-      () => {
+      async () => {
         const otherCert = {
           ...delegationCert,
           stakeCredential: {
@@ -578,7 +600,7 @@ describe('txInspector', () => {
         };
         const tx = buildMockTx({ certificates: [delegationCert, otherCert] });
         const inspectTx = createTxInspector({ signedCertificates: signedCertificatesInspector([rewardAccount]) });
-        const txProperties = inspectTx(tx);
+        const txProperties = await inspectTx(tx);
         expect(txProperties.signedCertificates).toEqual([delegationCert]);
       }
     );
@@ -586,22 +608,22 @@ describe('txInspector', () => {
     test(
       'a transaction with certificates signed with any of the provided reward accounts' +
         ' produces an inspection containing only the certificates of the provided types',
-      () => {
+      async () => {
         const tx = buildMockTx({ certificates: [delegationCert, keyRegistrationCert] });
         const inspectTx = createTxInspector({
           signedCertificates: signedCertificatesInspector([rewardAccount], [CertificateType.StakeRegistration])
         });
-        const txProperties = inspectTx(tx);
+        const txProperties = await inspectTx(tx);
         expect(txProperties.signedCertificates).toEqual([keyRegistrationCert]);
       }
     );
   });
 
   describe('mint and burn transaction inspector', () => {
-    test('inspects a transaction that mints and burns tokens and can retrieve the minting details', () => {
+    test('inspects a transaction that mints and burns tokens and can retrieve the minting details', async () => {
       const tx = buildMockTx({ includeAuxData: true });
       const inspectTx = createTxInspector({ burned: assetsBurnedInspector, minted: assetsMintedInspector });
-      const { minted, burned } = inspectTx(tx);
+      const { minted, burned } = await inspectTx(tx);
 
       expect(minted.length).toEqual(2);
       expect(burned.length).toEqual(1);
@@ -632,18 +654,18 @@ describe('txInspector', () => {
   });
 
   describe('metadata inspector', () => {
-    test('a transaction with metadata produces an inspection with the metadatum', () => {
+    test('a transaction with metadata produces an inspection with the metadatum', async () => {
       const tx = buildMockTx({ includeAuxData: true });
       const inspectTx = createTxInspector({ metadata: metadataInspector });
-      const { metadata } = inspectTx(tx);
+      const { metadata } = await inspectTx(tx);
 
       expect(metadata).toEqual(txMetadatum);
     });
 
-    test('a transaction with no metadata  produces an inspection with an empty metadatum', () => {
+    test('a transaction with no metadata  produces an inspection with an empty metadatum', async () => {
       const tx = buildMockTx({ includeAuxData: false });
       const inspectTx = createTxInspector({ metadata: metadataInspector });
-      const { metadata } = inspectTx(tx);
+      const { metadata } = await inspectTx(tx);
 
       expect(metadata).toEqual(new Map());
     });

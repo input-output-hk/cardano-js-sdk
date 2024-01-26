@@ -6,20 +6,35 @@ import transform from 'lodash/transform';
 const PLAIN_TYPES = new Set(['boolean', 'number', 'string']);
 
 export type TransformKey = (key: string) => string;
-export type GetErrorPrototype = (err: unknown) => typeof Error.prototype;
 
 export interface ToSerializableObjectOptions {
   transformationTypeKey?: string;
   serializeKey?: TransformKey;
 }
 
+export interface ClassOf<T> extends Function {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  new (...args: any[]): T;
+}
+export type ErrorClass = ClassOf<Error>;
+
 export interface FromSerializableObjectOptions {
   transformationTypeKey?: string;
   deserializeKey?: TransformKey;
-  getErrorPrototype?: GetErrorPrototype;
+  errorTypes?: ErrorClass[];
 }
 
-const defaultGetErrorPrototype: GetErrorPrototype = () => Error.prototype;
+const matchPrototype = (errorTypes: ErrorClass[], error: unknown) => {
+  if (typeof error === 'object' && error !== null) {
+    for (let ErrorType of errorTypes) {
+      if ((error as Error).name === ErrorType.name) {
+        return ErrorType.prototype;
+      }
+      ErrorType = Object.getPrototypeOf(ErrorType.prototype)?.constructor;
+    }
+  }
+  return Error.prototype;
+};
 const defaultTransformKey: TransformKey = (key) => key;
 const defaultTransformationTypeKey = '__type';
 
@@ -104,7 +119,7 @@ const fromSerializableObjectUnknown = (obj: unknown, options: FromSerializableOb
     const {
       transformationTypeKey = defaultTransformationTypeKey,
       deserializeKey = defaultTransformKey,
-      getErrorPrototype = defaultGetErrorPrototype
+      errorTypes = []
     } = options;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const docAsAny = obj as any;
@@ -127,7 +142,7 @@ const fromSerializableObjectUnknown = (obj: unknown, options: FromSerializableOb
         );
       case 'Error': {
         const error = fromSerializableObjectUnknown(docAsAny.value, options);
-        return Object.setPrototypeOf(error, getErrorPrototype(error));
+        return Object.setPrototypeOf(error, matchPrototype(errorTypes, error));
       }
       default:
         return transform(

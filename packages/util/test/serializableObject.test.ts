@@ -53,23 +53,23 @@ describe('serializableObject', () => {
 
   it('supports custom error types', () => {
     const err = new CustomError('msg');
-    const deserialized = serializeAndDeserialize(err, { getErrorPrototype: () => CustomError.prototype });
+    const deserialized = serializeAndDeserialize(err, { errorTypes: [CustomError] });
     expect(deserialized).toEqual(err);
     expect(deserialized).toBeInstanceOf(CustomError);
   });
 
   it('supports error types with string data', () => {
     const err = new ErrorWithData('some-data', 'msg');
-    const deserialized = serializeAndDeserialize(err, { getErrorPrototype: () => CustomError.prototype });
+    const deserialized = serializeAndDeserialize(err, { errorTypes: [ErrorWithData] });
     expect(deserialized).toEqual(err);
-    expect(deserialized).toBeInstanceOf(CustomError);
+    expect(deserialized).toBeInstanceOf(ErrorWithData);
   });
 
   it('supports error types with object data', () => {
     const err = new ErrorWithData({ bigIntProp: 15n }, 'msg');
-    const deserialized = serializeAndDeserialize(err, { getErrorPrototype: () => CustomError.prototype });
+    const deserialized = serializeAndDeserialize(err, { errorTypes: [ErrorWithData] });
     expect(deserialized).toEqual(err);
-    expect(deserialized).toBeInstanceOf(CustomError);
+    expect(deserialized).toBeInstanceOf(ErrorWithData);
   });
 
   it('supports custom transformation discriminator key', () => {

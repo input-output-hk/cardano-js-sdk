@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.23.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.22.0...@cardano-sdk/web-extension@0.23.0) (2024-01-25)
+
+### ⚠ BREAKING CHANGES
+
+* replace fromSerializableObj getErrorPrototype with errorTypes
+
+### Bug Fixes
+
+* **web-extension:** ignore SigningCoordinator responses from unintended targets ([868600e](https://github.com/input-output-hk/cardano-js-sdk/commit/868600ec0b3ec2cb3739d6bf427cc312e6b57df8))
+
+### Code Refactoring
+
+* replace fromSerializableObj getErrorPrototype with errorTypes ([7a9770c](https://github.com/input-output-hk/cardano-js-sdk/commit/7a9770cc318a0149d2d623eca5c42e8c0699983e))
+
 ## [0.22.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.21.0...@cardano-sdk/web-extension@0.22.0) (2024-01-17)
 
 ### ⚠ BREAKING CHANGES

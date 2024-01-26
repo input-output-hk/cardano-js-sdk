@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.10.8...@cardano-sdk/projection@0.10.9) (2024-01-25)
+
+### Bug Fixes
+
+* **projection:** log moving average speeds even if after a restart ([87559e2](https://github.com/input-output-hk/cardano-js-sdk/commit/87559e2041baaa1f1a402e1472816ce3a8c22d48))
+
 ## [0.10.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.10.7...@cardano-sdk/projection@0.10.8) (2024-01-17)
 
 **Note:** Version bump only for package @cardano-sdk/projection

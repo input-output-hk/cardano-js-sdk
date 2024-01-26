@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.24.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.23.1...@cardano-sdk/core@0.24.0) (2024-01-25)
+
+### ⚠ BREAKING CHANGES
+
+* txInxpectors are now asynchronous
+- TotalAddressInputsValueInspector now takes an InputResolver instead of historical Txs
+
+### Features
+
+* **core:** added fromCredential and toNetworkId util functions to the RewardAccount type ([a515431](https://github.com/input-output-hk/cardano-js-sdk/commit/a51543106396348be130cfbbc61cdf05f67ac7d6))
+* **core:** added new inspectors to compute transaction summary and asset transfer ([2007534](https://github.com/input-output-hk/cardano-js-sdk/commit/20075341adfc3f4645dfcaccf4197ccb63758be5))
+* txInxpectors are now asynchronous ([dc6e2ea](https://github.com/input-output-hk/cardano-js-sdk/commit/dc6e2ea5528b90cf9159a955b7a5e43ef6a1bf7a))
+
+### Bug Fixes
+
+* **core:** fromMetadatum now uses asset_name as utf8 when name field is missing ([0bc80cb](https://github.com/input-output-hk/cardano-js-sdk/commit/0bc80cbc6d1e6bc43c6e2efb6de6238360d118e4))
+* **core:** subtractTokenMaps now properly subtract when there is an asset missing in one map ([03e84bb](https://github.com/input-output-hk/cardano-js-sdk/commit/03e84bb815026394f5f44bf01673012ef32a7ad8))
+* **core:** withdrawals canonical sorting by address bytes ([5bf0f9c](https://github.com/input-output-hk/cardano-js-sdk/commit/5bf0f9c8e11e4032d072cd6e51973647b8ebd9a0))
+
 ## [0.23.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.23.0...@cardano-sdk/core@0.23.1) (2023-12-20)
 
 ### Bug Fixes

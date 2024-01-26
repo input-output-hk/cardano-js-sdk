@@ -1,4 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
+import * as cip19TestVectors from '../../../../util-dev/src/Cip19TestVectors';
 import { Cardano } from '../../../src';
 import { typedBech32 } from '@cardano-sdk/util';
 
@@ -38,6 +39,24 @@ describe('Cardano/Address/RewardAccount', () => {
     it('creates a testnet address', () => {
       const rewardAccount = Cardano.createRewardAccount(keyHash, Cardano.NetworkId.Testnet);
       expect(rewardAccount.startsWith('stake_test')).toBe(true);
+    });
+  });
+
+  describe('fromCredential', () => {
+    it('creates can create a reward account given a credential and a network id', () => {
+      const rewardAccount = Cardano.RewardAccount.fromCredential(
+        cip19TestVectors.KEY_STAKE_CREDENTIAL,
+        Cardano.NetworkId.Mainnet
+      );
+      expect(rewardAccount).toBe(cip19TestVectors.rewardKey);
+    });
+  });
+
+  describe('toNetworkId', () => {
+    it('get the correct network id from a reward account', () => {
+      expect(Cardano.RewardAccount.toNetworkId(Cardano.RewardAccount(cip19TestVectors.rewardKey))).toBe(
+        Cardano.NetworkId.Mainnet
+      );
     });
   });
 });
