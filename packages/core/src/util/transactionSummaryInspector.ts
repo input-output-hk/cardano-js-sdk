@@ -1,4 +1,5 @@
 import * as Cardano from '../Cardano';
+import * as Crypto from '@cardano-sdk/crypto';
 import { AssetId } from '../Cardano';
 import {
   AssetsMintedInspection,
@@ -21,6 +22,7 @@ interface TransactionSummaryInspectorArgs {
   rewardAccounts: Cardano.RewardAccount[];
   inputResolver: Cardano.InputResolver;
   protocolParameters: Cardano.ProtocolParameters;
+  dRepKeyHash?: Crypto.Ed25519KeyHashHex;
 }
 
 export type TransactionSummaryInspection = {
@@ -116,14 +118,15 @@ const getUnaccountedFunds = async (
  */
 export const transactionSummaryInspector: TransactionSummaryInspector =
   (args: TransactionSummaryInspectorArgs) => async (tx) => {
-    const { inputResolver, addresses, rewardAccounts, protocolParameters } = args;
+    const { inputResolver, addresses, rewardAccounts, protocolParameters, dRepKeyHash } = args;
     const resolvedInputs = await resolveInputs(tx.body.inputs, inputResolver);
     const fee = tx.body.fee;
 
     const implicit = computeImplicitCoin(
       protocolParameters,
       { certificates: tx.body.certificates, withdrawals: tx.body.withdrawals },
-      rewardAccounts || []
+      rewardAccounts || [],
+      dRepKeyHash
     );
 
     const collateral = await getCollateral(tx, inputResolver, addresses);
