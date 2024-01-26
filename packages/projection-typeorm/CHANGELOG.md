@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.8.0...@cardano-sdk/projection-typeorm@0.8.1) (2024-01-25)
+
+### Bug Fixes
+
+* **projection-typeorm:** ignore orphan subhandles ([b62dce5](https://github.com/input-output-hk/cardano-js-sdk/commit/b62dce54e2c7829a9ea4a8a02780b888e156e912))
+
 ## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.7.7...@cardano-sdk/projection-typeorm@0.8.0) (2024-01-17)
 
 ### ⚠ BREAKING CHANGES

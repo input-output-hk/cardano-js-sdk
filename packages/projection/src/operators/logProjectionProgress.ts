@@ -55,7 +55,7 @@ const logSyncLine = (params: {
       else return;
   };
 
-  pruneOldTimes(header.blockNo - 100_000);
+  pruneOldTimes(numEvt - 100_000);
 };
 
 export const logProjectionProgress =

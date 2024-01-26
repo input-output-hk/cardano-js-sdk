@@ -16,6 +16,7 @@ import {
   TransactionWitnessRequest
 } from './types';
 import { Subject } from 'rxjs';
+import { WrongTargetError } from '../../messaging';
 
 export type HardwareKeyAgentOptions = TrezorConfig;
 
@@ -124,7 +125,7 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
   ) {
     return new Promise<R>((resolve, reject) => {
       if (!emitter$.observed) {
-        return reject(new errors.AuthenticationError('Internal error: signDataRequest$ not observed'));
+        return reject(new WrongTargetError('Not expecting sign requests at this time'));
       }
       const account = request.requestContext.wallet.accounts.find(
         ({ accountIndex }) => accountIndex === request.requestContext.accountIndex

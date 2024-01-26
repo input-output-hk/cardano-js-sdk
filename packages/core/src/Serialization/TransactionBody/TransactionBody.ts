@@ -132,19 +132,24 @@ export class TransactionBody {
 
     if (this.#withdrawals && this.#withdrawals.size > 0) {
       writer.writeInt(5n);
-
-      const sortedCanonically = new Map([...this.#withdrawals].sort((a, b) => (a > b ? 1 : -1)));
-
-      writer.writeStartMap(sortedCanonically.size);
-
-      for (const [key, value] of sortedCanonically) {
+      // Create a new map with address bytes to avoid logic duplication and address checks
+      const withdrawalsWithAddressBytes = new Map();
+      for (const [key, value] of this.#withdrawals) {
         const rewardAddress = Cardano.RewardAddress.fromAddress(Cardano.Address.fromBech32(key));
-
         if (!rewardAddress) {
           throw new SerializationError(SerializationFailure.InvalidAddress, `Invalid withdrawal address: ${key}`);
         }
+        const rewardAddressBytes = rewardAddress.toAddress().toBytes();
+        withdrawalsWithAddressBytes.set(rewardAddressBytes, value);
+      }
 
-        writer.writeByteString(Buffer.from(rewardAddress.toAddress().toBytes(), 'hex'));
+      // Sort withdrawals by address bytes, canonically
+      const sortedCanonically = [...withdrawalsWithAddressBytes].sort((a, b) => (a > b ? 1 : -1));
+
+      writer.writeStartMap(sortedCanonically.length);
+
+      for (const [key, value] of sortedCanonically) {
+        writer.writeByteString(Buffer.from(key, 'hex'));
         writer.writeInt(value);
       }
     }

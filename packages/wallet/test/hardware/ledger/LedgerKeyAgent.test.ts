@@ -146,6 +146,33 @@ describe('LedgerKeyAgent', () => {
       ).rejects.toThrow();
     });
 
+    it('can sign multi-delegation transaction', async () => {
+      const poolId1 = Cardano.PoolId('pool1ev8vy6fyj7693ergzty2t0azjvw35tvkt2vcjwpgajqs7z6u2vn');
+      const poolId2 = Cardano.PoolId('pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt');
+
+      const txBuilder = wallet.createTxBuilder();
+      const builtTx = await txBuilder
+        .delegatePortfolio({
+          name: 'Ledger multi-delegation Portfolio',
+          pools: [
+            {
+              id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolId1)),
+              weight: 1
+            },
+            {
+              id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolId2)),
+              weight: 2
+            }
+          ]
+        })
+        .build()
+        .inspect();
+      const {
+        witness: { signatures }
+      } = await wallet.finalizeTx({ tx: builtTx });
+      expect(signatures.size).toBe(3);
+    });
+
     it('can sign a transaction that mints a token using a plutus script', async () => {
       const script: Cardano.PlutusScript = {
         __type: Cardano.ScriptType.Plutus,
