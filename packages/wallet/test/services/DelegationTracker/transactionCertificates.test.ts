@@ -1,20 +1,9 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
-import { isLastStakeKeyCertOfType, stakeKeyCertficates, transactionsWithCertificates } from '../../../src';
+import { isLastStakeKeyCertOfType, transactionsWithCertificates } from '../../../src';
 
 describe('transactionCertificates', () => {
-  test('transactionStakeKeyCertficates', () => {
-    const certificates = stakeKeyCertficates([
-      { __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate,
-      { __typename: Cardano.CertificateType.StakeRegistration } as Cardano.Certificate,
-      { __typename: Cardano.CertificateType.StakeDeregistration } as Cardano.Certificate
-    ]);
-    expect(certificates).toHaveLength(2);
-    expect(certificates[0].__typename).toBe(Cardano.CertificateType.StakeRegistration);
-    expect(certificates[1].__typename).toBe(Cardano.CertificateType.StakeDeregistration);
-  });
-
   test('isLastStakeKeyCertOfType', () => {
     const rewardAccount = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
     const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
@@ -45,9 +34,11 @@ describe('transactionCertificates', () => {
         } as Cardano.Certificate)
       ]
     ];
-    expect(isLastStakeKeyCertOfType(certificates, Cardano.CertificateType.StakeRegistration)).toBe(false);
-    expect(isLastStakeKeyCertOfType(certificates, Cardano.CertificateType.StakeRegistration, rewardAccount)).toBe(true);
-    expect(isLastStakeKeyCertOfType(certificates, Cardano.CertificateType.StakeDeregistration)).toBe(true);
+    expect(isLastStakeKeyCertOfType(certificates, [Cardano.CertificateType.StakeRegistration])).toBe(false);
+    expect(isLastStakeKeyCertOfType(certificates, [Cardano.CertificateType.StakeRegistration], rewardAccount)).toBe(
+      true
+    );
+    expect(isLastStakeKeyCertOfType(certificates, [Cardano.CertificateType.StakeDeregistration])).toBe(true);
   });
 
   test('outgoingTransactionsWithCertificates', () => {

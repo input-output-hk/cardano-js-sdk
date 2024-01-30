@@ -6,7 +6,8 @@ import {
   RewardAccount,
   createDelegationCert,
   createStakeDeregistrationCert,
-  createStakeRegistrationCert
+  createStakeRegistrationCert,
+  stakeKeyCertificates
 } from '../../../src/Cardano';
 
 const rewardAccount = RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
@@ -46,5 +47,22 @@ describe('Certificate', () => {
         stakeCredential
       });
     });
+  });
+
+  it('can identify stake key certificates', () => {
+    const certificates = stakeKeyCertificates([
+      { __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate, // does not register stake key
+      { __typename: Cardano.CertificateType.StakeRegistration } as Cardano.Certificate,
+      { __typename: Cardano.CertificateType.StakeDeregistration } as Cardano.Certificate,
+      { __typename: Cardano.CertificateType.StakeVoteDelegation } as Cardano.Certificate, // does not register stake key
+      { __typename: Cardano.CertificateType.StakeRegistrationDelegation } as Cardano.Certificate,
+      { __typename: Cardano.CertificateType.StakeVoteDelegation } as Cardano.Certificate, // does not register stake key
+      { __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation } as Cardano.Certificate,
+      { __typename: Cardano.CertificateType.VoteRegistrationDelegation } as Cardano.Certificate,
+      { __typename: Cardano.CertificateType.Registration } as Cardano.Certificate
+    ]);
+    expect(certificates).toHaveLength(6);
+    expect(certificates[0].__typename).toBe(Cardano.CertificateType.StakeRegistration);
+    expect(certificates[1].__typename).toBe(Cardano.CertificateType.StakeDeregistration);
   });
 });

@@ -163,7 +163,7 @@ export const totalAddressOutputsValueInspector: SendReceiveValueInspector = (own
 export const getCertificatesByType = (
   tx: Tx,
   rewardAccounts: RewardAccount[],
-  certificateTypes?: CertificateType[]
+  certificateTypes?: readonly CertificateType[]
 ) => {
   if (!tx.body.certificates || tx.body.certificates.length === 0) return [];
   const certificates = certificateTypes

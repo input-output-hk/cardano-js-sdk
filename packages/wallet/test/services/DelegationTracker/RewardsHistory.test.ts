@@ -43,113 +43,110 @@ describe('RewardsHistory', () => {
   });
 
   describe('createRewardsHistoryTracker', () => {
-    it('queries and maps reward history starting from first delegation epoch+2', () => {
-      createTestScheduler().run(({ cold, expectObservable, flush }) => {
-        const accountRewardsHistory = rewardsHistory.get(rewardAccount)!;
-        const epoch = accountRewardsHistory[0].epoch;
-        const getRewardsHistory = jest.fn().mockReturnValue(cold('-a', { a: rewardsHistory }));
-        const target$ = createRewardsHistoryTracker(
-          cold('aa', {
-            a: [
-              {
-                epoch: Cardano.EpochNo(0),
-                tx: createStubTxWithCertificates([
-                  { __typename: Cardano.CertificateType.StakeDeregistration } as Cardano.Certificate
-                ])
-              },
-              {
-                epoch,
-                tx: createStubTxWithCertificates(
-                  [{ __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate],
-                  {
+    it.each(Cardano.StakeDelegationCertificateTypes)(
+      'queries and maps reward history starting from first delegation epoch+2 with %s',
+      (delegationCertificateType) => {
+        createTestScheduler().run(({ cold, expectObservable, flush }) => {
+          const accountRewardsHistory = rewardsHistory.get(rewardAccount)!;
+          const epoch = accountRewardsHistory[0].epoch;
+          const getRewardsHistory = jest.fn().mockReturnValue(cold('-a', { a: rewardsHistory }));
+          const target$ = createRewardsHistoryTracker(
+            cold('aa', {
+              a: [
+                {
+                  epoch: Cardano.EpochNo(0),
+                  tx: createStubTxWithCertificates([
+                    { __typename: Cardano.CertificateType.StakeDeregistration } as Cardano.Certificate
+                  ])
+                },
+                {
+                  epoch,
+                  tx: createStubTxWithCertificates([{ __typename: delegationCertificateType } as Cardano.Certificate], {
                     stakeCredential: {
                       hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
                       type: Cardano.CredentialType.KeyHash
                     }
-                  }
-                )
-              }
-            ]
-          }),
-          of(rewardAccounts),
-          getRewardsHistory,
-          new InMemoryRewardsHistoryStore(),
-          logger
-        );
-        expectObservable(target$).toBe('-a', {
-          a: {
-            all: accountRewardsHistory,
-            avgReward: 10_500n,
-            lastReward: accountRewardsHistory[1],
-            lifetimeRewards: 21_000n
-          } as RewardsHistory
+                  })
+                }
+              ]
+            }),
+            of(rewardAccounts),
+            getRewardsHistory,
+            new InMemoryRewardsHistoryStore(),
+            logger
+          );
+          expectObservable(target$).toBe('-a', {
+            a: {
+              all: accountRewardsHistory,
+              avgReward: 10_500n,
+              lastReward: accountRewardsHistory[1],
+              lifetimeRewards: 21_000n
+            } as RewardsHistory
+          });
+          flush();
+          expect(getRewardsHistory).toBeCalledTimes(1);
+          expect(getRewardsHistory).toBeCalledWith(
+            rewardAccounts,
+            Cardano.EpochNo(calcFirstDelegationEpoch(epoch)),
+            undefined
+          );
         });
-        flush();
-        expect(getRewardsHistory).toBeCalledTimes(1);
-        expect(getRewardsHistory).toBeCalledWith(
-          rewardAccounts,
-          Cardano.EpochNo(calcFirstDelegationEpoch(epoch)),
-          undefined
-        );
-      });
-    });
+      }
+    );
 
-    it('considers only first delegation signed by the reward account', () => {
-      createTestScheduler().run(({ cold, expectObservable, flush }) => {
-        const accountRewardsHistory = rewardsHistory.get(rewardAccount)!;
-        const epoch = accountRewardsHistory[0].epoch;
-        const getRewardsHistory = jest.fn().mockReturnValue(cold('-a', { a: rewardsHistory }));
-        const target$ = createRewardsHistoryTracker(
-          cold('aa', {
-            a: [
-              {
-                epoch: Cardano.EpochNo(0),
-                tx: createStubTxWithCertificates(
-                  [{ __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate],
-                  {
+    it.each(Cardano.StakeDelegationCertificateTypes)(
+      'considers only first delegation signed by the reward account with %s',
+      (delegationCertificateType) => {
+        createTestScheduler().run(({ cold, expectObservable, flush }) => {
+          const accountRewardsHistory = rewardsHistory.get(rewardAccount)!;
+          const epoch = accountRewardsHistory[0].epoch;
+          const getRewardsHistory = jest.fn().mockReturnValue(cold('-a', { a: rewardsHistory }));
+          const target$ = createRewardsHistoryTracker(
+            cold('aa', {
+              a: [
+                {
+                  epoch: Cardano.EpochNo(0),
+                  tx: createStubTxWithCertificates([{ __typename: delegationCertificateType } as Cardano.Certificate], {
                     stakeCredential: {
                       hash: Crypto.Hash28ByteBase16('00000000000000000000000000000000000000000000000000000000'),
                       type: Cardano.CredentialType.KeyHash
                     }
-                  }
-                )
-              },
-              {
-                epoch,
-                tx: createStubTxWithCertificates(
-                  [{ __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate],
-                  {
+                  })
+                },
+                {
+                  epoch,
+                  tx: createStubTxWithCertificates([{ __typename: delegationCertificateType } as Cardano.Certificate], {
                     stakeCredential: {
                       hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
                       type: Cardano.CredentialType.KeyHash
                     }
-                  }
-                )
-              }
-            ]
-          }),
-          of(rewardAccounts),
-          getRewardsHistory,
-          new InMemoryRewardsHistoryStore(),
-          logger
-        );
-        expectObservable(target$).toBe('-a', {
-          a: {
-            all: accountRewardsHistory,
-            avgReward: 10_500n,
-            lastReward: accountRewardsHistory[1],
-            lifetimeRewards: 21_000n
-          } as RewardsHistory
+                  })
+                }
+              ]
+            }),
+            of(rewardAccounts),
+            getRewardsHistory,
+            new InMemoryRewardsHistoryStore(),
+            logger
+          );
+          expectObservable(target$).toBe('-a', {
+            a: {
+              all: accountRewardsHistory,
+              avgReward: 10_500n,
+              lastReward: accountRewardsHistory[1],
+              lifetimeRewards: 21_000n
+            } as RewardsHistory
+          });
+          flush();
+          expect(getRewardsHistory).toBeCalledTimes(1);
+          expect(getRewardsHistory).toBeCalledWith(
+            rewardAccounts,
+            Cardano.EpochNo(calcFirstDelegationEpoch(epoch)),
+            undefined
+          );
         });
-        flush();
-        expect(getRewardsHistory).toBeCalledTimes(1);
-        expect(getRewardsHistory).toBeCalledWith(
-          rewardAccounts,
-          Cardano.EpochNo(calcFirstDelegationEpoch(epoch)),
-          undefined
-        );
-      });
-    });
+      }
+    );
 
     it.todo('emits value from store if it exists and updates store after provider response');
   });

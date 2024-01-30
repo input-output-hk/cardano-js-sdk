@@ -6,7 +6,7 @@ import { firstValueFrom, of } from 'rxjs';
 type EventData = Mappers.WithCertificates & { eventType: ChainSyncEventType };
 
 describe('withStakeKeyRegistrations', () => {
-  it('collects all key registration certificates', async () => {
+  it.each(Cardano.StakeRegistrationCertificateTypes)('collects %s registration certificates', async (regCertType) => {
     const pointer: Cardano.Pointer = {
       certIndex: Cardano.CertIndex(1),
       slot: Cardano.Slot(123),
@@ -16,12 +16,12 @@ describe('withStakeKeyRegistrations', () => {
       certificates: [
         {
           certificate: {
-            __typename: Cardano.CertificateType.StakeRegistration,
+            __typename: regCertType,
             stakeCredential: {
               hash: Crypto.Hash28ByteBase16('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b'),
               type: Cardano.CredentialType.KeyHash
             }
-          },
+          } as Cardano.Certificate,
           pointer
         },
         {
