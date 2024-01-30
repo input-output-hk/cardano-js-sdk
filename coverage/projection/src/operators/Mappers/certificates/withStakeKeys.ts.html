@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>17/17</span>
+                <span class='fraction'>19/19</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>8/8</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>17/17</span>
+                <span class='fraction'>19/19</span>
             </div>
         
             
@@ -118,7 +118,16 @@
 <a name='L53'></a><a href='#L53'>53</a>
 <a name='L54'></a><a href='#L54'>54</a>
 <a name='L55'></a><a href='#L55'>55</a>
-<a name='L56'></a><a href='#L56'>56</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">22x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">22x</span>
@@ -140,32 +149,41 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">22x</span>
-<span class="cline-any cline-yes">258x</span>
-<span class="cline-any cline-yes">258x</span>
-<span class="cline-any cline-yes">258x</span>
-<span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-yes">22x</span>
+<span class="cline-any cline-yes">262x</span>
+<span class="cline-any cline-yes">262x</span>
+<span class="cline-any cline-yes">262x</span>
+<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">258x</span>
+<span class="cline-any cline-yes">17x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">258x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">262x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">262x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -195,25 +213,34 @@ export interface WithStakeKeys {
  * The intended use case of this operator is to keep track of the current set of active stake keys,
  * ignoring **when** they were registered or unregistered.
  */
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export const withStakeKeys = unifiedProjectorOperator&lt;WithCertificates, WithStakeKeys&gt;((evt) =&gt; {
   const register = new Set&lt;Crypto.Hash28ByteBase16&gt;();
   const deregister = new Set&lt;Crypto.Hash28ByteBase16&gt;();
   for (const { certificate } of evt.certificates) {
-    switch (certificate.__typename) {
-      case Cardano.CertificateType.StakeRegistration:
-        if (deregister.has(certificate.stakeCredential.hash)) {
-          deregister.delete(certificate.stakeCredential.hash);
-        } else {
-          register.add(certificate.stakeCredential.hash);
-        }
-        break;
-      case Cardano.CertificateType.StakeDeregistration:
-        if (register.has(certificate.stakeCredential.hash)) {
-          register.delete(certificate.stakeCredential.hash);
-        } else {
-          deregister.add(certificate.stakeCredential.hash);
-        }
-        break;
+    if (Cardano.RegAndDeregCertificateTypes.includes(certificate.__typename as Cardano.RegAndDeregCertificateTypes)) {
+      const {
+        stakeCredential: { hash: stakeCredentialHash }
+      } = certificate as Cardano.RegAndDeregCertificateUnion;
+&nbsp;
+      switch (certificate.__typename) {
+        case Cardano.CertificateType.StakeDeregistration:
+        case Cardano.CertificateType.Unregistration:
+          if (register.has(certificate.stakeCredential.hash)) {
+            register.delete(certificate.stakeCredential.hash);
+          } else {
+            deregister.add(certificate.stakeCredential.hash);
+          }
+          break;
+        default:
+          // Stake registration
+          if (deregister.has(stakeCredentialHash)) {
+            deregister.delete(stakeCredentialHash);
+          } else {
+            register.add(stakeCredentialHash);
+          }
+          break;
+      }
     }
   }
   const [insert, del] =
@@ -235,7 +262,7 @@ export const withStakeKeys = unifiedProjectorOperator&lt;WithCertificates, WithS
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-01-26T12:26:32.649Z
+                at 2024-01-30T15:51:04.677Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">96.72% </span>
+                <span class="strong">98.14% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>59/61</span>
+                <span class='fraction'>53/54</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">89.47% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>17/19</span>
+                <span class='fraction'>14/14</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">96.29% </span>
+                <span class="strong">97.91% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>52/54</span>
+                <span class='fraction'>47/48</span>
             </div>
         
             
@@ -249,23 +249,7 @@
 <a name='L184'></a><a href='#L184'>184</a>
 <a name='L185'></a><a href='#L185'>185</a>
 <a name='L186'></a><a href='#L186'>186</a>
-<a name='L187'></a><a href='#L187'>187</a>
-<a name='L188'></a><a href='#L188'>188</a>
-<a name='L189'></a><a href='#L189'>189</a>
-<a name='L190'></a><a href='#L190'>190</a>
-<a name='L191'></a><a href='#L191'>191</a>
-<a name='L192'></a><a href='#L192'>192</a>
-<a name='L193'></a><a href='#L193'>193</a>
-<a name='L194'></a><a href='#L194'>194</a>
-<a name='L195'></a><a href='#L195'>195</a>
-<a name='L196'></a><a href='#L196'>196</a>
-<a name='L197'></a><a href='#L197'>197</a>
-<a name='L198'></a><a href='#L198'>198</a>
-<a name='L199'></a><a href='#L199'>199</a>
-<a name='L200'></a><a href='#L200'>200</a>
-<a name='L201'></a><a href='#L201'>201</a>
-<a name='L202'></a><a href='#L202'>202</a>
-<a name='L203'></a><a href='#L203'>203</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">40x</span>
+<a name='L187'></a><a href='#L187'>187</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">40x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -342,19 +326,7 @@
 <span class="cline-any cline-yes">216x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">110x</span>
-<span class="cline-any cline-yes">110x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">110x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">110x</span>
-<span class="cline-any cline-yes">110x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">110x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -417,10 +389,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">107x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -540,25 +508,13 @@ export const certificateTransactionsWithEpochs = (
     )
   );
 &nbsp;
-const hasDelegationCert = (certificates: Array&lt;Cardano.Certificate&gt; | undefined): boolean =&gt; {
-  if (!certificates || certificates.length === 0) return false;
-&nbsp;
-  return certificates.some((cert) =&gt; {
-    let hasCert = false;
-&nbsp;
-    switch (cert.__typename) {
-<span class="branch-0 cbranch-no" title="branch not covered" >      case Cardano.CertificateType.StakeDelegation:</span>
-      case Cardano.CertificateType.StakeRegistration:
-      case Cardano.CertificateType.StakeDeregistration:
-        hasCert = true;
-        break;
-<span class="branch-3 cbranch-no" title="branch not covered" >      default:</span>
-<span class="cstat-no" title="statement not covered" >        hasCert = false;</span>
-    }
-&nbsp;
-    return hasCert;
-  });
-};
+const hasDelegationCert = (certificates: Array&lt;Cardano.Certificate&gt; | undefined): boolean =&gt;
+  !!certificates &amp;&amp;
+  certificates.some((cert) =&gt;
+    [...Cardano.RegAndDeregCertificateTypes, ...Cardano.StakeDelegationCertificateTypes].includes(
+      cert.__typename as Cardano.RegAndDeregCertificateTypes | Cardano.StakeDelegationCertificateTypes
+    )
+  );
 &nbsp;
 export const createDelegationPortfolioTracker = (transactions: Observable&lt;Cardano.HydratedTx[]&gt;) =&gt;
   transactions.pipe(
@@ -622,11 +578,7 @@ export const createDelegationTracker = ({
     transactionsTracker,
     rewardAccountAddresses$,
     slotEpochCalc$,
-    [
-      Cardano.CertificateType.StakeDelegation,
-      Cardano.CertificateType.StakeRegistration,
-      Cardano.CertificateType.StakeDeregistration
-    ]
+    [...Cardano.RegAndDeregCertificateTypes, ...Cardano.StakeDelegationCertificateTypes]
   ).pipe(tap((transactionsWithEpochs) =&gt; logger.debug(`Found ${transactionsWithEpochs.length} staking transactions`)));
 &nbsp;
   const rewardsHistory$ = new TrackerSubject(
@@ -676,7 +628,7 @@ export const createDelegationTracker = ({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-01-26T12:30:18.558Z
+                at 2024-01-30T15:54:53.727Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
