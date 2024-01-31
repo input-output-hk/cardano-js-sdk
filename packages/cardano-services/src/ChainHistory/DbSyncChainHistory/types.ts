@@ -128,6 +128,9 @@ export interface ProposalProcedureModel {
   type: string;
   url: string;
   view: string;
+  // LW-9675
+  numerator?: string;
+  denominator?: string;
 }
 
 export interface CertificateModel {

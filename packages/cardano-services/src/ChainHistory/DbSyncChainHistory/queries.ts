@@ -200,6 +200,7 @@ export const findVotingProceduresByTxIds = `
 	WHERE tx.id = ANY($1)
 	ORDER BY vp.index`;
 
+// LW-9675
 export const findProposalProceduresByTxIds = `
 	SELECT
 		tx.hash AS tx_id,
@@ -208,11 +209,14 @@ export const findProposalProceduresByTxIds = `
 		ga.type,
 		va.url,
 		va.data_hash,
-		sa.view
+		sa.view,
+		quorum_nominator AS numerator,
+		quorum_denominator AS denominator
 	FROM tx
 	JOIN gov_action_proposal AS ga ON tx.id = ga.tx_id
 	JOIN voting_anchor AS va ON voting_anchor_id = va.id
 	JOIN stake_address AS sa ON ga.return_address = sa.id
+	LEFT JOIN new_committee AS nc ON gov_action_proposal_id = ga.id
 	WHERE tx.id = ANY($1)
 	ORDER BY ga.index`;
 
