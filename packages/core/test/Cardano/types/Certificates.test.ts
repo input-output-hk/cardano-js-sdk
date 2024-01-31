@@ -65,4 +65,19 @@ describe('Certificate', () => {
     expect(certificates[0].__typename).toBe(Cardano.CertificateType.StakeRegistration);
     expect(certificates[1].__typename).toBe(Cardano.CertificateType.StakeDeregistration);
   });
+
+  it('can narrow down the type of a certificate based on CertificateType', () => {
+    const cert: Cardano.StakeAddressCertificate = {
+      __typename: Cardano.CertificateType.StakeRegistration,
+      stakeCredential
+    };
+
+    expect(Cardano.isCertType(cert, [Cardano.CertificateType.StakeRegistration])).toBeTruthy();
+    expect(Cardano.isCertType(cert, Cardano.StakeRegistrationCertificateTypes)).toBeTruthy();
+    expect(Cardano.isCertType(cert, Cardano.StakeDelegationCertificateTypes)).toBeFalsy();
+    expect(Cardano.isCertType(cert, Cardano.PostConwayStakeRegistrationCertificateTypes)).toBeFalsy();
+
+    // Narrows down the type to certificates with stakeCredential property, based on the array of certificate types
+    expect(Cardano.isCertType(cert, Cardano.StakeCredentialCertificateTypes) && cert.stakeCredential).toBeTruthy();
+  });
 });
