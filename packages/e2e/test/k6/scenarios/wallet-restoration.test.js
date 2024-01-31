@@ -77,6 +77,15 @@ const hdWalletParams = {
   stakeAddrSearchGap: 5 * 2
 };
 
+/** OpenAPI versions. Needed to access provider endpoints */
+const apiVersion = {
+  chainHistory: '3.0.0',
+  networkInfo: '1.0.0',
+  rewards: '1.0.0',
+  stakePool: '1.1.0',
+  utxo: '2.0.0'
+};
+
 /** Custom trend statistic to measure trend to sync wallets */
 const walletSyncTrend = new Trend('wallet_sync', true);
 /** Custom count statistic to measure how many wallets were successfully syncd */
@@ -95,10 +104,7 @@ const chunkArray = (array, chunkSize) => {
   return chunked;
 };
 
-/**
- * Grab the wallets json file to be used by the scenario.
- * Group the addresses per wallet (single address or HD wallets).
- */
+/** Grab the wallets json file to be used by the scenario. Group the addresses per wallet (single address or HD wallets). */
 export function setup() {
   console.log(`Running in ${RUN_MODE} mode`);
   console.log(`Ramp-up: ${RAMP_UP_DURATION}; Sustain: ${STEADY_STATE_DURATION}; Iteration sleep: ${ITERATION_SLEEP}s`);
@@ -178,9 +184,9 @@ export const options = {
 };
 
 /** Util functions for sending the http post requests to cardano-sdk services */
-const cardanoHttpPost = (url, body = {}) => {
+const cardanoHttpPost = (url, apiVer, body = {}) => {
   const opts = { headers: { 'content-type': 'application/json' } };
-  return http.post(`${PROVIDER_SERVER_URL}/${url}`, JSON.stringify(body), opts);
+  return http.post(`${PROVIDER_SERVER_URL}/v${apiVer}/${url}`, JSON.stringify(body), opts);
 };
 
 /**
@@ -196,7 +202,7 @@ const txsByAddress = (addresses, takeOne = false, pageSize = 25) => {
     let txCount = 0;
 
     do {
-      const resp = cardanoHttpPost('chain-history/txs/by-addresses', {
+      const resp = cardanoHttpPost('chain-history/txs/by-addresses', apiVersion.chainHistory, {
         addresses: chunk,
         blockRange: { lowerBound: { __type: 'undefined' } },
         pagination: { limit: pageSize, startAt }
@@ -218,13 +224,14 @@ const txsByAddress = (addresses, takeOne = false, pageSize = 25) => {
 const utxosByAddresses = (addresses) => {
   const addressChunks = chunkArray(addresses, 25);
   for (const chunk of addressChunks) {
-    cardanoHttpPost('utxo/utxo-by-addresses', { addresses: chunk });
+    cardanoHttpPost('utxo/utxo-by-addresses', apiVersion.utxo, { addresses: chunk });
   }
 };
 
-const rewardsAccBalance = (rewardAccount) => cardanoHttpPost('rewards/account-balance', { rewardAccount });
+const rewardsAccBalance = (rewardAccount) =>
+  cardanoHttpPost('rewards/account-balance', apiVersion.rewards, { rewardAccount });
 const stakePoolSearch = (poolAddress) =>
-  cardanoHttpPost('stake-pool/search', {
+  cardanoHttpPost('stake-pool/search', apiVersion.stakePool, {
     filters: { identifier: { values: [{ id: poolAddress }] } },
     pagination: { limit: 1, startAt: 0 }
   });
@@ -240,10 +247,7 @@ const getDummyAddr = (addr, idx, suffix = 'mh') => {
   return addr.slice(0, -3) + updateChars;
 };
 
-/**
- * Simulate http requests normally done in discovery mode.
- * `wallet` MUST have at least 2 elements
- */
+/** Simulate http requests normally done in discovery mode. `wallet` MUST have at least 2 elements */
 const walletDiscovery = (wallet) => {
   check(wallet, {
     'At least one address is required to run HD wallet discovery mode': (walletArray) =>
@@ -284,22 +288,22 @@ const syncWallet = ({ wallet, poolAddress }) => {
     walletDiscovery(wallet);
   }
 
-  cardanoHttpPost('network-info/era-summaries');
-  cardanoHttpPost(TIP_URL);
+  cardanoHttpPost('network-info/era-summaries', apiVersion.networkInfo);
+  cardanoHttpPost(TIP_URL, apiVersion.networkInfo);
   txsByAddress(addresses);
   utxosByAddresses(addresses);
-  cardanoHttpPost('network-info/era-summaries');
-  cardanoHttpPost('network-info/genesis-parameters');
-  cardanoHttpPost('network-info/protocol-parameters');
+  cardanoHttpPost('network-info/era-summaries', apiVersion.networkInfo);
+  cardanoHttpPost('network-info/genesis-parameters', apiVersion.networkInfo);
+  cardanoHttpPost('network-info/protocol-parameters', apiVersion.networkInfo);
   // Test restoring HD wallets with a single stake key
   rewardsAccBalance(wallet[0].stake_address);
-  cardanoHttpPost(TIP_URL);
-  cardanoHttpPost('network-info/lovelace-supply');
-  cardanoHttpPost('network-info/stake');
+  cardanoHttpPost(TIP_URL, apiVersion.networkInfo);
+  cardanoHttpPost('network-info/lovelace-supply', apiVersion.networkInfo);
+  cardanoHttpPost('network-info/stake', apiVersion.networkInfo);
   if (RUN_MODE === RunMode.Restore) {
     stakePoolSearch(poolAddress);
   }
-  cardanoHttpPost('stake-pool/stats');
+  cardanoHttpPost('stake-pool/stats', apiVersion.stakePool);
 
   // Consider the wallet synced by tracking its first address
   syncedWallets.add(addresses[0]);
@@ -307,11 +311,8 @@ const syncWallet = ({ wallet, poolAddress }) => {
   walletSyncCount.add(1);
 };
 
-/**
- * Simulate keeping wallet in sync
- * For now, just polling the tip
- */
-const emulateIdleClient = () => cardanoHttpPost(TIP_URL);
+/** Simulate keeping wallet in sync For now, just polling the tip */
+const emulateIdleClient = () => cardanoHttpPost(TIP_URL, apiVersion.networkInfo);
 
 /**
  * K6 default VU action function
