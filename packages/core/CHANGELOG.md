@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.25.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.24.0...@cardano-sdk/core@0.25.0) (2024-01-31)
+
+### ⚠ BREAKING CHANGES
+
+* typo stakeKeyCertficates renamed to stakeKeyCertificates
+
+### Features
+
+* **core:** add drep in implicit coin calculation ([903fa1c](https://github.com/input-output-hk/cardano-js-sdk/commit/903fa1c052fbf8a3ef1b2d1c369e75f9d314fcb2))
+* use new conway certs in stake and delegation scenarios ([3a59317](https://github.com/input-output-hk/cardano-js-sdk/commit/3a5931702ab6aeb5a62b18d2834125ce6fbfc594))
+
 ## [0.24.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.23.1...@cardano-sdk/core@0.24.0) (2024-01-25)
 
 ### ⚠ BREAKING CHANGES
