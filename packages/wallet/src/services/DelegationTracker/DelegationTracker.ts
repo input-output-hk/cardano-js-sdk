@@ -10,11 +10,6 @@ import {
   createRewardAccountsTracker,
   createRewardsProvider
 } from './RewardAccounts';
-import {
-  RegAndDeregCertificateTypes,
-  StakeDelegationCertificateTypes,
-  transactionsWithCertificates
-} from './transactionCertificates';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistoryProvider, createRewardsHistoryProvider, createRewardsHistoryTracker } from './RewardsHistory';
 import { Shutdown, contextLogger } from '@cardano-sdk/util';
@@ -23,6 +18,7 @@ import { TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { TxWithEpoch } from './types';
 import { WalletStores } from '../../persistence';
 import { createDelegationDistributionTracker } from './DelegationDistributionTracker';
+import { transactionsWithCertificates } from './transactionCertificates';
 
 export const createBlockEpochProvider =
   (
@@ -78,8 +74,8 @@ export const certificateTransactionsWithEpochs = (
 const hasDelegationCert = (certificates: Array<Cardano.Certificate> | undefined): boolean =>
   !!certificates &&
   certificates.some((cert) =>
-    [...RegAndDeregCertificateTypes, ...StakeDelegationCertificateTypes].includes(
-      cert.__typename as RegAndDeregCertificateTypes | StakeDelegationCertificateTypes
+    [...Cardano.RegAndDeregCertificateTypes, ...Cardano.StakeDelegationCertificateTypes].includes(
+      cert.__typename as Cardano.RegAndDeregCertificateTypes | Cardano.StakeDelegationCertificateTypes
     )
   );
 
@@ -145,7 +141,7 @@ export const createDelegationTracker = ({
     transactionsTracker,
     rewardAccountAddresses$,
     slotEpochCalc$,
-    [...RegAndDeregCertificateTypes, ...StakeDelegationCertificateTypes]
+    [...Cardano.RegAndDeregCertificateTypes, ...Cardano.StakeDelegationCertificateTypes]
   ).pipe(tap((transactionsWithEpochs) => logger.debug(`Found ${transactionsWithEpochs.length} staking transactions`)));
 
   const rewardsHistory$ = new TrackerSubject(

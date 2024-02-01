@@ -175,6 +175,46 @@ export type Certificate =
   | UnRegisterDelegateRepresentativeCertificate
   | UpdateDelegateRepresentativeCertificate;
 
+export const StakeRegistrationCertificateTypes = [
+  CertificateType.StakeRegistration,
+  CertificateType.Registration,
+  CertificateType.VoteRegistrationDelegation,
+  CertificateType.StakeRegistrationDelegation,
+  CertificateType.StakeVoteRegistrationDelegation
+] as const;
+
+export type StakeRegistrationCertificateTypes = typeof StakeRegistrationCertificateTypes[number];
+
+export type StakeDelegationCertificateUnion =
+  | StakeDelegationCertificate
+  | StakeVoteDelegationCertificate
+  | StakeRegistrationDelegationCertificate
+  | StakeVoteRegistrationDelegationCertificate;
+
+export const StakeDelegationCertificateTypes = [
+  CertificateType.StakeDelegation,
+  CertificateType.StakeVoteDelegation,
+  CertificateType.StakeRegistrationDelegation,
+  CertificateType.StakeVoteRegistrationDelegation
+] as const;
+
+export type StakeDelegationCertificateTypes = typeof StakeDelegationCertificateTypes[number];
+
+export type RegAndDeregCertificateUnion =
+  | StakeAddressCertificate
+  | NewStakeAddressCertificate
+  | VoteRegistrationDelegationCertificate
+  | StakeRegistrationDelegationCertificate
+  | StakeVoteRegistrationDelegationCertificate;
+
+export const RegAndDeregCertificateTypes = [
+  ...StakeRegistrationCertificateTypes,
+  CertificateType.Unregistration,
+  CertificateType.StakeDeregistration
+] as const;
+
+export type RegAndDeregCertificateTypes = typeof RegAndDeregCertificateTypes[number];
+
 /**
  * Creates a stake key registration certificate from a given reward account.
  *
@@ -215,3 +255,12 @@ export const createDelegationCert = (rewardAccount: RewardAccount, poolId: PoolI
     type: CredentialType.KeyHash
   }
 });
+
+/** Filters certificates, returning only stake key register/deregister certificates */
+export const stakeKeyCertificates = (certificates?: Certificate[]) =>
+  certificates?.filter((certificate): certificate is RegAndDeregCertificateUnion =>
+    RegAndDeregCertificateTypes.includes(certificate.__typename as RegAndDeregCertificateTypes)
+  ) || [];
+
+export const includesAnyCertificate = (haystack: Certificate[], needle: readonly CertificateType[]) =>
+  haystack.some(({ __typename }) => needle.includes(__typename)) || false;

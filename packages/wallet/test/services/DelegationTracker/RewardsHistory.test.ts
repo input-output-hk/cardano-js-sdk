@@ -5,7 +5,6 @@ import { InMemoryRewardsHistoryStore } from '../../../src/persistence';
 import {
   RewardsHistory,
   RewardsHistoryProvider,
-  StakeDelegationCertificateTypes,
   TrackedRewardsProvider,
   calcFirstDelegationEpoch,
   createRewardsHistoryProvider,
@@ -44,7 +43,7 @@ describe('RewardsHistory', () => {
   });
 
   describe('createRewardsHistoryTracker', () => {
-    it.each(StakeDelegationCertificateTypes)(
+    it.each(Cardano.StakeDelegationCertificateTypes)(
       'queries and maps reward history starting from first delegation epoch+2 with %s',
       (delegationCertificateType) => {
         createTestScheduler().run(({ cold, expectObservable, flush }) => {
@@ -95,7 +94,7 @@ describe('RewardsHistory', () => {
       }
     );
 
-    it.each(StakeDelegationCertificateTypes)(
+    it.each(Cardano.StakeDelegationCertificateTypes)(
       'considers only first delegation signed by the reward account with %s',
       (delegationCertificateType) => {
         createTestScheduler().run(({ cold, expectObservable, flush }) => {

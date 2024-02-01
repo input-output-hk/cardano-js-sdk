@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.4.7...@cardano-sdk/hardware-trezor@0.4.8) (2024-01-31)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-trezor
+
 ## [0.4.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.4.6...@cardano-sdk/hardware-trezor@0.4.7) (2024-01-25)
 
 **Note:** Version bump only for package @cardano-sdk/hardware-trezor

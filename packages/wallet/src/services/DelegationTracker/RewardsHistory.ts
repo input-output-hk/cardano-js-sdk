@@ -5,7 +5,6 @@ import { Logger } from 'ts-log';
 import { Observable, concat, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistory } from '../types';
-import { StakeDelegationCertificateTypes } from './transactionCertificates';
 import { TrackedRewardsProvider } from '../ProviderTracker';
 import { TxWithEpoch } from './types';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
@@ -49,7 +48,7 @@ const firstDelegationEpoch$ = (transactions$: Observable<TxWithEpoch[]>, rewardA
     map((transactions) =>
       first(
         transactions.filter(
-          ({ tx }) => getCertificatesByType(tx, rewardAccounts, [...StakeDelegationCertificateTypes]).length > 0
+          ({ tx }) => getCertificatesByType(tx, rewardAccounts, Cardano.StakeDelegationCertificateTypes).length > 0
         )
       )
     ),
