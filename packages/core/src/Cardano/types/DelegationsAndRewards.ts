@@ -29,6 +29,7 @@ export interface RewardAccountInfo {
   delegatee?: Delegatee;
   rewardBalance: Lovelace;
   // Maybe add rewardsHistory for each reward account too
+  deposit?: Lovelace; // defined only when keyStatus is Registered
 }
 
 export interface Cip17Pool {

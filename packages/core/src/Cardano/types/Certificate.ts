@@ -5,6 +5,7 @@ import { EpochNo } from './Block';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { Lovelace } from './Value';
 import { PoolId, PoolParameters } from './StakePool';
+import { isNotNil } from '@cardano-sdk/util';
 
 export enum CertificateType {
   StakeRegistration = 'StakeRegistrationCertificate',
@@ -175,21 +176,19 @@ export type Certificate =
   | UnRegisterDelegateRepresentativeCertificate
   | UpdateDelegateRepresentativeCertificate;
 
-export const StakeRegistrationCertificateTypes = [
-  CertificateType.StakeRegistration,
+export const PostConwayStakeRegistrationCertificateTypes = [
   CertificateType.Registration,
   CertificateType.VoteRegistrationDelegation,
   CertificateType.StakeRegistrationDelegation,
   CertificateType.StakeVoteRegistrationDelegation
 ] as const;
 
-export type StakeRegistrationCertificateTypes = typeof StakeRegistrationCertificateTypes[number];
+export const StakeRegistrationCertificateTypes = [
+  CertificateType.StakeRegistration,
+  ...PostConwayStakeRegistrationCertificateTypes
+] as const;
 
-export type StakeDelegationCertificateUnion =
-  | StakeDelegationCertificate
-  | StakeVoteDelegationCertificate
-  | StakeRegistrationDelegationCertificate
-  | StakeVoteRegistrationDelegationCertificate;
+export type StakeRegistrationCertificateTypes = typeof StakeRegistrationCertificateTypes[number];
 
 export const StakeDelegationCertificateTypes = [
   CertificateType.StakeDelegation,
@@ -200,13 +199,6 @@ export const StakeDelegationCertificateTypes = [
 
 export type StakeDelegationCertificateTypes = typeof StakeDelegationCertificateTypes[number];
 
-export type RegAndDeregCertificateUnion =
-  | StakeAddressCertificate
-  | NewStakeAddressCertificate
-  | VoteRegistrationDelegationCertificate
-  | StakeRegistrationDelegationCertificate
-  | StakeVoteRegistrationDelegationCertificate;
-
 export const RegAndDeregCertificateTypes = [
   ...StakeRegistrationCertificateTypes,
   CertificateType.Unregistration,
@@ -214,6 +206,40 @@ export const RegAndDeregCertificateTypes = [
 ] as const;
 
 export type RegAndDeregCertificateTypes = typeof RegAndDeregCertificateTypes[number];
+
+export const StakeCredentialCertificateTypes = [
+  ...RegAndDeregCertificateTypes,
+  ...StakeDelegationCertificateTypes,
+  CertificateType.VoteDelegation
+] as const;
+
+type CertificateTypeMap = {
+  [CertificateType.AuthorizeCommitteeHot]: AuthorizeCommitteeHotCertificate;
+  [CertificateType.GenesisKeyDelegation]: GenesisKeyDelegationCertificate;
+  [CertificateType.MIR]: MirCertificate;
+  [CertificateType.PoolRegistration]: PoolRegistrationCertificate;
+  [CertificateType.PoolRetirement]: PoolRetirementCertificate;
+  [CertificateType.RegisterDelegateRepresentative]: RegisterDelegateRepresentativeCertificate;
+  [CertificateType.Registration]: NewStakeAddressCertificate;
+  [CertificateType.ResignCommitteeCold]: ResignCommitteeColdCertificate;
+  [CertificateType.StakeDelegation]: StakeDelegationCertificate;
+  [CertificateType.StakeDeregistration]: StakeAddressCertificate;
+  [CertificateType.StakeRegistration]: StakeAddressCertificate;
+  [CertificateType.StakeRegistrationDelegation]: StakeRegistrationDelegationCertificate;
+  [CertificateType.StakeVoteDelegation]: StakeVoteDelegationCertificate;
+  [CertificateType.StakeVoteRegistrationDelegation]: StakeVoteRegistrationDelegationCertificate;
+  [CertificateType.UnregisterDelegateRepresentative]: UnRegisterDelegateRepresentativeCertificate;
+  [CertificateType.Unregistration]: NewStakeAddressCertificate;
+  [CertificateType.UpdateDelegateRepresentative]: UpdateDelegateRepresentativeCertificate;
+  [CertificateType.VoteDelegation]: VoteDelegationCertificate;
+  [CertificateType.VoteRegistrationDelegation]: VoteRegistrationDelegationCertificate;
+};
+
+/** Checks if {@link certificate} is one {@link certificateTypes}, and narrows down its type */
+export const isCertType = <K extends keyof CertificateTypeMap>(
+  certificate: Certificate,
+  certificateTypes: readonly K[]
+): certificate is CertificateTypeMap[K] => certificateTypes.includes(certificate.__typename as K);
 
 /**
  * Creates a stake key registration certificate from a given reward account.
@@ -233,13 +259,23 @@ export const createStakeRegistrationCert = (rewardAccount: RewardAccount): Certi
  *
  * @param rewardAccount The reward account to be de-registered.
  */
-export const createStakeDeregistrationCert = (rewardAccount: RewardAccount): Certificate => ({
-  __typename: CertificateType.StakeDeregistration,
-  stakeCredential: {
-    hash: Hash28ByteBase16.fromEd25519KeyHashHex(RewardAccount.toHash(rewardAccount)),
-    type: CredentialType.KeyHash
-  }
-});
+export const createStakeDeregistrationCert = (rewardAccount: RewardAccount, deposit?: Lovelace): Certificate =>
+  deposit === undefined
+    ? {
+        __typename: CertificateType.StakeDeregistration,
+        stakeCredential: {
+          hash: Hash28ByteBase16.fromEd25519KeyHashHex(RewardAccount.toHash(rewardAccount)),
+          type: CredentialType.KeyHash
+        }
+      }
+    : {
+        __typename: CertificateType.Unregistration,
+        deposit,
+        stakeCredential: {
+          hash: Hash28ByteBase16.fromEd25519KeyHashHex(RewardAccount.toHash(rewardAccount)),
+          type: CredentialType.KeyHash
+        }
+      };
 
 /**
  * Creates a delegation certificate from a given reward account and a pool id.
@@ -258,9 +294,8 @@ export const createDelegationCert = (rewardAccount: RewardAccount, poolId: PoolI
 
 /** Filters certificates, returning only stake key register/deregister certificates */
 export const stakeKeyCertificates = (certificates?: Certificate[]) =>
-  certificates?.filter((certificate): certificate is RegAndDeregCertificateUnion =>
-    RegAndDeregCertificateTypes.includes(certificate.__typename as RegAndDeregCertificateTypes)
-  ) || [];
+  certificates?.map((cert) => (isCertType(cert, RegAndDeregCertificateTypes) ? cert : undefined)).filter(isNotNil) ||
+  [];
 
 export const includesAnyCertificate = (haystack: Certificate[], needle: readonly CertificateType[]) =>
   haystack.some(({ __typename }) => needle.includes(__typename)) || false;
