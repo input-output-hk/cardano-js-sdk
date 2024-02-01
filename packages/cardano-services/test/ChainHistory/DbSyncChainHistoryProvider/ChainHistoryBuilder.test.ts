@@ -101,7 +101,7 @@ describe('ChainHistoryBuilder', () => {
       const result = await builder.queryTransactionOutputsByIds(ids);
       expect(result.length).toBeGreaterThanOrEqual(2);
       expect(result[0]).toMatchShapeOf(DataMocks.Tx.txOut);
-      checkLoggedTxIds('About to find outputs for transactions with ids', true);
+      checkLoggedTxIds('About to find outputs \\(collateral: false\\) for transactions with ids', true);
     });
     test('query transaction outputs with empty array', async () => {
       const result = await builder.queryTransactionOutputsByIds([]);
