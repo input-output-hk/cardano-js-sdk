@@ -68,11 +68,11 @@ export class ChainHistoryBuilder {
     return mapTxOutTokenMap(result.rows);
   }
 
-  public async queryTransactionOutputsByIds(ids: string[]): Promise<TxOutput[]> {
-    this.#logger.debug('About to find outputs for transactions with ids:', ids);
+  public async queryTransactionOutputsByIds(ids: string[], collateral = false): Promise<TxOutput[]> {
+    this.#logger.debug(`About to find outputs (collateral: ${collateral}) for transactions with ids:`, ids);
     const result: QueryResult<TxOutputModel> = await this.#db.query({
-      name: 'tx_outputs_by_tx_ids',
-      text: Queries.findTxOutputsByIds,
+      name: `tx_${collateral ? 'collateral' : 'outputs'}_by_tx_ids`,
+      text: collateral ? Queries.findCollateralOutputsByTxIds : Queries.findTxOutputsByIds,
       values: [ids]
     });
     if (result.rows.length === 0) return [];

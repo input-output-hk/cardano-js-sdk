@@ -15,7 +15,7 @@ const selectTxInput = (collateral?: boolean) => `
 	JOIN tx AS source_tx
   		ON tx_out.tx_id = source_tx.id`;
 
-const selectTxOutput = `
+const selectTxOutput = (collateral = false) => `
 	SELECT
 		tx_out.id AS id,
 		tx_out.address AS address,
@@ -23,7 +23,7 @@ const selectTxOutput = `
 		tx_out.value AS coin_value,
 		tx_out.data_hash AS datum,
 		tx.hash AS tx_id
-	FROM tx_out
+	FROM ${collateral ? 'collateral_tx_out' : 'tx_out'} AS tx_out 
 	JOIN tx ON tx_out.tx_id = tx.id`;
 
 export const findTxInputsByIds = `
@@ -45,17 +45,22 @@ export const findTxInputsByAddresses = `
 	ORDER BY tx_in.id ASC`;
 
 export const findTxOutputsByIds = `
-  	${selectTxOutput}
+  	${selectTxOutput()}
   	WHERE tx.id = ANY($1)
 	ORDER BY tx_out.id ASC`;
 
 export const findTxOutputsByAddresses = `
-  ${selectTxOutput}
+  ${selectTxOutput()}
 	JOIN block ON tx.block_id = block.id
   WHERE tx_out.address = ANY($1)
 	AND block.block_no >= $2
 	AND block.block_no <= $3
 	ORDER BY tx_out.id ASC`;
+
+export const findCollateralOutputsByTxIds = `
+	${selectTxOutput(true)}
+	WHERE tx.id = ANY($1)
+  ORDER BY tx_out.id ASC`;
 
 export const findTip = `
 	SELECT 
