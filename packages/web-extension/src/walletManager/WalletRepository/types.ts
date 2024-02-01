@@ -52,8 +52,8 @@ export interface WalletRepositoryApi<WalletMetadata extends {}, AccountMetadata 
   ): Promise<UpdateWalletMetadataProps<WalletMetadata>>;
 
   updateAccountMetadata(
-    props: UpdateWalletMetadataProps<AccountMetadata>
-  ): Promise<UpdateWalletMetadataProps<AccountMetadata>>;
+    props: UpdateAccountMetadataProps<AccountMetadata>
+  ): Promise<UpdateAccountMetadataProps<AccountMetadata>>;
 
   /** Rejects with WalletConflictError when account is not found. */
   removeAccount(props: RemoveAccountProps): Promise<RemoveAccountProps>;
