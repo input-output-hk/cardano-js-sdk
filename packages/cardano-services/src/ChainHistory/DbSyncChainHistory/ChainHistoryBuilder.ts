@@ -51,7 +51,7 @@ export class ChainHistoryBuilder {
   public async queryTransactionInputsByIds(ids: string[], collateral = false): Promise<TxInput[]> {
     this.#logger.debug(`About to find inputs (collateral: ${collateral}) for transactions with ids:`, ids);
     const result: QueryResult<TxInputModel> = await this.#db.query({
-      name: `tx_${collateral ? 'collateral' : 'inputs'}_by_tx_ids`,
+      name: `tx_${collateral ? 'collateral_' : ''}inputs_by_tx_ids`,
       text: collateral ? Queries.findTxCollateralsByIds : Queries.findTxInputsByIds,
       values: [ids]
     });
@@ -71,7 +71,7 @@ export class ChainHistoryBuilder {
   public async queryTransactionOutputsByIds(ids: string[], collateral = false): Promise<TxOutput[]> {
     this.#logger.debug(`About to find outputs (collateral: ${collateral}) for transactions with ids:`, ids);
     const result: QueryResult<TxOutputModel> = await this.#db.query({
-      name: `tx_${collateral ? 'collateral' : 'outputs'}_by_tx_ids`,
+      name: `tx_${collateral ? 'collateral_' : ''}outputs_by_tx_ids`,
       text: collateral ? Queries.findCollateralOutputsByTxIds : Queries.findTxOutputsByIds,
       values: [ids]
     });
