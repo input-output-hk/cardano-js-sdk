@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.25.0...@cardano-sdk/core@0.26.0) (2024-02-02)
+
+### ⚠ BREAKING CHANGES
+
+* `isLastStakeKeyCertOfType` was renamed to
+`lastStakeKeyCertOfType` and returns the certificate or undefined.
+
+### Features
+
+* store stake reg deposit in reward acct info ([d48e349](https://github.com/input-output-hk/cardano-js-sdk/commit/d48e34945974f4e24b4f35282adfbeadff5600de))
+* use new deposit field when building dereg cert ([659f4f0](https://github.com/input-output-hk/cardano-js-sdk/commit/659f4f053ab0ddc9ae9e713e4367dd427008b10c))
+
 ## [0.25.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.24.0...@cardano-sdk/core@0.25.0) (2024-01-31)
 
 ### ⚠ BREAKING CHANGES

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.32.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.31.2...@cardano-sdk/e2e@0.32.0) (2024-02-02)
+
+### ⚠ BREAKING CHANGES
+
+* **web-extension:** WalletRepository.addWallet now requires at least 1 account for bip32 wallets
+
+### Bug Fixes
+
+* **web-extension:** hoist extendedAccountPublicKey from Bip32Wallet into Bip32WalletAccount ([2184be1](https://github.com/input-output-hk/cardano-js-sdk/commit/2184be13371e3ccde46b20f701236c752eef94cb))
+
 ## [0.31.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.31.1...@cardano-sdk/e2e@0.31.2) (2024-01-31)
 
 **Note:** Version bump only for package @cardano-sdk/e2e
