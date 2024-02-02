@@ -1,4 +1,5 @@
 import { AnyWallet, HardwareWallet, InMemoryWallet, ScriptWallet, WalletId } from '../types';
+import { Bip32PublicKeyHex } from '@cardano-sdk/crypto';
 import { Observable } from 'rxjs';
 
 export type RemoveAccountProps = {
@@ -12,6 +13,7 @@ export type AddAccountProps<Metadata extends {}> = {
   /** account' in cip1852 */
   accountIndex: number;
   metadata: Metadata;
+  extendedAccountPublicKey: Bip32PublicKeyHex;
 };
 
 export type UpdateWalletMetadataProps<Metadata extends {}> = {
@@ -27,14 +29,19 @@ export type UpdateAccountMetadataProps<Metadata extends {}> = {
 };
 
 export type AddWalletProps<WalletMetadata extends {}, AccountMetadata extends {}> =
-  | Omit<HardwareWallet<WalletMetadata, AccountMetadata>, 'walletId' | 'accounts'>
-  | Omit<InMemoryWallet<WalletMetadata, AccountMetadata>, 'walletId' | 'accounts'>
+  | Omit<HardwareWallet<WalletMetadata, AccountMetadata>, 'walletId'>
+  | Omit<InMemoryWallet<WalletMetadata, AccountMetadata>, 'walletId'>
   | Omit<ScriptWallet<WalletMetadata>, 'walletId'>;
 
 export interface WalletRepositoryApi<WalletMetadata extends {}, AccountMetadata extends {}> {
   wallets$: Observable<AnyWallet<WalletMetadata, AccountMetadata>[]>;
 
-  /** Rejects with WalletConflictError when wallet already exists */
+  /**
+   * When adding a BIP32 wallet, it must have at least 1 account.
+   * 1st (accounts[0]) account is used to derive wallet id.
+   *
+   * Rejects with WalletConflictError when wallet already exists.
+   */
   addWallet(props: AddWalletProps<WalletMetadata, AccountMetadata>): Promise<WalletId>;
 
   /**
@@ -52,8 +59,8 @@ export interface WalletRepositoryApi<WalletMetadata extends {}, AccountMetadata 
   ): Promise<UpdateWalletMetadataProps<WalletMetadata>>;
 
   updateAccountMetadata(
-    props: UpdateWalletMetadataProps<AccountMetadata>
-  ): Promise<UpdateWalletMetadataProps<AccountMetadata>>;
+    props: UpdateAccountMetadataProps<AccountMetadata>
+  ): Promise<UpdateAccountMetadataProps<AccountMetadata>>;
 
   /** Rejects with WalletConflictError when account is not found. */
   removeAccount(props: RemoveAccountProps): Promise<RemoveAccountProps>;

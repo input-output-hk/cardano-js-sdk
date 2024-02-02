@@ -379,7 +379,7 @@ export const bindObservableChannels = <API extends object>(
 
       const observableMessenger = messenger.deriveChannel(observableProperty);
       const connectSubscription = observableMessenger.connect$.subscribe((port) => {
-        if (observable$.value !== null) {
+        if (observable$.value !== TrackerSubject.NO_VALUE) {
           try {
             port.postMessage(
               toSerializableObject({ emit: observable$.value, messageId: newMessageId() } as EmitMessage)

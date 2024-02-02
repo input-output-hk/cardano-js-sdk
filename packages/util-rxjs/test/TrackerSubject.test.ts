@@ -18,13 +18,13 @@ describe('TrackerSubject', () => {
     expect(subject$.value).toBe(true);
   });
 
-  it('value is null by default', () => {
+  it('value is TrackerSubject.NO_VALUE by default', () => {
     createTestScheduler().run(({ cold, expectObservable, flush }) => {
       const source$ = cold('|');
       const subject$ = new TrackerSubject(source$);
       expectObservable(subject$).toBe('|');
       flush();
-      expect(subject$.value).toBe(null);
+      expect(subject$.value).toBe(TrackerSubject.NO_VALUE);
     });
   });
 

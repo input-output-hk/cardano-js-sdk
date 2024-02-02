@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.33.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.32.0...@cardano-sdk/wallet@0.33.0) (2024-02-02)
+
+### ⚠ BREAKING CHANGES
+
+* TrackerSubject.value$ type changed to T | typeof TrackerSubject.NO_VALUE
+* `isLastStakeKeyCertOfType` was renamed to
+`lastStakeKeyCertOfType` and returns the certificate or undefined.
+
+### Features
+
+* store stake reg deposit in reward acct info ([d48e349](https://github.com/input-output-hk/cardano-js-sdk/commit/d48e34945974f4e24b4f35282adfbeadff5600de))
+* **wallet:** add a new util createWalletAssetProvider that creates a new assetProvider that uses local cache ([44db6b5](https://github.com/input-output-hk/cardano-js-sdk/commit/44db6b50971f933eafa98c3f4deee3bc11dbebdd))
+
+### Bug Fixes
+
+* emit null through remote api when no wallet is active ([bd9b6cd](https://github.com/input-output-hk/cardano-js-sdk/commit/bd9b6cd02854f9e1cdd6935089f945ad8d030e24))
+
 ## [0.32.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.31.0...@cardano-sdk/wallet@0.32.0) (2024-01-31)
 
 ### ⚠ BREAKING CHANGES

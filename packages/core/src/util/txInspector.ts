@@ -14,12 +14,14 @@ import {
   Script,
   ScriptType,
   StakeAddressCertificate,
+  StakeCredentialCertificateTypes,
   StakeDelegationCertificate,
   TokenMap,
   Tx,
   TxIn,
   TxOut,
-  Value
+  Value,
+  isCertType
 } from '../Cardano/types';
 import { BigIntMath } from '@cardano-sdk/util';
 import { InputResolver, PaymentAddress, RewardAccount, isAddressWithin } from '../Cardano';
@@ -167,16 +169,18 @@ export const getCertificatesByType = (
 ) => {
   if (!tx.body.certificates || tx.body.certificates.length === 0) return [];
   const certificates = certificateTypes
-    ? tx.body.certificates?.filter((certificate) => certificateTypes.includes(certificate.__typename))
+    ? tx.body.certificates?.filter((certificate) => isCertType(certificate, certificateTypes))
     : tx.body.certificates;
 
   return certificates.filter((certificate) => {
-    if ('stakeCredential' in certificate && certificate.stakeCredential) {
+    if (isCertType(certificate, StakeCredentialCertificateTypes)) {
       const credHash = Crypto.Ed25519KeyHashHex(certificate.stakeCredential.hash);
       return rewardAccounts.some((account) => RewardAccount.toHash(account) === credHash);
     }
 
-    if ('poolParameters' in certificate) return rewardAccounts.includes(certificate.poolParameters.rewardAccount);
+    if (isCertType(certificate, [CertificateType.PoolRegistration]))
+      return rewardAccounts.includes(certificate.poolParameters.rewardAccount);
+
     return false;
   });
 };

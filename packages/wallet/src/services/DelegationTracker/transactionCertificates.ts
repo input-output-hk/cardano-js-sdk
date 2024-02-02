@@ -5,9 +5,9 @@ import { isNotNil } from '@cardano-sdk/util';
 import { transactionsEquals } from '../util/equals';
 import last from 'lodash/last';
 
-export const isLastStakeKeyCertOfType = (
+export const lastStakeKeyCertOfType = <K extends Cardano.RegAndDeregCertificateTypes>(
   transactionsCertificates: Cardano.Certificate[][],
-  certTypes: readonly Cardano.RegAndDeregCertificateTypes[],
+  certTypes: readonly K[],
   rewardAccount?: Cardano.RewardAccount
 ) => {
   const stakeKeyHash = rewardAccount
@@ -24,7 +24,10 @@ export const isLastStakeKeyCertOfType = (
       })
       .filter(isNotNil)
   );
-  return certTypes.includes(lastRegOrDereg?.__typename as Cardano.RegAndDeregCertificateTypes);
+
+  if (lastRegOrDereg && Cardano.isCertType(lastRegOrDereg, certTypes)) {
+    return lastRegOrDereg;
+  }
 };
 
 export const transactionsWithCertificates = (

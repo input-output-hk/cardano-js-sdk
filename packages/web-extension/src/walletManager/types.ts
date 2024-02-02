@@ -16,11 +16,11 @@ export type Bip32WalletAccount<Metadata extends {}> = {
   accountIndex: number;
   /** e.g. account name, picture */
   metadata: Metadata;
+  extendedAccountPublicKey: Bip32PublicKeyHex;
 };
 
 export type Bip32Wallet<WalletMetadata extends {}, AccountMetadata extends {}> = {
   walletId: WalletId;
-  extendedAccountPublicKey: Bip32PublicKeyHex;
   metadata: WalletMetadata;
   accounts: Bip32WalletAccount<AccountMetadata>[];
 };

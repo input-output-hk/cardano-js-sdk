@@ -74,9 +74,7 @@ export const certificateTransactionsWithEpochs = (
 const hasDelegationCert = (certificates: Array<Cardano.Certificate> | undefined): boolean =>
   !!certificates &&
   certificates.some((cert) =>
-    [...Cardano.RegAndDeregCertificateTypes, ...Cardano.StakeDelegationCertificateTypes].includes(
-      cert.__typename as Cardano.RegAndDeregCertificateTypes | Cardano.StakeDelegationCertificateTypes
-    )
+    Cardano.isCertType(cert, [...Cardano.RegAndDeregCertificateTypes, ...Cardano.StakeDelegationCertificateTypes])
   );
 
 export const createDelegationPortfolioTracker = (transactions: Observable<Cardano.HydratedTx[]>) =>

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.6.11...@cardano-sdk/util-rxjs@0.7.0) (2024-02-02)
+
+### ⚠ BREAKING CHANGES
+
+* TrackerSubject.value$ type changed to T | typeof TrackerSubject.NO_VALUE
+
+### Bug Fixes
+
+* emit null through remote api when no wallet is active ([bd9b6cd](https://github.com/input-output-hk/cardano-js-sdk/commit/bd9b6cd02854f9e1cdd6935089f945ad8d030e24))
+
 ## [0.6.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.6.10...@cardano-sdk/util-rxjs@0.6.11) (2024-01-31)
 
 **Note:** Version bump only for package @cardano-sdk/util-rxjs

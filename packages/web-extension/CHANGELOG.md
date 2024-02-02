@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.24.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.23.1...@cardano-sdk/web-extension@0.24.0) (2024-02-02)
+
+### ⚠ BREAKING CHANGES
+
+* TrackerSubject.value$ type changed to T | typeof TrackerSubject.NO_VALUE
+* **web-extension:** WalletRepository.addWallet now requires at least 1 account for bip32 wallets
+
+### Bug Fixes
+
+* emit null through remote api when no wallet is active ([bd9b6cd](https://github.com/input-output-hk/cardano-js-sdk/commit/bd9b6cd02854f9e1cdd6935089f945ad8d030e24))
+* **web-extension:** correct updateMetadata props type ([521eee5](https://github.com/input-output-hk/cardano-js-sdk/commit/521eee580e81e031e6b0cb0b3308cc3e50b9e856))
+* **web-extension:** hoist extendedAccountPublicKey from Bip32Wallet into Bip32WalletAccount ([2184be1](https://github.com/input-output-hk/cardano-js-sdk/commit/2184be13371e3ccde46b20f701236c752eef94cb))
+
 ## [0.23.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.23.0...@cardano-sdk/web-extension@0.23.1) (2024-01-31)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension
