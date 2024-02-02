@@ -1,6 +1,6 @@
 /* eslint-disable no-bitwise */
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
 import { GroupedAddress, util as KeyManagementUtil } from '@cardano-sdk/key-management';
 import { Observable, firstValueFrom } from 'rxjs';
 import { ObservableWallet, ScriptAddress, isScriptAddress } from '../types';
@@ -28,6 +28,58 @@ export const createInputResolver = ({ utxo }: InputResolverContext): Cardano.Inp
     const availableUtxo = utxoAvailable?.find(([txIn]) => txInEquals(txIn, input));
     if (!availableUtxo) return null;
     return availableUtxo[1];
+  }
+});
+
+/**
+ * Creates an input resolver that fetch transaction inputs from the backend.
+ *
+ * This function tries to fetch the transaction from the backend using a `ChainHistoryProvider`. It
+ * also caches fetched transactions to optimize subsequent input resolutions.
+ *
+ * @param provider The backend provider used to fetch transactions by their hashes if
+ * they are not found by the inputResolver.
+ * @returns An input resolver that can fetch unresolved inputs from the backend.
+ */
+export const createBackendInputResolver = (provider: ChainHistoryProvider): Cardano.InputResolver => {
+  const txCache = new Map<Cardano.TransactionId, Cardano.Tx>();
+
+  const fetchAndCacheTransaction = async (txId: Cardano.TransactionId): Promise<Cardano.Tx | null> => {
+    if (txCache.has(txId)) {
+      return txCache.get(txId)!;
+    }
+
+    const txs = await provider.transactionsByHashes({ ids: [txId] });
+    if (txs.length > 0) {
+      txCache.set(txId, txs[0]);
+      return txs[0];
+    }
+
+    return null;
+  };
+
+  return {
+    async resolveInput(input: Cardano.TxIn) {
+      const tx = await fetchAndCacheTransaction(input.txId);
+      if (!tx) return null;
+
+      return tx.body.outputs.length > input.index ? tx.body.outputs[input.index] : null;
+    }
+  };
+};
+
+/**
+ * Combines multiple input resolvers into a single resolver.
+ *
+ * @param resolvers The input resolvers to combine.
+ */
+export const combineInputResolvers = (...resolvers: Cardano.InputResolver[]): Cardano.InputResolver => ({
+  async resolveInput(txIn: Cardano.TxIn) {
+    for (const resolver of resolvers) {
+      const resolved = await resolver.resolveInput(txIn);
+      if (resolved) return resolved;
+    }
+    return null;
   }
 });
 

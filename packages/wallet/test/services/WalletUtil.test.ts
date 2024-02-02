@@ -6,12 +6,14 @@ import {
   util as KeyManagementUtil,
   KeyRole
 } from '@cardano-sdk/key-management';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
 import { DrepScriptHashVoter } from '@cardano-sdk/core/dist/cjs/Cardano';
 import {
   ObservableWallet,
   PersonalWallet,
   ScriptAddress,
+  combineInputResolvers,
+  createBackendInputResolver,
   createInputResolver,
   requiresForeignSignatures
 } from '../../src';
@@ -19,6 +21,19 @@ import { createAsyncKeyAgent, waitForWalletStateSettle } from '../util';
 import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
 import { of } from 'rxjs';
+
+const createMockChainHistoryProvider = (txs: Cardano.HydratedTx[] = []): ChainHistoryProvider => {
+  const chainHistoryProvider = {
+    blocksByHashes: jest.fn(),
+    healthCheck: jest.fn(),
+    transactionsByAddresses: jest.fn(),
+    transactionsByHashes: jest.fn()
+  };
+  chainHistoryProvider.blocksByHashes.mockResolvedValue(txs);
+  chainHistoryProvider.transactionsByHashes.mockResolvedValue(txs);
+  chainHistoryProvider.transactionsByAddresses.mockResolvedValue(txs);
+  return chainHistoryProvider;
+};
 
 describe('WalletUtil', () => {
   describe('createInputResolver', () => {
@@ -48,6 +63,229 @@ describe('WalletUtil', () => {
         address: 'addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg',
         value: { coins: 50_000_000n }
       });
+      expect(
+        await resolver.resolveInput({
+          index: 0,
+          txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d4')
+        })
+      ).toBeNull();
+    });
+  });
+
+  describe('createBackendInputResolver', () => {
+    it('resolveInput resolves inputs from provided chain history provider', async () => {
+      const tx = {
+        body: {
+          outputs: [
+            {
+              address: Cardano.PaymentAddress(
+                'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz'
+              ),
+              value: { coins: 50_000_000n }
+            },
+            {
+              address: Cardano.PaymentAddress(
+                'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz'
+              ),
+              value: { coins: 150_000_000n }
+            }
+          ]
+        }
+      } as Cardano.HydratedTx;
+
+      const resolver = createBackendInputResolver(createMockChainHistoryProvider([tx]));
+
+      expect(
+        await resolver.resolveInput({
+          index: 0,
+          txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
+        })
+      ).toEqual({
+        address:
+          'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz',
+        value: { coins: 50_000_000n }
+      });
+
+      expect(
+        await resolver.resolveInput({
+          index: 1,
+          txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
+        })
+      ).toEqual({
+        address:
+          'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz',
+        value: { coins: 150_000_000n }
+      });
+    });
+  });
+
+  describe('combineInputResolvers', () => {
+    it('resolveInput resolves inputs from provided utxo set', async () => {
+      const utxo: Cardano.Utxo[] = [
+        [
+          {
+            address: Cardano.PaymentAddress(
+              'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+            ),
+            index: 0,
+            txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
+          },
+          {
+            address: Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg'),
+            value: { coins: 50_000_000n }
+          }
+        ]
+      ];
+      const resolver = combineInputResolvers(
+        createInputResolver({ utxo: { available$: of(utxo) } }),
+        createBackendInputResolver(createMockChainHistoryProvider())
+      );
+
+      expect(
+        await resolver.resolveInput({
+          index: 0,
+          txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
+        })
+      ).toEqual({
+        address: 'addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg',
+        value: { coins: 50_000_000n }
+      });
+      expect(
+        await resolver.resolveInput({
+          index: 0,
+          txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d4')
+        })
+      ).toBeNull();
+    });
+
+    it('resolveInput resolves inputs from provided chain history provider', async () => {
+      const tx = {
+        body: {
+          outputs: [
+            {
+              address: Cardano.PaymentAddress(
+                'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz'
+              ),
+              value: { coins: 50_000_000n }
+            },
+            {
+              address: Cardano.PaymentAddress(
+                'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz'
+              ),
+              value: { coins: 150_000_000n }
+            }
+          ]
+        }
+      } as Cardano.HydratedTx;
+
+      const resolver = combineInputResolvers(
+        createInputResolver({ utxo: { available$: of([]) } }),
+        createBackendInputResolver(createMockChainHistoryProvider([tx]))
+      );
+
+      expect(
+        await resolver.resolveInput({
+          index: 0,
+          txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
+        })
+      ).toEqual({
+        address:
+          'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz',
+        value: { coins: 50_000_000n }
+      });
+
+      expect(
+        await resolver.resolveInput({
+          index: 1,
+          txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
+        })
+      ).toEqual({
+        address:
+          'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz',
+        value: { coins: 150_000_000n }
+      });
+    });
+
+    it('can resolve inputs from own transactions and from chain history provider', async () => {
+      const tx = {
+        body: {
+          outputs: [
+            {
+              address: Cardano.PaymentAddress(
+                'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz'
+              ),
+              value: { coins: 50_000_000n }
+            },
+            {
+              address: Cardano.PaymentAddress(
+                'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz'
+              ),
+              value: { coins: 150_000_000n }
+            }
+          ]
+        }
+      } as Cardano.HydratedTx;
+
+      const utxo: Cardano.Utxo[] = [
+        [
+          {
+            address: Cardano.PaymentAddress(
+              'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+            ),
+            index: 0,
+            txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
+          },
+          {
+            address: Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg'),
+            value: { coins: 50_000_000n }
+          }
+        ]
+      ];
+
+      const resolver = combineInputResolvers(
+        createInputResolver({ utxo: { available$: of(utxo) } }),
+        createBackendInputResolver(createMockChainHistoryProvider([tx]))
+      );
+
+      expect(
+        await resolver.resolveInput({
+          index: 0,
+          txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
+        })
+      ).toEqual({
+        address: 'addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg',
+        value: { coins: 50_000_000n }
+      });
+
+      expect(
+        await resolver.resolveInput({
+          index: 0,
+          txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e7FFFFFFFF')
+        })
+      ).toEqual({
+        address:
+          'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz',
+        value: { coins: 50_000_000n }
+      });
+
+      expect(
+        await resolver.resolveInput({
+          index: 1,
+          txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e7FFFFFFFF')
+        })
+      ).toEqual({
+        address:
+          'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz',
+        value: { coins: 150_000_000n }
+      });
+    });
+
+    it('resolveInput resolves to null if the input can not be found', async () => {
+      const resolver = combineInputResolvers(
+        createInputResolver({ utxo: { available$: of([]) } }),
+        createBackendInputResolver(createMockChainHistoryProvider())
+      );
+
       expect(
         await resolver.resolveInput({
           index: 0,
