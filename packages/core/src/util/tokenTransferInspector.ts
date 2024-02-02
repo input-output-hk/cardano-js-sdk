@@ -1,16 +1,33 @@
 import * as Cardano from '../Cardano';
+import { AssetInfo } from '../Asset';
+import { AssetProvider } from '../Provider';
 import { Inspector, resolveInputs } from './txInspector';
 import { coalesceValueQuantities } from './coalesceValueQuantities';
 import { subtractValueQuantities } from './subtractValueQuantities';
 import uniq from 'lodash/uniq';
 
-export type TokenTransferInspection = {
-  fromAddress: Map<Cardano.PaymentAddress, Cardano.Value>;
-  toAddress: Map<Cardano.PaymentAddress, Cardano.Value>;
+export type AssetInfoWithAmount = { amount: Cardano.Lovelace; assetInfo: AssetInfo };
+
+export type TokenTransferValue = {
+  assets: Map<Cardano.AssetId, AssetInfoWithAmount>;
+  coins: Cardano.Lovelace;
 };
 
+export type TokenTransferInspection = {
+  fromAddress: Map<Cardano.PaymentAddress, TokenTransferValue>;
+  toAddress: Map<Cardano.PaymentAddress, TokenTransferValue>;
+};
+
+/** Arguments for the token transfer inspector. */
 export interface TokenTransferInspectorArgs {
+  /** The input resolver. */
   inputResolver: Cardano.InputResolver;
+
+  /** The asset provider to resolve AssetInfo for assets in the fromAddress field. */
+  fromAddressAssetProvider: AssetProvider;
+
+  /** The asset provider to resolve AssetInfo for assets in the toAddress field. */
+  toAddressAssetProvider: AssetProvider;
 }
 
 export type TokenTransferInspector = (args: TokenTransferInspectorArgs) => Inspector<TokenTransferInspection>;
@@ -99,9 +116,41 @@ const removeZeroBalanceEntries = (addressMap: Map<Cardano.PaymentAddress, Cardan
   }
 };
 
+const toTokenTransferValue = async (
+  assetProvider: AssetProvider,
+  addressMap: Map<Cardano.PaymentAddress, Cardano.Value>
+): Promise<Map<Cardano.PaymentAddress, TokenTransferValue>> => {
+  const tokenTransferValue = new Map<Cardano.PaymentAddress, TokenTransferValue>();
+
+  for (const [address, value] of addressMap.entries()) {
+    const coins = value.coins;
+    const assetIds = uniq(value.assets && value.assets.size > 0 ? [...value.assets.keys()] : []);
+    const assetInfos = new Map<Cardano.AssetId, AssetInfoWithAmount>();
+
+    if (assetIds.length > 0) {
+      const assets = await assetProvider.getAssets({
+        assetIds,
+        extraData: { nftMetadata: true, tokenMetadata: true }
+      });
+
+      for (const asset of assets) {
+        const amount = value.assets?.get(asset.assetId) ?? 0n;
+        assetInfos.set(asset.assetId, { amount, assetInfo: asset });
+      }
+    }
+
+    tokenTransferValue.set(address, {
+      assets: assetInfos,
+      coins
+    });
+  }
+
+  return tokenTransferValue;
+};
+
 /** Inspect a transaction and return a map of addresses and their balances. */
 export const tokenTransferInspector: TokenTransferInspector =
-  ({ inputResolver }) =>
+  ({ inputResolver, fromAddressAssetProvider, toAddressAssetProvider }) =>
   async (tx) => {
     const { resolvedInputs } = await resolveInputs(tx.body.inputs, inputResolver);
 
@@ -118,5 +167,8 @@ export const tokenTransferInspector: TokenTransferInspector =
     removeZeroBalanceEntries(fromAddress);
     removeZeroBalanceEntries(toAddress);
 
-    return { fromAddress, toAddress };
+    return {
+      fromAddress: await toTokenTransferValue(fromAddressAssetProvider, fromAddress),
+      toAddress: await toTokenTransferValue(toAddressAssetProvider, toAddress)
+    };
   };
