@@ -1,4 +1,5 @@
 /* eslint-disable sonarjs/no-duplicate-string */
+import { AccountMetadata, WalletMetadata, createAccount } from './util';
 import {
   AddWalletProps,
   HardwareWallet,
@@ -10,40 +11,27 @@ import {
   WalletRepositoryDependencies,
   WalletType
 } from '../../src';
-import { Bip32PublicKeyHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { Cardano, Serialization } from '@cardano-sdk/core';
+import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { firstValueFrom, of } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 import pick from 'lodash/pick';
 
-type WalletMetadata = { friendlyName: string };
-type AccountMetadata = { friendlyName: string };
-
 const storedLedgerWallet: HardwareWallet<WalletMetadata, AccountMetadata> = {
-  accounts: [
-    {
-      accountIndex: 0,
-      metadata: { friendlyName: 'Account #0' }
-    }
-  ],
-  extendedAccountPublicKey: Bip32PublicKeyHex(
-    'ba4f80dea2632a17c99ae9d8b934abf02643db5426b889fef14709c85e294aa12ac1f1560a893ea7937c5bfbfdeab459b1a396f1174b9c5a673a640d01880c35'
-  ),
-  metadata: { friendlyName: 'My Ledger Wallet' },
+  accounts: [createAccount(0, 0)],
+  metadata: { name: 'My Ledger Wallet' },
   type: WalletType.Ledger as const,
-  walletId: 'bc10b0e8fdff359b389822d98d4def22'
+  walletId: '13e603103d9f6d5aa0cb445ed0d801a9' // result of getWalletId(createPubKey(0, 0))
 };
 
 const createTrezorWalletProps: AddWalletProps<WalletMetadata, AccountMetadata> = {
-  extendedAccountPublicKey: Bip32PublicKeyHex(
-    'ca4f80dea2632a17c99ae9d8b934abf02643db5426b889fef14709c85e294aa12ac1f1560a893ea7937c5bfbfdeab459b1a396f1174b9c5a673a640d01880c35'
-  ),
-  metadata: { friendlyName: 'My Trezor Wallet' },
+  accounts: [createAccount(1, 0)],
+  metadata: { name: 'My Trezor Wallet' },
   type: WalletType.Trezor as const
 };
 
 const createScriptWalletProps = {
-  metadata: { friendlyName: 'Treasury' },
+  metadata: { name: 'Treasury' },
   ownSigners: [
     {
       accountIndex: storedLedgerWallet.accounts[0].accountIndex,
@@ -60,7 +48,7 @@ const createScriptWalletProps = {
 
 const storedScriptWallet = {
   ...createScriptWalletProps,
-  metadata: { friendlyName: 'Shared' },
+  metadata: { name: 'Shared' },
   walletId: Serialization.Script.fromCore(createScriptWalletProps.script).hash().slice(32)
 };
 
@@ -101,13 +89,23 @@ describe('WalletRepository', () => {
       await repository.addWallet(createTrezorWalletProps);
       expect(store.setAll).toBeCalledWith([
         storedLedgerWallet,
-        expect.objectContaining({ ...createTrezorWalletProps, accounts: [], walletId: expect.stringContaining('') })
+        expect.objectContaining({ ...createTrezorWalletProps, walletId: expect.stringContaining('') })
       ]);
+    });
+
+    it('rejects with WalletConflictError when no accounts or extended root public key is specified', async () => {
+      await expect(
+        repository.addWallet({
+          ...pick(storedLedgerWallet, ['metadata', 'type']),
+          accounts: []
+        })
+      ).rejects.toThrowError(WalletConflictError);
+      expect(store.setAll).not.toBeCalled();
     });
 
     it('rejects with WalletConflictError when wallet already exists', async () => {
       await expect(
-        repository.addWallet(pick(storedLedgerWallet, ['metadata', 'type', 'extendedAccountPublicKey']))
+        repository.addWallet(pick(storedLedgerWallet, ['metadata', 'type', 'accounts']))
       ).rejects.toThrowError(WalletConflictError);
       expect(store.setAll).not.toBeCalled();
     });
@@ -140,7 +138,16 @@ describe('WalletRepository', () => {
       ).rejects.toThrowError(WalletConflictError);
     });
 
-    it('computes and returns WalletId for bip32 wallets', async () => {
+    it('rejects with WalletConflictError when adding a bip32 wallet with no accounts', async () => {
+      await expect(
+        repository.addWallet({
+          ...createTrezorWalletProps,
+          accounts: []
+        })
+      ).rejects.toThrowError(WalletConflictError);
+    });
+
+    it('computes and returns WalletId based on first xpub key for bip32 wallets', async () => {
       await expect(repository.addWallet(createTrezorWalletProps)).resolves.toHaveLength(32);
     });
 
@@ -151,11 +158,14 @@ describe('WalletRepository', () => {
 
   describe('addAccount', () => {
     it('adds account to an existing wallet and returns AccountId that also contains walletId', async () => {
-      const accountProps = {
-        accountIndex: storedLedgerWallet.accounts[storedLedgerWallet.accounts.length - 1].accountIndex + 1,
-        metadata: { friendlyName: 'Next account' }
+      const accountProps = createAccount(
+        0,
+        storedLedgerWallet.accounts[storedLedgerWallet.accounts.length - 1].accountIndex + 1
+      );
+      const props = {
+        ...accountProps,
+        walletId: storedLedgerWallet.walletId
       };
-      const props = { ...accountProps, walletId: storedLedgerWallet.walletId };
       await expect(repository.addAccount(props)).resolves.toEqual(props);
       expect(store.setAll).toBeCalledWith([
         {
@@ -168,8 +178,7 @@ describe('WalletRepository', () => {
     it('rejects with WalletConflictError when wallet is not found', async () => {
       await expect(
         repository.addAccount({
-          accountIndex: 1,
-          metadata: { friendlyName: 'Secret Account' },
+          ...createAccount(0, 1),
           walletId: 'doesnt exist' as Hash28ByteBase16
         })
       ).rejects.toThrowError(WalletConflictError);
@@ -180,8 +189,7 @@ describe('WalletRepository', () => {
       store.observeAll.mockReturnValueOnce(of([storedScriptWallet]));
       await expect(
         repository.addAccount({
-          accountIndex: 1,
-          metadata: { friendlyName: 'Secret Account' },
+          ...createAccount(0, 1),
           walletId: storedScriptWallet.walletId
         })
       ).rejects.toThrowError(WalletConflictError);
@@ -191,8 +199,7 @@ describe('WalletRepository', () => {
     it('rejects with WalletConflictError when account already exists', async () => {
       await expect(
         repository.addAccount({
-          accountIndex: storedLedgerWallet.accounts[0].accountIndex,
-          metadata: { friendlyName: 'Does not matter' },
+          ...createAccount(0, storedLedgerWallet.accounts[0].accountIndex),
           walletId: storedLedgerWallet.walletId
         })
       ).rejects.toThrowError(WalletConflictError);
@@ -201,7 +208,7 @@ describe('WalletRepository', () => {
   });
 
   describe('updateMetadata', () => {
-    const newMetadata = { friendlyName: 'New name' };
+    const newMetadata = { name: 'New name' };
 
     it('updates metadata of an existing ledger wallet', async () => {
       const props: UpdateWalletMetadataProps<WalletMetadata> = {

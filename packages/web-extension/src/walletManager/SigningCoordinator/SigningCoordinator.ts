@@ -155,7 +155,7 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
                           encryptedRootPrivateKeyBytes: [
                             ...Buffer.from(wallet.encryptedSecrets.rootPrivateKeyBytes, 'hex')
                           ],
-                          extendedAccountPublicKey: wallet.extendedAccountPublicKey,
+                          extendedAccountPublicKey: account.extendedAccountPublicKey,
                           getPassphrase: async () => passphrase
                         })
                       );
@@ -182,12 +182,12 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
                             accountIndex: request.requestContext.accountIndex,
                             chainId: request.requestContext.chainId,
                             communicationType: this.#hwOptions.communicationType,
-                            extendedAccountPublicKey: request.requestContext.wallet.extendedAccountPublicKey
+                            extendedAccountPublicKey: account.extendedAccountPublicKey
                           })
                         : this.#keyAgentFactory.Trezor({
                             accountIndex: request.requestContext.accountIndex,
                             chainId: request.requestContext.chainId,
-                            extendedAccountPublicKey: request.requestContext.wallet.extendedAccountPublicKey,
+                            extendedAccountPublicKey: account.extendedAccountPublicKey,
                             trezorConfig: this.#hwOptions
                           })
                     ).catch((error) => throwMaybeWrappedWithNoRejectError(error, options)),

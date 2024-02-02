@@ -6,7 +6,7 @@ import {
   UpdateWalletMetadataProps,
   WalletRepositoryApi
 } from './types';
-import { AnyWallet, WalletId, WalletType } from '../types';
+import { AnyWallet, ScriptWallet, WalletId, WalletType } from '../types';
 import { Logger } from 'ts-log';
 import { Observable, defer, firstValueFrom, map, shareReplay, switchMap, take } from 'rxjs';
 import { WalletConflictError } from '../errors';
@@ -66,9 +66,16 @@ export class WalletRepository<WalletMetadata extends {}, AccountMetadata extends
 
   async addWallet(props: AddWalletProps<WalletMetadata, AccountMetadata>): Promise<WalletId> {
     this.#logger.debug('addWallet', props.type);
-    const walletId = await getWalletId(
-      props.type === WalletType.Script ? props.script : props.extendedAccountPublicKey
-    );
+    const walletId =
+      props.type === WalletType.Script
+        ? await getWalletId(props.script)
+        : await (() => {
+            const pubKey = props.accounts[0]?.extendedAccountPublicKey;
+            if (!pubKey) {
+              throw new WalletConflictError('New wallet must have at least one account');
+            }
+            return getWalletId(pubKey);
+          })();
 
     return firstValueFrom(
       this.#getWallets().pipe(
@@ -77,25 +84,9 @@ export class WalletRepository<WalletMetadata extends {}, AccountMetadata extends
             throw new WalletConflictError(`Wallet '${walletId}' already exists`);
           }
           if (props.type === WalletType.Script) {
-            for (const ownSigner of props.ownSigners) {
-              if (
-                !wallets.some(
-                  (wallet) =>
-                    wallet.walletId === ownSigner.walletId &&
-                    wallet.type !== WalletType.Script &&
-                    wallet.accounts.some((account) => account.accountIndex === ownSigner.accountIndex)
-                )
-              ) {
-                throw new WalletConflictError(
-                  `Wallet or account does not exist: ${ownSigner.walletId}/${ownSigner.accountIndex}`
-                );
-              }
-            }
+            this.#validateOwnSigners(wallets, props.ownSigners);
           }
-          return this.#store.setAll([
-            ...wallets,
-            props.type === WalletType.Script ? { ...props, walletId } : { ...props, accounts: [], walletId }
-          ]);
+          return this.#store.setAll([...wallets, { ...props, walletId }]);
         }),
         map(() => walletId)
       )
@@ -103,7 +94,7 @@ export class WalletRepository<WalletMetadata extends {}, AccountMetadata extends
   }
 
   addAccount(props: AddAccountProps<AccountMetadata>): Promise<AddAccountProps<AccountMetadata>> {
-    const { walletId, accountIndex, metadata } = props;
+    const { walletId, accountIndex, metadata, extendedAccountPublicKey } = props;
     this.#logger.debug('addAccount', walletId, accountIndex, metadata);
     return firstValueFrom(
       this.#getWallets().pipe(
@@ -119,6 +110,7 @@ export class WalletRepository<WalletMetadata extends {}, AccountMetadata extends
           if (wallet.accounts.some((acc) => acc.accountIndex === accountIndex)) {
             throw new WalletConflictError(`Account #${accountIndex} for wallet '${walletId}' already exists`);
           }
+
           return this.#store
             .setAll(
               cloneSplice(wallets, walletIndex, 1, {
@@ -127,6 +119,7 @@ export class WalletRepository<WalletMetadata extends {}, AccountMetadata extends
                   ...wallet.accounts,
                   {
                     accountIndex,
+                    extendedAccountPublicKey,
                     metadata
                   }
                 ]
@@ -245,5 +238,25 @@ export class WalletRepository<WalletMetadata extends {}, AccountMetadata extends
         map(() => walletId)
       )
     );
+  }
+
+  #validateOwnSigners(
+    wallets: AnyWallet<WalletMetadata, AccountMetadata>[],
+    ownSigners: ScriptWallet<WalletMetadata>['ownSigners']
+  ) {
+    for (const ownSigner of ownSigners) {
+      if (
+        !wallets.some(
+          (wallet) =>
+            wallet.walletId === ownSigner.walletId &&
+            wallet.type !== WalletType.Script &&
+            wallet.accounts.some((account) => account.accountIndex === ownSigner.accountIndex)
+        )
+      ) {
+        throw new WalletConflictError(
+          `Wallet or account does not exist: ${ownSigner.walletId}/${ownSigner.accountIndex}`
+        );
+      }
+    }
   }
 }

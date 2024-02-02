@@ -1,13 +1,17 @@
 import { Observable, ReplaySubject, Subscription } from 'rxjs';
 
+type NO_VALUE_TYPE = 'TRACKER_SUBJECT_NO_VALUE';
+
 export interface BehaviorObservable<T> extends Observable<T> {
-  get value(): T | null;
+  get value(): T | NO_VALUE_TYPE;
 }
 
 export class TrackerSubject<T> extends ReplaySubject<T> implements BehaviorObservable<T> {
+  static NO_VALUE: NO_VALUE_TYPE = 'TRACKER_SUBJECT_NO_VALUE';
+
   #sourceSubscription$: Subscription;
-  #value: T | null = null;
-  get value(): T | null {
+  #value: T | NO_VALUE_TYPE = 'TRACKER_SUBJECT_NO_VALUE';
+  get value(): T | NO_VALUE_TYPE {
     return this.#value;
   }
   constructor(source$: Observable<T>) {

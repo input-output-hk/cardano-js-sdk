@@ -8,10 +8,11 @@ import {
   SignTransactionContext,
   errors
 } from '@cardano-sdk/key-management';
-import { Bip32PublicKeyHex, Ed25519PublicKeyHex, Ed25519SignatureHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { Cardano, TxCBOR } from '@cardano-sdk/core';
+import { Ed25519PublicKeyHex, Ed25519SignatureHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 import { InMemoryWallet, KeyAgentFactory, SigningCoordinator, WalletType, WrongTargetError } from '../../src';
+import { createAccount } from './util';
 import { firstValueFrom } from 'rxjs';
 
 describe('SigningCoordinator', () => {
@@ -19,19 +20,11 @@ describe('SigningCoordinator', () => {
   let keyAgentFactory: jest.Mocked<KeyAgentFactory>;
   let keyAgent: jest.Mocked<InMemoryKeyAgent>;
   const wallet: InMemoryWallet<{}, {}> = {
-    accounts: [
-      {
-        accountIndex: 0,
-        metadata: { friendlyName: 'My Wallet' }
-      }
-    ],
+    accounts: [createAccount(0, 0)],
     encryptedSecrets: {
       keyMaterial: HexBlob('abc'),
       rootPrivateKeyBytes: HexBlob('123')
     },
-    extendedAccountPublicKey: Bip32PublicKeyHex(
-      'ba4f80dea2632a17c99ae9d8b934abf02643db5426b889fef14709c85e294aa12ac1f1560a893ea7937c5bfbfdeab459b1a396f1174b9c5a673a640d01880c35'
-    ),
     metadata: {},
     type: WalletType.InMemory,
     walletId: Hash28ByteBase16('ad63f855e831d937457afc52a21a7f351137e4a9fff26c217817335a')

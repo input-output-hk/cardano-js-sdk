@@ -103,7 +103,7 @@ const assertWalletProperties = async (
   await firstValueFrom(wallet.tip$);
   expect(wallet.tip$.value).toEqual(mocks.ledgerTip);
   // currentEpoch$
-  expect(wallet.currentEpoch$.value?.epochNo).toEqual(mocks.currentEpoch.number);
+  expect(wallet.currentEpoch$.value).toEqual(expect.objectContaining({ epochNo: mocks.currentEpoch.number }));
   // protocolParameters$
   await firstValueFrom(wallet.protocolParameters$);
   expect(wallet.protocolParameters$.value).toEqual(mocks.protocolParameters);

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
+import { AccountMetadata, WalletMetadata, createAccount, createPubKey } from './util';
 import {
   AddWalletProps,
   WalletFactory,
@@ -10,8 +11,6 @@ import {
   getWalletId,
   getWalletStoreId
 } from '../../src';
-import { AsyncKeyAgent } from '@cardano-sdk/key-management';
-import { Bip32PublicKeyHex } from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { HexBlob, InvalidArgumentError, isNotNil } from '@cardano-sdk/util';
 import { MinimalRuntime } from '../../src/messaging';
@@ -20,9 +19,6 @@ import { Storage } from 'webextension-polyfill';
 import { TimeoutError, filter, firstValueFrom, from, timeout } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 import pick from 'lodash/pick';
-
-type WalletMetadata = { name: string };
-type AccountMetadata = { name: string };
 
 jest.mock('../../src/messaging', () => {
   const originalModule = jest.requireActual('../../src/messaging');
@@ -51,17 +47,7 @@ const createInMemoryStorage = () => {
   } as Storage.StorageArea;
 };
 
-describe('WalletManagerWorker', () => {
-  const pubKey = Bip32PublicKeyHex(
-    // eslint-disable-next-line max-len
-    '3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d'
-  );
-
-  const mockKeyAgent = {
-    getChainId: async () => Promise.resolve({ networkId: Cardano.NetworkId.Testnet, networkMagic: 888 }),
-    getExtendedAccountPublicKey: async () => Promise.resolve(pubKey)
-  } as AsyncKeyAgent;
-
+describe('WalletManager', () => {
   let walletId: WalletId;
   let chainId: Cardano.ChainId;
   let managerStorage: Storage.StorageArea;
@@ -71,6 +57,7 @@ describe('WalletManagerWorker', () => {
   const runtime: MinimalRuntime = { connect: jest.fn(), onConnect: jest.fn() as any };
 
   const walletProps: AddWalletProps<WalletMetadata, AccountMetadata> = {
+    accounts: [createAccount(0, 0)],
     encryptedSecrets: {
       keyMaterial: HexBlob('f07e8b397c93a16c06f83c8f0c1a1866477c6090926445fc0cb1201228ace6e9'),
       rootPrivateKeyBytes: HexBlob(
@@ -79,7 +66,6 @@ describe('WalletManagerWorker', () => {
           '8d515cb54181fb2f5fc3af329e80949c082fb52f7b07e359bd7835a6762148bf'
       )
     },
-    extendedAccountPublicKey: pubKey,
     metadata: { name: 'test' },
     type: WalletType.InMemory
   };
@@ -105,10 +91,11 @@ describe('WalletManagerWorker', () => {
 
     const id = await walletRepository.addWallet(walletProps);
 
-    for (let i = 0; i < 4; i++) {
+    for (let i = 1; i < 4; i++) {
       await walletRepository.addAccount({
         accountIndex: i,
-        metadata: { name: 'Account #0' },
+        extendedAccountPublicKey: createPubKey(0, i),
+        metadata: { name: `Account #${i}` },
         walletId: id
       });
     }
@@ -159,8 +146,8 @@ describe('WalletManagerWorker', () => {
     walletFactoryCreate = jest.fn().mockResolvedValue(mockWallet);
     managerStorage = createInMemoryStorage();
     walletManager = await createWalletManager();
-    walletId = await getWalletId(mockKeyAgent);
-    chainId = await mockKeyAgent.getChainId();
+    walletId = await getWalletId(walletProps.accounts[0].extendedAccountPublicKey);
+    chainId = Cardano.ChainIds.Preprod;
   });
 
   afterEach(() => {
@@ -268,7 +255,7 @@ describe('WalletManagerWorker', () => {
           accountIndex: 0,
           chainId: { networkId: Cardano.NetworkId.Testnet, networkMagic: 888 },
           provider: { a: 'some_attr' },
-          walletId: 'da7b4795b11a79116eb5232c83d2c862'
+          walletId
         }
       });
 
@@ -281,7 +268,7 @@ describe('WalletManagerWorker', () => {
         provider
       } = await firstValueFrom(walletManager.activeWalletId$.pipe(filter(isNotNil)));
 
-      expect(id).toEqual('da7b4795b11a79116eb5232c83d2c862');
+      expect(id).toEqual(walletId);
       expect(accountIndex).toEqual(0);
       expect(chain).toEqual({ networkId: Cardano.NetworkId.Testnet, networkMagic: 888 });
       expect(provider).toEqual({ a: 'some_attr' });

@@ -313,18 +313,19 @@ const createWalletIfNotExistsAndActivate = async (accountIndex: number) => {
     logger.log('adding to repository wallet');
     // Add wallet to the repository.
     walletId = await repository.addWallet({
+      accounts: [
+        {
+          accountIndex,
+          extendedAccountPublicKey: keyAgent.serializableData.extendedAccountPublicKey,
+          metadata: { name: `wallet-${accountIndex}` }
+        }
+      ],
       encryptedSecrets: {
         keyMaterial: HexBlob.fromBytes(encryptedMnemonic),
         rootPrivateKeyBytes: HexBlob.fromBytes(new Uint8Array(encryptedRootPrivateKey))
       },
-      extendedAccountPublicKey: keyAgent.serializableData.extendedAccountPublicKey,
       metadata: {},
       type: WalletType.InMemory
-    });
-    await repository.addAccount({
-      accountIndex,
-      metadata: { name: `wallet-${accountIndex}` },
-      walletId
     });
 
     logger.log(`Wallet added: ${walletId}`);
