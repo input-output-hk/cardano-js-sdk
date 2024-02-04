@@ -160,6 +160,8 @@ export class WalletManager<WalletMetadata extends { name: string }, AccountMetad
   /** Deactivate wallet. Wallet observable properties will emit only after a new wallet is {@link activate}ed. */
   async deactivate(): Promise<void> {
     this.#deactivateWallet();
+    await this.#managerStorage.remove(this.#managerStorageKey);
+    this.activeWalletId$.next(null);
   }
 
   /** Deactivates the active. */

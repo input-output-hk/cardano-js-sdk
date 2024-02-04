@@ -16,7 +16,7 @@ import { HexBlob, InvalidArgumentError, isNotNil } from '@cardano-sdk/util';
 import { MinimalRuntime } from '../../src/messaging';
 import { ObservableWallet, storage } from '@cardano-sdk/wallet';
 import { Storage } from 'webextension-polyfill';
-import { TimeoutError, filter, firstValueFrom, from, timeout } from 'rxjs';
+import { TimeoutError, filter, firstValueFrom, from, skip, timeout } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 import pick from 'lodash/pick';
 
@@ -33,6 +33,7 @@ jest.mock('../../src/messaging', () => {
 const createInMemoryStorage = () => {
   const store: Record<string, any> = {};
   return {
+    clear: jest.fn(),
     get: async (keyOrKeys) =>
       typeof keyOrKeys === 'object'
         ? Array.isArray(keyOrKeys)
@@ -41,6 +42,15 @@ const createInMemoryStorage = () => {
         : keyOrKeys
         ? pick(store, keyOrKeys)
         : {},
+    remove: jest.fn(async (keyOrKeys) => {
+      if (Array.isArray(keyOrKeys)) {
+        for (const key of keyOrKeys) {
+          delete store[key];
+        }
+      } else {
+        delete store[keyOrKeys];
+      }
+    }),
     set: async (items) => {
       Object.assign(store, items);
     }
@@ -227,6 +237,17 @@ describe('WalletManager', () => {
     it('compares the chainId using deepEquals', async () => {
       await walletManager.activate({ accountIndex: 0, chainId: { ...chainId }, walletId });
       expect(walletFactoryCreate).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('deactivate', () => {
+    it('deletes lastActivateProps from storage and emits null from activeWalletId$', async () => {
+      walletManager = await createWalletManager();
+      await walletManager.activate({ accountIndex: 0, chainId, walletId });
+      const activeWalletId = firstValueFrom(walletManager.activeWallet$.pipe(skip(1)));
+      await walletManager.deactivate();
+      expect(managerStorage.remove).toBeCalledTimes(1);
+      await expect(activeWalletId).resolves.toBeNull();
     });
   });
 
