@@ -107,29 +107,35 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
     });
     if (txResults.rows.length === 0) return [];
 
-    const [inputs, outputs, mints, withdrawals, redeemers, metadata, collaterals, certificates] = await Promise.all([
-      this.#builder.queryTransactionInputsByIds(ids),
-      this.#builder.queryTransactionOutputsByIds(ids),
-      this.#builder.queryTxMintByIds(ids),
-      this.#builder.queryWithdrawalsByTxIds(ids),
-      this.#builder.queryRedeemersByIds(ids),
-      // Missing witness datums
-      this.#metadataService.queryTxMetadataByRecordIds(ids),
-      this.#builder.queryTransactionInputsByIds(ids, true),
-      this.#builder.queryCertificatesByIds(ids)
-    ]);
+    const [inputs, outputs, mints, withdrawals, redeemers, metadata, collaterals, certificates, collateralOutputs] =
+      await Promise.all([
+        this.#builder.queryTransactionInputsByIds(ids),
+        this.#builder.queryTransactionOutputsByIds(ids),
+        this.#builder.queryTxMintByIds(ids),
+        this.#builder.queryWithdrawalsByTxIds(ids),
+        this.#builder.queryRedeemersByIds(ids),
+        // Missing witness datums
+        this.#metadataService.queryTxMetadataByRecordIds(ids),
+        this.#builder.queryTransactionInputsByIds(ids, true),
+        this.#builder.queryCertificatesByIds(ids),
+        this.#builder.queryTransactionOutputsByIds(ids, true)
+      ]);
 
     return txResults.rows.map((tx) => {
       const txId = tx.id.toString('hex') as unknown as Cardano.TransactionId;
       const txInputs = orderBy(inputs.filter((input) => input.txInputId === txId).map(mapTxIn), ['index']);
       const txCollaterals = orderBy(collaterals.filter((col) => col.txInputId === txId).map(mapTxIn), ['index']);
       const txOutputs = orderBy(outputs.filter((output) => output.txId === txId).map(mapTxOut), ['index']);
+      const txCollateralOutputs = orderBy(collateralOutputs.filter((output) => output.txId === txId).map(mapTxOut), [
+        'index'
+      ]);
       const inputSource: Cardano.InputSource = tx.valid_contract
         ? Cardano.InputSource.inputs
         : Cardano.InputSource.collaterals;
 
       return mapTxAlonzo(tx, {
         certificates: certificates.get(txId),
+        collateralOutputs: txCollateralOutputs,
         collaterals: txCollaterals,
         inputSource,
         inputs: txInputs,

@@ -185,11 +185,23 @@ interface TxAlonzoData {
   metadata?: Cardano.TxMetadata;
   collaterals?: Cardano.HydratedTxIn[];
   certificates?: Cardano.Certificate[];
+  collateralOutputs?: Cardano.TxOut[];
 }
 
 export const mapTxAlonzo = (
   txModel: TxModel,
-  { inputSource, inputs, outputs, mint, withdrawals, redeemers, metadata, collaterals, certificates }: TxAlonzoData
+  {
+    inputSource,
+    inputs,
+    outputs,
+    mint,
+    withdrawals,
+    redeemers,
+    metadata,
+    collaterals,
+    certificates,
+    collateralOutputs = []
+  }: TxAlonzoData
 ): Cardano.HydratedTx => ({
   auxiliaryData:
     metadata && metadata.size > 0
@@ -204,6 +216,7 @@ export const mapTxAlonzo = (
   },
   body: {
     certificates,
+    collateralReturn: collateralOutputs.length > 0 ? collateralOutputs[0] : undefined,
     collaterals,
     fee: BigInt(txModel.fee),
     inputs,

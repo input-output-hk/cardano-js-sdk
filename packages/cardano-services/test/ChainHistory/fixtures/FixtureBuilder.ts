@@ -17,7 +17,8 @@ export enum TxWith {
   Mint = 'mint',
   MultiAsset = 'multiAsset',
   Redeemer = 'redeemer',
-  Withdrawal = 'withdrawal'
+  Withdrawal = 'withdrawal',
+  CollateralOutput = 'collateralOutput'
 }
 
 export type AddressesInBlockRange = {
@@ -120,6 +121,7 @@ export class ChainHistoryFixtureBuilder {
       if (options.with.includes(TxWith.DelegationCertificate)) query += Queries.latestTxHashesWithDelegationCerts;
       if (options.with.includes(TxWith.MirCertificate)) query += Queries.latestTxHashesWithMirCerts;
       if (options.with.includes(TxWith.Withdrawal)) query += Queries.latestTxHashesWithWithdrawal;
+      if (options.with.includes(TxWith.CollateralOutput)) query += Queries.latestTxHashesWithCollateralOutput;
 
       query += Queries.endLatestTxHashes;
     }

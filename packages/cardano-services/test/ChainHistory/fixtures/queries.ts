@@ -57,6 +57,9 @@ export const latestTxHashesWithMirCerts = `
 export const latestTxHashesWithWithdrawal = `
   JOIN withdrawal ON withdrawal.tx_id = tx.id`;
 
+export const latestTxHashesWithCollateralOutput = `
+  JOIN collateral_tx_out ON collateral_tx_out.tx_id = tx.id`;
+
 export const endLatestTxHashes = `
   GROUP BY tx.id
   ORDER BY tx.id DESC
@@ -101,6 +104,7 @@ const Queries = {
   latestTxHashes,
   latestTxHashesWithAuxiliaryData,
   latestTxHashesWithCollateral,
+  latestTxHashesWithCollateralOutput,
   latestTxHashesWithDelegationCerts,
   latestTxHashesWithMint,
   latestTxHashesWithMirCerts,

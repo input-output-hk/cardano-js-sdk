@@ -114,6 +114,13 @@ export const collateralInputs = [
   }
 ];
 
+export const collateralReturn: Cardano.TxOut = {
+  address: Cardano.PaymentAddress('addr_test1wqnp362vmvr8jtc946d3a3utqgclfdl5y9d3kn849e359hst7hkqk'),
+  value: {
+    coins: 3_681_817_479_100_950n
+  }
+};
+
 export const withValidityInterval: Cardano.HydratedTx = merge(withAssets, {
   body: {
     validityInterval: {
