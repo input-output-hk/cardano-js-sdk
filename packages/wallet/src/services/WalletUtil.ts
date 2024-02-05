@@ -23,11 +23,20 @@ export interface WalletOutputValidatorContext {
 export type WalletUtilContext = WalletOutputValidatorContext & InputResolverContext;
 
 export const createInputResolver = ({ utxo }: InputResolverContext): Cardano.InputResolver => ({
-  async resolveInput(input: Cardano.TxIn) {
+  async resolveInput(input: Cardano.TxIn, options?: Cardano.ResolveOptions) {
     const utxoAvailable = await firstValueFrom(utxo.available$);
     const availableUtxo = utxoAvailable?.find(([txIn]) => txInEquals(txIn, input));
-    if (!availableUtxo) return null;
-    return availableUtxo[1];
+
+    if (availableUtxo) return availableUtxo[1];
+
+    if (options?.hints) {
+      const tx = options?.hints.find((hint) => hint.id === input.txId);
+
+      if (tx && tx.body.outputs.length > input.index) {
+        return tx.body.outputs[input.index];
+      }
+    }
+    return null;
   }
 });
 
@@ -59,7 +68,14 @@ export const createBackendInputResolver = (provider: ChainHistoryProvider): Card
   };
 
   return {
-    async resolveInput(input: Cardano.TxIn) {
+    async resolveInput(input: Cardano.TxIn, options?: Cardano.ResolveOptions) {
+      // Add hints to the cache
+      if (options?.hints) {
+        for (const hint of options.hints) {
+          txCache.set(hint.id, hint);
+        }
+      }
+
       const tx = await fetchAndCacheTransaction(input.txId);
       if (!tx) return null;
 
@@ -74,9 +90,9 @@ export const createBackendInputResolver = (provider: ChainHistoryProvider): Card
  * @param resolvers The input resolvers to combine.
  */
 export const combineInputResolvers = (...resolvers: Cardano.InputResolver[]): Cardano.InputResolver => ({
-  async resolveInput(txIn: Cardano.TxIn) {
+  async resolveInput(txIn: Cardano.TxIn, options?: Cardano.ResolveOptions) {
     for (const resolver of resolvers) {
-      const resolved = await resolver.resolveInput(txIn);
+      const resolved = await resolver.resolveInput(txIn, options);
       if (resolved) return resolved;
     }
     return null;
