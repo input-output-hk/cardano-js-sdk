@@ -365,6 +365,7 @@ interface TxAlonzoData {
   metadata?: Cardano.TxMetadata;
   collaterals?: Cardano.HydratedTxIn[];
   certificates?: Cardano.Certificate[];
+  collateralOutputs?: Cardano.TxOut[];
   proposalProcedures?: Cardano.ProposalProcedure[];
   votingProcedures?: Cardano.VotingProcedures;
 }
@@ -374,6 +375,7 @@ export const mapTxAlonzo = (
   {
     certificates,
     collaterals,
+    collateralOutputs = [],
     inputSource,
     inputs,
     metadata,
@@ -398,6 +400,7 @@ export const mapTxAlonzo = (
   },
   body: {
     certificates,
+    collateralReturn: collateralOutputs.length > 0 ? collateralOutputs[0] : undefined,
     collaterals,
     fee: BigInt(txModel.fee),
     inputs,

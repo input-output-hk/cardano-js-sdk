@@ -1,11 +1,22 @@
+import * as AssetId from '../../../util-dev/src/assetId';
 import * as AssetIds from '../AssetId';
 import * as Cardano from '../../src/Cardano';
+import {
+  Asset,
+  AssetInfoWithAmount,
+  AssetProvider,
+  HealthCheckResponse,
+  TokenTransferValue,
+  createTxInspector,
+  tokenTransferInspector
+} from '../../src';
 import { Ed25519KeyHashHex, Ed25519PublicKeyHex, Ed25519SignatureHex } from '@cardano-sdk/crypto';
-import { createTxInspector, tokenTransferInspector } from '../../src';
 import { jsonToMetadatum } from '../../src/util/metadatum';
 
-const buildValue = (coins: bigint, assets: Array<[Cardano.AssetId, bigint]>): Cardano.Value => ({
-  assets: new Map(assets),
+const buildTokenTransferValue = (coins: bigint, assets: Array<[Asset.AssetInfo, bigint]>): TokenTransferValue => ({
+  assets: new Map<Cardano.AssetId, AssetInfoWithAmount>(
+    assets.map(([assetInfo, amount]) => [assetInfo.assetId, { amount, assetInfo }])
+  ),
   coins
 });
 
@@ -17,6 +28,13 @@ const createMockInputResolver = (historicalTxs: Cardano.HydratedTx[]): Cardano.I
 
     return Promise.resolve(tx.body.outputs[input.index]);
   }
+});
+
+const createMockAssetProvider = (assets: Asset.AssetInfo[]): AssetProvider => ({
+  getAsset: async ({ assetId }) =>
+    assets.find((asset) => asset.assetId === assetId) ?? Promise.reject('Asset not found'),
+  getAssets: async ({ assetIds }) => assets.filter((asset) => assetIds.includes(asset.assetId)),
+  healthCheck: async () => Promise.resolve({} as HealthCheckResponse)
 });
 
 // eslint-disable-next-line max-statements
@@ -163,6 +181,46 @@ describe('txInspector', () => {
       }
     } as Cardano.HydratedTx);
 
+  const assetInfos = [
+    {
+      assetId: AssetId.PXL,
+      nftMetadata: { name: 'PXL' },
+      supply: 11_242_452_000n,
+      tokenMetadata: null
+    } as Asset.AssetInfo,
+    {
+      assetId: AssetId.TSLA,
+      nftMetadata: { name: 'TSLA' },
+      supply: 1_000_000n,
+      tokenMetadata: null
+    } as Asset.AssetInfo,
+    { assetId: AssetId.Unit, nftMetadata: { name: 'Unit' }, supply: 1n, tokenMetadata: null } as Asset.AssetInfo
+  ];
+
+  const oldAssetInfos = [
+    {
+      assetId: AssetId.PXL,
+      nftMetadata: { name: 'PXL_old' },
+      supply: 11_242_452_000n,
+      tokenMetadata: null
+    } as Asset.AssetInfo,
+    {
+      assetId: AssetId.TSLA,
+      nftMetadata: { name: 'TSLA_old' },
+      supply: 1_000_000n,
+      tokenMetadata: null
+    } as Asset.AssetInfo,
+    { assetId: AssetId.Unit, nftMetadata: { name: 'Unit_old' }, supply: 1n, tokenMetadata: null } as Asset.AssetInfo
+  ];
+
+  const AssetInfoIdx = {
+    PXL: 0,
+    TSA: 1,
+    Unit: 2
+  };
+
+  const assetProvider = createMockAssetProvider(assetInfos);
+
   describe('Token Transfer Inspector', () => {
     it('does not include addresses which net difference is 0 (assets and coins)', async () => {
       // Arrange
@@ -241,7 +299,11 @@ describe('txInspector', () => {
       ];
 
       const inspectTx = createTxInspector({
-        tokenTransfer: tokenTransferInspector({ inputResolver: createMockInputResolver(histTx) })
+        tokenTransfer: tokenTransferInspector({
+          fromAddressAssetProvider: assetProvider,
+          inputResolver: createMockInputResolver(histTx),
+          toAddressAssetProvider: assetProvider
+        })
       });
 
       // Act
@@ -250,11 +312,13 @@ describe('txInspector', () => {
       // Assert
       expect(tokenTransfer.fromAddress).toEqual(
         new Map([
-          [addresses[1], buildValue(-3_000_000n, [[AssetIds.PXL, -15n]])],
-          [addresses[2], buildValue(-2_000_000n, [[AssetIds.TSLA, -25n]])]
+          [addresses[1], buildTokenTransferValue(-3_000_000n, [[assetInfos[AssetInfoIdx.PXL], -15n]])],
+          [addresses[2], buildTokenTransferValue(-2_000_000n, [[assetInfos[AssetInfoIdx.TSA], -25n]])]
         ])
       );
-      expect(tokenTransfer.toAddress).toEqual(new Map([[addresses[1], buildValue(0n, [[AssetIds.TSLA, 25n]])]]));
+      expect(tokenTransfer.toAddress).toEqual(
+        new Map([[addresses[1], buildTokenTransferValue(0n, [[assetInfos[AssetInfoIdx.TSA], 25n]])]])
+      );
     });
 
     it('adds assets with a positive net difference to the address in the toAddress list', async () => {
@@ -298,7 +362,11 @@ describe('txInspector', () => {
       ];
 
       const inspectTx = createTxInspector({
-        tokenTransfer: tokenTransferInspector({ inputResolver: createMockInputResolver(histTx) })
+        tokenTransfer: tokenTransferInspector({
+          fromAddressAssetProvider: assetProvider,
+          inputResolver: createMockInputResolver(histTx),
+          toAddressAssetProvider: assetProvider
+        })
       });
 
       // Act
@@ -306,7 +374,9 @@ describe('txInspector', () => {
 
       // Assert
       expect(tokenTransfer.fromAddress).toEqual(new Map([]));
-      expect(tokenTransfer.toAddress).toEqual(new Map([[addresses[0], buildValue(1_000_000n, [[AssetIds.TSLA, 4n]])]]));
+      expect(tokenTransfer.toAddress).toEqual(
+        new Map([[addresses[0], buildTokenTransferValue(1_000_000n, [[assetInfos[AssetInfoIdx.TSA], 4n]])]])
+      );
     });
 
     it('adds assets with a negative net difference to the address in the fromAddress list', async () => {
@@ -350,7 +420,11 @@ describe('txInspector', () => {
       ];
 
       const inspectTx = createTxInspector({
-        tokenTransfer: tokenTransferInspector({ inputResolver: createMockInputResolver(histTx) })
+        tokenTransfer: tokenTransferInspector({
+          fromAddressAssetProvider: assetProvider,
+          inputResolver: createMockInputResolver(histTx),
+          toAddressAssetProvider: assetProvider
+        })
       });
 
       // Act
@@ -358,7 +432,7 @@ describe('txInspector', () => {
 
       // Assert
       expect(tokenTransfer.fromAddress).toEqual(
-        new Map([[addresses[0], buildValue(-1_000_000n, [[AssetIds.TSLA, -4n]])]])
+        new Map([[addresses[0], buildTokenTransferValue(-1_000_000n, [[assetInfos[AssetInfoIdx.TSA], -4n]])]])
       );
       expect(tokenTransfer.toAddress).toEqual(new Map([]));
     });
@@ -423,7 +497,11 @@ describe('txInspector', () => {
       ];
 
       const inspectTx = createTxInspector({
-        tokenTransfer: tokenTransferInspector({ inputResolver: createMockInputResolver(histTx) })
+        tokenTransfer: tokenTransferInspector({
+          fromAddressAssetProvider: assetProvider,
+          inputResolver: createMockInputResolver(histTx),
+          toAddressAssetProvider: assetProvider
+        })
       });
 
       // Act
@@ -434,10 +512,10 @@ describe('txInspector', () => {
         new Map([
           [
             addresses[0],
-            buildValue(-31_000_000n, [
-              [AssetIds.TSLA, -30n],
-              [AssetIds.PXL, -25n],
-              [AssetIds.Unit, -5n]
+            buildTokenTransferValue(-31_000_000n, [
+              [assetInfos[AssetInfoIdx.TSA], -30n],
+              [assetInfos[AssetInfoIdx.PXL], -25n],
+              [assetInfos[AssetInfoIdx.Unit], -5n]
             ])
           ]
         ])
@@ -487,7 +565,11 @@ describe('txInspector', () => {
       ];
 
       const inspectTx = createTxInspector({
-        tokenTransfer: tokenTransferInspector({ inputResolver: createMockInputResolver(histTx) })
+        tokenTransfer: tokenTransferInspector({
+          fromAddressAssetProvider: assetProvider,
+          inputResolver: createMockInputResolver(histTx),
+          toAddressAssetProvider: assetProvider
+        })
       });
 
       // Act
@@ -498,10 +580,10 @@ describe('txInspector', () => {
         new Map([
           [
             addresses[0],
-            buildValue(31_000_000n, [
-              [AssetIds.TSLA, 30n],
-              [AssetIds.PXL, 25n],
-              [AssetIds.Unit, 5n]
+            buildTokenTransferValue(31_000_000n, [
+              [assetInfos[AssetInfoIdx.TSA], 30n],
+              [assetInfos[AssetInfoIdx.PXL], 25n],
+              [assetInfos[AssetInfoIdx.Unit], 5n]
             ])
           ]
         ])
@@ -635,7 +717,11 @@ describe('txInspector', () => {
       ];
 
       const inspectTx = createTxInspector({
-        tokenTransfer: tokenTransferInspector({ inputResolver: createMockInputResolver(histTx) })
+        tokenTransfer: tokenTransferInspector({
+          fromAddressAssetProvider: assetProvider,
+          inputResolver: createMockInputResolver(histTx),
+          toAddressAssetProvider: assetProvider
+        })
       });
 
       // Act
@@ -644,16 +730,16 @@ describe('txInspector', () => {
       // Assert
       expect(tokenTransfer.toAddress).toEqual(
         new Map([
-          [addresses[0], buildValue(0n, [[AssetIds.TSLA, 110n]])],
-          [addresses[1], buildValue(0n, [[AssetIds.TSLA, 14n]])],
+          [addresses[0], buildTokenTransferValue(0n, [[assetInfos[AssetInfoIdx.TSA], 110n]])],
+          [addresses[1], buildTokenTransferValue(0n, [[assetInfos[AssetInfoIdx.TSA], 14n]])],
           [
             addresses[2],
-            buildValue(8_000_000n, [
-              [AssetIds.PXL, 211n],
-              [AssetIds.Unit, 2n]
+            buildTokenTransferValue(8_000_000n, [
+              [assetInfos[AssetInfoIdx.PXL], 211n],
+              [assetInfos[AssetInfoIdx.Unit], 2n]
             ])
           ],
-          [addresses[3], buildValue(0n, [[AssetIds.PXL, 991n]])]
+          [addresses[3], buildTokenTransferValue(0n, [[assetInfos[AssetInfoIdx.PXL], 991n]])]
         ])
       );
 
@@ -661,24 +747,24 @@ describe('txInspector', () => {
         new Map([
           [
             addresses[0],
-            buildValue(-5_000_000n, [
-              [AssetIds.PXL, -50n],
-              [AssetIds.Unit, -25n]
+            buildTokenTransferValue(-5_000_000n, [
+              [assetInfos[AssetInfoIdx.PXL], -50n],
+              [assetInfos[AssetInfoIdx.Unit], -25n]
             ])
           ],
           [
             addresses[1],
-            buildValue(0n, [
-              [AssetIds.PXL, -1n],
-              [AssetIds.Unit, -88n]
+            buildTokenTransferValue(0n, [
+              [assetInfos[AssetInfoIdx.PXL], -1n],
+              [assetInfos[AssetInfoIdx.Unit], -88n]
             ])
           ],
-          [addresses[2], buildValue(0n, [[AssetIds.TSLA, -5000n]])],
+          [addresses[2], buildTokenTransferValue(0n, [[assetInfos[AssetInfoIdx.TSA], -5000n]])],
           [
             addresses[3],
-            buildValue(-1_000_000n, [
-              [AssetIds.TSLA, -2n],
-              [AssetIds.Unit, -1108n]
+            buildTokenTransferValue(-1_000_000n, [
+              [assetInfos[AssetInfoIdx.TSA], -2n],
+              [assetInfos[AssetInfoIdx.Unit], -1108n]
             ])
           ]
         ])
@@ -767,15 +853,201 @@ describe('txInspector', () => {
       ];
 
       const inspectTx = createTxInspector({
-        tokenTransfer: tokenTransferInspector({ inputResolver: createMockInputResolver(histTx) })
+        tokenTransfer: tokenTransferInspector({
+          fromAddressAssetProvider: assetProvider,
+          inputResolver: createMockInputResolver(histTx),
+          toAddressAssetProvider: assetProvider
+        })
       });
 
       // Act
       const { tokenTransfer } = await inspectTx(tx);
 
       // Assert
-      expect(tokenTransfer.toAddress).toEqual(new Map([[addresses[0], buildValue(0n, [[AssetIds.Unit, 5n]])]]));
+      expect(tokenTransfer.toAddress).toEqual(
+        new Map([[addresses[0], buildTokenTransferValue(0n, [[assetInfos[AssetInfoIdx.Unit], 5n]])]])
+      );
       expect(tokenTransfer.fromAddress).toEqual(new Map([]));
+    });
+
+    it('uses different asset providers for the fromAddress and toAddress field', async () => {
+      // Arrange
+
+      // This TX is not balanced, but it's not the point of this test
+      const tx = buildMockTx({
+        inputs: [
+          {
+            address: addresses[0],
+            index: 0,
+            txId: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+          },
+          {
+            address: addresses[1],
+            index: 1,
+            txId: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+          },
+          {
+            address: addresses[2],
+            index: 2,
+            txId: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+          },
+          {
+            address: addresses[3],
+            index: 3,
+            txId: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+          }
+        ],
+
+        outputs: [
+          {
+            address: addresses[0],
+            value: {
+              assets: new Map([[AssetIds.TSLA, 210n]]),
+              coins: 4_500_000n
+            }
+          },
+          {
+            address: addresses[1],
+            value: {
+              assets: new Map([
+                [AssetIds.TSLA, 15n],
+                [AssetIds.PXL, 1n],
+                [AssetIds.Unit, 12n]
+              ]),
+              coins: 5_000_000n
+            }
+          },
+          {
+            address: addresses[2],
+            value: {
+              assets: new Map([
+                [AssetIds.TSLA, 5000n],
+                [AssetIds.PXL, 1000n],
+                [AssetIds.Unit, 12n]
+              ]),
+              coins: 10_000_000n
+            }
+          },
+          {
+            address: addresses[3],
+            value: {
+              assets: new Map([
+                [AssetIds.PXL, 1000n],
+                [AssetIds.Unit, 12n]
+              ]),
+              coins: 1_000_000n
+            }
+          }
+        ]
+      });
+
+      const histTx: Cardano.HydratedTx[] = [
+        {
+          body: {
+            outputs: [
+              {
+                address: addresses[0],
+                value: {
+                  assets: new Map([
+                    [AssetIds.TSLA, 100n],
+                    [AssetIds.PXL, 50n],
+                    [AssetIds.Unit, 25n]
+                  ]),
+                  coins: 9_500_000n
+                }
+              },
+              {
+                address: addresses[1],
+                value: {
+                  assets: new Map([
+                    [AssetIds.TSLA, 1n],
+                    [AssetIds.PXL, 2n],
+                    [AssetIds.Unit, 100n]
+                  ]),
+                  coins: 5_000_000n
+                }
+              },
+              {
+                address: addresses[2],
+                value: {
+                  assets: new Map([
+                    [AssetIds.TSLA, 10_000n],
+                    [AssetIds.PXL, 789n],
+                    [AssetIds.Unit, 10n]
+                  ]),
+                  coins: 2_000_000n
+                }
+              },
+              {
+                address: addresses[3],
+                value: {
+                  assets: new Map([
+                    [AssetIds.TSLA, 2n],
+                    [AssetIds.PXL, 9n],
+                    [AssetIds.Unit, 1120n]
+                  ]),
+                  coins: 2_000_000n
+                }
+              }
+            ]
+          },
+          id: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+        } as unknown as Cardano.HydratedTx
+      ];
+
+      const inspectTx = createTxInspector({
+        tokenTransfer: tokenTransferInspector({
+          fromAddressAssetProvider: createMockAssetProvider(oldAssetInfos),
+          inputResolver: createMockInputResolver(histTx),
+          toAddressAssetProvider: assetProvider
+        })
+      });
+
+      // Act
+      const { tokenTransfer } = await inspectTx(tx);
+
+      // Assert
+      expect(tokenTransfer.toAddress).toEqual(
+        new Map([
+          [addresses[0], buildTokenTransferValue(0n, [[assetInfos[AssetInfoIdx.TSA], 110n]])],
+          [addresses[1], buildTokenTransferValue(0n, [[assetInfos[AssetInfoIdx.TSA], 14n]])],
+          [
+            addresses[2],
+            buildTokenTransferValue(8_000_000n, [
+              [assetInfos[AssetInfoIdx.PXL], 211n],
+              [assetInfos[AssetInfoIdx.Unit], 2n]
+            ])
+          ],
+          [addresses[3], buildTokenTransferValue(0n, [[assetInfos[AssetInfoIdx.PXL], 991n]])]
+        ])
+      );
+
+      expect(tokenTransfer.fromAddress).toEqual(
+        new Map([
+          [
+            addresses[0],
+            buildTokenTransferValue(-5_000_000n, [
+              [oldAssetInfos[AssetInfoIdx.PXL], -50n],
+              [oldAssetInfos[AssetInfoIdx.Unit], -25n]
+            ])
+          ],
+          [
+            addresses[1],
+            buildTokenTransferValue(0n, [
+              [oldAssetInfos[AssetInfoIdx.PXL], -1n],
+              [oldAssetInfos[AssetInfoIdx.Unit], -88n]
+            ])
+          ],
+          [addresses[2], buildTokenTransferValue(0n, [[oldAssetInfos[AssetInfoIdx.TSA], -5000n]])],
+          [
+            addresses[3],
+            buildTokenTransferValue(-1_000_000n, [
+              [oldAssetInfos[AssetInfoIdx.TSA], -2n],
+              [oldAssetInfos[AssetInfoIdx.Unit], -1108n]
+            ])
+          ]
+        ])
+      );
     });
   });
 });
