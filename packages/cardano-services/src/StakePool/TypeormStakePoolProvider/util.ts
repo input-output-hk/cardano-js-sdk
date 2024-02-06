@@ -50,9 +50,15 @@ export const stakePoolSearchSelection = [
 
 export const sortSelectionMap: { [key in SortField]: string } = {
   apy: 'metrics_ros',
+  blocks: 'metrics_minted_blocks',
   cost: 'params.cost',
   lastRos: 'metrics_last_ros',
+  liveStake: 'metrics_live_stake',
+  // PERF: this may be source of performances issue due to its complexity.
+  // In case of performances degradation we need to keep in mind this.
+  margin: "(margin->>'numerator')::numeric / (margin->>'denominator')::numeric",
   name: 'metadata.name',
+  pledge: 'params_pledge',
   ros: 'metrics_ros',
   saturation: 'metrics_live_saturation'
 };

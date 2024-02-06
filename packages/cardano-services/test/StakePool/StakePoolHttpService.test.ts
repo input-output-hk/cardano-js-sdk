@@ -445,6 +445,14 @@ describe('StakePoolHttpService', () => {
           }, dbPools.main)
         );
 
+        it.each(DbSyncStakePoolProvider.notSupportedSortFields)(
+          "Doesn't support sorting by %s",
+          async (field) =>
+            await expect(provider.queryStakePools({ pagination, sort: { field, order: 'asc' } })).rejects.toThrow(
+              `DbSyncStakePoolProvider doesn't support sort by ${field}`
+            )
+        );
+
         describe('pagination', () => {
           const baseArgs = { pagination: { limit: 2, startAt: 0 } };
 
