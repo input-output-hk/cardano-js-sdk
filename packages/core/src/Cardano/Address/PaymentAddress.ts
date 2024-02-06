@@ -7,7 +7,7 @@ import {
   assertIsBech32WithPrefix,
   assertIsHexString
 } from '@cardano-sdk/util';
-import { HydratedTx, HydratedTxIn, TxIn, TxOut } from '../types';
+import { HydratedTx, HydratedTxIn, Tx, TxIn, TxOut } from '../types';
 import { NetworkId } from '../ChainId';
 import { RewardAccount } from './RewardAccount';
 
@@ -68,11 +68,15 @@ export const isAddressWithin =
 export const inputsWithAddresses = (tx: HydratedTx, ownAddresses: PaymentAddress[]): HydratedTxIn[] =>
   tx.body.inputs.filter(isAddressWithin(ownAddresses));
 
+export type ResolveOptions = {
+  hints: Tx[];
+};
+
 /**
  * @param txIn transaction input to resolve associated txOut from
  * @returns txOut
  */
-export type ResolveInput = (txIn: TxIn) => Promise<TxOut | null>;
+export type ResolveInput = (txIn: TxIn, options?: ResolveOptions) => Promise<TxOut | null>;
 
 export interface InputResolver {
   resolveInput: ResolveInput;
