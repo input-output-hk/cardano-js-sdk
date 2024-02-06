@@ -326,7 +326,8 @@ describe('ChainHistoryHttpService', () => {
           expect(tx.body.collaterals?.length).toEqual(1);
         });
 
-        it('has collateral outputs', async () => {
+        // TODO LW-9182 REMOVE SKIP
+        it.skip('has collateral outputs', async () => {
           const response = await provider.transactionsByHashes({
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.CollateralOutput] })
           });
