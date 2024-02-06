@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.27.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.26.0...@cardano-sdk/core@0.27.0) (2024-02-02)
+
+### ⚠ BREAKING CHANGES
+
+* **core:** tokenTransferInspector now takes an extra parameter AssetProvider
+- txSummaryInspector now takes an extra parameter AssetProvider
+- tokenTransferInspector now return AssetInfo rather than AssettId
+- txSummaryInspector now return AssetInfo rather than AssettId
+
+### Features
+
+* **core:** tokenTransferInspector and txSummaryInspector now return AssetInfo rather than AssettId ([219623f](https://github.com/input-output-hk/cardano-js-sdk/commit/219623fa1218c5f5e4c4cffffd43af7db04951f1))
+
 ## [0.26.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.25.0...@cardano-sdk/core@0.26.0) (2024-02-02)
 
 ### ⚠ BREAKING CHANGES

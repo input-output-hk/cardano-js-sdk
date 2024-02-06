@@ -326,6 +326,17 @@ describe('ChainHistoryHttpService', () => {
           expect(tx.body.collaterals?.length).toEqual(1);
         });
 
+        // TODO LW-9182 REMOVE SKIP
+        it.skip('has collateral outputs', async () => {
+          const response = await provider.transactionsByHashes({
+            ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.CollateralOutput] })
+          });
+          const tx: Cardano.HydratedTx = response[0];
+          expect(response.length).toEqual(1);
+
+          expect(tx.body.collateralReturn).toMatchShapeOf(DataMocks.Tx.collateralReturn);
+        });
+
         it('has certificates', async () => {
           const response = await provider.transactionsByHashes({
             ids: await fixtureBuilder.getTxHashes(2, { with: [TxWith.DelegationCertificate] })

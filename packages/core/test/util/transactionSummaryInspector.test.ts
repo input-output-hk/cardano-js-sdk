@@ -1,5 +1,14 @@
+import * as AssetId from '../../../util-dev/src/assetId';
 import * as AssetIds from '../AssetId';
 import * as Cardano from '../../src/Cardano';
+import {
+  Asset,
+  AssetInfoWithAmount,
+  AssetProvider,
+  HealthCheckResponse,
+  createTxInspector,
+  transactionSummaryInspector
+} from '../../src';
 import {
   CertificateType,
   CredentialType,
@@ -8,13 +17,7 @@ import {
   createStakeRegistrationCert
 } from '../../src/Cardano';
 import { Ed25519KeyHashHex, Ed25519PublicKeyHex, Ed25519SignatureHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { createTxInspector, transactionSummaryInspector } from '../../src';
 import { jsonToMetadatum } from '../../src/util/metadatum';
-
-const buildValue = (coins: bigint, assets: Array<[Cardano.AssetId, bigint]>): Cardano.Value => ({
-  assets: new Map(assets),
-  coins
-});
 
 const createMockInputResolver = (historicalTxs: Cardano.HydratedTx[]): Cardano.InputResolver => ({
   async resolveInput(input: Cardano.TxIn) {
@@ -25,6 +28,20 @@ const createMockInputResolver = (historicalTxs: Cardano.HydratedTx[]): Cardano.I
     return Promise.resolve(tx.body.outputs[input.index]);
   }
 });
+
+const createMockAssetProvider = (assets: Asset.AssetInfo[]): AssetProvider => ({
+  getAsset: async ({ assetId }) =>
+    assets.find((asset) => asset.assetId === assetId) ?? Promise.reject('Asset not found'),
+  getAssets: async ({ assetIds }) => assets.filter((asset) => assetIds.includes(asset.assetId)),
+  healthCheck: async () => Promise.resolve({} as HealthCheckResponse)
+});
+
+const buildAssetInfoWithAmount = (
+  assets: Array<[Asset.AssetInfo, bigint]>
+): Map<Cardano.AssetId, AssetInfoWithAmount> =>
+  new Map<Cardano.AssetId, AssetInfoWithAmount>(
+    assets.map(([assetInfo, amount]) => [assetInfo.assetId, { amount, assetInfo }])
+  );
 
 // eslint-disable-next-line max-statements
 const externalAddress1 = Cardano.PaymentAddress(
@@ -177,6 +194,36 @@ const buildMockTx = (
     }
   } as Cardano.HydratedTx);
 
+const assetInfos = [
+  { assetId: AssetId.A, nftMetadata: { name: 'A' }, supply: 100n, tokenMetadata: null } as Asset.AssetInfo,
+  { assetId: AssetId.B, nftMetadata: { name: 'B' }, supply: 100n, tokenMetadata: null } as Asset.AssetInfo,
+  { assetId: AssetId.C, nftMetadata: { name: 'C' }, supply: 100n, tokenMetadata: null } as Asset.AssetInfo,
+  {
+    assetId: AssetId.PXL,
+    nftMetadata: { name: 'PXL' },
+    supply: 11_242_452_000n,
+    tokenMetadata: null
+  } as Asset.AssetInfo,
+  {
+    assetId: AssetId.TSLA,
+    nftMetadata: { name: 'TSLA' },
+    supply: 1_000_000n,
+    tokenMetadata: null
+  } as Asset.AssetInfo,
+  { assetId: AssetId.Unit, nftMetadata: { name: 'Unit' }, supply: 1n, tokenMetadata: null } as Asset.AssetInfo
+];
+
+const AssetInfoIdx = {
+  A: 0,
+  B: 1,
+  C: 2,
+  PXL: 3,
+  TSA: 4,
+  Unit: 5
+};
+
+const assetProvider = createMockAssetProvider(assetInfos);
+
 describe('Transaction Summary Inspector', () => {
   it('computes the correct asset and coin difference', async () => {
     // Arrange
@@ -199,9 +246,9 @@ describe('Transaction Summary Inspector', () => {
         }
       ],
       mint: new Map([
-        [Cardano.AssetId('b8fdbcbe003cef7e47eb5307d328e10191952bd02901a850699e7e3500000000000000'), 1n],
-        [Cardano.AssetId('5ba141e401cfebf1929d539e48d14f4b20679c5409526814e0f17121ffffffffffffff'), 100_000n],
-        [Cardano.AssetId('00000000000000000000000000000000000000000000000000000000aaaaaaaaaaaaaa'), -1n]
+        [AssetId.A, 1n],
+        [AssetId.B, 100_000n],
+        [AssetId.C, -1n]
       ]),
       outputs: [
         {
@@ -229,8 +276,8 @@ describe('Transaction Summary Inspector', () => {
               [AssetIds.PXL, 5n],
               [AssetIds.Unit, 5n],
               // added by mint
-              [Cardano.AssetId('b8fdbcbe003cef7e47eb5307d328e10191952bd02901a850699e7e3500000000000000'), 1n],
-              [Cardano.AssetId('5ba141e401cfebf1929d539e48d14f4b20679c5409526814e0f17121ffffffffffffff'), 100_000n]
+              [AssetId.A, 1n],
+              [AssetId.B, 100_000n]
             ]),
             coins: 6_000_000n
           }
@@ -248,7 +295,7 @@ describe('Transaction Summary Inspector', () => {
                 assets: new Map([
                   [AssetIds.TSLA, 10n],
                   // to be burned
-                  [Cardano.AssetId('00000000000000000000000000000000000000000000000000000000aaaaaaaaaaaaaa'), 1n]
+                  [AssetId.C, 1n]
                 ]),
                 coins: 9_000_000n
               }
@@ -276,6 +323,7 @@ describe('Transaction Summary Inspector', () => {
     const inspectTx = createTxInspector({
       summary: transactionSummaryInspector({
         addresses,
+        assetProvider,
         inputResolver: createMockInputResolver(histTx),
         protocolParameters,
         rewardAccounts
@@ -287,14 +335,14 @@ describe('Transaction Summary Inspector', () => {
 
     // Assert
     expect(summary).toEqual({
-      assets: buildValue(0n, [
-        [Cardano.AssetId('b8fdbcbe003cef7e47eb5307d328e10191952bd02901a850699e7e3500000000000000'), 1n],
-        [Cardano.AssetId('00000000000000000000000000000000000000000000000000000000aaaaaaaaaaaaaa'), -1n],
-        [Cardano.AssetId('5ba141e401cfebf1929d539e48d14f4b20679c5409526814e0f17121ffffffffffffff'), 100_000n],
-        [AssetIds.TSLA, -5n],
-        [AssetIds.PXL, -6n],
-        [AssetIds.Unit, -7n]
-      ]).assets,
+      assets: buildAssetInfoWithAmount([
+        [assetInfos[AssetInfoIdx.A], 1n],
+        [assetInfos[AssetInfoIdx.C], -1n],
+        [assetInfos[AssetInfoIdx.B], 100_000n],
+        [assetInfos[AssetInfoIdx.TSA], -5n],
+        [assetInfos[AssetInfoIdx.PXL], -6n],
+        [assetInfos[AssetInfoIdx.Unit], -7n]
+      ]),
       coins: -10_000_000n,
       collateral: 0n,
       deposit: 0n,
@@ -372,6 +420,7 @@ describe('Transaction Summary Inspector', () => {
     const inspectTx = createTxInspector({
       summary: transactionSummaryInspector({
         addresses,
+        assetProvider,
         inputResolver: createMockInputResolver(histTx),
         protocolParameters,
         rewardAccounts
@@ -463,6 +512,7 @@ describe('Transaction Summary Inspector', () => {
     const inspectTx = createTxInspector({
       summary: transactionSummaryInspector({
         addresses,
+        assetProvider,
         inputResolver: createMockInputResolver(histTx),
         protocolParameters,
         rewardAccounts
@@ -546,6 +596,7 @@ describe('Transaction Summary Inspector', () => {
     const inspectTx = createTxInspector({
       summary: transactionSummaryInspector({
         addresses,
+        assetProvider,
         inputResolver: createMockInputResolver(histTx),
         protocolParameters,
         rewardAccounts
@@ -612,6 +663,7 @@ describe('Transaction Summary Inspector', () => {
     const inspectTx = createTxInspector({
       summary: transactionSummaryInspector({
         addresses,
+        assetProvider,
         inputResolver: createMockInputResolver(histTx),
         protocolParameters,
         rewardAccounts
@@ -678,6 +730,7 @@ describe('Transaction Summary Inspector', () => {
     const inspectTx = createTxInspector({
       summary: transactionSummaryInspector({
         addresses,
+        assetProvider,
         inputResolver: createMockInputResolver(histTx),
         protocolParameters,
         rewardAccounts
@@ -753,6 +806,7 @@ describe('Transaction Summary Inspector', () => {
     const inspectTx = createTxInspector({
       summary: transactionSummaryInspector({
         addresses,
+        assetProvider,
         inputResolver: createMockInputResolver(histTx),
         protocolParameters,
         rewardAccounts
@@ -828,6 +882,7 @@ describe('Transaction Summary Inspector', () => {
     const inspectTx = createTxInspector({
       summary: transactionSummaryInspector({
         addresses,
+        assetProvider,
         inputResolver: createMockInputResolver(histTx),
         protocolParameters,
         rewardAccounts
@@ -914,6 +969,7 @@ describe('Transaction Summary Inspector', () => {
     const inspectTx = createTxInspector({
       summary: transactionSummaryInspector({
         addresses,
+        assetProvider,
         inputResolver: createMockInputResolver(histTx),
         protocolParameters,
         rewardAccounts
@@ -925,10 +981,10 @@ describe('Transaction Summary Inspector', () => {
 
     // Assert
     expect(summary).toEqual({
-      assets: new Map([
-        [AssetIds.TSLA, 1n],
-        [AssetIds.PXL, 1n],
-        [AssetIds.Unit, 1n]
+      assets: buildAssetInfoWithAmount([
+        [assetInfos[AssetInfoIdx.TSA], 1n],
+        [assetInfos[AssetInfoIdx.PXL], 1n],
+        [assetInfos[AssetInfoIdx.Unit], 1n]
       ]),
       coins: 100_000_000n,
       collateral: 0n,

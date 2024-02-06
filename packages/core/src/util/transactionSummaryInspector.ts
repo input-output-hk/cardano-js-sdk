@@ -1,6 +1,8 @@
 import * as Cardano from '../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
-import { AssetId } from '../Cardano';
+import { AssetId, TokenMap } from '../Cardano';
+import { AssetInfoWithAmount } from './tokenTransferInspector';
+import { AssetProvider } from '../Provider';
 import {
   AssetsMintedInspection,
   Inspector,
@@ -22,11 +24,12 @@ interface TransactionSummaryInspectorArgs {
   rewardAccounts: Cardano.RewardAccount[];
   inputResolver: Cardano.InputResolver;
   protocolParameters: Cardano.ProtocolParameters;
+  assetProvider: AssetProvider;
   dRepKeyHash?: Crypto.Ed25519KeyHashHex;
 }
 
 export type TransactionSummaryInspection = {
-  assets: Cardano.TokenMap;
+  assets: Map<Cardano.AssetId, AssetInfoWithAmount>;
   coins: Cardano.Lovelace;
   collateral: Cardano.Lovelace;
   deposit: Cardano.Lovelace;
@@ -111,6 +114,30 @@ const getUnaccountedFunds = async (
   return subtractValueQuantities([totalOutputs, totalInputs]);
 };
 
+const toAssetInfoWithAmount = async (
+  assetProvider: AssetProvider,
+  tokenMap?: TokenMap
+): Promise<Map<Cardano.AssetId, AssetInfoWithAmount>> => {
+  if (!tokenMap) return new Map();
+
+  const assetIds = tokenMap && tokenMap.size > 0 ? [...tokenMap.keys()] : [];
+  const assetInfos = new Map<Cardano.AssetId, AssetInfoWithAmount>();
+
+  if (assetIds.length > 0) {
+    const assets = await assetProvider.getAssets({
+      assetIds,
+      extraData: { nftMetadata: true, tokenMetadata: true }
+    });
+
+    for (const asset of assets) {
+      const amount = tokenMap?.get(asset.assetId) ?? 0n;
+      assetInfos.set(asset.assetId, { amount, assetInfo: asset });
+    }
+  }
+
+  return assetInfos;
+};
+
 /**
  * Inspects a transaction and produces a summary.
  *
@@ -118,7 +145,7 @@ const getUnaccountedFunds = async (
  */
 export const transactionSummaryInspector: TransactionSummaryInspector =
   (args: TransactionSummaryInspectorArgs) => async (tx) => {
-    const { inputResolver, addresses, rewardAccounts, protocolParameters, dRepKeyHash } = args;
+    const { inputResolver, addresses, rewardAccounts, protocolParameters, assetProvider, dRepKeyHash } = args;
     const resolvedInputs = await resolveInputs(tx.body.inputs, inputResolver);
     const fee = tx.body.fee;
 
@@ -142,7 +169,7 @@ export const transactionSummaryInspector: TransactionSummaryInspector =
     };
 
     return {
-      assets: diff.assets ?? new Map(),
+      assets: await toAssetInfoWithAmount(assetProvider, diff.assets),
       coins: diff.coins,
       collateral,
       deposit: implicit.deposit || 0n,
