@@ -103,6 +103,7 @@ const getUnaccountedFunds = async (
   tx: Cardano.Tx,
   resolvedInputs: ResolutionResult,
   implicitCoin: Cardano.Lovelace,
+  fee: Cardano.Lovelace,
   implicitAssets: Cardano.TokenMap = new Map()
 ): Promise<Cardano.Value> => {
   const totalInputs = totalInputsValue(resolvedInputs);
@@ -110,6 +111,7 @@ const getUnaccountedFunds = async (
 
   totalInputs.assets = coalesceTokenMaps([totalInputs.assets, implicitAssets]);
   totalInputs.coins += implicitCoin;
+  totalOutputs.coins += fee;
 
   return subtractValueQuantities([totalOutputs, totalInputs]);
 };
@@ -177,7 +179,7 @@ export const transactionSummaryInspector: TransactionSummaryInspector =
       returnedDeposit: implicit.reclaimDeposit || 0n,
       unresolved: {
         inputs: resolvedInputs.unresolvedInputs,
-        value: await getUnaccountedFunds(tx, resolvedInputs, implicitCoin, implicitAssets)
+        value: await getUnaccountedFunds(tx, resolvedInputs, implicitCoin, fee, implicitAssets)
       }
     };
   };
