@@ -12,6 +12,7 @@ import {
   ProviderError,
   ProviderFailure,
   QueryStakePoolsArgs,
+  SortField,
   StakePoolProvider,
   StakePoolStats
 } from '@cardano-sdk/core';
@@ -80,6 +81,8 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
   #responseConfig: StakePoolProviderProps['responseConfig'];
   #useBlockfrost: boolean;
 
+  static notSupportedSortFields: SortField[] = ['blocks', 'lastRos', 'liveStake', 'margin', 'pledge', 'ros'];
+
   constructor(
     { paginationPageSizeLimit, responseConfig, useBlockfrost }: StakePoolProviderProps,
     { cache, dbPools, cardanoNode, genesisData, metadataService, logger, epochMonitor }: StakePoolProviderDependencies
@@ -133,12 +136,6 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
         }
 
         return (options: QueryStakePoolsArgs) => this.#builder.queryPoolAPY(hashesIds, this.#epochLength, options);
-      case 'ros':
-        throw new ProviderError(
-          ProviderFailure.NotImplemented,
-          null,
-          'DbSyncStakePoolProvider do not support sort by ROS'
-        );
       case 'data':
       default:
         return (options: QueryStakePoolsArgs) => this.#builder.queryPoolData(updatesIds, useBlockfrost, options);
@@ -258,7 +255,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
   }
 
   public async queryStakePools(options: QueryStakePoolsArgs): Promise<Paginated<Cardano.StakePool>> {
-    const { filters, pagination, apyEpochsBackLimit = APY_EPOCHS_BACK_LIMIT_DEFAULT } = options;
+    const { filters, pagination, sort, apyEpochsBackLimit = APY_EPOCHS_BACK_LIMIT_DEFAULT } = options;
     const useBlockfrost = this.#useBlockfrost;
 
     if (pagination.limit > this.#paginationPageSizeLimit) {
@@ -276,6 +273,14 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
         `Filter identifiers of ${filters.identifier.values.length} can not be greater than ${
           this.#paginationPageSizeLimit
         }`
+      );
+    }
+
+    if (DbSyncStakePoolProvider.notSupportedSortFields.includes(sort?.field || 'name')) {
+      throw new ProviderError(
+        ProviderFailure.NotImplemented,
+        undefined,
+        `DbSyncStakePoolProvider doesn't support sort by ${sort?.field} `
       );
     }
 
