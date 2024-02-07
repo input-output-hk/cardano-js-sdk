@@ -93,7 +93,8 @@ const signSigStructure = (
   sender?: MessageSender
 ) => {
   try {
-    return witnesser.signBlob(derivationPath, util.bytesToHex(sigStructure.to_bytes()), { address, sender });
+    const payload = util.bytesToHex(sigStructure.payload());
+    return witnesser.signBlob(derivationPath, util.bytesToHex(sigStructure.to_bytes()), { address, payload, sender });
   } catch (error) {
     throw new Cip30DataSignError(Cip30DataSignErrorCode.UserDeclined, 'Failed to sign', error);
   }

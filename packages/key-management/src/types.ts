@@ -149,6 +149,8 @@ export interface SignTransactionContext {
 
 export interface SignDataContext {
   address?: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID;
+  /** Present when signing CIP-0008 structure */
+  payload?: HexBlob;
   sender?: MessageSender;
 }
 
