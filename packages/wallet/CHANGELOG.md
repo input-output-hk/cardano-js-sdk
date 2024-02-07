@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.34.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.33.1...@cardano-sdk/wallet@0.34.0) (2024-02-07)
+
+### ⚠ BREAKING CHANGES
+
+* inputResolver resolveInput function now takes an additional parameter options
+
+### Features
+
+* inputResolver resolveInput function now takes an additional parameter options ([14c486d](https://github.com/input-output-hk/cardano-js-sdk/commit/14c486dabe881cf80a924aa13e6dad9f2675a4d6))
+* **key-management:** add payload to SignDataContext when signing cip8 structure ([17a82b5](https://github.com/input-output-hk/cardano-js-sdk/commit/17a82b57ec96939dd5501e28f32cda7898533065))
+* **wallet:** added a new input resolver that fetches from the backend ([c831857](https://github.com/input-output-hk/cardano-js-sdk/commit/c831857b6117d38edaa82b8f3ce951931b5894a7))
+
 ## [0.33.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.33.0...@cardano-sdk/wallet@0.33.1) (2024-02-02)
 
 **Note:** Version bump only for package @cardano-sdk/wallet

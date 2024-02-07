@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.19.4...@cardano-sdk/key-management@0.19.5) (2024-02-07)
+
+### Features
+
+* **key-management:** add payload to SignDataContext when signing cip8 structure ([17a82b5](https://github.com/input-output-hk/cardano-js-sdk/commit/17a82b57ec96939dd5501e28f32cda7898533065))
+
 ## [0.19.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.19.3...@cardano-sdk/key-management@0.19.4) (2024-02-02)
 
 **Note:** Version bump only for package @cardano-sdk/key-management

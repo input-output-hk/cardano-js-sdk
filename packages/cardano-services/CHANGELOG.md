@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.25.4...@cardano-sdk/cardano-services@0.26.0) (2024-02-07)
+
+### ⚠ BREAKING CHANGES
+
+* add and implement new stake pool sorting options
+
+### Features
+
+* add and implement new stake pool sorting options ([bcc5e80](https://github.com/input-output-hk/cardano-js-sdk/commit/bcc5e807fb58996998c1d0065b448066fb33d946))
+* **cardano-services:** resolve collateralReturn property ([98291b5](https://github.com/input-output-hk/cardano-js-sdk/commit/98291b52ffeab7fd7c936716bdba84c8614055cf))
+
+### Bug Fixes
+
+* **cardano-services:** change log pattern match ([d1286b7](https://github.com/input-output-hk/cardano-js-sdk/commit/d1286b7c80c7482d40b72270fcb0525533407c27))
+
 ## [0.25.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.25.3...@cardano-sdk/cardano-services@0.25.4) (2024-02-02)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services

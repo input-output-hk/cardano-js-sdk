@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.27.0...@cardano-sdk/core@0.28.0) (2024-02-07)
+
+### ⚠ BREAKING CHANGES
+
+* add and implement new stake pool sorting options
+* inputResolver resolveInput function now takes an additional parameter options
+
+### Features
+
+* add and implement new stake pool sorting options ([bcc5e80](https://github.com/input-output-hk/cardano-js-sdk/commit/bcc5e807fb58996998c1d0065b448066fb33d946))
+* inputResolver resolveInput function now takes an additional parameter options ([14c486d](https://github.com/input-output-hk/cardano-js-sdk/commit/14c486dabe881cf80a924aa13e6dad9f2675a4d6))
+
 ## [0.27.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.26.0...@cardano-sdk/core@0.27.0) (2024-02-02)
 
 ### ⚠ BREAKING CHANGES
