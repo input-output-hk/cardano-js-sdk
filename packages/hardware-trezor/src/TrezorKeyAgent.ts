@@ -203,14 +203,13 @@ export class TrezorKeyAgent extends KeyAgentBase {
   }
 
   async signTransaction(
-    tx: Cardano.TxBodyWithHash,
+    { body, hash }: Cardano.TxBodyWithHash,
     { knownAddresses, txInKeyPathMap }: SignTransactionContext
   ): Promise<Cardano.Signatures> {
     try {
       await this.isTrezorInitialized;
-      const trezorTxData = txToTrezor({
+      const trezorTxData = await txToTrezor(body, {
         accountIndex: this.accountIndex,
-        cardanoTxBody: tx.body,
         chainId: this.chainId,
         knownAddresses,
         txInKeyPathMap
@@ -226,7 +225,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
 
       const expectedPublicKeys = await Promise.all(
         util
-          .ownSignatureKeyPaths(tx.body, knownAddresses, txInKeyPathMap)
+          .ownSignatureKeyPaths(body, knownAddresses, txInKeyPathMap)
           .map((derivationPath) => this.derivePublicKey(derivationPath))
       );
 
@@ -236,7 +235,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
 
       const signedData = result.payload;
 
-      if (signedData.hash !== tx.hash) {
+      if (signedData.hash !== hash) {
         throw new errors.HwMappingError('Trezor computed a different transaction id');
       }
 

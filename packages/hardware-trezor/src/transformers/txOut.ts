@@ -31,10 +31,10 @@ const toDestination: Transform<Cardano.TxOut, TrezorTxOutputDestination, TrezorT
   };
 };
 
-const getScriptHex = (output: Serialization.TransactionOutput): HexBlob | null => {
+const getScriptHex = (output: Serialization.TransactionOutput): HexBlob | undefined => {
   const scriptRef = output.scriptRef();
 
-  if (!scriptRef) return null;
+  if (!scriptRef) return undefined;
 
   return scriptRef.toCbor();
 };
@@ -69,37 +69,30 @@ const isBabbage = (out: Serialization.TransactionOutput): boolean => {
 
 const getInlineDatum = (datum: Cardano.PlutusData): string => Serialization.PlutusData.fromCore(datum).toCbor();
 
-// TODO - use Transform (@cardano-sdk/util) once it is fixed. Even if prop is marked as optional it has to be added to fullfil Transform rules e.g. datumHash
-export const toTxOut = (txOut: Cardano.TxOut, context: TrezorTxTransformerContext): Trezor.CardanoOutput => {
+export const toTxOut: Transform<Cardano.TxOut, Trezor.CardanoOutput, TrezorTxTransformerContext> = (txOut, context) => {
   const destination = toDestination(txOut, context);
   const output = Serialization.TransactionOutput.fromCore(txOut);
-  const referenceScriptHex = getScriptHex(output);
+  const scriptHex = getScriptHex(output);
 
-  const trezorTxOut = isBabbage(output)
+  return isBabbage(output)
     ? {
         ...destination,
-        ...(txOut.datumHash
-          ? { datumHash: txOut.datumHash.toString() }
-          : txOut.datum
-          ? { inlineDatum: getInlineDatum(txOut.datum) }
-          : undefined),
-        ...(referenceScriptHex && { referenceScript: referenceScriptHex }),
         amount: txOut.value.coins.toString(),
-        format: Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE
+        datumHash: txOut.datumHash?.toString(),
+        format: Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE,
+        inlineDatum: txOut.datum ? getInlineDatum(txOut.datum) : undefined,
+        referenceScript: scriptHex,
+        tokenBundle: mapTokenMap(txOut.value.assets)
       }
     : {
         ...destination,
-        ...(txOut.datumHash && { datumHash: txOut.datumHash.toString() }),
         amount: txOut.value.coins.toString(),
-        format: Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY
+        datumHash: txOut.datumHash?.toString(),
+        format: Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY,
+        inlineDatum: undefined,
+        referenceScript: undefined,
+        tokenBundle: mapTokenMap(txOut.value.assets)
       };
-
-  if (txOut.value.assets) {
-    const tokenBundle = mapTokenMap(txOut.value.assets);
-    Object.assign(trezorTxOut, { tokenBundle });
-  }
-
-  return trezorTxOut;
 };
 
 export const mapTxOuts = (txOuts: Cardano.TxOut[], context: TrezorTxTransformerContext): Trezor.CardanoOutput[] =>
