@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.28.0...@cardano-sdk/core@0.28.1) (2024-02-08)
+
+### Bug Fixes
+
+* **core:** transactionSummaryInspector now correctly accounts for transaction fees ([c55d71c](https://github.com/input-output-hk/cardano-js-sdk/commit/c55d71ce7eef58b435b26852c248d46d220e292d))
+
 ## [0.28.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.27.0...@cardano-sdk/core@0.28.0) (2024-02-07)
 
 ### ⚠ BREAKING CHANGES
