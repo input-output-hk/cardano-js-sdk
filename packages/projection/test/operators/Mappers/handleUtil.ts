@@ -17,6 +17,7 @@ export const maryAddress = Cardano.PaymentAddress(
 export const bobHandleOne = 'bob.handle.one';
 export const bobHandleTwo = 'bob.handle.two';
 export const maryHandleOne = 'mary.handle.one';
+export const invalidHandle = '@#!';
 export const virtualHandle = 'virtual@handl';
 export const NFTHandle = 'sub@handl';
 export const handleOutputs = {

@@ -1,10 +1,11 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Handle } from '@cardano-sdk/core';
 import { ProjectionEvent } from '../../../src';
 import {
   assetIdFromHandle,
   handleAssetName,
   handleOutputs,
   handlePolicyId,
+  invalidHandle,
   maryHandleOne,
   referenceNftOutput,
   userNftOutput
@@ -29,43 +30,45 @@ const project = (tx: Cardano.OnChainTx) =>
     )
   );
 
+const createCip25HandleMetadata = (handle: Handle) => ({
+  blob: new Map([
+    [
+      721n,
+      new Map<Cardano.Metadatum, Cardano.Metadatum>([
+        [
+          handlePolicyId,
+          new Map([
+            [
+              handleAssetName(handle),
+              new Map<Cardano.Metadatum, Cardano.Metadatum>([
+                ['name', `$${handle}`],
+                ['description', 'The Handle Standard'],
+                ['website', 'https://adahandle.com'],
+                ['image', 'ipfs://QmZqUk6nGqYJZzHiCGzbzqppA5qE99yNkuTSHuRQpymE1X'],
+                [
+                  'core',
+                  new Map<Cardano.Metadatum, Cardano.Metadatum>([
+                    ['og', 1n],
+                    ['termsofuse', 'https://adahandle.com/tou'],
+                    ['handleEncoding', 'utf-8'],
+                    ['prefix', '$'],
+                    ['version', 0n]
+                  ])
+                ],
+                ['augmentations', []]
+              ])
+            ]
+          ])
+        ]
+      ])
+    ]
+  ])
+});
+
 describe('withHandleMetadata', () => {
   it('maps "og" when handle is minted with cip25 metadata', async () => {
     const { handleMetadata } = await project({
-      auxiliaryData: {
-        blob: new Map([
-          [
-            721n,
-            new Map<Cardano.Metadatum, Cardano.Metadatum>([
-              [
-                handlePolicyId,
-                new Map([
-                  [
-                    handleAssetName(maryHandleOne),
-                    new Map<Cardano.Metadatum, Cardano.Metadatum>([
-                      ['name', '$mary'],
-                      ['description', 'The Handle Standard'],
-                      ['website', 'https://adahandle.com'],
-                      ['image', 'ipfs://QmZqUk6nGqYJZzHiCGzbzqppA5qE99yNkuTSHuRQpymE1X'],
-                      [
-                        'core',
-                        new Map<Cardano.Metadatum, Cardano.Metadatum>([
-                          ['og', 1n],
-                          ['termsofuse', 'https://adahandle.com/tou'],
-                          ['handleEncoding', 'utf-8'],
-                          ['prefix', '$'],
-                          ['version', 0n]
-                        ])
-                      ],
-                      ['augmentations', []]
-                    ])
-                  ]
-                ])
-              ]
-            ])
-          ]
-        ])
-      },
+      auxiliaryData: createCip25HandleMetadata(maryHandleOne),
       body: {
         mint: new Map([[assetIdFromHandle(maryHandleOne), 1n]]),
         outputs: [handleOutputs.oneHandleMary]
@@ -75,6 +78,18 @@ describe('withHandleMetadata', () => {
     expect(handleMetadata).toHaveLength(1);
     expect(handleMetadata[0].og).toBe(true);
     expect(handleMetadata[0].txOut).toBeUndefined();
+  });
+
+  it('ignores handles with invalid name', async () => {
+    const { handleMetadata } = await project({
+      auxiliaryData: createCip25HandleMetadata(invalidHandle),
+      body: {
+        mint: new Map([[assetIdFromHandle(invalidHandle), 1n]]),
+        outputs: [handleOutputs.oneHandleMary]
+      }
+    } as Cardano.OnChainTx);
+
+    expect(handleMetadata).toHaveLength(0);
   });
 
   describe('cip68', () => {
