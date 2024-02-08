@@ -11,13 +11,13 @@ describe('HandleProvider', () => {
   it('resolves handle', async () => {
     const policyPath = path.join(__dirname, '../../local-network/sdk-ipc/handle_policy_ids');
     const policyId = fs.readFileSync(policyPath, 'utf8').toString().trim();
-    const handleName = 'HelloHandle'; // handle minted in mint-handles.sh
-    const handleName2 = 'TestHandle';
+    const handleName = 'hellohandle'; // handle minted in mint-handles.sh
+    const handleName2 = 'testhandle';
     const config = { baseUrl: env.HANDLE_PROVIDER_PARAMS.baseUrl, logger };
     const handleProvider = handleHttpProvider(config);
     const handle = await handleProvider.resolveHandles({ handles: [handleName, handleName2] });
     expect(handle.length).toEqual(2);
-    expect(handle[0]?.handle).toEqual('HelloHandle');
+    expect(handle[0]?.handle).toEqual('hellohandle');
     expect(handle[0]?.hasDatum).toEqual(false);
     expect(handle[0]?.policyId).toEqual(policyId);
     expect(handle[0]?.resolvedAt).toBeDefined();

@@ -69,7 +69,7 @@ describe('TypeormAssetProvider', () => {
     });
 
     it('should throw an error if the asset does not exist', async () => {
-      const assetId = Cardano.AssetId('64190c10b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a48656c6c6f48616e646c65');
+      const assetId = Cardano.AssetId('64190c10b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a68656c6c6f68616e646c65');
       await expect(provider.getAsset({ assetId })).rejects.toThrowError(ProviderError);
     });
 
@@ -124,7 +124,7 @@ describe('TypeormAssetProvider', () => {
     it('Should throw error when one of the assetIds does not exist', async () => {
       const testAssets = await fixtureBuilder.getAssets(1);
       const invalidAssetId = Cardano.AssetId(
-        '64190c10b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a48656c6c6f48616e646c65'
+        '64190c10b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a68656c6c6f68616e646c65'
       );
       const assetIds = [...testAssets.map((asset) => asset.assetId), invalidAssetId];
       await expect(provider.getAssets({ assetIds })).rejects.toThrowError(ProviderError);
