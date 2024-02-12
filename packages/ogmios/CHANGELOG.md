@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.15](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.15.14...@cardano-sdk/ogmios@0.15.15) (2024-02-12)
+
+### Features
+
+* **ogmios:** bypass handle validation when no handle provider is set ([06d41c6](https://github.com/input-output-hk/cardano-js-sdk/commit/06d41c6f801631f13c1c852d4502ed79b6781188))
+
+## [0.15.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.15.13...@cardano-sdk/ogmios@0.15.14) (2024-02-08)
+
+**Note:** Version bump only for package @cardano-sdk/ogmios
+
+## [0.15.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.15.12...@cardano-sdk/ogmios@0.15.13) (2024-02-07)
+
+**Note:** Version bump only for package @cardano-sdk/ogmios
+
 ## [0.15.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.15.11...@cardano-sdk/ogmios@0.15.12) (2024-02-02)
 
 **Note:** Version bump only for package @cardano-sdk/ogmios

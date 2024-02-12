@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, util } from '@cardano-sdk/core';
 import { TypeOrmNftMetadataService, createDnsResolver, getConnectionConfig, getEntities } from '../../src';
 import { logger, mockProviders } from '@cardano-sdk/util-dev';
 
@@ -31,11 +31,12 @@ describe('TypeOrmNftMetadataService', () => {
   });
 
   describe('existing nft', () => {
-    const helloHandleAssetId = Cardano.AssetId(
-      '62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a48656c6c6f48616e646c65'
+    const helloHandleAssetId = Cardano.AssetId.fromParts(
+      Cardano.PolicyId('62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a'),
+      Cardano.AssetName(util.utf8ToHex('hellohandle'))
     );
     const testHandleAssetId = Cardano.AssetId(
-      '62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a5465737448616e646c65'
+      '62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a7465737468616e646c65'
     );
 
     const helloHandleOtherProperties = new Map<string, string | Array<string> | Map<string, string | bigint>>([
@@ -62,7 +63,7 @@ describe('TypeOrmNftMetadataService', () => {
       const response = {
         description: 'The Handle Standard',
         image: 'ipfs://some-hash',
-        name: 'HelloHandle',
+        name: 'hellohandle',
         otherProperties: helloHandleOtherProperties
       };
 

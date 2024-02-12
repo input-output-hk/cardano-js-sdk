@@ -35,12 +35,12 @@ spec:
         - name: POSTGRES_DB_DB_SYNC
           value: cardano
         - name: POSTGRES_HOST_DB_SYNC
-          value: dev-preview-dbsync-db
+          value: dev-preview-postgresql
         - name: POSTGRES_PASSWORD_DB_SYNC
           valueFrom:
             secretKeyRef:
               key: password
-              name: cardano-owner-user.dev-preview-dbsync-db.credentials.postgresql.acid.zalan.do
+              name: cardano-owner-user.dev-preview-postgresql.credentials.postgresql.acid.zalan.do
         - name: POSTGRES_PORT_DB_SYNC
           value: "5432"
         - name: POSTGRES_SSL_CA_FILE_DB_SYNC
@@ -51,7 +51,7 @@ spec:
           valueFrom:
             secretKeyRef:
               key: username
-              name: cardano-owner-user.dev-preview-dbsync-db.credentials.postgresql.acid.zalan.do
+              name: cardano-owner-user.dev-preview-postgresql.credentials.postgresql.acid.zalan.do
         image: 926093910549.dkr.ecr.us-east-1.amazonaws.com/cardano-services:hkysmjx503aiijb33cw929p6zmbvlp8d
         livenessProbe:
           httpGet:
@@ -78,11 +78,6 @@ spec:
       imagePullSecrets:
       - name: dockerconfigjson
       volumes:
-      - csi:
-          driver: csi.cert-manager.io
-          readOnly: true
-          volumeAttributes:
-            csi.cert-manager.io/issuer-kind: ClusterIssuer
-            csi.cert-manager.io/issuer-name: root-ca
-            csi.cert-manager.io/key-usages: client auth
-        name: tls
+        - name: tls
+          secret:
+            secretName: postgresql-server-cert

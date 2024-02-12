@@ -82,11 +82,8 @@ export class NodeTxSubmitProvider implements TxSubmitProvider {
   async #throwIfHandleResolutionConflict(context: SubmitTxArgs['context']): Promise<void> {
     if (context?.handleResolutions && context.handleResolutions.length > 0) {
       if (!this.#handleProvider) {
-        throw new ProviderError(
-          ProviderFailure.NotImplemented,
-          undefined,
-          'No HandleProvider was set during construction.'
-        );
+        this.#logger.debug('No handle provider: bypassing handle validation');
+        return;
       }
 
       const handleInfoList = await this.#handleProvider.resolveHandles({

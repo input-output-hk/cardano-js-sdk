@@ -1,5 +1,6 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
 import { Buffer } from 'buffer';
+import { CIP67Assets, withCIP67, withHandles, withMint, withUtxo } from '../../../src/operators/Mappers';
 import { Mappers, ProjectionEvent } from '../../../src';
 import {
   NFTSubHandleOutput,
@@ -7,8 +8,10 @@ import {
   bobAddress,
   bobHandleOne,
   bobHandleTwo,
+  handleDatum,
   handleOutputs,
   handlePolicyId,
+  invalidHandle,
   maryAddress,
   maryHandleOne,
   referenceNftOutput,
@@ -19,7 +22,6 @@ import {
 } from './handleUtil';
 import { firstValueFrom, of } from 'rxjs';
 import { logger, mockProviders } from '@cardano-sdk/util-dev';
-import { withCIP67, withHandles, withMint, withUtxo } from '../../../src/operators/Mappers';
 
 type In = Mappers.WithMint & Mappers.WithCIP67 & Mappers.WithNftMetadata;
 
@@ -174,8 +176,23 @@ describe('withHandles', () => {
   });
 
   describe('assets with invalid asset names', () => {
-    const invalidAssetName = Asset.AssetNameLabel.encode(Cardano.AssetName('abc'), Asset.AssetNameLabelNum.UserFT);
+    const invalidAssetName = Cardano.AssetName(Buffer.from(invalidHandle, 'utf8').toString('hex'));
     const invalidAssetId = Cardano.AssetId.fromParts(handlePolicyId, invalidAssetName);
+    const decodedInvalidAssetName = Cardano.AssetName(Buffer.from(`${invalidHandle}other`, 'utf8').toString('hex'));
+    const invalidAssetCip67AssetName = Asset.AssetNameLabel.encode(
+      decodedInvalidAssetName,
+      Asset.AssetNameLabelNum.UserNFT
+    );
+    const invalidAssetCip67ReferenceNftAssetName = Asset.AssetNameLabel.encode(
+      decodedInvalidAssetName,
+      Asset.AssetNameLabelNum.ReferenceNFT
+    );
+    const invalidCip67AssetId = Cardano.AssetId.fromParts(handlePolicyId, invalidAssetCip67AssetName);
+    const invalidCip67ReferenceNftAssetId = Cardano.AssetId.fromParts(
+      handlePolicyId,
+      invalidAssetCip67ReferenceNftAssetName
+    );
+
     const outputsWithInvalidHandles = {
       invalidAssetName: {
         address: 'addr_test1vptwv4jvaqt635jvthpa29lww3vkzypm8l6vk4lv4tqfhhgajdgwf',
@@ -184,14 +201,55 @@ describe('withHandles', () => {
           coins: 1n
         }
       },
-      oneValidAndOneInvalidAssetName: {
-        address: 'addr_test1vptwv4jvaqt635jvthpa29lww3vkzypm8l6vk4lv4tqfhhgajdgwf',
+      oneValidTwoInvalidAssetName: {
+        address: Cardano.PaymentAddress('addr_test1vptwv4jvaqt635jvthpa29lww3vkzypm8l6vk4lv4tqfhhgajdgwf'),
+        datum: handleDatum,
         value: {
           assets: new Map([
             [invalidAssetId, 1n],
-            [assetIdFromHandle(bobHandleTwo), 1n]
-          ])
+            [assetIdFromHandle(bobHandleTwo), 1n],
+            [invalidCip67AssetId, 1n],
+            [invalidCip67ReferenceNftAssetId, 1n]
+          ]),
+          coins: 123n
         }
+      }
+    };
+
+    const txId = Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000');
+    const utxo: [Cardano.TxIn, Cardano.TxOut] = [
+      { index: 0, txId },
+      outputsWithInvalidHandles.oneValidTwoInvalidAssetName
+    ];
+    const userNftCip67Asset = {
+      assetId: invalidCip67ReferenceNftAssetId,
+      assetName: invalidAssetCip67ReferenceNftAssetName,
+      decoded: {
+        content: decodedInvalidAssetName,
+        label: Asset.AssetNameLabelNum.ReferenceNFT
+      },
+      policyId: handlePolicyId,
+      utxo
+    };
+    const referenceNftCip67Asset = {
+      assetId: invalidCip67AssetId,
+      assetName: invalidAssetCip67AssetName,
+      decoded: {
+        content: decodedInvalidAssetName,
+        label: Asset.AssetNameLabelNum.UserNFT
+      },
+      policyId: handlePolicyId,
+      utxo
+    };
+
+    const cip67: CIP67Assets = {
+      byAssetId: {
+        [invalidAssetCip67ReferenceNftAssetName]: userNftCip67Asset,
+        [invalidCip67AssetId]: referenceNftCip67Asset
+      },
+      byLabel: {
+        [Asset.AssetNameLabelNum.UserNFT]: [userNftCip67Asset],
+        [Asset.AssetNameLabelNum.ReferenceNFT]: [referenceNftCip67Asset]
       }
     };
 
@@ -222,12 +280,12 @@ describe('withHandles', () => {
           body: [
             {
               body: {
-                outputs: [outputsWithInvalidHandles.oneValidAndOneInvalidAssetName]
+                outputs: [outputsWithInvalidHandles.oneValidTwoInvalidAssetName]
               }
             }
           ]
         },
-        cip67: { byAssetId: {}, byLabel: {} }
+        cip67
       } as ProjectionEvent<In>);
 
       const { handles } = await firstValueFrom(
@@ -243,7 +301,7 @@ describe('withHandles', () => {
           body: [
             {
               body: {
-                outputs: [outputsWithInvalidHandles.oneValidAndOneInvalidAssetName]
+                outputs: [outputsWithInvalidHandles.oneValidTwoInvalidAssetName]
               }
             },
             {
@@ -253,7 +311,7 @@ describe('withHandles', () => {
             }
           ]
         },
-        cip67: { byAssetId: {}, byLabel: {} }
+        cip67
       } as ProjectionEvent<In>);
 
       const { handles } = await firstValueFrom(

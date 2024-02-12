@@ -2,6 +2,12 @@
 name: STD
 on:
   workflow_dispatch:
+    inputs:
+      deploy:
+        description: Deploy to dev-preview
+        type: boolean
+        required: true
+        default: false
   workflow_call:
   pull_request:
     branches:
@@ -11,6 +17,8 @@ on:
     branches:
       - master
       - conway-era
+    tags:
+      - '@cardano-sdk/cardano-services**'
 env:
   AWS_REGION: us-east-1
   AWS_ROLE_ARN: arn:aws:iam::926093910549:role/lace-ci
@@ -53,35 +61,12 @@ jobs:
       - uses: divnix/std-action/discover@main
         with: {ffBuildInstructions: true}
         id: discovery
-  build:
-    needs: discover
-    name: ${{ matrix.target.jobName }}
-    runs-on: ubuntu-latest
-    if: fromJSON(needs.discover.outputs.hits).packages.build != '{}'
-    strategy:
-      matrix:
-        target: ${{ fromJSON(needs.discover.outputs.hits).packages.build }}
-    steps:
-      - uses: nixbuild/nix-quick-install-action@v25
-      - uses: nixbuild/nixbuild-action@v17
-        with:
-          nixbuild_ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          generate_summary_for: job
-      - uses: divnix/std-action/setup-discovery-ssh@main
-        with:
-          ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          user_name: ${{ env.DISCOVERY_USER_NAME }}
-          ssh_known_hosts_entry: ${{ env.DISCOVERY_KNOWN_HOSTS_ENTRY }}
-      - name: Show commit
-        shell: bash
-        run: |
-          echo commit: ${{ github.sha }}
-      - uses: divnix/std-action/run@main
-        with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
+
+
   images:
     name: ${{ matrix.target.jobName }}
     runs-on: ubuntu-latest
-    needs: [discover, build]
+    needs: discover
     if: fromJSON(needs.discover.outputs.hits).oci-images.publish != '{}'
     strategy:
       matrix:
@@ -111,12 +96,14 @@ jobs:
           echo commit: ${{ github.sha }}
       - uses: divnix/std-action/run@main
         with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
+
+
   diff-to-eu:
     runs-on: ubuntu-latest
     needs: [discover, images]
-    name: ${{ matrix.target.jobName }} (eu-central-1)
+    name: ${{ matrix.target.jobName }} (us-east-1)
     env:
-      AWS_REGION: eu-central-1
+      AWS_REGION: us-east-1
     permissions:
       id-token: write
       contents: read
@@ -144,8 +131,8 @@ jobs:
       - name: Configure K8S Cluster Access
         shell: bash
         run: |
-          echo "Assuming role '$(aws sts get-caller-identity)' in cluster 'lace-prod-eu-central-1'."
-          aws eks update-kubeconfig --name "lace-prod-eu-central-1"
+          echo "Assuming role '$(aws sts get-caller-identity)' in cluster 'lace-dev-us-east-1'."
+          aws eks update-kubeconfig --name "lace-dev-us-east-1"
       - name: Show commit
         shell: bash
         run: |
@@ -156,12 +143,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           OWNER_AND_REPO: ${{ github.repository }}
         with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
+
+
   deploy-to-eu:
     runs-on: ubuntu-latest
     needs: [discover, images]
-    name: ${{ matrix.target.jobName }} (eu-central-1)
+    name: ${{ matrix.target.jobName }} (us-east-1)
     env:
-      AWS_REGION: eu-central-1
+      AWS_REGION: us-east-1
     permissions:
       id-token: write
       contents: read
@@ -171,7 +160,7 @@ jobs:
       url: https://backend.dev-preview.eks.lw.iog.io
     # Boolean input should be compared with string until https://github.com/actions/runner/issues/2238 resolved
     if: >
-      fromJSON(needs.discover.outputs.hits).deployments.apply != '{}' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+      fromJSON(needs.discover.outputs.hits).deployments.apply != '{}' && ((github.event_name == 'push' && github.ref == 'refs/heads/master') || inputs.deploy)
 
     strategy:
       matrix:
@@ -195,8 +184,8 @@ jobs:
       - name: Configure K8S Cluster Access
         shell: bash
         run: |
-          echo "Assuming role '$(aws sts get-caller-identity)' in cluster 'lace-prod-eu-central-1'."
-          aws eks update-kubeconfig --name "lace-prod-eu-central-1"
+          echo "Assuming role '$(aws sts get-caller-identity)' in cluster 'lace-dev-us-east-1'."
+          aws eks update-kubeconfig --name "lace-dev-us-east-1"
       - name: Show commit
         shell: bash
         run: |

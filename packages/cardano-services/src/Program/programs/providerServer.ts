@@ -317,7 +317,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
         ? getSubmitApiProvider()
         : new NodeTxSubmitProvider({
             cardanoNode: getOgmiosObservableCardanoNode(dnsResolver, logger, args),
-            handleProvider: await getHandleProvider(),
+            handleProvider: args.submitValidateHandles ? await getHandleProvider() : undefined,
             logger
           });
       return new TxSubmitHttpService({ logger, txSubmitProvider });

@@ -302,16 +302,25 @@ describe.skip('Service dependency abstractions', () => {
         });
 
         it.skip('throws a provider error if the submitted transaction does not contain addresses that can be resolved from the included context', async () => {
-          // const provider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
-          //   ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
-          // });
+          // const provider = await getOgmiosTxSubmitProvider(
+          //  dnsResolver,
+          //  logger,
+          //  {
+          //    ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
+          //  },
+          //  {
+          //    getPolicyIds: async () => [],
+          //    healthCheck: async () => ({ ok: true }),
+          //    resolveHandles: async ({ handles }) => handles.map(() => null)
+          //  }
+          // );
           // await provider.initialize();
           // await provider.start();
           // await expect(
-          //   provider.submitTx({
-          //     context: { handleResolutions: [handleProviderMocks.getWrongHandleProviderResponse] },
-          //     signedTransaction: bufferToHexString(Buffer.from(new Uint8Array([])))
-          //   })
+          //  provider.submitTx({
+          //    context: { handleResolutions: [handleProviderMocks.getWrongHandleProviderResponse] },
+          //    signedTransaction: bufferToHexString(Buffer.from(new Uint8Array([])))
+          //  })
           // ).rejects.toBeInstanceOf(ProviderError);
           // await provider.shutdown();
         });

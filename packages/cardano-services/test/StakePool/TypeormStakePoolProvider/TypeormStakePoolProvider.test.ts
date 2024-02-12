@@ -780,6 +780,125 @@ describe('TypeormStakePoolProvider', () => {
               expect(response.pageResults[0].metrics?.ros).toEqual(expectedRos.min);
             });
           });
+
+          describe('sort by margin', () => {
+            let margins: Cardano.Fraction[] = [];
+
+            beforeAll(() => {
+              margins = poolsInfo
+                .map(({ margin }) => margin)
+                .sort((a, b) => (a.numerator / a.denominator < b.numerator / b.denominator ? -1 : 1));
+            });
+
+            it('desc order', async () => {
+              const { pageResults } = await provider.queryStakePools(
+                setSortCondition({ pagination }, 'desc', 'margin')
+              );
+
+              expect(pageResults.map(({ margin }) => margin)).toEqual(
+                margins
+                  .map((_) => _)
+                  .reverse()
+                  .splice(0, 10)
+              );
+            });
+
+            it('asc order', async () => {
+              const { pageResults } = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'margin'));
+
+              expect(pageResults.map(({ margin }) => margin)).toEqual(margins.map((_) => _).splice(0, 10));
+            });
+          });
+
+          describe('sort by pledge', () => {
+            let pledges: bigint[] = [];
+
+            beforeAll(() => {
+              pledges = poolsInfo.map(({ pledge }) => BigInt(pledge)).sort((a, b) => (a < b ? -1 : 1));
+            });
+
+            it('desc order', async () => {
+              const { pageResults } = await provider.queryStakePools(
+                setSortCondition({ pagination }, 'desc', 'pledge')
+              );
+
+              expect(pageResults.map(({ pledge }) => pledge)).toEqual(
+                pledges
+                  .map((_) => _)
+                  .reverse()
+                  .splice(0, 10)
+              );
+            });
+
+            it('asc order', async () => {
+              const { pageResults } = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'pledge'));
+
+              expect(pageResults.map(({ pledge }) => pledge)).toEqual(pledges.map((_) => _).splice(0, 10));
+            });
+          });
+
+          describe('sort by blocks', () => {
+            let blocks: number[] = [];
+
+            beforeAll(() => {
+              blocks = poolsInfoWithMetrics.map((_) => _.blocks).sort((a, b) => (a < b ? -1 : 1));
+            });
+
+            it('desc order', async () => {
+              const { pageResults } = await provider.queryStakePools(
+                setSortCondition({ pagination }, 'desc', 'blocks')
+              );
+
+              expect(pageResults.map(({ metrics }) => metrics!.blocksCreated)).toEqual(
+                blocks
+                  .map((_) => _)
+                  .reverse()
+                  .splice(0, 10)
+              );
+            });
+
+            it('asc order', async () => {
+              const { pageResults } = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'blocks'));
+
+              expect(pageResults.map(({ metrics }) => metrics!.blocksCreated)).toEqual(
+                blocks.filter((_) => _ !== null).splice(0, 10)
+              );
+            });
+          });
+
+          describe('sort by liveStake', () => {
+            let pledges: bigint[] = [];
+
+            beforeAll(() => {
+              pledges = poolsInfoWithMetrics
+                .filter(({ stake }) => stake !== null)
+                .map(({ stake }) => BigInt(stake))
+                .sort((a, b) => (a < b ? -1 : 1));
+            });
+
+            it('desc order', async () => {
+              const { pageResults } = await provider.queryStakePools(
+                setSortCondition({ pagination }, 'desc', 'liveStake')
+              );
+
+              expect(pageResults.map(({ metrics }) => metrics!.stake.live)).toEqual(
+                pledges
+                  .map((_) => _)
+                  .reverse()
+                  .splice(0, 10)
+              );
+            });
+
+            it('asc order', async () => {
+              const { pageResults } = await provider.queryStakePools(
+                setSortCondition({ pagination }, 'asc', 'liveStake')
+              );
+
+              expect(pageResults.map(({ metrics }) => metrics!.stake.live)).toEqual(
+                pledges.map((_) => _).splice(0, 10)
+              );
+            });
+          });
         });
       });
 

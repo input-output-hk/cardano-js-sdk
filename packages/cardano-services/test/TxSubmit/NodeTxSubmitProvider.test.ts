@@ -80,23 +80,6 @@ describe('NodeTxSubmitProvider', () => {
           })
         );
       });
-
-      it('throws when submitting transaction with handles context', async () => {
-        await expect(
-          provider.submitTx({
-            context: {
-              handleResolutions: [mockHandleResolution]
-            },
-            signedTransaction: emptyUintArrayAsHexString
-          })
-        ).rejects.toThrowError(
-          expect.objectContaining({
-            name: ProviderError.name,
-            reason: ProviderFailure.NotImplemented
-          })
-        );
-        expect(cardanoNode.submitTx).not.toBeCalled();
-      });
     });
 
     describe('healthCheck', () => {

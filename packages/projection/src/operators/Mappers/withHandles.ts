@@ -27,18 +27,18 @@ export interface WithHandles {
   handles: HandleOwnership[];
 }
 
-const assetIdToUTF8Handle = (assetId: Cardano.AssetId, cip67Asset: CIP67Asset | undefined) => {
+const assetIdToUTF8Handle = (assetId: Cardano.AssetId, cip67Asset: CIP67Asset | undefined, logger: Logger) => {
   if (cip67Asset) {
     if (
       cip67Asset.decoded.label === Asset.AssetNameLabelNum.UserNFT ||
       cip67Asset.decoded.label === Asset.AssetNameLabelNum.VirtualHandle
     ) {
-      return Cardano.AssetName.toUTF8(cip67Asset.decoded.content);
+      return assetNameToUTF8Handle(cip67Asset.decoded.content, logger);
     }
     // Ignore all but UserNFT cip67 assets
     return null;
   }
-  return assetNameToUTF8Handle(Cardano.AssetId.getAssetName(assetId));
+  return assetNameToUTF8Handle(Cardano.AssetId.getAssetName(assetId), logger);
 };
 
 const getHandleMetadata = (handleDataFields: Cardano.PlutusList, logger: Logger) => {
@@ -83,7 +83,8 @@ const tryCreateHandleOwnership = (
   try {
     const cip67Asset = cip67Assets.byAssetId[assetId];
 
-    const handle = assetIdToUTF8Handle(assetId, cip67Asset);
+    const handle = assetIdToUTF8Handle(assetId, cip67Asset, logger);
+    if (!handle) return;
     const subhandleProps: Partial<HandleOwnership> = {};
     if (handle) {
       if (handle.includes('@')) {

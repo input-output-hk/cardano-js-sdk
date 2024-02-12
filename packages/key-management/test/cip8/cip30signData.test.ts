@@ -17,6 +17,7 @@ import { HexBlob } from '@cardano-sdk/util';
 import { testAsyncKeyAgent, testKeyAgent } from '../mocks';
 
 describe('cip30signData', () => {
+  const payload = HexBlob('abc123');
   const addressDerivationPath = { index: 0, type: AddressType.External };
   let keyAgent: KeyAgent;
   let witnesser: Bip32Ed25519Witnesser;
@@ -39,7 +40,7 @@ describe('cip30signData', () => {
   ) => {
     const dataSignature = await cip8.cip30signData({
       knownAddresses,
-      payload: HexBlob('abc123'),
+      payload,
       sender,
       signWith,
       witnesser
@@ -113,6 +114,10 @@ describe('cip30signData', () => {
     const signBlobSpy = jest.spyOn(witnesser, 'signBlob');
     const sender = { url: 'https://lace.io' };
     await signAndDecode(address.address, [address], sender);
-    expect(signBlobSpy).toBeCalledWith(expect.anything(), expect.anything(), { address: address.address, sender });
+    expect(signBlobSpy).toBeCalledWith(expect.anything(), expect.anything(), {
+      address: address.address,
+      payload,
+      sender
+    });
   });
 });

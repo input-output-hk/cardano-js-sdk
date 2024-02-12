@@ -363,9 +363,9 @@ addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlzgq5zda4g
 --
 
 COPY public.asset (id, supply, first_mint_block_slot, nft_metadata_id) FROM stdin;
-62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a5465737448616e646c65	1	1324	1
-62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a48656c6c6f48616e646c65	1	1324	2
-62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a446f75626c6548616e646c65	2	1324	3
+62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a7465737468616e646c65	1	1324	1
+62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a68656c6c6f68616e646c65	1	1324	2
+62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a646f75626c6568616e646c65	2	1324	3
 62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a283232322968616e646c653638	1	1337	\N
 62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a000643b068616e646c6532	1	23249	\N
 62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a000de14068616e646c6532	1	23249	4
@@ -2984,8 +2984,8 @@ handle1	addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlz
 handl	addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlzgq5zda4gtv8k9cy38756r9y3qgmkqqjz6aa7	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a	t	handl	handl	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a000de14068616e646c	\N
 sub@handl	addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlzgq5zda4gtv8k9cy38756r9y3qgmkqqjz6aa7	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a	t	handl	handl	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a000de1407375624068616e646c	handl
 virtual@handl	addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlzgq5zda4gtv8k9cy38756r9y3qgmkqqjz6aa7	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a	f	handl	handl	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a000000007669727475616c4068616e646c	handl
-HelloHandle	addr_test1qr0c3frkem9cqn5f73dnvqpena27k2fgqew6wct9eaka03agfwkvzr0zyq7nqvcj24zehrshx63zzdxv24x3a4tcnfeq9zwmn7	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a	f	TestHandle	TestHandle	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a48656c6c6f48616e646c65	\N
-TestHandle	addr_test1qr0c3frkem9cqn5f73dnvqpena27k2fgqew6wct9eaka03agfwkvzr0zyq7nqvcj24zehrshx63zzdxv24x3a4tcnfeq9zwmn7	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a	f	TestHandle	TestHandle	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a5465737448616e646c65	\N
+hellohandle	addr_test1qr0c3frkem9cqn5f73dnvqpena27k2fgqew6wct9eaka03agfwkvzr0zyq7nqvcj24zehrshx63zzdxv24x3a4tcnfeq9zwmn7	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a	f	testhandle	testhandle	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a68656c6c6f68616e646c65	\N
+testhandle	addr_test1qr0c3frkem9cqn5f73dnvqpena27k2fgqew6wct9eaka03agfwkvzr0zyq7nqvcj24zehrshx63zzdxv24x3a4tcnfeq9zwmn7	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a	f	testhandle	testhandle	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a7465737468616e646c65	\N
 \.
 
 
@@ -2994,9 +2994,9 @@ TestHandle	addr_test1qr0c3frkem9cqn5f73dnvqpena27k2fgqew6wct9eaka03agfwkvzr0zyq7
 --
 
 COPY public.handle_metadata (id, handle, og, profile_pic_image, background_image, output_id, block_slot) FROM stdin;
-1	TestHandle	f	\N	\N	\N	1324
-2	HelloHandle	f	\N	\N	\N	1324
-3	DoubleHandle	f	\N	\N	\N	1324
+1	testhandle	f	\N	\N	\N	1324
+2	hellohandle	f	\N	\N	\N	1324
+3	doublehandle	f	\N	\N	\N	1324
 4	handle2	f	ipfs://QmWgjXCxVUSWPy1WmUV3joPP1sZMvZ71so6qy6C2ZukRBD	ipfs://QmY6XiqBr9JNnuguTRsx3ocvkQemNJ5iCRMie85wqz94Jo	6	23249
 5	handle1	f	\N	\N	\N	23249
 \.
@@ -3007,9 +3007,9 @@ COPY public.handle_metadata (id, handle, og, profile_pic_image, background_image
 --
 
 COPY public.nft_metadata (id, name, description, image, media_type, files, type, other_properties, user_token_asset_id, parent_asset_id, created_at_slot) FROM stdin;
-1	TestHandle	The Handle Standard	ipfs://some-hash	image/jpeg	[{"src": "ipfs://Qmb78QQ4RXxKQrteRn4X3WaMXXfmi2BU2dLjfWxuJoF2N5", "name": "some name", "mediaType": "video/mp4"}, {"src": "ipfs://Qmb78QQ4RXxKQrteRn4X3WaMXXfmi2BU2dLjfWxuJoF2Ny", "name": "some name", "mediaType": "audio/mpeg"}]	CIP-0025	{"value": [["augmentations", []], ["core", {"value": [["handleEncoding", "utf-8"], ["og", {"value": "0", "__type": "bigint"}], ["prefix", "$"], ["termsofuse", "https://cardanofoundation.org/en/terms-and-conditions/"], ["version", {"value": "0", "__type": "bigint"}]], "__type": "Map"}], ["website", "https://cardano.org/"]], "__type": "Map"}	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a5465737448616e646c65	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a5465737448616e646c65	1324
-2	HelloHandle	The Handle Standard	ipfs://some-hash	\N	\N	CIP-0025	{"value": [["augmentations", []], ["core", {"value": [["handleEncoding", "utf-8"], ["og", {"value": "0", "__type": "bigint"}], ["prefix", "$"], ["termsofuse", "https://cardanofoundation.org/en/terms-and-conditions/"], ["version", {"value": "0", "__type": "bigint"}]], "__type": "Map"}], ["website", "https://cardano.org/"]], "__type": "Map"}	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a48656c6c6f48616e646c65	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a48656c6c6f48616e646c65	1324
-3	DoubleHandle	The Handle Standard	ipfs://some-hash	\N	\N	CIP-0025	{"value": [["augmentations", []], ["core", {"value": [["handleEncoding", "utf-8"], ["og", {"value": "0", "__type": "bigint"}], ["prefix", "$"], ["termsofuse", "https://cardanofoundation.org/en/terms-and-conditions/"], ["version", {"value": "0", "__type": "bigint"}]], "__type": "Map"}], ["website", "https://cardano.org/"]], "__type": "Map"}	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a446f75626c6548616e646c65	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a446f75626c6548616e646c65	1324
+1	testhandle	The Handle Standard	ipfs://some-hash	image/jpeg	[{"src": "ipfs://Qmb78QQ4RXxKQrteRn4X3WaMXXfmi2BU2dLjfWxuJoF2N5", "name": "some name", "mediaType": "video/mp4"}, {"src": "ipfs://Qmb78QQ4RXxKQrteRn4X3WaMXXfmi2BU2dLjfWxuJoF2Ny", "name": "some name", "mediaType": "audio/mpeg"}]	CIP-0025	{"value": [["augmentations", []], ["core", {"value": [["handleEncoding", "utf-8"], ["og", {"value": "0", "__type": "bigint"}], ["prefix", "$"], ["termsofuse", "https://cardanofoundation.org/en/terms-and-conditions/"], ["version", {"value": "0", "__type": "bigint"}]], "__type": "Map"}], ["website", "https://cardano.org/"]], "__type": "Map"}	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a7465737468616e646c65	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a7465737468616e646c65	1324
+2	hellohandle	The Handle Standard	ipfs://some-hash	\N	\N	CIP-0025	{"value": [["augmentations", []], ["core", {"value": [["handleEncoding", "utf-8"], ["og", {"value": "0", "__type": "bigint"}], ["prefix", "$"], ["termsofuse", "https://cardanofoundation.org/en/terms-and-conditions/"], ["version", {"value": "0", "__type": "bigint"}]], "__type": "Map"}], ["website", "https://cardano.org/"]], "__type": "Map"}	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a68656c6c6f68616e646c65	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a68656c6c6f68616e646c65	1324
+3	doublehandle	The Handle Standard	ipfs://some-hash	\N	\N	CIP-0025	{"value": [["augmentations", []], ["core", {"value": [["handleEncoding", "utf-8"], ["og", {"value": "0", "__type": "bigint"}], ["prefix", "$"], ["termsofuse", "https://cardanofoundation.org/en/terms-and-conditions/"], ["version", {"value": "0", "__type": "bigint"}]], "__type": "Map"}], ["website", "https://cardano.org/"]], "__type": "Map"}	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a646f75626c6568616e646c65	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a646f75626c6568616e646c65	1324
 4	$pharmers2	\N	ipfs://zdj7WmoZ6Vy5d3K6uqBSRZPRzSebVxbL2n1WAQNAX3oLaWeYt	image/jpeg	\N	CIP-0068	{"value": [["og", {"value": "0", "__type": "bigint"}], ["og_number", {"value": "0", "__type": "bigint"}], ["rarity", "basic"], ["length", {"value": "9", "__type": "bigint"}], ["characters", "letters,numbers"], ["numeric_modifiers", ""], ["version", {"value": "1", "__type": "bigint"}]], "__type": "Map"}	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a000de14068616e646c6532	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a000643b068616e646c6532	23249
 5	$handle1	The Handle Standard	ipfs://some-hash	\N	\N	CIP-0025	{"value": [["augmentations", []], ["core", {"value": [["handleEncoding", "utf-8"], ["og", {"value": "0", "__type": "bigint"}], ["prefix", "$"], ["termsofuse", "https://cardanofoundation.org/en/terms-and-conditions/"], ["version", {"value": "0", "__type": "bigint"}]], "__type": "Map"}], ["website", "https://cardano.org/"]], "__type": "Map"}	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a68616e646c6531	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a68616e646c6531	23249
 \.
@@ -3073,16 +3073,16 @@ COPY public.stake_key_registration (id, stake_key_hash, block_slot) FROM stdin;
 --
 
 COPY public.tokens (id, quantity, asset_id, output_id) FROM stdin;
-1	2	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a446f75626c6548616e646c65	1
-2	1	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a48656c6c6f48616e646c65	1
-3	1	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a5465737448616e646c65	1
+1	2	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a646f75626c6568616e646c65	1
+2	1	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a68656c6c6f68616e646c65	1
+3	1	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a7465737468616e646c65	1
 4	1	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a283232322968616e646c653638	2
-8	2	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a446f75626c6548616e646c65	4
-9	1	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a48656c6c6f48616e646c65	4
-10	1	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a5465737448616e646c65	4
-11	2	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a446f75626c6548616e646c65	5
-12	1	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a48656c6c6f48616e646c65	5
-13	1	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a5465737448616e646c65	5
+8	2	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a646f75626c6568616e646c65	4
+9	1	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a68656c6c6f68616e646c65	4
+10	1	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a7465737468616e646c65	4
+11	2	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a646f75626c6568616e646c65	5
+12	1	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a68656c6c6f68616e646c65	5
+13	1	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a7465737468616e646c65	5
 14	1	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a000643b068616e646c6532	6
 15	1	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a000de14068616e646c6532	6
 16	1	62173b90b567ad4bcf254ad0f76eb374d749d0b25fd82786af6a839a68616e646c6531	6

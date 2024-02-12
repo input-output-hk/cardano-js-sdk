@@ -2,8 +2,8 @@
 
 source $(dirname $0)/common.sh
 
-handleNames=("HelloHandle" "TestHandle" "DoubleHandle")
-handleHexes=("48656c6c6f48616e646c65" "5465737448616e646c65" "446f75626c6548616e646c65")
+handleNames=("hellohandle" "testhandle" "doublehandle")
+handleHexes=("68656c6c6f68616e646c65" "7465737468616e646c65" "646f75626c6568616e646c65")
 
 # addr, payment.skey and payment.vkey are generated from mnemonic
 # vacant violin soft weird deliver render brief always monitor general maid smart jelly core drastic erode echo there clump dizzy card filter option defense

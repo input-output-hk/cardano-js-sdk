@@ -118,6 +118,8 @@ const auxiliaryData = {
   scripts: [mockScript2]
 };
 
+const fee = 170_000n;
+
 const buildMockTx = (
   args: {
     inputs?: Cardano.HydratedTxIn[];
@@ -143,7 +145,7 @@ const buildMockTx = (
       certificates: args.certificates,
       collateralReturn: args.collateralReturn ?? undefined,
       collaterals: args.collaterals ?? undefined,
-      fee: 170_000n,
+      fee,
       inputs: args.inputs ?? [
         {
           address: addresses[0],
@@ -255,7 +257,7 @@ describe('Transaction Summary Inspector', () => {
           address: externalAddress1,
           value: {
             assets: new Map([[AssetIds.TSLA, 5n]]),
-            coins: 5_000_000n
+            coins: 5_000_000n - fee // In this TX the fee is coming out of one of the external addresses.
           }
         },
         {
@@ -346,7 +348,7 @@ describe('Transaction Summary Inspector', () => {
       coins: -10_000_000n,
       collateral: 0n,
       deposit: 0n,
-      fee: 170_000n,
+      fee,
       returnedDeposit: 0n,
       unresolved: {
         inputs: [],
@@ -382,7 +384,7 @@ describe('Transaction Summary Inspector', () => {
           address: addresses[0],
           value: {
             assets: new Map([[AssetIds.TSLA, 5n]]),
-            coins: 5_000_000n
+            coins: 5_000_000n - fee // In this TX the fee is coming out of one of our own addresses.
           }
         }
       ]
@@ -433,10 +435,10 @@ describe('Transaction Summary Inspector', () => {
     // Assert
     expect(summary).toEqual({
       assets: new Map(),
-      coins: 0n,
+      coins: -fee,
       collateral: 10_000_000n,
       deposit: 0n,
-      fee: 170_000n,
+      fee,
       returnedDeposit: 0n,
       unresolved: {
         inputs: [],
@@ -473,7 +475,7 @@ describe('Transaction Summary Inspector', () => {
           address: addresses[0],
           value: {
             assets: new Map([[AssetIds.TSLA, 5n]]),
-            coins: 27_000_000n
+            coins: 27_000_000n - fee // In this TX the fee is coming out of one of our own addresses.
           }
         }
       ],
@@ -525,10 +527,10 @@ describe('Transaction Summary Inspector', () => {
     // Assert
     expect(summary).toEqual({
       assets: new Map(),
-      coins: 0n,
+      coins: -fee,
       collateral: 25_000_000n,
       deposit: 0n,
-      fee: 170_000n,
+      fee,
       returnedDeposit: 0n,
       unresolved: {
         inputs: [],
@@ -564,7 +566,7 @@ describe('Transaction Summary Inspector', () => {
           address: addresses[0],
           value: {
             assets: new Map([[AssetIds.TSLA, 5n]]),
-            coins: 5_000_000n
+            coins: 5_000_000n - fee // In this TX the fee is coming out of one of our own addresses.
           }
         }
       ]
@@ -609,10 +611,10 @@ describe('Transaction Summary Inspector', () => {
     // Assert
     expect(summary).toEqual({
       assets: new Map(),
-      coins: 0n,
+      coins: -fee,
       collateral: 5_000_000n,
       deposit: 0n,
-      fee: 170_000n,
+      fee,
       returnedDeposit: 0n,
       unresolved: {
         inputs: [],
@@ -637,7 +639,7 @@ describe('Transaction Summary Inspector', () => {
           address: addresses[0],
           value: {
             assets: new Map([[AssetIds.TSLA, 5n]]),
-            coins: 3_000_000n
+            coins: 3_000_000n - fee // In this TX the fee is coming out of one of our own addresses.
           }
         }
       ]
@@ -676,10 +678,10 @@ describe('Transaction Summary Inspector', () => {
     // Assert
     expect(summary).toEqual({
       assets: new Map(),
-      coins: -2_000_000n,
+      coins: -2_000_000n - fee,
       collateral: 0n,
       deposit: 2_000_000n,
-      fee: 170_000n,
+      fee,
       returnedDeposit: 0n,
       unresolved: {
         inputs: [],
@@ -704,7 +706,7 @@ describe('Transaction Summary Inspector', () => {
           address: addresses[0],
           value: {
             assets: new Map([[AssetIds.TSLA, 5n]]),
-            coins: 5_000_000n
+            coins: 5_000_000n - fee // In this TX the fee is coming out of one of our own addresses.
           }
         }
       ]
@@ -743,10 +745,10 @@ describe('Transaction Summary Inspector', () => {
     // Assert
     expect(summary).toEqual({
       assets: new Map(),
-      coins: 2_000_000n,
+      coins: 2_000_000n - fee,
       collateral: 0n,
       deposit: 0n,
-      fee: 170_000n,
+      fee,
       returnedDeposit: 2_000_000n,
       unresolved: {
         inputs: [],
@@ -780,7 +782,7 @@ describe('Transaction Summary Inspector', () => {
           address: addresses[0],
           value: {
             assets: new Map([[AssetIds.TSLA, 5n]]),
-            coins: 5_000_000n
+            coins: 5_000_000n - fee // In this TX the fee is coming out of one of our own addresses.
           }
         }
       ]
@@ -819,10 +821,10 @@ describe('Transaction Summary Inspector', () => {
     // Assert
     expect(summary).toEqual({
       assets: new Map(),
-      coins: -15_000_000n,
+      coins: -15_000_000n - fee,
       collateral: 0n,
       deposit: 15_000_000n,
-      fee: 170_000n,
+      fee,
       returnedDeposit: 0n,
       unresolved: {
         inputs: [],
@@ -856,7 +858,7 @@ describe('Transaction Summary Inspector', () => {
           address: addresses[0],
           value: {
             assets: new Map([[AssetIds.TSLA, 5n]]),
-            coins: 20_000_000n
+            coins: 20_000_000n - fee // In this TX the fee is coming out of one of our own addresses.
           }
         }
       ]
@@ -895,10 +897,10 @@ describe('Transaction Summary Inspector', () => {
     // Assert
     expect(summary).toEqual({
       assets: new Map(),
-      coins: 15_000_000n,
+      coins: 15_000_000n - fee,
       collateral: 0n,
       deposit: 0n,
-      fee: 170_000n,
+      fee,
       returnedDeposit: 15_000_000n,
       unresolved: {
         inputs: [],
@@ -932,7 +934,7 @@ describe('Transaction Summary Inspector', () => {
           address: addresses[0],
           value: {
             assets: new Map([[AssetIds.TSLA, 5n]]),
-            coins: 20_000_000n
+            coins: 20_000_000n - fee // In this TX the fee is coming out of one of our own addresses.
           }
         },
         {
@@ -986,10 +988,10 @@ describe('Transaction Summary Inspector', () => {
         [assetInfos[AssetInfoIdx.PXL], 1n],
         [assetInfos[AssetInfoIdx.Unit], 1n]
       ]),
-      coins: 100_000_000n,
+      coins: 100_000_000n - fee,
       collateral: 0n,
       deposit: 0n,
-      fee: 170_000n,
+      fee,
       returnedDeposit: 0n,
       unresolved: {
         inputs: [

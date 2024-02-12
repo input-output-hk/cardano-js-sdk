@@ -311,6 +311,18 @@ addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon
     false
   ),
   newOption(
+    '--submit-validate-handles <true/false>',
+    ProviderServerOptionDescriptions.SubmitValidateHandles,
+    'SUBMIT_VALIDATE_HANDLES',
+    (submitValidateHandles) =>
+      stringOptionToBoolean(
+        submitValidateHandles,
+        Programs.ProviderServer,
+        ProviderServerOptionDescriptions.SubmitValidateHandles
+      ),
+    false
+  ),
+  newOption(
     '--pagination-page-size-limit <paginationPageSizeLimit>',
     ProviderServerOptionDescriptions.PaginationPageSizeLimit,
     'PAGINATION_PAGE_SIZE_LIMIT',

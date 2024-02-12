@@ -438,8 +438,9 @@ describe('PersonalWallet methods', () => {
     it('passes through context to witnesser', async () => {
       const sender = { url: 'https://lace.io' };
       const signBlobSpy = jest.spyOn(witnesser, 'signBlob');
-      await wallet.signData({ payload: HexBlob('abc123'), sender, signWith: address });
-      expect(signBlobSpy).toBeCalledWith(expect.anything(), expect.anything(), { address, sender });
+      const payload = HexBlob('abc123');
+      await wallet.signData({ payload, sender, signWith: address });
+      expect(signBlobSpy).toBeCalledWith(expect.anything(), expect.anything(), { address, payload, sender });
     });
 
     test('rejects if bech32 DRepID is not a type 6 address', async () => {

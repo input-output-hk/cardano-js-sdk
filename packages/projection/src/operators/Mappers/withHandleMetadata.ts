@@ -73,8 +73,8 @@ const getHandleMetadata = (
     .map(({ nftMetadata, userTokenAssetId, referenceTokenAssetId, extra }): HandleMetadata | undefined => {
       const cip67Asset = referenceTokenAssetId && cip67Assets.byAssetId[referenceTokenAssetId];
       const handle = cip67Asset
-        ? assetNameToUTF8Handle(cip67Asset!.decoded.content)
-        : assetNameToUTF8Handle(Cardano.AssetId.getAssetName(userTokenAssetId));
+        ? assetNameToUTF8Handle(cip67Asset!.decoded.content, logger)
+        : assetNameToUTF8Handle(Cardano.AssetId.getAssetName(userTokenAssetId), logger);
       if (!handle) return;
       return {
         handle,
