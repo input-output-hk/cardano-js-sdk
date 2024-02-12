@@ -4,26 +4,39 @@ const validHandles = [
   'bob',
   'a',
   'alice',
+  '_',
   'test-handle',
   'test.handle',
-  'test-handle-123',
-  'test-handle-123.456',
+  'test-handle.123',
   'handle_name',
   'handle_name',
-  '@alice',
-  'test-@handle'
+  'a@alice',
+  'alice@a',
+  'test-@handle',
+  // Exists on mainnet
+  '0|0'
 ];
 
 const invalidHandles = [
+  'Alice',
   'bob!',
   '$wallet',
   'alice@',
+  '@alice',
   'test*handle#2',
   'lace&bob',
   'ada%1_test',
   'lace ',
-  'wallet ',
-  'sub@sub@handle'
+  'wallet|',
+  'comma,',
+  'comma,@sub',
+  'sub@comma,',
+  '\n',
+  '\r',
+  ' ',
+  'sub@sub@handle',
+  // too long
+  'test-handle-123.456'
 ];
 
 describe('isValidHandle', () => {
