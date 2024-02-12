@@ -16,6 +16,7 @@
 A suite of TypeScript packages suitable for both Node.js and browser-based development.
 
 - [@cardano-sdk/core](./packages/core)
+- [@cardano-sdk/crypto](./packages/crypto)
 - [@cardano-sdk/input-selection](./packages/input-selection)
 - [@cardano-sdk/dapp-connector](./packages/dapp-connector)
 - [@cardano-sdk/governance](./packages/governance)
