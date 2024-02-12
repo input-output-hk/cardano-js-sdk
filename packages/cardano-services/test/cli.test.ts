@@ -1486,6 +1486,27 @@ describe('CLI', () => {
               await assertServiceHealthy(apiUrl, services.txSubmit, lastBlock, { withTip: false });
             });
 
+            it('exposes a HTTP server with /tx-submit/health endpoint when SUBMIT_VALIDATE_HANDLES is true', async () => {
+              proc = withLogging(
+                fork(exePath, ['start-provider-server'], {
+                  env: {
+                    API_URL: apiUrl,
+                    CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
+                    DB_CACHE_TTL: dbCacheTtl,
+                    HANDLE_POLICY_IDS,
+                    LOGGER_MIN_SEVERITY: 'error',
+                    OGMIOS_URL: ogmiosConnection.address.webSocket,
+                    POSTGRES_CONNECTION_STRING_HANDLE: postgresConnectionStringHandle,
+                    SERVICE_NAMES: `${ServiceNames.TxSubmit}`,
+                    SUBMIT_VALIDATE_HANDLES: 'true'
+                  },
+                  stdio: 'pipe'
+                })
+              );
+
+              await assertServiceHealthy(apiUrl, services.txSubmit, lastBlock, { withTip: false });
+            });
+
             it('tx-submit uses the default Ogmios configuration if not specified when using env variables', async () => {
               proc = withLogging(
                 fork(exePath, ['start-provider-server'], {
@@ -1494,7 +1515,6 @@ describe('CLI', () => {
                     HANDLE_POLICY_IDS,
                     HANDLE_PROVIDER_SERVER_URL,
                     LOGGER_MIN_SEVERITY: 'error',
-                    POSTGRES_CONNECTION_STRING_HANDLE: postgresConnectionStringHandle,
                     SERVICE_NAMES: ServiceNames.TxSubmit
                   },
                   stdio: 'pipe'

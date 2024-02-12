@@ -308,9 +308,18 @@ describe('Service dependency abstractions', () => {
         });
 
         it('throws a provider error if the submitted transaction does not contain addresses that can be resolved from the included context', async () => {
-          const provider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
-            ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
-          });
+          const provider = await getOgmiosTxSubmitProvider(
+            dnsResolver,
+            logger,
+            {
+              ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
+            },
+            {
+              getPolicyIds: async () => [],
+              healthCheck: async () => ({ ok: true }),
+              resolveHandles: async ({ handles }) => handles.map(() => null)
+            }
+          );
           await provider.initialize();
           await provider.start();
 

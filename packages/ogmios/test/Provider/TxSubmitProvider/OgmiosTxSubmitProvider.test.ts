@@ -137,25 +137,6 @@ describe('OgmiosTxSubmitProvider', () => {
       );
     });
 
-    it('throws an error if context has handles, and no handleProvider is passed', async () => {
-      mockServer = createMockOgmiosServer({
-        submitTx: { response: { failWith: { type: 'eraMismatch' }, success: false } }
-      });
-      await listenPromise(mockServer, connection.port);
-      provider = new OgmiosTxSubmitProvider(connection, { logger });
-      await provider.initialize();
-      await provider.start();
-
-      await expect(
-        provider.submitTx({
-          context: {
-            handleResolutions: [mockHandleResolution]
-          },
-          signedTransaction: emptyUintArrayAsHexString
-        })
-      ).rejects.toThrowError(/not_implemented/i);
-    });
-
     it('does not throw an error if handles resolve to same addresses as in context', async () => {
       mockServer = createMockOgmiosServer({ submitTx: { response: { success: true } } });
       await listenPromise(mockServer, connection.port);
