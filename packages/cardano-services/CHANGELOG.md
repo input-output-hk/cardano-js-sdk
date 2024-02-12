@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.26.1...@cardano-sdk/cardano-services@0.26.2) (2024-02-12)
+
+### Features
+
+* **cardano-services:** add an explicit option for tx-submit provider handle validation ([01938a2](https://github.com/input-output-hk/cardano-js-sdk/commit/01938a2bd69b0710f204d33b0a783e865b6652b9))
+
+### Bug Fixes
+
+* **core:** update isValidHandle RegExp to match ADA Handle rules ([78f7f35](https://github.com/input-output-hk/cardano-js-sdk/commit/78f7f35cb86cec921b13d006c8a314530a09d55e))
+
 ## [0.26.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.26.0...@cardano-sdk/cardano-services@0.26.1) (2024-02-08)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services
