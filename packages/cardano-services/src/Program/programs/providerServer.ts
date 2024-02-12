@@ -315,7 +315,12 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     [ServiceNames.TxSubmit]: async () => {
       const txSubmitProvider = args.useSubmitApi
         ? getSubmitApiProvider()
-        : await getOgmiosTxSubmitProvider(dnsResolver, logger, args, await getHandleProvider());
+        : await getOgmiosTxSubmitProvider(
+            dnsResolver,
+            logger,
+            args,
+            args.submitValidateHandles ? await getHandleProvider() : undefined
+          );
       return new TxSubmitHttpService({ logger, txSubmitProvider });
     }
   };
