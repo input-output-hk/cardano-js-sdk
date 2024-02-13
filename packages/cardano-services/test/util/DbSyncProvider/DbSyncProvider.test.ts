@@ -1,11 +1,9 @@
-import { Connection, createConnectionObject } from '@cardano-ogmios/client';
+import { CardanoNode, HealthCheckResponse, Provider } from '@cardano-sdk/core';
 import { DbPools, DbSyncProvider, DbSyncProviderDependencies } from '../../../src/util';
 import { HEALTH_RESPONSE_BODY } from '../../../../ogmios/test/mocks/util';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
-import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
+import { OgmiosCardanoNode, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import { Pool, QueryResult } from 'pg';
-import { Provider } from '@cardano-sdk/core';
-import { getRandomPort } from 'get-port-please';
 import { dummyLogger as logger } from 'ts-log';
 
 const someError = new Error('Some error');
@@ -32,11 +30,24 @@ jest.mock('pg', () => ({
   }))
 }));
 
-// TODO: refactor these tests to use a mock CardanoNode instead of OgmiosCardanoNode
-describe.skip('DbSyncProvider', () => {
+let mockHealthResponse: HealthCheckResponse;
+jest.mock('@cardano-sdk/ogmios', () => ({
+  ...jest.requireActual('@cardano-sdk/ogmios'),
+  OgmiosCardanoNode: jest.fn().mockImplementation(() => ({
+    healthCheck: jest.fn((): ReturnType<CardanoNode['healthCheck']> => Promise.resolve(mockHealthResponse)),
+    initialize: jest.fn().mockResolvedValue(true),
+    shutdown: jest.fn().mockResolvedValue(true)
+  }))
+}));
+
+describe('DbSyncProvider', () => {
+  beforeEach(() => {
+    mockHealthResponse = { localNode: {}, ok: true };
+  });
+
   describe('healthCheck', () => {
     let cardanoNode: OgmiosCardanoNode;
-    let connection: Connection;
+    const ogmiosUrl = new URL('http://dummy');
     let dbPools: DbPools;
     let provider: DbSyncSomeProvider;
     const cache = { db: new InMemoryCache(UNLIMITED_CACHE_TTL), healthCheck: new InMemoryCache(UNLIMITED_CACHE_TTL) };
@@ -44,7 +55,7 @@ describe.skip('DbSyncProvider', () => {
     beforeEach(async () => {
       cache.db.clear();
       cache.healthCheck.clear();
-      connection = createConnectionObject({ port: await getRandomPort() });
+
       dbPools = {
         healthCheck: new Pool(),
         main: new Pool()
@@ -52,7 +63,6 @@ describe.skip('DbSyncProvider', () => {
     });
 
     afterEach(async () => {
-      // await serverClosePromise(mockServer);
       jest.clearAllMocks();
     });
 
@@ -69,12 +79,10 @@ describe.skip('DbSyncProvider', () => {
             }
           ]
         });
-        cardanoNode = new OgmiosCardanoNode(connection, logger);
+        cardanoNode = new OgmiosCardanoNode(urlToConnectionConfig(ogmiosUrl), logger);
       });
 
       it('is ok when node is healthy', async () => {
-        // mockServer = healthyMockOgmios();
-        // await listenPromise(mockServer, connection.port);
         provider = new DbSyncSomeProvider({ cache, cardanoNode, dbPools, logger });
         const res = await provider.healthCheck();
         expect(res.ok).toEqual(true);
@@ -85,8 +93,6 @@ describe.skip('DbSyncProvider', () => {
       it('caches the node health and projected tip', async () => {
         const healthCheckCacheSetSpy = jest.spyOn(cache.healthCheck, 'set');
         provider = new DbSyncSomeProvider({ cache, cardanoNode, dbPools, logger });
-        // mockServer = healthyMockOgmios();
-        // await listenPromise(mockServer, connection.port);
 
         expect(cache.healthCheck.keys()).toEqual([]);
         const res1 = await provider.healthCheck();
@@ -103,9 +109,7 @@ describe.skip('DbSyncProvider', () => {
       });
 
       it('is not ok when node is unhealthy', async () => {
-        // mockServer = unhealthyMockOgmios();
-        // await listenPromise(mockServer, connection.port);
-        cardanoNode = new OgmiosCardanoNode(connection, logger);
+        mockHealthResponse = { ok: false };
         provider = new DbSyncSomeProvider({ cache, cardanoNode, dbPools, logger });
         const res = await provider.healthCheck();
         expect(res.ok).toEqual(false);
@@ -120,9 +124,6 @@ describe.skip('DbSyncProvider', () => {
       });
 
       it('is not ok when the node is healthy', async () => {
-        // mockServer = healthyMockOgmios();
-        // await listenPromise(mockServer, connection.port);
-        cardanoNode = new OgmiosCardanoNode(connection, logger);
         provider = new DbSyncSomeProvider({ cache, cardanoNode, dbPools, logger });
         const res = await provider.healthCheck();
         expect(res.ok).toEqual(false);
@@ -131,9 +132,7 @@ describe.skip('DbSyncProvider', () => {
       });
 
       it('is not ok when the node is unhealthy', async () => {
-        // mockServer = unhealthyMockOgmios();
-        // await listenPromise(mockServer, connection.port);
-        cardanoNode = new OgmiosCardanoNode(connection, logger);
+        mockHealthResponse = { ok: false };
         provider = new DbSyncSomeProvider({ cache, cardanoNode, dbPools, logger });
         const res = await provider.healthCheck();
         expect(res.ok).toEqual(false);
