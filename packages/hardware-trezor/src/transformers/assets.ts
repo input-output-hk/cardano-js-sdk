@@ -1,5 +1,6 @@
 import * as Trezor from '@trezor/connect';
 import { Cardano } from '@cardano-sdk/core';
+import { Transform } from '@cardano-sdk/util';
 
 const compareAssetNameCanonically = (a: Trezor.CardanoToken, b: Trezor.CardanoToken) => {
   if (a.assetNameBytes.length === b.assetNameBytes.length) {
@@ -12,7 +13,7 @@ const comparePolicyIdCanonically = (a: Trezor.CardanoAssetGroup, b: Trezor.Carda
   // PolicyId is always of the same length
   a.policyId > b.policyId ? 1 : -1;
 
-const tokenMapToAssetGroup = (tokenMap: Cardano.TokenMap, isMint: boolean): Trezor.CardanoAssetGroup[] => {
+const tokenMapToAssetGroup: Transform<Cardano.TokenMap, Trezor.CardanoAssetGroup[]> = (tokenMap, isMint) => {
   const map = new Map<string, Array<Trezor.CardanoToken>>();
 
   for (const [key, value] of tokenMap.entries()) {

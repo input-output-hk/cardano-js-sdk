@@ -1,13 +1,13 @@
 import * as Trezor from '@trezor/connect';
 import { Cardano } from '@cardano-sdk/core';
-import { InvalidArgumentError } from '@cardano-sdk/util';
+import { InvalidArgumentError, Transform } from '@cardano-sdk/util';
 import { TrezorTxTransformerContext } from '../types';
 import { resolveStakeKeyPath } from './keyPaths';
 
-export const toTrezorWithdrawal = (
-  withdrawal: Cardano.Withdrawal,
-  context: TrezorTxTransformerContext
-): Trezor.CardanoWithdrawal => {
+export const toTrezorWithdrawal: Transform<Cardano.Withdrawal, Trezor.CardanoWithdrawal, TrezorTxTransformerContext> = (
+  withdrawal,
+  context
+) => {
   const address = Cardano.Address.fromString(withdrawal.stakeAddress);
   const rewardAddress = address?.asReward();
 
@@ -22,19 +22,25 @@ export const toTrezorWithdrawal = (
    * - The script hash, blake2b-224 hash digests of serialized monetary scripts.
    */
   if (rewardAddress.getPaymentCredential().type === Cardano.CredentialType.KeyHash) {
-    const keyPath = resolveStakeKeyPath(rewardAddress, context);
+    const keyPath = context?.knownAddresses ? resolveStakeKeyPath(rewardAddress, context.knownAddresses) : null;
     trezorWithdrawal = keyPath
       ? {
           amount: withdrawal.quantity.toString(),
-          path: keyPath
+          keyHash: undefined,
+          path: keyPath,
+          scriptHash: undefined
         }
       : {
           amount: withdrawal.quantity.toString(),
-          keyHash: rewardAddress.getPaymentCredential().hash.toString()
+          keyHash: rewardAddress.getPaymentCredential().hash.toString(),
+          path: undefined,
+          scriptHash: undefined
         };
   } else {
     trezorWithdrawal = {
       amount: withdrawal.quantity.toString(),
+      keyHash: undefined,
+      path: undefined,
       scriptHash: rewardAddress.getPaymentCredential().hash.toString()
     };
   }
@@ -43,6 +49,7 @@ export const toTrezorWithdrawal = (
 };
 
 export const mapWithdrawals = (
-  withdrawals: Cardano.Withdrawal[],
+  withdrawals: Cardano.Withdrawal[] | undefined,
   context: TrezorTxTransformerContext
-): Trezor.CardanoWithdrawal[] => withdrawals.map((coreWithdrawal) => toTrezorWithdrawal(coreWithdrawal, context));
+): Trezor.CardanoWithdrawal[] | undefined =>
+  withdrawals ? withdrawals.map((coreWithdrawal) => toTrezorWithdrawal(coreWithdrawal, context)) : undefined;

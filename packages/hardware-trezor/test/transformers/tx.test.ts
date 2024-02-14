@@ -17,16 +17,9 @@ import { txToTrezor } from '../../src/transformers/tx';
 
 describe('tx', () => {
   describe('txToTrezor', () => {
-    test('can map min valid transaction', () => {
-      expect(
-        txToTrezor({
-          ...contextWithoutKnownAddresses,
-          cardanoTxBody: minValidTxBody
-        })
-      ).toEqual({
+    test('can map min valid transaction', async () => {
+      expect(await txToTrezor(minValidTxBody, contextWithoutKnownAddresses)).toEqual({
         additionalWitnessRequests: [],
-        auxiliaryData: undefined,
-        certificates: [],
         fee: '10',
         inputs: [
           {
@@ -34,7 +27,6 @@ describe('tx', () => {
             prev_index: txIn.index
           }
         ],
-        mint: undefined,
         networkId: 0,
         outputs: [
           {
@@ -44,18 +36,14 @@ describe('tx', () => {
             format: Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY
           }
         ],
-        protocolMagic: 999,
-        ttl: undefined,
-        validityIntervalStart: undefined,
-        withdrawals: []
+        protocolMagic: 999
       });
     });
 
-    test('can map transaction without scripts', () => {
+    test('can map transaction without scripts', async () => {
       expect(
-        txToTrezor({
+        await txToTrezor(txBody, {
           ...contextWithKnownAddresses,
-          cardanoTxBody: txBody,
           txInKeyPathMap: { [TxInId(txBody.inputs[0])]: knownAddressPaymentKeyPath }
         })
       ).toEqual({
@@ -208,11 +196,10 @@ describe('tx', () => {
       });
     });
 
-    test('can map babbage transaction with scripts', () => {
+    test('can map babbage transaction with scripts', async () => {
       expect(
-        txToTrezor({
+        await txToTrezor(babbageTxBodyWithScripts, {
           ...contextWithKnownAddresses,
-          cardanoTxBody: babbageTxBodyWithScripts,
           txInKeyPathMap: {
             [TxInId(babbageTxBodyWithScripts.inputs[0])]: knownAddressPaymentKeyPath
           }
@@ -294,16 +281,9 @@ describe('tx', () => {
       });
     });
 
-    test('can map transaction with collaterals', () => {
-      expect(
-        txToTrezor({
-          ...contextWithoutKnownAddresses,
-          cardanoTxBody: txBodyWithCollaterals
-        })
-      ).toEqual({
+    test('can map transaction with collaterals', async () => {
+      expect(await txToTrezor(txBodyWithCollaterals, contextWithoutKnownAddresses)).toEqual({
         additionalWitnessRequests: [],
-        auxiliaryData: undefined,
-        certificates: [],
         collateralInputs: [
           {
             prev_hash: txIn.txId,
@@ -323,7 +303,6 @@ describe('tx', () => {
             prev_index: txIn.index
           }
         ],
-        mint: undefined,
         networkId: 0,
         outputs: [
           {
@@ -333,18 +312,14 @@ describe('tx', () => {
             format: Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY
           }
         ],
-        protocolMagic: 999,
-        ttl: undefined,
-        validityIntervalStart: undefined,
-        withdrawals: []
+        protocolMagic: 999
       });
     });
 
-    test('can map plutus transaction with babbage elements', () => {
+    test('can map plutus transaction with babbage elements', async () => {
       expect(
-        txToTrezor({
+        await txToTrezor(plutusTxWithBabbage, {
           ...contextWithKnownAddresses,
-          cardanoTxBody: plutusTxWithBabbage,
           txInKeyPathMap: {
             [TxInId(plutusTxWithBabbage.inputs[0])]: knownAddressPaymentKeyPath,
             [TxInId(plutusTxWithBabbage.collaterals[0])]: knownAddressPaymentKeyPath
