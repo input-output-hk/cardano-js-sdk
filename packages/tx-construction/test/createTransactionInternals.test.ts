@@ -38,7 +38,7 @@ describe('createTransactionInternals', () => {
     });
     const ledgerTip = await provider.ledgerTip();
     const overrides = props(result.selection);
-    return await createTransactionInternals({
+    return createTransactionInternals({
       validityInterval: {
         invalidHereafter: Cardano.Slot(ledgerTip.slot + 3600)
       },

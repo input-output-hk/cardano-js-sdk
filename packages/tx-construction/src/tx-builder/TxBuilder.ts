@@ -8,8 +8,8 @@ import {
   util
 } from '@cardano-sdk/key-management';
 import { Cardano, HandleProvider, HandleResolution, metadatum } from '@cardano-sdk/core';
-import { GreedyInputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
 import {
+  CustomizeCb,
   InsufficientRewardAccounts,
   OutOfSyncRewardAccounts,
   OutputBuilderTxOut,
@@ -23,6 +23,7 @@ import {
   TxOutValidationError,
   UnsignedTx
 } from './types';
+import { GreedyInputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { OutputBuilderValidator, TxOutputBuilder } from './OutputBuilder';
 import { RewardAccountWithPoolId } from '../types';
@@ -102,6 +103,7 @@ export class GenericTxBuilder implements TxBuilder {
   #logger: Logger;
   #handleProvider?: HandleProvider;
   #handleResolutions: HandleResolution[];
+  #customizeCb: CustomizeCb;
 
   constructor(dependencies: TxBuilderDependencies) {
     this.#outputValidator =
@@ -194,6 +196,11 @@ export class GenericTxBuilder implements TxBuilder {
     return this;
   }
 
+  customize(cb: CustomizeCb): TxBuilder {
+    this.#customizeCb = cb;
+    return this;
+  }
+
   build(): UnsignedTx {
     return new LazyTxSigner({
       builder: {
@@ -250,6 +257,7 @@ export class GenericTxBuilder implements TxBuilder {
               {
                 auxiliaryData,
                 certificates: this.partialTxBody.certificates,
+                customizeCb: this.#customizeCb,
                 handleResolutions: this.#handleResolutions,
                 outputs: new Set(this.partialTxBody.outputs || []),
                 signingOptions: partialSigningOptions,

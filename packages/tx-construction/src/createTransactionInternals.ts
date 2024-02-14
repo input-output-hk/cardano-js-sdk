@@ -1,6 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, Serialization, util } from '@cardano-sdk/core';
 import { SelectionResult } from '@cardano-sdk/input-selection';
+import { TxBodyPreInputSelection } from './types';
 
 export type CreateTxInternalsProps = {
   inputSelection: SelectionResult['selection'];
@@ -14,34 +15,48 @@ export type CreateTxInternalsProps = {
   requiredExtraSignatures?: Crypto.Ed25519KeyHashHex[];
 };
 
-export const createTransactionInternals = async ({
+/** Returns transaction body based on the information available before input selection takes place */
+export const createPreInputSelectionTxBody = ({
   auxiliaryData,
   withdrawals,
   certificates,
   validityInterval,
-  inputSelection,
   collaterals,
   mint,
   scriptIntegrityHash,
-  requiredExtraSignatures
-}: CreateTxInternalsProps): Promise<Cardano.TxBodyWithHash> => {
-  const outputs = [...inputSelection.outputs];
-  for (const changeOutput of inputSelection.change) {
-    outputs.push(changeOutput);
-  }
-  const body: Cardano.TxBody = {
+  requiredExtraSignatures,
+  outputs
+}: Omit<CreateTxInternalsProps, 'inputSelection'> & { outputs?: Cardano.TxOut[] }): {
+  txBody: TxBodyPreInputSelection;
+  auxiliaryData?: Cardano.AuxiliaryData;
+} => ({
+  auxiliaryData,
+  txBody: {
     auxiliaryDataHash: auxiliaryData ? Cardano.computeAuxiliaryDataHash(auxiliaryData) : undefined,
     certificates,
-    fee: inputSelection.fee,
-    inputs: [...inputSelection.inputs].map(([txIn]) => txIn),
     mint,
-    outputs,
+    outputs: outputs || [],
     requiredExtraSignatures,
     scriptIntegrityHash,
     validityInterval,
-    withdrawals
+    ...(withdrawals?.length && { withdrawals }),
+    ...(collaterals?.size && { collaterals: [...collaterals] })
+  }
+});
+
+/** Updates the txBody after input selection takes place with the calculated change and selected inputs */
+export const includeChangeAndInputs = ({
+  bodyPreInputSelection,
+  inputSelection
+}: Pick<CreateTxInternalsProps, 'inputSelection'> & {
+  bodyPreInputSelection: TxBodyPreInputSelection;
+}): Cardano.TxBodyWithHash => {
+  const body: Cardano.TxBody = {
+    ...bodyPreInputSelection,
+    fee: inputSelection.fee,
+    inputs: [...inputSelection.inputs].map(([txIn]) => txIn),
+    outputs: [...inputSelection.outputs, ...inputSelection.change]
   };
-  if (collaterals) body.collaterals = [...collaterals];
   const serializableBody = Serialization.TransactionBody.fromCore(body);
 
   return {
@@ -50,4 +65,9 @@ export const createTransactionInternals = async ({
       util.bytesToHex(Crypto.blake2b(Crypto.blake2b.BYTES).update(util.hexToBytes(serializableBody.toCbor())).digest())
     )
   };
+};
+
+export const createTransactionInternals = (props: CreateTxInternalsProps): Cardano.TxBodyWithHash => {
+  const { txBody } = createPreInputSelectionTxBody({ ...props });
+  return includeChangeAndInputs({ bodyPreInputSelection: txBody, inputSelection: props.inputSelection });
 };

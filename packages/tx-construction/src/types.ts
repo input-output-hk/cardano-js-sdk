@@ -3,6 +3,7 @@ import { Cardano, HandleResolution } from '@cardano-sdk/core';
 import { GroupedAddress, SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 import { SelectionSkeleton } from '@cardano-sdk/input-selection';
 
+import { CustomizeCb } from './tx-builder';
 import { MinimumCoinQuantityPerOutput } from './output-validation';
 
 export type InitializeTxResult = Cardano.TxBodyWithHash & { inputSelection: SelectionSkeleton };
@@ -31,6 +32,7 @@ export interface TxBuilderProviders {
 }
 
 export type InitializeTxWitness = Partial<Cardano.Witness> & { extraSigners?: TransactionSigner[] };
+export type TxBodyPreInputSelection = Omit<Cardano.TxBody, 'inputs' | 'fee'>;
 
 export interface InitializeTxProps {
   outputs?: Set<Cardano.TxOut>;
@@ -46,6 +48,8 @@ export interface InitializeTxProps {
   witness?: InitializeTxWitness;
   signingOptions?: Pick<SignTransactionOptions, 'additionalKeyPaths'>;
   handleResolutions?: HandleResolution[];
+  /** callback function that allows updating the transaction before input selection */
+  customizeCb?: CustomizeCb;
 }
 
 export interface InitializeTxPropsValidationResult {

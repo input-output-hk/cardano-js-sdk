@@ -3,6 +3,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import {
   AddressType,
+  AsyncKeyAgent,
   Bip32Account,
   GroupedAddress,
   InMemoryKeyAgent,
@@ -11,6 +12,7 @@ import {
   util
 } from '@cardano-sdk/key-management';
 import { AssetId, mockProviders as mocks } from '@cardano-sdk/util-dev';
+import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano, Handle, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import {
   GenericTxBuilder,
@@ -53,6 +55,7 @@ describe('GenericTxBuilder', () => {
   let output2: Cardano.TxOut;
   let inputResolver: Cardano.InputResolver;
   let knownAddresses: GroupedAddress[];
+  let asyncKeyAgent: AsyncKeyAgent;
 
   beforeEach(async () => {
     output = mocks.utxo[0][1];
@@ -102,7 +105,7 @@ describe('GenericTxBuilder', () => {
       validateOutput: jest.fn().mockResolvedValue({ coinMissing: 0n } as OutputValidation)
     };
 
-    const asyncKeyAgent = util.createAsyncKeyAgent(keyAgent);
+    asyncKeyAgent = util.createAsyncKeyAgent(keyAgent);
     const builderParams = {
       bip32Account: await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent),
       inputResolver,
@@ -482,6 +485,137 @@ describe('GenericTxBuilder', () => {
       await expect(txBuilder.addOutput(output).addOutput(output2).build().inspect()).rejects.toThrowError(
         OutputValidationMinimumCoinError
       );
+    });
+  });
+
+  describe('customize callback', () => {
+    let dRepPublicKey: Crypto.Ed25519PublicKeyHex;
+    let dRepKeyHash: Crypto.Ed25519KeyHashHex;
+
+    beforeEach(async () => {
+      dRepPublicKey = Crypto.Ed25519PublicKeyHex('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01');
+      dRepKeyHash = (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex();
+    });
+
+    it('can add a custom fields which are accounted for by input selector', async () => {
+      const txProps = await txBuilder
+        .addOutput(mocks.utxo[0][1])
+        .customize(({ txBody }) => {
+          const outputs = [...txBody.outputs, { ...mocks.utxo[1][1], value: { coins: 100n } }];
+          return {
+            ...txBody,
+            outputs,
+            withdrawals: [...(txBody.withdrawals || []), { quantity: 13n, stakeAddress: mocks.rewardAccount }]
+          };
+        })
+        .build()
+        .inspect();
+
+      // Check if the custom fields were included the built transaction
+      expect(txProps.body.outputs.filter(({ value: { coins } }) => coins === 100n).length).toBe(1);
+      expect(txProps.body.withdrawals?.filter(({ quantity }) => quantity === 13n).length).toBe(1);
+
+      // Check if the transaction is balanced
+      const inputTotal =
+        BigIntMath.sum([...txProps.inputSelection.inputs].map((i) => i[1].value.coins)) +
+        BigIntMath.sum(txProps.body.withdrawals?.map((x) => x.quantity) || []);
+      const outputTotal = BigIntMath.sum(txProps.body.outputs.map((o) => o.value.coins));
+      expect(inputTotal).toEqual(outputTotal + txProps.body.fee);
+    });
+
+    it('can add a custom certificate', async () => {
+      const poolId = Cardano.PoolId('pool1y6chk7x7fup4ms9leesdr57r4qy9cwxuee0msan72x976a6u0nc');
+      const stakeVoteRegDelegCert: Cardano.StakeVoteRegistrationDelegationCertificate = {
+        __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
+        dRep: {
+          hash: Crypto.Hash28ByteBase16(dRepKeyHash),
+          type: Cardano.CredentialType.KeyHash
+        },
+        deposit: 2n,
+        poolId,
+        stakeCredential: {
+          hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(mocks.stakeKeyHash),
+          type: Cardano.CredentialType.KeyHash
+        }
+      };
+      const txProps = await txBuilder
+        .customize(({ txBody }) => {
+          const certificates = [...(txBody.certificates || []), stakeVoteRegDelegCert];
+          return { ...txBody, certificates };
+        })
+        .build()
+        .inspect();
+
+      expect(txProps.body.certificates?.length).toEqual(1);
+      expect(txProps.body.certificates![0]).toEqual(stakeVoteRegDelegCert);
+    });
+
+    it('certificates are accounted for when calculating implicit coin', async () => {
+      const stakeRegDelegCert: Cardano.StakeRegistrationDelegationCertificate = {
+        __typename: Cardano.CertificateType.StakeRegistrationDelegation,
+        deposit: 5n,
+        poolId: Cardano.PoolId('pool1y6chk7x7fup4ms9leesdr57r4qy9cwxuee0msan72x976a6u0nc'),
+        stakeCredential: {
+          hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(mocks.stakeKeyHash),
+          type: Cardano.CredentialType.KeyHash
+        }
+      };
+
+      const txProps = await txBuilder
+        .customize(({ txBody }) => {
+          const certificates = [...(txBody.certificates || []), stakeRegDelegCert];
+          return { ...txBody, certificates };
+        })
+        .build()
+        .inspect();
+
+      expect(txProps.body.certificates?.length).toEqual(1);
+      expect(txProps.body.certificates![0]).toEqual(stakeRegDelegCert);
+
+      // Check if the transaction is balanced
+      const inputTotal =
+        BigIntMath.sum([...txProps.inputSelection.inputs].map((i) => i[1].value.coins)) +
+        BigIntMath.sum(txProps.body.withdrawals?.map((x) => x.quantity) || []);
+      const outputTotal = BigIntMath.sum(txProps.body.outputs.map((o) => o.value.coins));
+      expect(inputTotal).toEqual(outputTotal + txProps.body.fee + stakeRegDelegCert.deposit);
+    });
+
+    it('can add a custom voting procedure', async () => {
+      const votingProcedure: Cardano.VotingProcedures[0] = {
+        voter: {
+          __typename: Cardano.VoterType.dRepKeyHash,
+          credential: { hash: Crypto.Hash28ByteBase16(dRepKeyHash), type: Cardano.CredentialType.KeyHash }
+        },
+        votes: [
+          {
+            actionId: {
+              actionIndex: 3,
+              id: Cardano.TransactionId('1000000000000000000000000000000000000000000000000000000000000000')
+            },
+            votingProcedure: {
+              anchor: {
+                dataHash: Crypto.Hash32ByteBase16('0000000000000000000000000000000000000000000000000000000000000000'),
+                url: 'https://www.someurl.io'
+              },
+              vote: 0
+            }
+          }
+        ]
+      };
+
+      const txProps = await txBuilder
+        .customize(({ txBody }) => {
+          const votingProcedures: Cardano.TxBody['votingProcedures'] = [
+            ...(txBody.votingProcedures || []),
+            votingProcedure
+          ];
+          return { ...txBody, votingProcedures };
+        })
+        .build()
+        .inspect();
+
+      expect(txProps.body.votingProcedures?.length).toBe(1);
+      expect(txProps.body.votingProcedures![0]).toEqual(votingProcedure);
     });
   });
 

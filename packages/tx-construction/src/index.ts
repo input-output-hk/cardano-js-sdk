@@ -1,4 +1,4 @@
-export * from './createTransactionInternals';
+export { CreateTxInternalsProps, createTransactionInternals } from './createTransactionInternals';
 export * from './fees';
 export * from './input-selection';
 export * from './output-validation';

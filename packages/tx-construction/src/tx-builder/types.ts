@@ -9,7 +9,7 @@ import {
 import { Cardano, Handle, HandleProvider, HandleResolution, TxCBOR } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
-import { InitializeTxWitness, TxBuilderProviders } from '../types';
+import { InitializeTxWitness, TxBodyPreInputSelection, TxBuilderProviders } from '../types';
 import { InputSelectionError, InputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { OutputBuilderValidator } from './OutputBuilder';
@@ -181,6 +181,10 @@ export interface PartialTx {
   extraSigners?: TransactionSigner[];
   signingOptions?: SignTransactionOptions;
 }
+
+type CustomizeCbProps = { txBody: Readonly<TxBodyPreInputSelection> };
+export type CustomizeCb = (props: CustomizeCbProps) => TxBodyPreInputSelection;
+
 export interface TxBuilder {
   /**
    * @returns a partial transaction that has properties set by calling other TxBuilder methods. Does not validate the transaction.
@@ -234,6 +238,16 @@ export interface TxBuilder {
   extraSigners(signers: TransactionSigner[]): TxBuilder;
   /** Sets signing options in {@link signingOptions} */
   signingOptions(options: SignTransactionOptions): TxBuilder;
+  /**
+   * Hook allowing users to customize the transaction before being processed by the input selection on the build() step.
+   * Input selection and fee is calculated automatically, but, being a low level transaction customization option,
+   * users of this method are responsible for maintaining the integrity and validity of the transaction.
+   * For example, using both `delegatePortfolio` and altering the certificates with the `customize` method, can result
+   * in an invalid transaction or produce an effect different from the one configured with
+   * the `delegatePortfolio` method.
+   * This method is not available when using web extension remote apis.
+   */
+  customize(cb: CustomizeCb): TxBuilder;
 
   /**
    * Create a snapshot of current transaction properties.
