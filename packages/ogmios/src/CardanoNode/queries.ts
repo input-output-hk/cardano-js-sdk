@@ -94,8 +94,6 @@ export const queryEraSummaries = (client: LedgerStateQuery.LedgerStateQueryClien
 export const queryGenesisParameters = (client: LedgerStateQuery.LedgerStateQueryClient, logger: Logger) =>
   withCoreCardanoNodeError(async () => {
     logger.info('Querying genesis parameters');
-    // REVIEW: The queryNetwork/genesis local-state-query now expects one era as argument (either 'byron', 'shelley' or 'alonzo')
-    // to retrieve the corresponding genesis configuration.
-    // 'shelley' genesis maps best to the compact genesis we're using
+    // Update this to query multiple eras if the CompactGenesis type will have to include params from other eras
     return genesis(await client.genesisConfiguration('shelley'));
   });

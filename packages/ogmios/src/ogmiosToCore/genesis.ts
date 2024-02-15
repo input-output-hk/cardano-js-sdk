@@ -2,7 +2,6 @@ import { Cardano, Milliseconds } from '@cardano-sdk/core';
 import { Schema } from '@cardano-ogmios/client';
 import omit from 'lodash/omit';
 
-// REVIEW: Schema.GenesisShelley has all the properties we are looking for here
 export const genesis = (ogmiosGenesis: Schema.GenesisShelley): Cardano.CompactGenesis => ({
   ...omit(ogmiosGenesis, 'initialParameters'),
   activeSlotsCoefficient: (() => {
