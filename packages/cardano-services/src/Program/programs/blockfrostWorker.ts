@@ -67,8 +67,6 @@ export const loadBlockfrostWorker = async (args: BlockfrostWorkerArgs, deps: Loa
       BlockfrostWorkerOptionDescriptions.BlockfrostApiKey
     ]);
 
-  if (!args.network) throw new MissingProgramOption(blockfrostWorker, BlockfrostWorkerOptionDescriptions.Network);
-
   if (!db)
     throw new MissingProgramOption(blockfrostWorker, [
       PostgresOptionDescriptions.ConnectionString,

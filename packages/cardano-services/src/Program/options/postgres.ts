@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import { addOptions, newOption } from './util';
-import { existingFileValidator } from '../../util/validators';
+import { existingFileValidator, integerValidator } from '../../util/validators';
 
 export enum PostgresOptionDescriptions {
   ConnectionString = 'PostgreSQL Connection string',
@@ -120,7 +120,7 @@ export const withPostgresOptions = (command: Command, suffixes: ConnectionNames[
         `--postgres-pool-max${cliSuffix} <postgresPoolMax${suffix}>`,
         PostgresOptionDescriptions.PoolMax + descSuffix,
         `POSTGRES_POOL_MAX${envSuffix}`,
-        (max) => Number.parseInt(max, 10)
+        integerValidator(PostgresOptionDescriptions.PoolMax + descSuffix)
       ),
       newOption(
         `--postgres-port${cliSuffix} <postgresPort${suffix}>`,
