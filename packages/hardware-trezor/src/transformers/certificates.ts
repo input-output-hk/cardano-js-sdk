@@ -3,45 +3,14 @@ import * as Trezor from '@trezor/connect';
 import { BIP32Path } from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { GroupedAddress, util } from '@cardano-sdk/key-management';
-import { InvalidArgumentError /* , Transform*/ } from '@cardano-sdk/util';
+import { InvalidArgumentError, Transform } from '@cardano-sdk/util';
 import { TrezorTxTransformerContext } from '../types';
 
-type StakeKeyCertificateType =
-  | Trezor.PROTO.CardanoCertificateType.STAKE_REGISTRATION
-  | Trezor.PROTO.CardanoCertificateType.STAKE_DEREGISTRATION;
-
-type TrezorStakeKeyCertificate = {
-  type: StakeKeyCertificateType;
-  path?: BIP32Path;
+type CertCredentialsType = {
   scriptHash?: Crypto.Ed25519KeyHashHex;
   keyHash?: Crypto.Ed25519KeyHashHex;
-};
-
-type TrezorDelegationCertificate = {
-  type: Trezor.PROTO.CardanoCertificateType.STAKE_DELEGATION;
   path?: BIP32Path;
-  scriptHash?: Crypto.Ed25519KeyHashHex;
-  pool: string;
 };
-
-type TrezorPoolRegistrationCertificate = {
-  poolParameters: Trezor.CardanoPoolParameters;
-  type: Trezor.PROTO.CardanoCertificateType.STAKE_POOL_REGISTRATION;
-};
-
-type ScriptHashCertCredentials = {
-  scriptHash: Crypto.Ed25519KeyHashHex;
-};
-
-type KeyHashCertCredentials = {
-  keyHash: Crypto.Ed25519KeyHashHex;
-};
-
-type PathCertCredentials = {
-  path: BIP32Path;
-};
-
-type CertCredentialsType = ScriptHashCertCredentials | KeyHashCertCredentials | PathCertCredentials;
 
 const getCertCredentials = (
   stakeKeyHash: Crypto.Ed25519KeyHashHex,
@@ -61,37 +30,6 @@ const getCertCredentials = (
   };
 };
 
-const getStakeAddressCertificate = (
-  certificate: Cardano.StakeAddressCertificate,
-  context: TrezorTxTransformerContext,
-  type: StakeKeyCertificateType
-): TrezorStakeKeyCertificate => {
-  const credentials = getCertCredentials(
-    certificate.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex,
-    context.knownAddresses
-  );
-  return {
-    ...credentials,
-    type
-  };
-};
-
-const getStakeDelegationCertificate = (
-  certificate: Cardano.StakeDelegationCertificate,
-  context: TrezorTxTransformerContext
-): TrezorDelegationCertificate => {
-  const poolIdKeyHash = Cardano.PoolId.toKeyHash(certificate.poolId);
-  const credentials = getCertCredentials(
-    certificate.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex,
-    context.knownAddresses
-  );
-  return {
-    ...credentials,
-    pool: poolIdKeyHash,
-    type: Trezor.PROTO.CardanoCertificateType.STAKE_DELEGATION
-  };
-};
-
 const toPoolMetadata = (metadataJson: Cardano.PoolMetadataJson): Trezor.CardanoPoolMetadata => ({
   hash: metadataJson.hash,
   url: metadataJson.url
@@ -105,13 +43,60 @@ const getPoolOperatorKeyPath = (
   return util.stakeKeyPathFromGroupedAddress(knownAddress);
 };
 
-export const getPoolRegistrationCertificate = (
-  certificate: Cardano.PoolRegistrationCertificate,
-  context: TrezorTxTransformerContext
-): TrezorPoolRegistrationCertificate => {
+export const getStakeAddressCertificate: Transform<
+  Cardano.StakeAddressCertificate,
+  Trezor.CardanoCertificate,
+  TrezorTxTransformerContext
+> = (certificate, context) => {
+  const credentials = getCertCredentials(
+    certificate.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex,
+    context?.knownAddresses
+  );
+  const certificateType =
+    certificate.__typename === Cardano.CertificateType.StakeRegistration
+      ? Trezor.PROTO.CardanoCertificateType.STAKE_REGISTRATION
+      : Trezor.PROTO.CardanoCertificateType.STAKE_DEREGISTRATION;
+  return {
+    keyHash: credentials.keyHash,
+    path: credentials.path,
+    pool: undefined,
+    poolParameters: undefined,
+    scriptHash: credentials.scriptHash,
+    type: certificateType
+  };
+};
+
+export const getStakeDelegationCertificate: Transform<
+  Cardano.StakeDelegationCertificate,
+  Trezor.CardanoCertificate,
+  TrezorTxTransformerContext
+> = (certificate, context) => {
+  const poolIdKeyHash = Cardano.PoolId.toKeyHash(certificate.poolId);
+  const credentials = getCertCredentials(
+    certificate.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex,
+    context?.knownAddresses
+  );
+  return {
+    keyHash: credentials.keyHash,
+    path: credentials.path,
+    pool: poolIdKeyHash,
+    poolParameters: undefined,
+    scriptHash: credentials.scriptHash,
+    type: Trezor.PROTO.CardanoCertificateType.STAKE_DELEGATION
+  };
+};
+
+export const getPoolRegistrationCertificate: Transform<
+  Cardano.PoolRegistrationCertificate,
+  Trezor.CardanoCertificate,
+  TrezorTxTransformerContext
+> = (certificate, context) => {
   if (!certificate.poolParameters.metadataJson)
     throw new InvalidArgumentError('certificate', 'Missing pool registration pool metadata.');
   return {
+    keyHash: undefined,
+    path: undefined,
+    pool: undefined,
     poolParameters: {
       cost: certificate.poolParameters.cost.toString(),
       margin: {
@@ -153,6 +138,7 @@ export const getPoolRegistrationCertificate = (
       rewardAccount: certificate.poolParameters.rewardAccount,
       vrfKeyHash: certificate.poolParameters.vrf
     },
+    scriptHash: undefined,
     type: Trezor.PROTO.CardanoCertificateType.STAKE_POOL_REGISTRATION
   };
 };
@@ -160,9 +146,9 @@ export const getPoolRegistrationCertificate = (
 const toCert = (cert: Cardano.Certificate, context: TrezorTxTransformerContext) => {
   switch (cert.__typename) {
     case Cardano.CertificateType.StakeRegistration:
-      return getStakeAddressCertificate(cert, context, Trezor.PROTO.CardanoCertificateType.STAKE_REGISTRATION);
+      return getStakeAddressCertificate(cert, context);
     case Cardano.CertificateType.StakeDeregistration:
-      return getStakeAddressCertificate(cert, context, Trezor.PROTO.CardanoCertificateType.STAKE_DEREGISTRATION);
+      return getStakeAddressCertificate(cert, context);
     case Cardano.CertificateType.StakeDelegation:
       return getStakeDelegationCertificate(cert, context);
     case Cardano.CertificateType.PoolRegistration:

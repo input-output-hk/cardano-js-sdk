@@ -9,6 +9,7 @@ import {
   BlockfrostWorkerOptionDescriptions,
   CACHE_TTL_DEFAULT,
   CREATE_SCHEMA_DEFAULT,
+  DEFAULT_HEALTH_CHECK_CACHE_TTL,
   DISABLE_DB_CACHE_DEFAULT,
   DISABLE_STAKE_POOL_METRIC_APY_DEFAULT,
   DROP_SCHEMA_DEFAULT,
@@ -60,7 +61,7 @@ import { EPOCH_POLL_INTERVAL_DEFAULT } from './util';
 import { HttpServer } from './Http';
 import { PgBossQueue, isValidQueue } from './PgBoss';
 import { ProjectionName } from './Projection';
-import { dbCacheValidator } from './util/validators';
+import { cacheTtlValidator, dbCacheValidator, integerValidator, urlValidator } from './util/validators';
 import { readScheduleConfig } from './util/schedule';
 import fs from 'fs';
 import onDeath from 'death';
@@ -72,7 +73,22 @@ const packageJsonPath = fs.existsSync(copiedPackageJsonPath)
   ? copiedPackageJsonPath
   : path.join(__dirname, '../package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-const projectionNameParser = (names: string) => names.split(',') as ProjectionName[];
+
+const projections = Object.values(ProjectionName);
+const projectionNameParser = (names: string) =>
+  (names.split(',') as ProjectionName[]).map((name) => {
+    if (!projections.includes(name)) throw new Error(`Unknown projection name "${name}"`);
+
+    return name;
+  });
+
+const services = Object.values(ServiceNames);
+const serviceNameParser = (names: string) =>
+  (names.split(',') as ServiceNames[]).map((name) => {
+    if (!services.includes(name)) throw new Error(`Unknown service name "${name}"`);
+
+    return name;
+  });
 
 process.on('unhandledRejection', (reason) => {
   // To be handled by 'onDeath'
@@ -85,7 +101,17 @@ const program = new Command('cardano-services');
 
 program.version(packageJson.version);
 
-const runServer = async (message: string, loadServer: () => Promise<HttpServer>) => {
+const runServer = async (
+  message: string,
+  args: {
+    args: BlockfrostWorkerArgs | PgBossWorkerArgs | ProjectorArgs | ProviderServerArgs;
+    projectionNames?: ProjectionName[];
+    serviceNames?: ServiceNames[];
+  },
+  loadServer: () => Promise<HttpServer>
+) => {
+  if (args.args.dumpOnly) return process.stdout.write(`${JSON.stringify(args)}\n`) as unknown as void;
+
   try {
     process.stdout.write(`${message}\n`);
     const server = await loadServer();
@@ -119,7 +145,7 @@ addOptions(withCommonOptions(projectorWithArgs, PROJECTOR_API_URL_DEFAULT), [
     '--blocks-buffer-length <blocksBufferLength>',
     ProjectorOptionDescriptions.BlocksBufferLength,
     'BLOCKS_BUFFER_LENGTH',
-    (blocksBufferLength) => Number.parseInt(blocksBufferLength, 10),
+    integerValidator(ProjectorOptionDescriptions.BlocksBufferLength),
     BLOCKS_BUFFER_LENGTH_DEFAULT
   ),
   newOption(
@@ -140,28 +166,28 @@ addOptions(withCommonOptions(projectorWithArgs, PROJECTOR_API_URL_DEFAULT), [
     '--exit-at-block-no <exitAtBlockNo>',
     ProjectorOptionDescriptions.ExitAtBlockNo,
     'EXIT_AT_BLOCK_NO',
-    (exitAtBlockNo) => (exitAtBlockNo ? Number.parseInt(exitAtBlockNo, 10) : 0),
-    ''
+    integerValidator(ProjectorOptionDescriptions.ExitAtBlockNo),
+    0
   ),
   newOption(
     '--metadata-job-retry-delay <metadataJobRetryDelay>',
     ProjectorOptionDescriptions.MetadataJobRetryDelay,
     'METADATA_JOB_RETRY_DELAY',
-    (metadataJobRetryDelay) => Number.parseInt(metadataJobRetryDelay, 10),
+    integerValidator(ProjectorOptionDescriptions.MetadataJobRetryDelay),
     METADATA_JOB_RETRY_DELAY_DEFAULT
   ),
   newOption(
     '--pools-metrics-interval <poolsMetricsInterval>',
     ProjectorOptionDescriptions.PoolsMetricsInterval,
     'POOLS_METRICS_INTERVAL',
-    (interval) => Number.parseInt(interval, 10),
+    integerValidator(ProjectorOptionDescriptions.PoolsMetricsInterval),
     POOLS_METRICS_INTERVAL_DEFAULT
   ),
   newOption(
     '--pools-metrics-outdated-interval <poolsMetricsOutdatedInterval>',
     ProjectorOptionDescriptions.PoolsMetricsOutdatedInterval,
     'POOLS_METRICS_OUTDATED_INTERVAL',
-    (interval) => Number.parseInt(interval, 10),
+    integerValidator(ProjectorOptionDescriptions.PoolsMetricsOutdatedInterval),
     POOLS_METRICS_OUTDATED_INTERVAL_DEFAULT
   ),
   newOption(
@@ -177,8 +203,8 @@ addOptions(withCommonOptions(projectorWithArgs, PROJECTOR_API_URL_DEFAULT), [
     (synchronize) => stringOptionToBoolean(synchronize, Programs.Projector, ProjectorOptionDescriptions.Synchronize),
     false
   )
-]).action(async (projectionNames: ProjectionName[], args: { apiUrl: URL } & ProjectorArgs) =>
-  runServer('projector', () =>
+]).action(async (projectionNames: ProjectionName[], args: ProjectorArgs) =>
+  runServer('projector', { args, projectionNames }, () =>
     loadProjector({
       ...args,
       postgresConnectionString: connectionStringFromArgs(args, ''),
@@ -191,7 +217,11 @@ addOptions(withCommonOptions(projectorWithArgs, PROJECTOR_API_URL_DEFAULT), [
 const providerServer = program
   .command('start-provider-server')
   .description('Start the Provider Server')
-  .argument('[serviceNames...]', `List of services to attach: ${Object.values(ServiceNames).toString()}`);
+  .argument(
+    '[serviceNames...]',
+    `List of services to attach: ${Object.values(ServiceNames).toString()}`,
+    serviceNameParser
+  );
 const providerServerWithPostgres = withPostgresOptions(providerServer, ['Asset', 'DbSync', 'Handle', 'StakePool']);
 const providerServerWithCommon = withCommonOptions(providerServerWithPostgres, PROVIDER_SERVER_API_URL_DEFAULT);
 
@@ -200,7 +230,7 @@ addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon
     '--service-names <serviceNames>',
     `List of services to attach: ${Object.values(ServiceNames).toString()}`,
     'SERVICE_NAMES',
-    (names) => names.split(',') as ServiceNames[]
+    serviceNameParser
   ),
   newOption(
     '--allowed-origins <allowedOrigins>',
@@ -218,7 +248,7 @@ addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon
     '--db-cache-ttl <dbCacheTtl>',
     ProviderServerOptionDescriptions.DbCacheTtl,
     'DB_CACHE_TTL',
-    dbCacheValidator,
+    dbCacheValidator(ProviderServerOptionDescriptions.DbCacheTtl),
     DB_CACHE_TTL_DEFAULT
   ),
   newOption(
@@ -245,41 +275,49 @@ addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon
     '--epoch-poll-interval <epochPollInterval>',
     ProviderServerOptionDescriptions.EpochPollInterval,
     'EPOCH_POLL_INTERVAL',
-    (interval) => Number.parseInt(interval, 10),
+    integerValidator(ProviderServerOptionDescriptions.EpochPollInterval),
     EPOCH_POLL_INTERVAL_DEFAULT
+  ),
+  newOption(
+    '--health-check-cache-ttl <healthCheckCacheTTL>',
+    ProviderServerOptionDescriptions.HealthCheckCacheTtl,
+    'HEALTH_CHECK_CACHE_TTL',
+    (ttl: string) =>
+      cacheTtlValidator(ttl, { lowerBound: 1, upperBound: 120 }, ProviderServerOptionDescriptions.HealthCheckCacheTtl),
+    DEFAULT_HEALTH_CHECK_CACHE_TTL
   ),
   newOption(
     '--submit-api-url <submitApiUrl>',
     ProviderServerOptionDescriptions.SubmitApiUrl,
     'SUBMIT_API_URL',
-    (url) => new URL(url)
+    urlValidator(ProviderServerOptionDescriptions.SubmitApiUrl)
   ),
   newOption(
     '--token-metadata-server-url <tokenMetadataServerUrl>',
     ProviderServerOptionDescriptions.TokenMetadataServerUrl,
     'TOKEN_METADATA_SERVER_URL',
-    (url) => new URL(url).toString(),
+    urlValidator(ProviderServerOptionDescriptions.TokenMetadataServerUrl, true),
     DEFAULT_TOKEN_METADATA_SERVER_URL
   ),
   newOption(
     '--token-metadata-cache-ttl <tokenMetadataCacheTTL>',
     ProviderServerOptionDescriptions.TokenMetadataCacheTtl,
     'TOKEN_METADATA_CACHE_TTL',
-    dbCacheValidator,
+    dbCacheValidator(ProviderServerOptionDescriptions.TokenMetadataCacheTtl),
     DEFAULT_TOKEN_METADATA_CACHE_TTL
   ),
   newOption(
     '--asset-cache-ttl <assetCacheTTL>',
     ProviderServerOptionDescriptions.AssetCacheTtl,
     'ASSET_CACHE_TTL',
-    dbCacheValidator,
+    dbCacheValidator(ProviderServerOptionDescriptions.AssetCacheTtl),
     DB_CACHE_TTL_DEFAULT
   ),
   newOption(
     '--token-metadata-request-timeout <tokenMetadataRequestTimeout>',
-    ProviderServerOptionDescriptions.PaginationPageSizeLimit,
+    ProviderServerOptionDescriptions.TokenMetadataRequestTimeout,
     'TOKEN_METADATA_REQUEST_TIMEOUT',
-    (interval) => Number.parseInt(interval, 10),
+    integerValidator(ProviderServerOptionDescriptions.TokenMetadataRequestTimeout),
     DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT
   ),
   newOption(
@@ -326,7 +364,7 @@ addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon
     '--pagination-page-size-limit <paginationPageSizeLimit>',
     ProviderServerOptionDescriptions.PaginationPageSizeLimit,
     'PAGINATION_PAGE_SIZE_LIMIT',
-    (interval) => Number.parseInt(interval, 10),
+    integerValidator(ProviderServerOptionDescriptions.PaginationPageSizeLimit),
     PAGINATION_PAGE_SIZE_LIMIT_DEFAULT
   ),
   newOption(
@@ -356,7 +394,7 @@ addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon
     USE_TYPEORM_ASSET_PROVIDER_DEFAULT
   )
 ]).action(async (serviceNames: ServiceNames[], args: ProviderServerArgs) =>
-  runServer('Provider server', () =>
+  runServer('Provider server', { args, serviceNames }, () =>
     loadProviderServer({
       ...args,
       postgresConnectionStringAsset: connectionStringFromArgs(args, 'Asset'),
@@ -385,7 +423,7 @@ addOptions(withCommonOptions(withPostgresOptions(blockfrost, ['DbSync']), BLOCKF
     '--cache-ttl <cacheTtl>',
     BlockfrostWorkerOptionDescriptions.CacheTTL,
     'CACHE_TTL',
-    (interval) => Number.parseInt(interval, 10),
+    integerValidator(BlockfrostWorkerOptionDescriptions.CacheTTL),
     CACHE_TTL_DEFAULT
   ),
   newOption(
@@ -415,16 +453,16 @@ addOptions(withCommonOptions(withPostgresOptions(blockfrost, ['DbSync']), BLOCKF
     if (availableNetworks.includes(network as AvailableNetworks)) return network;
 
     throw new Error(`Unknown network: ${network}`);
-  }),
+  }).makeOptionMandatory(),
   newOption(
     '--scan-interval <scanInterval>',
     BlockfrostWorkerOptionDescriptions.ScanInterval,
     'SCAN_INTERVAL',
-    (interval) => Number.parseInt(interval, 10),
+    integerValidator(BlockfrostWorkerOptionDescriptions.ScanInterval),
     SCAN_INTERVAL_DEFAULT
   )
 ]).action(async (args: BlockfrostWorkerArgs) =>
-  runServer('Blockfrost worker', () =>
+  runServer('Blockfrost worker', { args }, () =>
     loadBlockfrostWorker({ ...args, postgresConnectionStringDbSync: connectionStringFromArgs(args, 'DbSync') })
   )
 );
@@ -441,7 +479,7 @@ addOptions(
       '--parallel-jobs <parallelJobs>',
       PgBossWorkerOptionDescriptions.ParallelJobs,
       'PARALLEL_JOBS',
-      (parallelJobs) => Number.parseInt(parallelJobs, 10),
+      integerValidator(PgBossWorkerOptionDescriptions.ParallelJobs),
       PARALLEL_JOBS_DEFAULT
     ),
     newOption('--queues <queues>', PgBossWorkerOptionDescriptions.Queues, 'QUEUES', (queues) => {
@@ -463,7 +501,7 @@ addOptions(
     )
   ]
 ).action(async (args: PgBossWorkerArgs) =>
-  runServer('pg-boss worker', () =>
+  runServer('pg-boss worker', { args }, () =>
     loadPgBossWorker({
       ...args,
       postgresConnectionStringDbSync: connectionStringFromArgs(args, 'DbSync'),

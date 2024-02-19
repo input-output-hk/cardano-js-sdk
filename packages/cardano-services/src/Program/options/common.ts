@@ -11,7 +11,7 @@ import {
 import { Seconds } from '@cardano-sdk/core';
 import { BuildInfo as ServiceBuildInfo } from '../../Http';
 import { addOptions, newOption } from './util';
-import { buildInfoValidator, cacheTtlValidator } from '../../util/validators';
+import { buildInfoValidator, floatValidator, integerValidator, urlValidator } from '../../util/validators';
 import { loggerMethodNames } from '@cardano-sdk/util';
 
 export const ENABLE_METRICS_DEFAULT = false;
@@ -21,10 +21,10 @@ export const LAST_ROS_EPOCHS_DEFAULT = 10;
 enum Descriptions {
   ApiUrl = 'API URL',
   BuildInfo = 'Service build info',
+  DumpOnly = 'Dumps the input arguments and exits. Used for tests',
+  EnableMetrics = 'Enable Prometheus Metrics',
   LastRosEpochs = 'Number of epochs over which lastRos is computed',
   LoggerMinSeverity = 'Log level',
-  HealthCheckCacheTtl = 'Health check cache TTL in seconds between 1 and 10',
-  EnableMetrics = 'Enable Prometheus Metrics',
   ServiceDiscoveryBackoffFactor = 'Exponential backoff factor for service discovery',
   ServiceDiscoveryTimeout = 'Timeout for service discovery attempts'
 }
@@ -32,6 +32,7 @@ enum Descriptions {
 export type CommonProgramOptions = {
   apiUrl: URL;
   buildInfo?: ServiceBuildInfo;
+  dumpOnly?: boolean;
   enableMetrics?: boolean;
   lastRosEpochs?: number;
   loggerMinSeverity?: LogLevel;
@@ -41,8 +42,11 @@ export type CommonProgramOptions = {
 
 export const withCommonOptions = (command: Command, apiUrl: URL) => {
   addOptions(command, [
-    newOption('--api-url <apiUrl>', Descriptions.ApiUrl, 'API_URL', (url) => new URL(url), apiUrl),
+    newOption('--api-url <apiUrl>', Descriptions.ApiUrl, 'API_URL', urlValidator(Descriptions.ApiUrl), apiUrl),
     newOption('--build-info <buildInfo>', Descriptions.BuildInfo, 'BUILD_INFO', buildInfoValidator),
+    newOption('--dump-only <true/false>', Descriptions.DumpOnly, 'DUMP_ONLY', (dumpOnly) =>
+      stringOptionToBoolean(dumpOnly, Programs.ProviderServer, Descriptions.DumpOnly)
+    ),
     newOption(
       '--enable-metrics <true/false>',
       Descriptions.EnableMetrics,
@@ -51,17 +55,10 @@ export const withCommonOptions = (command: Command, apiUrl: URL) => {
       ENABLE_METRICS_DEFAULT
     ),
     newOption(
-      '--health-check-cache-ttl <healthCheckCacheTTL>',
-      Descriptions.HealthCheckCacheTtl,
-      'HEALTH_CHECK_CACHE_TTL',
-      (ttl: string) => cacheTtlValidator(ttl, { lowerBound: 1, upperBound: 120 }, Descriptions.HealthCheckCacheTtl),
-      DEFAULT_HEALTH_CHECK_CACHE_TTL
-    ),
-    newOption(
       '--last-ros-epochs <lastRosEpochs>',
       Descriptions.LastRosEpochs,
       'LAST_ROS_EPOCHS',
-      (lastRosEpochs) => Number.parseInt(lastRosEpochs, 10),
+      integerValidator(Descriptions.LastRosEpochs),
       LAST_ROS_EPOCHS_DEFAULT
     ),
     newOption(
@@ -78,14 +75,14 @@ export const withCommonOptions = (command: Command, apiUrl: URL) => {
       '--service-discovery-backoff-factor <serviceDiscoveryBackoffFactor>',
       Descriptions.ServiceDiscoveryBackoffFactor,
       'SERVICE_DISCOVERY_BACKOFF_FACTOR',
-      (factor) => Number.parseFloat(factor),
+      floatValidator(Descriptions.ServiceDiscoveryBackoffFactor),
       SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT
     ),
     newOption(
       '--service-discovery-timeout <serviceDiscoveryTimeout>',
       Descriptions.ServiceDiscoveryTimeout,
       'SERVICE_DISCOVERY_TIMEOUT',
-      (interval) => Number.parseInt(interval, 10),
+      integerValidator(Descriptions.ServiceDiscoveryTimeout),
       SERVICE_DISCOVERY_TIMEOUT_DEFAULT
     )
   ]);

@@ -48,5 +48,6 @@ jobs:
         run: |
           yarn test:build:verify
           yarn test --forceExit
+          yarn workspace @cardano-sdk/cardano-services test:cli
         env:
           NODE_OPTIONS: '--max_old_space_size=8192'

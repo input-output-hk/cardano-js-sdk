@@ -1,21 +1,23 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import * as Trezor from '@trezor/connect';
 import { Cardano } from '@cardano-sdk/core';
+import { Transform } from '@cardano-sdk/util';
 import { TrezorTxTransformerContext } from '../types';
 import { util } from '@cardano-sdk/key-management';
 
-export const toRequiredSigner = (
-  signer: Crypto.Ed25519KeyHashHex,
-  context: TrezorTxTransformerContext
-): Trezor.CardanoRequiredSigner => {
+export const toRequiredSigner: Transform<
+  Crypto.Ed25519KeyHashHex,
+  Trezor.CardanoRequiredSigner,
+  TrezorTxTransformerContext
+> = (keyHash, context) => {
   const paymentCredKnownAddress = context?.knownAddresses.find((address) => {
     const paymentCredential = Cardano.Address.fromBech32(address.address)?.asBase()?.getPaymentCredential().hash;
-    return paymentCredential && paymentCredential.toString() === signer;
+    return paymentCredential && paymentCredential.toString() === keyHash;
   });
 
   const stakeCredKnownAddress = context?.knownAddresses.find((address) => {
     const stakeCredential = Cardano.RewardAccount.toHash(address.rewardAccount);
-    return stakeCredential && stakeCredential.toString() === signer;
+    return stakeCredential && stakeCredential.toString() === keyHash;
   });
 
   const paymentKeyPath = paymentCredKnownAddress
@@ -23,7 +25,24 @@ export const toRequiredSigner = (
     : null;
   const stakeKeyPath = stakeCredKnownAddress ? util.stakeKeyPathFromGroupedAddress(stakeCredKnownAddress) : null;
 
-  return paymentKeyPath ? { keyPath: paymentKeyPath } : stakeKeyPath ? { keyPath: stakeKeyPath } : { keyHash: signer };
+  if (paymentKeyPath) {
+    return {
+      keyHash: undefined,
+      keyPath: paymentKeyPath
+    };
+  }
+
+  if (stakeKeyPath) {
+    return {
+      keyHash: undefined,
+      keyPath: stakeKeyPath
+    };
+  }
+
+  return {
+    keyHash,
+    keyPath: undefined
+  };
 };
 
 export const mapRequiredSigners = (
