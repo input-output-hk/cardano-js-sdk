@@ -293,12 +293,18 @@ export const findStakeCertsByTxIds = `
 		addr."view" AS address,
 		FALSE AS registration,
 		tx.hash AS tx_id,
-		-epoch_param.key_deposit AS deposit
+		-(SELECT key_deposit FROM stake_registration AS sr
+			JOIN tx AS tx2 ON sr.tx_id = tx2.id
+			JOIN block ON tx2.block_id = block.id
+			JOIN epoch_param ON block.epoch_no = epoch_param.epoch_no
+			WHERE sr.addr_id = cert.addr_id
+				AND sr.tx_id < tx.id
+			ORDER BY sr.tx_id DESC
+			LIMIT 1
+		) AS deposit
 	FROM tx
 	JOIN stake_deregistration AS cert ON cert.tx_id = tx.id
 	JOIN stake_address AS addr ON addr.id = cert.addr_id
-	JOIN block ON block_id = block.id
-	JOIN epoch_param ON block.epoch_no = epoch_param.epoch_no
 	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC)`;
 
@@ -407,3 +413,42 @@ FROM combined`,
     WITH: ''
   }
 } as const;
+
+/*
+	(SELECT
+		tx.id,
+		cert.cert_index AS cert_index,
+		addr."view" AS address,
+		TRUE AS registration,
+		tx.hash AS tx_id,
+		epoch_param.key_deposit AS deposit
+	FROM tx
+	JOIN stake_registration AS cert ON cert.tx_id = tx.id
+	JOIN stake_address AS addr ON addr.id = cert.addr_id
+	JOIN block ON block_id = block.id
+	JOIN epoch_param ON block.epoch_no = epoch_param.epoch_no
+	WHERE tx.id in (134,135,143,144)
+	ORDER BY tx.id ASC)
+	UNION
+	(SELECT
+		tx.id,
+		cert.cert_index AS cert_index,
+		addr."view" AS address,
+		FALSE AS registration,
+		tx.hash AS tx_id,
+		-(SELECT key_deposit FROM stake_registration AS sr
+			JOIN tx AS tx2 ON sr.tx_id = tx2.id
+			JOIN block ON tx2.block_id = block.id
+			JOIN epoch_param ON block.epoch_no = epoch_param.epoch_no
+			WHERE sr.addr_id = cert.addr_id
+				AND sr.tx_id < tx.id
+			ORDER BY sr.tx_id DESC
+			LIMIT 1
+		) AS deposit
+	FROM tx
+	JOIN stake_deregistration AS cert ON cert.tx_id = tx.id
+	JOIN stake_address AS addr ON addr.id = cert.addr_id
+	WHERE tx.id in (134,135,143,144)
+	ORDER BY tx.id ASC);
+
+*/
