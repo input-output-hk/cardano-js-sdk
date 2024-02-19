@@ -1,8 +1,8 @@
 import { Command } from 'commander';
 import { MissingProgramOption } from '../errors';
 import { STAKE_POOL_METADATA_QUEUE } from '@cardano-sdk/projection-typeorm';
-import { URL } from 'url';
 import { addOptions, newOption } from './util';
+import { urlValidator } from '../../util/validators';
 
 export enum StakePoolMetadataOptionDescriptions {
   Mode = 'This mode governs where the stake pool metadata is fetched from',
@@ -32,8 +32,11 @@ export const withStakePoolMetadataOptions = (command: Command) => {
       (mode: string) => StakePoolMetadataFetchMode[mode.toUpperCase() as keyof typeof StakePoolMetadataFetchMode],
       'direct'
     ).choices(['direct', 'smash']),
-    newOption('--smash-url <smashUrl>', StakePoolMetadataOptionDescriptions.Url, 'SMASH_URL', (url) =>
-      new URL(url).toString()
+    newOption(
+      '--smash-url <smashUrl>',
+      StakePoolMetadataOptionDescriptions.Url,
+      'SMASH_URL',
+      urlValidator(StakePoolMetadataOptionDescriptions.Url, true)
     )
   ]);
 
@@ -41,11 +44,6 @@ export const withStakePoolMetadataOptions = (command: Command) => {
 };
 
 export const checkProgramOptions = (metadataFetchMode: StakePoolMetadataFetchMode, smashUrl: string | undefined) => {
-  if (!metadataFetchMode) throw new MissingProgramOption(STAKE_POOL_METADATA_QUEUE, 'medata-fetch-mode');
-
   if (metadataFetchMode === StakePoolMetadataFetchMode.SMASH && !smashUrl)
-    throw new MissingProgramOption(
-      STAKE_POOL_METADATA_QUEUE,
-      `smash-url to be set when medata-fetch-mode is smash ${smashUrl}`
-    );
+    throw new MissingProgramOption(STAKE_POOL_METADATA_QUEUE, 'smash-url to be set when metadata-fetch-mode is smash');
 };

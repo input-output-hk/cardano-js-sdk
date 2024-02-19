@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { Ogmios } from '@cardano-sdk/ogmios';
 import { addOptions, newOption } from './util';
+import { urlValidator } from '../../util/validators';
 
 const OGMIOS_URL_DEFAULT = (() => {
   const connection = Ogmios.createConnectionObject();
@@ -28,7 +29,7 @@ export const withOgmiosOptions = (command: Command) =>
       '--ogmios-url <ogmiosUrl>',
       OgmiosOptionDescriptions.Url,
       'OGMIOS_URL',
-      (url) => new URL(url),
+      urlValidator(OgmiosOptionDescriptions.Url),
       new URL(OGMIOS_URL_DEFAULT)
     ).conflicts('ogmiosSrvServiceName')
   ]);
