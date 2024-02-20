@@ -38,7 +38,7 @@ export const outputBuilderProperties: RemoteApiProperties<OutputBuilder> = {
   }
 };
 
-export const txBuilderProperties: RemoteApiProperties<TxBuilder> = {
+export const txBuilderProperties: RemoteApiProperties<Omit<TxBuilder, 'customize'>> = {
   addOutput: {
     getApiProperties: () => txBuilderProperties,
     propType: RemoteApiPropertyType.ApiFactory
