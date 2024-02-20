@@ -3,7 +3,7 @@ import { StaticChangeAddressResolver, roundRobinRandomImprove } from '@cardano-s
 import { Cardano } from '@cardano-sdk/core';
 import { InitializeTxProps, InitializeTxResult } from '../types';
 import { TxBuilderDependencies } from './types';
-import { createTransactionInternals } from '../createTransactionInternals';
+import { createPreInputSelectionTxBody, includeChangeAndInputs } from '../createTransactionInternals';
 import { defaultSelectionConstraints } from '../input-selection';
 import { ensureValidityInterval } from '../ensureValidityInterval';
 import { finalizeTx } from './finalizeTx';
@@ -35,36 +35,41 @@ export const initializeTx = async (
       changeAddressResolver: new StaticChangeAddressResolver(async () => addresses)
     });
 
-  const validityInterval = ensureValidityInterval(tip.slot, genesisParameters, props.options?.validityInterval);
-  const withdrawals: Cardano.Withdrawal[] = rewardAccounts
-    .map(({ rewardBalance: quantity, address: stakeAddress }) => ({
-      quantity,
-      stakeAddress
-    }))
-    .filter(({ quantity }) => !!quantity);
+  // Create transaction body that can be customized by the user via the customizeCb
+  const { txBody, auxiliaryData } = createPreInputSelectionTxBody({
+    auxiliaryData: props.auxiliaryData,
+    certificates: props.certificates,
+    collaterals: props.collaterals,
+    mint: props.mint,
+    outputs: [...(props.outputs || [])],
+    requiredExtraSignatures: props.requiredExtraSignatures,
+    scriptIntegrityHash: props.scriptIntegrityHash,
+    validityInterval: ensureValidityInterval(tip.slot, genesisParameters, props.options?.validityInterval),
+    withdrawals: rewardAccounts
+      .map(({ rewardBalance: quantity, address: stakeAddress }) => ({
+        quantity,
+        stakeAddress
+      }))
+      .filter(({ quantity }) => !!quantity)
+  });
+
+  const bodyPreInputSelection = props.customizeCb ? props.customizeCb({ txBody }) : txBody;
 
   const constraints = defaultSelectionConstraints({
     buildTx: async (inputSelection) => {
       logger.debug('Building TX for selection constraints', inputSelection);
-      if (withdrawals.length > 0) {
-        logger.debug('Adding rewards withdrawal in the transaction', withdrawals);
+      if (bodyPreInputSelection.withdrawals?.length) {
+        logger.debug('Adding rewards withdrawal in the transaction', bodyPreInputSelection.withdrawals);
       }
-      const unsignedTx = await createTransactionInternals({
-        auxiliaryData: props.auxiliaryData,
-        certificates: props.certificates,
-        collaterals: props.collaterals,
-        inputSelection,
-        mint: props.mint,
-        requiredExtraSignatures: props.requiredExtraSignatures,
-        scriptIntegrityHash: props.scriptIntegrityHash,
-        validityInterval,
-        ...(withdrawals.length > 0 ? { withdrawals } : {})
+      const unsignedTx = includeChangeAndInputs({
+        bodyPreInputSelection,
+        inputSelection
       });
 
       const { tx } = await finalizeTx(
         unsignedTx,
         {
-          auxiliaryData: props.auxiliaryData,
+          auxiliaryData,
           handleResolutions: props.handleResolutions ?? [],
           signingContext: {
             knownAddresses: addresses,
@@ -82,27 +87,20 @@ export const initializeTx = async (
   });
 
   const implicitCoin = Cardano.util.computeImplicitCoin(protocolParameters, {
-    certificates: props.certificates,
-    withdrawals
+    certificates: bodyPreInputSelection.certificates,
+    withdrawals: bodyPreInputSelection.withdrawals
   });
 
   const { selection: inputSelection } = await inputSelector.select({
     constraints,
-    implicitValue: { coin: implicitCoin, mint: props.mint },
-    outputs: props.outputs || new Set(),
+    implicitValue: { coin: implicitCoin, mint: bodyPreInputSelection.mint },
+    outputs: new Set(bodyPreInputSelection.outputs),
     utxo: new Set(utxo)
   });
-  const { body, hash } = await createTransactionInternals({
-    auxiliaryData: props.auxiliaryData,
-    certificates: props.certificates,
-    collaterals: props.collaterals,
-    inputSelection,
-    mint: props.mint,
-    requiredExtraSignatures: props.requiredExtraSignatures,
-    scriptIntegrityHash: props.scriptIntegrityHash,
-    validityInterval,
-    ...(withdrawals.length > 0 ? { withdrawals } : {})
-  });
 
+  const { body, hash } = includeChangeAndInputs({
+    bodyPreInputSelection,
+    inputSelection
+  });
   return { body, hash, inputSelection };
 };
