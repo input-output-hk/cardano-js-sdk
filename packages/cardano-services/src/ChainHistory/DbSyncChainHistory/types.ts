@@ -163,8 +163,10 @@ export interface PoolRetireCertModel extends CertificateModel {
   retiring_epoch: number;
   pool_id: string;
 }
+
 export interface PoolRegisterCertModel extends CertificateModel {
   pool_id: string;
+  deposit: string;
 }
 
 export interface MirCertModel extends CertificateModel {
