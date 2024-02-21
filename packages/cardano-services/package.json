@@ -95,7 +95,7 @@
     "@cardano-sdk/util": "workspace:~",
     "@cardano-sdk/util-rxjs": "workspace:~",
     "@hapi/topo": "^6.0.2",
-    "axios": "^0.27.2",
+    "axios": "^0.28.0",
     "backoff-rxjs": "^7.0.0",
     "bignumber.js": "^9.1.0",
     "body-parser": "^1.19.2",
