@@ -21,6 +21,12 @@ in {
         {
           name = "backend";
           image = cell.oci-images.cardano-services.image.name;
+          env = dmerge.append [
+            {
+              name = "BUILD_INFO";
+              value = cell.oci-images.cardano-services.meta.buildInfo;
+            }
+          ];
         }
       ];
     };
@@ -29,6 +35,12 @@ in {
         {
           name = "handle-provider";
           image = cell.oci-images.cardano-services.image.name;
+          env = dmerge.append [
+            {
+              name = "BUILD_INFO";
+              value = cell.oci-images.cardano-services.meta.buildInfo;
+            }
+          ];
         }
       ];
     };
@@ -37,6 +49,12 @@ in {
         {
           name = "handle-projector";
           image = cell.oci-images.cardano-services.image.name;
+          env = dmerge.append [
+            {
+              name = "BUILD_INFO";
+              value = cell.oci-images.cardano-services.meta.buildInfo;
+            }
+          ];
         }
       ];
     };
@@ -45,6 +63,12 @@ in {
         {
           name = "pg-boss-worker";
           image = cell.oci-images.cardano-services.image.name;
+          env = dmerge.append [
+            {
+              name = "BUILD_INFO";
+              value = cell.oci-images.cardano-services.meta.buildInfo;
+            }
+          ];
         }
       ];
     };
@@ -53,6 +77,12 @@ in {
         {
           name = "stake-pool-projector";
           image = cell.oci-images.cardano-services.image.name;
+          env = dmerge.append [
+            {
+              name = "BUILD_INFO";
+              value = cell.oci-images.cardano-services.meta.buildInfo;
+            }
+          ];
         }
       ];
     };
@@ -61,6 +91,12 @@ in {
         {
           name = "stake-pool-provider";
           image = cell.oci-images.cardano-services.image.name;
+          env = dmerge.append [
+            {
+              name = "BUILD_INFO";
+              value = cell.oci-images.cardano-services.meta.buildInfo;
+            }
+          ];
         }
       ];
     };
