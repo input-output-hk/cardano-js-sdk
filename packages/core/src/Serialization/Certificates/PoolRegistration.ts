@@ -170,7 +170,7 @@ export class PoolRegistration {
    * @param cert core PoolRegistrationCertificate object.
    */
   static fromCore(cert: Cardano.PoolRegistrationCertificate) {
-    return new PoolRegistration(PoolParams.fromCore(cert.poolParameters)); // TODO: Core type does not support script hash as credential, fix?
+    return new PoolRegistration(PoolParams.fromCore(cert.poolParameters));
   }
 
   /**

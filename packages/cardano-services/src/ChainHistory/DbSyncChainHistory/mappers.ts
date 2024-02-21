@@ -155,7 +155,7 @@ export const mapAnchor = (anchorUrl: string, anchorDataHash: string): Cardano.An
 export const mapCertificate = (
   certModel: WithCertType<CertificateModel>
   // eslint-disable-next-line sonarjs/cognitive-complexity
-): WithCertIndex<Cardano.Certificate> | null => {
+): WithCertIndex<Cardano.HydratedCertificate> | null => {
   if (isPoolRetireCertModel(certModel))
     return {
       __typename: Cardano.CertificateType.PoolRetirement,
@@ -168,8 +168,9 @@ export const mapCertificate = (
     return {
       __typename: Cardano.CertificateType.PoolRegistration,
       cert_index: certModel.cert_index,
+      deposit: BigInt(certModel.deposit),
       poolParameters: null as unknown as Cardano.PoolParameters
-    } as WithCertIndex<Cardano.PoolRegistrationCertificate>;
+    } as WithCertIndex<Cardano.HydratedPoolRegistrationCertificate>;
 
   if (isMirCertModel(certModel)) {
     const credential = Cardano.Address.fromString(certModel.address)?.asReward()?.getPaymentCredential();

@@ -201,15 +201,17 @@ describe('chain history mappers', () => {
         poolId: Cardano.PoolId(poolId)
       });
     });
-    test('map PoolUpdateCertModel to Cardano.PoolRegistrationCertificate', () => {
+    test('map PoolUpdateCertModel to Cardano.HydratedPoolRegistrationCertificate', () => {
       const result = mappers.mapCertificate({
         ...baseCertModel,
+        deposit: '500000000',
         pool_id: poolId,
         type: 'register'
       } as WithCertType<PoolRegisterCertModel>);
-      expect(result).toEqual<WithCertIndex<Cardano.PoolRegistrationCertificate>>({
+      expect(result).toEqual<WithCertIndex<Cardano.HydratedPoolRegistrationCertificate>>({
         __typename: Cardano.CertificateType.PoolRegistration,
         cert_index: 0,
+        deposit: 500_000_000n,
         poolParameters: null as unknown as Cardano.PoolParameters
       });
     });

@@ -1,7 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AuxiliaryData } from './AuxiliaryData';
 import { Base64Blob, HexBlob, OpaqueString } from '@cardano-sdk/util';
-import { Certificate } from './Certificate';
+import { Certificate, PoolRegistrationCertificate } from './Certificate';
 import { ExUnits, Update, ValidityInterval } from './ProtocolParameters';
 import { HydratedTxIn, TxIn, TxOut } from './Utxo';
 import { Lovelace, TokenMap } from './Value';
@@ -36,6 +36,12 @@ export interface Withdrawal {
   quantity: Lovelace;
 }
 
+export type HydratedPoolRegistrationCertificate = PoolRegistrationCertificate & { deposit?: Lovelace };
+
+export type HydratedCertificate =
+  | Exclude<Certificate, PoolRegistrationCertificate>
+  | HydratedPoolRegistrationCertificate;
+
 export interface HydratedTxBody {
   inputs: HydratedTxIn[];
   collaterals?: HydratedTxIn[];
@@ -43,7 +49,7 @@ export interface HydratedTxBody {
   fee: Lovelace;
   validityInterval?: ValidityInterval;
   withdrawals?: Withdrawal[];
-  certificates?: Certificate[];
+  certificates?: HydratedCertificate[];
   mint?: TokenMap;
   scriptIntegrityHash?: Crypto.Hash32ByteBase16;
   requiredExtraSignatures?: Crypto.Ed25519KeyHashHex[];
@@ -80,9 +86,10 @@ export interface HydratedTxBody {
   donation?: Lovelace;
 }
 
-export interface TxBody extends Omit<HydratedTxBody, 'inputs' | 'collaterals' | 'referenceInputs'> {
-  inputs: TxIn[];
+export interface TxBody extends Omit<HydratedTxBody, 'certificates' | 'inputs' | 'collaterals' | 'referenceInputs'> {
+  certificates?: Certificate[];
   collaterals?: TxIn[];
+  inputs: TxIn[];
   referenceInputs?: TxIn[];
 }
 
