@@ -66,6 +66,10 @@ export const initializeTx = async (
         inputSelection
       });
 
+      const dRepPublicKey = addressManager
+        ? (await addressManager.derivePublicKey(util.DREP_KEY_DERIVATION_PATH)).hex()
+        : undefined;
+
       const { tx } = await finalizeTx(
         unsignedTx,
         {
@@ -78,7 +82,7 @@ export const initializeTx = async (
           signingOptions: props.signingOptions,
           witness: props.witness
         },
-        { bip32Account: addressManager, witnesser },
+        { dRepPublicKey, witnesser },
         true
       );
       return tx;

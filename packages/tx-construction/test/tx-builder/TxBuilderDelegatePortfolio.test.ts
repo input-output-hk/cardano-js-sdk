@@ -118,7 +118,14 @@ const createTxBuilder = async ({
       txBuilderProviders,
       witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)
     }),
-    txBuilderProviders
+    txBuilderProviders,
+    txBuilderWithoutBip32Account: new GenericTxBuilder({
+      inputResolver,
+      logger: dummyLogger,
+      outputValidator,
+      txBuilderProviders,
+      witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)
+    })
   };
 };
 
@@ -736,6 +743,59 @@ describe('TxBuilder/delegatePortfolio', () => {
       ).rejects.toThrow(OutOfSyncRewardAccounts);
       // Expect retries
       expect(rewardAccountsProvider.mock.calls.length).toBeGreaterThan(normalRewardAccountsCalls);
+    });
+  });
+
+  describe('No Bip32Account', () => {
+    it('throws if delegatePortfolio is called in a TxBuilder without Bip32Account', async () => {
+      await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0);
+      const rewardAccountsProvider = jest.fn().mockResolvedValue([]);
+      const txBuilderFactory = await createTxBuilder({
+        keyAgent,
+        rewardAccounts: rewardAccountsProvider,
+        stakeDelegations: []
+      });
+
+      txBuilder = txBuilderFactory.txBuilderWithoutBip32Account;
+
+      expect(() =>
+        txBuilder.delegatePortfolio({
+          name: 'Test Portfolio',
+          pools: [{ id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[0])), weight: 1 }]
+        })
+      ).toThrow('BIP32 account is required to delegate portfolio.');
+    });
+
+    it('can delegate calling delegateFirstStakeCredential', async () => {
+      const groupAddress = await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0);
+      const txBuilderFactory = await createTxBuilder({
+        keyAgent,
+        stakeDelegations: [{ credentialStatus: Cardano.StakeCredentialStatus.Unregistered }]
+      });
+
+      txBuilder = txBuilderFactory.txBuilderWithoutBip32Account;
+
+      const tx = await txBuilder.delegateFirstStakeCredential(poolIds[0]).build().inspect();
+
+      expect(tx.body.certificates?.length).toBe(2);
+      expect(tx.body.certificates).toContainEqual<Cardano.Certificate>({
+        __typename: Cardano.CertificateType.StakeRegistration,
+        stakeCredential: {
+          hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(groupAddress.rewardAccount)),
+          type: Cardano.CredentialType.KeyHash
+        }
+      });
+      expect(tx.body.certificates).toContainEqual({
+        __typename: Cardano.CertificateType.StakeDelegation,
+        poolId: poolIds[0],
+        stakeCredential: {
+          hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(groupAddress.rewardAccount)),
+          type: Cardano.CredentialType.KeyHash
+        }
+      });
+
+      expect(GreedyInputSelector).not.toHaveBeenCalled();
+      expect(roundRobinRandomImprove).toHaveBeenCalled();
     });
   });
 });

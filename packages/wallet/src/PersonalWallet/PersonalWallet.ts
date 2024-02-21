@@ -538,6 +538,8 @@ export class PersonalWallet implements ObservableWallet {
 
   async finalizeTx({ tx, sender, ...rest }: FinalizeTxProps, stubSign = false): Promise<Cardano.Tx> {
     const knownAddresses = await firstValueFrom(this.addresses$);
+    const dRepPublicKey = (await this.bip32Account.derivePublicKey(util.DREP_KEY_DERIVATION_PATH)).hex();
+
     const result = await finalizeTx(
       tx,
       {
@@ -548,7 +550,7 @@ export class PersonalWallet implements ObservableWallet {
           txInKeyPathMap: await util.createTxInKeyPathMap(tx.body, knownAddresses, this.util)
         }
       },
-      { bip32Account: this.bip32Account, witnesser: this.witnesser },
+      { dRepPublicKey, witnesser: this.witnesser },
       stubSign
     );
     this.#newTransactions.signed$.next(result);

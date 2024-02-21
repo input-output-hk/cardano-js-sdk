@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import {
   Bip32Account,
   GroupedAddress,
@@ -205,6 +206,14 @@ export interface TxBuilder {
    * @returns {OutputBuilder} {@link OutputBuilder} util for building transaction outputs.
    */
   buildOutput(txOut?: PartialTxOut): OutputBuilder;
+
+  /**
+   * Delegates the first stake credential controlled by the wallet.
+   *
+   * @param poolId The pool to delegate to, or null if the stake credential should be de-registered.
+   */
+  delegateFirstStakeCredential(poolId: Cardano.PoolId | null): TxBuilder;
+
   /**
    * Configures the transaction to include all the certificates needed to delegate to the pools from the portfolio.
    *
@@ -284,7 +293,7 @@ export interface TxBuilder {
 export interface TxBuilderDependencies {
   inputSelector?: InputSelector;
   inputResolver: Cardano.InputResolver;
-  bip32Account: Bip32Account;
+  bip32Account?: Bip32Account;
   witnesser: Witnesser;
   txBuilderProviders: TxBuilderProviders;
   logger: Logger;
@@ -292,4 +301,7 @@ export interface TxBuilderDependencies {
   handleProvider?: HandleProvider;
 }
 
-export type FinalizeTxDependencies = Pick<TxBuilderDependencies, 'bip32Account' | 'witnesser'>;
+export type FinalizeTxDependencies = { dRepPublicKey?: Crypto.Ed25519PublicKeyHex } & Pick<
+  TxBuilderDependencies,
+  'witnesser'
+>;

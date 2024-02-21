@@ -2,6 +2,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import {
   AddressType,
+  Bip32Account,
   GroupedAddress,
   SignTransactionOptions,
   TransactionSigner,
@@ -103,6 +104,8 @@ export class GenericTxBuilder implements TxBuilder {
   #logger: Logger;
   #handleProvider?: HandleProvider;
   #handleResolutions: HandleResolution[];
+  #delegateFirstStakeCredConfig: Cardano.PoolId | null | undefined = undefined;
+
   #customizeCb: CustomizeCb;
 
   constructor(dependencies: TxBuilderDependencies) {
@@ -153,7 +156,14 @@ export class GenericTxBuilder implements TxBuilder {
     });
   }
 
+  delegateFirstStakeCredential(poolId: Cardano.PoolId | null): TxBuilder {
+    this.#delegateFirstStakeCredConfig = poolId;
+    return this;
+  }
+
   delegatePortfolio(portfolio: Cardano.Cip17DelegationPortfolio | null): TxBuilder {
+    if (!this.#dependencies.bip32Account) throw new Error('BIP32 account is required to delegate portfolio.');
+
     if (portfolio?.pools.length === 0) {
       throw new Error('Portfolio should define at least one delegation pool.');
     }
@@ -204,10 +214,14 @@ export class GenericTxBuilder implements TxBuilder {
   build(): UnsignedTx {
     return new LazyTxSigner({
       builder: {
+        // eslint-disable-next-line sonarjs/cognitive-complexity
         build: async () => {
           this.#logger.debug('Building');
           try {
-            const rewardAccountsWithWeights = await this.#delegatePortfolio();
+            const rewardAccountsWithWeights = this.#dependencies.bip32Account
+              ? await this.#delegatePortfolio()
+              : await this.#delegateFirstStakeCredential();
+
             await this.#validateOutputs();
             // Take a snapshot of returned properties,
             // so that they don't change while `initializeTx` is resolving
@@ -226,13 +240,15 @@ export class GenericTxBuilder implements TxBuilder {
             }
 
             const dependencies = { ...this.#dependencies };
-            // Use greedy input selection if:
+
+            // Use greedy input selection if the wallet is a bip32 account and either of the following conditions are met
             // 1. Multi delegating: to distribute the funds to multiple addresses.
             // 2. Reducing the number of pools to 1 or 0, which implies we have multiple registered stake keys. This is needed
             //    to concentrate the funds back into a single address and delegate its stake key.
             if (
-              rewardAccountsWithWeights.size > 1 ||
-              (registeredRewardAccounts.length > 1 && rewardAccountsWithWeights.size <= 1)
+              this.#dependencies.bip32Account &&
+              (rewardAccountsWithWeights.size > 1 ||
+                (registeredRewardAccounts.length > 1 && rewardAccountsWithWeights.size <= 1))
             ) {
               // If the wallet is currently delegating to several pools, and all delegations are being removed,
               // then the funds will be concentrated back into a single address.
@@ -311,12 +327,12 @@ export class GenericTxBuilder implements TxBuilder {
     }
   }
 
-  async #getOrCreateRewardAccounts(): Promise<RewardAccountWithPoolId[]> {
+  async #getOrCreateRewardAccounts(bip32Account: Bip32Account): Promise<RewardAccountWithPoolId[]> {
     let allRewardAccounts: Cardano.RewardAccount[] = [];
     if (this.#requestedPortfolio) {
       const knownAddresses = await this.#dependencies.txBuilderProviders.addresses.get();
       const { newAddresses } = await util.ensureStakeKeys({
-        bip32Account: this.#dependencies.bip32Account,
+        bip32Account,
         count: this.#requestedPortfolio.length,
         knownAddresses,
         logger: contextLogger(this.#logger, 'getOrCreateRewardAccounts')
@@ -339,6 +355,63 @@ export class GenericTxBuilder implements TxBuilder {
     }
   }
 
+  async #delegateFirstStakeCredential(): Promise<RewardAccountsAndWeights> {
+    const rewardAccountsWithWeights: RewardAccountsAndWeights = new Map();
+    if (this.#delegateFirstStakeCredConfig === undefined) {
+      // Delegation was not configured by user
+      return Promise.resolve(rewardAccountsWithWeights);
+    }
+
+    const rewardAccounts = await this.#dependencies.txBuilderProviders.rewardAccounts();
+
+    if (!rewardAccounts?.length) {
+      // This shouldn't happen
+      throw new Error('Could not find any rewardAccount.');
+    }
+
+    const rewardAccount = rewardAccounts[0];
+
+    this.partialTxBody = { ...this.partialTxBody, certificates: [] };
+
+    const stakeCredential = Cardano.Address.fromBech32(rewardAccount.address).asReward()?.getPaymentCredential();
+
+    if (!stakeCredential) {
+      // This shouldn't happen
+      throw new Error(`Invalid credential ${stakeCredential}.`);
+    }
+
+    if (this.#delegateFirstStakeCredConfig === null) {
+      // Deregister scenario
+      if (rewardAccount.credentialStatus === Cardano.StakeCredentialStatus.Unregistered) {
+        this.#logger.warn('Stake key not registered.', rewardAccount.address, rewardAccount.credentialStatus);
+      } else {
+        this.partialTxBody.certificates!.push({
+          __typename: Cardano.CertificateType.StakeDeregistration,
+          stakeCredential
+        });
+      }
+    } else {
+      // Register and delegate scenario
+      if (rewardAccount.credentialStatus !== Cardano.StakeCredentialStatus.Unregistered) {
+        this.#logger.debug('Stake key already registered', rewardAccount.address, rewardAccount.credentialStatus);
+      } else {
+        this.partialTxBody.certificates!.push({
+          __typename: Cardano.CertificateType.StakeRegistration,
+          stakeCredential
+        });
+      }
+
+      rewardAccountsWithWeights.set(rewardAccount.address, 1);
+      this.partialTxBody.certificates!.push({
+        __typename: Cardano.CertificateType.StakeDelegation,
+        poolId: this.#delegateFirstStakeCredConfig,
+        stakeCredential
+      });
+    }
+
+    return rewardAccountsWithWeights;
+  }
+
   async #delegatePortfolio(): Promise<RewardAccountsAndWeights> {
     const rewardAccountsWithWeights: RewardAccountsAndWeights = new Map();
     if (!this.#requestedPortfolio) {
@@ -346,8 +419,10 @@ export class GenericTxBuilder implements TxBuilder {
       return rewardAccountsWithWeights;
     }
 
+    if (!this.#dependencies.bip32Account) throw new Error('BIP32 account is required to delegate portfolio.');
+
     // Create stake keys to match number of requested pools
-    const rewardAccounts = await this.#getOrCreateRewardAccounts();
+    const rewardAccounts = await this.#getOrCreateRewardAccounts(this.#dependencies.bip32Account);
 
     // New poolIds will be allocated to un-delegated stake keys
     const newPools = this.#requestedPortfolio

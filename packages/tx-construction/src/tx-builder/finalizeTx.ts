@@ -37,13 +37,13 @@ const getSignatures = async (
 export const finalizeTx = async (
   tx: Cardano.TxBodyWithHash,
   { witness, signingOptions, signingContext, auxiliaryData, isValid, handleResolutions }: TxContext,
-  { bip32Account: addressManager, witnesser }: FinalizeTxDependencies,
+  { dRepPublicKey, witnesser }: FinalizeTxDependencies,
   stubSign = false
 ): Promise<SignedTx> => {
   const signatures = stubSign
     ? await keyManagementUtil.stubSignTransaction({
         context: signingContext,
-        dRepPublicKey: (await addressManager.derivePublicKey(keyManagementUtil.DREP_KEY_DERIVATION_PATH)).hex(),
+        dRepPublicKey,
         extraSigners: witness?.extraSigners,
         signTransactionOptions: signingOptions,
         txBody: tx.body
