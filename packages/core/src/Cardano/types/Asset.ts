@@ -22,7 +22,7 @@ AssetName.toUTF8 = (assetName: AssetName) => {
   try {
     return utf8Decoder.decode(Buffer.from(assetName, 'hex'));
   } catch (error) {
-    throw new InvalidStringError('Cannot convert AssetName to UTF8', error);
+    throw new InvalidStringError(`Cannot convert AssetName '${assetName}' to UTF8`, error);
   }
 };
 

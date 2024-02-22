@@ -121,7 +121,11 @@ export const fromMetadatum = (
   const assetId = Cardano.AssetId.fromParts(asset.policyId, asset.name);
 
   if (version === '1.0' && !name) {
-    name = AssetName.toUTF8(asset.name);
+    try {
+      name = AssetName.toUTF8(asset.name);
+    } catch (error) {
+      logger.warn(error);
+    }
   }
 
   if (!name || !image) {
