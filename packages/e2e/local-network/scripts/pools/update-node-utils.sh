@@ -214,7 +214,7 @@ updatePool() {
   currentBalance=$(getAddressBalance "$paymentAddr")
 
   # create pool delegation certificate
-  cardano-cli conway stake-address stake-delegation-certificate \
+  cardano-cli stake-address delegation-certificate \
     --stake-verification-key-file "$delegatorStakeKey" \
     --stake-pool-id "$POOL_ID" \
     --out-file deleg.cert
