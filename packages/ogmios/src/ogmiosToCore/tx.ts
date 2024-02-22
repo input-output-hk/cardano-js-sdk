@@ -273,6 +273,12 @@ const mapRedeemer = (redeemer: Schema.Redeemer): Cardano.Redeemer => {
     case 'withdraw':
       purpose = Cardano.RedeemerPurpose.withdrawal;
       break;
+    case 'propose':
+      purpose = Cardano.RedeemerPurpose.propose;
+      break;
+    case 'vote':
+      purpose = Cardano.RedeemerPurpose.vote;
+      break;
   }
 
   return {

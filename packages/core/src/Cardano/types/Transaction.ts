@@ -103,7 +103,9 @@ export enum RedeemerPurpose {
   mint = 'mint',
   certificate = 'certificate',
   withdrawal = 'withdrawal',
-  delegateRepresentative = 'representative'
+  delegateRepresentative = 'representative',
+  propose = 'propose',
+  vote = 'vote'
 }
 
 export interface Redeemer {
