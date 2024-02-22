@@ -6,17 +6,18 @@ import {
   util as KeyManagementUtil,
   KeyRole
 } from '@cardano-sdk/key-management';
-import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
-import { DrepScriptHashVoter } from '@cardano-sdk/core/dist/cjs/Cardano';
 import {
+  BaseWallet,
   ObservableWallet,
-  PersonalWallet,
   ScriptAddress,
   combineInputResolvers,
   createBackendInputResolver,
   createInputResolver,
+  createPersonalWallet,
   requiresForeignSignatures
 } from '../../src';
+import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
+import { DrepScriptHashVoter } from '@cardano-sdk/core/dist/cjs/Cardano';
 import { createAsyncKeyAgent, signTx, toSignedTx, waitForWalletStateSettle } from '../util';
 import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
@@ -472,7 +473,7 @@ describe('WalletUtil', () => {
     const address = mocks.utxo[0][0].address!;
     let txSubmitProvider: mocks.TxSubmitProviderStub;
     let networkInfoProvider: mocks.NetworkInfoProviderStub;
-    let wallet: PersonalWallet;
+    let wallet: BaseWallet;
     let utxoProvider: mocks.UtxoProviderStub;
     let tx: Cardano.Tx;
 
@@ -508,7 +509,7 @@ describe('WalletUtil', () => {
       const asyncKeyAgent = await createAsyncKeyAgent();
       const bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
       bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
-      wallet = new PersonalWallet(
+      wallet = createPersonalWallet(
         { name: 'Test Wallet' },
         {
           assetProvider,
@@ -553,7 +554,7 @@ describe('WalletUtil', () => {
         walletUtil: wallet.util
       });
 
-      dRepCredential = await wallet.getPubDRepKey();
+      dRepCredential = (await wallet.getPubDRepKey())!;
       dRepKeyHash = Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(
         (await Crypto.Ed25519PublicKey.fromHex(dRepCredential).hash()).hex()
       );

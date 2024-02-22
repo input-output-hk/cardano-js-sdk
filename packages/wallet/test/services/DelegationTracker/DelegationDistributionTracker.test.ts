@@ -36,22 +36,22 @@ describe('createDelegationDistributionTracker', () => {
     rewardAccounts = [
       {
         address: mocks.rewardAccount,
+        credentialStatus: Cardano.StakeCredentialStatus.Registered,
         delegatee: {
           currentEpoch: undefined,
           nextEpoch: undefined,
           nextNextEpoch: pools[0] as Cardano.StakePool
         },
-        credentialStatus: Cardano.StakeCredentialStatus.Registered,
         rewardBalance: 1_000_000n
       },
       {
         address: Cardano.RewardAccount('stake_test1upx9faamuf54pm7alg4lna5l7ll08pz833rj45tgr9m2jyceasqjt'),
+        credentialStatus: Cardano.StakeCredentialStatus.Registered,
         delegatee: {
           currentEpoch: undefined,
           nextEpoch: undefined,
           nextNextEpoch: pools[1] as Cardano.StakePool
         },
-        credentialStatus: Cardano.StakeCredentialStatus.Registered,
         rewardBalance: 1_000_000n
       }
     ];

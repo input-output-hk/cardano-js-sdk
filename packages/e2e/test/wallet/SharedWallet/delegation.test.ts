@@ -1,20 +1,19 @@
 /* eslint-disable max-statements */
-import * as Crypto from '@cardano-sdk/crypto';
 import { BaseWallet, ObservableWallet } from '@cardano-sdk/wallet';
-import { BigIntMath } from '@cardano-sdk/util';
-import { Cardano } from '@cardano-sdk/core';
+import { BigIntMath, isNotNil } from '@cardano-sdk/util';
+import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
 import {
   TX_TIMEOUT_DEFAULT,
-  TestWallet,
-  bip32Ed25519Factory,
   firstValueFromTimed,
   getEnv,
   getWallet,
+  normalizeTxBody,
   waitForWalletStateSettle,
   walletReady,
   walletVariables
 } from '../../../src';
-import { combineLatest, filter, firstValueFrom } from 'rxjs';
+import { buildSharedWallets } from './ultils';
+import { combineLatest, filter, firstValueFrom, map, take } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 
 const env = getEnv(walletVariables);
@@ -33,7 +32,7 @@ const getWalletStateSnapshot = async (wallet: ObservableWallet) => {
   return {
     balance: { available: balanceAvailable, deposit, total: balanceTotal },
     epoch: epoch.epochNo,
-    isStakeKeyRegistered: rewardAccount.credentialStatus === Cardano.StakeCredentialStatus.Registered,
+    isStakeCredentialRegistered: rewardAccount.credentialStatus === Cardano.StakeCredentialStatus.Registered,
     publicStakeKey,
     rewardAccount,
     rewardsBalance,
@@ -54,35 +53,71 @@ const waitForTx = async (wallet: ObservableWallet, hash: Cardano.TransactionId) 
   await waitForWalletStateSettle(wallet);
 };
 
-describe('PersonalWallet/delegation', () => {
-  let wallet1: TestWallet;
-  let wallet2: TestWallet;
-  let bip32Ed25519: Crypto.Bip32Ed25519;
+describe('SharedWallet/delegation', () => {
+  let fundingTx: Cardano.Tx<Cardano.TxBody>;
+  let faucetWallet: BaseWallet;
+  let faucetAddress: Cardano.PaymentAddress;
+  let aliceMultiSigWallet: BaseWallet;
+  let bobMultiSigWallet: BaseWallet;
+  let charlotteMultiSigWallet: BaseWallet;
+  let stakePoolProvider: StakePoolProvider;
+
+  const initialFunds = 10_000_000n;
 
   beforeAll(async () => {
     jest.setTimeout(180_000);
-    wallet1 = await getWallet({ env, idx: 0, logger, name: 'Test Wallet 1', polling: { interval: 500 } });
-    wallet2 = await getWallet({ env, idx: 1, logger, name: 'Test Wallet 2', polling: { interval: 500 } });
 
-    await Promise.all([waitForWalletStateSettle(wallet1.wallet), waitForWalletStateSettle(wallet2.wallet)]);
-    bip32Ed25519 = await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger);
+    ({
+      wallet: faucetWallet,
+      providers: { stakePoolProvider }
+    } = await getWallet({ env, logger, name: 'Sending Wallet', polling: { interval: 50 } }));
+
+    // Make sure the wallet has sufficient funds to run this test
+    await walletReady(faucetWallet, initialFunds);
+
+    faucetAddress = (await firstValueFrom(faucetWallet.addresses$))[0].address;
+
+    ({ aliceMultiSigWallet, bobMultiSigWallet, charlotteMultiSigWallet } = await buildSharedWallets(
+      env,
+      await firstValueFrom(faucetWallet.genesisParameters$),
+      logger
+    ));
+
+    await Promise.all([
+      waitForWalletStateSettle(aliceMultiSigWallet),
+      waitForWalletStateSettle(bobMultiSigWallet),
+      waitForWalletStateSettle(charlotteMultiSigWallet)
+    ]);
+
+    const [{ address: receivingAddress }] = await firstValueFrom(aliceMultiSigWallet.addresses$);
+
+    logger.info(`Address ${faucetAddress} will send ${initialFunds} lovelace to address ${receivingAddress}.`);
+
+    // Send 10 tADA to the shared wallet.
+    const txBuilder = faucetWallet.createTxBuilder();
+    const txOutput = await txBuilder.buildOutput().address(receivingAddress).coin(initialFunds).build();
+    fundingTx = (await txBuilder.addOutput(txOutput).build().sign()).tx;
+    await faucetWallet.submitTx(fundingTx);
+
+    logger.info(
+      `Submitted transaction id: ${fundingTx.id}, inputs: ${JSON.stringify(
+        fundingTx.body.inputs.map((txIn) => [txIn.txId, txIn.index])
+      )} and outputs:${JSON.stringify(
+        fundingTx.body.outputs.map((txOut) => [txOut.address, Number.parseInt(txOut.value.coins.toString())])
+      )}.`
+    );
   });
 
   afterAll(() => {
-    wallet1.wallet.shutdown();
-    wallet2.wallet.shutdown();
+    faucetWallet.shutdown();
+    aliceMultiSigWallet.shutdown();
+    bobMultiSigWallet.shutdown();
+    charlotteMultiSigWallet.shutdown();
+    faucetWallet.shutdown();
   });
 
-  const chooseWallets = async (): Promise<[BaseWallet, BaseWallet]> => {
-    const wallet1Balance = await firstValueFrom(wallet1.wallet.balance.utxo.available$);
-    const wallet2Balance = await firstValueFrom(wallet2.wallet.balance.utxo.available$);
-    return wallet1Balance.coins > wallet2Balance.coins
-      ? [wallet1.wallet, wallet2.wallet]
-      : [wallet2.wallet, wallet1.wallet];
-  };
-
   const chooseDifferentPoolIdRandomly = async (delegateeBefore1stTx?: Cardano.PoolId): Promise<Cardano.PoolId> => {
-    const activePools = await wallet1.providers.stakePoolProvider.queryStakePools({
+    const activePools = await stakePoolProvider.queryStakePools({
       filters: { status: [Cardano.StakePoolStatus.Active] },
       pagination: { limit: 2, startAt: 0 }
     });
@@ -91,50 +126,66 @@ describe('PersonalWallet/delegation', () => {
   };
 
   test('delegation preconditions', async () => {
-    const addresses = await firstValueFrom(wallet1.wallet.addresses$);
-    const currentEpoch = await firstValueFrom(wallet1.wallet.currentEpoch$);
+    const addresses = await firstValueFrom(aliceMultiSigWallet.addresses$);
+    const currentEpoch = await firstValueFrom(aliceMultiSigWallet.currentEpoch$);
     expect(addresses[0].rewardAccount).toBeTruthy();
     expect(currentEpoch.epochNo).toBeGreaterThan(0);
   });
 
   test('balance & transaction', async () => {
-    // source wallet has the highest balance to begin with
-    const [sourceWallet, destWallet] = await chooseWallets();
+    const txFoundInHistory = await firstValueFrom(
+      aliceMultiSigWallet.transactions.history$.pipe(
+        map((txs) => txs.find((tx) => tx.id === fundingTx.id)),
+        filter(isNotNil),
+        take(1)
+      )
+    );
+
+    logger.info(`Found transaction id in chain history: ${txFoundInHistory.id}`);
+
+    expect(txFoundInHistory).toBeDefined();
+    expect(txFoundInHistory.id).toEqual(fundingTx.id);
+    expect(normalizeTxBody(txFoundInHistory.body)).toEqual(normalizeTxBody(fundingTx.body));
 
     const tx1OutputCoins = 1_000_000n;
-    await walletReady(sourceWallet, tx1OutputCoins);
+    await walletReady(aliceMultiSigWallet, tx1OutputCoins);
 
-    const protocolParameters = await firstValueFrom(sourceWallet.protocolParameters$);
+    const protocolParameters = await firstValueFrom(aliceMultiSigWallet.protocolParameters$);
     const stakeKeyDeposit = BigInt(protocolParameters.stakeKeyDeposit);
-    const initialState = await getWalletStateSnapshot(sourceWallet);
+    const initialState = await getWalletStateSnapshot(aliceMultiSigWallet);
     expect(initialState.balance.total.coins).toBe(initialState.balance.available.coins);
     const poolId = await chooseDifferentPoolIdRandomly(initialState.rewardAccount.delegatee?.nextNextEpoch?.id);
     expect(poolId).toBeDefined();
-    const initialDeposit = initialState.isStakeKeyRegistered ? stakeKeyDeposit : 0n;
+    const initialDeposit = initialState.isStakeCredentialRegistered ? stakeKeyDeposit : 0n;
     expect(initialState.balance.deposit).toBe(initialDeposit);
 
     // Make a 1st tx with key registration (if not already registered) and stake delegation
     // Also send some coin to another wallet
-    const destAddresses = (await firstValueFrom(destWallet.addresses$))[0].address;
-    const txBuilder = sourceWallet.createTxBuilder();
+    const destAddresses = (await firstValueFrom(faucetWallet.addresses$))[0].address;
+    const txBuilder = aliceMultiSigWallet.createTxBuilder();
 
-    const { tx } = await txBuilder
-      .addOutput(await txBuilder.buildOutput().address(destAddresses).coin(tx1OutputCoins).build())
-      .delegatePortfolio({ pools: [{ id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolId)), weight: 1 }] })
-      .build()
-      .sign();
-    await sourceWallet.submitTx(tx);
+    let tx = (
+      await txBuilder
+        .addOutput(await txBuilder.buildOutput().address(destAddresses).coin(tx1OutputCoins).build())
+        .delegateFirstStakeCredential(poolId)
+        .build()
+        .sign()
+    ).tx;
+
+    tx = await bobMultiSigWallet.updateWitness({ sender: { id: 'e2e' }, tx });
+    tx = await charlotteMultiSigWallet.updateWitness({ sender: { id: 'e2e' }, tx });
+    await aliceMultiSigWallet.submitTx(tx);
 
     // Test it locks available balance after tx is submitted
     await firstValueFromTimed(
-      sourceWallet.transactions.outgoing.inFlight$.pipe(filter((inFlight) => inFlight.length === 1)),
+      aliceMultiSigWallet.transactions.outgoing.inFlight$.pipe(filter((inFlight) => inFlight.length === 1)),
       'No tx in flight'
     );
 
-    const tx1PendingState = await getWalletStateSnapshot(sourceWallet);
+    const tx1PendingState = await getWalletStateSnapshot(aliceMultiSigWallet);
 
     // Updates total and available balance right after tx is submitted
-    const coinsSpentOnDeposit = initialState.isStakeKeyRegistered ? 0n : stakeKeyDeposit;
+    const coinsSpentOnDeposit = initialState.isStakeCredentialRegistered ? 0n : stakeKeyDeposit;
     const newRewardsWhileSigningAndSubmitting = tx1PendingState.rewardsBalance;
     const expectedCoinsAfterTx1 =
       initialState.balance.total.coins -
@@ -147,8 +198,8 @@ describe('PersonalWallet/delegation', () => {
     expect(tx1PendingState.balance.available.coins).toEqual(expectedCoinsAfterTx1);
     expect(tx1PendingState.balance.deposit).toEqual(stakeKeyDeposit);
 
-    await waitForTx(sourceWallet, tx.id);
-    const tx1ConfirmedState = await getWalletStateSnapshot(sourceWallet);
+    await waitForTx(aliceMultiSigWallet, tx.id);
+    const tx1ConfirmedState = await getWalletStateSnapshot(aliceMultiSigWallet);
 
     // Updates total and available balance after tx is on-chain
     expect(tx1ConfirmedState.balance.total.coins).toBe(expectedCoinsAfterTx1);
@@ -169,22 +220,24 @@ describe('PersonalWallet/delegation', () => {
       expect(tx1ConfirmedState.rewardAccount.delegatee?.currentEpoch?.id).toEqual(poolId);
     }
 
-    const stakeKeyHash = await bip32Ed25519.getPubKeyHash(tx1ConfirmedState.publicStakeKey.publicStakeKey);
-    expect(stakeKeyHash).toEqual(Cardano.RewardAccount.toHash(tx1ConfirmedState.rewardAccount.address));
-    expect(tx1ConfirmedState.publicStakeKey.credentialStatus).toBe(Cardano.StakeCredentialStatus.Registered);
+    expect(tx1ConfirmedState.rewardAccount.credentialStatus).toBe(Cardano.StakeCredentialStatus.Registered);
 
     // Make a 2nd tx with key de-registration
-    const { tx: txDeregisterSigned } = await sourceWallet.createTxBuilder().delegatePortfolio(null).build().sign();
-    await sourceWallet.submitTx(txDeregisterSigned);
-    await waitForTx(sourceWallet, txDeregisterSigned.id);
-    const tx2ConfirmedState = await getWalletStateSnapshot(sourceWallet);
+    tx = (await aliceMultiSigWallet.createTxBuilder().delegateFirstStakeCredential(null).build().sign()).tx;
+    tx = await bobMultiSigWallet.updateWitness({ sender: { id: 'e2e' }, tx });
+    tx = await charlotteMultiSigWallet.updateWitness({ sender: { id: 'e2e' }, tx });
+
+    await aliceMultiSigWallet.submitTx(tx);
+
+    await waitForTx(aliceMultiSigWallet, tx.id);
+    const tx2ConfirmedState = await getWalletStateSnapshot(aliceMultiSigWallet);
 
     // No longer delegating
     expect(tx2ConfirmedState.rewardAccount.delegatee?.nextNextEpoch?.id).toBeUndefined();
-    expect(tx2ConfirmedState.publicStakeKey.credentialStatus).toBe(Cardano.StakeCredentialStatus.Unregistered);
+    expect(tx2ConfirmedState.rewardAccount.credentialStatus).toBe(Cardano.StakeCredentialStatus.Unregistered);
 
     // Deposit is returned to wallet balance
-    const expectedCoinsAfterTx2 = expectedCoinsAfterTx1 + stakeKeyDeposit - txDeregisterSigned.body.fee;
+    const expectedCoinsAfterTx2 = expectedCoinsAfterTx1 + stakeKeyDeposit - tx.body.fee;
     expect(tx2ConfirmedState.balance.total.coins).toBe(expectedCoinsAfterTx2);
     expect(tx2ConfirmedState.balance.total).toEqual(tx2ConfirmedState.balance.available);
     expect(tx2ConfirmedState.balance.deposit).toBe(0n);

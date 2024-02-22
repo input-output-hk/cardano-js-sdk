@@ -1,8 +1,7 @@
-import { Bip32Account, GroupedAddress } from '@cardano-sdk/key-management';
+import { Bip32Account, GroupedAddress, WitnessedTx } from '@cardano-sdk/key-management';
 import { Cardano, Reward, TxCBOR } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
 import { Percent } from '@cardano-sdk/util';
-import { SignedTx } from '@cardano-sdk/tx-construction';
 
 export enum TransactionFailure {
   InvalidTransaction = 'INVALID_TRANSACTION',
@@ -60,7 +59,7 @@ export interface OutgoingTx {
   cbor: TxCBOR;
   body: Cardano.TxBody;
   id: Cardano.TransactionId;
-  context?: SignedTx['context'];
+  context?: WitnessedTx['context'];
 }
 
 export interface FailedTx extends OutgoingTx {
@@ -83,7 +82,7 @@ export interface TransactionsTracker {
     readonly inFlight$: Observable<TxInFlight[]>;
     readonly submitting$: Observable<OutgoingTx>;
     readonly pending$: Observable<OutgoingTx>;
-    readonly signed$: Observable<SignedTx[]>;
+    readonly signed$: Observable<WitnessedTx[]>;
     readonly failed$: Observable<FailedTx>;
     readonly onChain$: Observable<OutgoingOnChainTx>;
   };

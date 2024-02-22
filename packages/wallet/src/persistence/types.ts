@@ -1,9 +1,8 @@
 import { Assets } from '../types';
 import { Cardano, EraSummary, Reward, StakeSummary, SupplySummary } from '@cardano-sdk/core';
-import { GroupedAddress } from '@cardano-sdk/key-management';
+import { GroupedAddress, WitnessedTx } from '@cardano-sdk/key-management';
 import { Observable } from 'rxjs';
 import { OutgoingOnChainTx, TxInFlight } from '../services';
-import { SignedTx } from '@cardano-sdk/tx-construction';
 
 export interface Destroyable {
   destroyed: boolean;
@@ -89,7 +88,7 @@ export interface WalletStores extends Destroyable {
   assets: DocumentStore<Assets>;
   addresses: DocumentStore<GroupedAddress[]>;
   policyIds: DocumentStore<Cardano.PolicyId[]>;
-  signedTransactions: DocumentStore<SignedTx[]>;
+  signedTransactions: DocumentStore<WitnessedTx[]>;
 }
 
 export interface SupplyDistributionStores extends Destroyable {

@@ -1,6 +1,7 @@
 /* eslint-disable no-console, max-statements, max-params, @typescript-eslint/no-floating-promises */
 import { ValueTransferConfig, configLoader } from './config';
 
+import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano } from '@cardano-sdk/core';
 import { Files, Paths } from './files';
 import {
@@ -14,7 +15,6 @@ import {
   walletVariables
 } from '../../../';
 import { Observable, filter, firstValueFrom, map } from 'rxjs';
-import { PersonalWallet } from '@cardano-sdk/wallet';
 import { TaskResult, TerminalProgressMonitor } from './terminal-progress-monitor';
 import { logger } from '@cardano-sdk/util-dev';
 import { util } from '@cardano-sdk/key-management';
@@ -26,7 +26,7 @@ import chalk from 'chalk';
  * @param wallet The wallet to get the pools from.
  * @param count The requested number of pools.
  */
-const getPoolIds = async (wallet: PersonalWallet, count: number): Promise<Cardano.StakePool[]> => {
+const getPoolIds = async (wallet: BaseWallet, count: number): Promise<Cardano.StakePool[]> => {
   const activePools = await wallet.stakePoolProvider.queryStakePools({
     filters: { status: [Cardano.StakePoolStatus.Active] },
     pagination: { limit: count, startAt: 0 }
@@ -93,7 +93,7 @@ export const loadConfiguration = async (monitor: TerminalProgressMonitor) => {
  *
  * @param monitor The progress monitor
  */
-export const waitForFundingWallet = async (monitor: TerminalProgressMonitor): Promise<PersonalWallet> => {
+export const waitForFundingWallet = async (monitor: TerminalProgressMonitor): Promise<BaseWallet> => {
   monitor.startTask('Waiting for funding wallet to be ready.');
 
   const fundingWallet = (await getWallet({ env, idx: 0, logger, name: 'Funding wallet', polling: { interval: 500 } }))
@@ -146,8 +146,8 @@ export const createDelegationWallet = async (monitor: TerminalProgressMonitor) =
  * @param monitor The progress monitor.
  */
 export const transferStartingFunds = async (
-  fundingWallet: PersonalWallet,
-  delegationWallet: PersonalWallet,
+  fundingWallet: BaseWallet,
+  delegationWallet: BaseWallet,
   startingFunds: number,
   monitor: TerminalProgressMonitor
 ) => {
@@ -175,7 +175,7 @@ export const transferStartingFunds = async (
  * @param monitor The progress monitor.
  */
 export const distributeStake = async (
-  delegationWallet: PersonalWallet,
+  delegationWallet: BaseWallet,
   stakeDistribution: Array<number>,
   monitor: TerminalProgressMonitor
 ): Promise<Cardano.Cip17DelegationPortfolio> => {
@@ -205,7 +205,7 @@ export const distributeStake = async (
  * @param monitor The progress monitor.
  */
 export const logState = async (
-  delegationWallet: PersonalWallet,
+  delegationWallet: BaseWallet,
   iteration: number,
   outputPath: string,
   monitor: TerminalProgressMonitor
@@ -262,7 +262,7 @@ export const getOutputPathName = () =>
  * @param currentIteration the current iteration.
  */
 const transferValue = async (
-  wallet: PersonalWallet,
+  wallet: BaseWallet,
   targetAddress: Cardano.PaymentAddress,
   config: ValueTransferConfig,
   currentIteration: number
@@ -297,8 +297,8 @@ const transferValue = async (
  * @param monitor The progress monitor.
  */
 export const sendTransactions = async (
-  fundingWallet: PersonalWallet,
-  delegationWallet: PersonalWallet,
+  fundingWallet: BaseWallet,
+  delegationWallet: BaseWallet,
   inputsConfig: ValueTransferConfig,
   outputsConfig: ValueTransferConfig,
   iteration: number,

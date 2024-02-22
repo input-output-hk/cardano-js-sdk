@@ -7,9 +7,10 @@ import {
   HDSequentialDiscovery,
   Milliseconds,
   ObservableWallet,
-  PersonalWallet,
   PollingConfig,
   SingleAddressDiscovery,
+  createPersonalWallet,
+  createSharedWallet,
   storage
 } from '@cardano-sdk/wallet';
 import {
@@ -286,6 +287,18 @@ export type GetWalletProps = {
   witnesser?: Witnesser;
 };
 
+export type GetSharedWalletProps = {
+  env: any;
+  logger: Logger;
+  name: string;
+  polling?: PollingConfig;
+  handlePolicyIds?: Cardano.PolicyId[];
+  stores?: storage.WalletStores;
+  witnesser: Witnesser;
+  paymentScript: Cardano.RequireAllOfScript | Cardano.RequireAnyOfScript | Cardano.RequireAtLeastScript;
+  stakingScript: Cardano.RequireAllOfScript | Cardano.RequireAnyOfScript | Cardano.RequireAtLeastScript;
+};
+
 /** Delays initializing tx when nearing the epoch boundary. Relies on system clock being accurate. */
 const patchInitializeTxToRespectEpochBoundary = <T extends ObservableWallet>(
   wallet: T,
@@ -360,7 +373,7 @@ export const getWallet = async (props: GetWalletProps) => {
       logger
     }));
   const bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
-  const wallet = new PersonalWallet(
+  const wallet = createPersonalWallet(
     { name, polling },
     {
       ...providers,
@@ -379,6 +392,62 @@ export const getWallet = async (props: GetWalletProps) => {
     (polling?.interval && polling.interval * DEFAULT_POLLING_CONFIG.maxIntervalMultiplier) ||
     DEFAULT_POLLING_CONFIG.maxInterval;
   return { bip32Account, providers, wallet: patchInitializeTxToRespectEpochBoundary(wallet, maxInterval) };
+};
+
+/**
+ * Create a shared wallet instance given the environment variables.
+ *
+ * @param props Wallet configuration parameters.
+ * @returns an object containing the wallet and providers passed to it
+ */
+export const getSharedWallet = async (props: GetSharedWalletProps) => {
+  const { env, logger, name, polling, stores, paymentScript, stakingScript, witnesser } = props;
+  const providers = {
+    assetProvider: await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS, logger),
+    chainHistoryProvider: await chainHistoryProviderFactory.create(
+      env.CHAIN_HISTORY_PROVIDER,
+      env.CHAIN_HISTORY_PROVIDER_PARAMS,
+      logger
+    ),
+    handleProvider: await handleProviderFactory.create(env.HANDLE_PROVIDER, env.HANDLE_PROVIDER_PARAMS, logger),
+    networkInfoProvider: await networkInfoProviderFactory.create(
+      env.NETWORK_INFO_PROVIDER,
+      env.NETWORK_INFO_PROVIDER_PARAMS,
+      logger
+    ),
+    rewardsProvider: await rewardsProviderFactory.create(env.REWARDS_PROVIDER, env.REWARDS_PROVIDER_PARAMS, logger),
+    stakePoolProvider: await stakePoolProviderFactory.create(
+      env.STAKE_POOL_PROVIDER,
+      env.STAKE_POOL_PROVIDER_PARAMS,
+      logger
+    ),
+    txSubmitProvider: await txSubmitProviderFactory.create(
+      env.TX_SUBMIT_PROVIDER,
+      env.TX_SUBMIT_PROVIDER_PARAMS,
+      logger
+    ),
+    utxoProvider: await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS, logger)
+  };
+  const wallet = createSharedWallet(
+    { name, polling },
+    {
+      ...providers,
+      logger,
+      paymentScript,
+      stakingScript,
+      stores,
+      witnesser
+    }
+  );
+
+  const [{ address, rewardAccount }] = await firstValueFrom(wallet.addresses$);
+  logger.info(`Created wallet "${wallet.name}": ${address}/${rewardAccount}`);
+
+  const maxInterval =
+    polling?.maxInterval ||
+    (polling?.interval && polling.interval * DEFAULT_POLLING_CONFIG.maxIntervalMultiplier) ||
+    DEFAULT_POLLING_CONFIG.maxInterval;
+  return { providers, wallet: patchInitializeTxToRespectEpochBoundary(wallet, maxInterval) };
 };
 
 export type TestWallet = Awaited<ReturnType<typeof getWallet>>;

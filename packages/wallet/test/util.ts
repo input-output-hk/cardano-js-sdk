@@ -1,10 +1,9 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Bip32Account, GroupedAddress, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
-import { Cardano, TxCBOR } from '@cardano-sdk/core';
+import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
+import { GroupedAddress, InMemoryKeyAgent, WitnessedTx, util } from '@cardano-sdk/key-management';
 import { HexBlob } from '@cardano-sdk/util';
 import { Observable, catchError, filter, firstValueFrom, throwError, timeout } from 'rxjs';
 import { ObservableWallet, OutgoingTx, WalletUtil } from '../src';
-import { SignedTx, finalizeTx } from '@cardano-sdk/tx-construction';
 import { SodiumBip32Ed25519 } from '@cardano-sdk/crypto';
 import { logger } from '@cardano-sdk/util-dev';
 import { testAsyncKeyAgent } from '../../key-management/test/mocks';
@@ -40,7 +39,7 @@ export const toOutgoingTx = (tx: Cardano.Tx): OutgoingTx => ({
   id: tx.id
 });
 
-export const toSignedTx = (tx: Cardano.Tx): SignedTx => ({
+export const toSignedTx = (tx: Cardano.Tx): WitnessedTx => ({
   cbor: TxCBOR.serialize(tx),
   context: {
     handleResolutions: []
@@ -95,18 +94,16 @@ export const signTx = async ({
 }): Promise<Cardano.Tx> => {
   const keyAgent = await testAsyncKeyAgent();
   const knownAddresses = await firstValueFrom(addresses$);
+  const witnesser = util.createBip32Ed25519Witnesser(keyAgent);
 
-  const signed = await finalizeTx(
-    tx,
+  const signed = await witnesser.witness(
+    new Serialization.Transaction(
+      Serialization.TransactionBody.fromCore(tx.body),
+      Serialization.TransactionWitnessSet.fromCore({ signatures: new Map() })
+    ),
     {
-      signingContext: {
-        knownAddresses,
-        txInKeyPathMap: await util.createTxInKeyPathMap(tx.body, knownAddresses, walletUtil)
-      }
-    },
-    {
-      bip32Account: await Bip32Account.fromAsyncKeyAgent(keyAgent),
-      witnesser: util.createBip32Ed25519Witnesser(keyAgent)
+      knownAddresses,
+      txInKeyPathMap: await util.createTxInKeyPathMap(tx.body, knownAddresses, walletUtil)
     }
   );
 

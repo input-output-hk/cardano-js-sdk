@@ -478,7 +478,7 @@ const baseCip30WalletApi = (
           );
         const {
           witness: { signatures }
-        } = await wallet.finalizeTx({ sender, tx: { ...coreTx, hash } });
+        } = await wallet.finalizeTx({ signingContext: { sender }, tx: { ...coreTx, hash } });
 
         // If partialSign is true, the wallet only tries to sign what it can. However, if
         // signatures size is 0 then throw.
@@ -564,7 +564,11 @@ const extendedCip95WalletApi = (
     logger.debug('getting public DRep key');
     try {
       const wallet = await firstValueFrom(wallet$);
-      return await wallet.getPubDRepKey();
+      const dReKey = await wallet.getPubDRepKey();
+
+      if (!dReKey) throw new Error('Shared wallet does not support DRep key');
+
+      return dReKey;
     } catch (error) {
       logger.error(error);
       throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));

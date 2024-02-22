@@ -15,8 +15,8 @@ import {
   waitForFundingWallet
 } from './utils';
 
+import { BaseWallet, DynamicChangeAddressResolver } from '@cardano-sdk/wallet';
 import { Cardano } from '@cardano-sdk/core';
-import { DynamicChangeAddressResolver, PersonalWallet } from '@cardano-sdk/wallet';
 import { roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { walletReady } from '../../';
 import chalk from 'chalk';
@@ -37,7 +37,7 @@ const monitor = new TerminalProgressMonitor();
   }
 
   let exitCode = 0;
-  let fundingWallet: PersonalWallet | undefined;
+  let fundingWallet: BaseWallet | undefined;
 
   try {
     const config = await loadConfiguration(monitor);

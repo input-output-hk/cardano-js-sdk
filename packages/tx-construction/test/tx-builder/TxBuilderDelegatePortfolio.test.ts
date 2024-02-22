@@ -37,15 +37,7 @@ const inputResolver: Cardano.InputResolver = {
     null
 };
 
-/**
- * Utility factory for tests to create a GenericTxBuilder with mocked dependencies
- *
- * @param stakeDelegations for each entry it derives an address + a stake key. Reward accounts are created from the stake keys.
- *  Depending on the `credentialStatus`, it configures the reward accounts to be registered, unregistered or delegated to a poolId
- * @param useMultiplePaymentKeys simulates 2 addresses per stake key (HD wallet). If enabled, groupedAddresses will have 2 entries per stake key.
- * @returns the txBuilder, groupedAddresses and other information useful in tests.
- */
-
+/** Utility factory for tests to create a GenericTxBuilder with mocked dependencies */
 const createTxBuilder = async ({
   stakeDelegations,
   numAddresses = stakeDelegations.length,
@@ -321,7 +313,7 @@ describe('TxBuilder/delegatePortfolio', () => {
         keyAgent,
         stakeDelegations: [
           { credentialStatus: Cardano.StakeCredentialStatus.Registered, poolId: poolIds[0] },
-          { deposit, credentialStatus: Cardano.StakeCredentialStatus.Registered, poolId: poolIds[1] }
+          { credentialStatus: Cardano.StakeCredentialStatus.Registered, deposit, poolId: poolIds[1] }
         ]
       });
       groupedAddresses = txBuilderFactory.groupedAddresses;

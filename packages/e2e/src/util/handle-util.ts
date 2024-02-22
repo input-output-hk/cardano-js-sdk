@@ -138,15 +138,21 @@ export const mint = async (
     auxiliaryData,
     mint: tokens,
     outputs,
-    witness: { extraSigners: [policySigner], scripts: [policyScript] }
+    signingOptions: {
+      extraSigners: [policySigner]
+    },
+    witness: { scripts: [policyScript] }
   };
 
   const unsignedTx = await wallet.initializeTx(txProps);
 
   const finalizeProps: FinalizeTxProps = {
     auxiliaryData,
+    signingOptions: {
+      extraSigners: [policySigner]
+    },
     tx: unsignedTx,
-    witness: { extraSigners: [policySigner], scripts: [policyScript] }
+    witness: { scripts: [policyScript] }
   };
 
   const signedTx = await wallet.finalizeTx(finalizeProps);

@@ -1,13 +1,13 @@
 import * as Crypto from '@cardano-sdk/crypto';
+import { BaseWallet, TransactionFailure } from '../../src';
 import { Cardano } from '@cardano-sdk/core';
-import { PersonalWallet, TransactionFailure } from '../../src';
 import { createWallet } from './util';
 import { firstValueFrom, of } from 'rxjs';
 import { mockProviders as mocks } from '@cardano-sdk/util-dev';
 import uniq from 'lodash/uniq';
 
 describe('integration/withdrawal', () => {
-  let wallet: PersonalWallet;
+  let wallet: BaseWallet;
   let rewardAccounts: Cardano.RewardAccountInfo[];
 
   beforeEach(async () => {

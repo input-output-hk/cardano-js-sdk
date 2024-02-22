@@ -6,9 +6,10 @@ import {
   GroupedAddress,
   SignTransactionOptions,
   TransactionSigner,
+  WitnessedTx,
   util
 } from '@cardano-sdk/key-management';
-import { Cardano, HandleProvider, HandleResolution, metadatum } from '@cardano-sdk/core';
+import { Cardano, HandleProvider, HandleResolution, Serialization, metadatum } from '@cardano-sdk/core';
 import {
   CustomizeCb,
   InsufficientRewardAccounts,
@@ -16,13 +17,12 @@ import {
   OutputBuilderTxOut,
   PartialTx,
   PartialTxOut,
-  SignedTx,
   TxBuilder,
   TxBuilderDependencies,
   TxContext,
   TxInspection,
   TxOutValidationError,
-  UnsignedTx
+  UnwitnessedTx
 } from './types';
 import { GreedyInputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
@@ -31,7 +31,6 @@ import { RewardAccountWithPoolId } from '../types';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { contextLogger, deepEquals } from '@cardano-sdk/util';
 import { createOutputValidator } from '../output-validation';
-import { finalizeTx } from './finalizeTx';
 import { initializeTx } from './initializeTx';
 import { lastValueFrom } from 'rxjs';
 import minBy from 'lodash/minBy';
@@ -45,7 +44,7 @@ type BuiltTx = {
 };
 
 interface Signer {
-  sign(builtTx: BuiltTx): Promise<SignedTx>;
+  sign(builtTx: BuiltTx): Promise<WitnessedTx>;
 }
 
 interface Builder {
@@ -60,7 +59,7 @@ interface LazySignerProps {
 type TxBuilderStakePool = Omit<Cardano.Cip17Pool, 'id'> & { id: Cardano.PoolId };
 type RewardAccountsAndWeights = Map<Cardano.RewardAccount, number>;
 
-class LazyTxSigner implements UnsignedTx {
+class LazyTxSigner implements UnwitnessedTx {
   #built?: BuiltTx;
   #signer: Signer;
   #builder: Builder;
@@ -78,16 +77,15 @@ class LazyTxSigner implements UnsignedTx {
     const {
       tx,
       ctx: {
-        signingContext: { knownAddresses },
-        auxiliaryData,
-        handleResolutions
+        signingContext: { knownAddresses, handleResolutions },
+        auxiliaryData
       },
       inputSelection
     } = await this.#build();
     return { ...tx, auxiliaryData, handleResolutions, inputSelection, ownAddresses: knownAddresses };
   }
 
-  async sign(): Promise<SignedTx> {
+  async sign(): Promise<WitnessedTx> {
     return this.#signer.sign(await this.#build());
   }
 }
@@ -211,7 +209,7 @@ export class GenericTxBuilder implements TxBuilder {
     return this;
   }
 
-  build(): UnsignedTx {
+  build(): UnwitnessedTx {
     return new LazyTxSigner({
       builder: {
         // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -233,7 +231,7 @@ export class GenericTxBuilder implements TxBuilder {
             );
             const auxiliaryData = this.partialAuxiliaryData && { ...this.partialAuxiliaryData };
             const extraSigners = this.partialExtraSigners && [...this.partialExtraSigners];
-            const partialSigningOptions = this.partialSigningOptions && { ...this.partialSigningOptions };
+            const partialSigningOptions = this.partialSigningOptions && { ...this.partialSigningOptions, extraSigners };
 
             if (this.partialAuxiliaryData) {
               this.partialTxBody.auxiliaryDataHash = Cardano.computeAuxiliaryDataHash(this.partialAuxiliaryData);
@@ -277,22 +275,20 @@ export class GenericTxBuilder implements TxBuilder {
                 handleResolutions: this.#handleResolutions,
                 outputs: new Set(this.partialTxBody.outputs || []),
                 proposalProcedures: this.partialTxBody.proposalProcedures,
-                signingOptions: partialSigningOptions,
-                witness: { extraSigners }
+                signingOptions: partialSigningOptions
               },
               dependencies
             );
             return {
               ctx: {
                 auxiliaryData,
-                handleResolutions: this.#handleResolutions,
                 ownAddresses,
                 signingContext: {
+                  handleResolutions: this.#handleResolutions,
                   knownAddresses: ownAddresses,
                   txInKeyPathMap: await util.createTxInKeyPathMap(body, ownAddresses, this.#dependencies.inputResolver)
                 },
-                signingOptions: partialSigningOptions,
-                witness: { extraSigners }
+                signingOptions: { ...partialSigningOptions, extraSigners }
               },
               inputSelection,
               tx: { body, hash }
@@ -305,7 +301,22 @@ export class GenericTxBuilder implements TxBuilder {
         }
       },
       signer: {
-        sign: ({ tx, ctx }) => finalizeTx(tx, ctx, this.#dependencies)
+        sign: ({ tx, ctx }) => {
+          const transaction = new Serialization.Transaction(
+            Serialization.TransactionBody.fromCore(tx.body),
+            Serialization.TransactionWitnessSet.fromCore(
+              ctx.witness ? (ctx.witness as Cardano.Witness) : { signatures: new Map() }
+            ),
+            ctx.auxiliaryData ? Serialization.AuxiliaryData.fromCore(ctx.auxiliaryData) : undefined
+          );
+
+          if (ctx.isValid !== undefined) transaction.setIsValid(ctx.isValid);
+
+          const signingOptions = { ...ctx.signingOptions, stubSign: false };
+          const signingContext = ctx.signingContext;
+
+          return this.#dependencies.witnesser.witness(transaction, signingContext, signingOptions);
+        }
       }
     });
   }

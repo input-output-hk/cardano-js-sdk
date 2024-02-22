@@ -36,7 +36,7 @@ describe('cip36', () => {
     });
 
     it('can create cip36 voting registration metadata', async () => {
-      // Just ensuring we have some address. PersonalWallet already does this internally.
+      // Just ensuring we have some address. BaseWallet already does this internally.
       const groupedAddress = await walletKeyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0);
       const paymentAddress = groupedAddress.address;
       // InMemoryKeyAgent uses this derivation path for stake key.
