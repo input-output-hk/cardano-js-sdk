@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.4.13...@cardano-sdk/hardware-trezor@0.4.14) (2024-02-23)
+
+### Features
+
+* **hardware-trezor:** conditionally load trezor dependency so that it works with bundlers ([1cd4582](https://github.com/input-output-hk/cardano-js-sdk/commit/1cd4582125dd197f97fc00ab41197826e04a00a9))
+
 ## [0.4.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.4.12...@cardano-sdk/hardware-trezor@0.4.13) (2024-02-12)
 
 **Note:** Version bump only for package @cardano-sdk/hardware-trezor

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.26.2...@cardano-sdk/cardano-services@0.26.3) (2024-02-23)
+
+### Bug Fixes
+
+* **cardano-services:** cardano-submit-api parameters typo ([580ae98](https://github.com/input-output-hk/cardano-js-sdk/commit/580ae9801219d31b8f8466a62a3d92cc0f55c67a))
+
 ## [0.26.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.26.1...@cardano-sdk/cardano-services@0.26.2) (2024-02-12)
 
 ### Features

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.17.10...@cardano-sdk/tx-construction@0.17.11) (2024-02-23)
+
+### Features
+
+* **tx-construction:** add customizeCb to GenericTxBuilder ([87732b6](https://github.com/input-output-hk/cardano-js-sdk/commit/87732b60ec38c9528dde6310bbb608589896870f))
+
 ## [0.17.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.17.9...@cardano-sdk/tx-construction@0.17.10) (2024-02-12)
 
 **Note:** Version bump only for package @cardano-sdk/tx-construction
