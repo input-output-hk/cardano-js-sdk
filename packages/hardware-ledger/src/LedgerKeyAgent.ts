@@ -40,6 +40,16 @@ const LedgerConnection = (_LedgerConnection as any).default
   : _LedgerConnection;
 type LedgerConnection = _LedgerConnection;
 
+const isDeviceAlreadyOpenError = (error: unknown) => {
+  if (typeof error !== 'object') return false;
+  const innerError = (error as any).innerError;
+  if (typeof innerError !== 'object') return false;
+  return (
+    innerError.code === 11 ||
+    (typeof innerError.message === 'string' && innerError.message.includes('cannot open device with path'))
+  );
+};
+
 export interface LedgerKeyAgentProps extends Omit<SerializableLedgerKeyAgentData, '__typename'> {
   deviceConnection?: LedgerConnection;
 }
@@ -223,7 +233,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
       });
       return newConnection;
     } catch (error: any) {
-      if (error.innerError.message.includes('cannot open device with path')) {
+      if (isDeviceAlreadyOpenError(error)) {
         throw new errors.TransportError('Connection already established', error);
       }
       // If transport is established we need to close it so we can recover device from previous session

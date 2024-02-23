@@ -16,9 +16,12 @@ import {
   util
 } from '@cardano-sdk/key-management';
 import { txToTrezor } from './transformers/tx';
-import TrezorConnectWeb from '@trezor/connect-web';
+import _TrezorConnectWeb from '@trezor/connect-web';
 
 const TrezorConnectNode = Trezor.default;
+const TrezorConnectWeb = (_TrezorConnectWeb as any).default
+  ? ((_TrezorConnectWeb as any).default as typeof _TrezorConnectWeb)
+  : _TrezorConnectWeb;
 
 const transportTypedError = (error?: any) =>
   new errors.AuthenticationError(
