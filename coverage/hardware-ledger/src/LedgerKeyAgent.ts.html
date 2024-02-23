@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">47.28% </span>
+                <span class="strong">45.58% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>61/129</span>
+                <span class='fraction'>62/136</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">38.98% </span>
+                <span class="strong">35.93% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>23/59</span>
+                <span class='fraction'>23/64</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">48.14% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>13/26</span>
+                <span class='fraction'>13/27</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">47.54% </span>
+                <span class="strong">46.45% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>58/122</span>
+                <span class='fraction'>59/127</span>
             </div>
         
             
@@ -483,7 +483,17 @@
 <a name='L418'></a><a href='#L418'>418</a>
 <a name='L419'></a><a href='#L419'>419</a>
 <a name='L420'></a><a href='#L420'>420</a>
-<a name='L421'></a><a href='#L421'>421</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L421'></a><a href='#L421'>421</a>
+<a name='L422'></a><a href='#L422'>422</a>
+<a name='L423'></a><a href='#L423'>423</a>
+<a name='L424'></a><a href='#L424'>424</a>
+<a name='L425'></a><a href='#L425'>425</a>
+<a name='L426'></a><a href='#L426'>426</a>
+<a name='L427'></a><a href='#L427'>427</a>
+<a name='L428'></a><a href='#L428'>428</a>
+<a name='L429'></a><a href='#L429'>429</a>
+<a name='L430'></a><a href='#L430'>430</a>
+<a name='L431'></a><a href='#L431'>431</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
@@ -521,6 +531,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -945,6 +965,16 @@ const LedgerConnection = (_LedgerConnection as any).default
   : _LedgerConnection;
 type LedgerConnection = _LedgerConnection;
 &nbsp;
+const isDeviceAlreadyOpenError = <span class="fstat-no" title="function not covered" >(e</span>rror: unknown) =&gt; {
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (typeof error !== 'object') <span class="cstat-no" title="statement not covered" >return false;</span></span>
+  const innerError = (<span class="cstat-no" title="statement not covered" >error as any).innerError;</span>
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (typeof innerError !== 'object') <span class="cstat-no" title="statement not covered" >return false;</span></span>
+<span class="cstat-no" title="statement not covered" >  return (</span>
+    innerError.code === 11 ||
+    (typeof innerError.message === 'string' &amp;&amp; innerError.message.includes('cannot open device with path'))
+  );
+};
+&nbsp;
 export interface LedgerKeyAgentProps extends Omit&lt;SerializableLedgerKeyAgentData, '__typename'&gt; {
   deviceConnection?: LedgerConnection;
 }
@@ -1128,7 +1158,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
       });
 <span class="cstat-no" title="statement not covered" >      return newConnection;</span>
     } catch (error: any) {
-<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (error.innerError.message.includes('cannot open device with path')) {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (isDeviceAlreadyOpenError(error)) {</span>
 <span class="cstat-no" title="statement not covered" >        throw new errors.TransportError('Connection already established', error);</span>
       }
       // If transport is established we need to close it so we can recover device from previous session
@@ -1330,7 +1360,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-02-23T11:26:08.515Z
+                at 2024-02-23T11:53:01.454Z
             </div>
         <script src="../prettify.js"></script>
         <script>
