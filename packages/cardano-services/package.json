@@ -37,7 +37,7 @@
     "lint:fix": "yarn lint --fix",
     "generate-migration": "typeorm-ts-node-commonjs migration:generate src/Projection/migrations/migrations -d src/migrationDataSource.ts",
     "mainnet:dev": "FILES='-f ../../compose/dev.yml -f dev.yml' yarn mainnet:up",
-    "mainnet:up": "NETWORK=mainnet SUBMIT_API_ARGS=--mainnnet yarn compose:up",
+    "mainnet:up": "NETWORK=mainnet SUBMIT_API_ARGS=--mainnet yarn compose:up",
     "mainnet:down": "NETWORK=mainnet yarn compose:down",
     "prepack": "yarn build",
     "preprod:dev": "FILES='-f ../../compose/dev.yml -f dev.yml' yarn preprod:up",
