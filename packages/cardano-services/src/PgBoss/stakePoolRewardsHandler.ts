@@ -168,11 +168,11 @@ const hasRewardsInEpoch = async (context: RewardsComputeContext) => {
  * @param context the computation context
  */
 const epochRewards = async (context: RewardsComputeContext) => {
-  const { dataSource, lastRosEpochs, logger, stakePool } = context;
+  const { dataSource, epochNo, idx, lastRosEpochs, logger, stakePool, totalStakePools } = context;
   const { id } = stakePool;
 
   if (await hasRewardsInEpoch(context)) {
-    logger.info(`Going to compute epoch rewards for stake pool ${id}`);
+    logger.info(`Going to compute rewards for stake pool ${id} on epoch ${epochNo} (${idx}/${totalStakePools})`);
 
     await getPoolHashId(context);
     await getPoolDelegators(context);
@@ -230,8 +230,10 @@ export const stakePoolRewardsHandlerFactory: WorkerHandlerFactory = (options) =>
     await checkPreviousEpochCompleted(dataSource, epochNo);
 
     const { epochLength, lastSlot } = await getLastSlot(provider, epochNo);
+    const stakePools = await dataSource.getRepository(StakePoolEntity).find();
+    const totalStakePools = stakePools.length;
+    const context = { dataSource, db, epochLength, epochNo, lastRosEpochs, lastSlot, logger, totalStakePools };
 
-    for (const stakePool of await dataSource.getRepository(StakePoolEntity).find())
-      await epochRewards({ dataSource, db, epochLength, epochNo, lastRosEpochs, lastSlot, logger, stakePool });
+    for (const [idx, stakePool] of stakePools.entries()) await epochRewards({ ...context, idx, stakePool });
   };
 };
