@@ -15,7 +15,7 @@ export const storeStakePoolRewardsJob = typeormOperator<WithPgBoss>(
       await pgBoss.send(
         STAKE_POOL_REWARDS,
         { epochNo },
-        { ...defaultJobOptions, retryDelay: 30, singletonKey: epochNo.toString(), slot }
+        { ...defaultJobOptions, expireInHours: 6, retryDelay: 30, singletonKey: epochNo.toString(), slot }
       );
     }
   }
