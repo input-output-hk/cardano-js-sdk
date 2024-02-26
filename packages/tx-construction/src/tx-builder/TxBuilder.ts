@@ -228,8 +228,8 @@ export class GenericTxBuilder implements TxBuilder {
             const ownAddresses = await this.#dependencies.txBuilderProviders.addresses.get();
             const registeredRewardAccounts = (await this.#dependencies.txBuilderProviders.rewardAccounts()).filter(
               (acct) =>
-                acct.keyStatus === Cardano.StakeKeyStatus.Registered ||
-                acct.keyStatus === Cardano.StakeKeyStatus.Registering
+                acct.credentialStatus === Cardano.StakeCredentialStatus.Registered ||
+                acct.credentialStatus === Cardano.StakeCredentialStatus.Registering
             );
             const auxiliaryData = this.partialAuxiliaryData && { ...this.partialAuxiliaryData };
             const extraSigners = this.partialExtraSigners && [...this.partialExtraSigners];
@@ -439,7 +439,7 @@ export class GenericTxBuilder implements TxBuilder {
     // Reward accounts already delegated to the correct pool. Change must be distributed accordingly
     for (const account of rewardAccounts.filter(
       (rewardAccount) =>
-        rewardAccount.keyStatus === Cardano.StakeKeyStatus.Registered &&
+        rewardAccount.credentialStatus === Cardano.StakeCredentialStatus.Registered &&
         rewardAccount.delegatee?.nextNextEpoch &&
         this.#requestedPortfolio?.some(({ id }) => id === rewardAccount.delegatee?.nextNextEpoch?.id)
     ))
@@ -452,7 +452,7 @@ export class GenericTxBuilder implements TxBuilder {
     const availableRewardAccounts = rewardAccounts
       .filter(
         (rewardAccount) =>
-          rewardAccount.keyStatus === Cardano.StakeKeyStatus.Unregistered ||
+          rewardAccount.credentialStatus === Cardano.StakeCredentialStatus.Unregistered ||
           !rewardAccount.delegatee?.nextNextEpoch ||
           this.#requestedPortfolio?.every(({ id }) => id !== rewardAccount.delegatee?.nextNextEpoch?.id)
       )
@@ -472,7 +472,7 @@ export class GenericTxBuilder implements TxBuilder {
       const { id: newPoolId, weight } = newPools.pop()!;
       const rewardAccount = availableRewardAccounts.pop()!;
       this.#logger.debug(`Building delegation certificate for ${newPoolId} ${rewardAccount}`);
-      if (rewardAccount.keyStatus !== Cardano.StakeKeyStatus.Registered) {
+      if (rewardAccount.credentialStatus !== Cardano.StakeCredentialStatus.Registered) {
         certificates.push(Cardano.createStakeRegistrationCert(rewardAccount.address));
       }
       certificates.push(Cardano.createDelegationCert(rewardAccount.address, newPoolId));
@@ -482,7 +482,7 @@ export class GenericTxBuilder implements TxBuilder {
     // Deregister stake keys no longer needed
     this.#logger.debug(`De-registering ${availableRewardAccounts.length} stake keys`);
     for (const rewardAccount of availableRewardAccounts) {
-      if (rewardAccount.keyStatus === Cardano.StakeKeyStatus.Registered) {
+      if (rewardAccount.credentialStatus === Cardano.StakeCredentialStatus.Registered) {
         certificates.push(Cardano.createStakeDeregistrationCert(rewardAccount.address, rewardAccount.deposit));
       }
     }
@@ -494,7 +494,7 @@ export class GenericTxBuilder implements TxBuilder {
   static #sortRewardAccountsDelegatedFirst(a: RewardAccountWithPoolId, b: RewardAccountWithPoolId): number {
     const getScore = (acct: RewardAccountWithPoolId) => {
       let score = 2;
-      if (acct.keyStatus === Cardano.StakeKeyStatus.Registered) {
+      if (acct.credentialStatus === Cardano.StakeCredentialStatus.Registered) {
         score = 1;
         if (acct.delegatee?.nextNextEpoch) {
           score = 0;

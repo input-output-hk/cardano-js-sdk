@@ -33,7 +33,7 @@ const getWalletStateSnapshot = async (wallet: ObservableWallet) => {
   return {
     balance: { available: balanceAvailable, deposit, total: balanceTotal },
     epoch: epoch.epochNo,
-    isStakeKeyRegistered: rewardAccount.keyStatus === Cardano.StakeKeyStatus.Registered,
+    isStakeKeyRegistered: rewardAccount.credentialStatus === Cardano.StakeCredentialStatus.Registered,
     publicStakeKey,
     rewardAccount,
     rewardsBalance,
@@ -171,7 +171,7 @@ describe('PersonalWallet/delegation', () => {
 
     const stakeKeyHash = await bip32Ed25519.getPubKeyHash(tx1ConfirmedState.publicStakeKey.publicStakeKey);
     expect(stakeKeyHash).toEqual(Cardano.RewardAccount.toHash(tx1ConfirmedState.rewardAccount.address));
-    expect(tx1ConfirmedState.publicStakeKey.keyStatus).toBe(Cardano.StakeKeyStatus.Registered);
+    expect(tx1ConfirmedState.publicStakeKey.credentialStatus).toBe(Cardano.StakeCredentialStatus.Registered);
 
     // Make a 2nd tx with key de-registration
     const { tx: txDeregisterSigned } = await sourceWallet.createTxBuilder().delegatePortfolio(null).build().sign();
@@ -181,7 +181,7 @@ describe('PersonalWallet/delegation', () => {
 
     // No longer delegating
     expect(tx2ConfirmedState.rewardAccount.delegatee?.nextNextEpoch?.id).toBeUndefined();
-    expect(tx2ConfirmedState.publicStakeKey.keyStatus).toBe(Cardano.StakeKeyStatus.Unregistered);
+    expect(tx2ConfirmedState.publicStakeKey.credentialStatus).toBe(Cardano.StakeCredentialStatus.Unregistered);
 
     // Deposit is returned to wallet balance
     const expectedCoinsAfterTx2 = expectedCoinsAfterTx1 + stakeKeyDeposit - txDeregisterSigned.body.fee;

@@ -72,7 +72,7 @@ describe('CustomObservableWallet', () => {
       const getRewardAccountsDelegation: () => Promise<Cardano.RewardAccountInfo[]> = async () => [
         {
           address: Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr'),
-          keyStatus: Cardano.StakeKeyStatus.Unregistering,
+          credentialStatus: Cardano.StakeCredentialStatus.Unregistering,
           rewardBalance: 5000n
         }
       ];

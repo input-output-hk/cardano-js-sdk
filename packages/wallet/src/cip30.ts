@@ -536,17 +536,18 @@ const baseCip30WalletApi = (
 
 const getPubStakeKeys = async (
   wallet$: Observable<ObservableWallet>,
-  filter: Cardano.StakeKeyStatus.Registered | Cardano.StakeKeyStatus.Unregistered
+  filter: Cardano.StakeCredentialStatus.Registered | Cardano.StakeCredentialStatus.Unregistered
 ) => {
   const wallet = await firstValueFrom(wallet$);
   return firstValueFrom(
     wallet.publicStakeKeys$.pipe(
       map((keys) =>
-        keys.filter(({ keyStatus }) => {
+        keys.filter(({ credentialStatus }) => {
           const status =
-            keyStatus === Cardano.StakeKeyStatus.Registered || keyStatus === Cardano.StakeKeyStatus.Registering
-              ? Cardano.StakeKeyStatus.Registered
-              : Cardano.StakeKeyStatus.Unregistered;
+            credentialStatus === Cardano.StakeCredentialStatus.Registered ||
+            credentialStatus === Cardano.StakeCredentialStatus.Registering
+              ? Cardano.StakeCredentialStatus.Registered
+              : Cardano.StakeCredentialStatus.Unregistered;
           return filter === status;
         })
       ),
@@ -572,7 +573,7 @@ const extendedCip95WalletApi = (
   getRegisteredPubStakeKeys: async () => {
     logger.debug('getting registered public stake keys');
     try {
-      return await getPubStakeKeys(wallet$, Cardano.StakeKeyStatus.Registered);
+      return await getPubStakeKeys(wallet$, Cardano.StakeCredentialStatus.Registered);
     } catch (error) {
       logger.error(error);
       throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
@@ -581,7 +582,7 @@ const extendedCip95WalletApi = (
   getUnregisteredPubStakeKeys: async () => {
     logger.debug('getting unregistered public stake keys');
     try {
-      return await getPubStakeKeys(wallet$, Cardano.StakeKeyStatus.Unregistered);
+      return await getPubStakeKeys(wallet$, Cardano.StakeCredentialStatus.Unregistered);
     } catch (error) {
       logger.error(error);
       throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));

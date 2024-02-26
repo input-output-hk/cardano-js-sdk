@@ -72,8 +72,8 @@ const monitor = new TerminalProgressMonitor();
 
     monitor.startTask('Waiting for delegation to be updated on the wallet.');
     await rewardAccountStatuses(delegationWallet.delegation.rewardAccounts$, [
-      Cardano.StakeKeyStatus.Registering,
-      Cardano.StakeKeyStatus.Registered
+      Cardano.StakeCredentialStatus.Registering,
+      Cardano.StakeCredentialStatus.Registered
     ]);
     monitor.endTask('Delegation updated.', TaskResult.Success);
 

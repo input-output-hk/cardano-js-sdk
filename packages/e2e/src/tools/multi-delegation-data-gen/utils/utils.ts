@@ -44,12 +44,12 @@ const getPoolIds = async (wallet: PersonalWallet, count: number): Promise<Cardan
  */
 export const rewardAccountStatuses = async (
   rewardAccounts$: Observable<Cardano.RewardAccountInfo[]>,
-  statuses: Cardano.StakeKeyStatus[],
+  statuses: Cardano.StakeCredentialStatus[],
   timeout = MINUTE
 ) =>
   firstValueFromTimed(
     rewardAccounts$.pipe(
-      map((accts) => accts.map(({ keyStatus }) => keyStatus)),
+      map((accts) => accts.map(({ credentialStatus }) => credentialStatus)),
       filter((statusArr) => statusArr.every((s) => statuses.includes(s)))
     ),
     `Timeout waiting for all reward accounts stake keys to be one of ${statuses.join('|')}`,

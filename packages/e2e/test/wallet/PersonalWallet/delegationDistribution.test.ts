@@ -42,13 +42,13 @@ const fundWallet = async (wallet: PersonalWallet) => {
 /** await for rewardAccounts$ to be registered, unregistered, as defined in states   */
 const rewardAccountStatuses = async (
   rewardAccounts$: Observable<Cardano.RewardAccountInfo[]>,
-  statuses: Cardano.StakeKeyStatus[],
+  statuses: Cardano.StakeCredentialStatus[],
   timeout = MINUTE
 ) =>
   firstValueFromTimed(
     rewardAccounts$.pipe(
-      tap((accts) => accts.map(({ address, keyStatus }) => logger.debug(address, keyStatus))),
-      map((accts) => accts.map(({ keyStatus }) => keyStatus)),
+      tap((accts) => accts.map(({ address, credentialStatus }) => logger.debug(address, credentialStatus))),
+      map((accts) => accts.map(({ credentialStatus }) => credentialStatus)),
       filter((statusArr) => statusArr.every((s) => statuses.includes(s)))
     ),
     `Timeout waiting for all reward accounts stake keys to be one of ${statuses.join('|')}`,
@@ -61,7 +61,7 @@ const deregisterAllStakeKeys = async (wallet: PersonalWallet): Promise<void> => 
   try {
     await rewardAccountStatuses(
       wallet.delegation.rewardAccounts$,
-      [Cardano.StakeKeyStatus.Unregistered, Cardano.StakeKeyStatus.Unregistering],
+      [Cardano.StakeCredentialStatus.Unregistered, Cardano.StakeCredentialStatus.Unregistering],
       0
     );
     logger.info('Stake keys are already deregistered');
@@ -73,8 +73,8 @@ const deregisterAllStakeKeys = async (wallet: PersonalWallet): Promise<void> => 
     await submitAndConfirm(wallet, deregTx);
 
     await rewardAccountStatuses(wallet.delegation.rewardAccounts$, [
-      Cardano.StakeKeyStatus.Unregistered,
-      Cardano.StakeKeyStatus.Unregistering
+      Cardano.StakeCredentialStatus.Unregistered,
+      Cardano.StakeCredentialStatus.Unregistering
     ]);
     logger.info('Deregistered all stake keys');
   }
@@ -153,8 +153,8 @@ describe('PersonalWallet/delegationDistribution', () => {
     // Check that reward addresses were delegated
     await walletReady(wallet);
     await rewardAccountStatuses(wallet.delegation.rewardAccounts$, [
-      Cardano.StakeKeyStatus.Registering,
-      Cardano.StakeKeyStatus.Registered
+      Cardano.StakeCredentialStatus.Registering,
+      Cardano.StakeCredentialStatus.Registered
     ]);
     logger.debug('Delegations successfully done');
 

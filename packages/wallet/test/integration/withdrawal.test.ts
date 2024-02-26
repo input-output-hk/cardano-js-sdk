@@ -15,22 +15,22 @@ describe('integration/withdrawal', () => {
     rewardAccounts = [
       {
         address: Cardano.RewardAccount('stake_test1uqu7qkgf00zwqupzqfzdq87dahwntcznklhp3x30t3ukz6gswungn'),
+        credentialStatus: Cardano.StakeCredentialStatus.Registered,
         delegatee: {
           currentEpoch: undefined,
           nextEpoch: undefined,
           nextNextEpoch: undefined
         },
-        keyStatus: Cardano.StakeKeyStatus.Registered,
         rewardBalance: 33_333n
       },
       {
         address: Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr'),
+        credentialStatus: Cardano.StakeCredentialStatus.Unregistered,
         delegatee: {
           currentEpoch: undefined,
           nextEpoch: undefined,
           nextNextEpoch: undefined
         },
-        keyStatus: Cardano.StakeKeyStatus.Unregistered,
         rewardBalance: 44_444n
       }
     ];

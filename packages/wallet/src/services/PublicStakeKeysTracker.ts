@@ -12,12 +12,12 @@ export interface CreatePubStakeKeysTrackerProps {
 }
 
 export interface PubStakeKeyAndStatus {
-  keyStatus: Cardano.StakeKeyStatus;
+  credentialStatus: Cardano.StakeCredentialStatus;
   publicStakeKey: Ed25519PublicKeyHex;
 }
 
 type StakeKeyDerivationPathAndStatus = {
-  keyStatus: Cardano.StakeKeyStatus;
+  credentialStatus: Cardano.StakeCredentialStatus;
   stakeKeyDerivationPath: AccountKeyDerivationPath;
 };
 
@@ -29,8 +29,8 @@ const withStakeKeyDerivationPaths =
           // Get stakeKeyDerivationPath of each reward account
           map((groupedAddresses) =>
             rewardAccounts
-              .map(({ keyStatus, address }) => ({
-                keyStatus,
+              .map(({ credentialStatus, address }) => ({
+                credentialStatus,
                 stakeKeyDerivationPath: groupedAddresses.find((groupedAddr) => groupedAddr.rewardAccount === address)
                   ?.stakeKeyDerivationPath
               }))
@@ -50,9 +50,9 @@ export const createPublicStakeKeysTracker = ({
       withStakeKeyDerivationPaths(addresses$),
       mergeMap((derivationPathsAndStatus) =>
         forkJoin(
-          derivationPathsAndStatus.map(({ stakeKeyDerivationPath, keyStatus }) =>
+          derivationPathsAndStatus.map(({ stakeKeyDerivationPath, credentialStatus }) =>
             from(addressManager.derivePublicKey(stakeKeyDerivationPath)).pipe(
-              map((publicStakeKey) => ({ keyStatus, publicStakeKey: publicStakeKey.hex() }))
+              map((publicStakeKey) => ({ credentialStatus, publicStakeKey: publicStakeKey.hex() }))
             )
           )
         ).pipe(defaultIfEmpty([]))

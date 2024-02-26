@@ -16,7 +16,7 @@ export interface Delegatee {
   nextNextEpoch?: StakePool;
 }
 
-export enum StakeKeyStatus {
+export enum StakeCredentialStatus {
   Registering = 'REGISTERING',
   Registered = 'REGISTERED',
   Unregistering = 'UNREGISTERING',
@@ -25,7 +25,7 @@ export enum StakeKeyStatus {
 
 export interface RewardAccountInfo {
   address: RewardAccount;
-  keyStatus: StakeKeyStatus;
+  credentialStatus: StakeCredentialStatus;
   delegatee?: Delegatee;
   rewardBalance: Lovelace;
   // Maybe add rewardsHistory for each reward account too
