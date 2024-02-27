@@ -17,7 +17,7 @@ import {
   createInputResolver,
   requiresForeignSignatures
 } from '../../src';
-import { createAsyncKeyAgent, waitForWalletStateSettle } from '../util';
+import { createAsyncKeyAgent, signTx, toSignedTx, waitForWalletStateSettle } from '../util';
 import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
 import { of } from 'rxjs';
@@ -53,7 +53,10 @@ describe('WalletUtil', () => {
           }
         ]
       ];
-      const resolver = createInputResolver({ utxo: { available$: of(utxo) } });
+      const resolver = createInputResolver({
+        transactions: { outgoing: { signed$: of() } },
+        utxo: { available$: of(utxo) }
+      });
       expect(
         await resolver.resolveInput({
           index: 0,
@@ -92,7 +95,10 @@ describe('WalletUtil', () => {
         id: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
       } as Cardano.HydratedTx;
 
-      const resolver = createInputResolver({ utxo: { available$: of([]) } });
+      const resolver = createInputResolver({
+        transactions: { outgoing: { signed$: of() } },
+        utxo: { available$: of([]) }
+      });
 
       expect(
         await resolver.resolveInput(
@@ -121,6 +127,31 @@ describe('WalletUtil', () => {
           'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz',
         value: { coins: 150_000_000n }
       });
+    });
+
+    it('resolveInput resolves inputs from provided signed transactions utxo set', async () => {
+      const signedTxs = mocks.queryTransactionsResult.pageResults.map(toSignedTx);
+
+      const resolver = createInputResolver({
+        transactions: { outgoing: { signed$: of(signedTxs) } },
+        utxo: { available$: of() }
+      });
+      expect(
+        await resolver.resolveInput({
+          index: 0,
+          txId: signedTxs[0].tx.id
+        })
+      ).toEqual({
+        address:
+          'addr_test1qpfhhfy2qgls50r9u4yh0l7z67xpg0a5rrhkmvzcuqrd0znuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q9gw0lz',
+        value: { coins: 5_000_000n }
+      });
+      expect(
+        await resolver.resolveInput({
+          index: 0,
+          txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
+        })
+      ).toBeNull();
     });
   });
 
@@ -241,7 +272,7 @@ describe('WalletUtil', () => {
         ]
       ];
       const resolver = combineInputResolvers(
-        createInputResolver({ utxo: { available$: of(utxo) } }),
+        createInputResolver({ transactions: { outgoing: { signed$: of() } }, utxo: { available$: of(utxo) } }),
         createBackendInputResolver(createMockChainHistoryProvider())
       );
 
@@ -283,7 +314,7 @@ describe('WalletUtil', () => {
       } as Cardano.HydratedTx;
 
       const resolver = combineInputResolvers(
-        createInputResolver({ utxo: { available$: of([]) } }),
+        createInputResolver({ transactions: { outgoing: { signed$: of() } }, utxo: { available$: of([]) } }),
         createBackendInputResolver(createMockChainHistoryProvider([tx]))
       );
 
@@ -363,7 +394,7 @@ describe('WalletUtil', () => {
       ];
 
       const resolver = combineInputResolvers(
-        createInputResolver({ utxo: { available$: of(utxo) } }),
+        createInputResolver({ transactions: { outgoing: { signed$: of() } }, utxo: { available$: of(utxo) } }),
         createBackendInputResolver(createMockChainHistoryProvider([tx]))
       );
 
@@ -424,7 +455,7 @@ describe('WalletUtil', () => {
 
     it('resolveInput resolves to null if the input can not be found', async () => {
       const resolver = combineInputResolvers(
-        createInputResolver({ utxo: { available$: of([]) } }),
+        createInputResolver({ transactions: { outgoing: { signed$: of() } }, utxo: { available$: of([]) } }),
         createBackendInputResolver(createMockChainHistoryProvider())
       );
 
@@ -516,7 +547,11 @@ describe('WalletUtil', () => {
         ])
       };
 
-      tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
+      tx = await signTx({
+        addresses$: wallet.addresses$,
+        tx: await wallet.initializeTx(props),
+        walletUtil: wallet.util
+      });
 
       dRepCredential = await wallet.getPubDRepKey();
       dRepKeyHash = Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(

@@ -84,6 +84,7 @@ describe('createUtxoTracker', () => {
         b: [inFlightTx1],
         c: [inFlightTx1, inFlightTx2]
       });
+
       const utxoTracker = createUtxoTracker(
         {
           addresses$: cold('a|', { a: [ownAddress!] }),

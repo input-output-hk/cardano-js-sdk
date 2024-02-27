@@ -199,6 +199,7 @@ export class PersonalWallet implements ObservableWallet {
   #newTransactions = {
     failedToSubmit$: new Subject<FailedTx>(),
     pending$: new Subject<OutgoingTx>(),
+    signed$: new Subject<SignedTx>(),
     submitting$: new Subject<OutgoingTx>()
   };
   #reemitSubscriptions: Subscription;
@@ -412,6 +413,7 @@ export class PersonalWallet implements ObservableWallet {
       newTransactions: this.#newTransactions,
       onFatalError,
       retryBackoffConfig,
+      signedTransactionsStore: stores.signedTransactions,
       tip$: this.tip$,
       transactionsHistoryStore: stores.transactions
     });
@@ -517,6 +519,7 @@ export class PersonalWallet implements ObservableWallet {
 
     this.util = createWalletUtil({
       protocolParameters$: this.protocolParameters$,
+      transactions: this.transactions,
       utxo: this.utxo
     });
 
@@ -535,7 +538,7 @@ export class PersonalWallet implements ObservableWallet {
 
   async finalizeTx({ tx, sender, ...rest }: FinalizeTxProps, stubSign = false): Promise<Cardano.Tx> {
     const knownAddresses = await firstValueFrom(this.addresses$);
-    const { tx: signedTx } = await finalizeTx(
+    const result = await finalizeTx(
       tx,
       {
         ...rest,
@@ -548,7 +551,8 @@ export class PersonalWallet implements ObservableWallet {
       { bip32Account: this.bip32Account, witnesser: this.witnesser },
       stubSign
     );
-    return signedTx;
+    this.#newTransactions.signed$.next(result);
+    return result.tx;
   }
 
   private initializeHandles(handlePolicyIds$: Observable<Cardano.PolicyId[]>): Observable<HandleInfo[]> {

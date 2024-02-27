@@ -7,6 +7,7 @@ import { OutgoingOnChainTx, TxInFlight } from '../../services';
 import { PouchDbCollectionStore } from './PouchDbCollectionStore';
 import { PouchDbDocumentStore } from './PouchDbDocumentStore';
 import { PouchDbKeyValueStore } from './PouchDbKeyValueStore';
+import { SignedTx } from '@cardano-sdk/tx-construction';
 import { WalletStores } from '../types';
 
 export class PouchDbTipStore extends PouchDbDocumentStore<Cardano.Tip> {}
@@ -19,6 +20,7 @@ export class PouchDbAddressesStore extends PouchDbDocumentStore<GroupedAddress[]
 export class PouchDbInFlightTransactionsStore extends PouchDbDocumentStore<TxInFlight[]> {}
 export class PouchDbVolatileTransactionsStore extends PouchDbDocumentStore<OutgoingOnChainTx[]> {}
 export class PouchDbPolicyIdsStore extends PouchDbDocumentStore<Cardano.PolicyId[]> {}
+export class PouchDbSignedTransactionsStore extends PouchDbDocumentStore<SignedTx[]> {}
 
 export class PouchDbTransactionsStore extends PouchDbCollectionStore<Cardano.HydratedTx> {}
 export class PouchDbUtxoStore extends PouchDbCollectionStore<Cardano.Utxo> {}
@@ -65,6 +67,7 @@ export const createPouchDbWalletStores = (
     protocolParameters: new PouchDbProtocolParametersStore(docsDbName, 'protocolParameters', logger),
     rewardsBalances: new PouchDbRewardsBalancesStore(`${baseDbName}RewardsBalances`, logger),
     rewardsHistory: new PouchDbRewardsHistoryStore(`${baseDbName}RewardsHistory`, logger),
+    signedTransactions: new PouchDbSignedTransactionsStore(docsDbName, 'signedTransactions', logger),
     stakePools: new PouchDbStakePoolsStore(`${baseDbName}StakePools`, logger),
     tip: new PouchDbTipStore(docsDbName, 'tip', logger),
     transactions: new PouchDbTransactionsStore(

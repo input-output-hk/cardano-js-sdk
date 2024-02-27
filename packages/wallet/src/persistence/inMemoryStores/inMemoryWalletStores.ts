@@ -6,6 +6,7 @@ import { InMemoryCollectionStore } from './InMemoryCollectionStore';
 import { InMemoryDocumentStore } from './InMemoryDocumentStore';
 import { InMemoryKeyValueStore } from './InMemoryKeyValueStore';
 import { OutgoingOnChainTx, TxInFlight } from '../../services';
+import { SignedTx } from '@cardano-sdk/tx-construction';
 import { WalletStores } from '../types';
 
 export class InMemoryTipStore extends InMemoryDocumentStore<Cardano.Tip> {}
@@ -18,6 +19,7 @@ export class InMemoryAssetsStore extends InMemoryDocumentStore<Assets> {}
 export class InMemoryAddressesStore extends InMemoryDocumentStore<GroupedAddress[]> {}
 export class InMemoryInFlightTransactionsStore extends InMemoryDocumentStore<TxInFlight[]> {}
 export class InMemoryVolatileTransactionsStore extends InMemoryDocumentStore<OutgoingOnChainTx[]> {}
+export class InMemorySignedTransactionsStore extends InMemoryDocumentStore<SignedTx[]> {}
 
 export class InMemoryTransactionsStore extends InMemoryCollectionStore<Cardano.HydratedTx> {}
 export class InMemoryUtxoStore extends InMemoryCollectionStore<Cardano.Utxo> {}
@@ -61,6 +63,7 @@ export const createInMemoryWalletStores = (): WalletStores => ({
   protocolParameters: new InMemoryProtocolParametersStore(),
   rewardsBalances: new InMemoryRewardsBalancesStore(),
   rewardsHistory: new InMemoryRewardsHistoryStore(),
+  signedTransactions: new InMemorySignedTransactionsStore(),
   stakePools: new InMemoryStakePoolsStore(),
   tip: new InMemoryTipStore(),
   transactions: new InMemoryTransactionsStore(),
