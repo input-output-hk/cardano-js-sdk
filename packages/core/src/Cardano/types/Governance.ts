@@ -44,6 +44,7 @@ export type ParameterChangeAction = {
   __typename: GovernanceActionType.parameter_change_action;
   governanceActionId: GovernanceActionId | null;
   protocolParamUpdate: ProtocolParametersUpdate;
+  policyHash: Crypto.Hash28ByteBase16 | null;
 };
 
 export type HardForkInitiationAction = {
@@ -58,6 +59,7 @@ export type TreasuryWithdrawalsAction = {
     rewardAccount: RewardAccount;
     coin: Lovelace;
   }>;
+  policyHash: Crypto.Hash28ByteBase16 | null;
 };
 
 export type NoConfidence = {
