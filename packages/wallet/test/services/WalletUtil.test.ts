@@ -641,7 +641,6 @@ describe('WalletUtil', () => {
         tx.body.certificates = [
           {
             __typename: Cardano.CertificateType.Registration,
-            // using foreign intentionally because registration is not signed so it should be accepted
             stakeCredential: {
               hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(mocks.stakeKeyHash),
               type: Cardano.CredentialType.KeyHash
@@ -962,6 +961,11 @@ describe('WalletUtil', () => {
             anchor: null,
             dRepCredential: { hash: dRepKeyHash, type: Cardano.CredentialType.KeyHash }
           } as Cardano.UpdateDelegateRepresentativeCertificate,
+          {
+            __typename: Cardano.CertificateType.RegisterDelegateRepresentative,
+            anchor: null,
+            dRepCredential: { hash: dRepKeyHash, type: Cardano.CredentialType.KeyHash }
+          } as Cardano.RegisterDelegateRepresentativeCertificate,
           ...tx.body.certificates!
         ];
 
@@ -988,6 +992,19 @@ describe('WalletUtil', () => {
             anchor: null,
             dRepCredential: { hash: foreignDRepKeyHash, type: Cardano.CredentialType.KeyHash }
           } as Cardano.UpdateDelegateRepresentativeCertificate,
+          ...tx.body.certificates!
+        ];
+
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
+
+      it('detects foreign register_drep_cert', async () => {
+        tx.body.certificates = [
+          {
+            __typename: Cardano.CertificateType.RegisterDelegateRepresentative,
+            anchor: null,
+            dRepCredential: { hash: foreignDRepKeyHash, type: Cardano.CredentialType.KeyHash }
+          } as Cardano.RegisterDelegateRepresentativeCertificate,
           ...tx.body.certificates!
         ];
 

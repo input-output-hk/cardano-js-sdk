@@ -306,8 +306,8 @@ export const getDRepCredentialKeyPaths = ({
   for (const certificate of txBody.certificates || []) {
     if (
       certificate.__typename === Cardano.CertificateType.UnregisterDelegateRepresentative ||
-      certificate.__typename === Cardano.CertificateType.UpdateDelegateRepresentative
-      // Cardano.CertificateType.RegisterDelegateRepresentative does not require signing
+      certificate.__typename === Cardano.CertificateType.UpdateDelegateRepresentative ||
+      certificate.__typename === Cardano.CertificateType.RegisterDelegateRepresentative
     ) {
       if (
         certificate.dRepCredential.type === Cardano.CredentialType.ScriptHash ||

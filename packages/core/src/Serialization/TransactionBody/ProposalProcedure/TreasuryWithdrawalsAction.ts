@@ -2,23 +2,28 @@ import * as Cardano from '../../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { GovernanceActionKind } from './GovernanceActionKind';
 import { GovernanceActionType } from '../../../Cardano';
+import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { SerializationError, SerializationFailure } from '../../../errors';
+import { hexToBytes } from '../../../util/misc';
 
-const EMBEDDED_GROUP_SIZE = 2;
+const EMBEDDED_GROUP_SIZE = 3;
 
 /** Withdraws funds from the treasury. */
 export class TreasuryWithdrawalsAction {
   #withdrawals: Map<Cardano.RewardAccount, Cardano.Lovelace>;
+  #policyHash: Hash28ByteBase16 | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
    * Creates a new TreasuryWithdrawalsAction instance.
    *
    * @param withdrawals A map specifying which rewards accounts to transfer the funds to.
+   * @param policyHash The optional policyHash.
    */
-  constructor(withdrawals: Map<Cardano.RewardAccount, Cardano.Lovelace>) {
+  constructor(withdrawals: Map<Cardano.RewardAccount, Cardano.Lovelace>, policyHash?: Hash28ByteBase16) {
     this.#withdrawals = withdrawals;
+    this.#policyHash = policyHash;
   }
 
   /**
@@ -32,7 +37,7 @@ export class TreasuryWithdrawalsAction {
     if (this.#originalBytes) return this.#originalBytes;
 
     // CDDL
-    // treasury_withdrawals_action = (2, { reward_account => coin })
+    // treasury_withdrawals_action = (2, { reward_account => coin }, policy_hash / null)
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
     writer.writeInt(GovernanceActionKind.TreasuryWithdrawals);
 
@@ -50,6 +55,7 @@ export class TreasuryWithdrawalsAction {
       writer.writeByteString(Buffer.from(rewardAddress.toAddress().toBytes(), 'hex'));
       writer.writeInt(value);
     }
+    this.#policyHash ? writer.writeByteString(hexToBytes(this.#policyHash as unknown as HexBlob)) : writer.writeNull();
 
     return writer.encodeAsHex();
   }
@@ -93,7 +99,16 @@ export class TreasuryWithdrawalsAction {
 
     reader.readEndMap();
 
-    const action = new TreasuryWithdrawalsAction(amounts);
+    let policyHash: Hash28ByteBase16 | undefined;
+    if (reader.peekState() === CborReaderState.Null) {
+      reader.readNull();
+    } else {
+      policyHash = HexBlob.fromBytes(reader.readByteString()) as unknown as Hash28ByteBase16;
+    }
+
+    reader.readEndArray();
+
+    const action = new TreasuryWithdrawalsAction(amounts, policyHash);
     action.#originalBytes = cbor;
 
     return action;
@@ -114,6 +129,7 @@ export class TreasuryWithdrawalsAction {
 
     return {
       __typename: GovernanceActionType.treasury_withdrawals_action,
+      policyHash: this.#policyHash ? this.#policyHash : null,
       withdrawals
     };
   }
@@ -125,7 +141,8 @@ export class TreasuryWithdrawalsAction {
    */
   static fromCore(treasuryWithdrawalsAction: Cardano.TreasuryWithdrawalsAction) {
     return new TreasuryWithdrawalsAction(
-      new Map([...treasuryWithdrawalsAction.withdrawals].map((value) => [value.rewardAccount, value.coin]))
+      new Map([...treasuryWithdrawalsAction.withdrawals].map((value) => [value.rewardAccount, value.coin])),
+      treasuryWithdrawalsAction.policyHash !== null ? treasuryWithdrawalsAction.policyHash : undefined
     );
   }
 
@@ -136,5 +153,12 @@ export class TreasuryWithdrawalsAction {
    */
   withdrawals(): Map<Cardano.RewardAccount, Cardano.Lovelace> {
     return this.#withdrawals;
+  }
+
+  /**
+   * @returns the policyHash.
+   */
+  policyHash(): Hash28ByteBase16 | undefined {
+    return this.#policyHash;
   }
 }

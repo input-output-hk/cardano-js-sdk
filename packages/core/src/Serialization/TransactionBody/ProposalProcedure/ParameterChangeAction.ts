@@ -2,16 +2,18 @@ import * as Cardano from '../../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { GovernanceActionId } from '../../Common/GovernanceActionId';
 import { GovernanceActionKind } from './GovernanceActionKind';
+import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { ProtocolParamUpdate } from '../../Update';
 import { hexToBytes } from '../../../util/misc';
 
-const EMBEDDED_GROUP_SIZE = 3;
+const EMBEDDED_GROUP_SIZE = 4;
 
 /** Updates one or more updatable protocol parameters, excluding changes to major protocol versions (i.e., "hard forks"). */
 export class ParameterChangeAction {
   #protocolParamUpdate: ProtocolParamUpdate;
   #govActionId: GovernanceActionId | undefined;
+  #policyHash: Hash28ByteBase16 | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -19,10 +21,16 @@ export class ParameterChangeAction {
    *
    * @param protocolParamUpdate The protocol parameter updates.
    * @param govActionId The optional unique identifier for this governance action.
+   * @param policyHash The optional policyHash.
    */
-  constructor(protocolParamUpdate: ProtocolParamUpdate, govActionId?: GovernanceActionId) {
+  constructor(
+    protocolParamUpdate: ProtocolParamUpdate,
+    govActionId?: GovernanceActionId,
+    policyHash?: Hash28ByteBase16
+  ) {
     this.#protocolParamUpdate = protocolParamUpdate;
     this.#govActionId = govActionId;
+    this.#policyHash = policyHash;
   }
 
   /**
@@ -36,11 +44,12 @@ export class ParameterChangeAction {
     if (this.#originalBytes) return this.#originalBytes;
 
     // CDDL
-    // parameter_change_action = (0, gov_action_id / null, protocol_param_update)
+    // parameter_change_action = (0, gov_action_id / null, protocol_param_update, policy_hash / null)
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
     writer.writeInt(GovernanceActionKind.ParameterChange);
     this.#govActionId ? writer.writeEncodedValue(hexToBytes(this.#govActionId.toCbor())) : writer.writeNull();
     writer.writeEncodedValue(hexToBytes(this.#protocolParamUpdate.toCbor()));
+    this.#policyHash ? writer.writeByteString(hexToBytes(this.#policyHash as unknown as HexBlob)) : writer.writeNull();
 
     return writer.encodeAsHex();
   }
@@ -79,7 +88,16 @@ export class ParameterChangeAction {
 
     const parameterUpdate = ProtocolParamUpdate.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
 
-    const action = new ParameterChangeAction(parameterUpdate, govActionId);
+    let policyHash: Hash28ByteBase16 | undefined;
+    if (reader.peekState() === CborReaderState.Null) {
+      reader.readNull();
+    } else {
+      policyHash = HexBlob.fromBytes(reader.readByteString()) as unknown as Hash28ByteBase16;
+    }
+
+    reader.readEndArray();
+
+    const action = new ParameterChangeAction(parameterUpdate, govActionId, policyHash);
     action.#originalBytes = cbor;
 
     return action;
@@ -94,6 +112,7 @@ export class ParameterChangeAction {
     return {
       __typename: Cardano.GovernanceActionType.parameter_change_action,
       governanceActionId: this.#govActionId ? this.#govActionId.toCore() : null,
+      policyHash: this.#policyHash ? this.#policyHash : null,
       protocolParamUpdate: this.#protocolParamUpdate.toCore()
     };
   }
@@ -108,7 +127,8 @@ export class ParameterChangeAction {
       ProtocolParamUpdate.fromCore(parameterChangeAction.protocolParamUpdate),
       parameterChangeAction.governanceActionId !== null
         ? GovernanceActionId.fromCore(parameterChangeAction.governanceActionId)
-        : undefined
+        : undefined,
+      parameterChangeAction.policyHash !== null ? parameterChangeAction.policyHash : undefined
     );
   }
 
@@ -128,5 +148,12 @@ export class ParameterChangeAction {
    */
   protocolParamUpdate(): ProtocolParamUpdate {
     return this.#protocolParamUpdate;
+  }
+
+  /**
+   * @returns the policyHash.
+   */
+  policyHash(): Hash28ByteBase16 | undefined {
+    return this.#policyHash;
   }
 }
