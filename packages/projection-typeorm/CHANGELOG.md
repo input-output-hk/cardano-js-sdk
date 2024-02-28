@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.8.8...@cardano-sdk/projection-typeorm@0.8.9) (2024-02-28)
+
+### Bug Fixes
+
+* **projection-typeorm:** increse the expire timeout for stake pool rewards job ([3dd2174](https://github.com/input-output-hk/cardano-js-sdk/commit/3dd2174e61a3cf8629422c5c637440b49d54e6d5))
+
+## [0.8.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.8.7...@cardano-sdk/projection-typeorm@0.8.8) (2024-02-23)
+
+**Note:** Version bump only for package @cardano-sdk/projection-typeorm
+
 ## [0.8.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.8.6...@cardano-sdk/projection-typeorm@0.8.7) (2024-02-12)
 
 **Note:** Version bump only for package @cardano-sdk/projection-typeorm

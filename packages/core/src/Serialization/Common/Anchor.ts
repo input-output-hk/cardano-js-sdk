@@ -4,7 +4,7 @@ import { CborReader, CborWriter } from '../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
 const EMBEDDED_GROUP_SIZE = 2;
-const MAX_URL_SIZE_STR_LENGTH = 64;
+const MAX_URL_SIZE_STR_LENGTH = 128;
 
 /**
  * An anchor is a pair of:

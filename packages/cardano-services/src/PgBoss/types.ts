@@ -31,6 +31,7 @@ export type RewardsComputeContext = {
   dataSource: DataSource;
   db: Pool;
   delegatorsIds?: string[];
+  idx: number;
   lastSlot: Cardano.Slot;
   lastRosEpochs: number;
   logger: Logger;
@@ -38,6 +39,7 @@ export type RewardsComputeContext = {
   ownersIds?: string[];
   poolHashId?: string;
   registration?: PoolRegistrationEntity;
+  totalStakePools: number;
 } & PoolRewardsEntity &
   Required<Pick<PoolRewardsEntity, 'epochNo' | 'stakePool'>>;
 

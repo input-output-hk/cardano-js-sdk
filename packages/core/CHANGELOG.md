@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.28.3...@cardano-sdk/core@0.28.4) (2024-02-28)
+
+### Features
+
+* **core:** cbor ser/des handle 128 bytes anchors ([7378c72](https://github.com/input-output-hk/cardano-js-sdk/commit/7378c72afad56b3f3fad896678756c5863cb321d))
+* **core:** conway-era cddl changes new policy_hash field ([eff403e](https://github.com/input-output-hk/cardano-js-sdk/commit/eff403e5bbe81419a62d9d34018b1ba81878f5c1))
+
+## [0.28.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.28.2...@cardano-sdk/core@0.28.3) (2024-02-23)
+
+### Bug Fixes
+
+* **core:** make the projector not exit on asset name error ([0021b95](https://github.com/input-output-hk/cardano-js-sdk/commit/0021b953bb70a8bc032e8a2f2e971783f9867dc2))
+* **core:** proposal procedure now correctly deserializes info action procedures ([8ec646a](https://github.com/input-output-hk/cardano-js-sdk/commit/8ec646a657df80bd0d43f2ea134cffda06e2a4b0))
+
 ## [0.28.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.28.1...@cardano-sdk/core@0.28.2) (2024-02-12)
 
 ### Bug Fixes
