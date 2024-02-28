@@ -1,6 +1,8 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+		flake-parts.url = "github:hercules-ci/flake-parts";
+
     devshell.url = "github:numtide/devshell";
 
     n2c.url = "github:nlewo/nix2container";
@@ -15,8 +17,14 @@
   };
 
   outputs = {std, ...} @ inputs:
-    std.growOn {
-      inherit inputs;
+	  inputs.flake-parts.lib.mkFlake {inherit inputs;} {
+    imports = with inputs; [
+      std.flakeModule
+      devshell.flakeModule
+    ];
+    systems = ["x86_64-linux"];
+
+    std.grow = {
       cellsFrom = ./nix;
       cellBlocks = with std.blockTypes; [
         # Software Delivery Lifecycle (Local Development Environment)
@@ -32,6 +40,7 @@
           ci.diff = true;
           ci.apply = true;
         })
-      ];
+       ];
     };
+};
 }
