@@ -215,7 +215,7 @@ export const findProposalProceduresByTxIds = `
 		va.url,
 		va.data_hash,
 		sa.view,
-		quorum_nominator AS numerator,
+		quorum_numerator AS numerator,
 		quorum_denominator AS denominator
 	FROM tx
 	JOIN gov_action_proposal AS ga ON tx.id = ga.tx_id

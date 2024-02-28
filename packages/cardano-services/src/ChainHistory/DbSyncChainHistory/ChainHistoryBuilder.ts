@@ -134,16 +134,20 @@ const getGovernanceAction = ({
       return { __typename: GovernanceActionType.no_confidence, governanceActionId };
 
     case 'ParameterChange':
+      // {"contents":[{"govActionIx":0,"txId":"950d4b364840a27afeba929324d51dec0fac80b00cf7ca37905de08e3eae5ca6"},{"committeeMinSize":5},null],"tag":"ParameterChange"}
       return {
         __typename: GovernanceActionType.parameter_change_action,
         governanceActionId,
+        policyHash: contents[2],
         protocolParamUpdate: contents[1]
       };
 
     case 'TreasuryWithdrawals':
+      // {"contents":[[[{"credential":{"keyHash":"248f556b733c3ef24899ae0609d3796198d5470192304c4894dd85cb"},"network":"Testnet"},1000000000]],null],"tag":"TreasuryWithdrawals"}
       return {
         __typename: GovernanceActionType.treasury_withdrawals_action,
-        withdrawals: new Set(contents.map(mapWithdrawals))
+        policyHash: contents[1],
+        withdrawals: new Set(contents[0].map(mapWithdrawals))
       };
   }
 

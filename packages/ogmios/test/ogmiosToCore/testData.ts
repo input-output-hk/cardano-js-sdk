@@ -642,6 +642,7 @@ export const mockAllegraBlock: Ogmios.Schema.Block = {
         },
         {
           action: {
+            guardrails: null,
             parameters: {
               federatedBlockProductionRatio: '0/1'
             },
@@ -659,6 +660,7 @@ export const mockAllegraBlock: Ogmios.Schema.Block = {
         },
         {
           action: {
+            guardrails: null,
             parameters: {
               federatedBlockProductionRatio: '0/1'
             },
@@ -676,6 +678,7 @@ export const mockAllegraBlock: Ogmios.Schema.Block = {
         },
         {
           action: {
+            guardrails: null,
             parameters: {
               federatedBlockProductionRatio: '0/1'
             },
@@ -693,6 +696,7 @@ export const mockAllegraBlock: Ogmios.Schema.Block = {
         },
         {
           action: {
+            guardrails: null,
             parameters: {
               federatedBlockProductionRatio: '0/1'
             },
@@ -710,6 +714,7 @@ export const mockAllegraBlock: Ogmios.Schema.Block = {
         },
         {
           action: {
+            guardrails: null,
             parameters: {
               federatedBlockProductionRatio: '0/1'
             },
@@ -727,6 +732,7 @@ export const mockAllegraBlock: Ogmios.Schema.Block = {
         },
         {
           action: {
+            guardrails: null,
             parameters: {
               federatedBlockProductionRatio: '0/1'
             },
@@ -744,6 +750,7 @@ export const mockAllegraBlock: Ogmios.Schema.Block = {
         },
         {
           action: {
+            guardrails: null,
             parameters: {
               federatedBlockProductionRatio: '0/1'
             },
