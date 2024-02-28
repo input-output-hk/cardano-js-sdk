@@ -238,10 +238,16 @@ export const mapScript = (script: Schema.Script): Cardano.Script => {
       return nativeScript(script.json);
     case 'plutus:v1':
     case 'plutus:v2':
+    case 'plutus:v3':
       return {
         __type: Cardano.ScriptType.Plutus,
         bytes: HexBlob(script.cbor),
-        version: script.language === 'plutus:v1' ? Cardano.PlutusLanguageVersion.V1 : Cardano.PlutusLanguageVersion.V2
+        version:
+          script.language === 'plutus:v1'
+            ? Cardano.PlutusLanguageVersion.V1
+            : script.language === 'plutus:v2'
+            ? Cardano.PlutusLanguageVersion.V2
+            : Cardano.PlutusLanguageVersion.V3
       };
     default:
       throw new SerializationError(SerializationFailure.InvalidScriptType, `Script '${script}' is not supported.`);
