@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.34.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.34.3...@cardano-sdk/wallet@0.34.4) (2024-02-28)
+
+### Features
+
+* sign own dRep registration certificate ([b384e85](https://github.com/input-output-hk/cardano-js-sdk/commit/b384e85d8449b96e0115111d2313e0fe5d60103d))
+
 ## [0.34.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.34.2...@cardano-sdk/wallet@0.34.3) (2024-02-23)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
