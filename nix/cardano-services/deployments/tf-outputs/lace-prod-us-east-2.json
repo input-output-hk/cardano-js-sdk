@@ -1,0 +1,1 @@
+{"acm_arn":"arn:aws:acm:us-east-2:926093910549:certificate/5ecbcb9a-222f-40ed-9067-05a70e416b30","acm_dapp_arn":"arn:aws:acm:us-east-2:926093910549:certificate/2f2912ea-f2eb-4fe7-adab-080fabcda0be","waf_arn":"arn:aws:wafv2:us-east-2:926093910549:regional/webacl/rate-limit/78a416a5-74d6-4215-95eb-575dd9146a6e"}

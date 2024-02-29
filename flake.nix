@@ -27,6 +27,14 @@
       ];
       systems = ["x86_64-linux"];
 
+      perSystem = {
+        pkgs,
+        system,
+        ...
+      }: {
+        legacyPackages.cardano-services = import ./nix/cardano-services/deployments {inherit pkgs nix-helm inputs;};
+      };
+
       std.grow = {
         cellsFrom = ./nix;
         cellBlocks = with std.blockTypes; [
@@ -39,10 +47,6 @@
           (installables "packages" {ci.build = true;})
           (runnables "operables")
           (containers "oci-images" {ci.publish = true;})
-          (kubectl "deployments" {
-            ci.diff = true;
-            ci.apply = true;
-          })
         ];
       };
     };
