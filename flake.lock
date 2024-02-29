@@ -175,6 +175,26 @@
         "type": "github"
       }
     },
+    "nix-helm": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1709134601,
+        "narHash": "sha256-84TIQzMoYT1lmYxKSyJLpXbG0Iqut5vDlDHVkPz0dFA=",
+        "owner": "gytis-ivaskevicius",
+        "repo": "nix-helm",
+        "rev": "2466f6061710e5322eb6fac6a93876f7ec9a27c6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "gytis-ivaskevicius",
+        "repo": "nix-helm",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1677383253,
@@ -304,6 +324,7 @@
         "devshell": "devshell",
         "flake-parts": "flake-parts",
         "n2c": "n2c",
+        "nix-helm": "nix-helm",
         "nixpkgs": "nixpkgs_2",
         "std": "std"
       }

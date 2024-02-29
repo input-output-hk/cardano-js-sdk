@@ -8,6 +8,9 @@
     n2c.url = "github:nlewo/nix2container";
     n2c.inputs.nixpkgs.follows = "nixpkgs";
 
+    nix-helm.url = "github:gytis-ivaskevicius/nix-helm";
+    nix-helm.inputs.nixpkgs.follows = "nixpkgs";
+
     std = {
       url = "github:divnix/std";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -16,7 +19,7 @@
     };
   };
 
-  outputs = {std, ...} @ inputs:
+  outputs = {std, nix-helm, ...} @ inputs:
     inputs.flake-parts.lib.mkFlake {inherit inputs;} {
       imports = with inputs; [
         std.flakeModule
