@@ -16,11 +16,9 @@ In this document, we will cover:
 
 - **Diagrams:** Discussing how these components interact within the context of a web browser extension with visual representations to aid in understanding the structure and flow of interactions.
 
-
 ## System Overview
 
 The **web-extension** package provides components for handling wallet management-related operations within the browser web extensions context. It brings together its own specialized components and further leverages additional elements from other SDK packages, notably the **ObservableWallet** interface from the 'wallet' package and the **Witnesser** interface from the 'key-management’ package.
-
 
 ### Components from the web-extension Package
 
@@ -52,7 +50,6 @@ In-memory key agents could technically live in the service worker, but keeping t
 
 This arrangement also ensures a safer, isolated environment for user prompts and transaction confirmations. As thus, the components of the wallet-extension are distributed among the service worker and the UI script as follows:
 
-
 ![Location of instances within the web extension](img/fig1.png)
 
 ## Component Descriptions
@@ -64,7 +61,6 @@ The **SigningCoordinator** component operates within the UI script of the web ex
 In essence, the **SigningCoordinator** is responsible for managing the signing of transactions and data. It is designed to handle various types of signing requests, including transaction witness requests and data signing requests. For instance, when a transaction needs to be signed, the **SigningCoordinator** takes the transaction details along with the context and options provided and processes them to generate the necessary signatures. This process may involve interactions with hardware wallets or user inputs, which are handled within the UI script environment.
 
 The **SigningCoordinator** also offers flexibility in handling different wallet types, such as InMemory, Ledger, and Trezor wallets. This flexibility is crucial for a web extension that aims to support a wide range of user preferences and hardware capabilities.
-
 
 ### WalletManager
 
@@ -92,7 +88,7 @@ The **ObservableWallet** is designed as a comprehensive interface that offers re
 
 ## Integration and Communication Flow
 
-The web-extension package components interact across the UI script and the background script (service worker) of the web extension environment. The scripts communicate using message passing, which allows both service worker and UI scripts to listen for each other's messages and respond on the same channel. 
+The web-extension package components interact across the UI script and the background script (service worker) of the web extension environment. The scripts communicate using message passing, which allows both service worker and UI scripts to listen for each other's messages and respond on the same channel.
 
 ## Bootstrapping
 
@@ -104,20 +100,19 @@ In the UI script the application creates the **SigningCoordinator** instance and
 
 ```javascript
 exposeApi(
-    {
-      api$: of(signingCoordinator),
-      baseChannel: signingCoordinatorApiChannel,
-      properties: signingCoordinatorApiProperties
-    },
-    dependencies
-  );
-
+  {
+    api$: of(signingCoordinator),
+    baseChannel: signingCoordinatorApiChannel,
+    properties: signingCoordinatorApiProperties
+  },
+  dependencies
+);
 ```
 
 This function exposes the **SigningCoordinator** to the code running in the service worker. Additionally, the UI script must subscribe to the **transactionWitnessRequest$** and **signDataRequest$** observables of the **SigningCoordinator** so it can handle signing requests that are initiated by the **ObservableWallet** that lives in the service worker. This is an example on how the web extension application could start the **SigningCoordinator**:
 
 ```javascript
-ui.ts
+ui.ts;
 
 // Instantiate the SigningCoordinator
 const signingCoordinator = new SigningCoordinator(
@@ -161,7 +156,7 @@ exposeSigningCoordinatorApi(
 The UI script also creates proxy objects for the exposed instances from the service worker of the **WalletRepository**, **WalletManager** and **ObservableWallet**:
 
 ```javascript
-ui.ts
+ui.ts;
 
 // Consume remote objects.
 const walletManager = consumeRemoteApi(
@@ -179,7 +174,6 @@ const wallet = consumeRemoteApi(
   { baseChannel: walletChannel(walletName), properties: observableWalletProperties },
   { logger, runtime }
 );
-
 ```
 
 The **consumeRemoteApi**, **walletManagerChannel**, **repositoryChannel** and **walletChannel** are all utility functions exported from the web-extension package.
@@ -258,7 +252,7 @@ This way the UI script can use this proxy object and subscribe to its observable
 
 ### WalletManager
 
-The **WalletManager**, residing in the service worker, is responsible for instantiating **ObservableWallets** configured to track the given credentials, network and account (if applicable). 
+The **WalletManager**, residing in the service worker, is responsible for instantiating **ObservableWallets** configured to track the given credentials, network and account (if applicable).
 
 When the UI scripts triggers a wallet switch, either by switching networks, accounts or even wallet credentials entirely, the **WalletManager** retrieves the requested wallet data from the **WalletRepository**, builds a new **Witnesser** using the **SigningCoordinator** (which is a proxy object from the UI script) and creates the new **ObservableWallet** instance, this new active wallet is emitted via the **activeWallet$** observable:
 

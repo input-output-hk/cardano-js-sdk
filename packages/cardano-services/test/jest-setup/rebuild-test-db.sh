@@ -25,8 +25,8 @@ TEST1="yarn workspace @cardano-sdk/e2e test:wallet"
 TEST2="yarn workspace @cardano-sdk/e2e test:long-running delegation-rewards.test.ts"
 TEST3="yarn workspace @cardano-sdk/e2e test:local-network register-pool.test.ts"
 
-for test in "$TEST1" "$TEST2" "$TEST3" ; do
-  while ! $test ; do echo repeating... ; done
+for test in "$TEST1" "$TEST2" "$TEST3"; do
+  while ! $test; do echo repeating...; done
 done
 
 TL_LEVEL="${TL_LEVEL:=info}" node "$SCRIPT_DIR/mint-handles.js"

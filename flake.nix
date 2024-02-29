@@ -1,7 +1,7 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-		flake-parts.url = "github:hercules-ci/flake-parts";
+    flake-parts.url = "github:hercules-ci/flake-parts";
 
     devshell.url = "github:numtide/devshell";
 
@@ -17,30 +17,30 @@
   };
 
   outputs = {std, ...} @ inputs:
-	  inputs.flake-parts.lib.mkFlake {inherit inputs;} {
-    imports = with inputs; [
-      std.flakeModule
-      devshell.flakeModule
-    ];
-    systems = ["x86_64-linux"];
+    inputs.flake-parts.lib.mkFlake {inherit inputs;} {
+      imports = with inputs; [
+        std.flakeModule
+        devshell.flakeModule
+      ];
+      systems = ["x86_64-linux"];
 
-    std.grow = {
-      cellsFrom = ./nix;
-      cellBlocks = with std.blockTypes; [
-        # Software Delivery Lifecycle (Local Development Environment)
-        (devshells "envs")
-        (runnables "jobs")
-        # Software Delivery Lifecycle (Packaging Layers)
-        # For deeper context, please consult:
-        #   https://std.divnix.com/patterns/four-packaging-layers.html
-        (installables "packages" {ci.build = true;})
-        (runnables "operables")
-        (containers "oci-images" {ci.publish = true;})
-        (kubectl "deployments" {
-          ci.diff = true;
-          ci.apply = true;
-        })
-       ];
+      std.grow = {
+        cellsFrom = ./nix;
+        cellBlocks = with std.blockTypes; [
+          # Software Delivery Lifecycle (Local Development Environment)
+          (devshells "envs")
+          (runnables "jobs")
+          # Software Delivery Lifecycle (Packaging Layers)
+          # For deeper context, please consult:
+          #   https://std.divnix.com/patterns/four-packaging-layers.html
+          (installables "packages" {ci.build = true;})
+          (runnables "operables")
+          (containers "oci-images" {ci.publish = true;})
+          (kubectl "deployments" {
+            ci.diff = true;
+            ci.apply = true;
+          })
+        ];
+      };
     };
-};
 }
