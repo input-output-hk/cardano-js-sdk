@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/util-dev",
-  "version": "0.19.15",
+  "version": "0.19.16",
   "description": "Utilities for tests in other packages",
   "engines": {
     "node": ">=16.20.2"

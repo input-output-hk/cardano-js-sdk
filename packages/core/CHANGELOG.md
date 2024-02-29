@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.28.4...@cardano-sdk/core@0.28.5) (2024-02-29)
+
+### Bug Fixes
+
+* **core:** transaction body can now serializes bodies with no inputs correctly ([13800d6](https://github.com/input-output-hk/cardano-js-sdk/commit/13800d61482b102ac49d3f4fcc88ed0b427aecae))
+
 ## [0.28.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.28.3...@cardano-sdk/core@0.28.4) (2024-02-28)
 
 ### Features
