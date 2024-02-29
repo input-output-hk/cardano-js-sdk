@@ -65,6 +65,23 @@ export const core: Cardano.TxBody = {
   ]
 };
 
+export const noInputsCore: Cardano.TxBody = {
+  certificates: [
+    {
+      __typename: Cardano.CertificateType.PoolRetirement,
+      epoch: Cardano.EpochNo(500),
+      poolId: Cardano.PoolId('pool1y6chk7x7fup4ms9leesdr57r4qy9cwxuee0msan72x976a6u0nc')
+    }
+  ],
+  fee: 10n,
+  inputs: [],
+  outputs: [txOut]
+};
+
+export const noInputsCbor = HexBlob(
+  'a30181825839009493315cd92eb5d8c4304e67b7e16ae36d61d34502694657811a2c8e32c728d3861e164cab28cb8f006448139c8f1740ffb8e7aa9e5232dc820aa3581c2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740a14014581c659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba82a14454534c411832581c7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373a240182846504154415445181e020a04818304581c26b17b78de4f035dc0bfce60d1d3c3a8085c38dcce5fb8767e518bed1901f4'
+);
+
 export const conwayCore: Cardano.TxBody = {
   ...core,
   donation: 1000n,
@@ -238,5 +255,13 @@ describe('TransactionBody', () => {
     }
 
     expect(withdrawals).toEqual(expectedWithdrawals);
+  });
+
+  it('can encode transaction bodies with 0 inputs correctly', () => {
+    const bodyFromCbor = TransactionBody.fromCbor(noInputsCbor);
+    const bodyFromCore = TransactionBody.fromCore(noInputsCore);
+
+    expect(bodyFromCbor.toCore()).toEqual(noInputsCore);
+    expect(bodyFromCore.toCbor()).toEqual(noInputsCbor);
   });
 });

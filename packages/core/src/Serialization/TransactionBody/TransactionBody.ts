@@ -990,7 +990,7 @@ export class TransactionBody {
     let mapSize = 0;
 
     if (this.#inputs !== undefined && this.#inputs.length > 0) ++mapSize;
-    if (this.#outputs !== undefined && this.#inputs.length > 0) ++mapSize;
+    if (this.#outputs !== undefined && this.#outputs.length > 0) ++mapSize;
     if (this.#fee !== undefined) ++mapSize;
     if (this.#ttl !== undefined) ++mapSize;
     if (this.#certs !== undefined && this.#certs.length > 0) ++mapSize;
