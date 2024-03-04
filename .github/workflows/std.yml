@@ -13,10 +13,12 @@ on:
     branches:
       - master
       - conway-era
+      - dev-preview
   push:
     branches:
       - master
       - conway-era
+      - dev-preview
     tags:
       - '@cardano-sdk/cardano-services**'
 env:
@@ -168,50 +170,55 @@ jobs:
           gh pr comment "$prNumber" --body "$(sed -e '2i\\n```diff' -e '$a```' k8s-plan.diff)"
 
 
-  deploy-to-eu:
-    runs-on: ubuntu-latest
-    needs: [discover, images]
-    name: ${{ matrix.target.jobName }} (us-east-1)
-    env:
-      AWS_REGION: us-east-1
-    permissions:
-      id-token: write
-      contents: read
-      deployments: write
+  # TODO: remove all hardcoded instances of `dev-preview` in the next iteration
+  deploy-to-us:
+    if: (github.event_name == 'push' && github.ref_name == 'master') || (github.event_name == 'workflow_dispatch' && inputs.deploy)
+    needs: [images]
+    concurrency:
+      # Only one deployment at a time per environment, and wait for the previous one to finish:
+      group: deploy-dev-preview
+      cancel-in-progress: false
+    name: Deploy (dev-preview)
+    runs-on: ubuntu-22.04
     environment:
       name: dev-preview
-      url: https://backend.dev-preview.eks.lw.iog.io
-    # Boolean input should be compared with string until https://github.com/actions/runner/issues/2238 resolved
-    if: >
-      fromJSON(needs.discover.outputs.hits).deployments.apply != '{}' && ((github.event_name == 'push' && github.ref == 'refs/heads/master') || inputs.deploy)
-
-    strategy:
-      matrix:
-        target: ${{ fromJSON(needs.discover.outputs.hits).deployments.apply }}
+      url: https://dev-preview.lw.iog.io/
     steps:
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2.2.0
-        with:
-          role-to-assume: ${{ env.AWS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
+      - uses: actions/checkout@v4
       - uses: nixbuild/nix-quick-install-action@v25
       - uses: nixbuild/nixbuild-action@v17
         with:
           nixbuild_ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
           generate_summary_for: job
+      # Further steps assume AWS_PROFILE=lw, while the official action has no way to specify that profile:
+      - name: Set up AWS credentials
+        run: |
+          mkdir -p ~/.aws
+
+          cat <<EOF >~/.aws/credentials
+          [lw]
+          aws_access_key_id = ${{ secrets.AWS_ACCESS_KEY}}
+          aws_secret_access_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          EOF
+
+          cat <<EOF >~/.aws/config
+          [lw]
+          region = us-east-1
+          EOF
       - uses: divnix/std-action/setup-discovery-ssh@main
         with:
           ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
           user_name: ${{ env.DISCOVERY_USER_NAME }}
           ssh_known_hosts_entry: ${{ env.DISCOVERY_KNOWN_HOSTS_ENTRY }}
-      - name: Configure K8S Cluster Access
-        shell: bash
+      - name: Deploy to K8s
         run: |
-          echo "Assuming role '$(aws sts get-caller-identity)' in cluster 'lace-dev-us-east-1'."
-          aws eks update-kubeconfig --name "lace-dev-us-east-1"
-      - name: Show commit
-        shell: bash
-        run: |
-          echo commit: ${{ github.sha }}
-      - uses: divnix/std-action/run@main
-        with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
+          echo 'export K8S_USER=eks-devs' >.envrc.local
+
+          nix develop .#x86_64-linux.local.envs.main -L --command bash -c '
+            set -euo pipefail
+
+            export AWS_PROFILE="lw"
+            export AWS_REGION="us-east-1"
+
+            echo yes | nix run -L ".#cardano-services.dev-preview@us-east-1.apply"
+          '
