@@ -81,7 +81,6 @@ cardano-cli conway transaction build \
   --tx-in "$utxo" \
   --tx-out "$REFERENCE_INPUT_ADDR"+"$AMOUNT" \
   --tx-out-inline-datum-value 42 \
-  --protocol-params-file pparams.json \
   --out-file tx-script.build
 
 cardano-cli transaction sign \
@@ -114,7 +113,6 @@ cardano-cli conway transaction build \
   --tx-in "$utxo" \
   --tx-out "$REFERENCE_SCRIPT_ADDR"+"$AMOUNT" \
   --tx-out-reference-script-file scripts/contracts/multisignature.json \
-  --protocol-params-file pparams.json \
   --out-file tx-script.build
 
 cardano-cli transaction sign \
@@ -145,7 +143,6 @@ cardano-cli conway transaction build \
   --tx-in "$utxo" \
   --tx-out "$REFERENCE_SCRIPT_ADDR"+"$AMOUNT" \
   --tx-out-reference-script-file scripts/contracts/timelock.json \
-  --protocol-params-file pparams.json \
   --out-file tx-script.build
 
 cardano-cli transaction sign \
@@ -176,7 +173,6 @@ cardano-cli conway transaction build \
   --tx-in "$utxo" \
   --tx-out "$REFERENCE_SCRIPT_ADDR"+"$AMOUNT" \
   --tx-out-reference-script-file scripts/contracts/alwayssucceeds.plutus \
-  --protocol-params-file pparams.json \
   --out-file tx-script.build
 
 cardano-cli transaction sign \
@@ -207,7 +203,6 @@ cardano-cli conway transaction build \
   --tx-in "$utxo" \
   --tx-out "$REFERENCE_SCRIPT_ADDR"+"$AMOUNT" \
   --tx-out-reference-script-file scripts/contracts/reference-input.plutus \
-  --protocol-params-file pparams.json \
   --out-file tx-script.build
 
 cardano-cli transaction sign \
@@ -237,7 +232,6 @@ cardano-cli conway transaction build \
   --tx-out "$REFERENCE_INPUT_SCRIPT_ADDR"+"$AMOUNT" \
   --tx-out-inline-datum-file scripts/contracts/unit.json \
   --change-address "$genesisAddr" \
-  --protocol-params-file pparams.json \
   --out-file test-babbage.tx
 
 cardano-cli transaction sign \
@@ -275,7 +269,6 @@ cardano-cli conway transaction build \
   --tx-in-redeemer-value 42 \
   --read-only-tx-in-reference "$referenceInputUtxo" \
   --change-address "$genesisAddr" \
-  --protocol-params-file pparams.json \
   --tx-out-return-collateral "$REFERENCE_INPUT_ADDR"+"$returnCollateralVal" \
   --tx-total-collateral 1450000 \
   --out-file test-babbage2.tx
