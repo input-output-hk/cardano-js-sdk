@@ -20,14 +20,9 @@ on:
     tags:
       - '@cardano-sdk/cardano-services**'
 env:
-  AWS_REGION: us-east-1
-  AWS_ROLE_ARN: arn:aws:iam::926093910549:role/lace-ci
   # NIX_UPLOAD_CACHE: s3://lace-nix-cache?region=us-east-1
   DISCOVERY_USER_NAME: gha-runner
   DISCOVERY_KNOWN_HOSTS_ENTRY: "65.109.126.156 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEOVVDZydvD+diYa6A3EtA3WGw5NfN0wv7ckQxa/fX1O"
-permissions:
-  id-token: write
-  contents: read
 concurrency:
   group: std-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -36,6 +31,12 @@ jobs:
     outputs:
       hits: ${{ steps.discovery.outputs.hits }}
     runs-on: [self-hosted, discovery]
+    env:
+      AWS_REGION: us-east-1
+      AWS_ROLE_ARN: arn:aws:iam::926093910549:role/lace-ci
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2.2.0
@@ -67,6 +68,13 @@ jobs:
     name: ${{ matrix.target.jobName }}
     runs-on: ubuntu-latest
     needs: discover
+    env:
+      AWS_REGION: us-east-1
+      AWS_ROLE_ARN: arn:aws:iam::926093910549:role/lace-ci
+      # NIX_UPLOAD_CACHE: s3://lace-nix-cache?region=us-east-1
+    permissions:
+      id-token: write
+      contents: read
     strategy:
       matrix:
         target: ${{ contains(fromJSON(needs.discover.outputs.hits), 'oci-images') && fromJSON(needs.discover.outputs.hits).oci-images.publish || fromJSON('["dummy-target"]') }}
@@ -103,51 +111,61 @@ jobs:
         with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
 
 
-  diff-to-eu:
-    runs-on: ubuntu-latest
-    needs: [discover, images]
-    name: ${{ matrix.target.jobName }} (us-east-1)
-    env:
-      AWS_REGION: us-east-1
+  # TODO: remove all hardcoded instances of `dev-preview` in the next iteration
+  diff-to-us:
+    needs: images
+    name: Diff & Comment (dev-preview)
+    if: github.event_name == 'pull_request' && (github.base_ref == 'master')
     permissions:
-      id-token: write
       contents: read
       pull-requests: write
-    if: fromJSON(needs.discover.outputs.hits).deployments.diff != '{}' && github.event_name == 'pull_request'
-    strategy:
-      matrix:
-        target: ${{ fromJSON(needs.discover.outputs.hits).deployments.diff }}
+    runs-on: ubuntu-22.04
     steps:
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2.2.0
-        with:
-          role-to-assume: ${{ env.AWS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
+      - uses: actions/checkout@v4
       - uses: nixbuild/nix-quick-install-action@v25
       - uses: nixbuild/nixbuild-action@v17
         with:
           nixbuild_ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
           generate_summary_for: job
+      # Further steps assume AWS_PROFILE=lw, while the official action has no way to specify that profile:
+      - name: Set up AWS credentials
+        run: |
+          mkdir -p ~/.aws
+
+          cat <<EOF >~/.aws/credentials
+          [lw]
+          aws_access_key_id = ${{ secrets.AWS_ACCESS_KEY}}
+          aws_secret_access_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          EOF
+
+          cat <<EOF >~/.aws/config
+          [lw]
+          region = us-east-1
+          EOF
       - uses: divnix/std-action/setup-discovery-ssh@main
         with:
           ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
           user_name: ${{ env.DISCOVERY_USER_NAME }}
           ssh_known_hosts_entry: ${{ env.DISCOVERY_KNOWN_HOSTS_ENTRY }}
-      - name: Configure K8S Cluster Access
-        shell: bash
+      - name: Generate the Diff
         run: |
-          echo "Assuming role '$(aws sts get-caller-identity)' in cluster 'lace-dev-us-east-1'."
-          aws eks update-kubeconfig --name "lace-dev-us-east-1"
-      - name: Show commit
-        shell: bash
-        run: |
-          echo commit: ${{ github.sha }}
-      - uses: divnix/std-action/run@main
+          echo 'export K8S_USER=eks-devs' >.envrc.local
+
+          nix develop .#x86_64-linux.local.envs.main -L --command bash -c '
+            set -euo pipefail
+
+            export AWS_PROFILE="lw"
+            export AWS_REGION="us-east-1"
+
+            # FIXME: before merging: change target to `dev-preview@us-east-1`
+            nix run -L ".#cardano-services.dev-preprod@us-east-1.plan" | tee k8s-plan.diff
+          '
+      - name: Post Comment on the PR
         env:
-          BRANCH: ${{ github.ref_type == 'branch' && github.head_ref }}
           GH_TOKEN: ${{ github.token }}
-          OWNER_AND_REPO: ${{ github.repository }}
-        with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
+        run: |
+          prNumber=$(cut -d/ -f1 <<<'${{ github.ref_name }}')
+          gh pr comment "$prNumber" --body "$(sed -e '2i\\n```diff' -e '$a```' k8s-plan.diff)"
 
 
   deploy-to-eu:
