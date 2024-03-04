@@ -159,8 +159,7 @@ jobs:
             export AWS_PROFILE="lw"
             export AWS_REGION="us-east-1"
 
-            # FIXME: before merging: change target to `dev-preview@us-east-1`
-            nix run -L ".#cardano-services.dev-preprod@us-east-1.plan" | tee k8s-plan.diff
+            nix run -L ".#cardano-services.dev-preview@us-east-1.plan" | tee k8s-plan.diff
           '
       - name: Post Comment on the PR
         env:
