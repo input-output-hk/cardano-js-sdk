@@ -167,7 +167,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           prNumber=$(cut -d/ -f1 <<<'${{ github.ref_name }}')
-          gh pr comment "$prNumber" --body "$(sed -e '2i\\n```diff' -e '$a```' k8s-plan.diff)"
+          gh pr comment "$prNumber" --body "$(
+            echo '<details>'
+            echo "<summary>$(head -n 1 k8s-plan.diff)</summary>"
+            echo
+            echo '```diff'
+            tail -n +2 k8s-plan.diff
+            echo '```'
+            echo '</details>'
+          )"
 
 
   # TODO: remove all hardcoded instances of `dev-preview` in the next iteration
