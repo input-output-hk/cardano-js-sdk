@@ -151,6 +151,75 @@ in
     };
 
     targets = {
+      "dev-preview@us-east-1" = final: let
+        oci = inputs.self.x86_64-linux.cardano-services.oci-images.cardano-services;
+      in {
+        namespace = "dev-preview";
+
+        providers = {
+          backend = {
+            enabled = true;
+            replicas = 3;
+            env.HANDLE_POLICY_IDS = "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a";
+            env.USE_BLOCKFROST = "true";
+            env.USE_KORA_LABS = "true";
+          };
+          stake-pool-provider.enabled = true;
+          handle-provider.enabled = true;
+          # asset-provider.enabled = true;
+        };
+
+        projectors = {
+          handle.enabled = true;
+          stake-pool.enabled = true;
+          # asset.enabled = true;
+        };
+
+        values = {
+          network = "preview";
+          region = "us-east-1";
+          cardano-services = {
+            ingresOrder = 99;
+            image = oci.image.name;
+            buildInfo = oci.meta.buildInfo;
+            versions = oci.meta.versions;
+            httpPrefix = "/v${oci.meta.versions.root}";
+            additionalRoutes = [
+              {
+                pathType = "Prefix";
+                path = "/v1.0.0/stake-pool";
+                backend.service = {
+                  name = "${final.namespace}-cardanojs-stake-pool-provider";
+                  port.name = "http";
+                };
+              }
+            ];
+          };
+
+          pg-boss-worker.metadata-fetch-mode = "smash";
+
+          backend = {
+            routes = let
+              inherit (oci.meta) versions;
+            in [
+              "/v${versions.root}/health"
+              "/v${versions.root}/live"
+              "/v${versions.root}/meta"
+              "/v${versions.root}/ready"
+              "/v${versions.assetInfo}/asset"
+              "/v${versions.chainHistory}/chain-history"
+              "/v${versions.networkInfo}/network-info"
+              "/v${versions.rewards}/rewards"
+              "/v${versions.txSubmit}/tx-submit"
+              "/v${versions.utxo}/utxo"
+            ];
+          };
+
+          blockfrost-worker.enabled = true;
+          pg-boss-worker.enabled = true;
+        };
+      };
+
       "dev-sanchonet@us-east-1@v1" = final: let
         oci = inputs.self.x86_64-linux.cardano-services.oci-images.cardano-services;
       in {
