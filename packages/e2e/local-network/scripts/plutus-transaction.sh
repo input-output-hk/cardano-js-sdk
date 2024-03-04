@@ -17,7 +17,7 @@ SCRIPT_DATUM_VALUE=12
 SCRIPT_DATUM_HASH='5e9d8bac576e8604e7c3526025bc146f5fa178173e3a5592d122687bd785b520'
 
 clean() {
-  rm pparams.json tx-script.build tx-script.signed test-alonzo.tx test-alonzo.signed balance.out fullUtxo.out
+  rm tx-script.build tx-script.signed test-alonzo.tx test-alonzo.signed balance.out fullUtxo.out
 }
 
 getAddressBalance() {
