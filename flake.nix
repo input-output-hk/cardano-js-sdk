@@ -8,6 +8,9 @@
     n2c.url = "github:nlewo/nix2container";
     n2c.inputs.nixpkgs.follows = "nixpkgs";
 
+    nix-helm.url = "github:gytis-ivaskevicius/nix-helm";
+    nix-helm.inputs.nixpkgs.follows = "nixpkgs";
+
     std = {
       url = "github:divnix/std";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -16,13 +19,21 @@
     };
   };
 
-  outputs = {std, ...} @ inputs:
+  outputs = {std, nix-helm, ...} @ inputs:
     inputs.flake-parts.lib.mkFlake {inherit inputs;} {
       imports = with inputs; [
         std.flakeModule
         devshell.flakeModule
       ];
       systems = ["x86_64-linux"];
+
+      perSystem = {
+        pkgs,
+        system,
+        ...
+      }: {
+        legacyPackages.cardano-services = import ./nix/cardano-services/deployments {inherit pkgs nix-helm inputs;};
+      };
 
       std.grow = {
         cellsFrom = ./nix;
@@ -36,10 +47,6 @@
           (installables "packages" {ci.build = true;})
           (runnables "operables")
           (containers "oci-images" {ci.publish = true;})
-          (kubectl "deployments" {
-            ci.diff = true;
-            ci.apply = true;
-          })
         ];
       };
     };
