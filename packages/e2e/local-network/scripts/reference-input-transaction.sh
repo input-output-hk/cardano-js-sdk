@@ -17,7 +17,7 @@ REFERENCE_INPUT_ADDR='addr_test1wqnp362vmvr8jtc946d3a3utqgclfdl5y9d3kn849e359hst
 REFERENCE_SCRIPT_ADDR='addr_test1wz3937ykmlcaqxkf4z7stxpsfwfn4re7ncy48yu8vutcpxgnj28k0'
 
 clean() {
-  rm pparams.json tx-script.build tx-script.signed test-babbage.tx test-babbage.signed test-babbage2.tx test-babbage2.signed balance.out fullUtxo.out
+  rm -f pparams.json tx-script.build tx-script.signed test-babbage.tx test-babbage.signed test-babbage2.tx test-babbage2.signed balance.out fullUtxo.out
 }
 
 getAddressBalance() {

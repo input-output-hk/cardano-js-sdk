@@ -12,7 +12,7 @@ cd "$root"
 
 clean() {
   echo "Clean up"
-  rm bin.tar.gz
+  rm -f bin.tar.gz
 }
 trap clean EXIT
 
