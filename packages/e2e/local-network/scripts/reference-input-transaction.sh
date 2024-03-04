@@ -5,6 +5,7 @@
 
 set -euo pipefail
 
+SCRIPT_NAME=$(basename "$0")
 here="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
 root="$(cd "$here/.." && pwd)"
 cd "$root"
@@ -59,7 +60,7 @@ getBiggestUtxo() {
 trap clean EXIT
 
 while [ ! -S "$CARDANO_NODE_SOCKET_PATH" ]; do
-  echo "plutus-transaction.sh: CARDANO_NODE_SOCKET_PATH: $CARDANO_NODE_SOCKET_PATH file doesn't exist, waiting..."
+  echo "$SCRIPT_NAME: CARDANO_NODE_SOCKET_PATH: $CARDANO_NODE_SOCKET_PATH file doesn't exist, waiting..."
   sleep 2
 done
 
