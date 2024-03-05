@@ -124,6 +124,7 @@
     "@babel/preset-env": "^7.18.2",
     "@babel/preset-typescript": "^7.17.12",
     "@cardano-sdk/dapp-connector": "workspace:~",
+    "@cardano-sdk/dapp-connector-client": "workspace:~",
     "@cardano-sdk/projection": "workspace:~",
     "@cardano-sdk/projection-typeorm": "workspace:~",
     "@cardano-sdk/web-extension": "workspace:~",
