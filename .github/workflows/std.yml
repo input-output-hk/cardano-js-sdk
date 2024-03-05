@@ -79,7 +79,7 @@ jobs:
       contents: read
     strategy:
       matrix:
-        target: ${{ contains(fromJSON(needs.discover.outputs.hits), 'oci-images') && fromJSON(needs.discover.outputs.hits).oci-images.publish || fromJSON('["dummy-target"]') }}
+        target: ${{ fromJSON(needs.discover.outputs.hits).oci-images && fromJSON(needs.discover.outputs.hits).oci-images.publish || fromJSON('["dummy-target"]') }}
     steps:
       - name: Configure AWS Credentials
         if: matrix.target != 'dummy-target'
