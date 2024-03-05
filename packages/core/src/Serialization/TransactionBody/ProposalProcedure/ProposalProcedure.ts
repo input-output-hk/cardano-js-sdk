@@ -1,6 +1,6 @@
 import * as Cardano from '../../../Cardano';
 import { Anchor } from '../../Common/Anchor';
-import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
+import { CborReader, CborWriter } from '../../CBOR';
 import { GovernanceActionKind } from './GovernanceActionKind';
 import { HardForkInitiationAction } from './HardForkInitiationAction';
 import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
@@ -116,15 +116,10 @@ export class ProposalProcedure {
 
     const actionReader = new CborReader(actionCbor);
 
-    let kind;
-    let action;
+    actionReader.readStartArray();
 
-    if (actionReader.peekState() === CborReaderState.UnsignedInteger) {
-      kind = Number(actionReader.readInt());
-    } else {
-      actionReader.readStartArray();
-      kind = Number(actionReader.readInt());
-    }
+    let action;
+    const kind = Number(actionReader.readInt());
 
     switch (kind) {
       case GovernanceActionKind.ParameterChange:

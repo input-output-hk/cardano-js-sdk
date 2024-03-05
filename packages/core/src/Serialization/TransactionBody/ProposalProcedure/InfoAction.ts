@@ -3,6 +3,8 @@ import { CborReader, CborWriter } from '../../CBOR';
 import { GovernanceActionKind } from './GovernanceActionKind';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
+const EMBEDDED_GROUP_SIZE = 1;
+
 /**
  * Represents an action that has no direct effect on the blockchain,
  * but serves as an on-chain record or informative notice.
@@ -22,6 +24,7 @@ export class InfoAction {
 
     // CDDL
     // info_action = 6
+    writer.writeStartArray(EMBEDDED_GROUP_SIZE);
     writer.writeInt(GovernanceActionKind.Info);
     return writer.encodeAsHex();
   }
@@ -34,6 +37,14 @@ export class InfoAction {
    */
   static fromCbor(cbor: HexBlob): InfoAction {
     const reader = new CborReader(cbor);
+
+    const length = reader.readStartArray();
+
+    if (length !== EMBEDDED_GROUP_SIZE)
+      throw new InvalidArgumentError(
+        'cbor',
+        `Expected an array of ${EMBEDDED_GROUP_SIZE} elements, but got an array of ${length} elements`
+      );
 
     const kind = Number(reader.readUInt());
 
