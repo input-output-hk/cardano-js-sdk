@@ -1,0 +1,70 @@
+{
+  "name": "@cardano-sdk/dapp-connector-client",
+  "version": "0.0.1",
+  "description": "Utilize cardano-js-sdk to build dApps",
+  "engines": {
+    "node": ">=16.20.2"
+  },
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk",
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "license": "Apache-2.0",
+  "scripts": {
+    "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
+    "build:cjs": "tsc --build src",
+    "build": "run-s build:cjs build:esm module-fixup",
+    "circular-deps:check": "madge --circular dist/cjs",
+    "module-fixup": "cp ../../build/cjs-package.json ./dist/cjs/package.json && cp ../../build/esm-package.json ./dist/esm/package.json",
+    "tscNoEmit": "echo typescript --noEmit command not implemented yet",
+    "cleanup:dist": "rm -rf dist",
+    "cleanup:nm": "rm -rf node_modules",
+    "cleanup": "rm -rf dist node_modules",
+    "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
+    "lint:fix": "yarn lint --fix",
+    "test": "jest -c ./jest.config.js",
+    "test:build:verify": "tsc --build ./test",
+    "test:e2e": "echo 'test:e2e' command not implemented yet",
+    "coverage": "echo No coverage report for this package",
+    "prepack": "yarn build",
+    "test:debug": "DEBUG=true yarn test"
+  },
+  "devDependencies": {
+    "@cardano-sdk/key-management": "workspace:~",
+    "eslint": "^7.32.0",
+    "jest": "^28.1.3",
+    "jest-environment-jsdom": "^28.1.3",
+    "jest-webextension-mock": "^3.7.19",
+    "madge": "^5.0.1",
+    "mock-browser": "^0.92.14",
+    "npm-run-all": "^4.1.5",
+    "ts-jest": "^28.0.7",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "@cardano-sdk/core": "workspace:~",
+    "@cardano-sdk/util": "workspace:~",
+    "@cardano-sdk/wallet": "workspace:~",
+    "@cardano-sdk/key-management": "workspace:~",
+    "lodash": "^4.17.21",
+    "rxjs": "^7.4.0",
+    "ts-custom-error": "^3.2.0",
+    "ts-log": "^2.2.4",
+    "webextension-polyfill": "^0.8.0"
+  },
+  "files": [
+    "dist/*",
+    "!dist/tsconfig.tsbuildinfo",
+    "LICENSE",
+    "NOTICE"
+  ]
+}
