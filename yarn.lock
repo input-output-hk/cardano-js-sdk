@@ -3270,6 +3270,31 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cardano-sdk/dapp-connector-client@workspace:packages/dapp-connector-client, @cardano-sdk/dapp-connector-client@workspace:~":
+  version: 0.0.0-use.local
+  resolution: "@cardano-sdk/dapp-connector-client@workspace:packages/dapp-connector-client"
+  dependencies:
+    "@cardano-sdk/core": "workspace:~"
+    "@cardano-sdk/key-management": "workspace:~"
+    "@cardano-sdk/util": "workspace:~"
+    "@cardano-sdk/wallet": "workspace:~"
+    eslint: ^7.32.0
+    jest: ^28.1.3
+    jest-environment-jsdom: ^28.1.3
+    jest-webextension-mock: ^3.7.19
+    lodash: ^4.17.21
+    madge: ^5.0.1
+    mock-browser: ^0.92.14
+    npm-run-all: ^4.1.5
+    rxjs: ^7.4.0
+    ts-custom-error: ^3.2.0
+    ts-jest: ^28.0.7
+    ts-log: ^2.2.4
+    typescript: ^4.7.4
+    webextension-polyfill: ^0.8.0
+  languageName: unknown
+  linkType: soft
+
 "@cardano-sdk/dapp-connector@workspace:packages/dapp-connector, @cardano-sdk/dapp-connector@workspace:~":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/dapp-connector@workspace:packages/dapp-connector"
@@ -3307,6 +3332,7 @@ __metadata:
     "@cardano-sdk/core": "workspace:~"
     "@cardano-sdk/crypto": "workspace:~"
     "@cardano-sdk/dapp-connector": "workspace:~"
+    "@cardano-sdk/dapp-connector-client": "workspace:~"
     "@cardano-sdk/hardware-ledger": "workspace:~"
     "@cardano-sdk/hardware-trezor": "workspace:~"
     "@cardano-sdk/input-selection": "workspace:~"
