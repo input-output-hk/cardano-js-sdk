@@ -443,10 +443,18 @@ export class ProtocolParamUpdate {
     params.#poolDeposit = parametersUpdate.poolDeposit ? BigInt(parametersUpdate.poolDeposit) : undefined;
     params.#maxEpoch = parametersUpdate.poolRetirementEpochBound;
     params.#nOpt = parametersUpdate.desiredNumberOfPools;
-    params.#poolPledgeInfluence = UnitInterval.fromFloat(Number(parametersUpdate.poolInfluence));
-    params.#expansionRate = UnitInterval.fromFloat(Number(parametersUpdate.monetaryExpansion));
-    params.#treasuryGrowthRate = UnitInterval.fromFloat(Number(parametersUpdate.treasuryExpansion));
-    params.#d = UnitInterval.fromFloat(Number(parametersUpdate.decentralizationParameter));
+    params.#poolPledgeInfluence = parametersUpdate.poolInfluence
+      ? UnitInterval.fromFloat(Number(parametersUpdate.poolInfluence))
+      : undefined;
+    params.#expansionRate = parametersUpdate.monetaryExpansion
+      ? UnitInterval.fromFloat(Number(parametersUpdate.monetaryExpansion))
+      : undefined;
+    params.#treasuryGrowthRate = parametersUpdate.treasuryExpansion
+      ? UnitInterval.fromFloat(Number(parametersUpdate.treasuryExpansion))
+      : undefined;
+    params.#d = parametersUpdate.decentralizationParameter
+      ? UnitInterval.fromFloat(Number(parametersUpdate.decentralizationParameter))
+      : undefined;
     params.#minPoolCost = parametersUpdate.minPoolCost ? BigInt(parametersUpdate.minPoolCost) : undefined;
     params.#protocolVersion = parametersUpdate.protocolVersion
       ? ProtocolVersion.fromCore(parametersUpdate.protocolVersion)
