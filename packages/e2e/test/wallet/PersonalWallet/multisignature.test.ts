@@ -19,8 +19,7 @@ import { filter, firstValueFrom } from 'rxjs';
 const env = getEnv(walletVariables);
 const logger = createLogger();
 
-// TODO LW-9182 REMOVE SKIP
-describe.skip('PersonalWallet/multisignature', () => {
+describe('PersonalWallet/multisignature', () => {
   let wallet: PersonalWallet;
   const assetName = '3030303030';
 
