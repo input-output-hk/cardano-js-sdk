@@ -148,10 +148,9 @@ jobs:
         with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
 
 
-  # TODO: decide if this is only ever for dev-preview? control with another diff-matrix?
-  diff-dev-preview:
+  diff:
     needs: images
-    name: Diff & Comment (dev-preview)
+    name: Diff & Comment
     if: github.event_name == 'pull_request' && (github.base_ref == 'master')
     permissions:
       contents: read
@@ -194,22 +193,34 @@ jobs:
             export AWS_PROFILE="lw"
             export AWS_REGION="us-east-1"
 
-            nix run -L ".#cardano-services.dev-preview@us-east-1.plan" | tee k8s-plan.diff
+            printf "" >pr-comment.md
+
+            for target in \
+              "dev-preview@us-east-1" \
+              "dev-preprod@us-east-1@v1" \
+              "dev-mainnet@us-east-1" \
+            ; do
+              nix run -L ".#cardano-services.${target}.plan" | tee k8s-plan.diff
+
+              (
+                echo "<details>"
+                echo "<summary><code>${target}</code> would change:</summary>"
+                echo
+                cat k8s-plan.diff \
+                  | sed -r "s|^[^ +-].*|\`\`\`\n\n\0\n\n\`\`\`diff|g" \
+                  | tail -n +3 \
+                  | sed -r "s|^([^ +-].*)has changed(.*)|\1would change\2|g"
+                echo "\`\`\`"
+                echo "</details>"
+              ) >>pr-comment.md
+            done
           '
       - name: Post Comment on the PR
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           prNumber=$(cut -d/ -f1 <<<'${{ github.ref_name }}')
-          gh pr comment "$prNumber" --body "$(
-            echo '<details>'
-            echo "<summary>$(head -n 1 k8s-plan.diff)</summary>"
-            echo
-            echo '```diff'
-            tail -n +2 k8s-plan.diff
-            echo '```'
-            echo '</details>'
-          )"
+          gh pr comment "$prNumber" --body "$(cat pr-comment.md)"
 
 
   deploy:
@@ -218,6 +229,7 @@ jobs:
       # Only one deployment at a time per environment, and wait for the previous one to finish:
       group: deploy-${{ matrix.environment }}
       cancel-in-progress: false
+    if: fromJSON(needs.discover.outputs.deployment-matrix) != '[]'
     strategy:
       matrix:
         include: ${{ fromJSON(fromJSON(needs.discover.outputs.deployment-matrix)) }}
