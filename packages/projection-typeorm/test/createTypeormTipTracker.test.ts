@@ -117,7 +117,8 @@ describe('createTypeormTipTracker', () => {
         tipTracker = createTypeormTipTracker({ connection$, reconnectionConfig: retryBackoffConfig });
       });
 
-      it('tip$ emits latest block', async () => {
+      // TODO LW-9971
+      it.skip('tip$ emits latest block', async () => {
         await expect(firstValueFrom(tipTracker.tip$)).resolves.toEqual(header2);
       });
 

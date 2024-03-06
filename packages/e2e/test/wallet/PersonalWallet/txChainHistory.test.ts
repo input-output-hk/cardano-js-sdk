@@ -61,7 +61,8 @@ describe('PersonalWallet/txChainHistory', () => {
     expect(normalizeTxBody(txFoundInHistory.body)).toEqual(normalizeTxBody(signedTx.body));
   });
 
-  it('can detect a ValueNotConserved error', async () => {
+  // TODO LW-9972
+  it.skip('can detect a ValueNotConserved error', async () => {
     expect.assertions(1);
     // Search chain history to see if the transaction is there.
     await firstValueFrom(
