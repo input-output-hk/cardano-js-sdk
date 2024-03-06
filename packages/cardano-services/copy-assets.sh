@@ -14,7 +14,7 @@ for i in $(ls ./src); do
   fi
 done
 
-for i in Http/schema.json Program/services/openApi.json ; do
+for i in Http/schema.json Program/services/openApi.json; do
   cp ./src/$i ./dist/cjs/$i
   # cp ./src/$i ./dist/esm/$i
 done

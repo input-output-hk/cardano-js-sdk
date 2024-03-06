@@ -198,4 +198,35 @@ describe('Cardano.util.computeImplicitCoin', () => {
     expect(coin.input).toBe(withdrawals[0].quantity + expectedReclaim);
     expect(coin.withdrawals).toBe(withdrawals[0].quantity);
   });
+
+  it('sums certificates and proposal procedures for deposit', () => {
+    const protocolParameters = { governanceActionDeposit: 4, stakeKeyDeposit: 2 } as Cardano.ProtocolParameters;
+    const governanceActionDeposit = BigInt(protocolParameters.governanceActionDeposit);
+    const stakeKeyDeposit = BigInt(protocolParameters.stakeKeyDeposit);
+
+    const anchor = {
+      dataHash: '3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d' as Crypto.Hash32ByteBase16,
+      url: 'https://testing.this'
+    };
+    const certificates: Cardano.Certificate[] = [
+      { __typename: Cardano.CertificateType.Registration, deposit: stakeKeyDeposit, stakeCredential }
+    ];
+    const proposalProcedures: Cardano.ProposalProcedure[] = [
+      {
+        anchor,
+        deposit: governanceActionDeposit,
+        governanceAction: { __typename: Cardano.GovernanceActionType.info_action },
+        rewardAccount
+      }
+    ];
+
+    const coin = Cardano.util.computeImplicitCoin(
+      protocolParameters,
+      { certificates, proposalProcedures },
+      [rewardAccount],
+      dRepKeyHash
+    );
+
+    expect(coin.deposit).toBe(stakeKeyDeposit + governanceActionDeposit);
+  });
 });
