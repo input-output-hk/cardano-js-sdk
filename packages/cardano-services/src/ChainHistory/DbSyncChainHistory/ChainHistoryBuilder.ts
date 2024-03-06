@@ -458,9 +458,13 @@ export class ChainHistoryBuilder {
       ...stakeCertsArr.map((cert): WithCertType<StakeCertModel> => ({ ...cert, type: 'stake' })),
       ...delegationCertsArr.map((cert): WithCertType<DelegationCertModel> => ({ ...cert, type: 'delegation' })),
       ...drepCerts.rows.map(
-        (cert): WithCertType<DrepCertModel> => ({
+        ({ deposit, ...cert }): WithCertType<DrepCertModel> => ({
           ...cert,
-          type: cert.deposit === null ? 'updateDrep' : BigInt(cert.deposit) >= 0n ? 'registerDrep' : 'unregisterDrep'
+          ...(deposit === null
+            ? { deposit, type: 'updateDrep' }
+            : deposit.startsWith('-')
+            ? { deposit: deposit.slice(1), type: 'unregisterDrep' }
+            : { deposit, type: 'registerDrep' })
         })
       ),
       ...voteDelegationCertsArr.map(
