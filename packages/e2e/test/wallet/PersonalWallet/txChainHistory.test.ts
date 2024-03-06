@@ -78,7 +78,7 @@ describe('PersonalWallet/txChainHistory', () => {
     } catch (error) {
       if (error instanceof ProviderError) {
         expect(CardanoNodeUtil.isValueNotConservedError(error?.innerError)).toBeTruthy();
-      }
+      } else throw error;
     }
   });
 });
