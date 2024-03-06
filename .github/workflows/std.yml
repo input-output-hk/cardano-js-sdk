@@ -151,8 +151,6 @@ jobs:
           ssh_known_hosts_entry: ${{ env.DISCOVERY_KNOWN_HOSTS_ENTRY }}
       - name: Generate the Diff
         run: |
-          echo 'export K8S_USER=eks-devs' >.envrc.local
-
           nix develop .#x86_64-linux.local.envs.main -L --command bash -c '
             set -euo pipefail
 
@@ -219,8 +217,6 @@ jobs:
           ssh_known_hosts_entry: ${{ env.DISCOVERY_KNOWN_HOSTS_ENTRY }}
       - name: Deploy to K8s
         run: |
-          echo 'export K8S_USER=eks-devs' >.envrc.local
-
           nix develop .#x86_64-linux.local.envs.main -L --command bash -c '
             set -euo pipefail
 
