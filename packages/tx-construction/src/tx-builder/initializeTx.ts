@@ -88,6 +88,7 @@ export const initializeTx = async (
 
   const implicitCoin = Cardano.util.computeImplicitCoin(protocolParameters, {
     certificates: bodyPreInputSelection.certificates,
+    proposalProcedures: bodyPreInputSelection.proposalProcedures,
     withdrawals: bodyPreInputSelection.withdrawals
   });
 

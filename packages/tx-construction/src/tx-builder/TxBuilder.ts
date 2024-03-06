@@ -260,6 +260,7 @@ export class GenericTxBuilder implements TxBuilder {
                 customizeCb: this.#customizeCb,
                 handleResolutions: this.#handleResolutions,
                 outputs: new Set(this.partialTxBody.outputs || []),
+                proposalProcedures: this.partialTxBody.proposalProcedures,
                 signingOptions: partialSigningOptions,
                 witness: { extraSigners }
               },
@@ -361,15 +362,15 @@ export class GenericTxBuilder implements TxBuilder {
     );
 
     // Reward accounts already delegated to the correct pool. Change must be distributed accordingly
-    for (const accnt of rewardAccounts.filter(
+    for (const account of rewardAccounts.filter(
       (rewardAccount) =>
         rewardAccount.keyStatus === Cardano.StakeKeyStatus.Registered &&
         rewardAccount.delegatee?.nextNextEpoch &&
         this.#requestedPortfolio?.some(({ id }) => id === rewardAccount.delegatee?.nextNextEpoch?.id)
     ))
       rewardAccountsWithWeights.set(
-        accnt.address,
-        this.#requestedPortfolio!.find(({ id }) => id === accnt.delegatee?.nextNextEpoch?.id)!.weight
+        account.address,
+        this.#requestedPortfolio!.find(({ id }) => id === account.delegatee?.nextNextEpoch?.id)!.weight
       );
 
     // Reward accounts which don't have the stake key registered or that were delegated but should not be anymore

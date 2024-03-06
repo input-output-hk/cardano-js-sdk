@@ -43,7 +43,11 @@ export class TxSubmitApiProvider implements TxSubmitProvider {
 
         if (typeof status === 'number' && status >= 400 && status < 500) this.#healthStatus = true;
 
-        throw new ProviderError(ProviderFailure.BadRequest, mapCardanoTxSubmitError(data), data as string);
+        throw new ProviderError(
+          ProviderFailure.BadRequest,
+          mapCardanoTxSubmitError(data),
+          typeof data === 'string' ? data : JSON.stringify(data)
+        );
       }
 
       throw new ProviderError(ProviderFailure.Unknown, error, 'submitting tx');

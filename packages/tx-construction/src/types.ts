@@ -48,6 +48,7 @@ export interface InitializeTxProps {
   witness?: InitializeTxWitness;
   signingOptions?: Pick<SignTransactionOptions, 'additionalKeyPaths'>;
   handleResolutions?: HandleResolution[];
+  proposalProcedures?: Cardano.ProposalProcedure[];
   /** callback function that allows updating the transaction before input selection */
   customizeCb?: CustomizeCb;
 }

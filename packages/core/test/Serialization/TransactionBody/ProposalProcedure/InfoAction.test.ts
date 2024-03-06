@@ -4,7 +4,7 @@ import { HexBlob } from '@cardano-sdk/util';
 import { InfoAction } from '../../../../src/Serialization';
 
 // Test data used in the following tests was generated with the cardano-serialization-lib
-const cbor = HexBlob('06');
+const cbor = HexBlob('8106');
 const core = {
   __typename: Cardano.GovernanceActionType.info_action
 } as Cardano.InfoAction;

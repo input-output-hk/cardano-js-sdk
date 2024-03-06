@@ -77,7 +77,8 @@ const computeShellyDeposits = (
 const computeConwayDeposits = (
   certificates: Cardano.Certificate[],
   rewardAccounts: Cardano.RewardAccount[],
-  dRepKeyHash?: Crypto.Ed25519KeyHashHex
+  dRepKeyHash?: Crypto.Ed25519KeyHashHex,
+  proposalProcedures?: Cardano.ProposalProcedure[]
 ): { deposit: Cardano.Lovelace; reclaimDeposit: Cardano.Lovelace } => {
   let deposit = 0n;
   let reclaimDeposit = 0n;
@@ -108,6 +109,8 @@ const computeConwayDeposits = (
     }
   }
 
+  if (proposalProcedures) for (const proposal of proposalProcedures) deposit += proposal.deposit;
+
   return {
     deposit,
     reclaimDeposit
@@ -119,9 +122,11 @@ const getTxDeposits = (
   { stakeKeyDeposit, poolDeposit }: Pick<Cardano.ProtocolParameters, 'stakeKeyDeposit' | 'poolDeposit'>,
   certificates: Cardano.Certificate[],
   rewardAccounts: Cardano.RewardAccount[] = [],
-  dRepKeyHash?: Crypto.Ed25519KeyHashHex
+  dRepKeyHash?: Crypto.Ed25519KeyHashHex,
+  proposalProcedures?: Cardano.ProposalProcedure[]
 ): { deposit: Cardano.Lovelace; reclaimDeposit: Cardano.Lovelace } => {
-  if (certificates.length === 0) return { deposit: 0n, reclaimDeposit: 0n };
+  if (certificates.length === 0 && (!proposalProcedures || proposalProcedures.length === 0))
+    return { deposit: 0n, reclaimDeposit: 0n };
 
   const depositParams = {
     poolDeposit: poolDeposit ? BigInt(poolDeposit) : 0n,
@@ -129,7 +134,7 @@ const getTxDeposits = (
   };
 
   const shelleyDeposits = computeShellyDeposits(depositParams, certificates, rewardAccounts);
-  const conwayDeposits = computeConwayDeposits(certificates, rewardAccounts, dRepKeyHash);
+  const conwayDeposits = computeConwayDeposits(certificates, rewardAccounts, dRepKeyHash, proposalProcedures);
 
   return {
     deposit: shelleyDeposits.deposit + conwayDeposits.deposit,
@@ -150,11 +155,15 @@ const getTxDeposits = (
  * On the other hand, the transaction summary/display could receive a transaction from a dApp,
  * and can have mixed certificates (foreign and ours), so we need the list of reward accounts and drepKeyHash
  * to be able to distinguish the deposits that are going to our rewardAccounts from the ones that could
- * potentially go to a different reward accounts that we dont control (same with reclaims).
+ * potentially go to a different reward accounts that we don't control (same with reclaims).
  */
 export const computeImplicitCoin = (
   { stakeKeyDeposit, poolDeposit }: Pick<Cardano.ProtocolParameters, 'stakeKeyDeposit' | 'poolDeposit'>,
-  { certificates, withdrawals }: Pick<HydratedTxBody, 'certificates' | 'withdrawals'>,
+  {
+    certificates,
+    proposalProcedures,
+    withdrawals
+  }: Pick<HydratedTxBody, 'certificates' | 'proposalProcedures' | 'withdrawals'>,
   rewardAccounts?: Cardano.RewardAccount[],
   dRepKeyHash?: Crypto.Ed25519KeyHashHex
 ): ImplicitCoin => {
@@ -162,7 +171,8 @@ export const computeImplicitCoin = (
     { poolDeposit, stakeKeyDeposit },
     certificates ?? [],
     rewardAccounts,
-    dRepKeyHash
+    dRepKeyHash,
+    proposalProcedures
   );
 
   const withdrawalsTotal = (withdrawals && BigIntMath.sum(withdrawals.map(({ quantity }) => quantity))) || 0n;
