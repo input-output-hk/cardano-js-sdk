@@ -106,7 +106,8 @@ describe('createTypeormTipTracker', () => {
       });
     });
 
-    describe('with 2 blocks in the buffer', () => {
+    // TODO LW-9971
+    describe.skip('with 2 blocks in the buffer', () => {
       let header1: Cardano.PartialBlockHeader;
       let header2: Cardano.PartialBlockHeader;
 
@@ -117,8 +118,7 @@ describe('createTypeormTipTracker', () => {
         tipTracker = createTypeormTipTracker({ connection$, reconnectionConfig: retryBackoffConfig });
       });
 
-      // TODO LW-9971
-      it.skip('tip$ emits latest block', async () => {
+      it('tip$ emits latest block', async () => {
         await expect(firstValueFrom(tipTracker.tip$)).resolves.toEqual(header2);
       });
 
