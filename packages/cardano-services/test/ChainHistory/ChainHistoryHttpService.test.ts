@@ -293,8 +293,7 @@ describe('ChainHistoryHttpService', () => {
           expect(tx.body.withdrawals?.length).toBeGreaterThan(0);
         });
 
-        // TODO LW-9182 REMOVE SKIP
-        it.skip('has redeemers', async () => {
+        it('has redeemers', async () => {
           const response = await provider.transactionsByHashes({
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.Redeemer] })
           });
@@ -314,8 +313,7 @@ describe('ChainHistoryHttpService', () => {
           expect(tx.auxiliaryData).toBeDefined();
         });
 
-        // TODO LW-9182 REMOVE SKIP
-        it.skip('has collateral inputs', async () => {
+        it('has collateral inputs', async () => {
           const response = await provider.transactionsByHashes({
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.CollateralInput] })
           });
@@ -326,8 +324,7 @@ describe('ChainHistoryHttpService', () => {
           expect(tx.body.collaterals?.length).toEqual(1);
         });
 
-        // TODO LW-9182 REMOVE SKIP
-        it.skip('has collateral outputs', async () => {
+        it('has collateral outputs', async () => {
           const response = await provider.transactionsByHashes({
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.CollateralOutput] })
           });
