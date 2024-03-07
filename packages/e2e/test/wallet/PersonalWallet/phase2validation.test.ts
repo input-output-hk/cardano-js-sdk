@@ -150,6 +150,6 @@ describe('PersonalWallet/phase2validation', () => {
     expect([TransactionFailure.Phase2Validation, TransactionFailure.FailedToSubmit].includes(failedTx.reason)).toBe(
       true
     );
-    expect(txFoundInHistory.body.fee).toEqual(collateralCoinValue);
+    expect(txFoundInHistory.body.totalCollateral).toEqual(collateralCoinValue);
   });
 });
