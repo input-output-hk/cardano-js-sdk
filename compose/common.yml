@@ -107,8 +107,8 @@ services:
       RESTORE_SNAPSHOT: ${RESTORE_SNAPSHOT:-}
       RESTORE_RECREATE_DB: N
     depends_on:
-      ogmios:
-        condition: service_healthy
+      cardano-node:
+        condition: service_started
     healthcheck:
       test: ['CMD', '/scripts/is-db-synced.sh']
       interval: 5s
@@ -164,6 +164,9 @@ services:
     image: cardanosolutions/ogmios:v${OGMIOS_VERSION:-6.1.0}
     command:
       ['--host', '0.0.0.0', '--node-socket', '/ipc/node.socket', '--node-config', '/config/cardano-node/config.json']
+    depends_on:
+      cardano-node:
+        condition: service_started
     healthcheck:
       retries: 2000
     ports:
@@ -174,7 +177,7 @@ services:
 
   cardano-submit-api:
     command: --config /config/cardano-submit-api/config.json --listen-address 0.0.0.0 --socket-path /ipc/node.socket $SUBMIT_API_ARGS
-    image: ghcr.io/intersectmbo/cardano-submit-api:${CARDANO_NODE_VERSION:-8.8.0-pre} 
+    image: ghcr.io/intersectmbo/cardano-submit-api:${CARDANO_NODE_VERSION:-8.8.0-pre}
     ports:
       - 8090:8090
     restart: on-failure
