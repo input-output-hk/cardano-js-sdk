@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">97% </span>
+                <span class="strong">97.01% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>194/200</span>
+                <span class='fraction'>195/201</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">96.89% </span>
+                <span class="strong">96.9% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>187/193</span>
+                <span class='fraction'>188/194</span>
             </div>
         
             
@@ -814,7 +814,11 @@
 <a name='L749'></a><a href='#L749'>749</a>
 <a name='L750'></a><a href='#L750'>750</a>
 <a name='L751'></a><a href='#L751'>751</a>
-<a name='L752'></a><a href='#L752'>752</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L752'></a><a href='#L752'>752</a>
+<a name='L753'></a><a href='#L753'>753</a>
+<a name='L754'></a><a href='#L754'>754</a>
+<a name='L755'></a><a href='#L755'>755</a>
+<a name='L756'></a><a href='#L756'>756</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1013,6 +1017,7 @@
 <span class="cline-any cline-yes">108x</span>
 <span class="cline-any cline-yes">108x</span>
 <span class="cline-any cline-yes">108x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1216,10 +1221,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">108x</span>
-<span class="cline-any cline-yes">1729x</span>
+<span class="cline-any cline-yes">1694x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">108x</span>
 <span class="cline-any cline-yes">108x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1336,6 +1342,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">108x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">108x</span>
@@ -1350,8 +1357,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">76x</span>
-<span class="cline-any cline-yes">76x</span>
+<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1364,7 +1371,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">76x</span>
+<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1766,6 +1774,7 @@ export class PersonalWallet implements ObservableWallet {
   #newTransactions = {
     failedToSubmit$: new Subject&lt;FailedTx&gt;(),
     pending$: new Subject&lt;OutgoingTx&gt;(),
+    signed$: new Subject&lt;SignedTx&gt;(),
     submitting$: new Subject&lt;OutgoingTx&gt;()
   };
   #reemitSubscriptions: Subscription;
@@ -1979,6 +1988,7 @@ export class PersonalWallet implements ObservableWallet {
       newTransactions: this.#newTransactions,
       onFatalError,
       retryBackoffConfig,
+      signedTransactionsStore: stores.signedTransactions,
       tip$: this.tip$,
       transactionsHistoryStore: stores.transactions
     });
@@ -2084,6 +2094,7 @@ export class PersonalWallet implements ObservableWallet {
 &nbsp;
     this.util = createWalletUtil({
       protocolParameters$: this.protocolParameters$,
+      transactions: this.transactions,
       utxo: this.utxo
     });
 &nbsp;
@@ -2102,7 +2113,7 @@ export class PersonalWallet implements ObservableWallet {
 &nbsp;
   async finalizeTx({ tx, sender, ...rest }: FinalizeTxProps, stubSign = false): Promise&lt;Cardano.Tx&gt; {
     const knownAddresses = await firstValueFrom(this.addresses$);
-    const { tx: signedTx } = await finalizeTx(
+    const result = await finalizeTx(
       tx,
       {
         ...rest,
@@ -2115,7 +2126,8 @@ export class PersonalWallet implements ObservableWallet {
       { bip32Account: this.bip32Account, witnesser: this.witnesser },
       stubSign
     );
-    return signedTx;
+    this.#newTransactions.signed$.next(result);
+    return result.tx;
   }
 &nbsp;
   private initializeHandles(handlePolicyIds$: Observable&lt;Cardano.PolicyId[]&gt;): Observable&lt;HandleInfo[]&gt; {
@@ -2323,7 +2335,7 @@ export class PersonalWallet implements ObservableWallet {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-03-07T18:54:54.396Z
+                at 2024-03-07T19:42:29.926Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
