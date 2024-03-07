@@ -19,8 +19,7 @@ import { isNotNil } from '@cardano-sdk/util';
 const env = getEnv(walletVariables);
 const logger = createLogger();
 
-// TODO LW-9182 REMOVE SKIP
-describe.skip('PersonalWallet/mint', () => {
+describe('PersonalWallet/mint', () => {
   let wallet: PersonalWallet;
 
   afterAll(() => {

@@ -5,6 +5,7 @@
 
 set -euo pipefail
 
+SCRIPT_NAME=$(basename "$0")
 here="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
 root="$(cd "$here/.." && pwd)"
 cd "$root"
@@ -16,7 +17,7 @@ REFERENCE_INPUT_ADDR='addr_test1wqnp362vmvr8jtc946d3a3utqgclfdl5y9d3kn849e359hst
 REFERENCE_SCRIPT_ADDR='addr_test1wz3937ykmlcaqxkf4z7stxpsfwfn4re7ncy48yu8vutcpxgnj28k0'
 
 clean() {
-  rm pparams.json tx-script.build tx-script.signed test-babbage.tx test-babbage.signed test-babbage2.tx test-babbage2.signed balance.out fullUtxo.out
+  rm -f pparams.json tx-script.build tx-script.signed test-babbage.tx test-babbage.signed test-babbage2.tx test-babbage2.signed balance.out fullUtxo.out
 }
 
 getAddressBalance() {
@@ -59,7 +60,7 @@ getBiggestUtxo() {
 trap clean EXIT
 
 while [ ! -S "$CARDANO_NODE_SOCKET_PATH" ]; do
-  echo "plutus-transaction.sh: CARDANO_NODE_SOCKET_PATH: $CARDANO_NODE_SOCKET_PATH file doesn't exist, waiting..."
+  echo "$SCRIPT_NAME: CARDANO_NODE_SOCKET_PATH: $CARDANO_NODE_SOCKET_PATH file doesn't exist, waiting..."
   sleep 2
 done
 
@@ -80,7 +81,6 @@ cardano-cli conway transaction build \
   --tx-in "$utxo" \
   --tx-out "$REFERENCE_INPUT_ADDR"+"$AMOUNT" \
   --tx-out-inline-datum-value 42 \
-  --protocol-params-file pparams.json \
   --out-file tx-script.build
 
 cardano-cli transaction sign \
@@ -113,7 +113,6 @@ cardano-cli conway transaction build \
   --tx-in "$utxo" \
   --tx-out "$REFERENCE_SCRIPT_ADDR"+"$AMOUNT" \
   --tx-out-reference-script-file scripts/contracts/multisignature.json \
-  --protocol-params-file pparams.json \
   --out-file tx-script.build
 
 cardano-cli transaction sign \
@@ -144,7 +143,6 @@ cardano-cli conway transaction build \
   --tx-in "$utxo" \
   --tx-out "$REFERENCE_SCRIPT_ADDR"+"$AMOUNT" \
   --tx-out-reference-script-file scripts/contracts/timelock.json \
-  --protocol-params-file pparams.json \
   --out-file tx-script.build
 
 cardano-cli transaction sign \
@@ -175,7 +173,6 @@ cardano-cli conway transaction build \
   --tx-in "$utxo" \
   --tx-out "$REFERENCE_SCRIPT_ADDR"+"$AMOUNT" \
   --tx-out-reference-script-file scripts/contracts/alwayssucceeds.plutus \
-  --protocol-params-file pparams.json \
   --out-file tx-script.build
 
 cardano-cli transaction sign \
@@ -206,7 +203,6 @@ cardano-cli conway transaction build \
   --tx-in "$utxo" \
   --tx-out "$REFERENCE_SCRIPT_ADDR"+"$AMOUNT" \
   --tx-out-reference-script-file scripts/contracts/reference-input.plutus \
-  --protocol-params-file pparams.json \
   --out-file tx-script.build
 
 cardano-cli transaction sign \
@@ -236,7 +232,6 @@ cardano-cli conway transaction build \
   --tx-out "$REFERENCE_INPUT_SCRIPT_ADDR"+"$AMOUNT" \
   --tx-out-inline-datum-file scripts/contracts/unit.json \
   --change-address "$genesisAddr" \
-  --protocol-params-file pparams.json \
   --out-file test-babbage.tx
 
 cardano-cli transaction sign \
@@ -274,7 +269,6 @@ cardano-cli conway transaction build \
   --tx-in-redeemer-value 42 \
   --read-only-tx-in-reference "$referenceInputUtxo" \
   --change-address "$genesisAddr" \
-  --protocol-params-file pparams.json \
   --tx-out-return-collateral "$REFERENCE_INPUT_ADDR"+"$returnCollateralVal" \
   --tx-total-collateral 1450000 \
   --out-file test-babbage2.tx

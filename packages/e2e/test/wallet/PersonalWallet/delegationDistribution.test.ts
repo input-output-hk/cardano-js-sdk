@@ -121,8 +121,7 @@ const delegateAllToSinglePool = async (wallet: PersonalWallet): Promise<void> =>
   await submitAndConfirm(wallet, tx);
 };
 
-// TODO LW-9182 REMOVE SKIP
-describe.skip('PersonalWallet/delegationDistribution', () => {
+describe('PersonalWallet/delegationDistribution', () => {
   let wallet: PersonalWallet;
 
   beforeAll(async () => {

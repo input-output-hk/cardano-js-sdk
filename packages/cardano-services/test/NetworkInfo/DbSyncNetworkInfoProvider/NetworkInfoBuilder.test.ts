@@ -58,8 +58,7 @@ describe('NetworkInfoBuilder', () => {
   });
 
   describe('queryProtocolParams', () => {
-    // TODO LW-9182 REMOVE SKIP
-    test.skip('query wallet protocol params from current epoch', async () => {
+    test('query wallet protocol params from current epoch', async () => {
       const result = await builder.queryProtocolParams();
       expect(result).toMatchShapeOf(DataMocks.Ledger.parameters);
     });

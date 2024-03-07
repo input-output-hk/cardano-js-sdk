@@ -12,11 +12,11 @@ cd "$root"
 
 clean() {
   echo "Clean up"
-  rm bin.tar.gz
+  rm -f bin.tar.gz
 }
 trap clean EXIT
 
-VERSION="8.8.0-pre"
+VERSION="8.8.0"
 
 rm -rf bin
 mkdir -p bin
@@ -24,10 +24,10 @@ mkdir -p bin
 echo "Download binaries from IOG build"
 case $(uname) in
 Darwin)
-  wget -O bin.tar.gz https://github.com/input-output-hk/cardano-node/releases/download/${VERSION}-pre/cardano-node-${VERSION}-macos.tar.gz
+  wget -O bin.tar.gz https://github.com/IntersectMBO/cardano-node/releases/download/${VERSION}-pre/cardano-node-${VERSION}-macos.tar.gz
   ;;
 Linux)
-  wget -O bin.tar.gz https://github.com/input-output-hk/cardano-node/releases/download/${VERSION}-pre/cardano-node-${VERSION}-linux.tar.gz
+  wget -O bin.tar.gz https://github.com/IntersectMBO/cardano-node/releases/download/${VERSION}-pre/cardano-node-${VERSION}-linux.tar.gz
   ;;
 esac
 
