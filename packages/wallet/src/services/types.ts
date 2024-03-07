@@ -83,6 +83,7 @@ export interface TransactionsTracker {
     readonly inFlight$: Observable<TxInFlight[]>;
     readonly submitting$: Observable<OutgoingTx>;
     readonly pending$: Observable<OutgoingTx>;
+    readonly signed$: Observable<SignedTx[]>;
     readonly failed$: Observable<FailedTx>;
     readonly onChain$: Observable<OutgoingOnChainTx>;
   };

@@ -128,6 +128,7 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
       inFlight$: RemoteApiPropertyType.HotObservable,
       onChain$: RemoteApiPropertyType.HotObservable,
       pending$: RemoteApiPropertyType.HotObservable,
+      signed$: RemoteApiPropertyType.HotObservable,
       submitting$: RemoteApiPropertyType.HotObservable
     },
     rollback$: RemoteApiPropertyType.HotObservable

@@ -1,11 +1,13 @@
 import * as Crypto from '@cardano-sdk/crypto';
+import { Bip32Account, GroupedAddress, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
 import { Cardano, TxCBOR } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
-import { InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
 import { Observable, catchError, filter, firstValueFrom, throwError, timeout } from 'rxjs';
-import { ObservableWallet, OutgoingTx } from '../src';
+import { ObservableWallet, OutgoingTx, WalletUtil } from '../src';
+import { SignedTx, finalizeTx } from '@cardano-sdk/tx-construction';
 import { SodiumBip32Ed25519 } from '@cardano-sdk/crypto';
 import { logger } from '@cardano-sdk/util-dev';
+import { testAsyncKeyAgent } from '../../key-management/test/mocks';
 
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;
@@ -33,9 +35,17 @@ export const waitForWalletStateSettle = (wallet: ObservableWallet) =>
   );
 
 export const toOutgoingTx = (tx: Cardano.Tx): OutgoingTx => ({
-  body: tx.body,
+  body: { ...tx.body },
   cbor: TxCBOR.serialize(tx),
   id: tx.id
+});
+
+export const toSignedTx = (tx: Cardano.Tx): SignedTx => ({
+  cbor: TxCBOR.serialize(tx),
+  context: {
+    handleResolutions: []
+  },
+  tx
 });
 
 export const dummyCbor = TxCBOR('123');
@@ -73,3 +83,32 @@ export const createAsyncKeyAgent = async () =>
       }
     )
   );
+
+export const signTx = async ({
+  tx,
+  addresses$,
+  walletUtil
+}: {
+  tx: Cardano.TxBodyWithHash;
+  addresses$: Observable<GroupedAddress[]>;
+  walletUtil: WalletUtil;
+}): Promise<Cardano.Tx> => {
+  const keyAgent = await testAsyncKeyAgent();
+  const knownAddresses = await firstValueFrom(addresses$);
+
+  const signed = await finalizeTx(
+    tx,
+    {
+      signingContext: {
+        knownAddresses,
+        txInKeyPathMap: await util.createTxInKeyPathMap(tx.body, knownAddresses, walletUtil)
+      }
+    },
+    {
+      bip32Account: await Bip32Account.fromAsyncKeyAgent(keyAgent),
+      witnesser: util.createBip32Ed25519Witnesser(keyAgent)
+    }
+  );
+
+  return signed.tx;
+};

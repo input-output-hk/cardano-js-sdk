@@ -1,6 +1,7 @@
 import { Cardano, EpochInfo, EraSummary } from '@cardano-sdk/core';
 import { DelegatedStake } from '../types';
 import { GroupedAddress } from '@cardano-sdk/key-management';
+import { SignedTx } from '@cardano-sdk/tx-construction';
 import { sameArrayItems } from '@cardano-sdk/util';
 
 export const tipEquals = (a: Cardano.Tip, b: Cardano.Tip) => a.hash === b.hash;
@@ -26,3 +27,7 @@ export const epochInfoEquals = (a: EpochInfo, b: EpochInfo) => a.epochNo === b.e
 
 export const delegatedStakeEquals = (a: DelegatedStake, b: DelegatedStake) =>
   a.pool.id === b.pool.id && a.stake === b.stake && a.percentage === b.percentage;
+
+const signedTxEquals = (a: SignedTx, b: SignedTx) => a.tx.id === b.tx.id;
+
+export const signedTxsEquals = (a: SignedTx[], b: SignedTx[]) => sameArrayItems(a, b, signedTxEquals);

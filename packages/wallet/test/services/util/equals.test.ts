@@ -6,6 +6,7 @@ import {
   epochInfoEquals,
   eraSummariesEquals,
   groupedAddressesEquals,
+  signedTxsEquals,
   tipEquals,
   transactionsEquals,
   txEquals,
@@ -13,6 +14,7 @@ import {
 } from '../../../src';
 import { GroupedAddress } from '@cardano-sdk/key-management';
 import { Percent } from '@cardano-sdk/util';
+import { SignedTx } from '@cardano-sdk/tx-construction';
 
 describe('equals', () => {
   const txId1 = Cardano.TransactionId('4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6');
@@ -79,5 +81,12 @@ describe('equals', () => {
     expect(delegatedStakeEquals(pool1, { ...pool1, pool: { id: 'cde' } as Cardano.StakePool })).toBe(false);
     expect(delegatedStakeEquals(pool1, { ...pool1, percentage: Percent(0.22) })).toBe(false);
     expect(delegatedStakeEquals(pool1, { ...pool1, stake: 101n })).toBe(false);
+  });
+
+  test('signedTxsEquals compares signed tx id', () => {
+    const signedTxs1 = [{ tx: { id: txId1 } } as SignedTx];
+    const signedTxs2 = [{ tx: { id: txId2 } } as SignedTx];
+    expect(signedTxsEquals(signedTxs1, [...signedTxs1.map((signedTx) => ({ ...signedTx }))])).toBe(true);
+    expect(signedTxsEquals(signedTxs1, signedTxs2)).toBe(false);
   });
 });

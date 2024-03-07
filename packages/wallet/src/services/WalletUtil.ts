@@ -4,7 +4,11 @@ import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
 import { GroupedAddress, util as KeyManagementUtil } from '@cardano-sdk/key-management';
 import { Observable, firstValueFrom } from 'rxjs';
 import { ObservableWallet, ScriptAddress, isScriptAddress } from '../types';
-import { ProtocolParametersRequiredByOutputValidator, createOutputValidator } from '@cardano-sdk/tx-construction';
+import {
+  ProtocolParametersRequiredByOutputValidator,
+  SignedTx,
+  createOutputValidator
+} from '@cardano-sdk/tx-construction';
 import { txInEquals } from './util';
 import uniqBy from 'lodash/uniqBy';
 
@@ -12,6 +16,11 @@ export interface InputResolverContext {
   utxo: {
     /** Subscribed on every InputResolver call */
     available$: Observable<Cardano.Utxo[]>;
+  };
+  transactions: {
+    outgoing: {
+      signed$: Observable<SignedTx[]>;
+    };
   };
 }
 
@@ -22,10 +31,31 @@ export interface WalletOutputValidatorContext {
 
 export type WalletUtilContext = WalletOutputValidatorContext & InputResolverContext;
 
-export const createInputResolver = ({ utxo }: InputResolverContext): Cardano.InputResolver => ({
+export const createInputResolver = ({ utxo, transactions }: InputResolverContext): Cardano.InputResolver => ({
   async resolveInput(input: Cardano.TxIn, options?: Cardano.ResolveOptions) {
-    const utxoAvailable = await firstValueFrom(utxo.available$);
-    const availableUtxo = utxoAvailable?.find(([txIn]) => txInEquals(txIn, input));
+    const utxoAvailable = await firstValueFrom(utxo.available$, { defaultValue: [] });
+    const signedTransactions = await firstValueFrom(transactions.outgoing.signed$, { defaultValue: [] });
+    const utxoFromSigned = signedTransactions.flatMap(({ tx: signedTx }, signedTxIndex) =>
+      signedTx.body.outputs
+        .filter((_, outputIndex) => {
+          const alreadyConsumed = signedTransactions.some(
+            ({ tx: { body } }, i) =>
+              signedTxIndex !== i &&
+              body.inputs.some((consumedInput) => txInEquals(consumedInput, { index: outputIndex, txId: signedTx.id }))
+          );
+
+          return !alreadyConsumed;
+        })
+        .map((txOut): Cardano.Utxo => {
+          const txIn: Cardano.HydratedTxIn = {
+            address: txOut.address,
+            index: signedTx.body.outputs.indexOf(txOut),
+            txId: signedTx.id
+          };
+          return [txIn, txOut];
+        })
+    );
+    const availableUtxo = [...utxoAvailable, ...utxoFromSigned].find(([txIn]) => txInEquals(txIn, input));
 
     if (availableUtxo) return availableUtxo[1];
 
