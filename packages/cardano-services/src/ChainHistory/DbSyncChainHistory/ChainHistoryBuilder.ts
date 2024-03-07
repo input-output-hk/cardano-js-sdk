@@ -128,7 +128,11 @@ const getGovernanceAction = ({
       };
 
     case 'NewConstitution':
-      return { __typename: GovernanceActionType.new_constitution, constitution: contents[1], governanceActionId };
+      return {
+        __typename: GovernanceActionType.new_constitution,
+        constitution: { scriptHash: null, ...contents[1] },
+        governanceActionId
+      };
 
     case 'NoConfidence':
       return { __typename: GovernanceActionType.no_confidence, governanceActionId };
