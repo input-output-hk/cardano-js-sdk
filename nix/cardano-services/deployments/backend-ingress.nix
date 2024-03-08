@@ -35,9 +35,7 @@
           "alb.ingress.kubernetes.io/group.name" = chart.namespace;
           # ACM
           "alb.ingress.kubernetes.io/certificate-arn" = values.cardano-services.certificateArn;
-        }
-        // lib.optionalAttrs (values.cardano-services.ingresOrder != 0) {
-          "alb.ingress.kubernetes.io/group.order" = toString values.cardano-services.ingresOrder;
+          "alb.ingress.kubernetes.io/group.order" =  toString values.cardano-services.ingresOrder;
         };
     };
     spec = {

@@ -48,6 +48,8 @@
               env = utils.mkPodEnv ({
                   NETWORK = values.network;
                   LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
+                  BUILD_INFO = values.cardano-services.buildInfo;
+
                   BLOCKFROST_API_KEY = {
                     valueFrom.secretKeyRef = {
                       name = "blockfrost";
@@ -75,8 +77,7 @@
                   };
                   POSTGRES_SSL_DB_SYNC = "true";
                   POSTGRES_SSL_CA_FILE_DB_SYNC = "/tls/ca.crt";
-                }
-                // (lib.optionalAttrs (values.cardano-services.buildInfo != null) {BUILD_INFO = values.cardano-services.buildInfo;}));
+                });
               volumeMounts = [
                 {
                   mountPath = "/tls";
