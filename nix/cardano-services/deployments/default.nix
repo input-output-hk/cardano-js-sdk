@@ -14,6 +14,7 @@ in
   nix-helm.builders.${pkgs.system}.mkHelmMultiTarget {
     defaults = final: let
       inherit (final) values;
+      oci = inputs.self.x86_64-linux.cardano-services.oci-images.cardano-services;
     in {
       name = "${final.namespace}-cardanojs";
       chart = ./Chart.yaml;
@@ -87,11 +88,13 @@ in
       values = {
         postgresName = "${final.namespace}-postgresql";
         cardano-services = {
-          image = null;
-          buildInfo = null;
+          image = oci.image.name;
+          buildInfo = oci.meta.buildInfo;
+          versions = oci.meta.versions;
+          httpPrefix = "/v${oci.meta.versions.root}";
+
           loggingLevel = "debug";
           tokenMetadataServerUrl = "http://${final.namespace}-cardano-stack-metadata.${final.namespace}.svc.cluster.local";
-          httpPrefix = "";
           ingresOrder = 0;
           certificateArn = tf-outputs.${values.region}.acm_arn;
           additionalRoutes = [];
@@ -111,7 +114,6 @@ in
         };
 
         backend = {
-          routes = ["/"];
           allowedOrigins = lib.concatStringsSep "," [
             # gafhhkghbfjjkeiendhlofajokpaflmk represents Chrome production version
             "chrome-extension://gafhhkghbfjjkeiendhlofajokpaflmk"
@@ -135,6 +137,21 @@ in
             interval = 60;
             timeout = 30;
           };
+          routes = let
+            inherit (oci.meta) versions;
+          in [
+            "/v${versions.root}/health"
+            "/v${versions.root}/live"
+            "/v${versions.root}/meta"
+            "/v${versions.root}/ready"
+            "/v${versions.assetInfo}/asset"
+            "/v${versions.chainHistory}/chain-history"
+            # "/v${versions.handle}/handle"
+            "/v${versions.networkInfo}/network-info"
+            "/v${versions.rewards}/rewards"
+            "/v${versions.txSubmit}/tx-submit"
+            "/v${versions.utxo}/utxo"
+          ];
         };
       };
       imports = [
@@ -151,15 +168,12 @@ in
     };
 
     targets = {
-      "dev-preview@us-east-1" = final: let
-        oci = inputs.self.x86_64-linux.cardano-services.oci-images.cardano-services;
-      in {
+      "dev-preview@us-east-1" = final: {
         namespace = "dev-preview";
 
         providers = {
           backend = {
             enabled = true;
-            replicas = 3;
             env.HANDLE_POLICY_IDS = "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a";
             env.USE_BLOCKFROST = "true";
             env.USE_KORA_LABS = "true";
@@ -180,10 +194,6 @@ in
           region = "us-east-1";
           cardano-services = {
             ingresOrder = 99;
-            image = oci.image.name;
-            buildInfo = oci.meta.buildInfo;
-            versions = oci.meta.versions;
-            httpPrefix = "/v${oci.meta.versions.root}";
             additionalRoutes = [
               {
                 pathType = "Prefix";
@@ -196,27 +206,9 @@ in
             ];
           };
 
-          pg-boss-worker.metadata-fetch-mode = "smash";
-
-          backend = {
-            routes = let
-              inherit (oci.meta) versions;
-            in [
-              "/v${versions.root}/health"
-              "/v${versions.root}/live"
-              "/v${versions.root}/meta"
-              "/v${versions.root}/ready"
-              "/v${versions.assetInfo}/asset"
-              "/v${versions.chainHistory}/chain-history"
-              "/v${versions.networkInfo}/network-info"
-              "/v${versions.rewards}/rewards"
-              "/v${versions.txSubmit}/tx-submit"
-              "/v${versions.utxo}/utxo"
-            ];
-          };
-
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
+          pg-boss-worker.metadata-fetch-mode = "smash";
         };
       };
 
@@ -274,31 +266,10 @@ in
             ];
           };
 
-          backend = {
-            routes = let
-              inherit (oci.meta) versions;
-            in [
-              "/v${versions.root}/health"
-              "/v${versions.root}/live"
-              "/v${versions.root}/meta"
-              "/v${versions.root}/ready"
-              "/v${versions.assetInfo}/asset"
-              "/v${versions.chainHistory}/chain-history"
-              "/v${versions.handle}/handle"
-              "/v${versions.networkInfo}/network-info"
-              "/v${versions.rewards}/rewards"
-              "/v${versions.stakePool}/provider-server"
-              "/v${versions.stakePool}/stake-pool-provider-server"
-              "/v${versions.txSubmit}/tx-submit"
-              "/v${versions.utxo}/utxo"
-            ];
-          };
         };
       };
 
-      "dev-mainnet@us-east-1" = final: let
-        oci = inputs.self.x86_64-linux.cardano-services.oci-images.cardano-services;
-      in {
+      "dev-mainnet@us-east-1" = final: {
         namespace = "dev-mainnet";
 
         providers = {
@@ -325,10 +296,6 @@ in
           region = "us-east-1";
           cardano-services = {
             ingresOrder = 99;
-            image = oci.image.name;
-            buildInfo = oci.meta.buildInfo;
-            versions = oci.meta.versions;
-            httpPrefix = "/v${oci.meta.versions.root}";
             additionalRoutes = [
               {
                 pathType = "Prefix";
@@ -341,27 +308,9 @@ in
             ];
           };
 
-          pg-boss-worker.metadata-fetch-mode = "smash";
-
-          backend = {
-            routes = let
-              inherit (oci.meta) versions;
-            in [
-              "/v${versions.root}/health"
-              "/v${versions.root}/live"
-              "/v${versions.root}/meta"
-              "/v${versions.root}/ready"
-              "/v${versions.assetInfo}/asset"
-              "/v${versions.chainHistory}/chain-history"
-              "/v${versions.networkInfo}/network-info"
-              "/v${versions.rewards}/rewards"
-              "/v${versions.txSubmit}/tx-submit"
-              "/v${versions.utxo}/utxo"
-            ];
-          };
-
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
+          pg-boss-worker.metadata-fetch-mode = "smash";
         };
       };
 
@@ -387,6 +336,7 @@ in
           };
 
           backend = {
+            routes = ["/"];
             env.HANDLE_POLICY_IDS = "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a";
             env.USE_BLOCKFROST = "false";
             env.USE_KORA_LABS = "true";
@@ -394,9 +344,7 @@ in
         };
       };
 
-      "dev-preprod@us-east-1@v1" = final: let
-        oci = inputs.self.x86_64-linux.cardano-services.oci-images.cardano-services;
-      in {
+      "dev-preprod@us-east-1@v1" = final: {
         name = "${final.namespace}-cardanojs-v1";
         namespace = "dev-preprod";
 
@@ -425,10 +373,6 @@ in
 
           cardano-services = {
             ingresOrder = 99;
-            image = oci.image.name;
-            buildInfo = oci.meta.buildInfo;
-            versions = oci.meta.versions;
-            httpPrefix = "/v${oci.meta.versions.root}";
             additionalRoutes = [
               {
                 pathType = "Prefix";
@@ -440,29 +384,10 @@ in
               }
             ];
           };
-
-          backend = {
-            routes = let
-              inherit (oci.meta) versions;
-            in [
-              "/v${versions.root}/health"
-              "/v${versions.root}/live"
-              "/v${versions.root}/meta"
-              "/v${versions.root}/ready"
-              "/v${versions.assetInfo}/asset"
-              "/v${versions.chainHistory}/chain-history"
-              "/v${versions.networkInfo}/network-info"
-              "/v${versions.rewards}/rewards"
-              "/v${versions.txSubmit}/tx-submit"
-              "/v${versions.utxo}/utxo"
-            ];
-          };
         };
       };
 
-      "ops-preview-1@us-east-1" = final: let
-        oci = inputs.self.x86_64-linux.cardano-services.oci-images.cardano-services;
-      in {
+      "ops-preview-1@us-east-1" = final: {
         namespace = "ops-preview-1";
 
         providers = {
@@ -478,17 +403,11 @@ in
           region = "us-east-1";
           cardano-services = {
             ingresOrder = 99;
-            image = oci.image.name;
-            buildInfo = oci.meta.buildInfo;
-            versions = oci.meta.versions;
-            httpPrefix = "/v${oci.meta.versions.root}";
           };
         };
       };
 
-      "ops-preprod-1@us-east-1" = final: let
-        oci = inputs.self.x86_64-linux.cardano-services.oci-images.cardano-services;
-      in {
+      "ops-preprod-1@us-east-1" = final: {
         namespace = "ops-preprod-1";
 
         providers = {
@@ -505,10 +424,6 @@ in
 
           cardano-services = {
             ingresOrder = 99;
-            image = oci.image.name;
-            buildInfo = oci.meta.buildInfo;
-            versions = oci.meta.versions;
-            httpPrefix = "/v${oci.meta.versions.root}";
           };
         };
       };
