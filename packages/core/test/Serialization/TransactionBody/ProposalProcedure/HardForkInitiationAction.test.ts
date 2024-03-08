@@ -4,7 +4,7 @@ import { HardForkInitiationAction } from '../../../../src/Serialization';
 import { HexBlob } from '@cardano-sdk/util';
 
 // Test data used in the following tests was generated with the cardano-serialization-lib
-const cbor = HexBlob('830182582000000000000000000000000000000000000000000000000000000000000000000381820103');
+const cbor = HexBlob('8301825820000000000000000000000000000000000000000000000000000000000000000003820103');
 const core = {
   __typename: Cardano.GovernanceActionType.hard_fork_initiation_action,
   governanceActionId: { actionIndex: 3, id: '0000000000000000000000000000000000000000000000000000000000000000' },
