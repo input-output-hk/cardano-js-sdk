@@ -57,6 +57,7 @@
                   LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
                   QUEUES = "pool-metadata,pool-metrics";
                   STAKE_POOL_PROVIDER_URL = "http://${chart.name}-backend.${chart.namespace}.svc.cluster.local";
+                  BUILD_INFO = values.cardano-services.buildInfo;
 
                   METADATA_FETCH_MODE = values.pg-boss-worker.metadata-fetch-mode;
 
@@ -98,7 +99,6 @@
                   POSTGRES_SSL_DB_SYNC = "true";
                   POSTGRES_SSL_CA_FILE_DB_SYNC = "/tls/ca.crt";
                 }
-                // (lib.optionalAttrs (values.cardano-services.buildInfo != null) {BUILD_INFO = values.cardano-services.buildInfo;})
                 // lib.optionalAttrs (values.pg-boss-worker ? env) values.pg-boss-worker.env
                 // lib.optionalAttrs (values.pg-boss-worker.metadata-fetch-mode == "smash") {
                   SMASH_URL = "https://smash.cardano-mainnet.iohk.io/api/v1";

@@ -21,8 +21,8 @@
     };
 
     env = {
-      BUILD_INFO = lib.mkIf (values.cardano-services.buildInfo != null) values.cardano-services.buildInfo;
-      ALLOWED_ORIGINS = lib.mkIf (values.backend.allowedOrigins != null) values.backend.allowedOrigins;
+      BUILD_INFO = values.cardano-services.buildInfo;
+      ALLOWED_ORIGINS = values.backend.allowedOrigins;
 
       NETWORK = values.network;
       OGMIOS_SRV_SERVICE_NAME = values.backend.ogmiosSrvServiceName;
@@ -68,7 +68,7 @@
     port = 3000;
 
     env = {
-      BUILD_INFO = lib.mkIf (values.cardano-services.buildInfo != null) values.cardano-services.buildInfo;
+      BUILD_INFO = values.cardano-services.buildInfo;
 
       NETWORK = values.network;
       LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
