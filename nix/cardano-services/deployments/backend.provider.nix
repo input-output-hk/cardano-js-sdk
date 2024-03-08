@@ -36,8 +36,8 @@
         then "https://api.handle.me"
         else "https://${values.network}.api.handle.me";
 
-      BUILD_INFO = lib.mkIf (values.cardano-services.buildInfo != null) values.cardano-services.buildInfo;
-      ALLOWED_ORIGINS = lib.mkIf (values.backend.allowedOrigins != null) values.backend.allowedOrigins;
+      BUILD_INFO = values.cardano-services.buildInfo;
+      ALLOWED_ORIGINS = values.backend.allowedOrigins;
 
       POSTGRES_POOL_MAX_DB_SYNC = "50";
       POSTGRES_HOST_DB_SYNC = values.postgresName;
