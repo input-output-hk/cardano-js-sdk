@@ -200,9 +200,8 @@ in
         };
       };
 
-      "dev-sanchonet@us-east-1@v1" = final: let
-        oci = inputs.self.x86_64-linux.cardano-services.oci-images.cardano-services;
-      in {
+      "dev-sanchonet@us-east-1@v1" = final: {
+        name = "${final.namespace}-cardanojs-v1";
         namespace = "dev-sanchonet";
 
         providers = {
@@ -223,15 +222,11 @@ in
           network = "sanchonet-1";
           region = "us-east-1";
 
-          name = "${final.namespace}-cardanojs-v1";
           blockfrost-worker.enabled = false;
           pg-boss-worker.enabled = true;
 
           cardano-services = {
             ingresOrder = 99;
-            image = oci.image.name;
-            versions = oci.meta.versions;
-            httpPrefix = "/v${oci.meta.versions.root}";
             additionalRoutes = [
               {
                 pathType = "Prefix";
@@ -312,7 +307,6 @@ in
 
           cardano-services = {
             ingresOrder = 100;
-            image = inputs.self.x86_64-linux.cardano-services.oci-images.cardano-services.image.name;
           };
 
           backend = {
