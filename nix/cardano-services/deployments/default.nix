@@ -42,14 +42,6 @@ in
         backend = {
           resources.limits = mkPodResources "512Mi" "1500m";
           resources.requests = mkPodResources "350Mi" "1000m";
-
-          env.DISABLE_STAKE_POOL_METRIC_APY = "true";
-          env.PAGINATION_PAGE_SIZE_LIMIT = "5500";
-          env.USE_BLOCKFROST = "true";
-          env.HANDLE_PROVIDER_SERVER_URL =
-            if values.network == "mainnet"
-            then "https://api.handle.me"
-            else "https://${values.network}.api.handle.me";
         };
 
         stake-pool-provider = {
@@ -146,7 +138,6 @@ in
             "/v${versions.root}/ready"
             "/v${versions.assetInfo}/asset"
             "/v${versions.chainHistory}/chain-history"
-            # "/v${versions.handle}/handle"
             "/v${versions.networkInfo}/network-info"
             "/v${versions.rewards}/rewards"
             "/v${versions.txSubmit}/tx-submit"
@@ -174,9 +165,6 @@ in
         providers = {
           backend = {
             enabled = true;
-            env.HANDLE_POLICY_IDS = "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a";
-            env.USE_BLOCKFROST = "true";
-            env.USE_KORA_LABS = "true";
           };
           stake-pool-provider.enabled = true;
           handle-provider.enabled = true;
@@ -220,10 +208,8 @@ in
         providers = {
           backend = {
             enabled = true;
-            env.HANDLE_POLICY_IDS = "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a";
-            env.USE_KORA_LABS = "true";
             env.USE_SUBMIT_API = "true";
-            env.USE_BLOCKFROST = "false";
+            env.USE_BLOCKFROST = lib.mkForce "false";
             env.SUBMIT_API_URL = "http://${final.namespace}-cardano-stack.${final.namespace}.svc.cluster.local:8090";
           };
           stake-pool-provider.enabled = true;
@@ -265,7 +251,6 @@ in
               }
             ];
           };
-
         };
       };
 
@@ -276,9 +261,6 @@ in
           backend = {
             enabled = true;
             replicas = 3;
-            env.HANDLE_POLICY_IDS = "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a";
-            env.USE_BLOCKFROST = "true";
-            env.USE_KORA_LABS = "true";
           };
           stake-pool-provider.enabled = true;
           handle-provider.enabled = true;
@@ -320,9 +302,7 @@ in
         providers = {
           backend = {
             enabled = true;
-            env.HANDLE_POLICY_IDS = "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a";
-            env.USE_BLOCKFROST = "false";
-            env.USE_KORA_LABS = "true";
+            env.USE_BLOCKFROST = lib.mkForce "false";
           };
         };
 
@@ -337,9 +317,6 @@ in
 
           backend = {
             routes = ["/"];
-            env.HANDLE_POLICY_IDS = "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a";
-            env.USE_BLOCKFROST = "false";
-            env.USE_KORA_LABS = "true";
           };
         };
       };
@@ -351,9 +328,7 @@ in
         providers = {
           backend = {
             enabled = true;
-            env.HANDLE_POLICY_IDS = "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a";
-            env.USE_BLOCKFROST = "false";
-            env.USE_KORA_LABS = "true";
+            env.USE_BLOCKFROST = lib.mkForce "false";
           };
           stake-pool-provider.enabled = true;
           handle-provider.enabled = true;
@@ -393,8 +368,6 @@ in
         providers = {
           backend = {
             enabled = true;
-            env.HANDLE_POLICY_IDS = "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a";
-            env.USE_KORA_LABS = "true";
           };
         };
 
@@ -413,8 +386,6 @@ in
         providers = {
           backend = {
             enabled = true;
-            env.HANDLE_POLICY_IDS = "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a";
-            env.USE_KORA_LABS = "true";
           };
         };
 
