@@ -200,8 +200,9 @@ in
         };
       };
 
-      "dev-sanchonet@us-east-1@v1" = final: {
-        name = "${final.namespace}-cardanojs-v1";
+      "dev-sanchonet@us-east-1@v1" = final: let
+        oci = inputs.cardanojs-dev-sanchonet.x86_64-linux.cardano-services.oci-images.cardano-services;
+   		in {
         namespace = "dev-sanchonet";
 
         providers = {
@@ -222,6 +223,7 @@ in
           network = "sanchonet-1";
           region = "us-east-1";
 
+          name = "${final.namespace}-cardanojs-v1";
           blockfrost-worker.enabled = false;
           pg-boss-worker.enabled = true;
 
