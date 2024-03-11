@@ -215,10 +215,11 @@ export const mapCertificate = (
   if (isDrepRegistrationCertModel(certModel))
     return {
       __typename: Cardano.CertificateType.RegisterDelegateRepresentative,
-      anchor: mapAnchor(certModel.url, certModel.data_hash),
+      anchor:
+        certModel.url && certModel.data_hash ? mapAnchor(certModel.url, certModel.data_hash.toString('hex')) : null,
       cert_index: certModel.cert_index,
       dRepCredential: {
-        hash: certModel.drep_hash as Hash28ByteBase16,
+        hash: certModel.drep_hash.toString('hex') as Hash28ByteBase16,
         type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
       },
       deposit: BigInt(certModel.deposit)
@@ -229,7 +230,7 @@ export const mapCertificate = (
       __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
       cert_index: certModel.cert_index,
       dRepCredential: {
-        hash: certModel.drep_hash as Hash28ByteBase16,
+        hash: certModel.drep_hash.toString('hex') as Hash28ByteBase16,
         type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
       },
       deposit: BigInt(certModel.deposit)
@@ -238,10 +239,11 @@ export const mapCertificate = (
   if (isUpdateDrepCertModel(certModel))
     return {
       __typename: Cardano.CertificateType.UpdateDelegateRepresentative,
-      anchor: mapAnchor(certModel.url, certModel.data_hash),
+      anchor:
+        certModel.url && certModel.data_hash ? mapAnchor(certModel.url, certModel.data_hash.toString('hex')) : null,
       cert_index: certModel.cert_index,
       dRepCredential: {
-        hash: certModel.drep_hash as Hash28ByteBase16,
+        hash: certModel.drep_hash.toString('hex') as Hash28ByteBase16,
         type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
       }
     };
@@ -251,7 +253,7 @@ export const mapCertificate = (
       __typename: Cardano.CertificateType.VoteDelegation,
       cert_index: certModel.cert_index,
       dRep: {
-        hash: certModel.drep_hash as Hash28ByteBase16,
+        hash: certModel.drep_hash.toString('hex') as Hash28ByteBase16,
         type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
       },
       stakeCredential: {
@@ -267,7 +269,7 @@ export const mapCertificate = (
       __typename: Cardano.CertificateType.VoteRegistrationDelegation,
       cert_index: certModel.cert_index,
       dRep: {
-        hash: certModel.drep_hash as Hash28ByteBase16,
+        hash: certModel.drep_hash.toString('hex') as Hash28ByteBase16,
         type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
       },
       deposit: BigInt(certModel.deposit),
@@ -284,7 +286,7 @@ export const mapCertificate = (
       __typename: Cardano.CertificateType.StakeVoteDelegation,
       cert_index: certModel.cert_index,
       dRep: {
-        hash: certModel.drep_hash as Hash28ByteBase16,
+        hash: certModel.drep_hash.toString('hex') as Hash28ByteBase16,
         type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
       },
       poolId: certModel.pool_id as unknown as Cardano.PoolId,
@@ -315,7 +317,7 @@ export const mapCertificate = (
       __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
       cert_index: certModel.cert_index,
       dRep: {
-        hash: certModel.drep_hash as Hash28ByteBase16,
+        hash: certModel.drep_hash.toString('hex') as Hash28ByteBase16,
         type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
       },
       deposit: BigInt(certModel.deposit),

@@ -121,10 +121,8 @@ export const txConfirmed = (
     SYNC_TIMEOUT_DEFAULT / 5
   );
 
-const submit = (wallet: ObservableWallet, tx: Cardano.Tx) => wallet.submitTx(tx);
-const confirm = (wallet: ObservableWallet, tx: Cardano.Tx) => txConfirmed(wallet, tx);
-export const submitAndConfirm = (wallet: ObservableWallet, tx: Cardano.Tx) =>
-  Promise.all([submit(wallet, tx), confirm(wallet, tx)]);
+export const submitAndConfirm = (wallet: ObservableWallet, tx: Cardano.Tx, numConfirmations?: number) =>
+  Promise.all([wallet.submitTx(tx), txConfirmed(wallet, tx, numConfirmations)]);
 
 export type RequestCoinsProps = {
   wallet: ObservableWallet;

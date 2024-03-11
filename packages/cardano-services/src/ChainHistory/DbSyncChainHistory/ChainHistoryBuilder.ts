@@ -128,7 +128,11 @@ const getGovernanceAction = ({
       };
 
     case 'NewConstitution':
-      return { __typename: GovernanceActionType.new_constitution, constitution: contents[1], governanceActionId };
+      return {
+        __typename: GovernanceActionType.new_constitution,
+        constitution: { scriptHash: null, ...contents[1] },
+        governanceActionId
+      };
 
     case 'NoConfidence':
       return { __typename: GovernanceActionType.no_confidence, governanceActionId };
@@ -454,9 +458,13 @@ export class ChainHistoryBuilder {
       ...stakeCertsArr.map((cert): WithCertType<StakeCertModel> => ({ ...cert, type: 'stake' })),
       ...delegationCertsArr.map((cert): WithCertType<DelegationCertModel> => ({ ...cert, type: 'delegation' })),
       ...drepCerts.rows.map(
-        (cert): WithCertType<DrepCertModel> => ({
+        ({ deposit, ...cert }): WithCertType<DrepCertModel> => ({
           ...cert,
-          type: cert.deposit === null ? 'updateDrep' : BigInt(cert.deposit) >= 0n ? 'registerDrep' : 'unregisterDrep'
+          ...(deposit === null
+            ? { deposit, type: 'updateDrep' }
+            : deposit.startsWith('-')
+            ? { deposit: deposit.slice(1), type: 'unregisterDrep' }
+            : { deposit, type: 'registerDrep' })
         })
       ),
       ...voteDelegationCertsArr.map(

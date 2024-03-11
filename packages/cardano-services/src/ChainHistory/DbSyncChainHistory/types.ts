@@ -188,15 +188,15 @@ export interface DelegationCertModel extends CertificateModel {
 
 export interface DrepCertModel extends CertificateModel {
   has_script: boolean;
-  drep_hash: string;
-  url: string;
-  data_hash: string;
+  drep_hash: Buffer;
+  url: string | null;
+  data_hash: Buffer | null;
   deposit: string;
 }
 
 export interface VoteDelegationCertModel extends CertificateModel {
   has_script: boolean;
-  drep_hash: string;
+  drep_hash: Buffer;
   address: string;
 }
 
