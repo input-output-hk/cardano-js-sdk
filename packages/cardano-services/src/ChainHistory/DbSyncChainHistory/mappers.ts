@@ -215,13 +215,25 @@ export const mapTxAlonzo = (
     slot: Cardano.Slot(Number(txModel.block_slot_no))
   },
   body: {
+    ...(inputSource === Cardano.InputSource.collaterals
+      ? {
+          collateralReturn: outputs.length > 0 ? outputs[0] : undefined,
+          collaterals: inputs,
+          fee: BigInt(0),
+          inputs: [],
+          outputs: [],
+          totalCollateral: BigInt(txModel.fee)
+        }
+      : {
+          collateralReturn: collateralOutputs.length > 0 ? collateralOutputs[0] : undefined,
+          collaterals,
+          fee: BigInt(txModel.fee),
+          inputs,
+          outputs
+        }),
     certificates,
-    collateralReturn: collateralOutputs.length > 0 ? collateralOutputs[0] : undefined,
-    collaterals,
-    fee: BigInt(txModel.fee),
-    inputs,
     mint,
-    outputs,
+    totalCollateral: inputSource === Cardano.InputSource.collaterals ? BigInt(txModel.fee) : undefined,
     validityInterval: {
       invalidBefore: Cardano.Slot(Number(txModel.invalid_before)) || undefined,
       invalidHereafter: Cardano.Slot(Number(txModel.invalid_hereafter)) || undefined

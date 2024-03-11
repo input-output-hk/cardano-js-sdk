@@ -398,6 +398,36 @@ describe('chain history mappers', () => {
         witness: { ...expected.witness, redeemers }
       });
     });
+    test('map collaterals input source TxModel to Cardano.HydratedTx', () => {
+      const result = mappers.mapTxAlonzo(txModel, {
+        certificates,
+        inputSource: Cardano.InputSource.collaterals,
+        inputs,
+        metadata,
+        mint: assets,
+        outputs,
+        redeemers,
+        withdrawals
+      });
+      expect(result).toEqual<Cardano.HydratedTx>({
+        ...expected,
+        auxiliaryData: { blob: metadata },
+        body: {
+          ...expected.body,
+          certificates,
+          collateralReturn: outputs[0],
+          collaterals: inputs,
+          fee: 0n,
+          inputs: [],
+          mint: assets,
+          outputs: [],
+          totalCollateral: 170_000n,
+          withdrawals
+        },
+        inputSource: Cardano.InputSource.collaterals,
+        witness: { ...expected.witness, redeemers }
+      });
+    });
   });
   describe('mapTxInModel', () => {
     test('map txInputModel to TxInput', () => {
