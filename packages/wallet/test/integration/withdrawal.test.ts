@@ -1,13 +1,13 @@
 import * as Crypto from '@cardano-sdk/crypto';
+import { BaseWallet, TransactionFailure } from '../../src';
 import { Cardano } from '@cardano-sdk/core';
-import { PersonalWallet, TransactionFailure } from '../../src';
 import { createWallet } from './util';
 import { firstValueFrom, of } from 'rxjs';
 import { mockProviders as mocks } from '@cardano-sdk/util-dev';
 import uniq from 'lodash/uniq';
 
 describe('integration/withdrawal', () => {
-  let wallet: PersonalWallet;
+  let wallet: BaseWallet;
   let rewardAccounts: Cardano.RewardAccountInfo[];
 
   beforeEach(async () => {
@@ -15,22 +15,22 @@ describe('integration/withdrawal', () => {
     rewardAccounts = [
       {
         address: Cardano.RewardAccount('stake_test1uqu7qkgf00zwqupzqfzdq87dahwntcznklhp3x30t3ukz6gswungn'),
+        credentialStatus: Cardano.StakeCredentialStatus.Registered,
         delegatee: {
           currentEpoch: undefined,
           nextEpoch: undefined,
           nextNextEpoch: undefined
         },
-        keyStatus: Cardano.StakeKeyStatus.Registered,
         rewardBalance: 33_333n
       },
       {
         address: Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr'),
+        credentialStatus: Cardano.StakeCredentialStatus.Unregistered,
         delegatee: {
           currentEpoch: undefined,
           nextEpoch: undefined,
           nextNextEpoch: undefined
         },
-        keyStatus: Cardano.StakeKeyStatus.Unregistered,
         rewardBalance: 44_444n
       }
     ];

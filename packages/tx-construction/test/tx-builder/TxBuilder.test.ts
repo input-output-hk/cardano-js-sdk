@@ -43,8 +43,10 @@ const resolvedHandle = {
     slot: Cardano.Slot(100)
   }
 };
-
-describe('GenericTxBuilder', () => {
+describe.each([
+  ['TxBuilderGeneric', false],
+  ['TxBuilderGeneric - bip32Account', true]
+])('%s', (_, useBip32Account) => {
   let outputValidator: jest.Mocked<OutputBuilderValidator>;
   let txBuilder: GenericTxBuilder;
   let txBuilderWithoutHandleProvider: GenericTxBuilder;
@@ -94,7 +96,7 @@ describe('GenericTxBuilder', () => {
       rewardAccounts: jest.fn().mockResolvedValue([
         {
           address: rewardAccount,
-          keyStatus: Cardano.StakeKeyStatus.Unregistered,
+          keyStatus: Cardano.StakeCredentialStatus.Unregistered,
           rewardBalance: mocks.rewardAccountBalance
         }
       ]),
@@ -107,7 +109,7 @@ describe('GenericTxBuilder', () => {
 
     asyncKeyAgent = util.createAsyncKeyAgent(keyAgent);
     const builderParams = {
-      bip32Account: await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent),
+      bip32Account: useBip32Account ? await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent) : undefined,
       inputResolver,
       logger: dummyLogger,
       outputValidator,
@@ -227,7 +229,7 @@ describe('GenericTxBuilder', () => {
     );
 
     beforeEach(() => {
-      signers = [{ sign: (_) => Promise.resolve({ pubKey, signature }) }];
+      signers = [{ sign: () => Promise.resolve({ pubKey, signature }) }];
     });
 
     it('can setExtraSigners without mutating extraSigners', () => {

@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/consistent-destructuring, sonarjs/no-duplicate-string, @typescript-eslint/no-floating-promises, promise/no-nesting, promise/always-return */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressDiscovery, PersonalWallet, TxInFlight } from '../../src';
+import { AddressDiscovery, BaseWallet, TxInFlight, createPersonalWallet } from '../../src';
 import { AddressType, Bip32Account, GroupedAddress, Witnesser, util } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BehaviorSubject, Subscription, firstValueFrom, skip } from 'rxjs';
@@ -11,6 +11,7 @@ import {
   ProviderError,
   ProviderFailure,
   RewardsProvider,
+  Serialization,
   StakePoolProvider,
   TxCBOR,
   TxSubmissionError,
@@ -58,7 +59,7 @@ const promiseTimeout = (p: Promise<unknown>, timeout = 10): Promise<unknown> => 
   return Promise.race([p, timeoutReject]);
 };
 
-describe('PersonalWallet methods', () => {
+describe('BaseWallet methods', () => {
   const address = mocks.utxo[0][0].address!;
   const groupedAddress: GroupedAddress = {
     accountIndex: 0,
@@ -76,7 +77,7 @@ describe('PersonalWallet methods', () => {
   let rewardsProvider: RewardsProvider;
   let chainHistoryProvider: ChainHistoryProvider;
   let handleProvider: HandleProvider;
-  let wallet: PersonalWallet;
+  let wallet: BaseWallet;
   let utxoProvider: mocks.UtxoProviderStub;
   let witnesser: Witnesser;
   let bip32Account: Bip32Account;
@@ -97,7 +98,7 @@ describe('PersonalWallet methods', () => {
     bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
     bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
     witnesser = util.createBip32Ed25519Witnesser(asyncKeyAgent);
-    wallet = new PersonalWallet(
+    wallet = createPersonalWallet(
       { name: 'Test Wallet' },
       {
         addressDiscovery,
@@ -222,8 +223,10 @@ describe('PersonalWallet methods', () => {
     describe('finalizeTx', () => {
       it('resolves with TransactionWitnessSet', async () => {
         const txInternals = await wallet.initializeTx(props);
+        const unhydratedTxBody = Serialization.TransactionBody.fromCore(txInternals.body).toCore();
         const tx = await wallet.finalizeTx({ tx: txInternals });
-        expect(tx.body).toBe(txInternals.body);
+
+        expect(tx.body).toEqual(unhydratedTxBody);
         expect(tx.id).toBe(txInternals.hash);
         expect(tx.witness.signatures.size).toBe(2); // spending key and stake key for withdrawal
       });
@@ -232,7 +235,7 @@ describe('PersonalWallet methods', () => {
         const sender = { url: 'https://lace.io' };
         const witnessSpy = jest.spyOn(witnesser, 'witness');
         const txInternals = await wallet.initializeTx(props);
-        await wallet.finalizeTx({ sender, tx: txInternals });
+        await wallet.finalizeTx({ signingContext: { sender }, tx: txInternals });
 
         expect(witnessSpy).toBeCalledWith(expect.anything(), expect.objectContaining({ sender }), void 0);
       });
@@ -447,7 +450,7 @@ describe('PersonalWallet methods', () => {
       const dRepKey = await wallet.getPubDRepKey();
       for (const type in Cardano.AddressType) {
         if (!Number.isNaN(Number(type)) && Number(type) !== Cardano.AddressType.EnterpriseKey) {
-          const drepid = buildDRepIDFromDRepKey(dRepKey, 0, type as unknown as Cardano.AddressType);
+          const drepid = buildDRepIDFromDRepKey(dRepKey!, 0, type as unknown as Cardano.AddressType);
           await expect(wallet.signData({ payload: HexBlob('abc123'), signWith: drepid })).rejects.toThrow();
         }
       }
@@ -465,7 +468,7 @@ describe('PersonalWallet methods', () => {
       .fn()
       .mockRejectedValueOnce('error')
       .mockResolvedValue({ hex: () => 'string' });
-    wallet = new PersonalWallet(
+    wallet = createPersonalWallet(
       { name: 'Test Wallet' },
       {
         assetProvider,

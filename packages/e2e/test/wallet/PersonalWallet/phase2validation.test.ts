@@ -1,5 +1,5 @@
+import { BaseWallet, FinalizeTxProps, TransactionFailure } from '@cardano-sdk/wallet';
 import { Cardano, Serialization } from '@cardano-sdk/core';
-import { FinalizeTxProps, PersonalWallet, TransactionFailure } from '@cardano-sdk/wallet';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, isNotNil } from '@cardano-sdk/util';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
@@ -16,7 +16,7 @@ const logger = createLogger();
  * @param wallet The wallet which will set the collateral.
  */
 const createCollateral = async (
-  wallet: PersonalWallet
+  wallet: BaseWallet
 ): Promise<{ collateralInput: Cardano.TxIn; collateralCoinValue: bigint }> => {
   const txBuilder = wallet.createTxBuilder();
 
@@ -53,7 +53,7 @@ const createCollateral = async (
 };
 
 describe('PersonalWallet/phase2validation', () => {
-  let wallet: PersonalWallet;
+  let wallet: BaseWallet;
 
   afterAll(() => {
     wallet.shutdown();

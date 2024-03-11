@@ -32,7 +32,8 @@ export const createDelegationDistributionTracker = ({
   const delegatedAccounts$ = rewardAccounts$.pipe(
     map((rewardsAccounts) =>
       rewardsAccounts.filter(
-        (account) => account.keyStatus === Cardano.StakeKeyStatus.Registered && account.delegatee?.nextNextEpoch
+        (account) =>
+          account.credentialStatus === Cardano.StakeCredentialStatus.Registered && account.delegatee?.nextNextEpoch
       )
     )
   );

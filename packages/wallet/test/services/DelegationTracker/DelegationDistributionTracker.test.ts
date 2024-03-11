@@ -36,22 +36,22 @@ describe('createDelegationDistributionTracker', () => {
     rewardAccounts = [
       {
         address: mocks.rewardAccount,
+        credentialStatus: Cardano.StakeCredentialStatus.Registered,
         delegatee: {
           currentEpoch: undefined,
           nextEpoch: undefined,
           nextNextEpoch: pools[0] as Cardano.StakePool
         },
-        keyStatus: Cardano.StakeKeyStatus.Registered,
         rewardBalance: 1_000_000n
       },
       {
         address: Cardano.RewardAccount('stake_test1upx9faamuf54pm7alg4lna5l7ll08pz833rj45tgr9m2jyceasqjt'),
+        credentialStatus: Cardano.StakeCredentialStatus.Registered,
         delegatee: {
           currentEpoch: undefined,
           nextEpoch: undefined,
           nextNextEpoch: pools[1] as Cardano.StakePool
         },
-        keyStatus: Cardano.StakeKeyStatus.Registered,
         rewardBalance: 1_000_000n
       }
     ];
@@ -79,7 +79,7 @@ describe('createDelegationDistributionTracker', () => {
 
   it('does not include reward accounts that are not staked', () => {
     createTestScheduler().run(({ expectObservable, cold }) => {
-      rewardAccounts[0].keyStatus = Cardano.StakeKeyStatus.Unregistered;
+      rewardAccounts[0].credentialStatus = Cardano.StakeCredentialStatus.Unregistered;
       const rewardAccounts$ = cold('a', { a: [rewardAccounts[0]] });
       const knownAddresses$ = cold('a', { a: [knownAddresses[0]] as GroupedAddress[] });
       const utxoTracker: UtxoTracker = getTransactionalObservableMock(
@@ -293,7 +293,7 @@ describe('createDelegationDistributionTracker', () => {
   it('updates stake distribution when a new stake key is delegated', () => {
     createTestScheduler().run(({ expectObservable, cold }) => {
       const rewardAccounts$ = cold('ab', {
-        a: [rewardAccounts[0], { ...rewardAccounts[1], keyStatus: Cardano.StakeKeyStatus.Unregistered }],
+        a: [rewardAccounts[0], { ...rewardAccounts[1], credentialStatus: Cardano.StakeCredentialStatus.Unregistered }],
         b: rewardAccounts
       });
       const knownAddresses$ = cold('a', { a: knownAddresses });

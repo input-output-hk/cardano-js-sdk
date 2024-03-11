@@ -54,6 +54,10 @@ export const txBuilderProperties: RemoteApiProperties<Omit<TxBuilder, 'customize
     getApiProperties: () => outputBuilderProperties,
     propType: RemoteApiPropertyType.ApiFactory
   },
+  delegateFirstStakeCredential: {
+    getApiProperties: () => txBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
   delegatePortfolio: {
     getApiProperties: () => txBuilderProperties,
     propType: RemoteApiPropertyType.ApiFactory

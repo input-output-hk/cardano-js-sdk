@@ -1,14 +1,10 @@
 /* eslint-disable no-bitwise */
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
-import { GroupedAddress, util as KeyManagementUtil } from '@cardano-sdk/key-management';
+import { GroupedAddress, util as KeyManagementUtil, WitnessedTx } from '@cardano-sdk/key-management';
 import { Observable, firstValueFrom } from 'rxjs';
 import { ObservableWallet, ScriptAddress, isScriptAddress } from '../types';
-import {
-  ProtocolParametersRequiredByOutputValidator,
-  SignedTx,
-  createOutputValidator
-} from '@cardano-sdk/tx-construction';
+import { ProtocolParametersRequiredByOutputValidator, createOutputValidator } from '@cardano-sdk/tx-construction';
 import { txInEquals } from './util';
 import uniqBy from 'lodash/uniqBy';
 
@@ -19,7 +15,7 @@ export interface InputResolverContext {
   };
   transactions: {
     outgoing: {
-      signed$: Observable<SignedTx[]>;
+      signed$: Observable<WitnessedTx[]>;
     };
   };
 }
@@ -300,14 +296,17 @@ export const requiresForeignSignatures = async (tx: Cardano.Tx, wallet: Observab
     })
     .filter((acct): acct is KeyManagementUtil.StakeKeySignerData => acct.derivationPath !== null);
 
-  const dRepKeyHash = (await Crypto.Ed25519PublicKey.fromHex(await wallet.getPubDRepKey()).hash()).hex();
+  const dRepKey = await wallet.getPubDRepKey();
+  const dRepKeyHash = dRepKey ? (await Crypto.Ed25519PublicKey.fromHex(dRepKey).hash()).hex() : undefined;
 
   return (
     hasForeignInputs(tx, utxoSet) ||
     KeyManagementUtil.checkStakeCredentialCertificates(uniqueAccounts, tx.body).requiresForeignSignatures ||
-    KeyManagementUtil.getDRepCredentialKeyPaths({ dRepKeyHash, txBody: tx.body }).requiresForeignSignatures ||
-    KeyManagementUtil.getVotingProcedureKeyPaths({ dRepKeyHash, groupedAddresses: keyHashAddresses, txBody: tx.body })
-      .requiresForeignSignatures ||
+    (dRepKeyHash &&
+      KeyManagementUtil.getDRepCredentialKeyPaths({ dRepKeyHash, txBody: tx.body }).requiresForeignSignatures) ||
+    (dRepKeyHash &&
+      KeyManagementUtil.getVotingProcedureKeyPaths({ dRepKeyHash, groupedAddresses: keyHashAddresses, txBody: tx.body })
+        .requiresForeignSignatures) ||
     hasCommitteeCertificates(tx.body)
   );
 };

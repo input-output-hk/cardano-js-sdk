@@ -1,5 +1,5 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { PersonalWallet, utxoEquals } from '@cardano-sdk/wallet';
+import { BaseWallet, utxoEquals } from '@cardano-sdk/wallet';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { firstValueFromTimed, getEnv, getWallet, walletReady, walletVariables } from '../../../src';
@@ -9,8 +9,8 @@ const env = getEnv(walletVariables);
 const logger = createLogger();
 
 describe('PersonalWallet/unspendableUtxos', () => {
-  let wallet1: PersonalWallet;
-  let wallet2: PersonalWallet;
+  let wallet1: BaseWallet;
+  let wallet2: BaseWallet;
 
   afterAll(() => {
     wallet1.shutdown();

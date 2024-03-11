@@ -11,7 +11,7 @@ import {
   PAGE_SIZE,
   TrackedStakePoolProvider,
   TxInFlight,
-  addressKeyStatuses,
+  addressCredentialStatuses,
   addressRewards,
   createDelegateeTracker,
   createQueryStakePoolsProvider,
@@ -220,7 +220,7 @@ describe('RewardAccounts', () => {
     Cardano.CertificateType.StakeRegistrationDelegation,
     Cardano.CertificateType.StakeVoteRegistrationDelegation,
     Cardano.CertificateType.VoteRegistrationDelegation
-  ])('addressKeyStatuses %p', (registrationCertType) => {
+  ])('addresscredentialStatuses %p', (registrationCertType) => {
     createTestScheduler().run(({ cold, expectObservable }) => {
       const rewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
       const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
@@ -318,12 +318,12 @@ describe('RewardAccounts', () => {
           }
         ]
       });
-      const tracker$ = addressKeyStatuses([rewardAccount], transactions$, transactionsInFlight$);
+      const tracker$ = addressCredentialStatuses([rewardAccount], transactions$, transactionsInFlight$);
       expectObservable(tracker$).toBe('abcda', {
-        a: [{ keyStatus: Cardano.StakeKeyStatus.Unregistered }],
-        b: [{ keyStatus: Cardano.StakeKeyStatus.Registering }],
-        c: [{ deposit: 0n, keyStatus: Cardano.StakeKeyStatus.Registered }],
-        d: [{ keyStatus: Cardano.StakeKeyStatus.Unregistering }]
+        a: [{ credentialStatus: Cardano.StakeCredentialStatus.Unregistered }],
+        b: [{ credentialStatus: Cardano.StakeCredentialStatus.Registering }],
+        c: [{ credentialStatus: Cardano.StakeCredentialStatus.Registered, deposit: 0n }],
+        d: [{ credentialStatus: Cardano.StakeCredentialStatus.Unregistering }]
       });
     });
   });

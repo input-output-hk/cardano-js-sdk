@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable sonarjs/no-extra-arguments */
 /* eslint-disable unicorn/consistent-function-scoping */
+import { BaseWallet, ObservableWallet, createPersonalWallet } from '../../src';
 import { Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
 import { Cardano, Serialization } from '@cardano-sdk/core';
-import { ObservableWallet, PersonalWallet } from '../../src';
 import {
   OutputValidator,
   ProtocolParametersRequiredByOutputValidator,
@@ -38,9 +38,9 @@ describe('CustomObservableWallet', () => {
       submitTx: ObservableWallet['submitTx'];
     }
 
-    it('can use PersonalWallet to satisfy application-specific interface', async () => {
+    it('can use BaseWallet to satisfy application-specific interface', async () => {
       // this compiles
-      const extensionWallet: LaceObservableWallet = new PersonalWallet(
+      const extensionWallet: LaceObservableWallet = createPersonalWallet(
         { name: 'Extension Wallet' },
         {
           assetProvider: mocks.mockAssetProvider(),
@@ -58,7 +58,7 @@ describe('CustomObservableWallet', () => {
       extensionWallet;
     });
 
-    it('does not necessarily have to use PersonalWallet, but can still utilize SDK utils', () => {
+    it('does not necessarily have to use BaseWallet, but can still utilize SDK utils', () => {
       // let's say we have an API endpoint to submit transaction as bytes and not as SDK's Cardano.Tx
       const submitTxBytesHexString: (tx: string) => Promise<Cardano.TransactionId> = () =>
         Promise.resolve(Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000'));
@@ -72,7 +72,7 @@ describe('CustomObservableWallet', () => {
       const getRewardAccountsDelegation: () => Promise<Cardano.RewardAccountInfo[]> = async () => [
         {
           address: Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr'),
-          keyStatus: Cardano.StakeKeyStatus.Unregistering,
+          credentialStatus: Cardano.StakeCredentialStatus.Unregistering,
           rewardBalance: 5000n
         }
       ];
@@ -134,8 +134,8 @@ describe('CustomObservableWallet', () => {
       // that is too constrained by the types - we're open to refactors
       let outputValidator: OutputValidator;
 
-      it('can utilize PersonalWallet', () => {
-        const wallet: PersonalWallet = {} as PersonalWallet;
+      it('can utilize BaseWallet', () => {
+        const wallet: BaseWallet = {} as BaseWallet;
         // this compiles
         outputValidator = createOutputValidator({
           protocolParameters: () => firstValueFrom(wallet.protocolParameters$)

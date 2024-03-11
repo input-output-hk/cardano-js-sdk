@@ -10,8 +10,8 @@ import {
 import { BalanceTracker, DelegationTracker, TransactionsTracker, UtxoTracker } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
-import { GroupedAddress, MessageSender, SignTransactionOptions, cip8 } from '@cardano-sdk/key-management';
-import { InitializeTxProps, InitializeTxResult, SignedTx, TxBuilder, TxContext } from '@cardano-sdk/tx-construction';
+import { GroupedAddress, MessageSender, SignTransactionContext, WitnessedTx, cip8 } from '@cardano-sdk/key-management';
+import { InitializeTxProps, InitializeTxResult, TxBuilder, TxContext } from '@cardano-sdk/tx-construction';
 import { Observable } from 'rxjs';
 import { PubStakeKeyAndStatus } from './services/PublicStakeKeysTracker';
 import { Shutdown } from '@cardano-sdk/util';
@@ -45,7 +45,11 @@ export interface SyncStatus extends Shutdown {
 
 export type FinalizeTxProps = Omit<TxContext, 'signingContext'> & {
   tx: Cardano.TxBodyWithHash;
-  signingOptions?: SignTransactionOptions;
+  signingContext?: Partial<SignTransactionContext>;
+};
+
+export type UpdateWitnessProps = {
+  tx: Cardano.Tx;
   sender?: MessageSender;
 };
 
@@ -92,8 +96,8 @@ export interface ObservableWallet {
 
   getName(): Promise<string>;
 
-  /** Returns the wallet account's public DRep Key */
-  getPubDRepKey(): Promise<Ed25519PublicKeyHex>;
+  /** Returns the wallet account's public DRep Key or undefined if the wallet doesn't control any DRep key */
+  getPubDRepKey(): Promise<Ed25519PublicKeyHex | undefined>;
   /**
    * @deprecated Use `createTxBuilder()` instead.
    * @throws InputSelectionError
@@ -108,7 +112,7 @@ export interface ObservableWallet {
   /**
    * @throws CardanoNodeErrors.TxSubmissionError
    */
-  submitTx(tx: Cardano.Tx | TxCBOR | SignedTx): Promise<Cardano.TransactionId>;
+  submitTx(tx: Cardano.Tx | TxCBOR | WitnessedTx): Promise<Cardano.TransactionId>;
 
   /** Create a TxBuilder from this wallet */
   createTxBuilder(): TxBuilder;

@@ -113,7 +113,12 @@ describe('WalletManager', () => {
     await walletRepository.addWallet({
       metadata: { name: 'Wallet #1' },
       ownSigners: [],
-      script: {
+      paymentScript: {
+        __type: Cardano.ScriptType.Native,
+        keyHash: Crypto.Ed25519KeyHashHex('b275b08c999097247f7c17e77007c7010cd19f20cc086ad99d398538'),
+        kind: Cardano.NativeScriptKind.RequireSignature
+      },
+      stakingScript: {
         __type: Cardano.ScriptType.Native,
         keyHash: Crypto.Ed25519KeyHashHex('b275b08c999097247f7c17e77007c7010cd19f20cc086ad99d398538'),
         kind: Cardano.NativeScriptKind.RequireSignature

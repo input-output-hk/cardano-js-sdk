@@ -1,12 +1,11 @@
 import { StaticChangeAddressResolver, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { InitializeTxProps, InitializeTxResult } from '../types';
 import { TxBuilderDependencies } from './types';
 import { createPreInputSelectionTxBody, includeChangeAndInputs } from '../createTransactionInternals';
 import { defaultSelectionConstraints } from '../input-selection';
 import { ensureValidityInterval } from '../ensureValidityInterval';
-import { finalizeTx } from './finalizeTx';
 import { util } from '@cardano-sdk/key-management';
 
 export const initializeTx = async (
@@ -61,26 +60,34 @@ export const initializeTx = async (
       if (bodyPreInputSelection.withdrawals?.length) {
         logger.debug('Adding rewards withdrawal in the transaction', bodyPreInputSelection.withdrawals);
       }
-      const unsignedTx = includeChangeAndInputs({
+      const unwitnessedTx = includeChangeAndInputs({
         bodyPreInputSelection,
         inputSelection
       });
 
-      const { tx } = await finalizeTx(
-        unsignedTx,
-        {
-          auxiliaryData,
-          handleResolutions: props.handleResolutions ?? [],
-          signingContext: {
-            knownAddresses: addresses,
-            txInKeyPathMap: await util.createTxInKeyPathMap(unsignedTx.body, addresses, inputResolver)
-          },
-          signingOptions: props.signingOptions,
-          witness: props.witness
-        },
-        { bip32Account: addressManager, witnesser },
-        true
+      const dRepPublicKey = addressManager
+        ? (await addressManager.derivePublicKey(util.DREP_KEY_DERIVATION_PATH)).hex()
+        : undefined;
+
+      const transaction = new Serialization.Transaction(
+        Serialization.TransactionBody.fromCore(unwitnessedTx.body),
+        Serialization.TransactionWitnessSet.fromCore(
+          props.witness ? (props.witness as Cardano.Witness) : { signatures: new Map() }
+        ),
+        auxiliaryData ? Serialization.AuxiliaryData.fromCore(auxiliaryData) : undefined
       );
+
+      const signingContext = {
+        dRepPublicKey,
+        handleResolutions: props.handleResolutions ?? [],
+        knownAddresses: addresses,
+        txInKeyPathMap: await util.createTxInKeyPathMap(unwitnessedTx.body, addresses, inputResolver)
+      };
+
+      const signingOptions = { ...props.signingOptions, stubSign: true };
+
+      const { tx } = await witnesser.witness(transaction, signingContext, signingOptions);
+
       return tx;
     },
     protocolParameters

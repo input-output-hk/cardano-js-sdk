@@ -5,7 +5,10 @@ import { SodiumBip32Ed25519 } from '@cardano-sdk/crypto';
 import { dummyLogger } from 'ts-log';
 import { logger, mockProviders as mocks } from '@cardano-sdk/util-dev';
 
-describe('TxBuilder bootstrap', () => {
+describe.each([
+  ['TxBuilderGeneric', false],
+  ['TxBuilderGeneric - bip32Account', true]
+])('%s', (_, useBip32Account) => {
   it('awaits for non-empty knownAddresses', async () => {
     // Initialize the TxBuilder
     const output = mocks.utxo[0][1];
@@ -46,7 +49,7 @@ describe('TxBuilder bootstrap', () => {
       rewardAccounts: jest.fn().mockResolvedValue([
         {
           address: rewardAccount,
-          keyStatus: Cardano.StakeKeyStatus.Unregistered,
+          keyStatus: Cardano.StakeCredentialStatus.Unregistered,
           rewardBalance: mocks.rewardAccountBalance
         }
       ]),
@@ -58,7 +61,7 @@ describe('TxBuilder bootstrap', () => {
     };
 
     const builderParams = {
-      bip32Account: await Bip32Account.fromAsyncKeyAgent(keyAgent),
+      bip32Account: useBip32Account ? await Bip32Account.fromAsyncKeyAgent(keyAgent) : undefined,
       inputResolver,
       logger: dummyLogger,
       outputValidator,
