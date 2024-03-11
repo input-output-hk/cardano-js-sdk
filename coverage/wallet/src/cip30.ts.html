@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">84.24% </span>
+                <span class="strong">84.05% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>230/273</span>
+                <span class='fraction'>232/276</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">79.22% </span>
+                <span class="strong">78.2% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>61/77</span>
+                <span class='fraction'>61/78</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.92% </span>
+                <span class="strong">84.04% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>214/255</span>
+                <span class='fraction'>216/257</span>
             </div>
         
             
@@ -662,7 +662,12 @@
 <a name='L597'></a><a href='#L597'>597</a>
 <a name='L598'></a><a href='#L598'>598</a>
 <a name='L599'></a><a href='#L599'>599</a>
-<a name='L600'></a><a href='#L600'>600</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">34x</span>
+<a name='L600'></a><a href='#L600'>600</a>
+<a name='L601'></a><a href='#L601'>601</a>
+<a name='L602'></a><a href='#L602'>602</a>
+<a name='L603'></a><a href='#L603'>603</a>
+<a name='L604'></a><a href='#L604'>604</a>
+<a name='L605'></a><a href='#L605'>605</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1211,6 +1216,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1228,6 +1234,10 @@
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -1741,7 +1751,7 @@ const baseCip30WalletApi = (
           );
         const {
           witness: { signatures }
-        } = await wallet.finalizeTx({ sender, tx: { ...coreTx, hash } });
+        } = await wallet.finalizeTx({ signingContext: { sender }, tx: { ...coreTx, hash } });
 &nbsp;
         // If partialSign is true, the wallet only tries to sign what it can. However, if
         // signatures size is 0 then throw.
@@ -1799,17 +1809,18 @@ const baseCip30WalletApi = (
 &nbsp;
 const getPubStakeKeys = <span class="fstat-no" title="function not covered" >async </span>(
   wallet$: Observable&lt;ObservableWallet&gt;,
-  filter: Cardano.StakeKeyStatus.Registered | Cardano.StakeKeyStatus.Unregistered
+  filter: Cardano.StakeCredentialStatus.Registered | Cardano.StakeCredentialStatus.Unregistered
 ) =&gt; {
   const wallet = <span class="cstat-no" title="statement not covered" >await firstValueFrom(wallet$);</span>
 <span class="cstat-no" title="statement not covered" >  return firstValueFrom(</span>
     wallet.publicStakeKeys$.pipe(
       map(<span class="fstat-no" title="function not covered" >(k</span>eys) =&gt;
-<span class="cstat-no" title="statement not covered" >        keys.filter(<span class="fstat-no" title="function not covered" >({</span> keyStatus }) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        keys.filter(<span class="fstat-no" title="function not covered" >({</span> credentialStatus }) =&gt; {</span>
           const status =
-<span class="cstat-no" title="statement not covered" >            keyStatus === Cardano.StakeKeyStatus.Registered || keyStatus === Cardano.StakeKeyStatus.Registering</span>
-              ? Cardano.StakeKeyStatus.Registered
-              : Cardano.StakeKeyStatus.Unregistered;
+<span class="cstat-no" title="statement not covered" >            credentialStatus === Cardano.StakeCredentialStatus.Registered ||</span>
+            credentialStatus === Cardano.StakeCredentialStatus.Registering
+              ? Cardano.StakeCredentialStatus.Registered
+              : Cardano.StakeCredentialStatus.Unregistered;
 <span class="cstat-no" title="statement not covered" >          return filter === status;</span>
         })
       ),
@@ -1826,7 +1837,11 @@ const extendedCip95WalletApi = (
     logger.debug('getting public DRep key');
     try {
       const wallet = await firstValueFrom(wallet$);
-      return await wallet.getPubDRepKey();
+      const dReKey = await wallet.getPubDRepKey();
+&nbsp;
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (!dReKey) <span class="cstat-no" title="statement not covered" >throw new Error('Shared wallet does not support DRep key');</span>
+&nbsp;
+      return dReKey;
     } catch (error) {
       logger.error(error);
       throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
@@ -1835,7 +1850,7 @@ const extendedCip95WalletApi = (
   getRegisteredPubStakeKeys: <span class="fstat-no" title="function not covered" >async </span>() =&gt; {
 <span class="cstat-no" title="statement not covered" >    logger.debug('getting registered public stake keys');</span>
 <span class="cstat-no" title="statement not covered" >    try {</span>
-<span class="cstat-no" title="statement not covered" >      return await getPubStakeKeys(wallet$, Cardano.StakeKeyStatus.Registered);</span>
+<span class="cstat-no" title="statement not covered" >      return await getPubStakeKeys(wallet$, Cardano.StakeCredentialStatus.Registered);</span>
     } catch (error) {
 <span class="cstat-no" title="statement not covered" >      logger.error(error);</span>
 <span class="cstat-no" title="statement not covered" >      throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));</span>
@@ -1844,7 +1859,7 @@ const extendedCip95WalletApi = (
   getUnregisteredPubStakeKeys: <span class="fstat-no" title="function not covered" >async </span>() =&gt; {
 <span class="cstat-no" title="statement not covered" >    logger.debug('getting unregistered public stake keys');</span>
 <span class="cstat-no" title="statement not covered" >    try {</span>
-<span class="cstat-no" title="statement not covered" >      return await getPubStakeKeys(wallet$, Cardano.StakeKeyStatus.Unregistered);</span>
+<span class="cstat-no" title="statement not covered" >      return await getPubStakeKeys(wallet$, Cardano.StakeCredentialStatus.Unregistered);</span>
     } catch (error) {
 <span class="cstat-no" title="statement not covered" >      logger.error(error);</span>
 <span class="cstat-no" title="statement not covered" >      throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));</span>
@@ -1867,7 +1882,7 @@ export const createWalletApi = (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-03-08T14:55:38.049Z
+                at 2024-03-11T10:41:50.785Z
             </div>
         <script src="../prettify.js"></script>
         <script>
