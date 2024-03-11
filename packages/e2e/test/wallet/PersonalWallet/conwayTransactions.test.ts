@@ -1,6 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
+import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano } from '@cardano-sdk/core';
-import { PersonalWallet } from '@cardano-sdk/wallet';
 import { logger } from '@cardano-sdk/util-dev';
 
 import { firstValueFrom, map } from 'rxjs';
@@ -25,7 +25,7 @@ const {
   CredentialType,
   GovernanceActionType,
   RewardAccount,
-  StakeKeyStatus,
+  StakeCredentialStatus,
   StakePoolStatus,
   Vote,
   VoterType
@@ -50,8 +50,8 @@ const getTestWallet = async (idx: number, name: string, minCoinBalance?: bigint)
 };
 
 describe('PersonalWallet/conwayTransactions', () => {
-  let dRepWallet: PersonalWallet;
-  let wallet: PersonalWallet;
+  let dRepWallet: BaseWallet;
+  let wallet: BaseWallet;
 
   let dRepCredential: Cardano.Credential & { type: Cardano.CredentialType.KeyHash };
   let poolId: Cardano.PoolId;
@@ -68,7 +68,7 @@ describe('PersonalWallet/conwayTransactions', () => {
   const cleanWallet = async () => {
     const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
 
-    if (!rewardAccounts.some((acct) => acct.keyStatus === StakeKeyStatus.Unregistered)) {
+    if (!rewardAccounts.some((acct) => acct.credentialStatus === StakeCredentialStatus.Unregistered)) {
       const { tx } = await wallet.createTxBuilder().delegatePortfolio(null).build().sign();
 
       await submitAndConfirm(wallet, tx, 1);
@@ -78,7 +78,7 @@ describe('PersonalWallet/conwayTransactions', () => {
   const getDRepCredential = async () => {
     const drepPubKey = await dRepWallet.getPubDRepKey();
     const dRepKeyHash = Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(
-      (await Crypto.Ed25519PublicKey.fromHex(drepPubKey).hash()).hex()
+      (await Crypto.Ed25519PublicKey.fromHex(drepPubKey!).hash()).hex()
     );
 
     return { hash: dRepKeyHash, type: CredentialType.KeyHash } as typeof dRepCredential;
@@ -300,7 +300,9 @@ describe('PersonalWallet/conwayTransactions', () => {
       const [, confirmedTx] = await submitAndConfirm(wallet, signedTx.tx, 1);
 
       assertTxHasCertificate(confirmedTx, newRegCert);
-      expect((await firstValueFrom(wallet.delegation.rewardAccounts$))[0].keyStatus).toBe(StakeKeyStatus.Registered);
+      expect((await firstValueFrom(wallet.delegation.rewardAccounts$))[0].credentialStatus).toBe(
+        StakeCredentialStatus.Registered
+      );
     });
 
     it('can un-register stake key through the new Conway certificates', async () => {
@@ -317,7 +319,9 @@ describe('PersonalWallet/conwayTransactions', () => {
       const [, confirmedTx] = await submitAndConfirm(wallet, signedTx.tx, 1);
 
       assertTxHasCertificate(confirmedTx, newUnRegCert);
-      expect((await firstValueFrom(wallet.delegation.rewardAccounts$))[0].keyStatus).toBe(StakeKeyStatus.Unregistered);
+      expect((await firstValueFrom(wallet.delegation.rewardAccounts$))[0].credentialStatus).toBe(
+        StakeCredentialStatus.Unregistered
+      );
     });
 
     it('can delegate vote', async () => {
