@@ -57,7 +57,7 @@ in {
     ];
 
     devshell.startup.setup.text = ''
-      source $PRJ_ROOT/.envrc.local
+      [ -e $PRJ_ROOT/.envrc.local ] && source $PRJ_ROOT/.envrc.local
       kubectl config use-context $K8S_USER
       chmod 600 $PRJ_ROOT/.kube/*
     '';

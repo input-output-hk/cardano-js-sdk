@@ -50,7 +50,7 @@ export type ParameterChangeAction = {
 export type HardForkInitiationAction = {
   __typename: GovernanceActionType.hard_fork_initiation_action;
   governanceActionId: GovernanceActionId | null;
-  protocolVersion: ProtocolVersion;
+  protocolVersion: Pick<ProtocolVersion, 'major' | 'minor'>;
 };
 
 export type TreasuryWithdrawalsAction = {

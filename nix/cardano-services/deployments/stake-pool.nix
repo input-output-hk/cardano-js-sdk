@@ -32,8 +32,8 @@
       TOKEN_METADATA_SERVER_URL = values.cardano-services.tokenMetadataServerUrl;
       USE_BLOCKFROST = "true";
 
-      BUILD_INFO = lib.mkIf (values.cardano-services.buildInfo != null) values.cardano-services.buildInfo;
-      ALLOWED_ORIGINS = lib.mkIf (values.backend.allowedOrigins != null) values.backend.allowedOrigins;
+      BUILD_INFO = values.cardano-services.buildInfo;
+      ALLOWED_ORIGINS = values.backend.allowedOrigins;
 
       POSTGRES_POOL_MAX_STAKE_POOL = "10";
       POSTGRES_HOST_STAKE_POOL = values.postgresName;
@@ -75,7 +75,7 @@
       OGMIOS_SRV_SERVICE_NAME = values.backend.ogmiosSrvServiceName;
       PROJECTION_NAMES = "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
 
-      BUILD_INFO = lib.mkIf (values.cardano-services.buildInfo != null) values.cardano-services.buildInfo;
+      BUILD_INFO = values.cardano-services.buildInfo;
 
       POSTGRES_POOL_MAX = "2";
       POSTGRES_HOST = values.postgresName;

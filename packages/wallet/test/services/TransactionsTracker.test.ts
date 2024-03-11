@@ -12,19 +12,21 @@ import {
   createTransactionsTracker,
   newTransactions$
 } from '../../src';
-import { InMemoryInFlightTransactionsStore, InMemoryTransactionsStore, WalletStores } from '../../src/persistence';
+import {
+  InMemoryInFlightTransactionsStore,
+  InMemorySignedTransactionsStore,
+  InMemoryTransactionsStore,
+  WalletStores
+} from '../../src/persistence';
 import { NEVER, bufferCount, firstValueFrom, map, of } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
+import { SignedTx } from '@cardano-sdk/tx-construction';
 import { createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
-import { dummyCbor, toOutgoingTx } from '../util';
+import { dummyCbor, toOutgoingTx, toSignedTx } from '../util';
 import { dummyLogger } from 'ts-log';
 import delay from 'delay';
 
-const {
-  generateTxAlonzo,
-  mockChainHistoryProvider,
-  queryTransactionsResult
-} = mockProviders;
+const { generateTxAlonzo, mockChainHistoryProvider, queryTransactionsResult } = mockProviders;
 
 describe('TransactionsTracker', () => {
   const logger = dummyLogger;
@@ -187,12 +189,14 @@ describe('TransactionsTracker', () => {
     let chainHistoryProvider: ChainHistoryProvider;
     let transactionsStore: WalletStores['transactions'];
     let inFlightTransactionsStore: WalletStores['inFlightTransactions'];
+    let signedTransactionsStore: WalletStores['signedTransactions'];
     const myAddress = queryTransactionsResult.pageResults[0].body.inputs[0].address;
     const addresses$ = of([myAddress!]);
 
     beforeEach(() => {
       transactionsStore = new InMemoryTransactionsStore();
       inFlightTransactionsStore = new InMemoryInFlightTransactionsStore();
+      signedTransactionsStore = new InMemorySignedTransactionsStore();
     });
 
     it('observable properties behave correctly on successful transaction', async () => {
@@ -204,6 +208,7 @@ describe('TransactionsTracker', () => {
         const tip$ = hot<Cardano.Tip>('----|');
         const submitting$ = hot('-a--|', { a: outgoingTx });
         const pending$ = hot('--a-|', { a: outgoingTx });
+        const signed$ = hot<SignedTx>('----|');
         const transactionsSource$ = hot<Cardano.HydratedTx[]>('a-bc|', {
           a: [],
           b: [incomingTx],
@@ -219,9 +224,11 @@ describe('TransactionsTracker', () => {
             newTransactions: {
               failedToSubmit$,
               pending$,
+              signed$,
               submitting$
             },
             retryBackoffConfig,
+            signedTransactionsStore,
             tip$,
             transactionsHistoryStore: transactionsStore
           },
@@ -259,6 +266,7 @@ describe('TransactionsTracker', () => {
         const tip$ = hot<Cardano.Tip>('--ab-|', { a: tip1, b: tip2 });
         const submitting$ = hot('-a---|', { a: outgoingTx });
         const pending$ = hot('--a--|', { a: outgoingTx });
+        const signed$ = hot<SignedTx>('----|', {});
         const transactionsSource$ = hot<Cardano.HydratedTx[]>('-----|');
         const failedSubscription = '--^---'; // regression: subscribing after submitting$ emits
         const transactionsTracker = createTransactionsTracker(
@@ -270,9 +278,11 @@ describe('TransactionsTracker', () => {
             newTransactions: {
               failedToSubmit$,
               pending$,
+              signed$,
               submitting$
             },
             retryBackoffConfig,
+            signedTransactionsStore,
             tip$,
             transactionsHistoryStore: transactionsStore
           },
@@ -307,6 +317,7 @@ describe('TransactionsTracker', () => {
         const submitting$ = hot('-a---|', { a: outgoingTx });
         const pending$ = hot('--a-a|', { a: outgoingTx }); // second emission must not re-add it to inFlight$
         const rollback$ = hot('---a-|', { a: { id: tx.body.inputs[0].txId } as Cardano.HydratedTx });
+        const signed$ = hot<SignedTx>('----|', {});
         const transactionsSource$ = hot<Cardano.HydratedTx[]>('-----|');
         const transactionsTracker = createTransactionsTracker(
           {
@@ -317,9 +328,11 @@ describe('TransactionsTracker', () => {
             newTransactions: {
               failedToSubmit$,
               pending$,
+              signed$,
               submitting$
             },
             retryBackoffConfig,
+            signedTransactionsStore,
             tip$,
             transactionsHistoryStore: transactionsStore
           },
@@ -356,7 +369,7 @@ describe('TransactionsTracker', () => {
         const pending$ = cold('--a--|', { a: outgoingTx });
         const transactionsSource$ = cold<Cardano.HydratedTx[]>('a--b-|', { a: [], b: [phase2FailedTx] });
         const failedToSubmit$ = hot<FailedTx>('-----|');
-
+        const signed$ = hot<SignedTx>('----|', {});
         const transactionsTracker = createTransactionsTracker(
           {
             addresses$,
@@ -366,9 +379,11 @@ describe('TransactionsTracker', () => {
             newTransactions: {
               failedToSubmit$,
               pending$,
+              signed$,
               submitting$
             },
             retryBackoffConfig,
+            signedTransactionsStore,
             tip$,
             transactionsHistoryStore: transactionsStore
           },
@@ -402,6 +417,7 @@ describe('TransactionsTracker', () => {
         const failedFromReemitter$ = cold<FailedTx>('-a|', {
           a: { reason: TransactionFailure.Timeout, ...outgoingTxReemit }
         });
+        const signed$ = hot<SignedTx>('----|', {});
         const transactionsTracker = createTransactionsTracker(
           {
             addresses$,
@@ -412,9 +428,11 @@ describe('TransactionsTracker', () => {
             newTransactions: {
               failedToSubmit$,
               pending$,
+              signed$,
               submitting$
             },
             retryBackoffConfig,
+            signedTransactionsStore,
             tip$,
             transactionsHistoryStore: transactionsStore
           },
@@ -447,6 +465,7 @@ describe('TransactionsTracker', () => {
         const failedToSubmit$ = hot<FailedTx>('---a|', {
           a: { reason: TransactionFailure.FailedToSubmit, ...outgoingTx }
         });
+        const signed$ = hot<SignedTx>('----|', {});
         const transactionsTracker = createTransactionsTracker(
           {
             addresses$,
@@ -456,9 +475,11 @@ describe('TransactionsTracker', () => {
             newTransactions: {
               failedToSubmit$,
               pending$,
+              signed$,
               submitting$
             },
             retryBackoffConfig,
+            signedTransactionsStore,
             tip$,
             transactionsHistoryStore: transactionsStore
           },
@@ -494,6 +515,7 @@ describe('TransactionsTracker', () => {
           b: [tx]
         });
         const failedToSubmit$ = hot<FailedTx>('------|');
+        const signed$ = hot<SignedTx>('----|', {});
         const transactionsTracker = createTransactionsTracker(
           {
             addresses$,
@@ -503,9 +525,11 @@ describe('TransactionsTracker', () => {
             newTransactions: {
               failedToSubmit$,
               pending$,
+              signed$,
               submitting$
             },
             retryBackoffConfig,
+            signedTransactionsStore,
             tip$,
             transactionsHistoryStore: transactionsStore
           },
@@ -547,6 +571,7 @@ describe('TransactionsTracker', () => {
         const failedToSubmit$ = hot<FailedTx>('-----a|', {
           a: { reason: TransactionFailure.FailedToSubmit, ...outgoingTx }
         });
+        const signed$ = hot<SignedTx>('----|', {});
         const transactionsTracker = createTransactionsTracker(
           {
             addresses$,
@@ -556,9 +581,11 @@ describe('TransactionsTracker', () => {
             newTransactions: {
               failedToSubmit$,
               pending$,
+              signed$,
               submitting$
             },
             retryBackoffConfig,
+            signedTransactionsStore,
             tip$,
             transactionsHistoryStore: transactionsStore
           },
@@ -593,6 +620,7 @@ describe('TransactionsTracker', () => {
           b: [tx]
         });
         const failedToSubmit$ = hot<FailedTx>('----|');
+        const signed$ = hot<SignedTx>('----|', {});
         const transactionsTracker = createTransactionsTracker(
           {
             addresses$,
@@ -602,9 +630,11 @@ describe('TransactionsTracker', () => {
             newTransactions: {
               failedToSubmit$,
               pending$,
+              signed$,
               submitting$
             },
             retryBackoffConfig,
+            signedTransactionsStore,
             tip$,
             transactionsHistoryStore: transactionsStore
           },
@@ -649,6 +679,7 @@ describe('TransactionsTracker', () => {
         const submitting$ = hot('--a|', { a: outgoingTx });
         const pending$ = hot<OutgoingTx>('|');
         const transactionsSource$ = hot<Cardano.HydratedTx[]>('|');
+        const signed$ = hot<SignedTx>('----|', {});
 
         const transactionsTracker = createTransactionsTracker(
           {
@@ -659,9 +690,11 @@ describe('TransactionsTracker', () => {
             newTransactions: {
               failedToSubmit$,
               pending$,
+              signed$,
               submitting$
             },
             retryBackoffConfig,
+            signedTransactionsStore,
             tip$,
             transactionsHistoryStore: transactionsStore
           },
@@ -710,6 +743,7 @@ describe('TransactionsTracker', () => {
           b: [incomingTx],
           c: [incomingTx, storedInFlightTx]
         });
+        const signed$ = hot<SignedTx>('----|', {});
 
         const transactionsTracker = createTransactionsTracker(
           {
@@ -720,9 +754,11 @@ describe('TransactionsTracker', () => {
             newTransactions: {
               failedToSubmit$,
               pending$,
+              signed$,
               submitting$
             },
             retryBackoffConfig,
+            signedTransactionsStore,
             tip$,
             transactionsHistoryStore: transactionsStore
           },
@@ -770,6 +806,7 @@ describe('TransactionsTracker', () => {
         const transactionsSource$ = hot<Cardano.HydratedTx[]>('----a|', {
           a: [txToBeConfirmed]
         });
+        const signed$ = hot<SignedTx>('----|', {});
 
         const transactionsTracker = createTransactionsTracker(
           {
@@ -780,9 +817,11 @@ describe('TransactionsTracker', () => {
             newTransactions: {
               failedToSubmit$,
               pending$,
+              signed$,
               submitting$
             },
             retryBackoffConfig,
+            signedTransactionsStore,
             tip$,
             transactionsHistoryStore: transactionsStore
           },
@@ -835,6 +874,7 @@ describe('TransactionsTracker', () => {
           a: [],
           b: [incomingTx]
         });
+        const signed$ = hot<SignedTx>('----|', {});
 
         const transactionsTracker = createTransactionsTracker(
           {
@@ -845,9 +885,11 @@ describe('TransactionsTracker', () => {
             newTransactions: {
               failedToSubmit$,
               pending$,
+              signed$,
               submitting$
             },
             retryBackoffConfig,
+            signedTransactionsStore,
             tip$,
             transactionsHistoryStore: transactionsStore
           },
@@ -866,6 +908,255 @@ describe('TransactionsTracker', () => {
       });
       expect(inFlightTransactionsStore.set).toHaveBeenCalledTimes(3);
       expect(inFlightTransactionsStore.set).lastCalledWith([outgoingTx]);
+    });
+
+    it('emit transaction from signed observable', () => {
+      const tx = queryTransactionsResult.pageResults[0];
+      const signedTx = toSignedTx(tx);
+      createTestScheduler().run(({ hot, expectObservable }) => {
+        const failedToSubmit$ = hot<FailedTx>('----|');
+        const tip$ = hot<Cardano.Tip>('----|');
+        const submitting$ = hot<OutgoingTx>('----|', {});
+        const pending$ = hot<OutgoingTx>('----|', {});
+        const signed$ = hot<SignedTx>('-a--|', { a: signedTx });
+        const transactionsSource$ = hot<Cardano.HydratedTx[]>('----|');
+        const transactionsTracker = createTransactionsTracker(
+          {
+            addresses$,
+            chainHistoryProvider,
+            inFlightTransactionsStore,
+            logger,
+            newTransactions: {
+              failedToSubmit$,
+              pending$,
+              signed$,
+              submitting$
+            },
+            retryBackoffConfig,
+            signedTransactionsStore,
+            tip$,
+            transactionsHistoryStore: transactionsStore
+          },
+          {
+            rollback$: NEVER,
+            transactionsSource$
+          }
+        );
+        expectObservable(transactionsTracker.outgoing.signed$).toBe('ab--|', { a: [], b: [signedTx] });
+      });
+    });
+
+    it('remove transaction from signed after timeout', () => {
+      const tx = queryTransactionsResult.pageResults[0];
+      const signedTx = toSignedTx(tx);
+      createTestScheduler().run(({ hot, expectObservable }) => {
+        const tip1 = { slot: Cardano.Slot(tx.body.validityInterval!.invalidHereafter! - 1) } as Cardano.Tip;
+        const tip2 = { slot: Cardano.Slot(tx.body.validityInterval!.invalidHereafter! + 1) } as Cardano.Tip;
+        const failedToSubmit$ = hot<FailedTx>('|');
+        const tip$ = hot<Cardano.Tip>('--ab|', { a: tip1, b: tip2 });
+        const signed$ = hot<SignedTx>('-a--|', { a: signedTx });
+        const submitting$ = hot<OutgoingTx>('|');
+        const pending$ = hot<OutgoingTx>('|');
+        const transactionsSource$ = hot<Cardano.HydratedTx[]>('|');
+        const transactionsTracker = createTransactionsTracker(
+          {
+            addresses$,
+            chainHistoryProvider,
+            inFlightTransactionsStore,
+            logger,
+            newTransactions: {
+              failedToSubmit$,
+              pending$,
+              signed$,
+              submitting$
+            },
+            retryBackoffConfig,
+            signedTransactionsStore,
+            tip$,
+            transactionsHistoryStore: transactionsStore
+          },
+          {
+            rollback$: NEVER,
+            transactionsSource$
+          }
+        );
+        expectObservable(transactionsTracker.outgoing.signed$).toBe('ab-a|', { a: [], b: [signedTx] });
+      });
+    });
+
+    it('remove transaction from signed if they are submitted', () => {
+      const tx = queryTransactionsResult.pageResults[0];
+      const outgoingTx = toOutgoingTx(tx);
+      const signedTx = toSignedTx(tx);
+      createTestScheduler().run(({ hot, expectObservable }) => {
+        const failedToSubmit$ = hot<FailedTx>('|');
+        const tip$ = hot<Cardano.Tip>('|');
+        const pending$ = hot<OutgoingTx>('|');
+        const transactionsSource$ = hot<Cardano.HydratedTx[]>('|');
+        const submitting$ = hot('--a-|', { a: outgoingTx });
+        const signed$ = hot<SignedTx>('-a--|', { a: signedTx });
+
+        const transactionsTracker = createTransactionsTracker(
+          {
+            addresses$,
+            chainHistoryProvider,
+            inFlightTransactionsStore,
+            logger,
+            newTransactions: {
+              failedToSubmit$,
+              pending$,
+              signed$,
+              submitting$
+            },
+            retryBackoffConfig,
+            signedTransactionsStore,
+            tip$,
+            transactionsHistoryStore: transactionsStore
+          },
+          {
+            rollback$: NEVER,
+            transactionsSource$
+          }
+        );
+
+        expectObservable(transactionsTracker.outgoing.signed$).toBe('aba-|', { a: [], b: [signedTx] });
+      });
+    });
+
+    it('remove transaction from signed if input is spent', () => {
+      const txs = generateTxAlonzo(2);
+      const tx = queryTransactionsResult.pageResults[0];
+      const signedTx = toSignedTx(tx);
+      createTestScheduler().run(({ hot, expectObservable }) => {
+        const failedToSubmit$ = hot<FailedTx>('|');
+        const tip$ = hot<Cardano.Tip>('|');
+        const submitting$ = hot<OutgoingTx>('|');
+        const pending$ = hot<OutgoingTx>('|');
+        const signed$ = hot<SignedTx>('-a--|', { a: signedTx });
+        const transactionsSource$ = hot<Cardano.HydratedTx[]>('--ab|', { a: txs, b: [...txs, tx] });
+
+        const transactionsTracker = createTransactionsTracker(
+          {
+            addresses$,
+            chainHistoryProvider,
+            inFlightTransactionsStore,
+            logger,
+            newTransactions: {
+              failedToSubmit$,
+              pending$,
+              signed$,
+              submitting$
+            },
+            retryBackoffConfig,
+            signedTransactionsStore,
+            tip$,
+            transactionsHistoryStore: transactionsStore
+          },
+          {
+            rollback$: NEVER,
+            transactionsSource$
+          }
+        );
+
+        expectObservable(transactionsTracker.outgoing.signed$).toBe('ab-a|', { a: [], b: [signedTx] });
+      });
+    });
+
+    it('stored signed transactions are restored and merged with current ones', () => {
+      const storedSignedTransactions = generateTxAlonzo(1).map(toSignedTx);
+      const signed = toSignedTx(queryTransactionsResult.pageResults[0]);
+      createTestScheduler().run(({ hot, expectObservable }) => {
+        const storedSigned$ = hot<SignedTx[]>('-a|', {
+          a: storedSignedTransactions
+        });
+        signedTransactionsStore.get = jest.fn(() => storedSigned$);
+        signedTransactionsStore.set = jest.fn();
+
+        const failedToSubmit$ = hot<FailedTx>('|');
+        const tip$ = hot<Cardano.Tip>('|');
+        const submitting$ = hot<OutgoingTx>('|');
+        const pending$ = hot<OutgoingTx>('|');
+        const transactionsSource$ = hot<Cardano.HydratedTx[]>('|');
+        const signed$ = hot<SignedTx>('--a|', { a: signed });
+
+        const transactionsTracker = createTransactionsTracker(
+          {
+            addresses$,
+            chainHistoryProvider,
+            inFlightTransactionsStore,
+            logger,
+            newTransactions: {
+              failedToSubmit$,
+              pending$,
+              signed$,
+              submitting$
+            },
+            retryBackoffConfig,
+            signedTransactionsStore,
+            tip$,
+            transactionsHistoryStore: transactionsStore
+          },
+          {
+            rollback$: NEVER,
+            transactionsSource$
+          }
+        );
+
+        expectObservable(transactionsTracker.outgoing.signed$).toBe('abc|', {
+          a: [],
+          b: storedSignedTransactions,
+          c: [...storedSignedTransactions, signed]
+        });
+      });
+      expect(signedTransactionsStore.set).toHaveBeenCalledTimes(2);
+      expect(signedTransactionsStore.set).lastCalledWith([...storedSignedTransactions, signed]);
+    });
+
+    it('signed transactions are removed from store when submitted', () => {
+      const storedSignedTx = toSignedTx(queryTransactionsResult.pageResults[0]);
+      const outgoingTx = toOutgoingTx(queryTransactionsResult.pageResults[0]);
+
+      createTestScheduler().run(({ hot, expectObservable }) => {
+        const storedSigned$ = hot<SignedTx[]>('-a|', {
+          a: [storedSignedTx]
+        });
+        signedTransactionsStore.get = jest.fn(() => storedSigned$);
+        signedTransactionsStore.set = jest.fn();
+
+        const failedToSubmit$ = hot<FailedTx>('|');
+        const tip$ = hot<Cardano.Tip>('|');
+        const submitting$ = hot<OutgoingTx>('--a|', { a: outgoingTx });
+        const pending$ = hot<OutgoingTx>('|');
+        const transactionsSource$ = hot<Cardano.HydratedTx[]>('|');
+        const signed$ = hot<SignedTx>('|');
+
+        const transactionsTracker = createTransactionsTracker(
+          {
+            addresses$,
+            chainHistoryProvider,
+            inFlightTransactionsStore,
+            logger,
+            newTransactions: {
+              failedToSubmit$,
+              pending$,
+              signed$,
+              submitting$
+            },
+            retryBackoffConfig,
+            signedTransactionsStore,
+            tip$,
+            transactionsHistoryStore: transactionsStore
+          },
+          {
+            rollback$: NEVER,
+            transactionsSource$
+          }
+        );
+        expectObservable(transactionsTracker.outgoing.signed$).toBe('aba|', { a: [], b: [storedSignedTx] });
+      });
+      expect(signedTransactionsStore.set).toHaveBeenCalledTimes(2);
+      expect(signedTransactionsStore.set).toHaveBeenNthCalledWith(1, [storedSignedTx]);
+      expect(signedTransactionsStore.set).lastCalledWith([]);
     });
   });
 });

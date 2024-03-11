@@ -9,3 +9,6 @@ jobs:
     if: startsWith(github.event.release.name, '@cardano-sdk/cardano-services@')
     steps:
       - uses: ./.github/workflows/std.yml
+        with:
+          deploy-dev-preprod: true
+          deploy-dev-mainnet: true

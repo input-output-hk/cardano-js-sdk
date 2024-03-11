@@ -8,10 +8,10 @@ import {
   combineLatest,
   concat,
   defaultIfEmpty,
+  distinctUntilChanged,
   exhaustMap,
   filter,
   from,
-  groupBy,
   map,
   merge,
   mergeMap,
@@ -33,8 +33,10 @@ import { Logger } from 'ts-log';
 import { Range, Shutdown, contextLogger } from '@cardano-sdk/util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
-import { distinctBlock, transactionsEquals } from './util';
+import { distinctBlock, signedTxsEquals, transactionsEquals, txInEquals } from './util';
 
+import { SignedTx } from '@cardano-sdk/tx-construction';
+import { newAndStoredMulticast } from './util/newAndStoredMulticast';
 import chunk from 'lodash/chunk';
 import intersectionBy from 'lodash/intersectionBy';
 import sortBy from 'lodash/sortBy';
@@ -47,10 +49,12 @@ export interface TransactionsTrackerProps {
   retryBackoffConfig: RetryBackoffConfig;
   transactionsHistoryStore: OrderedCollectionStore<Cardano.HydratedTx>;
   inFlightTransactionsStore: DocumentStore<TxInFlight[]>;
+  signedTransactionsStore: DocumentStore<SignedTx[]>;
   newTransactions: {
     submitting$: Observable<OutgoingTx>;
     pending$: Observable<OutgoingTx>;
     failedToSubmit$: Observable<FailedTx>;
+    signed$: Observable<SignedTx>;
   };
   failedFromReemitter$?: Observable<FailedTx>;
   logger: Logger;
@@ -217,10 +221,11 @@ export const createTransactionsTracker = (
     tip$,
     chainHistoryProvider,
     addresses$,
-    newTransactions: { submitting$: newSubmitting$, pending$, failedToSubmit$ },
+    newTransactions: { submitting$: newSubmitting$, pending$, signed$: newSigned$, failedToSubmit$ },
     retryBackoffConfig,
     transactionsHistoryStore: transactionsStore,
     inFlightTransactionsStore: newTransactionsStore,
+    signedTransactionsStore,
     logger,
     failedFromReemitter$,
     onFatalError
@@ -263,19 +268,22 @@ export const createTransactionsTracker = (
       tap(({ slot }) => logger.debug(`Transaction ${evt.id} is on-chain in slot ${slot}`))
     );
 
-  const submittingOrPreviouslySubmitted$ = merge<TxInFlight[]>(
-    submitting$.pipe(map((evt) => evt)),
-    newTransactionsStore.get().pipe(
-      tap((transactions) => logger.debug(`Store contains ${transactions?.length} in flight transactions`)),
-      map((transactions) => transactions.filter(({ submittedAt }) => !!submittedAt)),
-      mergeMap((transactions) => from(transactions))
-    )
-  ).pipe(
-    // Tx could be re-submitted, so we group by tx id
-    groupBy(({ id }) => id),
-    map((group$) => group$.pipe(share())),
-    share()
-  );
+  const submittingOrPreviouslySubmitted$ = newAndStoredMulticast<TxInFlight, Cardano.TransactionId>({
+    groupByFn: ({ id }) => id,
+    logStringfn: (transactions) => `Store contains ${transactions?.length} in flight transactions`,
+    logger,
+    new$: submitting$,
+    stored$: newTransactionsStore.get(),
+    storedFilterfn: ({ submittedAt }) => !!submittedAt
+  });
+
+  const newSignedOrPreviouslySigned$ = newAndStoredMulticast<SignedTx, Cardano.TransactionId>({
+    groupByFn: ({ tx }) => tx.id,
+    logStringfn: (signedTxs) => `Store contains ${signedTxs?.length} signed transactions`,
+    logger,
+    new$: newSigned$,
+    stored$: signedTransactionsStore.get()
+  });
 
   const failed$ = new Subject<FailedTx>();
   const failedSubscription = submittingOrPreviouslySubmitted$
@@ -382,6 +390,57 @@ export const createTransactionsTracker = (
     )
   );
 
+  const signed$ = new TrackerSubject<SignedTx[]>(
+    merge(
+      newSignedOrPreviouslySigned$.pipe(
+        mergeMap((signedTx$) => signedTx$),
+        map((signedTx) => ({ op: 'add' as const, signedTx }))
+      ),
+      inFlight$.pipe(
+        mergeMap((txs) => txs),
+        map((tx) => ({ id: tx.id, op: 'remove' as const }))
+      ),
+      historicalTransactions$.pipe(
+        map((txs) => ({
+          inputs: txs.flatMap((tx) => tx.body.inputs.map((inputs) => inputs)),
+          op: 'check_inputs' as const
+        }))
+      ),
+      tip$.pipe(map(({ slot }) => ({ op: 'check_interval' as const, slot })))
+    ).pipe(
+      scan((signed, action) => {
+        if (action.op === 'add') {
+          return [...signed, action.signedTx];
+        }
+        if (action.op === 'remove') {
+          return signed.filter(({ tx }) => tx.id !== action.id);
+        }
+        if (action.op === 'check_interval') {
+          return signed.filter(
+            ({
+              tx: {
+                body: { validityInterval: { invalidHereafter } = {} }
+              }
+            }) => invalidHereafter && invalidHereafter > action.slot
+          );
+        }
+        if (action.op === 'check_inputs') {
+          return signed.filter(({ tx }) => {
+            const anyUtxoIsUsed = tx.body.inputs.some((signedTxInput) =>
+              action.inputs.some((historicalInput) => txInEquals(signedTxInput, historicalInput))
+            );
+
+            return !anyUtxoIsUsed;
+          });
+        }
+        return signed;
+      }, [] as SignedTx[]),
+      tap((signed) => signedTransactionsStore.set(signed)),
+      startWith([]),
+      distinctUntilChanged(signedTxsEquals)
+    )
+  );
+
   const onChain$ = new Subject<OutgoingOnChainTx>();
   const onChainSubscription = submittingOrPreviouslySubmitted$
     .pipe(mergeMap((group$) => group$.pipe(switchMap((tx) => txOnChain$(tx).pipe(takeUntil(txFailed$(tx)))))))
@@ -394,6 +453,7 @@ export const createTransactionsTracker = (
       inFlight$,
       onChain$,
       pending$,
+      signed$,
       submitting$
     },
     rollback$,

@@ -3,6 +3,7 @@ import { Cardano, EraSummary, Reward, StakeSummary, SupplySummary } from '@carda
 import { GroupedAddress } from '@cardano-sdk/key-management';
 import { Observable } from 'rxjs';
 import { OutgoingOnChainTx, TxInFlight } from '../services';
+import { SignedTx } from '@cardano-sdk/tx-construction';
 
 export interface Destroyable {
   destroyed: boolean;
@@ -88,6 +89,7 @@ export interface WalletStores extends Destroyable {
   assets: DocumentStore<Assets>;
   addresses: DocumentStore<GroupedAddress[]>;
   policyIds: DocumentStore<Cardano.PolicyId[]>;
+  signedTransactions: DocumentStore<SignedTx[]>;
 }
 
 export interface SupplyDistributionStores extends Destroyable {

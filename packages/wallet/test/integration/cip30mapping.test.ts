@@ -31,7 +31,7 @@ import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import { PersonalWallet, cip30 } from '../../src';
 import { Providers, createWallet } from './util';
-import { buildDRepIDFromDRepKey, waitForWalletStateSettle } from '../util';
+import { buildDRepIDFromDRepKey, signTx, waitForWalletStateSettle } from '../util';
 import { firstValueFrom, of } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
@@ -489,7 +489,11 @@ describe('cip30', () => {
 
         beforeEach(async () => {
           const txInternals: InitializeTxResult = await wallet.initializeTx(simpleTxProps);
-          finalizedTx = await wallet.finalizeTx({ tx: txInternals });
+          finalizedTx = await signTx({
+            addresses$: wallet.addresses$,
+            tx: txInternals,
+            walletUtil: wallet.util
+          });
           hexTx = Serialization.Transaction.fromCore(finalizedTx).toCbor();
         });
 
@@ -663,7 +667,7 @@ describe('cip30', () => {
         let hexTx: string;
         beforeAll(async () => {
           const txInternals = await wallet.initializeTx(simpleTxProps);
-          const finalizedTx = await wallet.finalizeTx({ tx: txInternals });
+          const finalizedTx = await signTx({ addresses$: wallet.addresses$, tx: txInternals, walletUtil: wallet.util });
           hexTx = Serialization.Transaction.fromCore(finalizedTx).toCbor();
         });
 
@@ -789,7 +793,11 @@ describe('cip30', () => {
           ])
         };
 
-        tx = await mockWallet.finalizeTx({ tx: await mockWallet.initializeTx(props) });
+        tx = await signTx({
+          addresses$: mockWallet.addresses$,
+          tx: await mockWallet.initializeTx(props),
+          walletUtil: mockWallet.util
+        });
       });
 
       afterEach(() => {

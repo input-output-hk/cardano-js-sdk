@@ -46,6 +46,14 @@ The [GETTING_STARTED](./GETTING_STARTED.md) guide provides a quick way to start 
 
 - [@cardano-sdk/golden-test-generator](./packages/golden-test-generator)
 
+## Deployments
+
+Automatic deployments are done for:
+
+- [dev-preview](https://dev-preview.lw.iog.io/v1.0.0/health) - On each push to master
+- [dev-preprod](https://dev-preprod.lw.iog.io/v1.0.0/health) - On each release
+- [dev-mainnet](https://dev-mainnet.lw.iog.io/v1.0.0/health) - On each release
+
 ## Development
 
 A Yarn Workspace maintaining a single version across all packages.

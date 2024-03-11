@@ -41,7 +41,6 @@ export class HardForkInitiationAction {
     writer.writeInt(GovernanceActionKind.HardForkInitiation);
     this.#govActionId ? writer.writeEncodedValue(hexToBytes(this.#govActionId.toCbor())) : writer.writeNull();
 
-    writer.writeStartArray(1);
     writer.writeEncodedValue(hexToBytes(this.#protocolVersion.toCbor()));
 
     return writer.encodeAsHex();
@@ -79,10 +78,7 @@ export class HardForkInitiationAction {
       govActionId = GovernanceActionId.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
     }
 
-    reader.readStartArray();
     const protocolVersion = ProtocolVersion.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
-    reader.readEndArray();
-
     const action = new HardForkInitiationAction(protocolVersion, govActionId);
     action.#originalBytes = cbor;
 

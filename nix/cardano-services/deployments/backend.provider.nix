@@ -25,9 +25,19 @@
       OGMIOS_SRV_SERVICE_NAME = values.backend.ogmiosSrvServiceName;
       LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
       TOKEN_METADATA_SERVER_URL = values.cardano-services.tokenMetadataServerUrl;
+      HANDLE_POLICY_IDS = "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a";
+      USE_BLOCKFROST = "true";
+      USE_KORA_LABS = "true";
+      DISABLE_STAKE_POOL_METRIC_APY = "true";
+      PAGINATION_PAGE_SIZE_LIMIT = "5500";
 
-      BUILD_INFO = lib.mkIf (values.cardano-services.buildInfo != null) values.cardano-services.buildInfo;
-      ALLOWED_ORIGINS = lib.mkIf (values.backend.allowedOrigins != null) values.backend.allowedOrigins;
+      HANDLE_PROVIDER_SERVER_URL =
+        if values.network == "mainnet"
+        then "https://api.handle.me"
+        else "https://${values.network}.api.handle.me";
+
+      BUILD_INFO = values.cardano-services.buildInfo;
+      ALLOWED_ORIGINS = values.backend.allowedOrigins;
 
       POSTGRES_POOL_MAX_DB_SYNC = "50";
       POSTGRES_HOST_DB_SYNC = values.postgresName;
