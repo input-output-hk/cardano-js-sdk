@@ -1,5 +1,5 @@
+import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
-import { PersonalWallet } from '@cardano-sdk/wallet';
 import {
   TestWallet,
   getEnv,
@@ -16,7 +16,7 @@ import { waitForWalletStateSettle } from '../../../wallet/test/util';
 
 const env = getEnv(walletVariables);
 
-const submitDelegationTx = async (wallet: PersonalWallet, pools: Cardano.PoolId[]) => {
+const submitDelegationTx = async (wallet: BaseWallet, pools: Cardano.PoolId[]) => {
   logger.info(`Creating delegation tx at epoch #${(await firstValueFrom(wallet.currentEpoch$)).epochNo}`);
   const { tx: signedTx } = await wallet
     .createTxBuilder()
@@ -33,7 +33,7 @@ const submitDelegationTx = async (wallet: PersonalWallet, pools: Cardano.PoolId[
   return signedTx;
 };
 
-const generateTxs = async (sendingWallet: PersonalWallet, receivingWallet: PersonalWallet) => {
+const generateTxs = async (sendingWallet: BaseWallet, receivingWallet: BaseWallet) => {
   logger.info('Sending 100 txs to generate reward fees');
 
   const tAdaToSend = 5_000_000n;
@@ -47,7 +47,7 @@ const generateTxs = async (sendingWallet: PersonalWallet, receivingWallet: Perso
   }
 };
 
-const buildSpendRewardTx = async (sendingWallet: PersonalWallet, receivingWallet: PersonalWallet) => {
+const buildSpendRewardTx = async (sendingWallet: BaseWallet, receivingWallet: BaseWallet) => {
   const tAdaToSend = 5_000_000n;
   const [{ address: receivingAddress }] = await firstValueFrom(receivingWallet.addresses$);
   const txBuilder = sendingWallet.createTxBuilder();
@@ -77,8 +77,8 @@ const getPoolIds = async (stakePoolProvider: StakePoolProvider, count: number) =
 
 describe('delegation rewards', () => {
   let providers: TestWallet['providers'];
-  let wallet1: PersonalWallet;
-  let wallet2: PersonalWallet;
+  let wallet1: BaseWallet;
+  let wallet2: BaseWallet;
 
   const initializeWallets = async () => {
     ({ wallet: wallet1, providers } = await getWallet({

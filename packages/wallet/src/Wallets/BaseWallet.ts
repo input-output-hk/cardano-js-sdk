@@ -9,7 +9,6 @@ import {
   DelegationTracker,
   DynamicChangeAddressResolver,
   FailedTx,
-  HDSequentialDiscovery,
   OutgoingTx,
   PersistentDocumentTrackerSubject,
   PollingConfig,
@@ -64,6 +63,7 @@ import {
   ObservableWallet,
   SignDataProps,
   SyncStatus,
+  UpdateWitnessProps,
   WalletNetworkInfoProvider
 } from '../types';
 import { BehaviorObservable, TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
@@ -74,24 +74,19 @@ import {
   Subject,
   Subscription,
   catchError,
+  distinctUntilChanged,
   filter,
   firstValueFrom,
   from,
   map,
   mergeMap,
+  of,
   switchMap,
   take,
   tap,
   throwError
 } from 'rxjs';
-import {
-  Bip32Account,
-  GroupedAddress,
-  Witnesser,
-  cip8,
-  util as keyManagementUtil,
-  util
-} from '@cardano-sdk/key-management';
+import { Bip32Account, GroupedAddress, WitnessedTx, Witnesser, cip8, util } from '@cardano-sdk/key-management';
 import { ChangeAddressResolver, InputSelector, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
@@ -100,9 +95,7 @@ import {
   InitializeTxProps,
   InitializeTxResult,
   InvalidConfigurationError,
-  SignedTx,
   TxBuilderDependencies,
-  finalizeTx,
   initializeTx
 } from '@cardano-sdk/tx-construction';
 import { Logger } from 'ts-log';
@@ -110,19 +103,47 @@ import { PubStakeKeyAndStatus, createPublicStakeKeysTracker } from '../services/
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
 import { WalletStores, createInMemoryWalletStores } from '../persistence';
+import { getScriptAddress } from './internals';
 import isEqual from 'lodash/isEqual';
 import uniq from 'lodash/uniq';
 import type { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
 
-export interface PersonalWalletProps {
+export interface BaseWalletProps {
   readonly name: string;
   readonly polling?: PollingConfig;
   readonly retryBackoffConfig?: RetryBackoffConfig;
 }
 
-export interface PersonalWalletDependencies {
+export enum PublicCredentialsManagerType {
+  SCRIPT_CREDENTIALS_MANAGER = 'SCRIPT_CREDENTIALS_MANAGER',
+  BIP32_CREDENTIALS_MANAGER = 'BIP32_CREDENTIALS_MANAGER'
+}
+
+export interface Bip32PublicCredentialsManager {
+  __type: PublicCredentialsManagerType.BIP32_CREDENTIALS_MANAGER;
+  bip32Account: Bip32Account;
+  addressDiscovery: AddressDiscovery;
+}
+
+export interface ScriptPublicCredentialsManager {
+  __type: PublicCredentialsManagerType.SCRIPT_CREDENTIALS_MANAGER;
+  paymentScript: Cardano.RequireAllOfScript | Cardano.RequireAnyOfScript | Cardano.RequireAtLeastScript;
+  stakingScript: Cardano.RequireAllOfScript | Cardano.RequireAnyOfScript | Cardano.RequireAtLeastScript;
+}
+
+export type PublicCredentialsManager = ScriptPublicCredentialsManager | Bip32PublicCredentialsManager;
+
+export const isScriptPublicCredentialsManager = (
+  credManager: PublicCredentialsManager
+): credManager is ScriptPublicCredentialsManager =>
+  credManager.__type === PublicCredentialsManagerType.SCRIPT_CREDENTIALS_MANAGER;
+
+export const isBip32PublicCredentialsManager = (
+  credManager: PublicCredentialsManager
+): credManager is Bip32PublicCredentialsManager => !isScriptPublicCredentialsManager(credManager);
+
+export interface BaseWalletDependencies {
   readonly witnesser: Witnesser;
-  readonly bip32Account: Bip32Account;
   readonly txSubmitProvider: TxSubmitProvider;
   readonly stakePoolProvider: StakePoolProvider;
   readonly assetProvider: AssetProvider;
@@ -135,7 +156,7 @@ export interface PersonalWalletDependencies {
   readonly stores?: WalletStores;
   readonly logger: Logger;
   readonly connectionStatusTracker$?: ConnectionStatusTracker;
-  readonly addressDiscovery?: AddressDiscovery;
+  readonly publicCredentialsManager: PublicCredentialsManager;
 }
 
 export interface SubmitTxOptions {
@@ -148,19 +169,17 @@ export const DEFAULT_POLLING_CONFIG = {
   pollInterval: 5000
 };
 
-export const DEFAULT_LOOK_AHEAD_SEARCH = 20;
-
 // Adjust the number of slots to wait until a transaction is considered lost (send but not found on chain)
 // Configured to 2.5 because on preprod/mainnet, blocks produced at more than 250 slots apart are very rare (1 per epoch or less).
 // Ideally we should calculate this based on the activeSlotsCoeff and probability of a single block per epoch.
 const BLOCK_SLOT_GAP_MULTIPLIER = 2.5;
 
-const isOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx): input is OutgoingTx =>
+const isOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | WitnessedTx): input is OutgoingTx =>
   typeof input === 'object' && 'cbor' in input;
-const isTxCBOR = (input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx): input is TxCBOR => typeof input === 'string';
-const isSignedTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx): input is SignedTx =>
+const isTxCBOR = (input: Cardano.Tx | TxCBOR | OutgoingTx | WitnessedTx): input is TxCBOR => typeof input === 'string';
+const isWitnessedTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | WitnessedTx): input is WitnessedTx =>
   typeof input === 'object' && 'context' in input;
-const processOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx): OutgoingTx => {
+const processOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | WitnessedTx): OutgoingTx => {
   // TxCbor
   if (isTxCBOR(input)) {
     const tx = Serialization.Transaction.fromCbor(input);
@@ -171,8 +190,8 @@ const processOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx): 
       id: tx.getId()
     };
   }
-  // SignedTx
-  if (isSignedTx(input)) {
+  // WitnessedTx
+  if (isWitnessedTx(input)) {
     return {
       body: input.tx.body,
       cbor: input.cbor,
@@ -192,25 +211,24 @@ const processOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx): 
   };
 };
 
-export class PersonalWallet implements ObservableWallet {
+export class BaseWallet implements ObservableWallet {
   #inputSelector: InputSelector;
   #logger: Logger;
   #tip$: TipTracker;
   #newTransactions = {
     failedToSubmit$: new Subject<FailedTx>(),
     pending$: new Subject<OutgoingTx>(),
-    signed$: new Subject<SignedTx>(),
+    signed$: new Subject<WitnessedTx>(),
     submitting$: new Subject<OutgoingTx>()
   };
   #reemitSubscriptions: Subscription;
   #failedFromReemitter$: Subject<FailedTx>;
   #trackedTxSubmitProvider: TrackedTxSubmitProvider;
   #addressTracker: AddressTracker;
-  #addressDiscovery: AddressDiscovery;
+  #publicCredentialsManager: PublicCredentialsManager;
   #submittingPromises: Partial<Record<Cardano.TransactionId, Promise<Cardano.TransactionId>>> = {};
 
   readonly witnesser: Witnesser;
-  readonly bip32Account: Bip32Account;
   readonly currentEpoch$: TrackerSubject<EpochInfo>;
   readonly txSubmitProvider: TxSubmitProvider;
   readonly utxoProvider: TrackedUtxoProvider;
@@ -236,7 +254,6 @@ export class PersonalWallet implements ObservableWallet {
   readonly handleProvider: HandleProvider;
   readonly changeAddressResolver: ChangeAddressResolver;
   readonly publicStakeKeys$: TrackerSubject<PubStakeKeyAndStatus[]>;
-  private drepPubKey: Ed25519PublicKeyHex;
   handles$: Observable<HandleInfo[]>;
 
   // eslint-disable-next-line max-statements
@@ -252,12 +269,11 @@ export class PersonalWallet implements ObservableWallet {
         initialInterval: Math.min(pollInterval, 1000),
         maxInterval
       }
-    }: PersonalWalletProps,
+    }: BaseWalletProps,
     {
       txSubmitProvider,
       stakePoolProvider,
       witnesser,
-      bip32Account: addressManager,
       assetProvider,
       handleProvider,
       networkInfoProvider,
@@ -266,13 +282,13 @@ export class PersonalWallet implements ObservableWallet {
       rewardsProvider,
       logger,
       inputSelector,
+      publicCredentialsManager,
       stores = createInMemoryWalletStores(),
-      connectionStatusTracker$ = createSimpleConnectionStatusTracker(),
-      addressDiscovery = new HDSequentialDiscovery(chainHistoryProvider, DEFAULT_LOOK_AHEAD_SEARCH)
-    }: PersonalWalletDependencies
+      connectionStatusTracker$ = createSimpleConnectionStatusTracker()
+    }: BaseWalletDependencies
   ) {
     this.#logger = contextLogger(logger, name);
-
+    this.#publicCredentialsManager = publicCredentialsManager;
     this.#trackedTxSubmitProvider = new TrackedTxSubmitProvider(txSubmitProvider);
 
     this.utxoProvider = new TrackedUtxoProvider(utxoProvider);
@@ -295,7 +311,6 @@ export class PersonalWallet implements ObservableWallet {
       { consideredOutOfSyncAfter }
     );
 
-    this.bip32Account = addressManager;
     this.witnesser = witnesser;
 
     this.fatalError$ = new Subject();
@@ -308,24 +323,35 @@ export class PersonalWallet implements ObservableWallet {
       filter((status) => status === ConnectionStatus.down)
     );
 
-    this.#addressDiscovery = addressDiscovery;
-    this.#addressTracker = createAddressTracker({
-      addressDiscovery$: coldObservableProvider({
-        cancel$,
-        onFatalError,
-        provider: () => addressDiscovery.discover(this.bip32Account),
-        retryBackoffConfig
-      }).pipe(
-        take(1),
-        catchError((error) => {
-          this.#logger.error('Failed to complete the address discovery process', error);
-          throw error;
-        })
-      ),
-      logger: this.#logger,
-      store: stores.addresses
-    });
-    this.addresses$ = this.#addressTracker.addresses$;
+    if (isBip32PublicCredentialsManager(this.#publicCredentialsManager)) {
+      this.#addressTracker = createAddressTracker({
+        addressDiscovery$: coldObservableProvider({
+          cancel$,
+          onFatalError,
+          provider: () => {
+            const credManager = this.#publicCredentialsManager as Bip32PublicCredentialsManager;
+            return credManager.addressDiscovery.discover(credManager.bip32Account);
+          },
+          retryBackoffConfig
+        }).pipe(
+          take(1),
+          catchError((error) => {
+            this.#logger.error('Failed to complete the address discovery process', error);
+            throw error;
+          })
+        ),
+        logger: this.#logger,
+        store: stores.addresses
+      });
+      this.addresses$ = this.#addressTracker.addresses$;
+    } else {
+      const credManager = this.#publicCredentialsManager as ScriptPublicCredentialsManager;
+      this.addresses$ = from(this.networkInfoProvider.genesisParameters()).pipe(
+        map(({ networkId }) => networkId),
+        distinctUntilChanged(),
+        map((networkId) => [getScriptAddress(credManager.paymentScript, credManager.stakingScript, networkId)])
+      );
+    }
 
     this.#tip$ = this.tip$ = new TipTracker({
       connectionStatus$: connectionStatusTracker$,
@@ -484,11 +510,13 @@ export class PersonalWallet implements ObservableWallet {
           )
         });
 
-    this.publicStakeKeys$ = createPublicStakeKeysTracker({
-      addresses$: this.addresses$,
-      bip32Account: this.bip32Account,
-      rewardAccounts$: this.delegation.rewardAccounts$
-    });
+    this.publicStakeKeys$ = isBip32PublicCredentialsManager(this.#publicCredentialsManager)
+      ? createPublicStakeKeysTracker({
+          addresses$: this.addresses$,
+          bip32Account: this.#publicCredentialsManager.bip32Account,
+          rewardAccounts$: this.delegation.rewardAccounts$
+        })
+      : new TrackerSubject(of(new Array<PubStakeKeyAndStatus>()));
 
     this.balance = createBalanceTracker(this.protocolParameters$, this.utxo, this.delegation);
     this.assetInfo$ = new PersistentDocumentTrackerSubject(
@@ -515,7 +543,7 @@ export class PersonalWallet implements ObservableWallet {
             stores.policyIds
           )
         )
-      : throwError(() => new InvalidConfigurationError('PersonalWallet is missing a "handleProvider"'));
+      : throwError(() => new InvalidConfigurationError('BaseWallet is missing a "handleProvider"'));
 
     this.util = createWalletUtil({
       protocolParameters$: this.protocolParameters$,
@@ -536,22 +564,37 @@ export class PersonalWallet implements ObservableWallet {
     return initializeTx(props, this.getTxBuilderDependencies());
   }
 
-  async finalizeTx({ tx, sender, ...rest }: FinalizeTxProps, stubSign = false): Promise<Cardano.Tx> {
+  async finalizeTx({
+    tx,
+    signingOptions,
+    signingContext,
+    auxiliaryData,
+    isValid,
+    witness
+  }: FinalizeTxProps): Promise<Cardano.Tx> {
     const knownAddresses = await firstValueFrom(this.addresses$);
-    const result = await finalizeTx(
-      tx,
-      {
-        ...rest,
-        signingContext: {
-          knownAddresses,
-          sender,
-          txInKeyPathMap: await util.createTxInKeyPathMap(tx.body, knownAddresses, this.util)
-        }
-      },
-      { bip32Account: this.bip32Account, witnesser: this.witnesser },
-      stubSign
+    const dRepPublicKey = await this.getPubDRepKey();
+
+    const context = {
+      ...signingContext,
+      dRepPublicKey,
+      knownAddresses,
+      txInKeyPathMap: await util.createTxInKeyPathMap(tx.body, knownAddresses, this.util)
+    };
+
+    const emptyWitness = { signatures: new Map() };
+    const transaction = new Serialization.Transaction(
+      Serialization.TransactionBody.fromCore(tx.body),
+      Serialization.TransactionWitnessSet.fromCore({ ...emptyWitness, ...witness }),
+      auxiliaryData ? Serialization.AuxiliaryData.fromCore(auxiliaryData) : undefined
     );
+
+    if (isValid !== undefined) transaction.setIsValid(isValid);
+
+    const result = await this.witnesser.witness(transaction, context, signingOptions);
+
     this.#newTransactions.signed$.next(result);
+
     return result.tx;
   }
 
@@ -611,7 +654,7 @@ export class PersonalWallet implements ObservableWallet {
   }
 
   async submitTx(
-    input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx,
+    input: Cardano.Tx | TxCBOR | OutgoingTx | WitnessedTx,
     options: SubmitTxOptions = {}
   ): Promise<Cardano.TransactionId> {
     const outgoingTx = processOutgoingTx(input);
@@ -622,7 +665,7 @@ export class PersonalWallet implements ObservableWallet {
       try {
         // Submit to provider only if it's either:
         // - an internal re-submission. External re-submissions are ignored,
-        //   because PersonalWallet takes care of it internally.
+        //   because BaseWallet takes care of it internally.
         // - is a new submission
         if (options.mightBeAlreadySubmitted || !(await this.#isTxInFlight(outgoingTx.id))) {
           await this.#submitTx(outgoingTx, options);
@@ -634,16 +677,6 @@ export class PersonalWallet implements ObservableWallet {
     })());
   }
 
-  async signData(props: SignDataProps): Promise<Cip30DataSignature> {
-    return cip8.cip30signData({
-      // TODO: signData probably needs to be refactored out of the wallet and supported as a stand alone util
-      // as this operation doesnt require any of the wallet state. Also this operation can only be performed
-      // by Bip32Ed25519 type of wallets.
-      knownAddresses: await firstValueFrom(this.addresses$),
-      witnesser: this.witnesser as keyManagementUtil.Bip32Ed25519Witnesser,
-      ...props
-    });
-  }
   sync() {
     this.#tip$.sync();
   }
@@ -654,7 +687,7 @@ export class PersonalWallet implements ObservableWallet {
     this.protocolParameters$.complete();
     this.genesisParameters$.complete();
     this.#tip$.complete();
-    this.#addressTracker.shutdown();
+    this.#addressTracker?.shutdown();
     this.assetProvider.stats.shutdown();
     this.#trackedTxSubmitProvider.stats.shutdown();
     this.networkInfoProvider.stats.shutdown();
@@ -690,13 +723,20 @@ export class PersonalWallet implements ObservableWallet {
     return this.#inputSelector;
   }
 
+  async #isTxInFlight(txId: Cardano.TransactionId) {
+    const inFlightTxs = await firstValueFrom(this.transactions.outgoing.inFlight$);
+    return inFlightTxs.some((inFlight) => inFlight.id === txId);
+  }
+
   /**
-   * Utility function that creates the TxBuilderDependencies based on the PersonalWallet observables.
+   * Utility function that creates the TxBuilderDependencies based on the BaseWallet observables.
    * All dependencies will wait until the wallet is settled before emitting.
    */
   getTxBuilderDependencies(): TxBuilderDependencies {
     return {
-      bip32Account: this.bip32Account,
+      bip32Account: isBip32PublicCredentialsManager(this.#publicCredentialsManager)
+        ? this.#publicCredentialsManager.bip32Account
+        : undefined,
       handleProvider: this.handleProvider,
       inputResolver: this.util,
       inputSelector: this.#inputSelector,
@@ -717,11 +757,6 @@ export class PersonalWallet implements ObservableWallet {
     };
   }
 
-  async #isTxInFlight(txId: Cardano.TransactionId) {
-    const inFlightTxs = await firstValueFrom(this.transactions.outgoing.inFlight$);
-    return inFlightTxs.some((inFlight) => inFlight.id === txId);
-  }
-
   #firstValueFromSettled<T>(o$: Observable<T>): Promise<T> {
     return firstValueFrom(
       this.syncStatus.isSettled$.pipe(
@@ -731,25 +766,54 @@ export class PersonalWallet implements ObservableWallet {
     );
   }
 
-  async getPubDRepKey(): Promise<Ed25519PublicKeyHex> {
-    if (!this.drepPubKey) {
-      try {
-        this.drepPubKey = (await this.bip32Account.derivePublicKey(keyManagementUtil.DREP_KEY_DERIVATION_PATH)).hex();
-      } catch (error) {
-        this.#logger.error(error);
-        throw error;
-      }
+  async signData(props: SignDataProps): Promise<Cip30DataSignature> {
+    if (isBip32PublicCredentialsManager(this.#publicCredentialsManager)) {
+      return cip8.cip30signData({
+        // LW-9989: signData probably needs to be refactored out of the wallet and supported as a stand alone util
+        // as this operation doesnt require any of the wallet state. Also this operation can only be performed
+        // by Bip32Ed25519 type of wallets.
+        knownAddresses: await firstValueFrom(this.addresses$),
+        witnesser: this.witnesser as util.Bip32Ed25519Witnesser,
+        ...props
+      });
     }
-    return Promise.resolve(this.drepPubKey);
+
+    throw new Error('getPubDRepKey is not supported by script wallets');
+  }
+
+  async getPubDRepKey(): Promise<Ed25519PublicKeyHex | undefined> {
+    if (isBip32PublicCredentialsManager(this.#publicCredentialsManager)) {
+      return (await this.#publicCredentialsManager.bip32Account.derivePublicKey(util.DREP_KEY_DERIVATION_PATH)).hex();
+    }
+
+    return undefined;
   }
 
   async discoverAddresses(): Promise<GroupedAddress[]> {
-    const addresses = await this.#addressDiscovery.discover(this.bip32Account);
-    const knownAddresses = await firstValueFrom(this.addresses$);
-    const newAddresses = addresses.filter(
-      ({ address }) => !knownAddresses.some((knownAddr) => knownAddr.address === address)
-    );
-    await firstValueFrom(this.#addressTracker.addAddresses(newAddresses));
+    if (isBip32PublicCredentialsManager(this.#publicCredentialsManager)) {
+      const addresses = await this.#publicCredentialsManager.addressDiscovery.discover(
+        this.#publicCredentialsManager.bip32Account
+      );
+      const knownAddresses = await firstValueFrom(this.addresses$);
+      const newAddresses = addresses.filter(
+        ({ address }) => !knownAddresses.some((knownAddr) => knownAddr.address === address)
+      );
+      await firstValueFrom(this.#addressTracker.addAddresses(newAddresses));
+      return firstValueFrom(this.addresses$);
+    }
+
     return firstValueFrom(this.addresses$);
+  }
+
+  /** Update the witness of a transaction with witness provided by this wallet */
+  async updateWitness({ tx, sender }: UpdateWitnessProps): Promise<Cardano.Tx> {
+    return this.finalizeTx({
+      auxiliaryData: tx.auxiliaryData,
+      signingContext: {
+        sender
+      },
+      tx: { body: tx.body, hash: tx.id },
+      witness: tx.witness
+    });
   }
 }

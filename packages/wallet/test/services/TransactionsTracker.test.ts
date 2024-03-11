@@ -20,7 +20,7 @@ import {
 } from '../../src/persistence';
 import { NEVER, bufferCount, firstValueFrom, map, of } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { SignedTx } from '@cardano-sdk/tx-construction';
+import { WitnessedTx } from '@cardano-sdk/key-management';
 import { createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyCbor, toOutgoingTx, toSignedTx } from '../util';
 import { dummyLogger } from 'ts-log';
@@ -208,7 +208,7 @@ describe('TransactionsTracker', () => {
         const tip$ = hot<Cardano.Tip>('----|');
         const submitting$ = hot('-a--|', { a: outgoingTx });
         const pending$ = hot('--a-|', { a: outgoingTx });
-        const signed$ = hot<SignedTx>('----|');
+        const signed$ = hot<WitnessedTx>('----|');
         const transactionsSource$ = hot<Cardano.HydratedTx[]>('a-bc|', {
           a: [],
           b: [incomingTx],
@@ -266,7 +266,7 @@ describe('TransactionsTracker', () => {
         const tip$ = hot<Cardano.Tip>('--ab-|', { a: tip1, b: tip2 });
         const submitting$ = hot('-a---|', { a: outgoingTx });
         const pending$ = hot('--a--|', { a: outgoingTx });
-        const signed$ = hot<SignedTx>('----|', {});
+        const signed$ = hot<WitnessedTx>('----|', {});
         const transactionsSource$ = hot<Cardano.HydratedTx[]>('-----|');
         const failedSubscription = '--^---'; // regression: subscribing after submitting$ emits
         const transactionsTracker = createTransactionsTracker(
@@ -317,7 +317,7 @@ describe('TransactionsTracker', () => {
         const submitting$ = hot('-a---|', { a: outgoingTx });
         const pending$ = hot('--a-a|', { a: outgoingTx }); // second emission must not re-add it to inFlight$
         const rollback$ = hot('---a-|', { a: { id: tx.body.inputs[0].txId } as Cardano.HydratedTx });
-        const signed$ = hot<SignedTx>('----|', {});
+        const signed$ = hot<WitnessedTx>('----|', {});
         const transactionsSource$ = hot<Cardano.HydratedTx[]>('-----|');
         const transactionsTracker = createTransactionsTracker(
           {
@@ -369,7 +369,7 @@ describe('TransactionsTracker', () => {
         const pending$ = cold('--a--|', { a: outgoingTx });
         const transactionsSource$ = cold<Cardano.HydratedTx[]>('a--b-|', { a: [], b: [phase2FailedTx] });
         const failedToSubmit$ = hot<FailedTx>('-----|');
-        const signed$ = hot<SignedTx>('----|', {});
+        const signed$ = hot<WitnessedTx>('----|', {});
         const transactionsTracker = createTransactionsTracker(
           {
             addresses$,
@@ -417,7 +417,7 @@ describe('TransactionsTracker', () => {
         const failedFromReemitter$ = cold<FailedTx>('-a|', {
           a: { reason: TransactionFailure.Timeout, ...outgoingTxReemit }
         });
-        const signed$ = hot<SignedTx>('----|', {});
+        const signed$ = hot<WitnessedTx>('----|', {});
         const transactionsTracker = createTransactionsTracker(
           {
             addresses$,
@@ -465,7 +465,7 @@ describe('TransactionsTracker', () => {
         const failedToSubmit$ = hot<FailedTx>('---a|', {
           a: { reason: TransactionFailure.FailedToSubmit, ...outgoingTx }
         });
-        const signed$ = hot<SignedTx>('----|', {});
+        const signed$ = hot<WitnessedTx>('----|', {});
         const transactionsTracker = createTransactionsTracker(
           {
             addresses$,
@@ -515,7 +515,7 @@ describe('TransactionsTracker', () => {
           b: [tx]
         });
         const failedToSubmit$ = hot<FailedTx>('------|');
-        const signed$ = hot<SignedTx>('----|', {});
+        const signed$ = hot<WitnessedTx>('----|', {});
         const transactionsTracker = createTransactionsTracker(
           {
             addresses$,
@@ -571,7 +571,7 @@ describe('TransactionsTracker', () => {
         const failedToSubmit$ = hot<FailedTx>('-----a|', {
           a: { reason: TransactionFailure.FailedToSubmit, ...outgoingTx }
         });
-        const signed$ = hot<SignedTx>('----|', {});
+        const signed$ = hot<WitnessedTx>('----|', {});
         const transactionsTracker = createTransactionsTracker(
           {
             addresses$,
@@ -620,7 +620,7 @@ describe('TransactionsTracker', () => {
           b: [tx]
         });
         const failedToSubmit$ = hot<FailedTx>('----|');
-        const signed$ = hot<SignedTx>('----|', {});
+        const signed$ = hot<WitnessedTx>('----|', {});
         const transactionsTracker = createTransactionsTracker(
           {
             addresses$,
@@ -679,7 +679,7 @@ describe('TransactionsTracker', () => {
         const submitting$ = hot('--a|', { a: outgoingTx });
         const pending$ = hot<OutgoingTx>('|');
         const transactionsSource$ = hot<Cardano.HydratedTx[]>('|');
-        const signed$ = hot<SignedTx>('----|', {});
+        const signed$ = hot<WitnessedTx>('----|', {});
 
         const transactionsTracker = createTransactionsTracker(
           {
@@ -743,7 +743,7 @@ describe('TransactionsTracker', () => {
           b: [incomingTx],
           c: [incomingTx, storedInFlightTx]
         });
-        const signed$ = hot<SignedTx>('----|', {});
+        const signed$ = hot<WitnessedTx>('----|', {});
 
         const transactionsTracker = createTransactionsTracker(
           {
@@ -806,7 +806,7 @@ describe('TransactionsTracker', () => {
         const transactionsSource$ = hot<Cardano.HydratedTx[]>('----a|', {
           a: [txToBeConfirmed]
         });
-        const signed$ = hot<SignedTx>('----|', {});
+        const signed$ = hot<WitnessedTx>('----|', {});
 
         const transactionsTracker = createTransactionsTracker(
           {
@@ -874,7 +874,7 @@ describe('TransactionsTracker', () => {
           a: [],
           b: [incomingTx]
         });
-        const signed$ = hot<SignedTx>('----|', {});
+        const signed$ = hot<WitnessedTx>('----|', {});
 
         const transactionsTracker = createTransactionsTracker(
           {
@@ -918,7 +918,7 @@ describe('TransactionsTracker', () => {
         const tip$ = hot<Cardano.Tip>('----|');
         const submitting$ = hot<OutgoingTx>('----|', {});
         const pending$ = hot<OutgoingTx>('----|', {});
-        const signed$ = hot<SignedTx>('-a--|', { a: signedTx });
+        const signed$ = hot<WitnessedTx>('-a--|', { a: signedTx });
         const transactionsSource$ = hot<Cardano.HydratedTx[]>('----|');
         const transactionsTracker = createTransactionsTracker(
           {
@@ -954,7 +954,7 @@ describe('TransactionsTracker', () => {
         const tip2 = { slot: Cardano.Slot(tx.body.validityInterval!.invalidHereafter! + 1) } as Cardano.Tip;
         const failedToSubmit$ = hot<FailedTx>('|');
         const tip$ = hot<Cardano.Tip>('--ab|', { a: tip1, b: tip2 });
-        const signed$ = hot<SignedTx>('-a--|', { a: signedTx });
+        const signed$ = hot<WitnessedTx>('-a--|', { a: signedTx });
         const submitting$ = hot<OutgoingTx>('|');
         const pending$ = hot<OutgoingTx>('|');
         const transactionsSource$ = hot<Cardano.HydratedTx[]>('|');
@@ -994,7 +994,7 @@ describe('TransactionsTracker', () => {
         const pending$ = hot<OutgoingTx>('|');
         const transactionsSource$ = hot<Cardano.HydratedTx[]>('|');
         const submitting$ = hot('--a-|', { a: outgoingTx });
-        const signed$ = hot<SignedTx>('-a--|', { a: signedTx });
+        const signed$ = hot<WitnessedTx>('-a--|', { a: signedTx });
 
         const transactionsTracker = createTransactionsTracker(
           {
@@ -1032,7 +1032,7 @@ describe('TransactionsTracker', () => {
         const tip$ = hot<Cardano.Tip>('|');
         const submitting$ = hot<OutgoingTx>('|');
         const pending$ = hot<OutgoingTx>('|');
-        const signed$ = hot<SignedTx>('-a--|', { a: signedTx });
+        const signed$ = hot<WitnessedTx>('-a--|', { a: signedTx });
         const transactionsSource$ = hot<Cardano.HydratedTx[]>('--ab|', { a: txs, b: [...txs, tx] });
 
         const transactionsTracker = createTransactionsTracker(
@@ -1066,7 +1066,7 @@ describe('TransactionsTracker', () => {
       const storedSignedTransactions = generateTxAlonzo(1).map(toSignedTx);
       const signed = toSignedTx(queryTransactionsResult.pageResults[0]);
       createTestScheduler().run(({ hot, expectObservable }) => {
-        const storedSigned$ = hot<SignedTx[]>('-a|', {
+        const storedSigned$ = hot<WitnessedTx[]>('-a|', {
           a: storedSignedTransactions
         });
         signedTransactionsStore.get = jest.fn(() => storedSigned$);
@@ -1077,7 +1077,7 @@ describe('TransactionsTracker', () => {
         const submitting$ = hot<OutgoingTx>('|');
         const pending$ = hot<OutgoingTx>('|');
         const transactionsSource$ = hot<Cardano.HydratedTx[]>('|');
-        const signed$ = hot<SignedTx>('--a|', { a: signed });
+        const signed$ = hot<WitnessedTx>('--a|', { a: signed });
 
         const transactionsTracker = createTransactionsTracker(
           {
@@ -1113,12 +1113,12 @@ describe('TransactionsTracker', () => {
     });
 
     it('signed transactions are removed from store when submitted', () => {
-      const storedSignedTx = toSignedTx(queryTransactionsResult.pageResults[0]);
+      const storedWitnessedTx = toSignedTx(queryTransactionsResult.pageResults[0]);
       const outgoingTx = toOutgoingTx(queryTransactionsResult.pageResults[0]);
 
       createTestScheduler().run(({ hot, expectObservable }) => {
-        const storedSigned$ = hot<SignedTx[]>('-a|', {
-          a: [storedSignedTx]
+        const storedSigned$ = hot<WitnessedTx[]>('-a|', {
+          a: [storedWitnessedTx]
         });
         signedTransactionsStore.get = jest.fn(() => storedSigned$);
         signedTransactionsStore.set = jest.fn();
@@ -1128,7 +1128,7 @@ describe('TransactionsTracker', () => {
         const submitting$ = hot<OutgoingTx>('--a|', { a: outgoingTx });
         const pending$ = hot<OutgoingTx>('|');
         const transactionsSource$ = hot<Cardano.HydratedTx[]>('|');
-        const signed$ = hot<SignedTx>('|');
+        const signed$ = hot<WitnessedTx>('|');
 
         const transactionsTracker = createTransactionsTracker(
           {
@@ -1152,10 +1152,10 @@ describe('TransactionsTracker', () => {
             transactionsSource$
           }
         );
-        expectObservable(transactionsTracker.outgoing.signed$).toBe('aba|', { a: [], b: [storedSignedTx] });
+        expectObservable(transactionsTracker.outgoing.signed$).toBe('aba|', { a: [], b: [storedWitnessedTx] });
       });
       expect(signedTransactionsStore.set).toHaveBeenCalledTimes(2);
-      expect(signedTransactionsStore.set).toHaveBeenNthCalledWith(1, [storedSignedTx]);
+      expect(signedTransactionsStore.set).toHaveBeenNthCalledWith(1, [storedWitnessedTx]);
       expect(signedTransactionsStore.set).lastCalledWith([]);
     });
   });

@@ -1,3 +1,4 @@
+import { AccountKeyDerivationPath } from '@cardano-sdk/key-management';
 import { Bip32PublicKeyHex } from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
@@ -55,6 +56,8 @@ export type AnyBip32Wallet<WalletMetadata extends {}, AccountMetadata extends {}
 export type OwnSignerAccount = {
   walletId: WalletId;
   accountIndex: number;
+  stakingScriptKeyPath: AccountKeyDerivationPath;
+  paymentScriptKeyPath: AccountKeyDerivationPath;
 };
 
 export type ScriptWallet<Metadata extends {}> = {
@@ -62,7 +65,8 @@ export type ScriptWallet<Metadata extends {}> = {
   walletId: WalletId;
   /** e.g. account name, picture */
   metadata: Metadata;
-  script: Cardano.Script;
+  paymentScript: Cardano.Script;
+  stakingScript: Cardano.Script;
   ownSigners: OwnSignerAccount[];
 };
 

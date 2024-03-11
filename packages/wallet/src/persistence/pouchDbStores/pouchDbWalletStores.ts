@@ -2,12 +2,11 @@ import { Assets } from '../../types';
 import { Cardano, EraSummary, Reward } from '@cardano-sdk/core';
 import { CreatePouchDbStoresDependencies } from './types';
 import { EMPTY, combineLatest, map } from 'rxjs';
-import { GroupedAddress } from '@cardano-sdk/key-management';
+import { GroupedAddress, WitnessedTx } from '@cardano-sdk/key-management';
 import { OutgoingOnChainTx, TxInFlight } from '../../services';
 import { PouchDbCollectionStore } from './PouchDbCollectionStore';
 import { PouchDbDocumentStore } from './PouchDbDocumentStore';
 import { PouchDbKeyValueStore } from './PouchDbKeyValueStore';
-import { SignedTx } from '@cardano-sdk/tx-construction';
 import { WalletStores } from '../types';
 
 export class PouchDbTipStore extends PouchDbDocumentStore<Cardano.Tip> {}
@@ -20,7 +19,7 @@ export class PouchDbAddressesStore extends PouchDbDocumentStore<GroupedAddress[]
 export class PouchDbInFlightTransactionsStore extends PouchDbDocumentStore<TxInFlight[]> {}
 export class PouchDbVolatileTransactionsStore extends PouchDbDocumentStore<OutgoingOnChainTx[]> {}
 export class PouchDbPolicyIdsStore extends PouchDbDocumentStore<Cardano.PolicyId[]> {}
-export class PouchDbSignedTransactionsStore extends PouchDbDocumentStore<SignedTx[]> {}
+export class PouchDbSignedTransactionsStore extends PouchDbDocumentStore<WitnessedTx[]> {}
 
 export class PouchDbTransactionsStore extends PouchDbCollectionStore<Cardano.HydratedTx> {}
 export class PouchDbUtxoStore extends PouchDbCollectionStore<Cardano.Utxo> {}

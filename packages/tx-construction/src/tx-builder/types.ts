@@ -4,9 +4,10 @@ import {
   SignTransactionContext,
   SignTransactionOptions,
   TransactionSigner,
+  WitnessedTx,
   Witnesser
 } from '@cardano-sdk/key-management';
-import { Cardano, Handle, HandleProvider, HandleResolution, TxCBOR } from '@cardano-sdk/core';
+import { Cardano, Handle, HandleProvider, HandleResolution } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { InitializeTxWitness, TxBodyPreInputSelection, TxBuilderProviders } from '../types';
@@ -141,33 +142,25 @@ export interface TxContext {
   auxiliaryData?: Cardano.AuxiliaryData;
   witness?: InitializeTxWitness;
   isValid?: boolean;
+}
+
+export type TxInspection = Cardano.TxBodyWithHash & {
   handleResolutions?: HandleResolution[];
-}
-
-export type TxInspection = Cardano.TxBodyWithHash &
-  Pick<TxContext, 'auxiliaryData' | 'handleResolutions'> & {
-    inputSelection: SelectionSkeleton;
-    ownAddresses: GroupedAddress[];
-  };
-
-export interface SignedTx {
-  cbor: TxCBOR;
-  tx: Cardano.Tx;
-  context: {
-    handleResolutions: HandleResolution[];
-  };
-}
+  auxiliaryData?: Cardano.AuxiliaryData;
+  inputSelection: SelectionSkeleton;
+  ownAddresses: GroupedAddress[];
+};
 
 /**
  * Transaction body built with {@link TxBuilder.build}
- * `const unsignedTx = await txBuilder.build().sign();`
+ * `const unwitnessedTx = await txBuilder.build().sign();`
  * At the same time it allows inspecting the built transaction before signing it:
- * `const signedTx = await txBuilder.build().inspect();`
+ * `const witnessedTx = await txBuilder.build().inspect();`
  * Transaction is built lazily: only when inspect() or sign() is called.
  */
-export interface UnsignedTx {
+export interface UnwitnessedTx {
   inspect(): Promise<TxInspection>;
-  sign(): Promise<SignedTx>;
+  sign(): Promise<WitnessedTx>;
 }
 
 export interface PartialTx {
@@ -205,6 +198,14 @@ export interface TxBuilder {
    * @returns {OutputBuilder} {@link OutputBuilder} util for building transaction outputs.
    */
   buildOutput(txOut?: PartialTxOut): OutputBuilder;
+
+  /**
+   * Delegates the first stake credential controlled by the wallet.
+   *
+   * @param poolId The pool to delegate to, or null if the stake credential should be de-registered.
+   */
+  delegateFirstStakeCredential(poolId: Cardano.PoolId | null): TxBuilder;
+
   /**
    * Configures the transaction to include all the certificates needed to delegate to the pools from the portfolio.
    *
@@ -254,7 +255,7 @@ export interface TxBuilder {
    * All positive balance found in reward accounts is included in the transaction withdrawal.
    * Performs multiple validations to make sure the transaction body is correct.
    *
-   * @returns {UnsignedTx}
+   * @returns {UnwitnessedTx}
    * Can be used to build and sign directly: `const signedTx = await txBuilder.build().sign()`,
    * or inspect the transaction before signing:
    * ```
@@ -266,7 +267,7 @@ export interface TxBuilder {
    * This is a snapshot of transaction. Further changes done via TxBuilder, will not update this snapshot.
    * @throws {TxBodyValidationError[]} TxBodyValidationError[]
    */
-  build(): UnsignedTx;
+  build(): UnwitnessedTx;
 
   // TODO:
   // - setMint
@@ -284,12 +285,10 @@ export interface TxBuilder {
 export interface TxBuilderDependencies {
   inputSelector?: InputSelector;
   inputResolver: Cardano.InputResolver;
-  bip32Account: Bip32Account;
+  bip32Account?: Bip32Account;
   witnesser: Witnesser;
   txBuilderProviders: TxBuilderProviders;
   logger: Logger;
   outputValidator?: OutputBuilderValidator;
   handleProvider?: HandleProvider;
 }
-
-export type FinalizeTxDependencies = Pick<TxBuilderDependencies, 'bip32Account' | 'witnesser'>;

@@ -1,5 +1,5 @@
+import { BaseWallet, FinalizeTxProps } from '@cardano-sdk/wallet';
 import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
-import { FinalizeTxProps, PersonalWallet } from '@cardano-sdk/wallet';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { KeyRole, util } from '@cardano-sdk/key-management';
 import {
@@ -20,7 +20,7 @@ const env = getEnv(walletVariables);
 const logger = createLogger();
 
 describe('PersonalWallet/mint', () => {
-  let wallet: PersonalWallet;
+  let wallet: BaseWallet;
 
   afterAll(() => {
     wallet.shutdown();
@@ -79,14 +79,20 @@ describe('PersonalWallet/mint', () => {
           }
         }
       ]),
-      witness: { extraSigners: [alicePolicySigner], scripts: [policyScript] }
+      signingOptions: {
+        extraSigners: [alicePolicySigner]
+      },
+      witness: { scripts: [policyScript] }
     };
 
     const unsignedTx = await wallet.initializeTx(txProps);
 
     const finalizeProps: FinalizeTxProps = {
+      signingOptions: {
+        extraSigners: [alicePolicySigner]
+      },
       tx: unsignedTx,
-      witness: { extraSigners: [alicePolicySigner], scripts: [policyScript] }
+      witness: { scripts: [policyScript] }
     };
 
     const signedTx = await wallet.finalizeTx(finalizeProps);

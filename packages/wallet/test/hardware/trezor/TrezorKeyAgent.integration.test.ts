@@ -1,7 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Bip32Account, CommunicationType, KeyAgent, util } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
-import { ObservableWallet, PersonalWallet, restoreKeyAgent } from '../../../src';
+import { ObservableWallet, createPersonalWallet, restoreKeyAgent } from '../../../src';
 import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
 import { createStubStakePoolProvider, mockProviders } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';
@@ -27,7 +27,7 @@ const createWallet = async (keyAgent: KeyAgent) => {
   const rewardsProvider = mockRewardsProvider();
   const asyncKeyAgent = util.createAsyncKeyAgent(keyAgent);
   const chainHistoryProvider = mockChainHistoryProvider();
-  return new PersonalWallet(
+  return createPersonalWallet(
     { name: 'Wallet1' },
     {
       assetProvider,
@@ -46,7 +46,7 @@ const createWallet = async (keyAgent: KeyAgent) => {
 
 const getAddress = async (wallet: ObservableWallet) => (await firstValueFrom(wallet.addresses$))[0].address;
 
-describe('TrezorKeyAgent+PersonalWallet', () => {
+describe('TrezorKeyAgent+BaseWallet', () => {
   test('creating and restoring TrezorKeyAgent wallet', async () => {
     const freshKeyAgent = await TrezorKeyAgent.createWithDevice(
       {

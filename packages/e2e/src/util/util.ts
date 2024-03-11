@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, createSlotEpochCalc } from '@cardano-sdk/core';
+import { BaseWallet, FinalizeTxProps, ObservableWallet } from '@cardano-sdk/wallet';
+import { Cardano, Serialization, createSlotEpochCalc } from '@cardano-sdk/core';
 import {
   EMPTY,
   Observable,
@@ -17,7 +18,6 @@ import {
   timeout
 } from 'rxjs';
 import { FAST_OPERATION_TIMEOUT_DEFAULT, SYNC_TIMEOUT_DEFAULT } from '../defaults';
-import { FinalizeTxProps, ObservableWallet, PersonalWallet } from '@cardano-sdk/wallet';
 import { InMemoryKeyAgent, TransactionSigner } from '@cardano-sdk/key-management';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { TestWallet, networkInfoProviderFactory } from '../factories';
@@ -76,12 +76,15 @@ const sortTxIn = (txInCollection: Cardano.TxIn[] | undefined): Cardano.TxIn[] =>
   sortBy(txInCollection, ['txId', 'index']);
 
 export const normalizeTxBody = (body: Cardano.HydratedTxBody | Cardano.TxBody) => {
+  const dehydratedTx = Serialization.TransactionBody.fromCore(body).toCore();
+
   // TODO: inputs should be a Set since they're unordered.
   // Then Jest should correctly compare it with toEqual.
-  body.inputs = sortTxIn(body.inputs);
-  body.collaterals = sortTxIn(body.collaterals);
-  body.referenceInputs = sortTxIn(body.referenceInputs);
-  return body;
+  dehydratedTx.inputs = sortTxIn(dehydratedTx.inputs);
+  dehydratedTx.collaterals = sortTxIn(dehydratedTx.collaterals);
+  dehydratedTx.referenceInputs = sortTxIn(dehydratedTx.referenceInputs);
+
+  return dehydratedTx;
 };
 
 export const txConfirmed = (
@@ -189,7 +192,7 @@ export const runningAgainstLocalNetwork = async () => {
  * @param tx The **already confirmed** transaction we need to know the confirmation epoch
  * @returns The epoch when the given transaction was confirmed
  */
-export const getTxConfirmationEpoch = async (wallet: PersonalWallet, tx: Cardano.Tx<Cardano.TxBody>) => {
+export const getTxConfirmationEpoch = async (wallet: ObservableWallet, tx: Cardano.Tx<Cardano.TxBody>) => {
   const txs = await firstValueFrom(wallet.transactions.history$.pipe(filter((_) => _.some(({ id }) => id === tx.id))));
   const observedTx = txs.find(({ id }) => id === tx.id);
   const slotEpochCalc = createSlotEpochCalc(await firstValueFrom(wallet.eraSummaries$));
@@ -254,7 +257,7 @@ export const burnTokens = async ({
   scripts,
   policySigners: extraSigners
 }: {
-  wallet: PersonalWallet;
+  wallet: BaseWallet;
   tokens?: Cardano.TokenMap;
   scripts: Cardano.Script[];
   policySigners: TransactionSigner[];
@@ -270,14 +273,20 @@ export const burnTokens = async ({
   const negativeTokens = new Map([...tokens].map(([assetId, value]) => [assetId, -value]));
   const txProps: InitializeTxProps = {
     mint: negativeTokens,
-    witness: { extraSigners, scripts }
+    signingOptions: {
+      extraSigners
+    },
+    witness: { scripts }
   };
 
   const unsignedTx = await wallet.initializeTx(txProps);
 
   const finalizeProps: FinalizeTxProps = {
+    signingOptions: {
+      extraSigners
+    },
     tx: unsignedTx,
-    witness: { extraSigners, scripts }
+    witness: { scripts }
   };
 
   const signedTx = await wallet.finalizeTx(finalizeProps);

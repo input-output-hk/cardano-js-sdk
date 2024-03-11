@@ -44,22 +44,22 @@ describe('PublicStakeKeysTracker', () => {
     rewardAccounts = [
       {
         address: addresses[0].rewardAccount!,
-        keyStatus: Cardano.StakeKeyStatus.Registering,
+        credentialStatus: Cardano.StakeCredentialStatus.Registering,
         rewardBalance: 1_000_000n
       },
       {
         address: addresses[1].rewardAccount!,
-        keyStatus: Cardano.StakeKeyStatus.Registered,
+        credentialStatus: Cardano.StakeCredentialStatus.Registered,
         rewardBalance: 1_000_000n
       },
       {
         address: addresses[2].rewardAccount!,
-        keyStatus: Cardano.StakeKeyStatus.Unregistering,
+        credentialStatus: Cardano.StakeCredentialStatus.Unregistering,
         rewardBalance: 1_000_000n
       },
       {
         address: addresses[3].rewardAccount!,
-        keyStatus: Cardano.StakeKeyStatus.Unregistered,
+        credentialStatus: Cardano.StakeCredentialStatus.Unregistered,
         rewardBalance: 1_000_000n
       }
     ];
@@ -102,10 +102,10 @@ describe('PublicStakeKeysTracker', () => {
 
     await assertEmits(stakePubKeys$, [
       [
-        { keyStatus: rewardAccounts[0].keyStatus, publicStakeKey: 'abc-0' },
-        { keyStatus: rewardAccounts[1].keyStatus, publicStakeKey: 'abc-1' },
-        { keyStatus: rewardAccounts[2].keyStatus, publicStakeKey: 'abc-2' },
-        { keyStatus: rewardAccounts[3].keyStatus, publicStakeKey: 'abc-3' }
+        { credentialStatus: rewardAccounts[0].credentialStatus, publicStakeKey: 'abc-0' },
+        { credentialStatus: rewardAccounts[1].credentialStatus, publicStakeKey: 'abc-1' },
+        { credentialStatus: rewardAccounts[2].credentialStatus, publicStakeKey: 'abc-2' },
+        { credentialStatus: rewardAccounts[3].credentialStatus, publicStakeKey: 'abc-3' }
       ] as PubStakeKeyAndStatus[]
     ]);
     expect(derivePublicKey).toHaveBeenCalledTimes(4);
@@ -128,9 +128,9 @@ describe('PublicStakeKeysTracker', () => {
 
     await assertEmits(stakePubKeys$, [
       [
-        { keyStatus: rewardAccounts[1].keyStatus, publicStakeKey: 'abc-1' },
-        { keyStatus: rewardAccounts[2].keyStatus, publicStakeKey: 'abc-2' },
-        { keyStatus: rewardAccounts[3].keyStatus, publicStakeKey: 'abc-3' }
+        { credentialStatus: rewardAccounts[1].credentialStatus, publicStakeKey: 'abc-1' },
+        { credentialStatus: rewardAccounts[2].credentialStatus, publicStakeKey: 'abc-2' },
+        { credentialStatus: rewardAccounts[3].credentialStatus, publicStakeKey: 'abc-3' }
       ] as PubStakeKeyAndStatus[]
     ]);
   });
@@ -146,12 +146,12 @@ describe('PublicStakeKeysTracker', () => {
     });
 
     await assertEmits(stakePubKeys$, [
-      [{ keyStatus: rewardAccounts[0].keyStatus, publicStakeKey: 'abc-0' }],
+      [{ credentialStatus: rewardAccounts[0].credentialStatus, publicStakeKey: 'abc-0' }],
       [
-        { keyStatus: rewardAccounts[0].keyStatus, publicStakeKey: 'abc-0' },
-        { keyStatus: rewardAccounts[1].keyStatus, publicStakeKey: 'abc-1' },
-        { keyStatus: rewardAccounts[2].keyStatus, publicStakeKey: 'abc-2' },
-        { keyStatus: rewardAccounts[3].keyStatus, publicStakeKey: 'abc-3' }
+        { credentialStatus: rewardAccounts[0].credentialStatus, publicStakeKey: 'abc-0' },
+        { credentialStatus: rewardAccounts[1].credentialStatus, publicStakeKey: 'abc-1' },
+        { credentialStatus: rewardAccounts[2].credentialStatus, publicStakeKey: 'abc-2' },
+        { credentialStatus: rewardAccounts[3].credentialStatus, publicStakeKey: 'abc-3' }
       ]
     ] as PubStakeKeyAndStatus[][]);
   });
@@ -167,12 +167,12 @@ describe('PublicStakeKeysTracker', () => {
     });
 
     await assertEmits(stakePubKeys$, [
-      [{ keyStatus: rewardAccounts[0].keyStatus, publicStakeKey: 'abc-0' }],
+      [{ credentialStatus: rewardAccounts[0].credentialStatus, publicStakeKey: 'abc-0' }],
       [
-        { keyStatus: rewardAccounts[0].keyStatus, publicStakeKey: 'abc-0' },
-        { keyStatus: rewardAccounts[1].keyStatus, publicStakeKey: 'abc-1' },
-        { keyStatus: rewardAccounts[2].keyStatus, publicStakeKey: 'abc-2' },
-        { keyStatus: rewardAccounts[3].keyStatus, publicStakeKey: 'abc-3' }
+        { credentialStatus: rewardAccounts[0].credentialStatus, publicStakeKey: 'abc-0' },
+        { credentialStatus: rewardAccounts[1].credentialStatus, publicStakeKey: 'abc-1' },
+        { credentialStatus: rewardAccounts[2].credentialStatus, publicStakeKey: 'abc-2' },
+        { credentialStatus: rewardAccounts[3].credentialStatus, publicStakeKey: 'abc-3' }
       ]
     ] as PubStakeKeyAndStatus[][]);
   });
@@ -190,12 +190,12 @@ describe('PublicStakeKeysTracker', () => {
     });
 
     await assertEmits(stakePubKeys$, [
-      [{ keyStatus: rewardAccounts[0].keyStatus, publicStakeKey: 'abc-0' }],
+      [{ credentialStatus: rewardAccounts[0].credentialStatus, publicStakeKey: 'abc-0' }],
       [
-        { keyStatus: rewardAccounts[0].keyStatus, publicStakeKey: 'abc-0' },
-        { keyStatus: rewardAccounts[1].keyStatus, publicStakeKey: 'abc-1' },
-        { keyStatus: rewardAccounts[2].keyStatus, publicStakeKey: 'abc-2' },
-        { keyStatus: rewardAccounts[3].keyStatus, publicStakeKey: 'abc-3' }
+        { credentialStatus: rewardAccounts[0].credentialStatus, publicStakeKey: 'abc-0' },
+        { credentialStatus: rewardAccounts[1].credentialStatus, publicStakeKey: 'abc-1' },
+        { credentialStatus: rewardAccounts[2].credentialStatus, publicStakeKey: 'abc-2' },
+        { credentialStatus: rewardAccounts[3].credentialStatus, publicStakeKey: 'abc-3' }
       ]
     ] as PubStakeKeyAndStatus[][]);
   });

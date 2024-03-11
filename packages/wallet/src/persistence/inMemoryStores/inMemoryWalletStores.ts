@@ -1,12 +1,11 @@
 import { Assets } from '../../types';
 import { Cardano, EraSummary, Reward } from '@cardano-sdk/core';
 import { EMPTY, combineLatest, map } from 'rxjs';
-import { GroupedAddress } from '@cardano-sdk/key-management';
+import { GroupedAddress, WitnessedTx } from '@cardano-sdk/key-management';
 import { InMemoryCollectionStore } from './InMemoryCollectionStore';
 import { InMemoryDocumentStore } from './InMemoryDocumentStore';
 import { InMemoryKeyValueStore } from './InMemoryKeyValueStore';
 import { OutgoingOnChainTx, TxInFlight } from '../../services';
-import { SignedTx } from '@cardano-sdk/tx-construction';
 import { WalletStores } from '../types';
 
 export class InMemoryTipStore extends InMemoryDocumentStore<Cardano.Tip> {}
@@ -19,7 +18,7 @@ export class InMemoryAssetsStore extends InMemoryDocumentStore<Assets> {}
 export class InMemoryAddressesStore extends InMemoryDocumentStore<GroupedAddress[]> {}
 export class InMemoryInFlightTransactionsStore extends InMemoryDocumentStore<TxInFlight[]> {}
 export class InMemoryVolatileTransactionsStore extends InMemoryDocumentStore<OutgoingOnChainTx[]> {}
-export class InMemorySignedTransactionsStore extends InMemoryDocumentStore<SignedTx[]> {}
+export class InMemorySignedTransactionsStore extends InMemoryDocumentStore<WitnessedTx[]> {}
 
 export class InMemoryTransactionsStore extends InMemoryCollectionStore<Cardano.HydratedTx> {}
 export class InMemoryUtxoStore extends InMemoryCollectionStore<Cardano.Utxo> {}

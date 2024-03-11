@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
+import { BaseWallet, FinalizeTxProps } from '@cardano-sdk/wallet';
 import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
-import { FinalizeTxProps, PersonalWallet } from '@cardano-sdk/wallet';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { KeyRole, util } from '@cardano-sdk/key-management';
 import {
@@ -20,7 +20,7 @@ const env = getEnv(walletVariables);
 const logger = createLogger();
 
 describe('PersonalWallet/multisignature', () => {
-  let wallet: PersonalWallet;
+  let wallet: BaseWallet;
   const assetName = '3030303030';
 
   afterAll(() => {
@@ -100,14 +100,20 @@ describe('PersonalWallet/multisignature', () => {
           }
         }
       ]),
-      witness: { extraSigners: [alicePolicySigner, bobPolicySigner], scripts: [policyScript] }
+      signingOptions: {
+        extraSigners: [alicePolicySigner, bobPolicySigner]
+      },
+      witness: { scripts: [policyScript] }
     };
 
     const unsignedTx = await wallet.initializeTx(txProps);
 
     const finalizeProps: FinalizeTxProps = {
+      signingOptions: {
+        extraSigners: [alicePolicySigner, bobPolicySigner]
+      },
       tx: unsignedTx,
-      witness: { extraSigners: [alicePolicySigner, bobPolicySigner], scripts: [policyScript] }
+      witness: { scripts: [policyScript] }
     };
 
     const signedTx = await wallet.finalizeTx(finalizeProps);

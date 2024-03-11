@@ -68,7 +68,7 @@ export class WalletRepository<WalletMetadata extends {}, AccountMetadata extends
     this.#logger.debug('addWallet', props.type);
     const walletId =
       props.type === WalletType.Script
-        ? await getWalletId(props.script)
+        ? await getWalletId(props.paymentScript)
         : await (() => {
             const pubKey = props.accounts[0]?.extendedAccountPublicKey;
             if (!pubKey) {
