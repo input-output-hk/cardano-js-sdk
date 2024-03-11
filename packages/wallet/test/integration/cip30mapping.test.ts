@@ -16,6 +16,7 @@ import {
 } from '@cardano-sdk/dapp-connector';
 import { AddressType, Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
+import { BaseWallet, cip30, createPersonalWallet } from '../../src';
 import { CallbackConfirmation, GetCollateralCallbackParams } from '../../src/cip30';
 import {
   Cardano,
@@ -29,7 +30,6 @@ import {
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
-import { PersonalWallet, cip30 } from '../../src';
 import { Providers, createWallet } from './util';
 import { buildDRepIDFromDRepKey, signTx, waitForWalletStateSettle } from '../util';
 import { firstValueFrom, of } from 'rxjs';
@@ -85,7 +85,7 @@ const createWalletAndApiWithStores = async (
 
 describe('cip30', () => {
   const context: SenderContext = { sender: { url: 'https://lace.io' } };
-  let wallet: PersonalWallet;
+  let wallet: BaseWallet;
   let api: WithSenderContext<WalletApi>;
   let confirmationCallback: CallbackConfirmation;
 
@@ -267,27 +267,27 @@ describe('cip30', () => {
 
       describe('api.getCollateral', () => {
         // Wallet 2
-        let wallet2: PersonalWallet;
+        let wallet2: BaseWallet;
         let api2: WithSenderContext<WalletApi>;
 
         // Wallet 3
-        let wallet3: PersonalWallet;
+        let wallet3: BaseWallet;
         let api3: WithSenderContext<WalletApi>;
 
         // Wallet 4
-        let wallet4: PersonalWallet;
+        let wallet4: BaseWallet;
         let api4: WithSenderContext<WalletApi>;
 
         // Wallet 5
-        let wallet5: PersonalWallet;
+        let wallet5: BaseWallet;
         let api5: WithSenderContext<WalletApi>;
 
         // Wallet 6
-        let wallet6: PersonalWallet;
+        let wallet6: BaseWallet;
         let api6: WithSenderContext<WalletApi>;
 
         // Wallet 7
-        let wallet7: PersonalWallet;
+        let wallet7: BaseWallet;
         let api7: WithSenderContext<WalletApi>;
 
         beforeAll(async () => {
@@ -507,8 +507,10 @@ describe('cip30', () => {
           await api.signTx(context, hexTx);
           expect(finalizeTxSpy).toBeCalledWith(
             expect.objectContaining({
-              sender: {
-                url: context.sender.url
+              signingContext: {
+                sender: {
+                  url: context.sender.url
+                }
               }
             })
           );
@@ -719,7 +721,7 @@ describe('cip30', () => {
       const address = mocks.utxo[0][0].address!;
       let txSubmitProvider: mocks.TxSubmitProviderStub;
       let networkInfoProvider: mocks.NetworkInfoProviderStub;
-      let mockWallet: PersonalWallet;
+      let mockWallet: BaseWallet;
       let utxoProvider: mocks.UtxoProviderStub;
       let tx: Cardano.Tx;
       let mockApi: WithSenderContext<WalletApi>;
@@ -744,7 +746,7 @@ describe('cip30', () => {
         const asyncKeyAgent = await testAsyncKeyAgent();
         const bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
         bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
-        mockWallet = new PersonalWallet(
+        mockWallet = createPersonalWallet(
           { name: 'Test Wallet' },
           {
             assetProvider,

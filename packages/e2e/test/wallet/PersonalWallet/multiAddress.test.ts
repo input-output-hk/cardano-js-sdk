@@ -1,5 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { AddressType, GroupedAddress, util } from '@cardano-sdk/key-management';
+import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano } from '@cardano-sdk/core';
 import {
   KeyAgentFactoryProps,
@@ -10,7 +11,6 @@ import {
   normalizeTxBody,
   walletReady
 } from '../../../src';
-import { PersonalWallet } from '@cardano-sdk/wallet';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, map, take } from 'rxjs';
 import { getEnv, walletVariables } from '../../../src/environment';
@@ -23,7 +23,7 @@ const PAYMENT_ADDRESSES_TO_GENERATE = PAYMENT_INDICES_TO_GENERATE * 2; // Extern
 const COINS_PER_ADDRESS = 3_000_000n;
 
 describe('PersonalWallet/multiAddress', () => {
-  let wallet: PersonalWallet;
+  let wallet: BaseWallet;
 
   beforeAll(async () => {
     wallet = (await getWallet({ env, idx: 0, logger, name: 'Wallet', polling: { interval: 50 } })).wallet;

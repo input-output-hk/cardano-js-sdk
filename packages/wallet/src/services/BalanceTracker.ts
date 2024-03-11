@@ -17,9 +17,12 @@ const computeDepositCoin = (
     distinctUntilChanged()
   );
 
-const numRewardAccountsWithKeyStatus = (delegationTracker: DelegationTracker, keyStatuses: Cardano.StakeKeyStatus[]) =>
+const numRewardAccountsWithKeyStatus = (
+  delegationTracker: DelegationTracker,
+  keyStatuses: Cardano.StakeCredentialStatus[]
+) =>
   delegationTracker.rewardAccounts$.pipe(
-    map((accounts) => accounts.filter((account) => keyStatuses.includes(account.keyStatus)).length)
+    map((accounts) => accounts.filter((account) => keyStatuses.includes(account.credentialStatus)).length)
   );
 
 export const createBalanceTracker = (
@@ -32,8 +35,8 @@ export const createBalanceTracker = (
     deposit$: computeDepositCoin(
       protocolParameters$,
       numRewardAccountsWithKeyStatus(delegationTracker, [
-        Cardano.StakeKeyStatus.Registered,
-        Cardano.StakeKeyStatus.Registering
+        Cardano.StakeCredentialStatus.Registered,
+        Cardano.StakeCredentialStatus.Registering
       ])
     ),
     rewards$: delegationTracker.rewardAccounts$.pipe(

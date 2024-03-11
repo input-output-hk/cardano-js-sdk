@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Asset, Cardano, metadatum, nativeScriptPolicyId } from '@cardano-sdk/core';
-import { Assets, FinalizeTxProps, PersonalWallet } from '@cardano-sdk/wallet';
+import { Assets, BaseWallet, FinalizeTxProps } from '@cardano-sdk/wallet';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
 import {
@@ -21,7 +21,7 @@ const env = getEnv(walletVariables);
 const logger = createLogger();
 
 // Returns [assets in wallet balance, assetInfos with nftMetadata for the assets in the balance]
-const walletBalanceAssetsAndNfts = (wallet: PersonalWallet) =>
+const walletBalanceAssetsAndNfts = (wallet: BaseWallet) =>
   combineLatest([wallet.balance.utxo.total$, wallet.assetInfo$]).pipe(
     filter(([balance]) => !!balance.assets),
     map(([balance, assetInfos]): [Cardano.TokenMap, Assets] => [balance.assets!, assetInfos]),
@@ -41,7 +41,7 @@ describe('PersonalWallet.assets/nft', () => {
   const TOKEN_METADATA_2_INDEX = 1;
   const TOKEN_BURN_INDEX = 2;
 
-  let wallet: PersonalWallet;
+  let wallet: BaseWallet;
   let policySigner: TransactionSigner;
   let policyId: Cardano.PolicyId;
   let policyScript: Cardano.NativeScript;
@@ -160,15 +160,21 @@ describe('PersonalWallet.assets/nft', () => {
           }
         }
       ]),
-      witness: { extraSigners: [policySigner], scripts: [policyScript] }
+      signingOptions: {
+        extraSigners: [policySigner]
+      },
+      witness: { scripts: [policyScript] }
     };
 
     const unsignedTx = await wallet.initializeTx(txProps);
 
     const finalizeProps: FinalizeTxProps = {
       auxiliaryData,
+      signingOptions: {
+        extraSigners: [policySigner]
+      },
       tx: unsignedTx,
-      witness: { extraSigners: [policySigner], scripts: [policyScript] }
+      witness: { scripts: [policyScript] }
     };
 
     const signedTx = await wallet.finalizeTx(finalizeProps);
@@ -270,14 +276,20 @@ describe('PersonalWallet.assets/nft', () => {
           }
         }
       ]),
-      witness: { extraSigners: [policySigner], scripts: [policyScript] }
+      signingOptions: {
+        extraSigners: [policySigner]
+      },
+      witness: { scripts: [policyScript] }
     };
 
     const unsignedTx = await wallet.initializeTx(txProps);
 
     const finalizeProps: FinalizeTxProps = {
+      signingOptions: {
+        extraSigners: [policySigner]
+      },
       tx: unsignedTx,
-      witness: { extraSigners: [policySigner], scripts: [policyScript] }
+      witness: { scripts: [policyScript] }
     };
 
     const signedTx = await wallet.finalizeTx(finalizeProps);
@@ -334,15 +346,21 @@ describe('PersonalWallet.assets/nft', () => {
               }
             }
           ]),
-          witness: { extraSigners: [policySigner], scripts: [policyScript] }
+          signingOptions: {
+            extraSigners: [policySigner]
+          },
+          witness: { scripts: [policyScript] }
         };
 
         const unsignedTx = await wallet.initializeTx(txProps);
 
         const finalizeProps: FinalizeTxProps = {
           auxiliaryData,
+          signingOptions: {
+            extraSigners: [policySigner]
+          },
           tx: unsignedTx,
-          witness: { extraSigners: [policySigner], scripts: [policyScript] }
+          witness: { scripts: [policyScript] }
         };
 
         const signedTx = await wallet.finalizeTx(finalizeProps);

@@ -2,12 +2,13 @@
 /* eslint-disable max-statements */
 import {
   AddressDiscovery,
+  BaseWallet,
   ConnectionStatus,
   ConnectionStatusTracker,
   ObservableWallet,
-  PersonalWallet,
   PollingConfig,
-  SingleAddressDiscovery
+  SingleAddressDiscovery,
+  createPersonalWallet
 } from '../../src';
 import { AddressType, AsyncKeyAgent, Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
 import {
@@ -118,7 +119,7 @@ const createWallet = async (props: CreateWalletProps) => {
   const bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
   bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
 
-  return new PersonalWallet(
+  return createPersonalWallet(
     { name, polling: props.pollingConfig },
     {
       addressDiscovery: props?.addressDiscovery,
@@ -140,12 +141,11 @@ const createWallet = async (props: CreateWalletProps) => {
 };
 
 const assertWalletProperties = async (
-  wallet: PersonalWallet,
+  wallet: BaseWallet,
   expectedDelegateeId: Cardano.PoolId | undefined,
   expectedRewardsHistory = flatten([...mocks.rewardsHistory.values()]),
   expectHandles?: boolean
 ) => {
-  expect(wallet.bip32Account).toBeTruthy();
   expect(wallet.witnesser).toBeTruthy();
   // name
   expect(wallet.name).toBe(name);
@@ -293,7 +293,7 @@ const getAssetsFromUtxos = (utxos: Cardano.Utxo[]) => {
   return { totalLovelace, totalTokens };
 };
 
-describe('PersonalWallet load', () => {
+describe('BaseWallet load', () => {
   it('loads all properties from provider, stores them and restores on subsequent load, fetches new data', async () => {
     const stores = createInMemoryWalletStores();
     const wallet1 = await createWallet({
@@ -436,7 +436,7 @@ describe('PersonalWallet load', () => {
   });
 });
 
-describe('PersonalWallet creates big UTXO', () => {
+describe('BaseWallet creates big UTXO', () => {
   it('creates an UTXO with 300 hundred mixed assets coming from several inputs', async () => {
     const stores = createInMemoryWalletStores();
     const utxoSet = generateUtxos(30, 10);
@@ -473,14 +473,14 @@ describe('PersonalWallet creates big UTXO', () => {
     const signedTx = await wallet.finalizeTx(finalizeProps);
 
     const nonChangeOutput = signedTx.body.outputs.find((out) => out.value!.assets!.size > 0);
-    expect(nonChangeOutput!.value.assets).toBe(totalAssets.totalTokens);
+    expect(nonChangeOutput!.value.assets).toEqual(totalAssets.totalTokens);
 
     wallet.shutdown();
   });
 });
 
-describe('PersonalWallet.AddressDiscovery', () => {
-  it('PersonalWallet address discovery recovers from errors', async () => {
+describe('BaseWallet.AddressDiscovery', () => {
+  it('BaseWallet address discovery recovers from errors', async () => {
     const stores = createInMemoryWalletStores();
     const testValue = {
       accountIndex: 0,
@@ -511,7 +511,7 @@ describe('PersonalWallet.AddressDiscovery', () => {
   });
 });
 
-describe('PersonalWallet.fatalError$', () => {
+describe('BaseWallet.fatalError$', () => {
   it('emits non retryable errors', async () => {
     const stores = createInMemoryWalletStores();
     const tipHandler = jest.fn();
@@ -542,7 +542,7 @@ describe('PersonalWallet.fatalError$', () => {
     expect(tipHandler).not.toBeCalled();
   });
 
-  it('Observables work even if PersonalWallet.fatalError$ is not observed', async () => {
+  it('Observables work even if BaseWallet.fatalError$ is not observed', async () => {
     const stores = createInMemoryWalletStores();
     const testValue = { test: 'value' };
     const utxoSet = generateUtxos(30, 10);

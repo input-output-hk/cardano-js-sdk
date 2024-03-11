@@ -17,8 +17,7 @@ describe('KeyManagement.util.stubSignTransaction', () => {
     expect(
       (
         await util.stubSignTransaction({
-          context: { knownAddresses, txInKeyPathMap },
-          dRepPublicKey,
+          context: { dRepPublicKey, knownAddresses, txInKeyPathMap },
           txBody
         })
       ).size
@@ -26,8 +25,7 @@ describe('KeyManagement.util.stubSignTransaction', () => {
     expect(
       (
         await util.stubSignTransaction({
-          context: { knownAddresses, txInKeyPathMap },
-          dRepPublicKey,
+          context: { dRepPublicKey, knownAddresses, txInKeyPathMap },
           txBody
         })
       ).size

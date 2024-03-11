@@ -1,14 +1,7 @@
-import {
-  AccountKeyDerivationPath,
-  SignDataContext,
-  SignTransactionContext,
-  WitnessOptions,
-  Witnesser
-} from '@cardano-sdk/key-management';
 import { AnyBip32Wallet, AnyWallet, WalletId, WalletType } from './types';
 import { BehaviorSubject, ReplaySubject, firstValueFrom, lastValueFrom } from 'rxjs';
-import { Cardano, Serialization } from '@cardano-sdk/core';
-import { HexBlob, InvalidArgumentError, deepEquals } from '@cardano-sdk/util';
+import { Cardano } from '@cardano-sdk/core';
+import { InvalidArgumentError, deepEquals } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { MessengerDependencies } from '../messaging';
 import { ObservableWallet, storage } from '@cardano-sdk/wallet';
@@ -22,6 +15,8 @@ import {
   WalletManagerProps
 } from './walletManager.types';
 import { WalletRepository } from './WalletRepository';
+import { Witnesser } from '@cardano-sdk/key-management';
+import { buildBip32Witnesser, buildNativeScriptWitnesser } from './util';
 
 /**
  * Checks if the wallet is a bip32 wallet.
@@ -295,40 +290,17 @@ export class WalletManager<WalletMetadata extends { name: string }, AccountMetad
       case WalletType.InMemory:
       case WalletType.Ledger:
       case WalletType.Trezor:
-        witnesser = {
-          signBlob: async (derivationPath: AccountKeyDerivationPath, blob: HexBlob, context: SignDataContext) =>
-            await this.#signingCoordinatorApi.signData(
-              {
-                blob,
-                derivationPath,
-                signContext: context
-              },
-              {
-                accountIndex: accountIndex!,
-                chainId,
-                wallet
-              }
-            ),
-          witness: async (tx: Serialization.Transaction, context: SignTransactionContext, options?: WitnessOptions) => {
-            const signatures = await this.#signingCoordinatorApi.signTransaction(
-              {
-                options,
-                signContext: context,
-                tx: tx.toCbor()
-              },
-              {
-                accountIndex: accountIndex!,
-                chainId,
-                wallet
-              }
-            );
-            return { signatures };
-          }
-        };
+        witnesser = buildBip32Witnesser(wallet, _walletId, chainId, this.#signingCoordinatorApi, accountIndex);
         break;
       case WalletType.Script:
       default:
-        throw new InvalidArgumentError('walletType', `Wallet type '${wallet.type}' is not supported`);
+        witnesser = buildNativeScriptWitnesser(
+          wallet,
+          _walletId,
+          chainId,
+          this.#signingCoordinatorApi,
+          this.#walletRepository
+        );
     }
 
     return witnesser;

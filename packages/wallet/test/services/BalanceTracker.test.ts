@@ -17,9 +17,9 @@ describe('createBalanceTracker', () => {
       const utxoUnspendable = hot(     '-a-----', { a: utxo2 }) as unknown as BehaviorObservable<Cardano.Utxo[]>;
       const rewardAccounts$ = hot(     'a--b-cd', {
         a: [],
-        b: [{ keyStatus: Cardano.StakeKeyStatus.Registering, rewardBalance: 0n }],
-        c: [{ keyStatus: Cardano.StakeKeyStatus.Registered, rewardBalance: 5n }],
-        d: [{ keyStatus: Cardano.StakeKeyStatus.Unregistering, rewardBalance: 5n }]
+        b: [{ credentialStatus: Cardano.StakeCredentialStatus.Registering, rewardBalance: 0n }],
+        c: [{ credentialStatus: Cardano.StakeCredentialStatus.Registered, rewardBalance: 5n }],
+        d: [{ credentialStatus: Cardano.StakeCredentialStatus.Unregistering, rewardBalance: 5n }]
       }) as unknown as BehaviorObservable<Cardano.RewardAccountInfo[]>;
       const balanceTracker = createBalanceTracker(
         protocolParameters$,

@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, Serialization } from '@cardano-sdk/core';
+import { Cardano, HandleResolution, Serialization, TxCBOR } from '@cardano-sdk/core';
 import { HexBlob, OpaqueString, Shutdown } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import type { Runtime } from 'webextension-polyfill';
@@ -137,13 +137,37 @@ export type TxInKeyPathMap = Partial<Record<TxInId, AccountKeyDerivationPath>>;
 export type RewardAccountKeyPathMap = Partial<Record<Cardano.RewardAccount, AccountKeyDerivationPath>>;
 export type KeyHashKeyPathMap = Partial<Record<Crypto.Ed25519KeyHashHex, AccountKeyDerivationPath>>;
 
+/** The result of the transaction signer signing operation. */
+export type TransactionSignerResult = {
+  /** The public key matching the private key that generate the signature. */
+  pubKey: Crypto.Ed25519PublicKeyHex;
+
+  /** The transaction signature. */
+  signature: Crypto.Ed25519SignatureHex;
+};
+
+/** Produces a Ed25519Signature of a transaction. */
+export interface TransactionSigner {
+  /**
+   * Sings a transaction.
+   *
+   * @param tx The transaction to be signed.
+   * @returns A Ed25519 transaction signature.
+   */
+  sign(tx: Cardano.TxBodyWithHash): Promise<TransactionSignerResult>;
+}
+
 export interface SignTransactionOptions {
   additionalKeyPaths?: AccountKeyDerivationPath[];
+  extraSigners?: TransactionSigner[];
+  stubSign?: boolean;
 }
 
 export interface SignTransactionContext {
   txInKeyPathMap: TxInKeyPathMap;
   knownAddresses: GroupedAddress[];
+  handleResolutions?: HandleResolution[];
+  dRepPublicKey?: Crypto.Ed25519PublicKeyHex;
   sender?: MessageSender;
 }
 
@@ -202,27 +226,15 @@ export type AsyncKeyAgent = Pick<KeyAgent, 'deriveAddress' | 'derivePublicKey' |
   getAccountIndex(): Promise<number>;
 } & Shutdown;
 
-/** The result of the transaction signer signing operation. */
-export type TransactionSignerResult = {
-  /** The public key matching the private key that generate the signature. */
-  pubKey: Crypto.Ed25519PublicKeyHex;
-
-  /** The transaction signature. */
-  signature: Crypto.Ed25519SignatureHex;
-};
-
-/** Produces a Ed25519Signature of a transaction. */
-export interface TransactionSigner {
-  /**
-   * Sings a transaction.
-   *
-   * @param tx The transaction to be signed.
-   * @returns A Ed25519 transaction signature.
-   */
-  sign(tx: Cardano.TxBodyWithHash): Promise<TransactionSignerResult>;
-}
-
 export type WitnessOptions = SignTransactionOptions;
+
+export interface WitnessedTx {
+  cbor: TxCBOR;
+  tx: Cardano.Tx;
+  context: {
+    handleResolutions: HandleResolution[];
+  };
+}
 
 /** Interface for an entity capable of generating witness data for a transaction. */
 export interface Witnesser {
@@ -232,13 +244,13 @@ export interface Witnesser {
    * @param transaction The transaction along with its hash for which the witness data is to be generated.
    * @param context The witness sign transaction context
    * @param options Optional additional parameters that may influence how the witness data is generated.
-   * @returns A promise that resolves to the generated witness data for the transaction.
+   * @returns A promise that resolves to the transaction with the generated witness data.
    */
   witness(
     transaction: Serialization.Transaction,
     context: SignTransactionContext,
     options?: WitnessOptions
-  ): Promise<Cardano.Witness>;
+  ): Promise<WitnessedTx>;
 
   /**
    * @throws AuthenticationError

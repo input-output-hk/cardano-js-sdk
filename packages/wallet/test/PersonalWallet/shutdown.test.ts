@@ -8,6 +8,14 @@ import {
   somePartialStakePools
 } from '@cardano-sdk/util-dev';
 import {
+  BaseWallet,
+  ConnectionStatusTracker,
+  PollingConfig,
+  TxSubmitProviderStats,
+  WalletNetworkInfoProviderStats,
+  createPersonalWallet
+} from '../../src';
+import {
   Cardano,
   ChainHistoryProvider,
   NetworkInfoProvider,
@@ -15,13 +23,6 @@ import {
   UtxoProvider,
   coalesceValueQuantities
 } from '@cardano-sdk/core';
-import {
-  ConnectionStatusTracker,
-  PersonalWallet,
-  PollingConfig,
-  TxSubmitProviderStats,
-  WalletNetworkInfoProviderStats
-} from '../../src';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import { firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
@@ -59,7 +60,7 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
   const assetProvider = mocks.mockAssetProvider();
   const stakePoolProvider = createStubStakePoolProvider();
 
-  return new PersonalWallet(
+  return createPersonalWallet(
     { name, polling: pollingConfig },
     {
       assetProvider,
@@ -79,11 +80,10 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
 };
 
 const assertWalletProperties = async (
-  wallet: PersonalWallet,
+  wallet: BaseWallet,
   expectedDelegateeId: Cardano.PoolId | undefined,
   expectedRewardsHistory = flatten([...mocks.rewardsHistory.values()])
 ) => {
-  expect(wallet.bip32Account).toBeTruthy();
   expect(wallet.witnesser).toBeTruthy();
   // name
   expect(wallet.name).toBe(name);
@@ -134,7 +134,7 @@ const assertWalletProperties = async (
   expect(typeof wallet.util).toBe('object');
 };
 
-describe('PersonalWallet shutdown', () => {
+describe('BaseWallet shutdown', () => {
   // These two properties are not reachable via the public interface of the wallet.
   let txSubmitProviderStats: any;
   let walletNetworkInfoProviderStats: any;

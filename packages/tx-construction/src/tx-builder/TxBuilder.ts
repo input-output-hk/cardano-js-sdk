@@ -2,12 +2,14 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import {
   AddressType,
+  Bip32Account,
   GroupedAddress,
   SignTransactionOptions,
   TransactionSigner,
+  WitnessedTx,
   util
 } from '@cardano-sdk/key-management';
-import { Cardano, HandleProvider, HandleResolution, metadatum } from '@cardano-sdk/core';
+import { Cardano, HandleProvider, HandleResolution, Serialization, metadatum } from '@cardano-sdk/core';
 import {
   CustomizeCb,
   InsufficientRewardAccounts,
@@ -15,13 +17,12 @@ import {
   OutputBuilderTxOut,
   PartialTx,
   PartialTxOut,
-  SignedTx,
   TxBuilder,
   TxBuilderDependencies,
   TxContext,
   TxInspection,
   TxOutValidationError,
-  UnsignedTx
+  UnwitnessedTx
 } from './types';
 import { GreedyInputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
@@ -30,7 +31,6 @@ import { RewardAccountWithPoolId } from '../types';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { contextLogger, deepEquals } from '@cardano-sdk/util';
 import { createOutputValidator } from '../output-validation';
-import { finalizeTx } from './finalizeTx';
 import { initializeTx } from './initializeTx';
 import { lastValueFrom } from 'rxjs';
 import minBy from 'lodash/minBy';
@@ -44,7 +44,7 @@ type BuiltTx = {
 };
 
 interface Signer {
-  sign(builtTx: BuiltTx): Promise<SignedTx>;
+  sign(builtTx: BuiltTx): Promise<WitnessedTx>;
 }
 
 interface Builder {
@@ -59,7 +59,7 @@ interface LazySignerProps {
 type TxBuilderStakePool = Omit<Cardano.Cip17Pool, 'id'> & { id: Cardano.PoolId };
 type RewardAccountsAndWeights = Map<Cardano.RewardAccount, number>;
 
-class LazyTxSigner implements UnsignedTx {
+class LazyTxSigner implements UnwitnessedTx {
   #built?: BuiltTx;
   #signer: Signer;
   #builder: Builder;
@@ -77,16 +77,15 @@ class LazyTxSigner implements UnsignedTx {
     const {
       tx,
       ctx: {
-        signingContext: { knownAddresses },
-        auxiliaryData,
-        handleResolutions
+        signingContext: { knownAddresses, handleResolutions },
+        auxiliaryData
       },
       inputSelection
     } = await this.#build();
     return { ...tx, auxiliaryData, handleResolutions, inputSelection, ownAddresses: knownAddresses };
   }
 
-  async sign(): Promise<SignedTx> {
+  async sign(): Promise<WitnessedTx> {
     return this.#signer.sign(await this.#build());
   }
 }
@@ -103,6 +102,8 @@ export class GenericTxBuilder implements TxBuilder {
   #logger: Logger;
   #handleProvider?: HandleProvider;
   #handleResolutions: HandleResolution[];
+  #delegateFirstStakeCredConfig: Cardano.PoolId | null | undefined = undefined;
+
   #customizeCb: CustomizeCb;
 
   constructor(dependencies: TxBuilderDependencies) {
@@ -153,7 +154,14 @@ export class GenericTxBuilder implements TxBuilder {
     });
   }
 
+  delegateFirstStakeCredential(poolId: Cardano.PoolId | null): TxBuilder {
+    this.#delegateFirstStakeCredConfig = poolId;
+    return this;
+  }
+
   delegatePortfolio(portfolio: Cardano.Cip17DelegationPortfolio | null): TxBuilder {
+    if (!this.#dependencies.bip32Account) throw new Error('BIP32 account is required to delegate portfolio.');
+
     if (portfolio?.pools.length === 0) {
       throw new Error('Portfolio should define at least one delegation pool.');
     }
@@ -201,38 +209,44 @@ export class GenericTxBuilder implements TxBuilder {
     return this;
   }
 
-  build(): UnsignedTx {
+  build(): UnwitnessedTx {
     return new LazyTxSigner({
       builder: {
+        // eslint-disable-next-line sonarjs/cognitive-complexity
         build: async () => {
           this.#logger.debug('Building');
           try {
-            const rewardAccountsWithWeights = await this.#delegatePortfolio();
+            const rewardAccountsWithWeights = this.#dependencies.bip32Account
+              ? await this.#delegatePortfolio()
+              : await this.#delegateFirstStakeCredential();
+
             await this.#validateOutputs();
             // Take a snapshot of returned properties,
             // so that they don't change while `initializeTx` is resolving
             const ownAddresses = await this.#dependencies.txBuilderProviders.addresses.get();
             const registeredRewardAccounts = (await this.#dependencies.txBuilderProviders.rewardAccounts()).filter(
               (acct) =>
-                acct.keyStatus === Cardano.StakeKeyStatus.Registered ||
-                acct.keyStatus === Cardano.StakeKeyStatus.Registering
+                acct.credentialStatus === Cardano.StakeCredentialStatus.Registered ||
+                acct.credentialStatus === Cardano.StakeCredentialStatus.Registering
             );
             const auxiliaryData = this.partialAuxiliaryData && { ...this.partialAuxiliaryData };
             const extraSigners = this.partialExtraSigners && [...this.partialExtraSigners];
-            const partialSigningOptions = this.partialSigningOptions && { ...this.partialSigningOptions };
+            const partialSigningOptions = this.partialSigningOptions && { ...this.partialSigningOptions, extraSigners };
 
             if (this.partialAuxiliaryData) {
               this.partialTxBody.auxiliaryDataHash = Cardano.computeAuxiliaryDataHash(this.partialAuxiliaryData);
             }
 
             const dependencies = { ...this.#dependencies };
-            // Use greedy input selection if:
+
+            // Use greedy input selection if the wallet is a bip32 account and either of the following conditions are met
             // 1. Multi delegating: to distribute the funds to multiple addresses.
             // 2. Reducing the number of pools to 1 or 0, which implies we have multiple registered stake keys. This is needed
             //    to concentrate the funds back into a single address and delegate its stake key.
             if (
-              rewardAccountsWithWeights.size > 1 ||
-              (registeredRewardAccounts.length > 1 && rewardAccountsWithWeights.size <= 1)
+              this.#dependencies.bip32Account &&
+              (rewardAccountsWithWeights.size > 1 ||
+                (registeredRewardAccounts.length > 1 && rewardAccountsWithWeights.size <= 1))
             ) {
               // If the wallet is currently delegating to several pools, and all delegations are being removed,
               // then the funds will be concentrated back into a single address.
@@ -261,22 +275,20 @@ export class GenericTxBuilder implements TxBuilder {
                 handleResolutions: this.#handleResolutions,
                 outputs: new Set(this.partialTxBody.outputs || []),
                 proposalProcedures: this.partialTxBody.proposalProcedures,
-                signingOptions: partialSigningOptions,
-                witness: { extraSigners }
+                signingOptions: partialSigningOptions
               },
               dependencies
             );
             return {
               ctx: {
                 auxiliaryData,
-                handleResolutions: this.#handleResolutions,
                 ownAddresses,
                 signingContext: {
+                  handleResolutions: this.#handleResolutions,
                   knownAddresses: ownAddresses,
                   txInKeyPathMap: await util.createTxInKeyPathMap(body, ownAddresses, this.#dependencies.inputResolver)
                 },
-                signingOptions: partialSigningOptions,
-                witness: { extraSigners }
+                signingOptions: { ...partialSigningOptions, extraSigners }
               },
               inputSelection,
               tx: { body, hash }
@@ -289,7 +301,22 @@ export class GenericTxBuilder implements TxBuilder {
         }
       },
       signer: {
-        sign: ({ tx, ctx }) => finalizeTx(tx, ctx, this.#dependencies)
+        sign: ({ tx, ctx }) => {
+          const transaction = new Serialization.Transaction(
+            Serialization.TransactionBody.fromCore(tx.body),
+            Serialization.TransactionWitnessSet.fromCore(
+              ctx.witness ? (ctx.witness as Cardano.Witness) : { signatures: new Map() }
+            ),
+            ctx.auxiliaryData ? Serialization.AuxiliaryData.fromCore(ctx.auxiliaryData) : undefined
+          );
+
+          if (ctx.isValid !== undefined) transaction.setIsValid(ctx.isValid);
+
+          const signingOptions = { ...ctx.signingOptions, stubSign: false };
+          const signingContext = ctx.signingContext;
+
+          return this.#dependencies.witnesser.witness(transaction, signingContext, signingOptions);
+        }
       }
     });
   }
@@ -311,12 +338,12 @@ export class GenericTxBuilder implements TxBuilder {
     }
   }
 
-  async #getOrCreateRewardAccounts(): Promise<RewardAccountWithPoolId[]> {
+  async #getOrCreateRewardAccounts(bip32Account: Bip32Account): Promise<RewardAccountWithPoolId[]> {
     let allRewardAccounts: Cardano.RewardAccount[] = [];
     if (this.#requestedPortfolio) {
       const knownAddresses = await this.#dependencies.txBuilderProviders.addresses.get();
       const { newAddresses } = await util.ensureStakeKeys({
-        bip32Account: this.#dependencies.bip32Account,
+        bip32Account,
         count: this.#requestedPortfolio.length,
         knownAddresses,
         logger: contextLogger(this.#logger, 'getOrCreateRewardAccounts')
@@ -339,6 +366,63 @@ export class GenericTxBuilder implements TxBuilder {
     }
   }
 
+  async #delegateFirstStakeCredential(): Promise<RewardAccountsAndWeights> {
+    const rewardAccountsWithWeights: RewardAccountsAndWeights = new Map();
+    if (this.#delegateFirstStakeCredConfig === undefined) {
+      // Delegation was not configured by user
+      return Promise.resolve(rewardAccountsWithWeights);
+    }
+
+    const rewardAccounts = await this.#dependencies.txBuilderProviders.rewardAccounts();
+
+    if (!rewardAccounts?.length) {
+      // This shouldn't happen
+      throw new Error('Could not find any rewardAccount.');
+    }
+
+    const rewardAccount = rewardAccounts[0];
+
+    this.partialTxBody = { ...this.partialTxBody, certificates: [] };
+
+    const stakeCredential = Cardano.Address.fromBech32(rewardAccount.address).asReward()?.getPaymentCredential();
+
+    if (!stakeCredential) {
+      // This shouldn't happen
+      throw new Error(`Invalid credential ${stakeCredential}.`);
+    }
+
+    if (this.#delegateFirstStakeCredConfig === null) {
+      // Deregister scenario
+      if (rewardAccount.credentialStatus === Cardano.StakeCredentialStatus.Unregistered) {
+        this.#logger.warn('Stake key not registered.', rewardAccount.address, rewardAccount.credentialStatus);
+      } else {
+        this.partialTxBody.certificates!.push({
+          __typename: Cardano.CertificateType.StakeDeregistration,
+          stakeCredential
+        });
+      }
+    } else {
+      // Register and delegate scenario
+      if (rewardAccount.credentialStatus !== Cardano.StakeCredentialStatus.Unregistered) {
+        this.#logger.debug('Stake key already registered', rewardAccount.address, rewardAccount.credentialStatus);
+      } else {
+        this.partialTxBody.certificates!.push({
+          __typename: Cardano.CertificateType.StakeRegistration,
+          stakeCredential
+        });
+      }
+
+      rewardAccountsWithWeights.set(rewardAccount.address, 1);
+      this.partialTxBody.certificates!.push({
+        __typename: Cardano.CertificateType.StakeDelegation,
+        poolId: this.#delegateFirstStakeCredConfig,
+        stakeCredential
+      });
+    }
+
+    return rewardAccountsWithWeights;
+  }
+
   async #delegatePortfolio(): Promise<RewardAccountsAndWeights> {
     const rewardAccountsWithWeights: RewardAccountsAndWeights = new Map();
     if (!this.#requestedPortfolio) {
@@ -346,8 +430,10 @@ export class GenericTxBuilder implements TxBuilder {
       return rewardAccountsWithWeights;
     }
 
+    if (!this.#dependencies.bip32Account) throw new Error('BIP32 account is required to delegate portfolio.');
+
     // Create stake keys to match number of requested pools
-    const rewardAccounts = await this.#getOrCreateRewardAccounts();
+    const rewardAccounts = await this.#getOrCreateRewardAccounts(this.#dependencies.bip32Account);
 
     // New poolIds will be allocated to un-delegated stake keys
     const newPools = this.#requestedPortfolio
@@ -364,7 +450,7 @@ export class GenericTxBuilder implements TxBuilder {
     // Reward accounts already delegated to the correct pool. Change must be distributed accordingly
     for (const account of rewardAccounts.filter(
       (rewardAccount) =>
-        rewardAccount.keyStatus === Cardano.StakeKeyStatus.Registered &&
+        rewardAccount.credentialStatus === Cardano.StakeCredentialStatus.Registered &&
         rewardAccount.delegatee?.nextNextEpoch &&
         this.#requestedPortfolio?.some(({ id }) => id === rewardAccount.delegatee?.nextNextEpoch?.id)
     ))
@@ -377,7 +463,7 @@ export class GenericTxBuilder implements TxBuilder {
     const availableRewardAccounts = rewardAccounts
       .filter(
         (rewardAccount) =>
-          rewardAccount.keyStatus === Cardano.StakeKeyStatus.Unregistered ||
+          rewardAccount.credentialStatus === Cardano.StakeCredentialStatus.Unregistered ||
           !rewardAccount.delegatee?.nextNextEpoch ||
           this.#requestedPortfolio?.every(({ id }) => id !== rewardAccount.delegatee?.nextNextEpoch?.id)
       )
@@ -397,7 +483,7 @@ export class GenericTxBuilder implements TxBuilder {
       const { id: newPoolId, weight } = newPools.pop()!;
       const rewardAccount = availableRewardAccounts.pop()!;
       this.#logger.debug(`Building delegation certificate for ${newPoolId} ${rewardAccount}`);
-      if (rewardAccount.keyStatus !== Cardano.StakeKeyStatus.Registered) {
+      if (rewardAccount.credentialStatus !== Cardano.StakeCredentialStatus.Registered) {
         certificates.push(Cardano.createStakeRegistrationCert(rewardAccount.address));
       }
       certificates.push(Cardano.createDelegationCert(rewardAccount.address, newPoolId));
@@ -407,7 +493,7 @@ export class GenericTxBuilder implements TxBuilder {
     // Deregister stake keys no longer needed
     this.#logger.debug(`De-registering ${availableRewardAccounts.length} stake keys`);
     for (const rewardAccount of availableRewardAccounts) {
-      if (rewardAccount.keyStatus === Cardano.StakeKeyStatus.Registered) {
+      if (rewardAccount.credentialStatus === Cardano.StakeCredentialStatus.Registered) {
         certificates.push(Cardano.createStakeDeregistrationCert(rewardAccount.address, rewardAccount.deposit));
       }
     }
@@ -419,7 +505,7 @@ export class GenericTxBuilder implements TxBuilder {
   static #sortRewardAccountsDelegatedFirst(a: RewardAccountWithPoolId, b: RewardAccountWithPoolId): number {
     const getScore = (acct: RewardAccountWithPoolId) => {
       let score = 2;
-      if (acct.keyStatus === Cardano.StakeKeyStatus.Registered) {
+      if (acct.credentialStatus === Cardano.StakeCredentialStatus.Registered) {
         score = 1;
         if (acct.delegatee?.nextNextEpoch) {
           score = 0;

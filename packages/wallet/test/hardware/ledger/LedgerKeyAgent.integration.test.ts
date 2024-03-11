@@ -3,7 +3,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { Bip32Account, CommunicationType, KeyAgent, util } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
-import { ObservableWallet, PersonalWallet, restoreKeyAgent } from '../../../src';
+import { ObservableWallet, createPersonalWallet, restoreKeyAgent } from '../../../src';
 import { createStubStakePoolProvider, mockProviders } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
@@ -26,7 +26,7 @@ const createWallet = async (keyAgent: KeyAgent) => {
   const rewardsProvider = mockRewardsProvider();
   const asyncKeyAgent = util.createAsyncKeyAgent(keyAgent);
   const chainHistoryProvider = mockChainHistoryProvider();
-  return new PersonalWallet(
+  return createPersonalWallet(
     { name: 'Wallet1' },
     {
       assetProvider,
@@ -47,7 +47,7 @@ const getAddress = async (wallet: ObservableWallet) => (await firstValueFrom(wal
 
 const keyAgentDependencies = { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), logger };
 
-describe('LedgerKeyAgent+PersonalWallet', () => {
+describe('LedgerKeyAgent+BaseWallet', () => {
   test('creating and restoring LedgerKeyAgent wallet', async () => {
     const freshKeyAgent = await LedgerKeyAgent.createWithDevice(
       {

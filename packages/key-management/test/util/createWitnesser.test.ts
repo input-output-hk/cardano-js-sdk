@@ -40,9 +40,11 @@ describe('createBip32Ed25519Witnesser', () => {
     };
 
     const options = { knownAddresses: [], txInKeyPathMap: {} };
-    const result = {} as Cardano.Signatures;
+    const result = new Map();
     asyncKeyAgent.signTransaction.mockResolvedValueOnce(result);
-    await expect(witnesser.witness(transaction, options)).resolves.toEqual({ signatures: result });
+
+    const witnessTx = await witnesser.witness(transaction, options);
+    await expect(witnessTx.tx.witness).toEqual({ signatures: result });
     expect(asyncKeyAgent.signTransaction).toBeCalledWith(txInternals, options, void 0);
   });
 });

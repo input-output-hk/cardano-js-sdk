@@ -5,8 +5,8 @@ import path from 'path';
 // This line must come before loading the env, to configure the location of the .env file
 dotenv.config({ path: path.join(__dirname, '../../../.env') });
 
+import { BaseWallet, createPersonalWallet } from '@cardano-sdk/wallet';
 import { Logger } from 'ts-log';
-import { PersonalWallet } from '@cardano-sdk/wallet';
 import { bufferCount, bufferTime, from, mergeAll, tap } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 
@@ -77,14 +77,14 @@ const getKeyAgent = async (accountIndex: number) => {
   return { keyAgent };
 };
 
-const createWallet = async (accountIndex: number): Promise<PersonalWallet> => {
+const createWallet = async (accountIndex: number): Promise<BaseWallet> => {
   measurementUtil.addStartMarker(MeasureTarget.keyAgent, accountIndex);
   const providers = await getProviders();
   const { keyAgent } = await getKeyAgent(accountIndex);
   measurementUtil.addMeasureMarker(MeasureTarget.keyAgent, accountIndex);
 
   measurementUtil.addStartMarker(MeasureTarget.wallet, accountIndex);
-  return new PersonalWallet(
+  return createPersonalWallet(
     { name: `Wallet ${accountIndex}` },
     {
       ...providers,
@@ -111,7 +111,7 @@ const showResults = () => {
 measurementUtil.start();
 
 // Simple scheduler that distributes the requested number of calls evenly in the duration time
-getLoadTestScheduler<PersonalWallet>(
+getLoadTestScheduler<BaseWallet>(
   {
     // callUnderTest must be a method returning an observable
     callUnderTest: (id) => from(initWallet(id)),

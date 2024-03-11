@@ -224,7 +224,7 @@ jobs:
 
 
   deploy:
-    needs: [images]
+    needs: [images,discover]
     concurrency:
       # Only one deployment at a time per environment, and wait for the previous one to finish:
       group: deploy-${{ matrix.environment }}

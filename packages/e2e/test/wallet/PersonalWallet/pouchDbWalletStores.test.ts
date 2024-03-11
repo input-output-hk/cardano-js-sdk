@@ -14,7 +14,7 @@ describe('PersonalWallet/pouchDbWalletStores', () => {
     stores1 = storage.createPouchDbWalletStores(walletName, { logger });
   });
 
-  it('stores and restores PersonalWallet, continues sync after initial load', async () => {
+  it('stores and restores BaseWallet, continues sync after initial load', async () => {
     const wallet1 = (await getWallet({ env, logger, name: 'Test Wallet', stores: stores1 })).wallet;
 
     // wallet1 fetched all responses from wallet provider

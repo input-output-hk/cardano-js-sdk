@@ -7,18 +7,18 @@ import {
   util
 } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
+import { BaseWallet, createPersonalWallet } from '../../../src';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
-import { PersonalWallet } from '../../../src';
 import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
 import { firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import { mockKeyAgentDependencies } from '../../../../key-management/test/mocks';
 
 describe('TrezorKeyAgent', () => {
-  let wallet: PersonalWallet;
+  let wallet: BaseWallet;
   let trezorKeyAgent: TrezorKeyAgent;
   let txSubmitProvider: mocks.TxSubmitProviderStub;
   let address: Cardano.PaymentAddress;
@@ -50,7 +50,7 @@ describe('TrezorKeyAgent', () => {
     const rewardsProvider = mocks.mockRewardsProvider({ rewardAccount });
     const chainHistoryProvider = mocks.mockChainHistoryProvider({ rewardAccount });
     const asyncKeyAgent = util.createAsyncKeyAgent(trezorKeyAgent);
-    wallet = new PersonalWallet(
+    wallet = createPersonalWallet(
       { name: 'HW Wallet' },
       {
         assetProvider,

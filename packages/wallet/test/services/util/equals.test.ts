@@ -12,9 +12,8 @@ import {
   txEquals,
   utxoEquals
 } from '../../../src';
-import { GroupedAddress } from '@cardano-sdk/key-management';
+import { GroupedAddress, WitnessedTx } from '@cardano-sdk/key-management';
 import { Percent } from '@cardano-sdk/util';
-import { SignedTx } from '@cardano-sdk/tx-construction';
 
 describe('equals', () => {
   const txId1 = Cardano.TransactionId('4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6');
@@ -84,8 +83,8 @@ describe('equals', () => {
   });
 
   test('signedTxsEquals compares signed tx id', () => {
-    const signedTxs1 = [{ tx: { id: txId1 } } as SignedTx];
-    const signedTxs2 = [{ tx: { id: txId2 } } as SignedTx];
+    const signedTxs1 = [{ tx: { id: txId1 } } as WitnessedTx];
+    const signedTxs2 = [{ tx: { id: txId2 } } as WitnessedTx];
     expect(signedTxsEquals(signedTxs1, [...signedTxs1.map((signedTx) => ({ ...signedTx }))])).toBe(true);
     expect(signedTxsEquals(signedTxs1, signedTxs2)).toBe(false);
   });

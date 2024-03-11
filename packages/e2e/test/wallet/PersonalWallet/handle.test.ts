@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
+import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano, metadatum } from '@cardano-sdk/core';
 import { KeyAgent, TransactionSigner } from '@cardano-sdk/key-management';
-import { PersonalWallet } from '@cardano-sdk/wallet';
 import {
   bip32Ed25519Factory,
   burnTokens,
@@ -34,9 +34,9 @@ const toHex = (value: string) =>
 
 // TODO: LW-9889 Ada handle tests fail intermittently with `DeserialiseFailure 56 "expected word"` returned by cardano-submit-api
 describe.skip('Ada handle', () => {
-  let wallet: PersonalWallet;
+  let wallet: BaseWallet;
   let keyAgent: KeyAgent;
-  let receivingWallet: PersonalWallet;
+  let receivingWallet: BaseWallet;
   let policySigner: TransactionSigner;
   let policyId: Cardano.PolicyId;
   let policyScript: Cardano.NativeScript;
@@ -124,7 +124,7 @@ describe.skip('Ada handle', () => {
   });
 
   // eslint-disable-next-line max-statements
-  it("PersonalWallet discovers it's own cip25 and cip68 handles", async () => {
+  it("BaseWallet discovers it's own cip25 and cip68 handles", async () => {
     await mintCIP25andCIP68Handles(wallet, keyAgent, policyId);
     let utxo = await firstValueFrom(wallet.balance.utxo.available$);
     let receivingUtxo = await firstValueFrom(receivingWallet.balance.utxo.available$);

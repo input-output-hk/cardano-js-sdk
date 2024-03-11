@@ -1,5 +1,5 @@
+import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano, CardanoNodeUtil, ProviderError } from '@cardano-sdk/core';
-import { PersonalWallet } from '@cardano-sdk/wallet';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { getEnv, getWallet, normalizeTxBody, walletReady, walletVariables } from '../../../src';
 import { isNotNil } from '@cardano-sdk/util';
@@ -8,7 +8,7 @@ import { logger } from '@cardano-sdk/util-dev';
 const env = getEnv(walletVariables);
 
 describe('PersonalWallet/txChainHistory', () => {
-  let wallet: PersonalWallet;
+  let wallet: BaseWallet;
   let signedTx: Cardano.Tx<Cardano.TxBody>;
 
   beforeEach(async () => {

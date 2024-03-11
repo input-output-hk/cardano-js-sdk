@@ -35,7 +35,7 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { distinctBlock, signedTxsEquals, transactionsEquals, txInEquals } from './util';
 
-import { SignedTx } from '@cardano-sdk/tx-construction';
+import { WitnessedTx } from '@cardano-sdk/key-management';
 import { newAndStoredMulticast } from './util/newAndStoredMulticast';
 import chunk from 'lodash/chunk';
 import intersectionBy from 'lodash/intersectionBy';
@@ -49,12 +49,12 @@ export interface TransactionsTrackerProps {
   retryBackoffConfig: RetryBackoffConfig;
   transactionsHistoryStore: OrderedCollectionStore<Cardano.HydratedTx>;
   inFlightTransactionsStore: DocumentStore<TxInFlight[]>;
-  signedTransactionsStore: DocumentStore<SignedTx[]>;
+  signedTransactionsStore: DocumentStore<WitnessedTx[]>;
   newTransactions: {
     submitting$: Observable<OutgoingTx>;
     pending$: Observable<OutgoingTx>;
     failedToSubmit$: Observable<FailedTx>;
-    signed$: Observable<SignedTx>;
+    signed$: Observable<WitnessedTx>;
   };
   failedFromReemitter$?: Observable<FailedTx>;
   logger: Logger;
@@ -277,9 +277,9 @@ export const createTransactionsTracker = (
     storedFilterfn: ({ submittedAt }) => !!submittedAt
   });
 
-  const newSignedOrPreviouslySigned$ = newAndStoredMulticast<SignedTx, Cardano.TransactionId>({
+  const newSignedOrPreviouslySigned$ = newAndStoredMulticast<WitnessedTx, Cardano.TransactionId>({
     groupByFn: ({ tx }) => tx.id,
-    logStringfn: (signedTxs) => `Store contains ${signedTxs?.length} signed transactions`,
+    logStringfn: (WitnessedTxs) => `Store contains ${WitnessedTxs?.length} signed transactions`,
     logger,
     new$: newSigned$,
     stored$: signedTransactionsStore.get()
@@ -390,11 +390,11 @@ export const createTransactionsTracker = (
     )
   );
 
-  const signed$ = new TrackerSubject<SignedTx[]>(
+  const signed$ = new TrackerSubject<WitnessedTx[]>(
     merge(
       newSignedOrPreviouslySigned$.pipe(
-        mergeMap((signedTx$) => signedTx$),
-        map((signedTx) => ({ op: 'add' as const, signedTx }))
+        mergeMap((WitnessedTx$) => WitnessedTx$),
+        map((witnessedTx) => ({ op: 'add' as const, witnessedTx }))
       ),
       inFlight$.pipe(
         mergeMap((txs) => txs),
@@ -410,7 +410,7 @@ export const createTransactionsTracker = (
     ).pipe(
       scan((signed, action) => {
         if (action.op === 'add') {
-          return [...signed, action.signedTx];
+          return [...signed, action.witnessedTx];
         }
         if (action.op === 'remove') {
           return signed.filter(({ tx }) => tx.id !== action.id);
@@ -426,15 +426,15 @@ export const createTransactionsTracker = (
         }
         if (action.op === 'check_inputs') {
           return signed.filter(({ tx }) => {
-            const anyUtxoIsUsed = tx.body.inputs.some((signedTxInput) =>
-              action.inputs.some((historicalInput) => txInEquals(signedTxInput, historicalInput))
+            const anyUtxoIsUsed = tx.body.inputs.some((WitnessedTxInput) =>
+              action.inputs.some((historicalInput) => txInEquals(WitnessedTxInput, historicalInput))
             );
 
             return !anyUtxoIsUsed;
           });
         }
         return signed;
-      }, [] as SignedTx[]),
+      }, [] as WitnessedTx[]),
       tap((signed) => signedTransactionsStore.set(signed)),
       startWith([]),
       distinctUntilChanged(signedTxsEquals)

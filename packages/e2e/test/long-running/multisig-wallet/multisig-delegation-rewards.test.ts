@@ -1,10 +1,10 @@
 import * as Crypto from '@cardano-sdk/crypto';
+import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano, EraSummary, StakePoolProvider, createSlotEpochCalc } from '@cardano-sdk/core';
 import { InMemoryKeyAgent, KeyRole } from '@cardano-sdk/key-management';
 import { MultiSigTx } from './MultiSigTx';
 import { MultiSigWallet } from './MultiSigWallet';
 import { Observable, filter, firstValueFrom, map, take } from 'rxjs';
-import { PersonalWallet } from '@cardano-sdk/wallet';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import {
   bip32Ed25519Factory,
@@ -49,7 +49,7 @@ const getPoolIds = async (stakePoolProvider: StakePoolProvider, count: number) =
   return poolIds;
 };
 
-const fundMultiSigWallet = async (sendingWallet: PersonalWallet, address: Cardano.PaymentAddress) => {
+const fundMultiSigWallet = async (sendingWallet: BaseWallet, address: Cardano.PaymentAddress) => {
   logger.info(`Funding multisig wallet with address: ${address}`);
 
   const tAdaToSend = 5_000_000n;
@@ -60,7 +60,7 @@ const fundMultiSigWallet = async (sendingWallet: PersonalWallet, address: Cardan
   await sendingWallet.submitTx(signedTx);
 };
 
-const getKeyAgent = async (mnemonics: string, faucetWallet: PersonalWallet, bip32Ed25519: Crypto.Bip32Ed25519) => {
+const getKeyAgent = async (mnemonics: string, faucetWallet: BaseWallet, bip32Ed25519: Crypto.Bip32Ed25519) => {
   const genesis = await firstValueFrom(faucetWallet.genesisParameters$);
 
   const keyAgent = await createStandaloneKeyAgent(mnemonics.split(' '), genesis, bip32Ed25519);
@@ -70,7 +70,7 @@ const getKeyAgent = async (mnemonics: string, faucetWallet: PersonalWallet, bip3
   return { keyAgent, pubKey };
 };
 
-const generateTxs = async (sendingWallet: PersonalWallet, receivingWallet: PersonalWallet) => {
+const generateTxs = async (sendingWallet: BaseWallet, receivingWallet: BaseWallet) => {
   logger.info('Sending 100 txs to generate reward fees');
 
   const tAdaToSend = 5_000_000n;
@@ -86,7 +86,7 @@ const generateTxs = async (sendingWallet: PersonalWallet, receivingWallet: Perso
 
 const createMultiSignWallet = async (
   keyAgent: InMemoryKeyAgent,
-  faucetWallet: PersonalWallet,
+  faucetWallet: BaseWallet,
   participants: Array<Crypto.Ed25519PublicKeyHex>
 ) => {
   const props = {
@@ -117,7 +117,7 @@ const getTxConfirmationEpoch = async (
 };
 
 describe('multi signature wallet', () => {
-  let faucetWallet: PersonalWallet;
+  let faucetWallet: BaseWallet;
   let aliceKeyAgent: InMemoryKeyAgent;
   let bobKeyAgent: InMemoryKeyAgent;
   let charlotteKeyAgent: InMemoryKeyAgent;

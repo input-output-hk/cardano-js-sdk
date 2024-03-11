@@ -13,6 +13,7 @@ import {
 } from '../../src';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import { KeyRole } from '@cardano-sdk/key-management';
 import { firstValueFrom, of } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 import pick from 'lodash/pick';
@@ -31,14 +32,28 @@ const createTrezorWalletProps: AddWalletProps<WalletMetadata, AccountMetadata> =
 };
 
 const createScriptWalletProps = {
+  accountIndex: 0,
   metadata: { name: 'Treasury' },
   ownSigners: [
     {
       accountIndex: storedLedgerWallet.accounts[0].accountIndex,
+      paymentScriptKeyPath: {
+        index: 0,
+        role: KeyRole.External
+      },
+      stakingScriptKeyPath: {
+        index: 0,
+        role: KeyRole.External
+      },
       walletId: storedLedgerWallet.walletId
     }
   ],
-  script: {
+  paymentScript: {
+    __type: Cardano.ScriptType.Native,
+    kind: Cardano.NativeScriptKind.RequireTimeBefore,
+    slot: 123
+  } as Cardano.Script,
+  stakingScript: {
     __type: Cardano.ScriptType.Native,
     kind: Cardano.NativeScriptKind.RequireTimeBefore,
     slot: 123
@@ -49,7 +64,7 @@ const createScriptWalletProps = {
 const storedScriptWallet = {
   ...createScriptWalletProps,
   metadata: { name: 'Shared' },
-  walletId: Serialization.Script.fromCore(createScriptWalletProps.script).hash().slice(32)
+  walletId: Serialization.Script.fromCore(createScriptWalletProps.paymentScript).hash().slice(32)
 };
 
 describe('WalletRepository', () => {
@@ -117,6 +132,14 @@ describe('WalletRepository', () => {
           ownSigners: [
             {
               accountIndex: createScriptWalletProps.ownSigners[0].accountIndex,
+              paymentScriptKeyPath: {
+                index: 0,
+                role: KeyRole.External
+              },
+              stakingScriptKeyPath: {
+                index: 0,
+                role: KeyRole.External
+              },
               walletId: 'does not exist' as WalletId
             }
           ]
@@ -131,6 +154,14 @@ describe('WalletRepository', () => {
           ownSigners: [
             {
               accountIndex: 999_999_999,
+              paymentScriptKeyPath: {
+                index: 0,
+                role: KeyRole.External
+              },
+              stakingScriptKeyPath: {
+                index: 0,
+                role: KeyRole.External
+              },
               walletId: createScriptWalletProps.ownSigners[0].walletId
             }
           ]

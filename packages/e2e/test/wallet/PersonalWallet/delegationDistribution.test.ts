@@ -1,5 +1,5 @@
+import { BaseWallet, DelegatedStake, createUtxoBalanceByAddressTracker } from '@cardano-sdk/wallet';
 import { Cardano } from '@cardano-sdk/core';
-import { DelegatedStake, PersonalWallet, createUtxoBalanceByAddressTracker } from '@cardano-sdk/wallet';
 import { MINUTE, firstValueFromTimed, getWallet, submitAndConfirm, walletReady } from '../../../src';
 import { Observable, filter, firstValueFrom, map, tap } from 'rxjs';
 import { Percent } from '@cardano-sdk/util';
@@ -13,7 +13,7 @@ const POOLS_COUNT = 5;
 const distributionMessage = 'ObservableWallet.delegation.distribution$:';
 
 /** Distribute the wallet funds evenly across all its addresses */
-const fundWallet = async (wallet: PersonalWallet) => {
+const fundWallet = async (wallet: BaseWallet) => {
   await walletReady(wallet, 0n);
   const addresses = await firstValueFrom(wallet.addresses$);
 
@@ -42,13 +42,13 @@ const fundWallet = async (wallet: PersonalWallet) => {
 /** await for rewardAccounts$ to be registered, unregistered, as defined in states   */
 const rewardAccountStatuses = async (
   rewardAccounts$: Observable<Cardano.RewardAccountInfo[]>,
-  statuses: Cardano.StakeKeyStatus[],
+  statuses: Cardano.StakeCredentialStatus[],
   timeout = MINUTE
 ) =>
   firstValueFromTimed(
     rewardAccounts$.pipe(
-      tap((accts) => accts.map(({ address, keyStatus }) => logger.debug(address, keyStatus))),
-      map((accts) => accts.map(({ keyStatus }) => keyStatus)),
+      tap((accts) => accts.map(({ address, credentialStatus }) => logger.debug(address, credentialStatus))),
+      map((accts) => accts.map(({ credentialStatus }) => credentialStatus)),
       filter((statusArr) => statusArr.every((s) => statuses.includes(s)))
     ),
     `Timeout waiting for all reward accounts stake keys to be one of ${statuses.join('|')}`,
@@ -56,12 +56,12 @@ const rewardAccountStatuses = async (
   );
 
 /** Create stakeKey deregistration transaction for all reward accounts */
-const deregisterAllStakeKeys = async (wallet: PersonalWallet): Promise<void> => {
+const deregisterAllStakeKeys = async (wallet: BaseWallet): Promise<void> => {
   await walletReady(wallet, 0n);
   try {
     await rewardAccountStatuses(
       wallet.delegation.rewardAccounts$,
-      [Cardano.StakeKeyStatus.Unregistered, Cardano.StakeKeyStatus.Unregistering],
+      [Cardano.StakeCredentialStatus.Unregistered, Cardano.StakeCredentialStatus.Unregistering],
       0
     );
     logger.info('Stake keys are already deregistered');
@@ -73,14 +73,14 @@ const deregisterAllStakeKeys = async (wallet: PersonalWallet): Promise<void> => 
     await submitAndConfirm(wallet, deregTx);
 
     await rewardAccountStatuses(wallet.delegation.rewardAccounts$, [
-      Cardano.StakeKeyStatus.Unregistered,
-      Cardano.StakeKeyStatus.Unregistering
+      Cardano.StakeCredentialStatus.Unregistered,
+      Cardano.StakeCredentialStatus.Unregistering
     ]);
     logger.info('Deregistered all stake keys');
   }
 };
 
-const getPoolIds = async (wallet: PersonalWallet): Promise<Cardano.StakePool[]> => {
+const getPoolIds = async (wallet: BaseWallet): Promise<Cardano.StakePool[]> => {
   const activePools = await wallet.stakePoolProvider.queryStakePools({
     filters: { status: [Cardano.StakePoolStatus.Active] },
     pagination: { limit: POOLS_COUNT, startAt: 0 }
@@ -91,7 +91,7 @@ const getPoolIds = async (wallet: PersonalWallet): Promise<Cardano.StakePool[]> 
 
 /** Delegate to unique POOLS_COUNT pools. Use even distribution as default. */
 const delegateToMultiplePools = async (
-  wallet: PersonalWallet,
+  wallet: BaseWallet,
   weights = Array.from({ length: POOLS_COUNT }).map(() => 1)
 ) => {
   const poolIds = await getPoolIds(wallet);
@@ -106,7 +106,7 @@ const delegateToMultiplePools = async (
   return { poolIds, portfolio };
 };
 
-const delegateAllToSinglePool = async (wallet: PersonalWallet): Promise<void> => {
+const delegateAllToSinglePool = async (wallet: BaseWallet): Promise<void> => {
   // This is a negative testcase, simulating an HD wallet that has multiple stake keys delegated
   // to the same stake pool. txBuilder.delegatePortfolio does not support this scenario.
   const [{ id: poolId }] = await getPoolIds(wallet);
@@ -122,7 +122,7 @@ const delegateAllToSinglePool = async (wallet: PersonalWallet): Promise<void> =>
 };
 
 describe('PersonalWallet/delegationDistribution', () => {
-  let wallet: PersonalWallet;
+  let wallet: BaseWallet;
 
   beforeAll(async () => {
     wallet = (await getWallet({ env, idx: 3, logger, name: 'Wallet', polling: { interval: 50 } })).wallet;
@@ -153,8 +153,8 @@ describe('PersonalWallet/delegationDistribution', () => {
     // Check that reward addresses were delegated
     await walletReady(wallet);
     await rewardAccountStatuses(wallet.delegation.rewardAccounts$, [
-      Cardano.StakeKeyStatus.Registering,
-      Cardano.StakeKeyStatus.Registered
+      Cardano.StakeCredentialStatus.Registering,
+      Cardano.StakeCredentialStatus.Registered
     ]);
     logger.debug('Delegations successfully done');
 
