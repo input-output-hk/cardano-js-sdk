@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 DB=$(cat /run/secrets/postgres_db_db_sync)
 PASSWORD=$(cat /run/secrets/postgres_password)
