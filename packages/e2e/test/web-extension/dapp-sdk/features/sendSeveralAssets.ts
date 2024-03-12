@@ -1,5 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { catchError, combineLatest, tap, EMPTY } from 'rxjs';
+/* eslint-disable sonarjs/no-nested-template-literals */
+import { EMPTY, catchError, combineLatest, tap } from 'rxjs';
+import { buildAndSignTx } from '../utils';
 import type { ObservableWallet } from '@cardano-sdk/wallet';
 
 export const sendSeveralAssets = ({
@@ -10,6 +11,7 @@ export const sendSeveralAssets = ({
   connectedWallet: ObservableWallet;
 }) => {
   const addressAssetsElement = document.querySelector('#info-several-assets-tokens')!;
+  const transactionInfoElement = document.querySelector('#info-several-assets-tokens-transaction')!;
 
   combineLatest([connectedWallet.addresses$, connectedWallet.balance.utxo.available$])
     .pipe(
@@ -41,17 +43,13 @@ export const sendSeveralAssets = ({
           .addOutput(await txBuilder.buildOutput().handle('rhys').coin(10_000_000n).assets(assetMap).build())
           .build();
 
-        const txDetails = await builtTx.inspect();
-        addressAssetsElement.textContent = `Built: ${txDetails.hash}`;
-        const signedTx = await builtTx.sign();
-        addressAssetsElement.textContent = `Signed: ${signedTx.tx.id}`;
-        await connectedWallet.submitTx(signedTx);
-        addressAssetsElement.textContent = `Submitted: ${signedTx.tx.id}`;
+        buildAndSignTx({ builtTx, connectedWallet, textElement: transactionInfoElement });
 
         addressAssetsElement.textContent = `
-                Addresses: ${addresses.map((addr) => addr.address).join(', ')}
-                \r\n
-                Assets: ${availableBalance.assets}
+Addresses: ${addresses.map((addr) => addr.address).join(', ')}
+\r\n
+Assets to send and quantity:
+${[...assetMap].map(([key, value]) => `- ${key} : ${value}`).join('\r\n')}
               `;
       }),
       catchError((error) => {
