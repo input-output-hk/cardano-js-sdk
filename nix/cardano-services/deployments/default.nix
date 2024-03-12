@@ -131,17 +131,27 @@ in
           };
           routes = let
             inherit (oci.meta) versions;
-          in [
-            "/v${versions.root}/health"
-            "/v${versions.root}/live"
-            "/v${versions.root}/meta"
-            "/v${versions.root}/ready"
-            "/v${versions.assetInfo}/asset"
-            "/v${versions.chainHistory}/chain-history"
-            "/v${versions.networkInfo}/network-info"
-            "/v${versions.rewards}/rewards"
-            "/v${versions.txSubmit}/tx-submit"
-            "/v${versions.utxo}/utxo"
+            mk = version: mkEndpoint: let
+              major = __fromJSON (__elemAt (__splitVersion version) 0);
+              minor = __fromJSON (__elemAt (__splitVersion version) 1);
+              patch = __fromJSON (__elemAt (__splitVersion version) 2);
+            in
+            map (minor':
+              map (patch':
+                mkEndpoint "${toString major}.${toString minor'}.${toString patch'}"
+              ) (__genList (a: a) (patch + 1))
+            ) (__genList (a: a) (minor + 1));
+          in __concatLists [
+            (mk versions.root (v: "/v${v}/health"))
+            (mk versions.root (v: "/v${v}/live"))
+            (mk versions.root (v: "/v${v}/meta"))
+            (mk versions.root (v: "/v${v}/ready"))
+            (mk versions.assetInfo (v: "/v${v}/asset"))
+            (mk versions.chainHistory (v: "/v${v}/chain-history"))
+            (mk versions.networkInfo (v: "/v${v}/network-info"))
+            (mk versions.rewards (v: "/v${v}/rewards"))
+            (mk versions.txSubmit (v: "/v${v}/tx-submit"))
+            (mk versions.utxo (v: "/v${v}/utxo"))
           ];
         };
       };
