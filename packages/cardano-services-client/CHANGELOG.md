@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.17.9...@cardano-sdk/cardano-services-client@0.17.10) (2024-03-12)
+
+### Features
+
+* **cardano-services-client:** increase details for cardano-submit-api txs submission errors ([c36a4d2](https://github.com/input-output-hk/cardano-js-sdk/commit/c36a4d2d09cbdf6144edac28da78c123eda89e35))
+
+### Bug Fixes
+
+* **cardano-services:** phase-2 failure tx mapper ([320cd41](https://github.com/input-output-hk/cardano-js-sdk/commit/320cd4147079acd4c06f3ec9598d7ea9ffa47cca))
+
 ## [0.17.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.17.8...@cardano-sdk/cardano-services-client@0.17.9) (2024-02-29)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services-client

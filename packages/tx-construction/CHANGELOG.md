@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.17.13...@cardano-sdk/tx-construction@0.18.0) (2024-03-12)
+
+### ⚠ BREAKING CHANGES
+
+* finalizeTx was added to the Witnesser interface
+- the PersonalWallet was renamed BaseWallet
+- all code specific to Bip32 wallet have been abstracted out of the BaseWallet
+- the PersonalWallet must now be constructed with the createPersonalWallet util function
+- the SignedTx type was renamed to WitnessedTx
+- the UnsignedTx type was renamed to UnwitnessedTx
+- the Witness method from the Witnesser interface now returns a WitnessedTx
+- extraSigners was moved from the witness field to the signingOptions in both the wallet FinalizeTxProps and witness signingOptions
+- wallet repository script wallets ownSigners type now includes paymentScriptKeyPath and stakingScriptKeyPath
+- wallet repository script wallets script field replaced by paymentScript and stakingScript
+- stubSignTransaction util function now takes and optional dRepPublicKey as part of the context
+* rename RewardAccountInfo keyStatus field to credentialStatus
+* bip32Account is now an optional TxBuilder dependency
+
+### Features
+
+* add proposal procedures deposit to compute implicit coins ([21e1863](https://github.com/input-output-hk/cardano-js-sdk/commit/21e18638bee85f1c8f3e43246efa289f63d77662))
+* added SharedWallet implementation ([272f392](https://github.com/input-output-hk/cardano-js-sdk/commit/272f3923ac872337cdf1f8647ac07c6a7a78384a))
+* finalizeTxDependencies no longer requires a bip32Account, but should provide a dRepPublicKey if available ([eaf01dd](https://github.com/input-output-hk/cardano-js-sdk/commit/eaf01dd4135a37c77295e4c587f9897e9eb50890))
+
+### Code Refactoring
+
+* stakeKeyStatus renamed StakeCredentialStatus ([cf76584](https://github.com/input-output-hk/cardano-js-sdk/commit/cf76584c3531c72c659de13df06a9f4342101f46))
+
 ## [0.17.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.17.12...@cardano-sdk/tx-construction@0.17.13) (2024-02-29)
 
 **Note:** Version bump only for package @cardano-sdk/tx-construction
