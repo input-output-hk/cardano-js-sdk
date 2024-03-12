@@ -220,7 +220,7 @@ in
         };
 
         values = {
-          network = "sanchonet-1";
+          network = "sanchonet";
           region = "us-east-1";
 
           name = "${final.namespace}-cardanojs-v1";
