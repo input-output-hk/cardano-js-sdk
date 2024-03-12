@@ -27,6 +27,7 @@ source
 
 # direnv
 /.direnv
+/.access.local
 
 # prj-spec dirs
 # <https://github.com/numtide/prj-spec>
