@@ -16,7 +16,7 @@ in {
     name = "926093910549.dkr.ecr.us-east-1.amazonaws.com/cardano-services";
     operable = cell.operables.cardano-services;
     meta.description = "Minimal Cardano Services OCI Image";
-    meta.versions = builtins.fromJSON (builtins.readFile (self + /packages/cardano-services-client/version.json));
+    meta.versions = builtins.fromJSON (builtins.readFile (self + /packages/cardano-services-client/supportedVersions.json));
     meta.buildInfo = buildInfo;
   };
 }
