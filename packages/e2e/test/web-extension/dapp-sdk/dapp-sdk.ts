@@ -8,9 +8,8 @@ import {
   rewardsHttpProvider,
   stakePoolHttpProvider
 } from '@cardano-sdk/cardano-services-client';
-import { connectToLace } from './features/connectLace';
-import { sendCoins } from './features/sendCoins';
-import { sendSeveralAssets } from './features/sendSeveralAssets';
+
+import { connectToLace, sendCoins, sendSeveralAssets, singleDelegation, singleUndelegation } from './features';
 import type { ObservableWallet } from '@cardano-sdk/wallet';
 
 const logger = console;
@@ -18,6 +17,7 @@ const httpProviderDependencies = {
   baseUrl: 'https://dev-preprod.lw.iog.io',
   logger
 };
+
 const dependencies: ConnectWalletDependencies = {
   assetProvider: assetInfoHttpProvider(httpProviderDependencies),
   chainHistoryProvider: chainHistoryHttpProvider(httpProviderDependencies),
@@ -30,6 +30,8 @@ const dependencies: ConnectWalletDependencies = {
 
 let connectedWallet: ObservableWallet | null;
 
+const CONNECT_WALLET = 'Please connect the wallet first';
+
 document.querySelector('#connect-to-lace')?.addEventListener('click', () => {
   connectToLace({
     dependencies,
@@ -40,7 +42,7 @@ document.querySelector('#connect-to-lace')?.addEventListener('click', () => {
 
 document.querySelector('#send-coins')?.addEventListener('click', async () => {
   if (!connectedWallet) {
-    return logger.warn('Please connect the wallet first');
+    return logger.warn(CONNECT_WALLET);
   }
 
   sendCoins({ connectedWallet });
@@ -48,10 +50,32 @@ document.querySelector('#send-coins')?.addEventListener('click', async () => {
 
 document.querySelector('#send-several-assets')?.addEventListener('click', () => {
   if (!connectedWallet) {
-    return logger.warn('Please connect the wallet first');
+    return logger.warn(CONNECT_WALLET);
   }
 
   sendSeveralAssets({
+    connectedWallet,
+    logger
+  });
+});
+
+document.querySelector('#single-delegation')?.addEventListener('click', () => {
+  if (!connectedWallet) {
+    return logger.warn(CONNECT_WALLET);
+  }
+
+  singleDelegation({
+    connectedWallet,
+    logger
+  });
+});
+
+document.querySelector('#single-undelegation')?.addEventListener('click', () => {
+  if (!connectedWallet) {
+    return logger.warn(CONNECT_WALLET);
+  }
+
+  singleUndelegation({
     connectedWallet,
     logger
   });
