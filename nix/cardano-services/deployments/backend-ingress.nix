@@ -39,9 +39,9 @@
     };
     spec = {
       ingressClassName = "alb";
-      rules = [
-        {
-          host = values.backend.url;
+      rules =
+        map (hostname: {
+          host = hostname;
           http.paths =
             [
               {
@@ -95,8 +95,8 @@
               }
             ]
             ++ values.cardano-services.additionalRoutes;
-        }
-      ];
+        })
+        values.backend.hostnames;
     };
   };
 }

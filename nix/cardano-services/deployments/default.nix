@@ -9,6 +9,7 @@
   readJsonFile = path: builtins.fromJSON (builtins.readFile path);
   tf-outputs = {
     us-east-1 = readJsonFile ./tf-outputs/lace-dev-us-east-1.json;
+    us-east-2 = readJsonFile ./tf-outputs/lace-prod-us-east-2.json;
   };
 in
   nix-helm.builders.${pkgs.system}.mkHelmMultiTarget {
@@ -106,6 +107,7 @@ in
         };
 
         backend = {
+          passHandleDBArgs = true;
           allowedOrigins = lib.concatStringsSep "," [
             # gafhhkghbfjjkeiendhlofajokpaflmk represents Chrome production version
             "chrome-extension://gafhhkghbfjjkeiendhlofajokpaflmk"
@@ -116,7 +118,7 @@ in
             # djcdfchkaijggdjokfomholkalbffgil represents Chrome dev preview version
             "chrome-extension://djcdfchkaijggdjokfomholkalbffgil"
           ];
-          url = "${final.namespace}.${baseUrl}";
+          hostnames = ["${final.namespace}.${baseUrl}"];
           dnsId = lib.toLower "${values.region}-${final.namespace}-backend";
           ogmiosSrvServiceName = "${final.namespace}-cardano-stack.${final.namespace}.svc.cluster.local";
 
@@ -354,6 +356,84 @@ in
                 };
               }
             ];
+          };
+        };
+      };
+
+      "live-preprod@us-east-2@v1" = final: {
+        name = "${final.namespace}-cardanojs-v1";
+        namespace = "live-preprod";
+        context = "eks-admin";
+
+        providers = {
+          backend = {
+            enabled = true;
+          };
+        };
+
+        values = {
+          network = "preprod";
+          region = "us-east-2";
+
+          backend.hostnames = ["tmp-backend.${final.namespace}.eks.${baseUrl}" "tmp-${final.namespace}.${baseUrl}"];
+          backend.passHandleDBArgs = false;
+          backend.routes = [
+            "/v1.0.0/health"
+            "/v1.0.0/live"
+            "/v1.0.0/meta"
+            "/v1.0.0/ready"
+            "/v1.0.0/asset"
+            "/v2.0.0/chain-history"
+            "/v1.0.0/handle"
+            "/v1.0.0/network-info"
+            "/v1.0.0/rewards"
+            "/v1.0.0/stake-pool"
+            "/v2.0.0/tx-submit"
+            "/v2.0.0/utxo"
+          ];
+          blockfrost-worker.enabled = true;
+          cardano-services = {
+            ingresOrder = 99;
+            image = "926093910549.dkr.ecr.us-east-1.amazonaws.com/cardano-services:s8j5nx9x2naar194pr58kpmlr5s4xn7b";
+          };
+        };
+      };
+
+      "live-preview@us-east-2@v1" = final: {
+        name = "${final.namespace}-cardanojs-v1";
+        namespace = "live-preview";
+        context = "eks-admin";
+
+        providers = {
+          backend = {
+            enabled = true;
+          };
+        };
+
+        values = {
+          network = "preview";
+          region = "us-east-2";
+
+          backend.hostnames = ["tmp-backend.${final.namespace}.eks.${baseUrl}" "tmp-${final.namespace}.${baseUrl}"];
+          backend.passHandleDBArgs = false;
+          backend.routes = [
+            "/v1.0.0/health"
+            "/v1.0.0/live"
+            "/v1.0.0/meta"
+            "/v1.0.0/ready"
+            "/v1.0.0/asset"
+            "/v2.0.0/chain-history"
+            "/v1.0.0/handle"
+            "/v1.0.0/network-info"
+            "/v1.0.0/rewards"
+            "/v1.0.0/stake-pool"
+            "/v2.0.0/tx-submit"
+            "/v2.0.0/utxo"
+          ];
+          blockfrost-worker.enabled = true;
+          cardano-services = {
+            ingresOrder = 99;
+            image = "926093910549.dkr.ecr.us-east-1.amazonaws.com/cardano-services:s8j5nx9x2naar194pr58kpmlr5s4xn7b";
           };
         };
       };
