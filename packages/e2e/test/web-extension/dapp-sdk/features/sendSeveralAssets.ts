@@ -1,6 +1,7 @@
 /* eslint-disable sonarjs/no-nested-template-literals */
-import { EMPTY, catchError, combineLatest, tap } from 'rxjs';
-import { buildAndSignTx } from '../utils';
+import { EMPTY, catchError, take, tap } from 'rxjs';
+
+import { inspectAndSignTx } from '../utils';
 import type { ObservableWallet } from '@cardano-sdk/wallet';
 
 export const sendSeveralAssets = ({
@@ -10,17 +11,15 @@ export const sendSeveralAssets = ({
   logger: typeof console;
   connectedWallet: ObservableWallet;
 }) => {
-  const addressAssetsElement = document.querySelector('#info-several-assets-tokens')!;
+  const addressAssetsElement = document.querySelector('#info-send')!;
   const transactionInfoElement = document.querySelector('#info-several-assets-tokens-transaction')!;
 
-  combineLatest([connectedWallet.addresses$, connectedWallet.balance.utxo.available$])
+  connectedWallet.balance.utxo.available$
     .pipe(
-      tap(async ([addresses, availableBalance]) => {
-        if (!connectedWallet) {
-          return logger.warn('Please connect the wallet first');
-        }
+      take(1),
+      tap(async (availableBalance) => {
         if (!availableBalance.assets || availableBalance.assets?.size === 0) {
-          throw new Error('No assets');
+          throw new Error('Your wallet has no assets');
         }
 
         let nftCount = 0;
@@ -43,17 +42,15 @@ export const sendSeveralAssets = ({
           .addOutput(await txBuilder.buildOutput().handle('rhys').coin(10_000_000n).assets(assetMap).build())
           .build();
 
-        buildAndSignTx({ builtTx, connectedWallet, textElement: transactionInfoElement });
+        inspectAndSignTx({ builtTx, connectedWallet, textElement: transactionInfoElement });
 
-        addressAssetsElement.textContent = `
-Addresses: ${addresses.map((addr) => addr.address).join(', ')}
-\r\n
-Assets to send and quantity:
+        addressAssetsElement.textContent += `
+Assets and quantity:
 ${[...assetMap].map(([key, value]) => `- ${key} : ${value}`).join('\r\n')}
               `;
       }),
       catchError((error) => {
-        console.error('Error fetching assets:', error);
+        logger.error('Error fetching assets:', error);
         return EMPTY;
       })
     )

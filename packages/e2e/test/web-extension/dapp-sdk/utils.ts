@@ -2,7 +2,7 @@
 import { UnwitnessedTx } from '@cardano-sdk/tx-construction';
 import type { ObservableWallet } from '@cardano-sdk/wallet';
 
-export const buildAndSignTx = async ({
+export const inspectAndSignTx = async ({
   connectedWallet,
   builtTx,
   textElement

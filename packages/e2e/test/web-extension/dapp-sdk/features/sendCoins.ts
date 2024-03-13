@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { buildAndSignTx } from '../utils';
+import { inspectAndSignTx } from '../utils';
 import type { ObservableWallet } from '@cardano-sdk/wallet';
 
 export const sendCoins = async ({ connectedWallet }: { connectedWallet: ObservableWallet }) => {
@@ -7,5 +7,5 @@ export const sendCoins = async ({ connectedWallet }: { connectedWallet: Observab
 
   const builder = connectedWallet.createTxBuilder();
   const builtTx = builder.addOutput(await builder.buildOutput().handle('rhys').coin(10_000_000n).build()).build();
-  buildAndSignTx({ builtTx, connectedWallet, textElement: sendInfoElement });
+  inspectAndSignTx({ builtTx, connectedWallet, textElement: sendInfoElement });
 };
