@@ -375,6 +375,7 @@ in
           network = "preprod";
           region = "us-east-2";
 
+          backend.ogmiosSrvServiceName = "${final.namespace}-cardano-core.${final.namespace}.svc.cluster.local";
           backend.hostnames = ["tmp-backend.${final.namespace}.eks.${baseUrl}" "tmp-${final.namespace}.${baseUrl}"];
           backend.passHandleDBArgs = false;
           backend.routes = [
@@ -414,6 +415,7 @@ in
           network = "preview";
           region = "us-east-2";
 
+          backend.ogmiosSrvServiceName = "${final.namespace}-cardano-core.${final.namespace}.svc.cluster.local";
           backend.hostnames = ["tmp-backend.${final.namespace}.eks.${baseUrl}" "tmp-${final.namespace}.${baseUrl}"];
           backend.passHandleDBArgs = false;
           backend.routes = [
