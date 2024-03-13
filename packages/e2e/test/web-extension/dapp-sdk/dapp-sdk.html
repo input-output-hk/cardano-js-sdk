@@ -1,26 +1,39 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>cardano-js-sdk example dApp</title>
+    <script defer="defer" src="dapp.js"></script>
+    <link rel="stylesheet" href="./dapp.css" type="text/css" />
+  </head>
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>cardano-js-sdk example dApp</title>
-  <script defer="defer" src="dapp.js"></script>
-</head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root">
+      <h2 class="header">Dapp connector</h2>
 
-<body><noscript>You need to enable JavaScript to run this app.</noscript>
-  <div id="root">
-    <button id="connect-to-lace">Connect Lace</button>
-    <div id="info" style="white-space: pre;"></div>
+      <div class="container">
+        <div class="actions-container">
+          <h4>Actions</h4>
+          <button id="connect-to-lace" class="action">Connect Lace</button>
+          <button id="send-coins" class="action">Send 10 ADA to Rhys</button>
+          <button id="send-several-assets" class="action">Send Asset and Tokens to Rhys</button>
+          <button id="single-delegation" class="action">Delegate</button>
+          <button id="single-undelegation" class="action">Undelegate</button>
+        </div>
 
-    <button id="send-coins">Send 10 ADA to Rhys</button>
-    <div id="info-send" style="white-space: pre;"></div>
-
-    <button id="send-several-assets">Send Asset and Tokens to Rhys</button>
-    <div id="info-several-assets-tokens-transaction" style="white-space: pre;"></div>
-    <div id="info-several-assets-tokens" style="white-space: pre;"></div>
-
-  </div>
-</body>
-
+        <div class="details-container">
+          <h4>Details</h4>
+          <div id="info" class="text"></div>
+          <div id="info-send" class="text"></div>
+          <div id="info-several-assets-tokens-transaction" class="text"></div>
+          <div id="info-several-assets-tokens" class="text"></div>
+          <div id="info-delegate-assets" class="text"></div>
+          <div id="info-delegate-asset-id" class="text"></div>
+          <div id="info-undelegate-assets" class="text"></div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>

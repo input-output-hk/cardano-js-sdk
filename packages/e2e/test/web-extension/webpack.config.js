@@ -19,7 +19,8 @@ module.exports = merge(baseConfig, {
       patterns: [
         { from: path.join(__dirname, 'extension/manifest.json'), to: distDir },
         { from: path.join(__dirname, 'extension/ui.html'), to: distDir },
-        { from: path.join(__dirname, 'dapp-sdk/dapp-sdk.html'), to: distDir }
+        { from: path.join(__dirname, 'dapp-sdk/dapp-sdk.html'), to: distDir },
+        { from: path.join(__dirname, 'dapp-sdk/dapp.css'), to: distDir }
       ]
     })
   ]
