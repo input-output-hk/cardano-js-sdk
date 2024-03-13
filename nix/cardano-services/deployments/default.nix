@@ -204,6 +204,7 @@ in
         oci = inputs.cardanojs-dev-sanchonet.x86_64-linux.cardano-services.oci-images.cardano-services;
    		in {
         namespace = "dev-sanchonet";
+        name = "${final.namespace}-cardanojs-v1";
 
         providers = {
           backend = {
@@ -223,7 +224,6 @@ in
           network = "sanchonet";
           region = "us-east-1";
 
-          name = "${final.namespace}-cardanojs-v1";
           blockfrost-worker.enabled = false;
           pg-boss-worker.enabled = true;
 
