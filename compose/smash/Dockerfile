@@ -1,25 +1,28 @@
-FROM nixos/nix AS nix-configured
-# prepare the base nix image with our nix.conf
-# this is done in a separate stage since we want nix.conf picked up in the next stage
+ARG ALPINE_VERSION=3.14
 
-RUN nix-channel --update
-COPY ./compose/smash/nix/nix.conf /etc/nix/nix.conf
+FROM alpine:${ALPINE_VERSION} AS nix-builder
 
-FROM nix-configured as nix-builder
-
-ENV NETWORK=${NETWORK:-"mainnet"}
-
-# checkout the source
-RUN git clone --depth 1 --branch ${CARDANO_DB_SYNC_VERSION:-13.1.0.0} \
-    https://github.com/IntersectMBO/cardano-db-sync.git
-WORKDIR cardano-db-sync
+RUN apk add --no-cache curl git
+RUN curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix/tag/v0.11.0 | sh -s -- install linux \
+  --extra-conf "sandbox = false" \
+  --extra-conf "substituters = https://cache.nixos.org https://cache.iog.io" \
+  --extra-conf "trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ=" \
+  --init none --no-confirm
 
 # build the binary
-RUN nix build .#cardano-smash-server:exe:cardano-smash-server --accept-flake-config
-RUN nix profile install .#cardano-smash-server:exe:cardano-smash-server --impure
-RUN nix-store --gc
+RUN . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
+    nix build github:input-output-hk/cardano-db-sync/${CARDANO_DB_SYNC_VERSION:-13.1.0.0}#static/cardano-smash-server
+
+
+FROM alpine:${ALPINE_VERSION} AS smash-runtime
+
+# copy the static linked binary from the build step
+COPY --from=nix-builder /nix/store/r0gnc88dcsx4njcg8bz7fs8diqnpg5yr-cardano-smash-server-exe-cardano-smash-server-x86_64-unknown-linux-musl-${CARDANO_DB_SYNC_VERSION:-13.1.0.0}/bin/cardano-smash-server \
+     /bin/cardano-smash-server
 
 # prepare the configuration
+ENV NETWORK=${NETWORK:-"mainnet"}
+
 COPY packages/cardano-services/config/network/${NETWORK}/cardano-db-sync /config/
 COPY compose/placeholder-secrets/smash-admins.txt /config/
 COPY compose/smash/init.sh /bin
