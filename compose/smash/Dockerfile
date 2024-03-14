@@ -2,7 +2,7 @@ ARG ALPINE_VERSION=3.14
 
 FROM alpine:${ALPINE_VERSION} AS nix-builder
 
-RUN apk add --no-cache curl git
+RUN apk add --no-cache curl
 RUN curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix/tag/v0.11.0 | sh -s -- install linux \
   --extra-conf "sandbox = false" \
   --extra-conf "substituters = https://cache.nixos.org https://cache.iog.io" \
@@ -16,17 +16,17 @@ RUN . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
 
 FROM alpine:${ALPINE_VERSION} AS smash-runtime
 
+# curl used for Docker healthcheck
+RUN apk add --no-cache curl
+
 # copy the static linked binary from the build step
 COPY --from=nix-builder /nix/store/r0gnc88dcsx4njcg8bz7fs8diqnpg5yr-cardano-smash-server-exe-cardano-smash-server-x86_64-unknown-linux-musl-${CARDANO_DB_SYNC_VERSION:-13.1.0.0}/bin/cardano-smash-server \
      /bin/cardano-smash-server
 
-# prepare the configuration
-ENV NETWORK=${NETWORK:-"mainnet"}
-
-COPY packages/cardano-services/config/network/${NETWORK}/cardano-db-sync /config/
-COPY compose/placeholder-secrets/smash-admins.txt /config/
+COPY compose/placeholder-secrets/smash-admins.txt /smash-config/
 COPY compose/smash/init.sh /bin
 
 RUN chmod 755 /bin/init.sh
 
 ENTRYPOINT ["/bin/init.sh"]
+

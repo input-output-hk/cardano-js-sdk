@@ -138,6 +138,8 @@ services:
     restart: on-failure
     healthcheck:
       test: ['CMD-SHELL', 'curl -s --fail http://localhost:3100/api/v1/status']
+    volumes:
+      - ../cardano-services/config/network/${NETWORK:-mainnet}/cardano-db-sync:/config/cardano-db-sync
 
   cardano-node:
     <<: *logging

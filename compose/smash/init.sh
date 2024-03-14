@@ -4,7 +4,7 @@ DB=$(cat /run/secrets/postgres_db_db_sync)
 PASSWORD=$(cat /run/secrets/postgres_password)
 USER=$(cat /run/secrets/postgres_user)
 
-echo "postgres:5432:${DB}:${USER}:${PASSWORD}" >/config/pgpass
+echo "postgres:5432:${DB}:${USER}:${PASSWORD}" >/smash-config/pgpass
 
 _term() {
   kill $CHILD
@@ -12,10 +12,10 @@ _term() {
 
 trap _term SIGTERM
 
-PGPASSFILE=/config/pgpass cardano-smash-server \
-  --config /config/config.json \
+PGPASSFILE=/smash-config/pgpass cardano-smash-server \
+  --config /config/cardano-db-sync/config.json \
   --port 3100 \
-  --admins /config/smash-admins.txt &
+  --admins /smash-config/smash-admins.txt &
 
 CHILD=$!
 wait "$CHILD"
