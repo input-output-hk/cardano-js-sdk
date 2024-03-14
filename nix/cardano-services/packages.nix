@@ -28,6 +28,7 @@ in {
         oldAttrs.configurePhase;
       # A bunch of deps build binaries using node-gyp that requires Python
       PYTHON = "${nixpkgs.python3}/bin/python3";
+      NODE_OPTIONS = "--max_old_space_size=8192";
       # node-hid uses pkg-config to find sources
       buildInputs = oldAttrs.buildInputs ++ [nixpkgs.pkg-config nixpkgs.libusb1];
 
@@ -46,6 +47,7 @@ in {
     project.overrideAttrs (oldAttrs: {
       # A bunch of deps build binaries using node-gyp that requires Python
       PYTHON = "${nixpkgs.python3}/bin/python3";
+      NODE_OPTIONS = "--max_old_space_size=8192";
       # playwright build fixes
       PLAYWRIGHT_BROWSERS_PATH = nixpkgs.playwright-driver.browsers;
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = 1;

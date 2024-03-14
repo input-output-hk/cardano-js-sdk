@@ -83,7 +83,7 @@ in
           image = oci.image.name;
           buildInfo = oci.meta.buildInfo;
           versions = oci.meta.versions;
-          httpPrefix = "/v${oci.meta.versions.root}";
+          httpPrefix = "/v${lib.last (lib.sort lib.versionOlder oci.meta.versions.root)}";
 
           loggingLevel = "debug";
           tokenMetadataServerUrl = "http://${final.namespace}-cardano-stack-metadata.${final.namespace}.svc.cluster.local";
@@ -131,18 +131,19 @@ in
           };
           routes = let
             inherit (oci.meta) versions;
-          in [
-            "/v${versions.root}/health"
-            "/v${versions.root}/live"
-            "/v${versions.root}/meta"
-            "/v${versions.root}/ready"
-            "/v${versions.assetInfo}/asset"
-            "/v${versions.chainHistory}/chain-history"
-            "/v${versions.networkInfo}/network-info"
-            "/v${versions.rewards}/rewards"
-            "/v${versions.txSubmit}/tx-submit"
-            "/v${versions.utxo}/utxo"
-          ];
+          in
+            lib.concatLists [
+              (map (v: "/v${v}/health") versions.root)
+              (map (v: "/v${v}/live") versions.root)
+              (map (v: "/v${v}/meta") versions.root)
+              (map (v: "/v${v}/ready") versions.root)
+              (map (v: "/v${v}/asset") versions.assetInfo)
+              (map (v: "/v${v}/chain-history") versions.chainHistory)
+              (map (v: "/v${v}/network-info") versions.networkInfo)
+              (map (v: "/v${v}/rewards") versions.rewards)
+              (map (v: "/v${v}/tx-submit") versions.txSubmit)
+              (map (v: "/v${v}/utxo") versions.utxo)
+            ];
         };
       };
       imports = [
