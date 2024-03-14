@@ -107,6 +107,12 @@ export class Redeemer {
       case RedeemerTag.Reward:
         purpose = Cardano.RedeemerPurpose.withdrawal;
         break;
+      case RedeemerTag.Voting:
+        purpose = Cardano.RedeemerPurpose.vote;
+        break;
+      case RedeemerTag.Proposing:
+        purpose = Cardano.RedeemerPurpose.propose;
+        break;
       default:
         throw new InvalidStateError(`Invalid redeemer type ${this.#tag}`);
     }
@@ -139,6 +145,12 @@ export class Redeemer {
         break;
       case Cardano.RedeemerPurpose.withdrawal:
         tag = RedeemerTag.Reward;
+        break;
+      case Cardano.RedeemerPurpose.vote:
+        tag = RedeemerTag.Voting;
+        break;
+      case Cardano.RedeemerPurpose.propose:
+        tag = RedeemerTag.Proposing;
         break;
       default:
         throw new InvalidStateError(`Invalid redeemer type ${redeemer.purpose}`);
