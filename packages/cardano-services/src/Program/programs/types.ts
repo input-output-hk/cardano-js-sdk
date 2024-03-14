@@ -6,6 +6,7 @@ import {
 } from '../options';
 import { HandlePolicyIdsProgramOptions } from '../options/policyIds';
 import { Milliseconds, Seconds } from '@cardano-sdk/core';
+import { TypeOrmStakePoolProviderProps } from '../../StakePool';
 import { defaultJobOptions } from '@cardano-sdk/projection-typeorm';
 
 /** cardano-services programs */
@@ -50,8 +51,10 @@ export enum ProviderServerOptionDescriptions {
   DisableDbCache = 'Disable DB cache',
   DisableStakePoolMetricApy = 'Omit this metric for improved query performance',
   EpochPollInterval = 'Epoch poll interval',
+  FuzzyOptions = 'Options for the fuzzy search on stake pool metadata',
   HandleProviderServerUrl = 'URL for the Handle provider server',
   HealthCheckCacheTtl = 'Health check cache TTL in seconds between 1 and 10',
+  OverrideFuzzyOptions = 'Allows the override of fuzzyOptions through queryStakePools call',
   PaginationPageSizeLimit = 'Pagination page size limit shared across all providers',
   SubmitApiUrl = 'cardano-submit-api URL',
   TokenMetadataCacheTtl = 'Token Metadata API cache TTL in seconds',
@@ -72,7 +75,8 @@ export type ProviderServerArgs = CommonProgramOptions &
   PosgresProgramOptions<'Asset'> &
   OgmiosProgramOptions &
   HandlePolicyIdsProgramOptions &
-  StakePoolMetadataProgramOptions & {
+  StakePoolMetadataProgramOptions &
+  TypeOrmStakePoolProviderProps & {
     allowedOrigins?: string[];
     assetCacheTTL?: Seconds;
     cardanoNodeConfigPath?: string;
@@ -82,7 +86,6 @@ export type ProviderServerArgs = CommonProgramOptions &
     epochPollInterval: number;
     handleProviderServerUrl?: string;
     healthCheckCacheTtl: Seconds;
-    paginationPageSizeLimit?: number;
     serviceNames: ServiceNames[];
     submitApiUrl?: URL;
     submitValidateHandles?: boolean;

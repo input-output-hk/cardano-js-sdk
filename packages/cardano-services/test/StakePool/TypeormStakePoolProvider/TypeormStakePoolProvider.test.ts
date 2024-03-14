@@ -3,10 +3,13 @@
 import { Cardano, QueryStakePoolsArgs, SortField, StakePoolProvider } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
 import {
+  DEFAULT_FUZZY_SEARCH_OPTIONS,
   HttpServer,
   HttpServerConfig,
+  InMemoryCache,
   StakePoolHttpService,
   TypeormStakePoolProvider,
+  UNLIMITED_CACHE_TTL,
   createDnsResolver,
   getConnectionConfig,
   getEntities
@@ -146,8 +149,8 @@ describe('TypeormStakePoolProvider', () => {
       beforeAll(async () => {
         provider = stakePoolHttpProvider(clientConfig);
         stakePoolProvider = new TypeormStakePoolProvider(
-          { lastRosEpochs: 10, paginationPageSizeLimit: pagination.limit },
-          { connectionConfig$, entities, logger }
+          { fuzzyOptions: DEFAULT_FUZZY_SEARCH_OPTIONS, lastRosEpochs: 10, paginationPageSizeLimit: pagination.limit },
+          { cache: new InMemoryCache(UNLIMITED_CACHE_TTL), connectionConfig$, entities, logger }
         );
         service = new StakePoolHttpService({ logger, stakePoolProvider });
         httpServer = new HttpServer(config, { logger, runnableDependencies: [], services: [service] });
@@ -612,6 +615,36 @@ describe('TypeormStakePoolProvider', () => {
               expect(response.pageResults.length).toBeGreaterThan(0);
               expect(response.pageResults[0].status).toEqual(Cardano.StakePoolStatus.Retiring);
             });
+          });
+        });
+
+        // Being this search based on a not exact match, the results of these tests are strongly dependant on
+        // stake pools configuration in the local-network: the expected result of the tests is hard coded.
+        // In case of changes in the local-network configuration, the need of some actions here is expected.
+        describe('search pools by text', () => {
+          describe('by default, result is sorted by relevance', () => {
+            it('with stringent search', async () => {
+              const response = await provider.queryStakePools({ filters: { text: 'sp11' }, pagination });
+              expect(response.pageResults.map(({ metadata }) => metadata?.ticker)).toEqual(['SP11', 'SP1', 'SP10']);
+            });
+
+            it('with mild search', async () => {
+              const response = await provider.queryStakePools({ filters: { text: 'pool 10 ' }, pagination });
+              expect(response.pageResults.map(({ metadata }) => metadata?.ticker).slice(0, 3)).toEqual([
+                'SP10',
+                'SP1',
+                'SP11'
+              ]);
+            });
+          });
+
+          it('when search options are specified, they take precedence over sort by relevance', async () => {
+            const response = await provider.queryStakePools({
+              filters: { text: 'sp1' },
+              pagination,
+              sort: { field: 'ticker', order: 'desc' }
+            });
+            expect(response.pageResults.map(({ metadata }) => metadata?.ticker)).toEqual(['SP11', 'SP10', 'SP1']);
           });
         });
 

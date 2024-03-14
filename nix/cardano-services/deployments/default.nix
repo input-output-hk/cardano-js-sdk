@@ -167,7 +167,10 @@ in
           backend = {
             enabled = true;
           };
-          stake-pool-provider.enabled = true;
+          stake-pool-provider = {
+            enabled = true;
+            env.OVERRIDE_FUZZY_OPTIONS = "true";
+          };
           handle-provider.enabled = true;
           # asset-provider.enabled = true;
         };
@@ -213,7 +216,10 @@ in
             env.USE_BLOCKFROST = lib.mkForce "false";
             env.SUBMIT_API_URL = "http://${final.namespace}-cardano-stack.${final.namespace}.svc.cluster.local:8090";
           };
-          stake-pool-provider.enabled = true;
+          stake-pool-provider = {
+            enabled = true;
+            env.OVERRIDE_FUZZY_OPTIONS = "true";
+          };
         };
 
         projectors = {
@@ -259,7 +265,10 @@ in
             enabled = true;
             replicas = 3;
           };
-          stake-pool-provider.enabled = true;
+          stake-pool-provider = {
+            enabled = true;
+            env.OVERRIDE_FUZZY_OPTIONS = "true";
+          };
           handle-provider.enabled = true;
           # asset-provider.enabled = true;
         };
@@ -326,7 +335,10 @@ in
             enabled = true;
             env.USE_BLOCKFROST = lib.mkForce "false";
           };
-          stake-pool-provider.enabled = true;
+          stake-pool-provider = {
+            enabled = true;
+            env.OVERRIDE_FUZZY_OPTIONS = "true";
+          };
           handle-provider.enabled = true;
         };
 

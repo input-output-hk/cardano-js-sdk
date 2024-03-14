@@ -22,6 +22,15 @@ export interface MultipleChoiceSearchFilter<T> {
   values: T[];
 }
 
+/** Options for the fuzzy search on stake pool metadata */
+export interface FuzzyOptions {
+  /** Maximum threshold. `0`: exact match; `1`: match everything. */
+  threshold: number;
+
+  /** Weights of metadata fields. Free positive values: they will be normalized internally. */
+  weights: { description: number; homepage: number; name: number; poolId: number; ticker: number };
+}
+
 /** The StakePoolProvider.queryStakePools call arguments. */
 export interface QueryStakePoolsArgs {
   /** Will return all stake pools sorted by name ascending if not specified. */
@@ -40,7 +49,13 @@ export interface QueryStakePoolsArgs {
 
     /** If provided, returns all the pools in any of the given status. */
     status?: Cardano.StakePoolStatus[];
+
+    /** Fuzzy search on text metadata fields. Ignored if shorter than 3 characters. If provided and valid, `identifier` is ignored. */
+    text?: string;
   };
+
+  /** Overrides default fuzzy options. Ignored in _live_ environments. */
+  fuzzyOptions?: FuzzyOptions;
 
   /**
    * Used for APY metric computation. It will take 3 epochs back if not specified.
