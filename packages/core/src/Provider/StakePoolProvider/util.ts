@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export const PoolDataSortFields = ['cost', 'name', 'margin', 'pledge'] as const;
+export const PoolDataSortFields = ['cost', 'name', 'margin', 'pledge', 'ticker'] as const;
 export const PoolMetricsSortFields = ['blocks', 'liveStake', 'saturation'] as const;
 export const PoolAPYSortFields = ['apy'] as const;
 export const PoolROSSortFields = ['ros', 'lastRos'] as const;

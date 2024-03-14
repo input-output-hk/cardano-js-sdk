@@ -679,6 +679,31 @@ describe('TypeormStakePoolProvider', () => {
             });
           });
 
+          describe('sort by ticker', () => {
+            it('desc order', async () => {
+              const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'ticker'));
+              const expected = [...poolsInfoWithMeta].sort((a, b) => (a.ticker < b.ticker ? 1 : -1));
+              expect(response.pageResults[0].metadata?.ticker).toEqual(expected[0].ticker);
+              expect(response.pageResults[1].metadata?.ticker).toEqual(expected[1].ticker);
+            });
+
+            it('asc order', async () => {
+              const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'ticker'));
+              const expected = [...poolsInfoWithMeta].sort((a, b) => (a.ticker < b.ticker ? -1 : 1));
+              expect(response.pageResults[0].metadata?.ticker).toEqual(expected[0].ticker);
+              expect(response.pageResults[1].metadata?.ticker).toEqual(expected[1].ticker);
+            });
+
+            it('with applied filters', async () => {
+              const response = await provider.queryStakePools(
+                setSortCondition(setFilterCondition(filterArgs, 'or'), 'asc', 'ticker')
+              );
+              const expected = [...poolsInfoWithMeta].sort((a, b) => (a.ticker < b.ticker ? -1 : 1));
+              expect(response.pageResults[0].metadata?.ticker).toEqual(expected[0].ticker);
+              expect(response.pageResults[1].metadata?.ticker).toEqual(expected[1].ticker);
+            });
+          });
+
           describe('sort by cost', () => {
             it('desc order', async () => {
               const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'cost'));

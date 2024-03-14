@@ -60,7 +60,8 @@ export const sortSelectionMap: { [key in SortField]: string } = {
   name: 'metadata.name',
   pledge: 'params_pledge',
   ros: 'metrics_ros',
-  saturation: 'metrics_live_saturation'
+  saturation: 'metrics_live_saturation',
+  ticker: 'metadata_ticker'
 };
 
 export const nullsInSort = 'NULLS LAST';
