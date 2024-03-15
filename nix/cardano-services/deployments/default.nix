@@ -202,7 +202,7 @@ in
 
       "dev-sanchonet@us-east-1@v1" = final: let
         oci = inputs.cardanojs-dev-sanchonet.x86_64-linux.cardano-services.oci-images.cardano-services;
-   		in {
+      in {
         namespace = "dev-sanchonet";
         name = "${final.namespace}-cardanojs-v1";
 
