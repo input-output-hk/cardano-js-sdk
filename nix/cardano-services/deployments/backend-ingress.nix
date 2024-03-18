@@ -12,31 +12,30 @@
     metadata = {
       name = "${chart.name}-backend";
       labels = utils.appLabels "backend";
-      annotations =
-        {
-          "alb.ingress.kubernetes.io/actions.ssl-redirect" = builtins.toJSON {
-            Type = "redirect";
-            RedirectConfig = {
-              Protocol = "HTTPS";
-              Port = "443";
-              StatusCode = "HTTP_301";
-            };
+      annotations = {
+        "alb.ingress.kubernetes.io/actions.ssl-redirect" = builtins.toJSON {
+          Type = "redirect";
+          RedirectConfig = {
+            Protocol = "HTTPS";
+            Port = "443";
+            StatusCode = "HTTP_301";
           };
-          "alb.ingress.kubernetes.io/listen-ports" = builtins.toJSON [{HTTP = 80;} {HTTPS = 443;}];
-          "alb.ingress.kubernetes.io/target-type" = "ip";
-          "alb.ingress.kubernetes.io/scheme" = "internet-facing";
-          "alb.ingress.kubernetes.io/wafv2-acl-arn" = values.backend.wafARN;
-          "alb.ingress.kubernetes.io/healthcheck-path" = "${values.cardano-services.httpPrefix}/health";
-          "alb.ingress.kubernetes.io/healthcheck-interval-seconds" = toString values.backend.albHealthcheck.interval;
-          "alb.ingress.kubernetes.io/healthcheck-timeout-seconds" = toString values.backend.albHealthcheck.timeout;
-          # Use latency routing policy
-          "external-dns.alpha.kubernetes.io/aws-region" = values.region;
-          "external-dns.alpha.kubernetes.io/set-identifier" = values.backend.dnsId;
-          "alb.ingress.kubernetes.io/group.name" = chart.namespace;
-          # ACM
-          "alb.ingress.kubernetes.io/certificate-arn" = values.cardano-services.certificateArn;
-          "alb.ingress.kubernetes.io/group.order" =  toString values.cardano-services.ingresOrder;
         };
+        "alb.ingress.kubernetes.io/listen-ports" = builtins.toJSON [{HTTP = 80;} {HTTPS = 443;}];
+        "alb.ingress.kubernetes.io/target-type" = "ip";
+        "alb.ingress.kubernetes.io/scheme" = "internet-facing";
+        "alb.ingress.kubernetes.io/wafv2-acl-arn" = values.backend.wafARN;
+        "alb.ingress.kubernetes.io/healthcheck-path" = "${values.cardano-services.httpPrefix}/health";
+        "alb.ingress.kubernetes.io/healthcheck-interval-seconds" = toString values.backend.albHealthcheck.interval;
+        "alb.ingress.kubernetes.io/healthcheck-timeout-seconds" = toString values.backend.albHealthcheck.timeout;
+        # Use latency routing policy
+        "external-dns.alpha.kubernetes.io/aws-region" = values.region;
+        "external-dns.alpha.kubernetes.io/set-identifier" = values.backend.dnsId;
+        "alb.ingress.kubernetes.io/group.name" = chart.namespace;
+        # ACM
+        "alb.ingress.kubernetes.io/certificate-arn" = values.cardano-services.certificateArn;
+        "alb.ingress.kubernetes.io/group.order" = toString values.cardano-services.ingresOrder;
+      };
     };
     spec = {
       ingressClassName = "alb";

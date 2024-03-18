@@ -202,8 +202,9 @@ in
       };
 
       "dev-sanchonet@us-east-1@v1" = final: {
-        name = "${final.namespace}-cardanojs-v1";
+
         namespace = "dev-sanchonet";
+        name = "${final.namespace}-cardanojs-v1";
 
         providers = {
           backend = {
@@ -220,7 +221,7 @@ in
         };
 
         values = {
-          network = "sanchonet-1";
+          network = "sanchonet";
           region = "us-east-1";
 
           blockfrost-worker.enabled = false;
