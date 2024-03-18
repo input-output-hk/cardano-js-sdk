@@ -394,5 +394,55 @@ in
           };
         };
       };
+
+      "live-sanchonet@us-east-2@v1" = final: {
+
+        namespace = "live-sanchonet";
+        name = "${final.namespace}-cardanojs-v1";
+
+        providers = {
+          backend = {
+            enabled = true;
+            env.USE_SUBMIT_API = "true";
+            env.USE_BLOCKFROST = lib.mkForce "false";
+            env.SUBMIT_API_URL = "http://${final.namespace}-cardano-stack.${final.namespace}.svc.cluster.local:8090";
+          };
+          stake-pool-provider.enabled = true;
+        };
+
+        projectors = {
+          stake-pool.enabled = true;
+        };
+
+        values = {
+          network = "sanchonet";
+          region = "us-east-2";
+
+          blockfrost-worker.enabled = false;
+          pg-boss-worker.enabled = true;
+
+          cardano-services = {
+            ingresOrder = 99;
+            additionalRoutes = [
+              {
+                pathType = "Prefix";
+                path = "/v1.0.0/stake-pool";
+                backend.service = {
+                  name = "${final.namespace}-cardanojs-v1-stake-pool-provider";
+                  port.name = "http";
+                };
+              }
+              {
+                pathType = "Prefix";
+                path = "/v3.0.0/chain-history";
+                backend.service = {
+                  name = "${final.namespace}-cardanojs-v1-backend";
+                  port.name = "http";
+                };
+              }
+            ];
+          };
+        };
+      };
     };
   }
