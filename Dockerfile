@@ -29,6 +29,7 @@ COPY packages/cardano-services-client/package.json packages/cardano-services-cli
 COPY packages/core/package.json packages/core/package.json
 COPY packages/crypto/package.json packages/crypto/package.json
 COPY packages/dapp-connector/package.json packages/dapp-connector/package.json
+COPY packages/dapp-connector-client/package.json packages/dapp-connector-client/package.json
 COPY packages/e2e/package.json packages/e2e/package.json
 COPY packages/golden-test-generator/package.json packages/golden-test-generator/package.json
 COPY packages/governance/package.json packages/governance/package.json
