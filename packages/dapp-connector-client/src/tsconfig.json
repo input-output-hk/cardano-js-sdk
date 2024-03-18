@@ -6,6 +6,12 @@
   "references": [
     {
       "path": "../../core/src"
+    },
+    {
+      "path": "../../key-management/src",
+    },
+    {
+      "path": "../../wallet/src",
     }
   ]
 }
