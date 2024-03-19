@@ -26,6 +26,18 @@ let
       yq-go
     ];
   };
+  mkK9sCommand = region: {
+    command = ''
+      if [ -z "$K8S_USER" ]; then
+        echo "To use this command you must set K8S_USER in $PRJ_ROOT/.access.local. See Readme."
+      else
+        ${k9s}/bin/k9s --kubeconfig $PRJ_ROOT/.kube/${region} $@
+      fi
+    '';
+    name = "k9s-${region}";
+    category = "direct access";
+  };
+
 in {
   checks = mkShell {
     imports = [formattingModule];
@@ -54,6 +66,8 @@ in {
       {package = std;}
       {package = yarn;}
       {package = k9s;}
+      (mkK9sCommand "us-east-1")
+      (mkK9sCommand "us-east-2")
     ];
 
     devshell.startup.setup.text = ''
