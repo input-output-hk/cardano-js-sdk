@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.25.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.24.8...@cardano-sdk/web-extension@0.25.0) (2024-03-12)
+
+### ⚠ BREAKING CHANGES
+
+* finalizeTx was added to the Witnesser interface
+- the PersonalWallet was renamed BaseWallet
+- all code specific to Bip32 wallet have been abstracted out of the BaseWallet
+- the PersonalWallet must now be constructed with the createPersonalWallet util function
+- the SignedTx type was renamed to WitnessedTx
+- the UnsignedTx type was renamed to UnwitnessedTx
+- the Witness method from the Witnesser interface now returns a WitnessedTx
+- extraSigners was moved from the witness field to the signingOptions in both the wallet FinalizeTxProps and witness signingOptions
+- wallet repository script wallets ownSigners type now includes paymentScriptKeyPath and stakingScriptKeyPath
+- wallet repository script wallets script field replaced by paymentScript and stakingScript
+- stubSignTransaction util function now takes and optional dRepPublicKey as part of the context
+* bip32Account is now an optional TxBuilder dependency
+
+### Features
+
+* added SharedWallet implementation ([272f392](https://github.com/input-output-hk/cardano-js-sdk/commit/272f3923ac872337cdf1f8647ac07c6a7a78384a))
+* finalizeTxDependencies no longer requires a bip32Account, but should provide a dRepPublicKey if available ([eaf01dd](https://github.com/input-output-hk/cardano-js-sdk/commit/eaf01dd4135a37c77295e4c587f9897e9eb50890))
+* **wallet:** add signed transactions observable ([aca3660](https://github.com/input-output-hk/cardano-js-sdk/commit/aca3660534cc7660d6ebd9aa6eb1efe9b7862b92))
+
 ## [0.24.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.24.7...@cardano-sdk/web-extension@0.24.8) (2024-02-29)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension

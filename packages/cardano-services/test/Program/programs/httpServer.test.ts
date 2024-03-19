@@ -76,6 +76,7 @@ describe('HTTP Server', () => {
         healthCheckCacheTtl,
         metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
         ogmiosUrl,
+        paginationPageSizeLimit: 10,
         postgresConnectionStringAsset,
         postgresConnectionStringDbSync,
         postgresConnectionStringHandle,
@@ -102,6 +103,7 @@ describe('HTTP Server', () => {
           healthCheckCacheTtl,
           metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
           ogmiosUrl,
+          paginationPageSizeLimit: 10,
           postgresDbDbSync,
           postgresPasswordDbSync,
           postgresSrvServiceNameDbSync,
@@ -128,6 +130,7 @@ describe('HTTP Server', () => {
               healthCheckCacheTtl,
               metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
               ogmiosUrl,
+              paginationPageSizeLimit: 10,
               postgresDbDbSync: missingPostgresDb,
               postgresSrvServiceNameDbSync,
               postgresUserDbSync,
@@ -155,6 +158,7 @@ describe('HTTP Server', () => {
               healthCheckCacheTtl,
               metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
               ogmiosUrl,
+              paginationPageSizeLimit: 10,
               serviceNames: [ServiceNames.StakePool]
             })
         ).rejects.toThrow(
@@ -178,6 +182,8 @@ describe('HTTP Server', () => {
           metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
           ogmiosSrvServiceName,
           ogmiosUrl,
+          paginationPageSizeLimit: 10,
+          // postgresConnectionStringDbSync,
           serviceDiscoveryBackoffFactor,
           serviceDiscoveryTimeout,
           serviceNames: [ServiceNames.TxSubmit]
@@ -196,6 +202,8 @@ describe('HTTP Server', () => {
           healthCheckCacheTtl,
           metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
           ogmiosSrvServiceName,
+          paginationPageSizeLimit: 10,
+          // postgresConnectionStringDbSync,
           serviceDiscoveryBackoffFactor,
           serviceDiscoveryTimeout,
           serviceNames: [ServiceNames.TxSubmit]
@@ -215,6 +223,7 @@ describe('HTTP Server', () => {
               handlePolicyIds: [],
               healthCheckCacheTtl,
               metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
+              paginationPageSizeLimit: 10,
               postgresConnectionStringDbSync,
               serviceDiscoveryBackoffFactor,
               serviceDiscoveryTimeout,
@@ -238,6 +247,7 @@ describe('HTTP Server', () => {
             healthCheckCacheTtl,
             metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
             ogmiosUrl,
+            paginationPageSizeLimit: 10,
             postgresConnectionStringDbSync: 'postgres',
             serviceNames: [serviceName]
           })
@@ -262,6 +272,7 @@ describe('HTTP Server', () => {
           healthCheckCacheTtl,
           metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
           ogmiosUrl,
+          paginationPageSizeLimit: 10,
           postgresConnectionStringDbSync,
           serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]
         })

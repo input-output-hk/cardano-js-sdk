@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.29.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.28.5...@cardano-sdk/core@0.29.0) (2024-03-12)
+
+### ⚠ BREAKING CHANGES
+
+* rename RewardAccountInfo keyStatus field to credentialStatus
+* **core:** protocol parameter type for hard fork proposal
+
+### Features
+
+* add proposal procedures deposit to compute implicit coins ([21e1863](https://github.com/input-output-hk/cardano-js-sdk/commit/21e18638bee85f1c8f3e43246efa289f63d77662))
+
+### Bug Fixes
+
+* **core:** hard fork proposal serialization ([3214392](https://github.com/input-output-hk/cardano-js-sdk/commit/3214392b04dc4c611ef446f539b9126e56e27fbb))
+* **core:** info action proposal procedure serialization and de-serialization ([baebef7](https://github.com/input-output-hk/cardano-js-sdk/commit/baebef706ff19eab9d9e12b4f18470ae9cd8816b))
+* **core:** protocol parameter type for hard fork proposal ([341dfd0](https://github.com/input-output-hk/cardano-js-sdk/commit/341dfd0ab5db7c220a0de16db9fd7038f322ee44))
+* **core:** protocol parameters update proposal serialization ([f85fb55](https://github.com/input-output-hk/cardano-js-sdk/commit/f85fb55e3b2385e141b528efd120c1b31bd67df5))
+
+### Code Refactoring
+
+* stakeKeyStatus renamed StakeCredentialStatus ([cf76584](https://github.com/input-output-hk/cardano-js-sdk/commit/cf76584c3531c72c659de13df06a9f4342101f46))
+
 ## [0.28.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.28.4...@cardano-sdk/core@0.28.5) (2024-02-29)
 
 ### Bug Fixes

@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-services",
-  "version": "0.26.5",
+  "version": "0.26.6",
   "description": "Cardano GraphQL Services",
   "engines": {
     "node": ">=16.20.2"
@@ -113,6 +113,7 @@
     "express-openapi-validator": "^4.13.8",
     "express-prom-bundle": "^6.4.1",
     "fraction.js": "^4.2.0",
+    "fuse.js": "^7.0.0",
     "json-bigint": "^1.0.0",
     "jsonschema": "^1.4.1",
     "lodash": "^4.17.21",

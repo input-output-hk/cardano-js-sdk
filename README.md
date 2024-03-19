@@ -54,6 +54,12 @@ Automatic deployments are done for:
 - [dev-preprod](https://dev-preprod.lw.iog.io/v1.0.0/health) - On each release
 - [dev-mainnet](https://dev-mainnet.lw.iog.io/v1.0.0/health) - On each release
 
+Manual deployments can be done via [STD Workflow](https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/std.yml)
+- Click 'Run workflow'
+- Select branch
+- Check checkboxes for environments that should be deployed
+- Click 'Run workflow'
+
 ## Development
 
 A Yarn Workspace maintaining a single version across all packages.

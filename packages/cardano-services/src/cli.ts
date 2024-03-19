@@ -35,6 +35,7 @@ import {
   USE_BLOCKFROST_DEFAULT,
   USE_TYPEORM_ASSET_PROVIDER_DEFAULT,
   USE_TYPEORM_STAKE_POOL_PROVIDER_DEFAULT,
+  WrongOption,
   addOptions,
   availableNetworks,
   connectionStringFromArgs,
@@ -52,6 +53,7 @@ import {
 } from './Program';
 import { Command } from 'commander';
 import { DB_CACHE_TTL_DEFAULT } from './InMemoryCache';
+import { DEFAULT_FUZZY_SEARCH_OPTIONS, validateFuzzyOptions } from './StakePool';
 import {
   DEFAULT_TOKEN_METADATA_CACHE_TTL,
   DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT,
@@ -227,17 +229,18 @@ const providerServerWithCommon = withCommonOptions(providerServerWithPostgres, P
 
 addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon)), [
   newOption(
-    '--service-names <serviceNames>',
-    `List of services to attach: ${Object.values(ServiceNames).toString()}`,
-    'SERVICE_NAMES',
-    serviceNameParser
-  ),
-  newOption(
     '--allowed-origins <allowedOrigins>',
     ProviderServerOptionDescriptions.AllowedOrigins,
     'ALLOWED_ORIGINS',
     (originsList) => originsList.split(',') as string[],
     ALLOWED_ORIGINS_DEFAULT
+  ),
+  newOption(
+    '--asset-cache-ttl <assetCacheTTL>',
+    ProviderServerOptionDescriptions.AssetCacheTtl,
+    'ASSET_CACHE_TTL',
+    dbCacheValidator(ProviderServerOptionDescriptions.AssetCacheTtl),
+    DB_CACHE_TTL_DEFAULT
   ),
   newOption(
     '--cardano-node-config-path <cardanoNodeConfigPath>',
@@ -263,12 +266,8 @@ addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon
     '--disable-stake-pool-metric-apy <true/false>',
     ProviderServerOptionDescriptions.DisableStakePoolMetricApy,
     'DISABLE_STAKE_POOL_METRIC_APY',
-    (disableApy) =>
-      stringOptionToBoolean(
-        disableApy,
-        Programs.ProviderServer,
-        ProviderServerOptionDescriptions.DisableStakePoolMetricApy
-      ),
+    (value) =>
+      stringOptionToBoolean(value, Programs.ProviderServer, ProviderServerOptionDescriptions.DisableStakePoolMetricApy),
     DISABLE_STAKE_POOL_METRIC_APY_DEFAULT
   ),
   newOption(
@@ -279,6 +278,27 @@ addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon
     EPOCH_POLL_INTERVAL_DEFAULT
   ),
   newOption(
+    '--fuzzy-options <fuzzyOptions>',
+    ProviderServerOptionDescriptions.FuzzyOptions,
+    'FUZZY_OPTIONS',
+    (value) => {
+      try {
+        return validateFuzzyOptions(value);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        throw new WrongOption(Programs.ProviderServer, ProviderServerOptionDescriptions.FuzzyOptions, error.message);
+      }
+    },
+    DEFAULT_FUZZY_SEARCH_OPTIONS
+  ),
+  newOption(
+    '--handle-provider-server-url <handleProviderServerUrl>',
+    ProviderServerOptionDescriptions.HandleProviderServerUrl,
+    'HANDLE_PROVIDER_SERVER_URL',
+    (serverUrl: string) => serverUrl,
+    HANDLE_PROVIDER_SERVER_URL_DEFAULT
+  ),
+  newOption(
     '--health-check-cache-ttl <healthCheckCacheTTL>',
     ProviderServerOptionDescriptions.HealthCheckCacheTtl,
     'HEALTH_CHECK_CACHE_TTL',
@@ -287,17 +307,38 @@ addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon
     DEFAULT_HEALTH_CHECK_CACHE_TTL
   ),
   newOption(
+    '--override-fuzzy-options <true/false>',
+    ProviderServerOptionDescriptions.OverrideFuzzyOptions,
+    'OVERRIDE_FUZZY_OPTIONS',
+    (value) =>
+      stringOptionToBoolean(value, Programs.ProviderServer, ProviderServerOptionDescriptions.OverrideFuzzyOptions)
+  ),
+  newOption(
+    '--pagination-page-size-limit <paginationPageSizeLimit>',
+    ProviderServerOptionDescriptions.PaginationPageSizeLimit,
+    'PAGINATION_PAGE_SIZE_LIMIT',
+    integerValidator(ProviderServerOptionDescriptions.PaginationPageSizeLimit),
+    PAGINATION_PAGE_SIZE_LIMIT_DEFAULT
+  ),
+  newOption(
+    '--service-names <serviceNames>',
+    `List of services to attach: ${Object.values(ServiceNames).toString()}`,
+    'SERVICE_NAMES',
+    serviceNameParser
+  ),
+  newOption(
     '--submit-api-url <submitApiUrl>',
     ProviderServerOptionDescriptions.SubmitApiUrl,
     'SUBMIT_API_URL',
     urlValidator(ProviderServerOptionDescriptions.SubmitApiUrl)
   ),
   newOption(
-    '--token-metadata-server-url <tokenMetadataServerUrl>',
-    ProviderServerOptionDescriptions.TokenMetadataServerUrl,
-    'TOKEN_METADATA_SERVER_URL',
-    urlValidator(ProviderServerOptionDescriptions.TokenMetadataServerUrl, true),
-    DEFAULT_TOKEN_METADATA_SERVER_URL
+    '--submit-validate-handles <true/false>',
+    ProviderServerOptionDescriptions.SubmitValidateHandles,
+    'SUBMIT_VALIDATE_HANDLES',
+    (value) =>
+      stringOptionToBoolean(value, Programs.ProviderServer, ProviderServerOptionDescriptions.SubmitValidateHandles),
+    false
   ),
   newOption(
     '--token-metadata-cache-ttl <tokenMetadataCacheTTL>',
@@ -307,13 +348,6 @@ addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon
     DEFAULT_TOKEN_METADATA_CACHE_TTL
   ),
   newOption(
-    '--asset-cache-ttl <assetCacheTTL>',
-    ProviderServerOptionDescriptions.AssetCacheTtl,
-    'ASSET_CACHE_TTL',
-    dbCacheValidator(ProviderServerOptionDescriptions.AssetCacheTtl),
-    DB_CACHE_TTL_DEFAULT
-  ),
-  newOption(
     '--token-metadata-request-timeout <tokenMetadataRequestTimeout>',
     ProviderServerOptionDescriptions.TokenMetadataRequestTimeout,
     'TOKEN_METADATA_REQUEST_TIMEOUT',
@@ -321,16 +355,11 @@ addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon
     DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT
   ),
   newOption(
-    '--use-typeorm-stake-pool-provider <true/false>',
-    ProviderServerOptionDescriptions.UseTypeOrmStakePoolProvider,
-    'USE_TYPEORM_STAKE_POOL_PROVIDER',
-    (useTypeormStakePoolProvider) =>
-      stringOptionToBoolean(
-        useTypeormStakePoolProvider,
-        Programs.ProviderServer,
-        ProviderServerOptionDescriptions.UseTypeOrmStakePoolProvider
-      ),
-    USE_TYPEORM_STAKE_POOL_PROVIDER_DEFAULT
+    '--token-metadata-server-url <tokenMetadataServerUrl>',
+    ProviderServerOptionDescriptions.TokenMetadataServerUrl,
+    'TOKEN_METADATA_SERVER_URL',
+    urlValidator(ProviderServerOptionDescriptions.TokenMetadataServerUrl, true),
+    DEFAULT_TOKEN_METADATA_SERVER_URL
   ),
   newOption(
     '--use-blockfrost <true/false>',
@@ -349,32 +378,6 @@ addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon
     false
   ),
   newOption(
-    '--submit-validate-handles <true/false>',
-    ProviderServerOptionDescriptions.SubmitValidateHandles,
-    'SUBMIT_VALIDATE_HANDLES',
-    (submitValidateHandles) =>
-      stringOptionToBoolean(
-        submitValidateHandles,
-        Programs.ProviderServer,
-        ProviderServerOptionDescriptions.SubmitValidateHandles
-      ),
-    false
-  ),
-  newOption(
-    '--pagination-page-size-limit <paginationPageSizeLimit>',
-    ProviderServerOptionDescriptions.PaginationPageSizeLimit,
-    'PAGINATION_PAGE_SIZE_LIMIT',
-    integerValidator(ProviderServerOptionDescriptions.PaginationPageSizeLimit),
-    PAGINATION_PAGE_SIZE_LIMIT_DEFAULT
-  ),
-  newOption(
-    '--handle-provider-server-url <handleProviderServerUrl>',
-    ProviderServerOptionDescriptions.HandleProviderServerUrl,
-    'HANDLE_PROVIDER_SERVER_URL',
-    (serverUrl: string) => serverUrl,
-    HANDLE_PROVIDER_SERVER_URL_DEFAULT
-  ),
-  newOption(
     '--use-submit-api <true/false>',
     ProviderServerOptionDescriptions.UseSubmitApi,
     'USE_SUBMIT_API',
@@ -385,13 +388,17 @@ addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon
     '--use-typeorm-asset-provider <true/false>',
     ProviderServerOptionDescriptions.UseTypeormAssetProvider,
     'USE_TYPEORM_ASSET_PROVIDER',
-    (useTypeormAssetProvider) =>
-      stringOptionToBoolean(
-        useTypeormAssetProvider,
-        Programs.ProviderServer,
-        ProviderServerOptionDescriptions.UseTypeormAssetProvider
-      ),
+    (value) =>
+      stringOptionToBoolean(value, Programs.ProviderServer, ProviderServerOptionDescriptions.UseTypeormAssetProvider),
     USE_TYPEORM_ASSET_PROVIDER_DEFAULT
+  ),
+  newOption(
+    '--use-typeorm-stake-pool-provider <true/false>',
+    ProviderServerOptionDescriptions.UseTypeOrmStakePoolProvider,
+    'USE_TYPEORM_STAKE_POOL_PROVIDER',
+    (val) =>
+      stringOptionToBoolean(val, Programs.ProviderServer, ProviderServerOptionDescriptions.UseTypeOrmStakePoolProvider),
+    USE_TYPEORM_STAKE_POOL_PROVIDER_DEFAULT
   )
 ]).action(async (serviceNames: ServiceNames[], args: ProviderServerArgs) =>
   runServer('Provider server', { args, serviceNames }, () =>

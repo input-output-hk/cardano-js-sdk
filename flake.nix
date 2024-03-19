@@ -19,7 +19,11 @@
     };
   };
 
-  outputs = {std, nix-helm, ...} @ inputs:
+  outputs = {
+    std,
+    nix-helm,
+    ...
+  } @ inputs:
     inputs.flake-parts.lib.mkFlake {inherit inputs;} {
       imports = with inputs; [
         std.flakeModule

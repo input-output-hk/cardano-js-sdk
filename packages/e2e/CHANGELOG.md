@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.33.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.32.8...@cardano-sdk/e2e@0.33.0) (2024-03-12)
+
+### ⚠ BREAKING CHANGES
+
+* finalizeTx was added to the Witnesser interface
+- the PersonalWallet was renamed BaseWallet
+- all code specific to Bip32 wallet have been abstracted out of the BaseWallet
+- the PersonalWallet must now be constructed with the createPersonalWallet util function
+- the SignedTx type was renamed to WitnessedTx
+- the UnsignedTx type was renamed to UnwitnessedTx
+- the Witness method from the Witnesser interface now returns a WitnessedTx
+- extraSigners was moved from the witness field to the signingOptions in both the wallet FinalizeTxProps and witness signingOptions
+- wallet repository script wallets ownSigners type now includes paymentScriptKeyPath and stakingScriptKeyPath
+- wallet repository script wallets script field replaced by paymentScript and stakingScript
+- stubSignTransaction util function now takes and optional dRepPublicKey as part of the context
+* rename RewardAccountInfo keyStatus field to credentialStatus
+
+### Features
+
+* added SharedWallet implementation ([272f392](https://github.com/input-output-hk/cardano-js-sdk/commit/272f3923ac872337cdf1f8647ac07c6a7a78384a))
+
+### Bug Fixes
+
+* **cardano-services:** phase-2 failure tx mapper ([320cd41](https://github.com/input-output-hk/cardano-js-sdk/commit/320cd4147079acd4c06f3ec9598d7ea9ffa47cca))
+
+### Code Refactoring
+
+* stakeKeyStatus renamed StakeCredentialStatus ([cf76584](https://github.com/input-output-hk/cardano-js-sdk/commit/cf76584c3531c72c659de13df06a9f4342101f46))
+
 ## [0.32.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.32.7...@cardano-sdk/e2e@0.32.8) (2024-02-29)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

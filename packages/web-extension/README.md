@@ -183,12 +183,15 @@ The **consumeRemoteApi**, **walletManagerChannel**, **repositoryChannel** and **
 In the service worker the application instantiates the **WalletRepository** and **WalletManager** and exposes them via the web-extension messaging system:
 
 ```javascript
-serviceWorker.ts
+serviceWorker.ts;
 
-const walletRepository = new WalletRepository<Metadata>({
-  logger,
-  store: new storage.InMemoryCollectionStore()
-});
+const walletRepository =
+  new WalletRepository() <
+  Metadata >
+  {
+    logger,
+    store: new storage.InMemoryCollectionStore()
+  };
 
 const signingCoordinatorApi = consumeRemoteApi(
   {
@@ -198,9 +201,10 @@ const signingCoordinatorApi = consumeRemoteApi(
   dependencies
 );
 
-
-const walletManager = new WalletManager<Metadata>(
-  { name: walletName },
+const walletManager =
+  new WalletManager() <
+  Metadata >
+  ({ name: walletName },
   {
     logger,
     managerStorage: WebExtensionStorage.local,
@@ -209,8 +213,7 @@ const walletManager = new WalletManager<Metadata>(
     storesFactory,
     walletFactory,
     walletRepository
-  }
-);
+  });
 
 exposeApi(
   {

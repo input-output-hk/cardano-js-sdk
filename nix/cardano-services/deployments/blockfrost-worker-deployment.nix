@@ -45,39 +45,39 @@
                 runAsUser = 0;
                 runAsGroup = 0;
               };
-              env = utils.mkPodEnv ({
-                  NETWORK = values.network;
-                  LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
-                  BUILD_INFO = values.cardano-services.buildInfo;
+              env = utils.mkPodEnv {
+                NETWORK = values.network;
+                LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
+                BUILD_INFO = values.cardano-services.buildInfo;
 
-                  BLOCKFROST_API_KEY = {
-                    valueFrom.secretKeyRef = {
-                      name = "blockfrost";
-                      key = "api-key";
-                    };
+                BLOCKFROST_API_KEY = {
+                  valueFrom.secretKeyRef = {
+                    name = "blockfrost";
+                    key = "api-key";
                   };
-                  POSTGRES_HOST_DB_SYNC = values.postgresName;
-                  POSTGRES_PORT_DB_SYNC = "5432";
-                  POSTGRES_DB_DB_SYNC = "cardano";
-                  # Actually, we'd need blokfrost-owner-user (for create table)
-                  # and cardano-public-reader-user (for accessing dbsync source data).
-                  # Howerver, quoting https://postgres-operator.readthedocs.io/en/refactoring-sidecars/user/#manifest-roles:
-                  # > At the moment it is not possible to define membership of the manifest role in other roles.
-                  POSTGRES_PASSWORD_DB_SYNC = {
-                    valueFrom.secretKeyRef = {
-                      name = "cardano-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
-                      key = "password";
-                    };
+                };
+                POSTGRES_HOST_DB_SYNC = values.postgresName;
+                POSTGRES_PORT_DB_SYNC = "5432";
+                POSTGRES_DB_DB_SYNC = "cardano";
+                # Actually, we'd need blokfrost-owner-user (for create table)
+                # and cardano-public-reader-user (for accessing dbsync source data).
+                # Howerver, quoting https://postgres-operator.readthedocs.io/en/refactoring-sidecars/user/#manifest-roles:
+                # > At the moment it is not possible to define membership of the manifest role in other roles.
+                POSTGRES_PASSWORD_DB_SYNC = {
+                  valueFrom.secretKeyRef = {
+                    name = "cardano-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
+                    key = "password";
                   };
-                  POSTGRES_USER_DB_SYNC = {
-                    valueFrom.secretKeyRef = {
-                      name = "cardano-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
-                      key = "username";
-                    };
+                };
+                POSTGRES_USER_DB_SYNC = {
+                  valueFrom.secretKeyRef = {
+                    name = "cardano-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
+                    key = "username";
                   };
-                  POSTGRES_SSL_DB_SYNC = "true";
-                  POSTGRES_SSL_CA_FILE_DB_SYNC = "/tls/ca.crt";
-                });
+                };
+                POSTGRES_SSL_DB_SYNC = "true";
+                POSTGRES_SSL_CA_FILE_DB_SYNC = "/tls/ca.crt";
+              };
               volumeMounts = [
                 {
                   mountPath = "/tls";

@@ -5,3 +5,4 @@ export * from './output-validation';
 export * from './tx-builder';
 export * from './ensureValidityInterval';
 export * from './types';
+export * from './computeScriptDataHash';

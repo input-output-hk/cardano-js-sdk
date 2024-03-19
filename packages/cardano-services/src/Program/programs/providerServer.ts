@@ -134,12 +134,8 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
 
   const getTypeormStakePoolProvider = withTypeOrmProvider('StakePool', (connectionConfig$) => {
     const entities = getEntities(['currentPoolMetrics', 'poolDelisted', 'poolMetadata', 'poolRewards']);
-    const { lastRosEpochs, paginationPageSizeLimit } = args;
 
-    return new TypeormStakePoolProvider(
-      { lastRosEpochs, paginationPageSizeLimit: paginationPageSizeLimit! },
-      { connectionConfig$, entities, logger }
-    );
+    return new TypeormStakePoolProvider(args, { cache: getDbCache(), connectionConfig$, entities, logger });
   });
 
   let networkInfoProvider: DbSyncNetworkInfoProvider | undefined;

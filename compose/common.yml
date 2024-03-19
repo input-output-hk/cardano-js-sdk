@@ -72,6 +72,7 @@ x-sdk-environment: &sdk-environment
   LOGGER_MIN_SEVERITY: ${LOGGER_MIN_SEVERITY:-info}
   NETWORK_INFO_PROVIDER_URL: http://provider-server:3000/
   OGMIOS_URL: ws://ogmios:1337
+  OVERRIDE_FUZZY_OPTIONS: true
   POSTGRES_DB_FILE_ASSET: /run/secrets/postgres_db_asset
   POSTGRES_DB_FILE_DB_SYNC: /run/secrets/postgres_db_db_sync
   POSTGRES_DB_FILE_HANDLE: /run/secrets/postgres_db_handle

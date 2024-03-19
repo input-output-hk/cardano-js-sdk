@@ -1,14 +1,25 @@
 import { BaseWallet, FinalizeTxProps, TransactionFailure } from '@cardano-sdk/wallet';
 import { Cardano, Serialization } from '@cardano-sdk/core';
-import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, isNotNil } from '@cardano-sdk/util';
-import { InitializeTxProps } from '@cardano-sdk/tx-construction';
+import { InitializeTxProps, computeScriptDataHash } from '@cardano-sdk/tx-construction';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { firstValueFromTimed, getEnv, getWallet, walletReady, walletVariables } from '../../../src';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();
+
+const localNetworkPlutusV2CostModel = [
+  205_665, 812, 1, 1, 1000, 571, 0, 1, 1000, 24_177, 4, 1, 1000, 32, 117_366, 10_475, 4, 23_000, 100, 23_000, 100,
+  23_000, 100, 23_000, 100, 23_000, 100, 23_000, 100, 100, 100, 23_000, 100, 19_537, 32, 175_354, 32, 46_417, 4,
+  221_973, 511, 0, 1, 89_141, 32, 497_525, 14_068, 4, 2, 196_500, 453_240, 220, 0, 1, 1, 1000, 28_662, 4, 2, 245_000,
+  216_773, 62, 1, 1_060_367, 12_586, 1, 208_512, 421, 1, 187_000, 1000, 52_998, 1, 80_436, 32, 43_249, 32, 1000, 32,
+  80_556, 1, 57_667, 4, 1000, 10, 197_145, 156, 1, 197_145, 156, 1, 204_924, 473, 1, 208_896, 511, 1, 52_467, 32,
+  64_832, 32, 65_493, 32, 22_558, 32, 16_563, 32, 76_511, 32, 196_500, 453_240, 220, 0, 1, 1, 69_522, 11_687, 0, 1,
+  60_091, 32, 196_500, 453_240, 220, 0, 1, 1, 196_500, 453_240, 220, 0, 1, 1, 1_159_724, 392_670, 0, 2, 806_990, 30_482,
+  4, 1_927_926, 82_523, 4, 265_318, 0, 4, 0, 85_931, 32, 205_665, 812, 1, 1, 41_182, 32, 212_342, 32, 31_220, 32,
+  32_696, 32, 43_357, 32, 32_247, 32, 38_314, 32, 35_892_428, 10, 9_462_713, 1021, 10, 38_887_044, 32_947, 10
+];
 
 /**
  * Creates an output suitable legacy collateral.
@@ -89,8 +100,15 @@ describe('PersonalWallet/phase2validation', () => {
       purpose: Cardano.RedeemerPurpose.mint
     };
 
-    // Script data hash was precomputed with the CML (hash of datums, redeemers and language views).
-    const scriptDataHash = Hash32ByteBase16('b6eb57092c330973b23784ac39426921eebd8376343409c03f613fa1a2017126');
+    // LW-7691: Currently cost models come from the backend out of order and as an object rather than an array.
+    // for now we will hard code them.
+    // const protocolParameters = await wallet.networkInfoProvider.protocolParameters();
+
+    const scriptDataHash = computeScriptDataHash(
+      new Map([[Cardano.PlutusLanguageVersion.V2, localNetworkPlutusV2CostModel]]),
+      [alwaysFailScript.version],
+      [scriptRedeemer]
+    );
 
     await walletReady(wallet);
 
@@ -153,6 +171,6 @@ describe('PersonalWallet/phase2validation', () => {
     expect([TransactionFailure.Phase2Validation, TransactionFailure.FailedToSubmit].includes(failedTx.reason)).toBe(
       true
     );
-    expect(txFoundInHistory.body.fee).toEqual(collateralCoinValue);
+    expect(txFoundInHistory.body.totalCollateral).toEqual(collateralCoinValue);
   });
 });
