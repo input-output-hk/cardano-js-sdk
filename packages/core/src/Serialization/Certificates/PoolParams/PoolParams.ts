@@ -7,8 +7,6 @@ import { PoolMetadata } from './PoolMetadata';
 import { Relay } from './Relay';
 import { UnitInterval } from '../../Common/UnitInterval';
 
-const EMBEDDED_GROUP_SIZE = 9;
-
 /**
  * Stake pool update certificate parameters.
  *
@@ -26,6 +24,8 @@ export class PoolParams {
   #relays: Array<Relay>;
   #poolMetadata?: PoolMetadata;
   #originalBytes: HexBlob | undefined = undefined;
+
+  static readonly subgroupCount = 9;
 
   /**
    * Initializes a new instance of the PoolParams class.
@@ -83,7 +83,20 @@ export class PoolParams {
     //               , relays:         [* relay]
     //               , pool_metadata:  pool_metadata / null
     //               )
-    writer.writeStartArray(EMBEDDED_GROUP_SIZE);
+    writer.writeStartArray(PoolParams.subgroupCount);
+    return this.toFlattenedCbor(writer);
+  }
+
+  /**
+   * Serializes a PoolMetadata flattened (without grouping), into CBOR format, assuming the caller already created
+   * the grouping.
+   * An example is the PoolRegistration certificate which flattens the pool parameters in the pool_registration, rather
+   * than insert as a subgroup
+   *
+   * @param the parent writer that already created the subgroup
+   * @returns The PoolMetadata in CBOR format.
+   */
+  toFlattenedCbor(writer: CborWriter): HexBlob {
     writer.writeByteString(Buffer.from(this.#operator, 'hex'));
     writer.writeByteString(Buffer.from(this.#vrfKeyHash, 'hex'));
     writer.writeInt(this.#pledge);
@@ -117,12 +130,28 @@ export class PoolParams {
 
     const length = reader.readStartArray();
 
-    if (length !== EMBEDDED_GROUP_SIZE)
+    if (length !== PoolParams.subgroupCount)
       throw new InvalidArgumentError(
         'cbor',
-        `Expected an array of ${EMBEDDED_GROUP_SIZE} elements, but got an array of ${length} elements`
+        `Expected an array of ${PoolParams.subgroupCount} elements, but got an array of ${length} elements`
       );
 
+    const params = PoolParams.fromFlattenedCbor(reader);
+
+    params.#originalBytes = cbor;
+
+    return params;
+  }
+
+  /**
+   * Read the params one by one. Reading the grouping array was done previously.
+   * An example is the PoolRegistration certificate which flattens the pool parameters into an array that includes the
+   * certificate type.
+   *
+   * @param reader The reader that started reading the subgroup
+   * @returns The new PoolParams instance.
+   */
+  static fromFlattenedCbor(reader: CborReader): PoolParams {
     const operator = Crypto.Ed25519KeyHashHex(HexBlob.fromBytes(reader.readByteString()));
     const vrfKeyHash = Cardano.VrfVkHex(HexBlob.fromBytes(reader.readByteString()));
     const pledge = reader.readInt();
@@ -155,21 +184,7 @@ export class PoolParams {
       reader.readNull();
     }
 
-    const params = new PoolParams(
-      operator,
-      vrfKeyHash,
-      pledge,
-      cost,
-      margin,
-      rewardAccount,
-      poolOwner,
-      relays,
-      poolMetadata
-    );
-
-    params.#originalBytes = cbor;
-
-    return params;
+    return new PoolParams(operator, vrfKeyHash, pledge, cost, margin, rewardAccount, poolOwner, relays, poolMetadata);
   }
 
   /**
