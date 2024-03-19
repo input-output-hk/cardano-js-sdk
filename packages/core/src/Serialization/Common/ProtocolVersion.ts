@@ -38,9 +38,9 @@ export class ProtocolVersion {
     if (this.#originalBytes) return this.#originalBytes;
 
     // CDDL
-    // next_major_protocol_version = 9
+    // next_major_protocol_version = 10
     // major_protocol_version = 1..next_major_protocol_version
-    // protocol_version = (major_protocol_version, uint32)
+    // protocol_version = [(major_protocol_version, uint32)]
     writer.writeStartArray(PROTOCOL_VERSION_ARRAY_SIZE);
     writer.writeInt(this.#major);
     writer.writeInt(this.#minor);

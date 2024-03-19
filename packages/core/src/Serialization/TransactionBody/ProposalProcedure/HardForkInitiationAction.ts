@@ -36,7 +36,7 @@ export class HardForkInitiationAction {
     if (this.#originalBytes) return this.#originalBytes;
 
     // CDDL
-    // hard_fork_initiation_action = (1, gov_action_id / null, [protocol_version])
+    // hard_fork_initiation_action = (1, gov_action_id / null, protocol_version)
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
     writer.writeInt(GovernanceActionKind.HardForkInitiation);
     this.#govActionId ? writer.writeEncodedValue(hexToBytes(this.#govActionId.toCbor())) : writer.writeNull();

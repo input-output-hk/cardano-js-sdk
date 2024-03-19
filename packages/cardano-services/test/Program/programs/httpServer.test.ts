@@ -95,6 +95,7 @@ describe('HTTP Server', () => {
         healthCheckCacheTtl,
         metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
         ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+        paginationPageSizeLimit: 10,
         postgresConnectionStringAsset,
         postgresConnectionStringDbSync,
         postgresConnectionStringHandle,
@@ -121,6 +122,7 @@ describe('HTTP Server', () => {
           healthCheckCacheTtl,
           metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+          paginationPageSizeLimit: 10,
           postgresDbDbSync,
           postgresPasswordDbSync,
           postgresSrvServiceNameDbSync,
@@ -147,6 +149,7 @@ describe('HTTP Server', () => {
               healthCheckCacheTtl,
               metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
               ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+              paginationPageSizeLimit: 10,
               postgresDbDbSync: missingPostgresDb,
               postgresSrvServiceNameDbSync,
               postgresUserDbSync,
@@ -174,6 +177,7 @@ describe('HTTP Server', () => {
               healthCheckCacheTtl,
               metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
               ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+              paginationPageSizeLimit: 10,
               serviceNames: [ServiceNames.StakePool]
             })
         ).rejects.toThrow(
@@ -197,6 +201,7 @@ describe('HTTP Server', () => {
           metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
           ogmiosSrvServiceName,
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+          paginationPageSizeLimit: 10,
           // postgresConnectionStringDbSync,
           serviceDiscoveryBackoffFactor,
           serviceDiscoveryTimeout,
@@ -216,6 +221,7 @@ describe('HTTP Server', () => {
           healthCheckCacheTtl,
           metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
           ogmiosSrvServiceName,
+          paginationPageSizeLimit: 10,
           // postgresConnectionStringDbSync,
           serviceDiscoveryBackoffFactor,
           serviceDiscoveryTimeout,
@@ -236,6 +242,7 @@ describe('HTTP Server', () => {
               handlePolicyIds: [],
               healthCheckCacheTtl,
               metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
+              paginationPageSizeLimit: 10,
               postgresConnectionStringDbSync,
               serviceDiscoveryBackoffFactor,
               serviceDiscoveryTimeout,
@@ -259,6 +266,7 @@ describe('HTTP Server', () => {
             healthCheckCacheTtl,
             metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
             ogmiosUrl: new URL('http://localhost:1337'),
+            paginationPageSizeLimit: 10,
             postgresConnectionStringDbSync: 'postgres',
             serviceNames: [serviceName]
           })
@@ -293,6 +301,7 @@ describe('HTTP Server', () => {
           healthCheckCacheTtl,
           metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+          paginationPageSizeLimit: 10,
           postgresConnectionStringDbSync,
           serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]
         })
