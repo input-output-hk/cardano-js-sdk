@@ -9,12 +9,13 @@
   readJsonFile = path: builtins.fromJSON (builtins.readFile path);
   tf-outputs = {
     us-east-1 = readJsonFile ./tf-outputs/lace-dev-us-east-1.json;
+    us-east-2 = readJsonFile ./tf-outputs/lace-prod-us-east-2.json;
   };
+  oci = inputs.self.x86_64-linux.cardano-services.oci-images.cardano-services;
 in
   nix-helm.builders.${pkgs.system}.mkHelmMultiTarget {
     defaults = final: let
       inherit (final) values;
-      oci = inputs.self.x86_64-linux.cardano-services.oci-images.cardano-services;
     in {
       name = "${final.namespace}-cardanojs";
       chart = ./Chart.yaml;
@@ -212,25 +213,6 @@ in
             env.USE_SUBMIT_API = "true";
             env.USE_BLOCKFROST = lib.mkForce "false";
             env.SUBMIT_API_URL = "http://${final.namespace}-cardano-stack.${final.namespace}.svc.cluster.local:8090";
-          routes = let
-            oci = inputs.self.x86_64-linux.cardano-services.oci-images.cardano-services;
-            inherit (oci.meta) versions;
-          in
-            lib.concatLists [
-              (map (v: "/v${v}/health") versions.root)
-              (map (v: "/v${v}/live") versions.root)
-              (map (v: "/v${v}/meta") versions.root)
-              (map (v: "/v${v}/ready") versions.root)
-              (map (v: "/v${v}/asset") versions.assetInfo)
-              (map (v: "/v${v}/chain-history") versions.chainHistory)
-              (map (v: "/v${v}/network-info") versions.networkInfo)
-              (map (v: "/v${v}/rewards") versions.rewards)
-              (map (v: "/v${v}/tx-submit") versions.txSubmit)
-              (map (v: "/v${v}/utxo") versions.utxo)
-              (map (v: "/v${v}/handle") versions.handle)
-              (map (v: "/v${v}/provider-server") versions.stakePool)
-              (map (v: "/v${v}/stake-pool-provider-server") versions.stakePool)
-            ];
           };
           stake-pool-provider.enabled = true;
         };
@@ -245,6 +227,24 @@ in
 
           blockfrost-worker.enabled = false;
           pg-boss-worker.enabled = true;
+          backend.routes = let
+              inherit (oci.meta) versions;
+            in
+              lib.concatLists [
+                (map (v: "/v${v}/health") versions.root)
+                (map (v: "/v${v}/live") versions.root)
+                (map (v: "/v${v}/meta") versions.root)
+                (map (v: "/v${v}/ready") versions.root)
+                (map (v: "/v${v}/asset") versions.assetInfo)
+                (map (v: "/v${v}/chain-history") versions.chainHistory)
+                (map (v: "/v${v}/network-info") versions.networkInfo)
+                (map (v: "/v${v}/rewards") versions.rewards)
+                (map (v: "/v${v}/tx-submit") versions.txSubmit)
+                (map (v: "/v${v}/utxo") versions.utxo)
+                (map (v: "/v${v}/handle") versions.handle)
+                (map (v: "/v${v}/provider-server") versions.stakePool)
+                (map (v: "/v${v}/stake-pool-provider-server") versions.stakePool)
+              ];
 
           cardano-services = {
             ingresOrder = 99;
@@ -425,25 +425,6 @@ in
             env.USE_SUBMIT_API = "true";
             env.USE_BLOCKFROST = lib.mkForce "false";
             env.SUBMIT_API_URL = "http://${final.namespace}-cardano-stack.${final.namespace}.svc.cluster.local:8090";
-          routes = let
-  		      oci = inputs.self.x86_64-linux.cardano-services.oci-images.cardano-services;
-            inherit (oci.meta) versions;
-          in
-            lib.concatLists [
-              (map (v: "/v${v}/health") versions.root)
-              (map (v: "/v${v}/live") versions.root)
-              (map (v: "/v${v}/meta") versions.root)
-              (map (v: "/v${v}/ready") versions.root)
-              (map (v: "/v${v}/asset") versions.assetInfo)
-              (map (v: "/v${v}/chain-history") versions.chainHistory)
-              (map (v: "/v${v}/network-info") versions.networkInfo)
-              (map (v: "/v${v}/rewards") versions.rewards)
-              (map (v: "/v${v}/tx-submit") versions.txSubmit)
-              (map (v: "/v${v}/utxo") versions.utxo)
-              (map (v: "/v${v}/handle") versions.handle)
-              (map (v: "/v${v}/provider-server") versions.stakePool)
-              (map (v: "/v${v}/stake-pool-provider-server") versions.stakePool)
-            ];
           };
           stake-pool-provider.enabled = true;
         };
@@ -458,6 +439,24 @@ in
 
           blockfrost-worker.enabled = false;
           pg-boss-worker.enabled = true;
+          backend.routes = let
+              inherit (oci.meta) versions;
+            in
+              lib.concatLists [
+                (map (v: "/v${v}/health") versions.root)
+                (map (v: "/v${v}/live") versions.root)
+                (map (v: "/v${v}/meta") versions.root)
+                (map (v: "/v${v}/ready") versions.root)
+                (map (v: "/v${v}/asset") versions.assetInfo)
+                (map (v: "/v${v}/chain-history") versions.chainHistory)
+                (map (v: "/v${v}/network-info") versions.networkInfo)
+                (map (v: "/v${v}/rewards") versions.rewards)
+                (map (v: "/v${v}/tx-submit") versions.txSubmit)
+                (map (v: "/v${v}/utxo") versions.utxo)
+                (map (v: "/v${v}/handle") versions.handle)
+                (map (v: "/v${v}/provider-server") versions.stakePool)
+                (map (v: "/v${v}/stake-pool-provider-server") versions.stakePool)
+              ];
 
           cardano-services = {
             ingresOrder = 99;
