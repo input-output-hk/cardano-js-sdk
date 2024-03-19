@@ -57,7 +57,7 @@
       };
       POSTGRES_SSL_DB_SYNC = "true";
       POSTGRES_SSL_CA_FILE_DB_SYNC = "/tls/ca.crt";
-
+    } // lib.optionalAttrs values.backend.passHandleDBArgs {
       POSTGRES_POOL_MAX_HANDLE = "10";
       POSTGRES_HOST_HANDLE = values.postgresName;
       POSTGRES_PORT_HANDLE = "5432";

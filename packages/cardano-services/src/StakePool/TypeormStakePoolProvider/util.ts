@@ -3,6 +3,7 @@
 import {
   Cardano,
   FilterCondition,
+  FuzzyOptions,
   QueryStakePoolsArgs,
   SortField,
   SortOrder,
@@ -51,28 +52,27 @@ export const stakePoolSearchSelection = [
 export const sortSelectionMap: { [key in SortField]: string } = {
   apy: 'metrics_ros',
   blocks: 'metrics_minted_blocks',
-  cost: 'params.cost',
+  cost: 'params_cost',
   lastRos: 'metrics_last_ros',
   liveStake: 'metrics_live_stake',
   // PERF: this may be source of performances issue due to its complexity.
   // In case of performances degradation we need to keep in mind this.
   margin: "(margin->>'numerator')::numeric / (margin->>'denominator')::numeric",
-  name: 'metadata.name',
+  name: 'lower(metadata.name)',
   pledge: 'params_pledge',
   ros: 'metrics_ros',
-  saturation: 'metrics_live_saturation'
+  saturation: 'metrics_live_saturation',
+  ticker: 'metadata_ticker'
 };
-
-export const nullsInSort = 'NULLS LAST';
 
 export const stakePoolSearchTotalCount = 'count(*) over () as total_count';
 
 const defaultSortOption = { field: 'name', order: 'asc' } as const;
 
-export const getSortOptions = (sort: StakePoolSortOptions = defaultSortOption) => {
-  const order = sort.order.toUpperCase() as Uppercase<SortOrder>;
+export const getSortOptions = (sortByScore: boolean, sort: StakePoolSortOptions = defaultSortOption) => {
+  if (sortByScore) return { field: 'score', order: 'ASC' as const };
 
-  if (sort.field === 'name') return { field: `lower(${sortSelectionMap[sort.field]})`, order };
+  const order = sort.order.toUpperCase() as Uppercase<SortOrder>;
 
   return { field: sortSelectionMap[sort.field], order };
 };
@@ -81,7 +81,7 @@ export const getFilterCondition = (condition?: FilterCondition, defaultCondition
   condition ? (condition.toUpperCase() as Uppercase<FilterCondition>) : defaultCondition;
 
 // eslint-disable-next-line max-statements
-export const getWhereClauseAndArgs = (filters: QueryStakePoolsArgs['filters']) => {
+export const getWhereClauseAndArgs = (filters: QueryStakePoolsArgs['filters'], textFilter: boolean) => {
   if (!filters) return { args: {}, clause: '1=1' };
 
   let args: StakePoolWhereClauseArgs = {};
@@ -93,7 +93,7 @@ export const getWhereClauseAndArgs = (filters: QueryStakePoolsArgs['filters']) =
     args = { ...args, status: filters.status };
     clauses.push('pool.status IN (:...status)');
   }
-  if (filters.identifier && filters.identifier.values.length > 0) {
+  if (!textFilter && filters.identifier && filters.identifier.values.length > 0) {
     const identifierClauses: string[] = [];
     const identifierCondition = getFilterCondition(filters.identifier?._condition, 'OR');
     for (const item of filters.identifier.values) {
@@ -185,4 +185,29 @@ export const computeROS = async ({ dataSource, epochs, logger, stakePool: { id }
 
   // eslint-disable-next-line @typescript-eslint/no-shadow, @typescript-eslint/no-unused-vars
   return [ros, result.map(({ id, ...rest }) => rest) as Cardano.StakePoolEpochRewards[]] as const;
+};
+
+type NotUndefinedFilters = Exclude<QueryStakePoolsArgs['filters'], undefined>;
+
+export const withTextFilter = (
+  filters?: QueryStakePoolsArgs['filters']
+): filters is NotUndefinedFilters & Required<Pick<NotUndefinedFilters, 'text'>> =>
+  (filters && typeof filters.text === 'string' && filters.text.length > 2) as unknown as boolean;
+
+export const validateFuzzyOptions = (arg: string) => {
+  const options = JSON.parse(arg) as FuzzyOptions;
+
+  if (typeof options !== 'object' || !options) throw new Error('must be an object');
+
+  const { threshold, weights } = options;
+
+  if (typeof threshold !== 'number') throw new Error('threshold must be a number');
+  if (threshold < 0 || threshold > 1) throw new Error('expected 0 <= threshold <= 1');
+  if (typeof weights !== 'object' || !weights) throw new Error('weights must be an object');
+
+  for (const weight of ['description', 'homepage', 'name', 'poolId', 'ticker'] as const)
+    if (typeof weights[weight] !== 'number' || weights[weight] < 0)
+      throw new Error(`weights.${weight} must be a positive number`);
+
+  return options;
 };
