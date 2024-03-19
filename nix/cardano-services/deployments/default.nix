@@ -376,7 +376,7 @@ in
           region = "us-east-2";
 
           backend.ogmiosSrvServiceName = "${final.namespace}-cardano-core.${final.namespace}.svc.cluster.local";
-          backend.hostnames = ["tmp-backend.${final.namespace}.eks.${baseUrl}" "tmp-${final.namespace}.${baseUrl}"];
+          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           backend.passHandleDBArgs = false;
           backend.routes = [
             "/v1.0.0/health"
@@ -416,7 +416,7 @@ in
           region = "us-east-2";
 
           backend.ogmiosSrvServiceName = "${final.namespace}-cardano-core.${final.namespace}.svc.cluster.local";
-          backend.hostnames = ["tmp-backend.${final.namespace}.eks.${baseUrl}" "tmp-${final.namespace}.${baseUrl}"];
+          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           backend.passHandleDBArgs = false;
           backend.routes = [
             "/v1.0.0/health"
