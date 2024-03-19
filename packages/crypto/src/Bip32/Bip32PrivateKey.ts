@@ -2,7 +2,7 @@
 import * as Bip32KeyDerivation from './Bip32KeyDerivation';
 import { Bip32PrivateKeyHex } from '../hexTypes';
 import { Bip32PublicKey } from './Bip32PublicKey';
-import { EXTENDED_ED25519_PRIVATE_KEY_LENGTH, Ed25519PrivateKey, NORMAL_ED25519_PRIVATE_KEY_LENGTH } from '../Ed25519e';
+import { EXTENDED_ED25519_PRIVATE_KEY_LENGTH, Ed25519PrivateKey } from '../Ed25519e';
 import { InvalidArgumentError } from '@cardano-sdk/util';
 import { crypto_scalarmult_ed25519_base_noclamp, ready } from 'libsodium-wrappers-sumo';
 import { pbkdf2 } from 'pbkdf2';
