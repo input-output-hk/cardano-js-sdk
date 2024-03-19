@@ -97,7 +97,7 @@ export class Bip32PrivateKey {
     if (key.length !== BIP32_ED25519_PRIVATE_KEY_LENGTH)
       throw new InvalidArgumentError(
         'key',
-        `Key should be ${NORMAL_ED25519_PRIVATE_KEY_LENGTH} bytes; however ${key.length} bytes were provided.`
+        `Key should be ${BIP32_ED25519_PRIVATE_KEY_LENGTH} bytes; however ${key.length} bytes were provided.`
       );
     return new Bip32PrivateKey(key);
   }
