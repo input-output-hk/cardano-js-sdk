@@ -305,30 +305,6 @@ in
         };
       };
 
-      "dev-preprod@us-east-1" = final: {
-        namespace = "dev-preprod";
-
-        providers = {
-          backend = {
-            enabled = true;
-            env.USE_BLOCKFROST = lib.mkForce "false";
-          };
-        };
-
-        values = {
-          network = "preprod";
-          region = "us-east-1";
-
-          cardano-services = {
-            ingresOrder = 100;
-          };
-
-          backend = {
-            routes = ["/"];
-          };
-        };
-      };
-
       "dev-preprod@us-east-1@v1" = final: {
         name = "${final.namespace}-cardanojs-v1";
         namespace = "dev-preprod";
