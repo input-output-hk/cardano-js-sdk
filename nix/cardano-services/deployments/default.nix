@@ -120,7 +120,7 @@ in
           ];
           hostnames = ["${final.namespace}.${baseUrl}"];
           dnsId = lib.toLower "${values.region}-${final.namespace}-backend";
-          ogmiosSrvServiceName = "${final.namespace}-cardano-stack.${final.namespace}.svc.cluster.local";
+          ogmiosSrvServiceName = "${final.namespace}-cardano-core.${final.namespace}.svc.cluster.local";
 
           wafARN = tf-outputs.${values.region}.waf_arn;
           # Healthcheck paramteres for ALB
@@ -234,6 +234,7 @@ in
 
           blockfrost-worker.enabled = false;
           pg-boss-worker.enabled = true;
+          backend.ogmiosSrvServiceName = "${final.namespace}-cardano-stack.${final.namespace}.svc.cluster.local";
 
           cardano-services = {
             ingresOrder = 99;
@@ -304,30 +305,6 @@ in
         };
       };
 
-      "dev-preprod@us-east-1" = final: {
-        namespace = "dev-preprod";
-
-        providers = {
-          backend = {
-            enabled = true;
-            env.USE_BLOCKFROST = lib.mkForce "false";
-          };
-        };
-
-        values = {
-          network = "preprod";
-          region = "us-east-1";
-
-          cardano-services = {
-            ingresOrder = 100;
-          };
-
-          backend = {
-            routes = ["/"];
-          };
-        };
-      };
-
       "dev-preprod@us-east-1@v1" = final: {
         name = "${final.namespace}-cardanojs-v1";
         namespace = "dev-preprod";
@@ -387,7 +364,6 @@ in
           network = "preprod";
           region = "us-east-2";
 
-          backend.ogmiosSrvServiceName = "${final.namespace}-cardano-core.${final.namespace}.svc.cluster.local";
           backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           backend.passHandleDBArgs = false;
           backend.routes = [
@@ -427,7 +403,6 @@ in
           network = "preview";
           region = "us-east-2";
 
-          backend.ogmiosSrvServiceName = "${final.namespace}-cardano-core.${final.namespace}.svc.cluster.local";
           backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           backend.passHandleDBArgs = false;
           backend.routes = [
