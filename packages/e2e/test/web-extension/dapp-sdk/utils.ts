@@ -1,3 +1,4 @@
+/* eslint-disable promise/no-nesting */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { UnwitnessedTx } from '@cardano-sdk/tx-construction';
 import type { ObservableWallet } from '@cardano-sdk/wallet';

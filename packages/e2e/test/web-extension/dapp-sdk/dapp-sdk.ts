@@ -10,9 +10,9 @@ import {
 } from '@cardano-sdk/cardano-services-client';
 
 import { connectToLace, sendCoins, sendSeveralAssets, singleDelegation, singleUndelegation } from './features';
+import { logger } from '@cardano-sdk/util-dev';
 import type { ObservableWallet } from '@cardano-sdk/wallet';
 
-const logger = console;
 const httpProviderDependencies = {
   baseUrl: 'https://dev-preprod.lw.iog.io',
   logger
@@ -45,7 +45,7 @@ document.querySelector('#send-coins')?.addEventListener('click', async () => {
     return logger.warn(CONNECT_WALLET);
   }
 
-  sendCoins({ connectedWallet });
+  await sendCoins({ connectedWallet });
 });
 
 document.querySelector('#send-several-assets')?.addEventListener('click', () => {
