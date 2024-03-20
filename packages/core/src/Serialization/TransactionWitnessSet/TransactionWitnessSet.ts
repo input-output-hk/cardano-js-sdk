@@ -6,7 +6,7 @@ import { CborSet } from '../Common';
 import { HexBlob } from '@cardano-sdk/util';
 import { NativeScript, PlutusV1Script, PlutusV2Script, PlutusV3Script } from '../Scripts';
 import { PlutusData } from '../PlutusData/PlutusData';
-import { Redeemer } from './Redeemer';
+import { Redeemers } from './Redeemer';
 import { SerializationError, SerializationFailure } from '../../errors';
 import { VkeyWitness } from './VkeyWitness';
 import { hexToBytes } from '../../util/misc';
@@ -35,7 +35,7 @@ export class TransactionWitnessSet {
   #bootstrapWitnesses: CborSet<ReturnType<BootstrapWitness['toCore']>, BootstrapWitness> | undefined;
   #plutusV1Scripts: CborSet<ReturnType<PlutusV1Script['toCore']>, PlutusV1Script> | undefined;
   #plutusData: CborSet<ReturnType<PlutusData['toCore']>, PlutusData> | undefined;
-  #redeemers: Array<Redeemer> | undefined;
+  #redeemers: Redeemers | undefined;
   #plutusV2Scripts: CborSet<ReturnType<PlutusV2Script['toCore']>, PlutusV2Script> | undefined;
   #plutusV3Scripts: CborSet<ReturnType<PlutusV3Script['toCore']>, PlutusV3Script> | undefined;
   #originalBytes: HexBlob | undefined = undefined;
@@ -96,13 +96,9 @@ export class TransactionWitnessSet {
       writer.writeEncodedValue(Buffer.from(this.#plutusData.toCbor(), 'hex'));
     }
 
-    if (this.#redeemers && this.#redeemers.length > 0) {
+    if (this.#redeemers && this.#redeemers.size() > 0) {
       writer.writeInt(5n);
-      writer.writeStartArray(this.#redeemers.length);
-
-      for (const data of this.#redeemers) {
-        writer.writeEncodedValue(Buffer.from(data.toCbor(), 'hex'));
-      }
+      writer.writeEncodedValue(hexToBytes(this.#redeemers.toCbor()));
     }
 
     if (this.#plutusV2Scripts && this.#plutusV2Scripts.size() > 0) {
@@ -156,16 +152,10 @@ export class TransactionWitnessSet {
         case 4n:
           witness.setPlutusData(CborSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), PlutusData.fromCbor));
           break;
-        case 5n:
-          witness.setRedeemers(new Array<Redeemer>());
-          reader.readStartArray();
-
-          while (reader.peekState() !== CborReaderState.EndArray) {
-            witness.redeemers()!.push(Redeemer.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
-          }
-
-          reader.readEndArray();
+        case 5n: {
+          witness.setRedeemers(Redeemers.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
           break;
+        }
         case 6n:
           witness.setPlutusV2Scripts(
             CborSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), PlutusV2Script.fromCbor)
@@ -196,7 +186,7 @@ export class TransactionWitnessSet {
     return {
       bootstrap: this.#bootstrapWitnesses ? this.#bootstrapWitnesses.toCore() : undefined,
       datums: this.#plutusData ? this.#plutusData.toCore() : undefined,
-      redeemers: this.#redeemers ? this.#redeemers.map((data) => data.toCore()) : undefined,
+      redeemers: this.#redeemers?.size() ? this.#redeemers.toCore() : undefined,
       scripts: scripts.length > 0 ? scripts : undefined,
       signatures: this.#vkeywitnesses ? new Map(this.#vkeywitnesses.toCore()) : new Map()
     };
@@ -224,7 +214,7 @@ export class TransactionWitnessSet {
     }
 
     if (coreWitness.redeemers) {
-      witness.setRedeemers(coreWitness.redeemers.map((data) => Redeemer.fromCore(data)));
+      witness.setRedeemers(Redeemers.fromCore(coreWitness.redeemers));
     }
 
     if (coreWitness.datums) {
@@ -340,7 +330,7 @@ export class TransactionWitnessSet {
    *
    * @param redeemers The redeemers.
    */
-  setRedeemers(redeemers: Array<Redeemer>) {
+  setRedeemers(redeemers: Redeemers) {
     this.#redeemers = redeemers;
     this.#originalBytes = undefined;
   }
@@ -350,7 +340,7 @@ export class TransactionWitnessSet {
    *
    * @returns The redeemers.
    */
-  redeemers(): Array<Redeemer> | undefined {
+  redeemers(): Redeemers | undefined {
     return this.#redeemers;
   }
 
@@ -432,17 +422,17 @@ export class TransactionWitnessSet {
               break;
             case Cardano.PlutusLanguageVersion.V2:
               v2 ? v2.push(script) : (v2 = [script]);
-          break;
+              break;
             case Cardano.PlutusLanguageVersion.V3:
               v3 ? v3.push(script) : (v3 = [script]);
-          break;
-        default:
+              break;
+            default:
               throw new SerializationError(
                 SerializationFailure.InvalidScriptType,
                 `Script '${script}' is not supported.`
               );
-      }
-    }
+          }
+        }
         return [native, v1, v2, v3];
       },
       [null, null, null, null]
@@ -469,7 +459,7 @@ export class TransactionWitnessSet {
     if (this.#bootstrapWitnesses !== undefined && this.#bootstrapWitnesses.size() > 0) ++mapSize;
     if (this.#plutusV1Scripts !== undefined && this.#plutusV1Scripts.size() > 0) ++mapSize;
     if (this.#plutusData !== undefined && this.#plutusData.size() > 0) ++mapSize;
-    if (this.#redeemers !== undefined && this.#redeemers.length > 0) ++mapSize;
+    if (this.#redeemers !== undefined && this.#redeemers.size() > 0) ++mapSize;
     if (this.#plutusV2Scripts !== undefined && this.#plutusV2Scripts.size() > 0) ++mapSize;
     if (this.#plutusV3Scripts !== undefined && this.#plutusV3Scripts.size() > 0) ++mapSize;
 
