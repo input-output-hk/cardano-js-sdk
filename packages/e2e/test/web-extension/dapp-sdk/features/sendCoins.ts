@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Logger } from '@cardano-sdk/util-dev';
 import { inspectAndSignTx } from '../utils';
 import type { ObservableWallet } from '@cardano-sdk/wallet';
 
-export const sendCoins = async ({ connectedWallet }: { connectedWallet: ObservableWallet }) => {
+export const sendCoins = async ({ connectedWallet, logger }: { connectedWallet: ObservableWallet; logger: Logger }) => {
   const sendInfoElement = document.querySelector('#info-send')!;
 
   const builder = connectedWallet.createTxBuilder();
-  const builtTx = builder.addOutput(await builder.buildOutput().handle('rhys').coin(10_000_000n).build()).build();
-  inspectAndSignTx({ builtTx, connectedWallet, textElement: sendInfoElement });
+  const output = await builder.buildOutput().handle('rhys').coin(10_000_000n).build();
+  const builtTx = builder.addOutput(output).build();
+  await inspectAndSignTx({ builtTx, connectedWallet, logger, textElement: sendInfoElement });
 };

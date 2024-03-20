@@ -1,4 +1,5 @@
 import { ConnectWalletDependencies, connectWallet, listWallets } from '@cardano-sdk/dapp-connector-client';
+import { Logger } from '@cardano-sdk/util-dev';
 import { ObservableWallet } from '@cardano-sdk/wallet';
 import { combineLatest, switchMap, tap } from 'rxjs';
 
@@ -8,7 +9,7 @@ export const connectToLace = ({
   onWalletConnected
 }: {
   dependencies: ConnectWalletDependencies;
-  logger: typeof console;
+  logger: Logger;
   onWalletConnected: (wallet: ObservableWallet) => void;
 }) => {
   const infoElement = document.querySelector('#info')!;
