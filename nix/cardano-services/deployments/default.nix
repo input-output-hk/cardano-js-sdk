@@ -308,43 +308,62 @@ in
       "dev-preprod@us-east-1@v1" = final: {
         name = "${final.namespace}-cardanojs-v1";
         namespace = "dev-preprod";
+        context = "eks-devs";
 
         providers = {
           backend = {
             enabled = true;
-            env.USE_BLOCKFROST = lib.mkForce "false";
           };
-          stake-pool-provider = {
-            enabled = true;
-            env.OVERRIDE_FUZZY_OPTIONS = "true";
-          };
-          handle-provider.enabled = true;
-        };
-
-        projectors = {
-          handle.enabled = true;
-          stake-pool.enabled = true;
         };
 
         values = {
           network = "preprod";
           region = "us-east-1";
 
+          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
+          backend.passHandleDBArgs = false;
+          backend.routes = [
+            "/v1.0.0/health"
+            "/v1.0.0/live"
+            "/v1.0.0/meta"
+            "/v1.0.0/ready"
+            "/v1.0.0/asset"
+            "/v2.0.0/chain-history"
+            "/v1.0.0/handle"
+            "/v1.0.0/network-info"
+            "/v1.0.0/rewards"
+            "/v1.0.0/stake-pool"
+            "/v2.0.0/tx-submit"
+            "/v2.0.0/utxo"
+          ];
           blockfrost-worker.enabled = true;
-          pg-boss-worker.enabled = true;
-
           cardano-services = {
             ingresOrder = 99;
-            additionalRoutes = [
-              {
-                pathType = "Prefix";
-                path = "/v1.0.0/stake-pool";
-                backend.service = {
-                  name = "${final.namespace}-cardanojs-v1-stake-pool-provider";
-                  port.name = "http";
-                };
-              }
-            ];
+            image = "926093910549.dkr.ecr.us-east-1.amazonaws.com/cardano-services:s8j5nx9x2naar194pr58kpmlr5s4xn7b";
+          };
+        };
+      };
+
+      "dev-preprod@us-east-1@v2" = final: {
+        name = "${final.namespace}-cardanojs-v2";
+        namespace = "dev-preprod";
+        context = "eks-devs";
+
+        providers = {
+          backend = {
+            enabled = true;
+          };
+        };
+
+        values = {
+          network = "preprod";
+          region = "us-east-1";
+
+          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
+          backend.passHandleDBArgs = false;
+          # blockfrost-worker.enabled = true;
+          cardano-services = {
+            ingresOrder = 98;
           };
         };
       };
