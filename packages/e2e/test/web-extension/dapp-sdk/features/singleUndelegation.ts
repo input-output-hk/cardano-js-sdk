@@ -1,11 +1,13 @@
+import { EMPTY, catchError, take, tap } from 'rxjs';
+import { Logger } from '@cardano-sdk/util-dev';
 import { ObservableWallet } from '@cardano-sdk/wallet';
 import { inspectAndSignTx } from '../utils';
-import { take, tap } from 'rxjs';
 
 export const singleUndelegation = ({
-  connectedWallet
+  connectedWallet,
+  logger
 }: {
-  logger: typeof console;
+  logger: Logger;
   connectedWallet: ObservableWallet;
 }) => {
   const undelegateAssetsElement = document.querySelector('#info-undelegate-assets')!;
@@ -20,7 +22,11 @@ export const singleUndelegation = ({
 
         const builtTx = connectedWallet.createTxBuilder().delegatePortfolio(null).build();
 
-        inspectAndSignTx({ builtTx, connectedWallet, textElement: undelegateAssetsElement });
+        await inspectAndSignTx({ builtTx, connectedWallet, textElement: undelegateAssetsElement });
+      }),
+      catchError((error) => {
+        logger.error('Error fetching assets:', error);
+        return EMPTY;
       })
     )
     .subscribe();

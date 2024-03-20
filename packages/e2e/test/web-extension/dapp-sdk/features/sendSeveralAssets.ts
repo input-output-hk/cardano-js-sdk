@@ -1,6 +1,7 @@
 /* eslint-disable sonarjs/no-nested-template-literals */
 import { EMPTY, catchError, take, tap } from 'rxjs';
 
+import { Logger } from '@cardano-sdk/util-dev';
 import { inspectAndSignTx } from '../utils';
 import type { ObservableWallet } from '@cardano-sdk/wallet';
 
@@ -8,7 +9,7 @@ export const sendSeveralAssets = ({
   connectedWallet,
   logger
 }: {
-  logger: typeof console;
+  logger: Logger;
   connectedWallet: ObservableWallet;
 }) => {
   const addressAssetsElement = document.querySelector('#info-send')!;
@@ -38,11 +39,11 @@ export const sendSeveralAssets = ({
         if (assetMap.size < 2) throw new Error("Didn't find 1NFT and FT to send");
 
         const txBuilder = connectedWallet.createTxBuilder();
-        const builtTx = txBuilder
-          .addOutput(await txBuilder.buildOutput().handle('rhys').coin(10_000_000n).assets(assetMap).build())
-          .build();
 
-        inspectAndSignTx({ builtTx, connectedWallet, textElement: transactionInfoElement });
+        const output = await txBuilder.buildOutput().handle('rhys').coin(10_000_000n).assets(assetMap).build();
+        const builtTx = txBuilder.addOutput(output).build();
+
+        await inspectAndSignTx({ builtTx, connectedWallet, textElement: transactionInfoElement });
 
         addressAssetsElement.textContent += `
 Assets and quantity:
