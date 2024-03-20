@@ -33,15 +33,14 @@
         "external-dns.alpha.kubernetes.io/set-identifier" = values.backend.dnsId;
         "alb.ingress.kubernetes.io/group.name" = chart.namespace;
         # ACM
-        "alb.ingress.kubernetes.io/certificate-arn" = values.cardano-services.certificateArn;
         "alb.ingress.kubernetes.io/group.order" = toString values.cardano-services.ingresOrder;
       };
     };
     spec = {
       ingressClassName = "alb";
-      rules = [
-        {
-          host = values.backend.url;
+      rules =
+        map (hostname: {
+          host = hostname;
           http.paths =
             [
               {
@@ -95,8 +94,8 @@
               }
             ]
             ++ values.cardano-services.additionalRoutes;
-        }
-      ];
+        })
+        values.backend.hostnames;
     };
   };
 }

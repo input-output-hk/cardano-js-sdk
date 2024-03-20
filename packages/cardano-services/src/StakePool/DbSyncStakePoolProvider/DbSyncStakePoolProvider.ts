@@ -254,15 +254,22 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     return { poolMetrics, poolOwners, poolRegistrations, poolRelays, poolRetirements };
   }
 
-  public async queryStakePools(options: QueryStakePoolsArgs): Promise<Paginated<Cardano.StakePool>> {
-    const { filters, pagination, sort, apyEpochsBackLimit = APY_EPOCHS_BACK_LIMIT_DEFAULT } = options;
-    const useBlockfrost = this.#useBlockfrost;
+  public queryStakePoolsChecks(options: QueryStakePoolsArgs) {
+    const { filters, pagination, sort } = options;
 
     if (pagination.limit > this.#paginationPageSizeLimit) {
       throw new ProviderError(
         ProviderFailure.BadRequest,
         undefined,
         `Page size of ${pagination.limit} can not be greater than ${this.#paginationPageSizeLimit}`
+      );
+    }
+
+    if (filters?.text) {
+      throw new ProviderError(
+        ProviderFailure.NotImplemented,
+        undefined,
+        'DbSyncStakePoolProvider does not support text filter'
       );
     }
 
@@ -283,6 +290,13 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
         `DbSyncStakePoolProvider doesn't support sort by ${sort?.field} `
       );
     }
+  }
+
+  public async queryStakePools(options: QueryStakePoolsArgs): Promise<Paginated<Cardano.StakePool>> {
+    const { filters, apyEpochsBackLimit = APY_EPOCHS_BACK_LIMIT_DEFAULT } = options;
+    const useBlockfrost = this.#useBlockfrost;
+
+    this.queryStakePoolsChecks(options);
 
     const { params, query } = useBlockfrost
       ? this.#builder.buildBlockfrostQuery(filters)

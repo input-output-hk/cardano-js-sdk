@@ -1,5 +1,6 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-duplicate-string */
+import { DEFAULT_FUZZY_SEARCH_OPTIONS } from '../src';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { fork } from 'child_process';
 import path from 'path';
@@ -852,6 +853,26 @@ describe('CLI', () => {
       });
     });
 
+    describe('fuzzyOptions', () => {
+      const FUZZY_OPTIONS = '{"threshold":0.4,"weights":{"description":1,"homepage":2,"name":3,"poolId":4,"ticker":4}}';
+
+      testCli('has a default value', 'provider', {
+        expectedArgs: { args: { fuzzyOptions: DEFAULT_FUZZY_SEARCH_OPTIONS } }
+      });
+
+      testCli('accepts a valid options object', 'provider', {
+        args: ['--fuzzy-options', FUZZY_OPTIONS],
+        env: { FUZZY_OPTIONS },
+        expectedArgs: { args: { fuzzyOptions: DEFAULT_FUZZY_SEARCH_OPTIONS } }
+      });
+
+      testCli('expects an object', 'provider', {
+        args: ['--fuzzy-options', 'test'],
+        env: { FUZZY_OPTIONS: 'test' },
+        expectedError: 'TypeError: expected.join is not a function'
+      });
+    });
+
     describe('handleProviderServerUrl', () => {
       testCli('accepts any string', 'provider', {
         args: ['--handle-provider-server-url', 'test'],
@@ -877,6 +898,21 @@ describe('CLI', () => {
         args: ['--health-check-cache-ttl', '123'],
         env: { HEALTH_CHECK_CACHE_TTL: '123' },
         expectedError: 'Health check cache TTL in seconds between 1 and 10 - 123 must be between 1 and 120'
+      });
+    });
+
+    describe('overrideFuzzyOptions', () => {
+      testCli('accepts a boolean', 'provider', {
+        args: ['--override-fuzzy-options', 'true'],
+        env: { OVERRIDE_FUZZY_OPTIONS: 'true' },
+        expectedArgs: { args: { overrideFuzzyOptions: true } }
+      });
+
+      testCli('expects a boolean', 'provider', {
+        args: ['--override-fuzzy-options', 'test'],
+        env: { OVERRIDE_FUZZY_OPTIONS: 'test' },
+        expectedError:
+          'Provider server requires a valid Allows the override of fuzzyOptions through queryStakePools call program option. Expected: false, true'
       });
     });
 

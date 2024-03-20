@@ -1364,6 +1364,16 @@ describe('StakePoolHttpService', () => {
             limitFiveResponse.pageResults[0].metrics?.apy
           );
         });
+
+        it('text filter is not supported', async () => {
+          await expect(
+            provider.queryStakePools({
+              apyEpochsBackLimit: 3,
+              filters: { text: 'test' },
+              pagination
+            })
+          ).rejects.toThrow('DbSyncStakePoolProvider does not support text filter');
+        });
       });
 
       describe('/stats', () => {
