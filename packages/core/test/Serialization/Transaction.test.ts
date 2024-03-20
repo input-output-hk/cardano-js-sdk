@@ -28,7 +28,7 @@ describe('Transaction', () => {
     expect(tx.body()).toBeInstanceOf(TransactionBody);
     const witnessSet = tx.witnessSet();
     const vKeys = witnessSet.vkeys();
-    const witness = vKeys![0];
+    const witness = vKeys!.values()[0];
     const witnessSignature = witness.signature();
     const vKey = witness.vkey();
     expect(vKey).toBe(vkey);

@@ -2,11 +2,13 @@
 import * as Cardano from '../../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
+import { CborSet, Hash } from '../../Common';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { PoolMetadata } from './PoolMetadata';
 import { Relay } from './Relay';
 import { UnitInterval } from '../../Common/UnitInterval';
 
+type PoolOwners = CborSet<Crypto.Ed25519KeyHashHex, Hash<Crypto.Ed25519KeyHashHex>>;
 /**
  * Stake pool update certificate parameters.
  *
@@ -20,7 +22,7 @@ export class PoolParams {
   #cost: Cardano.Lovelace;
   #margin: UnitInterval;
   #rewardAccount: Cardano.RewardAddress;
-  #poolOwners: Array<Crypto.Ed25519KeyHashHex>;
+  #poolOwners: PoolOwners;
   #relays: Array<Relay>;
   #poolMetadata?: PoolMetadata;
   #originalBytes: HexBlob | undefined = undefined;
@@ -47,7 +49,7 @@ export class PoolParams {
     cost: Cardano.Lovelace,
     margin: UnitInterval,
     rewardAccount: Cardano.RewardAddress,
-    poolOwners: Array<Crypto.Ed25519KeyHashHex>,
+    poolOwners: PoolOwners,
     relays: Array<Relay>,
     poolMetadata?: PoolMetadata
   ) {
@@ -93,7 +95,7 @@ export class PoolParams {
    * An example is the PoolRegistration certificate which flattens the pool parameters in the pool_registration, rather
    * than insert as a subgroup
    *
-   * @param the parent writer that already created the subgroup
+   * @param writer the parent writer that already created the subgroup
    * @returns The PoolMetadata in CBOR format.
    */
   toFlattenedCbor(writer: CborWriter): HexBlob {
@@ -103,10 +105,7 @@ export class PoolParams {
     writer.writeInt(this.#cost);
     writer.writeEncodedValue(Buffer.from(this.#margin.toCbor(), 'hex'));
     writer.writeByteString(Buffer.from(this.#rewardAccount.toAddress().toBytes(), 'hex'));
-
-    writer.writeStartArray(this.#poolOwners.length);
-    for (const owner of this.#poolOwners) writer.writeByteString(Buffer.from(owner, 'hex'));
-
+    writer.writeEncodedValue(Buffer.from(this.#poolOwners.toCbor(), 'hex'));
     writer.writeStartArray(this.#relays.length);
     for (const relay of this.#relays) writer.writeEncodedValue(Buffer.from(relay.toCbor(), 'hex'));
 
@@ -158,17 +157,14 @@ export class PoolParams {
     const cost = reader.readInt();
     const margin = UnitInterval.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
     const rewardAccount = Cardano.Address.fromBytes(HexBlob.fromBytes(reader.readByteString())).asReward()!;
-    const poolOwner = new Array<Crypto.Ed25519KeyHashHex>();
     const relays = new Array<Relay>();
     let poolMetadata;
 
     // Pool owners.
-    reader.readStartArray();
-
-    while (reader.peekState() !== CborReaderState.EndArray)
-      poolOwner.push(Crypto.Ed25519KeyHashHex(HexBlob.fromBytes(reader.readByteString())));
-
-    reader.readEndArray();
+    const poolOwner = CborSet.fromCbor<Crypto.Ed25519KeyHashHex, Hash<Crypto.Ed25519KeyHashHex>>(
+      HexBlob.fromBytes(reader.readEncodedValue()),
+      Hash.fromCbor
+    );
 
     // Relays
     reader.readStartArray();
@@ -200,9 +196,9 @@ export class PoolParams {
       id: Cardano.PoolId.fromKeyHash(this.#operator),
       margin: this.#margin.toCore(),
       metadataJson: this.#poolMetadata?.toCore(),
-      owners: this.#poolOwners.map((keyHash) =>
-        Cardano.createRewardAccount(keyHash, rewardAccountAddress.getNetworkId())
-      ),
+      owners: this.#poolOwners
+        .toCore()
+        .map((keyHash) => Cardano.createRewardAccount(keyHash, rewardAccountAddress.getNetworkId())),
       pledge: this.#pledge,
       relays: this.#relays.map((relay) => relay.toCore()),
       rewardAccount: this.#rewardAccount.toAddress().toBech32() as Cardano.RewardAccount,
@@ -223,8 +219,11 @@ export class PoolParams {
       params.cost,
       UnitInterval.fromCore(params.margin),
       Cardano.Address.fromBech32(params.rewardAccount).asReward()!,
-      params.owners.map((owner) =>
-        Crypto.Ed25519KeyHashHex(Cardano.Address.fromBech32(owner).asReward()!.getPaymentCredential()!.hash)
+      CborSet.fromCore(
+        params.owners.map((owner) =>
+          Crypto.Ed25519KeyHashHex(Cardano.Address.fromBech32(owner).asReward()!.getPaymentCredential()!.hash)
+        ),
+        Hash.fromCore
       ),
       params.relays.map((relay) => Relay.fromCore(relay)),
       params.metadataJson ? PoolMetadata.fromCore(params.metadataJson) : undefined
@@ -356,7 +355,7 @@ export class PoolParams {
    *
    * @returns The pool owners key hashes.
    */
-  poolOwners(): Array<Crypto.Ed25519KeyHashHex> {
+  poolOwners(): PoolOwners {
     return this.#poolOwners;
   }
 
@@ -365,8 +364,8 @@ export class PoolParams {
    *
    * @param poolOwners The pool owners key hashes.
    */
-  setPoolOwners(poolOwners: Array<Crypto.Ed25519KeyHashHex>): void {
-    this.#poolOwners = [...poolOwners];
+  setPoolOwners(poolOwners: PoolOwners): void {
+    this.#poolOwners = poolOwners;
     this.#originalBytes = undefined;
   }
 

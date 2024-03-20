@@ -2,6 +2,7 @@
 import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
+import { CborSet, Hash } from '../Common';
 import { Certificate } from '../Certificates';
 import { HexBlob } from '@cardano-sdk/util';
 import { ProposalProcedure } from './ProposalProcedure';
@@ -10,32 +11,35 @@ import { TransactionInput } from './TransactionInput';
 import { TransactionOutput } from './TransactionOutput';
 import { Update } from '../Update';
 import { VotingProcedures } from './VotingProcedures';
+import { hexToBytes } from '../../util/misc';
 import { multiAssetsToTokenMap, sortCanonically, tokenMapToMultiAsset } from './Utils';
+
+type TransactionInputSet = CborSet<ReturnType<TransactionInput['toCore']>, TransactionInput>;
 
 /** The transaction body encapsulates the core details of a transaction. */
 export class TransactionBody {
   // Required fields
-  #inputs: Array<TransactionInput>;
+  #inputs: TransactionInputSet;
   #outputs: Array<TransactionOutput>;
   #fee: Cardano.Lovelace;
 
   // Optional fields
   #ttl: Cardano.Slot | undefined;
-  #certs: Array<Certificate> | undefined;
+  #certs: CborSet<ReturnType<Certificate['toCore']>, Certificate> | undefined;
   #withdrawals: Map<Cardano.RewardAccount, Cardano.Lovelace> | undefined;
   #update: Update | undefined;
   #auxiliaryDataHash: Crypto.Hash32ByteBase16 | undefined;
   #validityStartInterval: Cardano.Slot | undefined;
   #mint: Cardano.TokenMap | undefined;
   #scriptDataHash: Crypto.Hash32ByteBase16 | undefined;
-  #collateral: Array<TransactionInput> | undefined;
-  #requiredSigners: Array<Crypto.Ed25519KeyHashHex> | undefined;
+  #collateral: TransactionInputSet | undefined;
+  #requiredSigners: CborSet<Crypto.Ed25519KeyHashHex, Hash<Crypto.Ed25519KeyHashHex>> | undefined;
   #networkId: Cardano.NetworkId | undefined;
   #collateralReturn: TransactionOutput | undefined;
   #totalCollateral: Cardano.Lovelace | undefined;
-  #referenceInputs: Array<TransactionInput> | undefined;
+  #referenceInputs: TransactionInputSet | undefined;
   #votingProcedures: VotingProcedures | undefined;
-  #proposalProcedures: Array<ProposalProcedure> | undefined;
+  #proposalProcedures: CborSet<ReturnType<ProposalProcedure['toCore']>, ProposalProcedure> | undefined;
   #currentTreasuryValue: Cardano.Lovelace | undefined;
   #donation: Cardano.Lovelace | undefined;
   #originalBytes: HexBlob | undefined = undefined;
@@ -49,7 +53,7 @@ export class TransactionBody {
    * @param ttl Specifies the slot number until which the transaction is valid. If the transaction isn't included in a block by this slot, it becomes invalid.
    */
   constructor(
-    inputs: Array<TransactionInput>,
+    inputs: TransactionInputSet,
     outputs: Array<TransactionOutput>,
     fee: Cardano.Lovelace,
     ttl?: Cardano.Slot
@@ -95,13 +99,9 @@ export class TransactionBody {
     //   }
     writer.writeStartMap(this.#getMapSize());
 
-    if (this.#inputs && this.#inputs.length > 0) {
+    if (this.#inputs && this.#inputs.size() > 0) {
       writer.writeInt(0n);
-      writer.writeStartArray(this.#inputs.length);
-
-      for (const input of this.#inputs) {
-        writer.writeEncodedValue(Buffer.from(input.toCbor(), 'hex'));
-      }
+      writer.writeEncodedValue(hexToBytes(this.#inputs.toCbor()));
     }
 
     if (this.#outputs && this.#outputs.length > 0) {
@@ -121,13 +121,9 @@ export class TransactionBody {
       writer.writeInt(this.#ttl);
     }
 
-    if (this.#certs && this.#certs.length > 0) {
+    if (this.#certs && this.#certs.size() > 0) {
       writer.writeInt(4n);
-      writer.writeStartArray(this.#certs.length);
-
-      for (const cert of this.#certs) {
-        writer.writeEncodedValue(Buffer.from(cert.toCbor(), 'hex'));
-      }
+      writer.writeEncodedValue(hexToBytes(this.#certs.toCbor()));
     }
 
     if (this.#withdrawals && this.#withdrawals.size > 0) {
@@ -195,24 +191,14 @@ export class TransactionBody {
       writer.writeByteString(Buffer.from(this.#scriptDataHash, 'hex'));
     }
 
-    if (this.#collateral && this.#collateral.length > 0) {
+    if (this.#collateral && this.#collateral.size() > 0) {
       writer.writeInt(13n);
-
-      writer.writeStartArray(this.#collateral.length);
-
-      for (const input of this.#collateral) {
-        writer.writeEncodedValue(Buffer.from(input.toCbor(), 'hex'));
-      }
+      writer.writeEncodedValue(hexToBytes(this.#collateral.toCbor()));
     }
 
-    if (this.#requiredSigners && this.#requiredSigners.length > 0) {
+    if (this.#requiredSigners && this.#requiredSigners.size() > 0) {
       writer.writeInt(14n);
-
-      writer.writeStartArray(this.#requiredSigners.length);
-
-      for (const signer of this.#requiredSigners) {
-        writer.writeByteString(Buffer.from(signer, 'hex'));
-      }
+      writer.writeEncodedValue(hexToBytes(this.#requiredSigners.toCbor()));
     }
 
     if (this.#networkId) {
@@ -230,14 +216,9 @@ export class TransactionBody {
       writer.writeInt(this.#totalCollateral);
     }
 
-    if (this.#referenceInputs && this.#referenceInputs.length > 0) {
+    if (this.#referenceInputs && this.#referenceInputs.size() > 0) {
       writer.writeInt(18n);
-
-      writer.writeStartArray(this.#referenceInputs.length);
-
-      for (const input of this.#referenceInputs) {
-        writer.writeEncodedValue(Buffer.from(input.toCbor(), 'hex'));
-      }
+      writer.writeEncodedValue(hexToBytes(this.#referenceInputs.toCbor()));
     }
 
     if (this.#votingProcedures) {
@@ -245,13 +226,9 @@ export class TransactionBody {
       writer.writeEncodedValue(Buffer.from(this.#votingProcedures.toCbor(), 'hex'));
     }
 
-    if (this.#proposalProcedures && this.#proposalProcedures.length > 0) {
+    if (this.#proposalProcedures && this.#proposalProcedures.size() > 0) {
       writer.writeInt(20n);
-      writer.writeStartArray(this.#proposalProcedures.length);
-
-      for (const procedure of this.#proposalProcedures) {
-        writer.writeEncodedValue(Buffer.from(procedure.toCbor(), 'hex'));
-      }
+      writer.writeEncodedValue(hexToBytes(this.#proposalProcedures.toCbor()));
     }
 
     if (this.#currentTreasuryValue) {
@@ -276,7 +253,7 @@ export class TransactionBody {
   static fromCbor(cbor: HexBlob): TransactionBody {
     const reader = new CborReader(cbor);
 
-    const inputs: Array<TransactionInput> = new Array<TransactionInput>();
+    const inputs = CborSet.fromCore([], TransactionInput.fromCore);
     const outputs: Array<TransactionOutput> = new Array<TransactionOutput>();
     const fee: Cardano.Lovelace = 0n;
     const body = new TransactionBody(inputs, outputs, fee);
@@ -288,14 +265,8 @@ export class TransactionBody {
 
       switch (key) {
         case 0n: {
-          reader.readStartArray();
-
-          while (reader.peekState() !== CborReaderState.EndArray) {
-            body.inputs().push(TransactionInput.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
-          }
-
-          reader.readEndArray();
-
+          const inputsBytes = reader.readEncodedValue();
+          body.setInputs(CborSet.fromCbor(HexBlob.fromBytes(inputsBytes), TransactionInput.fromCbor));
           break;
         }
         case 1n: {
@@ -316,14 +287,7 @@ export class TransactionBody {
           body.setTtl(Cardano.Slot(Number(reader.readInt())));
           break;
         case 4n: {
-          reader.readStartArray();
-
-          body.setCerts(new Array<Certificate>());
-          while (reader.peekState() !== CborReaderState.EndArray) {
-            body.certs()!.push(Certificate.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
-          }
-
-          reader.readEndArray();
+          body.setCerts(CborSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), Certificate.fromCbor));
           break;
         }
         case 5n: {
@@ -379,26 +343,15 @@ export class TransactionBody {
           body.setScriptDataHash(HexBlob.fromBytes(reader.readByteString()) as unknown as Crypto.Hash32ByteBase16);
           break;
         case 13n:
-          body.setCollateral(new Array<TransactionInput>());
-          reader.readStartArray();
-
-          while (reader.peekState() !== CborReaderState.EndArray) {
-            body.collateral()!.push(TransactionInput.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
-          }
-
-          reader.readEndArray();
+          body.setCollateral(CborSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), TransactionInput.fromCbor));
           break;
         case 14n:
-          body.setRequiredSigners(new Array<Crypto.Ed25519KeyHashHex>());
-          reader.readStartArray();
-
-          while (reader.peekState() !== CborReaderState.EndArray) {
-            body
-              .requiredSigners()!
-              .push(HexBlob.fromBytes(reader.readByteString()) as unknown as Crypto.Ed25519KeyHashHex);
-          }
-
-          reader.readEndArray();
+          body.setRequiredSigners(
+            CborSet.fromCbor<Crypto.Ed25519KeyHashHex, Hash<Crypto.Ed25519KeyHashHex>>(
+              HexBlob.fromBytes(reader.readEncodedValue()),
+              Hash.fromCbor
+            )
+          );
           break;
         case 15n:
           body.setNetworkId(Number(reader.readInt()) as Cardano.NetworkId);
@@ -410,27 +363,17 @@ export class TransactionBody {
           body.setTotalCollateral(reader.readInt());
           break;
         case 18n:
-          body.setReferenceInputs(new Array<TransactionInput>());
-          reader.readStartArray();
-
-          while (reader.peekState() !== CborReaderState.EndArray) {
-            body.referenceInputs()!.push(TransactionInput.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
-          }
-
-          reader.readEndArray();
+          body.setReferenceInputs(
+            CborSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), TransactionInput.fromCbor)
+          );
           break;
         case 19n:
           body.setVotingProcedures(VotingProcedures.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
           break;
         case 20n:
-          body.setProposalProcedures(new Array<ProposalProcedure>());
-          reader.readStartArray();
-
-          while (reader.peekState() !== CborReaderState.EndArray) {
-            body.proposalProcedures()!.push(ProposalProcedure.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
-          }
-
-          reader.readEndArray();
+          body.setProposalProcedures(
+            CborSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), ProposalProcedure.fromCbor)
+          );
           break;
         case 21n:
           body.setCurrentTreasuryValue(reader.readInt());
@@ -456,20 +399,18 @@ export class TransactionBody {
   toCore(): Cardano.TxBody {
     return {
       auxiliaryDataHash: this.#auxiliaryDataHash,
-      certificates: this.#certs ? this.#certs.map((cert) => cert.toCore()) : undefined,
+      certificates: this.#certs?.values() ? this.#certs.toCore() : undefined,
       collateralReturn: this.#collateralReturn?.toCore(),
-      collaterals: this.#collateral ? this.#collateral.map((input) => input.toCore()) : undefined,
+      collaterals: this.#collateral?.values() ? this.#collateral.toCore() : undefined,
       donation: this.#donation,
       fee: this.#fee,
-      inputs: this.#inputs.map((input) => input.toCore()),
+      inputs: this.#inputs.toCore(),
       mint: this.#mint,
       networkId: this.#networkId,
       outputs: this.#outputs.map((output) => output.toCore()),
-      proposalProcedures: this.#proposalProcedures
-        ? this.#proposalProcedures.map((input) => input.toCore())
-        : undefined,
-      referenceInputs: this.#referenceInputs ? this.#referenceInputs.map((input) => input.toCore()) : undefined,
-      requiredExtraSignatures: this.#requiredSigners,
+      proposalProcedures: this.#proposalProcedures?.values() ? this.#proposalProcedures.toCore() : undefined,
+      referenceInputs: this.#referenceInputs?.size() ? this.#referenceInputs.toCore() : undefined,
+      requiredExtraSignatures: this.#requiredSigners?.toCore(),
       scriptIntegrityHash: this.#scriptDataHash,
       totalCollateral: this.#totalCollateral,
       treasuryValue: this.#currentTreasuryValue,
@@ -495,7 +436,8 @@ export class TransactionBody {
    */
   static fromCore(coreTransactionBody: Cardano.TxBody): TransactionBody {
     const body = new TransactionBody(
-      coreTransactionBody.inputs.map((input) => TransactionInput.fromCore(input)),
+      CborSet.fromCore(coreTransactionBody.inputs, TransactionInput.fromCore),
+      // new CborSet<TransactionInput>(coreTransactionBody.inputs.map((input) => TransactionInput.fromCore(input))),
       coreTransactionBody.outputs.map((output) => TransactionOutput.fromCore(output)),
       coreTransactionBody.fee
     );
@@ -503,23 +445,23 @@ export class TransactionBody {
     if (coreTransactionBody.auxiliaryDataHash) body.setAuxiliaryDataHash(coreTransactionBody.auxiliaryDataHash);
 
     if (coreTransactionBody.certificates)
-      body.setCerts(coreTransactionBody.certificates.map((cert) => Certificate.fromCore(cert)));
+      body.setCerts(CborSet.fromCore(coreTransactionBody.certificates, Certificate.fromCore));
 
     if (coreTransactionBody.collateralReturn)
       body.setCollateralReturn(TransactionOutput.fromCore(coreTransactionBody.collateralReturn));
 
     if (coreTransactionBody.collaterals)
-      body.setCollateral(coreTransactionBody.collaterals.map((input) => TransactionInput.fromCore(input)));
+      body.setCollateral(CborSet.fromCore(coreTransactionBody.collaterals, TransactionInput.fromCore));
 
     if (coreTransactionBody.mint) body.setMint(coreTransactionBody.mint);
 
     if (coreTransactionBody.networkId) body.setNetworkId(coreTransactionBody.networkId);
 
     if (coreTransactionBody.referenceInputs)
-      body.setReferenceInputs(coreTransactionBody.referenceInputs.map((input) => TransactionInput.fromCore(input)));
+      body.setReferenceInputs(CborSet.fromCore(coreTransactionBody.referenceInputs, TransactionInput.fromCore));
 
     if (coreTransactionBody.requiredExtraSignatures)
-      body.setRequiredSigners(coreTransactionBody.requiredExtraSignatures);
+      body.setRequiredSigners(CborSet.fromCore(coreTransactionBody.requiredExtraSignatures, Hash.fromCore));
 
     if (coreTransactionBody.scriptIntegrityHash) body.setScriptDataHash(coreTransactionBody.scriptIntegrityHash);
 
@@ -547,9 +489,7 @@ export class TransactionBody {
     if (coreTransactionBody.votingProcedures)
       body.setVotingProcedures(VotingProcedures.fromCore(coreTransactionBody.votingProcedures));
     if (coreTransactionBody.proposalProcedures)
-      body.setProposalProcedures(
-        coreTransactionBody.proposalProcedures.map((core) => ProposalProcedure.fromCore(core))
-      );
+      body.setProposalProcedures(CborSet.fromCore(coreTransactionBody.proposalProcedures, ProposalProcedure.fromCore));
 
     return body;
   }
@@ -560,7 +500,7 @@ export class TransactionBody {
    *
    * @param inputs the list of references to UTxOs.
    */
-  setInputs(inputs: Array<TransactionInput>) {
+  setInputs(inputs: TransactionInputSet) {
     this.#inputs = inputs;
     this.#originalBytes = undefined;
   }
@@ -571,7 +511,7 @@ export class TransactionBody {
    *
    * @returns The list of references to UTxOs.
    */
-  inputs(): Array<TransactionInput> {
+  inputs() {
     return this.#inputs;
   }
 
@@ -644,7 +584,7 @@ export class TransactionBody {
    *
    * @param certs The certificates to be issued by this transaction.
    */
-  setCerts(certs: Array<Certificate>): void {
+  setCerts(certs: CborSet<ReturnType<Certificate['toCore']>, Certificate>): void {
     this.#certs = certs;
     this.#originalBytes = undefined;
   }
@@ -655,7 +595,7 @@ export class TransactionBody {
    *
    * @returns The certificates to be issued by this transaction.
    */
-  certs(): Array<Certificate> | undefined {
+  certs() {
     return this.#certs;
   }
 
@@ -785,7 +725,7 @@ export class TransactionBody {
    *
    * @param collateral The UTxOs that a sender commits to forfeit.
    */
-  setCollateral(collateral: Array<TransactionInput>): void {
+  setCollateral(collateral: TransactionInputSet): void {
     this.#collateral = collateral;
     this.#originalBytes = undefined;
   }
@@ -796,7 +736,7 @@ export class TransactionBody {
    *
    * @returns The UTxOs that a sender commits to forfeit.
    */
-  collateral(): Array<TransactionInput> | undefined {
+  collateral() {
     return this.#collateral;
   }
 
@@ -805,7 +745,7 @@ export class TransactionBody {
    *
    * @param requiredSigners The set of keys which need to sign a transaction
    */
-  setRequiredSigners(requiredSigners: Array<Crypto.Ed25519KeyHashHex>): void {
+  setRequiredSigners(requiredSigners: CborSet<Crypto.Ed25519KeyHashHex, Hash<Crypto.Ed25519KeyHashHex>>): void {
     this.#requiredSigners = requiredSigners;
     this.#originalBytes = undefined;
   }
@@ -815,7 +755,7 @@ export class TransactionBody {
    *
    * @returns The set of keys which need to sign a transaction
    */
-  requiredSigners(): Array<Crypto.Ed25519KeyHashHex> | undefined {
+  requiredSigners() {
     return this.#requiredSigners;
   }
 
@@ -891,7 +831,7 @@ export class TransactionBody {
    * Reference inputs allows looking at an output without spending it. This facilitates access to information
    * stored on the blockchain without the need of spending and recreating UTxOs.
    */
-  setReferenceInputs(referenceInputs: Array<TransactionInput>): void {
+  setReferenceInputs(referenceInputs: TransactionInputSet): void {
     this.#referenceInputs = referenceInputs;
     this.#originalBytes = undefined;
   }
@@ -901,7 +841,7 @@ export class TransactionBody {
    *
    * @returns the reference inputs.
    */
-  referenceInputs(): Array<TransactionInput> | undefined {
+  referenceInputs() {
     return this.#referenceInputs;
   }
 
@@ -929,7 +869,7 @@ export class TransactionBody {
    *
    * @param proposalProcedure the proposal procedures.
    */
-  setProposalProcedures(proposalProcedure: Array<ProposalProcedure>): void {
+  setProposalProcedures(proposalProcedure: CborSet<ReturnType<ProposalProcedure['toCore']>, ProposalProcedure>): void {
     this.#proposalProcedures = proposalProcedure;
     this.#originalBytes = undefined;
   }
@@ -939,7 +879,7 @@ export class TransactionBody {
    *
    * @returns the proposal procedures.
    */
-  proposalProcedures(): Array<ProposalProcedure> | undefined {
+  proposalProcedures() {
     return this.#proposalProcedures;
   }
 
@@ -989,25 +929,25 @@ export class TransactionBody {
   #getMapSize(): number {
     let mapSize = 0;
 
-    if (this.#inputs !== undefined && this.#inputs.length > 0) ++mapSize;
+    if (this.#inputs !== undefined && this.#inputs.size() > 0) ++mapSize;
     if (this.#outputs !== undefined && this.#outputs.length > 0) ++mapSize;
     if (this.#fee !== undefined) ++mapSize;
     if (this.#ttl !== undefined) ++mapSize;
-    if (this.#certs !== undefined && this.#certs.length > 0) ++mapSize;
+    if (this.#certs !== undefined && this.#certs.size() > 0) ++mapSize;
     if (this.#withdrawals !== undefined && this.#withdrawals.size > 0) ++mapSize;
     if (this.#update !== undefined) ++mapSize;
     if (this.#auxiliaryDataHash !== undefined) ++mapSize;
     if (this.#validityStartInterval !== undefined) ++mapSize;
     if (this.#mint !== undefined && this.#mint.size > 0) ++mapSize;
     if (this.#scriptDataHash !== undefined) ++mapSize;
-    if (this.#collateral !== undefined && this.#collateral.length > 0) ++mapSize;
-    if (this.#requiredSigners !== undefined && this.#requiredSigners.length > 0) ++mapSize;
+    if (this.#collateral !== undefined && this.#collateral.size() > 0) ++mapSize;
+    if (this.#requiredSigners?.values() !== undefined && this.#requiredSigners.size() > 0) ++mapSize;
     if (this.#networkId !== undefined) ++mapSize;
     if (this.#collateralReturn !== undefined) ++mapSize;
     if (this.#totalCollateral !== undefined) ++mapSize;
-    if (this.#referenceInputs !== undefined && this.#referenceInputs.length > 0) ++mapSize;
+    if (this.#referenceInputs !== undefined && this.#referenceInputs.size() > 0) ++mapSize;
     if (this.#votingProcedures !== undefined) ++mapSize;
-    if (this.#proposalProcedures !== undefined && this.#proposalProcedures.length > 0) ++mapSize;
+    if (this.#proposalProcedures !== undefined && this.#proposalProcedures.size() > 0) ++mapSize;
     if (this.#currentTreasuryValue !== undefined) ++mapSize;
     if (this.#donation !== undefined) ++mapSize;
 
