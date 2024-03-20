@@ -1,13 +1,15 @@
 import { Cardano } from '@cardano-sdk/core';
+import { EMPTY, catchError, take, tap } from 'rxjs';
+import { Logger } from '@cardano-sdk/util-dev';
 import { ObservableWallet } from '@cardano-sdk/wallet';
 import { inspectAndSignTx } from '../utils';
-import { take, tap } from 'rxjs';
 import { toSerializableObject } from '@cardano-sdk/util';
 
 export const singleDelegation = ({
-  connectedWallet
+  connectedWallet,
+  logger
 }: {
-  logger: typeof console;
+  logger: Logger;
   connectedWallet: ObservableWallet;
 }) => {
   const delegateElement = document.querySelector('#info-delegate-assets')!;
@@ -41,7 +43,11 @@ export const singleDelegation = ({
         const inspection = await builtTx.inspect();
         delegateElement.textContent = `Built: ${JSON.stringify(toSerializableObject(inspection))}`;
 
-        inspectAndSignTx({ builtTx, connectedWallet, textElement: delegateAssetsElement });
+        await inspectAndSignTx({ builtTx, connectedWallet, textElement: delegateAssetsElement });
+      }),
+      catchError((error) => {
+        logger.error('Error fetching assets:', error);
+        return EMPTY;
       })
     )
     .subscribe();
