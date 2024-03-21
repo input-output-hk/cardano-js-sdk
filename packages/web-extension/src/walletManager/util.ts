@@ -161,7 +161,7 @@ const requiresStakingWitness = (
     networkId
   );
   const withdrawals = body.withdrawals() ?? new Map();
-  const certificates = (body.certs() ?? []).map((certificate) => certificate.toCore());
+  const certificates = (body.certs()?.values() ?? []).map((certificate) => certificate.toCore());
 
   if (withdrawals.size > 0 && withdrawals.has((key: Cardano.RewardAccount) => key === rewardAccount)) return true;
 

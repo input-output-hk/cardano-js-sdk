@@ -2,20 +2,23 @@
 import * as Cardano from '../../Cardano';
 import { BootstrapWitness } from './BootstrapWitness';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
+import { CborSet } from '../Common';
 import { HexBlob } from '@cardano-sdk/util';
 import { NativeScript, PlutusV1Script, PlutusV2Script, PlutusV3Script } from '../Scripts';
 import { PlutusData } from '../PlutusData/PlutusData';
-import { Redeemer } from './Redeemer';
+import { Redeemers } from './Redeemer';
 import { SerializationError, SerializationFailure } from '../../errors';
 import { VkeyWitness } from './VkeyWitness';
+import { hexToBytes } from '../../util/misc';
+import _groupBy from 'lodash/groupBy';
 import uniqWith from 'lodash/uniqWith';
 
 /** This type represents the segregated CDDL scripts. */
 type CddlScripts = {
-  native: Array<NativeScript> | undefined;
-  plutusV1: Array<PlutusV1Script> | undefined;
-  plutusV2: Array<PlutusV2Script> | undefined;
-  plutusV3: Array<PlutusV3Script> | undefined;
+  native?: CborSet<ReturnType<NativeScript['toCore']>, NativeScript>;
+  plutusV1?: CborSet<ReturnType<PlutusV1Script['toCore']>, PlutusV1Script>;
+  plutusV2?: CborSet<ReturnType<PlutusV2Script['toCore']>, PlutusV2Script>;
+  plutusV3?: CborSet<ReturnType<PlutusV3Script['toCore']>, PlutusV3Script>;
 };
 
 /**
@@ -27,14 +30,14 @@ type CddlScripts = {
  * smart contract execution.
  */
 export class TransactionWitnessSet {
-  #vkeywitnesses: Array<VkeyWitness> | undefined;
-  #nativeScripts: Array<NativeScript> | undefined;
-  #bootstrapWitnesses: Array<BootstrapWitness> | undefined;
-  #plutusV1Scripts: Array<PlutusV1Script> | undefined;
-  #plutusData: Array<PlutusData> | undefined;
-  #redeemers: Array<Redeemer> | undefined;
-  #plutusV2Scripts: Array<PlutusV2Script> | undefined;
-  #plutusV3Scripts: Array<PlutusV3Script> | undefined;
+  #vkeywitnesses: CborSet<ReturnType<VkeyWitness['toCore']>, VkeyWitness> | undefined;
+  #nativeScripts: CborSet<ReturnType<NativeScript['toCore']>, NativeScript> | undefined;
+  #bootstrapWitnesses: CborSet<ReturnType<BootstrapWitness['toCore']>, BootstrapWitness> | undefined;
+  #plutusV1Scripts: CborSet<ReturnType<PlutusV1Script['toCore']>, PlutusV1Script> | undefined;
+  #plutusData: CborSet<ReturnType<PlutusData['toCore']>, PlutusData> | undefined;
+  #redeemers: Redeemers | undefined;
+  #plutusV2Scripts: CborSet<ReturnType<PlutusV2Script['toCore']>, PlutusV2Script> | undefined;
+  #plutusV3Scripts: CborSet<ReturnType<PlutusV3Script['toCore']>, PlutusV3Script> | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -49,91 +52,63 @@ export class TransactionWitnessSet {
 
     // CDDL
     // transaction_witness_set =
-    //   { ? 0: [* vkeywitness ]
-    //   , ? 1: [* native_script ]
-    //   , ? 2: [* bootstrap_witness ]
-    //   , ? 3: [* plutus_v1_script ]
-    //   , ? 4: [* plutus_data ]
-    //   , ? 5: [* redeemer ]
-    //   , ? 6: [* plutus_v2_script ]
-    //   , ? 7: [* plutus_v3_script ]
+    //   { ? 0: nonempty_set<vkeywitness>
+    //   , ? 1: nonempty_set<native_script>
+    //   , ? 2: nonempty_set<bootstrap_witness>
+    //   , ? 3: nonempty_set<plutus_v1_script>
+    //   , ? 4: nonempty_set<plutus_data>
+    //   , ? 5: redeemers
+    //   , ? 6: nonempty_set<plutus_v2_script>
+    //   , ? 7: nonempty_set<plutus_v3_script>
     //   }
+    //
+    // redeemers =
+    //   [ + [ tag: redeemer_tag, index: uint, data: plutus_data, ex_units: ex_units ] ]
+    //   / { + [ tag: redeemer_tag, index: uint ] => [ data: plutus_data, ex_units: ex_units ] }
     writer.writeStartMap(this.#getMapSize());
 
-    if (this.#vkeywitnesses && this.#vkeywitnesses.length > 0) {
-      const uniqueWitnesses = uniqWith(this.#vkeywitnesses, (lhs, rhs) => lhs.vkey() === rhs.vkey());
-
+    if (this.#vkeywitnesses && this.#vkeywitnesses.size() > 0) {
+      this.#vkeywitnesses.setValues(uniqWith(this.#vkeywitnesses.values(), (lhs, rhs) => lhs.vkey() === rhs.vkey()));
       writer.writeInt(0n);
-      writer.writeStartArray(uniqueWitnesses.length);
-
-      for (const witness of uniqueWitnesses) {
-        writer.writeEncodedValue(Buffer.from(witness.toCbor(), 'hex'));
-      }
+      writer.writeEncodedValue(Buffer.from(this.#vkeywitnesses.toCbor(), 'hex'));
     }
 
-    if (this.#nativeScripts && this.#nativeScripts.length > 0) {
+    if (this.#nativeScripts && this.#nativeScripts.size() > 0) {
       writer.writeInt(1n);
-      writer.writeStartArray(this.#nativeScripts.length);
-
-      for (const script of this.#nativeScripts) {
-        writer.writeEncodedValue(Buffer.from(script.toCbor(), 'hex'));
-      }
+      writer.writeEncodedValue(Buffer.from(this.#nativeScripts.toCbor(), 'hex'));
     }
 
-    if (this.#bootstrapWitnesses && this.#bootstrapWitnesses.length > 0) {
-      const uniqueWitnesses = uniqWith(this.#bootstrapWitnesses, (lhs, rhs) => lhs.vkey() === rhs.vkey());
-
+    if (this.#bootstrapWitnesses && this.#bootstrapWitnesses.size() > 0) {
+      this.#bootstrapWitnesses.setValues(
+        uniqWith(this.#bootstrapWitnesses.values(), (lhs, rhs) => lhs.vkey() === rhs.vkey())
+      );
       writer.writeInt(2n);
-      writer.writeStartArray(uniqueWitnesses.length);
-
-      for (const witness of uniqueWitnesses) {
-        writer.writeEncodedValue(Buffer.from(witness.toCbor(), 'hex'));
-      }
+      writer.writeEncodedValue(Buffer.from(this.#bootstrapWitnesses.toCbor(), 'hex'));
     }
 
-    if (this.#plutusV1Scripts && this.#plutusV1Scripts.length > 0) {
+    if (this.#plutusV1Scripts && this.#plutusV1Scripts.size() > 0) {
       writer.writeInt(3n);
-      writer.writeStartArray(this.#plutusV1Scripts.length);
-
-      for (const script of this.#plutusV1Scripts) {
-        writer.writeEncodedValue(Buffer.from(script.toCbor(), 'hex'));
-      }
+      writer.writeEncodedValue(Buffer.from(this.#plutusV1Scripts.toCbor(), 'hex'));
     }
 
-    if (this.#plutusData && this.#plutusData.length > 0) {
+    if (this.#plutusData && this.#plutusData.size() > 0) {
       writer.writeInt(4n);
-      writer.writeStartArray(this.#plutusData.length);
-
-      for (const data of this.#plutusData) {
-        writer.writeEncodedValue(Buffer.from(data.toCbor(), 'hex'));
-      }
+      writer.writeEncodedValue(Buffer.from(this.#plutusData.toCbor(), 'hex'));
     }
 
-    if (this.#redeemers && this.#redeemers.length > 0) {
+    if (this.#redeemers && this.#redeemers.size() > 0) {
       writer.writeInt(5n);
-      writer.writeStartArray(this.#redeemers.length);
-
-      for (const data of this.#redeemers) {
-        writer.writeEncodedValue(Buffer.from(data.toCbor(), 'hex'));
-      }
+      writer.writeEncodedValue(hexToBytes(this.#redeemers.toCbor()));
     }
 
-    if (this.#plutusV2Scripts && this.#plutusV2Scripts.length > 0) {
+    if (this.#plutusV2Scripts && this.#plutusV2Scripts.size() > 0) {
       writer.writeInt(6n);
-      writer.writeStartArray(this.#plutusV2Scripts.length);
-
-      for (const script of this.#plutusV2Scripts) {
-        writer.writeEncodedValue(Buffer.from(script.toCbor(), 'hex'));
-      }
+      writer.writeEncodedValue(Buffer.from(this.#plutusV2Scripts.toCbor(), 'hex'));
     }
 
-    if (this.#plutusV3Scripts && this.#plutusV3Scripts.length > 0) {
+    if (this.#plutusV3Scripts && this.#plutusV3Scripts.size() > 0) {
       writer.writeInt(7n);
-      writer.writeStartArray(this.#plutusV3Scripts.length);
-
-      for (const script of this.#plutusV3Scripts) {
-        writer.writeEncodedValue(Buffer.from(script.toCbor(), 'hex'));
-      }
+      writer.writeEncodedValue(Buffer.from(this.#plutusV3Scripts.toCbor(), 'hex'));
     }
 
     return writer.encodeAsHex();
@@ -157,84 +132,39 @@ export class TransactionWitnessSet {
 
       switch (key) {
         case 0n:
-          witness.setVkeys(new Array<VkeyWitness>());
-          reader.readStartArray();
-
-          while (reader.peekState() !== CborReaderState.EndArray) {
-            witness.vkeys()!.push(VkeyWitness.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
-          }
-
-          reader.readEndArray();
+          witness.setVkeys(CborSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), VkeyWitness.fromCbor));
           break;
         case 1n:
-          witness.setNativeScripts(new Array<NativeScript>());
-          reader.readStartArray();
-
-          while (reader.peekState() !== CborReaderState.EndArray) {
-            witness.nativeScripts()!.push(NativeScript.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
-          }
-
-          reader.readEndArray();
+          witness.setNativeScripts(
+            CborSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), NativeScript.fromCbor)
+          );
           break;
         case 2n:
-          witness.setBootstraps(new Array<BootstrapWitness>());
-          reader.readStartArray();
-
-          while (reader.peekState() !== CborReaderState.EndArray) {
-            witness.bootstraps()!.push(BootstrapWitness.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
-          }
-
-          reader.readEndArray();
+          witness.setBootstraps(
+            CborSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), BootstrapWitness.fromCbor)
+          );
           break;
         case 3n:
-          witness.setPlutusV1Scripts(new Array<PlutusV1Script>());
-          reader.readStartArray();
-
-          while (reader.peekState() !== CborReaderState.EndArray) {
-            witness.plutusV1Scripts()!.push(PlutusV1Script.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
-          }
-
-          reader.readEndArray();
+          witness.setPlutusV1Scripts(
+            CborSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), PlutusV1Script.fromCbor)
+          );
           break;
         case 4n:
-          witness.setPlutusData(new Array<PlutusData>());
-          reader.readStartArray();
-
-          while (reader.peekState() !== CborReaderState.EndArray) {
-            witness.plutusData()!.push(PlutusData.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
-          }
-
-          reader.readEndArray();
+          witness.setPlutusData(CborSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), PlutusData.fromCbor));
           break;
-        case 5n:
-          witness.setRedeemers(new Array<Redeemer>());
-          reader.readStartArray();
-
-          while (reader.peekState() !== CborReaderState.EndArray) {
-            witness.redeemers()!.push(Redeemer.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
-          }
-
-          reader.readEndArray();
+        case 5n: {
+          witness.setRedeemers(Redeemers.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
           break;
+        }
         case 6n:
-          witness.setPlutusV2Scripts(new Array<PlutusV2Script>());
-          reader.readStartArray();
-
-          while (reader.peekState() !== CborReaderState.EndArray) {
-            witness.plutusV2Scripts()!.push(PlutusV2Script.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
-          }
-
-          reader.readEndArray();
+          witness.setPlutusV2Scripts(
+            CborSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), PlutusV2Script.fromCbor)
+          );
           break;
         case 7n:
-          witness.setPlutusV3Scripts(new Array<PlutusV3Script>());
-          reader.readStartArray();
-
-          while (reader.peekState() !== CborReaderState.EndArray) {
-            witness.plutusV3Scripts()!.push(PlutusV3Script.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
-          }
-
-          reader.readEndArray();
+          witness.setPlutusV3Scripts(
+            CborSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), PlutusV3Script.fromCbor)
+          );
           break;
       }
     }
@@ -254,11 +184,11 @@ export class TransactionWitnessSet {
   toCore(): Cardano.Witness {
     const scripts = this.#getCoreScripts();
     return {
-      bootstrap: this.#bootstrapWitnesses ? this.#bootstrapWitnesses.map((witness) => witness.toCore()) : undefined,
-      datums: this.#plutusData ? this.#plutusData.map((data) => data.toCore()) : undefined,
-      redeemers: this.#redeemers ? this.#redeemers.map((data) => data.toCore()) : undefined,
+      bootstrap: this.#bootstrapWitnesses ? this.#bootstrapWitnesses.toCore() : undefined,
+      datums: this.#plutusData ? this.#plutusData.toCore() : undefined,
+      redeemers: this.#redeemers?.size() ? this.#redeemers.toCore() : undefined,
       scripts: scripts.length > 0 ? scripts : undefined,
-      signatures: this.#vkeywitnesses ? new Map(this.#vkeywitnesses.map((witness) => witness.toCore())) : new Map()
+      signatures: this.#vkeywitnesses ? new Map(this.#vkeywitnesses.toCore()) : new Map()
     };
   }
 
@@ -271,7 +201,7 @@ export class TransactionWitnessSet {
     const witness = new TransactionWitnessSet();
 
     if (coreWitness.signatures) {
-      witness.setVkeys([...coreWitness.signatures].map((vkWitness) => VkeyWitness.fromCore(vkWitness)));
+      witness.setVkeys(CborSet.fromCore([...coreWitness.signatures], VkeyWitness.fromCore));
     }
 
     if (coreWitness.scripts) {
@@ -284,15 +214,15 @@ export class TransactionWitnessSet {
     }
 
     if (coreWitness.redeemers) {
-      witness.setRedeemers(coreWitness.redeemers.map((data) => Redeemer.fromCore(data)));
+      witness.setRedeemers(Redeemers.fromCore(coreWitness.redeemers));
     }
 
     if (coreWitness.datums) {
-      witness.setPlutusData(coreWitness.datums.map((data) => PlutusData.fromCore(data)));
+      witness.setPlutusData(CborSet.fromCore(coreWitness.datums, PlutusData.fromCore));
     }
 
     if (coreWitness.bootstrap) {
-      witness.setBootstraps(coreWitness.bootstrap.map((bootstrap) => BootstrapWitness.fromCore(bootstrap)));
+      witness.setBootstraps(CborSet.fromCore(coreWitness.bootstrap, BootstrapWitness.fromCore));
     }
 
     return witness;
@@ -304,7 +234,7 @@ export class TransactionWitnessSet {
    *
    * @param vkeys The set of verification key witnesses.
    */
-  setVkeys(vkeys: Array<VkeyWitness>) {
+  setVkeys(vkeys: CborSet<ReturnType<VkeyWitness['toCore']>, VkeyWitness>) {
     this.#vkeywitnesses = vkeys;
     this.#originalBytes = undefined;
   }
@@ -315,7 +245,7 @@ export class TransactionWitnessSet {
    *
    * @returns The set of verification key witnesses.
    */
-  vkeys(): Array<VkeyWitness> | undefined {
+  vkeys() {
     return this.#vkeywitnesses;
   }
 
@@ -324,7 +254,7 @@ export class TransactionWitnessSet {
    *
    * @param nativeScripts The set of native scripts.
    */
-  setNativeScripts(nativeScripts: Array<NativeScript>) {
+  setNativeScripts(nativeScripts: CborSet<ReturnType<NativeScript['toCore']>, NativeScript>) {
     this.#nativeScripts = nativeScripts;
     this.#originalBytes = undefined;
   }
@@ -334,7 +264,7 @@ export class TransactionWitnessSet {
    *
    * @returns The set of native scripts.
    */
-  nativeScripts(): Array<NativeScript> | undefined {
+  nativeScripts() {
     return this.#nativeScripts;
   }
 
@@ -343,7 +273,7 @@ export class TransactionWitnessSet {
    *
    * @param bootstraps The Bootstrap witnesses for this transaction.
    */
-  setBootstraps(bootstraps: Array<BootstrapWitness>) {
+  setBootstraps(bootstraps: CborSet<ReturnType<BootstrapWitness['toCore']>, BootstrapWitness>) {
     this.#bootstrapWitnesses = bootstraps;
     this.#originalBytes = undefined;
   }
@@ -353,7 +283,7 @@ export class TransactionWitnessSet {
    *
    * @returns The Bootstrap witnesses for this transaction.
    */
-  bootstraps(): Array<BootstrapWitness> | undefined {
+  bootstraps() {
     return this.#bootstrapWitnesses;
   }
 
@@ -362,7 +292,7 @@ export class TransactionWitnessSet {
    *
    * @param plutusV1Scripts The set of plutus v1 scripts.
    */
-  setPlutusV1Scripts(plutusV1Scripts: Array<PlutusV1Script>) {
+  setPlutusV1Scripts(plutusV1Scripts: CborSet<ReturnType<PlutusV1Script['toCore']>, PlutusV1Script>) {
     this.#plutusV1Scripts = plutusV1Scripts;
     this.#originalBytes = undefined;
   }
@@ -372,7 +302,7 @@ export class TransactionWitnessSet {
    *
    * @returns The set of plutus v1 scripts.
    */
-  plutusV1Scripts(): Array<PlutusV1Script> | undefined {
+  plutusV1Scripts() {
     return this.#plutusV1Scripts;
   }
 
@@ -381,7 +311,7 @@ export class TransactionWitnessSet {
    *
    * @param plutusData The Plutus Data.
    */
-  setPlutusData(plutusData: Array<PlutusData>) {
+  setPlutusData(plutusData: CborSet<ReturnType<PlutusData['toCore']>, PlutusData>) {
     this.#plutusData = plutusData;
     this.#originalBytes = undefined;
   }
@@ -391,7 +321,7 @@ export class TransactionWitnessSet {
    *
    * @returns The Plutus Data.
    */
-  plutusData(): Array<PlutusData> | undefined {
+  plutusData() {
     return this.#plutusData;
   }
 
@@ -400,7 +330,7 @@ export class TransactionWitnessSet {
    *
    * @param redeemers The redeemers.
    */
-  setRedeemers(redeemers: Array<Redeemer>) {
+  setRedeemers(redeemers: Redeemers) {
     this.#redeemers = redeemers;
     this.#originalBytes = undefined;
   }
@@ -410,7 +340,7 @@ export class TransactionWitnessSet {
    *
    * @returns The redeemers.
    */
-  redeemers(): Array<Redeemer> | undefined {
+  redeemers(): Redeemers | undefined {
     return this.#redeemers;
   }
 
@@ -419,7 +349,7 @@ export class TransactionWitnessSet {
    *
    * @param plutusV2Scripts The set of plutus v2 scripts.
    */
-  setPlutusV2Scripts(plutusV2Scripts: Array<PlutusV2Script>) {
+  setPlutusV2Scripts(plutusV2Scripts: CborSet<ReturnType<PlutusV2Script['toCore']>, PlutusV2Script>) {
     this.#plutusV2Scripts = plutusV2Scripts;
     this.#originalBytes = undefined;
   }
@@ -429,7 +359,7 @@ export class TransactionWitnessSet {
    *
    * @returns The set of plutus v2 scripts.
    */
-  plutusV2Scripts(): Array<PlutusV2Script> | undefined {
+  plutusV2Scripts() {
     return this.#plutusV2Scripts;
   }
 
@@ -438,7 +368,7 @@ export class TransactionWitnessSet {
    *
    * @param plutusV3Scripts The set of plutus v3 scripts.
    */
-  setPlutusV3Scripts(plutusV3Scripts: Array<PlutusV3Script>) {
+  setPlutusV3Scripts(plutusV3Scripts: CborSet<ReturnType<PlutusV3Script['toCore']>, PlutusV3Script>) {
     this.#plutusV3Scripts = plutusV3Scripts;
     this.#originalBytes = undefined;
   }
@@ -448,7 +378,7 @@ export class TransactionWitnessSet {
    *
    * @returns The set of plutus v3 scripts.
    */
-  plutusV3Scripts(): Array<PlutusV3Script> | undefined {
+  plutusV3Scripts() {
     return this.#plutusV3Scripts;
   }
 
@@ -459,10 +389,10 @@ export class TransactionWitnessSet {
    * @private
    */
   #getCoreScripts(): Array<Cardano.Script> {
-    const plutusV1 = this.#plutusV1Scripts ? this.#plutusV1Scripts.map((script) => script.toCore()) : [];
-    const plutusV2 = this.#plutusV2Scripts ? this.#plutusV2Scripts.map((script) => script.toCore()) : [];
-    const plutusV3 = this.#plutusV3Scripts ? this.#plutusV3Scripts.map((script) => script.toCore()) : [];
-    const native = this.#nativeScripts ? this.#nativeScripts.map((script) => script.toCore()) : [];
+    const plutusV1 = this.#plutusV1Scripts ? this.#plutusV1Scripts.toCore() : [];
+    const plutusV2 = this.#plutusV2Scripts ? this.#plutusV2Scripts.toCore() : [];
+    const plutusV3 = this.#plutusV3Scripts ? this.#plutusV3Scripts.toCore() : [];
+    const native = this.#nativeScripts ? this.#nativeScripts.toCore() : [];
 
     return [...plutusV1, ...plutusV2, ...plutusV3, ...native];
   }
@@ -474,36 +404,46 @@ export class TransactionWitnessSet {
    * @private
    */
   static #getCddlScripts(scripts: Array<Cardano.Script>): CddlScripts {
-    const result: CddlScripts = { native: undefined, plutusV1: undefined, plutusV2: undefined, plutusV3: undefined };
-
-    for (const script of scripts) {
-      switch (script.__type) {
-        case Cardano.ScriptType.Native:
-          if (!result.native) result.native = new Array<NativeScript>();
-
-          result.native.push(NativeScript.fromCore(script));
-          break;
-        case Cardano.ScriptType.Plutus:
-          if (script.version === Cardano.PlutusLanguageVersion.V1) {
-            if (!result.plutusV1) result.plutusV1 = new Array<PlutusV1Script>();
-
-            result.plutusV1.push(PlutusV1Script.fromCore(script));
-          } else if (script.version === Cardano.PlutusLanguageVersion.V2) {
-            if (!result.plutusV2) result.plutusV2 = new Array<PlutusV2Script>();
-
-            result.plutusV2.push(PlutusV2Script.fromCore(script));
-          } else if (script.version === Cardano.PlutusLanguageVersion.V3) {
-            if (!result.plutusV3) result.plutusV3 = new Array<PlutusV3Script>();
-
-            result.plutusV3.push(PlutusV3Script.fromCore(script));
+    const [coreNative, coreV1, coreV2, coreV3] = scripts.reduce<
+      [
+        Cardano.NativeScript[] | null,
+        Cardano.PlutusScript[] | null,
+        Cardano.PlutusScript[] | null,
+        Cardano.PlutusScript[] | null
+      ]
+    >(
+      ([native, v1, v2, v3], script) => {
+        if (script.__type === Cardano.ScriptType.Native) {
+          native ? native.push(script) : (native = [script]);
+        } else {
+          switch (script.version) {
+            case Cardano.PlutusLanguageVersion.V1:
+              v1 ? v1.push(script) : (v1 = [script]);
+              break;
+            case Cardano.PlutusLanguageVersion.V2:
+              v2 ? v2.push(script) : (v2 = [script]);
+              break;
+            case Cardano.PlutusLanguageVersion.V3:
+              v3 ? v3.push(script) : (v3 = [script]);
+              break;
+            default:
+              throw new SerializationError(
+                SerializationFailure.InvalidScriptType,
+                `Script '${script}' is not supported.`
+              );
           }
-          break;
-        default:
-          throw new SerializationError(SerializationFailure.InvalidScriptType, `Script '${script}' is not supported.`);
-      }
-    }
+        }
+        return [native, v1, v2, v3];
+      },
+      [null, null, null, null]
+    );
 
-    return result;
+    return {
+      ...(coreNative && { native: CborSet.fromCore(coreNative, NativeScript.fromCore) }),
+      ...(coreV1 && { plutusV1: CborSet.fromCore(coreV1, PlutusV1Script.fromCore) }),
+      ...(coreV2 && { plutusV2: CborSet.fromCore(coreV2, PlutusV2Script.fromCore) }),
+      ...(coreV3 && { plutusV3: CborSet.fromCore(coreV3, PlutusV3Script.fromCore) })
+    };
   }
 
   /**
@@ -514,14 +454,14 @@ export class TransactionWitnessSet {
   #getMapSize(): number {
     let mapSize = 0;
 
-    if (this.#vkeywitnesses !== undefined && this.#vkeywitnesses.length > 0) ++mapSize;
-    if (this.#nativeScripts !== undefined && this.#nativeScripts.length > 0) ++mapSize;
-    if (this.#bootstrapWitnesses !== undefined && this.#bootstrapWitnesses.length > 0) ++mapSize;
-    if (this.#plutusV1Scripts !== undefined && this.#plutusV1Scripts.length > 0) ++mapSize;
-    if (this.#plutusData !== undefined && this.#plutusData.length > 0) ++mapSize;
-    if (this.#redeemers !== undefined && this.#redeemers.length > 0) ++mapSize;
-    if (this.#plutusV2Scripts !== undefined && this.#plutusV2Scripts.length > 0) ++mapSize;
-    if (this.#plutusV3Scripts !== undefined && this.#plutusV3Scripts.length > 0) ++mapSize;
+    if (this.#vkeywitnesses !== undefined && this.#vkeywitnesses.size() > 0) ++mapSize;
+    if (this.#nativeScripts !== undefined && this.#nativeScripts.size() > 0) ++mapSize;
+    if (this.#bootstrapWitnesses !== undefined && this.#bootstrapWitnesses.size() > 0) ++mapSize;
+    if (this.#plutusV1Scripts !== undefined && this.#plutusV1Scripts.size() > 0) ++mapSize;
+    if (this.#plutusData !== undefined && this.#plutusData.size() > 0) ++mapSize;
+    if (this.#redeemers !== undefined && this.#redeemers.size() > 0) ++mapSize;
+    if (this.#plutusV2Scripts !== undefined && this.#plutusV2Scripts.size() > 0) ++mapSize;
+    if (this.#plutusV3Scripts !== undefined && this.#plutusV3Scripts.size() > 0) ++mapSize;
 
     return mapSize;
   }

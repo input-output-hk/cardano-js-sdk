@@ -48,6 +48,9 @@ export enum CborTag {
   /** Tag value for MIME messages (including all headers), as defined in RFC2045. */
   MimeMessage = 36,
 
+  /** Tag value for `set<a> = #6.258([* a]) / [* a]`, `nonempty_set<a> = #6.258([+ a]) / [+ a]`, `nonempty_oset<a> = #6.258([+ a]) / [+ a]` */
+  Set = 258,
+
   /** Tag value for the Self-Describe CBOR header (0xd9d9f7). */
   SelfDescribeCbor = 55_799
 }
