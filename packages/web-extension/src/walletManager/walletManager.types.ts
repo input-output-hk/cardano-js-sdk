@@ -56,7 +56,7 @@ export interface WalletManagerApi {
    * Create and activate a new ObservableWallet.
    * Reuses the store if the wallet was previously deactivated but not destroyed.
    */
-  activate(props: WalletManagerActivateProps): Promise<void>;
+  activate(props: WalletManagerActivateProps, force?: boolean): Promise<void>;
 
   /**
    * Switches the network of the active wallet.

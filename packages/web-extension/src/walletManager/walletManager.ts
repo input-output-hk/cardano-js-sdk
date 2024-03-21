@@ -116,10 +116,16 @@ export class WalletManager<WalletMetadata extends { name: string }, AccountMetad
   /**
    * Create and activate a new ObservableWallet.
    *
-   * @param props The properties of the wallet to activate.
+   * @param props - An object containing the necessary properties and configurations to activate the wallet.
+   * @param force - Optional. A boolean flag that determines the activation behavior. If set to `true`,
+   *                the wallet will be activated regardless of whether its properties have changed since
+   *                the last activation. This is useful for scenarios where reinitialization is needed
+   *                without changes to the properties. Defaults to `false`, meaning the wallet will only
+   *                be activated if there have been changes in the `props`.
+   * @returns A Promise that resolves once the wallet has been successfully activated.
    */
-  async activate(props: WalletManagerActivateProps): Promise<void> {
-    if (this.#isActive(props)) {
+  async activate(props: WalletManagerActivateProps, force?: boolean): Promise<void> {
+    if (!force && this.#isActive(props)) {
       return;
     }
 
