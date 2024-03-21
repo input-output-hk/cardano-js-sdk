@@ -195,7 +195,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     if (!submitApiUrl)
       throw new MissingProgramOption(ServiceNames.TxSubmit, ProviderServerOptionDescriptions.SubmitApiUrl);
 
-    return new TxSubmitApiProvider(submitApiUrl, logger);
+    return new TxSubmitApiProvider({ baseUrl: submitApiUrl }, { logger });
   };
 
   const getTypeormAssetProvider = withTypeOrmProvider('Asset', (connectionConfig$) => {

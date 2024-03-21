@@ -2,18 +2,33 @@ import { Cardano, ProviderError, ProviderFailure, SubmitTxArgs, TxBodyCBOR, TxSu
 import { Logger } from 'ts-log';
 import { hexStringToBuffer } from '@cardano-sdk/util';
 import { mapCardanoTxSubmitError } from './cardanoTxSubmitErrorMapper';
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosAdapter, AxiosInstance } from 'axios';
+
+export type TxSubmitApiProviderProperties = {
+  baseUrl: URL;
+  path?: string;
+};
+
+export type TxSubmitApiProviderDependencies = {
+  logger: Logger;
+  adapter?: AxiosAdapter;
+};
 
 export class TxSubmitApiProvider implements TxSubmitProvider {
   #axios: AxiosInstance;
   #healthStatus = true;
   #logger: Logger;
   #path: string;
+  #adapter?: AxiosAdapter;
 
-  constructor(submitApiBaseUrl: URL, logger: Logger, submitApiPath = '/api/submit/tx') {
-    this.#axios = axios.create({ baseURL: submitApiBaseUrl.origin });
+  constructor(
+    { baseUrl, path = '/api/submit/tx' }: TxSubmitApiProviderProperties,
+    { logger, adapter }: TxSubmitApiProviderDependencies
+  ) {
+    this.#axios = axios.create({ baseURL: baseUrl.origin });
     this.#logger = logger;
-    this.#path = submitApiPath;
+    this.#path = path;
+    this.#adapter = adapter;
   }
 
   async submitTx({ signedTransaction }: SubmitTxArgs) {
@@ -25,6 +40,7 @@ export class TxSubmitApiProvider implements TxSubmitProvider {
       this.#logger.debug(`Submitting tx ${txId} ...`);
 
       await this.#axios({
+        adapter: this.#adapter,
         data: hexStringToBuffer(signedTransaction),
         headers: { 'Content-Type': 'application/cbor' },
         method: 'post',
