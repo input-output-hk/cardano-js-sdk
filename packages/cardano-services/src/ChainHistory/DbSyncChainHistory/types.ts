@@ -123,7 +123,8 @@ export interface VotingProceduresModel {
 export interface ProposalProcedureModel {
   data_hash: Buffer;
   deposit: string;
-  description: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  description: any;
   tx_id: Buffer;
   type: string;
   url: string;

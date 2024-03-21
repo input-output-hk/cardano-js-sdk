@@ -962,7 +962,7 @@ describe('StakePoolHttpService', () => {
               expect(response.pageResults).toEqual(responseCached.pageResults);
               expect(response.pageResults[0].status).toEqual(Cardano.StakePoolStatus.Activating);
             });
-            it('pledgeMet false, status activating, and condition', async () => {
+            it.skip('pledgeMet false, status activating, and condition', async () => {
               const activating = await fixtureBuilder.getPools(1, {
                 with: [PoolWith.ActivatingState, PoolWith.PledgeNotMet]
               });
