@@ -1,12 +1,12 @@
 /* eslint-disable max-statements */
 import * as Cardano from '../../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
-import { CommitteeMember, Credential, GovernanceActionType } from '../../../Cardano';
+import { CborSet, Credential, UnitInterval } from '../../Common';
+import { CommitteeMember, GovernanceActionType } from '../../../Cardano';
 import { GovernanceActionId } from '../../Common/GovernanceActionId';
 import { GovernanceActionKind } from './GovernanceActionKind';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import { UnitInterval } from '../../Common';
 import { hexToBytes } from '../../../util/misc';
 
 const EMBEDDED_GROUP_SIZE = 5;
@@ -14,10 +14,12 @@ const CREDENTIAL_ARRAY_SIZE = 2;
 const CREDENTIAL_INDEX = 0;
 const EPOCH_INDEX = 1;
 
+type CredentialSet = CborSet<ReturnType<Credential['toCore']>, Credential>;
+
 /** Modifies the composition of the constitutional committee, its signature threshold, or its terms of operation. */
 export class UpdateCommittee {
   #govActionId: GovernanceActionId | undefined;
-  #membersToBeRemoved: Cardano.Credential[];
+  #membersToBeRemoved: CredentialSet;
   #membersToBeAdded: [Cardano.Credential, number][];
   #newQuorum: UnitInterval;
   #originalBytes: HexBlob | undefined = undefined;
@@ -31,7 +33,7 @@ export class UpdateCommittee {
    * @param govActionId Previous governance action id of `UpdateCommittee`.
    */
   constructor(
-    membersToBeRemoved: Cardano.Credential[],
+    membersToBeRemoved: CredentialSet,
     membersToBeAdded: [Cardano.Credential, number][],
     newQuorum: UnitInterval,
     govActionId?: GovernanceActionId
@@ -58,12 +60,7 @@ export class UpdateCommittee {
     writer.writeInt(GovernanceActionKind.UpdateCommittee);
     this.#govActionId ? writer.writeEncodedValue(hexToBytes(this.#govActionId.toCbor())) : writer.writeNull();
 
-    writer.writeStartArray(this.#membersToBeRemoved.length);
-    for (const entry of this.#membersToBeRemoved) {
-      writer.writeStartArray(CREDENTIAL_ARRAY_SIZE);
-      writer.writeInt(entry.type);
-      writer.writeByteString(hexToBytes(entry.hash as unknown as HexBlob));
-    }
+    writer.writeEncodedValue(hexToBytes(this.#membersToBeRemoved.toCbor()));
 
     writer.writeStartMap(this.#membersToBeAdded.length);
     for (const entry of this.#membersToBeAdded) {
@@ -111,24 +108,10 @@ export class UpdateCommittee {
       govActionId = GovernanceActionId.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
     }
 
-    reader.readStartArray();
-
-    const membersToRemove: Cardano.Credential[] = [];
-    while (reader.peekState() !== CborReaderState.EndArray) {
-      if (reader.readStartArray() !== CREDENTIAL_ARRAY_SIZE)
-        throw new InvalidArgumentError(
-          'cbor',
-          `Expected an array of ${CREDENTIAL_ARRAY_SIZE} elements, but got an array of ${length} elements`
-        );
-
-      const type = Number(reader.readUInt());
-      const hash = HexBlob.fromBytes(reader.readByteString()) as unknown as Hash28ByteBase16;
-
-      reader.readEndArray();
-      membersToRemove.push({ hash, type });
-    }
-
-    reader.readEndArray();
+    const membersToRemove: CredentialSet = CborSet.fromCbor(
+      HexBlob.fromBytes(reader.readEncodedValue()),
+      Credential.fromCbor
+    );
 
     reader.readStartMap();
 
@@ -173,7 +156,7 @@ export class UpdateCommittee {
           epoch: Cardano.EpochNo(entry[EPOCH_INDEX])
         }))
       ),
-      membersToBeRemoved: new Set<Credential>(this.#membersToBeRemoved),
+      membersToBeRemoved: new Set<Cardano.Credential>(this.#membersToBeRemoved.toCore()),
       newQuorumThreshold: this.#newQuorum.toCore()
     };
   }
@@ -185,7 +168,7 @@ export class UpdateCommittee {
    */
   static fromCore(updateCommittee: Cardano.UpdateCommittee) {
     return new UpdateCommittee(
-      [...updateCommittee.membersToBeRemoved],
+      CborSet.fromCore([...updateCommittee.membersToBeRemoved], Credential.fromCore),
       [...updateCommittee.membersToBeAdded].map((entry) => [entry.coldCredential, entry.epoch]),
       UnitInterval.fromCore(updateCommittee.newQuorumThreshold),
       updateCommittee.governanceActionId !== null
@@ -209,7 +192,7 @@ export class UpdateCommittee {
    * @returns the committee members to be removed.
    */
   membersToBeRemoved(): Cardano.Credential[] {
-    return this.#membersToBeRemoved;
+    return this.#membersToBeRemoved.toCore();
   }
 
   /**

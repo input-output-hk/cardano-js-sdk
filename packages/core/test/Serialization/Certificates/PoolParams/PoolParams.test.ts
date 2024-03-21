@@ -52,6 +52,7 @@ describe('PoolParams', () => {
     expect(
       params
         .poolOwners()
+        .toCore()
         .map((keyHash) => Cardano.createRewardAccount(keyHash, params.rewardAccount().toAddress().getNetworkId()))
     ).toEqual([Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr')]);
     expect(params.relays().map((relay) => relay.toCore())).toEqual([
@@ -87,6 +88,7 @@ describe('PoolParams', () => {
     expect(
       params
         .poolOwners()
+        .toCore()
         .map((keyHash) => Cardano.createRewardAccount(keyHash, params.rewardAccount().toAddress().getNetworkId()))
     ).toEqual([Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr')]);
     expect(params.relays().map((relay) => relay.toCore())).toEqual([
