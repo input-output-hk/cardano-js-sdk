@@ -150,6 +150,23 @@ describe('PersonalWallet/conwayTransactions', () => {
     assertTxHasCertificate(confirmedTx, certificate);
   };
 
+  const isRegisteredDRep = async () => {
+    const txs = [...(await firstValueFrom(dRepWallet.transactions.history$))].reverse();
+
+    for (const {
+      body: { certificates }
+    } of txs) {
+      if (certificates) {
+        for (const certificate of certificates) {
+          if (certificate.__typename === CertificateType.UnregisterDelegateRepresentative) return false;
+          if (certificate.__typename === CertificateType.RegisterDelegateRepresentative) return true;
+        }
+      }
+    }
+
+    return false;
+  };
+
   beforeAll(async () => {
     [wallet, dRepWallet] = await Promise.all([
       getTestWallet(0, 'Conway Wallet', 100_000_000n),
@@ -159,15 +176,7 @@ describe('PersonalWallet/conwayTransactions', () => {
     [, dRepCredential, [dRepDeposit, governanceActionDeposit, stakeKeyDeposit], poolId, stakeCredential] =
       await Promise.all([feedDRepWallet(), getDRepCredential(), getDeposits(), getPoolId(), getStakeCredential()]);
 
-    try {
-      await sendDRepRegCert(true);
-    } catch (error) {
-      // TODO LW-9898 Remove this try / catch and register only if not yet registered
-      if (error instanceof Error && error.message.includes('ConwayDRepAlreadyRegistered'))
-        // eslint-disable-next-line no-console
-        console.log('DRepAlreadyRegistered');
-      else throw error;
-    }
+    if (!(await isRegisteredDRep())) await sendDRepRegCert(true);
   });
 
   beforeEach(cleanWallet);
