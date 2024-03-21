@@ -207,7 +207,6 @@ in
       };
 
       "dev-sanchonet@us-east-1@v1" = final: {
-
         namespace = "dev-sanchonet";
         name = "${final.namespace}-cardanojs-v1";
 
@@ -336,7 +335,7 @@ in
             "/v2.0.0/tx-submit"
             "/v2.0.0/utxo"
           ];
-          blockfrost-worker.enabled = true;
+          # blockfrost-worker.enabled = true;
           cardano-services = {
             ingresOrder = 99;
             image = "926093910549.dkr.ecr.us-east-1.amazonaws.com/cardano-services:s8j5nx9x2naar194pr58kpmlr5s4xn7b";
@@ -353,6 +352,16 @@ in
           backend = {
             enabled = true;
           };
+          stake-pool-provider = {
+            enabled = true;
+            env.OVERRIDE_FUZZY_OPTIONS = "true";
+          };
+          handle-provider.enabled = true;
+        };
+
+        projectors = {
+          handle.enabled = true;
+          stake-pool.enabled = true;
         };
 
         values = {
@@ -360,24 +369,8 @@ in
           region = "us-east-1";
 
           backend.hostnames = ["${final.namespace}.${baseUrl}"];
-          backend.passHandleDBArgs = false;
-          backend.routes = let
-            inherit (oci.meta) versions;
-          in
-            lib.concatLists [
-              (map (v: "/v${v}/health") versions.root)
-              (map (v: "/v${v}/live") versions.root)
-              (map (v: "/v${v}/meta") versions.root)
-              (map (v: "/v${v}/ready") versions.root)
-              (map (v: "/v${v}/asset") versions.assetInfo)
-              (map (v: "/v${v}/chain-history") versions.chainHistory)
-              (map (v: "/v${v}/network-info") versions.networkInfo)
-              (map (v: "/v${v}/rewards") versions.rewards)
-              (map (v: "/v${v}/tx-submit") versions.txSubmit)
-              (map (v: "/v${v}/utxo") versions.utxo)
-              (map (v: "/v${v}/stake-pool") versions.stakePool)
-            ];
-          # blockfrost-worker.enabled = true;
+          blockfrost-worker.enabled = true;
+          pg-boss-worker.enabled = true;
           cardano-services = {
             ingresOrder = 98;
           };
