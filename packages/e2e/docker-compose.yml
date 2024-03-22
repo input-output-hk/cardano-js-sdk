@@ -61,6 +61,7 @@ services:
     depends_on:
       file-server:
         condition: service_healthy
+    command: ['--config', '/config/cardano-db-sync/config.json', '--socket-path', '/node-ipc/node.socket']
     volumes:
       - ./local-network/config/network:/config
 

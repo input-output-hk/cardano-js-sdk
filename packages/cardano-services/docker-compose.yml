@@ -21,8 +21,8 @@ services:
       - ./config/network/${NETWORK:-mainnet}:/config
 
   cardano-db-sync:
-    volumes:
-      - ./config/network/${NETWORK:-mainnet}:/config
+    environment:
+      NETWORK: ${NETWORK:-mainnet}
 
   cardano-submit-api:
     volumes:
