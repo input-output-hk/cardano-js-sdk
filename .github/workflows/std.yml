@@ -85,7 +85,7 @@ jobs:
               echo '{"environment":"dev-preview", "target":"dev-preview@us-east-1",    "url": "https://dev-preview.lw.iog.io/"}'
             fi
             if [ "true" == ${{ inputs.deploy-dev-preprod || false }} ] ; then
-              echo '{"environment":"dev-preprod", "target":"dev-preprod@us-east-1@v1", "url": "https://dev-preprod.lw.iog.io/"}'
+              echo '{"environment":"dev-preprod", "target":"dev-preprod@us-east-1@v2", "url": "https://dev-preprod.lw.iog.io/"}'
             fi
             if [ "true" == ${{ inputs.deploy-dev-mainnet || false }} ] ; then
               echo '{"environment":"dev-mainnet", "target":"dev-mainnet@us-east-1",    "url": "https://dev-mainnet.lw.iog.io/"}'

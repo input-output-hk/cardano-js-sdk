@@ -11,11 +11,11 @@
     us-east-1 = readJsonFile ./tf-outputs/lace-dev-us-east-1.json;
     us-east-2 = readJsonFile ./tf-outputs/lace-prod-us-east-2.json;
   };
+  oci = inputs.self.x86_64-linux.cardano-services.oci-images.cardano-services;
 in
   nix-helm.builders.${pkgs.system}.mkHelmMultiTarget {
     defaults = final: let
       inherit (final) values;
-      oci = inputs.self.x86_64-linux.cardano-services.oci-images.cardano-services;
     in {
       name = "${final.namespace}-cardanojs";
       chart = ./Chart.yaml;
@@ -207,7 +207,6 @@ in
       };
 
       "dev-sanchonet@us-east-1@v1" = final: {
-
         namespace = "dev-sanchonet";
         name = "${final.namespace}-cardanojs-v1";
 
@@ -308,11 +307,50 @@ in
       "dev-preprod@us-east-1@v1" = final: {
         name = "${final.namespace}-cardanojs-v1";
         namespace = "dev-preprod";
+        context = "eks-devs";
 
         providers = {
           backend = {
             enabled = true;
-            env.USE_BLOCKFROST = lib.mkForce "false";
+          };
+        };
+
+        values = {
+          network = "preprod";
+          region = "us-east-1";
+
+          backend.hostnames = ["${final.namespace}.${baseUrl}"];
+          backend.passHandleDBArgs = false;
+          backend.routes = [
+            "/v1.0.0/health"
+            "/v1.0.0/live"
+            "/v1.0.0/meta"
+            "/v1.0.0/ready"
+            "/v1.0.0/asset"
+            "/v2.0.0/chain-history"
+            "/v1.0.0/handle"
+            "/v1.0.0/network-info"
+            "/v1.0.0/rewards"
+            "/v1.0.0/stake-pool"
+            "/v2.0.0/tx-submit"
+            "/v2.0.0/utxo"
+          ];
+          # blockfrost-worker.enabled = true;
+          cardano-services = {
+            ingresOrder = 99;
+            image = "926093910549.dkr.ecr.us-east-1.amazonaws.com/cardano-services:s8j5nx9x2naar194pr58kpmlr5s4xn7b";
+          };
+        };
+      };
+
+      "dev-preprod@us-east-1@v2" = final: {
+        name = "${final.namespace}-cardanojs-v2";
+        namespace = "dev-preprod";
+        context = "eks-devs";
+
+        providers = {
+          backend = {
+            enabled = true;
           };
           stake-pool-provider = {
             enabled = true;
@@ -330,21 +368,11 @@ in
           network = "preprod";
           region = "us-east-1";
 
+          backend.hostnames = ["${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
-
           cardano-services = {
-            ingresOrder = 99;
-            additionalRoutes = [
-              {
-                pathType = "Prefix";
-                path = "/v1.0.0/stake-pool";
-                backend.service = {
-                  name = "${final.namespace}-cardanojs-v1-stake-pool-provider";
-                  port.name = "http";
-                };
-              }
-            ];
+            ingresOrder = 98;
           };
         };
       };
