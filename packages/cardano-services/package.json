@@ -48,7 +48,7 @@
     "preview:up": "NETWORK=preview SUBMIT_API_ARGS='--testnet-magic 2' yarn compose:up",
     "preview:down": "NETWORK=preview yarn compose:down",
     "sanchonet:dev": "FILES='-f ../../compose/dev.yml -f dev.yml' yarn sanchonet:up",
-    "sanchonet:up": "NETWORK=sanchonet SUBMIT_API_ARGS='--testnet-magic 4' yarn compose:up",
+    "sanchonet:up": "CARDANO_DB_SYNC_VERSION=sancho-4.1.0 NETWORK=sanchonet SUBMIT_API_ARGS='--testnet-magic 4' yarn compose:up",
     "sanchonet:down": "NETWORK=sanchonet yarn compose:down",
     "test": "jest --runInBand -c ./jest.config.js --selectProjects unit",
     "test:build:verify": "tsc --build ./test",
