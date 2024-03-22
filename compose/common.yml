@@ -101,7 +101,6 @@ services:
     <<:
       - *logging
       - *with-postgres
-    command: ['--config', '/config/cardano-db-sync/config.json', '--socket-path', '/node-ipc/node.socket']
     environment:
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
