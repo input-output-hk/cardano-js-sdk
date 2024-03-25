@@ -426,7 +426,7 @@ in
             "/v2.0.0/tx-submit"
             "/v2.0.0/utxo"
           ];
-          blockfrost-worker.enabled = true;
+          # blockfrost-worker.enabled = true;
           cardano-services = {
             ingresOrder = 99;
             image = "926093910549.dkr.ecr.us-east-1.amazonaws.com/cardano-services:s8j5nx9x2naar194pr58kpmlr5s4xn7b";
@@ -500,7 +500,7 @@ in
             "/v2.0.0/tx-submit"
             "/v2.0.0/utxo"
           ];
-          blockfrost-worker.enabled = true;
+          # blockfrost-worker.enabled = true;
           cardano-services = {
             ingresOrder = 99;
             image = "926093910549.dkr.ecr.us-east-1.amazonaws.com/cardano-services:s8j5nx9x2naar194pr58kpmlr5s4xn7b";
