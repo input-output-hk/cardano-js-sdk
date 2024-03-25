@@ -13,6 +13,7 @@ import { Cardano, HandleProvider, HandleResolution, Serialization, metadatum } f
 import {
   CustomizeCb,
   InsufficientRewardAccounts,
+  InvalidHereafterError,
   OutOfSyncRewardAccounts,
   OutputBuilderTxOut,
   PartialTx,
@@ -221,6 +222,7 @@ export class GenericTxBuilder implements TxBuilder {
               : await this.#delegateFirstStakeCredential();
 
             await this.#validateOutputs();
+            await this.#validateValidityInterval();
             // Take a snapshot of returned properties,
             // so that they don't change while `initializeTx` is resolving
             const ownAddresses = await this.#dependencies.txBuilderProviders.addresses.get();
@@ -273,6 +275,9 @@ export class GenericTxBuilder implements TxBuilder {
                 certificates: this.partialTxBody.certificates,
                 customizeCb: this.#customizeCb,
                 handleResolutions: this.#handleResolutions,
+                options: {
+                  validityInterval: this.partialTxBody.validityInterval
+                },
                 outputs: new Set(this.partialTxBody.outputs || []),
                 proposalProcedures: this.partialTxBody.proposalProcedures,
                 signingOptions: partialSigningOptions
@@ -319,6 +324,22 @@ export class GenericTxBuilder implements TxBuilder {
         }
       }
     });
+  }
+  setValidityInterval(validityInterval: Cardano.ValidityInterval): TxBuilder {
+    this.partialTxBody = { ...this.partialTxBody, validityInterval };
+
+    return this;
+  }
+
+  async #validateValidityInterval(): Promise<void> {
+    if (!this.partialTxBody.validityInterval?.invalidHereafter) {
+      return;
+    }
+
+    const tip = await this.#dependencies.txBuilderProviders.tip();
+    if (tip.slot >= this.partialTxBody.validityInterval.invalidHereafter) {
+      throw new InvalidHereafterError();
+    }
   }
 
   /** @throws {TxOutValidationError[]} TxOutValidationError[] in case of validation errors */

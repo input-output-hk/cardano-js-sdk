@@ -18,6 +18,7 @@ import {
   GenericTxBuilder,
   HandleNotFoundError,
   InvalidConfigurationError,
+  InvalidHereafterError,
   OutputBuilderValidator,
   OutputValidation,
   OutputValidationMinimumCoinError,
@@ -652,5 +653,49 @@ describe.each([
 
     // Number of outputs is not affected by second build() call
     expect(propsAfterBuild2.body.outputs).toHaveLength(numOutputsAfterBuild1);
+  });
+
+  describe('validityInterval', () => {
+    it('sets validity interval ', async () => {
+      const validityInterval: Cardano.ValidityInterval = { invalidHereafter: Cardano.Slot(mocks.ledgerTip.slot + 1) };
+      txBuilder.setValidityInterval(validityInterval);
+      const tx = await txBuilder.build().inspect();
+      expect(tx.body.validityInterval).toEqual(validityInterval);
+    });
+
+    it('sets validity interval without mutating partialTxBody', () => {
+      const initialPartialTxBody = txBuilder.partialTxBody;
+      const validityInterval: Cardano.ValidityInterval = { invalidHereafter: Cardano.Slot(mocks.ledgerTip.slot + 1) };
+      txBuilder.setValidityInterval(validityInterval);
+      expect(txBuilder.partialTxBody.validityInterval).toEqual(validityInterval);
+      assertObjectRefsAreDifferent(txBuilder.partialTxBody, initialPartialTxBody);
+    });
+
+    it('throws InvalidHereafterError if invalidHereafter is in the past', async () => {
+      const pastValidityInterval: Cardano.ValidityInterval = {
+        invalidHereafter: Cardano.Slot(mocks.ledgerTip.slot - 1)
+      };
+      txBuilder.setValidityInterval(pastValidityInterval);
+      await expect(txBuilder.build().inspect()).rejects.toThrowError(InvalidHereafterError);
+    });
+
+    it('throws InvalidHereafterError if invalidHereafter is current tip slot', async () => {
+      const pastValidityInterval: Cardano.ValidityInterval = {
+        invalidHereafter: Cardano.Slot(mocks.ledgerTip.slot)
+      };
+      txBuilder.setValidityInterval(pastValidityInterval);
+      await expect(txBuilder.build().inspect()).rejects.toThrowError(InvalidHereafterError);
+    });
+
+    it('overrides validity interval', async () => {
+      const validityInterval1: Cardano.ValidityInterval = {
+        invalidHereafter: Cardano.Slot(mocks.ledgerTip.slot + 100)
+      };
+      const validityInterval2: Cardano.ValidityInterval = {
+        invalidHereafter: Cardano.Slot(mocks.ledgerTip.slot + 150)
+      };
+      txBuilder.setValidityInterval(validityInterval1).setValidityInterval(validityInterval2);
+      expect(txBuilder.partialTxBody.validityInterval).toEqual(validityInterval2);
+    });
   });
 });
