@@ -104,6 +104,9 @@ const handleRollBackwardEvent = async (
   }
 };
 
+export const willStoreNftMetadata = ({ nftMetadata, cip67 }: Mappers.WithCIP67 & Mappers.WithNftMetadata) =>
+  nftMetadata.length > 0 || Object.keys(cip67.byLabel).length > 0;
+
 export const storeNftMetadata = typeormOperator<Mappers.WithCIP67 & Mappers.WithMint & Mappers.WithNftMetadata>(
   async (evt) => {
     const nftMetadataRepository = evt.queryRunner.manager.getRepository(NftMetadataEntity);

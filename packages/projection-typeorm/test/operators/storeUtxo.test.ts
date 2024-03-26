@@ -12,6 +12,7 @@ import {
   storeBlock,
   storeUtxo,
   typeormTransactionCommit,
+  willStoreUtxo,
   withTypeormTransaction
 } from '../../src';
 import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
@@ -68,7 +69,7 @@ describe('storeUtxo', () => {
     expect(evt.storedProducedUtxo.get(evt.utxo.produced[0])).toBeTruthy();
   });
 
-  it('inserts outputs, deletes when block is rolled back, updates output "consumed" column when spent', async () => {
+  it('inserts outputs, deletes when block is rolled back, consumed output "consumed" column when spent', async () => {
     const outputRepository = queryRunner.manager.getRepository(OutputEntity);
     const producedUtxo: Cardano.TxIn[] = [];
     const spentEvent = await projectTilFirst(({ utxo }) => {
@@ -108,5 +109,39 @@ describe('storeUtxo', () => {
         eventType === ChainSyncEventType.RollBackward && block.header.hash === produceTokensEvent.block.header.hash
     );
     expect(await tokensRepository.count()).toBe(0);
+  });
+});
+
+describe('willStoreUtxo', () => {
+  it('returns true if there are both consumed and produced', () => {
+    expect(
+      willStoreUtxo({
+        utxo: { consumed: [{} as never], produced: [{} as never] }
+      })
+    ).toBeTruthy();
+  });
+
+  it('returns true if there are consumed', () => {
+    expect(
+      willStoreUtxo({
+        utxo: { consumed: [{} as never], produced: [] }
+      })
+    ).toBeTruthy();
+  });
+
+  it('returns true if there are produced', () => {
+    expect(
+      willStoreUtxo({
+        utxo: { consumed: [], produced: [{} as never] }
+      })
+    ).toBeTruthy();
+  });
+
+  it('returns false if there are no consumed or produced', () => {
+    expect(
+      willStoreUtxo({
+        utxo: { consumed: [], produced: [] }
+      })
+    ).toBeFalsy();
   });
 });

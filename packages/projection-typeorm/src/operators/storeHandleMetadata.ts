@@ -4,6 +4,8 @@ import { Mappers } from '@cardano-sdk/projection';
 import { WithStoredProducedUtxo } from './storeUtxo';
 import { typeormOperator } from './util';
 
+export const willStoreHandleMetadata = ({ handleMetadata }: Mappers.WithHandleMetadata) => handleMetadata.length > 0;
+
 export const storeHandleMetadata = typeormOperator<Mappers.WithHandleMetadata & WithStoredProducedUtxo>(
   async ({
     eventType,

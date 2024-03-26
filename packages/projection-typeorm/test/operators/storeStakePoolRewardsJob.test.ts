@@ -1,6 +1,6 @@
-import { ChainSyncEventType } from '@cardano-sdk/core';
+import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { OperatorFunction, of } from 'rxjs';
-import { STAKE_POOL_REWARDS, storeStakePoolRewardsJob } from '../../src';
+import { STAKE_POOL_REWARDS, storeStakePoolRewardsJob, willStoreStakePoolRewardsJob } from '../../src';
 
 const testPromise = () => {
   let resolvePromise: Function;
@@ -60,5 +60,32 @@ describe('storeStakePoolRewardsJob', () => {
       { epochNo: 1 },
       { expireInHours: 6, retryDelay: 30, retryLimit: 1_000_000, singletonKey: '1', slot: 2010 }
     );
+  });
+});
+
+describe('willStoreStakePoolRewardsJob', () => {
+  it('returns true if is at epoch boundary and epoch is greater than 1', () => {
+    expect(
+      willStoreStakePoolRewardsJob({
+        crossEpochBoundary: true,
+        epochNo: Cardano.EpochNo(2)
+      })
+    ).toBeTruthy();
+  });
+  it('returns false if not at epoch boundary', () => {
+    expect(
+      willStoreStakePoolRewardsJob({
+        crossEpochBoundary: false,
+        epochNo: Cardano.EpochNo(2)
+      })
+    ).toBeFalsy();
+  });
+  it('returns false if at first epoch', () => {
+    expect(
+      willStoreStakePoolRewardsJob({
+        crossEpochBoundary: true,
+        epochNo: Cardano.EpochNo(1)
+      })
+    ).toBeFalsy();
   });
 });

@@ -4,6 +4,8 @@ import { STAKE_POOL_METADATA_QUEUE, StakePoolMetadataJob, defaultJobOptions } fr
 import { WithPgBoss } from './withTypeormTransaction';
 import { certificatePointerToId, typeormOperator } from './util';
 
+export const willStoreStakePoolMetadataJob = ({ stakePools }: Mappers.WithStakePools) => stakePools.updates.length > 0;
+
 export const createStoreStakePoolMetadataJob = (retryDelay = defaultJobOptions.retryDelay) =>
   typeormOperator<Mappers.WithStakePools & WithPgBoss>(async ({ block: { header }, eventType, pgBoss, stakePools }) => {
     const { slot } = header;

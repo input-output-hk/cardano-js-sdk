@@ -1,3 +1,4 @@
+import { Address } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
 import {
   AddressEntity,
   AssetEntity,
@@ -16,6 +17,7 @@ import {
   storeStakeKeyRegistrations,
   storeUtxo,
   typeormTransactionCommit,
+  willStoreAddresses,
   withTypeormTransaction
 } from '../../src';
 import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
@@ -193,5 +195,23 @@ describe('storeAddresses', () => {
         createStubProjectionSource([createRollForwardEventBasedOn(evt, (block) => block)]).pipe(applyOperators)
       )
     ).resolves.not.toThrow();
+  });
+});
+
+describe('willStoreAddresses', () => {
+  it('returns true if address are bigger than 1', () => {
+    expect(
+      willStoreAddresses({
+        addresses: [{} as Address]
+      })
+    ).toBeTruthy();
+  });
+
+  it('returns false if there are no addresses', () => {
+    expect(
+      willStoreAddresses({
+        addresses: []
+      })
+    ).toBeFalsy();
   });
 });
