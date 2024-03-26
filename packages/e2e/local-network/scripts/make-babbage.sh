@@ -134,6 +134,22 @@ echo "TestConwayHardForkAtEpoch: 0" >> "${ROOT}/configuration.yaml"
 echo "ExperimentalHardForksEnabled: True" >> "${ROOT}/configuration.yaml"
 echo "ExperimentalProtocolsEnabled: True" >> "${ROOT}/configuration.yaml"
 
+# TODO: Remove once mainnet is hardforked to conway-era and we don't need to run the e2e tests on pre-conway too.
+# If we want the network to start in Babbage era we need to configure it to hardfork to Conway very far in the future.
+# We also need to update the conway transaction cli commands to babbage cli commands.
+if [ [ -n "$PRE_CONWAY" ] ]; then
+  echo "Updating scripts for pre-conway eras"
+  # Start in Babbage era
+  sed -i '/TestConwayHardForkAtEpoch/d' ./templates/babbage/node-config.json
+  sed -i '/TestConwayHardForkAtEpoch/d' ${ROOT}/configuration.yaml
+
+  # Convert all cardano-cli conway cmds to babbage
+  find ./scripts/ -type f -name "*.sh" -exec sed -i 's/cardano-cli conway /cardano-cli babbage /g' {} +
+
+  # Remove cardano-cli conway specific args
+  sed -i '/--key-reg-deposit-amt/d' ./scripts/setup-new-delegator-keys.sh
+fi
+
 # Copy the cost mode
 cardano-cli genesis create-staked --genesis-dir "${ROOT}" \
   --testnet-magic "${NETWORK_MAGIC}" \
