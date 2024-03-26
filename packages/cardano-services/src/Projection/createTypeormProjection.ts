@@ -3,7 +3,7 @@
 import { Bootstrap, ProjectionEvent, logProjectionProgress, requestNext } from '@cardano-sdk/projection';
 import { Cardano, ObservableCardanoNode } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { Observable, concat, defer, take, takeWhile } from 'rxjs';
+import { Observable, concat, defer, groupBy, mergeMap, take, takeWhile } from 'rxjs';
 import {
   PgConnectionConfig,
   TypeormDevOptions,
@@ -72,7 +72,7 @@ export const createTypeormProjection = ({
   logger.debug(`Creating projection with policyIds ${JSON.stringify(handlePolicyIds)}`);
   logger.debug(`Using a ${blocksBufferLength} blocks buffer`);
 
-  const { mappers, entities, stores, extensions } = prepareTypeormProjection(
+  const { mappers, entities, stores, extensions, willStore } = prepareTypeormProjection(
     {
       options: projectionOptions,
       projections
@@ -118,15 +118,23 @@ export const createTypeormProjection = ({
     defer(() =>
       projectionSource$.pipe(
         applyMappers(mappers),
-        shareRetryBackoff(
-          (evt$) =>
-            evt$.pipe(
-              withTypeormTransaction({ connection$: connect() }),
-              applyStores(stores),
-              buffer.storeBlockData(),
-              typeormTransactionCommit()
-            ),
-          { shouldRetry: isRecoverableTypeormError }
+        // if there are any relevant data to write into db
+        groupBy((evt) => willStore(evt)),
+        mergeMap((group$) =>
+          group$.key
+            ? group$.pipe(
+                shareRetryBackoff(
+                  (evt$) =>
+                    evt$.pipe(
+                      withTypeormTransaction({ connection$: connect() }),
+                      applyStores(stores),
+                      buffer.storeBlockData(),
+                      typeormTransactionCommit()
+                    ),
+                  { shouldRetry: isRecoverableTypeormError }
+                )
+              )
+            : group$
         ),
         tipTracker.trackProjectedTip(),
         requestNext(),

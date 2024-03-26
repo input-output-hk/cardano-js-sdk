@@ -28,14 +28,16 @@ import {
   storeStakeKeyRegistrations,
   storeStakePoolRewardsJob,
   storeStakePools,
-  storeUtxo
+  storeUtxo,
+  willStoreAssets,
+  willStoreHandles
 } from '@cardano-sdk/projection-typeorm';
 import { Cardano } from '@cardano-sdk/core';
 import { Mappers as Mapper } from '@cardano-sdk/projection';
+import { ObservableType, passthrough } from '@cardano-sdk/util-rxjs';
 import { POOLS_METRICS_INTERVAL_DEFAULT, POOLS_METRICS_OUTDATED_INTERVAL_DEFAULT } from '../Program/programs/types';
 import { Sorter } from '@hapi/topo';
-import { WithLogger } from '@cardano-sdk/util';
-import { passthrough } from '@cardano-sdk/util-rxjs';
+import { WithLogger, isNotNil } from '@cardano-sdk/util';
 
 /** Used as mount segments, so must be URL-friendly */
 export enum ProjectionName {
@@ -117,6 +119,17 @@ export const storeOperators = {
 type StoreOperators = typeof storeOperators;
 type StoreName = keyof StoreOperators;
 type StoreOperator = StoreOperators[StoreName];
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type InferArg0<F extends Function> = F extends (arg0: infer Args) => any ? Args : never;
+type WillStore = {
+  [k in keyof StoreOperators]: (args: ObservableType<InferArg0<StoreOperators[k]>>) => boolean;
+};
+
+const willStore: Partial<WillStore> = {
+  storeAssets: willStoreAssets,
+  storeHandles: willStoreHandles
+};
 
 const entities = {
   address: AddressEntity,
@@ -338,6 +351,10 @@ export const prepareTypeormProjection = (
   const selectedMappers = mapperSorter.nodes;
   const selectedStores = storeSorter.nodes;
   const extensions = requiredExtensions(projections);
+  const willStoreCheckers = selectedStores
+    .map((store) => Object.entries(storeOperators).find(([_, operator]) => store === operator)!)
+    .map(([storeName]) => willStore[storeName as keyof StoreOperators])
+    .filter(isNotNil);
   return {
     __debug: {
       entities: selectedEntities.map((Entity) => keyOf(entities, Entity)),
@@ -347,7 +364,9 @@ export const prepareTypeormProjection = (
     entities: selectedEntities,
     extensions,
     mappers: selectedMappers,
-    stores: selectedStores
+    stores: selectedStores,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    willStore: <T>(evt: T) => willStoreCheckers.some((check) => check(evt as any))
   };
 };
 

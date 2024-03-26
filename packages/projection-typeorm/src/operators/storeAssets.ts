@@ -53,6 +53,8 @@ const rollBackward = async ({ mint, queryRunner }: StoreAssetEventParams): Promi
   return mintedAssetTotalSupplies;
 };
 
+// TODO: this is proably incorrect, check the implenetation of storeAssets
+export const willStoreAssets = ({ mint }: Mappers.WithMint) => mint.length > 0;
 export const storeAssets = typeormOperator<Mappers.WithMint, WithMintedAssetSupplies>(
   async ({ mint, block: { header }, eventType, queryRunner }) => {
     const storeAssetEventParams: StoreAssetEventParams = { header, mint, queryRunner };
