@@ -65,6 +65,23 @@ $ yarn workspace @cardano-sdk/e2e local-network:down
 
 Instead of CTRL-C, since some resources need to be clear before you can set up the environment again, if you don't stop the containers with the proper command, you may run into issues restarting it.
 
+## Local Test Network - Pre-Conway
+
+- DbSync currently has two versions, a stable one for `mainnet/preprod/preview`, and a conway-era one for `sanchonet`.
+- In order to test SDK against the stable DbSync version, we need to start local-network only up to `babbage` era, 
+  and use the stable DbSync version.
+- A yarn script that sets the variables for you exist: `local-network-stable:up`
+- The script uses the `PRE_CONWAY` variable set to a string, which will start e2e local-network under the docker compose project
+  name `local-network${PRE_CONWAY:-}-e2e` (e.g. local-networkstable-e2e`). The network will not hard-fork to conway-era.
+
+```bash
+$ yarn workspace @cardano-sdk/e2e local-network-stable:up
+```
+
+```bash
+$ yarn workspace @cardano-sdk/e2e local-network-stable:down
+```
+
 To obtain tADA on this network there is a set of fixed wallets that are created when the network bootstraps, these wallets contain 5 million tADA each and you can use them directly:
 
 ```
