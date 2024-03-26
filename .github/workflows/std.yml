@@ -26,6 +26,13 @@ on:
       deploy-dev-mainnet:
         type: boolean
         required: true
+    secrets:
+      AWS_ACCESS_KEY:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      SSH_PRIVATE_KEY:
+        required: true
   pull_request:
     branches:
       - master
