@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.25.0...@cardano-sdk/web-extension@0.26.0) (2024-03-26)
+
+### ⚠ BREAKING CHANGES
+
+* encapsulate `set` fields in CborSet
+
+### Features
+
+* encapsulate `set` fields in CborSet ([06269ab](https://github.com/input-output-hk/cardano-js-sdk/commit/06269abaa323b20931ba6505a0c5aa244d21e783)), closes [/github.com/IntersectMBO/cardano-ledger/blob/master/eras/conway/impl/cddl-files/extra.cddl#L5](https://github.com/input-output-hk//github.com/IntersectMBO/cardano-ledger/blob/master/eras/conway/impl/cddl-files/extra.cddl/issues/L5)
+* **web-extension:** added an optional parameter to WalletManager activate to allow force reload ([9149a96](https://github.com/input-output-hk/cardano-js-sdk/commit/9149a96a43e469e46cd626bd7ee385c1356edbba))
+
 ## [0.25.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.24.8...@cardano-sdk/web-extension@0.25.0) (2024-03-12)
 
 ### ⚠ BREAKING CHANGES

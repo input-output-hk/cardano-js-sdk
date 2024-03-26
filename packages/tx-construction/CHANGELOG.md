@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.18.0...@cardano-sdk/tx-construction@0.18.1) (2024-03-26)
+
+### Features
+
+* added computeScriptDataHash function ([ae2bbea](https://github.com/input-output-hk/cardano-js-sdk/commit/ae2bbea42a0c2583486f065f39868eb598ed2516))
+
 ## [0.18.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.17.13...@cardano-sdk/tx-construction@0.18.0) (2024-03-12)
 
 ### ⚠ BREAKING CHANGES
