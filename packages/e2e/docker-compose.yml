@@ -20,6 +20,7 @@ services:
       CARDANO_NODE_LOG_LEVEL: ${CARDANO_NODE_LOG_LEVEL:-Info}
       CARDANO_NODE_CHAINDB_LOG_LEVEL: ${CARDANO_NODE_CHAINDB_LOG_LEVEL:-Notice}
       PRE_CONWAY: ${PRE_CONWAY}
+      DB_SYNC_ALT_CFG_FOLDER: $DB_SYNC_ALT_CFG_FOLDER
     ports:
       - 3001:3001
     volumes:
@@ -64,7 +65,7 @@ services:
         condition: service_healthy
     command: ['--config', '/config/cardano-db-sync/config.json', '--socket-path', '/node-ipc/node.socket']
     volumes:
-      - ./local-network/config/network:/config
+      - ./local-network/config/${DB_SYNC_ALT_CFG_FOLDER:-network}:/config
 
   cardano-submit-api:
     volumes:
