@@ -208,11 +208,14 @@ export type StakeVoteRegistrationDelegationCertModel = StakeCertModel & Delegati
 
 export interface AuthorizeCommitteeHotCertModel extends CertificateModel {
   cold_key: Buffer;
+  cold_key_has_script: boolean;
   hot_key: Buffer;
+  hot_key_has_script: boolean;
 }
 
 export interface ResignCommitteeColdCertModel extends CertificateModel {
   cold_key: Buffer;
+  cold_key_has_script: boolean;
   url: string;
   data_hash: string;
 }
