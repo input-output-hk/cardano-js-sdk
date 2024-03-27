@@ -315,6 +315,23 @@ cp "${ROOT}"/genesis/shelley/genesis.alonzo.json ./config/network/genesis/alonzo
 cp "${ROOT}"/genesis/shelley/genesis.conway.json ./config/network/cardano-node/genesis/conway.json
 cp "${ROOT}"/genesis/shelley/genesis.conway.json ./config/network/genesis/conway.json
 
+# TODO: All this is done for db-sync 13.2.0.1. Remove once db-sync version uses same config files as cardano-node.
+# We want to use an alternative conway config for db-sync, so we need to create another folder for it
+# The default folder is 'network', so if DB_SYNC_ALT_CFG_FOLDER is 'network', it means no alt cfg is needed
+if [ -n "$PRE_CONWAY" ] && [ -n "$DB_SYNC_ALT_CFG_FOLDER" ] && [ "$DB_SYNC_ALT_CFG_FOLDER" != "network" ]; then
+  # Copy the configurations to the alternative cfg folder
+  cp -fr ./config/network ./config/$DB_SYNC_ALT_CFG_FOLDER
+  
+  # Replace the conway.json config file with the custom one for db-sync
+  CONWAY_GENESIS_DB_SYNC=./templates/babbage/conway-babbage-test-genesis-dbsync.json
+  cp $CONWAY_GENESIS_DB_SYNC ./config/${DB_SYNC_ALT_CFG_FOLDER}/cardano-node/genesis/conway.json
+  cp $CONWAY_GENESIS_DB_SYNC ./config/${DB_SYNC_ALT_CFG_FOLDER}/genesis/conway.json
+
+  # Compute the hash of the modified conway genesis and update the node config.json
+  conwayDbSyncGenesisHash=$(cardano-cli genesis hash --genesis $CONWAY_GENESIS_DB_SYNC)
+  $SED -i -E "s/\"ConwayGenesisHash\": \".*\"/\"ConwayGenesisHash\": \"${conwayDbSyncGenesisHash}\"/" ./config/${DB_SYNC_ALT_CFG_FOLDER}/cardano-node/config.json
+fi
+
 mkdir -p "${ROOT}/run"
 
 echo "#!/usr/bin/env bash" >"${ROOT}/run/all.sh"
