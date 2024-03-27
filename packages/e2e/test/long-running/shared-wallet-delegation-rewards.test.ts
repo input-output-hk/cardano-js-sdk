@@ -84,7 +84,7 @@ const getPoolIds = async (stakePoolProvider: StakePoolProvider, count: number) =
   return poolIds;
 };
 
-describe('delegation rewards', () => {
+describe('shared wallet delegation rewards', () => {
   let fundingTx: Cardano.Tx<Cardano.TxBody>;
   let faucetWallet: BaseWallet;
   let faucetAddress: Cardano.PaymentAddress;
