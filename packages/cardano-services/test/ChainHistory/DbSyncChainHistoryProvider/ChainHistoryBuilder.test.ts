@@ -225,4 +225,58 @@ describe('ChainHistoryBuilder', () => {
       expect(result.size).toEqual(0);
     });
   });
+
+  describe('queryProposalProceduresByIds', () => {
+    test('query proposal procedures by tx hashes', async () => {
+      const txHashes = await fixtureBuilder.getTxHashes(1, { with: [TxWith.ProposalProcedures] });
+      const ids = await getTxIds(txHashes);
+      const result = await builder.queryProposalProceduresByIds(ids);
+      expect(result.size).toBeGreaterThanOrEqual(1);
+      const proposalProcedures = result.get(txHashes[0]);
+      expect(proposalProcedures).toBeDefined();
+      let infoAction;
+      for (const proposalProcedure of proposalProcedures!) {
+        if (proposalProcedure.governanceAction.__typename === Cardano.GovernanceActionType.info_action)
+          infoAction = proposalProcedure;
+      }
+      expect(infoAction).toBeDefined();
+      expect(infoAction).toMatchShapeOf(DataMocks.Tx.infoAction);
+    });
+    test('query proposal procedures with empty array', async () => {
+      const result = await builder.queryProposalProceduresByIds([]);
+      expect(result.size).toEqual(0);
+    });
+    test('query proposal procedures when tx not found', async () => {
+      const ids = await getTxIds([
+        Cardano.TransactionId('cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819')
+      ]);
+      const result = await builder.queryProposalProceduresByIds(['0', ...ids]);
+      expect(result.size).toEqual(0);
+    });
+  });
+
+  describe('queryVotingProceduresByIds', () => {
+    test('query voting procedures by tx hashes', async () => {
+      const txHashes = await fixtureBuilder.getTxHashes(1, { with: [TxWith.VotingProcedure] });
+      const ids = await getTxIds(txHashes);
+      const result = await builder.queryVotingProceduresByIds(ids);
+      expect(result.size).toBeGreaterThanOrEqual(1);
+      const votingProcedures = result.get(txHashes[0]);
+      expect(votingProcedures).toBeDefined();
+      const vote = votingProcedures![0];
+      expect(vote).toBeDefined();
+      expect(vote).toMatchShapeOf(DataMocks.Tx.vote);
+    });
+    test('query voting procedures with empty array', async () => {
+      const result = await builder.queryVotingProceduresByIds([]);
+      expect(result.size).toEqual(0);
+    });
+    test('query voting procedures when tx not found', async () => {
+      const ids = await getTxIds([
+        Cardano.TransactionId('cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819')
+      ]);
+      const result = await builder.queryVotingProceduresByIds(['0', ...ids]);
+      expect(result.size).toEqual(0);
+    });
+  });
 });
