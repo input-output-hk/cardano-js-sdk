@@ -11,6 +11,8 @@ root_path="$(cd "$here/.." && pwd)"
 cd "$root_path"
 
 export PATH=$PWD/bin:$PATH
+export CARDANO_NODE_CHAINDB_LOG_LEVEL=${CARDANO_NODE_CHAINDB_LOG_LEVEL:-Warning}
+export CARDANO_NODE_LOG_LEVEL="Warning"
 
 source ./scripts/nodes-configuration.sh
 
@@ -176,16 +178,16 @@ $SED -i "${ROOT}/genesis/shelley/genesis.json" \
 
 for NODE_ID in ${SP_NODES_ID}; do
   TARGET="${ROOT}/node-sp${NODE_ID}"
-  PORT="$(("$NODE_ID" + 3000))"
+  PORT=$((NODE_ID + 3000))
 
   mv "${ROOT}/pools/vrf${NODE_ID}.skey" "${TARGET}/vrf.skey"
   mv "${ROOT}/pools/opcert${NODE_ID}.cert" "${TARGET}/opcert.cert"
   mv "${ROOT}/pools/kes${NODE_ID}.skey" "${TARGET}/kes.skey"
 
-  BYRON_KEYS_POSFIX=$(seq -f '%03.f' $(("$NODE_ID" - 1)) $(("$NODE_ID" - 1)))
+  BYRON_KEYS_POSFIX=$(seq -f '%03.f' $((NODE_ID - 1)) $((NODE_ID - 1)))
   #Byron related
-  mv "${ROOT}/byron-gen-command/delegate-keys.${BYRON_KEYS_POSFIX}.key" "${TARGET}/byron-delegate.key"
-  mv "${ROOT}/byron-gen-command/delegation-cert.${BYRON_KEYS_POSFIX}.json" "${TARGET}/byron-delegation.cert"
+  cp "${ROOT}/byron-gen-command/delegate-keys.${BYRON_KEYS_POSFIX}.key" "${TARGET}/byron-delegate.key"
+  cp "${ROOT}/byron-gen-command/delegation-cert.${BYRON_KEYS_POSFIX}.json" "${TARGET}/byron-delegation.cert"
 
   echo "${PORT}" >"${TARGET}/port"
 
@@ -274,14 +276,27 @@ cp ./templates/babbage/db-sync-config.json ./config/network/cardano-db-sync/conf
 cp ./templates/babbage/node-config.json ./config/network/cardano-node/config.json
 cp ./templates/babbage/submit-api-config.json ./config/network/cardano-submit-api/config.json
 
-$SED -i -E "s/\"ByronGenesisHash\": \".*\"/\"ByronGenesisHash\": \"${byronGenesisHash}\"/" ./config/network/cardano-node/config.json
-$SED -i -E "s/\"ShelleyGenesisHash\": \".*\"/\"ShelleyGenesisHash\": \"${shelleyGenesisHash}\"/" ./config/network/cardano-node/config.json
-$SED -i -E "s/\"AlonzoGenesisHash\": \".*\"/\"AlonzoGenesisHash\": \"${alonzoGenesisHash}\"/" ./config/network/cardano-node/config.json
+###############################
+# Use a temporary file to make the changes and copy them back to where we want
+# the change to be, as we can't use -i to do inline replacement because this breaks 
+# due to permission errors on MacOS.
+# https://forums.docker.com/t/sed-couldnt-open-temporary-file-xyz-permission-denied-when-using-virtiofs/125473
+###############################
+
+$SED -E "s/\"ByronGenesisHash\": \".*\"/\"ByronGenesisHash\": \"${byronGenesisHash}\"/" ./config/network/cardano-node/config.json > ./config/network/cardano-node/config.json.tmp
+mv ./config/network/cardano-node/config.json.tmp ./config/network/cardano-node/config.json
+
+$SED -E "s/\"ShelleyGenesisHash\": \".*\"/\"ShelleyGenesisHash\": \"${shelleyGenesisHash}\"/" ./config/network/cardano-node/config.json > ./config/network/cardano-node/config.json.tmp
+mv ./config/network/cardano-node/config.json.tmp ./config/network/cardano-node/config.json
+
+$SED -E "s/\"AlonzoGenesisHash\": \".*\"/\"AlonzoGenesisHash\": \"${alonzoGenesisHash}\"/" ./config/network/cardano-node/config.json > ./config/network/cardano-node/config.json.tmp
+mv ./config/network/cardano-node/config.json.tmp ./config/network/cardano-node/config.json
 
 cp ./templates/babbage/topology.json ./config/network/cardano-node/topology.json
 # docker hostname in topology.json isn't working, so need to specify ip of local network
 CONTAINER_IP=$(hostname -I | xargs)
-$SED -i "s/172.17.0.1/$CONTAINER_IP/g" ./config/network/cardano-node/topology.json
+$SED "s/172.17.0.1/$CONTAINER_IP/g" ./config/network/cardano-node/topology.json > ./config/network/cardano-node/topology.json.tmp
+mv ./config/network/cardano-node/topology.json.tmp ./config/network/cardano-node/topology.json
 
 cp "${ROOT}"/genesis/byron/genesis.json ./config/network/cardano-node/genesis/byron.json
 cp "${ROOT}"/genesis/byron/genesis.json ./config/network/genesis/byron.json
