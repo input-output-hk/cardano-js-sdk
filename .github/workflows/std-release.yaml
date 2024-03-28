@@ -9,6 +9,7 @@ jobs:
     if: startsWith(github.event.release.name, '@cardano-sdk/cardano-services@')
     uses: ./.github/workflows/std.yml
     with:
+      deploy-staging-preprod: true
       deploy-dev-preprod: true
       deploy-dev-mainnet: true
     # Secrets have to be passed explicitly even if callee is in the same repo:
