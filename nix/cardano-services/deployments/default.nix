@@ -403,6 +403,7 @@ in
         providers = {
           backend = {
             enabled = true;
+            env.NODE_ENV = "production";
           };
         };
 
@@ -442,12 +443,17 @@ in
         providers = {
           backend = {
             enabled = true;
+            env.NODE_ENV = "production";
           };
           stake-pool-provider = {
             enabled = true;
             env.OVERRIDE_FUZZY_OPTIONS = "true";
+            env.NODE_ENV = "production";
           };
-          handle-provider.enabled = true;
+          handle-provider = {
+            enabled = true;
+            env.NODE_ENV = "production";
+          };
         };
 
         projectors = {
@@ -477,6 +483,7 @@ in
         providers = {
           backend = {
             enabled = true;
+            env.NODE_ENV = "production";
           };
         };
 
@@ -516,12 +523,17 @@ in
         providers = {
           backend = {
             enabled = true;
+            env.NODE_ENV = "production";
           };
           stake-pool-provider = {
             enabled = true;
             env.OVERRIDE_FUZZY_OPTIONS = "true";
+            env.NODE_ENV = "production";
           };
-          handle-provider.enabled = true;
+          handle-provider = {
+            enabled = true;
+            env.NODE_ENV = "production";
+          };
         };
 
         projectors = {
@@ -590,6 +602,7 @@ in
             env.USE_SUBMIT_API = "true";
             env.USE_BLOCKFROST = lib.mkForce "false";
             env.SUBMIT_API_URL = "http://${final.namespace}-cardano-stack.${final.namespace}.svc.cluster.local:8090";
+            env.NODE_ENV = "production";
           };
           stake-pool-provider.enabled = true;
         };
