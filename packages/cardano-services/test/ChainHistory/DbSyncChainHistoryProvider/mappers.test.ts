@@ -294,16 +294,22 @@ describe('chain history mappers', () => {
     });
   });
   describe('mapRedeemer', () => {
-    const redeemerModel: RedeemerModel = {
+    const redeemerModel: Omit<RedeemerModel, 'purpose'> = {
       index: 1,
-      purpose: 'mint',
       script_hash: Buffer.from(hash28ByteBase16, 'hex'),
       tx_id: Buffer.from(transactionHash, 'hex'),
       unit_mem: '2000',
       unit_steps: '5000'
     };
-    test('map RedeemerModel to Cardano.Redeemer', () => {
-      const result = mappers.mapRedeemer(redeemerModel);
+    test.each([
+      ['spend', Cardano.RedeemerPurpose.spend],
+      ['mint', Cardano.RedeemerPurpose.mint],
+      ['cert', Cardano.RedeemerPurpose.certificate],
+      ['reward', Cardano.RedeemerPurpose.withdrawal],
+      ['voting', Cardano.RedeemerPurpose.vote],
+      ['proposing', Cardano.RedeemerPurpose.propose]
+    ])("maps '%p' redeemer", (dbSyncRedeemerPurpose, sdkRedeemerPurpose) => {
+      const result = mappers.mapRedeemer({ ...redeemerModel, purpose: dbSyncRedeemerPurpose });
       expect(result).toEqual<Cardano.Redeemer>({
         data: Buffer.from('not implemented'),
         executionUnits: {
@@ -311,7 +317,7 @@ describe('chain history mappers', () => {
           steps: 5000
         },
         index: 1,
-        purpose: Cardano.RedeemerPurpose.mint
+        purpose: sdkRedeemerPurpose
       });
     });
   });
