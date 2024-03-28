@@ -32,6 +32,7 @@
     "test:pg-boss": "jest -c jest.config.js --forceExit --selectProjects pg-boss --runInBand --verbose",
     "test:providers": "jest -c jest.config.js --forceExit --selectProjects providers --runInBand --verbose",
     "test:wallet": "jest -c jest.config.js --forceExit --selectProjects wallet --runInBand --verbose",
+    "test:wallet-conway": "jest -c jest.config.js --forceExit --selectProjects wallet --runInBand --verbose",
     "test:wallet-real-ada": "jest -c jest.config.js --forceExit --selectProjects wallet-real-ada --runInBand --verbose",
     "test:web-extension:build:sw": "tsc --build ./test && tsc --build ./test/web-extension && webpack -c test/web-extension/webpack.config.sw.js",
     "test:web-extension:build:other": "tsc --build ./test && tsc --build ./test/web-extension && webpack -c test/web-extension/webpack.config.js",
