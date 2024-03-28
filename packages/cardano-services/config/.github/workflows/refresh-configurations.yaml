@@ -18,7 +18,7 @@ jobs:
       run: |
         .github/scripts/download-all.sh $CARDANO_CONFIG_URL $CARDANO_NETWORK
       env:
-        CARDANO_CONFIG_URL: https://book.world.dev.cardano.org/environments/
+        CARDANO_CONFIG_URL: https://book.play.dev.cardano.org/environments
         CARDANO_NETWORK: mainnet
 
     - name: Download from The Cardano Book (preprod)
@@ -26,7 +26,7 @@ jobs:
       run: |
         .github/scripts/download-all.sh $CARDANO_CONFIG_URL $CARDANO_NETWORK
       env:
-        CARDANO_CONFIG_URL: https://book.world.dev.cardano.org/environments
+        CARDANO_CONFIG_URL: https://book.play.dev.cardano.org/environments
         CARDANO_NETWORK: preprod
 
     - name: Download from The Cardano Book (preview)
@@ -34,7 +34,7 @@ jobs:
       run: |
         .github/scripts/download-all.sh $CARDANO_CONFIG_URL $CARDANO_NETWORK
       env:
-        CARDANO_CONFIG_URL: https://book.world.dev.cardano.org/environments
+        CARDANO_CONFIG_URL: https://book.play.dev.cardano.org/environments
         CARDANO_NETWORK: preview
 
     - name: Download from The Cardano Book (sanchonet)
@@ -42,7 +42,7 @@ jobs:
       run: |
         .github/scripts/download-all.sh $CARDANO_CONFIG_URL $CARDANO_NETWORK
       env:
-        CARDANO_CONFIG_URL: https://book.world.dev.cardano.org/environments
+        CARDANO_CONFIG_URL: https://book.play.dev.cardano.org/environments
         CARDANO_NETWORK: sanchonet
 
     - name: Push new configurations
@@ -51,4 +51,4 @@ jobs:
         git status -s
         .github/scripts/update-when-new.sh $CARDANO_CONFIG_URL
       env:
-        CARDANO_CONFIG_URL: https://book.world.dev.cardano.org/environments
+        CARDANO_CONFIG_URL: https://book.play.dev.cardano.org/environments
