@@ -395,6 +395,81 @@ in
         };
       };
 
+
+      "staging-preprod@us-east-1@v1" = final: {
+        name = "${final.namespace}-cardanojs-v1";
+        namespace = "staging-preprod";
+        context = "eks-devs";
+
+        providers = {
+          backend = {
+            enabled = true;
+          };
+        };
+
+        values = {
+          network = "preprod";
+          region = "us-east-1";
+
+          backend.hostnames = ["${final.namespace}.${baseUrl}"];
+          backend.passHandleDBArgs = false;
+          backend.routes = [
+            "/v1.0.0/health"
+            "/v1.0.0/live"
+            "/v1.0.0/meta"
+            "/v1.0.0/ready"
+            "/v1.0.0/asset"
+            "/v2.0.0/chain-history"
+            "/v1.0.0/handle"
+            "/v1.0.0/network-info"
+            "/v1.0.0/rewards"
+            "/v1.0.0/stake-pool"
+            "/v2.0.0/tx-submit"
+            "/v2.0.0/utxo"
+          ];
+          # blockfrost-worker.enabled = true;
+          cardano-services = {
+            ingresOrder = 99;
+            image = "926093910549.dkr.ecr.us-east-1.amazonaws.com/cardano-services:s8j5nx9x2naar194pr58kpmlr5s4xn7b";
+          };
+        };
+      };
+
+      "staging-preprod@us-east-1@v2" = final: {
+        name = "${final.namespace}-cardanojs-v2";
+        namespace = "staging-preprod";
+        context = "eks-devs";
+
+        providers = {
+          backend = {
+            enabled = true;
+          };
+          stake-pool-provider = {
+            enabled = true;
+            env.OVERRIDE_FUZZY_OPTIONS = "true";
+          };
+          handle-provider.enabled = true;
+        };
+
+        projectors = {
+          handle.enabled = true;
+          stake-pool.enabled = true;
+        };
+
+        values = {
+          network = "preprod";
+          region = "us-east-1";
+
+          backend.hostnames = ["${final.namespace}.${baseUrl}"];
+          blockfrost-worker.enabled = true;
+          pg-boss-worker.enabled = true;
+          cardano-services = {
+            ingresOrder = 98;
+          };
+        };
+      };
+
+
       "live-preprod@us-east-2@v1" = final: {
         name = "${final.namespace}-cardanojs-v1";
         namespace = "live-preprod";
