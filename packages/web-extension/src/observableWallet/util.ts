@@ -75,6 +75,10 @@ export const txBuilderProperties: RemoteApiProperties<Omit<TxBuilder, 'customize
     getApiProperties: () => txBuilderProperties,
     propType: RemoteApiPropertyType.ApiFactory
   },
+  setValidityInterval: {
+    getApiProperties: () => txBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
   signingOptions: {
     getApiProperties: () => txBuilderProperties,
     propType: RemoteApiPropertyType.ApiFactory

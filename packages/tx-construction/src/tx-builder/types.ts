@@ -32,6 +32,10 @@ export enum TxOutputFailure {
   NegativeAssetQty = 'Negative or zero asset quantity'
 }
 
+export enum TxValidityIntervalFailure {
+  Expired = 'Transaction expired'
+}
+
 export class InvalidConfigurationError extends CustomError {
   public constructor(public message: string) {
     super(message);
@@ -84,11 +88,20 @@ export class OutputValidationNegativeAssetQtyError extends CustomError {
   }
 }
 
+export class InvalidHereafterError extends CustomError {
+  public constructor() {
+    super(TxValidityIntervalFailure.Expired);
+  }
+}
+
 export type TxOutValidationError =
   | OutputValidationMissingRequiredError
   | OutputValidationMinimumCoinError
   | OutputValidationTokenBundleSizeError;
-export type TxBodyValidationError = TxOutValidationError | InputSelectionError;
+
+export type TxValidityIntervalValidationError = InvalidHereafterError;
+
+export type TxBodyValidationError = TxOutValidationError | InputSelectionError | TxValidityIntervalValidationError;
 
 /**
  * Add handle data which is only used when building the output but doesn't
@@ -269,6 +282,9 @@ export interface TxBuilder {
    */
   build(): UnwitnessedTx;
 
+  /** @param validityInterval sets ValidityInterval */
+  setValidityInterval(validityInterval: Cardano.ValidityInterval): TxBuilder;
+
   // TODO:
   // - setMint
   // - setMetadatum(label: bigint, metadatum: Cardano.Metadatum | null);
@@ -276,7 +292,6 @@ export interface TxBuilder {
   // TODO: maybe this, or maybe datum should be added together with an output?
   //  collaterals should be automatically computed and added to tx when you add scripts
   // - setScripts(scripts: Array<{script, datum, redeemer}>)
-  // - setValidityInterval
   // TODO: figure out what script_data_hash is used for
   // - setScriptIntegrityHash(hash: Cardano.util.Hash32ByteBase16 | null);
   // - setRequiredExtraSignatures(keyHashes: Cardano.Ed25519KeyHash[]);
