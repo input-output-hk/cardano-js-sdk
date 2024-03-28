@@ -1,0 +1,3 @@
+# Nothing to override – for x86_64 processors we use the official `amd64` images.
+
+{}
