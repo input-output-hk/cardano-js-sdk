@@ -168,12 +168,17 @@ const isMultiSig = (tx: Transaction): boolean => {
   return result;
 };
 
-type LedgerConnectionWithCommunicationTypeAndDevicePath = {
-  communicationType: CommunicationType;
-  device?: LedgerDevice;
-  deviceConnection: LedgerConnection;
-  nodeHidDevicePath?: string;
-};
+type DeviceConnectionsWithTheirInitialParams = { deviceConnection: LedgerConnection } & (
+  | {
+      communicationType: CommunicationType.Node;
+      device?: HID;
+      nodeHidDevicePath?: string;
+    }
+  | {
+      communicationType: CommunicationType.Web;
+      device?: USBDevice;
+    }
+);
 
 type OpenTransportForDeviceParams = {
   communicationType: CommunicationType;
@@ -183,7 +188,7 @@ type OpenTransportForDeviceParams = {
 export class LedgerKeyAgent extends KeyAgentBase {
   readonly deviceConnection?: LedgerConnection;
   readonly #communicationType: CommunicationType;
-  static deviceConnections: LedgerConnectionWithCommunicationTypeAndDevicePath[] = [];
+  static deviceConnections: DeviceConnectionsWithTheirInitialParams[] = [];
 
   constructor({ deviceConnection, ...serializableData }: LedgerKeyAgentProps, dependencies: KeyAgentDependencies) {
     super({ ...serializableData, __typename: KeyAgentType.Ledger }, dependencies);
@@ -196,12 +201,15 @@ export class LedgerKeyAgent extends KeyAgentBase {
     nodeHidDevicePath?: string,
     device?: LedgerDevice
   ): Promise<LedgerConnection | null> {
-    const matchingConnectionData = this.deviceConnections?.find(
-      (connection) =>
-        connection.communicationType === communicationType &&
-        connection.nodeHidDevicePath === nodeHidDevicePath &&
-        connection.device === device
-    );
+    const matchingConnectionData = this.deviceConnections?.find((connection) => {
+      const sameCommunication = communicationType === connection.communicationType;
+      if (connection.communicationType === CommunicationType.Web) {
+        return sameCommunication && device === connection.device;
+      }
+      if (connection.communicationType === CommunicationType.Node) {
+        return sameCommunication && device === connection.device && nodeHidDevicePath === connection.nodeHidDevicePath;
+      }
+    });
     if (!matchingConnectionData) return null;
 
     try {
@@ -304,6 +312,32 @@ export class LedgerKeyAgent extends KeyAgentBase {
     return deviceConnection;
   }
 
+  private static rememberConnection({
+    communicationType,
+    device,
+    deviceConnection,
+    nodeHidDevicePath
+  }: {
+    communicationType: CommunicationType;
+    device?: LedgerDevice;
+    deviceConnection: LedgerConnection;
+    nodeHidDevicePath?: string;
+  }) {
+    this.deviceConnections.push({
+      deviceConnection,
+      ...(communicationType === CommunicationType.Node
+        ? {
+            communicationType,
+            ...(device instanceof HID && { device }),
+            ...(nodeHidDevicePath !== undefined && { nodeHidDevicePath })
+          }
+        : {
+            communicationType,
+            ...(isUsbDevice(device) && { device })
+          })
+    });
+  }
+
   /**
    * @throws TransportError
    */
@@ -350,7 +384,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
       }
 
       const newConnection = await LedgerKeyAgent.createDeviceConnection(transport);
-      this.deviceConnections.push({
+      this.rememberConnection({
         communicationType,
         device,
         deviceConnection: newConnection,
