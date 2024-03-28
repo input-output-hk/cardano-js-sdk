@@ -23,6 +23,9 @@ const realAdaTestFileNames = [
   'unspendableUtxos'
 ];
 
+// TODO: remove this and unify wallet and wallet-conway back into a single `wallet`
+const conwayEraTestFileNames = ['conwayTransactions'];
+
 module.exports = {
   projects: [
     { ...project('blockfrost'), globalSetup: './test/blockfrost/setup.ts' },
@@ -32,7 +35,16 @@ module.exports = {
     project('pg-boss'),
     project('projection'),
     project('providers'),
-    project('wallet'),
+    {
+      ...project('wallet'),
+      // TODO: remove this once DbSync has a unified version and we run all tests on conway era
+      testPathIgnorePatterns: [`<rootDir>/test/wallet/PersonalWallet/(${conwayEraTestFileNames.join('|')}).test.ts`]
+    },
+    {
+      ...commonProjectProps,
+      displayName: 'wallet-conway',
+      testMatch: [`<rootDir>/test/wallet/PersonalWallet/(${conwayEraTestFileNames.join('|')}).test.ts`]
+    },
     {
       ...commonProjectProps,
       displayName: 'wallet-real-ada',

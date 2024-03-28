@@ -1,4 +1,4 @@
-name: Continuous Integration - E2E
+name: Continuous Integration - E2E - stable DbSync
 
 env:
   TL_DEPTH: ${{ github.event.pull_request.head.repo.fork && '0' || fromJson(vars.TL_DEPTH) }}
@@ -29,9 +29,9 @@ env:
 
 on:
   pull_request:
+    branches: ['conway-era']
   push:
-    branches: ['master', 'conway-era']
-    tags: ['*.*.*']
+    branches: ['conway-era']
 
 jobs:
   build_and_test:
@@ -59,7 +59,7 @@ jobs:
       - name: 🌐 Setup local test network
         working-directory: packages/e2e
         run: |
-          yarn local-network:up -d
+          yarn local-network-stable:up -d
         env:
           CARDANO_NODE_CHAINDB_LOG_LEVEL: 'Warning'
           CARDANO_NODE_LOG_LEVEL: 'Warning'
@@ -76,7 +76,6 @@ jobs:
       - name: 🔬 Test - e2e - wallet
         run: |
           yarn workspace @cardano-sdk/e2e test:wallet
-          yarn workspace @cardano-sdk/e2e test:wallet-conway
           yarn workspace @cardano-sdk/e2e test:providers
           yarn workspace @cardano-sdk/e2e test:projection
           yarn workspace @cardano-sdk/e2e test:pg-boss
