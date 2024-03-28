@@ -1,23 +1,23 @@
-import * as CardanoNodeUtil from './errorUtils';
 import {
   Cardano,
   CardanoNode,
-  CardanoNodeErrors,
   EraSummary,
+  GeneralCardanoNodeError,
+  GeneralCardanoNodeErrorCode,
   HealthCheckResponse,
   StakeDistribution
 } from '@cardano-sdk/core';
 import {
   ConnectionConfig,
-  StateQuery,
+  LedgerStateQuery,
   createConnectionObject,
-  createStateQueryClient,
+  createLedgerStateQueryClient,
   getServerHealth
 } from '@cardano-ogmios/client';
 import { Logger } from 'ts-log';
 import { RunnableModule, contextLogger } from '@cardano-sdk/util';
 import { createInteractionContextWithLogger, ogmiosServerHealthToHealthCheckResponse } from '../util';
-import { queryEraSummaries } from './queries';
+import { queryEraSummaries, withCoreCardanoNodeError } from './queries';
 
 /**
  * Access cardano-node APIs via Ogmios
@@ -25,7 +25,7 @@ import { queryEraSummaries } from './queries';
  * @class OgmiosCardanoNode
  */
 export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
-  #stateQueryClient: StateQuery.StateQueryClient;
+  #stateQueryClient: LedgerStateQuery.LedgerStateQueryClient;
   #logger: Logger;
   #connectionConfig: ConnectionConfig;
 
@@ -37,7 +37,7 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
 
   public async initializeImpl(): Promise<void> {
     this.#logger.info('Initializing CardanoNode');
-    this.#stateQueryClient = await createStateQueryClient(
+    this.#stateQueryClient = await createLedgerStateQueryClient(
       await createInteractionContextWithLogger(this.#logger, { connection: this.#connectionConfig })
     );
     this.#logger.info('CardanoNode initialized');
@@ -49,32 +49,22 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
   }
 
   public async eraSummaries(): Promise<EraSummary[]> {
-    if (this.state !== 'running') {
-      throw new CardanoNodeErrors.NotInitializedError('eraSummaries', this.name);
-    }
+    this.#assertIsRunning();
     return queryEraSummaries(this.#stateQueryClient, this.#logger);
   }
 
   public async systemStart(): Promise<Date> {
-    if (this.state !== 'running') {
-      throw new CardanoNodeErrors.NotInitializedError('systemStart', this.name);
-    }
-    try {
-      this.#logger.info('Getting system start');
-      return await this.#stateQueryClient.systemStart();
-    } catch (error) {
-      throw CardanoNodeUtil.asCardanoNodeError(error) || new CardanoNodeErrors.UnknownCardanoNodeError(error);
-    }
+    this.#assertIsRunning();
+    this.#logger.info('Getting system start');
+    return withCoreCardanoNodeError(async () => this.#stateQueryClient.networkStartTime());
   }
 
   public async stakeDistribution(): Promise<StakeDistribution> {
-    if (this.state !== 'running') {
-      throw new CardanoNodeErrors.NotInitializedError('stakeDistribution', this.name);
-    }
-    try {
-      this.#logger.info('Getting stake distribution');
+    this.#assertIsRunning();
+    this.#logger.info('Getting stake distribution');
+    return withCoreCardanoNodeError(async () => {
       const map = new Map();
-      for (const [key, value] of Object.entries(await this.#stateQueryClient.stakeDistribution())) {
+      for (const [key, value] of Object.entries(await this.#stateQueryClient.liveStakeDistribution())) {
         const splitStake = value.stake.split('/');
         map.set(Cardano.PoolId(key), {
           ...value,
@@ -82,9 +72,7 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
         });
       }
       return map;
-    } catch (error) {
-      throw CardanoNodeUtil.asCardanoNodeError(error) || new CardanoNodeErrors.UnknownCardanoNodeError(error);
-    }
+    });
   }
 
   healthCheck(): Promise<HealthCheckResponse> {
@@ -107,5 +95,15 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
 
   async startImpl(): Promise<void> {
     return Promise.resolve();
+  }
+
+  #assertIsRunning() {
+    if (this.state !== 'running') {
+      throw new GeneralCardanoNodeError(
+        GeneralCardanoNodeErrorCode.ServerNotReady,
+        null,
+        'OgmiosCardanoNode is not running'
+      );
+    }
   }
 }

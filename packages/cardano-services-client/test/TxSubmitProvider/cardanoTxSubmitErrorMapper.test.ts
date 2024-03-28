@@ -28,4 +28,28 @@ describe('mapCardanoTxSubmitError', () => {
       expect(mapCardanoTxSubmitError(errorData)).toBeNull();
     });
   });
+
+  describe('json errors', () => {
+    const errorData = {
+      contents: {
+        contents: {
+          contents: {
+            era: 'ShelleyBasedEraConway',
+            error: [
+              'ConwayUtxowFailure (UtxoFailure (AlonzoInBabbageUtxoPredFailure (ValueNotConservedUTxO (MaryValue (Coin 0) (MultiAsset (fromList []))) (MaryValue (Coin 4999969413825) (MultiAsset (fromList []))))))',
+              'ConwayUtxowFailure (UtxoFailure (AlonzoInBabbageUtxoPredFailure (BadInputsUTxO (fromList [TxIn (TxId {unTxId = SafeHash "5f968400f05638454896883ae0f34491e14d748194a10df3f5a7fe2d10f52373"}) (TxIx 1)]))))'
+            ],
+            kind: 'ShelleyTxValidationError'
+          },
+          tag: 'TxValidationErrorInCardanoMode'
+        },
+        tag: 'TxCmdTxSubmitValidationError'
+      },
+      tag: 'TxSubmitFail'
+    };
+
+    it('can map ValueNotConservedError to TxSubmissionErrorCode.ValueNotConserved', () => {
+      expect(CardanoNodeUtil.isValueNotConservedError(mapCardanoTxSubmitError(errorData))).toBeTruthy();
+    });
+  });
 });

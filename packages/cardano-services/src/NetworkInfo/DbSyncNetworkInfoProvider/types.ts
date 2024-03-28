@@ -59,7 +59,7 @@ export interface ProtocolParamsModel {
   min_committee_size: number;
   committee_term_limit: number;
   governance_action_validity_period: number;
-  governance_action_deposit: number;
+  gov_action_deposit: number;
   drep_deposit: number;
   drep_inactivity_period: number;
 }

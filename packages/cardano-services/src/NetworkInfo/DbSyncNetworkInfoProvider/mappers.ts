@@ -65,7 +65,7 @@ export const toProtocolParams = ({
   min_committee_size,
   committee_term_limit,
   governance_action_validity_period,
-  governance_action_deposit,
+  gov_action_deposit,
   drep_deposit,
   drep_inactivity_period
 }: ProtocolParamsModel): Cardano.ProtocolParameters => ({
@@ -78,7 +78,7 @@ export const toProtocolParams = ({
   dRepVotingThresholds: drep_voting_thresholds,
   decentralizationParameter: String(decentralisation),
   desiredNumberOfPools: optimal_pool_count,
-  governanceActionDeposit: governance_action_deposit,
+  governanceActionDeposit: Number(gov_action_deposit),
   governanceActionValidityPeriod: Cardano.EpochNo(governance_action_validity_period),
   maxBlockBodySize: max_block_size,
   maxBlockHeaderSize: max_bh_size,

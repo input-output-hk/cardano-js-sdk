@@ -5,18 +5,18 @@ export const pointOrOriginToOgmios = (point: PointOrOrigin) =>
   point === 'origin'
     ? 'origin'
     : {
-        hash: point.hash,
+        id: point.hash,
         slot: point.slot
       };
 
 export const ogmiosToCorePoint = (point: Schema.Point) => ({
-  hash: Cardano.BlockId(point.hash),
+  hash: Cardano.BlockId(point.id),
   slot: Cardano.Slot(point.slot)
 });
 
 export const ogmiosToCoreTip = (tip: Schema.Tip) => ({
   ...ogmiosToCorePoint(tip),
-  blockNo: Cardano.BlockNo(tip.blockNo)
+  blockNo: Cardano.BlockNo(tip.height)
 });
 
 export const ogmiosToCoreTipOrOrigin = (tip: Schema.TipOrOrigin) => (tip === 'origin' ? tip : ogmiosToCoreTip(tip));

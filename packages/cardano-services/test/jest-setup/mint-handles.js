@@ -14,8 +14,13 @@ const path = require('path');
 const { SodiumBip32Ed25519 } = require('@cardano-sdk/crypto');
 
 (async () => {
-  const wallet = (await getWallet({ env, idx: 0, logger, name: 'Handle Init Wallet', polling: { interval: 50 } }))
-    .wallet;
+  const { wallet, asyncKeyAgent } = await getWallet({
+    env,
+    idx: 0,
+    logger,
+    name: 'Handle Init Wallet',
+    polling: { interval: 50 }
+  });
   logger.info('Waiting for walletReady');
   await walletReady(wallet, coinsRequiredByHandleMint + 10_000_000n);
 

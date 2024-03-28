@@ -632,8 +632,7 @@ export class BaseWallet implements ObservableWallet {
         mightBeAlreadySubmitted &&
         error instanceof ProviderError &&
         // Review: not sure if those 2 errors cover the original ones: there is no longer a CollectErrorsError or BadInputsError
-        // Re-add error.innerError.data.produced.coins === 0n check once Ogmios6 is released. It is not part of the error in pre-ogmios6.
-        (CardanoNodeUtil.isValueNotConservedError(error.innerError) ||
+        ((CardanoNodeUtil.isValueNotConservedError(error.innerError) && error.innerError.data.produced.coins === 0n) ||
           // TODO: check if IncompleteWithdrawals available withdrawal amount === wallet's reward acc balance?
           // Not sure what the 'Withdrawals' in error data is exactly: value being withdrawed, or reward acc balance
           CardanoNodeUtil.isIncompleteWithdrawalsError(error.innerError))

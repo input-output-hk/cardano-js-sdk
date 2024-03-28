@@ -67,13 +67,13 @@ export const SlotLeader = (value: string): SlotLeader => {
 };
 
 /**
- * Get Bech32 encoded VRF verification key from base64 encoded string
+ * Get Bech32 encoded VRF verification key from base16 encoded string
  *
- * @param value is a Base64 string
+ * @param value is a base16 string
  * @returns Bech32 encoded vrf_vk
  */
-export const VrfVkBech32FromBase64 = (value: string) => {
-  const words = BaseEncoding.bech32.toWords(Buffer.from(value, 'base64'));
+VrfVkBech32.fromHex = (value: string) => {
+  const words = BaseEncoding.bech32.toWords(Buffer.from(value, 'hex'));
   return VrfVkBech32(BaseEncoding.bech32.encode('vrf_vk', words, 1023));
 };
 

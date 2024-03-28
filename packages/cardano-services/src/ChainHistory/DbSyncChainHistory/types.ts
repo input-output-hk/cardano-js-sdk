@@ -102,21 +102,72 @@ export interface RedeemerModel {
   tx_id: Buffer;
 }
 
+type VoterRole = 'ConstitutionalCommittee' | 'DRep' | 'SPO';
+
+export interface VotingProceduresModel {
+  tx_id: Buffer;
+  voter_role: VoterRole;
+  drep_voter: Buffer | null;
+  committee_voter: Buffer | null;
+  pool_voter: Buffer | null;
+  governance_action_tx_id: Buffer;
+  governance_action_index: number;
+  drep_hash_raw: string;
+  drep_has_script: boolean;
+  pool_hash_hash_raw: string;
+  vote: Cardano.Vote;
+  url: string;
+  data_hash: Buffer | null;
+}
+
+export interface ProposalProcedureModel {
+  data_hash: Buffer;
+  deposit: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  description: any;
+  tx_id: Buffer;
+  type: string;
+  url: string;
+  view: string;
+  // LW-9675
+  numerator?: string;
+  denominator?: string;
+}
+
 export interface CertificateModel {
   cert_index: number;
   tx_id: Buffer;
 }
 export type WithCertIndex<T extends Cardano.Certificate> = T & { cert_index: number };
 export type WithCertType<T extends CertificateModel> = T & {
-  type: 'retire' | 'register' | 'mir' | 'stake' | 'delegation';
+  type:
+    | 'retire'
+    | 'register'
+    | 'mir'
+    | 'stake'
+    | 'delegation'
+    | 'registration'
+    | 'unregistration'
+    | 'voteDelegation'
+    | 'stakeVoteDelegation'
+    | 'stakeRegistrationDelegation'
+    | 'voteRegistrationDelegation'
+    | 'stakeVoteRegistrationDelegation'
+    | 'registerDrep'
+    | 'unregisterDrep'
+    | 'updateDrep'
+    | 'authorizeCommitteeHot'
+    | 'resignCommitteeCold';
 };
 
 export interface PoolRetireCertModel extends CertificateModel {
   retiring_epoch: number;
   pool_id: string;
 }
+
 export interface PoolRegisterCertModel extends CertificateModel {
   pool_id: string;
+  deposit: string;
 }
 
 export interface MirCertModel extends CertificateModel {
@@ -124,14 +175,49 @@ export interface MirCertModel extends CertificateModel {
   pot: 'reserve' | 'treasury';
   address: string;
 }
+
 export interface StakeCertModel extends CertificateModel {
   address: string;
+  deposit: string;
   registration: boolean;
 }
 
 export interface DelegationCertModel extends CertificateModel {
   address: string;
   pool_id: string;
+}
+
+export interface DrepCertModel extends CertificateModel {
+  has_script: boolean;
+  drep_hash: Buffer;
+  url: string | null;
+  data_hash: Buffer | null;
+  deposit: string;
+}
+
+export interface VoteDelegationCertModel extends CertificateModel {
+  has_script: boolean;
+  drep_hash: Buffer;
+  address: string;
+}
+
+export type StakeVoteDelegationCertModel = DelegationCertModel & VoteDelegationCertModel;
+export type StakeRegistrationDelegationCertModel = StakeCertModel & DelegationCertModel;
+export type VoteRegistrationDelegationCertModel = StakeCertModel & VoteDelegationCertModel;
+export type StakeVoteRegistrationDelegationCertModel = StakeCertModel & DelegationCertModel & VoteDelegationCertModel;
+
+export interface AuthorizeCommitteeHotCertModel extends CertificateModel {
+  cold_key: Buffer;
+  cold_key_has_script: boolean;
+  hot_key: Buffer;
+  hot_key_has_script: boolean;
+}
+
+export interface ResignCommitteeColdCertModel extends CertificateModel {
+  cold_key: Buffer;
+  cold_key_has_script: boolean;
+  url: string;
+  data_hash: string;
 }
 
 export interface TxIdModel {

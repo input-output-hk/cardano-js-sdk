@@ -52,6 +52,8 @@ export const findProtocolParams = `
     max_block_ex_mem,
     max_block_ex_steps,
     max_epoch,
+    gov_action_deposit,
+    drep_deposit,
     cost_model.costs
     FROM epoch_param
     LEFT JOIN cost_model

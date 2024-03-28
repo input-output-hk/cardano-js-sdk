@@ -6,12 +6,14 @@ import {
   ChainSyncEventType,
   ChainSyncRollBackward,
   ChainSyncRollForward,
+  GeneralCardanoNodeError,
+  GeneralCardanoNodeErrorCode,
   Intersection,
   ObservableCardanoNode,
   Point,
   PointOrOrigin
 } from '@cardano-sdk/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { fromSerializableObject } from '@cardano-sdk/util';
 import { genesisToEraSummary } from './genesisToEraSummary';
 import memoize from 'lodash/memoize';
@@ -136,7 +138,11 @@ export const chainSyncData = memoize((dataSet: ChainSyncDataSet) => {
       });
     },
     genesisParameters$: of(compactGenesis),
-    healthCheck$: new Observable()
+    healthCheck$: new Observable(),
+    submitTx: () =>
+      throwError(
+        () => new GeneralCardanoNodeError(GeneralCardanoNodeErrorCode.Unknown, null, 'submitTx is not implemented')
+      )
   };
   return {
     allEvents,

@@ -4,22 +4,12 @@ exports[`OgmiosCardanoNode initialized and started eraSummaries success resolves
 Array [
   Object {
     "parameters": Object {
-      "epochLength": 21600,
-      "slotLength": 20000,
-    },
-    "start": Object {
-      "slot": 0,
-      "time": 2017-09-23T21:44:51.000Z,
-    },
-  },
-  Object {
-    "parameters": Object {
-      "epochLength": 432000,
+      "epochLength": 1,
       "slotLength": 1000,
     },
     "start": Object {
-      "slot": 1598400,
-      "time": 2018-09-28T21:44:51.000Z,
+      "slot": 0,
+      "time": 2022-08-09T00:00:00.000Z,
     },
   },
 ]
@@ -27,35 +17,12 @@ Array [
 
 exports[`OgmiosCardanoNode initialized and started stakeDistribution success resolves if successful 1`] = `
 Map {
-  "pool1la4ghj4w4f8p4yk4qmx0qvqmzv6592ee9rs0vgla5w6lc2nc8w5" => Object {
+  "pool1cjm567pd9eqj7wlpuq2mnsasw2upewq0tchg4n8gktq5k7eepvr" => Object {
     "stake": Object {
-      "pool": 10098109508n,
-      "supply": 40453712883332027n,
+      "pool": 1n,
+      "supply": 100n,
     },
-    "vrf": "4e4a2e82dc455449bf5f1f6d249470963cf97389b5dc4d2118fe21625f50f518",
-  },
-  "pool1lad5j5kawu60qljfqh02vnazxrahtaaj6cpaz4xeluw5xf023cg" => Object {
-    "stake": Object {
-      "pool": 14255969766n,
-      "supply": 40453712883332027n,
-    },
-    "vrf": "474a6d2a44b51add62d8f2fd8fe80abc722bf84478479b617ad05b39aaa84971",
-  },
-  "pool1llugtz5r4t6m7xz6es4qu7cszllm5y3uvx3ast5a9jzlv7h3xdu" => Object {
-    "stake": Object {
-      "pool": 98763124501826n,
-      "supply": 40453712883332027n,
-    },
-    "vrf": "dc1c0fd7d2fd95b6e9bf0e50ab5cb722edbd7d6e85b7d53323884d429ec6a83c",
-  },
-  "pool1lu6ll4rcxm92059ggy6uym2p804s5hcwqyyn5vyqhy35kuxtn2f" => Object {
-    "stake": Object {
-      "pool": 1494933206n,
-      "supply": 40453712883332027n,
-    },
-    "vrf": "4a13d5e99a1868788057bf401fdb4379b7846290dd948918839981088059a564",
+    "vrf": "vrf",
   },
 }
 `;
-
-exports[`OgmiosCardanoNode initialized and started systemStart success resolves if successful 1`] = `2017-09-23T21:44:51.000Z`;

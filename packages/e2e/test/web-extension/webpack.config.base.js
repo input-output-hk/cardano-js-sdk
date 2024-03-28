@@ -70,7 +70,9 @@ module.exports = {
     resolve: {
       extensions: ['.ts', '.js'],
       fallback: {
+        '@cardano-sdk/cardano-services': false,
         buffer: require.resolve('buffer/'),
+        crypto: require.resolve('crypto-browserify'),
         events: require.resolve('events/'),
         fs: false,
         'get-port-please': false,
@@ -79,7 +81,6 @@ module.exports = {
         os: false,
         path: false,
         perf_hooks: false,
-        crypto: require.resolve('crypto-browserify'),
         stream: require.resolve('readable-stream'),
         util: require.resolve('util/')
       }

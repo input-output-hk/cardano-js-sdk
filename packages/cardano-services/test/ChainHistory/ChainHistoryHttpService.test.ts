@@ -516,7 +516,8 @@ describe('ChainHistoryHttpService', () => {
           expect(response.pageResults[0].body.inputs).toMatchShapeOf(DataMocks.Tx.inputs);
         });
 
-        it('finds transactions with address within outputs', async () => {
+        // TODO: LW-9889 Empty genesis addresses returned by fixtureBuilder.getGenesisAddresses()
+        it.skip('finds transactions with address within outputs', async () => {
           const addresses: Cardano.PaymentAddress[] = await fixtureBuilder.getGenesisAddresses();
           expect(() => Cardano.PaymentAddress(addresses[0] as unknown as string)).not.toThrow();
 

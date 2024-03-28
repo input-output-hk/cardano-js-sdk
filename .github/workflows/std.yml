@@ -23,6 +23,11 @@ on:
         type: boolean
         required: true
         default: false
+      deploy-dev-sanchonet:
+        description: Deploy to dev-sanchonet
+        type: boolean
+        required: true
+        default: false
   workflow_call:
     inputs:
       deploy-dev-preprod:
@@ -101,6 +106,9 @@ jobs:
             if [ "true" == ${{ inputs.deploy-dev-preview || (github.event_name == 'push' && github.ref_name == 'master') }} ] ; then
               echo '{"environment":"dev-preview", "target":"dev-preview@us-east-1",    "url": "https://dev-preview.lw.iog.io/"}'
             fi
+            if [ "true" == ${{ inputs.deploy-dev-sanchonet || (github.event_name == 'push' && github.ref_name == 'conway-era') }} ] ; then
+              echo '{"environment":"dev-sanchonet", "target":"dev-sanchonet@us-east-1@v1",    "url": "https://dev-sanchonet.lw.iog.io/"}'
+            fi
             if [ "true" == ${{ inputs.deploy-dev-preprod || false }} ] ; then
               echo '{"environment":"dev-preprod", "target":"dev-preprod@us-east-1@v2", "url": "https://dev-preprod.lw.iog.io/"}'
             fi
@@ -171,7 +179,7 @@ jobs:
   diff:
     needs: images
     name: Diff & Comment
-    if: github.event_name == 'pull_request' && (github.base_ref == 'master')
+    if: github.event_name == 'pull_request' && (github.base_ref == 'master' || github.base_ref == 'conway-era')
     permissions:
       contents: read
       pull-requests: write
@@ -216,9 +224,10 @@ jobs:
             printf "" >pr-comment.md
 
             for target in \
-              "dev-preview@us-east-1" \
-              "dev-preprod@us-east-1@v1" \
-              "dev-mainnet@us-east-1" \
+              ${{ github.base_ref == 'master' && '"dev-preview@us-east-1"'    || '' }} \
+              ${{ github.base_ref == 'master' && '"dev-preprod@us-east-1@v1"' || '' }} \
+              ${{ github.base_ref == 'master' && '"dev-mainnet@us-east-1"'    || '' }} \
+              ${{ github.base_ref == 'conway-era' && '"dev-sanchonet@us-east-1@v1"'    || '' }} \
             ; do
               nix run -L ".#cardano-services.${target}.plan" | tee k8s-plan.diff
 
