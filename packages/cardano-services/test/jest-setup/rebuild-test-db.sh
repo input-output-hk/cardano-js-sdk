@@ -21,13 +21,9 @@ yarn workspace @cardano-sdk/e2e local-network:down
 yarn workspace @cardano-sdk/e2e local-network:up -d --build
 yarn workspace @cardano-sdk/e2e wait-for-network
 
-TEST1="yarn workspace @cardano-sdk/e2e test:wallet"
-TEST2="yarn workspace @cardano-sdk/e2e test:long-running delegation-rewards.test.ts"
-TEST3="yarn workspace @cardano-sdk/e2e test:local-network register-pool.test.ts"
-
-for test in "$TEST1" "$TEST2" "$TEST3"; do
-  while ! $test; do echo repeating...; done
-done
+yarn workspace @cardano-sdk/e2e test:wallet
+yarn workspace @cardano-sdk/e2e test:long-running simple-delegation-rewards.test.ts
+yarn workspace @cardano-sdk/e2e test:local-network register-pool.test.ts
 
 TL_LEVEL="${TL_LEVEL:=info}" node "$SCRIPT_DIR/mint-handles.js"
 
