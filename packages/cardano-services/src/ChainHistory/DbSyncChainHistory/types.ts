@@ -123,7 +123,8 @@ export interface VotingProceduresModel {
 export interface ProposalProcedureModel {
   data_hash: Buffer;
   deposit: string;
-  description: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  description: any;
   tx_id: Buffer;
   type: string;
   url: string;
@@ -207,11 +208,14 @@ export type StakeVoteRegistrationDelegationCertModel = StakeCertModel & Delegati
 
 export interface AuthorizeCommitteeHotCertModel extends CertificateModel {
   cold_key: Buffer;
+  cold_key_has_script: boolean;
   hot_key: Buffer;
+  hot_key_has_script: boolean;
 }
 
 export interface ResignCommitteeColdCertModel extends CertificateModel {
   cold_key: Buffer;
+  cold_key_has_script: boolean;
   url: string;
   data_hash: string;
 }

@@ -4,7 +4,7 @@ import { Cardano, Serialization } from '@cardano-sdk/core';
 import { logger } from '@cardano-sdk/util-dev';
 
 import { firstValueFrom, map } from 'rxjs';
-import { getEnv, getWallet, submitAndConfirm, walletReady, walletVariables } from '../../../src';
+import { getEnv, getWallet, submitAndConfirm, unDelegateWallet, walletReady, walletVariables } from '../../../src';
 
 /*
 Use cases not covered by specific tests because covered by (before|after)(All|Each) hooks
@@ -64,16 +64,6 @@ describe('PersonalWallet/conwayTransactions', () => {
 
   const assertWalletIsDelegating = async () =>
     expect((await firstValueFrom(wallet.delegation.rewardAccounts$))[0].delegatee?.nextNextEpoch?.id).toEqual(poolId);
-
-  const cleanWallet = async () => {
-    const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
-
-    if (!rewardAccounts.some((acct) => acct.credentialStatus === StakeCredentialStatus.Unregistered)) {
-      const { tx } = await wallet.createTxBuilder().delegatePortfolio(null).build().sign();
-
-      await submitAndConfirm(wallet, tx, 1);
-    }
-  };
 
   const getDRepCredential = async () => {
     const drepPubKey = await dRepWallet.getPubDRepKey();
@@ -183,11 +173,11 @@ describe('PersonalWallet/conwayTransactions', () => {
     if (!(await isRegisteredDRep())) await sendDRepRegCert(true);
   });
 
-  beforeEach(cleanWallet);
+  beforeEach(() => unDelegateWallet(wallet));
 
   afterAll(async () => {
     await sendDRepRegCert(false);
-    await cleanWallet();
+    await unDelegateWallet(wallet);
 
     wallet.shutdown();
     dRepWallet.shutdown();

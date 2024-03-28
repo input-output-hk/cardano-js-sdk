@@ -291,3 +291,13 @@ export const burnTokens = async ({
   await submitAndConfirm(wallet, signedTx);
   await txConfirmed(wallet, signedTx);
 };
+
+export const unDelegateWallet = async (wallet: BaseWallet) => {
+  const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
+
+  if (!rewardAccounts.some((acct) => acct.credentialStatus === Cardano.StakeCredentialStatus.Unregistered)) {
+    const { tx } = await wallet.createTxBuilder().delegatePortfolio(null).build().sign();
+
+    await submitAndConfirm(wallet, tx, 1);
+  }
+};

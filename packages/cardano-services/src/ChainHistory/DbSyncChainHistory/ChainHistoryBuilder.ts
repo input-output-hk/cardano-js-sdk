@@ -92,7 +92,7 @@ const getGovernanceAction = ({
   numerator,
   type
 }: ProposalProcedureModel): Cardano.GovernanceAction => {
-  const { contents } = JSON.parse(description);
+  const { contents } = description;
   const governanceActionId =
     contents && contents[0] ? { actionIndex: contents[0].govActionIx, id: contents[0].txId } : null;
 
@@ -155,7 +155,7 @@ const getGovernanceAction = ({
       };
   }
 
-  throw new Error(`Unknown GovernanceActionType '${type}' with description "${description}"`);
+  throw new Error(`Unknown GovernanceActionType '${type}' with description "${JSON.stringify(description)}"`);
 };
 
 const getVoter = (

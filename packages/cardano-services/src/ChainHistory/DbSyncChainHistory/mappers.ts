@@ -336,11 +336,11 @@ export const mapCertificate = (
       cert_index: certModel.cert_index,
       coldCredential: {
         hash: certModel.cold_key.toString('hex') as unknown as Crypto.Hash28ByteBase16,
-        type: Cardano.CredentialType.KeyHash
+        type: certModel.cold_key_has_script ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
       },
       hotCredential: {
         hash: certModel.hot_key.toString('hex') as unknown as Crypto.Hash28ByteBase16,
-        type: Cardano.CredentialType.KeyHash
+        type: certModel.hot_key_has_script ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
       }
     };
 
@@ -351,7 +351,7 @@ export const mapCertificate = (
       cert_index: certModel.cert_index,
       coldCredential: {
         hash: certModel.cold_key.toString('hex') as unknown as Crypto.Hash28ByteBase16,
-        type: Cardano.CredentialType.KeyHash
+        type: certModel.cold_key_has_script ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
       }
     };
 

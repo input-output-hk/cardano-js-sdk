@@ -374,10 +374,14 @@ export const findCommitteeRegistrationByTxIds = `
 	SELECT
 		cert_index,
 		tx.hash AS tx_id,
-		cold_key,
-		hot_key
+		ch1.raw AS cold_key,
+		ch1.has_script AS cold_key_has_script,
+		ch2.raw AS hot_key,
+		ch2.has_script AS hot_key_has_script
 	FROM tx
 	JOIN committee_registration AS cert ON cert.tx_id = tx.id
+	JOIN committee_hash AS ch1 ON cold_key_id = ch1.id
+	JOIN committee_hash AS ch2 ON hot_key_id = ch2.id
 	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC`;
 
@@ -385,11 +389,13 @@ export const findCommitteeResignByTxIds = `
 	SELECT
 		cert_index,
 		tx.hash AS tx_id,
-		cold_key,
+		ch.raw AS cold_key,
+		ch.has_script AS cold_key_has_script,
 		url,
 		data_hash
 	FROM tx
 	JOIN committee_de_registration AS cert ON cert.tx_id = tx.id
+	JOIN committee_hash AS ch ON cold_key_id = ch.id
 	LEFT JOIN voting_anchor AS anchor ON anchor.id = voting_anchor_id
 	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC`;
