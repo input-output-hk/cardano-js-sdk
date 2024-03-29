@@ -12,6 +12,21 @@
     us-east-2 = readJsonFile ./tf-outputs/lace-prod-us-east-2.json;
   };
   oci = inputs.self.x86_64-linux.cardano-services.oci-images.cardano-services;
+  allowedOrigins =  [
+    # Represents Chrome production version
+    "chrome-extension://gafhhkghbfjjkeiendhlofajokpaflmk"
+    # Represents Edge production version
+    "chrome-extension://efeiemlfnahiidnjglmehaihacglceia"
+    # Represents midnights version of lace
+    "chrome-extension://bjlhpephaokolembmpdcbobbpkjnoheb"
+    # Represents Chrome dev preview version
+    "chrome-extension://djcdfchkaijggdjokfomholkalbffgil"
+  ];
+
+  allowedOriginsDev = allowedOrigins ++ [
+    "http://localhost/"
+    "http://localhost"
+  ];
 in
   nix-helm.builders.${pkgs.system}.mkHelmMultiTarget {
     defaults = final: let
@@ -107,17 +122,8 @@ in
         };
 
         backend = {
+          allowedOrigins = lib.concatStringsSep "," allowedOrigins;
           passHandleDBArgs = true;
-          allowedOrigins = lib.concatStringsSep "," [
-            # gafhhkghbfjjkeiendhlofajokpaflmk represents Chrome production version
-            "chrome-extension://gafhhkghbfjjkeiendhlofajokpaflmk"
-            # efeiemlfnahiidnjglmehaihacglceia represents Edge production version
-            "chrome-extension://efeiemlfnahiidnjglmehaihacglceia"
-            # bjlhpephaokolembmpdcbobbpkjnoheb represents midnights version of lace
-            "chrome-extension://bjlhpephaokolembmpdcbobbpkjnoheb"
-            # djcdfchkaijggdjokfomholkalbffgil represents Chrome dev preview version
-            "chrome-extension://djcdfchkaijggdjokfomholkalbffgil"
-          ];
           hostnames = ["${final.namespace}.${baseUrl}"];
           dnsId = lib.toLower "${values.region}-${final.namespace}-backend";
           ogmiosSrvServiceName = "${final.namespace}-cardano-core.${final.namespace}.svc.cluster.local";
@@ -200,6 +206,8 @@ in
             ];
           };
 
+          backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
+
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
           pg-boss-worker.metadata-fetch-mode = "smash";
@@ -233,6 +241,8 @@ in
 
           blockfrost-worker.enabled = false;
           pg-boss-worker.enabled = true;
+
+          backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
           backend.routes = let
               inherit (oci.meta) versions;
             in
@@ -315,6 +325,7 @@ in
               }
             ];
           };
+          backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
 
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
@@ -353,6 +364,7 @@ in
             "/v2.0.0/tx-submit"
             "/v2.0.0/utxo"
           ];
+          backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
           # blockfrost-worker.enabled = true;
           cardano-services = {
             ingresOrder = 99;
@@ -386,7 +398,9 @@ in
           network = "preprod";
           region = "us-east-1";
 
+          backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
           backend.hostnames = ["${final.namespace}.${baseUrl}"];
+
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
           cardano-services = {
