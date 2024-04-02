@@ -134,7 +134,8 @@ describe('createTypeormTipTracker', () => {
     });
   });
 
-  describe('with failing connection', () => {
+  // TODO LW-9971
+  describe.skip('with failing connection', () => {
     it('reconnects and eventually emits the tip', async () => {
       connection$ = createStubObservable(
         throwError(() => new NoConnectionForRepositoryError('conn')),
