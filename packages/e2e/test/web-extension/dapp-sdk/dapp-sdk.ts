@@ -9,7 +9,14 @@ import {
   stakePoolHttpProvider
 } from '@cardano-sdk/cardano-services-client';
 
-import { connectToLace, sendCoins, sendSeveralAssets, singleDelegation, singleUndelegation } from './features';
+import {
+  connectToLace,
+  sendCoins,
+  sendSeveralAssets,
+  setExpiredValidityInterval,
+  singleDelegation,
+  singleUndelegation
+} from './features';
 import type { ObservableWallet } from '@cardano-sdk/wallet';
 
 const logger = console;
@@ -46,6 +53,14 @@ document.querySelector('#send-coins')?.addEventListener('click', async () => {
   }
 
   sendCoins({ connectedWallet });
+});
+
+document.querySelector('#send-coins-expire-tx')?.addEventListener('click', async () => {
+  if (!connectedWallet) {
+    return logger.warn(CONNECT_WALLET);
+  }
+
+  setExpiredValidityInterval({ connectedWallet, logger });
 });
 
 document.querySelector('#send-several-assets')?.addEventListener('click', () => {
