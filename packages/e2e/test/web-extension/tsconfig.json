@@ -1,6 +1,8 @@
 {
   "extends": "../../../../test/tsconfig.json",
   "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "baseUrl": "./extension",
     "types": [
       "node",

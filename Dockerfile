@@ -28,6 +28,7 @@ COPY packages/cardano-services/package.json packages/cardano-services/package.js
 COPY packages/cardano-services-client/package.json packages/cardano-services-client/package.json
 COPY packages/core/package.json packages/core/package.json
 COPY packages/crypto/package.json packages/crypto/package.json
+COPY packages/dapp-connector-preact/package.json packages/dapp-connector-preact/package.json
 COPY packages/dapp-connector/package.json packages/dapp-connector/package.json
 COPY packages/dapp-connector-client/package.json packages/dapp-connector-client/package.json
 COPY packages/e2e/package.json packages/e2e/package.json

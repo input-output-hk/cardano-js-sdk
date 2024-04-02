@@ -1,0 +1,10 @@
+.actions-container { 
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  padding: 20px;
+}
+
+.wallet-button { 
+  margin: 10px 20px;
+}

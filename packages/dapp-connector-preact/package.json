@@ -1,0 +1,53 @@
+{
+	"name": "@cardano-sdk/dapp-connector-preact",
+	"scripts": {
+		"dev": "webpack serve --mode development --open",
+		"build": "webpack --mode production",
+		"lint": "eslint --ignore-path ../../../../../.eslintignore \"**/*.ts\" \"**/*.tsx\""
+	},
+	"dependencies": {
+		"@cardano-sdk/cardano-services-client": "workspace:~",
+		"@cardano-sdk/core": "workspace:~",
+		"@cardano-sdk/crypto": "workspace:~",
+		"@cardano-sdk/dapp-connector-client": "workspace:~",
+		"@cardano-sdk/tx-construction": "workspace:~",
+		"@cardano-sdk/util": "workspace:~",
+		"@cardano-sdk/util-dev": "workspace:~",
+		"@cardano-sdk/util-rxjs": "workspace:~",
+		"@cardano-sdk/wallet": "workspace:~",
+		"buffer": "^6.0.3",
+		"copy-webpack-plugin": "^12.0.2",
+		"crypto-browserify": "^3.12.0",
+		"libsodium-wrappers-sumo": "^0.7.5",
+		"preact": "^10.13.1",
+		"preact-iso": "^2.6.2",
+		"preact-render-to-string": "^6.4.1",
+		"preact-router": "^4.1.2",
+		"rollup-plugin-polyfill-node": "^0.13.0"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.24.4",
+		"@babel/plugin-transform-react-jsx": "^7.23.4",
+		"@babel/plugin-transform-runtime": "^7.24.3",
+		"@babel/preset-env": "^7.24.4",
+		"@babel/preset-react": "^7.24.1",
+		"@babel/preset-typescript": "^7.24.1",
+		"@preact/preset-vite": "^2.5.0",
+		"babel-loader": "^9.1.3",
+		"css-loader": "^7.1.0",
+		"dotenv": "^16.4.5",
+		"eslint": "^8.57.0",
+		"eslint-config-preact": "^1.3.0",
+		"html-webpack-plugin": "^5.6.0",
+		"source-map-loader": "^5.0.0",
+		"style-loader": "^4.0.0",
+		"ts-loader": "^9.5.1",
+		"typescript": "^5.4.3",
+		"vite": "^4.3.2",
+		"vite-compatible-readable-stream": "^3.6.1",
+		"vite-plugin-node-polyfills": "^0.21.0",
+		"webpack": "^5.91.0",
+		"webpack-cli": "^5.1.4",
+		"webpack-dev-server": "^5.0.4"
+	}
+}

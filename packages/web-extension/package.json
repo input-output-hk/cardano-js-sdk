@@ -56,6 +56,7 @@
     "@cardano-sdk/core": "workspace:~",
     "@cardano-sdk/crypto": "workspace:~",
     "@cardano-sdk/dapp-connector": "workspace:~",
+    "@cardano-sdk/dapp-connector-client": "workspace:~",
     "@cardano-sdk/hardware-ledger": "workspace:~",
     "@cardano-sdk/hardware-trezor": "workspace:~",
     "@cardano-sdk/key-management": "workspace:~",
