@@ -20,7 +20,7 @@ export const providerHandler =
     logger: Logger
   ) =>
   (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    logger.debug(req.method, req.path, { ip: req.ip });
+    logger.debug(req.method, req.path);
     if (typeof req.body !== 'object' && req.body !== undefined && req.body !== '') {
       return res.status(400).send('Must use application/json Content-Type header and have {args} in body');
     }

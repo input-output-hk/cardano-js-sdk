@@ -32,8 +32,8 @@ export abstract class HttpService extends RunnableModule {
 
     router.use(OpenApiValidator.middleware({ apiSpec: this.openApiPath, ...openApiOption }));
 
-    const healthHandler = async (req: express.Request, res: express.Response) => {
-      logger.debug('/health', { ip: req.ip });
+    const healthHandler = async (_: express.Request, res: express.Response) => {
+      logger.debug('/health');
       let body: HealthCheckResponse | Error['message'];
       try {
         body = await this.healthCheck();
