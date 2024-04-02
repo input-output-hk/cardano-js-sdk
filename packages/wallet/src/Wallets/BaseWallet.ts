@@ -28,6 +28,7 @@ import {
   createAddressTracker,
   createAssetsTracker,
   createBalanceTracker,
+  createDRepRegistrationTracker,
   createDelegationTracker,
   createHandlesTracker,
   createProviderStatusTracker,
@@ -89,7 +90,7 @@ import {
 import { Bip32Account, GroupedAddress, WitnessedTx, Witnesser, cip8, util } from '@cardano-sdk/key-management';
 import { ChangeAddressResolver, InputSelector, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
-import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
+import { Ed25519PublicKey, Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 import {
   GenericTxBuilder,
   InitializeTxProps,
@@ -210,6 +211,8 @@ const processOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | WitnessedTx
     id: input.id
   };
 };
+const getDRepKeyHash = async (dRepKey: Ed25519PublicKeyHex | undefined) =>
+  dRepKey ? (await Ed25519PublicKey.fromHex(dRepKey).hash()).hex() : undefined;
 
 export class BaseWallet implements ObservableWallet {
   #inputSelector: InputSelector;
@@ -254,6 +257,9 @@ export class BaseWallet implements ObservableWallet {
   readonly handleProvider: HandleProvider;
   readonly changeAddressResolver: ChangeAddressResolver;
   readonly publicStakeKeys$: TrackerSubject<PubStakeKeyAndStatus[]>;
+  readonly governance: {
+    readonly isRegisteredAsDRep$: Observable<boolean>;
+  };
   handles$: Observable<HandleInfo[]>;
 
   // eslint-disable-next-line max-statements
@@ -551,7 +557,12 @@ export class BaseWallet implements ObservableWallet {
       utxo: this.utxo
     });
 
-    this.getPubDRepKey().catch(() => void 0);
+    this.governance = {
+      isRegisteredAsDRep$: createDRepRegistrationTracker({
+        historyTransactions$: this.transactions.history$,
+        pubDRepKeyHash$: from(this.getPubDRepKey().then(getDRepKeyHash))
+      })
+    };
 
     this.#logger.debug('Created');
   }

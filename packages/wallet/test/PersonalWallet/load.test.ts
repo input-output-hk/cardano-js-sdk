@@ -200,6 +200,9 @@ const assertWalletProperties = async (
     : expect(firstValueFrom(wallet.handles$)).rejects.toThrowError(InvalidConfigurationError));
   // inputAddressResolver
   expect(typeof wallet.util).toBe('object');
+  expect(typeof wallet.governance).toBe('object');
+  // isRegisteredAsDRep$
+  expect(typeof (await firstValueFrom(wallet.governance.isRegisteredAsDRep$))).toBe('boolean');
 };
 
 const assertWalletProperties2 = async (wallet: ObservableWallet) => {

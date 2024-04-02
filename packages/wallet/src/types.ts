@@ -84,6 +84,10 @@ export interface ObservableWallet {
   readonly addresses$: Observable<WalletAddress[]>;
   readonly publicStakeKeys$: Observable<PubStakeKeyAndStatus[]>;
   readonly handles$: Observable<HandleInfo[]>;
+  readonly governance: {
+    /** true this wallet is registered as drep */
+    readonly isRegisteredAsDRep$: Observable<boolean>;
+  };
   /** All owned and historical assets */
   readonly assetInfo$: Observable<Assets>;
   /**
