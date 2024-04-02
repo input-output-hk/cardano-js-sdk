@@ -31,7 +31,7 @@
     "cleanup": "rm -rf dist node_modules",
     "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint:fix": "yarn lint --fix",
-    "test": "jest -c ./jest.config.js",
+    "test": "jest -c ./jest.config.js --passWithNoTests",
     "test:build:verify": "tsc --build ./test",
     "test:e2e": "echo 'test:e2e' command not implemented yet",
     "coverage": "echo No coverage report for this package",
