@@ -1,3 +1,5 @@
+/* eslint-disable sonarjs/cognitive-complexity */
+/* eslint-disable sonarjs/no-duplicate-string */
 import {
   APIErrorCode,
   ApiError,
@@ -75,6 +77,7 @@ export type CallbackConfirmation = {
   signTx: (args: SignTxCallbackParams) => Promise<boolean>;
   submitTx: (args: SubmitTxCallbackParams) => Promise<boolean>;
   getCollateral?: GetCollateralCallback;
+  onNoWalletError?: (error: ApiError) => void;
 };
 
 const mapCallbackFailure = (err: unknown, logger: Logger) => {
@@ -253,7 +256,7 @@ const getSortedUtxos = async (observableUtxos: Observable<Cardano.Utxo[]>): Prom
 };
 
 const baseCip30WalletApi = (
-  wallet$: Observable<ObservableWallet>,
+  wallet$: Observable<ObservableWallet | null>,
   confirmationCallback: CallbackConfirmation,
   { logger }: Cip30WalletDependencies
 ) => ({
@@ -261,8 +264,14 @@ const baseCip30WalletApi = (
     logger.debug('getting balance');
     try {
       const wallet = await firstValueFrom(wallet$);
-      const value = await firstValueFrom(wallet.balance.utxo.available$);
-      return Serialization.Value.fromCore(value).toCbor();
+      if (!wallet) {
+        const error = new ApiError(APIErrorCode.Refused, "You don't have a wallet right now");
+        confirmationCallback.onNoWalletError?.(error);
+        throw error;
+      } else {
+        const value = await firstValueFrom(wallet.balance.utxo.available$);
+        return Serialization.Value.fromCore(value).toCbor();
+      }
     } catch (error) {
       logger.error(error);
       throw error;
@@ -272,6 +281,11 @@ const baseCip30WalletApi = (
     logger.debug('getting changeAddress');
     try {
       const wallet = await firstValueFrom(wallet$);
+      if (!wallet) {
+        const error = new ApiError(APIErrorCode.Refused, "You don't have a wallet right now");
+        confirmationCallback.onNoWalletError?.(error);
+        throw error;
+      }
       const [{ address }] = await firstValueFrom(wallet.addresses$);
 
       if (!address) {
@@ -298,6 +312,11 @@ const baseCip30WalletApi = (
   > => {
     logger.debug('getting collateral');
     const wallet = await firstValueFrom(wallet$);
+    if (!wallet) {
+      const error = new ApiError(APIErrorCode.Refused, "You don't have a wallet right now");
+      confirmationCallback.onNoWalletError?.(error);
+      throw error;
+    }
     let unspendables = await getSortedUtxos(wallet.utxo.unspendable$);
     const available = await getSortedUtxos(wallet.utxo.available$);
     // No available unspendable UTxO
@@ -363,6 +382,11 @@ const baseCip30WalletApi = (
   getNetworkId: async (): Promise<Cardano.NetworkId> => {
     logger.debug('getting networkId');
     const wallet = await firstValueFrom(wallet$);
+    if (!wallet) {
+      const error = new ApiError(APIErrorCode.Refused, "You don't have a wallet right now");
+      confirmationCallback.onNoWalletError?.(error);
+      throw error;
+    }
     const genesisParameters = await firstValueFrom(wallet.genesisParameters$);
     return genesisParameters.networkId;
   },
@@ -370,6 +394,11 @@ const baseCip30WalletApi = (
     logger.debug('getting reward addresses');
     try {
       const wallet = await firstValueFrom(wallet$);
+      if (!wallet) {
+        const error = new ApiError(APIErrorCode.Refused, "You don't have a wallet right now");
+        confirmationCallback.onNoWalletError?.(error);
+        throw error;
+      }
       const walletAddresses = await firstValueFrom(wallet.addresses$);
       const rewardAccounts = uniq(walletAddresses.map((address) => address.rewardAccount));
 
@@ -394,6 +423,11 @@ const baseCip30WalletApi = (
     logger.debug('getting used addresses');
 
     const wallet = await firstValueFrom(wallet$);
+    if (!wallet) {
+      const error = new ApiError(APIErrorCode.Refused, "You don't have a wallet right now");
+      confirmationCallback.onNoWalletError?.(error);
+      throw error;
+    }
     const addresses = await firstValueFrom(wallet.addresses$);
 
     if (addresses.length === 0) {
@@ -406,6 +440,11 @@ const baseCip30WalletApi = (
     const scope = new ManagedFreeableScope();
     try {
       const wallet = await firstValueFrom(wallet$);
+      if (!wallet) {
+        const error = new ApiError(APIErrorCode.Refused, "You don't have a wallet right now");
+        confirmationCallback.onNoWalletError?.(error);
+        throw error;
+      }
       let utxos = amount
         ? await selectUtxo(wallet, parseValueCbor(amount).toCore(), !!paginate)
         : await firstValueFrom(wallet.utxo.available$);
@@ -442,6 +481,11 @@ const baseCip30WalletApi = (
 
     if (shouldProceed) {
       const wallet = await firstValueFrom(wallet$);
+      if (!wallet) {
+        const error = new ApiError(APIErrorCode.Refused, "You don't have a wallet right now");
+        confirmationCallback.onNoWalletError?.(error);
+        throw error;
+      }
       return wallet.signData({
         payload: hexBlobPayload,
         sender,
@@ -467,6 +511,11 @@ const baseCip30WalletApi = (
       .catch((error) => mapCallbackFailure(error, logger));
     if (shouldProceed) {
       const wallet = await firstValueFrom(wallet$);
+      if (!wallet) {
+        const error = new ApiError(APIErrorCode.Refused, "You don't have a wallet right now");
+        confirmationCallback.onNoWalletError?.(error);
+        throw error;
+      }
       try {
         const needsForeignSignature = await requiresForeignSignatures(coreTx, wallet);
 
@@ -520,6 +569,11 @@ const baseCip30WalletApi = (
     if (shouldProceed) {
       try {
         const wallet = await firstValueFrom(wallet$);
+        if (!wallet) {
+          const error = new ApiError(APIErrorCode.Refused, "You don't have a wallet right now");
+          confirmationCallback.onNoWalletError?.(error);
+          throw error;
+        }
         await wallet.submitTx(cbor);
         return tx.id;
       } catch (error) {
