@@ -52,9 +52,9 @@
   },
   "dependencies": {
     "@cardano-sdk/core": "workspace:~",
+    "@cardano-sdk/key-management": "workspace:~",
     "@cardano-sdk/util": "workspace:~",
     "@cardano-sdk/wallet": "workspace:~",
-    "@cardano-sdk/key-management": "workspace:~",
     "lodash": "^4.17.21",
     "rxjs": "^7.4.0",
     "ts-custom-error": "^3.2.0",
