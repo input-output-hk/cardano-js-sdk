@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.30.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.29.0...@cardano-sdk/core@0.30.0) (2024-03-26)
+
+### ⚠ BREAKING CHANGES
+
+* **core:** redeemers accepts and encodes as map or array
+* encapsulate `set` fields in CborSet
+
+### Features
+
+* add fuzzy search on stake pool metadata ([34446ac](https://github.com/input-output-hk/cardano-js-sdk/commit/34446ac87e0d6d8aaf0d732aaaa4cbb946649141))
+* add sort by ticker to stake pool search ([2168d9e](https://github.com/input-output-hk/cardano-js-sdk/commit/2168d9e7952d2d926538608ff7977d8e5e9cd178))
+* **core:** add voting and proposing RedeemerTags ([f21e68d](https://github.com/input-output-hk/cardano-js-sdk/commit/f21e68dd97dcfe543bdb2dbe309bee95e552137a))
+* **core:** new CborSet<T> wraps Mathematical finite set ([3fdd115](https://github.com/input-output-hk/cardano-js-sdk/commit/3fdd115cef815d6c595b2eb7a4486eba1ad437e9))
+* **core:** redeemers accepts and encodes as map or array ([e075e63](https://github.com/input-output-hk/cardano-js-sdk/commit/e075e6366f8516bfc2329a66b4da4242ebe40c6f)), closes [/github.com/IntersectMBO/cardano-ledger/blob/master/eras/conway/impl/cddl-files/conway.cddl#L480](https://github.com/input-output-hk//github.com/IntersectMBO/cardano-ledger/blob/master/eras/conway/impl/cddl-files/conway.cddl/issues/L480)
+* encapsulate `set` fields in CborSet ([06269ab](https://github.com/input-output-hk/cardano-js-sdk/commit/06269abaa323b20931ba6505a0c5aa244d21e783)), closes [/github.com/IntersectMBO/cardano-ledger/blob/master/eras/conway/impl/cddl-files/extra.cddl#L5](https://github.com/input-output-hk//github.com/IntersectMBO/cardano-ledger/blob/master/eras/conway/impl/cddl-files/extra.cddl/issues/L5)
+
 ## [0.29.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.28.5...@cardano-sdk/core@0.29.0) (2024-03-12)
 
 ### ⚠ BREAKING CHANGES

@@ -139,14 +139,14 @@ export class HttpServer extends RunnableModule {
       })
     );
 
-    const serverMetadataHandler = async (req: express.Request, res: express.Response) => {
-      this.logger.debug('/meta', { ip: req.ip });
+    const serverMetadataHandler = async (_: express.Request, res: express.Response) => {
+      this.logger.debug('/meta');
       return HttpServer.sendJSON(res, this.#config.meta);
     };
 
     const handlers = {
-      health: async (req: express.Request, res: express.Response) => {
-        this.logger.debug('/health', { ip: req.ip });
+      health: async (_: express.Request, res: express.Response) => {
+        this.logger.debug('/health');
         let health: ServicesHealthCheckResponse | Error['message'];
         try {
           health = await this.#getServicesHealth();
@@ -156,13 +156,13 @@ export class HttpServer extends RunnableModule {
           return HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, error), 500);
         }
       },
-      live: async (req: express.Request, res: express.Response) => {
-        this.logger.debug('/live', { ip: req.ip });
+      live: async (_: express.Request, res: express.Response) => {
+        this.logger.debug('/live');
         return res.sendStatus(200);
       },
       meta: serverMetadataHandler,
-      ready: async (req: express.Request, res: express.Response) => {
-        this.logger.debug('/ready', { ip: req.ip });
+      ready: async (_: express.Request, res: express.Response) => {
+        this.logger.debug('/ready');
         let health: ServicesHealthCheckResponse | Error['message'];
         try {
           health = await this.#getServicesHealth();

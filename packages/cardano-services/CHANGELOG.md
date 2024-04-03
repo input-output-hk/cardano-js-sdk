@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.27.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.26.6...@cardano-sdk/cardano-services@0.27.0) (2024-03-26)
+
+### ⚠ BREAKING CHANGES
+
+* **cardnao-services:** txSubmitApiProvider can now optionally take an axios adapter in its constructor
+
+### Features
+
+* add fuzzy search on stake pool metadata ([34446ac](https://github.com/input-output-hk/cardano-js-sdk/commit/34446ac87e0d6d8aaf0d732aaaa4cbb946649141))
+* add sort by ticker to stake pool search ([2168d9e](https://github.com/input-output-hk/cardano-js-sdk/commit/2168d9e7952d2d926538608ff7977d8e5e9cd178))
+* **cardnao-services:** txSubmitApiProvider can now optionally take an axios adapter in its constructor ([afcc82c](https://github.com/input-output-hk/cardano-js-sdk/commit/afcc82cdf4eb7249468be65c77e2e2a66d097b2c))
+
 ## [0.26.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.26.5...@cardano-sdk/cardano-services@0.26.6) (2024-03-12)
 
 ### Bug Fixes

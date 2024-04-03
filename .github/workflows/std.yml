@@ -13,6 +13,11 @@ on:
         type: boolean
         required: true
         default: false
+      deploy-staging-preprod:
+        description: Deploy to staging-preprod
+        type: boolean
+        required: true
+        default: false
       deploy-dev-mainnet:
         description: Deploy to dev-mainnet
         type: boolean
@@ -28,8 +33,18 @@ on:
       deploy-dev-preprod:
         type: boolean
         required: true
+      deploy-staging-preprod:
+        type: boolean
+        required: true
       deploy-dev-mainnet:
         type: boolean
+        required: true
+    secrets:
+      AWS_ACCESS_KEY:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      SSH_PRIVATE_KEY:
         required: true
   pull_request:
     branches:
@@ -50,6 +65,8 @@ concurrency:
   cancel-in-progress: true
 jobs:
   discover:
+    # Don’t run on PRs from forks (no access to secrets):
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     outputs:
       hits: ${{ steps.discovery.outputs.hits }}
       deployment-matrix: ${{ steps.deployment-matrix.outputs.deployment-matrix }}
@@ -93,7 +110,10 @@ jobs:
               echo '{"environment":"dev-sanchonet", "target":"dev-sanchonet@us-east-1@v1",    "url": "https://dev-sanchonet.lw.iog.io/"}'
             fi
             if [ "true" == ${{ inputs.deploy-dev-preprod || false }} ] ; then
-              echo '{"environment":"dev-preprod", "target":"dev-preprod@us-east-1@v1", "url": "https://dev-preprod.lw.iog.io/"}'
+              echo '{"environment":"dev-preprod", "target":"dev-preprod@us-east-1@v2", "url": "https://dev-preprod.lw.iog.io/"}'
+            fi
+            if [ "true" == ${{ inputs.deploy-staging-preprod || false }} ] ; then
+              echo '{"environment":"staging-preprod", "target":"staging-preprod@us-east-1@v2", "url": "https://staging-preprod.lw.iog.io/"}'
             fi
             if [ "true" == ${{ inputs.deploy-dev-mainnet || false }} ] ; then
               echo '{"environment":"dev-mainnet", "target":"dev-mainnet@us-east-1",    "url": "https://dev-mainnet.lw.iog.io/"}'

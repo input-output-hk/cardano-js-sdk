@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.17.10...@cardano-sdk/cardano-services-client@0.18.0) (2024-03-26)
+
+### ⚠ BREAKING CHANGES
+
+* **cardnao-services:** txSubmitApiProvider can now optionally take an axios adapter in its constructor
+
+### Features
+
+* **cardnao-services:** txSubmitApiProvider can now optionally take an axios adapter in its constructor ([afcc82c](https://github.com/input-output-hk/cardano-js-sdk/commit/afcc82cdf4eb7249468be65c77e2e2a66d097b2c))
+
 ## [0.17.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.17.9...@cardano-sdk/cardano-services-client@0.17.10) (2024-03-12)
 
 ### Features

@@ -40,6 +40,8 @@ const distributeAssets = (
 
   let i = 0;
   const availableOutputs = adjustedOutputs;
+  const alreadyFullOutputs = [];
+
   while (totalAssets.size > 0) {
     const splicedAsset = new Map([...totalAssets.entries()].splice(0, 1));
     const currentUtxoIndex = i % availableOutputs.length;
@@ -48,7 +50,7 @@ const distributeAssets = (
     currentValue.assets = addTokenMaps(currentValue.assets, splicedAsset);
 
     if (!isValidValue(currentValue, computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit, fee)) {
-      availableOutputs.splice(currentUtxoIndex, 1);
+      alreadyFullOutputs.push(...availableOutputs.splice(currentUtxoIndex, 1));
     } else {
       availableOutputs[currentUtxoIndex].value = currentValue;
       totalAssets.delete([...splicedAsset.keys()][0]);
@@ -58,7 +60,7 @@ const distributeAssets = (
     ++i;
   }
 
-  return adjustedOutputs;
+  return [...adjustedOutputs, ...alreadyFullOutputs];
 };
 
 /**

@@ -9,5 +9,12 @@ jobs:
     if: startsWith(github.event.release.name, '@cardano-sdk/cardano-services@')
     uses: ./.github/workflows/std.yml
     with:
+      # staging-* is deployed, with the versions and services identical to dev-*, at the start of the Lace release process:
+      deploy-staging-preprod: false
       deploy-dev-preprod: true
       deploy-dev-mainnet: true
+    # Secrets have to be passed explicitly even if callee is in the same repo:
+    secrets:
+      AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}

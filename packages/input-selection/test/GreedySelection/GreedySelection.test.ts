@@ -618,4 +618,154 @@ describe('GreedySelection', () => {
       utxo
     });
   });
+
+  it('correctly distributes native assets when not all outputs can hold assets', async () => {
+    const selector = new GreedyInputSelector({
+      getChangeAddresses: async () =>
+        new Map([
+          [asPaymentAddress('X'), 1],
+          [asPaymentAddress('Y'), 1]
+        ])
+    });
+
+    const utxo = new Set([
+      TxTestUtil.createUnspentTxOutput({
+        assets: asTokenMap([
+          [asAssetId('0'), 1500n],
+          [asAssetId('2'), 1500n],
+          [asAssetId('3'), 1500n],
+          [asAssetId('4'), 1500n],
+          [asAssetId('5'), 1500n],
+          [asAssetId('6'), 1500n],
+          [asAssetId('7'), 1500n],
+          [asAssetId('8'), 1500n],
+          [asAssetId('9'), 1500n],
+          [asAssetId('10'), 1500n],
+          [asAssetId('11'), 1500n],
+          [asAssetId('12'), 1500n],
+          [asAssetId('13'), 1500n],
+          [asAssetId('14'), 1500n],
+          [asAssetId('15'), 1500n]
+        ]),
+        coins: 7_500_000n
+      }),
+      TxTestUtil.createUnspentTxOutput({
+        coins: 7_500_000n
+      })
+    ]);
+
+    const outputs = new Set<Cardano.TxOut>();
+    const implicitValue = {
+      coin: { deposit: 4_000_000n }
+    };
+    const constraints = mockConstraintsToConstraints({
+      ...MOCK_NO_CONSTRAINTS,
+      minimumCoinQuantity: 500_000n
+    });
+
+    constraints.computeMinimumCoinQuantity = (output: Cardano.TxOut) =>
+      BigInt(output.value.assets ? output.value.assets?.size : 1n) * 500_000n;
+
+    const results = await selector.select({
+      constraints,
+      implicitValue,
+      outputs,
+      utxo
+    });
+
+    const {
+      remainingUTxO,
+      selection: { change, inputs }
+    } = results;
+
+    expect(inputs).toEqual(utxo);
+    expect(remainingUTxO.size).toEqual(0);
+    expect(getCoinValueForAddress('X', change)).toEqual(5_500_000n);
+    expect(getCoinValueForAddress('Y', change)).toEqual(5_500_000n);
+
+    expect(change).toEqual([
+      {
+        address: 'X',
+        value: {
+          assets: asTokenMap([
+            [asAssetId('0'), 1500n],
+            [asAssetId('9'), 1500n],
+            [asAssetId('13'), 1500n]
+          ]),
+          coins: 2_750_000n
+        }
+      },
+      {
+        address: 'Y',
+        value: {
+          assets: asTokenMap([
+            [asAssetId('2'), 1500n],
+            [asAssetId('10'), 1500n],
+            [asAssetId('14'), 1500n],
+            [asAssetId('15'), 1500n]
+          ]),
+          coins: 2_750_000n
+        }
+      },
+      {
+        address: 'X',
+        value: {
+          assets: asTokenMap([
+            [asAssetId('3'), 1500n],
+            [asAssetId('11'), 1500n]
+          ]),
+          coins: 1_375_000n
+        }
+      },
+      {
+        address: 'Y',
+        value: {
+          assets: asTokenMap([
+            [asAssetId('4'), 1500n],
+            [asAssetId('12'), 1500n]
+          ]),
+          coins: 1_375_000n
+        }
+      },
+      {
+        address: 'Y',
+        value: {
+          assets: asTokenMap([[asAssetId('7'), 1500n]]),
+          coins: 687_500n
+        }
+      },
+      {
+        address: 'X',
+        value: {
+          assets: asTokenMap([[asAssetId('5'), 1500n]]),
+          coins: 687_500n
+        }
+      },
+      {
+        address: 'Y',
+        value: {
+          assets: asTokenMap([[asAssetId('8'), 1500n]]),
+          coins: 687_500n
+        }
+      },
+      {
+        address: 'X',
+        value: {
+          assets: asTokenMap([[asAssetId('6'), 1500n]]),
+          coins: 687_500n
+        }
+      }
+    ]);
+
+    assertInputSelectionProperties({
+      constraints: {
+        ...MOCK_NO_CONSTRAINTS,
+        minimumCoinQuantity: 500_000n
+      },
+      implicitValue,
+      outputs,
+      results,
+      utxo
+    });
+  });
 });

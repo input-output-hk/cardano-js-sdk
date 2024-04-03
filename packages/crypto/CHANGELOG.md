@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.22](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.1.21...@cardano-sdk/crypto@0.1.22) (2024-03-26)
+
+### Bug Fixes
+
+* **crypto:** replace variable in keylength error message ([8fe30e7](https://github.com/input-output-hk/cardano-js-sdk/commit/8fe30e7afec160226e3151946981e82fcaad3a68))
+
 ## [0.1.21](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.1.20...@cardano-sdk/crypto@0.1.21) (2024-02-12)
 
 **Note:** Version bump only for package @cardano-sdk/crypto
