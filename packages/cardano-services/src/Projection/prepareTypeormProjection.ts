@@ -250,7 +250,7 @@ const storeMapperDependencies: Partial<Record<StoreName, MapperName[]>> = {
 };
 
 const storeInterDependencies: Partial<Record<StoreName, StoreName[]>> = {
-  storeAddresses: ['storeStakeKeyRegistrations'],
+  storeAddresses: ['storeBlock', 'storeStakeKeyRegistrations'],
   storeAssets: ['storeBlock'],
   storeHandleMetadata: ['storeUtxo'],
   storeHandles: ['storeUtxo', 'storeAddresses', 'storeHandleMetadata'],
