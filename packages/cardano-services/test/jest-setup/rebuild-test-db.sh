@@ -22,7 +22,7 @@ yarn workspace @cardano-sdk/e2e local-network:up -d --build
 yarn workspace @cardano-sdk/e2e wait-for-network
 
 yarn workspace @cardano-sdk/e2e test:wallet
-yarn workspace @cardano-sdk/e2e test:long-running delegation-rewards.test.ts
+yarn workspace @cardano-sdk/e2e test:long-running simple-delegation-rewards.test.ts
 yarn workspace @cardano-sdk/e2e test:local-network register-pool.test.ts
 
 TL_LEVEL="${TL_LEVEL:=info}" node "$SCRIPT_DIR/mint-handles.js"
