@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.26.0...@cardano-sdk/web-extension@0.26.1) (2024-04-03)
+
+### Features
+
+* **tx-construction:** add setValidityInterval to txBuilder ([52102b0](https://github.com/input-output-hk/cardano-js-sdk/commit/52102b0dc3053832b99846dbbd5d87bdd19dd57f))
+
 ## [0.26.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.25.0...@cardano-sdk/web-extension@0.26.0) (2024-03-26)
 
 ### ⚠ BREAKING CHANGES
