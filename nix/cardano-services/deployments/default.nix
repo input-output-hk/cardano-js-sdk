@@ -492,6 +492,7 @@ in
         providers = {
           backend = {
             enabled = true;
+            env.NODE_ENV = "production";
           };
         };
 
@@ -515,13 +516,53 @@ in
             "/v2.0.0/tx-submit"
             "/v2.0.0/utxo"
           ];
-          blockfrost-worker.enabled = true;
+          # blockfrost-worker.enabled = true;
           cardano-services = {
             ingresOrder = 99;
             image = "926093910549.dkr.ecr.us-east-1.amazonaws.com/cardano-services:s8j5nx9x2naar194pr58kpmlr5s4xn7b";
           };
         };
       };
+
+      "live-preprod@us-east-2@v2" = final: {
+        name = "${final.namespace}-cardanojs-v2";
+        namespace = "live-preprod";
+        context = "eks-admin";
+
+        providers = {
+          backend = {
+            enabled = true;
+            env.NODE_ENV = "production";
+          };
+          stake-pool-provider = {
+            enabled = true;
+            env.OVERRIDE_FUZZY_OPTIONS = "true";
+            env.NODE_ENV = "production";
+          };
+          handle-provider = {
+            enabled = true;
+            env.NODE_ENV = "production";
+          };
+        };
+
+        projectors = {
+          handle.enabled = true;
+          stake-pool.enabled = true;
+        };
+
+        values = {
+          network = "preprod";
+          region = "us-east-2";
+
+          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
+          blockfrost-worker.enabled = true;
+          pg-boss-worker.enabled = true;
+          cardano-services = {
+            ingresOrder = 98;
+          };
+        };
+      };
+
 
       "live-preview@us-east-2@v1" = final: {
         name = "${final.namespace}-cardanojs-v1";
@@ -531,6 +572,7 @@ in
         providers = {
           backend = {
             enabled = true;
+            env.NODE_ENV = "production";
           };
         };
 
@@ -554,10 +596,49 @@ in
             "/v2.0.0/tx-submit"
             "/v2.0.0/utxo"
           ];
-          blockfrost-worker.enabled = true;
+          # blockfrost-worker.enabled = true;
           cardano-services = {
             ingresOrder = 99;
             image = "926093910549.dkr.ecr.us-east-1.amazonaws.com/cardano-services:s8j5nx9x2naar194pr58kpmlr5s4xn7b";
+          };
+        };
+      };
+
+      "live-preview@us-east-2@v2" = final: {
+        name = "${final.namespace}-cardanojs-v2";
+        namespace = "live-preview";
+        context = "eks-admin";
+
+        providers = {
+          backend = {
+            enabled = true;
+            env.NODE_ENV = "production";
+          };
+          stake-pool-provider = {
+            enabled = true;
+            env.OVERRIDE_FUZZY_OPTIONS = "true";
+            env.NODE_ENV = "production";
+          };
+          handle-provider = {
+            enabled = true;
+            env.NODE_ENV = "production";
+          };
+        };
+
+        projectors = {
+          handle.enabled = true;
+          stake-pool.enabled = true;
+        };
+
+        values = {
+          network = "preview";
+          region = "us-east-2";
+
+          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
+          blockfrost-worker.enabled = true;
+          pg-boss-worker.enabled = true;
+          cardano-services = {
+            ingresOrder = 98;
           };
         };
       };
@@ -610,6 +691,7 @@ in
             env.USE_SUBMIT_API = "true";
             env.USE_BLOCKFROST = lib.mkForce "false";
             env.SUBMIT_API_URL = "http://${final.namespace}-cardano-stack.${final.namespace}.svc.cluster.local:8090";
+            env.NODE_ENV = "production";
           };
           stake-pool-provider.enabled = true;
         };
