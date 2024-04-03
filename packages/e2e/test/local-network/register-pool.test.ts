@@ -7,6 +7,7 @@ import {
   getEnv,
   getWallet,
   submitCertificate,
+  unDelegateWallet,
   waitForWalletStateSettle,
   walletReady,
   walletVariables
@@ -73,6 +74,8 @@ describe('local-network/register-pool', () => {
     wallet1.wallet.shutdown();
     wallet2.wallet.shutdown();
   });
+
+  beforeEach(() => unDelegateWallet(wallet1.wallet));
 
   test('does not meet pledge', async () => {
     const wallet = wallet1.wallet;

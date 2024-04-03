@@ -75,7 +75,7 @@ const getPoolIds = async (stakePoolProvider: StakePoolProvider, count: number) =
   return poolIds;
 };
 
-describe('delegation rewards', () => {
+describe('simple delegation rewards', () => {
   let providers: TestWallet['providers'];
   let wallet1: BaseWallet;
   let wallet2: BaseWallet;
