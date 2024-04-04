@@ -15,7 +15,11 @@ import { versionPathFromSpec } from '../util/openApi';
 import express, { Router } from 'express';
 import path from 'path';
 
-const openApiOption = { ignoreUndocumented: true, validateRequests: true, validateResponses: true };
+const openApiOption = {
+  ignoreUndocumented: true,
+  validateRequests: true,
+  validateResponses: process.env.NODE_ENV !== 'production'
+};
 
 export abstract class HttpService extends RunnableModule {
   public router: express.Router;
