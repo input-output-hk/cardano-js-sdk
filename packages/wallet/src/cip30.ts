@@ -564,7 +564,7 @@ const extendedCip95WalletApi = (
     logger.debug('getting public DRep key');
     try {
       const wallet = await firstValueFrom(wallet$);
-      const dReKey = await wallet.getPubDRepKey();
+      const dReKey = await wallet.governance.getPubDRepKey();
 
       if (!dReKey) throw new Error('Shared wallet does not support DRep key');
 

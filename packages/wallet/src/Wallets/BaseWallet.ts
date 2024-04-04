@@ -259,6 +259,7 @@ export class BaseWallet implements ObservableWallet {
   readonly publicStakeKeys$: TrackerSubject<PubStakeKeyAndStatus[]>;
   readonly governance: {
     readonly isRegisteredAsDRep$: Observable<boolean>;
+    getPubDRepKey(): Promise<Ed25519PublicKeyHex | undefined>;
   };
   handles$: Observable<HandleInfo[]>;
 
@@ -557,10 +558,19 @@ export class BaseWallet implements ObservableWallet {
       utxo: this.utxo
     });
 
+    const getPubDRepKey = async (): Promise<Ed25519PublicKeyHex | undefined> => {
+      if (isBip32PublicCredentialsManager(this.#publicCredentialsManager)) {
+        return (await this.#publicCredentialsManager.bip32Account.derivePublicKey(util.DREP_KEY_DERIVATION_PATH)).hex();
+      }
+
+      return undefined;
+    };
+
     this.governance = {
+      getPubDRepKey,
       isRegisteredAsDRep$: createDRepRegistrationTracker({
         historyTransactions$: this.transactions.history$,
-        pubDRepKeyHash$: from(this.getPubDRepKey().then(getDRepKeyHash))
+        pubDRepKeyHash$: from(getPubDRepKey().then(getDRepKeyHash))
       })
     };
 
@@ -584,7 +594,7 @@ export class BaseWallet implements ObservableWallet {
     witness
   }: FinalizeTxProps): Promise<Cardano.Tx> {
     const knownAddresses = await firstValueFrom(this.addresses$);
-    const dRepPublicKey = await this.getPubDRepKey();
+    const dRepPublicKey = await this.governance.getPubDRepKey();
 
     const context = {
       ...signingContext,
@@ -790,14 +800,6 @@ export class BaseWallet implements ObservableWallet {
     }
 
     throw new Error('getPubDRepKey is not supported by script wallets');
-  }
-
-  async getPubDRepKey(): Promise<Ed25519PublicKeyHex | undefined> {
-    if (isBip32PublicCredentialsManager(this.#publicCredentialsManager)) {
-      return (await this.#publicCredentialsManager.bip32Account.derivePublicKey(util.DREP_KEY_DERIVATION_PATH)).hex();
-    }
-
-    return undefined;
   }
 
   async discoverAddresses(): Promise<GroupedAddress[]> {
