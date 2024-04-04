@@ -57,7 +57,8 @@
     "@cardano-sdk/util": "workspace:~",
     "@ledgerhq/hw-transport": "^6.28.1",
     "@ledgerhq/hw-transport-node-hid-noevents": "^6.27.12",
-    "@ledgerhq/hw-transport-webhid": "^6.27.12",
+    "@ledgerhq/hw-transport-webusb": "^6.27.12",
+    "node-hid": "^2.1.2",
     "ts-custom-error": "^3.2.0",
     "ts-log": "^2.2.4"
   },

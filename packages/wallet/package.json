@@ -46,6 +46,7 @@
     "@cardano-sdk/cardano-services-client": "workspace:~",
     "@cardano-sdk/ogmios": "workspace:~",
     "@cardano-sdk/util-dev": "workspace:~",
+    "@ledgerhq/hw-transport-node-hid-noevents": "^6.27.12",
     "@types/node-hid": "^1.3.1",
     "@types/pouchdb": "^6.4.0",
     "bunyan": "^1.8.15",
