@@ -117,6 +117,7 @@ in
         pg-boss-worker = {
           enabled = false;
           metadata-fetch-mode = "direct";
+          smash-url = "https://smash.cardano-mainnet.iohk.io/api/v1";
           resources.limits = mkPodResources "300Mi" "300m";
           resources.requests = mkPodResources "150Mi" "200m";
         };
@@ -211,6 +212,7 @@ in
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
           pg-boss-worker.metadata-fetch-mode = "smash";
+          pg-boss-worker.smash-url = "https://preview-smash.world.dev.cardano.org";
         };
       };
 
@@ -330,6 +332,7 @@ in
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
           pg-boss-worker.metadata-fetch-mode = "smash";
+          pg-boss-worker.smash-url = "https://smash.cardano-mainnet.iohk.io/api/v1";
         };
       };
 
@@ -347,6 +350,7 @@ in
         values = {
           network = "preprod";
           region = "us-east-1";
+
 
           backend.hostnames = ["${final.namespace}.${baseUrl}"];
           backend.passHandleDBArgs = false;
@@ -401,8 +405,11 @@ in
           backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
           backend.hostnames = ["${final.namespace}.${baseUrl}"];
 
-          blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
+          pg-boss-worker.metadata-fetch-mode = "smash";
+          pg-boss-worker.smash-url = "https://preprod-smash.world.dev.cardano.org/";
+
+          blockfrost-worker.enabled = true;
           cardano-services = {
             ingresOrder = 98;
           };
@@ -476,6 +483,8 @@ in
 
           backend.hostnames = ["${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
+          pg-boss-worker.metadata-fetch-mode = "direct";
+          pg-boss-worker.smash-url = "https://preprod-smash.world.dev.cardano.org/";
           pg-boss-worker.enabled = true;
           cardano-services = {
             ingresOrder = 98;
@@ -556,6 +565,8 @@ in
 
           backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
+          pg-boss-worker.metadata-fetch-mode = "direct";
+          pg-boss-worker.smash-url = "https://preprod-smash.world.dev.cardano.org/";
           pg-boss-worker.enabled = true;
           cardano-services = {
             ingresOrder = 98;
@@ -637,6 +648,8 @@ in
           backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
+          pg-boss-worker.metadata-fetch-mode = "direct";
+          pg-boss-worker.smash-url = "https://preview-smash.world.dev.cardano.org/";
           cardano-services = {
             ingresOrder = 98;
           };
@@ -705,6 +718,8 @@ in
           region = "us-east-2";
 
           blockfrost-worker.enabled = false;
+          pg-boss-worker.metadata-fetch-mode = "direct";
+					pg-boss-worker.smash-url = "https://sanchonet-smash.world.dev.cardano.org/";
           pg-boss-worker.enabled = true;
           backend.routes = let
               inherit (oci.meta) versions;
