@@ -604,6 +604,7 @@ in
 
         namespace = "live-sanchonet";
         name = "${final.namespace}-cardanojs-v1";
+        context = "eks-admin";
 
         providers = {
           backend = {
