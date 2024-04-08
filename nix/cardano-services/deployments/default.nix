@@ -242,6 +242,7 @@ in
           blockfrost-worker.enabled = false;
           pg-boss-worker.enabled = true;
 
+          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
           backend.routes = let
               inherit (oci.meta) versions;
@@ -624,6 +625,7 @@ in
 
           blockfrost-worker.enabled = false;
           pg-boss-worker.enabled = true;
+          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           backend.routes = let
               inherit (oci.meta) versions;
             in
