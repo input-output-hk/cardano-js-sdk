@@ -113,14 +113,12 @@ in
           resources.limits = mkPodResources "300Mi" "500m";
           resources.requests = mkPodResources "150Mi" "100m";
         };
-        pg-boss-worker =  let
-          smash-url = if values.network == "mainnet"
-                         then "https://smash.cardano-mainnet.iohk.io/api/v1"
-                         else "https://${values.network}-smash.world.dev.cardano.org/api/v1";
-        in {
+        pg-boss-worker = {
            enabled = false;
            metadata-fetch-mode = "smash";
-           smash-url = smash-url;
+           smash-url = if values.network == "mainnet"
+                         then "https://smash.cardano-mainnet.iohk.io/api/v1"
+                         else "https://${values.network}-smash.world.dev.cardano.org/api/v1";
            resources.limits = mkPodResources "300Mi" "300m";
            resources.requests = mkPodResources "150Mi" "200m";
         };
