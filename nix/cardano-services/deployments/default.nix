@@ -113,12 +113,14 @@ in
           resources.limits = mkPodResources "300Mi" "500m";
           resources.requests = mkPodResources "150Mi" "100m";
         };
-
         pg-boss-worker = {
-          enabled = false;
-          metadata-fetch-mode = "direct";
-          resources.limits = mkPodResources "300Mi" "300m";
-          resources.requests = mkPodResources "150Mi" "200m";
+           enabled = false;
+           metadata-fetch-mode = "smash";
+           smash-url = if values.network == "mainnet"
+                         then "https://smash.cardano-mainnet.iohk.io/api/v1"
+                         else "https://${values.network}-smash.world.dev.cardano.org/api/v1";
+           resources.limits = mkPodResources "300Mi" "300m";
+           resources.requests = mkPodResources "150Mi" "200m";
         };
 
         backend = {
@@ -210,7 +212,6 @@ in
 
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
-          pg-boss-worker.metadata-fetch-mode = "smash";
         };
       };
 
@@ -329,7 +330,6 @@ in
 
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
-          pg-boss-worker.metadata-fetch-mode = "smash";
         };
       };
 
@@ -347,6 +347,7 @@ in
         values = {
           network = "preprod";
           region = "us-east-1";
+
 
           backend.hostnames = ["${final.namespace}.${baseUrl}"];
           backend.passHandleDBArgs = false;
@@ -401,8 +402,9 @@ in
           backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
           backend.hostnames = ["${final.namespace}.${baseUrl}"];
 
-          blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
+
+          blockfrost-worker.enabled = true;
           cardano-services = {
             ingresOrder = 98;
           };
