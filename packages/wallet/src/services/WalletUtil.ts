@@ -296,7 +296,7 @@ export const requiresForeignSignatures = async (tx: Cardano.Tx, wallet: Observab
     })
     .filter((acct): acct is KeyManagementUtil.StakeKeySignerData => acct.derivationPath !== null);
 
-  const dRepKey = await wallet.getPubDRepKey();
+  const dRepKey = await wallet.governance.getPubDRepKey();
   const dRepKeyHash = dRepKey ? (await Crypto.Ed25519PublicKey.fromHex(dRepKey).hash()).hex() : undefined;
 
   return (
