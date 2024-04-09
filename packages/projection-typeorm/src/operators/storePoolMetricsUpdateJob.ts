@@ -5,11 +5,13 @@ import { typeormOperator } from './util';
 
 export const createStorePoolMetricsUpdateJob = (jobFrequency = 1000, jobOutdatedFrequency?: number) => {
   // Remember the blockNo of last sent job in order to no resend another job in case of rollback
-  let lastSentBlock: Cardano.BlockNo | undefined;
+  let lastAllSentBlock: Cardano.BlockNo | undefined;
+  let lastOutdatedSentBlock: Cardano.BlockNo | undefined;
   // Metrics updated before this slot is considered outdated
   let outdatedSlot: Cardano.Slot;
   let reachedTheTip = false;
 
+  // eslint-disable-next-line complexity
   return typeormOperator<WithPgBoss>(async ({ eventType, pgBoss, block: { header }, tip }) => {
     let insertFirstJob = false;
 
@@ -20,23 +22,31 @@ export const createStorePoolMetricsUpdateJob = (jobFrequency = 1000, jobOutdated
 
     const sendForAll = async () => {
       // run the update for all pools
-      lastSentBlock = blockNo;
+      lastAllSentBlock = blockNo;
+
+      if (lastOutdatedSentBlock === undefined) lastOutdatedSentBlock = blockNo;
+
       outdatedSlot = slot;
       await pgBoss.send(STAKE_POOL_METRICS_UPDATE, { slot }, { slot });
     };
 
     const sendForOutdated = async () => {
       // run the update for only pools with outdated metrics
-      lastSentBlock = blockNo;
+      lastOutdatedSentBlock = blockNo;
       await pgBoss.send(STAKE_POOL_METRICS_UPDATE, { outdatedSlot, slot }, { slot });
     };
 
     if (insertFirstJob) {
       await sendForAll();
-    } else if (blockNo !== lastSentBlock && reachedTheTip) {
-      if (blockNo % jobFrequency === 0) {
+    } else if ((blockNo !== lastAllSentBlock || blockNo !== lastOutdatedSentBlock) && reachedTheTip) {
+      if (lastAllSentBlock && blockNo - lastAllSentBlock >= jobFrequency) {
         await sendForAll();
-      } else if (jobOutdatedFrequency && outdatedSlot && blockNo % jobOutdatedFrequency === 0) {
+      } else if (
+        jobOutdatedFrequency &&
+        lastOutdatedSentBlock &&
+        outdatedSlot &&
+        blockNo - lastOutdatedSentBlock >= jobOutdatedFrequency
+      ) {
         await sendForOutdated();
       }
     }

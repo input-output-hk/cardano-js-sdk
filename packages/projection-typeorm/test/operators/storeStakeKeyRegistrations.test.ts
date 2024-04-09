@@ -9,12 +9,14 @@ import {
   storeBlock,
   storeStakeKeyRegistrations,
   typeormTransactionCommit,
+  willStoreStakeKeyRegistrations,
   withTypeormTransaction
 } from '../../src';
 import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { Observable, firstValueFrom, pairwise, takeWhile } from 'rxjs';
+import { StakeKeyRegistration } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
 import { connectionConfig$, initializeDataSource } from '../util';
 import {
   createProjectorContext,
@@ -91,5 +93,23 @@ describe('storeStakeKeyRegistrations', () => {
       }
     });
     expect(registration?.stakeKeyHash).toEqual(stakeKeyRegistrations[0].stakeKeyHash);
+  });
+});
+
+describe('willStoreStakeKeyRegistrations', () => {
+  it('returns true if stakeKeyRegistrations are bigger than 1', () => {
+    expect(
+      willStoreStakeKeyRegistrations({
+        stakeKeyRegistrations: [{} as StakeKeyRegistration]
+      })
+    ).toBeTruthy();
+  });
+
+  it('returns false if there are no stakeKeyRegistrations', () => {
+    expect(
+      willStoreStakeKeyRegistrations({
+        stakeKeyRegistrations: []
+      })
+    ).toBeFalsy();
   });
 });

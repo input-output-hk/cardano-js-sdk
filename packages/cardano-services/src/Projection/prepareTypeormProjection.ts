@@ -28,14 +28,24 @@ import {
   storeStakeKeyRegistrations,
   storeStakePoolRewardsJob,
   storeStakePools,
-  storeUtxo
+  storeUtxo,
+  willStoreAddresses,
+  willStoreAssets,
+  willStoreHandleMetadata,
+  willStoreHandles,
+  willStoreNftMetadata,
+  willStoreStakeKeyRegistrations,
+  willStoreStakePoolMetadataJob,
+  willStoreStakePoolRewardsJob,
+  willStoreStakePools,
+  willStoreUtxo
 } from '@cardano-sdk/projection-typeorm';
-import { Cardano } from '@cardano-sdk/core';
-import { Mappers as Mapper } from '@cardano-sdk/projection';
+import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { Mappers as Mapper, ProjectionEvent } from '@cardano-sdk/projection';
+import { ObservableType, passthrough } from '@cardano-sdk/util-rxjs';
 import { POOLS_METRICS_INTERVAL_DEFAULT, POOLS_METRICS_OUTDATED_INTERVAL_DEFAULT } from '../Program/programs/types';
 import { Sorter } from '@hapi/topo';
-import { WithLogger } from '@cardano-sdk/util';
-import { passthrough } from '@cardano-sdk/util-rxjs';
+import { WithLogger, isNotNil } from '@cardano-sdk/util';
 
 /** Used as mount segments, so must be URL-friendly */
 export enum ProjectionName {
@@ -117,6 +127,25 @@ export const storeOperators = {
 type StoreOperators = typeof storeOperators;
 type StoreName = keyof StoreOperators;
 type StoreOperator = StoreOperators[StoreName];
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type InferArg0<F extends Function> = F extends (arg0: infer Args) => any ? Args : never;
+type WillStore = {
+  [k in keyof StoreOperators]: (args: ObservableType<InferArg0<StoreOperators[k]>>) => boolean;
+};
+
+const willStore: Partial<WillStore> = {
+  storeAddresses: willStoreAddresses,
+  storeAssets: willStoreAssets,
+  storeHandleMetadata: willStoreHandleMetadata,
+  storeHandles: willStoreHandles,
+  storeNftMetadata: willStoreNftMetadata,
+  storeStakeKeyRegistrations: willStoreStakeKeyRegistrations,
+  storeStakePoolMetadataJob: willStoreStakePoolMetadataJob,
+  storeStakePoolRewardsJob: willStoreStakePoolRewardsJob,
+  storeStakePools: willStoreStakePools,
+  storeUtxo: willStoreUtxo
+};
 
 const entities = {
   address: AddressEntity,
@@ -221,7 +250,7 @@ const storeMapperDependencies: Partial<Record<StoreName, MapperName[]>> = {
 };
 
 const storeInterDependencies: Partial<Record<StoreName, StoreName[]>> = {
-  storeAddresses: ['storeStakeKeyRegistrations'],
+  storeAddresses: ['storeBlock', 'storeStakeKeyRegistrations'],
   storeAssets: ['storeBlock'],
   storeHandleMetadata: ['storeUtxo'],
   storeHandles: ['storeUtxo', 'storeAddresses', 'storeHandleMetadata'],
@@ -338,16 +367,24 @@ export const prepareTypeormProjection = (
   const selectedMappers = mapperSorter.nodes;
   const selectedStores = storeSorter.nodes;
   const extensions = requiredExtensions(projections);
+  const willStoreCheckers = selectedStores
+    .map((store) => Object.entries(storeOperators).find(([_, operator]) => store === operator)!)
+    .map(([storeName]) => willStore[storeName as keyof StoreOperators])
+    .filter(isNotNil);
   return {
     __debug: {
       entities: selectedEntities.map((Entity) => keyOf(entities, Entity)),
       mappers: selectedMappers.map((mapper) => keyOf(mapperOperators, mapper)),
-      stores: selectedStores.map((store) => keyOf(storeOperators, store))
+      stores: selectedStores.map((store) => keyOf(storeOperators, store)),
+      willStoreCheckers: willStoreCheckers.map((checker) => checker.name)
     },
     entities: selectedEntities,
     extensions,
     mappers: selectedMappers,
-    stores: selectedStores
+    stores: selectedStores,
+    willStore: <T extends ProjectionEvent>(evt: T) =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      evt.eventType === ChainSyncEventType.RollBackward || willStoreCheckers.some((check) => check(evt as any))
   };
 };
 

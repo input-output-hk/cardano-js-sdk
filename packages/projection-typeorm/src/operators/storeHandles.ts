@@ -230,6 +230,8 @@ const withTotalSupplies = (
     )
   );
 
+export const willStoreHandles = ({ handles }: Mappers.WithHandles) => handles.length > 0;
+
 export const storeHandles = typeormOperator<Mappers.WithHandles & WithMintedAssetSupplies & Mappers.WithHandleMetadata>(
   async ({ handles, queryRunner, eventType, block, mintedAssetTotalSupplies, handleMetadata }) => {
     const handleEventParams: HandleEventParams = {

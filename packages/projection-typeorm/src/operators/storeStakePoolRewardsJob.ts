@@ -3,6 +3,14 @@ import { STAKE_POOL_REWARDS, defaultJobOptions } from '../pgBoss';
 import { WithPgBoss } from './withTypeormTransaction';
 import { typeormOperator } from './util';
 
+export const willStoreStakePoolRewardsJob = ({
+  crossEpochBoundary,
+  epochNo
+}: {
+  crossEpochBoundary: boolean;
+  epochNo: Cardano.EpochNo;
+}) => crossEpochBoundary && epochNo !== 1;
+
 export const storeStakePoolRewardsJob = typeormOperator<WithPgBoss>(
   async ({ block: { header }, crossEpochBoundary, epochNo, eventType, pgBoss }) => {
     const { slot } = header;

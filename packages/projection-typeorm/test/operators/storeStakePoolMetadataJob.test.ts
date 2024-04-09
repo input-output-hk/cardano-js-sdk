@@ -8,12 +8,14 @@ import {
   createStoreStakePoolMetadataJob,
   storeBlock,
   typeormTransactionCommit,
+  willStoreStakePoolMetadataJob,
   withTypeormTransaction
 } from '../../src';
 import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { ChainSyncEventType } from '@cardano-sdk/core';
 import { Observable, filter, of } from 'rxjs';
+import { PoolUpdate } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
 import { QueryRunner } from 'typeorm';
 import { StakePoolMetadataJob, createPgBoss } from '../../src/pgBoss';
 import { connectionConfig, initializeDataSource } from '../util';
@@ -139,5 +141,28 @@ describe('storeStakePoolMetadataJob', () => {
     await projectTilFirstPoolUpdateWithMetadata();
     await job2Complete;
     await boss.stop();
+  });
+});
+
+describe('willStoreStakePoolMetadataJob', () => {
+  it('returns true if has stake pool updates', () => {
+    expect(
+      willStoreStakePoolMetadataJob({
+        stakePools: {
+          retirements: [],
+          updates: [{} as PoolUpdate]
+        }
+      })
+    ).toBeTruthy();
+  });
+  it('returns false if no pool updates', () => {
+    expect(
+      willStoreStakePoolMetadataJob({
+        stakePools: {
+          retirements: [],
+          updates: []
+        }
+      })
+    ).toBeFalsy();
   });
 });

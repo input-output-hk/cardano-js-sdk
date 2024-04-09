@@ -12,6 +12,7 @@ import {
   storeBlock,
   storeStakePools,
   typeormTransactionCommit,
+  willStoreStakePools,
   withTypeormTransaction
 } from '../../src';
 import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
@@ -215,5 +216,39 @@ describe('storeStakePools', () => {
     });
 
     it.todo('lastRegistration is always set to an entity representing the latest certificate');
+  });
+});
+
+describe('willStoreStakePools', () => {
+  it('returns true if there are both updates and retirements', () => {
+    expect(
+      willStoreStakePools({
+        stakePools: { retirements: [{} as never], updates: [{} as never] }
+      })
+    ).toBeTruthy();
+  });
+
+  it('returns true if there are updates', () => {
+    expect(
+      willStoreStakePools({
+        stakePools: { retirements: [], updates: [{} as never] }
+      })
+    ).toBeTruthy();
+  });
+
+  it('returns true if there are retirements', () => {
+    expect(
+      willStoreStakePools({
+        stakePools: { retirements: [{} as never], updates: [] }
+      })
+    ).toBeTruthy();
+  });
+
+  it('returns false if there are no updates or retirements', () => {
+    expect(
+      willStoreStakePools({
+        stakePools: { retirements: [], updates: [] }
+      })
+    ).toBeFalsy();
   });
 });
