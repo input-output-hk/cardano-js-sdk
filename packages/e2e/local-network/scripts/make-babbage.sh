@@ -298,6 +298,14 @@ $SED -i -E "s/\"ShelleyGenesisHash\": \".*\"/\"ShelleyGenesisHash\": \"${shelley
 $SED -i -E "s/\"AlonzoGenesisHash\": \".*\"/\"AlonzoGenesisHash\": \"${alonzoGenesisHash}\"/" ./config/network/cardano-node/config.json
 $SED -i -E "s/\"ConwayGenesisHash\": \".*\"/\"ConwayGenesisHash\": \"${conwayGenesisHash}\"/" ./config/network/cardano-node/config.json
 
+# TODO: Remove once db-sync is in sync with the conway.json config file format
+cp ./config/network/cardano-node/config.json ./config/network/cardano-node/config-for-db-sync.json
+if [ -n "$PRE_CONWAY" ]; then
+  echo "Remove db-sync reference to conway.json configuration file"
+  sed -i "/ConwayGenesisFile/d; /ConwayGenesisHash/d" ./config/network/cardano-node/config-for-db-sync.json
+fi
+
+
 cp ./templates/babbage/topology.json ./config/network/cardano-node/topology.json
 # docker hostname in topology.json isn't working, so need to specify ip of local network
 CONTAINER_IP=$(hostname -I | xargs)

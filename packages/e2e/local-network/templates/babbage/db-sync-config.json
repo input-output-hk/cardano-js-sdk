@@ -2,7 +2,7 @@
   "EnableLogMetrics": false,
   "EnableLogging": true,
   "NetworkName": "testnet",
-  "NodeConfigFile": "../cardano-node/config.json",
+  "NodeConfigFile": "../cardano-node/config-for-db-sync.json",
   "PrometheusPort": 8080,
   "RequiresNetworkMagic": "RequiresMagic",
   "defaultBackends": [
