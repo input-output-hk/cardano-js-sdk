@@ -76,10 +76,9 @@ export const genesisUtxoAddresses = `
    address
   FROM 
   tx_out WHERE
-    stake_address_id = 1 OR
-    stake_address_id = 2 OR
-    stake_address_id = 3
-  GROUP BY address`;
+    value = 500000000000
+  GROUP BY address
+  LIMIT 3`;
 
 export const transactionInBlockRange = `
   SELECT
