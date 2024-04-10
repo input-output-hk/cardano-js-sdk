@@ -61,7 +61,7 @@ export const toWithdrawal: Transform<Cardano.Withdrawal, Ledger.Withdrawal, Ledg
       stakeCredential: {
         scriptHashHex: rewardAddress.getPaymentCredential().hash.toString(),
         type: Ledger.CredentialParamsType.SCRIPT_HASH
-      } as Ledger.CredentialParams
+      } as Ledger.ScriptHashCredentialParams
     };
   }
 

@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import {
   AccountKeyDerivationPath,
@@ -12,6 +13,8 @@ import {
 import {
   CONTEXT_WITHOUT_KNOWN_ADDRESSES,
   CONTEXT_WITH_KNOWN_ADDRESSES,
+  dRepCredential,
+  metadataJson,
   poolId,
   poolId2,
   poolParameters,
@@ -92,13 +95,13 @@ describe('certificates', () => {
   describe('mapCerts', () => {
     it('returns null when given an undefined token map', async () => {
       const certs: Cardano.Certificate | undefined = undefined;
-      const ledgerCerts = mapCerts(certs, CONTEXT_WITHOUT_KNOWN_ADDRESSES);
+      const ledgerCerts = await mapCerts(certs, CONTEXT_WITHOUT_KNOWN_ADDRESSES);
 
       expect(ledgerCerts).toEqual(null);
     });
 
     it('can map a script hash stake registration certificate', async () => {
-      const ledgerCerts = mapCerts(
+      const ledgerCerts = await mapCerts(
         [
           {
             __typename: Cardano.CertificateType.StakeRegistration,
@@ -112,7 +115,7 @@ describe('certificates', () => {
         {
           params: {
             stakeCredential: {
-              scriptHashHex: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
+              scriptHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
               type: Ledger.CredentialParamsType.SCRIPT_HASH
             }
           },
@@ -122,7 +125,7 @@ describe('certificates', () => {
     });
 
     it('can map a stake key stake registration certificate', async () => {
-      const ledgerCerts = mapCerts(
+      const ledgerCerts = await mapCerts(
         [
           {
             __typename: Cardano.CertificateType.StakeRegistration,
@@ -152,7 +155,7 @@ describe('certificates', () => {
     });
 
     it('can map a script hash stake deregistration certificate', async () => {
-      const ledgerCerts = mapCerts(
+      const ledgerCerts = await mapCerts(
         [
           {
             __typename: Cardano.CertificateType.StakeDeregistration,
@@ -166,7 +169,7 @@ describe('certificates', () => {
         {
           params: {
             stakeCredential: {
-              scriptHashHex: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
+              scriptHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
               type: Ledger.CredentialParamsType.SCRIPT_HASH
             }
           },
@@ -176,7 +179,7 @@ describe('certificates', () => {
     });
 
     it('can map a stake key stake deregistration certificate', async () => {
-      const ledgerCerts = mapCerts(
+      const ledgerCerts = await mapCerts(
         [
           {
             __typename: Cardano.CertificateType.StakeDeregistration,
@@ -207,7 +210,7 @@ describe('certificates', () => {
 
     it('can map a pool registration certificate with known keys', async () => {
       expect(
-        mapCerts(
+        await mapCerts(
           [
             {
               __typename: Cardano.CertificateType.PoolRegistration,
@@ -298,7 +301,7 @@ describe('certificates', () => {
 
     it('can map a pool registration certificate with unknown keys', async () => {
       expect(
-        mapCerts(
+        await mapCerts(
           [
             {
               __typename: Cardano.CertificateType.PoolRegistration,
@@ -322,14 +325,14 @@ describe('certificates', () => {
             pledge: 10_000n,
             poolKey: {
               params: {
-                keyHashHex: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f'
+                keyHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8'
               },
               type: Ledger.PoolKeyType.THIRD_PARTY
             },
             poolOwners: [
               {
                 params: {
-                  stakingKeyHashHex: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f'
+                  stakingKeyHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8'
                 },
                 type: Ledger.PoolOwnerType.THIRD_PARTY
               }
@@ -358,7 +361,7 @@ describe('certificates', () => {
             ],
             rewardAccount: {
               params: {
-                rewardAccountHex: 'e1cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f'
+                rewardAccountHex: 'e07c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8'
               },
               type: Ledger.PoolRewardAccountType.THIRD_PARTY
             },
@@ -370,7 +373,7 @@ describe('certificates', () => {
     });
 
     it('throws if its given a pool retirement certificate but the signing key cant be found', async () => {
-      expect(() =>
+      await expect(
         mapCerts(
           [
             {
@@ -381,11 +384,11 @@ describe('certificates', () => {
           ],
           CONTEXT_WITHOUT_KNOWN_ADDRESSES
         )
-      ).toThrow("Invalid argument 'certificate': Missing key matching pool retirement certificate.");
+      ).rejects.toThrow("Invalid argument 'certificate': Missing key matching pool retirement certificate.");
     });
 
     it('can map a stake pool retirement certificate', async () => {
-      const ledgerCerts = mapCerts(
+      const ledgerCerts = await mapCerts(
         [
           {
             __typename: Cardano.CertificateType.PoolRetirement,
@@ -414,7 +417,7 @@ describe('certificates', () => {
     });
 
     it('can map a delegation certificate with unknown stake key', async () => {
-      const ledgerCerts = mapCerts(
+      const ledgerCerts = await mapCerts(
         [
           {
             __typename: Cardano.CertificateType.StakeDelegation,
@@ -430,7 +433,7 @@ describe('certificates', () => {
           params: {
             poolKeyHashHex: '153806dbcd134ddee69a8c5204e38ac80448f62342f8c23cfe4b7edf',
             stakeCredential: {
-              scriptHashHex: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
+              scriptHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
               type: Ledger.CredentialParamsType.SCRIPT_HASH
             }
           },
@@ -440,7 +443,7 @@ describe('certificates', () => {
     });
 
     it('can map a delegation certificate with known stake key', async () => {
-      const ledgerCerts = mapCerts(
+      const ledgerCerts = await mapCerts(
         [
           {
             __typename: Cardano.CertificateType.StakeDelegation,
@@ -474,49 +477,557 @@ describe('certificates', () => {
 
   describe('getKnownAddress', () => {
     it('should return undefined immediately if context is not provided', () => {
-      const fakeCertificate: Cardano.StakeDelegationCertificate = {
-        __typename: Cardano.CertificateType.StakeDelegation,
-        poolId: 'pool1' as Cardano.PoolId,
-        stakeCredential: {
-          hash: 'fakehash' as Hash28ByteBase16,
-          type: Cardano.CredentialType.KeyHash
-        }
+      const fakeCredential: Cardano.Credential = {
+        hash: 'fakehash' as Hash28ByteBase16,
+        type: Cardano.CredentialType.KeyHash
       };
 
-      const result = getKnownAddress(fakeCertificate);
+      const result = getKnownAddress(fakeCredential);
       expect(result).toBeUndefined();
     });
 
     it('should return the matching known address when context is provided', () => {
       const hashUsedForTest = '13cf55d175ea848b87deb3e914febd7e028e2bf6534475d52fb9c3d0' as Hash28ByteBase16;
-      const fakeCertificate: Cardano.StakeDelegationCertificate = {
-        __typename: Cardano.CertificateType.StakeDelegation,
-        poolId: 'pool1' as Cardano.PoolId,
-        stakeCredential: {
-          hash: hashUsedForTest,
-          type: Cardano.CredentialType.KeyHash
-        }
+      const fakeCredential: Cardano.Credential = {
+        hash: hashUsedForTest,
+        type: Cardano.CredentialType.KeyHash
       };
 
       const expectedAddress = mockContext.knownAddresses[0];
-      const result = getKnownAddress(fakeCertificate, mockContext);
+      const result = getKnownAddress(fakeCredential, mockContext);
       expect(result).not.toBeUndefined();
       expect(result).toEqual(expectedAddress);
     });
 
     it('should return undefined if no addresses match the stake credential hash', () => {
       const hashUsedForTest = 'unknown-hash' as Hash28ByteBase16;
-      const fakeCertificate: Cardano.StakeDelegationCertificate = {
-        __typename: Cardano.CertificateType.StakeDelegation,
-        poolId: 'pool1' as Cardano.PoolId,
-        stakeCredential: {
-          hash: hashUsedForTest,
-          type: Cardano.CredentialType.KeyHash
-        }
+      const fakeCredential: Cardano.Credential = {
+        hash: hashUsedForTest,
+        type: Cardano.CredentialType.KeyHash
       };
 
-      const result = getKnownAddress(fakeCertificate, mockContext);
+      const result = getKnownAddress(fakeCredential, mockContext);
       expect(result).toBeUndefined();
+    });
+  });
+  describe('conway-era', () => {
+    describe('Cardano.CertificateType.Registration', () => {
+      it('can map a script hash type of params', async () => {
+        const ledgerCerts = await mapCerts(
+          [
+            {
+              __typename: Cardano.CertificateType.Registration,
+              deposit: 5n,
+              stakeCredential
+            }
+          ],
+          CONTEXT_WITHOUT_KNOWN_ADDRESSES
+        );
+
+        expect(ledgerCerts).toEqual([
+          {
+            params: {
+              deposit: 5n,
+              stakeCredential: {
+                scriptHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
+                type: Ledger.CredentialParamsType.SCRIPT_HASH
+              }
+            },
+            type: Ledger.CertificateType.STAKE_REGISTRATION_CONWAY
+          }
+        ]);
+      });
+
+      it('can map a key path type of params', async () => {
+        const ledgerCerts = await mapCerts(
+          [
+            {
+              __typename: Cardano.CertificateType.Registration,
+              deposit: 5n,
+              stakeCredential
+            }
+          ],
+          CONTEXT_WITH_KNOWN_ADDRESSES
+        );
+
+        expect(ledgerCerts).toEqual([
+          {
+            params: {
+              deposit: 5n,
+              stakeCredential: {
+                keyPath: [
+                  util.harden(CardanoKeyConst.PURPOSE),
+                  util.harden(CardanoKeyConst.COIN_TYPE),
+                  util.harden(0),
+                  KeyRole.Stake,
+                  0
+                ],
+                type: Ledger.CredentialParamsType.KEY_PATH
+              }
+            },
+            type: Ledger.CertificateType.STAKE_REGISTRATION_CONWAY
+          }
+        ]);
+      });
+
+      it.todo('can map a key hash type of params');
+    });
+    describe('Cardano.CertificateType.Unregistration', () => {
+      it('can map a script hash type of params', async () => {
+        const ledgerCerts = await mapCerts(
+          [
+            {
+              __typename: Cardano.CertificateType.Unregistration,
+              deposit: 5n,
+              stakeCredential
+            }
+          ],
+          CONTEXT_WITHOUT_KNOWN_ADDRESSES
+        );
+
+        expect(ledgerCerts).toEqual([
+          {
+            params: {
+              deposit: 5n,
+              stakeCredential: {
+                scriptHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
+                type: Ledger.CredentialParamsType.SCRIPT_HASH
+              }
+            },
+            type: Ledger.CertificateType.STAKE_DEREGISTRATION_CONWAY
+          }
+        ]);
+      });
+
+      it('can map a key path type of params', async () => {
+        const ledgerCerts = await mapCerts(
+          [
+            {
+              __typename: Cardano.CertificateType.Unregistration,
+              deposit: 5n,
+              stakeCredential
+            }
+          ],
+          CONTEXT_WITH_KNOWN_ADDRESSES
+        );
+
+        expect(ledgerCerts).toEqual([
+          {
+            params: {
+              deposit: 5n,
+              stakeCredential: {
+                keyPath: [
+                  util.harden(CardanoKeyConst.PURPOSE),
+                  util.harden(CardanoKeyConst.COIN_TYPE),
+                  util.harden(0),
+                  KeyRole.Stake,
+                  0
+                ],
+                type: Ledger.CredentialParamsType.KEY_PATH
+              }
+            },
+            type: Ledger.CertificateType.STAKE_DEREGISTRATION_CONWAY
+          }
+        ]);
+      });
+
+      it.todo('can map a key hash type of params');
+    });
+
+    describe('Cardano.CertificateType.VoteDelegation', () => {
+      it('can map always abstain type of drep', async () => {
+        const ledgerCerts = await mapCerts(
+          [
+            {
+              __typename: Cardano.CertificateType.VoteDelegation,
+              dRep: { __typename: 'AlwaysAbstain' },
+              stakeCredential
+            }
+          ],
+          CONTEXT_WITHOUT_KNOWN_ADDRESSES
+        );
+
+        expect(ledgerCerts).toEqual([
+          {
+            params: {
+              dRep: { type: Ledger.DRepParamsType.ABSTAIN },
+              stakeCredential: {
+                scriptHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
+                type: Ledger.CredentialParamsType.SCRIPT_HASH
+              }
+            },
+            type: Ledger.CertificateType.VOTE_DELEGATION
+          }
+        ]);
+      });
+      it('can map always no confidence type of drep', async () => {
+        const ledgerCerts = await mapCerts(
+          [
+            {
+              __typename: Cardano.CertificateType.VoteDelegation,
+              dRep: { __typename: 'AlwaysNoConfidence' },
+              stakeCredential
+            }
+          ],
+          CONTEXT_WITHOUT_KNOWN_ADDRESSES
+        );
+
+        expect(ledgerCerts).toEqual([
+          {
+            params: {
+              dRep: { type: Ledger.DRepParamsType.NO_CONFIDENCE },
+              stakeCredential: {
+                scriptHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
+                type: Ledger.CredentialParamsType.SCRIPT_HASH
+              }
+            },
+            type: Ledger.CertificateType.VOTE_DELEGATION
+          }
+        ]);
+      });
+      it('can map dRep credential type of drep', async () => {
+        const ledgerCerts = await mapCerts(
+          [
+            {
+              __typename: Cardano.CertificateType.VoteDelegation,
+              dRep: stakeCredential,
+              stakeCredential
+            }
+          ],
+          CONTEXT_WITHOUT_KNOWN_ADDRESSES
+        );
+
+        expect(ledgerCerts).toEqual([
+          {
+            params: {
+              dRep: {
+                keyPath: [
+                  util.harden(CardanoKeyConst.PURPOSE),
+                  util.harden(CardanoKeyConst.COIN_TYPE),
+                  util.harden(0),
+                  3,
+                  0
+                ],
+                type: Ledger.DRepParamsType.KEY_PATH
+              },
+              stakeCredential: {
+                scriptHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
+                type: Ledger.CredentialParamsType.SCRIPT_HASH
+              }
+            },
+            type: Ledger.CertificateType.VOTE_DELEGATION
+          }
+        ]);
+      });
+    });
+
+    describe('Cardano.CertificateType.RegisterDelegateRepresentative', () => {
+      it('can map a key path type of params', async () => {
+        const ledgerCerts = await mapCerts(
+          [
+            {
+              __typename: Cardano.CertificateType.RegisterDelegateRepresentative,
+              anchor: {
+                dataHash: metadataJson.hash,
+                url: metadataJson.url
+              },
+              dRepCredential,
+              deposit: 5n
+            }
+          ],
+          CONTEXT_WITH_KNOWN_ADDRESSES
+        );
+
+        expect(ledgerCerts).toEqual([
+          {
+            params: {
+              anchor: { hashHex: metadataJson.hash, url: metadataJson.url },
+              dRepCredential: {
+                keyPath: [2_147_485_500, 2_147_485_463, 2_147_483_648, 3, 0],
+                type: Ledger.CredentialParamsType.KEY_PATH
+              },
+              deposit: 5n
+            },
+            type: Ledger.CertificateType.DREP_REGISTRATION
+          }
+        ]);
+      });
+
+      it('can map a script hash type of params', async () => {
+        const ledgerCerts = await mapCerts(
+          [
+            {
+              __typename: Cardano.CertificateType.RegisterDelegateRepresentative,
+              anchor: {
+                dataHash: metadataJson.hash,
+                url: metadataJson.url
+              },
+              dRepCredential: {
+                ...dRepCredential,
+                type: Cardano.CredentialType.ScriptHash
+              },
+              deposit: 5n
+            }
+          ],
+          CONTEXT_WITH_KNOWN_ADDRESSES
+        );
+
+        expect(ledgerCerts).toEqual([
+          {
+            params: {
+              anchor: { hashHex: metadataJson.hash, url: metadataJson.url },
+              dRepCredential: {
+                scriptHashHex: 'b276b4f7a706a81364de606d890343a76af570268d4bbfee2fc8fcab',
+                type: Ledger.CredentialParamsType.SCRIPT_HASH
+              },
+              deposit: 5n
+            },
+            type: Ledger.CertificateType.DREP_REGISTRATION
+          }
+        ]);
+      });
+
+      it("it throws if public key doesn't match credential", async () => {
+        await expect(
+          mapCerts(
+            [
+              {
+                __typename: Cardano.CertificateType.RegisterDelegateRepresentative,
+                anchor: {
+                  dataHash: metadataJson.hash,
+                  url: metadataJson.url
+                },
+                dRepCredential: {
+                  ...dRepCredential,
+                  type: Cardano.CredentialType.ScriptHash
+                },
+                deposit: 5n
+              }
+            ],
+            CONTEXT_WITHOUT_KNOWN_ADDRESSES
+          )
+        ).rejects.toThrowError('dRepPublicKey does not match certificate drep credential.');
+      });
+
+      it("it throws if public key wasn't provided", async () => {
+        await expect(
+          mapCerts(
+            [
+              {
+                __typename: Cardano.CertificateType.RegisterDelegateRepresentative,
+                anchor: {
+                  dataHash: metadataJson.hash,
+                  url: metadataJson.url
+                },
+                dRepCredential: {
+                  ...dRepCredential,
+                  type: Cardano.CredentialType.ScriptHash
+                },
+                deposit: 5n
+              }
+            ],
+            { ...CONTEXT_WITHOUT_KNOWN_ADDRESSES, dRepPublicKey: undefined }
+          )
+        ).rejects.toThrowError('dRepPublicKey does not match certificate drep credential.');
+      });
+    });
+
+    describe('Cardano.CertificateType.UnregisterDelegateRepresentative', () => {
+      it('can map a key path type of params', async () => {
+        const ledgerCerts = await mapCerts(
+          [
+            {
+              __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
+              dRepCredential,
+              deposit: 5n
+            }
+          ],
+          CONTEXT_WITH_KNOWN_ADDRESSES
+        );
+
+        expect(ledgerCerts).toEqual([
+          {
+            params: {
+              dRepCredential: {
+                keyPath: [2_147_485_500, 2_147_485_463, 2_147_483_648, 3, 0],
+                type: Ledger.CredentialParamsType.KEY_PATH
+              },
+              deposit: 5n
+            },
+            type: Ledger.CertificateType.DREP_DEREGISTRATION
+          }
+        ]);
+      });
+
+      it('can map a script hash type of params', async () => {
+        const ledgerCerts = await mapCerts(
+          [
+            {
+              __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
+              dRepCredential: {
+                ...dRepCredential,
+                type: Cardano.CredentialType.ScriptHash
+              },
+              deposit: 5n
+            }
+          ],
+          CONTEXT_WITH_KNOWN_ADDRESSES
+        );
+
+        expect(ledgerCerts).toEqual([
+          {
+            params: {
+              dRepCredential: {
+                scriptHashHex: 'b276b4f7a706a81364de606d890343a76af570268d4bbfee2fc8fcab',
+                type: Ledger.CredentialParamsType.SCRIPT_HASH
+              },
+              deposit: 5n
+            },
+            type: Ledger.CertificateType.DREP_DEREGISTRATION
+          }
+        ]);
+      });
+
+      it("it throws if public key doesn't match credential", async () => {
+        await expect(
+          mapCerts(
+            [
+              {
+                __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
+                dRepCredential: {
+                  ...dRepCredential,
+                  type: Cardano.CredentialType.ScriptHash
+                },
+                deposit: 5n
+              }
+            ],
+            CONTEXT_WITHOUT_KNOWN_ADDRESSES
+          )
+        ).rejects.toThrowError('dRepPublicKey does not match certificate drep credential.');
+      });
+
+      it("it throws if public key wasn't provided", async () => {
+        await expect(
+          mapCerts(
+            [
+              {
+                __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
+                dRepCredential: {
+                  ...dRepCredential,
+                  type: Cardano.CredentialType.ScriptHash
+                },
+                deposit: 5n
+              }
+            ],
+            { ...CONTEXT_WITHOUT_KNOWN_ADDRESSES, dRepPublicKey: undefined }
+          )
+        ).rejects.toThrowError('dRepPublicKey does not match certificate drep credential.');
+      });
+    });
+
+    describe('Cardano.CertificateType.UpdateDelegateRepresentative', () => {
+      it('can map a key path type of params', async () => {
+        const ledgerCerts = await mapCerts(
+          [
+            {
+              __typename: Cardano.CertificateType.UpdateDelegateRepresentative,
+              anchor: {
+                dataHash: metadataJson.hash,
+                url: metadataJson.url
+              },
+              dRepCredential
+            }
+          ],
+          CONTEXT_WITH_KNOWN_ADDRESSES
+        );
+
+        expect(ledgerCerts).toEqual([
+          {
+            params: {
+              anchor: { hashHex: metadataJson.hash, url: metadataJson.url },
+              dRepCredential: {
+                keyPath: [2_147_485_500, 2_147_485_463, 2_147_483_648, 3, 0],
+                type: Ledger.CredentialParamsType.KEY_PATH
+              }
+            },
+            type: Ledger.CertificateType.DREP_UPDATE
+          }
+        ]);
+      });
+
+      it('can map a script hash type of params', async () => {
+        const ledgerCerts = await mapCerts(
+          [
+            {
+              __typename: Cardano.CertificateType.UpdateDelegateRepresentative,
+              anchor: {
+                dataHash: metadataJson.hash,
+                url: metadataJson.url
+              },
+              dRepCredential: {
+                ...dRepCredential,
+                type: Cardano.CredentialType.ScriptHash
+              }
+            }
+          ],
+          CONTEXT_WITH_KNOWN_ADDRESSES
+        );
+
+        expect(ledgerCerts).toEqual([
+          {
+            params: {
+              anchor: { hashHex: metadataJson.hash, url: metadataJson.url },
+              dRepCredential: {
+                scriptHashHex: 'b276b4f7a706a81364de606d890343a76af570268d4bbfee2fc8fcab',
+                type: Ledger.CredentialParamsType.SCRIPT_HASH
+              }
+            },
+            type: Ledger.CertificateType.DREP_UPDATE
+          }
+        ]);
+      });
+
+      it("it throws if public key doesn't match credential", async () => {
+        await expect(
+          mapCerts(
+            [
+              {
+                __typename: Cardano.CertificateType.UpdateDelegateRepresentative,
+                anchor: {
+                  dataHash: metadataJson.hash,
+                  url: metadataJson.url
+                },
+                dRepCredential: {
+                  ...dRepCredential,
+                  type: Cardano.CredentialType.ScriptHash
+                }
+              }
+            ],
+            CONTEXT_WITHOUT_KNOWN_ADDRESSES
+          )
+        ).rejects.toThrowError('dRepPublicKey does not match certificate drep credential.');
+      });
+
+      it("it throws if public key wasn't provided", async () => {
+        await expect(
+          mapCerts(
+            [
+              {
+                __typename: Cardano.CertificateType.UpdateDelegateRepresentative,
+                anchor: {
+                  dataHash: metadataJson.hash,
+                  url: metadataJson.url
+                },
+                dRepCredential: {
+                  ...dRepCredential,
+                  type: Cardano.CredentialType.ScriptHash
+                }
+              }
+            ],
+            { ...CONTEXT_WITHOUT_KNOWN_ADDRESSES, dRepPublicKey: undefined }
+          )
+        ).rejects.toThrowError('dRepPublicKey does not match certificate drep credential.');
+      });
     });
   });
 });

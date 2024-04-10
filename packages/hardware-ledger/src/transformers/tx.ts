@@ -16,7 +16,7 @@ import { mapWithdrawals } from './withdrawals';
 
 export const LedgerTxTransformer: Transformer<Cardano.TxBody, Ledger.Transaction, LedgerTxTransformerContext> = {
   auxiliaryData: ({ auxiliaryDataHash }) => mapAuxiliaryData(auxiliaryDataHash),
-  certificates: ({ certificates }, context) => mapCerts(certificates, context!),
+  certificates: async ({ certificates }, context) => await mapCerts(certificates, context!),
   collateralInputs: ({ collaterals }, context) => mapCollateralTxIns(collaterals, context!),
   collateralOutput: ({ collateralReturn }, context) => mapCollateralTxOut(collateralReturn, context!),
   donation: ({ donation }) => donation,
