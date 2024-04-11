@@ -31,6 +31,7 @@ import {
   storeUtxo,
   willStoreAddresses,
   willStoreAssets,
+  willStoreBlockData,
   willStoreHandleMetadata,
   willStoreHandles,
   willStoreNftMetadata,
@@ -371,6 +372,7 @@ export const prepareTypeormProjection = (
     .map((store) => Object.entries(storeOperators).find(([_, operator]) => store === operator)!)
     .map(([storeName]) => willStore[storeName as keyof StoreOperators])
     .filter(isNotNil);
+
   return {
     __debug: {
       entities: selectedEntities.map((Entity) => keyOf(entities, Entity)),
@@ -383,8 +385,10 @@ export const prepareTypeormProjection = (
     mappers: selectedMappers,
     stores: selectedStores,
     willStore: <T extends ProjectionEvent>(evt: T) =>
+      evt.eventType === ChainSyncEventType.RollBackward ||
+      willStoreBlockData(evt) ||
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      evt.eventType === ChainSyncEventType.RollBackward || willStoreCheckers.some((check) => check(evt as any))
+      willStoreCheckers.some((check) => check(evt as any))
   };
 };
 

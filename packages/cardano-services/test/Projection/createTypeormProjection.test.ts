@@ -6,6 +6,7 @@ import {
   TokensEntity,
   createDataSource
 } from '@cardano-sdk/projection-typeorm';
+import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { ProjectionName, createTypeormProjection, prepareTypeormProjection } from '../../src';
 import { lastValueFrom } from 'rxjs';
@@ -56,6 +57,12 @@ describe('createTypeormProjection', () => {
     const emptyBlocksHashes = data.allEvents
       .filter((evt) => (evt as any).block && (evt as any).block.body.length === 0)
       .map((evt) => (evt as any).block.header.hash);
+
+    // Make sure our empty blocks are outside the stability window.
+    for (const event of data.allEvents) {
+      if (event.eventType === ChainSyncEventType.RollForward && emptyBlocksHashes.includes(event.block.header.hash))
+        event.tip.blockNo = Cardano.BlockNo(Number.MAX_SAFE_INTEGER);
+    }
 
     const projection$ = createTypeormProjection({
       blocksBufferLength: 10,
