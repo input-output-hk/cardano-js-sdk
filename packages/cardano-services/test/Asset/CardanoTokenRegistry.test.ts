@@ -179,6 +179,7 @@ describe('CardanoTokenRegistry', () => {
     it('internal server error', async () => {
       const failedMetadata = null;
       const succeededMetadata = { assetId: validAssetId, name: 'test' };
+      const innerError = 'AxiosError: Request failed with status code 500';
 
       let alreadyCalled = false;
       const record = async () => {
@@ -204,7 +205,7 @@ describe('CardanoTokenRegistry', () => {
       await expect(tokenRegistry.getTokenMetadata([invalidAssetId, validAssetId])).rejects.toThrow(
         new ProviderError(
           ProviderFailure.Unhealthy,
-          null,
+          innerError,
           'CardanoTokenRegistry failed to fetch asset metadata from the token registry server due to: Request failed with status code 500'
         )
       );
@@ -212,6 +213,7 @@ describe('CardanoTokenRegistry', () => {
 
     it('timeout server error', async () => {
       const exceededTimeout = defaultTimeout + 1000;
+      const innerError = `AxiosError: timeout of ${defaultTimeout}ms exceeded`;
       const record = async () => {
         await sleep(exceededTimeout);
 
@@ -231,7 +233,7 @@ describe('CardanoTokenRegistry', () => {
       await expect(tokenRegistry.getTokenMetadata([validAssetId])).rejects.toThrow(
         new ProviderError(
           ProviderFailure.Unhealthy,
-          null,
+          innerError,
           `CardanoTokenRegistry failed to fetch asset metadata from the token registry server due to: timeout of ${defaultTimeout}ms exceeded`
         )
       );

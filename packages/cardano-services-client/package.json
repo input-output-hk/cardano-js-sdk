@@ -56,7 +56,7 @@
   "dependencies": {
     "@cardano-sdk/core": "workspace:~",
     "@cardano-sdk/util": "workspace:~",
-    "axios": "^0.27.2",
+    "axios": "^0.28.0",
     "class-validator": "^0.14.0",
     "json-bigint": "~1.0.0",
     "ts-log": "^2.2.4"
