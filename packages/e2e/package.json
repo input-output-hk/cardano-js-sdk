@@ -50,6 +50,7 @@
     "local-network:profile:up": "FILES='-f ../../compose/pg-agent.yml' yarn local-network:common",
     "local-network:profile:dev": "FILES='-f ../../compose/dev.yml -f ../../compose/pg-agent.yml' yarn local-network:common",
     "local-network:down": "docker compose -p local-network-e2e -f docker-compose.yml -f ../../compose/common.yml -f ../../compose/pg-agent.yml down -v --remove-orphans",
+    "local-network:persistent:down": "docker compose -p local-network-e2e -f docker-compose.yml -f ../../compose/common.yml -f ../../compose/pg-agent.yml down --remove-orphans",
     "cardano-services:up": "ts-node --transpile-only ../cardano-services/src/cli.ts start-provider-server",
     "cardano-services:up:debug": "npx nodemon --legacy-watch --exec 'node -r ts-node/register --inspect=0.0.0.0:9229 ../cardano-services/src/cli.ts start-provider-server'",
     "circular-deps:check": "madge --circular dist/cjs",

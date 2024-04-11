@@ -25,6 +25,7 @@ services:
       - ./local-network/network-files/node-sp1/:/root/network-files/node-sp1
       - ./local-network/config:/root/config
       - sdk-ipc:/sdk-ipc
+      - local-network-files:/root/network-files
 
   file-server:
     <<: *logging
@@ -102,6 +103,7 @@ services:
       METADATA_JOB_RETRY_DELAY: 60
 
 volumes:
+  local-network-files:
   sdk-ipc:
     driver: local
     driver_opts:

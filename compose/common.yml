@@ -230,6 +230,8 @@ services:
       - postgres_password
       - postgres_user
     shm_size: '2gb'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   asset-projector:
     <<:
@@ -378,3 +380,4 @@ volumes:
   db-sync-data:
   node-db:
   node-ipc:
+  postgres_data:
