@@ -52,6 +52,9 @@ describe('StakePoolMetadataService', () => {
     await closeMock();
   });
 
+  const innerError500 = 'AxiosError: Request failed with status code 500';
+  const innerError404 = 'AxiosError: Request failed with status code 404';
+
   describe('getStakePoolMetadata', () => {
     it('fetch stake pool JSON metadata without extended data', async () => {
       ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(async () => ({
@@ -116,7 +119,7 @@ describe('StakePoolMetadataService', () => {
       expect(result).toEqual(
         new StakePoolMetadataServiceError(
           StakePoolMetadataServiceFailure.FailedToFetchMetadata,
-          null,
+          innerError500,
           `StakePoolMetadataService failed to fetch metadata JSON from ${serverUrl} due to Request failed with status code 500`
         )
       );
@@ -205,7 +208,7 @@ describe('StakePoolMetadataService', () => {
       expect(result).toEqual(
         new StakePoolMetadataServiceError(
           StakePoolMetadataServiceFailure.FailedToFetchExtendedSignature,
-          null,
+          innerError404,
           `StakePoolMetadataService failed to fetch extended signature from ${metadata.extSigUrl} due to connection error`
         )
       );
@@ -372,7 +375,7 @@ describe('StakePoolMetadataService', () => {
       await expect(metadataService.getStakePoolExtendedMetadata(extMetadata)).rejects.toThrow(
         new StakePoolMetadataServiceError(
           StakePoolMetadataServiceFailure.FailedToFetchExtendedMetadata,
-          null,
+          innerError500,
           `StakePoolMetadataService failed to fetch extended metadata from ${serverUrl}/${ExtMetadataFormat.CIP6} due to connection error`
         )
       );
@@ -402,7 +405,7 @@ describe('StakePoolMetadataService', () => {
       await expect(metadataService.getStakePoolExtendedMetadata(extMetadata)).rejects.toThrow(
         new StakePoolMetadataServiceError(
           StakePoolMetadataServiceFailure.FailedToFetchExtendedMetadata,
-          null,
+          innerError404,
           `StakePoolMetadataService failed to fetch extended metadata from ${serverUrl}/${ExtMetadataFormat.CIP6} due to resource not found`
         )
       );
