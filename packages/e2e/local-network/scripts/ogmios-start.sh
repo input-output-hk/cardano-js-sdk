@@ -10,4 +10,4 @@
 while [ -f /sdk-ipc/prevent_ogmios ]; do sleep 10; done
 
 # Start the ogmios as normal
-/bin/ogmios "$@"
+exec /bin/ogmios "$@"

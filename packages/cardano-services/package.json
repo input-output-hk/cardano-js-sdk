@@ -29,7 +29,7 @@
     "cleanup:nm": "rm -rf node_modules",
     "cleanup": "rm -rf dist node_modules",
     "cli": "ts-node --transpile-only src/cli.ts",
-    "compose:up": "docker compose --env-file environments/.env.$NETWORK -p cardano-services-$NETWORK -f docker-compose.yml -f ../../compose/common.yml -f ../../compose/pg-agent.yml -f ../../compose/$(uname -m).yml ${FILES:-} up",
+    "compose:up": "__FIX_UMASK__=$(chmod -R a+r ../../compose/placeholder-secrets) docker compose --env-file environments/.env.$NETWORK -p cardano-services-$NETWORK -f docker-compose.yml -f ../../compose/common.yml -f ../../compose/pg-agent.yml -f ../../compose/$(uname -m).yml ${FILES:-} up",
     "compose:down": "docker compose -p cardano-services-$NETWORK -f docker-compose.yml -f ../../compose/common.yml -f ../../compose/pg-agent.yml -f ../../compose/$(uname -m).yml down -t 120",
     "coverage": "yarn test --coverage || true",
     "circular-deps:check": "madge --circular dist/cjs",
