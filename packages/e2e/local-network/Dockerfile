@@ -6,27 +6,39 @@ ENV DEBIAN_FRONTEND=nonintercative
 
 WORKDIR /build
 ARG CARDANO_NODE_BUILD_URL=https://github.com/IntersectMBO/cardano-node/releases/download/8.9.1/cardano-node-8.9.1-linux.tar.gz
+ARG CARDANO_NODE_BUILD_URL_ARM64=hxxp://temporarily-broken
+
 RUN apt-get update -y && \
-  apt-get install -y wget tar && \
-  wget $CARDANO_NODE_BUILD_URL -O cardano-node.tar.gz && \
-  mkdir -p bin && \
-  tar -xzf cardano-node.tar.gz
+    apt-get install -y wget tar curl && \
+    if [ "$(uname -m)" = "aarch64" ] ; then \
+      curl -fsSL "$CARDANO_NODE_BUILD_URL_ARM64" >cardano-node.tar.gz ;\
+    else \
+      curl -fsSL "$CARDANO_NODE_BUILD_URL" >cardano-node.tar.gz ;\
+    fi && \
+    mkdir -p cardano-node && \
+    tar -xzf cardano-node.tar.gz -C cardano-node
 
 FROM ubuntu:${UBUNTU_VERSION}
 
-ENV TINI_VERSION v0.19.0
-
 WORKDIR /root
 RUN apt-get update -y && \
-  apt-get install -y tzdata ca-certificates jq coreutils curl
+  apt-get install -y tzdata ca-certificates jq coreutils curl wget
 
 HEALTHCHECK --interval=5s --timeout=1s --retries=2000 --start-period=100ms \
   CMD /root/scripts/get-epoch.sh | awk '{ if ($0 >= "3") exit 0; else exit 1}'
 
 STOPSIGNAL SIGINT
-COPY --from=builder /build/bin ./bin
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static /tini
-RUN chmod +x /tini
+COPY --from=builder /build/cardano-node /opt/cardano-node
+ARG TINI_VERSION=v0.19.0
+RUN mkdir -p ./bin && ln -s /opt/cardano-node/bin/* ./bin/ &&\
+    if [ "$(uname -m)" = "aarch64" ] ; then \
+      TINI_VARIANT=static-arm64 ;\
+    else \
+      TINI_VARIANT=static-amd64 ;\
+    fi &&\
+    curl -fsSL >/tini https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-${TINI_VARIANT} &&\
+    chmod +x /tini
 
-COPY . .
+COPY scripts scripts
+COPY templates templates
 ENTRYPOINT ["/tini", "-g", "--", "/root/scripts/start.sh" ]

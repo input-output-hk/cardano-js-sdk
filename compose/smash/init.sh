@@ -6,16 +6,9 @@ USER=$(cat /run/secrets/postgres_user)
 
 echo "postgres:5432:${DB}:${USER}:${PASSWORD}" >/config/pgpass
 
-_term() {
-  kill $CHILD
-}
+export PGPASSFILE=/config/pgpass
 
-trap _term SIGTERM
-
-PGPASSFILE=/config/pgpass cardano-smash-server \
+exec cardano-smash-server \
   --config /config/config.json \
   --port 3100 \
-  --admins /config/smash-admins.txt &
-
-CHILD=$!
-wait "$CHILD"
+  --admins /config/smash-admins.txt
