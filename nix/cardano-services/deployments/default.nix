@@ -243,6 +243,7 @@ in
           blockfrost-worker.enabled = false;
           pg-boss-worker.enabled = true;
 
+          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
           backend.routes = let
               inherit (oci.meta) versions;
@@ -686,6 +687,7 @@ in
 
         namespace = "live-sanchonet";
         name = "${final.namespace}-cardanojs-v1";
+        context = "eks-admin";
 
         providers = {
           backend = {
@@ -708,6 +710,7 @@ in
 
           blockfrost-worker.enabled = false;
           pg-boss-worker.enabled = true;
+          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           backend.routes = let
               inherit (oci.meta) versions;
             in
