@@ -14,11 +14,29 @@ export PATH=$PWD/bin:$PATH
 
 source ./scripts/nodes-configuration.sh
 
-UNAME=$(uname -s) SED=
-case $UNAME in
-Darwin) SED="gsed" ;;
-Linux) SED="sed" ;;
-esac
+# We need this when running in Docker Desktop on macOS. `sed -i` doesn’t work well with VOLUMEs
+# there, unless it can create its temporary files outside of a VOLUME, which requires $TMPDIR.
+export TMPDIR="${TMPDIR:-/tmp}"
+export TMP="${TMP:-/tmp}"
+
+UNAME=$(uname -s)
+
+# Normal `sed -i` is a bit stubborn, and really wants to create its temporary files in the
+# directory of the target file. It is not a true in-place edit, and often braks permissions.
+# Let’s use this wrapper instead.
+sed_i() {
+    local tmpfile=$(mktemp)
+    local sed_bin=sed
+    if [ "$UNAME" == "Darwin" ] ; then sed_bin=gsed ; fi
+    if $sed_bin "$@" >"$tmpfile"; then
+        cat "$tmpfile" >"${@: -1}" # Replace the last argument file (in-place file) with tmpfile content
+        rm "$tmpfile"
+    else
+        echo "sed failed." >&2
+        rm "$tmpfile"
+        return 1
+    fi
+}
 
 case $(uname) in
 Darwin) date='gdate' ;;
@@ -109,7 +127,7 @@ cp templates/babbage/alonzo-babbage-test-genesis.json "${ROOT}/genesis.alonzo.sp
 cp templates/babbage/conway-babbage-test-genesis.json "${ROOT}/genesis.conway.spec.json"
 cp templates/babbage/byron-configuration.yaml "${ROOT}/configuration.yaml"
 
-$SED -i "${ROOT}/configuration.yaml" \
+sed_i \
   -e 's/Protocol: RealPBFT/Protocol: Cardano/' \
   -e 's|GenesisFile: genesis.json|ByronGenesisFile: genesis/byron/genesis.json|' \
   -e '/ByronGenesisFile/ aShelleyGenesisFile: genesis/shelley/genesis.json' \
@@ -119,7 +137,8 @@ $SED -i "${ROOT}/configuration.yaml" \
   -e 's/LastKnownBlockVersion-Major: 0/LastKnownBlockVersion-Major: 6/' \
   -e 's/LastKnownBlockVersion-Minor: 2/LastKnownBlockVersion-Minor: 0/' \
   -e "s/minSeverity: Info/minSeverity: ${CARDANO_NODE_LOG_LEVEL}/" \
-  -e "s/cardano.node.ChainDB: Notice/cardano.node.ChainDB: ${CARDANO_NODE_CHAINDB_LOG_LEVEL}/"
+  -e "s/cardano.node.ChainDB: Notice/cardano.node.ChainDB: ${CARDANO_NODE_CHAINDB_LOG_LEVEL}/" \
+  "${ROOT}/configuration.yaml"
 
 echo "" >>"${ROOT}/configuration.yaml"
 echo "PBftSignatureThreshold: 0.6" >>"${ROOT}/configuration.yaml"
@@ -248,8 +267,8 @@ for NODE in ${SP_NODES}; do
 done
 
 echo "Update start time in genesis files"
-$SED -i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" ${ROOT}/genesis/byron/genesis.json
-$SED -i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/" ${ROOT}/genesis/shelley/genesis.json
+sed_i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" ${ROOT}/genesis/byron/genesis.json
+sed_i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/" ${ROOT}/genesis/shelley/genesis.json
 
 byronGenesisHash=$(cardano-cli byron genesis print-genesis-hash --genesis-json ${ROOT}/genesis/byron/genesis.json)
 shelleyGenesisHash=$(cardano-cli genesis hash --genesis ${ROOT}/genesis/shelley/genesis.json)
@@ -261,10 +280,10 @@ echo "Shelley genesis hash: $shelleyGenesisHash"
 echo "Alonzo genesis hash: $alonzoGenesisHash"
 echo "Conway genesis hash: $conwayGenesisHash"
 
-$SED -i -E "s/ByronGenesisHash: '.*'/ByronGenesisHash: '${byronGenesisHash}'/" ${ROOT}/configuration.yaml
-$SED -i -E "s/ShelleyGenesisHash: '.*'/ShelleyGenesisHash: '${shelleyGenesisHash}'/" ${ROOT}/configuration.yaml
-$SED -i -E "s/AlonzoGenesisHash: '.*'/AlonzoGenesisHash: '${alonzoGenesisHash}'/" ${ROOT}/configuration.yaml
-$SED -i -E "s/ConwayGenesisHash: '.*'/ConwayGenesisHash: '${conwayGenesisHash}'/" ${ROOT}/configuration.yaml
+sed_i -E "s/ByronGenesisHash: '.*'/ByronGenesisHash: '${byronGenesisHash}'/" ${ROOT}/configuration.yaml
+sed_i -E "s/ShelleyGenesisHash: '.*'/ShelleyGenesisHash: '${shelleyGenesisHash}'/" ${ROOT}/configuration.yaml
+sed_i -E "s/AlonzoGenesisHash: '.*'/AlonzoGenesisHash: '${alonzoGenesisHash}'/" ${ROOT}/configuration.yaml
+sed_i -E "s/ConwayGenesisHash: '.*'/ConwayGenesisHash: '${conwayGenesisHash}'/" ${ROOT}/configuration.yaml
 
 # Create config folder
 rm -rf ./config/*
@@ -277,15 +296,17 @@ cp ./templates/babbage/db-sync-config.json ./config/network/cardano-db-sync/conf
 cp ./templates/babbage/node-config.json ./config/network/cardano-node/config.json
 cp ./templates/babbage/submit-api-config.json ./config/network/cardano-submit-api/config.json
 
-$SED -i -E "s/\"ByronGenesisHash\": \".*\"/\"ByronGenesisHash\": \"${byronGenesisHash}\"/" ./config/network/cardano-node/config.json
-$SED -i -E "s/\"ShelleyGenesisHash\": \".*\"/\"ShelleyGenesisHash\": \"${shelleyGenesisHash}\"/" ./config/network/cardano-node/config.json
-$SED -i -E "s/\"AlonzoGenesisHash\": \".*\"/\"AlonzoGenesisHash\": \"${alonzoGenesisHash}\"/" ./config/network/cardano-node/config.json
-$SED -i -E "s/\"ConwayGenesisHash\": \".*\"/\"ConwayGenesisHash\": \"${conwayGenesisHash}\"/" ./config/network/cardano-node/config.json
+sed_i -E "s/\"ByronGenesisHash\": \".*\"/\"ByronGenesisHash\": \"${byronGenesisHash}\"/" ./config/network/cardano-node/config.json
+sed_i -E "s/\"ShelleyGenesisHash\": \".*\"/\"ShelleyGenesisHash\": \"${shelleyGenesisHash}\"/" ./config/network/cardano-node/config.json
+sed_i -E "s/\"AlonzoGenesisHash\": \".*\"/\"AlonzoGenesisHash\": \"${alonzoGenesisHash}\"/" ./config/network/cardano-node/config.json
+sed_i -E "s/\"ConwayGenesisHash\": \".*\"/\"ConwayGenesisHash\": \"${conwayGenesisHash}\"/" ./config/network/cardano-node/config.json
 
 cp ./templates/babbage/topology.json ./config/network/cardano-node/topology.json
 # docker hostname in topology.json isn't working, so need to specify ip of local network
 CONTAINER_IP=$(hostname -I | xargs)
-$SED -i "s/172.17.0.1/$CONTAINER_IP/g" ./config/network/cardano-node/topology.json
+sed_i "s/172.17.0.1/$CONTAINER_IP/g" ./config/network/cardano-node/topology.json
+# Note: for some reason, the first cardano-node (on port 3001) isn’t immediately responsive to the outside world, so:
+sed_i "s/3001/3002/g" ./config/network/cardano-node/topology.json
 
 cp "${ROOT}"/genesis/byron/genesis.json ./config/network/cardano-node/genesis/byron.json
 cp "${ROOT}"/genesis/byron/genesis.json ./config/network/genesis/byron.json
