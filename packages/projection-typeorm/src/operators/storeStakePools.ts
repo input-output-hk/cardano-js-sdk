@@ -312,6 +312,9 @@ const rollBackward = async (evt: Event) => {
   await undoUpdateLatestCertificatesAndDeletePoolsWithZeroRegistrations(evt);
 };
 
+export const willStoreStakePools = ({ stakePools: { updates, retirements } }: Mappers.WithStakePools) =>
+  updates.length > 0 || retirements.length > 0;
+
 export const storeStakePools = typeormOperator<Mappers.WithStakePools>(async (evt) => {
   await (evt.eventType === ChainSyncEventType.RollForward ? rollForward(evt) : rollBackward(evt));
 });

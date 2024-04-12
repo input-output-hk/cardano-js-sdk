@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-services",
-  "version": "0.27.0",
+  "version": "0.27.1",
   "description": "Cardano GraphQL Services",
   "engines": {
     "node": ">=16.20.2"
@@ -29,8 +29,8 @@
     "cleanup:nm": "rm -rf node_modules",
     "cleanup": "rm -rf dist node_modules",
     "cli": "ts-node --transpile-only src/cli.ts",
-    "compose:up": "docker compose --env-file environments/.env.$NETWORK -p cardano-services-$NETWORK -f docker-compose.yml -f ../../compose/common.yml -f ../../compose/pg-agent.yml ${FILES:-} up",
-    "compose:down": "docker compose -p cardano-services-$NETWORK -f docker-compose.yml -f ../../compose/common.yml -f ../../compose/pg-agent.yml down -t 120",
+    "compose:up": "docker compose --env-file environments/.env.$NETWORK -p cardano-services-$NETWORK -f docker-compose.yml -f ../../compose/common.yml -f ../../compose/pg-agent.yml -f ../../compose/$(uname -m).yml ${FILES:-} up",
+    "compose:down": "docker compose -p cardano-services-$NETWORK -f docker-compose.yml -f ../../compose/common.yml -f ../../compose/pg-agent.yml -f ../../compose/$(uname -m).yml down -t 120",
     "coverage": "yarn test --coverage || true",
     "circular-deps:check": "madge --circular dist/cjs",
     "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -98,7 +98,7 @@
     "@cardano-sdk/util": "workspace:~",
     "@cardano-sdk/util-rxjs": "workspace:~",
     "@hapi/topo": "^6.0.2",
-    "axios": "^0.27.2",
+    "axios": "^0.28.0",
     "backoff-rxjs": "^7.0.0",
     "bignumber.js": "^9.1.0",
     "body-parser": "^1.19.2",

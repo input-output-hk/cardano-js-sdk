@@ -1,0 +1,11 @@
+# Overrides for AArch64 processors, until we get official images:
+
+services:
+  cardano-db-sync:
+    image: ghcr.io/input-output-hk/ogmios-tracker/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-13.1.0.0}
+  cardano-node:
+    image: ghcr.io/input-output-hk/ogmios-tracker/cardano-node:${CARDANO_NODE_VERSION:-1.35.5}
+  ogmios:
+    image: ghcr.io/input-output-hk/ogmios-tracker/ogmios:v${OGMIOS_VERSION:-5.6.0}
+  cardano-submit-api:
+    image: ghcr.io/input-output-hk/ogmios-tracker/cardano-submit-api:${CARDANO_NODE_VERSION:-1.35.5}

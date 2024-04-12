@@ -56,7 +56,11 @@ describe('HandleHttpService', () => {
 
       const { message, response } = error;
 
-      if (!response) return { message, statusText: error.status };
+      if (!response)
+        return {
+          message,
+          statusText: `${typeof error.status === 'string' ? error.status : JSON.stringify(error.status)}`
+        };
 
       const { data, status, statusText } = response;
 

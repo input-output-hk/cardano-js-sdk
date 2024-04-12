@@ -9,11 +9,13 @@ import {
   storeAssets,
   storeBlock,
   typeormTransactionCommit,
+  willStoreAssets,
   withTypeormTransaction
 } from '../../src';
 import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
+import { Mint } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
 import { QueryRunner } from 'typeorm';
 import { connectionConfig$, initializeDataSource } from '../util';
 import { createProjectorContext, createProjectorTilFirst } from './util';
@@ -107,5 +109,23 @@ describe('storeAssets', () => {
     expect(secondMintEvent.mint.length).toBeGreaterThan(0);
     expect(rollbackEvent.mintedAssetTotalSupplies[assetIdThatWasMintedTwice]).toBeLessThan(totalSupplyAfterSecondMint);
     expect(rollbackEvent.mintedAssetTotalSupplies[assetIdThatWasMintedTwice]).toBeGreaterThan(0);
+  });
+});
+
+describe('willStoreAssets', () => {
+  it('returns true if there are mints', () => {
+    expect(
+      willStoreAssets({
+        mint: [{} as Mint]
+      })
+    ).toBeTruthy();
+  });
+
+  it('returns false if there are no mints', () => {
+    expect(
+      willStoreAssets({
+        mint: []
+      })
+    ).toBeFalsy();
   });
 });

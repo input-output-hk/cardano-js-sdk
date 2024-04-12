@@ -1,5 +1,6 @@
 import { Asset, Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { AssetEntity, HandleEntity, OutputEntity } from '../../../src';
+import { AssetEntity, HandleEntity, OutputEntity, willStoreHandles } from '../../../src';
+import { HandleOwnership } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
 import { ProjectorContext, createProjectorContext } from '../util';
 import { QueryRunner } from 'typeorm';
 import { createMultiTxProjectionSource, entities, mapAndStore, policyId, projectTilFirst } from './util';
@@ -85,5 +86,23 @@ describe('storeHandles', () => {
     await firstValueFrom(source$.pipe(mapAndStore(context)));
 
     expect(await repository.count()).toBe(numHandles);
+  });
+});
+
+describe('willStoreHandles', () => {
+  it('returns true if handles are bigger than 1', () => {
+    expect(
+      willStoreHandles({
+        handles: [{} as HandleOwnership]
+      })
+    ).toBeTruthy();
+  });
+
+  it('returns false if there are no handles', () => {
+    expect(
+      willStoreHandles({
+        handles: []
+      })
+    ).toBeFalsy();
   });
 });

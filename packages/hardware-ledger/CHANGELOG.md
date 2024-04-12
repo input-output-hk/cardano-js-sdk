@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.8.19...@cardano-sdk/hardware-ledger@0.9.0) (2024-04-04)
+
+### ⚠ BREAKING CHANGES
+
+* **hardware-ledger:** replace LedgerKeyAgent webhid transport with webusb
+- make some of the LedgerKeyAgent methods private
+- remove activeTransport parameter from the LedgerKeyAgent.createTransport method
+
+### Features
+
+* **hardware-ledger:** enable LedgerKeyAgent to accept a device to establish connection with ([f084f42](https://github.com/input-output-hk/cardano-js-sdk/commit/f084f4203240a25f9680d200e13dc27a47c1f439))
+
+## [0.8.19](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.8.18...@cardano-sdk/hardware-ledger@0.8.19) (2024-04-03)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-ledger
+
 ## [0.8.18](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.8.17...@cardano-sdk/hardware-ledger@0.8.18) (2024-03-26)
 
 **Note:** Version bump only for package @cardano-sdk/hardware-ledger

@@ -101,7 +101,7 @@
                 }
                 // lib.optionalAttrs (values.pg-boss-worker ? env) values.pg-boss-worker.env
                 // lib.optionalAttrs (values.pg-boss-worker.metadata-fetch-mode == "smash") {
-                  SMASH_URL = "https://smash.cardano-mainnet.iohk.io/api/v1";
+                  SMASH_URL = values.pg-boss-worker.smash-url;
                 });
               volumeMounts = [
                 {

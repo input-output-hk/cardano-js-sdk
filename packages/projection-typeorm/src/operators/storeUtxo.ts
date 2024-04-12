@@ -11,6 +11,9 @@ export interface WithStoredProducedUtxo {
   storedProducedUtxo: Map<Mappers.ProducedUtxo, ObjectLiteral>;
 }
 
+export const willStoreUtxo = ({ utxo: { produced, consumed } }: Mappers.WithUtxo) =>
+  produced.length > 0 || consumed.length > 0;
+
 export const storeUtxo = typeormOperator<Mappers.WithUtxo, WithStoredProducedUtxo>(
   async ({ utxo: { consumed, produced }, block: { header }, eventType, queryRunner }) => {
     const utxoRepository = queryRunner.manager.getRepository(OutputEntity);

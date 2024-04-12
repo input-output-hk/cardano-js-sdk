@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.36.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.35.2...@cardano-sdk/wallet@0.36.0) (2024-04-04)
+
+### ⚠ BREAKING CHANGES
+
+* **hardware-ledger:** replace LedgerKeyAgent webhid transport with webusb
+- make some of the LedgerKeyAgent methods private
+- remove activeTransport parameter from the LedgerKeyAgent.createTransport method
+
+### Features
+
+* **hardware-ledger:** enable LedgerKeyAgent to accept a device to establish connection with ([f084f42](https://github.com/input-output-hk/cardano-js-sdk/commit/f084f4203240a25f9680d200e13dc27a47c1f439))
+
+## [0.35.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.35.1...@cardano-sdk/wallet@0.35.2) (2024-04-03)
+
+**Note:** Version bump only for package @cardano-sdk/wallet
+
 ## [0.35.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.35.0...@cardano-sdk/wallet@0.35.1) (2024-03-26)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
