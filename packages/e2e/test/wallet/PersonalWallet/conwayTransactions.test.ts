@@ -66,7 +66,7 @@ describe('PersonalWallet/conwayTransactions', () => {
     expect((await firstValueFrom(wallet.delegation.rewardAccounts$))[0].delegatee?.nextNextEpoch?.id).toEqual(poolId);
 
   const getDRepCredential = async () => {
-    const drepPubKey = await dRepWallet.getPubDRepKey();
+    const drepPubKey = await dRepWallet.governance.getPubDRepKey();
     const dRepKeyHash = Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(
       (await Crypto.Ed25519PublicKey.fromHex(drepPubKey!).hash()).hex()
     );
