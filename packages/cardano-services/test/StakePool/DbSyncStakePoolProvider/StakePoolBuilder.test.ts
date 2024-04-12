@@ -270,8 +270,7 @@ describe('StakePoolBuilder', () => {
     });
   });
   describe('buildAndQuery', () => {
-    // TODO: LW-9889 Debug and reenable after Node 8.8 upgrade
-    it.skip('buildAndQuery, queryPoolHashes & queryTotalCount', async () => {
+    it('buildAndQuery, queryPoolHashes & queryTotalCount', async () => {
       const builtQuery = builder.buildAndQuery(filters);
       const { query, params } = builtQuery;
       const poolHashes = await builder.queryPoolHashes(query, params);
