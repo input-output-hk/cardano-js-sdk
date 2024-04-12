@@ -3,7 +3,8 @@ import {
   BlockEntity,
   TypeormStabilityWindowBuffer,
   WithTypeormContext,
-  createObservableConnection
+  createObservableConnection,
+  willStoreBlockData
 } from '../src';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { DataSource, NoConnectionForRepositoryError, QueryRunner, Repository } from 'typeorm';
@@ -21,6 +22,12 @@ const createBlockDataEntity = (block: Cardano.Block, blockEntity: BlockEntity): 
   block: blockEntity,
   blockHeight: blockEntity.height,
   data: block
+});
+
+const createCustomEvent = (secParameter: number, blockNo: number, tipBlockNo: number) => ({
+  block: { header: { blockNo } } as Cardano.Block,
+  genesisParameters: { securityParameter: secParameter } as Cardano.CompactGenesis,
+  tip: { blockNo: tipBlockNo } as Cardano.Tip
 });
 
 describe('TypeormStabilityWindowBuffer', () => {
@@ -168,6 +175,16 @@ describe('TypeormStabilityWindowBuffer', () => {
         await insertBlockAndData(block);
         await expect(getBlockFromBuffer(block.header.hash)).resolves.toEqual(block);
       });
+    });
+  });
+
+  describe('willStoreBlockData', () => {
+    it('returns false when block is outside stability window', () => {
+      expect(willStoreBlockData(createCustomEvent(10, 1, 500))).toBe(false);
+    });
+
+    it('returns true when block is within stability window', () => {
+      expect(willStoreBlockData(createCustomEvent(10, 490, 500))).toBe(true);
     });
   });
 });

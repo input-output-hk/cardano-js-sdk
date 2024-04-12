@@ -21,6 +21,16 @@ export interface TypeormStabilityWindowBufferProps extends WithLogger {
   reconnectionConfig: ReconnectionConfig;
 }
 
+export const willStoreBlockData = ({
+  genesisParameters,
+  block,
+  tip
+}: {
+  genesisParameters: Cardano.CompactGenesis;
+  block: Cardano.Block;
+  tip: Cardano.Tip;
+}) => block.header.blockNo >= tip.blockNo - genesisParameters.securityParameter;
+
 export class TypeormStabilityWindowBuffer implements StabilityWindowBuffer {
   readonly #queryRunner$: Observable<QueryRunner>;
   readonly #retryBackoffConfig: RetryBackoffConfig;
