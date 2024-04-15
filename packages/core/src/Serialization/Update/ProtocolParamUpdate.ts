@@ -46,6 +46,7 @@ export class ProtocolParamUpdate {
   #governanceActionDeposit: number | undefined;
   #drepDeposit: number | undefined;
   #drepInactivityPeriod: number | undefined;
+  #minFeeRefScriptCostPerByte: UnitInterval | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -90,6 +91,7 @@ export class ProtocolParamUpdate {
     //   , ? 30: coin                   ; governance action deposit
     //   , ? 31: coin                   ; DRep deposit
     //   , ? 32: epoch                  ; DRep inactivity period
+    //   , ? 33: nonnegative_interval   ; MinFee RefScriptCostPerByte
     //   }
     writer.writeStartMap(this.#getMapSize());
 
@@ -254,6 +256,12 @@ export class ProtocolParamUpdate {
       writer.writeInt(32n);
       writer.writeInt(this.#drepInactivityPeriod);
     }
+
+    if (this.#minFeeRefScriptCostPerByte) {
+      writer.writeInt(33n);
+      writer.writeEncodedValue(Buffer.from(this.#minFeeRefScriptCostPerByte.toCbor(), 'hex'));
+    }
+
     return writer.encodeAsHex();
   }
 
@@ -373,6 +381,9 @@ export class ProtocolParamUpdate {
         case 32n:
           params.#drepInactivityPeriod = Number(reader.readInt());
           break;
+        case 33n:
+          params.#minFeeRefScriptCostPerByte = UnitInterval.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
+          break;
       }
     }
 
@@ -392,7 +403,7 @@ export class ProtocolParamUpdate {
     return {
       coinsPerUtxoByte: this.#adaPerUtxoByte ? Number(this.#adaPerUtxoByte) : undefined,
       collateralPercentage: this.#collateralPercentage,
-      committeeTermLimit: this.#committeeTermLimit,
+      committeeTermLimit: this.#committeeTermLimit ? Cardano.EpochNo(this.#committeeTermLimit) : undefined,
       costModels: this.#costModels?.toCore(),
       dRepDeposit: this.#drepDeposit,
       dRepInactivityPeriod: this.#drepInactivityPeriod ? Cardano.EpochNo(this.#drepInactivityPeriod) : undefined,
@@ -414,6 +425,9 @@ export class ProtocolParamUpdate {
       minCommitteeSize: this.#minCommitteeSize,
       minFeeCoefficient: this.#minFeeA ? Number(this.#minFeeA) : undefined,
       minFeeConstant: this.#minFeeB ? Number(this.#minFeeB) : undefined,
+      minFeeRefScriptCostPerByte: this.#minFeeRefScriptCostPerByte
+        ? this.#minFeeRefScriptCostPerByte.toFloat().toString()
+        : undefined,
       minPoolCost: this.#minPoolCost ? Number(this.#minPoolCost) : undefined,
       monetaryExpansion: this.#expansionRate ? this.#expansionRate.toFloat().toString() : undefined,
       poolDeposit: this.#poolDeposit ? Number(this.#poolDeposit) : undefined,
@@ -485,6 +499,9 @@ export class ProtocolParamUpdate {
     params.#governanceActionDeposit = parametersUpdate.governanceActionDeposit;
     params.#drepDeposit = parametersUpdate.dRepDeposit;
     params.#drepInactivityPeriod = parametersUpdate.dRepInactivityPeriod;
+    params.#minFeeRefScriptCostPerByte = parametersUpdate.minFeeRefScriptCostPerByte
+      ? UnitInterval.fromFloat(Number(parametersUpdate.minFeeRefScriptCostPerByte))
+      : undefined;
 
     return params;
   }
@@ -1177,6 +1194,10 @@ export class ProtocolParamUpdate {
     return this.#drepInactivityPeriod;
   }
 
+  minFeeRefScriptCostPerByte(): UnitInterval | undefined {
+    return this.#minFeeRefScriptCostPerByte;
+  }
+
   /**
    * Gets the size of the serialized map.
    *
@@ -1217,6 +1238,7 @@ export class ProtocolParamUpdate {
     if (this.#governanceActionDeposit !== undefined) ++mapSize;
     if (this.#drepDeposit !== undefined) ++mapSize;
     if (this.#drepInactivityPeriod !== undefined) ++mapSize;
+    if (this.#minFeeRefScriptCostPerByte !== undefined) ++mapSize;
 
     return mapSize;
   }
