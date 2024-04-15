@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.8.12...@cardano-sdk/projection-typeorm@0.8.13) (2024-04-15)
+
+### Features
+
+* optimize projector to not write irrelevant blocks ([132a9f6](https://github.com/input-output-hk/cardano-js-sdk/commit/132a9f63c6927ec82af0ea39516c720d0674ad20))
+
+### Bug Fixes
+
+* the projection now always stores blocks when it reaches tip - k ([ba01291](https://github.com/input-output-hk/cardano-js-sdk/commit/ba01291c66178d372527f3fb07dceafd147c3891))
+
 ## [0.8.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.8.11...@cardano-sdk/projection-typeorm@0.8.12) (2024-03-26)
 
 **Note:** Version bump only for package @cardano-sdk/projection-typeorm

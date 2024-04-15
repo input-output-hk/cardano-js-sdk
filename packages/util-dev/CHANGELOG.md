@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.20.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.19.18...@cardano-sdk/util-dev@0.20.0) (2024-04-15)
+
+### ⚠ BREAKING CHANGES
+
+* upgrade cardano-services, cardano-services-client, e2e and util-dev packages to use version 0.28.0 of Axios
+
+### Miscellaneous Chores
+
+* upgrade Axios version to 0.28.0 ([59fcd06](https://github.com/input-output-hk/cardano-js-sdk/commit/59fcd06debc2712ca9fdd027400450d52a21caeb))
+
 ## [0.19.18](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.19.17...@cardano-sdk/util-dev@0.19.18) (2024-03-26)
 
 **Note:** Version bump only for package @cardano-sdk/util-dev

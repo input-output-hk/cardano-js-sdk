@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.27.1...@cardano-sdk/cardano-services@0.28.0) (2024-04-15)
+
+### ⚠ BREAKING CHANGES
+
+* upgrade cardano-services, cardano-services-client, e2e and util-dev packages to use version 0.28.0 of Axios
+
+### Features
+
+* optimize projector to not write irrelevant blocks ([132a9f6](https://github.com/input-output-hk/cardano-js-sdk/commit/132a9f63c6927ec82af0ea39516c720d0674ad20))
+
+### Bug Fixes
+
+* **cardano-services:** address projection now applies store operators in correct order ([2178cda](https://github.com/input-output-hk/cardano-js-sdk/commit/2178cdadddb0841c19d8cdea438fec14b4fe0e98))
+* **cardano-services:** emergency fix for lw-10209 ([abbf5fe](https://github.com/input-output-hk/cardano-js-sdk/commit/abbf5fed603e1c7e4cc133146035e88248f75f5b))
+* the projection now always stores blocks when it reaches tip - k ([ba01291](https://github.com/input-output-hk/cardano-js-sdk/commit/ba01291c66178d372527f3fb07dceafd147c3891))
+
+### Miscellaneous Chores
+
+* upgrade Axios version to 0.28.0 ([59fcd06](https://github.com/input-output-hk/cardano-js-sdk/commit/59fcd06debc2712ca9fdd027400450d52a21caeb))
+
 ## [0.27.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.27.0...@cardano-sdk/cardano-services@0.27.1) (2024-04-03)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services
