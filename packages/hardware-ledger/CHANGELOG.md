@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.9.0...@cardano-sdk/hardware-ledger@0.9.1) (2024-04-15)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-ledger
+
 ## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.8.19...@cardano-sdk/hardware-ledger@0.9.0) (2024-04-04)
 
 ### ⚠ BREAKING CHANGES

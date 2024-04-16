@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/projection",
-  "version": "0.11.10",
+  "version": "0.11.11",
   "description": "Chain Sync event projection",
   "engines": {
     "node": ">=16.20.2"

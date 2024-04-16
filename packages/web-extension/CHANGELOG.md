@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.27.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.26.2...@cardano-sdk/web-extension@0.27.0) (2024-04-15)
+
+### ⚠ BREAKING CHANGES
+
+* **wallet:** hoist ObservableWallet getPubDRepKey under ObservableWallet.governance
+
+### Features
+
+* **wallet:** implement drep registration tracker ([06a1de5](https://github.com/input-output-hk/cardano-js-sdk/commit/06a1de5ec67e13ecc33111532735242e17256df7))
+
+### Code Refactoring
+
+* **wallet:** hoist ObservableWallet getPubDRepKey under ObservableWallet.governance ([9cf346f](https://github.com/input-output-hk/cardano-js-sdk/commit/9cf346f7945384949a9b3a615680b448d5ffde94))
+
 ## [0.26.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.26.1...@cardano-sdk/web-extension@0.26.2) (2024-04-04)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension
