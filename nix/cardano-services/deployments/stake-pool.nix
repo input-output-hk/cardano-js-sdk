@@ -30,7 +30,6 @@
       SERVICE_NAMES = "stake-pool";
       USE_TYPEORM_STAKE_POOL_PROVIDER = "true";
       TOKEN_METADATA_SERVER_URL = values.cardano-services.tokenMetadataServerUrl;
-      USE_BLOCKFROST = "true";
 
       BUILD_INFO = values.cardano-services.buildInfo;
       ALLOWED_ORIGINS = values.backend.allowedOrigins;
