@@ -83,7 +83,7 @@ in
         };
 
         handle = {
-          resources.limits = mkPodResources "300Mi" "500m";
+          resources.limits = mkPodResources "300Mi" "700m";
           resources.requests = mkPodResources "150Mi" "100m";
         };
 
@@ -286,6 +286,57 @@ in
               }
             ];
           };
+        };
+      };
+
+      "live-mainnet@us-east-2@v2" = final: {
+        name = "${final.namespace}-cardanojs-v2";
+        namespace = "live-mainnet";
+        context = "eks-admin";
+
+        providers = {
+          backend = {
+            enabled = true;
+            replicas = 3;
+            env.NODE_ENV = "production";
+          };
+          stake-pool-provider = {
+            enabled = true;
+            env.OVERRIDE_FUZZY_OPTIONS = "true";
+            env.NODE_ENV = "production";
+          };
+          # handle-provider.enabled = true;
+          # asset-provider.enabled = true;
+        };
+
+        projectors = {
+          handle.enabled = true;
+          stake-pool.enabled = true;
+          # asset.enabled = true;
+        };
+
+        values = {
+          network = "mainnet";
+          region = "us-east-2";
+          cardano-services = {
+            ingresOrder = 98;
+            additionalRoutes = [
+              {
+                pathType = "Prefix";
+                path = "/v1.0.0/stake-pool";
+                backend.service = {
+                  name = "${final.namespace}-cardanojs-stake-pool-provider";
+                  port.name = "http";
+                };
+              }
+            ];
+          };
+          backend.allowedOrigins = lib.concatStringsSep "," allowedOrigins;
+          # backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
+          backend.hostnames = ["tmp-${final.namespace}.${baseUrl}"];
+
+          blockfrost-worker.enabled = true;
+          pg-boss-worker.enabled = true;
         };
       };
 
