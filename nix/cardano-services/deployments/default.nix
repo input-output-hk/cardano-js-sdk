@@ -295,7 +295,7 @@ in
           backend = {
             enabled = true;
             replicas = 3;
-            env.NODE_EXTRA_OPTIONS = "--gc-trace";
+            env.NODE_EXTRA_OPTIONS = "--trace-gc";
           };
           stake-pool-provider = {
             enabled = true;
