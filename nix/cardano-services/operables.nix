@@ -8,7 +8,7 @@ let
   mainnet  preprod  preprod_p2p  preview  preview_p2p  testnet  vasil-dev  vasil-dev_p2p  vasil-qa
   */
   cardanoServicesPath = pkg: "${pkg}/libexec/incl/packages/cardano-services";
-  runCardanoServices = pkg: "${lib.getExe pkg.nodejs} ${cardanoServicesPath pkg}";
+  runCardanoServices = pkg: "${lib.getExe pkg.nodejs} \${NODE_EXTRA_OPTIONS:-} ${cardanoServicesPath pkg}";
 in {
   cardano-services = std.lib.ops.mkOperable rec {
     package = cell.packages.cardano-services;
