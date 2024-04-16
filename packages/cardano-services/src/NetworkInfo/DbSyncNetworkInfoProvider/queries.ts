@@ -57,6 +57,7 @@ export const findProtocolParams = `
     cost_model.costs,
     committee_min_size,
     committee_max_term_length,
+    gov_action_lifetime,
     FROM epoch_param
     LEFT JOIN cost_model
         ON cost_model.id = epoch_param.cost_model_id
