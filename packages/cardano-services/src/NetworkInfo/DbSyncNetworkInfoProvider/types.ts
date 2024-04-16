@@ -57,7 +57,7 @@ export interface ProtocolParamsModel {
   costs: CostModelsParamModel | null;
   pool_voting_thresholds: Cardano.PoolVotingThresholds;
   drep_voting_thresholds: Cardano.DelegateRepresentativeThresholds;
-  min_committee_size: number;
+  committee_min_size: number;
   committee_term_limit: number;
   governance_action_validity_period: number;
   gov_action_deposit: number;
