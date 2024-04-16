@@ -62,5 +62,5 @@ export interface ProtocolParamsModel {
   gov_action_lifetime: number;
   gov_action_deposit: number;
   drep_deposit: number;
-  drep_inactivity_period: number;
+  drep_activity: number;
 }

@@ -67,7 +67,7 @@ export const toProtocolParams = ({
   gov_action_lifetime,
   gov_action_deposit,
   drep_deposit,
-  drep_inactivity_period,
+  drep_activity,
   min_fee_ref_script_cost_per_byte
 }: ProtocolParamsModel): Cardano.ProtocolParameters => ({
   coinsPerUtxoByte: Number(coins_per_utxo_size),
@@ -75,7 +75,8 @@ export const toProtocolParams = ({
   committeeTermLimit: Cardano.EpochNo(committee_max_term_length),
   costModels: mapCostModels(costs),
   dRepDeposit: Number(drep_deposit),
-  dRepInactivityPeriod: Cardano.EpochNo(drep_inactivity_period),
+  // CDDL represents it as `32: epoch  ; DRep inactivity period`
+  dRepInactivityPeriod: Cardano.EpochNo(drep_activity),
   dRepVotingThresholds: drep_voting_thresholds,
   decentralizationParameter: String(decentralisation),
   desiredNumberOfPools: optimal_pool_count,
