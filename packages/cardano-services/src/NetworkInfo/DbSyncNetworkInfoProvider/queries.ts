@@ -56,6 +56,7 @@ export const findProtocolParams = `
     drep_deposit,
     cost_model.costs,
     committee_min_size,
+    committee_max_term_length,
     FROM epoch_param
     LEFT JOIN cost_model
         ON cost_model.id = epoch_param.cost_model_id

@@ -58,7 +58,7 @@ export interface ProtocolParamsModel {
   pool_voting_thresholds: Cardano.PoolVotingThresholds;
   drep_voting_thresholds: Cardano.DelegateRepresentativeThresholds;
   committee_min_size: number;
-  committee_term_limit: number;
+  committee_max_term_length: number;
   governance_action_validity_period: number;
   gov_action_deposit: number;
   drep_deposit: number;
