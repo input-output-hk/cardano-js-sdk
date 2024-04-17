@@ -79,7 +79,7 @@ const conwayCore: Cardano.ProtocolParametersUpdate = {
   dRepDeposit: 2000,
   dRepInactivityPeriod: EpochNo(5000),
   dRepVotingThresholds: {
-    commiteeNoConfidence: { denominator: 2, numerator: 2 },
+    committeeNoConfidence: { denominator: 2, numerator: 2 },
     committeeNormal: { denominator: 1, numerator: 1 },
     hardForkInitiation: { denominator: 4, numerator: 4 },
     motionNoConfidence: { denominator: 0, numerator: 0 },
@@ -112,7 +112,7 @@ const conwayCore: Cardano.ProtocolParametersUpdate = {
   poolInfluence: '0.5',
   poolRetirementEpochBound: 800,
   poolVotingThresholds: {
-    commiteeNoConfidence: { denominator: 2, numerator: 2 },
+    committeeNoConfidence: { denominator: 2, numerator: 2 },
     committeeNormal: { denominator: 1, numerator: 1 },
     hardForkInitiation: { denominator: 3, numerator: 3 },
     motionNoConfidence: { denominator: 0, numerator: 0 },
@@ -214,7 +214,7 @@ describe('ProtocolParamUpdate', () => {
     expect(proposedParams.drepDeposit()).toEqual(2000);
     expect(proposedParams.drepInactivityPeriod()).toEqual(5000);
     expect(proposedParams.drepVotingThresholds()?.toCore()).toEqual({
-      commiteeNoConfidence: { denominator: 2, numerator: 2 },
+      committeeNoConfidence: { denominator: 2, numerator: 2 },
       committeeNormal: { denominator: 1, numerator: 1 },
       hardForkInitiation: { denominator: 4, numerator: 4 },
       motionNoConfidence: { denominator: 0, numerator: 0 },
@@ -226,7 +226,7 @@ describe('ProtocolParamUpdate', () => {
       updateConstitution: { denominator: 3, numerator: 3 }
     });
     expect(proposedParams.poolVotingThresholds()?.toCore()).toEqual({
-      commiteeNoConfidence: { denominator: 2, numerator: 2 },
+      committeeNoConfidence: { denominator: 2, numerator: 2 },
       committeeNormal: { denominator: 1, numerator: 1 },
       hardForkInitiation: { denominator: 3, numerator: 3 },
       motionNoConfidence: { denominator: 0, numerator: 0 },

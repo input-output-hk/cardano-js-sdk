@@ -120,7 +120,7 @@ export class PoolVotingThresholds {
    */
   toCore(): Cardano.PoolVotingThresholds {
     return {
-      commiteeNoConfidence: this.#committeeNoConfidence.toCore(),
+      committeeNoConfidence: this.#committeeNoConfidence.toCore(),
       committeeNormal: this.#committeeNormal.toCore(),
       hardForkInitiation: this.#hardForkInitiation.toCore(),
       motionNoConfidence: this.#motionNoConfidence.toCore(),
@@ -137,7 +137,7 @@ export class PoolVotingThresholds {
     return new PoolVotingThresholds(
       UnitInterval.fromCore(core.motionNoConfidence),
       UnitInterval.fromCore(core.committeeNormal),
-      UnitInterval.fromCore(core.commiteeNoConfidence),
+      UnitInterval.fromCore(core.committeeNoConfidence),
       UnitInterval.fromCore(core.hardForkInitiation),
       UnitInterval.fromCore(core.securityRelevantParamVotingThreshold)
     );
