@@ -22,37 +22,39 @@
 
     env = {
       NETWORK = values.network;
+      ENABLE_METRICS = "true";
+      SERVICE_NAMES = "chain-history";
       OGMIOS_SRV_SERVICE_NAME = values.backend.ogmiosSrvServiceName;
       LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
-      ENABLE_METRICS = "true";
+      TOKEN_METADATA_SERVER_URL = values.cardano-services.tokenMetadataServerUrl;
+      HANDLE_POLICY_IDS = "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a";
+      USE_BLOCKFROST = "true";
+      USE_KORA_LABS = "true";
       DISABLE_STAKE_POOL_METRIC_APY = "true";
       PAGINATION_PAGE_SIZE_LIMIT = "5500";
-      SERVICE_NAMES = "chain-history";
-      USE_TYPEORM_STAKE_POOL_PROVIDER = "true";
-      TOKEN_METADATA_SERVER_URL = values.cardano-services.tokenMetadataServerUrl;
-      USE_BLOCKFROST = "true";
+
 
       BUILD_INFO = values.cardano-services.buildInfo;
       ALLOWED_ORIGINS = values.backend.allowedOrigins;
 
-      POSTGRES_POOL_MAX = "10";
-      POSTGRES_HOST = values.postgresName;
-      POSTGRES_PORT = "5432";
-      POSTGRES_DB = "cardano";
-      POSTGRES_PASSWORD = {
+      POSTGRES_POOL_MAX_DB_SYNC = "50";
+      POSTGRES_HOST_DB_SYNC = values.postgresName;
+      POSTGRES_PORT_DB_SYNC = "5432";
+      POSTGRES_DB_DB_SYNC = "cardano";
+      POSTGRES_PASSWORD_DB_SYNC = {
         valueFrom.secretKeyRef = {
-          name = "cardano_public_owner_user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
+          name = "cardano-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
           key = "password";
         };
       };
-      POSTGRES_USER_STAKE_POOL = {
+      POSTGRES_USER_DB_SYNC = {
         valueFrom.secretKeyRef = {
-          name = "cardano_public_owner_user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
+          name = "cardano-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
           key = "username";
         };
       };
-      POSTGRES_SSL_STAKE_POOL = "true";
-      POSTGRES_SSL_CA_FILE_STAKE_POOL = "/tls/ca.crt";
+      POSTGRES_SSL_DB_SYNC = "true";
+      POSTGRES_SSL_CA_FILE_DB_SYNC = "/tls/ca.crt";
     };
   };
 }
