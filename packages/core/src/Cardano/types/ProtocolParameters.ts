@@ -103,7 +103,10 @@ type NewProtocolParamsInBabbage = {
 };
 
 // coinsPerUtxoWord was replaced by coinsPerUtxoByte and extraEntropy was deprecated.
-type BabbageProtocolParameters = Omit<AlonzoProtocolParams, 'coinsPerUtxoWord' | 'extraEntropy'> &
+type BabbageProtocolParameters = Omit<
+  AlonzoProtocolParams,
+  'coinsPerUtxoWord' | 'extraEntropy' | 'decentralizationParameter'
+> &
   NewProtocolParamsInBabbage;
 
 // Voting thresholds
@@ -142,7 +145,9 @@ export type ConwayProtocolParameters = Omit<ProtocolParameters, 'protocolVersion
 
 // Even tho extraEntropy was deprecated on babbage era, and protocolVersion was deprecated in conway era,
 // they are still present in the ProtocolParametersUpdate structure since this structure is backward compatible with all eras.
-export type ProtocolParametersUpdate = Partial<ProtocolParameters & Pick<AlonzoProtocolParams, 'extraEntropy'>>;
+export type ProtocolParametersUpdate = Partial<
+  ProtocolParameters & Pick<AlonzoProtocolParams, 'extraEntropy' | 'decentralizationParameter'>
+>;
 export type ProtocolParametersUpdateConway = Partial<ConwayProtocolParameters>;
 
 export type GenesisDelegateKeyHash = Crypto.Hash28ByteBase16;

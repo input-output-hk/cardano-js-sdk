@@ -56,7 +56,6 @@ export const toProtocolParams = ({
   influence,
   monetary_expand_rate,
   treasury_growth_rate,
-  decentralisation,
   collateral_percent,
   price_mem,
   price_step,
@@ -108,7 +107,6 @@ export const toProtocolParams = ({
     treasuryWithdrawal: mapFraction(dvt_treasury_withdrawal),
     updateConstitution: mapFraction(dvt_update_to_constitution)
   },
-  decentralizationParameter: String(decentralisation),
   desiredNumberOfPools: optimal_pool_count,
   governanceActionDeposit: Number(gov_action_deposit),
   governanceActionValidityPeriod: Cardano.EpochNo(gov_action_lifetime),

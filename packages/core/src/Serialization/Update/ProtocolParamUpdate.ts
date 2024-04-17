@@ -468,9 +468,6 @@ export class ProtocolParamUpdate {
     params.#treasuryGrowthRate = parametersUpdate.treasuryExpansion
       ? UnitInterval.fromFloat(Number(parametersUpdate.treasuryExpansion))
       : undefined;
-    params.#d = parametersUpdate.decentralizationParameter
-      ? UnitInterval.fromFloat(Number(parametersUpdate.decentralizationParameter))
-      : undefined;
     params.#minPoolCost = parametersUpdate.minPoolCost ? BigInt(parametersUpdate.minPoolCost) : undefined;
     params.#maxValueSize = parametersUpdate.maxValueSize;
     params.#maxTxSize = parametersUpdate.maxTxSize;
@@ -501,8 +498,10 @@ export class ProtocolParamUpdate {
       ? UnitInterval.fromFloat(Number(parametersUpdate.minFeeRefScriptCostPerByte))
       : undefined;
 
-    const { protocolVersion, extraEntropy } = parametersUpdate as unknown as Cardano.ProtocolParametersUpdate;
-    if (protocolVersion !== undefined || extraEntropy !== undefined) {
+    const { protocolVersion, extraEntropy, decentralizationParameter } =
+      parametersUpdate as unknown as Cardano.ProtocolParametersUpdate;
+    if (protocolVersion !== undefined || extraEntropy !== undefined || decentralizationParameter) {
+      params.#d = decentralizationParameter ? UnitInterval.fromFloat(Number(decentralizationParameter)) : undefined;
       params.#protocolVersion = protocolVersion ? ProtocolVersion.fromCore(protocolVersion) : undefined;
       params.#extraEntropy = extraEntropy ? HexBlob(extraEntropy) : undefined;
     }
