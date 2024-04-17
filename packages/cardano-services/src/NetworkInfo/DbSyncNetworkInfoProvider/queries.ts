@@ -59,6 +59,21 @@ export const findProtocolParams = `
     committee_max_term_length,
     gov_action_lifetime,
     drep_activity,
+    pvt_motion_no_confidence,
+    pvt_committee_normal,
+    pvt_committee_no_confidence,
+    pvt_hard_fork_initiation,
+    pvtpp_security_group,
+    dvt_motion_no_confidence,
+    dvt_committee_normal,
+    dvt_committee_no_confidence,
+    dvt_update_to_constitution,
+    dvt_hard_fork_initiation,
+    dvt_p_p_network_group,
+    dvt_p_p_economic_group,
+    dvt_p_p_technical_group,
+    dvt_p_p_gov_group,
+    dvt_treasury_withdrawal
     FROM epoch_param
     LEFT JOIN cost_model
         ON cost_model.id = epoch_param.cost_model_id

@@ -2,11 +2,17 @@ import { Cardano, Seconds, SupplySummary } from '@cardano-sdk/core';
 import { CostModelsParamModel, ProtocolParamsModel } from './types';
 import { GenesisData } from '../../types';
 import { LedgerTipModel } from '../../util/DbSyncProvider';
+import Fraction from 'fraction.js';
 
 interface ToLovalaceSupplyInput {
   circulatingSupply: string;
   totalSupply: string;
 }
+
+const mapFraction = (value: number): Cardano.Fraction => {
+  const { n: numerator, d: denominator } = new Fraction(value);
+  return { denominator, numerator };
+};
 
 export const networkIdMap = {
   Mainnet: Cardano.NetworkId.Mainnet,
@@ -60,8 +66,21 @@ export const toProtocolParams = ({
   max_block_ex_steps,
   max_epoch,
   costs,
-  pool_voting_thresholds,
-  drep_voting_thresholds,
+  pvt_motion_no_confidence,
+  pvt_committee_normal,
+  pvt_committee_no_confidence,
+  pvt_hard_fork_initiation,
+  pvtpp_security_group,
+  dvt_motion_no_confidence,
+  dvt_committee_normal,
+  dvt_committee_no_confidence,
+  dvt_update_to_constitution,
+  dvt_hard_fork_initiation,
+  dvt_p_p_network_group,
+  dvt_p_p_economic_group,
+  dvt_p_p_technical_group,
+  dvt_p_p_gov_group,
+  dvt_treasury_withdrawal,
   committee_min_size,
   committee_max_term_length,
   gov_action_lifetime,
@@ -77,7 +96,18 @@ export const toProtocolParams = ({
   dRepDeposit: Number(drep_deposit),
   // CDDL represents it as `32: epoch  ; DRep inactivity period`
   dRepInactivityPeriod: Cardano.EpochNo(drep_activity),
-  dRepVotingThresholds: drep_voting_thresholds,
+  dRepVotingThresholds: {
+    committeeNoConfidence: mapFraction(dvt_committee_no_confidence),
+    committeeNormal: mapFraction(dvt_committee_normal),
+    hardForkInitiation: mapFraction(dvt_hard_fork_initiation),
+    motionNoConfidence: mapFraction(dvt_motion_no_confidence),
+    ppEconomicGroup: mapFraction(dvt_p_p_economic_group),
+    ppGovernanceGroup: mapFraction(dvt_p_p_gov_group),
+    ppNetworkGroup: mapFraction(dvt_p_p_network_group),
+    ppTechnicalGroup: mapFraction(dvt_p_p_technical_group),
+    treasuryWithdrawal: mapFraction(dvt_treasury_withdrawal),
+    updateConstitution: mapFraction(dvt_update_to_constitution)
+  },
   decentralizationParameter: String(decentralisation),
   desiredNumberOfPools: optimal_pool_count,
   governanceActionDeposit: Number(gov_action_deposit),
@@ -104,7 +134,13 @@ export const toProtocolParams = ({
   poolDeposit: Number(pool_deposit),
   poolInfluence: String(influence),
   poolRetirementEpochBound: max_epoch,
-  poolVotingThresholds: pool_voting_thresholds,
+  poolVotingThresholds: {
+    committeeNoConfidence: mapFraction(pvt_committee_no_confidence),
+    committeeNormal: mapFraction(pvt_committee_normal),
+    hardForkInitiation: mapFraction(pvt_hard_fork_initiation),
+    motionNoConfidence: mapFraction(pvt_motion_no_confidence),
+    securityRelevantParamVotingThreshold: mapFraction(pvtpp_security_group)
+  },
   prices: {
     memory: price_mem,
     steps: price_step

@@ -55,12 +55,25 @@ export interface ProtocolParamsModel {
   max_block_ex_steps: string;
   max_epoch: number;
   costs: CostModelsParamModel | null;
-  pool_voting_thresholds: Cardano.PoolVotingThresholds;
-  drep_voting_thresholds: Cardano.DelegateRepresentativeThresholds;
   committee_min_size: number;
   committee_max_term_length: number;
   gov_action_lifetime: number;
   gov_action_deposit: number;
   drep_deposit: number;
   drep_activity: number;
+  pvt_motion_no_confidence: number;
+  pvt_committee_normal: number;
+  pvt_committee_no_confidence: number;
+  pvt_hard_fork_initiation: number;
+  pvtpp_security_group: number;
+  dvt_motion_no_confidence: number;
+  dvt_committee_normal: number;
+  dvt_committee_no_confidence: number;
+  dvt_update_to_constitution: number;
+  dvt_hard_fork_initiation: number;
+  dvt_p_p_network_group: number;
+  dvt_p_p_economic_group: number;
+  dvt_p_p_technical_group: number;
+  dvt_p_p_gov_group: number;
+  dvt_treasury_withdrawal: number;
 }
