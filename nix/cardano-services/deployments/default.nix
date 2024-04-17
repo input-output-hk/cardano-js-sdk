@@ -674,6 +674,7 @@ in
           backend = {
             enabled = true;
           };
+          chain-history-provider.enabled = true;
         };
 
         values = {

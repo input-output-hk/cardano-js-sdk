@@ -35,19 +35,19 @@
       BUILD_INFO = values.cardano-services.buildInfo;
       ALLOWED_ORIGINS = values.backend.allowedOrigins;
 
-      POSTGRES_POOL_MAX_STAKE_POOL = "10";
-      POSTGRES_HOST_STAKE_POOL = values.postgresName;
-      POSTGRES_PORT_STAKE_POOL = "5432";
-      POSTGRES_DB_STAKE_POOL = "stakepool";
-      POSTGRES_PASSWORD_STAKE_POOL = {
+      POSTGRES_POOL_MAX = "10";
+      POSTGRES_HOST = values.postgresName;
+      POSTGRES_PORT = "5432";
+      POSTGRES_DB = "cardano";
+      POSTGRES_PASSWORD = {
         valueFrom.secretKeyRef = {
-          name = "stakepool-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
+          name = "cardano_public_owner_user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
           key = "password";
         };
       };
       POSTGRES_USER_STAKE_POOL = {
         valueFrom.secretKeyRef = {
-          name = "stakepool-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
+          name = "cardano_public_owner_user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
           key = "username";
         };
       };
