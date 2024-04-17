@@ -176,6 +176,7 @@ in
         providers = {
           backend = {
             enabled = true;
+            env.NODE_EXTRA_OPTIONS = "--trace-gc";
           };
           stake-pool-provider = {
             enabled = true;
@@ -383,6 +384,7 @@ in
         providers = {
           backend = {
             enabled = true;
+            env.NODE_EXTRA_OPTIONS = "--trace-gc";
           };
           stake-pool-provider = {
             enabled = true;
