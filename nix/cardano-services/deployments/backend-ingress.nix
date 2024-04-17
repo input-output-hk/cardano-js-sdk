@@ -63,6 +63,16 @@
                 }
               )
               values.backend.routes)
+            ++ lib.optionals config.providers.chain-history-provider.enabled [
+              {
+                pathType = "Prefix";
+                path = "/v${lib.last (lib.sort lib.versionOlder values.cardano-services.versions.chainHistory)}/chain-history";
+                backend.service = {
+                  name = "${chart.name}-chain-history-provider";
+                  port.name = "http";
+                };
+              }
+            ]
             ++ lib.optionals config.providers.stake-pool-provider.enabled [
               {
                 pathType = "Prefix";

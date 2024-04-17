@@ -221,7 +221,7 @@ in
                     (map (v: "/v${v}/chain-history") versions.chainHistory)
                   ];
                 backend.service = {
-                  name = "${final.namespace}-chain-history";
+                  name = "${final.namespace}-chain-history-provider";
                   port.name = "http";
                 };
               }
