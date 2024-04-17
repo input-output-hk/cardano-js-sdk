@@ -332,8 +332,7 @@ in
             ];
           };
           backend.allowedOrigins = lib.concatStringsSep "," allowedOrigins;
-          # backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
-          backend.hostnames = ["tmp-${final.namespace}.${baseUrl}"];
+          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
 
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
