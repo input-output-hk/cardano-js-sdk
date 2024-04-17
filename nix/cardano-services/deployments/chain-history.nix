@@ -2,9 +2,11 @@
   config,
   values,
   lib,
+  utils,
+  chart,
   ...
 }: {
-  providers.backend = {
+  providers.chain-history-provider = {
     inherit (values.cardano-services) image;
     args = ["start-provider-server"];
     port = 3000;
@@ -21,7 +23,7 @@
     env = {
       NETWORK = values.network;
       ENABLE_METRICS = "true";
-      SERVICE_NAMES = "asset,network-info,rewards,stake-pool,tx-submit,utxo";
+      SERVICE_NAMES = "chain-history";
       OGMIOS_SRV_SERVICE_NAME = values.backend.ogmiosSrvServiceName;
       LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
       TOKEN_METADATA_SERVER_URL = values.cardano-services.tokenMetadataServerUrl;
@@ -31,10 +33,6 @@
       DISABLE_STAKE_POOL_METRIC_APY = "true";
       PAGINATION_PAGE_SIZE_LIMIT = "5500";
 
-      HANDLE_PROVIDER_SERVER_URL =
-        if values.network == "mainnet"
-        then "https://api.handle.me"
-        else "https://${values.network}.api.handle.me";
 
       BUILD_INFO = values.cardano-services.buildInfo;
       ALLOWED_ORIGINS = values.backend.allowedOrigins;
@@ -57,25 +55,6 @@
       };
       POSTGRES_SSL_DB_SYNC = "true";
       POSTGRES_SSL_CA_FILE_DB_SYNC = "/tls/ca.crt";
-    } // lib.optionalAttrs values.backend.passHandleDBArgs {
-      POSTGRES_POOL_MAX_HANDLE = "10";
-      POSTGRES_HOST_HANDLE = values.postgresName;
-      POSTGRES_PORT_HANDLE = "5432";
-      POSTGRES_DB_HANDLE = "handle";
-      POSTGRES_PASSWORD_HANDLE = {
-        valueFrom.secretKeyRef = {
-          name = "handle-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
-          key = "password";
-        };
-      };
-      POSTGRES_USER_HANDLE = {
-        valueFrom.secretKeyRef = {
-          name = "handle-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
-          key = "username";
-        };
-      };
-      POSTGRES_SSL_HANDLE = "true";
-      POSTGRES_SSL_CA_FILE_HANDLE = "/tls/ca.crt";
     };
   };
 }
