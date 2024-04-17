@@ -15,6 +15,7 @@ import {
 } from '@cardano-sdk/key-management';
 import { HID } from 'node-hid';
 import { LedgerDevice, LedgerTransportType } from './types';
+import { areNumbersEqualInConstantTime, areStringsEqualInConstantTime } from '@cardano-sdk/util';
 import { str_to_path } from '@cardano-foundation/ledgerjs-hw-app-cardano/dist/utils/address';
 import { toLedgerTx } from './transformers';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
@@ -93,7 +94,6 @@ const stakeCredentialCert = (cert: Certificate) =>
   cert.type === CertificateType.STAKE_REGISTRATION ||
   cert.type === CertificateType.STAKE_DEREGISTRATION ||
   cert.type === CertificateType.STAKE_DELEGATION;
-
 const isLedgerModelSupported = (deviceModelId: string): deviceModelId is 'nanoS' | 'nanoX' | 'nanoSP' =>
   ['nanoS', 'nanoX', 'nanoSP'].includes(deviceModelId);
 
@@ -132,7 +132,8 @@ interface StakeCredentialCertificateParams {
 
 const containsOnlyScriptHashCreds = (tx: Transaction): boolean => {
   const withdrawalsAllScriptHash = !tx.withdrawals?.some(
-    (withdrawal) => withdrawal.stakeCredential.type !== StakeCredentialParamsType.SCRIPT_HASH
+    (withdrawal) =>
+      !areNumbersEqualInConstantTime(withdrawal.stakeCredential.type, StakeCredentialParamsType.SCRIPT_HASH)
   );
 
   if (tx.certificates) {
@@ -140,7 +141,8 @@ const containsOnlyScriptHashCreds = (tx: Transaction): boolean => {
       if (!stakeCredentialCert(cert)) return false;
 
       const certParams = cert.params as unknown as StakeCredentialCertificateParams;
-      if (certParams.stakeCredential.type !== StakeCredentialParamsType.SCRIPT_HASH) return false;
+      if (!areNumbersEqualInConstantTime(certParams.stakeCredential.type, StakeCredentialParamsType.SCRIPT_HASH))
+        return false;
     }
   }
 
@@ -555,7 +557,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
         tx: ledgerTxData
       });
 
-      if (result.txHashHex !== hash) {
+      if (!areStringsEqualInConstantTime(result.txHashHex, hash)) {
         throw new errors.HwMappingError('Ledger computed a different transaction id');
       }
 

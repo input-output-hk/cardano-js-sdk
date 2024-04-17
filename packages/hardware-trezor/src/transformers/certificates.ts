@@ -3,7 +3,12 @@ import * as Trezor from '@trezor/connect';
 import { BIP32Path } from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { GroupedAddress, util } from '@cardano-sdk/key-management';
-import { InvalidArgumentError, Transform } from '@cardano-sdk/util';
+import {
+  InvalidArgumentError,
+  Transform,
+  areNumbersEqualInConstantTime,
+  areStringsEqualInConstantTime
+} from '@cardano-sdk/util';
 import { TrezorTxTransformerContext } from '../types';
 
 type CertCredentialsType = {
@@ -16,12 +21,15 @@ const getCertCredentials = (
   stakeKeyHash: Crypto.Ed25519KeyHashHex,
   knownAddresses: GroupedAddress[] | undefined
 ): CertCredentialsType => {
-  const knownAddress = knownAddresses?.find(
-    (address) => Cardano.RewardAccount.toHash(address.rewardAccount) === stakeKeyHash
+  const knownAddress = knownAddresses?.find((address) =>
+    areStringsEqualInConstantTime(Cardano.RewardAccount.toHash(address.rewardAccount), stakeKeyHash)
   );
   const rewardAddress = knownAddress ? Cardano.Address.fromBech32(knownAddress.rewardAccount)?.asReward() : null;
 
-  if (rewardAddress?.getPaymentCredential().type === Cardano.CredentialType.KeyHash) {
+  if (
+    !!rewardAddress &&
+    areNumbersEqualInConstantTime(rewardAddress?.getPaymentCredential().type, Cardano.CredentialType.KeyHash)
+  ) {
     const path = util.stakeKeyPathFromGroupedAddress(knownAddress);
     return path ? { path } : { keyHash: stakeKeyHash };
   }

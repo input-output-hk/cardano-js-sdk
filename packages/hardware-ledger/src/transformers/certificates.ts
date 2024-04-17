@@ -1,9 +1,8 @@
-import * as Crypto from '@cardano-sdk/crypto';
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Cardano } from '@cardano-sdk/core';
-import { InvalidArgumentError, Transform } from '@cardano-sdk/util';
+import { GroupedAddress, util } from '@cardano-sdk/key-management';
+import { InvalidArgumentError, Transform, areStringsEqualInConstantTime } from '@cardano-sdk/util';
 import { LedgerTxTransformerContext } from '../types';
-import { util } from '@cardano-sdk/key-management';
 
 type StakeKeyCertificateType = Ledger.CertificateType.STAKE_REGISTRATION | Ledger.CertificateType.STAKE_DEREGISTRATION;
 
@@ -14,16 +13,40 @@ type StakeKeyCertificate = {
   type: StakeKeyCertificateType;
 };
 
+// Type guard for certificates with stakeCredential
+const hasStakeCredential = (
+  certificate: Cardano.StakeAddressCertificate | Cardano.StakeDelegationCertificate | Cardano.PoolRetirementCertificate
+): certificate is Cardano.StakeAddressCertificate | Cardano.StakeDelegationCertificate =>
+  'stakeCredential' in certificate;
+
+/**
+ * This function checks if the provided certificate contains a stake credential and if so, attempts to
+ * find a corresponding known address within the provided context based on a constant-time string comparison
+ * of the hashed reward account and the stake credential hash.
+ *
+ * @param {Cardano.StakeAddressCertificate | Cardano.StakeDelegationCertificate | Cardano.PoolRetirementCertificate} certificate - The certificate containing a stake credential.
+ * @param {LedgerTxTransformerContext} [context] - The context containing known addresses to search within. Optional; if not provided, the function returns undefined.
+ * @returns {GroupedAddress | undefined} The matching grouped address if found, or undefined if no match is found or if context is not provided.
+ */
+export const getKnownAddress = (
+  certificate: Cardano.StakeAddressCertificate | Cardano.StakeDelegationCertificate | Cardano.PoolRetirementCertificate,
+  context?: LedgerTxTransformerContext
+): GroupedAddress | undefined =>
+  !!context && hasStakeCredential(certificate)
+    ? context?.knownAddresses.find((address) =>
+        areStringsEqualInConstantTime(
+          Cardano.RewardAccount.toHash(address.rewardAccount) as unknown as string,
+          certificate.stakeCredential.hash as unknown as string
+        )
+      )
+    : undefined;
+
 const getStakeAddressCertificate = (
   certificate: Cardano.StakeAddressCertificate,
   context: LedgerTxTransformerContext,
   type: StakeKeyCertificateType
 ): StakeKeyCertificate => {
-  const knownAddress = context?.knownAddresses.find(
-    (address) =>
-      Cardano.RewardAccount.toHash(address.rewardAccount) ===
-      (certificate.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex)
-  );
+  const knownAddress = getKnownAddress(certificate, context);
 
   const rewardAddress = knownAddress ? Cardano.Address.fromBech32(knownAddress.rewardAccount)?.asReward() : null;
   const path = util.stakeKeyPathFromGroupedAddress(knownAddress);
@@ -69,11 +92,8 @@ export const stakeDelegationCertificate: Transform<
   LedgerTxTransformerContext
 > = (certificate, context): Ledger.Certificate => {
   const poolIdKeyHash = Cardano.PoolId.toKeyHash(certificate.poolId);
-  const knownAddress = context?.knownAddresses.find(
-    (address) =>
-      Cardano.RewardAccount.toHash(address.rewardAccount) ===
-      (certificate.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex)
-  );
+  const knownAddress = getKnownAddress(certificate, context);
+
   const rewardAddress = knownAddress ? Cardano.Address.fromBech32(knownAddress.rewardAccount)?.asReward() : null;
 
   const credentialType = rewardAddress
@@ -228,8 +248,11 @@ const poolRetirementCertificate: Transform<
 > = (certificate, context): Ledger.Certificate => {
   const poolIdKeyHash = Cardano.PoolId.toKeyHash(certificate.poolId);
 
-  const knownAddress = context?.knownAddresses.find(
-    (address) => Cardano.RewardAccount.toHash(address.rewardAccount) === poolIdKeyHash
+  const knownAddress = context?.knownAddresses.find((address) =>
+    areStringsEqualInConstantTime(
+      Cardano.RewardAccount.toHash(address.rewardAccount) as unknown as string,
+      poolIdKeyHash as unknown as string
+    )
   );
 
   const poolKeyPath = util.stakeKeyPathFromGroupedAddress(knownAddress);
