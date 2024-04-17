@@ -212,19 +212,6 @@ in
                   port.name = "http";
                 };
               }
-              {
-                pathType = "Prefix";
-                path = let
-                  inherit (oci.meta) versions;
-                 in
-                  lib.concatLists [
-                    (map (v: "/v${v}/chain-history") versions.chainHistory)
-                  ];
-                backend.service = {
-                  name = "${final.namespace}-chain-history-provider";
-                  port.name = "http";
-                };
-              }
             ];
           };
 
