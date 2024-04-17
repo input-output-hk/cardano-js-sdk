@@ -12,7 +12,7 @@
     us-east-2 = readJsonFile ./tf-outputs/lace-prod-us-east-2.json;
   };
   oci = inputs.self.x86_64-linux.cardano-services.oci-images.cardano-services;
-  allowedOrigins =  [
+  allowedOrigins = [
     # Represents Chrome production version
     "chrome-extension://gafhhkghbfjjkeiendhlofajokpaflmk"
     # Represents Edge production version
@@ -23,10 +23,12 @@
     "chrome-extension://djcdfchkaijggdjokfomholkalbffgil"
   ];
 
-  allowedOriginsDev = allowedOrigins ++ [
-    "http://localhost/"
-    "http://localhost"
-  ];
+  allowedOriginsDev =
+    allowedOrigins
+    ++ [
+      "http://localhost/"
+      "http://localhost"
+    ];
 in
   nix-helm.builders.${pkgs.system}.mkHelmMultiTarget {
     defaults = final: let
@@ -114,13 +116,14 @@ in
           resources.requests = mkPodResources "150Mi" "100m";
         };
         pg-boss-worker = {
-           enabled = false;
-           metadata-fetch-mode = "smash";
-           smash-url = if values.network == "mainnet"
-                         then "https://smash.cardano-mainnet.iohk.io/api/v1"
-                         else "https://${values.network}-smash.world.dev.cardano.org/api/v1";
-           resources.limits = mkPodResources "300Mi" "300m";
-           resources.requests = mkPodResources "150Mi" "200m";
+          enabled = false;
+          metadata-fetch-mode = "smash";
+          smash-url =
+            if values.network == "mainnet"
+            then "https://smash.cardano-mainnet.iohk.io/api/v1"
+            else "https://${values.network}-smash.world.dev.cardano.org/api/v1";
+          resources.limits = mkPodResources "300Mi" "300m";
+          resources.requests = mkPodResources "150Mi" "200m";
         };
 
         backend = {
@@ -245,24 +248,23 @@ in
 
           backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
           backend.routes = let
-              inherit (oci.meta) versions;
-            in
-              lib.concatLists [
-                (map (v: "/v${v}/health") versions.root)
-                (map (v: "/v${v}/live") versions.root)
-                (map (v: "/v${v}/meta") versions.root)
-                (map (v: "/v${v}/ready") versions.root)
-                (map (v: "/v${v}/asset") versions.assetInfo)
-                (map (v: "/v${v}/chain-history") versions.chainHistory)
-                (map (v: "/v${v}/network-info") versions.networkInfo)
-                (map (v: "/v${v}/rewards") versions.rewards)
-                (map (v: "/v${v}/tx-submit") versions.txSubmit)
-                (map (v: "/v${v}/utxo") versions.utxo)
-                (map (v: "/v${v}/handle") versions.handle)
-                (map (v: "/v${v}/provider-server") versions.stakePool)
-                (map (v: "/v${v}/stake-pool-provider-server") versions.stakePool)
-              ];
-
+            inherit (oci.meta) versions;
+          in
+            lib.concatLists [
+              (map (v: "/v${v}/health") versions.root)
+              (map (v: "/v${v}/live") versions.root)
+              (map (v: "/v${v}/meta") versions.root)
+              (map (v: "/v${v}/ready") versions.root)
+              (map (v: "/v${v}/asset") versions.assetInfo)
+              (map (v: "/v${v}/chain-history") versions.chainHistory)
+              (map (v: "/v${v}/network-info") versions.networkInfo)
+              (map (v: "/v${v}/rewards") versions.rewards)
+              (map (v: "/v${v}/tx-submit") versions.txSubmit)
+              (map (v: "/v${v}/utxo") versions.utxo)
+              (map (v: "/v${v}/handle") versions.handle)
+              (map (v: "/v${v}/provider-server") versions.stakePool)
+              (map (v: "/v${v}/stake-pool-provider-server") versions.stakePool)
+            ];
 
           cardano-services = {
             ingresOrder = 99;
@@ -448,12 +450,27 @@ in
           };
           backend.allowedOrigins = lib.concatStringsSep "," allowedOrigins;
           backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
+          backend.routes = let
+            inherit (oci.meta) versions;
+          in
+            lib.concatLists [
+              (map (v: "/v${v}/health") versions.root)
+              (map (v: "/v${v}/live") versions.root)
+              (map (v: "/v${v}/meta") versions.root)
+              (map (v: "/v${v}/ready") versions.root)
+              (map (v: "/v${v}/asset") versions.assetInfo)
+              (map (v: "/v${v}/chain-history") versions.chainHistory)
+              (map (v: "/v${v}/network-info") versions.networkInfo)
+              (map (v: "/v${v}/rewards") versions.rewards)
+              (map (v: "/v${v}/tx-submit") versions.txSubmit)
+              (map (v: "/v${v}/utxo") versions.utxo)
+              (map (v: "/v${v}/handle") versions.handle)
+            ];
 
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
         };
       };
-
 
       "live-preprod@us-east-2@v2" = final: {
         name = "${final.namespace}-cardanojs-v2";
@@ -491,6 +508,22 @@ in
           cardano-services = {
             ingresOrder = 98;
           };
+          backend.routes = let
+            inherit (oci.meta) versions;
+          in
+            lib.concatLists [
+              (map (v: "/v${v}/health") versions.root)
+              (map (v: "/v${v}/live") versions.root)
+              (map (v: "/v${v}/meta") versions.root)
+              (map (v: "/v${v}/ready") versions.root)
+              (map (v: "/v${v}/asset") versions.assetInfo)
+              (map (v: "/v${v}/chain-history") versions.chainHistory)
+              (map (v: "/v${v}/network-info") versions.networkInfo)
+              (map (v: "/v${v}/rewards") versions.rewards)
+              (map (v: "/v${v}/tx-submit") versions.txSubmit)
+              (map (v: "/v${v}/utxo") versions.utxo)
+              (map (v: "/v${v}/handle") versions.handle)
+            ];
         };
       };
 
@@ -530,6 +563,22 @@ in
           cardano-services = {
             ingresOrder = 98;
           };
+          backend.routes = let
+            inherit (oci.meta) versions;
+          in
+            lib.concatLists [
+              (map (v: "/v${v}/health") versions.root)
+              (map (v: "/v${v}/live") versions.root)
+              (map (v: "/v${v}/meta") versions.root)
+              (map (v: "/v${v}/ready") versions.root)
+              (map (v: "/v${v}/asset") versions.assetInfo)
+              (map (v: "/v${v}/chain-history") versions.chainHistory)
+              (map (v: "/v${v}/network-info") versions.networkInfo)
+              (map (v: "/v${v}/rewards") versions.rewards)
+              (map (v: "/v${v}/tx-submit") versions.txSubmit)
+              (map (v: "/v${v}/utxo") versions.utxo)
+              (map (v: "/v${v}/handle") versions.handle)
+            ];
         };
       };
 
@@ -571,7 +620,6 @@ in
       };
 
       "live-sanchonet@us-east-2@v1" = final: {
-
         namespace = "live-sanchonet";
         name = "${final.namespace}-cardanojs-v1";
 
@@ -597,23 +645,23 @@ in
           blockfrost-worker.enabled = false;
           pg-boss-worker.enabled = true;
           backend.routes = let
-              inherit (oci.meta) versions;
-            in
-              lib.concatLists [
-                (map (v: "/v${v}/health") versions.root)
-                (map (v: "/v${v}/live") versions.root)
-                (map (v: "/v${v}/meta") versions.root)
-                (map (v: "/v${v}/ready") versions.root)
-                (map (v: "/v${v}/asset") versions.assetInfo)
-                (map (v: "/v${v}/chain-history") versions.chainHistory)
-                (map (v: "/v${v}/network-info") versions.networkInfo)
-                (map (v: "/v${v}/rewards") versions.rewards)
-                (map (v: "/v${v}/tx-submit") versions.txSubmit)
-                (map (v: "/v${v}/utxo") versions.utxo)
-                (map (v: "/v${v}/handle") versions.handle)
-                (map (v: "/v${v}/provider-server") versions.stakePool)
-                (map (v: "/v${v}/stake-pool-provider-server") versions.stakePool)
-              ];
+            inherit (oci.meta) versions;
+          in
+            lib.concatLists [
+              (map (v: "/v${v}/health") versions.root)
+              (map (v: "/v${v}/live") versions.root)
+              (map (v: "/v${v}/meta") versions.root)
+              (map (v: "/v${v}/ready") versions.root)
+              (map (v: "/v${v}/asset") versions.assetInfo)
+              (map (v: "/v${v}/chain-history") versions.chainHistory)
+              (map (v: "/v${v}/network-info") versions.networkInfo)
+              (map (v: "/v${v}/rewards") versions.rewards)
+              (map (v: "/v${v}/tx-submit") versions.txSubmit)
+              (map (v: "/v${v}/utxo") versions.utxo)
+              (map (v: "/v${v}/handle") versions.handle)
+              (map (v: "/v${v}/provider-server") versions.stakePool)
+              (map (v: "/v${v}/stake-pool-provider-server") versions.stakePool)
+            ];
 
           cardano-services = {
             ingresOrder = 99;
