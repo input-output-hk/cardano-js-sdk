@@ -446,7 +446,9 @@ export class ProtocolParamUpdate {
    *
    * @param parametersUpdate core parametersUpdate object.
    */
-  static fromCore(parametersUpdate: Cardano.ProtocolParametersUpdate) {
+  static fromCore<T extends Cardano.ProtocolParametersUpdateConway = Cardano.ProtocolParametersUpdate>(
+    parametersUpdate: T
+  ) {
     const params = new ProtocolParamUpdate();
 
     params.#minFeeA = parametersUpdate.minFeeCoefficient ? BigInt(parametersUpdate.minFeeCoefficient) : undefined;
@@ -470,14 +472,10 @@ export class ProtocolParamUpdate {
       ? UnitInterval.fromFloat(Number(parametersUpdate.decentralizationParameter))
       : undefined;
     params.#minPoolCost = parametersUpdate.minPoolCost ? BigInt(parametersUpdate.minPoolCost) : undefined;
-    params.#protocolVersion = parametersUpdate.protocolVersion
-      ? ProtocolVersion.fromCore(parametersUpdate.protocolVersion)
-      : undefined;
     params.#maxValueSize = parametersUpdate.maxValueSize;
     params.#maxTxSize = parametersUpdate.maxTxSize;
     params.#collateralPercentage = parametersUpdate.collateralPercentage;
     params.#maxCollateralInputs = parametersUpdate.maxCollateralInputs;
-    params.#extraEntropy = parametersUpdate.extraEntropy ? HexBlob(parametersUpdate.extraEntropy) : undefined;
     params.#costModels = parametersUpdate.costModels ? Costmdls.fromCore(parametersUpdate.costModels) : undefined;
     params.#executionCosts = parametersUpdate.prices ? ExUnitPrices.fromCore(parametersUpdate.prices) : undefined;
     params.#maxTxExUnits = parametersUpdate.maxExecutionUnitsPerTransaction
@@ -502,6 +500,12 @@ export class ProtocolParamUpdate {
     params.#minFeeRefScriptCostPerByte = parametersUpdate.minFeeRefScriptCostPerByte
       ? UnitInterval.fromFloat(Number(parametersUpdate.minFeeRefScriptCostPerByte))
       : undefined;
+
+    const { protocolVersion, extraEntropy } = parametersUpdate as unknown as Cardano.ProtocolParametersUpdate;
+    if (protocolVersion !== undefined || extraEntropy !== undefined) {
+      params.#protocolVersion = protocolVersion ? ProtocolVersion.fromCore(protocolVersion) : undefined;
+      params.#extraEntropy = extraEntropy ? HexBlob(extraEntropy) : undefined;
+    }
 
     return params;
   }
