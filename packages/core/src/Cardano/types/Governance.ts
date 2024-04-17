@@ -2,7 +2,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { Credential, CredentialType, RewardAccount } from '../Address';
 import { EpochNo, Fraction, ProtocolVersion, TransactionId } from '.';
 import { Lovelace } from './Value';
-import { ProtocolParametersUpdate } from './ProtocolParameters';
+import { ProtocolParametersUpdateConway } from './ProtocolParameters';
 
 export type Anchor = {
   url: string;
@@ -43,7 +43,7 @@ export type Constitution = {
 export type ParameterChangeAction = {
   __typename: GovernanceActionType.parameter_change_action;
   governanceActionId: GovernanceActionId | null;
-  protocolParamUpdate: ProtocolParametersUpdate;
+  protocolParamUpdate: ProtocolParametersUpdateConway;
   policyHash: Crypto.Hash28ByteBase16 | null;
 };
 
