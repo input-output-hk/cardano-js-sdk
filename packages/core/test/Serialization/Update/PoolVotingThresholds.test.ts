@@ -8,7 +8,7 @@ import { PoolVotingThresholds } from '../../../src/Serialization';
 const cbor = HexBlob('85d81e820000d81e820101d81e820202d81e820303d81e820101');
 
 const core: Cardano.PoolVotingThresholds = {
-  commiteeNoConfidence: { denominator: 2, numerator: 2 },
+  committeeNoConfidence: { denominator: 2, numerator: 2 },
   committeeNormal: { denominator: 1, numerator: 1 },
   hardForkInitiation: { denominator: 3, numerator: 3 },
   motionNoConfidence: { denominator: 0, numerator: 0 },
@@ -19,7 +19,7 @@ describe('PoolVotingThresholds', () => {
   it('can decode PoolVotingThresholds from CBOR', () => {
     const thresholds = PoolVotingThresholds.fromCbor(cbor);
 
-    expect(thresholds.committeeNoConfidence().toCore()).toEqual(core.commiteeNoConfidence);
+    expect(thresholds.committeeNoConfidence().toCore()).toEqual(core.committeeNoConfidence);
     expect(thresholds.committeeNormal().toCore()).toEqual(core.committeeNormal);
     expect(thresholds.hardForkInitiation().toCore()).toEqual(core.hardForkInitiation);
     expect(thresholds.motionNoConfidence().toCore()).toEqual(core.motionNoConfidence);
@@ -29,7 +29,7 @@ describe('PoolVotingThresholds', () => {
   it('can decode PoolVotingThresholds from Core', () => {
     const thresholds = PoolVotingThresholds.fromCore(core);
 
-    expect(thresholds.committeeNoConfidence().toCore()).toEqual(core.commiteeNoConfidence);
+    expect(thresholds.committeeNoConfidence().toCore()).toEqual(core.committeeNoConfidence);
     expect(thresholds.committeeNormal().toCore()).toEqual(core.committeeNormal);
     expect(thresholds.hardForkInitiation().toCore()).toEqual(core.hardForkInitiation);
     expect(thresholds.motionNoConfidence().toCore()).toEqual(core.motionNoConfidence);

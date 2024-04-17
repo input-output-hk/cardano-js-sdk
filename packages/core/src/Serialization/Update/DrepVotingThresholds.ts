@@ -168,7 +168,7 @@ export class DrepVotingThresholds {
    */
   toCore(): Cardano.DelegateRepresentativeThresholds {
     return {
-      commiteeNoConfidence: this.#committeeNoConfidence.toCore(),
+      committeeNoConfidence: this.#committeeNoConfidence.toCore(),
       committeeNormal: this.#committeeNormal.toCore(),
       hardForkInitiation: this.#hardForkInitiation.toCore(),
       motionNoConfidence: this.#motionNoConfidence.toCore(),
@@ -190,7 +190,7 @@ export class DrepVotingThresholds {
     return new DrepVotingThresholds(
       UnitInterval.fromCore(core.motionNoConfidence),
       UnitInterval.fromCore(core.committeeNormal),
-      UnitInterval.fromCore(core.commiteeNoConfidence),
+      UnitInterval.fromCore(core.committeeNoConfidence),
       UnitInterval.fromCore(core.updateConstitution),
       UnitInterval.fromCore(core.hardForkInitiation),
       UnitInterval.fromCore(core.ppNetworkGroup),

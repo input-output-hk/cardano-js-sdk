@@ -110,7 +110,7 @@ type BabbageProtocolParameters = Omit<AlonzoProtocolParams, 'coinsPerUtxoWord' |
 export interface PoolVotingThresholds {
   motionNoConfidence: Fraction;
   committeeNormal: Fraction;
-  commiteeNoConfidence: Fraction;
+  committeeNoConfidence: Fraction;
   hardForkInitiation: Fraction;
   securityRelevantParamVotingThreshold: Fraction;
 }
