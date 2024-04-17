@@ -475,7 +475,7 @@ in
             env.NODE_ENV = "production";
           };
           handle-provider = {
-            enabled = true;
+            enabled = false;
             env.NODE_ENV = "production";
           };
         };
@@ -514,7 +514,7 @@ in
             env.NODE_ENV = "production";
           };
           handle-provider = {
-            enabled = true;
+            enabled = false;
             env.NODE_ENV = "production";
           };
         };
