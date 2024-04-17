@@ -37,7 +37,6 @@ let
     name = "k9s-${region}";
     category = "direct access";
   };
-
 in {
   checks = mkShell {
     imports = [formattingModule];
