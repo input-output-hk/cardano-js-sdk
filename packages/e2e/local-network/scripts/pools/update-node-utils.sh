@@ -112,7 +112,7 @@ updatePool() {
     --tx-out "$genesisAddr"+0 \
     --invalid-hereafter 5000000 \
     --fee 0 \
-    --out-file tx.tmp \
+    --out-file tx.raw \
     --certificate pool-owner-registration.cert
 
   refScriptSize=$(cardano-cli conway query ref-script-size \
@@ -120,26 +120,31 @@ updatePool() {
     --testnet-magic 888 \
     --output-json | jq '.refInputScriptSize')
 
-  fee=$(cardano-cli conway transaction calculate-min-fee \
-    --reference-script-size $refScriptSize \
-    --tx-body-file tx.tmp \
-    --tx-in-count 1 \
-    --tx-out-count 1 \
-    --testnet-magic 888 \
-    --witness-count 2 \
-    --byron-witness-count 0 \
-    --protocol-params-file ./params.json | awk '{ print $1 }')
+  # Upon applying the fee, the tx size could increase, rendering the fee insuficient
+  # Calculate it twice, once with fee 0, then with the calculated fee, to minimise the 
+  # chance that the tx size increases the second time
+  for i in {1..2}; do
+    fee=$(cardano-cli conway transaction calculate-min-fee \
+      --reference-script-size $refScriptSize \
+      --tx-body-file tx.raw \
+      --tx-in-count 1 \
+      --tx-out-count 1 \
+      --testnet-magic 888 \
+      --witness-count 2 \
+      --byron-witness-count 0 \
+      --protocol-params-file ./params.json | awk '{ print $1 }')
 
-  initialBalance=$(getAddressBalance "$genesisAddr")
-  txOut=$((initialBalance - fee))
+    initialBalance=$(getAddressBalance "$genesisAddr")
+    txOut=$((initialBalance - fee))
 
-  cardano-cli conway transaction build-raw \
-    --tx-in "$utxo" \
-    --tx-out "$genesisAddr"+"$txOut" \
-    --invalid-hereafter 5000000 \
-    --fee "$fee" \
-    --certificate pool-owner-registration.cert \
-    --out-file tx.raw
+    cardano-cli conway transaction build-raw \
+      --tx-in "$utxo" \
+      --tx-out "$genesisAddr"+"$txOut" \
+      --invalid-hereafter 5000000 \
+      --fee "$fee" \
+      --certificate pool-owner-registration.cert \
+      --out-file tx.raw
+  done
 
   cardano-cli conway transaction sign \
     --tx-body-file tx.raw \
@@ -161,7 +166,7 @@ updatePool() {
 
   # delegating pool owner stake
   currentBalance=$(getAddressBalance "$genesisAddr")
-  cardano-cli conway stake-address delegation-certificate \
+  cardano-cli conway stake-address stake-delegation-certificate \
     --stake-verification-key-file "$stakeVKey" \
     --cold-verification-key-file "$coldVKey" \
     --out-file pool-owner-delegation.cert
@@ -173,34 +178,39 @@ updatePool() {
     --tx-out "$genesisAddr"+0 \
     --invalid-hereafter 5000000 \
     --fee 0 \
-    --out-file tx.tmp \
+    --out-file tx.raw \
     --certificate pool-owner-delegation.cert
 
   refScriptSize=$(cardano-cli conway query ref-script-size \
     --tx-in "$utxo" \
     --testnet-magic 888 \
     --output-json | jq '.refInputScriptSize')
+  
+  # Upon applying the fee, the tx size could increase, rendering the fee insuficient
+  # Calculate it twice, once with fee 0, then with the calculated fee, to minimise the 
+  # chance that the tx size increases the second time
+  for i in {1..2}; do
+    fee=$(cardano-cli conway transaction calculate-min-fee \
+      --reference-script-size $refScriptSize \
+      --tx-body-file tx.raw \
+      --tx-in-count 1 \
+      --tx-out-count 1 \
+      --testnet-magic 888 \
+      --witness-count 2 \
+      --byron-witness-count 0 \
+      --protocol-params-file ./params.json | awk '{ print $1 }')
 
-  fee=$(cardano-cli conway transaction calculate-min-fee \
-    --reference-script-size $refScriptSize \
-    --tx-body-file tx.tmp \
-    --tx-in-count 1 \
-    --tx-out-count 1 \
-    --testnet-magic 888 \
-    --witness-count 2 \
-    --byron-witness-count 0 \
-    --protocol-params-file ./params.json | awk '{ print $1 }')
+    initialBalance=$(getAddressBalance "$genesisAddr")
+    txOut=$((initialBalance - fee))
 
-  initialBalance=$(getAddressBalance "$genesisAddr")
-  txOut=$((initialBalance - fee))
-
-  cardano-cli conway transaction build-raw \
-    --tx-in "$utxo" \
-    --tx-out "$genesisAddr"+"$txOut" \
-    --invalid-hereafter 5000000 \
-    --fee "$fee" \
-    --certificate pool-owner-delegation.cert \
-    --out-file tx.raw
+    cardano-cli conway transaction build-raw \
+      --tx-in "$utxo" \
+      --tx-out "$genesisAddr"+"$txOut" \
+      --invalid-hereafter 5000000 \
+      --fee "$fee" \
+      --certificate pool-owner-delegation.cert \
+      --out-file tx.raw
+  done
 
   cardano-cli conway transaction sign \
     --tx-body-file tx.raw \
@@ -227,7 +237,7 @@ updatePool() {
   currentBalance=$(getAddressBalance "$paymentAddr")
 
   # create pool delegation certificate
-  cardano-cli conway stake-address delegation-certificate \
+  cardano-cli conway stake-address stake-delegation-certificate \
     --stake-verification-key-file "$delegatorStakeKey" \
     --stake-pool-id "$POOL_ID" \
     --out-file deleg.cert
@@ -239,7 +249,7 @@ updatePool() {
     --tx-out "$paymentAddr"+0 \
     --invalid-hereafter 5000000 \
     --fee 0 \
-    --out-file tx.tmp \
+    --out-file tx.raw \
     --certificate deleg.cert
 
   refScriptSize=$(cardano-cli conway query ref-script-size \
@@ -247,26 +257,31 @@ updatePool() {
     --testnet-magic 888 \
     --output-json | jq '.refInputScriptSize')
 
-  fee=$(cardano-cli conway transaction calculate-min-fee \
-    --reference-script-size $refScriptSize \
-    --tx-body-file tx.tmp \
-    --tx-in-count 1 \
-    --tx-out-count 1 \
-    --testnet-magic 888 \
-    --witness-count 2 \
-    --byron-witness-count 0 \
-    --protocol-params-file ./params.json | awk '{ print $1 }')
+  # Upon applying the fee, the tx size could increase, rendering the fee insuficient
+  # Calculate it twice, once with fee 0, then with the calculated fee, to minimise the 
+  # chance that the tx size increases the second time
+  for i in {1..2}; do
+    fee=$(cardano-cli conway transaction calculate-min-fee \
+      --reference-script-size $refScriptSize \
+      --tx-body-file tx.raw \
+      --tx-in-count 1 \
+      --tx-out-count 1 \
+      --testnet-magic 888 \
+      --witness-count 2 \
+      --byron-witness-count 0 \
+      --protocol-params-file ./params.json | awk '{ print $1 }')
 
-  initialBalance=$(getAddressBalance "$paymentAddr")
-  txOut=$((initialBalance - fee))
+    initialBalance=$(getAddressBalance "$paymentAddr")
+    txOut=$((initialBalance - fee))
 
-  cardano-cli conway transaction build-raw \
-    --tx-in "$utxo" \
-    --tx-out "$paymentAddr"+"$txOut" \
-    --invalid-hereafter 5000000 \
-    --fee "$fee" \
-    --certificate-file deleg.cert \
-    --out-file tx.raw
+    cardano-cli conway transaction build-raw \
+      --tx-in "$utxo" \
+      --tx-out "$paymentAddr"+"$txOut" \
+      --invalid-hereafter 5000000 \
+      --fee "$fee" \
+      --certificate-file deleg.cert \
+      --out-file tx.raw
+  done
 
   cardano-cli conway transaction sign \
     --tx-body-file tx.raw \
@@ -329,33 +344,38 @@ updatePool() {
     --invalid-hereafter 500000 \
     --fee 0 \
     --certificate-file pool.cert \
-    --out-file tx.tmp
+    --out-file tx.raw
 
   refScriptSize=$(cardano-cli conway query ref-script-size \
     --tx-in "$utxo" \
     --testnet-magic 888 \
     --output-json | jq '.refInputScriptSize')
 
-  fee=$(cardano-cli conway transaction calculate-min-fee \
-    --reference-script-size $refScriptSize \
-    --tx-body-file tx.tmp \
-    --tx-in-count 1 \
-    --tx-out-count 1 \
-    --testnet-magic 888 \
-    --witness-count 3 \
-    --byron-witness-count 0 \
-    --protocol-params-file ./params.json | awk '{ print $1 }')
+  # Upon applying the fee, the tx size could increase, rendering the fee insuficient
+  # Calculate it twice, once with fee 0, then with the calculated fee, to minimise the 
+  # chance that the tx size increases the second time
+  for i in {1..2}; do
+    fee=$(cardano-cli conway transaction calculate-min-fee \
+      --reference-script-size $refScriptSize \
+      --tx-body-file tx.raw \
+      --tx-in-count 1 \
+      --tx-out-count 1 \
+      --testnet-magic 888 \
+      --witness-count 3 \
+      --byron-witness-count 0 \
+      --protocol-params-file ./params.json | awk '{ print $1 }')
 
-  initialBalance=$(getAddressBalance "$paymentAddr")
-  txOut=$((initialBalance - fee))
+    initialBalance=$(getAddressBalance "$paymentAddr")
+    txOut=$((initialBalance - fee))
 
-  cardano-cli conway transaction build-raw \
-    --tx-in "$utxo" \
-    --tx-out "$paymentAddr"+"$txOut" \
-    --invalid-hereafter 500000 \
-    --fee "$fee" \
-    --certificate-file pool.cert \
-    --out-file tx.raw
+    cardano-cli conway transaction build-raw \
+      --tx-in "$utxo" \
+      --tx-out "$paymentAddr"+"$txOut" \
+      --invalid-hereafter 500000 \
+      --fee "$fee" \
+      --certificate-file pool.cert \
+      --out-file tx.raw
+  done
 
   cardano-cli conway transaction sign \
     --tx-body-file tx.raw \
@@ -412,7 +432,7 @@ deregisterPool() {
   POOL_ID=$(cardano-cli conway stake-pool id --cold-verification-key-file "$coldVKey" --output-format "hex")
 
   # create pool delegation certificate
-  cardano-cli conway stake-address delegation-certificate \
+  cardano-cli conway stake-address stake-delegation-certificate \
     --stake-verification-key-file "$delegatorStakeKey" \
     --stake-pool-id "$POOL_ID" \
     --out-file deleg.cert
@@ -424,7 +444,7 @@ deregisterPool() {
     --tx-out "$paymentAddr"+0 \
     --invalid-hereafter 5000000 \
     --fee 0 \
-    --out-file tx.tmp \
+    --out-file tx.raw \
     --certificate deleg.cert
 
   refScriptSize=$(cardano-cli conway query ref-script-size \
@@ -432,26 +452,31 @@ deregisterPool() {
     --testnet-magic 888 \
     --output-json | jq '.refInputScriptSize')
 
-  fee=$(cardano-cli conway transaction calculate-min-fee \
-    --reference-script-size $refScriptSize \
-    --tx-body-file tx.tmp \
-    --tx-in-count 1 \
-    --tx-out-count 1 \
-    --testnet-magic 888 \
-    --witness-count 2 \
-    --byron-witness-count 0 \
-    --protocol-params-file ./params.json | awk '{ print $1 }')
+  # Upon applying the fee, the tx size could increase, rendering the fee insuficient
+  # Calculate it twice, once with fee 0, then with the calculated fee, to minimise the 
+  # chance that the tx size increases the second time
+  for i in {1..2}; do
+    fee=$(cardano-cli conway transaction calculate-min-fee \
+      --reference-script-size $refScriptSize \
+      --tx-body-file tx.raw \
+      --tx-in-count 1 \
+      --tx-out-count 1 \
+      --testnet-magic 888 \
+      --witness-count 2 \
+      --byron-witness-count 0 \
+      --protocol-params-file ./params.json | awk '{ print $1 }')
 
-  initialBalance=$(getAddressBalance "$paymentAddr")
-  txOut=$((initialBalance - fee))
+    initialBalance=$(getAddressBalance "$paymentAddr")
+    txOut=$((initialBalance - fee))
 
-  cardano-cli conway transaction build-raw \
-    --tx-in "$utxo" \
-    --tx-out "$paymentAddr"+"$txOut" \
-    --invalid-hereafter 5000000 \
-    --fee "$fee" \
-    --certificate-file deleg.cert \
-    --out-file tx.raw
+    cardano-cli conway transaction build-raw \
+      --tx-in "$utxo" \
+      --tx-out "$paymentAddr"+"$txOut" \
+      --invalid-hereafter 5000000 \
+      --fee "$fee" \
+      --certificate-file deleg.cert \
+      --out-file tx.raw
+  done
 
   cardano-cli conway transaction sign \
     --tx-body-file tx.raw \
@@ -488,33 +513,38 @@ deregisterPool() {
     --invalid-hereafter 500000 \
     --fee 0 \
     --certificate-file pool.dereg \
-    --out-file tx.tmp
+    --out-file tx.raw
 
   refScriptSize=$(cardano-cli conway query ref-script-size \
     --tx-in "$utxo" \
     --testnet-magic 888 \
     --output-json | jq '.refInputScriptSize')
-    
-  fee=$(cardano-cli conway transaction calculate-min-fee \
-    --reference-script-size $refScriptSize \
-    --tx-body-file tx.tmp \
-    --tx-in-count 1 \
-    --tx-out-count 1 \
-    --testnet-magic 888 \
-    --witness-count 3 \
-    --byron-witness-count 0 \
-    --protocol-params-file ./params.json | awk '{ print $1 }')
+  
+  # Upon applying the fee, the tx size could increase, rendering the fee insuficient
+  # Calculate it twice, once with fee 0, then with the calculated fee, to minimise the 
+  # chance that the tx size increases the second time
+  for i in {1..2}; do
+    fee=$(cardano-cli conway transaction calculate-min-fee \
+      --reference-script-size $refScriptSize \
+      --tx-body-file tx.raw \
+      --tx-in-count 1 \
+      --tx-out-count 1 \
+      --testnet-magic 888 \
+      --witness-count 3 \
+      --byron-witness-count 0 \
+      --protocol-params-file ./params.json | awk '{ print $1 }')
 
-  initialBalance=$(getAddressBalance "$genesisAddr")
-  txOut=$((initialBalance - fee))
+    initialBalance=$(getAddressBalance "$genesisAddr")
+    txOut=$((initialBalance - fee))
 
-  cardano-cli conway transaction build-raw \
-    --tx-in "$utxo" \
-    --tx-out "$genesisAddr"+"$txOut" \
-    --invalid-hereafter 500000 \
-    --fee "$fee" \
-    --certificate-file pool.dereg \
-    --out-file tx.raw
+    cardano-cli conway transaction build-raw \
+      --tx-in "$utxo" \
+      --tx-out "$genesisAddr"+"$txOut" \
+      --invalid-hereafter 500000 \
+      --fee "$fee" \
+      --certificate-file pool.dereg \
+      --out-file tx.raw
+  done
 
   cardano-cli conway transaction sign \
     --tx-body-file tx.raw \
