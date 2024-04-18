@@ -22,7 +22,6 @@ services:
     ports:
       - 3001:3001
     volumes:
-      - ./local-network/network-files/node-sp1/:/root/network-files/node-sp1
       - ./local-network/config:/root/config
       - sdk-ipc:/sdk-ipc
       - local-network-files:/root/network-files

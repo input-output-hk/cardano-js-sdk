@@ -3,6 +3,7 @@
 set -euo pipefail
 
 ROOT=network-files
+MARK_FILE=/root/network-files/MARK
 
 here="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
 root="$(cd "$here/.." && pwd)"
@@ -17,7 +18,7 @@ trap 'kill 0' INT
 
 echo "Run"
 
-if [ ! -f "/root/network-files/SNAPSHOT" ]; then
+if [ ! -f "$MARK_FILE" ]; then
   echo "Clean old state and logs"
   ./scripts/clean.sh
 
@@ -36,8 +37,13 @@ if [ ! -f "/root/network-files/SNAPSHOT" ]; then
     CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/mint-tokens.sh
     CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/setup-wallets.sh
     CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/mint-handles.sh
+
+    # We are going to mark the filesystem with a MARK file, so we can later detect when starting
+    # the network if its bootstrapping from scratch or it was already initialized.
+    touch "$MARK_FILE"
 else
     echo "Skipping scripts execution because we are starting from a snapshot."
+    #"$PWD"/bin/db-synthesizer --config "$PWD"/config/network/cardano-node/config.json --db "$PWD"/network-files/node-sp1/db/  --bulk-credentials-file "$PWD"/network-files/bulk-creds.json -b 10 -a
     ./network-files/run/all.sh &
 fi
 
