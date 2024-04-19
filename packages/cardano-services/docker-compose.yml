@@ -25,6 +25,10 @@ services:
     volumes:
       - ./config/network/${NETWORK:-mainnet}:/config
 
+  pg-boss-worker:
+    volumes:
+      - ./environments/.schedules.json:/config/schedules.json
+
   cardano-submit-api:
     volumes:
       - ./config/network/${NETWORK:-mainnet}:/config
