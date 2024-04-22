@@ -1,7 +1,6 @@
 import { Lovelace, PoolId, VrfVkHex } from '../../Cardano';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { CardanoNodeError } from './CardanoNodeErrors';
 import { HealthCheckResponse } from '../../Provider';
 import { Milliseconds } from '../../util';
 

@@ -1,6 +1,14 @@
-/* eslint-disable sonarjs/no-duplicate-string */
-// import * as Crypto from '@cardano-sdk/crypto';
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import {
+  AccountKeyDerivationPath,
+  AddressType,
+  CardanoKeyConst,
+  GroupedAddress,
+  KeyRole,
+  TxInId,
+  TxInKeyPathMap,
+  util
+} from '@cardano-sdk/key-management';
 import {
   CONTEXT_WITHOUT_KNOWN_ADDRESSES,
   CONTEXT_WITH_KNOWN_ADDRESSES,
@@ -10,8 +18,75 @@ import {
   stakeCredential
 } from '../testData';
 import { Cardano } from '@cardano-sdk/core';
-import { CardanoKeyConst, KeyRole, util } from '@cardano-sdk/key-management';
-import { mapCerts } from '../../src/transformers/certificates';
+import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import { LedgerTxTransformerContext } from '../../src';
+import { getKnownAddress, mapCerts } from '../../src/transformers/certificates';
+
+export const stakeKeyPath = {
+  index: 0,
+  role: KeyRole.Stake
+};
+const createGroupedAddress = (
+  address: Cardano.PaymentAddress,
+  rewardAccount: Cardano.RewardAccount,
+  type: AddressType,
+  index: number,
+  stakeKeyDerivationPath: AccountKeyDerivationPath
+): GroupedAddress =>
+  ({
+    address,
+    index,
+    rewardAccount,
+    stakeKeyDerivationPath,
+    type
+  } as GroupedAddress);
+
+const createChainId = (networkId: number, networkMagic: number): Cardano.ChainId =>
+  ({
+    networkId,
+    networkMagic
+  } as Cardano.ChainId);
+
+const ownRewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
+const address1 = Cardano.PaymentAddress(
+  'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x'
+);
+const address2 = Cardano.PaymentAddress(
+  'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+);
+
+export const createTxInKeyPathMapMock = (knownAddresses: GroupedAddress[]): TxInKeyPathMap => {
+  const result: TxInKeyPathMap = {};
+  for (const [index, address] of knownAddresses.entries()) {
+    const txInId: TxInId = `MockTxIn_${index}` as TxInId; // Mock TxInId creation
+    result[txInId] = {
+      index: address.index,
+      role: KeyRole.Internal
+    };
+  }
+  return result;
+};
+
+const mockContext: LedgerTxTransformerContext = {
+  accountIndex: 0,
+  chainId: createChainId(1, 764_824_073),
+  dRepPublicKey: undefined,
+
+  handleResolutions: [],
+
+  knownAddresses: [
+    createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0, stakeKeyPath),
+    createGroupedAddress(address2, ownRewardAccount, AddressType.External, 1, stakeKeyPath)
+  ],
+  sender: undefined,
+  txInKeyPathMap: createTxInKeyPathMapMock([
+    createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0, stakeKeyPath),
+    createGroupedAddress(address2, ownRewardAccount, AddressType.External, 1, stakeKeyPath)
+  ])
+};
+
+const EXAMPLE_URL = 'https://example.com';
+const DNS_NAME = 'example.com';
 
 describe('certificates', () => {
   describe('mapCerts', () => {
@@ -151,7 +226,7 @@ describe('certificates', () => {
             },
             metadata: {
               metadataHashHex: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5',
-              metadataUrl: 'https://example.com'
+              metadataUrl: EXAMPLE_URL
             },
             pledge: 10_000n,
             poolKey: {
@@ -183,7 +258,7 @@ describe('certificates', () => {
             relays: [
               {
                 params: {
-                  dnsName: 'example.com',
+                  dnsName: DNS_NAME,
                   portNumber: 5000
                 },
                 type: 1
@@ -197,7 +272,7 @@ describe('certificates', () => {
               },
               {
                 params: {
-                  dnsName: 'example.com'
+                  dnsName: DNS_NAME
                 },
                 type: 1
               }
@@ -242,7 +317,7 @@ describe('certificates', () => {
             },
             metadata: {
               metadataHashHex: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5',
-              metadataUrl: 'https://example.com'
+              metadataUrl: EXAMPLE_URL
             },
             pledge: 10_000n,
             poolKey: {
@@ -262,7 +337,7 @@ describe('certificates', () => {
             relays: [
               {
                 params: {
-                  dnsName: 'example.com',
+                  dnsName: DNS_NAME,
                   portNumber: 5000
                 },
                 type: 1
@@ -276,7 +351,7 @@ describe('certificates', () => {
               },
               {
                 params: {
-                  dnsName: 'example.com'
+                  dnsName: DNS_NAME
                 },
                 type: 1
               }
@@ -394,6 +469,54 @@ describe('certificates', () => {
           type: Ledger.CertificateType.STAKE_DELEGATION
         }
       ]);
+    });
+  });
+
+  describe('getKnownAddress', () => {
+    it('should return undefined immediately if context is not provided', () => {
+      const fakeCertificate: Cardano.StakeDelegationCertificate = {
+        __typename: Cardano.CertificateType.StakeDelegation,
+        poolId: 'pool1' as Cardano.PoolId,
+        stakeCredential: {
+          hash: 'fakehash' as Hash28ByteBase16,
+          type: Cardano.CredentialType.KeyHash
+        }
+      };
+
+      const result = getKnownAddress(fakeCertificate);
+      expect(result).toBeUndefined();
+    });
+
+    it('should return the matching known address when context is provided', () => {
+      const hashUsedForTest = '13cf55d175ea848b87deb3e914febd7e028e2bf6534475d52fb9c3d0' as Hash28ByteBase16;
+      const fakeCertificate: Cardano.StakeDelegationCertificate = {
+        __typename: Cardano.CertificateType.StakeDelegation,
+        poolId: 'pool1' as Cardano.PoolId,
+        stakeCredential: {
+          hash: hashUsedForTest,
+          type: Cardano.CredentialType.KeyHash
+        }
+      };
+
+      const expectedAddress = mockContext.knownAddresses[0];
+      const result = getKnownAddress(fakeCertificate, mockContext);
+      expect(result).not.toBeUndefined();
+      expect(result).toEqual(expectedAddress);
+    });
+
+    it('should return undefined if no addresses match the stake credential hash', () => {
+      const hashUsedForTest = 'unknown-hash' as Hash28ByteBase16;
+      const fakeCertificate: Cardano.StakeDelegationCertificate = {
+        __typename: Cardano.CertificateType.StakeDelegation,
+        poolId: 'pool1' as Cardano.PoolId,
+        stakeCredential: {
+          hash: hashUsedForTest,
+          type: Cardano.CredentialType.KeyHash
+        }
+      };
+
+      const result = getKnownAddress(fakeCertificate, mockContext);
+      expect(result).toBeUndefined();
     });
   });
 });

@@ -1,7 +1,7 @@
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Cardano } from '@cardano-sdk/core';
 import { CardanoKeyConst, GroupedAddress, util } from '@cardano-sdk/key-management';
-import { InvalidArgumentError, Transform } from '@cardano-sdk/util';
+import { InvalidArgumentError, Transform, areNumbersEqualInConstantTime } from '@cardano-sdk/util';
 import { LedgerTxTransformerContext } from '../types';
 
 const resolveKeyPath = (
@@ -38,7 +38,7 @@ export const toWithdrawal: Transform<Cardano.Withdrawal, Ledger.Withdrawal, Ledg
 
   let ledgerWithdrawal;
 
-  if (rewardAddress.getPaymentCredential().type === Cardano.CredentialType.KeyHash) {
+  if (areNumbersEqualInConstantTime(rewardAddress.getPaymentCredential().type, Cardano.CredentialType.KeyHash)) {
     const keyPath = resolveKeyPath(rewardAddress, context?.knownAddresses);
     ledgerWithdrawal = keyPath
       ? {
