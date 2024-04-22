@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">68.75% </span>
+                <span class="strong">55.55% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>11/16</span>
+                <span class='fraction'>15/27</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">66.66% </span>
+                <span class="strong">54.54% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>6/9</span>
+                <span class='fraction'>6/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">16.66% </span>
+                <span class="strong">10% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/6</span>
+                <span class='fraction'>1/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">78.94% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>11/11</span>
+                <span class='fraction'>15/19</span>
             </div>
         
             
@@ -76,7 +76,16 @@
 <a name='L11'></a><a href='#L11'>11</a>
 <a name='L12'></a><a href='#L12'>12</a>
 <a name='L13'></a><a href='#L13'>13</a>
-<a name='L14'></a><a href='#L14'>14</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -89,12 +98,21 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">"use strict";
 var __importDefault = (this &amp;&amp; this.__importDefault) || function (mod) {
     return (mod &amp;&amp; mod.__esModule) ? <span class="branch-0 cbranch-no" title="branch not covered" >mod </span>: { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sameArrayItems = exports.strictEquals = exports.deepEquals = void 0;
+exports.areStringsEqualInConstantTime = exports.areNumbersEqualInConstantTime = exports.sameArrayItems = exports.strictEquals = exports.deepEquals = void 0;
 const isEqual_1 = __importDefault(require("lodash/isEqual"));
 const deepEquals = <span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >(0, isEqual_1.default)(a, b);</span>
 exports.deepEquals = deepEquals;
@@ -102,6 +120,15 @@ const strictEquals = <span class="fstat-no" title="function not covered" >(a</sp
 exports.strictEquals = strictEquals;
 const sameArrayItems = <span class="fstat-no" title="function not covered" >(a</span>rrayA, arrayB, itemEquals) =&gt; <span class="cstat-no" title="statement not covered" >arrayA.length === arrayB.length &amp;&amp; arrayA.every(<span class="fstat-no" title="function not covered" >(a</span>) =&gt; <span class="cstat-no" title="statement not covered" >arrayB.some(<span class="fstat-no" title="function not covered" >(b</span>) =&gt; <span class="cstat-no" title="statement not covered" >itemEquals(a, b))</span>)</span>;</span>
 exports.sameArrayItems = sameArrayItems;
+const areNumbersEqualInConstantTime = <span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; <span class="cstat-no" title="statement not covered" >(a ^ b) === 0;</span>
+exports.areNumbersEqualInConstantTime = areNumbersEqualInConstantTime;
+const areStringsEqualInConstantTime = <span class="fstat-no" title="function not covered" >(a</span>, b) =&gt; {
+    const maxLength = <span class="cstat-no" title="statement not covered" >Math.max(a.length, b.length);</span>
+    const results = <span class="cstat-no" title="statement not covered" >Array.from({ length: maxLength }, <span class="fstat-no" title="function not covered" >(_</span>, i) =&gt; (<span class="cstat-no" title="statement not covered" >a.charCodeAt(i) === b.charCodeAt(i) ? 1 : 0)</span>);</span>
+    const areAllCharactersEqual = <span class="cstat-no" title="statement not covered" >results.reduce(<span class="fstat-no" title="function not covered" >(a</span>ccumulator, currentValue) =&gt; (<span class="cstat-no" title="statement not covered" >accumulator &amp; currentValue)</span>, 1);</span>
+<span class="cstat-no" title="statement not covered" >    return areAllCharactersEqual === 1;</span>
+};
+exports.areStringsEqualInConstantTime = areStringsEqualInConstantTime;
 //# sourceMappingURL=equals.js.map</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -109,7 +136,7 @@ exports.sameArrayItems = sameArrayItems;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-04-17T13:13:59.730Z
+                at 2024-04-22T11:41:38.011Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

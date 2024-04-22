@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">36.95% </span>
+                <span class="strong">37.29% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>68/184</span>
+                <span class='fraction'>69/185</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">37.35% </span>
+                <span class="strong">37.5% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>65/174</span>
+                <span class='fraction'>66/176</span>
             </div>
         
             
@@ -652,7 +652,9 @@
 <a name='L587'></a><a href='#L587'>587</a>
 <a name='L588'></a><a href='#L588'>588</a>
 <a name='L589'></a><a href='#L589'>589</a>
-<a name='L590'></a><a href='#L590'>590</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L590'></a><a href='#L590'>590</a>
+<a name='L591'></a><a href='#L591'>591</a>
+<a name='L592'></a><a href='#L592'>592</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
@@ -669,6 +671,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
@@ -747,7 +750,6 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -786,6 +788,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -795,6 +798,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1258,6 +1262,7 @@ import {
 } from '@cardano-sdk/key-management';
 import { HID } from 'node-hid';
 import { LedgerDevice, LedgerTransportType } from './types';
+import { areNumbersEqualInConstantTime, areStringsEqualInConstantTime } from '@cardano-sdk/util';
 import { str_to_path } from '@cardano-foundation/ledgerjs-hw-app-cardano/dist/utils/address';
 import { toLedgerTx } from './transformers';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
@@ -1336,7 +1341,6 @@ const stakeCredentialCert = (cert: Certificate) =&gt;
   cert.type === CertificateType.STAKE_REGISTRATION ||
   cert.type === CertificateType.STAKE_DEREGISTRATION ||
 <span class="branch-2 cbranch-no" title="branch not covered" >  cert.type === CertificateType.STAKE_DELEGATION;</span>
-&nbsp;
 const isLedgerModelSupported = <span class="fstat-no" title="function not covered" >(d</span>eviceModelId: string): deviceModelId is 'nanoS' | 'nanoX' | 'nanoSP' =&gt;
 <span class="cstat-no" title="statement not covered" >  ['nanoS', 'nanoX', 'nanoSP'].includes(deviceModelId);</span>
 &nbsp;
@@ -1375,7 +1379,8 @@ interface StakeCredentialCertificateParams {
 &nbsp;
 const containsOnlyScriptHashCreds = (tx: Transaction): boolean =&gt; {
   const withdrawalsAllScriptHash = !tx.withdrawals?.some(
-<span class="fstat-no" title="function not covered" >    (w</span>ithdrawal) =&gt; <span class="cstat-no" title="statement not covered" >withdrawal.stakeCredential.type !== StakeCredentialParamsType.SCRIPT_HASH</span>
+<span class="fstat-no" title="function not covered" >    (w</span>ithdrawal) =&gt;
+<span class="cstat-no" title="statement not covered" >      !areNumbersEqualInConstantTime(withdrawal.stakeCredential.type, StakeCredentialParamsType.SCRIPT_HASH)</span>
   );
 &nbsp;
   if (tx.certificates) {
@@ -1383,7 +1388,8 @@ const containsOnlyScriptHashCreds = (tx: Transaction): boolean =&gt; {
       <span class="missing-if-branch" title="if path not taken" >I</span>if (!stakeCredentialCert(cert)) <span class="cstat-no" title="statement not covered" >return false;</span>
 &nbsp;
       const certParams = cert.params as unknown as StakeCredentialCertificateParams;
-      <span class="missing-if-branch" title="if path not taken" >I</span>if (certParams.stakeCredential.type !== StakeCredentialParamsType.SCRIPT_HASH) <span class="cstat-no" title="statement not covered" >return false;</span>
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (!areNumbersEqualInConstantTime(certParams.stakeCredential.type, StakeCredentialParamsType.SCRIPT_HASH))
+<span class="cstat-no" title="statement not covered" >        return false;</span>
     }
   }
 &nbsp;
@@ -1798,7 +1804,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
         tx: ledgerTxData
       });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (result.txHashHex !== hash) {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (!areStringsEqualInConstantTime(result.txHashHex, hash)) {</span>
 <span class="cstat-no" title="statement not covered" >        throw new errors.HwMappingError('Ledger computed a different transaction id');</span>
       }
 &nbsp;
@@ -1837,7 +1843,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-04-17T13:10:05.012Z
+                at 2024-04-22T11:37:42.840Z
             </div>
         <script src="../prettify.js"></script>
         <script>
