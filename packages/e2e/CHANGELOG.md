@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.34.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.34.0...@cardano-sdk/e2e@0.34.1) (2024-04-23)
+
+### Features
+
+* use publicly available SMASH docker image ([e29cc9c](https://github.com/input-output-hk/cardano-js-sdk/commit/e29cc9c7ff70495efe8ccf51779bcfb8b05ea335))
+
 ## [0.34.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.33.3...@cardano-sdk/e2e@0.34.0) (2024-04-15)
 
 ### ⚠ BREAKING CHANGES
