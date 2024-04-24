@@ -6,7 +6,7 @@ import { PoolParameters } from './PoolParameters';
 
 /** Stake quantities for a Stake Pool. */
 export interface StakePoolMetricsStake {
-  /** The total amount of stake currently delegated to the pool. This will be snapshotted at the end of the epoch. */
+  /** The total amount of stake currently delegated to the pool. A snapshot will be taken at the end of the epoch. */
   live: Lovelace;
 
   /** A snapshot from 2 epochs ago, used in the current epoch as part of the block leadership schedule. */
@@ -15,7 +15,7 @@ export interface StakePoolMetricsStake {
 
 /** Stake percentages for a Stake Pool. */
 export interface StakePoolMetricsSize {
-  /** The percentage of stake currently delegated to the pool. This will be snapshotted at the end of the epoch. */
+  /** The percentage of stake currently delegated to the pool. A snapshot will be taken at the end of the epoch. */
   live: Percent;
 
   /**

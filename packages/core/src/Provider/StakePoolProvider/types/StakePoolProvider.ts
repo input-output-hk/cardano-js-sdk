@@ -38,6 +38,24 @@ export interface FuzzyOptions {
   weights: { description: number; homepage: number; name: number; poolId: number; ticker: number };
 }
 
+export const MetricsFiltersFields = [
+  'blocks',
+  'cost',
+  'lastRos',
+  'margin',
+  'pledge',
+  'ros',
+  'saturation',
+  'stake'
+] as const;
+export type MetricsFiltersFields = typeof MetricsFiltersFields[number];
+export type MetricsFiltersFieldType<F extends MetricsFiltersFields> = F extends 'pledge' | 'stake'
+  ? Cardano.Lovelace
+  : number;
+export type MetricsFilters = {
+  [K in MetricsFiltersFields]?: { from?: MetricsFiltersFieldType<K>; to?: MetricsFiltersFieldType<K> };
+};
+
 /** The StakePoolProvider.queryStakePools call arguments. */
 export interface QueryStakePoolsArgs {
   /** Will return all stake pools sorted by name ascending if not specified. */
@@ -50,6 +68,9 @@ export interface QueryStakePoolsArgs {
 
     /** Will return results for partial matches. */
     identifier?: MultipleChoiceSearchFilter<FilterIdentifiers>;
+
+    /** Range filters on some selected metrics fields. */
+    metrics?: MetricsFilters;
 
     /** If provided, returns all the pools which live stake meets / do not meets the pledge. */
     pledgeMet?: boolean;
