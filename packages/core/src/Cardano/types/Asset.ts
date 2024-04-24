@@ -20,7 +20,10 @@ export const AssetName = (value: string): AssetName => {
 const utf8Decoder = new TextDecoder('utf8', { fatal: true });
 AssetName.toUTF8 = (assetName: AssetName) => {
   try {
-    return utf8Decoder.decode(Buffer.from(assetName, 'hex'));
+    // 'empty' control characters are valid utf8, but we don't want to use them, strip them out
+    const sanitizedBuffer = Buffer.from(assetName, 'hex').filter((v) => v > 31);
+    if (sanitizedBuffer.length > 0) return utf8Decoder.decode(sanitizedBuffer);
+    throw Error;
   } catch (error) {
     throw new InvalidStringError(`Cannot convert AssetName '${assetName}' to UTF8`, error);
   }
