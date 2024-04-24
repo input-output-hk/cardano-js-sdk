@@ -67,6 +67,7 @@ in {
       {package = k9s;}
       (mkK9sCommand "us-east-1")
       (mkK9sCommand "us-east-2")
+      (mkK9sCommand "eu-central-1")
     ];
 
     devshell.startup.setup.text = ''
