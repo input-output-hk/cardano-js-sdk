@@ -1,4 +1,5 @@
 import { Cardano, Provider } from '../../..';
+import { DeepPartial } from '@cardano-sdk/util';
 import { Paginated, PaginationArgs } from '../../types/Pagination';
 import { SortFields } from '../util';
 
@@ -24,6 +25,12 @@ export interface MultipleChoiceSearchFilter<T> {
 
 /** Options for the fuzzy search on stake pool metadata */
 export interface FuzzyOptions {
+  /** Determines how close the match must be to the location. */
+  distance: number;
+
+  /** Determines approximately where in the text is the pattern expected to be found. */
+  location: number;
+
   /** Maximum threshold. `0`: exact match; `1`: match everything. */
   threshold: number;
 
@@ -55,7 +62,7 @@ export interface QueryStakePoolsArgs {
   };
 
   /** Overrides default fuzzy options. Ignored in _live_ environments. */
-  fuzzyOptions?: FuzzyOptions;
+  fuzzyOptions?: DeepPartial<FuzzyOptions>;
 
   /**
    * Used for APY metric computation. It will take 3 epochs back if not specified.
