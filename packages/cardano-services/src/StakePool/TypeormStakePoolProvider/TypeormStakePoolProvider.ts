@@ -9,6 +9,7 @@ import {
   StakePoolStats
 } from '@cardano-sdk/core';
 import { DataSource } from 'typeorm';
+import { DeepPartial } from '@cardano-sdk/util';
 import { InMemoryCache } from '../../InMemoryCache';
 import { MissingProgramOption } from '../../Program/errors';
 import { PoolDelistedEntity, StakePoolEntity } from '@cardano-sdk/projection-typeorm';
@@ -26,6 +27,8 @@ import {
 import Fuse from 'fuse.js';
 
 export const DEFAULT_FUZZY_SEARCH_OPTIONS: FuzzyOptions = {
+  distance: 100,
+  location: 0,
   threshold: 0.4,
   weights: { description: 1, homepage: 2, name: 3, poolId: 4, ticker: 4 }
 };
@@ -80,14 +83,18 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
     await this.withDataSource((dataSource) => this.getFuse(dataSource));
   }
 
-  private async getFuse(dataSource: DataSource, fuzzyOptions?: FuzzyOptions) {
+  private async getFuse(dataSource: DataSource, fuzzyOptions?: DeepPartial<FuzzyOptions>) {
     const {
+      distance,
+      location,
       threshold,
       weights: { description, homepage, name, poolId, ticker }
-    } = this.#overrideFuzzyOptions ? { ...this.#fuzzyOptions, ...fuzzyOptions } : this.#fuzzyOptions;
+    } = this.#overrideFuzzyOptions
+      ? { ...this.#fuzzyOptions, ...fuzzyOptions, weights: { ...this.#fuzzyOptions.weights, ...fuzzyOptions?.weights } }
+      : this.#fuzzyOptions;
 
     const cacheKey = this.#overrideFuzzyOptions
-      ? `fuzzy-index-${JSON.stringify([description, homepage, name, threshold, ticker])}`
+      ? `fuzzy-index-${JSON.stringify([description, distance, homepage, location, name, threshold, ticker])}`
       : 'fuzzy-index';
 
     return this.#cache.get(cacheKey, async () => {
@@ -102,8 +109,7 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
       );
 
       const opts = {
-        ignoreFieldNorm: true,
-        ignoreLocation: true,
+        distance,
         includeScore: true,
         keys: [
           { name: 'description', weight: description },
@@ -112,6 +118,7 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
           { name: 'pool_id', weight: poolId },
           { name: 'ticker', weight: ticker }
         ],
+        location,
         minMatchCharLength: 3,
         threshold
       };
