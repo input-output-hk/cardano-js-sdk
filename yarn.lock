@@ -3063,15 +3063,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cardano-foundation/ledgerjs-hw-app-cardano@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@cardano-foundation/ledgerjs-hw-app-cardano@npm:6.0.0"
+"@cardano-foundation/ledgerjs-hw-app-cardano@npm:^7.1.2":
+  version: 7.1.2
+  resolution: "@cardano-foundation/ledgerjs-hw-app-cardano@npm:7.1.2"
   dependencies:
     "@ledgerhq/hw-transport": ^6.27.10
     base-x: ^3.0.5
     bech32: ^1.1.4
     int64-buffer: ^1.0.1
-  checksum: 6767792e68bd72333423eda25203b69a9686ee12602503e98037c68fc95abb74ceefc4cc1661579720fa3ecb822c4d30e0f0979fee9c8ef476668d4ee99df561
+  checksum: 121d90fa16c29dfa2644a3d6583763411246ea52a9ccf72346bf809690fa85d88eb6cec322d4cda2ba39a6e869ebc993a294eb8f8cb34612cfac6a7e8271b9ce
   languageName: node
   linkType: hard
 
@@ -3300,7 +3300,7 @@ __metadata:
     "@babel/core": ^7.18.2
     "@babel/preset-env": ^7.18.2
     "@babel/preset-typescript": ^7.17.12
-    "@cardano-foundation/ledgerjs-hw-app-cardano": ^6.0.0
+    "@cardano-foundation/ledgerjs-hw-app-cardano": ^7.1.2
     "@cardano-ogmios/client": 5.6.0
     "@cardano-sdk/cardano-services": "workspace:~"
     "@cardano-sdk/cardano-services-client": "workspace:~"
@@ -3453,7 +3453,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/hardware-ledger@workspace:packages/hardware-ledger"
   dependencies:
-    "@cardano-foundation/ledgerjs-hw-app-cardano": ^6.0.0
+    "@cardano-foundation/ledgerjs-hw-app-cardano": ^7.1.2
     "@cardano-sdk/core": "workspace:~"
     "@cardano-sdk/crypto": "workspace:~"
     "@cardano-sdk/key-management": "workspace:~"
@@ -3730,7 +3730,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/wallet@workspace:packages/wallet"
   dependencies:
-    "@cardano-foundation/ledgerjs-hw-app-cardano": ^6.0.0
+    "@cardano-foundation/ledgerjs-hw-app-cardano": ^7.1.2
     "@cardano-ogmios/client": 5.6.0
     "@cardano-sdk/cardano-services-client": "workspace:~"
     "@cardano-sdk/core": "workspace:~"

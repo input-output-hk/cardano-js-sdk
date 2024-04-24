@@ -41,7 +41,7 @@
     "test:e2e": "echo 'test:e2e' command not implemented yet"
   },
   "devDependencies": {
-    "@cardano-foundation/ledgerjs-hw-app-cardano": "^6.0.0",
+    "@cardano-foundation/ledgerjs-hw-app-cardano": "^7.1.2",
     "@cardano-ogmios/client": "5.6.0",
     "@cardano-sdk/cardano-services-client": "workspace:~",
     "@cardano-sdk/ogmios": "workspace:~",
