@@ -78,7 +78,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@cardano-foundation/ledgerjs-hw-app-cardano": "^6.0.0",
+    "@cardano-foundation/ledgerjs-hw-app-cardano": "^7.1.2",
     "@cardano-ogmios/client": "5.6.0",
     "@cardano-sdk/cardano-services": "workspace:~",
     "@cardano-sdk/cardano-services-client": "workspace:~",

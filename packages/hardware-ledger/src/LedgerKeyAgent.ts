@@ -22,11 +22,11 @@ import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import _LedgerConnection, {
   Certificate,
   CertificateType,
+  CredentialParams,
+  CredentialParamsType,
   GetVersionResponse,
   PoolKeyType,
   PoolOwnerType,
-  StakeCredentialParams,
-  StakeCredentialParamsType,
   Transaction,
   TransactionSigningMode,
   TxOutputDestinationType
@@ -127,13 +127,12 @@ const parseEstablishDeviceConnectionSecondParam = (
 };
 
 interface StakeCredentialCertificateParams {
-  stakeCredential: StakeCredentialParams;
+  stakeCredential: CredentialParams;
 }
 
 const containsOnlyScriptHashCreds = (tx: Transaction): boolean => {
   const withdrawalsAllScriptHash = !tx.withdrawals?.some(
-    (withdrawal) =>
-      !areNumbersEqualInConstantTime(withdrawal.stakeCredential.type, StakeCredentialParamsType.SCRIPT_HASH)
+    (withdrawal) => !areNumbersEqualInConstantTime(withdrawal.stakeCredential.type, CredentialParamsType.SCRIPT_HASH)
   );
 
   if (tx.certificates) {
@@ -141,7 +140,7 @@ const containsOnlyScriptHashCreds = (tx: Transaction): boolean => {
       if (!stakeCredentialCert(cert)) return false;
 
       const certParams = cert.params as unknown as StakeCredentialCertificateParams;
-      if (!areNumbersEqualInConstantTime(certParams.stakeCredential.type, StakeCredentialParamsType.SCRIPT_HASH))
+      if (!areNumbersEqualInConstantTime(certParams.stakeCredential.type, CredentialParamsType.SCRIPT_HASH))
         return false;
     }
   }

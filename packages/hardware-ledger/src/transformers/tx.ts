@@ -11,6 +11,7 @@ import { mapRequiredSigners } from './requiredSigners';
 import { mapTokenMap } from './assets';
 import { mapTxIns } from './txIn';
 import { mapTxOuts } from './txOut';
+import { mapVotingProcedures } from './votingProcedures';
 import { mapWithdrawals } from './withdrawals';
 
 export const LedgerTxTransformer: Transformer<Cardano.TxBody, Ledger.Transaction, LedgerTxTransformerContext> = {
@@ -18,6 +19,7 @@ export const LedgerTxTransformer: Transformer<Cardano.TxBody, Ledger.Transaction
   certificates: ({ certificates }, context) => mapCerts(certificates, context!),
   collateralInputs: ({ collaterals }, context) => mapCollateralTxIns(collaterals, context!),
   collateralOutput: ({ collateralReturn }, context) => mapCollateralTxOut(collateralReturn, context!),
+  donation: ({ donation }) => donation,
   fee: ({ fee }) => fee,
   includeNetworkId: ({ networkId }) => !!networkId,
   inputs: ({ inputs }, context) => mapTxIns(inputs, context!),
@@ -31,8 +33,10 @@ export const LedgerTxTransformer: Transformer<Cardano.TxBody, Ledger.Transaction
   requiredSigners: ({ requiredExtraSignatures }, context) => mapRequiredSigners(requiredExtraSignatures, context!),
   scriptDataHashHex: ({ scriptIntegrityHash }) => scriptIntegrityHash?.toString(),
   totalCollateral: ({ totalCollateral }) => totalCollateral,
+  treasury: ({ treasuryValue }) => treasuryValue,
   ttl: ({ validityInterval }) => validityInterval?.invalidHereafter,
   validityIntervalStart: ({ validityInterval }) => validityInterval?.invalidBefore,
+  votingProcedures: ({ votingProcedures }) => mapVotingProcedures(votingProcedures),
   withdrawals: ({ withdrawals }, context) => mapWithdrawals(withdrawals, context!)
 };
 

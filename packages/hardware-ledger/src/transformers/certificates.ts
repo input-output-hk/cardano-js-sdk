@@ -8,7 +8,7 @@ type StakeKeyCertificateType = Ledger.CertificateType.STAKE_REGISTRATION | Ledge
 
 type StakeKeyCertificate = {
   params: {
-    stakeCredential: Ledger.StakeCredentialParams;
+    stakeCredential: Ledger.CredentialParams;
   };
   type: StakeKeyCertificateType;
 };
@@ -52,20 +52,20 @@ const getStakeAddressCertificate = (
   const path = util.stakeKeyPathFromGroupedAddress(knownAddress);
   const credentialType = rewardAddress
     ? rewardAddress.getPaymentCredential().type
-    : Ledger.StakeCredentialParamsType.SCRIPT_HASH;
+    : Ledger.CredentialParamsType.SCRIPT_HASH;
 
-  let credential: Ledger.StakeCredentialParams;
+  let credential: Ledger.CredentialParams;
 
   switch (credentialType) {
     case Cardano.CredentialType.KeyHash: {
       credential = path
         ? {
             keyPath: path,
-            type: Ledger.StakeCredentialParamsType.KEY_PATH
+            type: Ledger.CredentialParamsType.KEY_PATH
           }
         : {
             keyHashHex: certificate.stakeCredential.hash,
-            type: Ledger.StakeCredentialParamsType.KEY_HASH
+            type: Ledger.CredentialParamsType.KEY_HASH
           };
       break;
     }
@@ -73,7 +73,7 @@ const getStakeAddressCertificate = (
     default: {
       credential = {
         scriptHashHex: certificate.stakeCredential.hash,
-        type: Ledger.StakeCredentialParamsType.SCRIPT_HASH
+        type: Ledger.CredentialParamsType.SCRIPT_HASH
       };
     }
   }
@@ -98,22 +98,22 @@ export const stakeDelegationCertificate: Transform<
 
   const credentialType = rewardAddress
     ? rewardAddress.getPaymentCredential().type
-    : Ledger.StakeCredentialParamsType.SCRIPT_HASH;
+    : Ledger.CredentialParamsType.SCRIPT_HASH;
 
   const path = util.stakeKeyPathFromGroupedAddress(knownAddress);
 
-  let credential: Ledger.StakeCredentialParams;
+  let credential: Ledger.CredentialParams;
 
   switch (credentialType) {
     case Cardano.CredentialType.KeyHash: {
       credential = path
         ? {
             keyPath: path,
-            type: Ledger.StakeCredentialParamsType.KEY_PATH
+            type: Ledger.CredentialParamsType.KEY_PATH
           }
         : {
             keyHashHex: certificate.stakeCredential.hash,
-            type: Ledger.StakeCredentialParamsType.KEY_HASH
+            type: Ledger.CredentialParamsType.KEY_HASH
           };
       break;
     }
@@ -121,7 +121,7 @@ export const stakeDelegationCertificate: Transform<
     default: {
       credential = {
         scriptHashHex: certificate.stakeCredential.hash,
-        type: Ledger.StakeCredentialParamsType.SCRIPT_HASH
+        type: Ledger.CredentialParamsType.SCRIPT_HASH
       };
     }
   }

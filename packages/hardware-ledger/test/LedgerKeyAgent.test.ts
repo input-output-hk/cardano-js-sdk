@@ -320,7 +320,7 @@ describe('LedgerKeyAgent', () => {
             params: {
               stakeCredential: {
                 scriptHashHex: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
-                type: Ledger.StakeCredentialParamsType.SCRIPT_HASH
+                type: Ledger.CredentialParamsType.SCRIPT_HASH
               }
             },
             type: Ledger.CertificateType.STAKE_DEREGISTRATION

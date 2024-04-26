@@ -41,7 +41,7 @@ describe('withdrawals', () => {
               2,
               0
             ],
-            type: Ledger.StakeCredentialParamsType.KEY_PATH
+            type: Ledger.CredentialParamsType.KEY_PATH
           }
         });
       }
@@ -63,7 +63,7 @@ describe('withdrawals', () => {
         amount: 5n,
         stakeCredential: {
           keyPath: [util.harden(CardanoKeyConst.PURPOSE), util.harden(CardanoKeyConst.COIN_TYPE), util.harden(0), 2, 0],
-          type: Ledger.StakeCredentialParamsType.KEY_PATH
+          type: Ledger.CredentialParamsType.KEY_PATH
         }
       });
     });
@@ -81,7 +81,7 @@ describe('withdrawals', () => {
         amount: 5n,
         stakeCredential: {
           keyHashHex: stakeKeyHash,
-          type: Ledger.StakeCredentialParamsType.KEY_HASH
+          type: Ledger.CredentialParamsType.KEY_HASH
         }
       });
     });

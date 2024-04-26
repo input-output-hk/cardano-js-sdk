@@ -23,7 +23,10 @@ const testVotingProcedure = (procedureType: string, cbor: HexBlob, core: Cardano
 // Test data used in the following tests was generated with the cardano-serialization-lib
 testVotingProcedure('vote no with null anchor', HexBlob('8200f6'), { anchor: null, vote: Cardano.Vote.no });
 testVotingProcedure('vote yes with null anchor', HexBlob('8201f6'), { anchor: null, vote: Cardano.Vote.yes });
-testVotingProcedure('vote abstain with null anchor', HexBlob('8202f6'), { anchor: null, vote: Cardano.Vote.abstain });
+testVotingProcedure('vote abstain with null anchor', HexBlob('8202f6'), {
+  anchor: null,
+  vote: Cardano.Vote.abstain
+});
 testVotingProcedure(
   'vote no with anchor',
   HexBlob(

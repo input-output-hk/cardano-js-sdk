@@ -161,12 +161,13 @@ describe('tx', () => {
         scriptDataHashHex: '6199186adb51974690d7247d2646097d2c62763b16fb7ed3f9f55d38abc123de',
         ttl: 1000,
         validityIntervalStart: 100,
+        votingProcedures: null,
         withdrawals: [
           {
             amount: 5n,
             stakeCredential: {
               keyHashHex: '13cf55d175ea848b87deb3e914febd7e028e2bf6534475d52fb9c3d0',
-              type: Ledger.StakeCredentialParamsType.KEY_HASH
+              type: Ledger.CredentialParamsType.KEY_HASH
             }
           }
         ]
@@ -245,6 +246,7 @@ describe('tx', () => {
         requiredSigners: null,
         ttl: 1000,
         validityIntervalStart: 100,
+        votingProcedures: null,
         withdrawals: null
       });
     });

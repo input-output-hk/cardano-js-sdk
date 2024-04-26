@@ -45,23 +45,23 @@ export const toWithdrawal: Transform<Cardano.Withdrawal, Ledger.Withdrawal, Ledg
           amount: withdrawal.quantity,
           stakeCredential: {
             keyPath,
-            type: Ledger.StakeCredentialParamsType.KEY_PATH
-          } as Ledger.KeyPathStakeCredentialParams
+            type: Ledger.CredentialParamsType.KEY_PATH
+          } as Ledger.KeyPathCredentialParams
         }
       : {
           amount: withdrawal.quantity,
           stakeCredential: {
             keyHashHex: rewardAddress.getPaymentCredential().hash.toString(),
-            type: Ledger.StakeCredentialParamsType.KEY_HASH
-          } as Ledger.KeyHashStakeCredentialParams
+            type: Ledger.CredentialParamsType.KEY_HASH
+          } as Ledger.KeyHashCredentialParams
         };
   } else {
     ledgerWithdrawal = {
       amount: withdrawal.quantity,
       stakeCredential: {
         scriptHashHex: rewardAddress.getPaymentCredential().hash.toString(),
-        type: Ledger.StakeCredentialParamsType.SCRIPT_HASH
-      } as Ledger.ScriptStakeCredentialParams
+        type: Ledger.CredentialParamsType.SCRIPT_HASH
+      } as Ledger.CredentialParams
     };
   }
 
