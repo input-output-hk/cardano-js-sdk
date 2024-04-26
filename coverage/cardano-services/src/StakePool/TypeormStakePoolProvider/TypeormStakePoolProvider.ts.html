@@ -298,24 +298,19 @@
 <a name='L233'></a><a href='#L233'>233</a>
 <a name='L234'></a><a href='#L234'>234</a>
 <a name='L235'></a><a href='#L235'>235</a>
-<a name='L236'></a><a href='#L236'>236</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">34x</span>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a>
+<a name='L240'></a><a href='#L240'>240</a>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -324,8 +319,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -384,7 +394,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -544,6 +558,7 @@
   StakePoolStats
 } from '@cardano-sdk/core';
 import { DataSource } from 'typeorm';
+import { DeepPartial } from '@cardano-sdk/util';
 import { InMemoryCache } from '../../InMemoryCache';
 import { MissingProgramOption } from '../../Program/errors';
 import { PoolDelistedEntity, StakePoolEntity } from '@cardano-sdk/projection-typeorm';
@@ -561,6 +576,8 @@ import {
 import Fuse from 'fuse.js';
 &nbsp;
 export const DEFAULT_FUZZY_SEARCH_OPTIONS: FuzzyOptions = {
+  distance: 100,
+  location: 0,
   threshold: 0.4,
   weights: { description: 1, homepage: 2, name: 3, poolId: 4, ticker: 4 }
 };
@@ -615,14 +632,18 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
     await this.withDataSource((dataSource) =&gt; this.getFuse(dataSource));
   }
 &nbsp;
-  private async getFuse(dataSource: DataSource, fuzzyOptions?: FuzzyOptions) {
+  private async getFuse(dataSource: DataSource, fuzzyOptions?: DeepPartial&lt;FuzzyOptions&gt;) {
     const {
+      distance,
+      location,
       threshold,
       weights: { description, homepage, name, poolId, ticker }
-    } = this.#overrideFuzzyOptions ? { ...this.#fuzzyOptions, ...fuzzyOptions } : <span class="branch-1 cbranch-no" title="branch not covered" >this.#fuzzyOptions;</span>
+    } = this.#overrideFuzzyOptions
+      ? { ...this.#fuzzyOptions, ...fuzzyOptions, weights: { ...this.#fuzzyOptions.weights, ...fuzzyOptions?.weights } }
+      : <span class="branch-1 cbranch-no" title="branch not covered" >this.#fuzzyOptions;</span>
 &nbsp;
     const cacheKey = this.#overrideFuzzyOptions
-      ? `fuzzy-index-${JSON.stringify([description, homepage, name, threshold, ticker])}`
+      ? `fuzzy-index-${JSON.stringify([description, distance, homepage, location, name, threshold, ticker])}`
       : <span class="branch-1 cbranch-no" title="branch not covered" >'fuzzy-index';</span>
 &nbsp;
     return this.#cache.get(cacheKey, async () =&gt; {
@@ -637,8 +658,7 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
       );
 &nbsp;
       const opts = {
-        ignoreFieldNorm: true,
-        ignoreLocation: true,
+        distance,
         includeScore: true,
         keys: [
           { name: 'description', weight: description },
@@ -647,6 +667,7 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
           { name: 'pool_id', weight: poolId },
           { name: 'ticker', weight: ticker }
         ],
+        location,
         minMatchCharLength: 3,
         threshold
       };
@@ -775,7 +796,7 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-04-24T12:07:31.049Z
+                at 2024-04-26T08:58:45.619Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
