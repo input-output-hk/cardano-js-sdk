@@ -30,7 +30,7 @@ describe('TypeormStakePoolProvider utils', () => {
     it('correctly parse a valid options object', () =>
       expect(
         validateFuzzyOptions(
-          '{"threshold":0.4,"weights":{"description":1,"homepage":2,"name":3,"poolId":4,"ticker":4}}'
+          '{"distance":100,"location":0,"threshold":0.4,"weights":{"description":1,"homepage":2,"name":3,"poolId":4,"ticker":4}}'
         )
       ).toStrictEqual(DEFAULT_FUZZY_SEARCH_OPTIONS));
   });

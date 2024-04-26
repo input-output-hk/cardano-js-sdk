@@ -854,7 +854,8 @@ describe('CLI', () => {
     });
 
     describe('fuzzyOptions', () => {
-      const FUZZY_OPTIONS = '{"threshold":0.4,"weights":{"description":1,"homepage":2,"name":3,"poolId":4,"ticker":4}}';
+      const FUZZY_OPTIONS =
+        '{"distance":100,"location":0,"threshold":0.4,"weights":{"description":1,"homepage":2,"name":3,"poolId":4,"ticker":4}}';
 
       testCli('has a default value', 'provider', {
         expectedArgs: { args: { fuzzyOptions: DEFAULT_FUZZY_SEARCH_OPTIONS } }
