@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.1...@cardano-sdk/cardano-services@0.28.2) (2024-04-26)
+
+### Features
+
+* **cardano-services:** implement location and distance new options in stake pools fuzzy search ([8deeed7](https://github.com/input-output-hk/cardano-js-sdk/commit/8deeed739c2b8d6f9b73a2fccfd6be85f0566f38))
+
+### Bug Fixes
+
+* add needed params in the docker composer file to activate batch pool delisting from smash server ([22eb99d](https://github.com/input-output-hk/cardano-js-sdk/commit/22eb99de65fefcc29bc19885f405ca4f2020a54d))
+* **cardano-services:** ensure only leader and member rewards are used to compute stake pool rewards ([b5805fc](https://github.com/input-output-hk/cardano-js-sdk/commit/b5805fcc5490632e5e4be126b07c23ba594bb0e2))
+
 ## [0.28.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.0...@cardano-sdk/cardano-services@0.28.1) (2024-04-23)
 
 ### Features

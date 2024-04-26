@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.30.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.30.1...@cardano-sdk/core@0.30.2) (2024-04-26)
+
+### Features
+
+* **core:** add location and distance to stake pools search fuzzy options ([f51d482](https://github.com/input-output-hk/cardano-js-sdk/commit/f51d482c9c7e367c38a248430ca875e7f2d9beac))
+
 ## [0.30.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.30.0...@cardano-sdk/core@0.30.1) (2024-04-23)
 
 **Note:** Version bump only for package @cardano-sdk/core
