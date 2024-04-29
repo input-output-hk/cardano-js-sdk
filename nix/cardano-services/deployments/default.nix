@@ -74,6 +74,11 @@ in
           resources.limits = mkPodResources "300Mi" "500m";
           resources.requests = mkPodResources "150Mi" "100m";
         };
+
+        chain-history-provider = {
+          resources.limits = mkPodResources "300Mi" "500m";
+          resources.requests = mkPodResources "150Mi" "100m";
+        };
       };
 
       projectors = {
@@ -148,7 +153,6 @@ in
               (map (v: "/v${v}/meta") versions.root)
               (map (v: "/v${v}/ready") versions.root)
               (map (v: "/v${v}/asset") versions.assetInfo)
-              (map (v: "/v${v}/chain-history") versions.chainHistory)
               (map (v: "/v${v}/network-info") versions.networkInfo)
               (map (v: "/v${v}/rewards") versions.rewards)
               (map (v: "/v${v}/tx-submit") versions.txSubmit)
@@ -161,6 +165,7 @@ in
         ./projector.resource.nix
         ./backend.provider.nix
         ./stake-pool.nix
+        ./chain-history.nix
         ./handle.nix
         ./asset.nix
         ./backend-ingress.nix
@@ -183,6 +188,7 @@ in
             env.OVERRIDE_FUZZY_OPTIONS = "true";
           };
           handle-provider.enabled = true;
+          chain-history-provider.enabled = true;
           # asset-provider.enabled = true;
         };
 
@@ -655,6 +661,7 @@ in
           backend = {
             enabled = true;
           };
+          chain-history-provider.enabled = true;
         };
 
         values = {
