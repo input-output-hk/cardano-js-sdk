@@ -28,8 +28,13 @@ import Fuse from 'fuse.js';
 
 export const DEFAULT_FUZZY_SEARCH_OPTIONS: FuzzyOptions = {
   distance: 100,
+  fieldNormWeight: 1,
+  ignoreFieldNorm: false,
+  ignoreLocation: false,
   location: 0,
+  minMatchCharLength: 3,
   threshold: 0.4,
+  useExtendedSearch: false,
   weights: { description: 1, homepage: 2, name: 3, poolId: 4, ticker: 4 }
 };
 
@@ -57,16 +62,16 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
   #fuzzyOptions: FuzzyOptions;
   #lastRosEpochs: number;
   #paginationPageSizeLimit: number;
-  #overrideFuzzyOptions: boolean;
+  #overrideFuzzyOptions?: boolean;
 
   constructor(config: TypeOrmStakePoolProviderProps, deps: TypeormStakePoolProviderDependencies) {
-    const { lastRosEpochs, paginationPageSizeLimit } = config;
+    const { lastRosEpochs, overrideFuzzyOptions, paginationPageSizeLimit } = config;
 
     super('TypeormStakePoolProvider', deps);
     this.#cache = deps.cache;
     this.#fuzzyOptions = DEFAULT_FUZZY_SEARCH_OPTIONS;
     this.#paginationPageSizeLimit = paginationPageSizeLimit;
-    this.#overrideFuzzyOptions = true;
+    this.#overrideFuzzyOptions = overrideFuzzyOptions;
 
     // Introduced following code repetition as the correct form is source of a circular-deps:check failure.
     // Solving it would require an invasive refactoring action, probably better to defer it.
@@ -86,15 +91,33 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
   private async getFuse(dataSource: DataSource, fuzzyOptions?: DeepPartial<FuzzyOptions>) {
     const {
       distance,
+      fieldNormWeight,
+      ignoreFieldNorm,
+      ignoreLocation,
       location,
+      minMatchCharLength,
       threshold,
+      useExtendedSearch,
       weights: { description, homepage, name, poolId, ticker }
     } = this.#overrideFuzzyOptions
       ? { ...this.#fuzzyOptions, ...fuzzyOptions, weights: { ...this.#fuzzyOptions.weights, ...fuzzyOptions?.weights } }
       : this.#fuzzyOptions;
 
     const cacheKey = this.#overrideFuzzyOptions
-      ? `fuzzy-index-${JSON.stringify([description, distance, homepage, location, name, threshold, ticker])}`
+      ? `fuzzy-index-${JSON.stringify([
+          description,
+          distance,
+          fieldNormWeight,
+          homepage,
+          ignoreFieldNorm,
+          ignoreLocation,
+          location,
+          minMatchCharLength,
+          name,
+          threshold,
+          ticker,
+          useExtendedSearch
+        ])}`
       : 'fuzzy-index';
 
     return this.#cache.get(cacheKey, async () => {
@@ -110,6 +133,9 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
 
       const opts = {
         distance,
+        fieldNormWeight,
+        ignoreFieldNorm,
+        ignoreLocation,
         includeScore: true,
         keys: [
           { name: 'description', weight: description },
@@ -119,8 +145,9 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
           { name: 'ticker', weight: ticker }
         ],
         location,
-        minMatchCharLength: 3,
-        threshold
+        minMatchCharLength,
+        threshold,
+        useExtendedSearch
       };
 
       return new Fuse(metadata, opts, Fuse.createIndex(opts.keys, metadata));
