@@ -149,7 +149,7 @@ services:
 
   cardano-node:
     <<: *logging
-    image: inputoutput/cardano-node:${CARDANO_NODE_VERSION:-1.35.5}
+    image: public.ecr.aws/e8d0p1a5/cardano-node:${CARDANO_NODE_VERSION:-1.35.5}
     command:
       [
         'run',
@@ -182,7 +182,7 @@ services:
 
   cardano-submit-api:
     command: --config /config/cardano-submit-api/config.json --listen-address 0.0.0.0 --socket-path /ipc/node.socket $SUBMIT_API_ARGS
-    image: inputoutput/cardano-submit-api:${CARDANO_NODE_VERSION:-1.35.5}
+    image: public.ecr.aws/e8d0p1a5/cardano-submit-api:${CARDANO_NODE_VERSION:-1.35.5}
     ports:
       - 8090:8090
     restart: on-failure
