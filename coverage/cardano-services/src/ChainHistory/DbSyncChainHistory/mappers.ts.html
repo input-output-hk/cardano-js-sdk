@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">98.52% </span>
+                <span class="strong">97.22% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>67/68</span>
+                <span class='fraction'>70/72</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">92% </span>
+                <span class="strong">90.38% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>46/50</span>
+                <span class='fraction'>47/52</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">93.33% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>13/13</span>
+                <span class='fraction'>14/15</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">97.95% </span>
+                <span class="strong">96.22% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>48/49</span>
+                <span class='fraction'>51/53</span>
             </div>
         
             
@@ -346,7 +346,22 @@
 <a name='L281'></a><a href='#L281'>281</a>
 <a name='L282'></a><a href='#L282'>282</a>
 <a name='L283'></a><a href='#L283'>283</a>
-<a name='L284'></a><a href='#L284'>284</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -452,6 +467,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -651,7 +681,7 @@ import {
   WithCertType,
   WithdrawalModel
 } from './types';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, NotImplementedError } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import {
   isDelegationCertModel,
@@ -736,6 +766,21 @@ export const mapWithdrawal = (withdrawalModel: WithdrawalModel): Cardano.Withdra
 // Remove this and select the actual redeemer data from `redeemer_data` table.
 const stubRedeemerData = Buffer.from('not implemented');
 &nbsp;
+const redeemerPurposeMap: Record&lt;RedeemerModel['purpose'], Cardano.RedeemerPurpose&gt; = {
+  cert: Cardano.RedeemerPurpose.certificate,
+  mint: Cardano.RedeemerPurpose.mint,
+  proposing: Cardano.RedeemerPurpose.propose,
+  reward: Cardano.RedeemerPurpose.withdrawal,
+  spend: Cardano.RedeemerPurpose.spend,
+  voting: Cardano.RedeemerPurpose.vote
+};
+&nbsp;
+const mapRedeemerPurpose = (purpose: RedeemerModel['purpose']): Cardano.RedeemerPurpose =&gt;
+  redeemerPurposeMap[purpose] ||
+<span class="branch-1 cbranch-no" title="branch not covered" >  (<span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
+<span class="cstat-no" title="statement not covered" >    throw new NotImplementedError(`Failed to map redeemer "purpose": ${purpose}`);</span>
+  })();
+&nbsp;
 export const mapRedeemer = (redeemerModel: RedeemerModel): Cardano.Redeemer =&gt; ({
   data: stubRedeemerData,
   executionUnits: {
@@ -743,7 +788,7 @@ export const mapRedeemer = (redeemerModel: RedeemerModel): Cardano.Redeemer =&gt
     steps: Number(redeemerModel.unit_steps)
   },
   index: redeemerModel.index,
-  purpose: redeemerModel.purpose as Cardano.RedeemerPurpose
+  purpose: mapRedeemerPurpose(redeemerModel.purpose)
 });
 &nbsp;
 export const mapCertificate = (
@@ -919,7 +964,7 @@ export const mapTxId = ({ tx_id }: TxIdModel) =&gt; tx_id;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-04-30T09:38:15.380Z
+                at 2024-04-30T13:16:44.592Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
