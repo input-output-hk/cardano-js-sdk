@@ -103,7 +103,7 @@ in
           versions = oci.meta.versions;
           httpPrefix = "/v${lib.last (lib.sort lib.versionOlder oci.meta.versions.root)}";
 
-          loggingLevel = "debug";
+          loggingLevel = "info";
           tokenMetadataServerUrl = "http://${final.namespace}-cardano-stack-metadata.${final.namespace}.svc.cluster.local";
           ingresOrder = 0;
           certificateArn = tf-outputs.${values.region}.acm_arn;
