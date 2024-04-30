@@ -315,6 +315,56 @@ describe('LedgerKeyAgent', () => {
         expect(signatures.size).toBe(2);
       });
 
+      it('can sign a transaction with voting procedures, treasury and donation', async () => {
+        const dRepPublicKey = Crypto.Ed25519PublicKeyHex(
+          'deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01'
+        );
+        const dRepKeyHash = (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex();
+        const votingProcedure: Cardano.VotingProcedures[0] = {
+          voter: {
+            __typename: Cardano.VoterType.dRepKeyHash,
+            credential: { hash: Crypto.Hash28ByteBase16(dRepKeyHash), type: Cardano.CredentialType.KeyHash }
+          },
+          votes: [
+            {
+              actionId: {
+                actionIndex: 3,
+                id: Cardano.TransactionId('1000000000000000000000000000000000000000000000000000000000000000')
+              },
+              votingProcedure: {
+                anchor: {
+                  dataHash: Crypto.Hash32ByteBase16('0000000000000000000000000000000000000000000000000000000000000000'),
+                  url: 'https://www.someurl.io'
+                },
+                vote: 0
+              }
+            }
+          ]
+        };
+
+        const txBuilder = wallet.createTxBuilder();
+        const builtTx = await txBuilder
+          .customize(({ txBody }) => {
+            const votingProcedures: Cardano.TxBody['votingProcedures'] = [
+              ...(txBody.votingProcedures || []),
+              votingProcedure
+            ];
+            return {
+              ...txBody,
+              donation: 1000n,
+              treasuryValue: 2000n,
+              votingProcedures
+            };
+          })
+          .build()
+          .inspect();
+
+        const {
+          witness: { signatures }
+        } = await wallet.finalizeTx({ tx: builtTx });
+        expect(signatures.size).toBe(2);
+      });
+
       describe('conway-era', () => {
         describe('ordinary tx mode', () => {
           it('can sign a transaction with Registration certs', async () => {

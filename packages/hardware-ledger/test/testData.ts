@@ -152,6 +152,67 @@ export const txOutWithReferenceScriptWithInlineDatum: Cardano.TxOut = {
   value: { coins: 10n }
 };
 
+export const constitutionalCommitteeKeyHashVoter: Cardano.Voter = {
+  __typename: Cardano.VoterType.ccHotKeyHash,
+  credential: {
+    hash: 'somehash' as Crypto.Hash28ByteBase16,
+    type: Cardano.CredentialType.KeyHash
+  }
+};
+
+export const constitutionalCommitteeScriptHashVoter: Cardano.Voter = {
+  __typename: Cardano.VoterType.ccHotScriptHash,
+  credential: {
+    hash: 'somehash' as Crypto.Hash28ByteBase16,
+    type: Cardano.CredentialType.ScriptHash
+  }
+};
+
+export const drepKeyHashVoter: Cardano.Voter = {
+  __typename: Cardano.VoterType.dRepKeyHash,
+  credential: {
+    hash: 'somehash' as Crypto.Hash28ByteBase16,
+    type: Cardano.CredentialType.KeyHash
+  }
+};
+
+export const drepScriptHashVoter: Cardano.Voter = {
+  __typename: Cardano.VoterType.dRepScriptHash,
+  credential: {
+    hash: 'somehash' as Crypto.Hash28ByteBase16,
+    type: Cardano.CredentialType.ScriptHash
+  }
+};
+
+export const stakePoolKeyHashVoter: Cardano.Voter = {
+  __typename: Cardano.VoterType.stakePoolKeyHash,
+  credential: {
+    hash: 'somehash' as Crypto.Hash28ByteBase16,
+    type: Cardano.CredentialType.KeyHash
+  }
+};
+
+export const votingProcedureVotes = [
+  {
+    actionId: {
+      actionIndex: 1,
+      id: 'someActionId' as Cardano.TransactionId
+    },
+    votingProcedure: {
+      anchor: {
+        dataHash: 'datahash' as Crypto.Hash32ByteBase16,
+        url: 'http://example.com'
+      },
+      vote: Cardano.Vote.yes
+    }
+  }
+];
+
+export const constitutionalCommitteeVotingProcedure = {
+  voter: constitutionalCommitteeKeyHashVoter,
+  votes: votingProcedureVotes
+};
+
 export const txBody: Cardano.TxBody = {
   auxiliaryDataHash: Crypto.Hash32ByteBase16('2ceb364d93225b4a0f004a0975a13eb50c3cc6348474b4fe9121f8dc72ca0cfa'),
   certificates: [
