@@ -6,7 +6,7 @@
   utils,
   ...
 }: {
-  templates.backend-ingress = {
+  templates.backend-ingress = lib.mkIf values.ingress.enabled {
     apiVersion = "networking.k8s.io/v1";
     kind = "Ingress";
     metadata = {

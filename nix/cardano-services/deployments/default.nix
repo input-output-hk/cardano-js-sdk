@@ -99,6 +99,7 @@ in
       values = {
         postgresName = "${final.namespace}-postgresql";
         stakepool.databaseName = "stakepool";
+        ingress.enabled = true;
         cardano-services = {
           image = oci.image.name;
           buildInfo = oci.meta.buildInfo;
@@ -750,6 +751,22 @@ in
           cardano-services = {
             ingresOrder = 99;
           };
+        };
+      };
+
+      "ops-preview-1@us-east-1@v2" = final: {
+        name = "${final.namespace}-cardanojs-v2";
+        namespace = "ops-preview-1";
+
+        projectors = {
+          stake-pool.enabled = true;
+        };
+
+        values = {
+          network = "preview";
+          region = "us-east-1";
+          ingress.enabled = false;
+          pg-boss-worker.enabled = true;
         };
       };
 
