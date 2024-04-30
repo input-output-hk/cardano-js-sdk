@@ -35,9 +35,9 @@
       ALLOWED_ORIGINS = values.backend.allowedOrigins;
 
       POSTGRES_POOL_MAX_STAKE_POOL = "10";
-      POSTGRES_HOST_STAKE_POOL = values.stakepool.databaseName;
+      POSTGRES_HOST_STAKE_POOL = values.postgresName;
       POSTGRES_PORT_STAKE_POOL = "5432";
-      POSTGRES_DB_STAKE_POOL = values.postgres;
+      POSTGRES_DB_STAKE_POOL = values.stakepool.databaseName;
       POSTGRES_PASSWORD_STAKE_POOL = {
         valueFrom.secretKeyRef = {
           name = "${values.stakepool.databaseName}-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
