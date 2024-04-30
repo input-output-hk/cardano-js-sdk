@@ -20,7 +20,7 @@ import {
   WithCertType,
   WithdrawalModel
 } from './types';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, NotImplementedError } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import {
   isDelegationCertModel,
@@ -105,6 +105,21 @@ export const mapWithdrawal = (withdrawalModel: WithdrawalModel): Cardano.Withdra
 // Remove this and select the actual redeemer data from `redeemer_data` table.
 const stubRedeemerData = Buffer.from('not implemented');
 
+const redeemerPurposeMap: Record<RedeemerModel['purpose'], Cardano.RedeemerPurpose> = {
+  cert: Cardano.RedeemerPurpose.certificate,
+  mint: Cardano.RedeemerPurpose.mint,
+  proposing: Cardano.RedeemerPurpose.propose,
+  reward: Cardano.RedeemerPurpose.withdrawal,
+  spend: Cardano.RedeemerPurpose.spend,
+  voting: Cardano.RedeemerPurpose.vote
+};
+
+const mapRedeemerPurpose = (purpose: RedeemerModel['purpose']): Cardano.RedeemerPurpose =>
+  redeemerPurposeMap[purpose] ||
+  (() => {
+    throw new NotImplementedError(`Failed to map redeemer "purpose": ${purpose}`);
+  })();
+
 export const mapRedeemer = (redeemerModel: RedeemerModel): Cardano.Redeemer => ({
   data: stubRedeemerData,
   executionUnits: {
@@ -112,7 +127,7 @@ export const mapRedeemer = (redeemerModel: RedeemerModel): Cardano.Redeemer => (
     steps: Number(redeemerModel.unit_steps)
   },
   index: redeemerModel.index,
-  purpose: redeemerModel.purpose as Cardano.RedeemerPurpose
+  purpose: mapRedeemerPurpose(redeemerModel.purpose)
 });
 
 export const mapCertificate = (

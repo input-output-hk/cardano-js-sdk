@@ -361,7 +361,9 @@
               "spend",
               "mint",
               "certificate",
-              "withdrawal"
+              "withdrawal",
+              "vote",
+              "propose"
             ]
           },
           "data": {
