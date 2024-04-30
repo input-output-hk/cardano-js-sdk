@@ -823,9 +823,16 @@ in
           stake-pool.enabled = true;
         };
 
+        providers = {
+          stake-pool-provider = {
+            enabled = false;
+          };
+        };
+
         values = {
           ingress.enabled = false;
           pg-boss-worker.enabled = true;
+          stakepool.databaseName = "stakepoolv2";
         };
       };
 
