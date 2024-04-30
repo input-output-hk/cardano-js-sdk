@@ -74,10 +74,6 @@ services:
     volumes:
       - ./local-network/config/network:/config
 
-  pg-boss-worker:
-    volumes:
-      - ./schedules.json:/config/schedules.json
-
   cardano-submit-api:
     depends_on:
       local-testnet:
