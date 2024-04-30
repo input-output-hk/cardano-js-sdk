@@ -35,18 +35,18 @@
       ALLOWED_ORIGINS = values.backend.allowedOrigins;
 
       POSTGRES_POOL_MAX_STAKE_POOL = "10";
-      POSTGRES_HOST_STAKE_POOL = values.postgresName;
+      POSTGRES_HOST_STAKE_POOL = values.stakepool.databaseName;
       POSTGRES_PORT_STAKE_POOL = "5432";
-      POSTGRES_DB_STAKE_POOL = "stakepool";
+      POSTGRES_DB_STAKE_POOL = values.postgres;
       POSTGRES_PASSWORD_STAKE_POOL = {
         valueFrom.secretKeyRef = {
-          name = "stakepool-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
+          name = "${values.stakepool.databaseName}-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
           key = "password";
         };
       };
       POSTGRES_USER_STAKE_POOL = {
         valueFrom.secretKeyRef = {
-          name = "stakepool-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
+          name = "${values.stakepool.databaseName}-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
           key = "username";
         };
       };
@@ -79,16 +79,16 @@
       POSTGRES_POOL_MAX = "2";
       POSTGRES_HOST = values.postgresName;
       POSTGRES_PORT = "5432";
-      POSTGRES_DB = "stakepool";
+      POSTGRES_DB = values.stakepool.databaseName;
       POSTGRES_PASSWORD = {
         valueFrom.secretKeyRef = {
-          name = "stakepool-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
+          name = "${values.stakepool.databaseName}-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
           key = "password";
         };
       };
       POSTGRES_USER = {
         valueFrom.secretKeyRef = {
-          name = "stakepool-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
+          name = "${values.stakepool.databaseName}-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
           key = "username";
         };
       };

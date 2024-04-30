@@ -98,6 +98,7 @@ in
 
       values = {
         postgresName = "${final.namespace}-postgresql";
+        stakepool.databaseName = "stakepool";
         cardano-services = {
           image = oci.image.name;
           buildInfo = oci.meta.buildInfo;
