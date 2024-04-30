@@ -38,7 +38,7 @@ in
       name = "${final.namespace}-cardanojs";
       chart = ./Chart.yaml;
       context = "eks-devs";
-      kubeconfig = "$PRJ_ROOT/.kube/${values.region}";
+      kubeconfig = "$PRJ_ROOT/.kube/${final.region}";
 
       utils = {
         mkPodEnv = lib.mapAttrsToList (
@@ -53,7 +53,7 @@ in
         appLabels = app: {
           inherit app;
           release = values.releaseName or final.name;
-          network = values.network;
+          network = final.network;
         };
       };
 
@@ -109,7 +109,7 @@ in
           loggingLevel = "info";
           tokenMetadataServerUrl = "http://${final.namespace}-cardano-stack-metadata.${final.namespace}.svc.cluster.local";
           ingresOrder = 0;
-          certificateArn = tf-outputs.${values.region}.acm_arn;
+          certificateArn = tf-outputs.${final.region}.acm_arn;
           additionalRoutes = [];
         };
 
@@ -122,9 +122,9 @@ in
           enabled = false;
           metadata-fetch-mode = "smash";
           smash-url =
-            if values.network == "mainnet"
+            if final.network == "mainnet"
             then "https://smash.cardano-mainnet.iohk.io/api/v1"
-            else "https://${values.network}-smash.world.dev.cardano.org/api/v1";
+            else "https://${final.network}-smash.world.dev.cardano.org/api/v1";
           resources.limits = mkPodResources "300Mi" "300m";
           resources.requests = mkPodResources "150Mi" "200m";
         };
@@ -133,10 +133,10 @@ in
           allowedOrigins = lib.concatStringsSep "," allowedOrigins;
           passHandleDBArgs = true;
           hostnames = ["${final.namespace}.${baseUrl}"];
-          dnsId = lib.toLower "${values.region}-${final.namespace}-backend";
+          dnsId = lib.toLower "${final.region}-${final.namespace}-backend";
           ogmiosSrvServiceName = "${final.namespace}-cardano-core.${final.namespace}.svc.cluster.local";
 
-          wafARN = tf-outputs.${values.region}.waf_arn;
+          wafARN = tf-outputs.${final.region}.waf_arn;
           # Healthcheck paramteres for ALB
           # For mainnet, default value of timeout of 5 is too short, so have to increase it significantly
           # Interval cannot be less than timeout
@@ -163,6 +163,7 @@ in
         };
       };
       imports = [
+        ./options.nix
         ./provider.resource.nix
         ./projector.resource.nix
         ./backend.provider.nix
@@ -178,6 +179,8 @@ in
     targets = {
       "dev-preview@us-east-1" = final: {
         namespace = "dev-preview";
+        network = "preview";
+        region = "us-east-1";
 
         providers = {
           backend = {
@@ -198,8 +201,6 @@ in
         };
 
         values = {
-          network = "preview";
-          region = "us-east-1";
           cardano-services = {
             ingresOrder = 99;
             additionalRoutes = [
@@ -224,6 +225,8 @@ in
       "dev-sanchonet@us-east-1@v1" = final: {
         namespace = "dev-sanchonet";
         name = "${final.namespace}-cardanojs-v1";
+        network = "sanchonet";
+        region = "us-east-1";
 
         providers = {
           backend = {
@@ -243,9 +246,6 @@ in
         };
 
         values = {
-          network = "sanchonet";
-          region = "us-east-1";
-
           blockfrost-worker.enabled = false;
           pg-boss-worker.enabled = true;
 
@@ -295,6 +295,8 @@ in
 
       "dev-mainnet@us-east-1" = final: {
         namespace = "dev-mainnet";
+        network = "mainnet";
+        region = "us-east-1";
 
         providers = {
           backend = {
@@ -316,8 +318,6 @@ in
         };
 
         values = {
-          network = "mainnet";
-          region = "us-east-1";
           cardano-services = {
             ingresOrder = 99;
             additionalRoutes = [
@@ -342,6 +342,8 @@ in
         name = "${final.namespace}-cardanojs-v2";
         namespace = "dev-preprod";
         context = "eks-devs";
+        network = "preprod";
+        region = "us-east-1";
 
         providers = {
           backend = {
@@ -360,9 +362,6 @@ in
         };
 
         values = {
-          network = "preprod";
-          region = "us-east-1";
-
           backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
           backend.hostnames = ["${final.namespace}.${baseUrl}"];
 
@@ -379,6 +378,8 @@ in
         name = "${final.namespace}-cardanojs-v2";
         namespace = "staging-preprod";
         context = "eks-devs";
+        network = "preprod";
+        region = "us-east-1";
 
         providers = {
           backend = {
@@ -397,9 +398,6 @@ in
         };
 
         values = {
-          network = "preprod";
-          region = "us-east-1";
-
           backend.hostnames = ["${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
@@ -413,6 +411,8 @@ in
         name = "${final.namespace}-cardanojs-v2";
         namespace = "live-mainnet";
         context = "eks-admin";
+        network = "mainnet";
+        region = "us-east-2";
 
         providers = {
           backend = {
@@ -436,8 +436,6 @@ in
         };
 
         values = {
-          network = "mainnet";
-          region = "us-east-2";
           cardano-services = {
             ingresOrder = 98;
             additionalRoutes = [
@@ -479,6 +477,8 @@ in
         name = "${final.namespace}-cardanojs-v2";
         namespace = "live-preprod";
         context = "eks-admin";
+        network = "preprod";
+        region = "us-east-2";
 
         providers = {
           backend = {
@@ -502,9 +502,6 @@ in
         };
 
         values = {
-          network = "preprod";
-          region = "us-east-2";
-
           backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
@@ -589,6 +586,8 @@ in
         name = "${final.namespace}-cardanojs-v1";
         namespace = "live-preview";
         context = "eks-admin";
+        network = "preview";
+        region = "us-east-2";
 
         providers = {
           backend = {
@@ -598,9 +597,6 @@ in
         };
 
         values = {
-          network = "preview";
-          region = "us-east-2";
-
           backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           backend.passHandleDBArgs = false;
           backend.routes = [
@@ -629,6 +625,8 @@ in
         name = "${final.namespace}-cardanojs-v2";
         namespace = "live-preview";
         context = "eks-admin";
+        network = "preview";
+        region = "us-east-2";
 
         providers = {
           backend = {
@@ -652,9 +650,6 @@ in
         };
 
         values = {
-          network = "preview";
-          region = "us-east-2";
-
           backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
@@ -738,6 +733,8 @@ in
 
       "ops-preview-1@us-east-1" = final: {
         namespace = "ops-preview-1";
+        network = "preview";
+        region = "us-east-1";
 
         providers = {
           backend = {
@@ -746,8 +743,6 @@ in
         };
 
         values = {
-          network = "preview";
-          region = "us-east-1";
           cardano-services = {
             ingresOrder = 99;
           };
@@ -757,14 +752,14 @@ in
       "ops-preview-1@us-east-1@v2" = final: {
         name = "${final.namespace}-cardanojs-v2";
         namespace = "ops-preview-1";
+        network = "preview";
+        region = "us-east-1";
 
         projectors = {
           stake-pool.enabled = true;
         };
 
         values = {
-          network = "preview";
-          region = "us-east-1";
           ingress.enabled = false;
           pg-boss-worker.enabled = true;
         };
@@ -772,6 +767,8 @@ in
 
       "ops-preprod-1@us-east-1" = final: {
         namespace = "ops-preprod-1";
+        network = "preprod";
+        region = "us-east-1";
 
         providers = {
           backend = {
@@ -780,9 +777,6 @@ in
         };
 
         values = {
-          network = "preprod";
-          region = "us-east-1";
-
           cardano-services = {
             ingresOrder = 99;
           };
@@ -792,6 +786,8 @@ in
       "live-sanchonet@us-east-2@v1" = final: {
         namespace = "live-sanchonet";
         name = "${final.namespace}-cardanojs-v1";
+        network = "sanchonet";
+        region = "us-east-2";
 
         providers = {
           backend = {
@@ -809,9 +805,6 @@ in
         };
 
         values = {
-          network = "sanchonet";
-          region = "us-east-2";
-
           blockfrost-worker.enabled = false;
           pg-boss-worker.enabled = true;
           backend.routes = let

@@ -20,7 +20,7 @@
 
     env =
       {
-        NETWORK = values.network;
+        NETWORK = config.network;
         ENABLE_METRICS = "true";
         SERVICE_NAMES = "asset,chain-history,network-info,rewards,stake-pool,tx-submit,utxo";
         OGMIOS_SRV_SERVICE_NAME = values.backend.ogmiosSrvServiceName;
@@ -33,9 +33,9 @@
         PAGINATION_PAGE_SIZE_LIMIT = "5500";
 
         HANDLE_PROVIDER_SERVER_URL =
-          if values.network == "mainnet"
+          if config.network == "mainnet"
           then "https://api.handle.me"
-          else "https://${values.network}.api.handle.me";
+          else "https://${config.network}.api.handle.me";
 
         BUILD_INFO = values.cardano-services.buildInfo;
         ALLOWED_ORIGINS = values.backend.allowedOrigins;

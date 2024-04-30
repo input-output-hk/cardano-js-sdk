@@ -21,7 +21,7 @@
     };
 
     env = {
-      NETWORK = values.network;
+      NETWORK = config.network;
       OGMIOS_SRV_SERVICE_NAME = values.backend.ogmiosSrvServiceName;
       LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
       ENABLE_METRICS = "true";
@@ -69,7 +69,7 @@
     port = 3000;
 
     env = {
-      NETWORK = values.network;
+      NETWORK = config.network;
       LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
       OGMIOS_SRV_SERVICE_NAME = values.backend.ogmiosSrvServiceName;
       PROJECTION_NAMES = "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";

@@ -3,6 +3,7 @@
   utils,
   values,
   chart,
+  config,
   ...
 }: {
   templates.pgboss-deployment = lib.mkIf values.pg-boss-worker.enabled {
@@ -53,7 +54,7 @@
               };
               args = ["start-pg-boss-worker"];
               env = utils.mkPodEnv ({
-                  NETWORK = values.network;
+                  NETWORK = config.network;
                   LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
                   QUEUES = "pool-metadata,pool-metrics";
                   STAKE_POOL_PROVIDER_URL = "http://${chart.name}-backend.${chart.namespace}.svc.cluster.local";

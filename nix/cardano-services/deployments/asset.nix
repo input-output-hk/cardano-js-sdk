@@ -24,7 +24,7 @@
       BUILD_INFO = values.cardano-services.buildInfo;
       ALLOWED_ORIGINS = values.backend.allowedOrigins;
 
-      NETWORK = values.network;
+      NETWORK = config.network;
       OGMIOS_SRV_SERVICE_NAME = values.backend.ogmiosSrvServiceName;
       LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
       ENABLE_METRICS = "true";
@@ -70,7 +70,7 @@
     env = {
       BUILD_INFO = values.cardano-services.buildInfo;
 
-      NETWORK = values.network;
+      NETWORK = config.network;
       LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
       OGMIOS_SRV_SERVICE_NAME = values.backend.ogmiosSrvServiceName;
       PROJECTION_NAMES = "asset";
