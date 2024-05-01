@@ -222,6 +222,29 @@ in
         };
       };
 
+      "dev-preview@us-east-1@v2" = final: {
+        name = "${final.namespace}-cardanojs-v2";
+        namespace = "dev-preview";
+        network = "preview";
+        region = "us-east-1";
+
+        projectors = {
+          stake-pool.enabled = true;
+        };
+
+        providers = {
+          stake-pool-provider = {
+            enabled = false;
+          };
+        };
+
+        values = {
+          ingress.enabled = false;
+          pg-boss-worker.enabled = true;
+          stakepool.databaseName = "stakepoolv2";
+        };
+      };
+
       "dev-sanchonet@us-east-1@v1" = final: {
         namespace = "dev-sanchonet";
         name = "${final.namespace}-cardanojs-v1";
@@ -835,6 +858,7 @@ in
           stakepool.databaseName = "stakepoolv2";
         };
       };
+
 
       "ops-preprod-1@us-east-1" = final: {
         namespace = "ops-preprod-1";
