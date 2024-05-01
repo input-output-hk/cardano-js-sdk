@@ -305,7 +305,34 @@
 <a name='L240'></a><a href='#L240'>240</a>
 <a name='L241'></a><a href='#L241'>241</a>
 <a name='L242'></a><a href='#L242'>242</a>
-<a name='L243'></a><a href='#L243'>243</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">34x</span>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a>
+<a name='L265'></a><a href='#L265'>265</a>
+<a name='L266'></a><a href='#L266'>266</a>
+<a name='L267'></a><a href='#L267'>267</a>
+<a name='L268'></a><a href='#L268'>268</a>
+<a name='L269'></a><a href='#L269'>269</a>
+<a name='L270'></a><a href='#L270'>270</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -334,6 +361,11 @@
 <span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -396,11 +428,29 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -416,6 +466,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -577,8 +631,13 @@ import Fuse from 'fuse.js';
 &nbsp;
 export const DEFAULT_FUZZY_SEARCH_OPTIONS: FuzzyOptions = {
   distance: 100,
+  fieldNormWeight: 1,
+  ignoreFieldNorm: false,
+  ignoreLocation: false,
   location: 0,
+  minMatchCharLength: 3,
   threshold: 0.4,
+  useExtendedSearch: false,
   weights: { description: 1, homepage: 2, name: 3, poolId: 4, ticker: 4 }
 };
 &nbsp;
@@ -606,16 +665,16 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
   #fuzzyOptions: FuzzyOptions;
   #lastRosEpochs: number;
   #paginationPageSizeLimit: number;
-  #overrideFuzzyOptions: boolean;
+  #overrideFuzzyOptions?: boolean;
 &nbsp;
   constructor(config: TypeOrmStakePoolProviderProps, deps: TypeormStakePoolProviderDependencies) {
-    const { lastRosEpochs, paginationPageSizeLimit } = config;
+    const { lastRosEpochs, overrideFuzzyOptions, paginationPageSizeLimit } = config;
 &nbsp;
     super('TypeormStakePoolProvider', deps);
     this.#cache = deps.cache;
     this.#fuzzyOptions = DEFAULT_FUZZY_SEARCH_OPTIONS;
     this.#paginationPageSizeLimit = paginationPageSizeLimit;
-    this.#overrideFuzzyOptions = true;
+    this.#overrideFuzzyOptions = overrideFuzzyOptions;
 &nbsp;
     // Introduced following code repetition as the correct form is source of a circular-deps:check failure.
     // Solving it would require an invasive refactoring action, probably better to defer it.
@@ -635,16 +694,34 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
   private async getFuse(dataSource: DataSource, fuzzyOptions?: DeepPartial&lt;FuzzyOptions&gt;) {
     const {
       distance,
+      fieldNormWeight,
+      ignoreFieldNorm,
+      ignoreLocation,
       location,
+      minMatchCharLength,
       threshold,
+      useExtendedSearch,
       weights: { description, homepage, name, poolId, ticker }
     } = this.#overrideFuzzyOptions
-      ? { ...this.#fuzzyOptions, ...fuzzyOptions, weights: { ...this.#fuzzyOptions.weights, ...fuzzyOptions?.weights } }
-      : <span class="branch-1 cbranch-no" title="branch not covered" >this.#fuzzyOptions;</span>
+      ? <span class="branch-0 cbranch-no" title="branch not covered" >{ ...this.#fuzzyOptions, ...fuzzyOptions, weights: { ...this.#fuzzyOptions.weights, ...fuzzyOptions?.weights } }</span>
+      : this.#fuzzyOptions;
 &nbsp;
     const cacheKey = this.#overrideFuzzyOptions
-      ? `fuzzy-index-${JSON.stringify([description, distance, homepage, location, name, threshold, ticker])}`
-      : <span class="branch-1 cbranch-no" title="branch not covered" >'fuzzy-index';</span>
+      ? <span class="branch-0 cbranch-no" title="branch not covered" >`fuzzy-index-${JSON.stringify([</span>
+          description,
+          distance,
+          fieldNormWeight,
+          homepage,
+          ignoreFieldNorm,
+          ignoreLocation,
+          location,
+          minMatchCharLength,
+          name,
+          threshold,
+          ticker,
+          useExtendedSearch
+        ])}`
+      : 'fuzzy-index';
 &nbsp;
     return this.#cache.get(cacheKey, async () =&gt; {
       const metadata = await this.#cache.get('all-metadata', async () =&gt;
@@ -659,6 +736,9 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
 &nbsp;
       const opts = {
         distance,
+        fieldNormWeight,
+        ignoreFieldNorm,
+        ignoreLocation,
         includeScore: true,
         keys: [
           { name: 'description', weight: description },
@@ -668,8 +748,9 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
           { name: 'ticker', weight: ticker }
         ],
         location,
-        minMatchCharLength: 3,
-        threshold
+        minMatchCharLength,
+        threshold,
+        useExtendedSearch
       };
 &nbsp;
       return new Fuse(metadata, opts, Fuse.createIndex(opts.keys, metadata));
@@ -796,7 +877,7 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-05-01T12:57:55.383Z
+                at 2024-05-01T16:11:19.823Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
