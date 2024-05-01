@@ -30,7 +30,7 @@ describe('TypeormStakePoolProvider utils', () => {
     it('correctly parse a valid options object', () =>
       expect(
         validateFuzzyOptions(
-          '{"distance":100,"location":0,"threshold":0.4,"weights":{"description":1,"homepage":2,"name":3,"poolId":4,"ticker":4}}'
+          '{"distance":100,"fieldNormWeight":1,"ignoreFieldNorm":false,"ignoreLocation":false,"location":0,"minMatchCharLength":3,"threshold":0.4,"useExtendedSearch":false,"weights":{"description":1,"homepage":2,"name":3,"poolId":4,"ticker":4}}'
         )
       ).toStrictEqual(DEFAULT_FUZZY_SEARCH_OPTIONS));
   });
@@ -38,7 +38,7 @@ describe('TypeormStakePoolProvider utils', () => {
   describe('withTextFilter', () => {
     it('returns false without filters', () => expect(withTextFilter()).toBeFalsy());
     it('returns false without filters.text', () => expect(withTextFilter({})).toBeFalsy());
-    it('returns false with filters.text.length < 3', () => expect(withTextFilter({ text: '12' })).toBeFalsy());
+    it('returns false with filters.text.length === 0', () => expect(withTextFilter({ text: '' })).toBeFalsy());
     it('returns true with valid filters.text', () => expect(withTextFilter({ text: '123' })).toBeTruthy());
   });
 });
