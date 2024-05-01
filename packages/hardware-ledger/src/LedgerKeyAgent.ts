@@ -11,7 +11,8 @@ import {
   SerializableLedgerKeyAgentData,
   SignBlobResult,
   SignTransactionContext,
-  errors
+  errors,
+  util
 } from '@cardano-sdk/key-management';
 import { HID } from 'node-hid';
 import { LedgerDevice, LedgerTransportType } from './types';
@@ -540,6 +541,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
       const ledgerTxData = await toLedgerTx(body, {
         accountIndex: this.accountIndex,
         chainId: this.chainId,
+        dRepPublicKey: await this.derivePublicKey(util.DREP_KEY_DERIVATION_PATH),
         knownAddresses,
         txInKeyPathMap
       });
