@@ -36,14 +36,18 @@ export const createStubStakePoolProvider = (
   queryStakePools: async (options) => {
     if (delayMs) await delay(delayMs);
     const identifierFilters = options?.filters?.identifier;
+    const textSearchValue = options?.filters?.text;
     const filterValues = identifierFilters ? identifierFilters.values : [];
-    const pageResults = stakePools.filter(({ id, metadata }) =>
-      filterValues.some(
-        (value) =>
-          (value.id && id.includes(value.id)) ||
-          (value.name && metadata?.name.includes(value.name)) ||
-          (value.ticker && metadata?.ticker.includes(value.ticker))
-      )
+    const pageResults = stakePools.filter(
+      ({ id, metadata }) =>
+        (textSearchValue && metadata?.name.includes(textSearchValue)) ||
+        (textSearchValue && metadata?.ticker.includes(textSearchValue)) ||
+        filterValues.some(
+          (value) =>
+            (value.id && id.includes(value.id)) ||
+            (value.name && metadata?.name.includes(value.name)) ||
+            (value.ticker && metadata?.ticker.includes(value.ticker))
+        )
     );
     return {
       pageResults,
