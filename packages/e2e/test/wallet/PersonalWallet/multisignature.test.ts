@@ -1,18 +1,10 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { BaseWallet, FinalizeTxProps } from '@cardano-sdk/wallet';
-import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
-import { InitializeTxProps } from '@cardano-sdk/tx-construction';
-import { KeyRole, util } from '@cardano-sdk/key-management';
-import {
-  bip32Ed25519Factory,
-  burnTokens,
-  createStandaloneKeyAgent,
-  getEnv,
-  getWallet,
-  submitAndConfirm,
-  walletReady,
-  walletVariables
-} from '../../../src';
+import { AsyncKeyAgent, TransactionSigner, util } from '@cardano-sdk/key-management';
+import { BaseWallet } from '@cardano-sdk/wallet';
+import { Cardano } from '@cardano-sdk/core';
+import { GenericTxBuilder } from '@cardano-sdk/tx-construction';
+import { PolicyBuilder } from '@cardano-sdk/tx-construction/dist/cjs/tx-builder/PolicyBuilder';
+import { burnTokens, getEnv, getWallet, txConfirmed, walletReady, walletVariables } from '../../../src';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';
 
@@ -20,118 +12,90 @@ const env = getEnv(walletVariables);
 const logger = createLogger();
 
 describe('PersonalWallet/multisignature', () => {
-  let wallet: BaseWallet;
-  const assetName = '3030303030';
+  let aliceWallet: BaseWallet;
+  let bobWallet: BaseWallet;
+  let aliceTxBuilder: GenericTxBuilder;
+  let bobTxBuilder: GenericTxBuilder;
+  let alicePolicyBuilder: PolicyBuilder;
+  let bobPolicyBuilder: PolicyBuilder;
+  let bobKeyAgent: AsyncKeyAgent;
+  const coins = 2_000_000n;
+  let policyScript: Cardano.NativeScript;
+  let bobSigner: TransactionSigner;
+
+  beforeAll(async () => {
+    aliceWallet = (
+      await getWallet({
+        env,
+        idx: 0,
+        logger,
+        name: 'Alice Wallet',
+        polling: { interval: 50 }
+      })
+    ).wallet;
+
+    const getWalletRet = await getWallet({ env, idx: 1, logger, name: 'Bob Wallet', polling: { interval: 50 } });
+    bobWallet = getWalletRet.wallet;
+    bobKeyAgent = getWalletRet.asyncKeyAgent;
+    await walletReady(aliceWallet, coins);
+  });
+
+  beforeEach(async () => {
+    aliceTxBuilder = aliceWallet.createTxBuilder();
+    alicePolicyBuilder = aliceTxBuilder.buildPolicy();
+    bobTxBuilder = bobWallet.createTxBuilder();
+    bobPolicyBuilder = bobTxBuilder.buildPolicy();
+  });
+
+  afterEach(async () => {
+    await burnTokens({ policySigners: [bobSigner], scripts: [policyScript], wallet: aliceWallet });
+  });
 
   afterAll(() => {
-    wallet.shutdown();
+    aliceWallet.shutdown();
+    bobWallet.shutdown();
   });
 
   it('can create a transaction with multiple signatures to mint an asset', async () => {
-    wallet = (await getWallet({ env, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
-
-    const coins = 3_000_000n;
-    await walletReady(wallet, coins);
-
-    const genesis = await firstValueFrom(wallet.genesisParameters$);
-
-    const bip32Ed25519 = await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger);
-    const aliceKeyAgent = await createStandaloneKeyAgent(
-      env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
-      genesis,
-      bip32Ed25519
-    );
-    const bobKeyAgent = await createStandaloneKeyAgent(
-      env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
-      genesis,
-      bip32Ed25519
-    );
-
-    const aliceDerivationPath = {
-      index: 2,
-      role: KeyRole.External
-    };
-
-    const bobDerivationPath = {
-      index: 3,
-      role: KeyRole.External
-    };
-
-    const alicePubKey = await aliceKeyAgent.derivePublicKey(aliceDerivationPath);
-    const aliceKeyHash = await aliceKeyAgent.bip32Ed25519.getPubKeyHash(alicePubKey);
-
-    const bobPubKey = await bobKeyAgent.derivePublicKey(bobDerivationPath);
-    const bobKeyHash = await bobKeyAgent.bip32Ed25519.getPubKeyHash(bobPubKey);
-
-    const alicePolicySigner = new util.KeyAgentTransactionSigner(aliceKeyAgent, aliceDerivationPath);
-    const bobPolicySigner = new util.KeyAgentTransactionSigner(bobKeyAgent, bobDerivationPath);
-
-    const policyScript: Cardano.NativeScript = {
+    policyScript = {
       __type: Cardano.ScriptType.Native,
       kind: Cardano.NativeScriptKind.RequireAllOf,
       scripts: [
         {
           __type: Cardano.ScriptType.Native,
-          keyHash: aliceKeyHash,
+          keyHash: await alicePolicyBuilder.getKeyHash(),
           kind: Cardano.NativeScriptKind.RequireSignature
         },
         {
           __type: Cardano.ScriptType.Native,
-          keyHash: bobKeyHash,
+          keyHash: await bobPolicyBuilder.getKeyHash(),
           kind: Cardano.NativeScriptKind.RequireSignature
         }
       ]
     };
+    bobSigner = new util.KeyAgentTransactionSigner(bobKeyAgent, bobPolicyBuilder.getDerivationPath());
+    const policyId = await alicePolicyBuilder.setPolicyScript(policyScript).getPolicyId();
+    const tokens = aliceTxBuilder.buildToken(policyId).addAsset('Multisig', 10n).build();
+    const walletAddress = (await firstValueFrom(aliceWallet.addresses$))[0].address;
 
-    const policyId = nativeScriptPolicyId(policyScript);
-    const assetId = Cardano.AssetId(`${policyId}${assetName}`);
-    const tokens = new Map([[assetId, 10n]]);
-
-    const walletAddress = (await firstValueFrom(wallet.addresses$))[0].address;
-
-    const txProps: InitializeTxProps = {
-      mint: tokens,
-      outputs: new Set([
-        {
-          address: walletAddress,
-          value: {
-            assets: tokens,
-            coins
-          }
-        }
-      ]),
-      signingOptions: {
-        extraSigners: [alicePolicySigner, bobPolicySigner]
-      },
-      witness: { scripts: [policyScript] }
-    };
-
-    const unsignedTx = await wallet.initializeTx(txProps);
-
-    const finalizeProps: FinalizeTxProps = {
-      signingOptions: {
-        extraSigners: [alicePolicySigner, bobPolicySigner]
-      },
-      tx: unsignedTx,
-      witness: { scripts: [policyScript] }
-    };
-
-    const signedTx = await wallet.finalizeTx(finalizeProps);
-    await submitAndConfirm(wallet, signedTx);
+    const { tx: signedTx } = await aliceTxBuilder
+      .addMint(tokens)
+      .extraSigners([bobSigner])
+      .addNativeScripts([policyScript])
+      .addOutput(await aliceTxBuilder.buildOutput().address(walletAddress).coin(coins).assets(tokens).build())
+      .build()
+      .sign();
+    await aliceWallet.submitTx(signedTx);
+    await txConfirmed(aliceWallet, signedTx);
 
     // Wait until wallet is aware of the minted token.
+    const assetId = tokens.keys().next().value;
     const value = await firstValueFrom(
-      wallet.balance.utxo.total$.pipe(filter(({ assets }) => (assets ? assets.has(assetId) : false)))
+      aliceWallet.balance.utxo.total$.pipe(filter(({ assets }) => (assets ? assets.has(assetId) : false)))
     );
 
     expect(value).toBeDefined();
     expect(value!.assets!.has(assetId)).toBeTruthy();
     expect(value!.assets!.get(assetId)).toBe(10n);
-
-    await burnTokens({
-      policySigners: [alicePolicySigner, bobPolicySigner],
-      scripts: [policyScript],
-      wallet
-    });
   });
 });

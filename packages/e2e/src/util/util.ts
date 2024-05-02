@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import { BaseWallet, FinalizeTxProps, ObservableWallet } from '@cardano-sdk/wallet';
+import { BaseWallet, ObservableWallet } from '@cardano-sdk/wallet';
 import { Cardano, Serialization, createSlotEpochCalc } from '@cardano-sdk/core';
 import {
   EMPTY,
@@ -253,42 +253,27 @@ export const burnTokens = async ({
   wallet,
   tokens,
   scripts,
-  policySigners: extraSigners
+  policySigners: extraSigners = []
 }: {
   wallet: BaseWallet;
   tokens?: Cardano.TokenMap;
-  scripts: Cardano.Script[];
-  policySigners: TransactionSigner[];
+  scripts: Cardano.NativeScript[];
+  policySigners?: TransactionSigner[];
 }) => {
-  if (!tokens) {
-    tokens = (await firstValueFrom(wallet.balance.utxo.available$)).assets;
-  }
-
-  if (!tokens?.size) {
-    return; // nothing to burn
-  }
+  if (!tokens) tokens = (await firstValueFrom(wallet.balance.utxo.available$)).assets;
+  if (!tokens?.size) return; // nothing to burn
 
   const negativeTokens = new Map([...tokens].map(([assetId, value]) => [assetId, -value]));
-  const txProps: InitializeTxProps = {
-    mint: negativeTokens,
-    signingOptions: {
-      extraSigners
-    },
-    witness: { scripts }
-  };
-
-  const unsignedTx = await wallet.initializeTx(txProps);
-
-  const finalizeProps: FinalizeTxProps = {
-    signingOptions: {
-      extraSigners
-    },
-    tx: unsignedTx,
-    witness: { scripts }
-  };
-
-  const signedTx = await wallet.finalizeTx(finalizeProps);
-  await submitAndConfirm(wallet, signedTx);
+  const walletAddress = (await firstValueFrom(wallet.addresses$))[0].address;
+  const txBuilder = wallet.createTxBuilder();
+  const { tx: signedTx } = await txBuilder
+    .addMint(negativeTokens)
+    .addNativeScripts(scripts)
+    .extraSigners(extraSigners)
+    .addOutput(await txBuilder.buildOutput().address(walletAddress).coin(2_000_000n).build())
+    .build()
+    .sign();
+  await wallet.submitTx(signedTx);
   await txConfirmed(wallet, signedTx);
 };
 

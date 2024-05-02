@@ -322,7 +322,8 @@ const patchInitializeTxToRespectEpochBoundary = <T extends ObservableWallet>(
  * @returns an object containing the wallet and providers passed to it
  */
 export const getWallet = async (props: GetWalletProps) => {
-  const { env, idx, logger, name, polling, stores, customKeyParams, keyAgent, witnesser } = props;
+  const { env, idx, logger, name, polling, stores, customKeyParams, witnesser } = props;
+  const keyAgent = props.keyAgent;
   const providers = {
     addressDiscovery: await addressDiscoveryFactory.create(
       env.ADDRESS_DISCOVERY,
@@ -364,6 +365,7 @@ export const getWallet = async (props: GetWalletProps) => {
   const keyManagementParams = { ...envKeyParams, ...(idx === undefined ? {} : { accountIndex: idx }) };
 
   const bip32Ed25519 = await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger);
+
   const asyncKeyAgent =
     keyAgent ||
     (await (
@@ -391,7 +393,12 @@ export const getWallet = async (props: GetWalletProps) => {
     polling?.maxInterval ||
     (polling?.interval && polling.interval * DEFAULT_POLLING_CONFIG.maxIntervalMultiplier) ||
     DEFAULT_POLLING_CONFIG.maxInterval;
-  return { bip32Account, providers, wallet: patchInitializeTxToRespectEpochBoundary(wallet, maxInterval) };
+  return {
+    asyncKeyAgent,
+    bip32Account,
+    providers,
+    wallet: patchInitializeTxToRespectEpochBoundary(wallet, maxInterval)
+  };
 };
 
 /**

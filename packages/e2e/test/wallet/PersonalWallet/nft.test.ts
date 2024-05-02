@@ -1,12 +1,8 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Asset, Cardano, metadatum, nativeScriptPolicyId } from '@cardano-sdk/core';
-import { Assets, BaseWallet, FinalizeTxProps } from '@cardano-sdk/wallet';
-import { InitializeTxProps } from '@cardano-sdk/tx-construction';
-import { KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
+import { Asset, Cardano, metadatum } from '@cardano-sdk/core';
+import { Assets, BaseWallet } from '@cardano-sdk/wallet';
 import {
-  bip32Ed25519Factory,
   burnTokens,
-  createStandaloneKeyAgent,
   firstValueFromTimed,
   getEnv,
   getWallet,
@@ -42,7 +38,6 @@ describe('PersonalWallet.assets/nft', () => {
   const TOKEN_BURN_INDEX = 2;
 
   let wallet: BaseWallet;
-  let policySigner: TransactionSigner;
   let policyId: Cardano.PolicyId;
   let policyScript: Cardano.NativeScript;
   let assetIds: Cardano.AssetId[];
@@ -53,60 +48,12 @@ describe('PersonalWallet.assets/nft', () => {
 
   beforeAll(async () => {
     wallet = (await getWallet({ env, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
-
     await walletReady(wallet, coins);
 
-    const genesis = await firstValueFrom(wallet.genesisParameters$);
-
-    const keyAgent = await createStandaloneKeyAgent(
-      env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
-      genesis,
-      await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger)
-    );
-
-    const derivationPath = {
-      index: 2,
-      role: KeyRole.External
-    };
-
-    const pubKey = await keyAgent.derivePublicKey(derivationPath);
-
-    const keyHash = await keyAgent.bip32Ed25519.getPubKeyHash(pubKey);
-
-    policySigner = new util.KeyAgentTransactionSigner(keyAgent, derivationPath);
-
-    policyScript = {
-      __type: Cardano.ScriptType.Native,
-      kind: Cardano.NativeScriptKind.RequireAllOf,
-      scripts: [
-        {
-          __type: Cardano.ScriptType.Native,
-          keyHash,
-          kind: Cardano.NativeScriptKind.RequireSignature
-        }
-      ]
-    };
-
-    policyId = nativeScriptPolicyId(policyScript);
-
-    assetIds = [
-      Cardano.AssetId(`${policyId}${assetNames[TOKEN_METADATA_1_INDEX]}`),
-      Cardano.AssetId(`${policyId}${assetNames[TOKEN_METADATA_2_INDEX]}`),
-      Cardano.AssetId(`${policyId}${assetNames[TOKEN_BURN_INDEX]}`)
-    ];
-
-    const tokens = new Map([
-      [assetIds[TOKEN_METADATA_1_INDEX], 1n],
-      [assetIds[TOKEN_METADATA_2_INDEX], 1n],
-      [assetIds[TOKEN_BURN_INDEX], 1n]
-    ]);
-
-    fingerprints = [
-      Cardano.AssetFingerprint.fromParts(policyId, Cardano.AssetName(assetNames[TOKEN_METADATA_1_INDEX])),
-      Cardano.AssetFingerprint.fromParts(policyId, Cardano.AssetName(assetNames[TOKEN_METADATA_2_INDEX])),
-      Cardano.AssetFingerprint.fromParts(policyId, Cardano.AssetName(assetNames[TOKEN_BURN_INDEX]))
-    ];
-
+    const txBuilder = wallet.createTxBuilder();
+    const policy = txBuilder.buildPolicy();
+    policyScript = await policy.getPolicyScript();
+    policyId = await policy.getPolicyId();
     walletAddress = (await firstValueFrom(wallet.addresses$))[0].address;
 
     const txMetadatum = metadatum.jsonToMetadatum({
@@ -143,41 +90,33 @@ describe('PersonalWallet.assets/nft', () => {
         }
       }
     });
+    const auxiliaryData = new Map([[721n, txMetadatum]]);
 
-    const auxiliaryData = {
-      blob: new Map([[721n, txMetadatum]])
-    };
+    assetIds = [
+      Cardano.AssetId(`${policyId}${assetNames[TOKEN_METADATA_1_INDEX]}`),
+      Cardano.AssetId(`${policyId}${assetNames[TOKEN_METADATA_2_INDEX]}`),
+      Cardano.AssetId(`${policyId}${assetNames[TOKEN_BURN_INDEX]}`)
+    ];
 
-    const txProps: InitializeTxProps = {
-      auxiliaryData,
-      mint: tokens,
-      outputs: new Set([
-        {
-          address: walletAddress,
-          value: {
-            assets: tokens,
-            coins
-          }
-        }
-      ]),
-      signingOptions: {
-        extraSigners: [policySigner]
-      },
-      witness: { scripts: [policyScript] }
-    };
+    const tokens = new Map([
+      [assetIds[TOKEN_METADATA_1_INDEX], 1n],
+      [assetIds[TOKEN_METADATA_2_INDEX], 1n],
+      [assetIds[TOKEN_BURN_INDEX], 1n]
+    ]);
 
-    const unsignedTx = await wallet.initializeTx(txProps);
+    fingerprints = [
+      Cardano.AssetFingerprint.fromParts(policyId, Cardano.AssetName(assetNames[TOKEN_METADATA_1_INDEX])),
+      Cardano.AssetFingerprint.fromParts(policyId, Cardano.AssetName(assetNames[TOKEN_METADATA_2_INDEX])),
+      Cardano.AssetFingerprint.fromParts(policyId, Cardano.AssetName(assetNames[TOKEN_BURN_INDEX]))
+    ];
 
-    const finalizeProps: FinalizeTxProps = {
-      auxiliaryData,
-      signingOptions: {
-        extraSigners: [policySigner]
-      },
-      tx: unsignedTx,
-      witness: { scripts: [policyScript] }
-    };
-
-    const signedTx = await wallet.finalizeTx(finalizeProps);
+    const { tx: signedTx } = await txBuilder
+      .addMint(tokens)
+      .metadata(auxiliaryData)
+      .addNativeScripts([policyScript])
+      .addOutput(await txBuilder.buildOutput().address(walletAddress).coin(coins).assets(tokens).build())
+      .build()
+      .sign();
     await submitAndConfirm(wallet, signedTx);
 
     // Wait until wallet is aware of the minted tokens.
@@ -185,11 +124,7 @@ describe('PersonalWallet.assets/nft', () => {
   });
 
   afterAll(async () => {
-    await burnTokens({
-      policySigners: [policySigner],
-      scripts: [policyScript],
-      wallet
-    });
+    await burnTokens({ scripts: [policyScript], wallet });
     wallet.shutdown();
   });
 
@@ -266,33 +201,14 @@ describe('PersonalWallet.assets/nft', () => {
     const availableBalance = await firstValueFromTimed(wallet.balance.utxo.available$);
     const assetBalance = availableBalance.assets!.get(assetIds[TOKEN_BURN_INDEX])!;
     expect(assetBalance).toBeGreaterThan(0n);
-    const txProps: InitializeTxProps = {
-      mint: new Map([[assetIds[TOKEN_BURN_INDEX], -assetBalance]]),
-      outputs: new Set([
-        {
-          address: walletAddress,
-          value: {
-            coins
-          }
-        }
-      ]),
-      signingOptions: {
-        extraSigners: [policySigner]
-      },
-      witness: { scripts: [policyScript] }
-    };
+    const txBuilder = wallet.createTxBuilder();
+    const { tx: signedTx } = await txBuilder
+      .addMint(new Map([[assetIds[TOKEN_BURN_INDEX], -assetBalance]]))
+      .addNativeScripts([policyScript])
+      .addOutput(await txBuilder.buildOutput().address(walletAddress).coin(coins).build())
+      .build()
+      .sign();
 
-    const unsignedTx = await wallet.initializeTx(txProps);
-
-    const finalizeProps: FinalizeTxProps = {
-      signingOptions: {
-        extraSigners: [policySigner]
-      },
-      tx: unsignedTx,
-      witness: { scripts: [policyScript] }
-    };
-
-    const signedTx = await wallet.finalizeTx(finalizeProps);
     await submitAndConfirm(wallet, signedTx);
 
     // Wait until wallet is aware of the burned token.
@@ -332,38 +248,15 @@ describe('PersonalWallet.assets/nft', () => {
           ]
         ]);
 
-        const auxiliaryData = { blob: new Map([[721n, txDataMetadatum]]) };
-
-        const txProps: InitializeTxProps = {
-          auxiliaryData,
-          mint: tokens,
-          outputs: new Set([
-            {
-              address: walletAddress,
-              value: {
-                assets: tokens,
-                coins
-              }
-            }
-          ]),
-          signingOptions: {
-            extraSigners: [policySigner]
-          },
-          witness: { scripts: [policyScript] }
-        };
-
-        const unsignedTx = await wallet.initializeTx(txProps);
-
-        const finalizeProps: FinalizeTxProps = {
-          auxiliaryData,
-          signingOptions: {
-            extraSigners: [policySigner]
-          },
-          tx: unsignedTx,
-          witness: { scripts: [policyScript] }
-        };
-
-        const signedTx = await wallet.finalizeTx(finalizeProps);
+        const auxiliaryData = new Map([[721n, txDataMetadatum]]);
+        const txBuilder = wallet.createTxBuilder();
+        const { tx: signedTx } = await txBuilder
+          .addMint(tokens)
+          .metadata(auxiliaryData)
+          .addNativeScripts([policyScript])
+          .addOutput(await txBuilder.buildOutput().address(walletAddress).coin(coins).assets(tokens).build())
+          .build()
+          .sign();
 
         await submitAndConfirm(wallet, signedTx);
 
