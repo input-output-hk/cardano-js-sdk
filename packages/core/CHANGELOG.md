@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.31.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.30.2...@cardano-sdk/core@0.31.0) (2024-05-02)
+
+### ⚠ BREAKING CHANGES
+
+* **core:** replace delegateRepresentative redeemer purpose with vote and propose
+
+### Features
+
+* **core:** replace delegateRepresentative redeemer purpose with vote and propose ([10611ef](https://github.com/input-output-hk/cardano-js-sdk/commit/10611ef2eacbb3bb923be03ca02bf8d2569ae7b5))
+
 ## [0.30.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.30.1...@cardano-sdk/core@0.30.2) (2024-04-26)
 
 ### Features

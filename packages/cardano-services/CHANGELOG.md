@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.2...@cardano-sdk/cardano-services@0.28.3) (2024-05-02)
+
+### Bug Fixes
+
+* **cardano-services:** correct mapping of chain history redeemer purpose ([b27bcac](https://github.com/input-output-hk/cardano-js-sdk/commit/b27bcac3e807f97f9b1555a8e7df81d58d797006))
+
 ## [0.28.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.1...@cardano-sdk/cardano-services@0.28.2) (2024-04-26)
 
 ### Features
