@@ -3,6 +3,7 @@ import {
   CONTEXT_WITHOUT_KNOWN_ADDRESSES,
   CONTEXT_WITH_KNOWN_ADDRESSES,
   rewardAccount,
+  rewardAccount2,
   stakeKeyHash
 } from '../testData';
 import { Cardano } from '@cardano-sdk/core';
@@ -17,21 +18,29 @@ describe('withdrawals', () => {
       expect(txIns).toEqual(null);
     });
 
-    it('can map a a set of withdrawals', async () => {
+    it('can sort canonically and map a set of withdrawals', async () => {
       const coreWithdrawal = {
         quantity: 5n,
         stakeAddress: rewardAccount
       };
+      const coreWithdrawal2 = {
+        quantity: 5n,
+        stakeAddress: rewardAccount2
+      };
 
-      const withdrawals = await mapWithdrawals(
-        [coreWithdrawal, coreWithdrawal, coreWithdrawal],
-        CONTEXT_WITH_KNOWN_ADDRESSES
-      );
+      const withdrawals = await mapWithdrawals([coreWithdrawal, coreWithdrawal2], CONTEXT_WITH_KNOWN_ADDRESSES);
 
-      expect(withdrawals!.length).toEqual(3);
+      expect(withdrawals!.length).toEqual(2);
 
-      for (const withdrawal of withdrawals!) {
-        expect(withdrawal).toEqual({
+      expect(withdrawals).toEqual([
+        {
+          amount: 5n,
+          stakeCredential: {
+            keyHashHex: '06e2ae44dff6770dc0f4ada3cf4cf2605008e27aecdb332ad349fda7',
+            type: Ledger.CredentialParamsType.KEY_HASH
+          }
+        },
+        {
           amount: 5n,
           stakeCredential: {
             keyPath: [
@@ -43,9 +52,10 @@ describe('withdrawals', () => {
             ],
             type: Ledger.CredentialParamsType.KEY_PATH
           }
-        });
-      }
-      expect.assertions(4);
+        }
+      ]);
+
+      expect.assertions(2);
     });
   });
 

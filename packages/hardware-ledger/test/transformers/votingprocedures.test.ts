@@ -1,11 +1,11 @@
 import { Cardano } from '@cardano-sdk/core';
 import { VoteOption, VoterType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import {
-  constitutionalCommitteeKeyHashVoter,
-  constitutionalCommitteeScriptHashVoter,
+  ccHotKeyHashVoter,
+  ccHotScriptHashVoter,
   constitutionalCommitteeVotingProcedure,
-  drepKeyHashVoter,
-  drepScriptHashVoter,
+  dRepKeyHashVoter,
+  dRepScriptHashVoter,
   stakePoolKeyHashVoter,
   votingProcedureVotes
 } from '../testData';
@@ -33,37 +33,37 @@ describe('votingProcedures', () => {
   };
 
   describe('toVoter', () => {
-    it('can map a ConstitutionalCommitteeKeyHashVoter correctly', () => {
-      expect(toVoter(constitutionalCommitteeKeyHashVoter)).toEqual({
-        keyHashHex: 'somehash',
+    it('can map a ccHotKeyHashVoter correctly', () => {
+      expect(toVoter(ccHotKeyHashVoter)).toEqual({
+        keyHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
         type: VoterType.COMMITTEE_KEY_HASH
       });
     });
 
-    it('can map a ConstitutionalCommitteeScriptHashVoter correctly', () => {
-      expect(toVoter(constitutionalCommitteeScriptHashVoter)).toEqual({
-        scriptHashHex: 'somehash',
+    it('can map a ccHotScriptHashVoter correctly', () => {
+      expect(toVoter(ccHotScriptHashVoter)).toEqual({
+        scriptHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
         type: VoterType.COMMITTEE_SCRIPT_HASH
       });
     });
 
-    it('can map a DrepKeyHashVoter correctly', () => {
-      expect(toVoter(drepKeyHashVoter)).toEqual({
-        keyHashHex: 'somehash',
+    it('can map a dRepKeyHashVoter correctly', () => {
+      expect(toVoter(dRepKeyHashVoter)).toEqual({
+        keyHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
         type: VoterType.DREP_KEY_HASH
       });
     });
 
-    it('can map a DrepScriptHashVoter correctly', () => {
-      expect(toVoter(drepScriptHashVoter)).toEqual({
-        scriptHashHex: 'somehash',
+    it('can map a dRepScriptHashVoter correctly', () => {
+      expect(toVoter(dRepScriptHashVoter)).toEqual({
+        scriptHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
         type: VoterType.DREP_SCRIPT_HASH
       });
     });
 
-    it('can map a StakePoolKeyHashVoter correctly', () => {
+    it('can map a stakePoolKeyHashVoter correctly', () => {
       expect(toVoter(stakePoolKeyHashVoter)).toEqual({
-        keyHashHex: 'somehash',
+        keyHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
         type: VoterType.STAKE_POOL_KEY_HASH
       });
     });
@@ -97,7 +97,7 @@ describe('votingProcedures', () => {
     it('can map voting procedure correctly', () => {
       expect(toVotingProcedure(constitutionalCommitteeVotingProcedure)).toEqual({
         voter: {
-          keyHashHex: 'somehash',
+          keyHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
           type: VoterType.COMMITTEE_KEY_HASH
         },
         votes: [expectedVotingProcedureVote]
@@ -123,7 +123,7 @@ describe('votingProcedures', () => {
       for (const votingProcedure of votingProcedures!) {
         expect(votingProcedure).toEqual({
           voter: {
-            keyHashHex: 'somehash',
+            keyHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
             type: VoterType.COMMITTEE_KEY_HASH
           },
           votes: [expectedVotingProcedureVote]
