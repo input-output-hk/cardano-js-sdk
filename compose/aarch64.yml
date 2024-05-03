@@ -2,7 +2,7 @@
 
 services:
   cardano-db-sync:
-    image: ghcr.io/input-output-hk/ogmios-tracker/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-sancho-4-0-0}
+    image: ghcr.io/input-output-hk/ogmios-tracker/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-13.2.0.2}
   cardano-node:
     image: ghcr.io/input-output-hk/ogmios-tracker/cardano-node:${CARDANO_NODE_VERSION:-8.9.2}
   ogmios:
