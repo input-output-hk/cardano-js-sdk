@@ -322,8 +322,7 @@ const patchInitializeTxToRespectEpochBoundary = <T extends ObservableWallet>(
  * @returns an object containing the wallet and providers passed to it
  */
 export const getWallet = async (props: GetWalletProps) => {
-  const { env, idx, logger, name, polling, stores, customKeyParams, witnesser } = props;
-  const keyAgent = props.keyAgent;
+  const { env, idx, logger, name, polling, stores, customKeyParams, keyAgent, witnesser } = props;
   const providers = {
     addressDiscovery: await addressDiscoveryFactory.create(
       env.ADDRESS_DISCOVERY,
