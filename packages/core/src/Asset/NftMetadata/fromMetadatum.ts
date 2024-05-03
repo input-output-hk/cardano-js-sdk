@@ -98,12 +98,18 @@ const getAssetMetadata = (policy: Cardano.MetadatumMap, assetName: Cardano.Asset
   );
 
 type AssetIdParts = Pick<AssetInfo, 'policyId' | 'name'>;
-const getName = (assetMetadata: Cardano.MetadatumMap, version: string, asset: AssetIdParts, logger: Logger) => {
+const getName = (
+  assetMetadata: Cardano.MetadatumMap,
+  version: string,
+  asset: AssetIdParts,
+  logger: Logger,
+  stripInvisibleCharacters = false
+) => {
   const name = asString(assetMetadata.get('name'));
   if (name) return name;
   if (version === '1.0') {
     try {
-      return AssetName.toUTF8(asset.name);
+      return AssetName.toUTF8(asset.name, stripInvisibleCharacters);
     } catch (error) {
       logger.warn(error);
     }
@@ -143,7 +149,7 @@ export const fromMetadatum = (
   if (!version) return null;
   const assetMetadata = getAssetMetadata(policy, asset.name);
   if (!assetMetadata) return null;
-  const name = getName(assetMetadata, version, asset, logger);
+  const name = getName(assetMetadata, version, asset, logger, true);
   const image = metadatumToString(assetMetadata.get('image'));
   const assetId = Cardano.AssetId.fromParts(asset.policyId, asset.name);
 
