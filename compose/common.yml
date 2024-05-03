@@ -119,7 +119,7 @@ services:
       timeout: 1s
       retries: 120
       start_period: 100ms
-    image: ghcr.io/intersectmbo/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-sancho-4-2-1}
+    image: ghcr.io/intersectmbo/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-13.2.0.2}
     restart: on-failure
     stop_signal: SIGINT
     volumes:
@@ -131,7 +131,7 @@ services:
     <<:
       - *logging
       - *with-postgres
-    image: ghcr.io/intersectmbo/cardano-smash-server:${CARDANO_DB_SYNC_VERSION:-sancho-4-2-1}
+    image: ghcr.io/intersectmbo/cardano-smash-server:${CARDANO_DB_SYNC_VERSION:-13.2.0.2}-docker
     command: ['--config', '/config/cardano-db-sync/config.json']
     environment:
       POSTGRES_HOST: postgres
