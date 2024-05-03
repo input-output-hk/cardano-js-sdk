@@ -531,6 +531,8 @@ in
         name = "${final.namespace}-cardanojs-v2";
         namespace = "live-preprod";
         context = "eks-admin";
+        network = "preprod";
+        region = "eu-central-1";
 
         providers = {
           backend = {
@@ -554,9 +556,6 @@ in
         };
 
         values = {
-          network = "preprod";
-          region = "eu-central-1";
-
           backend.hostnames = ["tmp-${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
@@ -679,6 +678,8 @@ in
         name = "${final.namespace}-cardanojs-v2";
         namespace = "live-preview";
         context = "eks-admin";
+        network = "preview";
+        region = "eu-central-1";
 
         providers = {
           backend = {
@@ -702,9 +703,6 @@ in
         };
 
         values = {
-          network = "preview";
-          region = "eu-central-1";
-
           backend.hostnames = ["tmp-${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
@@ -729,7 +727,6 @@ in
             ];
         };
       };
-
 
       "ops-preview-1@us-east-1" = final: {
         namespace = "ops-preview-1";
