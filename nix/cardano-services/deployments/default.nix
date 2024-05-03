@@ -473,6 +473,73 @@ in
         };
       };
 
+      "live-mainnet@eu-central-1@v2" = final: {
+        name = "${final.namespace}-cardanojs-v2";
+        namespace = "live-mainnet";
+        context = "eks-admin";
+        network = "mainnet";
+        region = "eu-central-1";
+
+        providers = {
+          backend = {
+            enabled = true;
+            replicas = 3;
+            env.NODE_ENV = "production";
+          };
+          stake-pool-provider = {
+            enabled = true;
+            env.OVERRIDE_FUZZY_OPTIONS = "true";
+            env.NODE_ENV = "production";
+          };
+          # handle-provider.enabled = true;
+          # asset-provider.enabled = true;
+        };
+
+        projectors = {
+          handle.enabled = true;
+          stake-pool.enabled = true;
+          # asset.enabled = true;
+        };
+
+        values = {
+          cardano-services = {
+            ingresOrder = 98;
+            additionalRoutes = [
+              {
+                pathType = "Prefix";
+                path = "/v1.0.0/stake-pool";
+                backend.service = {
+                  name = "${final.namespace}-cardanojs-stake-pool-provider";
+                  port.name = "http";
+                };
+              }
+            ];
+          };
+          backend.allowedOrigins = lib.concatStringsSep "," allowedOrigins;
+          # backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
+          backend.hostnames = ["tmp-${final.namespace}.${baseUrl}"];
+          backend.routes = let
+            inherit (oci.meta) versions;
+          in
+            lib.concatLists [
+              (map (v: "/v${v}/health") versions.root)
+              (map (v: "/v${v}/live") versions.root)
+              (map (v: "/v${v}/meta") versions.root)
+              (map (v: "/v${v}/ready") versions.root)
+              (map (v: "/v${v}/asset") versions.assetInfo)
+              (map (v: "/v${v}/chain-history") versions.chainHistory)
+              (map (v: "/v${v}/network-info") versions.networkInfo)
+              (map (v: "/v${v}/rewards") versions.rewards)
+              (map (v: "/v${v}/tx-submit") versions.txSubmit)
+              (map (v: "/v${v}/utxo") versions.utxo)
+              (map (v: "/v${v}/handle") versions.handle)
+            ];
+
+          blockfrost-worker.enabled = true;
+          pg-boss-worker.enabled = true;
+        };
+      };
+
       "live-preprod@us-east-2@v2" = final: {
         name = "${final.namespace}-cardanojs-v2";
         namespace = "live-preprod";
