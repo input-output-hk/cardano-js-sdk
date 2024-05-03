@@ -49,7 +49,8 @@ const getTestWallet = async (idx: number, name: string, minCoinBalance?: bigint)
   return wallet;
 };
 
-describe('PersonalWallet/conwayTransactions', () => {
+// TODO: remove once mainnet hardforks to conway-era, and this becomes "the norm"
+describe.skip('PersonalWallet/conwayTransactions', () => {
   let dRepWallet: BaseWallet;
   let wallet: BaseWallet;
 
