@@ -57,10 +57,12 @@
                   NETWORK = config.network;
                   LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
                   QUEUES = "pool-delist-schedule,pool-metadata,pool-metrics,pool-rewards";
-                  STAKE_POOL_PROVIDER_URL = "http://${chart.name}-backend.${chart.namespace}.svc.cluster.local";
                   BUILD_INFO = values.cardano-services.buildInfo;
 
                   METADATA_FETCH_MODE = values.pg-boss-worker.metadata-fetch-mode;
+
+                  STAKE_POOL_PROVIDER_URL = "http://${chart.name}-backend.${chart.namespace}.svc.cluster.local";
+                  NETWORK_INFO_PROVIDER_URL = "http://${chart.name}-backend.${chart.namespace}.svc.cluster.local";
 
                   POSTGRES_POOL_MAX_STAKE_POOL = "5";
                   POSTGRES_HOST_STAKE_POOL = values.postgresName;
