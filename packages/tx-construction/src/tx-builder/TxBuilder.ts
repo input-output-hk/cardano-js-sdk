@@ -515,7 +515,8 @@ export class GenericTxBuilder implements TxBuilder {
     this.#logger.debug(`De-registering ${availableRewardAccounts.length} stake keys`);
     for (const rewardAccount of availableRewardAccounts) {
       if (rewardAccount.credentialStatus === Cardano.StakeCredentialStatus.Registered) {
-        certificates.push(Cardano.createStakeDeregistrationCert(rewardAccount.address, rewardAccount.deposit));
+        // TODO: re-enable conway stake deregistration cert, after the conway hardfork
+        certificates.push(Cardano.createStakeDeregistrationCert(rewardAccount.address /* , rewardAccount.deposit*/));
       }
     }
     this.partialTxBody = { ...this.partialTxBody, certificates };
