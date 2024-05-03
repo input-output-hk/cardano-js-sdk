@@ -4,8 +4,8 @@ services:
   cardano-db-sync:
     image: ghcr.io/input-output-hk/ogmios-tracker/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-sancho-4-2-1}
   cardano-node:
-    image: ghcr.io/input-output-hk/ogmios-tracker/cardano-node:${CARDANO_NODE_VERSION:-8.10.1-pre}
+    image: ghcr.io/input-output-hk/ogmios-tracker/cardano-node:${CARDANO_NODE_VERSION:-8.9.2}
   ogmios:
     image: ghcr.io/input-output-hk/ogmios-tracker/ogmios:v${OGMIOS_VERSION:-6.3.0}
   cardano-submit-api:
-    image: ghcr.io/input-output-hk/ogmios-tracker/cardano-submit-api:${CARDANO_NODE_VERSION:-8.10.1-pre}
+    image: ghcr.io/input-output-hk/ogmios-tracker/cardano-submit-api:${CARDANO_NODE_VERSION:-8.9.2}
