@@ -316,6 +316,29 @@ in
         };
       };
 
+      "dev-sanchonet@us-east-1@v2" = final: {
+        name = "${final.namespace}-cardanojs-v2";
+        namespace = "dev-sanchonet";
+        network = "sanchonet";
+        region = "us-east-1";
+
+        projectors = {
+          stake-pool.enabled = true;
+        };
+
+        providers = {
+          stake-pool-provider = {
+            enabled = false;
+          };
+        };
+
+        values = {
+          ingress.enabled = false;
+          pg-boss-worker.enabled = true;
+          stakepool.databaseName = "stakepoolv2";
+        };
+      };
+
       "dev-mainnet@us-east-1" = final: {
         namespace = "dev-mainnet";
         network = "mainnet";
@@ -883,6 +906,30 @@ in
         };
       };
 
+      "live-preview@us-east-2@v3" = final: {
+        name = "${final.namespace}-cardanojs-v3";
+        namespace = "live-preview";
+        network = "preview";
+        region = "us-east-2";
+        context = "eks-admin";
+
+        projectors = {
+          stake-pool.enabled = true;
+        };
+
+        providers = {
+          stake-pool-provider = {
+            enabled = false;
+          };
+        };
+
+        values = {
+          ingress.enabled = false;
+          pg-boss-worker.enabled = true;
+          stakepool.databaseName = "stakepoolv2";
+        };
+      };
+
       "live-preview@eu-central-1@v2" = final: {
         name = "${final.namespace}-cardanojs-v2";
         namespace = "live-preview";
@@ -936,31 +983,6 @@ in
             ];
         };
       };
-
-      "live-preview@us-east-2@v3" = final: {
-        name = "${final.namespace}-cardanojs-v3";
-        namespace = "live-preview";
-        network = "preview";
-        region = "us-east-2";
-        context = "eks-admin";
-
-        projectors = {
-          stake-pool.enabled = true;
-        };
-
-        providers = {
-          stake-pool-provider = {
-            enabled = false;
-          };
-        };
-
-        values = {
-          ingress.enabled = false;
-          pg-boss-worker.enabled = true;
-          stakepool.databaseName = "stakepoolv2";
-        };
-      };
-
 
       "ops-preview-1@us-east-1" = final: {
         namespace = "ops-preview-1";
@@ -1088,5 +1110,30 @@ in
           };
         };
       };
+
+      "live-sanchonet@us-east-2@v2" = final: {
+        name = "${final.namespace}-cardanojs-v2";
+        namespace = "live-sanchonet";
+        network = "sanchonet";
+        region = "us-east-2";
+        context = "eks-admin";
+
+        projectors = {
+          stake-pool.enabled = true;
+        };
+
+        providers = {
+          stake-pool-provider = {
+            enabled = false;
+          };
+        };
+
+        values = {
+          ingress.enabled = false;
+          pg-boss-worker.enabled = true;
+          stakepool.databaseName = "stakepoolv2";
+        };
+      };
+
     };
   }
