@@ -67,11 +67,14 @@ in {
       {package = k9s;}
       (mkK9sCommand "us-east-1")
       (mkK9sCommand "us-east-2")
+      (mkK9sCommand "eu-central-1")
     ];
 
     devshell.startup.setup.text = ''
       [ -e $PRJ_ROOT/.envrc.local ] && source $PRJ_ROOT/.envrc.local
       kubectl config use-context $K8S_USER
+      kubectl config use-context $K8S_USER --kubeconfig $PRJ_ROOT/.kube/us-east-2
+      kubectl config use-context $K8S_USER --kubeconfig $PRJ_ROOT/.kube/eu-central-1
       chmod 600 $PRJ_ROOT/.kube/*
     '';
   };
