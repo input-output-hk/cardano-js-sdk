@@ -588,6 +588,30 @@ in
         };
       };
 
+      "live-mainnet@us-east-2@v3" = final: {
+        name = "${final.namespace}-cardanojs-v3";
+        namespace = "live-mainnet";
+        network = "mainnet";
+        region = "us-east-2";
+        context = "eks-admin";
+
+        projectors = {
+          stake-pool.enabled = true;
+        };
+
+        providers = {
+          stake-pool-provider = {
+            enabled = false;
+          };
+        };
+
+        values = {
+          ingress.enabled = false;
+          pg-boss-worker.enabled = true;
+          stakepool.databaseName = "stakepoolv2";
+        };
+      };
+
       "live-mainnet@eu-central-1@v2" = final: {
         name = "${final.namespace}-cardanojs-v2";
         namespace = "live-mainnet";
@@ -657,11 +681,11 @@ in
         };
       };
 
-      "live-mainnet@us-east-2@v3" = final: {
+      "live-mainnet@eu-central-1@v3" = final: {
         name = "${final.namespace}-cardanojs-v3";
         namespace = "live-mainnet";
         network = "mainnet";
-        region = "us-east-2";
+        region = "eu-central-1";
         context = "eks-admin";
 
         projectors = {
@@ -676,7 +700,7 @@ in
 
         values = {
           ingress.enabled = false;
-          pg-boss-worker.enabled = true;
+          pg-boss-worker.enabled = false;
           stakepool.databaseName = "stakepoolv2";
         };
       };
@@ -735,6 +759,30 @@ in
         };
       };
 
+      "live-preprod@us-east-2@v3" = final: {
+        name = "${final.namespace}-cardanojs-v3";
+        namespace = "live-preprod";
+        network = "preprod";
+        region = "us-east-2";
+        context = "eks-admin";
+
+        projectors = {
+          stake-pool.enabled = true;
+        };
+
+        providers = {
+          stake-pool-provider = {
+            enabled = false;
+          };
+        };
+
+        values = {
+          ingress.enabled = false;
+          pg-boss-worker.enabled = true;
+          stakepool.databaseName = "stakepoolv2";
+        };
+      };
+
       "live-preprod@eu-central-1@v2" = final: {
         name = "${final.namespace}-cardanojs-v2";
         namespace = "live-preprod";
@@ -789,11 +837,11 @@ in
         };
       };
 
-      "live-preprod@us-east-2@v3" = final: {
+      "live-preprod@eu-central-1@v3" = final: {
         name = "${final.namespace}-cardanojs-v3";
         namespace = "live-preprod";
         network = "preprod";
-        region = "us-east-2";
+        region = "eu-central-1";
         context = "eks-admin";
 
         projectors = {
@@ -984,6 +1032,29 @@ in
         };
       };
 
+      "live-preview@eu-central-1@v3" = final: {
+        name = "${final.namespace}-cardanojs-v3";
+        namespace = "live-preview";
+        network = "preview";
+        region = "eu-central-1";
+        context = "eks-admin";
+
+        projectors = {
+          stake-pool.enabled = true;
+        };
+
+        providers = {
+          stake-pool-provider = {
+            enabled = false;
+          };
+        };
+
+        values = {
+          ingress.enabled = false;
+          pg-boss-worker.enabled = true;
+          stakepool.databaseName = "stakepoolv2";
+        };
+      };
       "ops-preview-1@us-east-1" = final: {
         namespace = "ops-preview-1";
         network = "preview";
@@ -1024,7 +1095,6 @@ in
           stakepool.databaseName = "stakepoolv2";
         };
       };
-
 
       "ops-preprod-1@us-east-1" = final: {
         namespace = "ops-preprod-1";
@@ -1116,6 +1186,30 @@ in
         namespace = "live-sanchonet";
         network = "sanchonet";
         region = "us-east-2";
+        context = "eks-admin";
+
+        projectors = {
+          stake-pool.enabled = true;
+        };
+
+        providers = {
+          stake-pool-provider = {
+            enabled = false;
+          };
+        };
+
+        values = {
+          ingress.enabled = false;
+          pg-boss-worker.enabled = true;
+          stakepool.databaseName = "stakepoolv2";
+        };
+      };
+
+      "live-sanchonet@eu-central-1@v2" = final: {
+        name = "${final.namespace}-cardanojs-v2";
+        namespace = "live-sanchonet";
+        network = "sanchonet";
+        region = "eu-central-1";
         context = "eks-admin";
 
         projectors = {
