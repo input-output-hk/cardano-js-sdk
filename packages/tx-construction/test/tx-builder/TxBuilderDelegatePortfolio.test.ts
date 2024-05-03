@@ -345,7 +345,8 @@ describe('TxBuilder/delegatePortfolio', () => {
         Cardano.createStakeDeregistrationCert(groupedAddresses[0].rewardAccount)
       );
       expect(tx.body.certificates).toContainEqual(
-        Cardano.createStakeDeregistrationCert(groupedAddresses[1].rewardAccount, deposit)
+        // TODO: use conway era deregistration cert after hardfork
+        Cardano.createStakeDeregistrationCert(groupedAddresses[1].rewardAccount /* , deposit*/)
       );
 
       expect(GreedyInputSelector).toHaveBeenCalled();
