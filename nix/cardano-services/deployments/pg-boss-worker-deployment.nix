@@ -56,7 +56,7 @@
               env = utils.mkPodEnv ({
                   NETWORK = config.network;
                   LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
-                  QUEUES = "pool-metadata,pool-metrics";
+                  QUEUES = "pool-delist-schedule,pool-metadata,pool-metrics,pool-rewards";
                   STAKE_POOL_PROVIDER_URL = "http://${chart.name}-backend.${chart.namespace}.svc.cluster.local";
                   BUILD_INFO = values.cardano-services.buildInfo;
 

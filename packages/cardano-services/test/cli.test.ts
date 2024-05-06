@@ -544,8 +544,8 @@ describe('CLI', () => {
 
     describe('schedules', () => {
       testPgBoss('accepts a valid schedule file', 'pgboss', {
-        args: ['--schedules', 'environments/schedules.json'],
-        env: { SCHEDULES: 'environments/schedules.json' },
+        args: ['--schedules', '../../compose/schedules.json'],
+        env: { SCHEDULES: '../../compose/schedules.json' },
         expectedArgs: {
           args: { schedules: [{ cron: '0 * * * *', queue: 'pool-delist-schedule', scheduleOptions: {} }] }
         }
