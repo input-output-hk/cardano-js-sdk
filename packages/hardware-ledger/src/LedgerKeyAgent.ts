@@ -518,7 +518,11 @@ export class LedgerKeyAgent extends KeyAgentBase {
       }
     }
 
-    if (tx.collateralInputs) {
+    /**
+     * VotingProcedures: We are currently supporting only keyHash and scriptHash voter types in voting procedures.
+     * To sign tx with keyHash and scriptHash voter type we have to use PLUTUS_TRANSACTION signing mode
+     */
+    if (tx.collateralInputs || tx.votingProcedures) {
       return TransactionSigningMode.PLUTUS_TRANSACTION;
     }
 
@@ -552,7 +556,6 @@ export class LedgerKeyAgent extends KeyAgentBase {
       );
 
       const signingMode = LedgerKeyAgent.getSigningMode(ledgerTxData);
-
       const result = await deviceConnection.signTransaction({
         signingMode,
         tx: ledgerTxData

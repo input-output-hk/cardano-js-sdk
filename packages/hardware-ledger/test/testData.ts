@@ -4,6 +4,7 @@ import { Base64Blob, HexBlob } from '@cardano-sdk/util';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { LedgerTxTransformerContext } from '../src';
 export const rewardAccount = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
+export const rewardAccount2 = Cardano.RewardAccount('stake_test1uqrw9tjymlm8wrwq7jk68n6v7fs9qz8z0tkdkve26dylmfc2ux2hj');
 export const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
 export const stakeCredential = {
   hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
@@ -458,3 +459,24 @@ export const singleVotingProcedureMultipleVotes: Cardano.VotingProcedures = [
     votes
   }
 ];
+
+export const votingProcedureVotes = [
+  {
+    actionId: {
+      actionIndex: 1,
+      id: 'someActionId' as Cardano.TransactionId
+    },
+    votingProcedure: {
+      anchor: {
+        dataHash: 'datahash' as Crypto.Hash32ByteBase16,
+        url: 'http://example.com'
+      },
+      vote: Cardano.Vote.yes
+    }
+  }
+];
+
+export const constitutionalCommitteeVotingProcedure = {
+  voter: ccHotKeyHashVoter,
+  votes: votingProcedureVotes
+};

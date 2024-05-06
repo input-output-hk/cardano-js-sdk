@@ -1,99 +1,134 @@
-import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
-import { VoteOption, VoterType, VoterVotes } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { mapVoteOption, mapVoterToLedgerVoter, mapVotingProcedures } from '../../src/transformers/votingProcedures';
+import { VoteOption, VoterType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import {
+  ccHotKeyHashVoter,
+  ccHotScriptHashVoter,
+  constitutionalCommitteeVotingProcedure,
+  dRepKeyHashVoter,
+  dRepScriptHashVoter,
+  stakePoolKeyHashVoter,
+  votingProcedureVotes
+} from '../testData';
+import {
+  mapVotingProcedures,
+  toVoteOption,
+  toVoter,
+  toVotes,
+  toVotingProcedure
+} from '../../src/transformers/votingProcedures';
 
-describe('mapVoterToLedgerVoter', () => {
-  it('maps a ConstitutionalCommitteeKeyHashVoter correctly', () => {
-    const coreVoter = {
-      __typename: 'ccHotKeyHash',
-      credential: {
-        hash: 'somehash',
-        type: Cardano.CredentialType.KeyHash
-      }
-    };
-    const expected = {
-      keyHashHex: 'somehash',
-      type: VoterType.COMMITTEE_KEY_HASH
-    };
-    expect(mapVoterToLedgerVoter(coreVoter as Cardano.Voter)).toEqual(expected);
+describe('votingProcedures', () => {
+  const expectedVotingProcedureVote = {
+    govActionId: {
+      govActionIndex: 1,
+      txHashHex: 'someActionId'
+    },
+    votingProcedure: {
+      anchor: {
+        hashHex: 'datahash',
+        url: 'http://example.com'
+      },
+      vote: VoteOption.YES
+    }
+  };
+
+  describe('toVoter', () => {
+    it('can map a ccHotKeyHashVoter correctly', () => {
+      expect(toVoter(ccHotKeyHashVoter)).toEqual({
+        keyHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
+        type: VoterType.COMMITTEE_KEY_HASH
+      });
+    });
+
+    it('can map a ccHotScriptHashVoter correctly', () => {
+      expect(toVoter(ccHotScriptHashVoter)).toEqual({
+        scriptHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
+        type: VoterType.COMMITTEE_SCRIPT_HASH
+      });
+    });
+
+    it('can map a dRepKeyHashVoter correctly', () => {
+      expect(toVoter(dRepKeyHashVoter)).toEqual({
+        keyHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
+        type: VoterType.DREP_KEY_HASH
+      });
+    });
+
+    it('can map a dRepScriptHashVoter correctly', () => {
+      expect(toVoter(dRepScriptHashVoter)).toEqual({
+        scriptHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
+        type: VoterType.DREP_SCRIPT_HASH
+      });
+    });
+
+    it('can map a stakePoolKeyHashVoter correctly', () => {
+      expect(toVoter(stakePoolKeyHashVoter)).toEqual({
+        keyHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
+        type: VoterType.STAKE_POOL_KEY_HASH
+      });
+    });
   });
-});
 
-describe('mapVoteOption', () => {
-  it('maps the vote option NO correctly', () => {
-    expect(mapVoteOption(0)).toEqual(VoteOption.NO);
+  describe('toVotes', () => {
+    it('can map votes correctly', () => {
+      expect(toVotes(votingProcedureVotes)).toEqual([expectedVotingProcedureVote]);
+    });
   });
 
-  it('maps the vote option YES correctly', () => {
-    expect(mapVoteOption(1)).toEqual(VoteOption.YES);
+  describe('toVoteOption', () => {
+    it('maps the vote option NO correctly', () => {
+      expect(toVoteOption(Cardano.Vote.no)).toEqual(VoteOption.NO);
+    });
+
+    it('maps the vote option YES correctly', () => {
+      expect(toVoteOption(Cardano.Vote.yes)).toEqual(VoteOption.YES);
+    });
+
+    it('maps the vote option ABSTAIN correctly', () => {
+      expect(toVoteOption(Cardano.Vote.abstain)).toEqual(VoteOption.ABSTAIN);
+    });
+
+    it('throws on invalid vote options', () => {
+      expect(() => toVoteOption(3)).toThrow('Unsupported vote type');
+    });
   });
 
-  it('maps the vote option ABSTAIN correctly', () => {
-    expect(mapVoteOption(2)).toEqual(VoteOption.ABSTAIN);
-  });
-
-  it('throws on invalid vote options', () => {
-    expect(() => mapVoteOption(3)).toThrow('Unsupported vote type');
-  });
-});
-
-const toHash32ByteBase16 = (hash: string): Crypto.Hash32ByteBase16 => hash as unknown as Crypto.Hash32ByteBase16;
-const toHash28ByteBase16 = (hash: string): Crypto.Hash28ByteBase16 => hash as unknown as Crypto.Hash28ByteBase16;
-const toTransactionId = (id: string): Cardano.TransactionId => id as unknown as Cardano.TransactionId;
-
-describe('mapVotingProcedures', () => {
-  it('maps voting procedures correctly', () => {
-    const votingProcedures: Cardano.VotingProcedures = [
-      {
+  describe('toVotingProcedure', () => {
+    it('can map voting procedure correctly', () => {
+      expect(toVotingProcedure(constitutionalCommitteeVotingProcedure)).toEqual({
         voter: {
-          __typename: Cardano.VoterType.ccHotKeyHash,
-          credential: {
-            hash: toHash28ByteBase16('keyhash'),
-            type: Cardano.CredentialType.KeyHash
-          }
-        },
-        votes: [
-          {
-            actionId: {
-              actionIndex: 1,
-              id: toTransactionId('actionId')
-            },
-            votingProcedure: {
-              anchor: {
-                dataHash: toHash32ByteBase16('datahash'),
-                url: 'http://example.com'
-              },
-              vote: 1
-            }
-          }
-        ]
-      }
-    ];
-
-    const voterVotes: VoterVotes[] = [
-      {
-        voter: {
-          keyHashHex: 'keyhash',
+          keyHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
           type: VoterType.COMMITTEE_KEY_HASH
         },
-        votes: [
-          {
-            govActionId: {
-              govActionIndex: 1,
-              txHashHex: 'actionId'
-            },
-            votingProcedure: {
-              anchor: {
-                hashHex: 'datahash',
-                url: 'http://example.com'
-              },
-              vote: VoteOption.YES
-            }
-          }
-        ]
+        votes: [expectedVotingProcedureVote]
+      });
+    });
+  });
+
+  describe('mapVotingProcedures', () => {
+    it('return null if given an undefined object as votingProcedures', async () => {
+      const votingProcedure: Cardano.VotingProcedures[0] | undefined = undefined;
+      const votingProcedures = mapVotingProcedures(votingProcedure);
+      expect(votingProcedures).toEqual(null);
+    });
+
+    it('can map voting procedures correctly', () => {
+      const votingProcedures = mapVotingProcedures([
+        constitutionalCommitteeVotingProcedure,
+        constitutionalCommitteeVotingProcedure
+      ]);
+
+      expect(votingProcedures!.length).toEqual(2);
+
+      for (const votingProcedure of votingProcedures!) {
+        expect(votingProcedure).toEqual({
+          voter: {
+            keyHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
+            type: VoterType.COMMITTEE_KEY_HASH
+          },
+          votes: [expectedVotingProcedureVote]
+        });
       }
-    ];
-    expect(mapVotingProcedures(votingProcedures)).toEqual(voterVotes);
+    });
   });
 });
