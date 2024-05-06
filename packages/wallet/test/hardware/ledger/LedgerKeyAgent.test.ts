@@ -192,14 +192,6 @@ describe('LedgerKeyAgent', () => {
 
       afterAll(() => wallet.shutdown());
 
-      let dRepPublicKey: Crypto.Ed25519PublicKeyHex;
-      let dRepKeyHash: Crypto.Ed25519KeyHashHex;
-
-      beforeEach(async () => {
-        dRepPublicKey = Crypto.Ed25519PublicKeyHex('b3691d42417d8307ad71da8586c2b439965545f481343b9073324ae60ad263f6');
-        dRepKeyHash = (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex();
-      });
-
       it('successfully signs a transaction with assets and validity interval', async () => {
         const {
           witness: { signatures }
@@ -292,52 +284,6 @@ describe('LedgerKeyAgent', () => {
         expect(signatures.size).toBe(2);
       });
 
-      it('can sign a transaction with voting procedures, treasury and donation', async () => {
-        const votingProcedure: Cardano.VotingProcedures[0] = {
-          voter: {
-            __typename: Cardano.VoterType.dRepKeyHash,
-            credential: { hash: Crypto.Hash28ByteBase16(dRepKeyHash), type: Cardano.CredentialType.KeyHash }
-          },
-          votes: [
-            {
-              actionId: {
-                actionIndex: 3,
-                id: Cardano.TransactionId('1000000000000000000000000000000000000000000000000000000000000000')
-              },
-              votingProcedure: {
-                anchor: {
-                  dataHash: Crypto.Hash32ByteBase16('0000000000000000000000000000000000000000000000000000000000000000'),
-                  url: 'https://www.someurl.io'
-                },
-                vote: 0
-              }
-            }
-          ]
-        };
-
-        const txBuilder = wallet.createTxBuilder();
-        const builtTx = await txBuilder
-          .customize(({ txBody }) => {
-            const votingProcedures: Cardano.TxBody['votingProcedures'] = [
-              ...(txBody.votingProcedures || []),
-              votingProcedure
-            ];
-            return {
-              ...txBody,
-              donation: 1000n,
-              treasuryValue: 2000n,
-              votingProcedures
-            };
-          })
-          .build()
-          .inspect();
-
-        const {
-          witness: { signatures }
-        } = await wallet.finalizeTx({ tx: builtTx });
-        expect(signatures.size).toBe(2);
-      });
-
       it('can sign multi-delegation transaction', async () => {
         const txBuilder = wallet.createTxBuilder();
         const builtTx = await txBuilder
@@ -364,6 +310,15 @@ describe('LedgerKeyAgent', () => {
 
       describe('conway-era', () => {
         describe('ordinary tx mode', () => {
+          let dRepPublicKey: Crypto.Ed25519PublicKeyHex | undefined;
+          let dRepKeyHash: Crypto.Ed25519KeyHashHex;
+
+          beforeEach(async () => {
+            dRepPublicKey = await wallet.governance.getPubDRepKey();
+            if (!dRepPublicKey) throw new Error('No dRep pub key');
+            dRepKeyHash = (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex();
+          });
+
           it('can sign a transaction with Registration certs', async () => {
             const txBuilder = wallet.createTxBuilder();
             txBuilder.partialTxBody.certificates = [
@@ -668,6 +623,49 @@ describe('LedgerKeyAgent', () => {
             await expect(tx.sign()).rejects.toThrow(
               InvalidDataReason.SIGN_MODE_ORDINARY__CERTIFICATE_DREP_CREDENTIAL_ONLY_AS_PATH
             );
+          });
+
+          it('can sign a transaction with voting procedures, treasury and donation', async () => {
+            const votingProcedure: Cardano.VotingProcedures[0] = {
+              voter: {
+                __typename: Cardano.VoterType.dRepKeyHash,
+                credential: { hash: Crypto.Hash28ByteBase16(dRepKeyHash), type: Cardano.CredentialType.KeyHash }
+              },
+              votes: [
+                {
+                  actionId: {
+                    actionIndex: 3,
+                    id: Cardano.TransactionId('1000000000000000000000000000000000000000000000000000000000000000')
+                  },
+                  votingProcedure: {
+                    anchor: {
+                      dataHash: Crypto.Hash32ByteBase16(
+                        '0000000000000000000000000000000000000000000000000000000000000000'
+                      ),
+                      url: 'https://www.someurl.io'
+                    },
+                    vote: 0
+                  }
+                }
+              ]
+            };
+
+            const txBuilder = wallet.createTxBuilder();
+            const builtTx = await txBuilder
+              .customize(({ txBody }) => {
+                const votingProcedures: Cardano.TxBody['votingProcedures'] = [
+                  ...(txBody.votingProcedures || []),
+                  votingProcedure
+                ];
+                return {
+                  ...txBody,
+                  donation: 1000n,
+                  treasuryValue: 2000n,
+                  votingProcedures
+                };
+              })
+              .build();
+            expect(await builtTx.sign()).toBeTruthy();
           });
         });
       });
