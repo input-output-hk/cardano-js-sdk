@@ -1,15 +1,8 @@
 /* eslint-disable sonarjs/no-nested-template-literals */
 import { Cardano, MultipleChoiceSearchFilter, QueryStakePoolsArgs } from '@cardano-sdk/core';
 import { OrderByOptions, SubQuery } from './types';
+import { findLastEpoch } from '../../util';
 import { getStakePoolSortType } from './util';
-
-export const findLastEpoch = `
- SELECT
-  "no"
- FROM epoch
- ORDER BY no DESC
- LIMIT 1
-`;
 
 export const findLastEpochWithData = `
 SELECT

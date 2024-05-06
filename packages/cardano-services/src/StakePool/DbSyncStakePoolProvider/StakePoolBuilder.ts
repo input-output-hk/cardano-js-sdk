@@ -26,6 +26,7 @@ import {
 } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
+import { findLastEpoch } from '../../util';
 import {
   mapAddressOwner,
   mapBlockfrostPoolMetrics,
@@ -43,7 +44,6 @@ import Queries, {
   addSentenceToQuery,
   blockfrostQuery,
   buildOrQueryFromClauses,
-  findLastEpoch,
   findPoolStats,
   getIdentifierFullJoinClause,
   getIdentifierWhereClause,
