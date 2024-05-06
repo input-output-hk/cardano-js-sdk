@@ -3,18 +3,22 @@ import { AddressType, KeyRole } from '@cardano-sdk/key-management';
 import { Base64Blob, HexBlob } from '@cardano-sdk/util';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { LedgerTxTransformerContext } from '../src';
-export const rewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
+export const rewardAccount = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
 export const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
 export const stakeCredential = {
-  hash: stakeKeyHash as unknown as Crypto.Hash28ByteBase16,
+  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+  type: Cardano.CredentialType.KeyHash
+};
+
+export const dRepCredential = {
+  hash: Crypto.Hash28ByteBase16('b276b4f7a706a81364de606d890343a76af570268d4bbfee2fc8fcab'),
   type: Cardano.CredentialType.KeyHash
 };
 export const paymentAddress = Cardano.PaymentAddress(
   'addr1qxdtr6wjx3kr7jlrvrfzhrh8w44qx9krcxhvu3e79zr7497tpmpxjfyhk3vwg6qjezjmlg5nr5dzm9j6nxyns28vsy8stu5lh6'
 );
 export const paymentHash = Crypto.Ed25519KeyHashHex('9ab1e9d2346c3f4be360d22b8ee7756a0316c3c1aece473e2887ea97');
-export const ownerRewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
-export const poolId = Cardano.PoolId('pool1ev8vy6fyj7693ergzty2t0azjvw35tvkt2vcjwpgajqs7z6u2vn');
+export const poolId = Cardano.PoolId('pool10stzgpc5ag8p9dq6j98jj3tcftzffwce2ulsefs6pzh6sw2zet5');
 export const poolId2 = Cardano.PoolId('pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt');
 export const vrf = Cardano.VrfVkHex('8dd154228946bd12967c12bedb1cb6038b78f8b84a1760b1a788fa72a4af3db0');
 export const metadataJson = {
@@ -27,7 +31,7 @@ export const poolParameters: Cardano.PoolParameters = {
   id: poolId,
   margin: { denominator: 5, numerator: 1 },
   metadataJson,
-  owners: [ownerRewardAccount],
+  owners: [rewardAccount],
   pledge: 10_000n,
   relays: [
     { __typename: 'RelayByName', hostname: 'example.com', port: 5000 },
@@ -337,6 +341,7 @@ export const CONTEXT_WITH_KNOWN_ADDRESSES: LedgerTxTransformerContext = {
     networkId: Cardano.NetworkId.Testnet,
     networkMagic: 999
   },
+  dRepPublicKey: Crypto.Ed25519PublicKeyHex('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01'),
   knownAddresses: [
     {
       accountIndex: 0,
@@ -363,3 +368,93 @@ export const CONTEXT_WITHOUT_KNOWN_ADDRESSES: LedgerTxTransformerContext = {
   knownAddresses: [],
   txInKeyPathMap: {}
 };
+
+export const votes = [
+  {
+    actionId: {
+      actionIndex: 1,
+      id: Cardano.TransactionId('8d2feeab1087e0aa4ad06e878c5269eaa2edcef5264bcc97542a28c189b2cbc5')
+    },
+    votingProcedure: {
+      anchor: {
+        dataHash: metadataJson.hash,
+        url: metadataJson.url
+      },
+      vote: Cardano.Vote.yes
+    }
+  },
+  {
+    actionId: {
+      actionIndex: 2,
+      id: Cardano.TransactionId('8d2feeab1087e0aa4ad06e878c5269eaa2edcef5264bcc97542a28c189b2cbc6')
+    },
+    votingProcedure: {
+      anchor: null,
+      vote: Cardano.Vote.no
+    }
+  },
+  {
+    actionId: {
+      actionIndex: 3,
+      id: Cardano.TransactionId('8d2feeab1087e0aa4ad06e878c5269eaa2edcef5264bcc97542a28c189b2cbc7')
+    },
+    votingProcedure: {
+      anchor: null,
+      vote: Cardano.Vote.abstain
+    }
+  }
+];
+
+export const dRepKeyHashVoter: Cardano.Voter = {
+  __typename: Cardano.VoterType.dRepKeyHash,
+  credential: {
+    hash: stakeCredential.hash,
+    type: Cardano.CredentialType.KeyHash
+  }
+};
+
+export const dRepScriptHashVoter: Cardano.Voter = {
+  __typename: Cardano.VoterType.dRepScriptHash,
+  credential: {
+    hash: stakeCredential.hash,
+    type: Cardano.CredentialType.ScriptHash
+  }
+};
+
+export const stakePoolKeyHashVoter: Cardano.Voter = {
+  __typename: Cardano.VoterType.stakePoolKeyHash,
+  credential: {
+    hash: stakeCredential.hash,
+    type: Cardano.CredentialType.KeyHash
+  }
+};
+
+export const ccHotKeyHashVoter: Cardano.Voter = {
+  __typename: Cardano.VoterType.ccHotKeyHash,
+  credential: {
+    hash: stakeCredential.hash,
+    type: Cardano.CredentialType.KeyHash
+  }
+};
+
+export const ccHotScriptHashVoter: Cardano.Voter = {
+  __typename: Cardano.VoterType.ccHotScriptHash,
+  credential: {
+    hash: stakeCredential.hash,
+    type: Cardano.CredentialType.ScriptHash
+  }
+};
+
+export const singleVotingProcedure: Cardano.VotingProcedures = [
+  {
+    voter: dRepKeyHashVoter,
+    votes: [votes[0]]
+  }
+];
+
+export const singleVotingProcedureMultipleVotes: Cardano.VotingProcedures = [
+  {
+    voter: dRepKeyHashVoter,
+    votes
+  }
+];

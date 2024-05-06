@@ -11,21 +11,23 @@ import {
   SerializableLedgerKeyAgentData,
   SignBlobResult,
   SignTransactionContext,
-  errors
+  errors,
+  util
 } from '@cardano-sdk/key-management';
 import { HID } from 'node-hid';
 import { LedgerDevice, LedgerTransportType } from './types';
+import { areNumbersEqualInConstantTime, areStringsEqualInConstantTime } from '@cardano-sdk/util';
 import { str_to_path } from '@cardano-foundation/ledgerjs-hw-app-cardano/dist/utils/address';
 import { toLedgerTx } from './transformers';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import _LedgerConnection, {
   Certificate,
   CertificateType,
+  CredentialParams,
+  CredentialParamsType,
   GetVersionResponse,
   PoolKeyType,
   PoolOwnerType,
-  StakeCredentialParams,
-  StakeCredentialParamsType,
   Transaction,
   TransactionSigningMode,
   TxOutputDestinationType
@@ -93,7 +95,6 @@ const stakeCredentialCert = (cert: Certificate) =>
   cert.type === CertificateType.STAKE_REGISTRATION ||
   cert.type === CertificateType.STAKE_DEREGISTRATION ||
   cert.type === CertificateType.STAKE_DELEGATION;
-
 const isLedgerModelSupported = (deviceModelId: string): deviceModelId is 'nanoS' | 'nanoX' | 'nanoSP' =>
   ['nanoS', 'nanoX', 'nanoSP'].includes(deviceModelId);
 
@@ -127,12 +128,12 @@ const parseEstablishDeviceConnectionSecondParam = (
 };
 
 interface StakeCredentialCertificateParams {
-  stakeCredential: StakeCredentialParams;
+  stakeCredential: CredentialParams;
 }
 
 const containsOnlyScriptHashCreds = (tx: Transaction): boolean => {
   const withdrawalsAllScriptHash = !tx.withdrawals?.some(
-    (withdrawal) => withdrawal.stakeCredential.type !== StakeCredentialParamsType.SCRIPT_HASH
+    (withdrawal) => !areNumbersEqualInConstantTime(withdrawal.stakeCredential.type, CredentialParamsType.SCRIPT_HASH)
   );
 
   if (tx.certificates) {
@@ -140,7 +141,8 @@ const containsOnlyScriptHashCreds = (tx: Transaction): boolean => {
       if (!stakeCredentialCert(cert)) return false;
 
       const certParams = cert.params as unknown as StakeCredentialCertificateParams;
-      if (certParams.stakeCredential.type !== StakeCredentialParamsType.SCRIPT_HASH) return false;
+      if (!areNumbersEqualInConstantTime(certParams.stakeCredential.type, CredentialParamsType.SCRIPT_HASH))
+        return false;
     }
   }
 
@@ -539,6 +541,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
       const ledgerTxData = await toLedgerTx(body, {
         accountIndex: this.accountIndex,
         chainId: this.chainId,
+        dRepPublicKey: await this.derivePublicKey(util.DREP_KEY_DERIVATION_PATH),
         knownAddresses,
         txInKeyPathMap
       });
@@ -555,7 +558,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
         tx: ledgerTxData
       });
 
-      if (result.txHashHex !== hash) {
+      if (!areStringsEqualInConstantTime(result.txHashHex, hash)) {
         throw new errors.HwMappingError('Ledger computed a different transaction id');
       }
 

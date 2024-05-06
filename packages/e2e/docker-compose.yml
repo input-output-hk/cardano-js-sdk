@@ -67,6 +67,13 @@ services:
     volumes:
       - ./local-network/config/network:/config
 
+  cardano-smash:
+    depends_on:
+      cardano-db-sync:
+        condition: service_healthy
+    volumes:
+      - ./local-network/config/network:/config
+
   cardano-submit-api:
     depends_on:
       local-testnet:

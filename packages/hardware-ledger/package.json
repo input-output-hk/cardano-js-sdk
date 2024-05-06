@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/hardware-ledger",
-  "version": "0.9.0",
+  "version": "0.9.4",
   "description": "Mappings and integration with Ledger hardware",
   "engines": {
     "node": ">=16.20.2"
@@ -49,7 +49,7 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@cardano-foundation/ledgerjs-hw-app-cardano": "^6.0.0",
+    "@cardano-foundation/ledgerjs-hw-app-cardano": "^7.1.2",
     "@cardano-sdk/core": "workspace:~",
     "@cardano-sdk/crypto": "workspace:~",
     "@cardano-sdk/key-management": "workspace:~",

@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.34.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.34.3...@cardano-sdk/e2e@0.34.4) (2024-05-02)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
+## [0.34.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.34.2...@cardano-sdk/e2e@0.34.3) (2024-04-26)
+
+### Bug Fixes
+
+* add needed params in the docker composer file to activate batch pool delisting from smash server ([22eb99d](https://github.com/input-output-hk/cardano-js-sdk/commit/22eb99de65fefcc29bc19885f405ca4f2020a54d))
+
+## [0.34.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.34.1...@cardano-sdk/e2e@0.34.2) (2024-04-23)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
+## [0.34.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.34.0...@cardano-sdk/e2e@0.34.1) (2024-04-23)
+
+### Features
+
+* use publicly available SMASH docker image ([e29cc9c](https://github.com/input-output-hk/cardano-js-sdk/commit/e29cc9c7ff70495efe8ccf51779bcfb8b05ea335))
+
+## [0.34.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.33.3...@cardano-sdk/e2e@0.34.0) (2024-04-15)
+
+### ⚠ BREAKING CHANGES
+
+* upgrade cardano-services, cardano-services-client, e2e and util-dev packages to use version 0.28.0 of Axios
+
+### Miscellaneous Chores
+
+* upgrade Axios version to 0.28.0 ([59fcd06](https://github.com/input-output-hk/cardano-js-sdk/commit/59fcd06debc2712ca9fdd027400450d52a21caeb))
+
 ## [0.33.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.33.2...@cardano-sdk/e2e@0.33.3) (2024-04-04)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

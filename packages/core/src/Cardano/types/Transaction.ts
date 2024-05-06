@@ -103,7 +103,6 @@ export enum RedeemerPurpose {
   mint = 'mint',
   certificate = 'certificate',
   withdrawal = 'withdrawal',
-  delegateRepresentative = 'representative',
   propose = 'propose',
   vote = 'vote'
 }

@@ -192,7 +192,7 @@ type NotUndefinedFilters = Exclude<QueryStakePoolsArgs['filters'], undefined>;
 export const withTextFilter = (
   filters?: QueryStakePoolsArgs['filters']
 ): filters is NotUndefinedFilters & Required<Pick<NotUndefinedFilters, 'text'>> =>
-  (filters && typeof filters.text === 'string' && filters.text.length > 2) as unknown as boolean;
+  (filters && typeof filters.text === 'string' && filters.text !== '') as unknown as boolean;
 
 export const validateFuzzyOptions = (arg: string) => {
   const options = JSON.parse(arg) as FuzzyOptions;

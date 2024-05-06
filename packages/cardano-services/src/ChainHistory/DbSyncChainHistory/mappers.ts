@@ -20,7 +20,7 @@ import {
   WithCertType,
   WithdrawalModel
 } from './types';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, NotImplementedError } from '@cardano-sdk/core';
 import { Hash28ByteBase16, Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import {
   isAuthorizeCommitteeHotCertModel,
@@ -115,31 +115,30 @@ export const mapWithdrawal = (withdrawalModel: WithdrawalModel): Cardano.Withdra
 // Remove this and select the actual redeemer data from `redeemer_data` table.
 const stubRedeemerData = Buffer.from('not implemented');
 
-export const mapRedeemer = (redeemerModel: RedeemerModel): Cardano.Redeemer => {
-  let purpose: Cardano.RedeemerPurpose;
-  // It can be one of 'spend', 'mint', 'cert', 'reward'
-  switch (redeemerModel.purpose) {
-    case 'cert':
-      purpose = Cardano.RedeemerPurpose.certificate;
-      break;
-    case 'reward':
-      purpose = Cardano.RedeemerPurpose.withdrawal;
-      break;
-    default:
-      // spend or mint
-      purpose = redeemerModel.purpose as Cardano.RedeemerPurpose;
-  }
-
-  return {
-    data: stubRedeemerData,
-    executionUnits: {
-      memory: Number(redeemerModel.unit_mem),
-      steps: Number(redeemerModel.unit_steps)
-    },
-    index: redeemerModel.index,
-    purpose
-  };
+const redeemerPurposeMap: Record<RedeemerModel['purpose'], Cardano.RedeemerPurpose> = {
+  cert: Cardano.RedeemerPurpose.certificate,
+  mint: Cardano.RedeemerPurpose.mint,
+  proposing: Cardano.RedeemerPurpose.propose,
+  reward: Cardano.RedeemerPurpose.withdrawal,
+  spend: Cardano.RedeemerPurpose.spend,
+  voting: Cardano.RedeemerPurpose.vote
 };
+
+const mapRedeemerPurpose = (purpose: RedeemerModel['purpose']): Cardano.RedeemerPurpose =>
+  redeemerPurposeMap[purpose] ||
+  (() => {
+    throw new NotImplementedError(`Failed to map redeemer "purpose": ${purpose}`);
+  })();
+
+export const mapRedeemer = (redeemerModel: RedeemerModel): Cardano.Redeemer => ({
+  data: stubRedeemerData,
+  executionUnits: {
+    memory: Number(redeemerModel.unit_mem),
+    steps: Number(redeemerModel.unit_steps)
+  },
+  index: redeemerModel.index,
+  purpose: mapRedeemerPurpose(redeemerModel.purpose)
+});
 
 export const mapAnchor = (anchorUrl: string, anchorDataHash: string): Cardano.Anchor | null => {
   if (!!anchorUrl && !!anchorDataHash) {
