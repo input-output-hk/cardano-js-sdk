@@ -201,6 +201,7 @@ in
         };
 
         values = {
+          stakepool.databaseName = "stakepoolv2";
           cardano-services = {
             ingresOrder = 99;
             additionalRoutes = [
@@ -233,6 +234,9 @@ in
         };
 
         providers = {
+          backend = {
+            enabled = true;
+          };
           stake-pool-provider = {
             enabled = false;
           };
@@ -240,8 +244,8 @@ in
 
         values = {
           ingress.enabled = false;
-          pg-boss-worker.enabled = true;
           stakepool.databaseName = "stakepoolv2";
+          pg-boss-worker.enabled = true;
         };
       };
 
@@ -327,6 +331,9 @@ in
         };
 
         providers = {
+          backend = {
+            enabled = true;
+          };
           stake-pool-provider = {
             enabled = false;
           };
@@ -395,6 +402,9 @@ in
         };
 
         providers = {
+          backend = {
+            enabled = true;
+          };
           stake-pool-provider = {
             enabled = false;
           };
@@ -454,6 +464,9 @@ in
         };
 
         providers = {
+          backend = {
+            enabled = true;
+          };
           stake-pool-provider = {
             enabled = false;
           };
@@ -490,6 +503,7 @@ in
         };
 
         values = {
+          stakepool.databaseName = "stakepoolv2";
           backend.hostnames = ["${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
@@ -600,6 +614,9 @@ in
         };
 
         providers = {
+          backend = {
+            enabled = true;
+          };
           stake-pool-provider = {
             enabled = false;
           };
@@ -771,6 +788,9 @@ in
         };
 
         providers = {
+          backend = {
+            enabled = true;
+          };
           stake-pool-provider = {
             enabled = false;
           };
@@ -849,6 +869,9 @@ in
         };
 
         providers = {
+          backend = {
+            enabled = true;
+          };
           stake-pool-provider = {
             enabled = false;
           };
@@ -966,6 +989,9 @@ in
         };
 
         providers = {
+          backend = {
+            enabled = true;
+          };
           stake-pool-provider = {
             enabled = false;
           };
@@ -1044,6 +1070,9 @@ in
         };
 
         providers = {
+          backend = {
+            enabled = true;
+          };
           stake-pool-provider = {
             enabled = false;
           };
@@ -1171,6 +1200,9 @@ in
         };
 
         providers = {
+          backend = {
+            enabled = true;
+          };
           stake-pool-provider = {
             enabled = false;
           };
@@ -1195,6 +1227,9 @@ in
         };
 
         providers = {
+          backend = {
+            enabled = true;
+          };
           stake-pool-provider = {
             enabled = false;
           };
