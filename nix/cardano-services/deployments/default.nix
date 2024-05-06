@@ -1067,32 +1067,10 @@ in
         };
 
         values = {
+          stakepool.databaseName = "stakepoolv2";
           cardano-services = {
             ingresOrder = 99;
           };
-        };
-      };
-
-      "ops-preview-1@us-east-1@v2" = final: {
-        name = "${final.namespace}-cardanojs-v2";
-        namespace = "ops-preview-1";
-        network = "preview";
-        region = "us-east-1";
-
-        projectors = {
-          stake-pool.enabled = true;
-        };
-
-        providers = {
-          stake-pool-provider = {
-            enabled = false;
-          };
-        };
-
-        values = {
-          ingress.enabled = false;
-          pg-boss-worker.enabled = true;
-          stakepool.databaseName = "stakepoolv2";
         };
       };
 
