@@ -183,7 +183,10 @@ export class StakePoolBuilder {
 
   public async getLastEpoch() {
     this.#logger.debug('About to query last epoch');
-    const result: QueryResult<EpochModel> = await this.#db.query(Queries.findLastEpoch);
+    const result: QueryResult<EpochModel> = await this.#db.query({
+      name: 'current_epoch',
+      text: findLastEpoch
+    });
     const lastEpoch = result.rows[0];
     if (!lastEpoch) throw new ProviderError(ProviderFailure.Unknown, null, "Couldn't find last epoch");
     return lastEpoch.no;
