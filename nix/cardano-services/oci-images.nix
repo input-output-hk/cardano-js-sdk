@@ -20,7 +20,7 @@ let
       }
     ] ''
       mkdir -p $out/config
-      cp ${self}/compose/schedules.json $out/config/schedules.json
+      cp ${builtins.path { path = self + "/compose/schedules.json"; }} $out/config/schedules.json;
     '';
 in {
   cardano-services = std.lib.ops.mkStandardOCI {
