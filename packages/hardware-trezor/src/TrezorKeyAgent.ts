@@ -15,6 +15,7 @@ import {
   errors,
   util
 } from '@cardano-sdk/key-management';
+import { areStringsEqualInConstantTime } from '@cardano-sdk/util';
 import { txToTrezor } from './transformers/tx';
 import _TrezorConnectWeb from '@trezor/connect-web';
 
@@ -238,7 +239,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
 
       const signedData = result.payload;
 
-      if (signedData.hash !== hash) {
+      if (!areStringsEqualInConstantTime(signedData.hash, hash)) {
         throw new errors.HwMappingError('Trezor computed a different transaction id');
       }
 

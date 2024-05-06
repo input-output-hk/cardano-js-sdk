@@ -338,7 +338,7 @@
           },
           "purpose": {
             "type": "string",
-            "enum": ["spend", "mint", "certificate", "withdrawal"]
+            "enum": ["spend", "mint", "certificate", "withdrawal", "vote", "propose"]
           },
           "data": {
             "type": "object"

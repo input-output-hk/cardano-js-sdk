@@ -55,6 +55,7 @@ Automatic deployments are done for:
 - [dev-mainnet](https://dev-mainnet.lw.iog.io/v1.0.0/health) - On each release
 
 Manual deployments can be done via [STD Workflow](https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/std.yml)
+
 - Click 'Run workflow'
 - Select branch
 - Check checkboxes for environments that should be deployed

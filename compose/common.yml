@@ -128,15 +128,22 @@ services:
     <<:
       - *logging
       - *with-postgres
+    image: ghcr.io/intersectmbo/cardano-smash-server:${CARDANO_DB_SYNC_VERSION:-13.1.0.2}
+    command: ['--config', '/config/cardano-db-sync/config.json']
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      RESTORE_SNAPSHOT: ${RESTORE_SNAPSHOT:-}
+      RESTORE_RECREATE_DB: N
+      SMASH_USER: ${SMASH_USER:-admin}
+      SMASH_PASSWORD: ${SMASH_PASSWORD:-change_m}
     depends_on:
       cardano-db-sync:
         condition: service_healthy
-    build:
-      context: ../../
-      dockerfile: compose/smash/Dockerfile
     ports:
       - ${SMASH_PORT:-3100}:3100
     restart: on-failure
+    stop_signal: SIGINT
     healthcheck:
       test: ['CMD-SHELL', 'curl -s --fail http://localhost:3100/api/v1/status']
 
@@ -203,8 +210,9 @@ services:
       <<: *sdk-environment
       API_URL: http://0.0.0.0:3003
       QUEUES: ${QUEUES:-pool-delist-schedule,pool-metadata,pool-metrics,pool-rewards}
+      SCHEDULES: ${SCHEDULES:-/config/schedules.json}
       STAKE_POOL_PROVIDER_URL: http://provider-server:3000/
-      METADATA_FETCH_MODE: ${METADATA_FETCH_MODE:-direct}
+      METADATA_FETCH_MODE: ${METADATA_FETCH_MODE:-smash}
       SMASH_URL: ${SMASH_URL:-http://cardano-smash:3100/api/v1}
     healthcheck:
       test: ['CMD-SHELL', 'curl -s --fail http://localhost:3003/v1.0.0/health']

@@ -6,7 +6,7 @@
   utils,
   ...
 }: {
-  templates.backend-ingress = {
+  templates.backend-ingress = lib.mkIf values.ingress.enabled {
     apiVersion = "networking.k8s.io/v1";
     kind = "Ingress";
     metadata = {
@@ -29,7 +29,7 @@
         "alb.ingress.kubernetes.io/healthcheck-interval-seconds" = toString values.backend.albHealthcheck.interval;
         "alb.ingress.kubernetes.io/healthcheck-timeout-seconds" = toString values.backend.albHealthcheck.timeout;
         # Use latency routing policy
-        "external-dns.alpha.kubernetes.io/aws-region" = values.region;
+        "external-dns.alpha.kubernetes.io/aws-region" = config.region;
         "external-dns.alpha.kubernetes.io/set-identifier" = values.backend.dnsId;
         "alb.ingress.kubernetes.io/group.name" = chart.namespace;
         # ACM

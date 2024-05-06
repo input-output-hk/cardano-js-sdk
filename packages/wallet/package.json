@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/wallet",
-  "version": "0.36.0",
+  "version": "0.37.4",
   "description": "Wallet modules",
   "engines": {
     "node": ">=16.20.2"
@@ -41,7 +41,7 @@
     "test:e2e": "echo 'test:e2e' command not implemented yet"
   },
   "devDependencies": {
-    "@cardano-foundation/ledgerjs-hw-app-cardano": "^6.0.0",
+    "@cardano-foundation/ledgerjs-hw-app-cardano": "^7.1.2",
     "@cardano-ogmios/client": "6.2.0",
     "@cardano-sdk/cardano-services-client": "workspace:~",
     "@cardano-sdk/ogmios": "workspace:~",
