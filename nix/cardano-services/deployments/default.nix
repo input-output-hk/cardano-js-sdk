@@ -120,6 +120,7 @@ in
         };
         pg-boss-worker = {
           enabled = false;
+          queues = "pool-delist-schedule,pool-metadata,pool-metrics,pool-rewards";
           metadata-fetch-mode = "smash";
           smash-url =
             if final.network == "mainnet"
@@ -560,7 +561,10 @@ in
 
         projectors = {
           handle.enabled = true;
-          stake-pool.enabled = true;
+          stake-pool = {
+            enabled = true;
+            env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
+          };
           # asset.enabled = true;
         };
 
@@ -599,6 +603,7 @@ in
 
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
+          pg-boss-worker.queues = "pool-metadata,pool-metrics";
         };
       };
 
@@ -698,30 +703,6 @@ in
         };
       };
 
-      "live-mainnet@eu-central-1@v3" = final: {
-        name = "${final.namespace}-cardanojs-v3";
-        namespace = "live-mainnet";
-        network = "mainnet";
-        region = "eu-central-1";
-        context = "eks-admin";
-
-        projectors = {
-          stake-pool.enabled = true;
-        };
-
-        providers = {
-          stake-pool-provider = {
-            enabled = false;
-          };
-        };
-
-        values = {
-          ingress.enabled = false;
-          pg-boss-worker.enabled = false;
-          stakepool.databaseName = "stakepoolv2";
-        };
-      };
-
       "live-preprod@us-east-2@v2" = final: {
         name = "${final.namespace}-cardanojs-v2";
         namespace = "live-preprod";
@@ -747,13 +728,17 @@ in
 
         projectors = {
           handle.enabled = true;
-          stake-pool.enabled = true;
+          stake-pool = {
+            enabled = true;
+            env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
+          };
         };
 
         values = {
           backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
+          pg-boss-worker.queues = "pool-metadata,pool-metrics";
           cardano-services = {
             ingresOrder = 98;
           };
@@ -828,13 +813,17 @@ in
 
         projectors = {
           handle.enabled = true;
-          stake-pool.enabled = true;
+          stake-pool = {
+            enabled = true;
+            env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
+          };
         };
 
         values = {
           backend.hostnames = ["tmp-${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
+          pg-boss-worker.queues = "pool-metadata,pool-metrics";
           cardano-services = {
             ingresOrder = 98;
           };
@@ -948,13 +937,17 @@ in
 
         projectors = {
           handle.enabled = true;
-          stake-pool.enabled = true;
+          stake-pool = {
+            enabled = true;
+            env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
+          };
         };
 
         values = {
           backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
+          pg-boss-worker.queues = "pool-metadata,pool-metrics";
           cardano-services = {
             ingresOrder = 98;
           };
@@ -1029,13 +1022,17 @@ in
 
         projectors = {
           handle.enabled = true;
-          stake-pool.enabled = true;
+          stake-pool = {
+            enabled = true;
+            env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
+          };
         };
 
         values = {
           backend.hostnames = ["tmp-${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
+          pg-boss-worker.queues = "pool-metadata,pool-metrics";
           cardano-services = {
             ingresOrder = 98;
           };
@@ -1139,12 +1136,16 @@ in
         };
 
         projectors = {
-          stake-pool.enabled = true;
+          stake-pool = {
+            enabled = true;
+            env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
+          };
         };
 
         values = {
           blockfrost-worker.enabled = false;
           pg-boss-worker.enabled = true;
+          pg-boss-worker.queues = "pool-metadata,pool-metrics";
           backend.routes = let
             inherit (oci.meta) versions;
           in
@@ -1223,7 +1224,10 @@ in
         context = "eks-admin";
 
         projectors = {
-          stake-pool.enabled = true;
+          stake-pool = {
+            enabled = true;
+            env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
+          };
         };
 
         providers = {
