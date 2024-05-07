@@ -198,7 +198,7 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
             [
               'DROP TABLE IF EXISTS tmp_fuzzy',
               'CREATE TEMPORARY TABLE tmp_fuzzy (pool_id VARCHAR, score NUMERIC) WITHOUT OIDS',
-              `INSERT INTO tmp_fuzzy VALUES ${values}`
+              ...(values === '' ? [] : [`INSERT INTO tmp_fuzzy VALUES ${values}`])
             ].join(';')
           );
         }
