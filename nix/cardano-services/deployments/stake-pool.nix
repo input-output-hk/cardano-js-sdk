@@ -72,7 +72,7 @@
       NETWORK = config.network;
       LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
       OGMIOS_SRV_SERVICE_NAME = values.backend.ogmiosSrvServiceName;
-      PROJECTION_NAMES = "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
+      PROJECTION_NAMES = "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job,stake-pool-rewards-job";
 
       BUILD_INFO = values.cardano-services.buildInfo;
 
