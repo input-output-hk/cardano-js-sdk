@@ -224,32 +224,6 @@ in
         };
       };
 
-      "dev-preview@us-east-1@v2" = final: {
-        name = "${final.namespace}-cardanojs-v2";
-        namespace = "dev-preview";
-        network = "preview";
-        region = "us-east-1";
-
-        projectors = {
-          stake-pool.enabled = true;
-        };
-
-        providers = {
-          backend = {
-            enabled = true;
-          };
-          stake-pool-provider = {
-            enabled = false;
-          };
-        };
-
-        values = {
-          ingress.enabled = false;
-          stakepool.databaseName = "stakepoolv2";
-          pg-boss-worker.enabled = true;
-        };
-      };
-
       "dev-sanchonet@us-east-1@v1" = final: {
         namespace = "dev-sanchonet";
         name = "${final.namespace}-cardanojs-v1";
@@ -442,6 +416,7 @@ in
         };
 
         values = {
+          stakepool.databaseName = "stakepoolv2";
           backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
           backend.hostnames = ["${final.namespace}.${baseUrl}"];
 
@@ -451,32 +426,6 @@ in
           cardano-services = {
             ingresOrder = 98;
           };
-        };
-      };
-
-      "dev-preprod@us-east-1@v3" = final: {
-        name = "${final.namespace}-cardanojs-v3";
-        namespace = "dev-preprod";
-        network = "preprod";
-        region = "us-east-1";
-
-        projectors = {
-          stake-pool.enabled = true;
-        };
-
-        providers = {
-          backend = {
-            enabled = true;
-          };
-          stake-pool-provider = {
-            enabled = false;
-          };
-        };
-
-        values = {
-          ingress.enabled = false;
-          pg-boss-worker.enabled = true;
-          stakepool.databaseName = "stakepoolv2";
         };
       };
 
@@ -511,29 +460,6 @@ in
           cardano-services = {
             ingresOrder = 98;
           };
-        };
-      };
-
-      "staging-preprod@us-east-1@v3" = final: {
-        name = "${final.namespace}-cardanojs-v3";
-        namespace = "staging-preprod";
-        network = "preprod";
-        region = "us-east-1";
-
-        projectors = {
-          stake-pool.enabled = true;
-        };
-
-        providers = {
-          stake-pool-provider = {
-            enabled = false;
-          };
-        };
-
-        values = {
-          ingress.enabled = false;
-          pg-boss-worker.enabled = true;
-          stakepool.databaseName = "stakepoolv2";
         };
       };
 
