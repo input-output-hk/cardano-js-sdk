@@ -32,8 +32,7 @@ const toHex = (value: string) =>
     .map((s) => s.charCodeAt(0).toString(16))
     .join('');
 
-// TODO: LW-9889 Ada handle tests fail intermittently with `DeserialiseFailure 56 "expected word"` returned by cardano-submit-api
-describe.skip('Ada handle', () => {
+describe('Ada handle', () => {
   let wallet: BaseWallet;
   let keyAgent: KeyAgent;
   let receivingWallet: BaseWallet;

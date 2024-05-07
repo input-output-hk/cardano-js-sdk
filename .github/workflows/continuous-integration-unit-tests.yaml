@@ -7,7 +7,7 @@ env:
 on:
   pull_request:
   push:
-    branches: ['master', 'conway-era']
+    branches: ['master']
     tags: ['*.*.*']
 
 jobs:
