@@ -544,8 +544,8 @@ describe('CLI', () => {
 
     describe('schedules', () => {
       testPgBoss('accepts a valid schedule file', 'pgboss', {
-        args: ['--schedules', 'environments/.schedule.local.json'],
-        env: { SCHEDULES: 'environments/.schedule.local.json' },
+        args: ['--schedules', '../../compose/schedules.json'],
+        env: { SCHEDULES: '../../compose/schedules.json' },
         expectedArgs: {
           args: { schedules: [{ cron: '0 * * * *', queue: 'pool-delist-schedule', scheduleOptions: {} }] }
         }
@@ -854,7 +854,8 @@ describe('CLI', () => {
     });
 
     describe('fuzzyOptions', () => {
-      const FUZZY_OPTIONS = '{"threshold":0.4,"weights":{"description":1,"homepage":2,"name":3,"poolId":4,"ticker":4}}';
+      const FUZZY_OPTIONS =
+        '{"distance":100,"fieldNormWeight":1,"ignoreFieldNorm":false,"ignoreLocation":false,"location":0,"minMatchCharLength":3,"threshold":0.4,"useExtendedSearch":false,"weights":{"description":1,"homepage":2,"name":3,"poolId":4,"ticker":4}}';
 
       testCli('has a default value', 'provider', {
         expectedArgs: { args: { fuzzyOptions: DEFAULT_FUZZY_SEARCH_OPTIONS } }

@@ -82,7 +82,7 @@ in {
       postInstall = ''
         cat > $out/bin/cli <<EOF
         #!${nixpkgs.bash}/bin/bash
-        exec "${nixpkgs.nodejs}/bin/node" "$out/libexec/$sourceRoot/packages/cardano-services/dist/cjs/cli.js" "\$@"
+        exec "${nixpkgs.nodejs}/bin/node" ''${NODE_EXTRA_OPTIONS:-} "$out/libexec/$sourceRoot/packages/cardano-services/dist/cjs/cli.js" "\$@"
         EOF
         chmod a+x $out/bin/cli
       '';

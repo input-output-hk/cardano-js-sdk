@@ -160,12 +160,14 @@ export type Voter =
   | DrepScriptHashVoter
   | StakePoolKeyHashVoter;
 
+export type VotingProcedureVote = {
+  actionId: GovernanceActionId;
+  votingProcedure: VotingProcedure;
+};
+
 export type VotingProcedures = Array<{
   voter: Voter;
-  votes: Array<{
-    actionId: GovernanceActionId;
-    votingProcedure: VotingProcedure;
-  }>;
+  votes: VotingProcedureVote[];
 }>;
 
 export type ProposalProcedure = {

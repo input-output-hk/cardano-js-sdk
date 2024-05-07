@@ -28,4 +28,5 @@ WHERE pool_hash_id = $2
 export const poolRewards = `
 SELECT amount, type FROM reward
 WHERE earned_epoch = $1
-  AND pool_id = $2`;
+  AND pool_id = $2
+  AND type IN ('leader', 'member')`;

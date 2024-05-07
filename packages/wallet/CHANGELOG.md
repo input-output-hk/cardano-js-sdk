@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.37.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.37.3...@cardano-sdk/wallet@0.37.4) (2024-05-02)
+
+**Note:** Version bump only for package @cardano-sdk/wallet
+
+## [0.37.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.37.2...@cardano-sdk/wallet@0.37.3) (2024-04-26)
+
+**Note:** Version bump only for package @cardano-sdk/wallet
+
+## [0.37.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.37.1...@cardano-sdk/wallet@0.37.2) (2024-04-23)
+
+**Note:** Version bump only for package @cardano-sdk/wallet
+
+## [0.37.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.37.0...@cardano-sdk/wallet@0.37.1) (2024-04-23)
+
+**Note:** Version bump only for package @cardano-sdk/wallet
+
+## [0.37.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.36.0...@cardano-sdk/wallet@0.37.0) (2024-04-15)
+
+### ⚠ BREAKING CHANGES
+
+* **wallet:** hoist ObservableWallet getPubDRepKey under ObservableWallet.governance
+
+### Features
+
+* **wallet:** implement drep registration tracker ([06a1de5](https://github.com/input-output-hk/cardano-js-sdk/commit/06a1de5ec67e13ecc33111532735242e17256df7))
+
+### Code Refactoring
+
+* **wallet:** hoist ObservableWallet getPubDRepKey under ObservableWallet.governance ([9cf346f](https://github.com/input-output-hk/cardano-js-sdk/commit/9cf346f7945384949a9b3a615680b448d5ffde94))
+
+## [0.36.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.35.2...@cardano-sdk/wallet@0.36.0) (2024-04-04)
+
+### ⚠ BREAKING CHANGES
+
+* **hardware-ledger:** replace LedgerKeyAgent webhid transport with webusb
+- make some of the LedgerKeyAgent methods private
+- remove activeTransport parameter from the LedgerKeyAgent.createTransport method
+
+### Features
+
+* **hardware-ledger:** enable LedgerKeyAgent to accept a device to establish connection with ([f084f42](https://github.com/input-output-hk/cardano-js-sdk/commit/f084f4203240a25f9680d200e13dc27a47c1f439))
+
+## [0.35.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.35.1...@cardano-sdk/wallet@0.35.2) (2024-04-03)
+
+**Note:** Version bump only for package @cardano-sdk/wallet
+
 ## [0.35.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.35.0...@cardano-sdk/wallet@0.35.1) (2024-03-26)
 
 **Note:** Version bump only for package @cardano-sdk/wallet

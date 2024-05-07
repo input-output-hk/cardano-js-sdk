@@ -9,3 +9,4 @@ export * from './tx';
 export * from './txIn';
 export * from './txOut';
 export * from './withdrawals';
+export * from './votingProcedures';

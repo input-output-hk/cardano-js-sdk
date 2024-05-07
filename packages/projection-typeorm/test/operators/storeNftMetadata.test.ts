@@ -15,9 +15,11 @@ import {
   storeNftMetadata,
   storeUtxo,
   typeormTransactionCommit,
+  willStoreNftMetadata,
   withTypeormTransaction
 } from '../../src';
 import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
+import { CIP67Asset, ProjectedNftMetadata } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
 import { ChainSyncDataSet, chainSyncData, generateRandomHexString, logger } from '@cardano-sdk/util-dev';
 import { Observable, firstValueFrom, lastValueFrom, toArray } from 'rxjs';
 import { QueryRunner, Repository } from 'typeorm';
@@ -445,5 +447,43 @@ describe('storeNftMetadata', () => {
     expect(typeof file.src).toBe('string');
     expect(['object', 'undefined'].includes(typeof file.otherProperties)).toBe(true);
     expect(['string', 'undefined'].includes(typeof file.name)).toBe(true);
+  });
+});
+
+describe('willStoreNftMetadata', () => {
+  it('returns true if there are nftMetadata', () => {
+    expect(
+      willStoreNftMetadata({
+        cip67: {
+          byAssetId: {},
+          byLabel: {}
+        },
+        nftMetadata: [{} as ProjectedNftMetadata]
+      })
+    ).toBeTruthy();
+  });
+
+  it('returns true if there are cip67 tokens', () => {
+    expect(
+      willStoreNftMetadata({
+        cip67: {
+          byAssetId: { [{} as Cardano.AssetId]: {} as CIP67Asset },
+          byLabel: { [Asset.AssetNameLabelNum.UserNFT]: [{} as CIP67Asset] }
+        },
+        nftMetadata: []
+      })
+    ).toBeTruthy();
+  });
+
+  it('returns false if there are no nftMetadata or cip67', () => {
+    expect(
+      willStoreNftMetadata({
+        cip67: {
+          byAssetId: {},
+          byLabel: {}
+        },
+        nftMetadata: []
+      })
+    ).toBeFalsy();
   });
 });

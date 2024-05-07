@@ -217,7 +217,7 @@ jobs:
 
             for target in \
               "dev-preview@us-east-1" \
-              "dev-preprod@us-east-1@v1" \
+              "dev-preprod@us-east-1@v2" \
               "dev-mainnet@us-east-1" \
             ; do
               nix run -L ".#cardano-services.${target}.plan" | tee k8s-plan.diff

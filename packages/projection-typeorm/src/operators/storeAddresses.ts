@@ -16,6 +16,8 @@ const lookupStakeKeyRegistration = async (pointer: Cardano.Pointer | undefined, 
   return Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyRegistration.stakeKeyHash);
 };
 
+export const willStoreAddresses = ({ addresses }: Mappers.WithAddresses) => addresses.length > 0;
+
 export const storeAddresses = typeormOperator<Mappers.WithAddresses>(async (evt) => {
   const { addresses, eventType, queryRunner } = evt;
   if (addresses.length === 0 || eventType !== ChainSyncEventType.RollForward) return;

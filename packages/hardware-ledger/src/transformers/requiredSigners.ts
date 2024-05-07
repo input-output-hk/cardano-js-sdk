@@ -2,7 +2,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Cardano } from '@cardano-sdk/core';
 import { LedgerTxTransformerContext } from '../types';
-import { Transform } from '@cardano-sdk/util';
+import { Transform, areStringsEqualInConstantTime } from '@cardano-sdk/util';
 import { util } from '@cardano-sdk/key-management';
 
 export const toRequiredSigner: Transform<
@@ -12,12 +12,12 @@ export const toRequiredSigner: Transform<
 > = (keyHash, context) => {
   const paymentCredKnownAddress = context?.knownAddresses.find((address) => {
     const paymentCredential = Cardano.Address.fromBech32(address.address)?.asBase()?.getPaymentCredential().hash;
-    return paymentCredential && paymentCredential.toString() === keyHash;
+    return !!paymentCredential && areStringsEqualInConstantTime(paymentCredential.toString(), keyHash);
   });
 
   const stakeCredKnownAddress = context?.knownAddresses.find((address) => {
     const stakeCredential = Cardano.RewardAccount.toHash(address.rewardAccount);
-    return stakeCredential && stakeCredential.toString() === keyHash;
+    return !!stakeCredential && areStringsEqualInConstantTime(stakeCredential.toString(), keyHash);
   });
 
   const paymentKeyPath = paymentCredKnownAddress

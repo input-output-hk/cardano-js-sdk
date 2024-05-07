@@ -11,34 +11,40 @@ import {
   SerializableLedgerKeyAgentData,
   SignBlobResult,
   SignTransactionContext,
-  errors
+  errors,
+  util
 } from '@cardano-sdk/key-management';
-import { LedgerTransportType } from './types';
+import { HID } from 'node-hid';
+import { LedgerDevice, LedgerTransportType } from './types';
+import { areNumbersEqualInConstantTime, areStringsEqualInConstantTime } from '@cardano-sdk/util';
 import { str_to_path } from '@cardano-foundation/ledgerjs-hw-app-cardano/dist/utils/address';
 import { toLedgerTx } from './transformers';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import _LedgerConnection, {
   Certificate,
   CertificateType,
+  CredentialParams,
+  CredentialParamsType,
   GetVersionResponse,
   PoolKeyType,
   PoolOwnerType,
-  StakeCredentialParams,
-  StakeCredentialParamsType,
   Transaction,
   TransactionSigningMode,
   TxOutputDestinationType
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import _TransportWebHID from '@ledgerhq/hw-transport-webhid';
+import _TransportWebUSB from '@ledgerhq/hw-transport-webusb';
 import type LedgerTransport from '@ledgerhq/hw-transport';
 
-const TransportWebHID = (_TransportWebHID as any).default
-  ? ((_TransportWebHID as any).default as typeof _TransportWebHID)
-  : _TransportWebHID;
+const TransportWebUSB = (_TransportWebUSB as any).default
+  ? ((_TransportWebUSB as any).default as typeof _TransportWebUSB)
+  : _TransportWebUSB;
 const LedgerConnection = (_LedgerConnection as any).default
   ? ((_LedgerConnection as any).default as typeof _LedgerConnection)
   : _LedgerConnection;
 type LedgerConnection = _LedgerConnection;
+
+const isUsbDevice = (device: any): device is USBDevice =>
+  typeof USBDevice !== 'undefined' && device instanceof USBDevice;
 
 const isDeviceAlreadyOpenError = (error: unknown) => {
   if (typeof error !== 'object') return false;
@@ -49,6 +55,8 @@ const isDeviceAlreadyOpenError = (error: unknown) => {
     (typeof innerError.message === 'string' && innerError.message.includes('cannot open device with path'))
   );
 };
+
+const CARDANO_APP_CONNECTION_ERROR_MESSAGE = 'Cannot communicate with Ledger Cardano App';
 
 export interface LedgerKeyAgentProps extends Omit<SerializableLedgerKeyAgentData, '__typename'> {
   deviceConnection?: LedgerConnection;
@@ -69,8 +77,7 @@ export interface GetLedgerXpubProps {
 
 export interface CreateLedgerTransportProps {
   communicationType: CommunicationType;
-  activeTransport?: LedgerTransportType;
-  devicePath?: string;
+  nodeHidDevicePath?: string;
 }
 
 const transportTypedError = (error?: any) => new errors.TransportError('Ledger transport failed', error);
@@ -88,14 +95,45 @@ const stakeCredentialCert = (cert: Certificate) =>
   cert.type === CertificateType.STAKE_REGISTRATION ||
   cert.type === CertificateType.STAKE_DEREGISTRATION ||
   cert.type === CertificateType.STAKE_DELEGATION;
+const isLedgerModelSupported = (deviceModelId: string): deviceModelId is 'nanoS' | 'nanoX' | 'nanoSP' =>
+  ['nanoS', 'nanoX', 'nanoSP'].includes(deviceModelId);
+
+const establishDeviceConnectionMethodName = 'establishDeviceConnection';
+
+const parseEstablishDeviceConnectionSecondParam = (
+  communicationType: CommunicationType,
+  nodeHidDevicePathOrDevice?: string | LedgerDevice
+) => {
+  let device: LedgerDevice | undefined;
+  let nodeHidDevicePath: string | undefined;
+
+  const deviceObjectRecognized =
+    (communicationType === CommunicationType.Node && nodeHidDevicePathOrDevice instanceof HID) ||
+    (communicationType === CommunicationType.Web && isUsbDevice(nodeHidDevicePathOrDevice));
+  const devicePathRecognized =
+    communicationType === CommunicationType.Node && typeof nodeHidDevicePathOrDevice === 'string';
+
+  if (deviceObjectRecognized) {
+    device = nodeHidDevicePathOrDevice;
+  } else if (devicePathRecognized) {
+    nodeHidDevicePath = nodeHidDevicePathOrDevice;
+  } else if (nodeHidDevicePathOrDevice !== undefined) {
+    throw new Error(`Invalid arguments of the '${establishDeviceConnectionMethodName}' method`);
+  }
+
+  return {
+    device,
+    nodeHidDevicePath
+  };
+};
 
 interface StakeCredentialCertificateParams {
-  stakeCredential: StakeCredentialParams;
+  stakeCredential: CredentialParams;
 }
 
 const containsOnlyScriptHashCreds = (tx: Transaction): boolean => {
   const withdrawalsAllScriptHash = !tx.withdrawals?.some(
-    (withdrawal) => withdrawal.stakeCredential.type !== StakeCredentialParamsType.SCRIPT_HASH
+    (withdrawal) => !areNumbersEqualInConstantTime(withdrawal.stakeCredential.type, CredentialParamsType.SCRIPT_HASH)
   );
 
   if (tx.certificates) {
@@ -103,7 +141,8 @@ const containsOnlyScriptHashCreds = (tx: Transaction): boolean => {
       if (!stakeCredentialCert(cert)) return false;
 
       const certParams = cert.params as unknown as StakeCredentialCertificateParams;
-      if (certParams.stakeCredential.type !== StakeCredentialParamsType.SCRIPT_HASH) return false;
+      if (!areNumbersEqualInConstantTime(certParams.stakeCredential.type, CredentialParamsType.SCRIPT_HASH))
+        return false;
     }
   }
 
@@ -131,16 +170,27 @@ const isMultiSig = (tx: Transaction): boolean => {
   return result;
 };
 
-type LedgerConnectionWithCommunicationTypeAndDevicePath = {
-  deviceConnection: LedgerConnection;
+type DeviceConnectionsWithTheirInitialParams = { deviceConnection: LedgerConnection } & (
+  | {
+      communicationType: CommunicationType.Node;
+      device?: HID;
+      nodeHidDevicePath?: string;
+    }
+  | {
+      communicationType: CommunicationType.Web;
+      device?: USBDevice;
+    }
+);
+
+type OpenTransportForDeviceParams = {
   communicationType: CommunicationType;
-  devicePath?: string;
+  device: LedgerDevice;
 };
 
 export class LedgerKeyAgent extends KeyAgentBase {
   readonly deviceConnection?: LedgerConnection;
   readonly #communicationType: CommunicationType;
-  static deviceConnections: LedgerConnectionWithCommunicationTypeAndDevicePath[] = [];
+  static deviceConnections: DeviceConnectionsWithTheirInitialParams[] = [];
 
   constructor({ deviceConnection, ...serializableData }: LedgerKeyAgentProps, dependencies: KeyAgentDependencies) {
     super({ ...serializableData, __typename: KeyAgentType.Ledger }, dependencies);
@@ -148,21 +198,78 @@ export class LedgerKeyAgent extends KeyAgentBase {
     this.#communicationType = serializableData.communicationType;
   }
 
-  static findKeyAgentByCommunicationTypeAndDevicePath(communicationType: CommunicationType, devicePath?: string) {
-    return this.deviceConnections?.find(
-      (connection) => connection.communicationType === communicationType && connection.devicePath === devicePath
-    );
+  private static async findConnectionByCommunicationTypeAndDevicePath(
+    communicationType: CommunicationType,
+    nodeHidDevicePath?: string,
+    device?: LedgerDevice
+  ): Promise<LedgerConnection | null> {
+    const matchingConnectionData = this.deviceConnections?.find((connection) => {
+      const sameCommunication = communicationType === connection.communicationType;
+      if (connection.communicationType === CommunicationType.Web) {
+        return sameCommunication && device === connection.device;
+      }
+      if (connection.communicationType === CommunicationType.Node) {
+        return sameCommunication && device === connection.device && nodeHidDevicePath === connection.nodeHidDevicePath;
+      }
+    });
+    if (!matchingConnectionData) return null;
+
+    try {
+      await this.testConnection(matchingConnectionData.deviceConnection);
+    } catch (error) {
+      if (error instanceof errors.TransportError && error.message.includes(CARDANO_APP_CONNECTION_ERROR_MESSAGE)) {
+        this.deviceConnections = this.deviceConnections.filter(
+          (connectionData) => connectionData !== matchingConnectionData
+        );
+        return null;
+      }
+
+      throw error;
+    }
+
+    return matchingConnectionData.deviceConnection;
   }
 
   /**
    * @throws TransportError
    */
-  static async getHidDeviceList(communicationType: CommunicationType): Promise<string[]> {
+  private static async getHidDeviceList(communicationType: CommunicationType): Promise<string[]> {
     try {
-      return communicationType === CommunicationType.Node ? TransportNodeHid.list() : TransportWebHID.list();
+      return communicationType === CommunicationType.Node ? TransportNodeHid.list() : TransportWebUSB.list();
     } catch (error) {
       throw new errors.TransportError('Cannot fetch device list', error);
     }
+  }
+
+  private static attachDisconnectionCleanupHandler(transport: LedgerTransportType) {
+    const onDisconnect = () => {
+      transport.off('disconnect', onDisconnect);
+      this.deviceConnections = this.deviceConnections.filter(
+        ({ deviceConnection }) => deviceConnection.transport !== transport
+      );
+      void transport.close();
+    };
+    transport.on('disconnect', onDisconnect);
+  }
+
+  /**
+   * @throws TransportError
+   */
+  private static async openTransportForDevice({ communicationType, device }: OpenTransportForDeviceParams) {
+    let transport: LedgerTransportType;
+    try {
+      if (communicationType === CommunicationType.Node && device instanceof HID) {
+        transport = new TransportNodeHid(device);
+      } else if (communicationType === CommunicationType.Web && isUsbDevice(device)) {
+        transport = await TransportWebUSB.open(device);
+      } else {
+        throw new errors.TransportError(`Invalid device object provided for communication type ${communicationType}`);
+      }
+    } catch (error) {
+      throw new errors.TransportError('Failed to open a transport for a given device', error);
+    }
+    this.attachDisconnectionCleanupHandler(transport);
+    return transport;
   }
 
   /**
@@ -170,18 +277,31 @@ export class LedgerKeyAgent extends KeyAgentBase {
    */
   static async createTransport({
     communicationType,
-    activeTransport,
-    devicePath = ''
+    nodeHidDevicePath = ''
   }: CreateLedgerTransportProps): Promise<LedgerTransportType> {
+    let transport: LedgerTransportType;
     try {
-      if (communicationType === CommunicationType.Node) {
-        return await TransportNodeHid.open(devicePath);
-      }
-      return await (activeTransport && activeTransport instanceof TransportWebHID
-        ? TransportWebHID.open(activeTransport.device)
-        : TransportWebHID.request());
+      transport =
+        communicationType === CommunicationType.Node
+          ? await TransportNodeHid.open(nodeHidDevicePath)
+          : await TransportWebUSB.request();
     } catch (error) {
       throw new errors.TransportError('Creating transport failed', error);
+    }
+
+    this.attachDisconnectionCleanupHandler(transport);
+    return transport;
+  }
+
+  /**
+   * @throws TransportError
+   */
+  private static async testConnection(activeConnection: LedgerConnection): Promise<void> {
+    try {
+      // Perform app check to see if device can respond
+      await activeConnection.getVersion();
+    } catch (error) {
+      throw new errors.TransportError(CARDANO_APP_CONNECTION_ERROR_MESSAGE, error);
     }
   }
 
@@ -189,57 +309,98 @@ export class LedgerKeyAgent extends KeyAgentBase {
    * @throws TransportError
    */
   static async createDeviceConnection(activeTransport: LedgerTransport): Promise<LedgerConnection> {
-    try {
-      const deviceConnection = new LedgerConnection(activeTransport);
-      // Perform app check to see if device can respond
-      await deviceConnection.getVersion();
-      return deviceConnection;
-    } catch (error) {
-      throw new errors.TransportError('Cannot communicate with Ledger Cardano App', error);
-    }
+    const deviceConnection = new LedgerConnection(activeTransport);
+    await this.testConnection(deviceConnection);
+    return deviceConnection;
+  }
+
+  private static rememberConnection({
+    communicationType,
+    device,
+    deviceConnection,
+    nodeHidDevicePath
+  }: {
+    communicationType: CommunicationType;
+    device?: LedgerDevice;
+    deviceConnection: LedgerConnection;
+    nodeHidDevicePath?: string;
+  }) {
+    this.deviceConnections.push({
+      deviceConnection,
+      ...(communicationType === CommunicationType.Node
+        ? {
+            communicationType,
+            ...(device instanceof HID && { device }),
+            ...(nodeHidDevicePath !== undefined && { nodeHidDevicePath })
+          }
+        : {
+            communicationType,
+            ...(isUsbDevice(device) && { device })
+          })
+    });
   }
 
   /**
    * @throws TransportError
    */
-  static async establishDeviceConnection(
+  static async [establishDeviceConnectionMethodName](communicationType: CommunicationType): Promise<LedgerConnection>;
+  static async [establishDeviceConnectionMethodName](
     communicationType: CommunicationType,
-    devicePath?: string
-    // eslint-disable-next-line complexity
+    nodeHidDevicePath: string
+  ): Promise<LedgerConnection>;
+  static async [establishDeviceConnectionMethodName](
+    communicationType: CommunicationType.Node,
+    device: HID
+  ): Promise<LedgerConnection>;
+  static async [establishDeviceConnectionMethodName](
+    communicationType: CommunicationType.Web,
+    device: USBDevice
+  ): Promise<LedgerConnection>;
+  static async [establishDeviceConnectionMethodName](
+    communicationType: CommunicationType,
+    nodeHidDevicePathOrDevice?: string | LedgerDevice
   ): Promise<LedgerConnection> {
-    const sameConnectionByTypeAndPath = this.findKeyAgentByCommunicationTypeAndDevicePath(
+    const { device, nodeHidDevicePath } = parseEstablishDeviceConnectionSecondParam(
       communicationType,
-      devicePath
+      nodeHidDevicePathOrDevice
     );
-    if (sameConnectionByTypeAndPath) return sameConnectionByTypeAndPath.deviceConnection;
-    let transport;
+
+    const matchingOpenConnection = await this.findConnectionByCommunicationTypeAndDevicePath(
+      communicationType,
+      nodeHidDevicePath,
+      device
+    );
+    if (matchingOpenConnection) return matchingOpenConnection;
+
+    let transport: LedgerTransportType | undefined;
     try {
-      transport = await LedgerKeyAgent.createTransport({ communicationType, devicePath });
+      transport = device
+        ? await LedgerKeyAgent.openTransportForDevice({ communicationType, device })
+        : await LedgerKeyAgent.createTransport({ communicationType, nodeHidDevicePath });
+
       if (!transport || !transport.deviceModel) {
         throw new errors.TransportError('Missing transport');
       }
-      const isSupportedLedgerModel =
-        transport.deviceModel.id === 'nanoS' ||
-        transport.deviceModel.id === 'nanoX' ||
-        transport.deviceModel.id === 'nanoSP';
-      if (!isSupportedLedgerModel) {
+      if (!isLedgerModelSupported(transport.deviceModel.id)) {
         throw new errors.TransportError(`Ledger device model: "${transport.deviceModel.id}" is not supported`);
       }
+
       const newConnection = await LedgerKeyAgent.createDeviceConnection(transport);
-      this.deviceConnections.push({
+      this.rememberConnection({
         communicationType,
+        device,
         deviceConnection: newConnection,
-        ...(!!devicePath && { devicePath })
+        nodeHidDevicePath
       });
+
       return newConnection;
-    } catch (error: any) {
+    } catch (error) {
       if (isDeviceAlreadyOpenError(error)) {
         throw new errors.TransportError('Connection already established', error);
       }
-      // If transport is established we need to close it so we can recover device from previous session
+      // If transport is established we need to close it, so we can recover device from previous session
       if (transport) {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        transport.close();
+        void transport.close();
       }
       throw new errors.TransportError('Establishing device connection failed', error);
     }
@@ -357,7 +518,11 @@ export class LedgerKeyAgent extends KeyAgentBase {
       }
     }
 
-    if (tx.collateralInputs) {
+    /**
+     * VotingProcedures: We are currently supporting only keyHash and scriptHash voter types in voting procedures.
+     * To sign tx with keyHash and scriptHash voter type we have to use PLUTUS_TRANSACTION signing mode
+     */
+    if (tx.collateralInputs || tx.votingProcedures) {
       return TransactionSigningMode.PLUTUS_TRANSACTION;
     }
 
@@ -380,6 +545,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
       const ledgerTxData = await toLedgerTx(body, {
         accountIndex: this.accountIndex,
         chainId: this.chainId,
+        dRepPublicKey: await this.derivePublicKey(util.DREP_KEY_DERIVATION_PATH),
         knownAddresses,
         txInKeyPathMap
       });
@@ -390,13 +556,12 @@ export class LedgerKeyAgent extends KeyAgentBase {
       );
 
       const signingMode = LedgerKeyAgent.getSigningMode(ledgerTxData);
-
       const result = await deviceConnection.signTransaction({
         signingMode,
         tx: ledgerTxData
       });
 
-      if (result.txHashHex !== hash) {
+      if (!areStringsEqualInConstantTime(result.txHashHex, hash)) {
         throw new errors.HwMappingError('Ledger computed a different transaction id');
       }
 

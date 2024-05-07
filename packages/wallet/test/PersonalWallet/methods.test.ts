@@ -447,7 +447,7 @@ describe('BaseWallet methods', () => {
     });
 
     test('rejects if bech32 DRepID is not a type 6 address', async () => {
-      const dRepKey = await wallet.getPubDRepKey();
+      const dRepKey = await wallet.governance.getPubDRepKey();
       for (const type in Cardano.AddressType) {
         if (!Number.isNaN(Number(type)) && Number(type) !== Cardano.AddressType.EnterpriseKey) {
           const drepid = buildDRepIDFromDRepKey(dRepKey!, 0, type as unknown as Cardano.AddressType);
@@ -458,7 +458,7 @@ describe('BaseWallet methods', () => {
   });
 
   it('getPubDRepKey', async () => {
-    const response = await wallet.getPubDRepKey();
+    const response = await wallet.governance.getPubDRepKey();
     expect(typeof response).toBe('string');
   });
 
@@ -486,7 +486,7 @@ describe('BaseWallet methods', () => {
     );
     await waitForWalletStateSettle(wallet);
 
-    const response = await wallet.getPubDRepKey();
+    const response = await wallet.governance.getPubDRepKey();
     expect(response).toBe('string');
     expect(bip32Account.derivePublicKey).toHaveBeenCalledTimes(3);
   });

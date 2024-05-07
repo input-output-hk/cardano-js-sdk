@@ -95,7 +95,7 @@ export interface WithdrawalModel {
 
 export interface RedeemerModel {
   index: number;
-  purpose: string;
+  purpose: 'cert' | 'mint' | 'spend' | 'reward' | 'voting' | 'proposing';
   script_hash: Buffer;
   unit_mem: string;
   unit_steps: string;

@@ -84,6 +84,12 @@ export interface ObservableWallet {
   readonly addresses$: Observable<WalletAddress[]>;
   readonly publicStakeKeys$: Observable<PubStakeKeyAndStatus[]>;
   readonly handles$: Observable<HandleInfo[]>;
+  readonly governance: {
+    /** true this wallet is registered as drep */
+    readonly isRegisteredAsDRep$: Observable<boolean>;
+    /** Returns the wallet account's public DRep Key or undefined if the wallet doesn't control any DRep key */
+    getPubDRepKey(): Promise<Ed25519PublicKeyHex | undefined>;
+  };
   /** All owned and historical assets */
   readonly assetInfo$: Observable<Assets>;
   /**
@@ -96,8 +102,6 @@ export interface ObservableWallet {
 
   getName(): Promise<string>;
 
-  /** Returns the wallet account's public DRep Key or undefined if the wallet doesn't control any DRep key */
-  getPubDRepKey(): Promise<Ed25519PublicKeyHex | undefined>;
   /**
    * @deprecated Use `createTxBuilder()` instead.
    * @throws InputSelectionError

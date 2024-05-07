@@ -114,6 +114,9 @@ WORKDIR /app/packages/cardano-services
 CMD ["node", "dist/cjs/cli.js", "start-blockfrost-worker"]
 
 FROM cardano-services as pg-boss-worker
+WORKDIR /config
+COPY compose/schedules.json .
+ENV SCHEDULES=/config/schedules.json
 WORKDIR /app/packages/cardano-services
 CMD ["node", "dist/cjs/cli.js", "start-pg-boss-worker"]
 

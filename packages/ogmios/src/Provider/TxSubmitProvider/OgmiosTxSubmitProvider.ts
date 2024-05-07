@@ -11,12 +11,7 @@ import {
   SubmitTxArgs,
   TxSubmitProvider
 } from '@cardano-sdk/core';
-import {
-  ConnectionConfig,
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  TxSubmission
-} from '@cardano-ogmios/client';
+import { ConnectionConfig } from '@cardano-ogmios/client';
 import { Logger } from 'ts-log';
 import { OgmiosCardanoNode } from '../../CardanoNode';
 import { RunnableModule, contextLogger, isNotNil } from '@cardano-sdk/util';
@@ -38,7 +33,7 @@ export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitPr
   /**
    * @param {ConnectionConfig} connectionConfig Ogmios connection configuration
    * @param {Logger} logger object implementing the Logger abstract class
-   * @throws {TxSubmission.errors}
+   * @param {HandleProvider} [handleProvider] - An optional provider used for resolving handles to specific addresses
    */
   constructor(connectionConfig: ConnectionConfig, { logger }: ProviderDependencies, handleProvider?: HandleProvider) {
     super('OgmiosTxSubmitProvider', logger);

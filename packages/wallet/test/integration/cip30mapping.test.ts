@@ -76,7 +76,7 @@ const createWalletAndApiWithStores = async (
     submitTx: createMockGenericCallback(),
     ...(!!getCollateralCallback && { getCollateral: getCollateralCallback })
   };
-  wallet.getPubDRepKey = jest.fn(wallet.getPubDRepKey);
+  wallet.governance.getPubDRepKey = jest.fn(wallet.governance.getPubDRepKey);
 
   const api = cip30.createWalletApi(of(wallet), confirmationCallback, { logger });
   if (settle) await waitForWalletStateSettle(wallet);
@@ -606,10 +606,10 @@ describe('cip30', () => {
       describe('api.getPubDRepKey', () => {
         test("returns the DRep key derived from the wallet's public key", async () => {
           const cip95PubDRepKey = await api.getPubDRepKey(context);
-          expect(cip95PubDRepKey).toEqual(await wallet.getPubDRepKey());
+          expect(cip95PubDRepKey).toEqual(await wallet.governance.getPubDRepKey());
         });
         test('throws an ApiError on unexpected error', async () => {
-          (wallet.getPubDRepKey as jest.Mock).mockRejectedValueOnce(new Error('unexpected error'));
+          (wallet.governance.getPubDRepKey as jest.Mock).mockRejectedValueOnce(new Error('unexpected error'));
           try {
             await api.getPubDRepKey(context);
           } catch (error) {
