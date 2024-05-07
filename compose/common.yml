@@ -66,7 +66,7 @@ x-provider-server-environment: &provider-server-environment
   SERVICE_NAMES: ${SERVICE_NAMES:-asset,chain-history,handle,network-info,rewards,stake-pool,tx-submit,utxo}
   SUBMIT_API_URL: ${SUBMIT_API_URL:-http://cardano-submit-api:8090/}
   USE_BLOCKFROST: ${USE_BLOCKFROST:-false}
-  USE_SUBMIT_API: ${USE_SUBMIT_API:-true}
+  USE_SUBMIT_API: ${USE_SUBMIT_API:-false}
 
 x-sdk-environment: &sdk-environment
   LOGGER_MIN_SEVERITY: ${LOGGER_MIN_SEVERITY:-info}
@@ -128,7 +128,7 @@ services:
     <<:
       - *logging
       - *with-postgres
-    image: ghcr.io/intersectmbo/cardano-smash-server:${CARDANO_DB_SYNC_VERSION:-13.1.0.2}
+    image: ghcr.io/intersectmbo/cardano-smash-server:${CARDANO_DB_SYNC_VERSION:-13.2.0.2}
     command: ['--config', '/config/cardano-db-sync/config.json']
     environment:
       POSTGRES_HOST: postgres

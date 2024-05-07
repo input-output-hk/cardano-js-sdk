@@ -23,11 +23,6 @@ on:
         type: boolean
         required: true
         default: false
-      deploy-dev-sanchonet:
-        description: Deploy to dev-sanchonet
-        type: boolean
-        required: true
-        default: false
   workflow_call:
     inputs:
       deploy-dev-preprod:
@@ -59,7 +54,7 @@ on:
 env:
   # NIX_UPLOAD_CACHE: s3://lace-nix-cache?region=us-east-1
   DISCOVERY_USER_NAME: gha-runner
-  DISCOVERY_KNOWN_HOSTS_ENTRY: '65.109.126.156 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEOVVDZydvD+diYa6A3EtA3WGw5NfN0wv7ckQxa/fX1O'
+  DISCOVERY_KNOWN_HOSTS_ENTRY: "65.109.126.156 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEOVVDZydvD+diYa6A3EtA3WGw5NfN0wv7ckQxa/fX1O"
 concurrency:
   group: std-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -106,9 +101,6 @@ jobs:
             if [ "true" == ${{ inputs.deploy-dev-preview || (github.event_name == 'push' && github.ref_name == 'master') }} ] ; then
               echo '{"environment":"dev-preview", "target":"dev-preview@us-east-1",    "url": "https://dev-preview.lw.iog.io/"}'
             fi
-            if [ "true" == ${{ inputs.deploy-dev-sanchonet || (github.event_name == 'push' && github.ref_name == 'conway-era') }} ] ; then
-              echo '{"environment":"dev-sanchonet", "target":"dev-sanchonet@us-east-1@v1",    "url": "https://dev-sanchonet.lw.iog.io/"}'
-            fi
             if [ "true" == ${{ inputs.deploy-dev-preprod || false }} ] ; then
               echo '{"environment":"dev-preprod", "target":"dev-preprod@us-east-1@v2", "url": "https://dev-preprod.lw.iog.io/"}'
             fi
@@ -125,8 +117,9 @@ jobs:
           # TODO: should we remove the trailing double quotes?
           echo "deployment-matrix=$(cat deployment-matrix.json | jq -c . | jq --raw-input)" >> "$GITHUB_OUTPUT"
       - uses: divnix/std-action/discover@main
-        with: { ffBuildInstructions: true }
+        with: {ffBuildInstructions: true}
         id: discovery
+
 
   images:
     name: ${{ matrix.target.jobName }}
@@ -172,12 +165,13 @@ jobs:
           echo commit: ${{ github.sha }}
       - uses: divnix/std-action/run@main
         if: matrix.target != 'dummy-target'
-        with: { ffBuildInstructions: true, remoteStore: 'ssh-ng://eu.nixbuild.net' }
+        with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
+
 
   diff:
     needs: images
     name: Diff & Comment
-    if: github.event_name == 'pull_request' && (github.base_ref == 'master' || github.base_ref == 'conway-era')
+    if: github.event_name == 'pull_request' && (github.base_ref == 'master')
     permissions:
       contents: read
       pull-requests: write
@@ -222,10 +216,9 @@ jobs:
             printf "" >pr-comment.md
 
             for target in \
-              ${{ github.base_ref == 'master' && '"dev-preview@us-east-1"'    || '' }} \
-              ${{ github.base_ref == 'master' && '"dev-preprod@us-east-1@v2"' || '' }} \
-              ${{ github.base_ref == 'master' && '"dev-mainnet@us-east-1"'    || '' }} \
-              ${{ github.base_ref == 'conway-era' && '"dev-sanchonet@us-east-1@v1"'    || '' }} \
+              "dev-preview@us-east-1" \
+              "dev-preprod@us-east-1@v2" \
+              "dev-mainnet@us-east-1" \
             ; do
               nix run -L ".#cardano-services.${target}.plan" | tee k8s-plan.diff
 
@@ -245,7 +238,7 @@ jobs:
       - name: Post Comment on the PR
         env:
           GH_TOKEN: ${{ github.token }}
-          COMMENT_MARKER: 'nix-helm-diff-777f3796-c80d-4d68-bf4f-8faad564f03f'
+          COMMENT_MARKER: "nix-helm-diff-777f3796-c80d-4d68-bf4f-8faad564f03f"
         run: |
           prNumber=$(cut -d/ -f1 <<<'${{ github.ref_name }}')
           # The `gh` command doesn’t return numeric comment ids, but instead node_ids, which don’t work with the regular API
@@ -271,8 +264,9 @@ jobs:
               -d "$(jq --null-input --arg body "$(cat pr-comment.md) <!-- $COMMENT_MARKER -->" '{body: $body}')"
           fi
 
+
   deploy:
-    needs: [images, discover]
+    needs: [images,discover]
     concurrency:
       # Only one deployment at a time per environment, and wait for the previous one to finish:
       group: deploy-${{ matrix.environment }}
