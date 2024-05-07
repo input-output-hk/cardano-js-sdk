@@ -71,5 +71,15 @@ export const toWithdrawal: Transform<Cardano.Withdrawal, Ledger.Withdrawal, Ledg
 export const mapWithdrawals = (
   withdrawals: Cardano.Withdrawal[] | undefined,
   context: LedgerTxTransformerContext
-): Ledger.Withdrawal[] | null =>
-  withdrawals ? withdrawals.map((coreWithdrawal) => toWithdrawal(coreWithdrawal, context)) : null;
+): Ledger.Withdrawal[] | null => {
+  if (!withdrawals) return null;
+  // Sort withdrawals by address bytes, canonically
+  withdrawals.sort((a, b) => {
+    const rewardAddress1 = Cardano.Address.fromString(a.stakeAddress)?.asReward();
+    const rewardAddress2 = Cardano.Address.fromString(b.stakeAddress)?.asReward();
+    if (!rewardAddress1 || !rewardAddress2)
+      throw new InvalidArgumentError('withdrawal', 'Invalid withdrawal stake address');
+    return rewardAddress1.toAddress().toBytes() > rewardAddress2.toAddress().toBytes() ? 1 : -1;
+  });
+  return withdrawals.map((coreWithdrawal) => toWithdrawal(coreWithdrawal, context));
+};

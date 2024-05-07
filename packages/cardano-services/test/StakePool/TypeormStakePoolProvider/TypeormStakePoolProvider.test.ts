@@ -646,6 +646,14 @@ describe('TypeormStakePoolProvider', () => {
             });
             expect(response.pageResults.map(({ metadata }) => metadata?.ticker)).toEqual(['SP11', 'SP10', 'SP1']);
           });
+
+          it('returns an empty array on empty search result', async () => {
+            const response = await provider.queryStakePools({
+              filters: { text: 'no one match this search' },
+              pagination
+            });
+            expect(response.pageResults).toEqual([]);
+          });
         });
 
         describe('stake pools sort', () => {
