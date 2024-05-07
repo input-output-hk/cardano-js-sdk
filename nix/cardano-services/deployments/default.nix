@@ -120,6 +120,7 @@ in
         };
         pg-boss-worker = {
           enabled = false;
+          queues = "pool-delist-schedule,pool-metadata,pool-metrics,pool-rewards";
           metadata-fetch-mode = "smash";
           smash-url =
             if final.network == "mainnet"
@@ -201,6 +202,7 @@ in
         };
 
         values = {
+          stakepool.databaseName = "stakepoolv2";
           cardano-services = {
             ingresOrder = 99;
             additionalRoutes = [
@@ -293,6 +295,32 @@ in
         };
       };
 
+      "dev-sanchonet@us-east-1@v2" = final: {
+        name = "${final.namespace}-cardanojs-v2";
+        namespace = "dev-sanchonet";
+        network = "sanchonet";
+        region = "us-east-1";
+
+        projectors = {
+          stake-pool.enabled = true;
+        };
+
+        providers = {
+          backend = {
+            enabled = true;
+          };
+          stake-pool-provider = {
+            enabled = false;
+          };
+        };
+
+        values = {
+          ingress.enabled = false;
+          pg-boss-worker.enabled = true;
+          stakepool.databaseName = "stakepoolv2";
+        };
+      };
+
       "dev-mainnet@us-east-1" = final: {
         namespace = "dev-mainnet";
         network = "mainnet";
@@ -338,6 +366,32 @@ in
         };
       };
 
+      "dev-mainnet@us-east-1@v2" = final: {
+        name = "${final.namespace}-cardanojs-v2";
+        namespace = "dev-mainnet";
+        network = "mainnet";
+        region = "us-east-1";
+
+        projectors = {
+          stake-pool.enabled = true;
+        };
+
+        providers = {
+          backend = {
+            enabled = true;
+          };
+          stake-pool-provider = {
+            enabled = false;
+          };
+        };
+
+        values = {
+          ingress.enabled = false;
+          pg-boss-worker.enabled = true;
+          stakepool.databaseName = "stakepoolv2";
+        };
+      };
+
       "dev-preprod@us-east-1@v2" = final: {
         name = "${final.namespace}-cardanojs-v2";
         namespace = "dev-preprod";
@@ -362,6 +416,7 @@ in
         };
 
         values = {
+          stakepool.databaseName = "stakepoolv2";
           backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
           backend.hostnames = ["${final.namespace}.${baseUrl}"];
 
@@ -398,6 +453,7 @@ in
         };
 
         values = {
+          stakepool.databaseName = "stakepoolv2";
           backend.hostnames = ["${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
@@ -431,7 +487,10 @@ in
 
         projectors = {
           handle.enabled = true;
-          stake-pool.enabled = true;
+          stake-pool = {
+            enabled = true;
+            env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
+          };
           # asset.enabled = true;
         };
 
@@ -470,6 +529,34 @@ in
 
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
+          pg-boss-worker.queues = "pool-metadata,pool-metrics";
+        };
+      };
+
+      "live-mainnet@us-east-2@v3" = final: {
+        name = "${final.namespace}-cardanojs-v3";
+        namespace = "live-mainnet";
+        network = "mainnet";
+        region = "us-east-2";
+        context = "eks-admin";
+
+        projectors = {
+          stake-pool.enabled = true;
+        };
+
+        providers = {
+          backend = {
+            enabled = true;
+          };
+          stake-pool-provider = {
+            enabled = false;
+          };
+        };
+
+        values = {
+          ingress.enabled = false;
+          pg-boss-worker.enabled = true;
+          stakepool.databaseName = "stakepoolv2";
         };
       };
 
@@ -502,6 +589,8 @@ in
         };
 
         values = {
+          stakepool.databaseName = "stakepoolv2";
+
           cardano-services = {
             ingresOrder = 98;
             additionalRoutes = [
@@ -565,13 +654,17 @@ in
 
         projectors = {
           handle.enabled = true;
-          stake-pool.enabled = true;
+          stake-pool = {
+            enabled = true;
+            env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
+          };
         };
 
         values = {
           backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
+          pg-boss-worker.queues = "pool-metadata,pool-metrics";
           cardano-services = {
             ingresOrder = 98;
           };
@@ -591,6 +684,33 @@ in
               (map (v: "/v${v}/utxo") versions.utxo)
               (map (v: "/v${v}/handle") versions.handle)
             ];
+        };
+      };
+
+      "live-preprod@us-east-2@v3" = final: {
+        name = "${final.namespace}-cardanojs-v3";
+        namespace = "live-preprod";
+        network = "preprod";
+        region = "us-east-2";
+        context = "eks-admin";
+
+        projectors = {
+          stake-pool.enabled = true;
+        };
+
+        providers = {
+          backend = {
+            enabled = true;
+          };
+          stake-pool-provider = {
+            enabled = false;
+          };
+        };
+
+        values = {
+          ingress.enabled = false;
+          pg-boss-worker.enabled = true;
+          stakepool.databaseName = "stakepoolv2";
         };
       };
 
@@ -619,13 +739,17 @@ in
 
         projectors = {
           handle.enabled = true;
-          stake-pool.enabled = true;
+          stake-pool = {
+            enabled = true;
+            env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
+          };
         };
 
         values = {
           backend.hostnames = ["tmp-${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
+          pg-boss-worker.queues = "pool-metadata,pool-metrics";
           cardano-services = {
             ingresOrder = 98;
           };
@@ -645,6 +769,33 @@ in
               (map (v: "/v${v}/utxo") versions.utxo)
               (map (v: "/v${v}/handle") versions.handle)
             ];
+        };
+      };
+
+      "live-preprod@eu-central-1@v3" = final: {
+        name = "${final.namespace}-cardanojs-v3";
+        namespace = "live-preprod";
+        network = "preprod";
+        region = "eu-central-1";
+        context = "eks-admin";
+
+        projectors = {
+          stake-pool.enabled = true;
+        };
+
+        providers = {
+          backend = {
+            enabled = true;
+          };
+          stake-pool-provider = {
+            enabled = false;
+          };
+        };
+
+        values = {
+          ingress.enabled = false;
+          pg-boss-worker.enabled = true;
+          stakepool.databaseName = "stakepoolv2";
         };
       };
 
@@ -712,13 +863,17 @@ in
 
         projectors = {
           handle.enabled = true;
-          stake-pool.enabled = true;
+          stake-pool = {
+            enabled = true;
+            env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
+          };
         };
 
         values = {
           backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
+          pg-boss-worker.queues = "pool-metadata,pool-metrics";
           cardano-services = {
             ingresOrder = 98;
           };
@@ -738,6 +893,33 @@ in
               (map (v: "/v${v}/utxo") versions.utxo)
               (map (v: "/v${v}/handle") versions.handle)
             ];
+        };
+      };
+
+      "live-preview@us-east-2@v3" = final: {
+        name = "${final.namespace}-cardanojs-v3";
+        namespace = "live-preview";
+        network = "preview";
+        region = "us-east-2";
+        context = "eks-admin";
+
+        projectors = {
+          stake-pool.enabled = true;
+        };
+
+        providers = {
+          backend = {
+            enabled = true;
+          };
+          stake-pool-provider = {
+            enabled = false;
+          };
+        };
+
+        values = {
+          ingress.enabled = false;
+          pg-boss-worker.enabled = true;
+          stakepool.databaseName = "stakepoolv2";
         };
       };
 
@@ -766,13 +948,17 @@ in
 
         projectors = {
           handle.enabled = true;
-          stake-pool.enabled = true;
+          stake-pool = {
+            enabled = true;
+            env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
+          };
         };
 
         values = {
           backend.hostnames = ["tmp-${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
+          pg-boss-worker.queues = "pool-metadata,pool-metrics";
           cardano-services = {
             ingresOrder = 98;
           };
@@ -795,6 +981,32 @@ in
         };
       };
 
+      "live-preview@eu-central-1@v3" = final: {
+        name = "${final.namespace}-cardanojs-v3";
+        namespace = "live-preview";
+        network = "preview";
+        region = "eu-central-1";
+        context = "eks-admin";
+
+        projectors = {
+          stake-pool.enabled = true;
+        };
+
+        providers = {
+          backend = {
+            enabled = true;
+          };
+          stake-pool-provider = {
+            enabled = false;
+          };
+        };
+
+        values = {
+          ingress.enabled = false;
+          pg-boss-worker.enabled = true;
+          stakepool.databaseName = "stakepoolv2";
+        };
+      };
       "ops-preview-1@us-east-1" = final: {
         namespace = "ops-preview-1";
         network = "preview";
@@ -807,25 +1019,10 @@ in
         };
 
         values = {
+          stakepool.databaseName = "stakepoolv2";
           cardano-services = {
             ingresOrder = 99;
           };
-        };
-      };
-
-      "ops-preview-1@us-east-1@v2" = final: {
-        name = "${final.namespace}-cardanojs-v2";
-        namespace = "ops-preview-1";
-        network = "preview";
-        region = "us-east-1";
-
-        projectors = {
-          stake-pool.enabled = true;
-        };
-
-        values = {
-          ingress.enabled = false;
-          pg-boss-worker.enabled = true;
         };
       };
 
@@ -865,12 +1062,16 @@ in
         };
 
         projectors = {
-          stake-pool.enabled = true;
+          stake-pool = {
+            enabled = true;
+            env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
+          };
         };
 
         values = {
           blockfrost-worker.enabled = false;
           pg-boss-worker.enabled = true;
+          pg-boss-worker.queues = "pool-metadata,pool-metrics";
           backend.routes = let
             inherit (oci.meta) versions;
           in
@@ -913,5 +1114,63 @@ in
           };
         };
       };
+
+      "live-sanchonet@us-east-2@v2" = final: {
+        name = "${final.namespace}-cardanojs-v2";
+        namespace = "live-sanchonet";
+        network = "sanchonet";
+        region = "us-east-2";
+        context = "eks-admin";
+
+        projectors = {
+          stake-pool.enabled = true;
+        };
+
+        providers = {
+          backend = {
+            enabled = true;
+          };
+          stake-pool-provider = {
+            enabled = false;
+          };
+        };
+
+        values = {
+          ingress.enabled = false;
+          pg-boss-worker.enabled = true;
+          stakepool.databaseName = "stakepoolv2";
+        };
+      };
+
+      "live-sanchonet@eu-central-1@v2" = final: {
+        name = "${final.namespace}-cardanojs-v2";
+        namespace = "live-sanchonet";
+        network = "sanchonet";
+        region = "eu-central-1";
+        context = "eks-admin";
+
+        projectors = {
+          stake-pool = {
+            enabled = true;
+            env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
+          };
+        };
+
+        providers = {
+          backend = {
+            enabled = true;
+          };
+          stake-pool-provider = {
+            enabled = false;
+          };
+        };
+
+        values = {
+          ingress.enabled = false;
+          pg-boss-worker.enabled = true;
+          stakepool.databaseName = "stakepoolv2";
+        };
+      };
+
     };
   }
