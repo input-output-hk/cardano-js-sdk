@@ -204,7 +204,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       : new CardanoTokenRegistry({ logger }, args);
 
     return new TypeormAssetProvider(
-      { paginationPageSizeLimit: args.paginationPageSizeLimit! },
+      { paginationPageSizeLimit: Math.min(args.paginationPageSizeLimit! * 10, PAGINATION_PAGE_SIZE_LIMIT_ASSETS) },
       {
         connectionConfig$,
         entities: getEntities(['asset']),
