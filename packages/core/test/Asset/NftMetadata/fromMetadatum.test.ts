@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-useless-undefined */
 import { Asset, Cardano } from '../../../src';
 import { AssetName, Metadatum, PolicyId, TxMetadata } from '../../../src/Cardano';
 import { dummyLogger } from 'ts-log';
@@ -5,8 +6,9 @@ import { fromSerializableObject } from '@cardano-sdk/util';
 
 const logger = dummyLogger;
 
+// eslint-disable-next-line max-statements
 describe('NftMetadata.fromMetadatum', () => {
-  const assetNameStringUtf8 = 'CIP0025-v2';
+  const assetNameStringUtf8 = 'Cardano Timeline 2022';
   const assetNameString = Buffer.from(assetNameStringUtf8).toString('hex');
   const policyIdString = 'b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7';
   const assetImageIPFS = 'ipfs://QmWS6DgF8Ma8oooBn7CtD3ChHyzzMw5NXWfnDbVFTip8af';
@@ -20,25 +22,49 @@ describe('NftMetadata.fromMetadatum', () => {
 
   const minimalMetadata = new Map([
     ['image', ipfsUrl],
-    ['name', 'test nft']
+    ['name', assetNameStringUtf8]
   ]);
 
-  const minimalConvertedMetadata = {
+  const minimalConvertedMetadataV1 = {
     image: ipfsUrl,
-    name: 'test nft',
+    name: assetNameStringUtf8,
     version: '1.0'
   };
 
-  const assetName = 'Cardano Timeline 2022';
+  const minimalConvertedMetadataV2 = {
+    ...minimalConvertedMetadataV1,
+    version: '2.0'
+  };
 
   const validAsset = {
     name: Cardano.AssetName('43617264616e6f2054696d656c696e652032303232'),
     policyId: Cardano.PolicyId('41b20f83bdf559fa1580caf7960fd188e6aafacf5e81dfb089e82486')
   };
 
+  const createMetadataV1 = (assetMetadatum: Map<Metadatum, Metadatum>): TxMetadata =>
+    new Map<bigint, Metadatum>([
+      [721n, new Map([[policyIdString, new Map<Metadatum, Metadatum>([[assetNameStringUtf8, assetMetadatum]])]])]
+    ]);
+  const createMetadataV2 = (assetMetadatum: Map<Metadatum, Metadatum>): TxMetadata =>
+    new Map<bigint, Metadatum>([
+      [
+        721n,
+        new Map([
+          [
+            policyIdString,
+            new Map<Metadatum, Metadatum>([
+              [assetNameString, assetMetadatum],
+              ['version', '2.0']
+            ])
+          ]
+        ])
+      ]
+    ]);
+
   const createMetadatumWithFiles = (
     files: { __type: 'Map'; value: string[][] }[],
-    image: string | string[] = assetImageIPFS
+    image: string | string[],
+    name: string | undefined
   ) =>
     fromSerializableObject<Cardano.TxMetadata>({
       __type: 'Map',
@@ -57,12 +83,12 @@ describe('NftMetadata.fromMetadatum', () => {
                   __type: 'Map',
                   value: [
                     [
-                      assetName,
+                      assetNameStringUtf8,
                       {
                         __type: 'Map',
                         value: [
                           ['era', 'ALL'],
-                          ['name', assetName],
+                          ['name', name],
                           ['unit', 'none'],
                           ['files', files],
                           ['image', image],
@@ -72,7 +98,7 @@ describe('NftMetadata.fromMetadatum', () => {
                           ['website', 'https://ctimelines1.io'],
                           ['copyright', 'CTimelines 2021'],
                           ['mediaType', 'image/gif'],
-                          ['collection', assetName]
+                          ['collection', name]
                         ]
                       }
                     ]
@@ -87,46 +113,54 @@ describe('NftMetadata.fromMetadatum', () => {
 
   describe('invalid metadata on optional fields', () => {
     it('omits files with a missing file media type', () => {
-      const metadatum = createMetadatumWithFiles([
-        {
-          __type: 'Map',
-          value: [
-            ['src', 'ipfs://QmTcKWh95A5fTx1Bbw158cowWysvqLCWTgR9UBiEKD9cuh'],
-            ['name', 'BRAVO']
-          ]
-        },
-        {
-          __type: 'Map',
-          value: [
-            ['src', 'ipfs://QmTcKWh95A5fTx1Bbw158cowWysvqLCWTgR9UBiEKD9cuv'],
-            ['mediaType', 'image/png'],
-            ['name', 'BRAVO']
-          ]
-        }
-      ]);
+      const metadatum = createMetadatumWithFiles(
+        [
+          {
+            __type: 'Map',
+            value: [
+              ['src', 'ipfs://QmTcKWh95A5fTx1Bbw158cowWysvqLCWTgR9UBiEKD9cuh'],
+              ['name', 'BRAVO']
+            ]
+          },
+          {
+            __type: 'Map',
+            value: [
+              ['src', 'ipfs://QmTcKWh95A5fTx1Bbw158cowWysvqLCWTgR9UBiEKD9cuv'],
+              ['mediaType', 'image/png'],
+              ['name', 'BRAVO']
+            ]
+          }
+        ],
+        assetImageIPFS,
+        assetNameStringUtf8
+      );
       const result = Asset.NftMetadata.fromMetadatum(validAsset, metadatum, logger);
       expect(result).toBeTruthy();
       expect(result?.files).toHaveLength(1);
     });
 
     it('omits files with a missing file source', () => {
-      const metadatum = createMetadatumWithFiles([
-        {
-          __type: 'Map',
-          value: [
-            ['mediaType', 'image/png'],
-            ['name', 'BRAVO']
-          ]
-        },
-        {
-          __type: 'Map',
-          value: [
-            ['src', 'ipfs://QmTcKWh95A5fTx1Bbw158cowWysvqLCWTgR9UBiEKD9cuq'],
-            ['mediaType', 'image/png'],
-            ['name', 'BRAVO']
-          ]
-        }
-      ]);
+      const metadatum = createMetadatumWithFiles(
+        [
+          {
+            __type: 'Map',
+            value: [
+              ['mediaType', 'image/png'],
+              ['name', 'BRAVO']
+            ]
+          },
+          {
+            __type: 'Map',
+            value: [
+              ['src', 'ipfs://QmTcKWh95A5fTx1Bbw158cowWysvqLCWTgR9UBiEKD9cuq'],
+              ['mediaType', 'image/png'],
+              ['name', 'BRAVO']
+            ]
+          }
+        ],
+        assetImageIPFS,
+        assetNameStringUtf8
+      );
       const result = Asset.NftMetadata.fromMetadatum(validAsset, metadatum, logger);
       expect(result).toBeTruthy();
       expect(result?.files).toHaveLength(1);
@@ -150,65 +184,88 @@ describe('NftMetadata.fromMetadatum', () => {
     expect(Asset.NftMetadata.fromMetadatum(asset, metadatum, logger)).toBeNull();
   });
 
+  describe('name', () => {
+    describe('metadatum without name', () => {
+      const metadatum = createMetadataV2(new Map([['image', ipfsUrl]]));
+
+      describe('loose mode', () => {
+        it('returns metadata with empty name string', () => {
+          expect(Asset.NftMetadata.fromMetadatum(asset, metadatum, logger)).toMatchObject({
+            name: ''
+          });
+        });
+      });
+
+      describe('strict mode', () => {
+        it('returns null', () => {
+          expect(Asset.NftMetadata.fromMetadatum(asset, metadatum, logger, true)).toBeNull();
+        });
+      });
+    });
+  });
+
   it('returns null for cip25 metadatum with invalid image format', () => {
-    const metadatum = createMetadatumWithFiles([], 'http/tokens.cardano.org');
+    const metadatum = createMetadatumWithFiles([], 'http/tokens.cardano.org', assetNameStringUtf8);
     expect(Asset.NftMetadata.fromMetadatum(validAsset, metadatum, logger)).toBeNull();
   });
 
   it('returns metadata files with a missing file name', () => {
-    const metadatum = createMetadatumWithFiles([
-      {
-        __type: 'Map',
-        value: [
-          ['src', 'ipfs://QmTcKWh95A5fTx1Bbw158cowWysvqLCWTgR9UBiEKD9cuf'],
-          ['mediaType', 'image/png']
-        ]
-      },
-      {
-        __type: 'Map',
-        value: [
-          ['src', 'ipfs://QmTcKWh95A5fTx1Bbw158cowWysvqLCWTgR9UBiEKD9cu8'],
-          ['mediaType', 'image/png'],
-          ['name', 'BRAVO']
-        ]
-      }
-    ]);
+    const metadatum = createMetadatumWithFiles(
+      [
+        {
+          __type: 'Map',
+          value: [
+            ['src', 'ipfs://QmTcKWh95A5fTx1Bbw158cowWysvqLCWTgR9UBiEKD9cuf'],
+            ['mediaType', 'image/png']
+          ]
+        },
+        {
+          __type: 'Map',
+          value: [
+            ['src', 'ipfs://QmTcKWh95A5fTx1Bbw158cowWysvqLCWTgR9UBiEKD9cu8'],
+            ['mediaType', 'image/png'],
+            ['name', 'BRAVO']
+          ]
+        }
+      ],
+      assetImageIPFS,
+      assetNameStringUtf8
+    );
     const result = Asset.NftMetadata.fromMetadatum(validAsset, metadatum, logger);
     expect(result).toBeTruthy();
     expect(result?.files).toHaveLength(2);
   });
 
   it('converts minimal metadata', () => {
-    const metadatum: TxMetadata = new Map([
-      [721n, new Map([[policyIdString, new Map([[assetNameString, minimalMetadata]])]])]
-    ]);
-    expect(Asset.NftMetadata.fromMetadatum(asset, metadatum, logger)).toEqual(minimalConvertedMetadata);
+    const metadatum: TxMetadata = createMetadataV1(minimalMetadata);
+    expect(Asset.NftMetadata.fromMetadatum(asset, metadatum, logger)).toEqual(minimalConvertedMetadataV1);
   });
 
   it('supports asset name as utf8 string', () => {
     const metadatum: TxMetadata = new Map([
       [721n, new Map([[policyIdString, new Map([[assetNameStringUtf8, minimalMetadata]])]])]
     ]);
-    expect(Asset.NftMetadata.fromMetadatum(asset, metadatum, logger)).toEqual(minimalConvertedMetadata);
+    expect(Asset.NftMetadata.fromMetadatum(asset, metadatum, logger)).toEqual(minimalConvertedMetadataV1);
   });
 
   it('supports image with ipfs protocol as string', () => {
     const metadatum = createMetadatumWithFiles(
       [],
-      ['ipfs://bafybeihtdkq3ntfcewytdaimnrslpxsatsg47e3bqlsgi', '3jkax65pypymi']
+      ['ipfs://bafybeihtdkq3ntfcewytdaimnrslpxsatsg47e3bqlsgi', '3jkax65pypymi'],
+      assetNameStringUtf8
     );
     const result = Asset.NftMetadata.fromMetadatum(validAsset, metadatum, logger);
     expect(result?.image).toEqual('ipfs://bafybeihtdkq3ntfcewytdaimnrslpxsatsg47e3bqlsgi3jkax65pypymi');
   });
 
   it('supports image with ipfs protocol as array', () => {
-    const metadatum = createMetadatumWithFiles([], assetImageIPFS);
+    const metadatum = createMetadatumWithFiles([], assetImageIPFS, assetNameStringUtf8);
     const result = Asset.NftMetadata.fromMetadatum(validAsset, metadatum, logger);
     expect(result?.image).toEqual(assetImageIPFS);
   });
 
   it('supports image in https protocol', () => {
-    const metadatum = createMetadatumWithFiles([], assetImageHTTPS);
+    const metadatum = createMetadatumWithFiles([], assetImageHTTPS, assetNameStringUtf8);
     const result = Asset.NftMetadata.fromMetadatum(validAsset, metadatum, logger);
     expect(result?.image).toEqual(assetImageHTTPS);
   });
@@ -247,39 +304,21 @@ describe('NftMetadata.fromMetadatum', () => {
       'bAAVkCB2QJHJAlcEDWL3M8PyEcpB1DAAAAAElFTkSuQmCC'
     ];
 
-    const metadatum = createMetadatumWithFiles([], base64DecodedImage);
+    const metadatum = createMetadatumWithFiles([], base64DecodedImage, assetNameStringUtf8);
     const result = Asset.NftMetadata.fromMetadatum(validAsset, metadatum, logger);
     expect(result?.image).toEqual(base64DecodedImage.join(''));
   });
 
   it('replaces the name field with the asset_name when name is missing', () => {
     // Arrange
-    const assetNameUtf8 = 'Meld Bank Manager v1 1589';
-    const assetNameHex = Buffer.from(assetNameUtf8).toString('hex');
     const missingNameMetadata = new Map([['image', ipfsUrl]]);
-
-    const metadata = {
-      image: ipfsUrl,
-      name: 'Meld Bank Manager v1 1589',
-      version: '1.0'
-    };
-
-    const metadatum: TxMetadata = new Map([
-      [721n, new Map([[policyIdString, new Map([[assetNameUtf8, missingNameMetadata]])]])]
-    ]);
+    const metadatum: TxMetadata = createMetadataV1(missingNameMetadata);
 
     // Act
-    const result = Asset.NftMetadata.fromMetadatum(
-      {
-        name: AssetName(assetNameHex),
-        policyId: PolicyId(policyIdString)
-      },
-      metadatum,
-      logger
-    );
+    const result = Asset.NftMetadata.fromMetadatum(asset, metadatum, logger);
 
     // Assert
-    expect(result).toEqual(metadata);
+    expect(result).toEqual(minimalConvertedMetadataV1);
   });
 
   it('supports CIP-0025 v2', () => {
@@ -289,54 +328,28 @@ describe('NftMetadata.fromMetadatum', () => {
         new Map([[Buffer.from(policyIdString, 'hex'), new Map([[Buffer.from(assetNameStringUtf8), minimalMetadata]])]])
       ]
     ]);
-    expect(Asset.NftMetadata.fromMetadatum(asset, metadatum, logger)).toEqual(minimalConvertedMetadata);
+    expect(Asset.NftMetadata.fromMetadatum(asset, metadatum, logger)).toEqual(minimalConvertedMetadataV1);
   });
 
   it('converts version', () => {
-    const metadatum: TxMetadata = new Map([
-      [
-        721n,
-        new Map([
-          [
-            policyIdString,
-            new Map<Metadatum, Metadatum>([
-              [assetNameString, minimalMetadata],
-              ['version', '2.0']
-            ])
-          ]
-        ])
-      ]
-    ]);
+    const metadatum: TxMetadata = createMetadataV2(minimalMetadata);
     expect(Asset.NftMetadata.fromMetadatum(asset, metadatum, logger)).toEqual({
-      ...minimalConvertedMetadata,
+      ...minimalConvertedMetadataV1,
       version: '2.0'
     });
   });
 
   it('coverts optional properties (mediaType, description and <other properties>)', () => {
-    const metadatum: TxMetadata = new Map([
-      [
-        721n,
-        new Map([
-          [
-            policyIdString,
-            new Map<Metadatum, Metadatum>([
-              [
-                assetNameString,
-                new Map([
-                  ...minimalMetadata.entries(),
-                  ['description', 'description'],
-                  ['extraProp', 'extra'],
-                  ['mediaType', 'image/png']
-                ])
-              ]
-            ])
-          ]
-        ])
-      ]
-    ]);
+    const metadatum: TxMetadata = createMetadataV1(
+      new Map([
+        ...minimalMetadata.entries(),
+        ['description', 'description'],
+        ['extraProp', 'extra'],
+        ['mediaType', 'image/png']
+      ])
+    );
     expect(Asset.NftMetadata.fromMetadatum(asset, metadatum, logger)).toEqual({
-      ...minimalConvertedMetadata,
+      ...minimalConvertedMetadataV1,
       description: 'description',
       mediaType: 'image/png',
       otherProperties: new Map([['extraProp', 'extra']])
@@ -431,24 +444,11 @@ describe('NftMetadata.fromMetadatum', () => {
       ['src', base64FileSrc]
     ]);
 
-    const metadatum: TxMetadata = new Map([
-      [
-        721n,
-        new Map([
-          [
-            policyIdString,
-            new Map<Metadatum, Metadatum>([
-              [
-                assetNameString,
-                new Map<Metadatum, Metadatum>([...minimalMetadata.entries(), ['files', [file1, file2, file3]]])
-              ]
-            ])
-          ]
-        ])
-      ]
-    ]);
+    const metadatum: TxMetadata = createMetadataV2(
+      new Map<Metadatum, Metadatum>([...minimalMetadata.entries(), ['files', [file1, file2, file3]]])
+    );
     expect(Asset.NftMetadata.fromMetadatum(asset, metadatum, logger)).toEqual({
-      ...minimalConvertedMetadata,
+      ...minimalConvertedMetadataV2,
       files: [
         { mediaType: 'image/jpg', name: 'file1', src: 'https://file1.location' },
         {
