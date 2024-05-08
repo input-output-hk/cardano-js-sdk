@@ -12,16 +12,19 @@ export class TypeOrmNftMetadataService extends TypeormService implements NftMeta
     const assetId = Cardano.AssetId.fromParts(assetInfo.policyId, assetInfo.name);
     return this.withDataSource(async (dataSource) => {
       const queryRunner = dataSource.createQueryRunner();
-      const nftMetadataRepository = queryRunner.manager.getRepository(NftMetadataEntity);
+      let asset: NftMetadataEntity | null;
 
-      const asset = await nftMetadataRepository
-        .findOneBy({
+      try {
+        const nftMetadataRepository = queryRunner.manager.getRepository(NftMetadataEntity);
+        asset = await nftMetadataRepository.findOneBy({
           userTokenAsset: { id: assetId }
-        })
-        .catch((error) => {
-          this.logger.error(error);
-          return null;
         });
+      } catch (error) {
+        this.logger.error(error);
+        asset = null;
+      } finally {
+        await queryRunner.release();
+      }
 
       if (!asset) {
         return null;
