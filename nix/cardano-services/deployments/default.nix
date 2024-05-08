@@ -746,7 +746,7 @@ in
         };
 
         values = {
-          backend.hostnames = ["tmp-${final.namespace}.${baseUrl}"];
+          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
           pg-boss-worker.queues = "pool-metadata,pool-metrics";
@@ -955,7 +955,7 @@ in
         };
 
         values = {
-          backend.hostnames = ["tmp-${final.namespace}.${baseUrl}"];
+          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
           pg-boss-worker.queues = "pool-metadata,pool-metrics";
