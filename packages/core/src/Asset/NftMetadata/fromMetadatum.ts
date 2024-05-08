@@ -10,6 +10,7 @@ import { isNotNil } from '@cardano-sdk/util';
 import difference from 'lodash/difference';
 
 const isString = (obj: unknown): obj is string => typeof obj === 'string';
+const VersionRegExp = /^\d+\.?\d?$/;
 
 const metadatumToString = (metadatum: Cardano.Metadatum | undefined): string | undefined => {
   if (Array.isArray(metadatum)) {
@@ -109,6 +110,17 @@ const getName = (assetMetadata: Cardano.MetadatumMap, version: string, asset: As
   }
 };
 
+const parseVersion = (version: Cardano.Metadatum | undefined) => {
+  if (!version) return '1.0';
+  if (typeof version === 'bigint') {
+    return `${version}.0`;
+  }
+  const stringVersion = asString(version);
+  if (stringVersion && VersionRegExp.test(stringVersion)) {
+    return `${Number(stringVersion)}.0`;
+  }
+};
+
 /**
  * @param asset try to parse NftMetadata for this asset
  * @param metadata transaction metadata (see CIP-0025)
@@ -127,7 +139,8 @@ export const fromMetadatum = (
   if (!cip25MetadatumMap) return null;
   const policy = getPolicyMetadata(cip25MetadatumMap, asset.policyId);
   if (!policy) return null;
-  const version = asString(policy.get('version')) || '1.0';
+  const version = parseVersion(policy.get('version'));
+  if (!version) return null;
   const assetMetadata = getAssetMetadata(policy, asset.name);
   if (!assetMetadata) return null;
   const name = getName(assetMetadata, version, asset, logger);

@@ -45,7 +45,7 @@ describe('NftMetadata.fromMetadatum', () => {
     new Map<bigint, Metadatum>([
       [721n, new Map([[policyIdString, new Map<Metadatum, Metadatum>([[assetNameStringUtf8, assetMetadatum]])]])]
     ]);
-  const createMetadataV2 = (assetMetadatum: Map<Metadatum, Metadatum>): TxMetadata =>
+  const createMetadataV2 = (assetMetadatum: Map<Metadatum, Metadatum>, version: Metadatum = 2n): TxMetadata =>
     new Map<bigint, Metadatum>([
       [
         721n,
@@ -54,7 +54,7 @@ describe('NftMetadata.fromMetadatum', () => {
             policyIdString,
             new Map<Metadatum, Metadatum>([
               [assetNameString, assetMetadatum],
-              ['version', '2.0']
+              ['version', version]
             ])
           ]
         ])
@@ -331,11 +331,30 @@ describe('NftMetadata.fromMetadatum', () => {
     expect(Asset.NftMetadata.fromMetadatum(asset, metadatum, logger)).toEqual(minimalConvertedMetadataV1);
   });
 
-  it('converts version', () => {
-    const metadatum: TxMetadata = createMetadataV2(minimalMetadata);
-    expect(Asset.NftMetadata.fromMetadatum(asset, metadatum, logger)).toEqual({
+  describe('version', () => {
+    const expectedMetadata = {
       ...minimalConvertedMetadataV1,
       version: '2.0'
+    };
+
+    it('can parse version as string that is a floating point number', () => {
+      const metadatum: TxMetadata = createMetadataV2(minimalMetadata, '2.0');
+      expect(Asset.NftMetadata.fromMetadatum(asset, metadatum, logger)).toEqual(expectedMetadata);
+    });
+
+    it('can parse version as string that is an integer number', () => {
+      const metadatum: TxMetadata = createMetadataV2(minimalMetadata, '2');
+      expect(Asset.NftMetadata.fromMetadatum(asset, metadatum, logger)).toEqual(expectedMetadata);
+    });
+
+    it('returns null if version is a string that has non-number characters', () => {
+      const metadatum: TxMetadata = createMetadataV2(minimalMetadata, '1a');
+      expect(Asset.NftMetadata.fromMetadatum(asset, metadatum, logger)).toBeNull();
+    });
+
+    it('can parse version as bigint', () => {
+      const metadatum: TxMetadata = createMetadataV2(minimalMetadata, 2n);
+      expect(Asset.NftMetadata.fromMetadatum(asset, metadatum, logger)).toEqual(expectedMetadata);
     });
   });
 
