@@ -746,7 +746,7 @@ in
         };
 
         values = {
-          backend.hostnames = ["tmp-${final.namespace}.${baseUrl}"];
+          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
           pg-boss-worker.queues = "pool-metadata,pool-metrics";
@@ -923,6 +923,45 @@ in
         };
       };
 
+      "live-preview@eu-central-1@v1" = final: {
+        name = "${final.namespace}-cardanojs-v1";
+        namespace = "live-preview";
+        context = "eks-admin";
+        network = "preview";
+        region = "eu-central-1";
+
+        providers = {
+          backend = {
+            enabled = true;
+            env.NODE_ENV = "production";
+          };
+        };
+
+        values = {
+          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
+          backend.passHandleDBArgs = false;
+          backend.routes = [
+            "/v1.0.0/health"
+            "/v1.0.0/live"
+            "/v1.0.0/meta"
+            "/v1.0.0/ready"
+            "/v1.0.0/asset"
+            "/v2.0.0/chain-history"
+            "/v1.0.0/handle"
+            "/v1.0.0/network-info"
+            "/v1.0.0/rewards"
+            "/v1.0.0/stake-pool"
+            "/v2.0.0/tx-submit"
+            "/v2.0.0/utxo"
+          ];
+          # blockfrost-worker.enabled = true;
+          cardano-services = {
+            ingresOrder = 99;
+            image = "926093910549.dkr.ecr.us-east-1.amazonaws.com/cardano-services:s8j5nx9x2naar194pr58kpmlr5s4xn7b";
+          };
+        };
+      };
+
       "live-preview@eu-central-1@v2" = final: {
         name = "${final.namespace}-cardanojs-v2";
         namespace = "live-preview";
@@ -955,7 +994,7 @@ in
         };
 
         values = {
-          backend.hostnames = ["tmp-${final.namespace}.${baseUrl}"];
+          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
           pg-boss-worker.queues = "pool-metadata,pool-metrics";
