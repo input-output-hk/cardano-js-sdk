@@ -92,8 +92,9 @@ export const fromPlutusData = (
   parentLogger: Logger
 ): NftMetadata | null => {
   const logger = contextLogger(parentLogger, 'NftMetadata.fromPlutusData');
-  if (!isConstrPlutusData(plutusData) || plutusData.constructor !== 0n || plutusData.fields.items.length < 3) {
-    logger.debug('Invalid PlutusData: expecting ConstrPlutusData with 0th constructor and 3 items');
+  if (!isConstrPlutusData(plutusData) || plutusData.constructor !== 0n || plutusData.fields.items.length < 2) {
+    // Actually CIP-68 requires exactly 3 items, but it is not how NMKR mints it
+    logger.debug('Invalid PlutusData: expecting ConstrPlutusData with 0th constructor and 2 items');
     return null;
   }
 

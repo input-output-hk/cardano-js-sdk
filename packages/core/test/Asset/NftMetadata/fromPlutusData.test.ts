@@ -318,4 +318,19 @@ describe('NftMetadata.fromPlutusData', () => {
     expect(typeof nftMetadata.otherProperties?.get('og')).toBe('bigint');
     expect(nftMetadata.files).toBeUndefined();
   });
+
+  it('can convert NMKR datum', () => {
+    const nmkrDatum = HexBlob(
+      'd8799fa5446e616d654b6e6d6b724e4654386d617945696d6167655835697066733a2f2f516d4e77566157314b655471424a4b4b6963355553443165424c41315a48396b596b455674535952423646314d64496d656469615479706549696d6167652f706e674b6465736372697074696f6e404566696c65739fa3496d656469615479706549696d6167652f706e67446e616d654b6e6d6b724e4654386d6179437372635835697066733a2f2f516d4e77566157314b655471424a4b4b6963355553443165424c41315a48396b596b455674535952423646314d64ff01ff'
+    );
+    const datum = Serialization.Datum.newInlineData(
+      Serialization.PlutusData.fromCbor(nmkrDatum)
+    ).toCore() as Cardano.PlutusData;
+
+    const nftMetadata = Asset.NftMetadata.fromPlutusData(datum, logger)!;
+
+    expect(nftMetadata).toMatchObject({
+      name: 'nmkrNFT8may'
+    });
+  });
 });
