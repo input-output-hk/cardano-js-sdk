@@ -13,6 +13,7 @@ import { Ed25519PublicKeyHex, Ed25519SignatureHex, Hash28ByteBase16 } from '@car
 import { HexBlob } from '@cardano-sdk/util';
 import { InMemoryWallet, KeyAgentFactory, SigningCoordinator, WalletType, WrongTargetError } from '../../src';
 import { createAccount } from './util';
+import { dummyLogger } from 'ts-log';
 import { firstValueFrom } from 'rxjs';
 
 describe('SigningCoordinator', () => {
@@ -54,7 +55,7 @@ describe('SigningCoordinator', () => {
           }
         }
       },
-      { keyAgentFactory }
+      { keyAgentFactory, logger: dummyLogger }
     );
   });
 
