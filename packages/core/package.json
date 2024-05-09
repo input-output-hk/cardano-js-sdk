@@ -55,8 +55,8 @@
     }
   },
   "dependencies": {
-    "@cardano-ogmios/client": "6.2.0",
-    "@cardano-ogmios/schema": "6.2.0",
+    "@cardano-ogmios/client": "6.3.0",
+    "@cardano-ogmios/schema": "6.3.0",
     "@cardano-sdk/crypto": "workspace:~",
     "@cardano-sdk/util": "workspace:~",
     "@foxglove/crc": "^0.0.3",
