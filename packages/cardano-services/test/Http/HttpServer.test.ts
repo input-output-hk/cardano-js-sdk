@@ -188,13 +188,15 @@ describe('HttpServer', () => {
         {
           body: { bigint: 23n, check: 'ok', test: 42 },
           method: 'POST',
-          path: path.join(someServiceVersionPath, 'stake-pool', 'echo'),
+          // Note: `.replaceAll(path.sep, '/')` is needed on Windows:
+          path: path.join(someServiceVersionPath, 'stake-pool', 'echo').replaceAll(path.sep, '/'),
           query: {}
         },
         {
           body: {},
           method: 'GET',
-          path: path.join(someServiceVersionPath, 'stake-pool', 'echo'),
+          // Note: `.replaceAll(path.sep, '/')` is needed on Windows:
+          path: path.join(someServiceVersionPath, 'stake-pool', 'echo').replaceAll(path.sep, '/'),
           query: { bigint: '23', check: 'ok', test: '42' }
         }
       ]);
