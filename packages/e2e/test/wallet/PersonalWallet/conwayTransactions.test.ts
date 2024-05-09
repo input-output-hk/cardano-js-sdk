@@ -102,16 +102,16 @@ describe('PersonalWallet/conwayTransactions', () => {
     };
   };
 
-  const feedDRepWallet = async () => {
+  const feedDRepWallet = async (amount: bigint) => {
     const balance = await firstValueFrom(dRepWallet.balance.utxo.total$);
 
-    if (balance.coins > 10_000_000n) return;
+    if (balance.coins > amount) return;
 
     const address = await firstValueFrom(dRepWallet.addresses$.pipe(map((addresses) => addresses[0].address)));
 
     const signedTx = await wallet
       .createTxBuilder()
-      .addOutput({ address, value: { coins: 20_000_000n } })
+      .addOutput({ address, value: { coins: amount } })
       .build()
       .sign();
 
@@ -167,13 +167,15 @@ describe('PersonalWallet/conwayTransactions', () => {
       getTestWallet(1, 'Conway DRep Wallet', 0n)
     ]);
 
-    [, dRepCredential, [dRepDeposit, governanceActionDeposit, stakeKeyDeposit], poolId, stakeCredential] =
-      await Promise.all([feedDRepWallet(), getDRepCredential(), getDeposits(), getPoolId(), getStakeCredential()]);
+    [dRepCredential, [dRepDeposit, governanceActionDeposit, stakeKeyDeposit], poolId, stakeCredential] =
+      await Promise.all([getDRepCredential(), getDeposits(), getPoolId(), getStakeCredential()]);
+
+    await feedDRepWallet(dRepDeposit * 2n);
 
     if (!(await isRegisteredDRep())) await sendDRepRegCert(true);
   });
 
-  beforeEach(() => unDelegateWallet(wallet));
+  beforeEach(async () => await unDelegateWallet(wallet));
 
   afterAll(async () => {
     await sendDRepRegCert(false);
