@@ -336,7 +336,7 @@ const mapAuxiliaryData = (
   return { auxiliaryData, auxiliaryDataHash };
 };
 
-const mapTxIn = (txIn: Schema.TransactionOutputReference): Cardano.TxIn => ({
+export const mapTxIn = (txIn: Schema.TransactionOutputReference): Cardano.TxIn => ({
   index: txIn.index,
   txId: Cardano.TransactionId(txIn.transaction.id)
 });
