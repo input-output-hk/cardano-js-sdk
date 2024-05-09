@@ -106,14 +106,18 @@ export const asTxSubmissionErrorCode = (code: unknown): TxSubmissionErrorCode | 
 
 export const isOutsideOfValidityIntervalError = (
   error: unknown
-): error is TxSubmissionError<OutsideOfValidityIntervalData> =>
+): error is TxSubmissionError<OutsideOfValidityIntervalData | null> =>
   error instanceof TxSubmissionError && error.code === TxSubmissionErrorCode.OutsideOfValidityInterval;
 
-export const isValueNotConservedError = (error: unknown): error is TxSubmissionError<ValueNotConservedData> =>
+export const isValueNotConservedError = (error: unknown): error is TxSubmissionError<ValueNotConservedData | null> =>
   error instanceof TxSubmissionError && error.code === TxSubmissionErrorCode.ValueNotConserved;
 
-export const isIncompleteWithdrawalsError = (error: unknown): error is TxSubmissionError<IncompleteWithdrawalsData> =>
+export const isIncompleteWithdrawalsError = (
+  error: unknown
+): error is TxSubmissionError<IncompleteWithdrawalsData | null> =>
   error instanceof TxSubmissionError && error.code === TxSubmissionErrorCode.IncompleteWithdrawals;
 
-export const isUnknownOutputReferences = (error: unknown): error is TxSubmissionError<UnknownOutputReferencesData> =>
+export const isUnknownOutputReferences = (
+  error: unknown
+): error is TxSubmissionError<UnknownOutputReferencesData | null> =>
   error instanceof TxSubmissionError && error.code === TxSubmissionErrorCode.UnknownOutputReferences;
