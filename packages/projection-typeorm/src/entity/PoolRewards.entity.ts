@@ -1,7 +1,7 @@
-import { BigIntColumnOptions, UInt64ColumnOptions } from './util';
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
 import { StakePoolEntity } from './StakePool.entity';
+import { UInt64ColumnOptions } from './util';
 
 @Entity()
 @Unique(['epochNo', 'stakePoolId'])
@@ -25,7 +25,7 @@ export class PoolRewardsEntity {
   @Column({ type: 'integer' })
   delegators?: number;
 
-  @Column(BigIntColumnOptions)
+  @Column(UInt64ColumnOptions)
   pledge?: Cardano.Lovelace;
 
   @Column(UInt64ColumnOptions)
