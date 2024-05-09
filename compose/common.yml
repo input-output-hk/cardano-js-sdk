@@ -78,16 +78,19 @@ x-sdk-environment: &sdk-environment
   POSTGRES_DB_FILE_HANDLE: /run/secrets/postgres_db_handle
   POSTGRES_DB_FILE_STAKE_POOL: /run/secrets/postgres_db_stake_pool
   POSTGRES_HOST_DB_SYNC: postgres
+  POSTGRES_HOST_ASSET: postgres
   POSTGRES_HOST_HANDLE: postgres
   POSTGRES_HOST_STAKE_POOL: postgres
   POSTGRES_POOL_MAX_DB_SYNC: ${POSTGRES_POOL_MAX:-10}
   POSTGRES_POOL_MAX_HANDLE: ${POSTGRES_POOL_MAX:-10}
+  POSTGRES_POOL_MAX_ASSET: ${POSTGRES_POOL_MAX:-10}
   POSTGRES_POOL_MAX_STAKE_POOL: ${POSTGRES_POOL_MAX:-10}
   POSTGRES_PASSWORD_FILE_ASSET: /run/secrets/postgres_password
   POSTGRES_PASSWORD_FILE_DB_SYNC: /run/secrets/postgres_password
   POSTGRES_PASSWORD_FILE_HANDLE: /run/secrets/postgres_password
   POSTGRES_PASSWORD_FILE_STAKE_POOL: /run/secrets/postgres_password
   POSTGRES_PORT_DB_SYNC: 5432
+  POSTGRES_PORT_ASSET: 5432
   POSTGRES_PORT_HANDLE: 5432
   POSTGRES_PORT_STAKE_POOL: 5432
   POSTGRES_USER_FILE_ASSET: /run/secrets/postgres_user
@@ -341,6 +344,7 @@ services:
         - *sdk-environment
         - *provider-server-environment
       SERVICE_NAMES: asset
+      USE_TYPEORM_ASSET_PROVIDER: true
     ports:
       - ${HANDLE_API_PORT:-4014}:3000
 
