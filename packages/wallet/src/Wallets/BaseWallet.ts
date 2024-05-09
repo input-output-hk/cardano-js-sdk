@@ -656,7 +656,8 @@ export class BaseWallet implements ObservableWallet {
         ((CardanoNodeUtil.isValueNotConservedError(error.innerError) && error.innerError.data.produced.coins === 0n) ||
           // TODO: check if IncompleteWithdrawals available withdrawal amount === wallet's reward acc balance?
           // Not sure what the 'Withdrawals' in error data is exactly: value being withdrawed, or reward acc balance
-          CardanoNodeUtil.isIncompleteWithdrawalsError(error.innerError))
+          CardanoNodeUtil.isIncompleteWithdrawalsError(error.innerError) ||
+          CardanoNodeUtil.isUnknownOutputReferences(error.innerError))
       ) {
         this.#logger.debug(
           `Transaction ${outgoingTx.id} failed with ${error.innerError}, but it appears to be already submitted...`

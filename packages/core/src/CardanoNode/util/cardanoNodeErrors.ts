@@ -10,6 +10,7 @@ import {
   StateQueryErrorCode,
   TxSubmissionError,
   TxSubmissionErrorCode,
+  UnknownOutputReferencesData,
   ValueNotConservedData
 } from '../types';
 import { isProductionEnvironment, stripStackTrace } from '@cardano-sdk/util';
@@ -113,3 +114,6 @@ export const isValueNotConservedError = (error: unknown): error is TxSubmissionE
 
 export const isIncompleteWithdrawalsError = (error: unknown): error is TxSubmissionError<IncompleteWithdrawalsData> =>
   error instanceof TxSubmissionError && error.code === TxSubmissionErrorCode.IncompleteWithdrawals;
+
+export const isUnknownOutputReferences = (error: unknown): error is TxSubmissionError<UnknownOutputReferencesData> =>
+  error instanceof TxSubmissionError && error.code === TxSubmissionErrorCode.UnknownOutputReferences;
