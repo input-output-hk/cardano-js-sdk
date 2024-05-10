@@ -48,6 +48,7 @@ export interface StakePoolRewardsJob {
 }
 
 export const defaultJobOptions: SendOptions = {
+  retentionDays: 365, // keep the job in a state that can be retried for one year
   retryDelay: 6 * 3600, // 6 hours
   retryLimit: 1_000_000 // retry forever
 };
