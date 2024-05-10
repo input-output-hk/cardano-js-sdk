@@ -46,9 +46,12 @@ in {
     imports = [formattingModule];
 
     packages = with inputs.nixpkgs; [
-      tmate
       awscli2
+      just
       kubectl
+      netcat
+      postgresql_14
+      tmate
     ];
 
     env = with inputs.nixpkgs; [
