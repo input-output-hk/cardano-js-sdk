@@ -362,37 +362,13 @@ in
             ];
           };
           backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
+          stakepool.databaseName = "stakepoolv2";
 
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
         };
       };
 
-      "dev-mainnet@us-east-1@v2" = final: {
-        name = "${final.namespace}-cardanojs-v2";
-        namespace = "dev-mainnet";
-        network = "mainnet";
-        region = "us-east-1";
-
-        projectors = {
-          stake-pool.enabled = true;
-        };
-
-        providers = {
-          backend = {
-            enabled = true;
-          };
-          stake-pool-provider = {
-            enabled = false;
-          };
-        };
-
-        values = {
-          ingress.enabled = false;
-          pg-boss-worker.enabled = true;
-          stakepool.databaseName = "stakepoolv2";
-        };
-      };
 
       "dev-preprod@us-east-1@v2" = final: {
         name = "${final.namespace}-cardanojs-v2";
