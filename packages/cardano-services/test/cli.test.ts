@@ -1050,21 +1050,6 @@ describe('CLI', () => {
       });
     });
 
-    describe('useKoraLabs', () => {
-      testCli('accepts a boolean', 'provider', {
-        args: ['--use-kora-labs', 'true'],
-        env: { USE_KORA_LABS: 'true' },
-        expectedArgs: { args: { useKoraLabs: true } }
-      });
-
-      testCli('expects a boolean', 'provider', {
-        args: ['--use-kora-labs', 'test'],
-        env: { USE_KORA_LABS: 'test' },
-        expectedError:
-          'Provider server requires a valid Use the KoraLabs handle provider program option. Expected: false, true'
-      });
-    });
-
     describe('useSubmitApi', () => {
       testCli('accepts a boolean', 'provider', {
         args: ['--use-submit-api', 'true'],

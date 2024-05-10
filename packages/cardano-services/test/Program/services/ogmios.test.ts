@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Cardano, CardanoNodeErrors, ProviderError } from '@cardano-sdk/core';
+import { CardanoNodeErrors, ProviderError } from '@cardano-sdk/core';
 import { Connection } from '@cardano-ogmios/client';
 import { DbPools, LedgerTipModel, findLedgerTip } from '../../../src/util/DbSyncProvider';
 import { DbSyncEpochPollService, listenPromise, loadGenesisData, serverClosePromise } from '../../../src/util';
@@ -15,7 +15,6 @@ import {
   getPool
 } from '../../../src';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
-import { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
 import { Ogmios, OgmiosCardanoNode, OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
@@ -28,6 +27,7 @@ import {
 } from '../../util';
 import { createMockOgmiosServer } from '../../../../ogmios/test/mocks/mockOgmiosServer';
 import { getPort, getRandomPort } from 'get-port-please';
+import { handleHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { handleProviderMocks, logger } from '@cardano-sdk/util-dev';
 import { healthCheckResponseMock } from '../../../../core/test/CardanoNode/mocks';
 import { mockDnsResolverFactory } from './util';
@@ -37,15 +37,15 @@ import http from 'http';
 
 jest.mock('@cardano-sdk/cardano-services-client', () => ({
   ...jest.requireActual('@cardano-sdk/cardano-services-client'),
-  KoraLabsHandleProvider: jest.fn().mockImplementation(() => ({
+  handleHttpProvider: jest.fn().mockImplementation(() => ({
     healthCheck: jest.fn(),
     resolveHandles: jest.fn().mockResolvedValue([handleProviderMocks.getAliceHandleProviderResponse])
   }))
 }));
 
-const handleProvider = new KoraLabsHandleProvider({
-  policyId: Cardano.PolicyId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb'),
-  serverUrl: 'https://localhost:3000'
+const handleProvider = handleHttpProvider({
+  baseUrl: 'https://localhost:3000',
+  logger
 });
 
 jest.mock('dns', () => ({
