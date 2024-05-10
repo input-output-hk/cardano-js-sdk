@@ -46,6 +46,7 @@ in {
     imports = [formattingModule];
 
     packages = with inputs.nixpkgs; [
+      tmate
       awscli2
       kubectl
     ];
