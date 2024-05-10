@@ -406,6 +406,44 @@ in
         };
       };
 
+      "dev-preprod-resync@us-east-1@v2" = final: {
+        name = "${final.namespace}-cardanojs-v2";
+        namespace = "dev-preprod-resync";
+        context = "eks-devs";
+        network = "preprod";
+        region = "us-east-1";
+
+        providers = {
+          backend = {
+            enabled = true;
+            env.NODE_EXTRA_OPTIONS = "--trace-gc";
+          };
+          stake-pool-provider = {
+            enabled = true;
+            env.OVERRIDE_FUZZY_OPTIONS = "true";
+          };
+          handle-provider.enabled = true;
+        };
+
+        projectors = {
+          handle.enabled = true;
+          stake-pool.enabled = true;
+        };
+
+        values = {
+          stakepool.databaseName = "stakepoolv2";
+          backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
+          backend.hostnames = ["${final.namespace}.${baseUrl}"];
+
+          pg-boss-worker.enabled = true;
+
+          blockfrost-worker.enabled = true;
+          cardano-services = {
+            ingresOrder = 98;
+          };
+        };
+      };
+
       "staging-preprod@us-east-1@v2" = final: {
         name = "${final.namespace}-cardanojs-v2";
         namespace = "staging-preprod";
