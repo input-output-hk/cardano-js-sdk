@@ -498,6 +498,7 @@ in
         };
 
         values = {
+          stakepool.databaseName = "stakepoolv2";
           cardano-services = {
             ingresOrder = 98;
             additionalRoutes = [
@@ -559,7 +560,6 @@ in
         values = {
           ingress.enabled = false;
           pg-boss-worker.enabled = true;
-          stakepool.databaseName = "stakepoolv2";
         };
       };
 
@@ -608,8 +608,7 @@ in
             ];
           };
           backend.allowedOrigins = lib.concatStringsSep "," allowedOrigins;
-          # backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
-          backend.hostnames = ["tmp-${final.namespace}.${baseUrl}"];
+          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           backend.routes = let
             inherit (oci.meta) versions;
           in
