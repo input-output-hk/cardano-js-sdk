@@ -507,6 +507,8 @@ in
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
           pg-boss-worker.queues = "pool-metadata,pool-metrics";
+          pg-boss-worker.resources.limits = mkPodResources "700Mi" "700m";
+          pg-boss-worker.resources.requests = mkPodResources "150Mi" "200m";
         };
       };
 
@@ -601,6 +603,9 @@ in
 
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
+          pg-boss-worker.resources.limits = mkPodResources "700Mi" "700m";
+          pg-boss-worker.resources.requests = mkPodResources "150Mi" "200m";
+
         };
       };
 
