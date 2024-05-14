@@ -102,20 +102,22 @@ describe('PersonalWallet/conwayTransactions', () => {
     };
   };
 
+  // TODO LW-10555: Revert this to feed the dRep wallet, not the `wallet`, once the dbsync bug is fixed
+  // https://github.com/IntersectMBO/cardano-db-sync/issues/1702
   const feedDRepWallet = async (amount: bigint) => {
-    const balance = await firstValueFrom(dRepWallet.balance.utxo.total$);
+    const balance = await firstValueFrom(wallet.balance.utxo.total$);
 
     if (balance.coins > amount) return;
 
-    const address = await firstValueFrom(dRepWallet.addresses$.pipe(map((addresses) => addresses[0].address)));
+    const address = await firstValueFrom(wallet.addresses$.pipe(map((addresses) => addresses[0].address)));
 
-    const signedTx = await wallet
+    const signedTx = await dRepWallet
       .createTxBuilder()
       .addOutput({ address, value: { coins: amount } })
       .build()
       .sign();
 
-    await submitAndConfirm(wallet, signedTx.tx, 1);
+    await submitAndConfirm(dRepWallet, signedTx.tx, 1);
   };
 
   const sendDRepRegCert = async (register: boolean) => {
@@ -162,15 +164,19 @@ describe('PersonalWallet/conwayTransactions', () => {
     Serialization.CborSet.useConwaySerialization = true;
     Serialization.Redeemers.useConwaySerialization = true;
 
-    [wallet, dRepWallet] = await Promise.all([
-      getTestWallet(0, 'Conway Wallet', 100_000_000n),
-      getTestWallet(1, 'Conway DRep Wallet', 0n)
+    // TODO LW-10555: Revert this so that wallet is at account 0 and drepWallet at account 1, once the dbsync bug is fixed
+    // https://github.com/IntersectMBO/cardano-db-sync/issues/1702
+    [dRepWallet, wallet] = await Promise.all([
+      getTestWallet(0, 'Conway DRep Wallet', 100_000_000n),
+      getTestWallet(1, 'Conway Wallet', 0n)
     ]);
 
     [dRepCredential, [dRepDeposit, governanceActionDeposit, stakeKeyDeposit], poolId, stakeCredential] =
       await Promise.all([getDRepCredential(), getDeposits(), getPoolId(), getStakeCredential()]);
 
-    await feedDRepWallet(dRepDeposit * 2n);
+    // TODO LW-10555: Revert this to use the 2*drepDeposit, once the dbsync bug is fixed
+    // https://github.com/IntersectMBO/cardano-db-sync/issues/1702
+    await feedDRepWallet(governanceActionDeposit * 6n + 100_000_000n);
 
     if (!(await isRegisteredDRep())) await sendDRepRegCert(true);
   });
