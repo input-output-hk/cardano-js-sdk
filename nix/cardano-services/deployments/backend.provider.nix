@@ -11,7 +11,7 @@
     metricsPath = "${values.cardano-services.httpPrefix}/metrics";
 
     livenessProbe = {
-      timeoutSeconds = 5;
+      timeoutSeconds = 20;
       httpGet = {
         path = "${values.cardano-services.httpPrefix}/health";
         port = 3000;
