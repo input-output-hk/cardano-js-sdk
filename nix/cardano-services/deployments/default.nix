@@ -193,13 +193,13 @@ in
             env.OVERRIDE_FUZZY_OPTIONS = "true";
           };
           handle-provider.enabled = true;
-          # asset-provider.enabled = true;
+          asset-provider.enabled = true;
         };
 
         projectors = {
           handle.enabled = true;
           stake-pool.enabled = true;
-          # asset.enabled = true;
+          asset.enabled = true;
         };
 
         values = {
@@ -331,20 +331,19 @@ in
           backend = {
             enabled = true;
             replicas = 3;
-            env.NODE_EXTRA_OPTIONS = "--trace-gc";
           };
           stake-pool-provider = {
             enabled = true;
             env.OVERRIDE_FUZZY_OPTIONS = "true";
           };
           handle-provider.enabled = true;
-          # asset-provider.enabled = true;
+          asset-provider.enabled = true;
         };
 
         projectors = {
           handle.enabled = true;
           stake-pool.enabled = true;
-          # asset.enabled = true;
+          asset.enabled = true;
         };
 
         values = {
@@ -362,6 +361,7 @@ in
             ];
           };
           backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
+          stakepool.databaseName = "stakepoolv2";
 
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
@@ -411,11 +411,13 @@ in
             env.OVERRIDE_FUZZY_OPTIONS = "true";
           };
           handle-provider.enabled = true;
+          asset-provider.enabled = true;
         };
 
         projectors = {
           handle.enabled = true;
           stake-pool.enabled = true;
+          asset.enabled = true;
         };
 
         values = {
@@ -448,11 +450,13 @@ in
             env.OVERRIDE_FUZZY_OPTIONS = "true";
           };
           handle-provider.enabled = true;
+          asset-provider.enabled = true;
         };
 
         projectors = {
           handle.enabled = true;
           stake-pool.enabled = true;
+          asset.enabled = true;
         };
 
         values = {
@@ -485,7 +489,10 @@ in
             env.NODE_ENV = "production";
           };
           # handle-provider.enabled = true;
-          # asset-provider.enabled = true;
+          asset-provider = {
+            enabled = true;
+            env.NODE_ENV = "production";
+          };
         };
 
         projectors = {
@@ -494,7 +501,7 @@ in
             enabled = true;
             env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
           };
-          # asset.enabled = true;
+          asset.enabled = true;
         };
 
         values = {
@@ -582,13 +589,16 @@ in
             env.NODE_ENV = "production";
           };
           # handle-provider.enabled = true;
-          # asset-provider.enabled = true;
+          asset-provider = {
+            enabled = true;
+            env.NODE_ENV = "production";
+          };
         };
 
         projectors = {
           handle.enabled = true;
           stake-pool.enabled = true;
-          # asset.enabled = true;
+          asset.enabled = true;
         };
 
         values = {
@@ -652,6 +662,10 @@ in
             enabled = false;
             env.NODE_ENV = "production";
           };
+          asset-provider = {
+            enabled = true;
+            env.NODE_ENV = "production";
+          };
         };
 
         projectors = {
@@ -660,6 +674,7 @@ in
             enabled = true;
             env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
           };
+          asset.enabled = true;
         };
 
         values = {
@@ -711,6 +726,10 @@ in
             enabled = false;
             env.NODE_ENV = "production";
           };
+          asset-provider = {
+            enabled = true;
+            env.NODE_ENV = "production";
+          };
         };
 
         projectors = {
@@ -719,6 +738,7 @@ in
             enabled = true;
             env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
           };
+          asset.enabled = true;
         };
 
         values = {
@@ -809,6 +829,10 @@ in
             enabled = false;
             env.NODE_ENV = "production";
           };
+          asset-provider = {
+            enabled = true;
+            env.NODE_ENV = "production";
+          };
         };
 
         projectors = {
@@ -817,6 +841,7 @@ in
             enabled = true;
             env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
           };
+          asset.enabled = true;
         };
 
         values = {
@@ -907,6 +932,10 @@ in
             enabled = false;
             env.NODE_ENV = "production";
           };
+          asset-provider = {
+            enabled = true;
+            env.NODE_ENV = "production";
+          };
         };
 
         projectors = {
@@ -915,6 +944,7 @@ in
             enabled = true;
             env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
           };
+          asset.enabled = true;
         };
 
         values = {
