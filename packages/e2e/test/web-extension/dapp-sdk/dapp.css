@@ -1,3 +1,23 @@
+label {
+    margin: 12px 0 6px;
+}
+
+input {
+    appearance: none;
+    background: #fff;
+    border: none;
+    border-radius: 3px;
+    box-shadow: 0 0 0 0 rgba(19, 124, 189, 0), 0 0 0 0 rgba(19, 124, 189, 0), inset 0 0 0 1px rgba(16, 22, 26, .15), inset 0 1px 1px rgba(16, 22, 26, .2);
+    color: #182026;
+    font-size: 14px;
+    font-weight: 400;
+    height: 30px;
+    line-height: 30px;
+    outline: none;
+    padding: 0 10px;
+    transition: box-shadow .1s cubic-bezier(.4,1,.75,.9);
+    vertical-align: middle;
+}
 
 .container {
     display: flex;
@@ -5,12 +25,12 @@
     padding: 20px;
 }
 
-
-.actions-container {
+.actions-container,
+.delegation {
     display: flex;
     flex-direction: column;
-    min-width: fit-content;
     padding-right: 20px;
+    min-width: 600px;
 }
 
 .details-container {
@@ -29,4 +49,10 @@
 .action { 
     margin: 10px;
     padding: 10px;
+}
+
+.sent-tx {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }

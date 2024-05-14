@@ -17,10 +17,38 @@
         <div class="actions-container">
           <h4>Actions</h4>
           <button id="connect-to-lace" class="action">Connect Lace</button>
-          <button id="send-coins" class="action">Send 10 ADA to Rhys</button>
-          <button id="send-several-assets" class="action">Send Asset and Tokens to Rhys</button>
-          <button id="single-delegation" class="action">Delegate</button>
-          <button id="single-undelegation" class="action">Undelegate</button>
+          <div class="sent-tx">
+            <h4>Send TX w/wo tokens</h4>
+            <label for="receiver">Receiver Address:</label>
+            <input type="text" id="receiver" name="receiver" value='addr_test1qqhfdzcw0ns60n25u2ka7w4hrushtflxlmjh8khx044t9vz4suwvtyu5dtr02wtcyjuc3lwdvlzaczrwaypgxgfk4hrq4cxwqm'>
+            
+            <label for="ada-amount">Amount (in Lovelace):</label>
+            <input type="number" id="ada-amount" name="ada-amount" value=3000000>
+            
+            <label for="asset-amount">Amount of Assets to send</label>
+            <input type="number" id="asset-amount" name="asset-amount" value=5>
+
+            <label for="asset-policy-id">Asset PolicyId:</label>
+            <input type="text" id="asset-policy-id" name="asset-policy-id" value='648823ffdad1610b4162f4dbc87bd47f6f9cf45d772ddef661eff198'>
+            
+            <label for="asset-name">Asset Name:</label>
+            <input type="text" id="asset-name" name="asset-name" value='444149'>
+
+            <button id="send-coins" class="action">Send</button>
+          </div>
+
+          <div class="delegation">
+            <h4>Delegate / Undelegate</h4>
+            <label for="pool-name">Pool Name:</label>
+            <input type="text" id="pool-name" name="pool-name" value='SMAUG'>
+            
+            <label for="pool-id">Pool ID:</label>
+            <input type="text" id="pool-id" name="pool-id" value='pool1pzdqdxrv0k74p4q33y98f2u7vzaz95et7mjeedjcfy0jcgk754f'>
+            
+            <button id="single-delegation" class="action">Delegate</button>
+
+            <button id="single-undelegation" class="action">Undelegate</button>
+          </div>
         </div>
 
         <div class="details-container">

@@ -5,15 +5,26 @@ import { ObservableWallet } from '@cardano-sdk/wallet';
 import { inspectAndSignTx } from '../utils';
 import { toSerializableObject } from '@cardano-sdk/util';
 
+type PoolData = {
+  poolName: string;
+  poolId: string;
+};
+
 export const singleDelegation = ({
   connectedWallet,
-  logger
+  logger,
+  poolData
 }: {
   logger: Logger;
   connectedWallet: ObservableWallet;
+  poolData: PoolData;
 }) => {
   const delegateElement = document.querySelector('#info-delegate-assets')!;
   const delegateAssetsElement = document.querySelector('#info-delegate-asset-id')!;
+  const { poolName, poolId } = poolData;
+  if (!poolName || !poolId) {
+    throw new Error('Missing poolId and / or poolName');
+  }
 
   connectedWallet.balance.utxo.available$
     .pipe(
@@ -23,13 +34,11 @@ export const singleDelegation = ({
           throw new Error('Your wallet has no coins');
         }
 
-        const poolId = Cardano.PoolId.toKeyHash(
-          Cardano.PoolId('pool1pzdqdxrv0k74p4q33y98f2u7vzaz95et7mjeedjcfy0jcgk754f')
-        );
-        const poolIdHex = Cardano.PoolIdHex(poolId);
+        const poolIdHash = Cardano.PoolId.toKeyHash(Cardano.PoolId(poolId));
+        const poolIdHex = Cardano.PoolIdHex(poolIdHash);
         const txBuilder = connectedWallet.createTxBuilder();
         const portfolio = {
-          name: 'SMAUG',
+          name: poolName,
           pools: [
             {
               id: Cardano.PoolIdHex(poolIdHex),

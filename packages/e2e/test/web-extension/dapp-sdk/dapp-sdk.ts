@@ -44,8 +44,20 @@ document.querySelector('#send-coins')?.addEventListener('click', async () => {
   if (!connectedWallet) {
     return logger.warn(CONNECT_WALLET);
   }
+  const receiverAddress = (document.querySelector('#receiver') as HTMLInputElement).value;
+  const adaAmount = (document.querySelector('#ada-amount') as HTMLInputElement).value;
+  const assetAmount = (document.querySelector('#asset-amount') as HTMLInputElement)?.value;
+  const assetPolicyId = (document.querySelector('#asset-policy-id') as HTMLInputElement)?.value;
+  const assetName = (document.querySelector('#asset-name') as HTMLInputElement)?.value;
 
-  await sendCoins({ connectedWallet });
+  const dataToSend = {
+    adaAmount,
+    assetAmount,
+    assetName,
+    assetPolicyId,
+    receiverAddress
+  };
+  await sendCoins({ connectedWallet, dataToSend, logger });
 });
 
 document.querySelector('#send-several-assets')?.addEventListener('click', () => {
@@ -63,10 +75,16 @@ document.querySelector('#single-delegation')?.addEventListener('click', () => {
   if (!connectedWallet) {
     return logger.warn(CONNECT_WALLET);
   }
-
+  const poolName = (document.querySelector('#pool-name') as HTMLInputElement)?.value;
+  const poolId = (document.querySelector('#pool-id') as HTMLInputElement)?.value;
+  const poolData = {
+    poolId,
+    poolName
+  };
   singleDelegation({
     connectedWallet,
-    logger
+    logger,
+    poolData
   });
 });
 
