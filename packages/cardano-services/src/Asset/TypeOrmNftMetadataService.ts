@@ -31,13 +31,14 @@ export class TypeOrmNftMetadataService extends TypeormService implements NftMeta
       }
 
       return {
-        image: asset.image,
-        name: asset.name,
+        image: asset.image!,
+        name: asset.name!,
         ...(asset.description && { description: asset.description }),
         ...(asset.files && { files: asset.files }),
-        ...(asset.mediaType && { mediaType: asset.mediaType }),
-        ...(asset.otherProperties && { otherProperties: asset.otherProperties })
-      } as unknown as Asset.NftMetadata;
+        ...(asset.mediaType && { mediaType: asset.mediaType as Asset.ImageMediaType }),
+        ...(asset.otherProperties && { otherProperties: asset.otherProperties }),
+        version: asset.otherProperties?.get('version') as string
+      };
     });
   }
 }
