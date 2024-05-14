@@ -86,7 +86,7 @@ in
         };
 
         handle = {
-          resources.limits = mkPodResources "300Mi" "700m";
+          resources.limits = mkPodResources "300Mi" "1000m";
           resources.requests = mkPodResources "150Mi" "100m";
         };
 
