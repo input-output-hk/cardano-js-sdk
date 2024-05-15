@@ -63,7 +63,7 @@ x-provider-server-environment: &provider-server-environment
   DISABLE_STAKE_POOL_METRIC_APY: ${DISABLE_STAKE_POOL_METRIC_APY:-false}
   ENABLE_METRICS: ${ENABLE_METRICS:-false}
   EPOCH_POLL_INTERVAL: ${EPOCH_POLL_INTERVAL:-500}
-  SERVICE_NAMES: ${SERVICE_NAMES:-asset,chain-history,handle,network-info,rewards,stake-pool,tx-submit,utxo}
+  SERVICE_NAMES: ${SERVICE_NAMES:-chain-history,network-info,rewards,stake-pool,tx-submit,utxo}
   SUBMIT_API_URL: ${SUBMIT_API_URL:-http://cardano-submit-api:8090/}
   USE_BLOCKFROST: ${USE_BLOCKFROST:-false}
   USE_SUBMIT_API: ${USE_SUBMIT_API:-false}
