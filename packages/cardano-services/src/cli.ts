@@ -370,14 +370,6 @@ addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon
     USE_BLOCKFROST_DEFAULT
   ),
   newOption(
-    '--use-kora-labs <true/false>',
-    ProviderServerOptionDescriptions.UseKoraLabsProvider,
-    'USE_KORA_LABS',
-    (useKoraLabs) =>
-      stringOptionToBoolean(useKoraLabs, Programs.ProviderServer, ProviderServerOptionDescriptions.UseKoraLabsProvider),
-    false
-  ),
-  newOption(
     '--use-submit-api <true/false>',
     ProviderServerOptionDescriptions.UseSubmitApi,
     'USE_SUBMIT_API',

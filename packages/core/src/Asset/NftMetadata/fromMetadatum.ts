@@ -10,6 +10,7 @@ import { isNotNil } from '@cardano-sdk/util';
 import difference from 'lodash/difference';
 
 const isString = (obj: unknown): obj is string => typeof obj === 'string';
+const VersionRegExp = /^\d+\.?\d?$/;
 
 const metadatumToString = (metadatum: Cardano.Metadatum | undefined): string | undefined => {
   if (Array.isArray(metadatum)) {
@@ -96,6 +97,36 @@ const getAssetMetadata = (policy: Cardano.MetadatumMap, assetName: Cardano.Asset
       })()
   );
 
+type AssetIdParts = Pick<AssetInfo, 'policyId' | 'name'>;
+const getName = (
+  assetMetadata: Cardano.MetadatumMap,
+  version: string,
+  asset: AssetIdParts,
+  logger: Logger,
+  stripInvisibleCharacters = false
+) => {
+  const name = asString(assetMetadata.get('name'));
+  if (name) return name;
+  if (version === '1.0') {
+    try {
+      return AssetName.toUTF8(asset.name, stripInvisibleCharacters);
+    } catch (error) {
+      logger.warn(error);
+    }
+  }
+};
+
+const parseVersion = (version: Cardano.Metadatum | undefined) => {
+  if (!version) return '1.0';
+  if (typeof version === 'bigint') {
+    return `${version}.0`;
+  }
+  const stringVersion = asString(version);
+  if (stringVersion && VersionRegExp.test(stringVersion)) {
+    return `${Number(stringVersion)}.0`;
+  }
+};
+
 /**
  * @param asset try to parse NftMetadata for this asset
  * @param metadata transaction metadata (see CIP-0025)
@@ -103,9 +134,10 @@ const getAssetMetadata = (policy: Cardano.MetadatumMap, assetName: Cardano.Asset
  */
 // eslint-disable-next-line complexity
 export const fromMetadatum = (
-  asset: Pick<AssetInfo, 'policyId' | 'name'>,
+  asset: AssetIdParts,
   metadata: Cardano.TxMetadata | undefined,
-  logger: Logger
+  logger: Logger,
+  strict = false
 ): NftMetadata | null => {
   const cip25Metadata = metadata?.get(721n);
   if (!cip25Metadata) return null;
@@ -113,22 +145,15 @@ export const fromMetadatum = (
   if (!cip25MetadatumMap) return null;
   const policy = getPolicyMetadata(cip25MetadatumMap, asset.policyId);
   if (!policy) return null;
+  const version = parseVersion(policy.get('version'));
+  if (!version) return null;
   const assetMetadata = getAssetMetadata(policy, asset.name);
   if (!assetMetadata) return null;
-  const version = asString(policy.get('version')) || '1.0';
-  let name = asString(assetMetadata.get('name'));
+  const name = getName(assetMetadata, version, asset, logger, true);
   const image = metadatumToString(assetMetadata.get('image'));
   const assetId = Cardano.AssetId.fromParts(asset.policyId, asset.name);
 
-  if (version === '1.0' && !name) {
-    try {
-      name = AssetName.toUTF8(asset.name);
-    } catch (error) {
-      logger.warn(error);
-    }
-  }
-
-  if (!name || !image) {
+  if ((strict && !name) || !image) {
     logger.warn(missingFieldLogMessage(!name ? 'name' : 'image', assetId, true));
     return null;
   }
@@ -142,7 +167,7 @@ export const fromMetadatum = (
       files: files?.map((file) => mapFile(file, assetId, logger)).filter(isNotNil),
       image: Uri(image),
       mediaType: mediaType ? ImageMediaType(mediaType) : undefined,
-      name,
+      name: name || '',
       otherProperties: mapOtherProperties(assetMetadata, ['name', 'image', 'mediaType', 'description', 'files']),
       version
     };

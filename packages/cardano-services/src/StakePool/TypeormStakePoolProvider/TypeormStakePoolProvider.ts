@@ -27,15 +27,15 @@ import {
 import Fuse from 'fuse.js';
 
 export const DEFAULT_FUZZY_SEARCH_OPTIONS: FuzzyOptions = {
-  distance: 100,
+  distance: 255,
   fieldNormWeight: 1,
   ignoreFieldNorm: false,
-  ignoreLocation: false,
+  ignoreLocation: true,
   location: 0,
-  minMatchCharLength: 3,
-  threshold: 0.4,
+  minMatchCharLength: 1,
+  threshold: 0.3,
   useExtendedSearch: false,
-  weights: { description: 1, homepage: 2, name: 3, poolId: 4, ticker: 4 }
+  weights: { description: 4, homepage: 1, name: 6, poolId: 1, ticker: 10 }
 };
 
 /** Properties that are need to create TypeormStakePoolProvider */

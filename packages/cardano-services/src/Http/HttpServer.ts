@@ -175,7 +175,9 @@ export class HttpServer extends RunnableModule {
     };
 
     let handler: keyof typeof handlers;
-    for (handler in handlers) this.app.use(path.join(versionPath, handler), handlers[handler]);
+    // Note: `.replaceAll(path.sep, '/')` is needed on Windows:
+    for (handler in handlers)
+      this.app.use(path.join(versionPath, handler).replaceAll(path.sep, '/'), handlers[handler]);
   }
 
   static sendJSON<ResponseBody>(
@@ -268,7 +270,10 @@ export class HttpServer extends RunnableModule {
         includePath: true,
         promRegistry,
         ...this.#config.metrics?.options,
-        metricsPath: path.join(versionPath, this.#config.metrics?.options?.metricsPath || '/metrics')
+        // Note: `.replaceAll(path.sep, '/')` is needed on Windows:
+        metricsPath: path
+          .join(versionPath, this.#config.metrics?.options?.metricsPath || '/metrics')
+          .replaceAll(path.sep, '/')
       })
     );
     this.logger.info(

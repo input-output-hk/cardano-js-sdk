@@ -34,8 +34,12 @@ import {
   Witnesser,
   util
 } from '@cardano-sdk/key-management';
+import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
+import { Logger } from 'ts-log';
+import { NodeTxSubmitProvider } from '@cardano-sdk/cardano-services';
+import { OgmiosObservableCardanoNode } from '@cardano-sdk/ogmios';
+import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
 import {
-  KoraLabsHandleProvider,
   assetInfoHttpProvider,
   chainHistoryHttpProvider,
   handleHttpProvider,
@@ -45,11 +49,6 @@ import {
   txSubmitHttpProvider,
   utxoHttpProvider
 } from '@cardano-sdk/cardano-services-client';
-import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
-import { Logger } from 'ts-log';
-import { NodeTxSubmitProvider } from '@cardano-sdk/cardano-services';
-import { OgmiosObservableCardanoNode } from '@cardano-sdk/ogmios';
-import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, of } from 'rxjs';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
@@ -76,7 +75,7 @@ export const utxoProviderFactory = new ProviderFactory<UtxoProvider>();
 export const stakePoolProviderFactory = new ProviderFactory<StakePoolProvider>();
 export const bip32Ed25519Factory = new ProviderFactory<Crypto.Bip32Ed25519>();
 export const addressDiscoveryFactory = new ProviderFactory<AddressDiscovery>();
-export const handleProviderFactory = new ProviderFactory<HandleProvider | KoraLabsHandleProvider>();
+export const handleProviderFactory = new ProviderFactory<HandleProvider>();
 
 // Address Discovery strategies
 
