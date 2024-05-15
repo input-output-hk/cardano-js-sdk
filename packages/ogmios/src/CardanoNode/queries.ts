@@ -8,6 +8,7 @@ import {
   StateQueryError,
   TxSubmissionError,
   TxSubmissionErrorCode,
+  UnknownOutputReferencesData,
   ValueNotConservedData
 } from '@cardano-sdk/core';
 
@@ -16,11 +17,12 @@ import { Logger } from 'ts-log';
 import {
   SubmitTransactionFailureIncompleteWithdrawals,
   SubmitTransactionFailureOutsideOfValidityInterval,
+  SubmitTransactionFailureUnknownOutputReferences,
   SubmitTransactionFailureValueNotConserved
 } from '@cardano-ogmios/schema';
 import { eraSummary, genesis } from '../ogmiosToCore';
 import { isConnectionError } from '@cardano-sdk/util';
-import { mapValue, mapWithdrawals } from '../ogmiosToCore/tx';
+import { mapTxIn, mapValue, mapWithdrawals } from '../ogmiosToCore/tx';
 
 const errorDataToCore = (data: unknown, code: number) => {
   switch (code) {
@@ -46,6 +48,12 @@ const errorDataToCore = (data: unknown, code: number) => {
           invalidHereafter: typedData.validityInterval.invalidAfter
         }
       } as OutsideOfValidityIntervalData;
+    }
+    case TxSubmissionErrorCode.UnknownOutputReferences: {
+      const typedData = data as SubmitTransactionFailureUnknownOutputReferences['data'];
+      return {
+        unknownOutputReferences: typedData.unknownOutputReferences.map(mapTxIn)
+      } as UnknownOutputReferencesData;
     }
     default:
       // Mapper not implemented

@@ -119,7 +119,7 @@ const mapCertificate = (certificate: Schema.Certificate): Cardano.Certificate =>
         genesisHash: Crypto.Hash28ByteBase16(certificate.issuer.id),
         vrfKeyHash: Crypto.Hash32ByteBase16(certificate.delegate.vrfVerificationKeyHash)
       };
-    case 'constitutionalCommitteeHotKeyRegistration':
+    case 'constitutionalCommitteeDelegation':
       // TODO: Conway rest of fields
       return {
         __typename: Cardano.CertificateType.AuthorizeCommitteeHot
@@ -336,7 +336,7 @@ const mapAuxiliaryData = (
   return { auxiliaryData, auxiliaryDataHash };
 };
 
-const mapTxIn = (txIn: Schema.TransactionOutputReference): Cardano.TxIn => ({
+export const mapTxIn = (txIn: Schema.TransactionOutputReference): Cardano.TxIn => ({
   index: txIn.index,
   txId: Cardano.TransactionId(txIn.transaction.id)
 });

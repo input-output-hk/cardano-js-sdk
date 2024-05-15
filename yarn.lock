@@ -3065,11 +3065,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cardano-ogmios/client@npm:6.2.0":
-  version: 6.2.0
-  resolution: "@cardano-ogmios/client@npm:6.2.0"
+"@cardano-ogmios/client@npm:6.3.0":
+  version: 6.3.0
+  resolution: "@cardano-ogmios/client@npm:6.3.0"
   dependencies:
-    "@cardano-ogmios/schema": 6.2.0
+    "@cardano-ogmios/schema": 6.3.0
     "@cardanosolutions/json-bigint": ^1.0.1
     "@types/json-bigint": ^1.0.1
     bech32: ^2.0.0
@@ -3079,14 +3079,14 @@ __metadata:
     nanoid: ^3.1.31
     ts-custom-error: ^3.2.0
     ws: ^7.4.6
-  checksum: d2ff61ebe8223ece6e7e9a3576eef59d75aaa66347a91621b89a2fc8018f47a298e166aa0f7e432084c70f93845d4825844e7bdf887cd510eb8f18914e8ec3c2
+  checksum: 452105c7f381e6b5244c6d29f732581eade51a6e6641eb4b30fee21b147dcd55498b30efb383bad71cd40f4f6f8b96fc11ba8c7f0c2c237fee00f87bdae11dbf
   languageName: node
   linkType: hard
 
-"@cardano-ogmios/schema@npm:6.2.0":
-  version: 6.2.0
-  resolution: "@cardano-ogmios/schema@npm:6.2.0"
-  checksum: fe32742b8eacdffdf98d96d8d4689ea61b3e39e394678fd1bd0110752bf97d41268c67f5f65a7e1b8b9efa98f9c409017bf48c9a9f5b7ab10108f2dc3259ad1b
+"@cardano-ogmios/schema@npm:6.3.0":
+  version: 6.3.0
+  resolution: "@cardano-ogmios/schema@npm:6.3.0"
+  checksum: 1ba6ced21fe60d935a17d9c8fd3f871ba1b9966d8badeae2583b990f0093320fb3c477bb806e549be10df2dd8550c759c478b95d187c46c768de2d07b8398485
   languageName: node
   linkType: hard
 
@@ -3120,7 +3120,7 @@ __metadata:
   resolution: "@cardano-sdk/cardano-services@workspace:packages/cardano-services"
   dependencies:
     "@blockfrost/blockfrost-js": 5.5.0-beta.0
-    "@cardano-ogmios/client": 6.2.0
+    "@cardano-ogmios/client": 6.3.0
     "@cardano-sdk/cardano-services-client": "workspace:~"
     "@cardano-sdk/core": "workspace:~"
     "@cardano-sdk/crypto": "workspace:~"
@@ -3195,8 +3195,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/core@workspace:packages/core"
   dependencies:
-    "@cardano-ogmios/client": 6.2.0
-    "@cardano-ogmios/schema": 6.2.0
+    "@cardano-ogmios/client": 6.3.0
+    "@cardano-ogmios/schema": 6.3.0
     "@cardano-sdk/crypto": "workspace:~"
     "@cardano-sdk/util": "workspace:~"
     "@foxglove/crc": ^0.0.3
@@ -3227,7 +3227,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/crypto@workspace:packages/crypto"
   dependencies:
-    "@cardano-ogmios/schema": 6.2.0
+    "@cardano-ogmios/schema": 6.3.0
     "@cardano-sdk/util": "workspace:~"
     "@dcspark/cardano-multiplatform-lib-nodejs": ^3.1.1
     "@types/blake2b": ^2.1.0
@@ -3292,7 +3292,7 @@ __metadata:
     "@babel/preset-env": ^7.18.2
     "@babel/preset-typescript": ^7.17.12
     "@cardano-foundation/ledgerjs-hw-app-cardano": ^7.1.2
-    "@cardano-ogmios/client": 6.2.0
+    "@cardano-ogmios/client": 6.3.0
     "@cardano-sdk/cardano-services": "workspace:~"
     "@cardano-sdk/cardano-services-client": "workspace:~"
     "@cardano-sdk/core": "workspace:~"
@@ -3545,8 +3545,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/ogmios@workspace:packages/ogmios"
   dependencies:
-    "@cardano-ogmios/client": 6.2.0
-    "@cardano-ogmios/schema": 6.2.0
+    "@cardano-ogmios/client": 6.3.0
+    "@cardano-ogmios/schema": 6.3.0
     "@cardano-sdk/cardano-services-client": "workspace:~"
     "@cardano-sdk/core": "workspace:~"
     "@cardano-sdk/crypto": "workspace:~"
@@ -3722,7 +3722,7 @@ __metadata:
   resolution: "@cardano-sdk/wallet@workspace:packages/wallet"
   dependencies:
     "@cardano-foundation/ledgerjs-hw-app-cardano": ^7.1.2
-    "@cardano-ogmios/client": 6.2.0
+    "@cardano-ogmios/client": 6.3.0
     "@cardano-sdk/cardano-services-client": "workspace:~"
     "@cardano-sdk/core": "workspace:~"
     "@cardano-sdk/crypto": "workspace:~"
