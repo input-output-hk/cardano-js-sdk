@@ -331,6 +331,7 @@ in
           backend = {
             enabled = true;
             replicas = 3;
+            env.NODE_EXTRA_OPTIONS = "--trace-gc";
           };
           stake-pool-provider = {
             enabled = true;
@@ -489,10 +490,10 @@ in
             env.NODE_ENV = "production";
           };
           # handle-provider.enabled = true;
-          asset-provider = {
-            enabled = true;
-            env.NODE_ENV = "production";
-          };
+          # asset-provider = {
+          #   enabled = true;
+          #   env.NODE_ENV = "production";
+          # };
         };
 
         projectors = {
@@ -501,7 +502,7 @@ in
             enabled = true;
             env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
           };
-          asset.enabled = true;
+          # asset.enabled = true;
         };
 
         values = {
@@ -589,16 +590,16 @@ in
             env.NODE_ENV = "production";
           };
           # handle-provider.enabled = true;
-          asset-provider = {
-            enabled = true;
-            env.NODE_ENV = "production";
-          };
+          #asset-provider = {
+          #  enabled = true;
+          #  env.NODE_ENV = "production";
+          #};
         };
 
         projectors = {
           handle.enabled = true;
           stake-pool.enabled = true;
-          asset.enabled = true;
+          #asset.enabled = true;
         };
 
         values = {
@@ -662,10 +663,10 @@ in
             enabled = false;
             env.NODE_ENV = "production";
           };
-          asset-provider = {
-            enabled = true;
-            env.NODE_ENV = "production";
-          };
+          #asset-provider = {
+          #  enabled = true;
+          #  env.NODE_ENV = "production";
+          #};
         };
 
         projectors = {
@@ -674,7 +675,7 @@ in
             enabled = true;
             env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
           };
-          asset.enabled = true;
+          #asset.enabled = true;
         };
 
         values = {
@@ -726,10 +727,10 @@ in
             enabled = false;
             env.NODE_ENV = "production";
           };
-          asset-provider = {
-            enabled = true;
-            env.NODE_ENV = "production";
-          };
+          #asset-provider = {
+          #  enabled = true;
+          #  env.NODE_ENV = "production";
+          #};
         };
 
         projectors = {
@@ -738,7 +739,7 @@ in
             enabled = true;
             env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
           };
-          asset.enabled = true;
+          #asset.enabled = true;
         };
 
         values = {
@@ -829,10 +830,10 @@ in
             enabled = false;
             env.NODE_ENV = "production";
           };
-          asset-provider = {
-            enabled = true;
-            env.NODE_ENV = "production";
-          };
+          #asset-provider = {
+          #  enabled = true;
+          #  env.NODE_ENV = "production";
+          #};
         };
 
         projectors = {
@@ -841,7 +842,7 @@ in
             enabled = true;
             env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
           };
-          asset.enabled = true;
+          #asset.enabled = true;
         };
 
         values = {
@@ -932,10 +933,10 @@ in
             enabled = false;
             env.NODE_ENV = "production";
           };
-          asset-provider = {
-            enabled = true;
-            env.NODE_ENV = "production";
-          };
+          # asset-provider = {
+          #   enabled = true;
+          #   env.NODE_ENV = "production";
+          # };
         };
 
         projectors = {
@@ -944,7 +945,7 @@ in
             enabled = true;
             env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
           };
-          asset.enabled = true;
+          # asset.enabled = true;
         };
 
         values = {
