@@ -192,13 +192,13 @@ in
             env.OVERRIDE_FUZZY_OPTIONS = "true";
           };
           handle-provider.enabled = true;
-          # asset-provider.enabled = true;
+          asset-provider.enabled = true;
         };
 
         projectors = {
           handle.enabled = true;
           stake-pool.enabled = true;
-          # asset.enabled = true;
+          asset.enabled = true;
         };
 
         values = {
@@ -336,13 +336,13 @@ in
             env.OVERRIDE_FUZZY_OPTIONS = "true";
           };
           handle-provider.enabled = true;
-          # asset-provider.enabled = true;
+          asset-provider.enabled = true;
         };
 
         projectors = {
           handle.enabled = true;
           stake-pool.enabled = true;
-          # asset.enabled = true;
+          asset.enabled = true;
         };
 
         values = {
@@ -367,7 +367,6 @@ in
         };
       };
 
-
       "dev-preprod@us-east-1@v2" = final: {
         name = "${final.namespace}-cardanojs-v2";
         namespace = "dev-preprod";
@@ -384,11 +383,13 @@ in
             env.OVERRIDE_FUZZY_OPTIONS = "true";
           };
           handle-provider.enabled = true;
+          asset-provider.enabled = true;
         };
 
         projectors = {
           handle.enabled = true;
           stake-pool.enabled = true;
+          asset.enabled = true;
         };
 
         values = {
@@ -421,11 +422,13 @@ in
             env.OVERRIDE_FUZZY_OPTIONS = "true";
           };
           handle-provider.enabled = true;
+          asset-provider.enabled = true;
         };
 
         projectors = {
           handle.enabled = true;
           stake-pool.enabled = true;
+          asset.enabled = true;
         };
 
         values = {
@@ -458,7 +461,10 @@ in
             env.NODE_ENV = "production";
           };
           # handle-provider.enabled = true;
-          # asset-provider.enabled = true;
+          # asset-provider = {
+          #   enabled = true;
+          #   env.NODE_ENV = "production";
+          # };
         };
 
         projectors = {
@@ -510,32 +516,6 @@ in
         };
       };
 
-      "live-mainnet@us-east-2@v3" = final: {
-        name = "${final.namespace}-cardanojs-v3";
-        namespace = "live-mainnet";
-        network = "mainnet";
-        region = "us-east-2";
-        context = "eks-admin";
-
-        projectors = {
-          stake-pool.enabled = true;
-        };
-
-        providers = {
-          backend = {
-            enabled = true;
-          };
-          stake-pool-provider = {
-            enabled = false;
-          };
-        };
-
-        values = {
-          ingress.enabled = false;
-          pg-boss-worker.enabled = true;
-        };
-      };
-
       "live-mainnet@eu-central-1@v2" = final: {
         name = "${final.namespace}-cardanojs-v2";
         namespace = "live-mainnet";
@@ -555,13 +535,16 @@ in
             env.NODE_ENV = "production";
           };
           # handle-provider.enabled = true;
-          # asset-provider.enabled = true;
+          #asset-provider = {
+          #  enabled = true;
+          #  env.NODE_ENV = "production";
+          #};
         };
 
         projectors = {
           handle.enabled = true;
           stake-pool.enabled = true;
-          # asset.enabled = true;
+          #asset.enabled = true;
         };
 
         values = {
@@ -625,6 +608,10 @@ in
             enabled = false;
             env.NODE_ENV = "production";
           };
+          #asset-provider = {
+          #  enabled = true;
+          #  env.NODE_ENV = "production";
+          #};
         };
 
         projectors = {
@@ -633,6 +620,7 @@ in
             enabled = true;
             env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
           };
+          #asset.enabled = true;
         };
 
         values = {
@@ -684,6 +672,10 @@ in
             enabled = false;
             env.NODE_ENV = "production";
           };
+          #asset-provider = {
+          #  enabled = true;
+          #  env.NODE_ENV = "production";
+          #};
         };
 
         projectors = {
@@ -692,6 +684,7 @@ in
             enabled = true;
             env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
           };
+          #asset.enabled = true;
         };
 
         values = {
@@ -782,6 +775,10 @@ in
             enabled = false;
             env.NODE_ENV = "production";
           };
+          #asset-provider = {
+          #  enabled = true;
+          #  env.NODE_ENV = "production";
+          #};
         };
 
         projectors = {
@@ -790,6 +787,7 @@ in
             enabled = true;
             env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
           };
+          #asset.enabled = true;
         };
 
         values = {
@@ -880,6 +878,10 @@ in
             enabled = false;
             env.NODE_ENV = "production";
           };
+          # asset-provider = {
+          #   enabled = true;
+          #   env.NODE_ENV = "production";
+          # };
         };
 
         projectors = {
@@ -888,6 +890,7 @@ in
             enabled = true;
             env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
           };
+          # asset.enabled = true;
         };
 
         values = {
