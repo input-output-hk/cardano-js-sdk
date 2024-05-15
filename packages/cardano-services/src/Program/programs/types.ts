@@ -62,7 +62,6 @@ export enum ProviderServerOptionDescriptions {
   TokenMetadataServerUrl = 'Token Metadata API server URL',
   UseTypeOrmStakePoolProvider = 'Enables the TypeORM Stake Pool Provider',
   UseBlockfrost = 'Enables Blockfrost cached data DB',
-  UseKoraLabsProvider = 'Use the KoraLabs handle provider',
   UseSubmitApi = 'Use cardano-submit-api provider',
   UseTypeormAssetProvider = 'Use the TypeORM Asset Provider (default is db-sync)',
   SubmitValidateHandles = 'Validate handle resolutions before submitting transactions. Requires handle provider options (USE_KORA_LABS or POSTGRES options with HANDLE suffix).'
@@ -93,7 +92,6 @@ export type ProviderServerArgs = CommonProgramOptions &
     tokenMetadataServerUrl?: string;
     tokenMetadataRequestTimeout?: Milliseconds;
     useBlockfrost?: boolean;
-    useKoraLabs?: boolean;
     useSubmitApi?: boolean;
     useTypeormAssetProvider?: boolean;
     useTypeormStakePoolProvider?: boolean;

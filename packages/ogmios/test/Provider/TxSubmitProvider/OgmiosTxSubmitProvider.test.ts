@@ -1,10 +1,10 @@
 import { Cardano, CardanoNodeErrors, ProviderError } from '@cardano-sdk/core';
 import { Connection, createConnectionObject } from '@cardano-ogmios/client';
-import { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
 import { OgmiosTxSubmitProvider } from '../../../src';
 import { bufferToHexString } from '@cardano-sdk/util';
 import { createMockOgmiosServer, listenPromise, serverClosePromise } from '../../mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
+import { handleHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { healthCheckResponseMock } from '../../../../core/test/CardanoNode/mocks';
 import { dummyLogger as logger } from 'ts-log';
 import http from 'http';
@@ -23,24 +23,12 @@ const mockHandleResolution = {
 };
 
 jest.mock('@cardano-sdk/cardano-services-client', () => ({
-  ...jest.requireActual('@cardano-sdk/cardano-services-client'),
-  KoraLabsHandleProvider: jest.fn().mockImplementation(() => ({
-    healthCheck: jest.fn(),
-    resolveHandles: jest.fn().mockResolvedValue([
-      {
-        ...mockHandleResolution,
-
-        cardanoAddress: Cardano.PaymentAddress(
-          'addr_test1qqk4sr4f7vtqzd2w90d5nfu3n59jhhpawyphnek2y7er02nkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuqmcnecd'
-        )
-      }
-    ])
-  }))
+  ...jest.requireActual('@cardano-sdk/cardano-services-client')
 }));
 
-const handleProvider = new KoraLabsHandleProvider({
-  policyId: Cardano.PolicyId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb'),
-  serverUrl: 'https://localhost:3000'
+const handleProvider = handleHttpProvider({
+  baseUrl: 'https://localhost:3000',
+  logger
 });
 
 const emptyUintArrayAsHexString = bufferToHexString(Buffer.from(new Uint8Array()));
@@ -140,14 +128,7 @@ describe('OgmiosTxSubmitProvider', () => {
     it('does not throw an error if handles resolve to same addresses as in context', async () => {
       mockServer = createMockOgmiosServer({ submitTx: { response: { success: true } } });
       await listenPromise(mockServer, connection.port);
-      provider = new OgmiosTxSubmitProvider(
-        connection,
-        { logger },
-        new KoraLabsHandleProvider({
-          policyId: Cardano.PolicyId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb'),
-          serverUrl: 'https://localhost:3000'
-        })
-      );
+      provider = new OgmiosTxSubmitProvider(connection, { logger });
       await provider.initialize();
       await provider.start();
 
