@@ -23,6 +23,11 @@ on:
         type: boolean
         required: true
         default: false
+      deploy-dev-preprod-respin:
+        description: Deploy to dev-preprod-respin
+        type: boolean
+        required: true
+        default: false
   workflow_call:
     inputs:
       deploy-dev-preprod:
@@ -103,6 +108,9 @@ jobs:
             fi
             if [ "true" == ${{ inputs.deploy-dev-preprod || false }} ] ; then
               echo '{"environment":"dev-preprod", "target":"dev-preprod@us-east-1@v2", "url": "https://dev-preprod.lw.iog.io/"}'
+            fi
+            if [ "true" == ${{ inputs.deploy-dev-preprod-respin || false }} ] ; then
+              echo '{"environment":"dev-preprod-respin", "target":"dev-preprod-respin@us-east-1@v2", "url": "https://dev-preprod-respin.lw.iog.io/"}'
             fi
             if [ "true" == ${{ inputs.deploy-staging-preprod || false }} ] ; then
               echo '{"environment":"staging-preprod", "target":"staging-preprod@us-east-1@v2", "url": "https://staging-preprod.lw.iog.io/"}'
@@ -218,6 +226,7 @@ jobs:
             for target in \
               "dev-preview@us-east-1" \
               "dev-preprod@us-east-1@v2" \
+              "dev-preprod-respin@us-east-1@v2" \
               "dev-mainnet@us-east-1" \
             ; do
               git restore .kube
