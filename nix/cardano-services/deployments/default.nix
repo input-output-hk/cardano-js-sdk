@@ -133,7 +133,7 @@ in
         backend = {
           allowedOrigins = lib.concatStringsSep "," allowedOrigins;
           passHandleDBArgs = true;
-          hostnames = ["${final.namespace}.${baseUrl}"];
+          hostnames = ["${final.namespace}.${baseUrl}" "${final.namespace}.${final.region}.${baseUrl}"];
           dnsId = lib.toLower "${final.region}-${final.namespace}-backend";
           ogmiosSrvServiceName = "${final.namespace}-cardano-core.${final.namespace}.svc.cluster.local";
 
@@ -398,7 +398,6 @@ in
         values = {
           stakepool.databaseName = "stakepoolv2";
           backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
-          backend.hostnames = ["${final.namespace}.${baseUrl}"];
 
           pg-boss-worker.enabled = true;
 
@@ -436,7 +435,6 @@ in
 
         values = {
           stakepool.databaseName = "stakepoolv2";
-          backend.hostnames = ["${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
           cardano-services = {
@@ -495,7 +493,6 @@ in
             ];
           };
           backend.allowedOrigins = lib.concatStringsSep "," allowedOrigins;
-          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           backend.routes = let
             inherit (oci.meta) versions;
           in
@@ -567,7 +564,6 @@ in
             ];
           };
           backend.allowedOrigins = lib.concatStringsSep "," allowedOrigins;
-          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           backend.routes = let
             inherit (oci.meta) versions;
           in
@@ -627,7 +623,6 @@ in
         };
 
         values = {
-          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           stakepool.databaseName = "stakepoolv2";
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
@@ -692,7 +687,6 @@ in
 
         values = {
           stakepool.databaseName = "stakepoolv2";
-          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
           pg-boss-worker.queues = "pool-metadata,pool-metrics";
@@ -795,7 +789,6 @@ in
 
         values = {
           stakepool.databaseName = "stakepoolv2";
-          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
           pg-boss-worker.queues = "pool-metadata,pool-metrics";
@@ -898,7 +891,6 @@ in
 
         values = {
           stakepool.databaseName = "stakepoolv2";
-          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
           pg-boss-worker.queues = "pool-metadata,pool-metrics";
