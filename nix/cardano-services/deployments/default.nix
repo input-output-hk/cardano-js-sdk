@@ -472,13 +472,12 @@ in
           handle.enabled = true;
           stake-pool = {
             enabled = true;
-            env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
           };
           # asset.enabled = true;
         };
 
         values = {
-          stakepool.databaseName = "stakepoolv2";
+          stakepool.databaseName = "stakepoolv3";
           cardano-services = {
             ingresOrder = 98;
             additionalRoutes = [
@@ -512,7 +511,6 @@ in
 
           blockfrost-worker.enabled = true;
           pg-boss-worker.enabled = true;
-          pg-boss-worker.queues = "pool-metadata,pool-metrics";
         };
       };
 
@@ -548,7 +546,7 @@ in
         };
 
         values = {
-          stakepool.databaseName = "stakepoolv2";
+          stakepool.databaseName = "stakepoolv3";
 
           cardano-services = {
             ingresOrder = 98;
