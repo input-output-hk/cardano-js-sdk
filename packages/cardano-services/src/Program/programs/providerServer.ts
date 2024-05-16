@@ -21,7 +21,6 @@ import { HandleHttpService, TypeOrmHandleProvider } from '../../Handle';
 import { HandlePolicyIdsOptionDescriptions, handlePolicyIdsFromFile } from '../options/policyIds';
 import { HttpServer, HttpServerConfig, HttpService, getListen } from '../../Http';
 import { InMemoryCache, NoCache } from '../../InMemoryCache';
-import { KoraLabsHandleProvider, TxSubmitApiProvider } from '@cardano-sdk/cardano-services-client';
 import { Logger } from 'ts-log';
 import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from '../errors';
 import { NodeTxSubmitProvider, TxSubmitHttpService } from '../../TxSubmit';
@@ -31,6 +30,7 @@ import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 import { Pool } from 'pg';
 import { ProviderServerArgs, ProviderServerOptionDescriptions, ServiceNames } from './types';
 import { SrvRecord } from 'dns';
+import { TxSubmitApiProvider } from '@cardano-sdk/cardano-services-client';
 import { TypeormAssetProvider } from '../../Asset/TypeormAssetProvider';
 import { TypeormStakePoolProvider } from '../../StakePool/TypeormStakePoolProvider/TypeormStakePoolProvider';
 import { createDbSyncMetadataService } from '../../Metadata';
@@ -169,22 +169,11 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     if (!args.handlePolicyIds)
       throw new MissingProgramOption(ServiceNames.Handle, HandlePolicyIdsOptionDescriptions.HandlePolicyIds);
 
-    if (args.useKoraLabs) {
-      if (!args.handleProviderServerUrl)
-        throw new MissingProgramOption(ServiceNames.Handle, ProviderServerOptionDescriptions.HandleProviderServerUrl);
-
-      // Cardano.PolicyId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a')
-      sharedHandleProvider = new KoraLabsHandleProvider({
-        policyId: args.handlePolicyIds[0],
-        serverUrl: args.handleProviderServerUrl
-      });
-    } else {
-      sharedHandleProvider = await withTypeOrmProvider(
-        'Handle',
-        async (connectionConfig$) =>
-          new TypeOrmHandleProvider({ connectionConfig$, entities: getEntities(['handle', 'handleMetadata']), logger })
-      )();
-    }
+    sharedHandleProvider = await withTypeOrmProvider(
+      'Handle',
+      async (connectionConfig$) =>
+        new TypeOrmHandleProvider({ connectionConfig$, entities: getEntities(['handle', 'handleMetadata']), logger })
+    )();
 
     return sharedHandleProvider;
   };
@@ -204,7 +193,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       : new CardanoTokenRegistry({ logger }, args);
 
     return new TypeormAssetProvider(
-      { paginationPageSizeLimit: args.paginationPageSizeLimit! },
+      { paginationPageSizeLimit: Math.min(args.paginationPageSizeLimit! * 10, PAGINATION_PAGE_SIZE_LIMIT_ASSETS) },
       {
         connectionConfig$,
         entities: getEntities(['asset']),

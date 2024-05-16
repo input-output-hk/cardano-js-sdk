@@ -47,7 +47,11 @@ in {
 
     packages = with inputs.nixpkgs; [
       awscli2
+      just
       kubectl
+      netcat
+      postgresql_14
+      tmate
     ];
 
     env = with inputs.nixpkgs; [
