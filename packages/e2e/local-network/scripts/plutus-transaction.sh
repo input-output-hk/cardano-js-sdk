@@ -5,6 +5,7 @@
 
 set -euo pipefail
 
+SCRIPT_NAME=$(basename "$0")
 here="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
 root="$(cd "$here/.." && pwd)"
 cd "$root"
@@ -16,7 +17,7 @@ SCRIPT_DATUM_VALUE=12
 SCRIPT_DATUM_HASH='5e9d8bac576e8604e7c3526025bc146f5fa178173e3a5592d122687bd785b520'
 
 clean() {
-  rm pparams.json tx-script.build tx-script.signed test-alonzo.tx test-alonzo.signed balance.out fullUtxo.out
+  rm -f tx-script.build tx-script.signed test-alonzo.tx test-alonzo.signed balance.out fullUtxo.out
 }
 
 getAddressBalance() {
@@ -38,7 +39,7 @@ getAddressBalance() {
 trap clean EXIT
 
 while [ ! -S "$CARDANO_NODE_SOCKET_PATH" ]; do
-  echo "plutus-transaction.sh: CARDANO_NODE_SOCKET_PATH: $CARDANO_NODE_SOCKET_PATH file doesn't exist, waiting..."
+  echo "$SCRIPT_NAME: CARDANO_NODE_SOCKET_PATH: $CARDANO_NODE_SOCKET_PATH file doesn't exist, waiting..."
   sleep 2
 done
 
@@ -48,18 +49,12 @@ currentBalance=$(getAddressBalance "$ALWAYS_SUCCEED_ADDR")
 
 # LOCK FUNDS
 
-cardano-cli query protocol-parameters \
-  --testnet-magic 888 \
-  --out-file pparams.json
-
-cardano-cli transaction build \
-  --babbage-era \
+cardano-cli conway transaction build \
   --testnet-magic 888 \
   --change-address "$genesisAddr" \
   --tx-in "$utxo" \
   --tx-out "$ALWAYS_SUCCEED_ADDR"+"$AMOUNT" \
   --tx-out-datum-hash "$SCRIPT_DATUM_HASH" \
-  --protocol-params-file pparams.json \
   --out-file tx-script.build
 
 cardano-cli transaction sign \
@@ -83,8 +78,7 @@ utxo=$(cardano-cli query utxo --address "$genesisAddr" --testnet-magic 888 | awk
 scriptUtxo=$(cardano-cli query utxo --address "$ALWAYS_SUCCEED_ADDR" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
 currentBalance=$(getAddressBalance "$ALWAYS_SUCCEED_ADDR")
 
-cardano-cli transaction build \
-  --babbage-era \
+cardano-cli conway transaction build \
   --testnet-magic 888 \
   --tx-in "$scriptUtxo" \
   --tx-in-script-file scripts/contracts/alwayssucceeds.plutus \
@@ -92,7 +86,6 @@ cardano-cli transaction build \
   --tx-in-redeemer-value "$SCRIPT_DATUM_VALUE" \
   --tx-in-collateral "$utxo" \
   --change-address "$genesisAddr" \
-  --protocol-params-file pparams.json \
   --out-file test-alonzo.tx
 
 cardano-cli transaction sign \

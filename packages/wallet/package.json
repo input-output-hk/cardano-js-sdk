@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@cardano-foundation/ledgerjs-hw-app-cardano": "^7.1.2",
-    "@cardano-ogmios/client": "5.6.0",
+    "@cardano-ogmios/client": "6.3.0",
     "@cardano-sdk/cardano-services-client": "workspace:~",
     "@cardano-sdk/ogmios": "workspace:~",
     "@cardano-sdk/util-dev": "workspace:~",

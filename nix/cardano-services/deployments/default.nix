@@ -251,6 +251,7 @@ in
           blockfrost-worker.enabled = false;
           pg-boss-worker.enabled = true;
 
+          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
           backend.routes = let
             inherit (oci.meta) versions;
@@ -953,6 +954,7 @@ in
       "live-sanchonet@us-east-2@v1" = final: {
         namespace = "live-sanchonet";
         name = "${final.namespace}-cardanojs-v1";
+        context = "eks-admin";
         network = "sanchonet";
         region = "us-east-2";
 
@@ -977,6 +979,7 @@ in
         values = {
           blockfrost-worker.enabled = false;
           pg-boss-worker.enabled = true;
+          backend.hostnames = ["backend.${final.namespace}.eks.${baseUrl}" "${final.namespace}.${baseUrl}"];
           pg-boss-worker.queues = "pool-metadata,pool-metrics";
           backend.routes = let
             inherit (oci.meta) versions;

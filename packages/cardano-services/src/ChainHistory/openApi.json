@@ -6,13 +6,13 @@
       "name": "Apache 2.0",
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "version": "3.0.1"
+    "version": "3.1.0"
   },
   "paths": {
-    "/v3.0.1/chain-history/health": {
+    "/v3.1.0/chain-history/health": {
       "$ref": "../Http/schema.json#/paths/Health"
     },
-    "/v3.0.1/chain-history/blocks/by-hashes": {
+    "/v3.1.0/chain-history/blocks/by-hashes": {
       "post": {
         "summary": "block history by hashes",
         "operationId": "blocksByHashes",
@@ -50,7 +50,7 @@
         }
       }
     },
-    "/v3.0.1/chain-history/txs/by-hashes": {
+    "/v3.1.0/chain-history/txs/by-hashes": {
       "post": {
         "summary": "transaction history by hashes",
         "operationId": "transactionsByHashes",
@@ -88,7 +88,7 @@
         }
       }
     },
-    "/v3.0.1/chain-history/txs/by-addresses": {
+    "/v3.1.0/chain-history/txs/by-addresses": {
       "post": {
         "summary": "transaction history by addresses",
         "operationId": "transactionsByAddresses",
@@ -130,10 +130,7 @@
   "components": {
     "schemas": {
       "BigInt": {
-        "required": [
-          "value",
-          "__type"
-        ],
+        "required": ["value", "__type"],
         "type": "object",
         "properties": {
           "value": {
@@ -141,17 +138,12 @@
           },
           "__type": {
             "type": "string",
-            "enum": [
-              "bigint"
-            ]
+            "enum": ["bigint"]
           }
         }
       },
       "Date": {
-        "required": [
-          "value",
-          "__type"
-        ],
+        "required": ["value", "__type"],
         "type": "object",
         "properties": {
           "value": {
@@ -159,31 +151,22 @@
           },
           "__type": {
             "type": "string",
-            "enum": [
-              "Date"
-            ]
+            "enum": ["Date"]
           }
         }
       },
       "Undefined": {
-        "required": [
-          "__type"
-        ],
+        "required": ["__type"],
         "type": "object",
         "properties": {
           "__type": {
             "type": "string",
-            "enum": [
-              "undefined"
-            ]
+            "enum": ["undefined"]
           }
         }
       },
       "Map": {
-        "required": [
-          "value",
-          "__type"
-        ],
+        "required": ["value", "__type"],
         "type": "object",
         "properties": {
           "value": {
@@ -194,9 +177,7 @@
           },
           "__type": {
             "type": "string",
-            "enum": [
-              "Map"
-            ]
+            "enum": ["Map"]
           }
         }
       },
@@ -357,14 +338,7 @@
           },
           "purpose": {
             "type": "string",
-            "enum": [
-              "spend",
-              "mint",
-              "certificate",
-              "withdrawal",
-              "vote",
-              "propose"
-            ]
+            "enum": ["spend", "mint", "certificate", "withdrawal", "vote", "propose"]
           },
           "data": {
             "type": "object"
@@ -429,9 +403,7 @@
         "type": "object"
       },
       "Value": {
-        "required": [
-          "coins"
-        ],
+        "required": ["coins"],
         "type": "object",
         "properties": {
           "coins": {
@@ -636,9 +608,7 @@
         }
       },
       "ChainHistoryBlocksBody": {
-        "required": [
-          "ids"
-        ],
+        "required": ["ids"],
         "type": "object",
         "properties": {
           "ids": {
@@ -656,9 +626,7 @@
         }
       },
       "ChainHistoryTxByHashesBody": {
-        "required": [
-          "ids"
-        ],
+        "required": ["ids"],
         "type": "object",
         "properties": {
           "ids": {
@@ -676,10 +644,7 @@
         }
       },
       "ChainHistoryTxByAddressesBody": {
-        "required": [
-          "addresses",
-          "pagination"
-        ],
+        "required": ["addresses", "pagination"],
         "type": "object",
         "properties": {
           "addresses": {

@@ -8,6 +8,7 @@ describe('createDbSyncMetadataService', () => {
   let dbConnection: Pool;
   let service: TxMetadataService;
   let fixtureBuilder: MetadataFixtureBuilder;
+
   beforeAll(() => {
     dbConnection = new Pool({
       connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC
@@ -15,6 +16,8 @@ describe('createDbSyncMetadataService', () => {
     service = createDbSyncMetadataService(dbConnection, logger);
     fixtureBuilder = new MetadataFixtureBuilder(dbConnection, logger);
   });
+
+  afterAll(() => dbConnection.end());
 
   test('query transaction metadata by tx hashes', async () => {
     const hashes = await fixtureBuilder.getTxIds(2);

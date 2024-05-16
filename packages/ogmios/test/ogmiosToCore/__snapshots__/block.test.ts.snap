@@ -4,300 +4,526 @@ exports[`ogmiosToCore block babbage can translate from babbage block 1`] = `
 Object {
   "body": Array [
     Object {
-      "auxiliaryData": Object {
-        "blob": Map {
-          2n => "",
-        },
-        "scripts": Array [
-          Object {
-            "__type": "native",
-            "kind": 4,
-            "slot": 63725,
-          },
-        ],
-      },
+      "auxiliaryData": undefined,
       "body": Object {
-        "auxiliaryDataHash": "bb30a42c1e62f0afda5f0a4e8a562f7a13a24cea00ee81917b86b89e801314aa",
+        "auxiliaryDataHash": undefined,
         "certificates": Array [
           Object {
-            "__typename": "MirCertificate",
-            "pot": "reserve",
-            "quantity": 712n,
-          },
-          Object {
-            "__typename": "PoolRegistrationCertificate",
-            "poolParameters": Object {
-              "cost": 290n,
-              "id": "pool1kkhxvw4w4rjsq9tmma964lt0twsvu46e7lx5zq0uzvh4ge9n0hc",
-              "margin": Object {
-                "denominator": 2,
-                "numerator": 1,
-              },
-              "metadataJson": Object {
-                "hash": "2738e2233800ab7f82bd2212a9a55f52d4851f9147f161684c63e6655bedb562",
-                "url": "https://public.bladepool.com/metadata.json",
-              },
-              "owners": Array [],
-              "pledge": 229n,
-              "relays": Array [
-                Object {
-                  "__typename": "RelayByAddress",
-                  "ipv4": "192.0.2.1",
-                  "ipv6": "2001:db8::1",
-                  "port": undefined,
-                },
-                Object {
-                  "__typename": "RelayByName",
-                  "hostname": "foo.example.com",
-                  "port": undefined,
-                },
-              ],
-              "rewardAccount": "stake_test1urs2w9p3nqfv8amnhgzwchtt8l7dt2kc2qrgqkcy0vyz2sgcp89zz",
-              "vrf": "ee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25",
+            "__typename": "StakeDeregistrationCertificate",
+            "stakeCredential": Object {
+              "hash": "c568341dc347876c1c79e07de3e76265560bca4bb9e6af9f36e40923",
+              "type": 0,
             },
           },
         ],
-        "collaterals": Array [
+        "collaterals": undefined,
+        "fee": 171661n,
+        "inputs": Array [
           Object {
-            "index": 2,
-            "txId": "0268be9dbd0446eaa217e1dec8f399249305e551d7fc1437dd84521f74aa621c",
+            "index": 0,
+            "txId": "b5d98d634ff9992fc448e665cf0a3f56c07fe5d96b511f8b17111dbb3f7eb7c9",
           },
         ],
-        "fee": 58n,
-        "inputs": Array [],
+        "mint": undefined,
+        "outputs": Array [
+          Object {
+            "address": "addr_test1qq2u3e0afx3dqk95hfptv7wm8rl0fht2ecehxzy2yr3g5z79dq6pms68sakpc70q0h37wcn92c9u5jaeu6he7dhypy3sxd05k6",
+            "datum": undefined,
+            "datumHash": undefined,
+            "scriptReference": undefined,
+            "value": Object {
+              "assets": Map {},
+              "coins": 9999134743n,
+            },
+          },
+        ],
+        "requiredExtraSignatures": undefined,
+        "validityInterval": Object {
+          "invalidHereafter": 11201918,
+        },
+      },
+      "id": "543dd5eb80eb34d4caabeb00f7137e9330d1c8afa890d367ef8bdfad24b7f321",
+      "inputSource": "inputs",
+      "witness": Object {
+        "bootstrap": Array [],
+        "signatures": Map {
+          "87e756b9b15d5d1265bb1297d63b20ef9461fd9d863e52656ec8cb6aca99a25c" => "d6f7bfebd57ede5023d0a766ad976cdf1b7c033b7ba95cf115ab8be70661c67134059c7a8c9a5fe3942096a6737e91e264d0add70b50a5215100dc12bdb75105",
+          "0b4bfb2f2fc4fbeaf9399455cad837f428706a76bc37deb4d9b0cc0ed8093e6b" => "639b988a45be61e0fd2cc0ddc46958dcf7ed9cb902ddcd55ecfb6c1a199b4b5e85e109e3d05d36301f6468c70c0e7dfde28068a0a31eb9a61bf9682348d0a102",
+        },
+      },
+    },
+    Object {
+      "auxiliaryData": Object {
+        "blob": Map {
+          58n => "",
+        },
+      },
+      "body": Object {
+        "auxiliaryDataHash": "3f5d7adf353de22cf1fc514aa911901c5fbd1b5ee3ed57950a6dc5a0fe1dbb20",
+        "certificates": undefined,
+        "collaterals": undefined,
+        "fee": 181033n,
+        "inputs": Array [
+          Object {
+            "index": 0,
+            "txId": "458965adb212f57bbe3bf97ba0cc9caa142ce59f79be803332408e567b55b4af",
+          },
+          Object {
+            "index": 1,
+            "txId": "458965adb212f57bbe3bf97ba0cc9caa142ce59f79be803332408e567b55b4af",
+          },
+        ],
         "mint": Map {
-          "0d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4" => -1n,
-          "1d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4" => 2n,
+          "eb48b495393986032e8cef0b0a9b2ce64b3881e8a29347e169c7122c4654" => -30n,
         },
         "outputs": Array [
           Object {
-            "address": "addr1vxnyv36t3a2rzfs4q6mvyu7nqlr4dxjwkmykkskafg54yzsv3uzfs",
+            "address": "addr_test1qq9tud0fzpj6pdeqeegrma25ngfrre9ruwwcuj2m6dnsreu2qtzuksrwqtv4stsk3hq2uscsh90rf5rdgg38k5t0f0nsp30w94",
             "datum": undefined,
-            "datumHash": "0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5",
-            "scriptReference": Object {
-              "__type": "plutus",
-              "bytes": "46010000220011",
-              "version": 1,
-            },
+            "datumHash": undefined,
+            "scriptReference": undefined,
             "value": Object {
-              "assets": Map {},
-              "coins": 2n,
+              "assets": Map {
+                "eb48b495393986032e8cef0b0a9b2ce64b3881e8a29347e169c7122c4654" => 70n,
+              },
+              "coins": 1150770n,
             },
           },
           Object {
-            "address": "addr1vxnyv36t3a2rzfs4q6mvyu7nqlr4dxjwkmykkskafg54yzsv3uzfs",
-            "datum": 123n,
+            "address": "addr_test1qq9tud0fzpj6pdeqeegrma25ngfrre9ruwwcuj2m6dnsreu2qtzuksrwqtv4stsk3hq2uscsh90rf5rdgg38k5t0f0nsp30w94",
+            "datum": undefined,
             "datumHash": undefined,
-            "scriptReference": Object {
-              "__type": "plutus",
-              "bytes": "46010000220011",
-              "version": 1,
-            },
+            "scriptReference": undefined,
             "value": Object {
               "assets": Map {},
-              "coins": 3n,
+              "coins": 9692318369n,
+            },
+          },
+        ],
+        "requiredExtraSignatures": undefined,
+        "validityInterval": Object {
+          "invalidHereafter": 11192321,
+        },
+      },
+      "id": "be69e4186eaf01fa31a1ad1b16780269f34dbab5d73dd34b8e785ed88e330e12",
+      "inputSource": "inputs",
+      "witness": Object {
+        "bootstrap": Array [],
+        "signatures": Map {
+          "c92a58c6a3bd0d181122e6294bdaf00ba43cf65c65d7275ceb2388570be883d7" => "594bb85fed2bef13f2f573607831a69b7a5cce97ca6fed2a0026303e85f65a9d552fd6bbd77d10720110321e0aa8e5d1571fb2d38c848a7f4789e80f17516601",
+          "47c7878b4737c1676d83422fb8f72eb66f1ecb7c94a3c9a7b93ccc0dec7e8f25" => "080a8bf5a6ffbdc521776fca3272290f243e441ffdbbd873e4dfa3f2466fa45e082176b3dbcd09f376eed9cc465fcf538520b2c58a487565e711ad158d2f1c07",
+        },
+      },
+    },
+    Object {
+      "auxiliaryData": Object {
+        "blob": Map {
+          0n => Array [],
+        },
+      },
+      "body": Object {
+        "auxiliaryDataHash": "b93d8e428871a0b0e12c5c554653f515f50fe48dc5b55af7e3667e7d9661ea2c",
+        "certificates": undefined,
+        "collaterals": undefined,
+        "fee": 177029n,
+        "inputs": Array [
+          Object {
+            "index": 1,
+            "txId": "803f8599f482d6f4c84da3b095efb4667aa4506d442cf080125a1baa1d66085e",
+          },
+          Object {
+            "index": 0,
+            "txId": "90f5bcb35b44d7f3f49ddb2907e0f916a86328eefe69bab9214bed9f5fad7487",
+          },
+        ],
+        "mint": undefined,
+        "outputs": Array [
+          Object {
+            "address": "addr_test1qry0mqhwlf84py9nhz5qukujgjjx26cwg3zqvm2aqeuqqneyz5g72vhh8ws2fcjudfjesyl8fy4qss4rdx9v34e2pxps5s28ar",
+            "datum": undefined,
+            "datumHash": undefined,
+            "scriptReference": undefined,
+            "value": Object {
+              "assets": Map {},
+              "coins": 1000000n,
+            },
+          },
+          Object {
+            "address": "addr_test1qra40qtvuef6dr4ckvzgme7sg5thtdjhjrc268uvn22reqeyz5g72vhh8ws2fcjudfjesyl8fy4qss4rdx9v34e2pxpsglu3mg",
+            "datum": undefined,
+            "datumHash": undefined,
+            "scriptReference": undefined,
+            "value": Object {
+              "assets": Map {},
+              "coins": 1639738n,
+            },
+          },
+        ],
+        "requiredExtraSignatures": undefined,
+        "validityInterval": Object {
+          "invalidHereafter": 11198351,
+        },
+      },
+      "id": "d95c45762d620b81a6eeeebacb86d2b6af4e00df2324f0b1bf14cf9d86b18c16",
+      "inputSource": "inputs",
+      "witness": Object {
+        "bootstrap": Array [],
+        "signatures": Map {
+          "21ccfef5d816ed98dbf00de037322303fda53e1a01a844f38444ba3eb6f6e9e4" => "634c8e2a38429b95e588732655c0513909b5415e7f736ba95c98c394b0fbdb9f1cf102d4230939db883226b7d850fc04b10101aec235686c1ad4da7b0765e600",
+          "2cf1d6c8d41391e658e25dbc88638831d7af3254988bde4650e1c595c2121461" => "b81ebb6d1c2ec74a5c210e9656cb27732f084f653abfe01f56e3d5d39a87a47d933724684d753564274b32def9d923dd3885240265ae7ce87904efd80a563708",
+        },
+      },
+    },
+    Object {
+      "auxiliaryData": undefined,
+      "body": Object {
+        "auxiliaryDataHash": undefined,
+        "certificates": undefined,
+        "collaterals": Array [
+          Object {
+            "index": 0,
+            "txId": "958adee7adb5cfe0510e9f9b63af2d9409bf25637af1ac899fe34b7519568112",
+          },
+        ],
+        "fee": 367282n,
+        "inputs": Array [
+          Object {
+            "index": 0,
+            "txId": "c962f25ff9293e84862f336cfa290adce4804fc7e9488c9a10939c17918935f0",
+          },
+        ],
+        "mint": Map {
+          "4d2047d7af3d8de799de5daa6e1b0ebfc039f4274084d5bb9ba3975d42594e45544c6963656e7365" => 2n,
+        },
+        "outputs": Array [
+          Object {
+            "address": "addr_test1qrc7mfr62uj0zg07ylfq37ukce6ahxtumdl0d3ar5aw35x758sc7z8763mfpes0j7wqrkkrdgna98c0rtlps585ypdnst69syh",
+            "datum": undefined,
+            "datumHash": undefined,
+            "scriptReference": undefined,
+            "value": Object {
+              "assets": Map {},
+              "coins": 2371174n,
+            },
+          },
+          Object {
+            "address": "addr_test1wrn96kc0xx774qnyzccygr0qdxs4escmy8ptfu38p3hfehsu5427k",
+            "datum": undefined,
+            "datumHash": "118cd93427a8e035d484e55ddd4c70200ac5a4d8e63d9d1b89e8a8d49d229415",
+            "scriptReference": undefined,
+            "value": Object {
+              "assets": Map {
+                "4d2047d7af3d8de799de5daa6e1b0ebfc039f4274084d5bb9ba3975d42594e45544c6963656e7365" => 1n,
+              },
+              "coins": 1724000n,
+            },
+          },
+          Object {
+            "address": "addr_test1wrn96kc0xx774qnyzccygr0qdxs4escmy8ptfu38p3hfehsu5427k",
+            "datum": undefined,
+            "datumHash": "118cd93427a8e035d484e55ddd4c70200ac5a4d8e63d9d1b89e8a8d49d229415",
+            "scriptReference": undefined,
+            "value": Object {
+              "assets": Map {
+                "4d2047d7af3d8de799de5daa6e1b0ebfc039f4274084d5bb9ba3975d42594e45544c6963656e7365" => 1n,
+              },
+              "coins": 1724000n,
             },
           },
         ],
         "requiredExtraSignatures": Array [
-          "0d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4",
-          "a646474b8f5431261506b6c273d307c7569a4eb6c96b42dd4a29520a",
+          "f1eda47a5724f121fe27d208fb96c675db997cdb7ef6c7a3a75d1a1b",
         ],
-        "scriptIntegrityHash": undefined,
-        "validityInterval": Object {
-          "invalidBefore": 78202,
-          "invalidHereafter": undefined,
-        },
-        "withdrawals": Array [
-          Object {
-            "quantity": 724n,
-            "stakeAddress": "stake1uxnyv36t3a2rzfs4q6mvyu7nqlr4dxjwkmykkskafg54yzssmuy4z",
-          },
-        ],
+        "scriptIntegrityHash": "86b2db419eb3ac0d6180255726b53900d26ea7c7eab5cd209607eb6d9ae5a136",
+        "validityInterval": Object {},
       },
-      "id": "c32a4a4f5a4b540d4f79730ca0c658d9a8400be2173e0ba1dc8471004c1cb0db",
-      "inputSource": "collaterals",
+      "id": "e8b1c72c0c3002f8d157dc94bb28d3f2ebb3839c859ef8a325c6feefb120e11b",
+      "inputSource": "inputs",
       "witness": Object {
-        "bootstrap": Array [
+        "bootstrap": Array [],
+        "datums": Array [
           Object {
-            "addressAttributes": undefined,
-            "chainCode": "4d",
-            "key": "de46fb9f52d8a229e3cedc60002564a3d23309dbf21dfaabd38485c4538419b2",
-            "signature": "3f6d08a1b7ab7818a78be8d48ea828b0e9976258a4ca38157f628fe4de1f326a4ef403c40d0348864de77259be9a5c606af20b29ebe7f6aeb594ac40177728aa",
-          },
-          Object {
-            "addressAttributes": "mQ==",
-            "chainCode": "20",
-            "key": "fc1a29ed3f0a4c1a4036298831ce117a23b6b714abba83d0a093d0839e193c39",
-            "signature": "3f1984ded5b35198bcfceaa4d5f44b26cb8e6aa59cde74e578b06f9351bdb17563162374f199980423e52dde6c8b7e42bf4ca120ddbf557241b9a59b730809fe",
+            "cbor": "d8799f581c0bfe875a7ae9db3c1b3827483ac6a1d02a7a93d3d26df00c7973aa47ff",
+            "constructor": 0n,
+            "fields": Object {
+              "cbor": "9f581c0bfe875a7ae9db3c1b3827483ac6a1d02a7a93d3d26df00c7973aa47ff",
+              "items": Array [
+                Uint8Array [
+                  11,
+                  254,
+                  135,
+                  90,
+                  122,
+                  233,
+                  219,
+                  60,
+                  27,
+                  56,
+                  39,
+                  72,
+                  58,
+                  198,
+                  161,
+                  208,
+                  42,
+                  122,
+                  147,
+                  211,
+                  210,
+                  109,
+                  240,
+                  12,
+                  121,
+                  115,
+                  170,
+                  71,
+                ],
+              ],
+            },
           },
         ],
-        "datums": Array [],
         "redeemers": Array [
           Object {
             "data": Object {
-              "cbor": "a34160029f20a3419c204386a48244e21bd936202004a0ffa3a4435aed90040242b07a210523409f414d429b3f0440ffa09f034001ffa222234041b4d8668218da9f2341440302413eff4204e1a1d866821901939f23ffa0",
-              "data": Map {
-                Uint8Array [
-                  96,
-                ] => 2n,
-                Object {
-                  "cbor": "9f20a3419c204386a48244e21bd936202004a0ff",
-                  "items": Array [
-                    -1n,
-                    Object {
-                      "cbor": "a3419c204386a48244e21bd9362020",
-                      "data": Map {
-                        Uint8Array [
-                          156,
-                        ] => -1n,
-                        Uint8Array [
-                          134,
-                          164,
-                          130,
-                        ] => Uint8Array [
-                          226,
-                          27,
-                          217,
-                          54,
-                        ],
-                        -1n => -1n,
-                      },
-                    },
-                    4n,
-                    Object {
-                      "cbor": "a0",
-                      "data": Map {},
-                    },
-                  ],
-                } => Object {
-                  "cbor": "a3a4435aed90040242b07a210523409f414d429b3f0440ffa09f034001ffa222234041b4d8668218da9f2341440302413eff",
-                  "data": Map {
-                    Object {
-                      "cbor": "a4435aed90040242b07a21052340",
-                      "data": Map {
-                        Uint8Array [
-                          90,
-                          237,
-                          144,
-                        ] => 4n,
-                        2n => Uint8Array [
-                          176,
-                          122,
-                        ],
-                        -2n => 5n,
-                        -4n => Uint8Array [],
-                      },
-                    } => Object {
-                      "cbor": "9f414d429b3f0440ff",
-                      "items": Array [
-                        Uint8Array [
-                          77,
-                        ],
-                        Uint8Array [
-                          155,
-                          63,
-                        ],
-                        4n,
-                        Uint8Array [],
-                      ],
-                    },
-                    Object {
-                      "cbor": "a0",
-                      "data": Map {},
-                    } => Object {
-                      "cbor": "9f034001ff",
-                      "items": Array [
-                        3n,
-                        Uint8Array [],
-                        1n,
-                      ],
-                    },
-                    Object {
-                      "cbor": "a222234041b4",
-                      "data": Map {
-                        -3n => -4n,
-                        Uint8Array [] => Uint8Array [
-                          180,
-                        ],
-                      },
-                    } => Object {
-                      "cbor": "d8668218da9f2341440302413eff",
-                      "constructor": 218n,
-                      "fields": Object {
-                        "cbor": "9f2341440302413eff",
-                        "items": Array [
-                          -4n,
-                          Uint8Array [
-                            68,
-                          ],
-                          3n,
-                          2n,
-                          Uint8Array [
-                            62,
-                          ],
-                        ],
-                      },
-                    },
-                  },
-                },
-                Uint8Array [
-                  4,
-                  225,
-                ] => Object {
-                  "cbor": "a1d866821901939f23ffa0",
-                  "data": Map {
-                    Object {
-                      "cbor": "d866821901939f23ff",
-                      "constructor": 403n,
-                      "fields": Object {
-                        "cbor": "9f23ff",
-                        "items": Array [
-                          -4n,
-                        ],
-                      },
-                    } => Object {
-                      "cbor": "a0",
-                      "data": Map {},
-                    },
-                  },
-                },
+              "cbor": "d87980",
+              "constructor": 0n,
+              "fields": Object {
+                "cbor": "9fff",
+                "items": Array [],
               },
             },
             "executionUnits": Object {
-              "memory": 6026711518256058000,
-              "steps": 4749668747002319000,
+              "memory": 769094,
+              "steps": 226632481,
             },
             "index": 0,
-            "purpose": "spend",
-          },
-        ],
-        "scripts": Array [
-          Object {
-            "__type": "plutus",
-            "bytes": "46010000220011",
-            "version": 0,
+            "purpose": "mint",
           },
         ],
         "signatures": Map {
-          "679b8abd1379729475da1c530dda8dc1bf9177eceae449a0a15e4f16f45399be" => "a3e2a2c4478afe7cd734fa593ce33f06841255656dc31d3acff48884ce9478d56314dd6ba8728de417413a798ab6e87f685fb917f8300b397728f08631c16e39",
-          "238287f3ea9a746513acbee2aeb1e980d9feead29bf8157b7756437ffbe8ee5b" => "1e639773425c0cfa6376d7326500efc574d9b87afba2296a4e12157ad83176ce7300600a921bed6087600b3a118ea905746a62cfe90649ea2aa00f46142aad7b",
+          "3213e3fa6e42a75ba69df35d80666a021b0a650be3c5dadee03532414e90ab9c" => "76183df968ab1309d7a411d5513c24640c766c87d875415769cf373c59454a181c93963b1b1c33be70cc62db0bc8e3e2e0a1b53c1ba338ab58e1baf79642ca0c",
+        },
+      },
+    },
+    Object {
+      "auxiliaryData": undefined,
+      "body": Object {
+        "auxiliaryDataHash": undefined,
+        "certificates": undefined,
+        "collaterals": Array [
+          Object {
+            "index": 0,
+            "txId": "958adee7adb5cfe0510e9f9b63af2d9409bf25637af1ac899fe34b7519568112",
+          },
+        ],
+        "fee": 383135n,
+        "inputs": Array [
+          Object {
+            "index": 7,
+            "txId": "20365bc2f9e9b368cf61f4670d0e0fb295a178f66fe8986d4aee713d105b27f6",
+          },
+        ],
+        "mint": Map {
+          "4d2047d7af3d8de799de5daa6e1b0ebfc039f4274084d5bb9ba3975d42594e45544c6963656e7365" => 3n,
+        },
+        "outputs": Array [
+          Object {
+            "address": "addr_test1qrc7mfr62uj0zg07ylfq37ukce6ahxtumdl0d3ar5aw35x758sc7z8763mfpes0j7wqrkkrdgna98c0rtlps585ypdnst69syh",
+            "datum": undefined,
+            "datumHash": undefined,
+            "scriptReference": undefined,
+            "value": Object {
+              "assets": Map {},
+              "coins": 4444865n,
+            },
+          },
+          Object {
+            "address": "addr_test1wrn96kc0xx774qnyzccygr0qdxs4escmy8ptfu38p3hfehsu5427k",
+            "datum": undefined,
+            "datumHash": "118cd93427a8e035d484e55ddd4c70200ac5a4d8e63d9d1b89e8a8d49d229415",
+            "scriptReference": undefined,
+            "value": Object {
+              "assets": Map {
+                "4d2047d7af3d8de799de5daa6e1b0ebfc039f4274084d5bb9ba3975d42594e45544c6963656e7365" => 1n,
+              },
+              "coins": 1724000n,
+            },
+          },
+          Object {
+            "address": "addr_test1wrn96kc0xx774qnyzccygr0qdxs4escmy8ptfu38p3hfehsu5427k",
+            "datum": undefined,
+            "datumHash": "118cd93427a8e035d484e55ddd4c70200ac5a4d8e63d9d1b89e8a8d49d229415",
+            "scriptReference": undefined,
+            "value": Object {
+              "assets": Map {
+                "4d2047d7af3d8de799de5daa6e1b0ebfc039f4274084d5bb9ba3975d42594e45544c6963656e7365" => 1n,
+              },
+              "coins": 1724000n,
+            },
+          },
+          Object {
+            "address": "addr_test1wrn96kc0xx774qnyzccygr0qdxs4escmy8ptfu38p3hfehsu5427k",
+            "datum": undefined,
+            "datumHash": "118cd93427a8e035d484e55ddd4c70200ac5a4d8e63d9d1b89e8a8d49d229415",
+            "scriptReference": undefined,
+            "value": Object {
+              "assets": Map {
+                "4d2047d7af3d8de799de5daa6e1b0ebfc039f4274084d5bb9ba3975d42594e45544c6963656e7365" => 1n,
+              },
+              "coins": 1724000n,
+            },
+          },
+        ],
+        "requiredExtraSignatures": Array [
+          "f1eda47a5724f121fe27d208fb96c675db997cdb7ef6c7a3a75d1a1b",
+        ],
+        "scriptIntegrityHash": "efa020e8985191676d8922ea1bb7f0134dda7008a9a02fa5d87d00363a9ae096",
+        "validityInterval": Object {},
+      },
+      "id": "2c8ddb336af166f19bf609f259fa9217fc3c7fed76c576e13bde393c145e181f",
+      "inputSource": "inputs",
+      "witness": Object {
+        "bootstrap": Array [],
+        "datums": Array [
+          Object {
+            "cbor": "d8799f581c0bfe875a7ae9db3c1b3827483ac6a1d02a7a93d3d26df00c7973aa47ff",
+            "constructor": 0n,
+            "fields": Object {
+              "cbor": "9f581c0bfe875a7ae9db3c1b3827483ac6a1d02a7a93d3d26df00c7973aa47ff",
+              "items": Array [
+                Uint8Array [
+                  11,
+                  254,
+                  135,
+                  90,
+                  122,
+                  233,
+                  219,
+                  60,
+                  27,
+                  56,
+                  39,
+                  72,
+                  58,
+                  198,
+                  161,
+                  208,
+                  42,
+                  122,
+                  147,
+                  211,
+                  210,
+                  109,
+                  240,
+                  12,
+                  121,
+                  115,
+                  170,
+                  71,
+                ],
+              ],
+            },
+          },
+        ],
+        "redeemers": Array [
+          Object {
+            "data": Object {
+              "cbor": "d87980",
+              "constructor": 0n,
+              "fields": Object {
+                "cbor": "9fff",
+                "items": Array [],
+              },
+            },
+            "executionUnits": Object {
+              "memory": 905186,
+              "steps": 265573006,
+            },
+            "index": 0,
+            "purpose": "mint",
+          },
+        ],
+        "signatures": Map {
+          "3213e3fa6e42a75ba69df35d80666a021b0a650be3c5dadee03532414e90ab9c" => "2c130293b9ec327d2ae59c4bfbc7779951b1deb1a9545ac9c3462ecb7e18b407e4d48d153500ee848dac1dd07c5db97e1fa1d094ee7903fa689e45fb08f96e0e",
+        },
+      },
+    },
+    Object {
+      "auxiliaryData": Object {
+        "blob": Map {
+          0n => Array [],
+        },
+      },
+      "body": Object {
+        "auxiliaryDataHash": "b93d8e428871a0b0e12c5c554653f515f50fe48dc5b55af7e3667e7d9661ea2c",
+        "certificates": undefined,
+        "collaterals": undefined,
+        "fee": 183233n,
+        "inputs": Array [
+          Object {
+            "index": 0,
+            "txId": "803f8599f482d6f4c84da3b095efb4667aa4506d442cf080125a1baa1d66085e",
+          },
+          Object {
+            "index": 0,
+            "txId": "98d92512364c908d1866e5a23e73c3f2b5219d7f4963343565943823dfc9b3a6",
+          },
+          Object {
+            "index": 1,
+            "txId": "98d92512364c908d1866e5a23e73c3f2b5219d7f4963343565943823dfc9b3a6",
+          },
+        ],
+        "mint": undefined,
+        "outputs": Array [
+          Object {
+            "address": "addr_test1qry0mqhwlf84py9nhz5qukujgjjx26cwg3zqvm2aqeuqqneyz5g72vhh8ws2fcjudfjesyl8fy4qss4rdx9v34e2pxps5s28ar",
+            "datum": undefined,
+            "datumHash": undefined,
+            "scriptReference": undefined,
+            "value": Object {
+              "assets": Map {},
+              "coins": 1000000n,
+            },
+          },
+          Object {
+            "address": "addr_test1qpavsa3m303vjnpsa4cpjzsgeqmkaa7wya3v94s9pq4wtrpyz5g72vhh8ws2fcjudfjesyl8fy4qss4rdx9v34e2pxpsnutk58",
+            "datum": undefined,
+            "datumHash": undefined,
+            "scriptReference": undefined,
+            "value": Object {
+              "assets": Map {},
+              "coins": 9986971687n,
+            },
+          },
+        ],
+        "requiredExtraSignatures": undefined,
+        "validityInterval": Object {
+          "invalidHereafter": 11198411,
+        },
+      },
+      "id": "5448314ba8c137b110f279c2b8869f88b77cce325cddf8aec64480708bd18915",
+      "inputSource": "inputs",
+      "witness": Object {
+        "bootstrap": Array [],
+        "signatures": Map {
+          "53b8509684715055c86ded21c00e6f7c9c2efa73a94959842a3fe91d6001e932" => "cc35732a94c3f4521479942a07bdbf54f71062dd134fe66ff015a66ec74016b348782e4d2eafd99ae66cc7894249587622c4092090c841b439dfea558ff2190d",
+          "2cf1d6c8d41391e658e25dbc88638831d7af3254988bde4650e1c595c2121461" => "f76fd79984cb7bbdeb5445c040aa873f60f1f3f56c71d3db77468261c864b8e745916bf519ae2e54453692dc2d1b0a0b1daf68ece63f084ac3b67d665637920d",
         },
       },
     },
   ],
-  "fees": 58n,
+  "fees": 1463373n,
   "header": Object {
-    "blockNo": 4,
-    "hash": "ee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25",
-    "slot": 6,
+    "blockNo": 203082,
+    "hash": "cfe3bf5be724076a3afbdf590873a4c616baa9a7daf5da26843a8bf1592b5757",
+    "slot": 11191217,
   },
-  "issuerVk": "f6cc957f17046ce6de24c81d08e9381608ed1acc083284916252f76f65643eae",
-  "previousBlock": undefined,
-  "size": 2,
-  "totalOutput": 5n,
-  "txCount": 1,
-  "vrf": "vrf_vk1mdx46ssmatqxlp4uedjxlnvepts5l6kh20m2a6mtzu0ycnsergpq6653ra",
+  "issuerVk": "9691ed9d98a5b79d5bc46c4496a6dba7e103f668f525c8349b6b92676cb3eae4",
+  "previousBlock": "93c19803741b88256b485b51f4f4f21753e3828033634c65ace84b637dac3259",
+  "size": 8511,
+  "totalOutput": 29698651346n,
+  "txCount": 6,
+  "vrf": "vrf_vk1afy7gefvgc9eaek64lhunxw2velmuh4467n6a2aalah7r8q68j0s4f2sa9",
 }
 `;
 
@@ -305,147 +531,63 @@ exports[`ogmiosToCore block can translate from allegra block 1`] = `
 Object {
   "body": Array [
     Object {
-      "auxiliaryData": Object {
-        "blob": Map {
-          2n => Array [
-            9798604473814314674n,
-            Object {
-              "data": Array [
-                122,
-                67,
-              ],
-              "type": "Buffer",
-            },
-          ],
-        },
-        "scripts": Array [
-          Object {
-            "__type": "native",
-            "keyHash": "b5ae663aaea8e500157bdf4baafd6f5ba0ce5759f7cd4101fc132f54",
-            "kind": 0,
-          },
-          Object {
-            "__type": "native",
-            "keyHash": "a646474b8f5431261506b6c273d307c7569a4eb6c96b42dd4a29520a",
-            "kind": 0,
-          },
-          Object {
-            "__type": "native",
-            "kind": 1,
-            "scripts": Array [
-              Object {
-                "__type": "native",
-                "kind": 2,
-                "scripts": Array [],
-              },
-              Object {
-                "__type": "native",
-                "keyHash": "58e1b65718531b42494610c506cef10ff031fa817a8ff75c0ab180e7",
-                "kind": 0,
-              },
-              Object {
-                "__type": "native",
-                "kind": 2,
-                "scripts": Array [
-                  Object {
-                    "__type": "native",
-                    "kind": 5,
-                    "slot": 15272,
-                  },
-                ],
-              },
-              Object {
-                "__type": "native",
-                "kind": 4,
-                "slot": 44521,
-              },
-              Object {
-                "__type": "native",
-                "kind": 4,
-                "slot": 91998,
-              },
-            ],
-          },
-        ],
-      },
+      "auxiliaryData": undefined,
       "body": Object {
-        "auxiliaryDataHash": "ee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25",
-        "certificates": Array [],
+        "auxiliaryDataHash": undefined,
+        "certificates": undefined,
         "collaterals": undefined,
-        "fee": 724n,
+        "fee": 207829n,
         "inputs": Array [
           Object {
-            "index": 2,
-            "txId": "03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314",
+            "index": 0,
+            "txId": "a00696a0c2d70c381a265a845e43c55e1d00f96b27c06defc015dc92eb206240",
           },
         ],
         "mint": undefined,
-        "outputs": Array [],
-        "requiredExtraSignatures": undefined,
-        "scriptIntegrityHash": undefined,
-        "validityInterval": Object {
-          "invalidBefore": undefined,
-          "invalidHereafter": 79985,
-        },
-        "withdrawals": Array [],
-      },
-      "id": "8ba812bad0c356ec842365720acb4a4ea18f03d40b03ad1cc785426170d542f5",
-      "inputSource": "inputs",
-      "witness": Object {
-        "bootstrap": Array [
+        "outputs": Array [
           Object {
-            "addressAttributes": "Sn5kyQ==",
-            "chainCode": "beba7627",
-            "key": "e731d1871cc922f6dac49e3130c03fdd706c565e2c9d64c02b6e5a9a5239ba67",
-            "signature": "6f737771796d78737765796e6377626864696e7a677967686163647365616a756d756f747474796f68696275626e6374747a6e65756b67676c6d6a766975696f",
-          },
-          Object {
-            "addressAttributes": "dFA=",
-            "chainCode": undefined,
-            "key": "f0f5ffa432e7936e1f47092aa805ad34f198bd2b00bafb1950b41dc864b47874",
-            "signature": "6975736274637a77706a69617a61696f6a62796a64787364666a746979686976676a78657872776765717763666f6c6661766279626f74766579626d656b6f6c",
-          },
-          Object {
-            "addressAttributes": undefined,
-            "chainCode": "06777003",
-            "key": "501d21a038832a37d1d1cec177697adb498954e3fa4315498108c9ca48d0e51b",
-            "signature": "10f6d6cd30b46e5eee1abf97c67cf426e2376ac410945c101823f3b3b289fea4229ae524993f3755cbf3ae69949272c4613a033ab525f7d65a0fc8569f5f9578",
-          },
-          Object {
-            "addressAttributes": "Mw==",
-            "chainCode": "82",
-            "key": "b99abe31700f07caa60b1ac6f7f55f00e5c926dea06c02451a88eefe9e81a2fa",
-            "signature": "646f736e7a6a69767469656b6c6b75746662687572707762636a616c7463657769616c6a75746573616f7461617a6d7a7576707562716561757471626e6f7465",
-          },
-          Object {
-            "addressAttributes": "LA==",
-            "chainCode": "cc",
-            "key": "cfb0a988516364010755fe4b00982dd37cc678fad4fe67bbf7b8ff85af2da478",
-            "signature": "c0c3181155255a3fa7af837fd91a599a1c5434381e6a38239b2660f22bc7b37882df576c807bbd385275b56647c706b24fc9d6b520083c4f865bd4f4b6b16079",
+            "address": "addr_test1vz09v9yfxguvlp0zsnrpa3tdtm7el8xufp3m5lsm7qxzclgmzkket",
+            "datum": undefined,
+            "datumHash": undefined,
+            "scriptReference": undefined,
+            "value": Object {
+              "assets": Map {},
+              "coins": 29699998493147869n,
+            },
           },
         ],
-        "datums": undefined,
-        "redeemers": undefined,
-        "scripts": Array [],
+        "requiredExtraSignatures": undefined,
+        "validityInterval": Object {},
+      },
+      "id": "59f68ea73b95940d443dc516702d5e5deccac2429e4d974f464cc9b26292fd9c",
+      "inputSource": "inputs",
+      "witness": Object {
+        "bootstrap": Array [],
         "signatures": Map {
-          "0c6be66a669a7e598d49bac208a3760f702ed2f59369f4efbf4bef3e25a99428" => "52839a987d9d301a0fe1319f2c2b47fdef94796b67400ac61752708934c4ff6378a5d0bc6803fea63f5073e9a7f830eb3f4f8631ad8e10fe63f8eb19eae3caf1",
-          "88d69c23b54b27f253aa51971458bd21b5d700a91f02fea2373bf76e69d33ac1" => "b7a3e4bbf2435b31b7546f7e2173b48a241600f2533c6214518b24f6bf8dcdd7a359ebc91ae5cee218b423b9beaa1251aec6a7fca46661823b8faec73e1eb982",
+          "8b0960d234bda67d52432c5d1a26aca2bfb5b9a09f966d9592a7bf0c728a1ecd" => "11a439a7391e34bd1bd4829f669a630276deb8cbe59f2a5ccca5190d19963bef9477e6f61e8d47438323ce9424befec3357c88908473fd332a7633ab2882c006",
+          "618b625df30de53895ff29e7a3770dca56c2ff066d4aa05a6971905deecef6db" => "5cde79e14b9c033276fb503aaf6ae84fd0142d63e01c0a81ec1fb0794874184c2e3ac0fca64274f01be1ff3b7a93d2e7df60b485deb71fa8549a8ad879b0cb07",
+          "69a14b724409e0ceef671c76ec4f8bce7509b5919bb971b3855bf92ca5653222" => "ecd0ea504800f96b34cc42742b1bd45990fa0068161c9cce3fb0703568c7dfe2a9283c02e63d0593bab15fa34fe9b732ad1915019d0f2d05a0fd0a570aa14205",
+          "d1a8de6caa8fd9b175c59862ecdd5abcd0477b84b82a0e52faecc6b3c85100a4" => "60a4389a2a3ef54f7060c638a4268b5c7e2042bde1d1c7dc9ae9d29ffbe8bb9170fc929f27e3b0b298d42f34035fd3c149c1ede0fce7ec2981c3c882123f180e",
+          "9aae625d4d15bcb3733d420e064f1cd338f386e0af049fcd42b455a69d28ad36" => "7e986eef76c9dcfb2483ca3fbe299f224c51a58da94b85ba1fcba41b384691b4cde236ca0d72237a2a21fe373a0d68c69ec490f0628cb6523b0263ca3338fc0a",
+          "942bb3aaab0f6442b906b65ba6ddbf7969caa662d90968926211a3d56532f11d" => "90b5745d1007bfc524ffc53dfa17e58483ff74e9d37275f0b9e9ca084e180e2c2799b7947dcdb34774836719ea897ee4bd3e38b7e52513084ef61dfd1ead3809",
+          "d4dd69a41071bc2dc8e64a97f4bd6379524ce0c2b665728043a067e34d3e218a" => "d9b5a70f1f14b084385930fa47ed66ed0c8237812825f6c3923bdc702ab1f219cc4583b8c0e5d291cfd3e0ae586f4e98d5e87d251304ed3afd1c088c129a190f",
+          "8ef320c2df6654a6188c45e9c639c0a686bf5a865295587d399dfeb05fe74ab6" => "a59197afd5188eba40323d57246103eda1bb231a4df0879e6b1c3ce512978af0c6e33355f53bb9db0e6f85cc8d835355b6b30af9dde11a94c8c7ed2c635a7603",
         },
       },
     },
   ],
-  "fees": 724n,
+  "fees": 207829n,
   "header": Object {
-    "blockNo": 13,
-    "hash": "bb30a42c1e62f0afda5f0a4e8a562f7a13a24cea00ee81917b86b89e801314aa",
-    "slot": 9,
+    "blockNo": 21655,
+    "hash": "affaf81ee993f657212d094c345ba86eed383a1ba19b5510e419390b85aa77a2",
+    "slot": 518600,
   },
-  "issuerVk": "60337a64656bf2646f66c90ab4a546bbf3c3f5f8f00bf06fcc1d9f7d01d924f6",
-  "previousBlock": "bb30a42c1e62f0afda5f0a4e8a562f7a13a24cea00ee81917b86b89e801314aa",
-  "size": 503,
-  "totalOutput": 0n,
+  "issuerVk": "618b625df30de53895ff29e7a3770dca56c2ff066d4aa05a6971905deecef6db",
+  "previousBlock": "cacf5da6b8d81bbdf77b5ce4f5ea7f7b6714a29b1e81dbf541b01e92d8e1a321",
+  "size": 1193,
+  "totalOutput": 29699998493147869n,
   "txCount": 1,
-  "vrf": "vrf_vk1njzx6395znzy6p7ene2dqw7y77rq4zfaepyw2v6megqnuhepmfgqkg07xz",
+  "vrf": "vrf_vk1wpa9axwwassnadt8drdrzptxm285latvhhvsgv0t6zhp0akgej9sfgecvl",
 }
 `;
 
@@ -453,145 +595,118 @@ exports[`ogmiosToCore block can translate from alonzo block 1`] = `
 Object {
   "body": Array [
     Object {
-      "auxiliaryData": Object {
-        "blob": Map {
-          674n => Map {
-            "msg" => Array [
-              "Auto-Loop-Transaction #338666 by ATADA",
-              "",
-              "Live Epoch 16, we have 061h 17m 32s left until the next one",
-              "It's Montag - 22 August 2022 - 12:42:28 in Austria",
-              "",
-              "📈 The current ADA Price on Kraken is: $0.451502 / ADA",
-              "",
-              "A random Zen-Quote for you: 🙏",
-              "There are three classes of people: those who see. Those who see",
-              "when they are shown. Those who do not see. - Leonardo da Vinci",
-              "",
-              "Node-Revision: 950c4e222086fed5ca53564e642434ce9307b0b9",
-              "",
-              "PreProd-Chain is awesome, have some fun! 😍",
-              " Best regards, Martin :-)",
-            ],
-          },
-        },
-        "scripts": Array [],
-      },
+      "auxiliaryData": undefined,
       "body": Object {
-        "auxiliaryDataHash": "0ad6d4a6e10182157142994b2cce2aebee9406e3e2be31bfb1574ed2409a71dc",
-        "certificates": Array [
-          Object {
-            "__typename": "StakeDelegationCertificate",
-            "poolId": "pool15erywju02scjv9gxkmp885c8catf5n4ke9459h2299fq57u9c3e",
-            "stakeCredential": Object {
-              "hash": "f2f6381fa7a3dcc144939b47dffb7dad677856dfbbee4c4b7e426049",
-              "type": 0,
-            },
-          },
-          Object {
-            "__typename": "StakeDeregistrationCertificate",
-            "stakeCredential": Object {
-              "hash": "f2f6381fa7a3dcc144939b47dffb7dad677856dfbbee4c4b7e426049",
-              "type": 0,
-            },
-          },
-          Object {
-            "__typename": "PoolRetirementCertificate",
-            "epoch": 123,
-            "poolId": "pool15erywju02scjv9gxkmp885c8catf5n4ke9459h2299fq57u9c3e",
-          },
-          Object {
-            "__typename": "GenesisKeyDelegationCertificate",
-            "genesisDelegateHash": "e0a714319812c3f773ba04ec5d6b3ffcd5aad85006805b047b082541",
-            "genesisHash": "b16b56f5ec064be6ac3cab6035efae86b366cc3dc4a0d571603d70e5",
-            "vrfKeyHash": "95c3003a78585e0db8c9496f6deef4de0ff000994b8534cd66d4fe96bb21ddd3",
-          },
-        ],
-        "collaterals": Array [],
-        "fee": 202549n,
+        "auxiliaryDataHash": undefined,
+        "certificates": undefined,
+        "collaterals": undefined,
+        "fee": 205981n,
         "inputs": Array [
           Object {
             "index": 0,
-            "txId": "1a3380c51384d151b876de02b7a4c5ca7eda7b1d1d744660aee4647516fd9a81",
-          },
-          Object {
-            "index": 1,
-            "txId": "1a3380c51384d151b876de02b7a4c5ca7eda7b1d1d744660aee4647516fd9a81",
+            "txId": "0dd9b1dd89ff50c6907b3fd0385fde86f7c6877c2c9a95a9a9aa83b1cfead128",
           },
         ],
-        "mint": Map {},
+        "mint": undefined,
         "outputs": Array [
           Object {
-            "address": "addr_test1vpfwv0ezc5g8a4mkku8hhy3y3vp92t7s3ul8g778g5yegsgalc6gc",
-            "datum": undefined,
-            "datumHash": undefined,
-            "scriptReference": undefined,
-            "value": Object {
-              "assets": Map {},
-              "coins": 999978n,
-            },
-          },
-          Object {
-            "address": "addr_test1vpfwv0ezc5g8a4mkku8hhy3y3vp92t7s3ul8g778g5yegsgalc6gc",
+            "address": "addr_test1vz09v9yfxguvlp0zsnrpa3tdtm7el8xufp3m5lsm7qxzclgmzkket",
             "datum": undefined,
             "datumHash": "c5dfa8c3cbd5a959829618a7b46e163078cb3f1b39f152514d0c3686d553529a",
             "scriptReference": undefined,
             "value": Object {
               "assets": Map {},
-              "coins": 8286924731n,
+              "coins": 29699998492735907n,
             },
           },
         ],
-        "requiredExtraSignatures": Array [],
-        "scriptIntegrityHash": undefined,
-        "validityInterval": Object {
-          "invalidBefore": undefined,
-          "invalidHereafter": 5581748,
-        },
-        "withdrawals": Array [],
+        "requiredExtraSignatures": undefined,
+        "validityInterval": Object {},
       },
-      "id": "bb81604e09c4530ad02de6b80a0c13d82949fb307402dd0c2b447e211bdc621d",
+      "id": "cb9a4cdc0e6555b713d99dd2088180be7a36a6c64d89e32b710e7c3a5d366cf2",
       "inputSource": "inputs",
       "witness": Object {
         "bootstrap": Array [],
-        "datums": Array [],
-        "redeemers": Array [],
-        "scripts": Array [],
         "signatures": Map {
-          "742d8af3543349b5b18f3cba28f23b2d6e465b9c136c42e1fae6b2390f565427" => "484d0c242bc240163a1ac84568fbf870d83cfff72c2532c2acb51d12a222ba6e7b6333c88123ee6e04ca78c3c61c2d5932ea2062c59093a95fcc4c35c3413206",
+          "8b0960d234bda67d52432c5d1a26aca2bfb5b9a09f966d9592a7bf0c728a1ecd" => "845756107198dcd60b639313ca9ca17ea4553ee24fcaa23620260f9da8304eee99b7bfce574071ec216a148b75162b01294dea76a6a8abae1de5387a68b44c03",
+          "618b625df30de53895ff29e7a3770dca56c2ff066d4aa05a6971905deecef6db" => "2c65c8f60495bdcf7fc077ff3545bf31d2379b5bc0efb88e393d54a2a43fbb7616d18c3e6537bb83d1c56f75241b9b13c72d9f28d96d692eb1e58cf52977a30d",
+          "69a14b724409e0ceef671c76ec4f8bce7509b5919bb971b3855bf92ca5653222" => "86f498524e0c7cfdd8999929ae915318d9bc67e1a935f24787bb9e7f5f4e68686650f5191f0783bfa343a56215d1ba67b721e9635d44af0d8fa28f003dcbe007",
+          "d1a8de6caa8fd9b175c59862ecdd5abcd0477b84b82a0e52faecc6b3c85100a4" => "898bbf40ffd2e7890665947986051ab90fa6b8988bf53ae89d263e3ba84acc288757aef8d0327692c94a487e919ef720bfa485bcff33b342787ff719fb83cc04",
+          "9aae625d4d15bcb3733d420e064f1cd338f386e0af049fcd42b455a69d28ad36" => "0b8eb0ec9dd0b16037a5f457176d6635c1934eeea7f3d8c419b7bb35316479adae9cf037a609ed0cc77fac76774bd8d50d1e2b205bd707127007312acfe8ac0e",
+          "942bb3aaab0f6442b906b65ba6ddbf7969caa662d90968926211a3d56532f11d" => "eac02a754184454b5a83983560b830e522f828fd17f5e014d49044891013cd87d3dab5730971459cad48a62ea33271f9164d9196e46a708538efce06d16c3e09",
+          "d4dd69a41071bc2dc8e64a97f4bd6379524ce0c2b665728043a067e34d3e218a" => "176b13ca898b1e8b9e87cefdd4a168f0d2ae65999e83fc82f4780ba0aaf3c81e9da85b46a294f780eb1318d40bea6678dc08eab441ce8f70b4fa9bfbceabdc07",
+          "8ef320c2df6654a6188c45e9c639c0a686bf5a865295587d399dfeb05fe74ab6" => "f36dcb0ae7d5a7d833ebe9adf272047794b6b0be28971302bfe0fa8ab09fd682080b42046c3f11362556aa76727cbaaa3c09c60618c47e35c0ed32fe89adf603",
         },
       },
     },
   ],
-  "fees": 202549n,
+  "fees": 205981n,
   "header": Object {
-    "blockNo": 100000,
-    "hash": "514f8be63ef25c46bee47a90658977f815919c06222c0b480be1e29efbd72c49",
-    "slot": 5481752,
+    "blockNo": 86474,
+    "hash": "1515d47fe2edba2275eca300e160032f99f684bbf4e852d6f2d86b2e13d0b897",
+    "slot": 1814649,
   },
-  "issuerVk": "a9d974fd26bfaf385749113f260271430276bed6ef4dad6968535de6778471ce",
-  "previousBlock": "518a24a3fb0cc6ee1a31668a63994e4dbda70ede5ff13be494a3b4c1bb7709c8",
-  "size": 836,
-  "totalOutput": 8287924709n,
+  "issuerVk": "f270c16659735ec4b65d15d1cbef937e50e608585ac3b71a4cd117fdb761624e",
+  "previousBlock": "89b666de5df4603c050a7a758e4e07f6b29acbaeb020603920e7ae82981bb7a5",
+  "size": 1152,
+  "totalOutput": 29699998492735907n,
   "txCount": 1,
-  "vrf": "vrf_vk1p8s5ysf7dgsvfrw0p0q7zczdytkxc95zsq3p9sfshk9s3z86jfdql5fdft",
+  "vrf": "vrf_vk1aw6s04lqkquell8drg6jjusrzd8c5259kctvxkgug5kta7nphz9qfqtr4w",
 }
 `;
 
 exports[`ogmiosToCore block can translate from byron block 1`] = `
 Object {
-  "body": Array [],
+  "body": Array [
+    Object {
+      "auxiliaryData": undefined,
+      "body": Object {
+        "auxiliaryDataHash": undefined,
+        "certificates": undefined,
+        "collaterals": undefined,
+        "fee": 165884094000000n,
+        "inputs": Array [
+          Object {
+            "index": 0,
+            "txId": "a12a839c25a01fa5d118167db5acdbd9e38172ae8f00e5ac0a4997ef792a2007",
+          },
+        ],
+        "mint": undefined,
+        "outputs": Array [
+          Object {
+            "address": "DdzFFzCqrhsszHTvbjTmYje5hehGbadkT6WgWbaqCy5XNxNttsPNF13eAjjBHYT7JaLJz2XVxiucam1EvwBRPSTiCrT4TNCBas4hfzic",
+            "datum": undefined,
+            "datumHash": undefined,
+            "scriptReference": undefined,
+            "value": Object {
+              "assets": Map {},
+              "coins": 1000000n,
+            },
+          },
+        ],
+        "requiredExtraSignatures": undefined,
+      },
+      "id": "6497b33b10fa2619c6efbd9f874ecd1c91badb10bf70850732aab45b90524d9e",
+      "inputSource": "inputs",
+      "witness": Object {
+        "bootstrap": Array [],
+        "signatures": Map {
+          "8c0bdedfbbab26a1308300512ffb1b220f068ee13f7612afb076c22de3fb7641" => "6cc41635a9794234966629ccfa2a5b089a20ae392f0e92154ff97eda30ff7a082a65fc4b362c24cf58c27f30103b1f1345e15479cf4b80cd4134c0f9dca83109",
+        },
+      },
+    },
+  ],
   "fees": undefined,
   "header": Object {
-    "blockNo": 42,
-    "hash": "5c3103bd0ff5ea85a62b202a1d2500cf3ebe0b9d793ed09e7febfe27ef12c968",
-    "slot": 77761,
+    "blockNo": 3314,
+    "hash": "cf80534e520fa8f4bde1ed2f623553b8a6a9fd616d73bf9d4f7d6d1687685248",
+    "slot": 3313,
   },
   "issuerVk": undefined,
-  "previousBlock": "dd8d7559a9b6c1177c0f5a328eb82967af68155d58cbcdc0a59de39a38aaf3f0",
-  "size": undefined,
-  "totalOutput": 0n,
-  "txCount": 0,
+  "previousBlock": "43d58aa00099c44787fdb174db22823494814eb2cdf209b044ca20cc5cf62b25",
+  "size": 908,
+  "totalOutput": 1000000n,
+  "txCount": 1,
   "vrf": undefined,
 }
 `;
@@ -603,366 +718,275 @@ Object {
       "auxiliaryData": undefined,
       "body": Object {
         "auxiliaryDataHash": undefined,
-        "certificates": Array [
-          Object {
-            "__typename": "StakeRegistrationCertificate",
-            "stakeCredential": Object {
-              "hash": "b5ae663aaea8e500157bdf4baafd6f5ba0ce5759f7cd4101fc132f54",
-              "type": 0,
-            },
-          },
-          Object {
-            "__typename": "GenesisKeyDelegationCertificate",
-            "genesisDelegateHash": "a646474b8f5431261506b6c273d307c7569a4eb6c96b42dd4a29520a",
-            "genesisHash": "0d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4",
-            "vrfKeyHash": "03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314",
-          },
-        ],
+        "certificates": undefined,
         "collaterals": undefined,
-        "fee": 125n,
+        "fee": 205981n,
         "inputs": Array [
           Object {
             "index": 0,
-            "txId": "0268be9dbd0446eaa217e1dec8f399249305e551d7fc1437dd84521f74aa621c",
+            "txId": "59f68ea73b95940d443dc516702d5e5deccac2429e4d974f464cc9b26292fd9c",
           },
         ],
-        "mint": Map {
-          "a646474b8f5431261506b6c273d307c7569a4eb6c96b42dd4a29520a" => -1n,
-        },
+        "mint": undefined,
         "outputs": Array [
           Object {
-            "address": "EqGAuA8vHnNpWh2vRvJSVMGRnu1r5SnDHJMQcHB1vbMSvMxgA8qwpMpsRJeSk2KaTZgJRTKwgDrLNaCQFVK1WisAZLVQ5oXZT6dqLDHDryZAkgwgZqf6S8x",
+            "address": "addr_test1vz09v9yfxguvlp0zsnrpa3tdtm7el8xufp3m5lsm7qxzclgmzkket",
             "datum": undefined,
             "datumHash": undefined,
             "scriptReference": undefined,
             "value": Object {
               "assets": Map {},
-              "coins": 2n,
+              "coins": 29699998492941888n,
             },
           },
         ],
         "requiredExtraSignatures": undefined,
-        "scriptIntegrityHash": undefined,
-        "validityInterval": Object {
-          "invalidBefore": 30892,
-          "invalidHereafter": undefined,
-        },
-        "withdrawals": Array [
-          Object {
-            "quantity": 157n,
-            "stakeAddress": "stake1uyxefct5wvh0n2h88uu44dz9q7l6nq7k2q3uzx54ruxr9eq8cjal2",
-          },
-        ],
+        "validityInterval": Object {},
       },
-      "id": "f138917a172058f68c93de999592c5fb7cafc9265add9723eb2e8b9c12654654",
-      "inputSource": "inputs",
-      "witness": Object {
-        "bootstrap": Array [
-          Object {
-            "addressAttributes": "/0dj0Q==",
-            "chainCode": "57d7",
-            "key": "35d259ed3ad32bda47b0bf2a4f049440f7c298e1c6919518b55cc75e26b06716",
-            "signature": "7169796f776a6c6875646f6768636d6270737a62626861696166747671626c6b7a7a6b6a65616272657a796563726e76746c6978776b6d776f6174706b647262",
-          },
-          Object {
-            "addressAttributes": "GJoe",
-            "chainCode": undefined,
-            "key": "ba1f868037ad35194f719fe964af14509cbf9f611a155a9d1a52aded9ab4ae02",
-            "signature": "290e11ae5da97c332b40aa5f9e649a42e65fa606d21735a58446443d88161c3e2f35d0302a30e1f0455ebd3dbcee12130899efea5c9db7b3d6a17f493d3304d6",
-          },
-          Object {
-            "addressAttributes": "+w==",
-            "chainCode": "336f",
-            "key": "035d0c6528fc5cf842615c5b32fa031b4a3999e9c9bc6c4435bece5bd3cffde5",
-            "signature": "61696e6e707579616a6c6b64747a77656d6178777a6964726d666c706c71797a78646b756579716a736d7170776b77646f7a706372676570697577746e687867",
-          },
-        ],
-        "datums": undefined,
-        "redeemers": undefined,
-        "scripts": Array [
-          Object {
-            "__type": "native",
-            "kind": 2,
-            "scripts": Array [
-              Object {
-                "__type": "native",
-                "kind": 5,
-                "slot": 14448,
-              },
-              Object {
-                "__type": "native",
-                "kind": 5,
-                "slot": 89513,
-              },
-              Object {
-                "__type": "native",
-                "kind": 3,
-                "required": 0,
-                "scripts": Array [],
-              },
-            ],
-          },
-        ],
-        "signatures": Map {},
-      },
-    },
-    Object {
-      "auxiliaryData": Object {
-        "blob": Map {
-          1n => -16613019303347710699n,
-          2n => Object {
-            "data": Array [
-              101,
-              115,
-            ],
-            "type": "Buffer",
-          },
-        },
-        "scripts": Array [],
-      },
-      "body": Object {
-        "auxiliaryDataHash": "ae85d245a3d00bfde01f59f3c4fe0b4bfae1cb37e9cf91929eadcea4985711de",
-        "certificates": Array [
-          Object {
-            "__typename": "PoolRegistrationCertificate",
-            "poolParameters": Object {
-              "cost": 810n,
-              "id": "pool15erywju02scjv9gxkmp885c8catf5n4ke9459h2299fq57u9c3e",
-              "margin": Object {
-                "denominator": 1,
-                "numerator": 0,
-              },
-              "metadataJson": undefined,
-              "owners": Array [
-                "stake_test1uq659t9n5excps5nqgnq6ckrhpa8g2k3f2lc2h4uvuess8sr44gva",
-              ],
-              "pledge": 525n,
-              "relays": Array [],
-              "rewardAccount": "stake_test1uz66ue36465w2qq40005h2hadad6pnjht8mu6sgplsfj74q9f9d7l",
-              "vrf": "bb30a42c1e62f0afda5f0a4e8a562f7a13a24cea00ee81917b86b89e801314aa",
-            },
-          },
-        ],
-        "collaterals": undefined,
-        "fee": 720n,
-        "inputs": Array [
-          Object {
-            "index": 0,
-            "txId": "0268be9dbd0446eaa217e1dec8f399249305e551d7fc1437dd84521f74aa621c",
-          },
-          Object {
-            "index": 0,
-            "txId": "ee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25",
-          },
-        ],
-        "mint": Map {
-          "0d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4" => 1n,
-        },
-        "outputs": Array [
-          Object {
-            "address": "addr_test1grs2w9p3nqfv8amnhgzwchtt8l7dt2kc2qrgqkcy0vyz2sgqqqqs2wje25",
-            "datum": undefined,
-            "datumHash": undefined,
-            "scriptReference": undefined,
-            "value": Object {
-              "assets": Map {
-                "0d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4" => 2n,
-              },
-              "coins": 2n,
-            },
-          },
-          Object {
-            "address": "addr1g8s2w9p3nqfv8amnhgzwchtt8l7dt2kc2qrgqkcy0vyz2sgqqqqqx8489p",
-            "datum": undefined,
-            "datumHash": undefined,
-            "scriptReference": undefined,
-            "value": Object {
-              "assets": Map {
-                "e0a714319812c3f773ba04ec5d6b3ffcd5aad85006805b047b082541" => 2n,
-              },
-              "coins": 1n,
-            },
-          },
-        ],
-        "requiredExtraSignatures": undefined,
-        "scriptIntegrityHash": undefined,
-        "validityInterval": Object {
-          "invalidBefore": undefined,
-          "invalidHereafter": 83856,
-        },
-        "withdrawals": Array [
-          Object {
-            "quantity": 608n,
-            "stakeAddress": "stake_test17z66ue36465w2qq40005h2hadad6pnjht8mu6sgplsfj74qvpedfl",
-          },
-          Object {
-            "quantity": 324n,
-            "stakeAddress": "stake17x66ue36465w2qq40005h2hadad6pnjht8mu6sgplsfj74qttn0dz",
-          },
-        ],
-      },
-      "id": "77c4a3c21573c57f0599499bc780de457c35c1d95bfb7e2370d3328b49327117",
+      "id": "0dd9b1dd89ff50c6907b3fd0385fde86f7c6877c2c9a95a9a9aa83b1cfead128",
       "inputSource": "inputs",
       "witness": Object {
         "bootstrap": Array [],
-        "datums": undefined,
-        "redeemers": undefined,
-        "scripts": Array [
-          Object {
-            "__type": "native",
-            "keyHash": "4acf2773917c7b547c576a7ff110d2ba5733c1f1ca9cdc659aea3a56",
-            "kind": 0,
-          },
-          Object {
-            "__type": "native",
-            "kind": 1,
-            "scripts": Array [
-              Object {
-                "__type": "native",
-                "keyHash": "bd039f956f4b302f3ab6fc7c4bac3350a540f44af81a8492194dd2c2",
-                "kind": 0,
-              },
-              Object {
-                "__type": "native",
-                "kind": 2,
-                "scripts": Array [
-                  Object {
-                    "__type": "native",
-                    "kind": 5,
-                    "slot": 14145,
-                  },
-                  Object {
-                    "__type": "native",
-                    "keyHash": "b16b56f5ec064be6ac3cab6035efae86b366cc3dc4a0d571603d70e5",
-                    "kind": 0,
-                  },
-                  Object {
-                    "__type": "native",
-                    "keyHash": "a646474b8f5431261506b6c273d307c7569a4eb6c96b42dd4a29520a",
-                    "kind": 0,
-                  },
-                  Object {
-                    "__type": "native",
-                    "keyHash": "58e1b65718531b42494610c506cef10ff031fa817a8ff75c0ab180e7",
-                    "kind": 0,
-                  },
-                  Object {
-                    "__type": "native",
-                    "kind": 4,
-                    "slot": 70503,
-                  },
-                ],
-              },
-              Object {
-                "__type": "native",
-                "kind": 3,
-                "required": 0,
-                "scripts": Array [
-                  Object {
-                    "__type": "native",
-                    "kind": 1,
-                    "scripts": Array [
-                      Object {
-                        "__type": "native",
-                        "keyHash": "a646474b8f5431261506b6c273d307c7569a4eb6c96b42dd4a29520a",
-                        "kind": 0,
-                      },
-                      Object {
-                        "__type": "native",
-                        "keyHash": "76e607db2a31c9a2c32761d2431a186a550cc321f79cd8d6a82b29b8",
-                        "kind": 0,
-                      },
-                      Object {
-                        "__type": "native",
-                        "keyHash": "e0a714319812c3f773ba04ec5d6b3ffcd5aad85006805b047b082541",
-                        "kind": 0,
-                      },
-                      Object {
-                        "__type": "native",
-                        "keyHash": "b5ae663aaea8e500157bdf4baafd6f5ba0ce5759f7cd4101fc132f54",
-                        "kind": 0,
-                      },
-                    ],
-                  },
-                  Object {
-                    "__type": "native",
-                    "kind": 3,
-                    "required": 2,
-                    "scripts": Array [
-                      Object {
-                        "__type": "native",
-                        "keyHash": "e0a714319812c3f773ba04ec5d6b3ffcd5aad85006805b047b082541",
-                        "kind": 0,
-                      },
-                      Object {
-                        "__type": "native",
-                        "keyHash": "e0a714319812c3f773ba04ec5d6b3ffcd5aad85006805b047b082541",
-                        "kind": 0,
-                      },
-                      Object {
-                        "__type": "native",
-                        "keyHash": "0d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4",
-                        "kind": 0,
-                      },
-                      Object {
-                        "__type": "native",
-                        "keyHash": "3542acb3a64d80c29302260d62c3b87a742ad14abf855ebc6733081e",
-                        "kind": 0,
-                      },
-                      Object {
-                        "__type": "native",
-                        "keyHash": "65fc709a5e019b8aba76f6977c1c8770e4b36fa76f434efc588747b7",
-                        "kind": 0,
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
-          Object {
-            "__type": "native",
-            "keyHash": "0d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4",
-            "kind": 0,
-          },
-        ],
         "signatures": Map {
-          "19cfd01741992858afaa1a8b99f2622738b4c03a68b9283027640b943181c4b6" => "9662f9fa099756d8c387463e74b863bd497ae22553751b70d2048ded7edd250711f3b4f27ba64a08d036934bac955acba2a99a89c31d0103ae85a48d95c5b337",
-          "97ba85b5beadd03c8ab7ea260a53f73cd47b87d9c2ef62b98f9bd23934bff852" => "8434465f8f816306f37728c24efb34956470c5a423503238068752aad2c2bec590c1d6a04a74e1f1b92dcdf887c8adf0eb68cfbc6b985e06c2b8c13833df0453",
-          "b005f0e09760c2371b7cc8d6a8b67dd0ba09f71f2febdc9cd794251f18567329" => "56362fa4e48645306b80a92e77e3a9d9b1596bf29d1456bdb166852548c16ccd68dcf07b6be086118361cd448b685b63a4f14aefcb747880065eddbb6d5393c7",
+          "8b0960d234bda67d52432c5d1a26aca2bfb5b9a09f966d9592a7bf0c728a1ecd" => "222b333c56031a63e8e975f59fa6e646a733cc8c4b6d9d2aecea0d23366edadb83077a9ac79541e3044798549bc9088e9409194f4451324a65bb1d8237b74a03",
+          "618b625df30de53895ff29e7a3770dca56c2ff066d4aa05a6971905deecef6db" => "05d8f7aff6fc03cbb3b8c63e0ebcef7cfd55c86be48d1d39642d46d62f879114e3285ec16814746e836d1f6ac6e8be4caf203651e5cbb41297c01b4dde17a606",
+          "69a14b724409e0ceef671c76ec4f8bce7509b5919bb971b3855bf92ca5653222" => "8575f55be5b478d224842bb841bc46e3b347613e54f5245e16b644bc022910ac847e55af0081ed17750a790bf703cde299c30c8f170026983a956206c5ef0108",
+          "d1a8de6caa8fd9b175c59862ecdd5abcd0477b84b82a0e52faecc6b3c85100a4" => "709e0431c27585279b573554c19f0cc4726334f594e03e483c22022116a2521920e148348e85cf447440883b12fb31367448b335be2eeed7f67cfff46bdf0b09",
+          "9aae625d4d15bcb3733d420e064f1cd338f386e0af049fcd42b455a69d28ad36" => "5757bb1a900d76381c3b2d3effcbb9be4ded84ccbed18a4e6fec1f2a9473b8fd39243c1a15c33b0094debb069bb0022827c691c23fef4558f70b4dea82a97f05",
+          "942bb3aaab0f6442b906b65ba6ddbf7969caa662d90968926211a3d56532f11d" => "e8aebefe3cf0415f7c3d5f45fd890962eeadf29e9c6e07456967cccbd17827add3a35e0b15d500a1c28522603e987fbb1733b2e4a2921d052ff8b2a2df975609",
+          "d4dd69a41071bc2dc8e64a97f4bd6379524ce0c2b665728043a067e34d3e218a" => "3db756d3166532edce43afb52affca938d2d6d50f4ce12354e20279ac30b2dc503329d482ac71c7412e9f39cf98a2d7d79014673d3e92d2d1e4cf7921794610d",
+          "8ef320c2df6654a6188c45e9c639c0a686bf5a865295587d399dfeb05fe74ab6" => "a9c6378add6790ec88661ed90b86d11f1e5db8750b5f758c6b4f7c43331b5414f86e519ffed0fe34ecf3ee030122bd1b58676e209ac7383039e42790477c1b02",
         },
       },
     },
   ],
-  "fees": 845n,
+  "fees": 205981n,
   "header": Object {
-    "blockNo": 20,
-    "hash": "ee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25",
-    "slot": 3,
+    "blockNo": 43245,
+    "hash": "e5e19970aa093a9cf6df9f62aa263ceccc9b06a7a8456a9a3cc3270cd980d7ab",
+    "slot": 950500,
   },
-  "issuerVk": "60337a64656bf2646f66c90ab4a546bbf3c3f5f8f00bf06fcc1d9f7d01d924f6",
-  "previousBlock": "ae85d245a3d00bfde01f59f3c4fe0b4bfae1cb37e9cf91929eadcea4985711de",
-  "size": 243,
-  "totalOutput": 5n,
-  "txCount": 2,
-  "vrf": "vrf_vk1njzx6395znzy6p7ene2dqw7y77rq4zfaepyw2v6megqnuhepmfgqkg07xz",
+  "issuerVk": "f270c16659735ec4b65d15d1cbef937e50e608585ac3b71a4cd117fdb761624e",
+  "previousBlock": "3618c2ea1f45f1735d990c15327446e60b36f60ca8c5266dcaae9a898d80e029",
+  "size": 1151,
+  "totalOutput": 29699998492941888n,
+  "txCount": 1,
+  "vrf": "vrf_vk1aw6s04lqkquell8drg6jjusrzd8c5259kctvxkgug5kta7nphz9qfqtr4w",
 }
 `;
 
 exports[`ogmiosToCore block can translate from shelley block 1`] = `
 Object {
-  "body": Array [],
-  "fees": 0n,
+  "body": Array [
+    Object {
+      "auxiliaryData": undefined,
+      "body": Object {
+        "auxiliaryDataHash": undefined,
+        "certificates": Array [
+          Object {
+            "__typename": "StakeRegistrationCertificate",
+            "stakeCredential": Object {
+              "hash": "968d1021ebd7178e1fb0e79676982825cabc779b653e1234d58ce3c6",
+              "type": 0,
+            },
+          },
+          Object {
+            "__typename": "PoolRegistrationCertificate",
+            "poolParameters": Object {
+              "cost": 500000000n,
+              "id": "pool1547tew8vmuj0g6vj3k5jfddudextcw6hsk2hwgg6pkhk7lwphe6",
+              "margin": Object {
+                "denominator": 1,
+                "numerator": 1,
+              },
+              "metadataJson": undefined,
+              "owners": Array [
+                "stake_test1uztg6yppa0t30rslkrneva5c9qju40rhndjnuy356kxw83s6n95nu",
+              ],
+              "pledge": 100000000000000n,
+              "relays": Array [
+                Object {
+                  "__typename": "RelayByName",
+                  "hostname": "preprod-node.world.dev.cardano.org",
+                  "port": 30000,
+                },
+              ],
+              "rewardAccount": "stake_test1uzkdwx64sjkt6xxtzye00y3k2m9wn5zultsguadaf4ggmssadyunp",
+              "vrf": "868173d343611103acbdb3452b922bbca5e580d08da4e8f7abf3fb0f2284338a",
+            },
+          },
+          Object {
+            "__typename": "StakeDelegationCertificate",
+            "poolId": "pool1547tew8vmuj0g6vj3k5jfddudextcw6hsk2hwgg6pkhk7lwphe6",
+            "stakeCredential": Object {
+              "hash": "968d1021ebd7178e1fb0e79676982825cabc779b653e1234d58ce3c6",
+              "type": 0,
+            },
+          },
+          Object {
+            "__typename": "StakeRegistrationCertificate",
+            "stakeCredential": Object {
+              "hash": "f130204b518f70c19995449e3737eded3d9ffc31cb50ec0e45010ba3",
+              "type": 0,
+            },
+          },
+          Object {
+            "__typename": "PoolRegistrationCertificate",
+            "poolParameters": Object {
+              "cost": 500000000n,
+              "id": "pool174mw7e20768e8vj4fn8y6p536n8rkzswsapwtwn354dckpjqzr8",
+              "margin": Object {
+                "denominator": 1,
+                "numerator": 1,
+              },
+              "metadataJson": undefined,
+              "owners": Array [
+                "stake_test1urcnqgzt2x8hpsvej4zfudehahknm8lux894pmqwg5qshgcrn346q",
+              ],
+              "pledge": 100000000000000n,
+              "relays": Array [
+                Object {
+                  "__typename": "RelayByName",
+                  "hostname": "preprod-node.world.dev.cardano.org",
+                  "port": 30000,
+                },
+              ],
+              "rewardAccount": "stake_test1uzkdwx64sjkt6xxtzye00y3k2m9wn5zultsguadaf4ggmssadyunp",
+              "vrf": "352196224497a0fd7bad52d113767660bf70f8b11a8c40c265f7bfb359ebe9ee",
+            },
+          },
+          Object {
+            "__typename": "StakeDelegationCertificate",
+            "poolId": "pool174mw7e20768e8vj4fn8y6p536n8rkzswsapwtwn354dckpjqzr8",
+            "stakeCredential": Object {
+              "hash": "f130204b518f70c19995449e3737eded3d9ffc31cb50ec0e45010ba3",
+              "type": 0,
+            },
+          },
+          Object {
+            "__typename": "StakeRegistrationCertificate",
+            "stakeCredential": Object {
+              "hash": "392ae9e068e55e8b5c27acc58b0bab8ea568c0aae2f6fc49be23a7ad",
+              "type": 0,
+            },
+          },
+          Object {
+            "__typename": "PoolRegistrationCertificate",
+            "poolParameters": Object {
+              "cost": 500000000n,
+              "id": "pool1z22x50lqsrwent6en0llzzs9e577rx7n3mv9kfw7udwa2rf42fa",
+              "margin": Object {
+                "denominator": 1,
+                "numerator": 1,
+              },
+              "metadataJson": undefined,
+              "owners": Array [
+                "stake_test1uquj460qdrj4az6uy7kvtzct4w8226xq4t30dlzfhc360tgegny4m",
+              ],
+              "pledge": 100000000000000n,
+              "relays": Array [
+                Object {
+                  "__typename": "RelayByName",
+                  "hostname": "preprod-node.world.dev.cardano.org",
+                  "port": 30000,
+                },
+              ],
+              "rewardAccount": "stake_test1uzkdwx64sjkt6xxtzye00y3k2m9wn5zultsguadaf4ggmssadyunp",
+              "vrf": "4b21cf2449bbbaa834e403a29788daec0faab9f3c6b8b25d82aa8366a1a94464",
+            },
+          },
+          Object {
+            "__typename": "StakeDelegationCertificate",
+            "poolId": "pool1z22x50lqsrwent6en0llzzs9e577rx7n3mv9kfw7udwa2rf42fa",
+            "stakeCredential": Object {
+              "hash": "392ae9e068e55e8b5c27acc58b0bab8ea568c0aae2f6fc49be23a7ad",
+              "type": 0,
+            },
+          },
+        ],
+        "collaterals": undefined,
+        "fee": 238057n,
+        "inputs": Array [
+          Object {
+            "index": 0,
+            "txId": "b75ec46c406113372efeb1e57d9880856c240c9b531e3c680c1c4d8bf2253625",
+          },
+        ],
+        "mint": undefined,
+        "outputs": Array [
+          Object {
+            "address": "addr_test1vz09v9yfxguvlp0zsnrpa3tdtm7el8xufp3m5lsm7qxzclgmzkket",
+            "datum": undefined,
+            "datumHash": undefined,
+            "scriptReference": undefined,
+            "value": Object {
+              "assets": Map {},
+              "coins": 29699998493561943n,
+            },
+          },
+          Object {
+            "address": "addr_test1qz09v9yfxguvlp0zsnrpa3tdtm7el8xufp3m5lsm7qxzclvk35gzr67hz78plv88jemfs2p9e2780xm98cfrf4vvu0rq83pdz2",
+            "datum": undefined,
+            "datumHash": undefined,
+            "scriptReference": undefined,
+            "value": Object {
+              "assets": Map {},
+              "coins": 100000000000000n,
+            },
+          },
+          Object {
+            "address": "addr_test1qz09v9yfxguvlp0zsnrpa3tdtm7el8xufp3m5lsm7qxzcl03xqsyk5v0wrqen92yncmn0m0d8k0lcvwt2rkqu3gppw3sdexkvh",
+            "datum": undefined,
+            "datumHash": undefined,
+            "scriptReference": undefined,
+            "value": Object {
+              "assets": Map {},
+              "coins": 100000000000000n,
+            },
+          },
+          Object {
+            "address": "addr_test1qz09v9yfxguvlp0zsnrpa3tdtm7el8xufp3m5lsm7qxzclfe9t57q689t694cfavck9sh2uw545vp2hz7m7yn03r57kslz5rjf",
+            "datum": undefined,
+            "datumHash": undefined,
+            "scriptReference": undefined,
+            "value": Object {
+              "assets": Map {},
+              "coins": 100000000000000n,
+            },
+          },
+        ],
+        "requiredExtraSignatures": undefined,
+        "validityInterval": Object {
+          "invalidHereafter": 90000,
+        },
+      },
+      "id": "a3d6f2627a56fe7921eeda546abfe164321881d41549b7f2fbf09ea0b718d758",
+      "inputSource": "inputs",
+      "witness": Object {
+        "bootstrap": Array [],
+        "signatures": Map {
+          "9691ed9d98a5b79d5bc46c4496a6dba7e103f668f525c8349b6b92676cb3eae4" => "5ce8776d3b749e7b096f5dbd388029db57a0c9fc87662b93cf31da4ad1748b3d5d92a7d65454043ae10dbfa4ac34929311526323a7ab3a7436f02e16abdbdb08",
+          "28450e496f2217e62bf9fd2ece94114562ade49368f456d2e63df2bc4af3244c" => "7c56a4a38044f6b5ee32590bf73cb1101c7c650ff76c07c15d31c87181607a750e90dc09abcb1a431e0ba7c31065f5e3743bf3e1bafe120ca45e4c910f2dc000",
+          "7b5e9791e10baedf8b1393a32e8851b2ab56c4e9ee1ec489a7ea24f2b6043573" => "512f085e1ffcf13d1328cc458929b79d70cef21bc1028ed1f94e716623869eae9aa9b364e129e289cb18e7d0f58b0d6e7502d4427899535d2d29fcdc30c9cc05",
+          "69a14b724409e0ceef671c76ec4f8bce7509b5919bb971b3855bf92ca5653222" => "aceda22823823a98fd7363a841c0f75f220bc31a5dd057878f4c59836077260b2db7c1df8547d733bc0972c96c7602cfc847218d4c8dc4f4b770e0dc33124a0f",
+          "f270c16659735ec4b65d15d1cbef937e50e608585ac3b71a4cd117fdb761624e" => "d4bd1741ee8064438c564d008b2b7278127f2c4d6b711f4ddb3354c66eb520f3bf3eb1b05046b54d7239df8aaa6623df91f5a59e844977c13fb952f40523a705",
+          "29036ea60a8b5335b4c026aeb30b87bbcb546fb15a207f4a7035519128bf8a64" => "4d521485917683dff50929915e484255d6360a84a1fe06d908558a242725e3d932ab4d72665af1d483e4b5b20656b524445b5267f50207aabf6a29098bbc1302",
+          "a9d974fd26bfaf385749113f260271430276bed6ef4dad6968535de6778471ce" => "22e89209cd66803d613dd586b4970ad77256aaf12a345abc28e07ac4b6975b7c5cfa729b18f00ea9cd252fe4ab1e89e37c6748ddca9e111ab2e2dba98743260d",
+        },
+      },
+    },
+  ],
+  "fees": 238057n,
   "header": Object {
-    "blockNo": 1087,
-    "hash": "071fceb6c20a412b9a9b57baedfe294e3cd9de641cd44c4cf8d0d56217e083ac",
-    "slot": 107220,
+    "blockNo": 48,
+    "hash": "49ef96c51afd2fbef46a73e6b535d7aea10a079a84df19d730e1a127be7e76f2",
+    "slot": 86440,
   },
-  "issuerVk": "8b0960d234bda67d52432c5d1a26aca2bfb5b9a09f966d9592a7bf0c728a1ecd",
-  "previousBlock": "8d5d930981710fc8c6ca9fc8e0628665283f7efb28c7e6bddeee2d289f012dee",
-  "size": 3,
-  "totalOutput": 0n,
-  "txCount": 0,
-  "vrf": "vrf_vk15c2edf9h66wllthgvyttzhzwrngq0rvd0wchzqlw8qray60fq5usfngf29",
+  "issuerVk": "9aae625d4d15bcb3733d420e064f1cd338f386e0af049fcd42b455a69d28ad36",
+  "previousBlock": "664b6ec8a708b9cf90b87c904e688477887b55cbf4ee6c36877166a2ef216665",
+  "size": 1880,
+  "totalOutput": 29999998493561943n,
+  "txCount": 1,
+  "vrf": "vrf_vk1ny8dyz3pa9u7v7h8l5evsmxxjq07dk6j5uda60lxe3zsya5ea20s2c6jph",
 }
 `;

@@ -24,7 +24,7 @@ export type EraSummariesResponse = {
 
 export type GenesisConfigResponse = {
   success: boolean;
-  config?: Schema.CompactGenesis;
+  config?: Schema.GenesisShelley;
   failWith?: {
     type: 'queryUnavailableInCurrentEraError' | 'eraMismatchError' | 'unknownResultError';
   };

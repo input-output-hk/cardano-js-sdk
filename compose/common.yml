@@ -66,7 +66,7 @@ x-provider-server-environment: &provider-server-environment
   SERVICE_NAMES: ${SERVICE_NAMES:-chain-history,network-info,rewards,stake-pool,tx-submit,utxo}
   SUBMIT_API_URL: ${SUBMIT_API_URL:-http://cardano-submit-api:8090/}
   USE_BLOCKFROST: ${USE_BLOCKFROST:-false}
-  USE_SUBMIT_API: ${USE_SUBMIT_API:-false}
+  USE_SUBMIT_API: ${USE_SUBMIT_API:-true}
 
 x-sdk-environment: &sdk-environment
   LOGGER_MIN_SEVERITY: ${LOGGER_MIN_SEVERITY:-info}
@@ -111,15 +111,15 @@ services:
       RESTORE_SNAPSHOT: ${RESTORE_SNAPSHOT:-}
       RESTORE_RECREATE_DB: N
     depends_on:
-      ogmios:
-        condition: service_healthy
+      cardano-node:
+        condition: service_started
     healthcheck:
       test: ['CMD', '/scripts/is-db-synced.sh']
       interval: 5s
       timeout: 1s
       retries: 120
       start_period: 100ms
-    image: ghcr.io/intersectmbo/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-13.1.0.2}
+    image: ghcr.io/intersectmbo/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-sancho-4-2-1}
     restart: on-failure
     stop_signal: SIGINT
     volumes:
@@ -131,7 +131,7 @@ services:
     <<:
       - *logging
       - *with-postgres
-    image: ghcr.io/intersectmbo/cardano-smash-server:${CARDANO_DB_SYNC_VERSION:-13.1.0.2}
+    image: ghcr.io/intersectmbo/cardano-smash-server:${CARDANO_DB_SYNC_VERSION:-sancho-4-2-1}
     command: ['--config', '/config/cardano-db-sync/config.json']
     environment:
       POSTGRES_HOST: postgres
@@ -152,7 +152,7 @@ services:
 
   cardano-node:
     <<: *logging
-    image: public.ecr.aws/e8d0p1a5/cardano-node:${CARDANO_NODE_VERSION:-1.35.5}
+    image: ghcr.io/intersectmbo/cardano-node:${CARDANO_NODE_VERSION:-8.10.1-pre}
     command:
       [
         'run',
@@ -172,9 +172,12 @@ services:
 
   ogmios:
     <<: *logging
-    image: cardanosolutions/ogmios:v${OGMIOS_VERSION:-5.6.0}
+    image: cardanosolutions/ogmios:v${OGMIOS_VERSION:-6.3.0}
     command:
       ['--host', '0.0.0.0', '--node-socket', '/ipc/node.socket', '--node-config', '/config/cardano-node/config.json']
+    depends_on:
+      cardano-node:
+        condition: service_started
     healthcheck:
       retries: 2000
     ports:
@@ -185,7 +188,7 @@ services:
 
   cardano-submit-api:
     command: --config /config/cardano-submit-api/config.json --listen-address 0.0.0.0 --socket-path /ipc/node.socket $SUBMIT_API_ARGS
-    image: public.ecr.aws/e8d0p1a5/cardano-submit-api:${CARDANO_NODE_VERSION:-1.35.5}
+    image: ghcr.io/intersectmbo/cardano-submit-api:${CARDANO_NODE_VERSION:-8.10.1-pre}
     ports:
       - 8090:8090
     restart: on-failure
@@ -227,7 +230,7 @@ services:
       POSTGRES_DB_FILE: /run/secrets/postgres_db_db_sync
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
       POSTGRES_USER_FILE: /run/secrets/postgres_user
-    image: postgres:${POSTGRES_VERSION:-11.5-alpine}
+    image: postgres:${POSTGRES_VERSION:-12.16-alpine}
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 10s
