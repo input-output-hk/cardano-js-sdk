@@ -474,6 +474,7 @@ in
             env.OVERRIDE_FUZZY_OPTIONS = "true";
           };
           handle-provider.enabled = true;
+          chain-history-provider.enabled = true;
         };
 
         projectors = {
