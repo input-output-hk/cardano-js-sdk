@@ -240,13 +240,12 @@ export class GenericTxBuilder implements TxBuilder {
             }
 
             const dependencies = { ...this.#dependencies };
+            const isAlteringDelegation =
+              this.#requestedPortfolio !== undefined || this.#delegateFirstStakeCredConfig !== undefined;
 
-            // Use greedy input selection if the wallet is a bip32 account and either of the following conditions are met
-            // 1. Multi delegating: to distribute the funds to multiple addresses.
-            // 2. Reducing the number of pools to 1 or 0, which implies we have multiple registered stake keys. This is needed
-            //    to concentrate the funds back into a single address and delegate its stake key.
             if (
               this.#dependencies.bip32Account &&
+              isAlteringDelegation &&
               (rewardAccountsWithWeights.size > 1 ||
                 (registeredRewardAccounts.length > 1 && rewardAccountsWithWeights.size <= 1))
             ) {
