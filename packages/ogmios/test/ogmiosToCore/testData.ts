@@ -2051,3 +2051,133 @@ export const mockBlockOgmiosMetadata: Ogmios.Schema.Block = {
   ],
   type: 'praos'
 };
+
+export const blockBootstrapWitness: Ogmios.Schema.Block = {
+  ancestor: 'bce2e4532eecd088e88aadd483a1ac66d2cc6d16c16eeb77cf5765c4067a73e8',
+  era: 'babbage',
+  height: 228_510,
+  id: 'c799569fc9699146dd3f27941a8060e5e7f3fc2ae3119dba3a7eb256496296ca',
+  issuer: {
+    leaderValue: {
+      output:
+        '415434fe3f477bb6592a041000deb9979cc6622157934ca5eb34ef57c2fa309776a9526581e817120fff3d15f78143fd839b12633f33ace4321d18136205df9d',
+      proof:
+        'f1b422931ebb47dc944a25457bd3e850676abe2fa9c9be1f68963be2ea3a0edaf6a7bac3daded51a1ca5c93b3f2032a371825817eabb49376e810eb6e09e002f0566ab2ff3de93f570158b6cf441f404'
+    },
+    operationalCertificate: {
+      count: 1,
+      kes: {
+        period: 60,
+        verificationKey: 'c8682c718e8670f9edd295d8b0db50e2e32bf25397726eef56227dbaf89a254a'
+      },
+      sigma:
+        'd0800cd6110c0bae4a682a874b2de596c233ea8e78897918157ea5c47c1fe68eb0dc05dd21fb51195d9363e033a6af63346d94303beb8cbbf415d4f571f27401'
+    },
+    verificationKey: '9691ed9d98a5b79d5bc46c4496a6dba7e103f668f525c8349b6b92676cb3eae4',
+    vrfVerificationKey: 'ea49e4652c460b9ee6daafefc999ca667fbe5eb5d7a7aeabbdff6fe19c1a3c9f'
+  },
+  protocol: { version: { major: 7, minor: 0 } },
+  size: { bytes: 897 },
+  slot: 11_713_442,
+  transactions: [
+    {
+      fee: { ada: { lovelace: 177_821n } },
+      id: '0715cc5a7c3be2d59446ae97fb940490307be34d16238e4f9cf6149ea653aac6',
+      inputs: [
+        {
+          index: 1,
+          transaction: {
+            id: '31a368aeb8a368043a787a24463d2775c8f875389858af019d6951f59a8bdeb3'
+          }
+        }
+      ],
+      mint: {
+        '9ce492a69b50a7f0aa3657b5a9c3b6f8b230902503817fdd03f4d51c': {
+          '476f65726c695665726966696564535447': 1_000_000n
+        }
+      },
+      outputs: [
+        {
+          address:
+            'addr_test1qr463kf5csysm6avfyzn369npapncxwqprlu4g0a4xwqm6r30weq59mvzrz3vq7tssdlps56nmgx0w6jmuyreh7660nqcp6e0m',
+          value: {
+            '9ce492a69b50a7f0aa3657b5a9c3b6f8b230902503817fdd03f4d51c': {
+              '476f65726c695665726966696564535447': 1_000_000n
+            },
+            ada: { lovelace: 1_439_540n }
+          }
+        },
+        {
+          address: 'addr_test1vp6da5q50gnk24642ay5c8yvzlp4w69f6244my9ey9t2qmg4pvtfp',
+          value: {
+            ada: { lovelace: 7_953_611_262n }
+          }
+        }
+      ],
+      scripts: {
+        '9ce492a69b50a7f0aa3657b5a9c3b6f8b230902503817fdd03f4d51c': {
+          json: {
+            clause: 'all',
+            from: [
+              {
+                clause: 'signature',
+                from: '9848999eaefa56d10e251cfe44dd757143609139a9111cef30cdbabe'
+              }
+            ]
+          },
+          language: 'native'
+        }
+      },
+      signatories: [
+        {
+          key: '0537c956cfdcc402b440b56498c88eb51243689692932d610494ed84f6d74804',
+          signature:
+            '908dd2780e4ea46eb35af9c9a94a52aae929a02abedc3da364892ddda870cf4d8850d737b9bb3456d744915c911dac07dd184dc40e7040e0c645be65d0cd0a05'
+        },
+        {
+          key: '134f407f28257ba709a183f61bd11e5ebfe77ea9e0b68edfb01ebf42572fadd8',
+          signature:
+            'c9aa7b9ea249447d1be3abe954e8023f2fb58b00afcb78d8baf32eae534ddbccb961a44cfff4c559d32e34a5eb79b244f531fbcbf0bb8ef04a438310a277b409'
+        }
+      ],
+      spends: 'inputs',
+      validityInterval: {}
+    },
+    {
+      fee: { ada: { lovelace: 173_817n } },
+      id: 'c3d3c6ecba51756361df49ce43d805966faa49745d42b55951c183e62a4f9afb',
+      inputs: [
+        {
+          index: 0,
+          transaction: {
+            id: '828e433344f5b1de24a60c96d5552e415b92368da3e85a7603a81577550cb8d5'
+          }
+        }
+      ],
+      outputs: [
+        {
+          address:
+            'addr_test1qr7e2lczgx8hlgvze62n48yqfl2792zeh976yay9skusresul0tp6j25e2lgf8ltzjna93yc50nl7jp0z9u507njwe4qcrhkem',
+          value: { ada: { lovelace: 2_000_000n } }
+        },
+        {
+          address:
+            'KjgoiXJS2cokscuXVoTqacj93htU4ASU1gMhAqpq7MfUPvDjSbfcM1mmd5ABYBFzB7QS8xmamYZeYueUUURtYMdrYhhvRXk5dzgZ93aadbRh',
+          value: { ada: { lovelace: 9_826_183n } }
+        }
+      ],
+      signatories: [
+        {
+          addressAttributes: 'a201581e581c47ede5542a33d20411c7f64293493c5cd35dba4e151b70e7fc810729024101',
+          chainCode: '108e03107e451d2298f68cf2d60269609b1d4dc5434ae4719e9b3dbce5d92850',
+          key: 'a7e7e51a990e7525271e4398d01235bfe02ff7dfe0d6cbd9a425de9edf169c6e',
+          signature:
+            'dde831bcee1ae9296e8926311d529c9b3030078340bb47d41c64a241c9ac9a3344a27e22ebef5518be8f522d3ba690c65ad8fdb791580549bee7aa6ae894500e'
+        }
+      ],
+      spends: 'inputs',
+      validityInterval: { invalidAfter: 11_720_626 }
+    }
+  ],
+  type: 'praos'
+};

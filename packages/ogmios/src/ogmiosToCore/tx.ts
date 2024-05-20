@@ -256,7 +256,7 @@ export const mapScript = (script: Schema.Script): Cardano.Script => {
 
 const mapBootstrapWitness = (b: Schema.Signatory): Cardano.BootstrapWitness => ({
   // Based on the Ogmios maintainer answer  https://github.com/CardanoSolutions/ogmios/discussions/285#discussioncomment-4271726
-  addressAttributes: b.addressAttributes ? Base64Blob(b.addressAttributes) : undefined,
+  addressAttributes: b.addressAttributes ? Base64Blob.fromBytes(Buffer.from(b.addressAttributes, 'hex')) : undefined,
   chainCode: b.chainCode ? HexBlob(b.chainCode) : undefined,
   key: Crypto.Ed25519PublicKeyHex(b.key),
   signature: Crypto.Ed25519SignatureHex(b.signature)
