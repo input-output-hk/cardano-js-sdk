@@ -308,8 +308,9 @@ const mapJsonMetadatum = (obj: Schema.Metadatum): Cardano.Metadatum => {
 };
 
 const mapMetadata = (ogmiosMetadata: Schema.MetadataLabels[0]): Cardano.Metadatum => {
-  if (ogmiosMetadata.cbor) return Serialization.TransactionMetadatum.fromCbor(ogmiosMetadata.cbor as HexBlob).toCore();
-  if (ogmiosMetadata.json) return mapJsonMetadatum(ogmiosMetadata.json);
+  if (ogmiosMetadata.cbor !== undefined)
+    return Serialization.TransactionMetadatum.fromCbor(ogmiosMetadata.cbor as HexBlob).toCore();
+  if (ogmiosMetadata.json !== undefined) return mapJsonMetadatum(ogmiosMetadata.json);
   throw new NotImplementedError(`Metadata format not recognized: ${JSON.stringify(ogmiosMetadata)}`);
 };
 

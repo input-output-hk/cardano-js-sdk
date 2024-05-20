@@ -1964,3 +1964,90 @@ export const mockBabbageBlockWithInlineDatum = {
   ],
   type: 'praos'
 };
+
+export const mockBlockOgmiosMetadata: Ogmios.Schema.Block = {
+  ancestor: 'd19a2103ec8c2cf06954512048423354d89e1612c61a0568a1a2062ab9d610b9',
+  era: 'babbage',
+  height: 193_778,
+  id: 'fe13ba3d9ffc9c5476678bc38270df00aff0cc9a19ec8fe0cf9b9a5dbde8478b',
+  issuer: {
+    leaderValue: {
+      output:
+        '9e975307337697468499ebc821beb894d922aba5e8c1933054eee49a2a7e4b9e1e6248450ba65d5f89dd88285b90af2a080555e1d72e7454ffd33e5d263b12c8',
+      proof:
+        '86edb227b6195bef9dd5f2798b60a5bc1523b77f7a5f185be68b60b55f195b441bcfc25f8cee398917d71736bd741066cc78aad6ac4e832d275038a72a36e95b5979c2698f47929553dcdb61d9c8d00d'
+    },
+    operationalCertificate: {
+      count: 1,
+      kes: {
+        period: 60,
+        verificationKey: '01a2a5d502467f061867fd59881bd2ddf11bb1d287c82d56692dd68c5428ec6c'
+      },
+      sigma:
+        'ba5be0d6705c112f3a5064bfc538fe44356dcdcd83c3708b7511d644378075edf75008c1ab928028057e8101575ae4444db0067a37ea2382842886d52d147604'
+    },
+    verificationKey: 'a9d974fd26bfaf385749113f260271430276bed6ef4dad6968535de6778471ce',
+    vrfVerificationKey: '09e142413e6a20c48dcf0bc1e1604d22ec6c1682802212c130bd8b0888fa925a'
+  },
+  protocol: { version: { major: 7, minor: 0 } },
+  size: { bytes: 524 },
+  slot: 10_996_290,
+  transactions: [
+    {
+      fee: { ada: { lovelace: 182_882n } },
+      id: '8188b55687049e581edeae7a5eab8b87db3bb5403b217aaf9af099fd85c4896a',
+      inputs: [
+        {
+          index: 0,
+          transaction: {
+            id: '2ca43dd56b9dde19e9e66af52b12266305f6f936621f56baefa242f7bbef4abf'
+          }
+        }
+      ],
+      metadata: {
+        hash: '94281e33c06ce2697d672fe38d277f79998b4bf02880f939195f40156cdaab3d',
+        labels: {
+          '674': { json: { msg: ['MuesliSwap Place Order'] } },
+          '1000': {
+            cbor: '5839002594883a083057131fd22271f9f52a5ed1c929e13b91612c54081a5fd03ec2b118c9e23449f281603e92d93c1690adcdfd25f0ec50f11c44'
+          },
+          '1002': {
+            json: '8a1cfae21368b8bebbbed9800fec304e95cce39a2a57dc35e2e3ebaa'
+          },
+          '1003': { json: '4d494c4b' },
+          '1004': { json: '3' },
+          '1005': { json: 2_650_000n },
+          '1007': { json: 1n },
+          '1008': { json: '' },
+          '1009': { json: '' }
+        }
+      },
+      outputs: [
+        {
+          address: 'addr_test1wrl28a6jsx4870ulrfygqvqqdnkdjc5sa8f70ys6dvgvjqc8vudlr',
+          datumHash: '35165ead2b7f33b5d1e1615f113eb9889f06c9d2fd06a96093a6b64f0018ae09',
+          value: {
+            ada: { lovelace: 12_650_000n }
+          }
+        },
+        {
+          address:
+            'addr_test1qqjefzp6pqc9wycl6g38r7049f0drjffuyaezcfv2syp5h7s8mptzxxfug6ynu5pvqlf9kfuz6g2mn0ayhcwc583r3zqgkvhws',
+          value: {
+            ada: { lovelace: 9_987_167_118n }
+          }
+        }
+      ],
+      signatories: [
+        {
+          key: '2ab00fa9874b569855113e7c63c70b2d117b27fb0231ebca30b3d4194e5424aa',
+          signature:
+            '107971977931ea9974b7c69c45a66e2500a02e358101bb85f0a4185886f54d3fa82e99053dea681dbae52765b15f6dba858dbae922f2cc38c33d4e8fee0b8509'
+        }
+      ],
+      spends: 'inputs',
+      validityInterval: {}
+    }
+  ],
+  type: 'praos'
+};

@@ -6,6 +6,7 @@ import {
   mockAlonzoBlock,
   mockBabbageBlock,
   mockBabbageBlockWithNftMetadata,
+  mockBlockOgmiosMetadata,
   mockByronBlock,
   mockMaryBlock,
   mockShelleyBlock
@@ -61,6 +62,10 @@ describe('ogmiosToCore', () => {
         const tokenMetadatum = policyIdMetadatum.get(policyIdMetadatum.keys().next().value) as Cardano.MetadatumMap;
         expect(typeof tokenMetadatum.get('name')).toBe('string');
       });
+    });
+
+    it('can translate from block with json metadata', () => {
+      expect(ogmiosToCore.block(mockBlockOgmiosMetadata)).toBeTruthy();
     });
 
     it.todo('maps all native scripts correctly');
