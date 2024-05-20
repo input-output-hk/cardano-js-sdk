@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.18.6...@cardano-sdk/tx-construction@0.18.7) (2024-05-20)
+
+### Bug Fixes
+
+* **tx-construction:** fix an issue where the tx-builder was always using greedy input selector for multi delegation wallets ([1995288](https://github.com/input-output-hk/cardano-js-sdk/commit/199528890b574eb8c9bd47bd90af35641d61715b))
+
 ## [0.18.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.18.5...@cardano-sdk/tx-construction@0.18.6) (2024-05-02)
 
 **Note:** Version bump only for package @cardano-sdk/tx-construction
