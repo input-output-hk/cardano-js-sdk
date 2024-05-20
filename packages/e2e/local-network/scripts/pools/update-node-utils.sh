@@ -128,8 +128,9 @@ updatePool() {
     --byron-witness-count 0 \
     --protocol-params-file ${SP_NODE_ID}/params.json | awk '{ print $1 }')
 
+  keyDeposit=2000000
   initialBalance=$(getAddressBalance "$genesisAddr")
-  txOut=$((initialBalance - fee))
+  txOut=$((initialBalance - fee - keyDeposit))
 
   cardano-cli transaction build-raw \
     --tx-in "$utxo" \
