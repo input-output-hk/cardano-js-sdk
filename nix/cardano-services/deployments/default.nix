@@ -616,16 +616,14 @@ in
             handle.enabled = true;
             stake-pool = {
               enabled = true;
-              env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
             };
             #asset.enabled = true;
           };
 
           values = {
-            stakepool.databaseName = "stakepoolv2";
+            stakepool.databaseName = "stakepoolv3";
             blockfrost-worker.enabled = true;
             pg-boss-worker.enabled = true;
-            pg-boss-worker.queues = "pool-metadata,pool-metrics";
             cardano-services = {
               ingresOrder = 98;
             };
@@ -679,16 +677,14 @@ in
             handle.enabled = true;
             stake-pool = {
               enabled = true;
-              env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
             };
             #asset.enabled = true;
           };
 
           values = {
-            stakepool.databaseName = "stakepoolv2";
+            stakepool.databaseName = "stakepoolv3";
             blockfrost-worker.enabled = true;
             pg-boss-worker.enabled = true;
-            pg-boss-worker.queues = "pool-metadata,pool-metrics";
             cardano-services = {
               ingresOrder = 98;
             };
@@ -781,16 +777,14 @@ in
             handle.enabled = true;
             stake-pool = {
               enabled = true;
-              env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
             };
             #asset.enabled = true;
           };
 
           values = {
-            stakepool.databaseName = "stakepoolv2";
+            stakepool.databaseName = "stakepoolv3";
             blockfrost-worker.enabled = true;
             pg-boss-worker.enabled = true;
-            pg-boss-worker.queues = "pool-metadata,pool-metrics";
             cardano-services = {
               ingresOrder = 98;
             };
@@ -883,16 +877,14 @@ in
             handle.enabled = true;
             stake-pool = {
               enabled = true;
-              env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
             };
             # asset.enabled = true;
           };
 
           values = {
-            stakepool.databaseName = "stakepoolv2";
+            stakepool.databaseName = "stakepoolv3";
             blockfrost-worker.enabled = true;
             pg-boss-worker.enabled = true;
-            pg-boss-worker.queues = "pool-metadata,pool-metrics";
             cardano-services = {
               ingresOrder = 98;
             };
@@ -1080,6 +1072,7 @@ in
           };
         };
       }
+      # Convenient for cases when you need to create multiple temporary deployments with the same configuration
       // (builtins.mapAttrs (_: value: (final:
         value
         // {
@@ -1099,36 +1092,12 @@ in
             pg-boss-worker.enabled = true;
           };
         })) {
-        "live-preview@us-east-2@tmp" = {
-          name = "tmp-cardanojs";
-          namespace = "live-preview";
-          network = "preview";
-          region = "us-east-2";
-          context = "eks-admin";
-        };
-
-        "live-preview@eu-central-1@tmp" = {
-          name = "tmp-cardanojs";
-          namespace = "live-preview";
-          network = "preview";
-          region = "eu-central-1";
-          context = "eks-admin";
-        };
-
-        "live-preprod@us-east-2@tmp" = {
-          name = "tmp-cardanojs";
-          namespace = "live-preprod";
-          network = "preprod";
-          region = "us-east-2";
-          context = "eks-admin";
-        };
-
-        "live-preprod@eu-central-1@tmp" = {
-          name = "tmp-cardanojs";
-          namespace = "live-preprod";
-          network = "preprod";
-          region = "eu-central-1";
-          context = "eks-admin";
-        };
+        #"live-preview@us-east-2@tmp" = {
+        #  name = "tmp-cardanojs";
+        #  namespace = "live-preview";
+        #  network = "preview";
+        #  region = "us-east-2";
+        #  context = "eks-admin";
+        #};
       });
   }
