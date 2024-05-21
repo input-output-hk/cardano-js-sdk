@@ -121,7 +121,7 @@ export const txConfirmed = (
       )
     ),
     `Tx confirmation timeout: ${id}`,
-    SYNC_TIMEOUT_DEFAULT / 5
+    env.NETWORK_SPEED === 'fast' ? SYNC_TIMEOUT_DEFAULT / 5 : SYNC_TIMEOUT_DEFAULT
   );
 
 export const submitAndConfirm = (wallet: ObservableWallet, tx: Cardano.Tx, numConfirmations?: number) =>
