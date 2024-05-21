@@ -336,7 +336,7 @@ in
             env.OVERRIDE_FUZZY_OPTIONS = "true";
           };
           handle-provider.enabled = true;
-          asset-provider.enabled = true;
+          #asset-provider.enabled = true;
         };
 
         projectors = {
