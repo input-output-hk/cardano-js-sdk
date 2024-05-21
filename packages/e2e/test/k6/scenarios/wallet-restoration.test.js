@@ -2,6 +2,7 @@
 /* eslint-disable func-style */
 import { Counter, Trend } from 'k6/metrics';
 import { check, sleep } from 'k6';
+import { apiVersion } from 'https://github.com/input-output-hk/cardano-js-sdk/blob/master/packages/cardano-services-client/src/version.ts';
 import http from 'k6/http';
 
 /**
@@ -55,7 +56,7 @@ const POOL_ADDRESSES_URL =
  * For this reason, it's a good practice to configure MAX_VUs in multiples of 100 in order to maintain the desired distribution.
  * In `RunMode.RestoreHD`, each VU will have multiple addresses.
  */
-const MAX_VU = 10;
+const MAX_VU = 1;
 
 /** Time span during which all virtual users are started in a linear fashion */
 const RAMP_UP_DURATION = '10s';
@@ -100,49 +101,7 @@ const chunkArray = (array, chunkSize) => {
  * Group the addresses per wallet (single address or HD wallets).
  */
 export function setup() {
-  console.log(`Running in ${RUN_MODE} mode`);
-  console.log(`Ramp-up: ${RAMP_UP_DURATION}; Sustain: ${STEADY_STATE_DURATION}; Iteration sleep: ${ITERATION_SLEEP}s`);
-
-  if (RUN_MODE === RunMode.RestoreHD) {
-    console.log('HD wallet params are:', hdWalletParams);
-  }
-
-  // This call will be part of the statistics. There is no way around it so far: https://github.com/grafana/k6/issues/1321
-  const res = http.batch([WALLET_ADDRESSES_URL, POOL_ADDRESSES_URL]);
-  check(res, { 'get wallets and pools files': (r) => r.every(({ status }) => status >= 200 && status < 300) });
-
-  const [{ body: resBodyWallets }, { body: resBodyPools }] = res;
-  const walletsOrig = JSON.parse(resBodyWallets);
-  const walletsOrigCount = walletsOrig ? walletsOrig.length : 0;
-  check(walletsOrigCount, {
-    'At least one wallet is required to run the test': (count) => count > 0
-  });
-  console.log(`Wallet addresses configuration file contains ${walletsOrigCount} addresses`);
-
-  // One wallet, one address
-  let wallets = chunkArray(walletsOrig, 1);
-  if (RUN_MODE === RunMode.RestoreHD) {
-    // One wallet, multiple addresses
-    // Remove "big transaction history wallets"
-    const filteredWallets = walletsOrig.filter(({ tx_count }) => tx_count < hdWalletParams.maxTxHistory);
-    // Create chunks of `activeAddrCount` addresses per HD wallet
-    wallets = chunkArray(filteredWallets, hdWalletParams.activeAddrCount);
-  }
-
-  const requestedAddrCount = RUN_MODE === RunMode.RestoreHD ? MAX_VU * hdWalletParams.activeAddrCount : MAX_VU;
-  const availableAddrCount = wallets.length;
-
-  if (availableAddrCount < requestedAddrCount) {
-    console.warn(
-      `Requested wallet count * addresses per wallet: ${requestedAddrCount}, is greater than the available addresses: ${availableAddrCount}. Some addresses will be reused`
-    );
-  }
-
-  const poolAddresses = JSON.parse(resBodyPools);
-  check(poolAddresses, {
-    'At least one stake pool address is required to run the test': (p) => p && p.length > 0
-  });
-  return { poolAddresses, wallets: wallets.slice(0, MAX_VU) };
+  console.log(apiVersion);
 }
 
 /** Keeps track of wallets that were successfully synced to avoid restoring twice */
@@ -326,6 +285,6 @@ export default function ({ wallets, poolAddresses }) {
   const wallet = wallets[vu % wallets.length]; // each wallet is a collection of addresses
   const poolAddress = poolAddresses[vu % poolAddresses.length];
 
-  syncedWallets.has(wallet[0].address) ? emulateIdleClient() : syncWallet({ poolAddress, wallet });
-  sleep(ITERATION_SLEEP);
+  // syncedWallets.has(wallet[0].address) ? emulateIdleClient() : syncWallet({ poolAddress, wallet });
+  // sleep(ITERATION_SLEEP);
 }
