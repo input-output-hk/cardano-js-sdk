@@ -30,7 +30,7 @@ describe('PersonalWallet/mint', () => {
   });
 
   it('can mint a token with no asset name', async () => {
-    wallet = (await getWallet({ env, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
+    wallet = (await getWallet({ env, logger, name: 'Minting Wallet' })).wallet;
 
     const coins = 3_000_000n;
     await walletReady(wallet, coins);
