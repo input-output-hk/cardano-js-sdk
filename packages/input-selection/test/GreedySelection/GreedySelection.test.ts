@@ -21,6 +21,8 @@ describe('GreedySelection', () => {
         ])
     });
 
+    const preSelectedUtxo = new Set<Cardano.Utxo>();
+
     const utxo = new Set([
       TxTestUtil.createUnspentTxOutput({ coins: 2_000_000n }),
       TxTestUtil.createUnspentTxOutput({ coins: 2_000_000n }),
@@ -40,6 +42,7 @@ describe('GreedySelection', () => {
       constraints: mockConstraintsToConstraints(constraints),
       implicitValue,
       outputs,
+      preSelectedUtxo,
       utxo
     });
 
@@ -89,6 +92,82 @@ describe('GreedySelection', () => {
     });
   });
 
+  it('consumes the pre selected inputs plus all available UTXOs in the set and returns that total amount distributed in the change minus the fee', async () => {
+    const selector = new GreedyInputSelector({
+      getChangeAddresses: async () =>
+        new Map([
+          [asPaymentAddress('A'), 1],
+          [asPaymentAddress('B'), 1]
+        ])
+    });
+
+    const preSelectedUtxo = new Set([
+      TxTestUtil.createUnspentTxOutput({ coins: 2_000_000n }),
+      TxTestUtil.createUnspentTxOutput({ coins: 2_000_000n }),
+      TxTestUtil.createUnspentTxOutput({ coins: 2_000_000n }),
+      TxTestUtil.createUnspentTxOutput({ coins: 2_000_000n }),
+      TxTestUtil.createUnspentTxOutput({ coins: 2_000_000n })
+    ]);
+
+    const utxo = new Set([
+      TxTestUtil.createUnspentTxOutput({ coins: 2_000_000n }),
+      TxTestUtil.createUnspentTxOutput({ coins: 2_000_000n }),
+      TxTestUtil.createUnspentTxOutput({ coins: 2_000_000n }),
+      TxTestUtil.createUnspentTxOutput({ coins: 2_000_000n }),
+      TxTestUtil.createUnspentTxOutput({ coins: 2_000_000n })
+    ]);
+    const outputs = new Set<Cardano.TxOut>();
+    const expectedFee = 1000n;
+    const implicitValue = {};
+    const constraints = {
+      ...MOCK_NO_CONSTRAINTS,
+      minimumCostCoefficient: 100n
+    };
+
+    const results = await selector.select({
+      constraints: mockConstraintsToConstraints(constraints),
+      implicitValue,
+      outputs,
+      preSelectedUtxo,
+      utxo
+    });
+
+    const {
+      remainingUTxO,
+      selection: { change, fee, inputs }
+    } = results;
+
+    expect(inputs).toEqual(new Set([...utxo, ...preSelectedUtxo]));
+    expect(remainingUTxO.size).toEqual(0);
+    expect(fee).toEqual(expectedFee);
+
+    expect(getCoinValueForAddress('A', change)).toEqual(10_000_000n - expectedFee);
+    expect(getCoinValueForAddress('B', change)).toEqual(10_000_000n);
+
+    expect(change).toEqual([
+      { address: 'A', value: { assets: new Map([]), coins: 4_999_000n } },
+      { address: 'B', value: { coins: 5_000_000n } },
+      { address: 'A', value: { coins: 2_500_000n } },
+      { address: 'B', value: { coins: 2_500_000n } },
+      { address: 'A', value: { coins: 1_250_000n } },
+      { address: 'B', value: { coins: 1_250_000n } },
+      { address: 'A', value: { coins: 625_000n } },
+      { address: 'B', value: { coins: 625_000n } },
+      { address: 'A', value: { coins: 312_500n } },
+      { address: 'A', value: { coins: 312_500n } },
+      { address: 'B', value: { coins: 312_500n } },
+      { address: 'B', value: { coins: 312_500n } }
+    ]);
+
+    assertInputSelectionProperties({
+      constraints,
+      implicitValue,
+      outputs,
+      results,
+      utxo
+    });
+  });
+
   it('correctly accounts for outputs and returns the remaining amount distributed in the change minus the fee', async () => {
     const selector = new GreedyInputSelector({
       getChangeAddresses: async () =>
@@ -100,6 +179,8 @@ describe('GreedySelection', () => {
           [asPaymentAddress('E'), 1]
         ])
     });
+
+    const preSelectedUtxo = new Set<Cardano.Utxo>();
 
     const utxo = new Set([
       TxTestUtil.createUnspentTxOutput({ coins: 5_000_000n }),
@@ -126,6 +207,7 @@ describe('GreedySelection', () => {
       constraints: mockConstraintsToConstraints(constraints),
       implicitValue,
       outputs,
+      preSelectedUtxo,
       utxo
     });
 
@@ -202,6 +284,8 @@ describe('GreedySelection', () => {
         ])
     });
 
+    const preSelectedUtxo = new Set<Cardano.Utxo>();
+
     const utxo = new Set([
       TxTestUtil.createUnspentTxOutput({
         assets: asTokenMap([
@@ -246,6 +330,7 @@ describe('GreedySelection', () => {
       constraints: mockConstraintsToConstraints(constraints),
       implicitValue,
       outputs,
+      preSelectedUtxo,
       utxo
     });
 
@@ -323,6 +408,7 @@ describe('GreedySelection', () => {
         ])
     });
 
+    const preSelectedUtxo = new Set<Cardano.Utxo>();
     const utxo = new Set([
       TxTestUtil.createUnspentTxOutput({
         assets: asTokenMap([
@@ -369,6 +455,7 @@ describe('GreedySelection', () => {
       constraints: mockConstraintsToConstraints(constraints),
       implicitValue,
       outputs,
+      preSelectedUtxo,
       utxo
     });
 
@@ -427,12 +514,15 @@ describe('GreedySelection', () => {
 
   it('accounts for implicit coin', async () => {
     const selector = new GreedyInputSelector({
+      // eslint-disable-next-line sonarjs/no-identical-functions
       getChangeAddresses: async () =>
         new Map([
           [asPaymentAddress('A'), 1],
           [asPaymentAddress('B'), 1]
         ])
     });
+
+    const preSelectedUtxo = new Set<Cardano.Utxo>();
 
     const utxo = new Set([
       TxTestUtil.createUnspentTxOutput({ coins: 2_000_000n }),
@@ -455,6 +545,7 @@ describe('GreedySelection', () => {
       constraints: mockConstraintsToConstraints(constraints),
       implicitValue,
       outputs,
+      preSelectedUtxo,
       utxo
     });
 
@@ -512,6 +603,7 @@ describe('GreedySelection', () => {
       })
     ]);
 
+    const preSelectedUtxo = new Set<Cardano.Utxo>();
     const outputs = new Set<Cardano.TxOut>();
     const expectedFee = 200n;
     const implicitValue = {
@@ -526,6 +618,7 @@ describe('GreedySelection', () => {
       constraints: mockConstraintsToConstraints(constraints),
       implicitValue,
       outputs,
+      preSelectedUtxo,
       utxo
     });
 
@@ -573,6 +666,7 @@ describe('GreedySelection', () => {
       })
     ]);
 
+    const preSelectedUtxo = new Set<Cardano.Utxo>();
     const outputs = new Set<Cardano.TxOut>();
     const expectedFee = 200n;
     const implicitValue = {
@@ -587,6 +681,7 @@ describe('GreedySelection', () => {
       constraints: mockConstraintsToConstraints(constraints),
       implicitValue,
       outputs,
+      preSelectedUtxo,
       utxo
     });
 
@@ -654,6 +749,7 @@ describe('GreedySelection', () => {
       })
     ]);
 
+    const preSelectedUtxo = new Set<Cardano.Utxo>();
     const outputs = new Set<Cardano.TxOut>();
     const implicitValue = {
       coin: { deposit: 4_000_000n }
@@ -670,6 +766,7 @@ describe('GreedySelection', () => {
       constraints,
       implicitValue,
       outputs,
+      preSelectedUtxo,
       utxo
     });
 

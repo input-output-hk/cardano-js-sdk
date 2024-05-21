@@ -3,10 +3,14 @@ import { Cardano, HandleResolution } from '@cardano-sdk/core';
 import { GroupedAddress, SignTransactionOptions } from '@cardano-sdk/key-management';
 import { SelectionSkeleton } from '@cardano-sdk/input-selection';
 
-import { CustomizeCb } from './tx-builder';
+import { CustomizeCb, TxEvaluator } from './tx-builder';
 import { MinimumCoinQuantityPerOutput } from './output-validation';
+import { RedeemersByType } from './input-selection';
 
-export type InitializeTxResult = Cardano.TxBodyWithHash & { inputSelection: SelectionSkeleton };
+export type InitializeTxResult = Cardano.TxBodyWithHash & {
+  inputSelection: SelectionSkeleton;
+  redeemers?: Array<Cardano.Redeemer>;
+};
 
 export type RewardAccountWithPoolId = Omit<Cardano.RewardAccountInfo, 'delegatee'> & {
   delegatee?: { nextNextEpoch?: { id: Cardano.PoolId } };
@@ -35,12 +39,16 @@ export type InitializeTxWitness = Partial<Cardano.Witness>;
 export type TxBodyPreInputSelection = Omit<Cardano.TxBody, 'inputs' | 'fee'>;
 
 export interface InitializeTxProps {
+  // Inputs specified at this stage will be included in the transaction regardless of the input selection result.
+  inputs?: Set<Cardano.Utxo>;
+  referenceInputs?: Set<Cardano.TxIn>;
   outputs?: Set<Cardano.TxOut>;
   certificates?: Cardano.Certificate[];
   options?: {
     validityInterval?: Cardano.ValidityInterval;
   };
   collaterals?: Set<Cardano.TxIn>;
+  collateralReturn?: Cardano.TxOut;
   mint?: Cardano.TokenMap;
   scriptIntegrityHash?: Crypto.Hash32ByteBase16;
   requiredExtraSignatures?: Crypto.Ed25519KeyHashHex[];
@@ -51,6 +59,9 @@ export interface InitializeTxProps {
   proposalProcedures?: Cardano.ProposalProcedure[];
   /** callback function that allows updating the transaction before input selection */
   customizeCb?: CustomizeCb;
+  txEvaluator?: TxEvaluator;
+  redeemersByType?: RedeemersByType;
+  scriptVersions?: Set<Cardano.PlutusLanguageVersion>;
 }
 
 export interface InitializeTxPropsValidationResult {

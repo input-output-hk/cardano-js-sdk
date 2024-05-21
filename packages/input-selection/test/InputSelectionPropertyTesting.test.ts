@@ -42,6 +42,7 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
       it('No change', async () => {
         await testInputSelectionProperties({
           createOutputs: () => [TxTestUtil.createOutput({ coins: 3_000_000n })],
+          createPreSelectedOutputUtxo: () => [],
           createUtxo: () => [TxTestUtil.createUnspentTxOutput({ coins: 3_000_000n })],
           getAlgorithm,
           mockConstraints: SelectionConstraints.MOCK_NO_CONSTRAINTS
@@ -51,6 +52,7 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
         // Regression
         await testInputSelectionProperties({
           createOutputs: () => [],
+          createPreSelectedOutputUtxo: () => [],
           createUtxo: () => [TxTestUtil.createUnspentTxOutput({ coins: 30_999_994n })],
           getAlgorithm,
           mockConstraints: {
@@ -64,6 +66,7 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
         // Regression
         await testInputSelectionProperties({
           createOutputs: () => [TxTestUtil.createOutput({ assets: new Map([[AssetId.TSLA, 7001n]]), coins: 1000n })],
+          createPreSelectedOutputUtxo: () => [],
           createUtxo: () => [
             TxTestUtil.createUnspentTxOutput({ assets: new Map([[AssetId.TSLA, 7001n]]), coins: 11_999_994n })
           ],
@@ -71,22 +74,58 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
           mockConstraints: SelectionConstraints.MOCK_NO_CONSTRAINTS
         });
       });
+
+      it('can use pre selected inputs', async () => {
+        await testInputSelectionProperties({
+          createOutputs: () => [TxTestUtil.createOutput({ assets: new Map([[AssetId.B, 999n]]), coins: 9_000_000n })],
+          createPreSelectedOutputUtxo: () => [
+            TxTestUtil.createUnspentTxOutput({ assets: new Map([[AssetId.TSLA, 1n]]), coins: 1000n })
+          ],
+          createUtxo: () => [
+            TxTestUtil.createUnspentTxOutput({ assets: new Map([[AssetId.B, 999n]]), coins: 99_000_000n })
+          ],
+          getAlgorithm,
+          mockConstraints: SelectionConstraints.MOCK_NO_CONSTRAINTS
+        });
+      });
+
+      it('selects pre selected inputs', async () => {
+        const preSelectedUtxo = new Set<Cardano.Utxo>([
+          TxTestUtil.createUnspentTxOutput({ assets: new Map([[AssetId.TSLA, 1n]]), coins: 1000n })
+        ]);
+        const utxo = new Set([TxTestUtil.createUnspentTxOutput({ coins: 10_000_000n })]);
+        const outputs = new Set([TxTestUtil.createOutput({ coins: 5_000_000n })]);
+        const results = await getAlgorithm().select({
+          constraints: SelectionConstraints.NO_CONSTRAINTS,
+          implicitValue: { coin: { input: 2_000_000n } },
+          outputs,
+          preSelectedUtxo,
+          utxo
+        });
+        expect(results.selection.inputs.size).toBe(2);
+        expect([...results.selection.inputs].some((output) => output[1].value.assets?.has(AssetId.TSLA))).toBeTruthy();
+      });
+
       it('Selects UTxO even when implicit input covers outputs', async () => {
+        const preSelectedUtxo = new Set<Cardano.Utxo>();
         const utxo = new Set([TxTestUtil.createUnspentTxOutput({ coins: 10_000_000n })]);
         const outputs = new Set([TxTestUtil.createOutput({ coins: 1_000_000n })]);
         const results = await getAlgorithm().select({
           constraints: SelectionConstraints.NO_CONSTRAINTS,
           implicitValue: { coin: { input: 2_000_000n } },
           outputs,
+          preSelectedUtxo,
           utxo
         });
         expect(results.selection.inputs.size).toBe(1);
       });
     });
+
     describe('mint', () => {
       const assetId = AssetId.TSLA;
 
       it('Considers positive quantity mint as implicit input', async () => {
+        const preSelectedUtxo = new Set<Cardano.Utxo>();
         const utxo = new Set([TxTestUtil.createUnspentTxOutput({ coins: 10_000_000n })]);
         const assets = new Map([[assetId, 100n]]);
         const outputs = new Set([TxTestUtil.createOutput({ assets, coins: 1_000_000n })]);
@@ -94,6 +133,7 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
           constraints: SelectionConstraints.NO_CONSTRAINTS,
           implicitValue: { mint: new Map(assets.entries()) },
           outputs,
+          preSelectedUtxo,
           utxo
         });
         expect(results.selection.inputs.size).toBe(1);
@@ -109,11 +149,13 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
             coins: 10_000_000n
           })
         ]);
+        const preSelectedUtxo = new Set<Cardano.Utxo>();
         const outputs = new Set([TxTestUtil.createOutput({ coins: 1_000_000n })]);
         const results = await getAlgorithm().select({
           constraints: SelectionConstraints.NO_CONSTRAINTS,
           implicitValue: { mint: new Map([[assetId, -burnQuantity]]) },
           outputs,
+          preSelectedUtxo,
           utxo
         });
         expect(results.selection.inputs.size).toBe(1);
@@ -130,6 +172,7 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
               TxTestUtil.createOutput({ coins: 12_000_000n }),
               TxTestUtil.createOutput({ coins: 2_000_000n })
             ],
+            createPreSelectedOutputUtxo: () => [],
             createUtxo: () => [
               TxTestUtil.createUnspentTxOutput({ coins: 3_000_000n }),
               TxTestUtil.createUnspentTxOutput({ coins: 10_000_000n })
@@ -142,6 +185,7 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
         it('Coin (Outputs+Fee>UTxO)', async () => {
           await testInputSelectionFailureMode({
             createOutputs: () => [TxTestUtil.createOutput({ coins: 9_000_000n })],
+            createPreSelectedOutputUtxo: () => [],
             createUtxo: () => [
               TxTestUtil.createUnspentTxOutput({ coins: 4_000_000n }),
               TxTestUtil.createUnspentTxOutput({ coins: 5_000_000n })
@@ -159,6 +203,7 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
             createOutputs: () => [
               TxTestUtil.createOutput({ assets: new Map([[AssetId.TSLA, 7001n]]), coins: 5_000_000n })
             ],
+            createPreSelectedOutputUtxo: () => [],
             createUtxo: () => [
               TxTestUtil.createUnspentTxOutput({ assets: new Map([[AssetId.TSLA, 7000n]]), coins: 10_000_000n })
             ],
@@ -170,6 +215,7 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
         it('No UTxO', async () => {
           await testInputSelectionFailureMode({
             createOutputs: () => [TxTestUtil.createOutput({ coins: 5_000_000n })],
+            createPreSelectedOutputUtxo: () => [],
             createUtxo: () => [],
             expectedError: InputSelectionFailure.UtxoBalanceInsufficient,
             getAlgorithm,
@@ -179,6 +225,7 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
         it('Attempting to burn tokens with insufficient quantity in utxo', async () => {
           await testInputSelectionFailureMode({
             createOutputs: () => [],
+            createPreSelectedOutputUtxo: () => [],
             createUtxo: () => [TxTestUtil.createUnspentTxOutput({ coins: 10_000_000n })],
             expectedError: InputSelectionFailure.UtxoBalanceInsufficient,
             getAlgorithm,
@@ -189,6 +236,7 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
         it('Maximum Input Count Exceeded', async () => {
           await testInputSelectionFailureMode({
             createOutputs: () => [TxTestUtil.createOutput({ coins: 6_000_000n })],
+            createPreSelectedOutputUtxo: () => [],
             createUtxo: () => [
               TxTestUtil.createUnspentTxOutput({ coins: 2_000_000n }),
               TxTestUtil.createUnspentTxOutput({ coins: 2_000_000n }),
@@ -207,6 +255,7 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
         it('Change bundle value is less than constrained', async () => {
           await testInputSelectionFailureMode({
             createOutputs: () => [TxTestUtil.createOutput({ coins: 2_999_999n })],
+            createPreSelectedOutputUtxo: () => [],
             createUtxo: () => [
               TxTestUtil.createUnspentTxOutput({ coins: 1_000_000n }),
               TxTestUtil.createUnspentTxOutput({ coins: 2_000_000n })
@@ -230,6 +279,7 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
                 coins: 1_000_000n
               })
             ],
+            createPreSelectedOutputUtxo: () => [],
             createUtxo: () => [
               TxTestUtil.createUnspentTxOutput({
                 assets: new Map([
@@ -266,12 +316,13 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
               utxoAmounts.map((valueQuantities) => TxTestUtil.createUnspentTxOutput(valueQuantities))
             );
             const outputs = new Set(outputsAmounts.map((valueQuantities) => TxTestUtil.createOutput(valueQuantities)));
-
+            const preSelectedUtxo = new Set<Cardano.Utxo>();
             try {
               const results = await algorithm.select({
                 constraints: SelectionConstraints.mockConstraintsToConstraints(constraints),
                 implicitValue,
                 outputs,
+                preSelectedUtxo,
                 utxo: new Set(utxo)
               });
               assertInputSelectionProperties({ constraints, implicitValue, outputs, results, utxo });

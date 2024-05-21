@@ -3,7 +3,6 @@ import * as Crypto from '@cardano-sdk/crypto';
 import {
   AddressType,
   Bip32Account,
-  GroupedAddress,
   SignTransactionOptions,
   TransactionSigner,
   WitnessedTx,
@@ -13,30 +12,42 @@ import { Cardano, HandleProvider, HandleResolution, Serialization, metadatum } f
 import {
   CustomizeCb,
   InsufficientRewardAccounts,
-  InvalidHereafterError,
   OutOfSyncRewardAccounts,
   OutputBuilderTxOut,
   PartialTx,
   PartialTxOut,
+  ScriptUnlockProps,
   TxBuilder,
   TxBuilderDependencies,
   TxContext,
+  TxEvaluator,
   TxInspection,
   TxOutValidationError,
   UnwitnessedTx
 } from './types';
-import { GreedyInputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
+import { GreedyTxEvaluator } from './GreedyTxEvaluator';
 import { Logger } from 'ts-log';
 import { OutputBuilderValidator, TxOutputBuilder } from './OutputBuilder';
+import { RedeemersByType } from '../input-selection';
 import { RewardAccountWithPoolId } from '../types';
+import {
+  RewardAccountsAndWeights,
+  buildWitness,
+  computeCollateral,
+  createGreedyInputSelector,
+  sortRewardAccountsDelegatedFirst,
+  validateValidityInterval
+} from './utils';
+import { SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { contextLogger, deepEquals } from '@cardano-sdk/util';
 import { createOutputValidator } from '../output-validation';
 import { initializeTx } from './initializeTx';
 import { lastValueFrom } from 'rxjs';
-import minBy from 'lodash/minBy';
 import omit from 'lodash/omit';
 import uniq from 'lodash/uniq';
+
+const DUMMY_SCRIPT_DATA_HASH = '0'.repeat(64) as unknown as Crypto.Hash32ByteBase16;
 
 type BuiltTx = {
   tx: Cardano.TxBodyWithHash;
@@ -58,7 +69,6 @@ interface LazySignerProps {
 }
 
 type TxBuilderStakePool = Omit<Cardano.Cip17Pool, 'id'> & { id: Cardano.PoolId };
-type RewardAccountsAndWeights = Map<Cardano.RewardAccount, number>;
 
 class LazyTxSigner implements UnwitnessedTx {
   #built?: BuiltTx;
@@ -79,17 +89,28 @@ class LazyTxSigner implements UnwitnessedTx {
       tx,
       ctx: {
         signingContext: { knownAddresses, handleResolutions },
-        auxiliaryData
+        auxiliaryData,
+        witness
       },
       inputSelection
     } = await this.#build();
-    return { ...tx, auxiliaryData, handleResolutions, inputSelection, ownAddresses: knownAddresses };
+
+    return {
+      ...tx,
+      auxiliaryData,
+      handleResolutions,
+      inputSelection,
+      ownAddresses: knownAddresses,
+      witness: witness as Cardano.Witness
+    };
   }
 
   async sign(): Promise<WitnessedTx> {
     return this.#signer.sign(await this.#build());
   }
 }
+
+export type TxIdWithIndex = string;
 
 export class GenericTxBuilder implements TxBuilder {
   partialTxBody: Partial<Cardano.TxBody> = {};
@@ -100,10 +121,30 @@ export class GenericTxBuilder implements TxBuilder {
   #dependencies: TxBuilderDependencies;
   #outputValidator: OutputBuilderValidator;
   #requestedPortfolio?: TxBuilderStakePool[];
+  #txEvaluator: TxEvaluator;
   #logger: Logger;
   #handleProvider?: HandleProvider;
   #handleResolutions: HandleResolution[];
   #delegateFirstStakeCredConfig: Cardano.PoolId | null | undefined = undefined;
+
+  #preSelectedInputs = new Map<TxIdWithIndex, Cardano.Utxo>();
+  #referenceInputs = new Map<TxIdWithIndex, Cardano.Utxo>();
+  #knownScripts = new Map<Crypto.Hash28ByteBase16, Cardano.Script>();
+  #knownReferenceScripts = new Set<Crypto.Hash28ByteBase16>();
+  #knownDatums = new Map<Cardano.DatumHash, Cardano.PlutusData>();
+  #knownInlineDatums = new Set<Cardano.DatumHash>();
+  #knownRedeemers: RedeemersByType = {
+    certificate: new Array<Cardano.Redeemer>(),
+    mint: new Array<Cardano.Redeemer>(),
+    propose: new Array<Cardano.Redeemer>(),
+    spend: new Map<TxIdWithIndex, Cardano.Redeemer>(),
+    vote: new Array<Cardano.Redeemer>(),
+    withdrawal: new Array<Cardano.Redeemer>()
+  };
+
+  #unresolvedInputs = new Array<Cardano.TxIn>();
+  #unresolvedReferenceInputs = new Array<Cardano.TxIn>();
+  #unresolvedDatums = new Array<Cardano.DatumHash>();
 
   #customizeCb: CustomizeCb;
 
@@ -117,6 +158,8 @@ export class GenericTxBuilder implements TxBuilder {
     this.#logger = dependencies.logger;
     this.#handleProvider = dependencies.handleProvider;
     this.#handleResolutions = [];
+    this.#txEvaluator =
+      dependencies.txEvaluator ?? new GreedyTxEvaluator(dependencies.txBuilderProviders.protocolParameters);
   }
 
   async inspect(): Promise<PartialTx> {
@@ -126,6 +169,55 @@ export class GenericTxBuilder implements TxBuilder {
       extraSigners: this.partialExtraSigners,
       signingOptions: this.partialSigningOptions
     };
+  }
+
+  addReferenceInput(input: Cardano.TxIn | Cardano.Utxo): TxBuilder {
+    if (Array.isArray(input)) {
+      const inputId: TxIdWithIndex = `${input[0].txId}#${input[0].index}`;
+      this.#referenceInputs.set(inputId, input);
+
+      return this;
+    }
+
+    if (
+      !this.#unresolvedReferenceInputs.some(
+        (unresolvedInput) => unresolvedInput.txId === input.txId && unresolvedInput.index === input.index
+      )
+    )
+      this.#unresolvedReferenceInputs.push(input);
+
+    return this;
+  }
+
+  addInput(input: Cardano.TxIn | Cardano.Utxo, scriptUnlockProps?: ScriptUnlockProps): TxBuilder {
+    if (scriptUnlockProps) {
+      this.#addScriptInput(input, scriptUnlockProps);
+      return this;
+    }
+
+    if (Array.isArray(input)) {
+      const inputId: TxIdWithIndex = `${input[0].txId}#${input[0].index}`;
+      this.#preSelectedInputs.set(inputId, input);
+
+      return this;
+    }
+
+    if (
+      !this.#unresolvedInputs.some(
+        (unresolvedInput) => unresolvedInput.txId === input.txId && unresolvedInput.index === input.index
+      )
+    )
+      this.#unresolvedInputs.push(input);
+
+    return this;
+  }
+
+  addDatum(datum: Cardano.PlutusData): TxBuilder {
+    const hash = Serialization.PlutusData.fromCore(datum).hash();
+
+    this.#knownDatums.set(hash, datum);
+
+    return this;
   }
 
   addOutput(txOut: OutputBuilderTxOut): TxBuilder {
@@ -213,7 +305,7 @@ export class GenericTxBuilder implements TxBuilder {
   build(): UnwitnessedTx {
     return new LazyTxSigner({
       builder: {
-        // eslint-disable-next-line sonarjs/cognitive-complexity
+        // eslint-disable-next-line sonarjs/cognitive-complexity,max-statements
         build: async () => {
           this.#logger.debug('Building');
           try {
@@ -222,7 +314,12 @@ export class GenericTxBuilder implements TxBuilder {
               : await this.#delegateFirstStakeCredential();
 
             await this.#validateOutputs();
-            await this.#validateValidityInterval();
+
+            validateValidityInterval(
+              await this.#dependencies.txBuilderProviders.tip(),
+              this.partialTxBody.validityInterval
+            );
+
             // Take a snapshot of returned properties,
             // so that they don't change while `initializeTx` is resolving
             const ownAddresses = await this.#dependencies.txBuilderProviders.addresses.get();
@@ -262,27 +359,69 @@ export class GenericTxBuilder implements TxBuilder {
 
               // Distributing balance according to weights is necessary when there are multiple reward accounts
               // and delegating, to make sure utxos are part of the correct addresses (the ones being delegated)
-              dependencies.inputSelector = GenericTxBuilder.#createGreedyInputSelector(
-                rewardAccountsWithWeights,
-                ownAddresses
-              );
+              dependencies.inputSelector = createGreedyInputSelector(rewardAccountsWithWeights, ownAddresses);
             }
 
-            const { body, hash, inputSelection } = await initializeTx(
+            // Resolved all unresolved inputs
+            await Promise.all(
+              this.#unresolvedInputs.map((input) => this.#resolveInput(input, this.#preSelectedInputs))
+            );
+            await Promise.all(
+              this.#unresolvedReferenceInputs.map((input) => this.#resolveInput(input, this.#referenceInputs))
+            );
+
+            // We must resolve datums after inputs since we may discover datums during that process.
+            await Promise.all(this.#unresolvedDatums.map((datumHash) => this.#resolveDatum(datumHash)));
+
+            const witness = await buildWitness(
+              this.#knownScripts,
+              this.#knownReferenceScripts,
+              this.#knownDatums,
+              this.#knownInlineDatums,
+              this.#knownRedeemers,
+              this.#dependencies.txBuilderProviders
+            );
+
+            const hasPlutusScripts = [...this.#knownScripts.values()].some((script) => Cardano.isPlutusScript(script));
+
+            const { collaterals, collateralReturn } = hasPlutusScripts
+              ? await computeCollateral(this.#dependencies.txBuilderProviders)
+              : { collateralReturn: undefined, collaterals: undefined };
+
+            const scriptVersions = new Set<Cardano.PlutusLanguageVersion>();
+            for (const script of this.#knownScripts.values()) {
+              if (Cardano.isPlutusScript(script)) {
+                scriptVersions.add(script.version);
+              }
+            }
+
+            const { body, hash, inputSelection, redeemers } = await initializeTx(
               {
                 auxiliaryData,
                 certificates: this.partialTxBody.certificates,
+                collateralReturn,
+                collaterals,
                 customizeCb: this.#customizeCb,
                 handleResolutions: this.#handleResolutions,
+                inputs: new Set(this.#preSelectedInputs.values()),
                 options: {
                   validityInterval: this.partialTxBody.validityInterval
                 },
                 outputs: new Set(this.partialTxBody.outputs || []),
                 proposalProcedures: this.partialTxBody.proposalProcedures,
-                signingOptions: partialSigningOptions
+                redeemersByType: this.#knownRedeemers,
+                referenceInputs: new Set([...this.#referenceInputs.values()].map((utxo) => utxo[0])),
+                scriptIntegrityHash: hasPlutusScripts ? DUMMY_SCRIPT_DATA_HASH : undefined,
+                scriptVersions,
+                signingOptions: partialSigningOptions,
+                txEvaluator: this.#txEvaluator,
+                witness
               },
               dependencies
             );
+
+            witness.redeemers = redeemers;
+
             return {
               ctx: {
                 auxiliaryData,
@@ -292,7 +431,8 @@ export class GenericTxBuilder implements TxBuilder {
                   knownAddresses: ownAddresses,
                   txInKeyPathMap: await util.createTxInKeyPathMap(body, ownAddresses, this.#dependencies.inputResolver)
                 },
-                signingOptions: { ...partialSigningOptions, extraSigners }
+                signingOptions: { ...partialSigningOptions, extraSigners },
+                witness
               },
               inputSelection,
               tx: { body, hash }
@@ -308,9 +448,7 @@ export class GenericTxBuilder implements TxBuilder {
         sign: ({ tx, ctx }) => {
           const transaction = new Serialization.Transaction(
             Serialization.TransactionBody.fromCore(tx.body),
-            Serialization.TransactionWitnessSet.fromCore(
-              ctx.witness ? (ctx.witness as Cardano.Witness) : { signatures: new Map() }
-            ),
+            Serialization.TransactionWitnessSet.fromCore((ctx.witness ?? { signatures: new Map() }) as Cardano.Witness),
             ctx.auxiliaryData ? Serialization.AuxiliaryData.fromCore(ctx.auxiliaryData) : undefined
           );
 
@@ -328,17 +466,6 @@ export class GenericTxBuilder implements TxBuilder {
     this.partialTxBody = { ...this.partialTxBody, validityInterval };
 
     return this;
-  }
-
-  async #validateValidityInterval(): Promise<void> {
-    if (!this.partialTxBody.validityInterval?.invalidHereafter) {
-      return;
-    }
-
-    const tip = await this.#dependencies.txBuilderProviders.tip();
-    if (tip.slot >= this.partialTxBody.validityInterval.invalidHereafter) {
-      throw new InvalidHereafterError();
-    }
   }
 
   /** @throws {TxOutValidationError[]} TxOutValidationError[] in case of validation errors */
@@ -487,7 +614,7 @@ export class GenericTxBuilder implements TxBuilder {
           !rewardAccount.delegatee?.nextNextEpoch ||
           this.#requestedPortfolio?.every(({ id }) => id !== rewardAccount.delegatee?.nextNextEpoch?.id)
       )
-      .sort(GenericTxBuilder.#sortRewardAccountsDelegatedFirst)
+      .sort(sortRewardAccountsDelegatedFirst)
       .reverse(); // items will be popped from this array, so we want the most suitable at the end of the array
 
     if (newPools.length > availableRewardAccounts.length) {
@@ -521,50 +648,100 @@ export class GenericTxBuilder implements TxBuilder {
     return rewardAccountsWithWeights;
   }
 
-  /** Registered and delegated < Registered < Unregistered */
-  static #sortRewardAccountsDelegatedFirst(a: RewardAccountWithPoolId, b: RewardAccountWithPoolId): number {
-    const getScore = (acct: RewardAccountWithPoolId) => {
-      let score = 2;
-      if (acct.credentialStatus === Cardano.StakeCredentialStatus.Registered) {
-        score = 1;
-        if (acct.delegatee?.nextNextEpoch) {
-          score = 0;
-        }
-      }
-      return score;
-    };
+  async #resolveDatum(datumHash: Cardano.DatumHash) {
+    // Lets check first if the datum was not added independently to the builder via addDatum.
+    if (this.#knownDatums.has(datumHash)) return;
 
-    return getScore(a) - getScore(b);
+    if (!this.#dependencies.datumResolver) throw new Error('Cant resolve unknown datums. Datum resolver not set.');
+
+    const datum = await this.#dependencies.datumResolver.resolve(datumHash);
+
+    if (!datum) throw new Error(`Could not resolve datum with datum hash ${datumHash}`);
+
+    this.#knownDatums.set(datumHash, datum);
   }
 
-  /**
-   * Searches the payment address with the smallest index associated to the reward accounts.
-   *
-   * @param rewardAccountsWithWeights reward account addresses and the portfolio distribution weights.
-   * @param ownAddresses addresses to search in by reward account.
-   * @returns GreedyInputSelector with the addresses and weights to use as change addresses.
-   * @throws in case some reward accounts are not associated with any of the own addresses
-   */
-  static #createGreedyInputSelector(
-    rewardAccountsWithWeights: RewardAccountsAndWeights,
-    ownAddresses: GroupedAddress[]
-  ) {
-    // select the address with smallest index for each reward account
-    const addressesAndWeights = new Map(
-      [...rewardAccountsWithWeights].map(([rewardAccount, weight]) => {
-        const address = minBy(
-          ownAddresses.filter((ownAddr) => ownAddr.rewardAccount === rewardAccount),
-          ({ index }) => index
-        );
-        if (!address) {
-          throw new Error(`Could not find any address associated with ${rewardAccount}.`);
-        }
-        return [address.address, weight];
-      })
-    );
+  async #resolveInput(input: Cardano.TxIn, inputs: Map<TxIdWithIndex, Cardano.Utxo>) {
+    const inputId: TxIdWithIndex = `${input.txId}#${input.index}`;
 
-    return new GreedyInputSelector({
-      getChangeAddresses: () => Promise.resolve(addressesAndWeights)
-    });
+    const resolvedInput = await this.#dependencies.inputResolver.resolveInput(input);
+
+    if (!resolvedInput) throw new Error(`Could not resolve input ${inputId}`);
+
+    if (resolvedInput.scriptReference) {
+      const policyId = Serialization.Script.fromCore(resolvedInput.scriptReference).hash();
+
+      this.#knownScripts.set(policyId, resolvedInput.scriptReference);
+      this.#knownReferenceScripts.add(policyId);
+    }
+
+    const datum = resolvedInput.datum;
+
+    if (datum) {
+      if (Serialization.isDatumHash(datum)) {
+        if (!this.#knownDatums.has(datum)) this.#unresolvedDatums.push(datum);
+      } else {
+        const hash = Serialization.PlutusData.fromCore(datum).hash();
+        this.#knownDatums.set(hash, datum);
+        this.#knownInlineDatums.add(hash); // We need to keep track of which datums are inline vs the ones provided
+      }
+    }
+
+    inputs.set(inputId, [{ ...input, address: resolvedInput.address }, resolvedInput]);
+  }
+
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+  #addScriptInput(input: Cardano.TxIn | Cardano.Utxo, scriptUnlockProps: ScriptUnlockProps) {
+    let txId: TxIdWithIndex;
+
+    if (Array.isArray(input)) {
+      txId = `${input[0].txId}#${input[0].index}`;
+      this.#preSelectedInputs.set(txId, input);
+
+      if (input[1].datum) {
+        const hash = Serialization.PlutusData.fromCore(input[1].datum).hash();
+        this.#knownDatums.set(hash, input[1].datum);
+        this.#knownInlineDatums.add(hash);
+      }
+
+      if (input[1].datumHash) {
+        this.#unresolvedDatums.push(input[1].datumHash);
+      }
+    } else {
+      txId = `${input.txId}#${input.index}`;
+
+      if (
+        !this.#unresolvedInputs.some(
+          (unresolvedInput) => unresolvedInput.txId === input.txId && unresolvedInput.index === input.index
+        )
+      )
+        this.#unresolvedInputs.push(input);
+    }
+
+    if (scriptUnlockProps.script) {
+      const hash = Serialization.Script.fromCore(scriptUnlockProps.script).hash();
+      this.#knownScripts.set(hash, scriptUnlockProps.script);
+    }
+
+    if (scriptUnlockProps.redeemer) {
+      this.#knownRedeemers.spend?.set(txId, {
+        data: scriptUnlockProps.redeemer,
+        executionUnits: {
+          memory: 0,
+          steps: 0
+        },
+        index: 0,
+        purpose: Cardano.RedeemerPurpose.spend
+      });
+    }
+
+    if (scriptUnlockProps.datum) {
+      if (Serialization.isDatumHash(scriptUnlockProps.datum)) {
+        if (!this.#knownDatums.has(scriptUnlockProps.datum)) this.#unresolvedDatums.push(scriptUnlockProps.datum);
+      } else {
+        const hash = Serialization.PlutusData.fromCore(scriptUnlockProps.datum).hash();
+        this.#knownDatums.set(hash, scriptUnlockProps.datum);
+      }
+    }
   }
 }
