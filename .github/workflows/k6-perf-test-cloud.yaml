@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
+      BRANCH: master
     steps:
       - name: Checkout
         uses: actions/checkout@v2

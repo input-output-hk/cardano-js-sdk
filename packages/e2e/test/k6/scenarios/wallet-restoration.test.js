@@ -2,7 +2,7 @@
 /* eslint-disable func-style */
 import { Counter, Trend } from 'k6/metrics';
 import { check, sleep } from 'k6';
-import { apiVersion } from 'https://raw.githubusercontent.com/input-output-hk/cardano-js-sdk/master/packages/cardano-services-client/src/version.ts';
+import { apiVersion } from `https://raw.githubusercontent.com/input-output-hk/cardano-js-sdk/${__ENV.BRANCH}/packages/cardano-services-client/src/version.ts`;
 import http from 'k6/http';
 
 /**
