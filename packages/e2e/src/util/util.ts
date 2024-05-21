@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
 import { BaseWallet, FinalizeTxProps, ObservableWallet } from '@cardano-sdk/wallet';
-import { Cardano, Serialization, createSlotEpochCalc } from '@cardano-sdk/core';
+import { Cardano, Serialization, createSlotEpochCalc, nativeScriptPolicyId } from '@cardano-sdk/core';
 import {
   EMPTY,
   Observable,
@@ -257,15 +257,23 @@ export const burnTokens = async ({
 }: {
   wallet: BaseWallet;
   tokens?: Cardano.TokenMap;
-  scripts: Cardano.Script[];
+  scripts: Cardano.NativeScript[];
   policySigners: TransactionSigner[];
 }) => {
   if (!tokens) {
     tokens = (await firstValueFrom(wallet.balance.utxo.available$)).assets;
   }
 
-  if (!tokens?.size) {
+  if (!tokens) {
     return; // nothing to burn
+  }
+
+  // Filter by policyId
+  const policyIds = new Set([...scripts].map((script) => nativeScriptPolicyId(script)));
+  tokens = new Map([...tokens].filter(([assetId]) => policyIds.has(Cardano.AssetId.getPolicyId(assetId))));
+
+  if (tokens.size === 0) {
+    return; // no tokens for this policy
   }
 
   const negativeTokens = new Map([...tokens].map(([assetId, value]) => [assetId, -value]));
