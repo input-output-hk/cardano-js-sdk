@@ -22,8 +22,17 @@ const logger = createLogger();
 describe('PersonalWallet/multisignature', () => {
   let wallet: BaseWallet;
   const assetName = '3030303030';
+  let alicePolicySigner: util.KeyAgentTransactionSigner;
+  let bobPolicySigner: util.KeyAgentTransactionSigner;
+  let policyScript: Cardano.NativeScript;
 
-  afterAll(() => {
+  afterAll(async () => {
+    await burnTokens({
+      policySigners: [alicePolicySigner, bobPolicySigner],
+      scripts: [policyScript],
+      wallet
+    });
+
     wallet.shutdown();
   });
 
@@ -63,10 +72,10 @@ describe('PersonalWallet/multisignature', () => {
     const bobPubKey = await bobKeyAgent.derivePublicKey(bobDerivationPath);
     const bobKeyHash = await bobKeyAgent.bip32Ed25519.getPubKeyHash(bobPubKey);
 
-    const alicePolicySigner = new util.KeyAgentTransactionSigner(aliceKeyAgent, aliceDerivationPath);
-    const bobPolicySigner = new util.KeyAgentTransactionSigner(bobKeyAgent, bobDerivationPath);
+    alicePolicySigner = new util.KeyAgentTransactionSigner(aliceKeyAgent, aliceDerivationPath);
+    bobPolicySigner = new util.KeyAgentTransactionSigner(bobKeyAgent, bobDerivationPath);
 
-    const policyScript: Cardano.NativeScript = {
+    policyScript = {
       __type: Cardano.ScriptType.Native,
       kind: Cardano.NativeScriptKind.RequireAllOf,
       scripts: [
@@ -127,11 +136,5 @@ describe('PersonalWallet/multisignature', () => {
     expect(value).toBeDefined();
     expect(value!.assets!.has(assetId)).toBeTruthy();
     expect(value!.assets!.get(assetId)).toBe(10n);
-
-    await burnTokens({
-      policySigners: [alicePolicySigner, bobPolicySigner],
-      scripts: [policyScript],
-      wallet
-    });
   });
 });
