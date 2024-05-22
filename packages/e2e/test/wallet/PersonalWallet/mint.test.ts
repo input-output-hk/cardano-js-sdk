@@ -21,13 +21,16 @@ const logger = createLogger();
 
 describe('PersonalWallet/mint', () => {
   let wallet: BaseWallet;
+  let alicePolicySigner: util.KeyAgentTransactionSigner;
+  let policyScript: Cardano.NativeScript;
 
-  afterAll(() => {
+  afterAll(async () => {
+    await burnTokens({ policySigners: [alicePolicySigner], scripts: [policyScript], wallet });
     wallet.shutdown();
   });
 
   it('can mint a token with no asset name', async () => {
-    wallet = (await getWallet({ env, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
+    wallet = (await getWallet({ env, logger, name: 'Minting Wallet' })).wallet;
 
     const coins = 3_000_000n;
     await walletReady(wallet, coins);
@@ -48,9 +51,9 @@ describe('PersonalWallet/mint', () => {
     const alicePubKey = await aliceKeyAgent.derivePublicKey(derivationPath);
     const aliceKeyHash = await aliceKeyAgent.bip32Ed25519.getPubKeyHash(alicePubKey);
 
-    const alicePolicySigner = new util.KeyAgentTransactionSigner(aliceKeyAgent, derivationPath);
+    alicePolicySigner = new util.KeyAgentTransactionSigner(aliceKeyAgent, derivationPath);
 
-    const policyScript: Cardano.NativeScript = {
+    policyScript = {
       __type: Cardano.ScriptType.Native,
       kind: Cardano.NativeScriptKind.RequireAllOf,
       scripts: [
@@ -118,7 +121,5 @@ describe('PersonalWallet/mint', () => {
     expect(value!.assets!.has(assetId)).toBeTruthy();
     expect(value!.assets!.get(assetId)).toBe(1n);
     expect(txFoundInHistory.inputSource).toBe(Cardano.InputSource.inputs);
-
-    await burnTokens({ policySigners: [alicePolicySigner], scripts: [policyScript], wallet });
   });
 });

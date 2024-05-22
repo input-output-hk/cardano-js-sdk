@@ -101,7 +101,7 @@ describe('shared wallet delegation rewards', () => {
     ({
       wallet: faucetWallet,
       providers: { stakePoolProvider }
-    } = await getWallet({ env, logger, name: 'Sending Wallet', polling: { interval: 50 } }));
+    } = await getWallet({ env, logger, name: 'Sending Wallet' }));
 
     // Make sure the wallet has sufficient funds to run this test
     await walletReady(faucetWallet, initialFunds);
