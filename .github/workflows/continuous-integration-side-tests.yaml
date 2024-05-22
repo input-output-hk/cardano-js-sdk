@@ -1,4 +1,4 @@
-name: Continuous Integration - Unit Tests
+name: Continuous Integration - Side Tests
 
 env:
   TL_DEPTH: ${{ github.event.pull_request.head.repo.fork && '0' || fromJson(vars.TL_DEPTH) }}
@@ -32,15 +32,14 @@ jobs:
         env:
           NODE_OPTIONS: '--max_old_space_size=8192'
 
-      - name: 🔨 Generated files
+      - name: 🔃 Check for circular dependencies
         run: |
-          git checkout yarn-project.nix
-          if [ ! -z "$(git status --porcelain)" ] ; then git status ; echo "The PR is missing some generated file" ; exit 1 ; fi
-        env:
-          NODE_OPTIONS: '--max_old_space_size=8192'
+          yarn circular-deps:check
 
       - name: 🔬 Test
         run: |
-          yarn test --forceExit
+          yarn lint
+          yarn test:build:verify
+          yarn workspace @cardano-sdk/cardano-services test:cli
         env:
           NODE_OPTIONS: '--max_old_space_size=8192'
