@@ -39,11 +39,11 @@ export const createStorePoolMetricsUpdateJob = (jobFrequency = 1000, jobOutdated
     if (insertFirstJob) {
       await sendForAll();
     } else if ((blockNo !== lastAllSentBlock || blockNo !== lastOutdatedSentBlock) && reachedTheTip) {
-      if (lastAllSentBlock && blockNo - lastAllSentBlock >= jobFrequency) {
+      if (lastAllSentBlock !== undefined && blockNo - lastAllSentBlock >= jobFrequency) {
         await sendForAll();
       } else if (
         jobOutdatedFrequency &&
-        lastOutdatedSentBlock &&
+        lastOutdatedSentBlock !== undefined &&
         outdatedSlot &&
         blockNo - lastOutdatedSentBlock >= jobOutdatedFrequency
       ) {

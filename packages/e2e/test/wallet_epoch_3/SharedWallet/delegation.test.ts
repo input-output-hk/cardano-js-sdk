@@ -12,7 +12,7 @@ import {
   walletReady,
   walletVariables
 } from '../../../src';
-import { buildSharedWallets } from './ultils';
+import { buildSharedWallets } from '../../wallet_epoch_0/SharedWallet/utils';
 import { combineLatest, filter, firstValueFrom, map, take } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 
