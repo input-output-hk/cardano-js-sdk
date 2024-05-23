@@ -25,12 +25,7 @@ const getNftMetadataFromCip67 = ({ cip67 }: WithCIP67, logger: Logger) =>
   (cip67.byLabel[Asset.AssetNameLabelNum.ReferenceNFT] || []).map(
     ({ decoded, assetId, policyId, utxo }): ProjectedNftMetadata | null => {
       const datum = utxo?.[1].datum;
-      if (
-        !datum ||
-        !Cardano.util.isConstrPlutusData(datum) ||
-        datum.constructor !== 0n ||
-        datum.fields.items.length < 3
-      ) {
+      if (!datum || !Cardano.util.isConstrPlutusData(datum)) {
         return null;
       }
       const nftMetadata = Asset.NftMetadata.fromPlutusData(datum, logger);

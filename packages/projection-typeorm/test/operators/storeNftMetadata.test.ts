@@ -21,7 +21,7 @@ import {
 import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
 import { CIP67Asset, ProjectedNftMetadata } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
 import { ChainSyncDataSet, chainSyncData, generateRandomHexString, logger } from '@cardano-sdk/util-dev';
-import { Observable, firstValueFrom, lastValueFrom, map, toArray } from 'rxjs';
+import { Observable, firstValueFrom, lastValueFrom, toArray } from 'rxjs';
 import { QueryRunner, Repository } from 'typeorm';
 import { connectionConfig$, initializeDataSource } from '../util';
 import {
@@ -31,7 +31,8 @@ import {
   createRollForwardEventBasedOn,
   createStubBlockHeader,
   createStubProjectionSource,
-  createStubRollForwardEvent
+  createStubRollForwardEvent,
+  filterAssets
 } from './util';
 import { dummyLogger } from 'ts-log';
 import omit from 'lodash/omit';
@@ -326,50 +327,9 @@ describe('storeNftMetadata', () => {
       const events = chainSyncData(ChainSyncDataSet.AssetNameUtf8Problem);
       await expect(
         lastValueFrom(
-          project$({
-            ...events,
-            cardanoNode: {
-              ...events.cardanoNode,
-              findIntersect: (points) =>
-                events.cardanoNode.findIntersect(points).pipe(
-                  map((observableChainSync) => ({
-                    ...observableChainSync,
-                    chainSync$: observableChainSync.chainSync$.pipe(
-                      // filter out Tokens that don't exist in the database with this dataset
-                      map((e) => ({
-                        ...e,
-                        ...(e.eventType === ChainSyncEventType.RollForward
-                          ? {
-                              block: {
-                                ...e.block,
-                                body: e.block.body.map((tx) => ({
-                                  ...tx,
-                                  body: {
-                                    ...tx.body,
-                                    outputs: tx.body.outputs.map((output) => ({
-                                      ...output,
-                                      value: {
-                                        ...output.value,
-                                        assets: new Map(
-                                          [...(output.value.assets?.entries() || [])].filter(
-                                            ([assetId]) =>
-                                              assetId ===
-                                              '00740069006e0079002000640069006e006f0073002000230035003600350032'
-                                          )
-                                        )
-                                      }
-                                    }))
-                                  }
-                                }))
-                              }
-                            }
-                          : {})
-                      }))
-                    )
-                  }))
-                )
-            }
-          })
+          project$(
+            filterAssets(events, [Cardano.AssetId('00740069006e0079002000640069006e006f0073002000230035003600350032')])
+          )
         )
         // throws 'invalid byte sequence for encoding "UTF8": 0x00'
         // when asset name is not sanitized
@@ -501,6 +461,19 @@ describe('storeNftMetadata', () => {
     expect(typeof file.src).toBe('string');
     expect(['object', 'undefined'].includes(typeof file.otherProperties)).toBe(true);
     expect(['string', 'undefined'].includes(typeof file.name)).toBe(true);
+  });
+
+  it('projects metadata with missing "extra" field', async () => {
+    const events = chainSyncData(ChainSyncDataSet.MissingExtraDatumMetadataProblem);
+    const userTokenAssetId = Cardano.AssetId(
+      'e51fbae37cc032eab73861f52ccfa3291e1f4746b7a471628ae27012000de1406e6d6b724e4654386d6179'
+    );
+    const referenceNftAssetId = Cardano.AssetId(
+      'e51fbae37cc032eab73861f52ccfa3291e1f4746b7a471628ae27012000643b06e6d6b724e4654386d6179'
+    );
+    await lastValueFrom(project$(filterAssets(events, [referenceNftAssetId, userTokenAssetId])));
+    const metadata = await nftMetadataRepo.findOneBy({ userTokenAssetId });
+    expect(metadata).toBeTruthy();
   });
 });
 
