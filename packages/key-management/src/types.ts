@@ -38,10 +38,26 @@ export enum KeyRole {
   DRep = 3
 }
 
+export enum MultiSigKeyRole {
+  Payment = 0,
+  Stake = 2
+}
+
+export enum KeyPurpose {
+  INDIVIDUAL = 1852,
+  MULTI_SIG = 1854
+}
+
 export interface AccountKeyDerivationPath {
   role: KeyRole;
   index: number;
 }
+
+export interface MultiSigAccountKeyDerivationPath {
+  role: MultiSigKeyRole;
+  index: number;
+}
+
 /** Internal = change address & External = receipt address */
 export enum AddressType {
   /** Change address */
@@ -69,6 +85,11 @@ export interface AccountAddressDerivationPath {
   index: number;
 }
 
+export interface SharedWalletAddressDerivationPath {
+  paymentKeyDerivationIndex: number;
+  stakeKeyDerivationIndex: number;
+}
+
 export interface GroupedAddress {
   type: AddressType;
   index: number;
@@ -77,6 +98,12 @@ export interface GroupedAddress {
   address: Cardano.PaymentAddress;
   rewardAccount: Cardano.RewardAccount;
   stakeKeyDerivationPath?: AccountKeyDerivationPath;
+}
+
+export interface SharedAddress {
+  networkId: Cardano.NetworkId;
+  address: Cardano.ScriptAddress;
+  accountIndex: number;
 }
 
 export interface TrezorConfig {
@@ -207,7 +234,6 @@ export interface KeyAgent {
    *
    * @param paymentKeyDerivationPath The payment key derivation path.
    * @param stakeKeyDerivationIndex The stake key index. This field is optional. If not provided it defaults to index 0.
-   * @param pure If set to true, the key agent will derive a new address without mutating its internal state.
    */
   deriveAddress(
     paymentKeyDerivationPath: AccountAddressDerivationPath,

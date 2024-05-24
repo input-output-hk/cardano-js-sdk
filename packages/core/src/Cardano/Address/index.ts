@@ -7,3 +7,4 @@ export * from './PaymentAddress';
 export * from './PointerAddress';
 export * from './RewardAccount';
 export * from './RewardAddress';
+export * from './ScriptAddress';

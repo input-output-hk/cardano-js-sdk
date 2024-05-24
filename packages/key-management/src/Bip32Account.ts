@@ -4,7 +4,12 @@ import {
   AccountKeyDerivationPath,
   AsyncKeyAgent,
   GroupedAddress,
-  KeyRole
+  KeyPurpose,
+  KeyRole,
+  MultiSigAccountKeyDerivationPath,
+  MultiSigKeyRole,
+  SharedAddress,
+  SharedWalletAddressDerivationPath
 } from './types';
 import { Cardano } from '@cardano-sdk/core';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
@@ -30,6 +35,11 @@ export class Bip32Account {
 
   async derivePublicKey(derivationPath: AccountKeyDerivationPath) {
     const key = await this.extendedAccountPublicKey.derive([derivationPath.role, derivationPath.index]);
+    return key.toRawKey();
+  }
+
+  async deriveMultiSigPublicKey({ role, index }: MultiSigAccountKeyDerivationPath) {
+    const key = await this.extendedAccountPublicKey.derive([KeyPurpose.MULTI_SIG, role, index]);
     return key.toRawKey();
   }
 
@@ -69,6 +79,35 @@ export class Bip32Account {
       rewardAccount: Cardano.RewardAccount(rewardAccount.toBech32()),
       stakeKeyDerivationPath,
       ...paymentKeyDerivationPath
+    };
+  }
+
+  async deriveSharedWalletAddress({
+    paymentKeyDerivationIndex,
+    stakeKeyDerivationIndex
+  }: SharedWalletAddressDerivationPath): Promise<SharedAddress> {
+    const derivedPublicPaymentKey = await this.deriveMultiSigPublicKey({
+      index: paymentKeyDerivationIndex,
+      role: MultiSigKeyRole.Payment
+    });
+    const publicPaymentKeyHash = await derivedPublicPaymentKey.hash();
+
+    const publicStakeKey = await this.deriveMultiSigPublicKey({
+      index: stakeKeyDerivationIndex,
+      role: MultiSigKeyRole.Stake
+    });
+    const publicStakeKeyHash = await publicStakeKey.hash();
+
+    const address = Cardano.BaseAddress.fromCredentials(
+      this.chainId.networkId,
+      { hash: Hash28ByteBase16(publicPaymentKeyHash.hex()), type: Cardano.CredentialType.ScriptHash },
+      { hash: Hash28ByteBase16(publicStakeKeyHash.hex()), type: Cardano.CredentialType.ScriptHash }
+    ).toAddress();
+
+    return {
+      accountIndex: this.accountIndex,
+      address: Cardano.ScriptAddress(address.toBech32()),
+      networkId: this.chainId.networkId
     };
   }
 

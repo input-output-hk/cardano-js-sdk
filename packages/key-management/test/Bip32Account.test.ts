@@ -1,5 +1,13 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AccountKeyDerivationPath, AddressType, Bip32Account, InMemoryKeyAgent, KeyRole, util } from '../src';
+import {
+  AccountKeyDerivationPath,
+  AddressType,
+  Bip32Account,
+  InMemoryKeyAgent,
+  KeyRole,
+  MultiSigKeyRole,
+  util
+} from '../src';
 import { Cardano } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { dummyLogger } from 'ts-log';
@@ -43,6 +51,21 @@ describe('Bip32Account', () => {
       await testnetAccount.derivePublicKey({ index: 1, role: KeyRole.External }),
       await mainnetAccount.derivePublicKey({ index: 2, role: KeyRole.Internal }),
       await mainnetAccount.derivePublicKey({ index: 3, role: KeyRole.Stake })
+    ];
+    for (const key of derivedKeys) {
+      const hexKey = key.hex();
+      expect(typeof hexKey).toBe('string');
+      expect(hexKey).toHaveLength(64);
+      expect(() => HexBlob(hexKey)).not.toThrow();
+    }
+  });
+
+  it('deriveMultiSigPublicKey resolves with ed25519 public key', async () => {
+    const derivedKeys = [
+      await testnetAccount.deriveMultiSigPublicKey({ index: 0, role: MultiSigKeyRole.Payment }),
+      await testnetAccount.deriveMultiSigPublicKey({ index: 1, role: MultiSigKeyRole.Stake }),
+      await mainnetAccount.deriveMultiSigPublicKey({ index: 2, role: MultiSigKeyRole.Payment }),
+      await mainnetAccount.deriveMultiSigPublicKey({ index: 3, role: MultiSigKeyRole.Stake })
     ];
     for (const key of derivedKeys) {
       const hexKey = key.hex();
@@ -119,6 +142,45 @@ describe('Bip32Account', () => {
       expect(addresses[3].address).toEqual(
         'addr_test1qruaegs6djpxaj9vkn8njh9uys63jdaluetqkf5r4w95zhly0wcuvvy7h5rxjkhyt8nflneatp097s0r60vvuu2jk5jq73efq0'
       );
+    });
+  });
+
+  it('derives shared wallet public key', async () => {
+    const sharedWalletPublicKey = await mainnetAccount.deriveMultiSigPublicKey({
+      index: 0,
+      role: MultiSigKeyRole.Payment
+    });
+    const sharedWalletTestPublicKey = await testnetAccount.deriveMultiSigPublicKey({
+      index: 0,
+      role: MultiSigKeyRole.Payment
+    });
+    const publicHexKey = sharedWalletPublicKey.hex();
+    const testPublicHexKey = sharedWalletTestPublicKey.hex();
+
+    expect(sharedWalletPublicKey).toBeDefined();
+    expect(typeof publicHexKey).toBe('string');
+
+    expect(sharedWalletTestPublicKey).toBeDefined();
+    expect(typeof testPublicHexKey).toBe('string');
+  });
+
+  describe('deriveSharedWalletAddress', () => {
+    it('derives a valid shared wallet mainnet address', async () => {
+      const sharedWalletAddress = await mainnetAccount.deriveSharedWalletAddress({
+        paymentKeyDerivationIndex: 0,
+        stakeKeyDerivationIndex: 0
+      });
+      expect(sharedWalletAddress).toBeDefined();
+      expect(sharedWalletAddress.address.startsWith('addr_test')).toBe(false);
+    });
+
+    it('derives a valid shared wallet testnet address', async () => {
+      const sharedWalletAddress = await testnetAccount.deriveSharedWalletAddress({
+        paymentKeyDerivationIndex: 0,
+        stakeKeyDerivationIndex: 0
+      });
+      expect(sharedWalletAddress).toBeDefined();
+      expect(sharedWalletAddress.address.startsWith('addr_test')).toBe(true);
     });
   });
 });
