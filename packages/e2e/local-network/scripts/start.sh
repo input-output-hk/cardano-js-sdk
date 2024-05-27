@@ -26,10 +26,10 @@ trap 'kill 0' INT
 echo "Run"
 ./scripts/make-babbage.sh
 ./network-files/run/all.sh &
+CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/setup-new-delegator-keys.sh
 healthy &
 
 ./scripts/update-stake-pools.sh.sh "$SP_NODES_ID"
-
 
 CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/plutus-transaction.sh
 CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/reference-input-transaction.sh
