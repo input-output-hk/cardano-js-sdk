@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.27.4...@cardano-sdk/web-extension@0.28.0) (2024-05-20)
+
+### ⚠ BREAKING CHANGES
+
+* **web-extension:** add logger dependency to SigningCoordinator
+
+### Features
+
+* **web-extension:** add log of transaction id when signing ([ba5871b](https://github.com/input-output-hk/cardano-js-sdk/commit/ba5871b71340ac13461a348fbbb2ec24f2a7c077))
+
 ## [0.27.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.27.3...@cardano-sdk/web-extension@0.27.4) (2024-05-02)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension

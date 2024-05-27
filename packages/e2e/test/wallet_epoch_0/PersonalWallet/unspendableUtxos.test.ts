@@ -21,8 +21,8 @@ describe('PersonalWallet/unspendableUtxos', () => {
   // eslint-disable-next-line max-statements
   it.skip('unsets unspendable UTxOs when no longer in the wallets UTxO set', async () => {
     // Here we will simulate the scenario of collateral consumption by spending it from another wallet instance.
-    wallet1 = (await getWallet({ env, logger, name: 'Wallet 1', polling: { interval: 50 } })).wallet;
-    wallet2 = (await getWallet({ env, logger, name: 'Wallet 2', polling: { interval: 50 } })).wallet;
+    wallet1 = (await getWallet({ env, logger, name: 'Wallet 1' })).wallet;
+    wallet2 = (await getWallet({ env, logger, name: 'Wallet 2' })).wallet;
 
     const coins = 5_000_000n;
     await walletReady(wallet1, coins);

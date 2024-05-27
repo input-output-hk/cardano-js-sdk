@@ -8,7 +8,7 @@ import { createLogger } from 'bunyan';
 import { readFile } from 'fs/promises';
 
 export const BLOCKFROST_WORKER_API_URL_DEFAULT = new URL('http://localhost:3000');
-export const CACHE_TTL_DEFAULT = 24 * 60; // One day
+export const CACHE_TTL_DEFAULT = 4 * 60; // Four hours
 export const CREATE_SCHEMA_DEFAULT = false;
 export const DROP_SCHEMA_DEFAULT = false;
 export const DRY_RUN_DEFAULT = false;

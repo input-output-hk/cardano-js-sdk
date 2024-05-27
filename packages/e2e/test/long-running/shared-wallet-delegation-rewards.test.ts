@@ -1,6 +1,6 @@
 import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
-import { buildSharedWallets } from '../wallet/SharedWallet/ultils';
+import { buildSharedWallets } from '../wallet_epoch_0/SharedWallet/utils';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import {
   getEnv,
@@ -101,7 +101,7 @@ describe('shared wallet delegation rewards', () => {
     ({
       wallet: faucetWallet,
       providers: { stakePoolProvider }
-    } = await getWallet({ env, logger, name: 'Sending Wallet', polling: { interval: 50 } }));
+    } = await getWallet({ env, logger, name: 'Sending Wallet' }));
 
     // Make sure the wallet has sufficient funds to run this test
     await walletReady(faucetWallet, initialFunds);

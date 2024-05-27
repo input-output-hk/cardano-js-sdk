@@ -20,8 +20,7 @@ FROM ubuntu-nodejs as nodejs-builder
 RUN \
   curl --proto '=https' --tlsv1.2 -sSf -L https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - &&\
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list &&\
-  apt-get update && apt-get install pkg-config libusb-1.0 libudev-dev gcc g++ make gnupg2 yarn -y &&\
-  yarn global add node-gyp@9.0.0
+  apt-get update && apt-get install yarn -y
 WORKDIR /app
 COPY build build
 COPY packages/cardano-services/package.json packages/cardano-services/package.json
@@ -118,10 +117,12 @@ WORKDIR /config
 COPY compose/schedules.json .
 ENV SCHEDULES=/config/schedules.json
 WORKDIR /app/packages/cardano-services
+HEALTHCHECK CMD curl -s --fail http://localhost:3003/v1.0.0/health
 CMD ["node", "dist/cjs/cli.js", "start-pg-boss-worker"]
 
 FROM cardano-services as projector
 WORKDIR /
 COPY compose/projector/init.* ./
 RUN chmod 755 init.sh
+HEALTHCHECK CMD test `curl -fs http://localhost:3000/v1.0.0/health | jq -r ".services[0].projectedTip.blockNo"` -gt 1
 CMD ["./init.sh"]

@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.3...@cardano-sdk/cardano-services@0.28.4) (2024-05-20)
+
+### Features
+
+* **cardano-services:** implement new fuzzy search options ([006ecf8](https://github.com/input-output-hk/cardano-js-sdk/commit/006ecf8d78d1a7e8b6c884fcad8c2910d0d25a5e))
+* **cardano-services:** remove check on asset name when fetching nft metadata ([ef562b2](https://github.com/input-output-hk/cardano-js-sdk/commit/ef562b2d0f91f50e45eddc333f98db4f04e8255d))
+
+### Bug Fixes
+
+* **cardano-services:** release query runner after query execution ([37c1887](https://github.com/input-output-hk/cardano-js-sdk/commit/37c188783ac9205a99a26323205218c48c3bbeea))
+* **cardano-services:** stake pool fuzzy search empty result ([aff2cdd](https://github.com/input-output-hk/cardano-js-sdk/commit/aff2cdd8ead77cf104da32ea7597650c8a95d0e4))
+* **cardano-services:** use correct asset limit pagination for typeorm asset provider ([8c13737](https://github.com/input-output-hk/cardano-js-sdk/commit/8c13737ee07a2d5811a069b86b7acaa1289d5b51))
+* increase the size of pledge column of stake pool rewards table ([988f9ae](https://github.com/input-output-hk/cardano-js-sdk/commit/988f9ae02415a1c8dc4327d1d40d2412a97064b0))
+
 ## [0.28.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.2...@cardano-sdk/cardano-services@0.28.3) (2024-05-02)
 
 ### Bug Fixes

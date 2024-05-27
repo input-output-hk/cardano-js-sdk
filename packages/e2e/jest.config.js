@@ -32,11 +32,12 @@ module.exports = {
     project('pg-boss'),
     project('projection'),
     project('providers'),
-    project('wallet'),
+    project('wallet_epoch_0'),
+    project('wallet_epoch_3'),
     {
       ...commonProjectProps,
       displayName: 'wallet-real-ada',
-      testMatch: [`<rootDir>/test/wallet/PersonalWallet/(${realAdaTestFileNames.join('|')}).test.ts`]
+      testMatch: [`<rootDir>/test/wallet*/PersonalWallet/(${realAdaTestFileNames.join('|')}).test.ts`]
     },
     {
       ...commonProjectProps,

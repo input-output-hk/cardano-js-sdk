@@ -8,7 +8,7 @@ import {
 } from '@cardano-sdk/projection';
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano, ChainSyncEventType, Point } from '@cardano-sdk/core';
-import { Observable, lastValueFrom, takeWhile } from 'rxjs';
+import { Observable, lastValueFrom, map, takeWhile } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import {
   TypeormStabilityWindowBuffer,
@@ -16,8 +16,8 @@ import {
   createObservableConnection,
   createTypeormTipTracker
 } from '../../src';
+import { chainSyncData, generateRandomHexString, logger } from '@cardano-sdk/util-dev';
 import { connectionConfig$ } from '../util';
-import { generateRandomHexString, logger } from '@cardano-sdk/util-dev';
 
 export interface ProjectorContext {
   buffer: TypeormStabilityWindowBuffer;
@@ -148,4 +148,50 @@ export const createStubTx = (body: Partial<Cardano.TxBody>, metadata?: Cardano.T
   id: Cardano.TransactionId(generateRandomHexString(64)),
   inputSource: Cardano.InputSource.inputs,
   witness: { signatures: new Map() }
+});
+
+export const filterAssets = (
+  events: ReturnType<typeof chainSyncData>,
+  assetIds: Cardano.AssetId[]
+): ReturnType<typeof chainSyncData> => ({
+  ...events,
+  cardanoNode: {
+    ...events.cardanoNode,
+    findIntersect: (points) =>
+      events.cardanoNode.findIntersect(points).pipe(
+        map((observableChainSync) => ({
+          ...observableChainSync,
+          chainSync$: observableChainSync.chainSync$.pipe(
+            // filter out Tokens that don't exist in the database with this dataset
+            map((e) => ({
+              ...e,
+              ...(e.eventType === ChainSyncEventType.RollForward
+                ? {
+                    block: {
+                      ...e.block,
+                      body: e.block.body.map((tx) => ({
+                        ...tx,
+                        body: {
+                          ...tx.body,
+                          outputs: tx.body.outputs.map((output) => ({
+                            ...output,
+                            value: {
+                              ...output.value,
+                              assets: new Map(
+                                [...(output.value.assets?.entries() || [])].filter(([assetId]) =>
+                                  assetIds.includes(assetId)
+                                )
+                              )
+                            }
+                          }))
+                        }
+                      }))
+                    }
+                  }
+                : {})
+            }))
+          )
+        }))
+      )
+  }
 });

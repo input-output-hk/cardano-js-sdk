@@ -26,7 +26,7 @@ describe('PersonalWallet/multiAddress', () => {
   let wallet: BaseWallet;
 
   beforeAll(async () => {
-    wallet = (await getWallet({ env, idx: 0, logger, name: 'Wallet', polling: { interval: 50 } })).wallet;
+    wallet = (await getWallet({ env, idx: 0, logger, name: 'Wallet' })).wallet;
   });
 
   afterAll(() => {

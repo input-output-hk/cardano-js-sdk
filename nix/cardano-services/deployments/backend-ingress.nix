@@ -42,7 +42,17 @@
         map (hostname: {
           host = hostname;
           http.paths =
-            [
+            (lib.optionals config.providers.asset-provider.enabled [
+              {
+                pathType = "Prefix";
+                path = "/v${lib.last (lib.sort lib.versionOlder values.cardano-services.versions.handle)}/asset";
+                backend.service = {
+                  name = "${chart.name}-asset-provider";
+                  port.name = "http";
+                };
+              }
+            ])
+            ++ [
               {
                 pathType = "Prefix";
                 path = "/";
@@ -79,16 +89,6 @@
                 path = "/v${lib.last (lib.sort lib.versionOlder values.cardano-services.versions.handle)}/handle";
                 backend.service = {
                   name = "${chart.name}-handle-provider";
-                  port.name = "http";
-                };
-              }
-            ]
-            ++ lib.optionals config.providers.asset-provider.enabled [
-              {
-                pathType = "Prefix";
-                path = "/v${lib.last (lib.sort lib.versionOlder values.cardano-services.versions.handle)}/asset";
-                backend.service = {
-                  name = "${chart.name}-asset-provider";
                   port.name = "http";
                 };
               }
