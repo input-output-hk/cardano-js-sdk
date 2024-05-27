@@ -3,7 +3,7 @@ import { AssetEntity } from './Asset.entity';
 import { BlockEntity } from './Block.entity';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { OnDeleteCascadeRelationOptions, OnDeleteSetNullRelationOptions } from './util';
-import { sanitizeString, serializableObj } from './transformers';
+import { sanitizeNullCharacters, serializableObj } from './transformers';
 
 export enum NftMetadataType {
   CIP25 = 'CIP-0025',
@@ -14,19 +14,19 @@ export enum NftMetadataType {
 export class NftMetadataEntity {
   @PrimaryGeneratedColumn()
   id?: number;
-  @Column({ transformer: sanitizeString })
+  @Column({ transformer: sanitizeNullCharacters })
   name?: string;
-  @Column({ nullable: true, transformer: sanitizeString, type: 'varchar' })
+  @Column({ nullable: true, transformer: sanitizeNullCharacters, type: 'varchar' })
   description?: string | null;
-  @Column({ transformer: sanitizeString })
+  @Column({ transformer: sanitizeNullCharacters })
   image?: Asset.Uri;
-  @Column({ nullable: true, transformer: sanitizeString, type: 'varchar' })
+  @Column({ nullable: true, transformer: sanitizeNullCharacters, type: 'varchar' })
   mediaType?: string | null;
   @Column({ nullable: true, type: 'jsonb' })
   files?: Asset.NftMetadataFile[] | null;
   @Column({ enum: NftMetadataType, type: 'enum' })
   type: NftMetadataType;
-  @Column({ nullable: true, transformer: [serializableObj], type: 'jsonb' })
+  @Column({ nullable: true, transformer: [serializableObj, sanitizeNullCharacters], type: 'jsonb' })
   otherProperties?: Map<string, Cardano.Metadatum> | null;
   @ManyToOne(() => AssetEntity, OnDeleteCascadeRelationOptions)
   @JoinColumn()

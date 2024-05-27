@@ -335,6 +335,18 @@ describe('storeNftMetadata', () => {
         // when asset name is not sanitized
       ).resolves.not.toThrow();
     });
+
+    it('does not throw when some field in otherProperties has null characters', async () => {
+      const events = chainSyncData(ChainSyncDataSet.ExtraDataNullCharactersProblem);
+      const assetId = Cardano.AssetId('65bcf672806de8a2335576339e801d41f3275c0c07dd6aadf2ea41d9000000000042414444');
+
+      // throws 'unsupported Unicode escape sequence'
+      // when otherProperties is not sanitized
+      await lastValueFrom(project$(filterAssets(events, [assetId])));
+
+      const metadata = await nftMetadataRepo.findOneBy({ userTokenAssetId: assetId });
+      expect(metadata!.otherProperties!.size).toBeGreaterThan(0);
+    });
   });
 
   describe('cip68', () => {
