@@ -22,7 +22,7 @@ export class NftMetadataEntity {
   image?: Asset.Uri;
   @Column({ nullable: true, transformer: sanitizeNullCharacters, type: 'varchar' })
   mediaType?: string | null;
-  @Column({ nullable: true, type: 'jsonb' })
+  @Column({ nullable: true, transformer: [serializableObj, sanitizeNullCharacters], type: 'jsonb' })
   files?: Asset.NftMetadataFile[] | null;
   @Column({ enum: NftMetadataType, type: 'enum' })
   type: NftMetadataType;

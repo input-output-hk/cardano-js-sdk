@@ -105,4 +105,11 @@ describe('serializableObject', () => {
       })
     ).toEqual(obj);
   });
+
+  describe('fromSerializableObject', () => {
+    it('returns the identical object when input is already (no bigint/Map/Set/Date/Error values)', () => {
+      const obj = [{ a: [{ b: 1, c: '2' }] }, 3];
+      expect(fromSerializableObject(obj)).toEqual(obj);
+    });
+  });
 });

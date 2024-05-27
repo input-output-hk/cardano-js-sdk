@@ -258,7 +258,7 @@ describe('storeNftMetadata', () => {
       );
       expect(omit(storedNftMetadata, ['userTokenAsset', 'userTokenAssetId', 'id'])).toEqual({
         description: someNftMetadata.description || null,
-        files: someNftMetadata.files || null,
+        files: someNftMetadata.files,
         image: someNftMetadata.image,
         mediaType: someNftMetadata.mediaType || null,
         name: someNftMetadata.name,
@@ -468,7 +468,7 @@ describe('storeNftMetadata', () => {
     expect(events.length).toBeGreaterThan(1);
     expect(await nftMetadataRepo.count()).toBeGreaterThan(0);
     const nftAssets = await nftMetadataRepo.find({ select: ['files'] });
-    const file = nftAssets.find((asset) => asset?.files!.length > 0)!.files![0];
+    const file = nftAssets.find((asset) => asset.files && asset.files.length > 0)!.files![0];
     expect(typeof file.mediaType).toBe('string');
     expect(typeof file.src).toBe('string');
     expect(['object', 'undefined'].includes(typeof file.otherProperties)).toBe(true);
