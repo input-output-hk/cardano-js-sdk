@@ -38,6 +38,16 @@ export const serializableObj: ValueTransformer = {
   }
 };
 
+export const sanitizeString: ValueTransformer = {
+  from(obj: any) {
+    return obj;
+  },
+  to(obj: any) {
+    if (typeof obj !== 'string') return obj;
+    return obj.replace(/\0/g, '');
+  }
+};
+
 export const parseBigInt: ValueTransformer = {
   from(obj: unknown) {
     return typeof obj === 'string' ? BigInt(obj) : obj;

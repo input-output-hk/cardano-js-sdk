@@ -16,7 +16,7 @@ POOL_COST=370000000
 POOL_MARGIN=0.15
 METADATA_URL="http://file-server/SP${SP_NODE_ID}.json"
 
-source ./scripts/pools/update-node-utils.sh
+source ./scripts/pools/update-node-utils.sh ${SP_NODE_ID}
 
 trap clean EXIT
 

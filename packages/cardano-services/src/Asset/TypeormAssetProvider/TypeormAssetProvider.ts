@@ -110,12 +110,15 @@ export class TypeormAssetProvider extends TypeormProvider implements AssetProvid
 
     return this.withDataSource(async (dataSource) => {
       const queryRunner = dataSource.createQueryRunner();
-      const assetRepository = queryRunner.manager.getRepository(AssetEntity);
-
-      const asset = await assetRepository.findOneBy({ id: assetId });
-
-      if (!asset) throw new ProviderError(ProviderFailure.NotFound, undefined, `Asset not found '${assetId}'`);
-      const supply = asset.supply!;
+      let supply: bigint;
+      try {
+        const assetRepository = queryRunner.manager.getRepository(AssetEntity);
+        const asset = await assetRepository.findOneBy({ id: assetId });
+        if (!asset) throw new ProviderError(ProviderFailure.NotFound, undefined, `Asset not found '${assetId}'`);
+        supply = asset.supply!;
+      } finally {
+        await queryRunner.release();
+      }
 
       return {
         assetId,

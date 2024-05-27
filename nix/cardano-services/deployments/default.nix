@@ -187,14 +187,13 @@ in
           providers = {
             backend = {
               enabled = true;
-              env.NODE_EXTRA_OPTIONS = "--trace-gc";
             };
             stake-pool-provider = {
               enabled = true;
               env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
             handle-provider.enabled = true;
-            asset-provider.enabled = true;
+          # asset-provider.enabled = true;
           };
 
           projectors = {
@@ -332,20 +331,19 @@ in
             backend = {
               enabled = true;
               replicas = 3;
-              env.NODE_EXTRA_OPTIONS = "--trace-gc";
             };
             stake-pool-provider = {
               enabled = true;
               env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
             handle-provider.enabled = true;
-            asset-provider.enabled = true;
+          # asset-provider.enabled = true;
           };
 
           projectors = {
             handle.enabled = true;
             stake-pool.enabled = true;
-            asset.enabled = true;
+          # asset.enabled = true;
           };
 
           values = {
@@ -380,14 +378,13 @@ in
           providers = {
             backend = {
               enabled = true;
-              env.NODE_EXTRA_OPTIONS = "--trace-gc";
             };
             stake-pool-provider = {
               enabled = true;
               env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
             handle-provider.enabled = true;
-            asset-provider.enabled = true;
+          # asset-provider.enabled = true;
           };
 
           projectors = {
@@ -425,13 +422,13 @@ in
               env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
             handle-provider.enabled = true;
-            asset-provider.enabled = true;
+          # asset-provider.enabled = true;
           };
 
           projectors = {
             handle.enabled = true;
             stake-pool.enabled = true;
-            asset.enabled = true;
+          # asset.enabled = true;
           };
 
           values = {

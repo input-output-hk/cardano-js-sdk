@@ -3,7 +3,7 @@ import { AssetEntity } from './Asset.entity';
 import { BlockEntity } from './Block.entity';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { OnDeleteCascadeRelationOptions, OnDeleteSetNullRelationOptions } from './util';
-import { serializableObj } from './transformers';
+import { sanitizeString, serializableObj } from './transformers';
 
 export enum NftMetadataType {
   CIP25 = 'CIP-0025',
@@ -14,13 +14,13 @@ export enum NftMetadataType {
 export class NftMetadataEntity {
   @PrimaryGeneratedColumn()
   id?: number;
-  @Column()
+  @Column({ transformer: sanitizeString })
   name?: string;
-  @Column({ nullable: true, type: 'varchar' })
+  @Column({ nullable: true, transformer: sanitizeString, type: 'varchar' })
   description?: string | null;
-  @Column()
+  @Column({ transformer: sanitizeString })
   image?: Asset.Uri;
-  @Column({ nullable: true, type: 'varchar' })
+  @Column({ nullable: true, transformer: sanitizeString, type: 'varchar' })
   mediaType?: string | null;
   @Column({ nullable: true, type: 'jsonb' })
   files?: Asset.NftMetadataFile[] | null;
