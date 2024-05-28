@@ -38,23 +38,13 @@ export enum KeyRole {
   DRep = 3
 }
 
-export enum MultiSigKeyRole {
-  Payment = 0,
-  Stake = 2
-}
-
 export enum KeyPurpose {
-  INDIVIDUAL = 1852,
+  STANDARD = 1852,
   MULTI_SIG = 1854
 }
 
 export interface AccountKeyDerivationPath {
   role: KeyRole;
-  index: number;
-}
-
-export interface MultiSigAccountKeyDerivationPath {
-  role: MultiSigKeyRole;
   index: number;
 }
 
@@ -102,7 +92,7 @@ export interface GroupedAddress {
 
 export interface SharedAddress {
   networkId: Cardano.NetworkId;
-  address: Cardano.ScriptAddress;
+  address: Cardano.PaymentAddress;
   accountIndex: number;
 }
 

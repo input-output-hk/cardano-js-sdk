@@ -4,45 +4,60 @@ import {
   AddressType,
   Bip32Account,
   InMemoryKeyAgent,
+  KeyPurpose,
   KeyRole,
-  MultiSigKeyRole,
   util
 } from '../src';
 import { Cardano } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { dummyLogger } from 'ts-log';
 
+const initializeKeyAgents = async (accountIndex: number, testnetChainId: Cardano.ChainId, purpose: KeyPurpose) => {
+  const mnemonicWords = util.generateMnemonicWords();
+  const getPassphrase = jest.fn().mockResolvedValue(Buffer.from('password'));
+  const keyAgentDependencies = { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), logger: dummyLogger };
+  const testnetKeyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
+    {
+      accountIndex,
+      chainId: testnetChainId,
+      getPassphrase,
+      mnemonicWords,
+      purpose
+    },
+    keyAgentDependencies
+  );
+  const mainnetKeyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
+    {
+      accountIndex,
+      chainId: Cardano.ChainIds.Mainnet,
+      getPassphrase,
+      mnemonicWords,
+      purpose
+    },
+    keyAgentDependencies
+  );
+
+  const testnetAccount = new Bip32Account(testnetKeyAgent.serializableData);
+  const mainnetAccount = new Bip32Account(mainnetKeyAgent.serializableData);
+
+  return { mainnetAccount, testnetAccount };
+};
+
 describe('Bip32Account', () => {
   const accountIndex = 1;
   const testnetChainId = Cardano.ChainIds.Preview;
   let testnetAccount: Bip32Account;
   let mainnetAccount: Bip32Account;
+  let multiSigTestnetAccount: Bip32Account;
+  let multiSigMainnetAccount: Bip32Account;
 
   beforeEach(async () => {
-    const mnemonicWords = util.generateMnemonicWords();
-    const getPassphrase = jest.fn().mockResolvedValue(Buffer.from('password'));
-    const keyAgentDependencies = { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), logger: dummyLogger };
-    const testnetKeyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
-      {
-        accountIndex,
-        chainId: testnetChainId,
-        getPassphrase,
-        mnemonicWords
-      },
-      keyAgentDependencies
-    );
-    const mainnetKeyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
-      {
-        accountIndex,
-        chainId: Cardano.ChainIds.Mainnet,
-        getPassphrase,
-        mnemonicWords
-      },
-      keyAgentDependencies
-    );
-
-    testnetAccount = new Bip32Account(testnetKeyAgent.serializableData);
-    mainnetAccount = new Bip32Account(mainnetKeyAgent.serializableData);
+    const standardKeyAgents = await initializeKeyAgents(accountIndex, testnetChainId, KeyPurpose.STANDARD);
+    const multiSigKeyAgents = await initializeKeyAgents(accountIndex, testnetChainId, KeyPurpose.MULTI_SIG);
+    testnetAccount = standardKeyAgents.testnetAccount;
+    mainnetAccount = standardKeyAgents.mainnetAccount;
+    multiSigTestnetAccount = multiSigKeyAgents.testnetAccount;
+    multiSigMainnetAccount = multiSigKeyAgents.mainnetAccount;
   });
 
   it('derivePublicKey resolves with ed25519 public key', async () => {
@@ -50,22 +65,9 @@ describe('Bip32Account', () => {
       await testnetAccount.derivePublicKey({ index: 0, role: KeyRole.DRep }),
       await testnetAccount.derivePublicKey({ index: 1, role: KeyRole.External }),
       await mainnetAccount.derivePublicKey({ index: 2, role: KeyRole.Internal }),
-      await mainnetAccount.derivePublicKey({ index: 3, role: KeyRole.Stake })
-    ];
-    for (const key of derivedKeys) {
-      const hexKey = key.hex();
-      expect(typeof hexKey).toBe('string');
-      expect(hexKey).toHaveLength(64);
-      expect(() => HexBlob(hexKey)).not.toThrow();
-    }
-  });
-
-  it('deriveMultiSigPublicKey resolves with ed25519 public key', async () => {
-    const derivedKeys = [
-      await testnetAccount.deriveMultiSigPublicKey({ index: 0, role: MultiSigKeyRole.Payment }),
-      await testnetAccount.deriveMultiSigPublicKey({ index: 1, role: MultiSigKeyRole.Stake }),
-      await mainnetAccount.deriveMultiSigPublicKey({ index: 2, role: MultiSigKeyRole.Payment }),
-      await mainnetAccount.deriveMultiSigPublicKey({ index: 3, role: MultiSigKeyRole.Stake })
+      await mainnetAccount.derivePublicKey({ index: 3, role: KeyRole.Stake }),
+      await multiSigTestnetAccount.derivePublicKey({ index: 0, role: KeyRole.External }),
+      await multiSigMainnetAccount.derivePublicKey({ index: 1, role: KeyRole.Stake })
     ];
     for (const key of derivedKeys) {
       const hexKey = key.hex();
@@ -145,42 +147,19 @@ describe('Bip32Account', () => {
     });
   });
 
-  it('derives shared wallet public key', async () => {
-    const sharedWalletPublicKey = await mainnetAccount.deriveMultiSigPublicKey({
-      index: 0,
-      role: MultiSigKeyRole.Payment
-    });
-    const sharedWalletTestPublicKey = await testnetAccount.deriveMultiSigPublicKey({
-      index: 0,
-      role: MultiSigKeyRole.Payment
-    });
-    const publicHexKey = sharedWalletPublicKey.hex();
-    const testPublicHexKey = sharedWalletTestPublicKey.hex();
-
-    expect(sharedWalletPublicKey).toBeDefined();
-    expect(typeof publicHexKey).toBe('string');
-
-    expect(sharedWalletTestPublicKey).toBeDefined();
-    expect(typeof testPublicHexKey).toBe('string');
-  });
-
-  describe('deriveSharedWalletAddress', () => {
-    it('derives a valid shared wallet mainnet address', async () => {
-      const sharedWalletAddress = await mainnetAccount.deriveSharedWalletAddress({
-        paymentKeyDerivationIndex: 0,
-        stakeKeyDerivationIndex: 0
-      });
-      expect(sharedWalletAddress).toBeDefined();
-      expect(sharedWalletAddress.address.startsWith('addr_test')).toBe(false);
+  describe('derives CIP-1854 address', () => {
+    it('derives valid multi sig mainnet address', async () => {
+      const externalAddress = await multiSigMainnetAccount.deriveAddress({ index: 0, type: AddressType.External }, 0);
+      expect(externalAddress.address.startsWith('addr')).toBe(true);
+      expect(externalAddress.address.startsWith('addr_test')).toBe(false);
+      expect(externalAddress.rewardAccount.startsWith('stake')).toBe(true);
+      expect(externalAddress.rewardAccount.startsWith('stake_test')).toBe(false);
     });
 
-    it('derives a valid shared wallet testnet address', async () => {
-      const sharedWalletAddress = await testnetAccount.deriveSharedWalletAddress({
-        paymentKeyDerivationIndex: 0,
-        stakeKeyDerivationIndex: 0
-      });
-      expect(sharedWalletAddress).toBeDefined();
-      expect(sharedWalletAddress.address.startsWith('addr_test')).toBe(true);
+    it('derives valid multi sig testnet address', async () => {
+      const externalAddress = await multiSigTestnetAccount.deriveAddress({ index: 0, type: AddressType.External }, 0);
+      expect(externalAddress.address.startsWith('addr_test')).toBe(true);
+      expect(externalAddress.rewardAccount.startsWith('stake_test')).toBe(true);
     });
   });
 });
