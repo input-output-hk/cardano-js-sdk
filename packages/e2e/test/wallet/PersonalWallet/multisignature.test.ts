@@ -28,7 +28,7 @@ describe('PersonalWallet/multisignature', () => {
   });
 
   it('can create a transaction with multiple signatures to mint an asset', async () => {
-    wallet = (await getWallet({ env, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
+    wallet = (await getWallet({ env, logger, name: 'Minting Wallet' })).wallet;
 
     const coins = 3_000_000n;
     await walletReady(wallet, coins);
