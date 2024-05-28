@@ -8,8 +8,15 @@ here="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
 root="$(cd "$here/.." && pwd)"
 cd "$root"
 
+waitForEpoch1() {
+  while [ `CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock cardano-cli query tip --testnet-magic 888 | jq -r .epoch` == "0" ] ; do
+    sleep 5
+  done
+}
+
 healthy() {
   sleep 20
+  waitForEpoch1
   touch ./network-files/run/healthy
 }
 
@@ -36,6 +43,9 @@ CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/referen
 CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/mint-tokens.sh
 CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/setup-wallets.sh
 CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/mint-handles.sh
+
+waitForEpoch1
+sleep 50
 
 touch ./network-files/run/done
 
