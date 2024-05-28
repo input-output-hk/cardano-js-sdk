@@ -38,13 +38,21 @@ export const serializableObj: ValueTransformer = {
   }
 };
 
-export const sanitizeString: ValueTransformer = {
+/** Remove all null characters. Deep/recursive if it's an array or an object. */
+export const sanitizeNullCharacters: ValueTransformer = {
   from(obj: any) {
     return obj;
   },
   to(obj: any) {
-    if (typeof obj !== 'string') return obj;
-    return obj.replace(/\0/g, '');
+    if (typeof obj === 'string') return obj.replace(/\0/g, '');
+    if (typeof obj === 'object') {
+      if (obj === null) return obj;
+      if (Array.isArray(obj)) {
+        return obj.map((item) => sanitizeNullCharacters.to(item));
+      }
+      return Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, sanitizeNullCharacters.to(v)]));
+    }
+    return obj;
   }
 };
 
