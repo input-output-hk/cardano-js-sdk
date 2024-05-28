@@ -282,6 +282,43 @@ describe('TxBuilder/plutusScripts', () => {
     expect(roundRobinRandomImprove).toHaveBeenCalled();
   });
 
+  it('can point the redeemer to the right input', async () => {
+    const tx = await txBuilder
+      .addInput(
+        {
+          index: 99,
+          txId: 'ff21ffbaff60ff0cff8cff55ffa6ff6dff78ff78ffaeffceff36ff3fffc5ffe0' as unknown as Cardano.TransactionId
+        },
+        {
+          datum: 1n,
+          redeemer: 1n,
+          script
+        }
+      )
+      .addOutput(
+        txBuilder
+          .buildOutput({
+            address: Cardano.PaymentAddress(
+              'addr_test1qqt9c69kjqf0wsnlp7hs8xees5l6pm4yxdqa3hknqr0kfe0htmj4e5t8n885zxm4qzpfzwruqx3ey3f5q8kpkr0gt9ms8dcsz6'
+            ),
+            value: { coins: 5_000_000_000n }
+          })
+          .toTxOut()
+      )
+      .build()
+      .inspect();
+
+    expect(
+      tx.body.inputs?.some((txIn) => txIn.txId === 'ff21ffbaff60ff0cff8cff55ffa6ff6dff78ff78ffaeffceff36ff3fffc5ffe0')
+    ).toBeTruthy();
+    expect(tx.witness?.redeemers?.some((redeemer) => redeemer.data === 1n)).toBeTruthy();
+
+    const scriptInputIndex = tx.body.inputs?.findIndex(
+      (input) => input.txId === 'ff21ffbaff60ff0cff8cff55ffa6ff6dff78ff78ffaeffceff36ff3fffc5ffe0' && input.index === 99
+    );
+    expect(tx.witness?.redeemers?.at(0)?.index).toEqual(scriptInputIndex);
+  });
+
   it('can set an script input for required selection with inline datum (unresolved),', async () => {
     const tx = await txBuilder
       .addInput(
