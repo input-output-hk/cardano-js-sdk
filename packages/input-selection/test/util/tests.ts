@@ -7,6 +7,8 @@ import { assertInputSelectionProperties } from './properties';
 export interface InputSelectionPropertiesTestParams {
   /** Test subject (Input Selection algorithm under test) */
   getAlgorithm: () => InputSelector;
+  /** Outputs that must always be included in the selection */
+  createPreSelectedOutputUtxo: () => Cardano.Utxo[];
   /** Available UTxO */
   createUtxo: () => Cardano.Utxo[];
   /** Transaction outputs */
@@ -31,6 +33,7 @@ export const testInputSelectionFailureMode = async ({
   expectedError,
   mockConstraints
 }: InputSelectionFailureModeTestParams) => {
+  const preSelectedUtxo = new Set<Cardano.Utxo>();
   const utxo = new Set(createUtxo());
   const outputs = new Set(createOutputs());
   const algorithm = getAlgorithm();
@@ -39,6 +42,7 @@ export const testInputSelectionFailureMode = async ({
       constraints: SelectionConstraints.mockConstraintsToConstraints(mockConstraints),
       implicitValue,
       outputs,
+      preSelectedUtxo,
       utxo
     })
   ).rejects.toThrowError(new InputSelectionError(expectedError));
@@ -52,6 +56,7 @@ export const testInputSelectionProperties = async ({
   implicitValue,
   mockConstraints
 }: InputSelectionPropertiesTestParams) => {
+  const preSelectedUtxo = new Set<Cardano.Utxo>();
   const utxo = new Set(createUtxo());
   const outputs = new Set(createOutputs());
   const algorithm = getAlgorithm();
@@ -59,6 +64,7 @@ export const testInputSelectionProperties = async ({
     constraints: SelectionConstraints.mockConstraintsToConstraints(mockConstraints),
     implicitValue,
     outputs,
+    preSelectedUtxo,
     utxo
   });
   assertInputSelectionProperties({ constraints: mockConstraints, outputs, results, utxo });

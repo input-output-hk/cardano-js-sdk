@@ -1,3 +1,4 @@
+import { Cardano } from '@cardano-sdk/core';
 import { MockChangeAddressResolver, SelectionConstraints } from './util';
 import { TxTestUtil } from '@cardano-sdk/util-dev';
 import { roundRobinRandomImprove } from '../src/RoundRobinRandomImprove';
@@ -23,6 +24,7 @@ describe('RoundRobinRandomImprove', () => {
      */
     const random = jest.fn().mockReturnValue(0).mockReturnValueOnce(0).mockReturnValueOnce(0.99);
 
+    const preSelectedUtxo = new Set<Cardano.Utxo>();
     const results = await roundRobinRandomImprove({
       changeAddressResolver: new MockChangeAddressResolver(),
       random
@@ -33,9 +35,47 @@ describe('RoundRobinRandomImprove', () => {
         minimumCostCoefficient: 200_000n
       }),
       outputs,
+      preSelectedUtxo,
       utxo
     });
     expect(results.selection.inputs.size).toBe(3);
     expect(results.selection.fee).toBe(600_000n);
+  });
+
+  it('Always select the preSelected input', async () => {
+    const utxo = new Set([
+      TxTestUtil.createUnspentTxOutput({ coins: 1_000_000n }),
+      TxTestUtil.createUnspentTxOutput({ coins: 1_000_000n }),
+      TxTestUtil.createUnspentTxOutput({ coins: 1_000_000n })
+    ]);
+
+    const mockForeignInput = TxTestUtil.createUnspentTxOutput({ coins: 2_000_111n });
+    const preSelectedUtxo = new Set([mockForeignInput]);
+    const outputs = new Set([TxTestUtil.createOutput({ coins: 1_000_000n })]);
+    const random = jest.fn().mockReturnValue(0).mockReturnValueOnce(0).mockReturnValueOnce(0.99);
+
+    const results = await roundRobinRandomImprove({
+      changeAddressResolver: new MockChangeAddressResolver(),
+      random
+    }).select({
+      constraints: SelectionConstraints.mockConstraintsToConstraints({
+        ...SelectionConstraints.MOCK_NO_CONSTRAINTS,
+        minimumCoinQuantity: 900_000n,
+        minimumCostCoefficient: 200_000n
+      }),
+      outputs,
+      preSelectedUtxo,
+      utxo
+    });
+    expect(results.selection.inputs.size).toBe(2);
+    expect(results.selection.fee).toBe(400_000n);
+    expect(
+      [...results.selection.inputs.values()].some(
+        (value) =>
+          value[0].txId === mockForeignInput[0].txId &&
+          value[0].index === mockForeignInput[0].index &&
+          value[1].value.coins === mockForeignInput[1].value.coins
+      )
+    ).toBeTruthy();
   });
 });

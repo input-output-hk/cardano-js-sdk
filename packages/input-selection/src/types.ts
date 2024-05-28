@@ -35,12 +35,17 @@ export interface SelectionResult {
    * has removed values to pay for entries in the requested output set.
    */
   remainingUTxO: Set<Cardano.Utxo>;
+
+  /** The list of redeemers and their execution cost. */
+  redeemers?: Array<Cardano.Redeemer>;
 }
+
+export type TxCosts = { fee: bigint; redeemers?: Array<Cardano.Redeemer> };
 
 /**
  * @returns minimum transaction fee in Lovelace.
  */
-export type EstimateTxFee = (selectionSkeleton: SelectionSkeleton) => Promise<Cardano.Lovelace>;
+export type EstimateTxCosts = (selectionSkeleton: SelectionSkeleton) => Promise<TxCosts>;
 
 /**
  * @returns true if token bundle size exceeds it's maximum size limit.
@@ -59,7 +64,7 @@ export type ComputeMinimumCoinQuantity = (output: Cardano.TxOut) => Cardano.Love
 export type ComputeSelectionLimit = (selectionSkeleton: SelectionSkeleton) => Promise<number>;
 
 export interface SelectionConstraints {
-  computeMinimumCost: EstimateTxFee;
+  computeMinimumCost: EstimateTxCosts;
   tokenBundleSizeExceedsLimit: TokenBundleSizeExceedsLimit;
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity;
   computeSelectionLimit: ComputeSelectionLimit;
@@ -74,6 +79,8 @@ export interface ImplicitValue {
 }
 
 export interface InputSelectionParameters {
+  /** Set of inputs that must be included as part of the final selection. */
+  preSelectedUtxo: Set<Cardano.Utxo>;
   /** The set of inputs available for selection. */
   utxo: Set<Cardano.Utxo>;
   /** The set of outputs requested for payment. */

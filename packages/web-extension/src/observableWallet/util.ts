@@ -39,7 +39,19 @@ export const outputBuilderProperties: RemoteApiProperties<OutputBuilder> = {
 };
 
 export const txBuilderProperties: RemoteApiProperties<Omit<TxBuilder, 'customize'>> = {
+  addDatum: {
+    getApiProperties: () => txBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
+  addInput: {
+    getApiProperties: () => txBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
   addOutput: {
+    getApiProperties: () => txBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
+  addReferenceInput: {
     getApiProperties: () => txBuilderProperties,
     propType: RemoteApiPropertyType.ApiFactory
   },

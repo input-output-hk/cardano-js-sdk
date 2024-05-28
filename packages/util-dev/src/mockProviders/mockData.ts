@@ -33,6 +33,10 @@ export const currentEpoch = {
 export const protocolParameters = {
   coinsPerUtxoByte: 4310,
   maxCollateralInputs: 1,
+  maxExecutionUnitsPerTransaction: {
+    memory: 100,
+    steps: 200
+  },
   maxTxSize: 16_384,
   maxValueSize: 1000,
   minFeeCoefficient: 44,
