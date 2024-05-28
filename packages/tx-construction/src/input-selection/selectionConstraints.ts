@@ -7,7 +7,8 @@ import {
   ProtocolParametersRequiredByInputSelection,
   SelectionConstraints,
   SelectionSkeleton,
-  TokenBundleSizeExceedsLimit
+  TokenBundleSizeExceedsLimit,
+  sortTxIn
 } from '@cardano-sdk/input-selection';
 import { MinFeeCoefficient, MinFeeConstant, minAdaRequired, minFee } from '../fees';
 import { TxEvaluationResult, TxEvaluator, TxIdWithIndex } from '../tx-builder';
@@ -116,7 +117,7 @@ export const computeMinimumCost =
   async (selection) => {
     const tx = await buildTx(selection);
     const utxos = [...selection.inputs];
-    const txIns = utxos.map((utxo) => utxo[0]);
+    const txIns = utxos.map((utxo) => utxo[0]).sort(sortTxIn);
 
     if (tx.witness && tx.witness.redeemers && tx.witness.redeemers.length > 0) {
       // before the evaluation can happen, we need to point every redeemer to its corresponding inputs.
