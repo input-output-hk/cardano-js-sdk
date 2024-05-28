@@ -17,7 +17,7 @@ POOL_COST=380000000
 POOL_MARGIN=0.15
 METADATA_URL="" # Leave it empty and the metadata field will be ignore in the TX
 
-source ./scripts/pools/update-node-utils.sh
+source ./scripts/pools/update-node-utils.sh ${SP_NODE_ID}
 
 trap clean EXIT
 

@@ -8,6 +8,18 @@ here="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
 root="$(cd "$here/.." && pwd)"
 cd "$root"
 
+waitForEpoch1() {
+  while [ `CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock cardano-cli query tip --testnet-magic 888 | jq -r .epoch` == "0" ] ; do
+    sleep 5
+  done
+}
+
+healthy() {
+  sleep 20
+  waitForEpoch1
+  touch ./network-files/run/healthy
+}
+
 export PATH=$PWD/bin:$PATH
 
 source ./scripts/nodes-configuration.sh
@@ -21,20 +33,20 @@ trap 'kill 0' INT
 echo "Run"
 ./scripts/make-babbage.sh
 ./network-files/run/all.sh &
-
 CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/setup-new-delegator-keys.sh
+healthy &
 
-for ID in ${SP_NODES_ID}; do
-  if [ -f "./scripts/pools/update-node-sp$ID.sh" ]; then # Only update the pool if a script exists for that pool.
-    CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp"$ID"/node.sock ./scripts/pools/update-node-sp"$ID".sh
-  fi
-done
-
+./scripts/update-stake-pools.sh.sh "$SP_NODES_ID"
 
 CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/plutus-transaction.sh
 CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/reference-input-transaction.sh
 CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/mint-tokens.sh
 CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/setup-wallets.sh
 CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/mint-handles.sh
+
+waitForEpoch1
+sleep 50
+
+touch ./network-files/run/done
 
 wait

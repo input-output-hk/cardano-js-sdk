@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.32.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.31.0...@cardano-sdk/core@0.32.0) (2024-05-20)
+
+### ⚠ BREAKING CHANGES
+
+* **core:** NftMetadata.fromPlutusData use '' as default name
+* **core:** NftMetadata.fromMetadatum use '' as default name
+
+### Features
+
+* **core:** add 'strict' option to NftMetadata.fromMetadatum ([012e6cc](https://github.com/input-output-hk/cardano-js-sdk/commit/012e6cce816ac851438f6719177d9c675516f1ae))
+* **core:** add 'strict' option to NftMetadata.fromPlutusData ([7689602](https://github.com/input-output-hk/cardano-js-sdk/commit/768960263d4267754dfd1656909e630a05cae3f1))
+
+### Bug Fixes
+
+* **core:** add option to remove invisible characters from asset name ([a47beba](https://github.com/input-output-hk/cardano-js-sdk/commit/a47beba874d362b5f82326ca18f2a74ba8d8df21))
+* **core:** add support for version specified as bigint in cip25 metadata ([92a35a6](https://github.com/input-output-hk/cardano-js-sdk/commit/92a35a6ec3c0271a8a1e0d3f8d51955f2836e862))
+
 ## [0.31.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.30.2...@cardano-sdk/core@0.31.0) (2024-05-02)
 
 ### ⚠ BREAKING CHANGES

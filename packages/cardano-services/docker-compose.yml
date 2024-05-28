@@ -1,5 +1,3 @@
-version: '3.9'
-
 x-logging: &logging
   logging:
     driver: 'json-file'
@@ -41,7 +39,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      - CACHE_TTL=${CACHE_TTL:-1440}
+      - CACHE_TTL=${CACHE_TTL:-240}
       - CREATE_SCHEMA=${CREATE_SCHEMA:-true}
       - DROP_SCHEMA=${DROP_SCHEMA:-false}
       - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}

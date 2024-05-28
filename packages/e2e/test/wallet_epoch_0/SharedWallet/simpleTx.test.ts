@@ -1,6 +1,6 @@
 import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano } from '@cardano-sdk/core';
-import { buildSharedWallets } from './ultils';
+import { buildSharedWallets } from './utils';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import {
   getEnv,

@@ -306,6 +306,11 @@ describe('TxBuilder/delegatePortfolio', () => {
   describe('pre-existing multi-delegation on all stake keys', () => {
     let txBuilderProviders: jest.Mocked<TxBuilderProviders>;
     let nonDelegatingWalletTxBuilder: GenericTxBuilder;
+    let multiDelegatingWalletTxBuilder: GenericTxBuilder;
+    let singleDelegatingWalletTxBuilder: GenericTxBuilder;
+    let singleDelegatingWalletGroupedAddresses: GroupedAddress[];
+    let multiDelegatingWalletGroupedAddresses: GroupedAddress[];
+
     const deposit = 5n;
 
     beforeEach(async () => {
@@ -329,11 +334,60 @@ describe('TxBuilder/delegatePortfolio', () => {
           ]
         })
       ).txBuilder;
+
+      const multiDelegatingWalletTxBuilderFactory = await createTxBuilder({
+        keyAgent,
+        stakeDelegations: [
+          { credentialStatus: Cardano.StakeCredentialStatus.Registered, poolId: poolIds[0] },
+          { credentialStatus: Cardano.StakeCredentialStatus.Registered, poolId: poolIds[1] }
+        ]
+      });
+
+      multiDelegatingWalletTxBuilder = multiDelegatingWalletTxBuilderFactory.txBuilder;
+      multiDelegatingWalletGroupedAddresses = multiDelegatingWalletTxBuilderFactory.groupedAddresses;
+
+      const singleDelegatingWalletTxBuilderFactory = await createTxBuilder({
+        keyAgent,
+        stakeDelegations: [{ credentialStatus: Cardano.StakeCredentialStatus.Registered, poolId: poolIds[0] }]
+      });
+
+      singleDelegatingWalletTxBuilder = singleDelegatingWalletTxBuilderFactory.txBuilder;
+      singleDelegatingWalletGroupedAddresses = singleDelegatingWalletTxBuilderFactory.groupedAddresses;
     });
 
     it('does nothing and uses random improve input selector when the wallet is not delegating and delegatePortfolio is given a null portfolio', async () => {
       const tx = await nonDelegatingWalletTxBuilder.delegatePortfolio(null).build().inspect();
       expect(tx.body.certificates?.length).toBe(0);
+      expect(GreedyInputSelector).not.toHaveBeenCalled();
+      expect(roundRobinRandomImprove).toHaveBeenCalled();
+    });
+
+    it('does nothing and uses random improve input selector when the wallet is multi delegating and transaction is not changing delegation', async () => {
+      const tx = await multiDelegatingWalletTxBuilder
+        .addOutput(
+          multiDelegatingWalletTxBuilder
+            .buildOutput({ address: multiDelegatingWalletGroupedAddresses[0].address, value: { coins: 10n } })
+            .toTxOut()
+        )
+        .build()
+        .inspect();
+      expect(tx.body.certificates).toBeUndefined();
+      expect(tx.body.outputs.length).toBeTruthy();
+      expect(GreedyInputSelector).not.toHaveBeenCalled();
+      expect(roundRobinRandomImprove).toHaveBeenCalled();
+    });
+
+    it('does nothing and uses random improve input selector when the wallet is single delegating and transaction is not changing delegation', async () => {
+      const tx = await singleDelegatingWalletTxBuilder
+        .addOutput(
+          singleDelegatingWalletTxBuilder
+            .buildOutput({ address: singleDelegatingWalletGroupedAddresses[0].address, value: { coins: 10n } })
+            .toTxOut()
+        )
+        .build()
+        .inspect();
+      expect(tx.body.certificates).toBeUndefined();
+      expect(tx.body.outputs.length).toBeTruthy();
       expect(GreedyInputSelector).not.toHaveBeenCalled();
       expect(roundRobinRandomImprove).toHaveBeenCalled();
     });
