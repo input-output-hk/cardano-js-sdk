@@ -50,6 +50,7 @@
 <a href="_cardano_sdk_e2e._internal_.TxOutputBuilder.html#datum" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>datum</span></a>
 <a href="_cardano_sdk_e2e._internal_.TxOutputBuilder.html#handle" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>handle</span></a>
 <a href="_cardano_sdk_e2e._internal_.TxOutputBuilder.html#inspect" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>inspect</span></a>
+<a href="_cardano_sdk_e2e._internal_.TxOutputBuilder.html#scriptReference" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>script<wbr/>Reference</span></a>
 <a href="_cardano_sdk_e2e._internal_.TxOutputBuilder.html#toTxOut" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>to<wbr/>Tx<wbr/>Out</span></a>
 <a href="_cardano_sdk_e2e._internal_.TxOutputBuilder.html#value" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>value</span></a>
 </div></section></div></details></section></section>
@@ -129,7 +130,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../types/_cardano_sdk_e2e._internal_.OutputBuilderTxOut.html" class="tsd-signature-type" data-tsd-kind="Type alias">OutputBuilderTxOut</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/_cardano_sdk_e2e._internal_.OutputBuilder.html">OutputBuilder</a>.<a href="../interfaces/_cardano_sdk_e2e._internal_.OutputBuilder.html#build">build</a></p>
 <ul>
-<li>Defined in packages/tx-construction/dist/cjs/tx-builder/OutputBuilder.d.ts:25</li></ul></aside></li></ul></section>
+<li>Defined in packages/tx-construction/dist/cjs/tx-builder/OutputBuilder.d.ts:26</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="coin" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>coin</span><a href="#coin" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -147,13 +148,13 @@
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="datum" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>datum</span><a href="#datum" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-<li class="tsd-signature tsd-anchor-link" id="datum.datum-1">datum<span class="tsd-signature-symbol">(</span>datumHash<span class="tsd-signature-symbol">: </span><a href="../functions/_cardano_sdk_e2e._internal_.Hash32ByteBase16-1.html" class="tsd-signature-type" data-tsd-kind="Function">Hash32ByteBase16</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_e2e._internal_.TxOutputBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">TxOutputBuilder</a><a href="#datum.datum-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="datum.datum-1">datum<span class="tsd-signature-symbol">(</span>datum<span class="tsd-signature-symbol">: </span><a href="../types/_cardano_sdk_e2e._internal_.PlutusData-1.html" class="tsd-signature-type" data-tsd-kind="Type alias">PlutusData</a><span class="tsd-signature-symbol"> | </span><a href="../functions/_cardano_sdk_e2e._internal_.Hash32ByteBase16-1.html" class="tsd-signature-type" data-tsd-kind="Function">Hash32ByteBase16</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_e2e._internal_.TxOutputBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">TxOutputBuilder</a><a href="#datum.datum-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5>datumHash: <a href="../functions/_cardano_sdk_e2e._internal_.Hash32ByteBase16-1.html" class="tsd-signature-type" data-tsd-kind="Function">Hash32ByteBase16</a></h5></li></ul></div>
+<h5>datum: <a href="../types/_cardano_sdk_e2e._internal_.PlutusData-1.html" class="tsd-signature-type" data-tsd-kind="Type alias">PlutusData</a><span class="tsd-signature-symbol"> | </span><a href="../functions/_cardano_sdk_e2e._internal_.Hash32ByteBase16-1.html" class="tsd-signature-type" data-tsd-kind="Function">Hash32ByteBase16</a></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_e2e._internal_.TxOutputBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">TxOutputBuilder</a></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/_cardano_sdk_e2e._internal_.OutputBuilder.html">OutputBuilder</a>.<a href="../interfaces/_cardano_sdk_e2e._internal_.OutputBuilder.html#datum">datum</a></p>
 <ul>
@@ -171,7 +172,7 @@
 <h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_e2e._internal_.TxOutputBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">TxOutputBuilder</a></h4><aside class="tsd-sources">
 <p>Implementation of <a href="../interfaces/_cardano_sdk_e2e._internal_.OutputBuilder.html">OutputBuilder</a>.<a href="../interfaces/_cardano_sdk_e2e._internal_.OutputBuilder.html#handle">handle</a></p>
 <ul>
-<li>Defined in packages/tx-construction/dist/cjs/tx-builder/OutputBuilder.d.ts:24</li></ul></aside></li></ul></section>
+<li>Defined in packages/tx-construction/dist/cjs/tx-builder/OutputBuilder.d.ts:25</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="inspect" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>inspect</span><a href="#inspect" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -181,6 +182,19 @@
 <p>Implementation of <a href="../interfaces/_cardano_sdk_e2e._internal_.OutputBuilder.html">OutputBuilder</a>.<a href="../interfaces/_cardano_sdk_e2e._internal_.OutputBuilder.html#inspect">inspect</a></p>
 <ul>
 <li>Defined in packages/tx-construction/dist/cjs/tx-builder/OutputBuilder.d.ts:17</li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="scriptReference" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>script<wbr/>Reference</span><a href="#scriptReference" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="scriptReference.scriptReference-1">script<wbr/>Reference<span class="tsd-signature-symbol">(</span>script<span class="tsd-signature-symbol">: </span><a href="../types/_cardano_sdk_e2e._internal_.Script-1.html" class="tsd-signature-type" data-tsd-kind="Type alias">Script</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_e2e._internal_.TxOutputBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">TxOutputBuilder</a><a href="#scriptReference.scriptReference-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>script: <a href="../types/_cardano_sdk_e2e._internal_.Script-1.html" class="tsd-signature-type" data-tsd-kind="Type alias">Script</a></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_e2e._internal_.TxOutputBuilder.html" class="tsd-signature-type" data-tsd-kind="Class">TxOutputBuilder</a></h4><aside class="tsd-sources">
+<ul>
+<li>Defined in packages/tx-construction/dist/cjs/tx-builder/OutputBuilder.d.ts:24</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="toTxOut" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>to<wbr/>Tx<wbr/>Out</span><a href="#toTxOut" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -329,6 +343,7 @@
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_e2e._internal_.TxOutputBuilder.html#datum" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>datum</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_e2e._internal_.TxOutputBuilder.html#handle" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>handle</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_e2e._internal_.TxOutputBuilder.html#inspect" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>inspect</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_e2e._internal_.TxOutputBuilder.html#scriptReference" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>script<wbr/>Reference</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_e2e._internal_.TxOutputBuilder.html#toTxOut" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>to<wbr/>Tx<wbr/>Out</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_e2e._internal_.TxOutputBuilder.html#value" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>value</a></li></ul></li></ul></nav></div></div>
 <div class="container tsd-generator">

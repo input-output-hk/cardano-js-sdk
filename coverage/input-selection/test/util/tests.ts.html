@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>16/16</span>
+                <span class='fraction'>18/18</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>14/14</span>
+                <span class='fraction'>16/16</span>
             </div>
         
             
@@ -128,11 +128,19 @@
 <a name='L63'></a><a href='#L63'>63</a>
 <a name='L64'></a><a href='#L64'>64</a>
 <a name='L65'></a><a href='#L65'>65</a>
-<a name='L66'></a><a href='#L66'>66</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">5x</span>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -165,6 +173,8 @@
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -182,16 +192,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import * as SelectionConstraints from './selectionConstraints';
 import { Cardano } from '@cardano-sdk/core';
@@ -202,6 +214,8 @@ import { assertInputSelectionProperties } from './properties';
 export interface InputSelectionPropertiesTestParams {
   /** Test subject (Input Selection algorithm under test) */
   getAlgorithm: () =&gt; InputSelector;
+  /** Outputs that must always be included in the selection */
+  createPreSelectedOutputUtxo: () =&gt; Cardano.Utxo[];
   /** Available UTxO */
   createUtxo: () =&gt; Cardano.Utxo[];
   /** Transaction outputs */
@@ -226,6 +240,7 @@ export const testInputSelectionFailureMode = async ({
   expectedError,
   mockConstraints
 }: InputSelectionFailureModeTestParams) =&gt; {
+  const preSelectedUtxo = new Set&lt;Cardano.Utxo&gt;();
   const utxo = new Set(createUtxo());
   const outputs = new Set(createOutputs());
   const algorithm = getAlgorithm();
@@ -234,6 +249,7 @@ export const testInputSelectionFailureMode = async ({
       constraints: SelectionConstraints.mockConstraintsToConstraints(mockConstraints),
       implicitValue,
       outputs,
+      preSelectedUtxo,
       utxo
     })
   ).rejects.toThrowError(new InputSelectionError(expectedError));
@@ -247,6 +263,7 @@ export const testInputSelectionProperties = async ({
   implicitValue,
   mockConstraints
 }: InputSelectionPropertiesTestParams) =&gt; {
+  const preSelectedUtxo = new Set&lt;Cardano.Utxo&gt;();
   const utxo = new Set(createUtxo());
   const outputs = new Set(createOutputs());
   const algorithm = getAlgorithm();
@@ -254,6 +271,7 @@ export const testInputSelectionProperties = async ({
     constraints: SelectionConstraints.mockConstraintsToConstraints(mockConstraints),
     implicitValue,
     outputs,
+    preSelectedUtxo,
     utxo
   });
   assertInputSelectionProperties({ constraints: mockConstraints, outputs, results, utxo });
@@ -265,7 +283,7 @@ export const testInputSelectionProperties = async ({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-05-27T20:05:20.436Z
+                at 2024-05-28T08:12:32.092Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
