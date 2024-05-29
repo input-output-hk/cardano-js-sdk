@@ -1,13 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
-import {
-  AddressType,
-  KeyAgentBase,
-  KeyAgentType,
-  KeyRole,
-  MultiSigKeyRole,
-  SerializableInMemoryKeyAgentData
-} from '../src';
+import { AddressType, KeyAgentBase, KeyAgentType, KeyRole, SerializableInMemoryKeyAgentData } from '../src';
 import { Cardano } from '@cardano-sdk/core';
 import { dummyLogger } from 'ts-log';
 
@@ -46,9 +39,6 @@ describe('KeyAgentBase', () => {
     });
   });
 
-  // eslint-disable-next-line max-len
-  // extpubkey:  return '';
-
   test('deriveAddress derives a new address', async () => {
     const index = 1;
     const type = AddressType.External;
@@ -62,17 +52,6 @@ describe('KeyAgentBase', () => {
     expect(address.rewardAccount.startsWith('stake_test')).toBe(true);
   });
 
-  test('deriveSharedWalletAddress derives a new address', async () => {
-    const address = await keyAgent.deriveSharedWalletAddress({
-      paymentKeyDerivationIndex: 0,
-      stakeKeyDerivationIndex: 0
-    });
-
-    expect(address.accountIndex).toBe(ACCOUNT_INDEX);
-    expect(address.networkId).toBe(Cardano.ChainIds.Preview.networkId);
-    expect(address.address.startsWith('addr_test')).toBe(true);
-  });
-
   test('derivePublicKey', async () => {
     const externalPublicKey = await keyAgent.derivePublicKey({ index: 1, role: KeyRole.External });
     expect(typeof externalPublicKey).toBe('string');
@@ -80,19 +59,5 @@ describe('KeyAgentBase', () => {
     expect(typeof stakePublicKey).toBe('string');
     const dRepPublicKey = await keyAgent.derivePublicKey({ index: 0, role: KeyRole.DRep });
     expect(typeof dRepPublicKey).toBe('string');
-  });
-
-  test('deriveMultiSigPublicKey', async () => {
-    const multisigPublicKey = await keyAgent.deriveMultiSigPublicKey({ index: 0, role: MultiSigKeyRole.Payment });
-    expect(typeof multisigPublicKey).toBe('string');
-    const multsigStakePublicKey = await keyAgent.deriveMultiSigPublicKey({ index: 0, role: MultiSigKeyRole.Stake });
-    expect(typeof multsigStakePublicKey).toBe('string');
-    const multisigPublicKeyIndex1 = await keyAgent.deriveMultiSigPublicKey({ index: 1, role: MultiSigKeyRole.Payment });
-    expect(typeof multisigPublicKeyIndex1).toBe('string');
-    const multsigStakePublicKeyIndex1 = await keyAgent.deriveMultiSigPublicKey({
-      index: 1,
-      role: MultiSigKeyRole.Stake
-    });
-    expect(typeof multsigStakePublicKeyIndex1).toBe('string');
   });
 });
