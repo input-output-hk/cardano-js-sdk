@@ -57,18 +57,7 @@ export abstract class KeyAgentBase implements KeyAgent {
     return this.#account.deriveAddress(paymentKeyDerivationPath, stakeKeyDerivationIndex);
   }
 
-  /* async deriveSharedWalletAddress({
-    paymentKeyDerivationIndex,
-    stakeKeyDerivationIndex
-  }: SharedWalletAddressDerivationPath): Promise<SharedAddress> {
-    return this.#account.deriveSharedWalletAddress({ paymentKeyDerivationIndex, stakeKeyDerivationIndex });
-  } */
-
   async derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise<Crypto.Ed25519PublicKeyHex> {
     return (await this.#account.derivePublicKey(derivationPath)).hex();
   }
-
-  /* async deriveMultiSigPublicKey(derivationPath: MultiSigAccountKeyDerivationPath): Promise<Crypto.Ed25519PublicKeyHex> {
-    return (await this.#account.deriveMultiSigPublicKey(derivationPath)).hex();
-  } */
 }

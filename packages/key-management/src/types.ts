@@ -75,11 +75,6 @@ export interface AccountAddressDerivationPath {
   index: number;
 }
 
-export interface SharedWalletAddressDerivationPath {
-  paymentKeyDerivationIndex: number;
-  stakeKeyDerivationIndex: number;
-}
-
 export interface GroupedAddress {
   type: AddressType;
   index: number;
@@ -88,12 +83,6 @@ export interface GroupedAddress {
   address: Cardano.PaymentAddress;
   rewardAccount: Cardano.RewardAccount;
   stakeKeyDerivationPath?: AccountKeyDerivationPath;
-}
-
-export interface SharedAddress {
-  networkId: Cardano.NetworkId;
-  address: Cardano.PaymentAddress;
-  accountIndex: number;
 }
 
 export interface TrezorConfig {
