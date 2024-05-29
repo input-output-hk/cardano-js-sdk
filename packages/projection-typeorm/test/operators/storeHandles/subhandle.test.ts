@@ -1,9 +1,17 @@
 import { Asset, Cardano, Handle, Serialization } from '@cardano-sdk/core';
 import { HandleEntity } from '../../../src';
+import {
+  HandleProjectionEvent,
+  burnHandle,
+  createMultiTxProjectionSource,
+  entities,
+  mapAndStore,
+  policyId,
+  queryHandle
+} from './util';
 import { HexBlob } from '@cardano-sdk/util';
 import { ProjectorContext, createProjectorContext } from '../util';
 import { QueryRunner, Repository } from 'typeorm';
-import { createMultiTxProjectionSource, entities, mapAndStore, policyId } from './util';
 import { firstValueFrom } from 'rxjs';
 import { initializeDataSource } from '../../util';
 
@@ -26,6 +34,121 @@ describe('subhandles', () => {
   let context: ProjectorContext;
   let repository: Repository<HandleEntity>;
 
+  const nftSubHandle = 'sub@handl';
+  const virtualSubHandle = 'virtual@handl';
+  const parentHandle = 'handl';
+  const handleRecipientAddress = Cardano.PaymentAddress(
+    'addr_test1qz690wvatwqgzt5u85hfzjxa8qqzthqwtp7xq8t3wh6ttc98hqtvlesvrpvln3srklcvhu2r9z22fdhaxvh2m2pg3nuq0n8gf2'
+  );
+
+  const mintParentAndNftSubHandle = () => {
+    const handleAssetName = (handleName: Handle) => Cardano.AssetName(Buffer.from(handleName).toString('hex'));
+    const subHandleAssetId = Cardano.AssetId.fromParts(
+      policyId,
+      Asset.AssetNameLabel.encode(handleAssetName(nftSubHandle), Asset.AssetNameLabelNum.UserNFT)
+    );
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    const handleAssetId = Cardano.AssetId.fromParts(
+      policyId,
+      Asset.AssetNameLabel.encode(handleAssetName(parentHandle), Asset.AssetNameLabelNum.UserNFT)
+    );
+
+    const source$ = createMultiTxProjectionSource([
+      {
+        body: {
+          fee: 111n,
+          inputs: [],
+          mint: new Map([[handleAssetId, 1n]]),
+          outputs: [
+            {
+              address: handleRecipientAddress,
+              value: {
+                assets: new Map([[handleAssetId, 1n]]),
+                coins: 123n
+              }
+            }
+          ]
+        },
+        id: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000')
+      },
+      {
+        body: {
+          fee: 111n,
+          inputs: [],
+          mint: new Map([[subHandleAssetId, 1n]]),
+          outputs: [
+            {
+              address: handleRecipientAddress,
+              value: {
+                assets: new Map([[subHandleAssetId, 1n]]),
+                coins: 123n
+              }
+            }
+          ]
+        },
+        id: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000')
+      }
+    ]);
+
+    return firstValueFrom(source$.pipe(mapAndStore(context)));
+  };
+
+  const mintParentAndVirtualSubHandle = () => {
+    const handleAssetName = (handleName: Handle) => Cardano.AssetName(Buffer.from(handleName).toString('hex'));
+    const virtualSubHandleAssetId = Cardano.AssetId.fromParts(
+      policyId,
+      Asset.AssetNameLabel.encode(handleAssetName(virtualSubHandle), Asset.AssetNameLabelNum.VirtualHandle)
+    );
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    const handleAssetId = Cardano.AssetId.fromParts(
+      policyId,
+      Asset.AssetNameLabel.encode(handleAssetName(parentHandle), Asset.AssetNameLabelNum.UserNFT)
+    );
+
+    const bobAddress = Cardano.PaymentAddress('addr_test1wzlv9cslk9tcj0wpm9p5t6kajyt37ap5sc9rzkaxa9p67ys2ygypv');
+
+    const source$ = createMultiTxProjectionSource([
+      {
+        body: {
+          fee: 111n,
+          inputs: [],
+          mint: new Map([[handleAssetId, 1n]]),
+          outputs: [
+            {
+              address: handleRecipientAddress,
+              datum: handlDatum,
+              value: {
+                assets: new Map([[handleAssetId, 1n]]),
+                coins: 123n
+              }
+            }
+          ]
+        },
+        id: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000')
+      },
+      {
+        body: {
+          fee: 111n,
+          inputs: [],
+          mint: new Map([[virtualSubHandleAssetId, 1n]]),
+          outputs: [
+            {
+              address: bobAddress,
+              datum: virtualSubhandleDatum,
+              value: {
+                assets: new Map([[virtualSubHandleAssetId, 1n]]),
+                coins: 123n
+              }
+            }
+          ]
+        },
+        id: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000')
+      }
+    ]);
+
+    return firstValueFrom(source$.pipe(mapAndStore(context)));
+  };
+
   beforeEach(async () => {
     const dataSource = await initializeDataSource({ entities });
     queryRunner = dataSource.createQueryRunner();
@@ -38,76 +161,22 @@ describe('subhandles', () => {
   });
 
   describe('store parenthandle information', () => {
-    const maryAddress = Cardano.PaymentAddress(
-      'addr_test1qz690wvatwqgzt5u85hfzjxa8qqzthqwtp7xq8t3wh6ttc98hqtvlesvrpvln3srklcvhu2r9z22fdhaxvh2m2pg3nuq0n8gf2'
-    );
-
     it('it stores NFT parentHandle information', async () => {
-      const subHandle = 'sub@handl';
-      const parentHandle = 'handl';
-      const handleAssetName = (handleName: Handle) => Cardano.AssetName(Buffer.from(handleName).toString('hex'));
-      const subHandleAssetId = Cardano.AssetId.fromParts(
-        policyId,
-        Asset.AssetNameLabel.encode(handleAssetName(subHandle), Asset.AssetNameLabelNum.UserNFT)
-      );
-      // eslint-disable-next-line @typescript-eslint/no-shadow
-      const handleAssetId = Cardano.AssetId.fromParts(
-        policyId,
-        Asset.AssetNameLabel.encode(handleAssetName(parentHandle), Asset.AssetNameLabelNum.UserNFT)
-      );
-
-      const source$ = createMultiTxProjectionSource([
-        {
-          body: {
-            fee: 111n,
-            inputs: [],
-            mint: new Map([[handleAssetId, 1n]]),
-            outputs: [
-              {
-                address: maryAddress,
-                value: {
-                  assets: new Map([[handleAssetId, 1n]]),
-                  coins: 123n
-                }
-              }
-            ]
-          },
-          id: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000')
-        },
-        {
-          body: {
-            fee: 111n,
-            inputs: [],
-            mint: new Map([[subHandleAssetId, 1n]]),
-            outputs: [
-              {
-                address: maryAddress,
-                value: {
-                  assets: new Map([[subHandleAssetId, 1n]]),
-                  coins: 123n
-                }
-              }
-            ]
-          },
-          id: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000')
-        }
-      ]);
-
-      const mintAndTransferEvt = await firstValueFrom(source$.pipe(mapAndStore(context)));
+      const mintAndTransferEvt = await mintParentAndNftSubHandle();
 
       expect(mintAndTransferEvt.handles[0].handle).toEqual(parentHandle);
-      expect(mintAndTransferEvt.handles[1].handle).toEqual(subHandle);
+      expect(mintAndTransferEvt.handles[1].handle).toEqual(nftSubHandle);
       expect(
         await repository.findOne({
           relations: { parentHandle: true },
           select: { cardanoAddress: true, handle: true },
-          where: { handle: subHandle }
+          where: { handle: nftSubHandle }
         })
       ).toEqual({
-        cardanoAddress: maryAddress,
-        handle: subHandle,
+        cardanoAddress: handleRecipientAddress,
+        handle: nftSubHandle,
         parentHandle: {
-          cardanoAddress: maryAddress,
+          cardanoAddress: handleRecipientAddress,
           defaultForPaymentCredential: parentHandle,
           defaultForStakeCredential: parentHandle,
           handle: parentHandle,
@@ -118,77 +187,23 @@ describe('subhandles', () => {
     });
 
     it('it stores virtual parentHandle information', async () => {
-      const virtualHandle = 'virtual@handl';
-      const parentHandle = 'handl';
-      const handleAssetName = (handleName: Handle) => Cardano.AssetName(Buffer.from(handleName).toString('hex'));
-      const virtualSubHandleAssetId = Cardano.AssetId.fromParts(
-        policyId,
-        Asset.AssetNameLabel.encode(handleAssetName(virtualHandle), Asset.AssetNameLabelNum.VirtualHandle)
-      );
-      // eslint-disable-next-line @typescript-eslint/no-shadow
-      const handleAssetId = Cardano.AssetId.fromParts(
-        policyId,
-        Asset.AssetNameLabel.encode(handleAssetName(parentHandle), Asset.AssetNameLabelNum.UserNFT)
-      );
-
-      const bobAddress = Cardano.PaymentAddress('addr_test1wzlv9cslk9tcj0wpm9p5t6kajyt37ap5sc9rzkaxa9p67ys2ygypv');
-
-      const source$ = createMultiTxProjectionSource([
-        {
-          body: {
-            fee: 111n,
-            inputs: [],
-            mint: new Map([[handleAssetId, 1n]]),
-            outputs: [
-              {
-                address: maryAddress,
-                datum: handlDatum,
-                value: {
-                  assets: new Map([[handleAssetId, 1n]]),
-                  coins: 123n
-                }
-              }
-            ]
-          },
-          id: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000')
-        },
-        {
-          body: {
-            fee: 111n,
-            inputs: [],
-            mint: new Map([[virtualSubHandleAssetId, 1n]]),
-            outputs: [
-              {
-                address: bobAddress,
-                datum: virtualSubhandleDatum,
-                value: {
-                  assets: new Map([[virtualSubHandleAssetId, 1n]]),
-                  coins: 123n
-                }
-              }
-            ]
-          },
-          id: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000')
-        }
-      ]);
-
-      const mintAndTransferEvt = await firstValueFrom(source$.pipe(mapAndStore(context)));
+      const mintAndTransferEvt = await mintParentAndVirtualSubHandle();
 
       expect(mintAndTransferEvt.handles[0].handle).toEqual(parentHandle);
-      expect(mintAndTransferEvt.handles[1].handle).toEqual(virtualHandle);
+      expect(mintAndTransferEvt.handles[1].handle).toEqual(virtualSubHandle);
       expect(
         await repository.findOne({
           relations: { parentHandle: true },
           select: { cardanoAddress: true, handle: true },
-          where: { handle: virtualHandle }
+          where: { handle: virtualSubHandle }
         })
       ).toEqual({
         cardanoAddress: Cardano.PaymentAddress(
           'addr_test1qpadxfxylvy8p8wejlmt9wnesr2squgr524r77n7hz6yh3h34r3hjynmsy2cxpc04a6dkqxcsr29qfl7v9cmrd5mm89qqh563f'
         ),
-        handle: virtualHandle,
+        handle: virtualSubHandle,
         parentHandle: {
-          cardanoAddress: maryAddress,
+          cardanoAddress: handleRecipientAddress,
           defaultForPaymentCredential: parentHandle,
           defaultForStakeCredential: parentHandle,
           handle: parentHandle,
@@ -201,7 +216,6 @@ describe('subhandles', () => {
     it('stores several sub-handles for one parent handle', async () => {
       const subHandleOne = 'one@handl';
       const subHandleTwo = 'two@handl';
-      const parentHandle = 'handl';
       const handleAssetName = (handleName: Handle) => Cardano.AssetName(Buffer.from(handleName).toString('hex'));
       const subHandleOneAssetId = Cardano.AssetId.fromParts(
         policyId,
@@ -225,7 +239,7 @@ describe('subhandles', () => {
             mint: new Map([[handleAssetId, 1n]]),
             outputs: [
               {
-                address: maryAddress,
+                address: handleRecipientAddress,
                 datum: virtualSubhandleDatum,
                 value: {
                   assets: new Map([[handleAssetId, 1n]]),
@@ -243,7 +257,7 @@ describe('subhandles', () => {
             mint: new Map([[subHandleOneAssetId, 1n]]),
             outputs: [
               {
-                address: maryAddress,
+                address: handleRecipientAddress,
                 datum: virtualSubhandleDatum,
                 value: {
                   assets: new Map([[subHandleOneAssetId, 1n]]),
@@ -261,7 +275,7 @@ describe('subhandles', () => {
             mint: new Map([[subHandleTwoAssetId, 1n]]),
             outputs: [
               {
-                address: maryAddress,
+                address: handleRecipientAddress,
                 datum: virtualSubhandleDatum,
                 value: {
                   assets: new Map([[subHandleTwoAssetId, 1n]]),
@@ -286,10 +300,10 @@ describe('subhandles', () => {
           where: { handle: subHandleOne }
         })
       ).toEqual({
-        cardanoAddress: maryAddress,
+        cardanoAddress: handleRecipientAddress,
         handle: subHandleOne,
         parentHandle: {
-          cardanoAddress: maryAddress,
+          cardanoAddress: handleRecipientAddress,
           defaultForPaymentCredential: parentHandle,
           defaultForStakeCredential: parentHandle,
           handle: parentHandle,
@@ -305,10 +319,10 @@ describe('subhandles', () => {
           where: { handle: subHandleTwo }
         })
       ).toEqual({
-        cardanoAddress: maryAddress,
+        cardanoAddress: handleRecipientAddress,
         handle: subHandleTwo,
         parentHandle: {
-          cardanoAddress: maryAddress,
+          cardanoAddress: handleRecipientAddress,
           defaultForPaymentCredential: parentHandle,
           defaultForStakeCredential: parentHandle,
           handle: parentHandle,
@@ -335,7 +349,7 @@ describe('subhandles', () => {
             mint: new Map([[handleAssetId, 1n]]),
             outputs: [
               {
-                address: maryAddress,
+                address: handleRecipientAddress,
                 datum: handlDatum,
                 value: {
                   assets: new Map([[handleAssetId, 1n]]),
@@ -352,4 +366,34 @@ describe('subhandles', () => {
       expect(await repository.countBy({ handle })).toBe(0);
     });
   });
+
+  describe('parent handle is burned', () => {
+    const assertKeepsSubhandleWhenParentIsBurned = async (
+      mint: () => Promise<HandleProjectionEvent>,
+      subHandle: Handle
+      // eslint-disable-next-line unicorn/consistent-function-scoping
+    ) => {
+      const mintEvent = await mint();
+      const subhandleAfterMint = await queryHandle(subHandle, repository);
+      expect(subhandleAfterMint?.cardanoAddress).toBeTruthy();
+
+      const parentHandleOwnership = mintEvent.handles.find((h) => h.handle === parentHandle)!;
+      await burnHandle(mintEvent, parentHandleOwnership, context);
+
+      const subhandleAfterBurn = await queryHandle(subHandle, repository);
+      expect(subhandleAfterBurn?.cardanoAddress).toBeTruthy();
+    };
+
+    it('keeps nft subhandles', async () => {
+      await assertKeepsSubhandleWhenParentIsBurned(mintParentAndNftSubHandle, nftSubHandle);
+    });
+
+    it('keeps virtual subhandles', async () => {
+      await assertKeepsSubhandleWhenParentIsBurned(mintParentAndVirtualSubHandle, virtualSubHandle);
+    });
+  });
+
+  it.todo('burning nft subhandle user token deletes it from database');
+  it.todo('burning nft subhandle reference token ???');
+  it.todo('burning virtual subhandle token deletes it from database');
 });

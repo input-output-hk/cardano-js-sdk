@@ -2,19 +2,21 @@ import { BaseProjectionEvent } from '@cardano-sdk/projection';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { HandleEntity } from '../../../src';
 import { ProjectorContext, createProjectorContext, createStubProjectionSource } from '../util';
-import { QueryRunner } from 'typeorm';
-import { createMultiTxProjectionSource, entities, mapAndStore, projectTilFirst } from './util';
+import { QueryRunner, Repository } from 'typeorm';
+import { burnHandle, createMultiTxProjectionSource, entities, mapAndStore, projectTilFirst, queryHandle } from './util';
 import { firstValueFrom } from 'rxjs';
 import { initializeDataSource } from '../../util';
 
 describe('storeHandles', () => {
   let queryRunner: QueryRunner;
   let context: ProjectorContext;
+  let repository: Repository<HandleEntity>;
 
   beforeEach(async () => {
     const dataSource = await initializeDataSource({ entities });
     queryRunner = dataSource.createQueryRunner();
     context = createProjectorContext(entities);
+    repository = queryRunner.manager.getRepository(HandleEntity);
   });
 
   afterEach(async () => {
@@ -23,7 +25,6 @@ describe('storeHandles', () => {
 
   it(`minting an existing handle sets address to null,
       rolling back a transaction that mint an existing handle sets address to the original owner`, async () => {
-    const repository = queryRunner.manager.getRepository(HandleEntity);
     const firstMintEvent = await projectTilFirst(context)(
       ({ handles, eventType }) => eventType === ChainSyncEventType.RollForward && handles[0]?.handle === 'bob'
     );
@@ -57,8 +58,19 @@ describe('storeHandles', () => {
     });
   });
 
+  it('burning handle asset deletes it from the database', async () => {
+    const mintEvent = await projectTilFirst(context)(({ handles }) => handles.length > 0);
+    const firstMintedHandle = mintEvent.handles[0];
+    expect(firstMintedHandle.latestOwnerAddress).toBeTruthy();
+    const projectedHandleAfterMint = await queryHandle(firstMintedHandle.handle, repository);
+    expect(projectedHandleAfterMint!.cardanoAddress).toBe(firstMintedHandle.latestOwnerAddress);
+
+    await burnHandle(mintEvent, firstMintedHandle, context);
+
+    await expect(queryHandle(firstMintedHandle.handle, repository)).resolves.toBeNull();
+  });
+
   it('burning a handle with supply >1 sets address and datum to the 1 remaining owner', async () => {
-    const repository = queryRunner.manager.getRepository(HandleEntity);
     const burnEvent = await projectTilFirst(context)(
       ({ eventType, mint }) => eventType === ChainSyncEventType.RollForward && mint[0]?.quantity === -1n
     );
@@ -77,7 +89,6 @@ describe('storeHandles', () => {
   });
 
   it('rolling back a transaction that burned a handle with supply >1 sets address to null', async () => {
-    const repository = queryRunner.manager.getRepository(HandleEntity);
     const mintEvent1 = await projectTilFirst(context)(
       ({ eventType, mint }) => eventType === ChainSyncEventType.RollBackward && mint[0]?.quantity === -1n
     );
@@ -91,7 +102,6 @@ describe('storeHandles', () => {
   });
 
   it('transferring handle updates the address to the new owner, rolling back sets it to original owner', async () => {
-    const repository = queryRunner.manager.getRepository(HandleEntity);
     const mintEvt = await projectTilFirst(context)((evt) => evt.handles.length > 0);
     const newOwnerAddress = Cardano.PaymentAddress(
       'addr_test1qpfhhfy2qgls50r9u4yh0l7z67xpg0a5rrhkmvzcuqrd0znuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q9gw0lz'
@@ -167,7 +177,6 @@ describe('storeHandles', () => {
     const handle = 'mary';
 
     it('it updates the owner of the handle when minting and transferring the same handle', async () => {
-      const repository = queryRunner.manager.getRepository(HandleEntity);
       const source$ = createMultiTxProjectionSource([
         {
           body: {
@@ -214,7 +223,6 @@ describe('storeHandles', () => {
 
     it('reverts address to the remaining owner when minting 2 handle assets and then burning 1', async () => {
       const mintTxId = Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000');
-      const repository = queryRunner.manager.getRepository(HandleEntity);
       const source$ = createMultiTxProjectionSource([
         {
           body: {

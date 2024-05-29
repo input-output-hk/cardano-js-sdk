@@ -20,11 +20,18 @@ import {
   typeormTransactionCommit,
   withTypeormTransaction
 } from '../../../src';
-import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { BaseProjectionEvent, Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
+import { Cardano, ChainSyncEventType, Handle } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger, mockProviders } from '@cardano-sdk/util-dev';
-import { Observable } from 'rxjs';
-import { ProjectorContext, createProjectorTilFirst, createStubProjectionSource } from '../util';
+import { Observable, firstValueFrom } from 'rxjs';
+import {
+  ProjectorContext,
+  createProjectorTilFirst,
+  createRollForwardEventBasedOn,
+  createStubProjectionSource,
+  createStubTx
+} from '../util';
+import { Repository } from 'typeorm';
 import { connectionConfig$ } from '../../util';
 
 export const stubEvents = chainSyncData(ChainSyncDataSet.WithHandle);
@@ -124,3 +131,30 @@ export const project$ =
     }).pipe(mapAndStore({ buffer, tipTracker }), tipTracker.trackProjectedTip(), requestNext());
 
 export const projectTilFirst = (context: ProjectorContext) => createProjectorTilFirst(project$(context));
+
+export type HandleProjectionEvent = BaseProjectionEvent & Mappers.WithHandles & Mappers.WithUtxo;
+export const burnHandle = async (
+  mintEvent: HandleProjectionEvent,
+  handle: Mappers.HandleOwnership,
+  context: ProjectorContext
+) => {
+  const createBurnBlock = (block: Cardano.Block): Cardano.Block => ({
+    ...block,
+    body: [
+      createStubTx({
+        inputs: mintEvent.utxo.produced.map(([txIn]) => txIn),
+        mint: new Map([[handle.assetId, -1n]])
+      })
+    ]
+  });
+  const burn$ = createStubProjectionSource([createRollForwardEventBasedOn(mintEvent, createBurnBlock)]).pipe(
+    mapAndStore(context)
+  );
+  await firstValueFrom(burn$);
+};
+
+export const queryHandle = (handle: Handle, repository: Repository<HandleEntity>) =>
+  repository.findOne({
+    select: { cardanoAddress: true },
+    where: { handle }
+  });
