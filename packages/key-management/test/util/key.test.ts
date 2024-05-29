@@ -31,17 +31,17 @@ const knownAddressStakeKeyPath = [2_147_485_500, 2_147_485_463, 2_147_483_648, 2
 describe('key utils', () => {
   describe('paymentKeyPathFromGroupedAddress', () => {
     it('returns a hardened BIP32 payment key path', () => {
-      expect(paymentKeyPathFromGroupedAddress(knownAddress)).toEqual(knownAddressKeyPath);
+      expect(paymentKeyPathFromGroupedAddress({ address: knownAddress })).toEqual(knownAddressKeyPath);
     });
   });
   describe('stakeKeyPathFromGroupedAddress', () => {
     it('returns null when given an undefined stakeKeyDerivationPath', async () => {
       const knownAddressClone = { ...knownAddress };
       delete knownAddressClone.stakeKeyDerivationPath;
-      expect(stakeKeyPathFromGroupedAddress(knownAddressClone)).toEqual(null);
+      expect(stakeKeyPathFromGroupedAddress({ address: knownAddressClone })).toEqual(null);
     });
     it('returns a hardened BIP32 stake key path', () => {
-      expect(stakeKeyPathFromGroupedAddress(knownAddress)).toEqual(knownAddressStakeKeyPath);
+      expect(stakeKeyPathFromGroupedAddress({ address: knownAddress })).toEqual(knownAddressStakeKeyPath);
     });
   });
 });

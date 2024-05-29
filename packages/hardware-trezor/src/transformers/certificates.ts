@@ -30,7 +30,7 @@ const getCertCredentials = (
     !!rewardAddress &&
     areNumbersEqualInConstantTime(rewardAddress?.getPaymentCredential().type, Cardano.CredentialType.KeyHash)
   ) {
-    const path = util.stakeKeyPathFromGroupedAddress(knownAddress);
+    const path = util.stakeKeyPathFromGroupedAddress({ address: knownAddress });
     return path ? { path } : { keyHash: stakeKeyHash };
   }
   return {
@@ -48,7 +48,7 @@ const getPoolOperatorKeyPath = (
   context: TrezorTxTransformerContext
 ): BIP32Path | null => {
   const knownAddress = context?.knownAddresses.find((address) => address.rewardAccount === operator);
-  return util.stakeKeyPathFromGroupedAddress(knownAddress);
+  return util.stakeKeyPathFromGroupedAddress({ address: knownAddress });
 };
 
 export const getStakeAddressCertificate: Transform<

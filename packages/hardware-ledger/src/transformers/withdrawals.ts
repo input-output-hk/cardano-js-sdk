@@ -1,13 +1,20 @@
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Cardano } from '@cardano-sdk/core';
-import { CardanoKeyConst, GroupedAddress, util } from '@cardano-sdk/key-management';
+import { CardanoKeyConst, GroupedAddress, KeyPurpose, util } from '@cardano-sdk/key-management';
 import { InvalidArgumentError, Transform, areNumbersEqualInConstantTime } from '@cardano-sdk/util';
 import { LedgerTxTransformerContext } from '../types';
 
-const resolveKeyPath = (
-  rewardAddress: Cardano.RewardAddress,
-  knownAddresses: GroupedAddress[] | undefined
-): Ledger.BIP32Path | null => {
+interface ResolveKeyPathParams {
+  rewardAddress: Cardano.RewardAddress;
+  knownAddresses: GroupedAddress[] | undefined;
+  purpose?: KeyPurpose;
+}
+
+const resolveKeyPath = ({
+  rewardAddress,
+  knownAddresses,
+  purpose = KeyPurpose.STANDARD
+}: ResolveKeyPathParams): Ledger.BIP32Path | null => {
   if (!knownAddresses) return null;
 
   const knownAddress = knownAddresses.find(
@@ -16,7 +23,7 @@ const resolveKeyPath = (
 
   if (knownAddress && knownAddress.stakeKeyDerivationPath) {
     return [
-      util.harden(CardanoKeyConst.PURPOSE),
+      util.harden(purpose),
       util.harden(CardanoKeyConst.COIN_TYPE),
       util.harden(knownAddress.accountIndex),
       knownAddress.stakeKeyDerivationPath.role,
@@ -39,7 +46,7 @@ export const toWithdrawal: Transform<Cardano.Withdrawal, Ledger.Withdrawal, Ledg
   let ledgerWithdrawal;
 
   if (areNumbersEqualInConstantTime(rewardAddress.getPaymentCredential().type, Cardano.CredentialType.KeyHash)) {
-    const keyPath = resolveKeyPath(rewardAddress, context?.knownAddresses);
+    const keyPath = resolveKeyPath({ knownAddresses: context?.knownAddresses, rewardAddress });
     ledgerWithdrawal = keyPath
       ? {
           amount: withdrawal.quantity,

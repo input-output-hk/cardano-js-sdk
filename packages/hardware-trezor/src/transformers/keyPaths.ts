@@ -22,5 +22,5 @@ export const resolveStakeKeyPath = (
   const knownAddress = knownAddresses.find(
     ({ rewardAccount }) => rewardAccount === rewardAddress.toAddress().toBech32()
   );
-  return util.stakeKeyPathFromGroupedAddress(knownAddress);
+  return util.stakeKeyPathFromGroupedAddress({ address: knownAddress });
 };

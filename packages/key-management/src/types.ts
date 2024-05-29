@@ -46,6 +46,7 @@ export enum KeyPurpose {
 export interface AccountKeyDerivationPath {
   role: KeyRole;
   index: number;
+  purpose?: KeyPurpose;
 }
 
 /** Internal = change address & External = receipt address */

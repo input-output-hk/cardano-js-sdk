@@ -21,9 +21,11 @@ export const toRequiredSigner: Transform<
   });
 
   const paymentKeyPath = paymentCredKnownAddress
-    ? util.paymentKeyPathFromGroupedAddress(paymentCredKnownAddress)
+    ? util.paymentKeyPathFromGroupedAddress({ address: paymentCredKnownAddress })
     : null;
-  const stakeKeyPath = stakeCredKnownAddress ? util.stakeKeyPathFromGroupedAddress(stakeCredKnownAddress) : null;
+  const stakeKeyPath = stakeCredKnownAddress
+    ? util.stakeKeyPathFromGroupedAddress({ address: stakeCredKnownAddress })
+    : null;
 
   if (paymentKeyPath) {
     return {

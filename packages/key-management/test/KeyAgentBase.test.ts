@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, KeyAgentBase, KeyAgentType, KeyRole, SerializableInMemoryKeyAgentData } from '../src';
 import { Cardano } from '@cardano-sdk/core';

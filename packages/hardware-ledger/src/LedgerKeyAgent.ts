@@ -8,6 +8,7 @@ import {
   KeyAgentBase,
   KeyAgentDependencies,
   KeyAgentType,
+  KeyPurpose,
   SerializableLedgerKeyAgentData,
   SignBlobResult,
   SignTransactionContext,
@@ -73,6 +74,7 @@ export interface GetLedgerXpubProps {
   deviceConnection?: LedgerConnection;
   communicationType: CommunicationType;
   accountIndex: number;
+  purpose?: KeyPurpose;
 }
 
 export interface CreateLedgerTransportProps {
@@ -434,11 +436,12 @@ export class LedgerKeyAgent extends KeyAgentBase {
   static async getXpub({
     deviceConnection,
     communicationType,
-    accountIndex
+    accountIndex,
+    purpose = KeyPurpose.STANDARD
   }: GetLedgerXpubProps): Promise<Crypto.Bip32PublicKeyHex> {
     try {
       const recoveredDeviceConnection = await LedgerKeyAgent.checkDeviceConnection(communicationType, deviceConnection);
-      const derivationPath = `${CardanoKeyConst.PURPOSE}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'`;
+      const derivationPath = `${purpose}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'`;
       const extendedPublicKey = await recoveredDeviceConnection.getExtendedPublicKey({
         path: str_to_path(derivationPath) // BIP32Path
       });

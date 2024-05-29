@@ -17,8 +17,8 @@ const toDestination: Transform<Cardano.TxOut, TrezorTxOutputDestination, TrezorT
     };
   }
 
-  const paymentPath = util.paymentKeyPathFromGroupedAddress(knownAddress);
-  const stakingPath = util.stakeKeyPathFromGroupedAddress(knownAddress);
+  const paymentPath = util.paymentKeyPathFromGroupedAddress({ address: knownAddress });
+  const stakingPath = util.stakeKeyPathFromGroupedAddress({ address: knownAddress });
 
   if (!stakingPath) throw new InvalidArgumentError('txOut', 'Missing staking key key path.');
 

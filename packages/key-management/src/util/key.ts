@@ -37,6 +37,11 @@ export interface DeriveAccountPrivateKeyProps {
   purpose?: KeyPurpose;
 }
 
+interface GroupAddressKeyPath {
+  address: GroupedAddress;
+  purpose?: KeyPurpose;
+}
+
 export const deriveAccountPrivateKey = async ({
   rootPrivateKey,
   accountIndex,
@@ -52,21 +57,25 @@ export const deriveAccountPrivateKey = async ({
 // TODO: test
 /**
  * Constructs the hardened derivation path for the specified
- * account key of an HD wallet as specified in CIP 1852
+ * account key of an HD wallet as specified in CIP 1852 or CIP 1854
  * https://cips.cardano.org/cips/cip1852/
+ * https://cips.cardano.org/cips/cip1854
  */
 export const accountKeyDerivationPathToBip32Path = (
   accountIndex: number,
-  { index, role }: AccountKeyDerivationPath
-): BIP32Path => [harden(CardanoKeyConst.PURPOSE), harden(CardanoKeyConst.COIN_TYPE), harden(accountIndex), role, index];
+  { index, role, purpose = KeyPurpose.STANDARD }: AccountKeyDerivationPath
+): BIP32Path => [harden(purpose), harden(CardanoKeyConst.COIN_TYPE), harden(accountIndex), role, index];
 
 /**
  * Constructs the hardened derivation path of the payment key for the
  * given grouped address of an HD wallet as specified in CIP 1852
  * https://cips.cardano.org/cips/cip1852/
  */
-export const paymentKeyPathFromGroupedAddress = (address: GroupedAddress): BIP32Path => [
-  harden(CardanoKeyConst.PURPOSE),
+export const paymentKeyPathFromGroupedAddress = ({
+  address,
+  purpose = KeyPurpose.STANDARD
+}: GroupAddressKeyPath): BIP32Path => [
+  harden(purpose),
   harden(CardanoKeyConst.COIN_TYPE),
   harden(address.accountIndex),
   address.type,
@@ -78,10 +87,13 @@ export const paymentKeyPathFromGroupedAddress = (address: GroupedAddress): BIP32
  * given grouped address of an HD wallet as specified in CIP 11
  * https://cips.cardano.org/cips/cip11/
  */
-export const stakeKeyPathFromGroupedAddress = (address: GroupedAddress | undefined): BIP32Path | null => {
+export const stakeKeyPathFromGroupedAddress = ({
+  address,
+  purpose = KeyPurpose.STANDARD
+}: Partial<GroupAddressKeyPath>): BIP32Path | null => {
   if (!address?.stakeKeyDerivationPath) return null;
   return [
-    harden(CardanoKeyConst.PURPOSE),
+    harden(purpose),
     harden(CardanoKeyConst.COIN_TYPE),
     harden(address.accountIndex),
     address.stakeKeyDerivationPath.role,

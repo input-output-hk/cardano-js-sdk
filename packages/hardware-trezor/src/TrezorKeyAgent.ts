@@ -8,6 +8,7 @@ import {
   KeyAgentBase,
   KeyAgentDependencies,
   KeyAgentType,
+  KeyPurpose,
   SerializableTrezorKeyAgentData,
   SignBlobResult,
   SignTransactionContext,
@@ -37,6 +38,7 @@ export interface TrezorKeyAgentProps extends Omit<SerializableTrezorKeyAgentData
 export interface GetTrezorXpubProps {
   accountIndex: number;
   communicationType: CommunicationType;
+  purpose?: KeyPurpose;
 }
 
 export interface CreateTrezorKeyAgentProps {
@@ -135,10 +137,14 @@ export class TrezorKeyAgent extends KeyAgentBase {
     }
   }
 
-  static async getXpub({ accountIndex, communicationType }: GetTrezorXpubProps): Promise<Crypto.Bip32PublicKeyHex> {
+  static async getXpub({
+    accountIndex,
+    communicationType,
+    purpose = KeyPurpose.STANDARD
+  }: GetTrezorXpubProps): Promise<Crypto.Bip32PublicKeyHex> {
     try {
       await TrezorKeyAgent.checkDeviceConnection(communicationType);
-      const derivationPath = `m/${CardanoKeyConst.PURPOSE}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'`;
+      const derivationPath = `m/${purpose}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'`;
       const trezorConnect = getTrezorConnect(communicationType);
       const extendedPublicKey = await trezorConnect.cardanoGetPublicKey({
         path: derivationPath,
