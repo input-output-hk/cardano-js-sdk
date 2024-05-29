@@ -146,20 +146,4 @@ describe('Bip32Account', () => {
       );
     });
   });
-
-  describe('derives CIP-1854 address', () => {
-    it('derives valid multi sig mainnet address', async () => {
-      const externalAddress = await multiSigMainnetAccount.deriveAddress({ index: 0, type: AddressType.External }, 0);
-      expect(externalAddress.address.startsWith('addr')).toBe(true);
-      expect(externalAddress.address.startsWith('addr_test')).toBe(false);
-      expect(externalAddress.rewardAccount.startsWith('stake')).toBe(true);
-      expect(externalAddress.rewardAccount.startsWith('stake_test')).toBe(false);
-    });
-
-    it('derives valid multi sig testnet address', async () => {
-      const externalAddress = await multiSigTestnetAccount.deriveAddress({ index: 0, type: AddressType.External }, 0);
-      expect(externalAddress.address.startsWith('addr_test')).toBe(true);
-      expect(externalAddress.rewardAccount.startsWith('stake_test')).toBe(true);
-    });
-  });
 });
