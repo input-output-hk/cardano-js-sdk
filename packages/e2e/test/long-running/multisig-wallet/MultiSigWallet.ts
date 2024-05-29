@@ -4,6 +4,7 @@ import {
   AddressType,
   GroupedAddress,
   InMemoryKeyAgent,
+  KeyPurpose,
   KeyRole
 } from '@cardano-sdk/key-management';
 import {
@@ -33,6 +34,7 @@ const DUMMY_HEX_BYTES =
 
 const DERIVATION_PATH: AccountKeyDerivationPath = {
   index: 0,
+  purpose: KeyPurpose.MULTI_SIG,
   role: KeyRole.External
 };
 

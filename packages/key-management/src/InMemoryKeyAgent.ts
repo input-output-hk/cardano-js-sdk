@@ -57,11 +57,15 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     this.#getPassphrase = getPassphrase;
   }
 
-  async signBlob({ index, role: type }: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult> {
+  async signBlob(
+    { index, role: type, purpose = KeyPurpose.STANDARD }: AccountKeyDerivationPath,
+    blob: HexBlob
+  ): Promise<SignBlobResult> {
     const rootPrivateKey = await this.#decryptRootPrivateKey();
     const accountKey = await deriveAccountPrivateKey({
       accountIndex: this.accountIndex,
       bip32Ed25519: this.bip32Ed25519,
+      purpose,
       rootPrivateKey
     });
 
@@ -135,15 +139,18 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
       await Crypto.Ed25519PublicKey.fromHex(await this.derivePublicKey(DREP_KEY_DERIVATION_PATH)).hash()
     ).hex();
     const derivationPaths = ownSignatureKeyPaths(body, knownAddresses, txInKeyPathMap, dRepKeyHash);
-    const keyPaths = uniqBy([...derivationPaths, ...additionalKeyPaths], ({ role, index }) => `${role}.${index}`);
+    const keyPaths = uniqBy(
+      [...derivationPaths, ...additionalKeyPaths],
+      ({ role, index, purpose }) => `${purpose}.${role}.${index}`
+    );
     // TODO:
     // if (keyPaths.length === 0) {
     //   throw new ProofGenerationError();
     // }
     return new Map<Crypto.Ed25519PublicKeyHex, Crypto.Ed25519SignatureHex>(
       await Promise.all(
-        keyPaths.map(async ({ role, index }) => {
-          const { publicKey, signature } = await this.signBlob({ index, role }, blob);
+        keyPaths.map(async ({ role, index, purpose }) => {
+          const { publicKey, signature } = await this.signBlob({ index, purpose, role }, blob);
           return [publicKey, signature] as const;
         })
       )
