@@ -258,7 +258,7 @@ describe('storeNftMetadata', () => {
       );
       expect(omit(storedNftMetadata, ['userTokenAsset', 'userTokenAssetId', 'id'])).toEqual({
         description: someNftMetadata.description || null,
-        files: someNftMetadata.files || null,
+        files: someNftMetadata.files,
         image: someNftMetadata.image,
         mediaType: someNftMetadata.mediaType || null,
         name: someNftMetadata.name,
@@ -334,6 +334,18 @@ describe('storeNftMetadata', () => {
         // throws 'invalid byte sequence for encoding "UTF8": 0x00'
         // when asset name is not sanitized
       ).resolves.not.toThrow();
+    });
+
+    it('does not throw when some field in otherProperties has null characters', async () => {
+      const events = chainSyncData(ChainSyncDataSet.ExtraDataNullCharactersProblem);
+      const assetId = Cardano.AssetId('65bcf672806de8a2335576339e801d41f3275c0c07dd6aadf2ea41d9000000000042414444');
+
+      // throws 'unsupported Unicode escape sequence'
+      // when otherProperties is not sanitized
+      await lastValueFrom(project$(filterAssets(events, [assetId])));
+
+      const metadata = await nftMetadataRepo.findOneBy({ userTokenAssetId: assetId });
+      expect(metadata!.otherProperties!.size).toBeGreaterThan(0);
     });
   });
 
@@ -456,7 +468,7 @@ describe('storeNftMetadata', () => {
     expect(events.length).toBeGreaterThan(1);
     expect(await nftMetadataRepo.count()).toBeGreaterThan(0);
     const nftAssets = await nftMetadataRepo.find({ select: ['files'] });
-    const file = nftAssets.find((asset) => asset?.files!.length > 0)!.files![0];
+    const file = nftAssets.find((asset) => asset.files && asset.files.length > 0)!.files![0];
     expect(typeof file.mediaType).toBe('string');
     expect(typeof file.src).toBe('string');
     expect(['object', 'undefined'].includes(typeof file.otherProperties)).toBe(true);

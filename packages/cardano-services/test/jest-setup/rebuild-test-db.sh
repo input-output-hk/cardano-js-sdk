@@ -19,7 +19,6 @@ yarn test:build:verify
 
 yarn workspace @cardano-sdk/e2e local-network:down
 yarn workspace @cardano-sdk/e2e local-network:up -d --build
-yarn workspace @cardano-sdk/e2e wait-for-network
 
 yarn workspace @cardano-sdk/e2e test:wallet
 yarn workspace @cardano-sdk/e2e test:long-running simple-delegation-rewards.test.ts

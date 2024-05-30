@@ -1,4 +1,4 @@
-import { Cardano, Handle, HandleProvider } from '@cardano-sdk/core';
+import { Cardano, Handle, HandleProvider, Serialization } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { Logger } from 'ts-log';
 
@@ -125,8 +125,21 @@ export class TxOutputBuilder implements OutputBuilder {
     return this;
   }
 
-  datum(datumHash: Hash32ByteBase16): TxOutputBuilder {
-    this.#partialOutput = { ...this.#partialOutput, datumHash };
+  datum(datum: Hash32ByteBase16 | Cardano.PlutusData): TxOutputBuilder {
+    if (Serialization.isDatumHash(datum)) {
+      this.#partialOutput = { ...this.#partialOutput, datumHash: datum };
+    } else {
+      this.#partialOutput = { ...this.#partialOutput, datum };
+    }
+
+    return this;
+  }
+
+  scriptReference(script: Cardano.Script) {
+    if (!Cardano.isPlutusScript(script)) throw new Error('Only plutus scripts can be added as reference scripts.');
+
+    this.#partialOutput = { ...this.#partialOutput, scriptReference: script };
+
     return this;
   }
 
@@ -136,6 +149,7 @@ export class TxOutputBuilder implements OutputBuilder {
     }
 
     this.#partialOutput = { ...this.#partialOutput, handle };
+
     return this;
   }
 

@@ -21,6 +21,7 @@ export interface RequiredImplicitValue {
 }
 
 export interface RoundRobinRandomImproveArgs {
+  requiredUtxo: Cardano.Utxo[];
   utxo: Cardano.Utxo[];
   outputs: Cardano.TxOut[];
   changeAddress: Cardano.PaymentAddress;
@@ -46,6 +47,7 @@ export const mintToImplicitTokens = (mintMap: Cardano.TokenMap = new Map()) => {
 };
 
 export const preProcessArgs = (
+  preSelectedUtxo: Set<Cardano.Utxo>,
   availableUtxo: Set<Cardano.Utxo>,
   outputSet: Set<Cardano.TxOut>,
   changeAddress: Cardano.PaymentAddress,
@@ -70,6 +72,7 @@ export const preProcessArgs = (
     changeAddress,
     implicitValue: { implicitCoin, implicitTokens },
     outputs,
+    requiredUtxo: [...preSelectedUtxo],
     uniqueTxAssetIDs,
     utxo: [...availableUtxo]
   };
@@ -116,14 +119,15 @@ export const assertIsCoinBalanceSufficient = (
  */
 export const assertIsBalanceSufficient = (
   uniqueTxAssetIDs: Cardano.AssetId[],
+  preSelectedUtxo: Cardano.Utxo[],
   utxo: Cardano.Utxo[],
   outputs: Cardano.TxOut[],
   { implicitCoin, implicitTokens }: RequiredImplicitValue
 ): void => {
-  if (utxo.length === 0) {
+  if (preSelectedUtxo.length + utxo.length === 0) {
     throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
   }
-  const utxoValues = toValues(utxo);
+  const utxoValues = [...toValues(utxo), ...toValues(preSelectedUtxo)];
   const outputsValues = toValues(outputs);
   for (const assetId of uniqueTxAssetIDs) {
     const getAssetQuantity = assetQuantitySelector(assetId);

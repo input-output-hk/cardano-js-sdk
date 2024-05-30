@@ -11,7 +11,7 @@ const DATUM_ARRAY_SIZE = 2;
  *
  * @param datum The datum to be checked for.
  */
-const isDatumHash = (datum: unknown): datum is Cardano.DatumHash => datum !== null && typeof datum === 'string';
+export const isDatumHash = (datum: unknown): datum is Cardano.DatumHash => datum !== null && typeof datum === 'string';
 
 /** Represents different ways of associating a Datum with a UTxO in a transaction. */
 export enum DatumKind {

@@ -1,10 +1,11 @@
 import { Cardano, Serialization } from '@cardano-sdk/core';
+import { GreedyTxEvaluator } from './GreedyTxEvaluator';
 import { InitializeTxProps, InitializeTxResult } from '../types';
 import { KeyPurpose, util } from '@cardano-sdk/key-management';
 import { StaticChangeAddressResolver, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
+import { RedeemersByType, defaultSelectionConstraints } from '../input-selection';
 import { TxBuilderDependencies } from './types';
 import { createPreInputSelectionTxBody, includeChangeAndInputs } from '../createTransactionInternals';
-import { defaultSelectionConstraints } from '../input-selection';
 import { ensureValidityInterval } from '../ensureValidityInterval';
 
 export const initializeTx = async (
@@ -27,6 +28,8 @@ export const initializeTx = async (
     txBuilderProviders.addresses.get()
   ]);
 
+  const txEvaluator = props.txEvaluator ?? new GreedyTxEvaluator(() => txBuilderProviders.protocolParameters());
+
   inputSelector =
     inputSelector ??
     roundRobinRandomImprove({
@@ -37,9 +40,11 @@ export const initializeTx = async (
   const { txBody, auxiliaryData } = createPreInputSelectionTxBody({
     auxiliaryData: props.auxiliaryData,
     certificates: props.certificates,
+    collateralReturn: props.collateralReturn,
     collaterals: props.collaterals,
     mint: props.mint,
     outputs: [...(props.outputs || [])],
+    referenceInputs: props.referenceInputs,
     requiredExtraSignatures: props.requiredExtraSignatures,
     scriptIntegrityHash: props.scriptIntegrityHash,
     validityInterval: ensureValidityInterval(tip.slot, genesisParameters, props.options?.validityInterval),
@@ -61,7 +66,9 @@ export const initializeTx = async (
       }
       const unwitnessedTx = includeChangeAndInputs({
         bodyPreInputSelection,
-        inputSelection
+        inputSelection,
+        scriptVersions: props.scriptVersions,
+        witness: props.witness as Cardano.Witness
       });
 
       const dRepPublicKey = addressManager
@@ -91,7 +98,9 @@ export const initializeTx = async (
 
       return tx;
     },
-    protocolParameters
+    protocolParameters,
+    redeemersByType: props.redeemersByType ?? ({} as RedeemersByType),
+    txEvaluator
   });
 
   const implicitCoin = Cardano.util.computeImplicitCoin(protocolParameters, {
@@ -100,16 +109,22 @@ export const initializeTx = async (
     withdrawals: bodyPreInputSelection.withdrawals
   });
 
-  const { selection: inputSelection } = await inputSelector.select({
+  const { selection: inputSelection, redeemers } = await inputSelector.select({
     constraints,
     implicitValue: { coin: implicitCoin, mint: bodyPreInputSelection.mint },
     outputs: new Set(bodyPreInputSelection.outputs),
+    preSelectedUtxo: props.inputs || new Set(),
     utxo: new Set(utxo)
   });
 
+  const witness = { ...props.witness, redeemers } as Cardano.Witness;
+
   const { body, hash } = includeChangeAndInputs({
     bodyPreInputSelection,
-    inputSelection
+    inputSelection,
+    scriptVersions: props.scriptVersions,
+    witness
   });
-  return { body, hash, inputSelection };
+
+  return { body, hash, inputSelection, redeemers };
 };

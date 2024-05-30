@@ -1,4 +1,5 @@
 import * as Cardano from '../../Cardano';
+import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborReaderState, CborTag, CborWriter } from '../CBOR';
 import { ConstrPlutusData } from './ConstrPlutusData';
 import { HexBlob } from '@cardano-sdk/util';
@@ -11,6 +12,7 @@ import { bytesToHex } from '../../util/misc';
 const MAX_WORD64 = 18_446_744_073_709_551_615n;
 const INDEFINITE_BYTE_STRING = new Uint8Array([95]);
 const MAX_BYTE_STRING_CHUNK_SIZE = 64;
+const HASH_LENGTH_IN_BYTES = 32;
 
 /**
  * A type corresponding to the Plutus Core Data datatype.
@@ -210,6 +212,17 @@ export class PlutusData {
       default:
         throw new NotImplementedError(`PlutusData mapping for kind ${this.#kind}`); // Probably can't happen
     }
+  }
+
+  /**
+   * Computes the plutus data hash.
+   *
+   * @returns the plutus data hash.
+   */
+  hash(): Crypto.Hash32ByteBase16 {
+    const hash = Crypto.blake2b(HASH_LENGTH_IN_BYTES).update(Buffer.from(this.toCbor(), 'hex')).digest();
+
+    return Crypto.Hash32ByteBase16(HexBlob.fromBytes(hash));
   }
 
   /**

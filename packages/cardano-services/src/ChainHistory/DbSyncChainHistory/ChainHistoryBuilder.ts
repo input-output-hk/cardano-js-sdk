@@ -8,12 +8,14 @@ import {
   PoolRegisterCertModel,
   PoolRetireCertModel,
   RedeemerModel,
+  ScriptModel,
   StakeCertModel,
   TransactionDataMap,
   TxIdModel,
   TxInput,
   TxInputModel,
   TxOutMultiAssetModel,
+  TxOutScriptMap,
   TxOutTokenMap,
   TxOutput,
   TxOutputModel,
@@ -28,6 +30,7 @@ import { Pool, QueryResult } from 'pg';
 import { Range, hexStringToBuffer } from '@cardano-sdk/util';
 import {
   mapCertificate,
+  mapPlutusScript,
   mapRedeemer,
   mapTxId,
   mapTxInModel,
@@ -68,6 +71,28 @@ export class ChainHistoryBuilder {
     return mapTxOutTokenMap(result.rows);
   }
 
+  public async queryReferenceScriptsByTxOut(txOutModel: TxOutputModel[]): Promise<TxOutScriptMap> {
+    const txScriptMap: TxOutScriptMap = new Map();
+
+    for (const model of txOutModel) {
+      if (model.reference_script_id) {
+        const result: QueryResult<ScriptModel> = await this.#db.query({
+          name: 'tx_reference_scripts_by_tx_out_ids',
+          text: Queries.findReferenceScriptsById,
+          values: [[model.reference_script_id]]
+        });
+
+        if (result.rows.length === 0) continue;
+        if (result.rows[0].type === 'timelock') continue; // Shouldn't happen.
+
+        // There can only be one refScript per output.
+        txScriptMap.set(model.id, mapPlutusScript(result.rows[0]));
+      }
+    }
+
+    return txScriptMap;
+  }
+
   public async queryTransactionOutputsByIds(ids: string[], collateral = false): Promise<TxOutput[]> {
     this.#logger.debug(`About to find outputs (collateral: ${collateral}) for transactions with ids:`, ids);
     const result: QueryResult<TxOutputModel> = await this.#db.query({
@@ -79,7 +104,14 @@ export class ChainHistoryBuilder {
 
     const txOutIds = result.rows.flatMap((txOut) => BigInt(txOut.id));
     const multiAssets = await this.queryMultiAssetsByTxOut(txOutIds);
-    return result.rows.map((txOut) => mapTxOutModel(txOut, multiAssets.get(txOut.id)));
+    const referenceScripts = await this.queryReferenceScriptsByTxOut(result.rows);
+
+    return result.rows.map((txOut) =>
+      mapTxOutModel(txOut, {
+        assets: multiAssets.get(txOut.id),
+        script: referenceScripts.get(txOut.id)
+      })
+    );
   }
 
   public async queryTxMintByIds(ids: string[]): Promise<TxTokenMap> {

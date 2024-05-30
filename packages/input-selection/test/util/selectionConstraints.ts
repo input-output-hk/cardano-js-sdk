@@ -17,7 +17,7 @@ export const MOCK_NO_CONSTRAINTS: MockSelectionConstraints = {
 
 export const mockConstraintsToConstraints = (constraints: MockSelectionConstraints): SelectionConstraints => ({
   computeMinimumCoinQuantity: () => constraints.minimumCoinQuantity,
-  computeMinimumCost: async ({ inputs }) => constraints.minimumCostCoefficient * BigInt(inputs.size),
+  computeMinimumCost: async ({ inputs }) => ({ fee: constraints.minimumCostCoefficient * BigInt(inputs.size) }),
   computeSelectionLimit: async () => constraints.selectionLimit,
   tokenBundleSizeExceedsLimit: (assets?: Cardano.TokenMap) => (assets?.size || 0) > constraints.maxTokenBundleSize
 });

@@ -73,6 +73,7 @@ const listTokensWithin = (
  * Considers all outputs collectively, as a combined output bundle.
  */
 export const roundRobinSelection = ({
+  requiredUtxo: requiredUtxoWithValue,
   utxo: utxosWithValue,
   outputs: outputsWithValue,
   uniqueTxAssetIDs,
@@ -80,7 +81,7 @@ export const roundRobinSelection = ({
   implicitValue
 }: RoundRobinRandomImproveArgs): UtxoSelection => {
   // The subset of the UTxO that has already been selected:
-  const utxoSelected: Cardano.Utxo[] = [];
+  const utxoSelected: Cardano.Utxo[] = requiredUtxoWithValue;
   // The subset of the UTxO that remains available for selection:
   const utxoRemaining = [...utxosWithValue];
   // The set of tokens that we still need to cover:
