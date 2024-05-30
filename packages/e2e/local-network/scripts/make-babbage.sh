@@ -154,7 +154,7 @@ cardano-cli genesis create-staked --genesis-dir "${ROOT}" \
   --testnet-magic "${NETWORK_MAGIC}" \
   --gen-pools ${NUM_SP_NODES} \
   --supply ${MAX_SUPPLY} \
-  --supply-delegated ${MAX_SUPPLY} \
+  --supply-delegated $((MAX_SUPPLY * 2)) \
   --gen-stake-delegs ${NUM_SP_NODES} \
   --gen-utxo-keys ${NUM_SP_NODES}
 
@@ -178,10 +178,11 @@ jq --raw-output ".protocolConsts.protocolMagic = ${NETWORK_MAGIC}" "${ROOT}/gene
 
 rm "${ROOT}/genesis/byron/genesis-wrong.json"
 
-jq -M '
+jq -M "
 . + {
   activeSlotsCoeff: 0.1,
   epochLength: 1000,
+  maxLovelaceSupply: $((MAX_SUPPLY * 3)),
   securityParam: 10,
   slotLength: 0.2,
   updateQuorum: 2
@@ -196,14 +197,9 @@ jq -M '
   protocolVersion: { major : 7, minor: 0 },
   rho: 0.1,
   tau: 0.1
-}' "${ROOT}/genesis/shelley/copy-genesis.json" > "${ROOT}/genesis/shelley/genesis.json"
+}" "${ROOT}/genesis/shelley/copy-genesis.json" > "${ROOT}/genesis/shelley/genesis.json"
 
 rm "${ROOT}/genesis/shelley/copy-genesis.json"
-
-# Previous version was trying to set this to ${MAX_SUPPLY}, but it wasn't able to due to a wrong regular expression.
-# Setting it to ${MAX_SUPPLY} somehow breaks the local-network with some negative stake amount (issue not investigated).
-# jq changes this value in 9E+16 which is the same value, but the exponential representation somehow breaks the local-network (issue not investigated).
-sed_i -e "s/\"maxLovelaceSupply\": [^,]*/\"maxLovelaceSupply\": 90000000000000000/" "${ROOT}/genesis/shelley/genesis.json"
 
 for NODE_ID in ${SP_NODES_ID}; do
   TARGET="${ROOT}/node-sp${NODE_ID}"
