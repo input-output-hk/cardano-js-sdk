@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Ed25519PublicKey, Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 
-import { GroupedAddress, util } from '../../src';
+import { GroupedAddress, KeyPurpose, util } from '../../src';
 
 jest.mock('../../src/util/ownSignatureKeyPaths');
 const { ownSignatureKeyPaths } = jest.requireMock('../../src/util/ownSignatureKeyPaths');
@@ -17,7 +17,7 @@ describe('KeyManagement.util.stubSignTransaction', () => {
     expect(
       (
         await util.stubSignTransaction({
-          context: { dRepPublicKey, knownAddresses, txInKeyPathMap },
+          context: { dRepPublicKey, knownAddresses, purpose: KeyPurpose.STANDARD, txInKeyPathMap },
           txBody
         })
       ).size
@@ -25,7 +25,7 @@ describe('KeyManagement.util.stubSignTransaction', () => {
     expect(
       (
         await util.stubSignTransaction({
-          context: { dRepPublicKey, knownAddresses, txInKeyPathMap },
+          context: { dRepPublicKey, knownAddresses, purpose: KeyPurpose.STANDARD, txInKeyPathMap },
           txBody
         })
       ).size

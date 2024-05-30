@@ -3,6 +3,7 @@ import {
   AddressType,
   Bip32Account,
   CommunicationType,
+  KeyPurpose,
   SerializableTrezorKeyAgentData,
   util
 } from '@cardano-sdk/key-management';
@@ -36,6 +37,7 @@ describe('TrezorKeyAgent', () => {
     trezorKeyAgent = await TrezorKeyAgent.createWithDevice(
       {
         chainId: Cardano.ChainIds.Preprod,
+        purpose: KeyPurpose.STANDARD,
         trezorConfig
       },
       { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), logger }
@@ -51,7 +53,7 @@ describe('TrezorKeyAgent', () => {
     const chainHistoryProvider = mocks.mockChainHistoryProvider({ rewardAccount });
     const asyncKeyAgent = util.createAsyncKeyAgent(trezorKeyAgent);
     wallet = createPersonalWallet(
-      { name: 'HW Wallet' },
+      { name: 'HW Wallet', purpose: KeyPurpose.STANDARD },
       {
         assetProvider,
         bip32Account: await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent),
@@ -300,7 +302,7 @@ describe('TrezorKeyAgent', () => {
             body: txInternals.body,
             hash: 'non-matching' as unknown as Cardano.TransactionId
           },
-          { knownAddresses: await firstValueFrom(wallet.addresses$), txInKeyPathMap: {} }
+          { knownAddresses: await firstValueFrom(wallet.addresses$), purpose: KeyPurpose.STANDARD, txInKeyPathMap: {} }
         )
       ).rejects.toThrow();
     });
@@ -441,6 +443,7 @@ describe('TrezorKeyAgent', () => {
       {
         accountIndex: 5,
         chainId: Cardano.ChainIds.Preprod,
+        purpose: KeyPurpose.STANDARD,
         trezorConfig
       },
       mockKeyAgentDependencies()

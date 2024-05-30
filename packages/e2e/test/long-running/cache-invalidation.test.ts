@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, KeyRole } from '@cardano-sdk/key-management';
+import { AddressType, KeyPurpose, KeyRole } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import {
   KeyAgentFactoryProps,
@@ -89,7 +89,8 @@ describe('cache invalidation', () => {
       idx: 0,
       logger,
       name: 'Pool Wallet 1',
-      polling: { interval: 500 }
+      polling: { interval: 500 },
+      purpose: KeyPurpose.STANDARD
     });
 
     await waitForWalletStateSettle(wallet1.wallet);

@@ -1,10 +1,10 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import {
-  AccountKeyDerivationPath,
   AddressType,
   CardanoKeyConst,
   GroupedAddress,
+  KeyPurpose,
   KeyRole,
   TxInId,
   TxInKeyPathMap,
@@ -22,23 +22,26 @@ import {
 } from '../testData';
 import { Cardano } from '@cardano-sdk/core';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { LedgerTxTransformerContext } from '../../src';
-import { getKnownAddress, mapCerts } from '../../src/transformers/certificates';
+import { LedgerTxTransformerContext, getKnownAddress, mapCerts } from '../../src';
 
 export const stakeKeyPath = {
   index: 0,
+  purpose: KeyPurpose.STANDARD,
   role: KeyRole.Stake
 };
-const createGroupedAddress = (
-  address: Cardano.PaymentAddress,
-  rewardAccount: Cardano.RewardAccount,
-  type: AddressType,
-  index: number,
-  stakeKeyDerivationPath: AccountKeyDerivationPath
-): GroupedAddress =>
+
+const createGroupedAddress = ({
+  address,
+  rewardAccount,
+  stakeKeyDerivationPath,
+  index,
+  purpose,
+  type
+}: Omit<GroupedAddress, 'networkId' | 'accountIndex'>): GroupedAddress =>
   ({
     address,
     index,
+    purpose,
     rewardAccount,
     stakeKeyDerivationPath,
     type
@@ -64,6 +67,7 @@ export const createTxInKeyPathMapMock = (knownAddresses: GroupedAddress[]): TxIn
     const txInId: TxInId = `MockTxIn_${index}` as TxInId; // Mock TxInId creation
     result[txInId] = {
       index: address.index,
+      purpose: address.purpose,
       role: KeyRole.Internal
     };
   }
@@ -78,13 +82,42 @@ const mockContext: LedgerTxTransformerContext = {
   handleResolutions: [],
 
   knownAddresses: [
-    createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0, stakeKeyPath),
-    createGroupedAddress(address2, ownRewardAccount, AddressType.External, 1, stakeKeyPath)
+    createGroupedAddress({
+      address: address1,
+      index: 0,
+      purpose: KeyPurpose.STANDARD,
+      rewardAccount: ownRewardAccount,
+      stakeKeyDerivationPath: stakeKeyPath,
+      type: AddressType.External
+    }),
+    createGroupedAddress({
+      address: address2,
+      index: 1,
+      purpose: KeyPurpose.STANDARD,
+      rewardAccount: ownRewardAccount,
+      stakeKeyDerivationPath: stakeKeyPath,
+      type: AddressType.External
+    })
   ],
+  purpose: KeyPurpose.STANDARD,
   sender: undefined,
   txInKeyPathMap: createTxInKeyPathMapMock([
-    createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0, stakeKeyPath),
-    createGroupedAddress(address2, ownRewardAccount, AddressType.External, 1, stakeKeyPath)
+    createGroupedAddress({
+      address: address1,
+      index: 0,
+      purpose: KeyPurpose.STANDARD,
+      rewardAccount: ownRewardAccount,
+      stakeKeyDerivationPath: stakeKeyPath,
+      type: AddressType.External
+    }),
+    createGroupedAddress({
+      address: address2,
+      index: 1,
+      purpose: KeyPurpose.STANDARD,
+      rewardAccount: ownRewardAccount,
+      stakeKeyDerivationPath: stakeKeyPath,
+      type: AddressType.External
+    })
   ])
 };
 
@@ -140,7 +173,7 @@ describe('certificates', () => {
           params: {
             stakeCredential: {
               keyPath: [
-                util.harden(CardanoKeyConst.PURPOSE),
+                util.harden(KeyPurpose.STANDARD),
                 util.harden(CardanoKeyConst.COIN_TYPE),
                 util.harden(0),
                 KeyRole.Stake,

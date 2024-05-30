@@ -1,4 +1,4 @@
-import { AddressType, Bip32Account, util } from '../../src';
+import { AddressType, Bip32Account, KeyPurpose, util } from '../../src';
 import { Bip32PublicKeyHex } from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { Logger, dummyLogger } from 'ts-log';
@@ -14,7 +14,8 @@ describe('ensureStakeKeys', () => {
       chainId: Cardano.ChainIds.Preview,
       extendedAccountPublicKey: Bip32PublicKeyHex(
         'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
-      )
+      ),
+      purpose: KeyPurpose.STANDARD
     });
   });
 

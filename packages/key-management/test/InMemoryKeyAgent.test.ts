@@ -28,7 +28,8 @@ describe('InMemoryKeyAgent', () => {
       {
         chainId: Cardano.ChainIds.Preview,
         getPassphrase,
-        mnemonicWords
+        mnemonicWords,
+        purpose: KeyPurpose.STANDARD
       },
       { bip32Ed25519, logger: dummyLogger }
     );
@@ -54,7 +55,8 @@ describe('InMemoryKeyAgent', () => {
         chainId: Cardano.ChainIds.Preview,
         getPassphrase,
         mnemonic2ndFactorPassphrase: 'passphrase',
-        mnemonicWords
+        mnemonicWords,
+        purpose: KeyPurpose.STANDARD
       },
       { bip32Ed25519, logger: dummyLogger }
     );
@@ -108,6 +110,7 @@ describe('InMemoryKeyAgent', () => {
       },
       {
         knownAddresses,
+        purpose: KeyPurpose.STANDARD,
         txInKeyPathMap
       }
     );
@@ -173,7 +176,8 @@ describe('InMemoryKeyAgent', () => {
               rootPrivateKey: Crypto.Bip32PrivateKeyHex(yoroiRootPrivateKeyHex)
             })
           ),
-          getPassphrase
+          getPassphrase,
+          purpose: KeyPurpose.STANDARD
         },
         { bip32Ed25519, logger: dummyLogger }
       );
@@ -186,7 +190,8 @@ describe('InMemoryKeyAgent', () => {
         {
           chainId: Cardano.ChainIds.Preview,
           getPassphrase,
-          mnemonicWords: yoroiMnemonic
+          mnemonicWords: yoroiMnemonic,
+          purpose: KeyPurpose.STANDARD
         },
         { bip32Ed25519, logger: dummyLogger }
       );
@@ -204,7 +209,8 @@ describe('InMemoryKeyAgent', () => {
         {
           chainId: Cardano.ChainIds.Preview,
           getPassphrase,
-          mnemonicWords: michaelMnemonic
+          mnemonicWords: michaelMnemonic,
+          purpose: KeyPurpose.STANDARD
         },
         { bip32Ed25519, logger: dummyLogger }
       );
@@ -215,7 +221,7 @@ describe('InMemoryKeyAgent', () => {
           body: { fee: 10n, inputs: [], outputs: [], validityInterval: {} },
           hash: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000')
         },
-        { knownAddresses: [], txInKeyPathMap: {} }
+        { knownAddresses: [], purpose: KeyPurpose.STANDARD, txInKeyPathMap: {} }
       );
       expect(
         signature.has(Crypto.Ed25519PublicKeyHex('0b1c96fad4179d7910bd9485ac28c4c11368c83d18d01b29d4cf84d8ff6a06c4'))
@@ -272,7 +278,8 @@ describe('InMemoryKeyAgent', () => {
             })
           ),
           // daedelus enforces min length of 10
-          getPassphrase: jest.fn().mockResolvedValue(Buffer.from('nMmys*X002'))
+          getPassphrase: jest.fn().mockResolvedValue(Buffer.from('nMmys*X002')),
+          purpose: KeyPurpose.STANDARD
         },
         { bip32Ed25519, logger: dummyLogger }
       );
@@ -291,7 +298,8 @@ describe('InMemoryKeyAgent', () => {
         {
           chainId: Cardano.ChainIds.Preview,
           getPassphrase,
-          mnemonicWords: daedelusMnemonic24
+          mnemonicWords: daedelusMnemonic24,
+          purpose: KeyPurpose.STANDARD
         },
         { bip32Ed25519, logger: dummyLogger }
       );

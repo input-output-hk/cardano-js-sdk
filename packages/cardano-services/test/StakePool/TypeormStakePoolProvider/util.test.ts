@@ -4,7 +4,7 @@ import { validateFuzzyOptions, withTextFilter } from '../../../src/StakePool/Typ
 describe('TypeormStakePoolProvider utils', () => {
   describe('validateFuzzyOptions', () => {
     it('throws if value is not a valid JSON encoded string', () =>
-      expect(() => validateFuzzyOptions('test')).toThrow('Unexpected token e in JSON at position 1'));
+      expect(() => validateFuzzyOptions('test')).toThrow(/Unexpected token/));
     it('throws if value is not an object', () =>
       expect(() => validateFuzzyOptions('"test"')).toThrow('must be an object'));
     it('throws without threshold', () =>

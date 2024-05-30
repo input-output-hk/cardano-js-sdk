@@ -4,6 +4,7 @@ import {
   Bip32Account,
   GroupedAddress,
   util as KeyManagementUtil,
+  KeyPurpose,
   KeyRole
 } from '@cardano-sdk/key-management';
 import {
@@ -499,9 +500,11 @@ describe('WalletUtil', () => {
         address,
         index: 0,
         networkId: Cardano.NetworkId.Testnet,
+        purpose: KeyPurpose.MULTI_SIG,
         rewardAccount: mocks.rewardAccount,
         stakeKeyDerivationPath: {
           index: 0,
+          purpose: KeyPurpose.STANDARD,
           role: KeyRole.Stake
         },
         type: AddressType.External
@@ -510,7 +513,7 @@ describe('WalletUtil', () => {
       const bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
       bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
       wallet = createPersonalWallet(
-        { name: 'Test Wallet' },
+        { name: 'Test Wallet', purpose: KeyPurpose.STANDARD },
         {
           assetProvider,
           bip32Account,

@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, Bip32Account, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, InMemoryKeyAgent, KeyPurpose, util } from '@cardano-sdk/key-management';
 import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
 import {
   DatumResolver,
@@ -199,7 +199,8 @@ describe('TxBuilder/plutusScripts', () => {
       {
         chainId: Cardano.ChainIds.Preprod,
         getPassphrase: async () => Buffer.from('passphrase'),
-        mnemonicWords: util.generateMnemonicWords()
+        mnemonicWords: util.generateMnemonicWords(),
+        purpose: KeyPurpose.STANDARD
       },
       { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), logger: dummyLogger }
     );

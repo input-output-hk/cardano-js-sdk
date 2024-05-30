@@ -1,5 +1,5 @@
 import * as Trezor from '@trezor/connect';
-import { CardanoKeyConst, TxInId, util } from '@cardano-sdk/key-management';
+import { CardanoKeyConst, KeyPurpose, TxInId, util } from '@cardano-sdk/key-management';
 import {
   babbageTxBodyWithScripts,
   contextWithKnownAddresses,
@@ -56,7 +56,7 @@ describe('tx', () => {
         },
         certificates: [
           {
-            path: [util.harden(CardanoKeyConst.PURPOSE), util.harden(CardanoKeyConst.COIN_TYPE), util.harden(0), 2, 0],
+            path: [util.harden(KeyPurpose.STANDARD), util.harden(CardanoKeyConst.COIN_TYPE), util.harden(0), 2, 0],
             pool: '153806dbcd134ddee69a8c5204e38ac80448f62342f8c23cfe4b7edf',
             type: Trezor.PROTO.CardanoCertificateType.STAKE_DELEGATION
           }

@@ -1,4 +1,13 @@
 /* eslint-disable unicorn/consistent-destructuring */
+import {
+  Cardano,
+  OutsideOfValidityIntervalData,
+  Serialization,
+  TxCBOR,
+  TxSubmissionError,
+  TxSubmissionErrorCode,
+  coalesceValueQuantities
+} from '@cardano-sdk/core';
 /* eslint-disable unicorn/consistent-function-scoping */
 /* eslint-disable @typescript-eslint/no-explicit-any, sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
@@ -14,19 +23,10 @@ import {
   WalletApi,
   WithSenderContext
 } from '@cardano-sdk/dapp-connector';
-import { AddressType, Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, GroupedAddress, KeyPurpose, util } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BaseWallet, cip30, createPersonalWallet } from '../../src';
 import { CallbackConfirmation, GetCollateralCallbackParams } from '../../src/cip30';
-import {
-  Cardano,
-  OutsideOfValidityIntervalData,
-  Serialization,
-  TxCBOR,
-  TxSubmissionError,
-  TxSubmissionErrorCode,
-  coalesceValueQuantities
-} from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
@@ -739,6 +739,7 @@ describe('cip30', () => {
           address,
           index: 0,
           networkId: Cardano.NetworkId.Testnet,
+          purpose: KeyPurpose.STANDARD,
           rewardAccount: mocks.rewardAccount,
           stakeKeyDerivationPath,
           type: AddressType.External
@@ -747,7 +748,7 @@ describe('cip30', () => {
         const bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
         bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
         mockWallet = createPersonalWallet(
-          { name: 'Test Wallet' },
+          { name: 'Test Wallet', purpose: KeyPurpose.STANDARD },
           {
             assetProvider,
             bip32Account,

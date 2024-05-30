@@ -154,7 +154,11 @@ export const knownAddress: GroupedAddress = {
   type: AddressType.Internal
 };
 
-export const knownAddressPaymentKeyPath = { index: knownAddress.index, role: Number(knownAddress.type) };
+export const knownAddressPaymentKeyPath = {
+  index: knownAddress.index,
+  purpose: knownAddress.purpose,
+  role: Number(knownAddress.type)
+};
 
 export const knownAddressWithoutStakingPath: GroupedAddress = {
   accountIndex: 0,

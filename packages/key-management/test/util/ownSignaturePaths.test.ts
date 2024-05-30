@@ -1,10 +1,11 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AccountKeyDerivationPath, AddressType, GroupedAddress, KeyRole, TxInId, util } from '../../src';
+import { AddressType, GroupedAddress, KeyPurpose, KeyRole, TxInId, util } from '../../src';
 import { Cardano } from '@cardano-sdk/core';
 
 export const stakeKeyPath = {
   index: 0,
+  purpose: KeyPurpose.STANDARD,
   role: KeyRole.Stake
 };
 
@@ -15,17 +16,18 @@ const toStakeCredential = (stakeKeyHash: Crypto.Ed25519KeyHashHex): Cardano.Cred
   type: Cardano.CredentialType.KeyHash
 });
 
-const createGroupedAddress = (
-  address: Cardano.PaymentAddress,
-  rewardAccount: Cardano.RewardAccount,
-  type: AddressType,
-  index: number,
-  stakeKeyDerivationPath: AccountKeyDerivationPath
-  // eslint-disable-next-line max-params
-): GroupedAddress =>
+const createGroupedAddress = ({
+  address,
+  index,
+  rewardAccount,
+  stakeKeyDerivationPath,
+  type,
+  purpose
+}: Omit<GroupedAddress, 'networkId' | 'accountIndex'>): GroupedAddress =>
   ({
     address,
     index,
+    purpose,
     rewardAccount,
     stakeKeyDerivationPath,
     type
@@ -57,7 +59,15 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
   let dRepKeyHash: Crypto.Ed25519KeyHashHex;
   const foreignDRepKeyHash = Crypto.Hash28ByteBase16('8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d');
 
-  const knownAddress1 = createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0, stakeKeyPath);
+  // address1, ownRewardAccount, AddressType.External, 0, stakeKeyPath
+  const knownAddress1 = createGroupedAddress({
+    address: address1,
+    index: 0,
+    purpose: KeyPurpose.STANDARD,
+    rewardAccount: ownRewardAccount,
+    stakeKeyDerivationPath: stakeKeyPath,
+    type: AddressType.External
+  });
 
   beforeEach(async () => {
     dRepPublicKey = Crypto.Ed25519PublicKeyHex('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01');
@@ -72,22 +82,43 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
     ];
     const txBody = { inputs } as Cardano.TxBody;
     const knownAddresses = [address1, address2].map((address, index) =>
-      createGroupedAddress(address, ownRewardAccount, AddressType.External, index, stakeKeyPath)
+      createGroupedAddress({
+        address,
+        index,
+        purpose: KeyPurpose.STANDARD,
+        rewardAccount: ownRewardAccount,
+        stakeKeyDerivationPath: stakeKeyPath,
+        type: AddressType.External
+      })
     );
 
     expect(
       util.ownSignatureKeyPaths(txBody, knownAddresses, {
-        [TxInId(inputs[0])]: { index: knownAddresses[0].index, role: Number(knownAddresses[0].type) },
-        [TxInId(inputs[1])]: { index: knownAddresses[1].index, role: Number(knownAddresses[1].type) },
-        [TxInId(inputs[2])]: { index: knownAddresses[0].index, role: Number(knownAddresses[0].type) }
+        [TxInId(inputs[0])]: {
+          index: knownAddresses[0].index,
+          purpose: Number(knownAddresses[0].purpose),
+          role: Number(knownAddresses[0].type)
+        },
+        [TxInId(inputs[1])]: {
+          index: knownAddresses[1].index,
+          purpose: Number(knownAddresses[0].purpose),
+          role: Number(knownAddresses[1].type)
+        },
+        [TxInId(inputs[2])]: {
+          index: knownAddresses[0].index,
+          purpose: Number(knownAddresses[0].purpose),
+          role: Number(knownAddresses[0].type)
+        }
       })
     ).toEqual([
       {
         index: 0,
+        purpose: KeyPurpose.STANDARD,
         role: KeyRole.External
       },
       {
         index: 1,
+        purpose: KeyPurpose.STANDARD,
         role: KeyRole.External
       }
     ]);
@@ -123,6 +154,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       expect(util.ownSignatureKeyPaths(txBody, [knownAddress1], {})).toEqual([
         {
           index: 0,
+          purpose: KeyPurpose.STANDARD,
           role: KeyRole.Stake
         }
       ]);
@@ -143,6 +175,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       expect(util.ownSignatureKeyPaths(txBody, [knownAddress1], {})).toEqual([
         {
           index: 0,
+          purpose: KeyPurpose.STANDARD,
           role: KeyRole.Stake
         }
       ]);
@@ -161,6 +194,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       expect(util.ownSignatureKeyPaths(txBody, [knownAddress1], {})).toEqual([
         {
           index: 0,
+          purpose: KeyPurpose.STANDARD,
           role: KeyRole.Stake
         }
       ]);
@@ -180,6 +214,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
     expect(util.ownSignatureKeyPaths(txBody, [knownAddress1], {})).toEqual([
       {
         index: 0,
+        purpose: KeyPurpose.STANDARD,
         role: KeyRole.Stake
       }
     ]);
@@ -203,6 +238,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       expect(util.ownSignatureKeyPaths(txBody, [knownAddress1], {})).toEqual([
         {
           index: 0,
+          purpose: KeyPurpose.STANDARD,
           role: KeyRole.Stake
         }
       ]);
@@ -243,6 +279,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       expect(util.ownSignatureKeyPaths(txBody, [knownAddress1], {})).toEqual([
         {
           index: 0,
+          purpose: KeyPurpose.STANDARD,
           role: KeyRole.Stake
         }
       ]);
@@ -264,6 +301,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
     expect(util.ownSignatureKeyPaths(txBody, [knownAddress1], {})).toEqual([
       {
         index: 0,
+        purpose: KeyPurpose.STANDARD,
         role: KeyRole.Stake
       }
     ]);
@@ -337,10 +375,20 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       inputs: [{}, {}, {}],
       withdrawals: [{ quantity: 1n, stakeAddress: ownRewardAccount }]
     } as Cardano.TxBody;
-    const knownAddresses = [createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0, stakeKeyPath)];
+    const knownAddresses = [
+      createGroupedAddress({
+        address: address1,
+        index: 0,
+        purpose: KeyPurpose.STANDARD,
+        rewardAccount: ownRewardAccount,
+        stakeKeyDerivationPath: stakeKeyPath,
+        type: AddressType.External
+      })
+    ];
     expect(util.ownSignatureKeyPaths(txBody, knownAddresses, {})).toEqual([
       {
         index: 0,
+        purpose: KeyPurpose.STANDARD,
         role: KeyRole.Stake
       }
     ]);
@@ -351,7 +399,16 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       inputs: [{}, {}, {}],
       withdrawals: [{ quantity: 1n, stakeAddress: otherRewardAccount }]
     } as Cardano.TxBody;
-    const knownAddresses = [createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0, stakeKeyPath)];
+    const knownAddresses = [
+      createGroupedAddress({
+        address: address1,
+        index: 0,
+        purpose: KeyPurpose.STANDARD,
+        rewardAccount: ownRewardAccount,
+        stakeKeyDerivationPath: stakeKeyPath,
+        type: AddressType.External
+      })
+    ];
     expect(util.ownSignatureKeyPaths(txBody, knownAddresses, {})).toEqual([]);
   });
 
@@ -366,12 +423,20 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       requiredExtraSignatures: [paymentHash]
     } as Cardano.TxBody;
     const knownAddresses = [
-      createGroupedAddress(paymentAddress, ownRewardAccount, AddressType.External, 100, stakeKeyPath)
+      createGroupedAddress({
+        address: paymentAddress,
+        index: 100,
+        purpose: KeyPurpose.STANDARD,
+        rewardAccount: ownRewardAccount,
+        stakeKeyDerivationPath: stakeKeyPath,
+        type: AddressType.External
+      })
     ];
 
     expect(util.ownSignatureKeyPaths(txBody, knownAddresses, {})).toEqual([
       {
         index: 100,
+        purpose: KeyPurpose.STANDARD,
         role: KeyRole.External
       }
     ]);
@@ -385,11 +450,21 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       inputs: [{}, {}, {}],
       requiredExtraSignatures: [stakeKeyHash]
     } as Cardano.TxBody;
-    const knownAddresses = [createGroupedAddress(address1, rewardAccount, AddressType.External, 0, stakeKeyPath)];
+    const knownAddresses = [
+      createGroupedAddress({
+        address: address1,
+        index: 0,
+        purpose: KeyPurpose.STANDARD,
+        rewardAccount,
+        stakeKeyDerivationPath: stakeKeyPath,
+        type: AddressType.External
+      })
+    ];
 
     expect(util.ownSignatureKeyPaths(txBody, knownAddresses, {})).toEqual([
       {
         index: 0,
+        purpose: KeyPurpose.STANDARD,
         role: KeyRole.Stake
       }
     ]);
@@ -409,7 +484,18 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
 
     // Using multiple stake keys with one payment key to have separate derivation paths per each certificate
     const knownAddresses = rewardAccounts.map(({ account }, index) =>
-      createGroupedAddress(address1, account, AddressType.External, 0, { index, role: KeyRole.Stake })
+      createGroupedAddress({
+        address: address1,
+        index,
+        purpose: KeyPurpose.STANDARD,
+        rewardAccount: account,
+        stakeKeyDerivationPath: {
+          index,
+          purpose: KeyPurpose.STANDARD,
+          role: KeyRole.Stake
+        },
+        type: AddressType.External
+      })
     );
 
     it('is returned for certificates with the wallet stake key hash', async () => {
@@ -444,12 +530,12 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       } as Cardano.TxBody;
 
       expect(util.ownSignatureKeyPaths(txBody, knownAddresses, {})).toEqual([
-        { index: 0, role: KeyRole.Stake },
-        { index: 1, role: KeyRole.Stake },
-        { index: 2, role: KeyRole.Stake },
-        { index: 3, role: KeyRole.Stake },
-        { index: 4, role: KeyRole.Stake },
-        { index: 5, role: KeyRole.Stake }
+        { index: 0, purpose: KeyPurpose.STANDARD, role: KeyRole.Stake },
+        { index: 1, purpose: KeyPurpose.STANDARD, role: KeyRole.Stake },
+        { index: 2, purpose: KeyPurpose.STANDARD, role: KeyRole.Stake },
+        { index: 3, purpose: KeyPurpose.STANDARD, role: KeyRole.Stake },
+        { index: 4, purpose: KeyPurpose.STANDARD, role: KeyRole.Stake },
+        { index: 5, purpose: KeyPurpose.STANDARD, role: KeyRole.Stake }
       ]);
     });
 
@@ -468,7 +554,9 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
         inputs: [{}, {}, {}]
       } as Cardano.TxBody;
 
-      expect(util.ownSignatureKeyPaths(txBody, knownAddresses, {})).toEqual([{ index: 0, role: KeyRole.Stake }]);
+      expect(util.ownSignatureKeyPaths(txBody, knownAddresses, {})).toEqual([
+        { index: 0, purpose: KeyPurpose.STANDARD, role: KeyRole.Stake }
+      ]);
     });
 
     it('is returned for StakePool voter in voting procedures', async () => {
@@ -490,7 +578,9 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
         ]
       } as Cardano.TxBody;
 
-      expect(util.ownSignatureKeyPaths(txBody, knownAddresses, {})).toEqual([{ index: 3, role: KeyRole.Stake }]);
+      expect(util.ownSignatureKeyPaths(txBody, knownAddresses, {})).toEqual([
+        { index: 3, purpose: KeyPurpose.STANDARD, role: KeyRole.Stake }
+      ]);
     });
   });
 
@@ -511,7 +601,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       } as Cardano.TxBody;
 
       expect(util.ownSignatureKeyPaths(txBody, [knownAddress1], {}, dRepKeyHash)).toEqual([
-        { index: 0, role: KeyRole.DRep }
+        { index: 0, purpose: KeyPurpose.STANDARD, role: KeyRole.DRep }
       ]);
     });
 
@@ -530,7 +620,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       } as Cardano.TxBody;
 
       expect(util.ownSignatureKeyPaths(txBody, [knownAddress1], {}, dRepKeyHash)).toEqual([
-        { index: 0, role: KeyRole.DRep }
+        { index: 0, purpose: KeyPurpose.STANDARD, role: KeyRole.DRep }
       ]);
     });
 
@@ -550,7 +640,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       } as Cardano.TxBody;
 
       expect(util.ownSignatureKeyPaths(txBody, [knownAddress1], {}, dRepKeyHash)).toEqual([
-        { index: 0, role: KeyRole.DRep }
+        { index: 0, purpose: KeyPurpose.STANDARD, role: KeyRole.DRep }
       ]);
     });
 
@@ -571,7 +661,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       } as Cardano.TxBody;
 
       expect(util.ownSignatureKeyPaths(txBody, [knownAddress1], {}, dRepKeyHash)).toEqual([
-        { index: 0, role: KeyRole.DRep }
+        { index: 0, purpose: KeyPurpose.STANDARD, role: KeyRole.DRep }
       ]);
     });
   });

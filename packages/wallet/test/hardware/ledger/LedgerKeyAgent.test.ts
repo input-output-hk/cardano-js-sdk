@@ -4,6 +4,7 @@ import {
   AddressType,
   Bip32Account,
   CommunicationType,
+  KeyPurpose,
   SerializableLedgerKeyAgentData,
   util
 } from '@cardano-sdk/key-management';
@@ -77,7 +78,8 @@ describe('LedgerKeyAgent', () => {
       ledgerKeyAgent = await LedgerKeyAgent.createWithDevice(
         {
           chainId: Cardano.ChainIds.Preprod,
-          communicationType: CommunicationType.Node
+          communicationType: CommunicationType.Node,
+          purpose: KeyPurpose.STANDARD
         },
         { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), logger }
       );
@@ -93,7 +95,8 @@ describe('LedgerKeyAgent', () => {
           accountIndex: 5,
           chainId: Cardano.ChainIds.Preprod,
           communicationType: CommunicationType.Node,
-          deviceConnection: ledgerKeyAgent.deviceConnection
+          deviceConnection: ledgerKeyAgent.deviceConnection,
+          purpose: KeyPurpose.STANDARD
         },
         mockKeyAgentDependencies()
       );
@@ -173,7 +176,7 @@ describe('LedgerKeyAgent', () => {
         const chainHistoryProvider = mocks.mockChainHistoryProvider({ rewardAccount });
         const asyncKeyAgent = util.createAsyncKeyAgent(ledgerKeyAgent);
         wallet = createPersonalWallet(
-          { name: 'HW Wallet' },
+          { name: 'HW Wallet', purpose: KeyPurpose.STANDARD },
           {
             assetProvider,
             bip32Account: await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent),
@@ -206,7 +209,11 @@ describe('LedgerKeyAgent', () => {
               ...txInternals,
               hash: 'non-matching' as unknown as Cardano.TransactionId
             },
-            { knownAddresses: await firstValueFrom(wallet.addresses$), txInKeyPathMap: {} }
+            {
+              knownAddresses: await firstValueFrom(wallet.addresses$),
+              purpose: KeyPurpose.STANDARD,
+              txInKeyPathMap: {}
+            }
           )
         ).rejects.toThrow();
       });

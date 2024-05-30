@@ -1,9 +1,9 @@
 import { CONTEXT_WITHOUT_KNOWN_ADDRESSES, CONTEXT_WITH_KNOWN_ADDRESSES, txIn } from '../testData';
-import { CardanoKeyConst, TxInId, util } from '@cardano-sdk/key-management';
-import { mapTxIns, toTxIn } from '../../src/transformers';
+import { CardanoKeyConst, KeyPurpose, TxInId, util } from '@cardano-sdk/key-management';
+import { mapTxIns, toTxIn } from '../../src';
 
 describe('txIn', () => {
-  const paymentKeyPath = { index: 0, role: 1 };
+  const paymentKeyPath = { index: 0, purpose: KeyPurpose.STANDARD, role: 1 };
 
   describe('mapTxIns', () => {
     it('can map a a set of TxIns', async () => {
@@ -52,7 +52,7 @@ describe('txIn', () => {
       expect(ledgerTxIn).toEqual({
         outputIndex: txIn.index,
         path: [
-          util.harden(CardanoKeyConst.PURPOSE),
+          util.harden(KeyPurpose.STANDARD),
           util.harden(CardanoKeyConst.COIN_TYPE),
           util.harden(CONTEXT_WITH_KNOWN_ADDRESSES.accountIndex),
           paymentKeyPath.role,

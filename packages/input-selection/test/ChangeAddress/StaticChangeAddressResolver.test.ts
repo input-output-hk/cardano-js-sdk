@@ -1,4 +1,4 @@
-import { AddressType, GroupedAddress, KeyRole } from '@cardano-sdk/key-management';
+import { AddressType, GroupedAddress, KeyPurpose, KeyRole } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { InvalidStateError } from '@cardano-sdk/util';
 import { StaticChangeAddressResolver } from '../../src';
@@ -10,8 +10,9 @@ export const knownAddresses = () =>
       address: 'testAddress' as Cardano.PaymentAddress,
       index: 0,
       networkId: Cardano.NetworkId.Testnet,
+      purpose: KeyPurpose.STANDARD,
       rewardAccount: '' as Cardano.RewardAccount,
-      stakeKeyDerivationPath: { index: 0, role: KeyRole.Stake },
+      stakeKeyDerivationPath: { index: 0, purpose: KeyPurpose.STANDARD, role: KeyRole.Stake },
       type: AddressType.External
     }
   ]);

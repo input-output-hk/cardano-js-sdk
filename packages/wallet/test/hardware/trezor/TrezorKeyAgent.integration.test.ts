@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Bip32Account, CommunicationType, KeyAgent, util } from '@cardano-sdk/key-management';
+import { Bip32Account, CommunicationType, KeyAgent, KeyPurpose, util } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet, createPersonalWallet, restoreKeyAgent } from '../../../src';
 import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
@@ -28,7 +28,7 @@ const createWallet = async (keyAgent: KeyAgent) => {
   const asyncKeyAgent = util.createAsyncKeyAgent(keyAgent);
   const chainHistoryProvider = mockChainHistoryProvider();
   return createPersonalWallet(
-    { name: 'Wallet1' },
+    { name: 'Wallet1', purpose: KeyPurpose.STANDARD },
     {
       assetProvider,
       bip32Account: await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent),
@@ -51,6 +51,7 @@ describe('TrezorKeyAgent+BaseWallet', () => {
     const freshKeyAgent = await TrezorKeyAgent.createWithDevice(
       {
         chainId: Cardano.ChainIds.Preprod,
+        purpose: KeyPurpose.STANDARD,
         trezorConfig: {
           communicationType: CommunicationType.Node,
           manifest: {

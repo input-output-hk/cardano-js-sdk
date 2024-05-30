@@ -1,4 +1,4 @@
-import { AddressType, Bip32Account, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, InMemoryKeyAgent, KeyPurpose, util } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { GenericTxBuilder, OutputValidation, TxBuilderProviders } from '../../src';
 import { SodiumBip32Ed25519 } from '@cardano-sdk/crypto';
@@ -35,7 +35,8 @@ describe.each([
         {
           chainId: Cardano.ChainIds.Preview,
           getPassphrase: async () => Buffer.from([]),
-          mnemonicWords: util.generateMnemonicWords()
+          mnemonicWords: util.generateMnemonicWords(),
+          purpose: KeyPurpose.STANDARD
         },
         { bip32Ed25519: new SodiumBip32Ed25519(), logger }
       )

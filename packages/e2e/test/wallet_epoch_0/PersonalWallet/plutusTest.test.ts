@@ -1,6 +1,7 @@
 import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano, Serialization, UtxoProvider } from '@cardano-sdk/core';
 import { HexBlob, isNotNil } from '@cardano-sdk/util';
+import { KeyPurpose } from '@cardano-sdk/key-management';
 import { Observable, filter, firstValueFrom, interval, map, switchMap, take } from 'rxjs';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { getEnv, getWallet, utxoProviderFactory, walletReady, walletVariables } from '../../../src';
@@ -191,7 +192,9 @@ describe('PersonalWallet/plutus', () => {
   });
 
   it('can spend balance from a plutus script', async () => {
-    wallet = (await getWallet({ env, logger, name: 'Spending Wallet', polling: { interval: 50 } })).wallet;
+    wallet = (
+      await getWallet({ env, logger, name: 'Spending Wallet', polling: { interval: 50 }, purpose: KeyPurpose.STANDARD })
+    ).wallet;
     // UTXO provider can be use to fetch the UTXO set from the script address.
     const utxoProvider = await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS, logger);
 
@@ -265,7 +268,9 @@ describe('PersonalWallet/plutus', () => {
   });
 
   it('can spend balance from a plutus script using a reference script', async () => {
-    wallet = (await getWallet({ env, logger, name: 'Spending Wallet', polling: { interval: 50 } })).wallet;
+    wallet = (
+      await getWallet({ env, logger, name: 'Spending Wallet', polling: { interval: 50 }, purpose: KeyPurpose.STANDARD })
+    ).wallet;
     // UTXO provider can be use to fetch the UTXO set from the script address.
     const utxoProvider = await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS, logger);
 

@@ -2,6 +2,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import {
   AccountKeyDerivationPath,
   KeyAgent,
+  KeyPurpose,
   KeyRole,
   SignBlobResult,
   SignDataContext,
@@ -22,6 +23,7 @@ const randomPublicKey = () => Crypto.Ed25519PublicKeyHex(Array.from({ length: 64
 
 const DERIVATION_PATH = {
   index: 0,
+  purpose: KeyPurpose.STANDARD,
   role: KeyRole.External
 };
 
@@ -30,7 +32,12 @@ const getKeyAgent = async (
   genesisParameters: Cardano.CompactGenesis,
   bip32Ed25519: Crypto.Bip32Ed25519
 ) => {
-  const keyAgent = await createStandaloneKeyAgent(mnemonics.split(' '), genesisParameters, bip32Ed25519);
+  const keyAgent = await createStandaloneKeyAgent(
+    mnemonics.split(' '),
+    genesisParameters,
+    bip32Ed25519,
+    KeyPurpose.STANDARD
+  );
 
   const pubKey = await keyAgent.derivePublicKey(DERIVATION_PATH);
 
@@ -294,6 +301,7 @@ export const buildSharedWallets = async (env: any, genesisParameters: Cardano.Co
       name: 'Alice shared Wallet',
       paymentScript,
       polling: { interval: 50 },
+      purpose: KeyPurpose.STANDARD,
       stakingScript,
       witnesser: new SharedWalletWitnesser(alice.keyAgent, paymentScript, stakingScript)
     })
@@ -306,6 +314,7 @@ export const buildSharedWallets = async (env: any, genesisParameters: Cardano.Co
       name: 'Bob shared Wallet',
       paymentScript,
       polling: { interval: 50 },
+      purpose: KeyPurpose.STANDARD,
       stakingScript,
       witnesser: new SharedWalletWitnesser(bob.keyAgent, paymentScript, stakingScript)
     })
@@ -318,6 +327,7 @@ export const buildSharedWallets = async (env: any, genesisParameters: Cardano.Co
       name: 'Charlotte shared Wallet',
       paymentScript,
       polling: { interval: 50 },
+      purpose: KeyPurpose.STANDARD,
       stakingScript,
       witnesser: new SharedWalletWitnesser(charlotte.keyAgent, paymentScript, stakingScript)
     })

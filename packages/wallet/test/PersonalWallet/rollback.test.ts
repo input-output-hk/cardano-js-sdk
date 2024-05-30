@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, GroupedAddress, KeyPurpose, util } from '@cardano-sdk/key-management';
 import {
   Cardano,
   ChainHistoryProvider,
@@ -35,6 +35,7 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
     address,
     index: 0,
     networkId: Cardano.NetworkId.Testnet,
+    purpose: KeyPurpose.STANDARD,
     rewardAccount,
     stakeKeyDerivationPath,
     type: AddressType.External
@@ -54,7 +55,7 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
   const stakePoolProvider = createStubStakePoolProvider();
 
   return createPersonalWallet(
-    { name, polling: pollingConfig },
+    { name, polling: pollingConfig, purpose: KeyPurpose.STANDARD },
     {
       addressDiscovery: new SingleAddressDiscovery(),
       assetProvider,

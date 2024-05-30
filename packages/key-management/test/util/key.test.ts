@@ -1,4 +1,4 @@
-import { AddressType, GroupedAddress, KeyRole } from '../../src';
+import { AddressType, GroupedAddress, KeyPurpose, KeyRole } from '../../src';
 import { Cardano } from '@cardano-sdk/core';
 import { paymentKeyPathFromGroupedAddress, stakeKeyPathFromGroupedAddress } from '../../src/util';
 
@@ -12,6 +12,7 @@ export const rewardAccount = Cardano.RewardAccount(rewardKey);
 
 const stakeKeyDerivationPath = {
   index: 0,
+  purpose: KeyPurpose.STANDARD,
   role: KeyRole.Stake
 };
 
@@ -20,6 +21,7 @@ const knownAddress: GroupedAddress = {
   address: paymentAddress,
   index: 0,
   networkId: Cardano.NetworkId.Testnet,
+  purpose: KeyPurpose.STANDARD,
   rewardAccount,
   stakeKeyDerivationPath,
   type: AddressType.Internal
@@ -31,17 +33,23 @@ const knownAddressStakeKeyPath = [2_147_485_500, 2_147_485_463, 2_147_483_648, 2
 describe('key utils', () => {
   describe('paymentKeyPathFromGroupedAddress', () => {
     it('returns a hardened BIP32 payment key path', () => {
-      expect(paymentKeyPathFromGroupedAddress({ address: knownAddress })).toEqual(knownAddressKeyPath);
+      expect(paymentKeyPathFromGroupedAddress({ address: knownAddress, purpose: KeyPurpose.STANDARD })).toEqual(
+        knownAddressKeyPath
+      );
     });
   });
   describe('stakeKeyPathFromGroupedAddress', () => {
     it('returns null when given an undefined stakeKeyDerivationPath', async () => {
       const knownAddressClone = { ...knownAddress };
       delete knownAddressClone.stakeKeyDerivationPath;
-      expect(stakeKeyPathFromGroupedAddress({ address: knownAddressClone })).toEqual(null);
+      expect(stakeKeyPathFromGroupedAddress({ address: knownAddressClone, purpose: KeyPurpose.STANDARD })).toEqual(
+        null
+      );
     });
     it('returns a hardened BIP32 stake key path', () => {
-      expect(stakeKeyPathFromGroupedAddress({ address: knownAddress })).toEqual(knownAddressStakeKeyPath);
+      expect(stakeKeyPathFromGroupedAddress({ address: knownAddress, purpose: KeyPurpose.STANDARD })).toEqual(
+        knownAddressStakeKeyPath
+      );
     });
   });
 });

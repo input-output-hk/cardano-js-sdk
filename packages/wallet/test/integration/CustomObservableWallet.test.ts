@@ -1,8 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-/* eslint-disable sonarjs/no-extra-arguments */
-/* eslint-disable unicorn/consistent-function-scoping */
-import { BaseWallet, ObservableWallet, createPersonalWallet } from '../../src';
-import { Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
+import { Bip32Account, GroupedAddress, KeyPurpose, util } from '@cardano-sdk/key-management';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import {
   OutputValidator,
@@ -15,6 +12,9 @@ import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sd
 import { firstValueFrom, of, timer } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
+/* eslint-disable sonarjs/no-extra-arguments */
+/* eslint-disable unicorn/consistent-function-scoping */
+import { BaseWallet, ObservableWallet, createPersonalWallet } from '../../src';
 
 describe('CustomObservableWallet', () => {
   describe('can create an application-specific subset of ObservableWallet interface', () => {
@@ -41,7 +41,7 @@ describe('CustomObservableWallet', () => {
     it('can use BaseWallet to satisfy application-specific interface', async () => {
       // this compiles
       const extensionWallet: LaceObservableWallet = createPersonalWallet(
-        { name: 'Extension Wallet' },
+        { name: 'Extension Wallet', purpose: KeyPurpose.STANDARD },
         {
           assetProvider: mocks.mockAssetProvider(),
           bip32Account: await Bip32Account.fromAsyncKeyAgent(await testAsyncKeyAgent()),

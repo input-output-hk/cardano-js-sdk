@@ -1,4 +1,5 @@
 /* eslint-disable func-style */
+import { Cardano, Handle, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 /* eslint-disable jsdoc/require-jsdoc */
 import * as Crypto from '@cardano-sdk/crypto';
 import {
@@ -7,13 +8,13 @@ import {
   Bip32Account,
   GroupedAddress,
   InMemoryKeyAgent,
+  KeyPurpose,
   SignTransactionOptions,
   TransactionSigner,
   util
 } from '@cardano-sdk/key-management';
 import { AssetId, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BigIntMath, HexBlob } from '@cardano-sdk/util';
-import { Cardano, Handle, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import {
   GenericTxBuilder,
   HandleNotFoundError,
@@ -75,7 +76,8 @@ describe.each([
       {
         chainId: Cardano.ChainIds.Preprod,
         getPassphrase: async () => Buffer.from('passphrase'),
-        mnemonicWords: util.generateMnemonicWords()
+        mnemonicWords: util.generateMnemonicWords(),
+        purpose: KeyPurpose.STANDARD
       },
       { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), logger: dummyLogger }
     );
@@ -258,7 +260,7 @@ describe.each([
     let signingOptions: SignTransactionOptions;
 
     beforeEach(() => {
-      signingOptions = { additionalKeyPaths: [{ index: 1, role: 1 }] };
+      signingOptions = { additionalKeyPaths: [{ index: 1, purpose: KeyPurpose.STANDARD, role: 1 }] };
     });
 
     it('can setSigningOptions without mutating signingOptions', () => {

@@ -217,7 +217,7 @@ export class MultiSigWallet {
         body: multiSigTx.getTransaction().body,
         hash: multiSigTx.getTransaction().id
       },
-      { knownAddresses: [this.#address], txInKeyPathMap: {} },
+      { knownAddresses: [this.#address], purpose: KeyPurpose.MULTI_SIG, txInKeyPathMap: {} },
       { additionalKeyPaths: [DERIVATION_PATH] }
     );
 
@@ -413,6 +413,7 @@ export class MultiSigWallet {
       address: baseAddress.toAddress().toBech32() as Cardano.PaymentAddress,
       index: 0,
       networkId,
+      purpose: KeyPurpose.MULTI_SIG,
       rewardAccount: Cardano.RewardAddress.fromCredentials(networkId, scriptCredential)
         .toAddress()
         .toBech32() as Cardano.RewardAccount,

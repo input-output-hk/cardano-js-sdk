@@ -1,5 +1,5 @@
 import { CONTEXT_WITH_KNOWN_ADDRESSES, txIn } from '../testData';
-import { CardanoKeyConst, TxInId, util } from '@cardano-sdk/key-management';
+import { CardanoKeyConst, KeyPurpose, TxInId, util } from '@cardano-sdk/key-management';
 import { mapCollateralTxIns } from '../../src/transformers';
 
 describe('collateralInputs', () => {
@@ -12,6 +12,7 @@ describe('collateralInputs', () => {
     it('can map a a set of collateral inputs', async () => {
       const keyPath = {
         index: 0,
+        purpose: KeyPurpose.STANDARD,
         role: 1
       };
       const txIns = mapCollateralTxIns([txIn, txIn, txIn], {

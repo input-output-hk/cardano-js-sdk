@@ -1,6 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
-import { GroupedAddress, InMemoryKeyAgent, WitnessedTx, util } from '@cardano-sdk/key-management';
+import { GroupedAddress, InMemoryKeyAgent, KeyPurpose, WitnessedTx, util } from '@cardano-sdk/key-management';
 import { HexBlob } from '@cardano-sdk/util';
 import { Observable, catchError, filter, firstValueFrom, throwError, timeout } from 'rxjs';
 import { ObservableWallet, OutgoingTx, WalletUtil } from '../src';
@@ -74,7 +74,8 @@ export const createAsyncKeyAgent = async () =>
       {
         chainId: Cardano.ChainIds.Preview,
         getPassphrase: async () => Buffer.from([]),
-        mnemonicWords: util.generateMnemonicWords()
+        mnemonicWords: util.generateMnemonicWords(),
+        purpose: KeyPurpose.STANDARD
       },
       {
         bip32Ed25519: new SodiumBip32Ed25519(),
@@ -103,6 +104,7 @@ export const signTx = async ({
     ),
     {
       knownAddresses,
+      purpose: KeyPurpose.STANDARD,
       txInKeyPathMap: await util.createTxInKeyPathMap(tx.body, knownAddresses, walletUtil)
     }
   );

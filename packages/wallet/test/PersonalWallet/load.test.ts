@@ -1,16 +1,12 @@
 /* eslint-disable unicorn/consistent-destructuring */
-/* eslint-disable max-statements */
 import {
-  AddressDiscovery,
-  BaseWallet,
-  ConnectionStatus,
-  ConnectionStatusTracker,
-  ObservableWallet,
-  PollingConfig,
-  SingleAddressDiscovery,
-  createPersonalWallet
-} from '../../src';
-import { AddressType, AsyncKeyAgent, Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
+  AddressType,
+  AsyncKeyAgent,
+  Bip32Account,
+  GroupedAddress,
+  KeyPurpose,
+  util
+} from '@cardano-sdk/key-management';
 import {
   AssetId,
   createStubStakePoolProvider,
@@ -31,13 +27,24 @@ import {
 import { InvalidConfigurationError } from '@cardano-sdk/tx-construction';
 import { InvalidStringError } from '@cardano-sdk/util';
 import { ReplaySubject, firstValueFrom } from 'rxjs';
-import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import { dummyLogger as logger } from 'ts-log';
 import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
-import { waitForWalletStateSettle } from '../util';
 import delay from 'delay';
 import flatten from 'lodash/flatten';
 import pick from 'lodash/pick';
+/* eslint-disable max-statements */
+import {
+  AddressDiscovery,
+  BaseWallet,
+  ConnectionStatus,
+  ConnectionStatusTracker,
+  ObservableWallet,
+  PollingConfig,
+  SingleAddressDiscovery,
+  createPersonalWallet
+} from '../../src';
+import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
+import { waitForWalletStateSettle } from '../util';
 
 const {
   currentEpoch,
@@ -97,6 +104,7 @@ const createWallet = async (props: CreateWalletProps) => {
     address,
     index: 0,
     networkId: Cardano.NetworkId.Testnet,
+    purpose: KeyPurpose.STANDARD,
     rewardAccount,
     stakeKeyDerivationPath,
     type: AddressType.External
@@ -120,7 +128,7 @@ const createWallet = async (props: CreateWalletProps) => {
   bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
 
   return createPersonalWallet(
-    { name, polling: props.pollingConfig },
+    { name, polling: props.pollingConfig, purpose: KeyPurpose.STANDARD },
     {
       addressDiscovery: props?.addressDiscovery,
       assetProvider,
@@ -490,6 +498,7 @@ describe('BaseWallet.AddressDiscovery', () => {
       address,
       index: 0,
       networkId: Cardano.NetworkId.Testnet,
+      purpose: KeyPurpose.STANDARD,
       rewardAccount,
       stakeKeyDerivationPath,
       type: AddressType.External

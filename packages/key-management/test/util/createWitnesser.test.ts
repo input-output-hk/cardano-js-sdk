@@ -1,4 +1,4 @@
-import { AsyncKeyAgent, SignBlobResult, Witnesser, util } from '../../src';
+import { AsyncKeyAgent, KeyPurpose, SignBlobResult, Witnesser, util } from '../../src';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 
@@ -15,7 +15,7 @@ describe('createBip32Ed25519Witnesser', () => {
   });
 
   it('signBlob is unchanged', async () => {
-    const keyDerivationPath = { index: 0, role: 0 };
+    const keyDerivationPath = { index: 0, purpose: KeyPurpose.STANDARD, role: 0 };
     const blob = HexBlob('abc123');
     const result = {} as SignBlobResult;
     asyncKeyAgent.signBlob.mockResolvedValueOnce(result);
@@ -39,7 +39,7 @@ describe('createBip32Ed25519Witnesser', () => {
       hash: Cardano.TransactionId('3643bb5fe745ba0532977f82ecf54699963c97adef2626f7c780225d218e9ba6')
     };
 
-    const options = { knownAddresses: [], txInKeyPathMap: {} };
+    const options = { knownAddresses: [], purpose: KeyPurpose.STANDARD, txInKeyPathMap: {} };
     const result = new Map();
     asyncKeyAgent.signTransaction.mockResolvedValueOnce(result);
 

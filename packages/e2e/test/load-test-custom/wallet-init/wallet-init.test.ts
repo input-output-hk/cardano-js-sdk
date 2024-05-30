@@ -1,16 +1,8 @@
 /* eslint-disable import/imports-first */
 import * as dotenv from 'dotenv';
-import path from 'path';
-
-// This line must come before loading the env, to configure the location of the .env file
-dotenv.config({ path: path.join(__dirname, '../../../.env') });
-
 import { BaseWallet, createPersonalWallet } from '@cardano-sdk/wallet';
+import { Bip32Account, KeyPurpose, util } from '@cardano-sdk/key-management';
 import { Logger } from 'ts-log';
-import { bufferCount, bufferTime, from, mergeAll, tap } from 'rxjs';
-import { logger } from '@cardano-sdk/util-dev';
-
-import { Bip32Account, util } from '@cardano-sdk/key-management';
 import {
   MeasurementUtil,
   assetProviderFactory,
@@ -27,6 +19,12 @@ import {
   waitForWalletStateSettle,
   walletVariables
 } from '../../../src';
+import { bufferCount, bufferTime, from, mergeAll, tap } from 'rxjs';
+import { logger } from '@cardano-sdk/util-dev';
+import path from 'path';
+
+// This line must come before loading the env, to configure the location of the .env file
+dotenv.config({ path: path.join(__dirname, '../../../.env') });
 
 // Example call that creates 5000 wallets in 10 minutes:
 // VIRTUAL_USERS_GENERATE_DURATION=600 VIRTUAL_USERS_COUNT=5000 yarn load-test-custom:wallet-init
@@ -85,7 +83,7 @@ const createWallet = async (accountIndex: number): Promise<BaseWallet> => {
 
   measurementUtil.addStartMarker(MeasureTarget.wallet, accountIndex);
   return createPersonalWallet(
-    { name: `Wallet ${accountIndex}` },
+    { name: `Wallet ${accountIndex}`, purpose: KeyPurpose.STANDARD },
     {
       ...providers,
       bip32Account: await Bip32Account.fromAsyncKeyAgent(keyAgent),
