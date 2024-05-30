@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, GroupedAddress, KeyRole } from '@cardano-sdk/key-management';
+import { AddressType, GroupedAddress, KeyPurpose, KeyRole } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { TrezorTxTransformerContext } from '../src';
@@ -139,6 +139,7 @@ export const auxiliaryDataHash = Crypto.Hash32ByteBase16(
 
 const stakeKeyDerivationPath = {
   index: 0,
+  purpose: KeyPurpose.STANDARD,
   role: KeyRole.Stake
 };
 
@@ -147,6 +148,7 @@ export const knownAddress: GroupedAddress = {
   address: paymentAddress,
   index: 0,
   networkId: Cardano.NetworkId.Testnet,
+  purpose: KeyPurpose.STANDARD,
   rewardAccount,
   stakeKeyDerivationPath,
   type: AddressType.Internal
@@ -159,6 +161,7 @@ export const knownAddressWithoutStakingPath: GroupedAddress = {
   address: paymentAddress,
   index: 0,
   networkId: Cardano.NetworkId.Testnet,
+  purpose: KeyPurpose.STANDARD,
   rewardAccount,
   type: AddressType.Internal
 };
@@ -170,6 +173,7 @@ export const contextWithKnownAddresses: TrezorTxTransformerContext = {
     networkMagic: 999
   },
   knownAddresses: [knownAddress],
+  purpose: KeyPurpose.STANDARD,
   txInKeyPathMap: {}
 };
 
@@ -180,6 +184,7 @@ export const contextWithKnownAddressesWithoutStakingCredentials: TrezorTxTransfo
     networkMagic: 999
   },
   knownAddresses: [knownAddressWithoutStakingPath],
+  purpose: KeyPurpose.STANDARD,
   txInKeyPathMap: {}
 };
 
@@ -190,6 +195,7 @@ export const contextWithoutKnownAddresses: TrezorTxTransformerContext = {
     networkMagic: 999
   },
   knownAddresses: [],
+  purpose: KeyPurpose.STANDARD,
   txInKeyPathMap: {}
 };
 

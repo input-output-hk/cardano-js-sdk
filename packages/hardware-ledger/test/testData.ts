@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, KeyRole } from '@cardano-sdk/key-management';
+import { AddressType, KeyPurpose, KeyRole } from '@cardano-sdk/key-management';
 import { Base64Blob, HexBlob } from '@cardano-sdk/util';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { LedgerTxTransformerContext } from '../src';
@@ -349,14 +349,17 @@ export const CONTEXT_WITH_KNOWN_ADDRESSES: LedgerTxTransformerContext = {
       address: paymentAddress,
       index: 0,
       networkId: Cardano.NetworkId.Testnet,
+      purpose: KeyPurpose.STANDARD,
       rewardAccount,
       stakeKeyDerivationPath: {
         index: 0,
+        purpose: KeyPurpose.STANDARD,
         role: KeyRole.Stake
       },
       type: AddressType.Internal
     }
   ],
+  purpose: KeyPurpose.STANDARD,
   txInKeyPathMap: {}
 };
 
@@ -367,6 +370,7 @@ export const CONTEXT_WITHOUT_KNOWN_ADDRESSES: LedgerTxTransformerContext = {
     networkMagic: 999
   },
   knownAddresses: [],
+  purpose: KeyPurpose.STANDARD,
   txInKeyPathMap: {}
 };
 

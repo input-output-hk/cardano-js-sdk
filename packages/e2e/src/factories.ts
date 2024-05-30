@@ -31,6 +31,7 @@ import {
   CommunicationType,
   InMemoryKeyAgent,
   KeyAgentDependencies,
+  KeyPurpose,
   Witnesser,
   util
 } from '@cardano-sdk/key-management';
@@ -204,7 +205,8 @@ keyManagementFactory.register('inMemory', async (params: any): Promise<CreateKey
           accountIndex: params.accountIndex,
           chainId: params.chainId,
           getPassphrase: async () => Buffer.from(params.passphrase),
-          mnemonicWords
+          mnemonicWords,
+          purpose: params.purpose
         },
         dependencies
       )
@@ -220,7 +222,8 @@ keyManagementFactory.register('ledger', async (params: any): Promise<CreateKeyAg
         accountIndex: params.accountIndex,
         chainId: params.chainId,
         communicationType: CommunicationType.Node,
-        deviceConnection
+        deviceConnection,
+        purpose: params.purpose
       },
       dependencies
     );
@@ -238,6 +241,7 @@ keyManagementFactory.register(
           {
             accountIndex: params.accountIndex,
             chainId: params.chainId,
+            purpose: params.purpose,
             trezorConfig: {
               communicationType: CommunicationType.Node,
               manifest: {
@@ -277,6 +281,7 @@ export type GetWalletProps = {
   env: any;
   idx?: number;
   logger: Logger;
+  purpose: KeyPurpose;
   name: string;
   polling?: PollingConfig;
   handlePolicyIds?: Cardano.PolicyId[];
@@ -290,6 +295,7 @@ export type GetSharedWalletProps = {
   env: any;
   logger: Logger;
   name: string;
+  purpose: KeyPurpose;
   polling?: PollingConfig;
   handlePolicyIds?: Cardano.PolicyId[];
   stores?: storage.WalletStores;
@@ -321,7 +327,7 @@ const patchInitializeTxToRespectEpochBoundary = <T extends ObservableWallet>(
  * @returns an object containing the wallet and providers passed to it
  */
 export const getWallet = async (props: GetWalletProps) => {
-  const { env, idx, logger, name, stores, customKeyParams, keyAgent, witnesser } = props;
+  const { env, idx, logger, name, stores, customKeyParams, keyAgent, witnesser, purpose } = props;
   let polling = props.polling;
   const providers = {
     addressDiscovery: await addressDiscoveryFactory.create(
@@ -378,7 +384,7 @@ export const getWallet = async (props: GetWalletProps) => {
   }
 
   const wallet = createPersonalWallet(
-    { name, polling },
+    { name, polling, purpose },
     {
       ...providers,
       bip32Account,
@@ -405,7 +411,7 @@ export const getWallet = async (props: GetWalletProps) => {
  * @returns an object containing the wallet and providers passed to it
  */
 export const getSharedWallet = async (props: GetSharedWalletProps) => {
-  const { env, logger, name, polling, stores, paymentScript, stakingScript, witnesser } = props;
+  const { env, logger, name, polling, stores, paymentScript, stakingScript, witnesser, purpose } = props;
   const providers = {
     assetProvider: await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS, logger),
     chainHistoryProvider: await chainHistoryProviderFactory.create(
@@ -433,7 +439,7 @@ export const getSharedWallet = async (props: GetSharedWalletProps) => {
     utxoProvider: await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS, logger)
   };
   const wallet = createSharedWallet(
-    { name, polling },
+    { name, polling, purpose },
     {
       ...providers,
       logger,

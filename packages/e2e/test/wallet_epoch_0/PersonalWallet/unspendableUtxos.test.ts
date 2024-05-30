@@ -1,5 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { BaseWallet, utxoEquals } from '@cardano-sdk/wallet';
+import { KeyPurpose } from '@cardano-sdk/key-management';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { firstValueFromTimed, getEnv, getWallet, walletReady, walletVariables } from '../../../src';
@@ -21,8 +22,8 @@ describe('PersonalWallet/unspendableUtxos', () => {
   // eslint-disable-next-line max-statements
   it.skip('unsets unspendable UTxOs when no longer in the wallets UTxO set', async () => {
     // Here we will simulate the scenario of collateral consumption by spending it from another wallet instance.
-    wallet1 = (await getWallet({ env, logger, name: 'Wallet 1' })).wallet;
-    wallet2 = (await getWallet({ env, logger, name: 'Wallet 2' })).wallet;
+    wallet1 = (await getWallet({ env, logger, name: 'Wallet 1', purpose: KeyPurpose.STANDARD })).wallet;
+    wallet2 = (await getWallet({ env, logger, name: 'Wallet 2', purpose: KeyPurpose.STANDARD })).wallet;
 
     const coins = 5_000_000n;
     await walletReady(wallet1, coins);

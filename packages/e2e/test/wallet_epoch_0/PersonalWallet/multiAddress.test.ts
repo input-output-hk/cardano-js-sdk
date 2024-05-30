@@ -1,5 +1,5 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { AddressType, GroupedAddress, util } from '@cardano-sdk/key-management';
+import { AddressType, GroupedAddress, KeyPurpose, util } from '@cardano-sdk/key-management';
 import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano } from '@cardano-sdk/core';
 import {
@@ -26,7 +26,7 @@ describe('PersonalWallet/multiAddress', () => {
   let wallet: BaseWallet;
 
   beforeAll(async () => {
-    wallet = (await getWallet({ env, idx: 0, logger, name: 'Wallet' })).wallet;
+    wallet = (await getWallet({ env, idx: 0, logger, name: 'Wallet', purpose: KeyPurpose.STANDARD })).wallet;
   });
 
   afterAll(() => {
@@ -43,7 +43,8 @@ describe('PersonalWallet/multiAddress', () => {
     const multiAddressKeyAgent = await createStandaloneKeyAgent(
       mnemonics,
       genesis,
-      await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger)
+      await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger),
+      KeyPurpose.STANDARD
     );
 
     let txBuilder = wallet.createTxBuilder();
@@ -107,7 +108,8 @@ describe('PersonalWallet/multiAddress', () => {
       idx: 0,
       logger,
       name: 'New Multi Address Wallet',
-      polling: { interval: 500 }
+      polling: { interval: 500 },
+      purpose: KeyPurpose.STANDARD
     });
 
     await walletReady(newWallet.wallet);

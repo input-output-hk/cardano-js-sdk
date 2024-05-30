@@ -143,6 +143,8 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
         return reject(new errors.ProofGenerationError(`Account not found: ${request.requestContext.accountIndex}`));
       }
 
+      const purpose = request.requestContext.purpose;
+
       const commonRequestProps = {
         ...request,
         reject: async (reason: string) => reject(new errors.AuthenticationError(reason))
@@ -164,7 +166,8 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
                             ...Buffer.from(wallet.encryptedSecrets.rootPrivateKeyBytes, 'hex')
                           ],
                           extendedAccountPublicKey: account.extendedAccountPublicKey,
-                          getPassphrase: async () => passphrase
+                          getPassphrase: async () => passphrase,
+                          purpose
                         })
                       );
                       clearPassphrase(passphrase);
@@ -190,12 +193,14 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
                             accountIndex: request.requestContext.accountIndex,
                             chainId: request.requestContext.chainId,
                             communicationType: this.#hwOptions.communicationType,
-                            extendedAccountPublicKey: account.extendedAccountPublicKey
+                            extendedAccountPublicKey: account.extendedAccountPublicKey,
+                            purpose
                           })
                         : this.#keyAgentFactory.Trezor({
                             accountIndex: request.requestContext.accountIndex,
                             chainId: request.requestContext.chainId,
                             extendedAccountPublicKey: account.extendedAccountPublicKey,
+                            purpose,
                             trezorConfig: this.#hwOptions
                           })
                     ).catch((error) => throwMaybeWrappedWithNoRejectError(error, options)),

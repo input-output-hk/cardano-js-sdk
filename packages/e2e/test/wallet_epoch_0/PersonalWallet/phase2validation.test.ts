@@ -2,6 +2,7 @@ import { BaseWallet, FinalizeTxProps, TransactionFailure } from '@cardano-sdk/wa
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { HexBlob, isNotNil } from '@cardano-sdk/util';
 import { InitializeTxProps, computeScriptDataHash } from '@cardano-sdk/tx-construction';
+import { KeyPurpose } from '@cardano-sdk/key-management';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { firstValueFromTimed, getEnv, getWallet, walletReady, walletVariables } from '../../../src';
@@ -71,7 +72,9 @@ describe('PersonalWallet/phase2validation', () => {
   });
 
   it('can detect a phase2 validation failure and emit the transaction as failed', async () => {
-    wallet = (await getWallet({ env, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
+    wallet = (
+      await getWallet({ env, logger, name: 'Minting Wallet', polling: { interval: 50 }, purpose: KeyPurpose.STANDARD })
+    ).wallet;
 
     // Plutus script that always returns false.
     const alwaysFailScript: Cardano.PlutusScript = {

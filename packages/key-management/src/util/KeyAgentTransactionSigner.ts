@@ -32,6 +32,7 @@ export class KeyAgentTransactionSigner implements TransactionSigner {
       tx,
       {
         knownAddresses: [],
+        purpose: this.#account.purpose,
         txInKeyPathMap: {}
       },
       {

@@ -38,13 +38,14 @@ export interface TrezorKeyAgentProps extends Omit<SerializableTrezorKeyAgentData
 export interface GetTrezorXpubProps {
   accountIndex: number;
   communicationType: CommunicationType;
-  purpose?: KeyPurpose;
+  purpose: KeyPurpose;
 }
 
 export interface CreateTrezorKeyAgentProps {
   chainId: Cardano.ChainId;
   accountIndex?: number;
   trezorConfig: TrezorConfig;
+  purpose: KeyPurpose;
 }
 
 export type TrezorConnectInstanceType = typeof TrezorConnectNode | typeof TrezorConnectWeb;
@@ -140,7 +141,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
   static async getXpub({
     accountIndex,
     communicationType,
-    purpose = KeyPurpose.STANDARD
+    purpose
   }: GetTrezorXpubProps): Promise<Crypto.Bip32PublicKeyHex> {
     try {
       await TrezorKeyAgent.checkDeviceConnection(communicationType);
@@ -160,13 +161,14 @@ export class TrezorKeyAgent extends KeyAgentBase {
   }
 
   static async createWithDevice(
-    { chainId, accountIndex = 0, trezorConfig }: CreateTrezorKeyAgentProps,
+    { chainId, accountIndex = 0, trezorConfig, purpose }: CreateTrezorKeyAgentProps,
     dependencies: KeyAgentDependencies
   ) {
     const isTrezorInitialized = await TrezorKeyAgent.initializeTrezorTransport(trezorConfig);
     const extendedAccountPublicKey = await TrezorKeyAgent.getXpub({
       accountIndex,
-      communicationType: trezorConfig.communicationType
+      communicationType: trezorConfig.communicationType,
+      purpose
     });
     return new TrezorKeyAgent(
       {
@@ -174,6 +176,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
         chainId,
         extendedAccountPublicKey,
         isTrezorInitialized,
+        purpose,
         trezorConfig
       },
       dependencies
@@ -214,7 +217,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
 
   async signTransaction(
     { body, hash }: Cardano.TxBodyWithHash,
-    { knownAddresses, txInKeyPathMap }: SignTransactionContext
+    { knownAddresses, txInKeyPathMap, purpose }: SignTransactionContext
   ): Promise<Cardano.Signatures> {
     try {
       await this.isTrezorInitialized;
@@ -222,6 +225,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
         accountIndex: this.accountIndex,
         chainId: this.chainId,
         knownAddresses,
+        purpose,
         txInKeyPathMap
       });
 

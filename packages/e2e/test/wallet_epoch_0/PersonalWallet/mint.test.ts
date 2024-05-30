@@ -1,7 +1,7 @@
 import { BaseWallet, FinalizeTxProps } from '@cardano-sdk/wallet';
 import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
-import { KeyRole, util } from '@cardano-sdk/key-management';
+import { KeyPurpose, KeyRole, util } from '@cardano-sdk/key-management';
 import {
   bip32Ed25519Factory,
   burnTokens,
@@ -30,7 +30,7 @@ describe('PersonalWallet/mint', () => {
   });
 
   it('can mint a token with no asset name', async () => {
-    wallet = (await getWallet({ env, logger, name: 'Minting Wallet' })).wallet;
+    wallet = (await getWallet({ env, logger, name: 'Minting Wallet', purpose: KeyPurpose.STANDARD })).wallet;
 
     const coins = 3_000_000n;
     await walletReady(wallet, coins);
@@ -40,11 +40,13 @@ describe('PersonalWallet/mint', () => {
     const aliceKeyAgent = await createStandaloneKeyAgent(
       env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
       genesis,
-      await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger)
+      await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger),
+      KeyPurpose.STANDARD
     );
 
     const derivationPath = {
       index: 2,
+      purpose: KeyPurpose.STANDARD,
       role: KeyRole.External
     };
 

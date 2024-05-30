@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
+import { AddressType, InMemoryKeyAgent, KeyPurpose, util } from '@cardano-sdk/key-management';
 import { localNetworkChainId } from '../util';
 
 /** Generates a new set of Mnemonic words and prints them to the console. */
@@ -14,7 +14,8 @@ import { localNetworkChainId } from '../util';
     {
       chainId: localNetworkChainId,
       getPassphrase: async () => Buffer.from(''),
-      mnemonicWords: mnemonicArray
+      mnemonicWords: mnemonicArray,
+      purpose: KeyPurpose.STANDARD
     },
     {
       bip32Ed25519: new Crypto.SodiumBip32Ed25519(),

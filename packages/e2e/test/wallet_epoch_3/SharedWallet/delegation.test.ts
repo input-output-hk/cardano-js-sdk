@@ -2,6 +2,7 @@
 import { BaseWallet, ObservableWallet } from '@cardano-sdk/wallet';
 import { BigIntMath, isNotNil } from '@cardano-sdk/util';
 import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
+import { KeyPurpose } from '@cardano-sdk/key-management';
 import {
   TX_TIMEOUT_DEFAULT,
   firstValueFromTimed,
@@ -70,7 +71,7 @@ describe('SharedWallet/delegation', () => {
     ({
       wallet: faucetWallet,
       providers: { stakePoolProvider }
-    } = await getWallet({ env, logger, name: 'Sending Wallet' }));
+    } = await getWallet({ env, logger, name: 'Sending Wallet', purpose: KeyPurpose.STANDARD }));
 
     // Make sure the wallet has sufficient funds to run this test
     await walletReady(faucetWallet, initialFunds);

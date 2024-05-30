@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AccountKeyDerivationPath, GroupedAddress, KeyRole, MessageSender } from '../types';
+import { AccountKeyDerivationPath, GroupedAddress, KeyPurpose, KeyRole, MessageSender } from '../types';
 import {
   AlgorithmId,
   CBORValue,
@@ -74,7 +74,7 @@ const getDerivationPath = async (
     throw new Cip30DataSignError(Cip30DataSignErrorCode.ProofGeneration, 'Unknown address');
   }
 
-  return { index: knownAddress.index, role: knownAddress.type as number as KeyRole };
+  return { index: knownAddress.index, purpose: KeyPurpose.STANDARD, role: knownAddress.type as number as KeyRole };
 };
 
 const createSigStructureHeaders = (addressBytes: Uint8Array) => {

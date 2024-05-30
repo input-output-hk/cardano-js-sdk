@@ -1,6 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano } from '@cardano-sdk/core';
+import { KeyPurpose } from '@cardano-sdk/key-management';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { getEnv, walletVariables } from '../../../src/environment';
@@ -14,7 +15,7 @@ describe('PersonalWallet/byron', () => {
   let wallet: BaseWallet;
 
   beforeAll(async () => {
-    wallet = (await getWallet({ env, idx: 0, logger, name: 'Wallet' })).wallet;
+    wallet = (await getWallet({ env, idx: 0, logger, name: 'Wallet', purpose: KeyPurpose.STANDARD })).wallet;
   });
 
   afterAll(() => {

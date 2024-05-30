@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { InMemoryKeyAgent, KeyAgentDependencies, util } from '../../src';
+import { InMemoryKeyAgent, KeyAgentDependencies, KeyPurpose, util } from '../../src';
 import { mockKeyAgentDependencies } from './mockKeyAgentDependencies';
 
 export const getPassphrase = jest.fn(async () => Buffer.from('password'));
@@ -9,7 +9,8 @@ export const testKeyAgent = async (dependencies: KeyAgentDependencies | undefine
     {
       chainId: Cardano.ChainIds.Preview,
       getPassphrase,
-      mnemonicWords: util.generateMnemonicWords()
+      mnemonicWords: util.generateMnemonicWords(),
+      purpose: KeyPurpose.STANDARD
     },
     dependencies
   );

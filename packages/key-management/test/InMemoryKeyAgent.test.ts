@@ -1,5 +1,13 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, GroupedAddress, InMemoryKeyAgent, KeyRole, SerializableInMemoryKeyAgentData, util } from '../src';
+import {
+  AddressType,
+  GroupedAddress,
+  InMemoryKeyAgent,
+  KeyPurpose,
+  KeyRole,
+  SerializableInMemoryKeyAgentData,
+  util
+} from '../src';
 import { Cardano } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { dummyLogger } from 'ts-log';
@@ -77,7 +85,10 @@ describe('InMemoryKeyAgent', () => {
   });
 
   test('signBlob', async () => {
-    const { publicKey, signature } = await keyAgent.signBlob({ index: 0, role: KeyRole.Internal }, HexBlob('abc123'));
+    const { publicKey, signature } = await keyAgent.signBlob(
+      { index: 0, purpose: KeyPurpose.STANDARD, role: KeyRole.Internal },
+      HexBlob('abc123')
+    );
     expect(typeof publicKey).toBe('string');
     expect(typeof signature).toBe('string');
   });
@@ -158,6 +169,7 @@ describe('InMemoryKeyAgent', () => {
             await util.deriveAccountPrivateKey({
               accountIndex: 0,
               bip32Ed25519,
+              purpose: KeyPurpose.STANDARD,
               rootPrivateKey: Crypto.Bip32PrivateKeyHex(yoroiRootPrivateKeyHex)
             })
           ),
@@ -255,6 +267,7 @@ describe('InMemoryKeyAgent', () => {
             await util.deriveAccountPrivateKey({
               accountIndex: 0,
               bip32Ed25519,
+              purpose: KeyPurpose.STANDARD,
               rootPrivateKey: Crypto.Bip32PrivateKeyHex(daedalusRootPrivateKeyHex)
             })
           ),

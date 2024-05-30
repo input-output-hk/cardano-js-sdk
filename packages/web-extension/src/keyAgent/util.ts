@@ -10,6 +10,7 @@ export const keyAgentProperties: RemoteApiProperties<AsyncKeyAgent> = {
   getBip32Ed25519: RemoteApiPropertyType.MethodReturningPromise,
   getChainId: RemoteApiPropertyType.MethodReturningPromise,
   getExtendedAccountPublicKey: RemoteApiPropertyType.MethodReturningPromise,
+  getKeyPurpose: RemoteApiPropertyType.MethodReturningPromise,
   signBlob: RemoteApiPropertyType.MethodReturningPromise,
   signTransaction: RemoteApiPropertyType.MethodReturningPromise
 };

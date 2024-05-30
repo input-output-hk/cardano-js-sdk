@@ -1,12 +1,11 @@
-import { StaticChangeAddressResolver, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
-
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { InitializeTxProps, InitializeTxResult } from '../types';
+import { KeyPurpose, util } from '@cardano-sdk/key-management';
+import { StaticChangeAddressResolver, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { TxBuilderDependencies } from './types';
 import { createPreInputSelectionTxBody, includeChangeAndInputs } from '../createTransactionInternals';
 import { defaultSelectionConstraints } from '../input-selection';
 import { ensureValidityInterval } from '../ensureValidityInterval';
-import { util } from '@cardano-sdk/key-management';
 
 export const initializeTx = async (
   props: InitializeTxProps,
@@ -81,6 +80,8 @@ export const initializeTx = async (
         dRepPublicKey,
         handleResolutions: props.handleResolutions ?? [],
         knownAddresses: addresses,
+        // TODO: Not sure about this. What is the best way to pass purpose to defaultSelectionConstraints?
+        purpose: KeyPurpose.STANDARD,
         txInKeyPathMap: await util.createTxInKeyPathMap(unwitnessedTx.body, addresses, inputResolver)
       };
 

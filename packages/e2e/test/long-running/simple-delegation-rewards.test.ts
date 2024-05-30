@@ -1,5 +1,6 @@
 import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
+import { KeyPurpose } from '@cardano-sdk/key-management';
 import {
   TestWallet,
   getEnv,
@@ -85,9 +86,10 @@ describe('simple delegation rewards', () => {
       env,
       logger,
       name: 'Sending Wallet',
-      polling: { interval: 50 }
+      polling: { interval: 50 },
+      purpose: KeyPurpose.STANDARD
     }));
-    ({ wallet: wallet2 } = await getWallet({ env, logger, name: 'Receiving Wallet' }));
+    ({ wallet: wallet2 } = await getWallet({ env, logger, name: 'Receiving Wallet', purpose: KeyPurpose.STANDARD }));
 
     await waitForWalletStateSettle(wallet1);
     await waitForWalletStateSettle(wallet2);

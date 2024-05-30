@@ -1,5 +1,6 @@
 import { BaseWallet, DelegatedStake, createUtxoBalanceByAddressTracker } from '@cardano-sdk/wallet';
 import { Cardano } from '@cardano-sdk/core';
+import { KeyPurpose } from '@cardano-sdk/key-management';
 import { MINUTE, firstValueFromTimed, getWallet, submitAndConfirm, walletReady } from '../../../src';
 import { Observable, filter, firstValueFrom, map, tap } from 'rxjs';
 import { Percent } from '@cardano-sdk/util';
@@ -25,7 +26,8 @@ const fundWallet = async (wallet: BaseWallet) => {
     logger.info(
       `Insufficient funds in wallet account index 1. Missing ${coinDeficit}. Transferring from wallet account index 0`
     );
-    const fundingWallet = (await getWallet({ env, idx: 0, logger, name: 'WalletAcct0' })).wallet;
+    const fundingWallet = (await getWallet({ env, idx: 0, logger, name: 'WalletAcct0', purpose: KeyPurpose.STANDARD }))
+      .wallet;
     await walletReady(fundingWallet);
     const fundingTxBuilder = fundingWallet.createTxBuilder();
     const { tx } = await fundingTxBuilder
@@ -124,7 +126,7 @@ describe('PersonalWallet/delegationDistribution', () => {
   let wallet: BaseWallet;
 
   beforeAll(async () => {
-    wallet = (await getWallet({ env, idx: 3, logger, name: 'Wallet' })).wallet;
+    wallet = (await getWallet({ env, idx: 3, logger, name: 'Wallet', purpose: KeyPurpose.STANDARD })).wallet;
     await fundWallet(wallet);
     await deregisterAllStakeKeys(wallet);
   });

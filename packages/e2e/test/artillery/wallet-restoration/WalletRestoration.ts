@@ -1,4 +1,4 @@
-import { AddressType, GroupedAddress, util } from '@cardano-sdk/key-management';
+import { AddressType, GroupedAddress, KeyPurpose, util } from '@cardano-sdk/key-management';
 import { AddressesModel, WalletVars } from './types';
 import { Cardano } from '@cardano-sdk/core';
 import { FunctionHook } from '../artillery';
@@ -12,6 +12,7 @@ export const mapToGroupedAddress = (addrModel: AddressesModel): GroupedAddress =
   address: Cardano.PaymentAddress(addrModel.address),
   index: 0,
   networkId: addrModel.address.startsWith('addr_test') ? Cardano.NetworkId.Testnet : Cardano.NetworkId.Mainnet,
+  purpose: KeyPurpose.STANDARD,
   rewardAccount: Cardano.RewardAccount(addrModel.stake_address),
   type: AddressType.External
 });
@@ -99,7 +100,8 @@ export const walletRestoration: FunctionHook<WalletVars> = async ({ vars, _uid }
       keyAgent,
       logger,
       name: `Test Wallet of VU with id: ${_uid}`,
-      polling: { interval: 50 }
+      polling: { interval: 50 },
+      purpose: KeyPurpose.STANDARD
     });
 
     vars.currentWallet = wallet;

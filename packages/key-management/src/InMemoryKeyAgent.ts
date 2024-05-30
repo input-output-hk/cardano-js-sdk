@@ -38,7 +38,7 @@ export interface FromBip39MnemonicWordsProps {
   mnemonic2ndFactorPassphrase?: string;
   getPassphrase: GetPassphrase;
   accountIndex?: number;
-  purpose?: KeyPurpose;
+  purpose: KeyPurpose;
 }
 
 const getPassphraseRethrowTypedError = async (getPassphrase: GetPassphrase) => {
@@ -122,7 +122,8 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
         chainId,
         encryptedRootPrivateKeyBytes: [...encryptedRootPrivateKey],
         extendedAccountPublicKey,
-        getPassphrase
+        getPassphrase,
+        purpose
       },
       dependencies
     );

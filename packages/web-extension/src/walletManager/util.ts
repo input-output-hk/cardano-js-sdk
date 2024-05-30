@@ -283,6 +283,7 @@ const createScriptWitness = async <WalletMetadata extends {}, AccountMetadata ex
       {
         accountIndex: signer.accountIndex,
         chainId,
+        purpose: context.purpose,
         wallet: signerWallet
       }
     );
@@ -315,6 +316,7 @@ export const buildBip32Witnesser = <WalletMetadata extends { name: string }, Acc
         {
           accountIndex: accountIndex!,
           chainId,
+          purpose: derivationPath.purpose,
           wallet
         }
       ),
@@ -341,6 +343,7 @@ export const buildBip32Witnesser = <WalletMetadata extends { name: string }, Acc
               {
                 accountIndex: accountIndex!,
                 chainId,
+                purpose: context.purpose,
                 wallet
               }
             );

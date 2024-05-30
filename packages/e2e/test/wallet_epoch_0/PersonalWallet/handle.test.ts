@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano, metadatum } from '@cardano-sdk/core';
-import { KeyAgent, TransactionSigner } from '@cardano-sdk/key-management';
+import { KeyAgent, KeyPurpose, TransactionSigner } from '@cardano-sdk/key-management';
 import {
   bip32Ed25519Factory,
   burnTokens,
@@ -44,13 +44,15 @@ describe('Ada handle', () => {
   const coins = coinsRequiredByHandleMint + 10_000_000n; // maximum number of coins to use in each transaction
 
   const initPolicyId = async () => {
-    wallet = (await getWallet({ env, idx: 0, logger, name: 'Handle Init Wallet' })).wallet;
+    wallet = (await getWallet({ env, idx: 0, logger, name: 'Handle Init Wallet', purpose: KeyPurpose.STANDARD }))
+      .wallet;
     await walletReady(wallet, coins);
 
     keyAgent = await createStandaloneKeyAgent(
       env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
       await firstValueFrom(wallet.genesisParameters$),
-      await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger)
+      await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger),
+      KeyPurpose.STANDARD
     );
     ({ policyScript, policySigner, policyId } = await createHandlePolicy(keyAgent));
     const handleProviderPolicyId = await getHandlePolicyId(
@@ -69,7 +71,8 @@ describe('Ada handle', () => {
         idx: 0,
         logger,
         name: 'Minting Wallet',
-        polling: { interval: 50 }
+        polling: { interval: 50 },
+        purpose: KeyPurpose.STANDARD
       })
     ).wallet;
     await walletReady(wallet, coins);
@@ -84,7 +87,8 @@ describe('Ada handle', () => {
         idx: 0,
         logger,
         name: 'Minting Wallet',
-        polling: { interval: 50 }
+        polling: { interval: 50 },
+        purpose: KeyPurpose.STANDARD
       })
     ).wallet;
     receivingWallet = (
@@ -94,7 +98,8 @@ describe('Ada handle', () => {
         idx: 1,
         logger,
         name: 'Receiving Wallet',
-        polling: { interval: 50 }
+        polling: { interval: 50 },
+        purpose: KeyPurpose.STANDARD
       })
     ).wallet;
     await Promise.all([walletReady(wallet, coins), walletReady(receivingWallet, 0n)]);

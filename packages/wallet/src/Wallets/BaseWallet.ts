@@ -87,7 +87,15 @@ import {
   tap,
   throwError
 } from 'rxjs';
-import { Bip32Account, GroupedAddress, WitnessedTx, Witnesser, cip8, util } from '@cardano-sdk/key-management';
+import {
+  Bip32Account,
+  GroupedAddress,
+  KeyPurpose,
+  WitnessedTx,
+  Witnesser,
+  cip8,
+  util
+} from '@cardano-sdk/key-management';
 import { ChangeAddressResolver, InputSelector, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { Ed25519PublicKey, Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
@@ -112,6 +120,7 @@ export interface BaseWalletProps {
   readonly name: string;
   readonly polling?: PollingConfig;
   readonly retryBackoffConfig?: RetryBackoffConfig;
+  readonly purpose: KeyPurpose;
 }
 
 export enum PublicCredentialsManagerType {
@@ -261,11 +270,13 @@ export class BaseWallet implements ObservableWallet {
     getPubDRepKey(): Promise<Ed25519PublicKeyHex | undefined>;
   };
   handles$: Observable<HandleInfo[]>;
+  readonly purpose: KeyPurpose;
 
   // eslint-disable-next-line max-statements
   constructor(
     {
       name,
+      purpose,
       polling: {
         interval: pollInterval = DEFAULT_POLLING_CONFIG.pollInterval,
         maxInterval = pollInterval * DEFAULT_POLLING_CONFIG.maxIntervalMultiplier,
@@ -316,6 +327,7 @@ export class BaseWallet implements ObservableWallet {
       },
       { consideredOutOfSyncAfter }
     );
+    this.purpose = purpose;
 
     this.witnesser = witnesser;
 
@@ -599,6 +611,7 @@ export class BaseWallet implements ObservableWallet {
       ...signingContext,
       dRepPublicKey,
       knownAddresses,
+      purpose: this.purpose,
       txInKeyPathMap: await util.createTxInKeyPathMap(tx.body, knownAddresses, this.util)
     };
 

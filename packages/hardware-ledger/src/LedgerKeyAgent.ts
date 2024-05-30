@@ -68,13 +68,14 @@ export interface CreateLedgerKeyAgentProps {
   accountIndex?: number;
   communicationType: CommunicationType;
   deviceConnection?: LedgerConnection | null;
+  purpose: KeyPurpose;
 }
 
 export interface GetLedgerXpubProps {
   deviceConnection?: LedgerConnection;
   communicationType: CommunicationType;
   accountIndex: number;
-  purpose?: KeyPurpose;
+  purpose: KeyPurpose;
 }
 
 export interface CreateLedgerTransportProps {
@@ -437,7 +438,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
     deviceConnection,
     communicationType,
     accountIndex,
-    purpose = KeyPurpose.STANDARD
+    purpose
   }: GetLedgerXpubProps): Promise<Crypto.Bip32PublicKeyHex> {
     try {
       const recoveredDeviceConnection = await LedgerKeyAgent.checkDeviceConnection(communicationType, deviceConnection);
@@ -471,7 +472,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
    * @throws TransportError
    */
   static async createWithDevice(
-    { chainId, accountIndex = 0, communicationType, deviceConnection }: CreateLedgerKeyAgentProps,
+    { chainId, accountIndex = 0, communicationType, deviceConnection, purpose }: CreateLedgerKeyAgentProps,
     dependencies: KeyAgentDependencies
   ) {
     const deviceListPaths = await LedgerKeyAgent.getHidDeviceList(communicationType);
@@ -482,7 +483,8 @@ export class LedgerKeyAgent extends KeyAgentBase {
     const extendedAccountPublicKey = await LedgerKeyAgent.getXpub({
       accountIndex,
       communicationType,
-      deviceConnection: activeDeviceConnection
+      deviceConnection: activeDeviceConnection,
+      purpose
     });
 
     return new LedgerKeyAgent(
@@ -491,7 +493,8 @@ export class LedgerKeyAgent extends KeyAgentBase {
         chainId,
         communicationType,
         deviceConnection: activeDeviceConnection,
-        extendedAccountPublicKey
+        extendedAccountPublicKey,
+        purpose
       },
       dependencies
     );
@@ -542,7 +545,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
   // TODO: Allow additional key paths
   async signTransaction(
     { body, hash }: Cardano.TxBodyWithHash,
-    { knownAddresses, txInKeyPathMap }: SignTransactionContext
+    { knownAddresses, txInKeyPathMap, purpose }: SignTransactionContext
   ): Promise<Cardano.Signatures> {
     try {
       const ledgerTxData = await toLedgerTx(body, {
@@ -550,6 +553,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
         chainId: this.chainId,
         dRepPublicKey: await this.derivePublicKey(util.DREP_KEY_DERIVATION_PATH),
         knownAddresses,
+        purpose,
         txInKeyPathMap
       });
 
@@ -573,6 +577,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
           result.witnesses.map(async (witness) => {
             const publicKey = await this.derivePublicKey({
               index: witness.path[Cip1852PathLevelIndexes.INDEX],
+              purpose: witness.path[Cip1852PathLevelIndexes.PURPOSE],
               role: witness.path[Cip1852PathLevelIndexes.ROLE]
             });
             const signature = Crypto.Ed25519SignatureHex(witness.witnessSignatureHex);

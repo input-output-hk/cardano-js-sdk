@@ -1,6 +1,6 @@
 import { Bip32PublicKeyHex, SodiumBip32Ed25519 } from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
-import { GroupedAddress, KeyAgent, KeyAgentType } from '@cardano-sdk/key-management';
+import { GroupedAddress, KeyAgent, KeyAgentType, KeyPurpose } from '@cardano-sdk/key-management';
 
 const accountIndex = 0;
 const chainId = Cardano.ChainIds.Preview;
@@ -23,7 +23,8 @@ export const createMockKeyAgent = (deriveAddressesReturn: GroupedAddress[] = [])
       accountIndex,
       chainId,
       encryptedRootPrivateKeyBytes: [],
-      extendedAccountPublicKey
+      extendedAccountPublicKey,
+      purpose: KeyPurpose.STANDARD
     },
     signBlob: jest.fn(),
     signTransaction: jest.fn()

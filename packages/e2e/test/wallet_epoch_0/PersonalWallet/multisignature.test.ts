@@ -2,7 +2,7 @@
 import { BaseWallet, FinalizeTxProps } from '@cardano-sdk/wallet';
 import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
-import { KeyRole, util } from '@cardano-sdk/key-management';
+import { KeyPurpose, KeyRole, util } from '@cardano-sdk/key-management';
 import {
   bip32Ed25519Factory,
   burnTokens,
@@ -37,7 +37,7 @@ describe('PersonalWallet/multisignature', () => {
   });
 
   it('can create a transaction with multiple signatures to mint an asset', async () => {
-    wallet = (await getWallet({ env, logger, name: 'Minting Wallet' })).wallet;
+    wallet = (await getWallet({ env, logger, name: 'Minting Wallet', purpose: KeyPurpose.MULTI_SIG })).wallet;
 
     const coins = 3_000_000n;
     await walletReady(wallet, coins);
@@ -48,21 +48,25 @@ describe('PersonalWallet/multisignature', () => {
     const aliceKeyAgent = await createStandaloneKeyAgent(
       env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
       genesis,
-      bip32Ed25519
+      bip32Ed25519,
+      KeyPurpose.MULTI_SIG
     );
     const bobKeyAgent = await createStandaloneKeyAgent(
       env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
       genesis,
-      bip32Ed25519
+      bip32Ed25519,
+      KeyPurpose.MULTI_SIG
     );
 
     const aliceDerivationPath = {
       index: 2,
+      purpose: KeyPurpose.MULTI_SIG,
       role: KeyRole.External
     };
 
     const bobDerivationPath = {
       index: 3,
+      purpose: KeyPurpose.MULTI_SIG,
       role: KeyRole.External
     };
 

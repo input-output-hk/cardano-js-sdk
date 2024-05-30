@@ -2,7 +2,7 @@
 import { Asset, Cardano, metadatum, nativeScriptPolicyId } from '@cardano-sdk/core';
 import { Assets, BaseWallet, FinalizeTxProps } from '@cardano-sdk/wallet';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
-import { KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
+import { KeyPurpose, KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
 import {
   bip32Ed25519Factory,
   burnTokens,
@@ -52,7 +52,7 @@ describe('PersonalWallet.assets/nft', () => {
   const coins = 10_000_000n; // number of coins to use in each transaction
 
   beforeAll(async () => {
-    wallet = (await getWallet({ env, logger, name: 'Minting Wallet' })).wallet;
+    wallet = (await getWallet({ env, logger, name: 'Minting Wallet', purpose: KeyPurpose.STANDARD })).wallet;
 
     await walletReady(wallet, coins);
 
@@ -61,11 +61,13 @@ describe('PersonalWallet.assets/nft', () => {
     const keyAgent = await createStandaloneKeyAgent(
       env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
       genesis,
-      await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger)
+      await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger),
+      KeyPurpose.STANDARD
     );
 
     const derivationPath = {
       index: 2,
+      purpose: KeyPurpose.STANDARD,
       role: KeyRole.External
     };
 

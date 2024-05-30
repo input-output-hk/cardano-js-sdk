@@ -18,7 +18,7 @@ import {
   timeout
 } from 'rxjs';
 import { FAST_OPERATION_TIMEOUT_DEFAULT, SYNC_TIMEOUT_DEFAULT } from '../defaults';
-import { InMemoryKeyAgent, TransactionSigner } from '@cardano-sdk/key-management';
+import { InMemoryKeyAgent, KeyPurpose, TransactionSigner } from '@cardano-sdk/key-management';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { TestWallet, networkInfoProviderFactory } from '../factories';
 import { getEnv, walletVariables } from '../environment';
@@ -228,17 +228,20 @@ export const submitCertificate = async (certificate: Cardano.Certificate, wallet
  * @param mnemonics The random set of mnemonics.
  * @param genesis Network genesis parameters
  * @param bip32Ed25519 The Ed25519 cryptography implementation.
+ * @param purpose they key derivation purpose of either 1852 or 1854
  */
 export const createStandaloneKeyAgent = async (
   mnemonics: string[],
   genesis: Cardano.CompactGenesis,
-  bip32Ed25519: Crypto.Bip32Ed25519
+  bip32Ed25519: Crypto.Bip32Ed25519,
+  purpose: KeyPurpose
 ) =>
   await InMemoryKeyAgent.fromBip39MnemonicWords(
     {
       chainId: genesis,
       getPassphrase: async () => Buffer.from(''),
-      mnemonicWords: mnemonics
+      mnemonicWords: mnemonics,
+      purpose
     },
     { bip32Ed25519, logger }
   );

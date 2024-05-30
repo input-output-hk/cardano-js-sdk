@@ -1,5 +1,6 @@
 import {
   AccountKeyDerivationPath,
+  KeyPurpose,
   SignBlobResult,
   SignDataContext,
   SignTransactionContext,
@@ -14,6 +15,7 @@ export type RequestContext<WalletMetadata extends {}, AccountMetadata extends {}
   wallet: AnyBip32Wallet<WalletMetadata, AccountMetadata>;
   accountIndex: number;
   chainId: Cardano.ChainId;
+  purpose: KeyPurpose;
 };
 
 export type RequestBase<WalletMetadata extends {}, AccountMetadata extends {}> = {

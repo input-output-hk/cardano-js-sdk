@@ -7,14 +7,10 @@ import { LedgerTxTransformerContext } from '../types';
 interface ResolveKeyPathParams {
   rewardAddress: Cardano.RewardAddress;
   knownAddresses: GroupedAddress[] | undefined;
-  purpose?: KeyPurpose;
+  purpose: KeyPurpose;
 }
 
-const resolveKeyPath = ({
-  rewardAddress,
-  knownAddresses,
-  purpose = KeyPurpose.STANDARD
-}: ResolveKeyPathParams): Ledger.BIP32Path | null => {
+const resolveKeyPath = ({ rewardAddress, knownAddresses, purpose }: ResolveKeyPathParams): Ledger.BIP32Path | null => {
   if (!knownAddresses) return null;
 
   const knownAddress = knownAddresses.find(
@@ -42,11 +38,16 @@ export const toWithdrawal: Transform<Cardano.Withdrawal, Ledger.Withdrawal, Ledg
   const rewardAddress = address?.asReward();
 
   if (!rewardAddress) throw new InvalidArgumentError('withdrawal', 'Invalid withdrawal stake address');
+  if (!context?.purpose) throw new InvalidArgumentError('withdrawal', 'Key purpose is required');
 
   let ledgerWithdrawal;
 
   if (areNumbersEqualInConstantTime(rewardAddress.getPaymentCredential().type, Cardano.CredentialType.KeyHash)) {
-    const keyPath = resolveKeyPath({ knownAddresses: context?.knownAddresses, rewardAddress });
+    const keyPath = resolveKeyPath({
+      knownAddresses: context?.knownAddresses,
+      purpose: context?.purpose,
+      rewardAddress
+    });
     ledgerWithdrawal = keyPath
       ? {
           amount: withdrawal.quantity,

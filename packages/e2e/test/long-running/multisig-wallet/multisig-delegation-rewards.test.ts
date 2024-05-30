@@ -1,7 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano, EraSummary, StakePoolProvider, createSlotEpochCalc } from '@cardano-sdk/core';
-import { InMemoryKeyAgent, KeyRole } from '@cardano-sdk/key-management';
+import { InMemoryKeyAgent, KeyPurpose, KeyRole } from '@cardano-sdk/key-management';
 import { MultiSigTx } from './MultiSigTx';
 import { MultiSigWallet } from './MultiSigWallet';
 import { Observable, filter, firstValueFrom, map, take } from 'rxjs';
@@ -34,6 +34,7 @@ const charlotteMnemonics =
 
 const DERIVATION_PATH = {
   index: 0,
+  purpose: KeyPurpose.MULTI_SIG,
   role: KeyRole.External
 };
 
@@ -63,7 +64,7 @@ const fundMultiSigWallet = async (sendingWallet: BaseWallet, address: Cardano.Pa
 const getKeyAgent = async (mnemonics: string, faucetWallet: BaseWallet, bip32Ed25519: Crypto.Bip32Ed25519) => {
   const genesis = await firstValueFrom(faucetWallet.genesisParameters$);
 
-  const keyAgent = await createStandaloneKeyAgent(mnemonics.split(' '), genesis, bip32Ed25519);
+  const keyAgent = await createStandaloneKeyAgent(mnemonics.split(' '), genesis, bip32Ed25519, KeyPurpose.STANDARD);
 
   const pubKey = await keyAgent.derivePublicKey(DERIVATION_PATH);
 
@@ -135,7 +136,8 @@ describe('multi signature wallet', () => {
       env,
       logger,
       name: 'Faucet Wallet',
-      polling: { interval: 50 }
+      polling: { interval: 50 },
+      purpose: KeyPurpose.MULTI_SIG
     }));
 
     await walletReady(faucetWallet);

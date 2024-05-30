@@ -46,7 +46,7 @@ export enum KeyPurpose {
 export interface AccountKeyDerivationPath {
   role: KeyRole;
   index: number;
-  purpose?: KeyPurpose;
+  purpose: KeyPurpose;
 }
 
 /** Internal = change address & External = receipt address */
@@ -80,6 +80,7 @@ export interface GroupedAddress {
   type: AddressType;
   index: number;
   networkId: Cardano.NetworkId;
+  purpose: KeyPurpose;
   accountIndex: number;
   address: Cardano.PaymentAddress;
   rewardAccount: Cardano.RewardAccount;
@@ -100,6 +101,7 @@ export interface SerializableKeyAgentDataBase {
   chainId: Cardano.ChainId;
   accountIndex: number;
   extendedAccountPublicKey: Crypto.Bip32PublicKeyHex;
+  purpose: KeyPurpose;
 }
 
 export interface SerializableInMemoryKeyAgentData extends SerializableKeyAgentDataBase {
@@ -174,6 +176,7 @@ export interface SignTransactionContext {
   txInKeyPathMap: TxInKeyPathMap;
   knownAddresses: GroupedAddress[];
   handleResolutions?: HandleResolution[];
+  purpose: KeyPurpose;
   dRepPublicKey?: Crypto.Ed25519PublicKeyHex;
   sender?: MessageSender;
 }
@@ -230,6 +233,7 @@ export type AsyncKeyAgent = Pick<KeyAgent, 'deriveAddress' | 'derivePublicKey' |
   getBip32Ed25519(): Promise<Crypto.Bip32Ed25519>;
   getExtendedAccountPublicKey(): Promise<Crypto.Bip32PublicKeyHex>;
   getAccountIndex(): Promise<number>;
+  getKeyPurpose(): Promise<KeyPurpose>;
 } & Shutdown;
 
 export type WitnessOptions = SignTransactionOptions;

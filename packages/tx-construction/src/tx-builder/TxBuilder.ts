@@ -4,6 +4,7 @@ import {
   AddressType,
   Bip32Account,
   GroupedAddress,
+  KeyPurpose,
   SignTransactionOptions,
   TransactionSigner,
   WitnessedTx,
@@ -235,6 +236,9 @@ export class GenericTxBuilder implements TxBuilder {
             const extraSigners = this.partialExtraSigners && [...this.partialExtraSigners];
             const partialSigningOptions = this.partialSigningOptions && { ...this.partialSigningOptions, extraSigners };
 
+            // TODO: Not sure about this. What is the best way to pass purpose to TxBuilder?
+            const purpose = KeyPurpose.STANDARD;
+
             if (this.partialAuxiliaryData) {
               this.partialTxBody.auxiliaryDataHash = Cardano.computeAuxiliaryDataHash(this.partialAuxiliaryData);
             }
@@ -290,6 +294,7 @@ export class GenericTxBuilder implements TxBuilder {
                 signingContext: {
                   handleResolutions: this.#handleResolutions,
                   knownAddresses: ownAddresses,
+                  purpose,
                   txInKeyPathMap: await util.createTxInKeyPathMap(body, ownAddresses, this.#dependencies.inputResolver)
                 },
                 signingOptions: { ...partialSigningOptions, extraSigners }

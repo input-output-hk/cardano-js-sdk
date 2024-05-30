@@ -3,6 +3,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { BaseWallet, ObservableWallet } from '@cardano-sdk/wallet';
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
+import { KeyPurpose } from '@cardano-sdk/key-management';
 import {
   TX_TIMEOUT_DEFAULT,
   TestWallet,
@@ -61,8 +62,22 @@ describe('PersonalWallet/delegation', () => {
 
   beforeAll(async () => {
     jest.setTimeout(180_000);
-    wallet1 = await getWallet({ env, idx: 0, logger, name: 'Test Wallet 1', polling: { interval: 500 } });
-    wallet2 = await getWallet({ env, idx: 1, logger, name: 'Test Wallet 2', polling: { interval: 500 } });
+    wallet1 = await getWallet({
+      env,
+      idx: 0,
+      logger,
+      name: 'Test Wallet 1',
+      polling: { interval: 500 },
+      purpose: KeyPurpose.STANDARD
+    });
+    wallet2 = await getWallet({
+      env,
+      idx: 1,
+      logger,
+      name: 'Test Wallet 2',
+      polling: { interval: 500 },
+      purpose: KeyPurpose.STANDARD
+    });
 
     await Promise.all([waitForWalletStateSettle(wallet1.wallet), waitForWalletStateSettle(wallet2.wallet)]);
     bip32Ed25519 = await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger);

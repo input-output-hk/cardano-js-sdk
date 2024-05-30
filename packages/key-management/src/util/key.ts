@@ -14,11 +14,13 @@ export const harden = (num: number): number => 0x80_00_00_00 + num;
 
 export const STAKE_KEY_DERIVATION_PATH: AccountKeyDerivationPath = {
   index: 0,
+  purpose: KeyPurpose.STANDARD,
   role: KeyRole.Stake
 };
 
 export const DREP_KEY_DERIVATION_PATH: AccountKeyDerivationPath = {
   index: 0,
+  purpose: KeyPurpose.STANDARD,
   role: KeyRole.DRep
 };
 
@@ -34,19 +36,19 @@ export interface DeriveAccountPrivateKeyProps {
   rootPrivateKey: Crypto.Bip32PrivateKeyHex;
   accountIndex: number;
   bip32Ed25519: Crypto.Bip32Ed25519;
-  purpose?: KeyPurpose;
+  purpose: KeyPurpose;
 }
 
 interface GroupAddressKeyPath {
   address: GroupedAddress;
-  purpose?: KeyPurpose;
+  purpose: KeyPurpose;
 }
 
 export const deriveAccountPrivateKey = async ({
   rootPrivateKey,
   accountIndex,
   bip32Ed25519,
-  purpose = KeyPurpose.STANDARD
+  purpose
 }: DeriveAccountPrivateKeyProps): Promise<Crypto.Bip32PrivateKeyHex> =>
   await bip32Ed25519.derivePrivateKey(rootPrivateKey, [
     harden(purpose),
@@ -63,18 +65,16 @@ export const deriveAccountPrivateKey = async ({
  */
 export const accountKeyDerivationPathToBip32Path = (
   accountIndex: number,
-  { index, role, purpose = KeyPurpose.STANDARD }: AccountKeyDerivationPath
+  { index, role, purpose }: AccountKeyDerivationPath
 ): BIP32Path => [harden(purpose), harden(CardanoKeyConst.COIN_TYPE), harden(accountIndex), role, index];
 
 /**
  * Constructs the hardened derivation path of the payment key for the
- * given grouped address of an HD wallet as specified in CIP 1852
+ * given grouped address of an HD wallet as specified in CIP 1852 or CIP 1854
  * https://cips.cardano.org/cips/cip1852/
+ * https://cips.cardano.org/cips/cip1854/
  */
-export const paymentKeyPathFromGroupedAddress = ({
-  address,
-  purpose = KeyPurpose.STANDARD
-}: GroupAddressKeyPath): BIP32Path => [
+export const paymentKeyPathFromGroupedAddress = ({ address, purpose }: GroupAddressKeyPath): BIP32Path => [
   harden(purpose),
   harden(CardanoKeyConst.COIN_TYPE),
   harden(address.accountIndex),
@@ -89,9 +89,9 @@ export const paymentKeyPathFromGroupedAddress = ({
  */
 export const stakeKeyPathFromGroupedAddress = ({
   address,
-  purpose = KeyPurpose.STANDARD
+  purpose
 }: Partial<GroupAddressKeyPath>): BIP32Path | null => {
-  if (!address?.stakeKeyDerivationPath) return null;
+  if (!address?.stakeKeyDerivationPath || !purpose) return null;
   return [
     harden(purpose),
     harden(CardanoKeyConst.COIN_TYPE),

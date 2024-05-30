@@ -2,7 +2,7 @@ import { Asset, Cardano, Handle, Serialization, metadatum, nativeScriptPolicyId,
 import { FinalizeTxProps, ObservableWallet } from '@cardano-sdk/wallet';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
-import { KeyAgent, KeyRole, util as keyManagementUtil } from '@cardano-sdk/key-management';
+import { KeyAgent, KeyPurpose, KeyRole, util as keyManagementUtil } from '@cardano-sdk/key-management';
 import { firstValueFrom } from 'rxjs';
 import { readFile } from 'fs/promises';
 import { submitAndConfirm } from './util';
@@ -79,6 +79,7 @@ export const createHandleMetadata = (handlePolicyId: string, handleNames: string
 export const createHandlePolicy = async (keyAgent: KeyAgent) => {
   const derivationPath = {
     index: 0,
+    purpose: KeyPurpose.STANDARD,
     role: KeyRole.External
   };
   const pubKey = await keyAgent.derivePublicKey(derivationPath);

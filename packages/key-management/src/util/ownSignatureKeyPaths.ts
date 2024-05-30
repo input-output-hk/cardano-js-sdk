@@ -281,7 +281,7 @@ const getRequiredSignersKeyPaths = (
       const stakeCredential = Cardano.RewardAccount.toHash(address.rewardAccount);
 
       if (paymentCredential && paymentCredential.toString() === keyHash) {
-        paths.push({ index: address.index, role: Number(address.type) });
+        paths.push({ index: address.index, purpose: address.purpose, role: Number(address.type) });
       }
 
       if (stakeCredential && address.stakeKeyDerivationPath && stakeCredential.toString() === keyHash) {
@@ -340,7 +340,7 @@ export const createTxInKeyPathMap = async (
       if (!resolution) return;
       const ownAddress = knownAddresses.find(({ address }) => address === resolution.address);
       if (!ownAddress) return;
-      result[TxInId(txIn)] = { index: ownAddress.index, role: Number(ownAddress.type) };
+      result[TxInId(txIn)] = { index: ownAddress.index, purpose: ownAddress.purpose, role: Number(ownAddress.type) };
     })
   );
 
