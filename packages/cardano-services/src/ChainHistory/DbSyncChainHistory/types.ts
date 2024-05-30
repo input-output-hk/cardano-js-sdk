@@ -3,6 +3,7 @@ import { Cardano } from '@cardano-sdk/core';
 export type TransactionDataMap<T> = Map<Cardano.TransactionId, T>;
 export type TxOutTokenMap = Map<string, Cardano.TokenMap>;
 export type TxTokenMap = TransactionDataMap<Cardano.TokenMap>;
+export type TxOutScriptMap = Map<string, Cardano.Script>;
 
 export interface BlockModel {
   block_no: number;
@@ -67,6 +68,7 @@ export interface TxOutputModel {
   datum?: Buffer | null;
   id: string;
   index: number;
+  reference_script_id: number | null;
   tx_id: Buffer;
 }
 
@@ -85,6 +87,13 @@ export interface MultiAssetModel {
 
 export interface TxOutMultiAssetModel extends MultiAssetModel {
   tx_out_id: string;
+}
+
+export interface ScriptModel {
+  type: 'timelock' | 'plutusV1' | 'plutusV2' | 'plutusV3';
+  bytes: Buffer;
+  hash: Buffer;
+  serialised_size: number;
 }
 
 export interface WithdrawalModel {

@@ -73,6 +73,8 @@ updatePool() {
   delegatorPaymentSKey=network-files/stake-delegator-keys/payment"${SP_NODE_ID}".skey
   delegatorStakeSKey=network-files/stake-delegator-keys/staking"${SP_NODE_ID}".skey
 
+  keyDeposit=2000000
+
   POOL_ID=$(cardano-cli conway stake-pool id --cold-verification-key-file "$coldVKey" --output-format "hex")
 
   # funding pool owner stake address
@@ -105,7 +107,7 @@ updatePool() {
   # register pool owner stake address
   currentBalance=$(getAddressBalance "$genesisAddr")
   cardano-cli conway stake-address registration-certificate \
-    --key-reg-deposit-amt 0 \
+    --key-reg-deposit-amt ${keyDeposit} \
     --stake-verification-key-file "$stakeVKey" \
     --out-file ${SP_NODE_ID}/pool-owner-registration.cert
 
@@ -139,7 +141,7 @@ updatePool() {
       --protocol-params-file ${SP_NODE_ID}/params.json | awk '{ print $1 }')
 
     initialBalance=$(getAddressBalance "$genesisAddr")
-    txOut=$((initialBalance - fee))
+    txOut=$((initialBalance - fee - keyDeposit))
 
     cardano-cli conway transaction build-raw \
       --tx-in "$utxo" \

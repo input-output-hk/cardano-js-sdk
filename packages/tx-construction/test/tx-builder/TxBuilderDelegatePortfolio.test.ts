@@ -12,6 +12,7 @@ import {
 } from '../../src';
 import { GreedyInputSelector, GreedySelectorProps, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { dummyLogger } from 'ts-log';
+import { mockTxEvaluator } from './mocks';
 import { mockProviders as mocks } from '@cardano-sdk/util-dev';
 import uniqBy from 'lodash/uniqBy';
 
@@ -112,6 +113,7 @@ const createTxBuilder = async ({
       logger: dummyLogger,
       outputValidator,
       txBuilderProviders,
+      txEvaluator: mockTxEvaluator,
       witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)
     }),
     txBuilderProviders,
@@ -120,6 +122,7 @@ const createTxBuilder = async ({
       logger: dummyLogger,
       outputValidator,
       txBuilderProviders,
+      txEvaluator: mockTxEvaluator,
       witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)
     })
   };

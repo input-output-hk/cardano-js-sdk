@@ -1,8 +1,7 @@
 import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
+import { TaggedCostModel, buildCostModels, plutusV1CostModel, plutusV2CostModel } from '../src/tx-builder/costModels';
 import { computeScriptDataHash } from '../src';
-
-type TaggedCostModel = { version: Cardano.PlutusLanguageVersion; prices: number[] };
 
 const alonzoPlutusV1CostModel: TaggedCostModel = {
   prices: [
@@ -34,50 +33,8 @@ const localNetworkPlutusV2CostModel: TaggedCostModel = {
   version: Cardano.PlutusLanguageVersion.V2
 };
 
-const vasilPlutusV1CostModel: TaggedCostModel = {
-  prices: [
-    205_665, 812, 1, 1, 1000, 571, 0, 1, 1000, 24_177, 4, 1, 1000, 32, 117_366, 10_475, 4, 23_000, 100, 23_000, 100,
-    23_000, 100, 23_000, 100, 23_000, 100, 23_000, 100, 100, 100, 23_000, 100, 19_537, 32, 175_354, 32, 46_417, 4,
-    221_973, 511, 0, 1, 89_141, 32, 497_525, 14_068, 4, 2, 196_500, 453_240, 220, 0, 1, 1, 1000, 28_662, 4, 2, 245_000,
-    216_773, 62, 1, 1_060_367, 12_586, 1, 208_512, 421, 1, 187_000, 1000, 52_998, 1, 80_436, 32, 43_249, 32, 1000, 32,
-    80_556, 1, 57_667, 4, 1000, 10, 197_145, 156, 1, 197_145, 156, 1, 204_924, 473, 1, 208_896, 511, 1, 52_467, 32,
-    64_832, 32, 65_493, 32, 22_558, 32, 16_563, 32, 76_511, 32, 196_500, 453_240, 220, 0, 1, 1, 69_522, 11_687, 0, 1,
-    60_091, 32, 196_500, 453_240, 220, 0, 1, 1, 196_500, 453_240, 220, 0, 1, 1, 806_990, 30_482, 4, 1_927_926, 82_523,
-    4, 265_318, 0, 4, 0, 85_931, 32, 205_665, 812, 1, 1, 41_182, 32, 212_342, 32, 31_220, 32, 32_696, 32, 43_357, 32,
-    32_247, 32, 38_314, 32, 57_996_947, 18_975, 10
-  ],
-  version: Cardano.PlutusLanguageVersion.V1
-};
-
-const vasilPlutusV2CostModel: TaggedCostModel = {
-  prices: [
-    205_665, 812, 1, 1, 1000, 571, 0, 1, 1000, 24_177, 4, 1, 1000, 32, 117_366, 10_475, 4, 23_000, 100, 23_000, 100,
-    23_000, 100, 23_000, 100, 23_000, 100, 23_000, 100, 100, 100, 23_000, 100, 19_537, 32, 175_354, 32, 46_417, 4,
-    221_973, 511, 0, 1, 89_141, 32, 497_525, 14_068, 4, 2, 196_500, 453_240, 220, 0, 1, 1, 1000, 28_662, 4, 2, 245_000,
-    216_773, 62, 1, 1_060_367, 12_586, 1, 208_512, 421, 1, 187_000, 1000, 52_998, 1, 80_436, 32, 43_249, 32, 1000, 32,
-    80_556, 1, 57_667, 4, 1000, 10, 197_145, 156, 1, 197_145, 156, 1, 204_924, 473, 1, 208_896, 511, 1, 52_467, 32,
-    64_832, 32, 65_493, 32, 22_558, 32, 16_563, 32, 76_511, 32, 196_500, 453_240, 220, 0, 1, 1, 69_522, 11_687, 0, 1,
-    60_091, 32, 196_500, 453_240, 220, 0, 1, 1, 196_500, 453_240, 220, 0, 1, 1, 1_159_724, 392_670, 0, 2, 806_990,
-    30_482, 4, 1_927_926, 82_523, 4, 265_318, 0, 4, 0, 85_931, 32, 205_665, 812, 1, 1, 41_182, 32, 212_342, 32, 31_220,
-    32, 32_696, 32, 43_357, 32, 32_247, 32, 38_314, 32, 35_892_428, 10, 57_996_947, 18_975, 10, 38_887_044, 32_947, 10
-  ],
-  version: Cardano.PlutusLanguageVersion.V2
-};
-
-const buildCostModels = (models: TaggedCostModel[]): Cardano.CostModels => {
-  const costModels = new Serialization.Costmdls();
-
-  for (const model of models) {
-    const alonzoCostModel = new Serialization.CostModel(model.version, model.prices);
-
-    costModels.insert(alonzoCostModel);
-  }
-
-  return costModels.toCore();
-};
-
 describe('computeScriptDataHash', () => {
-  const costModels = buildCostModels([vasilPlutusV1CostModel, vasilPlutusV2CostModel]);
+  const costModels = buildCostModels([plutusV1CostModel, plutusV2CostModel]);
 
   it('can compute script data hash for plutus v1 scripts using alonzo era cost models', () => {
     // Arrange

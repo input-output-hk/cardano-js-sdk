@@ -177,13 +177,11 @@ mkdir -p "${ROOT}/genesis/shelley"
 mv "${ROOT}/byron-gen-command/genesis.json" "${ROOT}/genesis/byron/genesis-wrong.json"
 mv "${ROOT}/genesis.alonzo.json" "${ROOT}/genesis/shelley/genesis.alonzo.json"
 mv "${ROOT}/genesis.conway.json" "${ROOT}/genesis/shelley/genesis.conway.json"
-mv "${ROOT}/genesis.json" "${ROOT}/genesis/shelley/genesis.json"
+mv "${ROOT}/genesis.json" "${ROOT}/genesis/shelley/copy-genesis.json"
 
 jq --raw-output ".protocolConsts.protocolMagic = ${NETWORK_MAGIC}" "${ROOT}/genesis/byron/genesis-wrong.json" >"${ROOT}/genesis/byron/genesis.json"
 
 rm "${ROOT}/genesis/byron/genesis-wrong.json"
-
-cp "${ROOT}/genesis/shelley/genesis.json" "${ROOT}/genesis/shelley/copy-genesis.json"
 
 if [[ "$NETWORK_SPEED" == "fast" ]]; then
   SLOT_LENGTH=0.2
@@ -191,12 +189,33 @@ else
   SLOT_LENGTH=1
 fi
 
+jq -M "
+. + {
+  activeSlotsCoeff: 0.1,
+  epochLength: 1000,
+  maxLovelaceSupply: $((MAX_SUPPLY * 3)),
+  securityParam: 10,
+  slotLength: ${SLOT_LENGTH},
+  updateQuorum: 2
+} |
+.protocolParams += {
+  decentralisationParam: 0.7,
+  keyDeposit: 2000000,
+  minFeeA: 44,
+  minFeeB: 155381,
+  minUTxOValue: 1000000,
+  poolDeposit: 500000000,
+  protocolVersion: { major : 9, minor: 0 },
+  rho: 0.1,
+  tau: 0.1
+}" "${ROOT}/genesis/shelley/copy-genesis.json" > "${ROOT}/genesis/shelley/genesis.json"
 
-jq -M ". + {slotLength:${SLOT_LENGTH}, activeSlotsCoeff:0.1, securityParam:10, epochLength:1000, maxLovelaceSupply:$((MAX_SUPPLY * 3)), updateQuorum:2}" "${ROOT}/genesis/shelley/copy-genesis.json" > "${ROOT}/genesis/shelley/copy2-genesis.json"
-jq --raw-output '.protocolParams.protocolVersion.major = 9 | .protocolParams.minFeeA = 44 | .protocolParams.minFeeB = 155381 | .protocolParams.minUTxOValue = 1000000 | .protocolParams.decentralisationParam = 0.7 | .protocolParams.rho = 0.1 | .protocolParams.tau = 0.1' "${ROOT}/genesis/shelley/copy2-genesis.json" > "${ROOT}/genesis/shelley/genesis.json"
-
-rm "${ROOT}/genesis/shelley/copy2-genesis.json"
 rm "${ROOT}/genesis/shelley/copy-genesis.json"
+
+# Previous version was trying to set this to ${MAX_SUPPLY}, but it wasn't able to due to a wrong regular expression.
+# Setting it to ${MAX_SUPPLY} somehow breaks the local-network with some negative stake amount (issue not investigated).
+# jq changes this value in 9E+16 which is the same value, but the exponential representation somehow breaks the local-network (issue not investigated).
+# sed_i -e "s/\"maxLovelaceSupply\": [^,]*/\"maxLovelaceSupply\": 90000000000000000/" "${ROOT}/genesis/shelley/genesis.json"
 
 for NODE_ID in ${SP_NODES_ID}; do
   TARGET="${ROOT}/node-sp${NODE_ID}"

@@ -1,4 +1,5 @@
 import * as Cardano from '../../../Cardano';
+import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborWriter } from '../../CBOR';
 import { ExUnits } from '../../Common';
 import { HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
@@ -7,6 +8,7 @@ import { RedeemerTag } from './RedeemerTag';
 import { hexToBytes } from '../../../util/misc';
 
 const REDEEMER_ARRAY_SIZE = 4;
+const HASH_LENGTH_IN_BYTES = 32;
 
 /**
  * The Redeemer is an argument provided to a Plutus smart contract (script) when
@@ -242,5 +244,16 @@ export class Redeemer {
   setExUnits(exUnits: ExUnits) {
     this.#exUnits = exUnits;
     this.#originalBytes = undefined;
+  }
+
+  /**
+   * Computes the redeemer hash.
+   *
+   * @returns the redeemer hash.
+   */
+  hash(): Crypto.Hash32ByteBase16 {
+    const hash = Crypto.blake2b(HASH_LENGTH_IN_BYTES).update(Buffer.from(this.toCbor(), 'hex')).digest();
+
+    return Crypto.Hash32ByteBase16(HexBlob.fromBytes(hash));
   }
 }

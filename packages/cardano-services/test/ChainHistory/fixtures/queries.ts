@@ -12,13 +12,13 @@ export const latestBlockHashes = `
   LIMIT $1`;
 
 export const latestTxHashes = `
-  SELECT hash
+  SELECT tx.hash as tx_hash
   FROM tx
   ORDER BY id DESC
   LIMIT $1`;
 
 export const beginLatestTxHashes = `
-  SELECT hash FROM tx
+  SELECT tx.hash as tx_hash FROM tx
   JOIN tx_out ON tx_out.tx_id = tx.id`;
 
 export const latestTxHashesWithMultiAsset = `
@@ -65,6 +65,10 @@ export const latestTxHashesWithProposalProcedures = `
 
 export const latestTxHashesWithVotingProcedures = `
   JOIN voting_procedure ON voting_procedure.tx_id = tx.id`;
+
+export const latestTxHashesWithScriptReference = `
+  JOIN script ON script.tx_id = tx.id
+  WHERE tx_out.reference_script_id IS NOT NULL`;
 
 export const endLatestTxHashes = `
   GROUP BY tx.id

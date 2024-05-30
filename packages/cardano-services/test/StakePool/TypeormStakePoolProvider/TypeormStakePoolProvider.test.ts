@@ -81,6 +81,7 @@ describe('TypeormStakePoolProvider', () => {
   let filterArgs: QueryStakePoolsArgs;
   let poolsInfo: PoolInfo[];
   let poolsInfoWithMeta: PoolInfo[];
+  let poolsInfoWithUniqueMeta: PoolInfo[];
   let poolsInfoWithMetaFiltered: PoolInfo[];
   let poolsInfoWithMetrics: PoolInfo[];
   let poolsInfoWithMetricsFiltered: PoolInfo[];
@@ -108,15 +109,18 @@ describe('TypeormStakePoolProvider', () => {
     poolsInfo = await fixtureBuilder.getPools(1000, ['active', 'activating', 'retired', 'retiring']);
     poolsInfoWithMeta = poolsInfo.filter((pool) => isNotNil(pool.metadataUrl));
     poolsInfoWithMetrics = poolsInfo.filter((pool) => isNotNil(pool.saturation));
+    poolsInfoWithUniqueMeta = poolsInfoWithMeta
+      .filter(({ name, ticker }) => name !== 'Same Name' && ticker !== 'SP6a7')
+      .sort((a, b) => (a.name < b.name ? -1 : 1));
 
     filterArgs = {
       filters: {
         identifier: {
           _condition: 'or',
           values: [
-            { ticker: poolsInfoWithMeta[0].ticker },
-            { name: poolsInfoWithMeta[1].name },
-            { id: poolsInfoWithMeta[2].id }
+            { ticker: poolsInfoWithUniqueMeta[0].ticker },
+            { name: poolsInfoWithUniqueMeta[1].name },
+            { id: poolsInfoWithUniqueMeta[2].id }
           ]
         }
       },
@@ -739,7 +743,7 @@ describe('TypeormStakePoolProvider', () => {
               const response = await provider.queryStakePools(
                 setSortCondition(setFilterCondition(filterArgs, 'or'), 'asc', 'ticker')
               );
-              const expected = [...poolsInfoWithMeta].sort((a, b) => (a.ticker < b.ticker ? -1 : 1));
+              const expected = [...poolsInfoWithMetricsFiltered].sort((a, b) => (a.ticker < b.ticker ? -1 : 1));
               expect(response.pageResults[0].metadata?.ticker).toEqual(expected[0].ticker);
               expect(response.pageResults[1].metadata?.ticker).toEqual(expected[1].ticker);
             });
