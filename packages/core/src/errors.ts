@@ -78,3 +78,9 @@ export class NotImplementedError extends CustomError {
     super(`Not implemented: ${missingFeature}`);
   }
 }
+
+export class TimeoutError extends CustomError {
+  public constructor(message: string) {
+    super(`Timeout: ${message}`);
+  }
+}
