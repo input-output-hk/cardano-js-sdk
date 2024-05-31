@@ -212,11 +212,6 @@ jq -M "
 
 rm "${ROOT}/genesis/shelley/copy-genesis.json"
 
-# Previous version was trying to set this to ${MAX_SUPPLY}, but it wasn't able to due to a wrong regular expression.
-# Setting it to ${MAX_SUPPLY} somehow breaks the local-network with some negative stake amount (issue not investigated).
-# jq changes this value in 9E+16 which is the same value, but the exponential representation somehow breaks the local-network (issue not investigated).
-# sed_i -e "s/\"maxLovelaceSupply\": [^,]*/\"maxLovelaceSupply\": 90000000000000000/" "${ROOT}/genesis/shelley/genesis.json"
-
 for NODE_ID in ${SP_NODES_ID}; do
   TARGET="${ROOT}/node-sp${NODE_ID}"
   PORT="$(("$NODE_ID" + 3000))"
