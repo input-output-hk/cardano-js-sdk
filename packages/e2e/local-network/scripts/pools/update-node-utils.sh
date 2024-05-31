@@ -73,6 +73,8 @@ updatePool() {
   delegatorPaymentSKey=network-files/stake-delegator-keys/payment"${SP_NODE_ID}".skey
   delegatorStakeSKey=network-files/stake-delegator-keys/staking"${SP_NODE_ID}".skey
 
+  keyDeposit=2000000
+
   POOL_ID=$(cardano-cli stake-pool id --cold-verification-key-file "$coldVKey" --output-format "hex")
 
   # funding pool owner stake address
@@ -128,7 +130,6 @@ updatePool() {
     --byron-witness-count 0 \
     --protocol-params-file ${SP_NODE_ID}/params.json | awk '{ print $1 }')
 
-  keyDeposit=2000000
   initialBalance=$(getAddressBalance "$genesisAddr")
   txOut=$((initialBalance - fee - keyDeposit))
 
