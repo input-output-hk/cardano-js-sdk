@@ -748,7 +748,7 @@ describe('cip30', () => {
         const bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
         bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
         mockWallet = createPersonalWallet(
-          { name: 'Test Wallet', purpose: KeyPurpose.STANDARD },
+          { name: 'Test Wallet' },
           {
             assetProvider,
             bip32Account,

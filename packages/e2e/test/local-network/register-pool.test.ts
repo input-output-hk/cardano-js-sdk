@@ -16,7 +16,7 @@ import { firstValueFrom } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, KeyPurpose, KeyRole } from '@cardano-sdk/key-management';
+import { AddressType, KeyRole } from '@cardano-sdk/key-management';
 
 const env = getEnv(walletVariables);
 
@@ -54,8 +54,7 @@ describe('local-network/register-pool', () => {
       idx: 0,
       logger,
       name: 'Pool Wallet 1',
-      polling: { interval: 500 },
-      purpose: KeyPurpose.STANDARD
+      polling: { interval: 500 }
     });
     wallet2 = await getWallet({
       customKeyParams: wallet2Params,
@@ -63,8 +62,7 @@ describe('local-network/register-pool', () => {
       idx: 0,
       logger,
       name: 'Pool Wallet 2',
-      polling: { interval: 500 },
-      purpose: KeyPurpose.STANDARD
+      polling: { interval: 500 }
     });
 
     await waitForWalletStateSettle(wallet1.wallet);

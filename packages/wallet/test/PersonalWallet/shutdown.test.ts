@@ -62,7 +62,7 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
   const stakePoolProvider = createStubStakePoolProvider();
 
   return createPersonalWallet(
-    { name, polling: pollingConfig, purpose: KeyPurpose.STANDARD },
+    { name, polling: pollingConfig },
     {
       assetProvider,
       bip32Account,

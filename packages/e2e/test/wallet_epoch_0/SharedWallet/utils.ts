@@ -301,7 +301,6 @@ export const buildSharedWallets = async (env: any, genesisParameters: Cardano.Co
       name: 'Alice shared Wallet',
       paymentScript,
       polling: { interval: 50 },
-      purpose: KeyPurpose.STANDARD,
       stakingScript,
       witnesser: new SharedWalletWitnesser(alice.keyAgent, paymentScript, stakingScript)
     })
@@ -314,7 +313,6 @@ export const buildSharedWallets = async (env: any, genesisParameters: Cardano.Co
       name: 'Bob shared Wallet',
       paymentScript,
       polling: { interval: 50 },
-      purpose: KeyPurpose.STANDARD,
       stakingScript,
       witnesser: new SharedWalletWitnesser(bob.keyAgent, paymentScript, stakingScript)
     })
@@ -327,7 +325,6 @@ export const buildSharedWallets = async (env: any, genesisParameters: Cardano.Co
       name: 'Charlotte shared Wallet',
       paymentScript,
       polling: { interval: 50 },
-      purpose: KeyPurpose.STANDARD,
       stakingScript,
       witnesser: new SharedWalletWitnesser(charlotte.keyAgent, paymentScript, stakingScript)
     })

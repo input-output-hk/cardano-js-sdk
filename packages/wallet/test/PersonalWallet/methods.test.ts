@@ -100,7 +100,7 @@ describe('BaseWallet methods', () => {
     bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
     witnesser = util.createBip32Ed25519Witnesser(asyncKeyAgent);
     wallet = createPersonalWallet(
-      { name: 'Test Wallet', purpose: KeyPurpose.STANDARD },
+      { name: 'Test Wallet' },
       {
         addressDiscovery,
         assetProvider,
@@ -469,7 +469,7 @@ describe('BaseWallet methods', () => {
       .mockRejectedValueOnce('error')
       .mockResolvedValue({ hex: () => 'string' });
     wallet = createPersonalWallet(
-      { name: 'Test Wallet', purpose: KeyPurpose.STANDARD },
+      { name: 'Test Wallet' },
       {
         assetProvider,
         bip32Account,

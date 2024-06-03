@@ -26,7 +26,7 @@ const createWallet = async (keyAgent: KeyAgent) => {
   const asyncKeyAgent = util.createAsyncKeyAgent(keyAgent);
   const chainHistoryProvider = mockChainHistoryProvider();
   return createPersonalWallet(
-    { name: 'Wallet1', purpose: KeyPurpose.STANDARD },
+    { name: 'Wallet1' },
     {
       assetProvider,
       bip32Account: await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent),

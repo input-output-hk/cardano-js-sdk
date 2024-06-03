@@ -1,7 +1,7 @@
 /* eslint-disable import/imports-first */
 import * as dotenv from 'dotenv';
 import { BaseWallet, createPersonalWallet } from '@cardano-sdk/wallet';
-import { Bip32Account, KeyPurpose, util } from '@cardano-sdk/key-management';
+import { Bip32Account, util } from '@cardano-sdk/key-management';
 import { Logger } from 'ts-log';
 import {
   MeasurementUtil,
@@ -83,7 +83,7 @@ const createWallet = async (accountIndex: number): Promise<BaseWallet> => {
 
   measurementUtil.addStartMarker(MeasureTarget.wallet, accountIndex);
   return createPersonalWallet(
-    { name: `Wallet ${accountIndex}`, purpose: KeyPurpose.STANDARD },
+    { name: `Wallet ${accountIndex}` },
     {
       ...providers,
       bip32Account: await Bip32Account.fromAsyncKeyAgent(keyAgent),

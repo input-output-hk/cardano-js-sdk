@@ -1,6 +1,5 @@
 import { BaseWallet, createWalletUtil } from '@cardano-sdk/wallet';
 import { Cardano } from '@cardano-sdk/core';
-import { KeyPurpose } from '@cardano-sdk/key-management';
 import { filter, firstValueFrom, map } from 'rxjs';
 import { getEnv, getWallet, walletReady, walletVariables } from '../../../src';
 import { isNotNil } from '@cardano-sdk/util';
@@ -13,7 +12,7 @@ describe('PersonalWallet/metadata', () => {
   let ownAddress: Cardano.PaymentAddress;
 
   beforeAll(async () => {
-    wallet = (await getWallet({ env, logger, name: 'Test Wallet', purpose: KeyPurpose.STANDARD })).wallet;
+    wallet = (await getWallet({ env, logger, name: 'Test Wallet' })).wallet;
     ownAddress = (await firstValueFrom(wallet.addresses$))[0].address;
 
     await walletReady(wallet);

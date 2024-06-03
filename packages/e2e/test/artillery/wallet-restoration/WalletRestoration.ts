@@ -100,8 +100,7 @@ export const walletRestoration: FunctionHook<WalletVars> = async ({ vars, _uid }
       keyAgent,
       logger,
       name: `Test Wallet of VU with id: ${_uid}`,
-      polling: { interval: 50 },
-      purpose: KeyPurpose.STANDARD
+      polling: { interval: 50 }
     });
 
     vars.currentWallet = wallet;

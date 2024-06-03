@@ -176,7 +176,7 @@ describe('LedgerKeyAgent', () => {
         const chainHistoryProvider = mocks.mockChainHistoryProvider({ rewardAccount });
         const asyncKeyAgent = util.createAsyncKeyAgent(ledgerKeyAgent);
         wallet = createPersonalWallet(
-          { name: 'HW Wallet', purpose: KeyPurpose.STANDARD },
+          { name: 'HW Wallet' },
           {
             assetProvider,
             bip32Account: await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent),

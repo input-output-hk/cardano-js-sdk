@@ -121,7 +121,6 @@ export interface BaseWalletProps {
   readonly name: string;
   readonly polling?: PollingConfig;
   readonly retryBackoffConfig?: RetryBackoffConfig;
-  readonly purpose: KeyPurpose;
 }
 
 export enum PublicCredentialsManagerType {
@@ -271,13 +270,11 @@ export class BaseWallet implements ObservableWallet {
     getPubDRepKey(): Promise<Ed25519PublicKeyHex | undefined>;
   };
   handles$: Observable<HandleInfo[]>;
-  readonly purpose: KeyPurpose;
 
   // eslint-disable-next-line max-statements
   constructor(
     {
       name,
-      purpose,
       polling: {
         interval: pollInterval = DEFAULT_POLLING_CONFIG.pollInterval,
         maxInterval = pollInterval * DEFAULT_POLLING_CONFIG.maxIntervalMultiplier,
@@ -328,7 +325,6 @@ export class BaseWallet implements ObservableWallet {
       },
       { consideredOutOfSyncAfter }
     );
-    this.purpose = purpose;
 
     this.witnesser = witnesser;
 
@@ -613,7 +609,7 @@ export class BaseWallet implements ObservableWallet {
       ...signingContext,
       dRepPublicKey,
       knownAddresses,
-      purpose: this.purpose,
+      purpose: signingContext?.purpose ?? KeyPurpose.STANDARD,
       txInKeyPathMap: await util.createTxInKeyPathMap(tx.body, knownAddresses, this.util)
     };
 

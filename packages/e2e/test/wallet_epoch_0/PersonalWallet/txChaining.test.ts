@@ -1,4 +1,3 @@
-import { KeyPurpose } from '@cardano-sdk/key-management';
 import { ObservableWallet } from '@cardano-sdk/wallet';
 import { firstValueFrom } from 'rxjs';
 import { getEnv, getWallet, submitAndConfirm, walletReady, walletVariables } from '../../../src';
@@ -11,7 +10,7 @@ describe('PersonalWallet/txChaining', () => {
 
   beforeAll(async () => {
     jest.setTimeout(180_000);
-    wallet = (await getWallet({ env, logger, name: 'Test Wallet', purpose: KeyPurpose.STANDARD })).wallet;
+    wallet = (await getWallet({ env, logger, name: 'Test Wallet' })).wallet;
 
     await walletReady(wallet, 1_000_000n);
   });

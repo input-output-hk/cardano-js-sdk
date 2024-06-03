@@ -5,7 +5,7 @@ import path from 'path';
 dotenv.config({ path: path.join(__dirname, '../../../.env') });
 import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano } from '@cardano-sdk/core';
-import { GroupedAddress, KeyPurpose, util } from '@cardano-sdk/key-management';
+import { GroupedAddress, util } from '@cardano-sdk/key-management';
 import { Logger } from 'ts-log';
 import { MINUTE, createMockKeyAgent, getEnv, getWallet, waitForWalletStateSettle, walletVariables } from '../../../src';
 import { logger } from '@cardano-sdk/util-dev';
@@ -48,8 +48,7 @@ const initWallets = async (walletsNum: number, addresses: GroupedAddress[]): Pro
       keyAgent,
       logger,
       name: 'Test Wallet',
-      polling: { interval: 50 },
-      purpose: KeyPurpose.STANDARD
+      polling: { interval: 50 }
     });
     wallets.push(wallet);
   }

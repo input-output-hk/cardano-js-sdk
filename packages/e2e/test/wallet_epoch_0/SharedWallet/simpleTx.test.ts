@@ -1,6 +1,5 @@
 import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano } from '@cardano-sdk/core';
-import { KeyPurpose } from '@cardano-sdk/key-management';
 import { buildSharedWallets } from './utils';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import {
@@ -26,7 +25,7 @@ describe('SharedWallet/simpleTx', () => {
   const initialFunds = 10_000_000n;
 
   beforeAll(async () => {
-    ({ wallet: faucetWallet } = await getWallet({ env, logger, name: 'Sending Wallet', purpose: KeyPurpose.STANDARD }));
+    ({ wallet: faucetWallet } = await getWallet({ env, logger, name: 'Sending Wallet' }));
 
     // Make sure the wallet has sufficient funds to run this test
     await walletReady(faucetWallet, initialFunds);

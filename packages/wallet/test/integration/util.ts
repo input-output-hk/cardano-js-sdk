@@ -1,4 +1,4 @@
-import { Bip32Account, KeyPurpose, util } from '@cardano-sdk/key-management';
+import { Bip32Account, util } from '@cardano-sdk/key-management';
 import { WalletStores } from '../../src/persistence';
 import { createPersonalWallet } from '../../src';
 import { createStubStakePoolProvider, mockProviders } from '@cardano-sdk/util-dev';
@@ -32,7 +32,7 @@ export type Providers = {
 export const createWallet = async (stores?: WalletStores, providers: Providers = {}) => {
   const keyAgent = await testAsyncKeyAgent();
   const wallet = createPersonalWallet(
-    { name: 'Test Wallet', purpose: KeyPurpose.STANDARD },
+    { name: 'Test Wallet' },
     {
       ...createDefaultProviders(),
       ...providers,

@@ -1,4 +1,3 @@
-import { KeyPurpose } from '@cardano-sdk/key-management';
 import { filter, firstValueFrom } from 'rxjs';
 import { getEnv, getWallet, waitForWalletStateSettle, walletReady, walletVariables } from '../../../src';
 import { logger } from '@cardano-sdk/util-dev';
@@ -16,9 +15,7 @@ describe('PersonalWallet/pouchDbWalletStores', () => {
   });
 
   it('stores and restores BaseWallet, continues sync after initial load', async () => {
-    const wallet1 = (
-      await getWallet({ env, logger, name: 'Test Wallet', purpose: KeyPurpose.STANDARD, stores: stores1 })
-    ).wallet;
+    const wallet1 = (await getWallet({ env, logger, name: 'Test Wallet', stores: stores1 })).wallet;
 
     // wallet1 fetched all responses from wallet provider
     await walletReady(wallet1);
@@ -35,7 +32,6 @@ describe('PersonalWallet/pouchDbWalletStores', () => {
         env,
         logger,
         name: walletName,
-        purpose: KeyPurpose.STANDARD,
         stores: storage.createPouchDbWalletStores(walletName, { logger })
       })
     ).wallet;

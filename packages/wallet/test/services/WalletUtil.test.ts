@@ -513,7 +513,7 @@ describe('WalletUtil', () => {
       const bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
       bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
       wallet = createPersonalWallet(
-        { name: 'Test Wallet', purpose: KeyPurpose.STANDARD },
+        { name: 'Test Wallet' },
         {
           assetProvider,
           bip32Account,

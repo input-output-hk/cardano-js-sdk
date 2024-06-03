@@ -136,8 +136,7 @@ describe('multi signature wallet', () => {
       env,
       logger,
       name: 'Faucet Wallet',
-      polling: { interval: 50 },
-      purpose: KeyPurpose.MULTI_SIG
+      polling: { interval: 50 }
     }));
 
     await walletReady(faucetWallet);

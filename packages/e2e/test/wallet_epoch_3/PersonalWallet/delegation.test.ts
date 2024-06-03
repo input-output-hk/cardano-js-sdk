@@ -3,7 +3,6 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { BaseWallet, ObservableWallet } from '@cardano-sdk/wallet';
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
-import { KeyPurpose } from '@cardano-sdk/key-management';
 import {
   TX_TIMEOUT_DEFAULT,
   TestWallet,
@@ -67,16 +66,14 @@ describe('PersonalWallet/delegation', () => {
       idx: 0,
       logger,
       name: 'Test Wallet 1',
-      polling: { interval: 500 },
-      purpose: KeyPurpose.STANDARD
+      polling: { interval: 500 }
     });
     wallet2 = await getWallet({
       env,
       idx: 1,
       logger,
       name: 'Test Wallet 2',
-      polling: { interval: 500 },
-      purpose: KeyPurpose.STANDARD
+      polling: { interval: 500 }
     });
 
     await Promise.all([waitForWalletStateSettle(wallet1.wallet), waitForWalletStateSettle(wallet2.wallet)]);

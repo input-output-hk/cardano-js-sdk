@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { Bip32Account, GroupedAddress, KeyPurpose, util } from '@cardano-sdk/key-management';
+import { Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import {
   OutputValidator,
@@ -41,7 +41,7 @@ describe('CustomObservableWallet', () => {
     it('can use BaseWallet to satisfy application-specific interface', async () => {
       // this compiles
       const extensionWallet: LaceObservableWallet = createPersonalWallet(
-        { name: 'Extension Wallet', purpose: KeyPurpose.STANDARD },
+        { name: 'Extension Wallet' },
         {
           assetProvider: mocks.mockAssetProvider(),
           bip32Account: await Bip32Account.fromAsyncKeyAgent(await testAsyncKeyAgent()),

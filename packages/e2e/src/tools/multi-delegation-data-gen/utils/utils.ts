@@ -1,7 +1,7 @@
 /* eslint-disable no-console, max-statements, max-params, @typescript-eslint/no-floating-promises */
 import { Cardano } from '@cardano-sdk/core';
-import { KeyPurpose, util } from '@cardano-sdk/key-management';
 import { logger } from '@cardano-sdk/util-dev';
+import { util } from '@cardano-sdk/key-management';
 
 import { BaseWallet } from '@cardano-sdk/wallet';
 import { Files, Paths } from './files';
@@ -102,8 +102,7 @@ export const waitForFundingWallet = async (monitor: TerminalProgressMonitor): Pr
       idx: 0,
       logger,
       name: 'Funding wallet',
-      polling: { interval: 500 },
-      purpose: KeyPurpose.STANDARD
+      polling: { interval: 500 }
     })
   ).wallet;
 
@@ -140,8 +139,7 @@ export const createDelegationWallet = async (monitor: TerminalProgressMonitor) =
       idx: 0,
       logger,
       name: 'Delegation Wallet',
-      polling: { interval: 500 },
-      purpose: KeyPurpose.STANDARD
+      polling: { interval: 500 }
     })
   ).wallet;
 };

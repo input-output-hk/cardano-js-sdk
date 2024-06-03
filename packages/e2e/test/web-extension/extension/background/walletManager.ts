@@ -1,4 +1,4 @@
-import { KeyPurpose, Witnesser } from '@cardano-sdk/key-management';
+import { Witnesser } from '@cardano-sdk/key-management';
 
 import {
   AnyWallet,
@@ -79,7 +79,6 @@ const walletFactory: WalletFactory<Metadata, Metadata> = {
         env,
         logger,
         name: getWalletName(wallet, props.accountIndex),
-        purpose: KeyPurpose.STANDARD,
         stores,
         witnesser
       })

@@ -44,8 +44,7 @@ describe('Ada handle', () => {
   const coins = coinsRequiredByHandleMint + 10_000_000n; // maximum number of coins to use in each transaction
 
   const initPolicyId = async () => {
-    wallet = (await getWallet({ env, idx: 0, logger, name: 'Handle Init Wallet', purpose: KeyPurpose.STANDARD }))
-      .wallet;
+    wallet = (await getWallet({ env, idx: 0, logger, name: 'Handle Init Wallet' })).wallet;
     await walletReady(wallet, coins);
 
     keyAgent = await createStandaloneKeyAgent(
@@ -71,8 +70,7 @@ describe('Ada handle', () => {
         idx: 0,
         logger,
         name: 'Minting Wallet',
-        polling: { interval: 50 },
-        purpose: KeyPurpose.STANDARD
+        polling: { interval: 50 }
       })
     ).wallet;
     await walletReady(wallet, coins);
@@ -87,8 +85,7 @@ describe('Ada handle', () => {
         idx: 0,
         logger,
         name: 'Minting Wallet',
-        polling: { interval: 50 },
-        purpose: KeyPurpose.STANDARD
+        polling: { interval: 50 }
       })
     ).wallet;
     receivingWallet = (
@@ -98,8 +95,7 @@ describe('Ada handle', () => {
         idx: 1,
         logger,
         name: 'Receiving Wallet',
-        polling: { interval: 50 },
-        purpose: KeyPurpose.STANDARD
+        polling: { interval: 50 }
       })
     ).wallet;
     await Promise.all([walletReady(wallet, coins), walletReady(receivingWallet, 0n)]);

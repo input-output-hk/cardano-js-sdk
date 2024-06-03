@@ -31,7 +31,6 @@ import {
   CommunicationType,
   InMemoryKeyAgent,
   KeyAgentDependencies,
-  KeyPurpose,
   Witnesser,
   util
 } from '@cardano-sdk/key-management';
@@ -281,7 +280,6 @@ export type GetWalletProps = {
   env: any;
   idx?: number;
   logger: Logger;
-  purpose: KeyPurpose;
   name: string;
   polling?: PollingConfig;
   handlePolicyIds?: Cardano.PolicyId[];
@@ -295,7 +293,6 @@ export type GetSharedWalletProps = {
   env: any;
   logger: Logger;
   name: string;
-  purpose: KeyPurpose;
   polling?: PollingConfig;
   handlePolicyIds?: Cardano.PolicyId[];
   stores?: storage.WalletStores;
@@ -327,7 +324,7 @@ const patchInitializeTxToRespectEpochBoundary = <T extends ObservableWallet>(
  * @returns an object containing the wallet and providers passed to it
  */
 export const getWallet = async (props: GetWalletProps) => {
-  const { env, idx, logger, name, stores, customKeyParams, keyAgent, witnesser, purpose } = props;
+  const { env, idx, logger, name, stores, customKeyParams, keyAgent, witnesser } = props;
   let polling = props.polling;
   const providers = {
     addressDiscovery: await addressDiscoveryFactory.create(
@@ -384,7 +381,7 @@ export const getWallet = async (props: GetWalletProps) => {
   }
 
   const wallet = createPersonalWallet(
-    { name, polling, purpose },
+    { name, polling },
     {
       ...providers,
       bip32Account,
@@ -411,7 +408,7 @@ export const getWallet = async (props: GetWalletProps) => {
  * @returns an object containing the wallet and providers passed to it
  */
 export const getSharedWallet = async (props: GetSharedWalletProps) => {
-  const { env, logger, name, polling, stores, paymentScript, stakingScript, witnesser, purpose } = props;
+  const { env, logger, name, polling, stores, paymentScript, stakingScript, witnesser } = props;
   const providers = {
     assetProvider: await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS, logger),
     chainHistoryProvider: await chainHistoryProviderFactory.create(
@@ -439,7 +436,7 @@ export const getSharedWallet = async (props: GetSharedWalletProps) => {
     utxoProvider: await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS, logger)
   };
   const wallet = createSharedWallet(
-    { name, polling, purpose },
+    { name, polling },
     {
       ...providers,
       logger,

@@ -128,7 +128,7 @@ const createWallet = async (props: CreateWalletProps) => {
   bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
 
   return createPersonalWallet(
-    { name, polling: props.pollingConfig, purpose: KeyPurpose.STANDARD },
+    { name, polling: props.pollingConfig },
     {
       addressDiscovery: props?.addressDiscovery,
       assetProvider,

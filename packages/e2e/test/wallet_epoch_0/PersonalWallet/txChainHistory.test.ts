@@ -1,6 +1,5 @@
 import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano, CardanoNodeUtil, ProviderError } from '@cardano-sdk/core';
-import { KeyPurpose } from '@cardano-sdk/key-management';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { getEnv, getWallet, normalizeTxBody, walletReady, walletVariables } from '../../../src';
 import { isNotNil } from '@cardano-sdk/util';
@@ -13,7 +12,7 @@ describe('PersonalWallet/txChainHistory', () => {
   let signedTx: Cardano.Tx<Cardano.TxBody>;
 
   beforeEach(async () => {
-    ({ wallet } = await getWallet({ env, logger, name: 'Sending Wallet', purpose: KeyPurpose.STANDARD }));
+    ({ wallet } = await getWallet({ env, logger, name: 'Sending Wallet' }));
     const tAdaToSend = 10_000_000n;
     // Make sure the wallet has sufficient funds to run this test
     await walletReady(wallet, tAdaToSend);

@@ -26,7 +26,7 @@ describe('PersonalWallet/multiAddress', () => {
   let wallet: BaseWallet;
 
   beforeAll(async () => {
-    wallet = (await getWallet({ env, idx: 0, logger, name: 'Wallet', purpose: KeyPurpose.STANDARD })).wallet;
+    wallet = (await getWallet({ env, idx: 0, logger, name: 'Wallet' })).wallet;
   });
 
   afterAll(() => {
@@ -108,8 +108,7 @@ describe('PersonalWallet/multiAddress', () => {
       idx: 0,
       logger,
       name: 'New Multi Address Wallet',
-      polling: { interval: 500 },
-      purpose: KeyPurpose.STANDARD
+      polling: { interval: 500 }
     });
 
     await walletReady(newWallet.wallet);
