@@ -422,13 +422,13 @@ in
               env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
             handle-provider.enabled = true;
-          # asset-provider.enabled = true;
+            asset-provider.enabled = true;
           };
 
           projectors = {
             handle.enabled = true;
             stake-pool.enabled = true;
-          # asset.enabled = true;
+            asset.enabled = true;
           };
 
           values = {
