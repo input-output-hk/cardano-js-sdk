@@ -52,6 +52,16 @@
                 };
               }
             ])
+            ++ (lib.optionals config.providers.handle-provider.enabled [
+              {
+                pathType = "Prefix";
+                path = "/v${lib.last (lib.sort lib.versionOlder values.cardano-services.versions.handle)}/handle";
+                backend.service = {
+                  name = "${chart.name}-handle-provider";
+                  port.name = "http";
+                };
+              }
+            ])
             ++ [
               {
                 pathType = "Prefix";
@@ -79,16 +89,6 @@
                 path = "/v${lib.last (lib.sort lib.versionOlder values.cardano-services.versions.stakePool)}/stake-pool";
                 backend.service = {
                   name = "${chart.name}-stake-pool-provider";
-                  port.name = "http";
-                };
-              }
-            ]
-            ++ lib.optionals config.providers.handle-provider.enabled [
-              {
-                pathType = "Prefix";
-                path = "/v${lib.last (lib.sort lib.versionOlder values.cardano-services.versions.handle)}/handle";
-                backend.service = {
-                  name = "${chart.name}-handle-provider";
                   port.name = "http";
                 };
               }
