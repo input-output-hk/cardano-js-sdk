@@ -1100,4 +1100,10 @@ in
         #  context = "eks-admin";
         #};
       });
+
+    targetGroups = targets: {
+      DEV = lib.filterAttrs (name: _: lib.hasPrefix "dev-" name) targets;
+      LIVE = lib.filterAttrs (name: _: lib.hasPrefix "live-" name) targets;
+      OPS = lib.filterAttrs (name: _: lib.hasPrefix "ops-" name) targets;
+    };
   }
