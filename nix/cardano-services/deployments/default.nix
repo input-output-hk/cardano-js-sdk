@@ -474,7 +474,7 @@ in
             stake-pool = {
               enabled = true;
             };
-            asset.enabled = true;
+            # asset.enabled = true;
           };
 
           values = {
@@ -543,7 +543,7 @@ in
           projectors = {
             handle.enabled = true;
             stake-pool.enabled = true;
-            asset.enabled = true;
+            # asset.enabled = true;
           };
 
           values = {
@@ -617,7 +617,7 @@ in
             stake-pool = {
               enabled = true;
             };
-            asset.enabled = true;
+            # asset.enabled = true;
           };
 
           values = {
@@ -678,7 +678,7 @@ in
             stake-pool = {
               enabled = true;
             };
-            asset.enabled = true;
+            # asset.enabled = true;
           };
 
           values = {
@@ -778,7 +778,7 @@ in
             stake-pool = {
               enabled = true;
             };
-            asset.enabled = true;
+            # asset.enabled = true;
           };
 
           values = {
@@ -878,7 +878,7 @@ in
             stake-pool = {
               enabled = true;
             };
-            asset.enabled = true;
+            # asset.enabled = true;
           };
 
           values = {
