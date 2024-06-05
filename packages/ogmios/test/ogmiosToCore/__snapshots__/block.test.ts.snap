@@ -288,7 +288,7 @@ Object {
               "cbor": "d87980",
               "constructor": 0n,
               "fields": Object {
-                "cbor": "9fff",
+                "cbor": "80",
                 "items": Array [],
               },
             },
@@ -431,7 +431,7 @@ Object {
               "cbor": "d87980",
               "constructor": 0n,
               "fields": Object {
-                "cbor": "9fff",
+                "cbor": "80",
                 "items": Array [],
               },
             },
