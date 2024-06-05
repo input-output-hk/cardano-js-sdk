@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, KeyAgentBase, KeyAgentType, KeyRole, SerializableInMemoryKeyAgentData } from '../src';
+import { AddressType, KeyAgentBase, KeyAgentType, KeyPurpose, KeyRole, SerializableInMemoryKeyAgentData } from '../src';
 import { Cardano } from '@cardano-sdk/core';
 import { dummyLogger } from 'ts-log';
 
@@ -35,7 +35,8 @@ describe('KeyAgentBase', () => {
       extendedAccountPublicKey: Crypto.Bip32PublicKeyHex(
         // eslint-disable-next-line max-len
         'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
-      )
+      ),
+      purpose: KeyPurpose.STANDARD
     });
   });
 
