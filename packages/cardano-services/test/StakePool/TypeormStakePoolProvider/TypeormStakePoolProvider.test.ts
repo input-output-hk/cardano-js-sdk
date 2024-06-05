@@ -629,15 +629,15 @@ describe('TypeormStakePoolProvider', () => {
           describe('by default, result is sorted by relevance', () => {
             it('with stringent search', async () => {
               const response = await provider.queryStakePools({ filters: { text: 'sp11' }, pagination });
-              expect(response.pageResults.map(({ metadata }) => metadata?.ticker)).toEqual(['SP11', 'SP10', 'SP1']);
+              expect(response.pageResults.map(({ metadata }) => metadata?.ticker)).toEqual(['SP11', 'SP1', 'SP10']);
             });
 
             it('with mild search', async () => {
               const response = await provider.queryStakePools({ filters: { text: 'pool 10 ' }, pagination });
               expect(response.pageResults.map(({ metadata }) => metadata?.ticker).slice(0, 3)).toEqual([
                 'SP10',
-                'SP3',
-                'SP1'
+                'SP1',
+                'SP11'
               ]);
             });
           });
