@@ -6,7 +6,7 @@ import { bytesToHex, hexToBytes } from '../../util/misc';
 /** A list of plutus data. */
 export class PlutusList {
   readonly #array = new Array<PlutusData>();
-  #useIndefiniteEncoding = true;
+  #useIndefiniteEncoding = false;
 
   /**
    * Serializes this PlutusList instance into its CBOR representation as a Uint8Array.
