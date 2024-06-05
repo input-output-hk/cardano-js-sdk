@@ -100,12 +100,12 @@ export const loadSecret = (path: string) => fs.readFileSync(path, 'utf8').toStri
 // according to documentation it is either a boolean or a compatible TlsOptions object.
 const mergeTlsOptions = (
   conn: connString.ConnectionOptions,
-  ssl: { ca: string } | undefined
+  ssl: { ca?: string; rejectUnauthorized?: boolean }
 ): boolean | TlsOptions | undefined =>
   typeof conn.ssl === 'object'
     ? {
         ...(conn.ssl as TlsOptions),
-        ca: ssl?.ca || (conn.ssl as TlsOptions).ca
+        ...ssl
       }
     : ssl || !!conn.ssl;
 
@@ -117,7 +117,7 @@ export const getConnectionConfig = <Suffix extends ConnectionNames>(
 ): Observable<PgConnectionConfig> => {
   const postgresConnectionString = getPostgresOption(suffix, 'postgresConnectionString', options);
   const postgresSslCaFile = getPostgresOption(suffix, 'postgresSslCaFile', options);
-  const ssl = postgresSslCaFile ? { ca: loadSecret(postgresSslCaFile) } : undefined;
+  const ssl = postgresSslCaFile ? { ca: loadSecret(postgresSslCaFile) } : { rejectUnauthorized: false };
 
   if (postgresConnectionString) {
     const conn = connString.parse(postgresConnectionString);
@@ -170,7 +170,9 @@ export const getPool = async (
   logger: Logger,
   options?: PosgresProgramOptions<'DbSync'>
 ): Promise<Pool | undefined> => {
-  const ssl = options?.postgresSslCaFileDbSync ? { ca: loadSecret(options.postgresSslCaFileDbSync) } : undefined;
+  const ssl = options?.postgresSslCaFileDbSync
+    ? { ca: loadSecret(options.postgresSslCaFileDbSync) }
+    : { rejectUnauthorized: false };
 
   if (options?.postgresConnectionStringDbSync) {
     const pool = new Pool({
