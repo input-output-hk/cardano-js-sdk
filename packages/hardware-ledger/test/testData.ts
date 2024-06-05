@@ -349,11 +349,9 @@ export const CONTEXT_WITH_KNOWN_ADDRESSES: LedgerTxTransformerContext = {
       address: paymentAddress,
       index: 0,
       networkId: Cardano.NetworkId.Testnet,
-      purpose: KeyPurpose.STANDARD,
       rewardAccount,
       stakeKeyDerivationPath: {
         index: 0,
-        purpose: KeyPurpose.STANDARD,
         role: KeyRole.Stake
       },
       type: AddressType.Internal

@@ -18,6 +18,9 @@ export const createMockKeyAgent = (deriveAddressesReturn: GroupedAddress[] = [])
     derivePublicKey: jest.fn(),
     exportRootPrivateKey: jest.fn(),
     extendedAccountPublicKey,
+    get purpose(): KeyPurpose {
+      return KeyPurpose.STANDARD;
+    },
     serializableData: {
       __typename: KeyAgentType.InMemory,
       accountIndex,

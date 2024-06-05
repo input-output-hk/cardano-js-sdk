@@ -5,7 +5,6 @@ import {
   GroupedAddress,
   KeyAgent,
   util as KeyManagementUtil,
-  KeyPurpose,
   KeyRole,
   MessageSender,
   cip8
@@ -78,7 +77,6 @@ describe('cip30signData', () => {
     expect(publicKeyHex).toEqual(
       await keyAgent.derivePublicKey({
         index: addressDerivationPath.index,
-        purpose: KeyPurpose.STANDARD,
         role: addressDerivationPath.type as number
       })
     );
@@ -93,7 +91,6 @@ describe('cip30signData', () => {
     expect(publicKeyHex).toEqual(
       await keyAgent.derivePublicKey({
         index: 0,
-        purpose: KeyPurpose.STANDARD,
         role: KeyRole.Stake
       })
     );

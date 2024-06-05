@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import { HID } from 'node-hid';
-import { KeyPurpose, SignTransactionContext } from '@cardano-sdk/key-management';
+import { SignTransactionContext } from '@cardano-sdk/key-management';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import TransportWebUSB from '@ledgerhq/hw-transport-webusb';
 
@@ -21,6 +21,4 @@ export type LedgerTxTransformerContext = {
   chainId: Cardano.ChainId;
   /** Non-hardened account index */
   accountIndex: number;
-  /** purpose of cip1852 or cip1854 */
-  purpose: KeyPurpose;
 } & SignTransactionContext;

@@ -6,14 +6,18 @@ import { TxInId, util } from '@cardano-sdk/key-management';
 
 const resolveKeyPath = (
   txIn: Cardano.TxIn,
-  { accountIndex, txInKeyPathMap }: LedgerTxTransformerContext
+  { accountIndex, txInKeyPathMap, purpose }: LedgerTxTransformerContext
 ): Ledger.BIP32Path | null => {
-  const utxoKeyPath = txInKeyPathMap[TxInId(txIn)];
-  if (utxoKeyPath) {
-    return util.accountKeyDerivationPathToBip32Path(accountIndex, utxoKeyPath);
-  }
+  const txInKeyPath = txInKeyPathMap[TxInId(txIn)];
 
-  return null;
+  if (!txInKeyPath || txInKeyPath.role === undefined || txInKeyPath.index === undefined) return null;
+
+  const utxoKeyPath = {
+    ...txInKeyPath,
+    purpose
+  };
+
+  return util.accountKeyDerivationPathToBip32Path(accountIndex, utxoKeyPath);
 };
 
 export const toTxIn: Transform<Cardano.TxIn, Ledger.TxInput, LedgerTxTransformerContext> = (txIn, context) => ({

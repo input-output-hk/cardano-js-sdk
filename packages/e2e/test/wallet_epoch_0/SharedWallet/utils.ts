@@ -23,7 +23,6 @@ const randomPublicKey = () => Crypto.Ed25519PublicKeyHex(Array.from({ length: 64
 
 const DERIVATION_PATH = {
   index: 0,
-  purpose: KeyPurpose.STANDARD,
   role: KeyRole.External
 };
 

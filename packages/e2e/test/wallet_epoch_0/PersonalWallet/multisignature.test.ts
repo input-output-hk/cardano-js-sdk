@@ -60,13 +60,11 @@ describe('PersonalWallet/multisignature', () => {
 
     const aliceDerivationPath = {
       index: 2,
-      purpose: KeyPurpose.MULTI_SIG,
       role: KeyRole.External
     };
 
     const bobDerivationPath = {
       index: 3,
-      purpose: KeyPurpose.MULTI_SIG,
       role: KeyRole.External
     };
 

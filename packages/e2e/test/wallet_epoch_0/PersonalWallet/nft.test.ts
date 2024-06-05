@@ -67,7 +67,6 @@ describe('PersonalWallet.assets/nft', () => {
 
     const derivationPath = {
       index: 2,
-      purpose: KeyPurpose.STANDARD,
       role: KeyRole.External
     };
 

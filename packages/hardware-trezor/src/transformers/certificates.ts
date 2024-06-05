@@ -2,7 +2,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import * as Trezor from '@trezor/connect';
 import { BIP32Path } from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
-import { GroupedAddress, KeyPurpose, util } from '@cardano-sdk/key-management';
+import { GroupedAddress, util } from '@cardano-sdk/key-management';
 import {
   InvalidArgumentError,
   Transform,
@@ -19,8 +19,7 @@ type CertCredentialsType = {
 
 const getCertCredentials = (
   stakeKeyHash: Crypto.Ed25519KeyHashHex,
-  knownAddresses: GroupedAddress[] | undefined,
-  purpose: KeyPurpose | undefined
+  knownAddresses: GroupedAddress[] | undefined
 ): CertCredentialsType => {
   const knownAddress = knownAddresses?.find((address) =>
     areStringsEqualInConstantTime(Cardano.RewardAccount.toHash(address.rewardAccount), stakeKeyHash)
@@ -31,7 +30,7 @@ const getCertCredentials = (
     !!rewardAddress &&
     areNumbersEqualInConstantTime(rewardAddress?.getPaymentCredential().type, Cardano.CredentialType.KeyHash)
   ) {
-    const path = util.stakeKeyPathFromGroupedAddress({ address: knownAddress, purpose });
+    const path = util.stakeKeyPathFromGroupedAddress(knownAddress);
     return path ? { path } : { keyHash: stakeKeyHash };
   }
   return {
@@ -49,7 +48,7 @@ const getPoolOperatorKeyPath = (
   context: TrezorTxTransformerContext
 ): BIP32Path | null => {
   const knownAddress = context?.knownAddresses.find((address) => address.rewardAccount === operator);
-  return util.stakeKeyPathFromGroupedAddress({ address: knownAddress, purpose: context.purpose });
+  return util.stakeKeyPathFromGroupedAddress(knownAddress);
 };
 
 export const getStakeAddressCertificate: Transform<
@@ -59,8 +58,7 @@ export const getStakeAddressCertificate: Transform<
 > = (certificate, context) => {
   const credentials = getCertCredentials(
     certificate.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex,
-    context?.knownAddresses,
-    context?.purpose
+    context?.knownAddresses
   );
   const certificateType =
     certificate.__typename === Cardano.CertificateType.StakeRegistration
@@ -84,8 +82,7 @@ export const getStakeDelegationCertificate: Transform<
   const poolIdKeyHash = Cardano.PoolId.toKeyHash(certificate.poolId);
   const credentials = getCertCredentials(
     certificate.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex,
-    context?.knownAddresses,
-    context?.purpose
+    context?.knownAddresses
   );
   return {
     keyHash: credentials.keyHash,

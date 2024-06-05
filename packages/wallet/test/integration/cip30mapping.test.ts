@@ -23,7 +23,7 @@ import {
   WalletApi,
   WithSenderContext
 } from '@cardano-sdk/dapp-connector';
-import { AddressType, Bip32Account, GroupedAddress, KeyPurpose, util } from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BaseWallet, cip30, createPersonalWallet } from '../../src';
 import { CallbackConfirmation, GetCollateralCallbackParams } from '../../src/cip30';
@@ -739,7 +739,6 @@ describe('cip30', () => {
           address,
           index: 0,
           networkId: Cardano.NetworkId.Testnet,
-          purpose: KeyPurpose.STANDARD,
           rewardAccount: mocks.rewardAccount,
           stakeKeyDerivationPath,
           type: AddressType.External

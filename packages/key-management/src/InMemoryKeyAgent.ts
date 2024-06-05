@@ -58,7 +58,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
   }
 
   async signBlob(
-    { index, role: type, purpose = KeyPurpose.STANDARD }: AccountKeyDerivationPath,
+    { index, role: type, purpose }: AccountKeyDerivationPath & { purpose: KeyPurpose },
     blob: HexBlob
   ): Promise<SignBlobResult> {
     const rootPrivateKey = await this.#decryptRootPrivateKey();
@@ -131,7 +131,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
 
   async signTransaction(
     { body, hash }: Cardano.TxBodyWithHash,
-    { txInKeyPathMap, knownAddresses }: SignTransactionContext,
+    { txInKeyPathMap, knownAddresses, purpose }: SignTransactionContext,
     { additionalKeyPaths = [] }: SignTransactionOptions = {}
   ): Promise<Cardano.Signatures> {
     // Possible optimization is casting strings to OpaqueString types directly and skipping validation
@@ -140,17 +140,14 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
       await Crypto.Ed25519PublicKey.fromHex(await this.derivePublicKey(DREP_KEY_DERIVATION_PATH)).hash()
     ).hex();
     const derivationPaths = ownSignatureKeyPaths(body, knownAddresses, txInKeyPathMap, dRepKeyHash);
-    const keyPaths = uniqBy(
-      [...derivationPaths, ...additionalKeyPaths],
-      ({ role, index, purpose }) => `${purpose}.${role}.${index}`
-    );
+    const keyPaths = uniqBy([...derivationPaths, ...additionalKeyPaths], ({ role, index }) => `${role}.${index}`);
     // TODO:
     // if (keyPaths.length === 0) {
     //   throw new ProofGenerationError();
     // }
     return new Map<Crypto.Ed25519PublicKeyHex, Crypto.Ed25519SignatureHex>(
       await Promise.all(
-        keyPaths.map(async ({ role, index, purpose }) => {
+        keyPaths.map(async ({ role, index }) => {
           const { publicKey, signature } = await this.signBlob({ index, purpose, role }, blob);
           return [publicKey, signature] as const;
         })

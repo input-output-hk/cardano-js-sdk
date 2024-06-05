@@ -34,7 +34,6 @@ const charlotteMnemonics =
 
 const DERIVATION_PATH = {
   index: 0,
-  purpose: KeyPurpose.MULTI_SIG,
   role: KeyRole.External
 };
 

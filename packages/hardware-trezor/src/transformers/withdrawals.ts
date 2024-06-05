@@ -22,9 +22,7 @@ export const toTrezorWithdrawal: Transform<Cardano.Withdrawal, Trezor.CardanoWit
    * - The script hash, blake2b-224 hash digests of serialized monetary scripts.
    */
   if (areNumbersEqualInConstantTime(rewardAddress.getPaymentCredential().type, Cardano.CredentialType.KeyHash)) {
-    const keyPath = context?.knownAddresses
-      ? resolveStakeKeyPath(rewardAddress, context.knownAddresses, context.purpose)
-      : null;
+    const keyPath = context?.knownAddresses ? resolveStakeKeyPath(rewardAddress, context.knownAddresses) : null;
     trezorWithdrawal = keyPath
       ? {
           amount: withdrawal.quantity.toString(),

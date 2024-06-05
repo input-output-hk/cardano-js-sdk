@@ -13,7 +13,7 @@ import {
 } from '../../src';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { KeyPurpose, KeyRole } from '@cardano-sdk/key-management';
+import { KeyRole } from '@cardano-sdk/key-management';
 import { firstValueFrom, of } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 import pick from 'lodash/pick';
@@ -39,12 +39,10 @@ const createScriptWalletProps = {
       accountIndex: storedLedgerWallet.accounts[0].accountIndex,
       paymentScriptKeyPath: {
         index: 0,
-        purpose: KeyPurpose.STANDARD,
         role: KeyRole.External
       },
       stakingScriptKeyPath: {
         index: 0,
-        purpose: KeyPurpose.STANDARD,
         role: KeyRole.External
       },
       walletId: storedLedgerWallet.walletId
@@ -136,12 +134,10 @@ describe('WalletRepository', () => {
               accountIndex: createScriptWalletProps.ownSigners[0].accountIndex,
               paymentScriptKeyPath: {
                 index: 0,
-                purpose: KeyPurpose.STANDARD,
                 role: KeyRole.External
               },
               stakingScriptKeyPath: {
                 index: 0,
-                purpose: KeyPurpose.STANDARD,
                 role: KeyRole.External
               },
               walletId: 'does not exist' as WalletId
@@ -160,12 +156,10 @@ describe('WalletRepository', () => {
               accountIndex: 999_999_999,
               paymentScriptKeyPath: {
                 index: 0,
-                purpose: KeyPurpose.STANDARD,
                 role: KeyRole.External
               },
               stakingScriptKeyPath: {
                 index: 0,
-                purpose: KeyPurpose.STANDARD,
                 role: KeyRole.External
               },
               walletId: createScriptWalletProps.ownSigners[0].walletId

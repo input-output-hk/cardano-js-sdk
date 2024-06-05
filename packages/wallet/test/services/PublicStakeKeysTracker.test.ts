@@ -1,10 +1,4 @@
-import {
-  AccountKeyDerivationPath,
-  Bip32Account,
-  GroupedAddress,
-  KeyPurpose,
-  KeyRole
-} from '@cardano-sdk/key-management';
+import { AccountKeyDerivationPath, Bip32Account, GroupedAddress, KeyRole } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet } from '../../src';
 import { PubStakeKeyAndStatus, createPublicStakeKeysTracker } from '../../src/services/PublicStakeKeysTracker';
@@ -78,8 +72,7 @@ describe('PublicStakeKeysTracker', () => {
       chainId: Cardano.ChainIds.Preview,
       deriveAddress: jest.fn(),
       derivePublicKey,
-      extendedAccountPublicKey: '' as unknown,
-      purpose: KeyPurpose.STANDARD
+      extendedAccountPublicKey: '' as unknown
     } as Bip32Account;
   });
 

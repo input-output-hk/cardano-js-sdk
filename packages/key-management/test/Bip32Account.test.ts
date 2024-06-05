@@ -98,7 +98,6 @@ describe('Bip32Account', () => {
       expect(internalAddress.rewardAccount.startsWith('stake_test')).toBe(true);
       expect(internalAddress.stakeKeyDerivationPath).toEqual({
         index: stakeKeyDerivationIndex,
-        purpose: KeyPurpose.STANDARD,
         role: 2
       });
     });
@@ -127,7 +126,6 @@ describe('Bip32Account', () => {
 
       expect(addresses[0].stakeKeyDerivationPath).toEqual({
         index: 0,
-        purpose: KeyPurpose.STANDARD,
         role: KeyRole.Stake
       });
       expect(addresses[0].rewardAccount).toEqual('stake_test1uruaegs6djpxaj9vkn8njh9uys63jdaluetqkf5r4w95zhc8cxn3h');
@@ -137,7 +135,6 @@ describe('Bip32Account', () => {
 
       expect(addresses[1].stakeKeyDerivationPath).toEqual({
         index: 1,
-        purpose: KeyPurpose.STANDARD,
         role: KeyRole.Stake
       });
       expect(addresses[1].rewardAccount).toEqual('stake_test1uzx0qqs06evy77cnpk6u5q3fc50exjpp5t4s0swl2ykc4jsmh8tej');
@@ -147,7 +144,6 @@ describe('Bip32Account', () => {
 
       expect(addresses[2].stakeKeyDerivationPath).toEqual({
         index: 2,
-        purpose: KeyPurpose.STANDARD,
         role: KeyRole.Stake
       });
       expect(addresses[2].rewardAccount).toEqual('stake_test1uqcnxxxatdgmqdmz0rhg72kn3n0egek5s0nqcvfy9ztyltc9cpuz4');
@@ -157,7 +153,6 @@ describe('Bip32Account', () => {
 
       expect(addresses[3].stakeKeyDerivationPath).toEqual({
         index: 3,
-        purpose: KeyPurpose.STANDARD,
         role: KeyRole.Stake
       });
       expect(addresses[3].rewardAccount).toEqual('stake_test1urj8hvwxxz0t6pnfttj9ne5leu74shjlg83a8kxww9ft2fqtdhssu');

@@ -5,6 +5,7 @@ import {
   GroupedAddress,
   KeyAgent,
   KeyAgentDependencies,
+  KeyPurpose,
   SerializableKeyAgentData,
   SignBlobResult,
   SignTransactionContext,
@@ -18,6 +19,7 @@ export abstract class KeyAgentBase implements KeyAgent {
   readonly #serializableData: SerializableKeyAgentData;
   readonly #bip32Ed25519: Crypto.Bip32Ed25519;
   readonly #account: Bip32Account;
+  readonly #purpose: KeyPurpose;
 
   get serializableData(): SerializableKeyAgentData {
     return this.#serializableData;
@@ -33,6 +35,9 @@ export abstract class KeyAgentBase implements KeyAgent {
   }
   get bip32Ed25519(): Crypto.Bip32Ed25519 {
     return this.#bip32Ed25519;
+  }
+  get purpose(): KeyPurpose {
+    return this.#purpose;
   }
 
   abstract signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult>;

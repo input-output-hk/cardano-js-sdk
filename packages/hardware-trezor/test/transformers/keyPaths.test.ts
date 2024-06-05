@@ -22,9 +22,9 @@ describe('key-paths', () => {
   });
   describe('resolveStakeKeyPath', () => {
     it('returns the stake key path for a known address', async () => {
-      expect(
-        resolveStakeKeyPath(rewardAddress, contextWithKnownAddresses.knownAddresses, contextWithKnownAddresses.purpose)
-      ).toEqual(knownAddressStakeKeyPath);
+      expect(resolveStakeKeyPath(rewardAddress, contextWithKnownAddresses.knownAddresses)).toEqual(
+        knownAddressStakeKeyPath
+      );
     });
   });
 });

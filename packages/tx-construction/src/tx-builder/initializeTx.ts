@@ -87,7 +87,6 @@ export const initializeTx = async (
         dRepPublicKey,
         handleResolutions: props.handleResolutions ?? [],
         knownAddresses: addresses,
-        // TODO: Not sure about this. What is the best way to pass purpose to defaultSelectionConstraints?
         purpose: KeyPurpose.STANDARD,
         txInKeyPathMap: await util.createTxInKeyPathMap(unwitnessedTx.body, addresses, inputResolver)
       };

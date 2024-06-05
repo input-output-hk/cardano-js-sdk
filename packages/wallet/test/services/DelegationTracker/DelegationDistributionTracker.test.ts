@@ -1,4 +1,4 @@
-import { AddressType, GroupedAddress, KeyPurpose } from '@cardano-sdk/key-management';
+import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { DelegatedStake, TransactionalObservables, UtxoTracker } from '../../../src';
 import { EMPTY, Observable, map } from 'rxjs';
@@ -61,7 +61,6 @@ describe('createDelegationDistributionTracker', () => {
         address: mocks.utxo[0][1].address,
         index: 0,
         networkId: Cardano.NetworkId.Testnet,
-        purpose: KeyPurpose.STANDARD,
         rewardAccount: mocks.rewardAccount,
         stakeKeyDerivationPath,
         type: AddressType.External
@@ -71,7 +70,6 @@ describe('createDelegationDistributionTracker', () => {
         address: utxos[1][1].address,
         index: 0,
         networkId: Cardano.NetworkId.Testnet,
-        purpose: KeyPurpose.STANDARD,
         rewardAccount: rewardAccounts[1].address,
         stakeKeyDerivationPath,
         type: AddressType.External

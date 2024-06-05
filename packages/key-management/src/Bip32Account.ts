@@ -4,7 +4,6 @@ import {
   AccountKeyDerivationPath,
   AsyncKeyAgent,
   GroupedAddress,
-  KeyPurpose,
   KeyRole
 } from './types';
 import { Cardano } from '@cardano-sdk/core';
@@ -14,7 +13,6 @@ type Bip32AccountProps = {
   extendedAccountPublicKey: Crypto.Bip32PublicKeyHex;
   accountIndex: number;
   chainId: Cardano.ChainId;
-  purpose: KeyPurpose;
 };
 
 /** Derives public keys and addresses from a BIP32-ED25519 public key */
@@ -22,17 +20,15 @@ export class Bip32Account {
   readonly extendedAccountPublicKey: Crypto.Bip32PublicKey;
   readonly chainId: Cardano.ChainId;
   readonly accountIndex: number;
-  readonly purpose: KeyPurpose;
 
   /** Initializes a new instance of the Bip32Ed25519AddressManager class. */
-  constructor({ extendedAccountPublicKey, chainId, accountIndex, purpose }: Bip32AccountProps) {
+  constructor({ extendedAccountPublicKey, chainId, accountIndex }: Bip32AccountProps) {
     this.extendedAccountPublicKey = Crypto.Bip32PublicKey.fromHex(extendedAccountPublicKey);
     this.chainId = chainId;
     this.accountIndex = accountIndex;
-    this.purpose = purpose;
   }
 
-  async derivePublicKey(derivationPath: Omit<AccountKeyDerivationPath, 'purpose'>) {
+  async derivePublicKey(derivationPath: AccountKeyDerivationPath) {
     const key = await this.extendedAccountPublicKey.derive([derivationPath.role, derivationPath.index]);
     return key.toRawKey();
   }
@@ -43,7 +39,6 @@ export class Bip32Account {
   ): Promise<GroupedAddress> {
     const stakeKeyDerivationPath = {
       index: stakeKeyDerivationIndex,
-      purpose: this.purpose,
       role: KeyRole.Stake
     };
 
@@ -71,7 +66,6 @@ export class Bip32Account {
       accountIndex: this.accountIndex,
       address: Cardano.PaymentAddress(address.toBech32()),
       networkId: this.chainId.networkId,
-      purpose: this.purpose,
       rewardAccount: Cardano.RewardAccount(rewardAccount.toBech32()),
       stakeKeyDerivationPath,
       ...paymentKeyDerivationPath
@@ -87,8 +81,7 @@ export class Bip32Account {
     return new Bip32Account({
       accountIndex: await keyAgent.getAccountIndex(),
       chainId: await keyAgent.getChainId(),
-      extendedAccountPublicKey: await keyAgent.getExtendedAccountPublicKey(),
-      purpose: await keyAgent.getKeyPurpose()
+      extendedAccountPublicKey: await keyAgent.getExtendedAccountPublicKey()
     });
   }
 }

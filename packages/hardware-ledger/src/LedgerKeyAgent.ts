@@ -577,7 +577,6 @@ export class LedgerKeyAgent extends KeyAgentBase {
           result.witnesses.map(async (witness) => {
             const publicKey = await this.derivePublicKey({
               index: witness.path[Cip1852PathLevelIndexes.INDEX],
-              purpose: witness.path[Cip1852PathLevelIndexes.PURPOSE],
               role: witness.path[Cip1852PathLevelIndexes.ROLE]
             });
             const signature = Crypto.Ed25519SignatureHex(witness.witnessSignatureHex);

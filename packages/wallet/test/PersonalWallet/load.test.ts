@@ -1,12 +1,5 @@
 /* eslint-disable unicorn/consistent-destructuring */
-import {
-  AddressType,
-  AsyncKeyAgent,
-  Bip32Account,
-  GroupedAddress,
-  KeyPurpose,
-  util
-} from '@cardano-sdk/key-management';
+import { AddressType, AsyncKeyAgent, Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
 import {
   AssetId,
   createStubStakePoolProvider,
@@ -104,7 +97,6 @@ const createWallet = async (props: CreateWalletProps) => {
     address,
     index: 0,
     networkId: Cardano.NetworkId.Testnet,
-    purpose: KeyPurpose.STANDARD,
     rewardAccount,
     stakeKeyDerivationPath,
     type: AddressType.External
@@ -498,7 +490,6 @@ describe('BaseWallet.AddressDiscovery', () => {
       address,
       index: 0,
       networkId: Cardano.NetworkId.Testnet,
-      purpose: KeyPurpose.STANDARD,
       rewardAccount,
       stakeKeyDerivationPath,
       type: AddressType.External

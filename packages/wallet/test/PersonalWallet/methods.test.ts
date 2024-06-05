@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/consistent-destructuring, sonarjs/no-duplicate-string, @typescript-eslint/no-floating-promises, promise/no-nesting, promise/always-return */
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressDiscovery, BaseWallet, TxInFlight, createPersonalWallet } from '../../src';
-import { AddressType, Bip32Account, GroupedAddress, KeyPurpose, Witnesser, util } from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, GroupedAddress, Witnesser, util } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BehaviorSubject, Subscription, firstValueFrom, skip } from 'rxjs';
 import {
@@ -66,7 +66,6 @@ describe('BaseWallet methods', () => {
     address,
     index: 0,
     networkId: Cardano.NetworkId.Testnet,
-    purpose: KeyPurpose.STANDARD,
     rewardAccount: mocks.rewardAccount,
     stakeKeyDerivationPath,
     type: AddressType.External

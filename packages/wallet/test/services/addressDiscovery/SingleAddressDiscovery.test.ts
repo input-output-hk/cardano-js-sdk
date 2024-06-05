@@ -1,4 +1,4 @@
-import { Bip32Account, KeyPurpose, KeyRole } from '@cardano-sdk/key-management';
+import { Bip32Account, KeyRole } from '@cardano-sdk/key-management';
 import { SingleAddressDiscovery } from '../../../src';
 import { createAsyncKeyAgent } from '../../util';
 
@@ -15,9 +15,8 @@ describe('SingleAddressDiscovery', () => {
       address: expect.stringContaining('addr'),
       index: 0,
       networkId: 0,
-      purpose: KeyPurpose.STANDARD,
       rewardAccount: expect.stringContaining('stake'),
-      stakeKeyDerivationPath: { index: 0, purpose: KeyPurpose.STANDARD, role: KeyRole.Stake },
+      stakeKeyDerivationPath: { index: 0, role: KeyRole.Stake },
       type: 0
     });
   });

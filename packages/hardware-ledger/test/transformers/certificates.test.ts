@@ -26,7 +26,6 @@ import { LedgerTxTransformerContext, getKnownAddress, mapCerts } from '../../src
 
 export const stakeKeyPath = {
   index: 0,
-  purpose: KeyPurpose.STANDARD,
   role: KeyRole.Stake
 };
 
@@ -35,13 +34,11 @@ const createGroupedAddress = ({
   rewardAccount,
   stakeKeyDerivationPath,
   index,
-  purpose,
   type
 }: Omit<GroupedAddress, 'networkId' | 'accountIndex'>): GroupedAddress =>
   ({
     address,
     index,
-    purpose,
     rewardAccount,
     stakeKeyDerivationPath,
     type
@@ -67,7 +64,6 @@ export const createTxInKeyPathMapMock = (knownAddresses: GroupedAddress[]): TxIn
     const txInId: TxInId = `MockTxIn_${index}` as TxInId; // Mock TxInId creation
     result[txInId] = {
       index: address.index,
-      purpose: address.purpose,
       role: KeyRole.Internal
     };
   }
@@ -85,7 +81,6 @@ const mockContext: LedgerTxTransformerContext = {
     createGroupedAddress({
       address: address1,
       index: 0,
-      purpose: KeyPurpose.STANDARD,
       rewardAccount: ownRewardAccount,
       stakeKeyDerivationPath: stakeKeyPath,
       type: AddressType.External
@@ -93,7 +88,6 @@ const mockContext: LedgerTxTransformerContext = {
     createGroupedAddress({
       address: address2,
       index: 1,
-      purpose: KeyPurpose.STANDARD,
       rewardAccount: ownRewardAccount,
       stakeKeyDerivationPath: stakeKeyPath,
       type: AddressType.External
@@ -105,7 +99,6 @@ const mockContext: LedgerTxTransformerContext = {
     createGroupedAddress({
       address: address1,
       index: 0,
-      purpose: KeyPurpose.STANDARD,
       rewardAccount: ownRewardAccount,
       stakeKeyDerivationPath: stakeKeyPath,
       type: AddressType.External
@@ -113,7 +106,6 @@ const mockContext: LedgerTxTransformerContext = {
     createGroupedAddress({
       address: address2,
       index: 1,
-      purpose: KeyPurpose.STANDARD,
       rewardAccount: ownRewardAccount,
       stakeKeyDerivationPath: stakeKeyPath,
       type: AddressType.External
@@ -173,7 +165,7 @@ describe('certificates', () => {
           params: {
             stakeCredential: {
               keyPath: [
-                util.harden(KeyPurpose.STANDARD),
+                util.harden(CardanoKeyConst.PURPOSE),
                 util.harden(CardanoKeyConst.COIN_TYPE),
                 util.harden(0),
                 KeyRole.Stake,

@@ -139,7 +139,6 @@ export const auxiliaryDataHash = Crypto.Hash32ByteBase16(
 
 const stakeKeyDerivationPath = {
   index: 0,
-  purpose: KeyPurpose.STANDARD,
   role: KeyRole.Stake
 };
 
@@ -148,7 +147,6 @@ export const knownAddress: GroupedAddress = {
   address: paymentAddress,
   index: 0,
   networkId: Cardano.NetworkId.Testnet,
-  purpose: KeyPurpose.STANDARD,
   rewardAccount,
   stakeKeyDerivationPath,
   type: AddressType.Internal
@@ -156,7 +154,6 @@ export const knownAddress: GroupedAddress = {
 
 export const knownAddressPaymentKeyPath = {
   index: knownAddress.index,
-  purpose: knownAddress.purpose,
   role: Number(knownAddress.type)
 };
 
@@ -165,7 +162,6 @@ export const knownAddressWithoutStakingPath: GroupedAddress = {
   address: paymentAddress,
   index: 0,
   networkId: Cardano.NetworkId.Testnet,
-  purpose: KeyPurpose.STANDARD,
   rewardAccount,
   type: AddressType.Internal
 };

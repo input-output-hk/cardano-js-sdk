@@ -22,10 +22,7 @@ export const mapAdditionalWitnessRequests: Transform<
   const additionalWitnessPaths: Trezor.DerivationPath[] = [...paymentKeyPaths];
 
   if (context?.knownAddresses?.length) {
-    const stakeKeyPath = util.stakeKeyPathFromGroupedAddress({
-      address: context.knownAddresses[0],
-      purpose: context.purpose
-    });
+    const stakeKeyPath = util.stakeKeyPathFromGroupedAddress(context.knownAddresses[0]);
     if (stakeKeyPath) additionalWitnessPaths.push(stakeKeyPath);
   }
   return additionalWitnessPaths;

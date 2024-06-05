@@ -1,14 +1,14 @@
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { CONTEXT_WITH_KNOWN_ADDRESSES, babbageTxWithoutScript, stakeCredential, tx } from '../testData';
 import { Cardano } from '@cardano-sdk/core';
-import { CardanoKeyConst, KeyPurpose, TxInId, util } from '@cardano-sdk/key-management';
+import { CardanoKeyConst, TxInId, util } from '@cardano-sdk/key-management';
 import { toLedgerTx } from '../../src';
 
 describe('tx', () => {
   describe('toLedgerTx', () => {
     test('can map a transaction with scripts', async () => {
-      const paymentKeyPath = { index: 0, purpose: KeyPurpose.STANDARD, role: 1 };
-      const stakeKeyPath = { index: 0, purpose: KeyPurpose.STANDARD, role: 2 };
+      const paymentKeyPath = { index: 0, role: 1 };
+      const stakeKeyPath = { index: 0, role: 2 };
       expect(
         await toLedgerTx(tx.body, {
           ...CONTEXT_WITH_KNOWN_ADDRESSES,
@@ -176,7 +176,7 @@ describe('tx', () => {
     });
 
     test('can map a transaction without scripts', async () => {
-      const paymentKeyPath = { index: 0, purpose: KeyPurpose.STANDARD, role: 1 };
+      const paymentKeyPath = { index: 0, role: 1 };
       expect(
         await toLedgerTx(babbageTxWithoutScript.body, {
           ...CONTEXT_WITH_KNOWN_ADDRESSES,

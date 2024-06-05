@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, GroupedAddress, KeyPurpose } from '@cardano-sdk/key-management';
+import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
 
 /**
@@ -35,7 +35,6 @@ export const getScriptAddress = (
     address: baseAddress.toAddress().toBech32() as Cardano.PaymentAddress,
     index: 0,
     networkId,
-    purpose: KeyPurpose.STANDARD,
     rewardAccount: Cardano.RewardAddress.fromCredentials(networkId, stakeScriptCredential)
       .toAddress()
       .toBech32() as Cardano.RewardAccount,

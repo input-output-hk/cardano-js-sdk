@@ -260,7 +260,7 @@ describe.each([
     let signingOptions: SignTransactionOptions;
 
     beforeEach(() => {
-      signingOptions = { additionalKeyPaths: [{ index: 1, purpose: KeyPurpose.STANDARD, role: 1 }] };
+      signingOptions = { additionalKeyPaths: [{ index: 1, role: 1 }] };
     });
 
     it('can setSigningOptions without mutating signingOptions', () => {

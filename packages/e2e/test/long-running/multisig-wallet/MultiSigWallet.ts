@@ -34,7 +34,6 @@ const DUMMY_HEX_BYTES =
 
 const DERIVATION_PATH: AccountKeyDerivationPath = {
   index: 0,
-  purpose: KeyPurpose.MULTI_SIG,
   role: KeyRole.External
 };
 
@@ -413,7 +412,6 @@ export class MultiSigWallet {
       address: baseAddress.toAddress().toBech32() as Cardano.PaymentAddress,
       index: 0,
       networkId,
-      purpose: KeyPurpose.MULTI_SIG,
       rewardAccount: Cardano.RewardAddress.fromCredentials(networkId, scriptCredential)
         .toAddress()
         .toBech32() as Cardano.RewardAccount,

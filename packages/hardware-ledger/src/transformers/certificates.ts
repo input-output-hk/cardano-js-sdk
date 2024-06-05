@@ -104,7 +104,7 @@ const getCredentialType = (knownAddress: GroupedAddress | undefined) => {
 const stakeCredentialMapper = (credential: Cardano.Credential, context: LedgerTxTransformerContext) => {
   const knownAddress = getKnownAddress(credential, context);
   const credentialType = getCredentialType(knownAddress);
-  const path = util.stakeKeyPathFromGroupedAddress({ address: knownAddress, purpose: context.purpose });
+  const path = util.stakeKeyPathFromGroupedAddress(knownAddress);
 
   return credentialMapper(credential, credentialType, path);
 };
@@ -160,7 +160,7 @@ const getPoolOperatorKeyPath = (
   context: LedgerTxTransformerContext
 ): Ledger.BIP32Path | null => {
   const knownAddress = context?.knownAddresses.find((address) => address.rewardAccount === operator);
-  return util.stakeKeyPathFromGroupedAddress({ address: knownAddress, purpose: context.purpose });
+  return util.stakeKeyPathFromGroupedAddress(knownAddress);
 };
 
 export const poolRegistrationCertificate: Transform<
@@ -270,7 +270,7 @@ const poolRetirementCertificate: Transform<
     )
   );
 
-  const poolKeyPath = util.stakeKeyPathFromGroupedAddress({ address: knownAddress, purpose: context?.purpose });
+  const poolKeyPath = util.stakeKeyPathFromGroupedAddress(knownAddress);
 
   if (!poolKeyPath) throw new InvalidArgumentError('certificate', 'Missing key matching pool retirement certificate.');
 

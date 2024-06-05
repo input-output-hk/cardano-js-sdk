@@ -4,7 +4,6 @@ import {
   Bip32Account,
   GroupedAddress,
   util as KeyManagementUtil,
-  KeyPurpose,
   KeyRole
 } from '@cardano-sdk/key-management';
 import {
@@ -500,11 +499,9 @@ describe('WalletUtil', () => {
         address,
         index: 0,
         networkId: Cardano.NetworkId.Testnet,
-        purpose: KeyPurpose.MULTI_SIG,
         rewardAccount: mocks.rewardAccount,
         stakeKeyDerivationPath: {
           index: 0,
-          purpose: KeyPurpose.STANDARD,
           role: KeyRole.Stake
         },
         type: AddressType.External

@@ -65,7 +65,9 @@ const getDerivationPath = async (
     if (!knownRewardAddress)
       throw new Cip30DataSignError(Cip30DataSignErrorCode.ProofGeneration, 'Unknown reward address');
 
-    return knownRewardAddress.stakeKeyDerivationPath || STAKE_KEY_DERIVATION_PATH;
+    const { role, index } = knownRewardAddress.stakeKeyDerivationPath || STAKE_KEY_DERIVATION_PATH;
+
+    return { index, purpose: KeyPurpose.STANDARD, role };
   }
 
   const knownAddress = knownAddresses.find(({ address }) => address === signWith);

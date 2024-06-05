@@ -1,7 +1,9 @@
 import * as Crypto from '@cardano-sdk/crypto';
+// import { AccountKeyDerivationPathWithPurpose } from '@cardano-sdk/key-management/dist/cjs/util';
 import {
   AccountKeyDerivationPath,
   AsyncKeyAgent,
+  KeyPurpose,
   SignDataContext,
   SignTransactionContext,
   TransactionSigner,
@@ -306,7 +308,11 @@ export const buildBip32Witnesser = <WalletMetadata extends { name: string }, Acc
   accountIndex?: number
 ): Witnesser =>
   <Witnesser>{
-    signBlob: async (derivationPath: AccountKeyDerivationPath, blob: HexBlob, context: SignDataContext) =>
+    signBlob: async (
+      derivationPath: AccountKeyDerivationPath & { purpose: KeyPurpose },
+      blob: HexBlob,
+      context: SignDataContext
+    ) =>
       await signingCoordinatorApi.signData(
         {
           blob,

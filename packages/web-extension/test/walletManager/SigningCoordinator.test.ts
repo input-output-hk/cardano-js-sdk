@@ -161,7 +161,7 @@ describe('SigningCoordinator', () => {
       signature: '123' as Ed25519SignatureHex
     };
     const signContext: SignDataContext = {};
-    const derivationPath: AccountKeyDerivationPath = { index: 0, purpose: KeyPurpose.STANDARD, role: KeyRole.DRep };
+    const derivationPath: AccountKeyDerivationPath = { index: 0, role: KeyRole.DRep };
 
     it('rejects with AuthenticationError when there is no subscriber', async () => {
       keyAgent.signBlob.mockResolvedValueOnce(signResult);

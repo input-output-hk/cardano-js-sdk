@@ -46,7 +46,6 @@ describe('PersonalWallet/mint', () => {
 
     const derivationPath = {
       index: 2,
-      purpose: KeyPurpose.STANDARD,
       role: KeyRole.External
     };
 

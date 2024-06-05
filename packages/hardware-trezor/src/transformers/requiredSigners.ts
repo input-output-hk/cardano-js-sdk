@@ -14,21 +14,16 @@ export const toRequiredSigner: Transform<
     const paymentCredential = Cardano.Address.fromBech32(address.address)?.asBase()?.getPaymentCredential().hash;
     return !!paymentCredential && areStringsEqualInConstantTime(paymentCredential.toString(), keyHash);
   });
-  const purpose = context?.purpose;
 
   const stakeCredKnownAddress = context?.knownAddresses.find((address) => {
     const stakeCredential = Cardano.RewardAccount.toHash(address.rewardAccount);
     return !!stakeCredential && areStringsEqualInConstantTime(stakeCredential.toString(), keyHash);
   });
 
-  const paymentKeyPath =
-    paymentCredKnownAddress && purpose
-      ? util.paymentKeyPathFromGroupedAddress({ address: paymentCredKnownAddress, purpose })
-      : null;
-  const stakeKeyPath =
-    stakeCredKnownAddress && purpose
-      ? util.stakeKeyPathFromGroupedAddress({ address: stakeCredKnownAddress, purpose })
-      : null;
+  const paymentKeyPath = paymentCredKnownAddress
+    ? util.paymentKeyPathFromGroupedAddress(paymentCredKnownAddress)
+    : null;
+  const stakeKeyPath = stakeCredKnownAddress ? util.stakeKeyPathFromGroupedAddress(stakeCredKnownAddress) : null;
 
   if (paymentKeyPath) {
     return {

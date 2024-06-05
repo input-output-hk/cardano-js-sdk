@@ -1,14 +1,5 @@
-/* eslint-disable max-statements */
-import {
-  Cardano,
-  ChainHistoryProvider,
-  NetworkInfoProvider,
-  RewardsProvider,
-  UtxoProvider,
-  coalesceValueQuantities
-} from '@cardano-sdk/core';
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { AddressType, Bip32Account, GroupedAddress, KeyPurpose, util } from '@cardano-sdk/key-management';
+/* eslint-disable max-statements, @typescript-eslint/no-explicit-any */
+import { AddressType, Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
 import {
   AssetId,
   createStubStakePoolProvider,
@@ -23,6 +14,14 @@ import {
   WalletNetworkInfoProviderStats,
   createPersonalWallet
 } from '../../src';
+import {
+  Cardano,
+  ChainHistoryProvider,
+  NetworkInfoProvider,
+  RewardsProvider,
+  UtxoProvider,
+  coalesceValueQuantities
+} from '@cardano-sdk/core';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import { firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
@@ -47,7 +46,6 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
     address,
     index: 0,
     networkId: Cardano.NetworkId.Testnet,
-    purpose: KeyPurpose.STANDARD,
     rewardAccount,
     stakeKeyDerivationPath,
     type: AddressType.External
