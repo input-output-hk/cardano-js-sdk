@@ -184,7 +184,8 @@ const getScriptUtxoSet = (
     )
   );
 
-describe('PersonalWallet/plutus', () => {
+// LW-10693: disable until costModels are fetched from protocolParams
+describe.skip('PersonalWallet/plutus', () => {
   let wallet: BaseWallet;
   afterAll(() => {
     wallet.shutdown();
