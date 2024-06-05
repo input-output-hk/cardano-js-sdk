@@ -132,19 +132,6 @@ in {
                       runAsGroup = 0;
                     };
                     env = utils.mkPodEnv value.env;
-
-                    volumeMounts = [
-                      {
-                        mountPath = "/tls";
-                        name = "tls";
-                      }
-                    ];
-                  }
-                ];
-                volumes = [
-                  {
-                    name = "tls";
-                    secret.secretName = "postgresql-server-cert";
                   }
                 ];
               };

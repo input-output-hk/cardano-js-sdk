@@ -94,6 +94,7 @@ in {
 
                 volumeMounts = mkOption {
                   type = types.anything;
+                  default = {};
                 };
               };
             });

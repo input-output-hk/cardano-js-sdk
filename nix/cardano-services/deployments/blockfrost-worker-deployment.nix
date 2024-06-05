@@ -75,21 +75,7 @@
                     key = "username";
                   };
                 };
-                POSTGRES_SSL_DB_SYNC = "true";
-                POSTGRES_SSL_CA_FILE_DB_SYNC = "/tls/ca.crt";
               };
-              volumeMounts = [
-                {
-                  mountPath = "/tls";
-                  name = "tls";
-                }
-              ];
-            }
-          ];
-          volumes = [
-            {
-              name = "tls";
-              secret.secretName = "postgresql-server-cert";
             }
           ];
         };
