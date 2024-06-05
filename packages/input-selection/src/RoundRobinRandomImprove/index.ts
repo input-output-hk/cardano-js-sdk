@@ -5,6 +5,7 @@ import { InputSelectionParameters, InputSelector, SelectionResult } from '../typ
 import { assertIsBalanceSufficient, preProcessArgs, stubMaxSizeAddress, toValues } from '../util';
 import { computeChangeAndAdjustForFee } from './change';
 import { roundRobinSelection } from './roundRobin';
+import { sortUtxoByTxIn } from '../GreedySelection';
 
 export const MAX_U64 = 18_446_744_073_709_551_615n;
 
@@ -18,33 +19,36 @@ export const roundRobinRandomImprove = ({
   random = Math.random
 }: RoundRobinRandomImproveOptions): InputSelector => ({
   select: async ({
+    preSelectedUtxo: preSelectedUtxoSet,
     utxo: utxoSet,
     outputs: outputSet,
     constraints: { computeMinimumCost, computeSelectionLimit, computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit },
     implicitValue: partialImplicitValue = {}
   }: InputSelectionParameters): Promise<SelectionResult> => {
     const changeAddress = stubMaxSizeAddress;
-    const { utxo, outputs, uniqueTxAssetIDs, implicitValue } = preProcessArgs(
+    const { requiredUtxo, utxo, outputs, uniqueTxAssetIDs, implicitValue } = preProcessArgs(
+      preSelectedUtxoSet,
       utxoSet,
       outputSet,
       changeAddress,
       partialImplicitValue
     );
 
-    assertIsBalanceSufficient(uniqueTxAssetIDs, utxo, outputs, implicitValue);
+    assertIsBalanceSufficient(uniqueTxAssetIDs, requiredUtxo, utxo, outputs, implicitValue);
 
     const roundRobinSelectionResult = roundRobinSelection({
       changeAddress,
       implicitValue,
       outputs,
       random,
+      requiredUtxo,
       uniqueTxAssetIDs,
       utxo
     });
 
     const result = await computeChangeAndAdjustForFee({
       computeMinimumCoinQuantity,
-      estimateTxFee: (utxos, changeValues) =>
+      estimateTxCosts: (utxos, changeValues) =>
         computeMinimumCost({
           change: changeValues.map(
             (value) =>
@@ -86,7 +90,10 @@ export const roundRobinRandomImprove = ({
       throw new InputSelectionError(InputSelectionFailure.MaximumInputCountExceeded);
     }
 
+    selection.inputs = new Set([...selection.inputs].sort(sortUtxoByTxIn));
+
     return {
+      redeemers: result.redeemers,
       remainingUTxO: new Set(result.remainingUTxO),
       selection
     };

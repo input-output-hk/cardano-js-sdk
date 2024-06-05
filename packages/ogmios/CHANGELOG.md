@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.25](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.15.24...@cardano-sdk/ogmios@0.15.25) (2024-05-20)
+
+**Note:** Version bump only for package @cardano-sdk/ogmios
+
 ## [0.15.24](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.15.23...@cardano-sdk/ogmios@0.15.24) (2024-05-02)
 
 **Note:** Version bump only for package @cardano-sdk/ogmios

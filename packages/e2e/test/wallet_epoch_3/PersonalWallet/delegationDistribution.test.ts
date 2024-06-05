@@ -25,8 +25,7 @@ const fundWallet = async (wallet: BaseWallet) => {
     logger.info(
       `Insufficient funds in wallet account index 1. Missing ${coinDeficit}. Transferring from wallet account index 0`
     );
-    const fundingWallet = (await getWallet({ env, idx: 0, logger, name: 'WalletAcct0', polling: { interval: 50 } }))
-      .wallet;
+    const fundingWallet = (await getWallet({ env, idx: 0, logger, name: 'WalletAcct0' })).wallet;
     await walletReady(fundingWallet);
     const fundingTxBuilder = fundingWallet.createTxBuilder();
     const { tx } = await fundingTxBuilder
@@ -126,7 +125,7 @@ describe('PersonalWallet/delegationDistribution', () => {
   let wallet: BaseWallet;
 
   beforeAll(async () => {
-    wallet = (await getWallet({ env, idx: 3, logger, name: 'Wallet', polling: { interval: 50 } })).wallet;
+    wallet = (await getWallet({ env, idx: 3, logger, name: 'Wallet' })).wallet;
     await fundWallet(wallet);
     await deregisterAllStakeKeys(wallet);
   });

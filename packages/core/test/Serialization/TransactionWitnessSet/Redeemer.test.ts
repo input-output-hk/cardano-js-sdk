@@ -45,6 +45,13 @@ describe('Redeemer', () => {
     expect(redeemer.index()).toEqual(0n);
   });
 
+  it('can compute correct hash', () => {
+    const redeemer = Redeemer.fromCore(core);
+
+    // Hash was generated with the CSL
+    expect(redeemer.hash()).toEqual('cfa253874f5f17b01d44e33377124e12fa0e7c8bcd88067fb9edb8c5f5ec662e');
+  });
+
   describe('Redeemer tag: Spend', () => {
     const spendCore = { ...core, purpose: RedeemerPurpose.spend };
     const spendCbor = HexBlob('840000d8799f0102030405ff821b000086788ffc4e831b00015060e9e46451');

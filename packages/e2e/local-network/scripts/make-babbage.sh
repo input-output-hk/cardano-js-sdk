@@ -193,18 +193,33 @@ mkdir -p "${ROOT}/genesis/shelley"
 mv "${ROOT}/byron-gen-command/genesis.json" "${ROOT}/genesis/byron/genesis-wrong.json"
 mv "${ROOT}/genesis.alonzo.json" "${ROOT}/genesis/shelley/genesis.alonzo.json"
 mv "${ROOT}/genesis.conway.json" "${ROOT}/genesis/shelley/genesis.conway.json"
-mv "${ROOT}/genesis.json" "${ROOT}/genesis/shelley/genesis.json"
+mv "${ROOT}/genesis.json" "${ROOT}/genesis/shelley/copy-genesis.json"
 
 jq --raw-output ".protocolConsts.protocolMagic = ${NETWORK_MAGIC}" "${ROOT}/genesis/byron/genesis-wrong.json" >"${ROOT}/genesis/byron/genesis.json"
 
 rm "${ROOT}/genesis/byron/genesis-wrong.json"
 
-cp "${ROOT}/genesis/shelley/genesis.json" "${ROOT}/genesis/shelley/copy-genesis.json"
+jq -M "
+. + {
+  activeSlotsCoeff: 0.1,
+  epochLength: 1000,
+  maxLovelaceSupply: $((MAX_SUPPLY * 3)),
+  securityParam: 10,
+  slotLength: 0.2,
+  updateQuorum: 2
+} |
+.protocolParams += {
+  decentralisationParam: 0.7,
+  keyDeposit: 2000000,
+  minFeeA: 44,
+  minFeeB: 155381,
+  minUTxOValue: 1000000,
+  poolDeposit: 500000000,
+  protocolVersion: { major : 7, minor: 0 },
+  rho: 0.1,
+  tau: 0.1
+}" "${ROOT}/genesis/shelley/copy-genesis.json" > "${ROOT}/genesis/shelley/genesis.json"
 
-jq -M ". + {slotLength:0.2, activeSlotsCoeff:0.1, securityParam:10, epochLength:1000, maxLovelaceSupply:$((MAX_SUPPLY * 3)), updateQuorum:2}" "${ROOT}/genesis/shelley/copy-genesis.json" > "${ROOT}/genesis/shelley/copy2-genesis.json"
-jq --raw-output '.protocolParams.protocolVersion.major = 9 | .protocolParams.minFeeA = 44 | .protocolParams.minFeeB = 155381 | .protocolParams.minUTxOValue = 1000000 | .protocolParams.decentralisationParam = 0.7 | .protocolParams.rho = 0.1 | .protocolParams.tau = 0.1' "${ROOT}/genesis/shelley/copy2-genesis.json" > "${ROOT}/genesis/shelley/genesis.json"
-
-rm "${ROOT}/genesis/shelley/copy2-genesis.json"
 rm "${ROOT}/genesis/shelley/copy-genesis.json"
 
 for NODE_ID in ${SP_NODES_ID}; do

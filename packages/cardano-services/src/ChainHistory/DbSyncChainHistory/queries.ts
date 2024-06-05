@@ -22,6 +22,7 @@ const selectTxOutput = (collateral = false) => `
 		tx_out."index" AS "index",
 		tx_out.value AS coin_value,
 		tx_out.data_hash AS datum,
+		tx_out.reference_script_id as reference_script_id,
 		tx.hash AS tx_id
 	FROM ${collateral ? 'collateral_tx_out' : 'tx_out'} AS tx_out 
 	JOIN tx ON tx_out.tx_id = tx.id`;
@@ -119,6 +120,14 @@ export const findMultiAssetByTxOut = `
 	JOIN tx ON tx_out.tx_id = tx.id
 	WHERE tx_out.id = ANY($1)
 	ORDER BY ma_out.id ASC`;
+
+export const findReferenceScriptsById = `
+	SELECT 
+		script.type AS type,
+		script.bytes AS bytes,
+		script.serialised_size AS serialized_size
+	FROM script AS script
+	WHERE id = ANY($1)`;
 
 export const findTxMintByIds = `
 	SELECT 

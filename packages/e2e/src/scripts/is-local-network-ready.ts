@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { Pool, QueryResult } from 'pg';
+import { Pool } from 'pg';
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -21,13 +21,9 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
   while (!isReady && currentElapsed < waitTime) {
     try {
       console.log('Waiting...');
-      const inputsResults: QueryResult<{ no: number }> = await db.query(
-        'select epoch.no from epoch order by epoch.no DESC limit 1'
-      );
+      const inputsResults = await db.query<{ no: number }>('SELECT no FROM epoch ORDER BY no DESC LIMIT 1');
 
-      isReady = inputsResults.rows[0].no >= 4; // One more than the local network healthcheck
-    } catch {
-      // continue
+      isReady = inputsResults.rows[0].no >= 3;
     } finally {
       currentElapsed = Date.now() / 1000 - start;
       await sleep(5000);
@@ -39,5 +35,5 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
     return -1;
   }
 
-  console.log('Local network ready!');
+  console.log('Local network reached epoch 3');
 })().catch(console.log);

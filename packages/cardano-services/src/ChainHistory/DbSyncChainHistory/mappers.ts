@@ -1,11 +1,12 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { BigIntMath } from '@cardano-sdk/util';
+import { BigIntMath, HexBlob } from '@cardano-sdk/util';
 import {
   BlockModel,
   BlockOutputModel,
   CertificateModel,
   MultiAssetModel,
   RedeemerModel,
+  ScriptModel,
   TipModel,
   TxIdModel,
   TxInput,
@@ -94,14 +95,18 @@ export const mapTxOut = (txOut: TxOutput): Cardano.TxOut => ({
   value: txOut.value
 });
 
-export const mapTxOutModel = (txOutModel: TxOutputModel, assets?: Cardano.TokenMap): TxOutput => ({
+export const mapTxOutModel = (
+  txOutModel: TxOutputModel,
+  props: { assets?: Cardano.TokenMap; script?: Cardano.Script }
+): TxOutput => ({
   address: txOutModel.address as unknown as Cardano.PaymentAddress,
   // Inline datums are missing, but for now it's ok on ChainHistoryProvider
   datumHash: txOutModel.datum ? (txOutModel.datum.toString('hex') as unknown as Hash32ByteBase16) : undefined,
   index: txOutModel.index,
+  scriptReference: props.script,
   txId: txOutModel.tx_id.toString('hex') as unknown as Cardano.TransactionId,
   value: {
-    assets: assets && assets.size > 0 ? assets : undefined,
+    assets: props.assets && props.assets.size > 0 ? props.assets : undefined,
     coins: BigInt(txOutModel.coin_value)
   }
 });
@@ -110,6 +115,21 @@ export const mapWithdrawal = (withdrawalModel: WithdrawalModel): Cardano.Withdra
   quantity: BigInt(withdrawalModel.quantity),
   stakeAddress: withdrawalModel.stake_address as unknown as Cardano.RewardAccount
 });
+
+export const mapPlutusScript = (scriptModel: ScriptModel): Cardano.Script => {
+  const cbor = scriptModel.bytes.toString('hex') as HexBlob;
+
+  return {
+    __type: Cardano.ScriptType.Plutus,
+    bytes: cbor,
+    version:
+      scriptModel.type === 'plutusV1'
+        ? Cardano.PlutusLanguageVersion.V1
+        : scriptModel.type === 'plutusV2'
+        ? Cardano.PlutusLanguageVersion.V2
+        : Cardano.PlutusLanguageVersion.V3
+  };
+};
 
 // TODO: unfortunately this is not nullable and not implemented.
 // Remove this and select the actual redeemer data from `redeemer_data` table.

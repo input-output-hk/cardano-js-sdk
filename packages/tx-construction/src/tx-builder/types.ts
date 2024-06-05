@@ -162,6 +162,7 @@ export type TxInspection = Cardano.TxBodyWithHash & {
   auxiliaryData?: Cardano.AuxiliaryData;
   inputSelection: SelectionSkeleton;
   ownAddresses: GroupedAddress[];
+  witness?: Cardano.Witness;
 };
 
 /**
@@ -191,19 +192,102 @@ export interface PartialTx {
 type CustomizeCbProps = { txBody: Readonly<TxBodyPreInputSelection> };
 export type CustomizeCb = (props: CustomizeCbProps) => TxBodyPreInputSelection;
 
+/**
+ * Type alias for a function that resolves a datum hash to the corresponding Plutus data.
+ *
+ * @param {Cardano.DatumHash} datumHash - The hash of the datum to be resolved.
+ * @returns {Promise<Cardano.PlutusData | null>} A promise that resolves to the Plutus data or null if not found.
+ */
+export type ResolveDatum = (datumHash: Cardano.DatumHash) => Promise<Cardano.PlutusData | null>;
+
+/**
+ * Interface for a datum resolver.
+ *
+ * @property {ResolveDatum} resolve - A function that resolves a datum hash to the corresponding Plutus data.
+ */
+export interface DatumResolver {
+  resolve: ResolveDatum;
+}
+
+/**
+ * Type alias for the result of a transaction evaluation.
+ * It is an array of objects that contain the purpose, index, and budget for each redeemer.
+ *
+ * @param purpose - The purpose of the redeemer.
+ * @param index - The index of the redeemer.
+ * @param budget - The execution budget for the redeemer.
+ */
+export type TxEvaluationResult = Array<{
+  purpose: Cardano.RedeemerPurpose;
+  index: number;
+  budget: Cardano.ExUnits;
+}>;
+
+/**
+ * Evaluates a transaction and provides an evaluation result.
+ *
+ * @param tx - The transaction to be evaluated.
+ * @param resolvedInputs - The list of resolved UTXOs used in the transaction.
+ * @returns A promise that resolves to the transaction evaluation result.
+ */
+export interface TxEvaluator {
+  evaluate(tx: Cardano.Tx, resolvedInputs: Array<Cardano.Utxo>): Promise<TxEvaluationResult>;
+}
+
+/**
+ * Type alias for the properties required to unlock a script.
+ *
+ * @param redeemer - The Plutus data for the redeemer (optional).
+ * @param script - The script used for unlocking (optional).
+ * @param datum - The datum associated with the output, required only when the output was created with a TxHash and no datum resolver was provided (optional).
+ */
+export type ScriptUnlockProps = {
+  redeemer?: Cardano.PlutusData;
+  script?: Cardano.Script;
+  // Only required when the output was created with a TxHash and no datum resolver was provided
+  datum?: Cardano.PlutusData;
+};
+
 export interface TxBuilder {
   /**
    * @returns a partial transaction that has properties set by calling other TxBuilder methods. Does not validate the transaction.
    */
   inspect(): Promise<PartialTx>;
 
+  /**
+   * Adds a reference input to the transaction.
+   *
+   * @param input - The transaction input or UTXO to add.
+   * @returns {TxBuilder} The current TxBuilder instance for chaining.
+   */
+  addReferenceInput(input: Cardano.TxIn | Cardano.Utxo): TxBuilder;
+
+  /**
+   * Adds an input to the transaction with optional script unlock properties.
+   *
+   * @param input - The transaction input or UTXO to add.
+   * @param scriptUnlockProps - Optional properties for unlocking the script.
+   * @returns {TxBuilder} The current TxBuilder instance for chaining.
+   */
+  addInput(input: Cardano.TxIn | Cardano.Utxo, scriptUnlockProps?: ScriptUnlockProps): TxBuilder;
+
+  /**
+   * Adds a datum to the transaction.
+   *
+   * @param datum - The Plutus datum to add.
+   * @returns {TxBuilder} The current TxBuilder instance for chaining.
+   */
+  addDatum(datum: Cardano.PlutusData): TxBuilder;
+
   /** @param txOut transaction output to add to {@link partialTxBody} outputs. */
   addOutput(txOut: Cardano.TxOut): TxBuilder;
+
   /**
    * @param txOut transaction output to be removed from {@link partialTxBody} outputs.
    * It must be in partialTxBody.outputs (===)
    */
   removeOutput(txOut: Cardano.TxOut): TxBuilder;
+
   /**
    * Does *not* addOutput.
    *
@@ -289,16 +373,13 @@ export interface TxBuilder {
   // - setMint
   // - setMetadatum(label: bigint, metadatum: Cardano.Metadatum | null);
   // - burn
-  // TODO: maybe this, or maybe datum should be added together with an output?
-  //  collaterals should be automatically computed and added to tx when you add scripts
-  // - setScripts(scripts: Array<{script, datum, redeemer}>)
-  // TODO: figure out what script_data_hash is used for
-  // - setScriptIntegrityHash(hash: Cardano.util.Hash32ByteBase16 | null);
   // - setRequiredExtraSignatures(keyHashes: Cardano.Ed25519KeyHash[]);
 }
 
 export interface TxBuilderDependencies {
   inputSelector?: InputSelector;
+  datumResolver?: DatumResolver;
+  txEvaluator: TxEvaluator;
   inputResolver: Cardano.InputResolver;
   bip32Account?: Bip32Account;
   witnesser: Witnesser;

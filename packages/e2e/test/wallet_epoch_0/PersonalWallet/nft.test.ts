@@ -52,7 +52,7 @@ describe('PersonalWallet.assets/nft', () => {
   const coins = 10_000_000n; // number of coins to use in each transaction
 
   beforeAll(async () => {
-    wallet = (await getWallet({ env, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
+    wallet = (await getWallet({ env, logger, name: 'Minting Wallet' })).wallet;
 
     await walletReady(wallet, coins);
 

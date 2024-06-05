@@ -20,7 +20,8 @@ export enum TxWith {
   Withdrawal = 'withdrawal',
   CollateralOutput = 'collateralOutput',
   ProposalProcedures = 'proposalProcedures',
-  VotingProcedure = 'votingProcedures'
+  VotingProcedure = 'votingProcedures',
+  ScriptReference = 'scriptReference'
 }
 
 export type AddressesInBlockRange = {
@@ -126,11 +127,12 @@ export class ChainHistoryFixtureBuilder {
       if (options.with.includes(TxWith.CollateralOutput)) query += Queries.latestTxHashesWithCollateralOutput;
       if (options.with.includes(TxWith.ProposalProcedures)) query += Queries.latestTxHashesWithProposalProcedures;
       if (options.with.includes(TxWith.VotingProcedure)) query += Queries.latestTxHashesWithVotingProcedures;
+      if (options.with.includes(TxWith.ScriptReference)) query += Queries.latestTxHashesWithScriptReference;
 
       query += Queries.endLatestTxHashes;
     }
 
-    const result: QueryResult<{ hash: Buffer }> = await this.#db.query(query, [desiredQty]);
+    const result: QueryResult<{ tx_hash: Buffer }> = await this.#db.query(query, [desiredQty]);
 
     const resultsQty = result.rows.length;
     if (result.rows.length === 0) {
@@ -138,7 +140,7 @@ export class ChainHistoryFixtureBuilder {
     } else if (resultsQty < desiredQty) {
       this.#logger.warn(`${desiredQty} transactions desired, only ${resultsQty} results found`);
     }
-    return result.rows.map(({ hash }) => bufferToHexString(hash) as unknown as Cardano.TransactionId);
+    return result.rows.map(({ tx_hash }) => bufferToHexString(tx_hash) as unknown as Cardano.TransactionId);
   }
 
   public async getMultiAssetTxOutIds(desiredQty: number) {

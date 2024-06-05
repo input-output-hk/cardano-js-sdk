@@ -99,6 +99,9 @@ const intersect = (events: ChainSyncData['body'], points: PointOrOrigin[]) => {
 
 export enum ChainSyncDataSet {
   PreviewStakePoolProblem = 'preview-stake-pool-problem.json',
+  AssetNameUtf8Problem = 'asset-name-utf8-problem.json',
+  MissingExtraDatumMetadataProblem = 'missing-extra-datum-metadata-problem.json',
+  ExtraDataNullCharactersProblem = 'extra-data-null-characters-problem.json',
   WithPoolRetirement = 'with-pool-retirement.json',
   WithStakeKeyDeregistration = 'with-stake-key-deregistration.json',
   WithMint = 'with-mint.json',

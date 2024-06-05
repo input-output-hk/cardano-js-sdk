@@ -1891,7 +1891,7 @@ COPY public.nft_metadata (id, name, description, image, media_type, files, type,
 -- Name: nft_metadata_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.nft_metadata_id_seq', 17, true);
+SELECT pg_catalog.setval('public.nft_metadata_id_seq', 18, true);
 
 
 --

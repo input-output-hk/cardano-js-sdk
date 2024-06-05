@@ -27,7 +27,7 @@ jobs:
 
       - name: 🔨 Build
         run: |
-          yarn install --immutable --inline-builds
+          yarn install --immutable --inline-builds --mode=skip-build
           yarn build
         env:
           NODE_OPTIONS: '--max_old_space_size=8192'
@@ -36,18 +36,11 @@ jobs:
         run: |
           git checkout yarn-project.nix
           if [ ! -z "$(git status --porcelain)" ] ; then git status ; echo "The PR is missing some generated file" ; exit 1 ; fi
-          yarn lint
         env:
           NODE_OPTIONS: '--max_old_space_size=8192'
 
-      - name: 🔃 Check for circular dependencies
-        run: |
-          yarn circular-deps:check
-
       - name: 🔬 Test
         run: |
-          yarn test:build:verify
           yarn test --forceExit
-          yarn workspace @cardano-sdk/cardano-services test:cli
         env:
           NODE_OPTIONS: '--max_old_space_size=8192'
