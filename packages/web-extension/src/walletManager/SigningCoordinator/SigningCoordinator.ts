@@ -165,7 +165,7 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
                           ],
                           extendedAccountPublicKey: account.extendedAccountPublicKey,
                           getPassphrase: async () => passphrase,
-                          purpose: KeyPurpose.STANDARD
+                          purpose: account.purpose || KeyPurpose.STANDARD
                         })
                       );
                       clearPassphrase(passphrase);
