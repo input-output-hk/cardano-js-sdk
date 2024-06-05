@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.20.4...@cardano-sdk/util-dev@0.21.0) (2024-06-05)
+
+### ⚠ BREAKING CHANGES
+
+* Input selectors now return selected inputs in lexicographic order
+- new input selection parameter added 'mustSpendUtxo', which force such UTXOs to be part of the selection
+- txBuilder now takes a new optional dependency TxEvaluator
+- added to the txBuilder the following new methods 'addInput', 'addReferenceInput' and 'addDatum'
+- the txBuilder now supports spending from script inputs
+- the txBuilder now resolve unknown inputs from on-chain data
+- outputBuilder 'datum' function can now take PlutusData as inline datum
+- added to the OutputBuilder a new method 'scriptReference'
+- walletUtilContext now requires an additional property 'chainHistoryProvider'
+- initializeTx now takes the list of redeemerByType and the script versions of the plutus scripts in the transaction
+
+### Features
+
+* tx-builder now supports spending from plutus scripts ([936351e](https://github.com/input-output-hk/cardano-js-sdk/commit/936351e22bea0b673e683333c84cbf9d0e134e19))
+
+### Bug Fixes
+
+* project datum nft metadata with missing extra field ([9b283d9](https://github.com/input-output-hk/cardano-js-sdk/commit/9b283d9ad0fd5b410772b0aca8b9382f6c3b6ef5))
+* remove null characters from user-specified strings when storing nft metadata ([29a0014](https://github.com/input-output-hk/cardano-js-sdk/commit/29a001482eec080a5bbea5a932c63c4adc35706b))
+* sanitize NftMetadata.otherProperties recursively ([95c8bd8](https://github.com/input-output-hk/cardano-js-sdk/commit/95c8bd8f0ec0eb92bf9ada7ae64491170f9823b8)), closes [#1294](https://github.com/input-output-hk/cardano-js-sdk/issues/1294)
+
 ## [0.20.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.20.3...@cardano-sdk/util-dev@0.20.4) (2024-05-20)
 
 **Note:** Version bump only for package @cardano-sdk/util-dev
