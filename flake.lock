@@ -182,11 +182,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1709134601,
-        "narHash": "sha256-84TIQzMoYT1lmYxKSyJLpXbG0Iqut5vDlDHVkPz0dFA=",
+        "lastModified": 1716461974,
+        "narHash": "sha256-7V5CPaewjBBurJ5y1jZ1zzmvRh7Amejk7qIL2MFI5H0=",
         "owner": "gytis-ivaskevicius",
         "repo": "nix-helm",
-        "rev": "2466f6061710e5322eb6fac6a93876f7ec9a27c6",
+        "rev": "00cfdd9314cb1090eb25a585741d947e9a674235",
         "type": "github"
       },
       "original": {

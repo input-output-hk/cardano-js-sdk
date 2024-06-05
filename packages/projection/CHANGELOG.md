@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.11.15...@cardano-sdk/projection@0.11.16) (2024-06-05)
+
+### Bug Fixes
+
+* project datum nft metadata with missing extra field ([9b283d9](https://github.com/input-output-hk/cardano-js-sdk/commit/9b283d9ad0fd5b410772b0aca8b9382f6c3b6ef5))
+
 ## [0.11.15](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.11.14...@cardano-sdk/projection@0.11.15) (2024-05-20)
 
 **Note:** Version bump only for package @cardano-sdk/projection
