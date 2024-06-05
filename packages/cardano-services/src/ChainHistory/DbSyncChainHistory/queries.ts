@@ -252,27 +252,12 @@ export const findPoolRegisterCertsByTxIds = `
 		pool."view" AS pool_id,
 		tx.hash AS tx_id,
 		CASE
-			WHEN (
-				SELECT count(*) = 0
-				FROM pool_update AS pu
-				WHERE pu.registered_tx_id BETWEEN (
-					CASE WHEN (
-						SELECT count(*) FROM pool_retire AS pr
-						WHERE pr.announced_tx_id < cert.registered_tx_id
-					) > 0 THEN (
-						SELECT max(pr.announced_tx_id) FROM pool_retire AS pr
-						WHERE pr.announced_tx_id < cert.registered_tx_id
-					)
-					ELSE 0 END
-				) AND cert.registered_tx_id - 1
-			) THEN pool_deposit
-			ELSE '0'
+			WHEN cert.deposit IS NULL THEN '0'
+			ELSE cert.deposit
 		END AS deposit
 	FROM tx
 	JOIN pool_update AS cert ON cert.registered_tx_id = tx.id
 	JOIN pool_hash AS pool ON pool.id = cert.hash_id
-	JOIN block ON block_id = block.id
-	JOIN epoch_param ON epoch_param.epoch_no = (CASE WHEN block.epoch_no > 1 THEN block.epoch_no ELSE 1 END)
 	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC`;
 
@@ -307,12 +292,10 @@ export const findStakeCertsByTxIds = `
 		addr."view" AS address,
 		TRUE AS registration,
 		tx.hash AS tx_id,
-		epoch_param.key_deposit AS deposit
+		cert.deposit AS deposit
 	FROM tx
 	JOIN stake_registration AS cert ON cert.tx_id = tx.id
 	JOIN stake_address AS addr ON addr.id = cert.addr_id
-	JOIN block ON block_id = block.id
-	JOIN epoch_param ON block.epoch_no = epoch_param.epoch_no
 	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC)
 	UNION
@@ -321,10 +304,7 @@ export const findStakeCertsByTxIds = `
 		addr."view" AS address,
 		FALSE AS registration,
 		tx.hash AS tx_id,
-		(SELECT key_deposit FROM stake_registration AS sr
-			JOIN tx AS tx2 ON sr.tx_id = tx2.id
-			JOIN block ON tx2.block_id = block.id
-			JOIN epoch_param ON block.epoch_no = epoch_param.epoch_no
+		(SELECT sr.deposit FROM stake_registration AS sr
 			WHERE sr.addr_id = cert.addr_id
 				AND sr.tx_id < tx.id
 			ORDER BY sr.tx_id DESC
