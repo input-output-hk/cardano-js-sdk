@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.36.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.35.0...@cardano-sdk/e2e@0.36.0) (2024-06-05)
+
+### ⚠ BREAKING CHANGES
+
+* Input selectors now return selected inputs in lexicographic order
+- new input selection parameter added 'mustSpendUtxo', which force such UTXOs to be part of the selection
+- txBuilder now takes a new optional dependency TxEvaluator
+- added to the txBuilder the following new methods 'addInput', 'addReferenceInput' and 'addDatum'
+- the txBuilder now supports spending from script inputs
+- the txBuilder now resolve unknown inputs from on-chain data
+- outputBuilder 'datum' function can now take PlutusData as inline datum
+- added to the OutputBuilder a new method 'scriptReference'
+- walletUtilContext now requires an additional property 'chainHistoryProvider'
+- initializeTx now takes the list of redeemerByType and the script versions of the plutus scripts in the transaction
+
+### Features
+
+* **e2e:** run e2e test on slow networks like preprod/preview ([288f6af](https://github.com/input-output-hk/cardano-js-sdk/commit/288f6af7a347e4cf160d7ab3217527e706bc1466))
+* tx-builder now supports spending from plutus scripts ([936351e](https://github.com/input-output-hk/cardano-js-sdk/commit/936351e22bea0b673e683333c84cbf9d0e134e19))
+
+### Bug Fixes
+
+* **e2e:** burn tokens based on policyId ([2709305](https://github.com/input-output-hk/cardano-js-sdk/commit/2709305ddc0c41d4f16d22cc1d213d3f745526c1))
+
+## [0.35.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.34.4...@cardano-sdk/e2e@0.35.0) (2024-05-20)
+
+### ⚠ BREAKING CHANGES
+
+* **web-extension:** add logger dependency to SigningCoordinator
+
+### Features
+
+* **web-extension:** add log of transaction id when signing ([ba5871b](https://github.com/input-output-hk/cardano-js-sdk/commit/ba5871b71340ac13461a348fbbb2ec24f2a7c077))
+
 ## [0.34.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.34.3...@cardano-sdk/e2e@0.34.4) (2024-05-02)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

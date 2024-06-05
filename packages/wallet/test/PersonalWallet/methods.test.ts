@@ -194,7 +194,6 @@ describe('BaseWallet methods', () => {
   describe('creating transactions', () => {
     const props = {
       collaterals: new Set([utxo[2][0]]),
-      inputs: new Set<Cardano.HydratedTxIn>([utxo[1][0]]),
       mint: new Map([
         [AssetId.PXL, 5n],
         [AssetId.TSLA, 20n]

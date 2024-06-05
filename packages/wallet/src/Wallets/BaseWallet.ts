@@ -93,6 +93,7 @@ import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { Ed25519PublicKey, Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 import {
   GenericTxBuilder,
+  GreedyTxEvaluator,
   InitializeTxProps,
   InitializeTxResult,
   InvalidConfigurationError,
@@ -107,7 +108,6 @@ import { WalletStores, createInMemoryWalletStores } from '../persistence';
 import { getScriptAddress } from './internals';
 import isEqual from 'lodash/isEqual';
 import uniq from 'lodash/uniq';
-import type { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
 
 export interface BaseWalletProps {
   readonly name: string;
@@ -148,7 +148,7 @@ export interface BaseWalletDependencies {
   readonly txSubmitProvider: TxSubmitProvider;
   readonly stakePoolProvider: StakePoolProvider;
   readonly assetProvider: AssetProvider;
-  readonly handleProvider?: HandleProvider | KoraLabsHandleProvider;
+  readonly handleProvider?: HandleProvider;
   readonly networkInfoProvider: WalletNetworkInfoProvider;
   readonly utxoProvider: UtxoProvider;
   readonly chainHistoryProvider: ChainHistoryProvider;
@@ -553,6 +553,7 @@ export class BaseWallet implements ObservableWallet {
       : throwError(() => new InvalidConfigurationError('BaseWallet is missing a "handleProvider"'));
 
     this.util = createWalletUtil({
+      chainHistoryProvider: this.chainHistoryProvider,
       protocolParameters$: this.protocolParameters$,
       transactions: this.transactions,
       utxo: this.utxo
@@ -774,6 +775,7 @@ export class BaseWallet implements ObservableWallet {
         tip: () => this.#firstValueFromSettled(this.tip$),
         utxoAvailable: () => this.#firstValueFromSettled(this.utxo.available$)
       },
+      txEvaluator: new GreedyTxEvaluator(() => this.#firstValueFromSettled(this.protocolParameters$)),
       witnesser: this.witnesser
     };
   }

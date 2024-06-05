@@ -18,11 +18,11 @@ import {
   nativeScriptPolicyId,
   util
 } from '@cardano-sdk/core';
+import { GreedyTxEvaluator, defaultSelectionConstraints } from '@cardano-sdk/tx-construction';
 import { InputSelector, StaticChangeAddressResolver, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { MultiSigTx } from './MultiSigTx';
 import { Observable, firstValueFrom, interval, map, switchMap } from 'rxjs';
 import { WalletNetworkInfoProvider } from '@cardano-sdk/wallet';
-import { defaultSelectionConstraints } from '@cardano-sdk/tx-construction';
 
 const randomHexChar = () => Math.floor(Math.random() * 16).toString(16);
 const randomPublicKey = () => Crypto.Ed25519PublicKeyHex(Array.from({ length: 64 }).map(randomHexChar).join(''));
@@ -464,7 +464,9 @@ export class MultiSigWallet {
           }
         };
       },
-      protocolParameters
+      protocolParameters,
+      redeemersByType: {},
+      txEvaluator: new GreedyTxEvaluator(() => this.#networkInfoProvider.protocolParameters())
     });
 
     const implicitCoin = Cardano.util.computeImplicitCoin(protocolParameters, {
@@ -476,6 +478,7 @@ export class MultiSigWallet {
       constraints,
       implicitValue: { coin: implicitCoin },
       outputs: txOuts || new Set(),
+      preSelectedUtxo: new Set(),
       utxo: new Set(utxo)
     });
 

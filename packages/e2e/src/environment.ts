@@ -91,6 +91,7 @@ const validators = {
   LOGGER_MIN_SEVERITY: str({ default: 'info' }),
   NETWORK_INFO_PROVIDER: str(),
   NETWORK_INFO_PROVIDER_PARAMS: providerParams(),
+  NETWORK_SPEED: str({ choices: ['fast', 'slow'], default: 'fast' }),
   OGMIOS_URL: str(),
   REWARDS_PROVIDER: str(),
   REWARDS_PROVIDER_PARAMS: providerParams(),
@@ -158,5 +159,6 @@ export const walletVariables = [
   'TX_SUBMIT_PROVIDER_PARAMS',
   'UTXO_PROVIDER',
   'UTXO_PROVIDER_PARAMS',
-  'ADDRESS_DISCOVERY'
+  'ADDRESS_DISCOVERY',
+  'NETWORK_SPEED'
 ] as const;

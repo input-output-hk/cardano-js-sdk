@@ -83,17 +83,45 @@ const mapFiles = (files: string | Cardano.PlutusData | undefined, logger: Logger
   return files.items.map((file) => mapFile(file, logger)).filter(isNotNil);
 };
 
+const getConditionalValidators = (strict: boolean, logger: Logger) => ({
+  isNameValid: (name: Cardano.PlutusData | string | undefined): name is string | undefined => {
+    if (typeof name === 'string') return true;
+    if (typeof name === 'undefined') {
+      if (strict) {
+        logger.debug('Invalid PlutusData: "name" is required');
+        return false;
+      }
+      return true;
+    }
+    logger.debug('Invalid PlutusData: "name" must be utf8 bounded bytes');
+    return false;
+  },
+  isValidDatumShape: (plutusData: Cardano.PlutusData | undefined): plutusData is Cardano.ConstrPlutusData => {
+    const minNumberOfFields = strict ? 3 : 2;
+    const isValid =
+      isConstrPlutusData(plutusData) &&
+      plutusData.constructor === 0n &&
+      plutusData.fields.items.length >= minNumberOfFields;
+    if (!isValid)
+      logger.debug(
+        `Invalid PlutusData: expecting ConstrPlutusData with 0th constructor and ${minNumberOfFields} items`
+      );
+    return isValid;
+  }
+});
+
 /**
  * @param plutusData CIP-0068 (label 222) datum
  * @param parentLogger logger
  */
 export const fromPlutusData = (
   plutusData: Cardano.PlutusData | undefined,
-  parentLogger: Logger
+  parentLogger: Logger,
+  strict = false
 ): NftMetadata | null => {
   const logger = contextLogger(parentLogger, 'NftMetadata.fromPlutusData');
-  if (!isConstrPlutusData(plutusData) || plutusData.constructor !== 0n || plutusData.fields.items.length < 3) {
-    logger.debug('Invalid PlutusData: expecting ConstrPlutusData with 0th constructor and 3 items');
+  const conditionalValidators = getConditionalValidators(strict, logger);
+  if (!conditionalValidators.isValidDatumShape(plutusData)) {
     return null;
   }
 
@@ -106,8 +134,12 @@ export const fromPlutusData = (
   const nftMetadataRecord = tryConvertPlutusMapToUtf8Record(nftMetadata, logger);
   const { name, image, mediaType, description, files, ...additionalProperties } = nftMetadataRecord;
 
-  if (typeof name !== 'string' || typeof image !== 'string') {
-    logger.debug('Invalid PlutusData: missing required field (name, image)');
+  if (!conditionalValidators.isNameValid(name)) {
+    return null;
+  }
+
+  if (typeof image !== 'string') {
+    logger.debug('Invalid PlutusData: "image" must be UTF-8 bounded bytes');
     return null;
   }
 
@@ -121,7 +153,7 @@ export const fromPlutusData = (
     files: mapFiles(files, logger),
     image: imageAsUri,
     mediaType: tryCoerce(mediaType, ImageMediaType, logger),
-    name,
+    name: name || '',
     otherProperties: undefinedIfEmpty(mapOtherProperties(additionalProperties, logger)),
     version: version.toString()
   };

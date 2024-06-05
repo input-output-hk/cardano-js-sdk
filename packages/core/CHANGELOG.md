@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.33.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.32.0...@cardano-sdk/core@0.33.0) (2024-06-05)
+
+### ⚠ BREAKING CHANGES
+
+* Input selectors now return selected inputs in lexicographic order
+- new input selection parameter added 'mustSpendUtxo', which force such UTXOs to be part of the selection
+- txBuilder now takes a new optional dependency TxEvaluator
+- added to the txBuilder the following new methods 'addInput', 'addReferenceInput' and 'addDatum'
+- the txBuilder now supports spending from script inputs
+- the txBuilder now resolve unknown inputs from on-chain data
+- outputBuilder 'datum' function can now take PlutusData as inline datum
+- added to the OutputBuilder a new method 'scriptReference'
+- walletUtilContext now requires an additional property 'chainHistoryProvider'
+- initializeTx now takes the list of redeemerByType and the script versions of the plutus scripts in the transaction
+
+### Features
+
+* tx-builder now supports spending from plutus scripts ([936351e](https://github.com/input-output-hk/cardano-js-sdk/commit/936351e22bea0b673e683333c84cbf9d0e134e19))
+
+### Bug Fixes
+
+* **core:** plutus list now encodes to canonical CBOR ([0e3d6d2](https://github.com/input-output-hk/cardano-js-sdk/commit/0e3d6d2d28c7b98c0064db7a67cc6a6975c58c25))
+
+## [0.32.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.31.0...@cardano-sdk/core@0.32.0) (2024-05-20)
+
+### ⚠ BREAKING CHANGES
+
+* **core:** NftMetadata.fromPlutusData use '' as default name
+* **core:** NftMetadata.fromMetadatum use '' as default name
+
+### Features
+
+* **core:** add 'strict' option to NftMetadata.fromMetadatum ([012e6cc](https://github.com/input-output-hk/cardano-js-sdk/commit/012e6cce816ac851438f6719177d9c675516f1ae))
+* **core:** add 'strict' option to NftMetadata.fromPlutusData ([7689602](https://github.com/input-output-hk/cardano-js-sdk/commit/768960263d4267754dfd1656909e630a05cae3f1))
+
+### Bug Fixes
+
+* **core:** add option to remove invisible characters from asset name ([a47beba](https://github.com/input-output-hk/cardano-js-sdk/commit/a47beba874d362b5f82326ca18f2a74ba8d8df21))
+* **core:** add support for version specified as bigint in cip25 metadata ([92a35a6](https://github.com/input-output-hk/cardano-js-sdk/commit/92a35a6ec3c0271a8a1e0d3f8d51955f2836e862))
+
 ## [0.31.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.30.2...@cardano-sdk/core@0.31.0) (2024-05-02)
 
 ### ⚠ BREAKING CHANGES

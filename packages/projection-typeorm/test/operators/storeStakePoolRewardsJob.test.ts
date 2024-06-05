@@ -48,17 +48,17 @@ describe('storeStakePoolRewardsJob', () => {
     expect(send).toBeCalledWith(
       STAKE_POOL_REWARDS,
       { epochNo: 0 },
-      { expireInHours: 6, retryDelay: 30, retryLimit: 1_000_000, singletonKey: '0', slot: 1010 }
+      { expireInHours: 6, retentionDays: 365, retryDelay: 30, retryLimit: 1_000_000, singletonKey: '0', slot: 1010 }
     );
     expect(send).toBeCalledWith(
       STAKE_POOL_REWARDS,
       { epochNo: 0 },
-      { expireInHours: 6, retryDelay: 30, retryLimit: 1_000_000, singletonKey: '0', slot: 1030 }
+      { expireInHours: 6, retentionDays: 365, retryDelay: 30, retryLimit: 1_000_000, singletonKey: '0', slot: 1030 }
     );
     expect(send).toBeCalledWith(
       STAKE_POOL_REWARDS,
       { epochNo: 1 },
-      { expireInHours: 6, retryDelay: 30, retryLimit: 1_000_000, singletonKey: '1', slot: 2010 }
+      { expireInHours: 6, retentionDays: 365, retryDelay: 30, retryLimit: 1_000_000, singletonKey: '1', slot: 2010 }
     );
   });
 });

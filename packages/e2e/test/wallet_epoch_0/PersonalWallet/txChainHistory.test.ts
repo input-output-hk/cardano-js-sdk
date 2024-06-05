@@ -12,7 +12,7 @@ describe('PersonalWallet/txChainHistory', () => {
   let signedTx: Cardano.Tx<Cardano.TxBody>;
 
   beforeEach(async () => {
-    ({ wallet } = await getWallet({ env, logger, name: 'Sending Wallet', polling: { interval: 50 } }));
+    ({ wallet } = await getWallet({ env, logger, name: 'Sending Wallet' }));
     const tAdaToSend = 10_000_000n;
     // Make sure the wallet has sufficient funds to run this test
     await walletReady(wallet, tAdaToSend);

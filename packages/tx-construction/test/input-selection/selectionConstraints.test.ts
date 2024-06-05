@@ -3,10 +3,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unicorn/consistent-function-scoping */
 import { AssetId } from '@cardano-sdk/util-dev';
-import { Cardano, InvalidProtocolParametersError } from '@cardano-sdk/core';
+import { Cardano, InvalidProtocolParametersError, Serialization } from '@cardano-sdk/core';
 import { DefaultSelectionConstraintsProps, defaultSelectionConstraints } from '../../src';
+import { HexBlob } from '@cardano-sdk/util';
 import { ProtocolParametersForInputSelection, SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { babbageTx, getBigBabbageTx } from '../testData';
+import { mockTxEvaluator } from '../tx-builder/mocks';
 
 describe('defaultSelectionConstraints', () => {
   const protocolParameters = {
@@ -29,15 +31,63 @@ describe('defaultSelectionConstraints', () => {
   });
 
   it('computeMinimumCost', async () => {
-    const fee = 218_763n;
+    const fee = 218_137n;
     const buildTx = jest.fn(async () => babbageTx);
-    const selectionSkeleton = {} as SelectionSkeleton;
+    const selectionSkeleton = { inputs: [] } as unknown as SelectionSkeleton;
     const constraints = defaultSelectionConstraints({
       buildTx,
-      protocolParameters
+      protocolParameters,
+      redeemersByType: {
+        certificate: [
+          {
+            data: Serialization.PlutusData.fromCbor(HexBlob('d86682008102')).toCore(),
+            executionUnits: {
+              memory: 0,
+              steps: 0
+            },
+            index: 1,
+            purpose: Cardano.RedeemerPurpose.certificate
+          }
+        ],
+        mint: [
+          {
+            data: Serialization.PlutusData.fromCbor(HexBlob('d86682008101')).toCore(),
+            executionUnits: {
+              memory: 0,
+              steps: 0
+            },
+            index: 0,
+            purpose: Cardano.RedeemerPurpose.mint
+          }
+        ]
+      },
+      txEvaluator: mockTxEvaluator
     });
+
     const result = await constraints.computeMinimumCost(selectionSkeleton);
-    expect(result).toEqual(fee);
+    expect(result).toEqual({
+      fee,
+      redeemers: [
+        {
+          data: Serialization.PlutusData.fromCbor(HexBlob('d86682008101')).toCore(),
+          executionUnits: {
+            memory: 100,
+            steps: 200
+          },
+          index: 0,
+          purpose: Cardano.RedeemerPurpose.mint
+        },
+        {
+          data: Serialization.PlutusData.fromCbor(HexBlob('d86682008102')).toCore(),
+          executionUnits: {
+            memory: 100,
+            steps: 200
+          },
+          index: 1,
+          purpose: Cardano.RedeemerPurpose.certificate
+        }
+      ]
+    });
     expect(buildTx).toBeCalledTimes(1);
     expect(buildTx).toBeCalledWith(selectionSkeleton);
   });
@@ -64,7 +114,9 @@ describe('defaultSelectionConstraints', () => {
     it("doesn't exceed max tx size", async () => {
       const constraints = defaultSelectionConstraints({
         buildTx: async () => babbageTx,
-        protocolParameters
+        protocolParameters,
+        redeemersByType: {},
+        txEvaluator: mockTxEvaluator
       });
       expect(await constraints.computeSelectionLimit({ inputs: new Set([1, 2]) as any } as SelectionSkeleton)).toEqual(
         2
@@ -74,7 +126,9 @@ describe('defaultSelectionConstraints', () => {
     it('exceeds max tx size', async () => {
       const constraints = defaultSelectionConstraints({
         buildTx: getBigBabbageTx,
-        protocolParameters
+        protocolParameters,
+        redeemersByType: {},
+        txEvaluator: mockTxEvaluator
       });
       expect(await constraints.computeSelectionLimit({ inputs: new Set([1, 2]) as any } as SelectionSkeleton)).toEqual(
         1
@@ -86,7 +140,9 @@ describe('defaultSelectionConstraints', () => {
     it('empty bundle', () => {
       const constraints = defaultSelectionConstraints({
         buildTx: jest.fn(),
-        protocolParameters
+        protocolParameters,
+        redeemersByType: {},
+        txEvaluator: mockTxEvaluator
       });
       expect(constraints.tokenBundleSizeExceedsLimit()).toBe(false);
     });

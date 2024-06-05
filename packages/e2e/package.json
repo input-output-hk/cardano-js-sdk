@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/e2e",
-  "version": "0.34.4",
+  "version": "0.36.0",
   "description": "End to end tests for the cardano-js-sdk packages.",
   "engines": {
     "node": ">=16.20.2"
@@ -31,8 +31,10 @@
     "test:ogmios": "jest -c jest.config.js --forceExit --selectProjects ogmios --runInBand --verbose",
     "test:pg-boss": "jest -c jest.config.js --forceExit --selectProjects pg-boss --runInBand --verbose",
     "test:providers": "jest -c jest.config.js --forceExit --selectProjects providers --runInBand --verbose",
-    "test:wallet": "jest -c jest.config.js --forceExit --selectProjects wallet --runInBand --verbose",
-    "test:wallet-real-ada": "jest -c jest.config.js --forceExit --selectProjects wallet-real-ada --runInBand --verbose",
+    "test:wallet": "yarn wait-for-network-init ; yarn test:wallet:epoch0 && { yarn wait-for-network-epoch-3 ; yarn test:wallet:epoch3 ; }",
+    "test:wallet:epoch0": "jest -c jest.config.js --forceExit --selectProjects wallet_epoch_0 --runInBand --verbose",
+    "test:wallet:epoch3": "jest -c jest.config.js --forceExit --selectProjects wallet_epoch_3 --runInBand --verbose",
+    "test:wallet-real-ada": "NETWORK_SPEED=slow jest -c jest.config.js --forceExit --selectProjects wallet-real-ada --runInBand --verbose",
     "test:web-extension:build:sw": "tsc --build ./test && tsc --build ./test/web-extension && webpack -c test/web-extension/webpack.config.sw.js",
     "test:web-extension:build:other": "tsc --build ./test && tsc --build ./test/web-extension && webpack -c test/web-extension/webpack.config.js",
     "test:web-extension:build:sw:watch": "yarn test:web-extension:build:sw --watch",
@@ -70,7 +72,8 @@
     "test:debug": "DEBUG=true yarn test",
     "generate-mnemonics": "ts-node src/scripts/mnemonic.ts",
     "multi-delegation-data-gen": "ts-node src/tools/multi-delegation-data-gen/index.ts",
-    "wait-for-network": "ts-node src/scripts/is-local-network-ready.ts"
+    "wait-for-network-epoch-3": "DB_SYNC_CONNECTION_STRING='postgresql://postgres:doNoUseThisSecret!@localhost:5435/cexplorer' ts-node src/scripts/is-local-network-ready.ts",
+    "wait-for-network-init": "local-network/scripts/wait-local-network-init.sh"
   },
   "repository": "https://github.com/input-output-hk/cardano-js-sdk",
   "license": "Apache-2.0",

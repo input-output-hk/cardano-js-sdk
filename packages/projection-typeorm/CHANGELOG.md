@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.18](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.8.17...@cardano-sdk/projection-typeorm@0.8.18) (2024-06-05)
+
+### Bug Fixes
+
+* project datum nft metadata with missing extra field ([9b283d9](https://github.com/input-output-hk/cardano-js-sdk/commit/9b283d9ad0fd5b410772b0aca8b9382f6c3b6ef5))
+* **projection-typeorm:** store pool metric job to work also when sends the fist job at block 0 ([8bd99bc](https://github.com/input-output-hk/cardano-js-sdk/commit/8bd99bccc3f62164126ac042f0247dbe58518dd1))
+* **projection-typeorm:** transform NftMetadataEntity.files to serializable & sanitize ([0b839d0](https://github.com/input-output-hk/cardano-js-sdk/commit/0b839d0c2e546e0a437d4ae3659aefdde3af850a))
+* remove null characters from user-specified strings when storing nft metadata ([29a0014](https://github.com/input-output-hk/cardano-js-sdk/commit/29a001482eec080a5bbea5a932c63c4adc35706b))
+* sanitize NftMetadata.otherProperties recursively ([95c8bd8](https://github.com/input-output-hk/cardano-js-sdk/commit/95c8bd8f0ec0eb92bf9ada7ae64491170f9823b8)), closes [#1294](https://github.com/input-output-hk/cardano-js-sdk/issues/1294)
+
+## [0.8.17](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.8.16...@cardano-sdk/projection-typeorm@0.8.17) (2024-05-20)
+
+### Bug Fixes
+
+* increase the size of pledge column of stake pool rewards table ([988f9ae](https://github.com/input-output-hk/cardano-js-sdk/commit/988f9ae02415a1c8dc4327d1d40d2412a97064b0))
+
 ## [0.8.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.8.15...@cardano-sdk/projection-typeorm@0.8.16) (2024-05-02)
 
 **Note:** Version bump only for package @cardano-sdk/projection-typeorm

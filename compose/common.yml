@@ -1,5 +1,3 @@
-version: '3.9'
-
 x-from-sdk: &from-sdk
   healthcheck:
     interval: 10s
@@ -30,7 +28,7 @@ x-provider-server: &provider-server
     target: provider-server
   depends_on:
     cardano-db-sync:
-      condition: service_healthy
+      condition: service_started
 
 x-with-postgres: &with-postgres
   depends_on:
@@ -63,7 +61,7 @@ x-provider-server-environment: &provider-server-environment
   DISABLE_STAKE_POOL_METRIC_APY: ${DISABLE_STAKE_POOL_METRIC_APY:-false}
   ENABLE_METRICS: ${ENABLE_METRICS:-false}
   EPOCH_POLL_INTERVAL: ${EPOCH_POLL_INTERVAL:-500}
-  SERVICE_NAMES: ${SERVICE_NAMES:-asset,chain-history,handle,network-info,rewards,stake-pool,tx-submit,utxo}
+  SERVICE_NAMES: ${SERVICE_NAMES:-chain-history,network-info,rewards,stake-pool,tx-submit,utxo}
   SUBMIT_API_URL: ${SUBMIT_API_URL:-http://cardano-submit-api:8090/}
   USE_BLOCKFROST: ${USE_BLOCKFROST:-false}
   USE_SUBMIT_API: ${USE_SUBMIT_API:-false}
@@ -78,16 +76,19 @@ x-sdk-environment: &sdk-environment
   POSTGRES_DB_FILE_HANDLE: /run/secrets/postgres_db_handle
   POSTGRES_DB_FILE_STAKE_POOL: /run/secrets/postgres_db_stake_pool
   POSTGRES_HOST_DB_SYNC: postgres
+  POSTGRES_HOST_ASSET: postgres
   POSTGRES_HOST_HANDLE: postgres
   POSTGRES_HOST_STAKE_POOL: postgres
   POSTGRES_POOL_MAX_DB_SYNC: ${POSTGRES_POOL_MAX:-10}
   POSTGRES_POOL_MAX_HANDLE: ${POSTGRES_POOL_MAX:-10}
+  POSTGRES_POOL_MAX_ASSET: ${POSTGRES_POOL_MAX:-10}
   POSTGRES_POOL_MAX_STAKE_POOL: ${POSTGRES_POOL_MAX:-10}
   POSTGRES_PASSWORD_FILE_ASSET: /run/secrets/postgres_password
   POSTGRES_PASSWORD_FILE_DB_SYNC: /run/secrets/postgres_password
   POSTGRES_PASSWORD_FILE_HANDLE: /run/secrets/postgres_password
   POSTGRES_PASSWORD_FILE_STAKE_POOL: /run/secrets/postgres_password
   POSTGRES_PORT_DB_SYNC: 5432
+  POSTGRES_PORT_ASSET: 5432
   POSTGRES_PORT_HANDLE: 5432
   POSTGRES_PORT_STAKE_POOL: 5432
   POSTGRES_USER_FILE_ASSET: /run/secrets/postgres_user
@@ -110,19 +111,12 @@ services:
     depends_on:
       ogmios:
         condition: service_healthy
-    healthcheck:
-      test: ['CMD', '/scripts/is-db-synced.sh']
-      interval: 5s
-      timeout: 1s
-      retries: 120
-      start_period: 100ms
     image: ghcr.io/intersectmbo/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-13.1.0.2}
     restart: on-failure
     stop_signal: SIGINT
     volumes:
       - db-sync-data:/var/lib/cexplorer
       - node-ipc:/node-ipc
-      - ../../packages/e2e/local-network/scripts:/scripts
 
   cardano-smash:
     <<:
@@ -139,7 +133,7 @@ services:
       SMASH_PASSWORD: ${SMASH_PASSWORD:-change_m}
     depends_on:
       cardano-db-sync:
-        condition: service_healthy
+        condition: service_started
     ports:
       - ${SMASH_PORT:-3100}:3100
     restart: on-failure
@@ -211,8 +205,6 @@ services:
       STAKE_POOL_PROVIDER_URL: http://provider-server:3000/
       METADATA_FETCH_MODE: ${METADATA_FETCH_MODE:-smash}
       SMASH_URL: ${SMASH_URL:-http://cardano-smash:3100/api/v1}
-    healthcheck:
-      test: ['CMD-SHELL', 'curl -s --fail http://localhost:3003/v1.0.0/health']
     ports:
       - ${PG_BOSS_PORT:-4003}:3003
 
@@ -251,12 +243,6 @@ services:
         - *sdk-environment
       POSTGRES_DB_FILE: /run/secrets/postgres_db_asset
       PROJECTION_NAMES: asset
-    healthcheck:
-      test:
-        [
-          'CMD-SHELL',
-          'test `curl -fs http://localhost:3000/v1.0.0/health | jq -r ".services[0].projectedTip.blockNo"` -gt 1'
-        ]
     ports:
       - ${ASSET_PROJECTOR_PORT:-4006}:3000
 
@@ -272,12 +258,6 @@ services:
         - *sdk-environment
       POSTGRES_DB_FILE: /run/secrets/postgres_db_handle
       PROJECTION_NAMES: handle
-    healthcheck:
-      test:
-        [
-          'CMD-SHELL',
-          'test `curl -fs http://localhost:3000/v1.0.0/health | jq -r ".services[0].projectedTip.blockNo"` -gt 1'
-        ]
     ports:
       - ${HANDLE_PROJECTOR_PORT:-4004}:3000
 
@@ -293,12 +273,6 @@ services:
         - *sdk-environment
       POSTGRES_DB_FILE: /run/secrets/postgres_db_stake_pool
       PROJECTION_NAMES: stake-pool,stake-pool-metadata-job,stake-pool-metrics-job,stake-pool-rewards-job
-    healthcheck:
-      test:
-        [
-          'CMD-SHELL',
-          'test `curl -fs http://localhost:3000/v1.0.0/health | jq -r ".services[0].projectedTip.blockNo"` -gt 1'
-        ]
     ports:
       - ${STAKE_POOL_PROJECTOR_PORT:-4002}:3000
 
@@ -341,6 +315,7 @@ services:
         - *sdk-environment
         - *provider-server-environment
       SERVICE_NAMES: asset
+      USE_TYPEORM_ASSET_PROVIDER: true
     ports:
       - ${HANDLE_API_PORT:-4014}:3000
 

@@ -18,9 +18,14 @@ export const AssetName = (value: string): AssetName => {
 };
 
 const utf8Decoder = new TextDecoder('utf8', { fatal: true });
-AssetName.toUTF8 = (assetName: AssetName) => {
+AssetName.toUTF8 = (assetName: AssetName, stripInvisibleCharacters = false) => {
+  const assetNameBuffer = Buffer.from(assetName, 'hex');
   try {
-    return utf8Decoder.decode(Buffer.from(assetName, 'hex'));
+    if (stripInvisibleCharacters) {
+      // 'invisible' control characters are valid utf8, but we don't want to use them, strip them out
+      return utf8Decoder.decode(assetNameBuffer.filter((v) => v > 31));
+    }
+    return utf8Decoder.decode(assetNameBuffer);
   } catch (error) {
     throw new InvalidStringError(`Cannot convert AssetName '${assetName}' to UTF8`, error);
   }

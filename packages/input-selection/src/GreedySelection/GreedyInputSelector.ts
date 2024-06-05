@@ -11,7 +11,7 @@ import {
   subtractTokenMaps,
   toValues
 } from '../util';
-import { splitChange } from './util';
+import { sortUtxoByTxIn, splitChange } from './util';
 
 /** Greedy selection initialization properties. */
 export interface GreedySelectorProps {
@@ -48,16 +48,21 @@ const adjustOutputsForFee = async (
   outputs: Set<Cardano.TxOut>,
   changeOutputs: Array<Cardano.TxOut>,
   currentFee: bigint
-): Promise<{ fee: bigint; change: Array<Cardano.TxOut>; feeAccountedFor: boolean }> => {
+): Promise<{
+  fee: bigint;
+  change: Array<Cardano.TxOut>;
+  feeAccountedFor: boolean;
+  redeemers?: Array<Cardano.Redeemer>;
+}> => {
   const totalOutputs = new Set([...outputs, ...changeOutputs]);
-  const fee = await constraints.computeMinimumCost({
+  const { fee, redeemers } = await constraints.computeMinimumCost({
     change: [],
     fee: currentFee,
     inputs,
     outputs: totalOutputs
   });
 
-  if (fee === changeLovelace) return { change: [], fee, feeAccountedFor: true };
+  if (fee === changeLovelace) return { change: [], fee, feeAccountedFor: true, redeemers };
 
   if (changeLovelace < fee) throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
 
@@ -76,7 +81,7 @@ const adjustOutputsForFee = async (
     }
   }
 
-  return { change: [...updatedOutputs], fee, feeAccountedFor };
+  return { change: [...updatedOutputs], fee, feeAccountedFor, redeemers };
 };
 
 /**
@@ -174,8 +179,9 @@ export class GreedyInputSelector implements InputSelector {
   }
 
   async select(params: InputSelectionParameters): Promise<SelectionResult> {
-    const { utxo: inputs, outputs, constraints, implicitValue } = params;
-    const utxoValues = toValues([...inputs]);
+    const { preSelectedUtxo, utxo: inputs, outputs, constraints, implicitValue } = params;
+    const allInputs = new Set([...inputs, ...preSelectedUtxo]);
+    const utxoValues = toValues([...allInputs]);
     const outputsValues = toValues([...outputs]);
     const totalLovelaceInUtxoSet = getCoinQuantity(utxoValues);
     const totalLovelaceInOutputSet = getCoinQuantity(outputsValues);
@@ -191,11 +197,11 @@ export class GreedyInputSelector implements InputSelector {
     const changeLovelace = totalLovelaceInput - totalLovelaceOutput;
     const changeAssets = subtractTokenMaps(totalAssetsInput, totalAssetsInOutputSet);
 
-    if (inputs.size === 0 || totalLovelaceOutput > totalLovelaceInput || hasNegativeAssetValue(changeAssets))
+    if (allInputs.size === 0 || totalLovelaceOutput > totalLovelaceInput || hasNegativeAssetValue(changeAssets))
       throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
 
     const adjustedChangeOutputs = await splitChangeAndComputeFee(
-      inputs,
+      allInputs,
       outputs,
       changeLovelace,
       changeAssets,
@@ -212,8 +218,8 @@ export class GreedyInputSelector implements InputSelector {
       throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
 
     if (
-      inputs.size >
-      (await constraints.computeSelectionLimit({ change, fee: adjustedChangeOutputs.fee, inputs, outputs }))
+      allInputs.size >
+      (await constraints.computeSelectionLimit({ change, fee: adjustedChangeOutputs.fee, inputs: allInputs, outputs }))
     ) {
       throw new InputSelectionError(InputSelectionFailure.MaximumInputCountExceeded);
     }
@@ -223,7 +229,7 @@ export class GreedyInputSelector implements InputSelector {
       selection: {
         change,
         fee: adjustedChangeOutputs.fee,
-        inputs,
+        inputs: new Set([...allInputs].sort(sortUtxoByTxIn)),
         outputs
       }
     };

@@ -19,6 +19,13 @@ describe('PlutusData', () => {
     expect(() => Serialization.PlutusData.fromCbor(cbor)).not.toThrowError();
   });
 
+  it('can compute correct hash', () => {
+    const data = Serialization.PlutusData.fromCbor(HexBlob('46010203040506'));
+
+    // Hash was generated with the CSL
+    expect(data.hash()).toEqual('f5e45fd57d6c5591dd9e83e76943827c4f4a9eacefd5ac974f48afd8420765a6');
+  });
+
   describe('Integer', () => {
     it('can encode a positive integer', () => {
       const data = Serialization.PlutusData.newInteger(5n);
@@ -135,7 +142,7 @@ describe('PlutusData', () => {
       data.add(Serialization.PlutusData.newInteger(4n));
       data.add(Serialization.PlutusData.newInteger(5n));
 
-      expect(data.toCbor()).toEqual('9f0102030405ff');
+      expect(data.toCbor()).toEqual('850102030405');
     });
 
     it('can encode a list of plutus list', () => {
@@ -155,7 +162,7 @@ describe('PlutusData', () => {
       outer.add(Serialization.PlutusData.newList(innerList));
       outer.add(Serialization.PlutusData.newInteger(5n));
 
-      expect(outer.toCbor()).toEqual('9f01029f0102030405ff9f0102030405ff05ff');
+      expect(outer.toCbor()).toEqual('85010285010203040585010203040505');
     });
   });
 
@@ -285,7 +292,7 @@ describe('PlutusData', () => {
 
       const data = new Serialization.ConstrPlutusData(0n, args);
 
-      expect(data.toCbor()).toEqual('d8799f0102030405ff');
+      expect(data.toCbor()).toEqual('d879850102030405');
     });
   });
 

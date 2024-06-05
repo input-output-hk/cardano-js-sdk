@@ -47,7 +47,10 @@ export class DbSyncEpochPollService implements EpochMonitor {
    * @returns {number} epoch number
    */
   async #queryLastEpoch() {
-    const result: QueryResult<EpochModel> = await this.#db.query(findLastEpoch);
+    const result: QueryResult<EpochModel> = await this.#db.query({
+      name: 'current_epoch',
+      text: findLastEpoch
+    });
     return Cardano.EpochNo(result.rows[0].no);
   }
 

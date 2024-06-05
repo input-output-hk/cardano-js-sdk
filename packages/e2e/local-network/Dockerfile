@@ -27,7 +27,7 @@ RUN apt-get update -y && \
   apt-get install -y tzdata ca-certificates jq coreutils curl wget
 
 HEALTHCHECK --interval=5s --timeout=1s --retries=200 --start-period=100ms \
-  CMD /root/scripts/get-epoch.sh | awk '{ if ($0 >= "3") exit 0; else exit 1}'
+  CMD test -e /root/network-files/run/healthy
 
 STOPSIGNAL SIGINT
 COPY --from=builder /build/cardano-node /opt/cardano-node

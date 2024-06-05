@@ -34,6 +34,7 @@ describe('createTransactionInternals', () => {
     }).select({
       constraints: SelectionConstraints.NO_CONSTRAINTS,
       outputs: new Set(outputs),
+      preSelectedUtxo: new Set<Cardano.Utxo>(),
       utxo: new Set(utxo)
     });
     const ledgerTip = await provider.ledgerTip();

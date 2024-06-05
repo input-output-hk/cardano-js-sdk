@@ -87,7 +87,7 @@ describe('simple delegation rewards', () => {
       name: 'Sending Wallet',
       polling: { interval: 50 }
     }));
-    ({ wallet: wallet2 } = await getWallet({ env, logger, name: 'Receiving Wallet', polling: { interval: 50 } }));
+    ({ wallet: wallet2 } = await getWallet({ env, logger, name: 'Receiving Wallet' }));
 
     await waitForWalletStateSettle(wallet1);
     await waitForWalletStateSettle(wallet2);

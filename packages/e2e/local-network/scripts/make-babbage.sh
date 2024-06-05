@@ -154,7 +154,7 @@ cardano-cli genesis create-staked --genesis-dir "${ROOT}" \
   --testnet-magic "${NETWORK_MAGIC}" \
   --gen-pools ${NUM_SP_NODES} \
   --supply ${MAX_SUPPLY} \
-  --supply-delegated ${MAX_SUPPLY} \
+  --supply-delegated $((MAX_SUPPLY * 2)) \
   --gen-stake-delegs ${NUM_SP_NODES} \
   --gen-utxo-keys ${NUM_SP_NODES}
 
@@ -172,27 +172,34 @@ mkdir -p "${ROOT}/genesis/shelley"
 
 mv "${ROOT}/byron-gen-command/genesis.json" "${ROOT}/genesis/byron/genesis-wrong.json"
 mv "${ROOT}/genesis.alonzo.json" "${ROOT}/genesis/shelley/genesis.alonzo.json"
-mv "${ROOT}/genesis.json" "${ROOT}/genesis/shelley/genesis.json"
+mv "${ROOT}/genesis.json" "${ROOT}/genesis/shelley/copy-genesis.json"
 
 jq --raw-output ".protocolConsts.protocolMagic = ${NETWORK_MAGIC}" "${ROOT}/genesis/byron/genesis-wrong.json" >"${ROOT}/genesis/byron/genesis.json"
 
 rm "${ROOT}/genesis/byron/genesis-wrong.json"
 
-sed_i \
-  -e 's/"slotLength": 1/"slotLength": 0.2/' \
-  -e 's/"activeSlotsCoeff": 5.0e-2/"activeSlotsCoeff": 0.1/' \
-  -e 's/"securityParam": 2160/"securityParam": 10/' \
-  -e 's/"epochLength": 432000/"epochLength": 1000/' \
-  -e "s/\"maxLovelaceSupply\": 0/\"maxLovelaceSupply\": ${MAX_SUPPLY}/" \
-  -e 's/"minFeeA": 1/"minFeeA": 44/' \
-  -e 's/"minFeeB": 0/"minFeeB": 155381/' \
-  -e 's/"minUTxOValue": 0/"minUTxOValue": 1000000/' \
-  -e 's/"decentralisationParam": 1.0/"decentralisationParam": 0.7/' \
-  -e 's/"major": 0/"major": 7/' \
-  -e 's/"rho": 0.0/"rho": 0.1/' \
-  -e 's/"tau": 0.0/"tau": 0.1/' \
-  -e 's/"updateQuorum": 5/"updateQuorum": 2/' \
-  "${ROOT}/genesis/shelley/genesis.json"
+jq -M "
+. + {
+  activeSlotsCoeff: 0.1,
+  epochLength: 1000,
+  maxLovelaceSupply: $((MAX_SUPPLY * 3)),
+  securityParam: 10,
+  slotLength: 0.2,
+  updateQuorum: 2
+} |
+.protocolParams += {
+  decentralisationParam: 0.7,
+  keyDeposit: 2000000,
+  minFeeA: 44,
+  minFeeB: 155381,
+  minUTxOValue: 1000000,
+  poolDeposit: 500000000,
+  protocolVersion: { major : 7, minor: 0 },
+  rho: 0.1,
+  tau: 0.1
+}" "${ROOT}/genesis/shelley/copy-genesis.json" > "${ROOT}/genesis/shelley/genesis.json"
+
+rm "${ROOT}/genesis/shelley/copy-genesis.json"
 
 for NODE_ID in ${SP_NODES_ID}; do
   TARGET="${ROOT}/node-sp${NODE_ID}"
