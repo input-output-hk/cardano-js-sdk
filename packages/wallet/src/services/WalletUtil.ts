@@ -26,7 +26,7 @@ export interface WalletOutputValidatorContext {
 }
 
 export type WalletUtilContext = WalletOutputValidatorContext &
-  InputResolverContext & { chainHistoryProvider: ChainHistoryProvider };
+  InputResolverContext & { chainHistoryProvider?: ChainHistoryProvider };
 
 export const createInputResolver = ({ utxo, transactions }: InputResolverContext): Cardano.InputResolver => ({
   async resolveInput(input: Cardano.TxIn, options?: Cardano.ResolveOptions) {
@@ -131,7 +131,9 @@ export const combineInputResolvers = (...resolvers: Cardano.InputResolver[]): Ca
  */
 export const createWalletUtil = (context: WalletUtilContext) => ({
   ...createOutputValidator({ protocolParameters: () => firstValueFrom(context.protocolParameters$) }),
-  ...combineInputResolvers(createInputResolver(context), createBackendInputResolver(context.chainHistoryProvider))
+  ...(context.chainHistoryProvider
+    ? combineInputResolvers(createInputResolver(context), createBackendInputResolver(context.chainHistoryProvider))
+    : createInputResolver(context))
 });
 
 export type WalletUtil = ReturnType<typeof createWalletUtil>;
