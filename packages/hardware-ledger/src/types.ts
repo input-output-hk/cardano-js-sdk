@@ -19,6 +19,6 @@ export type LedgerDevice = USBDevice | HID;
 export type LedgerTxTransformerContext = {
   /** The Cardano blockchain's network identifier (e.g., mainnet or testnet). */
   chainId: Cardano.ChainId;
-  /** Non-hardened account index */
+  /** Non-hardened account in cip1852 */
   accountIndex: number;
 } & SignTransactionContext;

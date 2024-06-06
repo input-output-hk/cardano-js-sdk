@@ -1,5 +1,4 @@
 import * as Crypto from '@cardano-sdk/crypto';
-// import { AccountKeyDerivationPathWithPurpose } from '@cardano-sdk/key-management/dist/cjs/util';
 import {
   AccountKeyDerivationPath,
   AsyncKeyAgent,

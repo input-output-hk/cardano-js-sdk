@@ -1,7 +1,4 @@
 /* eslint-disable no-use-before-define */
-import { Cardano } from '@cardano-sdk/core';
-
-import * as Crypto from '@cardano-sdk/crypto';
 import {
   BackgroundServices,
   UserPromptService,
@@ -10,15 +7,6 @@ import {
   env,
   logger
 } from './util';
-import { Buffer } from 'buffer';
-import {
-  CommunicationType,
-  InMemoryKeyAgent,
-  KeyPurpose,
-  SerializableInMemoryKeyAgentData,
-  emip3encrypt
-} from '@cardano-sdk/key-management';
-import { HexBlob, isNotNil } from '@cardano-sdk/util';
 import {
   RemoteApiPropertyType,
   SigningCoordinator,
@@ -35,8 +23,20 @@ import {
   walletManagerProperties,
   walletRepositoryProperties
 } from '@cardano-sdk/web-extension';
-import { SodiumBip32Ed25519 } from '@cardano-sdk/crypto';
 import { adaPriceServiceChannel, selectors, userPromptServiceChannel, walletName } from './const';
+
+import * as Crypto from '@cardano-sdk/crypto';
+import { Buffer } from 'buffer';
+import { Cardano } from '@cardano-sdk/core';
+import {
+  CommunicationType,
+  InMemoryKeyAgent,
+  KeyPurpose,
+  SerializableInMemoryKeyAgentData,
+  emip3encrypt
+} from '@cardano-sdk/key-management';
+import { HexBlob, isNotNil } from '@cardano-sdk/util';
+import { SodiumBip32Ed25519 } from '@cardano-sdk/crypto';
 import { combineLatest, filter, firstValueFrom, merge, of } from 'rxjs';
 import { runtime } from 'webextension-polyfill';
 

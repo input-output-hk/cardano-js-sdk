@@ -1,13 +1,4 @@
 /* eslint-disable unicorn/consistent-destructuring */
-import {
-  Cardano,
-  OutsideOfValidityIntervalData,
-  Serialization,
-  TxCBOR,
-  TxSubmissionError,
-  TxSubmissionErrorCode,
-  coalesceValueQuantities
-} from '@cardano-sdk/core';
 /* eslint-disable unicorn/consistent-function-scoping */
 /* eslint-disable @typescript-eslint/no-explicit-any, sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
@@ -27,6 +18,15 @@ import { AddressType, Bip32Account, GroupedAddress, util } from '@cardano-sdk/ke
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BaseWallet, cip30, createPersonalWallet } from '../../src';
 import { CallbackConfirmation, GetCollateralCallbackParams } from '../../src/cip30';
+import {
+  Cardano,
+  OutsideOfValidityIntervalData,
+  Serialization,
+  TxCBOR,
+  TxSubmissionError,
+  TxSubmissionErrorCode,
+  coalesceValueQuantities
+} from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';

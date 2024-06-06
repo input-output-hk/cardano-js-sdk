@@ -12,11 +12,11 @@ import {
   walletReady,
   walletVariables
 } from '../../src';
-import { firstValueFrom } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, KeyRole } from '@cardano-sdk/key-management';
+import { firstValueFrom } from 'rxjs';
 
 const env = getEnv(walletVariables);
 

@@ -53,20 +53,11 @@ describe('KeyAgentBase', () => {
   });
 
   test('derivePublicKey', async () => {
-    const externalPublicKey = await keyAgent.derivePublicKey({
-      index: 1,
-      role: KeyRole.External
-    });
+    const externalPublicKey = await keyAgent.derivePublicKey({ index: 1, role: KeyRole.External });
     expect(typeof externalPublicKey).toBe('string');
-    const stakePublicKey = await keyAgent.derivePublicKey({
-      index: 1,
-      role: KeyRole.Stake
-    });
+    const stakePublicKey = await keyAgent.derivePublicKey({ index: 1, role: KeyRole.Stake });
     expect(typeof stakePublicKey).toBe('string');
-    const dRepPublicKey = await keyAgent.derivePublicKey({
-      index: 0,
-      role: KeyRole.DRep
-    });
+    const dRepPublicKey = await keyAgent.derivePublicKey({ index: 0, role: KeyRole.DRep });
     expect(typeof dRepPublicKey).toBe('string');
   });
 });

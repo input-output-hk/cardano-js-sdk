@@ -61,20 +61,8 @@ describe('PersonalWallet/delegation', () => {
 
   beforeAll(async () => {
     jest.setTimeout(180_000);
-    wallet1 = await getWallet({
-      env,
-      idx: 0,
-      logger,
-      name: 'Test Wallet 1',
-      polling: { interval: 500 }
-    });
-    wallet2 = await getWallet({
-      env,
-      idx: 1,
-      logger,
-      name: 'Test Wallet 2',
-      polling: { interval: 500 }
-    });
+    wallet1 = await getWallet({ env, idx: 0, logger, name: 'Test Wallet 1', polling: { interval: 500 } });
+    wallet2 = await getWallet({ env, idx: 1, logger, name: 'Test Wallet 2', polling: { interval: 500 } });
 
     await Promise.all([waitForWalletStateSettle(wallet1.wallet), waitForWalletStateSettle(wallet2.wallet)]);
     bip32Ed25519 = await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger);

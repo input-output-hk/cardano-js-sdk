@@ -1,6 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import {
+  AccountKeyDerivationPath,
   AddressType,
   CardanoKeyConst,
   GroupedAddress,
@@ -22,20 +23,20 @@ import {
 } from '../testData';
 import { Cardano } from '@cardano-sdk/core';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { LedgerTxTransformerContext, getKnownAddress, mapCerts } from '../../src';
+import { LedgerTxTransformerContext } from '../../src';
+import { getKnownAddress, mapCerts } from '../../src/transformers/certificates';
 
 export const stakeKeyPath = {
   index: 0,
   role: KeyRole.Stake
 };
-
-const createGroupedAddress = ({
-  address,
-  rewardAccount,
-  stakeKeyDerivationPath,
-  index,
-  type
-}: Omit<GroupedAddress, 'networkId' | 'accountIndex'>): GroupedAddress =>
+const createGroupedAddress = (
+  address: Cardano.PaymentAddress,
+  rewardAccount: Cardano.RewardAccount,
+  type: AddressType,
+  index: number,
+  stakeKeyDerivationPath: AccountKeyDerivationPath
+): GroupedAddress =>
   ({
     address,
     index,
@@ -78,38 +79,14 @@ const mockContext: LedgerTxTransformerContext = {
   handleResolutions: [],
 
   knownAddresses: [
-    createGroupedAddress({
-      address: address1,
-      index: 0,
-      rewardAccount: ownRewardAccount,
-      stakeKeyDerivationPath: stakeKeyPath,
-      type: AddressType.External
-    }),
-    createGroupedAddress({
-      address: address2,
-      index: 1,
-      rewardAccount: ownRewardAccount,
-      stakeKeyDerivationPath: stakeKeyPath,
-      type: AddressType.External
-    })
+    createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0, stakeKeyPath),
+    createGroupedAddress(address2, ownRewardAccount, AddressType.External, 1, stakeKeyPath)
   ],
   purpose: KeyPurpose.STANDARD,
   sender: undefined,
   txInKeyPathMap: createTxInKeyPathMapMock([
-    createGroupedAddress({
-      address: address1,
-      index: 0,
-      rewardAccount: ownRewardAccount,
-      stakeKeyDerivationPath: stakeKeyPath,
-      type: AddressType.External
-    }),
-    createGroupedAddress({
-      address: address2,
-      index: 1,
-      rewardAccount: ownRewardAccount,
-      stakeKeyDerivationPath: stakeKeyPath,
-      type: AddressType.External
-    })
+    createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0, stakeKeyPath),
+    createGroupedAddress(address2, ownRewardAccount, AddressType.External, 1, stakeKeyPath)
   ])
 };
 

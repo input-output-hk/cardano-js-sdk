@@ -1,4 +1,5 @@
-/* eslint-disable max-statements, @typescript-eslint/no-explicit-any */
+/* eslint-disable max-statements */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AddressType, Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
 import {
   AssetId,

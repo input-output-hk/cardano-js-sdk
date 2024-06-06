@@ -1,9 +1,8 @@
 /* eslint-disable no-console, max-statements, max-params, @typescript-eslint/no-floating-promises */
-import { Cardano } from '@cardano-sdk/core';
-import { logger } from '@cardano-sdk/util-dev';
-import { util } from '@cardano-sdk/key-management';
+import { ValueTransferConfig, configLoader } from './config';
 
 import { BaseWallet } from '@cardano-sdk/wallet';
+import { Cardano } from '@cardano-sdk/core';
 import { Files, Paths } from './files';
 import {
   KeyAgentFactoryProps,
@@ -17,7 +16,8 @@ import {
 } from '../../../';
 import { Observable, filter, firstValueFrom, map } from 'rxjs';
 import { TaskResult, TerminalProgressMonitor } from './terminal-progress-monitor';
-import { ValueTransferConfig, configLoader } from './config';
+import { logger } from '@cardano-sdk/util-dev';
+import { util } from '@cardano-sdk/key-management';
 import chalk from 'chalk';
 
 /**
@@ -96,15 +96,8 @@ export const loadConfiguration = async (monitor: TerminalProgressMonitor) => {
 export const waitForFundingWallet = async (monitor: TerminalProgressMonitor): Promise<BaseWallet> => {
   monitor.startTask('Waiting for funding wallet to be ready.');
 
-  const fundingWallet = (
-    await getWallet({
-      env,
-      idx: 0,
-      logger,
-      name: 'Funding wallet',
-      polling: { interval: 500 }
-    })
-  ).wallet;
+  const fundingWallet = (await getWallet({ env, idx: 0, logger, name: 'Funding wallet', polling: { interval: 500 } }))
+    .wallet;
 
   await walletReady(fundingWallet);
 

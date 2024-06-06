@@ -1,5 +1,4 @@
 /* eslint-disable func-style */
-import { Cardano, Handle, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 /* eslint-disable jsdoc/require-jsdoc */
 import * as Crypto from '@cardano-sdk/crypto';
 import {
@@ -15,6 +14,7 @@ import {
 } from '@cardano-sdk/key-management';
 import { AssetId, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BigIntMath, HexBlob } from '@cardano-sdk/util';
+import { Cardano, Handle, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import {
   GenericTxBuilder,
   HandleNotFoundError,

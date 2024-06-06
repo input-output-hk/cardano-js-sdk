@@ -1,5 +1,3 @@
-import { Witnesser } from '@cardano-sdk/key-management';
-
 import {
   AnyWallet,
   StoresFactory,
@@ -17,9 +15,11 @@ import {
   walletManagerProperties,
   walletRepositoryProperties
 } from '@cardano-sdk/web-extension';
+
 import { InvalidArgumentError, isNotNil } from '@cardano-sdk/util';
 import { Metadata, env, logger } from '../util';
 import { storage as WebExtensionStorage, runtime } from 'webextension-polyfill';
+import { Witnesser } from '@cardano-sdk/key-management';
 import { filter, from, merge, of } from 'rxjs';
 import { getWallet } from '../../../../src';
 import { storage } from '@cardano-sdk/wallet';

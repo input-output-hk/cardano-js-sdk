@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, GroupedAddress, KeyPurpose, KeyRole, TxInId, util } from '../../src';
+import { AccountKeyDerivationPath, AddressType, GroupedAddress, KeyPurpose, KeyRole, TxInId, util } from '../../src';
 import { Cardano } from '@cardano-sdk/core';
 
 export const stakeKeyPath = {
@@ -15,13 +15,14 @@ const toStakeCredential = (stakeKeyHash: Crypto.Ed25519KeyHashHex): Cardano.Cred
   type: Cardano.CredentialType.KeyHash
 });
 
-const createGroupedAddress = ({
-  address,
-  index,
-  rewardAccount,
-  stakeKeyDerivationPath,
-  type
-}: Omit<GroupedAddress, 'networkId' | 'accountIndex'>): GroupedAddress =>
+const createGroupedAddress = (
+  address: Cardano.PaymentAddress,
+  rewardAccount: Cardano.RewardAccount,
+  type: AddressType,
+  index: number,
+  stakeKeyDerivationPath: AccountKeyDerivationPath
+  // eslint-disable-next-line max-params
+): GroupedAddress =>
   ({
     address,
     index,
@@ -56,14 +57,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
   let dRepKeyHash: Crypto.Ed25519KeyHashHex;
   const foreignDRepKeyHash = Crypto.Hash28ByteBase16('8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d');
 
-  // address1, ownRewardAccount, AddressType.External, 0, stakeKeyPath
-  const knownAddress1 = createGroupedAddress({
-    address: address1,
-    index: 0,
-    rewardAccount: ownRewardAccount,
-    stakeKeyDerivationPath: stakeKeyPath,
-    type: AddressType.External
-  });
+  const knownAddress1 = createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0, stakeKeyPath);
 
   beforeEach(async () => {
     dRepPublicKey = Crypto.Ed25519PublicKeyHex('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01');
@@ -78,13 +72,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
     ];
     const txBody = { inputs } as Cardano.TxBody;
     const knownAddresses = [address1, address2].map((address, index) =>
-      createGroupedAddress({
-        address,
-        index,
-        rewardAccount: ownRewardAccount,
-        stakeKeyDerivationPath: stakeKeyPath,
-        type: AddressType.External
-      })
+      createGroupedAddress(address, ownRewardAccount, AddressType.External, index, stakeKeyPath)
     );
 
     expect(
@@ -358,15 +346,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       inputs: [{}, {}, {}],
       withdrawals: [{ quantity: 1n, stakeAddress: ownRewardAccount }]
     } as Cardano.TxBody;
-    const knownAddresses = [
-      createGroupedAddress({
-        address: address1,
-        index: 0,
-        rewardAccount: ownRewardAccount,
-        stakeKeyDerivationPath: stakeKeyPath,
-        type: AddressType.External
-      })
-    ];
+    const knownAddresses = [createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0, stakeKeyPath)];
     expect(util.ownSignatureKeyPaths(txBody, knownAddresses, {})).toEqual([
       {
         index: 0,
@@ -380,15 +360,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       inputs: [{}, {}, {}],
       withdrawals: [{ quantity: 1n, stakeAddress: otherRewardAccount }]
     } as Cardano.TxBody;
-    const knownAddresses = [
-      createGroupedAddress({
-        address: address1,
-        index: 0,
-        rewardAccount: ownRewardAccount,
-        stakeKeyDerivationPath: stakeKeyPath,
-        type: AddressType.External
-      })
-    ];
+    const knownAddresses = [createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0, stakeKeyPath)];
     expect(util.ownSignatureKeyPaths(txBody, knownAddresses, {})).toEqual([]);
   });
 
@@ -403,13 +375,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       requiredExtraSignatures: [paymentHash]
     } as Cardano.TxBody;
     const knownAddresses = [
-      createGroupedAddress({
-        address: paymentAddress,
-        index: 100,
-        rewardAccount: ownRewardAccount,
-        stakeKeyDerivationPath: stakeKeyPath,
-        type: AddressType.External
-      })
+      createGroupedAddress(paymentAddress, ownRewardAccount, AddressType.External, 100, stakeKeyPath)
     ];
 
     expect(util.ownSignatureKeyPaths(txBody, knownAddresses, {})).toEqual([
@@ -428,15 +394,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       inputs: [{}, {}, {}],
       requiredExtraSignatures: [stakeKeyHash]
     } as Cardano.TxBody;
-    const knownAddresses = [
-      createGroupedAddress({
-        address: address1,
-        index: 0,
-        rewardAccount,
-        stakeKeyDerivationPath: stakeKeyPath,
-        type: AddressType.External
-      })
-    ];
+    const knownAddresses = [createGroupedAddress(address1, rewardAccount, AddressType.External, 0, stakeKeyPath)];
 
     expect(util.ownSignatureKeyPaths(txBody, knownAddresses, {})).toEqual([
       {
@@ -460,16 +418,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
 
     // Using multiple stake keys with one payment key to have separate derivation paths per each certificate
     const knownAddresses = rewardAccounts.map(({ account }, index) =>
-      createGroupedAddress({
-        address: address1,
-        index,
-        rewardAccount: account,
-        stakeKeyDerivationPath: {
-          index,
-          role: KeyRole.Stake
-        },
-        type: AddressType.External
-      })
+      createGroupedAddress(address1, account, AddressType.External, 0, { index, role: KeyRole.Stake })
     );
 
     it('is returned for certificates with the wallet stake key hash', async () => {
