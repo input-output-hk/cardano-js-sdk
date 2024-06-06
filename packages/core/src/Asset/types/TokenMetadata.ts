@@ -1,4 +1,4 @@
-import { Cardano } from '../..';
+import type { Cardano } from '../../index.js';
 
 export interface TokenMetadataSizedIcon {
   /** Most likely one of 16, 32, 64, 96, 128 icons are assumed to be square */

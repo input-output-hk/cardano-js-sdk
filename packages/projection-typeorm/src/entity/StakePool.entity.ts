@@ -1,9 +1,9 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, Index, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
-import { CurrentPoolMetricsEntity } from './CurrentPoolMetrics.entity';
-import { OnDeleteSetNullRelationOptions } from './util';
-import { PoolRegistrationEntity } from './PoolRegistration.entity';
-import { PoolRetirementEntity } from './PoolRetirement.entity';
+import { CurrentPoolMetricsEntity } from './CurrentPoolMetrics.entity.js';
+import { OnDeleteSetNullRelationOptions } from './util.js';
+import { PoolRegistrationEntity } from './PoolRegistration.entity.js';
+import { PoolRetirementEntity } from './PoolRetirement.entity.js';
 
 @Entity()
 export class StakePoolEntity {

@@ -1,17 +1,17 @@
 /* eslint-disable sonarjs/cognitive-complexity, complexity, max-statements, unicorn/prefer-switch */
-import * as Cardano from '../../Cardano';
-import { BootstrapWitness } from './BootstrapWitness';
-import { CborReader, CborReaderState, CborWriter } from '../CBOR';
-import { CborSet } from '../Common';
+import * as Cardano from '../../Cardano/index.js';
+import { BootstrapWitness } from './BootstrapWitness.js';
+import { CborReader, CborReaderState, CborWriter } from '../CBOR/index.js';
+import { CborSet } from '../Common/index.js';
 import { HexBlob } from '@cardano-sdk/util';
-import { NativeScript, PlutusV1Script, PlutusV2Script, PlutusV3Script } from '../Scripts';
-import { PlutusData } from '../PlutusData/PlutusData';
-import { Redeemers } from './Redeemer';
-import { SerializationError, SerializationFailure } from '../../errors';
-import { VkeyWitness } from './VkeyWitness';
-import { hexToBytes } from '../../util/misc';
-import _groupBy from 'lodash/groupBy';
-import uniqWith from 'lodash/uniqWith';
+import { NativeScript, PlutusV1Script, PlutusV2Script, PlutusV3Script } from '../Scripts/index.js';
+import { PlutusData } from '../PlutusData/PlutusData.js';
+import { Redeemers } from './Redeemer/index.js';
+import { SerializationError, SerializationFailure } from '../../errors.js';
+import { VkeyWitness } from './VkeyWitness.js';
+import { hexToBytes } from '../../util/misc/index.js';
+import _groupBy from 'lodash/groupBy.js';
+import uniqWith from 'lodash/uniqWith.js';
 
 /** This type represents the segregated CDDL scripts. */
 type CddlScripts = {

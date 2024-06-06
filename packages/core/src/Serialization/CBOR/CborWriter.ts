@@ -1,10 +1,10 @@
 /* eslint-disable no-bitwise */
 /* eslint-disable unicorn/number-literal-case */
-import { CborInitialByte } from './CborInitialByte';
-import { CborMajorType } from './CborMajorType';
-import { CborTag } from './CborTag';
-import { HexBlob } from '@cardano-sdk/util';
-import { encodeHalf } from './Half';
+import { CborInitialByte } from './CborInitialByte.js';
+import { CborMajorType } from './CborMajorType.js';
+import { CborTag } from './CborTag.js';
+import { encodeHalf } from './Half.js';
+import type { HexBlob } from '@cardano-sdk/util';
 
 // Constants
 const MINUS_ONE = BigInt(-1);

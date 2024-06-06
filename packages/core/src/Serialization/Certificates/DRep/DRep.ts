@@ -1,7 +1,7 @@
-import * as Cardano from '../../../Cardano';
+import * as Cardano from '../../../Cardano/index.js';
 import * as Crypto from '@cardano-sdk/crypto';
-import { CborReader, CborWriter } from '../../CBOR';
-import { DRepKind } from './DRepKind';
+import { CborReader, CborWriter } from '../../CBOR/index.js';
+import { DRepKind } from './DRepKind.js';
 import { HexBlob } from '@cardano-sdk/util';
 
 /**

@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 /* eslint-disable unicorn/no-nested-ternary */
 import { BigIntMath } from '@cardano-sdk/util';
-import { Ogmios } from '@cardano-sdk/ogmios';
+import type { Ogmios } from '@cardano-sdk/ogmios';
 
 const throwIfNegative = (value: bigint | number): void => {
   if (value < 0) {

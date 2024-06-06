@@ -1,4 +1,4 @@
-import { Cardano, ChainHistoryProvider, Paginated, TransactionsByAddressesArgs } from '@cardano-sdk/core';
+import type { Cardano, ChainHistoryProvider, Paginated, TransactionsByAddressesArgs } from '@cardano-sdk/core';
 
 const NOT_IMPLEMENTED = 'Not implemented';
 

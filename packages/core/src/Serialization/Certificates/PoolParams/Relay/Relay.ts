@@ -1,9 +1,10 @@
-import * as Cardano from '../../../../Cardano';
-import { CborReader } from '../../../CBOR';
-import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
-import { MultiHostName } from './MultiHostName';
-import { SingleHostAddr } from './SingleHostAddr';
-import { SingleHostName } from './SingleHostName';
+import { CborReader } from '../../../CBOR/index.js';
+import { InvalidStateError } from '@cardano-sdk/util';
+import { MultiHostName } from './MultiHostName.js';
+import { SingleHostAddr } from './SingleHostAddr.js';
+import { SingleHostName } from './SingleHostName.js';
+import type * as Cardano from '../../../../Cardano/index.js';
+import type { HexBlob } from '@cardano-sdk/util';
 
 /** The relay kind. */
 export enum RelayKind {

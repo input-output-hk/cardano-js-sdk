@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable func-style */
 import {
-  Observable,
-  OperatorFunction,
   combineLatest,
   defaultIfEmpty,
   delay,
@@ -18,6 +16,7 @@ import {
   takeUntil
 } from 'rxjs';
 import { isNotNil } from '@cardano-sdk/util';
+import type { Observable, OperatorFunction } from 'rxjs';
 
 const EMPTY_DEPENDENCY = Symbol('EMPTY');
 

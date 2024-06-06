@@ -1,5 +1,6 @@
-import * as AssetId from '../../AssetId';
-import { Cardano, coalesceValueQuantities } from '../../../src';
+import * as AssetId from '../../AssetId.js';
+import { coalesceValueQuantities } from '../../../src/index.js';
+import type { Cardano } from '../../../src/index.js';
 
 describe('Cardano.util.coalesceValueQuantities', () => {
   it('coin only', () => {

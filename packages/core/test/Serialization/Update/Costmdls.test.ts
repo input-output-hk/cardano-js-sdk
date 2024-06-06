@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import * as Cardano from '../../../src/Cardano';
-import { Costmdls } from '../../../src/Serialization/Update/Costmdls';
+import * as Cardano from '../../../src/Cardano/index.js';
+import { Costmdls } from '../../../src/Serialization/Update/Costmdls/index.js';
 import { HexBlob } from '@cardano-sdk/util';
 
 const vasilPlutusV1CostModel = [

@@ -1,20 +1,21 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { AddressType, GroupedAddress, util } from '@cardano-sdk/key-management';
-import { BaseWallet } from '@cardano-sdk/wallet';
-import { Cardano } from '@cardano-sdk/core';
+import { AddressType, util } from '@cardano-sdk/key-management';
 import {
-  KeyAgentFactoryProps,
   bip32Ed25519Factory,
   createStandaloneKeyAgent,
   firstValueFromTimed,
   getWallet,
   normalizeTxBody,
   walletReady
-} from '../../../src';
+} from '../../../src/index.js';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, map, take } from 'rxjs';
-import { getEnv, walletVariables } from '../../../src/environment';
+import { getEnv, walletVariables } from '../../../src/environment.js';
 import { isNotNil } from '@cardano-sdk/util';
+import type { BaseWallet } from '@cardano-sdk/wallet';
+import type { Cardano } from '@cardano-sdk/core';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
+import type { KeyAgentFactoryProps } from '../../../src/index.js';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();

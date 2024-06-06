@@ -1,7 +1,8 @@
 import { Asset, Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { logger } from '@cardano-sdk/util-dev';
 import { toSerializableObject } from '@cardano-sdk/util';
+import type { AxiosResponse } from 'axios';
 
 export const config = { baseUrl: 'http://some-hostname:3000', logger };
 

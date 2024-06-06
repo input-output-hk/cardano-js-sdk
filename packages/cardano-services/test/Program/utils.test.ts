@@ -1,4 +1,4 @@
-import { Programs, WrongOption, serviceSetHas, stringOptionToBoolean } from '../../src';
+import { Programs, WrongOption, serviceSetHas, stringOptionToBoolean } from '../../src/index.js';
 
 describe('Program/utils', () => {
   describe('serviceSetHas', () => {

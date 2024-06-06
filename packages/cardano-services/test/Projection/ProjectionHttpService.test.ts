@@ -1,9 +1,10 @@
-import { BaseProjectionEvent } from '@cardano-sdk/projection';
-import { Cardano, HealthCheckResponse, Milliseconds } from '@cardano-sdk/core';
+import { Milliseconds } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
-import { ProjectionHttpService, ProjectionName } from '../../src';
+import { ProjectionHttpService, ProjectionName } from '../../src/index.js';
 import { dummyLogger } from 'ts-log';
 import delay from 'delay';
+import type { BaseProjectionEvent } from '@cardano-sdk/projection';
+import type { Cardano, HealthCheckResponse } from '@cardano-sdk/core';
 
 describe('ProjectionHttpService', () => {
   const healthTimeout = Milliseconds(10);

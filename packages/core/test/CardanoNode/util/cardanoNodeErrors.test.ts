@@ -4,12 +4,12 @@ import {
   ChainSyncErrorCode,
   GeneralCardanoNodeError,
   GeneralCardanoNodeErrorCode,
-  OutsideOfValidityIntervalData,
   StateQueryError,
   StateQueryErrorCode,
   TxSubmissionError,
   TxSubmissionErrorCode
-} from '../../../src';
+} from '../../../src/index.js';
+import type { OutsideOfValidityIntervalData } from '../../../src/index.js';
 const unknownCardanoNodeError = (message: string) =>
   new GeneralCardanoNodeError(GeneralCardanoNodeErrorCode.Unknown, message, 'Unknown Cardano node error, see "data"');
 const stateQueryError = new StateQueryError(StateQueryErrorCode.UnavailableInCurrentEra, null, 'Query unavailable');

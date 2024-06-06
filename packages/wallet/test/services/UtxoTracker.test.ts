@@ -1,11 +1,13 @@
-import { Cardano, UtxoProvider } from '@cardano-sdk/core';
-import { InMemoryUtxoStore } from '../../src/persistence';
-import { Observable } from 'rxjs';
-import { PersistentCollectionTrackerSubject, TxInFlight, createUtxoTracker } from '../../src/services';
-import { RetryBackoffConfig } from 'backoff-rxjs';
+import { Cardano } from '@cardano-sdk/core';
+import { InMemoryUtxoStore } from '../../src/persistence/index.js';
+import { PersistentCollectionTrackerSubject, createUtxoTracker } from '../../src/services/index.js';
 import { createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
-import { dummyCbor } from '../util';
+import { dummyCbor } from '../util.js';
 import { dummyLogger } from 'ts-log';
+import type { Observable } from 'rxjs';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
+import type { TxInFlight } from '../../src/services/index.js';
+import type { UtxoProvider } from '@cardano-sdk/core';
 
 const { utxo, utxo2 } = mockProviders;
 

@@ -1,10 +1,10 @@
-import * as Cardano from '../../Cardano';
-import * as Crypto from '@cardano-sdk/crypto';
-import { CborReader, CborWriter } from '../CBOR';
+import * as Cardano from '../../Cardano/index.js';
+import { CborReader, CborWriter } from '../CBOR/index.js';
 import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
-import { NativeScript } from './NativeScript';
-import { PlutusV1Script, PlutusV2Script, PlutusV3Script } from './PlutusScript';
-import { ScriptLanguage } from './ScriptLanguage';
+import { NativeScript } from './NativeScript/index.js';
+import { PlutusV1Script, PlutusV2Script, PlutusV3Script } from './PlutusScript/index.js';
+import { ScriptLanguage } from './ScriptLanguage.js';
+import type * as Crypto from '@cardano-sdk/crypto';
 
 const SCRIPT_SUBGROUP = 2;
 

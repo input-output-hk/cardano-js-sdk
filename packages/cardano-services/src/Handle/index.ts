@@ -1,2 +1,2 @@
-export * from './HandleHttpService';
-export * from './TypeOrmHandleProvider';
+export * from './HandleHttpService.js';
+export * from './TypeOrmHandleProvider.js';

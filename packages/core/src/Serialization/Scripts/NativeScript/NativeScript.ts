@@ -1,13 +1,13 @@
-import * as Cardano from '../../../Cardano';
+import * as Cardano from '../../../Cardano/index.js';
 import * as Crypto from '@cardano-sdk/crypto';
-import { CborReader } from '../../CBOR';
+import { CborReader } from '../../CBOR/index.js';
 import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
-import { ScriptAll } from './ScriptAll';
-import { ScriptAny } from './ScriptAny';
-import { ScriptNOfK } from './ScriptNOfK';
-import { ScriptPubkey } from './ScriptPubkey';
-import { TimelockExpiry } from './TimelockExpiry';
-import { TimelockStart } from './TimelockStart';
+import { ScriptAll } from './ScriptAll.js';
+import { ScriptAny } from './ScriptAny.js';
+import { ScriptNOfK } from './ScriptNOfK.js';
+import { ScriptPubkey } from './ScriptPubkey.js';
+import { TimelockExpiry } from './TimelockExpiry.js';
+import { TimelockStart } from './TimelockStart.js';
 
 const HASH_LENGTH_IN_BYTES = 28;
 

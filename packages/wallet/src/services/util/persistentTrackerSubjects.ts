@@ -1,6 +1,7 @@
-import { CollectionStore, DocumentStore } from '../../persistence';
-import { Observable, concat, defaultIfEmpty, of, switchMap, tap } from 'rxjs';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
+import { concat, defaultIfEmpty, of, switchMap, tap } from 'rxjs';
+import type { CollectionStore, DocumentStore } from '../../persistence/index.js';
+import type { Observable } from 'rxjs';
 
 export class PersistentCollectionTrackerSubject<T> extends TrackerSubject<T[]> {
   readonly store: CollectionStore<T>;

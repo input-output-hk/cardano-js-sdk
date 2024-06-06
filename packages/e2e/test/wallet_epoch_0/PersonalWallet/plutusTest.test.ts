@@ -1,9 +1,10 @@
-import { BaseWallet } from '@cardano-sdk/wallet';
-import { Cardano, Serialization, UtxoProvider } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { HexBlob, isNotNil } from '@cardano-sdk/util';
 import { Observable, filter, firstValueFrom, interval, map, switchMap, take } from 'rxjs';
 import { createLogger } from '@cardano-sdk/util-dev';
-import { getEnv, getWallet, utxoProviderFactory, walletReady, walletVariables } from '../../../src';
+import { getEnv, getWallet, utxoProviderFactory, walletReady, walletVariables } from '../../../src/index.js';
+import type { BaseWallet } from '@cardano-sdk/wallet';
+import type { UtxoProvider } from '@cardano-sdk/core';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();

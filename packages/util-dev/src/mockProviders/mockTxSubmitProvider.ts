@@ -1,4 +1,4 @@
-import { TxSubmitProvider } from '@cardano-sdk/core';
+import type { TxSubmitProvider } from '@cardano-sdk/core';
 
 /** Provider stub for testing returns TxSubmitProvider-compatible object */
 export const mockTxSubmitProvider = (): jest.Mocked<TxSubmitProvider> => ({

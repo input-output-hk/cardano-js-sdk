@@ -1,7 +1,9 @@
-import { Cardano, ChainSyncEventType, ChainSyncRollBackward, TipOrOrigin } from '@cardano-sdk/core';
+import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, createTestScheduler } from '@cardano-sdk/util-dev';
-import { InMemory, UnifiedExtChainSyncEvent, withNetworkInfo, withRolledBackBlock } from '../../src';
-import { stubBlockId } from '../util';
+import { InMemory, withNetworkInfo, withRolledBackBlock } from '../../src/index.js';
+import { stubBlockId } from '../util.js';
+import type { ChainSyncRollBackward, TipOrOrigin } from '@cardano-sdk/core';
+import type { UnifiedExtChainSyncEvent } from '../../src/index.js';
 
 const dataWithStakeKeyDeregistration = chainSyncData(ChainSyncDataSet.WithPoolRetirement);
 

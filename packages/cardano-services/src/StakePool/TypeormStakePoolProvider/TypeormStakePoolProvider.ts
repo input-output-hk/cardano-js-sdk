@@ -1,21 +1,8 @@
-import {
-  Cardano,
-  FuzzyOptions,
-  Paginated,
-  ProviderError,
-  ProviderFailure,
-  QueryStakePoolsArgs,
-  StakePoolProvider,
-  StakePoolStats
-} from '@cardano-sdk/core';
-import { DataSource } from 'typeorm';
-import { DeepPartial } from '@cardano-sdk/util';
-import { InMemoryCache } from '../../InMemoryCache';
-import { MissingProgramOption } from '../../Program/errors';
+import { MissingProgramOption } from '../../Program/errors/index.js';
 import { PoolDelistedEntity, StakePoolEntity } from '@cardano-sdk/projection-typeorm';
-import { PoolModel, PoolStatsModel, mapPoolStats, mapStakePoolsResult } from './mappers';
-import { ServiceNames } from '../../Program/programs/types';
-import { TypeormProvider, TypeormProviderDependencies } from '../../util';
+import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { ServiceNames } from '../../Program/programs/types.js';
+import { TypeormProvider } from '../../util/index.js';
 import {
   computeROS,
   getSortOptions,
@@ -23,8 +10,22 @@ import {
   stakePoolSearchSelection,
   stakePoolSearchTotalCount,
   withTextFilter
-} from './util';
+} from './util.js';
+import { mapPoolStats, mapStakePoolsResult } from './mappers.js';
 import Fuse from 'fuse.js';
+import type {
+  Cardano,
+  FuzzyOptions,
+  Paginated,
+  QueryStakePoolsArgs,
+  StakePoolProvider,
+  StakePoolStats
+} from '@cardano-sdk/core';
+import type { DataSource } from 'typeorm';
+import type { DeepPartial } from '@cardano-sdk/util';
+import type { InMemoryCache } from '../../InMemoryCache/index.js';
+import type { PoolModel, PoolStatsModel } from './mappers.js';
+import type { TypeormProviderDependencies } from '../../util/index.js';
 
 export const DEFAULT_FUZZY_SEARCH_OPTIONS: FuzzyOptions = {
   distance: 255,

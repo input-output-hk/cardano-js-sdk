@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { DelegatedStake, DynamicChangeAddressResolver, delegationMatchesPortfolio } from '../../../src';
+import { DynamicChangeAddressResolver, delegationMatchesPortfolio } from '../../../src/index.js';
 import { InvalidStateError, Percent } from '@cardano-sdk/util';
 import {
   address_0_0,
@@ -26,8 +26,9 @@ import {
   rewardAccount_1,
   rewardAccount_2,
   rewardAccount_3
-} from './testData';
+} from './testData.js';
 import { logger } from '@cardano-sdk/util-dev';
+import type { DelegatedStake } from '../../../src/index.js';
 
 describe('delegationMatchesPortfolio', () => {
   const poolIds: Cardano.PoolId[] = [

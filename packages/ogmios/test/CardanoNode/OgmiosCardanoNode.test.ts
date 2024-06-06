@@ -1,12 +1,13 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { CardanoNodeErrors } from '@cardano-sdk/core';
-import { Connection, createConnectionObject } from '@cardano-ogmios/client';
 import { InvalidModuleState } from '@cardano-sdk/util';
-import { OgmiosCardanoNode } from '../../src';
-import { createMockOgmiosServer, listenPromise, serverClosePromise } from '../mocks/mockOgmiosServer';
+import { OgmiosCardanoNode } from '../../src/index.js';
+import { createConnectionObject } from '@cardano-ogmios/client';
+import { createMockOgmiosServer, listenPromise, serverClosePromise } from '../mocks/mockOgmiosServer.js';
 import { getRandomPort } from 'get-port-please';
 import { dummyLogger as logger } from 'ts-log';
-import http from 'http';
+import type { Connection } from '@cardano-ogmios/client';
+import type http from 'http';
 describe('OgmiosCardanoNode', () => {
   let mockServer: http.Server;
   let connection: Connection;

@@ -1,6 +1,6 @@
-import { CONTEXT_WITHOUT_KNOWN_ADDRESSES, CONTEXT_WITH_KNOWN_ADDRESSES, txIn } from '../testData';
+import { CONTEXT_WITHOUT_KNOWN_ADDRESSES, CONTEXT_WITH_KNOWN_ADDRESSES, txIn } from '../testData.js';
 import { CardanoKeyConst, TxInId, util } from '@cardano-sdk/key-management';
-import { mapTxIns, toTxIn } from '../../src/transformers';
+import { mapTxIns, toTxIn } from '../../src/transformers/index.js';
 
 describe('txIn', () => {
   const paymentKeyPath = { index: 0, role: 1 };

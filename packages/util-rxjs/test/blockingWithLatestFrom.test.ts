@@ -1,6 +1,6 @@
 /* eslint-disable no-multi-spaces */
 
-import { blockingWithLatestFrom } from '../src';
+import { blockingWithLatestFrom } from '../src/index.js';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { delay, firstValueFrom, from, of, toArray } from 'rxjs';
 

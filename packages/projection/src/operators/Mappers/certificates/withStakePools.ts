@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
-import { WithCertificates } from './withCertificates';
-import { WithEpochNo } from '../../../types';
-import { unifiedProjectorOperator } from '../../utils';
+import { unifiedProjectorOperator } from '../../utils/index.js';
+import type { WithCertificates } from './withCertificates.js';
+import type { WithEpochNo } from '../../../types.js';
 
 export interface WithCertificateSource {
   source: Cardano.Pointer;

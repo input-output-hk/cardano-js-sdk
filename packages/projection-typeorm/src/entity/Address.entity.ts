@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { StakeKeyRegistrationEntity } from './StakeKeyRegistration.entity';
+import { StakeKeyRegistrationEntity } from './StakeKeyRegistration.entity.js';
+import type { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 
 @Entity()
 export class AddressEntity {

@@ -1,16 +1,20 @@
 #!/usr/bin/env node
 /* eslint-disable no-console */
-import { AddressBalancesResponse, getOnChainAddressBalances } from './AddressBalance';
 import { Command } from 'commander';
-import { GeneratorMetadata, prepareContent } from './Content';
-import { GetChainSyncEventsResponse, getChainSyncEvents as chainSync } from './ChainSyncEvents';
-import { Options, SingleBar } from 'cli-progress';
+import { SingleBar } from 'cli-progress';
+import { getChainSyncEvents as chainSync } from './ChainSyncEvents/index.js';
 import { createLogger } from 'bunyan';
 import { ensureDir, writeFile } from 'fs-extra';
+import { getOnChainAddressBalances } from './AddressBalance/index.js';
+import { prepareContent } from './Content.js';
 import { toSerializableObject } from '@cardano-sdk/util';
 import chalk from 'chalk';
 import hash from 'object-hash';
 import path from 'path';
+import type { AddressBalancesResponse } from './AddressBalance/index.js';
+import type { GeneratorMetadata } from './Content.js';
+import type { GetChainSyncEventsResponse } from './ChainSyncEvents/index.js';
+import type { Options } from 'cli-progress';
 
 const clear = require('clear');
 const packageJson = require('../../package.json');

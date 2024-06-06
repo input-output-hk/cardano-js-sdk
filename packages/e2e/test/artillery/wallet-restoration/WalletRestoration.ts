@@ -1,11 +1,18 @@
-import { AddressType, GroupedAddress, util } from '@cardano-sdk/key-management';
-import { AddressesModel, WalletVars } from './types';
+import { AddressType, util } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
-import { FunctionHook } from '../artillery';
 import { Pool } from 'pg';
-import { createMockKeyAgent, getEnv, getWallet, waitForWalletStateSettle, walletVariables } from '../../../src';
-import { findAddressesWithRegisteredStakeKey } from './queries';
+import {
+  createMockKeyAgent,
+  getEnv,
+  getWallet,
+  waitForWalletStateSettle,
+  walletVariables
+} from '../../../src/index.js';
+import { findAddressesWithRegisteredStakeKey } from './queries.js';
 import { logger } from '@cardano-sdk/util-dev';
+import type { AddressesModel, WalletVars } from './types.js';
+import type { FunctionHook } from '../artillery.js';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
 
 export const mapToGroupedAddress = (addrModel: AddressesModel): GroupedAddress => ({
   accountIndex: 0,

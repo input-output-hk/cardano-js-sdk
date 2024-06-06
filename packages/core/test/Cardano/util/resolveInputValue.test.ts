@@ -1,4 +1,4 @@
-import { Cardano } from '../../../src';
+import { Cardano } from '../../../src/index.js';
 
 describe('Cardano.util.resolveInputValue', () => {
   const txs: Cardano.HydratedTx[] = [

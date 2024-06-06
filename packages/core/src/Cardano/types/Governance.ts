@@ -1,8 +1,8 @@
-import * as Crypto from '@cardano-sdk/crypto';
-import { Credential, CredentialType, RewardAccount } from '../Address';
-import { EpochNo, Fraction, ProtocolVersion, TransactionId } from '.';
-import { Lovelace } from './Value';
-import { ProtocolParametersUpdate } from './ProtocolParameters';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { Credential, CredentialType, RewardAccount } from '../Address/index.js';
+import type { EpochNo, Fraction, ProtocolVersion, TransactionId } from './index.js';
+import type { Lovelace } from './Value.js';
+import type { ProtocolParametersUpdate } from './ProtocolParameters.js';
 
 export type Anchor = {
   url: string;

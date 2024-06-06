@@ -1,5 +1,6 @@
-import * as AssetId from '../../AssetId';
-import { Cardano, subtractValueQuantities } from '../../../src';
+import * as AssetId from '../../AssetId.js';
+import { subtractValueQuantities } from '../../../src/index.js';
+import type { Cardano } from '../../../src/index.js';
 
 describe('Cardano.util.subtractValueQuantities', () => {
   it('subtracts quantities for coins only', () => {

@@ -1,6 +1,7 @@
-import { PerformanceEntry, performance } from 'perf_hooks';
+import { performance } from 'perf_hooks';
+import type { PerformanceEntry } from 'perf_hooks';
 
-import { MeasurementUtil } from '../../src';
+import { MeasurementUtil } from '../../src/index.js';
 
 const mockPerformanceObserver = {
   disconnect: jest.fn(),

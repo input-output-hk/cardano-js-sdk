@@ -2,9 +2,20 @@ import * as Crypto from '@cardano-sdk/crypto';
 import {
   AssetFingerprint,
   AssetId,
+  CertificateType,
+  ScriptType,
+  StakeCredentialCertificateTypes,
+  isCertType
+} from '../Cardano/types/index.js';
+import { BigIntMath } from '@cardano-sdk/util';
+import { RewardAccount, isAddressWithin } from '../Cardano/index.js';
+import { coalesceValueQuantities } from './coalesceValueQuantities.js';
+import { nativeScriptPolicyId } from './nativeScript.js';
+import { removeNegativesFromTokenMap } from '../Asset/util/index.js';
+import { subtractValueQuantities } from './subtractValueQuantities.js';
+import type {
   AssetName,
   Certificate,
-  CertificateType,
   HydratedTxIn,
   Lovelace,
   Metadatum,
@@ -12,23 +23,15 @@ import {
   PoolRegistrationCertificate,
   PoolRetirementCertificate,
   Script,
-  ScriptType,
   StakeAddressCertificate,
-  StakeCredentialCertificateTypes,
   StakeDelegationCertificate,
   TokenMap,
   Tx,
   TxIn,
   TxOut,
-  Value,
-  isCertType
-} from '../Cardano/types';
-import { BigIntMath } from '@cardano-sdk/util';
-import { InputResolver, PaymentAddress, RewardAccount, isAddressWithin } from '../Cardano';
-import { coalesceValueQuantities } from './coalesceValueQuantities';
-import { nativeScriptPolicyId } from './nativeScript';
-import { removeNegativesFromTokenMap } from '../Asset/util';
-import { subtractValueQuantities } from './subtractValueQuantities';
+  Value
+} from '../Cardano/types/index.js';
+import type { InputResolver, PaymentAddress } from '../Cardano/index.js';
 
 export type Inspector<Inspection> = (tx: Tx) => Promise<Inspection>;
 export type Inspectors = { [k: string]: Inspector<unknown> };

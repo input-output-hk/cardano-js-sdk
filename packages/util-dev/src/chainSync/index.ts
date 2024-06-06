@@ -1,9 +1,11 @@
-import {
+import { ChainSyncError, ChainSyncErrorCode, ChainSyncEventType } from '@cardano-sdk/core';
+import { Observable, of } from 'rxjs';
+import { fromSerializableObject } from '@cardano-sdk/util';
+import { genesisToEraSummary } from './genesisToEraSummary.js';
+import memoize from 'lodash/memoize.js';
+import type {
   Cardano,
-  ChainSyncError,
-  ChainSyncErrorCode,
   ChainSyncEvent,
-  ChainSyncEventType,
   ChainSyncRollBackward,
   ChainSyncRollForward,
   Intersection,
@@ -11,10 +13,6 @@ import {
   Point,
   PointOrOrigin
 } from '@cardano-sdk/core';
-import { Observable, of } from 'rxjs';
-import { fromSerializableObject } from '@cardano-sdk/util';
-import { genesisToEraSummary } from './genesisToEraSummary';
-import memoize from 'lodash/memoize';
 
 export type SerializedChainSyncEvent =
   | Omit<ChainSyncRollForward, 'requestNext'>
@@ -32,7 +30,7 @@ export type ChainSyncData = {
   metadata: ChainSyncMetadata;
 };
 
-export * from './genesisToEraSummary';
+export * from './genesisToEraSummary.js';
 
 const intersect = (events: ChainSyncData['body'], points: PointOrOrigin[]) => {
   const blockPoints = points.filter((point): point is Point => point !== 'origin');

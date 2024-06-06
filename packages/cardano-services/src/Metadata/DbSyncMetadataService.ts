@@ -1,10 +1,10 @@
-import * as Queries from './queries';
-import { Cardano } from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
-import { Pool, QueryResult } from 'pg';
-import { TxMetadataModel, TxMetadataService } from './types';
+import * as Queries from './queries.js';
 import { hexStringToBuffer } from '@cardano-sdk/util';
-import { mapTxMetadataByHashes } from './util';
+import { mapTxMetadataByHashes } from './util.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { Pool, QueryResult } from 'pg';
+import type { TxMetadataModel, TxMetadataService } from './types.js';
 
 export type TxMetadataByHashes = Map<Cardano.TransactionId, Cardano.TxMetadata>;
 

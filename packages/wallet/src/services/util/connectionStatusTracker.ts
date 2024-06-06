@@ -1,4 +1,5 @@
-import { NEVER, Observable, distinctUntilChanged, fromEvent, map, merge, shareReplay, startWith } from 'rxjs';
+import { NEVER, distinctUntilChanged, fromEvent, map, merge, shareReplay, startWith } from 'rxjs';
+import type { Observable } from 'rxjs';
 
 export enum ConnectionStatus {
   down = 0,

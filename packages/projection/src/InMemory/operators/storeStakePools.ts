@@ -1,7 +1,8 @@
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { Mappers } from '../../operators';
-import { WithInMemoryStore } from '../types';
-import { inMemoryStoreOperator } from './utils';
+import { ChainSyncEventType } from '@cardano-sdk/core';
+import { inMemoryStoreOperator } from './utils.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Mappers } from '../../operators/index.js';
+import type { WithInMemoryStore } from '../types.js';
 
 const findOrCreate = ({ store: { stakePools } }: WithInMemoryStore, poolId: Cardano.PoolId) => {
   let stakePool = stakePools.get(poolId);

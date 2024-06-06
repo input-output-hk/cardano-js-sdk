@@ -1,7 +1,7 @@
-import { AccountKeyDerivationPath } from '@cardano-sdk/key-management';
-import { Bip32PublicKeyHex } from '@cardano-sdk/crypto';
-import { Cardano } from '@cardano-sdk/core';
-import { HexBlob } from '@cardano-sdk/util';
+import type { AccountKeyDerivationPath } from '@cardano-sdk/key-management';
+import type { Bip32PublicKeyHex } from '@cardano-sdk/crypto';
+import type { Cardano } from '@cardano-sdk/core';
+import type { HexBlob } from '@cardano-sdk/util';
 
 export enum WalletType {
   InMemory = 'InMemory',

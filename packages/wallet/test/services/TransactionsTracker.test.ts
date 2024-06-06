@@ -1,30 +1,34 @@
 /* eslint-disable space-in-parens */
 /* eslint-disable no-multi-spaces */
 /* eslint-disable prettier/prettier */
-import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
-import {
-  FailedTx,
-  OutgoingTx,
-  PAGE_SIZE,
-  TransactionFailure,
-  TxInFlight,
-  createAddressTransactionsProvider,
-  createTransactionsTracker,
-  newTransactions$
-} from '../../src';
+import { Cardano } from '@cardano-sdk/core';
 import {
   InMemoryInFlightTransactionsStore,
   InMemorySignedTransactionsStore,
-  InMemoryTransactionsStore,
-  WalletStores
-} from '../../src/persistence';
+  InMemoryTransactionsStore
+} from '../../src/persistence/index.js';
 import { NEVER, bufferCount, firstValueFrom, map, of } from 'rxjs';
-import { RetryBackoffConfig } from 'backoff-rxjs';
-import { WitnessedTx } from '@cardano-sdk/key-management';
+import {
+  PAGE_SIZE,
+  TransactionFailure,
+  createAddressTransactionsProvider,
+  createTransactionsTracker,
+  newTransactions$
+} from '../../src/index.js';
 import { createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
-import { dummyCbor, toOutgoingTx, toSignedTx } from '../util';
+import { dummyCbor, toOutgoingTx, toSignedTx } from '../util.js';
 import { dummyLogger } from 'ts-log';
 import delay from 'delay';
+import type { ChainHistoryProvider } from '@cardano-sdk/core';
+import type {
+  FailedTx,
+  OutgoingTx,
+  TxInFlight } from '../../src/index.js';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
+import type {
+  WalletStores
+} from '../../src/persistence/index.js';
+import type { WitnessedTx } from '@cardano-sdk/key-management';
 
 const { generateTxAlonzo, mockChainHistoryProvider, queryTransactionsResult } = mockProviders;
 

@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import * as Cardano from '../../../../src/Cardano';
+import * as Cardano from '../../../../src/Cardano/index.js';
 import { HexBlob } from '@cardano-sdk/util';
-import { ProposalProcedure } from '../../../../src/Serialization';
+import { ProposalProcedure } from '../../../../src/Serialization/index.js';
 
 const infoActionCbor = HexBlob(
   '841a000f4240581de1cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f8106827668747470733a2f2f7777772e736f6d6575726c2e696f58200000000000000000000000000000000000000000000000000000000000000000'

@@ -1,7 +1,8 @@
-import { AddressType, Bip32Account, util } from '../../src';
+import { AddressType, Bip32Account, util } from '../../src/index.js';
 import { Bip32PublicKeyHex } from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
-import { Logger, dummyLogger } from 'ts-log';
+import { dummyLogger } from 'ts-log';
+import type { Logger } from 'ts-log';
 
 describe('ensureStakeKeys', () => {
   let bip32Account: Bip32Account;

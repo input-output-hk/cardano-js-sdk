@@ -1,21 +1,19 @@
 /* eslint-disable func-style */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Cardano } from '@cardano-sdk/core';
-import {
+import { InMemoryKeyAgent, KeyAgentType, errors } from '@cardano-sdk/key-management';
+import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
+import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
+import type {
   GetPassphrase,
-  InMemoryKeyAgent,
   KeyAgent,
   KeyAgentDependencies,
-  KeyAgentType,
   SerializableInMemoryKeyAgentData,
   SerializableKeyAgentData,
   SerializableLedgerKeyAgentData,
-  SerializableTrezorKeyAgentData,
-  errors
+  SerializableTrezorKeyAgentData
 } from '@cardano-sdk/key-management';
-import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
-import { Logger } from 'ts-log';
-import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
+import type { Logger } from 'ts-log';
 
 // TODO: use this type as 2nd parameter of restoreKeyAgent
 export interface RestoreInMemoryKeyAgentProps {

@@ -1,6 +1,7 @@
-import { ConnectionStatus, ConnectionStatusTrackerInternals, createSimpleConnectionStatusTracker } from '../../../src';
+import { ConnectionStatus, createSimpleConnectionStatusTracker } from '../../../src/index.js';
 import { Subject, filter, firstValueFrom } from 'rxjs';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
+import type { ConnectionStatusTrackerInternals } from '../../../src/index.js';
 
 describe('createSimpleConnectionStatusTracker', () => {
   it('creates ConnectionStatusTracker that always emits `up` when in Node', async () => {

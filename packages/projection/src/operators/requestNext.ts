@@ -1,6 +1,7 @@
-import { OperatorFunction, map, tap } from 'rxjs';
-import { WithRequestNext } from '@cardano-sdk/core';
-import omit from 'lodash/omit';
+import { map, tap } from 'rxjs';
+import omit from 'lodash/omit.js';
+import type { OperatorFunction } from 'rxjs';
+import type { WithRequestNext } from '@cardano-sdk/core';
 
 /** Calls event.requestNext() and emits event object without this method */
 export const requestNext =

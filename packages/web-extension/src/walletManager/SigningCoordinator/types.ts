@@ -1,14 +1,14 @@
-import {
+import type {
   AccountKeyDerivationPath,
   SignBlobResult,
   SignDataContext,
   SignTransactionContext,
   SignTransactionOptions
 } from '@cardano-sdk/key-management';
-import { AnyBip32Wallet, WalletType } from '../types';
-import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
-import { HexBlob } from '@cardano-sdk/util';
-import { Observable } from 'rxjs';
+import type { AnyBip32Wallet, WalletType } from '../types.js';
+import type { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
+import type { HexBlob } from '@cardano-sdk/util';
+import type { Observable } from 'rxjs';
 
 export type RequestContext<WalletMetadata extends {}, AccountMetadata extends {}> = {
   wallet: AnyBip32Wallet<WalletMetadata, AccountMetadata>;

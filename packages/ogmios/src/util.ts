@@ -1,13 +1,9 @@
-import { Cardano, HealthCheckResponse } from '@cardano-sdk/core';
-import {
-  ConnectionConfig,
-  InteractionContext,
-  InteractionType,
-  ServerHealth,
-  createInteractionContext
-} from '@cardano-ogmios/client';
-import { Logger } from 'ts-log';
+import { Cardano } from '@cardano-sdk/core';
 import { Percent } from '@cardano-sdk/util';
+import { createInteractionContext } from '@cardano-ogmios/client';
+import type { ConnectionConfig, InteractionContext, InteractionType, ServerHealth } from '@cardano-ogmios/client';
+import type { HealthCheckResponse } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
 
 /**
  * Converts an Ogmios connection URL to an Ogmios ConnectionConfig Object

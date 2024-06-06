@@ -1,18 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import * as errors from './errors';
-import {
-  AccountKeyDerivationPath,
-  GetPassphrase,
-  KeyAgent,
-  KeyAgentDependencies,
-  KeyAgentType,
-  KeyPair,
-  SerializableInMemoryKeyAgentData,
-  SignBlobResult,
-  SignTransactionContext,
-  SignTransactionOptions
-} from './types';
-import { Cardano } from '@cardano-sdk/core';
+import * as errors from './errors/index.js';
 import {
   DREP_KEY_DERIVATION_PATH,
   deriveAccountPrivateKey,
@@ -21,11 +8,24 @@ import {
   mnemonicWordsToEntropy,
   ownSignatureKeyPaths,
   validateMnemonic
-} from './util';
+} from './util/index.js';
 import { HexBlob } from '@cardano-sdk/util';
-import { KeyAgentBase } from './KeyAgentBase';
-import { emip3decrypt, emip3encrypt } from './emip3';
-import uniqBy from 'lodash/uniqBy';
+import { KeyAgentBase } from './KeyAgentBase.js';
+import { KeyAgentType } from './types.js';
+import { emip3decrypt, emip3encrypt } from './emip3.js';
+import uniqBy from 'lodash/uniqBy.js';
+import type {
+  AccountKeyDerivationPath,
+  GetPassphrase,
+  KeyAgent,
+  KeyAgentDependencies,
+  KeyPair,
+  SerializableInMemoryKeyAgentData,
+  SignBlobResult,
+  SignTransactionContext,
+  SignTransactionOptions
+} from './types.js';
+import type { Cardano } from '@cardano-sdk/core';
 
 export interface InMemoryKeyAgentProps extends Omit<SerializableInMemoryKeyAgentData, '__typename'> {
   getPassphrase: GetPassphrase;

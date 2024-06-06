@@ -1,12 +1,12 @@
 /* eslint-disable complexity, sonarjs/cognitive-complexity, max-statements, max-depth */
-import * as Cardano from '../../Cardano';
-import * as Crypto from '@cardano-sdk/crypto';
-import { CborReader, CborReaderState, CborTag, CborWriter } from '../CBOR';
-import { Datum, DatumKind } from '../Common/Datum';
+import * as Cardano from '../../Cardano/index.js';
+import { CborReader, CborReaderState, CborTag, CborWriter } from '../CBOR/index.js';
+import { Datum, DatumKind } from '../Common/Datum.js';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import { PlutusData } from '../PlutusData';
-import { Script } from '../Scripts';
-import { Value } from './Value';
+import { PlutusData } from '../PlutusData/index.js';
+import { Script } from '../Scripts/index.js';
+import { Value } from './Value.js';
+import type * as Crypto from '@cardano-sdk/crypto';
 
 export const REQUIRED_FIELDS_COUNT = 2;
 

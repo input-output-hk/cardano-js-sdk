@@ -1,6 +1,6 @@
-import { Cardano } from '@cardano-sdk/core';
-import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
-import { Mappers } from '../operators';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
+import type { Mappers } from '../operators/index.js';
 
 export type InMemoryStore = {
   stakeKeys: Set<Ed25519KeyHashHex>;

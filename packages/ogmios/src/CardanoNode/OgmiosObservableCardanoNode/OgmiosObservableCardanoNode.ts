@@ -1,23 +1,5 @@
 // Tested in packages/e2e/test/projection
-import {
-  Cardano,
-  CardanoNodeErrors,
-  EraSummary,
-  HealthCheckResponse,
-  Milliseconds,
-  ObservableCardanoNode,
-  ObservableChainSync,
-  PointOrOrigin
-} from '@cardano-sdk/core';
-import {
-  ConnectionConfig,
-  createConnectionObject,
-  createStateQueryClient,
-  getServerHealth
-} from '@cardano-ogmios/client';
-import { InteractionContextProps, createObservableInteractionContext } from './createObservableInteractionContext';
-import { Intersection, findIntersect } from '@cardano-ogmios/client/dist/ChainSync';
-import { Logger } from 'ts-log';
+import { CardanoNodeErrors } from '@cardano-sdk/core';
 import {
   Observable,
   catchError,
@@ -30,13 +12,31 @@ import {
   throwError,
   timeout
 } from 'rxjs';
-import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
-import { WithLogger, contextLogger } from '@cardano-sdk/util';
-import { createObservableChainSyncClient } from './createObservableChainSyncClient';
-import { ogmiosServerHealthToHealthCheckResponse } from '../../util';
-import { ogmiosToCorePointOrOrigin, ogmiosToCoreTipOrOrigin, pointOrOriginToOgmios } from './util';
-import { queryEraSummaries, queryGenesisParameters } from '../queries';
-import isEqual from 'lodash/isEqual';
+import { contextLogger } from '@cardano-sdk/util';
+import { createConnectionObject, createStateQueryClient, getServerHealth } from '@cardano-ogmios/client';
+import { createObservableChainSyncClient } from './createObservableChainSyncClient.js';
+import { createObservableInteractionContext } from './createObservableInteractionContext.js';
+import { findIntersect } from '@cardano-ogmios/client/dist/ChainSync';
+import { ogmiosServerHealthToHealthCheckResponse } from '../../util.js';
+import { ogmiosToCorePointOrOrigin, ogmiosToCoreTipOrOrigin, pointOrOriginToOgmios } from './util.js';
+import { queryEraSummaries, queryGenesisParameters } from '../queries.js';
+import { retryBackoff } from 'backoff-rxjs';
+import isEqual from 'lodash/isEqual.js';
+import type {
+  Cardano,
+  EraSummary,
+  HealthCheckResponse,
+  Milliseconds,
+  ObservableCardanoNode,
+  ObservableChainSync,
+  PointOrOrigin
+} from '@cardano-sdk/core';
+import type { ConnectionConfig } from '@cardano-ogmios/client';
+import type { InteractionContextProps } from './createObservableInteractionContext.js';
+import type { Intersection } from '@cardano-ogmios/client/dist/ChainSync';
+import type { Logger } from 'ts-log';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
+import type { WithLogger } from '@cardano-sdk/util';
 
 const ogmiosToCoreIntersection = (intersection: Intersection) => ({
   point: ogmiosToCorePointOrOrigin(intersection.point),

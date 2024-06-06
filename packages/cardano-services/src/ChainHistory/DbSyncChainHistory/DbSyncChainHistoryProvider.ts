@@ -1,24 +1,23 @@
 /* eslint-disable sonarjs/no-nested-template-literals */
-import * as Queries from './queries';
-import { BlockModel, BlockOutputModel, TipModel, TxModel } from './types';
-import {
+import * as Queries from './queries.js';
+import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { ChainHistoryBuilder } from './ChainHistoryBuilder.js';
+import { DB_MAX_SAFE_INTEGER } from './queries.js';
+import { DbSyncProvider } from '../../util/DbSyncProvider/index.js';
+import { hexStringToBuffer } from '@cardano-sdk/util';
+import { mapBlock, mapTxAlonzo, mapTxIn, mapTxOut } from './mappers.js';
+import orderBy from 'lodash/orderBy.js';
+import type { BlockModel, BlockOutputModel, TipModel, TxModel } from './types.js';
+import type {
   BlocksByIdsArgs,
-  Cardano,
   ChainHistoryProvider,
   Paginated,
-  ProviderError,
-  ProviderFailure,
   TransactionsByAddressesArgs,
   TransactionsByIdsArgs
 } from '@cardano-sdk/core';
-import { ChainHistoryBuilder } from './ChainHistoryBuilder';
-import { DB_MAX_SAFE_INTEGER } from './queries';
-import { DbSyncProvider, DbSyncProviderDependencies } from '../../util/DbSyncProvider';
-import { QueryResult } from 'pg';
-import { TxMetadataService } from '../../Metadata';
-import { hexStringToBuffer } from '@cardano-sdk/util';
-import { mapBlock, mapTxAlonzo, mapTxIn, mapTxOut } from './mappers';
-import orderBy from 'lodash/orderBy';
+import type { DbSyncProviderDependencies } from '../../util/DbSyncProvider/index.js';
+import type { QueryResult } from 'pg';
+import type { TxMetadataService } from '../../Metadata/index.js';
 
 /** Properties that are need to create DbSyncChainHistoryProvider */
 export interface ChainHistoryProviderProps {

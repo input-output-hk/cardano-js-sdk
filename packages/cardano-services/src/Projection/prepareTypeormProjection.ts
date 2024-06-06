@@ -4,7 +4,6 @@ import {
   BlockDataEntity,
   BlockEntity,
   CurrentPoolMetricsEntity,
-  DataSourceExtensions,
   HandleEntity,
   HandleMetadataEntity,
   NftMetadataEntity,
@@ -41,12 +40,17 @@ import {
   willStoreStakePools,
   willStoreUtxo
 } from '@cardano-sdk/projection-typeorm';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { Mappers as Mapper, ProjectionEvent } from '@cardano-sdk/projection';
-import { ObservableType, passthrough } from '@cardano-sdk/util-rxjs';
-import { POOLS_METRICS_INTERVAL_DEFAULT, POOLS_METRICS_OUTDATED_INTERVAL_DEFAULT } from '../Program/programs/types';
+import { ChainSyncEventType } from '@cardano-sdk/core';
+import { Mappers as Mapper } from '@cardano-sdk/projection';
+import { POOLS_METRICS_INTERVAL_DEFAULT, POOLS_METRICS_OUTDATED_INTERVAL_DEFAULT } from '../Program/programs/types.js';
 import { Sorter } from '@hapi/topo';
-import { WithLogger, isNotNil } from '@cardano-sdk/util';
+import { isNotNil } from '@cardano-sdk/util';
+import { passthrough } from '@cardano-sdk/util-rxjs';
+import type { Cardano } from '@cardano-sdk/core';
+import type { DataSourceExtensions } from '@cardano-sdk/projection-typeorm';
+import type { ObservableType } from '@cardano-sdk/util-rxjs';
+import type { ProjectionEvent } from '@cardano-sdk/projection';
+import type { WithLogger } from '@cardano-sdk/util';
 
 /** Used as mount segments, so must be URL-friendly */
 export enum ProjectionName {

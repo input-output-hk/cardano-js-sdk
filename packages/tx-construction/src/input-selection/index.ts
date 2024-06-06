@@ -1,1 +1,1 @@
-export * from './selectionConstraints';
+export * from './selectionConstraints.js';

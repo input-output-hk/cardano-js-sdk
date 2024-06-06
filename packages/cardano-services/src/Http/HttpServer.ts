@@ -1,20 +1,20 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 import * as OpenApiValidator from 'express-openapi-validator';
-import { APPLICATION_JSON, CONTENT_TYPE, corsOptions } from './util';
-import { DB_BLOCKS_BEHIND_TOLERANCE, listenPromise, serverClosePromise } from '../util';
+import { APPLICATION_JSON, CONTENT_TYPE, corsOptions } from './util.js';
+import { DB_BLOCKS_BEHIND_TOLERANCE, listenPromise, serverClosePromise } from '../util/index.js';
 import { Gauge, Registry } from 'prom-client';
-import { HttpServerConfig, ServiceHealth, ServicesHealthCheckResponse } from './types';
-import { HttpService } from './HttpService';
-import { Logger } from 'ts-log';
 import { ProviderError, ProviderFailure, providerFailureToStatusCodeMap } from '@cardano-sdk/core';
 import { RunnableModule, contextLogger, fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
-import { versionPathFromSpec } from '../util/openApi';
+import { versionPathFromSpec } from '../util/openApi.js';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 import expressPromBundle from 'express-prom-bundle';
-import http from 'http';
 import path from 'path';
+import type { HttpServerConfig, ServiceHealth, ServicesHealthCheckResponse } from './types.js';
+import type { HttpService } from './HttpService.js';
+import type { Logger } from 'ts-log';
+import type http from 'http';
 
 const apiSpecPath = path.join(__dirname, 'openApi.json');
 const versionPath = versionPathFromSpec(apiSpecPath);

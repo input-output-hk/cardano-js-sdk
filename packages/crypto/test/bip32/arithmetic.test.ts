@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/number-literal-case */
-import { add256bits, add28Mul8, le32 } from '../../src';
+import { add256bits, add28Mul8, le32 } from '../../src/index.js';
 
 describe('add28Mul8V2', () => {
   it('adds two 256-bit numbers, but for the first 28 bytes, it multiplies the second number by 8 before adding', async () => {

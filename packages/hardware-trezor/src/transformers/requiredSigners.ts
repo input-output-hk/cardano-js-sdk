@@ -1,9 +1,10 @@
-import * as Crypto from '@cardano-sdk/crypto';
-import * as Trezor from '@trezor/connect';
 import { Cardano } from '@cardano-sdk/core';
-import { Transform, areStringsEqualInConstantTime } from '@cardano-sdk/util';
-import { TrezorTxTransformerContext } from '../types';
+import { areStringsEqualInConstantTime } from '@cardano-sdk/util';
 import { util } from '@cardano-sdk/key-management';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type * as Trezor from '@trezor/connect';
+import type { Transform } from '@cardano-sdk/util';
+import type { TrezorTxTransformerContext } from '../types.js';
 
 export const toRequiredSigner: Transform<
   Crypto.Ed25519KeyHashHex,

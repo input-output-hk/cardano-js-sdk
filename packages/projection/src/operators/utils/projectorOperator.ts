@@ -1,8 +1,8 @@
 import { ChainSyncEventType } from '@cardano-sdk/core';
-import { MaybeObservable } from './types';
-import { RollBackwardEvent, RollForwardEvent } from '../../types';
 import { concatMap, isObservable, of } from 'rxjs';
-import { inferProjectorEventType } from './inferProjectorEventType';
+import { inferProjectorEventType } from './inferProjectorEventType.js';
+import type { MaybeObservable } from './types.js';
+import type { RollBackwardEvent, RollForwardEvent } from '../../types.js';
 
 export interface ProjectorEventHandlers<
   ExtraRollForwardPropsIn,

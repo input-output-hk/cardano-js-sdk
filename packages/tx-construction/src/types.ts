@@ -1,11 +1,11 @@
-import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, HandleResolution } from '@cardano-sdk/core';
-import { GroupedAddress, SignTransactionOptions } from '@cardano-sdk/key-management';
-import { SelectionSkeleton } from '@cardano-sdk/input-selection';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { Cardano, HandleResolution } from '@cardano-sdk/core';
+import type { GroupedAddress, SignTransactionOptions } from '@cardano-sdk/key-management';
+import type { SelectionSkeleton } from '@cardano-sdk/input-selection';
 
-import { CustomizeCb, TxEvaluator } from './tx-builder';
-import { MinimumCoinQuantityPerOutput } from './output-validation';
-import { RedeemersByType } from './input-selection';
+import type { CustomizeCb, TxEvaluator } from './tx-builder/index.js';
+import type { MinimumCoinQuantityPerOutput } from './output-validation/index.js';
+import type { RedeemersByType } from './input-selection/index.js';
 
 export type InitializeTxResult = Cardano.TxBodyWithHash & {
   inputSelection: SelectionSkeleton;

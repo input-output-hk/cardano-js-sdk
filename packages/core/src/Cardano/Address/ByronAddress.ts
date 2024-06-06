@@ -1,9 +1,10 @@
 /* eslint-disable no-bitwise */
-import { Address, AddressProps, AddressType } from './Address';
-import { CborReader, CborReaderState, CborTag, CborWriter } from '../../Serialization';
+import { Address, AddressType } from './Address.js';
+import { CborReader, CborReaderState, CborTag, CborWriter } from '../../Serialization/index.js';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { crc32 } from '@foxglove/crc';
+import type { AddressProps } from './Address.js';
 
 /**
  * Byron address attributes (both optional). The network tag is present only on test networks and contains an

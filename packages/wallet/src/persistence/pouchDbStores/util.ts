@@ -1,13 +1,9 @@
-import {
-  FromSerializableObjectOptions,
-  ToSerializableObjectOptions,
-  fromSerializableObject,
-  toSerializableObject
-} from '@cardano-sdk/util';
-import omit from 'lodash/omit';
+import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
+import omit from 'lodash/omit.js';
+import type { FromSerializableObjectOptions, ToSerializableObjectOptions } from '@cardano-sdk/util';
 
 const PouchDbDocMetadata = ['_id', '_rev', '_attachments', '_conflicts', '_revisions', '_revs_info'] as const;
-type PouchDbDocMetadata = typeof PouchDbDocMetadata[number];
+type PouchDbDocMetadata = (typeof PouchDbDocMetadata)[number];
 type PouchDbDoc = {
   [k in PouchDbDocMetadata]: unknown;
 };

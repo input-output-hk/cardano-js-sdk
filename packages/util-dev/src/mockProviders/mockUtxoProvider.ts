@@ -1,8 +1,9 @@
-import * as AssetId from '../assetId';
-import { Cardano, UtxoProvider } from '@cardano-sdk/core';
-import { handleAssetId } from './mockData';
-import { resolvedHandle } from './mockHandleProvider';
+import * as AssetId from '../assetId.js';
+import { Cardano } from '@cardano-sdk/core';
+import { handleAssetId } from './mockData.js';
+import { resolvedHandle } from './mockHandleProvider.js';
 import delay from 'delay';
+import type { UtxoProvider } from '@cardano-sdk/core';
 
 export const utxo: Cardano.Utxo[] = [
   [

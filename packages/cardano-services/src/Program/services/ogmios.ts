@@ -1,18 +1,19 @@
 /* eslint-disable promise/no-nesting */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { DnsResolver } from '../utils';
-import { HandleProvider, SubmitTxArgs } from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
-import { MissingCardanoNodeOption } from '../errors';
+import { MissingCardanoNodeOption } from '../errors/index.js';
 import {
   OgmiosCardanoNode,
   OgmiosObservableCardanoNode,
   OgmiosTxSubmitProvider,
   urlToConnectionConfig
 } from '@cardano-sdk/ogmios';
-import { OgmiosOptionDescriptions, OgmiosProgramOptions } from '../options/ogmios';
+import { OgmiosOptionDescriptions } from '../options/ogmios.js';
 import { RunnableModule, isConnectionError } from '@cardano-sdk/util';
 import { defer, from, of } from 'rxjs';
+import type { DnsResolver } from '../utils.js';
+import type { HandleProvider, SubmitTxArgs } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { OgmiosProgramOptions } from '../options/ogmios.js';
 
 const isCardanoNodeOperation = (prop: string | symbol): prop is 'eraSummaries' | 'systemStart' | 'stakeDistribution' =>
   ['eraSummaries', 'systemStart', 'stakeDistribution'].includes(prop as string);

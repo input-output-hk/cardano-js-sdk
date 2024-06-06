@@ -1,8 +1,9 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, KeyAgentBase, KeyAgentType, KeyRole, SerializableInMemoryKeyAgentData } from '../src';
+import { AddressType, KeyAgentBase, KeyAgentType, KeyRole } from '../src/index.js';
 import { Cardano } from '@cardano-sdk/core';
 import { dummyLogger } from 'ts-log';
+import type { SerializableInMemoryKeyAgentData } from '../src/index.js';
 
 const ACCOUNT_INDEX = 1;
 const bip32Ed25519 = new Crypto.SodiumBip32Ed25519();

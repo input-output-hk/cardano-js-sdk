@@ -1,6 +1,6 @@
-import { Cardano, StakePoolStats } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import {
-  Epoch,
   calcNodeMetricsValues,
   mapAddressOwner,
   mapEpoch,
@@ -13,8 +13,9 @@ import {
   mapPoolUpdate,
   mapRelay,
   toStakePoolResults
-} from '../../../src';
-import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+} from '../../../src/index.js';
+import type { Epoch } from '../../../src/index.js';
+import type { StakePoolStats } from '@cardano-sdk/core';
 
 // eslint-disable-next-line max-statements
 describe('mappers', () => {

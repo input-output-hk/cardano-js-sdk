@@ -2,7 +2,7 @@
 /* eslint-disable unicorn/number-literal-case */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { CborTag, CborWriter } from '../../../src/Serialization';
+import { CborTag, CborWriter } from '../../../src/Serialization/index.js';
 
 // Data points taken from https://tools.ietf.org/html/rfc7049#appendix-A
 // Additional pairs generated using http://cbor.me/

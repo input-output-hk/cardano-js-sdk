@@ -1,8 +1,6 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import Cardano, { HandleResolution, Provider } from '../..';
+import type { HandleResolution, Provider, TxCBOR } from '../../index.js';
 
-type SerializedTransaction = Cardano.util.HexBlob;
+type SerializedTransaction = TxCBOR;
 
 export interface SubmitTxArgs {
   signedTransaction: SerializedTransaction;

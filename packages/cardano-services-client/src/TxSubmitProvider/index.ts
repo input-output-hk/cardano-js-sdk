@@ -1,2 +1,2 @@
-export * from './TxSubmitApiProvider';
-export * from './txSubmitHttpProvider';
+export * from './TxSubmitApiProvider.js';
+export * from './txSubmitHttpProvider.js';

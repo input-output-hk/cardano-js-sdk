@@ -1,13 +1,14 @@
-import { Cardano, UtxoProvider } from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
-import { NEVER, Observable, combineLatest, concat, distinctUntilChanged, map, of, switchMap } from 'rxjs';
-import { PersistentCollectionTrackerSubject, txInEquals, utxoEquals } from './util';
-import { RetryBackoffConfig } from 'backoff-rxjs';
-import { TxInFlight, UtxoTracker } from './types';
-import { WalletStores } from '../persistence';
+import { NEVER, combineLatest, concat, distinctUntilChanged, map, of, switchMap } from 'rxjs';
+import { PersistentCollectionTrackerSubject, txInEquals, utxoEquals } from './util/index.js';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
-import chunk from 'lodash/chunk';
-import uniqWith from 'lodash/uniqWith';
+import chunk from 'lodash/chunk.js';
+import uniqWith from 'lodash/uniqWith.js';
+import type { Cardano, UtxoProvider } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
+import type { TxInFlight, UtxoTracker } from './types.js';
+import type { WalletStores } from '../persistence/index.js';
 
 // Temporarily hardcoded. Will be replaced with ChainHistoryProvider 'maxPageSize' value once ADP-2249 is implemented
 const PAGE_SIZE = 25;

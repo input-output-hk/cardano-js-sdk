@@ -1,13 +1,14 @@
-import { AssetInfo } from '../types';
-import { AssetName } from '../../Cardano';
-import { Cardano } from '../..';
-import { ImageMediaType, MediaType, NftMetadata, NftMetadataFile, Uri } from './types';
-import { InvalidFileError } from './errors';
-import { Logger } from 'ts-log';
-import { asMetadatumArray, asMetadatumMap } from '../../util/metadatum';
-import { asString } from './util';
+import { AssetName } from '../../Cardano/index.js';
+import { Cardano } from '../../index.js';
+import { ImageMediaType, MediaType, Uri } from './types.js';
+import { InvalidFileError } from './errors.js';
+import { asMetadatumArray, asMetadatumMap } from '../../util/metadatum.js';
+import { asString } from './util.js';
 import { isNotNil } from '@cardano-sdk/util';
-import difference from 'lodash/difference';
+import difference from 'lodash/difference.js';
+import type { AssetInfo } from '../types/index.js';
+import type { Logger } from 'ts-log';
+import type { NftMetadata, NftMetadataFile } from './types.js';
 
 const isString = (obj: unknown): obj is string => typeof obj === 'string';
 const VersionRegExp = /^\d+\.?\d?$/;

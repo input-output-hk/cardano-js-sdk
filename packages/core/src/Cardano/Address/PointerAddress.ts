@@ -1,9 +1,11 @@
 /* eslint-disable no-bitwise */
-import { Address, AddressProps, AddressType, Credential, CredentialType } from './Address';
+import { Address, AddressType, CredentialType } from './Address.js';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { InvalidArgumentError, OpaqueNumber } from '@cardano-sdk/util';
-import { NetworkId } from '../ChainId';
-import { Slot } from '../types';
+import { InvalidArgumentError } from '@cardano-sdk/util';
+import { Slot } from '../types/index.js';
+import type { AddressProps, Credential } from './Address.js';
+import type { NetworkId } from '../ChainId.js';
+import type { OpaqueNumber } from '@cardano-sdk/util';
 
 /**
  * Encodes the specified value with a variable number of bytes.

@@ -1,11 +1,11 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
-import { Anchor } from '../Common';
-import { CborReader, CborReaderState, CborWriter } from '../CBOR';
-import { CertificateKind } from './CertificateKind';
-import { CertificateType } from '../../Cardano';
+import { Anchor } from '../Common/index.js';
+import { CborReader, CborReaderState, CborWriter } from '../CBOR/index.js';
+import { CertificateKind } from './CertificateKind.js';
+import { CertificateType } from '../../Cardano/index.js';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import { hexToBytes } from '../../util/misc';
+import { hexToBytes } from '../../util/misc/index.js';
+import type * as Cardano from '../../Cardano/index.js';
 
 const EMBEDDED_GROUP_SIZE = 2;
 

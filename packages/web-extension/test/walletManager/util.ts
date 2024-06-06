@@ -1,5 +1,5 @@
 import { Bip32PublicKeyHex } from '@cardano-sdk/crypto';
-import { Bip32WalletAccount } from '../../src';
+import type { Bip32WalletAccount } from '../../src/index.js';
 
 export type WalletMetadata = { name: string };
 export type AccountMetadata = { name: string };

@@ -1,9 +1,9 @@
 /* eslint-disable complexity,max-statements,sonarjs/cognitive-complexity */
-import * as Cardano from '../../../Cardano';
-import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
+import { CborReader, CborReaderState, CborWriter } from '../../CBOR/index.js';
 import { HexBlob } from '@cardano-sdk/util';
-import { TransactionMetadatum } from './TransactionMetadatum';
-import { hexToBytes } from '../../../util/misc';
+import { TransactionMetadatum } from './TransactionMetadatum.js';
+import { hexToBytes } from '../../../util/misc/index.js';
+import type * as Cardano from '../../../Cardano/index.js';
 
 /** General Transaction Metadata. */
 export class GeneralTransactionMetadata {

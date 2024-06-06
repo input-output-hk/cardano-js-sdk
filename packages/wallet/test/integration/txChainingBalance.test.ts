@@ -1,8 +1,8 @@
-import { BaseWallet } from '../../src';
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
-import { createWallet } from './util';
+import { createWallet } from './util.js';
 import { firstValueFrom } from 'rxjs';
+import type { BaseWallet } from '../../src/index.js';
 
 describe('integration/txChainingBalance', () => {
   let wallet: BaseWallet;

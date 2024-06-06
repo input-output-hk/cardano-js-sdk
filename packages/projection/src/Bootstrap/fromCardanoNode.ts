@@ -1,21 +1,15 @@
 /* eslint-disable max-len */
 /* eslint-disable jsdoc/valid-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  Cardano,
-  ChainSyncEventType,
-  Intersection,
-  ObservableCardanoNode,
-  ObservableChainSync,
-  TipOrOrigin
-} from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
+import { ChainSyncEventType, ObservableCardanoNode } from '@cardano-sdk/core';
 import { Observable, concat, defer, map, mergeMap, noop, of, switchMap, take, takeWhile, tap } from 'rxjs';
-import { ProjectionEvent, StabilityWindowBuffer, UnifiedExtChainSyncEvent } from '../types';
 import { contextLogger } from '@cardano-sdk/util';
-import { pointDescription } from '../util';
-import { withEpochBoundary, withEpochNo, withNetworkInfo, withRolledBackBlock } from '../operators';
-import uniq from 'lodash/uniq';
+import { pointDescription } from '../util.js';
+import { withEpochBoundary, withEpochNo, withNetworkInfo, withRolledBackBlock } from '../operators/index.js';
+import uniq from 'lodash/uniq.js';
+import type { Cardano, Intersection, ObservableChainSync, TipOrOrigin } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { ProjectionEvent, StabilityWindowBuffer, UnifiedExtChainSyncEvent } from '../types.js';
 
 const isIntersectionBlock = (block: Cardano.Block, intersection: Intersection) => {
   if (intersection.point === 'origin') {

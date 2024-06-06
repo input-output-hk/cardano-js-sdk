@@ -1,7 +1,7 @@
-import * as Block from './block';
-import * as Ledger from './ledger';
-import * as Pool from './pool';
-import * as Tx from './tx';
+import * as Block from './block.js';
+import * as Ledger from './ledger.js';
+import * as Pool from './pool.js';
+import * as Tx from './tx.js';
 
 export const DataMocks = {
   Block,

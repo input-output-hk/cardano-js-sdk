@@ -1,8 +1,8 @@
 import { Cardano } from '@cardano-sdk/core';
-import { EpochModel } from '../../StakePool';
-import { EpochMonitor } from './types';
-import { Pool, QueryResult } from 'pg';
-import { findLastEpoch } from './queries';
+import { findLastEpoch } from './queries.js';
+import type { EpochModel } from '../../StakePool/index.js';
+import type { EpochMonitor } from './types.js';
+import type { Pool, QueryResult } from 'pg';
 
 export const EPOCH_POLL_INTERVAL_DEFAULT = 10_000;
 

@@ -1,8 +1,9 @@
-import * as Trezor from '@trezor/connect';
 import { Cardano } from '@cardano-sdk/core';
-import { InvalidArgumentError, Transform, areNumbersEqualInConstantTime } from '@cardano-sdk/util';
-import { TrezorTxTransformerContext } from '../types';
-import { resolveStakeKeyPath } from './keyPaths';
+import { InvalidArgumentError, areNumbersEqualInConstantTime } from '@cardano-sdk/util';
+import { resolveStakeKeyPath } from './keyPaths.js';
+import type * as Trezor from '@trezor/connect';
+import type { Transform } from '@cardano-sdk/util';
+import type { TrezorTxTransformerContext } from '../types.js';
 
 export const toTrezorWithdrawal: Transform<Cardano.Withdrawal, Trezor.CardanoWithdrawal, TrezorTxTransformerContext> = (
   withdrawal,

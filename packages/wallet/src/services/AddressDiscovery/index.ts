@@ -1,2 +1,2 @@
-export * from './SingleAddressDiscovery';
-export * from './HDSequentialDiscovery';
+export * from './SingleAddressDiscovery.js';
+export * from './HDSequentialDiscovery.js';

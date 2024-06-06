@@ -1,8 +1,10 @@
-import { Asset, Cardano } from '@cardano-sdk/core';
 import { AssetEntity, NftMetadataEntity } from '@cardano-sdk/projection-typeorm';
+import { Cardano } from '@cardano-sdk/core';
 import { IsNull, Not } from 'typeorm';
-import { Logger } from 'ts-log';
-import { TypeormProvider, TypeormProviderDependencies } from '../../../src/util';
+import { TypeormProvider } from '../../../src/util/index.js';
+import type { Asset } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { TypeormProviderDependencies } from '../../../src/util/index.js';
 
 export enum TypeormAssetWith {
   metadata = 'metadata'

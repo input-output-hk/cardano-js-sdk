@@ -1,6 +1,5 @@
 import { BigIntMath } from '@cardano-sdk/util';
 import {
-  Schema,
   isAllegraBlock,
   isAlonzoBlock,
   isBabbageBlock,
@@ -9,11 +8,12 @@ import {
   isMaryBlock,
   isShelleyBlock
 } from '@cardano-ogmios/client';
+import type { Schema } from '@cardano-ogmios/client';
 
 import * as Crypto from '@cardano-sdk/crypto';
-import { BlockAndKind, BlockKind, CommonBlock, OgmiosBlockType } from './types';
 import { Cardano } from '@cardano-sdk/core';
-import { mapByronBlockBody, mapCommonBlockBody } from './tx';
+import { mapByronBlockBody, mapCommonBlockBody } from './tx.js';
+import type { BlockAndKind, BlockKind, CommonBlock, OgmiosBlockType } from './types.js';
 
 /**
  * @returns

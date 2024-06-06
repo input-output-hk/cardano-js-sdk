@@ -5,8 +5,8 @@ import {
   knownAddressKeyPath,
   knownAddressPaymentKeyPath,
   txIn
-} from '../testData';
-import { mapTxIns, toTrezorTxIn } from '../../src';
+} from '../testData.js';
+import { mapTxIns, toTrezorTxIn } from '../../src/index.js';
 
 const expectedTrezorTxInWithKnownAddress = {
   path: knownAddressKeyPath,

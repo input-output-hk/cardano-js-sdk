@@ -1,7 +1,8 @@
-import { Cardano, EraSummary } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { createTestScheduler, testnetEraSummaries } from '@cardano-sdk/util-dev';
+import type { EraSummary } from '@cardano-sdk/core';
 
-import { currentEpochTracker } from '../../src/services';
+import { currentEpochTracker } from '../../src/services/index.js';
 
 describe('currentEpochTracker', () => {
   it('computes epoch info from eraSummaries$ and tip$', () => {

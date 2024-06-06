@@ -1,6 +1,6 @@
-import { Cardano } from '@cardano-sdk/core';
-import { mapReferenceInputs } from '../../src/transformers';
-import { txIn } from '../testData';
+import { mapReferenceInputs } from '../../src/transformers/index.js';
+import { txIn } from '../testData.js';
+import type { Cardano } from '@cardano-sdk/core';
 
 describe('referenceInputs', () => {
   describe('mapReferenceTxIns', () => {

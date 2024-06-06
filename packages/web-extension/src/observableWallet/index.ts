@@ -1,3 +1,3 @@
-export * from './exposeObservableWallet';
-export * from './consumeObservableWallet';
-export * from './util';
+export * from './exposeObservableWallet.js';
+export * from './consumeObservableWallet.js';
+export * from './util.js';

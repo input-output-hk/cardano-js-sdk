@@ -1,4 +1,4 @@
-import { Asset } from '../../../src';
+import { Asset } from '../../../src/index.js';
 
 const validHandles = [
   'bob',

@@ -1,16 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BlockDataEntity } from './entity';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { LessThan, QueryRunner } from 'typeorm';
-import { Logger } from 'ts-log';
-import { Observable, catchError, concatMap, from, map, of, switchMap, take } from 'rxjs';
-import { ProjectionEvent, RollForwardEvent, StabilityWindowBuffer, WithNetworkInfo } from '@cardano-sdk/projection';
-import { ReconnectionConfig } from '@cardano-sdk/util-rxjs';
-import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
-import { TypeormConnection } from './createDataSource';
-import { WithLogger, contextLogger } from '@cardano-sdk/util';
-import { WithTypeormContext } from './operators';
-import { isRecoverableTypeormError } from './isRecoverableTypeormError';
+import { BlockDataEntity } from './entity/index.js';
+import { ChainSyncEventType } from '@cardano-sdk/core';
+import { LessThan } from 'typeorm';
+import { catchError, concatMap, from, map, of, switchMap, take } from 'rxjs';
+import { contextLogger } from '@cardano-sdk/util';
+import { isRecoverableTypeormError } from './isRecoverableTypeormError.js';
+import { retryBackoff } from 'backoff-rxjs';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
+import type {
+  ProjectionEvent,
+  RollForwardEvent,
+  StabilityWindowBuffer,
+  WithNetworkInfo
+} from '@cardano-sdk/projection';
+import type { QueryRunner } from 'typeorm';
+import type { ReconnectionConfig } from '@cardano-sdk/util-rxjs';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
+import type { TypeormConnection } from './createDataSource.js';
+import type { WithLogger } from '@cardano-sdk/util';
+import type { WithTypeormContext } from './operators/index.js';
 
 export interface TypeormStabilityWindowBufferProps extends WithLogger {
   /** 100 by default */

@@ -1,18 +1,19 @@
-import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { Cardano } from '@cardano-sdk/core';
-import { LedgerTxTransformerContext } from '../types';
-import { Transformer, transformObj } from '@cardano-sdk/util';
-import { mapAuxiliaryData } from './auxiliaryData';
-import { mapCerts } from './certificates';
-import { mapCollateralTxIns } from './collateralInputs';
-import { mapCollateralTxOut } from './collateralOutput';
-import { mapReferenceInputs } from './referenceInputs';
-import { mapRequiredSigners } from './requiredSigners';
-import { mapTokenMap } from './assets';
-import { mapTxIns } from './txIn';
-import { mapTxOuts } from './txOut';
-import { mapVotingProcedures } from './votingProcedures';
-import { mapWithdrawals } from './withdrawals';
+import { mapAuxiliaryData } from './auxiliaryData.js';
+import { mapCerts } from './certificates.js';
+import { mapCollateralTxIns } from './collateralInputs.js';
+import { mapCollateralTxOut } from './collateralOutput.js';
+import { mapReferenceInputs } from './referenceInputs.js';
+import { mapRequiredSigners } from './requiredSigners.js';
+import { mapTokenMap } from './assets.js';
+import { mapTxIns } from './txIn.js';
+import { mapTxOuts } from './txOut.js';
+import { mapVotingProcedures } from './votingProcedures.js';
+import { mapWithdrawals } from './withdrawals.js';
+import { transformObj } from '@cardano-sdk/util';
+import type * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import type { Cardano } from '@cardano-sdk/core';
+import type { LedgerTxTransformerContext } from '../types.js';
+import type { Transformer } from '@cardano-sdk/util';
 
 export const LedgerTxTransformer: Transformer<Cardano.TxBody, Ledger.Transaction, LedgerTxTransformerContext> = {
   auxiliaryData: ({ auxiliaryDataHash }) => mapAuxiliaryData(auxiliaryDataHash),

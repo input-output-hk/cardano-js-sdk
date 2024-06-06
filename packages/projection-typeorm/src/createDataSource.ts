@@ -1,12 +1,16 @@
 import 'reflect-metadata';
-import { DataSource, DataSourceOptions, DefaultNamingStrategy, NamingStrategyInterface, QueryRunner } from 'typeorm';
-import { Logger } from 'ts-log';
-import { NEVER, Observable, concat, from, switchMap } from 'rxjs';
-import { PgBossExtension, createPgBoss, createPgBossExtension } from './pgBoss';
-import { WithLogger, contextLogger, patchObject } from '@cardano-sdk/util';
+import { DataSource, DefaultNamingStrategy } from 'typeorm';
+import { NEVER, concat, from, switchMap } from 'rxjs';
+import { contextLogger, patchObject } from '@cardano-sdk/util';
+import { createPgBoss, createPgBossExtension } from './pgBoss.js';
 import { finalizeWithLatest } from '@cardano-sdk/util-rxjs';
-import { typeormLogger } from './logger';
-import snakeCase from 'lodash/snakeCase';
+import { typeormLogger } from './logger.js';
+import snakeCase from 'lodash/snakeCase.js';
+import type { DataSourceOptions, NamingStrategyInterface, QueryRunner } from 'typeorm';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
+import type { PgBossExtension } from './pgBoss.js';
+import type { WithLogger } from '@cardano-sdk/util';
 
 export interface DataSourceExtensions {
   pgBoss?: boolean;

@@ -1,9 +1,10 @@
-import { Cardano } from '@cardano-sdk/core';
-import { Cip6ExtMetadataResponse } from './types';
-import { ExtMetadataFormat, StakePoolExtMetadataResponse } from '../types';
+import { ExtMetadataFormat } from '../types.js';
 import { isNotNil } from '@cardano-sdk/util';
 import fs from 'fs';
 import path from 'path';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Cip6ExtMetadataResponse } from './types.js';
+import type { StakePoolExtMetadataResponse } from '../types.js';
 
 /**
  * Extracts the extended metadata url, takes CIP-6 with priority if both extended properties exist

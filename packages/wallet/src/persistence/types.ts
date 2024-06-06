@@ -1,8 +1,8 @@
-import { Assets } from '../types';
-import { Cardano, EraSummary, Reward, StakeSummary, SupplySummary } from '@cardano-sdk/core';
-import { GroupedAddress, WitnessedTx } from '@cardano-sdk/key-management';
-import { Observable } from 'rxjs';
-import { OutgoingOnChainTx, TxInFlight } from '../services';
+import type { Assets } from '../types.js';
+import type { Cardano, EraSummary, Reward, StakeSummary, SupplySummary } from '@cardano-sdk/core';
+import type { GroupedAddress, WitnessedTx } from '@cardano-sdk/key-management';
+import type { Observable } from 'rxjs';
+import type { OutgoingOnChainTx, TxInFlight } from '../services/index.js';
 
 export interface Destroyable {
   destroyed: boolean;

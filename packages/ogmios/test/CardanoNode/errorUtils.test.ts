@@ -1,4 +1,4 @@
-import * as CardanoNodeUtil from '../../src/CardanoNode/errorUtils';
+import * as CardanoNodeUtil from '../../src/CardanoNode/errorUtils.js';
 import { CardanoNodeErrors } from '@cardano-sdk/core';
 
 const unavailableQueryError = new CardanoNodeErrors.CardanoClientErrors.QueryUnavailableInCurrentEraError(

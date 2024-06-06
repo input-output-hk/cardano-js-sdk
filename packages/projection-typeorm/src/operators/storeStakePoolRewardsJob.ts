@@ -1,7 +1,7 @@
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { STAKE_POOL_REWARDS, defaultJobOptions } from '../pgBoss';
-import { WithPgBoss } from './withTypeormTransaction';
-import { typeormOperator } from './util';
+import { STAKE_POOL_REWARDS, defaultJobOptions } from '../pgBoss.js';
+import { typeormOperator } from './util.js';
+import type { WithPgBoss } from './withTypeormTransaction.js';
 
 export const willStoreStakePoolRewardsJob = ({
   crossEpochBoundary,

@@ -1,9 +1,10 @@
-import { Asset, Cardano } from '@cardano-sdk/core';
-import { AssetBuilder } from './DbSyncAssetProvider';
-import { AssetPolicyIdAndName, NftMetadataService } from './types';
-import { Logger } from 'ts-log';
-import { Pool } from 'pg';
-import { TxMetadataService } from '../Metadata';
+import { Asset } from '@cardano-sdk/core';
+import { AssetBuilder } from './DbSyncAssetProvider/index.js';
+import type { AssetPolicyIdAndName, NftMetadataService } from './types.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { Pool } from 'pg';
+import type { TxMetadataService } from '../Metadata/index.js';
 
 /** Dependencies that are need to create DbSyncNftMetadataService */
 export interface DbSyncNftMetadataServiceDependencies {

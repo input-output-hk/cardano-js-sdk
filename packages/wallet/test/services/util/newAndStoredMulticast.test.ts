@@ -1,10 +1,10 @@
 import { Cardano } from '@cardano-sdk/core';
 import { createTestScheduler, logger, mockProviders } from '@cardano-sdk/util-dev';
 
-import { OutgoingTx, TxInFlight } from '../../../src';
-import { dummyCbor, toOutgoingTx } from '../../util';
+import { dummyCbor, toOutgoingTx } from '../../util.js';
 import { mergeMap } from 'rxjs';
-import { newAndStoredMulticast } from '../../../src/services/util';
+import { newAndStoredMulticast } from '../../../src/services/util/index.js';
+import type { OutgoingTx, TxInFlight } from '../../../src/index.js';
 const { generateTxAlonzo, queryTransactionsResult } = mockProviders;
 
 describe('newAndStoredMulticast', () => {

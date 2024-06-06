@@ -1,6 +1,6 @@
 import { PoolAPYSortFields, PoolDataSortFields, PoolMetricsSortFields, PoolROSSortFields } from '@cardano-sdk/core';
-import { PoolSortType } from '../../../src';
-import { getStakePoolSortType } from '../../../src/StakePool/DbSyncStakePoolProvider/util';
+import { getStakePoolSortType } from '../../../src/StakePool/DbSyncStakePoolProvider/util.js';
+import type { PoolSortType } from '../../../src/index.js';
 
 describe('getStakePoolSortType', () => {
   it('returns metrics for PoolMetricsSortFields', () => {

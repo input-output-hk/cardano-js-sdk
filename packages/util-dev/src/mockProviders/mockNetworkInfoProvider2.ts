@@ -1,7 +1,7 @@
 /* eslint-disable jsdoc/require-returns-type */
 import { Cardano } from '@cardano-sdk/core';
-import { genesisParameters, ledgerTip, protocolParameters } from './mockData';
-import { networkInfo } from './mockNetworkInfoProvider';
+import { genesisParameters, ledgerTip, protocolParameters } from './mockData.js';
+import { networkInfo } from './mockNetworkInfoProvider.js';
 import delay from 'delay';
 
 export const protocolParameters2 = {

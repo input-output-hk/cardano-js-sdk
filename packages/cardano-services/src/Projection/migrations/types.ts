@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 export abstract class ProjectionMigration implements MigrationInterface {
   abstract up(queryRunner: QueryRunner): Promise<any>;

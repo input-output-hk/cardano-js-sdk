@@ -1,5 +1,6 @@
-import { Cardano, UtxoByAddressesArgs, UtxoProvider } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import delay from 'delay';
+import type { UtxoByAddressesArgs, UtxoProvider } from '@cardano-sdk/core';
 
 export const somePartialUtxos: Cardano.Utxo[] = [
   [

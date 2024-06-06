@@ -1,7 +1,7 @@
-import { Cardano } from '@cardano-sdk/core';
-import { MockChangeAddressResolver, SelectionConstraints } from './util';
+import { MockChangeAddressResolver, SelectionConstraints } from './util/index.js';
 import { TxTestUtil } from '@cardano-sdk/util-dev';
-import { roundRobinRandomImprove } from '../src/RoundRobinRandomImprove';
+import { roundRobinRandomImprove } from '../src/RoundRobinRandomImprove/index.js';
+import type { Cardano } from '@cardano-sdk/core';
 
 describe('RoundRobinRandomImprove', () => {
   it('Recomputes fee after selecting an extra utxo due to change not meeting minimumCoinQuantity', async () => {

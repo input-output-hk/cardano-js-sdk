@@ -5,8 +5,6 @@ import {
   NftMetadataEntity,
   OutputEntity,
   TokensEntity,
-  TypeormStabilityWindowBuffer,
-  TypeormTipTracker,
   createObservableConnection,
   storeAssets,
   storeBlock,
@@ -14,14 +12,18 @@ import {
   typeormTransactionCommit,
   willStoreUtxo,
   withTypeormTransaction
-} from '../../src';
-import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+} from '../../src/index.js';
+import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
-import { IsNull, Not, QueryRunner } from 'typeorm';
-import { Observable } from 'rxjs';
-import { connectionConfig$, initializeDataSource } from '../util';
-import { createProjectorContext, createProjectorTilFirst } from './util';
+import { ChainSyncEventType } from '@cardano-sdk/core';
+import { IsNull, Not } from 'typeorm';
+import { connectionConfig$, initializeDataSource } from '../util.js';
+import { createProjectorContext, createProjectorTilFirst } from './util.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Observable } from 'rxjs';
+import type { ProjectionEvent } from '@cardano-sdk/projection';
+import type { QueryRunner } from 'typeorm';
+import type { TypeormStabilityWindowBuffer, TypeormTipTracker } from '../../src/index.js';
 
 describe('storeUtxo', () => {
   const stubEvents = chainSyncData(ChainSyncDataSet.WithMint);

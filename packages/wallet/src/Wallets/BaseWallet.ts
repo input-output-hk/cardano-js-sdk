@@ -1,77 +1,8 @@
 /* eslint-disable unicorn/no-nested-ternary */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {
-  AddressDiscovery,
-  AddressTracker,
-  BalanceTracker,
-  ConnectionStatus,
-  ConnectionStatusTracker,
-  DelegationTracker,
-  DynamicChangeAddressResolver,
-  FailedTx,
-  OutgoingTx,
-  PersistentDocumentTrackerSubject,
-  PollingConfig,
-  SmartTxSubmitProvider,
-  TipTracker,
-  TrackedAssetProvider,
-  TrackedChainHistoryProvider,
-  TrackedRewardsProvider,
-  TrackedStakePoolProvider,
-  TrackedTxSubmitProvider,
-  TrackedUtxoProvider,
-  TrackedWalletNetworkInfoProvider,
-  TransactionFailure,
-  TransactionsTracker,
-  UtxoTracker,
-  WalletUtil,
-  createAddressTracker,
-  createAssetsTracker,
-  createBalanceTracker,
-  createDRepRegistrationTracker,
-  createDelegationTracker,
-  createHandlesTracker,
-  createProviderStatusTracker,
-  createSimpleConnectionStatusTracker,
-  createTransactionReemitter,
-  createTransactionsTracker,
-  createUtxoTracker,
-  createWalletUtil,
-  currentEpochTracker,
-  distinctBlock,
-  distinctEraSummaries
-} from '../services';
-import {
-  AssetProvider,
-  Cardano,
-  CardanoNodeUtil,
-  ChainHistoryProvider,
-  EpochInfo,
-  EraSummary,
-  HandleProvider,
-  ProviderError,
-  RewardsProvider,
-  Serialization,
-  StakePoolProvider,
-  TxCBOR,
-  TxSubmitProvider,
-  UtxoProvider
-} from '@cardano-sdk/core';
-import {
-  Assets,
-  FinalizeTxProps,
-  HandleInfo,
-  ObservableWallet,
-  SignDataProps,
-  SyncStatus,
-  UpdateWitnessProps,
-  WalletNetworkInfoProvider
-} from '../types';
-import { BehaviorObservable, TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
-import {
   BehaviorSubject,
   EMPTY,
-  Observable,
   Subject,
   Subscription,
   catchError,
@@ -87,27 +18,100 @@ import {
   tap,
   throwError
 } from 'rxjs';
-import { Bip32Account, GroupedAddress, WitnessedTx, Witnesser, cip8, util } from '@cardano-sdk/key-management';
-import { ChangeAddressResolver, InputSelector, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
-import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
-import { Ed25519PublicKey, Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
+import { CardanoNodeUtil, ProviderError, Serialization, TxCBOR } from '@cardano-sdk/core';
+import {
+  ConnectionStatus,
+  DynamicChangeAddressResolver,
+  PersistentDocumentTrackerSubject,
+  SmartTxSubmitProvider,
+  TipTracker,
+  TrackedAssetProvider,
+  TrackedChainHistoryProvider,
+  TrackedRewardsProvider,
+  TrackedStakePoolProvider,
+  TrackedTxSubmitProvider,
+  TrackedUtxoProvider,
+  TrackedWalletNetworkInfoProvider,
+  TransactionFailure,
+  createAddressTracker,
+  createAssetsTracker,
+  createBalanceTracker,
+  createDRepRegistrationTracker,
+  createDelegationTracker,
+  createHandlesTracker,
+  createProviderStatusTracker,
+  createSimpleConnectionStatusTracker,
+  createTransactionReemitter,
+  createTransactionsTracker,
+  createUtxoTracker,
+  createWalletUtil,
+  currentEpochTracker,
+  distinctBlock,
+  distinctEraSummaries
+} from '../services/index.js';
+import { Ed25519PublicKey } from '@cardano-sdk/crypto';
 import {
   GenericTxBuilder,
   GreedyTxEvaluator,
-  InitializeTxProps,
-  InitializeTxResult,
   InvalidConfigurationError,
-  TxBuilderDependencies,
   initializeTx
 } from '@cardano-sdk/tx-construction';
-import { Logger } from 'ts-log';
-import { PubStakeKeyAndStatus, createPublicStakeKeysTracker } from '../services/PublicStakeKeysTracker';
-import { RetryBackoffConfig } from 'backoff-rxjs';
-import { Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
-import { WalletStores, createInMemoryWalletStores } from '../persistence';
-import { getScriptAddress } from './internals';
-import isEqual from 'lodash/isEqual';
-import uniq from 'lodash/uniq';
+import { TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
+import { cip8, util } from '@cardano-sdk/key-management';
+import { contextLogger, deepEquals } from '@cardano-sdk/util';
+import { createInMemoryWalletStores } from '../persistence/index.js';
+import { createPublicStakeKeysTracker } from '../services/PublicStakeKeysTracker.js';
+import { getScriptAddress } from './internals.js';
+import { roundRobinRandomImprove } from '@cardano-sdk/input-selection';
+import isEqual from 'lodash/isEqual.js';
+import uniq from 'lodash/uniq.js';
+import type {
+  AddressDiscovery,
+  AddressTracker,
+  BalanceTracker,
+  ConnectionStatusTracker,
+  DelegationTracker,
+  FailedTx,
+  OutgoingTx,
+  PollingConfig,
+  TransactionsTracker,
+  UtxoTracker,
+  WalletUtil
+} from '../services/index.js';
+import type {
+  AssetProvider,
+  Cardano,
+  ChainHistoryProvider,
+  EpochInfo,
+  EraSummary,
+  HandleProvider,
+  RewardsProvider,
+  StakePoolProvider,
+  TxSubmitProvider,
+  UtxoProvider
+} from '@cardano-sdk/core';
+import type {
+  Assets,
+  FinalizeTxProps,
+  HandleInfo,
+  ObservableWallet,
+  SignDataProps,
+  SyncStatus,
+  UpdateWitnessProps,
+  WalletNetworkInfoProvider
+} from '../types.js';
+import type { BehaviorObservable } from '@cardano-sdk/util-rxjs';
+import type { Bip32Account, GroupedAddress, WitnessedTx, Witnesser } from '@cardano-sdk/key-management';
+import type { ChangeAddressResolver, InputSelector } from '@cardano-sdk/input-selection';
+import type { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
+import type { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
+import type { InitializeTxProps, InitializeTxResult, TxBuilderDependencies } from '@cardano-sdk/tx-construction';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
+import type { PubStakeKeyAndStatus } from '../services/PublicStakeKeysTracker.js';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
+import type { Shutdown } from '@cardano-sdk/util';
+import type { WalletStores } from '../persistence/index.js';
 
 export interface BaseWalletProps {
   readonly name: string;

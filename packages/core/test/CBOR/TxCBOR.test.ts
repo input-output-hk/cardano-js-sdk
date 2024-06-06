@@ -1,6 +1,6 @@
 import { InvalidStringError } from '@cardano-sdk/util';
-import { TxCBOR } from '../../src';
-import { babbageTx } from './testData';
+import { TxCBOR } from '../../src/index.js';
+import { babbageTx } from './testData.js';
 
 describe('TxCBOR', () => {
   describe('used as a constructor', () => {

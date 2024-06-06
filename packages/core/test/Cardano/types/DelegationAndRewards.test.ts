@@ -1,4 +1,4 @@
-import * as Cardano from '../../../src/Cardano';
+import * as Cardano from '../../../src/Cardano/index.js';
 
 describe('portfolioMetadataFromCip17', () => {
   const poolIds: Cardano.PoolId[] = [

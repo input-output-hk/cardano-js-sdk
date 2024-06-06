@@ -1,1 +1,1 @@
-export * from './TypeormService';
+export * from './TypeormService.js';

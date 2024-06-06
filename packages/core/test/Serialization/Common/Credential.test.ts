@@ -1,8 +1,8 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 
-import { Cardano } from '../../../src';
-import { Credential } from '../../../src/Serialization/Common';
+import { Cardano } from '../../../src/index.js';
+import { Credential } from '../../../src/Serialization/Common/index.js';
 
 describe('Credential', () => {
   const cbor = HexBlob('8200581c30000000000000000000000000000000000000000000000000000000');

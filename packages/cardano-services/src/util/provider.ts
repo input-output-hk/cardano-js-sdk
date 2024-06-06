@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Awaited } from '@cardano-sdk/util';
-import { Logger } from 'ts-log';
-import { ProviderError } from '@cardano-sdk/core';
-import express from 'express';
+import type { Awaited } from '@cardano-sdk/util';
+import type { Logger } from 'ts-log';
+import type { ProviderError } from '@cardano-sdk/core';
+import type express from 'express';
 
 export type ProviderHandler<Args = any, ResponseBody = any, Handler extends (...args: any) => any = any> = (
   args: Args,

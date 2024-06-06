@@ -1,6 +1,6 @@
-import * as Crypto from '../../src';
+import * as Crypto from '../../src/index.js';
 import { HexBlob, InvalidStringError } from '@cardano-sdk/util';
-import { InvalidSignature, testVectorMessageZeroLength, vectors } from './Ed25519TestVectors';
+import { InvalidSignature, testVectorMessageZeroLength, vectors } from './Ed25519TestVectors.js';
 
 describe('Ed25519PublicKey', () => {
   it('can create an instance from a valid Ed25519 public key hex representation', () => {

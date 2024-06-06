@@ -1,2 +1,2 @@
-export * from './types';
-export * as CardanoNodeUtil from './util';
+export * from './types/index.js';
+export * as CardanoNodeUtil from './util/index.js';

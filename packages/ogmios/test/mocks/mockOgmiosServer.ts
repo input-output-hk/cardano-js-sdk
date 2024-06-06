@@ -1,14 +1,20 @@
 /* eslint-disable sonarjs/no-nested-switch */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
+import { HEALTH_RESPONSE_BODY } from './util.js';
+import { createServer } from 'http';
+import WebSocket from 'ws';
+import delay from 'delay';
+import fs from 'fs';
+import path from 'path';
+import type {
   EraMismatch,
   EraSummary,
   IntersectionFound,
   IntersectionNotFound,
   PointOrOrigin
 } from '@cardano-ogmios/schema';
-import {
+import type {
   EraSummariesResponse,
   GenesisConfigResponse,
   HealthCheckResponse,
@@ -16,15 +22,10 @@ import {
   StakeDistributionResponse,
   SystemStartResponse,
   TxSubmitResponse
-} from './types';
-import { HEALTH_RESPONSE_BODY } from './util';
-import { Milliseconds } from '@cardano-sdk/core';
-import { Schema } from '@cardano-ogmios/client';
-import { Server, createServer } from 'http';
-import WebSocket from 'ws';
-import delay from 'delay';
-import fs from 'fs';
-import path from 'path';
+} from './types.js';
+import type { Milliseconds } from '@cardano-sdk/core';
+import type { Schema } from '@cardano-ogmios/client';
+import type { Server } from 'http';
 
 export interface MockOgmiosServerConfig {
   healthCheck?: {

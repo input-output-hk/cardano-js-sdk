@@ -1,12 +1,13 @@
-import { AvailableNetworks } from '../Program/programs/blockfrostWorker';
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
-import { BlockfrostCacheBuilder } from './builder';
-import { Cardano, Provider } from '@cardano-sdk/core';
-import { HttpService } from '../Http';
-import { Logger } from 'ts-log';
-import { Pool } from 'pg';
+import { BlockfrostCacheBuilder } from './builder.js';
+import { Cardano } from '@cardano-sdk/core';
+import { HttpService } from '../Http/index.js';
 import { Router } from 'express';
-import { setPoolMetric } from './queries';
+import { setPoolMetric } from './queries.js';
+import type { AvailableNetworks } from '../Program/programs/blockfrostWorker.js';
+import type { Logger } from 'ts-log';
+import type { Pool } from 'pg';
+import type { Provider } from '@cardano-sdk/core';
 
 type BlockfrostMetrics = Awaited<ReturnType<BlockFrostAPI['poolsById']>>;
 

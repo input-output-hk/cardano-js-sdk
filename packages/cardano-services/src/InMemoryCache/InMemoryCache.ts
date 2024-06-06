@@ -1,5 +1,5 @@
-import { Seconds } from '@cardano-sdk/core';
 import NodeCache from 'node-cache';
+import type { Seconds } from '@cardano-sdk/core';
 
 export type Key = string | number;
 export type AsyncAction<T> = () => Promise<T>;

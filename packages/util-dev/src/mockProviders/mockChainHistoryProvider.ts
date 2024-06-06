@@ -1,9 +1,10 @@
-import * as AssetId from '../assetId';
-import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, Paginated } from '@cardano-sdk/core';
-import { currentEpoch, handleAssetId, ledgerTip, stakeCredential } from './mockData';
-import { somePartialStakePools } from '../createStubStakePoolProvider';
+import * as AssetId from '../assetId.js';
+import { Cardano } from '@cardano-sdk/core';
+import { currentEpoch, handleAssetId, ledgerTip, stakeCredential } from './mockData.js';
+import { somePartialStakePools } from '../createStubStakePoolProvider.js';
 import delay from 'delay';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { Paginated } from '@cardano-sdk/core';
 
 export const getRandomTxId = () =>
   Array.from({ length: 64 })

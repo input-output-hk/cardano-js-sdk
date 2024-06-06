@@ -4,15 +4,17 @@ import {
   ChainSyncErrorCode,
   GeneralCardanoNodeError,
   GeneralCardanoNodeErrorCode,
-  IncompleteWithdrawalsData,
-  OutsideOfValidityIntervalData,
   StateQueryError,
   StateQueryErrorCode,
   TxSubmissionError,
-  TxSubmissionErrorCode,
-  ValueNotConservedData
-} from '../types';
+  TxSubmissionErrorCode
+} from '../types/index.js';
 import { isProductionEnvironment, stripStackTrace } from '@cardano-sdk/util';
+import type {
+  IncompleteWithdrawalsData,
+  OutsideOfValidityIntervalData,
+  ValueNotConservedData
+} from '../types/index.js';
 
 type InferObjectType<T> = T extends new (...args: any[]) => infer O ? O : never;
 

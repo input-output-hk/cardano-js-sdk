@@ -1,6 +1,6 @@
-import { AssetEntity } from './Asset.entity';
-import { Cardano, Handle } from '@cardano-sdk/core';
+import { AssetEntity } from './Asset.entity.js';
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
+import type { Cardano, Handle } from '@cardano-sdk/core';
 
 @Entity()
 export class HandleEntity {

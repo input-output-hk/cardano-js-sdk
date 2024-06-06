@@ -1,13 +1,9 @@
-import { AddressDiscovery, HDSequentialDiscovery } from '../services';
-import {
-  BaseWallet,
-  BaseWalletDependencies,
-  BaseWalletProps,
-  PublicCredentialsManager,
-  PublicCredentialsManagerType
-} from './BaseWallet';
-import { Bip32Account } from '@cardano-sdk/key-management';
+import { BaseWallet, PublicCredentialsManagerType } from './BaseWallet.js';
 import { Cardano } from '@cardano-sdk/core';
+import { HDSequentialDiscovery } from '../services/index.js';
+import type { AddressDiscovery } from '../services/index.js';
+import type { BaseWalletDependencies, BaseWalletProps, PublicCredentialsManager } from './BaseWallet.js';
+import type { Bip32Account } from '@cardano-sdk/key-management';
 
 export const DEFAULT_LOOK_AHEAD_SEARCH = 20;
 

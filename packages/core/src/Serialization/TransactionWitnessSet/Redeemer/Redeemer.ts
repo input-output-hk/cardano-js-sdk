@@ -1,11 +1,11 @@
-import * as Cardano from '../../../Cardano';
+import * as Cardano from '../../../Cardano/index.js';
 import * as Crypto from '@cardano-sdk/crypto';
-import { CborReader, CborWriter } from '../../CBOR';
-import { ExUnits } from '../../Common';
+import { CborReader, CborWriter } from '../../CBOR/index.js';
+import { ExUnits } from '../../Common/index.js';
 import { HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
-import { PlutusData } from '../../PlutusData';
-import { RedeemerTag } from './RedeemerTag';
-import { hexToBytes } from '../../../util/misc';
+import { PlutusData } from '../../PlutusData/index.js';
+import { RedeemerTag } from './RedeemerTag.js';
+import { hexToBytes } from '../../../util/misc/index.js';
 
 const REDEEMER_ARRAY_SIZE = 4;
 const HASH_LENGTH_IN_BYTES = 32;

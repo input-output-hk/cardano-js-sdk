@@ -1,18 +1,16 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
-import {
-  CommunicationType,
+import { CommunicationType, KeyAgentType, errors } from '@cardano-sdk/key-management';
+import type {
   GetPassphrase,
   KeyAgentDependencies,
-  KeyAgentType,
   SerializableInMemoryKeyAgentData,
   SerializableLedgerKeyAgentData,
-  SerializableTrezorKeyAgentData,
-  errors
+  SerializableTrezorKeyAgentData
 } from '@cardano-sdk/key-management';
 
 import { dummyLogger } from 'ts-log';
-import { restoreKeyAgent } from '../../../src';
+import { restoreKeyAgent } from '../../../src/index.js';
 
 describe('KeyManagement/restoreKeyAgent', () => {
   const dependencies: KeyAgentDependencies = {

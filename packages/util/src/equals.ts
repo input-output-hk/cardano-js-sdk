@@ -1,4 +1,4 @@
-import isEqual from 'lodash/isEqual';
+import isEqual from 'lodash/isEqual.js';
 
 export const deepEquals = <T>(a: T, b: T) => isEqual(a, b);
 

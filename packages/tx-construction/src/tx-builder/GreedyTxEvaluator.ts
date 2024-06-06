@@ -1,5 +1,5 @@
-import { Cardano } from '@cardano-sdk/core';
-import { TxEvaluationResult, TxEvaluator } from './types';
+import type { Cardano } from '@cardano-sdk/core';
+import type { TxEvaluationResult, TxEvaluator } from './types.js';
 
 /*
  * This evaluator assigns the maximum execution units per transaction to each redeemer.

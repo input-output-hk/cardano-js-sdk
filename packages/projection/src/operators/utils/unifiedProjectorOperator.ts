@@ -1,7 +1,7 @@
-import { MaybeObservable } from './types';
-import { RollBackwardEvent, RollForwardEvent, WithBlock } from '../../types';
 import { concatMap, isObservable, of } from 'rxjs';
-import { inferProjectorEventType } from './inferProjectorEventType';
+import { inferProjectorEventType } from './inferProjectorEventType.js';
+import type { MaybeObservable } from './types.js';
+import type { RollBackwardEvent, RollForwardEvent, WithBlock } from '../../types.js';
 
 export type UnifiedEventHandler<PropsIn, PropsOut> = (
   evt: RollForwardEvent<PropsIn> | RollBackwardEvent<PropsIn & WithBlock>

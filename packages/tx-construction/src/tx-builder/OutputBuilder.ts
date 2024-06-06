@@ -1,20 +1,19 @@
-import { Cardano, Handle, HandleProvider, Serialization } from '@cardano-sdk/core';
-import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
-import { Logger } from 'ts-log';
+import { Cardano, Serialization } from '@cardano-sdk/core';
+import type { Handle, HandleProvider } from '@cardano-sdk/core';
+import type { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import type { Logger } from 'ts-log';
 
 import {
   HandleNotFoundError,
   InvalidConfigurationError,
-  OutputBuilder,
-  OutputBuilderTxOut,
   OutputValidationMinimumCoinError,
   OutputValidationMissingRequiredError,
   OutputValidationNegativeAssetQtyError,
   OutputValidationTokenBundleSizeError,
-  PartialTxOut,
   TxOutputFailure
-} from './types';
-import { OutputValidation, OutputValidator } from '../output-validation';
+} from './types.js';
+import type { OutputBuilder, OutputBuilderTxOut, PartialTxOut } from './types.js';
+import type { OutputValidation, OutputValidator } from '../output-validation/index.js';
 
 export type OutputBuilderValidator = Pick<OutputValidator, 'validateOutput'>;
 

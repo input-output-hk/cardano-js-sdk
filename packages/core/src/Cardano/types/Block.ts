@@ -1,9 +1,10 @@
 import * as BaseEncoding from '@scure/base';
 import * as Crypto from '@cardano-sdk/crypto';
-import { InvalidStringError, OpaqueNumber, OpaqueString, typedBech32 } from '@cardano-sdk/util';
-import { Lovelace } from './Value';
-import { OnChainTx } from './Transaction';
-import { PoolId } from './StakePool/primitives';
+import { InvalidStringError, typedBech32 } from '@cardano-sdk/util';
+import { PoolId } from './StakePool/primitives.js';
+import type { Lovelace } from './Value.js';
+import type { OnChainTx } from './Transaction.js';
+import type { OpaqueNumber, OpaqueString } from '@cardano-sdk/util';
 
 /** The block size in bytes */
 export type BlockSize = OpaqueNumber<'BlockSize'>;

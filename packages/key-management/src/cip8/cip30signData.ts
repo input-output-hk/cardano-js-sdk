@@ -1,5 +1,3 @@
-import * as Crypto from '@cardano-sdk/crypto';
-import { AccountKeyDerivationPath, GroupedAddress, KeyRole, MessageSender } from '../types';
 import {
   AlgorithmId,
   CBORValue,
@@ -10,14 +8,18 @@ import {
   HeaderMap,
   Headers,
   Label,
-  ProtectedHeaderMap,
-  SigStructure
+  ProtectedHeaderMap
 } from '@emurgo/cardano-message-signing-nodejs';
-import { Bip32Ed25519Witnesser, DREP_KEY_DERIVATION_PATH, STAKE_KEY_DERIVATION_PATH } from '../util';
 import { Cardano, util } from '@cardano-sdk/core';
-import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
-import { ComposableError, HexBlob } from '@cardano-sdk/util';
-import { CoseLabel } from './util';
+import { ComposableError } from '@cardano-sdk/util';
+import { CoseLabel } from './util.js';
+import { DREP_KEY_DERIVATION_PATH, STAKE_KEY_DERIVATION_PATH } from '../util/index.js';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { AccountKeyDerivationPath, GroupedAddress, KeyRole, MessageSender } from '../types.js';
+import type { Bip32Ed25519Witnesser } from '../util/index.js';
+import type { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
+import type { HexBlob } from '@cardano-sdk/util';
+import type { SigStructure } from '@emurgo/cardano-message-signing-nodejs';
 
 export interface Cip30SignDataRequest {
   knownAddresses: GroupedAddress[];

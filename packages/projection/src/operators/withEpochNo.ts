@@ -1,6 +1,6 @@
-import { WithEpochNo, WithNetworkInfo } from '../types';
 import { createSlotEpochCalc } from '@cardano-sdk/core';
-import { unifiedProjectorOperator } from './utils';
+import { unifiedProjectorOperator } from './utils/index.js';
+import type { WithEpochNo, WithNetworkInfo } from '../types.js';
 
 /** Adds current 'epochNo' of 'block' to each event */
 export const withEpochNo = unifiedProjectorOperator<Pick<WithNetworkInfo, 'eraSummaries'>, WithEpochNo>((evt) => {

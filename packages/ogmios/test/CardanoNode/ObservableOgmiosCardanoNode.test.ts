@@ -1,20 +1,21 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { CardanoNodeErrors, Milliseconds } from '@cardano-sdk/core';
-import { Connection, createConnectionObject } from '@cardano-ogmios/client';
+import { OgmiosObservableCardanoNode } from '../../src/index.js';
+import { combineLatest, delay as delayEmission, firstValueFrom, mergeMap, of, take, toArray } from 'rxjs';
+import { createConnectionObject } from '@cardano-ogmios/client';
 import {
-  MockOgmiosServerConfig,
   createMockOgmiosServer,
   listenPromise,
   mockEraSummaries,
   mockGenesisConfig,
   serverClosePromise,
   waitForWsClientsDisconnect
-} from '../mocks/mockOgmiosServer';
-import { OgmiosObservableCardanoNode } from '../../src';
-import { combineLatest, delay as delayEmission, firstValueFrom, mergeMap, of, take, toArray } from 'rxjs';
+} from '../mocks/mockOgmiosServer.js';
 import { getRandomPort } from 'get-port-please';
 import { logger } from '@cardano-sdk/util-dev';
 import delay from 'delay';
+import type { Connection } from '@cardano-ogmios/client';
+import type { MockOgmiosServerConfig } from '../mocks/mockOgmiosServer.js';
 
 const defaultConfig: MockOgmiosServerConfig = {
   chainSync: {

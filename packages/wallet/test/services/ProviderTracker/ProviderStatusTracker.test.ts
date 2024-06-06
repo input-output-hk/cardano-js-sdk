@@ -2,7 +2,6 @@
 /* eslint-disable no-multi-spaces */
 import {
   CLEAN_FN_STATS,
-  ProviderFnStats,
   TrackedAssetProvider,
   TrackedChainHistoryProvider,
   TrackedRewardsProvider,
@@ -10,9 +9,11 @@ import {
   TrackedUtxoProvider,
   TrackedWalletNetworkInfoProvider,
   createProviderStatusTracker
-} from '../../../src';
+} from '../../../src/index.js';
 import { createStubStakePoolProvider, createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyLogger } from 'ts-log';
+import type {
+  ProviderFnStats } from '../../../src/index.js';
 
 const {
   mockAssetProvider,

@@ -1,12 +1,13 @@
-import { AccountAddressDerivationPath, AddressType, Bip32Account, KeyRole } from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, KeyRole } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
-import { HDSequentialDiscovery } from '../../../src';
-import { createAsyncKeyAgent } from '../../util';
+import { HDSequentialDiscovery } from '../../../src/index.js';
+import { createAsyncKeyAgent } from '../../util.js';
 import {
   createMockChainHistoryProvider,
   mockAlwaysEmptyChainHistoryProvider,
   mockChainHistoryProvider
-} from './mockData';
+} from './mockData.js';
+import type { AccountAddressDerivationPath } from '@cardano-sdk/key-management';
 
 const asPaymentAddress = (address: string) => address as Cardano.PaymentAddress;
 

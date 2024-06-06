@@ -1,4 +1,5 @@
-import { HexBlob, OpaqueString, castHexBlob, typedHex } from '@cardano-sdk/util';
+import { castHexBlob, typedHex } from '@cardano-sdk/util';
+import type { HexBlob, OpaqueString } from '@cardano-sdk/util';
 
 export const BIP32_PUBLIC_KEY_HASH_LENGTH = 28;
 

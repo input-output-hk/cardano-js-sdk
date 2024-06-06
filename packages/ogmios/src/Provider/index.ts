@@ -1,1 +1,1 @@
-export * from './TxSubmitProvider';
+export * from './TxSubmitProvider/index.js';

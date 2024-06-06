@@ -1,7 +1,8 @@
-import { AddressType, GroupedAddress, KeyRole } from '@cardano-sdk/key-management';
+import { AddressType, KeyRole } from '@cardano-sdk/key-management';
 import { BehaviorSubject } from 'rxjs';
 import { Cardano } from '@cardano-sdk/core';
-import { DelegatedStake, RewardsHistory } from '../../../src';
+import type { DelegatedStake, RewardsHistory } from '../../../src/index.js';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
 
 const poolBase = {
   cost: 0n,

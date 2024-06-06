@@ -1,10 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import * as Crypto from '@cardano-sdk/crypto';
-import { BaseWallet, FinalizeTxProps, ObservableWallet } from '@cardano-sdk/wallet';
 import { Cardano, Serialization, createSlotEpochCalc, nativeScriptPolicyId } from '@cardano-sdk/core';
 import {
   EMPTY,
-  Observable,
   combineLatest,
   distinctUntilChanged,
   filter,
@@ -17,13 +14,18 @@ import {
   throwError,
   timeout
 } from 'rxjs';
-import { FAST_OPERATION_TIMEOUT_DEFAULT, SYNC_TIMEOUT_DEFAULT } from '../defaults';
-import { InMemoryKeyAgent, TransactionSigner } from '@cardano-sdk/key-management';
-import { InitializeTxProps } from '@cardano-sdk/tx-construction';
-import { TestWallet, networkInfoProviderFactory } from '../factories';
-import { getEnv, walletVariables } from '../environment';
+import { FAST_OPERATION_TIMEOUT_DEFAULT, SYNC_TIMEOUT_DEFAULT } from '../defaults.js';
+import { InMemoryKeyAgent } from '@cardano-sdk/key-management';
+import { getEnv, walletVariables } from '../environment.js';
 import { logger } from '@cardano-sdk/util-dev';
-import sortBy from 'lodash/sortBy';
+import { networkInfoProviderFactory } from '../factories.js';
+import sortBy from 'lodash/sortBy.js';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { BaseWallet, FinalizeTxProps, ObservableWallet } from '@cardano-sdk/wallet';
+import type { InitializeTxProps } from '@cardano-sdk/tx-construction';
+import type { Observable } from 'rxjs';
+import type { TestWallet } from '../factories.js';
+import type { TransactionSigner } from '@cardano-sdk/key-management';
 
 const env = getEnv(walletVariables);
 

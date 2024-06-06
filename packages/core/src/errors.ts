@@ -1,6 +1,6 @@
-import { Cardano, Handle } from '.';
 import { ComposableError, formatErrorMessage } from '@cardano-sdk/util';
 import { CustomError } from 'ts-custom-error';
+import type { Cardano, Handle } from './index.js';
 
 export enum ProviderFailure {
   Conflict = 'CONFLICT',

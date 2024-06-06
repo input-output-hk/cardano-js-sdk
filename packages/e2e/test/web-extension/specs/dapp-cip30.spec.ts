@@ -1,5 +1,5 @@
-import { selectors } from '../extension/const';
-import { switchToWalletUi } from './utils';
+import { selectors } from '../extension/const.js';
+import { switchToWalletUi } from './utils.js';
 
 describe('dapp/cip30', () => {
   const pWalletFound = '#root > div > p:nth-child(4)';

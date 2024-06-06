@@ -1,2 +1,2 @@
-export * from './DbSyncProvider';
-export * from './util';
+export * from './DbSyncProvider.js';
+export * from './util.js';

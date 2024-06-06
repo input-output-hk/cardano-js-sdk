@@ -1,5 +1,5 @@
-import { Cardano, PaginationArgs } from '@cardano-sdk/core';
-import {
+import type { Cardano, PaginationArgs } from '@cardano-sdk/core';
+import type {
   CertificateModel,
   DelegationCertModel,
   MirCertModel,
@@ -7,7 +7,7 @@ import {
   PoolRetireCertModel,
   StakeCertModel,
   WithCertType
-} from './types';
+} from './types.js';
 
 export const isPoolRetireCertModel = (
   value: WithCertType<CertificateModel>

@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import type { Cardano } from '@cardano-sdk/core';
 
 export type ProtocolParametersRequiredByOutputValidator = Pick<
   Cardano.ProtocolParameters,

@@ -1,4 +1,4 @@
-import { Cardano } from '../../../src';
+import { Cardano } from '../../../src/index.js';
 import { InvalidStringError } from '@cardano-sdk/util';
 
 describe('PaymentAddress', () => {

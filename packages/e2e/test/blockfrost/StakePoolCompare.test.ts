@@ -1,11 +1,14 @@
 import * as envalid from 'envalid';
-import { Cardano, QueryStakePoolsArgs, StakePoolProvider } from '@cardano-sdk/core';
-import { ChildProcess, fork } from 'child_process';
-import { WriteStream, createWriteStream } from 'fs';
+import { Cardano } from '@cardano-sdk/core';
+import { createWriteStream } from 'fs';
+import { fork } from 'child_process';
 import { getRandomPort } from 'get-port-please';
 import { logger } from '@cardano-sdk/util-dev';
 import { stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
 import path from 'path';
+import type { ChildProcess } from 'child_process';
+import type { QueryStakePoolsArgs, StakePoolProvider } from '@cardano-sdk/core';
+import type { WriteStream } from 'fs';
 
 type StakePoolRecord = Record<string, Cardano.StakePool>;
 

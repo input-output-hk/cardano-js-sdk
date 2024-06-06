@@ -1,10 +1,10 @@
-import * as Crypto from '../../src';
+import * as Crypto from '../../src/index.js';
 import { InvalidStringError } from '@cardano-sdk/util';
 import {
   bip32TestVectorMessageOneLength,
   bip32TestVectorMessageShaOfAbcUnhardened,
   extendedVectors
-} from '../ed25519e/Ed25519TestVectors';
+} from '../ed25519e/Ed25519TestVectors.js';
 
 describe('Bip32PublicKey', () => {
   it('can create an instance from a valid normal BIP-32 public key hex representation', async () => {

@@ -1,7 +1,7 @@
-import { APExtMetadataResponse, Cip6ExtMetadataResponse } from './types';
 import { Cardano } from '@cardano-sdk/core';
-import { StakePoolExtMetadataResponse } from '../types';
-import { isCip6Format } from './util';
+import { isCip6Format } from './util.js';
+import type { APExtMetadataResponse, Cip6ExtMetadataResponse } from './types.js';
+import type { StakePoolExtMetadataResponse } from '../types.js';
 
 const mapFromCip6Format = ({ serial, pool }: Cip6ExtMetadataResponse): Cardano.ExtendedStakePoolMetadata => ({
   pool: {

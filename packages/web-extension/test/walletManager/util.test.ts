@@ -1,9 +1,9 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AsyncKeyAgent } from '@cardano-sdk/key-management';
 import { Cardano, Serialization } from '@cardano-sdk/core';
+import type { AsyncKeyAgent } from '@cardano-sdk/key-management';
 
 import { HexBlob } from '@cardano-sdk/util';
-import { getWalletId } from '../../src';
+import { getWalletId } from '../../src/index.js';
 
 describe('getWalletId', () => {
   let pubKey: Crypto.Bip32PublicKeyHex;

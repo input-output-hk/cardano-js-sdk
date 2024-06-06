@@ -1,19 +1,23 @@
-import { Cardano } from '@cardano-sdk/core';
-import { CommonProgramOptions, OgmiosProgramOptions, PosgresProgramOptions } from '../options';
-import { DnsResolver, createDnsResolver } from '../utils';
+import { HandlePolicyIdsOptionDescriptions, handlePolicyIdsFromFile } from '../options/policyIds.js';
+import { HttpServer } from '../../Http/index.js';
+import { MissingProgramOption, UnknownServiceName } from '../errors/index.js';
 import {
-  HandlePolicyIdsOptionDescriptions,
-  HandlePolicyIdsProgramOptions,
-  handlePolicyIdsFromFile
-} from '../options/policyIds';
-import { HttpServer, HttpServerConfig } from '../../Http';
-import { Logger } from 'ts-log';
-import { MissingProgramOption, UnknownServiceName } from '../errors';
-import { ProjectionHttpService, ProjectionName, createTypeormProjection, storeOperators } from '../../Projection';
-import { SrvRecord } from 'dns';
+  ProjectionHttpService,
+  ProjectionName,
+  createTypeormProjection,
+  storeOperators
+} from '../../Projection/index.js';
+import { createDnsResolver } from '../utils.js';
 import { createLogger } from 'bunyan';
 import { createStorePoolMetricsUpdateJob, createStoreStakePoolMetadataJob } from '@cardano-sdk/projection-typeorm';
-import { getConnectionConfig, getOgmiosObservableCardanoNode } from '../services';
+import { getConnectionConfig, getOgmiosObservableCardanoNode } from '../services/index.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { CommonProgramOptions, OgmiosProgramOptions, PosgresProgramOptions } from '../options/index.js';
+import type { DnsResolver } from '../utils.js';
+import type { HandlePolicyIdsProgramOptions } from '../options/policyIds.js';
+import type { HttpServerConfig } from '../../Http/index.js';
+import type { Logger } from 'ts-log';
+import type { SrvRecord } from 'dns';
 
 export const BLOCKS_BUFFER_LENGTH_DEFAULT = 10;
 export const PROJECTOR_API_URL_DEFAULT = new URL('http://localhost:3002');

@@ -1,5 +1,6 @@
-import { Logger } from 'ts-log';
-import { Observable, from, groupBy, map, merge, mergeMap, share, tap } from 'rxjs';
+import { from, groupBy, map, merge, mergeMap, share, tap } from 'rxjs';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
 
 interface NewAndStoredMulticast<T, K> {
   new$: Observable<T>;

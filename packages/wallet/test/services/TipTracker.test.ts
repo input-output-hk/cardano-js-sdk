@@ -1,10 +1,11 @@
-import { Cardano } from '@cardano-sdk/core';
-import { ConnectionStatus, TipTracker } from '../../src/services';
-import { InMemoryDocumentStore } from '../../src/persistence';
-import { Milliseconds, SyncStatus } from '../../src';
-import { Observable, firstValueFrom, of } from 'rxjs';
+import { ConnectionStatus, TipTracker } from '../../src/services/index.js';
+import { InMemoryDocumentStore } from '../../src/persistence/index.js';
 import { createStubObservable, createTestScheduler } from '@cardano-sdk/util-dev';
 import { dummyLogger } from 'ts-log';
+import { firstValueFrom, of } from 'rxjs';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Milliseconds, SyncStatus } from '../../src/index.js';
+import type { Observable } from 'rxjs';
 
 const mockTips = {
   a: { hash: 'ha' },

@@ -1,12 +1,12 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { DB_CACHE_TTL_DEFAULT } from '../../../src/InMemoryCache';
+import { DB_CACHE_TTL_DEFAULT } from '../../../src/InMemoryCache/index.js';
 import {
   DEFAULT_HEALTH_CHECK_CACHE_TTL,
   OgmiosOptionDescriptions,
   PostgresOptionDescriptions,
   StakePoolMetadataFetchMode
-} from '../../../src/Program/options';
-import { EPOCH_POLL_INTERVAL_DEFAULT, listenPromise, serverClosePromise } from '../../../src/util';
+} from '../../../src/Program/options/index.js';
+import { EPOCH_POLL_INTERVAL_DEFAULT, listenPromise, serverClosePromise } from '../../../src/util/index.js';
 import {
   HttpServer,
   MissingCardanoNodeOption,
@@ -16,18 +16,19 @@ import {
   SERVICE_DISCOVERY_TIMEOUT_DEFAULT,
   ServiceNames,
   loadProviderServer
-} from '../../../src';
-import { Ogmios } from '@cardano-sdk/ogmios';
-import { ProviderError, ProviderFailure, Seconds } from '@cardano-sdk/core';
-import { SrvRecord } from 'dns';
+} from '../../../src/index.js';
+import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import {
   createConnectionObjectWithRandomPort,
   createHealthyMockOgmiosServer,
   createUnhealthyMockOgmiosServer,
   ogmiosServerReady
-} from '../../util';
+} from '../../util.js';
 import { getRandomPort } from 'get-port-please';
-import http from 'http';
+import type { Ogmios } from '@cardano-sdk/ogmios';
+import type { Seconds } from '@cardano-sdk/core';
+import type { SrvRecord } from 'dns';
+import type http from 'http';
 
 jest.mock('dns', () => ({
   promises: {

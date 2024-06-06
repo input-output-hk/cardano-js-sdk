@@ -1,4 +1,4 @@
-import { InMemoryStore } from './types';
+import type { InMemoryStore } from './types.js';
 
 export const createStore = (): InMemoryStore => ({
   stakeKeys: new Set(),

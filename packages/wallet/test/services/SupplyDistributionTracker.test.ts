@@ -1,5 +1,5 @@
-import { createInMemorySupplyDistributionStores } from '../../src/persistence';
-import { createSupplyDistributionTracker } from '../../src';
+import { createInMemorySupplyDistributionStores } from '../../src/persistence/index.js';
+import { createSupplyDistributionTracker } from '../../src/index.js';
 import { dummyLogger } from 'ts-log';
 import { firstValueFrom, of } from 'rxjs';
 import { mockProviders } from '@cardano-sdk/util-dev';

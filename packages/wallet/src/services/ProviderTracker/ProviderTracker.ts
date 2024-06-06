@@ -1,4 +1,4 @@
-import { BehaviorSubject } from 'rxjs';
+import type { BehaviorSubject } from 'rxjs';
 
 export interface ProviderFnStats {
   numCalls: number;

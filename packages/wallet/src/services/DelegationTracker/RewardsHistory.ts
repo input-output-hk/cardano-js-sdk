@@ -1,16 +1,18 @@
 import { BigIntMath, isNotNil } from '@cardano-sdk/util';
-import { Cardano, Reward, getCertificatesByType } from '@cardano-sdk/core';
-import { KeyValueStore } from '../../persistence';
-import { Logger } from 'ts-log';
-import { Observable, concat, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
-import { RetryBackoffConfig } from 'backoff-rxjs';
-import { RewardsHistory } from '../types';
-import { TrackedRewardsProvider } from '../ProviderTracker';
-import { TxWithEpoch } from './types';
+import { Cardano, getCertificatesByType } from '@cardano-sdk/core';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
-import first from 'lodash/first';
-import flatten from 'lodash/flatten';
-import sortBy from 'lodash/sortBy';
+import { concat, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
+import first from 'lodash/first.js';
+import flatten from 'lodash/flatten.js';
+import sortBy from 'lodash/sortBy.js';
+import type { KeyValueStore } from '../../persistence/index.js';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
+import type { Reward } from '@cardano-sdk/core';
+import type { RewardsHistory } from '../types.js';
+import type { TrackedRewardsProvider } from '../ProviderTracker/index.js';
+import type { TxWithEpoch } from './types.js';
 
 const DELEGATION_EPOCHS_AHEAD_COUNT = 2;
 

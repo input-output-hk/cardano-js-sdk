@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano } from '../../../src';
+import { Cardano } from '../../../src/index.js';
 
 describe('Cardano.util.computeImplicitCoin', () => {
   let rewardAccount: Cardano.RewardAccount;

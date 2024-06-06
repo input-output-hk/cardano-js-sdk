@@ -1,8 +1,9 @@
 /* eslint-disable unicorn/number-literal-case */
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
+import { Serialization } from '@cardano-sdk/core';
+import type { Cardano } from '@cardano-sdk/core';
 
 const CBOR_EMPTY_LIST = new Uint8Array([0x80]);
 const CBOR_EMPTY_MAP = new Uint8Array([0xa0]);

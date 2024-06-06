@@ -1,11 +1,12 @@
-import * as Crypto from '@cardano-sdk/crypto';
-import { Anchor, DelegateRepresentative } from './Governance';
-import { Credential, CredentialType, RewardAccount } from '../Address';
-import { EpochNo } from './Block';
+import { CredentialType, RewardAccount } from '../Address/index.js';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { Lovelace } from './Value';
-import { PoolId, PoolParameters } from './StakePool';
 import { isNotNil } from '@cardano-sdk/util';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { Anchor, DelegateRepresentative } from './Governance.js';
+import type { Credential } from '../Address/index.js';
+import type { EpochNo } from './Block.js';
+import type { Lovelace } from './Value.js';
+import type { PoolId, PoolParameters } from './StakePool/index.js';
 
 export enum CertificateType {
   StakeRegistration = 'StakeRegistrationCertificate',
@@ -188,7 +189,7 @@ export const StakeRegistrationCertificateTypes = [
   ...PostConwayStakeRegistrationCertificateTypes
 ] as const;
 
-export type StakeRegistrationCertificateTypes = typeof StakeRegistrationCertificateTypes[number];
+export type StakeRegistrationCertificateTypes = (typeof StakeRegistrationCertificateTypes)[number];
 
 export const StakeDelegationCertificateTypes = [
   CertificateType.StakeDelegation,
@@ -197,7 +198,7 @@ export const StakeDelegationCertificateTypes = [
   CertificateType.StakeVoteRegistrationDelegation
 ] as const;
 
-export type StakeDelegationCertificateTypes = typeof StakeDelegationCertificateTypes[number];
+export type StakeDelegationCertificateTypes = (typeof StakeDelegationCertificateTypes)[number];
 
 export const RegAndDeregCertificateTypes = [
   ...StakeRegistrationCertificateTypes,
@@ -205,7 +206,7 @@ export const RegAndDeregCertificateTypes = [
   CertificateType.StakeDeregistration
 ] as const;
 
-export type RegAndDeregCertificateTypes = typeof RegAndDeregCertificateTypes[number];
+export type RegAndDeregCertificateTypes = (typeof RegAndDeregCertificateTypes)[number];
 
 export const StakeCredentialCertificateTypes = [
   ...RegAndDeregCertificateTypes,

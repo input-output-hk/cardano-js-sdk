@@ -1,6 +1,6 @@
-import { Commit } from 'git-last-commit';
-import { getLastCommitPromise } from './util';
+import { getLastCommitPromise } from './util.js';
 import type { ChainSyncMetadata } from '@cardano-sdk/util-dev';
+import type { Commit } from 'git-last-commit';
 const packageJson = require('../../package.json');
 
 export type Metadata = {

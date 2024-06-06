@@ -1,12 +1,12 @@
 /* eslint-disable max-params */
-import * as Cardano from '../../../Cardano';
+import * as Cardano from '../../../Cardano/index.js';
 import * as Crypto from '@cardano-sdk/crypto';
-import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
-import { CborSet, Hash } from '../../Common';
+import { CborReader, CborReaderState, CborWriter } from '../../CBOR/index.js';
+import { CborSet, Hash } from '../../Common/index.js';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import { PoolMetadata } from './PoolMetadata';
-import { Relay } from './Relay';
-import { UnitInterval } from '../../Common/UnitInterval';
+import { PoolMetadata } from './PoolMetadata.js';
+import { Relay } from './Relay/index.js';
+import { UnitInterval } from '../../Common/UnitInterval.js';
 
 type PoolOwners = CborSet<Crypto.Ed25519KeyHashHex, Hash<Crypto.Ed25519KeyHashHex>>;
 /**

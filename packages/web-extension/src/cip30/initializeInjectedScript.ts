@@ -1,8 +1,10 @@
-import { Cip30Wallet, WalletProperties, injectGlobal } from '@cardano-sdk/dapp-connector';
-import { Logger } from 'ts-log';
-import { MessengerDependencies, injectedRuntime } from '../messaging';
-import { consumeRemoteAuthenticatorApi } from './consumeRemoteAuthenticatorApi';
-import { consumeRemoteWalletApi } from './consumeRemoteWalletApi';
+import { Cip30Wallet, injectGlobal } from '@cardano-sdk/dapp-connector';
+import { consumeRemoteAuthenticatorApi } from './consumeRemoteAuthenticatorApi.js';
+import { consumeRemoteWalletApi } from './consumeRemoteWalletApi.js';
+import { injectedRuntime } from '../messaging/index.js';
+import type { Logger } from 'ts-log';
+import type { MessengerDependencies } from '../messaging/index.js';
+import type { WalletProperties } from '@cardano-sdk/dapp-connector';
 
 export interface InitializeInjectedDependencies {
   logger: Logger;

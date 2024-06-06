@@ -1,5 +1,5 @@
-import { Asset, Cardano } from '@cardano-sdk/core';
-import { TokenMetadataService } from './types';
+import type { Asset, Cardano } from '@cardano-sdk/core';
+import type { TokenMetadataService } from './types.js';
 
 export class StubTokenMetadataService implements TokenMetadataService {
   async getTokenMetadata(assetIds: Cardano.AssetId[]): Promise<(Asset.TokenMetadata | null)[]> {

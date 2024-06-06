@@ -1,9 +1,9 @@
 /* eslint-disable complexity */
-import { GeneratorMetadata } from '../Content';
-import { Intersection } from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
 import { Ogmios, ogmiosToCore } from '@cardano-sdk/ogmios';
-import { applyValue } from './applyValue';
+import { applyValue } from './applyValue.js';
+import type { GeneratorMetadata } from '../Content.js';
+import type { Intersection } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
 
 export type AddressBalances = {
   [address: string]: Ogmios.Schema.Value;

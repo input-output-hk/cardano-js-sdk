@@ -1,6 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
-import { InMemoryKeyAgent, KeyAgentDependencies, util } from '../../src';
-import { mockKeyAgentDependencies } from './mockKeyAgentDependencies';
+import { InMemoryKeyAgent, util } from '../../src/index.js';
+import { mockKeyAgentDependencies } from './mockKeyAgentDependencies.js';
+import type { KeyAgentDependencies } from '../../src/index.js';
 
 export const getPassphrase = jest.fn(async () => Buffer.from('password'));
 

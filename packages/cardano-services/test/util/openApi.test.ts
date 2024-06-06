@@ -1,6 +1,6 @@
-import { OpenAPIV3 } from 'express-openapi-validator/dist/framework/types';
-import { versionPathFromSpec } from '../../src/util/openApi';
+import { versionPathFromSpec } from '../../src/util/openApi.js';
 import path from 'path';
+import type { OpenAPIV3 } from 'express-openapi-validator/dist/framework/types';
 
 describe('openApi utils', () => {
   describe('versionPathFromSpec', () => {

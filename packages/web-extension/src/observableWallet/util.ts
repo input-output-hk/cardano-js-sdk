@@ -1,7 +1,8 @@
-import { ObservableWallet } from '@cardano-sdk/wallet';
-import { OutputBuilder, TxBuilder } from '@cardano-sdk/tx-construction';
-import { RemoteApiProperties, RemoteApiPropertyType } from '../messaging';
-import { WalletRepository } from '../walletManager';
+import { RemoteApiPropertyType } from '../messaging/index.js';
+import type { ObservableWallet } from '@cardano-sdk/wallet';
+import type { OutputBuilder, TxBuilder } from '@cardano-sdk/tx-construction';
+import type { RemoteApiProperties } from '../messaging/index.js';
+import type { WalletRepository } from '../walletManager/index.js';
 
 export const observableWalletChannel = (walletName: string) => `${walletName}$`;
 

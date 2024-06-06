@@ -1,7 +1,7 @@
 import * as Trezor from '@trezor/connect';
 import { CardanoKeyConst, util } from '@cardano-sdk/key-management';
-import { TrezorKeyAgent } from '../src';
-import { knownAddressKeyPath, knownAddressStakeKeyPath } from './testData';
+import { TrezorKeyAgent } from '../src/index.js';
+import { knownAddressKeyPath, knownAddressStakeKeyPath } from './testData.js';
 
 describe('TrezorKeyAgent', () => {
   // Transformed / mapped data

@@ -1,18 +1,21 @@
-import { Connection, createConnectionObject } from '@cardano-ogmios/client';
-import { DbPools, DbSyncProvider, DbSyncProviderDependencies } from '../../../src/util';
-import { HEALTH_RESPONSE_BODY } from '../../../../ogmios/test/mocks/util';
-import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
+import { DbSyncProvider } from '../../../src/util/index.js';
+import { HEALTH_RESPONSE_BODY } from '../../../../ogmios/test/mocks/util.js';
+import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache/index.js';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
-import { Pool, QueryResult } from 'pg';
-import { Provider } from '@cardano-sdk/core';
+import { Pool } from 'pg';
+import { createConnectionObject } from '@cardano-ogmios/client';
 import {
   createMockOgmiosServer,
   listenPromise,
   serverClosePromise
-} from '../../../../ogmios/test/mocks/mockOgmiosServer';
+} from '../../../../ogmios/test/mocks/mockOgmiosServer.js';
 import { getRandomPort } from 'get-port-please';
 import { dummyLogger as logger } from 'ts-log';
-import http from 'http';
+import type { Connection } from '@cardano-ogmios/client';
+import type { DbPools, DbSyncProviderDependencies } from '../../../src/util/index.js';
+import type { Provider } from '@cardano-sdk/core';
+import type { QueryResult } from 'pg';
+import type http from 'http';
 
 const someError = new Error('Some error');
 

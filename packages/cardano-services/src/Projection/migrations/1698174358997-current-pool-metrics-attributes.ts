@@ -1,5 +1,5 @@
 import { CurrentPoolMetricsEntity } from '@cardano-sdk/projection-typeorm';
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class CurrentStakePollMetricsAttributesMigrations1698174358997 implements MigrationInterface {
   static entity = CurrentPoolMetricsEntity;

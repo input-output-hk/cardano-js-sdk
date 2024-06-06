@@ -1,6 +1,6 @@
-import { Cardano } from '@cardano-sdk/core';
-import { InputSelectionError, InputSelectionFailure, splitChange } from '../../src';
-import { asAssetId, asPaymentAddress, asTokenMap, getCoinValueForAddress } from '../util';
+import { InputSelectionError, InputSelectionFailure, splitChange } from '../../src/index.js';
+import { asAssetId, asPaymentAddress, asTokenMap, getCoinValueForAddress } from '../util/index.js';
+import type { Cardano } from '@cardano-sdk/core';
 
 describe('splitChange', () => {
   it('correctly split pure lovelace change', async () => {

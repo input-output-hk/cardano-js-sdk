@@ -1,6 +1,8 @@
-import { ChainHistoryProvider, HttpProviderConfigPaths, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
-import { apiVersion } from '../version';
+import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { apiVersion } from '../version.js';
+import { createHttpProvider } from '../HttpProvider.js';
+import type { ChainHistoryProvider, HttpProviderConfigPaths } from '@cardano-sdk/core';
+import type { CreateHttpProviderConfig } from '../HttpProvider.js';
 
 /** The ChainHistoryProvider endpoint paths. */
 const paths: HttpProviderConfigPaths<ChainHistoryProvider> = {

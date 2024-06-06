@@ -1,5 +1,7 @@
 import { Cardano, InvalidProtocolParametersError, Serialization } from '@cardano-sdk/core';
-import {
+import { MinFeeCoefficient, MinFeeConstant, minAdaRequired, minFee } from '../fees/index.js';
+import { sortTxIn } from '@cardano-sdk/input-selection';
+import type {
   ComputeMinimumCoinQuantity,
   ComputeSelectionLimit,
   EstimateTxCosts,
@@ -7,11 +9,9 @@ import {
   ProtocolParametersRequiredByInputSelection,
   SelectionConstraints,
   SelectionSkeleton,
-  TokenBundleSizeExceedsLimit,
-  sortTxIn
+  TokenBundleSizeExceedsLimit
 } from '@cardano-sdk/input-selection';
-import { MinFeeCoefficient, MinFeeConstant, minAdaRequired, minFee } from '../fees';
-import { TxEvaluationResult, TxEvaluator, TxIdWithIndex } from '../tx-builder';
+import type { TxEvaluationResult, TxEvaluator, TxIdWithIndex } from '../tx-builder/index.js';
 
 export const MAX_U64 = 18_446_744_073_709_551_615n;
 

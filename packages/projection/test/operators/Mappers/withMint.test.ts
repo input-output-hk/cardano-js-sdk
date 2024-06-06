@@ -1,7 +1,8 @@
 import { Cardano } from '@cardano-sdk/core';
-import { Mappers, ProjectionEvent } from '../../../src';
-import { computeCompactTxId } from '../../../src/operators/Mappers/util';
+import { Mappers } from '../../../src/index.js';
+import { computeCompactTxId } from '../../../src/operators/Mappers/util.js';
 import { firstValueFrom, of } from 'rxjs';
+import type { ProjectionEvent } from '../../../src/index.js';
 
 describe('withMint', () => {
   const source$ = of({

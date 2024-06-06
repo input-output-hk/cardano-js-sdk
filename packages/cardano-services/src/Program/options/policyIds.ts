@@ -1,7 +1,7 @@
 import { Cardano, NotImplementedError } from '@cardano-sdk/core';
-import { Command } from 'commander';
-import { addOptions, newOption } from './util';
+import { addOptions, newOption } from './util.js';
 import { readFile } from 'fs/promises';
+import type { Command } from 'commander';
 
 const handlePolicyIdsParser = (policyIds: string) => policyIds.split(',').map(Cardano.PolicyId);
 

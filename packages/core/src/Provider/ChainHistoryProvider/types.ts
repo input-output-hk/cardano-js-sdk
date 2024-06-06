@@ -1,5 +1,5 @@
-import { Cardano, Paginated, PaginationArgs, Provider } from '../..';
-import { Range } from '@cardano-sdk/util';
+import type { Cardano, Paginated, PaginationArgs, Provider } from '../../index.js';
+import type { Range } from '@cardano-sdk/util';
 
 export type TransactionsByAddressesArgs = {
   addresses: Cardano.PaymentAddress[];

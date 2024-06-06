@@ -3,7 +3,6 @@
 import {
   BehaviorSubject,
   EmptyError,
-  Observable,
   ReplaySubject,
   Subject,
   catchError,
@@ -15,7 +14,10 @@ import {
   takeWhile,
   tap
 } from 'rxjs';
-import {
+import { deriveChannelName } from './util.js';
+import { isNotNil } from '@cardano-sdk/util';
+import { retryBackoff } from 'backoff-rxjs';
+import type {
   DeriveChannelOptions,
   DisconnectEvent,
   Messenger,
@@ -23,10 +25,8 @@ import {
   MessengerPort,
   PortMessage,
   ReconnectConfig
-} from './types';
-import { deriveChannelName } from './util';
-import { isNotNil } from '@cardano-sdk/util';
-import { retryBackoff } from 'backoff-rxjs';
+} from './types.js';
+import type { Observable } from 'rxjs';
 
 export interface NonBackgroundMessengerOptions {
   baseChannel: string;

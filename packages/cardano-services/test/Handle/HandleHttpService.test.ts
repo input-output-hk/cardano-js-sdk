@@ -1,8 +1,10 @@
-import { Cardano, HandleProvider, ProviderError, ProviderFailure, ResolveHandlesArgs } from '@cardano-sdk/core';
-import { HandleHttpService, HttpServer, emptyStringHandleResolutionRequestError } from '../../src';
+import { HandleHttpService, HttpServer, emptyStringHandleResolutionRequestError } from '../../src/index.js';
+import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { getRandomPort } from 'get-port-please';
 import { logger } from '@cardano-sdk/util-dev';
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
+import type { AxiosResponse } from 'axios';
+import type { Cardano, HandleProvider, ResolveHandlesArgs } from '@cardano-sdk/core';
 
 const parseBody = (data: unknown): { body?: unknown; rawBody: string } => {
   if (typeof data === 'string') {

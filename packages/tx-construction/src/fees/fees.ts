@@ -1,5 +1,6 @@
-import { Cardano, Serialization } from '@cardano-sdk/core';
-import { OpaqueNumber } from '@cardano-sdk/util';
+import { Serialization } from '@cardano-sdk/core';
+import type { Cardano } from '@cardano-sdk/core';
+import type { OpaqueNumber } from '@cardano-sdk/util';
 
 /**
  * The constant overhead of 160 bytes accounts for the transaction input and the entry in the UTxO map data

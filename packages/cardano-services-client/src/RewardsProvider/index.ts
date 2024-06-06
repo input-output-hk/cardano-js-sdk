@@ -1,1 +1,1 @@
-export * from './rewardsHttpProvider';
+export * from './rewardsHttpProvider.js';

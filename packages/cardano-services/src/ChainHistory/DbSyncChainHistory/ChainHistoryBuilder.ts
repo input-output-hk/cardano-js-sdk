@@ -1,6 +1,21 @@
-import * as Queries from './queries';
-import { Cardano } from '@cardano-sdk/core';
+import * as Queries from './queries.js';
+import { DB_MAX_SAFE_INTEGER, findTxsByAddresses } from './queries.js';
+import { hexStringToBuffer } from '@cardano-sdk/util';
 import {
+  mapCertificate,
+  mapPlutusScript,
+  mapRedeemer,
+  mapTxId,
+  mapTxInModel,
+  mapTxOutModel,
+  mapTxOutTokenMap,
+  mapTxTokenMap,
+  mapWithdrawal
+} from './mappers.js';
+import omit from 'lodash/omit.js';
+import orderBy from 'lodash/orderBy.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type {
   CertificateModel,
   DelegationCertModel,
   MirCertModel,
@@ -23,24 +38,10 @@ import {
   WithCertIndex,
   WithCertType,
   WithdrawalModel
-} from './types';
-import { DB_MAX_SAFE_INTEGER, findTxsByAddresses } from './queries';
-import { Logger } from 'ts-log';
-import { Pool, QueryResult } from 'pg';
-import { Range, hexStringToBuffer } from '@cardano-sdk/util';
-import {
-  mapCertificate,
-  mapPlutusScript,
-  mapRedeemer,
-  mapTxId,
-  mapTxInModel,
-  mapTxOutModel,
-  mapTxOutTokenMap,
-  mapTxTokenMap,
-  mapWithdrawal
-} from './mappers';
-import omit from 'lodash/omit';
-import orderBy from 'lodash/orderBy';
+} from './types.js';
+import type { Logger } from 'ts-log';
+import type { Pool, QueryResult } from 'pg';
+import type { Range } from '@cardano-sdk/util';
 
 export class ChainHistoryBuilder {
   #db: Pool;

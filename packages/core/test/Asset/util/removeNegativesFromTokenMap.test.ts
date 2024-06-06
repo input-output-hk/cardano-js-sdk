@@ -1,5 +1,5 @@
-import * as AssetId from '../../AssetId';
-import { Asset } from '../../../src';
+import * as AssetId from '../../AssetId.js';
+import { Asset } from '../../../src/index.js';
 
 describe('Asset', () => {
   describe('util', () => {

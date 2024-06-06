@@ -1,5 +1,6 @@
-import { Cardano, EraSummary, HealthCheckResponse, Milliseconds, StakeDistribution } from '../../src';
+import { Cardano, Milliseconds } from '../../src/index.js';
 import { Percent } from '@cardano-sdk/util';
+import type { EraSummary, HealthCheckResponse, StakeDistribution } from '../../src/index.js';
 
 const mockEraSummaries: EraSummary[] = [
   {

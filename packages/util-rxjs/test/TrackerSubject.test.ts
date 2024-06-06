@@ -1,4 +1,4 @@
-import { TrackerSubject } from '../src';
+import { TrackerSubject } from '../src/index.js';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { lastValueFrom, of } from 'rxjs';
 

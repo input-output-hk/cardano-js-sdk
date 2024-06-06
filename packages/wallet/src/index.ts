@@ -1,5 +1,5 @@
-export * from './Wallets';
-export * from './types';
-export * from './services';
-export * as storage from './persistence';
-export * as cip30 from './cip30';
+export * from './Wallets/index.js';
+export * from './types.js';
+export * from './services/index.js';
+export * as storage from './persistence/index.js';
+export * as cip30 from './cip30.js';

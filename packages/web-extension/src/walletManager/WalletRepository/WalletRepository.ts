@@ -1,18 +1,20 @@
-import {
+import { WalletConflictError } from '../errors.js';
+import { WalletType } from '../types.js';
+import { contextLogger } from '@cardano-sdk/util';
+import { defer, firstValueFrom, map, shareReplay, switchMap, take } from 'rxjs';
+import { getWalletId } from '../util.js';
+import type {
   AddAccountProps,
   AddWalletProps,
   RemoveAccountProps,
   UpdateAccountMetadataProps,
   UpdateWalletMetadataProps,
   WalletRepositoryApi
-} from './types';
-import { AnyWallet, ScriptWallet, WalletId, WalletType } from '../types';
-import { Logger } from 'ts-log';
-import { Observable, defer, firstValueFrom, map, shareReplay, switchMap, take } from 'rxjs';
-import { WalletConflictError } from '../errors';
-import { contextLogger } from '@cardano-sdk/util';
-import { getWalletId } from '../util';
-import { storage } from '@cardano-sdk/wallet';
+} from './types.js';
+import type { AnyWallet, ScriptWallet, WalletId } from '../types.js';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
+import type { storage } from '@cardano-sdk/wallet';
 
 export interface WalletRepositoryDependencies<WalletMetadata extends {}, AccountMetadata extends {}> {
   store: storage.CollectionStore<AnyWallet<WalletMetadata, AccountMetadata>>;

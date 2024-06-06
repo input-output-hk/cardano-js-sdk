@@ -1,23 +1,18 @@
-import * as AssetId from '../../../util-dev/src/assetId';
-import * as AssetIds from '../AssetId';
-import * as Cardano from '../../src/Cardano';
-import {
-  Asset,
-  AssetInfoWithAmount,
-  AssetProvider,
-  HealthCheckResponse,
-  createTxInspector,
-  transactionSummaryInspector
-} from '../../src';
+import * as AssetId from '../../../util-dev/src/assetId.js';
+import * as AssetIds from '../AssetId.js';
+import * as Cardano from '../../src/Cardano/index.js';
 import {
   CertificateType,
   CredentialType,
   RewardAccount,
   createStakeDeregistrationCert,
   createStakeRegistrationCert
-} from '../../src/Cardano';
-import { Ed25519KeyHashHex, Ed25519PublicKeyHex, Ed25519SignatureHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { jsonToMetadatum } from '../../src/util/metadatum';
+} from '../../src/Cardano/index.js';
+import { Ed25519KeyHashHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import { createTxInspector, transactionSummaryInspector } from '../../src/index.js';
+import { jsonToMetadatum } from '../../src/util/metadatum.js';
+import type { Asset, AssetInfoWithAmount, AssetProvider, HealthCheckResponse } from '../../src/index.js';
+import type { Ed25519PublicKeyHex, Ed25519SignatureHex } from '@cardano-sdk/crypto';
 
 const createMockInputResolver = (historicalTxs: Cardano.HydratedTx[]): Cardano.InputResolver => ({
   async resolveInput(input: Cardano.TxIn) {

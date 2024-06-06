@@ -1,6 +1,6 @@
-import { Cardano } from '@cardano-sdk/core';
-import { ChangeAddressResolver, Selection } from '@cardano-sdk/input-selection';
-import { GreedyTxEvaluator } from '../../src';
+import { GreedyTxEvaluator } from '../../src/index.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { ChangeAddressResolver, Selection } from '@cardano-sdk/input-selection';
 
 export class MockChangeAddressResolver implements ChangeAddressResolver {
   async resolve(selection: Selection) {

@@ -1,7 +1,7 @@
 // only tested in ../e2e tests
-import { MessengerPort } from './types';
-import { Runtime } from 'webextension-polyfill';
-import { isResponseMessage } from './util';
+import { isResponseMessage } from './util.js';
+import type { MessengerPort } from './types.js';
+import type { Runtime } from 'webextension-polyfill';
 
 const noOp = () => void 0;
 

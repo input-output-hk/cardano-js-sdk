@@ -1,2 +1,2 @@
-export * from './DbSyncNetworkInfoProvider';
-export * from './NetworkInfoHttpService';
+export * from './DbSyncNetworkInfoProvider/index.js';
+export * from './NetworkInfoHttpService.js';

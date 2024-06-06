@@ -1,6 +1,6 @@
 import { OutsideRangeError } from '@cardano-sdk/util';
-import { ProviderServerOptionDescriptions } from '../../src';
-import { cacheTtlValidator } from '../../src/util/validators';
+import { ProviderServerOptionDescriptions } from '../../src/index.js';
+import { cacheTtlValidator } from '../../src/util/validators.js';
 
 describe('utils/validators', () => {
   describe('cacheTtlValidator', () => {

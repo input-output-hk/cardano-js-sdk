@@ -1,5 +1,5 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
 import { TokensEntity } from '@cardano-sdk/projection-typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class TokensQuantityNumericMigrations1691042603934 implements MigrationInterface {
   static entity = TokensEntity;

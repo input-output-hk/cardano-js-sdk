@@ -1,8 +1,8 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import * as Cardano from '../../../../src/Cardano';
+import * as Cardano from '../../../../src/Cardano/index.js';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
-import { Voter } from '../../../../src/Serialization';
+import { Voter } from '../../../../src/Serialization/index.js';
 
 const testVoter = (voterType: string, cbor: HexBlob, core: Cardano.Voter) => {
   describe(`Voter ${voterType}`, () => {

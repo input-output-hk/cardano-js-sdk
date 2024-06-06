@@ -1,5 +1,6 @@
-import { IncomingMessage, RequestListener, createServer } from 'http';
+import { createServer } from 'http';
 import { getRandomPort } from 'get-port-please';
+import type { IncomingMessage, RequestListener } from 'http';
 
 export type MockHandler = (req?: IncomingMessage) => Promise<{ body?: unknown; code?: number }>;
 export type ListenerGenerator = (handler: MockHandler) => RequestListener;

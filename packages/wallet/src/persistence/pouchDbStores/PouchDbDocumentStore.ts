@@ -1,9 +1,9 @@
 /* eslint-disable promise/always-return */
-import { DocumentStore } from '../types';
 import { EMPTY, Observable } from 'rxjs';
-import { Logger } from 'ts-log';
-import { PouchDbStore } from './PouchDbStore';
-import { sanitizePouchDbDoc } from './util';
+import { PouchDbStore } from './PouchDbStore.js';
+import { sanitizePouchDbDoc } from './util.js';
+import type { DocumentStore } from '../types.js';
+import type { Logger } from 'ts-log';
 
 /** PouchDB implementation that uses a shared db for multiple PouchDbDocumentStores */
 export class PouchDbDocumentStore<T extends {}> extends PouchDbStore<T> implements DocumentStore<T> {

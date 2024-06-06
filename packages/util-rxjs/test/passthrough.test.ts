@@ -1,5 +1,5 @@
 import { of } from 'rxjs';
-import { passthrough } from '../src';
+import { passthrough } from '../src/index.js';
 
 describe('passthrough', () => {
   it('returns source observable', () => {

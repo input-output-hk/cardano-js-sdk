@@ -1,7 +1,7 @@
-import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { WithCertificates } from './withCertificates';
-import { unifiedProjectorOperator } from '../../utils';
+import { unifiedProjectorOperator } from '../../utils/index.js';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { WithCertificates } from './withCertificates.js';
 
 export interface WithStakeKeys {
   stakeKeys: {

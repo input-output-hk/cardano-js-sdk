@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { logger } from '@cardano-sdk/util-dev';
-import { providerHandler } from '../../src/util';
+import { providerHandler } from '../../src/util/index.js';
 
 describe('util/provider', () => {
   describe('providerHandler', () => {

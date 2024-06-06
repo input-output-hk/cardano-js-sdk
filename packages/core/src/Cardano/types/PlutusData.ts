@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable unicorn/number-literal-case */
 
-import { HexBlob } from '@cardano-sdk/util';
+import type { HexBlob } from '@cardano-sdk/util';
 
 export enum PlutusListEncoding {
   FixedLength,

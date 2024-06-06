@@ -1,7 +1,8 @@
-import { CollectionStore } from '../types';
-import { EMPTY, Observable, Subject, delay, of, tap } from 'rxjs';
-import { InMemoryStore } from './InMemoryStore';
-import { observeAll } from '../util';
+import { EMPTY, Subject, delay, of, tap } from 'rxjs';
+import { InMemoryStore } from './InMemoryStore.js';
+import { observeAll } from '../util.js';
+import type { CollectionStore } from '../types.js';
+import type { Observable } from 'rxjs';
 
 export class InMemoryCollectionStore<T> extends InMemoryStore implements CollectionStore<T> {
   readonly #updates$ = new Subject<T[]>();

@@ -1,8 +1,9 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, GroupedAddress, KeyRole } from '@cardano-sdk/key-management';
+import { AddressType, KeyRole } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
-import { TrezorTxTransformerContext } from '../src';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
+import type { TrezorTxTransformerContext } from '../src/index.js';
 
 export const mintTokenMap = new Map([
   [Cardano.AssetId('2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740'), 20n],

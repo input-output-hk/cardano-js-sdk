@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
-import { StakePoolEntity } from './StakePool.entity';
-import { UInt64ColumnOptions } from './util';
+import { StakePoolEntity } from './StakePool.entity.js';
+import { UInt64ColumnOptions } from './util.js';
 
 @Entity()
 @Unique(['epochNo', 'stakePoolId'])

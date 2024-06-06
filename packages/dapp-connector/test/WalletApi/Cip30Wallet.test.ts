@@ -1,16 +1,14 @@
-import * as testWallet from '../testWallet';
-import {
-  ApiError,
-  Cip30EnableOptions,
-  Cip30Wallet,
-  Cip30WalletApiWithPossibleExtensions,
-  CipMethodsMapping,
-  RemoteAuthenticator,
-  WalletApiExtension
-} from '../../src';
+import * as testWallet from '../testWallet.js';
+import { ApiError, Cip30Wallet, CipMethodsMapping } from '../../src/index.js';
 import { Cardano } from '@cardano-sdk/core';
 import { dummyLogger } from 'ts-log';
 import browser from 'webextension-polyfill';
+import type {
+  Cip30EnableOptions,
+  Cip30WalletApiWithPossibleExtensions,
+  RemoteAuthenticator,
+  WalletApiExtension
+} from '../../src/index.js';
 
 describe('Wallet', () => {
   const logger = dummyLogger;

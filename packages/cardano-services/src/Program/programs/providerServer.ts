@@ -6,39 +6,53 @@ import {
   DbSyncAssetProvider,
   DbSyncNftMetadataService,
   StubTokenMetadataService
-} from '../../Asset';
-import { CardanoNode, HandleProvider, Seconds } from '@cardano-sdk/core';
-import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../../ChainHistory';
-import { ConnectionNames, PostgresOptionDescriptions, suffixType2Cli } from '../options/postgres';
-import { DbPools, DbSyncEpochPollService } from '../../util';
-import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../NetworkInfo';
-import { DbSyncRewardsProvider, RewardsHttpService } from '../../Rewards';
-import { DbSyncStakePoolProvider, StakePoolHttpService, createHttpStakePoolMetadataService } from '../../StakePool';
-import { DbSyncUtxoProvider, UtxoHttpService } from '../../Utxo';
-import { DnsResolver, createDnsResolver, getCardanoNode, getDbPools, getGenesisData } from '../utils';
-import { GenesisData } from '../../types';
-import { HandleHttpService, TypeOrmHandleProvider } from '../../Handle';
-import { HandlePolicyIdsOptionDescriptions, handlePolicyIdsFromFile } from '../options/policyIds';
-import { HttpServer, HttpServerConfig, HttpService, getListen } from '../../Http';
-import { InMemoryCache, NoCache } from '../../InMemoryCache';
-import { Logger } from 'ts-log';
-import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from '../errors';
-import { Observable } from 'rxjs';
-import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
-import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
-import { Pool } from 'pg';
-import { ProviderServerArgs, ProviderServerOptionDescriptions, ServiceNames } from './types';
-import { SrvRecord } from 'dns';
+} from '../../Asset/index.js';
+import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../../ChainHistory/index.js';
+import { DbSyncEpochPollService } from '../../util/index.js';
+import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../NetworkInfo/index.js';
+import { DbSyncRewardsProvider, RewardsHttpService } from '../../Rewards/index.js';
+import {
+  DbSyncStakePoolProvider,
+  StakePoolHttpService,
+  createHttpStakePoolMetadataService
+} from '../../StakePool/index.js';
+import { DbSyncUtxoProvider, UtxoHttpService } from '../../Utxo/index.js';
+import { HandleHttpService, TypeOrmHandleProvider } from '../../Handle/index.js';
+import { HandlePolicyIdsOptionDescriptions, handlePolicyIdsFromFile } from '../options/policyIds.js';
+import { HttpServer, getListen } from '../../Http/index.js';
+import { InMemoryCache, NoCache } from '../../InMemoryCache/index.js';
+import {
+  MissingProgramOption,
+  MissingServiceDependency,
+  RunnableDependencies,
+  UnknownServiceName
+} from '../errors/index.js';
+import { PostgresOptionDescriptions, suffixType2Cli } from '../options/postgres.js';
+import { ProviderServerOptionDescriptions, ServiceNames } from './types.js';
 import { TxSubmitApiProvider } from '@cardano-sdk/cardano-services-client';
-import { TxSubmitHttpService } from '../../TxSubmit';
-import { TypeormAssetProvider } from '../../Asset/TypeormAssetProvider';
-import { TypeormStakePoolProvider } from '../../StakePool/TypeormStakePoolProvider/TypeormStakePoolProvider';
-import { createDbSyncMetadataService } from '../../Metadata';
+import { TxSubmitHttpService } from '../../TxSubmit/index.js';
+import { TypeormAssetProvider } from '../../Asset/TypeormAssetProvider/index.js';
+import { TypeormStakePoolProvider } from '../../StakePool/TypeormStakePoolProvider/TypeormStakePoolProvider.js';
+import { createDbSyncMetadataService } from '../../Metadata/index.js';
+import { createDnsResolver, getCardanoNode, getDbPools, getGenesisData } from '../utils.js';
 import { createLogger } from 'bunyan';
-import { getConnectionConfig, getOgmiosTxSubmitProvider } from '../services';
-import { getEntities } from '../../Projection/prepareTypeormProjection';
+import { getConnectionConfig, getOgmiosTxSubmitProvider } from '../services/index.js';
+import { getEntities } from '../../Projection/prepareTypeormProjection.js';
 import { isNotNil } from '@cardano-sdk/util';
-import memoize from 'lodash/memoize';
+import memoize from 'lodash/memoize.js';
+import type { CardanoNode, HandleProvider, Seconds } from '@cardano-sdk/core';
+import type { ConnectionNames } from '../options/postgres.js';
+import type { DbPools } from '../../util/index.js';
+import type { DnsResolver } from '../utils.js';
+import type { GenesisData } from '../../types.js';
+import type { HttpServerConfig, HttpService } from '../../Http/index.js';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
+import type { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
+import type { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
+import type { Pool } from 'pg';
+import type { ProviderServerArgs } from './types.js';
+import type { SrvRecord } from 'dns';
 
 export const ALLOWED_ORIGINS_DEFAULT = false;
 export const DISABLE_DB_CACHE_DEFAULT = false;

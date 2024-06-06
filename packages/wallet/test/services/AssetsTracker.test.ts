@@ -1,15 +1,15 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
 import { AssetId, createTestScheduler, generateRandomHexString, logger } from '@cardano-sdk/util-dev';
-import {
+import { createAssetsTracker } from '../../src/services/index.js';
+import type {
   AssetService,
   AssetsTrackerProps,
   TrackedAssetProvider,
-  TransactionsTracker,
-  createAssetsTracker
-} from '../../src/services';
+  TransactionsTracker
+} from '../../src/services/index.js';
 
-import { RetryBackoffConfig } from 'backoff-rxjs';
 import { from, lastValueFrom, of, tap } from 'rxjs';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
 
 const createTxWithValues = (values: Partial<Cardano.Value>[]): Cardano.HydratedTx =>
   ({ body: { outputs: values.map((value) => ({ value })) }, id: generateRandomHexString(64) } as Cardano.HydratedTx);

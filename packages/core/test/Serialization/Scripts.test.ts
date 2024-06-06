@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
 
-import { Cardano, Serialization } from '../../src';
+import { Cardano, Serialization } from '../../src/index.js';
 import { HexBlob } from '@cardano-sdk/util';
 
 // Test data used in the following tests was generated with the cardano-cli and the cardano-serialization-lib

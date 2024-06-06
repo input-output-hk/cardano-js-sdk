@@ -1,7 +1,5 @@
 /* eslint-disable max-params */
-import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
-import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
-import { InputSelectionParameters, InputSelector, SelectionConstraints, SelectionResult } from '../types';
+import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError.js';
 import {
   addTokenMaps,
   getCoinQuantity,
@@ -10,8 +8,11 @@ import {
   stubMaxSizeAddress,
   subtractTokenMaps,
   toValues
-} from '../util';
-import { sortUtxoByTxIn, splitChange } from './util';
+} from '../util.js';
+import { coalesceValueQuantities } from '@cardano-sdk/core';
+import { sortUtxoByTxIn, splitChange } from './util.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { InputSelectionParameters, InputSelector, SelectionConstraints, SelectionResult } from '../types.js';
 
 /** Greedy selection initialization properties. */
 export interface GreedySelectorProps {

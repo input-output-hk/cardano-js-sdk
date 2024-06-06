@@ -1,7 +1,7 @@
-import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { Cardano } from '@cardano-sdk/core';
-import { LedgerTxTransformerContext } from '../types';
-import { mapTxIns } from './txIn';
+import { mapTxIns } from './txIn.js';
+import type * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import type { Cardano } from '@cardano-sdk/core';
+import type { LedgerTxTransformerContext } from '../types.js';
 
 export const mapCollateralTxIns = (
   collateralTxIns: Cardano.TxIn[] | undefined,

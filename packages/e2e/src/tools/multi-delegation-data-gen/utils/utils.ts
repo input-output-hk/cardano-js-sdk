@@ -1,11 +1,10 @@
 /* eslint-disable no-console, max-statements, max-params, @typescript-eslint/no-floating-promises */
-import { ValueTransferConfig, configLoader } from './config';
+import { configLoader } from './config.js';
+import type { ValueTransferConfig } from './config.js';
 
-import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano } from '@cardano-sdk/core';
-import { Files, Paths } from './files';
+import { Files, Paths } from './files.js';
 import {
-  KeyAgentFactoryProps,
   MINUTE,
   firstValueFromTimed,
   getEnv,
@@ -13,12 +12,16 @@ import {
   submitAndConfirm,
   walletReady,
   walletVariables
-} from '../../../';
-import { Observable, filter, firstValueFrom, map } from 'rxjs';
-import { TaskResult, TerminalProgressMonitor } from './terminal-progress-monitor';
+} from '../../../index.js';
+import { TaskResult } from './terminal-progress-monitor.js';
+import { filter, firstValueFrom, map } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 import { util } from '@cardano-sdk/key-management';
 import chalk from 'chalk';
+import type { BaseWallet } from '@cardano-sdk/wallet';
+import type { KeyAgentFactoryProps } from '../../../index.js';
+import type { Observable } from 'rxjs';
+import type { TerminalProgressMonitor } from './terminal-progress-monitor.js';
 
 /**
  * Gets a list of the available pool.

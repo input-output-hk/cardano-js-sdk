@@ -1,7 +1,8 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { Mappers, UnifiedExtChainSyncEvent, WithBlock } from '../../../../src';
+import { Mappers } from '../../../../src/index.js';
 import { firstValueFrom, of } from 'rxjs';
+import type { UnifiedExtChainSyncEvent, WithBlock } from '../../../../src/index.js';
 
 type EventData = Mappers.WithCertificates & { eventType: ChainSyncEventType };
 

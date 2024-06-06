@@ -1,13 +1,8 @@
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import {
-  UnifiedExtChainSyncEvent,
-  WithEpochBoundary,
-  WithEpochNo,
-  WithNetworkInfo,
-  withEpochBoundary
-} from '../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
-import { stubEraSummaries } from '../util';
+import { stubEraSummaries } from '../util.js';
+import { withEpochBoundary } from '../../src/index.js';
+import type { UnifiedExtChainSyncEvent, WithEpochBoundary, WithEpochNo, WithNetworkInfo } from '../../src/index.js';
 
 const createEvent = (epochNo: number, eventType: ChainSyncEventType, crossEpochBoundary?: boolean) =>
   ({

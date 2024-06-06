@@ -5,18 +5,15 @@ import {
   emptyPoolsExtraInfo,
   getStakePoolSortType,
   queryCacheKey
-} from './util';
-import {
-  Cardano,
-  Paginated,
-  ProviderError,
-  ProviderFailure,
-  QueryStakePoolsArgs,
-  SortField,
-  StakePoolProvider,
-  StakePoolStats
-} from '@cardano-sdk/core';
-import {
+} from './util.js';
+import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { DbSyncProvider } from '../../util/index.js';
+import { RunnableModule, resolveObjectValues } from '@cardano-sdk/util';
+import { StakePoolBuilder } from './StakePoolBuilder.js';
+import { UNLIMITED_CACHE_TTL } from '../../InMemoryCache/index.js';
+import { toStakePoolResults } from './mappers.js';
+import merge from 'lodash/merge.js';
+import type {
   CommonPoolInfo,
   OrderedResult,
   PoolAPY,
@@ -25,15 +22,13 @@ import {
   PoolSortType,
   PoolUpdate,
   StakePoolResults
-} from './types';
-import { DbSyncProvider, DbSyncProviderDependencies, Disposer, EpochMonitor } from '../../util';
-import { GenesisData } from '../../types';
-import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
-import { PromiseOrValue, RunnableModule, resolveObjectValues } from '@cardano-sdk/util';
-import { StakePoolBuilder } from './StakePoolBuilder';
-import { StakePoolMetadataService } from '../types';
-import { toStakePoolResults } from './mappers';
-import merge from 'lodash/merge';
+} from './types.js';
+import type { DbSyncProviderDependencies, Disposer, EpochMonitor } from '../../util/index.js';
+import type { GenesisData } from '../../types.js';
+import type { InMemoryCache } from '../../InMemoryCache/index.js';
+import type { Paginated, QueryStakePoolsArgs, SortField, StakePoolProvider, StakePoolStats } from '@cardano-sdk/core';
+import type { PromiseOrValue } from '@cardano-sdk/util';
+import type { StakePoolMetadataService } from '../types.js';
 
 /** Properties that are need to create DbSyncStakePoolProvider */
 export interface StakePoolProviderProps {

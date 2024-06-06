@@ -1,7 +1,7 @@
 import { Cardano, Serialization } from '@cardano-sdk/core';
-import { Cip30DataSignature, WalletApi, WalletProperties } from '../src/WalletApi';
-import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
-import { RemoteAuthenticator } from '../src';
+import type { Cip30DataSignature, WalletApi, WalletProperties } from '../src/WalletApi/index.js';
+import type { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
+import type { RemoteAuthenticator } from '../src/index.js';
 
 export const api = <WalletApi>{
   getBalance: async () => '100',

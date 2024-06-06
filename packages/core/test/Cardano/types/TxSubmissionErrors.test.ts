@@ -1,4 +1,4 @@
-import { CardanoNodeErrors } from '../../../src';
+import { CardanoNodeErrors } from '../../../src/index.js';
 import { TxSubmission } from '@cardano-ogmios/client';
 
 describe('Cardano/types/TxSubmissionErrors', () => {

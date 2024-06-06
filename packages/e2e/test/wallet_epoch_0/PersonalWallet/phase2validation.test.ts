@@ -1,10 +1,12 @@
-import { BaseWallet, FinalizeTxProps, TransactionFailure } from '@cardano-sdk/wallet';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { HexBlob, isNotNil } from '@cardano-sdk/util';
-import { InitializeTxProps, computeScriptDataHash } from '@cardano-sdk/tx-construction';
+import { TransactionFailure } from '@cardano-sdk/wallet';
+import { computeScriptDataHash } from '@cardano-sdk/tx-construction';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
-import { firstValueFromTimed, getEnv, getWallet, walletReady, walletVariables } from '../../../src';
+import { firstValueFromTimed, getEnv, getWallet, walletReady, walletVariables } from '../../../src/index.js';
+import type { BaseWallet, FinalizeTxProps } from '@cardano-sdk/wallet';
+import type { InitializeTxProps } from '@cardano-sdk/tx-construction';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();

@@ -1,6 +1,9 @@
-import * as mappers from '../../../src/ChainHistory/DbSyncChainHistory/mappers';
+import * as mappers from '../../../src/ChainHistory/DbSyncChainHistory/mappers.js';
 import { AssetId } from '@cardano-sdk/util-dev';
-import {
+import { Cardano } from '@cardano-sdk/core';
+import { Hash28ByteBase16, Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { HexBlob } from '@cardano-sdk/util';
+import type {
   BlockModel,
   BlockOutputModel,
   CertificateModel,
@@ -23,10 +26,7 @@ import {
   WithCertIndex,
   WithCertType,
   WithdrawalModel
-} from '../../../src/ChainHistory/DbSyncChainHistory/types';
-import { Cardano } from '@cardano-sdk/core';
-import { Hash28ByteBase16, Hash32ByteBase16 } from '@cardano-sdk/crypto';
-import { HexBlob } from '@cardano-sdk/util';
+} from '../../../src/ChainHistory/DbSyncChainHistory/types.js';
 
 const blockHash = '7a48b034645f51743550bbaf81f8a14771e58856e031eb63844738ca8ad72298';
 const poolId = 'pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh';

@@ -1,5 +1,5 @@
-import { Asset } from '../../src';
-import { AssetName } from '../../src/Cardano';
+import { Asset } from '../../src/index.js';
+import { AssetName } from '../../src/Cardano/index.js';
 import { InvalidArgumentError } from '@cardano-sdk/util';
 
 const cases: [Asset.AssetNameLabel, string][] = [

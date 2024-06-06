@@ -1,10 +1,8 @@
 /* eslint-disable unicorn/no-nested-ternary */
-import * as Crypto from '@cardano-sdk/crypto';
 import { BigIntMath, deepEquals, isNotNil } from '@cardano-sdk/util';
-import { Cardano, RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import {
   EMPTY,
-  Observable,
   combineLatest,
   concat,
   distinctUntilChanged,
@@ -18,17 +16,20 @@ import {
   switchMap,
   tap
 } from 'rxjs';
-import { KeyValueStore } from '../../persistence';
-import { OutgoingOnChainTx, TxInFlight } from '../types';
-import { PAGE_SIZE } from '../TransactionsTracker';
-import { RetryBackoffConfig } from 'backoff-rxjs';
-import { TrackedStakePoolProvider } from '../ProviderTracker';
-import { TxWithEpoch } from './types';
+import { PAGE_SIZE } from '../TransactionsTracker.js';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
-import { lastStakeKeyCertOfType } from './transactionCertificates';
-import findLast from 'lodash/findLast';
-import isEqual from 'lodash/isEqual';
-import uniq from 'lodash/uniq';
+import { lastStakeKeyCertOfType } from './transactionCertificates.js';
+import findLast from 'lodash/findLast.js';
+import isEqual from 'lodash/isEqual.js';
+import uniq from 'lodash/uniq.js';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { KeyValueStore } from '../../persistence/index.js';
+import type { Observable } from 'rxjs';
+import type { OutgoingOnChainTx, TxInFlight } from '../types.js';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
+import type { RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
+import type { TrackedStakePoolProvider } from '../ProviderTracker/index.js';
+import type { TxWithEpoch } from './types.js';
 
 const allStakePoolsByPoolIds = async (
   stakePoolProvider: StakePoolProvider,

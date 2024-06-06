@@ -1,3 +1,3 @@
-export * from './inMemoryStores';
-export * from './pouchDbStores';
-export * from './types';
+export * from './inMemoryStores/index.js';
+export * from './pouchDbStores/index.js';
+export * from './types.js';

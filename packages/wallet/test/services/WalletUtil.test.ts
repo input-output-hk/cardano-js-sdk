@@ -1,27 +1,21 @@
 import * as Crypto from '@cardano-sdk/crypto';
+import { AddressType, Bip32Account, util as KeyManagementUtil, KeyRole } from '@cardano-sdk/key-management';
+import { Cardano } from '@cardano-sdk/core';
 import {
-  AddressType,
-  Bip32Account,
-  GroupedAddress,
-  util as KeyManagementUtil,
-  KeyRole
-} from '@cardano-sdk/key-management';
-import {
-  BaseWallet,
-  ObservableWallet,
-  ScriptAddress,
   combineInputResolvers,
   createBackendInputResolver,
   createInputResolver,
   createPersonalWallet,
   requiresForeignSignatures
-} from '../../src';
-import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
-import { DrepScriptHashVoter } from '@cardano-sdk/core/dist/cjs/Cardano';
-import { createAsyncKeyAgent, signTx, toSignedTx, waitForWalletStateSettle } from '../util';
+} from '../../src/index.js';
+import { createAsyncKeyAgent, signTx, toSignedTx, waitForWalletStateSettle } from '../util.js';
 import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
 import { of } from 'rxjs';
+import type { BaseWallet, ObservableWallet, ScriptAddress } from '../../src/index.js';
+import type { ChainHistoryProvider } from '@cardano-sdk/core';
+import type { DrepScriptHashVoter } from '@cardano-sdk/core/dist/cjs/Cardano';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
 
 const createMockChainHistoryProvider = (txs: Cardano.HydratedTx[] = []): ChainHistoryProvider => {
   const chainHistoryProvider = {

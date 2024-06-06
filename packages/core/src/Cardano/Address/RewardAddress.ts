@@ -1,8 +1,9 @@
 /* eslint-disable no-bitwise */
-import { Address, AddressProps, AddressType, Credential, CredentialType } from './Address';
+import { Address, AddressType, CredentialType } from './Address.js';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { InvalidArgumentError } from '@cardano-sdk/util';
-import { NetworkId } from '../ChainId';
+import type { AddressProps, Credential } from './Address.js';
+import type { NetworkId } from '../ChainId.js';
 
 /**
  * A reward address is a cryptographic hash of the public stake key of the address. Reward account addresses are used

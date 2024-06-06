@@ -1,6 +1,6 @@
-import { AssetFingerprint, AssetId, AssetName, PolicyId, TransactionId } from '../../Cardano';
-import { NftMetadata } from '../NftMetadata';
-import { TokenMetadata } from './TokenMetadata';
+import type { AssetFingerprint, AssetId, AssetName, PolicyId, TransactionId } from '../../Cardano/index.js';
+import type { NftMetadata } from '../NftMetadata/index.js';
+import type { TokenMetadata } from './TokenMetadata.js';
 
 export interface AssetMintOrBurn {
   transactionId: TransactionId;

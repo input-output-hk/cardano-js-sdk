@@ -1,7 +1,8 @@
-import * as Cardano from '../../../Cardano';
-import { CborReader, CborWriter } from '../../CBOR';
-import { GovernanceActionKind } from './GovernanceActionKind';
-import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import * as Cardano from '../../../Cardano/index.js';
+import { CborReader, CborWriter } from '../../CBOR/index.js';
+import { GovernanceActionKind } from './GovernanceActionKind.js';
+import { InvalidArgumentError } from '@cardano-sdk/util';
+import type { HexBlob } from '@cardano-sdk/util';
 
 const EMBEDDED_GROUP_SIZE = 1;
 

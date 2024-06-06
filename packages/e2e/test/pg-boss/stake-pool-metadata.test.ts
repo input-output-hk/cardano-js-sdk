@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 import { STAKE_POOL_METADATA_QUEUE } from '@cardano-sdk/projection-typeorm';
-import { getEnv } from '../../src';
+import { getEnv } from '../../src/index.js';
 
 const expectedPoolMetadata = [
   {

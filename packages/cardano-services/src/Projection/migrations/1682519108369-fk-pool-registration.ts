@@ -1,5 +1,5 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
 import { PoolRegistrationEntity } from '@cardano-sdk/projection-typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class FkPoolRegistrationMigration1682519108369 implements MigrationInterface {
   static entity = PoolRegistrationEntity;

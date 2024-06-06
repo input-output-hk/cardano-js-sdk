@@ -1,24 +1,12 @@
-import { BaseProjectionEvent } from '@cardano-sdk/projection';
-import {
-  EMPTY,
-  Observable,
-  OperatorFunction,
-  Subscription,
-  last,
-  map,
-  merge,
-  of,
-  share,
-  startWith,
-  switchMap,
-  takeUntil,
-  timer
-} from 'rxjs';
-import { HealthCheckResponse, Milliseconds } from '@cardano-sdk/core';
-import { HttpService } from '../Http';
-import { Logger } from 'ts-log';
-import { ProjectionName } from './prepareTypeormProjection';
+import { EMPTY, last, map, merge, of, share, startWith, switchMap, takeUntil, timer } from 'rxjs';
+import { HttpService } from '../Http/index.js';
+import { Milliseconds } from '@cardano-sdk/core';
 import express from 'express';
+import type { BaseProjectionEvent } from '@cardano-sdk/projection';
+import type { HealthCheckResponse } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { Observable, OperatorFunction, Subscription } from 'rxjs';
+import type { ProjectionName } from './prepareTypeormProjection.js';
 
 export interface ProjectionServiceProps<T> {
   projection$: Observable<T>;

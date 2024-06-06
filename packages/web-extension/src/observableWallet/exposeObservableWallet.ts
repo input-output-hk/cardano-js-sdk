@@ -1,7 +1,8 @@
-import { MessengerDependencies, exposeApi } from '../messaging';
-import { ObservableWallet } from '@cardano-sdk/wallet';
-import { observableWalletChannel, observableWalletProperties } from './util';
+import { exposeApi } from '../messaging/index.js';
+import { observableWalletChannel, observableWalletProperties } from './util.js';
 import { of } from 'rxjs';
+import type { MessengerDependencies } from '../messaging/index.js';
+import type { ObservableWallet } from '@cardano-sdk/wallet';
 
 export interface ExposeObservableWalletProps {
   wallet: ObservableWallet;

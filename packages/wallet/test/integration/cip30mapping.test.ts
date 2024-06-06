@@ -7,20 +7,13 @@ import {
   ApiError,
   DataSignError,
   DataSignErrorCode,
-  Paginate,
-  SenderContext,
   TxSendError,
-  TxSignError,
-  WalletApi,
-  WithSenderContext
+  TxSignError
 } from '@cardano-sdk/dapp-connector';
-import { AddressType, Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, util } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
-import { BaseWallet, cip30, createPersonalWallet } from '../../src';
-import { CallbackConfirmation, GetCollateralCallbackParams } from '../../src/cip30';
 import {
   Cardano,
-  OutsideOfValidityIntervalData,
   Serialization,
   TxCBOR,
   TxSubmissionError,
@@ -28,14 +21,21 @@ import {
   coalesceValueQuantities
 } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
-import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
-import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
-import { Providers, createWallet } from './util';
-import { buildDRepIDFromDRepKey, signTx, waitForWalletStateSettle } from '../util';
+import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence/index.js';
+import { buildDRepIDFromDRepKey, signTx, waitForWalletStateSettle } from '../util.js';
+import { cip30, createPersonalWallet } from '../../src/index.js';
+import { createWallet } from './util.js';
 import { firstValueFrom, of } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
-import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
-import uniq from 'lodash/uniq';
+import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks/index.js';
+import uniq from 'lodash/uniq.js';
+import type { BaseWallet } from '../../src/index.js';
+import type { CallbackConfirmation, GetCollateralCallbackParams } from '../../src/cip30.js';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
+import type { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
+import type { OutsideOfValidityIntervalData } from '@cardano-sdk/core';
+import type { Paginate, SenderContext, WalletApi, WithSenderContext } from '@cardano-sdk/dapp-connector';
+import type { Providers } from './util.js';
 
 const {
   mockChainHistoryProvider,

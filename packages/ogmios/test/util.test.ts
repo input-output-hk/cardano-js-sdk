@@ -1,13 +1,13 @@
-import { HEALTH_RESPONSE_BODY } from './mocks/util';
-import { InteractionContext, ServerHealth } from '@cardano-ogmios/client';
-import { Logger } from 'ts-log';
+import { HEALTH_RESPONSE_BODY } from './mocks/util.js';
 import { Percent } from '@cardano-sdk/util';
-import { createInteractionContextWithLogger, ogmiosServerHealthToHealthCheckResponse } from '../src';
+import { createInteractionContextWithLogger, ogmiosServerHealthToHealthCheckResponse } from '../src/index.js';
 import { createLogger } from '@cardano-sdk/util-dev';
-import { createMockOgmiosServer, listenPromise, serverClosePromise } from './mocks/mockOgmiosServer';
+import { createMockOgmiosServer, listenPromise, serverClosePromise } from './mocks/mockOgmiosServer.js';
 import { getRandomPort } from 'get-port-please';
-import WebSocket from 'ws';
-import http from 'http';
+import type { InteractionContext, ServerHealth } from '@cardano-ogmios/client';
+import type { Logger } from 'ts-log';
+import type WebSocket from 'ws';
+import type http from 'http';
 
 const closeWithCode = (socket: WebSocket, code: number) =>
   new Promise((resolve, reject) => {

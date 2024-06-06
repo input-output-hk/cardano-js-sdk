@@ -1,3 +1,3 @@
-export * from './exposeKeyAgent';
-export * from './consumeKeyAgent';
-export * from './util';
+export * from './exposeKeyAgent.js';
+export * from './consumeKeyAgent.js';
+export * from './util.js';

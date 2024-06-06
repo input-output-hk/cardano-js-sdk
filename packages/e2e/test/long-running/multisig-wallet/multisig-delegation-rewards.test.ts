@@ -1,11 +1,7 @@
-import * as Crypto from '@cardano-sdk/crypto';
-import { BaseWallet } from '@cardano-sdk/wallet';
-import { Cardano, EraSummary, StakePoolProvider, createSlotEpochCalc } from '@cardano-sdk/core';
-import { InMemoryKeyAgent, KeyRole } from '@cardano-sdk/key-management';
-import { MultiSigTx } from './MultiSigTx';
-import { MultiSigWallet } from './MultiSigWallet';
-import { Observable, filter, firstValueFrom, map, take } from 'rxjs';
-import { TrackerSubject } from '@cardano-sdk/util-rxjs';
+import { Cardano, createSlotEpochCalc } from '@cardano-sdk/core';
+import { KeyRole } from '@cardano-sdk/key-management';
+import { MultiSigTx } from './MultiSigTx.js';
+import { MultiSigWallet } from './MultiSigWallet.js';
 import {
   bip32Ed25519Factory,
   createStandaloneKeyAgent,
@@ -14,9 +10,16 @@ import {
   waitForEpoch,
   walletReady,
   walletVariables
-} from '../../../src';
+} from '../../../src/index.js';
+import { filter, firstValueFrom, map, take } from 'rxjs';
 import { isNotNil } from '@cardano-sdk/util';
 import { logger } from '@cardano-sdk/util-dev';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { BaseWallet } from '@cardano-sdk/wallet';
+import type { EraSummary, StakePoolProvider } from '@cardano-sdk/core';
+import type { InMemoryKeyAgent } from '@cardano-sdk/key-management';
+import type { Observable } from 'rxjs';
+import type { TrackerSubject } from '@cardano-sdk/util-rxjs';
 
 const env = getEnv(walletVariables);
 

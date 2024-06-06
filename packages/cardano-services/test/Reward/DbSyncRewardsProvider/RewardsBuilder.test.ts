@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Pool } from 'pg';
-import { RewardsBuilder } from '../../../src';
-import { RewardsFixtureBuilder } from '../fixtures/FixtureBuilder';
+import { RewardsBuilder } from '../../../src/index.js';
+import { RewardsFixtureBuilder } from '../fixtures/FixtureBuilder.js';
 import { logger } from '@cardano-sdk/util-dev';
 
 describe('RewardsBuilder', () => {

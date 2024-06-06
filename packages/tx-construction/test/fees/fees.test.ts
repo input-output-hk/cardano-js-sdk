@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { MinFeeCoefficient, MinFeeConstant, minAdaRequired, minFee } from '../../src';
+import { MinFeeCoefficient, MinFeeConstant, minAdaRequired, minFee } from '../../src/index.js';
 import {
   babbageTx,
   babbageTxWithoutScript,
@@ -25,7 +25,7 @@ import {
   twoPolicyOne0CharAssetDatumHash,
   twoPolicyOne0CharAssetDatumHashMinAda,
   twoPolicyOne0CharAssetDatumMinAda
-} from '../testData';
+} from '../testData.js';
 import { generateRandomHexString } from '@cardano-sdk/util-dev';
 
 const COST_PER_UTXO_BYTE = BigInt(4310);

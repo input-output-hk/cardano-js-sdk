@@ -1,8 +1,8 @@
-import { CreatePouchDbStoresDependencies } from './types';
 import { EMPTY, map } from 'rxjs';
-import { PouchDbDocumentStore } from './PouchDbDocumentStore';
-import { StakeSummary, SupplySummary } from '@cardano-sdk/core';
-import { SupplyDistributionStores } from '../types';
+import { PouchDbDocumentStore } from './PouchDbDocumentStore.js';
+import type { CreatePouchDbStoresDependencies } from './types.js';
+import type { StakeSummary, SupplySummary } from '@cardano-sdk/core';
+import type { SupplyDistributionStores } from '../types.js';
 
 export class PouchDbStakeSummaryStore extends PouchDbDocumentStore<StakeSummary> {}
 export class PouchDbSupplySummaryStore extends PouchDbDocumentStore<SupplySummary> {}

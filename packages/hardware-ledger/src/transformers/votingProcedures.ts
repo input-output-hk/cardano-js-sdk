@@ -1,6 +1,6 @@
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { Cardano } from '@cardano-sdk/core';
-import { Transform } from '@cardano-sdk/util';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Transform } from '@cardano-sdk/util';
 
 /**
  * Maps a Voter to a Voter from the LedgerJS public types.

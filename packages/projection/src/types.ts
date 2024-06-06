@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Cardano, ChainSyncRollBackward, ChainSyncRollForward, EraSummary } from '@cardano-sdk/core';
-import { Observable } from 'rxjs';
-import { ObservableType } from '@cardano-sdk/util-rxjs';
+import type { Cardano, ChainSyncRollBackward, ChainSyncRollForward, EraSummary } from '@cardano-sdk/core';
+import type { Observable } from 'rxjs';
+import type { ObservableType } from '@cardano-sdk/util-rxjs';
 
 export type RollForwardEvent<ExtraProps = {}> = ExtraProps & ChainSyncRollForward;
 

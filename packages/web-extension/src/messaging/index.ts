@@ -1,17 +1,18 @@
-import { BackgroundMessenger, createBackgroundMessenger, generalizeBackgroundMessenger } from './BackgroundMessenger';
-import { ChannelName, ConsumeRemoteApiOptions, ExposeApiProps, MessengerDependencies } from './types';
-import { FinalizationRegistryDestructor } from './util';
-import { consumeMessengerRemoteApi, exposeMessengerApi } from './remoteApi';
-import { createNonBackgroundMessenger } from './NonBackgroundMessenger';
+import { FinalizationRegistryDestructor } from './util.js';
+import { consumeMessengerRemoteApi, exposeMessengerApi } from './remoteApi.js';
+import { createBackgroundMessenger, generalizeBackgroundMessenger } from './BackgroundMessenger.js';
+import { createNonBackgroundMessenger } from './NonBackgroundMessenger.js';
+import type { BackgroundMessenger } from './BackgroundMessenger.js';
+import type { ChannelName, ConsumeRemoteApiOptions, ExposeApiProps, MessengerDependencies } from './types.js';
 
-export * from './BackgroundMessenger';
-export * from './NonBackgroundMessenger';
-export * from './remoteApi';
-export * from './runContentScriptMessageProxy';
-export * from './types';
-export * from './util';
-export * from './injectedRuntime';
-export * from './errors';
+export * from './BackgroundMessenger.js';
+export * from './NonBackgroundMessenger.js';
+export * from './remoteApi.js';
+export * from './runContentScriptMessageProxy.js';
+export * from './types.js';
+export * from './util.js';
+export * from './injectedRuntime.js';
+export * from './errors.js';
 
 export type BaseChannel = { baseChannel: ChannelName };
 

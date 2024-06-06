@@ -1,5 +1,5 @@
 import { Cardano, util } from '@cardano-sdk/core';
-import { TypeOrmNftMetadataService, createDnsResolver, getConnectionConfig, getEntities } from '../../src';
+import { TypeOrmNftMetadataService, createDnsResolver, getConnectionConfig, getEntities } from '../../src/index.js';
 import { logger, mockProviders } from '@cardano-sdk/util-dev';
 
 describe('TypeOrmNftMetadataService', () => {

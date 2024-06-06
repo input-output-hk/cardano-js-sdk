@@ -1,13 +1,10 @@
-import { DataSource } from 'typeorm';
-import {
-  HandleEntity,
-  HandleMetadataEntity,
-  PgConnectionConfig,
-  createDataSource
-} from '@cardano-sdk/projection-typeorm';
-import { Observable, firstValueFrom } from 'rxjs';
-import { getEntities } from '../../src';
+import { HandleEntity, HandleMetadataEntity, createDataSource } from '@cardano-sdk/projection-typeorm';
+import { firstValueFrom } from 'rxjs';
+import { getEntities } from '../../src/index.js';
 import { logger } from '@cardano-sdk/util-dev';
+import type { DataSource } from 'typeorm';
+import type { Observable } from 'rxjs';
+import type { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 
 const queryHandle = (dataSource: DataSource) => dataSource.createQueryBuilder().from(HandleEntity, 'h');
 

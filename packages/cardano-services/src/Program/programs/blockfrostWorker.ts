@@ -1,11 +1,13 @@
-import { BlockfrostWorker, BlockfrostWorkerConfig, getPool } from '../services';
-import { CommonProgramOptions, PosgresProgramOptions, PostgresOptionDescriptions } from '../options';
-import { Logger } from 'ts-log';
-import { MissingProgramOption } from '../errors/MissingProgramOption';
-import { SrvRecord } from 'dns';
-import { createDnsResolver } from '../utils';
+import { BlockfrostWorker, getPool } from '../services/index.js';
+import { MissingProgramOption } from '../errors/MissingProgramOption.js';
+import { PostgresOptionDescriptions } from '../options/index.js';
+import { createDnsResolver } from '../utils.js';
 import { createLogger } from 'bunyan';
 import { readFile } from 'fs/promises';
+import type { BlockfrostWorkerConfig } from '../services/index.js';
+import type { CommonProgramOptions, PosgresProgramOptions } from '../options/index.js';
+import type { Logger } from 'ts-log';
+import type { SrvRecord } from 'dns';
 
 export const BLOCKFROST_WORKER_API_URL_DEFAULT = new URL('http://localhost:3000');
 export const CACHE_TTL_DEFAULT = 4 * 60; // Four hours
@@ -15,7 +17,7 @@ export const DRY_RUN_DEFAULT = false;
 export const SCAN_INTERVAL_DEFAULT = 60; // One hour
 
 export const availableNetworks = ['mainnet', 'preprod', 'preview'] as const;
-export type AvailableNetworks = typeof availableNetworks[number];
+export type AvailableNetworks = (typeof availableNetworks)[number];
 
 export enum BlockfrostWorkerOptionDescriptions {
   BlockfrostApiFile = 'Blockfrost API Key file path',

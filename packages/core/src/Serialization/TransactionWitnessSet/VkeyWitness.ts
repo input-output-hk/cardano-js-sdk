@@ -1,7 +1,7 @@
-import * as Crypto from '@cardano-sdk/crypto';
-import { CborReader, CborWriter } from '../CBOR';
+import { CborReader, CborWriter } from '../CBOR/index.js';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import { hexToBytes } from '../../util/misc';
+import { hexToBytes } from '../../util/misc/index.js';
+import type * as Crypto from '@cardano-sdk/crypto';
 
 const VKEY_ARRAY_SIZE = 2;
 

@@ -1,6 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 
-import { OutputValidator, createOutputValidator } from '../../src';
+import { createOutputValidator } from '../../src/index.js';
+import type { OutputValidator } from '../../src/index.js';
 
 describe('createOutputValidator', () => {
   let validator: OutputValidator;

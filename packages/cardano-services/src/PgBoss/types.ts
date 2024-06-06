@@ -1,11 +1,11 @@
-import { Cardano } from '@cardano-sdk/core';
-import { DataSource } from 'typeorm';
-import { Logger } from 'ts-log';
-import { PgBossWorkerArgs } from '../Program/services/pgboss';
-import { Pool } from 'pg';
-import { PoolRegistrationEntity, PoolRewardsEntity, availableQueues } from '@cardano-sdk/projection-typeorm';
+import type { Cardano } from '@cardano-sdk/core';
+import type { DataSource } from 'typeorm';
+import type { Logger } from 'ts-log';
+import type { PgBossWorkerArgs } from '../Program/services/pgboss.js';
+import type { Pool } from 'pg';
+import type { PoolRegistrationEntity, PoolRewardsEntity, availableQueues } from '@cardano-sdk/projection-typeorm';
 
-export type PgBossQueue = typeof availableQueues[number];
+export type PgBossQueue = (typeof availableQueues)[number];
 
 export type WorkerHandlerFactoryOptions = {
   dataSource: DataSource;

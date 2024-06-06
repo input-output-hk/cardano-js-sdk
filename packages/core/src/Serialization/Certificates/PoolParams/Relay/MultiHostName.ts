@@ -1,6 +1,7 @@
-import * as Cardano from '../../../../Cardano';
-import { CborReader, CborWriter } from '../../../CBOR';
-import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import { CborReader, CborWriter } from '../../../CBOR/index.js';
+import { InvalidArgumentError } from '@cardano-sdk/util';
+import type * as Cardano from '../../../../Cardano/index.js';
+import type { HexBlob } from '@cardano-sdk/util';
 
 const EMBEDDED_GROUP_SIZE = 2;
 const MULTI_HOST_NAME_RELAY_ID = 2;

@@ -1,7 +1,7 @@
-import { Cardano } from '../../../src';
 import { HexBlob } from '@cardano-sdk/util';
-import { RedeemerPurpose } from '../../../src/Cardano';
-import { Redeemers } from '../../../src/Serialization';
+import { RedeemerPurpose } from '../../../src/Cardano/index.js';
+import { Redeemers } from '../../../src/Serialization/index.js';
+import type { Cardano } from '../../../src/index.js';
 
 const core: Cardano.Redeemer[] = [
   {

@@ -6,8 +6,6 @@ import {
   NftMetadataEntity,
   OutputEntity,
   TokensEntity,
-  TypeormStabilityWindowBuffer,
-  TypeormTipTracker,
   createObservableConnection,
   storeAssets,
   storeBlock,
@@ -16,20 +14,24 @@ import {
   typeormTransactionCommit,
   willStoreHandleMetadata,
   withTypeormTransaction
-} from '../../src';
-import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
-import { Cardano, ObservableCardanoNode } from '@cardano-sdk/core';
+} from '../../src/index.js';
+import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
+import { Cardano } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
-import { HandleMetadata } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
-import { Observable, firstValueFrom } from 'rxjs';
-import { QueryRunner, Repository } from 'typeorm';
-import { connectionConfig$, initializeDataSource } from '../util';
+import { connectionConfig$, initializeDataSource } from '../util.js';
 import {
   createProjectorContext,
   createProjectorTilFirst,
   createRollBackwardEventFor,
   createStubProjectionSource
-} from './util';
+} from './util.js';
+import { firstValueFrom } from 'rxjs';
+import type { HandleMetadata } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
+import type { Observable } from 'rxjs';
+import type { ObservableCardanoNode } from '@cardano-sdk/core';
+import type { ProjectionEvent } from '@cardano-sdk/projection';
+import type { QueryRunner, Repository } from 'typeorm';
+import type { TypeormStabilityWindowBuffer, TypeormTipTracker } from '../../src/index.js';
 
 describe('storeHandleMetadata', () => {
   const eventsWithCip68Handle = chainSyncData(ChainSyncDataSet.WithInlineDatum);

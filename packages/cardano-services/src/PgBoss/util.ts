@@ -1,5 +1,5 @@
-import { PgBossQueue } from './types';
 import { availableQueues } from '@cardano-sdk/projection-typeorm';
+import type { PgBossQueue } from './types.js';
 
 /**
  * Checks if a string value is the name of a **pg-boss** queue.

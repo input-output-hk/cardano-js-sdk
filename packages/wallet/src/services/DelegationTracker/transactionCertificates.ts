@@ -1,9 +1,10 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, getCertificatesByType } from '@cardano-sdk/core';
-import { Observable, combineLatest, distinctUntilChanged, map } from 'rxjs';
+import { combineLatest, distinctUntilChanged, map } from 'rxjs';
 import { isNotNil } from '@cardano-sdk/util';
-import { transactionsEquals } from '../util/equals';
-import last from 'lodash/last';
+import { transactionsEquals } from '../util/equals.js';
+import last from 'lodash/last.js';
+import type { Observable } from 'rxjs';
 
 export const lastStakeKeyCertOfType = <K extends Cardano.RegAndDeregCertificateTypes>(
   transactionsCertificates: Cardano.Certificate[][],

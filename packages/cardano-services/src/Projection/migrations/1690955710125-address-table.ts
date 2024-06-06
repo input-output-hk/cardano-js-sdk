@@ -1,5 +1,5 @@
 import { AddressEntity } from '@cardano-sdk/projection-typeorm';
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddressTableMigrations1690955710125 implements MigrationInterface {
   static entity = AddressEntity;

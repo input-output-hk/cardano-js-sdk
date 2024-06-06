@@ -1,8 +1,8 @@
-import { Lovelace } from './Value';
-import { Metadatum } from './AuxiliaryData';
-import { PoolId, PoolIdHex, StakePool } from './StakePool';
-import { RewardAccount } from '../Address';
-import { metadatumToJson } from '../../util/metadatum';
+import { metadatumToJson } from '../../util/metadatum.js';
+import type { Lovelace } from './Value.js';
+import type { Metadatum } from './AuxiliaryData.js';
+import type { PoolId, PoolIdHex, StakePool } from './StakePool/index.js';
+import type { RewardAccount } from '../Address/index.js';
 
 export interface DelegationsAndRewards {
   delegate?: PoolId;

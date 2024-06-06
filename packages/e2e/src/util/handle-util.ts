@@ -1,12 +1,14 @@
-import { Asset, Cardano, Handle, Serialization, metadatum, nativeScriptPolicyId, util } from '@cardano-sdk/core';
-import { FinalizeTxProps, ObservableWallet } from '@cardano-sdk/wallet';
+import { Asset, Cardano, Serialization, metadatum, nativeScriptPolicyId, util } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
-import { InitializeTxProps } from '@cardano-sdk/tx-construction';
-import { KeyAgent, KeyRole, util as keyManagementUtil } from '@cardano-sdk/key-management';
+import { KeyRole, util as keyManagementUtil } from '@cardano-sdk/key-management';
 import { firstValueFrom } from 'rxjs';
 import { readFile } from 'fs/promises';
-import { submitAndConfirm } from './util';
+import { submitAndConfirm } from './util.js';
 import path from 'path';
+import type { FinalizeTxProps, ObservableWallet } from '@cardano-sdk/wallet';
+import type { Handle } from '@cardano-sdk/core';
+import type { InitializeTxProps } from '@cardano-sdk/tx-construction';
+import type { KeyAgent } from '@cardano-sdk/key-management';
 
 const handleDatum = Serialization.PlutusData.fromCbor(
   HexBlob(

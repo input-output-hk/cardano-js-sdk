@@ -1,6 +1,7 @@
-import { AsyncKeyAgent, SignBlobResult, Witnesser, util } from '../../src';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
+import { util } from '../../src/index.js';
+import type { AsyncKeyAgent, SignBlobResult, Witnesser } from '../../src/index.js';
 
 describe('createBip32Ed25519Witnesser', () => {
   let asyncKeyAgent: jest.Mocked<AsyncKeyAgent>;

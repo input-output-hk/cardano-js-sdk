@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import * as Cardano from '../../../src/Cardano';
+import * as Cardano from '../../../src/Cardano/index.js';
 import * as Crypto from '@cardano-sdk/crypto';
-import { Certificate } from '../../../src/Serialization';
+import { Certificate } from '../../../src/Serialization/index.js';
 import { HexBlob } from '@cardano-sdk/util';
 
 const poolParameters: Cardano.PoolParameters = {

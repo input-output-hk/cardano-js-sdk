@@ -1,4 +1,3 @@
-import { Cardano } from '@cardano-sdk/core';
 import {
   addTokenMaps,
   hasNegativeAssetValue,
@@ -6,8 +5,9 @@ import {
   sortByCoins,
   stubMaxSizeAddress,
   subtractTokenMaps
-} from '../src/util';
-import { asAssetId, asTokenMap } from './util';
+} from '../src/util.js';
+import { asAssetId, asTokenMap } from './util/index.js';
+import type { Cardano } from '@cardano-sdk/core';
 
 describe('sortByCoins', () => {
   it('can sort TxOut by coin value in descending order', async () => {

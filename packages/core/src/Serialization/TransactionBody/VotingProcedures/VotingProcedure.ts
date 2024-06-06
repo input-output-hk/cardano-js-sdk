@@ -1,9 +1,8 @@
-import * as Cardano from '../../../Cardano';
-import { Anchor } from '../../Common/Anchor';
-import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
+import { Anchor } from '../../Common/Anchor.js';
+import { CborReader, CborReaderState, CborWriter } from '../../CBOR/index.js';
 import { HexBlob } from '@cardano-sdk/util';
-import { Vote } from '../../../Cardano';
-import { hexToBytes } from '../../../util/misc';
+import { hexToBytes } from '../../../util/misc/index.js';
+import type * as Cardano from '../../../Cardano/index.js';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
@@ -14,7 +13,7 @@ const EMBEDDED_GROUP_SIZE = 2;
  * - an anchor, it links the vote to arbitrary off-chain JSON payload of metadata.
  */
 export class VotingProcedure {
-  #vote: Vote;
+  #vote: Cardano.Vote;
   #anchor: Anchor | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
@@ -24,7 +23,7 @@ export class VotingProcedure {
    * @param vote The vote (Yes, No or Abstain).
    * @param anchor The vote anchor (or undefined if none).
    */
-  constructor(vote: Vote, anchor?: Anchor) {
+  constructor(vote: Cardano.Vote, anchor?: Anchor) {
     this.#vote = vote;
     this.#anchor = anchor;
   }
@@ -106,7 +105,7 @@ export class VotingProcedure {
    *
    * @returns The vote.
    */
-  vote(): Vote {
+  vote(): Cardano.Vote {
     return this.#vote;
   }
 
@@ -115,7 +114,7 @@ export class VotingProcedure {
    *
    * @param vote The vote.
    */
-  setVote(vote: Vote) {
+  setVote(vote: Cardano.Vote) {
     this.#vote = vote;
     this.#originalBytes = undefined;
   }

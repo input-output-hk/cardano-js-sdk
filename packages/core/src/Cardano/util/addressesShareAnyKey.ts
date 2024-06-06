@@ -1,8 +1,9 @@
-import { Address, AddressType, Credential } from '../Address/Address';
-import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import { Address, AddressType } from '../Address/Address.js';
 import { InvalidStringError } from '@cardano-sdk/util';
-import { PaymentAddress } from '../Address/PaymentAddress';
-import { Pointer } from '../Address/PointerAddress';
+import type { Credential } from '../Address/Address.js';
+import type { Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import type { PaymentAddress } from '../Address/PaymentAddress.js';
+import type { Pointer } from '../Address/PointerAddress.js';
 
 type PaymentId = { credential: Credential } | { byronRoot: Hash28ByteBase16 };
 type StakeId = { credential: Credential } | { pointer: Pointer };

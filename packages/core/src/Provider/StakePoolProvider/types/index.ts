@@ -1,1 +1,1 @@
-export * from './StakePoolProvider';
+export * from './StakePoolProvider.js';

@@ -1,6 +1,6 @@
 import { Cardano, Seconds } from '@cardano-sdk/core';
-import { Schema } from '@cardano-ogmios/client';
-import omit from 'lodash/omit';
+import omit from 'lodash/omit.js';
+import type { Schema } from '@cardano-ogmios/client';
 
 export const genesis = (ogmiosGenesis: Schema.CompactGenesis): Cardano.CompactGenesis => ({
   ...omit(ogmiosGenesis, 'protocolParameters'),

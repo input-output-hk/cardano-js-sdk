@@ -1,7 +1,4 @@
-import { GroupedAddress } from '@cardano-sdk/key-management';
-import { Logger } from 'ts-log';
 import {
-  Observable,
   Subject,
   defaultIfEmpty,
   distinctUntilChanged,
@@ -15,8 +12,11 @@ import {
   take,
   tap
 } from 'rxjs';
-import { WalletStores } from '../persistence';
-import { groupedAddressesEquals } from './util';
+import { groupedAddressesEquals } from './util/index.js';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
+import type { WalletStores } from '../persistence/index.js';
 
 export type AddressTrackerDependencies = {
   store: WalletStores['addresses'];

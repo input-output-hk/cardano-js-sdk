@@ -1,7 +1,7 @@
-import { DbSyncEpochPollService } from '../../../src/util';
-import { NetworkInfoFixtureBuilder } from '../../NetworkInfo/fixtures/FixtureBuilder';
+import { DbSyncEpochPollService } from '../../../src/util/index.js';
+import { NetworkInfoFixtureBuilder } from '../../NetworkInfo/fixtures/FixtureBuilder.js';
 import { Pool } from 'pg';
-import { ingestDbData, sleep, wrapWithTransaction } from '../../util';
+import { ingestDbData, sleep, wrapWithTransaction } from '../../util.js';
 import { logger } from '@cardano-sdk/util-dev';
 
 describe('DbSyncEpochPollService', () => {

@@ -1,19 +1,19 @@
 import {
   BlockEntity,
-  PgConnectionConfig,
   STAKE_POOL_METADATA_QUEUE,
   createDataSource,
   createPgBossExtension
 } from '@cardano-sdk/projection-typeorm';
 import { Cardano } from '@cardano-sdk/core';
-import { DataSource } from 'typeorm';
 import { Observable, firstValueFrom } from 'rxjs';
-import { PgBossHttpService, pgBossEntities } from '../../../src/Program/services/pgboss';
-import { Pool } from 'pg';
-import { StakePoolMetadataFetchMode } from '../../../src/Program/options';
-import { WorkerHandlerFactoryOptions } from '../../../src/PgBoss';
-import { getConnectionConfig, getPool } from '../../../src/Program/services/postgres';
+import { PgBossHttpService, pgBossEntities } from '../../../src/Program/services/pgboss.js';
+import { StakePoolMetadataFetchMode } from '../../../src/Program/options/index.js';
+import { getConnectionConfig, getPool } from '../../../src/Program/services/postgres.js';
 import { logger } from '@cardano-sdk/util-dev';
+import type { DataSource } from 'typeorm';
+import type { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
+import type { Pool } from 'pg';
+import type { WorkerHandlerFactoryOptions } from '../../../src/PgBoss/index.js';
 
 const dnsResolver = () => Promise.resolve({ name: 'localhost', port: 5433, priority: 6, weight: 5 });
 

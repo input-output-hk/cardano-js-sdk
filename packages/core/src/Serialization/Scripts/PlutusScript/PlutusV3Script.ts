@@ -1,6 +1,6 @@
-import * as Cardano from '../../../Cardano';
+import * as Cardano from '../../../Cardano/index.js';
 import * as Crypto from '@cardano-sdk/crypto';
-import { CborReader, CborWriter } from '../../CBOR';
+import { CborReader, CborWriter } from '../../CBOR/index.js';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
 const HASH_LENGTH_IN_BYTES = 28;

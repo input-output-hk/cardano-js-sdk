@@ -5,10 +5,10 @@ import {
   rewardAccount,
   rewardAccount2,
   stakeKeyHash
-} from '../testData';
-import { Cardano } from '@cardano-sdk/core';
+} from '../testData.js';
 import { CardanoKeyConst, util } from '@cardano-sdk/key-management';
-import { mapWithdrawals, toWithdrawal } from '../../src/transformers';
+import { mapWithdrawals, toWithdrawal } from '../../src/transformers/index.js';
+import type { Cardano } from '@cardano-sdk/core';
 
 describe('withdrawals', () => {
   describe('mapWithdrawals', () => {

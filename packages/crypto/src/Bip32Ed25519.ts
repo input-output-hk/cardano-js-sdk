@@ -1,5 +1,5 @@
-import { BIP32Path } from './types';
-import {
+import type { BIP32Path } from './types.js';
+import type {
   Bip32PrivateKeyHex,
   Bip32PublicKeyHex,
   Ed25519KeyHashHex,
@@ -7,8 +7,8 @@ import {
   Ed25519PrivateNormalKeyHex,
   Ed25519PublicKeyHex,
   Ed25519SignatureHex
-} from './hexTypes';
-import { HexBlob } from '@cardano-sdk/util';
+} from './hexTypes.js';
+import type { HexBlob } from '@cardano-sdk/util';
 
 /**
  * Ed25519 is the EdDSA signature scheme used in Cardano, it uses SHA-512 (SHA-2) as its hashing algorithm

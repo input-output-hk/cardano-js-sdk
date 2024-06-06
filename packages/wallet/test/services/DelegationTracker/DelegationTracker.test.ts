@@ -1,11 +1,16 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, ChainHistoryProvider, metadatum } from '@cardano-sdk/core';
-import { RetryBackoffConfig } from 'backoff-rxjs';
-import { TransactionsTracker, createDelegationPortfolioTracker } from '../../../src/services';
-import { certificateTransactionsWithEpochs, createBlockEpochProvider } from '../../../src/services/DelegationTracker';
+import { Cardano, metadatum } from '@cardano-sdk/core';
+import {
+  certificateTransactionsWithEpochs,
+  createBlockEpochProvider
+} from '../../../src/services/DelegationTracker/index.js';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
-import { createStubTxWithCertificates, createStubTxWithSlot } from './stub-tx';
+import { createDelegationPortfolioTracker } from '../../../src/services/index.js';
+import { createStubTxWithCertificates, createStubTxWithSlot } from './stub-tx.js';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
+import type { ChainHistoryProvider } from '@cardano-sdk/core';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
+import type { TransactionsTracker } from '../../../src/services/index.js';
 
 jest.mock('@cardano-sdk/util-rxjs', () => {
   const originalModule = jest.requireActual('@cardano-sdk/util-rxjs');

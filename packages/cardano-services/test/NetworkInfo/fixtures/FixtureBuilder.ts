@@ -1,6 +1,6 @@
-import * as Queries from './queries';
-import { Logger } from 'ts-log';
-import { Pool, QueryResult } from 'pg';
+import * as Queries from './queries.js';
+import type { Logger } from 'ts-log';
+import type { Pool, QueryResult } from 'pg';
 
 export class NetworkInfoFixtureBuilder {
   #db: Pool;

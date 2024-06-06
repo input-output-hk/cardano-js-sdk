@@ -13,8 +13,8 @@ import {
   txOutWithInlineDatumAndOwnedAddress,
   txOutWithReferenceScriptAndDatumHash,
   txOutWithReferenceScriptAndInlineDatum
-} from '../testData';
-import { mapTxOuts, toTxOut } from '../../src/transformers/txOut';
+} from '../testData.js';
+import { mapTxOuts, toTxOut } from '../../src/transformers/txOut.js';
 
 describe('txOut', () => {
   describe('mapTxOuts', () => {

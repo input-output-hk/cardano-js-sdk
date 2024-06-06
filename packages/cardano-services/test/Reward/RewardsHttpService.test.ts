@@ -1,24 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Cardano, RewardsProvider } from '@cardano-sdk/core';
-import { CreateHttpProviderConfig, rewardsHttpProvider } from '@cardano-sdk/cardano-services-client';
-import { DbPools, LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
+import { Cardano } from '@cardano-sdk/core';
 import {
   DbSyncRewardsProvider,
   HttpServer,
-  HttpServerConfig,
   InMemoryCache,
   RewardsHttpService,
   UNLIMITED_CACHE_TTL
-} from '../../src';
+} from '../../src/index.js';
 import { INFO, createLogger } from 'bunyan';
-import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
-import { RewardsFixtureBuilder } from './fixtures/FixtureBuilder';
-import { clearDbPools, servicesWithVersionPath as services } from '../util';
+import { RewardsFixtureBuilder } from './fixtures/FixtureBuilder.js';
+import { clearDbPools, servicesWithVersionPath as services } from '../util.js';
+import { findLedgerTip } from '../../src/util/DbSyncProvider/index.js';
 import { getPort } from 'get-port-please';
-import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
+import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks.js';
 import { logger } from '@cardano-sdk/util-dev';
+import { rewardsHttpProvider } from '@cardano-sdk/cardano-services-client';
 import axios from 'axios';
+import type { CreateHttpProviderConfig } from '@cardano-sdk/cardano-services-client';
+import type { DbPools, LedgerTipModel } from '../../src/util/DbSyncProvider/index.js';
+import type { HttpServerConfig } from '../../src/index.js';
+import type { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
+import type { RewardsProvider } from '@cardano-sdk/core';
 
 const APPLICATION_JSON = 'application/json';
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';

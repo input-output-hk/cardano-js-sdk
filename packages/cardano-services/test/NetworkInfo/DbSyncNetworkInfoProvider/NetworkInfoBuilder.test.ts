@@ -1,6 +1,6 @@
-import { DataMocks } from '../../data-mocks';
-import { NetworkInfoBuilder } from '../../../src/NetworkInfo/DbSyncNetworkInfoProvider/NetworkInfoBuilder';
-import { NetworkInfoFixtureBuilder } from '../fixtures/FixtureBuilder';
+import { DataMocks } from '../../data-mocks/index.js';
+import { NetworkInfoBuilder } from '../../../src/NetworkInfo/DbSyncNetworkInfoProvider/NetworkInfoBuilder.js';
+import { NetworkInfoFixtureBuilder } from '../fixtures/FixtureBuilder.js';
 import { Pool } from 'pg';
 import { logger } from '@cardano-sdk/util-dev';
 

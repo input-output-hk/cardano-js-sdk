@@ -1,5 +1,5 @@
-import { config } from '../util';
-import { stakePoolHttpProvider } from '../../src';
+import { config } from '../util.js';
+import { stakePoolHttpProvider } from '../../src/index.js';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 

@@ -1,11 +1,11 @@
-import * as Cardano from '../../../Cardano';
-import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
-import { GovernanceActionId } from '../../Common/GovernanceActionId';
-import { GovernanceActionKind } from './GovernanceActionKind';
-import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import * as Cardano from '../../../Cardano/index.js';
+import { CborReader, CborReaderState, CborWriter } from '../../CBOR/index.js';
+import { GovernanceActionId } from '../../Common/GovernanceActionId.js';
+import { GovernanceActionKind } from './GovernanceActionKind.js';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import { ProtocolParamUpdate } from '../../Update';
-import { hexToBytes } from '../../../util/misc';
+import { ProtocolParamUpdate } from '../../Update/index.js';
+import { hexToBytes } from '../../../util/misc/index.js';
+import type { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 
 const EMBEDDED_GROUP_SIZE = 4;
 

@@ -1,5 +1,5 @@
 import { Percent } from '@cardano-sdk/util';
-import { StakePoolEpochRewards } from '../types';
+import type { StakePoolEpochRewards } from '../types/index.js';
 
 const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
 

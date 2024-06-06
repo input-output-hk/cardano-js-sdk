@@ -1,3 +1,3 @@
-export * from './InMemoryCache';
-export * from './NoCache';
-export * from './defaults';
+export * from './InMemoryCache.js';
+export * from './NoCache.js';
+export * from './defaults.js';

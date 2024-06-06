@@ -1,4 +1,4 @@
-import { OpaqueNumber } from '@cardano-sdk/util';
+import type { OpaqueNumber } from '@cardano-sdk/util';
 
 /** Milliseconds time unit. */
 export type Milliseconds = OpaqueNumber<'Milliseconds'>;

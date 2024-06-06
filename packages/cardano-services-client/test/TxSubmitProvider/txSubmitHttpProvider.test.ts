@@ -3,17 +3,18 @@ import {
   GeneralCardanoNodeErrorCode,
   ProviderError,
   ProviderFailure,
+  TxCBOR,
   TxSubmissionError,
   TxSubmissionErrorCode
 } from '@cardano-sdk/core';
 import { bufferToHexString } from '@cardano-sdk/util';
-import { config } from '../util';
+import { config } from '../util.js';
 import { handleProviderMocks } from '@cardano-sdk/util-dev';
-import { txSubmitHttpProvider } from '../../src';
+import { txSubmitHttpProvider } from '../../src/index.js';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 
-const emptyUintArrayAsHexString = bufferToHexString(Buffer.from(new Uint8Array()));
+const emptyUintArrayAsHexString = TxCBOR(bufferToHexString(Buffer.from(new Uint8Array())));
 
 describe('txSubmitHttpProvider', () => {
   describe('healthCheck', () => {

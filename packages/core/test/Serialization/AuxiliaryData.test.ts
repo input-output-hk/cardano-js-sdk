@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, Serialization, SerializationFailure } from '../../src';
+import { Cardano, Serialization, SerializationFailure } from '../../src/index.js';
 import { HexBlob } from '@cardano-sdk/util';
 
 // Shelley era

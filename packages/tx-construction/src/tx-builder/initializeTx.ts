@@ -1,13 +1,14 @@
 import { StaticChangeAddressResolver, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 
 import { Cardano, Serialization } from '@cardano-sdk/core';
-import { GreedyTxEvaluator } from './GreedyTxEvaluator';
-import { InitializeTxProps, InitializeTxResult } from '../types';
-import { RedeemersByType, defaultSelectionConstraints } from '../input-selection';
-import { TxBuilderDependencies } from './types';
-import { createPreInputSelectionTxBody, includeChangeAndInputs } from '../createTransactionInternals';
-import { ensureValidityInterval } from '../ensureValidityInterval';
+import { GreedyTxEvaluator } from './GreedyTxEvaluator.js';
+import { createPreInputSelectionTxBody, includeChangeAndInputs } from '../createTransactionInternals.js';
+import { defaultSelectionConstraints } from '../input-selection/index.js';
+import { ensureValidityInterval } from '../ensureValidityInterval.js';
 import { util } from '@cardano-sdk/key-management';
+import type { InitializeTxProps, InitializeTxResult } from '../types.js';
+import type { RedeemersByType } from '../input-selection/index.js';
+import type { TxBuilderDependencies } from './types.js';
 
 export const initializeTx = async (
   props: InitializeTxProps,

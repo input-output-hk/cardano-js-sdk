@@ -1,10 +1,11 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-multi-spaces */
 /* eslint-disable space-in-parens */
-import { BehaviorObservable } from '@cardano-sdk/util-rxjs';
 import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
-import { DelegationTracker, createBalanceTracker, createUtxoBalanceByAddressTracker } from '../../src/services';
+import { createBalanceTracker, createUtxoBalanceByAddressTracker } from '../../src/services/index.js';
 import { createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
+import type { BehaviorObservable } from '@cardano-sdk/util-rxjs';
+import type { DelegationTracker } from '../../src/services/index.js';
 
 const { utxo, utxo2 } = mockProviders;
 

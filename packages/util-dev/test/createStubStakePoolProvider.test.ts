@@ -1,5 +1,6 @@
-import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
-import { createStubStakePoolProvider } from '../src/createStubStakePoolProvider';
+import { Cardano } from '@cardano-sdk/core';
+import { createStubStakePoolProvider } from '../src/createStubStakePoolProvider.js';
+import type { StakePoolProvider } from '@cardano-sdk/core';
 
 describe('createStubStakePoolProvider', () => {
   let provider: StakePoolProvider;

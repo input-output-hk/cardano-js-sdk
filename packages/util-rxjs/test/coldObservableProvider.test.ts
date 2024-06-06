@@ -1,7 +1,8 @@
 import { BehaviorSubject, EmptyError, Subject, firstValueFrom, lastValueFrom, tap } from 'rxjs';
 import { InvalidStringError } from '@cardano-sdk/util';
-import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
-import { coldObservableProvider } from '../src';
+import { coldObservableProvider } from '../src/index.js';
+import { retryBackoff } from 'backoff-rxjs';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
 
 // There might be a more elegant way to mock with original implementation (spy)
 jest.mock('backoff-rxjs', () => ({

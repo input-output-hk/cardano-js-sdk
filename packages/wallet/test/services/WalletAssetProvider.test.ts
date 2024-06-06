@@ -1,9 +1,10 @@
-import { Asset, AssetProvider, Cardano, Serialization, metadatum } from '@cardano-sdk/core';
+import { Asset, Cardano, Serialization, metadatum } from '@cardano-sdk/core';
 import { AssetId, generateRandomHexString } from '@cardano-sdk/util-dev';
 import { HexBlob } from '@cardano-sdk/util';
-import { createWalletAssetProvider } from '../../src';
+import { createWalletAssetProvider } from '../../src/index.js';
 import { dummyLogger as logger } from 'ts-log';
 import { of } from 'rxjs';
+import type { AssetProvider } from '@cardano-sdk/core';
 
 const createMockAssetProvider = jest.fn().mockImplementation(
   (assets: Map<Cardano.AssetId, Asset.AssetInfo>): AssetProvider => ({

@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import * as Cardano from '../Cardano';
+import * as Cardano from '../Cardano/index.js';
 import * as Crypto from '@cardano-sdk/crypto';
-import { NativeScript } from '../Serialization';
-import { SerializationError, SerializationFailure } from '../';
+import { NativeScript } from '../Serialization/index.js';
+import { SerializationError, SerializationFailure } from '../errors.js';
 
 /**
  * Gets the policy id of the given native script.

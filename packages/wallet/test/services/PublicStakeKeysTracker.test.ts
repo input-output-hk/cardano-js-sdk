@@ -1,9 +1,11 @@
-import { AccountKeyDerivationPath, Bip32Account, GroupedAddress, KeyRole } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
-import { ObservableWallet } from '../../src';
-import { PubStakeKeyAndStatus, createPublicStakeKeysTracker } from '../../src/services/PublicStakeKeysTracker';
+import { KeyRole } from '@cardano-sdk/key-management';
+import { createPublicStakeKeysTracker } from '../../src/services/PublicStakeKeysTracker.js';
 import { firstValueFrom, from, lastValueFrom, of, shareReplay, toArray } from 'rxjs';
 import { mockProviders as mocks } from '@cardano-sdk/util-dev';
+import type { AccountKeyDerivationPath, Bip32Account, GroupedAddress } from '@cardano-sdk/key-management';
+import type { ObservableWallet } from '../../src/index.js';
+import type { PubStakeKeyAndStatus } from '../../src/services/PublicStakeKeysTracker.js';
 
 describe('PublicStakeKeysTracker', () => {
   let addresses: GroupedAddress[];

@@ -1,5 +1,5 @@
-import { Cip30Wallet } from './WalletApi';
-import { Logger } from 'ts-log';
+import type { Cip30Wallet } from './WalletApi/index.js';
+import type { Logger } from 'ts-log';
 
 export type WindowMaybeWithCardano = Window & { cardano?: { [k: string]: Cip30Wallet } };
 

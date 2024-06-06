@@ -1,11 +1,11 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano } from '@cardano-sdk/core';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
-import { getEnv, walletVariables } from '../../../src/environment';
-import { getWallet, normalizeTxBody, walletReady } from '../../../src';
+import { getEnv, walletVariables } from '../../../src/environment.js';
+import { getWallet, normalizeTxBody, walletReady } from '../../../src/index.js';
 import { isNotNil } from '@cardano-sdk/util';
+import type { BaseWallet } from '@cardano-sdk/wallet';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();

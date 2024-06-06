@@ -1,4 +1,5 @@
-import { Command, Option } from 'commander';
+import { Option } from 'commander';
+import type { Command } from 'commander';
 
 export const addOptions = (command: Command, options: Option[]) => {
   for (const option of options) command.addOption(option);

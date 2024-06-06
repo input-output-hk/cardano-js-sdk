@@ -1,5 +1,5 @@
-import { Cardano, Paginated, QueryStakePoolsArgs } from '@cardano-sdk/core';
-import { Percent } from '@cardano-sdk/util';
+import type { Cardano, Paginated, QueryStakePoolsArgs } from '@cardano-sdk/core';
+import type { Percent } from '@cardano-sdk/util';
 export interface PoolUpdateModel {
   id: string; // pool hash id
   update_id: string;

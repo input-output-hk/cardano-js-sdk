@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import * as Cardano from '../../../../src/Cardano';
-import { Committee } from '../../../../src/Serialization';
+import * as Cardano from '../../../../src/Cardano/index.js';
+import { Committee } from '../../../../src/Serialization/index.js';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 

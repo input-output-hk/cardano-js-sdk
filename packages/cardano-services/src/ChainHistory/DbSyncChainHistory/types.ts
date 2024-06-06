@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import type { Cardano } from '@cardano-sdk/core';
 
 export type TransactionDataMap<T> = Map<Cardano.TransactionId, T>;
 export type TxOutTokenMap = Map<string, Cardano.TokenMap>;

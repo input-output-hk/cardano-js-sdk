@@ -1,8 +1,6 @@
 /* eslint-disable max-statements */
 import { Cardano } from '@cardano-sdk/core';
 import {
-  KeyAgentFactoryProps,
-  TestWallet,
   bip32Ed25519Factory,
   getEnv,
   getWallet,
@@ -11,12 +9,13 @@ import {
   waitForWalletStateSettle,
   walletReady,
   walletVariables
-} from '../../src';
+} from '../../src/index.js';
 import { logger } from '@cardano-sdk/util-dev';
+import type { KeyAgentFactoryProps, TestWallet } from '../../src/index.js';
 
-import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, KeyRole } from '@cardano-sdk/key-management';
 import { firstValueFrom } from 'rxjs';
+import type * as Crypto from '@cardano-sdk/crypto';
 
 const env = getEnv(walletVariables);
 

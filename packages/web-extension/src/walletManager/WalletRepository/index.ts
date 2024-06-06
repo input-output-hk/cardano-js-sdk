@@ -1,2 +1,2 @@
-export * from './types';
-export * from './WalletRepository';
+export * from './types.js';
+export * from './WalletRepository.js';

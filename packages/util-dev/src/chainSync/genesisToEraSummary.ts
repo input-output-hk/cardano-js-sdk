@@ -1,4 +1,5 @@
-import { Cardano, EraSummary, Seconds } from '@cardano-sdk/core';
+import { Seconds } from '@cardano-sdk/core';
+import type { Cardano, EraSummary } from '@cardano-sdk/core';
 
 export const genesisToEraSummary = ({ systemStart, epochLength, slotLength }: Cardano.CompactGenesis): EraSummary => ({
   parameters: {

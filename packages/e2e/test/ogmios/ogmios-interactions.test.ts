@@ -1,20 +1,14 @@
-import {
-  DB_CACHE_TTL_DEFAULT,
-  HttpServer,
-  ProviderServerArgs,
-  ServiceNames,
-  loadProviderServer,
-  util
-} from '@cardano-sdk/cardano-services';
-import { SrvRecord } from 'dns';
+import { DB_CACHE_TTL_DEFAULT, ServiceNames, loadProviderServer, util } from '@cardano-sdk/cardano-services';
 import { createServer } from 'http';
 import { getPort } from 'get-port-please';
 import { logger } from '@cardano-sdk/util-dev';
 import WebSocket from 'ws';
 import axios from 'axios';
 import path from 'path';
+import type { HttpServer, ProviderServerArgs } from '@cardano-sdk/cardano-services';
+import type { SrvRecord } from 'dns';
 
-import { getEnv, networkInfoProviderFactory } from '../../src';
+import { getEnv, networkInfoProviderFactory } from '../../src/index.js';
 
 const env = getEnv(['DB_SYNC_CONNECTION_STRING', 'OGMIOS_URL']);
 

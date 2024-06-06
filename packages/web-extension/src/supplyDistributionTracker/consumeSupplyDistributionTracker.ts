@@ -1,5 +1,6 @@
-import { MessengerDependencies, consumeRemoteApi } from '../messaging';
-import { supplyDistributionTrackerChannel, supplyDistributionTrackerProperties } from './util';
+import { consumeRemoteApi } from '../messaging/index.js';
+import { supplyDistributionTrackerChannel, supplyDistributionTrackerProperties } from './util.js';
+import type { MessengerDependencies } from '../messaging/index.js';
 
 export interface ConsumeSupplyDistributionTrackerProps {
   walletName: string;

@@ -1,13 +1,14 @@
-import { Asset, Cardano, Handle } from '@cardano-sdk/core';
-import { CIP67Assets, WithCIP67 } from './withCIP67';
-import { FilterByPolicyIds } from './types';
-import { Logger } from 'ts-log';
-import { ProducedUtxo } from './withUtxo';
-import { ProjectedNftMetadata, WithNftMetadata } from './withNftMetadata';
-import { ProjectionOperator } from '../../types';
-import { assetNameToUTF8Handle } from './util';
+import { Asset, Cardano } from '@cardano-sdk/core';
+import { assetNameToUTF8Handle } from './util.js';
 import { isNotNil } from '@cardano-sdk/util';
 import { map } from 'rxjs';
+import type { CIP67Assets, WithCIP67 } from './withCIP67.js';
+import type { FilterByPolicyIds } from './types.js';
+import type { Handle } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { ProducedUtxo } from './withUtxo.js';
+import type { ProjectedNftMetadata, WithNftMetadata } from './withNftMetadata.js';
+import type { ProjectionOperator } from '../../types.js';
 
 /** Only present for cip68/personalized handles */
 interface PersonalizedProperties {

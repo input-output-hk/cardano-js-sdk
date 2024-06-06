@@ -1,4 +1,4 @@
-import { CborReader, CborReaderState, CborTag, CborWriter } from '../CBOR';
+import { CborReader, CborReaderState, CborTag, CborWriter } from '../CBOR/index.js';
 import { HexBlob } from '@cardano-sdk/util';
 
 /** Represents a cbor serialization wrapper for a Core type <{@link C}> */

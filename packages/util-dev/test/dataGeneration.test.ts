@@ -1,4 +1,4 @@
-import { generateRandomBigInt, generateRandomHexString } from '../src';
+import { generateRandomBigInt, generateRandomHexString } from '../src/index.js';
 
 describe('dataGeneration', () => {
   describe('generateRandomHexString', () => {

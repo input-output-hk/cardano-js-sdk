@@ -1,12 +1,12 @@
 import { Cardano } from '@cardano-sdk/core';
-import { ProjectionEvent } from '../../../src';
 import {
   filterProducedUtxoByAddresses,
   filterProducedUtxoByAssetPolicyId,
   filterProducedUtxoByAssetsPresence,
   withUtxo
-} from '../../../src/operators/Mappers';
+} from '../../../src/operators/Mappers/index.js';
 import { firstValueFrom, of } from 'rxjs';
+import type { ProjectionEvent } from '../../../src/index.js';
 
 export const validTxSource$ = of({
   block: {

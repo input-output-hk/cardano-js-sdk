@@ -1,7 +1,12 @@
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { CONTEXT_WITHOUT_KNOWN_ADDRESSES, CONTEXT_WITH_KNOWN_ADDRESSES, paymentHash, stakeKeyHash } from '../testData';
+import {
+  CONTEXT_WITHOUT_KNOWN_ADDRESSES,
+  CONTEXT_WITH_KNOWN_ADDRESSES,
+  paymentHash,
+  stakeKeyHash
+} from '../testData.js';
 import { CardanoKeyConst, util } from '@cardano-sdk/key-management';
-import { mapRequiredSigners, toRequiredSigner } from '../../src/transformers';
+import { mapRequiredSigners, toRequiredSigner } from '../../src/transformers/index.js';
 
 describe('requiredSigners', () => {
   describe('mapRequiredSigners', () => {

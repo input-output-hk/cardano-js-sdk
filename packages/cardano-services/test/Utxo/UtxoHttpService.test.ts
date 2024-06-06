@@ -1,24 +1,27 @@
-import { AddressWith, UtxoFixtureBuilder } from './fixtures/FixtureBuilder';
-import { Cardano, UtxoProvider } from '@cardano-sdk/core';
-import { CreateHttpProviderConfig, utxoHttpProvider } from '@cardano-sdk/cardano-services-client';
-import { DataMocks } from '../data-mocks';
-import { DbPools, LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
+import { AddressWith, UtxoFixtureBuilder } from './fixtures/FixtureBuilder.js';
+import { Cardano } from '@cardano-sdk/core';
+import { DataMocks } from '../data-mocks/index.js';
 import {
   DbSyncUtxoProvider,
   HttpServer,
-  HttpServerConfig,
   InMemoryCache,
   UNLIMITED_CACHE_TTL,
   UtxoHttpService
-} from '../../src';
+} from '../../src/index.js';
 import { INFO, createLogger } from 'bunyan';
-import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
-import { clearDbPools, servicesWithVersionPath as services } from '../util';
+import { clearDbPools, servicesWithVersionPath as services } from '../util.js';
+import { findLedgerTip } from '../../src/util/DbSyncProvider/index.js';
 import { getPort } from 'get-port-please';
-import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
+import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks.js';
 import { logger } from '@cardano-sdk/util-dev';
+import { utxoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import axios from 'axios';
+import type { CreateHttpProviderConfig } from '@cardano-sdk/cardano-services-client';
+import type { DbPools, LedgerTipModel } from '../../src/util/DbSyncProvider/index.js';
+import type { HttpServerConfig } from '../../src/index.js';
+import type { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
+import type { UtxoProvider } from '@cardano-sdk/core';
 
 const APPLICATION_JSON = 'application/json';
 const APPLICATION_CBOR = 'application/cbor';
@@ -181,7 +184,7 @@ describe('UtxoHttpService', () => {
           with: [AddressWith.ReferenceScript]
         });
         const res = await provider.utxoByAddresses({ addresses });
-        const scriptRefUtxo = res.find((utxo) => utxo[1].scriptReference.__type === Cardano.ScriptType.Native);
+        const scriptRefUtxo = res.find((utxo) => utxo[1].scriptReference!.__type === Cardano.ScriptType.Native);
         expect(res.length).toBeGreaterThan(0);
         expect(scriptRefUtxo).toBeDefined();
         expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.outputWithInlineDatum]);
@@ -195,8 +198,8 @@ describe('UtxoHttpService', () => {
         const res = await provider.utxoByAddresses({ addresses });
         const scriptRefUtxo = res.find(
           (utxo) =>
-            utxo[1].scriptReference.__type === Cardano.ScriptType.Plutus &&
-            utxo[1].scriptReference.version === Cardano.PlutusLanguageVersion.V1
+            utxo[1].scriptReference!.__type === Cardano.ScriptType.Plutus &&
+            utxo[1].scriptReference!.version === Cardano.PlutusLanguageVersion.V1
         );
         expect(res.length).toBeGreaterThan(0);
         expect(scriptRefUtxo).toBeDefined();
@@ -211,8 +214,8 @@ describe('UtxoHttpService', () => {
         const res = await provider.utxoByAddresses({ addresses });
         const scriptRefUtxo = res.find(
           (utxo) =>
-            utxo[1].scriptReference.__type === Cardano.ScriptType.Plutus &&
-            utxo[1].scriptReference.version === Cardano.PlutusLanguageVersion.V2
+            utxo[1].scriptReference!.__type === Cardano.ScriptType.Plutus &&
+            utxo[1].scriptReference!.version === Cardano.PlutusLanguageVersion.V2
         );
         expect(res.length).toBeGreaterThan(0);
         expect(scriptRefUtxo).toBeDefined();

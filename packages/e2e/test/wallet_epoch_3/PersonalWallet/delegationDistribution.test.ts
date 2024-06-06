@@ -1,10 +1,12 @@
-import { BaseWallet, DelegatedStake, createUtxoBalanceByAddressTracker } from '@cardano-sdk/wallet';
 import { Cardano } from '@cardano-sdk/core';
-import { MINUTE, firstValueFromTimed, getWallet, submitAndConfirm, walletReady } from '../../../src';
-import { Observable, filter, firstValueFrom, map, tap } from 'rxjs';
+import { MINUTE, firstValueFromTimed, getWallet, submitAndConfirm, walletReady } from '../../../src/index.js';
 import { Percent } from '@cardano-sdk/util';
 import { createLogger } from '@cardano-sdk/util-dev';
-import { getEnv, walletVariables } from '../../../src/environment';
+import { createUtxoBalanceByAddressTracker } from '@cardano-sdk/wallet';
+import { filter, firstValueFrom, map, tap } from 'rxjs';
+import { getEnv, walletVariables } from '../../../src/environment.js';
+import type { BaseWallet, DelegatedStake } from '@cardano-sdk/wallet';
+import type { Observable } from 'rxjs';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();

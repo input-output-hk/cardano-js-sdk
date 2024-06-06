@@ -1,7 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
-import { lastStakeKeyCertOfType, transactionsWithCertificates } from '../../../src';
+import { lastStakeKeyCertOfType, transactionsWithCertificates } from '../../../src/index.js';
 
 describe('transactionCertificates', () => {
   test('lastStakeKeyCertOfType', () => {

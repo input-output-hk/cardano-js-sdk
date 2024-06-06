@@ -6,10 +6,11 @@ import {
   createUtxoId,
   jsonToNativeScript
 } from '@cardano-sdk/core';
-import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, isNotNil } from '@cardano-sdk/util';
-import { ReferenceScriptType, UtxoModel } from './types';
-import { generateAssetId } from './util';
+import { ReferenceScriptType } from './types.js';
+import { generateAssetId } from './util.js';
+import type { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import type { UtxoModel } from './types.js';
 
 /**
  * Parse the reference script from the UtxoModel

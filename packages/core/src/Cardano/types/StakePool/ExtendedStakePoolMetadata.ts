@@ -1,4 +1,4 @@
-import { PoolIdHex } from './primitives';
+import type { PoolIdHex } from './primitives.js';
 /**
  * Integer number incremented on every update,
  * by using YYYYMMDDxx (xx each day start by 01 and is incremented on each update

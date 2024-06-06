@@ -1,10 +1,13 @@
-import * as SelectionConstraints from './selectionConstraints';
-import { Asset, Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
+import { Asset, coalesceValueQuantities } from '@cardano-sdk/core';
 import { AssetId } from '@cardano-sdk/util-dev';
-import { ImplicitValue, SelectionResult } from '../../src/types';
-import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
-import { mintToImplicitTokens } from '../../src/util';
-import fc, { Arbitrary } from 'fast-check';
+import { InputSelectionFailure } from '../../src/InputSelectionError.js';
+import { mintToImplicitTokens } from '../../src/util.js';
+import fc from 'fast-check';
+import type * as SelectionConstraints from './selectionConstraints.js';
+import type { Arbitrary } from 'fast-check';
+import type { Cardano } from '@cardano-sdk/core';
+import type { ImplicitValue, SelectionResult } from '../../src/types.js';
+import type { InputSelectionError } from '../../src/InputSelectionError.js';
 
 export const MAX_U64 = 18_446_744_073_709_551_615n;
 export const MIN_I64 = -9_223_372_036_854_775_808n;

@@ -1,7 +1,8 @@
-import * as Cardano from '../../Cardano';
-import { CborReader, CborTag, CborWriter } from '../CBOR';
-import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import { CborReader, CborTag, CborWriter } from '../CBOR/index.js';
+import { InvalidArgumentError } from '@cardano-sdk/util';
 import Fraction from 'fraction.js';
+import type * as Cardano from '../../Cardano/index.js';
+import type { HexBlob } from '@cardano-sdk/util';
 
 const UNIT_INTERVAL_ARRAY_SIZE = 2;
 

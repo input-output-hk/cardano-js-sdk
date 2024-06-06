@@ -1,4 +1,5 @@
-import { Cardano, ProviderError, ProviderUtil } from '../../src';
+import { ProviderError, ProviderUtil } from '../../src/index.js';
+import type { Cardano } from '../../src/index.js';
 
 describe('ProviderUtil', () => {
   describe('withProviderErrors', () => {

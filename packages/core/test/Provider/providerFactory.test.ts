@@ -1,6 +1,6 @@
-import { HealthCheckResponse, Provider } from '../../src/Provider/Provider';
-import { ProviderFactory } from '../../src';
+import { ProviderFactory } from '../../src/index.js';
 import { dummyLogger } from 'ts-log';
+import type { HealthCheckResponse, Provider } from '../../src/Provider/Provider.js';
 
 // Mock providers.
 

@@ -1,23 +1,12 @@
-import * as CardanoNodeUtil from './errorUtils';
-import {
-  Cardano,
-  CardanoNode,
-  CardanoNodeErrors,
-  EraSummary,
-  HealthCheckResponse,
-  StakeDistribution
-} from '@cardano-sdk/core';
-import {
-  ConnectionConfig,
-  StateQuery,
-  createConnectionObject,
-  createStateQueryClient,
-  getServerHealth
-} from '@cardano-ogmios/client';
-import { Logger } from 'ts-log';
+import * as CardanoNodeUtil from './errorUtils.js';
+import { Cardano, CardanoNodeErrors } from '@cardano-sdk/core';
 import { RunnableModule, contextLogger } from '@cardano-sdk/util';
-import { createInteractionContextWithLogger, ogmiosServerHealthToHealthCheckResponse } from '../util';
-import { queryEraSummaries } from './queries';
+import { createConnectionObject, createStateQueryClient, getServerHealth } from '@cardano-ogmios/client';
+import { createInteractionContextWithLogger, ogmiosServerHealthToHealthCheckResponse } from '../util.js';
+import { queryEraSummaries } from './queries.js';
+import type { CardanoNode, EraSummary, HealthCheckResponse, StakeDistribution } from '@cardano-sdk/core';
+import type { ConnectionConfig, StateQuery } from '@cardano-ogmios/client';
+import type { Logger } from 'ts-log';
 
 /**
  * Access cardano-node APIs via Ogmios

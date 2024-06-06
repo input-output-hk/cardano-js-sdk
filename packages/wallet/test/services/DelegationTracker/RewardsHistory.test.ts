@@ -1,19 +1,18 @@
 /* eslint-disable unicorn/no-useless-undefined */
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
-import { InMemoryRewardsHistoryStore } from '../../../src/persistence';
+import { InMemoryRewardsHistoryStore } from '../../../src/persistence/index.js';
 import {
-  RewardsHistory,
-  RewardsHistoryProvider,
   TrackedRewardsProvider,
   calcFirstDelegationEpoch,
   createRewardsHistoryProvider,
   createRewardsHistoryTracker
-} from '../../../src/services';
-import { createStubTxWithCertificates } from './stub-tx';
+} from '../../../src/services/index.js';
+import { createStubTxWithCertificates } from './stub-tx.js';
 import { createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyLogger } from 'ts-log';
 import { firstValueFrom, of } from 'rxjs';
+import type { RewardsHistory, RewardsHistoryProvider } from '../../../src/services/index.js';
 
 const { mockRewardsProvider, rewardAccount, rewardsHistory } = mockProviders;
 

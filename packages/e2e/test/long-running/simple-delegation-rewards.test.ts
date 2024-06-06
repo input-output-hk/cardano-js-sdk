@@ -1,7 +1,6 @@
-import { BaseWallet } from '@cardano-sdk/wallet';
-import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
+import { firstValueFrom } from 'rxjs';
 import {
-  TestWallet,
   getEnv,
   getTxConfirmationEpoch,
   getWallet,
@@ -9,10 +8,12 @@ import {
   submitAndConfirm,
   waitForEpoch,
   walletVariables
-} from '../../src';
-import { firstValueFrom } from 'rxjs';
+} from '../../src/index.js';
 import { logger } from '@cardano-sdk/util-dev';
-import { waitForWalletStateSettle } from '../../../wallet/test/util';
+import { waitForWalletStateSettle } from '../../../wallet/test/util.js';
+import type { BaseWallet } from '@cardano-sdk/wallet';
+import type { StakePoolProvider } from '@cardano-sdk/core';
+import type { TestWallet } from '../../src/index.js';
 
 const env = getEnv(walletVariables);
 

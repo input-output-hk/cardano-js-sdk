@@ -1,8 +1,8 @@
-import { Cardano } from '@cardano-sdk/core';
-import { HID } from 'node-hid';
-import { SignTransactionContext } from '@cardano-sdk/key-management';
-import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
-import TransportWebUSB from '@ledgerhq/hw-transport-webusb';
+import type { Cardano } from '@cardano-sdk/core';
+import type { HID } from 'node-hid';
+import type { SignTransactionContext } from '@cardano-sdk/key-management';
+import type TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
+import type TransportWebUSB from '@ledgerhq/hw-transport-webusb';
 
 export enum DeviceType {
   Ledger = 'Ledger'

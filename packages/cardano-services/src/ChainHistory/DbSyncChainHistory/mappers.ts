@@ -1,6 +1,14 @@
-import * as Crypto from '@cardano-sdk/crypto';
-import { BigIntMath, HexBlob } from '@cardano-sdk/util';
+import { BigIntMath } from '@cardano-sdk/util';
+import { Cardano, NotImplementedError } from '@cardano-sdk/core';
 import {
+  isDelegationCertModel,
+  isMirCertModel,
+  isPoolRegisterCertModel,
+  isPoolRetireCertModel,
+  isStakeCertModel
+} from './util.js';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type {
   BlockModel,
   BlockOutputModel,
   CertificateModel,
@@ -20,16 +28,8 @@ import {
   WithCertIndex,
   WithCertType,
   WithdrawalModel
-} from './types';
-import { Cardano, NotImplementedError } from '@cardano-sdk/core';
-import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
-import {
-  isDelegationCertModel,
-  isMirCertModel,
-  isPoolRegisterCertModel,
-  isPoolRetireCertModel,
-  isStakeCertModel
-} from './util';
+} from './types.js';
+import type { HexBlob } from '@cardano-sdk/util';
 
 const addMultiAssetToTokenMap = (multiAsset: MultiAssetModel, tokenMap: Cardano.TokenMap): Cardano.TokenMap => {
   const tokens = new Map(tokenMap);
@@ -91,7 +91,7 @@ export const mapTxOutModel = (
 ): TxOutput => ({
   address: txOutModel.address as unknown as Cardano.PaymentAddress,
   // Inline datums are missing, but for now it's ok on ChainHistoryProvider
-  datumHash: txOutModel.datum ? (txOutModel.datum.toString('hex') as unknown as Hash32ByteBase16) : undefined,
+  datumHash: txOutModel.datum ? (txOutModel.datum.toString('hex') as unknown as Crypto.Hash32ByteBase16) : undefined,
   index: txOutModel.index,
   scriptReference: props.script,
   txId: txOutModel.tx_id.toString('hex') as unknown as Cardano.TransactionId,

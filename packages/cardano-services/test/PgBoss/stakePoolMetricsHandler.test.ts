@@ -1,12 +1,13 @@
-import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { CurrentPoolMetricsEntity, StakePoolEntity } from '@cardano-sdk/projection-typeorm';
-import { DataSource } from 'typeorm';
 import { Percent } from '@cardano-sdk/util';
-import { Pool } from 'pg';
-import { Repository } from 'typeorm/repository/Repository';
-import { getPoolIdsToUpdate, savePoolMetrics } from '../../src/PgBoss/stakePoolMetricsHandler';
-import { initHandlerTest, poolId } from './util';
+import { getPoolIdsToUpdate, savePoolMetrics } from '../../src/PgBoss/stakePoolMetricsHandler.js';
+import { initHandlerTest, poolId } from './util.js';
 import { logger } from '@cardano-sdk/util-dev';
+import type { DataSource } from 'typeorm';
+import type { Pool } from 'pg';
+import type { Repository } from 'typeorm/repository/Repository';
+import type { StakePoolProvider } from '@cardano-sdk/core';
 
 describe('stakePoolMetricsHandler', () => {
   let dataSource: DataSource;

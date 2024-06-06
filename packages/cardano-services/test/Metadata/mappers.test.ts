@@ -1,6 +1,8 @@
 import { Buffer } from 'buffer';
-import { Cardano, Serialization, metadatum, util } from '@cardano-sdk/core';
-import { TxMetadataModel, mapTxMetadata } from '../../src/Metadata';
+import { Serialization, metadatum, util } from '@cardano-sdk/core';
+import { mapTxMetadata } from '../../src/Metadata/index.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { TxMetadataModel } from '../../src/Metadata/index.js';
 
 const toBytes = (data: Cardano.Metadatum) =>
   util.hexToBytes(Serialization.TransactionMetadatum.fromCore(data).toCbor());

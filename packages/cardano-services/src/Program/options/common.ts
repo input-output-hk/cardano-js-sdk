@@ -1,18 +1,18 @@
-import { Command } from 'commander';
-import { InvalidLoggerLevel } from '../../errors';
-import { LogLevel } from 'bunyan';
-import { MissingProgramOption } from '../errors';
-import { Programs, ServiceNames } from '../programs/types';
+import { InvalidLoggerLevel } from '../../errors/index.js';
+import { MissingProgramOption } from '../errors/index.js';
+import { Programs, ServiceNames } from '../programs/types.js';
 import {
   SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT,
   SERVICE_DISCOVERY_TIMEOUT_DEFAULT,
   stringOptionToBoolean
-} from '../utils';
+} from '../utils.js';
 import { Seconds } from '@cardano-sdk/core';
-import { BuildInfo as ServiceBuildInfo } from '../../Http';
-import { addOptions, newOption } from './util';
-import { buildInfoValidator, floatValidator, integerValidator, urlValidator } from '../../util/validators';
+import { addOptions, newOption } from './util.js';
+import { buildInfoValidator, floatValidator, integerValidator, urlValidator } from '../../util/validators.js';
 import { loggerMethodNames } from '@cardano-sdk/util';
+import type { Command } from 'commander';
+import type { LogLevel } from 'bunyan';
+import type { BuildInfo as ServiceBuildInfo } from '../../Http/index.js';
 
 export const ENABLE_METRICS_DEFAULT = false;
 export const DEFAULT_HEALTH_CHECK_CACHE_TTL = Seconds(5);

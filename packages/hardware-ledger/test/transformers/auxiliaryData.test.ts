@@ -1,7 +1,7 @@
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { Cardano } from '@cardano-sdk/core';
-import { mapAuxiliaryData } from '../../src/transformers/auxiliaryData';
-import { txBody } from '../testData';
+import { mapAuxiliaryData } from '../../src/transformers/auxiliaryData.js';
+import { txBody } from '../testData.js';
+import type { Cardano } from '@cardano-sdk/core';
 
 describe('auxiliaryData', () => {
   describe('mapAuxiliaryData', () => {

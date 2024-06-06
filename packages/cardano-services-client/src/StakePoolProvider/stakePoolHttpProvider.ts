@@ -1,6 +1,7 @@
-import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
-import { HttpProviderConfigPaths, StakePoolProvider } from '@cardano-sdk/core';
-import { apiVersion } from '../version';
+import { apiVersion } from '../version.js';
+import { createHttpProvider } from '../HttpProvider.js';
+import type { CreateHttpProviderConfig } from '../HttpProvider.js';
+import type { HttpProviderConfigPaths, StakePoolProvider } from '@cardano-sdk/core';
 
 /** The StakePoolProvider endpoint paths. */
 const paths: HttpProviderConfigPaths<StakePoolProvider> = {

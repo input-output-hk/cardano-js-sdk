@@ -1,6 +1,6 @@
-import { Options } from 'body-parser';
-import expressPromBundle from 'express-prom-bundle';
-import net from 'net';
+import type { Options } from 'body-parser';
+import type expressPromBundle from 'express-prom-bundle';
+import type net from 'net';
 
 export type ServiceHealth = {
   ok: boolean;

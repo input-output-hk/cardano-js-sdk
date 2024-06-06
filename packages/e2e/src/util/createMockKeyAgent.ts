@@ -1,6 +1,7 @@
 import { Bip32PublicKeyHex, SodiumBip32Ed25519 } from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
-import { GroupedAddress, KeyAgent, KeyAgentType } from '@cardano-sdk/key-management';
+import { KeyAgentType } from '@cardano-sdk/key-management';
+import type { GroupedAddress, KeyAgent } from '@cardano-sdk/key-management';
 
 const accountIndex = 0;
 const chainId = Cardano.ChainIds.Preview;

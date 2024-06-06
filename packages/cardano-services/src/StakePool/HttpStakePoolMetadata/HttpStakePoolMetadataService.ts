@@ -6,13 +6,14 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { CustomError } from 'ts-custom-error';
 import { HexBlob } from '@cardano-sdk/util';
-import { Logger } from 'ts-log';
-import { StakePoolExtMetadataResponse, StakePoolMetadataService } from '../types';
-import { StakePoolMetadataServiceError, StakePoolMetadataServiceFailure } from './errors';
+import { StakePoolMetadataServiceError, StakePoolMetadataServiceFailure } from './errors.js';
 import { ValidationError, validate } from 'jsonschema';
-import { getExtMetadataUrl, getSchemaFormat, loadJsonSchema } from './util';
-import { mapToExtendedMetadata } from './mappers';
-import axios, { AxiosInstance } from 'axios';
+import { getExtMetadataUrl, getSchemaFormat, loadJsonSchema } from './util.js';
+import { mapToExtendedMetadata } from './mappers.js';
+import axios from 'axios';
+import type { AxiosInstance } from 'axios';
+import type { Logger } from 'ts-log';
+import type { StakePoolExtMetadataResponse, StakePoolMetadataService } from '../types.js';
 
 const HTTP_CLIENT_TIMEOUT = 2 * 1000;
 const HTTP_CLIENT_MAX_CONTENT_LENGTH = 5000;

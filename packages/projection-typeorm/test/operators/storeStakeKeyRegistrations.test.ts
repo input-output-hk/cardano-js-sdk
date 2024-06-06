@@ -2,8 +2,6 @@ import {
   BlockDataEntity,
   BlockEntity,
   StakeKeyRegistrationEntity,
-  TypeormStabilityWindowBuffer,
-  TypeormTipTracker,
   certificatePointerToId,
   createObservableConnection,
   storeBlock,
@@ -11,19 +9,22 @@ import {
   typeormTransactionCommit,
   willStoreStakeKeyRegistrations,
   withTypeormTransaction
-} from '../../src';
-import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
+} from '../../src/index.js';
+import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
-import { DataSource, QueryRunner, Repository } from 'typeorm';
-import { Observable, firstValueFrom, pairwise, takeWhile } from 'rxjs';
-import { StakeKeyRegistration } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
-import { connectionConfig$, initializeDataSource } from '../util';
+import { connectionConfig$, initializeDataSource } from '../util.js';
 import {
   createProjectorContext,
   createProjectorTilFirst,
   createRollBackwardEventFor,
   createStubProjectionSource
-} from './util';
+} from './util.js';
+import { firstValueFrom, pairwise, takeWhile } from 'rxjs';
+import type { DataSource, QueryRunner, Repository } from 'typeorm';
+import type { Observable } from 'rxjs';
+import type { ProjectionEvent } from '@cardano-sdk/projection';
+import type { StakeKeyRegistration } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
+import type { TypeormStabilityWindowBuffer, TypeormTipTracker } from '../../src/index.js';
 
 describe('storeStakeKeyRegistrations', () => {
   const data = chainSyncData(ChainSyncDataSet.WithPoolRetirement);

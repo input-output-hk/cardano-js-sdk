@@ -1,4 +1,4 @@
-import { Ed25519KeyHashHex } from '../hexTypes';
+import { Ed25519KeyHashHex } from '../hexTypes.js';
 import { InvalidArgumentError } from '@cardano-sdk/util';
 
 export const ED25519_PUBLIC_KEY_HASH_LENGTH = 28;

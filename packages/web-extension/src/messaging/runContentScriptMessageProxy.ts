@@ -1,9 +1,9 @@
 // only tested in ../e2e tests
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Logger } from 'ts-log';
-import { MethodRequest, ResponseMessage } from './types';
-import { isRequestMessage } from './util';
+import { isRequestMessage } from './util.js';
 import { toSerializableObject } from '@cardano-sdk/util';
+import type { Logger } from 'ts-log';
+import type { MethodRequest, ResponseMessage } from './types.js';
 
 export type AnyApi = any;
 

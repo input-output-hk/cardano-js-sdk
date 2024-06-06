@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-shadow */
-import { AssetFixtureBuilder, AssetWith } from './fixtures/FixtureBuilder';
+import { AssetFixtureBuilder, AssetWith } from './fixtures/FixtureBuilder.js';
 import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import {
   CardanoTokenRegistry,
@@ -8,19 +8,18 @@ import {
   DbSyncAssetProvider,
   DbSyncNftMetadataService,
   InMemoryCache,
-  NftMetadataService,
   PAGINATION_PAGE_SIZE_LIMIT_ASSETS,
-  TokenMetadataService,
   UNLIMITED_CACHE_TTL
-} from '../../src';
-import { DbPools } from '../../src/util/DbSyncProvider';
-import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
+} from '../../src/index.js';
 import { Pool } from 'pg';
-import { clearDbPools, sleep } from '../util';
-import { createDbSyncMetadataService } from '../../src/Metadata';
+import { clearDbPools, sleep } from '../util.js';
+import { createDbSyncMetadataService } from '../../src/Metadata/index.js';
 import { logger } from '@cardano-sdk/util-dev';
-import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
-import { mockTokenRegistry } from './fixtures/mocks';
+import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks.js';
+import { mockTokenRegistry } from './fixtures/mocks.js';
+import type { DbPools } from '../../src/util/DbSyncProvider/index.js';
+import type { NftMetadataService, TokenMetadataService } from '../../src/index.js';
+import type { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 
 export const notValidAssetId = Cardano.AssetId('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef');
 const defaultTimeout = DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT;

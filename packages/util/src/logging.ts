@@ -1,4 +1,4 @@
-import { Logger } from 'ts-log';
+import type { Logger } from 'ts-log';
 
 export const loggerMethodNames: (keyof Logger)[] = ['debug', 'error', 'fatal', 'info', 'trace', 'warn'];
 

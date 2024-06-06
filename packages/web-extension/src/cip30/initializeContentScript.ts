@@ -1,6 +1,7 @@
-import { MessengerDependencies, runContentScriptMessageProxy } from '../messaging';
-import { consumeRemoteAuthenticatorApi } from './consumeRemoteAuthenticatorApi';
-import { consumeRemoteWalletApi } from './consumeRemoteWalletApi';
+import { consumeRemoteAuthenticatorApi } from './consumeRemoteAuthenticatorApi.js';
+import { consumeRemoteWalletApi } from './consumeRemoteWalletApi.js';
+import { runContentScriptMessageProxy } from '../messaging/index.js';
+import type { MessengerDependencies } from '../messaging/index.js';
 
 export interface InitializeContentScriptProps {
   walletName: string;

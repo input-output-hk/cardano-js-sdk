@@ -1,7 +1,6 @@
 import { AssetId, TxTestUtil } from '@cardano-sdk/util-dev';
-import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
-import { ChangeAddressResolver, GreedyInputSelector, InputSelectionError, InputSelector, Selection } from '../src';
-import { InputSelectionFailure } from '../src/InputSelectionError';
+import { GreedyInputSelector, InputSelectionError } from '../src/index.js';
+import { InputSelectionFailure } from '../src/InputSelectionError.js';
 import {
   SelectionConstraints,
   asPaymentAddress,
@@ -10,9 +9,12 @@ import {
   generateSelectionParams,
   testInputSelectionFailureMode,
   testInputSelectionProperties
-} from './util';
-import { roundRobinRandomImprove } from '../src/RoundRobinRandomImprove';
+} from './util/index.js';
+import { coalesceValueQuantities } from '@cardano-sdk/core';
+import { roundRobinRandomImprove } from '../src/RoundRobinRandomImprove/index.js';
 import fc from 'fast-check';
+import type { Cardano } from '@cardano-sdk/core';
+import type { ChangeAddressResolver, InputSelector, Selection } from '../src/index.js';
 
 const changeAddress =
   'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9' as Cardano.PaymentAddress;

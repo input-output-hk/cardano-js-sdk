@@ -1,6 +1,6 @@
-import * as Trezor from '@trezor/connect';
 import { Cardano } from '@cardano-sdk/core';
-import { Transform } from '@cardano-sdk/util';
+import type * as Trezor from '@trezor/connect';
+import type { Transform } from '@cardano-sdk/util';
 
 const compareAssetNameCanonically = (a: Trezor.CardanoToken, b: Trezor.CardanoToken) => {
   if (a.assetNameBytes.length === b.assetNameBytes.length) {

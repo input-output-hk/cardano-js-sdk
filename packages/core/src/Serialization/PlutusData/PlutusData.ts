@@ -1,13 +1,13 @@
-import * as Cardano from '../../Cardano';
+import * as Cardano from '../../Cardano/index.js';
 import * as Crypto from '@cardano-sdk/crypto';
-import { CborReader, CborReaderState, CborTag, CborWriter } from '../CBOR';
-import { ConstrPlutusData } from './ConstrPlutusData';
+import { CborReader, CborReaderState, CborTag, CborWriter } from '../CBOR/index.js';
+import { ConstrPlutusData } from './ConstrPlutusData.js';
 import { HexBlob } from '@cardano-sdk/util';
-import { NotImplementedError } from '../../errors';
-import { PlutusDataKind } from './PlutusDataKind';
-import { PlutusList } from './PlutusList';
-import { PlutusMap } from './PlutusMap';
-import { bytesToHex } from '../../util/misc';
+import { NotImplementedError } from '../../errors.js';
+import { PlutusDataKind } from './PlutusDataKind.js';
+import { PlutusList } from './PlutusList.js';
+import { PlutusMap } from './PlutusMap.js';
+import { bytesToHex } from '../../util/misc/index.js';
 
 const MAX_WORD64 = 18_446_744_073_709_551_615n;
 const INDEFINITE_BYTE_STRING = new Uint8Array([95]);

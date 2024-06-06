@@ -1,11 +1,11 @@
 /* eslint-disable complexity,max-statements,sonarjs/cognitive-complexity, unicorn/prefer-switch */
-import * as Cardano from '../../Cardano';
-import { CborReader, CborReaderState, CborWriter } from '../CBOR';
-import { GeneralTransactionMetadata } from './TransactionMetadata/GeneralTransactionMetadata';
+import * as Cardano from '../../Cardano/index.js';
+import { CborReader, CborReaderState, CborWriter } from '../CBOR/index.js';
+import { GeneralTransactionMetadata } from './TransactionMetadata/GeneralTransactionMetadata.js';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import { NativeScript, PlutusV1Script, PlutusV2Script, PlutusV3Script } from '../Scripts';
-import { SerializationError, SerializationFailure } from '../../errors';
-import { hexToBytes } from '../../util/misc';
+import { NativeScript, PlutusV1Script, PlutusV2Script, PlutusV3Script } from '../Scripts/index.js';
+import { SerializationError, SerializationFailure } from '../../errors.js';
+import { hexToBytes } from '../../util/misc/index.js';
 
 export const SHELLEY_ERA_FIELDS_COUNT = 2;
 export const ALONZO_AUX_TAG = 259;

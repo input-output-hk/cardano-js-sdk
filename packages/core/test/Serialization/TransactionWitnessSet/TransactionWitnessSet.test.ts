@@ -1,9 +1,9 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
 import { Base64Blob, HexBlob } from '@cardano-sdk/util';
-import { Cardano } from '../../../src';
-import { RedeemerPurpose } from '../../../src/Cardano';
-import { TransactionWitnessSet } from '../../../src/Serialization';
+import { Cardano } from '../../../src/index.js';
+import { RedeemerPurpose } from '../../../src/Cardano/index.js';
+import { TransactionWitnessSet } from '../../../src/Serialization/index.js';
 
 // Test data used in the following tests was generated with the cardano-serialization-lib
 const cbor = HexBlob(

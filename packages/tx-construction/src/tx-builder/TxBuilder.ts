@@ -1,18 +1,27 @@
 /* eslint-disable complexity */
-import * as Crypto from '@cardano-sdk/crypto';
+import { AddressType, util } from '@cardano-sdk/key-management';
+import { Cardano, Serialization, metadatum } from '@cardano-sdk/core';
+import { GreedyTxEvaluator } from './GreedyTxEvaluator.js';
+import { InsufficientRewardAccounts, OutOfSyncRewardAccounts } from './types.js';
+import { TxOutputBuilder } from './OutputBuilder.js';
 import {
-  AddressType,
-  Bip32Account,
-  SignTransactionOptions,
-  TransactionSigner,
-  WitnessedTx,
-  util
-} from '@cardano-sdk/key-management';
-import { Cardano, HandleProvider, HandleResolution, Serialization, metadatum } from '@cardano-sdk/core';
-import {
+  buildWitness,
+  computeCollateral,
+  createGreedyInputSelector,
+  sortRewardAccountsDelegatedFirst,
+  validateValidityInterval
+} from './utils.js';
+import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
+import { contextLogger, deepEquals } from '@cardano-sdk/util';
+import { createOutputValidator } from '../output-validation/index.js';
+import { initializeTx } from './initializeTx.js';
+import { lastValueFrom } from 'rxjs';
+import omit from 'lodash/omit.js';
+import uniq from 'lodash/uniq.js';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { Bip32Account, SignTransactionOptions, TransactionSigner, WitnessedTx } from '@cardano-sdk/key-management';
+import type {
   CustomizeCb,
-  InsufficientRewardAccounts,
-  OutOfSyncRewardAccounts,
   OutputBuilderTxOut,
   PartialTx,
   PartialTxOut,
@@ -24,28 +33,14 @@ import {
   TxInspection,
   TxOutValidationError,
   UnwitnessedTx
-} from './types';
-import { GreedyTxEvaluator } from './GreedyTxEvaluator';
-import { Logger } from 'ts-log';
-import { OutputBuilderValidator, TxOutputBuilder } from './OutputBuilder';
-import { RedeemersByType } from '../input-selection';
-import { RewardAccountWithPoolId } from '../types';
-import {
-  RewardAccountsAndWeights,
-  buildWitness,
-  computeCollateral,
-  createGreedyInputSelector,
-  sortRewardAccountsDelegatedFirst,
-  validateValidityInterval
-} from './utils';
-import { SelectionSkeleton } from '@cardano-sdk/input-selection';
-import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
-import { contextLogger, deepEquals } from '@cardano-sdk/util';
-import { createOutputValidator } from '../output-validation';
-import { initializeTx } from './initializeTx';
-import { lastValueFrom } from 'rxjs';
-import omit from 'lodash/omit';
-import uniq from 'lodash/uniq';
+} from './types.js';
+import type { HandleProvider, HandleResolution } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { OutputBuilderValidator } from './OutputBuilder.js';
+import type { RedeemersByType } from '../input-selection/index.js';
+import type { RewardAccountWithPoolId } from '../types.js';
+import type { RewardAccountsAndWeights } from './utils.js';
+import type { SelectionSkeleton } from '@cardano-sdk/input-selection';
 
 const DUMMY_SCRIPT_DATA_HASH = '0'.repeat(64) as unknown as Crypto.Hash32ByteBase16;
 

@@ -1,9 +1,11 @@
-import { Cardano, ChainSyncEventType, TipOrOrigin } from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
-import { Observable, defer, finalize, tap } from 'rxjs';
-import { UnifiedExtChainSyncEvent } from '../types';
+import { ChainSyncEventType } from '@cardano-sdk/core';
 import { contextLogger } from '@cardano-sdk/util';
-import { pointDescription } from '../util';
+import { defer, finalize, tap } from 'rxjs';
+import { pointDescription } from '../util.js';
+import type { Cardano, TipOrOrigin } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
+import type { UnifiedExtChainSyncEvent } from '../types.js';
 
 const isAtTheTipOrHigher = (header: Cardano.PartialBlockHeader, tip: TipOrOrigin) => {
   if (tip === 'origin') return false;
@@ -11,7 +13,7 @@ const isAtTheTipOrHigher = (header: Cardano.PartialBlockHeader, tip: TipOrOrigin
 };
 
 const intervals = [1000, 10_000, 100_000] as const;
-type Intervals = typeof intervals[number];
+type Intervals = (typeof intervals)[number];
 
 const intervalsDesc = new Map<Intervals, string>([
   [1000, '1K'],

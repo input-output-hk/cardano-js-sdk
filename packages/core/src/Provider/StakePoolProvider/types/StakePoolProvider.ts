@@ -1,12 +1,12 @@
-import { Cardano, Provider } from '../../..';
-import { DeepPartial } from '@cardano-sdk/util';
-import { Paginated, PaginationArgs } from '../../types/Pagination';
-import { SortFields } from '../util';
+import type { Cardano, Provider } from '../../../index.js';
+import type { DeepPartial } from '@cardano-sdk/util';
+import type { Paginated, PaginationArgs } from '../../types/Pagination.js';
+import type { SortFields } from '../util.js';
 
 export type FilterCondition = 'and' | 'or';
 export type SortOrder = 'asc' | 'desc';
 
-export type SortField = typeof SortFields[number];
+export type SortField = (typeof SortFields)[number];
 
 export interface StakePoolSortOptions {
   order: SortOrder;

@@ -1,35 +1,35 @@
 /* eslint-disable func-style */
 /* eslint-disable jsdoc/require-jsdoc */
 import * as Crypto from '@cardano-sdk/crypto';
-import {
-  AddressType,
-  AsyncKeyAgent,
-  Bip32Account,
-  GroupedAddress,
-  InMemoryKeyAgent,
-  SignTransactionOptions,
-  TransactionSigner,
-  util
-} from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
 import { AssetId, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BigIntMath, HexBlob } from '@cardano-sdk/util';
-import { Cardano, Handle, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import {
   GenericTxBuilder,
   HandleNotFoundError,
   InvalidConfigurationError,
   InvalidHereafterError,
-  OutputBuilderValidator,
-  OutputValidation,
   OutputValidationMinimumCoinError,
   OutputValidationMissingRequiredError,
+  TxOutputFailure
+} from '../../src/index.js';
+import { dummyLogger } from 'ts-log';
+import { mockTxEvaluator } from './mocks.js';
+import type {
+  AsyncKeyAgent,
+  GroupedAddress,
+  SignTransactionOptions,
+  TransactionSigner
+} from '@cardano-sdk/key-management';
+import type { Handle } from '@cardano-sdk/core';
+import type {
+  OutputBuilderValidator,
+  OutputValidation,
   TxBuilderProviders,
   TxOutValidationError,
-  TxOutputBuilder,
-  TxOutputFailure
-} from '../../src';
-import { dummyLogger } from 'ts-log';
-import { mockTxEvaluator } from './mocks';
+  TxOutputBuilder
+} from '../../src/index.js';
 
 function assertObjectRefsAreDifferent(obj1: unknown, obj2: unknown): void {
   expect(obj1).not.toBe(obj2);

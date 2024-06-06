@@ -9,7 +9,6 @@ import {
   OutputEntity,
   StakeKeyRegistrationEntity,
   TokensEntity,
-  TypeormStabilityWindowBuffer,
   createObservableConnection,
   storeAddresses,
   storeAssets,
@@ -19,13 +18,16 @@ import {
   storeUtxo,
   typeormTransactionCommit,
   withTypeormTransaction
-} from '../../../src';
-import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
+} from '../../../src/index.js';
+import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger, mockProviders } from '@cardano-sdk/util-dev';
-import { Observable } from 'rxjs';
-import { ProjectorContext, createProjectorTilFirst, createStubProjectionSource } from '../util';
-import { connectionConfig$ } from '../../util';
+import { connectionConfig$ } from '../../util.js';
+import { createProjectorTilFirst, createStubProjectionSource } from '../util.js';
+import type { Observable } from 'rxjs';
+import type { ProjectionEvent } from '@cardano-sdk/projection';
+import type { ProjectorContext } from '../util.js';
+import type { TypeormStabilityWindowBuffer } from '../../../src/index.js';
 
 export const stubEvents = chainSyncData(ChainSyncDataSet.WithHandle);
 export const policyId = Cardano.PolicyId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a');

@@ -1,10 +1,11 @@
 import { AddressType, Bip32Account, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
-import { GenericTxBuilder, OutputValidation, TxBuilderProviders } from '../../src';
+import { GenericTxBuilder } from '../../src/index.js';
 import { SodiumBip32Ed25519 } from '@cardano-sdk/crypto';
 import { dummyLogger } from 'ts-log';
 import { logger, mockProviders as mocks } from '@cardano-sdk/util-dev';
-import { mockTxEvaluator } from './mocks';
+import { mockTxEvaluator } from './mocks.js';
+import type { OutputValidation, TxBuilderProviders } from '../../src/index.js';
 
 describe.each([
   ['TxBuilderGeneric', false],

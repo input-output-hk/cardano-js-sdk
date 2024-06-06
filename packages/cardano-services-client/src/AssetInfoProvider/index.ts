@@ -1,1 +1,1 @@
-export * from './assetInfoHttpProvider';
+export * from './assetInfoHttpProvider.js';

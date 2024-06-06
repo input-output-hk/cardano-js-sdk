@@ -1,7 +1,8 @@
-import * as Cardano from '../../../Cardano';
-import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
-import { CostModel } from './CostModel';
-import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
+import * as Cardano from '../../../Cardano/index.js';
+import { CborReader, CborReaderState, CborWriter } from '../../CBOR/index.js';
+import { CostModel } from './CostModel.js';
+import { InvalidStateError } from '@cardano-sdk/util';
+import type { HexBlob } from '@cardano-sdk/util';
 
 /** Map of PlutusLanguageVersion to CostModel. */
 export class Costmdls {

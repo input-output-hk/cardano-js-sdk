@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 import { STAKE_POOL_METRICS_UPDATE } from '@cardano-sdk/projection-typeorm';
-import { getEnv } from '../../src';
+import { getEnv } from '../../src/index.js';
 
 const selectRowsCount = async (db: Pool, table: string) => {
   const query = `SELECT COUNT(*) FROM ${table}`;

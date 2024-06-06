@@ -1,28 +1,14 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import {
-  AccountKeyDerivationPath,
-  AddressType,
-  GroupedAddress,
-  InMemoryKeyAgent,
-  KeyRole
-} from '@cardano-sdk/key-management';
-import {
-  Cardano,
-  ChainHistoryProvider,
-  Reward,
-  RewardsProvider,
-  Serialization,
-  TxSubmitProvider,
-  UtxoProvider,
-  coalesceValueQuantities,
-  nativeScriptPolicyId,
-  util
-} from '@cardano-sdk/core';
+import { AddressType, KeyRole } from '@cardano-sdk/key-management';
+import { Cardano, Serialization, coalesceValueQuantities, nativeScriptPolicyId, util } from '@cardano-sdk/core';
 import { GreedyTxEvaluator, defaultSelectionConstraints } from '@cardano-sdk/tx-construction';
-import { InputSelector, StaticChangeAddressResolver, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
-import { MultiSigTx } from './MultiSigTx';
+import { MultiSigTx } from './MultiSigTx.js';
 import { Observable, firstValueFrom, interval, map, switchMap } from 'rxjs';
-import { WalletNetworkInfoProvider } from '@cardano-sdk/wallet';
+import { StaticChangeAddressResolver, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
+import type { AccountKeyDerivationPath, GroupedAddress, InMemoryKeyAgent } from '@cardano-sdk/key-management';
+import type { ChainHistoryProvider, Reward, RewardsProvider, TxSubmitProvider, UtxoProvider } from '@cardano-sdk/core';
+import type { InputSelector } from '@cardano-sdk/input-selection';
+import type { WalletNetworkInfoProvider } from '@cardano-sdk/wallet';
 
 const randomHexChar = () => Math.floor(Math.random() * 16).toString(16);
 const randomPublicKey = () => Crypto.Ed25519PublicKeyHex(Array.from({ length: 64 }).map(randomHexChar).join(''));

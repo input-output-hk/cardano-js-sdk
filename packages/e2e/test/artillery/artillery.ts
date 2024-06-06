@@ -1,5 +1,5 @@
-import { Agent, IncomingMessage } from 'http';
-import { Agent as HttpsAgent } from 'https';
+import type { Agent, IncomingMessage } from 'http';
+import type { Agent as HttpsAgent } from 'https';
 
 /** Artillery context */
 export interface ArtilleryContext<T> {

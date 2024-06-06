@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano } from '../../../src';
+import { Cardano } from '../../../src/index.js';
 
 describe('Cardano/types/StakePool', () => {
   it('PoolId() accepts a valid pool id bech32 string', () => {

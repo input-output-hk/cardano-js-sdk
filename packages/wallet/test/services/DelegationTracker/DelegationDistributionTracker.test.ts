@@ -1,11 +1,13 @@
-import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
+import { AddressType } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
-import { DelegatedStake, TransactionalObservables, UtxoTracker } from '../../../src';
-import { EMPTY, Observable, map } from 'rxjs';
+import { EMPTY, map } from 'rxjs';
 import { Percent } from '@cardano-sdk/util';
-import { createDelegationDistributionTracker } from '../../../src/services/DelegationTracker/DelegationDistributionTracker';
+import { createDelegationDistributionTracker } from '../../../src/services/DelegationTracker/DelegationDistributionTracker.js';
 import { createTestScheduler, mockProviders as mocks } from '@cardano-sdk/util-dev';
-import { stakeKeyDerivationPath } from '../../../../key-management/test/mocks';
+import { stakeKeyDerivationPath } from '../../../../key-management/test/mocks/index.js';
+import type { DelegatedStake, TransactionalObservables, UtxoTracker } from '../../../src/index.js';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
+import type { Observable } from 'rxjs';
 
 describe('createDelegationDistributionTracker', () => {
   let rewardAccounts: Cardano.RewardAccountInfo[];

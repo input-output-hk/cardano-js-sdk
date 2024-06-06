@@ -1,1 +1,1 @@
-export * from './handleHttpProvider';
+export * from './handleHttpProvider.js';

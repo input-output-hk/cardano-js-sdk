@@ -1,20 +1,9 @@
-import {
-  APIErrorCode,
-  ApiError,
-  AuthenticatorApi,
-  WalletApi,
-  WalletApiMethodNames,
-  WithSenderContext
-} from '@cardano-sdk/dapp-connector';
-import {
-  MessengerDependencies,
-  RemoteApiMethod,
-  RemoteApiProperties,
-  RemoteApiPropertyType,
-  exposeApi
-} from '../messaging';
-import { cloneSender, walletApiChannel } from './util';
+import { APIErrorCode, ApiError, WalletApiMethodNames } from '@cardano-sdk/dapp-connector';
+import { RemoteApiPropertyType, exposeApi } from '../messaging/index.js';
+import { cloneSender, walletApiChannel } from './util.js';
 import { of } from 'rxjs';
+import type { AuthenticatorApi, WalletApi, WithSenderContext } from '@cardano-sdk/dapp-connector';
+import type { MessengerDependencies, RemoteApiMethod, RemoteApiProperties } from '../messaging/index.js';
 
 export interface BackgroundWalletApiOptions {
   walletName: string;

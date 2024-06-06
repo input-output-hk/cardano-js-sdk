@@ -1,8 +1,8 @@
-import { EpochNo } from '../Block';
-import { Lovelace } from '../Value';
-import { Percent } from '@cardano-sdk/util';
-import { PoolIdHex } from './primitives';
-import { PoolParameters } from './PoolParameters';
+import type { EpochNo } from '../Block.js';
+import type { Lovelace } from '../Value.js';
+import type { Percent } from '@cardano-sdk/util';
+import type { PoolIdHex } from './primitives.js';
+import type { PoolParameters } from './PoolParameters.js';
 
 /** Stake quantities for a Stake Pool. */
 export interface StakePoolMetricsStake {

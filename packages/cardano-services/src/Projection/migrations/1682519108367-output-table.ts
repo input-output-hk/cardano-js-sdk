@@ -1,5 +1,5 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
 import { OutputEntity } from '@cardano-sdk/projection-typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class OutputTableMigration1682519108367 implements MigrationInterface {
   static entity = OutputEntity;

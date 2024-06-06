@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { EpochNo, PlutusLanguageVersion } from '../../../src/Cardano';
+import { EpochNo, PlutusLanguageVersion } from '../../../src/Cardano/index.js';
 import { HexBlob } from '@cardano-sdk/util';
-import { ProtocolParamUpdate } from '../../../src/Serialization/Update/ProtocolParamUpdate';
+import { ProtocolParamUpdate } from '../../../src/Serialization/Update/ProtocolParamUpdate.js';
 
 // Test data used in the following tests was generated with the cardano-serialization-lib
 

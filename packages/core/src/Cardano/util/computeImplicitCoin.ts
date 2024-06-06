@@ -2,8 +2,8 @@
 /* eslint-disable complexity */
 import * as Crypto from '@cardano-sdk/crypto';
 import { BigIntMath } from '@cardano-sdk/util';
-import { Cardano } from '../..';
-import { HydratedTxBody, Lovelace } from '../types';
+import { Cardano } from '../../index.js';
+import type { HydratedTxBody, Lovelace } from '../types/index.js';
 
 /** Implicit coin quantities used in the transaction */
 export interface ImplicitCoin {

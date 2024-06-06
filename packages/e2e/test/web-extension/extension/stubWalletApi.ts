@@ -1,6 +1,6 @@
 import { Cardano, Serialization } from '@cardano-sdk/core';
-import { Cip30DataSignature, WalletApi } from '@cardano-sdk/dapp-connector';
 import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
+import type { Cip30DataSignature, WalletApi } from '@cardano-sdk/dapp-connector';
 
 const mapUtxos = (utxos: Cardano.Utxo[]) =>
   utxos.map((utxo) => Serialization.TransactionUnspentOutput.fromCore(utxo).toCbor());

@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-duplicate-string */
-import { DEFAULT_FUZZY_SEARCH_OPTIONS } from '../src';
+import { DEFAULT_FUZZY_SEARCH_OPTIONS } from '../src/index.js';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { fork } from 'child_process';
 import path from 'path';

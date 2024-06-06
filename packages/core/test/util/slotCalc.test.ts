@@ -2,21 +2,17 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import {
   Cardano,
-  EpochInfo,
-  EraSummary,
   EraSummaryError,
   Milliseconds,
-  SlotEpochCalc,
-  SlotEpochInfoCalc,
-  SlotTimeCalc,
   createSlotEpochCalc,
   createSlotEpochInfoCalc,
   createSlotTimeCalc,
   epochSlotsCalc
-} from '../../src';
+} from '../../src/index.js';
 import { fromSerializableObject } from '@cardano-sdk/util';
+import type { EpochInfo, EraSummary, SlotEpochCalc, SlotEpochInfoCalc, SlotTimeCalc } from '../../src/index.js';
 
-import merge from 'lodash/merge';
+import merge from 'lodash/merge.js';
 
 // Era summaries copied from util-dev package.
 // Importing directly from util-dev reports Milliseconds types incompatible.

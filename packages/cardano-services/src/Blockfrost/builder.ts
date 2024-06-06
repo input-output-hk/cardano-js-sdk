@@ -1,15 +1,15 @@
-import {
+import { contextLogger } from '@cardano-sdk/util';
+import { findCurrentEpoch, findFirstUpdateAfterBlock, findLastRetire, findPools } from './queries.js';
+import { mapFirstUpdateAfterBlock } from './mappers.js';
+import type {
   CurrentEpochModel,
   FirstUpdateAfterBlock,
   FirstUpdateAfterBlockModel,
   LastRetireModel,
   PoolsModel
-} from './types';
-import { Logger } from 'ts-log';
-import { Pool } from 'pg';
-import { contextLogger } from '@cardano-sdk/util';
-import { findCurrentEpoch, findFirstUpdateAfterBlock, findLastRetire, findPools } from './queries';
-import { mapFirstUpdateAfterBlock } from './mappers';
+} from './types.js';
+import type { Logger } from 'ts-log';
+import type { Pool } from 'pg';
 
 export class BlockfrostCacheBuilder {
   #db: Pool;

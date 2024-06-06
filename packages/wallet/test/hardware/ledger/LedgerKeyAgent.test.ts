@@ -1,25 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import {
-  AddressType,
-  Bip32Account,
-  CommunicationType,
-  SerializableLedgerKeyAgentData,
-  util
-} from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, CommunicationType, util } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
-import { BaseWallet, createPersonalWallet } from '../../../src';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { HID } from 'node-hid';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
-import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
-import { LedgerKeyAgent, LedgerTransportType } from '@cardano-sdk/hardware-ledger';
+import { InvalidDataReason } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
+import { createPersonalWallet } from '../../../src/index.js';
 import { firstValueFrom } from 'rxjs';
 import { getDevices } from '@ledgerhq/hw-transport-node-hid-noevents';
 import { dummyLogger as logger } from 'ts-log';
-import { mockKeyAgentDependencies } from '../../../../key-management/test/mocks';
-import DeviceConnection, { InvalidDataReason } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import { mockKeyAgentDependencies } from '../../../../key-management/test/mocks/index.js';
+import type { BaseWallet } from '../../../src/index.js';
+import type { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
+import type { LedgerTransportType } from '@cardano-sdk/hardware-ledger';
+import type { SerializableLedgerKeyAgentData } from '@cardano-sdk/key-management';
+import type DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 const getHidDevice = () => {
   const ledgerDevicePath = getDevices()[0]?.path;

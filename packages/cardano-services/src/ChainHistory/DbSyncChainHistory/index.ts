@@ -1,2 +1,2 @@
-export * from './DbSyncChainHistoryProvider';
-export * from './ChainHistoryBuilder';
+export * from './DbSyncChainHistoryProvider.js';
+export * from './ChainHistoryBuilder.js';

@@ -1,7 +1,7 @@
 /* eslint-disable no-bitwise */
 /* eslint-disable unicorn/number-literal-case */
 
-import { LossOfPrecisionException } from './errors';
+import { LossOfPrecisionException } from './errors.js';
 
 const LOSS_OF_PRECISION_MSG = 'Invalid conversion. Loss of precision';
 

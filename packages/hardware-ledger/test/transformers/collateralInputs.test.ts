@@ -1,6 +1,6 @@
-import { CONTEXT_WITH_KNOWN_ADDRESSES, txIn } from '../testData';
+import { CONTEXT_WITH_KNOWN_ADDRESSES, txIn } from '../testData.js';
 import { CardanoKeyConst, TxInId, util } from '@cardano-sdk/key-management';
-import { mapCollateralTxIns } from '../../src/transformers';
+import { mapCollateralTxIns } from '../../src/transformers/index.js';
 
 describe('collateralInputs', () => {
   describe('mapCollateralTxIns', () => {

@@ -1,4 +1,4 @@
-import { Asset, Cardano, Provider } from '../..';
+import type { Asset, Cardano, Provider } from '../../index.js';
 
 export interface AssetsExtraData {
   nftMetadata?: boolean;

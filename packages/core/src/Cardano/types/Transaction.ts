@@ -1,18 +1,18 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AuxiliaryData } from './AuxiliaryData';
-import { Base64Blob, HexBlob, OpaqueString } from '@cardano-sdk/util';
-import { Certificate } from './Certificate';
-import { ExUnits, Update, ValidityInterval } from './ProtocolParameters';
-import { HydratedTxIn, TxIn, TxOut } from './Utxo';
-import { Lovelace, TokenMap } from './Value';
-import { NetworkId } from '../ChainId';
-import { PartialBlockHeader } from './Block';
-import { PlutusData } from './PlutusData';
-import { ProposalProcedure, VotingProcedures } from './Governance';
-import { RewardAccount } from '../Address';
-import { Script } from './Script';
-import { TxBodyCBOR } from '../../CBOR/TxBodyCBOR';
-import { bytesToHex, hexToBytes } from '../../util/misc';
+import { bytesToHex, hexToBytes } from '../../util/misc/index.js';
+import type { AuxiliaryData } from './AuxiliaryData.js';
+import type { Base64Blob, HexBlob, OpaqueString } from '@cardano-sdk/util';
+import type { Certificate } from './Certificate.js';
+import type { ExUnits, Update, ValidityInterval } from './ProtocolParameters.js';
+import type { HydratedTxIn, TxIn, TxOut } from './Utxo.js';
+import type { Lovelace, TokenMap } from './Value.js';
+import type { NetworkId } from '../ChainId.js';
+import type { PartialBlockHeader } from './Block.js';
+import type { PlutusData } from './PlutusData.js';
+import type { ProposalProcedure, VotingProcedures } from './Governance.js';
+import type { RewardAccount } from '../Address/index.js';
+import type { Script } from './Script.js';
+import type { TxBodyCBOR } from '../../CBOR/TxBodyCBOR.js';
 
 /** transaction hash as hex string */
 export type TransactionId = OpaqueString<'TransactionId'>;

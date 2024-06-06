@@ -1,4 +1,4 @@
-import { calculateStabilityWindowSlotsCount } from '../../src/util';
+import { calculateStabilityWindowSlotsCount } from '../../src/util/index.js';
 
 describe('calculateStabilityWindowSlotsCount', () => {
   it('calculate stability window slots count', () => {

@@ -1,5 +1,5 @@
-import { APExtMetadataResponse, Cip6ExtMetadataResponse } from '../../../src';
 import { Cardano } from '@cardano-sdk/core';
+import type { APExtMetadataResponse, Cip6ExtMetadataResponse } from '../../../src/index.js';
 
 export const mainExtMetadataMock = () => ({
   description: 'pool desc',

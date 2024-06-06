@@ -1,11 +1,13 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Bip32Account, CommunicationType, KeyAgent, util } from '@cardano-sdk/key-management';
+import { Bip32Account, CommunicationType, util } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
-import { ObservableWallet, createPersonalWallet, restoreKeyAgent } from '../../../src';
 import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
+import { createPersonalWallet, restoreKeyAgent } from '../../../src/index.js';
 import { createStubStakePoolProvider, mockProviders } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
+import type { KeyAgent } from '@cardano-sdk/key-management';
+import type { ObservableWallet } from '../../../src/index.js';
 
 const {
   mockAssetProvider,

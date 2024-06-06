@@ -1,22 +1,21 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { AccountMetadata, WalletMetadata, createAccount } from './util';
-import {
+import { Cardano, Serialization } from '@cardano-sdk/core';
+import { KeyRole } from '@cardano-sdk/key-management';
+import { WalletConflictError, WalletRepository, WalletType } from '../../src/index.js';
+import { createAccount } from './util.js';
+import { firstValueFrom, of } from 'rxjs';
+import { logger } from '@cardano-sdk/util-dev';
+import pick from 'lodash/pick.js';
+import type { AccountMetadata, WalletMetadata } from './util.js';
+import type {
   AddWalletProps,
   HardwareWallet,
   UpdateAccountMetadataProps,
   UpdateWalletMetadataProps,
-  WalletConflictError,
   WalletId,
-  WalletRepository,
-  WalletRepositoryDependencies,
-  WalletType
-} from '../../src';
-import { Cardano, Serialization } from '@cardano-sdk/core';
-import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { KeyRole } from '@cardano-sdk/key-management';
-import { firstValueFrom, of } from 'rxjs';
-import { logger } from '@cardano-sdk/util-dev';
-import pick from 'lodash/pick';
+  WalletRepositoryDependencies
+} from '../../src/index.js';
+import type { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 
 const storedLedgerWallet: HardwareWallet<WalletMetadata, AccountMetadata> = {
   accounts: [createAccount(0, 0)],

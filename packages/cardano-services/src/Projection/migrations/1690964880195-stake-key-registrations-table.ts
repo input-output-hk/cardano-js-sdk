@@ -1,5 +1,5 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
 import { StakeKeyRegistrationEntity } from '@cardano-sdk/projection-typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class StakeKeyRegistrationsTableMigrations1690964880195 implements MigrationInterface {
   static entity = StakeKeyRegistrationEntity;

@@ -1,23 +1,8 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable unicorn/consistent-function-scoping */
 import {
-  ChannelName,
-  Destructor,
-  FinalizationRegistryDestructor,
-  Messenger,
-  MinimalPort,
-  PortMessage,
-  RemoteApiProperties,
-  RemoteApiPropertyType,
-  RemoteApiShutdownError,
-  consumeMessengerRemoteApi,
-  deriveChannelName,
-  exposeMessengerApi
-} from '../../src/messaging';
-import {
   EMPTY,
   EmptyError,
-  Observable,
   Subject,
   delay,
   firstValueFrom,
@@ -30,8 +15,25 @@ import {
   timer,
   toArray
 } from 'rxjs';
+import {
+  FinalizationRegistryDestructor,
+  RemoteApiPropertyType,
+  RemoteApiShutdownError,
+  consumeMessengerRemoteApi,
+  deriveChannelName,
+  exposeMessengerApi
+} from '../../src/messaging/index.js';
 import { dummyLogger } from 'ts-log';
-import memoize from 'lodash/memoize';
+import memoize from 'lodash/memoize.js';
+import type {
+  ChannelName,
+  Destructor,
+  Messenger,
+  MinimalPort,
+  PortMessage,
+  RemoteApiProperties
+} from '../../src/messaging/index.js';
+import type { Observable } from 'rxjs';
 
 const logger = dummyLogger;
 
@@ -507,7 +509,7 @@ describe('remoteApi integration', () => {
         });
 
         it('rejects new api object with missing properties', async () => {
-          otherApi.someNumbers$ = null as unknown as typeof otherApi['someNumbers$'];
+          otherApi.someNumbers$ = null as unknown as (typeof otherApi)['someNumbers$'];
           sut.api$.next(otherApi);
           await expect(firstValueFrom(sut.consumer.someNumbers$)).rejects.toThrowError();
         });

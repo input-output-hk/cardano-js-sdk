@@ -1,6 +1,7 @@
-import { EraSummary, Milliseconds } from '@cardano-sdk/core';
-import { Schema } from '@cardano-ogmios/client';
-import { ogmiosToCore } from '../../src';
+import { Milliseconds } from '@cardano-sdk/core';
+import { ogmiosToCore } from '../../src/index.js';
+import type { EraSummary } from '@cardano-sdk/core';
+import type { Schema } from '@cardano-ogmios/client';
 
 describe('ogmiosToCore', () => {
   describe('eraSummary', () => {

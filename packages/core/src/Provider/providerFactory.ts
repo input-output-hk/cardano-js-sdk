@@ -1,4 +1,4 @@
-import { Logger } from 'ts-log';
+import type { Logger } from 'ts-log';
 
 /** ProviderFactory method interface. */
 export interface ProviderFactoryMethod<T> {

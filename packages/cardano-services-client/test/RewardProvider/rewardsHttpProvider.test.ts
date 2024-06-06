@@ -1,9 +1,10 @@
-import { Cardano, Reward } from '@cardano-sdk/core';
-import { config, healthCheckResponseWithState } from '../util';
-import { rewardsHttpProvider } from '../../src';
+import { Cardano } from '@cardano-sdk/core';
+import { config, healthCheckResponseWithState } from '../util.js';
+import { rewardsHttpProvider } from '../../src/index.js';
 import { toSerializableObject } from '@cardano-sdk/util';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
+import type { Reward } from '@cardano-sdk/core';
 
 describe('rewardsHttpProvider', () => {
   const rewardAccount = Cardano.RewardAccount('stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6');

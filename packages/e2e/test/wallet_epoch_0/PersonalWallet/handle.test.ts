@@ -1,7 +1,5 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano, metadatum } from '@cardano-sdk/core';
-import { KeyAgent, TransactionSigner } from '@cardano-sdk/key-management';
 import {
   bip32Ed25519Factory,
   burnTokens,
@@ -18,10 +16,12 @@ import {
   txConfirmed,
   walletReady,
   walletVariables
-} from '../../../src';
+} from '../../../src/index.js';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';
 import path from 'path';
+import type { BaseWallet } from '@cardano-sdk/wallet';
+import type { KeyAgent, TransactionSigner } from '@cardano-sdk/key-management';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();

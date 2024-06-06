@@ -2,28 +2,31 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
-import { ChainHistoryFixtureBuilder, TxWith } from './fixtures/FixtureBuilder';
+import { Cardano } from '@cardano-sdk/core';
+import { ChainHistoryFixtureBuilder, TxWith } from './fixtures/FixtureBuilder.js';
 import {
   ChainHistoryHttpService,
   DbSyncChainHistoryProvider,
   HttpServer,
-  HttpServerConfig,
   InMemoryCache,
   UNLIMITED_CACHE_TTL
-} from '../../src';
-import { CreateHttpProviderConfig, chainHistoryHttpProvider } from '@cardano-sdk/cardano-services-client';
-import { DB_MAX_SAFE_INTEGER } from '../../src/ChainHistory/DbSyncChainHistory/queries';
-import { DataMocks } from '../data-mocks';
-import { DbPools, LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
-import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
+} from '../../src/index.js';
+import { DB_MAX_SAFE_INTEGER } from '../../src/ChainHistory/DbSyncChainHistory/queries.js';
+import { DataMocks } from '../data-mocks/index.js';
 import { Pool } from 'pg';
-import { clearDbPools, servicesWithVersionPath as services } from '../util';
-import { createDbSyncMetadataService } from '../../src/Metadata';
+import { chainHistoryHttpProvider } from '@cardano-sdk/cardano-services-client';
+import { clearDbPools, servicesWithVersionPath as services } from '../util.js';
+import { createDbSyncMetadataService } from '../../src/Metadata/index.js';
+import { findLedgerTip } from '../../src/util/DbSyncProvider/index.js';
 import { getPort } from 'get-port-please';
-import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
+import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks.js';
 import { logger } from '@cardano-sdk/util-dev';
 import axios from 'axios';
+import type { ChainHistoryProvider } from '@cardano-sdk/core';
+import type { CreateHttpProviderConfig } from '@cardano-sdk/cardano-services-client';
+import type { DbPools, LedgerTipModel } from '../../src/util/DbSyncProvider/index.js';
+import type { HttpServerConfig } from '../../src/index.js';
+import type { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 
 require('json-bigint-patch');
 

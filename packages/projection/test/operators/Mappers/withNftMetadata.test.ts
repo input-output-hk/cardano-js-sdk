@@ -1,15 +1,14 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Asset, Cardano, ChainSyncEventType, ChainSyncRollForward, Serialization, util } from '@cardano-sdk/core';
-import {
-  ChainSyncDataSet,
-  SerializedChainSyncEvent,
-  chainSyncData,
-  generateRandomHexString
-} from '@cardano-sdk/util-dev';
+import { Asset, Cardano, ChainSyncEventType, Serialization, util } from '@cardano-sdk/core';
+import { ChainSyncDataSet, chainSyncData, generateRandomHexString } from '@cardano-sdk/util-dev';
 import { HexBlob } from '@cardano-sdk/util';
-import { Mappers, ProjectionEvent } from '../../../src';
-import { Observable, firstValueFrom, map, of } from 'rxjs';
+import { Mappers } from '../../../src/index.js';
 import { dummyLogger } from 'ts-log';
+import { firstValueFrom, map, of } from 'rxjs';
+import type { ChainSyncRollForward } from '@cardano-sdk/core';
+import type { Observable } from 'rxjs';
+import type { ProjectionEvent } from '../../../src/index.js';
+import type { SerializedChainSyncEvent } from '@cardano-sdk/util-dev';
 
 // Events in inline-datum.json have both cip25 and cip68 metadata.
 // Removing cip25 metadata helps testing cip68.

@@ -1,4 +1,4 @@
-import { CborReader, CborWriter } from '../CBOR';
+import { CborReader, CborWriter } from '../CBOR/index.js';
 import { HexBlob } from '@cardano-sdk/util';
 
 export class Hash<T extends string> {

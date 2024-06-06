@@ -1,6 +1,6 @@
-import * as Crypto from '@cardano-sdk/crypto';
-import * as Trezor from '@trezor/connect';
-import { Transform } from '@cardano-sdk/util';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type * as Trezor from '@trezor/connect';
+import type { Transform } from '@cardano-sdk/util';
 
 export const mapAuxiliaryData: Transform<Crypto.Hash32ByteBase16, Trezor.CardanoAuxiliaryData> = (
   auxiliaryDataHash

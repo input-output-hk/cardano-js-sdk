@@ -1,12 +1,17 @@
 /* eslint-disable no-bitwise */
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
-import { GroupedAddress, util as KeyManagementUtil, WitnessedTx } from '@cardano-sdk/key-management';
-import { Observable, firstValueFrom } from 'rxjs';
-import { ObservableWallet, ScriptAddress, isScriptAddress } from '../types';
-import { ProtocolParametersRequiredByOutputValidator, createOutputValidator } from '@cardano-sdk/tx-construction';
-import { txInEquals } from './util';
-import uniqBy from 'lodash/uniqBy';
+import { Cardano } from '@cardano-sdk/core';
+import { util as KeyManagementUtil } from '@cardano-sdk/key-management';
+import { createOutputValidator } from '@cardano-sdk/tx-construction';
+import { firstValueFrom } from 'rxjs';
+import { isScriptAddress } from '../types.js';
+import { txInEquals } from './util/index.js';
+import uniqBy from 'lodash/uniqBy.js';
+import type { ChainHistoryProvider } from '@cardano-sdk/core';
+import type { GroupedAddress, WitnessedTx } from '@cardano-sdk/key-management';
+import type { Observable } from 'rxjs';
+import type { ObservableWallet, ScriptAddress } from '../types.js';
+import type { ProtocolParametersRequiredByOutputValidator } from '@cardano-sdk/tx-construction';
 
 export interface InputResolverContext {
   utxo: {

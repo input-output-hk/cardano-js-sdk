@@ -1,6 +1,7 @@
-import { Origin, PersistentAuthenticator, senderOrigin } from '../../src';
-import { Runtime } from 'webextension-polyfill';
+import { PersistentAuthenticator, senderOrigin } from '../../src/index.js';
 import { dummyLogger } from 'ts-log';
+import type { Origin } from '../../src/index.js';
+import type { Runtime } from 'webextension-polyfill';
 
 const createStubStorage = () => {
   let origins: Origin[] = [];

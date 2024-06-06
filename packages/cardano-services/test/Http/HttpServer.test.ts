@@ -10,25 +10,27 @@ import {
   HttpService,
   InMemoryCache,
   ORIGIN,
-  ServerMetadata,
   ServiceNames,
   UNLIMITED_CACHE_TTL
-} from '../../src';
-import { Cardano, Provider } from '@cardano-sdk/core';
-import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
-import { Logger } from 'ts-log';
-import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
+} from '../../src/index.js';
+import { Cardano } from '@cardano-sdk/core';
 import { Pool } from 'pg';
 import { RunnableModule, fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
-import { baseVersionPath, serverStarted } from '../util';
+import { baseVersionPath, serverStarted } from '../util.js';
 import { createLogger, logger } from '@cardano-sdk/util-dev';
+import { findLedgerTip } from '../../src/util/DbSyncProvider/index.js';
 import { getRandomPort } from 'get-port-please';
-import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
-import { versionPathFromSpec } from '../../src/util/openApi';
+import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks.js';
+import { versionPathFromSpec } from '../../src/util/openApi.js';
 import axios from 'axios';
 import express from 'express';
-import net from 'net';
 import path from 'path';
+import type { LedgerTipModel } from '../../src/util/DbSyncProvider/index.js';
+import type { Logger } from 'ts-log';
+import type { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
+import type { Provider } from '@cardano-sdk/core';
+import type { ServerMetadata } from '../../src/index.js';
+import type net from 'net';
 
 const apiSpec = path.join(__dirname, 'openApi.json');
 const someServiceVersionPath = versionPathFromSpec(apiSpec);

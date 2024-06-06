@@ -1,8 +1,10 @@
-import { Cardano, CardanoNode, HealthCheckResponse, Provider, ProviderDependencies } from '@cardano-sdk/core';
-import { InMemoryCache } from '../../InMemoryCache';
-import { LedgerTipModel, findLedgerTip } from './util';
-import { Logger } from 'ts-log';
-import { Pool } from 'pg';
+import { Cardano } from '@cardano-sdk/core';
+import { findLedgerTip } from './util.js';
+import type { CardanoNode, HealthCheckResponse, Provider, ProviderDependencies } from '@cardano-sdk/core';
+import type { InMemoryCache } from '../../InMemoryCache/index.js';
+import type { LedgerTipModel } from './util.js';
+import type { Logger } from 'ts-log';
+import type { Pool } from 'pg';
 
 /** Dedicated DB pools */
 export interface DbPools {

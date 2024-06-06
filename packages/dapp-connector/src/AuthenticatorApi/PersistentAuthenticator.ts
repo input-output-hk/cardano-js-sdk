@@ -1,8 +1,8 @@
-import { AuthenticatorApi, Origin, RequestAccess } from './types';
-import { Logger } from 'ts-log';
-import { PersistentAuthenticatorStorage } from './PersistentAuthenticatorStorage';
-import { Runtime } from 'webextension-polyfill';
-import { senderOrigin } from '../util';
+import { senderOrigin } from '../util.js';
+import type { AuthenticatorApi, Origin, RequestAccess } from './types.js';
+import type { Logger } from 'ts-log';
+import type { PersistentAuthenticatorStorage } from './PersistentAuthenticatorStorage.js';
+import type { Runtime } from 'webextension-polyfill';
 
 export interface PersistentAuhenticatorOptions {
   requestAccess: RequestAccess;

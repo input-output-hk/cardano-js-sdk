@@ -3,14 +3,12 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
-import { EMPTY, Observable, firstValueFrom, of } from 'rxjs';
-import { InMemoryStakePoolsStore, KeyValueStore } from '../../../src/persistence';
+import { Cardano } from '@cardano-sdk/core';
+import { EMPTY, firstValueFrom, of } from 'rxjs';
+import { InMemoryStakePoolsStore } from '../../../src/persistence/index.js';
 import {
-  OutgoingOnChainTx,
   PAGE_SIZE,
   TrackedStakePoolProvider,
-  TxInFlight,
   addressCredentialStatuses,
   addressRewards,
   createDelegateeTracker,
@@ -18,12 +16,18 @@ import {
   createRewardsProvider,
   fetchRewardsTrigger$,
   getStakePoolIdAtEpoch
-} from '../../../src';
-import { RetryBackoffConfig } from 'backoff-rxjs';
-import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
+} from '../../../src/index.js';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
-import { dummyCbor } from '../../util';
+import { dummyCbor } from '../../util.js';
+import type { KeyValueStore } from '../../../src/persistence/index.js';
+import type { Observable } from 'rxjs';
+import type {
+  OutgoingOnChainTx,
+  TxInFlight } from '../../../src/index.js';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
+import type { RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
+import type { TxWithEpoch } from '../../../src/services/DelegationTracker/types.js';
 
 const { currentEpoch, generateStakePools, mockStakePoolsProvider } = mockProviders;
 

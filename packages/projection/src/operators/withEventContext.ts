@@ -1,5 +1,6 @@
-import { ExtChainSyncEvent, ExtChainSyncOperator } from '../types';
-import { Observable, isObservable, map, mergeMap, of } from 'rxjs';
+import { isObservable, map, mergeMap, of } from 'rxjs';
+import type { ExtChainSyncEvent, ExtChainSyncOperator } from '../types.js';
+import type { Observable } from 'rxjs';
 
 /** Extend events with custom context (created per event) */
 export const withEventContext =

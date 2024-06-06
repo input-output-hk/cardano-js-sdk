@@ -1,7 +1,9 @@
-import { Cardano, Paginated } from '@cardano-sdk/core';
-import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { Cardano } from '@cardano-sdk/core';
 import { Percent, isNotNil } from '@cardano-sdk/util';
-import { RelayModel, mapRelay } from '../DbSyncStakePoolProvider';
+import { mapRelay } from '../DbSyncStakePoolProvider/index.js';
+import type { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import type { Paginated } from '@cardano-sdk/core';
+import type { RelayModel } from '../DbSyncStakePoolProvider/index.js';
 
 export type Margin = {
   numerator: number;

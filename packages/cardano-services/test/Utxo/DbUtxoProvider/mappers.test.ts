@@ -1,5 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
-import { UtxoModel, utxosToCore } from '../../../src/Utxo';
+import { utxosToCore } from '../../../src/Utxo/index.js';
+import type { UtxoModel } from '../../../src/Utxo/index.js';
 
 describe('utxosToCore', () => {
   const someFetchedUtxos: UtxoModel[] = [

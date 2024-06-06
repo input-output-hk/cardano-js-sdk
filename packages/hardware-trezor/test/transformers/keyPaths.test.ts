@@ -6,8 +6,8 @@ import {
   knownAddressStakeKeyPath,
   rewardAddress,
   txIn
-} from '../testData';
-import { resolvePaymentKeyPathForTxIn, resolveStakeKeyPath } from '../../src';
+} from '../testData.js';
+import { resolvePaymentKeyPathForTxIn, resolveStakeKeyPath } from '../../src/index.js';
 
 describe('key-paths', () => {
   describe('resolvePaymentKeyPathForTxIn', () => {

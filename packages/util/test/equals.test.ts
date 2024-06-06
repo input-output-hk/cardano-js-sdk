@@ -4,7 +4,7 @@ import {
   deepEquals,
   sameArrayItems,
   strictEquals
-} from '../src';
+} from '../src/index.js';
 
 describe('equals', () => {
   test('deepEquals', () => {

@@ -1,13 +1,14 @@
-import { HttpServer } from '../../Http/HttpServer';
-import { Logger } from 'ts-log';
-import { MissingProgramOption } from '../errors';
-import { PgBossHttpService, PgBossServiceDependencies, PgBossWorkerArgs } from '../services/pgboss';
-import { PostgresOptionDescriptions } from '../options';
-import { SrvRecord } from 'dns';
-import { createDnsResolver } from '../utils';
+import { HttpServer } from '../../Http/HttpServer.js';
+import { MissingProgramOption } from '../errors/index.js';
+import { PgBossHttpService } from '../services/pgboss.js';
+import { PostgresOptionDescriptions } from '../options/index.js';
+import { createDnsResolver } from '../utils.js';
 import { createLogger } from 'bunyan';
-import { getConnectionConfig, getPool } from '../services/postgres';
-import { getListen } from '../../Http/util';
+import { getConnectionConfig, getPool } from '../services/postgres.js';
+import { getListen } from '../../Http/util.js';
+import type { Logger } from 'ts-log';
+import type { PgBossServiceDependencies, PgBossWorkerArgs } from '../services/pgboss.js';
+import type { SrvRecord } from 'dns';
 
 export const PARALLEL_JOBS_DEFAULT = 10;
 export const PG_BOSS_WORKER_API_URL_DEFAULT = new URL('http://localhost:3003');

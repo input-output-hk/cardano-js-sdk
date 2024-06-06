@@ -1,10 +1,19 @@
-import * as Trezor from '@trezor/connect';
-import { Cardano } from '@cardano-sdk/core';
-import { Transformer, transformObj } from '@cardano-sdk/util';
-import { TrezorTxTransformerContext } from '../types';
-import { mapAdditionalWitnessRequests } from './additionalWitnessRequests';
-import { mapAuxiliaryData, mapCerts, mapRequiredSigners, mapTxIns, mapTxOuts, mapWithdrawals, toTxOut } from './';
-import { mapTokenMap } from './assets';
+import { mapAdditionalWitnessRequests } from './additionalWitnessRequests.js';
+import {
+  mapAuxiliaryData,
+  mapCerts,
+  mapRequiredSigners,
+  mapTxIns,
+  mapTxOuts,
+  mapWithdrawals,
+  toTxOut
+} from './../index.js';
+import { mapTokenMap } from './assets.js';
+import { transformObj } from '@cardano-sdk/util';
+import type * as Trezor from '@trezor/connect';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Transformer } from '@cardano-sdk/util';
+import type { TrezorTxTransformerContext } from '../types.js';
 
 export const trezorTxTransformer: Transformer<
   Cardano.TxBody,

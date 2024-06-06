@@ -1,8 +1,8 @@
-import { AnyWallet, WalletId } from './types';
-import { Cardano } from '@cardano-sdk/core';
-import { Observable } from 'rxjs';
-import { ObservableWallet, storage } from '@cardano-sdk/wallet';
-import { Witnesser } from '@cardano-sdk/key-management';
+import type { AnyWallet, WalletId } from './types.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Observable } from 'rxjs';
+import type { ObservableWallet, storage } from '@cardano-sdk/wallet';
+import type { Witnesser } from '@cardano-sdk/key-management';
 
 export interface WalletManagerProps {
   name: string;

@@ -1,13 +1,7 @@
 import { BigIntMath } from '@cardano-sdk/util';
-import { Cardano } from '@cardano-sdk/core';
-import {
-  RequiredImplicitValue,
-  RoundRobinRandomImproveArgs,
-  UtxoSelection,
-  assetQuantitySelector,
-  getCoinQuantity,
-  toValues
-} from '../util';
+import { assetQuantitySelector, getCoinQuantity, toValues } from '../util.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { RequiredImplicitValue, RoundRobinRandomImproveArgs, UtxoSelection } from '../util.js';
 
 const improvesSelection = (
   utxoAlreadySelected: Cardano.Utxo[],

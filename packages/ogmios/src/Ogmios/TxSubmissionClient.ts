@@ -1,8 +1,9 @@
-import { InteractionContext, TxSubmission, ensureSocketIsOpen, safeJSON } from '@cardano-ogmios/client';
-import { Ogmios, TxId } from '@cardano-ogmios/schema';
-import { WebSocket } from '@cardano-ogmios/client/dist/IsomorphicWebSocket';
+import { TxSubmission, ensureSocketIsOpen, safeJSON } from '@cardano-ogmios/client';
 import { baseRequest } from '@cardano-ogmios/client/dist/Request';
 import { nanoid } from 'nanoid';
+import type { InteractionContext } from '@cardano-ogmios/client';
+import type { Ogmios, TxId } from '@cardano-ogmios/schema';
+import type { WebSocket } from '@cardano-ogmios/client/dist/IsomorphicWebSocket';
 
 /** See also {@link createTxSubmissionClient} for creating a client. */
 export interface TxSubmissionClient {

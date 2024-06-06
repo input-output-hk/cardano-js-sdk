@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { DbPools } from '../src/util/DbSyncProvider';
 import { Ogmios } from '@cardano-sdk/ogmios';
-import { Pool } from 'pg';
-import { ServiceNames } from '../src';
-import { createMockOgmiosServer } from '../../ogmios/test/mocks/mockOgmiosServer';
+import { ServiceNames } from '../src/index.js';
+import { createMockOgmiosServer } from '../../ogmios/test/mocks/mockOgmiosServer.js';
 import { getRandomPort } from 'get-port-please';
 import { of } from 'rxjs';
-import { versionPathFromSpec } from '../src/util/openApi';
-import axios, { AxiosRequestConfig } from 'axios';
+import { versionPathFromSpec } from '../src/util/openApi.js';
+import axios from 'axios';
 import path from 'path';
 import waitOn from 'wait-on';
+import type { AxiosRequestConfig } from 'axios';
+import type { DbPools } from '../src/util/DbSyncProvider/index.js';
+import type { Pool } from 'pg';
 
 type WrappedAsyncTestFunction = (db: Pool) => Promise<any>;
 type AsyncTestFunction = () => Promise<any>;

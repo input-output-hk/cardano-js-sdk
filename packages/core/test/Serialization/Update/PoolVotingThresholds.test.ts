@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { HexBlob } from '@cardano-sdk/util';
-import { PoolVotingThresholds } from '../../../src/Serialization';
+import { PoolVotingThresholds } from '../../../src/Serialization/index.js';
 
 // Test data used in the following tests was generated with the cardano-serialization-lib
 

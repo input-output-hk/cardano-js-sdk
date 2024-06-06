@@ -1,6 +1,6 @@
-import { AnyWallet, HardwareWallet, InMemoryWallet, ScriptWallet, WalletId } from '../types';
-import { Bip32PublicKeyHex } from '@cardano-sdk/crypto';
-import { Observable } from 'rxjs';
+import type { AnyWallet, HardwareWallet, InMemoryWallet, ScriptWallet, WalletId } from '../types.js';
+import type { Bip32PublicKeyHex } from '@cardano-sdk/crypto';
+import type { Observable } from 'rxjs';
 
 export type RemoveAccountProps = {
   walletId: WalletId;

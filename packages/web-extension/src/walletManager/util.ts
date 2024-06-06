@@ -1,5 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import {
+import { util as keyManagementUtil } from '@cardano-sdk/key-management';
+import type {
   AccountKeyDerivationPath,
   AsyncKeyAgent,
   SignDataContext,
@@ -7,19 +8,20 @@ import {
   TransactionSigner,
   WitnessOptions,
   WitnessedTx,
-  Witnesser,
-  util as keyManagementUtil
+  Witnesser
 } from '@cardano-sdk/key-management';
 
-import { AnyBip32Wallet, AnyWallet, ScriptWallet, WalletId, WalletType } from './types';
 import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
-import { HexBlob } from '@cardano-sdk/util';
-import { InitializeTxWitness } from '@cardano-sdk/tx-construction';
-import { RemoteApiProperties, RemoteApiPropertyType } from '../messaging';
-import { SigningCoordinatorSignApi } from './SigningCoordinator';
-import { WalletManagerApi } from './walletManager.types';
-import { WalletRepositoryApi } from './WalletRepository';
+import { RemoteApiPropertyType } from '../messaging/index.js';
+import { WalletType } from './types.js';
 import { firstValueFrom } from 'rxjs';
+import type { AnyBip32Wallet, AnyWallet, ScriptWallet, WalletId } from './types.js';
+import type { HexBlob } from '@cardano-sdk/util';
+import type { InitializeTxWitness } from '@cardano-sdk/tx-construction';
+import type { RemoteApiProperties } from '../messaging/index.js';
+import type { SigningCoordinatorSignApi } from './SigningCoordinator/index.js';
+import type { WalletManagerApi } from './walletManager.types.js';
+import type { WalletRepositoryApi } from './WalletRepository/index.js';
 
 const SCRIPT_TYPE_NOT_SUPPORTED =
   'Only native scripts of types: RequireAllOf, RequireAnyOf and RequireNOf are supported by this script witnesser';

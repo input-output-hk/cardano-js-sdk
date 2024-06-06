@@ -16,8 +16,8 @@ import {
   InMemoryTipStore,
   InMemoryTransactionsStore,
   InMemoryUtxoStore
-} from '../../src/persistence';
-import { assertCompletesWithoutEmitting } from './util';
+} from '../../src/persistence/index.js';
+import { assertCompletesWithoutEmitting } from './util.js';
 import { firstValueFrom, mergeMap, share, shareReplay, take, toArray } from 'rxjs';
 
 describe('inMemoryStores', () => {

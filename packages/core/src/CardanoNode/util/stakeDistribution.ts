@@ -1,5 +1,5 @@
-import { Lovelace } from '../../Cardano';
-import { StakeDistribution } from '../types';
+import type { Lovelace } from '../../Cardano/index.js';
+import type { StakeDistribution } from '../types/index.js';
 
 /**
  * Transforms StakeDistribution to a single live stake value of the network

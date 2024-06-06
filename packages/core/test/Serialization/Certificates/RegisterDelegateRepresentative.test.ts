@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import * as Cardano from '../../../src/Cardano';
 import { HexBlob } from '@cardano-sdk/util';
-import { RegisterDelegateRepresentative } from '../../../src/Serialization';
+import { RegisterDelegateRepresentative } from '../../../src/Serialization/index.js';
+import type * as Cardano from '../../../src/Cardano/index.js';
 
 // Test data used in the following tests was generated with the cardano-serialization-lib
 const cbor = HexBlob('84108200581c0000000000000000000000000000000000000000000000000000000000f6');

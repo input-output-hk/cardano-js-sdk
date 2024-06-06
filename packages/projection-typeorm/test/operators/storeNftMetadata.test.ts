@@ -1,4 +1,4 @@
-import { Asset, Cardano, ChainSyncEventType, ChainSyncRollForward } from '@cardano-sdk/core';
+import { Asset, Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import {
   AssetEntity,
   BlockDataEntity,
@@ -7,8 +7,6 @@ import {
   NftMetadataType,
   OutputEntity,
   TokensEntity,
-  TypeormStabilityWindowBuffer,
-  TypeormTipTracker,
   createObservableConnection,
   storeAssets,
   storeBlock,
@@ -17,13 +15,10 @@ import {
   typeormTransactionCommit,
   willStoreNftMetadata,
   withTypeormTransaction
-} from '../../src';
-import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
-import { CIP67Asset, ProjectedNftMetadata } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
+} from '../../src/index.js';
+import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
 import { ChainSyncDataSet, chainSyncData, generateRandomHexString, logger } from '@cardano-sdk/util-dev';
-import { Observable, firstValueFrom, lastValueFrom, toArray } from 'rxjs';
-import { QueryRunner, Repository } from 'typeorm';
-import { connectionConfig$, initializeDataSource } from '../util';
+import { connectionConfig$, initializeDataSource } from '../util.js';
 import {
   createProjectorContext,
   createProjectorTilFirst,
@@ -33,9 +28,16 @@ import {
   createStubProjectionSource,
   createStubRollForwardEvent,
   filterAssets
-} from './util';
+} from './util.js';
 import { dummyLogger } from 'ts-log';
-import omit from 'lodash/omit';
+import { firstValueFrom, lastValueFrom, toArray } from 'rxjs';
+import omit from 'lodash/omit.js';
+import type { CIP67Asset, ProjectedNftMetadata } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
+import type { ChainSyncRollForward } from '@cardano-sdk/core';
+import type { Observable } from 'rxjs';
+import type { ProjectionEvent } from '@cardano-sdk/projection';
+import type { QueryRunner, Repository } from 'typeorm';
+import type { TypeormStabilityWindowBuffer, TypeormTipTracker } from '../../src/index.js';
 
 const patchNftMetadataNameCip25 = (
   metadata: Cardano.TxMetadata,

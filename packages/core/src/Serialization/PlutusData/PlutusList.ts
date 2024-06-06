@@ -1,7 +1,7 @@
-import { CborReader, CborReaderState, CborWriter } from '../CBOR';
+import { CborReader, CborReaderState, CborWriter } from '../CBOR/index.js';
 import { HexBlob } from '@cardano-sdk/util';
-import { PlutusData } from './PlutusData';
-import { bytesToHex, hexToBytes } from '../../util/misc';
+import { PlutusData } from './PlutusData.js';
+import { bytesToHex, hexToBytes } from '../../util/misc/index.js';
 
 /** A list of plutus data. */
 export class PlutusList {

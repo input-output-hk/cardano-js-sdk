@@ -1,16 +1,18 @@
 import {
-  CompletionMessage,
-  EmitMessage,
-  MethodRequest,
-  RequestMessage,
-  ResponseMessage,
   isCompletionMessage,
   isEmitMessage,
   isRequest,
   isRequestMessage,
   isResponseMessage,
   newMessageId
-} from '../../src';
+} from '../../src/index.js';
+import type {
+  CompletionMessage,
+  EmitMessage,
+  MethodRequest,
+  RequestMessage,
+  ResponseMessage
+} from '../../src/index.js';
 
 describe('messaging/util', () => {
   const validRequest: MethodRequest = { args: ['arg'], method: 'method' };

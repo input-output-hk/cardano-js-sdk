@@ -1,7 +1,8 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { ChainSyncEventType } from '@cardano-sdk/core';
-import { InMemory, Mappers, ProjectionEvent } from '../../src';
+import { InMemory } from '../../src/index.js';
 import { firstValueFrom, of } from 'rxjs';
+import type { Mappers, ProjectionEvent } from '../../src/index.js';
 
 describe('InMemory.storeStakeKeys', () => {
   it('adds a key on registration, removes on deregistration and inverses operations on rollbacks', async () => {

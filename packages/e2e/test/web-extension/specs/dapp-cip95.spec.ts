@@ -1,5 +1,5 @@
-import { selectors } from '../extension/const';
-import { switchToWalletUi } from './utils';
+import { selectors } from '../extension/const.js';
+import { switchToWalletUi } from './utils.js';
 
 // uses cip95 demo dapp: https://github.com/Ryun1/cip95-cardano-wallet-connector @89b405fbc
 

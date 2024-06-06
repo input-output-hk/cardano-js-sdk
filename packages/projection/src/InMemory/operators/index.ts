@@ -1,2 +1,2 @@
-export * from './storeStakeKeys';
-export * from './storeStakePools';
+export * from './storeStakeKeys.js';
+export * from './storeStakePools.js';

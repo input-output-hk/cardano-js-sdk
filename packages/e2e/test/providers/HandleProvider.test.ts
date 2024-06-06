@@ -1,5 +1,5 @@
 import { createLogger } from '@cardano-sdk/util-dev';
-import { getEnv, walletVariables } from '../../src';
+import { getEnv, walletVariables } from '../../src/index.js';
 import { handleHttpProvider } from '@cardano-sdk/cardano-services-client';
 import fs from 'fs';
 import path from 'path';

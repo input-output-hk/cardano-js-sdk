@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { coalesceChangeBundlesForMinCoinRequirement } from '../src/RoundRobinRandomImprove/change';
+import { coalesceChangeBundlesForMinCoinRequirement } from '../src/RoundRobinRandomImprove/change.js';
 
 const TOKEN1_ASSET_ID = Cardano.AssetId('5c677ba4dd295d9286e0e22786fea9ed735a6ae9c07e7a45ae4d95c84249530000');
 const TOKEN2_ASSET_ID = Cardano.AssetId('5c677ba4dd295d9286e0e22786fea9ed735a6ae9c07e7a45ae4d95c84249530001');

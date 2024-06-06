@@ -1,5 +1,6 @@
-import { AsyncKeyAgent } from '@cardano-sdk/key-management';
-import { RemoteApiProperties, RemoteApiPropertyType } from '../messaging';
+import { RemoteApiPropertyType } from '../messaging/index.js';
+import type { AsyncKeyAgent } from '@cardano-sdk/key-management';
+import type { RemoteApiProperties } from '../messaging/index.js';
 
 export const keyAgentChannel = (walletName: string) => `${walletName}$-keyAgent`;
 

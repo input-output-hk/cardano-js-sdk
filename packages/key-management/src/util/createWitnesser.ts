@@ -1,4 +1,6 @@
-import {
+import { TxCBOR } from '@cardano-sdk/core';
+import { stubSignTransaction } from './stubSignTransaction.js';
+import type {
   AccountKeyDerivationPath,
   AsyncKeyAgent,
   SignBlobResult,
@@ -8,10 +10,9 @@ import {
   WitnessOptions,
   WitnessedTx,
   Witnesser
-} from '../types';
-import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
-import { HexBlob } from '@cardano-sdk/util';
-import { stubSignTransaction } from './stubSignTransaction';
+} from '../types.js';
+import type { Cardano, Serialization } from '@cardano-sdk/core';
+import type { HexBlob } from '@cardano-sdk/util';
 
 /** A witnesser that uses a {@link KeyAgent} to generate witness data for a transaction. */
 export class Bip32Ed25519Witnesser implements Witnesser {

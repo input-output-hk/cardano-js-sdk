@@ -1,7 +1,7 @@
-import { BaseWallet } from '../../src';
 import { createSlotTimeCalc } from '@cardano-sdk/core';
-import { createWallet } from './util';
+import { createWallet } from './util.js';
 import { firstValueFrom } from 'rxjs';
+import type { BaseWallet } from '../../src/index.js';
 
 describe('integration/transactionTime', () => {
   let wallet: BaseWallet;

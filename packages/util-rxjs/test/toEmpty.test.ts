@@ -1,5 +1,5 @@
 import { createTestScheduler } from '@cardano-sdk/util-dev';
-import { toEmpty } from '../src';
+import { toEmpty } from '../src/index.js';
 
 describe('toEmpty', () => {
   it('supresses emissions', () => {

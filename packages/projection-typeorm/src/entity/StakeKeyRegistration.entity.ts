@@ -1,5 +1,5 @@
-import { BigIntColumnOptions, OnDeleteCascadeRelationOptions } from './util';
-import { BlockEntity } from './Block.entity';
+import { BigIntColumnOptions, OnDeleteCascadeRelationOptions } from './util.js';
+import { BlockEntity } from './Block.entity.js';
 import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
 

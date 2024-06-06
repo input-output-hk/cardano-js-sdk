@@ -1,6 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, Serialization } from '@cardano-sdk/core';
-import { cip36 } from '../src';
+import { cip36 } from '../src/index.js';
 
 import delay from 'delay';
 

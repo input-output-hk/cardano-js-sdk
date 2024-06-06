@@ -1,14 +1,14 @@
 /* eslint-disable no-bitwise */
 /* eslint-disable unicorn/number-literal-case */
-import { CborAdditionalInfo } from './CborAdditionalInfo';
-import { CborContentException, CborInvalidOperationException } from './errors';
-import { CborInitialByte } from './CborInitialByte';
-import { CborMajorType } from './CborMajorType';
-import { CborReaderState } from './CborReaderState';
-import { CborSimpleValue } from './CborSimpleValue';
-import { CborTag } from './CborTag';
-import { HexBlob } from '@cardano-sdk/util';
-import { decodeHalf } from './Half';
+import { CborAdditionalInfo } from './CborAdditionalInfo.js';
+import { CborContentException, CborInvalidOperationException } from './errors.js';
+import { CborInitialByte } from './CborInitialByte.js';
+import { CborMajorType } from './CborMajorType.js';
+import { CborReaderState } from './CborReaderState.js';
+import { decodeHalf } from './Half.js';
+import type { CborSimpleValue } from './CborSimpleValue.js';
+import type { CborTag } from './CborTag.js';
+import type { HexBlob } from '@cardano-sdk/util';
 
 // Constants
 const UNEXPECTED_END_OF_BUFFER_MSG = 'Unexpected end of buffer';

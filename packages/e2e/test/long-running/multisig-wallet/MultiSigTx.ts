@@ -1,6 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, Serialization, deserializeTx } from '@cardano-sdk/core';
-import { HexBlob } from '@cardano-sdk/util';
+import { Serialization, deserializeTx } from '@cardano-sdk/core';
+import type { Cardano } from '@cardano-sdk/core';
+import type { HexBlob } from '@cardano-sdk/util';
 
 /**
  * Represents a multi-signature transaction for the Cardano blockchain.

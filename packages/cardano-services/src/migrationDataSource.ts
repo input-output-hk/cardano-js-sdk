@@ -1,7 +1,7 @@
 // To be used with typeorm cli for generating migrations.
 // Generated script has to be manually converted into 1 or more ProjectionMigration classes.
 // Works with local database as started by yarn:*:up
-import { allEntities } from './Projection/prepareTypeormProjection';
+import { allEntities } from './Projection/prepareTypeormProjection.js';
 import { createDataSource } from '@cardano-sdk/projection-typeorm';
 export { DataSource } from 'typeorm';
 

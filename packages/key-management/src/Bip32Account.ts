@@ -1,13 +1,8 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import {
-  AccountAddressDerivationPath,
-  AccountKeyDerivationPath,
-  AsyncKeyAgent,
-  GroupedAddress,
-  KeyRole
-} from './types';
 import { Cardano } from '@cardano-sdk/core';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import { KeyRole } from './types.js';
+import type { AccountAddressDerivationPath, AccountKeyDerivationPath, AsyncKeyAgent, GroupedAddress } from './types.js';
 
 type Bip32AccountProps = {
   extendedAccountPublicKey: Crypto.Bip32PublicKeyHex;

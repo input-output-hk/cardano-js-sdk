@@ -1,4 +1,4 @@
-import { CardanoNodeErrors } from '../../CardanoNode';
+import { CardanoNodeErrors } from '../../CardanoNode/index.js';
 import { isProductionEnvironment, stripStackTrace } from '@cardano-sdk/util';
 
 /**

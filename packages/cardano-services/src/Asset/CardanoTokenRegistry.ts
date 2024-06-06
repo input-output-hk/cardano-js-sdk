@@ -1,10 +1,12 @@
-import { Asset, Cardano, Milliseconds, ProviderError, ProviderFailure, Seconds } from '@cardano-sdk/core';
-import { InMemoryCache } from '../InMemoryCache';
-import { Logger } from 'ts-log';
-import { TokenMetadataService } from './types';
+import { Cardano, Milliseconds, ProviderError, ProviderFailure, Seconds } from '@cardano-sdk/core';
+import { InMemoryCache } from '../InMemoryCache/index.js';
 import { contextLogger } from '@cardano-sdk/util';
-import axios, { AxiosInstance } from 'axios';
-import pick from 'lodash/pick';
+import axios from 'axios';
+import pick from 'lodash/pick.js';
+import type { Asset } from '@cardano-sdk/core';
+import type { AxiosInstance } from 'axios';
+import type { Logger } from 'ts-log';
+import type { TokenMetadataService } from './types.js';
 
 export const DEFAULT_TOKEN_METADATA_CACHE_TTL = Seconds(10 * 60);
 export const DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT = Milliseconds(3 * 1000);

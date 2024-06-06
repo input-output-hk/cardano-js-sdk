@@ -1,9 +1,9 @@
 import { Bip32Account, util } from '@cardano-sdk/key-management';
-import { WalletStores } from '../../src/persistence';
-import { createPersonalWallet } from '../../src';
+import { createPersonalWallet } from '../../src/index.js';
 import { createStubStakePoolProvider, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
-import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
+import { testAsyncKeyAgent } from '../../../key-management/test/mocks/index.js';
+import type { WalletStores } from '../../src/persistence/index.js';
 
 const {
   mockAssetProvider,

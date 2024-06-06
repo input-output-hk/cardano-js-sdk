@@ -14,7 +14,8 @@ import {
   takeUntil,
   throwError
 } from 'rxjs';
-import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
+import { retryBackoff } from 'backoff-rxjs';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
 
 export interface ColdObservableProviderProps<T> {
   provider: () => Promise<T>;

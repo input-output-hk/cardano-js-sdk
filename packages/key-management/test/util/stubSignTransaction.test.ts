@@ -1,7 +1,8 @@
-import { Cardano } from '@cardano-sdk/core';
 import { Ed25519PublicKey, Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
+import type { Cardano } from '@cardano-sdk/core';
 
-import { GroupedAddress, util } from '../../src';
+import { util } from '../../src/index.js';
+import type { GroupedAddress } from '../../src/index.js';
 
 jest.mock('../../src/util/ownSignatureKeyPaths');
 const { ownSignatureKeyPaths } = jest.requireMock('../../src/util/ownSignatureKeyPaths');

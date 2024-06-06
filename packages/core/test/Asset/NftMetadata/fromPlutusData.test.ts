@@ -1,7 +1,8 @@
-import { Asset, Cardano, Serialization } from '../../../src';
+import { Asset, Serialization } from '../../../src/index.js';
 import { HexBlob } from '@cardano-sdk/util';
 import { dummyLogger } from 'ts-log';
-import { utf8ToBytes } from '../../../src/util/misc';
+import { utf8ToBytes } from '../../../src/util/misc/index.js';
+import type { Cardano } from '../../../src/index.js';
 
 const logger = dummyLogger;
 

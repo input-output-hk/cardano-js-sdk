@@ -1,18 +1,18 @@
 /* eslint-disable sonarjs/cognitive-complexity, complexity, sonarjs/cognitive-complexity, max-statements */
-import * as Cardano from '../../Cardano';
-import * as Crypto from '@cardano-sdk/crypto';
-import { CborReader, CborReaderState, CborWriter } from '../CBOR';
-import { CborSet, Hash } from '../Common';
-import { Certificate } from '../Certificates';
+import * as Cardano from '../../Cardano/index.js';
+import { CborReader, CborReaderState, CborWriter } from '../CBOR/index.js';
+import { CborSet, Hash } from '../Common/index.js';
+import { Certificate } from '../Certificates/index.js';
 import { HexBlob } from '@cardano-sdk/util';
-import { ProposalProcedure } from './ProposalProcedure';
-import { SerializationError, SerializationFailure } from '../../errors';
-import { TransactionInput } from './TransactionInput';
-import { TransactionOutput } from './TransactionOutput';
-import { Update } from '../Update';
-import { VotingProcedures } from './VotingProcedures';
-import { hexToBytes } from '../../util/misc';
-import { multiAssetsToTokenMap, sortCanonically, tokenMapToMultiAsset } from './Utils';
+import { ProposalProcedure } from './ProposalProcedure/index.js';
+import { SerializationError, SerializationFailure } from '../../errors.js';
+import { TransactionInput } from './TransactionInput.js';
+import { TransactionOutput } from './TransactionOutput.js';
+import { Update } from '../Update/index.js';
+import { VotingProcedures } from './VotingProcedures/index.js';
+import { hexToBytes } from '../../util/misc/index.js';
+import { multiAssetsToTokenMap, sortCanonically, tokenMapToMultiAsset } from './Utils.js';
+import type * as Crypto from '@cardano-sdk/crypto';
 
 type TransactionInputSet = CborSet<ReturnType<TransactionInput['toCore']>, TransactionInput>;
 

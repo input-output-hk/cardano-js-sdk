@@ -1,6 +1,7 @@
-import { Cardano, Serialization } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
-import { TxMetadataModel } from './types';
+import { Serialization } from '@cardano-sdk/core';
+import type { Cardano } from '@cardano-sdk/core';
+import type { TxMetadataModel } from './types.js';
 
 export const mapTxMetadata = (metadataModel: Pick<TxMetadataModel, 'bytes' | 'key'>[]): Cardano.TxMetadata =>
   metadataModel.reduce((map, metadatum) => {

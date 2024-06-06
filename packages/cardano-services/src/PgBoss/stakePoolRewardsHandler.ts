@@ -1,21 +1,23 @@
-import { Between, DataSource, LessThanOrEqual } from 'typeorm';
-import { Cardano, NetworkInfoProvider, epochSlotsCalcFactory } from '@cardano-sdk/core';
+import { Between, LessThanOrEqual } from 'typeorm';
 import {
   CurrentPoolMetricsEntity,
   PoolRegistrationEntity,
   PoolRetirementEntity,
   PoolRewardsEntity,
   STAKE_POOL_REWARDS,
-  StakePoolEntity,
-  StakePoolRewardsJob
+  StakePoolEntity
 } from '@cardano-sdk/projection-typeorm';
-import { MissingProgramOption } from '../Program/errors';
-import { RewardsComputeContext, WorkerHandlerFactory } from './types';
-import { ServiceNames } from '../Program/programs/types';
-import { accountActiveStake, poolDelegators, poolRewards } from './stakePoolRewardsQueries';
-import { computeROS } from '../StakePool/TypeormStakePoolProvider/util';
-import { missingProviderUrlOption } from '../Program/options/common';
+import { MissingProgramOption } from '../Program/errors/index.js';
+import { ServiceNames } from '../Program/programs/types.js';
+import { accountActiveStake, poolDelegators, poolRewards } from './stakePoolRewardsQueries.js';
+import { computeROS } from '../StakePool/TypeormStakePoolProvider/util.js';
+import { epochSlotsCalcFactory } from '@cardano-sdk/core';
+import { missingProviderUrlOption } from '../Program/options/common.js';
 import { networkInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
+import type { Cardano, NetworkInfoProvider } from '@cardano-sdk/core';
+import type { DataSource } from 'typeorm';
+import type { RewardsComputeContext, WorkerHandlerFactory } from './types.js';
+import type { StakePoolRewardsJob } from '@cardano-sdk/projection-typeorm';
 
 /** The version of the algorithm to compute rewards. */
 export const REWARDS_COMPUTE_VERSION = 1;

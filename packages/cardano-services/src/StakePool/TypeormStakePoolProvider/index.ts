@@ -1,2 +1,2 @@
-export * from './TypeormStakePoolProvider';
-export { validateFuzzyOptions } from './util';
+export * from './TypeormStakePoolProvider.js';
+export { validateFuzzyOptions } from './util.js';

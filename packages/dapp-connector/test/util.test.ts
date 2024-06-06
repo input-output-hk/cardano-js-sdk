@@ -1,4 +1,4 @@
-import { senderOrigin } from '../src';
+import { senderOrigin } from '../src/index.js';
 
 describe('util', () => {
   describe('senderOrigin', () => {

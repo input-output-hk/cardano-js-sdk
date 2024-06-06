@@ -1,13 +1,13 @@
-import {
+import { defaultJobOptions } from '@cardano-sdk/projection-typeorm';
+import type {
   CommonProgramOptions,
   OgmiosProgramOptions,
   PosgresProgramOptions,
   StakePoolMetadataProgramOptions
-} from '../options';
-import { HandlePolicyIdsProgramOptions } from '../options/policyIds';
-import { Milliseconds, Seconds } from '@cardano-sdk/core';
-import { TypeOrmStakePoolProviderProps } from '../../StakePool';
-import { defaultJobOptions } from '@cardano-sdk/projection-typeorm';
+} from '../options/index.js';
+import type { HandlePolicyIdsProgramOptions } from '../options/policyIds.js';
+import type { Milliseconds, Seconds } from '@cardano-sdk/core';
+import type { TypeOrmStakePoolProviderProps } from '../../StakePool/index.js';
 
 /** cardano-services programs */
 export enum Programs {

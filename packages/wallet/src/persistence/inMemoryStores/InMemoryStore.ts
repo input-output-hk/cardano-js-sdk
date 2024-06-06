@@ -1,5 +1,6 @@
-import { Destroyable } from '../types';
-import { Observable, of } from 'rxjs';
+import { of } from 'rxjs';
+import type { Destroyable } from '../types.js';
+import type { Observable } from 'rxjs';
 
 export abstract class InMemoryStore implements Destroyable {
   destroyed = false;

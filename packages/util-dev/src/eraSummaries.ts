@@ -1,4 +1,5 @@
-import { EraSummary, Milliseconds } from '@cardano-sdk/core';
+import { Milliseconds } from '@cardano-sdk/core';
+import type { EraSummary } from '@cardano-sdk/core';
 
 /** Valid at 2022-05-28 */
 

@@ -1,7 +1,7 @@
-import * as Cardano from '../../../Cardano';
-import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
+import * as Cardano from '../../../Cardano/index.js';
+import { CborReader, CborReaderState, CborWriter } from '../../CBOR/index.js';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import { NativeScript } from './NativeScript';
+import { NativeScript } from './NativeScript.js';
 
 const EMBEDDED_GROUP_SIZE = 2;
 

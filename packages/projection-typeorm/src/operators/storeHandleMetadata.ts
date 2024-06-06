@@ -1,8 +1,8 @@
 import { ChainSyncEventType } from '@cardano-sdk/core';
-import { HandleMetadataEntity } from '../entity';
-import { Mappers } from '@cardano-sdk/projection';
-import { WithStoredProducedUtxo } from './storeUtxo';
-import { typeormOperator } from './util';
+import { HandleMetadataEntity } from '../entity/index.js';
+import { typeormOperator } from './util.js';
+import type { Mappers } from '@cardano-sdk/projection';
+import type { WithStoredProducedUtxo } from './storeUtxo.js';
 
 export const willStoreHandleMetadata = ({ handleMetadata }: Mappers.WithHandleMetadata) => handleMetadata.length > 0;
 

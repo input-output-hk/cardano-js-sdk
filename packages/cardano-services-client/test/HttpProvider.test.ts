@@ -1,13 +1,16 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-duplicate-string */
-import { HttpProviderConfig, createHttpProvider } from '../src';
-import { Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { Server } from 'http';
+import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { createHttpProvider } from '../src/index.js';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { getPort } from 'get-port-please';
 import { logger } from '@cardano-sdk/util-dev';
-import express, { RequestHandler } from 'express';
+import express from 'express';
 import path from 'path';
+import type { HttpProviderConfig } from '../src/index.js';
+import type { Provider } from '@cardano-sdk/core';
+import type { RequestHandler } from 'express';
+import type { Server } from 'http';
 
 const packageJson = require(path.join(__dirname, '..', 'package.json'));
 

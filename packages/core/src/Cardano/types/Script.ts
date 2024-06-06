@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
-import * as Crypto from '@cardano-sdk/crypto';
-import { HexBlob } from '@cardano-sdk/util';
-import { Slot } from './Block';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { HexBlob } from '@cardano-sdk/util';
+import type { Slot } from './Block.js';
 
 /** Plutus script type. */
 export enum ScriptType {

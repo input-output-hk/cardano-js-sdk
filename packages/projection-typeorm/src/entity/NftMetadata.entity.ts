@@ -1,9 +1,10 @@
-import { Asset, Cardano } from '@cardano-sdk/core';
-import { AssetEntity } from './Asset.entity';
-import { BlockEntity } from './Block.entity';
+import { Asset } from '@cardano-sdk/core';
+import { AssetEntity } from './Asset.entity.js';
+import { BlockEntity } from './Block.entity.js';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { OnDeleteCascadeRelationOptions, OnDeleteSetNullRelationOptions } from './util';
-import { sanitizeNullCharacters, serializableObj } from './transformers';
+import { OnDeleteCascadeRelationOptions, OnDeleteSetNullRelationOptions } from './util.js';
+import { sanitizeNullCharacters, serializableObj } from './transformers.js';
+import type { Cardano } from '@cardano-sdk/core';
 
 export enum NftMetadataType {
   CIP25 = 'CIP-0025',

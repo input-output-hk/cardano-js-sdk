@@ -1,6 +1,6 @@
-import * as Bip32KeyDerivation from './Bip32KeyDerivation';
-import { BIP32_PUBLIC_KEY_HASH_LENGTH, Bip32PublicKeyHashHex, Bip32PublicKeyHex } from '../hexTypes';
-import { ED25519_PUBLIC_KEY_LENGTH, Ed25519PublicKey } from '../Ed25519e';
+import * as Bip32KeyDerivation from './Bip32KeyDerivation.js';
+import { BIP32_PUBLIC_KEY_HASH_LENGTH, Bip32PublicKeyHashHex, Bip32PublicKeyHex } from '../hexTypes.js';
+import { ED25519_PUBLIC_KEY_LENGTH, Ed25519PublicKey } from '../Ed25519e/index.js';
 import { InvalidArgumentError } from '@cardano-sdk/util';
 import { crypto_generichash, ready } from 'libsodium-wrappers-sumo';
 

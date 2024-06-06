@@ -1,5 +1,5 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
 import { PoolRewardsEntity } from '@cardano-sdk/projection-typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class RewardsPledgeNumericMigration1715157190230 implements MigrationInterface {
   static entity = PoolRewardsEntity;

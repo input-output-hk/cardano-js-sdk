@@ -1,6 +1,6 @@
 import { TxInId } from '@cardano-sdk/key-management';
-import { contextWithKnownAddresses, txIn } from '../testData';
-import { mapAdditionalWitnessRequests } from '../../src/transformers/additionalWitnessRequests';
+import { contextWithKnownAddresses, txIn } from '../testData.js';
+import { mapAdditionalWitnessRequests } from '../../src/transformers/additionalWitnessRequests.js';
 
 describe('additionalWitnessRequests', () => {
   it('should include payment key paths and reward account key path from given inputs', async () => {

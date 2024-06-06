@@ -1,5 +1,6 @@
-import { MessengerDependencies, consumeRemoteApi } from '../messaging';
-import { keyAgentChannel, keyAgentProperties } from './util';
+import { consumeRemoteApi } from '../messaging/index.js';
+import { keyAgentChannel, keyAgentProperties } from './util.js';
+import type { MessengerDependencies } from '../messaging/index.js';
 
 export interface ConsumeKeyAgentProps {
   walletName: string;

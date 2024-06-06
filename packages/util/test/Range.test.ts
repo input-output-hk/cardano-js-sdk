@@ -1,4 +1,4 @@
-import { InvalidRangeError, inRange, throwIfInvalidRange } from '../src/Range';
+import { InvalidRangeError, inRange, throwIfInvalidRange } from '../src/Range.js';
 
 describe('Range', () => {
   describe('throwIfInvalidRange', () => {

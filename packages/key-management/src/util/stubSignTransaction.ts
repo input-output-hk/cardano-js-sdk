@@ -1,10 +1,10 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano } from '@cardano-sdk/core';
-import { SignTransactionContext, SignTransactionOptions } from '../types';
 import { deepEquals } from '@cardano-sdk/util';
-import { ownSignatureKeyPaths } from './ownSignatureKeyPaths';
+import { ownSignatureKeyPaths } from './ownSignatureKeyPaths.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { SignTransactionContext, SignTransactionOptions } from '../types.js';
 
-import uniqWith from 'lodash/uniqWith';
+import uniqWith from 'lodash/uniqWith.js';
 
 const randomHexChar = () => Math.floor(Math.random() * 16).toString(16);
 const randomPublicKey = () => Crypto.Ed25519PublicKeyHex(Array.from({ length: 64 }).map(randomHexChar).join(''));

@@ -2,21 +2,30 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-identical-functions */
-import { CreateHttpProviderConfig, networkInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
-import { DbPools, DbSyncEpochPollService, LedgerTipModel, findLedgerTip, loadGenesisData } from '../../src/util';
-import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../src/NetworkInfo';
-import { HttpServer, HttpServerConfig } from '../../src';
+import { DbSyncEpochPollService, findLedgerTip, loadGenesisData } from '../../src/util/index.js';
+import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../src/NetworkInfo/index.js';
+import { HttpServer } from '../../src/index.js';
 import { INFO, createLogger } from 'bunyan';
-import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache';
-import { NetworkInfoFixtureBuilder } from './fixtures/FixtureBuilder';
-import { NetworkInfoProvider } from '@cardano-sdk/core';
-import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
+import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache/index.js';
+import { NetworkInfoFixtureBuilder } from './fixtures/FixtureBuilder.js';
 import { Pool } from 'pg';
-import { clearDbPools, ingestDbData, servicesWithVersionPath as services, sleep, wrapWithTransaction } from '../util';
+import {
+  clearDbPools,
+  ingestDbData,
+  servicesWithVersionPath as services,
+  sleep,
+  wrapWithTransaction
+} from '../util.js';
 import { getPort } from 'get-port-please';
-import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
+import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks.js';
 import { logger } from '@cardano-sdk/util-dev';
+import { networkInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import axios from 'axios';
+import type { CreateHttpProviderConfig } from '@cardano-sdk/cardano-services-client';
+import type { DbPools, LedgerTipModel } from '../../src/util/index.js';
+import type { HttpServerConfig } from '../../src/index.js';
+import type { NetworkInfoProvider } from '@cardano-sdk/core';
+import type { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
 const APPLICATION_CBOR = 'application/cbor';

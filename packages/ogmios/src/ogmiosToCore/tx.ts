@@ -13,9 +13,8 @@ import {
   isRequireNOf,
   isShelleyTx,
   isStartsAt
-} from './util';
+} from './util.js';
 import { Base64Blob, HexBlob } from '@cardano-sdk/util';
-import { BlockKind, CommonBlock } from './types';
 import {
   Cardano,
   NotImplementedError,
@@ -23,9 +22,10 @@ import {
   SerializationError,
   SerializationFailure
 } from '@cardano-sdk/core';
-import { Schema } from '@cardano-ogmios/client';
 import Fraction from 'fraction.js';
-import omit from 'lodash/omit';
+import omit from 'lodash/omit.js';
+import type { BlockKind, CommonBlock } from './types.js';
+import type { Schema } from '@cardano-ogmios/client';
 
 const mapMargin = (margin: string): Cardano.Fraction => {
   const { n: numerator, d: denominator } = new Fraction(margin);

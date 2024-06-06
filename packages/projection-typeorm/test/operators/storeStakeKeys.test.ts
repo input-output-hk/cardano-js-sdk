@@ -1,10 +1,11 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { DataSource, QueryRunner } from 'typeorm';
-import { Mappers, ProjectionEvent } from '@cardano-sdk/projection';
-import { StakeKeyEntity } from '../../src';
-import { WithTypeormContext, storeStakeKeys } from '../../src/operators';
+import { StakeKeyEntity } from '../../src/index.js';
 import { firstValueFrom, of } from 'rxjs';
-import { initializeDataSource } from '../util';
+import { initializeDataSource } from '../util.js';
+import { storeStakeKeys } from '../../src/operators/index.js';
+import type { DataSource, QueryRunner } from 'typeorm';
+import type { Mappers, ProjectionEvent } from '@cardano-sdk/projection';
+import type { WithTypeormContext } from '../../src/operators/index.js';
 
 describe('storeStakeKeys', () => {
   let dataSource: DataSource;

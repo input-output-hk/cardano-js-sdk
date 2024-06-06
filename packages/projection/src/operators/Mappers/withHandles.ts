@@ -1,11 +1,12 @@
-import { Asset, Cardano, Handle } from '@cardano-sdk/core';
-import { CIP67Asset, CIP67Assets, WithCIP67 } from './withCIP67';
-import { FilterByPolicyIds } from './types';
+import { Asset, Cardano } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
-import { Logger } from 'ts-log';
-import { ProjectionOperator } from '../../types';
-import { assetNameToUTF8Handle } from './util';
+import { assetNameToUTF8Handle } from './util.js';
 import { map } from 'rxjs';
+import type { CIP67Asset, CIP67Assets, WithCIP67 } from './withCIP67.js';
+import type { FilterByPolicyIds } from './types.js';
+import type { Handle } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { ProjectionOperator } from '../../types.js';
 
 export interface HandleOwnership {
   handle: Handle;

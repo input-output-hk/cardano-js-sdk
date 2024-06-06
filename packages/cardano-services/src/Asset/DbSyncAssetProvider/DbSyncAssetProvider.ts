@@ -1,17 +1,10 @@
-import {
-  Asset,
-  AssetProvider,
-  Cardano,
-  GetAssetArgs,
-  GetAssetsArgs,
-  ProviderError,
-  ProviderFailure,
-  Seconds
-} from '@cardano-sdk/core';
-import { AssetBuilder } from './AssetBuilder';
-import { AssetPolicyIdAndName, NftMetadataService, TokenMetadataService } from '../types';
-import { DB_CACHE_TTL_DEFAULT, InMemoryCache, NoCache } from '../../InMemoryCache';
-import { DbSyncProvider, DbSyncProviderDependencies } from '../../util';
+import { AssetBuilder } from './AssetBuilder.js';
+import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { DB_CACHE_TTL_DEFAULT, InMemoryCache, NoCache } from '../../InMemoryCache/index.js';
+import { DbSyncProvider } from '../../util/index.js';
+import type { Asset, AssetProvider, GetAssetArgs, GetAssetsArgs, Seconds } from '@cardano-sdk/core';
+import type { AssetPolicyIdAndName, NftMetadataService, TokenMetadataService } from '../types.js';
+import type { DbSyncProviderDependencies } from '../../util/index.js';
 
 /** Properties that are need to create DbSyncAssetProvider */
 export interface DbSyncAssetProviderProps {

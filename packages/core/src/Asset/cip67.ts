@@ -1,6 +1,7 @@
-import * as Cardano from '../Cardano';
-import { InvalidArgumentError, OpaqueNumber } from '@cardano-sdk/util';
-import crc8 from './crc8';
+import * as Cardano from '../Cardano/index.js';
+import { InvalidArgumentError } from '@cardano-sdk/util';
+import crc8 from './crc8.js';
+import type { OpaqueNumber } from '@cardano-sdk/util';
 
 const ASSET_LABEL_LENGTH = 8;
 const ASSET_LABEL_BRACKET = '0';

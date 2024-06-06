@@ -1,6 +1,6 @@
-import { Cardano } from '../..';
-import { Provider } from '../Provider';
-import { Range } from '@cardano-sdk/util';
+import type { Cardano } from '../../index.js';
+import type { Provider } from '../Provider.js';
+import type { Range } from '@cardano-sdk/util';
 
 export interface Reward {
   epoch: Cardano.EpochNo;

@@ -1,6 +1,7 @@
-import { AddressType, GroupedAddress, KeyRole } from '../../src';
+import { AddressType, KeyRole } from '../../src/index.js';
 import { Cardano } from '@cardano-sdk/core';
-import { paymentKeyPathFromGroupedAddress, stakeKeyPathFromGroupedAddress } from '../../src/util';
+import { paymentKeyPathFromGroupedAddress, stakeKeyPathFromGroupedAddress } from '../../src/util/index.js';
+import type { GroupedAddress } from '../../src/index.js';
 
 export const paymentAddress = Cardano.PaymentAddress(
   'addr1qxdtr6wjx3kr7jlrvrfzhrh8w44qx9krcxhvu3e79zr7497tpmpxjfyhk3vwg6qjezjmlg5nr5dzm9j6nxyns28vsy8stu5lh6'

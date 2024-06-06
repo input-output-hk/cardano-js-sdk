@@ -1,7 +1,7 @@
-import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
+import { CborReader, CborReaderState, CborWriter } from '../../CBOR/index.js';
 import { HexBlob } from '@cardano-sdk/util';
-import { TransactionMetadatum } from './TransactionMetadatum';
-import { bytesToHex, hexToBytes } from '../../../util/misc';
+import { TransactionMetadatum } from './TransactionMetadatum.js';
+import { bytesToHex, hexToBytes } from '../../../util/misc/index.js';
 
 /** A list of metadatum. */
 export class MetadatumList {

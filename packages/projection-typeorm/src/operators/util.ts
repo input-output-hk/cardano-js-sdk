@@ -1,7 +1,8 @@
-import { BootstrapExtraProps, ProjectionEvent, unifiedProjectorOperator } from '@cardano-sdk/projection';
 import { Cardano } from '@cardano-sdk/core';
-import { WithTypeormContext } from './withTypeormTransaction';
 import { from } from 'rxjs';
+import { unifiedProjectorOperator } from '@cardano-sdk/projection';
+import type { BootstrapExtraProps, ProjectionEvent } from '@cardano-sdk/projection';
+import type { WithTypeormContext } from './withTypeormTransaction.js';
 
 // With 2023-03 mainnet protocol parameters this is good for:
 // - >300 years

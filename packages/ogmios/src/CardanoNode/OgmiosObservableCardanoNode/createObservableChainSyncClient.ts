@@ -1,12 +1,16 @@
-import { CardanoNodeErrors, ChainSyncEvent, ChainSyncEventType, PointOrOrigin, RequestNext } from '@cardano-sdk/core';
-import { InteractionContext, Schema, safeJSON } from '@cardano-ogmios/client';
-import { Logger } from 'ts-log';
-import { Observable, Subscriber, from, switchMap } from 'rxjs';
-import { WithLogger, toSerializableObject } from '@cardano-sdk/util';
-import { block as blockToCore } from '../../ogmiosToCore';
+import { CardanoNodeErrors, ChainSyncEventType } from '@cardano-sdk/core';
+import { Observable, from, switchMap } from 'rxjs';
+import { block as blockToCore } from '../../ogmiosToCore/index.js';
 import { findIntersect, requestNext as sendRequestNext } from '@cardano-ogmios/client/dist/ChainSync';
 import { nanoid } from 'nanoid';
-import { ogmiosToCorePointOrOrigin, ogmiosToCoreTip, ogmiosToCoreTipOrOrigin, pointOrOriginToOgmios } from './util';
+import { ogmiosToCorePointOrOrigin, ogmiosToCoreTip, ogmiosToCoreTipOrOrigin, pointOrOriginToOgmios } from './util.js';
+import { safeJSON } from '@cardano-ogmios/client';
+import { toSerializableObject } from '@cardano-sdk/util';
+import type { ChainSyncEvent, PointOrOrigin, RequestNext } from '@cardano-sdk/core';
+import type { InteractionContext, Schema } from '@cardano-ogmios/client';
+import type { Logger } from 'ts-log';
+import type { Subscriber } from 'rxjs';
+import type { WithLogger } from '@cardano-sdk/util';
 
 const RequestIdProp = 'requestId';
 

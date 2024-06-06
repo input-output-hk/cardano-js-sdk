@@ -1,7 +1,8 @@
-import { BehaviorSubject } from 'rxjs';
-import { CLEAN_FN_STATS, ProviderFnStats, StakePoolProviderStats, TrackedStakePoolProvider } from '../../../src';
-import { StakePoolProvider } from '@cardano-sdk/core';
+import { CLEAN_FN_STATS, TrackedStakePoolProvider } from '../../../src/index.js';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
+import type { BehaviorSubject } from 'rxjs';
+import type { ProviderFnStats, StakePoolProviderStats } from '../../../src/index.js';
+import type { StakePoolProvider } from '@cardano-sdk/core';
 
 describe('TrackedStakePoolProvider', () => {
   let stakePoolProvider: StakePoolProvider;

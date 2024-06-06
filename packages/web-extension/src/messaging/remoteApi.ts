@@ -1,31 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  BindRequestHandlerOptions,
-  CompletionMessage,
-  ConsumeMessengerApiDependencies,
-  ConsumeRemoteApiOptions,
-  EmitMessage,
-  ExposableRemoteApi,
-  ExposeApiProps,
-  FactoryCallMessage,
-  MessengerApiDependencies,
-  MethodRequest,
-  MethodRequestOptions,
-  RemoteApiFactory,
-  RemoteApiMethod,
-  RemoteApiProperties,
-  RemoteApiPropertyType,
-  RequestMessage,
-  ResponseMessage
-} from './types';
 import { CustomError } from 'ts-custom-error';
 import {
   EMPTY,
   EmptyError,
   NEVER,
-  Observable,
-  Subscription,
-  TeardownLogic,
   concat,
   filter,
   firstValueFrom,
@@ -41,10 +19,10 @@ import {
   tap,
   throwError
 } from 'rxjs';
-import { ErrorClass, Shutdown, fromSerializableObject, isPromise, toSerializableObject } from '@cardano-sdk/util';
 import { NotImplementedError } from '@cardano-sdk/core';
+import { RemoteApiPropertyType } from './types.js';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
-import { WrongTargetError } from './errors';
+import { WrongTargetError } from './errors.js';
 import {
   disabledApiMsg,
   isCompletionMessage,
@@ -54,8 +32,29 @@ import {
   isRequestMessage,
   isResponseMessage,
   newMessageId
-} from './util';
+} from './util.js';
+import { fromSerializableObject, isPromise, toSerializableObject } from '@cardano-sdk/util';
 import { v4 as uuidv4 } from 'uuid';
+import type {
+  BindRequestHandlerOptions,
+  CompletionMessage,
+  ConsumeMessengerApiDependencies,
+  ConsumeRemoteApiOptions,
+  EmitMessage,
+  ExposableRemoteApi,
+  ExposeApiProps,
+  FactoryCallMessage,
+  MessengerApiDependencies,
+  MethodRequest,
+  MethodRequestOptions,
+  RemoteApiFactory,
+  RemoteApiMethod,
+  RemoteApiProperties,
+  RequestMessage,
+  ResponseMessage
+} from './types.js';
+import type { ErrorClass, Shutdown } from '@cardano-sdk/util';
+import type { Observable, Subscription, TeardownLogic } from 'rxjs';
 
 export class RemoteApiShutdownError extends CustomError {
   constructor(channel: string) {

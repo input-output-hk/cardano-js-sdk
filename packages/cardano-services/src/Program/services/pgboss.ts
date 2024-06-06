@@ -1,7 +1,6 @@
 import {
   BlockEntity,
   CurrentPoolMetricsEntity,
-  PgConnectionConfig,
   PoolDelistedEntity,
   PoolMetadataEntity,
   PoolRegistrationEntity,
@@ -12,32 +11,23 @@ import {
   createPgBoss,
   isRecoverableTypeormError
 } from '@cardano-sdk/projection-typeorm';
-import { CommonProgramOptions, PosgresProgramOptions } from '../options';
-import { DataSource } from 'typeorm';
-import { HealthCheckResponse } from '@cardano-sdk/core';
-import { HttpService } from '../../Http/HttpService';
-import { Logger } from 'ts-log';
-import {
-  Observable,
-  Subscription,
-  catchError,
-  concat,
-  finalize,
-  firstValueFrom,
-  from,
-  merge,
-  share,
-  switchMap,
-  tap
-} from 'rxjs';
-import { PgBossQueue, WorkerHandler, queueHandlers } from '../../PgBoss';
-import { Pool } from 'pg';
+import { HttpService } from '../../Http/HttpService.js';
+import { Observable, catchError, concat, finalize, firstValueFrom, from, merge, share, switchMap, tap } from 'rxjs';
 import { Router } from 'express';
-import { ScheduleConfig } from '../../util/schedule';
-import { StakePoolMetadataProgramOptions } from '../options/stakePoolMetadata';
 import { contextLogger } from '@cardano-sdk/util';
+import { queueHandlers } from '../../PgBoss/index.js';
 import { retryBackoff } from 'backoff-rxjs';
-import PgBoss from 'pg-boss';
+import type { CommonProgramOptions, PosgresProgramOptions } from '../options/index.js';
+import type { DataSource } from 'typeorm';
+import type { HealthCheckResponse } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { PgBossQueue, WorkerHandler } from '../../PgBoss/index.js';
+import type { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
+import type { Pool } from 'pg';
+import type { ScheduleConfig } from '../../util/schedule.js';
+import type { StakePoolMetadataProgramOptions } from '../options/stakePoolMetadata.js';
+import type { Subscription } from 'rxjs';
+import type PgBoss from 'pg-boss';
 
 /** The entities required by the job handlers */
 export const pgBossEntities: Function[] = [

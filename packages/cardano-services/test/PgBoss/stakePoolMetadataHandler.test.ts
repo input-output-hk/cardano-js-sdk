@@ -1,17 +1,18 @@
-import { Cardano, NotImplementedError, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { DataMocks } from '../data-mocks';
-import { DataSource } from 'typeorm';
-import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
-import { Pool } from 'pg';
+import { DataMocks } from '../data-mocks/index.js';
+import { NotImplementedError, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { PoolMetadataEntity, PoolRegistrationEntity } from '@cardano-sdk/projection-typeorm';
-import { StakePoolMetadataFetchMode } from '../../src/Program/options';
+import { StakePoolMetadataFetchMode } from '../../src/Program/options/index.js';
 import {
   attachExtendedMetadata,
   getUrlToFetch,
   isUpdateOutdated,
   savePoolMetadata
-} from '../../src/PgBoss/stakePoolMetadataHandler';
-import { initHandlerTest, poolId } from './util';
+} from '../../src/PgBoss/stakePoolMetadataHandler.js';
+import { initHandlerTest, poolId } from './util.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { DataSource } from 'typeorm';
+import type { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import type { Pool } from 'pg';
 
 describe('stakePoolMetadataHandler', () => {
   const rewardAccount = 'test_addr';

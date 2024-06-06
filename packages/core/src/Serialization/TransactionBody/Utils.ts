@@ -1,5 +1,5 @@
-import * as Cardano from '../../Cardano';
-import * as Crypto from '@cardano-sdk/crypto';
+import * as Cardano from '../../Cardano/index.js';
+import type * as Crypto from '@cardano-sdk/crypto';
 
 /**
  * Sorts the given map entry canonically.

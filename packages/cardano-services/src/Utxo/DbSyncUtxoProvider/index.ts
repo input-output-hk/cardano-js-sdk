@@ -1,3 +1,3 @@
-export * from './DbSyncUtxoProvider';
-export * from './mappers';
-export * from './types';
+export * from './DbSyncUtxoProvider.js';
+export * from './mappers.js';
+export * from './types.js';

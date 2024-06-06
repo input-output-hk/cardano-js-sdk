@@ -4,11 +4,12 @@
 /* eslint-disable unicorn/consistent-function-scoping */
 import { AssetId } from '@cardano-sdk/util-dev';
 import { Cardano, InvalidProtocolParametersError, Serialization } from '@cardano-sdk/core';
-import { DefaultSelectionConstraintsProps, defaultSelectionConstraints } from '../../src';
 import { HexBlob } from '@cardano-sdk/util';
-import { ProtocolParametersForInputSelection, SelectionSkeleton } from '@cardano-sdk/input-selection';
-import { babbageTx, getBigBabbageTx } from '../testData';
-import { mockTxEvaluator } from '../tx-builder/mocks';
+import { babbageTx, getBigBabbageTx } from '../testData.js';
+import { defaultSelectionConstraints } from '../../src/index.js';
+import { mockTxEvaluator } from '../tx-builder/mocks.js';
+import type { DefaultSelectionConstraintsProps } from '../../src/index.js';
+import type { ProtocolParametersForInputSelection, SelectionSkeleton } from '@cardano-sdk/input-selection';
 
 describe('defaultSelectionConstraints', () => {
   const protocolParameters = {

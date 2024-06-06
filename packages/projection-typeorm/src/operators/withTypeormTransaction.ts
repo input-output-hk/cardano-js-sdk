@@ -1,16 +1,16 @@
 /* eslint-disable func-style */
-import { Observable, Subject, defer, from, map, mergeMap } from 'rxjs';
-import { PgBossExtension } from '../pgBoss';
-import {
+import { Subject, defer, from, map, mergeMap } from 'rxjs';
+import { withEventContext, withStaticContext } from '@cardano-sdk/projection';
+import omit from 'lodash/omit.js';
+import type { Observable } from 'rxjs';
+import type { PgBossExtension } from '../pgBoss.js';
+import type {
   ProjectionEvent,
   UnifiedExtChainSyncObservable,
-  UnifiedExtChainSyncOperator,
-  withEventContext,
-  withStaticContext
+  UnifiedExtChainSyncOperator
 } from '@cardano-sdk/projection';
-import { QueryRunner } from 'typeorm';
-import { TypeormConnection } from '../createDataSource';
-import omit from 'lodash/omit';
+import type { QueryRunner } from 'typeorm';
+import type { TypeormConnection } from '../createDataSource.js';
 
 export interface WithTypeormTransactionDependencies {
   connection$: Observable<TypeormConnection>;

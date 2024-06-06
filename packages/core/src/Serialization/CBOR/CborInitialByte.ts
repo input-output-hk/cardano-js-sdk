@@ -1,7 +1,7 @@
 /* eslint-disable no-bitwise */
 /* eslint-disable unicorn/number-literal-case */
-import { CborAdditionalInfo } from './CborAdditionalInfo';
-import { CborMajorType } from './CborMajorType';
+import type { CborAdditionalInfo } from './CborAdditionalInfo.js';
+import type { CborMajorType } from './CborMajorType.js';
 
 /** Represents a CBOR initial byte. */
 export class CborInitialByte {

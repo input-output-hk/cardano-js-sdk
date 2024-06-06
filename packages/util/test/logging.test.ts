@@ -1,7 +1,7 @@
-import { Logger } from 'ts-log';
+import type { Logger } from 'ts-log';
 
-import { contextLogger } from '../src';
-import { createStubLogger } from './util';
+import { contextLogger } from '../src/index.js';
+import { createStubLogger } from './util.js';
 
 const SOME_MODULE = 'some-module';
 const SOME_FUNCTION_NAME = 'some-function-name';

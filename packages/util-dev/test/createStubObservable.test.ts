@@ -1,5 +1,5 @@
 import { concat } from 'rxjs';
-import { createStubObservable, createTestScheduler } from '../src';
+import { createStubObservable, createTestScheduler } from '../src/index.js';
 
 describe('createStubObservable', () => {
   it('returns an observable that subscribes to observables provided as arguments in order', () => {

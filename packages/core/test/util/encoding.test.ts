@@ -1,5 +1,5 @@
 import { HexBlob } from '@cardano-sdk/util';
-import { util } from '../../src/util';
+import { util } from '../../src/util/index.js';
 
 describe('encoding', () => {
   test('bytesToHex', () => {

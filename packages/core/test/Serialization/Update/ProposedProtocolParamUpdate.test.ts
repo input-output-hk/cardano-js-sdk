@@ -1,9 +1,9 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import * as Cardano from '../../../src/Cardano';
-import * as Crypto from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
-import { PlutusLanguageVersion } from '../../../src/Cardano';
-import { ProposedProtocolParameterUpdates } from '../../../src/Serialization/Update/ProposedProtocolParameterUpdates';
+import { PlutusLanguageVersion } from '../../../src/Cardano/index.js';
+import { ProposedProtocolParameterUpdates } from '../../../src/Serialization/Update/ProposedProtocolParameterUpdates.js';
+import type * as Cardano from '../../../src/Cardano/index.js';
+import type * as Crypto from '@cardano-sdk/crypto';
 
 const vasilPlutusV1Costmdls = [
   205_665, 812, 1, 1, 1000, 571, 0, 1, 1000, 24_177, 4, 1, 1000, 32, 117_366, 10_475, 4, 23_000, 100, 23_000, 100,

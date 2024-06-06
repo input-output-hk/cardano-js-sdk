@@ -1,9 +1,10 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
-import { Mappers, ProjectionEvent } from '../../../src';
-import { computeCompactTxId } from '../../../src/operators/Mappers/util';
+import { Mappers } from '../../../src/index.js';
+import { computeCompactTxId } from '../../../src/operators/Mappers/util.js';
 import { firstValueFrom, of } from 'rxjs';
 import { generateRandomHexString } from '@cardano-sdk/util-dev';
-import { subhandleAssetName, virtualHandleAssetName } from './handleUtil';
+import { subhandleAssetName, virtualHandleAssetName } from './handleUtil.js';
+import type { ProjectionEvent } from '../../../src/index.js';
 
 describe('withCIP67', () => {
   const txId1 = generateRandomHexString(64);

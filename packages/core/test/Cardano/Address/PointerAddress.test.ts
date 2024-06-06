@@ -1,5 +1,5 @@
-import * as cip19TestVectors from '../../../../util-dev/src/Cip19TestVectors';
-import { Cardano } from '../../../src';
+import * as cip19TestVectors from '../../../../util-dev/src/Cip19TestVectors.js';
+import { Cardano } from '../../../src/index.js';
 
 describe('Cardano/Address/PointerAddress', () => {
   it('fromCredentials can build the correct PointerAddress instance', () => {

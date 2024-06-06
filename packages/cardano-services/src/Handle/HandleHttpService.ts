@@ -1,8 +1,9 @@
-import { HandleProvider, handleProviderPaths } from '@cardano-sdk/core';
-import { HttpService } from '../Http';
-import { Logger } from 'ts-log';
+import { HttpService } from '../Http/index.js';
 import { Router } from 'express';
-import { ServiceNames } from '../Program/programs/types';
+import { ServiceNames } from '../Program/programs/types.js';
+import { handleProviderPaths } from '@cardano-sdk/core';
+import type { HandleProvider } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
 
 export interface HandleServiceDependencies {
   handleProvider: HandleProvider;

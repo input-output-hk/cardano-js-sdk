@@ -1,5 +1,6 @@
-import { MessengerDependencies, consumeRemoteApi } from '../messaging';
-import { observableWalletChannel, observableWalletProperties } from './util';
+import { consumeRemoteApi } from '../messaging/index.js';
+import { observableWalletChannel, observableWalletProperties } from './util.js';
+import type { MessengerDependencies } from '../messaging/index.js';
 
 export interface ConsumeObservableWalletProps {
   walletName: string;

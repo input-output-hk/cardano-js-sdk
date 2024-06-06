@@ -1,7 +1,8 @@
-import { BehaviorSubject } from 'rxjs';
-import { CLEAN_FN_STATS, ChainHistoryProviderStats, ProviderFnStats, TrackedChainHistoryProvider } from '../../../src';
-import { ChainHistoryProvider } from '@cardano-sdk/core';
+import { CLEAN_FN_STATS, TrackedChainHistoryProvider } from '../../../src/index.js';
 import { mockProviders } from '@cardano-sdk/util-dev';
+import type { BehaviorSubject } from 'rxjs';
+import type { ChainHistoryProvider } from '@cardano-sdk/core';
+import type { ChainHistoryProviderStats, ProviderFnStats } from '../../../src/index.js';
 
 describe('TrackedChainHistoryProvider', () => {
   let chainHistoryProvider: mockProviders.ChainHistoryProviderStub;

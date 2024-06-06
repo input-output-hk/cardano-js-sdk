@@ -1,9 +1,9 @@
-import { Cardano } from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
-import { Pool, QueryResult } from 'pg';
-import { UtxoModel } from './types';
-import { findUtxosByAddresses } from './queries';
-import { utxosToCore } from './mappers';
+import { findUtxosByAddresses } from './queries.js';
+import { utxosToCore } from './mappers.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { Pool, QueryResult } from 'pg';
+import type { UtxoModel } from './types.js';
 
 export class UtxoBuilder {
   #db: Pool;

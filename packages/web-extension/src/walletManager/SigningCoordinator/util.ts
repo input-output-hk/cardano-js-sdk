@@ -1,5 +1,6 @@
-import { RemoteApiProperties, RemoteApiPropertyType } from '../../messaging';
-import { SigningCoordinatorSignApi } from './types';
+import { RemoteApiPropertyType } from '../../messaging/index.js';
+import type { RemoteApiProperties } from '../../messaging/index.js';
+import type { SigningCoordinatorSignApi } from './types.js';
 
 export const signingCoordinatorApiChannel = 'signingCoordinator';
 

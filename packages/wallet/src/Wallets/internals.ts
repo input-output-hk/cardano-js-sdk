@@ -1,6 +1,7 @@
-import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
+import { AddressType } from '@cardano-sdk/key-management';
 import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
 
 /**
  * Method to derive the wallet's grouped address from the script and network ID.

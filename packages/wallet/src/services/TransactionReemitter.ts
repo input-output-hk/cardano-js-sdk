@@ -1,31 +1,13 @@
 import { Cardano, calculateStabilityWindowSlotsCount } from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
-import {
-  Observable,
-  combineLatest,
-  filter,
-  from,
-  map,
-  merge,
-  mergeMap,
-  partition,
-  scan,
-  share,
-  tap,
-  withLatestFrom
-} from 'rxjs';
+import { combineLatest, filter, from, map, merge, mergeMap, partition, scan, share, tap, withLatestFrom } from 'rxjs';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
 
-import {
-  FailedTx,
-  Milliseconds,
-  OutgoingOnChainTx,
-  OutgoingTx,
-  TransactionFailure,
-  TransactionsTracker
-} from './types';
-import { WalletStores } from '../persistence';
+import { TransactionFailure } from './types.js';
 import { isNotNil } from '@cardano-sdk/util';
-import pick from 'lodash/pick';
+import pick from 'lodash/pick.js';
+import type { FailedTx, Milliseconds, OutgoingOnChainTx, OutgoingTx, TransactionsTracker } from './types.js';
+import type { WalletStores } from '../persistence/index.js';
 
 export interface TransactionReemitterProps {
   transactions: Pick<TransactionsTracker, 'rollback$'> & {

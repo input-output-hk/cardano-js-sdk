@@ -1,6 +1,6 @@
 import { CardanoKeyConst, util } from '@cardano-sdk/key-management';
-import { contextWithKnownAddresses, contextWithoutKnownAddresses, paymentHash, stakeKeyHash } from '../testData';
-import { mapRequiredSigners, toRequiredSigner } from '../../src/transformers';
+import { contextWithKnownAddresses, contextWithoutKnownAddresses, paymentHash, stakeKeyHash } from '../testData.js';
+import { mapRequiredSigners, toRequiredSigner } from '../../src/transformers/index.js';
 
 describe('requiredSigners', () => {
   describe('mapRequiredSigners', () => {

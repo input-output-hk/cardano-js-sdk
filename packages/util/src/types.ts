@@ -1,5 +1,5 @@
-import { Logger } from 'ts-log';
-import { Primitive } from 'type-fest';
+import type { Logger } from 'ts-log';
+import type { Primitive } from 'type-fest';
 
 export interface Shutdown {
   shutdown(): void;

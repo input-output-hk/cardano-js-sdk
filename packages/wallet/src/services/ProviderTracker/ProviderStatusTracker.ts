@@ -1,6 +1,5 @@
 import {
   EMPTY,
-  Observable,
   combineLatest,
   concat,
   debounceTime,
@@ -16,16 +15,17 @@ import {
   tap,
   timer
 } from 'rxjs';
-import { Logger } from 'ts-log';
-import { Milliseconds } from '../types';
-import { ProviderFnStats } from './ProviderTracker';
-import { TrackedAssetProvider } from './TrackedAssetProvider';
-import { TrackedChainHistoryProvider } from './TrackedChainHistoryProvider';
-import { TrackedRewardsProvider } from './TrackedRewardsProvider';
-import { TrackedStakePoolProvider } from './TrackedStakePoolProvider';
-import { TrackedUtxoProvider } from './TrackedUtxoProvider';
-import { TrackedWalletNetworkInfoProvider } from './TrackedWalletNetworkInfoProvider';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
+import type { Logger } from 'ts-log';
+import type { Milliseconds } from '../types.js';
+import type { Observable } from 'rxjs';
+import type { ProviderFnStats } from './ProviderTracker.js';
+import type { TrackedAssetProvider } from './TrackedAssetProvider.js';
+import type { TrackedChainHistoryProvider } from './TrackedChainHistoryProvider.js';
+import type { TrackedRewardsProvider } from './TrackedRewardsProvider.js';
+import type { TrackedStakePoolProvider } from './TrackedStakePoolProvider.js';
+import type { TrackedUtxoProvider } from './TrackedUtxoProvider.js';
+import type { TrackedWalletNetworkInfoProvider } from './TrackedWalletNetworkInfoProvider.js';
 
 export interface ProviderStatusTrackerProps {
   consideredOutOfSyncAfter: Milliseconds;

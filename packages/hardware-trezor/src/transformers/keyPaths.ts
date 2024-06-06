@@ -1,7 +1,8 @@
-import { BIP32Path } from '@cardano-sdk/crypto';
-import { Cardano } from '@cardano-sdk/core';
-import { GroupedAddress, TxInId, util } from '@cardano-sdk/key-management';
-import { TrezorTxTransformerContext } from '../types';
+import { TxInId, util } from '@cardano-sdk/key-management';
+import type { BIP32Path } from '@cardano-sdk/crypto';
+import type { Cardano } from '@cardano-sdk/core';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
+import type { TrezorTxTransformerContext } from '../types.js';
 
 /** Uses the given Trezor input resolver to resolve the payment key path for known addresses for given input transaction. */
 export const resolvePaymentKeyPathForTxIn = (

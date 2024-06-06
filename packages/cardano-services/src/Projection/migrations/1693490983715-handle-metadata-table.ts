@@ -1,5 +1,5 @@
 import { HandleMetadataEntity } from '@cardano-sdk/projection-typeorm';
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class HandleMetadataTableMigrations1693490983715 implements MigrationInterface {
   static entity = HandleMetadataEntity;

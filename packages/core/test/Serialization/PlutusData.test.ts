@@ -1,5 +1,6 @@
-import { Cardano, Serialization } from '../../src';
 import { HexBlob } from '@cardano-sdk/util';
+import { Serialization } from '../../src/index.js';
+import type { Cardano } from '../../src/index.js';
 
 describe('PlutusData', () => {
   it('round trip serializations produce the same core type output', () => {

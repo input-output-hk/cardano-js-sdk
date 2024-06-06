@@ -1,39 +1,41 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
-import { CardanoNodeErrors, ProviderError } from '@cardano-sdk/core';
-import { Connection } from '@cardano-ogmios/client';
-import { DbPools, LedgerTipModel, findLedgerTip } from '../../../src/util/DbSyncProvider';
-import { DbSyncEpochPollService, listenPromise, loadGenesisData, serverClosePromise } from '../../../src/util';
-import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo';
+import { CardanoNodeErrors, ProviderError, TxCBOR } from '@cardano-sdk/core';
+import { DbSyncEpochPollService, listenPromise, loadGenesisData, serverClosePromise } from '../../../src/util/index.js';
+import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo/index.js';
 import {
   HttpServer,
-  HttpServerConfig,
   TxSubmitHttpService,
   createDnsResolver,
   getOgmiosCardanoNode,
   getOgmiosTxSubmitProvider,
   getPool
-} from '../../../src';
-import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
-import { Ogmios, OgmiosCardanoNode, OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
-import { Pool } from 'pg';
-import { SrvRecord } from 'dns';
+} from '../../../src/index.js';
+import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache/index.js';
+import { Ogmios } from '@cardano-sdk/ogmios';
 import { bufferToHexString } from '@cardano-sdk/util';
 import {
   clearDbPools,
   createHealthyMockOgmiosServer,
   ogmiosServerReady,
   servicesWithVersionPath as services
-} from '../../util';
-import { createMockOgmiosServer } from '../../../../ogmios/test/mocks/mockOgmiosServer';
+} from '../../util.js';
+import { createMockOgmiosServer } from '../../../../ogmios/test/mocks/mockOgmiosServer.js';
+import { findLedgerTip } from '../../../src/util/DbSyncProvider/index.js';
 import { getPort, getRandomPort } from 'get-port-please';
 import { handleHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { handleProviderMocks, logger } from '@cardano-sdk/util-dev';
-import { healthCheckResponseMock } from '../../../../core/test/CardanoNode/mocks';
-import { mockDnsResolverFactory } from './util';
+import { healthCheckResponseMock } from '../../../../core/test/CardanoNode/mocks.js';
+import { mockDnsResolverFactory } from './util.js';
 import { types } from 'util';
 import axios from 'axios';
-import http from 'http';
+import type { Connection } from '@cardano-ogmios/client';
+import type { DbPools, LedgerTipModel } from '../../../src/util/DbSyncProvider/index.js';
+import type { HttpServerConfig } from '../../../src/index.js';
+import type { OgmiosCardanoNode, OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
+import type { Pool } from 'pg';
+import type { SrvRecord } from 'dns';
+import type http from 'http';
 
 jest.mock('@cardano-sdk/cardano-services-client', () => ({
   ...jest.requireActual('@cardano-sdk/cardano-services-client'),
@@ -301,7 +303,7 @@ describe('Service dependency abstractions', () => {
           await provider.start();
           const res = await provider.submitTx({
             context: { handleResolutions: [handleProviderMocks.getAliceHandleProviderResponse] },
-            signedTransaction: bufferToHexString(Buffer.from(new Uint8Array([])))
+            signedTransaction: TxCBOR(bufferToHexString(Buffer.from(new Uint8Array([]))))
           });
           expect(res).toBeUndefined();
           await provider.shutdown();
@@ -326,7 +328,7 @@ describe('Service dependency abstractions', () => {
           await expect(
             provider.submitTx({
               context: { handleResolutions: [handleProviderMocks.getWrongHandleProviderResponse] },
-              signedTransaction: bufferToHexString(Buffer.from(new Uint8Array([])))
+              signedTransaction: TxCBOR(bufferToHexString(Buffer.from(new Uint8Array([]))))
             })
           ).rejects.toBeInstanceOf(ProviderError);
           await provider.shutdown();
@@ -438,7 +440,7 @@ describe('Service dependency abstractions', () => {
       await provider.initialize();
       await provider.start();
       await expect(
-        provider.submitTx({ signedTransaction: bufferToHexString(Buffer.from(new Uint8Array([]))) })
+        provider.submitTx({ signedTransaction: TxCBOR(bufferToHexString(Buffer.from(new Uint8Array([])))) })
       ).rejects.toBeInstanceOf(CardanoNodeErrors.TxSubmissionErrors.EraMismatchError);
       expect(dnsResolverMock).toBeCalledTimes(3);
       await provider.shutdown();

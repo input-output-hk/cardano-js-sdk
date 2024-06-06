@@ -1,8 +1,8 @@
 /* eslint-disable  no-bitwise */
-import { Ed25519PrivateExtendedKeyHex, Ed25519PrivateNormalKeyHex } from '../hexTypes';
-import { Ed25519PublicKey } from './Ed25519PublicKey';
-import { Ed25519Signature } from './Ed25519Signature';
-import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import { Ed25519PrivateExtendedKeyHex, Ed25519PrivateNormalKeyHex } from '../hexTypes.js';
+import { Ed25519PublicKey } from './Ed25519PublicKey.js';
+import { Ed25519Signature } from './Ed25519Signature.js';
+import { InvalidArgumentError } from '@cardano-sdk/util';
 import {
   crypto_core_ed25519_scalar_add,
   crypto_core_ed25519_scalar_mul,
@@ -13,6 +13,7 @@ import {
   crypto_sign_seed_keypair,
   ready
 } from 'libsodium-wrappers-sumo';
+import type { HexBlob } from '@cardano-sdk/util';
 
 const SCALAR_INDEX = 0;
 const SCALAR_SIZE = 32;

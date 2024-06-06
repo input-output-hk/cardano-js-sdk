@@ -1,9 +1,10 @@
-import { AccountKeyDerivationPath, Bip32Account, GroupedAddress } from '@cardano-sdk/key-management';
-import { Cardano } from '@cardano-sdk/core';
-import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
-import { Observable, defaultIfEmpty, distinctUntilChanged, forkJoin, from, map, mergeMap, switchMap } from 'rxjs';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { deepEquals } from '@cardano-sdk/util';
+import { defaultIfEmpty, distinctUntilChanged, forkJoin, from, map, mergeMap, switchMap } from 'rxjs';
+import type { AccountKeyDerivationPath, Bip32Account, GroupedAddress } from '@cardano-sdk/key-management';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
+import type { Observable } from 'rxjs';
 
 export interface CreatePubStakeKeysTrackerProps {
   addresses$: Observable<GroupedAddress[]>;

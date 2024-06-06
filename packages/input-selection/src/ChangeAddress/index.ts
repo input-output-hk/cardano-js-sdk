@@ -1,2 +1,2 @@
-export * from './ChangeAddressResolver';
-export * from './StaticChangeAddressResolver';
+export * from './ChangeAddressResolver.js';
+export * from './StaticChangeAddressResolver.js';

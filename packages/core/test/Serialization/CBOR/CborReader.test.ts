@@ -2,7 +2,7 @@
 /* eslint-disable unicorn/number-literal-case */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { CborReader, CborReaderState, CborSimpleValue, CborTag } from '../../../src/Serialization';
+import { CborReader, CborReaderState, CborSimpleValue, CborTag } from '../../../src/Serialization/index.js';
 import { HexBlob } from '@cardano-sdk/util';
 
 const areEqual = (first: Uint8Array, second: Uint8Array) =>

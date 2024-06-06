@@ -1,7 +1,8 @@
-import { Cardano } from '@cardano-sdk/core';
-import { Observable } from 'rxjs';
-import { Origin } from '@cardano-sdk/dapp-connector';
-import { RemoteApiProperties, RemoteApiPropertyType } from '@cardano-sdk/web-extension';
+import { RemoteApiPropertyType } from '@cardano-sdk/web-extension';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Observable } from 'rxjs';
+import type { Origin } from '@cardano-sdk/dapp-connector';
+import type { RemoteApiProperties } from '@cardano-sdk/web-extension';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { getEnv, walletVariables } from '@cardano-sdk/e2e';
 

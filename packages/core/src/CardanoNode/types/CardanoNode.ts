@@ -1,8 +1,8 @@
-import { Lovelace, PoolId, VrfVkHex } from '../../Cardano';
+import type { Lovelace, PoolId, VrfVkHex } from '../../Cardano/index.js';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { HealthCheckResponse } from '../../Provider';
-import { Milliseconds } from '../../util';
+import type { HealthCheckResponse } from '../../Provider/index.js';
+import type { Milliseconds } from '../../util/index.js';
 
 export interface EraSummary {
   parameters: {

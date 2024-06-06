@@ -1,5 +1,4 @@
-import { Cardano, Handle } from '@cardano-sdk/core';
-import { ProjectionEvent } from '../../../src';
+import { Cardano } from '@cardano-sdk/core';
 import {
   assetIdFromHandle,
   handleAssetName,
@@ -9,10 +8,18 @@ import {
   maryHandleOne,
   referenceNftOutput,
   userNftOutput
-} from './handleUtil';
+} from './handleUtil.js';
 import { firstValueFrom, of } from 'rxjs';
 import { logger, mockProviders } from '@cardano-sdk/util-dev';
-import { withCIP67, withHandleMetadata, withMint, withNftMetadata, withUtxo } from '../../../src/operators/Mappers';
+import {
+  withCIP67,
+  withHandleMetadata,
+  withMint,
+  withNftMetadata,
+  withUtxo
+} from '../../../src/operators/Mappers/index.js';
+import type { Handle } from '@cardano-sdk/core';
+import type { ProjectionEvent } from '../../../src/index.js';
 
 const project = (tx: Cardano.OnChainTx) =>
   firstValueFrom(

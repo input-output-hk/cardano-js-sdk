@@ -1,23 +1,16 @@
-import * as NetworkInfoCacheKey from './keys';
-import {
-  Cardano,
-  CardanoNodeUtil,
-  EraSummary,
-  NetworkInfoProvider,
-  Seconds,
-  SlotEpochCalc,
-  StakeSummary,
-  SupplySummary,
-  createSlotEpochCalc
-} from '@cardano-sdk/core';
-import { DbSyncProvider, DbSyncProviderDependencies, Disposer, EpochMonitor } from '../../util';
-import { GenesisData } from '../../types';
-import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
-import { Logger } from 'ts-log';
-import { NetworkInfoBuilder } from './NetworkInfoBuilder';
+import * as NetworkInfoCacheKey from './keys.js';
+import { Cardano, CardanoNodeUtil, Seconds, createSlotEpochCalc } from '@cardano-sdk/core';
+import { DbSyncProvider } from '../../util/index.js';
+import { NetworkInfoBuilder } from './NetworkInfoBuilder.js';
 import { RunnableModule } from '@cardano-sdk/util';
-import { toGenesisParams, toLedgerTip, toProtocolParams, toSupply } from './mappers';
-import memoize from 'lodash/memoize';
+import { UNLIMITED_CACHE_TTL } from '../../InMemoryCache/index.js';
+import { toGenesisParams, toLedgerTip, toProtocolParams, toSupply } from './mappers.js';
+import memoize from 'lodash/memoize.js';
+import type { DbSyncProviderDependencies, Disposer, EpochMonitor } from '../../util/index.js';
+import type { EraSummary, NetworkInfoProvider, SlotEpochCalc, StakeSummary, SupplySummary } from '@cardano-sdk/core';
+import type { GenesisData } from '../../types.js';
+import type { InMemoryCache } from '../../InMemoryCache/index.js';
+import type { Logger } from 'ts-log';
 
 /** Dependencies that are need to create DbSyncNetworkInfoProvider */
 export interface NetworkInfoProviderDependencies extends DbSyncProviderDependencies {

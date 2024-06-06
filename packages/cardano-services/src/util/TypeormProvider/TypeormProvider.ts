@@ -1,8 +1,9 @@
-import { HealthCheckResponse, Provider } from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
-import { Observable, skip } from 'rxjs';
-import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
-import { TypeormService } from '../TypeormService';
+import { TypeormService } from '../TypeormService/index.js';
+import { skip } from 'rxjs';
+import type { HealthCheckResponse, Provider } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
+import type { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 
 export interface TypeormProviderDependencies {
   logger: Logger;

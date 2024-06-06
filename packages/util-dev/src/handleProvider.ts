@@ -1,6 +1,7 @@
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { toSerializableObject } from '@cardano-sdk/util';
+import type { AxiosResponse } from 'axios';
 
 export const axiosError = (bodyError: Error | null = new Error('error'), reason = ProviderFailure.BadRequest) => {
   const response = {

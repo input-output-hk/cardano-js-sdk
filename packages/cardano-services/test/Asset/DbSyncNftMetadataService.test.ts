@@ -1,9 +1,11 @@
-import { Asset, Cardano } from '@cardano-sdk/core';
-import { AssetFixtureBuilder, AssetWith } from './fixtures/FixtureBuilder';
-import { AssetPolicyIdAndName, DbSyncNftMetadataService, NftMetadataService } from '../../src/Asset';
+import { AssetFixtureBuilder, AssetWith } from './fixtures/FixtureBuilder.js';
+import { Cardano } from '@cardano-sdk/core';
+import { DbSyncNftMetadataService } from '../../src/Asset/index.js';
 import { Pool } from 'pg';
-import { createDbSyncMetadataService } from '../../src/Metadata';
+import { createDbSyncMetadataService } from '../../src/Metadata/index.js';
 import { logger } from '@cardano-sdk/util-dev';
+import type { Asset } from '@cardano-sdk/core';
+import type { AssetPolicyIdAndName, NftMetadataService } from '../../src/Asset/index.js';
 
 export const nonExistentAsset: AssetPolicyIdAndName = {
   name: Cardano.AssetName(''),

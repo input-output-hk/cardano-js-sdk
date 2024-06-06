@@ -1,4 +1,4 @@
-import { createPbkdf2Key, emip3decrypt, emip3encrypt } from '../src';
+import { createPbkdf2Key, emip3decrypt, emip3encrypt } from '../src/index.js';
 import { util } from '@cardano-sdk/core';
 
 describe('emip3', () => {

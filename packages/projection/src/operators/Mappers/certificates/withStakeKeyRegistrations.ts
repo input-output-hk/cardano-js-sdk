@@ -1,8 +1,8 @@
 import { Cardano } from '@cardano-sdk/core';
-import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
-import { WithCertificates } from './withCertificates';
 import { isNotNil } from '@cardano-sdk/util';
-import { unifiedProjectorOperator } from '../../utils';
+import { unifiedProjectorOperator } from '../../utils/index.js';
+import type { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
+import type { WithCertificates } from './withCertificates.js';
 
 export interface StakeKeyRegistration {
   pointer: Cardano.Pointer;

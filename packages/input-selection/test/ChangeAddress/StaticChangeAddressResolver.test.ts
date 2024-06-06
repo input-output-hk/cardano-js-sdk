@@ -1,7 +1,8 @@
-import { AddressType, GroupedAddress, KeyRole } from '@cardano-sdk/key-management';
+import { AddressType, KeyRole } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { InvalidStateError } from '@cardano-sdk/util';
-import { StaticChangeAddressResolver } from '../../src';
+import { StaticChangeAddressResolver } from '../../src/index.js';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
 
 export const knownAddresses = () =>
   Promise.resolve([

@@ -1,1 +1,1 @@
-export * from './TxSubmitHttpService';
+export * from './TxSubmitHttpService.js';

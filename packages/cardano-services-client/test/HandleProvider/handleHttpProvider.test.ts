@@ -1,5 +1,5 @@
-import { config } from '../util';
-import { handleHttpProvider } from '../../src';
+import { config } from '../util.js';
+import { handleHttpProvider } from '../../src/index.js';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 

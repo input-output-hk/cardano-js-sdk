@@ -1,4 +1,4 @@
-import { concatAndCombineLatest } from '../src';
+import { concatAndCombineLatest } from '../src/index.js';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 
 describe('concatAndCombineLatest', () => {

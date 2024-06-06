@@ -1,6 +1,7 @@
-import { Asset, Cardano, Handle, Serialization } from '@cardano-sdk/core';
+import { Asset, Cardano, Serialization } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { mockProviders } from '@cardano-sdk/util-dev';
+import type { Handle } from '@cardano-sdk/core';
 
 export const handleAssetName = (handle: Handle) => Cardano.AssetName(Buffer.from(handle).toString('hex'));
 

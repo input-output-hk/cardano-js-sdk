@@ -1,9 +1,10 @@
 /* eslint-disable func-style, max-params */
 import { BigNumber } from 'bignumber.js';
-import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
-import { ComputeMinimumCoinQuantity, TokenBundleSizeExceedsLimit } from '../types';
-import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
-import { addTokenMaps, isValidValue, sortByCoins } from '../util';
+import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError.js';
+import { addTokenMaps, isValidValue, sortByCoins } from '../util.js';
+import { coalesceValueQuantities } from '@cardano-sdk/core';
+import type { Cardano } from '@cardano-sdk/core';
+import type { ComputeMinimumCoinQuantity, TokenBundleSizeExceedsLimit } from '../types.js';
 
 const PERCENTAGE_TOLERANCE = 0.05;
 

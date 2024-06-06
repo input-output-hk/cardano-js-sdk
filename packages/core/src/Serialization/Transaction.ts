@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import * as Cardano from '../Cardano';
+import * as Cardano from '../Cardano/index.js';
 import * as Crypto from '@cardano-sdk/crypto';
-import { AuxiliaryData } from './AuxiliaryData';
-import { CborReader, CborReaderState, CborWriter } from './CBOR';
+import { AuxiliaryData } from './AuxiliaryData/index.js';
+import { CborReader, CborReaderState, CborWriter } from './CBOR/index.js';
 import { HexBlob } from '@cardano-sdk/util';
-import { TransactionBody } from './TransactionBody';
-import { TransactionWitnessSet } from './TransactionWitnessSet';
-import { hexToBytes } from '../util/misc';
-import type { TxCBOR } from '../CBOR';
+import { TransactionBody } from './TransactionBody/index.js';
+import { TransactionWitnessSet } from './TransactionWitnessSet/index.js';
+import { hexToBytes } from '../util/misc/index.js';
+import type { TxCBOR } from '../CBOR/index.js';
 
 const ALONZO_ERA_TX_FRAME_SIZE = 4;
 

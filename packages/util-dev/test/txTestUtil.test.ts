@@ -1,4 +1,4 @@
-import { createOutput, createTxInput, createUnspentTxOutput } from '../src/txTestUtil';
+import { createOutput, createTxInput, createUnspentTxOutput } from '../src/txTestUtil.js';
 
 describe('txTestUtil', () => {
   describe('createTxInput', () => {

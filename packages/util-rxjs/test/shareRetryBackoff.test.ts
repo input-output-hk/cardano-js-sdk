@@ -1,6 +1,7 @@
-import { OperatorFunction, map } from 'rxjs';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
-import { shareRetryBackoff } from '../src';
+import { map } from 'rxjs';
+import { shareRetryBackoff } from '../src/index.js';
+import type { OperatorFunction } from 'rxjs';
 
 const passthrough = <T>(a: T) => a;
 const throwError = <T>(_: T) => {

@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { ogmiosToCore } from '../../src';
+import { ogmiosToCore } from '../../src/index.js';
 
 import {
   mockAllegraBlock,
@@ -9,7 +9,7 @@ import {
   mockByronBlock,
   mockMaryBlock,
   mockShelleyBlock
-} from './testData';
+} from './testData.js';
 
 describe('ogmiosToCore', () => {
   describe('blockHeader', () => {

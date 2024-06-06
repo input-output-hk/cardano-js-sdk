@@ -1,8 +1,8 @@
-import { AuthenticatorApi, WalletApi, WalletName, WithSenderContext } from '@cardano-sdk/dapp-connector';
-import { Logger } from 'ts-log';
-import { Runtime } from 'webextension-polyfill';
-import { exposeAuthenticatorApi } from './exposeAuthenticatorApi';
-import { exposeWalletApi } from './exposeWalletApi';
+import { exposeAuthenticatorApi } from './exposeAuthenticatorApi.js';
+import { exposeWalletApi } from './exposeWalletApi.js';
+import type { AuthenticatorApi, WalletApi, WalletName, WithSenderContext } from '@cardano-sdk/dapp-connector';
+import type { Logger } from 'ts-log';
+import type { Runtime } from 'webextension-polyfill';
 
 export interface InitializeBackgroundScriptProps {
   walletName: WalletName;

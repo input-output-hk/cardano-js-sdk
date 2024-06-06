@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
+import { v4 as uuidv4 } from 'uuid';
+import type {
   AnyMessage,
   ChannelName,
   CompletionMessage,
@@ -11,9 +12,8 @@ import {
   MethodRequest,
   RequestMessage,
   ResponseMessage
-} from './types';
-import { Logger } from 'ts-log';
-import { v4 as uuidv4 } from 'uuid';
+} from './types.js';
+import type { Logger } from 'ts-log';
 
 const isRequestLike = (message: any): message is MethodRequest & Partial<Record<string, unknown>> =>
   typeof message === 'object' && message !== null && Array.isArray(message.args) && typeof message.method === 'string';

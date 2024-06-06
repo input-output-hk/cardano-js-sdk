@@ -1,7 +1,9 @@
-import { BehaviorSubject } from 'rxjs';
-import { CLEAN_FN_STATS, ProviderFnStats, TrackedUtxoProvider, UtxoProviderStats } from '../../../src';
-import { Cardano, UtxoProvider } from '@cardano-sdk/core';
+import { CLEAN_FN_STATS, TrackedUtxoProvider } from '../../../src/index.js';
+import { Cardano } from '@cardano-sdk/core';
 import { createStubUtxoProvider } from '@cardano-sdk/util-dev';
+import type { BehaviorSubject } from 'rxjs';
+import type { ProviderFnStats, UtxoProviderStats } from '../../../src/index.js';
+import type { UtxoProvider } from '@cardano-sdk/core';
 
 describe('TrackedStakePoolProvider', () => {
   let utxoProvider: UtxoProvider;

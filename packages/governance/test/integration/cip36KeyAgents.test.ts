@@ -1,7 +1,8 @@
-import { AddressType, Ed25519KeyPair, InMemoryKeyAgent, KeyAgent, util } from '@cardano-sdk/key-management';
-import { Cardano } from '@cardano-sdk/core';
-import { cip36 } from '../../src';
-import { testKeyAgent } from '../../../key-management/test/mocks';
+import { AddressType, util } from '@cardano-sdk/key-management';
+import { cip36 } from '../../src/index.js';
+import { testKeyAgent } from '../../../key-management/test/mocks/index.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Ed25519KeyPair, InMemoryKeyAgent, KeyAgent } from '@cardano-sdk/key-management';
 
 describe('cip36', () => {
   // This is the KeyAgent used by the wallet, that has access to private stake key.

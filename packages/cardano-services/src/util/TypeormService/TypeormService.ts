@@ -1,9 +1,10 @@
-import { BehaviorSubject, Observable, Subscription, filter, firstValueFrom } from 'rxjs';
-import { DataSource } from 'typeorm';
-import { Logger } from 'ts-log';
-import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
+import { BehaviorSubject, filter, firstValueFrom } from 'rxjs';
 import { RunnableModule, isNotNil } from '@cardano-sdk/util';
-import { createTypeormDataSource } from '../createTypeormDataSource';
+import { createTypeormDataSource } from '../createTypeormDataSource.js';
+import type { DataSource } from 'typeorm';
+import type { Logger } from 'ts-log';
+import type { Observable, Subscription } from 'rxjs';
+import type { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 
 interface TypeormServiceDependencies {
   logger: Logger;

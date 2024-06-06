@@ -1,6 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
-import { CLEAN_FN_STATS, ProviderFnStats, ProviderTracker } from './ProviderTracker';
-import { WalletNetworkInfoProvider } from '../../types';
+import { CLEAN_FN_STATS, ProviderTracker } from './ProviderTracker.js';
+import type { ProviderFnStats } from './ProviderTracker.js';
+import type { WalletNetworkInfoProvider } from '../../types.js';
 
 export class WalletNetworkInfoProviderStats {
   readonly eraSummaries$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);

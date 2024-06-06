@@ -1,9 +1,9 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, Serialization, util } from '@cardano-sdk/core';
-import { SelectionResult } from '@cardano-sdk/input-selection';
-import { TxBodyPreInputSelection } from './types';
-import { computeScriptDataHash } from './computeScriptDataHash';
-import { getDefaultCostModelsForVersions } from './tx-builder/costModels';
+import { computeScriptDataHash } from './computeScriptDataHash.js';
+import { getDefaultCostModelsForVersions } from './tx-builder/costModels.js';
+import type { SelectionResult } from '@cardano-sdk/input-selection';
+import type { TxBodyPreInputSelection } from './types.js';
 
 export type CreateTxInternalsProps = {
   inputSelection: SelectionResult['selection'];

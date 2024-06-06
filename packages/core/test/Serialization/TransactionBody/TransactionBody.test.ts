@@ -1,9 +1,9 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import * as Cardano from '../../../src/Cardano';
+import * as Cardano from '../../../src/Cardano/index.js';
 import * as Crypto from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
-import { TransactionBody } from '../../../src/Serialization';
-import { mintTokenMap, params, txIn, txOut } from './testData';
+import { TransactionBody } from '../../../src/Serialization/index.js';
+import { mintTokenMap, params, txIn, txOut } from './testData.js';
 
 // Test data used in the following tests was generated with the cardano-serialization-lib
 

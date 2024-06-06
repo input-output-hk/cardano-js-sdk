@@ -1,10 +1,13 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AssetId, mockProviders } from '@cardano-sdk/util-dev';
-import { Cardano, NetworkInfoProvider } from '@cardano-sdk/core';
-import { CreateTxInternalsProps, createTransactionInternals } from '../src';
-import { MockChangeAddressResolver } from './tx-builder/mocks';
-import { SelectionConstraints } from '../../input-selection/test/util';
-import { SelectionSkeleton, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
+import { Cardano } from '@cardano-sdk/core';
+import { MockChangeAddressResolver } from './tx-builder/mocks.js';
+import { SelectionConstraints } from '../../input-selection/test/util/index.js';
+import { createTransactionInternals } from '../src/index.js';
+import { roundRobinRandomImprove } from '@cardano-sdk/input-selection';
+import type { CreateTxInternalsProps } from '../src/index.js';
+import type { NetworkInfoProvider } from '@cardano-sdk/core';
+import type { SelectionSkeleton } from '@cardano-sdk/input-selection';
 
 const { mockNetworkInfoProvider, utxo } = mockProviders;
 

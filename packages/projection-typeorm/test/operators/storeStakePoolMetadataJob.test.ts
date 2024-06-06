@@ -2,24 +2,26 @@ import {
   BlockDataEntity,
   BlockEntity,
   STAKE_POOL_METADATA_QUEUE,
-  TypeormStabilityWindowBuffer,
-  TypeormTipTracker,
   createObservableConnection,
   createStoreStakePoolMetadataJob,
   storeBlock,
   typeormTransactionCommit,
   willStoreStakePoolMetadataJob,
   withTypeormTransaction
-} from '../../src';
-import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
+} from '../../src/index.js';
+import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { ChainSyncEventType } from '@cardano-sdk/core';
-import { Observable, filter, of } from 'rxjs';
-import { PoolUpdate } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
-import { QueryRunner } from 'typeorm';
-import { StakePoolMetadataJob, createPgBoss } from '../../src/pgBoss';
-import { connectionConfig, initializeDataSource } from '../util';
-import { createProjectorContext, createProjectorTilFirst } from './util';
+import { connectionConfig, initializeDataSource } from '../util.js';
+import { createPgBoss } from '../../src/pgBoss.js';
+import { createProjectorContext, createProjectorTilFirst } from './util.js';
+import { filter, of } from 'rxjs';
+import type { Observable } from 'rxjs';
+import type { PoolUpdate } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
+import type { ProjectionEvent } from '@cardano-sdk/projection';
+import type { QueryRunner } from 'typeorm';
+import type { StakePoolMetadataJob } from '../../src/pgBoss.js';
+import type { TypeormStabilityWindowBuffer, TypeormTipTracker } from '../../src/index.js';
 
 const testPromise = () => {
   let resolvePromise: Function;

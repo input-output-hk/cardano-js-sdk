@@ -1,5 +1,5 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
 import { PoolDelistedEntity } from '@cardano-sdk/projection-typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class PoolDelistedTableMigration1695899010515 implements MigrationInterface {
   static entity = PoolDelistedEntity;

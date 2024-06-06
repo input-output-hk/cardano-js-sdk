@@ -1,20 +1,16 @@
-import * as Crypto from '@cardano-sdk/crypto';
 import * as Trezor from '@trezor/connect';
-import { BIP32Path } from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
-import { GroupedAddress, util } from '@cardano-sdk/key-management';
-import {
-  InvalidArgumentError,
-  Transform,
-  areNumbersEqualInConstantTime,
-  areStringsEqualInConstantTime
-} from '@cardano-sdk/util';
-import { TrezorTxTransformerContext } from '../types';
+import { InvalidArgumentError, areNumbersEqualInConstantTime, areStringsEqualInConstantTime } from '@cardano-sdk/util';
+import { util } from '@cardano-sdk/key-management';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
+import type { Transform } from '@cardano-sdk/util';
+import type { TrezorTxTransformerContext } from '../types.js';
 
 type CertCredentialsType = {
   scriptHash?: Crypto.Ed25519KeyHashHex;
   keyHash?: Crypto.Ed25519KeyHashHex;
-  path?: BIP32Path;
+  path?: Crypto.BIP32Path;
 };
 
 const getCertCredentials = (
@@ -46,7 +42,7 @@ const toPoolMetadata = (metadataJson: Cardano.PoolMetadataJson): Trezor.CardanoP
 const getPoolOperatorKeyPath = (
   operator: Cardano.RewardAccount,
   context: TrezorTxTransformerContext
-): BIP32Path | null => {
+): Crypto.BIP32Path | null => {
   const knownAddress = context?.knownAddresses.find((address) => address.rewardAccount === operator);
   return util.stakeKeyPathFromGroupedAddress(knownAddress);
 };

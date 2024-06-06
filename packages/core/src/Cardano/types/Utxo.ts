@@ -1,9 +1,9 @@
-import * as Crypto from '@cardano-sdk/crypto';
-import { PaymentAddress } from './../Address';
-import { PlutusData } from './PlutusData';
-import { Script } from './Script';
-import { TransactionId } from './Transaction';
-import { Value } from './Value';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { PaymentAddress } from './../Address/index.js';
+import type { PlutusData } from './PlutusData.js';
+import type { Script } from './Script.js';
+import type { TransactionId } from './Transaction.js';
+import type { Value } from './Value.js';
 
 /**
  * Datum hash, this allows to specify a Datum without publicly revealing its value. To spend an output which specifies

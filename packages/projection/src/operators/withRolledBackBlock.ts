@@ -1,19 +1,8 @@
-import { Cardano, ChainSyncEvent, ChainSyncEventType, TipOrOrigin } from '@cardano-sdk/core';
-import {
-  EMPTY,
-  Observable,
-  concatMap,
-  filter,
-  finalize,
-  map,
-  mergeMap,
-  noop,
-  of,
-  switchMap,
-  take,
-  takeWhile
-} from 'rxjs';
-import { ExtChainSyncOperator, StabilityWindowBuffer, WithBlock } from '../types';
+import { ChainSyncEventType } from '@cardano-sdk/core';
+import { EMPTY, concatMap, filter, finalize, map, mergeMap, noop, of, switchMap, take, takeWhile } from 'rxjs';
+import type { Cardano, ChainSyncEvent, TipOrOrigin } from '@cardano-sdk/core';
+import type { ExtChainSyncOperator, StabilityWindowBuffer, WithBlock } from '../types.js';
+import type { Observable } from 'rxjs';
 
 const syncFromOrigin = (chainSyncEvent: ChainSyncEvent, projectedTip$: Observable<TipOrOrigin>) =>
   projectedTip$.pipe(

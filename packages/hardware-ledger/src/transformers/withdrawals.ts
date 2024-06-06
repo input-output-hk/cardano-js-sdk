@@ -1,8 +1,10 @@
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Cardano } from '@cardano-sdk/core';
-import { CardanoKeyConst, GroupedAddress, util } from '@cardano-sdk/key-management';
-import { InvalidArgumentError, Transform, areNumbersEqualInConstantTime } from '@cardano-sdk/util';
-import { LedgerTxTransformerContext } from '../types';
+import { CardanoKeyConst, util } from '@cardano-sdk/key-management';
+import { InvalidArgumentError, areNumbersEqualInConstantTime } from '@cardano-sdk/util';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
+import type { LedgerTxTransformerContext } from '../types.js';
+import type { Transform } from '@cardano-sdk/util';
 
 const resolveKeyPath = (
   rewardAddress: Cardano.RewardAddress,

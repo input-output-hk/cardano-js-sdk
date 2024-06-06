@@ -1,31 +1,34 @@
 import {
   APIErrorCode,
   ApiError,
-  Bytes,
-  Cbor,
-  Cip30DataSignature,
-  Cip95WalletApi,
   DataSignError,
   DataSignErrorCode,
-  Paginate,
-  SenderContext,
   TxSendError,
   TxSendErrorCode,
   TxSignError,
-  TxSignErrorCode,
-  WalletApi,
-  WalletApiExtension,
-  WithSenderContext
+  TxSignErrorCode
 } from '@cardano-sdk/dapp-connector';
 import { Cardano, Serialization, TxCBOR, coalesceValueQuantities } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-selection';
-import { Logger } from 'ts-log';
-import { MessageSender } from '@cardano-sdk/key-management';
-import { Observable, firstValueFrom, map } from 'rxjs';
-import { ObservableWallet } from './types';
-import { requiresForeignSignatures } from './services';
-import uniq from 'lodash/uniq';
+import { firstValueFrom, map } from 'rxjs';
+import { requiresForeignSignatures } from './services/index.js';
+import uniq from 'lodash/uniq.js';
+import type {
+  Bytes,
+  Cbor,
+  Cip30DataSignature,
+  Cip95WalletApi,
+  Paginate,
+  SenderContext,
+  WalletApi,
+  WalletApiExtension,
+  WithSenderContext
+} from '@cardano-sdk/dapp-connector';
+import type { Logger } from 'ts-log';
+import type { MessageSender } from '@cardano-sdk/key-management';
+import type { Observable } from 'rxjs';
+import type { ObservableWallet } from './types.js';
 
 export type Cip30WalletDependencies = {
   logger: Logger;

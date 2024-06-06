@@ -1,5 +1,5 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { DrepVotingThresholds } from '../../../src/Serialization';
+import { DrepVotingThresholds } from '../../../src/Serialization/index.js';
 import { HexBlob } from '@cardano-sdk/util';
 
 // Test data used in the following tests was generated with the cardano-serialization-lib

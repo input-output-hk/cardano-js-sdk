@@ -1,6 +1,7 @@
-import { ExtChainSyncOperator, WithEpochBoundary, WithEpochNo, WithNetworkInfo } from '../types';
-import { Intersection, createSlotEpochCalc } from '@cardano-sdk/core';
+import { createSlotEpochCalc } from '@cardano-sdk/core';
 import { map, pairwise, startWith } from 'rxjs';
+import type { ExtChainSyncOperator, WithEpochBoundary, WithEpochNo, WithNetworkInfo } from '../types.js';
+import type { Intersection } from '@cardano-sdk/core';
 
 type PropsIn = WithEpochNo & WithNetworkInfo;
 

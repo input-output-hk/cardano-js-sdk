@@ -1,3 +1,3 @@
-export * from './createTypeormProjection';
-export * from './ProjectionHttpService';
-export * from './prepareTypeormProjection';
+export * from './createTypeormProjection.js';
+export * from './ProjectionHttpService.js';
+export * from './prepareTypeormProjection.js';

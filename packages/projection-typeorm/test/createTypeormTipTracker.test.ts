@@ -1,17 +1,15 @@
-import { BaseProjectionEvent } from '@cardano-sdk/projection';
-import {
-  BlockEntity,
-  TypeormConnection,
-  TypeormTipTracker,
-  createObservableConnection,
-  createTypeormTipTracker
-} from '../src';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { DataSource, NoConnectionForRepositoryError, QueryRunner, Repository } from 'typeorm';
-import { Observable, firstValueFrom, of, throwError } from 'rxjs';
-import { RetryBackoffConfig } from 'backoff-rxjs';
-import { connectionConfig$, createBlockEntity, createBlockHeader, initializeDataSource } from './util';
+import { BlockEntity, createObservableConnection, createTypeormTipTracker } from '../src/index.js';
+import { ChainSyncEventType } from '@cardano-sdk/core';
+import { NoConnectionForRepositoryError } from 'typeorm';
+import { connectionConfig$, createBlockEntity, createBlockHeader, initializeDataSource } from './util.js';
 import { createStubObservable, logger } from '@cardano-sdk/util-dev';
+import { firstValueFrom, of, throwError } from 'rxjs';
+import type { BaseProjectionEvent } from '@cardano-sdk/projection';
+import type { Cardano } from '@cardano-sdk/core';
+import type { DataSource, QueryRunner, Repository } from 'typeorm';
+import type { Observable } from 'rxjs';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
+import type { TypeormConnection, TypeormTipTracker } from '../src/index.js';
 
 const stubSingleEventProjection = (eventType: ChainSyncEventType, header: Cardano.PartialBlockHeader) =>
   of({

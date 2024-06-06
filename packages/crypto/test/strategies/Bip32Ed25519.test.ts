@@ -1,5 +1,5 @@
 import * as CML from '@dcspark/cardano-multiplatform-lib-nodejs';
-import * as Crypto from '../../src';
+import * as Crypto from '../../src/index.js';
 
 import { HexBlob } from '@cardano-sdk/util';
 import {
@@ -8,7 +8,7 @@ import {
   extendedVectors,
   testVectorMessageZeroLength,
   vectors
-} from '../Ed25519TestVectors';
+} from '../Ed25519TestVectors.js';
 
 /**
  * Test the given Bip32Ed25519 concrete implementation.

@@ -1,4 +1,4 @@
-import { Cardano, EraSummary, Provider } from '../..';
+import type { Cardano, EraSummary, Provider } from '../../index.js';
 
 export type SupplySummary = {
   circulating: Cardano.Lovelace;

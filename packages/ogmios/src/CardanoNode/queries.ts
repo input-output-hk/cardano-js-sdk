@@ -1,8 +1,8 @@
-import * as CardanoNodeUtil from './errorUtils';
+import * as CardanoNodeUtil from './errorUtils.js';
 import { CardanoNodeErrors } from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
-import { StateQueryClient } from '@cardano-ogmios/client/dist/StateQuery';
-import { eraSummary, genesis } from '../ogmiosToCore';
+import { eraSummary, genesis } from '../ogmiosToCore/index.js';
+import type { Logger } from 'ts-log';
+import type { StateQueryClient } from '@cardano-ogmios/client/dist/StateQuery';
 
 const wrapError = async <T>(query: () => Promise<T>) => {
   try {

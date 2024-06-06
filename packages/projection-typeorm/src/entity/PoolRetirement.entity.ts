@@ -1,8 +1,8 @@
-import { BigIntColumnOptions, OnDeleteCascadeRelationOptions } from './util';
-import { BlockEntity } from './Block.entity';
+import { BigIntColumnOptions, OnDeleteCascadeRelationOptions } from './util.js';
+import { BlockEntity } from './Block.entity.js';
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { StakePoolEntity } from './StakePool.entity';
+import { StakePoolEntity } from './StakePool.entity.js';
 
 @Entity()
 export class PoolRetirementEntity {

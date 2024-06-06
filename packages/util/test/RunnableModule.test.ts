@@ -1,6 +1,7 @@
-import { InvalidModuleState, RunnableModule } from '../src';
-import { Logger, dummyLogger } from 'ts-log';
-import { createStubLogger } from './util';
+import { InvalidModuleState, RunnableModule } from '../src/index.js';
+import { createStubLogger } from './util.js';
+import { dummyLogger } from 'ts-log';
+import type { Logger } from 'ts-log';
 
 class SomeRunnableModule extends RunnableModule {
   constructor(logger = dummyLogger) {

@@ -1,2 +1,2 @@
-export * from './Cip30Wallet';
-export * from './types';
+export * from './Cip30Wallet.js';
+export * from './types.js';

@@ -1,11 +1,8 @@
 /* eslint-disable max-statements */
-import * as Crypto from '@cardano-sdk/crypto';
-import { BaseWallet, ObservableWallet } from '@cardano-sdk/wallet';
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import {
   TX_TIMEOUT_DEFAULT,
-  TestWallet,
   bip32Ed25519Factory,
   firstValueFromTimed,
   getEnv,
@@ -13,9 +10,12 @@ import {
   waitForWalletStateSettle,
   walletReady,
   walletVariables
-} from '../../../src';
+} from '../../../src/index.js';
 import { combineLatest, filter, firstValueFrom } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { BaseWallet, ObservableWallet } from '@cardano-sdk/wallet';
+import type { TestWallet } from '../../../src/index.js';
 
 const env = getEnv(walletVariables);
 

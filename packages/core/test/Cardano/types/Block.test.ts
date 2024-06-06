@@ -1,4 +1,4 @@
-import { BlockId, SlotLeader, VrfVkBech32 } from '../../../src/Cardano';
+import { BlockId, SlotLeader, VrfVkBech32 } from '../../../src/Cardano/index.js';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { InvalidStringError, typedBech32 } from '@cardano-sdk/util';
 

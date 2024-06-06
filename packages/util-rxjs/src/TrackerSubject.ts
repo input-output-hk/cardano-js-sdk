@@ -1,4 +1,5 @@
-import { Observable, ReplaySubject, Subscription } from 'rxjs';
+import { ReplaySubject } from 'rxjs';
+import type { Observable, Subscription } from 'rxjs';
 
 type NO_VALUE_TYPE = 'TRACKER_SUBJECT_NO_VALUE';
 

@@ -1,8 +1,6 @@
-import { Asset, Cardano, Handle, HandleProvider } from '@cardano-sdk/core';
-import { Assets, HandleInfo } from '../types';
+import { Asset, Cardano } from '@cardano-sdk/core';
 import {
   EMPTY,
-  Observable,
   catchError,
   combineLatest,
   concatMap,
@@ -16,11 +14,14 @@ import {
   tap,
   toArray
 } from 'rxjs';
-import { Logger } from 'ts-log';
 import { deepEquals, isNotNil, sameArrayItems } from '@cardano-sdk/util';
 import { passthrough } from '@cardano-sdk/util-rxjs';
 import { retryBackoff } from 'backoff-rxjs';
-import uniqBy from 'lodash/uniqBy';
+import uniqBy from 'lodash/uniqBy.js';
+import type { Assets, HandleInfo } from '../types.js';
+import type { Handle, HandleProvider } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
 
 export const HYDRATE_HANDLE_INITIAL_INTERVAL = 50;
 export const HYDRATE_HANDLE_MAX_RETRIES = 5;

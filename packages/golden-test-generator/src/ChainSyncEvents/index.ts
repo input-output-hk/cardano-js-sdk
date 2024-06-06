@@ -1,1 +1,1 @@
-export * from './chainSyncEvents';
+export * from './chainSyncEvents.js';

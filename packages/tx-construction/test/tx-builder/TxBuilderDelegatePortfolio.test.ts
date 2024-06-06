@@ -1,20 +1,16 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, Bip32Account, GroupedAddress, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
-import {
-  GenericTxBuilder,
-  OutOfSyncRewardAccounts,
-  OutputValidation,
-  RewardAccountWithPoolId,
-  TxBuilderProviders,
-  TxInspection
-} from '../../src';
-import { GreedyInputSelector, GreedySelectorProps, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
+import { GenericTxBuilder, OutOfSyncRewardAccounts } from '../../src/index.js';
+import { GreedyInputSelector, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { dummyLogger } from 'ts-log';
-import { mockTxEvaluator } from './mocks';
+import { mockTxEvaluator } from './mocks.js';
 import { mockProviders as mocks } from '@cardano-sdk/util-dev';
-import uniqBy from 'lodash/uniqBy';
+import uniqBy from 'lodash/uniqBy.js';
+import type { GreedySelectorProps } from '@cardano-sdk/input-selection';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
+import type { OutputValidation, RewardAccountWithPoolId, TxBuilderProviders, TxInspection } from '../../src/index.js';
 
 jest.mock('@cardano-sdk/input-selection', () => {
   const actual = jest.requireActual('@cardano-sdk/input-selection');

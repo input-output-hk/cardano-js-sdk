@@ -1,15 +1,10 @@
-import { Address, AddressType } from './Address';
-import { DRepID } from './DRepID';
-import {
-  HexBlob,
-  InvalidStringError,
-  OpaqueString,
-  assertIsBech32WithPrefix,
-  assertIsHexString
-} from '@cardano-sdk/util';
-import { HydratedTx, HydratedTxIn, Tx, TxIn, TxOut } from '../types';
-import { NetworkId } from '../ChainId';
-import { RewardAccount } from './RewardAccount';
+import { Address, AddressType } from './Address.js';
+import { DRepID } from './DRepID.js';
+import { HexBlob, InvalidStringError, assertIsBech32WithPrefix, assertIsHexString } from '@cardano-sdk/util';
+import type { HydratedTx, HydratedTxIn, Tx, TxIn, TxOut } from '../types/index.js';
+import type { NetworkId } from '../ChainId.js';
+import type { OpaqueString } from '@cardano-sdk/util';
+import type { RewardAccount } from './RewardAccount.js';
 
 /** mainnet or testnet address (Shelley as bech32 string, Byron as base58-encoded string) */
 export type PaymentAddress = OpaqueString<'PaymentAddress'>;

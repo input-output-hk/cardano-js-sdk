@@ -1,11 +1,12 @@
-import { BaseProjectionEvent } from '@cardano-sdk/projection';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { HandleEntity } from '../../../src';
-import { ProjectorContext, createProjectorContext, createStubProjectionSource } from '../util';
-import { QueryRunner } from 'typeorm';
-import { createMultiTxProjectionSource, entities, mapAndStore, projectTilFirst } from './util';
+import { HandleEntity } from '../../../src/index.js';
+import { createMultiTxProjectionSource, entities, mapAndStore, projectTilFirst } from './util.js';
+import { createProjectorContext, createStubProjectionSource } from '../util.js';
 import { firstValueFrom } from 'rxjs';
-import { initializeDataSource } from '../../util';
+import { initializeDataSource } from '../../util.js';
+import type { BaseProjectionEvent } from '@cardano-sdk/projection';
+import type { ProjectorContext } from '../util.js';
+import type { QueryRunner } from 'typeorm';
 
 describe('storeHandles', () => {
   let queryRunner: QueryRunner;

@@ -1,11 +1,13 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Cardano, QueryStakePoolsArgs } from '@cardano-sdk/core';
-import { DataMocks } from '../../data-mocks';
-import { DbSyncStakePoolFixtureBuilder, PoolInfo, PoolWith } from '../fixtures/FixtureBuilder';
-import { PAGINATION_PAGE_SIZE_LIMIT_DEFAULT, StakePoolBuilder } from '../../../src';
+import { Cardano } from '@cardano-sdk/core';
+import { DataMocks } from '../../data-mocks/index.js';
+import { DbSyncStakePoolFixtureBuilder, PoolWith } from '../fixtures/FixtureBuilder.js';
+import { PAGINATION_PAGE_SIZE_LIMIT_DEFAULT, StakePoolBuilder } from '../../../src/index.js';
 import { Pool } from 'pg';
 import { logger } from '@cardano-sdk/util-dev';
+import type { PoolInfo } from '../fixtures/FixtureBuilder.js';
+import type { QueryStakePoolsArgs } from '@cardano-sdk/core';
 
 describe('StakePoolBuilder', () => {
   const dbConnection = new Pool({

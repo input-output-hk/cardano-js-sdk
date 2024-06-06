@@ -1,6 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
-import { Mappers, UnifiedExtChainSyncEvent, WithEpochNo } from '../../../../src';
+import { Mappers } from '../../../../src/index.js';
 import { firstValueFrom, of } from 'rxjs';
+import type { UnifiedExtChainSyncEvent, WithEpochNo } from '../../../../src/index.js';
 
 describe('withStakePools', () => {
   const epochNo = Cardano.EpochNo(2);

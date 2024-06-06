@@ -1,6 +1,6 @@
-import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
-import { Mappers } from '../../operators';
-import { inMemoryStoreOperator } from './utils';
+import { inMemoryStoreOperator } from './utils.js';
+import type { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
+import type { Mappers } from '../../operators/index.js';
 
 export const storeStakeKeys = inMemoryStoreOperator<Mappers.WithStakeKeys>(({ stakeKeys: { insert, del }, store }) => {
   for (const stakeKey of insert) {

@@ -12,8 +12,8 @@ import {
   txBody,
   txBodyWithCollaterals,
   txIn
-} from '../testData';
-import { txToTrezor } from '../../src/transformers/tx';
+} from '../testData.js';
+import { txToTrezor } from '../../src/transformers/tx.js';
 
 describe('tx', () => {
   describe('txToTrezor', () => {

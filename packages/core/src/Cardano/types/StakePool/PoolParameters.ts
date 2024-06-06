@@ -1,11 +1,12 @@
-import { ExtendedStakePoolMetadata } from './ExtendedStakePoolMetadata';
-import { Fraction } from '../';
-import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
-import { Lovelace } from '../Value';
-import { OpaqueString, typedBech32 } from '@cardano-sdk/util';
-import { PoolId, VrfVkHex } from './primitives';
-import { Relay } from './Relay';
-import { RewardAccount } from '../../Address';
+import { typedBech32 } from '@cardano-sdk/util';
+import type { ExtendedStakePoolMetadata } from './ExtendedStakePoolMetadata.js';
+import type { Fraction } from '../../index.js';
+import type { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import type { Lovelace } from '../Value.js';
+import type { OpaqueString } from '@cardano-sdk/util';
+import type { PoolId, VrfVkHex } from './primitives.js';
+import type { Relay } from './Relay.js';
+import type { RewardAccount } from '../../Address/index.js';
 
 export interface PoolMetadataJson {
   hash: Hash32ByteBase16;

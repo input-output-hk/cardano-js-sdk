@@ -1,1 +1,1 @@
-export * from './OgmiosTxSubmitProvider';
+export * from './OgmiosTxSubmitProvider.js';

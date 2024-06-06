@@ -1,5 +1,5 @@
-import { Metadatum } from '../../src/Cardano/types/AuxiliaryData';
-import { asMetadatumArray, asMetadatumMap, jsonToMetadatum, metadatumToJson } from '../../src/util/metadatum';
+import { asMetadatumArray, asMetadatumMap, jsonToMetadatum, metadatumToJson } from '../../src/util/metadatum.js';
+import type { Metadatum } from '../../src/Cardano/types/AuxiliaryData.js';
 
 const nestedJson = {
   '0000000000000000000000000000000000000000000000000000000000000000': {

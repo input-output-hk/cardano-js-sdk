@@ -1,7 +1,7 @@
 /* eslint-disable no-bitwise */
 /* eslint-disable unicorn/number-literal-case */
 import { InvalidArgumentError } from '@cardano-sdk/util';
-import { add256bits, add28Mul8 } from './arithmetic';
+import { add256bits, add28Mul8 } from './arithmetic.js';
 import {
   crypto_auth_hmacsha512,
   crypto_core_ed25519_add,

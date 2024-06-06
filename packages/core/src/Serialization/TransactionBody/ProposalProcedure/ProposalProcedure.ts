@@ -1,17 +1,17 @@
-import * as Cardano from '../../../Cardano';
-import { Anchor } from '../../Common/Anchor';
-import { CborReader, CborWriter } from '../../CBOR';
-import { GovernanceActionKind } from './GovernanceActionKind';
-import { HardForkInitiationAction } from './HardForkInitiationAction';
+import * as Cardano from '../../../Cardano/index.js';
+import { Anchor } from '../../Common/Anchor.js';
+import { CborReader, CborWriter } from '../../CBOR/index.js';
+import { GovernanceActionKind } from './GovernanceActionKind.js';
+import { HardForkInitiationAction } from './HardForkInitiationAction.js';
 import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
-import { InfoAction } from './InfoAction';
-import { NewConstitution } from './NewConstitution';
-import { NoConfidence } from './NoConfidence';
-import { ParameterChangeAction } from './ParameterChangeAction';
-import { SerializationError, SerializationFailure } from '../../../errors';
-import { TreasuryWithdrawalsAction } from './TreasuryWithdrawalsAction';
-import { UpdateCommittee } from './UpdateCommittee';
-import { hexToBytes } from '../../../util/misc';
+import { InfoAction } from './InfoAction.js';
+import { NewConstitution } from './NewConstitution.js';
+import { NoConfidence } from './NoConfidence.js';
+import { ParameterChangeAction } from './ParameterChangeAction.js';
+import { SerializationError, SerializationFailure } from '../../../errors.js';
+import { TreasuryWithdrawalsAction } from './TreasuryWithdrawalsAction.js';
+import { UpdateCommittee } from './UpdateCommittee.js';
+import { hexToBytes } from '../../../util/misc/index.js';
 
 const PROCEDURE_ARRAY_SIZE = 4;
 

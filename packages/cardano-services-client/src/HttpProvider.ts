@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { HttpProviderConfigPaths, Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
+import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
-import axios, { AxiosAdapter, AxiosRequestConfig, AxiosResponseTransformer } from 'axios';
+import axios from 'axios';
 import packageJson from '../package.json';
+import type { AxiosAdapter, AxiosRequestConfig, AxiosResponseTransformer } from 'axios';
+import type { HttpProviderConfigPaths, Provider } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
 
 const isEmptyResponse = (response: any) => response === '';
 

@@ -1,5 +1,5 @@
-import { config } from '../util';
-import { networkInfoHttpProvider } from '../../src';
+import { config } from '../util.js';
+import { networkInfoHttpProvider } from '../../src/index.js';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 

@@ -1,2 +1,2 @@
-export * from './BaseWallet';
-export * from './util';
+export * from './BaseWallet.js';
+export * from './util.js';

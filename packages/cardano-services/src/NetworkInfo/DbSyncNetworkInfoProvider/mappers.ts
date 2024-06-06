@@ -1,7 +1,8 @@
-import { Cardano, Seconds, SupplySummary } from '@cardano-sdk/core';
-import { CostModelsParamModel, ProtocolParamsModel } from './types';
-import { GenesisData } from '../../types';
-import { LedgerTipModel } from '../../util/DbSyncProvider';
+import { Cardano, Seconds } from '@cardano-sdk/core';
+import type { CostModelsParamModel, ProtocolParamsModel } from './types.js';
+import type { GenesisData } from '../../types.js';
+import type { LedgerTipModel } from '../../util/DbSyncProvider/index.js';
+import type { SupplySummary } from '@cardano-sdk/core';
 
 interface ToLovalaceSupplyInput {
   circulatingSupply: string;

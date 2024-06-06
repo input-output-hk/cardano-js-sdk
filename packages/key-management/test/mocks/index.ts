@@ -1,3 +1,3 @@
-export * from './mockKeyAgentDependencies';
-export * from './stakeKey';
-export * from './testKeyAgent';
+export * from './mockKeyAgentDependencies.js';
+export * from './stakeKey.js';
+export * from './testKeyAgent.js';

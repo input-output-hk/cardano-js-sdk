@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { rewardsToCore } from '../../../src';
+import { rewardsToCore } from '../../../src/index.js';
 
 describe('DbSyncRewardProvider mappers', () => {
   const rewardAddress1 = 'stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6';

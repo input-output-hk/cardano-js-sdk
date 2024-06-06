@@ -1,6 +1,6 @@
-import { AccountKeyDerivationPath, KeyAgent, TransactionSigner, TransactionSignerResult } from '../types';
-import { Cardano } from '@cardano-sdk/core';
-import { ProofGenerationError } from '../errors';
+import { ProofGenerationError } from '../errors/index.js';
+import type { AccountKeyDerivationPath, KeyAgent, TransactionSigner, TransactionSignerResult } from '../types.js';
+import type { Cardano } from '@cardano-sdk/core';
 
 const EXPECTED_SIG_NUM = 1;
 

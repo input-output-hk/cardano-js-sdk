@@ -1,5 +1,5 @@
-import { Cardano } from '@cardano-sdk/core';
-import { CustomError } from 'ts-custom-error';
+import type { Cardano } from '@cardano-sdk/core';
+import type { CustomError } from 'ts-custom-error';
 
 /** AdaPools format response types Based on: https://a.adapools.org/extended-example */
 export type PoolCompanyInfo = {

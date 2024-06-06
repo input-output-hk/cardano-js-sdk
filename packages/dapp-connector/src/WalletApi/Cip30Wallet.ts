@@ -1,5 +1,5 @@
-import { APIErrorCode, ApiError } from '../errors';
-import {
+import { APIErrorCode, ApiError } from '../errors/index.js';
+import type {
   Bytes,
   Cbor,
   Cip30WalletApiWithPossibleExtensions,
@@ -8,10 +8,10 @@ import {
   WalletApi,
   WalletApiExtension,
   WalletMethod
-} from './types';
-import { Cardano } from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
-import { RemoteAuthenticator } from '../AuthenticatorApi';
+} from './types.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { RemoteAuthenticator } from '../AuthenticatorApi/index.js';
 
 export const CipMethodsMapping: Record<number, WalletMethod[]> = {
   30: [

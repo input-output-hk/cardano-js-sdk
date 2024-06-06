@@ -1,21 +1,20 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import {
+import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
+import { KeyRole, util } from '@cardano-sdk/key-management';
+import { bip32Ed25519Factory, createStandaloneKeyAgent, getSharedWallet } from '../../../src/index.js';
+import type {
   AccountKeyDerivationPath,
   KeyAgent,
-  KeyRole,
   SignBlobResult,
   SignDataContext,
   SignTransactionContext,
   TransactionSigner,
   WitnessOptions,
   WitnessedTx,
-  Witnesser,
-  util
+  Witnesser
 } from '@cardano-sdk/key-management';
-import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
-import { HexBlob } from '@cardano-sdk/util';
-import { Logger } from 'ts-log';
-import { bip32Ed25519Factory, createStandaloneKeyAgent, getSharedWallet } from '../../../src';
+import type { HexBlob } from '@cardano-sdk/util';
+import type { Logger } from 'ts-log';
 
 const randomHexChar = () => Math.floor(Math.random() * 16).toString(16);
 const randomPublicKey = () => Crypto.Ed25519PublicKeyHex(Array.from({ length: 64 }).map(randomHexChar).join(''));

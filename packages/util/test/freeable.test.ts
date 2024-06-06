@@ -1,4 +1,5 @@
-import { Freeable, ManagedFreeableScope, usingAutoFree } from '../src';
+import { ManagedFreeableScope, usingAutoFree } from '../src/index.js';
+import type { Freeable } from '../src/index.js';
 
 class FreeableEntity implements Freeable {
   constructor(public id: number) {}

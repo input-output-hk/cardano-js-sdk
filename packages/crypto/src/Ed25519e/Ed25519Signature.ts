@@ -1,4 +1,4 @@
-import { Ed25519SignatureHex } from '../hexTypes';
+import { Ed25519SignatureHex } from '../hexTypes.js';
 import { InvalidArgumentError } from '@cardano-sdk/util';
 
 export const ED25519_SIGNATURE_LENGTH = 64;

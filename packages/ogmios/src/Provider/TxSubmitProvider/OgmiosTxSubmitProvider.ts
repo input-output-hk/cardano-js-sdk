@@ -1,23 +1,20 @@
 /* eslint-disable no-console */
-import {
-  Cardano,
-  CardanoNodeErrors,
-  HandleOwnerChangeError,
+import { Cardano, CardanoNodeErrors, HandleOwnerChangeError, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { OgmiosCardanoNode } from '../../CardanoNode/index.js';
+import { RunnableModule, contextLogger, isNotNil } from '@cardano-sdk/util';
+import { createInteractionContextWithLogger } from '../../util.js';
+import { createTxSubmissionClient } from '../../Ogmios/TxSubmissionClient.js';
+import { mapOgmiosTxSubmitError } from './errorMapper.js';
+import type { ConnectionConfig } from '@cardano-ogmios/client';
+import type {
   HandleProvider,
   HealthCheckResponse,
   ProviderDependencies,
-  ProviderError,
-  ProviderFailure,
   SubmitTxArgs,
   TxSubmitProvider
 } from '@cardano-sdk/core';
-import { ConnectionConfig } from '@cardano-ogmios/client';
-import { Logger } from 'ts-log';
-import { OgmiosCardanoNode } from '../../CardanoNode';
-import { RunnableModule, contextLogger, isNotNil } from '@cardano-sdk/util';
-import { TxSubmissionClient, createTxSubmissionClient } from '../../Ogmios/TxSubmissionClient';
-import { createInteractionContextWithLogger } from '../../util';
-import { mapOgmiosTxSubmitError } from './errorMapper';
+import type { Logger } from 'ts-log';
+import type { TxSubmissionClient } from '../../Ogmios/TxSubmissionClient.js';
 
 /**
  * Connect to an [Ogmios](https://ogmios.dev/) instance

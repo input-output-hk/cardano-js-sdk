@@ -1,1 +1,1 @@
-export * from './BlockfrostService';
+export * from './BlockfrostService.js';

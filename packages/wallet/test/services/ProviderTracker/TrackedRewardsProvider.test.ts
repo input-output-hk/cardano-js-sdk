@@ -1,7 +1,8 @@
-import { BehaviorSubject } from 'rxjs';
-import { CLEAN_FN_STATS, ProviderFnStats, RewardsProviderStats, TrackedRewardsProvider } from '../../../src';
-import { RewardsProvider } from '@cardano-sdk/core';
+import { CLEAN_FN_STATS, TrackedRewardsProvider } from '../../../src/index.js';
 import { mockProviders } from '@cardano-sdk/util-dev';
+import type { BehaviorSubject } from 'rxjs';
+import type { ProviderFnStats, RewardsProviderStats } from '../../../src/index.js';
+import type { RewardsProvider } from '@cardano-sdk/core';
 
 const { mockRewardsProvider, rewardAccount } = mockProviders;
 

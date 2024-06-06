@@ -1,6 +1,6 @@
-import { BlockEntity } from '../entity';
+import { BlockEntity } from '../entity/index.js';
 import { ChainSyncEventType } from '@cardano-sdk/core';
-import { typeormOperator } from './util';
+import { typeormOperator } from './util.js';
 
 export const storeBlock = typeormOperator(async (evt) => {
   const repository = evt.queryRunner.manager.getRepository(BlockEntity);

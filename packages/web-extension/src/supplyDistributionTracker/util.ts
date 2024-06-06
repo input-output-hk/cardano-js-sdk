@@ -1,5 +1,6 @@
-import { RemoteApiProperties, RemoteApiPropertyType } from '../messaging';
-import { SupplyDistributionTracker } from '@cardano-sdk/wallet';
+import { RemoteApiPropertyType } from '../messaging/index.js';
+import type { RemoteApiProperties } from '../messaging/index.js';
+import type { SupplyDistributionTracker } from '@cardano-sdk/wallet';
 
 export const supplyDistributionTrackerChannel = (walletName: string) => `${walletName}SupplyDistributionTracker$`;
 

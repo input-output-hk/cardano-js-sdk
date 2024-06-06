@@ -1,7 +1,7 @@
-import { Command } from 'commander';
 import { Ogmios } from '@cardano-sdk/ogmios';
-import { addOptions, newOption } from './util';
-import { urlValidator } from '../../util/validators';
+import { addOptions, newOption } from './util.js';
+import { urlValidator } from '../../util/validators.js';
+import type { Command } from 'commander';
 
 const OGMIOS_URL_DEFAULT = (() => {
   const connection = Ogmios.createConnectionObject();

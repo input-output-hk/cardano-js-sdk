@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import type { Observable } from 'rxjs';
 
 /**
  * RxJS operator that returns source observable without any changes.

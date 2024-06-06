@@ -1,5 +1,6 @@
-import { Cardano, Reward } from '@cardano-sdk/core';
-import { RewardEpochModel } from './types';
+import { Cardano } from '@cardano-sdk/core';
+import type { Reward } from '@cardano-sdk/core';
+import type { RewardEpochModel } from './types.js';
 
 export const rewardsToCore = (rewards: RewardEpochModel[]): Map<Cardano.RewardAccount, Reward[]> =>
   rewards.reduce((_rewards, current) => {

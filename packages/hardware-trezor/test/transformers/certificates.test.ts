@@ -1,6 +1,5 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Trezor from '@trezor/connect';
-import { Cardano } from '@cardano-sdk/core';
 import { CardanoKeyConst, KeyRole, util } from '@cardano-sdk/key-management';
 import {
   contextWithKnownAddresses,
@@ -10,8 +9,9 @@ import {
   stakeDelegationCertificate,
   stakeDeregistrationCertificate,
   stakeRegistrationCertificate
-} from '../testData';
-import { mapCerts } from '../../src/transformers';
+} from '../testData.js';
+import { mapCerts } from '../../src/transformers/index.js';
+import type { Cardano } from '@cardano-sdk/core';
 
 describe('certificates', () => {
   describe('mapCerts', () => {

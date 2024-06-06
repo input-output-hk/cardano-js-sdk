@@ -1,6 +1,7 @@
-import { AssetProvider, HttpProviderConfigPaths } from '@cardano-sdk/core';
-import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
-import { apiVersion } from '../version';
+import { apiVersion } from '../version.js';
+import { createHttpProvider } from '../HttpProvider.js';
+import type { AssetProvider, HttpProviderConfigPaths } from '@cardano-sdk/core';
+import type { CreateHttpProviderConfig } from '../HttpProvider.js';
 
 /** The AssetProvider endpoint paths. */
 const paths: HttpProviderConfigPaths<AssetProvider> = {

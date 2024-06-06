@@ -1,27 +1,28 @@
 /* eslint-disable complexity */
-import * as Cardano from '../../Cardano';
-import { AuthCommitteeHot } from './AuthCommitteeHot';
-import { CborReader } from '../CBOR';
-import { CertificateKind } from './CertificateKind';
-import { GenesisKeyDelegation } from './GenesisKeyDelegation';
-import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
-import { MoveInstantaneousReward } from './MoveInstantaneousReward';
-import { PoolRegistration } from './PoolRegistration';
-import { PoolRetirement } from './PoolRetirement';
-import { RegisterDelegateRepresentative } from './RegisterDelegateRepresentative';
-import { Registration } from './Registration';
-import { ResignCommitteeCold } from './ResignCommitteeCold';
-import { StakeDelegation } from './StakeDelegation';
-import { StakeDeregistration } from './StakeDeregistration';
-import { StakeRegistration } from './StakeRegistration';
-import { StakeRegistrationDelegation } from './StakeRegistrationDelegation';
-import { StakeVoteDelegation } from './StakeVoteDelegation';
-import { StakeVoteRegistrationDelegation } from './StakeVoteRegistrationDelegation';
-import { UnregisterDelegateRepresentative } from './UnregisterDelegateRepresentative';
-import { Unregistration } from './Unregistration';
-import { UpdateDelegateRepresentative } from './UpdateDelegateRepresentative';
-import { VoteDelegation } from './VoteDelegation';
-import { VoteRegistrationDelegation } from './VoteRegistrationDelegation';
+import * as Cardano from '../../Cardano/index.js';
+import { AuthCommitteeHot } from './AuthCommitteeHot.js';
+import { CborReader } from '../CBOR/index.js';
+import { CertificateKind } from './CertificateKind.js';
+import { GenesisKeyDelegation } from './GenesisKeyDelegation.js';
+import { InvalidStateError } from '@cardano-sdk/util';
+import { MoveInstantaneousReward } from './MoveInstantaneousReward/index.js';
+import { PoolRegistration } from './PoolRegistration.js';
+import { PoolRetirement } from './PoolRetirement.js';
+import { RegisterDelegateRepresentative } from './RegisterDelegateRepresentative.js';
+import { Registration } from './Registration.js';
+import { ResignCommitteeCold } from './ResignCommitteeCold.js';
+import { StakeDelegation } from './StakeDelegation.js';
+import { StakeDeregistration } from './StakeDeregistration.js';
+import { StakeRegistration } from './StakeRegistration.js';
+import { StakeRegistrationDelegation } from './StakeRegistrationDelegation.js';
+import { StakeVoteDelegation } from './StakeVoteDelegation.js';
+import { StakeVoteRegistrationDelegation } from './StakeVoteRegistrationDelegation.js';
+import { UnregisterDelegateRepresentative } from './UnregisterDelegateRepresentative.js';
+import { Unregistration } from './Unregistration.js';
+import { UpdateDelegateRepresentative } from './UpdateDelegateRepresentative.js';
+import { VoteDelegation } from './VoteDelegation.js';
+import { VoteRegistrationDelegation } from './VoteRegistrationDelegation.js';
+import type { HexBlob } from '@cardano-sdk/util';
 
 /**
  * Certificates are a means to encode various essential operations related to stake

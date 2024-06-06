@@ -1,5 +1,5 @@
-import { BlockKind } from './types';
-import { Schema } from '@cardano-ogmios/client';
+import type { BlockKind } from './types.js';
+import type { Schema } from '@cardano-ogmios/client';
 
 export const BYRON_TX_FEE_COEFFICIENT = 43_946_000_000;
 export const BYRON_TX_FEE_CONSTANT = 155_381_000_000_000;

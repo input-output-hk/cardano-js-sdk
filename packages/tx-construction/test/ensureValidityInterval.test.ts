@@ -1,5 +1,5 @@
 import { Cardano, Seconds } from '@cardano-sdk/core';
-import { calcTimeOffsetSlotNumber, ensureValidityInterval } from '../src';
+import { calcTimeOffsetSlotNumber, ensureValidityInterval } from '../src/index.js';
 
 describe('calcTimeOffsetSlotNumber', () => {
   it('can calculate using 1 second slot length', () => {

@@ -4,11 +4,12 @@ import {
   PaginateError,
   TxSendError,
   TxSignError,
-  WalletApi,
   WalletApiMethodNames
 } from '@cardano-sdk/dapp-connector';
-import { MessengerDependencies, RemoteApiProperties, RemoteApiPropertyType, consumeRemoteApi } from '../messaging';
-import { walletApiChannel } from './util';
+import { RemoteApiPropertyType, consumeRemoteApi } from '../messaging/index.js';
+import { walletApiChannel } from './util.js';
+import type { MessengerDependencies, RemoteApiProperties } from '../messaging/index.js';
+import type { WalletApi } from '@cardano-sdk/dapp-connector';
 
 const cip30errorTypes = [ApiError, DataSignError, PaginateError, TxSendError, TxSignError];
 export interface ConsumeRemoteWalletApiProps {

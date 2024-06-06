@@ -1,4 +1,4 @@
-import { Runtime } from 'webextension-polyfill';
+import type { Runtime } from 'webextension-polyfill';
 
 export const senderOrigin = (sender?: Runtime.MessageSender): string | null => {
   try {

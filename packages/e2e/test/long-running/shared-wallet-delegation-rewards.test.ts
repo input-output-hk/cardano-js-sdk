@@ -1,6 +1,5 @@
-import { BaseWallet } from '@cardano-sdk/wallet';
-import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
-import { buildSharedWallets } from '../wallet_epoch_0/SharedWallet/utils';
+import { Cardano } from '@cardano-sdk/core';
+import { buildSharedWallets } from '../wallet_epoch_0/SharedWallet/utils.js';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import {
   getEnv,
@@ -11,10 +10,12 @@ import {
   waitForEpoch,
   walletReady,
   walletVariables
-} from '../../src';
+} from '../../src/index.js';
 import { isNotNil } from '@cardano-sdk/util';
 import { logger } from '@cardano-sdk/util-dev';
-import { waitForWalletStateSettle } from '../../../wallet/test/util';
+import { waitForWalletStateSettle } from '../../../wallet/test/util.js';
+import type { BaseWallet } from '@cardano-sdk/wallet';
+import type { StakePoolProvider } from '@cardano-sdk/core';
 
 const env = getEnv(walletVariables);
 

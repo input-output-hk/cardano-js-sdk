@@ -3,22 +3,22 @@ import {
   BlockDataEntity,
   BlockEntity,
   NftMetadataEntity,
-  TypeormStabilityWindowBuffer,
-  TypeormTipTracker,
   createObservableConnection,
   storeAssets,
   storeBlock,
   typeormTransactionCommit,
   willStoreAssets,
   withTypeormTransaction
-} from '../../src';
+} from '../../src/index.js';
 import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
-import { Mint } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
-import { QueryRunner } from 'typeorm';
-import { connectionConfig$, initializeDataSource } from '../util';
-import { createProjectorContext, createProjectorTilFirst } from './util';
+import { ChainSyncEventType } from '@cardano-sdk/core';
+import { connectionConfig$, initializeDataSource } from '../util.js';
+import { createProjectorContext, createProjectorTilFirst } from './util.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Mint } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
+import type { QueryRunner } from 'typeorm';
+import type { TypeormStabilityWindowBuffer, TypeormTipTracker } from '../../src/index.js';
 
 describe('storeAssets', () => {
   const stubEvents = chainSyncData(ChainSyncDataSet.WithMint);

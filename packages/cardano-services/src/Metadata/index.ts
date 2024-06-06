@@ -1,4 +1,4 @@
-export * from './types';
-export * from './DbSyncMetadataService';
-export * from './mappers';
-export * as MetadataQueries from './queries';
+export * from './types.js';
+export * from './DbSyncMetadataService.js';
+export * from './mappers.js';
+export * as MetadataQueries from './queries.js';

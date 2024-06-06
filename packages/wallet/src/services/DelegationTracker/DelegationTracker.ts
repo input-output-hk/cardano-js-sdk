@@ -1,24 +1,23 @@
-import { Cardano, ChainHistoryProvider, EraSummary, SlotEpochCalc, createSlotEpochCalc } from '@cardano-sdk/core';
-import { DelegationTracker, TransactionsTracker, UtxoTracker } from '../types';
-import { GroupedAddress } from '@cardano-sdk/key-management';
-import { Logger } from 'ts-log';
-import { Observable, combineLatest, map, tap } from 'rxjs';
-import {
-  ObservableRewardsProvider,
-  ObservableStakePoolProvider,
-  createQueryStakePoolsProvider,
-  createRewardAccountsTracker,
-  createRewardsProvider
-} from './RewardAccounts';
-import { RetryBackoffConfig } from 'backoff-rxjs';
-import { RewardsHistoryProvider, createRewardsHistoryProvider, createRewardsHistoryTracker } from './RewardsHistory';
-import { Shutdown, contextLogger } from '@cardano-sdk/util';
-import { TrackedRewardsProvider, TrackedStakePoolProvider } from '../ProviderTracker';
+import { Cardano, createSlotEpochCalc } from '@cardano-sdk/core';
 import { TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
-import { TxWithEpoch } from './types';
-import { WalletStores } from '../../persistence';
-import { createDelegationDistributionTracker } from './DelegationDistributionTracker';
-import { transactionsWithCertificates } from './transactionCertificates';
+import { combineLatest, map, tap } from 'rxjs';
+import { contextLogger } from '@cardano-sdk/util';
+import { createDelegationDistributionTracker } from './DelegationDistributionTracker.js';
+import { createQueryStakePoolsProvider, createRewardAccountsTracker, createRewardsProvider } from './RewardAccounts.js';
+import { createRewardsHistoryProvider, createRewardsHistoryTracker } from './RewardsHistory.js';
+import { transactionsWithCertificates } from './transactionCertificates.js';
+import type { ChainHistoryProvider, EraSummary, SlotEpochCalc } from '@cardano-sdk/core';
+import type { DelegationTracker, TransactionsTracker, UtxoTracker } from '../types.js';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
+import type { ObservableRewardsProvider, ObservableStakePoolProvider } from './RewardAccounts.js';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
+import type { RewardsHistoryProvider } from './RewardsHistory.js';
+import type { Shutdown } from '@cardano-sdk/util';
+import type { TrackedRewardsProvider, TrackedStakePoolProvider } from '../ProviderTracker/index.js';
+import type { TxWithEpoch } from './types.js';
+import type { WalletStores } from '../../persistence/index.js';
 
 export const createBlockEpochProvider =
   (

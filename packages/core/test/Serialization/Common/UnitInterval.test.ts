@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import * as Cardano from '../../../src/Cardano';
 import { HexBlob } from '@cardano-sdk/util';
-import { UnitInterval } from '../../../src/Serialization';
+import { UnitInterval } from '../../../src/Serialization/index.js';
+import type * as Cardano from '../../../src/Cardano/index.js';
 
 // Test data used in the following tests was generated with the cardano-serialization-lib
 describe('UnitInterval', () => {

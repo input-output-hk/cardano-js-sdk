@@ -1,5 +1,5 @@
 import { HandleEntity } from '@cardano-sdk/projection-typeorm';
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class HandleTableMigration1686138943349 implements MigrationInterface {
   static entity = HandleEntity;

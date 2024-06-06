@@ -1,4 +1,4 @@
-import {
+import type {
   Asset,
   Cardano,
   EpochInfo,
@@ -7,14 +7,20 @@ import {
   NetworkInfoProvider,
   TxCBOR
 } from '@cardano-sdk/core';
-import { BalanceTracker, DelegationTracker, TransactionsTracker, UtxoTracker } from './services';
-import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
-import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
-import { GroupedAddress, MessageSender, SignTransactionContext, WitnessedTx, cip8 } from '@cardano-sdk/key-management';
-import { InitializeTxProps, InitializeTxResult, TxBuilder, TxContext } from '@cardano-sdk/tx-construction';
-import { Observable } from 'rxjs';
-import { PubStakeKeyAndStatus } from './services/PublicStakeKeysTracker';
-import { Shutdown } from '@cardano-sdk/util';
+import type { BalanceTracker, DelegationTracker, TransactionsTracker, UtxoTracker } from './services/index.js';
+import type { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
+import type { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
+import type {
+  GroupedAddress,
+  MessageSender,
+  SignTransactionContext,
+  WitnessedTx,
+  cip8
+} from '@cardano-sdk/key-management';
+import type { InitializeTxProps, InitializeTxResult, TxBuilder, TxContext } from '@cardano-sdk/tx-construction';
+import type { Observable } from 'rxjs';
+import type { PubStakeKeyAndStatus } from './services/PublicStakeKeysTracker.js';
+import type { Shutdown } from '@cardano-sdk/util';
 
 export type Assets = Map<Cardano.AssetId, Asset.AssetInfo>;
 

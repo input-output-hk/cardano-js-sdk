@@ -1,7 +1,8 @@
 import { ChainSyncEventType } from '@cardano-sdk/core';
-import { ExtChainSyncEvent, ProjectorEventHandlers, projectorOperator } from '../../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { of } from 'rxjs';
+import { projectorOperator } from '../../../src/index.js';
+import type { ExtChainSyncEvent, ProjectorEventHandlers } from '../../../src/index.js';
 
 describe('projectorOperator', () => {
   // eslint-disable-next-line unicorn/consistent-function-scoping

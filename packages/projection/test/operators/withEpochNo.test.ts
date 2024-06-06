@@ -1,7 +1,8 @@
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { RollForwardEvent, UnifiedExtChainSyncEvent, WithNetworkInfo, withEpochNo } from '../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
-import { stubEraSummaries } from '../util';
+import { stubEraSummaries } from '../util.js';
+import { withEpochNo } from '../../src/index.js';
+import type { RollForwardEvent, UnifiedExtChainSyncEvent, WithNetworkInfo } from '../../src/index.js';
 
 const rollForwardEvent = (slot: number) =>
   ({

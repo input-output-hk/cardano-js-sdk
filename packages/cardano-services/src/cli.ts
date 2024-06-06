@@ -2,10 +2,8 @@
 
 import {
   ALLOWED_ORIGINS_DEFAULT,
-  AvailableNetworks,
   BLOCKFROST_WORKER_API_URL_DEFAULT,
   BLOCKS_BUFFER_LENGTH_DEFAULT,
-  BlockfrostWorkerArgs,
   BlockfrostWorkerOptionDescriptions,
   CACHE_TTL_DEFAULT,
   CREATE_SCHEMA_DEFAULT,
@@ -23,12 +21,9 @@ import {
   POOLS_METRICS_OUTDATED_INTERVAL_DEFAULT,
   PROJECTOR_API_URL_DEFAULT,
   PROVIDER_SERVER_API_URL_DEFAULT,
-  PgBossWorkerArgs,
   PgBossWorkerOptionDescriptions,
   Programs,
-  ProjectorArgs,
   ProjectorOptionDescriptions,
-  ProviderServerArgs,
   ProviderServerOptionDescriptions,
   SCAN_INTERVAL_DEFAULT,
   ServiceNames,
@@ -50,24 +45,32 @@ import {
   withOgmiosOptions,
   withPostgresOptions,
   withStakePoolMetadataOptions
-} from './Program';
+} from './Program/index.js';
 import { Command } from 'commander';
-import { DB_CACHE_TTL_DEFAULT } from './InMemoryCache';
-import { DEFAULT_FUZZY_SEARCH_OPTIONS, validateFuzzyOptions } from './StakePool';
+import { DB_CACHE_TTL_DEFAULT } from './InMemoryCache/index.js';
+import { DEFAULT_FUZZY_SEARCH_OPTIONS, validateFuzzyOptions } from './StakePool/index.js';
 import {
   DEFAULT_TOKEN_METADATA_CACHE_TTL,
   DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT,
   DEFAULT_TOKEN_METADATA_SERVER_URL
-} from './Asset';
-import { EPOCH_POLL_INTERVAL_DEFAULT } from './util';
-import { HttpServer } from './Http';
-import { PgBossQueue, isValidQueue } from './PgBoss';
-import { ProjectionName } from './Projection';
-import { cacheTtlValidator, dbCacheValidator, integerValidator, urlValidator } from './util/validators';
-import { readScheduleConfig } from './util/schedule';
+} from './Asset/index.js';
+import { EPOCH_POLL_INTERVAL_DEFAULT } from './util/index.js';
+import { ProjectionName } from './Projection/index.js';
+import { cacheTtlValidator, dbCacheValidator, integerValidator, urlValidator } from './util/validators.js';
+import { isValidQueue } from './PgBoss/index.js';
+import { readScheduleConfig } from './util/schedule.js';
 import fs from 'fs';
 import onDeath from 'death';
 import path from 'path';
+import type {
+  AvailableNetworks,
+  BlockfrostWorkerArgs,
+  PgBossWorkerArgs,
+  ProjectorArgs,
+  ProviderServerArgs
+} from './Program/index.js';
+import type { HttpServer } from './Http/index.js';
+import type { PgBossQueue } from './PgBoss/index.js';
 
 const copiedPackageJsonPath = path.join(__dirname, 'original-package.json');
 // Exists in dist/, doesn't exist when run with ts-node

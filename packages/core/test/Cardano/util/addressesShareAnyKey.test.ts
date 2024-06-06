@@ -1,4 +1,4 @@
-import { Cardano } from '../../../src';
+import { Cardano } from '../../../src/index.js';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 
 const pairs = <T>(arr: T[]) => arr.flatMap((v, i) => arr.slice(i + 1).map((w) => [v, w] as const));

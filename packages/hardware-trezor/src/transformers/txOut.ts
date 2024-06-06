@@ -1,9 +1,12 @@
 import * as Trezor from '@trezor/connect';
-import { Cardano, Serialization } from '@cardano-sdk/core';
-import { GroupedAddress, util } from '@cardano-sdk/key-management';
-import { HexBlob, InvalidArgumentError, Transform } from '@cardano-sdk/util';
-import { TrezorTxOutputDestination, TrezorTxTransformerContext } from '../types';
-import { mapTokenMap } from './assets';
+import { InvalidArgumentError } from '@cardano-sdk/util';
+import { Serialization } from '@cardano-sdk/core';
+import { mapTokenMap } from './assets.js';
+import { util } from '@cardano-sdk/key-management';
+import type { Cardano } from '@cardano-sdk/core';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
+import type { HexBlob, Transform } from '@cardano-sdk/util';
+import type { TrezorTxOutputDestination, TrezorTxTransformerContext } from '../types.js';
 
 const toDestination: Transform<Cardano.TxOut, TrezorTxOutputDestination, TrezorTxTransformerContext> = (
   txOut,

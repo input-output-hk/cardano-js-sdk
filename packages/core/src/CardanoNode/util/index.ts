@@ -1,2 +1,2 @@
-export * from './cardanoNodeErrors';
-export * from './stakeDistribution';
+export * from './cardanoNodeErrors.js';
+export * from './stakeDistribution.js';

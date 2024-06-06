@@ -1,18 +1,11 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import {
-  Bootstrap,
-  BootstrapExtraProps,
-  InMemory,
-  Mappers,
-  ProjectionEvent,
-  ProjectionOperator,
-  RollForwardEvent,
-  requestNext,
-  withStaticContext
-} from '../../src';
-import { Cardano, ChainSyncEventType, ChainSyncRollForward } from '@cardano-sdk/core';
-import { ChainSyncDataSet, StubChainSyncData, chainSyncData, logger } from '@cardano-sdk/util-dev';
+import { Bootstrap, InMemory, Mappers, requestNext, withStaticContext } from '../../src/index.js';
+import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { from, lastValueFrom, of, take, toArray } from 'rxjs';
+import type { BootstrapExtraProps, ProjectionEvent, ProjectionOperator, RollForwardEvent } from '../../src/index.js';
+import type { ChainSyncRollForward } from '@cardano-sdk/core';
+import type { StubChainSyncData } from '@cardano-sdk/util-dev';
 
 const dataWithPoolRetirement = chainSyncData(ChainSyncDataSet.WithPoolRetirement);
 const dataWithStakeKeyDeregistration = chainSyncData(ChainSyncDataSet.WithStakeKeyDeregistration);

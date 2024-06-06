@@ -1,12 +1,12 @@
-import { Assets } from '../../types';
-import { Cardano, EraSummary, Reward } from '@cardano-sdk/core';
 import { EMPTY, combineLatest, map } from 'rxjs';
-import { GroupedAddress, WitnessedTx } from '@cardano-sdk/key-management';
-import { InMemoryCollectionStore } from './InMemoryCollectionStore';
-import { InMemoryDocumentStore } from './InMemoryDocumentStore';
-import { InMemoryKeyValueStore } from './InMemoryKeyValueStore';
-import { OutgoingOnChainTx, TxInFlight } from '../../services';
-import { WalletStores } from '../types';
+import { InMemoryCollectionStore } from './InMemoryCollectionStore.js';
+import { InMemoryDocumentStore } from './InMemoryDocumentStore.js';
+import { InMemoryKeyValueStore } from './InMemoryKeyValueStore.js';
+import type { Assets } from '../../types.js';
+import type { Cardano, EraSummary, Reward } from '@cardano-sdk/core';
+import type { GroupedAddress, WitnessedTx } from '@cardano-sdk/key-management';
+import type { OutgoingOnChainTx, TxInFlight } from '../../services/index.js';
+import type { WalletStores } from '../types.js';
 
 export class InMemoryTipStore extends InMemoryDocumentStore<Cardano.Tip> {}
 export class InMemoryPolicyIdsStore extends InMemoryDocumentStore<Cardano.PolicyId[]> {}

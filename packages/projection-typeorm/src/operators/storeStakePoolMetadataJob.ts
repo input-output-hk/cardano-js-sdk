@@ -1,8 +1,9 @@
 import { ChainSyncEventType } from '@cardano-sdk/core';
-import { Mappers } from '@cardano-sdk/projection';
-import { STAKE_POOL_METADATA_QUEUE, StakePoolMetadataJob, defaultJobOptions } from '../pgBoss';
-import { WithPgBoss } from './withTypeormTransaction';
-import { certificatePointerToId, typeormOperator } from './util';
+import { STAKE_POOL_METADATA_QUEUE, defaultJobOptions } from '../pgBoss.js';
+import { certificatePointerToId, typeormOperator } from './util.js';
+import type { Mappers } from '@cardano-sdk/projection';
+import type { StakePoolMetadataJob } from '../pgBoss.js';
+import type { WithPgBoss } from './withTypeormTransaction.js';
 
 export const willStoreStakePoolMetadataJob = ({ stakePools }: Mappers.WithStakePools) => stakePools.updates.length > 0;
 

@@ -1,16 +1,10 @@
-import {
-  Asset,
-  AssetProvider,
-  Cardano,
-  GetAssetArgs,
-  GetAssetsArgs,
-  ProviderError,
-  ProviderFailure
-} from '@cardano-sdk/core';
 import { AssetEntity } from '@cardano-sdk/projection-typeorm';
-import { TokenMetadataService } from '../types';
-import { TypeOrmNftMetadataService } from '../TypeOrmNftMetadataService';
-import { TypeormProvider, TypeormProviderDependencies } from '../../util';
+import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { TypeOrmNftMetadataService } from '../TypeOrmNftMetadataService.js';
+import { TypeormProvider } from '../../util/index.js';
+import type { Asset, AssetProvider, GetAssetArgs, GetAssetsArgs } from '@cardano-sdk/core';
+import type { TokenMetadataService } from '../types.js';
+import type { TypeormProviderDependencies } from '../../util/index.js';
 
 interface TypeormAssetProviderProps {
   paginationPageSizeLimit: number;

@@ -1,10 +1,13 @@
-import { AssetEntity, HandleEntity, HandleMetadataEntity } from '../entity';
-import { Cardano, ChainSyncEventType, Handle } from '@cardano-sdk/core';
-import { In, QueryRunner } from 'typeorm';
-import { Mappers } from '@cardano-sdk/projection';
-import { WithMintedAssetSupplies } from './storeAssets';
-import { typeormOperator } from './util';
-import sortBy from 'lodash/sortBy';
+import { AssetEntity, HandleEntity } from '../entity/index.js';
+import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { In } from 'typeorm';
+import { typeormOperator } from './util.js';
+import sortBy from 'lodash/sortBy.js';
+import type { Handle } from '@cardano-sdk/core';
+import type { HandleMetadataEntity } from '../entity/index.js';
+import type { Mappers } from '@cardano-sdk/projection';
+import type { QueryRunner } from 'typeorm';
+import type { WithMintedAssetSupplies } from './storeAssets.js';
 
 type HandleWithTotalSupply = Mappers.HandleOwnership & { totalSupply: bigint };
 

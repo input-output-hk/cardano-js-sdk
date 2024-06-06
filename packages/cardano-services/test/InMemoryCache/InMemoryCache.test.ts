@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { DB_CACHE_TTL_DEFAULT, InMemoryCache } from '../../src/InMemoryCache';
+import { DB_CACHE_TTL_DEFAULT, InMemoryCache } from '../../src/InMemoryCache/index.js';
 import NodeCache from 'node-cache';
 
 describe('InMemoryCache', () => {

@@ -1,6 +1,7 @@
-import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
-import { HttpProviderConfigPaths, NetworkInfoProvider } from '@cardano-sdk/core';
-import { apiVersion } from '../version';
+import { apiVersion } from '../version.js';
+import { createHttpProvider } from '../HttpProvider.js';
+import type { CreateHttpProviderConfig } from '../HttpProvider.js';
+import type { HttpProviderConfigPaths, NetworkInfoProvider } from '@cardano-sdk/core';
 
 /** The NetworkInfoProvider endpoint paths. */
 const paths: HttpProviderConfigPaths<NetworkInfoProvider> = {

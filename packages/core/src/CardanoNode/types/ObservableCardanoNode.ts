@@ -1,6 +1,6 @@
-import { bufferChainSyncEvent } from '../util/bufferChainSyncEvent';
-import type { Cardano, HealthCheckResponse } from '../..';
-import type { EraSummary } from './CardanoNode';
+import { bufferChainSyncEvent } from '../util/bufferChainSyncEvent.js';
+import type { Cardano, HealthCheckResponse } from '../../index.js';
+import type { EraSummary } from './CardanoNode.js';
 import type { Observable } from 'rxjs';
 
 // Similar to Ogmios.Point, but using Cardano.BlockId opaque string for hash

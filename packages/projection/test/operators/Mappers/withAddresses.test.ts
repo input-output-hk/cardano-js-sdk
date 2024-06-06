@@ -1,9 +1,9 @@
 import { Cardano } from '@cardano-sdk/core';
-import { ProjectionEvent } from '../../../src';
-import { WithUtxo } from '../../../src/operators/Mappers';
 import { cip19TestVectors, generateRandomHexString } from '@cardano-sdk/util-dev';
 import { firstValueFrom, of } from 'rxjs';
-import { withAddresses } from '../../../src/operators/Mappers/withAddresses';
+import { withAddresses } from '../../../src/operators/Mappers/withAddresses.js';
+import type { ProjectionEvent } from '../../../src/index.js';
+import type { WithUtxo } from '../../../src/operators/Mappers/index.js';
 
 const projectEvent = async (addresses: Cardano.PaymentAddress[]) => {
   const event = {

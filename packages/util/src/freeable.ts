@@ -1,5 +1,5 @@
-import { Freeable } from './types';
-import { isPromise } from './isPromise';
+import { isPromise } from './isPromise.js';
+import type { Freeable } from './types.js';
 
 /** A scope to ease the management of objects that require manual resource management. */
 export class ManagedFreeableScope {

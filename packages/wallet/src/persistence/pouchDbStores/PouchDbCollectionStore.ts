@@ -1,10 +1,10 @@
 /* eslint-disable promise/always-return */
-import { CollectionStore } from '../types';
 import { EMPTY, Observable, Subject, from } from 'rxjs';
-import { Logger } from 'ts-log';
-import { PouchDbStore } from './PouchDbStore';
-import { observeAll } from '../util';
-import { sanitizePouchDbDoc } from './util';
+import { PouchDbStore } from './PouchDbStore.js';
+import { observeAll } from '../util.js';
+import { sanitizePouchDbDoc } from './util.js';
+import type { CollectionStore } from '../types.js';
+import type { Logger } from 'ts-log';
 
 export type ComputePouchDbDocId<T> = (doc: T) => string;
 

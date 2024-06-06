@@ -1,23 +1,21 @@
-import * as Cardano from '../Cardano';
-import * as Crypto from '@cardano-sdk/crypto';
-import { AssetId, TokenMap } from '../Cardano';
-import { AssetInfoWithAmount } from './tokenTransferInspector';
-import { AssetProvider } from '../Provider';
+import { AssetId } from '../Cardano/index.js';
+import { BigIntMath } from '@cardano-sdk/util';
 import {
-  AssetsMintedInspection,
-  Inspector,
-  ResolutionResult,
   assetsBurnedInspector,
   assetsMintedInspector,
   resolveInputs,
   totalAddressInputsValueInspector,
   totalAddressOutputsValueInspector
-} from './txInspector';
-import { BigIntMath } from '@cardano-sdk/util';
-import { coalesceTokenMaps, subtractTokenMaps } from '../Asset/util';
-import { coalesceValueQuantities } from './coalesceValueQuantities';
-import { computeImplicitCoin } from '../Cardano/util';
-import { subtractValueQuantities } from './subtractValueQuantities';
+} from './txInspector.js';
+import { coalesceTokenMaps, subtractTokenMaps } from '../Asset/util/index.js';
+import { coalesceValueQuantities } from './coalesceValueQuantities.js';
+import { computeImplicitCoin } from '../Cardano/util/index.js';
+import { subtractValueQuantities } from './subtractValueQuantities.js';
+import type * as Cardano from '../Cardano/index.js';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { AssetInfoWithAmount } from './tokenTransferInspector.js';
+import type { AssetProvider } from '../Provider/index.js';
+import type { AssetsMintedInspection, Inspector, ResolutionResult } from './txInspector.js';
 
 interface TransactionSummaryInspectorArgs {
   addresses: Cardano.PaymentAddress[];
@@ -118,7 +116,7 @@ const getUnaccountedFunds = async (
 
 const toAssetInfoWithAmount = async (
   assetProvider: AssetProvider,
-  tokenMap?: TokenMap
+  tokenMap?: Cardano.TokenMap
 ): Promise<Map<Cardano.AssetId, AssetInfoWithAmount>> => {
   if (!tokenMap) return new Map();
 

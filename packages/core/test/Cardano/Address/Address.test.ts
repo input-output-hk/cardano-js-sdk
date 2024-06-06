@@ -1,6 +1,6 @@
-import * as cip19TestVectors from '../../../../util-dev/src/Cip19TestVectors';
-import { ByronAddressType } from '../../../src/Cardano';
-import { Cardano } from '../../../src';
+import * as cip19TestVectors from '../../../../util-dev/src/Cip19TestVectors.js';
+import { ByronAddressType } from '../../../src/Cardano/index.js';
+import { Cardano } from '../../../src/index.js';
 
 // eslint-disable-next-line max-statements
 describe('Cardano/Address', () => {

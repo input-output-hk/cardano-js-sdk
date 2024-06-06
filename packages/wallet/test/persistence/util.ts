@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import type { Observable } from 'rxjs';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const assertCompletesWithoutEmitting = async (observable: Observable<any>) =>

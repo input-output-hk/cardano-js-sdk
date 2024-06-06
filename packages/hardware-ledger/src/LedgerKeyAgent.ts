@@ -1,38 +1,43 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, NotImplementedError } from '@cardano-sdk/core';
 import {
   CardanoKeyConst,
   Cip1852PathLevelIndexes,
   CommunicationType,
   KeyAgentBase,
-  KeyAgentDependencies,
   KeyAgentType,
-  SerializableLedgerKeyAgentData,
-  SignBlobResult,
-  SignTransactionContext,
   errors,
   util
 } from '@cardano-sdk/key-management';
 import { HID } from 'node-hid';
-import { LedgerDevice, LedgerTransportType } from './types';
+import { NotImplementedError } from '@cardano-sdk/core';
 import { areNumbersEqualInConstantTime, areStringsEqualInConstantTime } from '@cardano-sdk/util';
 import { str_to_path } from '@cardano-foundation/ledgerjs-hw-app-cardano/dist/utils/address';
-import { toLedgerTx } from './transformers';
+import { toLedgerTx } from './transformers/index.js';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import _LedgerConnection, {
-  Certificate,
   CertificateType,
-  CredentialParams,
   CredentialParamsType,
-  GetVersionResponse,
   PoolKeyType,
   PoolOwnerType,
-  Transaction,
   TransactionSigningMode,
   TxOutputDestinationType
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import _TransportWebUSB from '@ledgerhq/hw-transport-webusb';
+import type { Cardano } from '@cardano-sdk/core';
+import type {
+  Certificate,
+  CredentialParams,
+  GetVersionResponse,
+  Transaction
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import type {
+  KeyAgentDependencies,
+  SerializableLedgerKeyAgentData,
+  SignBlobResult,
+  SignTransactionContext
+} from '@cardano-sdk/key-management';
+import type { LedgerDevice, LedgerTransportType } from './types.js';
 import type LedgerTransport from '@ledgerhq/hw-transport';
 
 const TransportWebUSB = (_TransportWebUSB as any).default

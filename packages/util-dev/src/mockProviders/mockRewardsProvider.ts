@@ -1,8 +1,15 @@
-import { Cardano, Paginated, StakePoolProvider } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { Percent } from '@cardano-sdk/util';
-import { epochRewards, rewardAccountBalance, rewardAccountBalance2, rewardsHistory, rewardsHistory2 } from './mockData';
-import { getRandomTxId } from './mockChainHistoryProvider';
+import {
+  epochRewards,
+  rewardAccountBalance,
+  rewardAccountBalance2,
+  rewardsHistory,
+  rewardsHistory2
+} from './mockData.js';
+import { getRandomTxId } from './mockChainHistoryProvider.js';
 import delay from 'delay';
+import type { Paginated, StakePoolProvider } from '@cardano-sdk/core';
 
 export const mockRewardsProvider = ({ rewardAccount }: { rewardAccount?: Cardano.RewardAccount } = {}) => ({
   healthCheck: jest.fn().mockResolvedValue({ ok: true }),

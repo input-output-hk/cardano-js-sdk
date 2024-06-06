@@ -1,17 +1,12 @@
-import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
-import { ComputeMinimumCoinQuantity, TokenBundleSizeExceedsLimit, TxCosts } from '../types';
-import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
-import {
-  RequiredImplicitValue,
-  UtxoSelection,
-  assetQuantitySelector,
-  getCoinQuantity,
-  stubMaxSizeAddress,
-  toValues
-} from '../util';
-import minBy from 'lodash/minBy';
-import orderBy from 'lodash/orderBy';
-import pick from 'lodash/pick';
+import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError.js';
+import { assetQuantitySelector, getCoinQuantity, stubMaxSizeAddress, toValues } from '../util.js';
+import { coalesceValueQuantities } from '@cardano-sdk/core';
+import minBy from 'lodash/minBy.js';
+import orderBy from 'lodash/orderBy.js';
+import pick from 'lodash/pick.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { ComputeMinimumCoinQuantity, TokenBundleSizeExceedsLimit, TxCosts } from '../types.js';
+import type { RequiredImplicitValue, UtxoSelection } from '../util.js';
 
 type EstimateTxCostsWithOriginalOutputs = (utxo: Cardano.Utxo[], change: Cardano.Value[]) => Promise<TxCosts>;
 

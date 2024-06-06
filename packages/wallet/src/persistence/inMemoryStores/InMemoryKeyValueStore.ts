@@ -1,6 +1,7 @@
-import { EMPTY, Observable, of } from 'rxjs';
-import { InMemoryCollectionStore } from './InMemoryCollectionStore';
-import { KeyValueCollection, KeyValueStore } from '../types';
+import { EMPTY, of } from 'rxjs';
+import { InMemoryCollectionStore } from './InMemoryCollectionStore.js';
+import type { KeyValueCollection, KeyValueStore } from '../types.js';
+import type { Observable } from 'rxjs';
 
 export class InMemoryKeyValueStore<K, V>
   extends InMemoryCollectionStore<KeyValueCollection<K, V>>

@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable promise/always-return */
 import { EMPTY, Observable, from } from 'rxjs';
-import { KeyValueCollection, KeyValueStore } from '../types';
-import { Logger } from 'ts-log';
-import { OpaqueString } from '@cardano-sdk/util';
-import { PouchDbStore } from './PouchDbStore';
-import { sanitizePouchDbDoc } from './util';
+import { PouchDbStore } from './PouchDbStore.js';
+import { sanitizePouchDbDoc } from './util.js';
+import type { KeyValueCollection, KeyValueStore } from '../types.js';
+import type { Logger } from 'ts-log';
+import type { OpaqueString } from '@cardano-sdk/util';
 
 /** PouchDB database that implements KeyValueStore by using keys as document _id */
 export class PouchDbKeyValueStore<K extends string | OpaqueString<any>, V extends {}>

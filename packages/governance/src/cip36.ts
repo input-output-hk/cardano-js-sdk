@@ -1,6 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, Serialization, util } from '@cardano-sdk/core';
-import { HexBlob } from '@cardano-sdk/util';
+import type { HexBlob } from '@cardano-sdk/util';
 
 /** CIP-36 metadata label */
 export enum MetadataLabel {

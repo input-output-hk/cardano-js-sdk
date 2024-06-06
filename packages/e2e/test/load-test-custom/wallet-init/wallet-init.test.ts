@@ -5,10 +5,11 @@ import path from 'path';
 // This line must come before loading the env, to configure the location of the .env file
 dotenv.config({ path: path.join(__dirname, '../../../.env') });
 
-import { BaseWallet, createPersonalWallet } from '@cardano-sdk/wallet';
-import { Logger } from 'ts-log';
 import { bufferCount, bufferTime, from, mergeAll, tap } from 'rxjs';
+import { createPersonalWallet } from '@cardano-sdk/wallet';
 import { logger } from '@cardano-sdk/util-dev';
+import type { BaseWallet } from '@cardano-sdk/wallet';
+import type { Logger } from 'ts-log';
 
 import { Bip32Account, util } from '@cardano-sdk/key-management';
 import {
@@ -26,7 +27,7 @@ import {
   utxoProviderFactory,
   waitForWalletStateSettle,
   walletVariables
-} from '../../../src';
+} from '../../../src/index.js';
 
 // Example call that creates 5000 wallets in 10 minutes:
 // VIRTUAL_USERS_GENERATE_DURATION=600 VIRTUAL_USERS_COUNT=5000 yarn load-test-custom:wallet-init

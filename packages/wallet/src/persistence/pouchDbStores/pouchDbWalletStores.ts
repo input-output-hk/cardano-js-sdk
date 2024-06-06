@@ -1,13 +1,13 @@
-import { Assets } from '../../types';
-import { Cardano, EraSummary, Reward } from '@cardano-sdk/core';
-import { CreatePouchDbStoresDependencies } from './types';
 import { EMPTY, combineLatest, map } from 'rxjs';
-import { GroupedAddress, WitnessedTx } from '@cardano-sdk/key-management';
-import { OutgoingOnChainTx, TxInFlight } from '../../services';
-import { PouchDbCollectionStore } from './PouchDbCollectionStore';
-import { PouchDbDocumentStore } from './PouchDbDocumentStore';
-import { PouchDbKeyValueStore } from './PouchDbKeyValueStore';
-import { WalletStores } from '../types';
+import { PouchDbCollectionStore } from './PouchDbCollectionStore.js';
+import { PouchDbDocumentStore } from './PouchDbDocumentStore.js';
+import { PouchDbKeyValueStore } from './PouchDbKeyValueStore.js';
+import type { Assets } from '../../types.js';
+import type { Cardano, EraSummary, Reward } from '@cardano-sdk/core';
+import type { CreatePouchDbStoresDependencies } from './types.js';
+import type { GroupedAddress, WitnessedTx } from '@cardano-sdk/key-management';
+import type { OutgoingOnChainTx, TxInFlight } from '../../services/index.js';
+import type { WalletStores } from '../types.js';
 
 export class PouchDbTipStore extends PouchDbDocumentStore<Cardano.Tip> {}
 export class PouchDbProtocolParametersStore extends PouchDbDocumentStore<Cardano.ProtocolParameters> {}

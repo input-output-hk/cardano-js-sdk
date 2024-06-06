@@ -1,13 +1,14 @@
-import { Cardano, CardanoNodeErrors, ProviderError } from '@cardano-sdk/core';
-import { Connection, createConnectionObject } from '@cardano-ogmios/client';
-import { OgmiosTxSubmitProvider } from '../../../src';
+import { Cardano, CardanoNodeErrors, ProviderError, TxCBOR } from '@cardano-sdk/core';
+import { OgmiosTxSubmitProvider } from '../../../src/index.js';
 import { bufferToHexString } from '@cardano-sdk/util';
-import { createMockOgmiosServer, listenPromise, serverClosePromise } from '../../mocks/mockOgmiosServer';
+import { createConnectionObject } from '@cardano-ogmios/client';
+import { createMockOgmiosServer, listenPromise, serverClosePromise } from '../../mocks/mockOgmiosServer.js';
 import { getRandomPort } from 'get-port-please';
 import { handleHttpProvider } from '@cardano-sdk/cardano-services-client';
-import { healthCheckResponseMock } from '../../../../core/test/CardanoNode/mocks';
+import { healthCheckResponseMock } from '../../../../core/test/CardanoNode/mocks.js';
 import { dummyLogger as logger } from 'ts-log';
-import http from 'http';
+import type { Connection } from '@cardano-ogmios/client';
+import type http from 'http';
 
 const mockHandleResolution = {
   cardanoAddress: Cardano.PaymentAddress(
@@ -31,7 +32,7 @@ const handleProvider = handleHttpProvider({
   logger
 });
 
-const emptyUintArrayAsHexString = bufferToHexString(Buffer.from(new Uint8Array()));
+const emptyUintArrayAsHexString = TxCBOR(bufferToHexString(Buffer.from(new Uint8Array())));
 
 describe('OgmiosTxSubmitProvider', () => {
   let mockServer: http.Server;

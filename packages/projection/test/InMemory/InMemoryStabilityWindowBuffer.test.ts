@@ -1,8 +1,9 @@
 import { Cardano, ChainSyncEventType, Seconds } from '@cardano-sdk/core';
-import { InMemory, UnifiedExtChainSyncEvent, WithNetworkInfo } from '../../src';
+import { InMemory } from '../../src/index.js';
 import { firstValueFrom, from } from 'rxjs';
 import { genesisToEraSummary } from '@cardano-sdk/util-dev';
-import { stubBlockId } from '../util';
+import { stubBlockId } from '../util.js';
+import type { UnifiedExtChainSyncEvent, WithNetworkInfo } from '../../src/index.js';
 
 const genesisParameters = {
   // stability window = 2 blocks

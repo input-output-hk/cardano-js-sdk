@@ -1,1 +1,1 @@
-export * from './encoding';
+export * from './encoding.js';

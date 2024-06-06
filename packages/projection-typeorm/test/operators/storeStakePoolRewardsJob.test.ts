@@ -1,6 +1,7 @@
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { OperatorFunction, of } from 'rxjs';
-import { STAKE_POOL_REWARDS, storeStakePoolRewardsJob, willStoreStakePoolRewardsJob } from '../../src';
+import { STAKE_POOL_REWARDS, storeStakePoolRewardsJob, willStoreStakePoolRewardsJob } from '../../src/index.js';
+import { of } from 'rxjs';
+import type { OperatorFunction } from 'rxjs';
 
 const testPromise = () => {
   let resolvePromise: Function;

@@ -1,4 +1,4 @@
-import { patchObject } from '../src';
+import { patchObject } from '../src/index.js';
 
 describe('patchObject', () => {
   const object = {

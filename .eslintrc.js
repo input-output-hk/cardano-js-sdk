@@ -7,13 +7,18 @@ module.exports = {
   extends: [
     '@atixlabs/eslint-config/configurations/node',
     'plugin:@typescript-eslint/recommended',
+    'plugin:require-extensions/recommended',
+    'plugin:import/recommended',
     'plugin:jsdoc/recommended'
   ],
   parser: '@typescript-eslint/parser',
-  plugins: ['jsdoc', 'sort-keys-fix', 'sort-imports-es6-autofix', 'jest'],
+  plugins: ['jsdoc', 'sort-keys-fix', 'sort-imports-es6-autofix', 'jest', 'require-extensions'],
   root: true,
   rules: {
     '@typescript-eslint/ban-types': 0,
+    // Those 2 would be nice, but requires ts parserServices which makes lint much slower
+    // '@typescript-eslint/consistent-type-exports': 'warn',
+    // '@typescript-eslint/consistent-type-imports': 'warn',
     // covered by unicorn/prefer-module
     '@typescript-eslint/explicit-module-boundary-types': 0,
     '@typescript-eslint/no-non-null-assertion': 0,
@@ -26,8 +31,8 @@ module.exports = {
     // typescript checks return types
     camelcase: 0,
     'consistent-return': 0,
+    'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
     'import/no-extraneous-dependencies': ['error', { devDependencies: ['**/test/**/*.ts'] }],
-    // eslint compains about TS enums hence disable here and enable @typescript-eslint/no-shadow
     'import/no-unresolved': 0,
     'jsdoc/multiline-blocks': ['error', { minimumLengthForMultiline: maxLineLength, noMultilineBlocks: true }],
     'jsdoc/no-undefined-types': 0,
@@ -54,7 +59,7 @@ module.exports = {
       'error',
       {
         paths: ['lodash'],
-        patterns: ['@cardano-sdk/*/src/*']
+        patterns: ['@cardano-sdk/*/src/*', 'lodash/*', '!lodash/*.js']
       }
     ],
     'no-shadow': 'off',

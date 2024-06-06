@@ -1,13 +1,16 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { BlockId, BlockNo, Slot, Tip } from '../../../src/Cardano';
-import { ChainSyncEvent, ChainSyncEventType, RequestNext } from '../../../src';
-import { Observable, Subject, Subscription } from 'rxjs';
-import { bufferChainSyncEvent } from '../../../src/CardanoNode/util/bufferChainSyncEvent';
+import { BlockNo, Slot } from '../../../src/Cardano/index.js';
+import { ChainSyncEventType } from '../../../src/index.js';
+import { Subject } from 'rxjs';
+import { bufferChainSyncEvent } from '../../../src/CardanoNode/util/bufferChainSyncEvent.js';
+import type { BlockId, Tip } from '../../../src/Cardano/index.js';
+import type { ChainSyncEvent, RequestNext } from '../../../src/index.js';
+import type { Observable, Subscription } from 'rxjs';
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 class ChainSyncEventTestConsumer {
-  private interval: NodeJS.Timer;
+  private interval: NodeJS.Timeout;
   private subscription: Subscription;
 
   private consumeUpTo = 0;
@@ -65,7 +68,7 @@ class ChainSyncEventTestConsumer {
 class ChainSyncEventTestProducer {
   public observable$ = new Subject<ChainSyncEvent>();
 
-  private interval: NodeJS.Timer;
+  private interval: NodeJS.Timeout;
 
   private canProduce = true;
   private produceUpTo = 1;

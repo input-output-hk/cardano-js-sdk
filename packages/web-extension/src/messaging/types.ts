@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ErrorClass, Shutdown } from '@cardano-sdk/util';
-import { Events, Runtime } from 'webextension-polyfill';
-import { Logger } from 'ts-log';
-import { Observable } from 'rxjs';
+import type { ErrorClass, Shutdown } from '@cardano-sdk/util';
+import type { Events, Runtime } from 'webextension-polyfill';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
 
 export type MethodRequest<Method extends string = string, Args = unknown[]> = { method: Method; args: Args };
 

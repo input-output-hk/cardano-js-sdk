@@ -1,1 +1,1 @@
-export * from './DynamicChangeAddressResolver';
+export * from './DynamicChangeAddressResolver.js';

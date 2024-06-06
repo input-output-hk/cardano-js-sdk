@@ -1,8 +1,9 @@
-import { Cardano, ChainSyncEventType, Serialization } from '@cardano-sdk/core';
-import { Mappers } from '@cardano-sdk/projection';
-import { ObjectLiteral } from 'typeorm';
-import { OutputEntity, TokensEntity } from '../entity';
-import { typeormOperator } from './util';
+import { ChainSyncEventType, Serialization } from '@cardano-sdk/core';
+import { OutputEntity, TokensEntity } from '../entity/index.js';
+import { typeormOperator } from './util.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Mappers } from '@cardano-sdk/projection';
+import type { ObjectLiteral } from 'typeorm';
 
 const serializeDatumIfExists = (datum: Cardano.PlutusData | undefined) =>
   datum ? Serialization.PlutusData.fromCore(datum).toCbor() : undefined;

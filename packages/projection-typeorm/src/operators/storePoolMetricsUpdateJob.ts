@@ -1,7 +1,8 @@
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { STAKE_POOL_METRICS_UPDATE } from '../pgBoss';
-import { WithPgBoss } from './withTypeormTransaction';
-import { typeormOperator } from './util';
+import { ChainSyncEventType } from '@cardano-sdk/core';
+import { STAKE_POOL_METRICS_UPDATE } from '../pgBoss.js';
+import { typeormOperator } from './util.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { WithPgBoss } from './withTypeormTransaction.js';
 
 export const createStorePoolMetricsUpdateJob = (jobFrequency = 1000, jobOutdatedFrequency?: number) => {
   // Remember the blockNo of last sent job in order to no resend another job in case of rollback

@@ -1,2 +1,2 @@
-export * from './applyValue';
-export * from './getOnChainAddressBalances';
+export * from './applyValue.js';
+export * from './getOnChainAddressBalances.js';

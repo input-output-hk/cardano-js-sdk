@@ -1,8 +1,8 @@
-import * as Trezor from '@trezor/connect';
-import { Cardano } from '@cardano-sdk/core';
-import { Transform } from '@cardano-sdk/util';
-import { TrezorTxTransformerContext } from '../types';
-import { resolvePaymentKeyPathForTxIn } from './keyPaths';
+import { resolvePaymentKeyPathForTxIn } from './keyPaths.js';
+import type * as Trezor from '@trezor/connect';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Transform } from '@cardano-sdk/util';
+import type { TrezorTxTransformerContext } from '../types.js';
 
 /**
  * Transforms the given Cardano input transaction to the Trezor

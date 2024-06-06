@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
-import { config, healthCheckResponseWithState } from '../util';
-import { utxoHttpProvider } from '../../src';
+import { config, healthCheckResponseWithState } from '../util.js';
+import { utxoHttpProvider } from '../../src/index.js';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 

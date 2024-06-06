@@ -1,17 +1,15 @@
-import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
+import type * as Crypto from '@cardano-sdk/crypto';
 
-import {
-  ComputeMinimumCoinQuantity,
-  GreedyInputSelector,
-  TokenBundleSizeExceedsLimit
-} from '@cardano-sdk/input-selection';
-import { GroupedAddress } from '@cardano-sdk/key-management';
-import { InvalidHereafterError } from './types';
-import { RedeemersByType, computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit } from '../input-selection';
-import { RewardAccountWithPoolId, TxBuilderProviders } from '../types';
-import { ValidityInterval } from '@cardano-sdk/core/dist/cjs/Cardano';
-import minBy from 'lodash/minBy';
+import { GreedyInputSelector } from '@cardano-sdk/input-selection';
+import { InvalidHereafterError } from './types.js';
+import { computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit } from '../input-selection/index.js';
+import minBy from 'lodash/minBy.js';
+import type { ComputeMinimumCoinQuantity, TokenBundleSizeExceedsLimit } from '@cardano-sdk/input-selection';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
+import type { RedeemersByType } from '../input-selection/index.js';
+import type { RewardAccountWithPoolId, TxBuilderProviders } from '../types.js';
+import type { ValidityInterval } from '@cardano-sdk/core/dist/cjs/Cardano';
 
 const COLLATERAL_AMOUNT_IN_LOVELACE = 5_000_000n;
 

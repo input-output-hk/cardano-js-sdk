@@ -1,11 +1,11 @@
-import * as Crypto from '../../src';
+import * as Crypto from '../../src/index.js';
 import { HexBlob, InvalidStringError } from '@cardano-sdk/util';
 import {
   bip32TestVectorMessageOneLength,
   extendedVectors,
   testVectorMessageZeroLength,
   vectors
-} from './Ed25519TestVectors';
+} from './Ed25519TestVectors.js';
 
 describe('Ed25519PrivateKey', () => {
   it('can create an instance from a valid normal Ed25519 private key hex representation', () => {

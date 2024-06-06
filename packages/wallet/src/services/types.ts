@@ -1,7 +1,7 @@
-import { Bip32Account, GroupedAddress, WitnessedTx } from '@cardano-sdk/key-management';
-import { Cardano, Reward, TxCBOR } from '@cardano-sdk/core';
-import { Observable } from 'rxjs';
-import { Percent } from '@cardano-sdk/util';
+import type { Bip32Account, GroupedAddress, WitnessedTx } from '@cardano-sdk/key-management';
+import type { Cardano, Reward, TxCBOR } from '@cardano-sdk/core';
+import type { Observable } from 'rxjs';
+import type { Percent } from '@cardano-sdk/util';
 
 export enum TransactionFailure {
   InvalidTransaction = 'INVALID_TRANSACTION',

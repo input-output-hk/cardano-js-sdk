@@ -1,8 +1,8 @@
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { CONTEXT_WITH_KNOWN_ADDRESSES, txOutWithReferenceScriptWithInlineDatum } from '../testData';
-import { Cardano } from '@cardano-sdk/core';
+import { CONTEXT_WITH_KNOWN_ADDRESSES, txOutWithReferenceScriptWithInlineDatum } from '../testData.js';
 import { CardanoKeyConst, util } from '@cardano-sdk/key-management';
-import { mapCollateralTxOut } from '../../src/transformers/collateralOutput';
+import { mapCollateralTxOut } from '../../src/transformers/collateralOutput.js';
+import type { Cardano } from '@cardano-sdk/core';
 
 describe('collateralOutput', () => {
   describe('mapCollateralTxOut', () => {

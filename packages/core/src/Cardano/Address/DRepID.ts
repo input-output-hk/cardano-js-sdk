@@ -1,5 +1,6 @@
-import { Address, AddressType } from './Address';
-import { OpaqueString, assertIsBech32WithPrefix, typedBech32 } from '@cardano-sdk/util';
+import { Address, AddressType } from './Address.js';
+import { assertIsBech32WithPrefix, typedBech32 } from '@cardano-sdk/util';
+import type { OpaqueString } from '@cardano-sdk/util';
 /** DRepID as bech32 string */
 export type DRepID = OpaqueString<'DRepID'>;
 

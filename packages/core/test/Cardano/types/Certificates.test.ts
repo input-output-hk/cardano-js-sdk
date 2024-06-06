@@ -1,4 +1,4 @@
-import * as Cardano from '../../../src/Cardano';
+import * as Cardano from '../../../src/Cardano/index.js';
 import * as Crypto from '@cardano-sdk/crypto';
 import {
   CertificateType,
@@ -8,7 +8,7 @@ import {
   createStakeDeregistrationCert,
   createStakeRegistrationCert,
   stakeKeyCertificates
-} from '../../../src/Cardano';
+} from '../../../src/Cardano/index.js';
 
 const rewardAccount = RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
 const stakeCredential = {

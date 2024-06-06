@@ -1,5 +1,5 @@
 import { CardanoNodeUtil, TxSubmissionErrorCode } from '@cardano-sdk/core';
-import { mapCardanoTxSubmitError } from '../../src/TxSubmitProvider/cardanoTxSubmitErrorMapper';
+import { mapCardanoTxSubmitError } from '../../src/TxSubmitProvider/cardanoTxSubmitErrorMapper.js';
 
 describe('mapCardanoTxSubmitError', () => {
   describe('stringish errors', () => {

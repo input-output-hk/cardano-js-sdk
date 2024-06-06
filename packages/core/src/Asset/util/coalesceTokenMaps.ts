@@ -1,5 +1,5 @@
-import { TokenMap } from '../../Cardano';
 import { isNotNil } from '@cardano-sdk/util';
+import type { TokenMap } from '../../Cardano/index.js';
 
 /** Sum asset quantities */
 export const coalesceTokenMaps = (totals: (TokenMap | undefined)[]): TokenMap | undefined => {

@@ -1,9 +1,9 @@
-import { HttpService } from '../Http';
-import { Logger } from 'ts-log';
-import { ServiceNames } from '../Program/programs/types';
-import { UtxoProvider } from '@cardano-sdk/core';
-import { providerHandler } from '../util';
+import { HttpService } from '../Http/index.js';
+import { ServiceNames } from '../Program/programs/types.js';
+import { providerHandler } from '../util/index.js';
 import express from 'express';
+import type { Logger } from 'ts-log';
+import type { UtxoProvider } from '@cardano-sdk/core';
 
 export interface UtxoServiceDependencies {
   logger: Logger;

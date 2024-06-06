@@ -1,15 +1,17 @@
 /* eslint-disable no-bitwise */
 import * as BaseEncoding from '@scure/base';
-import { BaseAddress } from './BaseAddress';
-import { ByronAddress, ByronAddressContent } from './ByronAddress';
-import { EnterpriseAddress } from './EnterpriseAddress';
-import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import { BaseAddress } from './BaseAddress.js';
+import { ByronAddress } from './ByronAddress.js';
+import { EnterpriseAddress } from './EnterpriseAddress.js';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import { NetworkId } from '../ChainId';
-import { PaymentAddress } from './PaymentAddress';
-import { Pointer, PointerAddress } from './PointerAddress';
-import { RewardAccount } from './RewardAccount';
-import { RewardAddress } from './RewardAddress';
+import { NetworkId } from '../ChainId.js';
+import { PointerAddress } from './PointerAddress.js';
+import { RewardAddress } from './RewardAddress.js';
+import type { ByronAddressContent } from './ByronAddress.js';
+import type { Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import type { PaymentAddress } from './PaymentAddress.js';
+import type { Pointer } from './PointerAddress.js';
+import type { RewardAccount } from './RewardAccount.js';
 
 const MAX_BECH32_LENGTH_LIMIT = 1023;
 

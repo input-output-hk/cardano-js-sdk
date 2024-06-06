@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Logger } from 'ts-log';
-import { QueryRunner, Logger as TypeormLogger } from 'typeorm';
 import { contextLogger } from '@cardano-sdk/util';
+import type { Logger } from 'ts-log';
+import type { QueryRunner, Logger as TypeormLogger } from 'typeorm';
 
 class MappedLogger implements TypeormLogger {
   #logger: Logger;

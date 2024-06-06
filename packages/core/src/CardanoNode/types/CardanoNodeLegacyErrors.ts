@@ -39,7 +39,7 @@ export const CardanoClientErrors = {
 };
 
 type CardanoClientErrorName = keyof typeof CardanoClientErrors;
-type CardanoClientErrorClass = typeof CardanoClientErrors[CardanoClientErrorName];
+type CardanoClientErrorClass = (typeof CardanoClientErrors)[CardanoClientErrorName];
 
 // TxSubmission related errors
 export class UnknownTxSubmissionError<InnerError = unknown> extends ComposableError<InnerError> {
@@ -121,7 +121,7 @@ export const TxSubmissionErrors = {
 };
 
 type TxSubmissionErrorName = keyof typeof TxSubmissionErrors;
-type TxSubmissionErrorClass = typeof TxSubmissionErrors[TxSubmissionErrorName];
+type TxSubmissionErrorClass = (typeof TxSubmissionErrors)[TxSubmissionErrorName];
 
 export type TxSubmissionError = InstanceType<TxSubmissionErrorClass> | UnknownTxSubmissionError;
 

@@ -1,7 +1,7 @@
-import { AssetEntity } from './Asset.entity';
+import { AssetEntity } from './Asset.entity.js';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { OnDeleteCascadeRelationOptions, UInt64ColumnOptions } from './util';
-import { OutputEntity } from './Output.entity';
+import { OnDeleteCascadeRelationOptions, UInt64ColumnOptions } from './util.js';
+import { OutputEntity } from './Output.entity.js';
 
 @Entity()
 export class TokensEntity {

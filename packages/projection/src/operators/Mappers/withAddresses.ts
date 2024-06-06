@@ -1,8 +1,8 @@
 import { Cardano } from '@cardano-sdk/core';
-import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { WithUtxo } from './withUtxo';
-import { unifiedProjectorOperator } from '../utils';
-import uniq from 'lodash/uniq';
+import { unifiedProjectorOperator } from '../utils/index.js';
+import uniq from 'lodash/uniq.js';
+import type { Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import type { WithUtxo } from './withUtxo.js';
 
 export interface Address {
   address: Cardano.PaymentAddress;

@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
-import { localNetworkChainId } from '../util';
+import { localNetworkChainId } from '../util/index.js';
 
 /** Generates a new set of Mnemonic words and prints them to the console. */
 (async () => {

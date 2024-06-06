@@ -1,15 +1,17 @@
-import { Cardano, ChainSyncEventType, EraSummary, epochSlotsCalc } from '@cardano-sdk/core';
-import { In, Not, QueryRunner, Repository } from 'typeorm';
-import { Mappers, ProjectionEvent } from '@cardano-sdk/projection';
+import { Cardano, ChainSyncEventType, epochSlotsCalc } from '@cardano-sdk/core';
+import { In, Not } from 'typeorm';
 import {
   MaxCertificatePointerIdCertificateIndex as MaxCertificatePointerIdCertIndex,
   MaxCertificatePointerIdTxIndex,
   certificatePointerToId,
   typeormOperator
-} from './util';
-import { PoolRegistrationEntity, PoolRetirementEntity, StakePoolEntity } from '../entity';
-import { WithTypeormContext } from './withTypeormTransaction';
-import omit from 'lodash/omit';
+} from './util.js';
+import { PoolRegistrationEntity, PoolRetirementEntity, StakePoolEntity } from '../entity/index.js';
+import omit from 'lodash/omit.js';
+import type { EraSummary } from '@cardano-sdk/core';
+import type { Mappers, ProjectionEvent } from '@cardano-sdk/projection';
+import type { QueryRunner, Repository } from 'typeorm';
+import type { WithTypeormContext } from './withTypeormTransaction.js';
 
 type Event = ProjectionEvent<WithTypeormContext & Mappers.WithStakePools>;
 

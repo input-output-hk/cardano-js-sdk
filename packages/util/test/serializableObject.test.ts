@@ -1,5 +1,6 @@
 import { CustomError } from 'ts-custom-error';
-import { FromSerializableObjectOptions, fromSerializableObject, toSerializableObject } from '../src';
+import { fromSerializableObject, toSerializableObject } from '../src/index.js';
+import type { FromSerializableObjectOptions } from '../src/index.js';
 
 export class ErrorWithData extends CustomError {
   innerError: { data: unknown };

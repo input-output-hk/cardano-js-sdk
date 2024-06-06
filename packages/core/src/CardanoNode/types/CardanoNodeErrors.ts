@@ -1,5 +1,5 @@
-import * as Cardano from '../../Cardano';
 import { CustomError } from 'ts-custom-error';
+import type * as Cardano from '../../Cardano/index.js';
 
 export enum GeneralCardanoNodeErrorCode {
   ServerNotReady = 503,

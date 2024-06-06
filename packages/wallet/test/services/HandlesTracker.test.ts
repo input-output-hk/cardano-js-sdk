@@ -5,13 +5,14 @@ import { Asset, Cardano } from '@cardano-sdk/core';
 import {
   HYDRATE_HANDLE_INITIAL_INTERVAL,
   HYDRATE_HANDLE_MAX_RETRIES,
-  HandleInfo,
   createHandlesTracker,
   hydrateHandleAsync,
   hydrateHandles
-} from '../../src';
+} from '../../src/index.js';
 import { combineLatest, delay, of, take, throwError } from 'rxjs';
 import { createTestScheduler, logger, mockProviders } from '@cardano-sdk/util-dev';
+import type {
+  HandleInfo } from '../../src/index.js';
 
 const {
   utxo,

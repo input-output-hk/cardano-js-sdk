@@ -1,6 +1,6 @@
 import { CustomError } from 'ts-custom-error';
-import { Logger } from 'ts-log';
-import { contextLogger } from './logging';
+import { contextLogger } from './logging.js';
+import type { Logger } from 'ts-log';
 
 export class InvalidModuleState<ModuleState> extends CustomError {
   public constructor(moduleName: string, methodName: string, requiredState: ModuleState) {

@@ -1,4 +1,4 @@
-import * as Cardano from '../../../Cardano';
+import * as Cardano from '../../../Cardano/index.js';
 import { InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
 
 const PLUTUS_V1_COST_MODEL_OP_COUNT = 166;

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import * as Queries from './queries';
+import * as Queries from './queries.js';
 import { Asset, Cardano, ProviderUtil } from '@cardano-sdk/core';
-import { LastMintTxModel } from '../../../src';
-import { Logger } from 'ts-log';
-import { Pool, QueryResult } from 'pg';
 import { bufferToHexString } from '@cardano-sdk/util';
+import type { LastMintTxModel } from '../../../src/index.js';
+import type { Logger } from 'ts-log';
+import type { Pool, QueryResult } from 'pg';
 
 export enum AssetWith {
   CIP25Metadata = 'CIP25Metadata'

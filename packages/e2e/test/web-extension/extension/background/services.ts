@@ -1,13 +1,14 @@
 // Expose any additional services to be shared with UIs
-import { BackgroundServices, adaPriceProperties, disconnectPortTestObjProperties, env, logger } from '../util';
 import { Cardano } from '@cardano-sdk/core';
 import { Subject, of } from 'rxjs';
-import { adaPriceServiceChannel, walletName } from '../const';
-import { authenticator } from './authenticator';
+import { adaPriceProperties, disconnectPortTestObjProperties, env, logger } from '../util.js';
+import { adaPriceServiceChannel, walletName } from '../const.js';
+import { authenticator } from './authenticator.js';
 import { consumeRemoteApi, exposeApi, exposeSupplyDistributionTracker } from '@cardano-sdk/web-extension';
 import { runtime } from 'webextension-polyfill';
-import { stakePoolProviderFactory } from '../../../../src';
-import { supplyDistributionTrackerReady } from './supplyDistributionTracker';
+import { stakePoolProviderFactory } from '../../../../src/index.js';
+import { supplyDistributionTrackerReady } from './supplyDistributionTracker.js';
+import type { BackgroundServices } from '../util.js';
 
 const apiDisconnectResult$ = new Subject<string>();
 const priceService: BackgroundServices = {

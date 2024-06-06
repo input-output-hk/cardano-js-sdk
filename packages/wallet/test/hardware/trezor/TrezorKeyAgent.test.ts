@@ -1,21 +1,17 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import {
-  AddressType,
-  Bip32Account,
-  CommunicationType,
-  SerializableTrezorKeyAgentData,
-  util
-} from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, CommunicationType, util } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
-import { BaseWallet, createPersonalWallet } from '../../../src';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
-import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
+import { createPersonalWallet } from '../../../src/index.js';
 import { firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
-import { mockKeyAgentDependencies } from '../../../../key-management/test/mocks';
+import { mockKeyAgentDependencies } from '../../../../key-management/test/mocks/index.js';
+import type { BaseWallet } from '../../../src/index.js';
+import type { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
+import type { SerializableTrezorKeyAgentData } from '@cardano-sdk/key-management';
 
 describe('TrezorKeyAgent', () => {
   let wallet: BaseWallet;

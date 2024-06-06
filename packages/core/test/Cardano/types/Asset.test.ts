@@ -1,4 +1,4 @@
-import { AssetFingerprint, AssetId, AssetName, PolicyId } from '../../../src/Cardano';
+import { AssetFingerprint, AssetId, AssetName, PolicyId } from '../../../src/Cardano/index.js';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { InvalidStringError, assertIsHexString, typedBech32 } from '@cardano-sdk/util';
 

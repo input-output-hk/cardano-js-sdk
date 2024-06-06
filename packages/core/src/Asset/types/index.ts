@@ -1,2 +1,2 @@
-export * from './TokenMetadata';
-export * from './AssetInfo';
+export * from './TokenMetadata.js';
+export * from './AssetInfo.js';

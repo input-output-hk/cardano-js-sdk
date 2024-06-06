@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/consistent-function-scoping */
-import { PouchDbCollectionStore, PouchDbDocumentStore, PouchDbKeyValueStore } from '../../src/persistence';
-import { assertCompletesWithoutEmitting } from './util';
+import { PouchDbCollectionStore, PouchDbDocumentStore, PouchDbKeyValueStore } from '../../src/persistence/index.js';
+import { assertCompletesWithoutEmitting } from './util.js';
 import { combineLatest, firstValueFrom, mergeMap, share, shareReplay, take, timer, toArray } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import PouchDB from 'pouchdb';

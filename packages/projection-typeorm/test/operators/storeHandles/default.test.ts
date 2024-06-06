@@ -1,23 +1,21 @@
-import { AddressEntity, AssetEntity, BlockEntity, HandleEntity, HandleMetadataEntity } from '../../../src';
-import { Cardano, Handle, util } from '@cardano-sdk/core';
+import { AddressEntity, AssetEntity, BlockEntity, HandleEntity, HandleMetadataEntity } from '../../../src/index.js';
+import { Cardano, util } from '@cardano-sdk/core';
+import { cip19TestVectors, generateRandomHexString } from '@cardano-sdk/util-dev';
 import {
-  DefaultHandleParamsQueryResponse,
-  queryHandlesByAddressCredentials,
-  sortHandles
-} from '../../../src/operators/storeHandles';
-import {
-  ProjectorContext,
   createProjectorContext,
   createStubBlockHeader,
   createStubProjectionSource,
   createStubRollForwardEvent,
   createStubTx
-} from '../util';
-import { QueryRunner, Repository } from 'typeorm';
-import { cip19TestVectors, generateRandomHexString } from '@cardano-sdk/util-dev';
-import { entities, mapAndStore, policyId, projectTilFirst, stubEvents } from './util';
+} from '../util.js';
+import { entities, mapAndStore, policyId, projectTilFirst, stubEvents } from './util.js';
 import { firstValueFrom } from 'rxjs';
-import { initializeDataSource } from '../../util';
+import { initializeDataSource } from '../../util.js';
+import { queryHandlesByAddressCredentials, sortHandles } from '../../../src/operators/storeHandles.js';
+import type { DefaultHandleParamsQueryResponse } from '../../../src/operators/storeHandles.js';
+import type { Handle } from '@cardano-sdk/core';
+import type { ProjectorContext } from '../util.js';
+import type { QueryRunner, Repository } from 'typeorm';
 
 describe('storeHandles', () => {
   let queryRunner: QueryRunner;

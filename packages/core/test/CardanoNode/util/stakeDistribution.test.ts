@@ -1,5 +1,5 @@
-import { Cardano, CardanoNodeUtil } from '../../../src';
-import { mockStakeDistribution } from '../mocks';
+import { Cardano, CardanoNodeUtil } from '../../../src/index.js';
+import { mockStakeDistribution } from '../mocks.js';
 
 describe('stakeDistribution', () => {
   describe('toLiveStake', () => {

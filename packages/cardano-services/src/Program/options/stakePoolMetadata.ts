@@ -1,8 +1,8 @@
-import { Command } from 'commander';
-import { MissingProgramOption } from '../errors';
+import { MissingProgramOption } from '../errors/index.js';
 import { STAKE_POOL_METADATA_QUEUE } from '@cardano-sdk/projection-typeorm';
-import { addOptions, newOption } from './util';
-import { urlValidator } from '../../util/validators';
+import { addOptions, newOption } from './util.js';
+import { urlValidator } from '../../util/validators.js';
+import type { Command } from 'commander';
 
 export enum StakePoolMetadataOptionDescriptions {
   Mode = 'This mode governs where the stake pool metadata is fetched from',

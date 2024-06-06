@@ -1,19 +1,15 @@
 import * as OpenApiValidator from 'express-openapi-validator';
-import {
-  HealthCheckResponse,
-  HttpProviderConfigPaths,
-  Provider,
-  ProviderError,
-  ProviderFailure,
-  providerFailureToStatusCodeMap
-} from '@cardano-sdk/core';
-import { HttpServer } from './HttpServer';
-import { Logger } from 'ts-log';
-import { ProviderHandler, providerHandler } from '../util';
+import { HttpServer } from './HttpServer.js';
+import { ProviderError, ProviderFailure, providerFailureToStatusCodeMap } from '@cardano-sdk/core';
 import { RunnableModule } from '@cardano-sdk/util';
-import { versionPathFromSpec } from '../util/openApi';
-import express, { Router } from 'express';
+import { providerHandler } from '../util/index.js';
+import { versionPathFromSpec } from '../util/openApi.js';
 import path from 'path';
+import type { HealthCheckResponse, HttpProviderConfigPaths, Provider } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { ProviderHandler } from '../util/index.js';
+import type { Router } from 'express';
+import type express from 'express';
 
 const openApiOption = {
   ignoreUndocumented: true,

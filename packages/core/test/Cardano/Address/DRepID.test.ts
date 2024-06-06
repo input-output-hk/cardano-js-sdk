@@ -1,4 +1,4 @@
-import { DRepID } from '../../../src/Cardano';
+import { DRepID } from '../../../src/Cardano/index.js';
 import { InvalidStringError } from '@cardano-sdk/util';
 
 describe('Cardano/Address/DRepID', () => {

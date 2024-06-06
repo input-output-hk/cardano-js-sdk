@@ -1,18 +1,18 @@
 import { Cardano } from '@cardano-sdk/core';
-import {
+import { InMemoryInFlightTransactionsStore, InMemoryVolatileTransactionsStore } from '../../src/persistence/index.js';
+import { TransactionFailure, createTransactionReemitter } from '../../src/index.js';
+import { createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
+import { dummyCbor } from '../util.js';
+import { dummyLogger } from 'ts-log';
+import omit from 'lodash/omit.js';
+import type {
   FailedTx,
   OutgoingOnChainTx,
   OutgoingTx,
-  TransactionFailure,
   TransactionReemitterProps,
-  TxInFlight,
-  createTransactionReemitter
-} from '../../src';
-import { InMemoryInFlightTransactionsStore, InMemoryVolatileTransactionsStore } from '../../src/persistence';
-import { Logger, dummyLogger } from 'ts-log';
-import { createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
-import { dummyCbor } from '../util';
-import omit from 'lodash/omit';
+  TxInFlight
+} from '../../src/index.js';
+import type { Logger } from 'ts-log';
 
 const { genesisParameters } = mockProviders;
 

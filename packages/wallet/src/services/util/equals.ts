@@ -1,7 +1,7 @@
-import { Cardano, EpochInfo, EraSummary } from '@cardano-sdk/core';
-import { DelegatedStake } from '../types';
-import { GroupedAddress, WitnessedTx } from '@cardano-sdk/key-management';
 import { sameArrayItems } from '@cardano-sdk/util';
+import type { Cardano, EpochInfo, EraSummary } from '@cardano-sdk/core';
+import type { DelegatedStake } from '../types.js';
+import type { GroupedAddress, WitnessedTx } from '@cardano-sdk/key-management';
 
 export const tipEquals = (a: Cardano.Tip, b: Cardano.Tip) => a.hash === b.hash;
 

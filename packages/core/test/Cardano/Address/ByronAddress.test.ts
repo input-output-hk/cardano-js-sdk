@@ -1,7 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import * as cip19TestVectors from '../../../../util-dev/src/Cip19TestVectors';
-import { ByronAddressType } from '../../../src/Cardano';
-import { Cardano } from '../../../src';
+import * as cip19TestVectors from '../../../../util-dev/src/Cip19TestVectors.js';
+import { ByronAddressType } from '../../../src/Cardano/index.js';
+import { Cardano } from '../../../src/index.js';
 import { HexBlob } from '@cardano-sdk/util';
 
 describe('Cardano/Address/ByronAddress', () => {

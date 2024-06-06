@@ -1,6 +1,7 @@
-import { MessengerDependencies, RemoteApiProperties, RemoteApiPropertyType, consumeRemoteApi } from '../messaging';
-import { RemoteAuthenticator, RemoteAuthenticatorMethod } from '@cardano-sdk/dapp-connector';
-import { authenticatorChannel } from './util';
+import { RemoteApiPropertyType, consumeRemoteApi } from '../messaging/index.js';
+import { authenticatorChannel } from './util.js';
+import type { MessengerDependencies, RemoteApiProperties } from '../messaging/index.js';
+import type { RemoteAuthenticator, RemoteAuthenticatorMethod } from '@cardano-sdk/dapp-connector';
 
 export const RemoteAuthenticatorMethodNames: Array<RemoteAuthenticatorMethod> = [
   'haveAccess',

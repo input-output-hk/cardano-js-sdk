@@ -1,7 +1,9 @@
-import { Asset, Cardano } from '@cardano-sdk/core';
-import { AssetPolicyIdAndName, NftMetadataService } from './types';
+import { Cardano } from '@cardano-sdk/core';
 import { NftMetadataEntity } from '@cardano-sdk/projection-typeorm';
-import { TypeormProviderDependencies, TypeormService } from '../util';
+import { TypeormService } from '../util/index.js';
+import type { Asset } from '@cardano-sdk/core';
+import type { AssetPolicyIdAndName, NftMetadataService } from './types.js';
+import type { TypeormProviderDependencies } from '../util/index.js';
 
 export class TypeOrmNftMetadataService extends TypeormService implements NftMetadataService {
   constructor({ connectionConfig$, logger, entities }: TypeormProviderDependencies) {

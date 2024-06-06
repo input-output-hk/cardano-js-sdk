@@ -1,1 +1,1 @@
-export * from './chainHistoryHttpProvider';
+export * from './chainHistoryHttpProvider.js';

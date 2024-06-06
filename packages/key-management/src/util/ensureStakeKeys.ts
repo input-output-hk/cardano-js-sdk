@@ -1,7 +1,8 @@
-import { AddressType, GroupedAddress, KeyRole } from '../types';
-import { Bip32Account } from '../Bip32Account';
-import { Cardano } from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
+import { AddressType, KeyRole } from '../types.js';
+import type { Bip32Account } from '../Bip32Account.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { GroupedAddress } from '../types.js';
+import type { Logger } from 'ts-log';
 
 export interface EnsureStakeKeysParams {
   /** Key agent to use */

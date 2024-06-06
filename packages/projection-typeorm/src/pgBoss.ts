@@ -3,13 +3,14 @@
 /* eslint-disable max-len */
 /* eslint-disable no-invalid-this */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Cardano } from '@cardano-sdk/core';
-import { DataSource, QueryRunner } from 'typeorm';
-import { Logger } from 'ts-log';
 import { contextLogger } from '@cardano-sdk/util';
 import { v4 } from 'uuid';
 import Attorney from 'pg-boss/src/attorney';
-import PgBoss, { SendOptions } from 'pg-boss';
+import PgBoss from 'pg-boss';
+import type { Cardano } from '@cardano-sdk/core';
+import type { DataSource, QueryRunner } from 'typeorm';
+import type { Logger } from 'ts-log';
+import type { SendOptions } from 'pg-boss';
 
 export const POOL_DELIST_SCHEDULE = 'pool-delist-schedule';
 export const STAKE_POOL_METADATA_QUEUE = 'pool-metadata';

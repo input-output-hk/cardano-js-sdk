@@ -1,5 +1,5 @@
 import { DockerUtil } from '@cardano-sdk/util-dev';
-import { connectionConfig } from '../util';
+import { connectionConfig } from '../util.js';
 import path from 'path';
 
 module.exports = async () => {

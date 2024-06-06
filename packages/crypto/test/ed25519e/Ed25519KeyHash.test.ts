@@ -1,5 +1,5 @@
-import * as Crypto from '../../src';
-import { Ed25519KeyHashHex } from '../../src';
+import * as Crypto from '../../src/index.js';
+import { Ed25519KeyHashHex } from '../../src/index.js';
 import { InvalidStringError } from '@cardano-sdk/util';
 
 describe('Ed25519KeyHash', () => {

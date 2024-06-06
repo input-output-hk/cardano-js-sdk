@@ -1,14 +1,11 @@
 import { CardanoNodeErrors } from '@cardano-sdk/core';
-import {
-  ConnectionConfig,
-  InteractionContext,
-  InteractionType,
-  createInteractionContext
-} from '@cardano-ogmios/client';
 import { Observable, switchMap } from 'rxjs';
-import { WithLogger, contextLogger, isConnectionError } from '@cardano-sdk/util';
+import { contextLogger, isConnectionError } from '@cardano-sdk/util';
+import { createInteractionContext } from '@cardano-ogmios/client';
 import { retryBackoff } from 'backoff-rxjs';
+import type { ConnectionConfig, InteractionContext, InteractionType } from '@cardano-ogmios/client';
 import type { ReconnectionConfig } from '@cardano-sdk/util-rxjs';
+import type { WithLogger } from '@cardano-sdk/util';
 
 const defaultReconnectionConfig: ReconnectionConfig = { initialInterval: 10, maxInterval: 5000 };
 

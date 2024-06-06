@@ -1,15 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import {
-  AccountKeyDerivationPath,
-  AddressType,
-  CardanoKeyConst,
-  GroupedAddress,
-  KeyRole,
-  TxInId,
-  TxInKeyPathMap,
-  util
-} from '@cardano-sdk/key-management';
+import { AddressType, CardanoKeyConst, KeyRole, util } from '@cardano-sdk/key-management';
 import {
   CONTEXT_WITHOUT_KNOWN_ADDRESSES,
   CONTEXT_WITH_KNOWN_ADDRESSES,
@@ -19,11 +10,12 @@ import {
   poolId2,
   poolParameters,
   stakeCredential
-} from '../testData';
+} from '../testData.js';
 import { Cardano } from '@cardano-sdk/core';
-import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { LedgerTxTransformerContext } from '../../src';
-import { getKnownAddress, mapCerts } from '../../src/transformers/certificates';
+import { getKnownAddress, mapCerts } from '../../src/transformers/certificates.js';
+import type { AccountKeyDerivationPath, GroupedAddress, TxInId, TxInKeyPathMap } from '@cardano-sdk/key-management';
+import type { Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import type { LedgerTxTransformerContext } from '../../src/index.js';
 
 export const stakeKeyPath = {
   index: 0,

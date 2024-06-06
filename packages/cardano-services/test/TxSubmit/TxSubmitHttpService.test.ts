@@ -1,15 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { APPLICATION_JSON, CONTENT_TYPE, HttpServer, HttpServerConfig, TxSubmitHttpService } from '../../src';
-import { CreateHttpProviderConfig, txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
+import { APPLICATION_JSON, CONTENT_TYPE, HttpServer, TxSubmitHttpService } from '../../src/index.js';
 import { FATAL, createLogger } from 'bunyan';
-import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
-import { ProviderError, TxSubmissionError, TxSubmissionErrorCode, TxSubmitProvider } from '@cardano-sdk/core';
+import { ProviderError, TxCBOR, TxSubmissionError, TxSubmissionErrorCode } from '@cardano-sdk/core';
 import { bufferToHexString, fromSerializableObject } from '@cardano-sdk/util';
 import { getPort } from 'get-port-please';
 import { logger } from '@cardano-sdk/util-dev';
-import { servicesWithVersionPath as services } from '../util';
+import { servicesWithVersionPath as services } from '../util.js';
+import { txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
 import axios from 'axios';
 import cbor from 'cbor';
+import type { CreateHttpProviderConfig } from '@cardano-sdk/cardano-services-client';
+import type { HttpServerConfig } from '../../src/index.js';
+import type { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
+import type { TxSubmitProvider } from '@cardano-sdk/core';
 
 const txSubmitProviderMock = (
   healthCheckImpl = async () => Promise.resolve({ ok: true }),
@@ -202,7 +205,7 @@ describe('TxSubmitHttpService', () => {
         expect.assertions(3);
         const clientProvider = txSubmitHttpProvider(clientConfig);
         try {
-          await clientProvider.submitTx({ signedTransaction: emptyUintArrayAsHexString });
+          await clientProvider.submitTx({ signedTransaction: TxCBOR(emptyUintArrayAsHexString) });
         } catch (error: any) {
           if (error instanceof ProviderError) {
             const innerError = error.innerError as TxSubmissionError;
@@ -228,6 +231,7 @@ describe('TxSubmitHttpService', () => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.status).toBe(400);
+          // eslint-disable-next-line prettier/prettier
           const parsedError = fromSerializableObject<ProviderError<typeof stubErrors[0]>>(error.response.data);
           expect(parsedError.innerError!.name).toEqual(stubErrors[0].name);
           expect(txSubmitProvider.submitTx).toHaveBeenCalledTimes(1);

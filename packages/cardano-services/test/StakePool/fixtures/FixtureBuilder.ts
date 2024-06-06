@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import * as Queries from './queries';
-import { Cardano } from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
-import { Pool, QueryResult } from 'pg';
+import * as Queries from './queries.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { Pool, QueryResult } from 'pg';
 
 export enum PoolWith {
   Metadata = 'Metadata',

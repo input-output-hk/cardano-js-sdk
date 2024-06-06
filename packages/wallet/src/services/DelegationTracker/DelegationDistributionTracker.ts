@@ -1,22 +1,13 @@
 import { BigIntMath, Percent, calcPercentages, sameArrayItems } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
-import { DelegatedStake } from '../types';
-import { DelegationTrackerProps } from './DelegationTracker';
-import {
-  Observable,
-  combineLatest,
-  combineLatestWith,
-  distinctUntilChanged,
-  iif,
-  map,
-  of,
-  switchMap,
-  withLatestFrom
-} from 'rxjs';
-import { createUtxoBalanceByAddressTracker } from '../BalanceTracker';
-import { delegatedStakeEquals } from '../util';
-import _groupBy from 'lodash/groupBy';
-import _map from 'lodash/map';
+import { combineLatest, combineLatestWith, distinctUntilChanged, iif, map, of, switchMap, withLatestFrom } from 'rxjs';
+import { createUtxoBalanceByAddressTracker } from '../BalanceTracker.js';
+import { delegatedStakeEquals } from '../util/index.js';
+import _groupBy from 'lodash/groupBy.js';
+import _map from 'lodash/map.js';
+import type { DelegatedStake } from '../types.js';
+import type { DelegationTrackerProps } from './DelegationTracker.js';
+import type { Observable } from 'rxjs';
 
 type DelegationDistributionTrackerProps = Pick<DelegationTrackerProps, 'knownAddresses$' | 'utxoTracker'> & {
   rewardAccounts$: Observable<Cardano.RewardAccountInfo[]>;

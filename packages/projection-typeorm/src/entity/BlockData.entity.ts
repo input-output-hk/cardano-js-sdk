@@ -1,8 +1,8 @@
-import { BlockEntity } from './Block.entity';
+import { BlockEntity } from './Block.entity.js';
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
-import { OnDeleteCascadeRelationOptions } from './util';
-import { json, serializableObj, stringBytea } from './transformers';
+import { OnDeleteCascadeRelationOptions } from './util.js';
+import { json, serializableObj, stringBytea } from './transformers.js';
 
 @Entity()
 export class BlockDataEntity {

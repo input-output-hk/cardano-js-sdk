@@ -8,9 +8,9 @@ import {
 } from '@cardano-sdk/projection-typeorm';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
-import { ProjectionName, createTypeormProjection, prepareTypeormProjection } from '../../src';
+import { ProjectionName, createTypeormProjection, prepareTypeormProjection } from '../../src/index.js';
 import { lastValueFrom } from 'rxjs';
-import { projectorConnectionConfig, projectorConnectionConfig$ } from '../util';
+import { projectorConnectionConfig, projectorConnectionConfig$ } from '../util.js';
 
 describe('createTypeormProjection', () => {
   it('creates a projection to PostgreSQL based on requested projection names', async () => {

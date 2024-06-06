@@ -1,13 +1,13 @@
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 
-import {
+import { computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit } from '../input-selection/index.js';
+import type {
   OutputValidation,
   OutputValidator,
   OutputValidatorContext,
   ProtocolParametersRequiredByOutputValidator
-} from './types';
-import { computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit } from '../input-selection';
+} from './types.js';
 
 export const createOutputValidator = ({
   protocolParameters: protocolParametersGetter

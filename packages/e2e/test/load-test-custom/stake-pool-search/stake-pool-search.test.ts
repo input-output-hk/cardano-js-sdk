@@ -1,10 +1,11 @@
 import * as envalid from 'envalid';
-import { Cardano, QueryStakePoolsArgs } from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
-import { MeasurementUtil, getEnv, getLoadTestScheduler } from '../../../src';
+import { Cardano } from '@cardano-sdk/core';
+import { MeasurementUtil, getEnv, getLoadTestScheduler } from '../../../src/index.js';
 import { bufferTime, from, tap } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 import { stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
+import type { Logger } from 'ts-log';
+import type { QueryStakePoolsArgs } from '@cardano-sdk/core';
 
 // Example call:
 /* STAKE_POOL_PROVIDER_URL="http://mhvm:4000/stake-pool" \

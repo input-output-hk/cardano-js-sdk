@@ -1,11 +1,11 @@
-import { Cardano } from '../../..';
-import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
-import { ExUnits } from '../../Common';
+import { CborReader, CborReaderState, CborWriter } from '../../CBOR/index.js';
+import { ExUnits } from '../../Common/index.js';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import { PlutusData } from '../../PlutusData';
-import { Redeemer } from './Redeemer';
-import { RedeemerTag } from './RedeemerTag';
-import { hexToBytes } from '../../../util/misc';
+import { PlutusData } from '../../PlutusData/index.js';
+import { Redeemer } from './Redeemer.js';
+import { hexToBytes } from '../../../util/misc/index.js';
+import type { Cardano } from '../../../index.js';
+import type { RedeemerTag } from './RedeemerTag.js';
 
 const MAP_INDEX_EMBEDDED_GROUP_SIZE = 2;
 const MAP_VALUE_EMBEDDED_GROUP_SIZE = 2;

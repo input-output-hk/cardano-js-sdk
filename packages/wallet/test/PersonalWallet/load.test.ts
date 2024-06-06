@@ -1,16 +1,6 @@
 /* eslint-disable unicorn/consistent-destructuring */
 /* eslint-disable max-statements */
-import {
-  AddressDiscovery,
-  BaseWallet,
-  ConnectionStatus,
-  ConnectionStatusTracker,
-  ObservableWallet,
-  PollingConfig,
-  SingleAddressDiscovery,
-  createPersonalWallet
-} from '../../src';
-import { AddressType, AsyncKeyAgent, Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, util } from '@cardano-sdk/key-management';
 import {
   AssetId,
   createStubStakePoolProvider,
@@ -19,25 +9,34 @@ import {
   mockProviders as mocks,
   somePartialStakePools
 } from '@cardano-sdk/util-dev';
-import {
-  Cardano,
+import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
+import { ConnectionStatus, SingleAddressDiscovery, createPersonalWallet } from '../../src/index.js';
+import { InvalidConfigurationError } from '@cardano-sdk/tx-construction';
+import { InvalidStringError } from '@cardano-sdk/util';
+import { ReplaySubject, firstValueFrom } from 'rxjs';
+import { createInMemoryWalletStores } from '../../src/persistence/index.js';
+import { dummyLogger as logger } from 'ts-log';
+import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks/index.js';
+import { waitForWalletStateSettle } from '../util.js';
+import delay from 'delay';
+import flatten from 'lodash/flatten.js';
+import pick from 'lodash/pick.js';
+import type {
+  AddressDiscovery,
+  BaseWallet,
+  ConnectionStatusTracker,
+  ObservableWallet,
+  PollingConfig
+} from '../../src/index.js';
+import type { AsyncKeyAgent, GroupedAddress } from '@cardano-sdk/key-management';
+import type {
   ChainHistoryProvider,
   HandleProvider,
   NetworkInfoProvider,
   RewardsProvider,
-  UtxoProvider,
-  coalesceValueQuantities
+  UtxoProvider
 } from '@cardano-sdk/core';
-import { InvalidConfigurationError } from '@cardano-sdk/tx-construction';
-import { InvalidStringError } from '@cardano-sdk/util';
-import { ReplaySubject, firstValueFrom } from 'rxjs';
-import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
-import { dummyLogger as logger } from 'ts-log';
-import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
-import { waitForWalletStateSettle } from '../util';
-import delay from 'delay';
-import flatten from 'lodash/flatten';
-import pick from 'lodash/pick';
+import type { WalletStores } from '../../src/persistence/index.js';
 
 const {
   currentEpoch,

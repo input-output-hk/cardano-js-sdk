@@ -1,8 +1,9 @@
 import * as envalid from 'envalid';
-import { ArtilleryContext, FunctionHook, WhileTrueHook } from './artillery';
-import { Cardano, Paginated, QueryStakePoolsArgs } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { logger } from '@cardano-sdk/util-dev';
 import { stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
+import type { ArtilleryContext, FunctionHook, WhileTrueHook } from './artillery.js';
+import type { Paginated, QueryStakePoolsArgs } from '@cardano-sdk/core';
 
 /**
  * The context variables shared between all the hooks.

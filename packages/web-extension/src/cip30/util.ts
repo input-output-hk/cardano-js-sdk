@@ -1,4 +1,4 @@
-import { MessageSender } from '@cardano-sdk/key-management';
+import type { MessageSender } from '@cardano-sdk/key-management';
 
 export const walletApiChannel = (walletName: string) => `wallet-api-${walletName}`;
 

@@ -1,2 +1,2 @@
-export * from './GreedyInputSelector';
-export * from './util';
+export * from './GreedyInputSelector.js';
+export * from './util.js';

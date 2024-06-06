@@ -8,9 +8,9 @@ import {
   StakePoolEntity,
   createDataSource
 } from '@cardano-sdk/projection-typeorm';
-import { Cardano } from '@cardano-sdk/core';
 import { Pool } from 'pg';
 import { logger } from '@cardano-sdk/util-dev';
+import type { Cardano } from '@cardano-sdk/core';
 
 export const blockId = 'test_block';
 export const poolId = 'test_pool'.padEnd(56, ' ') as Cardano.PoolId;

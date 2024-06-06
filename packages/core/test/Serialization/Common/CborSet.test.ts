@@ -1,5 +1,5 @@
-import { CborReader, CborSet, CborTag, CborWriter } from '../../../src/Serialization';
-import { HexBlob } from '@cardano-sdk/util';
+import { CborReader, CborSet, CborTag, CborWriter } from '../../../src/Serialization/index.js';
+import type { HexBlob } from '@cardano-sdk/util';
 
 class TestNumber {
   #value: number;

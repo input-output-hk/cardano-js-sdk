@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import type { Cardano } from '@cardano-sdk/core';
 
 export interface GenesisData {
   networkMagic: Cardano.NetworkMagic;

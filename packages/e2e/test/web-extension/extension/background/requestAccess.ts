@@ -1,9 +1,11 @@
 import { RemoteApiPropertyType, consumeRemoteApi } from '@cardano-sdk/web-extension';
-import { RequestAccess, senderOrigin } from '@cardano-sdk/dapp-connector';
-import { UserPromptService, logger } from '../util';
-import { ensureUiIsOpenAndLoaded } from './windowManager';
+import { ensureUiIsOpenAndLoaded } from './windowManager.js';
+import { logger } from '../util.js';
 import { runtime } from 'webextension-polyfill';
-import { userPromptServiceChannel } from '../const';
+import { senderOrigin } from '@cardano-sdk/dapp-connector';
+import { userPromptServiceChannel } from '../const.js';
+import type { RequestAccess } from '@cardano-sdk/dapp-connector';
+import type { UserPromptService } from '../util.js';
 
 const userPromptService = consumeRemoteApi<UserPromptService>(
   {

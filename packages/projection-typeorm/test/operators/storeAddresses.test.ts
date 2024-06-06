@@ -1,4 +1,3 @@
-import { Address } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
 import {
   AddressEntity,
   AssetEntity,
@@ -8,8 +7,6 @@ import {
   OutputEntity,
   StakeKeyRegistrationEntity,
   TokensEntity,
-  TypeormStabilityWindowBuffer,
-  TypeormTipTracker,
   createObservableConnection,
   storeAddresses,
   storeAssets,
@@ -19,8 +16,8 @@ import {
   typeormTransactionCommit,
   willStoreAddresses,
   withTypeormTransaction
-} from '../../src';
-import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
+} from '../../src/index.js';
+import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
 import { Cardano } from '@cardano-sdk/core';
 import {
   ChainSyncDataSet,
@@ -29,9 +26,7 @@ import {
   generateRandomHexString,
   logger
 } from '@cardano-sdk/util-dev';
-import { Observable, firstValueFrom } from 'rxjs';
-import { QueryRunner, Repository } from 'typeorm';
-import { connectionConfig$, initializeDataSource } from '../util';
+import { connectionConfig$, initializeDataSource } from '../util.js';
 import {
   createProjectorContext,
   createProjectorTilFirst,
@@ -39,7 +34,13 @@ import {
   createStubBlockHeader,
   createStubProjectionSource,
   createStubRollForwardEvent
-} from './util';
+} from './util.js';
+import { firstValueFrom } from 'rxjs';
+import type { Address } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
+import type { Observable } from 'rxjs';
+import type { ProjectionEvent } from '@cardano-sdk/projection';
+import type { QueryRunner, Repository } from 'typeorm';
+import type { TypeormStabilityWindowBuffer, TypeormTipTracker } from '../../src/index.js';
 
 const isAddressWithBothCredentials = (addr: Mappers.Address) =>
   typeof addr.stakeCredential === 'string' && !!addr.paymentCredentialHash;

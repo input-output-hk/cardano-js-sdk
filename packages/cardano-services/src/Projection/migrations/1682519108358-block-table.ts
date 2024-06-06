@@ -1,5 +1,5 @@
 import { BlockEntity } from '@cardano-sdk/projection-typeorm';
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class BlockTableMigration1682519108358 implements MigrationInterface {
   static entity = BlockEntity;

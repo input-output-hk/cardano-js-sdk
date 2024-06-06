@@ -1,5 +1,5 @@
-import { AssetBuilder } from '../../src';
-import { AssetFixtureBuilder, AssetWith } from './fixtures/FixtureBuilder';
+import { AssetBuilder } from '../../src/index.js';
+import { AssetFixtureBuilder, AssetWith } from './fixtures/FixtureBuilder.js';
 import { Cardano } from '@cardano-sdk/core';
 import { Pool } from 'pg';
 import { logger } from '@cardano-sdk/util-dev';

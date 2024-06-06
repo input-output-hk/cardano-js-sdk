@@ -1,6 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import Cardano, { Provider } from '../..';
+import type { Cardano, Provider } from '../../index.js';
 
 export interface UtxoByAddressesArgs {
   addresses: Cardano.PaymentAddress[];

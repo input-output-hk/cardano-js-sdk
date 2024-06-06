@@ -1,10 +1,16 @@
-import { Cardano, Serialization } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
-import { InMemoryWallet, WalletType } from '../types';
-import { KeyAgent, SignBlobResult, TrezorConfig, errors } from '@cardano-sdk/key-management';
-import { KeyAgentFactory } from './KeyAgentFactory';
-import { Logger } from 'ts-log';
-import {
+import { Serialization } from '@cardano-sdk/core';
+import { Subject } from 'rxjs';
+import { WalletType } from '../types.js';
+import { WrongTargetError } from '../../messaging/index.js';
+import { contextLogger } from '@cardano-sdk/util';
+import { errors } from '@cardano-sdk/key-management';
+import type { Cardano } from '@cardano-sdk/core';
+import type { InMemoryWallet } from '../types.js';
+import type { KeyAgent, SignBlobResult, TrezorConfig } from '@cardano-sdk/key-management';
+import type { KeyAgentFactory } from './KeyAgentFactory.js';
+import type { Logger } from 'ts-log';
+import type {
   RequestBase,
   RequestContext,
   SignDataProps,
@@ -15,10 +21,7 @@ import {
   SigningCoordinatorConfirmationApi,
   SigningCoordinatorSignApi,
   TransactionWitnessRequest
-} from './types';
-import { Subject } from 'rxjs';
-import { WrongTargetError } from '../../messaging';
-import { contextLogger } from '@cardano-sdk/util';
+} from './types.js';
 
 export type HardwareKeyAgentOptions = TrezorConfig;
 

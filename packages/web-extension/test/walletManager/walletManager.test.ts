@@ -1,24 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AccountMetadata, WalletMetadata, createAccount, createPubKey } from './util';
-import {
-  AddWalletProps,
-  WalletFactory,
-  WalletId,
-  WalletManager,
-  WalletRepository,
-  WalletType,
-  getWalletId,
-  getWalletStoreId
-} from '../../src';
 import { Cardano } from '@cardano-sdk/core';
 import { HexBlob, InvalidArgumentError, isNotNil } from '@cardano-sdk/util';
-import { MinimalRuntime } from '../../src/messaging';
-import { ObservableWallet, storage } from '@cardano-sdk/wallet';
-import { Storage } from 'webextension-polyfill';
 import { TimeoutError, filter, firstValueFrom, from, skip, timeout } from 'rxjs';
+import { WalletManager, WalletRepository, WalletType, getWalletId, getWalletStoreId } from '../../src/index.js';
+import { createAccount, createPubKey } from './util.js';
 import { logger } from '@cardano-sdk/util-dev';
-import pick from 'lodash/pick';
+import { storage } from '@cardano-sdk/wallet';
+import pick from 'lodash/pick.js';
+import type { AccountMetadata, WalletMetadata } from './util.js';
+import type { AddWalletProps, WalletFactory, WalletId } from '../../src/index.js';
+import type { MinimalRuntime } from '../../src/messaging/index.js';
+import type { ObservableWallet } from '@cardano-sdk/wallet';
+import type { Storage } from 'webextension-polyfill';
 
 jest.mock('../../src/messaging', () => {
   const originalModule = jest.requireActual('../../src/messaging');

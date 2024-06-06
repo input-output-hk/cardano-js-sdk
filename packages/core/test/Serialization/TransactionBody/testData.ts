@@ -1,6 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano } from '../../../src';
-import { NativeScript, NativeScriptKind, ScriptType } from '../../../src/Cardano';
+import { Cardano } from '../../../src/index.js';
+import { NativeScriptKind, ScriptType } from '../../../src/Cardano/index.js';
+import type { NativeScript } from '../../../src/Cardano/index.js';
 export const rewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
 export const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
 export const poolId = Cardano.PoolId('pool1mpgg03jxj52qwxvvy7cmj58a96vl9pvxcqqvuw0kumheygxmn34');

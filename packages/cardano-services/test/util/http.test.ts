@@ -1,5 +1,5 @@
 import { getPort } from 'get-port-please';
-import { listenPromise, serverClosePromise } from '../../src/util/http';
+import { listenPromise, serverClosePromise } from '../../src/util/http.js';
 import express from 'express';
 import http from 'http';
 

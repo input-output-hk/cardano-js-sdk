@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
-import { WithBlock } from '../../../types';
-import { unifiedProjectorOperator } from '../../utils';
+import { unifiedProjectorOperator } from '../../utils/index.js';
+import type { WithBlock } from '../../../types.js';
 
 export interface OnChainCertificate {
   pointer: Cardano.Pointer;

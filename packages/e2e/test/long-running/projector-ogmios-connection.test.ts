@@ -2,9 +2,10 @@ import * as envalid from 'envalid';
 import { DockerUtil } from '@cardano-sdk/util-dev';
 import { open, rm } from 'fs/promises';
 import Dockerode from 'dockerode';
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import delay from 'delay';
 import path from 'path';
+import type { AxiosResponse } from 'axios';
 
 const preventOgmiosStartFile = path.join(__dirname, '..', '..', 'local-network', 'sdk-ipc', 'prevent_ogmios');
 

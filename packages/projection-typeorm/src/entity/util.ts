@@ -1,5 +1,5 @@
-import { ColumnOptions, RelationOptions } from 'typeorm';
-import { parseBigInt } from './transformers';
+import { parseBigInt } from './transformers.js';
+import type { ColumnOptions, RelationOptions } from 'typeorm';
 
 /** Use these RelationOptions if it's appropriate for an entity row to be deleted when the block is rolled back. */
 export const OnDeleteCascadeRelationOptions: RelationOptions = {

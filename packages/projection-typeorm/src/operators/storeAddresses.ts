@@ -1,10 +1,11 @@
-import { AddressEntity } from '../entity/Address.entity';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { AddressEntity } from '../entity/Address.entity.js';
+import { ChainSyncEventType } from '@cardano-sdk/core';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { Mappers } from '@cardano-sdk/projection';
-import { QueryRunner } from 'typeorm';
-import { StakeKeyRegistrationEntity } from '../entity';
-import { certificatePointerToId, typeormOperator } from './util';
+import { StakeKeyRegistrationEntity } from '../entity/index.js';
+import { certificatePointerToId, typeormOperator } from './util.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Mappers } from '@cardano-sdk/projection';
+import type { QueryRunner } from 'typeorm';
 
 const lookupStakeKeyRegistration = async (pointer: Cardano.Pointer | undefined, queryRunner: QueryRunner) => {
   if (!pointer) return;

@@ -1,8 +1,9 @@
-import { ED25519_PUBLIC_KEY_HASH_LENGTH, Ed25519KeyHash } from './Ed25519KeyHash';
-import { Ed25519PublicKeyHex } from '../hexTypes';
-import { Ed25519Signature } from './Ed25519Signature';
-import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import { ED25519_PUBLIC_KEY_HASH_LENGTH, Ed25519KeyHash } from './Ed25519KeyHash.js';
+import { Ed25519PublicKeyHex } from '../hexTypes.js';
+import { InvalidArgumentError } from '@cardano-sdk/util';
 import { crypto_generichash, crypto_sign_verify_detached, ready } from 'libsodium-wrappers-sumo';
+import type { Ed25519Signature } from './Ed25519Signature.js';
+import type { HexBlob } from '@cardano-sdk/util';
 
 export const ED25519_PUBLIC_KEY_LENGTH = 32;
 

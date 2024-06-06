@@ -1,11 +1,9 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Cardano, QueryStakePoolsArgs, SortField, StakePoolProvider } from '@cardano-sdk/core';
-import { CreateHttpProviderConfig, stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
+import { Cardano } from '@cardano-sdk/core';
 import {
   DEFAULT_FUZZY_SEARCH_OPTIONS,
   HttpServer,
-  HttpServerConfig,
   InMemoryCache,
   StakePoolHttpService,
   TypeormStakePoolProvider,
@@ -13,18 +11,23 @@ import {
   createDnsResolver,
   getConnectionConfig,
   getEntities
-} from '../../../src';
+} from '../../../src/index.js';
 import { INFO, createLogger } from 'bunyan';
-import { Observable } from 'rxjs';
-import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 import { Pool } from 'pg';
-import { PoolInfo, TypeormStakePoolFixtureBuilder } from './fitxures/TypeormFixtureBuilder';
-import { emptyDbData, ingestDbData, servicesWithVersionPath as services, sleep } from '../../util';
+import { TypeormStakePoolFixtureBuilder } from './fitxures/TypeormFixtureBuilder.js';
+import { emptyDbData, ingestDbData, servicesWithVersionPath as services, sleep } from '../../util.js';
 import { getPort } from 'get-port-please';
 import { isNotNil } from '@cardano-sdk/util';
 import { logger } from '@cardano-sdk/util-dev';
+import { stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
 import axios from 'axios';
-import lowerCase from 'lodash/lowerCase';
+import lowerCase from 'lodash/lowerCase.js';
+import type { CreateHttpProviderConfig } from '@cardano-sdk/cardano-services-client';
+import type { HttpServerConfig } from '../../../src/index.js';
+import type { Observable } from 'rxjs';
+import type { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
+import type { PoolInfo } from './fitxures/TypeormFixtureBuilder.js';
+import type { QueryStakePoolsArgs, SortField, StakePoolProvider } from '@cardano-sdk/core';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
 const APPLICATION_CBOR = 'application/cbor';

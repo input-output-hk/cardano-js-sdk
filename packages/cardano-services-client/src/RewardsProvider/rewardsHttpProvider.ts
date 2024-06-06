@@ -1,7 +1,9 @@
-import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
-import { HttpProviderConfigPaths, ProviderError, ProviderFailure, RewardsProvider } from '@cardano-sdk/core';
-import { apiVersion } from '../version';
-import { mapHealthCheckError } from '../mapHealthCheckError';
+import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { apiVersion } from '../version.js';
+import { createHttpProvider } from '../HttpProvider.js';
+import { mapHealthCheckError } from '../mapHealthCheckError.js';
+import type { CreateHttpProviderConfig } from '../HttpProvider.js';
+import type { HttpProviderConfigPaths, RewardsProvider } from '@cardano-sdk/core';
 
 /** The RewardsProvider endpoint paths. */
 const paths: HttpProviderConfigPaths<RewardsProvider> = {

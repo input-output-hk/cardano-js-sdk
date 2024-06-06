@@ -1,4 +1,4 @@
-import { bufferToHexString, hexStringToBuffer } from '../src';
+import { bufferToHexString, hexStringToBuffer } from '../src/index.js';
 
 describe('hexString', () => {
   test('hexStringToBuffer', () =>

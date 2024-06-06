@@ -1,6 +1,4 @@
-import { BaseWallet, FinalizeTxProps } from '@cardano-sdk/wallet';
 import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
-import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { KeyRole, util } from '@cardano-sdk/key-management';
 import {
   bip32Ed25519Factory,
@@ -11,10 +9,12 @@ import {
   submitAndConfirm,
   walletReady,
   walletVariables
-} from '../../../src';
+} from '../../../src/index.js';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { isNotNil } from '@cardano-sdk/util';
+import type { BaseWallet, FinalizeTxProps } from '@cardano-sdk/wallet';
+import type { InitializeTxProps } from '@cardano-sdk/tx-construction';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();

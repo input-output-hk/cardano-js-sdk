@@ -1,4 +1,4 @@
-export * from './CardanoNode';
-export * as CardanoNodeErrors from './CardanoNodeLegacyErrors';
-export * from './CardanoNodeErrors';
-export * from './ObservableCardanoNode';
+export * from './CardanoNode.js';
+export * as CardanoNodeErrors from './CardanoNodeLegacyErrors.js';
+export * from './CardanoNodeErrors.js';
+export * from './ObservableCardanoNode.js';

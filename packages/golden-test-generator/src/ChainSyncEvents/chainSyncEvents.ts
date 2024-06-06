@@ -1,8 +1,10 @@
-import { Cardano, ChainSyncEventType, Intersection } from '@cardano-sdk/core';
-import { GeneratorMetadata } from '../Content';
-import { Logger } from 'ts-log';
+import { ChainSyncEventType } from '@cardano-sdk/core';
 import { Ogmios, ogmiosToCore } from '@cardano-sdk/ogmios';
-import { SerializedChainSyncEvent, generateRandomHexString } from '@cardano-sdk/util-dev';
+import { generateRandomHexString } from '@cardano-sdk/util-dev';
+import type { Cardano, Intersection } from '@cardano-sdk/core';
+import type { GeneratorMetadata } from '../Content.js';
+import type { Logger } from 'ts-log';
+import type { SerializedChainSyncEvent } from '@cardano-sdk/util-dev';
 
 type CardanoMetadata = Pick<GeneratorMetadata['metadata'], 'cardano'>;
 

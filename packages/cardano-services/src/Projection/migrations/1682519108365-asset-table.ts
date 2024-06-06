@@ -1,5 +1,5 @@
 import { AssetEntity } from '@cardano-sdk/projection-typeorm';
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AssetTableMigration1682519108365 implements MigrationInterface {
   static entity = AssetEntity;

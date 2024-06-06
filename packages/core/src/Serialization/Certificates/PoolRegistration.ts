@@ -1,8 +1,9 @@
-import * as Cardano from '../../Cardano';
-import { CborReader, CborWriter } from '../CBOR';
-import { CertificateKind } from './CertificateKind';
-import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import { PoolParams } from './PoolParams';
+import * as Cardano from '../../Cardano/index.js';
+import { CborReader, CborWriter } from '../CBOR/index.js';
+import { CertificateKind } from './CertificateKind.js';
+import { InvalidArgumentError } from '@cardano-sdk/util';
+import { PoolParams } from './PoolParams/index.js';
+import type { HexBlob } from '@cardano-sdk/util';
 
 // The group flattens the PoolParams along with one field for the certificate type
 const EMBEDDED_GROUP_SIZE = PoolParams.subgroupCount + 1;

@@ -1,8 +1,9 @@
 import { Cardano } from '@cardano-sdk/core';
-import { MetadataFixtureBuilder } from './fixtures/FixtureBuilder';
+import { MetadataFixtureBuilder } from './fixtures/FixtureBuilder.js';
 import { Pool } from 'pg';
-import { TxMetadataService, createDbSyncMetadataService } from '../../src/Metadata';
+import { createDbSyncMetadataService } from '../../src/Metadata/index.js';
 import { logger } from '@cardano-sdk/util-dev';
+import type { TxMetadataService } from '../../src/Metadata/index.js';
 
 describe('createDbSyncMetadataService', () => {
   let dbConnection: Pool;

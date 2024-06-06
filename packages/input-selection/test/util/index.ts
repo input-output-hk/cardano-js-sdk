@@ -1,9 +1,9 @@
-import { Cardano } from '@cardano-sdk/core';
-import { ChangeAddressResolver, Selection } from '../../src';
+import type { Cardano } from '@cardano-sdk/core';
+import type { ChangeAddressResolver, Selection } from '../../src/index.js';
 
-export * from './properties';
-export * from './tests';
-export * as SelectionConstraints from './selectionConstraints';
+export * from './properties.js';
+export * from './tests.js';
+export * as SelectionConstraints from './selectionConstraints.js';
 
 export const asAssetId = (x: string): Cardano.AssetId => x as unknown as Cardano.AssetId;
 export const asPaymentAddress = (x: string): Cardano.PaymentAddress => x as unknown as Cardano.PaymentAddress;

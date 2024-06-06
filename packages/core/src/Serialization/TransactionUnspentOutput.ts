@@ -1,8 +1,8 @@
-import * as Cardano from '../Cardano';
-import { CborReader, CborWriter } from './CBOR';
+import { CborReader, CborWriter } from './CBOR/index.js';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import { TransactionInput, TransactionOutput } from './TransactionBody';
-import { hexToBytes } from '../util/misc';
+import { TransactionInput, TransactionOutput } from './TransactionBody/index.js';
+import { hexToBytes } from '../util/misc/index.js';
+import type * as Cardano from '../Cardano/index.js';
 
 const TRANSACTION_UNSPENT_OUTPUT_ARRAY_SIZE = 2;
 

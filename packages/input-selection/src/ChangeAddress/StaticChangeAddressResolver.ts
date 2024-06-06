@@ -1,7 +1,7 @@
-import { Cardano } from '@cardano-sdk/core';
-import { ChangeAddressResolver, Selection } from '../';
-import { GroupedAddress } from '@cardano-sdk/key-management';
 import { InvalidStateError } from '@cardano-sdk/util';
+import type { Cardano } from '@cardano-sdk/core';
+import type { ChangeAddressResolver, Selection } from '../index.js';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
 
 export type GetAddresses = () => Promise<GroupedAddress[]>;
 

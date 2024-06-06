@@ -1,9 +1,9 @@
-import { AccountBalanceModel, RewardEpochModel } from './types';
-import { Cardano } from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
-import { Pool, QueryResult } from 'pg';
-import { Range } from '@cardano-sdk/util';
-import { findAccountBalance, findRewardsHistory } from './queries';
+import { findAccountBalance, findRewardsHistory } from './queries.js';
+import type { AccountBalanceModel, RewardEpochModel } from './types.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { Pool, QueryResult } from 'pg';
+import type { Range } from '@cardano-sdk/util';
 
 export class RewardsBuilder {
   #db: Pool;

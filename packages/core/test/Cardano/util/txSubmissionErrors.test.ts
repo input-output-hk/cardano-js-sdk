@@ -1,5 +1,5 @@
-import { CardanoNodeErrors } from '../../../src/CardanoNode';
-import { util } from '../../../src/Cardano';
+import { CardanoNodeErrors } from '../../../src/CardanoNode/index.js';
+import { util } from '../../../src/Cardano/index.js';
 
 const badInputsError = new CardanoNodeErrors.TxSubmissionErrors.BadInputsError({ badInputs: [] });
 const addressAttributesTooLargeError = new CardanoNodeErrors.TxSubmissionErrors.AddressAttributesTooLargeError({

@@ -1,5 +1,5 @@
 import { CustomError } from 'ts-custom-error';
-import { OgmiosOptionDescriptions } from '../options';
+import type { OgmiosOptionDescriptions } from '../options/index.js';
 
 export class MissingCardanoNodeOption extends CustomError {
   public constructor(option: OgmiosOptionDescriptions | OgmiosOptionDescriptions[]) {

@@ -1,7 +1,8 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AccountKeyDerivationPath, AddressType, GroupedAddress, KeyRole, TxInId, util } from '../../src';
+import { AddressType, KeyRole, TxInId, util } from '../../src/index.js';
 import { Cardano } from '@cardano-sdk/core';
+import type { AccountKeyDerivationPath, GroupedAddress } from '../../src/index.js';
 
 export const stakeKeyPath = {
   index: 0,

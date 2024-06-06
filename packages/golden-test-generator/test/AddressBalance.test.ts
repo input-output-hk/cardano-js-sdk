@@ -1,4 +1,5 @@
-import { AddressBalances, applyValue } from '../src/AddressBalance';
+import { applyValue } from '../src/AddressBalance/index.js';
+import type { AddressBalances } from '../src/AddressBalance/index.js';
 
 describe('AddressBalance', () => {
   describe('applyValueToBalance', () => {

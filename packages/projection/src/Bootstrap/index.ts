@@ -1,1 +1,1 @@
-export * from './fromCardanoNode';
+export * from './fromCardanoNode.js';

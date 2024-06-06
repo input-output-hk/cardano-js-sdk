@@ -1,6 +1,6 @@
-import { Lovelace } from './Value';
-import { NetworkId, NetworkMagic } from '../ChainId';
-import { Seconds } from '../../util';
+import type { Lovelace } from './Value.js';
+import type { NetworkId, NetworkMagic } from '../ChainId.js';
+import type { Seconds } from '../../util/index.js';
 
 /** A compact (without genesis UTxO) representation of the genesis configuration. */
 export interface CompactGenesis {

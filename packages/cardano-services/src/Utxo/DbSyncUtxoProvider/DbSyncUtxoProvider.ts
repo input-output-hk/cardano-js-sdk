@@ -1,6 +1,7 @@
-import { Cardano, UtxoByAddressesArgs, UtxoProvider } from '@cardano-sdk/core';
-import { DbSyncProvider, DbSyncProviderDependencies } from '../../util/DbSyncProvider';
-import { UtxoBuilder } from './UtxoBuilder';
+import { DbSyncProvider } from '../../util/DbSyncProvider/index.js';
+import { UtxoBuilder } from './UtxoBuilder.js';
+import type { Cardano, UtxoByAddressesArgs, UtxoProvider } from '@cardano-sdk/core';
+import type { DbSyncProviderDependencies } from '../../util/DbSyncProvider/index.js';
 
 export class DbSyncUtxoProvider extends DbSyncProvider() implements UtxoProvider {
   #builder: UtxoBuilder;

@@ -1,7 +1,7 @@
-import { Cardano } from '@cardano-sdk/core';
-import { TxMetadataByHashes } from './DbSyncMetadataService';
-import { TxMetadataModel } from './types';
-import { mapTxMetadata } from './mappers';
+import { mapTxMetadata } from './mappers.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { TxMetadataByHashes } from './DbSyncMetadataService.js';
+import type { TxMetadataModel } from './types.js';
 
 export const mapTxMetadataByHashes = (listOfMetadata: TxMetadataModel[]): TxMetadataByHashes => {
   const metadataMap: Map<Cardano.TransactionId, TxMetadataModel[]> = new Map();

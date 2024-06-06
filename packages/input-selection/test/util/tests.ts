@@ -1,8 +1,9 @@
-import * as SelectionConstraints from './selectionConstraints';
-import { Cardano } from '@cardano-sdk/core';
-import { ImplicitValue, InputSelector } from '../../src/types';
-import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
-import { assertInputSelectionProperties } from './properties';
+import * as SelectionConstraints from './selectionConstraints.js';
+import { InputSelectionError } from '../../src/InputSelectionError.js';
+import { assertInputSelectionProperties } from './properties.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { ImplicitValue, InputSelector } from '../../src/types.js';
+import type { InputSelectionFailure } from '../../src/InputSelectionError.js';
 
 export interface InputSelectionPropertiesTestParams {
   /** Test subject (Input Selection algorithm under test) */

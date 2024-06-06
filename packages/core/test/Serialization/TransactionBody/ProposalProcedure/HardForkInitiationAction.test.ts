@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import * as Cardano from '../../../../src/Cardano';
-import { HardForkInitiationAction } from '../../../../src/Serialization';
+import * as Cardano from '../../../../src/Cardano/index.js';
+import { HardForkInitiationAction } from '../../../../src/Serialization/index.js';
 import { HexBlob } from '@cardano-sdk/util';
 
 // Test data used in the following tests was generated with the cardano-serialization-lib

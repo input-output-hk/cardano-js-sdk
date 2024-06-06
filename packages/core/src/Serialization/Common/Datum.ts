@@ -1,8 +1,8 @@
-import * as Cardano from '../../Cardano';
-import * as Crypto from '@cardano-sdk/crypto';
-import { CborReader, CborWriter } from '../CBOR';
+import { CborReader, CborWriter } from '../CBOR/index.js';
 import { HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
-import { PlutusData } from '../PlutusData';
+import { PlutusData } from '../PlutusData/index.js';
+import type * as Cardano from '../../Cardano/index.js';
+import type * as Crypto from '@cardano-sdk/crypto';
 
 const DATUM_ARRAY_SIZE = 2;
 

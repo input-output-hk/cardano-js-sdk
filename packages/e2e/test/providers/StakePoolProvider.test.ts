@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 /* eslint-disable sonarjs/cognitive-complexity */
 import * as envalid from 'envalid';
-import { Cardano, QueryStakePoolsArgs, StakePoolProvider } from '@cardano-sdk/core';
 import { logger } from '@cardano-sdk/util-dev';
 import { stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
+import type { Cardano, QueryStakePoolsArgs, StakePoolProvider } from '@cardano-sdk/core';
 
 const stringToRegExEqualsTo = (str: string) => `^${str.replace(/[$()*+.?[\\\]^{|}-]/g, '\\$&')}$`;
 

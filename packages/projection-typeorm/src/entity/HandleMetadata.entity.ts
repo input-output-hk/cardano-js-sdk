@@ -1,8 +1,8 @@
-import { Asset, Handle } from '@cardano-sdk/core';
-import { BlockEntity } from './Block.entity';
+import { BlockEntity } from './Block.entity.js';
 import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { OnDeleteCascadeRelationOptions } from './util';
-import { OutputEntity } from './Output.entity';
+import { OnDeleteCascadeRelationOptions } from './util.js';
+import { OutputEntity } from './Output.entity.js';
+import type { Asset, Handle } from '@cardano-sdk/core';
 
 @Entity()
 export class HandleMetadataEntity {

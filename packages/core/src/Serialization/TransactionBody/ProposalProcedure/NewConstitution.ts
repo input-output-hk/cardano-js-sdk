@@ -1,10 +1,10 @@
-import * as Cardano from '../../../Cardano';
-import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
-import { Constitution } from './Constitution';
-import { GovernanceActionId } from '../../Common/GovernanceActionId';
-import { GovernanceActionKind } from './GovernanceActionKind';
+import * as Cardano from '../../../Cardano/index.js';
+import { CborReader, CborReaderState, CborWriter } from '../../CBOR/index.js';
+import { Constitution } from './Constitution.js';
+import { GovernanceActionId } from '../../Common/GovernanceActionId.js';
+import { GovernanceActionKind } from './GovernanceActionKind.js';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import { hexToBytes } from '../../../util/misc';
+import { hexToBytes } from '../../../util/misc/index.js';
 
 const EMBEDDED_GROUP_SIZE = 3;
 

@@ -1,4 +1,4 @@
-import { AsyncKeyAgent, KeyAgent } from '../';
+import type { AsyncKeyAgent, KeyAgent } from '../types.js';
 
 export const createAsyncKeyAgent = (keyAgent: KeyAgent, onShutdown?: () => void): AsyncKeyAgent => ({
   deriveAddress(derivationPath, stakeKeyDerivationIndex: number) {

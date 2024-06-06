@@ -1,7 +1,7 @@
-import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, HandleResolution, Serialization, TxCBOR } from '@cardano-sdk/core';
-import { HexBlob, OpaqueString, Shutdown } from '@cardano-sdk/util';
-import { Logger } from 'ts-log';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { Cardano, HandleResolution, Serialization, TxCBOR } from '@cardano-sdk/core';
+import type { HexBlob, OpaqueString, Shutdown } from '@cardano-sdk/util';
+import type { Logger } from 'ts-log';
 import type { Runtime } from 'webextension-polyfill';
 
 export type MessageSender = Runtime.MessageSender;

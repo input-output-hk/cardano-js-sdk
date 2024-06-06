@@ -1,7 +1,6 @@
 /* eslint-disable max-statements */
-import { BaseWallet, ObservableWallet } from '@cardano-sdk/wallet';
 import { BigIntMath, isNotNil } from '@cardano-sdk/util';
-import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import {
   TX_TIMEOUT_DEFAULT,
   firstValueFromTimed,
@@ -11,10 +10,12 @@ import {
   waitForWalletStateSettle,
   walletReady,
   walletVariables
-} from '../../../src';
-import { buildSharedWallets } from '../../wallet_epoch_0/SharedWallet/utils';
+} from '../../../src/index.js';
+import { buildSharedWallets } from '../../wallet_epoch_0/SharedWallet/utils.js';
 import { combineLatest, filter, firstValueFrom, map, take } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
+import type { BaseWallet, ObservableWallet } from '@cardano-sdk/wallet';
+import type { StakePoolProvider } from '@cardano-sdk/core';
 
 const env = getEnv(walletVariables);
 

@@ -1,5 +1,6 @@
-import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import delay from 'delay';
+import type { StakePoolProvider } from '@cardano-sdk/core';
 
 export const somePartialStakePools: Cardano.StakePool[] = [
   {

@@ -2,20 +2,20 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, Bip32Account, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
 import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
-import {
+import { GenericTxBuilder } from '../../src/index.js';
+import { HexBlob } from '@cardano-sdk/util';
+import { dummyLogger } from 'ts-log';
+import { mockTxEvaluator } from './mocks.js';
+import { mockProviders as mocks } from '@cardano-sdk/util-dev';
+import { roundRobinRandomImprove } from '@cardano-sdk/input-selection';
+import uniqBy from 'lodash/uniqBy.js';
+import type {
   DatumResolver,
-  GenericTxBuilder,
   OutputValidation,
   ResolveDatum,
   RewardAccountWithPoolId,
   TxBuilderProviders
-} from '../../src';
-import { HexBlob } from '@cardano-sdk/util';
-import { dummyLogger } from 'ts-log';
-import { mockTxEvaluator } from './mocks';
-import { mockProviders as mocks } from '@cardano-sdk/util-dev';
-import { roundRobinRandomImprove } from '@cardano-sdk/input-selection';
-import uniqBy from 'lodash/uniqBy';
+} from '../../src/index.js';
 
 jest.mock('@cardano-sdk/input-selection', () => {
   const actual = jest.requireActual('@cardano-sdk/input-selection');

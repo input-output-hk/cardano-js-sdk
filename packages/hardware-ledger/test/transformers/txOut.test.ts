@@ -5,9 +5,9 @@ import {
   txOutToOwnedAddress,
   txOutWithReferenceScript,
   txOutWithReferenceScriptWithInlineDatum
-} from '../testData';
+} from '../testData.js';
 import { CardanoKeyConst, util } from '@cardano-sdk/key-management';
-import { mapTxOuts, toTxOut } from '../../src/transformers/txOut';
+import { mapTxOuts, toTxOut } from '../../src/transformers/txOut.js';
 
 describe('txOut', () => {
   describe('mapTxOuts', () => {

@@ -1,16 +1,11 @@
-import {
-  CardanoNodeUtil,
-  ProviderError,
-  ProviderFailure,
-  TxSubmitProvider,
-  providerFailureToStatusCodeMap
-} from '@cardano-sdk/core';
-import { HttpServer, HttpService } from '../Http';
-import { Logger } from 'ts-log';
-import { ServiceNames } from '../Program/programs/types';
-import { providerHandler } from '../util';
+import { CardanoNodeUtil, ProviderError, ProviderFailure, providerFailureToStatusCodeMap } from '@cardano-sdk/core';
+import { HttpServer, HttpService } from '../Http/index.js';
+import { ServiceNames } from '../Program/programs/types.js';
+import { providerHandler } from '../util/index.js';
 import bodyParser from 'body-parser';
 import express from 'express';
+import type { Logger } from 'ts-log';
+import type { TxSubmitProvider } from '@cardano-sdk/core';
 
 export interface TxSubmitHttpServiceDependencies {
   logger: Logger;

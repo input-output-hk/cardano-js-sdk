@@ -1,5 +1,6 @@
-import { Cardano, PointOrOrigin } from '@cardano-sdk/core';
-import { Schema } from '@cardano-ogmios/client';
+import { Cardano } from '@cardano-sdk/core';
+import type { PointOrOrigin } from '@cardano-sdk/core';
+import type { Schema } from '@cardano-ogmios/client';
 
 export const pointOrOriginToOgmios = (point: PointOrOrigin) =>
   point === 'origin'

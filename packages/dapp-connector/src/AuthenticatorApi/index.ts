@@ -1,3 +1,3 @@
-export * from './PersistentAuthenticator';
-export * from './PersistentAuthenticatorStorage';
-export * from './types';
+export * from './PersistentAuthenticator.js';
+export * from './PersistentAuthenticatorStorage.js';
+export * from './types.js';

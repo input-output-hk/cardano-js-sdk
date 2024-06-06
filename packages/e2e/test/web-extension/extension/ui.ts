@@ -1,13 +1,5 @@
 /* eslint-disable no-use-before-define */
 import {
-  BackgroundServices,
-  UserPromptService,
-  adaPriceProperties,
-  disconnectPortTestObjProperties,
-  env,
-  logger
-} from './util';
-import {
   RemoteApiPropertyType,
   SigningCoordinator,
   WalletType,
@@ -23,21 +15,19 @@ import {
   walletManagerProperties,
   walletRepositoryProperties
 } from '@cardano-sdk/web-extension';
-import { adaPriceServiceChannel, selectors, userPromptServiceChannel, walletName } from './const';
+import { adaPriceProperties, disconnectPortTestObjProperties, env, logger } from './util.js';
+import { adaPriceServiceChannel, selectors, userPromptServiceChannel, walletName } from './const.js';
+import type { BackgroundServices, UserPromptService } from './util.js';
 
 import * as Crypto from '@cardano-sdk/crypto';
 import { Buffer } from 'buffer';
 import { Cardano } from '@cardano-sdk/core';
-import {
-  CommunicationType,
-  InMemoryKeyAgent,
-  SerializableInMemoryKeyAgentData,
-  emip3encrypt
-} from '@cardano-sdk/key-management';
+import { CommunicationType, InMemoryKeyAgent, emip3encrypt } from '@cardano-sdk/key-management';
 import { HexBlob, isNotNil } from '@cardano-sdk/util';
 import { SodiumBip32Ed25519 } from '@cardano-sdk/crypto';
 import { combineLatest, filter, firstValueFrom, merge, of } from 'rxjs';
 import { runtime } from 'webextension-polyfill';
+import type { SerializableInMemoryKeyAgentData } from '@cardano-sdk/key-management';
 
 const delegationConfig = {
   count: 3,

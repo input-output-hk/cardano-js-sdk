@@ -1,6 +1,7 @@
-import { BlockfrostService, BlockfrostServiceConfig, BlockfrostServiceDependencies } from '../../Blockfrost';
-import { HttpServer, getListen } from '../../Http';
-import { Pool } from 'pg';
+import { BlockfrostService } from '../../Blockfrost/index.js';
+import { HttpServer, getListen } from '../../Http/index.js';
+import type { BlockfrostServiceConfig, BlockfrostServiceDependencies } from '../../Blockfrost/index.js';
+import type { Pool } from 'pg';
 
 export type BlockfrostWorkerConfig = BlockfrostServiceConfig & {
   apiUrl: URL;

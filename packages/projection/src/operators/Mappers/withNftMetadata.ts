@@ -1,12 +1,13 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
-import { ProjectionOperator } from '../../types';
-import { WithCIP67 } from './withCIP67';
-import { WithLogger, isNotNil } from '@cardano-sdk/util';
-import { WithMint } from './withMint';
-import { WithUtxo } from './withUtxo';
+import { isNotNil } from '@cardano-sdk/util';
 import { map } from 'rxjs';
-import uniqBy from 'lodash/uniqBy';
+import uniqBy from 'lodash/uniqBy.js';
+import type { Logger } from 'ts-log';
+import type { ProjectionOperator } from '../../types.js';
+import type { WithCIP67 } from './withCIP67.js';
+import type { WithLogger } from '@cardano-sdk/util';
+import type { WithMint } from './withMint.js';
+import type { WithUtxo } from './withUtxo.js';
 
 export interface ProjectedNftMetadata {
   userTokenAssetId: Cardano.AssetId;

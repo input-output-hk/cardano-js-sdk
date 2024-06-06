@@ -1,16 +1,17 @@
-import { BIP32Path } from '../types';
-import { Bip32Ed25519 } from '../Bip32Ed25519';
 import {
   Bip32PrivateKeyHex,
   Bip32PublicKeyHex,
   Ed25519KeyHashHex,
   Ed25519PrivateExtendedKeyHex,
-  Ed25519PrivateNormalKeyHex,
   Ed25519PublicKeyHex,
   Ed25519SignatureHex
-} from '../hexTypes';
-import { CardanoMultiplatformLib } from './CML';
-import { HexBlob, usingAutoFree } from '@cardano-sdk/util';
+} from '../hexTypes.js';
+import { usingAutoFree } from '@cardano-sdk/util';
+import type { BIP32Path } from '../types.js';
+import type { Bip32Ed25519 } from '../Bip32Ed25519.js';
+import type { CardanoMultiplatformLib } from './CML.js';
+import type { Ed25519PrivateNormalKeyHex } from '../hexTypes.js';
+import type { HexBlob } from '@cardano-sdk/util';
 
 const EXTENDED_KEY_HEX_LENGTH = 128;
 

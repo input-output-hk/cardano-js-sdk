@@ -1,6 +1,7 @@
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { InMemory, Mappers, ProjectionEvent } from '../../src';
+import { InMemory } from '../../src/index.js';
 import { firstValueFrom, of } from 'rxjs';
+import type { Mappers, ProjectionEvent } from '../../src/index.js';
 
 describe('InMemory.storeStakePools', () => {
   it('adds pool updates and retirements on RollRorward, removes on RollBackward', async () => {

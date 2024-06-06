@@ -8,14 +8,14 @@ import {
   dRepScriptHashVoter,
   stakePoolKeyHashVoter,
   votingProcedureVotes
-} from '../testData';
+} from '../testData.js';
 import {
   mapVotingProcedures,
   toVoteOption,
   toVoter,
   toVotes,
   toVotingProcedure
-} from '../../src/transformers/votingProcedures';
+} from '../../src/transformers/votingProcedures.js';
 
 describe('votingProcedures', () => {
   const expectedVotingProcedureVote = {

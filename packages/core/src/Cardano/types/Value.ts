@@ -1,4 +1,4 @@
-import { AssetId } from './Asset';
+import type { AssetId } from './Asset.js';
 
 export type Lovelace = bigint;
 

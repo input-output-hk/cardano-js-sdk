@@ -1,6 +1,7 @@
-import { Decoded, bech32 } from 'bech32';
-import { InvalidStringError } from './errors';
-import { OpaqueString } from './opaqueTypes';
+import { InvalidStringError } from './errors.js';
+import { bech32 } from 'bech32';
+import type { Decoded } from 'bech32';
+import type { OpaqueString } from './opaqueTypes.js';
 
 const MAX_BECH32_LENGTH_LIMIT = 1023;
 

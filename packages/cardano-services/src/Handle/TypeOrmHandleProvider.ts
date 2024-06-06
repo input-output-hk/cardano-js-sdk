@@ -1,16 +1,10 @@
-import {
-  Cardano,
-  HandleProvider,
-  HandleResolution,
-  Point,
-  ProviderError,
-  ProviderFailure,
-  ResolveHandlesArgs
-} from '@cardano-sdk/core';
 import { HandleEntity, HandleMetadataEntity, NftMetadataEntity } from '@cardano-sdk/projection-typeorm';
 import { In } from 'typeorm';
-import { InMemoryCache } from '../InMemoryCache';
-import { TypeormProvider, TypeormProviderDependencies } from '../util/TypeormProvider';
+import { InMemoryCache } from '../InMemoryCache/index.js';
+import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { TypeormProvider } from '../util/TypeormProvider/index.js';
+import type { Cardano, HandleProvider, HandleResolution, Point, ResolveHandlesArgs } from '@cardano-sdk/core';
+import type { TypeormProviderDependencies } from '../util/TypeormProvider/index.js';
 
 export type TypeOrmHandleProviderDependencies = TypeormProviderDependencies;
 

@@ -1,4 +1,5 @@
-import { Metadatum, computeAuxiliaryDataHash } from '../../../src/Cardano';
+import { computeAuxiliaryDataHash } from '../../../src/Cardano/index.js';
+import type { Metadatum } from '../../../src/Cardano/index.js';
 
 describe('Cardano/types/AuxiliaryData', () => {
   describe('computeAuxiliaryDataHash', () => {

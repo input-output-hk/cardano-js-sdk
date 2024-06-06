@@ -1,3 +1,3 @@
-export * from './transformers';
-export * from './types';
-export * from './TrezorKeyAgent';
+export * from './transformers/index.js';
+export * from './types.js';
+export * from './TrezorKeyAgent.js';

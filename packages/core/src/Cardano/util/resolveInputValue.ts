@@ -1,4 +1,4 @@
-import { HydratedTx, HydratedTxIn, Value } from '../types';
+import type { HydratedTx, HydratedTxIn, Value } from '../types/index.js';
 
 /**
  * Resolves the value of an input by looking for the matching output in a list of transactions

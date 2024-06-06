@@ -1,9 +1,9 @@
-import * as Cardano from '../../../Cardano';
-import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
-import { CertificateKind } from '../CertificateKind';
+import * as Cardano from '../../../Cardano/index.js';
+import { CborReader, CborReaderState, CborWriter } from '../../CBOR/index.js';
+import { CertificateKind } from '../CertificateKind.js';
 import { HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
-import { MoveInstantaneousRewardToOtherPot } from './MoveInstantaneousRewardToOtherPot';
-import { MoveInstantaneousRewardToStakeCreds } from './MoveInstantaneousRewardToStakeCreds';
+import { MoveInstantaneousRewardToOtherPot } from './MoveInstantaneousRewardToOtherPot.js';
+import { MoveInstantaneousRewardToStakeCreds } from './MoveInstantaneousRewardToStakeCreds.js';
 
 const EMBEDDED_GROUP_SIZE = 2;
 

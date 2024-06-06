@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
-import { ChainHistoryBuilder } from '../../../src';
-import { ChainHistoryFixtureBuilder, TxWith } from '../fixtures/FixtureBuilder';
-import { DataMocks } from '../../data-mocks';
+import { ChainHistoryBuilder } from '../../../src/index.js';
+import { ChainHistoryFixtureBuilder, TxWith } from '../fixtures/FixtureBuilder.js';
+import { DataMocks } from '../../data-mocks/index.js';
 import { Pool } from 'pg';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { hexStringToBuffer } from '@cardano-sdk/util';

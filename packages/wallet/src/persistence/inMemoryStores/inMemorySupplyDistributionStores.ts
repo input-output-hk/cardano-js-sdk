@@ -1,7 +1,7 @@
 import { EMPTY, combineLatest, map } from 'rxjs';
-import { InMemoryDocumentStore } from './InMemoryDocumentStore';
-import { StakeSummary, SupplySummary } from '@cardano-sdk/core';
-import { SupplyDistributionStores } from '../types';
+import { InMemoryDocumentStore } from './InMemoryDocumentStore.js';
+import type { StakeSummary, SupplySummary } from '@cardano-sdk/core';
+import type { SupplyDistributionStores } from '../types.js';
 
 export class InMemoryStakeSummaryStore extends InMemoryDocumentStore<StakeSummary> {}
 export class InMemorySupplySummaryStore extends InMemoryDocumentStore<SupplySummary> {}

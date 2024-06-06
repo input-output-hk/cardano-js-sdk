@@ -1,7 +1,7 @@
-import * as Crypto from '@cardano-sdk/crypto';
-import { EpochNo, Slot } from './Block';
-import { Fraction } from '.';
-import { PlutusLanguageVersion } from './Script';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { EpochNo, Slot } from './Block.js';
+import type { Fraction } from './index.js';
+import type { PlutusLanguageVersion } from './Script.js';
 
 /* eslint-disable no-use-before-define */
 export interface ProtocolVersion {

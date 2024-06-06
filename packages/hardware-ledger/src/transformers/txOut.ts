@@ -1,9 +1,10 @@
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Cardano, Serialization } from '@cardano-sdk/core';
-import { HexBlob, InvalidArgumentError, Transform } from '@cardano-sdk/util';
-import { LedgerTxTransformerContext } from '../types';
-import { mapTokenMap } from './assets';
+import { InvalidArgumentError } from '@cardano-sdk/util';
+import { mapTokenMap } from './assets.js';
 import { util } from '@cardano-sdk/key-management';
+import type { HexBlob, Transform } from '@cardano-sdk/util';
+import type { LedgerTxTransformerContext } from '../types.js';
 
 const toInlineDatum: Transform<Cardano.PlutusData, Ledger.Datum> = (datum) => ({
   datumHex: Serialization.PlutusData.fromCore(datum).toCbor(),

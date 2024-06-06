@@ -1,5 +1,6 @@
-import { Asset, Cardano } from '@cardano-sdk/core';
-import { handleAssetId, handleAssetName, handleFingerprint, handlePolicyId } from './mockData';
+import { Cardano } from '@cardano-sdk/core';
+import { handleAssetId, handleAssetName, handleFingerprint, handlePolicyId } from './mockData.js';
+import type { Asset } from '@cardano-sdk/core';
 
 export const asset: Asset.AssetInfo = {
   assetId: Cardano.AssetId('659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41'),

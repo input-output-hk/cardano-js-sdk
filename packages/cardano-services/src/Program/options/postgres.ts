@@ -1,6 +1,6 @@
-import { Command } from 'commander';
-import { addOptions, newOption } from './util';
-import { existingFileValidator, integerValidator } from '../../util/validators';
+import { addOptions, newOption } from './util.js';
+import { existingFileValidator, integerValidator } from '../../util/validators.js';
+import type { Command } from 'commander';
 
 export enum PostgresOptionDescriptions {
   ConnectionString = 'PostgreSQL Connection string',

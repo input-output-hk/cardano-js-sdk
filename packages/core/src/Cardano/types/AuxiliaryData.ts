@@ -1,8 +1,8 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import * as Serialization from '../../Serialization';
+import * as Serialization from '../../Serialization/index.js';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
-import { Script } from './Script';
-import { hexToBytes } from '../../util/misc';
+import { hexToBytes } from '../../util/misc/index.js';
+import type { Script } from './Script.js';
 
 // eslint-disable-next-line no-use-before-define
 export type MetadatumMap = Map<Metadatum, Metadatum>;

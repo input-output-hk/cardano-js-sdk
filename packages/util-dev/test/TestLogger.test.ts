@@ -1,6 +1,6 @@
 import { PassThrough, Writable } from 'stream';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { createLogger } from '../src/TestLogger';
+import { createLogger } from '../src/TestLogger.js';
 
 const toVoid = new Writable({ write: (_chunk, _encoding, done) => done() });
 

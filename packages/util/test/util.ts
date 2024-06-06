@@ -1,4 +1,4 @@
-import { Logger } from 'ts-log';
+import type { Logger } from 'ts-log';
 
 export const createStubLogger = (): Logger => ({
   debug: jest.fn(),

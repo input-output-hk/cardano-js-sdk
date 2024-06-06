@@ -1,4 +1,5 @@
-import {
+import { CustomError } from 'ts-custom-error';
+import type {
   Bip32Account,
   GroupedAddress,
   SignTransactionContext,
@@ -7,14 +8,13 @@ import {
   WitnessedTx,
   Witnesser
 } from '@cardano-sdk/key-management';
-import { Cardano, Handle, HandleProvider, HandleResolution } from '@cardano-sdk/core';
-import { CustomError } from 'ts-custom-error';
-import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
-import { InitializeTxWitness, TxBodyPreInputSelection, TxBuilderProviders } from '../types';
-import { InputSelectionError, InputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
-import { Logger } from 'ts-log';
-import { OutputBuilderValidator } from './OutputBuilder';
-import { OutputValidation } from '../output-validation';
+import type { Cardano, Handle, HandleProvider, HandleResolution } from '@cardano-sdk/core';
+import type { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import type { InitializeTxWitness, TxBodyPreInputSelection, TxBuilderProviders } from '../types.js';
+import type { InputSelectionError, InputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
+import type { Logger } from 'ts-log';
+import type { OutputBuilderValidator } from './OutputBuilder.js';
+import type { OutputValidation } from '../output-validation/index.js';
 
 export type PartialTxOut = Partial<
   Pick<Cardano.TxOut, 'address' | 'datumHash' | 'datum' | 'scriptReference'> & {

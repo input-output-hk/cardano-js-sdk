@@ -1,4 +1,3 @@
-import { Cardano } from '@cardano-sdk/core';
 import { CardanoKeyConst, util } from '@cardano-sdk/key-management';
 import {
   contextWithKnownAddresses,
@@ -7,8 +6,9 @@ import {
   coreWithdrawalWithScriptHashCredential,
   stakeKeyHash,
   stakeScriptHash
-} from '../testData';
-import { mapWithdrawals, toTrezorWithdrawal } from '../../src/transformers';
+} from '../testData.js';
+import { mapWithdrawals, toTrezorWithdrawal } from '../../src/transformers/index.js';
+import type { Cardano } from '@cardano-sdk/core';
 
 describe('withdrawals', () => {
   describe('mapWithdrawals', () => {

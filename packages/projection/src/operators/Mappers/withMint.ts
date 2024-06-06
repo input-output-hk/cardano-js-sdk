@@ -1,9 +1,9 @@
 import { Cardano } from '@cardano-sdk/core';
-import { FilterByPolicyIds } from './types';
-import { ProjectionOperator } from '../../types';
-import { computeCompactTxId } from './util';
+import { computeCompactTxId } from './util.js';
 import { map } from 'rxjs';
-import { unifiedProjectorOperator } from '../utils';
+import { unifiedProjectorOperator } from '../utils/index.js';
+import type { FilterByPolicyIds } from './types.js';
+import type { ProjectionOperator } from '../../types.js';
 
 export interface Mint {
   assetId: Cardano.AssetId;

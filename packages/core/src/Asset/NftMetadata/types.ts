@@ -1,6 +1,7 @@
 /* eslint-disable wrap-regex */
-import { InvalidStringError, OpaqueString } from '@cardano-sdk/util';
-import { Metadatum } from '../../Cardano';
+import { InvalidStringError } from '@cardano-sdk/util';
+import type { Metadatum } from '../../Cardano/index.js';
+import type { OpaqueString } from '@cardano-sdk/util';
 
 export type Uri = OpaqueString<'Uri'>;
 export const Uri = (uri: string) => {

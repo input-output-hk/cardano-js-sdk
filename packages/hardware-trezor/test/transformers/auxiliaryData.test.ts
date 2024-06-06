@@ -1,5 +1,5 @@
-import { auxiliaryDataHash } from '../testData';
-import { mapAuxiliaryData } from '../../src/transformers/auxiliaryData';
+import { auxiliaryDataHash } from '../testData.js';
+import { mapAuxiliaryData } from '../../src/transformers/auxiliaryData.js';
 
 describe('auxiliaryData', () => {
   describe('mapAuxiliaryData', () => {

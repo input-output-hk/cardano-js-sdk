@@ -1,6 +1,7 @@
-import { ExtChainSyncOperator } from '../types';
-import { Observable, isObservable, of } from 'rxjs';
 import { blockingWithLatestFrom } from '@cardano-sdk/util-rxjs';
+import { isObservable, of } from 'rxjs';
+import type { ExtChainSyncOperator } from '../types.js';
+import type { Observable } from 'rxjs';
 
 /** Extend events with custom context (created before the 1st event is emitted) */
 export const withStaticContext = <TContext, ExtraRollForwardPropsIn, ExtraRollBackwardPropsIn>(

@@ -1,5 +1,5 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
 import { StakePoolEntity } from '@cardano-sdk/projection-typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class StakePoolTableMigration1682519108362 implements MigrationInterface {
   static entity = StakePoolEntity;

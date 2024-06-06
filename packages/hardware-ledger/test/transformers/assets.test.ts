@@ -1,6 +1,6 @@
-import { Cardano } from '@cardano-sdk/core';
-import { mapTokenMap } from '../../src/transformers/assets';
-import { mintTokenMap } from '../testData';
+import { mapTokenMap } from '../../src/transformers/assets.js';
+import { mintTokenMap } from '../testData.js';
+import type { Cardano } from '@cardano-sdk/core';
 
 describe('assets', () => {
   describe('mapTokenMap', () => {

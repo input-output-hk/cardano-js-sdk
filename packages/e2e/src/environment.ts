@@ -1,6 +1,8 @@
-import { Cardano } from '@cardano-sdk/core';
-import { Schema, Validator as SchemaValidator } from 'jsonschema';
-import { ValidatorSpec, bool, cleanEnv, makeValidator, num, str } from 'envalid';
+import { Validator as SchemaValidator } from 'jsonschema';
+import { bool, cleanEnv, makeValidator, num, str } from 'envalid';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Schema } from 'jsonschema';
+import type { ValidatorSpec } from 'envalid';
 
 export interface KeyManagementParams {
   accountIndex: number;

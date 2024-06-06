@@ -1,5 +1,4 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
 import {
   Observable,
   buffer,
@@ -15,14 +14,15 @@ import {
   take,
   tap
 } from 'rxjs';
-import { RetryBackoffConfig } from 'backoff-rxjs';
-import { TrackedAssetProvider } from './ProviderTracker';
-import { TransactionsTracker } from './types';
 import { coldObservableProvider, concatAndCombineLatest } from '@cardano-sdk/util-rxjs';
 import { deepEquals, isNotNil } from '@cardano-sdk/util';
-import { newTransactions$ } from './TransactionsTracker';
-import chunk from 'lodash/chunk';
-import uniq from 'lodash/uniq';
+import { newTransactions$ } from './TransactionsTracker.js';
+import chunk from 'lodash/chunk.js';
+import uniq from 'lodash/uniq.js';
+import type { Logger } from 'ts-log';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
+import type { TrackedAssetProvider } from './ProviderTracker/index.js';
+import type { TransactionsTracker } from './types.js';
 
 const isAssetInfoComplete = (assetInfo: Asset.AssetInfo): boolean =>
   assetInfo.nftMetadata !== undefined && assetInfo.tokenMetadata !== undefined;

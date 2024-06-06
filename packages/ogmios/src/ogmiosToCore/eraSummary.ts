@@ -1,5 +1,6 @@
-import { EraSummary, Seconds } from '@cardano-sdk/core';
-import { Schema } from '@cardano-ogmios/client';
+import { Seconds } from '@cardano-sdk/core';
+import type { EraSummary } from '@cardano-sdk/core';
+import type { Schema } from '@cardano-ogmios/client';
 
 export const eraSummary = (ogmiosEraSummary: Schema.EraSummary, systemStart: Date): EraSummary => ({
   parameters: {

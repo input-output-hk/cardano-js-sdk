@@ -2,9 +2,9 @@
 
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
-import { ComputeMinimumCoinQuantity, ImplicitValue, TokenBundleSizeExceedsLimit } from './types';
-import { InputSelectionError, InputSelectionFailure } from './InputSelectionError';
-import uniq from 'lodash/uniq';
+import { InputSelectionError, InputSelectionFailure } from './InputSelectionError.js';
+import uniq from 'lodash/uniq.js';
+import type { ComputeMinimumCoinQuantity, ImplicitValue, TokenBundleSizeExceedsLimit } from './types.js';
 
 export const stubMaxSizeAddress = Cardano.PaymentAddress(
   'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'

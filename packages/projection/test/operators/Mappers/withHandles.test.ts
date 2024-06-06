@@ -1,7 +1,5 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
 import { Buffer } from 'buffer';
-import { CIP67Assets, withCIP67, withHandles, withMint, withUtxo } from '../../../src/operators/Mappers';
-import { Mappers, ProjectionEvent } from '../../../src';
 import {
   NFTSubHandleOutput,
   assetIdFromHandle,
@@ -19,9 +17,12 @@ import {
   userNftOutput,
   virtualHandleAssetName,
   virtualSubHandleOutput
-} from './handleUtil';
+} from './handleUtil.js';
 import { firstValueFrom, of } from 'rxjs';
 import { logger, mockProviders } from '@cardano-sdk/util-dev';
+import { withCIP67, withHandles, withMint, withUtxo } from '../../../src/operators/Mappers/index.js';
+import type { CIP67Assets } from '../../../src/operators/Mappers/index.js';
+import type { Mappers, ProjectionEvent } from '../../../src/index.js';
 
 type In = Mappers.WithMint & Mappers.WithCIP67 & Mappers.WithNftMetadata;
 

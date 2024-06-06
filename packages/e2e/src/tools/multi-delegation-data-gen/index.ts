@@ -13,13 +13,14 @@ import {
   sendTransactions,
   transferStartingFunds,
   waitForFundingWallet
-} from './utils';
+} from './utils/index.js';
 
-import { BaseWallet, DynamicChangeAddressResolver } from '@cardano-sdk/wallet';
 import { Cardano } from '@cardano-sdk/core';
+import { DynamicChangeAddressResolver } from '@cardano-sdk/wallet';
 import { roundRobinRandomImprove } from '@cardano-sdk/input-selection';
-import { walletReady } from '../../';
+import { walletReady } from '../../index.js';
 import chalk from 'chalk';
+import type { BaseWallet } from '@cardano-sdk/wallet';
 
 const monitor = new TerminalProgressMonitor();
 

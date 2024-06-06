@@ -1,6 +1,6 @@
-import * as Trezor from '@trezor/connect';
-import { Cardano } from '@cardano-sdk/core';
-import { SignTransactionContext } from '@cardano-sdk/key-management';
+import type * as Trezor from '@trezor/connect';
+import type { Cardano } from '@cardano-sdk/core';
+import type { SignTransactionContext } from '@cardano-sdk/key-management';
 
 /**
  * The TrezorTxTransformerContext type represents the additional context necessary for

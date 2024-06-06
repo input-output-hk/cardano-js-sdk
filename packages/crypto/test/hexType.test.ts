@@ -1,4 +1,4 @@
-import * as Crypto from '../src';
+import * as Crypto from '../src/index.js';
 import { HexBlob, InvalidStringError } from '@cardano-sdk/util';
 
 describe('HexTypes', () => {

@@ -1,8 +1,8 @@
-import { Cardano } from '@cardano-sdk/core';
-import { LastMintTxModel, MultiAssetModel } from './types';
-import { Logger } from 'ts-log';
-import { Pool } from 'pg';
-import Queries from './queries';
+import Queries from './queries.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { LastMintTxModel, MultiAssetModel } from './types.js';
+import type { Logger } from 'ts-log';
+import type { Pool } from 'pg';
 
 export class AssetBuilder {
   #db: Pool;

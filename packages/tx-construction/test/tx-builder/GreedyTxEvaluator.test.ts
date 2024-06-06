@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { GreedyTxEvaluator } from '../../src';
+import { GreedyTxEvaluator } from '../../src/index.js';
 
 const getParams = (): Promise<Cardano.ProtocolParameters> =>
   Promise.resolve({

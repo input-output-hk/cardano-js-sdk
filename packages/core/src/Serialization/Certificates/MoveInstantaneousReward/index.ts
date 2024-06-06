@@ -1,3 +1,3 @@
-export * from './MoveInstantaneousReward';
-export * from './MoveInstantaneousRewardToStakeCreds';
-export * from './MoveInstantaneousRewardToOtherPot';
+export * from './MoveInstantaneousReward.js';
+export * from './MoveInstantaneousRewardToStakeCreds.js';
+export * from './MoveInstantaneousRewardToOtherPot.js';

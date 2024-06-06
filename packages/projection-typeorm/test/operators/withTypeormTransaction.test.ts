@@ -2,28 +2,23 @@
 import {
   BlockDataEntity,
   BlockEntity,
-  TypeormStabilityWindowBuffer,
-  TypeormTipTracker,
   connect,
   isRecoverableTypeormError,
   storeBlock,
   typeormTransactionCommit,
   withTypeormTransaction
-} from '../../src';
-import {
-  Bootstrap,
-  BootstrapExtraProps,
-  ProjectionEvent,
-  ProjectionOperator,
-  requestNext
-} from '@cardano-sdk/projection';
+} from '../../src/index.js';
+import { Bootstrap, requestNext } from '@cardano-sdk/projection';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
-import { ConnectionNotFoundError, DataSource, QueryFailedError, QueryRunner } from 'typeorm';
+import { ConnectionNotFoundError, QueryFailedError } from 'typeorm';
 import { Observable, defer, firstValueFrom, lastValueFrom, map, of, take, toArray } from 'rxjs';
-import { createProjectorContext } from './util';
-import { initializeDataSource } from '../util';
+import { createProjectorContext } from './util.js';
+import { initializeDataSource } from '../util.js';
 import { patchObject } from '@cardano-sdk/util';
 import { shareRetryBackoff } from '@cardano-sdk/util-rxjs';
+import type { BootstrapExtraProps, ProjectionEvent, ProjectionOperator } from '@cardano-sdk/projection';
+import type { DataSource, QueryRunner } from 'typeorm';
+import type { TypeormStabilityWindowBuffer, TypeormTipTracker } from '../../src/index.js';
 
 const { cardanoNode } = chainSyncData(ChainSyncDataSet.WithStakeKeyDeregistration);
 

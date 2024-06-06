@@ -1,7 +1,7 @@
 import { ChainSyncEventType } from '@cardano-sdk/core';
-import { Mappers } from '@cardano-sdk/projection';
-import { StakeKeyRegistrationEntity } from '../entity';
-import { certificatePointerToId, typeormOperator } from './util';
+import { StakeKeyRegistrationEntity } from '../entity/index.js';
+import { certificatePointerToId, typeormOperator } from './util.js';
+import type { Mappers } from '@cardano-sdk/projection';
 
 export const willStoreStakeKeyRegistrations = ({ stakeKeyRegistrations }: Mappers.WithStakeKeyRegistrations) =>
   stakeKeyRegistrations.length > 0;

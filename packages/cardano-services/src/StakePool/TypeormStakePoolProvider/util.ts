@@ -1,6 +1,8 @@
 /* eslint-disable complexity */
 /* eslint-disable sonarjs/cognitive-complexity */
-import {
+import { Percent } from '@cardano-sdk/util';
+import { PoolRewardsEntity } from '@cardano-sdk/projection-typeorm';
+import type {
   Cardano,
   FilterCondition,
   FuzzyOptions,
@@ -9,9 +11,7 @@ import {
   SortOrder,
   StakePoolSortOptions
 } from '@cardano-sdk/core';
-import { Percent } from '@cardano-sdk/util';
-import { PoolRewardsEntity } from '@cardano-sdk/projection-typeorm';
-import { RosComputeParams } from '../../PgBoss';
+import type { RosComputeParams } from '../../PgBoss/index.js';
 
 type StakePoolWhereClauseArgs = {
   name?: string[];

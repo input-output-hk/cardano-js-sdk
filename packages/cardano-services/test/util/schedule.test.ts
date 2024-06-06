@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { readScheduleConfig } from '../../src/util/schedule';
+import { readScheduleConfig } from '../../src/util/schedule.js';
 import path from 'path';
 
 describe('util/schedule', () => {

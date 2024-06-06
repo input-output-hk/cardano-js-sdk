@@ -1,1 +1,1 @@
-export * from './cip30signData';
+export * from './cip30signData.js';

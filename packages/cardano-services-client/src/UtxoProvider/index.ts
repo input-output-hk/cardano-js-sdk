@@ -1,1 +1,1 @@
-export * from './utxoHttpProvider';
+export * from './utxoHttpProvider.js';

@@ -4,17 +4,16 @@ import {
   GeneralCardanoNodeError,
   GeneralCardanoNodeErrorCode,
   HandleOwnerChangeError,
-  HttpProviderConfigPaths,
   ProviderError,
   ProviderFailure,
   TxSubmissionError,
-  TxSubmissionErrorCode,
-  TxSubmitProvider,
   reasonToProviderFailure
 } from '@cardano-sdk/core';
-import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
-import { apiVersion } from '../version';
-import { mapHealthCheckError } from '../mapHealthCheckError';
+import { apiVersion } from '../version.js';
+import { createHttpProvider } from '../HttpProvider.js';
+import { mapHealthCheckError } from '../mapHealthCheckError.js';
+import type { CreateHttpProviderConfig } from '../HttpProvider.js';
+import type { HttpProviderConfigPaths, TxSubmissionErrorCode, TxSubmitProvider } from '@cardano-sdk/core';
 
 /** The TxSubmitProvider endpoint paths. */
 const paths: HttpProviderConfigPaths<TxSubmitProvider> = {

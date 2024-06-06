@@ -1,4 +1,4 @@
-import { ExtChainSyncOperator } from '../../types';
+import type { ExtChainSyncOperator } from '../../types.js';
 
 /** Wrap an operator to easily infer extra props of source observable */
 export const inferProjectorEventType =

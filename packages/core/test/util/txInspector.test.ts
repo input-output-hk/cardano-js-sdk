@@ -1,5 +1,4 @@
-import * as AssetIds from '../AssetId';
-import * as Cardano from '../../src/Cardano';
+import * as AssetIds from '../AssetId.js';
 import * as Crypto from '@cardano-sdk/crypto';
 
 import {
@@ -8,31 +7,19 @@ import {
   AssetName,
   BlockId,
   BlockNo,
-  Certificate,
   CertificateType,
   CredentialType,
   EpochNo,
-  HydratedTx,
-  HydratedTxIn,
   NativeScriptKind,
   PaymentAddress,
   PolicyId,
   PoolId,
-  PoolRegistrationCertificate,
-  PoolRetirementCertificate,
   RewardAccount,
   ScriptType,
   Slot,
-  StakeAddressCertificate,
-  StakeDelegationCertificate,
-  TokenMap,
   TransactionId,
-  TxOut,
-  VrfVkHex,
-  Withdrawal,
-  Witness
-} from '../../src/Cardano';
-import { Ed25519KeyHashHex, Ed25519PublicKeyHex, Ed25519SignatureHex, Hash32ByteBase16 } from '@cardano-sdk/crypto';
+  VrfVkHex
+} from '../../src/Cardano/index.js';
 import {
   assetsBurnedInspector,
   assetsMintedInspector,
@@ -50,11 +37,26 @@ import {
   valueReceivedInspector,
   valueSentInspector,
   withdrawalInspector
-} from '../../src';
-import { jsonToMetadatum } from '../../src/util/metadatum';
+} from '../../src/index.js';
+import { jsonToMetadatum } from '../../src/util/metadatum.js';
+import type {
+  Certificate,
+  HydratedTx,
+  HydratedTxIn,
+  InputResolver,
+  PoolRegistrationCertificate,
+  PoolRetirementCertificate,
+  StakeAddressCertificate,
+  StakeDelegationCertificate,
+  TokenMap,
+  TxIn,
+  TxOut,
+  Withdrawal,
+  Witness
+} from '../../src/Cardano/index.js';
 
-const createMockInputResolver = (historicalTxs: HydratedTx[]): Cardano.InputResolver => ({
-  async resolveInput(input: Cardano.TxIn) {
+const createMockInputResolver = (historicalTxs: HydratedTx[]): InputResolver => ({
+  async resolveInput(input: TxIn) {
     const tx = historicalTxs.find((historicalTx) => historicalTx.id === input.txId);
 
     if (!tx || tx.body.outputs.length <= input.index) return Promise.resolve(null);
@@ -97,7 +99,7 @@ describe('txInspector', () => {
         numerator: 10
       },
       metadataJson: {
-        hash: Hash32ByteBase16('22cf1de98f4cf4ce61bef2c6bc99890cb39f1452f5143189ce3a69ad70fcde72'),
+        hash: Crypto.Hash32ByteBase16('22cf1de98f4cf4ce61bef2c6bc99890cb39f1452f5143189ce3a69ad70fcde72'),
         url: 'https://pools.iohk.io/IOG1.json'
       },
       owners: [rewardAccount],
@@ -192,7 +194,7 @@ describe('txInspector', () => {
     scripts: [
       {
         __type: ScriptType.Native,
-        keyHash: Ed25519KeyHashHex('24accb6ca2690388f067175d773871f5640de57bf11aec0be258d6c7'),
+        keyHash: Crypto.Ed25519KeyHashHex('24accb6ca2690388f067175d773871f5640de57bf11aec0be258d6c7'),
         kind: NativeScriptKind.RequireSignature
       }
     ]
@@ -204,7 +206,7 @@ describe('txInspector', () => {
     scripts: [
       {
         __type: ScriptType.Native,
-        keyHash: Ed25519KeyHashHex('00accb6ca2690388f067175d773871f5640de57bf11aec0be258d6c7'),
+        keyHash: Crypto.Ed25519KeyHashHex('00accb6ca2690388f067175d773871f5640de57bf11aec0be258d6c7'),
         kind: NativeScriptKind.RequireSignature
       }
     ]
@@ -288,7 +290,7 @@ describe('txInspector', () => {
       index: 0,
       witness: args.witness ?? {
         scripts: [mockScript1],
-        signatures: new Map<Ed25519PublicKeyHex, Ed25519SignatureHex>()
+        signatures: new Map<Crypto.Ed25519PublicKeyHex, Crypto.Ed25519SignatureHex>()
       }
     } as HydratedTx);
 

@@ -1,8 +1,9 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
-import { Observable, distinctUntilChanged, map, switchMap } from 'rxjs';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
+import { distinctUntilChanged, map, switchMap } from 'rxjs';
+import type { Observable } from 'rxjs';
 
 interface CreateDRepRegistrationTrackerProps {
   historyTransactions$: Observable<Cardano.HydratedTx[]>;

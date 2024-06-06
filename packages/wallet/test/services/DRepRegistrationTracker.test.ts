@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
-import { createDRepRegistrationTracker } from '../../src';
+import { createDRepRegistrationTracker } from '../../src/index.js';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { of } from 'rxjs';
 

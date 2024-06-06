@@ -1,5 +1,5 @@
-import { Cardano } from '@cardano-sdk/core';
-import { SelectionConstraints } from '../../src';
+import type { Cardano } from '@cardano-sdk/core';
+import type { SelectionConstraints } from '../../src/index.js';
 
 export interface MockSelectionConstraints {
   minimumCoinQuantity: bigint;

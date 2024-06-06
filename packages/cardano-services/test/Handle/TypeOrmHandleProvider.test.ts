@@ -1,6 +1,7 @@
-import { HandleFixtures, createHandleFixtures } from './fixtures';
-import { TypeOrmHandleProvider, createDnsResolver, getConnectionConfig, getEntities } from '../../src';
+import { TypeOrmHandleProvider, createDnsResolver, getConnectionConfig, getEntities } from '../../src/index.js';
+import { createHandleFixtures } from './fixtures.js';
 import { logger } from '@cardano-sdk/util-dev';
+import type { HandleFixtures } from './fixtures.js';
 
 describe('TypeOrmHandleProvider', () => {
   let provider: TypeOrmHandleProvider;

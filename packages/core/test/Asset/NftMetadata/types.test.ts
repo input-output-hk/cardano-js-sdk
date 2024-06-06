@@ -1,4 +1,4 @@
-import { ImageMediaType, MediaType, Uri } from '../../../src/Asset';
+import { ImageMediaType, MediaType, Uri } from '../../../src/Asset/index.js';
 import { InvalidStringError } from '@cardano-sdk/util';
 
 describe('NftMetadata/types', () => {

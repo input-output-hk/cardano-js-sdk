@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { ProviderFailure } from '@cardano-sdk/core';
-import { axiosError, config, healthCheckResponseWithState } from '../util';
-import { chainHistoryHttpProvider } from '../../src';
+import { axiosError, config, healthCheckResponseWithState } from '../util.js';
+import { chainHistoryHttpProvider } from '../../src/index.js';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 

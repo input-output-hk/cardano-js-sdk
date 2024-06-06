@@ -1,5 +1,5 @@
-import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Cardano } from '@cardano-sdk/core';
+import type * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 const compareAssetNameCanonically = (a: Ledger.Token, b: Ledger.Token) => {
   if (a.assetNameHex.length === b.assetNameHex.length) {

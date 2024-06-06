@@ -1,6 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
-import { CLEAN_FN_STATS, ProviderFnStats, ProviderTracker } from './ProviderTracker';
-import { TxSubmitProvider } from '@cardano-sdk/core';
+import { CLEAN_FN_STATS, ProviderTracker } from './ProviderTracker.js';
+import type { ProviderFnStats } from './ProviderTracker.js';
+import type { TxSubmitProvider } from '@cardano-sdk/core';
 
 export const CLEAN_TX_SUBMIT_STATS: ProviderFnStats = { ...CLEAN_FN_STATS, initialized: true };
 

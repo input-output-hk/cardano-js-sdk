@@ -1,6 +1,6 @@
 /* eslint-disable max-statements */
-import { getObservableWalletName, selectors } from '../extension/const';
-import { switchToWalletUi } from './utils';
+import { getObservableWalletName, selectors } from '../extension/const.js';
+import { switchToWalletUi } from './utils.js';
 
 const NUM_POOLS = 3;
 

@@ -1,7 +1,8 @@
 import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
-import { TaggedCostModel, buildCostModels, plutusV1CostModel, plutusV2CostModel } from '../src/tx-builder/costModels';
-import { computeScriptDataHash } from '../src';
+import { buildCostModels, plutusV1CostModel, plutusV2CostModel } from '../src/tx-builder/costModels.js';
+import { computeScriptDataHash } from '../src/index.js';
+import type { TaggedCostModel } from '../src/tx-builder/costModels.js';
 
 const alonzoPlutusV1CostModel: TaggedCostModel = {
   prices: [

@@ -1,8 +1,9 @@
-import { BuildInfo } from '../Http';
-import { CACHE_TTL_LOWER_LIMIT, CACHE_TTL_UPPER_LIMIT } from '../InMemoryCache';
-import { Range, throwIfOutsideRange } from '@cardano-sdk/util';
+import { CACHE_TTL_LOWER_LIMIT, CACHE_TTL_UPPER_LIMIT } from '../InMemoryCache/index.js';
+import { throwIfOutsideRange } from '@cardano-sdk/util';
 import { validate } from 'jsonschema';
 import fs from 'fs';
+import type { BuildInfo } from '../Http/index.js';
+import type { Range } from '@cardano-sdk/util';
 
 const buildInfoSchema = {
   additionalProperties: false,

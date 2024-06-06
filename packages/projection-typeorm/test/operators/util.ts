@@ -1,4 +1,10 @@
-import {
+import { BigIntMath } from '@cardano-sdk/util';
+import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { Observable, lastValueFrom, map, takeWhile } from 'rxjs';
+import { TypeormStabilityWindowBuffer, createObservableConnection, createTypeormTipTracker } from '../../src/index.js';
+import { connectionConfig$ } from '../util.js';
+import { generateRandomHexString, logger } from '@cardano-sdk/util-dev';
+import type {
   BaseProjectionEvent,
   BootstrapExtraProps,
   ProjectionEvent,
@@ -6,18 +12,10 @@ import {
   WithBlock,
   WithNetworkInfo
 } from '@cardano-sdk/projection';
-import { BigIntMath } from '@cardano-sdk/util';
-import { Cardano, ChainSyncEventType, Point } from '@cardano-sdk/core';
-import { Observable, lastValueFrom, map, takeWhile } from 'rxjs';
-import { RetryBackoffConfig } from 'backoff-rxjs';
-import {
-  TypeormStabilityWindowBuffer,
-  TypeormTipTracker,
-  createObservableConnection,
-  createTypeormTipTracker
-} from '../../src';
-import { chainSyncData, generateRandomHexString, logger } from '@cardano-sdk/util-dev';
-import { connectionConfig$ } from '../util';
+import type { Point } from '@cardano-sdk/core';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
+import type { TypeormTipTracker } from '../../src/index.js';
+import type { chainSyncData } from '@cardano-sdk/util-dev';
 
 export interface ProjectorContext {
   buffer: TypeormStabilityWindowBuffer;

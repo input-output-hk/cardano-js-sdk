@@ -1,33 +1,23 @@
 /* eslint-disable max-statements */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AddressType, Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, util } from '@cardano-sdk/key-management';
 import {
   AssetId,
   createStubStakePoolProvider,
   mockProviders as mocks,
   somePartialStakePools
 } from '@cardano-sdk/util-dev';
-import {
-  BaseWallet,
-  ConnectionStatusTracker,
-  PollingConfig,
-  TxSubmitProviderStats,
-  WalletNetworkInfoProviderStats,
-  createPersonalWallet
-} from '../../src';
-import {
-  Cardano,
-  ChainHistoryProvider,
-  NetworkInfoProvider,
-  RewardsProvider,
-  UtxoProvider,
-  coalesceValueQuantities
-} from '@cardano-sdk/core';
-import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
+import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
+import { TxSubmitProviderStats, WalletNetworkInfoProviderStats, createPersonalWallet } from '../../src/index.js';
+import { createInMemoryWalletStores } from '../../src/persistence/index.js';
 import { firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
-import { stakeKeyDerivationPath, testAsyncKeyAgent, testKeyAgent } from '../../../key-management/test/mocks';
-import flatten from 'lodash/flatten';
+import { stakeKeyDerivationPath, testAsyncKeyAgent, testKeyAgent } from '../../../key-management/test/mocks/index.js';
+import flatten from 'lodash/flatten.js';
+import type { BaseWallet, ConnectionStatusTracker, PollingConfig } from '../../src/index.js';
+import type { ChainHistoryProvider, NetworkInfoProvider, RewardsProvider, UtxoProvider } from '@cardano-sdk/core';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
+import type { WalletStores } from '../../src/persistence/index.js';
 
 const name = 'Test Wallet';
 const address = mocks.utxo[0][0].address!;

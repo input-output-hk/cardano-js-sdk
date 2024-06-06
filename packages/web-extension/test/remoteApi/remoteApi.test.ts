@@ -1,17 +1,16 @@
-import {
+import { EMPTY, Subject, map, of } from 'rxjs';
+import { RemoteApiPropertyType, bindFactoryMethods, exposeMessengerApi } from '../../src/messaging/index.js';
+import { dummyLogger } from 'ts-log';
+import type {
   ChannelName,
   FactoryCallMessage,
   Messenger,
   MinimalPort,
   PortMessage,
   RemoteApiProperties,
-  RemoteApiPropertyType,
-  RequestMessage,
-  bindFactoryMethods,
-  exposeMessengerApi
-} from '../../src/messaging';
-import { EMPTY, Observable, Subject, map, of } from 'rxjs';
-import { dummyLogger } from 'ts-log';
+  RequestMessage
+} from '../../src/messaging/index.js';
+import type { Observable } from 'rxjs';
 
 const logger = dummyLogger;
 

@@ -1,4 +1,4 @@
-import { calcPercentages } from '../src/Percent';
+import { calcPercentages } from '../src/Percent.js';
 
 describe('Percent', () => {
   it('single value is always 100%', () => {

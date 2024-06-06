@@ -1,4 +1,4 @@
-import { isConnectionError } from '../src';
+import { isConnectionError } from '../src/index.js';
 
 describe('isConnectionError', () => {
   it('returns false for an object that does not resemble a connection error', () => {

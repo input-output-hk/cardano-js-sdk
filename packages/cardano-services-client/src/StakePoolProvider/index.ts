@@ -1,1 +1,1 @@
-export * from './stakePoolHttpProvider';
+export * from './stakePoolHttpProvider.js';

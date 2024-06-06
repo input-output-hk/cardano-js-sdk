@@ -1,4 +1,3 @@
-import { PoolSortType } from './types';
 import {
   ProviderError,
   ProviderFailure,
@@ -8,6 +7,7 @@ import {
   isPoolROSSortField
 } from '@cardano-sdk/core';
 import BigNumber from 'bignumber.js';
+import type { PoolSortType } from './types.js';
 
 export const APY_EPOCHS_BACK_LIMIT_DEFAULT = 3;
 

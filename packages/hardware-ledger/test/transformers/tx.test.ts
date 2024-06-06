@@ -1,8 +1,8 @@
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { CONTEXT_WITH_KNOWN_ADDRESSES, babbageTxWithoutScript, stakeCredential, tx } from '../testData';
+import { CONTEXT_WITH_KNOWN_ADDRESSES, babbageTxWithoutScript, stakeCredential, tx } from '../testData.js';
 import { Cardano } from '@cardano-sdk/core';
 import { CardanoKeyConst, TxInId, util } from '@cardano-sdk/key-management';
-import { toLedgerTx } from '../../src';
+import { toLedgerTx } from '../../src/index.js';
 
 describe('tx', () => {
   describe('toLedgerTx', () => {

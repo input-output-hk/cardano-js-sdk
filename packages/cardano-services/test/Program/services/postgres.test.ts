@@ -1,20 +1,23 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
-import { DbPools, LedgerTipModel, findLedgerTip } from '../../../src/util/DbSyncProvider';
-import { DbSyncEpochPollService, EpochMonitor, loadGenesisData } from '../../../src/util';
-import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo';
-import { HttpServer, HttpServerConfig, createDnsResolver, getPool } from '../../../src';
-import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
-import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
-import { Pool } from 'pg';
-import { SrvRecord } from 'dns';
-import { clearDbPools, servicesWithVersionPath as services } from '../../util';
+import { DbSyncEpochPollService, loadGenesisData } from '../../../src/util/index.js';
+import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo/index.js';
+import { HttpServer, createDnsResolver, getPool } from '../../../src/index.js';
+import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache/index.js';
+import { clearDbPools, servicesWithVersionPath as services } from '../../util.js';
+import { findLedgerTip } from '../../../src/util/DbSyncProvider/index.js';
 import { getPort } from 'get-port-please';
-import { healthCheckResponseMock, mockCardanoNode } from '../../../../core/test/CardanoNode/mocks';
+import { healthCheckResponseMock, mockCardanoNode } from '../../../../core/test/CardanoNode/mocks.js';
 import { logger } from '@cardano-sdk/util-dev';
-import { mockDnsResolverFactory } from './util';
+import { mockDnsResolverFactory } from './util.js';
 import { types } from 'util';
 import axios from 'axios';
+import type { DbPools, LedgerTipModel } from '../../../src/util/DbSyncProvider/index.js';
+import type { EpochMonitor } from '../../../src/util/index.js';
+import type { HttpServerConfig } from '../../../src/index.js';
+import type { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
+import type { Pool } from 'pg';
+import type { SrvRecord } from 'dns';
 
 jest.mock('dns', () => ({
   promises: {

@@ -1,9 +1,9 @@
-import { BigIntColumnOptions, OnDeleteCascadeRelationOptions } from './util';
+import { BigIntColumnOptions, OnDeleteCascadeRelationOptions } from './util.js';
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import { Percent } from '@cardano-sdk/util';
-import { StakePoolEntity } from './StakePool.entity';
-import { float } from './transformers';
+import { StakePoolEntity } from './StakePool.entity.js';
+import { float } from './transformers.js';
 
 @Entity()
 export class CurrentPoolMetricsEntity {

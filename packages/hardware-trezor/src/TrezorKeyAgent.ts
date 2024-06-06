@@ -1,23 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
 import * as Trezor from '@trezor/connect';
-import { Cardano, NotImplementedError } from '@cardano-sdk/core';
 import {
   CardanoKeyConst,
   CommunicationType,
   KeyAgentBase,
-  KeyAgentDependencies,
   KeyAgentType,
-  SerializableTrezorKeyAgentData,
-  SignBlobResult,
-  SignTransactionContext,
-  TrezorConfig,
   errors,
   util
 } from '@cardano-sdk/key-management';
+import { NotImplementedError } from '@cardano-sdk/core';
 import { areStringsEqualInConstantTime } from '@cardano-sdk/util';
-import { txToTrezor } from './transformers/tx';
+import { txToTrezor } from './transformers/tx.js';
 import _TrezorConnectWeb from '@trezor/connect-web';
+import type { Cardano } from '@cardano-sdk/core';
+import type {
+  KeyAgentDependencies,
+  SerializableTrezorKeyAgentData,
+  SignBlobResult,
+  SignTransactionContext,
+  TrezorConfig
+} from '@cardano-sdk/key-management';
 
 const TrezorConnectNode = Trezor.default;
 const TrezorConnectWeb = (_TrezorConnectWeb as any).default

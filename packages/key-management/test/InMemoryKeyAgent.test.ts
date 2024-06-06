@@ -1,8 +1,9 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, GroupedAddress, InMemoryKeyAgent, KeyRole, SerializableInMemoryKeyAgentData, util } from '../src';
+import { AddressType, InMemoryKeyAgent, KeyRole, util } from '../src/index.js';
 import { Cardano } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { dummyLogger } from 'ts-log';
+import type { GroupedAddress, SerializableInMemoryKeyAgentData } from '../src/index.js';
 
 jest.mock('../src/util/ownSignatureKeyPaths');
 const { ownSignatureKeyPaths } = jest.requireMock('../src/util/ownSignatureKeyPaths');

@@ -1,42 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as CML from '@dcspark/cardano-multiplatform-lib-nodejs';
 import * as Crypto from '@cardano-sdk/crypto';
+import { Bip32Account, CommunicationType, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
 import {
-  AddressDiscovery,
   DEFAULT_POLLING_CONFIG,
   HDSequentialDiscovery,
-  Milliseconds,
-  ObservableWallet,
-  PollingConfig,
   SingleAddressDiscovery,
   createPersonalWallet,
-  createSharedWallet,
-  storage
+  createSharedWallet
 } from '@cardano-sdk/wallet';
-import {
-  AssetProvider,
-  Cardano,
-  ChainHistoryProvider,
-  HandleProvider,
-  NetworkInfoProvider,
-  ProviderFactory,
-  RewardsProvider,
-  StakePoolProvider,
-  TxSubmitProvider,
-  UtxoProvider
-} from '@cardano-sdk/core';
-import {
-  AsyncKeyAgent,
-  Bip32Account,
-  CommunicationType,
-  InMemoryKeyAgent,
-  KeyAgentDependencies,
-  Witnesser,
-  util
-} from '@cardano-sdk/key-management';
 import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
-import { Logger } from 'ts-log';
 import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
+import { ProviderFactory } from '@cardano-sdk/core';
 import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
 import {
   assetInfoHttpProvider,
@@ -51,8 +26,22 @@ import {
 import { createConnectionObject } from '@cardano-ogmios/client';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';
-import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import memoize from 'lodash/memoize';
+import memoize from 'lodash/memoize.js';
+import type { AddressDiscovery, Milliseconds, ObservableWallet, PollingConfig, storage } from '@cardano-sdk/wallet';
+import type {
+  AssetProvider,
+  Cardano,
+  ChainHistoryProvider,
+  HandleProvider,
+  NetworkInfoProvider,
+  RewardsProvider,
+  StakePoolProvider,
+  TxSubmitProvider,
+  UtxoProvider
+} from '@cardano-sdk/core';
+import type { AsyncKeyAgent, KeyAgentDependencies, Witnesser } from '@cardano-sdk/key-management';
+import type { Logger } from 'ts-log';
+import type DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 const isNodeJs = typeof process !== 'undefined' && process.release?.name === 'node';
 // tsc doesn't like the 'import' of this package, works with webpack

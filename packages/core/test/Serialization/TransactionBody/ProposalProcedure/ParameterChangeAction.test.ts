@@ -1,9 +1,9 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import * as Cardano from '../../../../src/Cardano';
-import { EpochNo, PlutusLanguageVersion } from '../../../../src/Cardano';
+import * as Cardano from '../../../../src/Cardano/index.js';
+import { EpochNo, PlutusLanguageVersion } from '../../../../src/Cardano/index.js';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
-import { ParameterChangeAction } from '../../../../src/Serialization';
+import { ParameterChangeAction } from '../../../../src/Serialization/index.js';
 
 // Test data used in the following tests was generated with the cardano-serialization-lib
 const cbor = HexBlob(

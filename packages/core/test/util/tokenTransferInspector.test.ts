@@ -1,17 +1,17 @@
-import * as AssetId from '../../../util-dev/src/assetId';
-import * as AssetIds from '../AssetId';
-import * as Cardano from '../../src/Cardano';
-import {
+import * as AssetId from '../../../util-dev/src/assetId.js';
+import * as AssetIds from '../AssetId.js';
+import * as Cardano from '../../src/Cardano/index.js';
+import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
+import { createTxInspector, tokenTransferInspector } from '../../src/index.js';
+import { jsonToMetadatum } from '../../src/util/metadatum.js';
+import type {
   Asset,
   AssetInfoWithAmount,
   AssetProvider,
   HealthCheckResponse,
-  TokenTransferValue,
-  createTxInspector,
-  tokenTransferInspector
-} from '../../src';
-import { Ed25519KeyHashHex, Ed25519PublicKeyHex, Ed25519SignatureHex } from '@cardano-sdk/crypto';
-import { jsonToMetadatum } from '../../src/util/metadatum';
+  TokenTransferValue
+} from '../../src/index.js';
+import type { Ed25519PublicKeyHex, Ed25519SignatureHex } from '@cardano-sdk/crypto';
 
 const buildTokenTransferValue = (coins: bigint, assets: Array<[Asset.AssetInfo, bigint]>): TokenTransferValue => ({
   assets: new Map<Cardano.AssetId, AssetInfoWithAmount>(

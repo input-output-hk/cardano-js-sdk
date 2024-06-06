@@ -1,6 +1,8 @@
-import { Logger } from 'ts-log';
-import { Observable, from, switchMap } from 'rxjs';
-import { PgConnectionConfig, createDataSource } from '@cardano-sdk/projection-typeorm';
+import { createDataSource } from '@cardano-sdk/projection-typeorm';
+import { from, switchMap } from 'rxjs';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
+import type { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 
 export const createTypeormDataSource = (
   connectionConfig$: Observable<PgConnectionConfig>,

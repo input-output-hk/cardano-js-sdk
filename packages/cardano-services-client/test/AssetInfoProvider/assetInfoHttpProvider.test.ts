@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
-import { assetInfoHttpProvider } from '../../src';
-import { config } from '../util';
+import { assetInfoHttpProvider } from '../../src/index.js';
+import { config } from '../util.js';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 

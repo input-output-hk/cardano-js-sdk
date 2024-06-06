@@ -1,6 +1,6 @@
-import { ConstrPlutusData, PlutusData, PlutusList, PlutusMap } from '../types';
-import { Logger } from 'ts-log';
 import { TextDecoder } from 'web-encoding';
+import type { ConstrPlutusData, PlutusData, PlutusList, PlutusMap } from '../types/index.js';
+import type { Logger } from 'ts-log';
 
 export const isPlutusBoundedBytes = (plutusData: unknown): plutusData is Uint8Array => ArrayBuffer.isView(plutusData);
 

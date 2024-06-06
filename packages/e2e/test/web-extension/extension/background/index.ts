@@ -1,2 +1,2 @@
-import './cip30';
-import './services';
+import './cip30.js';
+import './services.js';

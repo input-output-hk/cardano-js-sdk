@@ -1,5 +1,5 @@
-import { Origin } from './types';
-import { Storage } from 'webextension-polyfill';
+import type { Origin } from './types.js';
+import type { Storage } from 'webextension-polyfill';
 
 export type PersistentAuthenticatorStorage = {
   get(): Promise<Origin[]>;

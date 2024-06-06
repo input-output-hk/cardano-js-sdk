@@ -1,9 +1,5 @@
 import {
-  AnyWallet,
-  StoresFactory,
-  WalletFactory,
   WalletManager,
-  WalletManagerActivateProps,
   WalletRepository,
   WalletType,
   consumeSigningCoordinatorApi,
@@ -15,16 +11,18 @@ import {
   walletManagerProperties,
   walletRepositoryProperties
 } from '@cardano-sdk/web-extension';
+import type { AnyWallet, StoresFactory, WalletFactory, WalletManagerActivateProps } from '@cardano-sdk/web-extension';
 
 import { InvalidArgumentError, isNotNil } from '@cardano-sdk/util';
-import { Metadata, env, logger } from '../util';
 import { storage as WebExtensionStorage, runtime } from 'webextension-polyfill';
-import { Witnesser } from '@cardano-sdk/key-management';
+import { env, logger } from '../util.js';
 import { filter, from, merge, of } from 'rxjs';
-import { getWallet } from '../../../../src';
+import { getWallet } from '../../../../src/index.js';
 import { storage } from '@cardano-sdk/wallet';
 import { toEmpty } from '@cardano-sdk/util-rxjs';
-import { walletName } from '../const';
+import { walletName } from '../const.js';
+import type { Metadata } from '../util.js';
+import type { Witnesser } from '@cardano-sdk/key-management';
 
 export interface WalletFactoryDependencies {
   witnesser: Witnesser;

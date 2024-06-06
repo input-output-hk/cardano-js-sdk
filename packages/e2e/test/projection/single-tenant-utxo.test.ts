@@ -1,15 +1,17 @@
 /* eslint-disable promise/always-return */
 import * as Postgres from '@cardano-sdk/projection-typeorm';
-import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
-import { Cardano, ObservableCardanoNode } from '@cardano-sdk/core';
-import { ConnectionConfig } from '@cardano-ogmios/client';
-import { DataSource, QueryRunner } from 'typeorm';
-import { Observable, filter, firstValueFrom, lastValueFrom, of, scan, takeWhile } from 'rxjs';
+import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
 import { OgmiosObservableCardanoNode } from '@cardano-sdk/ogmios';
-import { ReconnectionConfig } from '@cardano-sdk/util-rxjs';
 import { createDatabase, dropDatabase } from 'typeorm-extension';
-import { getEnv } from '../../src';
+import { filter, firstValueFrom, lastValueFrom, of, scan, takeWhile } from 'rxjs';
+import { getEnv } from '../../src/index.js';
 import { logger } from '@cardano-sdk/util-dev';
+import type { Cardano, ObservableCardanoNode } from '@cardano-sdk/core';
+import type { ConnectionConfig } from '@cardano-ogmios/client';
+import type { DataSource, QueryRunner } from 'typeorm';
+import type { Observable } from 'rxjs';
+import type { ProjectionEvent } from '@cardano-sdk/projection';
+import type { ReconnectionConfig } from '@cardano-sdk/util-rxjs';
 
 const entities = [
   Postgres.BlockEntity,

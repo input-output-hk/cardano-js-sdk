@@ -1,7 +1,8 @@
-import { SmashStakePoolDelistedService, SmashStakePoolDelistedServiceError } from '../../../src';
-import { createSmashStakePoolDelistedService } from '../../../src/StakePool/HttpStakePoolMetadata/SmashStakePoolDelistedService';
+import { SmashStakePoolDelistedServiceError } from '../../../src/index.js';
+import { createSmashStakePoolDelistedService } from '../../../src/StakePool/HttpStakePoolMetadata/SmashStakePoolDelistedService.js';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
+import type { SmashStakePoolDelistedService } from '../../../src/index.js';
 
 describe('StakePoolMetadataService', () => {
   let axiosMock: MockAdapter;

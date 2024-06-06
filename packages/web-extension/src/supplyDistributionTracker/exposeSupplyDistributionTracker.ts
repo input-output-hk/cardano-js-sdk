@@ -1,7 +1,8 @@
-import { MessengerDependencies, exposeApi } from '../messaging';
-import { SupplyDistributionTracker } from '@cardano-sdk/wallet';
+import { exposeApi } from '../messaging/index.js';
 import { of } from 'rxjs';
-import { supplyDistributionTrackerChannel, supplyDistributionTrackerProperties } from './util';
+import { supplyDistributionTrackerChannel, supplyDistributionTrackerProperties } from './util.js';
+import type { MessengerDependencies } from '../messaging/index.js';
+import type { SupplyDistributionTracker } from '@cardano-sdk/wallet';
 
 export interface ExposeSupplyDistributionTrackerProps {
   supplyDistributionTracker: SupplyDistributionTracker;

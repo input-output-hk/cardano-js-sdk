@@ -1,20 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable sonarjs/no-extra-arguments */
 /* eslint-disable unicorn/consistent-function-scoping */
-import { BaseWallet, ObservableWallet, createPersonalWallet } from '../../src';
-import { Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
+import { Bip32Account, util } from '@cardano-sdk/key-management';
 import { Cardano, Serialization } from '@cardano-sdk/core';
-import {
-  OutputValidator,
-  ProtocolParametersRequiredByOutputValidator,
-  createOutputValidator
-} from '@cardano-sdk/tx-construction';
-import { RetryBackoffConfig } from 'backoff-rxjs';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
+import { createOutputValidator } from '@cardano-sdk/tx-construction';
+import { createPersonalWallet } from '../../src/index.js';
 import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { firstValueFrom, of, timer } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
-import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
+import { testAsyncKeyAgent } from '../../../key-management/test/mocks/index.js';
+import type { BaseWallet, ObservableWallet } from '../../src/index.js';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
+import type { OutputValidator, ProtocolParametersRequiredByOutputValidator } from '@cardano-sdk/tx-construction';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
 
 describe('CustomObservableWallet', () => {
   describe('can create an application-specific subset of ObservableWallet interface', () => {

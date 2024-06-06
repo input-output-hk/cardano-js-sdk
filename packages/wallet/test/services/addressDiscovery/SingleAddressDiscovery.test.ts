@@ -1,6 +1,6 @@
 import { Bip32Account, KeyRole } from '@cardano-sdk/key-management';
-import { SingleAddressDiscovery } from '../../../src';
-import { createAsyncKeyAgent } from '../../util';
+import { SingleAddressDiscovery } from '../../../src/index.js';
+import { createAsyncKeyAgent } from '../../util.js';
 
 describe('SingleAddressDiscovery', () => {
   it('return the first derived address', async () => {

@@ -1,4 +1,4 @@
-import { withSort } from '../../../src/StakePool/DbSyncStakePoolProvider/queries';
+import { withSort } from '../../../src/StakePool/DbSyncStakePoolProvider/queries.js';
 
 describe('queries', () => {
   describe('withSort', () => {

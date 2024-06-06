@@ -1,11 +1,12 @@
 import { Asset, Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { AssetEntity, HandleEntity, OutputEntity, willStoreHandles } from '../../../src';
-import { HandleOwnership } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
-import { ProjectorContext, createProjectorContext } from '../util';
-import { QueryRunner } from 'typeorm';
-import { createMultiTxProjectionSource, entities, mapAndStore, policyId, projectTilFirst } from './util';
+import { AssetEntity, HandleEntity, OutputEntity, willStoreHandles } from '../../../src/index.js';
+import { createMultiTxProjectionSource, entities, mapAndStore, policyId, projectTilFirst } from './util.js';
+import { createProjectorContext } from '../util.js';
 import { firstValueFrom } from 'rxjs';
-import { initializeDataSource } from '../../util';
+import { initializeDataSource } from '../../util.js';
+import type { HandleOwnership } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
+import type { ProjectorContext } from '../util.js';
+import type { QueryRunner } from 'typeorm';
 
 describe('storeHandles', () => {
   let queryRunner: QueryRunner;

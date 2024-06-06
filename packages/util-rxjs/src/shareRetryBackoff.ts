@@ -1,5 +1,7 @@
-import { Observable, OperatorFunction, ReplaySubject, defer, finalize } from 'rxjs';
-import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
+import { Observable, ReplaySubject, defer, finalize } from 'rxjs';
+import { retryBackoff } from 'backoff-rxjs';
+import type { OperatorFunction } from 'rxjs';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
 
 const defaultRetryBackoffConfig: RetryBackoffConfig = { initialInterval: 10, maxInterval: 5000, resetOnSuccess: true };
 

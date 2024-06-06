@@ -1,9 +1,7 @@
-import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
-import { DocumentStore, OrderedCollectionStore } from '../persistence';
+import { Cardano } from '@cardano-sdk/core';
 import {
   EMPTY,
   NEVER,
-  Observable,
   Subject,
   combineLatest,
   concat,
@@ -28,19 +26,24 @@ import {
   tap,
   withLatestFrom
 } from 'rxjs';
-import { FailedTx, OutgoingOnChainTx, OutgoingTx, TransactionFailure, TransactionsTracker, TxInFlight } from './types';
-import { Logger } from 'ts-log';
-import { Range, Shutdown, contextLogger } from '@cardano-sdk/util';
-import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
-import { distinctBlock, signedTxsEquals, transactionsEquals, txInEquals } from './util';
+import { TransactionFailure } from './types.js';
+import { contextLogger } from '@cardano-sdk/util';
+import { distinctBlock, signedTxsEquals, transactionsEquals, txInEquals } from './util/index.js';
+import type { ChainHistoryProvider } from '@cardano-sdk/core';
+import type { DocumentStore, OrderedCollectionStore } from '../persistence/index.js';
+import type { FailedTx, OutgoingOnChainTx, OutgoingTx, TransactionsTracker, TxInFlight } from './types.js';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
+import type { Range, Shutdown } from '@cardano-sdk/util';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
 
-import { WitnessedTx } from '@cardano-sdk/key-management';
-import { newAndStoredMulticast } from './util/newAndStoredMulticast';
-import chunk from 'lodash/chunk';
-import intersectionBy from 'lodash/intersectionBy';
-import sortBy from 'lodash/sortBy';
-import unionBy from 'lodash/unionBy';
+import { newAndStoredMulticast } from './util/newAndStoredMulticast.js';
+import chunk from 'lodash/chunk.js';
+import intersectionBy from 'lodash/intersectionBy.js';
+import sortBy from 'lodash/sortBy.js';
+import unionBy from 'lodash/unionBy.js';
+import type { WitnessedTx } from '@cardano-sdk/key-management';
 
 export interface TransactionsTrackerProps {
   chainHistoryProvider: ChainHistoryProvider;

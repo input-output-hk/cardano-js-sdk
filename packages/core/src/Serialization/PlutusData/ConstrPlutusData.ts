@@ -1,7 +1,7 @@
-import { CborReader, CborWriter } from '../CBOR';
+import { CborReader, CborWriter } from '../CBOR/index.js';
 import { HexBlob } from '@cardano-sdk/util';
-import { PlutusList } from './PlutusList';
-import { hexToBytes } from '../../util/misc';
+import { PlutusList } from './PlutusList.js';
+import { hexToBytes } from '../../util/misc/index.js';
 
 const GENERAL_FORM_TAG = 102n;
 const ALTERNATIVE_TAG_OFFSET = 7n;

@@ -1,8 +1,10 @@
-import { BehaviorSubject } from 'rxjs';
-import { CLEAN_TX_SUBMIT_STATS, ProviderFnStats, TrackedTxSubmitProvider, TxSubmitProviderStats } from '../../../src';
-import { TxSubmitProvider } from '@cardano-sdk/core';
+import { CLEAN_TX_SUBMIT_STATS, TrackedTxSubmitProvider } from '../../../src/index.js';
+import { TxCBOR } from '@cardano-sdk/core';
 import { bufferToHexString } from '@cardano-sdk/util';
 import { mockProviders } from '@cardano-sdk/util-dev';
+import type { BehaviorSubject } from 'rxjs';
+import type { ProviderFnStats, TxSubmitProviderStats } from '../../../src/index.js';
+import type { TxSubmitProvider } from '@cardano-sdk/core';
 
 describe('TrackedTxSubmitProvider', () => {
   let txSubmitProvider: TxSubmitProvider;
@@ -49,7 +51,8 @@ describe('TrackedTxSubmitProvider', () => {
     test(
       'submitTx',
       testFunctionStats(
-        (provider) => provider.submitTx({ signedTransaction: bufferToHexString(Buffer.from(new Uint8Array())) }),
+        (provider) =>
+          provider.submitTx({ signedTransaction: TxCBOR(bufferToHexString(Buffer.from(new Uint8Array()))) }),
         (stats) => stats.submitTx$
       )
     );

@@ -1,4 +1,5 @@
-import { Observable, finalize, tap } from 'rxjs';
+import { finalize, tap } from 'rxjs';
+import type { Observable } from 'rxjs';
 
 export const finalizeWithLatest =
   <T>(callback: (latest: T | null) => void) =>

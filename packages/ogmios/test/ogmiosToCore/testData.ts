@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
-import { Ogmios } from '../../src';
 import { fromSerializableObject } from '@cardano-sdk/util';
+import type { Ogmios } from '../../src/index.js';
 
 // Mock data extracted using ogmios chain-sync api from the preprod network
 export const mockByronBlock: Ogmios.Schema.Byron = {

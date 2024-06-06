@@ -1,20 +1,23 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
-import {
-  Cardano,
+import { AddressType, Bip32Account, util } from '@cardano-sdk/key-management';
+import { Cardano } from '@cardano-sdk/core';
+import { SingleAddressDiscovery, createPersonalWallet } from '../../src/index.js';
+import { createInMemoryWalletStores } from '../../src/persistence/index.js';
+import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
+import { filter, firstValueFrom } from 'rxjs';
+import { dummyLogger as logger } from 'ts-log';
+import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks/index.js';
+import { toOutgoingTx, waitForWalletStateSettle } from '../util.js';
+import type {
   ChainHistoryProvider,
   NetworkInfoProvider,
   RewardsProvider,
   TxSubmitProvider,
   UtxoProvider
 } from '@cardano-sdk/core';
-import { ConnectionStatusTracker, PollingConfig, SingleAddressDiscovery, createPersonalWallet } from '../../src';
-import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
-import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
-import { filter, firstValueFrom } from 'rxjs';
-import { dummyLogger as logger } from 'ts-log';
-import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
-import { toOutgoingTx, waitForWalletStateSettle } from '../util';
+import type { ConnectionStatusTracker, PollingConfig } from '../../src/index.js';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
+import type { WalletStores } from '../../src/persistence/index.js';
 
 const name = 'Test Wallet';
 const address = mocks.utxo[0][0].address!;

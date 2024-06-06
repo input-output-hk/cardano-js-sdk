@@ -1,9 +1,10 @@
-import * as Crypto from '@cardano-sdk/crypto';
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Cardano } from '@cardano-sdk/core';
-import { LedgerTxTransformerContext } from '../types';
-import { Transform, areStringsEqualInConstantTime } from '@cardano-sdk/util';
+import { areStringsEqualInConstantTime } from '@cardano-sdk/util';
 import { util } from '@cardano-sdk/key-management';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { LedgerTxTransformerContext } from '../types.js';
+import type { Transform } from '@cardano-sdk/util';
 
 export const toRequiredSigner: Transform<
   Crypto.Ed25519KeyHashHex,

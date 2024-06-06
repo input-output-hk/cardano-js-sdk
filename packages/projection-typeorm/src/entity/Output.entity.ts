@@ -1,9 +1,9 @@
-import { BigIntColumnOptions, OnDeleteCascadeRelationOptions } from './util';
-import { BlockEntity } from './Block.entity';
+import { BigIntColumnOptions, OnDeleteCascadeRelationOptions } from './util.js';
+import { BlockEntity } from './Block.entity.js';
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { HexBlob } from '@cardano-sdk/util';
-import { TokensEntity } from './Tokens.entity';
+import { TokensEntity } from './Tokens.entity.js';
+import type { HexBlob } from '@cardano-sdk/util';
 
 @Entity()
 export class OutputEntity {

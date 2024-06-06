@@ -1,8 +1,9 @@
-import { CustomError } from 'ts-custom-error';
-import { SmashDelistedResponse } from './types';
-import { SmashStakePoolDelistedService } from '../types';
-import { SmashStakePoolDelistedServiceError } from './errors';
-import axios, { AxiosInstance } from 'axios';
+import { SmashStakePoolDelistedServiceError } from './errors.js';
+import axios from 'axios';
+import type { AxiosInstance } from 'axios';
+import type { CustomError } from 'ts-custom-error';
+import type { SmashDelistedResponse } from './types.js';
+import type { SmashStakePoolDelistedService } from '../types.js';
 
 export const createSmashStakePoolDelistedService = (
   smashUrl: string,

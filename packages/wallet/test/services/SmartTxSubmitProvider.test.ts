@@ -1,8 +1,10 @@
 import { BehaviorSubject, EMPTY, of } from 'rxjs';
-import { Cardano, ProviderError, ProviderFailure, Serialization, TxSubmitProvider } from '@cardano-sdk/core';
-import { ConnectionStatus, SmartTxSubmitProvider, TipSlot } from '../../src';
-import { RetryBackoffConfig } from 'backoff-rxjs';
+import { Cardano, ProviderError, ProviderFailure, Serialization } from '@cardano-sdk/core';
+import { ConnectionStatus, SmartTxSubmitProvider } from '../../src/index.js';
 import { flushPromises, mockProviders } from '@cardano-sdk/util-dev';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
+import type { TipSlot } from '../../src/index.js';
+import type { TxSubmitProvider } from '@cardano-sdk/core';
 
 describe('SmartTxSubmitProvider', () => {
   let underlyingProvider: jest.Mocked<TxSubmitProvider>;

@@ -1,11 +1,11 @@
-import { Cardano } from '@cardano-sdk/core';
-import { ChangeAddressResolver } from '../ChangeAddress';
-import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
-import { InputSelectionParameters, InputSelector, SelectionResult } from '../types';
-import { assertIsBalanceSufficient, preProcessArgs, stubMaxSizeAddress, toValues } from '../util';
-import { computeChangeAndAdjustForFee } from './change';
-import { roundRobinSelection } from './roundRobin';
-import { sortUtxoByTxIn } from '../GreedySelection';
+import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError.js';
+import { assertIsBalanceSufficient, preProcessArgs, stubMaxSizeAddress, toValues } from '../util.js';
+import { computeChangeAndAdjustForFee } from './change.js';
+import { roundRobinSelection } from './roundRobin.js';
+import { sortUtxoByTxIn } from '../GreedySelection/index.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { ChangeAddressResolver } from '../ChangeAddress/index.js';
+import type { InputSelectionParameters, InputSelector, SelectionResult } from '../types.js';
 
 export const MAX_U64 = 18_446_744_073_709_551_615n;
 

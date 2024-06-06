@@ -1,7 +1,7 @@
-import * as Cardano from '../../Cardano';
-import { CborReader, CborWriter } from '../CBOR';
+import * as Cardano from '../../Cardano/index.js';
+import { CborReader, CborWriter } from '../CBOR/index.js';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import { ProposedProtocolParameterUpdates } from './ProposedProtocolParameterUpdates';
+import { ProposedProtocolParameterUpdates } from './ProposedProtocolParameterUpdates.js';
 
 const UPDATE_ARRAY_SIZE = 2;
 

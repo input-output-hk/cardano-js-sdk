@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ValueTransformer } from 'typeorm';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
+import type { ValueTransformer } from 'typeorm';
 
 export const float: ValueTransformer = {
   from(data: string) {

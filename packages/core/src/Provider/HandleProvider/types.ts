@@ -1,4 +1,4 @@
-import { Asset, Cardano, HttpProviderConfigPaths, Point, Provider } from '../..';
+import type { Asset, Cardano, HttpProviderConfigPaths, Point, Provider } from '../../index.js';
 
 export type Handle = string;
 

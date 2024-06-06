@@ -1,8 +1,8 @@
 import { Asset, Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { AssetEntity, NftMetadataEntity, NftMetadataType } from '../entity';
-import { Mappers, ProjectionEvent } from '@cardano-sdk/projection';
-import { Repository } from 'typeorm';
-import { typeormOperator } from './util';
+import { AssetEntity, NftMetadataEntity, NftMetadataType } from '../entity/index.js';
+import { typeormOperator } from './util.js';
+import type { Mappers, ProjectionEvent } from '@cardano-sdk/projection';
+import type { Repository } from 'typeorm';
 
 const userTokenAssetIfExists = async (
   assetRepository: Repository<AssetEntity>,

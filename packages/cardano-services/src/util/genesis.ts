@@ -1,8 +1,8 @@
-import { GenesisData } from '../types';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import JSONbig from 'json-bigint';
 import fs from 'fs';
 import path from 'path';
+import type { GenesisData } from '../types.js';
 
 export const loadGenesisData = async (cardanoNodeConfigPath: string): Promise<GenesisData> => {
   try {

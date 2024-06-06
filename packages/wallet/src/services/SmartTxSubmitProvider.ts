@@ -1,19 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { ConnectionStatus } from './util/index.js';
 import {
+  ProviderError,
+  ProviderFailure,
+  TxSubmissionError,
+  TxSubmissionErrorCode,
+  deserializeTx
+} from '@cardano-sdk/core';
+import { combineLatest, filter, firstValueFrom, from, mergeMap, take, tap } from 'rxjs';
+import { retryBackoff } from 'backoff-rxjs';
+import type {
   Cardano,
   HealthCheckResponse,
   OutsideOfValidityIntervalData,
-  ProviderError,
-  ProviderFailure,
   SubmitTxArgs,
-  TxSubmissionError,
-  TxSubmissionErrorCode,
-  TxSubmitProvider,
-  deserializeTx
+  TxSubmitProvider
 } from '@cardano-sdk/core';
-import { ConnectionStatus, ConnectionStatusTracker } from './util';
-import { Observable, combineLatest, filter, firstValueFrom, from, mergeMap, take, tap } from 'rxjs';
-import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
+import type { ConnectionStatusTracker } from './util/index.js';
+import type { Observable } from 'rxjs';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
 
 export interface RetryingTxSubmitProviderProps {
   retryBackoffConfig: RetryBackoffConfig;

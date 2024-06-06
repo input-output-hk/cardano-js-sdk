@@ -1,7 +1,8 @@
-import { EMPTY, Observable, from } from 'rxjs';
-import { Logger } from 'ts-log';
-import { toPouchDbDoc } from './util';
+import { EMPTY, from } from 'rxjs';
+import { toPouchDbDoc } from './util.js';
 import PouchDB from 'pouchdb';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
 
 const FETCH_ALL_PAGE_SIZE = 100;
 

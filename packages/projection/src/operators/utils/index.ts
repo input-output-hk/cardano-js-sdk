@@ -1,3 +1,3 @@
-export * from './inferProjectorEventType';
-export * from './projectorOperator';
-export * from './unifiedProjectorOperator';
+export * from './inferProjectorEventType.js';
+export * from './projectorOperator.js';
+export * from './unifiedProjectorOperator.js';

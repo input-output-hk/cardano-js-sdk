@@ -1,32 +1,22 @@
 import * as Postgres from '@cardano-sdk/projection-typeorm';
 import { BlockDataEntity, BlockEntity, StakeKeyEntity } from '@cardano-sdk/projection-typeorm';
-import {
-  Bootstrap,
-  InMemory,
-  Mappers,
-  ProjectionEvent,
-  ProjectionOperator,
-  StabilityWindowBuffer,
-  WithBlock,
-  requestNext,
-  withStaticContext
-} from '@cardano-sdk/projection';
-import {
-  Cardano,
+import { Bootstrap, InMemory, Mappers, requestNext, withStaticContext } from '@cardano-sdk/projection';
+import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
+import { Observable, filter, firstValueFrom, lastValueFrom, map, of, take, takeWhile, toArray } from 'rxjs';
+import { OgmiosObservableCardanoNode } from '@cardano-sdk/ogmios';
+import { createDatabase } from 'typeorm-extension';
+import { getEnv } from '../../src/index.js';
+import type {
   ChainSyncEvent,
-  ChainSyncEventType,
   ChainSyncRollForward,
   ObservableCardanoNode,
   Point,
   TipOrOrigin
 } from '@cardano-sdk/core';
-import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
-import { ConnectionConfig } from '@cardano-ogmios/client';
-import { Observable, filter, firstValueFrom, lastValueFrom, map, of, take, takeWhile, toArray } from 'rxjs';
-import { OgmiosObservableCardanoNode } from '@cardano-sdk/ogmios';
-import { ReconnectionConfig } from '@cardano-sdk/util-rxjs';
-import { createDatabase } from 'typeorm-extension';
-import { getEnv } from '../../src';
+import type { ConnectionConfig } from '@cardano-ogmios/client';
+import type { ProjectionEvent, ProjectionOperator, StabilityWindowBuffer, WithBlock } from '@cardano-sdk/projection';
+import type { ReconnectionConfig } from '@cardano-sdk/util-rxjs';
 
 const dataWithStakeDeregistration = chainSyncData(ChainSyncDataSet.WithStakeKeyDeregistration);
 

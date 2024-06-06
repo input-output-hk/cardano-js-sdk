@@ -1,2 +1,2 @@
-export * from './OgmiosCardanoNode';
-export * from './OgmiosObservableCardanoNode';
+export * from './OgmiosCardanoNode.js';
+export * from './OgmiosObservableCardanoNode/index.js';

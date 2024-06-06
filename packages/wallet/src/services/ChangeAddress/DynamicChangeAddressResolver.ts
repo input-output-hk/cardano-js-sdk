@@ -1,14 +1,15 @@
-import * as Crypto from '@cardano-sdk/crypto';
 import { BigNumber } from 'bignumber.js';
 import { Cardano } from '@cardano-sdk/core';
-import { ChangeAddressResolver, Selection } from '@cardano-sdk/input-selection';
-import { DelegatedStake, DelegationTracker } from '../types';
-import { GroupedAddress } from '@cardano-sdk/key-management';
 import { InvalidStateError } from '@cardano-sdk/util';
-import { Logger } from 'ts-log';
-import { Observable, firstValueFrom } from 'rxjs';
-import isEqual from 'lodash/isEqual';
-import uniq from 'lodash/uniq';
+import { firstValueFrom } from 'rxjs';
+import isEqual from 'lodash/isEqual.js';
+import uniq from 'lodash/uniq.js';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { ChangeAddressResolver, Selection } from '@cardano-sdk/input-selection';
+import type { DelegatedStake, DelegationTracker } from '../types.js';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
 
 /**
  * We are using buckets as an analogy to stake keys which are delegated to specific

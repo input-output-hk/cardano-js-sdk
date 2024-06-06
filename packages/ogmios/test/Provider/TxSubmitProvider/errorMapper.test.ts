@@ -1,5 +1,5 @@
 import { CardanoNodeErrors, TxSubmissionErrorCode } from '@cardano-sdk/core';
-import { mapOgmiosTxSubmitError } from '../../../src/Provider/TxSubmitProvider/errorMapper';
+import { mapOgmiosTxSubmitError } from '../../../src/Provider/TxSubmitProvider/errorMapper.js';
 
 describe('mapTxSubmitError', () => {
   it('should map CollateralHasNonAdaAssetsError to TxSubmissionErrorCode.NonAdaCollateral', () => {

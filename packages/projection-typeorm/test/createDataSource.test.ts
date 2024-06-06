@@ -1,6 +1,6 @@
-import { BlockDataEntity, BlockEntity, StakeKeyEntity, pgBossSchemaExists } from '../src';
+import { BlockDataEntity, BlockEntity, StakeKeyEntity, pgBossSchemaExists } from '../src/index.js';
 import { EntityMetadataNotFoundError } from 'typeorm';
-import { initializeDataSource } from './util';
+import { initializeDataSource } from './util.js';
 
 describe('createDataSource', () => {
   describe('with test configuration', () => {

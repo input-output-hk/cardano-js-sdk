@@ -1,29 +1,30 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable prefer-spread */
-import { Bootstrap, ProjectionEvent, logProjectionProgress, requestNext } from '@cardano-sdk/projection';
-import { Cardano, ObservableCardanoNode } from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
-import { Observable, concat, defer, groupBy, mergeMap, take, takeWhile } from 'rxjs';
+import { Bootstrap, logProjectionProgress, requestNext } from '@cardano-sdk/projection';
 import {
-  PgConnectionConfig,
-  TypeormDevOptions,
-  TypeormOptions,
   TypeormStabilityWindowBuffer,
-  WithTypeormContext,
   createObservableConnection,
   createTypeormTipTracker,
   isRecoverableTypeormError,
   typeormTransactionCommit,
   withTypeormTransaction
 } from '@cardano-sdk/projection-typeorm';
-import {
-  PreparedProjection,
-  ProjectionName,
-  ProjectionOptions,
-  prepareTypeormProjection
-} from './prepareTypeormProjection';
-import { ReconnectionConfig, passthrough, shareRetryBackoff, toEmpty } from '@cardano-sdk/util-rxjs';
-import { migrations } from './migrations';
+import { concat, defer, groupBy, mergeMap, take, takeWhile } from 'rxjs';
+import { migrations } from './migrations/index.js';
+import { passthrough, shareRetryBackoff, toEmpty } from '@cardano-sdk/util-rxjs';
+import { prepareTypeormProjection } from './prepareTypeormProjection.js';
+import type { Cardano, ObservableCardanoNode } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
+import type {
+  PgConnectionConfig,
+  TypeormDevOptions,
+  TypeormOptions,
+  WithTypeormContext
+} from '@cardano-sdk/projection-typeorm';
+import type { PreparedProjection, ProjectionName, ProjectionOptions } from './prepareTypeormProjection.js';
+import type { ProjectionEvent } from '@cardano-sdk/projection';
+import type { ReconnectionConfig } from '@cardano-sdk/util-rxjs';
 
 const reconnectionConfig: ReconnectionConfig = {
   initialInterval: 50,

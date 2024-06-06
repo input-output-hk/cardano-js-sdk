@@ -1,4 +1,4 @@
-import { resolveObjectValues } from '../src';
+import { resolveObjectValues } from '../src/index.js';
 
 describe('util', () => {
   describe('resolveObjectValues', () => {

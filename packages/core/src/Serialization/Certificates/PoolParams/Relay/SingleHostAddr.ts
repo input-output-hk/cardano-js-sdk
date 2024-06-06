@@ -1,7 +1,13 @@
-import * as Cardano from '../../../../Cardano';
-import { CborReader, CborReaderState, CborWriter } from '../../../CBOR';
-import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import { byteArrayToIPv6String, byteArrayToIpV4String, ipV4StringToByteArray, ipV6StringToByteArray } from './ipUtils';
+import { CborReader, CborReaderState, CborWriter } from '../../../CBOR/index.js';
+import { InvalidArgumentError } from '@cardano-sdk/util';
+import {
+  byteArrayToIPv6String,
+  byteArrayToIpV4String,
+  ipV4StringToByteArray,
+  ipV6StringToByteArray
+} from './ipUtils.js';
+import type * as Cardano from '../../../../Cardano/index.js';
+import type { HexBlob } from '@cardano-sdk/util';
 
 const EMBEDDED_GROUP_SIZE = 4;
 const SINGLE_HOST_ADDR_RELAY_ID = 0;

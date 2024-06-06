@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
+import { Cardano } from '@cardano-sdk/core';
+import { Percent, bufferToHexString, isNotNil } from '@cardano-sdk/util';
+import Fraction from 'fraction.js';
+import type {
   BlockfrostPoolMetrics,
   BlockfrostPoolMetricsModel,
   Epoch,
@@ -24,11 +27,9 @@ import {
   RelayModel,
   StakePoolResults,
   StakePoolStatsModel
-} from './types';
-import { Cardano, StakePoolStats } from '@cardano-sdk/core';
-import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
-import { Percent, bufferToHexString, isNotNil } from '@cardano-sdk/util';
-import Fraction from 'fraction.js';
+} from './types.js';
+import type { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import type { StakePoolStats } from '@cardano-sdk/core';
 
 const getPoolStatus = (
   lastPoolRegistration: PoolRegistration,

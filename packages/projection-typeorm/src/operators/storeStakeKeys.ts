@@ -1,6 +1,6 @@
-import { Mappers } from '@cardano-sdk/projection';
-import { StakeKeyEntity } from '../entity/StakeKey.entity';
-import { typeormOperator } from './util';
+import { StakeKeyEntity } from '../entity/StakeKey.entity.js';
+import { typeormOperator } from './util.js';
+import type { Mappers } from '@cardano-sdk/projection';
 
 export const storeStakeKeys = typeormOperator<Mappers.WithStakeKeys>(
   async ({ queryRunner, stakeKeys: { insert, del } }) => {

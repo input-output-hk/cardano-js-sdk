@@ -1,5 +1,5 @@
-import { InMemoryCollectionStore } from '../../../src/persistence';
-import { PersistentCollectionTrackerSubject } from '../../../src/services/util';
+import { InMemoryCollectionStore } from '../../../src/persistence/index.js';
+import { PersistentCollectionTrackerSubject } from '../../../src/services/util/index.js';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';
 

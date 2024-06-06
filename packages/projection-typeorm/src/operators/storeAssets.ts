@@ -1,8 +1,9 @@
-import { AssetEntity } from '../entity';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { Mappers } from '@cardano-sdk/projection';
-import { QueryRunner } from 'typeorm';
-import { typeormOperator } from './util';
+import { AssetEntity } from '../entity/index.js';
+import { ChainSyncEventType } from '@cardano-sdk/core';
+import { typeormOperator } from './util.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Mappers } from '@cardano-sdk/projection';
+import type { QueryRunner } from 'typeorm';
 
 type MintedAssetSupplies = Partial<Record<Cardano.AssetId, bigint>>;
 type StoreAssetEventParams = {

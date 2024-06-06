@@ -1,11 +1,14 @@
-import { Logger } from 'ts-log';
-import { Programs, ProviderServerArgs, ServiceNames } from './programs/types';
-import { WrongOption } from './errors';
-import { getOgmiosCardanoNode } from './services/ogmios';
-import { getPool } from './services/postgres';
-import { loadGenesisData } from '../util';
-import dns, { SrvRecord } from 'dns';
-import pRetry, { FailedAttemptError } from 'p-retry';
+import { ServiceNames } from './programs/types.js';
+import { WrongOption } from './errors/index.js';
+import { getOgmiosCardanoNode } from './services/ogmios.js';
+import { getPool } from './services/postgres.js';
+import { loadGenesisData } from '../util/index.js';
+import dns from 'dns';
+import pRetry from 'p-retry';
+import type { FailedAttemptError } from 'p-retry';
+import type { Logger } from 'ts-log';
+import type { Programs, ProviderServerArgs } from './programs/types.js';
+import type { SrvRecord } from 'dns';
 
 export const SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT = 1.1;
 export const SERVICE_DISCOVERY_TIMEOUT_DEFAULT = 60 * 1000;

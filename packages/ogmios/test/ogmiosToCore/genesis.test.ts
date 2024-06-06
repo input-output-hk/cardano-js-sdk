@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
-import { Schema } from '@cardano-ogmios/client';
-import { ogmiosToCore } from '../../src';
+import { ogmiosToCore } from '../../src/index.js';
+import type { Schema } from '@cardano-ogmios/client';
 
 describe('ogmiosToCore', () => {
   describe('genesis', () => {

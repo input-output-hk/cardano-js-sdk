@@ -1,29 +1,38 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Cardano, QueryStakePoolsArgs, SortField, StakePoolProvider } from '@cardano-sdk/core';
-import { CreateHttpProviderConfig, stakePoolHttpProvider } from '../../../cardano-services-client';
-import { DbPools, LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
-import { DbSyncEpochPollService, loadGenesisData } from '../../src/util';
-import { DbSyncStakePoolFixtureBuilder, PoolInfo, PoolWith } from './fixtures/FixtureBuilder';
+import { Cardano } from '@cardano-sdk/core';
+import { DbSyncEpochPollService, loadGenesisData } from '../../src/util/index.js';
+import { DbSyncStakePoolFixtureBuilder, PoolWith } from './fixtures/FixtureBuilder.js';
 import {
   DbSyncStakePoolProvider,
-  GenesisData,
   HttpServer,
-  HttpServerConfig,
   InMemoryCache,
   StakePoolHttpService,
   UNLIMITED_CACHE_TTL,
   createHttpStakePoolMetadataService
-} from '../../src';
+} from '../../src/index.js';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { INFO, createLogger } from 'bunyan';
-import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
-import { clearDbPools, ingestDbData, servicesWithVersionPath as services, sleep, wrapWithTransaction } from '../util';
+import {
+  clearDbPools,
+  ingestDbData,
+  servicesWithVersionPath as services,
+  sleep,
+  wrapWithTransaction
+} from '../util.js';
+import { findLedgerTip } from '../../src/util/DbSyncProvider/index.js';
 import { getPort } from 'get-port-please';
-import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
+import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks.js';
 import { logger } from '@cardano-sdk/util-dev';
+import { stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
 import axios from 'axios';
+import type { CreateHttpProviderConfig } from '@cardano-sdk/cardano-services-client';
+import type { DbPools, LedgerTipModel } from '../../src/util/DbSyncProvider/index.js';
+import type { GenesisData, HttpServerConfig } from '../../src/index.js';
+import type { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
+import type { PoolInfo } from './fixtures/FixtureBuilder.js';
+import type { QueryStakePoolsArgs, SortField, StakePoolProvider } from '@cardano-sdk/core';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
 const APPLICATION_CBOR = 'application/cbor';

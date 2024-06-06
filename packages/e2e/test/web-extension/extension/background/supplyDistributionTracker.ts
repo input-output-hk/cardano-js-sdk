@@ -1,10 +1,10 @@
 import { createSupplyDistributionTracker, storage } from '@cardano-sdk/wallet';
-import { networkInfoProviderFactory } from '../../../../src';
+import { networkInfoProviderFactory } from '../../../../src/index.js';
 import { switchMap } from 'rxjs';
 
-import { env, logger } from '../util';
-import { wallet$ } from './walletManager';
-import { walletName } from '../const';
+import { env, logger } from '../util.js';
+import { wallet$ } from './walletManager.js';
+import { walletName } from '../const.js';
 
 export const supplyDistributionTrackerReady = (async () =>
   createSupplyDistributionTracker(

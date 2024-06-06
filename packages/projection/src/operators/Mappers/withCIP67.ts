@@ -1,9 +1,9 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
-import { ProducedUtxo, WithUtxo } from './withUtxo';
-import { WithMint } from './withMint';
 import { isNotNil } from '@cardano-sdk/util';
-import { unifiedProjectorOperator } from '../utils';
-import groupBy from 'lodash/groupBy';
+import { unifiedProjectorOperator } from '../utils/index.js';
+import groupBy from 'lodash/groupBy.js';
+import type { ProducedUtxo, WithUtxo } from './withUtxo.js';
+import type { WithMint } from './withMint.js';
 
 export interface CIP67Asset {
   assetId: Cardano.AssetId;

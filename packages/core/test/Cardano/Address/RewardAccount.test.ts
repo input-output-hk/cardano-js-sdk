@@ -1,6 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import * as cip19TestVectors from '../../../../util-dev/src/Cip19TestVectors';
-import { Cardano } from '../../../src';
+import * as cip19TestVectors from '../../../../util-dev/src/Cip19TestVectors.js';
+import { Cardano } from '../../../src/index.js';
 import { typedBech32 } from '@cardano-sdk/util';
 
 jest.mock('@cardano-sdk/util', () => {

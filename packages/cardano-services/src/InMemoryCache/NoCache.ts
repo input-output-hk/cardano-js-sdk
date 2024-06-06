@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { AsyncAction, InMemoryCache, Key } from './InMemoryCache';
-import NodeCache from 'node-cache';
+import { InMemoryCache } from './InMemoryCache.js';
+import type { AsyncAction, Key } from './InMemoryCache.js';
+import type NodeCache from 'node-cache';
 
 export class NoCache extends InMemoryCache {
   constructor() {

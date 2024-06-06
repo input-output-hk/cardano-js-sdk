@@ -1,5 +1,5 @@
-import { Asset, Cardano } from '@cardano-sdk/core';
-import { Shutdown } from '@cardano-sdk/util';
+import type { Asset, Cardano } from '@cardano-sdk/core';
+import type { Shutdown } from '@cardano-sdk/util';
 
 /** Cardano.AssetId as an object with `policyId` and `name` */
 export type AssetPolicyIdAndName = Pick<Asset.AssetInfo, 'name' | 'policyId'>;

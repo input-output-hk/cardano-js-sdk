@@ -1,6 +1,7 @@
-import { OperatorFunction, tap } from 'rxjs';
-import { ProjectionEvent } from '../../types';
-import { WithInMemoryStore } from '../types';
+import { tap } from 'rxjs';
+import type { OperatorFunction } from 'rxjs';
+import type { ProjectionEvent } from '../../types.js';
+import type { WithInMemoryStore } from '../types.js';
 
 export const inMemoryStoreOperator =
   <ExtraProps>(op: (evt: ProjectionEvent<ExtraProps & WithInMemoryStore>) => void) =>

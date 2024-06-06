@@ -1,7 +1,8 @@
-import { BlockEntity, CreateDataSourceProps, createDataSource } from '../src';
 import { Cardano } from '@cardano-sdk/core';
 import { NEVER, concat, of } from 'rxjs';
+import { createDataSource } from '../src/index.js';
 import { generateRandomHexString, logger } from '@cardano-sdk/util-dev';
+import type { BlockEntity, CreateDataSourceProps } from '../src/index.js';
 
 export const connectionConfig = {
   database: 'projection',

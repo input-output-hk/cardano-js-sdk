@@ -6,22 +6,22 @@ import {
   PoolRegistrationEntity,
   PoolRetirementEntity,
   StakePoolEntity,
-  TypeormStabilityWindowBuffer,
-  TypeormTipTracker,
   createObservableConnection,
   storeBlock,
   storeStakePools,
   typeormTransactionCommit,
   willStoreStakePools,
   withTypeormTransaction
-} from '../../src';
+} from '../../src/index.js';
 import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
-import { Cardano, ChainSyncEventType, ObservableCardanoNode } from '@cardano-sdk/core';
+import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
-import { DataSource, QueryRunner, Repository } from 'typeorm';
-import { connectionConfig$, initializeDataSource } from '../util';
-import { createProjectorContext, createProjectorTilFirst } from './util';
+import { connectionConfig$, initializeDataSource } from '../util.js';
+import { createProjectorContext, createProjectorTilFirst } from './util.js';
 import { lastValueFrom } from 'rxjs';
+import type { DataSource, QueryRunner, Repository } from 'typeorm';
+import type { ObservableCardanoNode } from '@cardano-sdk/core';
+import type { TypeormStabilityWindowBuffer, TypeormTipTracker } from '../../src/index.js';
 
 describe('storeStakePools', () => {
   const data = chainSyncData(ChainSyncDataSet.WithPoolRetirement);

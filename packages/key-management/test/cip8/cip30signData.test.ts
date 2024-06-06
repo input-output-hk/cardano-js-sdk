@@ -1,20 +1,13 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import {
-  AddressType,
-  AsyncKeyAgent,
-  GroupedAddress,
-  KeyAgent,
-  util as KeyManagementUtil,
-  KeyRole,
-  MessageSender,
-  cip8
-} from '../../src';
-import { Bip32Ed25519Witnesser } from '../../src/util';
-import { COSEKey, COSESign1, SigStructure } from '@emurgo/cardano-message-signing-nodejs';
+import { AddressType, util as KeyManagementUtil, KeyRole, cip8 } from '../../src/index.js';
+import { COSEKey, COSESign1 } from '@emurgo/cardano-message-signing-nodejs';
 import { Cardano, util } from '@cardano-sdk/core';
-import { CoseLabel } from '../../src/cip8/util';
+import { CoseLabel } from '../../src/cip8/util.js';
 import { HexBlob } from '@cardano-sdk/util';
-import { testAsyncKeyAgent, testKeyAgent } from '../mocks';
+import { testAsyncKeyAgent, testKeyAgent } from '../mocks/index.js';
+import type { AsyncKeyAgent, GroupedAddress, KeyAgent, MessageSender } from '../../src/index.js';
+import type { Bip32Ed25519Witnesser } from '../../src/util/index.js';
+import type { SigStructure } from '@emurgo/cardano-message-signing-nodejs';
 
 describe('cip30signData', () => {
   const payload = HexBlob('abc123');

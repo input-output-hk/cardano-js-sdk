@@ -1,6 +1,7 @@
-import { Cardano, EraSummary } from '@cardano-sdk/core';
-import { Observable, distinctUntilChanged, map } from 'rxjs';
-import { eraSummariesEquals } from './equals';
+import { distinctUntilChanged, map } from 'rxjs';
+import { eraSummariesEquals } from './equals.js';
+import type { Cardano, EraSummary } from '@cardano-sdk/core';
+import type { Observable } from 'rxjs';
 
 export const distinctBlock = (tip$: Observable<Cardano.Tip>) =>
   tip$.pipe(

@@ -1,8 +1,9 @@
-import { BalanceTracker, DelegationTracker, TransactionalObservables } from './types';
 import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
+import type { BalanceTracker, DelegationTracker, TransactionalObservables } from './types.js';
 
-import { Observable, combineLatest, distinctUntilChanged, map } from 'rxjs';
-import { utxoEquals } from './util';
+import { combineLatest, distinctUntilChanged, map } from 'rxjs';
+import { utxoEquals } from './util/index.js';
+import type { Observable } from 'rxjs';
 
 const mapUtxoValue = map<Cardano.Utxo[], Cardano.Value>((utxo) =>
   coalesceValueQuantities(utxo.map(([_, txOut]) => txOut.value))

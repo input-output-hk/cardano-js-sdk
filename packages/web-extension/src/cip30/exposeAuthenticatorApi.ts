@@ -1,14 +1,9 @@
-import { AuthenticatorApi, RemoteAuthenticator } from '@cardano-sdk/dapp-connector';
-import {
-  MessengerDependencies,
-  RemoteApiMethod,
-  RemoteApiProperties,
-  RemoteApiPropertyType,
-  exposeApi
-} from '../messaging';
-import { RemoteAuthenticatorMethodNames } from './consumeRemoteAuthenticatorApi';
-import { cloneSender } from './util';
+import { RemoteApiPropertyType, exposeApi } from '../messaging/index.js';
+import { RemoteAuthenticatorMethodNames } from './consumeRemoteAuthenticatorApi.js';
+import { cloneSender } from './util.js';
 import { of } from 'rxjs';
+import type { AuthenticatorApi, RemoteAuthenticator } from '@cardano-sdk/dapp-connector';
+import type { MessengerDependencies, RemoteApiMethod, RemoteApiProperties } from '../messaging/index.js';
 
 export interface ExposeAuthenticatorApiOptions {
   walletName: string;

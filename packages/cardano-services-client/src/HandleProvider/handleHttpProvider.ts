@@ -1,6 +1,8 @@
-import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
-import { HandleProvider, handleProviderPaths } from '@cardano-sdk/core';
-import { apiVersion } from '../version';
+import { apiVersion } from '../version.js';
+import { createHttpProvider } from '../HttpProvider.js';
+import { handleProviderPaths } from '@cardano-sdk/core';
+import type { CreateHttpProviderConfig } from '../HttpProvider.js';
+import type { HandleProvider } from '@cardano-sdk/core';
 
 /**
  * Connect to a Cardano Services HttpServer instance with the service available

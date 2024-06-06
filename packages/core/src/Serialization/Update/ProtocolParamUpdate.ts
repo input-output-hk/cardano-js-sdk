@@ -1,12 +1,12 @@
 /* eslint-disable sonarjs/cognitive-complexity, complexity, sonarjs/max-switch-cases, max-statements */
-import * as Cardano from '../../Cardano';
-import { CborReader, CborReaderState, CborWriter } from '../CBOR';
-import { Costmdls } from './Costmdls';
-import { DrepVotingThresholds } from './DrepVotingThresholds';
-import { ExUnitPrices } from './ExUnitPrices';
-import { ExUnits, ProtocolVersion, UnitInterval } from '../Common';
+import * as Cardano from '../../Cardano/index.js';
+import { CborReader, CborReaderState, CborWriter } from '../CBOR/index.js';
+import { Costmdls } from './Costmdls/index.js';
+import { DrepVotingThresholds } from './DrepVotingThresholds.js';
+import { ExUnitPrices } from './ExUnitPrices.js';
+import { ExUnits, ProtocolVersion, UnitInterval } from '../Common/index.js';
 import { HexBlob } from '@cardano-sdk/util';
-import { PoolVotingThresholds } from './PoolVotingThresholds';
+import { PoolVotingThresholds } from './PoolVotingThresholds.js';
 
 /**
  * The ProtocolParamUpdate structure in Cardano is used to propose changes to

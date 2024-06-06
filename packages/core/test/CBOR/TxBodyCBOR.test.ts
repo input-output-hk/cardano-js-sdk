@@ -1,5 +1,5 @@
 import { InvalidStringError } from '@cardano-sdk/util';
-import { TxBodyCBOR, TxCBOR } from '../../src';
+import { TxBodyCBOR, TxCBOR } from '../../src/index.js';
 
 describe('TxBodyCBOR', () => {
   describe('used as a constructor', () => {

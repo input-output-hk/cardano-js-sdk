@@ -4,14 +4,14 @@ import {
   STAKE_POOL_METRICS_UPDATE,
   STAKE_POOL_REWARDS
 } from '@cardano-sdk/projection-typeorm';
-import { PgBossQueue, WorkerHandlerFactory } from './types';
-import { stakePoolBatchDelistHandlerFactory } from './stakePoolBatchDelistHandler';
-import { stakePoolMetadataHandlerFactory } from './stakePoolMetadataHandler';
-import { stakePoolMetricsHandlerFactory } from './stakePoolMetricsHandler';
-import { stakePoolRewardsHandlerFactory } from './stakePoolRewardsHandler';
+import { stakePoolBatchDelistHandlerFactory } from './stakePoolBatchDelistHandler.js';
+import { stakePoolMetadataHandlerFactory } from './stakePoolMetadataHandler.js';
+import { stakePoolMetricsHandlerFactory } from './stakePoolMetricsHandler.js';
+import { stakePoolRewardsHandlerFactory } from './stakePoolRewardsHandler.js';
+import type { PgBossQueue, WorkerHandlerFactory } from './types.js';
 
-export * from './types';
-export * from './util';
+export * from './types.js';
+export * from './util.js';
 
 /** Defines the _handler_ for each **pg-boss** queue. */
 export const queueHandlers: Record<PgBossQueue, WorkerHandlerFactory> = {

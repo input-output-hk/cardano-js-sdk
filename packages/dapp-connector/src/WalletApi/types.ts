@@ -1,7 +1,7 @@
-import { Cardano } from '@cardano-sdk/core';
-import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
-import { HexBlob } from '@cardano-sdk/util';
-import { Runtime } from 'webextension-polyfill';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
+import type { HexBlob } from '@cardano-sdk/util';
+import type { Runtime } from 'webextension-polyfill';
 
 /** A hex-encoded string of the corresponding bytes. */
 export type Bytes = string;

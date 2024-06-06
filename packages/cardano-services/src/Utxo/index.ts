@@ -1,2 +1,2 @@
-export * from './UtxoHttpService';
-export * from './DbSyncUtxoProvider';
+export * from './UtxoHttpService.js';
+export * from './DbSyncUtxoProvider/index.js';

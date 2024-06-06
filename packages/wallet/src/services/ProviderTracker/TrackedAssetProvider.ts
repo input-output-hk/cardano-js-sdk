@@ -1,6 +1,7 @@
-import { AssetProvider } from '@cardano-sdk/core';
 import { BehaviorSubject } from 'rxjs';
-import { CLEAN_FN_STATS, ProviderFnStats, ProviderTracker } from './ProviderTracker';
+import { CLEAN_FN_STATS, ProviderTracker } from './ProviderTracker.js';
+import type { AssetProvider } from '@cardano-sdk/core';
+import type { ProviderFnStats } from './ProviderTracker.js';
 
 export class AssetProviderStats {
   readonly healthCheck$ = new BehaviorSubject<ProviderFnStats>(CLEAN_FN_STATS);

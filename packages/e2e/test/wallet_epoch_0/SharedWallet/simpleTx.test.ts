@@ -1,6 +1,4 @@
-import { BaseWallet } from '@cardano-sdk/wallet';
-import { Cardano } from '@cardano-sdk/core';
-import { buildSharedWallets } from './utils';
+import { buildSharedWallets } from './utils.js';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import {
   getEnv,
@@ -9,9 +7,11 @@ import {
   waitForWalletStateSettle,
   walletReady,
   walletVariables
-} from '../../../src';
+} from '../../../src/index.js';
 import { isNotNil } from '@cardano-sdk/util';
 import { logger } from '@cardano-sdk/util-dev';
+import type { BaseWallet } from '@cardano-sdk/wallet';
+import type { Cardano } from '@cardano-sdk/core';
 
 const env = getEnv(walletVariables);
 

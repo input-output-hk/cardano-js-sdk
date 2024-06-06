@@ -1,5 +1,5 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Base64Blob, HexBlob, InvalidStringError, castHexBlob, typedBech32, typedHex } from '../src';
+import { Base64Blob, HexBlob, InvalidStringError, castHexBlob, typedBech32, typedHex } from '../src/index.js';
 
 describe('Cardano.util/primitives', () => {
   describe('typedBech32', () => {

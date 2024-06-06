@@ -1,7 +1,7 @@
-import * as Cardano from '../../Cardano';
-import { CborReader, CborWriter } from '../CBOR';
+import { CborReader, CborWriter } from '../CBOR/index.js';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import { UnitInterval } from '../Common';
+import { UnitInterval } from '../Common/index.js';
+import type * as Cardano from '../../Cardano/index.js';
 
 const POOL_VOTING_THRESHOLDS_SIZE = 4;
 

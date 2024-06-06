@@ -1,16 +1,16 @@
 import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { Observable } from 'rxjs';
 import {
   PAGINATION_PAGE_SIZE_LIMIT_ASSETS,
-  TokenMetadataService,
   TypeormAssetProvider,
   createDnsResolver,
   getConnectionConfig,
   getEntities
-} from '../../../src';
-import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
-import { TypeormAssetFixtureBuilder, TypeormAssetWith } from './TypeormAssetFixtureBuilder';
+} from '../../../src/index.js';
+import { TypeormAssetFixtureBuilder, TypeormAssetWith } from './TypeormAssetFixtureBuilder.js';
 import { logger } from '@cardano-sdk/util-dev';
+import type { Observable } from 'rxjs';
+import type { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
+import type { TokenMetadataService } from '../../../src/index.js';
 
 const tokenMetadata = {
   assetId: '4abc',

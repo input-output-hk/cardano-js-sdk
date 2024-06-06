@@ -1,5 +1,6 @@
-import * as Crypto from '@cardano-sdk/crypto';
-import {
+import { Bip32Account } from './Bip32Account.js';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type {
   AccountAddressDerivationPath,
   AccountKeyDerivationPath,
   GroupedAddress,
@@ -9,10 +10,9 @@ import {
   SignBlobResult,
   SignTransactionContext,
   SignTransactionOptions
-} from './types';
-import { Bip32Account } from './Bip32Account';
-import { Cardano } from '@cardano-sdk/core';
-import { HexBlob } from '@cardano-sdk/util';
+} from './types.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { HexBlob } from '@cardano-sdk/util';
 
 export abstract class KeyAgentBase implements KeyAgent {
   readonly #serializableData: SerializableKeyAgentData;

@@ -1,12 +1,7 @@
-import { BehaviorSubject } from 'rxjs';
-import {
-  CLEAN_FN_STATS,
-  ProviderFnStats,
-  TrackedWalletNetworkInfoProvider,
-  WalletNetworkInfoProvider,
-  WalletNetworkInfoProviderStats
-} from '../../../src';
+import { CLEAN_FN_STATS, TrackedWalletNetworkInfoProvider } from '../../../src/index.js';
 import { mockProviders } from '@cardano-sdk/util-dev';
+import type { BehaviorSubject } from 'rxjs';
+import type { ProviderFnStats, WalletNetworkInfoProvider, WalletNetworkInfoProviderStats } from '../../../src/index.js';
 
 describe('TrackedNetworkInfoProvider', () => {
   let networkInfoProvider: WalletNetworkInfoProvider;

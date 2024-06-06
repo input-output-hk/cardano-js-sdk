@@ -1,19 +1,19 @@
 /* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano } from '@cardano-sdk/core';
-import { DataMocks } from '../../data-mocks';
-import { ExtMetadataFormat } from '../../../src/StakePool/types';
-import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
-import { IncomingMessage } from 'http';
+import { DataMocks } from '../../data-mocks/index.js';
+import { ExtMetadataFormat } from '../../../src/StakePool/types.js';
 import {
   StakePoolMetadataServiceError,
   StakePoolMetadataServiceFailure,
   createHttpStakePoolMetadataService
-} from '../../../src';
-import { adaPoolsExtMetadataMock, cip6ExtMetadataMock, mainExtMetadataMock, stakePoolMetadata } from './mocks';
+} from '../../../src/index.js';
+import { adaPoolsExtMetadataMock, cip6ExtMetadataMock, mainExtMetadataMock, stakePoolMetadata } from './mocks.js';
 import { createGenericMockServer, logger } from '@cardano-sdk/util-dev';
 import url from 'url';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import type { IncomingMessage } from 'http';
 
 const UNFETCHABLE = 'http://some_url/unfetchable';
 const INVALID_KEY = 'd75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a';

@@ -2,9 +2,11 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Cardano } from '@cardano-sdk/core';
-import { GroupedAddress, util } from '@cardano-sdk/key-management';
-import { InvalidArgumentError, Transform, areStringsEqualInConstantTime } from '@cardano-sdk/util';
-import { LedgerTxTransformerContext } from '../types';
+import { InvalidArgumentError, areStringsEqualInConstantTime } from '@cardano-sdk/util';
+import { util } from '@cardano-sdk/key-management';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
+import type { LedgerTxTransformerContext } from '../types.js';
+import type { Transform } from '@cardano-sdk/util';
 
 const mapAnchorToParams = (certificate: Cardano.Certificate) => ({
   ...('anchor' in certificate &&

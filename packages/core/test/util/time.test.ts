@@ -1,4 +1,4 @@
-import { Days, Hours, Milliseconds, Minutes, Seconds, TimeSpan } from '../../src/util';
+import { Days, Hours, Milliseconds, Minutes, Seconds, TimeSpan } from '../../src/util/index.js';
 
 const oneAndAHalfDay = Milliseconds(129_600_000);
 const twentyMinutesAndTenSeconds = Milliseconds(1_210_000);

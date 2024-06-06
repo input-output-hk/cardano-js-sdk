@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Cardano, EpochInfo, EraSummary } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
+import { Percent } from '@cardano-sdk/util';
 import {
-  DelegatedStake,
   delegatedStakeEquals,
   epochInfoEquals,
   eraSummariesEquals,
@@ -11,9 +11,10 @@ import {
   transactionsEquals,
   txEquals,
   utxoEquals
-} from '../../../src';
-import { GroupedAddress, WitnessedTx } from '@cardano-sdk/key-management';
-import { Percent } from '@cardano-sdk/util';
+} from '../../../src/index.js';
+import type { DelegatedStake } from '../../../src/index.js';
+import type { EpochInfo, EraSummary } from '@cardano-sdk/core';
+import type { GroupedAddress, WitnessedTx } from '@cardano-sdk/key-management';
 
 describe('equals', () => {
   const txId1 = Cardano.TransactionId('4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6');

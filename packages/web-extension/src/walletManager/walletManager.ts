@@ -1,22 +1,23 @@
-import { AnyBip32Wallet, AnyWallet, WalletId, WalletType } from './types';
 import { BehaviorSubject, ReplaySubject, firstValueFrom, lastValueFrom } from 'rxjs';
-import { Cardano } from '@cardano-sdk/core';
 import { InvalidArgumentError, deepEquals } from '@cardano-sdk/util';
-import { Logger } from 'ts-log';
-import { MessengerDependencies } from '../messaging';
-import { ObservableWallet, storage } from '@cardano-sdk/wallet';
-import { SigningCoordinatorSignApi } from './SigningCoordinator';
-import { Storage } from 'webextension-polyfill';
-import {
+import { WalletType } from './types.js';
+import { buildBip32Witnesser, buildNativeScriptWitnesser } from './util.js';
+import type { AnyBip32Wallet, AnyWallet, WalletId } from './types.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { MessengerDependencies } from '../messaging/index.js';
+import type { ObservableWallet, storage } from '@cardano-sdk/wallet';
+import type { SigningCoordinatorSignApi } from './SigningCoordinator/index.js';
+import type { Storage } from 'webextension-polyfill';
+import type {
   StoresFactory,
   WalletFactory,
   WalletManagerActivateProps,
   WalletManagerApi,
   WalletManagerProps
-} from './walletManager.types';
-import { WalletRepository } from './WalletRepository';
-import { Witnesser } from '@cardano-sdk/key-management';
-import { buildBip32Witnesser, buildNativeScriptWitnesser } from './util';
+} from './walletManager.types.js';
+import type { WalletRepository } from './WalletRepository/index.js';
+import type { Witnesser } from '@cardano-sdk/key-management';
 
 /**
  * Checks if the wallet is a bip32 wallet.

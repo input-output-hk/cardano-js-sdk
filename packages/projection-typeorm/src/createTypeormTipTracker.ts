@@ -1,11 +1,13 @@
-import { BaseProjectionEvent } from '@cardano-sdk/projection';
-import { BlockEntity } from './entity';
-import { ChainSyncEventType, TipOrOrigin } from '@cardano-sdk/core';
+import { BlockEntity } from './entity/index.js';
+import { ChainSyncEventType } from '@cardano-sdk/core';
 import { Observable, ReplaySubject, from, map, of, switchMap, take, tap } from 'rxjs';
-import { ReconnectionConfig } from '@cardano-sdk/util-rxjs';
-import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
-import { TypeormConnection } from './createDataSource';
-import { isRecoverableTypeormError } from './isRecoverableTypeormError';
+import { isRecoverableTypeormError } from './isRecoverableTypeormError.js';
+import { retryBackoff } from 'backoff-rxjs';
+import type { BaseProjectionEvent } from '@cardano-sdk/projection';
+import type { ReconnectionConfig } from '@cardano-sdk/util-rxjs';
+import type { RetryBackoffConfig } from 'backoff-rxjs';
+import type { TipOrOrigin } from '@cardano-sdk/core';
+import type { TypeormConnection } from './createDataSource.js';
 
 export interface CreateTypeormTipTrackerProps {
   connection$: Observable<TypeormConnection>;

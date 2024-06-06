@@ -1,4 +1,4 @@
-import { KeyRole } from '../../src';
+import { KeyRole } from '../../src/index.js';
 
 export const stakeKeyDerivationPath = {
   index: 0,

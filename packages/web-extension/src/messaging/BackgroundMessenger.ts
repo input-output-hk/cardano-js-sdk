@@ -3,7 +3,6 @@ import {
   BehaviorSubject,
   EmptyError,
   ReplaySubject,
-  Subject,
   bufferCount,
   catchError,
   filter,
@@ -15,10 +14,18 @@ import {
   pairwise,
   tap
 } from 'rxjs';
-import { ChannelName, DisconnectEvent, Messenger, MessengerDependencies, MessengerPort, PortMessage } from './types';
-import { Logger } from 'ts-log';
-import { deriveChannelName } from './util';
+import { deriveChannelName } from './util.js';
 import { retryBackoff } from 'backoff-rxjs';
+import type {
+  ChannelName,
+  DisconnectEvent,
+  Messenger,
+  MessengerDependencies,
+  MessengerPort,
+  PortMessage
+} from './types.js';
+import type { Logger } from 'ts-log';
+import type { Subject } from 'rxjs';
 
 interface Channel {
   message$: Subject<PortMessage>;

@@ -1,7 +1,8 @@
-import { AsyncKeyAgent } from '@cardano-sdk/key-management';
-import { MessengerDependencies, exposeApi } from '../messaging';
-import { keyAgentChannel, keyAgentProperties } from './util';
+import { exposeApi } from '../messaging/index.js';
+import { keyAgentChannel, keyAgentProperties } from './util.js';
 import { of } from 'rxjs';
+import type { AsyncKeyAgent } from '@cardano-sdk/key-management';
+import type { MessengerDependencies } from '../messaging/index.js';
 
 export interface ExposeKeyAgentProps {
   keyAgent: AsyncKeyAgent;

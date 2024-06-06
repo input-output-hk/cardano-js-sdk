@@ -1,7 +1,7 @@
-import { APExtMetadataResponse, Cip6ExtMetadataResponse } from './HttpStakePoolMetadata';
-import { Cardano } from '@cardano-sdk/core';
-import { CustomError } from 'ts-custom-error';
-import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import type { APExtMetadataResponse, Cip6ExtMetadataResponse } from './HttpStakePoolMetadata/index.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { CustomError } from 'ts-custom-error';
+import type { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 
 export interface StakePoolMetadataService {
   getStakePoolMetadata(hash: Hash32ByteBase16, url: string): Promise<Cardano.StakePoolMetadata | CustomError>;

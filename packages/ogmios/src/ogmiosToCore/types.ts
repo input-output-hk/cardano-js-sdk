@@ -1,4 +1,4 @@
-import { Schema } from '@cardano-ogmios/client';
+import type { Schema } from '@cardano-ogmios/client';
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 /**

@@ -1,8 +1,8 @@
-import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { Cardano } from '@cardano-sdk/core';
-import { LedgerTxTransformerContext } from '../types';
-import { Transform } from '@cardano-sdk/util';
 import { TxInId, util } from '@cardano-sdk/key-management';
+import type * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import type { Cardano } from '@cardano-sdk/core';
+import type { LedgerTxTransformerContext } from '../types.js';
+import type { Transform } from '@cardano-sdk/util';
 
 const resolveKeyPath = (
   txIn: Cardano.TxIn,

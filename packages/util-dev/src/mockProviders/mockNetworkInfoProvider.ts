@@ -1,5 +1,5 @@
-import { genesisParameters, ledgerTip, protocolParameters } from './mockData';
-import { testnetEraSummaries } from '../eraSummaries';
+import { genesisParameters, ledgerTip, protocolParameters } from './mockData.js';
+import { testnetEraSummaries } from '../eraSummaries.js';
 
 export const networkInfo = {
   lovelaceSupply: {

@@ -1,8 +1,8 @@
-import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { OnDeleteCascadeRelationOptions } from './util';
-import { PoolRegistrationEntity } from './PoolRegistration.entity';
-import { StakePoolEntity } from './StakePool.entity';
+import { OnDeleteCascadeRelationOptions } from './util.js';
+import { PoolRegistrationEntity } from './PoolRegistration.entity.js';
+import { StakePoolEntity } from './StakePool.entity.js';
+import type { Cardano } from '@cardano-sdk/core';
 
 @Entity()
 export class PoolMetadataEntity {

@@ -1,17 +1,20 @@
 /* eslint-disable promise/no-nesting */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unicorn/no-nested-ternary */
-import { ConnectionNames, PosgresProgramOptions, getPostgresOption } from '../options/postgres';
-import { DnsResolver } from '../utils';
-import { InvalidProgramOption, MissingProgramOption } from '../errors';
-import { Logger } from 'ts-log';
-import { Observable, defer, from, of } from 'rxjs';
-import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
-import { Pool, PoolConfig, QueryConfig } from 'pg';
-import { TlsOptions } from 'tls';
+import { InvalidProgramOption, MissingProgramOption } from '../errors/index.js';
+import { Pool } from 'pg';
+import { defer, from, of } from 'rxjs';
+import { getPostgresOption } from '../options/postgres.js';
 import { isConnectionError, toSerializableObject } from '@cardano-sdk/util';
 import connString from 'pg-connection-string';
 import fs from 'fs';
+import type { ConnectionNames, PosgresProgramOptions } from '../options/postgres.js';
+import type { DnsResolver } from '../utils.js';
+import type { Logger } from 'ts-log';
+import type { Observable } from 'rxjs';
+import type { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
+import type { PoolConfig, QueryConfig } from 'pg';
+import type { TlsOptions } from 'tls';
 
 const TIMEOUT = 60 * 1000;
 

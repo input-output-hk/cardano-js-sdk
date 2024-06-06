@@ -1,9 +1,6 @@
-import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, KeyRole } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import {
-  KeyAgentFactoryProps,
-  TestWallet,
   bip32Ed25519Factory,
   getEnv,
   getTxConfirmationEpoch,
@@ -13,12 +10,14 @@ import {
   waitForWalletStateSettle,
   walletReady,
   walletVariables
-} from '../../src';
+} from '../../src/index.js';
 import { containerExec } from 'dockerode-utils';
 import { getRandomPort } from 'get-port-please';
 import { logger } from '@cardano-sdk/util-dev';
 import Docker from 'dockerode';
 import path from 'path';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { KeyAgentFactoryProps, TestWallet } from '../../src/index.js';
 
 const vrf = Cardano.VrfVkHex('2ee5a4c423224bb9c42107fc18a60556d6a83cec1d9dd37a71f56af7198fc759');
 
@@ -68,7 +67,7 @@ describe('cache invalidation', () => {
 
     const override = Object.fromEntries(
       Object.entries(process.env)
-        .filter(([key]) => walletVariables.includes(key as typeof walletVariables[number]))
+        .filter(([key]) => walletVariables.includes(key as (typeof walletVariables)[number]))
         .map(([key, value]) => [key, value?.replace('localhost:4000/', `localhost:${port}/`)])
     );
     const env = getEnv(walletVariables, { override });

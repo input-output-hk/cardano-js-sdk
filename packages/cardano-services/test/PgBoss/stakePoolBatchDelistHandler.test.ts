@@ -1,11 +1,11 @@
-import { DataSource } from 'typeorm';
-import { Pool } from 'pg';
 import { PoolDelistedEntity } from '@cardano-sdk/projection-typeorm';
-import { WorkerHandlerFactoryOptions } from '../../src/PgBoss';
-import { createSmashStakePoolDelistedService } from '../../src/StakePool/HttpStakePoolMetadata/SmashStakePoolDelistedService';
-import { initHandlerTest } from './util';
+import { createSmashStakePoolDelistedService } from '../../src/StakePool/HttpStakePoolMetadata/SmashStakePoolDelistedService.js';
+import { initHandlerTest } from './util.js';
 import { logger } from '@cardano-sdk/util-dev';
-import { stakePoolBatchDelistHandlerFactory } from '../../src/PgBoss/stakePoolBatchDelistHandler';
+import { stakePoolBatchDelistHandlerFactory } from '../../src/PgBoss/stakePoolBatchDelistHandler.js';
+import type { DataSource } from 'typeorm';
+import type { Pool } from 'pg';
+import type { WorkerHandlerFactoryOptions } from '../../src/PgBoss/index.js';
 
 jest.mock('../../src/StakePool/HttpStakePoolMetadata/SmashStakePoolDelistedService');
 

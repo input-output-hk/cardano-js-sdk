@@ -1,5 +1,5 @@
 import { EMPTY, from, lastValueFrom } from 'rxjs';
-import { finalizeWithLatest } from '../src';
+import { finalizeWithLatest } from '../src/index.js';
 
 describe('finalizeWithLatest', () => {
   describe('source completes without emitting', () => {

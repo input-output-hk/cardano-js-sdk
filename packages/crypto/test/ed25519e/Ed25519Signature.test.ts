@@ -1,6 +1,6 @@
-import * as Crypto from '../../src';
+import * as Crypto from '../../src/index.js';
 import { InvalidStringError } from '@cardano-sdk/util';
-import { testVectorMessageZeroLength } from './Ed25519TestVectors';
+import { testVectorMessageZeroLength } from './Ed25519TestVectors.js';
 
 describe('Ed25519Signature', () => {
   it('can create an instance from a valid Ed25519 signature hex representation', () => {

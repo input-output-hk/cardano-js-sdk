@@ -1,8 +1,10 @@
-import { Address, Credential, CredentialType } from './Address';
+import { Address, CredentialType } from './Address.js';
 import { Ed25519KeyHashHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { NetworkId } from '../ChainId';
-import { OpaqueString, typedBech32 } from '@cardano-sdk/util';
-import { RewardAddress } from './RewardAddress';
+import { RewardAddress } from './RewardAddress.js';
+import { typedBech32 } from '@cardano-sdk/util';
+import type { Credential } from './Address.js';
+import type { NetworkId } from '../ChainId.js';
+import type { OpaqueString } from '@cardano-sdk/util';
 
 /** mainnet or testnet stake address as bech32 string, consisting of network tag and stake credential */
 export type RewardAccount = OpaqueString<'RewardAccount'>;

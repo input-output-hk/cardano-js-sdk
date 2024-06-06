@@ -1,12 +1,14 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
-import { GroupedAddress, InMemoryKeyAgent, WitnessedTx, util } from '@cardano-sdk/key-management';
 import { HexBlob } from '@cardano-sdk/util';
-import { Observable, catchError, filter, firstValueFrom, throwError, timeout } from 'rxjs';
-import { ObservableWallet, OutgoingTx, WalletUtil } from '../src';
+import { InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
 import { SodiumBip32Ed25519 } from '@cardano-sdk/crypto';
+import { catchError, filter, firstValueFrom, throwError, timeout } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
-import { testAsyncKeyAgent } from '../../key-management/test/mocks';
+import { testAsyncKeyAgent } from '../../key-management/test/mocks/index.js';
+import type { GroupedAddress, WitnessedTx } from '@cardano-sdk/key-management';
+import type { Observable } from 'rxjs';
+import type { ObservableWallet, OutgoingTx, WalletUtil } from '../src/index.js';
 
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;

@@ -1,4 +1,5 @@
-import { Observable, combineLatest, concat, ignoreElements, of, share, take } from 'rxjs';
+import { combineLatest, concat, ignoreElements, of, share, take } from 'rxjs';
+import type { Observable } from 'rxjs';
 
 /** Subscribe to o$ after trigger$ emits its first value */
 const startOnTrigger = <A, B>(trigger$: Observable<A>, o$: Observable<B>) =>

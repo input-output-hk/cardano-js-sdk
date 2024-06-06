@@ -1,4 +1,5 @@
-import { Transformer, transformObj } from '../src';
+import { transformObj } from '../src/index.js';
+import type { Transformer } from '../src/index.js';
 
 const stubDns = new Map<string, string>([
   ['localhost', '0.0.0.0'],

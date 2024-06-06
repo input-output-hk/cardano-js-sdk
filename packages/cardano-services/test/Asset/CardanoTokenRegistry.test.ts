@@ -1,10 +1,15 @@
 /* eslint-disable max-len */
 import { Cardano, ProviderError, ProviderFailure, Seconds } from '@cardano-sdk/core';
-import { CardanoTokenRegistry, DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT, toCoreTokenMetadata } from '../../src/Asset';
-import { InMemoryCache, Key } from '../../src/InMemoryCache';
+import {
+  CardanoTokenRegistry,
+  DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT,
+  toCoreTokenMetadata
+} from '../../src/Asset/index.js';
+import { InMemoryCache } from '../../src/InMemoryCache/index.js';
 import { logger } from '@cardano-sdk/util-dev';
-import { mockTokenRegistry } from './fixtures/mocks';
-import { sleep } from '../util';
+import { mockTokenRegistry } from './fixtures/mocks.js';
+import { sleep } from '../util.js';
+import type { Key } from '../../src/InMemoryCache/index.js';
 
 const testDescription = 'test description';
 const testName = 'test name';

@@ -1,6 +1,6 @@
-import { Application } from 'express';
-import { ListenOptions } from 'net';
-import http from 'http';
+import type { Application } from 'express';
+import type { ListenOptions } from 'net';
+import type http from 'http';
 
 export const listenPromise = (
   serverLike: http.Server | Application,

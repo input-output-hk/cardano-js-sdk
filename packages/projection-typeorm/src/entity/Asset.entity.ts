@@ -1,9 +1,9 @@
-import { BlockEntity } from './Block.entity';
+import { BlockEntity } from './Block.entity.js';
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
-import { NftMetadataEntity } from './NftMetadata.entity';
-import { OnDeleteCascadeRelationOptions, OnDeleteSetNullRelationOptions } from './util';
-import { parseBigInt } from './transformers';
+import { NftMetadataEntity } from './NftMetadata.entity.js';
+import { OnDeleteCascadeRelationOptions, OnDeleteSetNullRelationOptions } from './util.js';
+import { parseBigInt } from './transformers.js';
 
 @Entity()
 export class AssetEntity {

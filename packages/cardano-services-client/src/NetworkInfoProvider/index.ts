@@ -1,1 +1,1 @@
-export * from './networkInfoHttpProvider';
+export * from './networkInfoHttpProvider.js';

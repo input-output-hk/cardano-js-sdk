@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
+import type { TxWithEpoch } from '../../../src/services/DelegationTracker/types.js';
 
 export const createStubTxWithCertificates = (
   certificates?: Cardano.Certificate[],

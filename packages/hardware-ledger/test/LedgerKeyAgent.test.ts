@@ -4,9 +4,9 @@ import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Ada, InvalidDataReason } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Cardano } from '@cardano-sdk/core';
 import { CardanoKeyConst, CommunicationType, util } from '@cardano-sdk/key-management';
-import { LedgerKeyAgent } from '../src';
+import { LedgerKeyAgent } from '../src/index.js';
 import { dummyLogger } from 'ts-log';
-import { poolId, poolParameters, pureAdaTxOut, stakeKeyHash, txIn, txOutWithDatum } from './testData';
+import { poolId, poolParameters, pureAdaTxOut, stakeKeyHash, txIn, txOutWithDatum } from './testData.js';
 import Transport from '@ledgerhq/hw-transport';
 
 describe('LedgerKeyAgent', () => {

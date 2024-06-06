@@ -1,8 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Asset, Cardano, metadatum, nativeScriptPolicyId } from '@cardano-sdk/core';
-import { Assets, BaseWallet, FinalizeTxProps } from '@cardano-sdk/wallet';
-import { InitializeTxProps } from '@cardano-sdk/tx-construction';
-import { KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
+import { Cardano, metadatum, nativeScriptPolicyId } from '@cardano-sdk/core';
+import { KeyRole, util } from '@cardano-sdk/key-management';
 import {
   bip32Ed25519Factory,
   burnTokens,
@@ -13,9 +11,13 @@ import {
   submitAndConfirm,
   walletReady,
   walletVariables
-} from '../../../src';
+} from '../../../src/index.js';
 import { combineLatest, filter, firstValueFrom, map } from 'rxjs';
 import { createLogger } from '@cardano-sdk/util-dev';
+import type { Asset } from '@cardano-sdk/core';
+import type { Assets, BaseWallet, FinalizeTxProps } from '@cardano-sdk/wallet';
+import type { InitializeTxProps } from '@cardano-sdk/tx-construction';
+import type { TransactionSigner } from '@cardano-sdk/key-management';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();

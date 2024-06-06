@@ -1,5 +1,5 @@
-import { BaseWallet } from '@cardano-sdk/wallet';
-import { GroupedAddress } from '@cardano-sdk/key-management';
+import type { BaseWallet } from '@cardano-sdk/wallet';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
 
 /** The context variables shared between all the hooks. */
 export interface WalletVars {

@@ -1,5 +1,32 @@
 /* eslint-disable sonarjs/no-nested-template-literals */
+import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { findLastEpoch } from '../../util/index.js';
 import {
+  mapAddressOwner,
+  mapBlockfrostPoolMetrics,
+  mapEpoch,
+  mapPoolAPY,
+  mapPoolData,
+  mapPoolMetrics,
+  mapPoolRegistration,
+  mapPoolRetirement,
+  mapPoolStats,
+  mapPoolUpdate,
+  mapRelay
+} from './mappers.js';
+import Queries, {
+  addSentenceToQuery,
+  blockfrostQuery,
+  buildOrQueryFromClauses,
+  findPoolStats,
+  getIdentifierFullJoinClause,
+  getIdentifierWhereClause,
+  getStatusWhereClause,
+  poolsByPledgeMetSubqueries,
+  withPagination,
+  withSort
+} from './queries.js';
+import type {
   BlockfrostPoolMetricsModel,
   EpochModel,
   OrderByOptions,
@@ -15,43 +42,10 @@ import {
   RelayModel,
   StakePoolStatsModel,
   SubQuery
-} from './types';
-import {
-  Cardano,
-  MultipleChoiceSearchFilter,
-  ProviderError,
-  ProviderFailure,
-  QueryStakePoolsArgs,
-  StakePoolStats
-} from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
-import { Pool, QueryResult } from 'pg';
-import { findLastEpoch } from '../../util';
-import {
-  mapAddressOwner,
-  mapBlockfrostPoolMetrics,
-  mapEpoch,
-  mapPoolAPY,
-  mapPoolData,
-  mapPoolMetrics,
-  mapPoolRegistration,
-  mapPoolRetirement,
-  mapPoolStats,
-  mapPoolUpdate,
-  mapRelay
-} from './mappers';
-import Queries, {
-  addSentenceToQuery,
-  blockfrostQuery,
-  buildOrQueryFromClauses,
-  findPoolStats,
-  getIdentifierFullJoinClause,
-  getIdentifierWhereClause,
-  getStatusWhereClause,
-  poolsByPledgeMetSubqueries,
-  withPagination,
-  withSort
-} from './queries';
+} from './types.js';
+import type { Cardano, MultipleChoiceSearchFilter, QueryStakePoolsArgs, StakePoolStats } from '@cardano-sdk/core';
+import type { Logger } from 'ts-log';
+import type { Pool, QueryResult } from 'pg';
 
 export class StakePoolBuilder {
   #db: Pool;

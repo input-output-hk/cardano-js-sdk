@@ -1,2 +1,2 @@
-export * from './TxCBOR';
-export * from './TxBodyCBOR';
+export * from './TxCBOR.js';
+export * from './TxBodyCBOR.js';

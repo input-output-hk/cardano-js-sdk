@@ -1,4 +1,4 @@
-import { ProjectionName, prepareTypeormProjection } from '../../src';
+import { ProjectionName, prepareTypeormProjection } from '../../src/index.js';
 import { dummyLogger } from 'ts-log';
 
 const prepare = (projections: ProjectionName[]) =>

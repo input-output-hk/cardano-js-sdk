@@ -1,13 +1,9 @@
-import { DbSyncProvider, DbSyncProviderDependencies } from '../../util/DbSyncProvider';
-import {
-  ProviderError,
-  ProviderFailure,
-  RewardAccountBalanceArgs,
-  RewardsHistoryArgs,
-  RewardsProvider
-} from '@cardano-sdk/core';
-import { RewardsBuilder } from './RewardsBuilder';
-import { rewardsToCore } from './mappers';
+import { DbSyncProvider } from '../../util/DbSyncProvider/index.js';
+import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { RewardsBuilder } from './RewardsBuilder.js';
+import { rewardsToCore } from './mappers.js';
+import type { DbSyncProviderDependencies } from '../../util/DbSyncProvider/index.js';
+import type { RewardAccountBalanceArgs, RewardsHistoryArgs, RewardsProvider } from '@cardano-sdk/core';
 
 /** Properties that are need to create DbSyncRewardsProvider */
 export interface RewardsProviderProps {

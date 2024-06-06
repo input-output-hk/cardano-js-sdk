@@ -1,3 +1,3 @@
-export * from './Script';
-export * from './NativeScript';
-export * from './PlutusScript';
+export * from './Script.js';
+export * from './NativeScript/index.js';
+export * from './PlutusScript/index.js';

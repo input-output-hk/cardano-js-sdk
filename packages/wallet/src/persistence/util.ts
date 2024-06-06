@@ -1,5 +1,6 @@
-import { CollectionStore } from './types';
-import { EMPTY, Subject, concat, defaultIfEmpty, race } from 'rxjs';
+import { EMPTY, concat, defaultIfEmpty, race } from 'rxjs';
+import type { CollectionStore } from './types.js';
+import type { Subject } from 'rxjs';
 
 export const observeAll =
   <T>(store: CollectionStore<T>, updates$: Subject<T[]>) =>

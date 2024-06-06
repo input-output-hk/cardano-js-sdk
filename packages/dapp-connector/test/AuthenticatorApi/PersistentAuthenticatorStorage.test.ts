@@ -1,4 +1,4 @@
-import { createPersistentAuthenticatorStorage } from '../../src';
+import { createPersistentAuthenticatorStorage } from '../../src/index.js';
 
 describe('createPersistentAuthenticatorStorage', () => {
   it('wraps calls to underlying storage under specified key', async () => {

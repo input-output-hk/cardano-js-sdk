@@ -1,9 +1,16 @@
-import { ActiveStakeModel, CirculatingSupplyModel, EpochModel, ProtocolParamsModel, TotalSupplyModel } from './types';
-import { Cardano } from '@cardano-sdk/core';
-import { LedgerTipModel, findLedgerTipOptions } from '../../util/DbSyncProvider';
-import { Logger } from 'ts-log';
-import { Pool, QueryResult } from 'pg';
-import Queries from './queries';
+import { findLedgerTipOptions } from '../../util/DbSyncProvider/index.js';
+import Queries from './queries.js';
+import type {
+  ActiveStakeModel,
+  CirculatingSupplyModel,
+  EpochModel,
+  ProtocolParamsModel,
+  TotalSupplyModel
+} from './types.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { LedgerTipModel } from '../../util/DbSyncProvider/index.js';
+import type { Logger } from 'ts-log';
+import type { Pool, QueryResult } from 'pg';
 
 export class NetworkInfoBuilder {
   #db: Pool;

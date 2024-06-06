@@ -1,10 +1,11 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { BaseWallet, TransactionFailure } from '../../src';
 import { Cardano } from '@cardano-sdk/core';
-import { createWallet } from './util';
+import { TransactionFailure } from '../../src/index.js';
+import { createWallet } from './util.js';
 import { firstValueFrom, of } from 'rxjs';
 import { mockProviders as mocks } from '@cardano-sdk/util-dev';
-import uniq from 'lodash/uniq';
+import uniq from 'lodash/uniq.js';
+import type { BaseWallet } from '../../src/index.js';
 
 describe('integration/withdrawal', () => {
   let wallet: BaseWallet;

@@ -1,10 +1,11 @@
-import * as Cardano from '../Cardano';
-import { AssetInfo } from '../Asset';
-import { AssetProvider } from '../Provider';
-import { Inspector, resolveInputs } from './txInspector';
-import { coalesceValueQuantities } from './coalesceValueQuantities';
-import { subtractValueQuantities } from './subtractValueQuantities';
-import uniq from 'lodash/uniq';
+import { coalesceValueQuantities } from './coalesceValueQuantities.js';
+import { resolveInputs } from './txInspector.js';
+import { subtractValueQuantities } from './subtractValueQuantities.js';
+import uniq from 'lodash/uniq.js';
+import type * as Cardano from '../Cardano/index.js';
+import type { AssetInfo } from '../Asset/index.js';
+import type { AssetProvider } from '../Provider/index.js';
+import type { Inspector } from './txInspector.js';
 
 export type AssetInfoWithAmount = { amount: Cardano.Lovelace; assetInfo: AssetInfo };
 

@@ -1,8 +1,9 @@
 /* eslint-disable prettier/prettier */
 /* eslint key-spacing: ["error", { align: { afterColon: true, beforeColon: false, on: "value" } }] */
 import * as envalid from 'envalid';
-import { InspectOptions, inspect } from 'util';
+import { inspect } from 'util';
 import JSONbig from 'json-bigint';
+import type { InspectOptions } from 'util';
 
 const logLevels = { debug: 2, error: 5, fatal: 6, info: 3, trace: 1, warn: 4 };
 const logLevelLabels = ['', 'TRACE  ', 'DEBUG  ', 'INFO   ', 'WARNING', 'ERROR  ', 'FATAL  '];

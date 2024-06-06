@@ -1,5 +1,5 @@
-import { Logger } from 'ts-log';
 import { Observable, map, mergeMap, take, timer } from 'rxjs';
+import type { Logger } from 'ts-log';
 
 export interface LoadTestSchedulerProps<T> {
   /** Time in seconds during which the scheduler calls the `callUnderTest` */

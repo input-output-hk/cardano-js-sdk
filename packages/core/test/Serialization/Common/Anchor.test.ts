@@ -1,8 +1,8 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
-import { Anchor } from '../../../src/Serialization';
-import { Cardano } from '../../../src';
+import { Anchor } from '../../../src/Serialization/index.js';
 import { HexBlob } from '@cardano-sdk/util';
+import type { Cardano } from '../../../src/index.js';
 
 // Test data used in the following tests was generated with the cardano-serialization-lib
 const cbor = HexBlob(

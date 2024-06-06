@@ -1,9 +1,10 @@
-import { AddressTracker, createAddressTracker } from '../../src';
-import { Cardano } from '@cardano-sdk/core';
 import { EMPTY, firstValueFrom, of } from 'rxjs';
-import { GroupedAddress } from '@cardano-sdk/key-management';
-import { WalletStores } from '../../src/persistence';
+import { createAddressTracker } from '../../src/index.js';
 import { createTestScheduler, logger } from '@cardano-sdk/util-dev';
+import type { AddressTracker } from '../../src/index.js';
+import type { Cardano } from '@cardano-sdk/core';
+import type { GroupedAddress } from '@cardano-sdk/key-management';
+import type { WalletStores } from '../../src/persistence/index.js';
 
 describe('AddressTracker', () => {
   let store: jest.Mocked<WalletStores['addresses']>;

@@ -1,5 +1,5 @@
-import { Cardano } from '@cardano-sdk/core';
-import { Selection } from '../';
+import type { Cardano } from '@cardano-sdk/core';
+import type { Selection } from '../../src/index.js';
 
 /**
  * Resolves the addresses to be used for change outputs.

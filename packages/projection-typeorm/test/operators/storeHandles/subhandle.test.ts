@@ -1,11 +1,13 @@
-import { Asset, Cardano, Handle, Serialization } from '@cardano-sdk/core';
-import { HandleEntity } from '../../../src';
+import { Asset, Cardano, Serialization } from '@cardano-sdk/core';
+import { HandleEntity } from '../../../src/index.js';
 import { HexBlob } from '@cardano-sdk/util';
-import { ProjectorContext, createProjectorContext } from '../util';
-import { QueryRunner, Repository } from 'typeorm';
-import { createMultiTxProjectionSource, entities, mapAndStore, policyId } from './util';
+import { createMultiTxProjectionSource, entities, mapAndStore, policyId } from './util.js';
+import { createProjectorContext } from '../util.js';
 import { firstValueFrom } from 'rxjs';
-import { initializeDataSource } from '../../util';
+import { initializeDataSource } from '../../util.js';
+import type { Handle } from '@cardano-sdk/core';
+import type { ProjectorContext } from '../util.js';
+import type { QueryRunner, Repository } from 'typeorm';
 
 const virtualSubhandleDatum = Serialization.PlutusData.fromCbor(
   HexBlob(

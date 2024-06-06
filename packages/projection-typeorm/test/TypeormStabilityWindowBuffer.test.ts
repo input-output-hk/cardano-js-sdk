@@ -2,16 +2,18 @@ import {
   BlockDataEntity,
   BlockEntity,
   TypeormStabilityWindowBuffer,
-  WithTypeormContext,
   createObservableConnection,
   willStoreBlockData
-} from '../src';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { DataSource, NoConnectionForRepositoryError, QueryRunner, Repository } from 'typeorm';
-import { ProjectionEvent } from '@cardano-sdk/projection';
-import { connectionConfig$, createBlockEntity, createBlockHeader, initializeDataSource } from './util';
+} from '../src/index.js';
+import { ChainSyncEventType } from '@cardano-sdk/core';
+import { NoConnectionForRepositoryError } from 'typeorm';
+import { connectionConfig$, createBlockEntity, createBlockHeader, initializeDataSource } from './util.js';
 import { createStubObservable, logger } from '@cardano-sdk/util-dev';
 import { firstValueFrom, of, throwError } from 'rxjs';
+import type { Cardano } from '@cardano-sdk/core';
+import type { DataSource, QueryRunner, Repository } from 'typeorm';
+import type { ProjectionEvent } from '@cardano-sdk/projection';
+import type { WithTypeormContext } from '../src/index.js';
 
 const createBlock = (height: number): Cardano.Block =>
   ({

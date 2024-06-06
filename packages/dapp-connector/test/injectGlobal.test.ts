@@ -1,9 +1,10 @@
-import { ApiError } from '../src/errors';
-import { Cip30Wallet } from '../src/WalletApi';
-import { RemoteAuthenticator, WindowMaybeWithCardano, injectGlobal } from '../src';
-import { api, properties, stubAuthenticator } from './testWallet';
+import { ApiError } from '../src/errors/index.js';
+import { Cip30Wallet } from '../src/WalletApi/index.js';
+import { api, properties, stubAuthenticator } from './testWallet.js';
+import { injectGlobal } from '../src/index.js';
 import { dummyLogger as logger } from 'ts-log';
 import { mocks } from 'mock-browser';
+import type { RemoteAuthenticator, WindowMaybeWithCardano } from '../src/index.js';
 
 describe('injectGlobal', () => {
   let window: ReturnType<typeof mocks.MockBrowser>;

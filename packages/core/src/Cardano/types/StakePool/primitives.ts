@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as BaseEncoding from '@scure/base';
 import * as Crypto from '@cardano-sdk/crypto';
-import { HexBlob, OpaqueString, typedBech32, typedHex } from '@cardano-sdk/util';
+import { HexBlob, typedBech32, typedHex } from '@cardano-sdk/util';
+import type { OpaqueString } from '@cardano-sdk/util';
 
 const MAX_BECH32_LENGTH_LIMIT = 1023;
 

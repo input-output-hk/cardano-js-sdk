@@ -1,5 +1,5 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
 import { NftMetadataEntity } from '@cardano-sdk/projection-typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class NftMetadataTableMigration1690269355640 implements MigrationInterface {
   static entity = NftMetadataEntity;

@@ -1,28 +1,33 @@
 /* eslint-disable unicorn/consistent-destructuring, sonarjs/no-duplicate-string, @typescript-eslint/no-floating-promises, promise/no-nesting, promise/always-return */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressDiscovery, BaseWallet, TxInFlight, createPersonalWallet } from '../../src';
-import { AddressType, Bip32Account, GroupedAddress, Witnesser, util } from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, util } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
-import { BehaviorSubject, Subscription, firstValueFrom, skip } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, skip } from 'rxjs';
 import {
   Cardano,
-  ChainHistoryProvider,
-  HandleProvider,
   ProviderError,
   ProviderFailure,
-  RewardsProvider,
   Serialization,
-  StakePoolProvider,
   TxCBOR,
   TxSubmissionError,
-  TxSubmissionErrorCode,
-  ValueNotConservedData
+  TxSubmissionErrorCode
 } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
-import { InitializeTxProps } from '@cardano-sdk/tx-construction';
-import { buildDRepIDFromDRepKey, toOutgoingTx, waitForWalletStateSettle } from '../util';
-import { getPassphrase, stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
+import { buildDRepIDFromDRepKey, toOutgoingTx, waitForWalletStateSettle } from '../util.js';
+import { createPersonalWallet } from '../../src/index.js';
+import { getPassphrase, stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks/index.js';
 import { dummyLogger as logger } from 'ts-log';
+import type { AddressDiscovery, BaseWallet, TxInFlight } from '../../src/index.js';
+import type {
+  ChainHistoryProvider,
+  HandleProvider,
+  RewardsProvider,
+  StakePoolProvider,
+  ValueNotConservedData
+} from '@cardano-sdk/core';
+import type { GroupedAddress, Witnesser } from '@cardano-sdk/key-management';
+import type { InitializeTxProps } from '@cardano-sdk/tx-construction';
+import type { Subscription } from 'rxjs';
 
 const { mockChainHistoryProvider, mockRewardsProvider, utxo } = mocks;
 

@@ -1,9 +1,6 @@
-import { Cardano } from '@cardano-sdk/core';
-import { ConnectionStatus, PersistentDocumentTrackerSubject, tipEquals } from './util';
-import { DocumentStore } from '../persistence';
+import { ConnectionStatus, PersistentDocumentTrackerSubject, tipEquals } from './util/index.js';
 import {
   EMPTY,
-  Observable,
   Subject,
   combineLatest,
   concat,
@@ -20,9 +17,12 @@ import {
   tap,
   timeout
 } from 'rxjs';
-import { Logger } from 'ts-log';
-import { Milliseconds } from './types';
-import { SyncStatus } from '../types';
+import type { Cardano } from '@cardano-sdk/core';
+import type { DocumentStore } from '../persistence/index.js';
+import type { Logger } from 'ts-log';
+import type { Milliseconds } from './types.js';
+import type { Observable } from 'rxjs';
+import type { SyncStatus } from '../types.js';
 export interface TipTrackerProps {
   provider$: Observable<Cardano.Tip>;
   syncStatus: SyncStatus;

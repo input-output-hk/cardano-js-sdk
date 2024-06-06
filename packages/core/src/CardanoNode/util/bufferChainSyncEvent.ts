@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { RequestNext, WithRequestNext } from '../types';
+import type { RequestNext, WithRequestNext } from '../types/index.js';
 
 export const bufferChainSyncEvent =
   <T extends WithRequestNext>(length: number) =>

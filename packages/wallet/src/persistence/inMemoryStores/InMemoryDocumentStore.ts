@@ -1,6 +1,7 @@
-import { DocumentStore } from '../types';
-import { EMPTY, Observable, of } from 'rxjs';
-import { InMemoryStore } from './InMemoryStore';
+import { EMPTY, of } from 'rxjs';
+import { InMemoryStore } from './InMemoryStore.js';
+import type { DocumentStore } from '../types.js';
+import type { Observable } from 'rxjs';
 
 export class InMemoryDocumentStore<T> extends InMemoryStore implements DocumentStore<T> {
   #doc: T | null = null;

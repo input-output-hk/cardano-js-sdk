@@ -1,6 +1,5 @@
-import { Cardano } from '@cardano-sdk/core';
-import { GreedyInputSelector } from '../../src';
-import { MOCK_NO_CONSTRAINTS, mockConstraintsToConstraints } from '../util/selectionConstraints';
+import { GreedyInputSelector } from '../../src/index.js';
+import { MOCK_NO_CONSTRAINTS, mockConstraintsToConstraints } from '../util/selectionConstraints.js';
 import { TxTestUtil } from '@cardano-sdk/util-dev';
 import {
   asAssetId,
@@ -8,7 +7,8 @@ import {
   asTokenMap,
   assertInputSelectionProperties,
   getCoinValueForAddress
-} from '../util';
+} from '../util/index.js';
+import type { Cardano } from '@cardano-sdk/core';
 
 describe('GreedySelection', () => {
   it('consumes all the UTXOs in the set and returns that total amount distributed in the change minus the fee', async () => {

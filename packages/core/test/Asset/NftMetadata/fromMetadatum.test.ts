@@ -1,8 +1,9 @@
 /* eslint-disable unicorn/no-useless-undefined */
-import { Asset, Cardano } from '../../../src';
-import { AssetName, Metadatum, PolicyId, TxMetadata } from '../../../src/Cardano';
+import { Asset, Cardano } from '../../../src/index.js';
+import { AssetName, PolicyId } from '../../../src/Cardano/index.js';
 import { dummyLogger } from 'ts-log';
 import { fromSerializableObject } from '@cardano-sdk/util';
+import type { Metadatum, TxMetadata } from '../../../src/Cardano/index.js';
 
 const logger = dummyLogger;
 

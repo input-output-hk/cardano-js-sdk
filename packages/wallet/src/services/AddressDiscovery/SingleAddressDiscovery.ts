@@ -1,5 +1,6 @@
-import { AddressDiscovery } from '../types';
-import { AddressType, Bip32Account, GroupedAddress } from '@cardano-sdk/key-management';
+import { AddressType } from '@cardano-sdk/key-management';
+import type { AddressDiscovery } from '../types.js';
+import type { Bip32Account, GroupedAddress } from '@cardano-sdk/key-management';
 
 /**
  * Discovers the first address in the derivation chain (both payment and stake credentials) without looking at the

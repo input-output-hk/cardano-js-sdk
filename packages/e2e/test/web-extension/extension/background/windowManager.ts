@@ -1,4 +1,5 @@
-import { Tabs, runtime, tabs } from 'webextension-polyfill';
+import { runtime, tabs } from 'webextension-polyfill';
+import type { Tabs } from 'webextension-polyfill';
 
 const waitForTabLoad = (tab: Tabs.Tab) =>
   new Promise<void>((resolve) => {

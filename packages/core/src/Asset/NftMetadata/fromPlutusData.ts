@@ -1,7 +1,5 @@
-import { Cardano } from '../..';
-import { ImageMediaType, MediaType, NftMetadata, NftMetadataFile, Uri } from './types';
-import { Logger } from 'ts-log';
-import { asString } from './util';
+import { ImageMediaType, MediaType, Uri } from './types.js';
+import { asString } from './util.js';
 import { contextLogger, isNotNil } from '@cardano-sdk/util';
 import {
   isConstrPlutusData,
@@ -10,7 +8,10 @@ import {
   isPlutusList,
   isPlutusMap,
   tryConvertPlutusMapToUtf8Record
-} from '../../Cardano/util';
+} from '../../Cardano/util/index.js';
+import type { Cardano } from '../../index.js';
+import type { Logger } from 'ts-log';
+import type { NftMetadata, NftMetadataFile } from './types.js';
 
 const tryCoerce = <T>(
   value: string | Cardano.PlutusData | undefined,

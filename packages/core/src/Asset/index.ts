@@ -1,4 +1,4 @@
-export * as util from './util';
-export * from './types';
-export * from './cip67';
-export * from './NftMetadata';
+export * as util from './util/index.js';
+export * from './types/index.js';
+export * from './cip67.js';
+export * from './NftMetadata/index.js';

@@ -1,5 +1,5 @@
-import { DEFAULT_FUZZY_SEARCH_OPTIONS } from '../../../src';
-import { validateFuzzyOptions, withTextFilter } from '../../../src/StakePool/TypeormStakePoolProvider/util';
+import { DEFAULT_FUZZY_SEARCH_OPTIONS } from '../../../src/index.js';
+import { validateFuzzyOptions, withTextFilter } from '../../../src/StakePool/TypeormStakePoolProvider/util.js';
 
 describe('TypeormStakePoolProvider utils', () => {
   describe('validateFuzzyOptions', () => {

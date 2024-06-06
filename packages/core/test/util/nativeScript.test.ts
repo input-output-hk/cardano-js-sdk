@@ -1,7 +1,8 @@
-import * as Cardano from '../../src/Cardano';
+import * as Cardano from '../../src/Cardano/index.js';
 import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
-import { NativeScript, NativeScriptKind, ScriptType, Slot } from '../../src/Cardano';
-import { jsonToNativeScript, nativeScriptPolicyId } from '../../src';
+import { NativeScriptKind, ScriptType, Slot } from '../../src/Cardano/index.js';
+import { jsonToNativeScript, nativeScriptPolicyId } from '../../src/index.js';
+import type { NativeScript } from '../../src/Cardano/index.js';
 
 describe('nativeScript utils', () => {
   it('can derive the policy id from a NativeScript', () => {

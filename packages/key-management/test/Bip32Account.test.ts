@@ -1,8 +1,9 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AccountKeyDerivationPath, AddressType, Bip32Account, InMemoryKeyAgent, KeyRole, util } from '../src';
+import { AddressType, Bip32Account, InMemoryKeyAgent, KeyRole, util } from '../src/index.js';
 import { Cardano } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { dummyLogger } from 'ts-log';
+import type { AccountKeyDerivationPath } from '../src/index.js';
 
 describe('Bip32Account', () => {
   const accountIndex = 1;

@@ -1,20 +1,20 @@
-import {
-  AccountKeyDerivationPath,
-  CommunicationType,
-  InMemoryKeyAgent,
-  KeyRole,
-  SignBlobResult,
-  SignDataContext,
-  SignTransactionContext,
-  errors
-} from '@cardano-sdk/key-management';
 import { Cardano, TxCBOR } from '@cardano-sdk/core';
-import { Ed25519PublicKeyHex, Ed25519SignatureHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import { CommunicationType, KeyRole, errors } from '@cardano-sdk/key-management';
+import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
-import { InMemoryWallet, KeyAgentFactory, SigningCoordinator, WalletType, WrongTargetError } from '../../src';
-import { createAccount } from './util';
+import { SigningCoordinator, WalletType, WrongTargetError } from '../../src/index.js';
+import { createAccount } from './util.js';
 import { dummyLogger } from 'ts-log';
 import { firstValueFrom } from 'rxjs';
+import type {
+  AccountKeyDerivationPath,
+  InMemoryKeyAgent,
+  SignBlobResult,
+  SignDataContext,
+  SignTransactionContext
+} from '@cardano-sdk/key-management';
+import type { Ed25519PublicKeyHex, Ed25519SignatureHex } from '@cardano-sdk/crypto';
+import type { InMemoryWallet, KeyAgentFactory } from '../../src/index.js';
 
 describe('SigningCoordinator', () => {
   let signingCoordinator: SigningCoordinator<{}, {}>;
