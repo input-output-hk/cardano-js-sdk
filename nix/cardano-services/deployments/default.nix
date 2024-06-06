@@ -941,6 +941,77 @@ in
           };
         };
 
+        "local-network@us-east-1@v1" = final: {
+          namespace = "local-network";
+          name = "${final.namespace}-cardanojs-v1";
+          network = "local";
+          region = "us-east-1";
+
+          providers = {
+            backend = {
+              enabled = true;
+              env.USE_SUBMIT_API = "true";
+              env.USE_BLOCKFROST = lib.mkForce "false";
+              env.SUBMIT_API_URL = "http://${final.namespace}-cardano-stack.${final.namespace}.svc.cluster.local:8090";
+            };
+            stake-pool-provider = {
+              enabled = true;
+              env.OVERRIDE_FUZZY_OPTIONS = "true";
+            };
+          };
+
+          projectors = {
+            stake-pool.enabled = true;
+          };
+
+          values = {
+            blockfrost-worker.enabled = false;
+            pg-boss-worker.enabled = true;
+
+            backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
+            backend.routes = let
+              inherit (oci.meta) versions;
+            in
+              lib.concatLists [
+                (map (v: "/v${v}/health") versions.root)
+                (map (v: "/v${v}/live") versions.root)
+                (map (v: "/v${v}/meta") versions.root)
+                (map (v: "/v${v}/ready") versions.root)
+                (map (v: "/v${v}/asset") versions.assetInfo)
+                (map (v: "/v${v}/chain-history") versions.chainHistory)
+                (map (v: "/v${v}/network-info") versions.networkInfo)
+                (map (v: "/v${v}/rewards") versions.rewards)
+                (map (v: "/v${v}/tx-submit") versions.txSubmit)
+                (map (v: "/v${v}/utxo") versions.utxo)
+                (map (v: "/v${v}/handle") versions.handle)
+                (map (v: "/v${v}/provider-server") versions.stakePool)
+                (map (v: "/v${v}/stake-pool-provider-server") versions.stakePool)
+              ];
+
+            cardano-services = {
+              ingresOrder = 99;
+              additionalRoutes = [
+                {
+                  pathType = "Prefix";
+                  path = "/v1.0.0/stake-pool";
+                  backend.service = {
+                    name = "${final.namespace}-cardanojs-v1-stake-pool-provider";
+                    port.name = "http";
+                  };
+                }
+                {
+                  pathType = "Prefix";
+                  path = "/v3.0.0/chain-history";
+                  backend.service = {
+                    name = "${final.namespace}-cardanojs-v1-backend";
+                    port.name = "http";
+                  };
+                }
+              ];
+            };
+          };
+        };
+
         "live-sanchonet@us-east-2@v1" = final: {
           namespace = "live-sanchonet";
           name = "${final.namespace}-cardanojs-v1";
