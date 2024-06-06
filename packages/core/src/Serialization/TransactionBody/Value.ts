@@ -81,7 +81,7 @@ export class Value {
     const reader = new CborReader(cbor);
 
     if (reader.peekState() === CborReaderState.UnsignedInteger) {
-      const coins = reader.readInt();
+      const coins = reader.readUInt();
       return new Value(coins);
     }
 
