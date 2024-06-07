@@ -11,10 +11,10 @@ import {
   WalletRepositoryDependencies,
   WalletType
 } from '../../src';
+import { BehaviorSubject, firstValueFrom, of } from 'rxjs';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { KeyRole } from '@cardano-sdk/key-management';
-import { firstValueFrom, of } from 'rxjs';
+import { KeyPurpose, KeyRole } from '@cardano-sdk/key-management';
 import { logger } from '@cardano-sdk/util-dev';
 import pick from 'lodash/pick';
 
@@ -41,6 +41,7 @@ const createScriptWalletProps = {
         index: 0,
         role: KeyRole.External
       },
+      purpose: KeyPurpose.STANDARD,
       stakingScriptKeyPath: {
         index: 0,
         role: KeyRole.External
@@ -136,6 +137,7 @@ describe('WalletRepository', () => {
                 index: 0,
                 role: KeyRole.External
               },
+              purpose: KeyPurpose.STANDARD,
               stakingScriptKeyPath: {
                 index: 0,
                 role: KeyRole.External
@@ -158,6 +160,7 @@ describe('WalletRepository', () => {
                 index: 0,
                 role: KeyRole.External
               },
+              purpose: KeyPurpose.STANDARD,
               stakingScriptKeyPath: {
                 index: 0,
                 role: KeyRole.External
@@ -188,11 +191,9 @@ describe('WalletRepository', () => {
   });
 
   describe('addAccount', () => {
+    const accountIndex = storedLedgerWallet.accounts[storedLedgerWallet.accounts.length - 1].accountIndex + 1;
     it('adds account to an existing wallet and returns AccountId that also contains walletId', async () => {
-      const accountProps = createAccount(
-        0,
-        storedLedgerWallet.accounts[storedLedgerWallet.accounts.length - 1].accountIndex + 1
-      );
+      const accountProps = createAccount(0, accountIndex);
       const props = {
         ...accountProps,
         walletId: storedLedgerWallet.walletId
@@ -202,6 +203,42 @@ describe('WalletRepository', () => {
         {
           ...storedLedgerWallet,
           accounts: [...storedLedgerWallet.accounts, accountProps]
+        }
+      ]);
+    });
+
+    it('allows creating 1852 and 1854 purpose account with the same index', async () => {
+      const storeSubject = new BehaviorSubject([storedLedgerWallet]);
+      store.observeAll.mockReturnValue(storeSubject.asObservable());
+
+      const standardAccountProps = createAccount(0, accountIndex, KeyPurpose.STANDARD);
+      const standardProps = {
+        ...standardAccountProps,
+        walletId: storedLedgerWallet.walletId
+      };
+      const walletWithStandardAccount = [
+        {
+          ...storedLedgerWallet,
+          accounts: [...storedLedgerWallet.accounts, standardAccountProps]
+        }
+      ];
+
+      const multiSigAccountProps = createAccount(0, accountIndex, KeyPurpose.MULTI_SIG);
+      const multiSigProps = {
+        ...multiSigAccountProps,
+        walletId: storedLedgerWallet.walletId
+      };
+
+      await expect(repository.addAccount(standardProps)).resolves.toEqual(standardProps);
+      expect(store.setAll).toBeCalledWith(walletWithStandardAccount);
+
+      storeSubject.next(walletWithStandardAccount);
+
+      await expect(repository.addAccount(multiSigProps)).resolves.toEqual(multiSigProps);
+      expect(store.setAll).toBeCalledWith([
+        {
+          ...storedLedgerWallet,
+          accounts: [...walletWithStandardAccount[0].accounts, multiSigAccountProps]
         }
       ]);
     });
@@ -290,6 +327,34 @@ describe('WalletRepository', () => {
       ]);
     });
 
+    it('does not update 1852 account metadata when updating 1854 account', async () => {
+      const storedAccount = storedLedgerWallet.accounts[0];
+      const newAccount = createAccount(0, storedAccount.accountIndex, KeyPurpose.MULTI_SIG);
+      const accounts = [storedAccount, newAccount];
+      store.observeAll.mockReturnValueOnce(of([{ ...storedLedgerWallet, accounts }]));
+
+      const props: UpdateAccountMetadataProps<WalletMetadata> = {
+        accountIndex: newAccount.accountIndex,
+        metadata: newMetadata,
+        purpose: KeyPurpose.MULTI_SIG,
+        walletId: storedLedgerWallet.walletId
+      };
+
+      await expect(repository.updateAccountMetadata(props)).resolves.toEqual(props);
+      expect(store.setAll).toBeCalledWith([
+        {
+          ...storedLedgerWallet,
+          accounts: [
+            storedAccount,
+            {
+              ...newAccount,
+              metadata: newMetadata
+            }
+          ]
+        }
+      ]);
+    });
+
     it('rejects with WalletConflictError when a bip32 account or a script wallet with specified id is not found', async () => {
       await expect(
         repository.updateWalletMetadata({
@@ -340,6 +405,26 @@ describe('WalletRepository', () => {
         {
           ...storedLedgerWallet,
           accounts: []
+        }
+      ]);
+    });
+
+    it('does not remove 1852 account when removing 1854 account', async () => {
+      const storedAccount = storedLedgerWallet.accounts[0];
+      const newAccount = createAccount(0, storedAccount.accountIndex, KeyPurpose.MULTI_SIG);
+      const accounts = [storedAccount, newAccount];
+      store.observeAll.mockReturnValueOnce(of([{ ...storedLedgerWallet, accounts }]));
+
+      const props = {
+        accountIndex: newAccount.accountIndex,
+        purpose: KeyPurpose.MULTI_SIG,
+        walletId: storedLedgerWallet.walletId
+      };
+      await expect(repository.removeAccount(props)).resolves.toEqual(props);
+      expect(store.setAll).toBeCalledWith([
+        {
+          ...storedLedgerWallet,
+          accounts: [storedAccount]
         }
       ]);
     });

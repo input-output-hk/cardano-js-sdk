@@ -7,6 +7,7 @@ import {
   KeyAgentDependencies,
   KeyAgentType,
   KeyPair,
+  KeyPurpose,
   SerializableInMemoryKeyAgentData,
   SignBlobResult,
   SignTransactionContext,
@@ -37,6 +38,7 @@ export interface FromBip39MnemonicWordsProps {
   mnemonic2ndFactorPassphrase?: string;
   getPassphrase: GetPassphrase;
   accountIndex?: number;
+  purpose?: KeyPurpose;
 }
 
 const getPassphraseRethrowTypedError = async (getPassphrase: GetPassphrase) => {
@@ -60,6 +62,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     const accountKey = await deriveAccountPrivateKey({
       accountIndex: this.accountIndex,
       bip32Ed25519: this.bip32Ed25519,
+      purpose: this.purpose,
       rootPrivateKey
     });
 
@@ -89,7 +92,8 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
       getPassphrase,
       mnemonicWords,
       mnemonic2ndFactorPassphrase = '',
-      accountIndex = 0
+      accountIndex = 0,
+      purpose = KeyPurpose.STANDARD
     }: FromBip39MnemonicWordsProps,
     dependencies: KeyAgentDependencies
   ): Promise<InMemoryKeyAgent> {
@@ -103,6 +107,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     const accountPrivateKey = await deriveAccountPrivateKey({
       accountIndex,
       bip32Ed25519: dependencies.bip32Ed25519,
+      purpose,
       rootPrivateKey
     });
 
@@ -114,7 +119,8 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
         chainId,
         encryptedRootPrivateKeyBytes: [...encryptedRootPrivateKey],
         extendedAccountPublicKey,
-        getPassphrase
+        getPassphrase,
+        purpose
       },
       dependencies
     );

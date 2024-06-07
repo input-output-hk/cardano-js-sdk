@@ -7,6 +7,7 @@ import {
   WalletRepositoryApi
 } from './types';
 import { AnyWallet, ScriptWallet, WalletId, WalletType } from '../types';
+import { KeyPurpose } from '@cardano-sdk/key-management';
 import { Logger } from 'ts-log';
 import { Observable, defer, firstValueFrom, map, shareReplay, switchMap, take } from 'rxjs';
 import { WalletConflictError } from '../errors';
@@ -28,16 +29,24 @@ const cloneSplice = <T>(array: T[], start: number, deleteCount: number, ...items
 const findAccount = <WalletMetadata extends {}, AccountMetadata extends {}>(
   wallets: AnyWallet<WalletMetadata, AccountMetadata>[],
   walletId: WalletId,
-  accountIndex: number
+  accountIndex: number,
+  purpose: KeyPurpose
 ) => {
   const walletIdx = wallets.findIndex((w) => w.walletId === walletId);
   const wallet = wallets[walletIdx];
+
   if (!wallet || wallet.type === WalletType.Script) return;
-  const accountIdx = wallet.accounts.findIndex((acc) => acc.accountIndex === accountIndex);
+
+  const accountIdx = wallet.accounts.findIndex((acc) => {
+    const accountPurpose = acc.purpose || KeyPurpose.STANDARD;
+    return acc.accountIndex === accountIndex && accountPurpose === purpose;
+  });
+
   if (accountIdx < 0) return;
   return {
     account: wallet.accounts[accountIdx],
     accountIdx,
+    purpose,
     wallet,
     walletIdx
   };
@@ -96,6 +105,8 @@ export class WalletRepository<WalletMetadata extends {}, AccountMetadata extends
   addAccount(props: AddAccountProps<AccountMetadata>): Promise<AddAccountProps<AccountMetadata>> {
     const { walletId, accountIndex, metadata, extendedAccountPublicKey } = props;
     this.#logger.debug('addAccount', walletId, accountIndex, metadata);
+    const purpose = props.purpose || KeyPurpose.STANDARD;
+
     return firstValueFrom(
       this.#getWallets().pipe(
         switchMap((wallets) => {
@@ -107,8 +118,16 @@ export class WalletRepository<WalletMetadata extends {}, AccountMetadata extends
           if (wallet.type === WalletType.Script) {
             throw new WalletConflictError('addAccount for script wallets is not supported');
           }
-          if (wallet.accounts.some((acc) => acc.accountIndex === accountIndex)) {
-            throw new WalletConflictError(`Account #${accountIndex} for wallet '${walletId}' already exists`);
+
+          if (
+            wallet.accounts.some((acc) => {
+              const accountPurpose = acc.purpose || KeyPurpose.STANDARD;
+              return acc.accountIndex === accountIndex && accountPurpose === purpose;
+            })
+          ) {
+            throw new WalletConflictError(
+              `Account #${accountIndex} with purpose ${purpose} for wallet '${walletId}' already exists`
+            );
           }
 
           return this.#store
@@ -120,7 +139,8 @@ export class WalletRepository<WalletMetadata extends {}, AccountMetadata extends
                   {
                     accountIndex,
                     extendedAccountPublicKey,
-                    metadata
+                    metadata,
+                    purpose: props.purpose
                   }
                 ]
               })
@@ -136,6 +156,7 @@ export class WalletRepository<WalletMetadata extends {}, AccountMetadata extends
   ): Promise<UpdateWalletMetadataProps<WalletMetadata>> {
     const { walletId, metadata } = props;
     this.#logger.debug('updateWalletMetadata', walletId, metadata);
+
     return firstValueFrom(
       this.#getWallets().pipe(
         switchMap((wallets) => {
@@ -160,14 +181,17 @@ export class WalletRepository<WalletMetadata extends {}, AccountMetadata extends
     props: UpdateAccountMetadataProps<AccountMetadata>
   ): Promise<UpdateAccountMetadataProps<AccountMetadata>> {
     const { walletId, accountIndex, metadata } = props;
-    this.#logger.debug('updateAccountMetadata', walletId, accountIndex, metadata);
+    const purpose = props.purpose || KeyPurpose.STANDARD;
+
+    this.#logger.debug('updateAccountMetadata', walletId, accountIndex, metadata, purpose);
+
     return firstValueFrom(
       this.#getWallets().pipe(
         switchMap((wallets) => {
           // update account
-          const bip32Account = findAccount(wallets, walletId, accountIndex);
+          const bip32Account = findAccount(wallets, walletId, accountIndex, purpose);
           if (!bip32Account) {
-            throw new WalletConflictError(`Account not found: ${walletId}/${accountIndex}`);
+            throw new WalletConflictError(`Account not found: ${walletId}/${purpose}/${accountIndex}`);
           }
           return this.#store.setAll(
             cloneSplice(wallets, bip32Account.walletIdx, 1, {
@@ -185,23 +209,29 @@ export class WalletRepository<WalletMetadata extends {}, AccountMetadata extends
   }
 
   removeAccount(props: RemoveAccountProps): Promise<RemoveAccountProps> {
-    const { walletId, accountIndex } = props;
-    this.#logger.debug('removeAccount', walletId, accountIndex);
+    const { walletId, accountIndex, purpose: maybePurpose } = props;
+
+    const purpose = maybePurpose || KeyPurpose.STANDARD;
+
+    this.#logger.debug('removeAccount', walletId, accountIndex, purpose);
     return firstValueFrom(
       this.#getWallets().pipe(
         switchMap((wallets) => {
-          const bip32Account = findAccount(wallets, walletId, accountIndex);
+          const bip32Account = findAccount(wallets, walletId, accountIndex, purpose);
           if (!bip32Account) {
-            throw new WalletConflictError(`Account '${walletId}/${accountIndex}' does not exist`);
+            throw new WalletConflictError(`Account '${walletId}/${purpose}/${accountIndex}' does not exist`);
           }
           const dependentWallet = wallets.find(
             (wallet) =>
               wallet.type === WalletType.Script &&
-              wallet.ownSigners.some((signer) => signer.walletId === walletId && signer.accountIndex === accountIndex)
+              wallet.ownSigners.some(
+                (signer) =>
+                  signer.walletId === walletId && signer.accountIndex === accountIndex && signer.purpose === purpose
+              )
           );
           if (dependentWallet) {
             throw new WalletConflictError(
-              `Wallet '${dependentWallet.walletId}' depends on account '${walletId}/${accountIndex}'`
+              `Wallet '${dependentWallet.walletId}' depends on account '${walletId}/${purpose}/${accountIndex}'`
             );
           }
           return this.#store.setAll(

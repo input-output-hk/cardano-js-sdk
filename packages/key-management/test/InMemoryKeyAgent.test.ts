@@ -1,5 +1,13 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, GroupedAddress, InMemoryKeyAgent, KeyRole, SerializableInMemoryKeyAgentData, util } from '../src';
+import {
+  AddressType,
+  GroupedAddress,
+  InMemoryKeyAgent,
+  KeyPurpose,
+  KeyRole,
+  SerializableInMemoryKeyAgentData,
+  util
+} from '../src';
 import { Cardano } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { dummyLogger } from 'ts-log';
@@ -158,10 +166,12 @@ describe('InMemoryKeyAgent', () => {
             await util.deriveAccountPrivateKey({
               accountIndex: 0,
               bip32Ed25519,
+              purpose: KeyPurpose.STANDARD,
               rootPrivateKey: Crypto.Bip32PrivateKeyHex(yoroiRootPrivateKeyHex)
             })
           ),
-          getPassphrase
+          getPassphrase,
+          purpose: KeyPurpose.STANDARD
         },
         { bip32Ed25519, logger: dummyLogger }
       );
@@ -255,11 +265,14 @@ describe('InMemoryKeyAgent', () => {
             await util.deriveAccountPrivateKey({
               accountIndex: 0,
               bip32Ed25519,
+              purpose: KeyPurpose.STANDARD,
               rootPrivateKey: Crypto.Bip32PrivateKeyHex(daedalusRootPrivateKeyHex)
             })
           ),
           // daedelus enforces min length of 10
-          getPassphrase: jest.fn().mockResolvedValue(Buffer.from('nMmys*X002'))
+          getPassphrase: jest.fn().mockResolvedValue(Buffer.from('nMmys*X002')),
+
+          purpose: KeyPurpose.STANDARD
         },
         { bip32Ed25519, logger: dummyLogger }
       );
