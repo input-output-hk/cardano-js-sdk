@@ -588,6 +588,7 @@ export class BaseWallet implements ObservableWallet {
 
   async finalizeTx({
     tx,
+    bodyCbor,
     signingOptions,
     signingContext,
     auxiliaryData,
@@ -605,8 +606,11 @@ export class BaseWallet implements ObservableWallet {
     };
 
     const emptyWitness = { signatures: new Map() };
+
+    // The Witnesser takes a serializable transaction. We cant build that from the hash alone, if
+    // the bodyCbor is available, use that instead of the coreTx type to build the transaction.
     const transaction = new Serialization.Transaction(
-      Serialization.TransactionBody.fromCore(tx.body),
+      bodyCbor ? Serialization.TransactionBody.fromCbor(bodyCbor) : Serialization.TransactionBody.fromCore(tx.body),
       Serialization.TransactionWitnessSet.fromCore({ ...emptyWitness, ...witness }),
       auxiliaryData ? Serialization.AuxiliaryData.fromCore(auxiliaryData) : undefined
     );
