@@ -6,8 +6,8 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxInFlight, UtxoTracker } from './types';
 import { WalletStores } from '../persistence';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
-import chunk from 'lodash/chunk';
-import uniqWith from 'lodash/uniqWith';
+import chunk from 'lodash/chunk.js';
+import uniqWith from 'lodash/uniqWith.js';
 
 // Temporarily hardcoded. Will be replaced with ChainHistoryProvider 'maxPageSize' value once ADP-2249 is implemented
 const PAGE_SIZE = 25;

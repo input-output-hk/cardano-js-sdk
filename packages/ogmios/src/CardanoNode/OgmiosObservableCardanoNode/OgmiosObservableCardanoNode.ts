@@ -36,7 +36,7 @@ import { createObservableChainSyncClient } from './createObservableChainSyncClie
 import { ogmiosServerHealthToHealthCheckResponse } from '../../util';
 import { ogmiosToCorePointOrOrigin, ogmiosToCoreTipOrOrigin, pointOrOriginToOgmios } from './util';
 import { queryEraSummaries, queryGenesisParameters } from '../queries';
-import isEqual from 'lodash/isEqual';
+import isEqual from 'lodash/isEqual.js';
 
 const ogmiosToCoreIntersection = (intersection: Intersection) => ({
   point: ogmiosToCorePointOrOrigin(intersection.point),

@@ -23,7 +23,7 @@ import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { TestWallet, networkInfoProviderFactory } from '../factories';
 import { getEnv, walletVariables } from '../environment';
 import { logger } from '@cardano-sdk/util-dev';
-import sortBy from 'lodash/sortBy';
+import sortBy from 'lodash/sortBy.js';
 
 const env = getEnv(walletVariables);
 

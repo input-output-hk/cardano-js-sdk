@@ -35,7 +35,7 @@ import { buildDRepIDFromDRepKey, signTx, waitForWalletStateSettle } from '../uti
 import { firstValueFrom, of } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
-import uniq from 'lodash/uniq';
+import uniq from 'lodash/uniq.js';
 
 const {
   mockChainHistoryProvider,

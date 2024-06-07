@@ -1,7 +1,7 @@
 import { AccountAddressDerivationPath, AddressType, Bip32Account, GroupedAddress } from '@cardano-sdk/key-management';
 import { AddressDiscovery } from '../types';
 import { ChainHistoryProvider } from '@cardano-sdk/core';
-import uniqBy from 'lodash/uniqBy';
+import uniqBy from 'lodash/uniqBy.js';
 
 const STAKE_KEY_INDEX_LOOKAHEAD = 5;
 

@@ -25,7 +25,7 @@ import { MessageSender } from '@cardano-sdk/key-management';
 import { Observable, firstValueFrom, map } from 'rxjs';
 import { ObservableWallet } from './types';
 import { requiresForeignSignatures } from './services';
-import uniq from 'lodash/uniq';
+import uniq from 'lodash/uniq.js';
 
 export type Cip30WalletDependencies = {
   logger: Logger;

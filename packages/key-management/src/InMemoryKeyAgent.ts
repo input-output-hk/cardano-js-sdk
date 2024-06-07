@@ -26,7 +26,7 @@ import {
 import { HexBlob } from '@cardano-sdk/util';
 import { KeyAgentBase } from './KeyAgentBase';
 import { emip3decrypt, emip3encrypt } from './emip3';
-import uniqBy from 'lodash/uniqBy';
+import uniqBy from 'lodash/uniqBy.js';
 
 export interface InMemoryKeyAgentProps extends Omit<SerializableInMemoryKeyAgentData, '__typename'> {
   getPassphrase: GetPassphrase;

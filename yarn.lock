@@ -3119,6 +3119,7 @@ __metadata:
     npm-run-all: ^4.1.5
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
+    tsc-alias: ^1.8.10
     typescript: ^4.7.4
   languageName: unknown
   linkType: soft
@@ -3221,6 +3222,7 @@ __metadata:
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
+    tsc-alias: ^1.8.10
     typescript: ^4.7.4
     web-encoding: ^1.1.5
   peerDependencies:
@@ -3254,6 +3256,7 @@ __metadata:
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
+    tsc-alias: ^1.8.10
     typescript: ^4.7.4
   peerDependencies:
     "@dcspark/cardano-multiplatform-lib-asmjs": ^3.1.1
@@ -3287,6 +3290,7 @@ __metadata:
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
+    tsc-alias: ^1.8.10
     typescript: ^4.7.4
     webextension-polyfill: ^0.8.0
   languageName: unknown
@@ -3380,6 +3384,7 @@ __metadata:
     ts-log: ^2.2.4
     ts-node: ^10.8.1
     ts-stopwatch: 0.0.4
+    tsc-alias: ^1.8.10
     typeorm: ^0.3.15
     typeorm-extension: ^2.7.0
     typescript: ^4.7.4
@@ -3404,6 +3409,7 @@ __metadata:
     "@cardano-sdk/ogmios": "workspace:~"
     "@cardano-sdk/util": "workspace:~"
     "@cardano-sdk/util-dev": "workspace:~"
+    "@types/clear": ^0.1.4
     "@types/cli-progress": ^3.9.2
     "@types/fs-extra": ^9.0.12
     "@types/object-hash": ^2.1.1
@@ -3423,6 +3429,7 @@ __metadata:
     pkg: ^5.3.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.3
+    tsc-alias: ^1.8.10
     typescript: ^4.7.4
   bin:
     golden-test-generator: dist/cjs/index.js
@@ -3444,6 +3451,7 @@ __metadata:
     npm-run-all: ^4.1.5
     ts-jest: ^28.0.7
     ts-log: 2.2.4
+    tsc-alias: ^1.8.10
     typescript: ^4.7.4
   languageName: unknown
   linkType: soft
@@ -3471,6 +3479,7 @@ __metadata:
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: 2.2.4
+    tsc-alias: ^1.8.10
     typescript: ^4.7.4
   languageName: unknown
   linkType: soft
@@ -3494,6 +3503,7 @@ __metadata:
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: 2.2.4
+    tsc-alias: ^1.8.10
     typescript: ^4.7.4
   languageName: unknown
   linkType: soft
@@ -3516,6 +3526,7 @@ __metadata:
     npm-run-all: ^4.1.5
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
+    tsc-alias: ^1.8.10
     typescript: ^4.7.4
   languageName: unknown
   linkType: soft
@@ -3545,6 +3556,7 @@ __metadata:
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: 2.2.4
+    tsc-alias: ^1.8.10
     typescript: ^4.7.4
   languageName: unknown
   linkType: soft
@@ -3576,6 +3588,7 @@ __metadata:
     rxjs: ^7.4.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.3
+    tsc-alias: ^1.8.10
     typescript: ^4.7.4
     ws: ^8.5.0
   languageName: unknown
@@ -3603,6 +3616,7 @@ __metadata:
     rxjs: ^7.4.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
+    tsc-alias: ^1.8.10
     typeorm: ^0.3.15
     typescript: ^4.7.4
     uuid: ^9.0.0
@@ -3628,6 +3642,7 @@ __metadata:
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
+    tsc-alias: ^1.8.10
     typescript: ^4.7.4
   languageName: unknown
   linkType: soft
@@ -3655,6 +3670,7 @@ __metadata:
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
+    tsc-alias: ^1.8.10
     typescript: ^4.7.4
   languageName: unknown
   linkType: soft
@@ -3684,6 +3700,7 @@ __metadata:
     rxjs: ^7.4.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
+    tsc-alias: ^1.8.10
     typescript: ^4.7.4
   languageName: unknown
   linkType: soft
@@ -3701,6 +3718,7 @@ __metadata:
     npm-run-all: ^4.1.5
     rxjs: ^7.4.0
     ts-jest: ^28.0.7
+    tsc-alias: ^1.8.10
     typescript: ^4.7.4
   languageName: unknown
   linkType: soft
@@ -3720,6 +3738,7 @@ __metadata:
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
+    tsc-alias: ^1.8.10
     type-fest: ^2.19.0
     typescript: ^4.7.4
   languageName: unknown
@@ -3765,6 +3784,7 @@ __metadata:
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.3
+    tsc-alias: ^1.8.10
     typescript: ^4.7.4
     wait-on: ^6.0.1
     webextension-polyfill: ^0.9.0
@@ -3800,6 +3820,7 @@ __metadata:
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.3
+    tsc-alias: ^1.8.10
     typescript: ^4.7.4
     util: ^0.12.4
     uuid: ^8.3.2
@@ -6533,6 +6554,13 @@ __metadata:
   dependencies:
     chalk: "*"
   checksum: 846437590d0bf0026d8c2f454e5d91a486becfabde61c0441025e791a0fed75304e143717bc4d025569394dcce5a32f2c53d97253d0c735ac1abae63f1b25c3e
+  languageName: node
+  linkType: hard
+
+"@types/clear@npm:^0.1.4":
+  version: 0.1.4
+  resolution: "@types/clear@npm:0.1.4"
+  checksum: d6da1441880e34ad82cc9915c178426fe31ea7ff759ed2745b725807c9660e2f258af8234f5879c374016daa781865a4d7a7391cb678ff4413fd495cbeda5dc2
   languageName: node
   linkType: hard
 
@@ -10237,6 +10265,7 @@ __metadata:
     ts-jest: ^28.0.7
     ts-node: ^10.0.0
     ts-node-dev: ^1.1.8
+    tsc-alias: ^1.8.10
     typedoc: ^0.23.24
     typedoc-plugin-missing-exports: ^1.0.0
     typescript: ^4.7.4
@@ -10416,6 +10445,25 @@ __metadata:
     fsevents:
       optional: true
   checksum: b49fcde40176ba007ff361b198a2d35df60d9bb2a5aab228279eb810feae9294a6b4649ab15981304447afe1e6ffbf4788ad5db77235dc770ab777c6e771980c
+  languageName: node
+  linkType: hard
+
+"chokidar@npm:^3.5.3":
+  version: 3.6.0
+  resolution: "chokidar@npm:3.6.0"
+  dependencies:
+    anymatch: ~3.1.2
+    braces: ~3.0.2
+    fsevents: ~2.3.2
+    glob-parent: ~5.1.2
+    is-binary-path: ~2.1.0
+    is-glob: ~4.0.1
+    normalize-path: ~3.0.0
+    readdirp: ~3.6.0
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  checksum: d2f29f499705dcd4f6f3bbed79a9ce2388cf530460122eed3b9c48efeab7a4e28739c6551fd15bec9245c6b9eeca7a32baa64694d64d9b6faeb74ddb8c4a413d
   languageName: node
   linkType: hard
 
@@ -10931,6 +10979,13 @@ __metadata:
   version: 8.3.0
   resolution: "commander@npm:8.3.0"
   checksum: 0f82321821fc27b83bd409510bb9deeebcfa799ff0bf5d102128b500b7af22872c0c92cb6a0ebc5a4cf19c6b550fba9cedfa7329d18c6442a625f851377bacf0
+  languageName: node
+  linkType: hard
+
+"commander@npm:^9.0.0":
+  version: 9.5.0
+  resolution: "commander@npm:9.5.0"
+  checksum: c7a3e27aa59e913b54a1bafd366b88650bc41d6651f0cbe258d4ff09d43d6a7394232a4dadd0bf518b3e696fdf595db1028a0d82c785b88bd61f8a440cecfade
   languageName: node
   linkType: hard
 
@@ -14820,7 +14875,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globby@npm:^11.0.3, globby@npm:^11.1.0":
+"globby@npm:^11.0.3, globby@npm:^11.0.4, globby@npm:^11.1.0":
   version: 11.1.0
   resolution: "globby@npm:11.1.0"
   dependencies:
@@ -19117,6 +19172,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mylas@npm:^2.1.9":
+  version: 2.1.13
+  resolution: "mylas@npm:2.1.13"
+  checksum: f861d092137a9ac268cba88042392a5dc2a290eed5c8543954eae849d85e5961332211161d2c08c3644ad893f20dbe9de89b07f5dc027f1f92f13f2d38f4b81f
+  languageName: node
+  linkType: hard
+
 "mz@npm:^2.4.0":
   version: 2.7.0
   resolution: "mz@npm:2.7.0"
@@ -21040,6 +21102,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"plimit-lit@npm:^1.2.6":
+  version: 1.6.1
+  resolution: "plimit-lit@npm:1.6.1"
+  dependencies:
+    queue-lit: ^1.5.1
+  checksum: 5f18f1ea7254832bdc663c303420c804b5bc8070c670c88161171f0ebacaf46ce7ca12147ddf52bc22d927bb37bfbac6ed6fa478c93cb4be16b62c5fad16dd5f
+  languageName: node
+  linkType: hard
+
 "pluralize@npm:^8.0.0":
   version: 8.0.0
   resolution: "pluralize@npm:8.0.0"
@@ -21714,6 +21785,13 @@ __metadata:
   version: 2.2.0
   resolution: "querystringify@npm:2.2.0"
   checksum: 5641ea231bad7ef6d64d9998faca95611ed4b11c2591a8cae741e178a974f6a8e0ebde008475259abe1621cb15e692404e6b6626e927f7b849d5c09392604b15
+  languageName: node
+  linkType: hard
+
+"queue-lit@npm:^1.5.1":
+  version: 1.5.2
+  resolution: "queue-lit@npm:1.5.2"
+  checksum: 8dd45c79bd25b33b0c7d587391eb0b4acc4deb797bf92fef62b2d8e7c03b64083f5304f09d52a18267d34d020cc67ccde97a88185b67590eeccb194938ff1f98
   languageName: node
   linkType: hard
 
@@ -24506,6 +24584,22 @@ __metadata:
   version: 0.0.4
   resolution: "ts-stopwatch@npm:0.0.4"
   checksum: 2f48476016356bf0fd25ae19d51d7aea5492ea5d85ff78ddd4a8bf818e207131c29ddaf6b469ac387060ae2d9b5f5d5585546dbd570868dbfe931bb54adbb622
+  languageName: node
+  linkType: hard
+
+"tsc-alias@npm:^1.8.10":
+  version: 1.8.10
+  resolution: "tsc-alias@npm:1.8.10"
+  dependencies:
+    chokidar: ^3.5.3
+    commander: ^9.0.0
+    globby: ^11.0.4
+    mylas: ^2.1.9
+    normalize-path: ^3.0.0
+    plimit-lit: ^1.2.6
+  bin:
+    tsc-alias: dist/bin/index.js
+  checksum: 4301767afb5b24ad354267790fb98b8df7ed41ff6a6d151c5e664c6b8b7717cd8753c790d67e5a0dbd731c3a4d85e57eca2429ff750b99d79c38300de7eb8d94
   languageName: node
   linkType: hard
 

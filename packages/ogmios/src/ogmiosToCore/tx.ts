@@ -25,7 +25,7 @@ import {
 } from '@cardano-sdk/core';
 import { Schema } from '@cardano-ogmios/client';
 import Fraction from 'fraction.js';
-import omit from 'lodash/omit';
+import omit from 'lodash/omit.js';
 
 const mapMargin = (margin: string): Cardano.Fraction => {
   const { n: numerator, d: denominator } = new Fraction(margin);

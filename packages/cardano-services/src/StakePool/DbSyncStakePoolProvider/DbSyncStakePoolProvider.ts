@@ -33,7 +33,7 @@ import { PromiseOrValue, RunnableModule, resolveObjectValues } from '@cardano-sd
 import { StakePoolBuilder } from './StakePoolBuilder';
 import { StakePoolMetadataService } from '../types';
 import { toStakePoolResults } from './mappers';
-import merge from 'lodash/merge';
+import merge from 'lodash/merge.js';
 
 /** Properties that are need to create DbSyncStakePoolProvider */
 export interface StakePoolProviderProps {

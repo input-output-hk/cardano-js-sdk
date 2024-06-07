@@ -27,7 +27,7 @@ import { WalletStores, createInMemoryWalletStores } from '../../src/persistence'
 import { firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import { stakeKeyDerivationPath, testAsyncKeyAgent, testKeyAgent } from '../../../key-management/test/mocks';
-import flatten from 'lodash/flatten';
+import flatten from 'lodash/flatten.js';
 
 const name = 'Test Wallet';
 const address = mocks.utxo[0][0].address!;

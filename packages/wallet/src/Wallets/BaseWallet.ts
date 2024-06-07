@@ -106,8 +106,8 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
 import { WalletStores, createInMemoryWalletStores } from '../persistence';
 import { getScriptAddress } from './internals';
-import isEqual from 'lodash/isEqual';
-import uniq from 'lodash/uniq';
+import isEqual from 'lodash/isEqual.js';
+import uniq from 'lodash/uniq.js';
 
 export interface BaseWalletProps {
   readonly name: string;

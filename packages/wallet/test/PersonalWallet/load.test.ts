@@ -36,8 +36,8 @@ import { dummyLogger as logger } from 'ts-log';
 import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { waitForWalletStateSettle } from '../util';
 import delay from 'delay';
-import flatten from 'lodash/flatten';
-import pick from 'lodash/pick';
+import flatten from 'lodash/flatten.js';
+import pick from 'lodash/pick.js';
 
 const {
   currentEpoch,

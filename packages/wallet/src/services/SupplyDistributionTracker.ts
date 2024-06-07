@@ -5,7 +5,7 @@ import { PersistentDocumentTrackerSubject } from './util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { SupplyDistributionStores } from '../persistence';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
-import isEqual from 'lodash/isEqual';
+import isEqual from 'lodash/isEqual.js';
 
 export type SupplyDistributionNetworkInfoProvider = Pick<NetworkInfoProvider, 'stake' | 'lovelaceSupply'>;
 

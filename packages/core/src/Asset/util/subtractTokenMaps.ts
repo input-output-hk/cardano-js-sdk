@@ -1,6 +1,6 @@
 /* eslint-disable complexity,sonarjs/cognitive-complexity */
 import * as Cardano from '../../Cardano';
-import uniq from 'lodash/uniq';
+import uniq from 'lodash/uniq.js';
 
 /**
  * Given two Cardano.TokenMaps, compute a Cardano.TokenMap with the difference between the left-hand side and the right-hand side.

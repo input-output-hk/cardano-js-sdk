@@ -4,7 +4,7 @@ import { Logger } from 'ts-log';
 import { TokenMetadataService } from './types';
 import { contextLogger } from '@cardano-sdk/util';
 import axios, { AxiosInstance } from 'axios';
-import pick from 'lodash/pick';
+import pick from 'lodash/pick.js';
 
 export const DEFAULT_TOKEN_METADATA_CACHE_TTL = Seconds(10 * 60);
 export const DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT = Milliseconds(3 * 1000);

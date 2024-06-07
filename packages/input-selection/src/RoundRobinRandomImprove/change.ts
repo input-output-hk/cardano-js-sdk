@@ -9,9 +9,9 @@ import {
   stubMaxSizeAddress,
   toValues
 } from '../util';
-import minBy from 'lodash/minBy';
-import orderBy from 'lodash/orderBy';
-import pick from 'lodash/pick';
+import minBy from 'lodash/minBy.js';
+import orderBy from 'lodash/orderBy.js';
+import pick from 'lodash/pick.js';
 
 type EstimateTxCostsWithOriginalOutputs = (utxo: Cardano.Utxo[], change: Cardano.Value[]) => Promise<TxCosts>;
 

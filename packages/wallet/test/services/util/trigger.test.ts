@@ -1,6 +1,6 @@
 import { Cardano, EraSummary } from '@cardano-sdk/core';
 import { createTestScheduler, testnetEraSummaries } from '@cardano-sdk/util-dev';
-import merge from 'lodash/merge';
+import merge from 'lodash/merge.js';
 
 import { distinctBlock, distinctEraSummaries } from '../../../src/services/util';
 
