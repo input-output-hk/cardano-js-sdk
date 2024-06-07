@@ -140,10 +140,15 @@ describe('PersonalWallet/phase2validation', () => {
     };
 
     const unsignedTx = await wallet.initializeTx(txProps);
+
+    const witness = { redeemers: [scriptRedeemer], scripts: [alwaysFailScript], signatures: new Map() };
+
     const finalizeProps: FinalizeTxProps = {
       isValid: false,
-      tx: unsignedTx,
-      witness: { redeemers: [scriptRedeemer], scripts: [alwaysFailScript] }
+      tx: new Serialization.Transaction(
+        Serialization.TransactionBody.fromCore(unsignedTx.body),
+        Serialization.TransactionWitnessSet.fromCore(witness)
+      )
     };
 
     const signedTx = await wallet.finalizeTx(finalizeProps);

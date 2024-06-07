@@ -1,6 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { BaseWallet, TransactionFailure } from '../../src';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { createWallet } from './util';
 import { firstValueFrom, of } from 'rxjs';
 import { mockProviders as mocks } from '@cardano-sdk/util-dev';
@@ -93,7 +93,7 @@ describe('integration/withdrawal', () => {
       outputs: new Set() // In a real transaction you would probably want to have some outputs
     });
     expect(typeof txInternals.body.fee).toBe('bigint');
-    const tx = await wallet.finalizeTx({ tx: txInternals });
+    const tx = await wallet.finalizeTx({ tx: Serialization.Transaction.fromCoreBody(txInternals.body) });
 
     const expectedRewards = accounts.map((rewardAccount) => ({
       quantity: availableRewards / BigInt(accounts.length),

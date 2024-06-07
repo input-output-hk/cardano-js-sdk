@@ -1,4 +1,5 @@
 import { ObservableWallet } from '@cardano-sdk/wallet';
+import { Serialization } from '@cardano-sdk/core';
 import { firstValueFrom } from 'rxjs';
 import { getEnv, getWallet, submitAndConfirm, walletReady, walletVariables } from '../../../src';
 import { logger } from '@cardano-sdk/util-dev';
@@ -29,7 +30,10 @@ describe('PersonalWallet/txChaining', () => {
       outputs: new Set([{ address, value: { coins: moreThanHalfOfTheBalanceCoins } }])
     });
 
-    const finalizedTx1 = await wallet.finalizeTx({ tx: tx1 });
+    const finalizedTx1 = await wallet.finalizeTx({
+      tx: Serialization.Transaction.fromCoreBody(tx1.body)
+    });
+
     await wallet.submitTx(finalizedTx1);
 
     const tx2 = await wallet.initializeTx({
@@ -40,7 +44,9 @@ describe('PersonalWallet/txChaining', () => {
     const usingTx1OutputAsInput = [...tx2.inputSelection.inputs].some(([txIn]) => txIn.txId === finalizedTx1.id);
     expect(usingTx1OutputAsInput).toBe(true);
 
-    const finalizedTx2 = await wallet.finalizeTx({ tx: tx2 });
+    const finalizedTx2 = await wallet.finalizeTx({
+      tx: Serialization.Transaction.fromCoreBody(tx2.body)
+    });
 
     // 1st tx must also be on-chain because the 2nd one uses output from the 1st one
     await submitAndConfirm(wallet, finalizedTx2);

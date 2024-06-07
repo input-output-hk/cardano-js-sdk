@@ -50,6 +50,26 @@ export class Transaction {
   }
 
   /**
+   * Creates a transaction object from the given transaction body with an empty witness set and no
+   * auxiliary data.
+   *
+   * @param body Data structure that contains all the elements of the transaction.
+   */
+  static fromBody(body: TransactionBody): Transaction {
+    return new Transaction(body, TransactionWitnessSet.fromCore({ signatures: new Map() }));
+  }
+
+  /**
+   * Creates a transaction object from the given transaction core body with an empty witness set and no
+   * auxiliary data.
+   *
+   * @param body Data structure that contains all the elements of the transaction.
+   */
+  static fromCoreBody(body: Cardano.TxBody): Transaction {
+    return new Transaction(TransactionBody.fromCore(body), TransactionWitnessSet.fromCore({ signatures: new Map() }));
+  }
+
+  /**
    * Serializes a transaction into CBOR format.
    *
    * @returns The transaction in CBOR format.

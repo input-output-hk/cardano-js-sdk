@@ -195,7 +195,10 @@ describe('LedgerKeyAgent', () => {
       it('successfully signs a transaction with assets and validity interval', async () => {
         const {
           witness: { signatures }
-        } = await wallet.finalizeTx({ tx: txInternals });
+        } = await wallet.finalizeTx({
+          tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+        });
+
         expect(signatures.size).toBe(2);
       });
 
@@ -280,7 +283,9 @@ describe('LedgerKeyAgent', () => {
 
         const {
           witness: { signatures }
-        } = await wallet.finalizeTx({ tx: unsignedTx });
+        } = await wallet.finalizeTx({
+          tx: Serialization.Transaction.fromCoreBody(unsignedTx.body)
+        });
         expect(signatures.size).toBe(2);
       });
 
@@ -302,9 +307,12 @@ describe('LedgerKeyAgent', () => {
           })
           .build()
           .inspect();
+
         const {
           witness: { signatures }
-        } = await wallet.finalizeTx({ tx: builtTx });
+        } = await wallet.finalizeTx({
+          tx: Serialization.Transaction.fromCoreBody(builtTx.body)
+        });
         expect(signatures.size).toBe(3);
       });
 

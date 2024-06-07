@@ -567,7 +567,7 @@ describe('cip30', () => {
 
         beforeEach(async () => {
           const txInternals = await wallet.initializeTx(simpleTxProps);
-          finalizedTx = await wallet.finalizeTx({ tx: txInternals });
+          finalizedTx = await wallet.finalizeTx({ tx: Serialization.Transaction.fromCoreBody(txInternals.body) });
           hexTx = Serialization.Transaction.fromCore(finalizedTx).toCbor();
           txBytes = Buffer.from(hexTx, 'hex');
         });
@@ -696,7 +696,7 @@ describe('cip30', () => {
 
         beforeAll(async () => {
           txInternals = await wallet.initializeTx(simpleTxProps);
-          finalizedTx = await wallet.finalizeTx({ tx: txInternals });
+          finalizedTx = await wallet.finalizeTx({ tx: Serialization.Transaction.fromCoreBody(txInternals.body) });
           serializedTx = Serialization.Transaction.fromCore(finalizedTx).toCbor();
         });
 

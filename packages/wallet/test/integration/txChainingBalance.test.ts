@@ -1,6 +1,6 @@
 import { BaseWallet } from '../../src';
 import { BigIntMath } from '@cardano-sdk/util';
-import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
+import { Cardano, Serialization, coalesceValueQuantities } from '@cardano-sdk/core';
 import { createWallet } from './util';
 import { firstValueFrom } from 'rxjs';
 
@@ -32,7 +32,7 @@ describe('integration/txChainingBalance', () => {
     // Wallet will consider the transaction 'in flight' upon submission,
     // UtxoProvider will not see the new utxo from change outputs.
     // It's up to UtxoTracker to track those.
-    await wallet.submitTx(await wallet.finalizeTx({ tx }));
+    await wallet.submitTx(await wallet.finalizeTx({ tx: Serialization.Transaction.fromCoreBody(tx.body) }));
     const balanceAfter = await firstValueFrom(wallet.balance.utxo.available$);
     expect(balanceAfter.coins).toEqual(balanceBefore.coins - coinsSpent);
   });

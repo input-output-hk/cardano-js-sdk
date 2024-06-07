@@ -146,13 +146,19 @@ export const mint = async (
 
   const unsignedTx = await wallet.initializeTx(txProps);
 
+  const witness = { redeemers: unsignedTx.redeemers, scripts: [policyScript], signatures: new Map() };
+
+  const serializableTx = new Serialization.Transaction(
+    Serialization.TransactionBody.fromCore(unsignedTx.body),
+    Serialization.TransactionWitnessSet.fromCore(witness),
+    Serialization.AuxiliaryData.fromCore(auxiliaryData)
+  );
+
   const finalizeProps: FinalizeTxProps = {
-    auxiliaryData,
     signingOptions: {
       extraSigners: [policySigner]
     },
-    tx: unsignedTx,
-    witness: { scripts: [policyScript] }
+    tx: serializableTx
   };
 
   const signedTx = await wallet.finalizeTx(finalizeProps);

@@ -25,6 +25,7 @@ import {
   HandleProvider,
   NetworkInfoProvider,
   RewardsProvider,
+  Serialization,
   UtxoProvider,
   coalesceValueQuantities
 } from '@cardano-sdk/core';
@@ -470,7 +471,7 @@ describe('BaseWallet creates big UTXO', () => {
     const unsignedTx = await wallet.initializeTx(txProps);
 
     const finalizeProps = {
-      tx: unsignedTx
+      tx: Serialization.Transaction.fromCoreBody(unsignedTx.body)
     };
 
     const signedTx = await wallet.finalizeTx(finalizeProps);

@@ -586,15 +586,7 @@ export class BaseWallet implements ObservableWallet {
     return initializeTx(props, this.getTxBuilderDependencies());
   }
 
-  async finalizeTx({
-    tx,
-    bodyCbor,
-    signingOptions,
-    signingContext,
-    auxiliaryData,
-    isValid,
-    witness
-  }: FinalizeTxProps): Promise<Cardano.Tx> {
+  async finalizeTx({ tx, signingOptions, signingContext, isValid }: FinalizeTxProps): Promise<Cardano.Tx> {
     const knownAddresses = await firstValueFrom(this.addresses$);
     const dRepPublicKey = await this.governance.getPubDRepKey();
 
@@ -602,22 +594,12 @@ export class BaseWallet implements ObservableWallet {
       ...signingContext,
       dRepPublicKey,
       knownAddresses,
-      txInKeyPathMap: await util.createTxInKeyPathMap(tx.body, knownAddresses, this.util)
+      txInKeyPathMap: await util.createTxInKeyPathMap(tx.body().toCore(), knownAddresses, this.util)
     };
 
-    const emptyWitness = { signatures: new Map() };
+    if (isValid !== undefined) tx.setIsValid(isValid);
 
-    // The Witnesser takes a serializable transaction. We cant build that from the hash alone, if
-    // the bodyCbor is available, use that instead of the coreTx type to build the transaction.
-    const transaction = new Serialization.Transaction(
-      bodyCbor ? Serialization.TransactionBody.fromCbor(bodyCbor) : Serialization.TransactionBody.fromCore(tx.body),
-      Serialization.TransactionWitnessSet.fromCore({ ...emptyWitness, ...witness }),
-      auxiliaryData ? Serialization.AuxiliaryData.fromCore(auxiliaryData) : undefined
-    );
-
-    if (isValid !== undefined) transaction.setIsValid(isValid);
-
-    const result = await this.witnesser.witness(transaction, context, signingOptions);
+    const result = await this.witnesser.witness(tx, context, signingOptions);
 
     this.#newTransactions.signed$.next(result);
 
@@ -827,12 +809,10 @@ export class BaseWallet implements ObservableWallet {
   /** Update the witness of a transaction with witness provided by this wallet */
   async updateWitness({ tx, sender }: UpdateWitnessProps): Promise<Cardano.Tx> {
     return this.finalizeTx({
-      auxiliaryData: tx.auxiliaryData,
       signingContext: {
         sender
       },
-      tx: { body: tx.body, hash: tx.id },
-      witness: tx.witness
+      tx: Serialization.Transaction.fromCore(tx)
     });
   }
 }

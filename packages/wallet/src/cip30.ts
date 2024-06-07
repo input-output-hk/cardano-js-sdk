@@ -456,7 +456,6 @@ const baseCip30WalletApi = (
     logger.debug('signTx');
     const txDecoded = Serialization.Transaction.fromCbor(TxCBOR(tx));
 
-    const hash = txDecoded.getId();
     const coreTx = txDecoded.toCore();
     const shouldProceed = await confirmationCallback
       .signTx({
@@ -479,9 +478,8 @@ const baseCip30WalletApi = (
         const {
           witness: { signatures }
         } = await wallet.finalizeTx({
-          bodyCbor: txDecoded.body().toCbor(),
           signingContext: { sender },
-          tx: { ...coreTx, hash }
+          tx: txDecoded
         });
 
         // If partialSign is true, the wallet only tries to sign what it can. However, if

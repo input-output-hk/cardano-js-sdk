@@ -229,7 +229,10 @@ describe('BaseWallet methods', () => {
       it('resolves with TransactionWitnessSet', async () => {
         const txInternals = await wallet.initializeTx(props);
         const unhydratedTxBody = Serialization.TransactionBody.fromCore(txInternals.body).toCore();
-        const tx = await wallet.finalizeTx({ tx: txInternals });
+
+        const tx = await wallet.finalizeTx({
+          tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+        });
 
         expect(tx.body).toEqual(unhydratedTxBody);
         expect(tx.id).toBe(txInternals.hash);
@@ -240,7 +243,10 @@ describe('BaseWallet methods', () => {
         const sender = { url: 'https://lace.io' };
         const witnessSpy = jest.spyOn(witnesser, 'witness');
         const txInternals = await wallet.initializeTx(props);
-        await wallet.finalizeTx({ signingContext: { sender }, tx: txInternals });
+        await wallet.finalizeTx({
+          signingContext: { sender },
+          tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+        });
 
         expect(witnessSpy).toBeCalledWith(expect.anything(), expect.objectContaining({ sender }), void 0);
       });
@@ -248,11 +254,10 @@ describe('BaseWallet methods', () => {
       it('uses the original CBOR to create the serializable transaction if given', async () => {
         const sender = { url: 'https://lace.io' };
         const witnessSpy = jest.spyOn(witnesser, 'witness');
-        const txInternals = await wallet.initializeTx(props);
+
         await wallet.finalizeTx({
-          bodyCbor: geniusYieldTx.body().toCbor(),
           signingContext: { sender },
-          tx: txInternals
+          tx: geniusYieldTx
         });
 
         expect(witnessSpy).toBeCalledWith(geniusYieldTx, expect.objectContaining({ sender }), void 0);
@@ -270,7 +275,12 @@ describe('BaseWallet methods', () => {
       );
 
       it('resolves on success', async () => {
-        const tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
+        const txInternals = await wallet.initializeTx(props);
+
+        const tx = await wallet.finalizeTx({
+          tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+        });
+
         const outgoingTx = toOutgoingTx(tx);
 
         const txSubmitting = firstValueFrom(wallet.transactions.outgoing.submitting$);
@@ -293,7 +303,12 @@ describe('BaseWallet methods', () => {
         let txInFlightSubscription: Subscription;
 
         beforeEach(async () => {
-          tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
+          const txInternals = await wallet.initializeTx(props);
+
+          tx = await wallet.finalizeTx({
+            tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+          });
+
           txInFlightEmissions = [];
           txInFlightSubscription = wallet.transactions.outgoing.inFlight$.subscribe((inFlight) =>
             txInFlightEmissions.push(inFlight)
@@ -344,10 +359,14 @@ describe('BaseWallet methods', () => {
       });
 
       it('mightBeAlreadySubmitted option interprets ValueNotConservedError as success', async () => {
+        const txInternals = await wallet.initializeTx(props);
+
         txSubmitProvider.submitTx
           .mockRejectedValueOnce(valueNotConservedError)
           .mockRejectedValueOnce(valueNotConservedError);
-        const tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
+        const tx = await wallet.finalizeTx({
+          tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+        });
         const outgoingTx = toOutgoingTx(tx);
 
         // rejects when option is not provided
@@ -369,7 +388,11 @@ describe('BaseWallet methods', () => {
       });
 
       it('attempts to resubmit the tx that is already in flight', async () => {
-        const tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
+        const txInternals = await wallet.initializeTx(props);
+
+        const tx = await wallet.finalizeTx({
+          tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+        });
 
         await wallet.submitTx(tx);
         expect(await firstValueFrom(wallet.transactions.outgoing.inFlight$)).toHaveLength(1);

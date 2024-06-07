@@ -213,7 +213,10 @@ export const submitCertificate = async (certificate: Cardano.Certificate, wallet
   };
 
   const unsignedTx = await wallet.wallet.initializeTx(txProps);
-  const signedTx = await wallet.wallet.finalizeTx({ tx: unsignedTx });
+
+  const signedTx = await wallet.wallet.finalizeTx({
+    tx: Serialization.Transaction.fromCoreBody(unsignedTx.body)
+  });
 
   await submitAndConfirm(wallet.wallet, signedTx);
 
@@ -287,12 +290,18 @@ export const burnTokens = async ({
 
   const unsignedTx = await wallet.initializeTx(txProps);
 
+  const witness = { redeemers: unsignedTx.redeemers, scripts, signatures: new Map() };
+
+  const serializableTx = new Serialization.Transaction(
+    Serialization.TransactionBody.fromCore(unsignedTx.body),
+    Serialization.TransactionWitnessSet.fromCore(witness)
+  );
+
   const finalizeProps: FinalizeTxProps = {
     signingOptions: {
       extraSigners
     },
-    tx: unsignedTx,
-    witness: { scripts }
+    tx: serializableTx
   };
 
   const signedTx = await wallet.finalizeTx(finalizeProps);

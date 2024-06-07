@@ -1,5 +1,5 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Asset, Cardano, metadatum, nativeScriptPolicyId } from '@cardano-sdk/core';
+import { Asset, Cardano, Serialization, metadatum, nativeScriptPolicyId } from '@cardano-sdk/core';
 import { Assets, BaseWallet, FinalizeTxProps } from '@cardano-sdk/wallet';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
@@ -168,13 +168,17 @@ describe('PersonalWallet.assets/nft', () => {
 
     const unsignedTx = await wallet.initializeTx(txProps);
 
+    const witness = { redeemers: unsignedTx.redeemers, scripts: [policyScript], signatures: new Map() };
+
     const finalizeProps: FinalizeTxProps = {
-      auxiliaryData,
       signingOptions: {
         extraSigners: [policySigner]
       },
-      tx: unsignedTx,
-      witness: { scripts: [policyScript] }
+      tx: new Serialization.Transaction(
+        Serialization.TransactionBody.fromCore(unsignedTx.body),
+        Serialization.TransactionWitnessSet.fromCore(witness),
+        Serialization.AuxiliaryData.fromCore(auxiliaryData)
+      )
     };
 
     const signedTx = await wallet.finalizeTx(finalizeProps);
@@ -284,12 +288,16 @@ describe('PersonalWallet.assets/nft', () => {
 
     const unsignedTx = await wallet.initializeTx(txProps);
 
+    const witness = { redeemers: unsignedTx.redeemers, scripts: [policyScript], signatures: new Map() };
+
     const finalizeProps: FinalizeTxProps = {
       signingOptions: {
         extraSigners: [policySigner]
       },
-      tx: unsignedTx,
-      witness: { scripts: [policyScript] }
+      tx: new Serialization.Transaction(
+        Serialization.TransactionBody.fromCore(unsignedTx.body),
+        Serialization.TransactionWitnessSet.fromCore(witness)
+      )
     };
 
     const signedTx = await wallet.finalizeTx(finalizeProps);
@@ -354,13 +362,17 @@ describe('PersonalWallet.assets/nft', () => {
 
         const unsignedTx = await wallet.initializeTx(txProps);
 
+        const witness = { redeemers: unsignedTx.redeemers, scripts: [policyScript], signatures: new Map() };
+
         const finalizeProps: FinalizeTxProps = {
-          auxiliaryData,
           signingOptions: {
             extraSigners: [policySigner]
           },
-          tx: unsignedTx,
-          witness: { scripts: [policyScript] }
+          tx: new Serialization.Transaction(
+            Serialization.TransactionBody.fromCore(unsignedTx.body),
+            Serialization.TransactionWitnessSet.fromCore(witness),
+            Serialization.AuxiliaryData.fromCore(auxiliaryData)
+          )
         };
 
         const signedTx = await wallet.finalizeTx(finalizeProps);

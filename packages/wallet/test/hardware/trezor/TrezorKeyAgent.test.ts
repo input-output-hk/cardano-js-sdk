@@ -143,7 +143,9 @@ describe('TrezorKeyAgent', () => {
 
       const {
         witness: { signatures }
-      } = await wallet.finalizeTx({ tx: txInternals });
+      } = await wallet.finalizeTx({
+        tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+      });
       expect(signatures.size).toBe(2);
     });
 
@@ -155,7 +157,9 @@ describe('TrezorKeyAgent', () => {
 
       const {
         witness: { signatures }
-      } = await wallet.finalizeTx({ tx: txInternals });
+      } = await wallet.finalizeTx({
+        tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+      });
       expect(signatures.size).toBe(2);
     });
 
@@ -168,7 +172,9 @@ describe('TrezorKeyAgent', () => {
 
       const {
         witness: { signatures }
-      } = await wallet.finalizeTx({ tx: txInternals });
+      } = await wallet.finalizeTx({
+        tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+      });
       expect(signatures.size).toBe(2);
     });
 
@@ -186,7 +192,9 @@ describe('TrezorKeyAgent', () => {
 
       const {
         witness: { signatures }
-      } = await wallet.finalizeTx({ tx: txInternals });
+      } = await wallet.finalizeTx({
+        tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+      });
       expect(signatures.size).toBe(2);
     });
 
@@ -201,7 +209,9 @@ describe('TrezorKeyAgent', () => {
 
       const {
         witness: { signatures }
-      } = await wallet.finalizeTx({ tx: txInternals });
+      } = await wallet.finalizeTx({
+        tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+      });
       expect(signatures.size).toBe(2);
     });
 
@@ -229,7 +239,9 @@ describe('TrezorKeyAgent', () => {
 
       const {
         witness: { signatures }
-      } = await wallet.finalizeTx({ tx: txInternals });
+      } = await wallet.finalizeTx({
+        tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+      });
       expect(signatures.size).toBe(2);
     });
 
@@ -252,7 +264,9 @@ describe('TrezorKeyAgent', () => {
 
       const {
         witness: { signatures }
-      } = await wallet.finalizeTx({ tx: txInternals });
+      } = await wallet.finalizeTx({
+        tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+      });
       expect(signatures.size).toBe(2);
     });
 
@@ -285,7 +299,9 @@ describe('TrezorKeyAgent', () => {
 
       const {
         witness: { signatures }
-      } = await wallet.finalizeTx({ tx: txInternals });
+      } = await wallet.finalizeTx({
+        tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+      });
       expect(signatures.size).toBe(2);
     });
 
@@ -313,7 +329,9 @@ describe('TrezorKeyAgent', () => {
 
       const {
         witness: { signatures }
-      } = await wallet.finalizeTx({ tx: txInternals });
+      } = await wallet.finalizeTx({
+        tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+      });
       expect(signatures.size).toBe(2);
     });
 
@@ -325,7 +343,9 @@ describe('TrezorKeyAgent', () => {
 
       const {
         witness: { signatures }
-      } = await wallet.finalizeTx({ tx: txInternals });
+      } = await wallet.finalizeTx({
+        tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+      });
       expect(signatures.size).toBe(2);
     });
 
@@ -337,7 +357,9 @@ describe('TrezorKeyAgent', () => {
 
       const {
         witness: { signatures }
-      } = await wallet.finalizeTx({ tx: txInternals });
+      } = await wallet.finalizeTx({
+        tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+      });
       expect(signatures.size).toBe(2);
     });
 
@@ -350,7 +372,9 @@ describe('TrezorKeyAgent', () => {
 
       const {
         witness: { signatures }
-      } = await wallet.finalizeTx({ tx: txInternals });
+      } = await wallet.finalizeTx({
+        tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+      });
       expect(signatures.size).toBe(2);
     });
 
@@ -382,7 +406,9 @@ describe('TrezorKeyAgent', () => {
 
       const {
         witness: { signatures }
-      } = await wallet.finalizeTx({ tx: txInternals });
+      } = await wallet.finalizeTx({
+        tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+      });
       expect(signatures.size).toBe(2);
     });
 
@@ -404,7 +430,9 @@ describe('TrezorKeyAgent', () => {
 
       const {
         witness: { signatures }
-      } = await wallet.finalizeTx({ tx: txInternals });
+      } = await wallet.finalizeTx({
+        tx: Serialization.Transaction.fromCoreBody(txInternals.body)
+      });
       expect(signatures.size).toBe(2);
     });
 
@@ -431,7 +459,9 @@ describe('TrezorKeyAgent', () => {
         .inspect();
       const {
         witness: { signatures }
-      } = await wallet.finalizeTx({ tx: builtTx });
+      } = await wallet.finalizeTx({
+        tx: Serialization.Transaction.fromCoreBody(builtTx.body)
+      });
       expect(signatures.size).toBe(3);
     });
   });
