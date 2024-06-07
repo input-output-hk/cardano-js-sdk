@@ -416,6 +416,9 @@ in
           providers = {
             backend = {
               enabled = true;
+              env.USE_SUBMIT_API = "true";
+              env.SUBMIT_API_URL = "http://${final.namespace}-cardano-stack.${final.namespace}.svc.cluster.local:8090";
+              env.USE_BLOCKFROST = lib.mkForce "false";
             };
             stake-pool-provider = {
               enabled = true;
