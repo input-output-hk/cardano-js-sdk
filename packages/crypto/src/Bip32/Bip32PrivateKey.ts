@@ -5,7 +5,7 @@ import { Bip32PublicKey } from './Bip32PublicKey';
 import { EXTENDED_ED25519_PRIVATE_KEY_LENGTH, Ed25519PrivateKey } from '../Ed25519e';
 import { InvalidArgumentError } from '@cardano-sdk/util';
 import { crypto_scalarmult_ed25519_base_noclamp, ready } from 'libsodium-wrappers-sumo';
-import { pbkdf2 } from 'pbkdf2';
+import { pbkdf2Sync } from 'pbkdf2';
 
 const SCALAR_INDEX = 0;
 const SCALAR_SIZE = 32;
@@ -75,17 +75,15 @@ export class Bip32PrivateKey {
    * @param password The second factor authentication password for the mnemonic phrase.
    * @returns The secret extended key.
    */
-  static fromBip39Entropy(entropy: Buffer, password: string): Promise<Bip32PrivateKey> {
-    return new Promise((resolve, reject) => {
-      pbkdf2(password, entropy, PBKDF2_ITERATIONS, PBKDF2_KEY_SIZE, PBKDF2_DIGEST_ALGORITHM, (err, xprv) => {
-        if (err) {
-          reject(err);
-        }
-
-        xprv = clampScalar(xprv);
-        resolve(Bip32PrivateKey.fromBytes(xprv));
-      });
-    });
+  static fromBip39Entropy(entropy: Buffer, password: string): Bip32PrivateKey {
+    const xprv = pbkdf2Sync(
+      password,
+      entropy,
+      PBKDF2_ITERATIONS,
+      PBKDF2_KEY_SIZE,
+      PBKDF2_DIGEST_ALGORITHM
+    );
+    return Bip32PrivateKey.fromBytes(clampScalar(xprv));
   }
 
   /**
