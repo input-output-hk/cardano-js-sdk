@@ -23,7 +23,7 @@ const testBip32Ed25519 = (name: string, bip32Ed25519: Crypto.Bip32Ed25519) => {
       expect.assertions(extendedVectors.length);
 
       for (const vector of extendedVectors) {
-        const bip32Key = await bip32Ed25519.fromBip39Entropy(Buffer.from(vector.bip39Entropy, 'hex'), vector.password);
+        const bip32Key = bip32Ed25519.fromBip39Entropy(Buffer.from(vector.bip39Entropy, 'hex'), vector.password);
         expect(bip32Key).toBe(vector.rootKey);
       }
     });
