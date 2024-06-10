@@ -2,17 +2,11 @@ import { Cardano, Seconds, SupplySummary } from '@cardano-sdk/core';
 import { CostModelsParamModel, ProtocolParamsModel } from './types';
 import { GenesisData } from '../../types';
 import { LedgerTipModel } from '../../util/DbSyncProvider';
-import Fraction from 'fraction.js';
 
 interface ToLovalaceSupplyInput {
   circulatingSupply: string;
   totalSupply: string;
 }
-
-const mapFraction = (value: number): Cardano.Fraction => {
-  const { n: numerator, d: denominator } = new Fraction(value);
-  return { denominator, numerator };
-};
 
 export const networkIdMap = {
   Mainnet: Cardano.NetworkId.Mainnet,
@@ -96,16 +90,16 @@ export const toProtocolParams = ({
   // CDDL represents it as `32: epoch  ; DRep inactivity period`
   dRepInactivityPeriod: Cardano.EpochNo(drep_activity),
   dRepVotingThresholds: {
-    committeeNoConfidence: mapFraction(dvt_committee_no_confidence),
-    committeeNormal: mapFraction(dvt_committee_normal),
-    hardForkInitiation: mapFraction(dvt_hard_fork_initiation),
-    motionNoConfidence: mapFraction(dvt_motion_no_confidence),
-    ppEconomicGroup: mapFraction(dvt_p_p_economic_group),
-    ppGovernanceGroup: mapFraction(dvt_p_p_gov_group),
-    ppNetworkGroup: mapFraction(dvt_p_p_network_group),
-    ppTechnicalGroup: mapFraction(dvt_p_p_technical_group),
-    treasuryWithdrawal: mapFraction(dvt_treasury_withdrawal),
-    updateConstitution: mapFraction(dvt_update_to_constitution)
+    committeeNoConfidence: Cardano.FractionUtils.toFraction(dvt_committee_no_confidence),
+    committeeNormal: Cardano.FractionUtils.toFraction(dvt_committee_normal),
+    hardForkInitiation: Cardano.FractionUtils.toFraction(dvt_hard_fork_initiation),
+    motionNoConfidence: Cardano.FractionUtils.toFraction(dvt_motion_no_confidence),
+    ppEconomicGroup: Cardano.FractionUtils.toFraction(dvt_p_p_economic_group),
+    ppGovernanceGroup: Cardano.FractionUtils.toFraction(dvt_p_p_gov_group),
+    ppNetworkGroup: Cardano.FractionUtils.toFraction(dvt_p_p_network_group),
+    ppTechnicalGroup: Cardano.FractionUtils.toFraction(dvt_p_p_technical_group),
+    treasuryWithdrawal: Cardano.FractionUtils.toFraction(dvt_treasury_withdrawal),
+    updateConstitution: Cardano.FractionUtils.toFraction(dvt_update_to_constitution)
   },
   desiredNumberOfPools: optimal_pool_count,
   governanceActionDeposit: Number(gov_action_deposit),
@@ -133,11 +127,11 @@ export const toProtocolParams = ({
   poolInfluence: String(influence),
   poolRetirementEpochBound: max_epoch,
   poolVotingThresholds: {
-    committeeNoConfidence: mapFraction(pvt_committee_no_confidence),
-    committeeNormal: mapFraction(pvt_committee_normal),
-    hardForkInitiation: mapFraction(pvt_hard_fork_initiation),
-    motionNoConfidence: mapFraction(pvt_motion_no_confidence),
-    securityRelevantParamVotingThreshold: mapFraction(pvtpp_security_group)
+    committeeNoConfidence: Cardano.FractionUtils.toFraction(pvt_committee_no_confidence),
+    committeeNormal: Cardano.FractionUtils.toFraction(pvt_committee_normal),
+    hardForkInitiation: Cardano.FractionUtils.toFraction(pvt_hard_fork_initiation),
+    motionNoConfidence: Cardano.FractionUtils.toFraction(pvt_motion_no_confidence),
+    securityRelevantParamVotingThreshold: Cardano.FractionUtils.toFraction(pvtpp_security_group)
   },
   prices: {
     memory: price_mem,
