@@ -6,7 +6,6 @@ import { bytesToHex, hexToBytes } from '../../util/misc';
 /** A list of plutus data. */
 export class PlutusList {
   readonly #array = new Array<PlutusData>();
-  #useIndefiniteEncoding = false;
 
   /**
    * Serializes this PlutusList instance into its CBOR representation as a Uint8Array.
@@ -15,8 +14,9 @@ export class PlutusList {
    */
   toCbor(): HexBlob {
     const writer = new CborWriter();
+    const shouldUseIndefinite = this.#array.length > 0;
 
-    if (this.#useIndefiniteEncoding) {
+    if (shouldUseIndefinite) {
       writer.writeStartArray();
     } else {
       writer.writeStartArray(this.#array.length);
@@ -26,7 +26,7 @@ export class PlutusList {
       writer.writeEncodedValue(hexToBytes(elem.toCbor()));
     }
 
-    if (this.#useIndefiniteEncoding) writer.writeEndArray();
+    if (shouldUseIndefinite) writer.writeEndArray();
 
     return HexBlob.fromBytes(writer.encode());
   }
@@ -41,9 +41,7 @@ export class PlutusList {
     const list = new PlutusList();
     const reader = new CborReader(cbor);
 
-    const length = reader.readStartArray();
-
-    if (length === null) list.#useIndefiniteEncoding = true;
+    reader.readStartArray();
 
     while (reader.peekState() !== CborReaderState.EndArray) {
       list.add(PlutusData.fromCbor(bytesToHex(reader.readEncodedValue())));
@@ -88,7 +86,6 @@ export class PlutusList {
    * @returns true if objects are equals; otherwise false.
    */
   equals(other: PlutusList): boolean {
-    if (this.#useIndefiniteEncoding !== other.#useIndefiniteEncoding) return false;
     if (this.#array.length !== other.#array.length) return false;
 
     for (let i = 0; i < this.#array.length; ++i) {
