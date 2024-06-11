@@ -3,7 +3,7 @@ import { CborReader, CborWriter } from '../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { UnitInterval } from '../Common';
 
-const POOL_VOTING_THRESHOLDS_SIZE = 4;
+const POOL_VOTING_THRESHOLDS_SIZE = 5;
 
 /**
  * Governance actions are ratified through on-chain voting. Different
@@ -17,6 +17,7 @@ export class PoolVotingThresholds {
   #committeeNormal: UnitInterval;
   #committeeNoConfidence: UnitInterval;
   #hardForkInitiation: UnitInterval;
+  #securityRelevantParam: UnitInterval;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -35,12 +36,14 @@ export class PoolVotingThresholds {
     motionNoConfidence: UnitInterval,
     committeeNormal: UnitInterval,
     committeeNoConfidence: UnitInterval,
-    hardForkInitiation: UnitInterval
+    hardForkInitiation: UnitInterval,
+    securityRelevantParam: UnitInterval
   ) {
     this.#motionNoConfidence = motionNoConfidence;
     this.#committeeNormal = committeeNormal;
     this.#committeeNoConfidence = committeeNoConfidence;
     this.#hardForkInitiation = hardForkInitiation;
+    this.#securityRelevantParam = securityRelevantParam;
   }
 
   /**
@@ -59,6 +62,7 @@ export class PoolVotingThresholds {
     //   , unit_interval ; committee normal
     //   , unit_interval ; committee no confidence
     //   , unit_interval ; hard fork initiation
+    //   , unit_interval ; security relevant parameter voting threshold
     //   ]
     writer.writeStartArray(POOL_VOTING_THRESHOLDS_SIZE);
 
@@ -66,6 +70,7 @@ export class PoolVotingThresholds {
     writer.writeEncodedValue(Buffer.from(this.#committeeNormal.toCbor(), 'hex'));
     writer.writeEncodedValue(Buffer.from(this.#committeeNoConfidence.toCbor(), 'hex'));
     writer.writeEncodedValue(Buffer.from(this.#hardForkInitiation.toCbor(), 'hex'));
+    writer.writeEncodedValue(Buffer.from(this.#securityRelevantParam.toCbor(), 'hex'));
 
     return writer.encodeAsHex();
   }
@@ -91,6 +96,7 @@ export class PoolVotingThresholds {
     const committeeNormal = UnitInterval.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
     const committeeNoConfidence = UnitInterval.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
     const hardForkInitiation = UnitInterval.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
+    const securityRelevantParamVotingThreshold = UnitInterval.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
 
     reader.readEndArray();
 
@@ -98,7 +104,8 @@ export class PoolVotingThresholds {
       motionNoConfidence,
       committeeNormal,
       committeeNoConfidence,
-      hardForkInitiation
+      hardForkInitiation,
+      securityRelevantParamVotingThreshold
     );
 
     thresholds.#originalBytes = cbor;
@@ -107,16 +114,17 @@ export class PoolVotingThresholds {
   }
 
   /**
-   * Creates a Core PoolVotingThresholdsSHOLDS_SIZE object from the current PoolVotingThresholds object.
+   * Creates a Core PoolVotingThresholds object from the current PoolVotingThresholds object.
    *
    * @returns The Core Prices object.
    */
   toCore(): Cardano.PoolVotingThresholds {
     return {
-      commiteeNoConfidence: this.#committeeNoConfidence.toCore(),
+      committeeNoConfidence: this.#committeeNoConfidence.toCore(),
       committeeNormal: this.#committeeNormal.toCore(),
       hardForkInitiation: this.#hardForkInitiation.toCore(),
-      motionNoConfidence: this.#motionNoConfidence.toCore()
+      motionNoConfidence: this.#motionNoConfidence.toCore(),
+      securityRelevantParamVotingThreshold: this.#securityRelevantParam.toCore()
     };
   }
 
@@ -129,8 +137,9 @@ export class PoolVotingThresholds {
     return new PoolVotingThresholds(
       UnitInterval.fromCore(core.motionNoConfidence),
       UnitInterval.fromCore(core.committeeNormal),
-      UnitInterval.fromCore(core.commiteeNoConfidence),
-      UnitInterval.fromCore(core.hardForkInitiation)
+      UnitInterval.fromCore(core.committeeNoConfidence),
+      UnitInterval.fromCore(core.hardForkInitiation),
+      UnitInterval.fromCore(core.securityRelevantParamVotingThreshold)
     );
   }
 
@@ -222,5 +231,14 @@ export class PoolVotingThresholds {
    */
   hardForkInitiation(): UnitInterval {
     return this.#hardForkInitiation;
+  }
+
+  /**
+   * Gets the security relevant parameter voting threshold
+   *
+   * @returns security relevant parameter voting threshold.
+   */
+  securityRelevantParam(): UnitInterval {
+    return this.#securityRelevantParam;
   }
 }

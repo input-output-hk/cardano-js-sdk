@@ -44,6 +44,7 @@ import {
   mapAnchor,
   mapCertificate,
   mapPlutusScript,
+  mapProtocolParametersUpdateAction,
   mapRedeemer,
   mapTxId,
   mapTxInModel,
@@ -146,7 +147,7 @@ const getGovernanceAction = ({
         __typename: GovernanceActionType.parameter_change_action,
         governanceActionId,
         policyHash: contents[2],
-        protocolParamUpdate: contents[1]
+        protocolParamUpdate: mapProtocolParametersUpdateAction(contents[1])
       };
 
     case 'TreasuryWithdrawals':
