@@ -473,6 +473,8 @@ in
             stakepool.databaseName = "stakepoolv2";
             blockfrost-worker.enabled = true;
             pg-boss-worker.enabled = true;
+            pg-boss-worker.metadata-fetch-mode = "direct";
+            pg-boss-worker.queues = "pool-metadata,pool-metrics,pool-rewards";
             cardano-services = {
               ingresOrder = 98;
             };
@@ -943,6 +945,7 @@ in
         };
 
         "ops-preview-1@us-east-1" = final: {
+          name = "${final.namespace}-cardanojs-v2";
           namespace = "ops-preview-1";
           network = "preview";
           region = "us-east-1";
