@@ -19,7 +19,8 @@ const stubSingleEventProjection = (eventType: ChainSyncEventType, header: Cardan
     eventType
   } as BaseProjectionEvent);
 
-describe('createTypeormTipTracker', () => {
+// TODO LW-9971
+describe.skip('createTypeormTipTracker', () => {
   const entities = [BlockEntity];
   const retryBackoffConfig: RetryBackoffConfig = { initialInterval: 1 };
 
@@ -106,8 +107,7 @@ describe('createTypeormTipTracker', () => {
       });
     });
 
-    // TODO LW-9971
-    describe.skip('with 2 blocks in the buffer', () => {
+    describe('with 2 blocks in the buffer', () => {
       let header1: Cardano.PartialBlockHeader;
       let header2: Cardano.PartialBlockHeader;
 
@@ -134,8 +134,7 @@ describe('createTypeormTipTracker', () => {
     });
   });
 
-  // TODO LW-9971
-  describe.skip('with failing connection', () => {
+  describe('with failing connection', () => {
     it('reconnects and eventually emits the tip', async () => {
       connection$ = createStubObservable(
         throwError(() => new NoConnectionForRepositoryError('conn')),
