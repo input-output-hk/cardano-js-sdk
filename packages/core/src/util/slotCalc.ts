@@ -2,10 +2,10 @@ import { CustomError } from 'ts-custom-error';
 import { EpochNo, NetworkMagics, Slot } from '../Cardano';
 import { EraSummary } from '../CardanoNode';
 import { NetworkInfoProvider } from '../Provider/NetworkInfoProvider';
-import groupBy from 'lodash/groupBy';
-import last from 'lodash/last';
-import memoize from 'lodash/memoize';
-import orderBy from 'lodash/orderBy';
+import groupBy from 'lodash/groupBy.js';
+import last from 'lodash/last.js';
+import memoize from 'lodash/memoize.js';
+import orderBy from 'lodash/orderBy.js';
 
 export interface SlotDate {
   slot: Slot;

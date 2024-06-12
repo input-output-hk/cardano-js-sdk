@@ -37,10 +37,10 @@ import { distinctBlock, signedTxsEquals, transactionsEquals, txInEquals } from '
 
 import { WitnessedTx } from '@cardano-sdk/key-management';
 import { newAndStoredMulticast } from './util/newAndStoredMulticast';
-import chunk from 'lodash/chunk';
-import intersectionBy from 'lodash/intersectionBy';
-import sortBy from 'lodash/sortBy';
-import unionBy from 'lodash/unionBy';
+import chunk from 'lodash/chunk.js';
+import intersectionBy from 'lodash/intersectionBy.js';
+import sortBy from 'lodash/sortBy.js';
+import unionBy from 'lodash/unionBy.js';
 
 export interface TransactionsTrackerProps {
   chainHistoryProvider: ChainHistoryProvider;

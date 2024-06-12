@@ -11,7 +11,7 @@ import { InvalidHereafterError } from './types';
 import { RedeemersByType, computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit } from '../input-selection';
 import { RewardAccountWithPoolId, TxBuilderProviders } from '../types';
 import { ValidityInterval } from '@cardano-sdk/core/dist/cjs/Cardano';
-import minBy from 'lodash/minBy';
+import minBy from 'lodash/minBy.js';
 
 const COLLATERAL_AMOUNT_IN_LOVELACE = 5_000_000n;
 

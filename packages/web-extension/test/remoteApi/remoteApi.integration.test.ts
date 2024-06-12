@@ -31,7 +31,7 @@ import {
   toArray
 } from 'rxjs';
 import { dummyLogger } from 'ts-log';
-import memoize from 'lodash/memoize';
+import memoize from 'lodash/memoize.js';
 
 const logger = dummyLogger;
 

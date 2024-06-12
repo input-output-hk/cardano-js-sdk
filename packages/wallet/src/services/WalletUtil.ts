@@ -6,7 +6,7 @@ import { Observable, firstValueFrom } from 'rxjs';
 import { ObservableWallet, ScriptAddress, isScriptAddress } from '../types';
 import { ProtocolParametersRequiredByOutputValidator, createOutputValidator } from '@cardano-sdk/tx-construction';
 import { txInEquals } from './util';
-import uniqBy from 'lodash/uniqBy';
+import uniqBy from 'lodash/uniqBy.js';
 
 export interface InputResolverContext {
   utxo: {

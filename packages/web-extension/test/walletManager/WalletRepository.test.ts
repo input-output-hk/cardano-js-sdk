@@ -16,7 +16,7 @@ import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { KeyPurpose, KeyRole } from '@cardano-sdk/key-management';
 import { logger } from '@cardano-sdk/util-dev';
-import pick from 'lodash/pick';
+import pick from 'lodash/pick.js';
 
 const storedLedgerWallet: HardwareWallet<WalletMetadata, AccountMetadata> = {
   accounts: [createAccount(0, 0)],

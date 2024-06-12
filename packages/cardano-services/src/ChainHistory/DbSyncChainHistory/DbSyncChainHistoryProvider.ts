@@ -18,7 +18,7 @@ import { QueryResult } from 'pg';
 import { TxMetadataService } from '../../Metadata';
 import { hexStringToBuffer } from '@cardano-sdk/util';
 import { mapBlock, mapTxAlonzo, mapTxIn, mapTxOut } from './mappers';
-import orderBy from 'lodash/orderBy';
+import orderBy from 'lodash/orderBy.js';
 
 /** Properties that are need to create DbSyncChainHistoryProvider */
 export interface ChainHistoryProviderProps {

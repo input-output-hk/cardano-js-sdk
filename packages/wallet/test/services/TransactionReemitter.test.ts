@@ -12,7 +12,7 @@ import { InMemoryInFlightTransactionsStore, InMemoryVolatileTransactionsStore } 
 import { Logger, dummyLogger } from 'ts-log';
 import { createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyCbor } from '../util';
-import omit from 'lodash/omit';
+import omit from 'lodash/omit.js';
 
 const { genesisParameters } = mockProviders;
 

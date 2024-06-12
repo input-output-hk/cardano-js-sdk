@@ -7,7 +7,7 @@ import { Logger } from 'ts-log';
 import { asMetadatumArray, asMetadatumMap } from '../../util/metadatum';
 import { asString } from './util';
 import { isNotNil } from '@cardano-sdk/util';
-import difference from 'lodash/difference';
+import difference from 'lodash/difference.js';
 
 const isString = (obj: unknown): obj is string => typeof obj === 'string';
 const VersionRegExp = /^\d+\.?\d?$/;

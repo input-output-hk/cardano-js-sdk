@@ -16,7 +16,7 @@ import {
 } from '../../src';
 import { fromSerializableObject } from '@cardano-sdk/util';
 
-import merge from 'lodash/merge';
+import merge from 'lodash/merge.js';
 
 // Era summaries copied from util-dev package.
 // Importing directly from util-dev reports Milliseconds types incompatible.

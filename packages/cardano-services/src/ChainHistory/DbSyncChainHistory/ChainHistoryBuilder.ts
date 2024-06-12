@@ -39,8 +39,8 @@ import {
   mapTxTokenMap,
   mapWithdrawal
 } from './mappers';
-import omit from 'lodash/omit';
-import orderBy from 'lodash/orderBy';
+import omit from 'lodash/omit.js';
+import orderBy from 'lodash/orderBy.js';
 
 export class ChainHistoryBuilder {
   #db: Pool;

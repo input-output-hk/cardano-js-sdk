@@ -18,7 +18,7 @@ import { ObservableWallet, storage } from '@cardano-sdk/wallet';
 import { Storage } from 'webextension-polyfill';
 import { TimeoutError, filter, firstValueFrom, from, skip, timeout } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
-import pick from 'lodash/pick';
+import pick from 'lodash/pick.js';
 
 jest.mock('../../src/messaging', () => {
   const originalModule = jest.requireActual('../../src/messaging');

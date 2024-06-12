@@ -20,10 +20,8 @@
   "sideEffects": false,
   "license": "Apache-2.0",
   "scripts": {
-    "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
-    "build:cjs": "tsc --build src",
-    "build": "run-s build:cjs build:esm module-fixup",
-    "module-fixup": "cp ../../build/cjs-package.json ./dist/cjs/package.json && cp ../../build/esm-package.json ./dist/esm/package.json",
+    "build": "yarn build:cjs && tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020 && tsc-alias -p src/tsconfig.json --outDir ./dist/esm && cp ../../build/esm-package.json ./dist/esm/package.json",
+    "build:cjs": "tsc --build src && cp ../../build/cjs-package.json ./dist/cjs/package.json",
     "tscNoEmit": "echo typescript --noEmit command not implemented yet",
     "cleanup:dist": "rm -rf dist",
     "cleanup:nm": "rm -rf node_modules",
@@ -50,6 +48,7 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.4.0",
     "ts-log": "^2.2.4",
+    "tsc-alias": "^1.8.10",
     "typeorm": "^0.3.15",
     "uuid": "^9.0.0"
   },
