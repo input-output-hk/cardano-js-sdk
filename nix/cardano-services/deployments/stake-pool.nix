@@ -31,7 +31,6 @@
       USE_TYPEORM_STAKE_POOL_PROVIDER = "true";
       TOKEN_METADATA_SERVER_URL = values.cardano-services.tokenMetadataServerUrl;
 
-      BUILD_INFO = values.cardano-services.buildInfo;
       ALLOWED_ORIGINS = values.backend.allowedOrigins;
 
       POSTGRES_POOL_MAX_STAKE_POOL = "10";
@@ -73,8 +72,6 @@
       LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
       OGMIOS_SRV_SERVICE_NAME = values.backend.ogmiosSrvServiceName;
       PROJECTION_NAMES = "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job,stake-pool-rewards-job";
-
-      BUILD_INFO = values.cardano-services.buildInfo;
 
       POSTGRES_POOL_MAX = "2";
       POSTGRES_HOST = values.postgresName;

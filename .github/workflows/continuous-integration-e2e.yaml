@@ -51,7 +51,7 @@ jobs:
       - name: 🔨 Build
         run: |
           yarn install --immutable --inline-builds --mode=skip-build
-          yarn build
+          yarn build:cjs
           docker build --no-cache .
         env:
           NODE_OPTIONS: '--max_old_space_size=8192'

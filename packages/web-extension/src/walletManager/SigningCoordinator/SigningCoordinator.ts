@@ -1,7 +1,7 @@
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 import { InMemoryWallet, WalletType } from '../types';
-import { KeyAgent, SignBlobResult, TrezorConfig, errors } from '@cardano-sdk/key-management';
+import { KeyAgent, KeyPurpose, SignBlobResult, TrezorConfig, errors } from '@cardano-sdk/key-management';
 import { KeyAgentFactory } from './KeyAgentFactory';
 import { Logger } from 'ts-log';
 import {
@@ -164,7 +164,8 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
                             ...Buffer.from(wallet.encryptedSecrets.rootPrivateKeyBytes, 'hex')
                           ],
                           extendedAccountPublicKey: account.extendedAccountPublicKey,
-                          getPassphrase: async () => passphrase
+                          getPassphrase: async () => passphrase,
+                          purpose: account.purpose || KeyPurpose.STANDARD
                         })
                       );
                       clearPassphrase(passphrase);
@@ -190,12 +191,14 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
                             accountIndex: request.requestContext.accountIndex,
                             chainId: request.requestContext.chainId,
                             communicationType: this.#hwOptions.communicationType,
-                            extendedAccountPublicKey: account.extendedAccountPublicKey
+                            extendedAccountPublicKey: account.extendedAccountPublicKey,
+                            purpose: KeyPurpose.STANDARD
                           })
                         : this.#keyAgentFactory.Trezor({
                             accountIndex: request.requestContext.accountIndex,
                             chainId: request.requestContext.chainId,
                             extendedAccountPublicKey: account.extendedAccountPublicKey,
+                            purpose: KeyPurpose.STANDARD,
                             trezorConfig: this.#hwOptions
                           })
                     ).catch((error) => throwMaybeWrappedWithNoRejectError(error, options)),

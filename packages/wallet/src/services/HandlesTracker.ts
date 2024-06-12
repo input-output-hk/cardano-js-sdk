@@ -20,7 +20,7 @@ import { Logger } from 'ts-log';
 import { deepEquals, isNotNil, sameArrayItems } from '@cardano-sdk/util';
 import { passthrough } from '@cardano-sdk/util-rxjs';
 import { retryBackoff } from 'backoff-rxjs';
-import uniqBy from 'lodash/uniqBy';
+import uniqBy from 'lodash/uniqBy.js';
 
 export const HYDRATE_HANDLE_INITIAL_INTERVAL = 50;
 export const HYDRATE_HANDLE_MAX_RETRIES = 5;

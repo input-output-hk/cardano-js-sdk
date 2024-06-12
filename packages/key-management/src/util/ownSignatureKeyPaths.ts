@@ -3,9 +3,9 @@ import { AccountKeyDerivationPath, GroupedAddress, TxInId, TxInKeyPathMap } from
 import { Cardano } from '@cardano-sdk/core';
 import { DREP_KEY_DERIVATION_PATH } from './key';
 import { isNotNil } from '@cardano-sdk/util';
-import isEqual from 'lodash/isEqual';
-import uniqBy from 'lodash/uniqBy';
-import uniqWith from 'lodash/uniqWith';
+import isEqual from 'lodash/isEqual.js';
+import uniqBy from 'lodash/uniqBy.js';
+import uniqWith from 'lodash/uniqWith.js';
 
 export type StakeKeySignerData = {
   poolId: Cardano.PoolId;

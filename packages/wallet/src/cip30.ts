@@ -25,7 +25,7 @@ import { MessageSender } from '@cardano-sdk/key-management';
 import { Observable, firstValueFrom, map } from 'rxjs';
 import { ObservableWallet } from './types';
 import { requiresForeignSignatures } from './services';
-import uniq from 'lodash/uniq';
+import uniq from 'lodash/uniq.js';
 
 export type Cip30WalletDependencies = {
   logger: Logger;
@@ -478,7 +478,11 @@ const baseCip30WalletApi = (
           );
         const {
           witness: { signatures }
-        } = await wallet.finalizeTx({ signingContext: { sender }, tx: { ...coreTx, hash } });
+        } = await wallet.finalizeTx({
+          bodyCbor: txDecoded.body().toCbor(),
+          signingContext: { sender },
+          tx: { ...coreTx, hash }
+        });
 
         // If partialSign is true, the wallet only tries to sign what it can. However, if
         // signatures size is 0 then throw.

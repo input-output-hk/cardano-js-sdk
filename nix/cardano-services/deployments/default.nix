@@ -422,13 +422,13 @@ in
               env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
             handle-provider.enabled = true;
-          # asset-provider.enabled = true;
+            # asset-provider.enabled = true;
           };
 
           projectors = {
             handle.enabled = true;
             stake-pool.enabled = true;
-          # asset.enabled = true;
+            # asset.enabled = true;
           };
 
           values = {
@@ -459,7 +459,7 @@ in
               env.OVERRIDE_FUZZY_OPTIONS = "true";
               env.NODE_ENV = "production";
             };
-            # handle-provider.enabled = true;
+            handle-provider.enabled = true;
             # asset-provider = {
             #   enabled = true;
             #   env.NODE_ENV = "production";
@@ -530,7 +530,7 @@ in
               env.OVERRIDE_FUZZY_OPTIONS = "true";
               env.NODE_ENV = "production";
             };
-            # handle-provider.enabled = true;
+            handle-provider.enabled = true;
             #asset-provider = {
             #  enabled = true;
             #  env.NODE_ENV = "production";
@@ -540,7 +540,7 @@ in
           projectors = {
             handle.enabled = true;
             stake-pool.enabled = true;
-            #asset.enabled = true;
+            # asset.enabled = true;
           };
 
           values = {
@@ -600,7 +600,7 @@ in
               env.NODE_ENV = "production";
             };
             handle-provider = {
-              enabled = false;
+              enabled = true;
               env.NODE_ENV = "production";
             };
             #asset-provider = {
@@ -614,7 +614,7 @@ in
             stake-pool = {
               enabled = true;
             };
-            #asset.enabled = true;
+            # asset.enabled = true;
           };
 
           values = {
@@ -661,7 +661,7 @@ in
               env.NODE_ENV = "production";
             };
             handle-provider = {
-              enabled = false;
+              enabled = true;
               env.NODE_ENV = "production";
             };
             #asset-provider = {
@@ -675,7 +675,7 @@ in
             stake-pool = {
               enabled = true;
             };
-            #asset.enabled = true;
+            # asset.enabled = true;
           };
 
           values = {
@@ -761,7 +761,7 @@ in
               env.NODE_ENV = "production";
             };
             handle-provider = {
-              enabled = false;
+              enabled = true;
               env.NODE_ENV = "production";
             };
             #asset-provider = {
@@ -775,7 +775,7 @@ in
             stake-pool = {
               enabled = true;
             };
-            #asset.enabled = true;
+            # asset.enabled = true;
           };
 
           values = {
@@ -861,7 +861,7 @@ in
               env.NODE_ENV = "production";
             };
             handle-provider = {
-              enabled = false;
+              enabled = true;
               env.NODE_ENV = "production";
             };
             # asset-provider = {
@@ -1097,4 +1097,10 @@ in
         #  context = "eks-admin";
         #};
       });
+
+    targetGroups = targets: {
+      DEV = lib.filterAttrs (name: _: lib.hasPrefix "dev-" name) targets;
+      LIVE = lib.filterAttrs (name: _: lib.hasPrefix "live-" name) targets;
+      OPS = lib.filterAttrs (name: _: lib.hasPrefix "ops-" name) targets;
+    };
   }

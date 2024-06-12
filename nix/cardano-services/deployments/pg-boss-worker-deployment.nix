@@ -57,7 +57,6 @@
                   NETWORK = config.network;
                   LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
                   QUEUES = values.pg-boss-worker.queues;
-                  BUILD_INFO = values.cardano-services.buildInfo;
 
                   METADATA_FETCH_MODE = values.pg-boss-worker.metadata-fetch-mode;
 

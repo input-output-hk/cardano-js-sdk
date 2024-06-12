@@ -38,7 +38,7 @@ import { createLogger } from 'bunyan';
 import { getConnectionConfig, getOgmiosObservableCardanoNode } from '../services';
 import { getEntities } from '../../Projection/prepareTypeormProjection';
 import { isNotNil } from '@cardano-sdk/util';
-import memoize from 'lodash/memoize';
+import memoize from 'lodash/memoize.js';
 
 export const ALLOWED_ORIGINS_DEFAULT = false;
 export const DISABLE_DB_CACHE_DEFAULT = false;

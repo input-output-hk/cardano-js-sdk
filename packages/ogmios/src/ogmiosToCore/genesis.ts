@@ -1,6 +1,6 @@
 import { Cardano, Milliseconds } from '@cardano-sdk/core';
 import { Schema } from '@cardano-ogmios/client';
-import omit from 'lodash/omit';
+import omit from 'lodash/omit.js';
 
 export const genesis = (ogmiosGenesis: Schema.GenesisShelley): Cardano.CompactGenesis => ({
   ...omit(ogmiosGenesis, 'initialParameters'),

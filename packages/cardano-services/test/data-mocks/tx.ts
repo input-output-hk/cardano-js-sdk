@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Hash28ByteBase16, Hash32ByteBase16 } from '@cardano-sdk/crypto';
 
-import merge from 'lodash/merge';
+import merge from 'lodash/merge.js';
 
 export const valueWithCoinOnly: Cardano.Value = {
   coins: 7_420_514n

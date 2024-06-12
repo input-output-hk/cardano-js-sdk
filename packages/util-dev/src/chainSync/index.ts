@@ -16,7 +16,7 @@ import {
 import { Observable, of, throwError } from 'rxjs';
 import { fromSerializableObject } from '@cardano-sdk/util';
 import { genesisToEraSummary } from './genesisToEraSummary';
-import memoize from 'lodash/memoize';
+import memoize from 'lodash/memoize.js';
 
 export type SerializedChainSyncEvent =
   | Omit<ChainSyncRollForward, 'requestNext'>

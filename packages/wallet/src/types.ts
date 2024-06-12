@@ -11,10 +11,10 @@ import { BalanceTracker, DelegationTracker, TransactionsTracker, UtxoTracker } f
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 import { GroupedAddress, MessageSender, SignTransactionContext, WitnessedTx, cip8 } from '@cardano-sdk/key-management';
+import { HexBlob, Shutdown } from '@cardano-sdk/util';
 import { InitializeTxProps, InitializeTxResult, TxBuilder, TxContext } from '@cardano-sdk/tx-construction';
 import { Observable } from 'rxjs';
 import { PubStakeKeyAndStatus } from './services/PublicStakeKeysTracker';
-import { Shutdown } from '@cardano-sdk/util';
 
 export type Assets = Map<Cardano.AssetId, Asset.AssetInfo>;
 
@@ -45,6 +45,7 @@ export interface SyncStatus extends Shutdown {
 
 export type FinalizeTxProps = Omit<TxContext, 'signingContext'> & {
   tx: Cardano.TxBodyWithHash;
+  bodyCbor?: HexBlob;
   signingContext?: Partial<SignTransactionContext>;
 };
 

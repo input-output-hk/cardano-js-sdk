@@ -3,7 +3,7 @@ import { ProducedUtxo, WithUtxo } from './withUtxo';
 import { WithMint } from './withMint';
 import { isNotNil } from '@cardano-sdk/util';
 import { unifiedProjectorOperator } from '../utils';
-import groupBy from 'lodash/groupBy';
+import groupBy from 'lodash/groupBy.js';
 
 export interface CIP67Asset {
   assetId: Cardano.AssetId;

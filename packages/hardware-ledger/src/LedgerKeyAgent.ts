@@ -8,6 +8,7 @@ import {
   KeyAgentBase,
   KeyAgentDependencies,
   KeyAgentType,
+  KeyPurpose,
   SerializableLedgerKeyAgentData,
   SignBlobResult,
   SignTransactionContext,
@@ -67,12 +68,14 @@ export interface CreateLedgerKeyAgentProps {
   accountIndex?: number;
   communicationType: CommunicationType;
   deviceConnection?: LedgerConnection | null;
+  purpose?: KeyPurpose;
 }
 
 export interface GetLedgerXpubProps {
   deviceConnection?: LedgerConnection;
   communicationType: CommunicationType;
   accountIndex: number;
+  purpose: KeyPurpose;
 }
 
 export interface CreateLedgerTransportProps {
@@ -434,11 +437,12 @@ export class LedgerKeyAgent extends KeyAgentBase {
   static async getXpub({
     deviceConnection,
     communicationType,
-    accountIndex
+    accountIndex,
+    purpose
   }: GetLedgerXpubProps): Promise<Crypto.Bip32PublicKeyHex> {
     try {
       const recoveredDeviceConnection = await LedgerKeyAgent.checkDeviceConnection(communicationType, deviceConnection);
-      const derivationPath = `${CardanoKeyConst.PURPOSE}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'`;
+      const derivationPath = `${purpose}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'`;
       const extendedPublicKey = await recoveredDeviceConnection.getExtendedPublicKey({
         path: str_to_path(derivationPath) // BIP32Path
       });
@@ -468,7 +472,13 @@ export class LedgerKeyAgent extends KeyAgentBase {
    * @throws TransportError
    */
   static async createWithDevice(
-    { chainId, accountIndex = 0, communicationType, deviceConnection }: CreateLedgerKeyAgentProps,
+    {
+      chainId,
+      accountIndex = 0,
+      communicationType,
+      deviceConnection,
+      purpose = KeyPurpose.STANDARD
+    }: CreateLedgerKeyAgentProps,
     dependencies: KeyAgentDependencies
   ) {
     const deviceListPaths = await LedgerKeyAgent.getHidDeviceList(communicationType);
@@ -479,7 +489,8 @@ export class LedgerKeyAgent extends KeyAgentBase {
     const extendedAccountPublicKey = await LedgerKeyAgent.getXpub({
       accountIndex,
       communicationType,
-      deviceConnection: activeDeviceConnection
+      deviceConnection: activeDeviceConnection,
+      purpose
     });
 
     return new LedgerKeyAgent(
@@ -488,7 +499,8 @@ export class LedgerKeyAgent extends KeyAgentBase {
         chainId,
         communicationType,
         deviceConnection: activeDeviceConnection,
-        extendedAccountPublicKey
+        extendedAccountPublicKey,
+        purpose
       },
       dependencies
     );
@@ -536,7 +548,10 @@ export class LedgerKeyAgent extends KeyAgentBase {
     return TransactionSigningMode.ORDINARY_TRANSACTION;
   }
 
-  // TODO: Allow additional key paths
+  // TODO: LW-10571 - Allow additional key paths. This is necessary for multi-signature wallets
+  // hardware devices inspect the transaction to determine which keys to use for signing,
+  // however, multi sig transaction do not reference the CIP-1854 directly, but rather the script hash
+  // so we need to be able to instruct the HW to sign the transaction with arbitrary keys.
   async signTransaction(
     { body, hash }: Cardano.TxBodyWithHash,
     { knownAddresses, txInKeyPathMap }: SignTransactionContext

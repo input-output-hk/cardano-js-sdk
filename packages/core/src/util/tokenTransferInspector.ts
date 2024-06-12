@@ -4,7 +4,7 @@ import { AssetProvider } from '../Provider';
 import { Inspector, resolveInputs } from './txInspector';
 import { coalesceValueQuantities } from './coalesceValueQuantities';
 import { subtractValueQuantities } from './subtractValueQuantities';
-import uniq from 'lodash/uniq';
+import uniq from 'lodash/uniq.js';
 
 export type AssetInfoWithAmount = { amount: Cardano.Lovelace; assetInfo: AssetInfo };
 

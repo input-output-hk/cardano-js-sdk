@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-services",
-  "version": "0.28.4",
+  "version": "0.28.5",
   "description": "Cardano GraphQL Services",
   "engines": {
     "node": ">=16.20.2"
@@ -21,9 +21,8 @@
   "sideEffects": false,
   "license": "Apache-2.0",
   "scripts": {
-    "build:cjs": "tsc --build src && chmod +x ./dist/cjs/cli.js",
-    "build:copy-assets": "bash ./copy-assets.sh",
-    "build": "run-s build:cjs build:copy-assets",
+    "build": "yarn build:cjs",
+    "build:cjs": "tsc --build src && chmod +x ./dist/cjs/cli.js && bash ./copy-assets.sh",
     "build:test-db": "./test/jest-setup/rebuild-test-db.sh",
     "cleanup:dist": "rm -rf dist",
     "cleanup:nm": "rm -rf node_modules",

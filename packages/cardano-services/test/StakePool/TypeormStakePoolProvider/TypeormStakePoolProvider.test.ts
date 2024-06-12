@@ -24,7 +24,7 @@ import { getPort } from 'get-port-please';
 import { isNotNil } from '@cardano-sdk/util';
 import { logger } from '@cardano-sdk/util-dev';
 import axios from 'axios';
-import lowerCase from 'lodash/lowerCase';
+import lowerCase from 'lodash/lowerCase.js';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
 const APPLICATION_CBOR = 'application/cbor';

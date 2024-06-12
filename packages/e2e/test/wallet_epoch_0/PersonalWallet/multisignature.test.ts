@@ -2,7 +2,7 @@
 import { BaseWallet, FinalizeTxProps } from '@cardano-sdk/wallet';
 import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
-import { KeyRole, util } from '@cardano-sdk/key-management';
+import { KeyPurpose, KeyRole, util } from '@cardano-sdk/key-management';
 import {
   bip32Ed25519Factory,
   burnTokens,
@@ -48,12 +48,14 @@ describe('PersonalWallet/multisignature', () => {
     const aliceKeyAgent = await createStandaloneKeyAgent(
       env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
       genesis,
-      bip32Ed25519
+      bip32Ed25519,
+      KeyPurpose.MULTI_SIG
     );
     const bobKeyAgent = await createStandaloneKeyAgent(
       env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
       genesis,
-      bip32Ed25519
+      bip32Ed25519,
+      KeyPurpose.MULTI_SIG
     );
 
     const aliceDerivationPath = {

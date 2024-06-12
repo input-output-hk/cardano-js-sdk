@@ -133,6 +133,12 @@ describe('PlutusData', () => {
   });
 
   describe('List', () => {
+    it('can encode an empty plutus list', () => {
+      const data = new Serialization.PlutusList();
+
+      expect(data.toCbor()).toEqual('80');
+    });
+
     it('can encode simple plutus list', () => {
       const data = new Serialization.PlutusList();
 
