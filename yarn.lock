@@ -3164,7 +3164,7 @@ __metadata:
     dockerode: ^3.3.1
     dockerode-utils: ^0.0.7
     dotenv: ^16.0.0
-    envalid: ^7.3.0
+    envalid: ^7.3.1
     eslint: ^7.32.0
     express: ^4.17.3
     express-openapi-validator: ^4.13.8
@@ -3771,7 +3771,7 @@ __metadata:
     bunyan: ^1.8.15
     delay: ^5.0.0
     emittery: ^0.10.0
-    envalid: ^7.3.0
+    envalid: ^7.3.1
     eslint: ^7.32.0
     jest: ^28.1.3
     jest-webextension-mock: ^3.7.19
@@ -12753,7 +12753,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"envalid@npm:^7.3.0, envalid@npm:^7.3.1":
+"envalid@npm:^7.3.1":
   version: 7.3.1
   resolution: "envalid@npm:7.3.1"
   dependencies:

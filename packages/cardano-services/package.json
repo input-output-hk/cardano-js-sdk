@@ -104,7 +104,7 @@
     "death": "^1.1.0",
     "debug": "^4.3.4",
     "dotenv": "^16.0.0",
-    "envalid": "^7.3.0",
+    "envalid": "^7.3.1",
     "express": "^4.17.3",
     "express-openapi-validator": "^4.13.8",
     "express-prom-bundle": "^6.4.1",
