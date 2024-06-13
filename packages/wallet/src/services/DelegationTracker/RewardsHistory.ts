@@ -8,9 +8,9 @@ import { RewardsHistory } from '../types';
 import { TrackedRewardsProvider } from '../ProviderTracker';
 import { TxWithEpoch } from './types';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
-import first from 'lodash/first';
-import flatten from 'lodash/flatten';
-import sortBy from 'lodash/sortBy';
+import first from 'lodash/first.js';
+import flatten from 'lodash/flatten.js';
+import sortBy from 'lodash/sortBy.js';
 
 const DELEGATION_EPOCHS_AHEAD_COUNT = 2;
 

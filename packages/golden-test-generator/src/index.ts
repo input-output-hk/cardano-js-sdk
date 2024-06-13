@@ -9,10 +9,10 @@ import { createLogger } from 'bunyan';
 import { ensureDir, writeFile } from 'fs-extra';
 import { toSerializableObject } from '@cardano-sdk/util';
 import chalk from 'chalk';
+import clear from 'clear';
 import hash from 'object-hash';
 import path from 'path';
 
-const clear = require('clear');
 const packageJson = require('../../package.json');
 
 clear();

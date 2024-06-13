@@ -133,6 +133,12 @@ describe('PlutusData', () => {
   });
 
   describe('List', () => {
+    it('can encode an empty plutus list', () => {
+      const data = new Serialization.PlutusList();
+
+      expect(data.toCbor()).toEqual('80');
+    });
+
     it('can encode simple plutus list', () => {
       const data = new Serialization.PlutusList();
 
@@ -142,7 +148,7 @@ describe('PlutusData', () => {
       data.add(Serialization.PlutusData.newInteger(4n));
       data.add(Serialization.PlutusData.newInteger(5n));
 
-      expect(data.toCbor()).toEqual('850102030405');
+      expect(data.toCbor()).toEqual('9f0102030405ff');
     });
 
     it('can encode a list of plutus list', () => {
@@ -162,7 +168,7 @@ describe('PlutusData', () => {
       outer.add(Serialization.PlutusData.newList(innerList));
       outer.add(Serialization.PlutusData.newInteger(5n));
 
-      expect(outer.toCbor()).toEqual('85010285010203040585010203040505');
+      expect(outer.toCbor()).toEqual('9f01029f0102030405ff9f0102030405ff05ff');
     });
   });
 
@@ -292,7 +298,7 @@ describe('PlutusData', () => {
 
       const data = new Serialization.ConstrPlutusData(0n, args);
 
-      expect(data.toCbor()).toEqual('d879850102030405');
+      expect(data.toCbor()).toEqual('d8799f0102030405ff');
     });
   });
 

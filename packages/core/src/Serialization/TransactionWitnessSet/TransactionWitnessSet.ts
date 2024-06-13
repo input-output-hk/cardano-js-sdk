@@ -10,8 +10,8 @@ import { Redeemers } from './Redeemer';
 import { SerializationError, SerializationFailure } from '../../errors';
 import { VkeyWitness } from './VkeyWitness';
 import { hexToBytes } from '../../util/misc';
-import _groupBy from 'lodash/groupBy';
-import uniqWith from 'lodash/uniqWith';
+import _groupBy from 'lodash/groupBy.js';
+import uniqWith from 'lodash/uniqWith.js';
 
 /** This type represents the segregated CDDL scripts. */
 type CddlScripts = {

@@ -1,5 +1,13 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AccountKeyDerivationPath, CardanoKeyConst, Ed25519KeyPair, GroupedAddress, KeyPair, KeyRole } from '../types';
+import {
+  AccountKeyDerivationPath,
+  CardanoKeyConst,
+  Ed25519KeyPair,
+  GroupedAddress,
+  KeyPair,
+  KeyPurpose,
+  KeyRole
+} from '../types';
 import { BIP32Path } from '@cardano-sdk/crypto';
 
 export const harden = (num: number): number => 0x80_00_00_00 + num;
@@ -26,15 +34,17 @@ export interface DeriveAccountPrivateKeyProps {
   rootPrivateKey: Crypto.Bip32PrivateKeyHex;
   accountIndex: number;
   bip32Ed25519: Crypto.Bip32Ed25519;
+  purpose?: KeyPurpose;
 }
 
 export const deriveAccountPrivateKey = async ({
   rootPrivateKey,
   accountIndex,
-  bip32Ed25519
+  bip32Ed25519,
+  purpose = KeyPurpose.STANDARD
 }: DeriveAccountPrivateKeyProps): Promise<Crypto.Bip32PrivateKeyHex> =>
   await bip32Ed25519.derivePrivateKey(rootPrivateKey, [
-    harden(CardanoKeyConst.PURPOSE),
+    harden(purpose),
     harden(CardanoKeyConst.COIN_TYPE),
     harden(accountIndex)
   ]);

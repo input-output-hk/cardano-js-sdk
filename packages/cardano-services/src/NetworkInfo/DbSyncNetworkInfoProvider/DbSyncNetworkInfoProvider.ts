@@ -17,7 +17,7 @@ import { Logger } from 'ts-log';
 import { NetworkInfoBuilder } from './NetworkInfoBuilder';
 import { RunnableModule } from '@cardano-sdk/util';
 import { toGenesisParams, toLedgerTip, toProtocolParams, toSupply } from './mappers';
-import memoize from 'lodash/memoize';
+import memoize from 'lodash/memoize.js';
 
 /** Dependencies that are need to create DbSyncNetworkInfoProvider */
 export interface NetworkInfoProviderDependencies extends DbSyncProviderDependencies {

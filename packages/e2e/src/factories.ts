@@ -52,7 +52,7 @@ import {
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, of } from 'rxjs';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import memoize from 'lodash/memoize';
+import memoize from 'lodash/memoize.js';
 
 const isNodeJs = typeof process !== 'undefined' && process.release?.name === 'node';
 // tsc doesn't like the 'import' of this package, works with webpack

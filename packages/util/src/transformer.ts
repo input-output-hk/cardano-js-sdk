@@ -1,5 +1,5 @@
-import isUndefined from 'lodash/isUndefined';
-import merge from 'lodash/merge';
+import isUndefined from 'lodash/isUndefined.js';
+import merge from 'lodash/merge.js';
 
 export interface Transform<From, To, Context = {}> {
   (from: From, context?: Context): To extends object

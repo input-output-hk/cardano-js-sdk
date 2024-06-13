@@ -5,6 +5,7 @@ import {
   GetPassphrase,
   KeyAgentDependencies,
   KeyAgentType,
+  KeyPurpose,
   SerializableInMemoryKeyAgentData,
   SerializableLedgerKeyAgentData,
   SerializableTrezorKeyAgentData,
@@ -41,7 +42,8 @@ describe('KeyManagement/restoreKeyAgent', () => {
       accountIndex: 0,
       chainId: Cardano.ChainIds.Preview,
       encryptedRootPrivateKeyBytes,
-      extendedAccountPublicKey
+      extendedAccountPublicKey,
+      purpose: KeyPurpose.STANDARD
     };
     // eslint-disable-next-line unicorn/consistent-function-scoping
     const getPassphrase: GetPassphrase = async () => Buffer.from('password');
@@ -76,7 +78,8 @@ describe('KeyManagement/restoreKeyAgent', () => {
       extendedAccountPublicKey: Crypto.Bip32PublicKeyHex(
         // eslint-disable-next-line max-len
         'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
-      )
+      ),
+      purpose: KeyPurpose.STANDARD
     };
 
     it('can restore key manager from valid data', async () => {
@@ -94,6 +97,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
         // eslint-disable-next-line max-len
         'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
       ),
+      purpose: KeyPurpose.STANDARD,
       trezorConfig: {
         communicationType: CommunicationType.Node,
         manifest: {

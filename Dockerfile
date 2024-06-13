@@ -55,7 +55,7 @@ RUN yarn --immutable --inline-builds --mode=skip-build
 COPY packages packages
 RUN \
   echo "export const unused = 'unused';" > packages/e2e/src/index.ts &&\
-  NODE_OPTIONS=--max_old_space_size=10240 yarn build
+  NODE_OPTIONS=--max_old_space_size=10240 yarn build:cjs
 
 FROM nodejs-builder as cardano-services-production-deps
 RUN yarn workspaces focus --all --production

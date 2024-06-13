@@ -1,17 +1,20 @@
 import { AnyWallet, HardwareWallet, InMemoryWallet, ScriptWallet, WalletId } from '../types';
 import { Bip32PublicKeyHex } from '@cardano-sdk/crypto';
+import { KeyPurpose } from '@cardano-sdk/key-management';
 import { Observable } from 'rxjs';
 
 export type RemoveAccountProps = {
   walletId: WalletId;
   /** account' in cip1852 */
   accountIndex: number;
+  purpose?: KeyPurpose;
 };
 
 export type AddAccountProps<Metadata extends {}> = {
   walletId: WalletId;
   /** account' in cip1852 */
   accountIndex: number;
+  purpose?: KeyPurpose;
   metadata: Metadata;
   extendedAccountPublicKey: Bip32PublicKeyHex;
 };
@@ -24,6 +27,7 @@ export type UpdateWalletMetadataProps<Metadata extends {}> = {
 export type UpdateAccountMetadataProps<Metadata extends {}> = {
   /** account' in cip1852; must be specified for bip32 wallets */
   walletId: WalletId;
+  purpose?: KeyPurpose;
   accountIndex: number;
   metadata: Metadata;
 };

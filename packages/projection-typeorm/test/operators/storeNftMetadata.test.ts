@@ -35,7 +35,7 @@ import {
   filterAssets
 } from './util';
 import { dummyLogger } from 'ts-log';
-import omit from 'lodash/omit';
+import omit from 'lodash/omit.js';
 
 const patchNftMetadataNameCip25 = (
   metadata: Cardano.TxMetadata,

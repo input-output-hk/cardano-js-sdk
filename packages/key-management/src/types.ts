@@ -38,6 +38,10 @@ export enum KeyRole {
   DRep = 3
 }
 
+export enum KeyPurpose {
+  STANDARD = 1852,
+  MULTI_SIG = 1854
+}
 export interface AccountKeyDerivationPath {
   role: KeyRole;
   index: number;
@@ -93,6 +97,7 @@ export interface SerializableKeyAgentDataBase {
   chainId: Cardano.ChainId;
   accountIndex: number;
   extendedAccountPublicKey: Crypto.Bip32PublicKeyHex;
+  purpose?: KeyPurpose;
 }
 
 export interface SerializableInMemoryKeyAgentData extends SerializableKeyAgentDataBase {
@@ -184,6 +189,7 @@ export interface KeyAgent {
   get serializableData(): SerializableKeyAgentData;
   get extendedAccountPublicKey(): Crypto.Bip32PublicKeyHex;
   get bip32Ed25519(): Crypto.Bip32Ed25519;
+  get purpose(): KeyPurpose | undefined;
 
   /**
    * @throws AuthenticationError

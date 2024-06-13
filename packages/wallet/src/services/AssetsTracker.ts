@@ -21,8 +21,8 @@ import { TransactionsTracker } from './types';
 import { coldObservableProvider, concatAndCombineLatest } from '@cardano-sdk/util-rxjs';
 import { deepEquals, isNotNil } from '@cardano-sdk/util';
 import { newTransactions$ } from './TransactionsTracker';
-import chunk from 'lodash/chunk';
-import uniq from 'lodash/uniq';
+import chunk from 'lodash/chunk.js';
+import uniq from 'lodash/uniq.js';
 
 const isAssetInfoComplete = (assetInfo: Asset.AssetInfo): boolean =>
   assetInfo.nftMetadata !== undefined && assetInfo.tokenMetadata !== undefined;

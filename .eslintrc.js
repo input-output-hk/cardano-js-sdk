@@ -54,7 +54,7 @@ module.exports = {
       'error',
       {
         paths: ['lodash'],
-        patterns: ['@cardano-sdk/*/src/*']
+        patterns: ['@cardano-sdk/*/src/*', 'lodash/*', '!lodash/*.js']
       }
     ],
     'no-shadow': 'off',

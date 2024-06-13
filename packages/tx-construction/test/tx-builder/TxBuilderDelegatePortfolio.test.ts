@@ -14,7 +14,7 @@ import { GreedyInputSelector, GreedySelectorProps, roundRobinRandomImprove } fro
 import { dummyLogger } from 'ts-log';
 import { mockTxEvaluator } from './mocks';
 import { mockProviders as mocks } from '@cardano-sdk/util-dev';
-import uniqBy from 'lodash/uniqBy';
+import uniqBy from 'lodash/uniqBy.js';
 
 jest.mock('@cardano-sdk/input-selection', () => {
   const actual = jest.requireActual('@cardano-sdk/input-selection');

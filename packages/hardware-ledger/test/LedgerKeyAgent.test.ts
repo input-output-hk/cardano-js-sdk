@@ -3,7 +3,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Ada, InvalidDataReason } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Cardano } from '@cardano-sdk/core';
-import { CardanoKeyConst, CommunicationType, util } from '@cardano-sdk/key-management';
+import { CardanoKeyConst, CommunicationType, KeyPurpose, util } from '@cardano-sdk/key-management';
 import { LedgerKeyAgent } from '../src';
 import { dummyLogger } from 'ts-log';
 import { poolId, poolParameters, pureAdaTxOut, stakeKeyHash, txIn, txOutWithDatum } from './testData';
@@ -379,7 +379,8 @@ describe('LedgerKeyAgent', () => {
           communicationType: CommunicationType.Node,
           extendedAccountPublicKey: Crypto.Bip32PublicKeyHex(
             '00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
-          )
+          ),
+          purpose: KeyPurpose.STANDARD
         },
         {
           bip32Ed25519: new Crypto.SodiumBip32Ed25519(),

@@ -44,8 +44,8 @@ import { contextLogger, deepEquals } from '@cardano-sdk/util';
 import { createOutputValidator } from '../output-validation';
 import { initializeTx } from './initializeTx';
 import { lastValueFrom } from 'rxjs';
-import omit from 'lodash/omit';
-import uniq from 'lodash/uniq';
+import omit from 'lodash/omit.js';
+import uniq from 'lodash/uniq.js';
 
 const DUMMY_SCRIPT_DATA_HASH = '0'.repeat(64) as unknown as Crypto.Hash32ByteBase16;
 

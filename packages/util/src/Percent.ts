@@ -1,5 +1,5 @@
 import { OpaqueNumber } from './opaqueTypes';
-import sum from 'lodash/sum';
+import sum from 'lodash/sum.js';
 
 /**
  * The Percentage is a relative value that indicates the hundredth parts of any quantity.

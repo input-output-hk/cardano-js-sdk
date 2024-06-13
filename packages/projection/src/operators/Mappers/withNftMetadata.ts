@@ -6,7 +6,7 @@ import { WithLogger, isNotNil } from '@cardano-sdk/util';
 import { WithMint } from './withMint';
 import { WithUtxo } from './withUtxo';
 import { map } from 'rxjs';
-import uniqBy from 'lodash/uniqBy';
+import uniqBy from 'lodash/uniqBy.js';
 
 export interface ProjectedNftMetadata {
   userTokenAssetId: Cardano.AssetId;

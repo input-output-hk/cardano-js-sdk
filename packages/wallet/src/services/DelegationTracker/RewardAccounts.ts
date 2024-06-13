@@ -26,9 +26,9 @@ import { TrackedStakePoolProvider } from '../ProviderTracker';
 import { TxWithEpoch } from './types';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { lastStakeKeyCertOfType } from './transactionCertificates';
-import findLast from 'lodash/findLast';
-import isEqual from 'lodash/isEqual';
-import uniq from 'lodash/uniq';
+import findLast from 'lodash/findLast.js';
+import isEqual from 'lodash/isEqual.js';
+import uniq from 'lodash/uniq.js';
 
 const allStakePoolsByPoolIds = async (
   stakePoolProvider: StakePoolProvider,

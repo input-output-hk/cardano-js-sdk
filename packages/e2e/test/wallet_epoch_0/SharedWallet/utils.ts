@@ -2,6 +2,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import {
   AccountKeyDerivationPath,
   KeyAgent,
+  KeyPurpose,
   KeyRole,
   SignBlobResult,
   SignDataContext,
@@ -30,7 +31,12 @@ const getKeyAgent = async (
   genesisParameters: Cardano.CompactGenesis,
   bip32Ed25519: Crypto.Bip32Ed25519
 ) => {
-  const keyAgent = await createStandaloneKeyAgent(mnemonics.split(' '), genesisParameters, bip32Ed25519);
+  const keyAgent = await createStandaloneKeyAgent(
+    mnemonics.split(' '),
+    genesisParameters,
+    bip32Ed25519,
+    KeyPurpose.MULTI_SIG
+  );
 
   const pubKey = await keyAgent.derivePublicKey(DERIVATION_PATH);
 

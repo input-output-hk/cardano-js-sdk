@@ -10,7 +10,7 @@ import {
 } from '@cardano-sdk/projection';
 import { QueryRunner } from 'typeorm';
 import { TypeormConnection } from '../createDataSource';
-import omit from 'lodash/omit';
+import omit from 'lodash/omit.js';
 
 export interface WithTypeormTransactionDependencies {
   connection$: Observable<TypeormConnection>;

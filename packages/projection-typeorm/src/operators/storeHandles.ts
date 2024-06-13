@@ -4,7 +4,7 @@ import { In, QueryRunner } from 'typeorm';
 import { Mappers } from '@cardano-sdk/projection';
 import { WithMintedAssetSupplies } from './storeAssets';
 import { typeormOperator } from './util';
-import sortBy from 'lodash/sortBy';
+import sortBy from 'lodash/sortBy.js';
 
 type HandleWithTotalSupply = Mappers.HandleOwnership & { totalSupply: bigint };
 
