@@ -19,6 +19,8 @@ export enum TxWith {
   Redeemer = 'redeemer',
   Withdrawal = 'withdrawal',
   CollateralOutput = 'collateralOutput',
+  ProposalProcedures = 'proposalProcedures',
+  VotingProcedure = 'votingProcedures',
   ScriptReference = 'scriptReference'
 }
 
@@ -123,6 +125,8 @@ export class ChainHistoryFixtureBuilder {
       if (options.with.includes(TxWith.MirCertificate)) query += Queries.latestTxHashesWithMirCerts;
       if (options.with.includes(TxWith.Withdrawal)) query += Queries.latestTxHashesWithWithdrawal;
       if (options.with.includes(TxWith.CollateralOutput)) query += Queries.latestTxHashesWithCollateralOutput;
+      if (options.with.includes(TxWith.ProposalProcedures)) query += Queries.latestTxHashesWithProposalProcedures;
+      if (options.with.includes(TxWith.VotingProcedure)) query += Queries.latestTxHashesWithVotingProcedures;
       if (options.with.includes(TxWith.ScriptReference)) query += Queries.latestTxHashesWithScriptReference;
 
       query += Queries.endLatestTxHashes;

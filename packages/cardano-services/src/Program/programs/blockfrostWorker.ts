@@ -14,7 +14,7 @@ export const DROP_SCHEMA_DEFAULT = false;
 export const DRY_RUN_DEFAULT = false;
 export const SCAN_INTERVAL_DEFAULT = 60; // One hour
 
-export const availableNetworks = ['mainnet', 'preprod', 'preview'] as const;
+export const availableNetworks = ['mainnet', 'preprod', 'preview', 'sanchonet'] as const;
 export type AvailableNetworks = typeof availableNetworks[number];
 
 export enum BlockfrostWorkerOptionDescriptions {

@@ -212,15 +212,17 @@ describe('chain history mappers', () => {
         poolId: Cardano.PoolId(poolId)
       });
     });
-    test('map PoolUpdateCertModel to Cardano.PoolRegistrationCertificate', () => {
+    test('map PoolUpdateCertModel to Cardano.HydratedPoolRegistrationCertificate', () => {
       const result = mappers.mapCertificate({
         ...baseCertModel,
+        deposit: '500000000',
         pool_id: poolId,
         type: 'register'
       } as WithCertType<PoolRegisterCertModel>);
-      expect(result).toEqual<WithCertIndex<Cardano.PoolRegistrationCertificate>>({
+      expect(result).toEqual<WithCertIndex<Cardano.HydratedPoolRegistrationCertificate>>({
         __typename: Cardano.CertificateType.PoolRegistration,
         cert_index: 0,
+        deposit: 500_000_000n,
         poolParameters: null as unknown as Cardano.PoolParameters
       });
     });
@@ -255,6 +257,7 @@ describe('chain history mappers', () => {
       const stakeCert: WithCertType<StakeCertModel> = {
         ...baseCertModel,
         address: stakeAddress,
+        deposit: '0',
         registration: true,
         type: 'stake'
       };
@@ -263,9 +266,10 @@ describe('chain history mappers', () => {
         ...stakeCert,
         registration: false
       } as WithCertType<StakeCertModel>);
-      expect(registrationResult).toEqual<WithCertIndex<Cardano.StakeAddressCertificate>>({
-        __typename: Cardano.CertificateType.StakeRegistration,
+      expect(registrationResult).toEqual<WithCertIndex<Cardano.NewStakeAddressCertificate>>({
+        __typename: Cardano.CertificateType.Registration,
         cert_index: 0,
+        deposit: 0n,
         stakeCredential: {
           hash: Hash28ByteBase16.fromEd25519KeyHashHex(
             Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))
@@ -273,9 +277,10 @@ describe('chain history mappers', () => {
           type: Cardano.CredentialType.KeyHash
         }
       });
-      expect(deregistrationResult).toEqual<WithCertIndex<Cardano.StakeAddressCertificate>>({
-        __typename: Cardano.CertificateType.StakeDeregistration,
+      expect(deregistrationResult).toEqual<WithCertIndex<Cardano.NewStakeAddressCertificate>>({
+        __typename: Cardano.CertificateType.Unregistration,
         cert_index: 0,
+        deposit: 0n,
         stakeCredential: {
           hash: Hash28ByteBase16.fromEd25519KeyHashHex(
             Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))
@@ -438,7 +443,9 @@ describe('chain history mappers', () => {
           inputs: [],
           mint: assets,
           outputs: [],
+          proposalProcedures: undefined,
           totalCollateral: 170_000n,
+          votingProcedures: undefined,
           withdrawals
         },
         inputSource: Cardano.InputSource.collaterals,

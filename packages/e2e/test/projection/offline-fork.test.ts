@@ -22,7 +22,7 @@ import {
 } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { ConnectionConfig } from '@cardano-ogmios/client';
-import { Observable, filter, firstValueFrom, lastValueFrom, map, of, take, takeWhile, toArray } from 'rxjs';
+import { Observable, filter, firstValueFrom, lastValueFrom, map, of, take, takeWhile, throwError, toArray } from 'rxjs';
 import { OgmiosObservableCardanoNode } from '@cardano-sdk/ogmios';
 import { ReconnectionConfig } from '@cardano-sdk/util-rxjs';
 import { createDatabase } from 'typeorm-extension';
@@ -62,6 +62,7 @@ const createForkProjectionSource = (
   // Same network info
   eraSummaries$: forkFromNode.eraSummaries$,
   genesisParameters$: forkFromNode.genesisParameters$,
+  submitTx: () => throwError(() => new Error('Not implemented')),
   // Stub chain sync that forks from provided tip
   // eslint-disable-next-line sort-keys-fix/sort-keys-fix
   findIntersect: (points) => {

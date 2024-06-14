@@ -46,8 +46,7 @@ for i in "${!TOKENS[@]}"; do
   tokenList="${tokenList}+${AMOUNT} ${currencySymbol}.${TOKENS[i]}"
 done
 
-cardano-cli transaction build \
-  --babbage-era \
+cardano-cli conway transaction build \
   --change-address "$addr" \
   --tx-in "$utxo" \
   --tx-out "$destAddr"+10000000+"$tokenList" \

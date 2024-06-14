@@ -5,20 +5,18 @@ FROM ubuntu:${UBUNTU_VERSION} as builder
 ENV DEBIAN_FRONTEND=nonintercative
 
 WORKDIR /build
-ARG CARDANO_NODE_BUILD_URL=https://update-cardano-mainnet.iohk.io/cardano-node-releases/cardano-node-1.35.4-linux.tar.gz
-ARG CARDANO_NODE_BUILD_URL_ARM64=https://github.com/input-output-hk/ogmios-tracker/releases/download/0.1.0/cardano-node-1.35.4-aarch64-linux.tar.gz
+ARG CARDANO_NODE_BUILD_URL=https://github.com/IntersectMBO/cardano-node/releases/download/8.9.2/cardano-node-8.9.2-linux.tar.gz
+ARG CARDANO_NODE_BUILD_URL_ARM64=https://github.com/input-output-hk/ogmios-tracker/releases/download/0.1.0/cardano-node-8.9.2-aarch64-linux.tar.gz
 
 RUN apt-get update -y && \
     apt-get install -y wget tar curl && \
     if [ "$(uname -m)" = "aarch64" ] ; then \
-      curl -fsSL "$CARDANO_NODE_BUILD_URL_ARM64" >cardano-node.tar.gz && \
-      mkdir -p cardano-node && \
-      tar -xzf cardano-node.tar.gz -C cardano-node ;\
+      curl -fsSL "$CARDANO_NODE_BUILD_URL_ARM64" >cardano-node.tar.gz ;\
     else \
-      curl -fsSL "$CARDANO_NODE_BUILD_URL" >cardano-node.tar.gz && \
-      mkdir -p cardano-node/bin && \
-      tar -xzf cardano-node.tar.gz -C cardano-node/bin ;\
-    fi
+      curl -fsSL "$CARDANO_NODE_BUILD_URL" >cardano-node.tar.gz ;\
+    fi && \
+    mkdir -p cardano-node && \
+    tar -xzf cardano-node.tar.gz -C cardano-node
 
 FROM ubuntu:${UBUNTU_VERSION}
 

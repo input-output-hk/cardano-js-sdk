@@ -36,7 +36,7 @@
     "prepack": "yarn build"
   },
   "devDependencies": {
-    "@cardano-ogmios/schema": "5.6.0",
+    "@cardano-ogmios/schema": "6.3.0",
     "@cardano-sdk/cardano-services-client": "workspace:~",
     "@cardano-sdk/util-dev": "workspace:~",
     "@cardano-sdk/util-rxjs": "workspace:~",
@@ -53,8 +53,8 @@
     "ws": "^8.5.0"
   },
   "dependencies": {
-    "@cardano-ogmios/client": "5.6.0",
-    "@cardano-ogmios/schema": "5.6.0",
+    "@cardano-ogmios/client": "6.3.0",
+    "@cardano-ogmios/schema": "6.3.0",
     "@cardano-sdk/core": "workspace:~",
     "@cardano-sdk/crypto": "workspace:~",
     "@cardano-sdk/util": "workspace:~",

@@ -81,6 +81,15 @@ export enum TxSubmissionErrorCode {
   InvalidCommitteeUpdate = 3157,
   TreasuryWithdrawalMismatch = 3158,
   InvalidOrMissingPreviousProposal = 3159,
+  VotingOnExpiredActions = 3160,
+  ExecutionBudgetOutOfBounds = 3161,
+  InvalidHardForkVersionBump = 3162,
+  ConstitutionGuardrailsHashMismatch = 3163,
+  /**
+   * Identical UTxO references were found in both the transaction inputs and references. This is redundant and no longer allowed by the ledger.
+   * Indeed, if the a UTxO is present in the inputs set, it is already in the transaction context
+   */
+  ConflictingInputsAndReferences = 3164,
   FailureUnrecognizedCertificateType = 3998,
   InternalLedgerTypeConversionError = 3999,
   DeserialisationFailure = -32_602
@@ -112,4 +121,8 @@ export type ValueNotConservedData = {
 };
 export type IncompleteWithdrawalsData = {
   withdrawals: Cardano.Withdrawal[];
+};
+
+export type UnknownOutputReferencesData = {
+  unknownOutputReferences: Cardano.TxIn[];
 };
