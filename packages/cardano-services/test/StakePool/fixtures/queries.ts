@@ -141,7 +141,7 @@ export const beginFindPoolsWithMetadata = `
     LEFT JOIN reward_acc_balance r_balance ON r_balance.pool_id = ph.id
     JOIN pool_update ON pool_update.hash_id = o_balance.pool_hash_id
     JOIN pool_metadata_ref metadata ON metadata.id = pool_update.meta_id
-    JOIN pool_offline_data pod ON metadata.id = pod.pmr_id
+    JOIN off_chain_pool_data pod ON metadata.id = pod.pmr_id
     LEFT JOIN pool_retire pr ON pr.id = (
       SELECT
         id

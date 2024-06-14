@@ -23,6 +23,7 @@ import { HttpServer, HttpServerConfig, HttpService, getListen } from '../../Http
 import { InMemoryCache, NoCache } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from '../errors';
+import { NodeTxSubmitProvider, TxSubmitHttpService } from '../../TxSubmit';
 import { Observable } from 'rxjs';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
@@ -30,12 +31,11 @@ import { Pool } from 'pg';
 import { ProviderServerArgs, ProviderServerOptionDescriptions, ServiceNames } from './types';
 import { SrvRecord } from 'dns';
 import { TxSubmitApiProvider } from '@cardano-sdk/cardano-services-client';
-import { TxSubmitHttpService } from '../../TxSubmit';
 import { TypeormAssetProvider } from '../../Asset/TypeormAssetProvider';
 import { TypeormStakePoolProvider } from '../../StakePool/TypeormStakePoolProvider/TypeormStakePoolProvider';
 import { createDbSyncMetadataService } from '../../Metadata';
 import { createLogger } from 'bunyan';
-import { getConnectionConfig, getOgmiosTxSubmitProvider } from '../services';
+import { getConnectionConfig, getOgmiosObservableCardanoNode } from '../services';
 import { getEntities } from '../../Projection/prepareTypeormProjection';
 import { isNotNil } from '@cardano-sdk/util';
 import memoize from 'lodash/memoize.js';
@@ -300,12 +300,11 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     [ServiceNames.TxSubmit]: async () => {
       const txSubmitProvider = args.useSubmitApi
         ? getSubmitApiProvider()
-        : await getOgmiosTxSubmitProvider(
-            dnsResolver,
-            logger,
-            args,
-            args.submitValidateHandles ? await getHandleProvider() : undefined
-          );
+        : new NodeTxSubmitProvider({
+            cardanoNode: getOgmiosObservableCardanoNode(dnsResolver, logger, args),
+            handleProvider: args.submitValidateHandles ? await getHandleProvider() : undefined,
+            logger
+          });
       return new TxSubmitHttpService({ logger, txSubmitProvider });
     }
   };

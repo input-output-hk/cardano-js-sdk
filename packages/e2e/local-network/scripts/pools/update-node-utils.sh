@@ -82,8 +82,7 @@ updatePool() {
   currentBalance=$(getAddressBalance "$stakeAddr")
   utxo=$(cardano-cli query utxo --address "$genesisAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
 
-  cardano-cli transaction build \
-    --babbage-era \
+  cardano-cli conway transaction build \
     --change-address "$genesisAddr" \
     --tx-in "$utxo" \
     --tx-out "$stakeAddr"+"$POOL_OWNER_STAKE" \

@@ -193,7 +193,7 @@ in
               env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
             handle-provider.enabled = true;
-          # asset-provider.enabled = true;
+            # asset-provider.enabled = true;
           };
 
           projectors = {
@@ -337,13 +337,13 @@ in
               env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
             handle-provider.enabled = true;
-          # asset-provider.enabled = true;
+            # asset-provider.enabled = true;
           };
 
           projectors = {
             handle.enabled = true;
             stake-pool.enabled = true;
-          # asset.enabled = true;
+            # asset.enabled = true;
           };
 
           values = {
@@ -384,7 +384,7 @@ in
               env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
             handle-provider.enabled = true;
-          # asset-provider.enabled = true;
+            # asset-provider.enabled = true;
           };
 
           projectors = {
@@ -396,6 +396,44 @@ in
           values = {
             stakepool.databaseName = "stakepoolv2";
             backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
+
+            pg-boss-worker.enabled = true;
+
+            blockfrost-worker.enabled = true;
+            cardano-services = {
+              ingresOrder = 98;
+            };
+          };
+        };
+
+        "dev-preprod-resync@us-east-1@v2" = final: {
+          name = "${final.namespace}-cardanojs-v2";
+          namespace = "dev-preprod-resync";
+          context = "eks-devs";
+          network = "preprod";
+          region = "us-east-1";
+
+          providers = {
+            backend = {
+              enabled = true;
+              env.NODE_EXTRA_OPTIONS = "--trace-gc";
+            };
+            stake-pool-provider = {
+              enabled = true;
+              env.OVERRIDE_FUZZY_OPTIONS = "true";
+            };
+            handle-provider.enabled = true;
+          };
+
+          projectors = {
+            handle.enabled = true;
+            stake-pool.enabled = true;
+          };
+
+          values = {
+            stakepool.databaseName = "stakepoolv2";
+            backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
+            backend.hostnames = ["${final.namespace}.${baseUrl}"];
 
             pg-boss-worker.enabled = true;
 
@@ -435,6 +473,8 @@ in
             stakepool.databaseName = "stakepoolv2";
             blockfrost-worker.enabled = true;
             pg-boss-worker.enabled = true;
+            pg-boss-worker.metadata-fetch-mode = "direct";
+            pg-boss-worker.queues = "pool-metadata,pool-metrics,pool-rewards";
             cardano-services = {
               ingresOrder = 98;
             };
@@ -905,6 +945,7 @@ in
         };
 
         "ops-preview-1@us-east-1" = final: {
+          name = "${final.namespace}-cardanojs-v2";
           namespace = "ops-preview-1";
           network = "preview";
           region = "us-east-1";

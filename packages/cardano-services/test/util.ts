@@ -1,10 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DbPools } from '../src/util/DbSyncProvider';
-import { Ogmios } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { ServiceNames } from '../src';
-import { createMockOgmiosServer } from '../../ogmios/test/mocks/mockOgmiosServer';
-import { getRandomPort } from 'get-port-please';
 import { of } from 'rxjs';
 import { versionPathFromSpec } from '../src/util/openApi';
 import axios, { AxiosRequestConfig } from 'axios';
@@ -27,31 +24,6 @@ export const serverStarted = (apiUrl: string, statusCodeMatch = 404, headers?: R
     resources: [apiUrl],
     validateStatus: (status: number) => status === statusCodeMatch
   });
-
-export const ogmiosServerReady = (connection: Ogmios.Connection): Promise<void> =>
-  serverStarted(connection.address.http, 405);
-
-export const createHealthyMockOgmiosServer = (submitTxHook?: () => void) =>
-  createMockOgmiosServer({
-    healthCheck: { response: { networkSynchronization: 0.999, success: true } },
-    stateQuery: {
-      eraSummaries: { response: { success: true } },
-      stakeDistribution: { response: { success: true } },
-      systemStart: { response: { success: true } }
-    },
-    submitTx: { response: { success: true } },
-    submitTxHook
-  });
-
-export const createUnhealthyMockOgmiosServer = () =>
-  createMockOgmiosServer({
-    healthCheck: { response: { networkSynchronization: 0.8, success: true } },
-    stateQuery: { eraSummaries: { response: { success: false } }, systemStart: { response: { success: false } } },
-    submitTx: { response: { success: false } }
-  });
-
-export const createConnectionObjectWithRandomPort = async () =>
-  Ogmios.createConnectionObject({ port: await getRandomPort() });
 
 export const doServerRequest =
   (apiBaseUrl: string) =>

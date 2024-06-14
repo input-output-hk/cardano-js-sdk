@@ -3,7 +3,10 @@
   "compilerOptions": {
     "baseUrl": "."
   },
-  "include": ["./**/*.ts"],
+  "include": [
+    "./**/*.ts",
+    "../../cardano-services/test/TxSubmit/NodeTxSubmitProvider.test.ts"
+  ],
   "references": [
     {
       "path": "../../core/src"

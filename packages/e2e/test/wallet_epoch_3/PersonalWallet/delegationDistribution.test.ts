@@ -105,19 +105,20 @@ const delegateToMultiplePools = async (
   return { poolIds, portfolio };
 };
 
-const delegateAllToSinglePool = async (wallet: BaseWallet): Promise<void> => {
+const delegateAllToSinglePool = async (wallet: BaseWallet): Promise<Cardano.StakePool> => {
   // This is a negative testcase, simulating an HD wallet that has multiple stake keys delegated
   // to the same stake pool. txBuilder.delegatePortfolio does not support this scenario.
-  const [{ id: poolId }] = await getPoolIds(wallet);
+  const [pool] = await getPoolIds(wallet);
   const txBuilder = wallet.createTxBuilder();
   const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
   txBuilder.partialTxBody.certificates = rewardAccounts.map(({ address }) =>
-    Cardano.createDelegationCert(address, poolId)
+    Cardano.createDelegationCert(address, pool.id)
   );
 
-  logger.debug(`Delegating all stake keys to pool ${poolId}`);
+  logger.debug(`Delegating all stake keys to pool ${pool.id}`);
   const { tx } = await txBuilder.build().sign();
   await submitAndConfirm(wallet, tx);
+  return pool;
 };
 
 describe('PersonalWallet/delegationDistribution', () => {
@@ -216,11 +217,11 @@ describe('PersonalWallet/delegationDistribution', () => {
     );
 
     // Delegate all reward accounts to the same pool. delegationDistribution$ should have 1 entry with 100% distribution
-    await delegateAllToSinglePool(wallet);
+    const pool = await delegateAllToSinglePool(wallet);
     simplifiedDelegationDistribution = await firstValueFrom(
       wallet.delegation.distribution$.pipe(
         tap((distribution) => {
-          logger.info('All stake keys are delegated to poolId:', poolIds[0].id);
+          logger.info('All stake keys are delegated to poolId:', pool.id);
           logger.info(distributionMessage, distribution);
         }),
         map((distribution) =>
@@ -236,8 +237,8 @@ describe('PersonalWallet/delegationDistribution', () => {
 
     expect(simplifiedDelegationDistribution).toEqual([
       {
-        id: poolIds[0].id,
-        name: poolIds[0].metadata?.name,
+        id: pool.id,
+        name: pool.metadata?.name,
         percentage: Percent(1),
         rewardAccounts: rewardAccounts.map(({ address }) => address)
       }

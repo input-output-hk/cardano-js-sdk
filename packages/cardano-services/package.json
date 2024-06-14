@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-services",
-  "version": "0.28.5",
+  "version": "0.28.6",
   "description": "Cardano GraphQL Services",
   "engines": {
     "node": ">=16.20.2"
@@ -46,6 +46,9 @@
     "preview:dev": "FILES='-f ../../compose/dev.yml -f dev.yml' yarn preview:up",
     "preview:up": "NETWORK=preview SUBMIT_API_ARGS='--testnet-magic 2' yarn compose:up",
     "preview:down": "NETWORK=preview yarn compose:down",
+    "sanchonet:dev": "FILES='-f ../../compose/dev.yml -f dev.yml' yarn sanchonet:up",
+    "sanchonet:up": "NETWORK=sanchonet SUBMIT_API_ARGS='--testnet-magic 4' yarn compose:up",
+    "sanchonet:down": "NETWORK=sanchonet yarn compose:down",
     "test": "jest --runInBand -c ./jest.config.js --selectProjects unit",
     "test:build:verify": "tsc --build ./test",
     "test:cli": "jest --runInBand -c ./jest.config.js --selectProjects cli",
@@ -55,7 +58,7 @@
     "tscNoEmit": "echo typescript --noEmit command not implemented yet"
   },
   "devDependencies": {
-    "@cardano-ogmios/client": "5.6.0",
+    "@cardano-ogmios/client": "6.3.0",
     "@cardano-sdk/util-dev": "workspace:~",
     "@types/bunyan": "^1.8.8",
     "@types/cors": "^2.8.13",
@@ -84,7 +87,7 @@
     "wait-on": "^6.0.1"
   },
   "dependencies": {
-    "@blockfrost/blockfrost-js": "^5.2.0",
+    "@blockfrost/blockfrost-js": "5.5.0-beta.0",
     "@cardano-sdk/cardano-services-client": "workspace:~",
     "@cardano-sdk/core": "workspace:~",
     "@cardano-sdk/crypto": "workspace:~",
@@ -104,7 +107,7 @@
     "death": "^1.1.0",
     "debug": "^4.3.4",
     "dotenv": "^16.0.0",
-    "envalid": "^7.3.0",
+    "envalid": "^7.3.1",
     "express": "^4.17.3",
     "express-openapi-validator": "^4.13.8",
     "express-prom-bundle": "^6.4.1",

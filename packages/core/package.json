@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/core",
-  "version": "0.33.0",
+  "version": "0.33.1",
   "description": "Core types and libraries for Cardano",
   "engines": {
     "node": ">=16.20.2"
@@ -54,8 +54,8 @@
     }
   },
   "dependencies": {
-    "@cardano-ogmios/client": "5.6.0",
-    "@cardano-ogmios/schema": "5.6.0",
+    "@cardano-ogmios/client": "6.3.0",
+    "@cardano-ogmios/schema": "6.3.0",
     "@cardano-sdk/crypto": "workspace:~",
     "@cardano-sdk/util": "workspace:~",
     "@foxglove/crc": "^0.0.3",
