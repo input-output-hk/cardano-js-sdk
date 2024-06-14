@@ -8,3 +8,4 @@ export * from './NetworkInfoProvider';
 export * from './RewardsProvider';
 export * from './HandleProvider';
 export * from './version';
+export * from './WebSocket';

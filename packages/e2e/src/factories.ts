@@ -34,12 +34,8 @@ import {
   Witnesser,
   util
 } from '@cardano-sdk/key-management';
-import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
-import { Logger } from 'ts-log';
-import { NodeTxSubmitProvider } from '@cardano-sdk/cardano-services';
-import { OgmiosObservableCardanoNode } from '@cardano-sdk/ogmios';
-import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
 import {
+  CardanoWsClient,
   assetInfoHttpProvider,
   chainHistoryHttpProvider,
   handleHttpProvider,
@@ -49,8 +45,14 @@ import {
   txSubmitHttpProvider,
   utxoHttpProvider
 } from '@cardano-sdk/cardano-services-client';
+import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
+import { Logger } from 'ts-log';
+import { NodeTxSubmitProvider } from '@cardano-sdk/cardano-services';
+import { OgmiosObservableCardanoNode } from '@cardano-sdk/ogmios';
+import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, of } from 'rxjs';
+import { getEnv, walletVariables } from './environment';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import memoize from 'lodash/memoize.js';
 
@@ -63,6 +65,7 @@ const HTTP_PROVIDER = 'http';
 const OGMIOS_PROVIDER = 'ogmios';
 const STUB_PROVIDER = 'stub';
 const MISSING_URL_PARAM = 'Missing URL';
+const WS_PROVIDER = 'ws';
 
 export type CreateKeyAgent = (dependencies: KeyAgentDependencies) => Promise<AsyncKeyAgent>;
 export const keyManagementFactory = new ProviderFactory<CreateKeyAgent>();
@@ -127,6 +130,16 @@ networkInfoProviderFactory.register(
     });
   }
 );
+
+networkInfoProviderFactory.register(WS_PROVIDER, (_params: any, logger: Logger): Promise<NetworkInfoProvider> => {
+  const env = getEnv(walletVariables);
+
+  if (env.WS_PROVIDER_URL === undefined) throw new Error(`${networkInfoHttpProvider.name}: ${MISSING_URL_PARAM}`);
+
+  const wsClient = new CardanoWsClient({ logger }, { url: new URL(env.WS_PROVIDER_URL) });
+
+  return Promise.resolve(wsClient.networkInfoProvider);
+});
 
 rewardsProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<RewardsProvider> => {
   if (params.baseUrl === undefined) throw new Error(`${rewardsHttpProvider.name}: ${MISSING_URL_PARAM}`);
