@@ -5,7 +5,7 @@ import { StakeKeyRegistrationEntity } from './StakeKeyRegistration.entity';
 
 @Entity()
 export class AddressEntity {
-  @PrimaryColumn()
+  @PrimaryColumn('varchar')
   address?: Cardano.PaymentAddress;
   @Column({ enum: Cardano.AddressType, type: 'enum' })
   type?: Cardano.AddressType;

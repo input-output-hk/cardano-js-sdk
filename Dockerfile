@@ -81,9 +81,7 @@ COPY --from=cardano-services-builder /app/packages/util-rxjs/package.json /app/p
 
 FROM cardano-services as provider-server
 ARG NETWORK=mainnet
-ENV \
-  CARDANO_NODE_CONFIG_PATH=/config/cardano-node/config.json \
-  NETWORK=${NETWORK}
+ENV NETWORK=${NETWORK}
 WORKDIR /app/packages/cardano-services
 COPY packages/cardano-services/config/network/${NETWORK} /config/
 EXPOSE 3000
@@ -121,3 +119,8 @@ COPY compose/projector/init.* ./
 RUN chmod 755 init.sh
 HEALTHCHECK CMD test `curl -fs http://localhost:3000/v1.0.0/health | jq -r ".services[0].projectedTip.blockNo"` -gt 1
 CMD ["./init.sh"]
+
+FROM cardano-services as ws-server
+WORKDIR /app
+HEALTHCHECK CMD curl -s --fail http://localhost:3000/health
+CMD ["bash", "-c", "./node_modules/.bin/tsx watch --clear-screen=false --conditions=development packages/cardano-services/src/cli start-ws-server"]

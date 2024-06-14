@@ -4,16 +4,16 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from '
 
 @Entity()
 export class HandleEntity {
-  @PrimaryColumn()
+  @PrimaryColumn('varchar')
   handle?: Handle;
   @Column({ nullable: true, type: 'varchar' })
   cardanoAddress?: Cardano.PaymentAddress | null;
   @OneToOne(() => AssetEntity, { onDelete: 'CASCADE' })
   @JoinColumn()
   asset?: AssetEntity;
-  @Column()
+  @Column('varchar')
   policyId?: Cardano.PolicyId;
-  @Column()
+  @Column('boolean')
   hasDatum?: boolean;
   @Column('varchar', { nullable: true })
   /** `null` when cardanoAddress === `null`, or owned by enterprise/byron address */

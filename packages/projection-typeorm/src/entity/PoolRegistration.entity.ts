@@ -12,7 +12,7 @@ export class PoolRegistrationEntity {
   @PrimaryColumn(BigIntColumnOptions)
   id?: bigint;
 
-  @Column()
+  @Column('varchar')
   rewardAccount?: Cardano.RewardAccount;
 
   @Column(UInt64ColumnOptions)
@@ -52,7 +52,7 @@ export class PoolRegistrationEntity {
   @OneToOne(() => PoolMetadataEntity, (metadata) => metadata.poolUpdate)
   metadata?: PoolMetadataEntity | null;
 
-  @Column()
+  @Column('integer')
   blockSlot?: Cardano.Slot;
 
   @ManyToOne(() => BlockEntity, OnDeleteCascadeRelationOptions)

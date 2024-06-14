@@ -7,7 +7,7 @@ import { json, serializableObj, stringBytea } from './transformers';
 @Entity()
 export class BlockDataEntity {
   // Using the same column for both primary and foreign key
-  @PrimaryColumn()
+  @PrimaryColumn('integer')
   blockHeight?: number;
 
   @OneToOne(() => BlockEntity, OnDeleteCascadeRelationOptions)

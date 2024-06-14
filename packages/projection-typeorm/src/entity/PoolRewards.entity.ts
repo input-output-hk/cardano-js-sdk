@@ -19,7 +19,7 @@ export class PoolRewardsEntity {
   @Column({ type: 'integer' })
   epochLength?: number;
 
-  @Column()
+  @Column('integer')
   epochNo?: Cardano.EpochNo;
 
   @Column({ type: 'integer' })

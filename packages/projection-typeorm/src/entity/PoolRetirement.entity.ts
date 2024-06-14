@@ -10,14 +10,14 @@ export class PoolRetirementEntity {
   @PrimaryColumn(BigIntColumnOptions)
   id?: bigint;
 
-  @Column()
+  @Column('integer')
   retireAtEpoch?: Cardano.EpochNo;
 
   @ManyToOne(() => StakePoolEntity, (stakePool) => stakePool.retirements, OnDeleteCascadeRelationOptions)
   @JoinColumn()
   stakePool?: StakePoolEntity;
 
-  @Column()
+  @Column('integer')
   blockSlot?: Cardano.Slot;
 
   @ManyToOne(() => BlockEntity, OnDeleteCascadeRelationOptions)
