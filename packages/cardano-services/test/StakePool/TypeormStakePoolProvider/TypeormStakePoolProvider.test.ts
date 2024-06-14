@@ -636,8 +636,8 @@ describe('TypeormStakePoolProvider', () => {
               const response = await provider.queryStakePools({ filters: { text: 'pool 10 ' }, pagination });
               expect(response.pageResults.map(({ metadata }) => metadata?.ticker).slice(0, 3)).toEqual([
                 'SP10',
-                'SP1',
-                'SP11'
+                'SP6a7',
+                'SP1'
               ]);
             });
           });

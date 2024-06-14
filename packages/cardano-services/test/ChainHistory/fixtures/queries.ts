@@ -60,6 +60,12 @@ export const latestTxHashesWithWithdrawal = `
 export const latestTxHashesWithCollateralOutput = `
   JOIN collateral_tx_out ON collateral_tx_out.tx_id = tx.id`;
 
+export const latestTxHashesWithProposalProcedures = `
+  JOIN gov_action_proposal ON gov_action_proposal.tx_id = tx.id`;
+
+export const latestTxHashesWithVotingProcedures = `
+  JOIN voting_procedure ON voting_procedure.tx_id = tx.id`;
+
 export const latestTxHashesWithScriptReference = `
   JOIN script ON script.tx_id = tx.id
   WHERE tx_out.reference_script_id IS NOT NULL`;
@@ -74,10 +80,9 @@ export const genesisUtxoAddresses = `
    address
   FROM 
   tx_out WHERE
-    stake_address_id = 1 OR
-    stake_address_id = 2 OR
-    stake_address_id = 3
-  GROUP BY address`;
+    value = 500000000000
+  GROUP BY address
+  LIMIT 3`;
 
 export const transactionInBlockRange = `
   SELECT

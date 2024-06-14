@@ -180,8 +180,8 @@ for each of them can be an easy way to iterate over all the impacted models.
 
 See [code coverage report]
 
-[cardano db sync]: https://github.com/input-output-hk/cardano-db-sync
-[cardano node]: https://github.com/input-output-hk/cardano-node
+[cardano db sync]: https://github.com/IntersectMBO/cardano-db-sync
+[cardano node]: https://github.com/IntersectMBO/cardano-node
 [cli]: ./src/cli.ts
 [code coverage report]: https://input-output-hk.github.io/cardano-js-sdk/coverage/cardano-services
 [install and build]: ../../README.md#install-and-build
@@ -189,5 +189,5 @@ See [code coverage report]
 [postgresql]: https://www.postgresql.org/
 [prometheus]: https://prometheus.io/
 [provider]: ../core/src/Provider
-[submit-api]: https://github.com/input-output-hk/cardano-node/tree/master/cardano-submit-api
+[submit-api]: https://github.com/IntersectMBO/cardano-node/tree/master/cardano-submit-api
 [txsubmithttpservice]: ./src/TxSubmit/TxSubmitHttpService.ts

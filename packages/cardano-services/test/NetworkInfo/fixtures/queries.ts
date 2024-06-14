@@ -1,5 +1,5 @@
 export const getMaxSupply = `
-  SELECT (treasury + reserves + rewards + utxo + deposits + fees) as max_supply
+  SELECT (treasury + reserves + rewards + utxo + deposits_stake + deposits_drep + deposits_proposal + fees) as max_supply
   FROM ada_pots
   ORDER BY epoch_no desc
   LIMIT 1

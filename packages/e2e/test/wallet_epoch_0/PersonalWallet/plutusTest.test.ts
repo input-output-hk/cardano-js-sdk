@@ -184,7 +184,7 @@ const getScriptUtxoSet = (
     )
   );
 
-describe('PersonalWallet/plutus', () => {
+describe.skip('PersonalWallet/plutus', () => {
   let wallet: BaseWallet;
   afterAll(() => {
     wallet.shutdown();

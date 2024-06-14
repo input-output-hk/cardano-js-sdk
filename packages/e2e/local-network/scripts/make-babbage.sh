@@ -124,6 +124,7 @@ cardano-cli byron genesis genesis \
 # SPs in the ShelleyGenesis
 
 cp templates/babbage/alonzo-babbage-test-genesis.json "${ROOT}/genesis.alonzo.spec.json"
+cp templates/babbage/conway-babbage-test-genesis.json "${ROOT}/genesis.conway.spec.json"
 cp templates/babbage/byron-configuration.yaml "${ROOT}/configuration.yaml"
 
 sed_i \
@@ -131,6 +132,7 @@ sed_i \
   -e 's|GenesisFile: genesis.json|ByronGenesisFile: genesis/byron/genesis.json|' \
   -e '/ByronGenesisFile/ aShelleyGenesisFile: genesis/shelley/genesis.json' \
   -e '/ByronGenesisFile/ aAlonzoGenesisFile: genesis/shelley/genesis.alonzo.json' \
+  -e '/ByronGenesisFile/ aConwayGenesisFile: genesis/shelley/genesis.conway.json' \
   -e 's/RequiresNoMagic/RequiresMagic/' \
   -e 's/LastKnownBlockVersion-Major: 0/LastKnownBlockVersion-Major: 6/' \
   -e 's/LastKnownBlockVersion-Minor: 2/LastKnownBlockVersion-Minor: 0/' \
@@ -142,12 +144,14 @@ echo "" >>"${ROOT}/configuration.yaml"
 echo "PBftSignatureThreshold: 0.6" >>"${ROOT}/configuration.yaml"
 echo "" >>"${ROOT}/configuration.yaml"
 
-echo "TestShelleyHardForkAtEpoch: 0" >>"${ROOT}/configuration.yaml"
-echo "TestAllegraHardForkAtEpoch: 0" >>"${ROOT}/configuration.yaml"
-echo "TestMaryHardForkAtEpoch: 0" >>"${ROOT}/configuration.yaml"
-echo "TestAlonzoHardForkAtEpoch: 0" >>"${ROOT}/configuration.yaml"
-echo "TestBabbageHardForkAtEpoch: 0" >>"${ROOT}/configuration.yaml"
-echo "TestEnableDevelopmentNetworkProtocols: True" >>"${ROOT}/configuration.yaml"
+echo "TestShelleyHardForkAtEpoch: 0" >> "${ROOT}/configuration.yaml"
+echo "TestAllegraHardForkAtEpoch: 0" >> "${ROOT}/configuration.yaml"
+echo "TestMaryHardForkAtEpoch: 0" >> "${ROOT}/configuration.yaml"
+echo "TestAlonzoHardForkAtEpoch: 0" >> "${ROOT}/configuration.yaml"
+echo "TestBabbageHardForkAtEpoch: 0" >> "${ROOT}/configuration.yaml"
+echo "TestConwayHardForkAtEpoch: 0" >> "${ROOT}/configuration.yaml"
+echo "ExperimentalHardForksEnabled: True" >> "${ROOT}/configuration.yaml"
+echo "ExperimentalProtocolsEnabled: True" >> "${ROOT}/configuration.yaml"
 
 # Copy the cost mode
 cardano-cli genesis create-staked --genesis-dir "${ROOT}" \
@@ -172,11 +176,18 @@ mkdir -p "${ROOT}/genesis/shelley"
 
 mv "${ROOT}/byron-gen-command/genesis.json" "${ROOT}/genesis/byron/genesis-wrong.json"
 mv "${ROOT}/genesis.alonzo.json" "${ROOT}/genesis/shelley/genesis.alonzo.json"
+mv "${ROOT}/genesis.conway.json" "${ROOT}/genesis/shelley/genesis.conway.json"
 mv "${ROOT}/genesis.json" "${ROOT}/genesis/shelley/copy-genesis.json"
 
 jq --raw-output ".protocolConsts.protocolMagic = ${NETWORK_MAGIC}" "${ROOT}/genesis/byron/genesis-wrong.json" >"${ROOT}/genesis/byron/genesis.json"
 
 rm "${ROOT}/genesis/byron/genesis-wrong.json"
+
+if [[ "$NETWORK_SPEED" == "fast" ]]; then
+  SLOT_LENGTH=0.2
+else
+  SLOT_LENGTH=1
+fi
 
 jq -M "
 . + {
@@ -184,7 +195,7 @@ jq -M "
   epochLength: 1000,
   maxLovelaceSupply: $((MAX_SUPPLY * 3)),
   securityParam: 10,
-  slotLength: 0.2,
+  slotLength: ${SLOT_LENGTH},
   updateQuorum: 2
 } |
 .protocolParams += {
@@ -194,7 +205,7 @@ jq -M "
   minFeeB: 155381,
   minUTxOValue: 1000000,
   poolDeposit: 500000000,
-  protocolVersion: { major : 7, minor: 0 },
+  protocolVersion: { major : 9, minor: 0 },
   rho: 0.1,
   tau: 0.1
 }" "${ROOT}/genesis/shelley/copy-genesis.json" > "${ROOT}/genesis/shelley/genesis.json"
@@ -253,6 +264,7 @@ for NODE in ${SP_NODES}; do
     echo ""
     echo 'export PATH=$PWD/bin:$PATH'
     echo ""
+    echo " while true ; do"
     echo 'cardano-node run \'
     echo "  --config                          '${ROOT}/configuration.yaml' \\"
     echo "  --topology                        '${ROOT}/${NODE}/topology.json' \\"
@@ -265,6 +277,7 @@ for NODE in ${SP_NODES}; do
     echo "  --shelley-operational-certificate '${ROOT}/${NODE}/opcert.cert' \\"
     echo "  --port                            $(cat "${ROOT}/${NODE}/port") \\"
     echo "  | tee -a '${ROOT}/${NODE}/node.log'"
+    echo "done"
     echo ""
     echo "wait"
   ) >"${ROOT}/${NODE}.sh"
@@ -281,14 +294,17 @@ sed_i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/" ${ROOT}/ge
 byronGenesisHash=$(cardano-cli byron genesis print-genesis-hash --genesis-json ${ROOT}/genesis/byron/genesis.json)
 shelleyGenesisHash=$(cardano-cli genesis hash --genesis ${ROOT}/genesis/shelley/genesis.json)
 alonzoGenesisHash=$(cardano-cli genesis hash --genesis ${ROOT}/genesis/shelley/genesis.alonzo.json)
+conwayGenesisHash=$(cardano-cli genesis hash --genesis ${ROOT}/genesis/shelley/genesis.conway.json)
 
 echo "Byron genesis hash: $byronGenesisHash"
 echo "Shelley genesis hash: $shelleyGenesisHash"
 echo "Alonzo genesis hash: $alonzoGenesisHash"
+echo "Conway genesis hash: $conwayGenesisHash"
 
 sed_i -E "s/ByronGenesisHash: '.*'/ByronGenesisHash: '${byronGenesisHash}'/" ${ROOT}/configuration.yaml
 sed_i -E "s/ShelleyGenesisHash: '.*'/ShelleyGenesisHash: '${shelleyGenesisHash}'/" ${ROOT}/configuration.yaml
 sed_i -E "s/AlonzoGenesisHash: '.*'/AlonzoGenesisHash: '${alonzoGenesisHash}'/" ${ROOT}/configuration.yaml
+sed_i -E "s/ConwayGenesisHash: '.*'/ConwayGenesisHash: '${conwayGenesisHash}'/" ${ROOT}/configuration.yaml
 
 # Create config folder
 rm -rf ./config/*
@@ -304,6 +320,7 @@ cp ./templates/babbage/submit-api-config.json ./config/network/cardano-submit-ap
 sed_i -E "s/\"ByronGenesisHash\": \".*\"/\"ByronGenesisHash\": \"${byronGenesisHash}\"/" ./config/network/cardano-node/config.json
 sed_i -E "s/\"ShelleyGenesisHash\": \".*\"/\"ShelleyGenesisHash\": \"${shelleyGenesisHash}\"/" ./config/network/cardano-node/config.json
 sed_i -E "s/\"AlonzoGenesisHash\": \".*\"/\"AlonzoGenesisHash\": \"${alonzoGenesisHash}\"/" ./config/network/cardano-node/config.json
+sed_i -E "s/\"ConwayGenesisHash\": \".*\"/\"ConwayGenesisHash\": \"${conwayGenesisHash}\"/" ./config/network/cardano-node/config.json
 
 cp ./templates/babbage/topology.json ./config/network/cardano-node/topology.json
 # docker hostname in topology.json isn't working, so need to specify ip of local network
@@ -320,6 +337,9 @@ cp "${ROOT}"/genesis/shelley/genesis.json ./config/network/genesis/shelley.json
 
 cp "${ROOT}"/genesis/shelley/genesis.alonzo.json ./config/network/cardano-node/genesis/alonzo.json
 cp "${ROOT}"/genesis/shelley/genesis.alonzo.json ./config/network/genesis/alonzo.json
+
+cp "${ROOT}"/genesis/shelley/genesis.conway.json ./config/network/cardano-node/genesis/conway.json
+cp "${ROOT}"/genesis/shelley/genesis.conway.json ./config/network/genesis/conway.json
 
 mkdir -p "${ROOT}/run"
 

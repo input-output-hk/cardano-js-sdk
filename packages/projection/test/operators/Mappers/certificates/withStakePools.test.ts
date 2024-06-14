@@ -70,7 +70,7 @@ describe('withStakePools', () => {
     expect(result.stakePools.retirements[0].epoch).toEqual(4);
   });
 
-  it("omits pool retirement if it's folowed by a pool registration", async () => {
+  it("omits pool retirement if it's followed by a pool registration", async () => {
     const data: Mappers.WithCertificates & WithEpochNo = {
       certificates: [
         {

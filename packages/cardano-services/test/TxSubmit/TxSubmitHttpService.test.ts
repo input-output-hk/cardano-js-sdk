@@ -2,7 +2,6 @@
 import { APPLICATION_JSON, CONTENT_TYPE, HttpServer, HttpServerConfig, TxSubmitHttpService } from '../../src';
 import { CreateHttpProviderConfig, txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { FATAL, createLogger } from 'bunyan';
-import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { ProviderError, TxSubmissionError, TxSubmissionErrorCode, TxSubmitProvider } from '@cardano-sdk/core';
 import { bufferToHexString, fromSerializableObject } from '@cardano-sdk/util';
 import { getPort } from 'get-port-please';
@@ -13,15 +12,11 @@ import cbor from 'cbor';
 
 const txSubmitProviderMock = (
   healthCheckImpl = async () => Promise.resolve({ ok: true }),
-  submitTxImpl = async () => Promise.resolve([])
-) =>
-  ({
-    healthCheck: jest.fn(healthCheckImpl),
-    initialize: jest.fn(),
-    shutdown: jest.fn(),
-    start: jest.fn(),
-    submitTx: jest.fn(submitTxImpl)
-  } as unknown as OgmiosTxSubmitProvider);
+  submitTxImpl: TxSubmitProvider['submitTx'] = async () => Promise.resolve<void>(void 0)
+): jest.Mocked<TxSubmitProvider> => ({
+  healthCheck: jest.fn(healthCheckImpl),
+  submitTx: jest.fn(submitTxImpl)
+});
 
 const serializeProviderArg = (arg: unknown) => ({ signedTransaction: arg });
 const bodyTx = serializeProviderArg(cbor.encode('#####').toString('hex'));
@@ -30,7 +25,7 @@ const APPLICATION_CBOR = 'application/cbor';
 const emptyUintArrayAsHexString = bufferToHexString(Buffer.from(new Uint8Array()));
 
 describe('TxSubmitHttpService', () => {
-  let txSubmitProvider: OgmiosTxSubmitProvider;
+  let txSubmitProvider: jest.Mocked<TxSubmitProvider>;
   let httpServer: HttpServer;
   let port: number;
   let baseUrl: string;

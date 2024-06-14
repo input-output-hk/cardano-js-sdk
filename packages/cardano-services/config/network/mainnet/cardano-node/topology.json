@@ -1,9 +1,31 @@
 {
-  "Producers": [
+  "bootstrapPeers": [
     {
-      "addr": "relays-new.cardano-mainnet.iohk.io",
-      "port": 3001,
-      "valency": 2
+      "address": "backbone.cardano.iog.io",
+      "port": 3001
+    },
+    {
+      "address": "backbone.mainnet.emurgornd.com",
+      "port": 3001
+    },
+    {
+      "address": "backbone.mainnet.cardanofoundation.org",
+      "port": 3001
     }
-  ]
+  ],
+  "localRoots": [
+    {
+      "accessPoints": [],
+      "advertise": false,
+      "trustable": false,
+      "valency": 1
+    }
+  ],
+  "publicRoots": [
+    {
+      "accessPoints": [],
+      "advertise": false
+    }
+  ],
+  "useLedgerAfterSlot": 116812831
 }

@@ -36,7 +36,8 @@ import {
 } from '@cardano-sdk/key-management';
 import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
 import { Logger } from 'ts-log';
-import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
+import { NodeTxSubmitProvider } from '@cardano-sdk/cardano-services';
+import { OgmiosObservableCardanoNode } from '@cardano-sdk/ogmios';
 import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
 import {
   assetInfoHttpProvider,
@@ -48,9 +49,8 @@ import {
   txSubmitHttpProvider,
   utxoHttpProvider
 } from '@cardano-sdk/cardano-services-client';
-import { createConnectionObject } from '@cardano-ogmios/client';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
-import { filter, firstValueFrom } from 'rxjs';
+import { filter, firstValueFrom, of } from 'rxjs';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import memoize from 'lodash/memoize.js';
 
@@ -137,7 +137,7 @@ rewardsProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logge
 });
 
 txSubmitProviderFactory.register(OGMIOS_PROVIDER, async (params: any, logger: Logger): Promise<TxSubmitProvider> => {
-  if (params.baseUrl === undefined) throw new Error(`${OgmiosTxSubmitProvider.name}: ${MISSING_URL_PARAM}`);
+  if (params.baseUrl === undefined) throw new Error(`${NodeTxSubmitProvider.name}: ${MISSING_URL_PARAM}`);
 
   const connectionConfig = {
     host: params.baseUrl.hostname,
@@ -146,7 +146,17 @@ txSubmitProviderFactory.register(OGMIOS_PROVIDER, async (params: any, logger: Lo
   };
 
   return new Promise<TxSubmitProvider>(async (resolve) => {
-    resolve(new OgmiosTxSubmitProvider(createConnectionObject(connectionConfig), { logger }));
+    resolve(
+      new NodeTxSubmitProvider({
+        cardanoNode: new OgmiosObservableCardanoNode(
+          {
+            connectionConfig$: of(connectionConfig)
+          },
+          { logger }
+        ),
+        logger
+      })
+    );
   });
 });
 

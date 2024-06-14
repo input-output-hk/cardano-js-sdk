@@ -75,12 +75,12 @@ describe('local-network/register-pool', () => {
     wallet2.wallet.shutdown();
   });
 
-  beforeEach(() => unDelegateWallet(wallet1.wallet));
-
   test('does not meet pledge', async () => {
     const wallet = wallet1.wallet;
 
     await walletReady(wallet);
+
+    await unDelegateWallet(wallet);
 
     const poolPubKey = await wallet1.bip32Account.derivePublicKey({
       index: 0,
@@ -167,6 +167,7 @@ describe('local-network/register-pool', () => {
     const wallet = wallet2.wallet;
 
     await walletReady(wallet);
+    await unDelegateWallet(wallet);
 
     const poolPubKey = await wallet2.bip32Account.derivePublicKey({
       index: 0,
