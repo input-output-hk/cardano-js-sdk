@@ -110,11 +110,13 @@ type BabbageProtocolParameters = Omit<AlonzoProtocolParams, 'coinsPerUtxoWord' |
 export interface PoolVotingThresholds {
   motionNoConfidence: Fraction;
   committeeNormal: Fraction;
-  commiteeNoConfidence: Fraction;
+  committeeNoConfidence: Fraction;
   hardForkInitiation: Fraction;
+  securityRelevantParamVotingThreshold: Fraction;
 }
 
-export interface DelegateRepresentativeThresholds extends PoolVotingThresholds {
+export interface DelegateRepresentativeThresholds
+  extends Omit<PoolVotingThresholds, 'securityRelevantParamVotingThreshold'> {
   updateConstitution: Fraction;
   ppNetworkGroup: Fraction;
   ppEconomicGroup: Fraction;
@@ -127,20 +129,21 @@ type NewProtocolParamsInConway = {
   poolVotingThresholds: PoolVotingThresholds;
   dRepVotingThresholds: DelegateRepresentativeThresholds;
   minCommitteeSize: number;
-  committeeTermLimit: number;
+  committeeTermLimit: EpochNo;
   governanceActionValidityPeriod: EpochNo;
   governanceActionDeposit: number;
   dRepDeposit: number;
   dRepInactivityPeriod: EpochNo;
+  minFeeRefScriptCostPerByte: string;
 };
 
-type ConwayProtocolParameters = BabbageProtocolParameters & NewProtocolParamsInConway;
+export type ProtocolParameters = BabbageProtocolParameters & NewProtocolParamsInConway;
+export type ConwayProtocolParameters = Omit<ProtocolParameters, 'protocolVersion'>;
 
-export type ProtocolParameters = ConwayProtocolParameters;
-
-// Even tho extraEntropy was deprecated on babbage era, it is still present in the ProtocolParametersUpdate structure
-// since this structure is backward compatible with all eras.
+// Even tho extraEntropy was deprecated on babbage era, and protocolVersion was deprecated in conway era,
+// they are still present in the ProtocolParametersUpdate structure since this structure is backward compatible with all eras.
 export type ProtocolParametersUpdate = Partial<ProtocolParameters & Pick<AlonzoProtocolParams, 'extraEntropy'>>;
+export type ProtocolParametersUpdateConway = Partial<ConwayProtocolParameters>;
 
 export type GenesisDelegateKeyHash = Crypto.Hash28ByteBase16;
 export type ProposedProtocolParameterUpdates = Map<GenesisDelegateKeyHash, ProtocolParametersUpdate>;

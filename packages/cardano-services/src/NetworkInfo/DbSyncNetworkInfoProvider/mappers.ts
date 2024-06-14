@@ -67,11 +67,12 @@ export const toProtocolParams = ({
   governance_action_validity_period,
   governance_action_deposit,
   drep_deposit,
-  drep_inactivity_period
+  drep_inactivity_period,
+  min_fee_ref_script_cost_per_byte
 }: ProtocolParamsModel): Cardano.ProtocolParameters => ({
   coinsPerUtxoByte: Number(coins_per_utxo_size),
   collateralPercentage: collateral_percent,
-  committeeTermLimit: Number(committee_term_limit),
+  committeeTermLimit: Cardano.EpochNo(committee_term_limit),
   costModels: mapCostModels(costs),
   dRepDeposit: Number(drep_deposit),
   dRepInactivityPeriod: Cardano.EpochNo(drep_inactivity_period),
@@ -96,6 +97,7 @@ export const toProtocolParams = ({
   minCommitteeSize: Number(min_committee_size),
   minFeeCoefficient: min_fee_a,
   minFeeConstant: min_fee_b,
+  minFeeRefScriptCostPerByte: String(min_fee_ref_script_cost_per_byte),
   minPoolCost: Number(min_pool_cost),
   monetaryExpansion: String(monetary_expand_rate),
   poolDeposit: Number(pool_deposit),

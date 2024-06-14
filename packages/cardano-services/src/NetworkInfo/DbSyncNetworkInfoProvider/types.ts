@@ -42,6 +42,7 @@ export interface ProtocolParamsModel {
   max_bh_size: number;
   optimal_pool_count: number;
   influence: number;
+  min_fee_ref_script_cost_per_byte: number;
   monetary_expand_rate: number;
   treasury_growth_rate: number;
   decentralisation: number;
