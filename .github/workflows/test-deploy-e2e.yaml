@@ -1,0 +1,15 @@
+name: CI/CD
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  hello-world-placeholder:
+    name: Hello World Placeholder
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Hello World
+        run: |
+          echo 'Hello, World!'
