@@ -22,7 +22,7 @@
 <ul class="tsd-hierarchy">
 <li><span class="target">InteractionContextProps</span></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ddb7e72/packages/ogmios/src/CardanoNode/OgmiosObservableCardanoNode/createObservableInteractionContext.ts#L15">packages/ogmios/src/CardanoNode/OgmiosObservableCardanoNode/createObservableInteractionContext.ts:15</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/9c7e831/packages/ogmios/src/CardanoNode/OgmiosObservableCardanoNode/createObservableInteractionContext.ts#L12">packages/ogmios/src/CardanoNode/OgmiosObservableCardanoNode/createObservableInteractionContext.ts:12</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -31,7 +31,6 @@
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Properties</h3>
 <div class="tsd-index-list"><a href="_cardano_sdk_ogmios._internal_.InteractionContextProps.html#connectionConfig_" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF984D" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-1024-path"></rect><path d="M9.354 16V7.24H12.174C12.99 7.24 13.638 7.476 14.118 7.948C14.606 8.412 14.85 9.036 14.85 9.82C14.85 10.604 14.606 11.232 14.118 11.704C13.638 12.168 12.99 12.4 12.174 12.4H10.434V16H9.354ZM10.434 11.428H12.174C12.646 11.428 13.022 11.284 13.302 10.996C13.59 10.7 13.734 10.308 13.734 9.82C13.734 9.324 13.59 8.932 13.302 8.644C13.022 8.356 12.646 8.212 12.174 8.212H10.434V11.428Z" fill="var(--color-text)" id="icon-1024-text"></path></svg><span>connection<wbr/>Config$</span></a>
-<a href="_cardano_sdk_ogmios._internal_.InteractionContextProps.html#interactionType" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>interaction<wbr/>Type</span></a>
 <a href="_cardano_sdk_ogmios._internal_.InteractionContextProps.html#reconnectionConfig" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>reconnection<wbr/>Config?</span></a>
 </div></section></div></details></section></section>
 <section class="tsd-panel-group tsd-member-group">
@@ -45,23 +44,14 @@ re-subscribed before reconnecting on connection errors.</p>
 close an existing connection and open a new one.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ddb7e72/packages/ogmios/src/CardanoNode/OgmiosObservableCardanoNode/createObservableInteractionContext.ts#L23">packages/ogmios/src/CardanoNode/OgmiosObservableCardanoNode/createObservableInteractionContext.ts:23</a></li></ul></aside></section>
-<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface"><a id="interactionType" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>interaction<wbr/>Type</span><a href="#interactionType" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
-<div class="tsd-signature">interaction<wbr/>Type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">InteractionType</span></div>
-<div class="tsd-comment tsd-typography"><p>&#39;LongRunning&#39; will keep the connection open until unsubscribed.
-&#39;OneTime&#39; will close the connectino (and complete the interaction context observable)
-after the 1st usage of emitted interaction context.</p>
-</div><aside class="tsd-sources">
-<ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ddb7e72/packages/ogmios/src/CardanoNode/OgmiosObservableCardanoNode/createObservableInteractionContext.ts#L29">packages/ogmios/src/CardanoNode/OgmiosObservableCardanoNode/createObservableInteractionContext.ts:29</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/9c7e831/packages/ogmios/src/CardanoNode/OgmiosObservableCardanoNode/createObservableInteractionContext.ts#L20">packages/ogmios/src/CardanoNode/OgmiosObservableCardanoNode/createObservableInteractionContext.ts:20</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface"><a id="reconnectionConfig" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>reconnection<wbr/>Config</span><a href="#reconnectionConfig" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">reconnection<wbr/>Config<span class="tsd-signature-symbol">?:</span> <a href="../types/_cardano_sdk_ogmios._internal_.ReconnectionConfig.html" class="tsd-signature-type" data-tsd-kind="Type alias">ReconnectionConfig</a></div>
 <div class="tsd-comment tsd-typography"><p>Retry backoff configuration for re-subscribing to connectionConfig$ on connection error.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ddb7e72/packages/ogmios/src/CardanoNode/OgmiosObservableCardanoNode/createObservableInteractionContext.ts#L31">packages/ogmios/src/CardanoNode/OgmiosObservableCardanoNode/createObservableInteractionContext.ts:31</a></li></ul></aside></section></section></div>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/9c7e831/packages/ogmios/src/CardanoNode/OgmiosObservableCardanoNode/createObservableInteractionContext.ts#L22">packages/ogmios/src/CardanoNode/OgmiosObservableCardanoNode/createObservableInteractionContext.ts:22</a></li></ul></aside></section></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
@@ -107,8 +97,8 @@ after the 1st usage of emitted interaction context.</p>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/_cardano_sdk_core.Cardano.PoolId.html">Pool<wbr/>Id</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/_cardano_sdk_core.Cardano.RewardAccount.html">Reward<wbr/>Account</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/_cardano_sdk_core.Cardano.TransactionId.html">Transaction<wbr/>Id</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/_cardano_sdk_core.Cardano.VrfVkBech32.html">Vrf<wbr/>Vk<wbr/>Bech32</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/_cardano_sdk_core.Cardano.util.html">util</a></li></ul></li>
-<li class="tsd-kind-namespace tsd-parent-kind-module"><a href="../modules/_cardano_sdk_core.CardanoNodeErrors.html">Cardano<wbr/>Node<wbr/>Errors</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-module"><a href="../modules/_cardano_sdk_core.CardanoNodeUtil.html">Cardano<wbr/>Node<wbr/>Util</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-module"><a href="../modules/_cardano_sdk_core.Days.html">Days</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-module"><a href="../modules/_cardano_sdk_core.Hours.html">Hours</a></li>
@@ -179,7 +169,6 @@ after the 1st usage of emitted interaction context.</p>
 <li class="current tsd-kind-interface tsd-parent-kind-module"><a href="_cardano_sdk_ogmios._internal_.InteractionContextProps.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-interface)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-256-path"></rect><path d="M9.51 16V15.016H11.298V8.224H9.51V7.24H14.19V8.224H12.402V15.016H14.19V16H9.51Z" fill="var(--color-text)" id="icon-256-text"></path></svg><span>Interaction<wbr/>Context<wbr/>Props</span></a>
 <ul>
 <li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_ogmios._internal_.InteractionContextProps.html#connectionConfig_" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>connection<wbr/>Config$</a></li>
-<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_ogmios._internal_.InteractionContextProps.html#interactionType" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>interaction<wbr/>Type</a></li>
 <li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_ogmios._internal_.InteractionContextProps.html#reconnectionConfig" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>reconnection<wbr/>Config?</a></li></ul></li></ul></nav></div></div>
 <div class="container tsd-generator">
 <p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div>

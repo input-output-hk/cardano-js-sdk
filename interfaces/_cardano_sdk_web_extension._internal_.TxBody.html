@@ -20,11 +20,11 @@
 <section class="tsd-panel tsd-hierarchy">
 <h4>Hierarchy</h4>
 <ul class="tsd-hierarchy">
-<li><span class="tsd-signature-type">Omit</span><span class="tsd-signature-symbol">&lt;</span><a href="_cardano_sdk_web_extension._internal_.HydratedTxBody.html" class="tsd-signature-type" data-tsd-kind="Interface">HydratedTxBody</a><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">&quot;inputs&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;collaterals&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;referenceInputs&quot;</span><span class="tsd-signature-symbol">&gt;</span>
+<li><span class="tsd-signature-type">Omit</span><span class="tsd-signature-symbol">&lt;</span><a href="_cardano_sdk_web_extension._internal_.HydratedTxBody.html" class="tsd-signature-type" data-tsd-kind="Interface">HydratedTxBody</a><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">&quot;certificates&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;inputs&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;collaterals&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;referenceInputs&quot;</span><span class="tsd-signature-symbol">&gt;</span>
 <ul class="tsd-hierarchy">
 <li><span class="target">TxBody</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:47</li></ul></aside>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:51</li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -33,7 +33,7 @@
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Properties</h3>
 <div class="tsd-index-list"><a href="_cardano_sdk_web_extension._internal_.TxBody.html#auxiliaryDataHash" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF984D" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-1024-path"></rect><path d="M9.354 16V7.24H12.174C12.99 7.24 13.638 7.476 14.118 7.948C14.606 8.412 14.85 9.036 14.85 9.82C14.85 10.604 14.606 11.232 14.118 11.704C13.638 12.168 12.99 12.4 12.174 12.4H10.434V16H9.354ZM10.434 11.428H12.174C12.646 11.428 13.022 11.284 13.302 10.996C13.59 10.7 13.734 10.308 13.734 9.82C13.734 9.324 13.59 8.932 13.302 8.644C13.022 8.356 12.646 8.212 12.174 8.212H10.434V11.428Z" fill="var(--color-text)" id="icon-1024-text"></path></svg><span>auxiliary<wbr/>Data<wbr/>Hash?</span></a>
-<a href="_cardano_sdk_web_extension._internal_.TxBody.html#certificates" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>certificates?</span></a>
+<a href="_cardano_sdk_web_extension._internal_.TxBody.html#certificates" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>certificates?</span></a>
 <a href="_cardano_sdk_web_extension._internal_.TxBody.html#collateralReturn" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>collateral<wbr/>Return?</span></a>
 <a href="_cardano_sdk_web_extension._internal_.TxBody.html#collaterals" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>collaterals?</span></a>
 <a href="_cardano_sdk_web_extension._internal_.TxBody.html#donation" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>donation?</span></a>
@@ -60,118 +60,117 @@
 <div class="tsd-signature">auxiliary<wbr/>Data<wbr/>Hash<span class="tsd-signature-symbol">?:</span> <a href="../functions/_cardano_sdk_web_extension._internal_.Hash32ByteBase16-1.html" class="tsd-signature-type" data-tsd-kind="Function">Hash32ByteBase16</a></div><aside class="tsd-sources">
 <p>Inherited from Omit.auxiliaryDataHash</p>
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:38</li></ul></aside></section>
-<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a id="certificates" class="tsd-anchor"></a>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:42</li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface"><a id="certificates" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>certificates</span><a href="#certificates" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">certificates<span class="tsd-signature-symbol">?:</span> <a href="../types/_cardano_sdk_web_extension._internal_.Certificate-1.html" class="tsd-signature-type" data-tsd-kind="Type alias">Certificate</a><span class="tsd-signature-symbol">[]</span></div><aside class="tsd-sources">
-<p>Inherited from Omit.certificates</p>
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:32</li></ul></aside></section>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:52</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a id="collateralReturn" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>collateral<wbr/>Return</span><a href="#collateralReturn" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">collateral<wbr/>Return<span class="tsd-signature-symbol">?:</span> <a href="_cardano_sdk_web_extension._internal_.TxOut.html" class="tsd-signature-type" data-tsd-kind="Interface">TxOut</a></div><aside class="tsd-sources">
 <p>Inherited from Omit.collateralReturn</p>
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:40</li></ul></aside></section>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:44</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface"><a id="collaterals" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>collaterals</span><a href="#collaterals" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">collaterals<span class="tsd-signature-symbol">?:</span> <a href="_cardano_sdk_web_extension._internal_.TxIn.html" class="tsd-signature-type" data-tsd-kind="Interface">TxIn</a><span class="tsd-signature-symbol">[]</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:49</li></ul></aside></section>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:53</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a id="donation" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>donation</span><a href="#donation" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">donation<span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">bigint</span></div><aside class="tsd-sources">
 <p>Inherited from Omit.donation</p>
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:45</li></ul></aside></section>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:49</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a id="fee" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>fee</span><a href="#fee" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">fee<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">bigint</span></div><aside class="tsd-sources">
 <p>Inherited from Omit.fee</p>
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:29</li></ul></aside></section>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:33</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface"><a id="inputs" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>inputs</span><a href="#inputs" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">inputs<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_web_extension._internal_.TxIn.html" class="tsd-signature-type" data-tsd-kind="Interface">TxIn</a><span class="tsd-signature-symbol">[]</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:48</li></ul></aside></section>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:54</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a id="mint" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>mint</span><a href="#mint" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">mint<span class="tsd-signature-symbol">?:</span> <a href="../types/_cardano_sdk_web_extension._internal_.TokenMap.html" class="tsd-signature-type" data-tsd-kind="Type alias">TokenMap</a></div><aside class="tsd-sources">
 <p>Inherited from Omit.mint</p>
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:33</li></ul></aside></section>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:37</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a id="networkId" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>network<wbr/>Id</span><a href="#networkId" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">network<wbr/>Id<span class="tsd-signature-symbol">?:</span> <a href="../enums/_cardano_sdk_web_extension._internal_.NetworkId.html" class="tsd-signature-type" data-tsd-kind="Enumeration">NetworkId</a></div><aside class="tsd-sources">
 <p>Inherited from Omit.networkId</p>
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:36</li></ul></aside></section>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:40</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a id="outputs" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>outputs</span><a href="#outputs" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">outputs<span class="tsd-signature-symbol">:</span> <a href="_cardano_sdk_web_extension._internal_.TxOut.html" class="tsd-signature-type" data-tsd-kind="Interface">TxOut</a><span class="tsd-signature-symbol">[]</span></div><aside class="tsd-sources">
 <p>Inherited from Omit.outputs</p>
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:28</li></ul></aside></section>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:32</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a id="proposalProcedures" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>proposal<wbr/>Procedures</span><a href="#proposalProcedures" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">proposal<wbr/>Procedures<span class="tsd-signature-symbol">?:</span> <a href="../types/_cardano_sdk_web_extension._internal_.ProposalProcedure-1.html" class="tsd-signature-type" data-tsd-kind="Type alias">ProposalProcedure</a><span class="tsd-signature-symbol">[]</span></div><aside class="tsd-sources">
 <p>Inherited from Omit.proposalProcedures</p>
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:43</li></ul></aside></section>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:47</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface"><a id="referenceInputs" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>reference<wbr/>Inputs</span><a href="#referenceInputs" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">reference<wbr/>Inputs<span class="tsd-signature-symbol">?:</span> <a href="_cardano_sdk_web_extension._internal_.TxIn.html" class="tsd-signature-type" data-tsd-kind="Interface">TxIn</a><span class="tsd-signature-symbol">[]</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:50</li></ul></aside></section>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:55</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a id="requiredExtraSignatures" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>required<wbr/>Extra<wbr/>Signatures</span><a href="#requiredExtraSignatures" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">required<wbr/>Extra<wbr/>Signatures<span class="tsd-signature-symbol">?:</span> <a href="../functions/_cardano_sdk_web_extension._internal_.Ed25519KeyHashHex-1.html" class="tsd-signature-type" data-tsd-kind="Function">Ed25519KeyHashHex</a><span class="tsd-signature-symbol">[]</span></div><aside class="tsd-sources">
 <p>Inherited from Omit.requiredExtraSignatures</p>
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:35</li></ul></aside></section>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:39</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a id="scriptIntegrityHash" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>script<wbr/>Integrity<wbr/>Hash</span><a href="#scriptIntegrityHash" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">script<wbr/>Integrity<wbr/>Hash<span class="tsd-signature-symbol">?:</span> <a href="../functions/_cardano_sdk_web_extension._internal_.Hash32ByteBase16-1.html" class="tsd-signature-type" data-tsd-kind="Function">Hash32ByteBase16</a></div><aside class="tsd-sources">
 <p>Inherited from Omit.scriptIntegrityHash</p>
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:34</li></ul></aside></section>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:38</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a id="totalCollateral" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>total<wbr/>Collateral</span><a href="#totalCollateral" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">total<wbr/>Collateral<span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">bigint</span></div><aside class="tsd-sources">
 <p>Inherited from Omit.totalCollateral</p>
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:39</li></ul></aside></section>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:43</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a id="treasuryValue" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>treasury<wbr/>Value</span><a href="#treasuryValue" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">treasury<wbr/>Value<span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">bigint</span></div><aside class="tsd-sources">
 <p>Inherited from Omit.treasuryValue</p>
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:44</li></ul></aside></section>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:48</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a id="update" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>update</span><a href="#update" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">update<span class="tsd-signature-symbol">?:</span> <a href="../types/_cardano_sdk_web_extension._internal_.Update-1.html" class="tsd-signature-type" data-tsd-kind="Type alias">Update</a></div><aside class="tsd-sources">
 <p>Inherited from Omit.update</p>
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:37</li></ul></aside></section>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:41</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a id="validityInterval" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>validity<wbr/>Interval</span><a href="#validityInterval" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">validity<wbr/>Interval<span class="tsd-signature-symbol">?:</span> <a href="_cardano_sdk_web_extension._internal_.ValidityInterval.html" class="tsd-signature-type" data-tsd-kind="Interface">ValidityInterval</a></div><aside class="tsd-sources">
 <p>Inherited from Omit.validityInterval</p>
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:30</li></ul></aside></section>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:34</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a id="votingProcedures" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>voting<wbr/>Procedures</span><a href="#votingProcedures" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">voting<wbr/>Procedures<span class="tsd-signature-symbol">?:</span> <a href="../types/_cardano_sdk_web_extension._internal_.VotingProcedures-1.html" class="tsd-signature-type" data-tsd-kind="Type alias">VotingProcedures</a></div><aside class="tsd-sources">
 <p>Inherited from Omit.votingProcedures</p>
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:42</li></ul></aside></section>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:46</li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a id="withdrawals" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>withdrawals</span><a href="#withdrawals" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">withdrawals<span class="tsd-signature-symbol">?:</span> <a href="_cardano_sdk_web_extension._internal_.Withdrawal.html" class="tsd-signature-type" data-tsd-kind="Interface">Withdrawal</a><span class="tsd-signature-symbol">[]</span></div><aside class="tsd-sources">
 <p>Inherited from Omit.withdrawals</p>
 <ul>
-<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:31</li></ul></aside></section></section></div>
+<li>Defined in packages/core/dist/cjs/Cardano/types/Transaction.d.ts:35</li></ul></aside></section></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
@@ -217,8 +216,8 @@
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/_cardano_sdk_core.Cardano.PoolId.html">Pool<wbr/>Id</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/_cardano_sdk_core.Cardano.RewardAccount.html">Reward<wbr/>Account</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/_cardano_sdk_core.Cardano.TransactionId.html">Transaction<wbr/>Id</a></li>
+<li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/_cardano_sdk_core.Cardano.VrfVkBech32.html">Vrf<wbr/>Vk<wbr/>Bech32</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-namespace"><a href="../modules/_cardano_sdk_core.Cardano.util.html">util</a></li></ul></li>
-<li class="tsd-kind-namespace tsd-parent-kind-module"><a href="../modules/_cardano_sdk_core.CardanoNodeErrors.html">Cardano<wbr/>Node<wbr/>Errors</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-module"><a href="../modules/_cardano_sdk_core.CardanoNodeUtil.html">Cardano<wbr/>Node<wbr/>Util</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-module"><a href="../modules/_cardano_sdk_core.Days.html">Days</a></li>
 <li class="tsd-kind-namespace tsd-parent-kind-module"><a href="../modules/_cardano_sdk_core.Hours.html">Hours</a></li>
@@ -289,7 +288,7 @@
 <li class="current tsd-kind-interface tsd-parent-kind-module"><a href="_cardano_sdk_web_extension._internal_.TxBody.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-interface)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-256-path"></rect><path d="M9.51 16V15.016H11.298V8.224H9.51V7.24H14.19V8.224H12.402V15.016H14.19V16H9.51Z" fill="var(--color-text)" id="icon-256-text"></path></svg><span>Tx<wbr/>Body</span></a>
 <ul>
 <li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="_cardano_sdk_web_extension._internal_.TxBody.html#auxiliaryDataHash" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>auxiliary<wbr/>Data<wbr/>Hash?</a></li>
-<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="_cardano_sdk_web_extension._internal_.TxBody.html#certificates" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>certificates?</a></li>
+<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_web_extension._internal_.TxBody.html#certificates" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>certificates?</a></li>
 <li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="_cardano_sdk_web_extension._internal_.TxBody.html#collateralReturn" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>collateral<wbr/>Return?</a></li>
 <li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_web_extension._internal_.TxBody.html#collaterals" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>collaterals?</a></li>
 <li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="_cardano_sdk_web_extension._internal_.TxBody.html#donation" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>donation?</a></li>
