@@ -56,7 +56,7 @@ in {
       buildInputs = oldAttrs.buildInputs ++ [nixpkgs.pkg-config nixpkgs.libusb1];
       # run actual build
       buildPhase = ''
-        yarn workspace @cardano-sdk/cardano-services run build
+        yarn build:cjs
       '';
       # override installPhase to only install what's necessary
       installPhase = ''
@@ -70,7 +70,6 @@ in {
         for p in cardano-services cardano-services-client core ogmios util crypto projection projection-typeorm util-rxjs; do
           mkdir -p $out/libexec/$sourceRoot/packages/$p
           cp -r packages/$p/dist $out/libexec/$sourceRoot/packages/$p/dist
-          cp -r packages/$p/package.json $out/libexec/$sourceRoot/packages/$p/package.json
         done
         cp -r ${production-deps}/libexec/$sourceRoot/packages/cardano-services/config $out/libexec/$sourceRoot/packages/cardano-services/config
 
