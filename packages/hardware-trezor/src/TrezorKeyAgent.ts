@@ -129,9 +129,6 @@ export class TrezorKeyAgent extends KeyAgentBase {
       if (!deviceFeatures.success) {
         throw new errors.TransportError('Failed to get device', deviceFeatures.payload);
       }
-      if (deviceFeatures.payload.model !== 'T') {
-        throw new errors.TransportError(`Trezor device model "${deviceFeatures.payload.model}" is not supported.`);
-      }
       return deviceFeatures.payload;
     } catch (error) {
       throw transportTypedError(error);
