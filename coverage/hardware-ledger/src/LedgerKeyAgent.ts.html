@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">37.29% </span>
+                <span class="strong">37.56% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>69/185</span>
+                <span class='fraction'>68/181</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">25.25% </span>
+                <span class="strong">25.51% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>25/99</span>
+                <span class='fraction'>25/98</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">34.21% </span>
+                <span class="strong">35.13% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>13/38</span>
+                <span class='fraction'>13/37</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">37.5% </span>
+                <span class="strong">37.79% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>66/176</span>
+                <span class='fraction'>65/172</span>
             </div>
         
             
@@ -668,12 +668,7 @@
 <a name='L603'></a><a href='#L603'>603</a>
 <a name='L604'></a><a href='#L604'>604</a>
 <a name='L605'></a><a href='#L605'>605</a>
-<a name='L606'></a><a href='#L606'>606</a>
-<a name='L607'></a><a href='#L607'>607</a>
-<a name='L608'></a><a href='#L608'>608</a>
-<a name='L609'></a><a href='#L609'>609</a>
-<a name='L610'></a><a href='#L610'>610</a>
-<a name='L611'></a><a href='#L611'>611</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L606'></a><a href='#L606'>606</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
@@ -773,8 +768,6 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1055,9 +1048,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -1383,8 +1373,6 @@ const stakeCredentialCert = (cert: Certificate) =&gt;
   cert.type === CertificateType.STAKE_REGISTRATION ||
   cert.type === CertificateType.STAKE_DEREGISTRATION ||
 <span class="branch-2 cbranch-no" title="branch not covered" >  cert.type === CertificateType.STAKE_DELEGATION;</span>
-const isLedgerModelSupported = <span class="fstat-no" title="function not covered" >(d</span>eviceModelId: string): deviceModelId is 'nanoS' | 'nanoX' | 'nanoSP' =&gt;
-<span class="cstat-no" title="statement not covered" >  ['nanoS', 'nanoX', 'nanoSP'].includes(deviceModelId);</span>
 &nbsp;
 const establishDeviceConnectionMethodName = 'establishDeviceConnection';
 &nbsp;
@@ -1669,9 +1657,6 @@ export class LedgerKeyAgent extends KeyAgentBase {
 <span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (!transport || !transport.deviceModel) {</span>
 <span class="cstat-no" title="statement not covered" >        throw new errors.TransportError('Missing transport');</span>
       }
-<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (!isLedgerModelSupported(transport.deviceModel.id)) {</span>
-<span class="cstat-no" title="statement not covered" >        throw new errors.TransportError(`Ledger device model: "${transport.deviceModel.id}" is not supported`);</span>
-      }
 &nbsp;
       const newConnection = <span class="cstat-no" title="statement not covered" >await LedgerKeyAgent.createDeviceConnection(transport);</span>
 <span class="cstat-no" title="statement not covered" >      this.rememberConnection({</span>
@@ -1900,7 +1885,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-06-17T06:45:17.177Z
+                at 2024-06-18T09:09:04.589Z
             </div>
         <script src="../prettify.js"></script>
         <script>
