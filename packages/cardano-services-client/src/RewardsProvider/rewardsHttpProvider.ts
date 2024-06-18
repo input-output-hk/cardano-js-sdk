@@ -18,7 +18,7 @@ const paths: HttpProviderConfigPaths<RewardsProvider> = {
 export const rewardsHttpProvider = (config: CreateHttpProviderConfig<RewardsProvider>): RewardsProvider =>
   createHttpProvider<RewardsProvider>({
     ...config,
-    apiVersion: apiVersion.rewards,
+    apiVersion: config.apiVersion || apiVersion.rewards,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mapError: (error: any, method) => {
       if (method === 'healthCheck') {

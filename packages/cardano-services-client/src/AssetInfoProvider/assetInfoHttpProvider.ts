@@ -17,7 +17,7 @@ const paths: HttpProviderConfigPaths<AssetProvider> = {
 export const assetInfoHttpProvider = (config: CreateHttpProviderConfig<AssetProvider>): AssetProvider =>
   createHttpProvider<AssetProvider>({
     ...config,
-    apiVersion: apiVersion.assetInfo,
+    apiVersion: config.apiVersion || apiVersion.assetInfo,
     paths,
     serviceSlug: 'asset'
   });
