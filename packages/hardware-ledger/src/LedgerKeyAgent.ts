@@ -98,8 +98,6 @@ const stakeCredentialCert = (cert: Certificate) =>
   cert.type === CertificateType.STAKE_REGISTRATION ||
   cert.type === CertificateType.STAKE_DEREGISTRATION ||
   cert.type === CertificateType.STAKE_DELEGATION;
-const isLedgerModelSupported = (deviceModelId: string): deviceModelId is 'nanoS' | 'nanoX' | 'nanoSP' =>
-  ['nanoS', 'nanoX', 'nanoSP'].includes(deviceModelId);
 
 const establishDeviceConnectionMethodName = 'establishDeviceConnection';
 
@@ -383,9 +381,6 @@ export class LedgerKeyAgent extends KeyAgentBase {
 
       if (!transport || !transport.deviceModel) {
         throw new errors.TransportError('Missing transport');
-      }
-      if (!isLedgerModelSupported(transport.deviceModel.id)) {
-        throw new errors.TransportError(`Ledger device model: "${transport.deviceModel.id}" is not supported`);
       }
 
       const newConnection = await LedgerKeyAgent.createDeviceConnection(transport);
