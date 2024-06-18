@@ -1,6 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { BaseWallet } from '@cardano-sdk/wallet';
-import { Cardano, Serialization } from '@cardano-sdk/core';
+import { Cardano, setInConwayEra } from '@cardano-sdk/core';
 import { logger } from '@cardano-sdk/util-dev';
 
 import { firstValueFrom, map } from 'rxjs';
@@ -161,9 +161,7 @@ describe.skip('PersonalWallet/conwayTransactions', () => {
   };
 
   beforeAll(async () => {
-    // TODO: remove once mainnet hardforks to conway-era, and this becomes "the norm"
-    Serialization.CborSet.useConwaySerialization = true;
-    Serialization.Redeemers.useConwaySerialization = true;
+    setInConwayEra(true);
 
     // TODO LW-10555: Revert this so that wallet is at account 0 and drepWallet at account 1, once the dbsync bug is fixed
     // https://github.com/IntersectMBO/cardano-db-sync/issues/1702
@@ -191,9 +189,7 @@ describe.skip('PersonalWallet/conwayTransactions', () => {
     wallet.shutdown();
     dRepWallet.shutdown();
 
-    // TODO: remove once mainnet hardforks to conway-era, and this becomes "the norm"
-    Serialization.CborSet.useConwaySerialization = false;
-    Serialization.Redeemers.useConwaySerialization = false;
+    setInConwayEra(false);
   });
 
   it('can register a stake key and delegate stake using a combo certificate', async () => {

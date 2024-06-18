@@ -1,5 +1,6 @@
 import { CborReader, CborSet, CborTag, CborWriter } from '../../../src/Serialization';
 import { HexBlob } from '@cardano-sdk/util';
+import { setInConwayEra } from '../../../src';
 
 class TestNumber {
   #value: number;
@@ -54,14 +55,14 @@ describe('CborSet', () => {
     testCborConway = writer.encodeAsHex();
   });
 
-  afterEach(() => (CborSet.useConwaySerialization = false));
+  afterEach(() => setInConwayEra(false));
 
   it('can serialize as array', () => {
     expect(testCbor).toEqual(set.toCbor());
   });
 
   it('can serialize as 258 tag set', () => {
-    CborSet.useConwaySerialization = true;
+    setInConwayEra(true);
     expect(testCborConway).toEqual(set.toCbor());
   });
 
@@ -84,7 +85,7 @@ describe('CborSet', () => {
     const emptyArrayCbor = writer.encodeAsHex();
 
     const emptySet = CborSet.fromCore<number, TestNumber>([], TestNumber.fromCore);
-    CborSet.useConwaySerialization = useConwaySerialization;
+    setInConwayEra(useConwaySerialization);
     expect(emptySet.toCbor()).toEqual(emptyArrayCbor);
   });
 

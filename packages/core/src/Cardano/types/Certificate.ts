@@ -241,6 +241,7 @@ export const isCertType = <K extends keyof CertificateTypeMap>(
   certificateTypes: readonly K[]
 ): certificate is CertificateTypeMap[K] => certificateTypes.includes(certificate.__typename as K);
 
+// LW-10773 add the deposit and change StakeRegistration certificate into Registration certificate
 /**
  * Creates a stake key registration certificate from a given reward account.
  *
@@ -254,6 +255,7 @@ export const createStakeRegistrationCert = (rewardAccount: RewardAccount): Certi
   }
 });
 
+// LW-10773 change deposit from optional to required and remove StakeDeregistration certificate
 /**
  * Creates a stake key de-registration certificate from a given reward account.
  *
