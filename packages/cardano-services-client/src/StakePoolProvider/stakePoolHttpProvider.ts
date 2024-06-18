@@ -17,7 +17,7 @@ const paths: HttpProviderConfigPaths<StakePoolProvider> = {
 export const stakePoolHttpProvider = (config: CreateHttpProviderConfig<StakePoolProvider>): StakePoolProvider =>
   createHttpProvider<StakePoolProvider>({
     ...config,
-    apiVersion: apiVersion.stakePool,
+    apiVersion: config.apiVersion || apiVersion.stakePool,
     paths,
     serviceSlug: 'stake-pool'
   });

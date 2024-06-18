@@ -37,6 +37,17 @@ describe('chainHistoryProvider', () => {
         const provider = chainHistoryHttpProvider(config);
         await expect(provider.healthCheck()).resolves.toEqual({ ok: false });
       });
+
+      it('uses custom apiVersion', async () => {
+        axiosMock.onPost().replyOnce(200, { ok: true });
+        const provider = chainHistoryHttpProvider({ ...config, adapter: axiosMock.adapter(), apiVersion: '100' });
+        await provider.healthCheck();
+        expect(axiosMock.history).toEqual(
+          expect.objectContaining({
+            post: [expect.objectContaining({ baseURL: `${config.baseUrl}/v100/chain-history` })]
+          })
+        );
+      });
     });
 
     describe('blocks', () => {

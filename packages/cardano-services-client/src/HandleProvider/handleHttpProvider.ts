@@ -10,7 +10,7 @@ import { apiVersion } from '../version';
 export const handleHttpProvider = (config: CreateHttpProviderConfig<HandleProvider>): HandleProvider =>
   createHttpProvider<HandleProvider>({
     ...config,
-    apiVersion: apiVersion.handle,
+    apiVersion: config.apiVersion || apiVersion.handle,
     paths: handleProviderPaths,
     serviceSlug: 'handle'
   });

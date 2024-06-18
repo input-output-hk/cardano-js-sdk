@@ -70,7 +70,7 @@ const codeToProviderFailure = (code: GeneralCardanoNodeErrorCode | TxSubmissionE
 export const txSubmitHttpProvider = (config: CreateHttpProviderConfig<TxSubmitProvider>): TxSubmitProvider =>
   createHttpProvider<TxSubmitProvider>({
     ...config,
-    apiVersion: apiVersion.txSubmit,
+    apiVersion: config.apiVersion || apiVersion.txSubmit,
     mapError: (error: any, method) => {
       switch (method) {
         case 'healthCheck': {
