@@ -1,15 +1,54 @@
-name: CI/CD
+name: Deployed Environments - SDK E2E Tests
 
 on:
-  push:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to run e2e tests against'
+        type: choice
+        required: true
+        default: 'dev-preprod'
+        options:
+        - live-preprod
+        - live-preview
+        - dev-preprod
+        - dev-preview
+        - staging-preprod
+
+env:
+  TL_DEPTH: ${{ github.event.pull_request.head.repo.fork && '0' || fromJson(vars.TL_DEPTH) }}
+  TL_LEVEL: ${{ github.event.pull_request.head.repo.fork && 'info' || vars.TL_LEVEL }}
 
 jobs:
-  hello-world-placeholder:
-    name: Hello World Placeholder
-    runs-on: ubuntu-22.04
-
+  build_and_test:
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
+    runs-on: ${{ matrix.os }}
     steps:
-      - name: Hello World
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Generate .env file
+        working-directory: ./packages/e2e/
         run: |
-          echo 'Hello, World!'
+          if [[ "${{ inputs.environment }}" == *"preprod"* ]]; then networkMagic=1; else networkMagic=2; fi
+          ./src/scripts/generate-dotenv.sh ${{ inputs.environment }}
+          echo "KEY_MANAGEMENT_PARAMS='$(jq --argjson networkMagic $networkMagic --arg mnemonic "${{ secrets.MNEMONIC }}" <<< '{"bip32Ed25519": "Sodium", "accountIndex": 0, "chainId":{"networkId": 0, "networkMagic": 0}, "passphrase":"some_passphrase","mnemonic":"mnemonics"}' '.mnemonic=$mnemonic | .chainId.networkMagic=$networkMagic')'" >> .env
+
+      - name: 🧰 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.12.0
+
+      - name: 🔨 Build
+        run: |
+          yarn install --immutable --inline-builds --mode=skip-build
+          yarn build:cjs
+          docker build --no-cache .
+        env:
+          NODE_OPTIONS: '--max_old_space_size=8192'
+
+      - name: 🔬 Test - e2e - wallet at epoch 0
+        run: |
+          yarn workspace @cardano-sdk/e2e test:wallet
