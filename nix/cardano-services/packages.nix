@@ -56,7 +56,7 @@ in {
       buildInputs = oldAttrs.buildInputs ++ [nixpkgs.pkg-config nixpkgs.libusb1];
       # run actual build
       buildPhase = ''
-        yarn workspace @cardano-sdk/cardano-services run build
+        yarn build:cjs
       '';
       # override installPhase to only install what's necessary
       installPhase = ''
