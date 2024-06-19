@@ -175,7 +175,6 @@ const getScriptUtxoSet = (
         new Observable<Cardano.Utxo[]>((subscriber) => {
           utxoProvider
             .utxoByAddresses({ addresses: [scriptAddress] })
-            // eslint-disable-next-line promise/always-return
             .then((utxos) => {
               subscriber.next(utxos);
             })

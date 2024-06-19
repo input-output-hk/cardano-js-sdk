@@ -256,7 +256,6 @@ export class MultiSigWallet {
           new Observable<Cardano.Utxo[]>((subscriber) => {
             this.#utxoProvider
               .utxoByAddresses({ addresses: [this.#address.address] })
-              // eslint-disable-next-line promise/always-return
               .then((utxos) => {
                 subscriber.next(utxos);
               })
@@ -293,7 +292,6 @@ export class MultiSigWallet {
                   startAt: 0
                 }
               })
-              // eslint-disable-next-line promise/always-return
               .then((paginatedTxs) => {
                 subscriber.next(paginatedTxs.pageResults);
                 subscriber.complete();
@@ -318,7 +316,6 @@ export class MultiSigWallet {
               .rewardsHistory({
                 rewardAccounts: [this.#address.rewardAccount]
               })
-              // eslint-disable-next-line promise/always-return
               .then((rewardsHistory) => {
                 subscriber.next(rewardsHistory);
                 subscriber.complete();
@@ -343,7 +340,6 @@ export class MultiSigWallet {
               .rewardAccountBalance({
                 rewardAccount: this.#address.rewardAccount
               })
-              // eslint-disable-next-line promise/always-return
               .then((rewardAccountBalance) => {
                 subscriber.next(rewardAccountBalance);
                 subscriber.complete();
