@@ -76,13 +76,7 @@ export class Bip32PrivateKey {
    * @returns The secret extended key.
    */
   static fromBip39Entropy(entropy: Buffer, password: string): Bip32PrivateKey {
-    const xprv = pbkdf2Sync(
-      password,
-      entropy,
-      PBKDF2_ITERATIONS,
-      PBKDF2_KEY_SIZE,
-      PBKDF2_DIGEST_ALGORITHM
-    );
+    const xprv = pbkdf2Sync(password, entropy, PBKDF2_ITERATIONS, PBKDF2_KEY_SIZE, PBKDF2_DIGEST_ALGORITHM);
     return Bip32PrivateKey.fromBytes(clampScalar(xprv));
   }
 

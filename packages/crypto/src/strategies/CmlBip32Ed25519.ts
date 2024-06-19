@@ -20,7 +20,7 @@ export class CmlBip32Ed25519 implements Bip32Ed25519 {
   constructor(CML: CardanoMultiplatformLib) {
     this.#CML = CML;
   }
-  
+
   public fromBip39Entropy(entropy: Buffer, passphrase: string): Bip32PrivateKeyHex {
     const hexKey = usingAutoFree((scope) => {
       const cmlKey = scope.manage(this.#CML.Bip32PrivateKey.from_bip39_entropy(entropy, Buffer.from(passphrase)));
