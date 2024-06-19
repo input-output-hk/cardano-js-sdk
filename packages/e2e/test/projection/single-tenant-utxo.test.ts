@@ -1,4 +1,3 @@
-/* eslint-disable promise/always-return */
 import * as Postgres from '@cardano-sdk/projection-typeorm';
 import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
 import { Cardano, ObservableCardanoNode } from '@cardano-sdk/core';

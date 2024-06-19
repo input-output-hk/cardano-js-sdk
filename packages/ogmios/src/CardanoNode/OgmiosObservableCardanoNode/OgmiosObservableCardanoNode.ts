@@ -179,10 +179,8 @@ export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
       switchMap(
         (interactionContext) =>
           new Observable<ObservableChainSync>((subscriber) => {
-            // eslint-disable-next-line promise/always-return
             if (subscriber.closed) return;
             void ChainSynchronization.findIntersection(interactionContext, points.map(pointOrOriginToOgmios))
-              // eslint-disable-next-line promise/always-return
               .then((ogmiosIntersection) => {
                 const intersection = ogmiosToCoreIntersection(ogmiosIntersection);
                 subscriber.next({

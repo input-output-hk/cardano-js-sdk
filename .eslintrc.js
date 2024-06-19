@@ -61,6 +61,7 @@ module.exports = {
     'no-unused-expressions': 'off',
     'no-unused-vars': 0,
     'no-useless-constructor': 0,
+    'promise/always-return': 0,
     'promise/avoid-new': 0,
     quotes: ['error', 'single', { avoidEscape: true }],
     'sort-imports': ['warn', { ignoreDeclarationSort: true }],
