@@ -205,7 +205,7 @@ jq -M "
   minFeeB: 155381,
   minUTxOValue: 1000000,
   poolDeposit: 500000000,
-  protocolVersion: { major : 9, minor: 0 },
+  protocolVersion: { major : 10, minor: 0 },
   rho: 0.1,
   tau: 0.1
 }" "${ROOT}/genesis/shelley/copy-genesis.json" > "${ROOT}/genesis/shelley/genesis.json"
