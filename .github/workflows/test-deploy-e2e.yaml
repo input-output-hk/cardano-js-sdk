@@ -14,10 +14,6 @@ on:
         - dev-preprod
         - dev-preview
         - staging-preprod
-  pull_request:
-  push:
-    branches: ['master']
-    tags: ['*.*.*']
 
 env:
   TL_DEPTH: ${{ github.event.pull_request.head.repo.fork && '0' || fromJson(vars.TL_DEPTH) }}
