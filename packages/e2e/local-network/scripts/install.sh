@@ -24,10 +24,10 @@ mkdir -p bin
 echo "Download binaries from IOG build"
 case $(uname) in
 Darwin)
-  wget -O bin.tar.gz https://github.com/IntersectMBO/cardano-node/releases/download/${VERSION}-pre/cardano-node-${VERSION}-macos.tar.gz
+  wget -O bin.tar.gz https://github.com/IntersectMBO/cardano-node/releases/download/${VERSION}-sancho/cardano-node-${VERSION}-macos.tar.gz
   ;;
 Linux)
-  wget -O bin.tar.gz https://github.com/IntersectMBO/cardano-node/releases/download/${VERSION}-pre/cardano-node-${VERSION}-linux.tar.gz
+  wget -O bin.tar.gz https://github.com/IntersectMBO/cardano-node/releases/download/${VERSION}-sancho/cardano-node-${VERSION}-linux.tar.gz
   ;;
 esac
 
