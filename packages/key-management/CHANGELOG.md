@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.20.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.20.7...@cardano-sdk/key-management@0.20.8) (2024-06-20)
+
+### Features
+
+* remove async from fromBip39Entropy ([#1326](https://github.com/input-output-hk/cardano-js-sdk/issues/1326)) ([da736d3](https://github.com/input-output-hk/cardano-js-sdk/commit/da736d33a4e6c4f1ea3ce4c654bf0f8ba2e39247))
+
 ## [0.20.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.20.6...@cardano-sdk/key-management@0.20.7) (2024-06-14)
 
 ### Features

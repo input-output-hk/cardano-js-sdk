@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.34.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.33.1...@cardano-sdk/core@0.34.0) (2024-06-20)
+
+### ⚠ BREAKING CHANGES
+
+* fix typo
+
+### Code Refactoring
+
+* fix typo ([d7cb0c9](https://github.com/input-output-hk/cardano-js-sdk/commit/d7cb0c971cac68670430a6f05970c331f2dfede0))
+
 ## [0.33.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.33.0...@cardano-sdk/core@0.33.1) (2024-06-14)
 
 ### Bug Fixes

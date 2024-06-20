@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.38.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.38.3...@cardano-sdk/wallet@0.38.4) (2024-06-20)
+
+### Bug Fixes
+
+* **wallet:** [lw-10539] export isValidSharedWalletScript util ([1129d1f](https://github.com/input-output-hk/cardano-js-sdk/commit/1129d1f82ade50f1b05480cd01fce04720b5378c))
+
 ## [0.38.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.38.2...@cardano-sdk/wallet@0.38.3) (2024-06-18)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
