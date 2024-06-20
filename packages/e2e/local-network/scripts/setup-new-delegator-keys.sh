@@ -63,11 +63,6 @@ AMOUNT_PER_DELEGATOR='500000000000' # 500K ADA
 mkdir -p "$TRANSACTIONS_DIR"
 mkdir -p "$DELEGATORS_DIR"
 
-while [ ! -S "$CARDANO_NODE_SOCKET_PATH" ]; do
-  echo "setup-new-delegator-keys.sh: CARDANO_NODE_SOCKET_PATH: $CARDANO_NODE_SOCKET_PATH file doesn't exist, waiting..."
-  sleep 2
-done
-
 # ----------------------
 
 # GENERATE NEW PAYMENT KEYS
