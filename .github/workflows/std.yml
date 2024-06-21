@@ -28,6 +28,11 @@ on:
         type: boolean
         required: true
         default: false
+      deploy-local-network:
+        description: Deploy to local-network
+        type: boolean
+        required: true
+        default: false
   workflow_call:
     inputs:
       deploy-dev-preprod:
@@ -117,6 +122,9 @@ jobs:
             fi
             if [ "true" == ${{ inputs.deploy-dev-mainnet || false }} ] ; then
               echo '{"environment":"dev-mainnet", "target":"dev-mainnet@us-east-1",    "url": "https://dev-mainnet.lw.iog.io/"}'
+            fi
+            if [ "true" == ${{ inputs.deploy-local-network || false }} ] ; then
+              echo '{"environment":"local-network", "target":"local-network@us-east-1@v1",    "url": "https://local-network.lw.iog.io/"}'
             fi
           ) | jq --slurp >deployment-matrix.json
 
