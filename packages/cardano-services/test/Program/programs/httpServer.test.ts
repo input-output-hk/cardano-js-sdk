@@ -1,17 +1,17 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { DB_CACHE_TTL_DEFAULT } from '../../../src/InMemoryCache';
 import {
+  CommonOptionsDescriptions,
   DEFAULT_HEALTH_CHECK_CACHE_TTL,
   OgmiosOptionDescriptions,
   PostgresOptionDescriptions,
   StakePoolMetadataFetchMode
 } from '../../../src/Program/options';
+import { DB_CACHE_TTL_DEFAULT } from '../../../src/InMemoryCache';
 import { EPOCH_POLL_INTERVAL_DEFAULT } from '../../../src/util';
 import {
   HttpServer,
   MissingCardanoNodeOption,
   MissingProgramOption,
-  ProviderServerOptionDescriptions,
   SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT,
   SERVICE_DISCOVERY_TIMEOUT_DEFAULT,
   ServiceNames,
@@ -251,9 +251,7 @@ describe('HTTP Server', () => {
             postgresConnectionStringDbSync: 'postgres',
             serviceNames: [serviceName]
           })
-        ).rejects.toThrow(
-          new MissingProgramOption(serviceName, ProviderServerOptionDescriptions.CardanoNodeConfigPath)
-        );
+        ).rejects.toThrow(new MissingProgramOption(serviceName, CommonOptionsDescriptions.CardanoNodeConfigPath));
 
       it('with network-info provider', () => test(ServiceNames.NetworkInfo));
       it('with stake-pool provider', () => test(ServiceNames.StakePool));

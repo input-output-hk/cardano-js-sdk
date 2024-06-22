@@ -9,6 +9,7 @@ import {
 } from '../../Asset';
 import { CardanoNode, HandleProvider, Seconds } from '@cardano-sdk/core';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../../ChainHistory';
+import { CommonOptionsDescriptions } from '../options';
 import { ConnectionNames, PostgresOptionDescriptions, suffixType2Cli } from '../options/postgres';
 import { DbPools, DbSyncEpochPollService } from '../../util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../NetworkInfo';
@@ -41,7 +42,6 @@ import { isNotNil } from '@cardano-sdk/util';
 import memoize from 'lodash/memoize.js';
 
 export const ALLOWED_ORIGINS_DEFAULT = false;
-export const DISABLE_DB_CACHE_DEFAULT = false;
 export const DISABLE_STAKE_POOL_METRIC_APY_DEFAULT = false;
 export const PROVIDER_SERVER_API_URL_DEFAULT = new URL('http://localhost:3000');
 export const PAGINATION_PAGE_SIZE_LIMIT_DEFAULT = 25;
@@ -107,9 +107,8 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
   const getEpochMonitor = memoize((dbPool: Pool) => new DbSyncEpochPollService(dbPool, args.epochPollInterval!));
 
   const getDbSyncStakePoolProvider = withDbSyncProvider((dbPools, cardanoNode) => {
-    if (!genesisData) {
-      throw new MissingProgramOption(ServiceNames.StakePool, ProviderServerOptionDescriptions.CardanoNodeConfigPath);
-    }
+    if (!genesisData)
+      throw new MissingProgramOption(ServiceNames.StakePool, CommonOptionsDescriptions.CardanoNodeConfigPath);
 
     return new DbSyncStakePoolProvider(
       {
@@ -146,7 +145,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     }
 
     if (!genesisData)
-      throw new MissingProgramOption(ServiceNames.NetworkInfo, ProviderServerOptionDescriptions.CardanoNodeConfigPath);
+      throw new MissingProgramOption(ServiceNames.NetworkInfo, CommonOptionsDescriptions.CardanoNodeConfigPath);
 
     networkInfoProvider = new DbSyncNetworkInfoProvider({
       cache: {

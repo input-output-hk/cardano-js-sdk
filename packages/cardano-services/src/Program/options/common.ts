@@ -1,4 +1,5 @@
 import { Command } from 'commander';
+import { DB_CACHE_TTL_DEFAULT } from '../../InMemoryCache';
 import { InvalidLoggerLevel } from '../../errors';
 import { LogLevel } from 'bunyan';
 import { MissingProgramOption } from '../errors';
@@ -11,16 +12,26 @@ import {
 import { Seconds } from '@cardano-sdk/core';
 import { BuildInfo as ServiceBuildInfo } from '../../Http';
 import { addOptions, newOption } from './util';
-import { buildInfoValidator, floatValidator, integerValidator, urlValidator } from '../../util/validators';
+import {
+  buildInfoValidator,
+  dbCacheValidator,
+  floatValidator,
+  integerValidator,
+  urlValidator
+} from '../../util/validators';
 import { loggerMethodNames } from '@cardano-sdk/util';
 
-export const ENABLE_METRICS_DEFAULT = false;
 export const DEFAULT_HEALTH_CHECK_CACHE_TTL = Seconds(5);
+export const DISABLE_DB_CACHE_DEFAULT = false;
+export const ENABLE_METRICS_DEFAULT = false;
 export const LAST_ROS_EPOCHS_DEFAULT = 10;
 
-enum Descriptions {
+export enum CommonOptionsDescriptions {
   ApiUrl = 'API URL',
   BuildInfo = 'Service build info',
+  CardanoNodeConfigPath = 'Cardano node config path',
+  DbCacheTtl = 'Cache TTL in seconds between 60 and 172800 (two days), an option for database related operations',
+  DisableDbCache = 'Disable DB cache',
   DumpOnly = 'Dumps the input arguments and exits. Used for tests',
   EnableMetrics = 'Enable Prometheus Metrics',
   LastRosEpochs = 'Number of epochs over which lastRos is computed',
@@ -32,6 +43,9 @@ enum Descriptions {
 export type CommonProgramOptions = {
   apiUrl: URL;
   buildInfo?: ServiceBuildInfo;
+  cardanoNodeConfigPath?: string;
+  dbCacheTtl: Seconds | 0;
+  disableDbCache?: boolean;
   dumpOnly?: boolean;
   enableMetrics?: boolean;
   lastRosEpochs?: number;
@@ -42,28 +56,55 @@ export type CommonProgramOptions = {
 
 export const withCommonOptions = (command: Command, apiUrl: URL) => {
   addOptions(command, [
-    newOption('--api-url <apiUrl>', Descriptions.ApiUrl, 'API_URL', urlValidator(Descriptions.ApiUrl), apiUrl),
-    newOption('--build-info <buildInfo>', Descriptions.BuildInfo, 'BUILD_INFO', buildInfoValidator),
-    newOption('--dump-only <true/false>', Descriptions.DumpOnly, 'DUMP_ONLY', (dumpOnly) =>
-      stringOptionToBoolean(dumpOnly, Programs.ProviderServer, Descriptions.DumpOnly)
+    newOption(
+      '--api-url <apiUrl>',
+      CommonOptionsDescriptions.ApiUrl,
+      'API_URL',
+      urlValidator(CommonOptionsDescriptions.ApiUrl),
+      apiUrl
+    ),
+    newOption('--build-info <buildInfo>', CommonOptionsDescriptions.BuildInfo, 'BUILD_INFO', buildInfoValidator),
+    newOption(
+      '--cardano-node-config-path <cardanoNodeConfigPath>',
+      CommonOptionsDescriptions.CardanoNodeConfigPath,
+      'CARDANO_NODE_CONFIG_PATH'
+    ),
+    newOption(
+      '--db-cache-ttl <dbCacheTtl>',
+      CommonOptionsDescriptions.DbCacheTtl,
+      'DB_CACHE_TTL',
+      dbCacheValidator(CommonOptionsDescriptions.DbCacheTtl),
+      DB_CACHE_TTL_DEFAULT
+    ),
+    newOption(
+      '--disable-db-cache <true/false>',
+      CommonOptionsDescriptions.DisableDbCache,
+      'DISABLE_DB_CACHE',
+      (disableDbCache) =>
+        stringOptionToBoolean(disableDbCache, Programs.ProviderServer, CommonOptionsDescriptions.DisableDbCache),
+      DISABLE_DB_CACHE_DEFAULT
+    ),
+    newOption('--dump-only <true/false>', CommonOptionsDescriptions.DumpOnly, 'DUMP_ONLY', (dumpOnly) =>
+      stringOptionToBoolean(dumpOnly, Programs.ProviderServer, CommonOptionsDescriptions.DumpOnly)
     ),
     newOption(
       '--enable-metrics <true/false>',
-      Descriptions.EnableMetrics,
+      CommonOptionsDescriptions.EnableMetrics,
       'ENABLE_METRICS',
-      (enableMetrics) => stringOptionToBoolean(enableMetrics, Programs.ProviderServer, Descriptions.EnableMetrics),
+      (enableMetrics) =>
+        stringOptionToBoolean(enableMetrics, Programs.ProviderServer, CommonOptionsDescriptions.EnableMetrics),
       ENABLE_METRICS_DEFAULT
     ),
     newOption(
       '--last-ros-epochs <lastRosEpochs>',
-      Descriptions.LastRosEpochs,
+      CommonOptionsDescriptions.LastRosEpochs,
       'LAST_ROS_EPOCHS',
-      integerValidator(Descriptions.LastRosEpochs),
+      integerValidator(CommonOptionsDescriptions.LastRosEpochs),
       LAST_ROS_EPOCHS_DEFAULT
     ),
     newOption(
       '--logger-min-severity <level>',
-      Descriptions.LoggerMinSeverity,
+      CommonOptionsDescriptions.LoggerMinSeverity,
       'LOGGER_MIN_SEVERITY',
       (level) => {
         if (!loggerMethodNames.includes(level)) throw new InvalidLoggerLevel(level);
@@ -73,16 +114,16 @@ export const withCommonOptions = (command: Command, apiUrl: URL) => {
     ),
     newOption(
       '--service-discovery-backoff-factor <serviceDiscoveryBackoffFactor>',
-      Descriptions.ServiceDiscoveryBackoffFactor,
+      CommonOptionsDescriptions.ServiceDiscoveryBackoffFactor,
       'SERVICE_DISCOVERY_BACKOFF_FACTOR',
-      floatValidator(Descriptions.ServiceDiscoveryBackoffFactor),
+      floatValidator(CommonOptionsDescriptions.ServiceDiscoveryBackoffFactor),
       SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT
     ),
     newOption(
       '--service-discovery-timeout <serviceDiscoveryTimeout>',
-      Descriptions.ServiceDiscoveryTimeout,
+      CommonOptionsDescriptions.ServiceDiscoveryTimeout,
       'SERVICE_DISCOVERY_TIMEOUT',
-      integerValidator(Descriptions.ServiceDiscoveryTimeout),
+      integerValidator(CommonOptionsDescriptions.ServiceDiscoveryTimeout),
       SERVICE_DISCOVERY_TIMEOUT_DEFAULT
     )
   ]);

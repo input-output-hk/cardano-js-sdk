@@ -46,9 +46,6 @@ export enum ProjectorOptionDescriptions {
 export enum ProviderServerOptionDescriptions {
   AllowedOrigins = 'List of allowed CORS origins separated by comma',
   AssetCacheTtl = 'Asset info and NFT Metadata cache TTL in seconds (600 by default)',
-  CardanoNodeConfigPath = 'Cardano node config path',
-  DbCacheTtl = 'Cache TTL in seconds between 60 and 172800 (two days), an option for database related operations',
-  DisableDbCache = 'Disable DB cache',
   DisableStakePoolMetricApy = 'Omit this metric for improved query performance',
   EpochPollInterval = 'Epoch poll interval',
   FuzzyOptions = 'Options for the fuzzy search on stake pool metadata',
@@ -78,9 +75,6 @@ export type ProviderServerArgs = CommonProgramOptions &
   TypeOrmStakePoolProviderProps & {
     allowedOrigins?: string[];
     assetCacheTTL?: Seconds;
-    cardanoNodeConfigPath?: string;
-    dbCacheTtl: Seconds | 0;
-    disableDbCache?: boolean;
     disableStakePoolMetricApy?: boolean;
     epochPollInterval: number;
     handleProviderServerUrl?: string;

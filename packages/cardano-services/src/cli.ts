@@ -10,7 +10,6 @@ import {
   CACHE_TTL_DEFAULT,
   CREATE_SCHEMA_DEFAULT,
   DEFAULT_HEALTH_CHECK_CACHE_TTL,
-  DISABLE_DB_CACHE_DEFAULT,
   DISABLE_STAKE_POOL_METRIC_APY_DEFAULT,
   DROP_SCHEMA_DEFAULT,
   DRY_RUN_DEFAULT,
@@ -241,26 +240,6 @@ addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon
     'ASSET_CACHE_TTL',
     dbCacheValidator(ProviderServerOptionDescriptions.AssetCacheTtl),
     DB_CACHE_TTL_DEFAULT
-  ),
-  newOption(
-    '--cardano-node-config-path <cardanoNodeConfigPath>',
-    ProviderServerOptionDescriptions.CardanoNodeConfigPath,
-    'CARDANO_NODE_CONFIG_PATH'
-  ),
-  newOption(
-    '--db-cache-ttl <dbCacheTtl>',
-    ProviderServerOptionDescriptions.DbCacheTtl,
-    'DB_CACHE_TTL',
-    dbCacheValidator(ProviderServerOptionDescriptions.DbCacheTtl),
-    DB_CACHE_TTL_DEFAULT
-  ),
-  newOption(
-    '--disable-db-cache <true/false>',
-    ProviderServerOptionDescriptions.DisableDbCache,
-    'DISABLE_DB_CACHE',
-    (disableDbCache) =>
-      stringOptionToBoolean(disableDbCache, Programs.ProviderServer, ProviderServerOptionDescriptions.DisableDbCache),
-    DISABLE_DB_CACHE_DEFAULT
   ),
   newOption(
     '--disable-stake-pool-metric-apy <true/false>',
@@ -513,7 +492,7 @@ if (process.argv.slice(2).length === 0) {
   program.outputHelp();
   process.exit(1);
 } else {
-  program.parseAsync(process.argv).catch((error) => {
+  program.parseAsync().catch((error) => {
     // eslint-disable-next-line no-console
     console.error(error);
     process.exit(1);
