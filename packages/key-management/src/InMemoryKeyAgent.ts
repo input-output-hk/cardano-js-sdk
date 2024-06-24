@@ -101,7 +101,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     const validMnemonic = validateMnemonic(mnemonic);
     if (!validMnemonic) throw new errors.InvalidMnemonicError();
     const entropy = Buffer.from(mnemonicWordsToEntropy(mnemonicWords), 'hex');
-    const rootPrivateKey = await dependencies.bip32Ed25519.fromBip39Entropy(entropy, mnemonic2ndFactorPassphrase);
+    const rootPrivateKey = dependencies.bip32Ed25519.fromBip39Entropy(entropy, mnemonic2ndFactorPassphrase);
     const passphrase = await getPassphraseRethrowTypedError(getPassphrase);
     const encryptedRootPrivateKey = await emip3encrypt(Buffer.from(rootPrivateKey, 'hex'), passphrase);
     const accountPrivateKey = await deriveAccountPrivateKey({

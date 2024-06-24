@@ -14,9 +14,12 @@ export interface AssetInfo {
   name: AssetName;
   fingerprint: AssetFingerprint;
   /**
+   * `0n` if not loaded
+   *
    * @deprecated Use `supply` instead
    */
   quantity: bigint;
+  /** `0n` if not loaded */
   supply: bigint;
   /** CIP-0035. `undefined` if not loaded, `null` if no metadata found */
   tokenMetadata?: TokenMetadata | null;

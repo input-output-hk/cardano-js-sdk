@@ -8,7 +8,7 @@ import {
   WitnessedTx,
   util
 } from '@cardano-sdk/key-management';
-import { Cardano, HandleProvider, HandleResolution, Serialization, metadatum } from '@cardano-sdk/core';
+import { Cardano, HandleProvider, HandleResolution, Serialization, inConwayEra, metadatum } from '@cardano-sdk/core';
 import {
   CustomizeCb,
   InsufficientRewardAccounts,
@@ -570,6 +570,7 @@ export class GenericTxBuilder implements TxBuilder {
     return rewardAccountsWithWeights;
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   async #delegatePortfolio(): Promise<RewardAccountsAndWeights> {
     const rewardAccountsWithWeights: RewardAccountsAndWeights = new Map();
     if (!this.#requestedPortfolio) {
@@ -641,7 +642,9 @@ export class GenericTxBuilder implements TxBuilder {
     this.#logger.debug(`De-registering ${availableRewardAccounts.length} stake keys`);
     for (const rewardAccount of availableRewardAccounts) {
       if (rewardAccount.credentialStatus === Cardano.StakeCredentialStatus.Registered) {
-        certificates.push(Cardano.createStakeDeregistrationCert(rewardAccount.address, rewardAccount.deposit));
+        certificates.push(
+          Cardano.createStakeDeregistrationCert(rewardAccount.address, inConwayEra ? rewardAccount.deposit : undefined)
+        );
       }
     }
     this.partialTxBody = { ...this.partialTxBody, certificates };

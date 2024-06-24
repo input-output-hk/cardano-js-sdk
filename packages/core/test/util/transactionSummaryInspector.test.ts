@@ -5,7 +5,7 @@ import {
   Asset,
   AssetInfoWithAmount,
   AssetProvider,
-  HealthCheckResponse,
+  Milliseconds,
   createTxInspector,
   transactionSummaryInspector
 } from '../../src';
@@ -17,24 +17,10 @@ import {
   createStakeRegistrationCert
 } from '../../src/Cardano';
 import { Ed25519KeyHashHex, Ed25519PublicKeyHex, Ed25519SignatureHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import { createMockAssetProvider, createMockInputResolver } from './mocks';
 import { jsonToMetadatum } from '../../src/util/metadatum';
-
-const createMockInputResolver = (historicalTxs: Cardano.HydratedTx[]): Cardano.InputResolver => ({
-  async resolveInput(input: Cardano.TxIn) {
-    const tx = historicalTxs.find((historicalTx) => historicalTx.id === input.txId);
-
-    if (!tx || tx.body.outputs.length <= input.index) return Promise.resolve(null);
-
-    return Promise.resolve(tx.body.outputs[input.index]);
-  }
-});
-
-const createMockAssetProvider = (assets: Asset.AssetInfo[]): AssetProvider => ({
-  getAsset: async ({ assetId }) =>
-    assets.find((asset) => asset.assetId === assetId) ?? Promise.reject('Asset not found'),
-  getAssets: async ({ assetIds }) => assets.filter((asset) => assetIds.includes(asset.assetId)),
-  healthCheck: async () => Promise.resolve({} as HealthCheckResponse)
-});
+import { logger } from '@cardano-sdk/util-dev';
+import delay from 'delay';
 
 const buildAssetInfoWithAmount = (
   assets: Array<[Asset.AssetInfo, bigint]>
@@ -226,6 +212,8 @@ const AssetInfoIdx = {
 
 const assetProvider = createMockAssetProvider(assetInfos);
 
+const timeout = 6000 as Milliseconds;
+
 describe('Transaction Summary Inspector', () => {
   it('computes the correct asset and coin difference', async () => {
     // Arrange
@@ -327,8 +315,10 @@ describe('Transaction Summary Inspector', () => {
         addresses,
         assetProvider,
         inputResolver: createMockInputResolver(histTx),
+        logger,
         protocolParameters,
-        rewardAccounts
+        rewardAccounts,
+        timeout
       })
     });
 
@@ -424,8 +414,10 @@ describe('Transaction Summary Inspector', () => {
         addresses,
         assetProvider,
         inputResolver: createMockInputResolver(histTx),
+        logger,
         protocolParameters,
-        rewardAccounts
+        rewardAccounts,
+        timeout
       })
     });
 
@@ -516,8 +508,10 @@ describe('Transaction Summary Inspector', () => {
         addresses,
         assetProvider,
         inputResolver: createMockInputResolver(histTx),
+        logger,
         protocolParameters,
-        rewardAccounts
+        rewardAccounts,
+        timeout
       })
     });
 
@@ -600,8 +594,10 @@ describe('Transaction Summary Inspector', () => {
         addresses,
         assetProvider,
         inputResolver: createMockInputResolver(histTx),
+        logger,
         protocolParameters,
-        rewardAccounts
+        rewardAccounts,
+        timeout
       })
     });
 
@@ -667,8 +663,10 @@ describe('Transaction Summary Inspector', () => {
         addresses,
         assetProvider,
         inputResolver: createMockInputResolver(histTx),
+        logger,
         protocolParameters,
-        rewardAccounts
+        rewardAccounts,
+        timeout
       })
     });
 
@@ -734,8 +732,10 @@ describe('Transaction Summary Inspector', () => {
         addresses,
         assetProvider,
         inputResolver: createMockInputResolver(histTx),
+        logger,
         protocolParameters,
-        rewardAccounts
+        rewardAccounts,
+        timeout
       })
     });
 
@@ -810,8 +810,10 @@ describe('Transaction Summary Inspector', () => {
         addresses,
         assetProvider,
         inputResolver: createMockInputResolver(histTx),
+        logger,
         protocolParameters,
-        rewardAccounts
+        rewardAccounts,
+        timeout
       })
     });
 
@@ -886,8 +888,10 @@ describe('Transaction Summary Inspector', () => {
         addresses,
         assetProvider,
         inputResolver: createMockInputResolver(histTx),
+        logger,
         protocolParameters,
-        rewardAccounts
+        rewardAccounts,
+        timeout
       })
     });
 
@@ -973,8 +977,10 @@ describe('Transaction Summary Inspector', () => {
         addresses,
         assetProvider,
         inputResolver: createMockInputResolver(histTx),
+        logger,
         protocolParameters,
-        rewardAccounts
+        rewardAccounts,
+        timeout
       })
     });
 
@@ -1016,5 +1022,179 @@ describe('Transaction Summary Inspector', () => {
         }
       }
     });
+  });
+
+  it('displays unresolved inputs on inputResolver timeout', async () => {
+    const resolveDelay = Milliseconds(5);
+    const timeoutAfter = Milliseconds(1);
+
+    const outputAssets = new Map([[AssetIds.TSLA, 5n]]);
+
+    const tx = buildMockTx({
+      certificates: [],
+      inputs: [
+        {
+          address: addresses[0],
+          index: 0,
+          txId: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+        }
+      ],
+      outputs: [
+        {
+          address: addresses[0],
+          value: {
+            assets: outputAssets,
+            coins: 3_000_000n - fee // In this TX the fee is coming out of one of our own addresses.
+          }
+        }
+      ]
+    });
+
+    const histTx: Cardano.HydratedTx[] = [
+      {
+        body: {
+          outputs: [
+            {
+              address: addresses[0],
+              value: {
+                assets: new Map([[AssetIds.TSLA, 5n]]),
+                coins: 5_000_000n
+              }
+            }
+          ]
+        },
+        id: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+      } as unknown as Cardano.HydratedTx
+    ];
+
+    const inspectTx = createTxInspector({
+      summary: transactionSummaryInspector({
+        addresses,
+        assetProvider,
+        inputResolver: createMockInputResolver(histTx, resolveDelay),
+        logger,
+        protocolParameters,
+        rewardAccounts,
+        timeout: timeoutAfter
+      })
+    });
+
+    const { summary } = await inspectTx(tx);
+
+    expect(summary).toEqual({
+      assets: new Map(),
+      coins: -2_000_000n - fee,
+      collateral: 0n,
+      deposit: 0n,
+      fee,
+      returnedDeposit: 0n,
+      unresolved: {
+        inputs: [
+          {
+            address: addresses[0],
+            index: 0,
+            txId: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+          }
+        ],
+        value: { assets: outputAssets, coins: 3_000_000n }
+      }
+    });
+  });
+
+  it('has no ntfMetadata nor tokenMetadata on AssetProvider timeout', async () => {
+    const resolveDelay = Milliseconds(5);
+    const timeoutAfter = Milliseconds(1);
+
+    const timeoutAssetProvider: AssetProvider = {
+      ...assetProvider,
+      getAssets: async (...args) => {
+        await delay(resolveDelay);
+        return assetProvider.getAssets(...args);
+      }
+    };
+    const outputAssets = new Map([[AssetIds.TSLA, 5n]]);
+
+    const tx = buildMockTx({
+      certificates: [],
+      inputs: [
+        {
+          address: addresses[1],
+          index: 0,
+          txId: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+        }
+      ],
+      outputs: [
+        {
+          address: Cardano.PaymentAddress(
+            'addr_test1qpfhhfy2qgls50r9u4yh0l7z67xpg0a5rrhkmvzcuqrd0znuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q9gw0lz'
+          ),
+          value: {
+            assets: outputAssets,
+            coins: 3_000_000n - fee // In this TX the fee is coming out of one of our own addresses.
+          }
+        }
+      ]
+    });
+
+    const histTx: Cardano.HydratedTx[] = [
+      {
+        body: {
+          outputs: [
+            {
+              address: addresses[1],
+              value: {
+                assets: new Map([[AssetIds.TSLA, 5n]]),
+                coins: 3_000_000n
+              }
+            }
+          ]
+        },
+        id: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+      } as unknown as Cardano.HydratedTx
+    ];
+
+    const inspectTx = createTxInspector({
+      summary: transactionSummaryInspector({
+        addresses,
+        assetProvider: timeoutAssetProvider,
+        inputResolver: createMockInputResolver(histTx),
+        logger,
+        protocolParameters,
+        rewardAccounts,
+        timeout: timeoutAfter
+      })
+    });
+
+    const { summary } = await inspectTx(tx);
+
+    expect(summary).toMatchInlineSnapshot(`
+      Object {
+        "assets": Map {
+          "659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41" => Object {
+            "amount": -5n,
+            "assetInfo": Object {
+              "assetId": "659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41",
+              "fingerprint": "asset1rqluyux4nxv6kjashz626c8usp8g88unmqwnyh",
+              "name": "54534c41",
+              "policyId": "659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba82",
+              "quantity": 0n,
+              "supply": 0n,
+            },
+          },
+        },
+        "coins": -3000000n,
+        "collateral": 0n,
+        "deposit": 0n,
+        "fee": 170000n,
+        "returnedDeposit": 0n,
+        "unresolved": Object {
+          "inputs": Array [],
+          "value": Object {
+            "assets": Map {},
+            "coins": 0n,
+          },
+        },
+      }
+    `);
   });
 });

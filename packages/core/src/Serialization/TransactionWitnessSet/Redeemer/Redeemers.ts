@@ -1,4 +1,4 @@
-import { Cardano } from '../../..';
+import { Cardano, inConwayEra } from '../../..';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { ExUnits } from '../../Common';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
@@ -13,27 +13,22 @@ const MAP_VALUE_EMBEDDED_GROUP_SIZE = 2;
 export class Redeemers {
   #values: Redeemer[];
 
-  // TODO: set to true or remove once mainnet is hardforked to mainnet
-  /**
-   * Enable encoding `redeemers` as `Map`:
-   * https://github.com/IntersectMBO/cardano-ledger/blob/master/eras/conway/impl/cddl-files/conway.cddl#L480
-   */
-  static useConwaySerialization = false;
-
   private constructor(redeemers: Redeemer[]) {
     this.#values = [...redeemers];
   }
 
   /**
    * Serializes Redeemers into CBOR format.
-   * Redeemers are encoded as array when {@link useConwaySerialization} is false, and as map when
-   * {@link useConwaySerialization} is true.
+   * Redeemers are encoded as array when {@link inConwayEra} is false, and as map when
+   * {@link inConwayEra} is true.
    *
    * @returns The Redeemers in CBOR format.
    */
   toCbor(): HexBlob {
     const writer = new CborWriter();
-    if (Redeemers.useConwaySerialization) {
+    // Encoding `redeemers` as `Map`:
+    // https://github.com/IntersectMBO/cardano-ledger/blob/master/eras/conway/impl/cddl-files/conway.cddl#L480
+    if (inConwayEra) {
       // { + [ tag: redeemer_tag, index: uint ] => [ data: plutus_data, ex_units: ex_units ] }
       const redeemersMap = new Map(this.#values.map((redeemer) => [`${redeemer.tag()}:${redeemer.index()}`, redeemer]));
 

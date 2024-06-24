@@ -17,7 +17,7 @@ const paths: HttpProviderConfigPaths<UtxoProvider> = {
 export const utxoHttpProvider = (config: CreateHttpProviderConfig<UtxoProvider>): UtxoProvider =>
   createHttpProvider<UtxoProvider>({
     ...config,
-    apiVersion: apiVersion.utxo,
+    apiVersion: config.apiVersion || apiVersion.utxo,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mapError: (error: any, method) => {
       if (method === 'healthCheck') {

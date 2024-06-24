@@ -28,7 +28,7 @@ describe('Bip32PrivateKey', () => {
     expect.assertions(extendedVectors.length);
 
     for (const vector of extendedVectors) {
-      const bip32Key = await Crypto.Bip32PrivateKey.fromBip39Entropy(
+      const bip32Key = Crypto.Bip32PrivateKey.fromBip39Entropy(
         Buffer.from(vector.bip39Entropy, 'hex'),
         vector.password
       );

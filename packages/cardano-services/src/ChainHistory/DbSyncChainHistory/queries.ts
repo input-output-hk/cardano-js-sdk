@@ -258,6 +258,8 @@ export const findPoolRegisterCertsByTxIds = `
 	FROM tx
 	JOIN pool_update AS cert ON cert.registered_tx_id = tx.id
 	JOIN pool_hash AS pool ON pool.id = cert.hash_id
+	JOIN block ON block_id = block.id
+	JOIN epoch_param ON epoch_param.epoch_no = (CASE WHEN block.epoch_no > 1 THEN block.epoch_no ELSE 1 END)
 	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC`;
 
@@ -296,6 +298,8 @@ export const findStakeCertsByTxIds = `
 	FROM tx
 	JOIN stake_registration AS cert ON cert.tx_id = tx.id
 	JOIN stake_address AS addr ON addr.id = cert.addr_id
+	JOIN block ON block_id = block.id
+	JOIN epoch_param ON block.epoch_no = epoch_param.epoch_no
 	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC)
 	UNION

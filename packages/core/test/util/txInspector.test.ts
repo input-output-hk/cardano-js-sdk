@@ -1,7 +1,5 @@
 import * as AssetIds from '../AssetId';
-import * as Cardano from '../../src/Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
-
 import {
   AssetFingerprint,
   AssetId,
@@ -51,17 +49,8 @@ import {
   valueSentInspector,
   withdrawalInspector
 } from '../../src';
+import { createMockInputResolver } from './mocks';
 import { jsonToMetadatum } from '../../src/util/metadatum';
-
-const createMockInputResolver = (historicalTxs: HydratedTx[]): Cardano.InputResolver => ({
-  async resolveInput(input: Cardano.TxIn) {
-    const tx = historicalTxs.find((historicalTx) => historicalTx.id === input.txId);
-
-    if (!tx || tx.body.outputs.length <= input.index) return Promise.resolve(null);
-
-    return Promise.resolve(tx.body.outputs[input.index]);
-  }
-});
 
 // eslint-disable-next-line max-statements
 describe('txInspector', () => {

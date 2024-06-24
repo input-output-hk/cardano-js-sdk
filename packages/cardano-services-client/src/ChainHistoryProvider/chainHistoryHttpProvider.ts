@@ -21,7 +21,7 @@ export const chainHistoryHttpProvider = (
 ): ChainHistoryProvider =>
   createHttpProvider<ChainHistoryProvider>({
     ...config,
-    apiVersion: apiVersion.chainHistory,
+    apiVersion: config.apiVersion || apiVersion.chainHistory,
     mapError: (error, method) => {
       if (method === 'healthCheck' && !error) {
         return { ok: false };

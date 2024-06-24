@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.25](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.1.24...@cardano-sdk/crypto@0.1.25) (2024-06-20)
+
+### Features
+
+* remove async from fromBip39Entropy ([#1326](https://github.com/input-output-hk/cardano-js-sdk/issues/1326)) ([da736d3](https://github.com/input-output-hk/cardano-js-sdk/commit/da736d33a4e6c4f1ea3ce4c654bf0f8ba2e39247))
+
+## [0.1.24](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.1.23...@cardano-sdk/crypto@0.1.24) (2024-06-14)
+
+**Note:** Version bump only for package @cardano-sdk/crypto
+
 ## [0.1.23](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.1.22...@cardano-sdk/crypto@0.1.23) (2024-04-23)
 
 **Note:** Version bump only for package @cardano-sdk/crypto

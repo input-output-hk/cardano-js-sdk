@@ -45,7 +45,10 @@ export interface HttpProviderConfig<T extends Provider> {
 export type CreateHttpProviderConfig<T extends Provider> = Pick<
   HttpProviderConfig<T>,
   'baseUrl' | 'adapter' | 'logger'
->;
+> & {
+  /** Override the OpenApi version */
+  apiVersion?: string;
+};
 
 /**
  * Creates a HTTP client for specified provider type, following some conventions:

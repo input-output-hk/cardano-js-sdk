@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/core",
-  "version": "0.33.0",
+  "version": "0.34.0",
   "description": "Core types and libraries for Cardano",
   "engines": {
     "node": ">=16.20.2"
@@ -58,6 +58,7 @@
     "@cardano-ogmios/schema": "6.4.0",
     "@cardano-sdk/crypto": "workspace:~",
     "@cardano-sdk/util": "workspace:~",
+    "@cardano-sdk/util-dev": "workspace:~",
     "@foxglove/crc": "^0.0.3",
     "@scure/base": "^1.1.1",
     "fraction.js": "4.0.1",

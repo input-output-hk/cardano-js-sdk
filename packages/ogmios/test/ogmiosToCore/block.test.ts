@@ -2,10 +2,12 @@ import { Cardano } from '@cardano-sdk/core';
 import { ogmiosToCore } from '../../src';
 
 import {
+  blockBootstrapWitness,
   mockAllegraBlock,
   mockAlonzoBlock,
   mockBabbageBlock,
   mockBabbageBlockWithNftMetadata,
+  mockBlockOgmiosMetadata,
   mockByronBlock,
   mockMaryBlock,
   mockShelleyBlock
@@ -61,6 +63,14 @@ describe('ogmiosToCore', () => {
         const tokenMetadatum = policyIdMetadatum.get(policyIdMetadatum.keys().next().value) as Cardano.MetadatumMap;
         expect(typeof tokenMetadatum.get('name')).toBe('string');
       });
+    });
+
+    it('can translate from block with json metadata', () => {
+      expect(ogmiosToCore.block(mockBlockOgmiosMetadata)).toBeTruthy();
+    });
+
+    it('can translate from block with bootstrap signatories', () => {
+      expect(ogmiosToCore.block(blockBootstrapWitness)).toBeTruthy();
     });
 
     it.todo('maps all native scripts correctly');

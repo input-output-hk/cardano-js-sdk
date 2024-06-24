@@ -54,16 +54,11 @@ FROM nodejs-builder as cardano-services-builder
 RUN yarn --immutable --inline-builds --mode=skip-build
 COPY packages packages
 RUN \
-  echo "export const unused = 'unused';" > packages/e2e/src/index.ts &&\
-  NODE_OPTIONS=--max_old_space_size=10240 yarn build:cjs
+  yarn workspace @cardano-sdk/cardano-services build &&\
+  yarn workspace @cardano-sdk/cardano-services-client build
 
-FROM nodejs-builder as cardano-services-production-deps
+FROM nodejs-builder as cardano-services
 RUN yarn workspaces focus --all --production
-
-FROM ubuntu-nodejs as cardano-services
-COPY --from=cardano-services-production-deps /app/node_modules /app/node_modules
-COPY --from=cardano-services-production-deps /app/packages/cardano-services/node_modules /app/packages/cardano-services/node_modules
-COPY --from=cardano-services-production-deps /app/packages/core/node_modules /app/packages/core/node_modules
 COPY --from=cardano-services-builder /app/scripts /app/scripts
 COPY --from=cardano-services-builder /app/packages/cardano-services/dist /app/packages/cardano-services/dist
 COPY --from=cardano-services-builder /app/packages/cardano-services/package.json /app/packages/cardano-services/package.json
