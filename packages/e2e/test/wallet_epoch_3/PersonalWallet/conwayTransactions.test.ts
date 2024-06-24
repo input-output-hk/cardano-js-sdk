@@ -1,6 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { BaseWallet } from '@cardano-sdk/wallet';
-import { Cardano, Serialization } from '@cardano-sdk/core';
+import { Cardano, setInConwayEra } from '@cardano-sdk/core';
 import { logger } from '@cardano-sdk/util-dev';
 
 import { firstValueFrom, map } from 'rxjs';
@@ -237,8 +237,7 @@ describe('PersonalWallet/conwayTransactions', () => {
 
   beforeAll(async () => {
     // TODO: remove once mainnet hardforks to conway-era, and this becomes "the norm"
-    Serialization.CborSet.useConwaySerialization = true;
-    Serialization.Redeemers.useConwaySerialization = true;
+    setInConwayEra(true);
 
     [wallet, dRepWallet] = await Promise.all([
       getTestWallet(0, 'Conway Wallet', 100_000_000n),
@@ -263,8 +262,7 @@ describe('PersonalWallet/conwayTransactions', () => {
     dRepWallet.shutdown();
 
     // TODO: remove once mainnet hardforks to conway-era, and this becomes "the norm"
-    Serialization.CborSet.useConwaySerialization = false;
-    Serialization.Redeemers.useConwaySerialization = false;
+    setInConwayEra(false);
   });
 
   it('can register a stake key and delegate stake using a combo certificate', async () => {

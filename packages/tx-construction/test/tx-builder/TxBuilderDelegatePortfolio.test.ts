@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, Bip32Account, GroupedAddress, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, setInConwayEra } from '@cardano-sdk/core';
 import {
   GenericTxBuilder,
   OutOfSyncRewardAccounts,
@@ -396,7 +396,9 @@ describe('TxBuilder/delegatePortfolio', () => {
     });
 
     it('de-registers all stake keys and uses greedy selector when wallet is delegating and delegatePortfolio is given a null portfolio', async () => {
+      setInConwayEra(true);
       const tx = await txBuilder.delegatePortfolio(null).build().inspect();
+      setInConwayEra(false);
       expect(tx.body.certificates?.length).toBe(2);
       expect(tx.body.certificates).toContainEqual(
         Cardano.createStakeDeregistrationCert(groupedAddresses[0].rewardAccount)
