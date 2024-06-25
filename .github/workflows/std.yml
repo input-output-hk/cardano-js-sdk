@@ -175,6 +175,18 @@ jobs:
         if: matrix.target != 'dummy-target'
         with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
 
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Build and push loccal-network-node Docker image
+        id: build-local-network-node-img
+        uses: docker/build-push-action@v2
+        with:
+          context: ./packages/e2e/local-network
+          file: ./packages/e2e/local-network/Dockerfile
+          push: true
+          tags: public.ecr.aws/e8d0p1a5/local-network-node:latest
 
   diff:
     needs: images
