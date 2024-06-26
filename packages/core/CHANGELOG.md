@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.35.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.34.0...@cardano-sdk/core@0.35.0) (2024-06-26)
+
+### ⚠ BREAKING CHANGES
+
+* **core:** add timeout prop to inspectors for them to return a timeout error
+
+### Features
+
+* **core:** add timeout and logger to the tokenTransferInspector and transactionSummaryInspector ([e0333fa](https://github.com/input-output-hk/cardano-js-sdk/commit/e0333fa6c0f5ca118cd543bdb23f3ab7f2d520ea))
+
 ## [0.34.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.33.1...@cardano-sdk/core@0.34.0) (2024-06-20)
 
 ### ⚠ BREAKING CHANGES

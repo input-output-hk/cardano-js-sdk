@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.9...@cardano-sdk/cardano-services@0.28.10) (2024-06-26)
+
+### Bug Fixes
+
+* **cardano-services:** negative stake key de-registration certificate deposit ([d52b084](https://github.com/input-output-hk/cardano-js-sdk/commit/d52b0840bee064f9be215183686e0dc1a0203a82))
+
 ## [0.28.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.8...@cardano-sdk/cardano-services@0.28.9) (2024-06-20)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services
