@@ -321,7 +321,7 @@ export const findStakeCertsByTxIds = `
 		addr."view" AS address,
 		FALSE AS registration,
 		tx.hash AS tx_id,
-		-(SELECT key_deposit FROM stake_registration AS sr
+		(SELECT key_deposit FROM stake_registration AS sr
 			JOIN tx AS tx2 ON sr.tx_id = tx2.id
 			JOIN block ON tx2.block_id = block.id
 			JOIN epoch_param ON block.epoch_no = epoch_param.epoch_no
