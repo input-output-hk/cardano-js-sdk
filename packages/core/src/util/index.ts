@@ -1,4 +1,5 @@
 export * as util from './misc';
+export * from './conwayEra';
 export * from './slotCalc';
 export * from './txInspector';
 export * from './tokenTransferInspector';

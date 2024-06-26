@@ -4,37 +4,21 @@ import * as Cardano from '../../src/Cardano';
 import {
   Asset,
   AssetInfoWithAmount,
-  AssetProvider,
-  HealthCheckResponse,
+  Milliseconds,
   TokenTransferValue,
   createTxInspector,
   tokenTransferInspector
 } from '../../src';
 import { Ed25519KeyHashHex, Ed25519PublicKeyHex, Ed25519SignatureHex } from '@cardano-sdk/crypto';
+import { createMockAssetProvider, createMockInputResolver } from './mocks';
 import { jsonToMetadatum } from '../../src/util/metadatum';
+import { logger } from '@cardano-sdk/util-dev';
 
 const buildTokenTransferValue = (coins: bigint, assets: Array<[Asset.AssetInfo, bigint]>): TokenTransferValue => ({
   assets: new Map<Cardano.AssetId, AssetInfoWithAmount>(
     assets.map(([assetInfo, amount]) => [assetInfo.assetId, { amount, assetInfo }])
   ),
   coins
-});
-
-const createMockInputResolver = (historicalTxs: Cardano.HydratedTx[]): Cardano.InputResolver => ({
-  async resolveInput(input: Cardano.TxIn) {
-    const tx = historicalTxs.find((historicalTx) => historicalTx.id === input.txId);
-
-    if (!tx || tx.body.outputs.length <= input.index) return Promise.resolve(null);
-
-    return Promise.resolve(tx.body.outputs[input.index]);
-  }
-});
-
-const createMockAssetProvider = (assets: Asset.AssetInfo[]): AssetProvider => ({
-  getAsset: async ({ assetId }) =>
-    assets.find((asset) => asset.assetId === assetId) ?? Promise.reject('Asset not found'),
-  getAssets: async ({ assetIds }) => assets.filter((asset) => assetIds.includes(asset.assetId)),
-  healthCheck: async () => Promise.resolve({} as HealthCheckResponse)
 });
 
 // eslint-disable-next-line max-statements
@@ -221,6 +205,8 @@ describe('txInspector', () => {
 
   const assetProvider = createMockAssetProvider(assetInfos);
 
+  const timeout = 6000 as Milliseconds;
+
   describe('Token Transfer Inspector', () => {
     it('does not include addresses which net difference is 0 (assets and coins)', async () => {
       // Arrange
@@ -302,6 +288,8 @@ describe('txInspector', () => {
         tokenTransfer: tokenTransferInspector({
           fromAddressAssetProvider: assetProvider,
           inputResolver: createMockInputResolver(histTx),
+          logger,
+          timeout,
           toAddressAssetProvider: assetProvider
         })
       });
@@ -365,6 +353,8 @@ describe('txInspector', () => {
         tokenTransfer: tokenTransferInspector({
           fromAddressAssetProvider: assetProvider,
           inputResolver: createMockInputResolver(histTx),
+          logger,
+          timeout,
           toAddressAssetProvider: assetProvider
         })
       });
@@ -423,6 +413,8 @@ describe('txInspector', () => {
         tokenTransfer: tokenTransferInspector({
           fromAddressAssetProvider: assetProvider,
           inputResolver: createMockInputResolver(histTx),
+          logger,
+          timeout,
           toAddressAssetProvider: assetProvider
         })
       });
@@ -500,6 +492,8 @@ describe('txInspector', () => {
         tokenTransfer: tokenTransferInspector({
           fromAddressAssetProvider: assetProvider,
           inputResolver: createMockInputResolver(histTx),
+          logger,
+          timeout,
           toAddressAssetProvider: assetProvider
         })
       });
@@ -568,6 +562,8 @@ describe('txInspector', () => {
         tokenTransfer: tokenTransferInspector({
           fromAddressAssetProvider: assetProvider,
           inputResolver: createMockInputResolver(histTx),
+          logger,
+          timeout,
           toAddressAssetProvider: assetProvider
         })
       });
@@ -720,6 +716,8 @@ describe('txInspector', () => {
         tokenTransfer: tokenTransferInspector({
           fromAddressAssetProvider: assetProvider,
           inputResolver: createMockInputResolver(histTx),
+          logger,
+          timeout,
           toAddressAssetProvider: assetProvider
         })
       });
@@ -856,6 +854,8 @@ describe('txInspector', () => {
         tokenTransfer: tokenTransferInspector({
           fromAddressAssetProvider: assetProvider,
           inputResolver: createMockInputResolver(histTx),
+          logger,
+          timeout,
           toAddressAssetProvider: assetProvider
         })
       });
@@ -999,6 +999,8 @@ describe('txInspector', () => {
         tokenTransfer: tokenTransferInspector({
           fromAddressAssetProvider: createMockAssetProvider(oldAssetInfos),
           inputResolver: createMockInputResolver(histTx),
+          logger,
+          timeout,
           toAddressAssetProvider: assetProvider
         })
       });
@@ -1048,6 +1050,226 @@ describe('txInspector', () => {
           ]
         ])
       );
+    });
+
+    it('has no resolved fromAddresses on inputResolver timeout', async () => {
+      const resolveDelay = Milliseconds(5);
+      const timeoutAfter = Milliseconds(1);
+
+      const tx = buildMockTx({
+        inputs: [
+          {
+            address: addresses[0],
+            index: 0,
+            txId: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+          },
+          {
+            address: addresses[1],
+            index: 0,
+            txId: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+          }
+        ],
+        outputs: [
+          {
+            address: addresses[0],
+            value: {
+              assets: new Map([
+                [AssetIds.TSLA, 100n],
+                [AssetIds.PXL, 50n],
+                [AssetIds.Unit, 30n]
+              ]),
+              coins: 3_000_000n
+            }
+          }
+        ]
+      });
+
+      const histTx: Cardano.HydratedTx[] = [
+        {
+          body: {
+            outputs: [
+              {
+                address: addresses[0],
+                value: {
+                  assets: new Map([
+                    [AssetIds.TSLA, 25n],
+                    [AssetIds.PXL, 10n],
+                    [AssetIds.Unit, 5n]
+                  ]),
+                  coins: 3_000_000n
+                }
+              }
+            ]
+          },
+          id: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+        } as unknown as Cardano.HydratedTx
+      ];
+
+      const inspectTx = createTxInspector({
+        tokenTransfer: tokenTransferInspector({
+          fromAddressAssetProvider: assetProvider,
+          inputResolver: createMockInputResolver(histTx, resolveDelay),
+          logger,
+          timeout: timeoutAfter,
+          toAddressAssetProvider: assetProvider
+        })
+      });
+
+      // Act
+      const { tokenTransfer } = await inspectTx(tx);
+
+      // Assert
+      expect(tokenTransfer.fromAddress).toEqual(new Map([]));
+    });
+
+    it('should have fromAddress and toAddress without metadata on AssetProvider.getAssets error', async () => {
+      const failingAssetProvider = {
+        ...assetProvider,
+        getAssets: () => Promise.reject('Failed to get assets')
+      };
+
+      const tx = buildMockTx({
+        inputs: [
+          {
+            address: addresses[1],
+            index: 0,
+            txId: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+          }
+        ],
+        outputs: [
+          {
+            address: addresses[0],
+            value: {
+              assets: new Map([
+                [AssetIds.TSLA, 100n],
+                [AssetIds.PXL, 50n],
+                [AssetIds.Unit, 30n]
+              ]),
+              coins: 3_000_000n
+            }
+          }
+        ]
+      });
+
+      const histTx: Cardano.HydratedTx[] = [
+        {
+          body: {
+            outputs: [
+              {
+                address: addresses[1],
+                value: {
+                  assets: new Map([
+                    [AssetIds.TSLA, 25n],
+                    [AssetIds.PXL, 10n],
+                    [AssetIds.Unit, 5n]
+                  ]),
+                  coins: 3_000_000n
+                }
+              }
+            ]
+          },
+          id: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+        } as unknown as Cardano.HydratedTx
+      ];
+
+      const inspectTx = createTxInspector({
+        tokenTransfer: tokenTransferInspector({
+          fromAddressAssetProvider: failingAssetProvider,
+          inputResolver: createMockInputResolver(histTx),
+          logger,
+          timeout,
+          toAddressAssetProvider: failingAssetProvider
+        })
+      });
+
+      // Act
+      const { tokenTransfer } = await inspectTx(tx);
+
+      // Assert
+      expect(tokenTransfer.fromAddress).toMatchInlineSnapshot(`
+        Map {
+          "addr1z8phkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gten0d3vllmyqwsx5wktcd8cc3sq835lu7drv2xwl2wywfgs9yc0hh" => Object {
+            "assets": Map {
+              "659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41" => Object {
+                "amount": -25n,
+                "assetInfo": Object {
+                  "assetId": "659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41",
+                  "fingerprint": "asset1rqluyux4nxv6kjashz626c8usp8g88unmqwnyh",
+                  "name": "54534c41",
+                  "policyId": "659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba82",
+                  "quantity": 0n,
+                  "supply": 0n,
+                },
+              },
+              "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c960150584c" => Object {
+                "amount": -10n,
+                "assetInfo": Object {
+                  "assetId": "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c960150584c",
+                  "fingerprint": "asset1376eat26n9qnucrkkcy4pjps8d536nh5gds0gt",
+                  "name": "50584c",
+                  "policyId": "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
+                  "quantity": 0n,
+                  "supply": 0n,
+                },
+              },
+              "a5425bd7bc4182325188af2340415827a73f845846c165d9e14c5aed556e6974" => Object {
+                "amount": -5n,
+                "assetInfo": Object {
+                  "assetId": "a5425bd7bc4182325188af2340415827a73f845846c165d9e14c5aed556e6974",
+                  "fingerprint": "asset1947w6qxce5w35ur5q4s62z9fml2np9st3v20d9",
+                  "name": "556e6974",
+                  "policyId": "a5425bd7bc4182325188af2340415827a73f845846c165d9e14c5aed",
+                  "quantity": 0n,
+                  "supply": 0n,
+                },
+              },
+            },
+            "coins": -3000000n,
+          },
+        }
+      `);
+      expect(tokenTransfer.toAddress).toMatchInlineSnapshot(`
+        Map {
+          "addr1qx2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3n0d3vllmyqwsx5wktcd8cc3sq835lu7drv2xwl2wywfgse35a3x" => Object {
+            "assets": Map {
+              "659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41" => Object {
+                "amount": 100n,
+                "assetInfo": Object {
+                  "assetId": "659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41",
+                  "fingerprint": "asset1rqluyux4nxv6kjashz626c8usp8g88unmqwnyh",
+                  "name": "54534c41",
+                  "policyId": "659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba82",
+                  "quantity": 0n,
+                  "supply": 0n,
+                },
+              },
+              "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c960150584c" => Object {
+                "amount": 50n,
+                "assetInfo": Object {
+                  "assetId": "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c960150584c",
+                  "fingerprint": "asset1376eat26n9qnucrkkcy4pjps8d536nh5gds0gt",
+                  "name": "50584c",
+                  "policyId": "1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c9601",
+                  "quantity": 0n,
+                  "supply": 0n,
+                },
+              },
+              "a5425bd7bc4182325188af2340415827a73f845846c165d9e14c5aed556e6974" => Object {
+                "amount": 30n,
+                "assetInfo": Object {
+                  "assetId": "a5425bd7bc4182325188af2340415827a73f845846c165d9e14c5aed556e6974",
+                  "fingerprint": "asset1947w6qxce5w35ur5q4s62z9fml2np9st3v20d9",
+                  "name": "556e6974",
+                  "policyId": "a5425bd7bc4182325188af2340415827a73f845846c165d9e14c5aed",
+                  "quantity": 0n,
+                  "supply": 0n,
+                },
+              },
+            },
+            "coins": 3000000n,
+          },
+        }
+      `);
     });
   });
 });

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable promise/always-return */
 import { EMPTY, Observable, from } from 'rxjs';
 import { KeyValueCollection, KeyValueStore } from '../types';
 import { Logger } from 'ts-log';

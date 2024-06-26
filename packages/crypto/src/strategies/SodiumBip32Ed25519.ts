@@ -16,8 +16,8 @@ import { HexBlob } from '@cardano-sdk/util';
 const EXTENDED_KEY_HEX_LENGTH = 128;
 
 export class SodiumBip32Ed25519 implements Bip32Ed25519 {
-  public async fromBip39Entropy(entropy: Buffer, passphrase: string): Promise<Bip32PrivateKeyHex> {
-    return (await Bip32PrivateKey.fromBip39Entropy(entropy, passphrase)).hex();
+  public fromBip39Entropy(entropy: Buffer, passphrase: string): Bip32PrivateKeyHex {
+    return Bip32PrivateKey.fromBip39Entropy(entropy, passphrase).hex();
   }
 
   public async getPublicKey(

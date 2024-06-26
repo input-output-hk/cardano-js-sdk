@@ -256,7 +256,7 @@ export const mapScript = (script: Schema.Script): Cardano.Script => {
 
 const mapBootstrapWitness = (b: Schema.Signatory): Cardano.BootstrapWitness => ({
   // Based on the Ogmios maintainer answer  https://github.com/CardanoSolutions/ogmios/discussions/285#discussioncomment-4271726
-  addressAttributes: b.addressAttributes ? Base64Blob(b.addressAttributes) : undefined,
+  addressAttributes: b.addressAttributes ? Base64Blob.fromBytes(Buffer.from(b.addressAttributes, 'hex')) : undefined,
   chainCode: b.chainCode ? HexBlob(b.chainCode) : undefined,
   key: Crypto.Ed25519PublicKeyHex(b.key),
   signature: Crypto.Ed25519SignatureHex(b.signature)
@@ -308,8 +308,9 @@ const mapJsonMetadatum = (obj: Schema.Metadatum): Cardano.Metadatum => {
 };
 
 const mapMetadata = (ogmiosMetadata: Schema.MetadataLabels[0]): Cardano.Metadatum => {
-  if (ogmiosMetadata.cbor) return Serialization.TransactionMetadatum.fromCbor(ogmiosMetadata.cbor as HexBlob).toCore();
-  if (ogmiosMetadata.json) return mapJsonMetadatum(ogmiosMetadata.json);
+  if (ogmiosMetadata.cbor !== undefined)
+    return Serialization.TransactionMetadatum.fromCbor(ogmiosMetadata.cbor as HexBlob).toCore();
+  if (ogmiosMetadata.json !== undefined) return mapJsonMetadatum(ogmiosMetadata.json);
   throw new NotImplementedError(`Metadata format not recognized: ${JSON.stringify(ogmiosMetadata)}`);
 };
 

@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.38.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.38.3...@cardano-sdk/wallet@0.38.4) (2024-06-20)
+
+### Bug Fixes
+
+* **wallet:** [lw-10539] export isValidSharedWalletScript util ([1129d1f](https://github.com/input-output-hk/cardano-js-sdk/commit/1129d1f82ade50f1b05480cd01fce04720b5378c))
+
+## [0.38.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.38.2...@cardano-sdk/wallet@0.38.3) (2024-06-18)
+
+**Note:** Version bump only for package @cardano-sdk/wallet
+
+## [0.38.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.38.1...@cardano-sdk/wallet@0.38.2) (2024-06-17)
+
+**Note:** Version bump only for package @cardano-sdk/wallet
+
+## [0.38.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.38.0...@cardano-sdk/wallet@0.38.1) (2024-06-14)
+
+### Features
+
+* key agents now can take optional coin purpose ([e6861d7](https://github.com/input-output-hk/cardano-js-sdk/commit/e6861d7008addb7cc736a44e7823ce062c7131d6))
+* **wallet:** createWalletUtil's chainHistoryProvider parameter is now optional ([e731cf6](https://github.com/input-output-hk/cardano-js-sdk/commit/e731cf6264f2d34f68cdbdecdae91eb7e66b53a1))
+
+### Bug Fixes
+
+* **wallet:** base wallet should now use the original CBOR if provided ([1494ed9](https://github.com/input-output-hk/cardano-js-sdk/commit/1494ed9b908a7798cc3b04c239bc135bbae1c672))
+
 ## [0.38.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.37.5...@cardano-sdk/wallet@0.38.0) (2024-06-05)
 
 ### ⚠ BREAKING CHANGES

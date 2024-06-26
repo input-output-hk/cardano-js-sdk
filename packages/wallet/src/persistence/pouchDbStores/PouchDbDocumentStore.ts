@@ -1,4 +1,3 @@
-/* eslint-disable promise/always-return */
 import { DocumentStore } from '../types';
 import { EMPTY, Observable } from 'rxjs';
 import { Logger } from 'ts-log';

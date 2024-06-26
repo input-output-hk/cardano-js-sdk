@@ -1,5 +1,6 @@
 import { CborReader, CborReaderState, CborTag, CborWriter } from '../CBOR';
 import { HexBlob } from '@cardano-sdk/util';
+import { inConwayEra } from '../../util';
 
 /** Represents a cbor serialization wrapper for a Core type <{@link C}> */
 interface CborSerializable<C> {
@@ -15,8 +16,6 @@ interface CborSerializable<C> {
  */
 export class CborSet<C, T extends CborSerializable<C>> {
   #values: T[];
-
-  static useConwaySerialization = false;
 
   // Prevent users from directly creating an instance. Only allow creating via fromCore or fromCbor.
   private constructor(values: T[]) {
@@ -50,13 +49,13 @@ export class CborSet<C, T extends CborSerializable<C>> {
   /**
    * Serializes a CborSet<T> into CBOR format.
    *
-   * @returns The CborSet in CBOR format, using the `258` tag representation if {@link useConwaySerialization} flag is set,
+   * @returns The CborSet in CBOR format, using the `258` tag representation if {@link inConwayEra} flag is set,
    * or as an the array.
    */
   toCbor(): HexBlob {
     const writer = new CborWriter();
 
-    if (CborSet.useConwaySerialization) writer.writeTag(CborTag.Set);
+    if (inConwayEra) writer.writeTag(CborTag.Set);
 
     writer.writeStartArray(this.size());
 

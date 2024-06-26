@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.29.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.29.3...@cardano-sdk/web-extension@0.29.4) (2024-06-20)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
+## [0.29.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.29.2...@cardano-sdk/web-extension@0.29.3) (2024-06-18)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
+## [0.29.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.29.1...@cardano-sdk/web-extension@0.29.2) (2024-06-17)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
+## [0.29.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.29.0...@cardano-sdk/web-extension@0.29.1) (2024-06-14)
+
+### Features
+
+* key agents now can take optional coin purpose ([e6861d7](https://github.com/input-output-hk/cardano-js-sdk/commit/e6861d7008addb7cc736a44e7823ce062c7131d6))
+* **web-extension:** added support to coin purpose in accounts ([0788606](https://github.com/input-output-hk/cardano-js-sdk/commit/07886060779044709a9a7dac0a9d2324b3eec3ed))
+
 ## [0.29.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.28.0...@cardano-sdk/web-extension@0.29.0) (2024-06-05)
 
 ### ⚠ BREAKING CHANGES

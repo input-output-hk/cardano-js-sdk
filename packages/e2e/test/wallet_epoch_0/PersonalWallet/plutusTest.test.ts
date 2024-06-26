@@ -175,7 +175,6 @@ const getScriptUtxoSet = (
         new Observable<Cardano.Utxo[]>((subscriber) => {
           utxoProvider
             .utxoByAddresses({ addresses: [scriptAddress] })
-            // eslint-disable-next-line promise/always-return
             .then((utxos) => {
               subscriber.next(utxos);
             })
@@ -184,6 +183,7 @@ const getScriptUtxoSet = (
     )
   );
 
+// LW-10693: disable until costModels are fetched from protocolParams
 describe.skip('PersonalWallet/plutus', () => {
   let wallet: BaseWallet;
   afterAll(() => {

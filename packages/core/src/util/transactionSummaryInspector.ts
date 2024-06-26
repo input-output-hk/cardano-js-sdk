@@ -14,10 +14,15 @@ import {
   totalAddressOutputsValueInspector
 } from './txInspector';
 import { BigIntMath } from '@cardano-sdk/util';
+import { Logger } from 'ts-log';
+import { Milliseconds } from './time';
+import { TimeoutError } from '../errors';
 import { coalesceTokenMaps, subtractTokenMaps } from '../Asset/util';
 import { coalesceValueQuantities } from './coalesceValueQuantities';
 import { computeImplicitCoin } from '../Cardano/util';
+import { promiseTimeout } from './promiseTimeout';
 import { subtractValueQuantities } from './subtractValueQuantities';
+import { tryGetAssetInfos } from './tryGetAssetInfos';
 
 interface TransactionSummaryInspectorArgs {
   addresses: Cardano.PaymentAddress[];
@@ -26,6 +31,8 @@ interface TransactionSummaryInspectorArgs {
   protocolParameters: Cardano.ProtocolParameters;
   assetProvider: AssetProvider;
   dRepKeyHash?: Crypto.Ed25519KeyHashHex;
+  timeout: Milliseconds;
+  logger: Logger;
 }
 
 export type TransactionSummaryInspection = {
@@ -44,6 +51,13 @@ export type TransactionSummaryInspection = {
 export type TransactionSummaryInspector = (
   args: TransactionSummaryInspectorArgs
 ) => Inspector<TransactionSummaryInspection>;
+
+type IntoTokenTransferValueProps = {
+  assetProvider: AssetProvider;
+  logger: Logger;
+  timeout: Milliseconds;
+  tokenMap?: TokenMap;
+};
 
 /**
  * Gets the collateral specified for this transaction.
@@ -116,19 +130,23 @@ const getUnaccountedFunds = async (
   return subtractValueQuantities([totalOutputs, totalInputs]);
 };
 
-const toAssetInfoWithAmount = async (
-  assetProvider: AssetProvider,
-  tokenMap?: TokenMap
-): Promise<Map<Cardano.AssetId, AssetInfoWithAmount>> => {
+const intoAssetInfoWithAmount = async ({
+  assetProvider,
+  logger,
+  timeout,
+  tokenMap
+}: IntoTokenTransferValueProps): Promise<Map<Cardano.AssetId, AssetInfoWithAmount>> => {
   if (!tokenMap) return new Map();
 
   const assetIds = tokenMap && tokenMap.size > 0 ? [...tokenMap.keys()] : [];
   const assetInfos = new Map<Cardano.AssetId, AssetInfoWithAmount>();
 
   if (assetIds.length > 0) {
-    const assets = await assetProvider.getAssets({
+    const assets = await tryGetAssetInfos({
       assetIds,
-      extraData: { nftMetadata: true, tokenMetadata: true }
+      assetProvider,
+      logger,
+      timeout
     });
 
     for (const asset of assets) {
@@ -146,9 +164,32 @@ const toAssetInfoWithAmount = async (
  * @param {TransactionSummaryInspectorArgs} args The arguments for the inspector.
  */
 export const transactionSummaryInspector: TransactionSummaryInspector =
-  (args: TransactionSummaryInspectorArgs) => async (tx) => {
-    const { inputResolver, addresses, rewardAccounts, protocolParameters, assetProvider, dRepKeyHash } = args;
-    const resolvedInputs = await resolveInputs(tx.body.inputs, inputResolver);
+  ({
+    inputResolver,
+    addresses,
+    rewardAccounts,
+    protocolParameters,
+    assetProvider,
+    dRepKeyHash,
+    timeout,
+    logger
+  }: TransactionSummaryInspectorArgs) =>
+  async (tx) => {
+    let resolvedInputs: ResolutionResult;
+
+    try {
+      resolvedInputs = await promiseTimeout(resolveInputs(tx.body.inputs, inputResolver), timeout);
+    } catch (error) {
+      if (error instanceof TimeoutError) {
+        logger.error('Error: Inputs resolution timed out');
+      }
+
+      resolvedInputs = {
+        resolvedInputs: [],
+        unresolvedInputs: tx.body.inputs
+      };
+    }
+
     const fee = tx.body.fee;
 
     const implicit = computeImplicitCoin(
@@ -171,7 +212,12 @@ export const transactionSummaryInspector: TransactionSummaryInspector =
     };
 
     return {
-      assets: await toAssetInfoWithAmount(assetProvider, diff.assets),
+      assets: await intoAssetInfoWithAmount({
+        assetProvider,
+        logger,
+        timeout,
+        tokenMap: diff.assets
+      }),
       coins: diff.coins,
       collateral,
       deposit: implicit.deposit || 0n,

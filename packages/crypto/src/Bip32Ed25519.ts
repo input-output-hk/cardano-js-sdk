@@ -29,7 +29,7 @@ export interface Bip32Ed25519 {
    * @param passphrase The second factor authentication passphrase for the mnemonic phrase.
    * @returns The secret extended key.
    */
-  fromBip39Entropy(entropy: Buffer, passphrase: string): Promise<Bip32PrivateKeyHex>;
+  fromBip39Entropy(entropy: Buffer, passphrase: string): Bip32PrivateKeyHex;
 
   /**
    * The function computes a public key from the provided private key.

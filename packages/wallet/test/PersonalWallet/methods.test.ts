@@ -1,4 +1,4 @@
-/* eslint-disable unicorn/consistent-destructuring, sonarjs/no-duplicate-string, @typescript-eslint/no-floating-promises, promise/no-nesting, promise/always-return */
+/* eslint-disable unicorn/consistent-destructuring, sonarjs/no-duplicate-string, @typescript-eslint/no-floating-promises, promise/no-nesting */
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressDiscovery, BaseWallet, TxInFlight, createPersonalWallet } from '../../src';
 import { AddressType, Bip32Account, GroupedAddress, Witnesser, util } from '@cardano-sdk/key-management';

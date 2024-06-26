@@ -56,7 +56,7 @@ in {
       buildInputs = oldAttrs.buildInputs ++ [nixpkgs.pkg-config nixpkgs.libusb1];
       # run actual build
       buildPhase = ''
-        yarn build:cjs
+        yarn workspace @cardano-sdk/cardano-services run build:cjs
       '';
       # override installPhase to only install what's necessary
       installPhase = ''
@@ -71,12 +71,16 @@ in {
           mkdir -p $out/libexec/$sourceRoot/packages/$p
           cp -r packages/$p/dist $out/libexec/$sourceRoot/packages/$p/dist
           cp -r packages/$p/package.json $out/libexec/$sourceRoot/packages/$p/package.json
+          ln -s $out/libexec/$sourceRoot/packages/$p/package.json $out/libexec/$sourceRoot/packages/$p/dist/package.json
         done
         cp -r ${production-deps}/libexec/$sourceRoot/packages/cardano-services/config $out/libexec/$sourceRoot/packages/cardano-services/config
 
         cd "$out/libexec/$sourceRoot"
 
         runHook postInstall
+
+        # Test that Node.js loads our code correctly:
+        $out/bin/cli --version
       '';
       # add a bin script that should be used to run cardano-services CLI
       postInstall = ''
