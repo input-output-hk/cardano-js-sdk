@@ -9,11 +9,11 @@ jobs:
       PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Run k6 cloud test
-        uses: grafana/k6-action@v0.2.0
+        uses: grafana/k6-action@v0.3.1
         with:
-          filename: ./packages/e2e/test/k6/wallet-restoration.test.js
+          filename: ./packages/e2e/test/k6/scenarios/wallet-restoration.test.js
           flags: --vus 3 --duration 10s
           cloud: true
           token: ${{ secrets.K6_CLOUD_API_TOKEN }}
