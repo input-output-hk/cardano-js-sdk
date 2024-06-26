@@ -1,19 +1,41 @@
 name: K6 Performance Cloud Test
 on:
   workflow_dispatch:
+    inputs:
+      target:
+        description: 'Target environment'
+        type: choice
+        required: true
+        options:
+          - 'dev-preprod'
+          - 'dev-mainnet'
 
 jobs:
   wallet-restoration:
     runs-on: ubuntu-latest
-    env:
-      PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Set target env url based on input
+        run: |
+          if [ "${{ github.event.inputs.target }}" = "dev-preprod" ]; then
+            echo "PROVIDER_SERVER_URL=https://dev-preprod.lw.iog.io" >> $GITHUB_ENV
+          elif [ "${{ github.event.inputs.target }}" = "dev-mainnet" ]; then
+            echo "PROVIDER_SERVER_URL=https://dev-mainnet.lw.iog.io" >> $GITHUB_ENV
+          fi
       - name: Run k6 cloud test
         uses: grafana/k6-action@v0.3.1
+        env:
+          K6_CLOUD_PROJECT_ID: ${{ secrets.K6_CLOUD_PROJECT_ID }}
         with:
           filename: ./packages/e2e/test/k6/scenarios/wallet-restoration.test.js
-          flags: --vus 3 --duration 10s
           cloud: true
           token: ${{ secrets.K6_CLOUD_API_TOKEN }}
+          flags: >
+            -e PROVIDER_SERVER_URL=$PROVIDER_SERVER_URL
+            -e RUN_MODE='RestoreHD'
+            -e MAX_VU=3
+            -e RAMP_UP_DURATION='13s'
+            -e STEADY_STATE_DURATION='17s'
+            -e HD_ACTIVE_ADDR_COUNT='3'
+            -e HD_MAX_TX_HISTORY='80'

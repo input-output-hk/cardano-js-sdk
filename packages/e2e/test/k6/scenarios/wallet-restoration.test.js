@@ -35,7 +35,7 @@ const RunMode = {
   RestoreHD: 'RestoreHD'
 };
 /** Determines run mode: Restore or Onboard */
-const RUN_MODE = RunMode.Restore;
+const RUN_MODE = __ENV.RUN_MODE || RunMode.Restore;
 
 // eslint-disable-next-line no-undef
 const PROVIDER_SERVER_URL = __ENV.PROVIDER_SERVER_URL;
@@ -56,12 +56,12 @@ const POOL_ADDRESSES_URL =
  * For this reason, it's a good practice to configure MAX_VUs in multiples of 100 in order to maintain the desired distribution.
  * In `RunMode.RestoreHD`, each VU will have multiple addresses.
  */
-const MAX_VU = 10;
+const MAX_VU = __ENV.MAX_VU || 1;
 
 /** Time span during which all virtual users are started in a linear fashion */
-const RAMP_UP_DURATION = '10s';
+const RAMP_UP_DURATION = __ENV.RAMP_UP_DURATION || '1s';
 /** Time span during which synced wallets do tip queries */
-const STEADY_STATE_DURATION = '20s';
+const STEADY_STATE_DURATION = __ENV.STEADY_STATE_DURATION || '2s';
 
 /** Time to sleep between iterations. Simulates polling tip to keep wallet in sync */
 const ITERATION_SLEEP = 5;
@@ -69,9 +69,9 @@ const ITERATION_SLEEP = 5;
 /** HD wallet discovery. Used when RunMode is `RestoreHD` */
 const hdWalletParams = {
   /** HD wallet size. The number of addresses with transaction history per wallet. They are queried at discover time. */
-  activeAddrCount: 10,
+  activeAddrCount: __ENV.HD_ACTIVE_ADDR_COUNT || 1,
   /** Use only addresses with a transaction history up to this value */
-  maxTxHistory: 100,
+  maxTxHistory: __ENV.HD_MAX_TX_HISTORY || 1,
   /** number of payment addresses to search for. It will search both internal and external address, thus multiplied by 2 */
   paymentAddrSearchGap: 20 * 2,
   /** number of stake keys to search for. It will search both internal and external address, thus multiplied by 2 */
