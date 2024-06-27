@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable func-style */
 import { Counter, Trend } from 'k6/metrics';
+import { SharedArray } from 'k6/data';
 import { check, sleep } from 'k6';
 import { apiVersion } from '../../../../cardano-services-client/src/version.ts';
 import http from 'k6/http';
@@ -40,15 +41,23 @@ const RUN_MODE = __ENV.RUN_MODE || RunMode.Restore;
 // eslint-disable-next-line no-undef
 const PROVIDER_SERVER_URL = __ENV.PROVIDER_SERVER_URL;
 
-/** URL of the JSON file containing the wallets */
-const WALLET_ADDRESSES_URL =
-  RUN_MODE === RunMode.Onboard
-    ? 'https://raw.githubusercontent.com/input-output-hk/cardano-js-sdk/master/packages/e2e/test/dump/addresses/no-history-mainnet.json'
-    : 'https://raw.githubusercontent.com/input-output-hk/cardano-js-sdk/master/packages/e2e/test/dump/addresses/mainnet.json';
+/** Wallet addresses extracted from the JSON dump file */
+const walletsOrig = new SharedArray('walletsData', function () {
+  const network = __ENV.TARGET_ENV == 'dev-mainnet' ? 'mainnet' : 'preprod';
+  const fileName = RUN_MODE === RunMode.Onboard ? `no-history-${network}.json` : `${network}.json`;
+  console.log(`Reading wallet addresses from ${fileName}`);
+  const walletAddresses = JSON.parse(open('../../dump/addresses/' + fileName));
+  return walletAddresses;
+});
 
-/** URL of the JSON file containing the stake pool addresses */
-const POOL_ADDRESSES_URL =
-  'https://raw.githubusercontent.com/input-output-hk/cardano-js-sdk/master/packages/e2e/test/dump/pool_addresses/mainnet.json';
+
+/** Stake pool addresses from the JSON dump file */
+const poolAddresses = new SharedArray('poolsData', function () {
+  // There is no dump of preprod pools, but it is ok. Pool address is used only in "Restore" mode
+  // and it is used to do a stake pool search call, so any pool will do
+  const pools = JSON.parse(open('../../dump/pool_addresses/mainnet.json'));
+  return pools;
+});
 
 /**
  * Define the maximum number of virtual users to simulate
@@ -105,12 +114,6 @@ export function setup() {
     console.log('HD wallet params are:', hdWalletParams);
   }
 
-  // This call will be part of the statistics. There is no way around it so far: https://github.com/grafana/k6/issues/1321
-  const res = http.batch([WALLET_ADDRESSES_URL, POOL_ADDRESSES_URL]);
-  check(res, { 'get wallets and pools files': (r) => r.every(({ status }) => status >= 200 && status < 300) });
-
-  const [{ body: resBodyWallets }, { body: resBodyPools }] = res;
-  const walletsOrig = JSON.parse(resBodyWallets);
   const walletsOrigCount = walletsOrig ? walletsOrig.length : 0;
   check(walletsOrigCount, {
     'At least one wallet is required to run the test': (count) => count > 0
@@ -136,7 +139,6 @@ export function setup() {
     );
   }
 
-  const poolAddresses = JSON.parse(resBodyPools);
   check(poolAddresses, {
     'At least one stake pool address is required to run the test': (p) => p && p.length > 0
   });
