@@ -9,6 +9,37 @@ on:
         options:
           - 'dev-mainnet'
           - 'dev-preprod'
+      wallet-count:
+        description: 'Number of wallets to simulate'
+        type: number
+        required: true
+        default: 500
+      hd-addr-per-wallet:
+        description: 'Number of addresses per wallet. Used when running in RestoreHD mode.'
+        type: number
+        required: true
+        default: 10
+      hd-tx-history-size-per-wallet:
+        description: 'Maximum number of transactions per wallet. Filter wallet addresses to have a tx history size smaller than this value. Used when running in RestoreHD mode.'
+        type: number
+        required: true
+        default: 10
+      rampup-duration:
+        description: 'Ramp up duration in minutes. Up to 100 wallets should use 1m. 500 wallets and above should use 5m or 10m. 1000 wallets should use 10m'
+        type: choice
+        required: true
+        options:
+          - '10m'
+          - '5m'
+          - '1m'
+      sustain-duration:
+        description: 'Sustain duration in minutes. Up to 100 wallets should use 2m. 500 wallets and above should use 2m or 5m. 1000 wallets should use 5m'
+        type: choice
+        required: true
+        options:
+          - '5m'
+          - '2m'
+        
 
 jobs:
   wallet-restoration:
@@ -35,8 +66,8 @@ jobs:
             -e TARGET_ENV=${{ github.event.inputs.target }}
             -e PROVIDER_SERVER_URL=$PROVIDER_SERVER_URL
             -e RUN_MODE='RestoreHD'
-            -e MAX_VU=3
-            -e RAMP_UP_DURATION='13s'
-            -e STEADY_STATE_DURATION='17s'
-            -e HD_ACTIVE_ADDR_COUNT='3'
-            -e HD_MAX_TX_HISTORY='80'
+            -e MAX_VU=${{ github.event.inputs.wallet-count }}
+            -e RAMP_UP_DURATION=${{ github.event.inputs.rampup-duration }}
+            -e STEADY_STATE_DURATION=${{ github.event.inputs.sustain-duration }}
+            -e HD_ACTIVE_ADDR_COUNT=${{ github.event.inputs.hd-addr-per-wallet }}
+            -e HD_MAX_TX_HISTORY=${{ github.event.inputs.hd-tx-history-size-per-wallet }}
