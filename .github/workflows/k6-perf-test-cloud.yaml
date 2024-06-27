@@ -28,7 +28,7 @@ jobs:
         env:
           K6_CLOUD_PROJECT_ID: ${{ secrets.K6_CLOUD_PROJECT_ID }}
         with:
-          filename: ./packages/e2e/test/k6/scenarios/wallet-restoration.test.js
+          filename: ./packages/e2e/test/k6/scenarios/wallets.test.js
           cloud: true
           token: ${{ secrets.K6_CLOUD_API_TOKEN }}
           flags: >

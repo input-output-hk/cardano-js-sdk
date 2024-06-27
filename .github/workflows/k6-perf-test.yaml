@@ -13,7 +13,7 @@ jobs:
       - name: Run k6 local test
         uses: grafana/k6-action@v0.2.0
         with:
-          filename: ./packages/e2e/test/k6/scenarios/wallet-creation.test.js
+          filename: ./packages/e2e/test/k6/scenarios/wallets.test.js
           flags: --vus 3 --duration 10s --out json=wallet-creation-results.json
       - name: Upload performance test results
         uses: actions/upload-artifact@v3
@@ -31,7 +31,7 @@ jobs:
       - name: Run k6 local test
         uses: grafana/k6-action@v0.2.0
         with:
-          filename: ./packages/e2e/test/k6/scenarios/wallet-restoration.test.js
+          filename: ./packages/e2e/test/k6/scenarios/wallets.test.js
           flags: --vus 3 --duration 10s --out json=wallet-restoration-results.json
       - name: Upload performance test results
         uses: actions/upload-artifact@v3
