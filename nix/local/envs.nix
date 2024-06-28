@@ -1,7 +1,9 @@
+pkgs:
+
 let
-  inherit (inputs.nixpkgs) lib;
+  inherit (pkgs) lib;
   inherit
-    (inputs.nixpkgs)
+    (pkgs)
     alejandra
     git-subrepo
     k9s
@@ -11,8 +13,6 @@ let
     yarn
     yq-go
     ;
-  inherit (inputs.std.lib.dev) mkShell;
-  inherit (inputs.std.std.cli) std;
 
   inherit (lib.stringsWithDeps) noDepEntry;
 
@@ -38,14 +38,14 @@ let
     category = "direct access";
   };
 in {
-  checks = mkShell {
+  checks = {
     imports = [formattingModule];
   };
-  main = mkShell {
+  default = {
     name = "Cardano JS SDK Local Env";
     imports = [formattingModule];
 
-    packages = with inputs.nixpkgs; [
+    packages = with pkgs; [
       awscli2
       just
       kubectl
@@ -54,7 +54,7 @@ in {
       tmate
     ];
 
-    env = with inputs.nixpkgs; [
+    env = with pkgs; [
       {
         name = "LD_LIBRARY_PATH";
         value = lib.makeLibraryPath [udev];
@@ -66,7 +66,6 @@ in {
     ];
 
     commands = [
-      {package = std;}
       {package = yarn;}
       {package = k9s;}
       (mkK9sCommand "us-east-1")
