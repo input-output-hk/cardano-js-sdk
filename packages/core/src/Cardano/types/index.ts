@@ -13,3 +13,4 @@ export * from './ProtocolParameters';
 export * from './PlutusData';
 export * from './UtilityTypes';
 export * from './Governance';
+export * from './Cip1854ExtendedAccountPublicKey';
