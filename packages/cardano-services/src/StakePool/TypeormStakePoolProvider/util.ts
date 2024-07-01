@@ -93,6 +93,7 @@ export const getWhereClauseAndArgs = (filters: QueryStakePoolsArgs['filters'], t
     args = { ...args, status: filters.status };
     clauses.push('pool.status IN (:...status)');
   }
+
   if (!textFilter && filters.identifier && filters.identifier.values.length > 0) {
     const identifierClauses: string[] = [];
     const identifierCondition = getFilterCondition(filters.identifier?._condition, 'OR');
@@ -123,6 +124,7 @@ export const getWhereClauseAndArgs = (filters: QueryStakePoolsArgs['filters'], t
     const identifierFilters = identifierClauses.join(` ${identifierCondition} `);
     clauses.push(` (${identifierFilters}) `);
   }
+
   if (filters.pledgeMet !== undefined && filters.pledgeMet !== null) {
     if (filters.pledgeMet) {
       clauses.push('params.pledge<=metrics.live_pledge');
