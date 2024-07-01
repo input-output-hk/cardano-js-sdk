@@ -1,34 +1,73 @@
 name: K6 Performance Cloud Test
 on:
   workflow_dispatch:
+    inputs:
+      target:
+        description: 'Target environment'
+        type: choice
+        required: true
+        options:
+          - 'dev-mainnet'
+          - 'dev-preprod'
+      wallet-count:
+        description: 'Number of wallets to simulate'
+        type: number
+        required: true
+        default: 500
+      hd-addr-per-wallet:
+        description: 'Number of addresses per wallet. Used when running in RestoreHD mode.'
+        type: number
+        required: true
+        default: 10
+      hd-tx-history-size-per-wallet:
+        description: 'Maximum number of transactions per wallet. Filter wallet addresses to have a tx history size smaller than this value. Used when running in RestoreHD mode.'
+        type: number
+        required: true
+        default: 10
+      rampup-duration:
+        description: 'Ramp up duration in minutes. Up to 100 wallets should use 1m. 500 wallets and above should use 5m or 10m. 1000 wallets should use 10m'
+        type: choice
+        required: true
+        options:
+          - '10m'
+          - '5m'
+          - '1m'
+      sustain-duration:
+        description: 'Sustain duration in minutes. Up to 100 wallets should use 2m. 500 wallets and above should use 2m or 5m. 1000 wallets should use 5m'
+        type: choice
+        required: true
+        options:
+          - '5m'
+          - '2m'
+        
 
 jobs:
-  wallet-creation:
-    runs-on: ubuntu-latest
-    env:
-      PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Run k6 cloud test
-        uses: grafana/k6-action@v0.2.0
-        with:
-          filename: ./packages/e2e/test/k6/wallet-creation.test.js
-          flags: --vus 3 --duration 10s
-          cloud: true
-          token: ${{ secrets.K6_CLOUD_API_TOKEN }}
-
   wallet-restoration:
     runs-on: ubuntu-latest
-    env:
-      PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+      - name: Set target env url based on input
+        run: |
+          if [ "${{ github.event.inputs.target }}" = "dev-preprod" ]; then
+            echo "PROVIDER_SERVER_URL=https://dev-preprod.lw.iog.io" >> $GITHUB_ENV
+          elif [ "${{ github.event.inputs.target }}" = "dev-mainnet" ]; then
+            echo "PROVIDER_SERVER_URL=https://dev-mainnet.lw.iog.io" >> $GITHUB_ENV
+          fi
       - name: Run k6 cloud test
-        uses: grafana/k6-action@v0.2.0
+        uses: grafana/k6-action@v0.3.1
+        env:
+          K6_CLOUD_PROJECT_ID: ${{ secrets.K6_CLOUD_PROJECT_ID }}
         with:
-          filename: ./packages/e2e/test/k6/wallet-restoration.test.js
-          flags: --vus 3 --duration 10s
+          filename: ./packages/e2e/test/k6/scenarios/wallets.test.js
           cloud: true
           token: ${{ secrets.K6_CLOUD_API_TOKEN }}
+          flags: >
+            -e TARGET_ENV=${{ github.event.inputs.target }}
+            -e PROVIDER_SERVER_URL=$PROVIDER_SERVER_URL
+            -e RUN_MODE='RestoreHD'
+            -e MAX_VU=${{ github.event.inputs.wallet-count }}
+            -e RAMP_UP_DURATION=${{ github.event.inputs.rampup-duration }}
+            -e STEADY_STATE_DURATION=${{ github.event.inputs.sustain-duration }}
+            -e HD_ACTIVE_ADDR_COUNT=${{ github.event.inputs.hd-addr-per-wallet }}
+            -e HD_MAX_TX_HISTORY=${{ github.event.inputs.hd-tx-history-size-per-wallet }}

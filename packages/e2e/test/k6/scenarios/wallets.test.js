@@ -1,7 +1,9 @@
 /* eslint-disable no-console */
 /* eslint-disable func-style */
 import { Counter, Trend } from 'k6/metrics';
+import { SharedArray } from 'k6/data';
 import { check, sleep } from 'k6';
+import { apiVersion } from '../../../../cardano-services-client/src/version.ts';
 import http from 'k6/http';
 
 /**
@@ -34,20 +36,28 @@ const RunMode = {
   RestoreHD: 'RestoreHD'
 };
 /** Determines run mode: Restore or Onboard */
-const RUN_MODE = RunMode.Restore;
+const RUN_MODE = __ENV.RUN_MODE || RunMode.Restore;
 
 // eslint-disable-next-line no-undef
 const PROVIDER_SERVER_URL = __ENV.PROVIDER_SERVER_URL;
 
-/** URL of the JSON file containing the wallets */
-const WALLET_ADDRESSES_URL =
-  RUN_MODE === RunMode.Onboard
-    ? 'https://raw.githubusercontent.com/input-output-hk/cardano-js-sdk/master/packages/e2e/test/dump/addresses/no-history-mainnet.json'
-    : 'https://raw.githubusercontent.com/input-output-hk/cardano-js-sdk/master/packages/e2e/test/dump/addresses/mainnet.json';
+/** Wallet addresses extracted from the JSON dump file */
+const walletsOrig = new SharedArray('walletsData', function () {
+  const network = __ENV.TARGET_ENV == 'dev-mainnet' ? 'mainnet' : 'preprod';
+  const fileName = RUN_MODE === RunMode.Onboard ? `no-history-${network}.json` : `${network}.json`;
+  console.log(`Reading wallet addresses from ${fileName}`);
+  const walletAddresses = JSON.parse(open('../../dump/addresses/' + fileName));
+  return walletAddresses;
+});
 
-/** URL of the JSON file containing the stake pool addresses */
-const POOL_ADDRESSES_URL =
-  'https://raw.githubusercontent.com/input-output-hk/cardano-js-sdk/master/packages/e2e/test/dump/pool_addresses/mainnet.json';
+
+/** Stake pool addresses from the JSON dump file */
+const poolAddresses = new SharedArray('poolsData', function () {
+  // There is no dump of preprod pools, but it is ok. Pool address is used only in "Restore" mode
+  // and it is used to do a stake pool search call, so any pool will do
+  const pools = JSON.parse(open('../../dump/pool_addresses/mainnet.json'));
+  return pools;
+});
 
 /**
  * Define the maximum number of virtual users to simulate
@@ -55,12 +65,12 @@ const POOL_ADDRESSES_URL =
  * For this reason, it's a good practice to configure MAX_VUs in multiples of 100 in order to maintain the desired distribution.
  * In `RunMode.RestoreHD`, each VU will have multiple addresses.
  */
-const MAX_VU = 10;
+const MAX_VU = __ENV.MAX_VU || 1;
 
 /** Time span during which all virtual users are started in a linear fashion */
-const RAMP_UP_DURATION = '10s';
+const RAMP_UP_DURATION = __ENV.RAMP_UP_DURATION || '1s';
 /** Time span during which synced wallets do tip queries */
-const STEADY_STATE_DURATION = '20s';
+const STEADY_STATE_DURATION = __ENV.STEADY_STATE_DURATION || '2s';
 
 /** Time to sleep between iterations. Simulates polling tip to keep wallet in sync */
 const ITERATION_SLEEP = 5;
@@ -68,9 +78,9 @@ const ITERATION_SLEEP = 5;
 /** HD wallet discovery. Used when RunMode is `RestoreHD` */
 const hdWalletParams = {
   /** HD wallet size. The number of addresses with transaction history per wallet. They are queried at discover time. */
-  activeAddrCount: 10,
+  activeAddrCount: __ENV.HD_ACTIVE_ADDR_COUNT || 1,
   /** Use only addresses with a transaction history up to this value */
-  maxTxHistory: 100,
+  maxTxHistory: __ENV.HD_MAX_TX_HISTORY || 1,
   /** number of payment addresses to search for. It will search both internal and external address, thus multiplied by 2 */
   paymentAddrSearchGap: 20 * 2,
   /** number of stake keys to search for. It will search both internal and external address, thus multiplied by 2 */
@@ -95,10 +105,7 @@ const chunkArray = (array, chunkSize) => {
   return chunked;
 };
 
-/**
- * Grab the wallets json file to be used by the scenario.
- * Group the addresses per wallet (single address or HD wallets).
- */
+/** Grab the wallets json file to be used by the scenario. Group the addresses per wallet (single address or HD wallets). */
 export function setup() {
   console.log(`Running in ${RUN_MODE} mode`);
   console.log(`Ramp-up: ${RAMP_UP_DURATION}; Sustain: ${STEADY_STATE_DURATION}; Iteration sleep: ${ITERATION_SLEEP}s`);
@@ -107,12 +114,6 @@ export function setup() {
     console.log('HD wallet params are:', hdWalletParams);
   }
 
-  // This call will be part of the statistics. There is no way around it so far: https://github.com/grafana/k6/issues/1321
-  const res = http.batch([WALLET_ADDRESSES_URL, POOL_ADDRESSES_URL]);
-  check(res, { 'get wallets and pools files': (r) => r.every(({ status }) => status >= 200 && status < 300) });
-
-  const [{ body: resBodyWallets }, { body: resBodyPools }] = res;
-  const walletsOrig = JSON.parse(resBodyWallets);
   const walletsOrigCount = walletsOrig ? walletsOrig.length : 0;
   check(walletsOrigCount, {
     'At least one wallet is required to run the test': (count) => count > 0
@@ -138,7 +139,6 @@ export function setup() {
     );
   }
 
-  const poolAddresses = JSON.parse(resBodyPools);
   check(poolAddresses, {
     'At least one stake pool address is required to run the test': (p) => p && p.length > 0
   });
@@ -178,9 +178,9 @@ export const options = {
 };
 
 /** Util functions for sending the http post requests to cardano-sdk services */
-const cardanoHttpPost = (url, body = {}) => {
+const cardanoHttpPost = (url, apiVer, body = {}) => {
   const opts = { headers: { 'content-type': 'application/json' } };
-  return http.post(`${PROVIDER_SERVER_URL}/${url}`, JSON.stringify(body), opts);
+  return http.post(`${PROVIDER_SERVER_URL}/v${apiVer}/${url}`, JSON.stringify(body), opts);
 };
 
 /**
@@ -196,7 +196,7 @@ const txsByAddress = (addresses, takeOne = false, pageSize = 25) => {
     let txCount = 0;
 
     do {
-      const resp = cardanoHttpPost('chain-history/txs/by-addresses', {
+      const resp = cardanoHttpPost('chain-history/txs/by-addresses', apiVersion.chainHistory, {
         addresses: chunk,
         blockRange: { lowerBound: { __type: 'undefined' } },
         pagination: { limit: pageSize, startAt }
@@ -218,13 +218,14 @@ const txsByAddress = (addresses, takeOne = false, pageSize = 25) => {
 const utxosByAddresses = (addresses) => {
   const addressChunks = chunkArray(addresses, 25);
   for (const chunk of addressChunks) {
-    cardanoHttpPost('utxo/utxo-by-addresses', { addresses: chunk });
+    cardanoHttpPost('utxo/utxo-by-addresses', apiVersion.utxo, { addresses: chunk });
   }
 };
 
-const rewardsAccBalance = (rewardAccount) => cardanoHttpPost('rewards/account-balance', { rewardAccount });
+const rewardsAccBalance = (rewardAccount) =>
+  cardanoHttpPost('rewards/account-balance', apiVersion.rewards, { rewardAccount });
 const stakePoolSearch = (poolAddress) =>
-  cardanoHttpPost('stake-pool/search', {
+  cardanoHttpPost('stake-pool/search', apiVersion.stakePool, {
     filters: { identifier: { values: [{ id: poolAddress }] } },
     pagination: { limit: 1, startAt: 0 }
   });
@@ -240,10 +241,7 @@ const getDummyAddr = (addr, idx, suffix = 'mh') => {
   return addr.slice(0, -3) + updateChars;
 };
 
-/**
- * Simulate http requests normally done in discovery mode.
- * `wallet` MUST have at least 2 elements
- */
+/** Simulate http requests normally done in discovery mode. `wallet` MUST have at least 2 elements */
 const walletDiscovery = (wallet) => {
   check(wallet, {
     'At least one address is required to run HD wallet discovery mode': (walletArray) =>
@@ -284,22 +282,22 @@ const syncWallet = ({ wallet, poolAddress }) => {
     walletDiscovery(wallet);
   }
 
-  cardanoHttpPost('network-info/era-summaries');
-  cardanoHttpPost(TIP_URL);
+  cardanoHttpPost('network-info/era-summaries', apiVersion.networkInfo);
+  cardanoHttpPost(TIP_URL, apiVersion.networkInfo);
   txsByAddress(addresses);
   utxosByAddresses(addresses);
-  cardanoHttpPost('network-info/era-summaries');
-  cardanoHttpPost('network-info/genesis-parameters');
-  cardanoHttpPost('network-info/protocol-parameters');
+  cardanoHttpPost('network-info/era-summaries', apiVersion.networkInfo);
+  cardanoHttpPost('network-info/genesis-parameters', apiVersion.networkInfo);
+  cardanoHttpPost('network-info/protocol-parameters', apiVersion.networkInfo);
   // Test restoring HD wallets with a single stake key
   rewardsAccBalance(wallet[0].stake_address);
-  cardanoHttpPost(TIP_URL);
-  cardanoHttpPost('network-info/lovelace-supply');
-  cardanoHttpPost('network-info/stake');
+  cardanoHttpPost(TIP_URL, apiVersion.networkInfo);
+  cardanoHttpPost('network-info/lovelace-supply', apiVersion.networkInfo);
+  cardanoHttpPost('network-info/stake', apiVersion.networkInfo);
   if (RUN_MODE === RunMode.Restore) {
     stakePoolSearch(poolAddress);
   }
-  cardanoHttpPost('stake-pool/stats');
+  cardanoHttpPost('stake-pool/stats', apiVersion.stakePool);
 
   // Consider the wallet synced by tracking its first address
   syncedWallets.add(addresses[0]);
@@ -307,11 +305,8 @@ const syncWallet = ({ wallet, poolAddress }) => {
   walletSyncCount.add(1);
 };
 
-/**
- * Simulate keeping wallet in sync
- * For now, just polling the tip
- */
-const emulateIdleClient = () => cardanoHttpPost(TIP_URL);
+/** Simulate keeping wallet in sync For now, just polling the tip */
+const emulateIdleClient = () => cardanoHttpPost(TIP_URL, apiVersion.networkInfo);
 
 /**
  * K6 default VU action function
