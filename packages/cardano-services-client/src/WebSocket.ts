@@ -17,6 +17,8 @@ import { Observable, ReplaySubject, firstValueFrom } from 'rxjs';
 import { NJSON } from 'next-json';
 import WebSocket from 'isomorphic-ws';
 
+const NOT_CONNECTED_ID = 'not-connected';
+
 type WSStatus = 'connecting' | 'connected' | 'idle' | 'stop';
 
 export type WSHandler = (message: WSMessage) => void;
@@ -43,7 +45,7 @@ const isEventError = (error: unknown): error is { error: Error } =>
 
 export class CardanoWsClient {
   /** The client id, assigned by the server. */
-  clientId = 'not-connected';
+  clientId = NOT_CONNECTED_ID;
 
   /** The `Observable` form of `NetworkInfoProvider`. */
   networkInfo: {
@@ -125,7 +127,7 @@ export class CardanoWsClient {
 
     ws.onclose = () => {
       this.logger.info('WebSocket client connection closed', this.clientId);
-      this.clientId = 'not-connected';
+      this.clientId = NOT_CONNECTED_ID;
       this.retry();
     };
 

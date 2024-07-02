@@ -1,6 +1,13 @@
 // cSpell:ignore njson
 
-import { Cardano, CardanoNode, NetworkInfoResponses, WSMessage, createSlotEpochInfoCalc } from '@cardano-sdk/core';
+import {
+  Cardano,
+  CardanoNode,
+  NetworkInfoResponses,
+  Seconds,
+  WSMessage,
+  createSlotEpochInfoCalc
+} from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { NJSON } from 'next-json';
 import { Notification, Pool } from 'pg';
@@ -62,7 +69,7 @@ export class CardanoWsServer {
 
     // Attach the handlers to the servers events
 
-    this.wss.on('connection', this.createOnConnection((cfg.heartbeatTimeout || 60) * 1000));
+    this.wss.on('connection', this.createOnConnection(Seconds.toMilliseconds(Seconds(cfg.heartbeatTimeout || 60))));
 
     this.server.on('error', (error) => {
       this.logger.error(error, 'Async error from HTTP server');
@@ -75,7 +82,7 @@ export class CardanoWsServer {
     });
 
     // Init the server
-    this.init(cfg.port, (cfg.dbCacheTtl || 120) * 1000).catch((error) => {
+    this.init(cfg.port, Seconds.toMilliseconds(Seconds(cfg.dbCacheTtl || 120))).catch((error) => {
       this.logger.error(error, 'Error in init sequence');
       this.close();
     });

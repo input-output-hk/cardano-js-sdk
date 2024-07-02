@@ -99,7 +99,7 @@ export const withCommonOptions = (command: Command, apiUrl: URL) => {
     ),
     newOption(
       '--heartbeat-interval <heartbeatInterval>',
-      CommonOptionsDescriptions.HeartbeatTimeout,
+      CommonOptionsDescriptions.HeartbeatInterval,
       'HEARTBEAT_INTERVAL',
       integerValidator(CommonOptionsDescriptions.HeartbeatInterval)
     ),
