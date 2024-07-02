@@ -15,8 +15,8 @@ env:
   HANDLE_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4011/"}'
   STAKE_POOL_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/stake_pool'
   STAKE_POOL_TEST_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/stake_pool_test'
-  NETWORK_INFO_PROVIDER: 'http'
-  NETWORK_INFO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
+  NETWORK_INFO_PROVIDER: 'ws'
+  NETWORK_INFO_PROVIDER_PARAMS: '{"wsUrl":"http://localhost:4100/"}'
   OGMIOS_URL: 'ws://localhost:1340/'
   REWARDS_PROVIDER: 'http'
   REWARDS_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
@@ -26,6 +26,8 @@ env:
   UTXO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
   STAKE_POOL_PROVIDER: 'http'
   STAKE_POOL_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
+  USE_WEB_SOCKET_API: true
+  WEB_SOCKET_API_URL: ws://ws-server:3000/
 
 on:
   pull_request:

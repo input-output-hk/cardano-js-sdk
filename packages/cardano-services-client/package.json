@@ -9,6 +9,7 @@
   "module": "dist/esm/index.js",
   "exports": {
     ".": {
+      "development": "./src/index.ts",
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
     }
@@ -56,8 +57,11 @@
     "@cardano-sdk/util": "workspace:~",
     "axios": "^0.28.0",
     "class-validator": "^0.14.0",
+    "isomorphic-ws": "^5.0.0",
     "json-bigint": "~1.0.0",
-    "ts-log": "^2.2.4"
+    "next-json": "^0.3.2",
+    "ts-log": "^2.2.4",
+    "ws": "^8.17.1"
   },
   "files": [
     "dist/*",

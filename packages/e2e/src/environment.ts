@@ -57,23 +57,24 @@ const keyManagementParams = makeValidator((value) =>
   )
 );
 
-const providerParams = makeValidator((value) => {
-  const validated = baseValidator<ProviderParams>(value, {
-    properties: { baseUrl: { type: 'string' } },
-    required: ['baseUrl'],
-    type: 'object'
-  });
+const providerParams = (required = ['baseUrl']) =>
+  makeValidator((value) => {
+    const validated = baseValidator<ProviderParams>(value, {
+      properties: { baseUrl: { type: 'string' }, wsUrl: { type: 'string' } },
+      required,
+      type: 'object'
+    });
 
-  try {
-    // eslint-disable-next-line no-new
-    new URL(validated.baseUrl);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    throw new Error(`baseUrl: ${error.message}`);
-  }
+    try {
+      // eslint-disable-next-line no-new
+      if (required.includes('baseUrl')) new URL(validated.baseUrl);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      throw new Error(`baseUrl: ${error.message}`);
+    }
 
-  return validated;
-});
+    return validated;
+  })();
 
 /** Shared across all tests */
 const validators = {
@@ -90,7 +91,7 @@ const validators = {
   KEY_MANAGEMENT_PROVIDER: str(),
   LOGGER_MIN_SEVERITY: str({ default: 'info' }),
   NETWORK_INFO_PROVIDER: str(),
-  NETWORK_INFO_PROVIDER_PARAMS: providerParams(),
+  NETWORK_INFO_PROVIDER_PARAMS: providerParams(['wsUrl']),
   NETWORK_SPEED: str({ choices: ['fast', 'slow'], default: 'fast' }),
   OGMIOS_URL: str(),
   REWARDS_PROVIDER: str(),

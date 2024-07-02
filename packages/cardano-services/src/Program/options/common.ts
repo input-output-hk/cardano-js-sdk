@@ -22,8 +22,6 @@ import {
 import { loggerMethodNames } from '@cardano-sdk/util';
 
 export const DEFAULT_HEALTH_CHECK_CACHE_TTL = Seconds(5);
-export const DISABLE_DB_CACHE_DEFAULT = false;
-export const ENABLE_METRICS_DEFAULT = false;
 export const LAST_ROS_EPOCHS_DEFAULT = 10;
 
 export enum CommonOptionsDescriptions {
@@ -33,11 +31,14 @@ export enum CommonOptionsDescriptions {
   DbCacheTtl = 'Cache TTL in seconds between 60 and 172800 (two days), an option for database related operations',
   DisableDbCache = 'Disable DB cache',
   DumpOnly = 'Dumps the input arguments and exits. Used for tests',
+  HeartbeatInterval = 'WebSocket client heartbeat interval in seconds',
+  HeartbeatTimeout = 'WebSocket client heartbeat timeout in seconds',
   EnableMetrics = 'Enable Prometheus Metrics',
   LastRosEpochs = 'Number of epochs over which lastRos is computed',
   LoggerMinSeverity = 'Log level',
   ServiceDiscoveryBackoffFactor = 'Exponential backoff factor for service discovery',
-  ServiceDiscoveryTimeout = 'Timeout for service discovery attempts'
+  ServiceDiscoveryTimeout = 'Timeout for service discovery attempts',
+  WebSocketApiUrl = 'WebSocket API server URL'
 }
 
 export type CommonProgramOptions = {
@@ -48,10 +49,13 @@ export type CommonProgramOptions = {
   disableDbCache?: boolean;
   dumpOnly?: boolean;
   enableMetrics?: boolean;
+  heartbeatInterval?: number;
+  heartbeatTimeout?: number;
   lastRosEpochs?: number;
   loggerMinSeverity?: LogLevel;
   serviceDiscoveryBackoffFactor?: number;
   serviceDiscoveryTimeout?: number;
+  webSocketApiUrl?: URL;
 } & { [k in keyof typeof ServiceNames as `${Uncapitalize<k>}ProviderUrl`]?: string };
 
 export const withCommonOptions = (command: Command, apiUrl: URL) => {
@@ -81,8 +85,7 @@ export const withCommonOptions = (command: Command, apiUrl: URL) => {
       CommonOptionsDescriptions.DisableDbCache,
       'DISABLE_DB_CACHE',
       (disableDbCache) =>
-        stringOptionToBoolean(disableDbCache, Programs.ProviderServer, CommonOptionsDescriptions.DisableDbCache),
-      DISABLE_DB_CACHE_DEFAULT
+        stringOptionToBoolean(disableDbCache, Programs.ProviderServer, CommonOptionsDescriptions.DisableDbCache)
     ),
     newOption('--dump-only <true/false>', CommonOptionsDescriptions.DumpOnly, 'DUMP_ONLY', (dumpOnly) =>
       stringOptionToBoolean(dumpOnly, Programs.ProviderServer, CommonOptionsDescriptions.DumpOnly)
@@ -92,8 +95,19 @@ export const withCommonOptions = (command: Command, apiUrl: URL) => {
       CommonOptionsDescriptions.EnableMetrics,
       'ENABLE_METRICS',
       (enableMetrics) =>
-        stringOptionToBoolean(enableMetrics, Programs.ProviderServer, CommonOptionsDescriptions.EnableMetrics),
-      ENABLE_METRICS_DEFAULT
+        stringOptionToBoolean(enableMetrics, Programs.ProviderServer, CommonOptionsDescriptions.EnableMetrics)
+    ),
+    newOption(
+      '--heartbeat-interval <heartbeatInterval>',
+      CommonOptionsDescriptions.HeartbeatInterval,
+      'HEARTBEAT_INTERVAL',
+      integerValidator(CommonOptionsDescriptions.HeartbeatInterval)
+    ),
+    newOption(
+      '--heartbeat-timeout <heartbeatTimeout>',
+      CommonOptionsDescriptions.HeartbeatTimeout,
+      'HEARTBEAT_TIMEOUT',
+      integerValidator(CommonOptionsDescriptions.HeartbeatTimeout)
     ),
     newOption(
       '--last-ros-epochs <lastRosEpochs>',
@@ -125,6 +139,12 @@ export const withCommonOptions = (command: Command, apiUrl: URL) => {
       'SERVICE_DISCOVERY_TIMEOUT',
       integerValidator(CommonOptionsDescriptions.ServiceDiscoveryTimeout),
       SERVICE_DISCOVERY_TIMEOUT_DEFAULT
+    ),
+    newOption(
+      '--web-socket-api-url <webSocketApiUrl>',
+      CommonOptionsDescriptions.WebSocketApiUrl,
+      'WEB_SOCKET_API_URL',
+      urlValidator(CommonOptionsDescriptions.WebSocketApiUrl)
     )
   ]);
 

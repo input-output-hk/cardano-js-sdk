@@ -8,17 +8,17 @@ import { StakePoolEntity } from './StakePool.entity';
 export class PoolMetadataEntity {
   @PrimaryGeneratedColumn()
   id?: number;
-  @Column()
+  @Column('varchar')
   @Index()
   ticker?: string;
-  @Column()
+  @Column('varchar')
   @Index()
   name?: string;
-  @Column()
+  @Column('varchar')
   description?: string;
-  @Column()
+  @Column('varchar')
   homepage?: string;
-  @Column()
+  @Column('varchar')
   hash?: string;
   @Column('jsonb', { nullable: true })
   ext?: Cardano.ExtendedStakePoolMetadata | null;

@@ -14,11 +14,11 @@ export enum NftMetadataType {
 export class NftMetadataEntity {
   @PrimaryGeneratedColumn()
   id?: number;
-  @Column({ transformer: sanitizeNullCharacters })
+  @Column('varchar', { transformer: sanitizeNullCharacters })
   name?: string;
   @Column({ nullable: true, transformer: sanitizeNullCharacters, type: 'varchar' })
   description?: string | null;
-  @Column({ transformer: sanitizeNullCharacters })
+  @Column('varchar', { transformer: sanitizeNullCharacters })
   image?: Asset.Uri;
   @Column({ nullable: true, transformer: sanitizeNullCharacters, type: 'varchar' })
   mediaType?: string | null;
