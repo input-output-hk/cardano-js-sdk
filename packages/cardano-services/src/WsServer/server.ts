@@ -1,16 +1,19 @@
 // cSpell:ignore njson
 
-import { Cardano, WSMessage } from '@cardano-sdk/core';
-import { HandleRequestOptions, handleRequest } from './requests';
+import { Cardano, CardanoNode, NetworkInfoResponses, WSMessage, createSlotEpochInfoCalc } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { NJSON } from 'next-json';
 import { Notification, Pool } from 'pg';
 import { Server, createServer } from 'http';
 import { WebSocket, WebSocketServer } from 'ws';
+import { getLovelaceSupply, getProtocolParameters, getStake } from './requests';
 import { initDB } from './db';
 import { v4 } from 'uuid';
 
 export interface WsServerConfiguration {
+  /** The cache time to live in seconds. */
+  dbCacheTtl: number;
+
   /** The heartbeat timeout in seconds. */
   heartbeatTimeout?: number;
 
@@ -18,7 +21,16 @@ export interface WsServerConfiguration {
   port: number;
 }
 
-export interface WsServerDependencies extends HandleRequestOptions {
+export interface WsServerDependencies {
+  /** The `CardanoNode` object. */
+  cardanoNode: CardanoNode;
+
+  /** The PostgreSQL Pool. */
+  db: Pool;
+
+  /** The `GenesisData` object */
+  genesis: Cardano.CompactGenesis;
+
   /** The logger. */
   logger: Logger;
 }
@@ -27,18 +39,22 @@ export interface WsServerDependencies extends HandleRequestOptions {
 const noop = () => {};
 
 export class CardanoWsServer {
-  private closeNotify: () => void;
+  private cardanoNode: CardanoNode;
+  private closeNotify = noop;
   private closing = false;
   private db: Pool;
+  private lastSlot: Cardano.Slot;
   private logger: Logger;
+  private networkInfo: NetworkInfoResponses;
   private notifyConnected = false;
   private server: Server;
-  private tip: Cardano.Tip;
   private wss: WebSocketServer;
 
   constructor(dependencies: WsServerDependencies, cfg: WsServerConfiguration) {
+    this.cardanoNode = dependencies.cardanoNode;
     this.db = dependencies.db;
     this.logger = dependencies.logger;
+    this.networkInfo = { genesisParameters: dependencies.genesis } as NetworkInfoResponses;
 
     // Create the HTTP and the WebSocket servers
     this.server = this.createHttpServer();
@@ -46,7 +62,7 @@ export class CardanoWsServer {
 
     // Attach the handlers to the servers events
 
-    this.wss.on('connection', this.createOnConnection(dependencies, (cfg.heartbeatTimeout || 60) * 1000));
+    this.wss.on('connection', this.createOnConnection((cfg.heartbeatTimeout || 60) * 1000));
 
     this.server.on('error', (error) => {
       this.logger.error(error, 'Async error from HTTP server');
@@ -59,7 +75,7 @@ export class CardanoWsServer {
     });
 
     // Init the server
-    this.init(cfg.port).catch((error) => {
+    this.init(cfg.port, (cfg.dbCacheTtl || 120) * 1000).catch((error) => {
       this.logger.error(error, 'Error in init sequence');
       this.close();
     });
@@ -102,23 +118,32 @@ export class CardanoWsServer {
   private createOnNotification() {
     // This is the entry point for a new NOTIFY event from the DB; i.e. each time a new record is inserted in the block table
     return (msg: Notification) => {
-      try {
+      (async () => {
         const { payload } = msg;
 
         if (!payload) throw new Error('Missing payload in NOTIFY');
 
         // The payload of the NOTIFY event contain the tip in the correct format
-        this.tip = JSON.parse(payload);
-      } catch (error) {
-        return this.logger.error(error, 'Error while handling tip notification');
-      }
+        this.networkInfo.ledgerTip = JSON.parse(payload);
 
-      const message: WSMessage = { tip: this.tip };
+        const message: WSMessage = { networkInfo: { ledgerTip: this.networkInfo.ledgerTip } };
 
-      // Create only once a stringified version of a message with the new tip
-      const stringMessage = JSON.stringify(message);
-      // Propagate the new tip to all the connected clients
-      for (const ws of this.wss.clients.values()) ws.send(stringMessage);
+        if (this.networkInfo.ledgerTip.slot > this.lastSlot) {
+          await this.onEpochRollover();
+
+          message.networkInfo!.eraSummaries = this.networkInfo.eraSummaries;
+          message.networkInfo!.lovelaceSupply = this.networkInfo.lovelaceSupply;
+          message.networkInfo!.protocolParameters = this.networkInfo.protocolParameters;
+        }
+
+        // Create only once a stringified version of a message with the new tip
+        const stringMessage = NJSON.stringify(message);
+        // Propagate the new tip to all the connected clients
+        for (const ws of this.wss.clients.values()) ws.send(stringMessage);
+      })().catch((error) => {
+        this.logger.error(error, 'Error while handling tip notification');
+        this.closeNotify();
+      });
     };
   }
 
@@ -186,27 +211,44 @@ export class CardanoWsServer {
     addListener();
   }
 
-  private async init(port: number) {
-    const { db, logger, server } = this;
+  private async init(port: number, dbCacheTtl: number) {
+    const { cardanoNode, db, logger, networkInfo, server, wss } = this;
 
-    this.tip = await initDB(db, logger);
+    const refreshStake = async () => {
+      const stake = await getStake(cardanoNode, db);
+
+      networkInfo.stake = stake;
+
+      const stringMessage = NJSON.stringify({ networkInfo: { stake } });
+      for (const ws of wss.clients.values()) ws.send(stringMessage);
+    };
+
+    networkInfo.ledgerTip = await initDB(db, logger);
+    await Promise.all([this.onEpochRollover(), refreshStake()]);
+
+    setInterval(
+      () =>
+        refreshStake().catch((error) => {
+          logger.error(error, 'Error while refreshing stake');
+          this.close();
+        }),
+      dbCacheTtl
+    ).unref();
 
     server.listen(port, () => logger.info('WebSocket server ready and listening'));
     this.listenNotify();
   }
 
-  private createOnConnection(dependencies: WsServerDependencies, heartbeatTimeout: number) {
-    const { logger } = this;
+  private createOnConnection(heartbeatTimeout: number) {
+    const { logger, networkInfo } = this;
 
     // This is the entry point for each new WebSocket connection
     return (ws: WebSocket) => {
       const clientId = v4();
-      const { tip } = this;
-      const stringMessage = JSON.stringify({ clientId, tip });
+      const stringMessage = NJSON.stringify({ clientId, networkInfo });
       let timeout: NodeJS.Timeout;
 
       // Create some wrappers for the logger
-      const logDebug = (msg: string) => logger.debug({ clientId }, msg);
       const logInfo = (msg: string) => logger.info({ clientId }, msg);
       const logError = (error: Error, msg: string) => {
         logger.error({ clientId }, msg);
@@ -248,31 +290,23 @@ export class CardanoWsServer {
             new Error('Not a Buffer'),
             `Unexpected data from WebSocket connection ${NJSON.stringify(data)}`
           );
-
-        // Parse the message
-        const message = NJSON.parse<WSMessage>(data.toString());
-        const { messageId: responseTo, request } = message;
-        // Prepare the function to send the response
-        const send = (msg: WSMessage) => ws.send(NJSON.stringify({ ...msg, responseTo }));
-
-        logDebug(request ? `Got request ${responseTo} ${NJSON.stringify(request)}` : 'Got heartbeat');
-
-        if (request)
-          // If the message contains a request, handle it
-          handleRequest(dependencies, request)
-            .then((response) => {
-              logDebug(`Sending response ${responseTo} ${NJSON.stringify(response)}`);
-              send({ response });
-            })
-            .catch((error) => {
-              logError(error, `Error while handling request ${NJSON.stringify(request)}`);
-              send({ error });
-            });
       });
 
       // Actually set the timeout for the first time
       refreshTimeout();
       ws.send(stringMessage);
     };
+  }
+
+  private async onEpochRollover() {
+    const { cardanoNode, db, networkInfo } = this;
+
+    [networkInfo.eraSummaries, networkInfo.lovelaceSupply, networkInfo.protocolParameters] = await Promise.all([
+      cardanoNode.eraSummaries(),
+      getLovelaceSupply(db, networkInfo.genesisParameters.maxLovelaceSupply),
+      getProtocolParameters(db)
+    ]);
+
+    this.lastSlot = createSlotEpochInfoCalc(networkInfo.eraSummaries)(networkInfo.ledgerTip.slot).lastSlot.slot;
   }
 }

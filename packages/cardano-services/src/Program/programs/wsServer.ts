@@ -5,7 +5,6 @@ import {
   OgmiosProgramOptions,
   PosgresProgramOptions
 } from '../options';
-import { InMemoryCache, NoCache } from '../../InMemoryCache';
 import { MissingProgramOption } from '../errors';
 import { OgmiosCardanoNode, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import { createDnsResolver } from '../utils';
@@ -17,7 +16,7 @@ import { toGenesisParams } from '../../NetworkInfo/DbSyncNetworkInfoProvider/map
 export type WsServerArgs = CommonProgramOptions & PosgresProgramOptions<'DbSync'> & OgmiosProgramOptions;
 
 export const loadWsServer = (args: WsServerArgs) => {
-  const { apiUrl, dbCacheTtl, disableDbCache, heartbeatTimeout, loggerMinSeverity, ogmiosUrl } = args;
+  const { apiUrl, dbCacheTtl, heartbeatTimeout, loggerMinSeverity, ogmiosUrl } = args;
   const { cardanoNodeConfigPath, serviceDiscoveryBackoffFactor: factor, serviceDiscoveryTimeout: maxRetryTime } = args;
 
   const logger = createLogger({ level: loggerMinSeverity, name: 'ws-server' });
@@ -28,7 +27,6 @@ export const loadWsServer = (args: WsServerArgs) => {
     throw new MissingProgramOption('WebSocketServer', CommonOptionsDescriptions.CardanoNodeConfigPath);
 
   (async () => {
-    const cache = disableDbCache ? new NoCache() : new InMemoryCache(dbCacheTtl);
     const cardanoNode = new OgmiosCardanoNode(urlToConnectionConfig(ogmiosUrl), logger);
     const dnsResolver = createDnsResolver({ factor, maxRetryTime }, logger);
     const db = await getPool(dnsResolver, logger, args);
@@ -41,7 +39,7 @@ export const loadWsServer = (args: WsServerArgs) => {
     await cardanoNode.initialize();
     await cardanoNode.start();
 
-    const server = new CardanoWsServer({ cache, cardanoNode, db, genesis, logger }, { heartbeatTimeout, port });
+    const server = new CardanoWsServer({ cardanoNode, db, genesis, logger }, { dbCacheTtl, heartbeatTimeout, port });
 
     let shuttingDown = false;
     const shutDown = (signal: string) => {

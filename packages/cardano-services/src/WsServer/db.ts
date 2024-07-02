@@ -28,13 +28,13 @@ FOR EACH ROW EXECUTE PROCEDURE sdk_notify_tip();`;
 export const initDB = async (db: Pool, logger: Logger) => {
   logger.info('Initializing the DB...');
 
-  // Wait for a block .i.e the schema is ready
-  let blocks: number;
+  // Wait for an epoch .i.e the schema is ready
+  let epochs: number;
   do {
-    logger.debug('Checking for latest block...');
-    const { rows } = await db.query<{ blocks: number }>('SELECT COUNT(*) AS blocks FROM block');
-    blocks = rows[0].blocks;
-  } while (blocks === 0);
+    logger.debug('Checking for an epoch...');
+    const { rows } = await db.query<{ epochs: number }>('SELECT COUNT(*) AS epochs FROM epoch');
+    epochs = rows[0].epochs;
+  } while (epochs < 2);
 
   logger.debug('Checking for sdk_notify_tip stored procedure...');
   const procedure = await db.query<{ prosrc: string }>("SELECT prosrc FROM pg_proc WHERE proname = 'sdk_notify_tip'");

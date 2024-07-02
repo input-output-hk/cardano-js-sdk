@@ -135,7 +135,7 @@ networkInfoProviderFactory.register(WS_PROVIDER, (params: any, logger: Logger): 
 
   const wsClient = new CardanoWsClient({ logger }, { url: params.wsUrl });
 
-  return Promise.resolve(wsClient.networkInfo);
+  return Promise.resolve(wsClient.networkInfoProvider);
 });
 
 rewardsProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<RewardsProvider> => {

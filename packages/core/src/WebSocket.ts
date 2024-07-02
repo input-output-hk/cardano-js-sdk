@@ -1,28 +1,17 @@
-import * as Cardano from './Cardano';
 import { NetworkInfoProvider } from './Provider';
 
 export type AsyncReturnType<F extends () => unknown> = F extends () => Promise<infer R> ? R : never;
 
-export type RequestMethods = Exclude<keyof NetworkInfoProvider, 'healthCheck' | 'ledgerTip'>;
+export type NetworkInfoMethods = Exclude<keyof NetworkInfoProvider, 'healthCheck'>;
+export type NetworkInfoResponses = { [m in NetworkInfoMethods]: AsyncReturnType<NetworkInfoProvider[m]> };
 
 export interface WSMessage {
   /** The client id assigned by the server. */
   clientId?: string;
 
+  /** The error occurred server side. */
   error?: Error;
 
-  /** If present, this message is in response to request with the same `messageId`. */
-  responseTo?: number;
-
-  /** Progressive message id from the client. */
-  messageId?: number;
-
-  request?: { [k in RequestMethods]?: Parameters<NetworkInfoProvider[k]> };
-
-  response?: { [k in RequestMethods]?: AsyncReturnType<NetworkInfoProvider[k]> };
-
-  /** Latest known tip. */
-  tip?: Cardano.Tip;
+  /** Latest value(s) for the `NetworkInfoProvider` methods.*/
+  networkInfo?: Partial<NetworkInfoResponses>;
 }
-
-export type WSRequest = Exclude<WSMessage['request'], undefined>;

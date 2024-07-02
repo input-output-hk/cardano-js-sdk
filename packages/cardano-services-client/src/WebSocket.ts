@@ -1,7 +1,16 @@
 /* eslint-disable unicorn/prefer-add-event-listener */
 // cSpell:ignore njson
 
-import { AsyncReturnType, Cardano, NetworkInfoProvider, RequestMethods, WSMessage } from '@cardano-sdk/core';
+import {
+  AsyncReturnType,
+  Cardano,
+  EraSummary,
+  NetworkInfoMethods,
+  NetworkInfoProvider,
+  StakeSummary,
+  SupplySummary,
+  WSMessage
+} from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { Observable, ReplaySubject, firstValueFrom } from 'rxjs';
 
@@ -11,7 +20,6 @@ import WebSocket from 'isomorphic-ws';
 type WSStatus = 'connecting' | 'connected' | 'idle' | 'stop';
 
 export type WSHandler = (message: WSMessage) => void;
-type WSPerform = () => boolean;
 
 export interface WsClientConfiguration {
   /** The interval in seconds between two heartbeat messages. Default 55". */
@@ -37,41 +45,49 @@ export class CardanoWsClient {
   /** The client id, assigned by the server. */
   clientId = 'not-connected';
 
+  /** The `Observable` form of `NetworkInfoProvider`. */
+  networkInfo: {
+    [m in NetworkInfoMethods]: Observable<AsyncReturnType<NetworkInfoProvider[m]>>;
+  };
+
   /** WebSocket based `NetworkInfoProvider` implementation. */
-  networkInfo: NetworkInfoProvider;
+  networkInfoProvider: NetworkInfoProvider;
 
-  /** Emits the tip. */
-  tip$: Observable<Cardano.Tip>;
-
-  private handlers = new Map<number, WSHandler>();
   private heartbeatInterval: number;
   private heartbeatTimeout: NodeJS.Timeout;
   private logger: Logger;
-  private messageId = 0;
-  private pending = new Map<number, WSPerform>();
-  private requestId = 0;
-  private requestTimeout: number;
   private status: WSStatus = 'idle';
-  private tipSubject$ = new ReplaySubject<Cardano.Tip>(1);
   private url: URL;
   private ws: WebSocket;
+
+  private networkInfoSubjects = {} as {
+    [m in NetworkInfoMethods]: ReplaySubject<AsyncReturnType<NetworkInfoProvider[m]>>;
+  };
 
   constructor(deps: WsClientDependencies, cfg: WsClientConfiguration) {
     this.heartbeatInterval = (cfg.heartbeatInterval || 55) * 1000;
     this.logger = deps.logger;
-    this.requestTimeout = (cfg.requestTimeout || 60) * 1000;
     this.url = cfg.url;
 
-    this.networkInfo = {
-      eraSummaries: this.createProviderMethod('eraSummaries'),
-      genesisParameters: this.createProviderMethod('genesisParameters'),
-      healthCheck: () => Promise.resolve({ ok: this.status === 'connected' }),
-      ledgerTip: () => firstValueFrom(this.tipSubject$),
-      lovelaceSupply: this.createProviderMethod('lovelaceSupply'),
-      protocolParameters: this.createProviderMethod('protocolParameters'),
-      stake: this.createProviderMethod('stake')
+    this.networkInfoSubjects = {
+      eraSummaries: new ReplaySubject<EraSummary[]>(1),
+      genesisParameters: new ReplaySubject<Cardano.CompactGenesis>(1),
+      ledgerTip: new ReplaySubject<Cardano.Tip>(1),
+      lovelaceSupply: new ReplaySubject<SupplySummary>(1),
+      protocolParameters: new ReplaySubject<Cardano.ProtocolParameters>(1),
+      stake: new ReplaySubject<StakeSummary>(1)
     };
-    this.tip$ = this.tipSubject$;
+    this.networkInfo = this.networkInfoSubjects;
+
+    this.networkInfoProvider = {
+      eraSummaries: () => firstValueFrom(this.networkInfo.eraSummaries),
+      genesisParameters: () => firstValueFrom(this.networkInfo.genesisParameters),
+      healthCheck: () => Promise.resolve({ ok: this.status === 'connected' }),
+      ledgerTip: () => firstValueFrom(this.networkInfo.ledgerTip),
+      lovelaceSupply: () => firstValueFrom(this.networkInfo.lovelaceSupply),
+      protocolParameters: () => firstValueFrom(this.networkInfo.protocolParameters),
+      stake: () => firstValueFrom(this.networkInfo.stake)
+    };
 
     this.connect();
   }
@@ -81,21 +97,26 @@ export class CardanoWsClient {
 
     const ws = new WebSocket(this.url);
 
+    // eslint-disable-next-line sonarjs/cognitive-complexity
     ws.onmessage = (event) => {
       try {
         if (typeof event.data !== 'string') throw new Error('Unexpected data from WebSocket ');
 
         const message = NJSON.parse<WSMessage>(event.data);
-        const { clientId, responseTo, tip } = message;
+        const { clientId, networkInfo } = message;
 
         if (clientId) this.logger.info(`Connected with clientId ${(this.clientId = clientId)}`);
-        if (tip) this.tipSubject$.next(tip);
 
-        if (responseTo) {
-          const handler = this.handlers.get(responseTo);
+        if (networkInfo) {
+          const { eraSummaries, genesisParameters, ledgerTip, lovelaceSupply, protocolParameters, stake } = networkInfo;
 
-          this.handlers.delete(responseTo);
-          if (handler) handler(message);
+          if (eraSummaries) this.networkInfoSubjects.eraSummaries.next(eraSummaries);
+          if (genesisParameters) this.networkInfoSubjects.genesisParameters.next(genesisParameters);
+          if (lovelaceSupply) this.networkInfoSubjects.lovelaceSupply.next(lovelaceSupply);
+          if (protocolParameters) this.networkInfoSubjects.protocolParameters.next(protocolParameters);
+          if (stake) this.networkInfoSubjects.stake.next(stake);
+          // Emit ledgerTip as last one
+          if (ledgerTip) this.networkInfoSubjects.ledgerTip.next(ledgerTip);
         }
       } catch (error) {
         this.logger.error(error, 'While parsing message', event.data, this.clientId);
@@ -117,52 +138,6 @@ export class CardanoWsClient {
       this.status = 'connected';
       this.ws = ws;
       this.heartbeat();
-
-      for (const request of this.pending.values()) request();
-    };
-  }
-
-  private createProviderMethod<M extends RequestMethods>(method: M) {
-    // eslint-disable-next-line sonarjs/cognitive-complexity
-    return (...args: Parameters<NetworkInfoProvider[M]>) => {
-      this.logger.debug(`Requesting ${method}: ${NJSON.stringify(args)}`);
-
-      return new Promise<AsyncReturnType<NetworkInfoProvider[M]>>((resolve, reject) => {
-        const requestId = ++this.requestId;
-
-        let timedOut = false;
-        const timeout = setTimeout(() => {
-          timedOut = true;
-          this.pending.delete(requestId);
-          reject(new Error('Request timeout'));
-        }, this.requestTimeout);
-
-        timeout.unref();
-
-        const perform = () =>
-          this.request({ request: { [method]: args } }, (message) => {
-            if (timedOut) return;
-            clearTimeout(timeout);
-            this.pending.delete(requestId);
-
-            this.logger.debug(`Responding to ${method}: ${NJSON.stringify(message)}`);
-
-            const { error, response } = message;
-
-            if (error) return reject(error);
-            if (!response) return reject(new Error('Missing "response" attribute from WebSocket response'));
-
-            const methodResponse = response[method];
-
-            if (!methodResponse)
-              return reject(new Error(`Missing "response.${method}" attribute from WebSocket response`));
-
-            resolve(methodResponse);
-          });
-
-        this.pending.set(requestId, perform);
-        perform();
-      });
     };
   }
 
@@ -182,6 +157,8 @@ export class CardanoWsClient {
 
   /** Closes the WebSocket connection. */
   close() {
+    if (this.heartbeatTimeout) clearInterval(this.heartbeatTimeout);
+
     this.status = 'stop';
     this.ws.close();
   }
@@ -190,18 +167,13 @@ export class CardanoWsClient {
    * Sends a request through WS to server.
    *
    * @param request the request.
-   * @param handler the response handles.
    * @returns `true` is sent, otherwise `false`.
    */
-  request(request: WSMessage, handler?: WSHandler) {
+  request(request: WSMessage) {
     if (this.status !== 'connected') return false;
 
-    const messageId = ++this.messageId;
-
-    this.ws!.send(NJSON.stringify({ ...request, messageId }));
+    this.ws!.send(NJSON.stringify(request));
     this.heartbeat();
-
-    if (handler) this.handlers.set(messageId, handler);
 
     return true;
   }

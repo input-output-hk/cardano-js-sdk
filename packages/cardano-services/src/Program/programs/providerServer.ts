@@ -146,7 +146,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
   });
 
   const getNetworkInfoProvider = (cardanoNode: CardanoNode, dbPools: DbPools) => {
-    if (args.useWebSocketApi) return getWebSocketClient().networkInfo;
+    if (args.useWebSocketApi) return getWebSocketClient().networkInfoProvider;
 
     if (!genesisData)
       throw new MissingProgramOption(ServiceNames.NetworkInfo, CommonOptionsDescriptions.CardanoNodeConfigPath);
