@@ -88,7 +88,7 @@ WORKDIR /app/packages/cardano-services
 COPY packages/cardano-services/config/network/${NETWORK} /config/
 EXPOSE 3000
 HEALTHCHECK --interval=15s --timeout=15s \
-  CMD curl --fail --silent -H 'Origin: http://0.0.0.0:3000' http://0.0.0.0:3000/health | jq '.ok' | awk '{ if ($0 == "true") exit 0; else exit 1}'
+  CMD curl --fail --silent -H 'Origin: http://0.0.0.0:3000' http://0.0.0.0:3000/v1.0.0/health | jq '.ok' | awk '{ if ($0 == "true") exit 0; else exit 1}' || exit 1
 CMD ["node", "dist/cjs/cli.js", "start-provider-server"]
 
 FROM cardano-services as worker
@@ -112,12 +112,12 @@ WORKDIR /config
 COPY compose/schedules.json .
 ENV SCHEDULES=/config/schedules.json
 WORKDIR /app/packages/cardano-services
-HEALTHCHECK CMD curl -s --fail http://localhost:3003/v1.0.0/health
+HEALTHCHECK CMD curl --fail --silent http://localhost:3003/v1.0.0/health
 CMD ["node", "dist/cjs/cli.js", "start-pg-boss-worker"]
 
 FROM cardano-services as projector
 WORKDIR /
 COPY compose/projector/init.* ./
 RUN chmod 755 init.sh
-HEALTHCHECK CMD test `curl -fs http://localhost:3000/v1.0.0/health | jq -r ".services[0].projectedTip.blockNo"` -gt 1
+HEALTHCHECK CMD test `curl --fail --silent http://localhost:3000/v1.0.0/health | jq -r ".services[0].projectedTip.blockNo"` -gt 1
 CMD ["./init.sh"]
