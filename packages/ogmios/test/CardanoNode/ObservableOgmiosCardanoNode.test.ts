@@ -69,13 +69,22 @@ describe('ObservableOgmiosCardanoNode', () => {
     } = require('@cardano-ogmios/client'));
     ledgerStateQueryClient = {
       eraSummaries: jest.fn() as MockedLedgerStateQueryClient['eraSummaries'],
-      genesisConfiguration: jest.fn() as MockedLedgerStateQueryClient['genesisConfiguration']
+      genesisConfiguration: jest.fn() as MockedLedgerStateQueryClient['genesisConfiguration'],
+      liveStakeDistribution: jest.fn() as MockedLedgerStateQueryClient['liveStakeDistribution'],
+      networkStartTime: jest.fn() as MockedLedgerStateQueryClient['networkStartTime']
     } as MockedLedgerStateQueryClient;
     createLedgerStateQueryClient.mockResolvedValue(ledgerStateQueryClient);
     chainSynchronization.findIntersection = jest.fn();
     chainSynchronization.nextBlock = jest.fn();
     ledgerStateQueryClient.eraSummaries.mockResolvedValue(ogmiosEraSummaries);
     ledgerStateQueryClient.genesisConfiguration.mockResolvedValue(mockGenesisShelley as any);
+    ledgerStateQueryClient.networkStartTime.mockResolvedValue(new Date(mockGenesisShelley.startTime));
+    ledgerStateQueryClient.liveStakeDistribution.mockResolvedValue({
+      pool1cjm567pd9eqj7wlpuq2mnsasw2upewq0tchg4n8gktq5k7eepvr: {
+        stake: '1/100',
+        vrf: '4e4a2e82dc455449bf5f1f6d249470963cf97389b5dc4d2118fe21625f50f518'
+      }
+    });
     chainSynchronization.findIntersection.mockResolvedValue({
       intersection: {
         id: generateRandomHexString(64),
@@ -141,6 +150,36 @@ describe('ObservableOgmiosCardanoNode', () => {
       const eraSummaries = await firstValueFrom(node.eraSummaries$);
       expect(eraSummaries[0].parameters.epochLength).toEqual(ogmiosEraSummaries[0].parameters.epochLength);
       expect(ledgerStateQueryClient.genesisConfiguration).toBeCalledTimes(3);
+    });
+
+    it('systemStart$ keeps polling until query is available', async () => {
+      ledgerStateQueryClient.networkStartTime
+        .mockRejectedValueOnce(new StateQueryError(StateQueryErrorCode.UnavailableInCurrentEra, null, ''))
+        .mockRejectedValueOnce(new StateQueryError(StateQueryErrorCode.UnavailableInCurrentEra, null, ''));
+      const node = new OgmiosObservableCardanoNode(
+        { connectionConfig$: of(connection), localStateQueryRetryConfig: { initialInterval: 1 } },
+        { logger }
+      );
+      expect(await firstValueFrom(node.systemStart$)).toEqual(new Date(mockGenesisShelley.startTime));
+      expect(ledgerStateQueryClient.networkStartTime).toBeCalledTimes(3);
+    });
+
+    it('stakeDistribution$ keeps polling until query is available', async () => {
+      ledgerStateQueryClient.liveStakeDistribution
+        .mockRejectedValueOnce(new StateQueryError(StateQueryErrorCode.UnavailableInCurrentEra, null, ''))
+        .mockRejectedValueOnce(new StateQueryError(StateQueryErrorCode.UnavailableInCurrentEra, null, ''));
+      const node = new OgmiosObservableCardanoNode(
+        { connectionConfig$: of(connection), localStateQueryRetryConfig: { initialInterval: 1 } },
+        { logger }
+      );
+      const stakeDistribution = await firstValueFrom(node.stakeDistribution$);
+      expect(stakeDistribution.get(Cardano.PoolId('pool1cjm567pd9eqj7wlpuq2mnsasw2upewq0tchg4n8gktq5k7eepvr'))).toEqual(
+        {
+          stake: { pool: BigInt(1), supply: BigInt(100) },
+          vrf: Cardano.VrfVkHex('4e4a2e82dc455449bf5f1f6d249470963cf97389b5dc4d2118fe21625f50f518')
+        }
+      );
+      expect(ledgerStateQueryClient.liveStakeDistribution).toBeCalledTimes(3);
     });
   });
 

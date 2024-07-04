@@ -24,6 +24,11 @@ const isIntersectionBlock = (block: Cardano.Block, intersection: Intersection) =
   return block.header.hash === intersection.point.hash;
 };
 
+type ProjectionCardanoNode = Pick<
+  ObservableCardanoNode,
+  'healthCheck$' | 'findIntersect' | 'eraSummaries$' | 'genesisParameters$' | 'submitTx'
+>;
+
 const syncFromIntersection = ({
   blocksBufferLength,
   buffer,
@@ -34,7 +39,7 @@ const syncFromIntersection = ({
 }: {
   blocksBufferLength: number;
   buffer: StabilityWindowBuffer;
-  cardanoNode: ObservableCardanoNode;
+  cardanoNode: ProjectionCardanoNode;
   chainSync: ObservableChainSync;
   projectedTip$: Observable<TipOrOrigin>;
   logger: Logger;
@@ -62,7 +67,7 @@ const rollbackAndSyncFromIntersection = ({
 }: {
   blocksBufferLength: number;
   buffer: StabilityWindowBuffer;
-  cardanoNode: ObservableCardanoNode;
+  cardanoNode: ProjectionCardanoNode;
   initialChainSync: ObservableChainSync;
   logger: Logger;
   projectedTip$: Observable<TipOrOrigin>;
@@ -138,7 +143,7 @@ export const fromCardanoNode = ({
 }: {
   blocksBufferLength: number;
   buffer: StabilityWindowBuffer;
-  cardanoNode: ObservableCardanoNode;
+  cardanoNode: ProjectionCardanoNode;
   logger: Logger;
   projectedTip$: Observable<TipOrOrigin>;
 }): Observable<ProjectionEvent> => {

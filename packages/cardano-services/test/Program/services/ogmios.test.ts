@@ -10,7 +10,6 @@ import { OgmiosCardanoNode, OgmiosObservableCardanoNode, OgmiosObservableCardano
 import { SrvRecord } from 'dns';
 import { firstValueFrom } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
-import { types } from 'util';
 
 // Connection retry mechanism will recreate an OgmiosCardanoNode and try to reconnect.
 // ogmiosCardanoNodeCallTracker tracks which call it is, to configure initialize() to resolve after 1 failure
@@ -63,68 +62,10 @@ describe('Ogmios Cardano Node factory utils', () => {
     mockOgmiosObservableNode.mockClear();
   });
 
-  describe('getOgmiosCardanoNode', () => {
-    it('creates an OgmiosCardanoNode using the provided URL', async () => {
-      await getOgmiosCardanoNode(dnsResolver, logger, { ogmiosUrl });
-      expect(mockOgmiosCardanoNode).toHaveBeenCalledTimes(1);
-      expect(mockOgmiosCardanoNode.mock.calls[0][0]).toEqual(expect.objectContaining({ host: 'dummy' }));
-    });
-
-    it('dnsResolver takes precedence and is used', async () => {
-      const dnsResolverMock = await mockDnsResolver(0);
-      await getOgmiosCardanoNode(dnsResolverMock, logger, {
-        ogmiosSrvServiceName: 'someName',
-        ogmiosUrl
-      });
-
-      expect(dnsResolverMock).toHaveBeenCalledTimes(1);
-      // expected host and port are defined in the mocked dns resolver
-      expect(mockOgmiosCardanoNode.mock.calls[0][0]).toEqual({ host: 'localhost', port: ogmiosPortDefault });
-    });
-
-    it('throws MissingCardanoNodeOption if no ogmiosUrl or ogmiosSrvServiceName is provided', async () => {
-      await expect(getOgmiosCardanoNode(dnsResolver, logger)).rejects.toThrowError(MissingCardanoNodeOption);
-    });
-
-    describe('With discovery', () => {
-      let ogmiosCardanoNode: OgmiosCardanoNode;
-      let dnsResolverMock: jest.Mock;
-
-      beforeEach(async () => {
-        dnsResolverMock = await mockDnsResolver(0);
-      });
-
-      it('uses a proxy object', async () => {
-        ogmiosCardanoNode = await getOgmiosCardanoNode(dnsResolverMock, logger, {
-          ogmiosSrvServiceName: 'someName'
-        });
-        expect(types.isProxy(ogmiosCardanoNode)).toEqual(true);
-      });
-
-      it('retries connection errors', async () => {
-        connectionFailureCount = 2;
-        ogmiosCardanoNode = await getOgmiosCardanoNode(dnsResolverMock, logger, {
-          ogmiosSrvServiceName: 'someName'
-        });
-        await ogmiosCardanoNode.initialize();
-        expect(mockOgmiosCardanoNode).toHaveBeenCalledTimes(3);
-      });
-
-      it('rethrows errors', async () => {
-        initializeError = 'uhm... error';
-        ogmiosCardanoNode = await getOgmiosCardanoNode(dnsResolverMock, logger, {
-          ogmiosSrvServiceName: 'someName'
-        });
-        // Regular `rejects` does not work here. Probably because of the Proxy object.
-        let hasError = false;
-        try {
-          await ogmiosCardanoNode.initialize();
-        } catch {
-          hasError = true;
-        }
-        expect(hasError).toBeTruthy();
-      });
-    });
+  it('getOgmiosCardanoNode wraps an OgmiosObservableCardanoNode', async () => {
+    await getOgmiosCardanoNode(dnsResolver, logger, { ogmiosUrl });
+    expect(mockOgmiosCardanoNode).toHaveBeenCalledTimes(1);
+    expect(mockOgmiosObservableNode).toHaveBeenCalledTimes(1);
   });
 
   describe('getOgmiosObservableCardanoNode', () => {
