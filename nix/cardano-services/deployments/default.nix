@@ -878,7 +878,7 @@ in
         };
 
         "ops-preview-1@us-east-1" = final: {
-          name = "${final.namespace}-cardanojs-v2";
+          name = "${final.namespace}-cardanojs-v1";
           namespace = "ops-preview-1";
           network = "preview";
           region = "us-east-1";
@@ -887,10 +887,10 @@ in
             backend = {
               enabled = true;
             };
+            chain-history-provider.enabled = true;
           };
 
           values = {
-            stakepool.databaseName = "stakepoolv2";
             cardano-services = {
               ingresOrder = 99;
             };
