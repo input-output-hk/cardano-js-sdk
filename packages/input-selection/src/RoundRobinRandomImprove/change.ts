@@ -1,5 +1,5 @@
 import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
-import { ComputeMinimumCoinQuantity, TokenBundleSizeExceedsLimit } from '../types';
+import { ComputeMinimumCoinQuantity, TokenBundleSizeExceedsLimit, TxCosts } from '../types';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import {
   RequiredImplicitValue,
@@ -9,18 +9,18 @@ import {
   stubMaxSizeAddress,
   toValues
 } from '../util';
-import minBy from 'lodash/minBy';
-import orderBy from 'lodash/orderBy';
-import pick from 'lodash/pick';
+import minBy from 'lodash/minBy.js';
+import orderBy from 'lodash/orderBy.js';
+import pick from 'lodash/pick.js';
 
-type EstimateTxFeeWithOriginalOutputs = (utxo: Cardano.Utxo[], change: Cardano.Value[]) => Promise<Cardano.Lovelace>;
+type EstimateTxCostsWithOriginalOutputs = (utxo: Cardano.Utxo[], change: Cardano.Value[]) => Promise<TxCosts>;
 
 interface ChangeComputationArgs {
   utxoSelection: UtxoSelection;
   outputValues: Cardano.Value[];
   uniqueTxAssetIDs: Cardano.AssetId[];
   implicitValue: RequiredImplicitValue;
-  estimateTxFee: EstimateTxFeeWithOriginalOutputs;
+  estimateTxCosts: EstimateTxCostsWithOriginalOutputs;
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity;
   tokenBundleSizeExceedsLimit: TokenBundleSizeExceedsLimit;
   random: typeof Math.random;
@@ -31,6 +31,7 @@ interface ChangeComputationResult {
   inputs: Cardano.Utxo[];
   change: Cardano.Value[];
   fee: Cardano.Lovelace;
+  redeemers?: Array<Cardano.Redeemer>;
 }
 
 const getLeftoverAssets = (utxoSelected: Cardano.Utxo[], uniqueTxAssetIDs: Cardano.AssetId[]) => {
@@ -333,7 +334,7 @@ const validateChangeBundles = (
 export const computeChangeAndAdjustForFee = async ({
   computeMinimumCoinQuantity,
   tokenBundleSizeExceedsLimit,
-  estimateTxFee,
+  estimateTxCosts,
   outputValues,
   uniqueTxAssetIDs,
   implicitValue,
@@ -344,7 +345,7 @@ export const computeChangeAndAdjustForFee = async ({
     if (currentUtxoSelection.utxoRemaining.length > 0) {
       return computeChangeAndAdjustForFee({
         computeMinimumCoinQuantity,
-        estimateTxFee,
+        estimateTxCosts,
         implicitValue,
         outputValues,
         random,
@@ -372,13 +373,13 @@ export const computeChangeAndAdjustForFee = async ({
   // Calculate fee with change outputs that include fee.
   // It will cover the fee of final selection,
   // where fee is excluded from change bundles
-  const fee = await estimateTxFee(
+  const estimatedCosts = await estimateTxCosts(
     selectionWithChangeAndFee.utxoSelected,
     validateChangeBundles(selectionWithChangeAndFee.changeBundles, tokenBundleSizeExceedsLimit)
   );
 
   // Ensure fee quantity is covered by current selection
-  const totalOutputCoin = getCoinQuantity(outputValues) + fee + implicitValue.implicitCoin.deposit;
+  const totalOutputCoin = getCoinQuantity(outputValues) + estimatedCosts.fee + implicitValue.implicitCoin.deposit;
   const totalInputCoin =
     getCoinQuantity(toValues(selectionWithChangeAndFee.utxoSelected)) + implicitValue.implicitCoin.input;
   if (totalOutputCoin > totalInputCoin) {
@@ -391,7 +392,7 @@ export const computeChangeAndAdjustForFee = async ({
 
   const finalSelection = computeChangeBundles({
     computeMinimumCoinQuantity,
-    fee,
+    fee: estimatedCosts.fee,
     implicitValue,
     outputValues,
     uniqueTxAssetIDs,
@@ -406,8 +407,9 @@ export const computeChangeAndAdjustForFee = async ({
 
   return {
     change: validateChangeBundles(changeBundles, tokenBundleSizeExceedsLimit),
-    fee,
+    fee: estimatedCosts.fee,
     inputs: utxoSelected,
+    redeemers: estimatedCosts.redeemers,
     remainingUTxO: utxoRemaining
   };
 };

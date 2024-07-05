@@ -21,7 +21,7 @@ const paths: HttpProviderConfigPaths<NetworkInfoProvider> = {
 export const networkInfoHttpProvider = (config: CreateHttpProviderConfig<NetworkInfoProvider>): NetworkInfoProvider =>
   createHttpProvider<NetworkInfoProvider>({
     ...config,
-    apiVersion: apiVersion.networkInfo,
+    apiVersion: config.apiVersion || apiVersion.networkInfo,
     paths,
     serviceSlug: 'network-info'
   });

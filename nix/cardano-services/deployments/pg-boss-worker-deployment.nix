@@ -3,6 +3,7 @@
   utils,
   values,
   chart,
+  config,
   ...
 }: {
   templates.pgboss-deployment = lib.mkIf values.pg-boss-worker.enabled {
@@ -53,27 +54,28 @@
               };
               args = ["start-pg-boss-worker"];
               env = utils.mkPodEnv ({
-                  NETWORK = values.network;
+                  NETWORK = config.network;
                   LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
-                  QUEUES = "pool-metadata,pool-metrics";
-                  STAKE_POOL_PROVIDER_URL = "http://${chart.name}-backend.${chart.namespace}.svc.cluster.local";
-                  BUILD_INFO = values.cardano-services.buildInfo;
+                  QUEUES = values.pg-boss-worker.queues;
 
                   METADATA_FETCH_MODE = values.pg-boss-worker.metadata-fetch-mode;
+
+                  STAKE_POOL_PROVIDER_URL = "http://${chart.name}-backend.${chart.namespace}.svc.cluster.local";
+                  NETWORK_INFO_PROVIDER_URL = "http://${chart.name}-backend.${chart.namespace}.svc.cluster.local";
 
                   POSTGRES_POOL_MAX_STAKE_POOL = "5";
                   POSTGRES_HOST_STAKE_POOL = values.postgresName;
                   POSTGRES_PORT_STAKE_POOL = "5432";
-                  POSTGRES_DB_STAKE_POOL = "stakepool";
+                  POSTGRES_DB_STAKE_POOL = values.stakepool.databaseName;
                   POSTGRES_PASSWORD_STAKE_POOL = {
                     valueFrom.secretKeyRef = {
-                      name = "stakepool-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
+                      name = "${values.stakepool.databaseName}-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
                       key = "password";
                     };
                   };
                   POSTGRES_USER_STAKE_POOL = {
                     valueFrom.secretKeyRef = {
-                      name = "stakepool-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
+                      name = "${values.stakepool.databaseName}-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
                       key = "username";
                     };
                   };

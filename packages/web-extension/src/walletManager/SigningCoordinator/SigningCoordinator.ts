@@ -1,8 +1,9 @@
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 import { InMemoryWallet, WalletType } from '../types';
-import { KeyAgent, SignBlobResult, TrezorConfig, errors } from '@cardano-sdk/key-management';
+import { KeyAgent, KeyPurpose, SignBlobResult, TrezorConfig, errors } from '@cardano-sdk/key-management';
 import { KeyAgentFactory } from './KeyAgentFactory';
+import { Logger } from 'ts-log';
 import {
   RequestBase,
   RequestContext,
@@ -17,6 +18,7 @@ import {
 } from './types';
 import { Subject } from 'rxjs';
 import { WrongTargetError } from '../../messaging';
+import { contextLogger } from '@cardano-sdk/util';
 
 export type HardwareKeyAgentOptions = TrezorConfig;
 
@@ -26,6 +28,7 @@ export type SigningCoordinatorProps = {
 
 export type SigningCoordinatorDependencies = {
   keyAgentFactory: KeyAgentFactory;
+  logger: Logger;
 };
 
 class NoRejectError extends CustomError {
@@ -72,10 +75,12 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
   readonly signDataRequest$ = new Subject<SignDataRequest<WalletMetadata, AccountMetadata>>();
   readonly #hwOptions: HardwareKeyAgentOptions;
   readonly #keyAgentFactory: KeyAgentFactory;
+  readonly #logger: Logger;
 
-  constructor(props: SigningCoordinatorProps, { keyAgentFactory }: SigningCoordinatorDependencies) {
+  constructor(props: SigningCoordinatorProps, { keyAgentFactory, logger }: SigningCoordinatorDependencies) {
     this.#hwOptions = props.hwOptions;
     this.#keyAgentFactory = keyAgentFactory;
+    this.#logger = contextLogger(logger, 'SigningCoordinator');
   }
 
   async signTransaction(
@@ -91,15 +96,18 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
         transaction,
         walletType: requestContext.wallet.type
       },
-      (keyAgent) =>
-        keyAgent.signTransaction(
+      (keyAgent) => {
+        const hash = transaction.getId();
+        this.#logger.info('Signing transaction', hash);
+        return keyAgent.signTransaction(
           {
             body: transaction.body().toCore(),
-            hash: transaction.getId()
+            hash
           },
           signContext,
           options
-        )
+        );
+      }
     );
   }
 
@@ -156,7 +164,8 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
                             ...Buffer.from(wallet.encryptedSecrets.rootPrivateKeyBytes, 'hex')
                           ],
                           extendedAccountPublicKey: account.extendedAccountPublicKey,
-                          getPassphrase: async () => passphrase
+                          getPassphrase: async () => passphrase,
+                          purpose: account.purpose || KeyPurpose.STANDARD
                         })
                       );
                       clearPassphrase(passphrase);
@@ -182,12 +191,14 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
                             accountIndex: request.requestContext.accountIndex,
                             chainId: request.requestContext.chainId,
                             communicationType: this.#hwOptions.communicationType,
-                            extendedAccountPublicKey: account.extendedAccountPublicKey
+                            extendedAccountPublicKey: account.extendedAccountPublicKey,
+                            purpose: KeyPurpose.STANDARD
                           })
                         : this.#keyAgentFactory.Trezor({
                             accountIndex: request.requestContext.accountIndex,
                             chainId: request.requestContext.chainId,
                             extendedAccountPublicKey: account.extendedAccountPublicKey,
+                            purpose: KeyPurpose.STANDARD,
                             trezorConfig: this.#hwOptions
                           })
                     ).catch((error) => throwMaybeWrappedWithNoRejectError(error, options)),

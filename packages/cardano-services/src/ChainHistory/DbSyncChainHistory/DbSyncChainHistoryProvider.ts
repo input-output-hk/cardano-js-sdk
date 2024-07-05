@@ -18,7 +18,7 @@ import { QueryResult } from 'pg';
 import { TxMetadataService } from '../../Metadata';
 import { hexStringToBuffer } from '@cardano-sdk/util';
 import { mapBlock, mapTxAlonzo, mapTxIn, mapTxOut } from './mappers';
-import orderBy from 'lodash/orderBy';
+import orderBy from 'lodash/orderBy.js';
 
 /** Properties that are need to create DbSyncChainHistoryProvider */
 export interface ChainHistoryProviderProps {
@@ -107,19 +107,32 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
     });
     if (txResults.rows.length === 0) return [];
 
-    const [inputs, outputs, mints, withdrawals, redeemers, metadata, collaterals, certificates, collateralOutputs] =
-      await Promise.all([
-        this.#builder.queryTransactionInputsByIds(ids),
-        this.#builder.queryTransactionOutputsByIds(ids),
-        this.#builder.queryTxMintByIds(ids),
-        this.#builder.queryWithdrawalsByTxIds(ids),
-        this.#builder.queryRedeemersByIds(ids),
-        // Missing witness datums
-        this.#metadataService.queryTxMetadataByRecordIds(ids),
-        this.#builder.queryTransactionInputsByIds(ids, true),
-        this.#builder.queryCertificatesByIds(ids),
-        this.#builder.queryTransactionOutputsByIds(ids, true)
-      ]);
+    const [
+      inputs,
+      outputs,
+      mints,
+      withdrawals,
+      redeemers,
+      metadata,
+      collaterals,
+      certificates,
+      collateralOutputs,
+      votingProcedures,
+      proposalProcedures
+    ] = await Promise.all([
+      this.#builder.queryTransactionInputsByIds(ids),
+      this.#builder.queryTransactionOutputsByIds(ids),
+      this.#builder.queryTxMintByIds(ids),
+      this.#builder.queryWithdrawalsByTxIds(ids),
+      this.#builder.queryRedeemersByIds(ids),
+      // Missing witness datums
+      this.#metadataService.queryTxMetadataByRecordIds(ids),
+      this.#builder.queryTransactionInputsByIds(ids, true),
+      this.#builder.queryCertificatesByIds(ids),
+      this.#builder.queryTransactionOutputsByIds(ids, true),
+      this.#builder.queryVotingProceduresByIds(ids),
+      this.#builder.queryProposalProceduresByIds(ids)
+    ]);
 
     return txResults.rows.map((tx) => {
       const txId = tx.id.toString('hex') as unknown as Cardano.TransactionId;
@@ -142,7 +155,9 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
         metadata: metadata.get(txId),
         mint: mints.get(txId),
         outputs: txOutputs,
+        proposalProcedures: proposalProcedures.get(txId),
         redeemers: redeemers.get(txId),
+        votingProcedures: votingProcedures.get(txId),
         withdrawals: withdrawals.get(txId)
       });
     });

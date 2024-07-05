@@ -3,6 +3,7 @@ import { GeneratorMetadata } from '../Content';
 import { Logger } from 'ts-log';
 import { Ogmios, ogmiosToCore } from '@cardano-sdk/ogmios';
 import { SerializedChainSyncEvent, generateRandomHexString } from '@cardano-sdk/util-dev';
+import { ogmiosIntersectionToCore } from '../util';
 
 type CardanoMetadata = Pick<GeneratorMetadata['metadata'], 'cardano'>;
 
@@ -76,8 +77,9 @@ export const getChainSyncEvents = async (
     const metadata: CardanoMetadata = {
       cardano: {
         compactGenesis: ogmiosToCore.genesis(
-          await Ogmios.StateQuery.genesisConfig(
-            await Ogmios.createInteractionContext(reject, logger.info, { connection: ogmiosConnectionConfig })
+          await Ogmios.LedgerStateQuery.genesisConfiguration(
+            await Ogmios.createInteractionContext(reject, logger.info, { connection: ogmiosConnectionConfig }),
+            'shelley'
           )
         ),
         intersection: undefined as unknown as Intersection
@@ -85,7 +87,7 @@ export const getChainSyncEvents = async (
     };
     const maxHeight = Math.max(...blockHeights);
     try {
-      const syncClient = await Ogmios.createChainSyncClient(
+      const syncClient = await Ogmios.createChainSynchronizationClient(
         await Ogmios.createInteractionContext(reject, logger.info, { connection: ogmiosConnectionConfig }),
         {
           rollBackward: async (_res, requestNext) => {
@@ -115,7 +117,7 @@ export const getChainSyncEvents = async (
           }
         }
       );
-      metadata.cardano.intersection = (await syncClient.startSync(['origin'])) as Intersection;
+      metadata.cardano.intersection = ogmiosIntersectionToCore(await syncClient.resume(['origin']));
     } catch (error) {
       logger.error(error);
       return reject(error);

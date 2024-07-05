@@ -7,6 +7,7 @@ import {
   KeyAgentDependencies,
   KeyAgentType,
   KeyPair,
+  KeyPurpose,
   SerializableInMemoryKeyAgentData,
   SignBlobResult,
   SignTransactionContext,
@@ -25,7 +26,7 @@ import {
 import { HexBlob } from '@cardano-sdk/util';
 import { KeyAgentBase } from './KeyAgentBase';
 import { emip3decrypt, emip3encrypt } from './emip3';
-import uniqBy from 'lodash/uniqBy';
+import uniqBy from 'lodash/uniqBy.js';
 
 export interface InMemoryKeyAgentProps extends Omit<SerializableInMemoryKeyAgentData, '__typename'> {
   getPassphrase: GetPassphrase;
@@ -37,6 +38,7 @@ export interface FromBip39MnemonicWordsProps {
   mnemonic2ndFactorPassphrase?: string;
   getPassphrase: GetPassphrase;
   accountIndex?: number;
+  purpose?: KeyPurpose;
 }
 
 const getPassphraseRethrowTypedError = async (getPassphrase: GetPassphrase) => {
@@ -60,6 +62,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     const accountKey = await deriveAccountPrivateKey({
       accountIndex: this.accountIndex,
       bip32Ed25519: this.bip32Ed25519,
+      purpose: this.purpose,
       rootPrivateKey
     });
 
@@ -89,7 +92,8 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
       getPassphrase,
       mnemonicWords,
       mnemonic2ndFactorPassphrase = '',
-      accountIndex = 0
+      accountIndex = 0,
+      purpose = KeyPurpose.STANDARD
     }: FromBip39MnemonicWordsProps,
     dependencies: KeyAgentDependencies
   ): Promise<InMemoryKeyAgent> {
@@ -97,12 +101,13 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     const validMnemonic = validateMnemonic(mnemonic);
     if (!validMnemonic) throw new errors.InvalidMnemonicError();
     const entropy = Buffer.from(mnemonicWordsToEntropy(mnemonicWords), 'hex');
-    const rootPrivateKey = await dependencies.bip32Ed25519.fromBip39Entropy(entropy, mnemonic2ndFactorPassphrase);
+    const rootPrivateKey = dependencies.bip32Ed25519.fromBip39Entropy(entropy, mnemonic2ndFactorPassphrase);
     const passphrase = await getPassphraseRethrowTypedError(getPassphrase);
     const encryptedRootPrivateKey = await emip3encrypt(Buffer.from(rootPrivateKey, 'hex'), passphrase);
     const accountPrivateKey = await deriveAccountPrivateKey({
       accountIndex,
       bip32Ed25519: dependencies.bip32Ed25519,
+      purpose,
       rootPrivateKey
     });
 
@@ -114,7 +119,8 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
         chainId,
         encryptedRootPrivateKeyBytes: [...encryptedRootPrivateKey],
         extendedAccountPublicKey,
-        getPassphrase
+        getPassphrase,
+        purpose
       },
       dependencies
     );

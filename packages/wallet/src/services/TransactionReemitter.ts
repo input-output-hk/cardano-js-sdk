@@ -25,7 +25,7 @@ import {
 } from './types';
 import { WalletStores } from '../persistence';
 import { isNotNil } from '@cardano-sdk/util';
-import pick from 'lodash/pick';
+import pick from 'lodash/pick.js';
 
 export interface TransactionReemitterProps {
   transactions: Pick<TransactionsTracker, 'rollback$'> & {

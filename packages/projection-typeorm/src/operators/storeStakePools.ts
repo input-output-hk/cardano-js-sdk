@@ -9,7 +9,7 @@ import {
 } from './util';
 import { PoolRegistrationEntity, PoolRetirementEntity, StakePoolEntity } from '../entity';
 import { WithTypeormContext } from './withTypeormTransaction';
-import omit from 'lodash/omit';
+import omit from 'lodash/omit.js';
 
 type Event = ProjectionEvent<WithTypeormContext & Mappers.WithStakePools>;
 

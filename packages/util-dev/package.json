@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/util-dev",
-  "version": "0.20.0",
+  "version": "0.21.4",
   "description": "Utilities for tests in other packages",
   "engines": {
     "node": ">=16.20.2"
@@ -24,12 +24,9 @@
   "sideEffects": false,
   "license": "Apache-2.0",
   "scripts": {
-    "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
-    "build:cjs": "tsc --build src",
-    "build:copy": "cp -rf src/chainSync/data dist/cjs/chainSync/",
-    "build": "run-s build:cjs build:esm module-fixup build:copy",
+    "build": "yarn build:cjs && tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020 && tsc-alias -p src/tsconfig.json --outDir ./dist/esm && cp ./esm-package.json ./dist/esm/package.json && cp -rf src/chainSync/data dist/esm/chainSync/",
+    "build:cjs": "tsc --build src && cp ../../build/cjs-package.json ./dist/cjs/package.json && cp -rf src/chainSync/data dist/cjs/chainSync/",
     "circular-deps:check": "madge --circular dist/cjs",
-    "module-fixup": "cp ../../build/cjs-package.json ./dist/cjs/package.json && cp ./esm-package.json ./dist/esm/package.json",
     "tscNoEmit": "echo typescript --noEmit command not implemented yet",
     "cleanup:dist": "rm -rf dist",
     "cleanup:nm": "rm -rf node_modules",
@@ -51,6 +48,7 @@
     "madge": "^5.0.1",
     "npm-run-all": "^4.1.5",
     "ts-jest": "^28.0.7",
+    "tsc-alias": "^1.8.10",
     "typescript": "^4.7.4"
   },
   "dependencies": {

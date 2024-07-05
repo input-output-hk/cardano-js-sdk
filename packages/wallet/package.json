@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/wallet",
-  "version": "0.37.0",
+  "version": "0.38.5",
   "description": "Wallet modules",
   "engines": {
     "node": ">=16.20.2"
@@ -20,11 +20,9 @@
   "sideEffects": false,
   "license": "Apache-2.0",
   "scripts": {
-    "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
-    "build:cjs": "tsc --build src",
-    "build": "run-s build:cjs build:esm module-fixup",
+    "build": "yarn build:cjs && tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020 && tsc-alias -p src/tsconfig.json --outDir ./dist/esm && cp ../../build/esm-package.json ./dist/esm/package.json",
+    "build:cjs": "tsc --build src && cp ../../build/cjs-package.json ./dist/cjs/package.json",
     "circular-deps:check": "madge --circular dist/cjs",
-    "module-fixup": "cp ../../build/cjs-package.json ./dist/cjs/package.json && cp ../../build/esm-package.json ./dist/esm/package.json",
     "tscNoEmit": "echo typescript --noEmit command not implemented yet",
     "cleanup:dist": "rm -rf dist",
     "cleanup:nm": "rm -rf node_modules",
@@ -41,8 +39,8 @@
     "test:e2e": "echo 'test:e2e' command not implemented yet"
   },
   "devDependencies": {
-    "@cardano-foundation/ledgerjs-hw-app-cardano": "^6.0.0",
-    "@cardano-ogmios/client": "5.6.0",
+    "@cardano-foundation/ledgerjs-hw-app-cardano": "^7.1.2",
+    "@cardano-ogmios/client": "6.3.0",
     "@cardano-sdk/cardano-services-client": "workspace:~",
     "@cardano-sdk/ogmios": "workspace:~",
     "@cardano-sdk/util-dev": "workspace:~",
@@ -50,7 +48,7 @@
     "@types/node-hid": "^1.3.1",
     "@types/pouchdb": "^6.4.0",
     "bunyan": "^1.8.15",
-    "envalid": "^7.3.0",
+    "envalid": "^7.3.1",
     "eslint": "^7.32.0",
     "jest": "^28.1.3",
     "jest-webextension-mock": "^3.7.19",
@@ -58,6 +56,7 @@
     "mock-browser": "^0.92.14",
     "npm-run-all": "^4.1.5",
     "ts-jest": "^28.0.7",
+    "tsc-alias": "^1.8.10",
     "typescript": "^4.7.4",
     "wait-on": "^6.0.1",
     "webextension-polyfill": "^0.9.0"

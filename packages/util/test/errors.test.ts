@@ -1,5 +1,4 @@
-import { ComposableError } from '../';
-import { stripStackTrace } from '../src';
+import { ComposableError, stripStackTrace } from '../src';
 
 class TestError<InnerError = unknown> extends ComposableError<InnerError> {
   constructor(innerError: InnerError) {

@@ -1,11 +1,12 @@
-version: '3.9'
-
 x-logging: &logging
   logging:
     driver: 'json-file'
     options:
       max-size: '400k'
       max-file: '20'
+
+x-sdk-environment: &sdk-environment
+  HANDLE_POLICY_IDS: ${HANDLE_POLICY_IDS:-f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a}
 
 services:
   cardano-node:
@@ -18,6 +19,10 @@ services:
       - ./config/network/${NETWORK:-mainnet}:/config
 
   cardano-db-sync:
+    volumes:
+      - ./config/network/${NETWORK:-mainnet}:/config
+
+  cardano-smash:
     volumes:
       - ./config/network/${NETWORK:-mainnet}:/config
 
@@ -34,7 +39,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      - CACHE_TTL=${CACHE_TTL:-1440}
+      - CACHE_TTL=${CACHE_TTL:-240}
       - CREATE_SCHEMA=${CREATE_SCHEMA:-true}
       - DROP_SCHEMA=${DROP_SCHEMA:-false}
       - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}
@@ -51,7 +56,7 @@ services:
 
   handle-projector:
     environment:
-      HANDLE_POLICY_IDS: $HANDLE_POLICY_IDS
+      <<: *sdk-environment
 
   postgres:
     volumes:
@@ -59,11 +64,11 @@ services:
 
   provider-server:
     environment:
-      HANDLE_POLICY_IDS: $HANDLE_POLICY_IDS
+      <<: *sdk-environment
 
   handle-provider-server:
     environment:
-      HANDLE_POLICY_IDS: $HANDLE_POLICY_IDS
+      <<: *sdk-environment
 
 secrets:
   blockfrost_key:

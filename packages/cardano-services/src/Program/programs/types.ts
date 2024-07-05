@@ -46,9 +46,6 @@ export enum ProjectorOptionDescriptions {
 export enum ProviderServerOptionDescriptions {
   AllowedOrigins = 'List of allowed CORS origins separated by comma',
   AssetCacheTtl = 'Asset info and NFT Metadata cache TTL in seconds (600 by default)',
-  CardanoNodeConfigPath = 'Cardano node config path',
-  DbCacheTtl = 'Cache TTL in seconds between 60 and 172800 (two days), an option for database related operations',
-  DisableDbCache = 'Disable DB cache',
   DisableStakePoolMetricApy = 'Omit this metric for improved query performance',
   EpochPollInterval = 'Epoch poll interval',
   FuzzyOptions = 'Options for the fuzzy search on stake pool metadata',
@@ -62,7 +59,6 @@ export enum ProviderServerOptionDescriptions {
   TokenMetadataServerUrl = 'Token Metadata API server URL',
   UseTypeOrmStakePoolProvider = 'Enables the TypeORM Stake Pool Provider',
   UseBlockfrost = 'Enables Blockfrost cached data DB',
-  UseKoraLabsProvider = 'Use the KoraLabs handle provider',
   UseSubmitApi = 'Use cardano-submit-api provider',
   UseTypeormAssetProvider = 'Use the TypeORM Asset Provider (default is db-sync)',
   SubmitValidateHandles = 'Validate handle resolutions before submitting transactions. Requires handle provider options (USE_KORA_LABS or POSTGRES options with HANDLE suffix).'
@@ -79,9 +75,6 @@ export type ProviderServerArgs = CommonProgramOptions &
   TypeOrmStakePoolProviderProps & {
     allowedOrigins?: string[];
     assetCacheTTL?: Seconds;
-    cardanoNodeConfigPath?: string;
-    dbCacheTtl: Seconds | 0;
-    disableDbCache?: boolean;
     disableStakePoolMetricApy?: boolean;
     epochPollInterval: number;
     handleProviderServerUrl?: string;
@@ -93,7 +86,6 @@ export type ProviderServerArgs = CommonProgramOptions &
     tokenMetadataServerUrl?: string;
     tokenMetadataRequestTimeout?: Milliseconds;
     useBlockfrost?: boolean;
-    useKoraLabs?: boolean;
     useSubmitApi?: boolean;
     useTypeormAssetProvider?: boolean;
     useTypeormStakePoolProvider?: boolean;

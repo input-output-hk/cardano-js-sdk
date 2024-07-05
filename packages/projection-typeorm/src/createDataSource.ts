@@ -6,7 +6,7 @@ import { PgBossExtension, createPgBoss, createPgBossExtension } from './pgBoss';
 import { WithLogger, contextLogger, patchObject } from '@cardano-sdk/util';
 import { finalizeWithLatest } from '@cardano-sdk/util-rxjs';
 import { typeormLogger } from './logger';
-import snakeCase from 'lodash/snakeCase';
+import snakeCase from 'lodash/snakeCase.js';
 
 export interface DataSourceExtensions {
   pgBoss?: boolean;

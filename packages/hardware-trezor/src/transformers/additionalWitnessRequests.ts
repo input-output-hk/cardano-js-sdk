@@ -4,8 +4,8 @@ import { Transform, isNotNil } from '@cardano-sdk/util';
 import { TrezorTxTransformerContext } from '../types';
 import { resolvePaymentKeyPathForTxIn } from './keyPaths';
 import { util } from '@cardano-sdk/key-management';
-import isArray from 'lodash/isArray';
-import uniq from 'lodash/uniq';
+import isArray from 'lodash/isArray.js';
+import uniq from 'lodash/uniq.js';
 
 export const mapAdditionalWitnessRequests: Transform<
   Cardano.TxIn[],

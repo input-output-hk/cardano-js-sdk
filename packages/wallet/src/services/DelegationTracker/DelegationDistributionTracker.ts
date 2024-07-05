@@ -15,8 +15,8 @@ import {
 } from 'rxjs';
 import { createUtxoBalanceByAddressTracker } from '../BalanceTracker';
 import { delegatedStakeEquals } from '../util';
-import _groupBy from 'lodash/groupBy';
-import _map from 'lodash/map';
+import _groupBy from 'lodash/groupBy.js';
+import _map from 'lodash/map.js';
 
 type DelegationDistributionTrackerProps = Pick<DelegationTrackerProps, 'knownAddresses$' | 'utxoTracker'> & {
   rewardAccounts$: Observable<Cardano.RewardAccountInfo[]>;

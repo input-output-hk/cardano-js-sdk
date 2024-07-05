@@ -3,6 +3,74 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.29.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.29.4...@cardano-sdk/web-extension@0.29.5) (2024-06-26)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
+## [0.29.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.29.3...@cardano-sdk/web-extension@0.29.4) (2024-06-20)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
+## [0.29.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.29.2...@cardano-sdk/web-extension@0.29.3) (2024-06-18)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
+## [0.29.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.29.1...@cardano-sdk/web-extension@0.29.2) (2024-06-17)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
+## [0.29.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.29.0...@cardano-sdk/web-extension@0.29.1) (2024-06-14)
+
+### Features
+
+* key agents now can take optional coin purpose ([e6861d7](https://github.com/input-output-hk/cardano-js-sdk/commit/e6861d7008addb7cc736a44e7823ce062c7131d6))
+* **web-extension:** added support to coin purpose in accounts ([0788606](https://github.com/input-output-hk/cardano-js-sdk/commit/07886060779044709a9a7dac0a9d2324b3eec3ed))
+
+## [0.29.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.28.0...@cardano-sdk/web-extension@0.29.0) (2024-06-05)
+
+### ⚠ BREAKING CHANGES
+
+* Input selectors now return selected inputs in lexicographic order
+- new input selection parameter added 'mustSpendUtxo', which force such UTXOs to be part of the selection
+- txBuilder now takes a new optional dependency TxEvaluator
+- added to the txBuilder the following new methods 'addInput', 'addReferenceInput' and 'addDatum'
+- the txBuilder now supports spending from script inputs
+- the txBuilder now resolve unknown inputs from on-chain data
+- outputBuilder 'datum' function can now take PlutusData as inline datum
+- added to the OutputBuilder a new method 'scriptReference'
+- walletUtilContext now requires an additional property 'chainHistoryProvider'
+- initializeTx now takes the list of redeemerByType and the script versions of the plutus scripts in the transaction
+
+### Features
+
+* tx-builder now supports spending from plutus scripts ([936351e](https://github.com/input-output-hk/cardano-js-sdk/commit/936351e22bea0b673e683333c84cbf9d0e134e19))
+
+## [0.28.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.27.4...@cardano-sdk/web-extension@0.28.0) (2024-05-20)
+
+### ⚠ BREAKING CHANGES
+
+* **web-extension:** add logger dependency to SigningCoordinator
+
+### Features
+
+* **web-extension:** add log of transaction id when signing ([ba5871b](https://github.com/input-output-hk/cardano-js-sdk/commit/ba5871b71340ac13461a348fbbb2ec24f2a7c077))
+
+## [0.27.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.27.3...@cardano-sdk/web-extension@0.27.4) (2024-05-02)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
+## [0.27.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.27.2...@cardano-sdk/web-extension@0.27.3) (2024-04-26)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
+## [0.27.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.27.1...@cardano-sdk/web-extension@0.27.2) (2024-04-23)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
+## [0.27.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.27.0...@cardano-sdk/web-extension@0.27.1) (2024-04-23)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
 ## [0.27.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.26.2...@cardano-sdk/web-extension@0.27.0) (2024-04-15)
 
 ### ⚠ BREAKING CHANGES

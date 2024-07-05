@@ -30,6 +30,7 @@ module.exports = {
     // eslint compains about TS enums hence disable here and enable @typescript-eslint/no-shadow
     'import/no-unresolved': 0,
     'jsdoc/multiline-blocks': ['error', { minimumLengthForMultiline: maxLineLength, noMultilineBlocks: true }],
+    'jsdoc/no-undefined-types': 0,
     'jsdoc/require-jsdoc': 0,
     'jsdoc/require-param': 0,
     'jsdoc/require-param-type': 0,
@@ -47,18 +48,20 @@ module.exports = {
       }
     ],
     'new-cap': 0,
+    'no-bitwise': 0, // Bitwise operations (&, |, ^) execute in constant time regardless of the values involved. This means that using a bitwise AND (&) to accumulate comparison results ensures that the comparison takes the same amount of time regardless of where differences occur between the strings. Important to mitigate (CWE-208)
     'no-magic-numbers': 0,
     'no-restricted-imports': [
       'error',
       {
         paths: ['lodash'],
-        patterns: ['@cardano-sdk/*/src/*']
+        patterns: ['@cardano-sdk/*/src/*', 'lodash/*', '!lodash/*.js']
       }
     ],
     'no-shadow': 'off',
     'no-unused-expressions': 'off',
     'no-unused-vars': 0,
     'no-useless-constructor': 0,
+    'promise/always-return': 0,
     'promise/avoid-new': 0,
     quotes: ['error', 'single', { avoidEscape: true }],
     'sort-imports': ['warn', { ignoreDeclarationSort: true }],

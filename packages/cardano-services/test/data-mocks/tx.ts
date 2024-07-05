@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Hash28ByteBase16, Hash32ByteBase16 } from '@cardano-sdk/crypto';
 
-import merge from 'lodash/merge';
+import merge from 'lodash/merge.js';
 
 export const valueWithCoinOnly: Cardano.Value = {
   coins: 7_420_514n
@@ -240,6 +240,32 @@ export const redeemer = {
   },
   index: 0,
   purpose: 'spend'
+};
+
+export const infoAction = {
+  anchor: { dataHash: '3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d', url: 'https://testing.this' },
+  deposit: 1_000_000_000n,
+  governanceAction: { __typename: 'info_action' },
+  rewardAccount: 'stake_test1urc4mvzl2cp4gedl3yq2px7659krmzuzgnl2dpjjgsydmqqxgamj7'
+};
+
+export const vote = {
+  voter: {
+    __typename: 'dRepKeyHash',
+    credential: { hash: '4615beb10ff7b5d247dd0f8cb28ba447e8db9e7b4782b5d6eec7f1ed', type: 0 }
+  },
+  votes: [
+    {
+      actionId: { actionIndex: 0, id: 'c8686bd84d979285513a27e1c8dd4f6306c332df1b888ca5f2bb652945d78d64' },
+      votingProcedure: {
+        anchor: {
+          dataHash: '3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d',
+          url: 'https://testing.this'
+        },
+        vote: 2
+      }
+    }
+  ]
 };
 
 export const tx = [

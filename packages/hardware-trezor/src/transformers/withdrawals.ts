@@ -1,6 +1,6 @@
 import * as Trezor from '@trezor/connect';
 import { Cardano } from '@cardano-sdk/core';
-import { InvalidArgumentError, Transform } from '@cardano-sdk/util';
+import { InvalidArgumentError, Transform, areNumbersEqualInConstantTime } from '@cardano-sdk/util';
 import { TrezorTxTransformerContext } from '../types';
 import { resolveStakeKeyPath } from './keyPaths';
 
@@ -21,7 +21,7 @@ export const toTrezorWithdrawal: Transform<Cardano.Withdrawal, Trezor.CardanoWit
    * - The stake key hash or payment key hash, blake2b-224 hash digests of Ed25519 verification keys.
    * - The script hash, blake2b-224 hash digests of serialized monetary scripts.
    */
-  if (rewardAddress.getPaymentCredential().type === Cardano.CredentialType.KeyHash) {
+  if (areNumbersEqualInConstantTime(rewardAddress.getPaymentCredential().type, Cardano.CredentialType.KeyHash)) {
     const keyPath = context?.knownAddresses ? resolveStakeKeyPath(rewardAddress, context.knownAddresses) : null;
     trezorWithdrawal = keyPath
       ? {

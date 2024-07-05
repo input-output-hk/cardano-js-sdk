@@ -9,6 +9,7 @@ import {
 } from '../../Asset';
 import { CardanoNode, HandleProvider, Seconds } from '@cardano-sdk/core';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../../ChainHistory';
+import { CommonOptionsDescriptions } from '../options';
 import { ConnectionNames, PostgresOptionDescriptions, suffixType2Cli } from '../options/postgres';
 import { DbPools, DbSyncEpochPollService } from '../../util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../NetworkInfo';
@@ -21,27 +22,26 @@ import { HandleHttpService, TypeOrmHandleProvider } from '../../Handle';
 import { HandlePolicyIdsOptionDescriptions, handlePolicyIdsFromFile } from '../options/policyIds';
 import { HttpServer, HttpServerConfig, HttpService, getListen } from '../../Http';
 import { InMemoryCache, NoCache } from '../../InMemoryCache';
-import { KoraLabsHandleProvider, TxSubmitApiProvider } from '@cardano-sdk/cardano-services-client';
 import { Logger } from 'ts-log';
 import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from '../errors';
+import { NodeTxSubmitProvider, TxSubmitHttpService } from '../../TxSubmit';
 import { Observable } from 'rxjs';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 import { Pool } from 'pg';
 import { ProviderServerArgs, ProviderServerOptionDescriptions, ServiceNames } from './types';
 import { SrvRecord } from 'dns';
-import { TxSubmitHttpService } from '../../TxSubmit';
+import { TxSubmitApiProvider } from '@cardano-sdk/cardano-services-client';
 import { TypeormAssetProvider } from '../../Asset/TypeormAssetProvider';
 import { TypeormStakePoolProvider } from '../../StakePool/TypeormStakePoolProvider/TypeormStakePoolProvider';
 import { createDbSyncMetadataService } from '../../Metadata';
 import { createLogger } from 'bunyan';
-import { getConnectionConfig, getOgmiosTxSubmitProvider } from '../services';
+import { getConnectionConfig, getOgmiosObservableCardanoNode } from '../services';
 import { getEntities } from '../../Projection/prepareTypeormProjection';
 import { isNotNil } from '@cardano-sdk/util';
-import memoize from 'lodash/memoize';
+import memoize from 'lodash/memoize.js';
 
 export const ALLOWED_ORIGINS_DEFAULT = false;
-export const DISABLE_DB_CACHE_DEFAULT = false;
 export const DISABLE_STAKE_POOL_METRIC_APY_DEFAULT = false;
 export const PROVIDER_SERVER_API_URL_DEFAULT = new URL('http://localhost:3000');
 export const PAGINATION_PAGE_SIZE_LIMIT_DEFAULT = 25;
@@ -107,9 +107,8 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
   const getEpochMonitor = memoize((dbPool: Pool) => new DbSyncEpochPollService(dbPool, args.epochPollInterval!));
 
   const getDbSyncStakePoolProvider = withDbSyncProvider((dbPools, cardanoNode) => {
-    if (!genesisData) {
-      throw new MissingProgramOption(ServiceNames.StakePool, ProviderServerOptionDescriptions.CardanoNodeConfigPath);
-    }
+    if (!genesisData)
+      throw new MissingProgramOption(ServiceNames.StakePool, CommonOptionsDescriptions.CardanoNodeConfigPath);
 
     return new DbSyncStakePoolProvider(
       {
@@ -146,7 +145,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     }
 
     if (!genesisData)
-      throw new MissingProgramOption(ServiceNames.NetworkInfo, ProviderServerOptionDescriptions.CardanoNodeConfigPath);
+      throw new MissingProgramOption(ServiceNames.NetworkInfo, CommonOptionsDescriptions.CardanoNodeConfigPath);
 
     networkInfoProvider = new DbSyncNetworkInfoProvider({
       cache: {
@@ -169,22 +168,11 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     if (!args.handlePolicyIds)
       throw new MissingProgramOption(ServiceNames.Handle, HandlePolicyIdsOptionDescriptions.HandlePolicyIds);
 
-    if (args.useKoraLabs) {
-      if (!args.handleProviderServerUrl)
-        throw new MissingProgramOption(ServiceNames.Handle, ProviderServerOptionDescriptions.HandleProviderServerUrl);
-
-      // Cardano.PolicyId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a')
-      sharedHandleProvider = new KoraLabsHandleProvider({
-        policyId: args.handlePolicyIds[0],
-        serverUrl: args.handleProviderServerUrl
-      });
-    } else {
-      sharedHandleProvider = await withTypeOrmProvider(
-        'Handle',
-        async (connectionConfig$) =>
-          new TypeOrmHandleProvider({ connectionConfig$, entities: getEntities(['handle', 'handleMetadata']), logger })
-      )();
-    }
+    sharedHandleProvider = await withTypeOrmProvider(
+      'Handle',
+      async (connectionConfig$) =>
+        new TypeOrmHandleProvider({ connectionConfig$, entities: getEntities(['handle', 'handleMetadata']), logger })
+    )();
 
     return sharedHandleProvider;
   };
@@ -204,7 +192,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       : new CardanoTokenRegistry({ logger }, args);
 
     return new TypeormAssetProvider(
-      { paginationPageSizeLimit: args.paginationPageSizeLimit! },
+      { paginationPageSizeLimit: Math.min(args.paginationPageSizeLimit! * 10, PAGINATION_PAGE_SIZE_LIMIT_ASSETS) },
       {
         connectionConfig$,
         entities: getEntities(['asset']),
@@ -311,12 +299,11 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     [ServiceNames.TxSubmit]: async () => {
       const txSubmitProvider = args.useSubmitApi
         ? getSubmitApiProvider()
-        : await getOgmiosTxSubmitProvider(
-            dnsResolver,
-            logger,
-            args,
-            args.submitValidateHandles ? await getHandleProvider() : undefined
-          );
+        : new NodeTxSubmitProvider({
+            cardanoNode: getOgmiosObservableCardanoNode(dnsResolver, logger, args),
+            handleProvider: args.submitValidateHandles ? await getHandleProvider() : undefined,
+            logger
+          });
       return new TxSubmitHttpService({ logger, txSubmitProvider });
     }
   };

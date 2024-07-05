@@ -1,10 +1,16 @@
+/* eslint-disable promise/param-names */
 import * as Cardano from '../Cardano';
 import { AssetInfo } from '../Asset';
 import { AssetProvider } from '../Provider';
-import { Inspector, resolveInputs } from './txInspector';
+import { Inspector, ResolutionResult, resolveInputs } from './txInspector';
+import { Logger } from 'ts-log';
+import { Milliseconds } from './time';
+import { TimeoutError } from '../errors';
 import { coalesceValueQuantities } from './coalesceValueQuantities';
+import { promiseTimeout } from './promiseTimeout';
 import { subtractValueQuantities } from './subtractValueQuantities';
-import uniq from 'lodash/uniq';
+import { tryGetAssetInfos } from './tryGetAssetInfos';
+import uniq from 'lodash/uniq.js';
 
 export type AssetInfoWithAmount = { amount: Cardano.Lovelace; assetInfo: AssetInfo };
 
@@ -28,9 +34,22 @@ export interface TokenTransferInspectorArgs {
 
   /** The asset provider to resolve AssetInfo for assets in the toAddress field. */
   toAddressAssetProvider: AssetProvider;
+
+  /** Timeout provided by the app that consumes the inspector to personalise the UI response */
+  timeout: Milliseconds;
+
+  /** logger */
+  logger: Logger;
 }
 
 export type TokenTransferInspector = (args: TokenTransferInspectorArgs) => Inspector<TokenTransferInspection>;
+
+type IntoTokenTransferValueProps = {
+  addressMap: Map<Cardano.PaymentAddress, Cardano.Value>;
+  assetProvider: AssetProvider;
+  timeout: Milliseconds;
+  logger: Logger;
+};
 
 const coalesceByAddress = <T extends { address: Cardano.PaymentAddress; value: Cardano.Value }>(
   elements: T[]
@@ -116,10 +135,12 @@ const removeZeroBalanceEntries = (addressMap: Map<Cardano.PaymentAddress, Cardan
   }
 };
 
-const toTokenTransferValue = async (
-  assetProvider: AssetProvider,
-  addressMap: Map<Cardano.PaymentAddress, Cardano.Value>
-): Promise<Map<Cardano.PaymentAddress, TokenTransferValue>> => {
+const intoTokenTransferValue = async ({
+  logger,
+  assetProvider,
+  timeout,
+  addressMap
+}: IntoTokenTransferValueProps): Promise<Map<Cardano.PaymentAddress, TokenTransferValue>> => {
   const tokenTransferValue = new Map<Cardano.PaymentAddress, TokenTransferValue>();
 
   for (const [address, value] of addressMap.entries()) {
@@ -128,9 +149,11 @@ const toTokenTransferValue = async (
     const assetInfos = new Map<Cardano.AssetId, AssetInfoWithAmount>();
 
     if (assetIds.length > 0) {
-      const assets = await assetProvider.getAssets({
+      const assets = await tryGetAssetInfos({
         assetIds,
-        extraData: { nftMetadata: true, tokenMetadata: true }
+        assetProvider,
+        logger,
+        timeout
       });
 
       for (const asset of assets) {
@@ -150,9 +173,20 @@ const toTokenTransferValue = async (
 
 /** Inspect a transaction and return a map of addresses and their balances. */
 export const tokenTransferInspector: TokenTransferInspector =
-  ({ inputResolver, fromAddressAssetProvider, toAddressAssetProvider }) =>
+  ({ inputResolver, fromAddressAssetProvider, toAddressAssetProvider, timeout, logger }) =>
   async (tx) => {
-    const { resolvedInputs } = await resolveInputs(tx.body.inputs, inputResolver);
+    let resolvedInputs: ResolutionResult['resolvedInputs'];
+
+    try {
+      const inputResolution = await promiseTimeout(resolveInputs(tx.body.inputs, inputResolver), timeout);
+      resolvedInputs = inputResolution.resolvedInputs;
+    } catch (error) {
+      if (error instanceof TimeoutError) {
+        logger.error('Error: Inputs resolution timed out');
+      }
+
+      resolvedInputs = [];
+    }
 
     const coalescedInputsByAddress = coalesceByAddress(resolvedInputs);
     const coalescedOutputsByAddress = coalesceByAddress(tx.body.outputs);
@@ -168,7 +202,17 @@ export const tokenTransferInspector: TokenTransferInspector =
     removeZeroBalanceEntries(toAddress);
 
     return {
-      fromAddress: await toTokenTransferValue(fromAddressAssetProvider, fromAddress),
-      toAddress: await toTokenTransferValue(toAddressAssetProvider, toAddress)
+      fromAddress: await intoTokenTransferValue({
+        addressMap: fromAddress,
+        assetProvider: fromAddressAssetProvider,
+        logger,
+        timeout
+      }),
+      toAddress: await intoTokenTransferValue({
+        addressMap: toAddress,
+        assetProvider: toAddressAssetProvider,
+        logger,
+        timeout
+      })
     };
   };

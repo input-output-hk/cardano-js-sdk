@@ -10,7 +10,6 @@ import {
   CACHE_TTL_DEFAULT,
   CREATE_SCHEMA_DEFAULT,
   DEFAULT_HEALTH_CHECK_CACHE_TTL,
-  DISABLE_DB_CACHE_DEFAULT,
   DISABLE_STAKE_POOL_METRIC_APY_DEFAULT,
   DROP_SCHEMA_DEFAULT,
   DRY_RUN_DEFAULT,
@@ -243,26 +242,6 @@ addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon
     DB_CACHE_TTL_DEFAULT
   ),
   newOption(
-    '--cardano-node-config-path <cardanoNodeConfigPath>',
-    ProviderServerOptionDescriptions.CardanoNodeConfigPath,
-    'CARDANO_NODE_CONFIG_PATH'
-  ),
-  newOption(
-    '--db-cache-ttl <dbCacheTtl>',
-    ProviderServerOptionDescriptions.DbCacheTtl,
-    'DB_CACHE_TTL',
-    dbCacheValidator(ProviderServerOptionDescriptions.DbCacheTtl),
-    DB_CACHE_TTL_DEFAULT
-  ),
-  newOption(
-    '--disable-db-cache <true/false>',
-    ProviderServerOptionDescriptions.DisableDbCache,
-    'DISABLE_DB_CACHE',
-    (disableDbCache) =>
-      stringOptionToBoolean(disableDbCache, Programs.ProviderServer, ProviderServerOptionDescriptions.DisableDbCache),
-    DISABLE_DB_CACHE_DEFAULT
-  ),
-  newOption(
     '--disable-stake-pool-metric-apy <true/false>',
     ProviderServerOptionDescriptions.DisableStakePoolMetricApy,
     'DISABLE_STAKE_POOL_METRIC_APY',
@@ -368,14 +347,6 @@ addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon
     (useBlockfrost) =>
       stringOptionToBoolean(useBlockfrost, Programs.ProviderServer, ProviderServerOptionDescriptions.UseBlockfrost),
     USE_BLOCKFROST_DEFAULT
-  ),
-  newOption(
-    '--use-kora-labs <true/false>',
-    ProviderServerOptionDescriptions.UseKoraLabsProvider,
-    'USE_KORA_LABS',
-    (useKoraLabs) =>
-      stringOptionToBoolean(useKoraLabs, Programs.ProviderServer, ProviderServerOptionDescriptions.UseKoraLabsProvider),
-    false
   ),
   newOption(
     '--use-submit-api <true/false>',
@@ -521,7 +492,7 @@ if (process.argv.slice(2).length === 0) {
   program.outputHelp();
   process.exit(1);
 } else {
-  program.parseAsync(process.argv).catch((error) => {
+  program.parseAsync().catch((error) => {
     // eslint-disable-next-line no-console
     console.error(error);
     process.exit(1);

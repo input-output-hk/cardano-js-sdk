@@ -26,6 +26,7 @@ import {
 } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
+import { findLastEpoch } from '../../util';
 import {
   mapAddressOwner,
   mapBlockfrostPoolMetrics,
@@ -43,7 +44,6 @@ import Queries, {
   addSentenceToQuery,
   blockfrostQuery,
   buildOrQueryFromClauses,
-  findLastEpoch,
   findPoolStats,
   getIdentifierFullJoinClause,
   getIdentifierWhereClause,
@@ -183,7 +183,10 @@ export class StakePoolBuilder {
 
   public async getLastEpoch() {
     this.#logger.debug('About to query last epoch');
-    const result: QueryResult<EpochModel> = await this.#db.query(Queries.findLastEpoch);
+    const result: QueryResult<EpochModel> = await this.#db.query({
+      name: 'current_epoch',
+      text: findLastEpoch
+    });
     const lastEpoch = result.rows[0];
     if (!lastEpoch) throw new ProviderError(ProviderFailure.Unknown, null, "Couldn't find last epoch");
     return lastEpoch.no;

@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/e2e",
-  "version": "0.34.0",
+  "version": "0.36.5",
   "description": "End to end tests for the cardano-js-sdk packages.",
   "engines": {
     "node": ">=16.20.2"
@@ -31,8 +31,10 @@
     "test:ogmios": "jest -c jest.config.js --forceExit --selectProjects ogmios --runInBand --verbose",
     "test:pg-boss": "jest -c jest.config.js --forceExit --selectProjects pg-boss --runInBand --verbose",
     "test:providers": "jest -c jest.config.js --forceExit --selectProjects providers --runInBand --verbose",
-    "test:wallet": "jest -c jest.config.js --forceExit --selectProjects wallet --runInBand --verbose",
-    "test:wallet-real-ada": "jest -c jest.config.js --forceExit --selectProjects wallet-real-ada --runInBand --verbose",
+    "test:wallet": "yarn wait-for-network-init ; yarn test:wallet:epoch0 && { yarn wait-for-network-epoch-3 ; yarn test:wallet:epoch3 ; }",
+    "test:wallet:epoch0": "jest -c jest.config.js --forceExit --selectProjects wallet_epoch_0 --runInBand --verbose",
+    "test:wallet:epoch3": "jest -c jest.config.js --forceExit --selectProjects wallet_epoch_3 --runInBand --verbose",
+    "test:wallet-real-ada": "NETWORK_SPEED=slow jest -c jest.config.js --forceExit --selectProjects wallet-real-ada --runInBand --verbose",
     "test:web-extension:build:sw": "tsc --build ./test && tsc --build ./test/web-extension && webpack -c test/web-extension/webpack.config.sw.js",
     "test:web-extension:build:other": "tsc --build ./test && tsc --build ./test/web-extension && webpack -c test/web-extension/webpack.config.js",
     "test:web-extension:build:sw:watch": "yarn test:web-extension:build:sw --watch",
@@ -44,7 +46,7 @@
     "test:web-extension:watch:run": "yarn test:web-extension:run --watch",
     "test:web-extension:watch": "run-s test:web-extension:build test:web-extension:watch:bg",
     "test:web-extension:watch:bg": "run-p test:web-extension:watch:build test:web-extension:watch:run",
-    "local-network:common": "DISABLE_DB_CACHE=${DISABLE_DB_CACHE:-true} SUBMIT_API_ARGS='--testnet-magic 888' USE_BLOCKFROST=false __FIX_UMASK__=$(chmod -R a+r ../../compose/placeholder-secrets) docker compose -p local-network-e2e -f docker-compose.yml -f ../../compose/common.yml -f ../../compose/$(uname -m).yml $FILES up",
+    "local-network:common": "PRE_CONWAY=${PRE_CONWAY:-stable} DISABLE_DB_CACHE=${DISABLE_DB_CACHE:-true} SUBMIT_API_ARGS='--testnet-magic 888' USE_BLOCKFROST=false __FIX_UMASK__=$(chmod -R a+r ../../compose/placeholder-secrets) docker compose --env-file ../cardano-services/environments/.env.local -p local-network-e2e -f docker-compose.yml -f ../../compose/common.yml -f ../../compose/$(uname -m).yml $FILES up",
     "local-network:up": "FILES='' yarn local-network:common",
     "local-network:dev": "FILES='-f ../../compose/dev.yml' yarn local-network:common",
     "local-network:profile:up": "FILES='-f ../../compose/pg-agent.yml' yarn local-network:common",
@@ -53,10 +55,8 @@
     "cardano-services:up": "ts-node --transpile-only ../cardano-services/src/cli.ts start-provider-server",
     "cardano-services:up:debug": "npx nodemon --legacy-watch --exec 'node -r ts-node/register --inspect=0.0.0.0:9229 ../cardano-services/src/cli.ts start-provider-server'",
     "circular-deps:check": "madge --circular dist/cjs",
-    "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
-    "build:cjs": "tsc --build src",
-    "build": "run-s build:cjs build:esm module-fixup",
-    "module-fixup": "cp ../../build/cjs-package.json ./dist/cjs/package.json && cp ../../build/esm-package.json ./dist/esm/package.json",
+    "build": "yarn build:cjs && tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020 && tsc-alias -p src/tsconfig.json --outDir ./dist/esm && cp ../../build/esm-package.json ./dist/esm/package.json",
+    "build:cjs": "tsc --build src && cp ../../build/cjs-package.json ./dist/cjs/package.json",
     "tscNoEmit": "echo typescript --noEmit command not implemented yet",
     "cleanup:dist": "rm -rf dist",
     "cleanup:nm": "rm -rf node_modules",
@@ -70,7 +70,8 @@
     "test:debug": "DEBUG=true yarn test",
     "generate-mnemonics": "ts-node src/scripts/mnemonic.ts",
     "multi-delegation-data-gen": "ts-node src/tools/multi-delegation-data-gen/index.ts",
-    "wait-for-network": "ts-node src/scripts/is-local-network-ready.ts"
+    "wait-for-network-epoch-3": "DB_SYNC_CONNECTION_STRING='postgresql://postgres:doNoUseThisSecret!@localhost:5435/cexplorer' ts-node src/scripts/is-local-network-ready.ts",
+    "wait-for-network-init": "local-network/scripts/wait-local-network-init.sh"
   },
   "repository": "https://github.com/input-output-hk/cardano-js-sdk",
   "license": "Apache-2.0",
@@ -78,8 +79,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@cardano-foundation/ledgerjs-hw-app-cardano": "^6.0.0",
-    "@cardano-ogmios/client": "5.6.0",
+    "@cardano-foundation/ledgerjs-hw-app-cardano": "^7.1.2",
+    "@cardano-ogmios/client": "6.3.0",
     "@cardano-sdk/cardano-services": "workspace:~",
     "@cardano-sdk/cardano-services-client": "workspace:~",
     "@cardano-sdk/core": "workspace:~",
@@ -168,6 +169,7 @@
     "readable-stream": "^3.6.0",
     "source-map-loader": "^4.0.1",
     "ts-jest": "^28.0.7",
+    "tsc-alias": "^1.8.10",
     "typeorm": "^0.3.15",
     "typeorm-extension": "^2.7.0",
     "typescript": "^4.7.4",

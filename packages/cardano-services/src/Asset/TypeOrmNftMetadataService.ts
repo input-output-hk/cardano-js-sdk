@@ -10,28 +10,35 @@ export class TypeOrmNftMetadataService extends TypeormService implements NftMeta
 
   async getNftMetadata(assetInfo: AssetPolicyIdAndName): Promise<Asset.NftMetadata | null> {
     const assetId = Cardano.AssetId.fromParts(assetInfo.policyId, assetInfo.name);
-    const stringAssetName = Buffer.from(assetInfo.name, 'hex').toString('utf8');
     return this.withDataSource(async (dataSource) => {
       const queryRunner = dataSource.createQueryRunner();
-      const nftMetadataRepository = queryRunner.manager.getRepository(NftMetadataEntity);
+      let asset: NftMetadataEntity | null;
 
-      const asset = await nftMetadataRepository.findOneBy({
-        name: stringAssetName,
-        userTokenAsset: { id: assetId }
-      });
+      try {
+        const nftMetadataRepository = queryRunner.manager.getRepository(NftMetadataEntity);
+        asset = await nftMetadataRepository.findOneBy({
+          userTokenAsset: { id: assetId }
+        });
+      } catch (error) {
+        this.logger.error(error);
+        asset = null;
+      } finally {
+        await queryRunner.release();
+      }
 
       if (!asset) {
         return null;
       }
 
       return {
-        image: asset.image,
-        name: asset.name,
+        image: asset.image!,
+        name: asset.name!,
         ...(asset.description && { description: asset.description }),
         ...(asset.files && { files: asset.files }),
-        ...(asset.mediaType && { mediaType: asset.mediaType }),
-        ...(asset.otherProperties && { otherProperties: asset.otherProperties })
-      } as unknown as Asset.NftMetadata;
+        ...(asset.mediaType && { mediaType: asset.mediaType as Asset.ImageMediaType }),
+        ...(asset.otherProperties && { otherProperties: asset.otherProperties }),
+        version: asset.otherProperties?.get('version') as string
+      };
     });
   }
 }

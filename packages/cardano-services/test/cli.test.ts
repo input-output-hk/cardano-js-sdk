@@ -544,8 +544,8 @@ describe('CLI', () => {
 
     describe('schedules', () => {
       testPgBoss('accepts a valid schedule file', 'pgboss', {
-        args: ['--schedules', 'environments/.schedule.local.json'],
-        env: { SCHEDULES: 'environments/.schedule.local.json' },
+        args: ['--schedules', '../../compose/schedules.json'],
+        env: { SCHEDULES: '../../compose/schedules.json' },
         expectedArgs: {
           args: { schedules: [{ cron: '0 * * * *', queue: 'pool-delist-schedule', scheduleOptions: {} }] }
         }
@@ -854,7 +854,8 @@ describe('CLI', () => {
     });
 
     describe('fuzzyOptions', () => {
-      const FUZZY_OPTIONS = '{"threshold":0.4,"weights":{"description":1,"homepage":2,"name":3,"poolId":4,"ticker":4}}';
+      const FUZZY_OPTIONS =
+        '{"distance":255,"fieldNormWeight":1,"ignoreFieldNorm":false,"ignoreLocation":true,"location":0,"minMatchCharLength":1,"threshold":0.3,"useExtendedSearch":false,"weights":{"description":4,"homepage":1,"name":6,"poolId":1,"ticker":10}}';
 
       testCli('has a default value', 'provider', {
         expectedArgs: { args: { fuzzyOptions: DEFAULT_FUZZY_SEARCH_OPTIONS } }
@@ -1047,21 +1048,6 @@ describe('CLI', () => {
         env: { USE_BLOCKFROST: 'test' },
         expectedError:
           'Provider server requires a valid Enables Blockfrost cached data DB program option. Expected: false, true'
-      });
-    });
-
-    describe('useKoraLabs', () => {
-      testCli('accepts a boolean', 'provider', {
-        args: ['--use-kora-labs', 'true'],
-        env: { USE_KORA_LABS: 'true' },
-        expectedArgs: { args: { useKoraLabs: true } }
-      });
-
-      testCli('expects a boolean', 'provider', {
-        args: ['--use-kora-labs', 'test'],
-        env: { USE_KORA_LABS: 'test' },
-        expectedError:
-          'Provider server requires a valid Use the KoraLabs handle provider program option. Expected: false, true'
       });
     });
 

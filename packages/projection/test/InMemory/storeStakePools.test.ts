@@ -3,7 +3,7 @@ import { InMemory, Mappers, ProjectionEvent } from '../../src';
 import { firstValueFrom, of } from 'rxjs';
 
 describe('InMemory.storeStakePools', () => {
-  it('adds pool updates and retirements on RollRorward, removes on RollBackward', async () => {
+  it('adds pool updates and retirements on RollForward, removes on RollBackward', async () => {
     const store = InMemory.createStore();
     const project = async (
       eventType: ChainSyncEventType,

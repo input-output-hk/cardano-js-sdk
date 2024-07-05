@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/ogmios",
-  "version": "0.15.21",
+  "version": "0.15.31",
   "description": "Ogmios Providers",
   "engines": {
     "node": ">=16.20.2"
@@ -20,11 +20,9 @@
   "sideEffects": false,
   "license": "Apache-2.0",
   "scripts": {
-    "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
-    "build:cjs": "tsc --build src",
-    "build": "run-s build:cjs build:esm module-fixup",
+    "build": "yarn build:cjs && tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020 && tsc-alias -p src/tsconfig.json --outDir ./dist/esm && cp ../../build/esm-package.json ./dist/esm/package.json",
+    "build:cjs": "tsc --build src && cp ../../build/cjs-package.json ./dist/cjs/package.json",
     "circular-deps:check": "madge --circular dist/cjs",
-    "module-fixup": "cp ../../build/cjs-package.json ./dist/cjs/package.json && cp ../../build/esm-package.json ./dist/esm/package.json",
     "tscNoEmit": "echo typescript --noEmit command not implemented yet",
     "cleanup:dist": "rm -rf dist",
     "cleanup:nm": "rm -rf node_modules",
@@ -38,7 +36,7 @@
     "prepack": "yarn build"
   },
   "devDependencies": {
-    "@cardano-ogmios/schema": "5.6.0",
+    "@cardano-ogmios/schema": "6.3.0",
     "@cardano-sdk/cardano-services-client": "workspace:~",
     "@cardano-sdk/util-dev": "workspace:~",
     "@cardano-sdk/util-rxjs": "workspace:~",
@@ -50,12 +48,13 @@
     "madge": "^5.0.1",
     "npm-run-all": "^4.1.5",
     "ts-jest": "^28.0.7",
+    "tsc-alias": "^1.8.10",
     "typescript": "^4.7.4",
     "ws": "^8.5.0"
   },
   "dependencies": {
-    "@cardano-ogmios/client": "5.6.0",
-    "@cardano-ogmios/schema": "5.6.0",
+    "@cardano-ogmios/client": "6.3.0",
+    "@cardano-ogmios/schema": "6.3.0",
     "@cardano-sdk/core": "workspace:~",
     "@cardano-sdk/crypto": "workspace:~",
     "@cardano-sdk/util": "workspace:~",

@@ -93,6 +93,7 @@ import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { Ed25519PublicKey, Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 import {
   GenericTxBuilder,
+  GreedyTxEvaluator,
   InitializeTxProps,
   InitializeTxResult,
   InvalidConfigurationError,
@@ -105,9 +106,8 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
 import { WalletStores, createInMemoryWalletStores } from '../persistence';
 import { getScriptAddress } from './internals';
-import isEqual from 'lodash/isEqual';
-import uniq from 'lodash/uniq';
-import type { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
+import isEqual from 'lodash/isEqual.js';
+import uniq from 'lodash/uniq.js';
 
 export interface BaseWalletProps {
   readonly name: string;
@@ -148,7 +148,7 @@ export interface BaseWalletDependencies {
   readonly txSubmitProvider: TxSubmitProvider;
   readonly stakePoolProvider: StakePoolProvider;
   readonly assetProvider: AssetProvider;
-  readonly handleProvider?: HandleProvider | KoraLabsHandleProvider;
+  readonly handleProvider?: HandleProvider;
   readonly networkInfoProvider: WalletNetworkInfoProvider;
   readonly utxoProvider: UtxoProvider;
   readonly chainHistoryProvider: ChainHistoryProvider;
@@ -553,6 +553,7 @@ export class BaseWallet implements ObservableWallet {
       : throwError(() => new InvalidConfigurationError('BaseWallet is missing a "handleProvider"'));
 
     this.util = createWalletUtil({
+      chainHistoryProvider: this.chainHistoryProvider,
       protocolParameters$: this.protocolParameters$,
       transactions: this.transactions,
       utxo: this.utxo
@@ -587,6 +588,7 @@ export class BaseWallet implements ObservableWallet {
 
   async finalizeTx({
     tx,
+    bodyCbor,
     signingOptions,
     signingContext,
     auxiliaryData,
@@ -604,8 +606,11 @@ export class BaseWallet implements ObservableWallet {
     };
 
     const emptyWitness = { signatures: new Map() };
+
+    // The Witnesser takes a serializable transaction. We cant build that from the hash alone, if
+    // the bodyCbor is available, use that instead of the coreTx type to build the transaction.
     const transaction = new Serialization.Transaction(
-      Serialization.TransactionBody.fromCore(tx.body),
+      bodyCbor ? Serialization.TransactionBody.fromCbor(bodyCbor) : Serialization.TransactionBody.fromCore(tx.body),
       Serialization.TransactionWitnessSet.fromCore({ ...emptyWitness, ...witness }),
       auxiliaryData ? Serialization.AuxiliaryData.fromCore(auxiliaryData) : undefined
     );
@@ -653,11 +658,12 @@ export class BaseWallet implements ObservableWallet {
         mightBeAlreadySubmitted &&
         error instanceof ProviderError &&
         // Review: not sure if those 2 errors cover the original ones: there is no longer a CollectErrorsError or BadInputsError
-        // Re-add error.innerError.data.produced.coins === 0n check once Ogmios6 is released. It is not part of the error in pre-ogmios6.
-        (CardanoNodeUtil.isValueNotConservedError(error.innerError) ||
+        ((CardanoNodeUtil.isValueNotConservedError(error.innerError) && !error.innerError.data) ||
+          error.innerError.data.produced.coins === 0n ||
           // TODO: check if IncompleteWithdrawals available withdrawal amount === wallet's reward acc balance?
           // Not sure what the 'Withdrawals' in error data is exactly: value being withdrawed, or reward acc balance
-          CardanoNodeUtil.isIncompleteWithdrawalsError(error.innerError))
+          CardanoNodeUtil.isIncompleteWithdrawalsError(error.innerError) ||
+          CardanoNodeUtil.isUnknownOutputReferences(error.innerError))
       ) {
         this.#logger.debug(
           `Transaction ${outgoingTx.id} failed with ${error.innerError}, but it appears to be already submitted...`
@@ -774,6 +780,7 @@ export class BaseWallet implements ObservableWallet {
         tip: () => this.#firstValueFromSettled(this.tip$),
         utxoAvailable: () => this.#firstValueFromSettled(this.utxo.available$)
       },
+      txEvaluator: new GreedyTxEvaluator(() => this.#firstValueFromSettled(this.protocolParameters$)),
       witnesser: this.witnesser
     };
   }

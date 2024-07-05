@@ -34,8 +34,12 @@ import {
   Witnesser,
   util
 } from '@cardano-sdk/key-management';
+import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
+import { Logger } from 'ts-log';
+import { NodeTxSubmitProvider } from '@cardano-sdk/cardano-services';
+import { OgmiosObservableCardanoNode } from '@cardano-sdk/ogmios';
+import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
 import {
-  KoraLabsHandleProvider,
   assetInfoHttpProvider,
   chainHistoryHttpProvider,
   handleHttpProvider,
@@ -45,15 +49,10 @@ import {
   txSubmitHttpProvider,
   utxoHttpProvider
 } from '@cardano-sdk/cardano-services-client';
-import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
-import { Logger } from 'ts-log';
-import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
-import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
-import { createConnectionObject } from '@cardano-ogmios/client';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
-import { filter, firstValueFrom } from 'rxjs';
+import { filter, firstValueFrom, of } from 'rxjs';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import memoize from 'lodash/memoize';
+import memoize from 'lodash/memoize.js';
 
 const isNodeJs = typeof process !== 'undefined' && process.release?.name === 'node';
 // tsc doesn't like the 'import' of this package, works with webpack
@@ -76,7 +75,7 @@ export const utxoProviderFactory = new ProviderFactory<UtxoProvider>();
 export const stakePoolProviderFactory = new ProviderFactory<StakePoolProvider>();
 export const bip32Ed25519Factory = new ProviderFactory<Crypto.Bip32Ed25519>();
 export const addressDiscoveryFactory = new ProviderFactory<AddressDiscovery>();
-export const handleProviderFactory = new ProviderFactory<HandleProvider | KoraLabsHandleProvider>();
+export const handleProviderFactory = new ProviderFactory<HandleProvider>();
 
 // Address Discovery strategies
 
@@ -138,7 +137,7 @@ rewardsProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logge
 });
 
 txSubmitProviderFactory.register(OGMIOS_PROVIDER, async (params: any, logger: Logger): Promise<TxSubmitProvider> => {
-  if (params.baseUrl === undefined) throw new Error(`${OgmiosTxSubmitProvider.name}: ${MISSING_URL_PARAM}`);
+  if (params.baseUrl === undefined) throw new Error(`${NodeTxSubmitProvider.name}: ${MISSING_URL_PARAM}`);
 
   const connectionConfig = {
     host: params.baseUrl.hostname,
@@ -147,7 +146,17 @@ txSubmitProviderFactory.register(OGMIOS_PROVIDER, async (params: any, logger: Lo
   };
 
   return new Promise<TxSubmitProvider>(async (resolve) => {
-    resolve(new OgmiosTxSubmitProvider(createConnectionObject(connectionConfig), { logger }));
+    resolve(
+      new NodeTxSubmitProvider({
+        cardanoNode: new OgmiosObservableCardanoNode(
+          {
+            connectionConfig$: of(connectionConfig)
+          },
+          { logger }
+        ),
+        logger
+      })
+    );
   });
 });
 
@@ -322,7 +331,8 @@ const patchInitializeTxToRespectEpochBoundary = <T extends ObservableWallet>(
  * @returns an object containing the wallet and providers passed to it
  */
 export const getWallet = async (props: GetWalletProps) => {
-  const { env, idx, logger, name, polling, stores, customKeyParams, keyAgent, witnesser } = props;
+  const { env, idx, logger, name, stores, customKeyParams, keyAgent, witnesser } = props;
+  let polling = props.polling;
   const providers = {
     addressDiscovery: await addressDiscoveryFactory.create(
       env.ADDRESS_DISCOVERY,
@@ -373,6 +383,10 @@ export const getWallet = async (props: GetWalletProps) => {
       logger
     }));
   const bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
+  if (!polling?.interval && env.NETWORK_SPEED === 'fast') {
+    polling = { ...polling, interval: 50 };
+  }
+
   const wallet = createPersonalWallet(
     { name, polling },
     {

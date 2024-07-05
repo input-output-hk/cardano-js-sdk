@@ -8,6 +8,12 @@ here="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
 root="$(cd "$here/.." && pwd)"
 cd "$root"
 
+healthy() {
+  # For some unknown reasons, if started before half of first epoch, db-sync doesn't sync
+  while [ `cardano-cli query tip --testnet-magic 888 | jq .slot` -lt 500 ] ; do sleep 1 ; done
+  touch ./network-files/run/healthy
+}
+
 export PATH=$PWD/bin:$PATH
 
 source ./scripts/nodes-configuration.sh
@@ -22,16 +28,29 @@ echo "Run"
 ./scripts/make-babbage.sh
 ./network-files/run/all.sh &
 
-for ID in ${SP_NODES_ID}; do
-  if [ -f "./scripts/pools/update-node-sp$ID.sh" ]; then # Only update the pool if a script exists for that pool.
-    CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp"$ID"/node.sock ./scripts/pools/update-node-sp"$ID".sh
-  fi
+export CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock
+
+while [ ! -S "$CARDANO_NODE_SOCKET_PATH" ]; do
+  echo "start.sh: CARDANO_NODE_SOCKET_PATH: $CARDANO_NODE_SOCKET_PATH file doesn't exist, waiting..."
+  sleep 1
 done
 
-CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/plutus-transaction.sh
-CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/reference-input-transaction.sh
-CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/mint-tokens.sh
-CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/setup-wallets.sh
-CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/mint-handles.sh
+while [ `cardano-cli query tip --testnet-magic 888 | jq .block` == null ] ; do
+  echo "start.sh: WAIT_FOR_TIP: Waiting for a tip..."
+  sleep 1
+done
+
+healthy &
+
+./scripts/setup-new-delegator-keys.sh
+./scripts/update-stake-pools.sh.sh "$SP_NODES_ID"
+
+./scripts/plutus-transaction.sh
+./scripts/reference-input-transaction.sh
+./scripts/mint-tokens.sh
+./scripts/setup-wallets.sh
+./scripts/mint-handles.sh
+
+touch ./network-files/run/done
 
 wait

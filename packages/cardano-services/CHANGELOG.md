@@ -3,6 +3,71 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.9...@cardano-sdk/cardano-services@0.28.10) (2024-06-26)
+
+### Bug Fixes
+
+* **cardano-services:** negative stake key de-registration certificate deposit ([d52b084](https://github.com/input-output-hk/cardano-js-sdk/commit/d52b0840bee064f9be215183686e0dc1a0203a82))
+
+## [0.28.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.8...@cardano-sdk/cardano-services@0.28.9) (2024-06-20)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services
+
+## [0.28.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.7...@cardano-sdk/cardano-services@0.28.8) (2024-06-18)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services
+
+## [0.28.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.6...@cardano-sdk/cardano-services@0.28.7) (2024-06-17)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services
+
+## [0.28.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.5...@cardano-sdk/cardano-services@0.28.6) (2024-06-14)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services
+
+## [0.28.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.4...@cardano-sdk/cardano-services@0.28.5) (2024-06-05)
+
+### Features
+
+* **cardano-services:** chain history provider now also returns reference scripts on outputs ([8b0731d](https://github.com/input-output-hk/cardano-js-sdk/commit/8b0731de9d7c1f0b7eb22528b1e3d22071931b40))
+
+## [0.28.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.3...@cardano-sdk/cardano-services@0.28.4) (2024-05-20)
+
+### Features
+
+* **cardano-services:** implement new fuzzy search options ([006ecf8](https://github.com/input-output-hk/cardano-js-sdk/commit/006ecf8d78d1a7e8b6c884fcad8c2910d0d25a5e))
+* **cardano-services:** remove check on asset name when fetching nft metadata ([ef562b2](https://github.com/input-output-hk/cardano-js-sdk/commit/ef562b2d0f91f50e45eddc333f98db4f04e8255d))
+
+### Bug Fixes
+
+* **cardano-services:** release query runner after query execution ([37c1887](https://github.com/input-output-hk/cardano-js-sdk/commit/37c188783ac9205a99a26323205218c48c3bbeea))
+* **cardano-services:** stake pool fuzzy search empty result ([aff2cdd](https://github.com/input-output-hk/cardano-js-sdk/commit/aff2cdd8ead77cf104da32ea7597650c8a95d0e4))
+* **cardano-services:** use correct asset limit pagination for typeorm asset provider ([8c13737](https://github.com/input-output-hk/cardano-js-sdk/commit/8c13737ee07a2d5811a069b86b7acaa1289d5b51))
+* increase the size of pledge column of stake pool rewards table ([988f9ae](https://github.com/input-output-hk/cardano-js-sdk/commit/988f9ae02415a1c8dc4327d1d40d2412a97064b0))
+
+## [0.28.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.2...@cardano-sdk/cardano-services@0.28.3) (2024-05-02)
+
+### Bug Fixes
+
+* **cardano-services:** correct mapping of chain history redeemer purpose ([b27bcac](https://github.com/input-output-hk/cardano-js-sdk/commit/b27bcac3e807f97f9b1555a8e7df81d58d797006))
+
+## [0.28.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.1...@cardano-sdk/cardano-services@0.28.2) (2024-04-26)
+
+### Features
+
+* **cardano-services:** implement location and distance new options in stake pools fuzzy search ([8deeed7](https://github.com/input-output-hk/cardano-js-sdk/commit/8deeed739c2b8d6f9b73a2fccfd6be85f0566f38))
+
+### Bug Fixes
+
+* add needed params in the docker composer file to activate batch pool delisting from smash server ([22eb99d](https://github.com/input-output-hk/cardano-js-sdk/commit/22eb99de65fefcc29bc19885f405ca4f2020a54d))
+* **cardano-services:** ensure only leader and member rewards are used to compute stake pool rewards ([b5805fc](https://github.com/input-output-hk/cardano-js-sdk/commit/b5805fcc5490632e5e4be126b07c23ba594bb0e2))
+
+## [0.28.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.0...@cardano-sdk/cardano-services@0.28.1) (2024-04-23)
+
+### Features
+
+* use publicly available SMASH docker image ([e29cc9c](https://github.com/input-output-hk/cardano-js-sdk/commit/e29cc9c7ff70495efe8ccf51779bcfb8b05ea335))
+
 ## [0.28.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.27.1...@cardano-sdk/cardano-services@0.28.0) (2024-04-15)
 
 ### ⚠ BREAKING CHANGES

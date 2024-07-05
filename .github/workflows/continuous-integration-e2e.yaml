@@ -7,7 +7,7 @@ env:
   KEY_MANAGEMENT_PROVIDER: 'inMemory'
   KEY_MANAGEMENT_PARAMS: '{"bip32Ed25519": "Sodium", "accountIndex": 0, "chainId":{"networkId": 0, "networkMagic": 888}, "passphrase":"some_passphrase","mnemonic":"vacant violin soft weird deliver render brief always monitor general maid smart jelly core drastic erode echo there clump dizzy card filter option defense"}'
   ASSET_PROVIDER: 'http'
-  ASSET_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
+  ASSET_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4014/"}'
   CHAIN_HISTORY_PROVIDER: 'http'
   CHAIN_HISTORY_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
   DB_SYNC_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/cexplorer'
@@ -50,8 +50,8 @@ jobs:
 
       - name: 🔨 Build
         run: |
-          yarn install --immutable --inline-builds
-          yarn build
+          yarn install --immutable --inline-builds --mode=skip-build
+          yarn build:cjs
           docker build --no-cache .
         env:
           NODE_OPTIONS: '--max_old_space_size=8192'
@@ -67,18 +67,24 @@ jobs:
           OGMIOS_URL: 'ws://ogmios:1340'
           POSTGRES_PORT: '5435'
 
-      - name: Wait for some epochs
+      - name: Wait for network init
         run: |
-          yarn workspace @cardano-sdk/e2e wait-for-network
-        env:
-          DB_SYNC_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/cexplorer'
+          yarn workspace @cardano-sdk/e2e wait-for-network-init
 
-      - name: 🔬 Test - e2e - wallet
+      - name: 🔬 Test - e2e - wallet at epoch 0
         run: |
-          yarn workspace @cardano-sdk/e2e test:wallet
-          yarn workspace @cardano-sdk/e2e test:providers
+          yarn workspace @cardano-sdk/e2e test:wallet:epoch0
           yarn workspace @cardano-sdk/e2e test:projection
+
+      - name: Wait for epoch 3
+        run: |
+          yarn workspace @cardano-sdk/e2e wait-for-network-epoch-3
+
+      - name: 🔬 Test - e2e - wallet at epoch 3
+        run: |
+          yarn workspace @cardano-sdk/e2e test:wallet:epoch3
           yarn workspace @cardano-sdk/e2e test:pg-boss
+          yarn workspace @cardano-sdk/e2e test:providers
         env:
           STAKE_POOL_PROVIDER_URL: 'http://localhost:4000/'
 

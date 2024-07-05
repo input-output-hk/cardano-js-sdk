@@ -3,6 +3,57 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.13.3...@cardano-sdk/input-selection@0.13.4) (2024-06-26)
+
+**Note:** Version bump only for package @cardano-sdk/input-selection
+
+## [0.13.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.13.2...@cardano-sdk/input-selection@0.13.3) (2024-06-20)
+
+**Note:** Version bump only for package @cardano-sdk/input-selection
+
+## [0.13.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.13.1...@cardano-sdk/input-selection@0.13.2) (2024-06-17)
+
+**Note:** Version bump only for package @cardano-sdk/input-selection
+
+## [0.13.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.13.0...@cardano-sdk/input-selection@0.13.1) (2024-06-14)
+
+**Note:** Version bump only for package @cardano-sdk/input-selection
+
+## [0.13.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.12.31...@cardano-sdk/input-selection@0.13.0) (2024-06-05)
+
+### ⚠ BREAKING CHANGES
+
+* Input selectors now return selected inputs in lexicographic order
+- new input selection parameter added 'mustSpendUtxo', which force such UTXOs to be part of the selection
+- txBuilder now takes a new optional dependency TxEvaluator
+- added to the txBuilder the following new methods 'addInput', 'addReferenceInput' and 'addDatum'
+- the txBuilder now supports spending from script inputs
+- the txBuilder now resolve unknown inputs from on-chain data
+- outputBuilder 'datum' function can now take PlutusData as inline datum
+- added to the OutputBuilder a new method 'scriptReference'
+- walletUtilContext now requires an additional property 'chainHistoryProvider'
+- initializeTx now takes the list of redeemerByType and the script versions of the plutus scripts in the transaction
+
+### Features
+
+* tx-builder now supports spending from plutus scripts ([936351e](https://github.com/input-output-hk/cardano-js-sdk/commit/936351e22bea0b673e683333c84cbf9d0e134e19))
+
+## [0.12.31](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.12.30...@cardano-sdk/input-selection@0.12.31) (2024-05-20)
+
+**Note:** Version bump only for package @cardano-sdk/input-selection
+
+## [0.12.30](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.12.29...@cardano-sdk/input-selection@0.12.30) (2024-05-02)
+
+**Note:** Version bump only for package @cardano-sdk/input-selection
+
+## [0.12.29](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.12.28...@cardano-sdk/input-selection@0.12.29) (2024-04-26)
+
+**Note:** Version bump only for package @cardano-sdk/input-selection
+
+## [0.12.28](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.12.27...@cardano-sdk/input-selection@0.12.28) (2024-04-23)
+
+**Note:** Version bump only for package @cardano-sdk/input-selection
+
 ## [0.12.27](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.12.26...@cardano-sdk/input-selection@0.12.27) (2024-04-15)
 
 **Note:** Version bump only for package @cardano-sdk/input-selection

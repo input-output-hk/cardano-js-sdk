@@ -31,7 +31,7 @@ import {
   toArray
 } from 'rxjs';
 import { dummyLogger } from 'ts-log';
-import memoize from 'lodash/memoize';
+import memoize from 'lodash/memoize.js';
 
 const logger = dummyLogger;
 
@@ -555,7 +555,6 @@ describe('remoteApi integration', () => {
             return !consumerMessage$.observed && !hostMessage$.observed;
           };
           // Create and consume a new remote api through another API's factory method
-          // eslint-disable-next-line promise/always-return
           void Promise.resolve(getFactory(sut.consumer)()).then(() => {
             expect(destructor.callbacks).toHaveLength(1);
             setTimeout(() => {

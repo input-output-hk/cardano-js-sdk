@@ -4,7 +4,7 @@ import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import { ComputeMinimumCoinQuantity, ImplicitValue, TokenBundleSizeExceedsLimit } from './types';
 import { InputSelectionError, InputSelectionFailure } from './InputSelectionError';
-import uniq from 'lodash/uniq';
+import uniq from 'lodash/uniq.js';
 
 export const stubMaxSizeAddress = Cardano.PaymentAddress(
   'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
@@ -21,6 +21,7 @@ export interface RequiredImplicitValue {
 }
 
 export interface RoundRobinRandomImproveArgs {
+  requiredUtxo: Cardano.Utxo[];
   utxo: Cardano.Utxo[];
   outputs: Cardano.TxOut[];
   changeAddress: Cardano.PaymentAddress;
@@ -46,6 +47,7 @@ export const mintToImplicitTokens = (mintMap: Cardano.TokenMap = new Map()) => {
 };
 
 export const preProcessArgs = (
+  preSelectedUtxo: Set<Cardano.Utxo>,
   availableUtxo: Set<Cardano.Utxo>,
   outputSet: Set<Cardano.TxOut>,
   changeAddress: Cardano.PaymentAddress,
@@ -70,6 +72,7 @@ export const preProcessArgs = (
     changeAddress,
     implicitValue: { implicitCoin, implicitTokens },
     outputs,
+    requiredUtxo: [...preSelectedUtxo],
     uniqueTxAssetIDs,
     utxo: [...availableUtxo]
   };
@@ -116,14 +119,15 @@ export const assertIsCoinBalanceSufficient = (
  */
 export const assertIsBalanceSufficient = (
   uniqueTxAssetIDs: Cardano.AssetId[],
+  preSelectedUtxo: Cardano.Utxo[],
   utxo: Cardano.Utxo[],
   outputs: Cardano.TxOut[],
   { implicitCoin, implicitTokens }: RequiredImplicitValue
 ): void => {
-  if (utxo.length === 0) {
+  if (preSelectedUtxo.length + utxo.length === 0) {
     throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
   }
-  const utxoValues = toValues(utxo);
+  const utxoValues = [...toValues(utxo), ...toValues(preSelectedUtxo)];
   const outputsValues = toValues(outputs);
   for (const assetId of uniqueTxAssetIDs) {
     const getAssetQuantity = assetQuantitySelector(assetId);

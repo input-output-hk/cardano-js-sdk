@@ -3,6 +3,48 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.19.9...@cardano-sdk/cardano-services-client@0.19.10) (2024-06-26)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services-client
+
+## [0.19.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.19.8...@cardano-sdk/cardano-services-client@0.19.9) (2024-06-20)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services-client
+
+## [0.19.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.19.7...@cardano-sdk/cardano-services-client@0.19.8) (2024-06-18)
+
+### Features
+
+* **cardano-services-client:** allow custom apiVersion for providers ([89f5ff4](https://github.com/input-output-hk/cardano-js-sdk/commit/89f5ff4e717af8adf93f8882c446d68a8569173e))
+
+## [0.19.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.19.6...@cardano-sdk/cardano-services-client@0.19.7) (2024-06-17)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services-client
+
+## [0.19.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.19.5...@cardano-sdk/cardano-services-client@0.19.6) (2024-06-14)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services-client
+
+## [0.19.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.19.4...@cardano-sdk/cardano-services-client@0.19.5) (2024-06-05)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services-client
+
+## [0.19.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.19.3...@cardano-sdk/cardano-services-client@0.19.4) (2024-05-20)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services-client
+
+## [0.19.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.19.2...@cardano-sdk/cardano-services-client@0.19.3) (2024-05-02)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services-client
+
+## [0.19.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.19.1...@cardano-sdk/cardano-services-client@0.19.2) (2024-04-26)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services-client
+
+## [0.19.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.19.0...@cardano-sdk/cardano-services-client@0.19.1) (2024-04-23)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services-client
+
 ## [0.19.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.18.0...@cardano-sdk/cardano-services-client@0.19.0) (2024-04-15)
 
 ### ⚠ BREAKING CHANGES

@@ -8,6 +8,7 @@ import {
   KeyAgentBase,
   KeyAgentDependencies,
   KeyAgentType,
+  KeyPurpose,
   SerializableTrezorKeyAgentData,
   SignBlobResult,
   SignTransactionContext,
@@ -15,6 +16,7 @@ import {
   errors,
   util
 } from '@cardano-sdk/key-management';
+import { areStringsEqualInConstantTime } from '@cardano-sdk/util';
 import { txToTrezor } from './transformers/tx';
 import _TrezorConnectWeb from '@trezor/connect-web';
 
@@ -36,12 +38,14 @@ export interface TrezorKeyAgentProps extends Omit<SerializableTrezorKeyAgentData
 export interface GetTrezorXpubProps {
   accountIndex: number;
   communicationType: CommunicationType;
+  purpose: KeyPurpose;
 }
 
 export interface CreateTrezorKeyAgentProps {
   chainId: Cardano.ChainId;
   accountIndex?: number;
   trezorConfig: TrezorConfig;
+  purpose?: KeyPurpose;
 }
 
 export type TrezorConnectInstanceType = typeof TrezorConnectNode | typeof TrezorConnectWeb;
@@ -125,19 +129,20 @@ export class TrezorKeyAgent extends KeyAgentBase {
       if (!deviceFeatures.success) {
         throw new errors.TransportError('Failed to get device', deviceFeatures.payload);
       }
-      if (deviceFeatures.payload.model !== 'T') {
-        throw new errors.TransportError(`Trezor device model "${deviceFeatures.payload.model}" is not supported.`);
-      }
       return deviceFeatures.payload;
     } catch (error) {
       throw transportTypedError(error);
     }
   }
 
-  static async getXpub({ accountIndex, communicationType }: GetTrezorXpubProps): Promise<Crypto.Bip32PublicKeyHex> {
+  static async getXpub({
+    accountIndex,
+    communicationType,
+    purpose
+  }: GetTrezorXpubProps): Promise<Crypto.Bip32PublicKeyHex> {
     try {
       await TrezorKeyAgent.checkDeviceConnection(communicationType);
-      const derivationPath = `m/${CardanoKeyConst.PURPOSE}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'`;
+      const derivationPath = `m/${purpose}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'`;
       const trezorConnect = getTrezorConnect(communicationType);
       const extendedPublicKey = await trezorConnect.cardanoGetPublicKey({
         path: derivationPath,
@@ -153,13 +158,14 @@ export class TrezorKeyAgent extends KeyAgentBase {
   }
 
   static async createWithDevice(
-    { chainId, accountIndex = 0, trezorConfig }: CreateTrezorKeyAgentProps,
+    { chainId, accountIndex = 0, trezorConfig, purpose = KeyPurpose.STANDARD }: CreateTrezorKeyAgentProps,
     dependencies: KeyAgentDependencies
   ) {
     const isTrezorInitialized = await TrezorKeyAgent.initializeTrezorTransport(trezorConfig);
     const extendedAccountPublicKey = await TrezorKeyAgent.getXpub({
       accountIndex,
-      communicationType: trezorConfig.communicationType
+      communicationType: trezorConfig.communicationType,
+      purpose
     });
     return new TrezorKeyAgent(
       {
@@ -167,6 +173,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
         chainId,
         extendedAccountPublicKey,
         isTrezorInitialized,
+        purpose,
         trezorConfig
       },
       dependencies
@@ -238,7 +245,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
 
       const signedData = result.payload;
 
-      if (signedData.hash !== hash) {
+      if (!areStringsEqualInConstantTime(signedData.hash, hash)) {
         throw new errors.HwMappingError('Trezor computed a different transaction id');
       }
 

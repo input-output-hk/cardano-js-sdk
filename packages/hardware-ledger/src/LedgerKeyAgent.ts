@@ -8,24 +8,27 @@ import {
   KeyAgentBase,
   KeyAgentDependencies,
   KeyAgentType,
+  KeyPurpose,
   SerializableLedgerKeyAgentData,
   SignBlobResult,
   SignTransactionContext,
-  errors
+  errors,
+  util
 } from '@cardano-sdk/key-management';
 import { HID } from 'node-hid';
 import { LedgerDevice, LedgerTransportType } from './types';
+import { areNumbersEqualInConstantTime, areStringsEqualInConstantTime } from '@cardano-sdk/util';
 import { str_to_path } from '@cardano-foundation/ledgerjs-hw-app-cardano/dist/utils/address';
 import { toLedgerTx } from './transformers';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import _LedgerConnection, {
   Certificate,
   CertificateType,
+  CredentialParams,
+  CredentialParamsType,
   GetVersionResponse,
   PoolKeyType,
   PoolOwnerType,
-  StakeCredentialParams,
-  StakeCredentialParamsType,
   Transaction,
   TransactionSigningMode,
   TxOutputDestinationType
@@ -65,12 +68,14 @@ export interface CreateLedgerKeyAgentProps {
   accountIndex?: number;
   communicationType: CommunicationType;
   deviceConnection?: LedgerConnection | null;
+  purpose?: KeyPurpose;
 }
 
 export interface GetLedgerXpubProps {
   deviceConnection?: LedgerConnection;
   communicationType: CommunicationType;
   accountIndex: number;
+  purpose: KeyPurpose;
 }
 
 export interface CreateLedgerTransportProps {
@@ -93,9 +98,6 @@ const stakeCredentialCert = (cert: Certificate) =>
   cert.type === CertificateType.STAKE_REGISTRATION ||
   cert.type === CertificateType.STAKE_DEREGISTRATION ||
   cert.type === CertificateType.STAKE_DELEGATION;
-
-const isLedgerModelSupported = (deviceModelId: string): deviceModelId is 'nanoS' | 'nanoX' | 'nanoSP' =>
-  ['nanoS', 'nanoX', 'nanoSP'].includes(deviceModelId);
 
 const establishDeviceConnectionMethodName = 'establishDeviceConnection';
 
@@ -127,12 +129,12 @@ const parseEstablishDeviceConnectionSecondParam = (
 };
 
 interface StakeCredentialCertificateParams {
-  stakeCredential: StakeCredentialParams;
+  stakeCredential: CredentialParams;
 }
 
 const containsOnlyScriptHashCreds = (tx: Transaction): boolean => {
   const withdrawalsAllScriptHash = !tx.withdrawals?.some(
-    (withdrawal) => withdrawal.stakeCredential.type !== StakeCredentialParamsType.SCRIPT_HASH
+    (withdrawal) => !areNumbersEqualInConstantTime(withdrawal.stakeCredential.type, CredentialParamsType.SCRIPT_HASH)
   );
 
   if (tx.certificates) {
@@ -140,7 +142,8 @@ const containsOnlyScriptHashCreds = (tx: Transaction): boolean => {
       if (!stakeCredentialCert(cert)) return false;
 
       const certParams = cert.params as unknown as StakeCredentialCertificateParams;
-      if (certParams.stakeCredential.type !== StakeCredentialParamsType.SCRIPT_HASH) return false;
+      if (!areNumbersEqualInConstantTime(certParams.stakeCredential.type, CredentialParamsType.SCRIPT_HASH))
+        return false;
     }
   }
 
@@ -379,9 +382,6 @@ export class LedgerKeyAgent extends KeyAgentBase {
       if (!transport || !transport.deviceModel) {
         throw new errors.TransportError('Missing transport');
       }
-      if (!isLedgerModelSupported(transport.deviceModel.id)) {
-        throw new errors.TransportError(`Ledger device model: "${transport.deviceModel.id}" is not supported`);
-      }
 
       const newConnection = await LedgerKeyAgent.createDeviceConnection(transport);
       this.rememberConnection({
@@ -432,11 +432,12 @@ export class LedgerKeyAgent extends KeyAgentBase {
   static async getXpub({
     deviceConnection,
     communicationType,
-    accountIndex
+    accountIndex,
+    purpose
   }: GetLedgerXpubProps): Promise<Crypto.Bip32PublicKeyHex> {
     try {
       const recoveredDeviceConnection = await LedgerKeyAgent.checkDeviceConnection(communicationType, deviceConnection);
-      const derivationPath = `${CardanoKeyConst.PURPOSE}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'`;
+      const derivationPath = `${purpose}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'`;
       const extendedPublicKey = await recoveredDeviceConnection.getExtendedPublicKey({
         path: str_to_path(derivationPath) // BIP32Path
       });
@@ -466,7 +467,13 @@ export class LedgerKeyAgent extends KeyAgentBase {
    * @throws TransportError
    */
   static async createWithDevice(
-    { chainId, accountIndex = 0, communicationType, deviceConnection }: CreateLedgerKeyAgentProps,
+    {
+      chainId,
+      accountIndex = 0,
+      communicationType,
+      deviceConnection,
+      purpose = KeyPurpose.STANDARD
+    }: CreateLedgerKeyAgentProps,
     dependencies: KeyAgentDependencies
   ) {
     const deviceListPaths = await LedgerKeyAgent.getHidDeviceList(communicationType);
@@ -477,7 +484,8 @@ export class LedgerKeyAgent extends KeyAgentBase {
     const extendedAccountPublicKey = await LedgerKeyAgent.getXpub({
       accountIndex,
       communicationType,
-      deviceConnection: activeDeviceConnection
+      deviceConnection: activeDeviceConnection,
+      purpose
     });
 
     return new LedgerKeyAgent(
@@ -486,7 +494,8 @@ export class LedgerKeyAgent extends KeyAgentBase {
         chainId,
         communicationType,
         deviceConnection: activeDeviceConnection,
-        extendedAccountPublicKey
+        extendedAccountPublicKey,
+        purpose
       },
       dependencies
     );
@@ -516,7 +525,11 @@ export class LedgerKeyAgent extends KeyAgentBase {
       }
     }
 
-    if (tx.collateralInputs) {
+    /**
+     * VotingProcedures: We are currently supporting only keyHash and scriptHash voter types in voting procedures.
+     * To sign tx with keyHash and scriptHash voter type we have to use PLUTUS_TRANSACTION signing mode
+     */
+    if (tx.collateralInputs || tx.votingProcedures) {
       return TransactionSigningMode.PLUTUS_TRANSACTION;
     }
 
@@ -530,7 +543,10 @@ export class LedgerKeyAgent extends KeyAgentBase {
     return TransactionSigningMode.ORDINARY_TRANSACTION;
   }
 
-  // TODO: Allow additional key paths
+  // TODO: LW-10571 - Allow additional key paths. This is necessary for multi-signature wallets
+  // hardware devices inspect the transaction to determine which keys to use for signing,
+  // however, multi sig transaction do not reference the CIP-1854 directly, but rather the script hash
+  // so we need to be able to instruct the HW to sign the transaction with arbitrary keys.
   async signTransaction(
     { body, hash }: Cardano.TxBodyWithHash,
     { knownAddresses, txInKeyPathMap }: SignTransactionContext
@@ -539,6 +555,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
       const ledgerTxData = await toLedgerTx(body, {
         accountIndex: this.accountIndex,
         chainId: this.chainId,
+        dRepPublicKey: await this.derivePublicKey(util.DREP_KEY_DERIVATION_PATH),
         knownAddresses,
         txInKeyPathMap
       });
@@ -549,13 +566,12 @@ export class LedgerKeyAgent extends KeyAgentBase {
       );
 
       const signingMode = LedgerKeyAgent.getSigningMode(ledgerTxData);
-
       const result = await deviceConnection.signTransaction({
         signingMode,
         tx: ledgerTxData
       });
 
-      if (result.txHashHex !== hash) {
+      if (!areStringsEqualInConstantTime(result.txHashHex, hash)) {
         throw new errors.HwMappingError('Ledger computed a different transaction id');
       }
 

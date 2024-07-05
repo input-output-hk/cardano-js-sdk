@@ -18,11 +18,11 @@ import {
   nativeScriptPolicyId,
   util
 } from '@cardano-sdk/core';
+import { GreedyTxEvaluator, defaultSelectionConstraints } from '@cardano-sdk/tx-construction';
 import { InputSelector, StaticChangeAddressResolver, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { MultiSigTx } from './MultiSigTx';
 import { Observable, firstValueFrom, interval, map, switchMap } from 'rxjs';
 import { WalletNetworkInfoProvider } from '@cardano-sdk/wallet';
-import { defaultSelectionConstraints } from '@cardano-sdk/tx-construction';
 
 const randomHexChar = () => Math.floor(Math.random() * 16).toString(16);
 const randomPublicKey = () => Crypto.Ed25519PublicKeyHex(Array.from({ length: 64 }).map(randomHexChar).join(''));
@@ -256,7 +256,6 @@ export class MultiSigWallet {
           new Observable<Cardano.Utxo[]>((subscriber) => {
             this.#utxoProvider
               .utxoByAddresses({ addresses: [this.#address.address] })
-              // eslint-disable-next-line promise/always-return
               .then((utxos) => {
                 subscriber.next(utxos);
               })
@@ -293,7 +292,6 @@ export class MultiSigWallet {
                   startAt: 0
                 }
               })
-              // eslint-disable-next-line promise/always-return
               .then((paginatedTxs) => {
                 subscriber.next(paginatedTxs.pageResults);
                 subscriber.complete();
@@ -318,7 +316,6 @@ export class MultiSigWallet {
               .rewardsHistory({
                 rewardAccounts: [this.#address.rewardAccount]
               })
-              // eslint-disable-next-line promise/always-return
               .then((rewardsHistory) => {
                 subscriber.next(rewardsHistory);
                 subscriber.complete();
@@ -343,7 +340,6 @@ export class MultiSigWallet {
               .rewardAccountBalance({
                 rewardAccount: this.#address.rewardAccount
               })
-              // eslint-disable-next-line promise/always-return
               .then((rewardAccountBalance) => {
                 subscriber.next(rewardAccountBalance);
                 subscriber.complete();
@@ -464,7 +460,9 @@ export class MultiSigWallet {
           }
         };
       },
-      protocolParameters
+      protocolParameters,
+      redeemersByType: {},
+      txEvaluator: new GreedyTxEvaluator(() => this.#networkInfoProvider.protocolParameters())
     });
 
     const implicitCoin = Cardano.util.computeImplicitCoin(protocolParameters, {
@@ -476,6 +474,7 @@ export class MultiSigWallet {
       constraints,
       implicitValue: { coin: implicitCoin },
       outputs: txOuts || new Set(),
+      preSelectedUtxo: new Set(),
       utxo: new Set(utxo)
     });
 

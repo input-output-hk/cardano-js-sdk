@@ -4,7 +4,7 @@ import { Cardano } from '@cardano-sdk/core';
 import { createWallet } from './util';
 import { firstValueFrom, of } from 'rxjs';
 import { mockProviders as mocks } from '@cardano-sdk/util-dev';
-import uniq from 'lodash/uniq';
+import uniq from 'lodash/uniq.js';
 
 describe('integration/withdrawal', () => {
   let wallet: BaseWallet;

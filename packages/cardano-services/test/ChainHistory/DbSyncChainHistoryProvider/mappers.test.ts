@@ -26,6 +26,7 @@ import {
 } from '../../../src/ChainHistory/DbSyncChainHistory/types';
 import { Cardano } from '@cardano-sdk/core';
 import { Hash28ByteBase16, Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { HexBlob } from '@cardano-sdk/util';
 
 const blockHash = '7a48b034645f51743550bbaf81f8a14771e58856e031eb63844738ca8ad72298';
 const poolId = 'pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh';
@@ -77,12 +78,22 @@ const txOutModel: TxOutputModel = {
   datum: Buffer.from(hash32ByteBase16, 'hex'),
   id: '1',
   index: 1,
+  reference_script_id: 0,
   tx_id: Buffer.from(transactionHash, 'hex')
 };
 const assets: Cardano.TokenMap = new Map([
   [AssetId.TSLA, 500n],
   [AssetId.PXL, 500n]
 ]);
+
+const script: Cardano.PlutusScript = {
+  __type: Cardano.ScriptType.Plutus,
+  bytes: HexBlob(
+    '59079201000033232323232323232323232323232332232323232323232222232325335333006300800530070043333573466E1CD55CEA80124000466442466002006004646464646464646464646464646666AE68CDC39AAB9D500C480008CCCCCCCCCCCC88888888888848CCCCCCCCCCCC00403403002C02802402001C01801401000C008CD4060064D5D0A80619A80C00C9ABA1500B33501801A35742A014666AA038EB9406CD5D0A804999AA80E3AE501B35742A01066A0300466AE85401CCCD54070091D69ABA150063232323333573466E1CD55CEA801240004664424660020060046464646666AE68CDC39AAB9D5002480008CC8848CC00400C008CD40B9D69ABA15002302F357426AE8940088C98C80C8CD5CE01981901809AAB9E5001137540026AE854008C8C8C8CCCD5CD19B8735573AA004900011991091980080180119A8173AD35742A004605E6AE84D5D1280111931901919AB9C033032030135573CA00226EA8004D5D09ABA2500223263202E33573805E05C05826AAE7940044DD50009ABA1500533501875C6AE854010CCD540700808004D5D0A801999AA80E3AE200135742A00460446AE84D5D1280111931901519AB9C02B02A028135744A00226AE8940044D5D1280089ABA25001135744A00226AE8940044D5D1280089ABA25001135744A00226AE8940044D55CF280089BAA00135742A00460246AE84D5D1280111931900E19AB9C01D01C01A101B13263201B3357389201035054350001B135573CA00226EA80054049404448C88C008DD6000990009AA80A911999AAB9F0012500A233500930043574200460066AE880080548C8C8CCCD5CD19B8735573AA004900011991091980080180118061ABA150023005357426AE8940088C98C8054CD5CE00B00A80989AAB9E5001137540024646464646666AE68CDC39AAB9D5004480008CCCC888848CCCC00401401000C008C8C8C8CCCD5CD19B8735573AA0049000119910919800801801180A9ABA1500233500F014357426AE8940088C98C8068CD5CE00D80D00C09AAB9E5001137540026AE854010CCD54021D728039ABA150033232323333573466E1D4005200423212223002004357426AAE79400C8CCCD5CD19B875002480088C84888C004010DD71ABA135573CA00846666AE68CDC3A801A400042444006464C6403866AE700740700680640604D55CEA80089BAA00135742A00466A016EB8D5D09ABA2500223263201633573802E02C02826AE8940044D5D1280089AAB9E500113754002266AA002EB9D6889119118011BAB00132001355012223233335573E0044A010466A00E66442466002006004600C6AAE754008C014D55CF280118021ABA200301313574200222440042442446600200800624464646666AE68CDC3A800A40004642446004006600A6AE84D55CF280191999AB9A3370EA0049001109100091931900899AB9C01201100F00E135573AA00226EA80048C8C8CCCD5CD19B875001480188C848888C010014C01CD5D09AAB9E500323333573466E1D400920042321222230020053009357426AAE7940108CCCD5CD19B875003480088C848888C004014C01CD5D09AAB9E500523333573466E1D40112000232122223003005375C6AE84D55CF280311931900899AB9C01201100F00E00D00C135573AA00226EA80048C8C8CCCD5CD19B8735573AA004900011991091980080180118029ABA15002375A6AE84D5D1280111931900699AB9C00E00D00B135573CA00226EA80048C8CCCD5CD19B8735573AA002900011BAE357426AAE7940088C98C802CCD5CE00600580489BAA001232323232323333573466E1D4005200C21222222200323333573466E1D4009200A21222222200423333573466E1D400D2008233221222222233001009008375C6AE854014DD69ABA135744A00A46666AE68CDC3A8022400C4664424444444660040120106EB8D5D0A8039BAE357426AE89401C8CCCD5CD19B875005480108CC8848888888CC018024020C030D5D0A8049BAE357426AE8940248CCCD5CD19B875006480088C848888888C01C020C034D5D09AAB9E500B23333573466E1D401D2000232122222223005008300E357426AAE7940308C98C8050CD5CE00A80A00900880800780700680609AAB9D5004135573CA00626AAE7940084D55CF280089BAA0012323232323333573466E1D400520022333222122333001005004003375A6AE854010DD69ABA15003375A6AE84D5D1280191999AB9A3370EA0049000119091180100198041ABA135573CA00C464C6401A66AE7003803402C0284D55CEA80189ABA25001135573CA00226EA80048C8C8CCCD5CD19B875001480088C8488C00400CDD71ABA135573CA00646666AE68CDC3A8012400046424460040066EB8D5D09AAB9E500423263200A33573801601401000E26AAE7540044DD500089119191999AB9A3370EA00290021091100091999AB9A3370EA00490011190911180180218031ABA135573CA00846666AE68CDC3A801A400042444004464C6401666AE7003002C02402001C4D55CEA80089BAA0012323333573466E1D40052002212200223333573466E1D40092000212200123263200733573801000E00A00826AAE74DD5000891999AB9A3370E6AAE74DD5000A40004008464C6400866AE700140100092612001490103505431001123230010012233003300200200122212200201'
+  ),
+  version: Cardano.PlutusLanguageVersion.V2
+};
+
 const multiAssetModel: MultiAssetModel = {
   asset_name: Buffer.from(assetName, 'hex'),
   fingerprint,
@@ -201,15 +212,17 @@ describe('chain history mappers', () => {
         poolId: Cardano.PoolId(poolId)
       });
     });
-    test('map PoolUpdateCertModel to Cardano.PoolRegistrationCertificate', () => {
+    test('map PoolUpdateCertModel to Cardano.HydratedPoolRegistrationCertificate', () => {
       const result = mappers.mapCertificate({
         ...baseCertModel,
+        deposit: '500000000',
         pool_id: poolId,
         type: 'register'
       } as WithCertType<PoolRegisterCertModel>);
-      expect(result).toEqual<WithCertIndex<Cardano.PoolRegistrationCertificate>>({
+      expect(result).toEqual<WithCertIndex<Cardano.HydratedPoolRegistrationCertificate>>({
         __typename: Cardano.CertificateType.PoolRegistration,
         cert_index: 0,
+        deposit: 500_000_000n,
         poolParameters: null as unknown as Cardano.PoolParameters
       });
     });
@@ -244,6 +257,7 @@ describe('chain history mappers', () => {
       const stakeCert: WithCertType<StakeCertModel> = {
         ...baseCertModel,
         address: stakeAddress,
+        deposit: '0',
         registration: true,
         type: 'stake'
       };
@@ -252,9 +266,10 @@ describe('chain history mappers', () => {
         ...stakeCert,
         registration: false
       } as WithCertType<StakeCertModel>);
-      expect(registrationResult).toEqual<WithCertIndex<Cardano.StakeAddressCertificate>>({
-        __typename: Cardano.CertificateType.StakeRegistration,
+      expect(registrationResult).toEqual<WithCertIndex<Cardano.NewStakeAddressCertificate>>({
+        __typename: Cardano.CertificateType.Registration,
         cert_index: 0,
+        deposit: 0n,
         stakeCredential: {
           hash: Hash28ByteBase16.fromEd25519KeyHashHex(
             Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))
@@ -262,9 +277,10 @@ describe('chain history mappers', () => {
           type: Cardano.CredentialType.KeyHash
         }
       });
-      expect(deregistrationResult).toEqual<WithCertIndex<Cardano.StakeAddressCertificate>>({
-        __typename: Cardano.CertificateType.StakeDeregistration,
+      expect(deregistrationResult).toEqual<WithCertIndex<Cardano.NewStakeAddressCertificate>>({
+        __typename: Cardano.CertificateType.Unregistration,
         cert_index: 0,
+        deposit: 0n,
         stakeCredential: {
           hash: Hash28ByteBase16.fromEd25519KeyHashHex(
             Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))
@@ -294,16 +310,22 @@ describe('chain history mappers', () => {
     });
   });
   describe('mapRedeemer', () => {
-    const redeemerModel: RedeemerModel = {
+    const redeemerModel: Omit<RedeemerModel, 'purpose'> = {
       index: 1,
-      purpose: 'mint',
       script_hash: Buffer.from(hash28ByteBase16, 'hex'),
       tx_id: Buffer.from(transactionHash, 'hex'),
       unit_mem: '2000',
       unit_steps: '5000'
     };
-    test('map RedeemerModel to Cardano.Redeemer', () => {
-      const result = mappers.mapRedeemer(redeemerModel);
+    test.each([
+      ['spend' as const, Cardano.RedeemerPurpose.spend],
+      ['mint' as const, Cardano.RedeemerPurpose.mint],
+      ['cert' as const, Cardano.RedeemerPurpose.certificate],
+      ['reward' as const, Cardano.RedeemerPurpose.withdrawal],
+      ['voting' as const, Cardano.RedeemerPurpose.vote],
+      ['proposing' as const, Cardano.RedeemerPurpose.propose]
+    ])("maps '%p' redeemer", (dbSyncRedeemerPurpose, sdkRedeemerPurpose) => {
+      const result = mappers.mapRedeemer({ ...redeemerModel, purpose: dbSyncRedeemerPurpose });
       expect(result).toEqual<Cardano.Redeemer>({
         data: Buffer.from('not implemented'),
         executionUnits: {
@@ -311,7 +333,7 @@ describe('chain history mappers', () => {
           steps: 5000
         },
         index: 1,
-        purpose: Cardano.RedeemerPurpose.mint
+        purpose: sdkRedeemerPurpose
       });
     });
   });
@@ -421,7 +443,9 @@ describe('chain history mappers', () => {
           inputs: [],
           mint: assets,
           outputs: [],
+          proposalProcedures: undefined,
           totalCollateral: 170_000n,
+          votingProcedures: undefined,
           withdrawals
         },
         inputSource: Cardano.InputSource.collaterals,
@@ -453,7 +477,7 @@ describe('chain history mappers', () => {
   });
   describe('mapTxOutModel', () => {
     test('map TxOutputModel with assets to TxOutput', () => {
-      const result = mappers.mapTxOutModel(txOutModel, assets);
+      const result = mappers.mapTxOutModel(txOutModel, { assets });
       expect(result).toEqual<TxOutput>({
         address: Cardano.PaymentAddress(address),
         datumHash: Hash32ByteBase16(hash32ByteBase16),
@@ -462,8 +486,21 @@ describe('chain history mappers', () => {
         value: { assets, coins: 20_000_000n }
       });
     });
+
+    test('map TxOutputModel with reference script to TxOutput', () => {
+      const result = mappers.mapTxOutModel(txOutModel, { assets, script });
+      expect(result).toEqual<TxOutput>({
+        address: Cardano.PaymentAddress(address),
+        datumHash: Hash32ByteBase16(hash32ByteBase16),
+        index: 1,
+        scriptReference: script,
+        txId: Cardano.TransactionId(transactionHash),
+        value: { assets, coins: 20_000_000n }
+      });
+    });
+
     test('map TxOutputModel with no assets to TxOutput', () => {
-      const result = mappers.mapTxOutModel(txOutModel);
+      const result = mappers.mapTxOutModel(txOutModel, {});
       expect(result).toEqual<TxOutput>({
         address: Cardano.PaymentAddress(address),
         datumHash: Hash32ByteBase16(hash32ByteBase16),
@@ -473,7 +510,7 @@ describe('chain history mappers', () => {
       });
     });
     test('map TxOutputModel with nulls to TxOutput', () => {
-      const result = mappers.mapTxOutModel({ ...txOutModel, datum: null });
+      const result = mappers.mapTxOutModel({ ...txOutModel, datum: null }, {});
       expect(result).toEqual<TxOutput>({
         address: Cardano.PaymentAddress(address),
         index: 1,

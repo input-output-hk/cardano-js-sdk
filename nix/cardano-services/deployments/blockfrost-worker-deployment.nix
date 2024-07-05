@@ -3,6 +3,7 @@
   values,
   chart,
   utils,
+  config,
   ...
 }: {
   templates.blockfrost-worker-deployment = lib.mkIf values.blockfrost-worker.enabled {
@@ -46,9 +47,8 @@
                 runAsGroup = 0;
               };
               env = utils.mkPodEnv {
-                NETWORK = values.network;
+                NETWORK = config.network;
                 LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
-                BUILD_INFO = values.cardano-services.buildInfo;
 
                 BLOCKFROST_API_KEY = {
                   valueFrom.secretKeyRef = {

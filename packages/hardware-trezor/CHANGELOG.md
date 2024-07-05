@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.31](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.4.30...@cardano-sdk/hardware-trezor@0.4.31) (2024-06-26)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-trezor
+
+## [0.4.30](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.4.29...@cardano-sdk/hardware-trezor@0.4.30) (2024-06-20)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-trezor
+
+## [0.4.29](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.4.28...@cardano-sdk/hardware-trezor@0.4.29) (2024-06-18)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-trezor
+
+## [0.4.28](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.4.27...@cardano-sdk/hardware-trezor@0.4.28) (2024-06-17)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-trezor
+
+## [0.4.27](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.4.26...@cardano-sdk/hardware-trezor@0.4.27) (2024-06-14)
+
+### Features
+
+* key agents now can take optional coin purpose ([e6861d7](https://github.com/input-output-hk/cardano-js-sdk/commit/e6861d7008addb7cc736a44e7823ce062c7131d6))
+
+## [0.4.26](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.4.25...@cardano-sdk/hardware-trezor@0.4.26) (2024-06-05)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-trezor
+
+## [0.4.25](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.4.24...@cardano-sdk/hardware-trezor@0.4.25) (2024-05-20)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-trezor
+
+## [0.4.24](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.4.23...@cardano-sdk/hardware-trezor@0.4.24) (2024-05-02)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-trezor
+
+## [0.4.23](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.4.22...@cardano-sdk/hardware-trezor@0.4.23) (2024-04-26)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-trezor
+
+## [0.4.22](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.4.21...@cardano-sdk/hardware-trezor@0.4.22) (2024-04-23)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-trezor
+
+## [0.4.21](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.4.20...@cardano-sdk/hardware-trezor@0.4.21) (2024-04-23)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-trezor
+
 ## [0.4.20](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.4.19...@cardano-sdk/hardware-trezor@0.4.20) (2024-04-15)
 
 **Note:** Version bump only for package @cardano-sdk/hardware-trezor

@@ -11,7 +11,7 @@ import { Cardano } from '@cardano-sdk/core';
 
 export const DEFAULT_LOOK_AHEAD_SEARCH = 20;
 
-const isValidSharedWalletScript = (script: Cardano.NativeScript): boolean => {
+export const isValidSharedWalletScript = (script: Cardano.NativeScript): boolean => {
   switch (script.kind) {
     case Cardano.NativeScriptKind.RequireAllOf:
     case Cardano.NativeScriptKind.RequireAnyOf:

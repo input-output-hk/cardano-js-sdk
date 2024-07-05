@@ -3,6 +3,82 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.36.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.36.4...@cardano-sdk/e2e@0.36.5) (2024-06-26)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
+## [0.36.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.36.3...@cardano-sdk/e2e@0.36.4) (2024-06-20)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
+## [0.36.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.36.2...@cardano-sdk/e2e@0.36.3) (2024-06-18)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
+## [0.36.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.36.1...@cardano-sdk/e2e@0.36.2) (2024-06-17)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
+## [0.36.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.36.0...@cardano-sdk/e2e@0.36.1) (2024-06-14)
+
+### Features
+
+* key agents now can take optional coin purpose ([e6861d7](https://github.com/input-output-hk/cardano-js-sdk/commit/e6861d7008addb7cc736a44e7823ce062c7131d6))
+
+## [0.36.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.35.0...@cardano-sdk/e2e@0.36.0) (2024-06-05)
+
+### ⚠ BREAKING CHANGES
+
+* Input selectors now return selected inputs in lexicographic order
+- new input selection parameter added 'mustSpendUtxo', which force such UTXOs to be part of the selection
+- txBuilder now takes a new optional dependency TxEvaluator
+- added to the txBuilder the following new methods 'addInput', 'addReferenceInput' and 'addDatum'
+- the txBuilder now supports spending from script inputs
+- the txBuilder now resolve unknown inputs from on-chain data
+- outputBuilder 'datum' function can now take PlutusData as inline datum
+- added to the OutputBuilder a new method 'scriptReference'
+- walletUtilContext now requires an additional property 'chainHistoryProvider'
+- initializeTx now takes the list of redeemerByType and the script versions of the plutus scripts in the transaction
+
+### Features
+
+* **e2e:** run e2e test on slow networks like preprod/preview ([288f6af](https://github.com/input-output-hk/cardano-js-sdk/commit/288f6af7a347e4cf160d7ab3217527e706bc1466))
+* tx-builder now supports spending from plutus scripts ([936351e](https://github.com/input-output-hk/cardano-js-sdk/commit/936351e22bea0b673e683333c84cbf9d0e134e19))
+
+### Bug Fixes
+
+* **e2e:** burn tokens based on policyId ([2709305](https://github.com/input-output-hk/cardano-js-sdk/commit/2709305ddc0c41d4f16d22cc1d213d3f745526c1))
+
+## [0.35.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.34.4...@cardano-sdk/e2e@0.35.0) (2024-05-20)
+
+### ⚠ BREAKING CHANGES
+
+* **web-extension:** add logger dependency to SigningCoordinator
+
+### Features
+
+* **web-extension:** add log of transaction id when signing ([ba5871b](https://github.com/input-output-hk/cardano-js-sdk/commit/ba5871b71340ac13461a348fbbb2ec24f2a7c077))
+
+## [0.34.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.34.3...@cardano-sdk/e2e@0.34.4) (2024-05-02)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
+## [0.34.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.34.2...@cardano-sdk/e2e@0.34.3) (2024-04-26)
+
+### Bug Fixes
+
+* add needed params in the docker composer file to activate batch pool delisting from smash server ([22eb99d](https://github.com/input-output-hk/cardano-js-sdk/commit/22eb99de65fefcc29bc19885f405ca4f2020a54d))
+
+## [0.34.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.34.1...@cardano-sdk/e2e@0.34.2) (2024-04-23)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
+## [0.34.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.34.0...@cardano-sdk/e2e@0.34.1) (2024-04-23)
+
+### Features
+
+* use publicly available SMASH docker image ([e29cc9c](https://github.com/input-output-hk/cardano-js-sdk/commit/e29cc9c7ff70495efe8ccf51779bcfb8b05ea335))
+
 ## [0.34.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.33.3...@cardano-sdk/e2e@0.34.0) (2024-04-15)
 
 ### ⚠ BREAKING CHANGES

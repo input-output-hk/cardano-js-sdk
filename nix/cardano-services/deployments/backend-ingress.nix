@@ -6,7 +6,7 @@
   utils,
   ...
 }: {
-  templates.backend-ingress = {
+  templates.backend-ingress = lib.mkIf values.ingress.enabled {
     apiVersion = "networking.k8s.io/v1";
     kind = "Ingress";
     metadata = {
@@ -29,7 +29,7 @@
         "alb.ingress.kubernetes.io/healthcheck-interval-seconds" = toString values.backend.albHealthcheck.interval;
         "alb.ingress.kubernetes.io/healthcheck-timeout-seconds" = toString values.backend.albHealthcheck.timeout;
         # Use latency routing policy
-        "external-dns.alpha.kubernetes.io/aws-region" = values.region;
+        "external-dns.alpha.kubernetes.io/aws-region" = config.region;
         "external-dns.alpha.kubernetes.io/set-identifier" = values.backend.dnsId;
         "alb.ingress.kubernetes.io/group.name" = chart.namespace;
         # ACM
@@ -42,7 +42,27 @@
         map (hostname: {
           host = hostname;
           http.paths =
-            [
+            (lib.optionals config.providers.asset-provider.enabled [
+              {
+                pathType = "Prefix";
+                path = "/v${lib.last (lib.sort lib.versionOlder values.cardano-services.versions.handle)}/asset";
+                backend.service = {
+                  name = "${chart.name}-asset-provider";
+                  port.name = "http";
+                };
+              }
+            ])
+            ++ (lib.optionals config.providers.handle-provider.enabled [
+              {
+                pathType = "Prefix";
+                path = "/v${lib.last (lib.sort lib.versionOlder values.cardano-services.versions.handle)}/handle";
+                backend.service = {
+                  name = "${chart.name}-handle-provider";
+                  port.name = "http";
+                };
+              }
+            ])
+            ++ [
               {
                 pathType = "Prefix";
                 path = "/";
@@ -80,26 +100,6 @@
                 path = "/v${lib.last (lib.sort lib.versionOlder values.cardano-services.versions.stakePool)}/stake-pool";
                 backend.service = {
                   name = "${chart.name}-stake-pool-provider";
-                  port.name = "http";
-                };
-              }
-            ]
-            ++ lib.optionals config.providers.handle-provider.enabled [
-              {
-                pathType = "Prefix";
-                path = "/v${lib.last (lib.sort lib.versionOlder values.cardano-services.versions.handle)}/handle";
-                backend.service = {
-                  name = "${chart.name}-handle-provider";
-                  port.name = "http";
-                };
-              }
-            ]
-            ++ lib.optionals config.providers.asset-provider.enabled [
-              {
-                pathType = "Prefix";
-                path = "/v${lib.last (lib.sort lib.versionOlder values.cardano-services.versions.handle)}/asset";
-                backend.service = {
-                  name = "${chart.name}-asset-provider";
                   port.name = "http";
                 };
               }

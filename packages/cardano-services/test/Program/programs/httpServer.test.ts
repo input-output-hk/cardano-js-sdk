@@ -1,39 +1,33 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { DB_CACHE_TTL_DEFAULT } from '../../../src/InMemoryCache';
 import {
+  CommonOptionsDescriptions,
   DEFAULT_HEALTH_CHECK_CACHE_TTL,
   OgmiosOptionDescriptions,
   PostgresOptionDescriptions,
   StakePoolMetadataFetchMode
 } from '../../../src/Program/options';
-import { EPOCH_POLL_INTERVAL_DEFAULT, listenPromise, serverClosePromise } from '../../../src/util';
+import { DB_CACHE_TTL_DEFAULT } from '../../../src/InMemoryCache';
+import { EPOCH_POLL_INTERVAL_DEFAULT } from '../../../src/util';
 import {
   HttpServer,
   MissingCardanoNodeOption,
   MissingProgramOption,
-  ProviderServerOptionDescriptions,
   SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT,
   SERVICE_DISCOVERY_TIMEOUT_DEFAULT,
   ServiceNames,
   loadProviderServer
 } from '../../../src';
-import { Ogmios } from '@cardano-sdk/ogmios';
 import { ProviderError, ProviderFailure, Seconds } from '@cardano-sdk/core';
 import { SrvRecord } from 'dns';
-import {
-  createConnectionObjectWithRandomPort,
-  createHealthyMockOgmiosServer,
-  createUnhealthyMockOgmiosServer,
-  ogmiosServerReady
-} from '../../util';
 import { getRandomPort } from 'get-port-please';
-import http from 'http';
 
 jest.mock('dns', () => ({
   promises: {
     resolveSrv: async (): Promise<SrvRecord[]> => [{ name: 'localhost', port: 5433, priority: 6, weight: 5 }]
   }
 }));
+
+const ogmiosUrl = new URL('http://localhost:1337');
 
 describe('HTTP Server', () => {
   let apiUrl: URL;
@@ -49,9 +43,7 @@ describe('HTTP Server', () => {
   let healthCheckCacheTtl: Seconds;
   let epochPollInterval: number;
   let httpServer: HttpServer;
-  let ogmiosConnection: Ogmios.Connection;
   let ogmiosSrvServiceName: string;
-  let ogmiosServer: http.Server;
   let serviceDiscoveryBackoffFactor: number;
   let serviceDiscoveryTimeout: number;
 
@@ -65,7 +57,6 @@ describe('HTTP Server', () => {
     postgresUserDbSync = process.env.POSTGRES_USER_DB_SYNC!;
     postgresPasswordDbSync = process.env.POSTGRES_PASSWORD_DB_SYNC!;
     cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
-    ogmiosConnection = await createConnectionObjectWithRandomPort();
     ogmiosSrvServiceName = process.env.OGMIOS_SRV_SERVICE_NAME!;
     serviceDiscoveryBackoffFactor = SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT;
     serviceDiscoveryTimeout = SERVICE_DISCOVERY_TIMEOUT_DEFAULT;
@@ -75,16 +66,6 @@ describe('HTTP Server', () => {
   });
 
   describe('healthy internal providers', () => {
-    beforeEach(async () => {
-      ogmiosServer = createHealthyMockOgmiosServer();
-      await listenPromise(ogmiosServer, { port: ogmiosConnection.port });
-      await ogmiosServerReady(ogmiosConnection);
-    });
-
-    afterEach(async () => {
-      await serverClosePromise(ogmiosServer);
-    });
-
     it('loads the nominated HTTP services and server if required program arguments are set', async () => {
       httpServer = await loadProviderServer({
         apiUrl,
@@ -94,7 +75,7 @@ describe('HTTP Server', () => {
         handlePolicyIds: [],
         healthCheckCacheTtl,
         metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
-        ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+        ogmiosUrl,
         paginationPageSizeLimit: 10,
         postgresConnectionStringAsset,
         postgresConnectionStringDbSync,
@@ -121,7 +102,7 @@ describe('HTTP Server', () => {
           handlePolicyIds: [],
           healthCheckCacheTtl,
           metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
-          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+          ogmiosUrl,
           paginationPageSizeLimit: 10,
           postgresDbDbSync,
           postgresPasswordDbSync,
@@ -148,7 +129,7 @@ describe('HTTP Server', () => {
               handlePolicyIds: [],
               healthCheckCacheTtl,
               metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
-              ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+              ogmiosUrl,
               paginationPageSizeLimit: 10,
               postgresDbDbSync: missingPostgresDb,
               postgresSrvServiceNameDbSync,
@@ -176,7 +157,7 @@ describe('HTTP Server', () => {
               handlePolicyIds: [],
               healthCheckCacheTtl,
               metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
-              ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+              ogmiosUrl,
               paginationPageSizeLimit: 10,
               serviceNames: [ServiceNames.StakePool]
             })
@@ -200,7 +181,7 @@ describe('HTTP Server', () => {
           healthCheckCacheTtl,
           metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
           ogmiosSrvServiceName,
-          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+          ogmiosUrl,
           paginationPageSizeLimit: 10,
           // postgresConnectionStringDbSync,
           serviceDiscoveryBackoffFactor,
@@ -265,14 +246,12 @@ describe('HTTP Server', () => {
             handlePolicyIds: [],
             healthCheckCacheTtl,
             metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
-            ogmiosUrl: new URL('http://localhost:1337'),
+            ogmiosUrl,
             paginationPageSizeLimit: 10,
             postgresConnectionStringDbSync: 'postgres',
             serviceNames: [serviceName]
           })
-        ).rejects.toThrow(
-          new MissingProgramOption(serviceName, ProviderServerOptionDescriptions.CardanoNodeConfigPath)
-        );
+        ).rejects.toThrow(new MissingProgramOption(serviceName, CommonOptionsDescriptions.CardanoNodeConfigPath));
 
       it('with network-info provider', () => test(ServiceNames.NetworkInfo));
       it('with stake-pool provider', () => test(ServiceNames.StakePool));
@@ -280,16 +259,6 @@ describe('HTTP Server', () => {
   });
 
   describe('unhealthy internal providers', () => {
-    beforeEach(async () => {
-      ogmiosServer = createUnhealthyMockOgmiosServer();
-      await listenPromise(ogmiosServer, { port: ogmiosConnection.port });
-      await ogmiosServerReady(ogmiosConnection);
-    });
-
-    afterEach(async () => {
-      await serverClosePromise(ogmiosServer);
-    });
-
     it('should not throw if any internal providers are unhealthy during Provider server initialization', () => {
       expect(() =>
         loadProviderServer({
@@ -300,7 +269,7 @@ describe('HTTP Server', () => {
           handlePolicyIds: [],
           healthCheckCacheTtl,
           metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
-          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+          ogmiosUrl,
           paginationPageSizeLimit: 10,
           postgresConnectionStringDbSync,
           serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]

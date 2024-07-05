@@ -7,8 +7,8 @@ import { GroupedAddress } from '@cardano-sdk/key-management';
 import { InvalidStateError } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { Observable, firstValueFrom } from 'rxjs';
-import isEqual from 'lodash/isEqual';
-import uniq from 'lodash/uniq';
+import isEqual from 'lodash/isEqual.js';
+import uniq from 'lodash/uniq.js';
 
 /**
  * We are using buckets as an analogy to stake keys which are delegated to specific

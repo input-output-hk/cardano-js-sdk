@@ -19,7 +19,7 @@ import { firstValueFrom } from 'rxjs';
 import { getDevices } from '@ledgerhq/hw-transport-node-hid-noevents';
 import { dummyLogger as logger } from 'ts-log';
 import { mockKeyAgentDependencies } from '../../../../key-management/test/mocks';
-import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import DeviceConnection, { InvalidDataReason } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 const getHidDevice = () => {
   const ledgerDevicePath = getDevices()[0]?.path;
@@ -35,6 +35,14 @@ const cleanupEstablishedConnections = async () => {
     await deviceConnection.transport.close();
   }
   LedgerKeyAgent.deviceConnections = [];
+};
+
+const getStakeCredential = (rewardAccount: Cardano.RewardAccount) => {
+  const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
+  return {
+    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+    type: Cardano.CredentialType.KeyHash
+  };
 };
 
 describe('LedgerKeyAgent', () => {
@@ -117,6 +125,10 @@ describe('LedgerKeyAgent', () => {
       let wallet: BaseWallet;
       let txInternals: InitializeTxResult;
 
+      const poolId1 = Cardano.PoolId('pool1ev8vy6fyj7693ergzty2t0azjvw35tvkt2vcjwpgajqs7z6u2vn');
+      const poolId2 = Cardano.PoolId('pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt');
+      const poolId1Hex = Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolId1));
+      const poolId2Hex = Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolId2));
       const outputs = [
         {
           address: Cardano.PaymentAddress(
@@ -199,33 +211,6 @@ describe('LedgerKeyAgent', () => {
         ).rejects.toThrow();
       });
 
-      it('can sign multi-delegation transaction', async () => {
-        const poolId1 = Cardano.PoolId('pool1ev8vy6fyj7693ergzty2t0azjvw35tvkt2vcjwpgajqs7z6u2vn');
-        const poolId2 = Cardano.PoolId('pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt');
-
-        const txBuilder = wallet.createTxBuilder();
-        const builtTx = await txBuilder
-          .delegatePortfolio({
-            name: 'Ledger multi-delegation Portfolio',
-            pools: [
-              {
-                id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolId1)),
-                weight: 1
-              },
-              {
-                id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolId2)),
-                weight: 2
-              }
-            ]
-          })
-          .build()
-          .inspect();
-        const {
-          witness: { signatures }
-        } = await wallet.finalizeTx({ tx: builtTx });
-        expect(signatures.size).toBe(3);
-      });
-
       it('can sign a transaction that mints a token using a plutus script', async () => {
         const script: Cardano.PlutusScript = {
           __type: Cardano.ScriptType.Plutus,
@@ -297,6 +282,392 @@ describe('LedgerKeyAgent', () => {
           witness: { signatures }
         } = await wallet.finalizeTx({ tx: unsignedTx });
         expect(signatures.size).toBe(2);
+      });
+
+      it('can sign multi-delegation transaction', async () => {
+        const txBuilder = wallet.createTxBuilder();
+        const builtTx = await txBuilder
+          .delegatePortfolio({
+            name: 'Ledger multi-delegation Portfolio',
+            pools: [
+              {
+                id: poolId1Hex,
+                weight: 1
+              },
+              {
+                id: poolId2Hex,
+                weight: 2
+              }
+            ]
+          })
+          .build()
+          .inspect();
+        const {
+          witness: { signatures }
+        } = await wallet.finalizeTx({ tx: builtTx });
+        expect(signatures.size).toBe(3);
+      });
+
+      describe('conway-era', () => {
+        describe('ordinary tx mode', () => {
+          let dRepPublicKey: Crypto.Ed25519PublicKeyHex | undefined;
+          let dRepKeyHash: Crypto.Ed25519KeyHashHex;
+
+          beforeEach(async () => {
+            dRepPublicKey = await wallet.governance.getPubDRepKey();
+            if (!dRepPublicKey) throw new Error('No dRep pub key');
+            dRepKeyHash = (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex();
+          });
+
+          it('can sign a transaction with Registration certs', async () => {
+            const txBuilder = wallet.createTxBuilder();
+            txBuilder.partialTxBody.certificates = [
+              {
+                __typename: Cardano.CertificateType.Registration,
+                deposit: 5n,
+                stakeCredential: getStakeCredential(
+                  (await firstValueFrom(wallet.delegation.rewardAccounts$))?.[0].address
+                )
+              }
+            ];
+            const tx = txBuilder
+              .addOutput(
+                txBuilder.buildOutput().address(outputs[0].address).coin(BigInt(outputs[0].value.coins)).toTxOut()
+              )
+              .build();
+
+            expect(await tx.sign()).toBeTruthy();
+          });
+
+          it('would throw while trying to sign a transaction with Registration certs', async () => {
+            const txBuilder = wallet.createTxBuilder();
+            txBuilder.partialTxBody.certificates = [
+              {
+                __typename: Cardano.CertificateType.Registration,
+                deposit: 5n,
+                stakeCredential: getStakeCredential(
+                  Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d')
+                )
+              }
+            ];
+            const tx = txBuilder
+              .addOutput(
+                txBuilder.buildOutput().address(outputs[0].address).coin(BigInt(outputs[0].value.coins)).toTxOut()
+              )
+              .build();
+
+            await expect(tx.sign()).rejects.toThrow(
+              InvalidDataReason.SIGN_MODE_ORDINARY__CERTIFICATE_STAKE_CREDENTIAL_ONLY_AS_PATH
+            );
+          });
+
+          it('can sign a transaction with Unregistration certs', async () => {
+            const txBuilder = wallet.createTxBuilder();
+            txBuilder.partialTxBody.certificates = [
+              {
+                __typename: Cardano.CertificateType.Unregistration,
+                deposit: 5n,
+                stakeCredential: getStakeCredential(
+                  (await firstValueFrom(wallet.delegation.rewardAccounts$))?.[0].address
+                )
+              }
+            ];
+            const tx = txBuilder
+              .addOutput(
+                txBuilder.buildOutput().address(outputs[0].address).coin(BigInt(outputs[0].value.coins)).toTxOut()
+              )
+              .build();
+
+            expect(await tx.sign()).toBeTruthy();
+          });
+
+          it('would throw while trying to sign a transaction with Unregistration certs', async () => {
+            const txBuilder = wallet.createTxBuilder();
+            txBuilder.partialTxBody.certificates = [
+              {
+                __typename: Cardano.CertificateType.Unregistration,
+                deposit: 5n,
+                stakeCredential: getStakeCredential(
+                  Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d')
+                )
+              }
+            ];
+            const tx = txBuilder
+              .addOutput(
+                txBuilder.buildOutput().address(outputs[0].address).coin(BigInt(outputs[0].value.coins)).toTxOut()
+              )
+              .build();
+
+            await expect(tx.sign()).rejects.toThrow(
+              InvalidDataReason.SIGN_MODE_ORDINARY__CERTIFICATE_STAKE_CREDENTIAL_ONLY_AS_PATH
+            );
+          });
+
+          it('can sign a transaction with VoteDelegation certs with dRep of credential type', async () => {
+            const txBuilder = wallet.createTxBuilder();
+            txBuilder.partialTxBody.certificates = [
+              {
+                __typename: Cardano.CertificateType.VoteDelegation,
+                dRep: {
+                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+                  type: Cardano.CredentialType.KeyHash
+                },
+                stakeCredential: getStakeCredential(
+                  (await firstValueFrom(wallet.delegation.rewardAccounts$))?.[0].address
+                )
+              }
+            ];
+            const tx = txBuilder
+              .addOutput(
+                txBuilder.buildOutput().address(outputs[0].address).coin(BigInt(outputs[0].value.coins)).toTxOut()
+              )
+              .build();
+
+            expect(await tx.sign()).toBeTruthy();
+          });
+
+          it('can sign a transaction with VoteDelegation certs with dRep of AlwaysAbstain type', async () => {
+            const txBuilder = wallet.createTxBuilder();
+            txBuilder.partialTxBody.certificates = [
+              {
+                __typename: Cardano.CertificateType.VoteDelegation,
+                dRep: { __typename: 'AlwaysAbstain' },
+                stakeCredential: getStakeCredential(
+                  (await firstValueFrom(wallet.delegation.rewardAccounts$))?.[0].address
+                )
+              }
+            ];
+            const tx = txBuilder
+              .addOutput(
+                txBuilder.buildOutput().address(outputs[0].address).coin(BigInt(outputs[0].value.coins)).toTxOut()
+              )
+              .build();
+
+            expect(await tx.sign()).toBeTruthy();
+          });
+
+          it('can sign a transaction with VoteDelegation certs with dRep of AlwaysNoConfidence type', async () => {
+            const txBuilder = wallet.createTxBuilder();
+            txBuilder.partialTxBody.certificates = [
+              {
+                __typename: Cardano.CertificateType.VoteDelegation,
+                dRep: { __typename: 'AlwaysNoConfidence' },
+                stakeCredential: getStakeCredential(
+                  (await firstValueFrom(wallet.delegation.rewardAccounts$))?.[0].address
+                )
+              }
+            ];
+            const tx = txBuilder
+              .addOutput(
+                txBuilder.buildOutput().address(outputs[0].address).coin(BigInt(outputs[0].value.coins)).toTxOut()
+              )
+              .build();
+
+            expect(await tx.sign()).toBeTruthy();
+          });
+
+          it('would throw while trying to sign a transaction with VoteDelegation certs', async () => {
+            const txBuilder = wallet.createTxBuilder();
+            txBuilder.partialTxBody.certificates = [
+              {
+                __typename: Cardano.CertificateType.VoteDelegation,
+                dRep: {
+                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+                  type: Cardano.CredentialType.KeyHash
+                },
+                stakeCredential: getStakeCredential(
+                  Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d')
+                )
+              }
+            ];
+            const tx = txBuilder
+              .addOutput(
+                txBuilder.buildOutput().address(outputs[0].address).coin(BigInt(outputs[0].value.coins)).toTxOut()
+              )
+              .build();
+
+            await expect(tx.sign()).rejects.toThrow(
+              InvalidDataReason.SIGN_MODE_ORDINARY__CERTIFICATE_STAKE_CREDENTIAL_ONLY_AS_PATH
+            );
+          });
+
+          it('can sign a transaction with RegisterDelegateRepresentative certs', async () => {
+            const txBuilder = wallet.createTxBuilder();
+            txBuilder.partialTxBody.certificates = [
+              {
+                __typename: Cardano.CertificateType.RegisterDelegateRepresentative,
+                anchor: null,
+                dRepCredential: {
+                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+                  type: Cardano.CredentialType.KeyHash
+                },
+                deposit: 5n
+              }
+            ];
+            const tx = txBuilder
+              .addOutput(
+                txBuilder.buildOutput().address(outputs[0].address).coin(BigInt(outputs[0].value.coins)).toTxOut()
+              )
+              .build();
+
+            expect(await tx.sign()).toBeTruthy();
+          });
+
+          it('would throw while trying to sign a transaction with RegisterDelegateRepresentative certs', async () => {
+            const txBuilder = wallet.createTxBuilder();
+            txBuilder.partialTxBody.certificates = [
+              {
+                __typename: Cardano.CertificateType.RegisterDelegateRepresentative,
+                anchor: null,
+                dRepCredential: {
+                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+                  type: Cardano.CredentialType.ScriptHash
+                },
+                deposit: 5n
+              }
+            ];
+            const tx = txBuilder
+              .addOutput(
+                txBuilder.buildOutput().address(outputs[0].address).coin(BigInt(outputs[0].value.coins)).toTxOut()
+              )
+              .build();
+
+            await expect(tx.sign()).rejects.toThrow(
+              InvalidDataReason.SIGN_MODE_ORDINARY__CERTIFICATE_DREP_CREDENTIAL_ONLY_AS_PATH
+            );
+          });
+
+          it('can sign a transaction with UnregisterDelegateRepresentative certs', async () => {
+            const txBuilder = wallet.createTxBuilder();
+            txBuilder.partialTxBody.certificates = [
+              {
+                __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
+                dRepCredential: {
+                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+                  type: Cardano.CredentialType.KeyHash
+                },
+                deposit: 5n
+              }
+            ];
+            const tx = txBuilder
+              .addOutput(
+                txBuilder.buildOutput().address(outputs[0].address).coin(BigInt(outputs[0].value.coins)).toTxOut()
+              )
+              .build();
+
+            expect(await tx.sign()).toBeTruthy();
+          });
+
+          it('would throw while trying to sign a transaction with UnregisterDelegateRepresentative certs', async () => {
+            const txBuilder = wallet.createTxBuilder();
+            txBuilder.partialTxBody.certificates = [
+              {
+                __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
+                dRepCredential: {
+                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+                  type: Cardano.CredentialType.ScriptHash
+                },
+                deposit: 5n
+              }
+            ];
+            const tx = txBuilder
+              .addOutput(
+                txBuilder.buildOutput().address(outputs[0].address).coin(BigInt(outputs[0].value.coins)).toTxOut()
+              )
+              .build();
+
+            await expect(tx.sign()).rejects.toThrow(
+              InvalidDataReason.SIGN_MODE_ORDINARY__CERTIFICATE_DREP_CREDENTIAL_ONLY_AS_PATH
+            );
+          });
+
+          it('can sign a transaction with UpdateDelegateRepresentative certs', async () => {
+            const txBuilder = wallet.createTxBuilder();
+            txBuilder.partialTxBody.certificates = [
+              {
+                __typename: Cardano.CertificateType.UpdateDelegateRepresentative,
+                anchor: null,
+                dRepCredential: {
+                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+                  type: Cardano.CredentialType.KeyHash
+                }
+              }
+            ];
+            const tx = txBuilder
+              .addOutput(
+                txBuilder.buildOutput().address(outputs[0].address).coin(BigInt(outputs[0].value.coins)).toTxOut()
+              )
+              .build();
+
+            expect(await tx.sign()).toBeTruthy();
+          });
+
+          it('would throw while trying to sign a transaction with UpdateDelegateRepresentative certs', async () => {
+            const txBuilder = wallet.createTxBuilder();
+            txBuilder.partialTxBody.certificates = [
+              {
+                __typename: Cardano.CertificateType.UpdateDelegateRepresentative,
+                anchor: null,
+                dRepCredential: {
+                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+                  type: Cardano.CredentialType.ScriptHash
+                }
+              }
+            ];
+            const tx = txBuilder
+              .addOutput(
+                txBuilder.buildOutput().address(outputs[0].address).coin(BigInt(outputs[0].value.coins)).toTxOut()
+              )
+              .build();
+
+            await expect(tx.sign()).rejects.toThrow(
+              InvalidDataReason.SIGN_MODE_ORDINARY__CERTIFICATE_DREP_CREDENTIAL_ONLY_AS_PATH
+            );
+          });
+
+          it('can sign a transaction with voting procedures, treasury and donation', async () => {
+            const votingProcedure: Cardano.VotingProcedures[0] = {
+              voter: {
+                __typename: Cardano.VoterType.dRepKeyHash,
+                credential: { hash: Crypto.Hash28ByteBase16(dRepKeyHash), type: Cardano.CredentialType.KeyHash }
+              },
+              votes: [
+                {
+                  actionId: {
+                    actionIndex: 3,
+                    id: Cardano.TransactionId('1000000000000000000000000000000000000000000000000000000000000000')
+                  },
+                  votingProcedure: {
+                    anchor: {
+                      dataHash: Crypto.Hash32ByteBase16(
+                        '0000000000000000000000000000000000000000000000000000000000000000'
+                      ),
+                      url: 'https://www.someurl.io'
+                    },
+                    vote: 0
+                  }
+                }
+              ]
+            };
+
+            const txBuilder = wallet.createTxBuilder();
+            const builtTx = await txBuilder
+              .customize(({ txBody }) => {
+                const votingProcedures: Cardano.TxBody['votingProcedures'] = [
+                  ...(txBody.votingProcedures || []),
+                  votingProcedure
+                ];
+                return {
+                  ...txBody,
+                  donation: 1000n,
+                  treasuryValue: 2000n,
+                  votingProcedures
+                };
+              })
+              .build();
+            expect(await builtTx.sign()).toBeTruthy();
+          });
+        });
       });
     });
 

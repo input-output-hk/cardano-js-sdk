@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
 import { BaseWallet, FinalizeTxProps, ObservableWallet } from '@cardano-sdk/wallet';
-import { Cardano, Serialization, createSlotEpochCalc } from '@cardano-sdk/core';
+import { Cardano, Serialization, createSlotEpochCalc, nativeScriptPolicyId } from '@cardano-sdk/core';
 import {
   EMPTY,
   Observable,
@@ -18,12 +18,12 @@ import {
   timeout
 } from 'rxjs';
 import { FAST_OPERATION_TIMEOUT_DEFAULT, SYNC_TIMEOUT_DEFAULT } from '../defaults';
-import { InMemoryKeyAgent, TransactionSigner } from '@cardano-sdk/key-management';
+import { InMemoryKeyAgent, KeyPurpose, TransactionSigner } from '@cardano-sdk/key-management';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { TestWallet, networkInfoProviderFactory } from '../factories';
 import { getEnv, walletVariables } from '../environment';
 import { logger } from '@cardano-sdk/util-dev';
-import sortBy from 'lodash/sortBy';
+import sortBy from 'lodash/sortBy.js';
 
 const env = getEnv(walletVariables);
 
@@ -121,7 +121,7 @@ export const txConfirmed = (
       )
     ),
     `Tx confirmation timeout: ${id}`,
-    SYNC_TIMEOUT_DEFAULT / 5
+    env.NETWORK_SPEED === 'fast' ? SYNC_TIMEOUT_DEFAULT / 5 : SYNC_TIMEOUT_DEFAULT
   );
 
 export const submitAndConfirm = (wallet: ObservableWallet, tx: Cardano.Tx, numConfirmations?: number) =>
@@ -228,17 +228,20 @@ export const submitCertificate = async (certificate: Cardano.Certificate, wallet
  * @param mnemonics The random set of mnemonics.
  * @param genesis Network genesis parameters
  * @param bip32Ed25519 The Ed25519 cryptography implementation.
+ * @param purpose The key purpose.
  */
 export const createStandaloneKeyAgent = async (
   mnemonics: string[],
   genesis: Cardano.CompactGenesis,
-  bip32Ed25519: Crypto.Bip32Ed25519
+  bip32Ed25519: Crypto.Bip32Ed25519,
+  purpose?: KeyPurpose
 ) =>
   await InMemoryKeyAgent.fromBip39MnemonicWords(
     {
       chainId: genesis,
       getPassphrase: async () => Buffer.from(''),
-      mnemonicWords: mnemonics
+      mnemonicWords: mnemonics,
+      purpose
     },
     { bip32Ed25519, logger }
   );
@@ -257,15 +260,23 @@ export const burnTokens = async ({
 }: {
   wallet: BaseWallet;
   tokens?: Cardano.TokenMap;
-  scripts: Cardano.Script[];
+  scripts: Cardano.NativeScript[];
   policySigners: TransactionSigner[];
 }) => {
   if (!tokens) {
     tokens = (await firstValueFrom(wallet.balance.utxo.available$)).assets;
   }
 
-  if (!tokens?.size) {
+  if (!tokens) {
     return; // nothing to burn
+  }
+
+  // Filter by policyId
+  const policyIds = new Set([...scripts].map((script) => nativeScriptPolicyId(script)));
+  tokens = new Map([...tokens].filter(([assetId]) => policyIds.has(Cardano.AssetId.getPolicyId(assetId))));
+
+  if (tokens.size === 0) {
+    return; // no tokens for this policy
   }
 
   const negativeTokens = new Map([...tokens].map(([assetId, value]) => [assetId, -value]));

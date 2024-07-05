@@ -3,6 +3,63 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.19.3...@cardano-sdk/tx-construction@0.19.4) (2024-06-26)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
+## [0.19.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.19.2...@cardano-sdk/tx-construction@0.19.3) (2024-06-20)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
+## [0.19.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.19.1...@cardano-sdk/tx-construction@0.19.2) (2024-06-17)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
+## [0.19.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.19.0...@cardano-sdk/tx-construction@0.19.1) (2024-06-14)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
+## [0.19.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.18.7...@cardano-sdk/tx-construction@0.19.0) (2024-06-05)
+
+### ⚠ BREAKING CHANGES
+
+* Input selectors now return selected inputs in lexicographic order
+- new input selection parameter added 'mustSpendUtxo', which force such UTXOs to be part of the selection
+- txBuilder now takes a new optional dependency TxEvaluator
+- added to the txBuilder the following new methods 'addInput', 'addReferenceInput' and 'addDatum'
+- the txBuilder now supports spending from script inputs
+- the txBuilder now resolve unknown inputs from on-chain data
+- outputBuilder 'datum' function can now take PlutusData as inline datum
+- added to the OutputBuilder a new method 'scriptReference'
+- walletUtilContext now requires an additional property 'chainHistoryProvider'
+- initializeTx now takes the list of redeemerByType and the script versions of the plutus scripts in the transaction
+
+### Features
+
+* tx-builder now supports spending from plutus scripts ([936351e](https://github.com/input-output-hk/cardano-js-sdk/commit/936351e22bea0b673e683333c84cbf9d0e134e19))
+
+### Bug Fixes
+
+* **tx-construction:** tx-builder now computes redeemer indices correctly everytime ([08f0ee0](https://github.com/input-output-hk/cardano-js-sdk/commit/08f0ee0084d1a50d98961b0fb281f27bd0e3ceb7))
+
+## [0.18.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.18.6...@cardano-sdk/tx-construction@0.18.7) (2024-05-20)
+
+### Bug Fixes
+
+* **tx-construction:** fix an issue where the tx-builder was always using greedy input selector for multi delegation wallets ([1995288](https://github.com/input-output-hk/cardano-js-sdk/commit/199528890b574eb8c9bd47bd90af35641d61715b))
+
+## [0.18.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.18.5...@cardano-sdk/tx-construction@0.18.6) (2024-05-02)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
+## [0.18.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.18.4...@cardano-sdk/tx-construction@0.18.5) (2024-04-26)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
+## [0.18.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.18.3...@cardano-sdk/tx-construction@0.18.4) (2024-04-23)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
 ## [0.18.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.18.2...@cardano-sdk/tx-construction@0.18.3) (2024-04-15)
 
 **Note:** Version bump only for package @cardano-sdk/tx-construction

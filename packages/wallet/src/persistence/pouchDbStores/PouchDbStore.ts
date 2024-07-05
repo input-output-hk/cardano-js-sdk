@@ -80,7 +80,6 @@ export abstract class PouchDbStore<T extends {}> {
             _rev: await this.#getRev(docId),
             ...serializableDoc
           };
-          // eslint-disable-next-line promise/always-return
           try {
             await this.db.put(pouchDbDoc, { force: true });
           } catch (error) {

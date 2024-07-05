@@ -1,7 +1,7 @@
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Cardano } from '@cardano-sdk/core';
 import { CardanoKeyConst, GroupedAddress, util } from '@cardano-sdk/key-management';
-import { InvalidArgumentError, Transform } from '@cardano-sdk/util';
+import { InvalidArgumentError, Transform, areNumbersEqualInConstantTime } from '@cardano-sdk/util';
 import { LedgerTxTransformerContext } from '../types';
 
 const resolveKeyPath = (
@@ -38,30 +38,30 @@ export const toWithdrawal: Transform<Cardano.Withdrawal, Ledger.Withdrawal, Ledg
 
   let ledgerWithdrawal;
 
-  if (rewardAddress.getPaymentCredential().type === Cardano.CredentialType.KeyHash) {
+  if (areNumbersEqualInConstantTime(rewardAddress.getPaymentCredential().type, Cardano.CredentialType.KeyHash)) {
     const keyPath = resolveKeyPath(rewardAddress, context?.knownAddresses);
     ledgerWithdrawal = keyPath
       ? {
           amount: withdrawal.quantity,
           stakeCredential: {
             keyPath,
-            type: Ledger.StakeCredentialParamsType.KEY_PATH
-          } as Ledger.KeyPathStakeCredentialParams
+            type: Ledger.CredentialParamsType.KEY_PATH
+          } as Ledger.KeyPathCredentialParams
         }
       : {
           amount: withdrawal.quantity,
           stakeCredential: {
             keyHashHex: rewardAddress.getPaymentCredential().hash.toString(),
-            type: Ledger.StakeCredentialParamsType.KEY_HASH
-          } as Ledger.KeyHashStakeCredentialParams
+            type: Ledger.CredentialParamsType.KEY_HASH
+          } as Ledger.KeyHashCredentialParams
         };
   } else {
     ledgerWithdrawal = {
       amount: withdrawal.quantity,
       stakeCredential: {
         scriptHashHex: rewardAddress.getPaymentCredential().hash.toString(),
-        type: Ledger.StakeCredentialParamsType.SCRIPT_HASH
-      } as Ledger.ScriptStakeCredentialParams
+        type: Ledger.CredentialParamsType.SCRIPT_HASH
+      } as Ledger.ScriptHashCredentialParams
     };
   }
 
@@ -71,5 +71,15 @@ export const toWithdrawal: Transform<Cardano.Withdrawal, Ledger.Withdrawal, Ledg
 export const mapWithdrawals = (
   withdrawals: Cardano.Withdrawal[] | undefined,
   context: LedgerTxTransformerContext
-): Ledger.Withdrawal[] | null =>
-  withdrawals ? withdrawals.map((coreWithdrawal) => toWithdrawal(coreWithdrawal, context)) : null;
+): Ledger.Withdrawal[] | null => {
+  if (!withdrawals) return null;
+  // Sort withdrawals by address bytes, canonically
+  withdrawals.sort((a, b) => {
+    const rewardAddress1 = Cardano.Address.fromString(a.stakeAddress)?.asReward();
+    const rewardAddress2 = Cardano.Address.fromString(b.stakeAddress)?.asReward();
+    if (!rewardAddress1 || !rewardAddress2)
+      throw new InvalidArgumentError('withdrawal', 'Invalid withdrawal stake address');
+    return rewardAddress1.toAddress().toBytes() > rewardAddress2.toAddress().toBytes() ? 1 : -1;
+  });
+  return withdrawals.map((coreWithdrawal) => toWithdrawal(coreWithdrawal, context));
+};

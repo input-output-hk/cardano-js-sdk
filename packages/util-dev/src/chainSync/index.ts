@@ -6,15 +6,17 @@ import {
   ChainSyncEventType,
   ChainSyncRollBackward,
   ChainSyncRollForward,
+  GeneralCardanoNodeError,
+  GeneralCardanoNodeErrorCode,
   Intersection,
   ObservableCardanoNode,
   Point,
   PointOrOrigin
 } from '@cardano-sdk/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { fromSerializableObject } from '@cardano-sdk/util';
 import { genesisToEraSummary } from './genesisToEraSummary';
-import memoize from 'lodash/memoize';
+import memoize from 'lodash/memoize.js';
 
 export type SerializedChainSyncEvent =
   | Omit<ChainSyncRollForward, 'requestNext'>
@@ -97,6 +99,9 @@ const intersect = (events: ChainSyncData['body'], points: PointOrOrigin[]) => {
 
 export enum ChainSyncDataSet {
   PreviewStakePoolProblem = 'preview-stake-pool-problem.json',
+  AssetNameUtf8Problem = 'asset-name-utf8-problem.json',
+  MissingExtraDatumMetadataProblem = 'missing-extra-datum-metadata-problem.json',
+  ExtraDataNullCharactersProblem = 'extra-data-null-characters-problem.json',
   WithPoolRetirement = 'with-pool-retirement.json',
   WithStakeKeyDeregistration = 'with-stake-key-deregistration.json',
   WithMint = 'with-mint.json',
@@ -136,7 +141,11 @@ export const chainSyncData = memoize((dataSet: ChainSyncDataSet) => {
       });
     },
     genesisParameters$: of(compactGenesis),
-    healthCheck$: new Observable()
+    healthCheck$: new Observable(),
+    submitTx: () =>
+      throwError(
+        () => new GeneralCardanoNodeError(GeneralCardanoNodeErrorCode.Unknown, null, 'submitTx is not implemented')
+      )
   };
   return {
     allEvents,

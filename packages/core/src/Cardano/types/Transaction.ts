@@ -1,7 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AuxiliaryData } from './AuxiliaryData';
 import { Base64Blob, HexBlob, OpaqueString } from '@cardano-sdk/util';
-import { Certificate } from './Certificate';
+import { Certificate, PoolRegistrationCertificate } from './Certificate';
 import { ExUnits, Update, ValidityInterval } from './ProtocolParameters';
 import { HydratedTxIn, TxIn, TxOut } from './Utxo';
 import { Lovelace, TokenMap } from './Value';
@@ -36,6 +36,12 @@ export interface Withdrawal {
   quantity: Lovelace;
 }
 
+export type HydratedPoolRegistrationCertificate = PoolRegistrationCertificate & { deposit?: Lovelace };
+
+export type HydratedCertificate =
+  | Exclude<Certificate, PoolRegistrationCertificate>
+  | HydratedPoolRegistrationCertificate;
+
 export interface HydratedTxBody {
   inputs: HydratedTxIn[];
   collaterals?: HydratedTxIn[];
@@ -43,7 +49,7 @@ export interface HydratedTxBody {
   fee: Lovelace;
   validityInterval?: ValidityInterval;
   withdrawals?: Withdrawal[];
-  certificates?: Certificate[];
+  certificates?: HydratedCertificate[];
   mint?: TokenMap;
   scriptIntegrityHash?: Crypto.Hash32ByteBase16;
   requiredExtraSignatures?: Crypto.Ed25519KeyHashHex[];
@@ -80,9 +86,10 @@ export interface HydratedTxBody {
   donation?: Lovelace;
 }
 
-export interface TxBody extends Omit<HydratedTxBody, 'inputs' | 'collaterals' | 'referenceInputs'> {
-  inputs: TxIn[];
+export interface TxBody extends Omit<HydratedTxBody, 'certificates' | 'inputs' | 'collaterals' | 'referenceInputs'> {
+  certificates?: Certificate[];
   collaterals?: TxIn[];
+  inputs: TxIn[];
   referenceInputs?: TxIn[];
 }
 
@@ -96,7 +103,6 @@ export enum RedeemerPurpose {
   mint = 'mint',
   certificate = 'certificate',
   withdrawal = 'withdrawal',
-  delegateRepresentative = 'representative',
   propose = 'propose',
   vote = 'vote'
 }
@@ -144,11 +150,18 @@ export interface Tx<TBody extends TxBody = TxBody> {
   isValid?: boolean;
 }
 
-export interface OnChainTx<TBody extends TxBody = TxBody> extends Omit<Tx<TBody>, 'isValid'> {
+interface TxWithInputSource<TBody extends TxBody = TxBody> extends Omit<Tx<TBody>, 'isValid'> {
   inputSource: InputSource;
 }
 
-export interface HydratedTx extends OnChainTx<HydratedTxBody> {
+// https://github.com/input-output-hk/cardano-js-sdk/pull/927#discussion_r1352081210
+export interface OnChainTx<TBody extends TxBody = TxBody>
+  extends Omit<TxWithInputSource<TBody>, 'witness' | 'auxiliaryData'> {
+  witness: Omit<Witness, 'scripts'>;
+  auxiliaryData?: Omit<AuxiliaryData, 'scripts'>;
+}
+
+export interface HydratedTx extends TxWithInputSource<HydratedTxBody> {
   index: number;
   blockHeader: PartialBlockHeader;
   body: HydratedTxBody;

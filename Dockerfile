@@ -20,8 +20,7 @@ FROM ubuntu-nodejs as nodejs-builder
 RUN \
   curl --proto '=https' --tlsv1.2 -sSf -L https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - &&\
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list &&\
-  apt-get update && apt-get install pkg-config libusb-1.0 libudev-dev gcc g++ make gnupg2 yarn -y &&\
-  yarn global add node-gyp@9.0.0
+  apt-get update && apt-get install yarn -y
 WORKDIR /app
 COPY build build
 COPY packages/cardano-services/package.json packages/cardano-services/package.json
@@ -55,16 +54,11 @@ FROM nodejs-builder as cardano-services-builder
 RUN yarn --immutable --inline-builds --mode=skip-build
 COPY packages packages
 RUN \
-  echo "export const unused = 'unused';" > packages/e2e/src/index.ts &&\
-  NODE_OPTIONS=--max_old_space_size=10240 yarn build
+  yarn workspace @cardano-sdk/cardano-services build &&\
+  yarn workspace @cardano-sdk/cardano-services-client build
 
-FROM nodejs-builder as cardano-services-production-deps
+FROM nodejs-builder as cardano-services
 RUN yarn workspaces focus --all --production
-
-FROM ubuntu-nodejs as cardano-services
-COPY --from=cardano-services-production-deps /app/node_modules /app/node_modules
-COPY --from=cardano-services-production-deps /app/packages/cardano-services/node_modules /app/packages/cardano-services/node_modules
-COPY --from=cardano-services-production-deps /app/packages/core/node_modules /app/packages/core/node_modules
 COPY --from=cardano-services-builder /app/scripts /app/scripts
 COPY --from=cardano-services-builder /app/packages/cardano-services/dist /app/packages/cardano-services/dist
 COPY --from=cardano-services-builder /app/packages/cardano-services/package.json /app/packages/cardano-services/package.json
@@ -114,11 +108,16 @@ WORKDIR /app/packages/cardano-services
 CMD ["node", "dist/cjs/cli.js", "start-blockfrost-worker"]
 
 FROM cardano-services as pg-boss-worker
+WORKDIR /config
+COPY compose/schedules.json .
+ENV SCHEDULES=/config/schedules.json
 WORKDIR /app/packages/cardano-services
+HEALTHCHECK CMD curl -s --fail http://localhost:3003/v1.0.0/health
 CMD ["node", "dist/cjs/cli.js", "start-pg-boss-worker"]
 
 FROM cardano-services as projector
 WORKDIR /
 COPY compose/projector/init.* ./
 RUN chmod 755 init.sh
+HEALTHCHECK CMD test `curl -fs http://localhost:3000/v1.0.0/health | jq -r ".services[0].projectedTip.blockNo"` -gt 1
 CMD ["./init.sh"]

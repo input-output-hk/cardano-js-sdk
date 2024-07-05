@@ -962,9 +962,10 @@ describe('StakePoolHttpService', () => {
               expect(response.pageResults).toEqual(responseCached.pageResults);
               expect(response.pageResults[0].status).toEqual(Cardano.StakePoolStatus.Activating);
             });
-            it('pledgeMet false, status activating, and condition', async () => {
+
+            it('pledgeMet false, status active, and condition', async () => {
               const activating = await fixtureBuilder.getPools(1, {
-                with: [PoolWith.ActivatingState, PoolWith.PledgeNotMet]
+                with: [PoolWith.ActiveState, PoolWith.PledgeNotMet]
               });
               const filter: QueryStakePoolsArgs = {
                 filters: {
@@ -975,13 +976,14 @@ describe('StakePoolHttpService', () => {
                 pagination
               };
 
-              const options = addPledgeMetFilter(addStatusFilter(filter, Cardano.StakePoolStatus.Activating), false);
+              const options = addPledgeMetFilter(addStatusFilter(filter, Cardano.StakePoolStatus.Active), false);
               const response = await provider.queryStakePools(options);
               const responseCached = await provider.queryStakePools(options);
               expect(response.pageResults.length).toBeGreaterThan(0);
               expect(response.pageResults).toEqual(responseCached.pageResults);
-              expect(response.pageResults[0].status).toEqual(Cardano.StakePoolStatus.Activating);
+              expect(response.pageResults[0].status).toEqual(Cardano.StakePoolStatus.Active);
             });
+
             it('pledgeMet true, status retired, or condition', async () => {
               const options = addPledgeMetFilter(
                 addStatusFilter(setFilterCondition(filterArgs, 'or'), Cardano.StakePoolStatus.Retired),

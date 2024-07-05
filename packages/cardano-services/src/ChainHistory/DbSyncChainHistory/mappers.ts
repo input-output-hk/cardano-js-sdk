@@ -1,11 +1,12 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { BigIntMath } from '@cardano-sdk/util';
+import { BigIntMath, HexBlob } from '@cardano-sdk/util';
 import {
   BlockModel,
   BlockOutputModel,
   CertificateModel,
   MultiAssetModel,
   RedeemerModel,
+  ScriptModel,
   TipModel,
   TxIdModel,
   TxInput,
@@ -20,14 +21,24 @@ import {
   WithCertType,
   WithdrawalModel
 } from './types';
-import { Cardano } from '@cardano-sdk/core';
-import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { Cardano, NotImplementedError } from '@cardano-sdk/core';
+import { Hash28ByteBase16, Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import {
+  isAuthorizeCommitteeHotCertModel,
   isDelegationCertModel,
+  isDrepRegistrationCertModel,
+  isDrepUnregistrationCertModel,
   isMirCertModel,
   isPoolRegisterCertModel,
   isPoolRetireCertModel,
-  isStakeCertModel
+  isResignCommitteeColdCertModel,
+  isStakeCertModel,
+  isStakeRegistrationDelegationCertModel,
+  isStakeVoteDelegationCertModel,
+  isStakeVoteRegistrationDelegationCertModel,
+  isUpdateDrepCertModel,
+  isVoteDelegationCertModel,
+  isVoteRegistrationDelegationCertModel
 } from './util';
 
 const addMultiAssetToTokenMap = (multiAsset: MultiAssetModel, tokenMap: Cardano.TokenMap): Cardano.TokenMap => {
@@ -84,14 +95,18 @@ export const mapTxOut = (txOut: TxOutput): Cardano.TxOut => ({
   value: txOut.value
 });
 
-export const mapTxOutModel = (txOutModel: TxOutputModel, assets?: Cardano.TokenMap): TxOutput => ({
+export const mapTxOutModel = (
+  txOutModel: TxOutputModel,
+  props: { assets?: Cardano.TokenMap; script?: Cardano.Script }
+): TxOutput => ({
   address: txOutModel.address as unknown as Cardano.PaymentAddress,
   // Inline datums are missing, but for now it's ok on ChainHistoryProvider
   datumHash: txOutModel.datum ? (txOutModel.datum.toString('hex') as unknown as Hash32ByteBase16) : undefined,
   index: txOutModel.index,
+  scriptReference: props.script,
   txId: txOutModel.tx_id.toString('hex') as unknown as Cardano.TransactionId,
   value: {
-    assets: assets && assets.size > 0 ? assets : undefined,
+    assets: props.assets && props.assets.size > 0 ? props.assets : undefined,
     coins: BigInt(txOutModel.coin_value)
   }
 });
@@ -101,9 +116,39 @@ export const mapWithdrawal = (withdrawalModel: WithdrawalModel): Cardano.Withdra
   stakeAddress: withdrawalModel.stake_address as unknown as Cardano.RewardAccount
 });
 
+export const mapPlutusScript = (scriptModel: ScriptModel): Cardano.Script => {
+  const cbor = scriptModel.bytes.toString('hex') as HexBlob;
+
+  return {
+    __type: Cardano.ScriptType.Plutus,
+    bytes: cbor,
+    version:
+      scriptModel.type === 'plutusV1'
+        ? Cardano.PlutusLanguageVersion.V1
+        : scriptModel.type === 'plutusV2'
+        ? Cardano.PlutusLanguageVersion.V2
+        : Cardano.PlutusLanguageVersion.V3
+  };
+};
+
 // TODO: unfortunately this is not nullable and not implemented.
 // Remove this and select the actual redeemer data from `redeemer_data` table.
 const stubRedeemerData = Buffer.from('not implemented');
+
+const redeemerPurposeMap: Record<RedeemerModel['purpose'], Cardano.RedeemerPurpose> = {
+  cert: Cardano.RedeemerPurpose.certificate,
+  mint: Cardano.RedeemerPurpose.mint,
+  proposing: Cardano.RedeemerPurpose.propose,
+  reward: Cardano.RedeemerPurpose.withdrawal,
+  spend: Cardano.RedeemerPurpose.spend,
+  voting: Cardano.RedeemerPurpose.vote
+};
+
+const mapRedeemerPurpose = (purpose: RedeemerModel['purpose']): Cardano.RedeemerPurpose =>
+  redeemerPurposeMap[purpose] ||
+  (() => {
+    throw new NotImplementedError(`Failed to map redeemer "purpose": ${purpose}`);
+  })();
 
 export const mapRedeemer = (redeemerModel: RedeemerModel): Cardano.Redeemer => ({
   data: stubRedeemerData,
@@ -112,12 +157,24 @@ export const mapRedeemer = (redeemerModel: RedeemerModel): Cardano.Redeemer => (
     steps: Number(redeemerModel.unit_steps)
   },
   index: redeemerModel.index,
-  purpose: redeemerModel.purpose as Cardano.RedeemerPurpose
+  purpose: mapRedeemerPurpose(redeemerModel.purpose)
 });
 
+export const mapAnchor = (anchorUrl: string, anchorDataHash: string): Cardano.Anchor | null => {
+  if (!!anchorUrl && !!anchorDataHash) {
+    return {
+      dataHash: anchorDataHash as Hash32ByteBase16,
+      url: anchorUrl
+    };
+  }
+  return null;
+};
+
+// eslint-disable-next-line complexity
 export const mapCertificate = (
   certModel: WithCertType<CertificateModel>
-): WithCertIndex<Cardano.Certificate> | null => {
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+): WithCertIndex<Cardano.HydratedCertificate> | null => {
   if (isPoolRetireCertModel(certModel))
     return {
       __typename: Cardano.CertificateType.PoolRetirement,
@@ -130,8 +187,9 @@ export const mapCertificate = (
     return {
       __typename: Cardano.CertificateType.PoolRegistration,
       cert_index: certModel.cert_index,
+      deposit: BigInt(certModel.deposit),
       poolParameters: null as unknown as Cardano.PoolParameters
-    } as WithCertIndex<Cardano.PoolRegistrationCertificate>;
+    } as WithCertIndex<Cardano.HydratedPoolRegistrationCertificate>;
 
   if (isMirCertModel(certModel)) {
     const credential = Cardano.Address.fromString(certModel.address)?.asReward()?.getPaymentCredential();
@@ -148,16 +206,17 @@ export const mapCertificate = (
   if (isStakeCertModel(certModel))
     return {
       __typename: certModel.registration
-        ? Cardano.CertificateType.StakeRegistration
-        : Cardano.CertificateType.StakeDeregistration,
+        ? Cardano.CertificateType.Registration
+        : Cardano.CertificateType.Unregistration,
       cert_index: certModel.cert_index,
+      deposit: BigInt(certModel.deposit),
       stakeCredential: {
         hash: Cardano.RewardAccount.toHash(
           Cardano.RewardAccount(certModel.address)
         ) as unknown as Crypto.Hash28ByteBase16,
         type: Cardano.CredentialType.KeyHash
       }
-    } as WithCertIndex<Cardano.StakeAddressCertificate>;
+    } as WithCertIndex<Cardano.NewStakeAddressCertificate>;
 
   if (isDelegationCertModel(certModel))
     return {
@@ -171,6 +230,149 @@ export const mapCertificate = (
         type: Cardano.CredentialType.KeyHash
       }
     } as WithCertIndex<Cardano.StakeDelegationCertificate>;
+
+  if (isDrepRegistrationCertModel(certModel))
+    return {
+      __typename: Cardano.CertificateType.RegisterDelegateRepresentative,
+      anchor:
+        certModel.url && certModel.data_hash ? mapAnchor(certModel.url, certModel.data_hash.toString('hex')) : null,
+      cert_index: certModel.cert_index,
+      dRepCredential: {
+        hash: certModel.drep_hash.toString('hex') as Hash28ByteBase16,
+        type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
+      },
+      deposit: BigInt(certModel.deposit)
+    };
+
+  if (isDrepUnregistrationCertModel(certModel))
+    return {
+      __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
+      cert_index: certModel.cert_index,
+      dRepCredential: {
+        hash: certModel.drep_hash.toString('hex') as Hash28ByteBase16,
+        type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
+      },
+      deposit: BigInt(certModel.deposit)
+    };
+
+  if (isUpdateDrepCertModel(certModel))
+    return {
+      __typename: Cardano.CertificateType.UpdateDelegateRepresentative,
+      anchor:
+        certModel.url && certModel.data_hash ? mapAnchor(certModel.url, certModel.data_hash.toString('hex')) : null,
+      cert_index: certModel.cert_index,
+      dRepCredential: {
+        hash: certModel.drep_hash.toString('hex') as Hash28ByteBase16,
+        type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
+      }
+    };
+
+  if (isVoteDelegationCertModel(certModel))
+    return {
+      __typename: Cardano.CertificateType.VoteDelegation,
+      cert_index: certModel.cert_index,
+      dRep: {
+        hash: certModel.drep_hash.toString('hex') as Hash28ByteBase16,
+        type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
+      },
+      stakeCredential: {
+        hash: Cardano.RewardAccount.toHash(
+          Cardano.RewardAccount(certModel.address)
+        ) as unknown as Crypto.Hash28ByteBase16,
+        type: Cardano.CredentialType.KeyHash
+      }
+    };
+
+  if (isVoteRegistrationDelegationCertModel(certModel))
+    return {
+      __typename: Cardano.CertificateType.VoteRegistrationDelegation,
+      cert_index: certModel.cert_index,
+      dRep: {
+        hash: certModel.drep_hash.toString('hex') as Hash28ByteBase16,
+        type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
+      },
+      deposit: BigInt(certModel.deposit),
+      stakeCredential: {
+        hash: Cardano.RewardAccount.toHash(
+          Cardano.RewardAccount(certModel.address)
+        ) as unknown as Crypto.Hash28ByteBase16,
+        type: Cardano.CredentialType.KeyHash
+      }
+    };
+
+  if (isStakeVoteDelegationCertModel(certModel))
+    return {
+      __typename: Cardano.CertificateType.StakeVoteDelegation,
+      cert_index: certModel.cert_index,
+      dRep: {
+        hash: certModel.drep_hash.toString('hex') as Hash28ByteBase16,
+        type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
+      },
+      poolId: certModel.pool_id as unknown as Cardano.PoolId,
+      stakeCredential: {
+        hash: Cardano.RewardAccount.toHash(
+          Cardano.RewardAccount(certModel.address)
+        ) as unknown as Crypto.Hash28ByteBase16,
+        type: Cardano.CredentialType.KeyHash
+      }
+    };
+
+  if (isStakeRegistrationDelegationCertModel(certModel))
+    return {
+      __typename: Cardano.CertificateType.StakeRegistrationDelegation,
+      cert_index: certModel.cert_index,
+      deposit: BigInt(certModel.deposit),
+      poolId: certModel.pool_id as unknown as Cardano.PoolId,
+      stakeCredential: {
+        hash: Cardano.RewardAccount.toHash(
+          Cardano.RewardAccount(certModel.address)
+        ) as unknown as Crypto.Hash28ByteBase16,
+        type: Cardano.CredentialType.KeyHash
+      }
+    };
+
+  if (isStakeVoteRegistrationDelegationCertModel(certModel))
+    return {
+      __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
+      cert_index: certModel.cert_index,
+      dRep: {
+        hash: certModel.drep_hash.toString('hex') as Hash28ByteBase16,
+        type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
+      },
+      deposit: BigInt(certModel.deposit),
+      poolId: certModel.pool_id as unknown as Cardano.PoolId,
+      stakeCredential: {
+        hash: Cardano.RewardAccount.toHash(
+          Cardano.RewardAccount(certModel.address)
+        ) as unknown as Crypto.Hash28ByteBase16,
+        type: Cardano.CredentialType.KeyHash
+      }
+    };
+
+  if (isAuthorizeCommitteeHotCertModel(certModel))
+    return {
+      __typename: Cardano.CertificateType.AuthorizeCommitteeHot,
+      cert_index: certModel.cert_index,
+      coldCredential: {
+        hash: certModel.cold_key.toString('hex') as unknown as Crypto.Hash28ByteBase16,
+        type: certModel.cold_key_has_script ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
+      },
+      hotCredential: {
+        hash: certModel.hot_key.toString('hex') as unknown as Crypto.Hash28ByteBase16,
+        type: certModel.hot_key_has_script ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
+      }
+    };
+
+  if (isResignCommitteeColdCertModel(certModel))
+    return {
+      __typename: Cardano.CertificateType.ResignCommitteeCold,
+      anchor: mapAnchor(certModel.url, certModel.data_hash),
+      cert_index: certModel.cert_index,
+      coldCredential: {
+        hash: certModel.cold_key.toString('hex') as unknown as Crypto.Hash28ByteBase16,
+        type: certModel.cold_key_has_script ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
+      }
+    };
 
   return null;
 };
@@ -186,21 +388,25 @@ interface TxAlonzoData {
   collaterals?: Cardano.HydratedTxIn[];
   certificates?: Cardano.Certificate[];
   collateralOutputs?: Cardano.TxOut[];
+  proposalProcedures?: Cardano.ProposalProcedure[];
+  votingProcedures?: Cardano.VotingProcedures;
 }
 
 export const mapTxAlonzo = (
   txModel: TxModel,
   {
+    certificates,
+    collaterals,
+    collateralOutputs = [],
     inputSource,
     inputs,
-    outputs,
-    mint,
-    withdrawals,
-    redeemers,
     metadata,
-    collaterals,
-    certificates,
-    collateralOutputs = []
+    mint,
+    outputs,
+    proposalProcedures,
+    redeemers,
+    votingProcedures,
+    withdrawals
   }: TxAlonzoData
 ): Cardano.HydratedTx => ({
   auxiliaryData:
@@ -233,11 +439,12 @@ export const mapTxAlonzo = (
         }),
     certificates,
     mint,
-    totalCollateral: inputSource === Cardano.InputSource.collaterals ? BigInt(txModel.fee) : undefined,
+    proposalProcedures,
     validityInterval: {
       invalidBefore: Cardano.Slot(Number(txModel.invalid_before)) || undefined,
       invalidHereafter: Cardano.Slot(Number(txModel.invalid_hereafter)) || undefined
     },
+    votingProcedures,
     withdrawals
   },
   id: txModel.id.toString('hex') as unknown as Cardano.TransactionId,

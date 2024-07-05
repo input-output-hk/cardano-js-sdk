@@ -3,6 +3,48 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.21](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.11.20...@cardano-sdk/projection@0.11.21) (2024-06-26)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
+## [0.11.20](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.11.19...@cardano-sdk/projection@0.11.20) (2024-06-20)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
+## [0.11.19](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.11.18...@cardano-sdk/projection@0.11.19) (2024-06-18)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
+## [0.11.18](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.11.17...@cardano-sdk/projection@0.11.18) (2024-06-17)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
+## [0.11.17](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.11.16...@cardano-sdk/projection@0.11.17) (2024-06-14)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
+## [0.11.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.11.15...@cardano-sdk/projection@0.11.16) (2024-06-05)
+
+### Bug Fixes
+
+* project datum nft metadata with missing extra field ([9b283d9](https://github.com/input-output-hk/cardano-js-sdk/commit/9b283d9ad0fd5b410772b0aca8b9382f6c3b6ef5))
+
+## [0.11.15](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.11.14...@cardano-sdk/projection@0.11.15) (2024-05-20)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
+## [0.11.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.11.13...@cardano-sdk/projection@0.11.14) (2024-05-02)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
+## [0.11.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.11.12...@cardano-sdk/projection@0.11.13) (2024-04-26)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
+## [0.11.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.11.11...@cardano-sdk/projection@0.11.12) (2024-04-23)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
 ## [0.11.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.11.10...@cardano-sdk/projection@0.11.11) (2024-04-15)
 
 **Note:** Version bump only for package @cardano-sdk/projection

@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.20.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.20.8...@cardano-sdk/key-management@0.20.9) (2024-06-26)
+
+**Note:** Version bump only for package @cardano-sdk/key-management
+
+## [0.20.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.20.7...@cardano-sdk/key-management@0.20.8) (2024-06-20)
+
+### Features
+
+* remove async from fromBip39Entropy ([#1326](https://github.com/input-output-hk/cardano-js-sdk/issues/1326)) ([da736d3](https://github.com/input-output-hk/cardano-js-sdk/commit/da736d33a4e6c4f1ea3ce4c654bf0f8ba2e39247))
+
+## [0.20.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.20.6...@cardano-sdk/key-management@0.20.7) (2024-06-14)
+
+### Features
+
+* key agents now can take optional coin purpose ([e6861d7](https://github.com/input-output-hk/cardano-js-sdk/commit/e6861d7008addb7cc736a44e7823ce062c7131d6))
+
+## [0.20.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.20.5...@cardano-sdk/key-management@0.20.6) (2024-06-05)
+
+**Note:** Version bump only for package @cardano-sdk/key-management
+
+## [0.20.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.20.4...@cardano-sdk/key-management@0.20.5) (2024-05-20)
+
+**Note:** Version bump only for package @cardano-sdk/key-management
+
+## [0.20.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.20.3...@cardano-sdk/key-management@0.20.4) (2024-05-02)
+
+**Note:** Version bump only for package @cardano-sdk/key-management
+
+## [0.20.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.20.2...@cardano-sdk/key-management@0.20.3) (2024-04-26)
+
+**Note:** Version bump only for package @cardano-sdk/key-management
+
+## [0.20.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.20.1...@cardano-sdk/key-management@0.20.2) (2024-04-23)
+
+**Note:** Version bump only for package @cardano-sdk/key-management
+
 ## [0.20.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.20.0...@cardano-sdk/key-management@0.20.1) (2024-03-26)
 
 **Note:** Version bump only for package @cardano-sdk/key-management

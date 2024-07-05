@@ -4,6 +4,7 @@ import { GenericTxBuilder, OutputValidation, TxBuilderProviders } from '../../sr
 import { SodiumBip32Ed25519 } from '@cardano-sdk/crypto';
 import { dummyLogger } from 'ts-log';
 import { logger, mockProviders as mocks } from '@cardano-sdk/util-dev';
+import { mockTxEvaluator } from './mocks';
 
 describe.each([
   ['TxBuilderGeneric', false],
@@ -66,6 +67,7 @@ describe.each([
       logger: dummyLogger,
       outputValidator,
       txBuilderProviders,
+      txEvaluator: mockTxEvaluator,
       witnesser: util.createBip32Ed25519Witnesser(keyAgent)
     };
     const txBuilder = new GenericTxBuilder(builderParams);

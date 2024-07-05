@@ -313,6 +313,15 @@ describe('ChainHistoryHttpService', () => {
           expect(tx.auxiliaryData).toBeDefined();
         });
 
+        it('has script reference data', async () => {
+          const response = await provider.transactionsByHashes({
+            ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.ScriptReference] })
+          });
+          const tx: Cardano.HydratedTx = response[0];
+          expect(response.length).toEqual(1);
+          expect(tx.body.outputs.some((txOut) => !!txOut.scriptReference)).toBeTruthy();
+        });
+
         it('has collateral inputs', async () => {
           const response = await provider.transactionsByHashes({
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.CollateralInput] })

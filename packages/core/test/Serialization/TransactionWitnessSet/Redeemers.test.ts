@@ -1,4 +1,4 @@
-import { Cardano } from '../../../src';
+import { Cardano, setInConwayEra } from '../../../src';
 import { HexBlob } from '@cardano-sdk/util';
 import { RedeemerPurpose } from '../../../src/Cardano';
 import { Redeemers } from '../../../src/Serialization';
@@ -33,7 +33,7 @@ const cborInvalidMapIndex = HexBlob('a28308000082d8799f0102030405ff821821182c820
 const cborInvalidMapValue = HexBlob('a28200008300d8799f0102030405ff821821182c82040082d8799f0102030405ff8218371842');
 
 describe('Redeemers', () => {
-  afterEach(() => (Redeemers.useConwaySerialization = false));
+  afterEach(() => setInConwayEra(false));
 
   it('can decode Redeemers from CBOR', () => {
     const redeemers = Redeemers.fromCbor(cbor);
@@ -47,13 +47,12 @@ describe('Redeemers', () => {
 
   it('can decode Redeemers from map encoded CBOR', () => {
     const redeemers = Redeemers.fromCbor(cborConway);
-    // Redeemers.useConwaySerialization = true;
     expect(redeemers.toCore()).toEqual(core);
   });
 
   it('can encode Redeemers as map in CBOR', () => {
     const redeemers = Redeemers.fromCore(core);
-    Redeemers.useConwaySerialization = true;
+    setInConwayEra(true);
     expect(redeemers.toCbor()).toEqual(cborConway);
   });
 
