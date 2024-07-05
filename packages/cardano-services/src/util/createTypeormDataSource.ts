@@ -11,9 +11,14 @@ export const createTypeormDataSource = (
     switchMap((connectionConfig) =>
       from(
         (async () => {
-          const dataSource = createDataSource({ connectionConfig, entities, logger });
-          await dataSource.initialize();
-          return dataSource;
+          try {
+            const dataSource = createDataSource({ connectionConfig, entities, logger });
+            await dataSource.initialize();
+            return dataSource;
+          } catch (error) {
+            logger.error(error, 'Error while creating DataSource');
+            return null;
+          }
         })()
       )
     )

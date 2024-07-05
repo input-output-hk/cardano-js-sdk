@@ -10,6 +10,8 @@ export interface TypeormProviderDependencies {
   connectionConfig$: Observable<PgConnectionConfig>;
 }
 
+const unhealthy = { ok: false, reason: 'Provider error' };
+
 export abstract class TypeormProvider extends TypeormService implements Provider {
   health: HealthCheckResponse = { ok: false, reason: 'not started' };
 
@@ -17,11 +19,18 @@ export abstract class TypeormProvider extends TypeormService implements Provider
     super(name, { connectionConfig$, entities, logger });
     // We skip 1 to omit the initial null value of the subject
     this.dataSource$.pipe(skip(1)).subscribe((dataSource) => {
-      this.health = dataSource ? { ok: true } : { ok: false, reason: 'Provider error' };
+      this.health = dataSource ? { ok: true } : unhealthy;
     });
   }
 
   async healthCheck(): Promise<HealthCheckResponse> {
+    if (this.state === 'running')
+      try {
+        await this.withDataSource((dataSource) => dataSource.query('SELECT 1'));
+      } catch {
+        return unhealthy;
+      }
+
     return this.health;
   }
 }
