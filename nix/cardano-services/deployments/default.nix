@@ -77,6 +77,11 @@ in
           resources.limits = mkPodResources "300Mi" "500m";
           resources.requests = mkPodResources "150Mi" "100m";
         };
+
+        chain-history-provider = {
+          resources.limits = mkPodResources "300Mi" "500m";
+          resources.requests = mkPodResources "150Mi" "100m";
+        };
       };
 
       projectors = {
@@ -155,7 +160,6 @@ in
               (map (v: "/v${v}/meta") versions.root)
               (map (v: "/v${v}/ready") versions.root)
               (map (v: "/v${v}/asset") versions.assetInfo)
-              (map (v: "/v${v}/chain-history") versions.chainHistory)
               (map (v: "/v${v}/network-info") versions.networkInfo)
               (map (v: "/v${v}/rewards") versions.rewards)
               (map (v: "/v${v}/tx-submit") versions.txSubmit)
@@ -169,6 +173,7 @@ in
         ./projector.resource.nix
         ./backend.provider.nix
         ./stake-pool.nix
+        ./chain-history.nix
         ./handle.nix
         ./asset.nix
         ./backend-ingress.nix
@@ -176,6 +181,7 @@ in
         ./blockfrost-worker-deployment.nix
       ];
     };
+
 
     targets =
       {
@@ -461,6 +467,7 @@ in
             };
             handle-provider.enabled = true;
             # asset-provider.enabled = true;
+            chain-history-provider.enabled = true;
           };
 
           projectors = {
@@ -468,6 +475,8 @@ in
             stake-pool.enabled = true;
             # asset.enabled = true;
           };
+     
+
 
           values = {
             stakepool.databaseName = "stakepoolv2";
@@ -865,10 +874,11 @@ in
                 (map (v: "/v${v}/handle") versions.handle)
               ];
           };
+          chain-history-provider.enabled = true;
         };
 
         "ops-preview-1@us-east-1" = final: {
-          name = "${final.namespace}-cardanojs-v2";
+          name = "${final.namespace}-cardanojs-v1";
           namespace = "ops-preview-1";
           network = "preview";
           region = "us-east-1";
@@ -877,10 +887,10 @@ in
             backend = {
               enabled = true;
             };
+            chain-history-provider.enabled = true;
           };
 
           values = {
-            stakepool.databaseName = "stakepoolv2";
             cardano-services = {
               ingresOrder = 99;
             };

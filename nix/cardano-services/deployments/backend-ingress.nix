@@ -83,6 +83,17 @@
                 }
               )
               values.backend.routes)
+            ++ lib.optionals config.providers.chain-history-provider.enabled (
+              map (version: {
+                pathType = "Prefix";
+                path = "/v${version}/chain-history";
+                backend.service = {
+                  name = "${chart.name}-chain-history-provider";
+                  port.name = "http";
+                };
+              })
+              values.cardano-services.versions.chainHistory
+            )
             ++ lib.optionals config.providers.stake-pool-provider.enabled [
               {
                 pathType = "Prefix";
