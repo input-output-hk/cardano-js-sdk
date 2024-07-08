@@ -21,7 +21,7 @@
     };
 
     env = {
-      NETWORK = values.network;
+      NETWORK = config.network;
       ENABLE_METRICS = "true";
       SERVICE_NAMES = "chain-history";
       OGMIOS_SRV_SERVICE_NAME = values.backend.ogmiosSrvServiceName;
