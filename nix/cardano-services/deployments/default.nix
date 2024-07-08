@@ -819,7 +819,7 @@ in
           };
 
           values = {
-            stakepool.databaseName = "stakepoolv3";
+            stakepool.databaseName = "stakepoolv2";
             blockfrost-worker.enabled = true;
             pg-boss-worker.enabled = true;
             cardano-services = {
