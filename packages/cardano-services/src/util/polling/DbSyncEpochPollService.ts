@@ -51,7 +51,7 @@ export class DbSyncEpochPollService implements EpochMonitor {
       name: 'current_epoch',
       text: findLastEpoch
     });
-    return Cardano.EpochNo(result.rows[0].no);
+    return Cardano.EpochNo(result.rowCount ? result.rows[0].no : 0);
   }
 
   /** Starts the poll execution */
