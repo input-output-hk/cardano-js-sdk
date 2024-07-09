@@ -53,6 +53,8 @@ services:
       - postgres_db_db_sync
       - postgres_password
       - postgres_user
+    volumes:
+      - ../..:/app
 
   handle-projector:
     environment:

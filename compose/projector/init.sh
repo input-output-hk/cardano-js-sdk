@@ -26,7 +26,7 @@ _term() {
 trap _term SIGTERM
 
 cd /app/packages/cardano-services
-node dist/cjs/cli.js start-projector &
+../../node_modules/.bin/tsx watch --clear-screen=false --conditions=development src/cli start-projector &
 
 CHILD=$!
 wait "$CHILD"

@@ -11,7 +11,7 @@ export class CurrentPoolMetricsEntity {
   @PrimaryColumn({ length: 56, type: 'char' })
   stakePoolId?: Cardano.PoolId;
 
-  @Column({ nullable: true })
+  @Column('integer', { nullable: true })
   slot: Cardano.Slot;
 
   @OneToOne(() => StakePoolEntity, OnDeleteCascadeRelationOptions)

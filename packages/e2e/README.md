@@ -99,37 +99,10 @@ Address:    addr_test1qr0c3frkem9cqn5f73dnvqpena27k2fgqew6wct9eaka03agfwkvzr0zyq
 
 You can configure any of these five wallets in your test and use any amount of tADA you need.
 
-### Local Test Network - development version
+## Local Test Network - Hot reload
 
-In addition to the **local-network** npm script there is a script suitable for development, which mounts the `packages` directory in
-the service containers. It helps to apply changes to the components without shutting down the **local-network** each time.
-
-It can be started with:
-
-```bash
-$ yarn workspace @cardano-sdk/e2e local-network:dev
-```
-
-and a good idea is to run following command before starting it.
-
-```bash
-$ yarn cleanup && yarn && yarn build
-```
-
-Restart the provider-server:
-
-```bash
-$ docker exec -it local-network-e2e-provider-server-1 kill 1
-```
-
-So, if while working on the `core` and `cardano-services` packages simultaneously, we need to restart the provider-server
-to check the effect of our ongoing changes, it is enough to issue the following command:
-
-```bash
-$ yarn workspace @cardano-sdk/core build && yarn workspace @cardano-sdk/cardano-services build && docker exec -it local-network-e2e-provider-server-1 kill 1
-```
-
-if it exits with error we need to fix our ongoing changes, if it exits silently, the provider-server is now running with our changes.
+The **local-network** runs with hot reload: once running, just saving a source file makes all the containers depending on that file
+are stopped and restarted loading the new version of the source files. No additional operations are required.
 
 ## Local file server
 

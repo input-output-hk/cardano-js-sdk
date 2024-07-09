@@ -8,6 +8,9 @@
       "path": "../../core/src"
     },
     {
+      "path": "../../key-management/src"
+    },
+    {
       "path": "../../util/src"
     }
   ]

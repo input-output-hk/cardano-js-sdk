@@ -51,7 +51,10 @@ jobs:
       - name: 🔨 Build
         run: |
           yarn install --immutable --inline-builds --mode=skip-build
-          yarn build:cjs
+          yarn workspace @cardano-sdk/cardano-services-client build:cjs
+          yarn workspace @cardano-sdk/cardano-services build:cjs
+          yarn workspace @cardano-sdk/e2e build:cjs
+          yarn workspace @cardano-sdk/util-dev build:cjs
           docker build --no-cache .
         env:
           NODE_OPTIONS: '--max_old_space_size=8192'
