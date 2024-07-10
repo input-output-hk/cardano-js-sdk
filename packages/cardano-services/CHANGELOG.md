@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.10...@cardano-sdk/cardano-services@0.28.11) (2024-07-10)
+
+### Bug Fixes
+
+* **cardano-services:** improve type orm provider health check ([c3c662b](https://github.com/input-output-hk/cardano-js-sdk/commit/c3c662b3ca6638d8a32a2bdef6a246fd71e206c8))
+
 ## [0.28.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.9...@cardano-sdk/cardano-services@0.28.10) (2024-06-26)
 
 ### Bug Fixes

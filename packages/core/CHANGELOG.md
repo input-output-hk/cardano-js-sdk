@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.35.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.35.0...@cardano-sdk/core@0.35.1) (2024-07-10)
+
+### Features
+
+* create Cip1854PublicKey core type ([#1346](https://github.com/input-output-hk/cardano-js-sdk/issues/1346)) ([9e0b077](https://github.com/input-output-hk/cardano-js-sdk/commit/9e0b077e497b7c1ac84abbe42d85e7af9f28041c))
+
 ## [0.35.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.34.0...@cardano-sdk/core@0.35.0) (2024-06-26)
 
 ### ⚠ BREAKING CHANGES
