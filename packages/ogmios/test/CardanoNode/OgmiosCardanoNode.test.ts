@@ -1,75 +1,63 @@
-// TODO: remove this and refactor
-/* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Connection, InteractionContext, createConnectionObject } from '@cardano-ogmios/client';
 import {
+  Cardano,
+  EraSummary,
   GeneralCardanoNodeError,
   GeneralCardanoNodeErrorCode,
+  HealthCheckResponse,
+  Milliseconds,
+  StakeDistribution,
   StateQueryError,
   StateQueryErrorCode
 } from '@cardano-sdk/core';
-import { HEALTH_RESPONSE_BODY } from '../mocks/util';
 import { InvalidModuleState } from '@cardano-sdk/util';
-import {
-  MockCreateInteractionContext,
-  MockCreateLedgerStateQuery,
-  MockGetServerHealth,
-  MockedLedgerStateQueryClient,
-  ogmiosEraSummaries
-} from './util';
-import { OgmiosCardanoNode } from '../../src';
+import { OgmiosCardanoNode, OgmiosObservableCardanoNode } from '../../src';
+import { ReplaySubject, Subject } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
-import { mockGenesisShelley } from '../ogmiosToCore/testData';
 
-jest.mock('@cardano-ogmios/client', () => {
-  const original = jest.requireActual('@cardano-ogmios/client');
-  return {
-    ...original,
-    createInteractionContext: jest.fn(),
-    createLedgerStateQueryClient: jest.fn(),
-    getServerHealth: jest.fn()
-  };
-});
+const expectShutdownRejection = async (promise: Promise<unknown>) => {
+  await expect(promise).rejects.toThrowError(
+    expect.objectContaining({
+      code: GeneralCardanoNodeErrorCode.ServerNotReady,
+      message: 'OgmiosCardanoNode is shutting down.'
+    })
+  );
+};
+
+const expectTimeoutRejection = async (promise: Promise<unknown>) => {
+  await expect(promise).rejects.toThrowError(
+    expect.objectContaining({
+      code: GeneralCardanoNodeErrorCode.ConnectionFailure,
+      message: 'Timeout'
+    })
+  );
+};
 
 describe('OgmiosCardanoNode', () => {
-  let connection: Connection;
   let node: OgmiosCardanoNode;
-  let createLedgerStateQueryClient: MockCreateLedgerStateQuery;
-  let ledgerStateQueryClient: MockedLedgerStateQueryClient;
-  let getServerHealth: MockGetServerHealth;
-  let createInteractionContext: MockCreateInteractionContext;
+  let ogmiosObservableCardanoNode: OgmiosObservableCardanoNode;
+  let eraSummaries$: Subject<EraSummary[]>;
+  let stakeDistribution$: Subject<StakeDistribution>;
+  let healthCheck$: Subject<HealthCheckResponse>;
+  let systemStart$: Subject<Date>;
 
   beforeEach(async () => {
-    connection = createConnectionObject();
-    ({ createInteractionContext, createLedgerStateQueryClient, getServerHealth } = require('@cardano-ogmios/client'));
-    ledgerStateQueryClient = {
-      eraSummaries: jest.fn() as MockedLedgerStateQueryClient['eraSummaries'],
-      genesisConfiguration: jest.fn() as MockedLedgerStateQueryClient['genesisConfiguration'],
-      liveStakeDistribution: jest.fn() as MockedLedgerStateQueryClient['liveStakeDistribution'],
-      networkStartTime: jest.fn() as MockedLedgerStateQueryClient['networkStartTime'],
-      shutdown: jest.fn() as MockedLedgerStateQueryClient['shutdown']
-    } as MockedLedgerStateQueryClient;
-    createLedgerStateQueryClient.mockResolvedValue(ledgerStateQueryClient);
-    ledgerStateQueryClient.eraSummaries.mockResolvedValue(ogmiosEraSummaries);
-    ledgerStateQueryClient.liveStakeDistribution.mockResolvedValue({
-      pool1cjm567pd9eqj7wlpuq2mnsasw2upewq0tchg4n8gktq5k7eepvr: {
-        stake: '1/100',
-        vrf: 'vrf'
-      }
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ledgerStateQueryClient.genesisConfiguration.mockResolvedValue(mockGenesisShelley as any);
-    createInteractionContext.mockResolvedValue({ connection } as InteractionContext);
-    getServerHealth.mockResolvedValue(HEALTH_RESPONSE_BODY);
+    eraSummaries$ = new ReplaySubject<EraSummary[]>();
+    stakeDistribution$ = new ReplaySubject<StakeDistribution>();
+    healthCheck$ = new ReplaySubject<HealthCheckResponse>();
+    systemStart$ = new ReplaySubject<Date>();
+
+    ogmiosObservableCardanoNode = {
+      eraSummaries$,
+      healthCheck$,
+      stakeDistribution$,
+      systemStart$
+    } as unknown as OgmiosObservableCardanoNode;
   });
-  afterEach(async () => {
-    createInteractionContext.mockReset();
-    createLedgerStateQueryClient.mockReset();
-    getServerHealth.mockReset();
-  });
+
   describe('not initialized and started', () => {
     beforeEach(async () => {
-      node = new OgmiosCardanoNode(connection, logger);
+      node = new OgmiosCardanoNode(ogmiosObservableCardanoNode, logger);
     });
 
     it('eraSummaries rejects with not initialized error', async () => {
@@ -85,151 +73,129 @@ describe('OgmiosCardanoNode', () => {
       await expect(node.shutdown()).rejects.toThrowError(InvalidModuleState);
     });
   });
-  describe('initialized and started', () => {
-    describe('eraSummaries', () => {
-      describe('success', () => {
-        beforeEach(async () => {
-          ledgerStateQueryClient.eraSummaries.mockResolvedValue(ogmiosEraSummaries);
-          node = new OgmiosCardanoNode(connection, logger);
-          await node.initialize();
-          await node.start();
-        });
-        afterEach(async () => {
-          await node.shutdown();
-        });
-        it('resolves if successful', async () => {
-          const res = await node.eraSummaries();
-          expect(res).toMatchSnapshot();
-        });
-      });
-      describe('failure', () => {
-        beforeEach(async () => {
-          ledgerStateQueryClient.eraSummaries.mockRejectedValue(
-            new StateQueryError(StateQueryErrorCode.UnavailableInCurrentEra, null, 'Some error')
-          );
-          node = new OgmiosCardanoNode(connection, logger);
-          await node.initialize();
-          await node.start();
-        });
-        afterEach(async () => {
-          await node.shutdown();
-        });
 
-        it('rejects with errors thrown by the service', async () => {
-          await expect(node.eraSummaries()).rejects.toThrowError(StateQueryError);
-        });
+  describe('initialized and started', () => {
+    beforeEach(async () => {
+      node = new OgmiosCardanoNode(ogmiosObservableCardanoNode, logger);
+      await node.initialize();
+      await node.start();
+    });
+
+    describe('eraSummaries', () => {
+      afterEach(async () => {
+        await node.shutdown();
+      });
+
+      it('resolves if successful', async () => {
+        const eraSummaries = [
+          {
+            parameters: {
+              epochLength: 1,
+              slotLength: Milliseconds(1000)
+            },
+            start: {
+              slot: 0,
+              time: new Date('2022-08-09T00:00:00.000Z')
+            }
+          }
+        ];
+        eraSummaries$.next(eraSummaries);
+        const res = await node.eraSummaries();
+
+        expect(res).toEqual(eraSummaries);
+      });
+
+      it('rejects with errors thrown by the service', async () => {
+        eraSummaries$.error(new StateQueryError(StateQueryErrorCode.UnavailableInCurrentEra, null, 'Some error'));
+        await expect(node.eraSummaries()).rejects.toThrowError(StateQueryError);
       });
     });
+
+    it('timeout rejects with connection failure error', async () => {
+      jest.useFakeTimers();
+
+      const eraSummaries = node.eraSummaries();
+      const stakeDistribution = node.stakeDistribution();
+      const systemStart = node.systemStart();
+
+      jest.advanceTimersByTime(10_000);
+
+      await expectTimeoutRejection(eraSummaries);
+      await expectTimeoutRejection(stakeDistribution);
+      await expectTimeoutRejection(systemStart);
+
+      jest.useRealTimers();
+    });
+
+    it('shutting down cancels the observable and rejects with ServerNotReady error', async () => {
+      const eraSummaries = node.eraSummaries();
+      const stakeDistribution = node.stakeDistribution();
+      const systemStart = node.systemStart();
+
+      await node.shutdown();
+
+      await expectShutdownRejection(eraSummaries);
+      await expectShutdownRejection(stakeDistribution);
+      await expectShutdownRejection(systemStart);
+    });
+
     describe('systemStart', () => {
       const startTime = new Date();
 
-      describe('success', () => {
-        beforeEach(async () => {
-          ledgerStateQueryClient.networkStartTime.mockResolvedValue(startTime);
-          node = new OgmiosCardanoNode(connection, logger);
-          await node.initialize();
-          await node.start();
-        });
-        afterEach(async () => {
-          await node.shutdown();
-        });
-        it('resolves if successful', async () => {
-          const res = await node.systemStart();
-          expect(res).toEqual(startTime);
-        });
+      afterEach(async () => {
+        await node.shutdown();
       });
-      describe('failure', () => {
-        beforeEach(async () => {
-          ledgerStateQueryClient.networkStartTime.mockRejectedValue(
-            new StateQueryError(StateQueryErrorCode.UnavailableInCurrentEra, null, 'Some error')
-          );
-          node = new OgmiosCardanoNode(connection, logger);
-          await node.initialize();
-          await node.start();
-        });
-        afterEach(async () => {
-          await node.shutdown();
-        });
 
-        it('rejects with errors thrown by the service', async () => {
-          await expect(node.systemStart()).rejects.toThrowError(StateQueryError);
-        });
+      it('resolves if successful', async () => {
+        systemStart$.next(startTime);
+        const res = await node.systemStart();
+        expect(res).toEqual(startTime);
+      });
+
+      it('rejects with errors thrown by the service', async () => {
+        systemStart$.error(new StateQueryError(StateQueryErrorCode.UnavailableInCurrentEra, null, 'Some error'));
+        await expect(node.systemStart()).rejects.toThrowError(StateQueryError);
       });
     });
+
     describe('healthCheck', () => {
-      describe('success', () => {
-        beforeEach(async () => {
-          node = new OgmiosCardanoNode(connection, logger);
-          await node.initialize();
-          await node.start();
-        });
-        afterEach(async () => {
-          await node.shutdown();
-        });
-        it('returns ok if successful', async () => {
-          const res = await node.healthCheck();
-          expect(res.ok).toBe(true);
-        });
+      it('returns ok if successful', async () => {
+        healthCheck$.next({ ok: true });
+        const res = await node.healthCheck();
+        expect(res.ok).toBe(true);
       });
-      describe('failure', () => {
-        beforeEach(async () => {
-          getServerHealth.mockRejectedValue(
-            new GeneralCardanoNodeError(GeneralCardanoNodeErrorCode.ServerNotReady, null, 'Not ready')
-          );
-          node = new OgmiosCardanoNode(connection, logger);
-          await node.initialize();
-          await node.start();
-        });
-        afterEach(async () => {
-          await node.shutdown();
-        });
 
-        it('returns not ok if the Ogmios server throws an error', async () => {
-          const res = await node.healthCheck();
-          expect(res.ok).toBe(false);
-        });
+      it('returns not ok when shutting down', async () => {
+        const healthCheck = node.healthCheck();
+        await node.shutdown();
+        await expect(healthCheck).resolves.toEqual({ message: 'OgmiosCardanoNode is shutting down.', ok: false });
       });
     });
+
     describe('stakeDistribution', () => {
-      describe('success', () => {
-        beforeEach(async () => {
-          node = new OgmiosCardanoNode(connection, logger);
-          await node.initialize();
-          await node.start();
-        });
-        afterEach(async () => {
-          await node.shutdown();
-        });
-        it('resolves if successful', async () => {
-          const res = await node.stakeDistribution();
-          expect(res).toMatchSnapshot();
-        });
+      afterEach(async () => {
+        await node.shutdown();
       });
-      describe('failure', () => {
-        beforeEach(async () => {
-          ledgerStateQueryClient.liveStakeDistribution.mockRejectedValue(
-            new StateQueryError(StateQueryErrorCode.UnavailableInCurrentEra, null, 'Some error')
-          );
-          node = new OgmiosCardanoNode(connection, logger);
-          await node.initialize();
-          await node.start();
-        });
-        afterEach(async () => {
-          await node.shutdown();
+
+      it('resolves if successful', async () => {
+        const stakeDistribution: StakeDistribution = new Map();
+        stakeDistribution.set(Cardano.PoolId('pool1cjm567pd9eqj7wlpuq2mnsasw2upewq0tchg4n8gktq5k7eepvr'), {
+          stake: { pool: BigInt(1), supply: BigInt(100) },
+          vrf: 'vrf' as Cardano.VrfVkHex
         });
 
-        it('rejects with errors thrown by the service', async () => {
-          await expect(node.stakeDistribution()).rejects.toThrowError(StateQueryError);
-        });
+        stakeDistribution$.next(stakeDistribution);
+        const res = await node.stakeDistribution();
+        expect(res).toEqual(stakeDistribution);
+      });
+
+      it('rejects with errors thrown by the service', async () => {
+        stakeDistribution$.error(new StateQueryError(StateQueryErrorCode.UnavailableInCurrentEra, null, 'Some error'));
+        await expect(node.stakeDistribution()).rejects.toThrowError(StateQueryError);
       });
     });
+
     describe('shutdown', () => {
-      beforeEach(async () => {
-        ledgerStateQueryClient.networkStartTime.mockResolvedValue(new Date());
-        node = new OgmiosCardanoNode(connection, logger);
-        await node.initialize();
-        await node.start();
-      });
       it('shuts down successfully', async () => {
         await expect(node.shutdown()).resolves.not.toThrow();
       });

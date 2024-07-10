@@ -1,23 +1,52 @@
 import {
-  Cardano,
   CardanoNode,
   EraSummary,
   GeneralCardanoNodeError,
   GeneralCardanoNodeErrorCode,
   HealthCheckResponse,
+  Milliseconds,
   StakeDistribution
 } from '@cardano-sdk/core';
-import {
-  ConnectionConfig,
-  LedgerStateQuery,
-  createConnectionObject,
-  createLedgerStateQueryClient,
-  getServerHealth
-} from '@cardano-ogmios/client';
 import { Logger } from 'ts-log';
-import { RunnableModule, contextLogger } from '@cardano-sdk/util';
-import { createInteractionContextWithLogger, ogmiosServerHealthToHealthCheckResponse } from '../util';
-import { queryEraSummaries, withCoreCardanoNodeError } from './queries';
+import {
+  MonoTypeOperatorFunction,
+  Observable,
+  Subject,
+  defaultIfEmpty,
+  firstValueFrom,
+  pipe,
+  takeUntil,
+  throwError,
+  throwIfEmpty,
+  timeout
+} from 'rxjs';
+import { OgmiosObservableCardanoNode } from './OgmiosObservableCardanoNode';
+import { RunnableModule } from '@cardano-sdk/util';
+
+const DEFAULT_RESPONSE_TIMEOUT = Milliseconds(10_000);
+
+const withTimeout = <T>(): MonoTypeOperatorFunction<T> =>
+  // Connection errors are retried by the OgmiosObservableCardanoNode. This timeout ensures the request will not hang indefinitely.
+  timeout({
+    first: DEFAULT_RESPONSE_TIMEOUT,
+    with: () =>
+      throwError(() => new GeneralCardanoNodeError(GeneralCardanoNodeErrorCode.ConnectionFailure, null, 'Timeout'))
+  });
+
+const withShutdown = <T>(shuttingDown$: Observable<void>): MonoTypeOperatorFunction<T> =>
+  pipe(
+    // Cancel ongoing requests when shutting down
+    takeUntil(shuttingDown$),
+    // Promises require a response, so throw if the observable completes without emitting a value due to a shutdown
+    throwIfEmpty(
+      () =>
+        new GeneralCardanoNodeError(
+          GeneralCardanoNodeErrorCode.ServerNotReady,
+          null,
+          'OgmiosCardanoNode is shutting down.'
+        )
+    )
+  );
 
 /**
  * Access cardano-node APIs via Ogmios
@@ -25,72 +54,52 @@ import { queryEraSummaries, withCoreCardanoNodeError } from './queries';
  * @class OgmiosCardanoNode
  */
 export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
-  #stateQueryClient: LedgerStateQuery.LedgerStateQueryClient;
-  #logger: Logger;
-  #connectionConfig: ConnectionConfig;
+  #ogmiosObservableCardanoNode: OgmiosObservableCardanoNode;
+  #shuttingDown$: Subject<void>;
 
-  constructor(connectionConfig: ConnectionConfig, logger: Logger) {
+  constructor(ogmiosObservableCardanoNode: OgmiosObservableCardanoNode, logger: Logger) {
     super('OgmiosCardanoNode', logger);
-    this.#logger = contextLogger(logger, 'OgmiosCardanoNode');
-    this.#connectionConfig = connectionConfig;
+    this.#ogmiosObservableCardanoNode = ogmiosObservableCardanoNode;
+    this.#shuttingDown$ = new Subject<void>();
   }
 
   public async initializeImpl(): Promise<void> {
-    this.#logger.info('Initializing CardanoNode');
-    this.#stateQueryClient = await createLedgerStateQueryClient(
-      await createInteractionContextWithLogger(this.#logger, { connection: this.#connectionConfig })
-    );
-    this.#logger.info('CardanoNode initialized');
+    return Promise.resolve();
   }
 
   public async shutdownImpl(): Promise<void> {
-    this.#logger.info('Shutting down CardanoNode');
-    await this.#stateQueryClient.shutdown();
+    this.#shuttingDown$.next();
+    return Promise.resolve();
   }
 
   public async eraSummaries(): Promise<EraSummary[]> {
     this.#assertIsRunning();
-    return queryEraSummaries(this.#stateQueryClient, this.#logger);
+    return firstValueFrom(
+      this.#ogmiosObservableCardanoNode.eraSummaries$.pipe(withTimeout(), withShutdown(this.#shuttingDown$))
+    );
   }
 
   public async systemStart(): Promise<Date> {
     this.#assertIsRunning();
-    this.#logger.info('Getting system start');
-    return withCoreCardanoNodeError(async () => this.#stateQueryClient.networkStartTime());
+    return firstValueFrom(
+      this.#ogmiosObservableCardanoNode.systemStart$.pipe(withTimeout(), withShutdown(this.#shuttingDown$))
+    );
   }
 
   public async stakeDistribution(): Promise<StakeDistribution> {
     this.#assertIsRunning();
-    this.#logger.info('Getting stake distribution');
-    return withCoreCardanoNodeError(async () => {
-      const map = new Map();
-      for (const [key, value] of Object.entries(await this.#stateQueryClient.liveStakeDistribution())) {
-        const splitStake = value.stake.split('/');
-        map.set(Cardano.PoolId(key), {
-          ...value,
-          stake: { pool: BigInt(splitStake[0]), supply: BigInt(splitStake[1]) }
-        });
-      }
-      return map;
-    });
+    return firstValueFrom(
+      this.#ogmiosObservableCardanoNode.stakeDistribution$.pipe(withTimeout(), withShutdown(this.#shuttingDown$))
+    );
   }
 
   healthCheck(): Promise<HealthCheckResponse> {
-    return OgmiosCardanoNode.healthCheck(this.#connectionConfig, this.logger);
-  }
-
-  static async healthCheck(connectionConfig: ConnectionConfig, logger: Logger): Promise<HealthCheckResponse> {
-    try {
-      return ogmiosServerHealthToHealthCheckResponse(
-        await getServerHealth({
-          connection: createConnectionObject(connectionConfig)
-        })
-      );
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      logger.error(error.message);
-      return { ok: false };
-    }
+    return firstValueFrom(
+      this.#ogmiosObservableCardanoNode.healthCheck$.pipe(
+        takeUntil(this.#shuttingDown$),
+        defaultIfEmpty({ message: 'OgmiosCardanoNode is shutting down.', ok: false })
+      )
+    );
   }
 
   async startImpl(): Promise<void> {

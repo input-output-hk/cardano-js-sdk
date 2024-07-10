@@ -2,7 +2,7 @@ import { CardanoNode, HealthCheckResponse, Provider } from '@cardano-sdk/core';
 import { DbPools, DbSyncProvider, DbSyncProviderDependencies } from '../../../src/util';
 import { HEALTH_RESPONSE_BODY } from '../../../../ogmios/test/mocks/util';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
-import { OgmiosCardanoNode, urlToConnectionConfig } from '@cardano-sdk/ogmios';
+import { OgmiosCardanoNode, OgmiosObservableCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool, QueryResult } from 'pg';
 import { dummyLogger as logger } from 'ts-log';
 
@@ -47,7 +47,7 @@ describe('DbSyncProvider', () => {
 
   describe('healthCheck', () => {
     let cardanoNode: OgmiosCardanoNode;
-    const ogmiosUrl = new URL('http://dummy');
+    // const ogmiosUrl = new URL('http://dummy');
     let dbPools: DbPools;
     let provider: DbSyncSomeProvider;
     const cache = { db: new InMemoryCache(UNLIMITED_CACHE_TTL), healthCheck: new InMemoryCache(UNLIMITED_CACHE_TTL) };
@@ -79,7 +79,7 @@ describe('DbSyncProvider', () => {
             }
           ]
         });
-        cardanoNode = new OgmiosCardanoNode(urlToConnectionConfig(ogmiosUrl), logger);
+        cardanoNode = new OgmiosCardanoNode({} as unknown as OgmiosObservableCardanoNode, logger);
       });
 
       it('is ok when node is healthy', async () => {

@@ -1,10 +1,12 @@
 import {
+  Cardano,
   CardanoNodeUtil,
   ChainSyncError,
   GeneralCardanoNodeError,
   GeneralCardanoNodeErrorCode,
   IncompleteWithdrawalsData,
   OutsideOfValidityIntervalData,
+  StakeDistribution,
   StateQueryError,
   TxSubmissionError,
   TxSubmissionErrorCode,
@@ -104,4 +106,18 @@ export const queryGenesisParameters = (client: LedgerStateQuery.LedgerStateQuery
     logger.info('Querying genesis parameters');
     // Update this to query multiple eras if the CompactGenesis type will have to include params from other eras
     return genesis(await client.genesisConfiguration('shelley'));
+  });
+
+export const queryStakeDistribution = (client: LedgerStateQuery.LedgerStateQueryClient, logger: Logger) =>
+  withCoreCardanoNodeError(async () => {
+    logger.info('Querying stake distribution');
+    const map: StakeDistribution = new Map();
+    for (const [key, value] of Object.entries(await client.liveStakeDistribution())) {
+      const splitStake = value.stake.split('/');
+      map.set(Cardano.PoolId(key), {
+        stake: { pool: BigInt(splitStake[0]), supply: BigInt(splitStake[1]) },
+        vrf: Cardano.VrfVkHex(value.vrf)
+      });
+    }
+    return map;
   });

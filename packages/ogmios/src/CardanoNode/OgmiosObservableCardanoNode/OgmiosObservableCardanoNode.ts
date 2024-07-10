@@ -11,6 +11,7 @@ import {
   ObservableCardanoNode,
   ObservableChainSync,
   PointOrOrigin,
+  StakeDistribution,
   StateQueryErrorCode,
   TxCBOR
 } from '@cardano-sdk/core';
@@ -42,7 +43,12 @@ import { WithLogger, contextLogger } from '@cardano-sdk/util';
 import { createObservableChainSyncClient } from './createObservableChainSyncClient';
 import { ogmiosServerHealthToHealthCheckResponse } from '../../util';
 import { ogmiosToCorePointOrOrigin, ogmiosToCoreTipOrOrigin, pointOrOriginToOgmios } from './util';
-import { queryEraSummaries, queryGenesisParameters, withCoreCardanoNodeError } from '../queries';
+import {
+  queryEraSummaries,
+  queryGenesisParameters,
+  queryStakeDistribution,
+  withCoreCardanoNodeError
+} from '../queries';
 import isEqual from 'lodash/isEqual.js';
 
 const ogmiosToCoreIntersection = (intersection: ChainSynchronization.Intersection) => ({
@@ -115,6 +121,8 @@ export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
 
   readonly eraSummaries$: Observable<EraSummary[]>;
   readonly genesisParameters$: Observable<Cardano.CompactGenesis>;
+  readonly stakeDistribution$: Observable<StakeDistribution>;
+  readonly systemStart$: Observable<Date>;
   readonly healthCheck$: Observable<HealthCheckResponse>;
 
   constructor(props: OgmiosObservableCardanoNodeProps, { logger }: WithLogger) {
@@ -141,6 +149,14 @@ export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
       retryBackoff(stateQueryRetryBackoffConfig(props.localStateQueryRetryConfig, logger)),
       distinctUntilChanged(isEqual),
       shareReplay({ bufferSize: 1, refCount: true })
+    );
+    this.stakeDistribution$ = stateQueryClient$.pipe(
+      switchMap((client) => from(queryStakeDistribution(client, this.#logger))),
+      retryBackoff(stateQueryRetryBackoffConfig(props.localStateQueryRetryConfig, logger))
+    );
+    this.systemStart$ = stateQueryClient$.pipe(
+      switchMap((client) => from(withCoreCardanoNodeError(() => client.networkStartTime()))),
+      retryBackoff(stateQueryRetryBackoffConfig(props.localStateQueryRetryConfig, logger))
     );
     this.healthCheck$ = this.#connectionConfig$.pipe(
       switchMap((connectionConfig) => from(getServerHealth({ connection: createConnectionObject(connectionConfig) }))),
