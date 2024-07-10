@@ -16,7 +16,7 @@
 <li><a href="_cardano_sdk_e2e.html">@cardano-sdk/e2e</a></li></ul>
 <h1>Module @cardano-sdk/e2e</h1></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1a8a82c/packages/e2e/src/index.ts#L1">packages/e2e/src/index.ts:1</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/4b18118/packages/e2e/src/index.ts#L1">packages/e2e/src/index.ts:1</a></li></ul></aside>
 <section class="tsd-panel-group">
 <section class="tsd-panel tsd-typography">
 <a href="#end-to-end-tests-for-cardano-js-sdk" id="end-to-end-tests-for-cardano-js-sdk" style="color: inherit; text-decoration: none;">
@@ -72,25 +72,11 @@ If you need to create a new wallet via a new set of mnemonics, you can run:</p>
 </code></pre>
 <p>You can configure any of these five wallets in your test and use any amount of tADA you need.</p>
 
-<a href="#local-test-network---development-version" id="local-test-network---development-version" style="color: inherit; text-decoration: none;">
-  <h3>Local Test Network - development version</h3>
+<a href="#local-test-network---hot-reload" id="local-test-network---hot-reload" style="color: inherit; text-decoration: none;">
+  <h2>Local Test Network - Hot reload</h2>
 </a>
-<p>In addition to the <strong>local-network</strong> npm script there is a script suitable for development, which mounts the <code>packages</code> directory in
-the service containers. It helps to apply changes to the components without shutting down the <strong>local-network</strong> each time.</p>
-<p>It can be started with:</p>
-<pre><code class="language-bash"><span class="hl-1">$ </span><span class="hl-3">yarn</span><span class="hl-1"> </span><span class="hl-3">workspace</span><span class="hl-1"> </span><span class="hl-3">@cardano-sdk/e2e</span><span class="hl-1"> </span><span class="hl-3">local-network:dev</span>
-</code></pre>
-<p>and a good idea is to run following command before starting it.</p>
-<pre><code class="language-bash"><span class="hl-1">$ </span><span class="hl-3">yarn</span><span class="hl-1"> </span><span class="hl-3">cleanup</span><span class="hl-1"> &amp;&amp; yarn &amp;&amp; yarn </span><span class="hl-3">build</span>
-</code></pre>
-<p>Restart the provider-server:</p>
-<pre><code class="language-bash"><span class="hl-1">$ </span><span class="hl-3">docker</span><span class="hl-1"> </span><span class="hl-3">exec</span><span class="hl-1"> </span><span class="hl-3">-it</span><span class="hl-1"> </span><span class="hl-3">local-network-e2e-provider-server-</span><span class="hl-4">1</span><span class="hl-1"> </span><span class="hl-3">kill</span><span class="hl-1"> </span><span class="hl-4">1</span>
-</code></pre>
-<p>So, if while working on the <code>core</code> and <code>cardano-services</code> packages simultaneously, we need to restart the provider-server
-to check the effect of our ongoing changes, it is enough to issue the following command:</p>
-<pre><code class="language-bash"><span class="hl-1">$ </span><span class="hl-3">yarn</span><span class="hl-1"> </span><span class="hl-3">workspace</span><span class="hl-1"> </span><span class="hl-3">@cardano-sdk/core</span><span class="hl-1"> </span><span class="hl-3">build</span><span class="hl-1"> &amp;&amp; yarn </span><span class="hl-3">workspace</span><span class="hl-1"> </span><span class="hl-3">@cardano-sdk/cardano-services</span><span class="hl-1"> </span><span class="hl-3">build</span><span class="hl-1"> &amp;&amp; docker </span><span class="hl-3">exec</span><span class="hl-1"> </span><span class="hl-3">-it</span><span class="hl-1"> </span><span class="hl-3">local-network-e2e-provider-server-</span><span class="hl-4">1</span><span class="hl-1"> </span><span class="hl-3">kill</span><span class="hl-1"> </span><span class="hl-4">1</span>
-</code></pre>
-<p>if it exits with error we need to fix our ongoing changes, if it exits silently, the provider-server is now running with our changes.</p>
+<p>The <strong>local-network</strong> runs with hot reload: once running, just saving a source file makes all the containers depending on that file
+are stopped and restarted loading the new version of the source files. No additional operations are required.</p>
 
 <a href="#local-file-server" id="local-file-server" style="color: inherit; text-decoration: none;">
   <h2>Local file server</h2>
