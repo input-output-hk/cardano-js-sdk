@@ -63,20 +63,19 @@
 <a href="_cardano_sdk_cardano_services._internal_.OgmiosCardanoNode.html#startBefore" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>start<wbr/>Before</span></a>
 <a href="_cardano_sdk_cardano_services._internal_.OgmiosCardanoNode.html#startImpl" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>start<wbr/>Impl</span></a>
 <a href="_cardano_sdk_cardano_services._internal_.OgmiosCardanoNode.html#systemStart" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>system<wbr/>Start</span></a>
-<a href="_cardano_sdk_cardano_services._internal_.OgmiosCardanoNode.html#healthCheck-2" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>health<wbr/>Check</span></a>
 </div></section></div></details></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Constructors</h2>
 <section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class"><a id="constructor" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>constructor</span><a href="#constructor" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" id="icon-anchor-a"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" id="icon-anchor-b"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" id="icon-anchor-c"></path></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-<li class="tsd-signature tsd-anchor-link" id="constructor.new_OgmiosCardanoNode">new <wbr/>Ogmios<wbr/>Cardano<wbr/>Node<span class="tsd-signature-symbol">(</span>connectionConfig<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ConnectionConfig</span>, logger<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Logger</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_cardano_services._internal_.OgmiosCardanoNode.html" class="tsd-signature-type" data-tsd-kind="Class">OgmiosCardanoNode</a><a href="#constructor.new_OgmiosCardanoNode" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="constructor.new_OgmiosCardanoNode">new <wbr/>Ogmios<wbr/>Cardano<wbr/>Node<span class="tsd-signature-symbol">(</span>ogmiosObservableCardanoNode<span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_cardano_services._internal_.OgmiosObservableCardanoNode.html" class="tsd-signature-type" data-tsd-kind="Class">OgmiosObservableCardanoNode</a>, logger<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Logger</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_cardano_sdk_cardano_services._internal_.OgmiosCardanoNode.html" class="tsd-signature-type" data-tsd-kind="Class">OgmiosCardanoNode</a><a href="#constructor.new_OgmiosCardanoNode" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5>connectionConfig: <span class="tsd-signature-type">ConnectionConfig</span></h5></li>
+<h5>ogmiosObservableCardanoNode: <a href="_cardano_sdk_cardano_services._internal_.OgmiosObservableCardanoNode.html" class="tsd-signature-type" data-tsd-kind="Class">OgmiosObservableCardanoNode</a></h5></li>
 <li>
 <h5>logger: <span class="tsd-signature-type">Logger</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="_cardano_sdk_cardano_services._internal_.OgmiosCardanoNode.html" class="tsd-signature-type" data-tsd-kind="Class">OgmiosCardanoNode</a></h4><aside class="tsd-sources">
@@ -244,7 +243,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Overrides <a href="_cardano_sdk_cardano_services._internal_.RunnableModule.html">RunnableModule</a>.<a href="_cardano_sdk_cardano_services._internal_.RunnableModule.html#startImpl">startImpl</a></p>
 <ul>
-<li>Defined in packages/ogmios/dist/cjs/CardanoNode/OgmiosCardanoNode.d.ts:15</li></ul></aside></li></ul></section>
+<li>Defined in packages/ogmios/dist/cjs/CardanoNode/OgmiosCardanoNode.d.ts:14</li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="systemStart" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>system<wbr/>Start</span><a href="#systemStart" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -253,22 +252,7 @@
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Date</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <p>Implementation of CardanoNode.systemStart</p>
 <ul>
-<li>Defined in packages/ogmios/dist/cjs/CardanoNode/OgmiosCardanoNode.d.ts:11</li></ul></aside></li></ul></section>
-<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="healthCheck-2" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>health<wbr/>Check</span><a href="#healthCheck-2" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
-<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-<li class="tsd-signature tsd-anchor-link" id="healthCheck-2.healthCheck-3">health<wbr/>Check<span class="tsd-signature-symbol">(</span>connectionConfig<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ConnectionConfig</span>, logger<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Logger</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../types/_cardano_sdk_cardano_services._internal_.HealthCheckResponse.html" class="tsd-signature-type" data-tsd-kind="Type alias">HealthCheckResponse</a><span class="tsd-signature-symbol">&gt;</span><a href="#healthCheck-2.healthCheck-3" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
-<li class="tsd-description">
-<div class="tsd-parameters">
-<h4 class="tsd-parameters-title">Parameters</h4>
-<ul class="tsd-parameter-list">
-<li>
-<h5>connectionConfig: <span class="tsd-signature-type">ConnectionConfig</span></h5></li>
-<li>
-<h5>logger: <span class="tsd-signature-type">Logger</span></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../types/_cardano_sdk_cardano_services._internal_.HealthCheckResponse.html" class="tsd-signature-type" data-tsd-kind="Type alias">HealthCheckResponse</a><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
-<ul>
-<li>Defined in packages/ogmios/dist/cjs/CardanoNode/OgmiosCardanoNode.d.ts:14</li></ul></aside></li></ul></section></section></div>
+<li>Defined in packages/ogmios/dist/cjs/CardanoNode/OgmiosCardanoNode.d.ts:11</li></ul></aside></li></ul></section></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
@@ -406,8 +390,7 @@
 <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_cardano_services._internal_.OgmiosCardanoNode.html#startAfter" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>start<wbr/>After</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_cardano_sdk_cardano_services._internal_.OgmiosCardanoNode.html#startBefore" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>start<wbr/>Before</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_cardano_services._internal_.OgmiosCardanoNode.html#startImpl" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>start<wbr/>Impl</a></li>
-<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_cardano_services._internal_.OgmiosCardanoNode.html#systemStart" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>system<wbr/>Start</a></li>
-<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_cardano_services._internal_.OgmiosCardanoNode.html#healthCheck-2" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>health<wbr/>Check</a></li></ul></li></ul></nav></div></div>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="_cardano_sdk_cardano_services._internal_.OgmiosCardanoNode.html#systemStart" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>system<wbr/>Start</a></li></ul></li></ul></nav></div></div>
 <div class="container tsd-generator">
 <p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div>
 <div class="overlay"></div><script src="../assets/main.js"></script></body></html>
