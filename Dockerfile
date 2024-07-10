@@ -16,11 +16,16 @@ RUN \
   apt-get install nodejs -y &&\
   apt-get install -y --no-install-recommends ca-certificates jq postgresql-client
 
-FROM ubuntu-nodejs as nodejs-builder
+FROM ubuntu-nodejs as cardano-services
+
+ARG NETWORK=mainnet
+ENV NETWORK=${NETWORK}
+
 RUN \
   curl --proto '=https' --tlsv1.2 -sSf -L https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - &&\
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list &&\
   apt-get update && apt-get install yarn -y
+COPY packages/cardano-services/config/network/${NETWORK} /config/
 WORKDIR /app
 COPY build build
 COPY packages/cardano-services/package.json packages/cardano-services/package.json
@@ -47,53 +52,16 @@ COPY packages/web-extension/package.json packages/web-extension/package.json
 COPY scripts scripts
 COPY .yarn .yarn
 COPY .eslintrc.js .prettierrc .yarnrc.yml complete.eslintrc.js eslint.tsconfig.json package.json tsconfig.json yarn.lock yarn-project.nix ./
-
-FROM nodejs-builder as cardano-services-builder
-# NOTE: Pay attention to --mode=skip-build
-# For details: https://github.com/input-output-hk/cardano-js-sdk/pull/1024
-RUN yarn --immutable --inline-builds --mode=skip-build
-COPY packages packages
-RUN \
-  yarn workspace @cardano-sdk/cardano-services build &&\
-  yarn workspace @cardano-sdk/cardano-services-client build
-
-FROM nodejs-builder as cardano-services
 RUN yarn workspaces focus --all --production
-COPY --from=cardano-services-builder /app/scripts /app/scripts
-COPY --from=cardano-services-builder /app/packages/cardano-services/dist /app/packages/cardano-services/dist
-COPY --from=cardano-services-builder /app/packages/cardano-services/package.json /app/packages/cardano-services/package.json
-COPY --from=cardano-services-builder /app/packages/cardano-services-client/dist /app/packages/cardano-services-client/dist
-COPY --from=cardano-services-builder /app/packages/cardano-services-client/package.json /app/packages/cardano-services-client/package.json
-COPY --from=cardano-services-builder /app/packages/core/dist /app/packages/core/dist
-COPY --from=cardano-services-builder /app/packages/core/package.json /app/packages/core/package.json
-COPY --from=cardano-services-builder /app/packages/crypto/dist /app/packages/crypto/dist
-COPY --from=cardano-services-builder /app/packages/crypto/package.json /app/packages/crypto/package.json
-COPY --from=cardano-services-builder /app/packages/ogmios/dist /app/packages/ogmios/dist
-COPY --from=cardano-services-builder /app/packages/ogmios/package.json /app/packages/ogmios/package.json
-COPY --from=cardano-services-builder /app/packages/projection/dist /app/packages/projection/dist
-COPY --from=cardano-services-builder /app/packages/projection/package.json /app/packages/projection/package.json
-COPY --from=cardano-services-builder /app/packages/projection-typeorm/dist /app/packages/projection-typeorm/dist
-COPY --from=cardano-services-builder /app/packages/projection-typeorm/package.json /app/packages/projection-typeorm/package.json
-COPY --from=cardano-services-builder /app/packages/util/dist /app/packages/util/dist
-COPY --from=cardano-services-builder /app/packages/util/package.json /app/packages/util/package.json
-COPY --from=cardano-services-builder /app/packages/util-rxjs/dist /app/packages/util-rxjs/dist
-COPY --from=cardano-services-builder /app/packages/util-rxjs/package.json /app/packages/util-rxjs/package.json
 
 FROM cardano-services as provider-server
-ARG NETWORK=mainnet
-ENV \
-  CARDANO_NODE_CONFIG_PATH=/config/cardano-node/config.json \
-  NETWORK=${NETWORK}
 WORKDIR /app/packages/cardano-services
-COPY packages/cardano-services/config/network/${NETWORK} /config/
-EXPOSE 3000
-HEALTHCHECK --interval=15s --timeout=15s \
-  CMD curl --fail --silent -H 'Origin: http://0.0.0.0:3000' http://0.0.0.0:3000/v1.0.0/health | jq '.ok' | awk '{ if ($0 == "true") exit 0; else exit 1}' || exit 1
-CMD ["node", "dist/cjs/cli.js", "start-provider-server"]
+HEALTHCHECK --interval=15s --timeout=15s CMD curl --fail --silent http://0.0.0.0:3000/health | jq '.ok' | awk '{ if ($0 == "true") exit 0; else exit 1}' || exit 1
+CMD ["bash", "-c", "../../node_modules/.bin/tsx watch --clear-screen=false --conditions=development src/cli start-provider-server"]
 
 FROM cardano-services as worker
 WORKDIR /app/packages/cardano-services
-CMD ["node", "dist/cjs/cli.js", "start-worker"]
+CMD ["bash", "-c", "../../node_modules/.bin/tsx watch --clear-screen=false --conditions=development src/cli start-worker"]
 
 FROM cardano-services as blockfrost-worker
 ENV \
@@ -105,7 +73,7 @@ ENV \
   POSTGRES_PORT_DB_SYNC=5432 \
   POSTGRES_USER_FILE_DB_SYNC=/run/secrets/postgres_user
 WORKDIR /app/packages/cardano-services
-CMD ["node", "dist/cjs/cli.js", "start-blockfrost-worker"]
+CMD ["bash", "-c", "../../node_modules/.bin/tsx watch --clear-screen=false --conditions=development src/cli start-blockfrost-worker"]
 
 FROM cardano-services as pg-boss-worker
 WORKDIR /config
@@ -113,7 +81,7 @@ COPY compose/schedules.json .
 ENV SCHEDULES=/config/schedules.json
 WORKDIR /app/packages/cardano-services
 HEALTHCHECK CMD curl --fail --silent http://localhost:3003/v1.0.0/health
-CMD ["node", "dist/cjs/cli.js", "start-pg-boss-worker"]
+CMD ["bash", "-c", "../../node_modules/.bin/tsx watch --clear-screen=false --conditions=development src/cli start-pg-boss-worker"]
 
 FROM cardano-services as projector
 WORKDIR /

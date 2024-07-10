@@ -7,7 +7,7 @@ import { parseBigInt } from './transformers';
 
 @Entity()
 export class AssetEntity {
-  @PrimaryColumn()
+  @PrimaryColumn('varchar')
   id?: Cardano.AssetId;
   @Column({
     transformer: parseBigInt,

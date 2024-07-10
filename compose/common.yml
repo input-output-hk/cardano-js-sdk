@@ -4,6 +4,8 @@ x-from-sdk: &from-sdk
     timeout: 5s
     retries: 10
   restart: on-failure
+  volumes:
+    - ../..:/app
 
 x-logging: &logging
   logging:
@@ -56,6 +58,7 @@ x-projector-environment: &projector-environment
 
 x-provider-server-environment: &provider-server-environment
   API_URL: http://0.0.0.0:3000
+  CARDANO_NODE_CONFIG_PATH: /config/cardano-node/config.json
   DB_CACHE_TTL: ${DB_CACHE_TTL:-120}
   DISABLE_DB_CACHE: ${DISABLE_DB_CACHE:-false}
   DISABLE_STAKE_POOL_METRIC_APY: ${DISABLE_STAKE_POOL_METRIC_APY:-false}
@@ -165,7 +168,16 @@ services:
     <<: *logging
     image: cardanosolutions/ogmios:v${OGMIOS_VERSION:-6.3.0}
     command:
-      ['--host', '0.0.0.0', '--node-socket', '/ipc/node.socket', '--node-config', '/config/cardano-node/config.json']
+      [
+        '--host',
+        '0.0.0.0',
+        '--node-socket',
+        '/ipc/node.socket',
+        '--node-config',
+        '/config/cardano-node/config.json',
+        '--log-level-websocket',
+        'Warning'
+      ]
     depends_on:
       cardano-node:
         condition: service_started
@@ -298,6 +310,9 @@ services:
       - *logging
       - *provider-server
       - *with-postgres
+    depends_on:
+      stake-pool-projector:
+        condition: service_healthy
     environment:
       <<:
         - *sdk-environment
@@ -313,6 +328,9 @@ services:
       - *logging
       - *provider-server
       - *with-postgres
+    depends_on:
+      asset-projector:
+        condition: service_healthy
     environment:
       <<:
         - *sdk-environment
@@ -328,6 +346,9 @@ services:
       - *logging
       - *provider-server
       - *with-postgres
+    depends_on:
+      handle-projector:
+        condition: service_healthy
     environment:
       <<:
         - *sdk-environment
