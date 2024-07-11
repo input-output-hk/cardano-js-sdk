@@ -16,6 +16,7 @@ interface CborSerializable<C> {
  */
 export class CborSet<C, T extends CborSerializable<C>> {
   #values: T[];
+  #originalBytes: HexBlob | undefined = undefined;
 
   // Prevent users from directly creating an instance. Only allow creating via fromCore or fromCbor.
   private constructor(values: T[]) {
@@ -43,6 +44,8 @@ export class CborSet<C, T extends CborSerializable<C>> {
       cborSet.#values.push(fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
     }
 
+    cborSet.#originalBytes = cbor;
+
     return cborSet;
   }
 
@@ -53,6 +56,8 @@ export class CborSet<C, T extends CborSerializable<C>> {
    * or as an the array.
    */
   toCbor(): HexBlob {
+    if (this.#originalBytes) return this.#originalBytes;
+
     const writer = new CborWriter();
 
     if (inConwayEra) writer.writeTag(CborTag.Set);
@@ -92,6 +97,7 @@ export class CborSet<C, T extends CborSerializable<C>> {
   /** Returns the values of the set as an array */
   setValues(values: T[]): void {
     this.#values = [...values];
+    this.#originalBytes = undefined;
   }
 
   size() {

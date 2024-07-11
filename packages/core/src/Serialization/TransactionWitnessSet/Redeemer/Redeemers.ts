@@ -12,6 +12,7 @@ const MAP_VALUE_EMBEDDED_GROUP_SIZE = 2;
 
 export class Redeemers {
   #values: Redeemer[];
+  #originalBytes: HexBlob | undefined = undefined;
 
   private constructor(redeemers: Redeemer[]) {
     this.#values = [...redeemers];
@@ -25,6 +26,8 @@ export class Redeemers {
    * @returns The Redeemers in CBOR format.
    */
   toCbor(): HexBlob {
+    if (this.#originalBytes) return this.#originalBytes;
+
     const writer = new CborWriter();
     // Encoding `redeemers` as `Map`:
     // https://github.com/IntersectMBO/cardano-ledger/blob/master/eras/conway/impl/cddl-files/conway.cddl#L480
@@ -103,7 +106,12 @@ export class Redeemers {
 
       reader.readEndArray();
     }
-    return new Redeemers(redeemers);
+
+    const result = new Redeemers(redeemers);
+
+    result.#originalBytes = cbor;
+
+    return result;
   }
 
   /**
@@ -132,6 +140,7 @@ export class Redeemers {
   /** @param redeemers replace the existing redeemers with the ones provided here  */
   setValues(redeemers: Redeemer[]) {
     this.#values = [...redeemers];
+    this.#originalBytes = undefined;
   }
 
   size() {
