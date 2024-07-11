@@ -345,6 +345,7 @@ in
             };
             handle-provider.enabled = true;
             # asset-provider.enabled = true;
+            chain-history-provider.enabled = true;
           };
 
           projectors = {
