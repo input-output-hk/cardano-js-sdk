@@ -2,6 +2,31 @@ name: K6 WebSocket server load tests
 
 on:
   workflow_dispatch:
+    branches: ['master', 'feat/web-socket-network-info-provider']
+    inputs:
+      environment:
+        description: 'Target environment'
+        type: choice
+        required: true
+        options:
+          - 'dev'
+          - 'ops'
+          - 'staging'
+          - 'prod'
+      network:
+        description: 'Target network'
+        type: choice
+        required: true
+        options:
+          - 'preview'
+          - 'preprod'
+          - 'sanchonet'
+          - 'mainnet'
+      wallets:
+        description: 'Number of wallets to simulate'
+        type: number
+        required: true
+        default: 1000
 
 jobs:
   web-socket:
@@ -9,3 +34,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Run k6 cloud test
+        uses: grafana/k6-action@v0.3.1
+        env:
+          K6_CLOUD_PROJECT_ID: ${{ secrets.K6_CLOUD_PROJECT_ID }}
+        with:
+          filename: ./packages/e2e/test/k6/scenarios/web-socket.test.js
+          cloud: false
+          token: ${{ secrets.K6_CLOUD_API_TOKEN }}
+          flags: >
+            -e TARGET_ENV=${{ inputs.environment }}
+            -e TARGET_NET=${{ inputs.network }}
+            -e WALLETS=${{ inputs.wallets }}
+            --out json=web-socket-results.json
+            --quiet
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-report
+          path: web-socket-results.json
