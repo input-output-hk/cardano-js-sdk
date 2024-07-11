@@ -135,6 +135,12 @@ in
           resources.requests = mkPodResources "150Mi" "200m";
         };
 
+        ws-server = {
+          enabled = false;
+          resources.limits = mkPodResources "300Mi" "300m";
+          resources.requests = mkPodResources "150Mi" "200m";
+        };
+
         backend = {
           allowedOrigins = lib.concatStringsSep "," allowedOrigins;
           passHandleDBArgs = true;
@@ -169,6 +175,7 @@ in
       };
       imports = [
         ./options.nix
+        ./ws-server.deployment.nix
         ./provider.resource.nix
         ./projector.resource.nix
         ./backend.provider.nix
@@ -209,6 +216,7 @@ in
           };
 
           values = {
+            ws-server.enabled = true;
             stakepool.databaseName = "stakepoolv2";
             cardano-services = {
               ingresOrder = 99;
@@ -255,6 +263,7 @@ in
           };
 
           values = {
+            ws-server.enabled = true;
             blockfrost-worker.enabled = false;
             pg-boss-worker.enabled = true;
 
@@ -322,6 +331,7 @@ in
           };
 
           values = {
+            ws-server.enabled = true;
             ingress.enabled = false;
             pg-boss-worker.enabled = true;
             stakepool.databaseName = "stakepoolv2";
@@ -358,6 +368,7 @@ in
           };
 
           values = {
+            ws-server.enabled = true;
             cardano-services = {
               ingresOrder = 99;
               additionalRoutes = [
@@ -406,6 +417,7 @@ in
           };
 
           values = {
+            ws-server.enabled = true;
             stakepool.databaseName = "stakepoolv2";
             backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
 
@@ -445,6 +457,7 @@ in
           };
 
           values = {
+            ws-server.enabled = true;
             stakepool.databaseName = "stakepoolv2";
             blockfrost-worker.enabled = true;
             pg-boss-worker.enabled = true;
@@ -870,6 +883,7 @@ in
           };
 
           values = {
+            ws-server.enabled = true;
             cardano-services = {
               ingresOrder = 99;
             };
