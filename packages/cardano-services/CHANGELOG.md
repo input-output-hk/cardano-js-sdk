@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.11...@cardano-sdk/cardano-services@0.28.12) (2024-07-11)
+
+### Bug Fixes
+
+* **cardano-services:** add workaround for db-sync not projecting epoch 0 to db sync epoch monitor ([b792354](https://github.com/input-output-hk/cardano-js-sdk/commit/b7923545182ed006b68d32b9054ac2f9e91d0592))
+
 ## [0.28.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.10...@cardano-sdk/cardano-services@0.28.11) (2024-07-10)
 
 ### Bug Fixes
