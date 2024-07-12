@@ -1,0 +1,11 @@
+name: K6 WebSocket server load tests
+
+on:
+  workflow_dispatch:
+
+jobs:
+  web-socket:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
