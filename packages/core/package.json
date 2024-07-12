@@ -54,8 +54,8 @@
     }
   },
   "dependencies": {
-    "@cardano-ogmios/client": "6.4.0",
-    "@cardano-ogmios/schema": "6.4.0",
+    "@cardano-ogmios/client": "6.5.0",
+    "@cardano-ogmios/schema": "6.5.0",
     "@cardano-sdk/crypto": "workspace:~",
     "@cardano-sdk/util": "workspace:~",
     "@cardano-sdk/util-dev": "workspace:~",
