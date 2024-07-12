@@ -345,6 +345,7 @@ in
             };
             handle-provider.enabled = true;
             # asset-provider.enabled = true;
+            chain-history-provider.enabled = true;
           };
 
           projectors = {
@@ -511,6 +512,7 @@ in
               env.NODE_ENV = "production";
             };
             handle-provider.enabled = true;
+            chain-history-provider.enabled = true;
             # asset-provider = {
             #   enabled = true;
             #   env.NODE_ENV = "production";
@@ -582,6 +584,7 @@ in
               env.NODE_ENV = "production";
             };
             handle-provider.enabled = true;
+            chain-history-provider.enabled = true;
             #asset-provider = {
             #  enabled = true;
             #  env.NODE_ENV = "production";
@@ -654,6 +657,7 @@ in
               enabled = true;
               env.NODE_ENV = "production";
             };
+            chain-history-provider.enabled = true;
             #asset-provider = {
             #  enabled = true;
             #  env.NODE_ENV = "production";
@@ -715,6 +719,7 @@ in
               enabled = true;
               env.NODE_ENV = "production";
             };
+            chain-history-provider.enabled = true;
             #asset-provider = {
             #  enabled = true;
             #  env.NODE_ENV = "production";
@@ -776,6 +781,7 @@ in
               enabled = true;
               env.NODE_ENV = "production";
             };
+            chain-history-provider.enabled = true;
             #asset-provider = {
             #  enabled = true;
             #  env.NODE_ENV = "production";
@@ -838,6 +844,7 @@ in
               enabled = true;
               env.NODE_ENV = "production";
             };
+            chain-history-provider.enabled = true;
             #asset-provider = {
             #  enabled = true;
             #  env.NODE_ENV = "production";
