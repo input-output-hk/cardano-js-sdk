@@ -33,8 +33,6 @@
       DISABLE_STAKE_POOL_METRIC_APY = "true";
       PAGINATION_PAGE_SIZE_LIMIT = "5500";
 
-
-      BUILD_INFO = values.cardano-services.buildInfo;
       ALLOWED_ORIGINS = values.backend.allowedOrigins;
 
       POSTGRES_POOL_MAX_DB_SYNC = "50";
