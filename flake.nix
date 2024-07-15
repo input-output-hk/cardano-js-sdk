@@ -72,10 +72,6 @@
         system,
         ...
       }: {
-        _module.args.pkgs = import inputs.nixpkgs {
-          inherit system;
-        };
-
         legacyPackages.cardano-services = import ./nix/cardano-services/deployments {inherit pkgs nix-helm inputs;};
       };
     };
