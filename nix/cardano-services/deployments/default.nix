@@ -79,8 +79,8 @@ in
         };
 
         chain-history-provider = {
-          resources.limits = mkPodResources "300Mi" "1000m";
-          resources.requests = mkPodResources "150Mi" "700m";
+          resources.limits = mkPodResources "300Mi" "1200m";
+          resources.requests = mkPodResources "150Mi" "1000m";
         };
       };
 
