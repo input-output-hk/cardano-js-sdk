@@ -79,8 +79,8 @@ in
         };
 
         chain-history-provider = {
-          resources.limits = mkPodResources "300Mi" "700m";
-          resources.requests = mkPodResources "150Mi" "300m";
+          resources.limits = mkPodResources "300Mi" "1000m";
+          resources.requests = mkPodResources "150Mi" "700m";
         };
       };
 
@@ -181,7 +181,6 @@ in
         ./blockfrost-worker-deployment.nix
       ];
     };
-
 
     targets =
       {
@@ -478,8 +477,6 @@ in
             stake-pool.enabled = true;
             # asset.enabled = true;
           };
-     
-
 
           values = {
             stakepool.databaseName = "stakepoolv2";
@@ -821,7 +818,6 @@ in
               ];
           };
         };
-
 
         "live-preview@eu-central-1@v2" = final: {
           name = "${final.namespace}-cardanojs-v2";
