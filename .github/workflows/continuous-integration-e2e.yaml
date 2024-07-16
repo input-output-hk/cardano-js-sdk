@@ -79,6 +79,7 @@ jobs:
         run: |
           yarn workspace @cardano-sdk/e2e test:wallet:epoch0
           yarn workspace @cardano-sdk/e2e test:projection
+          yarn workspace @cardano-sdk/e2e test:ws
 
       - name: Wait for epoch 3
         run: |

@@ -34,6 +34,7 @@ module.exports = {
     project('providers'),
     project('wallet_epoch_0'),
     project('wallet_epoch_3'),
+    project('ws-server'),
     {
       ...commonProjectProps,
       displayName: 'wallet-real-ada',
