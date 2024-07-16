@@ -336,7 +336,7 @@ in
           providers = {
             backend = {
               enabled = true;
-              replicas = 3;
+              replicas = 2;
             };
             stake-pool-provider = {
               enabled = true;
@@ -344,7 +344,11 @@ in
             };
             handle-provider.enabled = true;
             # asset-provider.enabled = true;
-            chain-history-provider.enabled = true;
+            chain-history-provider = {
+              enabled = true;
+              replicas = 2;
+              env.NODE_ENV = "production";
+            };
           };
 
           projectors = {
@@ -500,7 +504,7 @@ in
           providers = {
             backend = {
               enabled = true;
-              replicas = 3;
+              replicas = 2;
               env.NODE_ENV = "production";
             };
             stake-pool-provider = {
@@ -509,7 +513,11 @@ in
               env.NODE_ENV = "production";
             };
             handle-provider.enabled = true;
-            chain-history-provider.enabled = true;
+            chain-history-provider = {
+              enabled = true;
+              replicas = 2;
+              env.NODE_ENV = "production";
+            };
             # asset-provider = {
             #   enabled = true;
             #   env.NODE_ENV = "production";
@@ -572,7 +580,7 @@ in
           providers = {
             backend = {
               enabled = true;
-              replicas = 3;
+              replicas = 2;
               env.NODE_ENV = "production";
             };
             stake-pool-provider = {
@@ -581,7 +589,11 @@ in
               env.NODE_ENV = "production";
             };
             handle-provider.enabled = true;
-            chain-history-provider.enabled = true;
+            chain-history-provider = {
+              enabled = true;
+              replicas = 2;
+              env.NODE_ENV = "production";
+            };
             #asset-provider = {
             #  enabled = true;
             #  env.NODE_ENV = "production";
