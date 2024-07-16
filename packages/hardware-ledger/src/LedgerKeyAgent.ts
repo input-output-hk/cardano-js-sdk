@@ -552,10 +552,12 @@ export class LedgerKeyAgent extends KeyAgentBase {
     { knownAddresses, txInKeyPathMap }: SignTransactionContext
   ): Promise<Cardano.Signatures> {
     try {
+      const dRepPublicKey = await this.derivePublicKey(util.DREP_KEY_DERIVATION_PATH);
+      const dRepKeyHashHex = (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex();
       const ledgerTxData = await toLedgerTx(body, {
         accountIndex: this.accountIndex,
         chainId: this.chainId,
-        dRepPublicKey: await this.derivePublicKey(util.DREP_KEY_DERIVATION_PATH),
+        dRepKeyHashHex,
         knownAddresses,
         txInKeyPathMap
       });

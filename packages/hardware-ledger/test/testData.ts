@@ -342,7 +342,7 @@ export const CONTEXT_WITH_KNOWN_ADDRESSES: LedgerTxTransformerContext = {
     networkId: Cardano.NetworkId.Testnet,
     networkMagic: 999
   },
-  dRepPublicKey: Crypto.Ed25519PublicKeyHex('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01'),
+  dRepKeyHashHex: Crypto.Ed25519KeyHashHex(dRepCredential.hash),
   knownAddresses: [
     {
       accountIndex: 0,
