@@ -1,6 +1,6 @@
-import { Cardano } from '@cardano-sdk/core';
-import { VoteOption, VoterType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import * as Crypto from '@cardano-sdk/crypto';
 import {
+  CONTEXT_WITH_KNOWN_ADDRESSES,
   ccHotKeyHashVoter,
   ccHotScriptHashVoter,
   constitutionalCommitteeVotingProcedure,
@@ -9,6 +9,9 @@ import {
   stakePoolKeyHashVoter,
   votingProcedureVotes
 } from '../testData';
+import { Cardano } from '@cardano-sdk/core';
+import { LedgerTxTransformerContext } from '../../src';
+import { VoteOption, VoterType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import {
   mapVotingProcedures,
   toVoteOption,
@@ -16,6 +19,7 @@ import {
   toVotes,
   toVotingProcedure
 } from '../../src/transformers/votingProcedures';
+import { util } from '@cardano-sdk/key-management';
 
 describe('votingProcedures', () => {
   const expectedVotingProcedureVote = {
@@ -34,35 +38,38 @@ describe('votingProcedures', () => {
 
   describe('toVoter', () => {
     it('can map a ccHotKeyHashVoter correctly', () => {
-      expect(toVoter(ccHotKeyHashVoter)).toEqual({
+      expect(toVoter(ccHotKeyHashVoter, CONTEXT_WITH_KNOWN_ADDRESSES)).toEqual({
         keyHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
         type: VoterType.COMMITTEE_KEY_HASH
       });
     });
 
     it('can map a ccHotScriptHashVoter correctly', () => {
-      expect(toVoter(ccHotScriptHashVoter)).toEqual({
+      expect(toVoter(ccHotScriptHashVoter, CONTEXT_WITH_KNOWN_ADDRESSES)).toEqual({
         scriptHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
         type: VoterType.COMMITTEE_SCRIPT_HASH
       });
     });
 
     it('can map a dRepKeyHashVoter correctly', () => {
-      expect(toVoter(dRepKeyHashVoter)).toEqual({
-        keyHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
-        type: VoterType.DREP_KEY_HASH
+      expect(toVoter(dRepKeyHashVoter, CONTEXT_WITH_KNOWN_ADDRESSES)).toEqual({
+        keyPath: util.accountKeyDerivationPathToBip32Path(
+          CONTEXT_WITH_KNOWN_ADDRESSES.accountIndex,
+          util.DREP_KEY_DERIVATION_PATH
+        ),
+        type: VoterType.DREP_KEY_PATH
       });
     });
 
     it('can map a dRepScriptHashVoter correctly', () => {
-      expect(toVoter(dRepScriptHashVoter)).toEqual({
+      expect(toVoter(dRepScriptHashVoter, CONTEXT_WITH_KNOWN_ADDRESSES)).toEqual({
         scriptHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
         type: VoterType.DREP_SCRIPT_HASH
       });
     });
 
     it('can map a stakePoolKeyHashVoter correctly', () => {
-      expect(toVoter(stakePoolKeyHashVoter)).toEqual({
+      expect(toVoter(stakePoolKeyHashVoter, CONTEXT_WITH_KNOWN_ADDRESSES)).toEqual({
         keyHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
         type: VoterType.STAKE_POOL_KEY_HASH
       });
@@ -95,7 +102,7 @@ describe('votingProcedures', () => {
 
   describe('toVotingProcedure', () => {
     it('can map voting procedure correctly', () => {
-      expect(toVotingProcedure(constitutionalCommitteeVotingProcedure)).toEqual({
+      expect(toVotingProcedure(constitutionalCommitteeVotingProcedure, CONTEXT_WITH_KNOWN_ADDRESSES)).toEqual({
         voter: {
           keyHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
           type: VoterType.COMMITTEE_KEY_HASH
@@ -108,15 +115,21 @@ describe('votingProcedures', () => {
   describe('mapVotingProcedures', () => {
     it('return null if given an undefined object as votingProcedures', async () => {
       const votingProcedure: Cardano.VotingProcedures[0] | undefined = undefined;
-      const votingProcedures = mapVotingProcedures(votingProcedure);
+      const votingProcedures = mapVotingProcedures(votingProcedure, {
+        accountIndex: 0,
+        dRepKeyHashHex: Crypto.Ed25519KeyHashHex('7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8')
+      } as LedgerTxTransformerContext);
       expect(votingProcedures).toEqual(null);
     });
 
     it('can map voting procedures correctly', () => {
-      const votingProcedures = mapVotingProcedures([
-        constitutionalCommitteeVotingProcedure,
-        constitutionalCommitteeVotingProcedure
-      ]);
+      const votingProcedures = mapVotingProcedures(
+        [constitutionalCommitteeVotingProcedure, constitutionalCommitteeVotingProcedure],
+        {
+          accountIndex: 0,
+          dRepKeyHashHex: Crypto.Ed25519KeyHashHex('7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8')
+        } as LedgerTxTransformerContext
+      );
 
       expect(votingProcedures!.length).toEqual(2);
 

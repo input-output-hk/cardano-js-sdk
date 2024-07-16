@@ -1,6 +1,9 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Cardano } from '@cardano-sdk/core';
-import { Transform } from '@cardano-sdk/util';
+import { InvalidArgumentError, Transform } from '@cardano-sdk/util';
+import { LedgerTxTransformerContext } from '..';
+import { util } from '@cardano-sdk/key-management';
 
 /**
  * Maps a Voter to a Voter from the LedgerJS public types.
@@ -9,7 +12,8 @@ import { Transform } from '@cardano-sdk/util';
  * @returns {Ledger.Voter} Corresponding Voter object for use with LedgerJS.
  */
 
-export const toVoter: Transform<Cardano.Voter, Ledger.Voter> = (voter) => {
+export const toVoter: Transform<Cardano.Voter, Ledger.Voter, LedgerTxTransformerContext> = (voter, context) => {
+  if (!context) throw new InvalidArgumentError('LedgerTxTransformerContext', 'values was not provided');
   switch (voter.__typename) {
     case 'ccHotKeyHash':
       return {
@@ -23,12 +27,15 @@ export const toVoter: Transform<Cardano.Voter, Ledger.Voter> = (voter) => {
         type: Ledger.VoterType.COMMITTEE_SCRIPT_HASH
       } as Ledger.CommitteeScriptHashVoter;
 
-    case 'dRepKeyHash':
+    case 'dRepKeyHash': {
+      if (!context.dRepKeyHashHex || context.dRepKeyHashHex !== Crypto.Ed25519KeyHashHex(voter.credential.hash)) {
+        throw new Error('Foreign voter drepKeyHash');
+      }
       return {
-        keyHashHex: voter.credential.hash,
-        type: Ledger.VoterType.DREP_KEY_HASH
-      } as Ledger.DRepKeyHashVoter;
-
+        keyPath: util.accountKeyDerivationPathToBip32Path(context.accountIndex, util.DREP_KEY_DERIVATION_PATH),
+        type: Ledger.VoterType.DREP_KEY_PATH
+      } as Ledger.DRepKeyPathVoter;
+    }
     case 'dRepScriptHash':
       return {
         scriptHashHex: voter.credential.hash,
@@ -97,8 +104,12 @@ export const toVotes: Transform<Cardano.VotingProcedureVote[], Ledger.Vote[]> = 
  * @param votingProcedure A single voting procedure obj from Core.
  * @returns {Ledger.VoterVotes} LedgerJS-compatible voting records
  */
-export const toVotingProcedure: Transform<Cardano.VotingProcedures[0], Ledger.VoterVotes> = (votingProcedure) => ({
-  voter: toVoter(votingProcedure.voter),
+export const toVotingProcedure: Transform<
+  Cardano.VotingProcedures[0],
+  Ledger.VoterVotes,
+  LedgerTxTransformerContext
+> = (votingProcedure, context) => ({
+  voter: toVoter(votingProcedure.voter, context),
   votes: toVotes(votingProcedure.votes)
 });
 
@@ -113,6 +124,7 @@ export const toVotingProcedure: Transform<Cardano.VotingProcedures[0], Ledger.Vo
  */
 
 export const mapVotingProcedures = (
-  votingProcedures: Cardano.VotingProcedures | undefined
+  votingProcedures: Cardano.VotingProcedures | undefined,
+  context: LedgerTxTransformerContext
 ): Ledger.VoterVotes[] | null =>
-  votingProcedures ? votingProcedures.map((votingProcedure) => toVotingProcedure(votingProcedure)) : null;
+  votingProcedures ? votingProcedures.map((votingProcedure) => toVotingProcedure(votingProcedure, context)) : null;

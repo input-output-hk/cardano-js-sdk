@@ -409,7 +409,7 @@ export const votes = [
 export const dRepKeyHashVoter: Cardano.Voter = {
   __typename: Cardano.VoterType.dRepKeyHash,
   credential: {
-    hash: stakeCredential.hash,
+    hash: dRepCredential.hash,
     type: Cardano.CredentialType.KeyHash
   }
 };

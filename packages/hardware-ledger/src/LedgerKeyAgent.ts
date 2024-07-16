@@ -31,7 +31,9 @@ import _LedgerConnection, {
   PoolOwnerType,
   Transaction,
   TransactionSigningMode,
-  TxOutputDestinationType
+  TxOutputDestinationType,
+  VoterType,
+  VoterVotes
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import _TransportWebUSB from '@ledgerhq/hw-transport-webusb';
 import type LedgerTransport from '@ledgerhq/hw-transport';
@@ -501,6 +503,21 @@ export class LedgerKeyAgent extends KeyAgentBase {
     );
   }
 
+  private static isKeyHashOrScriptHashVoter(votingProcedures?: VoterVotes[] | null): boolean {
+    return !!votingProcedures?.some((votingProcedure) => {
+      switch (votingProcedure.voter.type) {
+        case VoterType.COMMITTEE_KEY_HASH:
+        case VoterType.COMMITTEE_SCRIPT_HASH:
+        case VoterType.DREP_KEY_HASH:
+        case VoterType.DREP_SCRIPT_HASH:
+        case VoterType.STAKE_POOL_KEY_HASH:
+          return true;
+        default:
+          return false;
+      }
+    });
+  }
+
   /**
    * Gets the mode in which we want to sign the transaction.
    * Ledger has certain limitations due to which it cannot sign arbitrary combination of all transaction features.
@@ -529,7 +546,8 @@ export class LedgerKeyAgent extends KeyAgentBase {
      * VotingProcedures: We are currently supporting only keyHash and scriptHash voter types in voting procedures.
      * To sign tx with keyHash and scriptHash voter type we have to use PLUTUS_TRANSACTION signing mode
      */
-    if (tx.collateralInputs || tx.votingProcedures) {
+
+    if (tx.collateralInputs || LedgerKeyAgent.isKeyHashOrScriptHashVoter(tx.votingProcedures)) {
       return TransactionSigningMode.PLUTUS_TRANSACTION;
     }
 

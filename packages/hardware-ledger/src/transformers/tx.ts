@@ -36,7 +36,7 @@ export const LedgerTxTransformer: Transformer<Cardano.TxBody, Ledger.Transaction
   treasury: ({ treasuryValue }) => treasuryValue,
   ttl: ({ validityInterval }) => validityInterval?.invalidHereafter,
   validityIntervalStart: ({ validityInterval }) => validityInterval?.invalidBefore,
-  votingProcedures: ({ votingProcedures }) => mapVotingProcedures(votingProcedures),
+  votingProcedures: ({ votingProcedures }, context) => mapVotingProcedures(votingProcedures, context!),
   withdrawals: ({ withdrawals }, context) => mapWithdrawals(withdrawals, context!)
 };
 
