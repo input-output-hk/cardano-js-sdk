@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/e2e",
-  "version": "0.36.6",
+  "version": "0.36.7",
   "description": "End to end tests for the cardano-js-sdk packages.",
   "engines": {
     "node": ">=16.20.2"
@@ -48,9 +48,7 @@
     "test:web-extension:watch:bg": "run-p test:web-extension:watch:build test:web-extension:watch:run",
     "local-network:common": "PRE_CONWAY=${PRE_CONWAY:-stable} DISABLE_DB_CACHE=${DISABLE_DB_CACHE:-true} SUBMIT_API_ARGS='--testnet-magic 888' USE_BLOCKFROST=false __FIX_UMASK__=$(chmod -R a+r ../../compose/placeholder-secrets) docker compose --env-file ../cardano-services/environments/.env.local -p local-network-e2e -f docker-compose.yml -f ../../compose/common.yml -f ../../compose/$(uname -m).yml $FILES up",
     "local-network:up": "FILES='' yarn local-network:common",
-    "local-network:dev": "FILES='-f ../../compose/dev.yml' yarn local-network:common",
     "local-network:profile:up": "FILES='-f ../../compose/pg-agent.yml' yarn local-network:common",
-    "local-network:profile:dev": "FILES='-f ../../compose/dev.yml -f ../../compose/pg-agent.yml' yarn local-network:common",
     "local-network:down": "docker compose -p local-network-e2e -f docker-compose.yml -f ../../compose/common.yml -f ../../compose/pg-agent.yml down -v --remove-orphans",
     "cardano-services:up": "ts-node --transpile-only ../cardano-services/src/cli.ts start-provider-server",
     "cardano-services:up:debug": "npx nodemon --legacy-watch --exec 'node -r ts-node/register --inspect=0.0.0.0:9229 ../cardano-services/src/cli.ts start-provider-server'",

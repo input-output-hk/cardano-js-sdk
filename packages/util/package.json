@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/util",
-  "version": "0.15.2",
+  "version": "0.15.3",
   "description": "General, not cardano-specific utils",
   "engines": {
     "node": ">=16.20.2"
@@ -9,6 +9,7 @@
   "module": "dist/esm/index.js",
   "exports": {
     ".": {
+      "development": "./src/index.ts",
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
     }

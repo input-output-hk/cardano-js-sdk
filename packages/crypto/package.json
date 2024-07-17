@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/crypto",
-  "version": "0.1.25",
+  "version": "0.1.26",
   "description": "Cryptographic types and functions for Cardano. Warning: The libsodium crypto provider has not yet been audited. Use at this stage is at own risk",
   "engines": {
     "node": ">=16.20.2"
@@ -9,6 +9,7 @@
   "module": "dist/esm/index.js",
   "exports": {
     ".": {
+      "development": "./src/index.ts",
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
     }

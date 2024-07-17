@@ -122,7 +122,7 @@ const checkPreviousEpochCompleted = async (dataSource: DataSource, epochNo: Card
       [STAKE_POOL_REWARDS, epochNo - 1, 'completed']
     );
 
-    if (result[0]?.completed !== '1') throw new Error('Previous epoch rewards job not completed yet');
+    if (result[0]?.completed !== '1') throw new Error(`Previous epoch (${epochNo - 1}) rewards job not completed yet`);
   } finally {
     await queryRunner.release();
   }

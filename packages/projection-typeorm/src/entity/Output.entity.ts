@@ -10,10 +10,10 @@ export class OutputEntity {
   @PrimaryGeneratedColumn()
   id?: number;
   @Index()
-  @Column()
+  @Column('varchar')
   address?: Cardano.PaymentAddress;
   @Index()
-  @Column()
+  @Column('varchar')
   txId?: Cardano.TransactionId;
   @Index()
   @Column('smallint')

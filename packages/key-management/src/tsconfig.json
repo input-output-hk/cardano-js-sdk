@@ -9,6 +9,12 @@
     },
     {
       "path": "../../crypto/src"
+    },
+    {
+      "path": "../../dapp-connector/src"
+    },
+    {
+      "path": "../../util/src"
     }
   ]
 }

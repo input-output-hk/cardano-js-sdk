@@ -215,7 +215,7 @@ jobs:
         run: |
           echo 'export K8S_USER=eks-devs' >.envrc.local
 
-          nix develop .#x86_64-linux.local.envs.main -L --command bash -c '
+          nix develop -L --command bash -c '
             set -euo pipefail
 
             export AWS_PROFILE="lw"
@@ -323,7 +323,7 @@ jobs:
         run: |
           echo 'export K8S_USER=eks-devs' >.envrc.local
 
-          nix develop .#x86_64-linux.local.envs.main -L --command bash -c '
+          nix develop -L --command bash -c '
             set -euo pipefail
 
             export AWS_PROFILE="lw"
