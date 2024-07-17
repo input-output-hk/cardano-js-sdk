@@ -13,11 +13,6 @@ on:
         type: boolean
         required: true
         default: false
-      deploy-dev-preprod-resync:
-        description: Deploy to dev-preprod-resync
-        type: boolean
-        required: true
-        default: false
       deploy-staging-preprod:
         description: Deploy to staging-preprod
         type: boolean
@@ -108,9 +103,6 @@ jobs:
             fi
             if [ "true" == ${{ inputs.deploy-dev-preprod || false }} ] ; then
               echo '{"environment":"dev-preprod", "target":"dev-preprod@us-east-1@v2", "url": "https://dev-preprod.lw.iog.io/"}'
-            fi
-            if [ "true" == ${{ inputs.deploy-dev-preprod-resync || false }} ] ; then
-              echo '{"environment":"dev-preprod-resync", "target":"dev-preprod-resync@us-east-1@v2", "url": "https://dev-preprod-resync.lw.iog.io/"}'
             fi
             if [ "true" == ${{ inputs.deploy-staging-preprod || false }} ] ; then
               echo '{"environment":"staging-preprod", "target":"staging-preprod@us-east-1@v2", "url": "https://staging-preprod.lw.iog.io/"}'
@@ -226,7 +218,6 @@ jobs:
             for target in \
               "dev-preview@us-east-1" \
               "dev-preprod@us-east-1@v2" \
-              "dev-preprod-resync@us-east-1@v2" \
               "dev-mainnet@us-east-1" \
             ; do
               git restore .kube
