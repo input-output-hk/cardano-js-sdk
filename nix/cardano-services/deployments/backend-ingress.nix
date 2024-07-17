@@ -6,7 +6,7 @@
   utils,
   ...
 }: {
-  templates.accelerator = lib.mkIf (values.useAccelerator && values.ingress.enabled)  {
+  templates.accelerator = lib.mkIf (values.useAccelerator && values.ingress.enabled) {
     apiVersion = "operator.h3poteto.dev/v1alpha1";
     kind = "EndpointGroupBinding";
     metadata.name = "${chart.name}-main";
@@ -22,45 +22,48 @@
     metadata = {
       name = "${chart.name}-backend";
       labels = utils.appLabels "backend";
-      annotations = if values.useAccelerator then {
-        "service.beta.kubernetes.io/aws-load-balancer-backend-protocol" = "tcp";
-        "service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled" = "true";
-        "service.beta.kubernetes.io/aws-load-balancer-type" = "external";
-        "alb.ingress.kubernetes.io/scheme" = "internet-facing";
-        "service.beta.kubernetes.io/aws-load-balancer-scheme" = "internet-facing";
-        "alb.ingress.kubernetes.io/target-type" = "ip";
-        "service.beta.kubernetes.io/aws-load-balancer-nlb-target-type" = "ip";
-        "service.beta.kubernetes.io/aws-load-balancer-proxy-protocol" = "*";
-        "service.beta.kubernetes.io/aws-load-balancer-target-group-attributes" = "proxy_protocol_v2.enabled=true,preserve_client_ip.enabled=true";
+      annotations =
+        if values.useAccelerator
+        then {
+          "service.beta.kubernetes.io/aws-load-balancer-backend-protocol" = "tcp";
+          "service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled" = "true";
+          "service.beta.kubernetes.io/aws-load-balancer-type" = "external";
+          "alb.ingress.kubernetes.io/scheme" = "internet-facing";
+          "service.beta.kubernetes.io/aws-load-balancer-scheme" = "internet-facing";
+          "alb.ingress.kubernetes.io/target-type" = "ip";
+          "service.beta.kubernetes.io/aws-load-balancer-nlb-target-type" = "ip";
+          "service.beta.kubernetes.io/aws-load-balancer-proxy-protocol" = "*";
+          "service.beta.kubernetes.io/aws-load-balancer-target-group-attributes" = "proxy_protocol_v2.enabled=true,preserve_client_ip.enabled=true";
 
-        "alb.ingress.kubernetes.io/listen-ports" = builtins.toJSON [{HTTP = 80;} {HTTPS = 443;}];
-        #"alb.ingress.kubernetes.io/wafv2-acl-arn" = values.backend.wafARN;
-        "alb.ingress.kubernetes.io/healthcheck-path" = "${values.cardano-services.httpPrefix}/health";
-        "alb.ingress.kubernetes.io/healthcheck-interval-seconds" = toString values.backend.albHealthcheck.interval;
-        "alb.ingress.kubernetes.io/healthcheck-timeout-seconds" = toString values.backend.albHealthcheck.timeout;
-        "alb.ingress.kubernetes.io/group.order" = toString values.cardano-services.ingresOrder;
-      } else {
-        "alb.ingress.kubernetes.io/actions.ssl-redirect" = builtins.toJSON {
-          Type = "redirect";
-          RedirectConfig = {
-            Protocol = "HTTPS";
-            Port = "443";
-            StatusCode = "HTTP_301";
+          "alb.ingress.kubernetes.io/listen-ports" = builtins.toJSON [{HTTP = 80;} {HTTPS = 443;}];
+          #"alb.ingress.kubernetes.io/wafv2-acl-arn" = values.backend.wafARN;
+          "alb.ingress.kubernetes.io/healthcheck-path" = "${values.cardano-services.httpPrefix}/health";
+          "alb.ingress.kubernetes.io/healthcheck-interval-seconds" = toString values.backend.albHealthcheck.interval;
+          "alb.ingress.kubernetes.io/healthcheck-timeout-seconds" = toString values.backend.albHealthcheck.timeout;
+          "alb.ingress.kubernetes.io/group.order" = toString values.cardano-services.ingresOrder;
+        }
+        else {
+          "alb.ingress.kubernetes.io/actions.ssl-redirect" = builtins.toJSON {
+            Type = "redirect";
+            RedirectConfig = {
+              Protocol = "HTTPS";
+              Port = "443";
+              StatusCode = "HTTP_301";
+            };
           };
+          "alb.ingress.kubernetes.io/listen-ports" = builtins.toJSON [{HTTP = 80;} {HTTPS = 443;}];
+          "alb.ingress.kubernetes.io/target-type" = "ip";
+          "alb.ingress.kubernetes.io/scheme" = "internet-facing";
+          "alb.ingress.kubernetes.io/wafv2-acl-arn" = values.backend.wafARN;
+          "alb.ingress.kubernetes.io/healthcheck-path" = "${values.cardano-services.httpPrefix}/health";
+          "alb.ingress.kubernetes.io/healthcheck-interval-seconds" = toString values.backend.albHealthcheck.interval;
+          "alb.ingress.kubernetes.io/healthcheck-timeout-seconds" = toString values.backend.albHealthcheck.timeout;
+          # Use latency routing policy
+          "external-dns.alpha.kubernetes.io/aws-region" = config.region;
+          "external-dns.alpha.kubernetes.io/set-identifier" = values.backend.dnsId;
+          "alb.ingress.kubernetes.io/group.name" = chart.namespace;
+          "alb.ingress.kubernetes.io/group.order" = toString values.cardano-services.ingresOrder;
         };
-        "alb.ingress.kubernetes.io/listen-ports" = builtins.toJSON [{HTTP = 80;} {HTTPS = 443;}];
-        "alb.ingress.kubernetes.io/target-type" = "ip";
-        "alb.ingress.kubernetes.io/scheme" = "internet-facing";
-        "alb.ingress.kubernetes.io/wafv2-acl-arn" = values.backend.wafARN;
-        "alb.ingress.kubernetes.io/healthcheck-path" = "${values.cardano-services.httpPrefix}/health";
-        "alb.ingress.kubernetes.io/healthcheck-interval-seconds" = toString values.backend.albHealthcheck.interval;
-        "alb.ingress.kubernetes.io/healthcheck-timeout-seconds" = toString values.backend.albHealthcheck.timeout;
-        # Use latency routing policy
-        "external-dns.alpha.kubernetes.io/aws-region" = config.region;
-        "external-dns.alpha.kubernetes.io/set-identifier" = values.backend.dnsId;
-        "alb.ingress.kubernetes.io/group.name" = chart.namespace;
-        "alb.ingress.kubernetes.io/group.order" = toString values.cardano-services.ingresOrder;
-      };
     };
     spec = {
       ingressClassName = "alb";
