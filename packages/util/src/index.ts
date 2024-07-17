@@ -18,4 +18,4 @@ export * from './patchObject';
 export * from './isPromise';
 export * from './transformer';
 export * from './Percent';
-export { PromiseOrValue, resolveObjectValues } from './util';
+export * from './util';
