@@ -272,6 +272,9 @@ describe('LedgerKeyAgent', () => {
               }
             }
           ]),
+          redeemersByType: {
+            mint: [scriptRedeemer]
+          },
           scriptIntegrityHash: scriptDataHash,
           witness: { redeemers: [scriptRedeemer], scripts: [script] }
         };
