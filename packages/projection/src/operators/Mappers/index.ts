@@ -6,3 +6,4 @@ export * from './withHandleMetadata';
 export * from './withNftMetadata';
 export * from './withCIP67';
 export * from './withAddresses';
+export { credentialsFromAddress } from './util';

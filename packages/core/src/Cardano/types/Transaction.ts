@@ -11,6 +11,7 @@ import { PlutusData } from './PlutusData';
 import { ProposalProcedure, VotingProcedures } from './Governance';
 import { RewardAccount } from '../Address';
 import { Script } from './Script';
+import { Serialization } from '../..';
 
 /** transaction hash as hex string */
 export type TransactionId = OpaqueString<'TransactionId'>;
@@ -151,6 +152,7 @@ export interface OnChainTx<TBody extends TxBody = TxBody>
   extends Omit<TxWithInputSource<TBody>, 'witness' | 'auxiliaryData'> {
   witness: Omit<Witness, 'scripts'>;
   auxiliaryData?: Omit<AuxiliaryData, 'scripts'>;
+  cbor?: Serialization.TxCBOR;
 }
 
 export interface HydratedTx extends TxWithInputSource<HydratedTxBody> {

@@ -5,7 +5,8 @@ import {
   NotImplementedError,
   Serialization,
   SerializationError,
-  SerializationFailure
+  SerializationFailure,
+  TxCBOR
 } from '@cardano-sdk/core';
 import { CommonBlock } from './types';
 import { Schema } from '@cardano-ogmios/client';
@@ -432,6 +433,7 @@ const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
         withdrawals: mapWithdrawals(tx.withdrawals)
       })
     },
+    cbor: tx.cbor ? TxCBOR(tx.cbor) : undefined,
     id: Cardano.TransactionId(tx.id),
     // At the time of writing Byron transactions didn't set this property
     inputSource: tx.spends ? Cardano.InputSource[tx.spends] : Cardano.InputSource.inputs,

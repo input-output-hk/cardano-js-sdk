@@ -3,6 +3,7 @@ import {
   AssetEntity,
   BlockDataEntity,
   BlockEntity,
+  CredentialEntity,
   CurrentPoolMetricsEntity,
   DataSourceExtensions,
   HandleEntity,
@@ -17,21 +18,25 @@ import {
   StakeKeyRegistrationEntity,
   StakePoolEntity,
   TokensEntity,
+  TransactionEntity,
   createStorePoolMetricsUpdateJob,
   createStoreStakePoolMetadataJob,
   storeAddresses,
   storeAssets,
   storeBlock,
+  storeCredentials,
   storeHandleMetadata,
   storeHandles,
   storeNftMetadata,
   storeStakeKeyRegistrations,
   storeStakePoolRewardsJob,
   storeStakePools,
+  storeTransactions,
   storeUtxo,
   willStoreAddresses,
   willStoreAssets,
   willStoreBlockData,
+  willStoreCredentials,
   willStoreHandleMetadata,
   willStoreHandles,
   willStoreNftMetadata,
@@ -39,6 +44,7 @@ import {
   willStoreStakePoolMetadataJob,
   willStoreStakePoolRewardsJob,
   willStoreStakePools,
+  willStoreTransactions,
   willStoreUtxo
 } from '@cardano-sdk/projection-typeorm';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
@@ -57,6 +63,7 @@ export enum ProjectionName {
   StakePoolMetadataJob = 'stake-pool-metadata-job',
   StakePoolMetricsJob = 'stake-pool-metrics-job',
   StakePoolRewardsJob = 'stake-pool-rewards-job',
+  Transaction = 'transaction',
   UTXO = 'utxo'
 }
 
@@ -112,6 +119,7 @@ export const storeOperators = {
   storeAddresses: storeAddresses(),
   storeAssets: storeAssets(),
   storeBlock: storeBlock(),
+  storeCredentials: storeCredentials(),
   storeHandleMetadata: storeHandleMetadata(),
   storeHandles: storeHandles(),
   storeNftMetadata: storeNftMetadata(),
@@ -123,6 +131,7 @@ export const storeOperators = {
   storeStakePoolMetadataJob: createStoreStakePoolMetadataJob()(),
   storeStakePoolRewardsJob: storeStakePoolRewardsJob(),
   storeStakePools: storeStakePools(),
+  storeTransactions: storeTransactions(),
   storeUtxo: storeUtxo()
 };
 type StoreOperators = typeof storeOperators;
@@ -138,6 +147,7 @@ type WillStore = {
 const willStore: Partial<WillStore> = {
   storeAddresses: willStoreAddresses,
   storeAssets: willStoreAssets,
+  storeCredentials: willStoreCredentials,
   storeHandleMetadata: willStoreHandleMetadata,
   storeHandles: willStoreHandles,
   storeNftMetadata: willStoreNftMetadata,
@@ -145,6 +155,7 @@ const willStore: Partial<WillStore> = {
   storeStakePoolMetadataJob: willStoreStakePoolMetadataJob,
   storeStakePoolRewardsJob: willStoreStakePoolRewardsJob,
   storeStakePools: willStoreStakePools,
+  storeTransactions: willStoreTransactions,
   storeUtxo: willStoreUtxo
 };
 
@@ -153,6 +164,7 @@ const entities = {
   asset: AssetEntity,
   block: BlockEntity,
   blockData: BlockDataEntity,
+  credential: CredentialEntity,
   currentPoolMetrics: CurrentPoolMetricsEntity,
   handle: HandleEntity,
   handleMetadata: HandleMetadataEntity,
@@ -165,7 +177,8 @@ const entities = {
   poolRewards: PoolRewardsEntity,
   stakeKeyRegistration: StakeKeyRegistrationEntity,
   stakePool: StakePoolEntity,
-  tokens: TokensEntity
+  tokens: TokensEntity,
+  transaction: TransactionEntity
 };
 export const allEntities = Object.values(entities);
 type Entities = typeof entities;
@@ -176,6 +189,7 @@ const storeEntities: Partial<Record<StoreName, EntityName[]>> = {
   storeAddresses: ['address'],
   storeAssets: ['asset'],
   storeBlock: ['block', 'blockData'],
+  storeCredentials: ['credential', 'transaction', 'output'],
   storeHandleMetadata: ['handleMetadata', 'output'],
   storeHandles: ['handle', 'asset', 'tokens', 'output'],
   storeNftMetadata: ['asset'],
@@ -186,6 +200,7 @@ const storeEntities: Partial<Record<StoreName, EntityName[]>> = {
   storeStakePoolMetadataJob: ['stakePool', 'currentPoolMetrics', 'poolMetadata'],
   storeStakePoolRewardsJob: ['poolRewards', 'stakePool'],
   storeStakePools: ['stakePool', 'currentPoolMetrics', 'poolMetadata', 'poolDelisted'],
+  storeTransactions: ['block', 'transaction'],
   storeUtxo: ['tokens', 'output']
 };
 
@@ -193,6 +208,7 @@ const entityInterDependencies: Partial<Record<EntityName, EntityName[]>> = {
   address: ['stakeKeyRegistration'],
   asset: ['block', 'nftMetadata'],
   blockData: ['block'],
+  credential: [],
   currentPoolMetrics: ['stakePool'],
   handle: ['asset'],
   handleMetadata: ['output'],
@@ -203,7 +219,8 @@ const entityInterDependencies: Partial<Record<EntityName, EntityName[]>> = {
   poolRetirement: ['block'],
   stakeKeyRegistration: ['block'],
   stakePool: ['block', 'poolRegistration', 'poolRetirement'],
-  tokens: ['asset']
+  tokens: ['asset'],
+  transaction: ['block', 'credential']
 };
 
 export const getEntities = (entityNames: EntityName[]): Entity[] => {
@@ -241,6 +258,7 @@ const mapperInterDependencies: Partial<Record<MapperName, MapperName[]>> = {
 const storeMapperDependencies: Partial<Record<StoreName, MapperName[]>> = {
   storeAddresses: ['withAddresses'],
   storeAssets: ['withMint'],
+  storeCredentials: ['withAddresses', 'withCertificates', 'withUtxo'],
   storeHandleMetadata: ['withHandleMetadata'],
   storeHandles: ['withHandles'],
   storeNftMetadata: ['withNftMetadata'],
@@ -260,6 +278,7 @@ const storeInterDependencies: Partial<Record<StoreName, StoreName[]>> = {
   storeStakePoolMetadataJob: ['storeBlock'],
   storeStakePoolRewardsJob: ['storeBlock'],
   storeStakePools: ['storeBlock'],
+  storeTransactions: ['storeCredentials', 'storeBlock'],
   storeUtxo: ['storeBlock', 'storeAssets']
 };
 
@@ -273,6 +292,7 @@ const projectionStoreDependencies: Record<ProjectionName, StoreName[]> = {
   'stake-pool-metadata-job': ['storeStakePoolMetadataJob'],
   'stake-pool-metrics-job': ['storePoolMetricsUpdateJob'],
   'stake-pool-rewards-job': ['storeStakePoolRewardsJob'],
+  transaction: ['storeCredentials', 'storeTransactions', 'storeUtxo'],
   utxo: ['storeUtxo']
 };
 
