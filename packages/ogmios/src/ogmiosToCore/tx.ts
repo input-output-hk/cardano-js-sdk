@@ -5,7 +5,8 @@ import {
   NotImplementedError,
   Serialization,
   SerializationError,
-  SerializationFailure
+  SerializationFailure,
+  TxCBOR
 } from '@cardano-sdk/core';
 import { CommonBlock } from './types';
 import { Schema } from '@cardano-ogmios/client';
