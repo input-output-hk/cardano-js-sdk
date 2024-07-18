@@ -41,9 +41,7 @@ users:
       - --role
       - arn:aws:iam::926093910549:role/eks-admin
       command: aws
-      env:
-      - name: AWS_PROFILE
-        value: lw
+      env: null
       interactiveMode: IfAvailable
       provideClusterInfo: false
 - name: eks-devs
@@ -62,9 +60,7 @@ users:
       - --role
       - arn:aws:iam::926093910549:role/eks-devs
       command: aws
-      env:
-      - name: AWS_PROFILE
-        value: lw
+      env: null
       interactiveMode: IfAvailable
       provideClusterInfo: false
 - name: eks-readonly
@@ -83,9 +79,7 @@ users:
       - --role
       - arn:aws:iam::926093910549:role/eks-readonly
       command: aws
-      env:
-      - name: AWS_PROFILE
-        value: lw
+      env: null
       interactiveMode: IfAvailable
       provideClusterInfo: false
 - name: lace-ci
@@ -104,8 +98,6 @@ users:
       - --role
       - arn:aws:iam::926093910549:role/lace-ci
       command: aws
-      env:
-      - name: AWS_PROFILE
-        value: lw
+      env: null
       interactiveMode: IfAvailable
       provideClusterInfo: false
