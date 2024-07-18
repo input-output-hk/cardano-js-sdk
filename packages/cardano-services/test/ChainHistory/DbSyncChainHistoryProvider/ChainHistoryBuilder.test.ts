@@ -226,8 +226,7 @@ describe('ChainHistoryBuilder', () => {
     });
   });
 
-  // TODO: enable after conway era hardfork
-  describe.skip('queryProposalProceduresByIds', () => {
+  describe('queryProposalProceduresByIds', () => {
     test('query proposal procedures by tx hashes', async () => {
       const txHashes = await fixtureBuilder.getTxHashes(1, { with: [TxWith.ProposalProcedures] });
       const ids = await getTxIds(txHashes);
@@ -256,8 +255,7 @@ describe('ChainHistoryBuilder', () => {
     });
   });
 
-  // TODO: enable after conway era hardfork
-  describe.skip('queryVotingProceduresByIds', () => {
+  describe('queryVotingProceduresByIds', () => {
     test('query voting procedures by tx hashes', async () => {
       const txHashes = await fixtureBuilder.getTxHashes(1, { with: [TxWith.VotingProcedure] });
       const ids = await getTxIds(txHashes);

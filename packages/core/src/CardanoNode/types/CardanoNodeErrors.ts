@@ -16,7 +16,8 @@ export enum StateQueryErrorCode {
   AcquireLedgerStateFailure = 2000,
   EraMismatch = 2001,
   UnavailableInCurrentEra = 2002,
-  AcquiredExpired = 2003
+  AcquiredExpired = 2003,
+  InvalidGenesis = 2004
 }
 
 export enum TxSubmissionErrorCode {
@@ -90,8 +91,10 @@ export enum TxSubmissionErrorCode {
    * Indeed, if the a UTxO is present in the inputs set, it is already in the transaction context
    */
   ConflictingInputsAndReferences = 3164,
-  FailureUnrecognizedCertificateType = 3998,
-  InternalLedgerTypeConversionError = 3999,
+  UnauthorizedGovernanceAction = 3165,
+  ReferenceScriptsTooLarge = 3166,
+  UnknownVoters = 3167,
+  UnrecognizedCertificateType = 3998,
   DeserialisationFailure = -32_602
 }
 

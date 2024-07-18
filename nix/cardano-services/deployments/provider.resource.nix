@@ -47,6 +47,16 @@ in {
           args = mkOption {
             type = types.listOf types.str;
           };
+
+          volumeMounts = mkOption {
+            type = types.attrsOf types.attrs;
+            default = {};
+          };
+
+          volumes = mkOption {
+            type = types.attrsOf types.attrs;
+            default = {};
+          };
         };
       });
 
@@ -133,20 +143,24 @@ in {
                     };
                     env = utils.mkPodEnv value.env;
 
-                    volumeMounts = [
-                      {
-                        mountPath = "/tls";
-                        name = "tls";
-                      }
-                    ];
+                    volumeMounts =
+                      [
+                        {
+                          mountPath = "/tls";
+                          name = "tls";
+                        }
+                      ]
+                      ++ (lib.mapAttrsToList (name: v: v // {inherit name;}) value.volumeMounts);
                   }
                 ];
-                volumes = [
-                  {
-                    name = "tls";
-                    secret.secretName = "postgresql-server-cert";
-                  }
-                ];
+                volumes =
+                  [
+                    {
+                      name = "tls";
+                      secret.secretName = "postgresql-server-cert";
+                    }
+                  ]
+                  ++ (lib.mapAttrsToList (name: v: v // {inherit name;}) value.volumes);
               };
             };
           };

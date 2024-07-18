@@ -8,7 +8,7 @@ in {
     };
 
     network = lib.mkOption {
-      type = types.enum ["mainnet" "preprod" "preview" "sanchonet"];
+      type = types.enum ["mainnet" "preprod" "preview" "sanchonet" "local"];
       description = "Network of the deployment";
     };
   };

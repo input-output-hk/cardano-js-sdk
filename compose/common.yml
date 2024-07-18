@@ -67,7 +67,7 @@ x-provider-server-environment: &provider-server-environment
   SERVICE_NAMES: ${SERVICE_NAMES:-chain-history,network-info,rewards,stake-pool,tx-submit,utxo}
   SUBMIT_API_URL: ${SUBMIT_API_URL:-http://cardano-submit-api:8090/}
   USE_BLOCKFROST: ${USE_BLOCKFROST:-false}
-  USE_SUBMIT_API: ${USE_SUBMIT_API:-false}
+  USE_SUBMIT_API: ${USE_SUBMIT_API:-true}
 
 x-sdk-environment: &sdk-environment
   LOGGER_MIN_SEVERITY: ${LOGGER_MIN_SEVERITY:-info}
@@ -114,7 +114,7 @@ services:
     depends_on:
       ogmios:
         condition: service_healthy
-    image: ghcr.io/intersectmbo/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-13.2.0.2}
+    image: ghcr.io/intersectmbo/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-13.3.0.0}
     restart: on-failure
     stop_signal: SIGINT
     volumes:
@@ -125,7 +125,7 @@ services:
     <<:
       - *logging
       - *with-postgres
-    image: ghcr.io/intersectmbo/cardano-smash-server:${CARDANO_DB_SYNC_VERSION:-13.2.0.2}-docker
+    image: ghcr.io/intersectmbo/cardano-smash-server:${CARDANO_DB_SYNC_VERSION:-13.3.0.0}
     command: ['--config', '/config/cardano-db-sync/config.json']
     environment:
       POSTGRES_HOST: postgres
@@ -146,7 +146,7 @@ services:
 
   cardano-node:
     <<: *logging
-    image: ghcr.io/intersectmbo/cardano-node:${CARDANO_NODE_VERSION:-8.9.2}
+    image: ghcr.io/intersectmbo/cardano-node:${CARDANO_NODE_VERSION:-9.0.0}
     command:
       [
         'run',
@@ -166,7 +166,7 @@ services:
 
   ogmios:
     <<: *logging
-    image: cardanosolutions/ogmios:v${OGMIOS_VERSION:-6.3.0}
+    image: cardanosolutions/ogmios:v${OGMIOS_VERSION:-6.5.0}
     command:
       [
         '--host',
@@ -191,7 +191,7 @@ services:
 
   cardano-submit-api:
     command: --config /config/cardano-submit-api/config.json --listen-address 0.0.0.0 --socket-path /ipc/node.socket $SUBMIT_API_ARGS
-    image: ghcr.io/intersectmbo/cardano-submit-api:${CARDANO_NODE_VERSION:-8.9.2}
+    image: ghcr.io/intersectmbo/cardano-submit-api:${CARDANO_NODE_VERSION:-9.0.0}
     ports:
       - 8090:8090
     restart: on-failure

@@ -1,4 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
+import { CostModelsParamModel } from '../../NetworkInfo/DbSyncNetworkInfoProvider/types';
 
 export type TransactionDataMap<T> = Map<Cardano.TransactionId, T>;
 export type TxOutTokenMap = Map<string, Cardano.TokenMap>;
@@ -132,7 +133,8 @@ export interface VotingProceduresModel {
 export interface ProposalProcedureModel {
   data_hash: Buffer;
   deposit: string;
-  description: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  description: any;
   tx_id: Buffer;
   type: string;
   url: string;
@@ -231,3 +233,56 @@ export interface ResignCommitteeColdCertModel extends CertificateModel {
 export interface TxIdModel {
   tx_id: string;
 }
+
+export type ProtocolParametersUpdateModel = Partial<{
+  maxTxSize: number;
+  costModels: CostModelsParamModel | null;
+  txFeeFixed: number;
+  dRepDeposit: number;
+  minPoolCost: number;
+  treasuryCut: Cardano.Fraction | number;
+  dRepActivity: number;
+  maxValueSize: number;
+  txFeePerByte: number;
+  utxoCostPerByte: number;
+  committeeMinSize: number;
+  govActionDeposit: number;
+  maxBlockBodySize: number;
+  stakePoolDeposit: number;
+  govActionLifetime: number;
+  monetaryExpansion: Cardano.Fraction | number;
+  maxBlockHeaderSize: number;
+  poolRetireMaxEpoch: number;
+  stakePoolTargetNum: number;
+  executionUnitPrices: {
+    priceSteps: Cardano.Fraction | number;
+    priceMemory: Cardano.Fraction | number;
+  };
+  maxCollateralInputs: number;
+  maxTxExecutionUnits: { steps: number; memory: number };
+  poolPledgeInfluence: Cardano.Fraction | number;
+  stakeAddressDeposit: number;
+  collateralPercentage: number;
+  dRepVotingThresholds: {
+    ppGovGroup: Cardano.Fraction | number;
+    ppNetworkGroup: Cardano.Fraction | number;
+    committeeNormal: Cardano.Fraction | number;
+    ppEconomicGroup: Cardano.Fraction | number;
+    ppTechnicalGroup: Cardano.Fraction | number;
+    hardForkInitiation: Cardano.Fraction | number;
+    motionNoConfidence: Cardano.Fraction | number;
+    treasuryWithdrawal: Cardano.Fraction | number;
+    updateToConstitution: Cardano.Fraction | number;
+    committeeNoConfidence: Cardano.Fraction | number;
+  };
+  poolVotingThresholds: {
+    committeeNormal: Cardano.Fraction | number;
+    ppSecurityGroup: Cardano.Fraction | number;
+    hardForkInitiation: Cardano.Fraction | number;
+    motionNoConfidence: Cardano.Fraction | number;
+    committeeNoConfidence: Cardano.Fraction | number;
+  };
+  committeeMaxTermLength: number;
+  maxBlockExecutionUnits: { steps: number; memory: number };
+  minFeeRefScriptCostPerByte: Cardano.Fraction | number;
+}>;
