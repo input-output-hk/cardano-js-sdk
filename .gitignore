@@ -36,3 +36,6 @@ source
 /.data
 /.config
 /.local
+
+# Auto generated
+.kube
