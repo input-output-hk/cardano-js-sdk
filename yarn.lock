@@ -3065,11 +3065,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cardano-ogmios/client@npm:6.4.0":
-  version: 6.4.0
-  resolution: "@cardano-ogmios/client@npm:6.4.0"
+"@cardano-ogmios/client@npm:6.5.0":
+  version: 6.5.0
+  resolution: "@cardano-ogmios/client@npm:6.5.0"
   dependencies:
-    "@cardano-ogmios/schema": 6.4.0
+    "@cardano-ogmios/schema": 6.5.0
     "@cardanosolutions/json-bigint": ^1.0.1
     "@types/json-bigint": ^1.0.1
     bech32: ^2.0.0
@@ -3078,15 +3078,15 @@ __metadata:
     isomorphic-ws: ^4.0.1
     nanoid: ^3.1.31
     ts-custom-error: ^3.2.0
-    ws: ^7.4.6
-  checksum: d6952ff797f42ff0d3e4184f764cca4e699f30b007e62ae1005016c0bb365d387555e4cd448977e5440fce579b9cc2a73c87fa0e4335356a32de43550977d516
+    ws: ^7.5.10
+  checksum: 7eb68d28a0e436b026cd2a422152b3242ec66c033ae747d89a0f4d90f89dc6053b825ce7b2e2ab211c8443c1273078882be70e493a0278b6b9bd7c8f992cc68b
   languageName: node
   linkType: hard
 
-"@cardano-ogmios/schema@npm:6.4.0":
-  version: 6.4.0
-  resolution: "@cardano-ogmios/schema@npm:6.4.0"
-  checksum: 40577cfb32f5a93315533b82c81cb29fbe55c8b00efac963c5107f6f9d13598b0231090e4a5ada9abaf48bc9f914251f0d7d2df0bf2b9b575ccd0dc6f787348a
+"@cardano-ogmios/schema@npm:6.5.0":
+  version: 6.5.0
+  resolution: "@cardano-ogmios/schema@npm:6.5.0"
+  checksum: be5ba6e73f84fc2ef063bd372068e55bd685afc6b71524423b32cec8e06892f170a9185354588c531ae98168182e1eacfd3620ef10a796d3ae68a3b0331a1de8
   languageName: node
   linkType: hard
 
@@ -3120,7 +3120,7 @@ __metadata:
   resolution: "@cardano-sdk/cardano-services@workspace:packages/cardano-services"
   dependencies:
     "@blockfrost/blockfrost-js": 5.5.0-beta.0
-    "@cardano-ogmios/client": 6.4.0
+    "@cardano-ogmios/client": 6.5.0
     "@cardano-sdk/cardano-services-client": "workspace:~"
     "@cardano-sdk/core": "workspace:~"
     "@cardano-sdk/crypto": "workspace:~"
@@ -3195,8 +3195,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/core@workspace:packages/core"
   dependencies:
-    "@cardano-ogmios/client": 6.4.0
-    "@cardano-ogmios/schema": 6.4.0
+    "@cardano-ogmios/client": 6.5.0
+    "@cardano-ogmios/schema": 6.5.0
     "@cardano-sdk/crypto": "workspace:~"
     "@cardano-sdk/util": "workspace:~"
     "@cardano-sdk/util-dev": "workspace:~"
@@ -3229,7 +3229,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/crypto@workspace:packages/crypto"
   dependencies:
-    "@cardano-ogmios/schema": 6.4.0
+    "@cardano-ogmios/schema": 6.5.0
     "@cardano-sdk/util": "workspace:~"
     "@dcspark/cardano-multiplatform-lib-nodejs": ^3.1.1
     "@types/blake2b": ^2.1.0
@@ -3296,7 +3296,7 @@ __metadata:
     "@babel/preset-env": ^7.18.2
     "@babel/preset-typescript": ^7.17.12
     "@cardano-foundation/ledgerjs-hw-app-cardano": ^7.1.2
-    "@cardano-ogmios/client": 6.4.0
+    "@cardano-ogmios/client": 6.5.0
     "@cardano-sdk/cardano-services": "workspace:~"
     "@cardano-sdk/cardano-services-client": "workspace:~"
     "@cardano-sdk/core": "workspace:~"
@@ -3557,8 +3557,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/ogmios@workspace:packages/ogmios"
   dependencies:
-    "@cardano-ogmios/client": 6.4.0
-    "@cardano-ogmios/schema": 6.4.0
+    "@cardano-ogmios/client": 6.5.0
+    "@cardano-ogmios/schema": 6.5.0
     "@cardano-sdk/cardano-services-client": "workspace:~"
     "@cardano-sdk/core": "workspace:~"
     "@cardano-sdk/crypto": "workspace:~"
@@ -3741,7 +3741,7 @@ __metadata:
   resolution: "@cardano-sdk/wallet@workspace:packages/wallet"
   dependencies:
     "@cardano-foundation/ledgerjs-hw-app-cardano": ^7.1.2
-    "@cardano-ogmios/client": 6.4.0
+    "@cardano-ogmios/client": 6.5.0
     "@cardano-sdk/cardano-services-client": "workspace:~"
     "@cardano-sdk/core": "workspace:~"
     "@cardano-sdk/crypto": "workspace:~"
@@ -26013,7 +26013,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:7.5.9, ws@npm:^7.2.0, ws@npm:^7.4.5, ws@npm:^7.4.6, ws@npm:^7.5.7":
+"ws@npm:7.5.9, ws@npm:^7.2.0, ws@npm:^7.4.5, ws@npm:^7.5.7":
   version: 7.5.9
   resolution: "ws@npm:7.5.9"
   peerDependencies:
@@ -26049,6 +26049,21 @@ __metadata:
   dependencies:
     async-limiter: ~1.0.0
   checksum: bdb2223a40c2c68cf91b25a6c9b8c67d5275378ec6187f343314d3df7530e55b77cb9fe79fb1c6a9758389ac5aefc569d24236924b5c65c5dbbaff409ef739fc
+  languageName: node
+  linkType: hard
+
+"ws@npm:^7.5.10":
+  version: 7.5.10
+  resolution: "ws@npm:7.5.10"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ^5.0.2
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: f9bb062abf54cc8f02d94ca86dcd349c3945d63851f5d07a3a61c2fcb755b15a88e943a63cf580cbdb5b74436d67ef6b67f745b8f7c0814e411379138e1863cb
   languageName: node
   linkType: hard
 
