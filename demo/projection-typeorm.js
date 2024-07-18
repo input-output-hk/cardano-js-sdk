@@ -6,19 +6,13 @@ const {
   withTypeormTransaction,
   typeormTransactionCommit,
   TypeormStabilityWindowBuffer,
-  BlockDataEntity,
   BlockEntity,
-  StakePoolEntity,
-  PoolRegistrationEntity,
-  PoolRetirementEntity,
-  OutputEntity,
-  AssetEntity,
-  TokensEntity,
-  storeBlock,
-  storeAssets,
+  BlockEntity,
+  CredentialEntity,
+  TransactionEntity,
   storeUtxo,
-  storeStakePools,
-  storeStakePoolMetadataJob,
+  storeBlock,
+  storeTransactions,
   isRecoverableTypeormError
 } = require('@cardano-sdk/projection-typeorm');
 const { OgmiosObservableCardanoNode } = require('@cardano-sdk/ogmios');
@@ -32,14 +26,9 @@ const logger = {
 };
 
 const entities = [
-  BlockDataEntity,
   BlockEntity,
-  StakePoolEntity,
-  PoolRegistrationEntity,
-  PoolRetirementEntity,
-  AssetEntity,
-  TokensEntity,
-  OutputEntity
+  CredentialEntity,
+  TransactionEntity,
 ];
 const extensions = {
   pgBoss: true
@@ -101,26 +90,16 @@ Bootstrap.fromCardanoNode({
   logger
 })
   .pipe(
-    Mappers.withCertificates(),
-    Mappers.withStakePools(),
-    Mappers.withMint(),
     Mappers.withUtxo(),
-    // Single-tenant example
-    // Mappers.filterProducedUtxoByAddresses({
-    //   addresses: [
-    //     'addr_test1qpgn04xka0857kh6859za75tfvlrlu2lft0yc9z87598yjezw8yvpkv977yj5va20xmd9vw5fczfl3uu4expskz8adfqpydths'
-    //   ]
-    // }),
     shareRetryBackoff(
       (evt$) =>
         evt$.pipe(
           withTypeormTransaction({ dataSource$, logger }, extensions),
-          storeBlock(),
-          buffer.storeBlockData(),
-          storeAssets(),
           storeUtxo(),
-          storeStakePools(),
-          storeStakePoolMetadataJob(),
+          storeBlock(),
+          storeTransactions(),
+          storeCredentials(),
+          // buffer.storeBlockData(),
           typeormTransactionCommit()
         ),
       { shouldRetry: isRecoverableTypeormError }

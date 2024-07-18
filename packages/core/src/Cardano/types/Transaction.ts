@@ -13,6 +13,7 @@ import { RewardAccount } from '../Address';
 import { Script } from './Script';
 import { TxBodyCBOR } from '../../CBOR/TxBodyCBOR';
 import { bytesToHex, hexToBytes } from '../../util/misc';
+import { TxCBOR } from '../../CBOR';
 
 /** transaction hash as hex string */
 export type TransactionId = OpaqueString<'TransactionId'>;
@@ -159,6 +160,7 @@ export interface OnChainTx<TBody extends TxBody = TxBody>
   extends Omit<TxWithInputSource<TBody>, 'witness' | 'auxiliaryData'> {
   witness: Omit<Witness, 'scripts'>;
   auxiliaryData?: Omit<AuxiliaryData, 'scripts'>;
+  cbor?: TxCBOR;
 }
 
 export interface HydratedTx extends TxWithInputSource<HydratedTxBody> {

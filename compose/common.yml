@@ -176,7 +176,8 @@ services:
         '--node-config',
         '/config/cardano-node/config.json',
         '--log-level-websocket',
-        'Warning'
+        'Warning',
+        '--include-cbor'
       ]
     depends_on:
       cardano-node:

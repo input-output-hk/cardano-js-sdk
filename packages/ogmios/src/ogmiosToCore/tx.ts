@@ -5,7 +5,8 @@ import {
   NotImplementedError,
   Serialization,
   SerializationError,
-  SerializationFailure
+  SerializationFailure,
+  TxCBOR
 } from '@cardano-sdk/core';
 import { CommonBlock } from './types';
 import { Schema } from '@cardano-ogmios/client';
@@ -417,6 +418,7 @@ const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
   const { auxiliaryData, auxiliaryDataHash } = mapAuxiliaryData(tx.metadata);
   return {
     auxiliaryData,
+    cbor: tx.cbor ? TxCBOR(tx.cbor) : undefined,
     body: {
       auxiliaryDataHash,
       certificates: tx.certificates?.map(mapCertificate),
