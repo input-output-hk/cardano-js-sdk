@@ -1,6 +1,12 @@
 import { Column, Entity, Index, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { TransactionEntity } from './Transaction.entity';
 
+export enum CredentialType {
+  PAYMENT = 'payment',
+  SCRIPT = 'script',
+  STAKE = 'stake'
+}
+
 @Entity()
 export class CredentialEntity {
   @PrimaryGeneratedColumn()
@@ -8,12 +14,14 @@ export class CredentialEntity {
 
   @Index()
   @Column('bytea', { nullable: false })
-  spendingHash?: Buffer;
-  
-  @Index()
-  @Column('bytea', { nullable: true })
-  stakeHash?: Buffer;
+  credentialHash?: Buffer;
 
-  @ManyToMany(() => TransactionEntity, transaction => transaction.credentials, { onDelete: 'CASCADE' })
+  @Column({
+    type: 'enum',
+    enum: CredentialType
+  })
+  credentialType?: CredentialType;
+
+  @ManyToMany(() => TransactionEntity, (transaction) => transaction.credentials, { onDelete: 'CASCADE' })
   transactions?: TransactionEntity[];
 }
