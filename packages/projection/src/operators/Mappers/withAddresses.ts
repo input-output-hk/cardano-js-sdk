@@ -3,7 +3,6 @@ import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { WithUtxo } from './withUtxo';
 import { unifiedProjectorOperator } from '../utils';
 import uniq from 'lodash/uniq.js';
-import { credentialsFromAddress } from '@cardano-sdk/core/src/Cardano/util';
 
 export interface Address {
   address: Cardano.PaymentAddress;
@@ -22,7 +21,7 @@ export interface WithAddresses {
 export const withAddresses = unifiedProjectorOperator<WithUtxo, WithAddresses>((evt) => ({
   ...evt,
   addresses: uniq(evt.utxo.produced.map(([_, txOut]) => txOut.address)).map((address): Address => {
-    const credentials = credentialsFromAddress(address);
+    const credentials = Cardano.util.credentialsFromAddress(address);
     return {
       address,
       paymentCredentialHash: credentials.spendingCredentialHash,

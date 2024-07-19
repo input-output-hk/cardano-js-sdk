@@ -1,5 +1,5 @@
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { Cardano } from '../../../dist/esm';
+import { Cardano } from '../..';
 
 export const credentialsFromAddress = (address: Cardano.PaymentAddress) => {
   const parsed = Cardano.Address.fromString(address)!;
