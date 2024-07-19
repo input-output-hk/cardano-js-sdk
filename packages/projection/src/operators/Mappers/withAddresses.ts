@@ -3,6 +3,7 @@ import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { WithUtxo } from './withUtxo';
 import { unifiedProjectorOperator } from '../utils';
 import uniq from 'lodash/uniq.js';
+import { credentialsFromAddress } from './util';
 
 export interface Address {
   address: Cardano.PaymentAddress;
@@ -20,41 +21,5 @@ export interface WithAddresses {
 /** Collect all unique addresses from produced utxo */
 export const withAddresses = unifiedProjectorOperator<WithUtxo, WithAddresses>((evt) => ({
   ...evt,
-  addresses: uniq(evt.utxo.produced.map(([_, txOut]) => txOut.address)).map((address): Address => {
-    const parsed = Cardano.Address.fromString(address)!;
-    let paymentCredentialHash: Hash28ByteBase16 | undefined;
-    let stakeCredentialHash: Hash28ByteBase16 | undefined;
-    let pointer: Cardano.Pointer | undefined;
-    const type = parsed.getType();
-    switch (type) {
-      case Cardano.AddressType.BasePaymentKeyStakeKey:
-      case Cardano.AddressType.BasePaymentKeyStakeScript:
-      case Cardano.AddressType.BasePaymentScriptStakeKey:
-      case Cardano.AddressType.BasePaymentScriptStakeScript: {
-        const baseAddress = parsed.asBase()!;
-        paymentCredentialHash = baseAddress.getPaymentCredential().hash;
-        stakeCredentialHash = baseAddress.getStakeCredential().hash;
-        break;
-      }
-      case Cardano.AddressType.EnterpriseKey:
-      case Cardano.AddressType.EnterpriseScript: {
-        const enterpriseAddress = parsed.asEnterprise()!;
-        paymentCredentialHash = enterpriseAddress.getPaymentCredential().hash;
-        break;
-      }
-      case Cardano.AddressType.PointerKey:
-      case Cardano.AddressType.PointerScript: {
-        const pointerAddress = parsed.asPointer()!;
-        paymentCredentialHash = pointerAddress.getPaymentCredential().hash;
-        pointer = pointerAddress.getStakePointer();
-        break;
-      }
-    }
-    return {
-      address,
-      paymentCredentialHash,
-      stakeCredential: stakeCredentialHash || pointer,
-      type
-    };
-  })
+  addresses: uniq(evt.utxo.produced.map(([_, txOut]) => txOut.address)).map(credentialsFromAddress)
 }));
