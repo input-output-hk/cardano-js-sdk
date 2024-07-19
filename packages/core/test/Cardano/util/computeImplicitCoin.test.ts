@@ -110,7 +110,7 @@ describe('Cardano.util.computeImplicitCoin', () => {
     const stakeKeyDepositCert = 10n;
     const stakeKeyReclaimCert = 20n;
     const poolDeposit = BigInt(protocolParameters.poolDeposit!);
-    const drepDeposit = BigInt(protocolParameters.dRepDeposit);
+    const drepDeposit = BigInt(protocolParameters.dRepDeposit!);
 
     const certificates: Cardano.Certificate[] = [
       { __typename: Cardano.CertificateType.StakeRegistration, stakeCredential },
@@ -201,7 +201,7 @@ describe('Cardano.util.computeImplicitCoin', () => {
 
   it('sums certificates and proposal procedures for deposit', () => {
     const protocolParameters = { governanceActionDeposit: 4, stakeKeyDeposit: 2 } as Cardano.ProtocolParameters;
-    const governanceActionDeposit = BigInt(protocolParameters.governanceActionDeposit);
+    const governanceActionDeposit = BigInt(protocolParameters.governanceActionDeposit!);
     const stakeKeyDeposit = BigInt(protocolParameters.stakeKeyDeposit);
 
     const anchor = {
