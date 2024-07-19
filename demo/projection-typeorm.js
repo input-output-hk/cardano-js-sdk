@@ -12,6 +12,7 @@ const {
   TransactionEntity,
   storeUtxo,
   storeBlock,
+  storeCredentials,
   storeTransactions,
   isRecoverableTypeormError
 } = require('@cardano-sdk/projection-typeorm');
@@ -97,8 +98,8 @@ Bootstrap.fromCardanoNode({
           withTypeormTransaction({ dataSource$, logger }, extensions),
           storeUtxo(),
           storeBlock(),
-          storeTransactions(),
           storeCredentials(),
+          storeTransactions(),
           // buffer.storeBlockData(),
           typeormTransactionCommit()
         ),

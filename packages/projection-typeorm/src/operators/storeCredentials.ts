@@ -2,9 +2,8 @@ import { ChainSyncEventType } from "@cardano-sdk/core";
 import { CredentialEntity, typeormOperator } from "../../dist/esm";
 import { uniq } from "lodash";
 import { Mappers } from "@cardano-sdk/projection";
-import { credentialsFromAddress } from '@cardano-sdk/core/src/Cardano/util';
 
-export const storeCredentials = typeormOperator<Mappers.WithUtxo>(async (evt) => {
+export const storeCredentials = typeormOperator<Mappers.WithUtxo & Mappers.WithAddresses>(async (evt) => {
   const {
     block: { body: txs },
     eventType,

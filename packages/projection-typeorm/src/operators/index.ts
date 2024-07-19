@@ -1,6 +1,7 @@
 export * from './storeAddresses';
 export * from './storeAssets';
 export * from './storeBlock';
+export * from './storeCredentials';
 export * from './storeHandles';
 export * from './storeHandleMetadata';
 export * from './storeNftMetadata';
@@ -10,6 +11,7 @@ export * from './storeStakeKeyRegistrations';
 export * from './storeStakePools';
 export * from './storeStakePoolMetadataJob';
 export * from './storeStakePoolRewardsJob';
+export * from './storeTransactions';
 export * from './storeUtxo';
 export * from './util';
 export * from './withTypeormTransaction';

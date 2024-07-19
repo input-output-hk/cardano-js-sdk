@@ -1,4 +1,3 @@
-export * from './credentialsFromAddress';
 export * from './computeMinUtxoValue';
 export * from './computeImplicitCoin';
 export * from './estimateStakePoolAPY';
