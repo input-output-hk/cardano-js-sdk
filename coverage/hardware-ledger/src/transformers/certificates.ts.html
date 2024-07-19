@@ -478,10 +478,7 @@
 <a name='L413'></a><a href='#L413'>413</a>
 <a name='L414'></a><a href='#L414'>414</a>
 <a name='L415'></a><a href='#L415'>415</a>
-<a name='L416'></a><a href='#L416'>416</a>
-<a name='L417'></a><a href='#L417'>417</a>
-<a name='L418'></a><a href='#L418'>418</a>
-<a name='L419'></a><a href='#L419'>419</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L416'></a><a href='#L416'>416</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">8x</span>
@@ -771,9 +768,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1184,25 +1178,22 @@ const poolRetirementCertificate: Transform&lt;
   };
 };
 &nbsp;
-const checkDrepPublicKeyAgainstCredential = async (
-  dRepPublicKey: Crypto.Ed25519PublicKeyHex | undefined,
+const checkDrepPublicKeyAgainstCredential = (
+  dRepKeyHashHex: Crypto.Ed25519KeyHashHex | undefined,
   hash: Crypto.Hash28ByteBase16
 ) =&gt; {
-  if (
-    !dRepPublicKey ||
-    (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex() !== Crypto.Ed25519KeyHashHex(hash)
-  ) {
+  if (!dRepKeyHashHex || dRepKeyHashHex !== Crypto.Ed25519KeyHashHex(hash)) {
     throw new InvalidArgumentError('certificate', 'dRepPublicKey does not match certificate drep credential.');
   }
 };
 &nbsp;
 const drepRegistrationCertificate: Transform&lt;
   Cardano.RegisterDelegateRepresentativeCertificate | Cardano.UnRegisterDelegateRepresentativeCertificate,
-  Promise&lt;Ledger.Certificate&gt;,
+  Ledger.Certificate,
   LedgerTxTransformerContext
-&gt; = async (certificate, context): Promise&lt;Ledger.Certificate&gt; =&gt; {
+&gt; = (certificate, context): Ledger.Certificate =&gt; {
   <span class="missing-if-branch" title="if path not taken" >I</span>if (!context) <span class="cstat-no" title="statement not covered" >throw new InvalidArgumentError('LedgerTxTransformerContext', 'values was not provided');</span>
-  await checkDrepPublicKeyAgainstCredential(context?.dRepPublicKey, certificate.dRepCredential.hash);
+  checkDrepPublicKeyAgainstCredential(context?.dRepKeyHashHex, certificate.dRepCredential.hash);
 &nbsp;
   const params: Ledger.DRepRegistrationParams = {
     ...mapAnchorToParams(certificate),
@@ -1225,12 +1216,12 @@ const drepRegistrationCertificate: Transform&lt;
 &nbsp;
 const updateDRepCertificate: Transform&lt;
   Cardano.UpdateDelegateRepresentativeCertificate,
-  Promise&lt;Ledger.Certificate&gt;,
+  Ledger.Certificate,
   LedgerTxTransformerContext
-&gt; = async (certificate, context): Promise&lt;Ledger.Certificate&gt; =&gt; {
+&gt; = (certificate, context): Ledger.Certificate =&gt; {
   <span class="missing-if-branch" title="if path not taken" >I</span>if (!context) <span class="cstat-no" title="statement not covered" >throw new InvalidArgumentError('LedgerTxTransformerContext', 'values was not provided');</span>
 &nbsp;
-  await checkDrepPublicKeyAgainstCredential(context?.dRepPublicKey, certificate.dRepCredential.hash);
+  checkDrepPublicKeyAgainstCredential(context?.dRepKeyHashHex, certificate.dRepCredential.hash);
 &nbsp;
   const params: Ledger.DRepUpdateParams = {
     ...mapAnchorToParams(certificate),
@@ -1278,7 +1269,7 @@ export const voteDelegationCertificate: Transform&lt;
   type: Ledger.CertificateType.VOTE_DELEGATION
 });
 &nbsp;
-const toCert = async (cert: Cardano.Certificate, context: LedgerTxTransformerContext): Promise&lt;Ledger.Certificate&gt; =&gt; {
+const toCert = (cert: Cardano.Certificate, context: LedgerTxTransformerContext): Ledger.Certificate =&gt; {
   switch (cert.__typename) {
     case Cardano.CertificateType.StakeRegistration:
       return getStakeAddressCertificate(cert, context);
@@ -1299,23 +1290,23 @@ const toCert = async (cert: Cardano.Certificate, context: LedgerTxTransformerCon
     case Cardano.CertificateType.VoteDelegation:
       return voteDelegationCertificate(cert, context);
     case Cardano.CertificateType.RegisterDelegateRepresentative:
-      return await drepRegistrationCertificate(cert, context);
+      return drepRegistrationCertificate(cert, context);
     case Cardano.CertificateType.UnregisterDelegateRepresentative:
-      return await drepRegistrationCertificate(cert, context);
+      return drepRegistrationCertificate(cert, context);
     case Cardano.CertificateType.UpdateDelegateRepresentative:
-      return await updateDRepCertificate(cert, context);
+      return updateDRepCertificate(cert, context);
 <span class="branch-11 cbranch-no" title="branch not covered" >    default:</span>
 <span class="cstat-no" title="statement not covered" >      throw new InvalidArgumentError('cert', `Certificate ${cert.__typename} not supported.`);</span>
   }
 };
 &nbsp;
-export const mapCerts = async (
+export const mapCerts = (
   certs: Cardano.Certificate[] | undefined,
   context: LedgerTxTransformerContext
-): Promise&lt;Ledger.Certificate[] | null&gt; =&gt; {
+): Ledger.Certificate[] | null =&gt; {
   if (!certs) return null;
 &nbsp;
-  return Promise.all(certs.map((coreCert) =&gt; toCert(coreCert, context)));
+  return certs.map((coreCert) =&gt; toCert(coreCert, context));
 };
 &nbsp;</pre></td></tr></table></pre>
 
@@ -1324,7 +1315,7 @@ export const mapCerts = async (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-07-18T17:33:56.546Z
+                at 2024-07-19T13:42:15.731Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
