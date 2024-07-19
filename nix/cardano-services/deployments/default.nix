@@ -891,7 +891,6 @@ in
                 (map (v: "/v${v}/handle") versions.handle)
               ];
           };
-          chain-history-provider.enabled = false;
         };
 
         "ops-preview-1@us-east-1" = final: {
