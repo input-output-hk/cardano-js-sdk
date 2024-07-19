@@ -220,7 +220,6 @@ jobs:
               "dev-preprod@us-east-1@v2" \
               "dev-mainnet@us-east-1" \
             ; do
-              git restore .kube
               nix run -L ".#cardano-services.${target}.plan" | tee k8s-plan.diff
 
               (
@@ -320,6 +319,5 @@ jobs:
             export AWS_PROFILE="lw"
             export AWS_REGION="us-east-1"
 
-            git restore .kube
             echo yes | nix run -L ".#cardano-services.${{ matrix.target }}.apply"
           '
