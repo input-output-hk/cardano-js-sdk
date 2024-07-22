@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">77.6% </span>
+                <span class="strong">75.19% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>97/125</span>
+                <span class='fraction'>97/129</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">44.11% </span>
+                <span class="strong">42.85% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>15/34</span>
+                <span class='fraction'>15/35</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">64% </span>
+                <span class="strong">61.53% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>16/25</span>
+                <span class='fraction'>16/26</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">78.15% </span>
+                <span class="strong">76.85% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>93/119</span>
+                <span class='fraction'>93/121</span>
             </div>
         
             
@@ -419,7 +419,9 @@
 <a name='L354'></a><a href='#L354'>354</a>
 <a name='L355'></a><a href='#L355'>355</a>
 <a name='L356'></a><a href='#L356'>356</a>
-<a name='L357'></a><a href='#L357'>357</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -438,21 +440,21 @@
 <span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-yes">34x</span>
@@ -528,6 +530,14 @@
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -558,12 +568,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -579,8 +585,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
@@ -785,6 +789,7 @@ import {
   StubTokenMetadataService
 } from '../../Asset';
 import { CardanoNode, HandleProvider, Seconds } from '@cardano-sdk/core';
+import { CardanoWsClient, TxSubmitApiProvider } from '@cardano-sdk/cardano-services-client';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../../ChainHistory';
 import { CommonOptionsDescriptions } from '../options';
 import { ConnectionNames, PostgresOptionDescriptions, suffixType2Cli } from '../options/postgres';
@@ -808,7 +813,6 @@ import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 import { Pool } from 'pg';
 import { ProviderServerArgs, ProviderServerOptionDescriptions, ServiceNames } from './types';
 import { SrvRecord } from 'dns';
-import { TxSubmitApiProvider } from '@cardano-sdk/cardano-services-client';
 import { TypeormAssetProvider } from '../../Asset/TypeormAssetProvider';
 import { TypeormStakePoolProvider } from '../../StakePool/TypeormStakePoolProvider/TypeormStakePoolProvider';
 import { createDbSyncMetadataService } from '../../Metadata';
@@ -883,6 +887,14 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) =&gt; {
 &nbsp;
   const getEpochMonitor = memoize((dbPool: Pool) =&gt; new DbSyncEpochPollService(dbPool, args.epochPollInterval!));
 &nbsp;
+  const getWebSocketClient = <span class="fstat-no" title="function not covered" >() =</span>&gt; {
+    const url = <span class="cstat-no" title="statement not covered" >args.webSocketApiUrl;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!url) <span class="cstat-no" title="statement not covered" >throw new MissingProgramOption('WebSocket', CommonOptionsDescriptions.WebSocketApiUrl);</span></span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return new CardanoWsClient({ logger }, { url });</span>
+  };
+&nbsp;
   const getDbSyncStakePoolProvider = withDbSyncProvider((dbPools, cardanoNode) =&gt; {
     if (!genesisData)
       throw new MissingProgramOption(ServiceNames.StakePool, CommonOptionsDescriptions.CardanoNodeConfigPath);
@@ -914,17 +926,13 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) =&gt; {
 <span class="cstat-no" title="statement not covered" >    return new TypeormStakePoolProvider(args, { cache: getDbCache(), connectionConfig$, entities, logger });</span>
   });
 &nbsp;
-  let networkInfoProvider: DbSyncNetworkInfoProvider | undefined;
-&nbsp;
   const getNetworkInfoProvider = (cardanoNode: CardanoNode, dbPools: DbPools) =&gt; {
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (networkInfoProvider) {
-<span class="cstat-no" title="statement not covered" >      return networkInfoProvider;</span>
-    }
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (args.useWebSocketApi) <span class="cstat-no" title="statement not covered" >return getWebSocketClient().networkInfoProvider;</span>
 &nbsp;
     if (!genesisData)
       throw new MissingProgramOption(ServiceNames.NetworkInfo, CommonOptionsDescriptions.CardanoNodeConfigPath);
 &nbsp;
-    networkInfoProvider = new DbSyncNetworkInfoProvider({
+    return new DbSyncNetworkInfoProvider({
       cache: {
         db: getDbCache(),
         healthCheck: healthCheckCache
@@ -935,8 +943,6 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) =&gt; {
       genesisData,
       logger
     });
-&nbsp;
-    return networkInfoProvider;
   };
 &nbsp;
   const getHandleProvider = <span class="fstat-no" title="function not covered" >async </span>() =&gt; {
@@ -1138,7 +1144,7 @@ export const loadProviderServer = async (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-07-22T12:42:32.376Z
+                at 2024-07-22T13:25:47.308Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
