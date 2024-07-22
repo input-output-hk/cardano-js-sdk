@@ -3,7 +3,7 @@
   "compilerOptions": {
     "baseUrl": "."
   },
-  "include": ["./**/*.ts"],
+  "include": ["./**/*.ts", "../../tx-construction/src/input-selection/selectionConstraints"],
   "references": [
     {
       "path": "../src"

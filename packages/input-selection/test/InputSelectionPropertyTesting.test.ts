@@ -298,7 +298,8 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
             getAlgorithm,
             mockConstraints: {
               ...SelectionConstraints.MOCK_NO_CONSTRAINTS,
-              maxTokenBundleSize: 1
+              maxTokenBundleSize: 1,
+              minimumCoinQuantity: 1_000_000n
             }
           });
         });
