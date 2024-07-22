@@ -172,7 +172,7 @@ export interface SignTransactionContext {
   txInKeyPathMap: TxInKeyPathMap;
   knownAddresses: GroupedAddress[];
   handleResolutions?: HandleResolution[];
-  dRepPublicKey?: Crypto.Ed25519PublicKeyHex;
+  dRepKeyHashHex?: Crypto.Ed25519KeyHashHex;
   sender?: MessageSender;
 }
 

@@ -89,3 +89,8 @@ COPY compose/projector/init.* ./
 RUN chmod 755 init.sh
 HEALTHCHECK CMD test `curl --fail --silent http://localhost:3000/v1.0.0/health | jq -r ".services[0].projectedTip.blockNo"` -gt 1
 CMD ["./init.sh"]
+
+FROM cardano-services as ws-server
+WORKDIR /app/packages/cardano-services
+HEALTHCHECK CMD curl --fail --silent http://localhost:3000/health
+CMD ["bash", "-c", "../../node_modules/.bin/tsx watch --clear-screen=false --conditions=development src/cli start-ws-server"]

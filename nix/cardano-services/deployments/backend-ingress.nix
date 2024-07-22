@@ -104,6 +104,16 @@
                 };
               }
             ]
+            ++ lib.optionals values.ws-server.enabled [
+              {
+                pathType = "Exact";
+                path = "/ws";
+                backend.service = {
+                  name = "${chart.name}-ws-server";
+                  port.name = "http";
+                };
+              }
+            ]
             ++ values.cardano-services.additionalRoutes;
         })
         values.backend.hostnames;

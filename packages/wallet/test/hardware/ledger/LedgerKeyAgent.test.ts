@@ -272,6 +272,9 @@ describe('LedgerKeyAgent', () => {
               }
             }
           ]),
+          redeemersByType: {
+            mint: [scriptRedeemer]
+          },
           scriptIntegrityHash: scriptDataHash,
           witness: { redeemers: [scriptRedeemer], scripts: [script] }
         };
@@ -651,7 +654,7 @@ describe('LedgerKeyAgent', () => {
             };
 
             const txBuilder = wallet.createTxBuilder();
-            const builtTx = await txBuilder
+            const builtTx = txBuilder
               .customize(({ txBody }) => {
                 const votingProcedures: Cardano.TxBody['votingProcedures'] = [
                   ...(txBody.votingProcedures || []),
@@ -665,7 +668,9 @@ describe('LedgerKeyAgent', () => {
                 };
               })
               .build();
-            expect(await builtTx.sign()).toBeTruthy();
+            const signedTx = await builtTx.sign();
+            // Payment witness + staking witness for withdrawals + DRep witness for voting
+            expect(signedTx.tx.witness.signatures.size).toBe(3);
           });
         });
       });

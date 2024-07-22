@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.13.6...@cardano-sdk/input-selection@0.13.7) (2024-07-22)
+
+### Bug Fixes
+
+* **input-selection:** round robin random improve now produces valid change outputs when wallet has too many assets ([0998bc9](https://github.com/input-output-hk/cardano-js-sdk/commit/0998bc993702649323875a25410fce6ed3e8211a))
+
 ## [0.13.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.13.5...@cardano-sdk/input-selection@0.13.6) (2024-07-11)
 
 **Note:** Version bump only for package @cardano-sdk/input-selection

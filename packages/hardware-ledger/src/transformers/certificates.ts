@@ -283,25 +283,22 @@ const poolRetirementCertificate: Transform<
   };
 };
 
-const checkDrepPublicKeyAgainstCredential = async (
-  dRepPublicKey: Crypto.Ed25519PublicKeyHex | undefined,
+const checkDrepPublicKeyAgainstCredential = (
+  dRepKeyHashHex: Crypto.Ed25519KeyHashHex | undefined,
   hash: Crypto.Hash28ByteBase16
 ) => {
-  if (
-    !dRepPublicKey ||
-    (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex() !== Crypto.Ed25519KeyHashHex(hash)
-  ) {
+  if (!dRepKeyHashHex || dRepKeyHashHex !== Crypto.Ed25519KeyHashHex(hash)) {
     throw new InvalidArgumentError('certificate', 'dRepPublicKey does not match certificate drep credential.');
   }
 };
 
 const drepRegistrationCertificate: Transform<
   Cardano.RegisterDelegateRepresentativeCertificate | Cardano.UnRegisterDelegateRepresentativeCertificate,
-  Promise<Ledger.Certificate>,
+  Ledger.Certificate,
   LedgerTxTransformerContext
-> = async (certificate, context): Promise<Ledger.Certificate> => {
+> = (certificate, context): Ledger.Certificate => {
   if (!context) throw new InvalidArgumentError('LedgerTxTransformerContext', 'values was not provided');
-  await checkDrepPublicKeyAgainstCredential(context?.dRepPublicKey, certificate.dRepCredential.hash);
+  checkDrepPublicKeyAgainstCredential(context?.dRepKeyHashHex, certificate.dRepCredential.hash);
 
   const params: Ledger.DRepRegistrationParams = {
     ...mapAnchorToParams(certificate),
@@ -324,12 +321,12 @@ const drepRegistrationCertificate: Transform<
 
 const updateDRepCertificate: Transform<
   Cardano.UpdateDelegateRepresentativeCertificate,
-  Promise<Ledger.Certificate>,
+  Ledger.Certificate,
   LedgerTxTransformerContext
-> = async (certificate, context): Promise<Ledger.Certificate> => {
+> = (certificate, context): Ledger.Certificate => {
   if (!context) throw new InvalidArgumentError('LedgerTxTransformerContext', 'values was not provided');
 
-  await checkDrepPublicKeyAgainstCredential(context?.dRepPublicKey, certificate.dRepCredential.hash);
+  checkDrepPublicKeyAgainstCredential(context?.dRepKeyHashHex, certificate.dRepCredential.hash);
 
   const params: Ledger.DRepUpdateParams = {
     ...mapAnchorToParams(certificate),
@@ -377,7 +374,7 @@ export const voteDelegationCertificate: Transform<
   type: Ledger.CertificateType.VOTE_DELEGATION
 });
 
-const toCert = async (cert: Cardano.Certificate, context: LedgerTxTransformerContext): Promise<Ledger.Certificate> => {
+const toCert = (cert: Cardano.Certificate, context: LedgerTxTransformerContext): Ledger.Certificate => {
   switch (cert.__typename) {
     case Cardano.CertificateType.StakeRegistration:
       return getStakeAddressCertificate(cert, context);
@@ -398,21 +395,21 @@ const toCert = async (cert: Cardano.Certificate, context: LedgerTxTransformerCon
     case Cardano.CertificateType.VoteDelegation:
       return voteDelegationCertificate(cert, context);
     case Cardano.CertificateType.RegisterDelegateRepresentative:
-      return await drepRegistrationCertificate(cert, context);
+      return drepRegistrationCertificate(cert, context);
     case Cardano.CertificateType.UnregisterDelegateRepresentative:
-      return await drepRegistrationCertificate(cert, context);
+      return drepRegistrationCertificate(cert, context);
     case Cardano.CertificateType.UpdateDelegateRepresentative:
-      return await updateDRepCertificate(cert, context);
+      return updateDRepCertificate(cert, context);
     default:
       throw new InvalidArgumentError('cert', `Certificate ${cert.__typename} not supported.`);
   }
 };
 
-export const mapCerts = async (
+export const mapCerts = (
   certs: Cardano.Certificate[] | undefined,
   context: LedgerTxTransformerContext
-): Promise<Ledger.Certificate[] | null> => {
+): Ledger.Certificate[] | null => {
   if (!certs) return null;
 
-  return Promise.all(certs.map((coreCert) => toCert(coreCert, context)));
+  return certs.map((coreCert) => toCert(coreCert, context));
 };

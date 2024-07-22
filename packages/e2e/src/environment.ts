@@ -109,7 +109,8 @@ const validators = {
   VIRTUAL_USERS_COUNT: num(),
   VIRTUAL_USERS_GENERATE_DURATION: num(),
   WALLET_SYNC_TIMEOUT_IN_MS: num({ default: undefined }),
-  WORKER_PARALLEL_TRANSACTION: num()
+  WORKER_PARALLEL_TRANSACTION: num(),
+  WS_PROVIDER_URL: str()
 } as const;
 
 type Entries<T> = { [K in keyof T]: [K, T[K]] }[keyof T][];
@@ -159,6 +160,7 @@ export const walletVariables = [
   'TX_SUBMIT_PROVIDER_PARAMS',
   'UTXO_PROVIDER',
   'UTXO_PROVIDER_PARAMS',
+  'WS_PROVIDER_URL',
   'ADDRESS_DISCOVERY',
   'NETWORK_SPEED'
 ] as const;

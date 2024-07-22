@@ -99,6 +99,8 @@ x-sdk-environment: &sdk-environment
   POSTGRES_USER_FILE_HANDLE: /run/secrets/postgres_user
   POSTGRES_USER_FILE_STAKE_POOL: /run/secrets/postgres_user
   TOKEN_METADATA_SERVER_URL: https://metadata.world.dev.cardano.org
+  USE_WEB_SOCKET_API: true
+  WEB_SOCKET_API_URL: ws://ws-server:3000/ws
 
 services:
   cardano-db-sync:
@@ -176,7 +178,8 @@ services:
         '--node-config',
         '/config/cardano-node/config.json',
         '--log-level-websocket',
-        'Warning'
+        'Warning',
+        '--include-cbor'
       ]
     depends_on:
       cardano-node:
@@ -356,6 +359,27 @@ services:
       SERVICE_NAMES: handle
     ports:
       - ${HANDLE_API_PORT:-4011}:3000
+
+  ws-server:
+    <<:
+      - *from-sdk
+      - *logging
+      - *provider-server
+      - *with-postgres
+    build:
+      args:
+        - NETWORK=${NETWORK:-mainnet}
+      context: ../../
+      target: ws-server
+    environment:
+      <<:
+        - *sdk-environment
+        - *provider-server-environment
+    ports:
+      - ${WS_SERVER_PORT:-4100}:3000
+    restart: always
+    volumes:
+      - ../..:/app
 
 secrets:
   # Replicates the db-sync secret for historical reasons.

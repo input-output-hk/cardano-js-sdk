@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-services",
-  "version": "0.28.12",
+  "version": "0.28.13",
   "description": "Cardano GraphQL Services",
   "engines": {
     "node": ">=16.20.2"
@@ -28,6 +28,7 @@
     "cleanup:nm": "rm -rf node_modules",
     "cleanup": "rm -rf dist node_modules",
     "cli": "ts-node --transpile-only src/cli.ts",
+    "compose:single:up": "yarn compose:up cardano-node ogmios postgres",
     "compose:up": "__FIX_UMASK__=$(chmod -R a+r ../../compose/placeholder-secrets) docker compose --env-file environments/.env.$NETWORK -p cardano-services-$NETWORK -f docker-compose.yml -f ../../compose/common.yml -f ../../compose/pg-agent.yml -f ../../compose/$(uname -m).yml ${FILES:-} up",
     "compose:down": "docker compose -p cardano-services-$NETWORK -f docker-compose.yml -f ../../compose/common.yml -f ../../compose/pg-agent.yml -f ../../compose/$(uname -m).yml down -t 120",
     "coverage": "yarn test --coverage || true",
@@ -35,14 +36,18 @@
     "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint:fix": "yarn lint --fix",
     "generate-migration": "typeorm-ts-node-commonjs migration:generate src/Projection/migrations/migrations -d src/migrationDataSource.ts",
+    "mainnet:single:up": "NETWORK=mainnet yarn compose:single:up",
     "mainnet:up": "NETWORK=mainnet SUBMIT_API_ARGS=--mainnet yarn compose:up",
     "mainnet:down": "NETWORK=mainnet yarn compose:down",
     "prepack": "yarn build",
+    "preprod:single:up": "NETWORK=preprod yarn compose:single:up",
     "preprod:up": "NETWORK=preprod SUBMIT_API_ARGS='--testnet-magic 1' yarn compose:up",
     "preprod:down": "NETWORK=preprod yarn compose:down",
     "pretest": "yarn build",
+    "preview:single:up": "NETWORK=preview yarn compose:single:up",
     "preview:up": "NETWORK=preview SUBMIT_API_ARGS='--testnet-magic 2' yarn compose:up",
     "preview:down": "NETWORK=preview yarn compose:down",
+    "sanchonet:single:up": "NETWORK=sanchonet yarn compose:single:up",
     "sanchonet:up": "NETWORK=sanchonet SUBMIT_API_ARGS='--testnet-magic 4' yarn compose:up",
     "sanchonet:down": "NETWORK=sanchonet yarn compose:down",
     "test": "jest --runInBand -c ./jest.config.js --selectProjects unit",
@@ -64,7 +69,9 @@
     "@types/express-prometheus-middleware": "^1.2.1",
     "@types/lodash": "^4.14.182",
     "@types/pg": "^8.6.5",
+    "@types/uuid": "^8.3.4",
     "@types/wait-on": "^5.3.1",
+    "@types/ws": "^8.5.10",
     "axios-mock-adapter": "^1.20.0",
     "cbor": "^8.1.0",
     "delay": "^5.0.0",
@@ -122,7 +129,9 @@
     "rxjs": "^7.4.0",
     "ts-custom-error": "^3.2.0",
     "ts-log": "^2.2.4",
-    "typeorm": "^0.3.15"
+    "typeorm": "^0.3.15",
+    "uuid": "^10.0.0",
+    "ws": "^8.17.1"
   },
   "files": [
     "dist/*",

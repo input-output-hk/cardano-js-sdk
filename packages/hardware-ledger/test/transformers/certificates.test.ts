@@ -73,7 +73,7 @@ export const createTxInKeyPathMapMock = (knownAddresses: GroupedAddress[]): TxIn
 const mockContext: LedgerTxTransformerContext = {
   accountIndex: 0,
   chainId: createChainId(1, 764_824_073),
-  dRepPublicKey: undefined,
+  dRepKeyHashHex: undefined,
 
   handleResolutions: [],
 
@@ -93,15 +93,15 @@ const DNS_NAME = 'example.com';
 
 describe('certificates', () => {
   describe('mapCerts', () => {
-    it('returns null when given an undefined token map', async () => {
+    it('returns null when given an undefined token map', () => {
       const certs: Cardano.Certificate | undefined = undefined;
-      const ledgerCerts = await mapCerts(certs, CONTEXT_WITHOUT_KNOWN_ADDRESSES);
+      const ledgerCerts = mapCerts(certs, CONTEXT_WITHOUT_KNOWN_ADDRESSES);
 
       expect(ledgerCerts).toEqual(null);
     });
 
-    it('can map a script hash stake registration certificate', async () => {
-      const ledgerCerts = await mapCerts(
+    it('can map a script hash stake registration certificate', () => {
+      const ledgerCerts = mapCerts(
         [
           {
             __typename: Cardano.CertificateType.StakeRegistration,
@@ -124,8 +124,8 @@ describe('certificates', () => {
       ]);
     });
 
-    it('can map a stake key stake registration certificate', async () => {
-      const ledgerCerts = await mapCerts(
+    it('can map a stake key stake registration certificate', () => {
+      const ledgerCerts = mapCerts(
         [
           {
             __typename: Cardano.CertificateType.StakeRegistration,
@@ -154,8 +154,8 @@ describe('certificates', () => {
       ]);
     });
 
-    it('can map a script hash stake deregistration certificate', async () => {
-      const ledgerCerts = await mapCerts(
+    it('can map a script hash stake deregistration certificate', () => {
+      const ledgerCerts = mapCerts(
         [
           {
             __typename: Cardano.CertificateType.StakeDeregistration,
@@ -178,8 +178,8 @@ describe('certificates', () => {
       ]);
     });
 
-    it('can map a stake key stake deregistration certificate', async () => {
-      const ledgerCerts = await mapCerts(
+    it('can map a stake key stake deregistration certificate', () => {
+      const ledgerCerts = mapCerts(
         [
           {
             __typename: Cardano.CertificateType.StakeDeregistration,
@@ -208,9 +208,9 @@ describe('certificates', () => {
       ]);
     });
 
-    it('can map a pool registration certificate with known keys', async () => {
+    it('can map a pool registration certificate with known keys', () => {
       expect(
-        await mapCerts(
+        mapCerts(
           [
             {
               __typename: Cardano.CertificateType.PoolRegistration,
@@ -299,9 +299,9 @@ describe('certificates', () => {
       ]);
     });
 
-    it('can map a pool registration certificate with unknown keys', async () => {
+    it('can map a pool registration certificate with unknown keys', () => {
       expect(
-        await mapCerts(
+        mapCerts(
           [
             {
               __typename: Cardano.CertificateType.PoolRegistration,
@@ -372,8 +372,8 @@ describe('certificates', () => {
       ]);
     });
 
-    it('throws if its given a pool retirement certificate but the signing key cant be found', async () => {
-      await expect(
+    it('throws if its given a pool retirement certificate but the signing key cant be found', () => {
+      expect(() =>
         mapCerts(
           [
             {
@@ -384,11 +384,11 @@ describe('certificates', () => {
           ],
           CONTEXT_WITHOUT_KNOWN_ADDRESSES
         )
-      ).rejects.toThrow("Invalid argument 'certificate': Missing key matching pool retirement certificate.");
+      ).toThrow("Invalid argument 'certificate': Missing key matching pool retirement certificate.");
     });
 
-    it('can map a stake pool retirement certificate', async () => {
-      const ledgerCerts = await mapCerts(
+    it('can map a stake pool retirement certificate', () => {
+      const ledgerCerts = mapCerts(
         [
           {
             __typename: Cardano.CertificateType.PoolRetirement,
@@ -416,8 +416,8 @@ describe('certificates', () => {
       ]);
     });
 
-    it('can map a delegation certificate with unknown stake key', async () => {
-      const ledgerCerts = await mapCerts(
+    it('can map a delegation certificate with unknown stake key', () => {
+      const ledgerCerts = mapCerts(
         [
           {
             __typename: Cardano.CertificateType.StakeDelegation,
@@ -442,8 +442,8 @@ describe('certificates', () => {
       ]);
     });
 
-    it('can map a delegation certificate with known stake key', async () => {
-      const ledgerCerts = await mapCerts(
+    it('can map a delegation certificate with known stake key', () => {
+      const ledgerCerts = mapCerts(
         [
           {
             __typename: Cardano.CertificateType.StakeDelegation,
@@ -512,8 +512,8 @@ describe('certificates', () => {
   });
   describe('conway-era', () => {
     describe('Cardano.CertificateType.Registration', () => {
-      it('can map a script hash type of params', async () => {
-        const ledgerCerts = await mapCerts(
+      it('can map a script hash type of params', () => {
+        const ledgerCerts = mapCerts(
           [
             {
               __typename: Cardano.CertificateType.Registration,
@@ -538,8 +538,8 @@ describe('certificates', () => {
         ]);
       });
 
-      it('can map a key path type of params', async () => {
-        const ledgerCerts = await mapCerts(
+      it('can map a key path type of params', () => {
+        const ledgerCerts = mapCerts(
           [
             {
               __typename: Cardano.CertificateType.Registration,
@@ -573,8 +573,8 @@ describe('certificates', () => {
       it.todo('can map a key hash type of params');
     });
     describe('Cardano.CertificateType.Unregistration', () => {
-      it('can map a script hash type of params', async () => {
-        const ledgerCerts = await mapCerts(
+      it('can map a script hash type of params', () => {
+        const ledgerCerts = mapCerts(
           [
             {
               __typename: Cardano.CertificateType.Unregistration,
@@ -599,8 +599,8 @@ describe('certificates', () => {
         ]);
       });
 
-      it('can map a key path type of params', async () => {
-        const ledgerCerts = await mapCerts(
+      it('can map a key path type of params', () => {
+        const ledgerCerts = mapCerts(
           [
             {
               __typename: Cardano.CertificateType.Unregistration,
@@ -635,8 +635,8 @@ describe('certificates', () => {
     });
 
     describe('Cardano.CertificateType.VoteDelegation', () => {
-      it('can map always abstain type of drep', async () => {
-        const ledgerCerts = await mapCerts(
+      it('can map always abstain type of drep', () => {
+        const ledgerCerts = mapCerts(
           [
             {
               __typename: Cardano.CertificateType.VoteDelegation,
@@ -660,8 +660,8 @@ describe('certificates', () => {
           }
         ]);
       });
-      it('can map always no confidence type of drep', async () => {
-        const ledgerCerts = await mapCerts(
+      it('can map always no confidence type of drep', () => {
+        const ledgerCerts = mapCerts(
           [
             {
               __typename: Cardano.CertificateType.VoteDelegation,
@@ -685,8 +685,8 @@ describe('certificates', () => {
           }
         ]);
       });
-      it('can map dRep credential type of drep', async () => {
-        const ledgerCerts = await mapCerts(
+      it('can map dRep credential type of drep', () => {
+        const ledgerCerts = mapCerts(
           [
             {
               __typename: Cardano.CertificateType.VoteDelegation,
@@ -722,8 +722,8 @@ describe('certificates', () => {
     });
 
     describe('Cardano.CertificateType.RegisterDelegateRepresentative', () => {
-      it('can map a key path type of params', async () => {
-        const ledgerCerts = await mapCerts(
+      it('can map a key path type of params', () => {
+        const ledgerCerts = mapCerts(
           [
             {
               __typename: Cardano.CertificateType.RegisterDelegateRepresentative,
@@ -753,8 +753,8 @@ describe('certificates', () => {
         ]);
       });
 
-      it('can map a script hash type of params', async () => {
-        const ledgerCerts = await mapCerts(
+      it('can map a script hash type of params', () => {
+        const ledgerCerts = mapCerts(
           [
             {
               __typename: Cardano.CertificateType.RegisterDelegateRepresentative,
@@ -787,8 +787,8 @@ describe('certificates', () => {
         ]);
       });
 
-      it("it throws if public key doesn't match credential", async () => {
-        await expect(
+      it("it throws if public key doesn't match credential", () => {
+        expect(() =>
           mapCerts(
             [
               {
@@ -806,11 +806,11 @@ describe('certificates', () => {
             ],
             CONTEXT_WITHOUT_KNOWN_ADDRESSES
           )
-        ).rejects.toThrowError('dRepPublicKey does not match certificate drep credential.');
+        ).toThrowError('dRepPublicKey does not match certificate drep credential.');
       });
 
-      it("it throws if public key wasn't provided", async () => {
-        await expect(
+      it("it throws if public key wasn't provided", () => {
+        expect(() =>
           mapCerts(
             [
               {
@@ -826,15 +826,15 @@ describe('certificates', () => {
                 deposit: 5n
               }
             ],
-            { ...CONTEXT_WITHOUT_KNOWN_ADDRESSES, dRepPublicKey: undefined }
+            { ...CONTEXT_WITHOUT_KNOWN_ADDRESSES, dRepKeyHashHex: undefined }
           )
-        ).rejects.toThrowError('dRepPublicKey does not match certificate drep credential.');
+        ).toThrowError('dRepPublicKey does not match certificate drep credential.');
       });
     });
 
     describe('Cardano.CertificateType.UnregisterDelegateRepresentative', () => {
-      it('can map a key path type of params', async () => {
-        const ledgerCerts = await mapCerts(
+      it('can map a key path type of params', () => {
+        const ledgerCerts = mapCerts(
           [
             {
               __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
@@ -859,8 +859,8 @@ describe('certificates', () => {
         ]);
       });
 
-      it('can map a script hash type of params', async () => {
-        const ledgerCerts = await mapCerts(
+      it('can map a script hash type of params', () => {
+        const ledgerCerts = mapCerts(
           [
             {
               __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
@@ -888,8 +888,8 @@ describe('certificates', () => {
         ]);
       });
 
-      it("it throws if public key doesn't match credential", async () => {
-        await expect(
+      it("it throws if public key doesn't match credential", () => {
+        expect(() =>
           mapCerts(
             [
               {
@@ -903,11 +903,11 @@ describe('certificates', () => {
             ],
             CONTEXT_WITHOUT_KNOWN_ADDRESSES
           )
-        ).rejects.toThrowError('dRepPublicKey does not match certificate drep credential.');
+        ).toThrowError('dRepPublicKey does not match certificate drep credential.');
       });
 
-      it("it throws if public key wasn't provided", async () => {
-        await expect(
+      it("it throws if public key wasn't provided", () => {
+        expect(() =>
           mapCerts(
             [
               {
@@ -919,15 +919,15 @@ describe('certificates', () => {
                 deposit: 5n
               }
             ],
-            { ...CONTEXT_WITHOUT_KNOWN_ADDRESSES, dRepPublicKey: undefined }
+            { ...CONTEXT_WITHOUT_KNOWN_ADDRESSES, dRepKeyHashHex: undefined }
           )
-        ).rejects.toThrowError('dRepPublicKey does not match certificate drep credential.');
+        ).toThrowError('dRepPublicKey does not match certificate drep credential.');
       });
     });
 
     describe('Cardano.CertificateType.UpdateDelegateRepresentative', () => {
-      it('can map a key path type of params', async () => {
-        const ledgerCerts = await mapCerts(
+      it('can map a key path type of params', () => {
+        const ledgerCerts = mapCerts(
           [
             {
               __typename: Cardano.CertificateType.UpdateDelegateRepresentative,
@@ -955,8 +955,8 @@ describe('certificates', () => {
         ]);
       });
 
-      it('can map a script hash type of params', async () => {
-        const ledgerCerts = await mapCerts(
+      it('can map a script hash type of params', () => {
+        const ledgerCerts = mapCerts(
           [
             {
               __typename: Cardano.CertificateType.UpdateDelegateRepresentative,
@@ -987,8 +987,8 @@ describe('certificates', () => {
         ]);
       });
 
-      it("it throws if public key doesn't match credential", async () => {
-        await expect(
+      it("it throws if public key doesn't match credential", () => {
+        expect(() =>
           mapCerts(
             [
               {
@@ -1005,11 +1005,11 @@ describe('certificates', () => {
             ],
             CONTEXT_WITHOUT_KNOWN_ADDRESSES
           )
-        ).rejects.toThrowError('dRepPublicKey does not match certificate drep credential.');
+        ).toThrowError('dRepPublicKey does not match certificate drep credential.');
       });
 
-      it("it throws if public key wasn't provided", async () => {
-        await expect(
+      it("it throws if public key wasn't provided", () => {
+        expect(() =>
           mapCerts(
             [
               {
@@ -1024,9 +1024,9 @@ describe('certificates', () => {
                 }
               }
             ],
-            { ...CONTEXT_WITHOUT_KNOWN_ADDRESSES, dRepPublicKey: undefined }
+            { ...CONTEXT_WITHOUT_KNOWN_ADDRESSES, dRepKeyHashHex: undefined }
           )
-        ).rejects.toThrowError('dRepPublicKey does not match certificate drep credential.');
+        ).toThrowError('dRepPublicKey does not match certificate drep credential.');
       });
     });
   });

@@ -8,6 +8,7 @@ import {
   StubTokenMetadataService
 } from '../../Asset';
 import { CardanoNode, HandleProvider, Seconds } from '@cardano-sdk/core';
+import { CardanoWsClient, TxSubmitApiProvider } from '@cardano-sdk/cardano-services-client';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../../ChainHistory';
 import { CommonOptionsDescriptions } from '../options';
 import { ConnectionNames, PostgresOptionDescriptions, suffixType2Cli } from '../options/postgres';
@@ -31,7 +32,6 @@ import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 import { Pool } from 'pg';
 import { ProviderServerArgs, ProviderServerOptionDescriptions, ServiceNames } from './types';
 import { SrvRecord } from 'dns';
-import { TxSubmitApiProvider } from '@cardano-sdk/cardano-services-client';
 import { TypeormAssetProvider } from '../../Asset/TypeormAssetProvider';
 import { TypeormStakePoolProvider } from '../../StakePool/TypeormStakePoolProvider/TypeormStakePoolProvider';
 import { createDbSyncMetadataService } from '../../Metadata';
@@ -106,6 +106,14 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
 
   const getEpochMonitor = memoize((dbPool: Pool) => new DbSyncEpochPollService(dbPool, args.epochPollInterval!));
 
+  const getWebSocketClient = () => {
+    const url = args.webSocketApiUrl;
+
+    if (!url) throw new MissingProgramOption('WebSocket', CommonOptionsDescriptions.WebSocketApiUrl);
+
+    return new CardanoWsClient({ logger }, { url });
+  };
+
   const getDbSyncStakePoolProvider = withDbSyncProvider((dbPools, cardanoNode) => {
     if (!genesisData)
       throw new MissingProgramOption(ServiceNames.StakePool, CommonOptionsDescriptions.CardanoNodeConfigPath);
@@ -137,17 +145,13 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     return new TypeormStakePoolProvider(args, { cache: getDbCache(), connectionConfig$, entities, logger });
   });
 
-  let networkInfoProvider: DbSyncNetworkInfoProvider | undefined;
-
   const getNetworkInfoProvider = (cardanoNode: CardanoNode, dbPools: DbPools) => {
-    if (networkInfoProvider) {
-      return networkInfoProvider;
-    }
+    if (args.useWebSocketApi) return getWebSocketClient().networkInfoProvider;
 
     if (!genesisData)
       throw new MissingProgramOption(ServiceNames.NetworkInfo, CommonOptionsDescriptions.CardanoNodeConfigPath);
 
-    networkInfoProvider = new DbSyncNetworkInfoProvider({
+    return new DbSyncNetworkInfoProvider({
       cache: {
         db: getDbCache(),
         healthCheck: healthCheckCache
@@ -158,8 +162,6 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       genesisData,
       logger
     });
-
-    return networkInfoProvider;
   };
 
   const getHandleProvider = async () => {

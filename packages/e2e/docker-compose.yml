@@ -112,6 +112,11 @@ services:
       METADATA_JOB_RETRY_DELAY: 60
       POOLS_METRICS_INTERVAL: 50
 
+  ws-server:
+    volumes:
+      - ./local-network/config/network:/config
+      - sdk-ipc:/sdk-ipc
+
 volumes:
   sdk-ipc:
     driver: local

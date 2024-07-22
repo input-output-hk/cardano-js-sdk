@@ -15,7 +15,7 @@ env:
   HANDLE_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4011/"}'
   STAKE_POOL_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/stake_pool'
   STAKE_POOL_TEST_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/stake_pool_test'
-  NETWORK_INFO_PROVIDER: 'http'
+  NETWORK_INFO_PROVIDER: 'ws'
   NETWORK_INFO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
   OGMIOS_URL: 'ws://localhost:1340/'
   REWARDS_PROVIDER: 'http'
@@ -26,6 +26,7 @@ env:
   UTXO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
   STAKE_POOL_PROVIDER: 'http'
   STAKE_POOL_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
+  WS_PROVIDER_URL: 'http://localhost:4100/ws'
 
 on:
   pull_request:
@@ -78,6 +79,7 @@ jobs:
         run: |
           yarn workspace @cardano-sdk/e2e test:wallet:epoch0
           yarn workspace @cardano-sdk/e2e test:projection
+          yarn workspace @cardano-sdk/e2e test:ws
 
       - name: Wait for epoch 3
         run: |
