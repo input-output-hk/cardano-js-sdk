@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.20.11...@cardano-sdk/key-management@0.21.0) (2024-07-22)
+
+### ⚠ BREAKING CHANGES
+
+* **hardware-ledger:** SignTransactionContext.dRepPublicKey was
+changed to dRepKeyHashHex of type Crypto.Ed25519KeyHashHex
+
+### Code Refactoring
+
+* **hardware-ledger:** async not needed for certificate mapping ([77d29d7](https://github.com/input-output-hk/cardano-js-sdk/commit/77d29d701f19287720e4655c3464c39ea1009c71))
+
 ## [0.20.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.20.10...@cardano-sdk/key-management@0.20.11) (2024-07-11)
 
 **Note:** Version bump only for package @cardano-sdk/key-management

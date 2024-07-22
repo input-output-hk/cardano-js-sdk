@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.39.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.38.7...@cardano-sdk/wallet@0.39.0) (2024-07-22)
+
+### ⚠ BREAKING CHANGES
+
+* **hardware-ledger:** mapVotingProcedures, toVotingProcedure and
+toVoter all require passing the LedgerTxTransformerContext as
+a parameter
+
+### Bug Fixes
+
+* **hardware-ledger:** sign voting procedure with drep keypath ([efa7c9c](https://github.com/input-output-hk/cardano-js-sdk/commit/efa7c9cfbf34f04464d1d37ee0a5b356991ef9d8))
+
 ## [0.38.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.38.6...@cardano-sdk/wallet@0.38.7) (2024-07-11)
 
 **Note:** Version bump only for package @cardano-sdk/wallet

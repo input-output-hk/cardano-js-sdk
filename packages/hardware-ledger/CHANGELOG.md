@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.9.13...@cardano-sdk/hardware-ledger@0.10.0) (2024-07-22)
+
+### ⚠ BREAKING CHANGES
+
+* **hardware-ledger:** mapVotingProcedures, toVotingProcedure and
+toVoter all require passing the LedgerTxTransformerContext as
+a parameter
+* **hardware-ledger:** SignTransactionContext.dRepPublicKey was
+changed to dRepKeyHashHex of type Crypto.Ed25519KeyHashHex
+
+### Bug Fixes
+
+* **hardware-ledger:** sign voting procedure with drep keypath ([efa7c9c](https://github.com/input-output-hk/cardano-js-sdk/commit/efa7c9cfbf34f04464d1d37ee0a5b356991ef9d8))
+
+### Code Refactoring
+
+* **hardware-ledger:** async not needed for certificate mapping ([77d29d7](https://github.com/input-output-hk/cardano-js-sdk/commit/77d29d701f19287720e4655c3464c39ea1009c71))
+
 ## [0.9.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.9.12...@cardano-sdk/hardware-ledger@0.9.13) (2024-07-11)
 
 **Note:** Version bump only for package @cardano-sdk/hardware-ledger
