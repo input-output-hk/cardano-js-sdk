@@ -270,12 +270,71 @@ export const coalesceChangeBundlesForMinCoinRequirement = (
   return sortedBundles.filter((bundle) => bundle.coins > 0n || (bundle.assets?.size || 0) > 0);
 };
 
+/**
+ * Splits change bundles if the token bundle size exceeds the specified limit. Each bundle is checked,
+ * and if it exceeds the limit, it's split into smaller bundles such that each conforms to the limit.
+ * It also ensures that each bundle has a minimum coin quantity.
+ *
+ * @param changeBundles - The array of change bundles, each containing assets and their quantities.
+ * @param computeMinimumCoinQuantity - A function to compute the minimum coin quantity required for a transaction output.
+ * @param tokenBundleSizeExceedsLimit - A function to determine if the token bundle size of a set of assets exceeds a predefined limit.
+ * @returns The array of adjusted change bundles, conforming to the token bundle size limits and each having the necessary minimum coin quantity.
+ * @throws Throws an error if the total coin amount is fully depleted and cannot cover the minimum required coin quantity.
+ */
+const splitChangeIfTokenBundlesSizeExceedsLimit = (
+  changeBundles: Cardano.Value[],
+  computeMinimumCoinQuantity: ComputeMinimumCoinQuantity,
+  tokenBundleSizeExceedsLimit: TokenBundleSizeExceedsLimit
+): Cardano.Value[] => {
+  const result: Cardano.Value[] = [];
+
+  for (const bundle of changeBundles) {
+    const { assets, coins } = bundle;
+    if (!assets || assets.size === 0 || !tokenBundleSizeExceedsLimit(assets)) {
+      result.push({ assets, coins });
+      continue;
+    }
+
+    const newValues = [];
+    let newValue = { assets: new Map(), coins: 0n };
+
+    for (const [assetId, quantity] of assets.entries()) {
+      newValue.assets.set(assetId, quantity);
+
+      if (tokenBundleSizeExceedsLimit(newValue.assets) && newValue.assets.size > 1) {
+        newValue.assets.delete(assetId);
+        newValues.push(newValue);
+        newValue = { assets: new Map([[assetId, quantity]]), coins: 0n };
+      }
+    }
+
+    newValues.push(newValue);
+
+    let totalMinCoin = 0n;
+    for (const value of newValues) {
+      const minCoin = computeMinimumCoinQuantity({ address: stubMaxSizeAddress, value });
+      value.coins = minCoin;
+      totalMinCoin += minCoin;
+    }
+
+    if (coins < totalMinCoin) {
+      throw new InputSelectionError(InputSelectionFailure.UtxoFullyDepleted);
+    }
+
+    newValues[0].coins += coins - totalMinCoin;
+    result.push(...newValues);
+  }
+
+  return result;
+};
+
 const computeChangeBundles = ({
   utxoSelection,
   outputValues,
   uniqueTxAssetIDs,
   implicitValue,
   computeMinimumCoinQuantity,
+  tokenBundleSizeExceedsLimit,
   fee = 0n
 }: {
   utxoSelection: UtxoSelection;
@@ -283,6 +342,7 @@ const computeChangeBundles = ({
   uniqueTxAssetIDs: Cardano.AssetId[];
   implicitValue: RequiredImplicitValue;
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity;
+  tokenBundleSizeExceedsLimit: TokenBundleSizeExceedsLimit;
   fee?: bigint;
 }): (UtxoSelection & { changeBundles: Cardano.Value[] }) | false => {
   const requestedAssetChangeBundles = computeRequestedAssetChangeBundles(
@@ -304,7 +364,17 @@ const computeChangeBundles = ({
   if (!changeBundles) {
     return false;
   }
-  return { changeBundles, ...utxoSelection };
+
+  // Make sure the change outputs do not exceed token bundle size limit, this can happen if the UTXO set
+  // has too many assets and the selection strategy selects enough of them to violates this constraint for the resulting
+  // change output set.
+  const adjustedChange = splitChangeIfTokenBundlesSizeExceedsLimit(
+    changeBundles,
+    computeMinimumCoinQuantity,
+    tokenBundleSizeExceedsLimit
+  );
+
+  return { changeBundles: adjustedChange, ...utxoSelection };
 };
 
 const validateChangeBundles = (
@@ -365,6 +435,7 @@ export const computeChangeAndAdjustForFee = async ({
     computeMinimumCoinQuantity,
     implicitValue,
     outputValues,
+    tokenBundleSizeExceedsLimit,
     uniqueTxAssetIDs,
     utxoSelection
   });
@@ -395,6 +466,7 @@ export const computeChangeAndAdjustForFee = async ({
     fee: estimatedCosts.fee,
     implicitValue,
     outputValues,
+    tokenBundleSizeExceedsLimit,
     uniqueTxAssetIDs,
     utxoSelection: pick(selectionWithChangeAndFee, ['utxoRemaining', 'utxoSelected'])
   });

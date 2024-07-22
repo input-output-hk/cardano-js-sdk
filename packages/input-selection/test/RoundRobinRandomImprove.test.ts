@@ -1,6 +1,14 @@
 import { Cardano } from '@cardano-sdk/core';
 import { MockChangeAddressResolver, SelectionConstraints } from './util';
 import { TxTestUtil } from '@cardano-sdk/util-dev';
+import {
+  babbageSelectionParameters,
+  cborUtxoSetWithManyAssets,
+  getCoreUtxosFromCbor,
+  txBuilder,
+  txEvaluator
+} from './vectors';
+import { defaultSelectionConstraints } from '../../tx-construction/src/input-selection/selectionConstraints';
 import { roundRobinRandomImprove } from '../src/RoundRobinRandomImprove';
 
 describe('RoundRobinRandomImprove', () => {
@@ -77,5 +85,33 @@ describe('RoundRobinRandomImprove', () => {
           value[1].value.coins === mockForeignInput[1].value.coins
       )
     ).toBeTruthy();
+  });
+
+  it('splits change outputs if they violate the tokenBundleSizeExceedsLimit constraint', async () => {
+    const utxoSet = getCoreUtxosFromCbor(cborUtxoSetWithManyAssets);
+    const maxSpendableAmount = 87_458_893n;
+    const assetsInUtxoSet = 511;
+
+    const constraints = defaultSelectionConstraints({
+      buildTx: txBuilder,
+      protocolParameters: babbageSelectionParameters,
+      redeemersByType: {},
+      txEvaluator: txEvaluator as never
+    });
+
+    const results = await roundRobinRandomImprove({
+      changeAddressResolver: new MockChangeAddressResolver()
+    }).select({
+      constraints,
+      outputs: new Set([TxTestUtil.createOutput({ coins: maxSpendableAmount })]),
+      preSelectedUtxo: new Set(),
+      utxo: utxoSet
+    });
+
+    expect(results.selection.inputs.size).toBe(utxoSet.size);
+    expect(results.selection.change.length).toBe(2);
+    expect(results.selection.change[0].value.assets!.size + results.selection.change[1].value.assets!.size).toBe(
+      assetsInUtxoSet
+    );
   });
 });
