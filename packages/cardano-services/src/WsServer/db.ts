@@ -9,6 +9,7 @@ BEGIN
   PERFORM pg_notify('sdk_tip', json_build_object(
     'blockNo', NEW.block_no,
     'hash',    encode(NEW.hash, 'hex'),
+    'id',      NEW.id,
     'slot',    NEW.slot_no
   )::TEXT);
   RETURN NEW;

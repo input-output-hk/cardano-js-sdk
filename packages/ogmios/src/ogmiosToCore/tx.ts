@@ -166,7 +166,7 @@ const mapCertificate = (certificate: Schema.Certificate): Cardano.Certificate =>
   //           : Cardano.MirCertificatePot.Treasury,
   //       quantity: certificate.moveInstantaneousRewards.value || 0n
   //       // TODO: update MIR certificate type to support 'rewards' (multiple reward acc map to coins)
-  //       // This is currently not compatible with core type (missing 'rewardAccount' which doesnt exist in ogmios)
+  //       // This is currently not compatible with core type (missing 'rewardAccount' which doesn't exist in ogmios)
   //       // rewardAccount: certificate.moveInstantaneousRewards.rewards.
   //       // Add test for it too.
   //     } as Cardano.MirCertificate;

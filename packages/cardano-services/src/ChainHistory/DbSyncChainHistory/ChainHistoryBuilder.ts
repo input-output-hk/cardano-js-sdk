@@ -1,3 +1,5 @@
+// cSpell:ignore timelock
+
 import * as Queries from './queries';
 import {
   AuthorizeCommitteeHotCertModel,
@@ -90,12 +92,12 @@ const mapWithdrawals: (source: [{ credential: DbSyncCredential; network: string 
 });
 
 // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
-const getGovernanceAction = ({
+export const getGovernanceAction = ({
   denominator,
   description,
   numerator,
   type
-}: ProposalProcedureModel): Cardano.GovernanceAction => {
+}: Pick<ProposalProcedureModel, 'denominator' | 'description' | 'numerator' | 'type'>): Cardano.GovernanceAction => {
   const { contents } = description;
   const governanceActionId =
     contents && contents[0] ? { actionIndex: contents[0].govActionIx, id: contents[0].txId } : null;

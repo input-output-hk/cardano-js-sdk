@@ -106,12 +106,24 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
 
   const getEpochMonitor = memoize((dbPool: Pool) => new DbSyncEpochPollService(dbPool, args.epochPollInterval!));
 
-  const getWebSocketClient = () => {
+  const getDbSyncChainHistoryProvider = withDbSyncProvider(async (dbPools, cardanoNode) => {
+    const cache = { healthCheck: healthCheckCache };
+    const metadataService = createDbSyncMetadataService(dbPools.main, logger);
+
+    return new DbSyncChainHistoryProvider(
+      { paginationPageSizeLimit: args.paginationPageSizeLimit! },
+      { cache, cardanoNode, dbPools, logger, metadataService }
+    );
+  }, ServiceNames.ChainHistory);
+
+  const getWebSocketClient = async () => {
     const url = args.webSocketApiUrl;
 
     if (!url) throw new MissingProgramOption('WebSocket', CommonOptionsDescriptions.WebSocketApiUrl);
 
-    return new CardanoWsClient({ logger }, { url });
+    const chainHistoryProvider = await getDbSyncChainHistoryProvider();
+
+    return new CardanoWsClient({ chainHistoryProvider, logger }, { url });
   };
 
   const getDbSyncStakePoolProvider = withDbSyncProvider((dbPools, cardanoNode) => {
@@ -145,8 +157,8 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     return new TypeormStakePoolProvider(args, { cache: getDbCache(), connectionConfig$, entities, logger });
   });
 
-  const getNetworkInfoProvider = (cardanoNode: CardanoNode, dbPools: DbPools) => {
-    if (args.useWebSocketApi) return getWebSocketClient().networkInfoProvider;
+  const getNetworkInfoProvider = async (cardanoNode: CardanoNode, dbPools: DbPools) => {
+    if (args.useWebSocketApi) return (await getWebSocketClient()).networkInfoProvider;
 
     if (!genesisData)
       throw new MissingProgramOption(ServiceNames.NetworkInfo, CommonOptionsDescriptions.CardanoNodeConfigPath);
@@ -259,22 +271,8 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
         }),
       ServiceNames.Utxo
     ),
-    [ServiceNames.ChainHistory]: withDbSyncProvider(async (dbPools, cardanoNode) => {
-      const metadataService = createDbSyncMetadataService(dbPools.main, logger);
-      const chainHistoryProvider = new DbSyncChainHistoryProvider(
-        { paginationPageSizeLimit: args.paginationPageSizeLimit! },
-        {
-          cache: {
-            healthCheck: healthCheckCache
-          },
-          cardanoNode,
-          dbPools,
-          logger,
-          metadataService
-        }
-      );
-      return new ChainHistoryHttpService({ chainHistoryProvider, logger });
-    }, ServiceNames.ChainHistory),
+    [ServiceNames.ChainHistory]: async () =>
+      new ChainHistoryHttpService({ chainHistoryProvider: await getDbSyncChainHistoryProvider(), logger }),
     [ServiceNames.Handle]: async () => new HandleHttpService({ handleProvider: await getHandleProvider(), logger }),
     [ServiceNames.Rewards]: withDbSyncProvider(async (dbPools, cardanoNode) => {
       const rewardsProvider = new DbSyncRewardsProvider(
@@ -294,7 +292,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       async (dbPools, cardanoNode) =>
         new NetworkInfoHttpService({
           logger,
-          networkInfoProvider: getNetworkInfoProvider(cardanoNode, dbPools)
+          networkInfoProvider: await getNetworkInfoProvider(cardanoNode, dbPools)
         }),
       ServiceNames.NetworkInfo
     ),

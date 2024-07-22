@@ -1,4 +1,5 @@
 import { HealthCheckResponse, NetworkInfoProvider, Provider } from './Provider';
+import { HydratedTx, PaymentAddress } from './Cardano';
 import { Observable, ReplaySubject, firstValueFrom } from 'rxjs';
 
 export type AsyncReturnType<F extends () => unknown> = F extends () => Promise<infer R> ? R : never;
@@ -7,11 +8,23 @@ export type NetworkInfoMethods = Exclude<keyof NetworkInfoProvider, 'healthCheck
 export type NetworkInfoResponses = { [m in NetworkInfoMethods]: AsyncReturnType<NetworkInfoProvider[m]> };
 
 export interface WSMessage {
+  /** The addresses the client subscribes. */
+  addresses?: PaymentAddress[];
+
   /** The client id assigned by the server. */
   clientId?: string;
 
   /** Latest value(s) for the `NetworkInfoProvider` methods.*/
   networkInfo?: Partial<NetworkInfoResponses>;
+
+  /** The request id from client to server. */
+  requestId?: number;
+
+  /** This message is the response to the message with this id. */
+  responseTo?: number;
+
+  /** The transactions. */
+  transactions?: HydratedTx[];
 }
 
 export class WsProvider implements Provider {

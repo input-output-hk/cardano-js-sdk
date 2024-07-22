@@ -12,7 +12,7 @@ import { Logger } from 'ts-log';
 import { Notification, Pool } from 'pg';
 import { Server, createServer } from 'http';
 import { WebSocket, WebSocketServer } from 'ws';
-import { getLovelaceSupply, getProtocolParameters, getStake } from './requests';
+import { getLovelaceSupply, getProtocolParameters, getStake, transactionsByAddresses } from './requests';
 import { initDB } from './db';
 import { toGenesisParams } from '../NetworkInfo/DbSyncNetworkInfoProvider/mappers';
 import { toSerializableObject } from '@cardano-sdk/util';
@@ -22,6 +22,7 @@ export { WebSocket } from 'ws';
 
 declare module 'ws' {
   interface WebSocket {
+    addresses: Cardano.PaymentAddress[];
     clientId: string;
     heartbeat: number;
 
@@ -62,6 +63,16 @@ export interface WsServerDependencies {
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noop = () => {};
 
+interface NotificationBody {
+  message: WSMessage;
+  transactions: Cardano.HydratedTx[];
+}
+
+interface NotificationEvent {
+  notification: number;
+  transactions: Cardano.HydratedTx[];
+}
+
 export class CardanoWsServer extends WsProvider {
   private cardanoNode: CardanoNode;
   private closeNotify = noop;
@@ -73,7 +84,7 @@ export class CardanoWsServer extends WsProvider {
   private lastSlot = Number.POSITIVE_INFINITY as Cardano.Slot;
   private logger: Logger;
   private networkInfo: NetworkInfoResponses;
-  private notifications = new Map<number, WSMessage>();
+  private notifications = new Map<number, NotificationBody>();
   private server: Server;
   private stakeInterval: NodeJS.Timer | undefined;
   private wss: WebSocketServer;
@@ -158,21 +169,30 @@ export class CardanoWsServer extends WsProvider {
         if (!payload) throw new Error('Missing payload in NOTIFY');
 
         // The payload of the NOTIFY event contain the tip in the correct format
-        const ledgerTip = JSON.parse(payload) as Cardano.Tip;
+        const { blockId, ...ledgerTip } = JSON.parse(payload) as Cardano.Tip & { blockId: string };
         this.networkInfo.ledgerTip = ledgerTip;
 
-        let networkInfo: WSMessage['networkInfo'];
+        const epochRollover = async () => {
+          if (ledgerTip.slot <= this.lastSlot) return { blockId, ledgerTip } as Partial<NetworkInfoResponses>;
 
-        if (ledgerTip.slot <= this.lastSlot) networkInfo = { ledgerTip };
-        else {
           await this.onEpochRollover();
 
           const { eraSummaries, lovelaceSupply, protocolParameters } = this.networkInfo;
 
-          networkInfo = { eraSummaries, ledgerTip, lovelaceSupply, protocolParameters };
-        }
+          return { eraSummaries, ledgerTip, lovelaceSupply, protocolParameters };
+        };
 
-        this.send({ networkInfo }, notification);
+        const loadTransactions = () => {
+          const addresses = new Map<Cardano.PaymentAddress, true>();
+
+          for (const ws of this.wss.clients) for (const address of ws.addresses) addresses.set(address, true);
+
+          return transactionsByAddresses([...addresses.keys()], this.db, blockId);
+        };
+
+        const [networkInfo, transactions] = await Promise.all([epochRollover(), loadTransactions()]);
+
+        this.send({ networkInfo }, { notification, transactions });
       })().catch((error) => {
         this.logger.error(error, 'Error while handling tip notification');
         // Since an error while handling tip notification may be source of data inconsistencies, better to shutdown
@@ -267,18 +287,16 @@ export class CardanoWsServer extends WsProvider {
     networkInfo.ledgerTip = await initDB(db, logger);
     await Promise.all([this.onEpochRollover(), refreshStake()]);
 
-    this.stakeInterval = setInterval(
+    (this.stakeInterval = setInterval(
       () =>
         refreshStake().catch((error) => {
           logger.error(error, 'Error while refreshing stake');
           this.close();
         }),
       dbCacheTtl
-    );
-    // eslint-disable-next-line unicorn/consistent-destructuring
-    this.stakeInterval.unref();
+    )).unref();
 
-    this.heartbeatInterval = setInterval(() => {
+    (this.heartbeatInterval = setInterval(() => {
       const threshold = Date.now() - heartbeatTimeout;
 
       for (const ws of wss.clients.values())
@@ -286,9 +304,7 @@ export class CardanoWsServer extends WsProvider {
           ws.logInfo('Timed out, closing');
           ws.close();
         }
-    }, 10_000);
-    // eslint-disable-next-line unicorn/consistent-destructuring
-    this.heartbeatInterval.unref();
+    }, 10_000)).unref();
 
     server.listen(port, () => logger.info('WebSocket server ready and listening'));
     this.listenNotify();
@@ -301,6 +317,8 @@ export class CardanoWsServer extends WsProvider {
     return (ws: WebSocket) => {
       const clientId = (ws.clientId = v4());
       const stringMessage = JSON.stringify(toSerializableObject({ clientId, networkInfo }));
+
+      ws.addresses = [];
 
       // Create some wrappers for the logger
       ws.logInfo = (msg: string) => logger.info({ clientId }, msg);
@@ -322,10 +340,27 @@ export class CardanoWsServer extends WsProvider {
 
         // This is never expected... just in case
         if (!(data instanceof Buffer))
-          return ws.logError(
-            new Error('Not a Buffer'),
-            `Unexpected data from WebSocket connection ${JSON.stringify(data)}`
-          );
+          return ws.logError(new Error('Not a Buffer'), `Unexpected data from WebSocket  ${JSON.stringify(data)}`);
+
+        // DoS protection
+        if (data.length > 1024 * 100) {
+          ws.logError(new Error('Buffer too long'), 'Unexpected data length from WebSocket: closing');
+          return ws.close();
+        }
+
+        let request: WSMessage;
+
+        try {
+          request = JSON.parse(data.toString('utf8'));
+        } catch (error) {
+          ws.logError(error as Error, 'Error parsing message: closing');
+          return ws.close();
+        }
+
+        // Heartbeat messages do not expect a response
+        if (Object.keys(request).length === 0) return;
+
+        this.request(ws, request).catch((error) => ws.logError(error, 'Error while processing request'));
       });
 
       // Actually set the timeout for the first time
@@ -351,18 +386,49 @@ export class CardanoWsServer extends WsProvider {
     this.lastSlot = createSlotEpochInfoCalc(networkInfo.eraSummaries)(networkInfo.ledgerTip.slot).lastSlot.slot;
   }
 
-  private send(message: WSMessage, notification?: number) {
+  private async request(ws: WebSocket, request: WSMessage) {
+    const { addresses, requestId } = request;
+    let response: WSMessage | null = null;
+
+    if (addresses) {
+      response = { transactions: await transactionsByAddresses(addresses, this.db) };
+      ws.addresses.push(...addresses);
+    }
+
+    if (requestId && response) ws.send(JSON.stringify(toSerializableObject({ ...response, responseTo: requestId })));
+  }
+
+  private send(message: WSMessage, notificationEvent?: NotificationEvent) {
     // If the message is not bound to a tip notification, just send it
-    if (!notification) return this.sendString(JSON.stringify(toSerializableObject(message)));
+    if (!notificationEvent) return this.sendString(JSON.stringify(toSerializableObject(message)));
+
+    const { notification, transactions } = notificationEvent;
 
     // Ensure messages from notifications are propagated in the same order as the notification was received
-    this.notifications.set(notification, message);
+    this.notifications.set(notification, { message, transactions });
 
     while (this.notifications.has(this.lastSentNotification + 1)) {
-      const msg = this.notifications.get(++this.lastSentNotification);
+      this.sendNotification(this.notifications.get(++this.lastSentNotification)!);
       this.notifications.delete(this.lastSentNotification);
+    }
+  }
 
-      this.sendString(JSON.stringify(toSerializableObject(msg)));
+  private sendNotification(notification: NotificationBody) {
+    const { message, transactions } = notification;
+    const stringMessage = JSON.stringify(toSerializableObject(message));
+
+    for (const ws of this.wss.clients) {
+      const txs = transactions.filter((tx) => {
+        for (const address of ws.addresses) {
+          if (tx.body.inputs.some((input) => input.address === address)) return true;
+          if (tx.body.outputs.some((output) => output.address === address)) return true;
+        }
+        return false;
+      });
+
+      ws.send(
+        txs.length === 0 ? stringMessage : JSON.stringify(toSerializableObject({ ...message, transactions: txs }))
+      );
     }
   }
 

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// cSpell:ignore dcspark ledgerjs multiplatform vespaiach
 import * as CML from '@dcspark/cardano-multiplatform-lib-nodejs';
 import * as Crypto from '@cardano-sdk/crypto';
 import {
@@ -15,6 +16,7 @@ import {
 } from '@cardano-sdk/wallet';
 import {
   AssetProvider,
+  BlocksByIdsArgs,
   Cardano,
   ChainHistoryProvider,
   HandleProvider,
@@ -22,6 +24,8 @@ import {
   ProviderFactory,
   RewardsProvider,
   StakePoolProvider,
+  TransactionsByAddressesArgs,
+  TransactionsByIdsArgs,
   TxSubmitProvider,
   UtxoProvider
 } from '@cardano-sdk/core';
@@ -53,6 +57,7 @@ import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, of } from 'rxjs';
 import { getEnv, walletVariables } from './environment';
+import DeepDiff from 'deep-diff';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import memoize from 'lodash/memoize.js';
 
@@ -64,8 +69,10 @@ const customHttpFetchAdapter = isNodeJs ? undefined : require('@vespaiach/axios-
 const HTTP_PROVIDER = 'http';
 const OGMIOS_PROVIDER = 'ogmios';
 const STUB_PROVIDER = 'stub';
-const MISSING_URL_PARAM = 'Missing URL';
+const TEST_PROVIDER = 'test';
 const WS_PROVIDER = 'ws';
+
+const MISSING_URL_PARAM = 'Missing URL';
 
 export type CreateKeyAgent = (dependencies: KeyAgentDependencies) => Promise<AsyncKeyAgent>;
 export const keyManagementFactory = new ProviderFactory<CreateKeyAgent>();
@@ -92,6 +99,25 @@ addressDiscoveryFactory.register(
 
 bip32Ed25519Factory.register('CML', async () => new Crypto.CmlBip32Ed25519(CML));
 bip32Ed25519Factory.register('Sodium', async () => new Crypto.SodiumBip32Ed25519());
+
+// Web Socket
+
+let wsClient: CardanoWsClient;
+
+const getWsClient = async (logger: Logger) => {
+  if (wsClient) return wsClient;
+
+  const env = getEnv(walletVariables);
+  const chainHistoryProvider = await chainHistoryProviderFactory.create(
+    HTTP_PROVIDER,
+    env.CHAIN_HISTORY_PROVIDER_PARAMS,
+    logger
+  );
+
+  if (env.WS_PROVIDER_URL === undefined) throw new Error(`${networkInfoHttpProvider.name}: ${MISSING_URL_PARAM}`);
+
+  return (wsClient = new CardanoWsClient({ chainHistoryProvider, logger }, { url: new URL(env.WS_PROVIDER_URL) }));
+};
 
 // Asset providers
 
@@ -120,6 +146,80 @@ chainHistoryProviderFactory.register(
   }
 );
 
+chainHistoryProviderFactory.register(TEST_PROVIDER, async (params: any, logger: Logger) => {
+  const httpProvider = await chainHistoryProviderFactory.create(HTTP_PROVIDER, params, logger);
+  const wsProvider = await chainHistoryProviderFactory.create(WS_PROVIDER, params, logger);
+
+  type ChainHistoryMethods = keyof ChainHistoryProvider;
+
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+  const createProviderMethod = <M extends ChainHistoryMethods>(method: M) =>
+    (async (args: TransactionsByAddressesArgs & TransactionsByIdsArgs & BlocksByIdsArgs) => {
+      let httpError: unknown;
+      let httpResult: unknown;
+      let wsError: unknown;
+      let wsResult: unknown;
+
+      try {
+        httpResult = await httpProvider[method](args);
+      } catch (error) {
+        httpError = error;
+      }
+
+      try {
+        wsResult = await wsProvider[method](args);
+      } catch (error) {
+        wsError = error;
+      }
+
+      if (wsError) {
+        if (httpError) {
+          const diffs = DeepDiff.diff(httpError, wsError);
+
+          if (diffs) {
+            logger.fatal(`ChainHistoryProvider["${method}"](${JSON.stringify(args)}) thrown different errors`);
+            for (const diff of diffs) logger.fatal(diff);
+          }
+        } else {
+          logger.fatal(`ChainHistoryProvider["${method}"](${JSON.stringify(args)}) thrown from WS but not from HTTP`);
+          logger.fatal(wsError);
+        }
+
+        throw wsError;
+      }
+
+      if (httpError) {
+        logger.fatal(`ChainHistoryProvider["${method}"](${JSON.stringify(args)}) thrown from HTTP but not from WS`);
+        logger.fatal(httpError);
+
+        throw httpError;
+      }
+
+      const diffs = DeepDiff.diff(httpResult, wsResult);
+
+      if (diffs) {
+        logger.fatal(`ChainHistoryProvider["${method}"](${JSON.stringify(args)}) returned different values`);
+        for (const diff of diffs) logger.fatal(diff);
+
+        throw new Error(`ChainHistoryProvider["${method}"](${JSON.stringify(args)}) returned different values`);
+      }
+
+      return wsResult;
+    }) as unknown as ChainHistoryProvider[M];
+
+  return {
+    blocksByHashes: createProviderMethod('blocksByHashes'),
+    healthCheck: () => wsProvider.healthCheck(),
+    transactionsByAddresses: createProviderMethod('transactionsByAddresses'),
+    transactionsByHashes: createProviderMethod('transactionsByHashes')
+  };
+});
+
+chainHistoryProviderFactory.register(
+  WS_PROVIDER,
+  async (_params: any, logger: Logger) => (await getWsClient(logger)).chainHistoryProvider
+);
+
 networkInfoProviderFactory.register(
   HTTP_PROVIDER,
   async (params: any, logger: Logger): Promise<NetworkInfoProvider> => {
@@ -131,15 +231,10 @@ networkInfoProviderFactory.register(
   }
 );
 
-networkInfoProviderFactory.register(WS_PROVIDER, (_params: any, logger: Logger): Promise<NetworkInfoProvider> => {
-  const env = getEnv(walletVariables);
-
-  if (env.WS_PROVIDER_URL === undefined) throw new Error(`${networkInfoHttpProvider.name}: ${MISSING_URL_PARAM}`);
-
-  const wsClient = new CardanoWsClient({ logger }, { url: new URL(env.WS_PROVIDER_URL) });
-
-  return Promise.resolve(wsClient.networkInfoProvider);
-});
+networkInfoProviderFactory.register(
+  WS_PROVIDER,
+  async (_params: any, logger: Logger) => (await getWsClient(logger)).networkInfoProvider
+);
 
 rewardsProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<RewardsProvider> => {
   if (params.baseUrl === undefined) throw new Error(`${rewardsHttpProvider.name}: ${MISSING_URL_PARAM}`);

@@ -1,4 +1,4 @@
-import { CardanoWsClient } from '@cardano-sdk/cardano-services-client';
+import { CardanoWsClient, chainHistoryHttpProvider } from '@cardano-sdk/cardano-services-client';
 import {
   CardanoWsServer,
   GenesisData,
@@ -29,12 +29,10 @@ const wsProviderReady = (provider: WsProvider) =>
       }
     });
 
-    timeout = setTimeout(() => {
+    (timeout = setTimeout(() => {
       subscription.unsubscribe();
       reject(new Error('WsProvider timeout'));
-    }, 10_000);
-
-    timeout.unref();
+    }, 10_000)).unref();
   });
 
 const wsProviderReadyAgain = (provider: WsProvider, close: () => Promise<unknown>) =>
@@ -77,15 +75,15 @@ const wsProviderReadyAgain = (provider: WsProvider, close: () => Promise<unknown
 
     closed = true;
 
-    timeout = setTimeout(() => {
+    (timeout = setTimeout(() => {
       subscription.unsubscribe();
       reject(new Error('WsProvider timeout'));
-    }, 10_000);
-
-    timeout.unref();
+    }, 10_000)).unref();
   });
 
 describe('Web Socket', () => {
+  const chainHistoryProvider = chainHistoryHttpProvider({ logger, ...env.CHAIN_HISTORY_PROVIDER_PARAMS });
+
   let db: Pool;
   let cardanoNode: OgmiosCardanoNode;
   let genesisData: GenesisData;
@@ -95,7 +93,10 @@ describe('Web Socket', () => {
   let server: CardanoWsServer;
 
   const openClient = (heartbeatInterval = 55) =>
-    (client = new CardanoWsClient({ logger }, { heartbeatInterval, url: new URL(`ws://localhost:${port}/ws`) }));
+    (client = new CardanoWsClient(
+      { chainHistoryProvider, logger },
+      { heartbeatInterval, url: new URL(`ws://localhost:${port}/ws`) }
+    ));
 
   const openServer = (heartbeatTimeout = 60) =>
     (server = new CardanoWsServer(

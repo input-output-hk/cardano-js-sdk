@@ -3327,6 +3327,7 @@ __metadata:
     "@types/bunyan": ^1.8.8
     "@types/chalk": ^2.2.0
     "@types/convict": ^6.1.2
+    "@types/deep-diff": ^1.0.5
     "@types/delay": ^3.1.0
     "@types/dockerode": ^3.3.8
     "@types/jest": ^28.1.2
@@ -3353,6 +3354,7 @@ __metadata:
     convict: ^6.2.4
     copy-webpack-plugin: ^10.2.4
     crypto-browserify: ^3.12.0
+    deep-diff: ^1.0.2
     delay: ^5.0.0
     dockerode: ^3.3.1
     dockerode-utils: ^0.0.7
@@ -6723,6 +6725,13 @@ __metadata:
   dependencies:
     "@types/ms": "*"
   checksum: 0a7b89d8ed72526858f0b61c6fd81f477853e8c4415bb97f48b1b5545248d2ae389931680b94b393b993a7cfe893537a200647d93defe6d87159b96812305adc
+  languageName: node
+  linkType: hard
+
+"@types/deep-diff@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "@types/deep-diff@npm:1.0.5"
+  checksum: 84504a725a3e79fc5410184d4d94fd8fae05b673e03fc4250998ea48c1f5c862dfedb9a227200b495b5979ed90288b291d739b65cea5792de9e47caff6630cc2
   languageName: node
   linkType: hard
 
@@ -11892,6 +11901,13 @@ __metadata:
   version: 0.7.0
   resolution: "dedent@npm:0.7.0"
   checksum: 87de191050d9a40dd70cad01159a0bcf05ecb59750951242070b6abf9569088684880d00ba92a955b4058804f16eeaf91d604f283929b4f614d181cd7ae633d2
+  languageName: node
+  linkType: hard
+
+"deep-diff@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "deep-diff@npm:1.0.2"
+  checksum: 9de8b5eedc1957116e1b47e4c3c4e3dbe23cb741abefc5ec8829a12e77958c689ac46888a3c35320f976cf42fb6de2b016e158facdb24d894ab5b5fdabad9b34
   languageName: node
   linkType: hard
 

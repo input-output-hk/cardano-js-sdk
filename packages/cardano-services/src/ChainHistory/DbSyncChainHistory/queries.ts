@@ -1,3 +1,5 @@
+// cSpell:ignore serialised
+
 export const DB_MAX_SAFE_INTEGER = 2_147_483_647;
 
 const selectTxInput = (collateral?: boolean) => `
