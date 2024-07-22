@@ -156,8 +156,8 @@ describe('PersonalWallet/conwayTransactions', () => {
     const protocolParameters = await wallet.networkInfoProvider.protocolParameters();
 
     return [
-      BigInt(protocolParameters.dRepDeposit),
-      BigInt(protocolParameters.governanceActionDeposit),
+      BigInt(protocolParameters.dRepDeposit!),
+      BigInt(protocolParameters.governanceActionDeposit!),
       BigInt(protocolParameters.stakeKeyDeposit)
     ];
   };
