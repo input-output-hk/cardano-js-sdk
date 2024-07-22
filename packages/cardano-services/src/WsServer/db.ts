@@ -6,9 +6,10 @@ import { Pool } from 'pg';
 
 const notifyTipBody = `\
 BEGIN
-  PERFORM pg_notify('sdk_tip', json_build_object(
+  PERFORM PG_NOTIFY('sdk_tip', JSON_BUILD_OBJECT(
+    'blockId', NEW.id,
     'blockNo', NEW.block_no,
-    'hash',    encode(NEW.hash, 'hex'),
+    'hash',    ENCODE(NEW.hash, 'hex'),
     'slot',    NEW.slot_no
   )::TEXT);
   RETURN NEW;

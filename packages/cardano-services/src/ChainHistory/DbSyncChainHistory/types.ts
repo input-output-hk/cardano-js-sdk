@@ -117,7 +117,7 @@ export interface RedeemerModel {
   tx_id: Buffer;
 }
 
-type VoterRole = 'ConstitutionalCommittee' | 'DRep' | 'SPO';
+export type VoterRole = 'ConstitutionalCommittee' | 'DRep' | 'SPO';
 
 export interface VotingProceduresModel {
   tx_id: Buffer;

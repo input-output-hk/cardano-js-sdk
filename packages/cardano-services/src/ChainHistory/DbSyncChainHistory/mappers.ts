@@ -171,7 +171,7 @@ export const mapRedeemer = (redeemerModel: RedeemerModel): Cardano.Redeemer => (
   purpose: mapRedeemerPurpose(redeemerModel.purpose)
 });
 
-export const mapAnchor = (anchorUrl: string, anchorDataHash: string): Cardano.Anchor | null => {
+export const mapAnchor = (anchorUrl?: string, anchorDataHash?: string): Cardano.Anchor | null => {
   if (!!anchorUrl && !!anchorDataHash) {
     return {
       dataHash: anchorDataHash as Hash32ByteBase16,

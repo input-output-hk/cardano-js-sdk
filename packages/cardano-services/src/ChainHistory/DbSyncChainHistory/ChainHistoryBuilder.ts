@@ -86,7 +86,7 @@ const mapWithdrawals: (source: [{ credential: DbSyncCredential; network: string 
 });
 
 // eslint-disable-next-line complexity, @typescript-eslint/no-explicit-any
-const getGovernanceAction = (description: any): Cardano.GovernanceAction => {
+export const getGovernanceAction = (description: any): Cardano.GovernanceAction => {
   const { contents, tag } = description;
   const governanceActionId =
     contents && contents[0] ? { actionIndex: contents[0].govActionIx, id: contents[0].txId } : null;
@@ -150,10 +150,13 @@ const getGovernanceAction = (description: any): Cardano.GovernanceAction => {
   throw new Error(`Unknown GovernanceActionType '${tag}' with description "${JSON.stringify(description)}"`);
 };
 
-const getVoter = (
-  txId: Cardano.TransactionId,
-  { committee_has_script, committee_voter, drep_has_script, drep_voter, pool_voter, voter_role }: VotingProceduresModel
-): Cardano.Voter => {
+type PartialVotingProceduresModel = Pick<
+  VotingProceduresModel,
+  'committee_has_script' | 'committee_voter' | 'drep_has_script' | 'drep_voter' | 'pool_voter' | 'voter_role'
+>;
+
+export const getVoter = (txId: Cardano.TransactionId, model: PartialVotingProceduresModel): Cardano.Voter => {
+  const { committee_has_script, committee_voter, drep_has_script, drep_voter, pool_voter, voter_role } = model;
   let hash: Hash28ByteBase16;
 
   switch (voter_role) {
