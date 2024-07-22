@@ -42,6 +42,7 @@ import {
   loadPgBossWorker,
   loadProjector,
   loadProviderServer,
+  loadWsServer,
   newOption,
   stringOptionToBoolean,
   withCommonOptions,
@@ -370,6 +371,12 @@ addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon
     (val) =>
       stringOptionToBoolean(val, Programs.ProviderServer, ProviderServerOptionDescriptions.UseTypeOrmStakePoolProvider),
     USE_TYPEORM_STAKE_POOL_PROVIDER_DEFAULT
+  ),
+  newOption(
+    '--use-web-socket-api <true/false>',
+    ProviderServerOptionDescriptions.UseWebSocketApi,
+    'USE_WEB_SOCKET_API',
+    (val) => stringOptionToBoolean(val, Programs.ProviderServer, ProviderServerOptionDescriptions.UseWebSocketApi)
   )
 ]).action(async (serviceNames: ServiceNames[], args: ProviderServerArgs) =>
   runServer('Provider server', { args, serviceNames }, () =>
@@ -486,6 +493,12 @@ addOptions(
       postgresConnectionStringStakePool: connectionStringFromArgs(args, 'StakePool')
     })
   )
+);
+
+const wss = withOgmiosOptions(program.command('start-ws-server').description('Start the WebSocket server'));
+
+withCommonOptions(withPostgresOptions(wss, ['DbSync']), PROVIDER_SERVER_API_URL_DEFAULT).action((args) =>
+  loadWsServer({ ...args, postgresConnectionStringDbSync: connectionStringFromArgs(args, 'DbSync') })
 );
 
 if (process.argv.slice(2).length === 0) {

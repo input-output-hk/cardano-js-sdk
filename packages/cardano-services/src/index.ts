@@ -10,6 +10,7 @@ export * from './StakePool';
 export * from './TxSubmit';
 export * from './Projection';
 export * from './Utxo';
+export * from './WsServer';
 export * from './types';
 export * as errors from './errors';
 export * as util from './util';
