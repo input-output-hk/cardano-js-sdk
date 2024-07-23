@@ -24,7 +24,7 @@
   "sideEffects": false,
   "license": "Apache-2.0",
   "scripts": {
-    "build": "yarn build:cjs && tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020 && tsc-alias -p src/tsconfig.json --outDir ./dist/esm && cp ./esm-package.json ./dist/esm/package.json && cp -rf src/chainSync/data dist/esm/chainSync/",
+    "build": "tsup --config tsup.config.ts && cp ../../build/esm-package.json ./dist/esm/package.json && cp ../../build/cjs-package.json ./dist/cjs/package.json && cp -rf src/chainSync/data dist/esm/chainSync/",
     "build:cjs": "tsc --build src && cp ../../build/cjs-package.json ./dist/cjs/package.json && cp -rf src/chainSync/data dist/cjs/chainSync/",
     "circular-deps:check": "madge --circular dist/cjs",
     "tscNoEmit": "echo typescript --noEmit command not implemented yet",

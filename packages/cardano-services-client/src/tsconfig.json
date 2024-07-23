@@ -3,6 +3,9 @@
   "compilerOptions": {
     "outDir": "../dist/cjs"
   },
+  "include": [
+    "**/*.ts"
+  ],
   "references": [
     {
       "path": "../../core/src"
