@@ -912,26 +912,6 @@ in
           };
         };
 
-        "ops-preprod-1@eu-central-1" = final: {
-          namespace = "ops-preprod-1";
-          network = "preprod";
-          context = "eks-admin";
-          region = "eu-central-1";
-
-          providers = {
-            backend = {
-              enabled = true;
-            };
-          };
-
-          values = {
-            useAccelerator = true;
-            cardano-services = {
-              ingresOrder = 99;
-            };
-          };
-        };
-
         "live-sanchonet@us-east-2@v1" = final: {
           namespace = "live-sanchonet";
           name = "${final.namespace}-cardanojs-v1";
