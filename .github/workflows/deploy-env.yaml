@@ -1,0 +1,48 @@
+name: Deploy Environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        type: choice
+        required: true
+        default: 'ops-preview-1'
+        options:
+        options:
+        - ops-preview-1
+      region:
+        description: 'Region containing cluster to deploy to'
+        type: choice
+        required: true
+        default: 'us-east-1'
+        options:
+        - us-east-1
+        - us-east-2
+        - eu-central-1
+
+jobs:
+  deploy:
+    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install QEMU
+        run: sudo apt-get install -y qemu-user-static
+
+      - name: 🧰 Setup Nix
+        uses: cachix/install-nix-action@v21
+        with:
+          extra_nix_config: |
+            system = aarch64-linux
+
+      - name: 🚀 Deploy
+        run: |
+          echo "${{ secrets.ENVRC }}" > .envrc
+          source .envrc
+          nix develop
+          nix run .#cardano-services.${{ inputs.environment }}@${{ inputs.region }}.status
+          nix run .#cardano-services.${{ inputs.environment }}@${{ inputs.region }}.plan
+          nix run .#cardano-services.${{ inputs.environment }}@${{ inputs.region }}.apply -y
