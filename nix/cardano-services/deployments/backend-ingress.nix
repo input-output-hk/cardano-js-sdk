@@ -41,6 +41,7 @@
           "alb.ingress.kubernetes.io/healthcheck-interval-seconds" = toString values.backend.albHealthcheck.interval;
           "alb.ingress.kubernetes.io/healthcheck-timeout-seconds" = toString values.backend.albHealthcheck.timeout;
           "alb.ingress.kubernetes.io/group.order" = toString values.cardano-services.ingresOrder;
+          "external-dns.alpha.kubernetes.io/disabled" = "true";
         }
         else {
           "alb.ingress.kubernetes.io/actions.ssl-redirect" = builtins.toJSON {
