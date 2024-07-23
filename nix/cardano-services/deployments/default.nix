@@ -102,6 +102,8 @@ in
       };
 
       values = {
+        useAccelerator = false;
+        acceleratorArn = tf-outputs.${final.region}.accelerators.${final.namespace} or null;
         postgresName = "${final.namespace}-postgresql";
         stakepool.databaseName = "stakepool";
         ingress.enabled = true;
@@ -216,6 +218,7 @@ in
           };
 
           values = {
+            useAccelerator = true;
             ws-server.enabled = true;
             stakepool.databaseName = "stakepoolv2";
             cardano-services = {
@@ -417,6 +420,7 @@ in
           };
 
           values = {
+            useAccelerator = true;
             ws-server.enabled = true;
             stakepool.databaseName = "stakepoolv2";
             backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
@@ -866,7 +870,6 @@ in
                 (map (v: "/v${v}/handle") versions.handle)
               ];
           };
-          chain-history-provider.enabled = false;
         };
 
         "ops-preview-1@us-east-1" = final: {
@@ -902,6 +905,7 @@ in
           };
 
           values = {
+            useAccelerator = true;
             cardano-services = {
               ingresOrder = 99;
             };
