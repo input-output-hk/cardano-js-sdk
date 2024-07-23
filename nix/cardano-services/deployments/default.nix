@@ -218,6 +218,7 @@ in
           };
 
           values = {
+            useAccelerator = true;
             ws-server.enabled = true;
             stakepool.databaseName = "stakepoolv2";
             cardano-services = {
@@ -419,6 +420,7 @@ in
           };
 
           values = {
+            useAccelerator = true;
             ws-server.enabled = true;
             stakepool.databaseName = "stakepoolv2";
             backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
