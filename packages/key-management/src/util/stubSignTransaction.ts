@@ -11,7 +11,6 @@ const randomPublicKey = () => Crypto.Ed25519PublicKeyHex(Array.from({ length: 64
 
 export interface StubSignTransactionProps {
   txBody: Cardano.TxBody;
-  dRepPublicKey?: Crypto.Ed25519PublicKeyHex;
   context: SignTransactionContext;
   signTransactionOptions?: SignTransactionOptions;
 }
