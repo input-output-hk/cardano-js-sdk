@@ -1,13 +1,17 @@
 import { StaticChangeAddressResolver, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 
+import { Bip32Account, SignTransactionContext, util } from '@cardano-sdk/key-management';
 import { Cardano, Serialization } from '@cardano-sdk/core';
+import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
 import { GreedyTxEvaluator } from './GreedyTxEvaluator';
 import { InitializeTxProps, InitializeTxResult } from '../types';
 import { RedeemersByType, defaultSelectionConstraints } from '../input-selection';
 import { TxBuilderDependencies } from './types';
 import { createPreInputSelectionTxBody, includeChangeAndInputs } from '../createTransactionInternals';
 import { ensureValidityInterval } from '../ensureValidityInterval';
-import { util } from '@cardano-sdk/key-management';
+
+const dRepPublicKeyHash = async (addressManager?: Bip32Account): Promise<Ed25519KeyHashHex | undefined> =>
+  addressManager && (await (await addressManager.derivePublicKey(util.DREP_KEY_DERIVATION_PATH)).hash()).hex();
 
 export const initializeTx = async (
   props: InitializeTxProps,
@@ -72,9 +76,7 @@ export const initializeTx = async (
         witness: props.witness as Cardano.Witness
       });
 
-      const dRepPublicKey = addressManager
-        ? (await addressManager.derivePublicKey(util.DREP_KEY_DERIVATION_PATH)).hex()
-        : undefined;
+      const dRepKeyHashHex = await dRepPublicKeyHash(addressManager);
 
       const transaction = new Serialization.Transaction(
         Serialization.TransactionBody.fromCore(unwitnessedTx.body),
@@ -84,8 +86,8 @@ export const initializeTx = async (
         auxiliaryData ? Serialization.AuxiliaryData.fromCore(auxiliaryData) : undefined
       );
 
-      const signingContext = {
-        dRepPublicKey,
+      const signingContext: SignTransactionContext = {
+        ...(dRepKeyHashHex && { dRepKeyHashHex }),
         handleResolutions: props.handleResolutions ?? [],
         knownAddresses: addresses,
         txInKeyPathMap: await util.createTxInKeyPathMap(unwitnessedTx.body, addresses, inputResolver)
