@@ -1,6 +1,7 @@
 export * from './certificates';
 export * from './withUtxo';
 export * from './withMint';
+export * from './withGovernanceActions';
 export * from './withHandles';
 export * from './withHandleMetadata';
 export * from './withNftMetadata';

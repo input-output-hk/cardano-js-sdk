@@ -1,6 +1,7 @@
 export * from './storeAddresses';
 export * from './storeAssets';
 export * from './storeBlock';
+export * from './storeGovernanceAction';
 export * from './storeHandles';
 export * from './storeHandleMetadata';
 export * from './storeNftMetadata';
