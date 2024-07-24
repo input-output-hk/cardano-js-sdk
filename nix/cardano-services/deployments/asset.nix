@@ -32,7 +32,7 @@
       TOKEN_METADATA_SERVER_URL = values.cardano-services.tokenMetadataServerUrl;
       USE_TYPEORM_ASSET_PROVIDER = "true";
 
-      POSTGRES_POOL_MAX_ASSET = "10";
+      POSTGRES_POOL_MAX_ASSET = "500";
       POSTGRES_HOST_ASSET = values.postgresName;
       POSTGRES_PORT_ASSET = "5432";
       POSTGRES_DB_ASSET = "asset";
