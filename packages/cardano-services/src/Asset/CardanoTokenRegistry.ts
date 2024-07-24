@@ -1,4 +1,12 @@
-import { Asset, Cardano, Milliseconds, ProviderError, ProviderFailure, Seconds } from '@cardano-sdk/core';
+import {
+  Asset,
+  Cardano,
+  CardanoNodeUtil,
+  Milliseconds,
+  ProviderError,
+  ProviderFailure,
+  Seconds
+} from '@cardano-sdk/core';
 import { InMemoryCache } from '../InMemoryCache';
 import { Logger } from 'ts-log';
 import { TokenMetadataService } from './types';
@@ -38,7 +46,7 @@ export const toCoreTokenMetadata = (record: TokenMetadataServiceRecord): Asset.T
   ) as Asset.TokenMetadata;
 
 const toProviderError = (error: unknown, details: string) => {
-  if (error instanceof ProviderError) return error;
+  if (CardanoNodeUtil.isProviderError(error)) return error;
 
   const message = error instanceof Error ? `${error.message} ` : '';
 

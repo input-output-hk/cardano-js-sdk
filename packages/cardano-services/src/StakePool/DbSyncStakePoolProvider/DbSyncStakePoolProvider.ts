@@ -8,6 +8,7 @@ import {
 } from './util';
 import {
   Cardano,
+  CardanoNodeUtil,
   Paginated,
   ProviderError,
   ProviderFailure,
@@ -148,9 +149,9 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
         try {
           pool.metadata.ext = await this.#metadataService.getStakePoolExtendedMetadata(pool.metadata);
         } catch (error) {
-          if (error instanceof ProviderError && error.reason === ProviderFailure.ConnectionFailure) {
+          if (CardanoNodeUtil.isProviderError(error) && error.reason === ProviderFailure.ConnectionFailure) {
             pool.metadata.ext = undefined;
-          } else if (error instanceof ProviderError && error.reason === ProviderFailure.NotFound) {
+          } else if (CardanoNodeUtil.isProviderError(error) && error.reason === ProviderFailure.NotFound) {
             pool.metadata.ext = null;
           } else {
             throw error;

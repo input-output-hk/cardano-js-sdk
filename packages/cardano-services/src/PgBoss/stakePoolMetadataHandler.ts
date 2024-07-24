@@ -1,4 +1,4 @@
-import { Cardano, NotImplementedError, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { Cardano, CardanoNodeUtil, NotImplementedError, ProviderFailure } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 import { DataSource, MoreThan } from 'typeorm';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
@@ -73,7 +73,7 @@ export const attachExtendedMetadata = (
   if (extMetadata instanceof CustomError) {
     const error = extMetadata;
 
-    if (error instanceof ProviderError && error.reason === ProviderFailure.NotFound) {
+    if (CardanoNodeUtil.isProviderError(error) && error.reason === ProviderFailure.NotFound) {
       return { ...metadataWithoutExt!, ext: null };
     }
     return metadataWithoutExt;
