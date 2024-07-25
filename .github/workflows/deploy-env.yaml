@@ -34,7 +34,7 @@ on:
 
 jobs:
   deploy:
-    environment: ${{ inputs.environment || 'ops-preview-1' }}
+    environment: ${{ inputs.environment || 'ops-preview-1@us-east-1' }}
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout repository
@@ -47,4 +47,4 @@ jobs:
         run: |
           echo "${{ secrets.ENVRC }}" > .envrc.local
           nix develop
-          echo "yes" | nix run .#cardano-services.${{ inputs.environment || 'ops-preview-1' }}.apply
+          echo "yes" | nix run .#cardano-services.${{ inputs.environment || 'ops-preview-1@us-east-1' }}.apply
