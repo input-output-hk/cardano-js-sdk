@@ -1,6 +1,7 @@
 name: Deploy Environment
 
 on:
+  push:
   workflow_dispatch:
     inputs:
       environment:
@@ -10,39 +11,43 @@ on:
         default: 'ops-preview-1'
         options:
         options:
-        - ops-preview-1
-      region:
-        description: 'Region containing cluster to deploy to'
-        type: choice
-        required: true
-        default: 'us-east-1'
-        options:
-        - us-east-1
-        - us-east-2
-        - eu-central-1
+        - ALL
+        - LIVE
+        - live-sanchonet@eu-central-1@v2
+        - DEV
+        - live-mainnet@eu-central-1@v2
+        - live-sanchonet@us-east-2@v1
+        - dev-mainnet@us-east-1
+        - live-mainnet@us-east-2@v2
+        - live-sanchonet@us-east-2@v2
+        - dev-preprod@us-east-1@v2
+        - live-preprod@eu-central-1@v2
+        - OPS
+        - dev-preview@us-east-1
+        - live-preprod@us-east-2@v2
+        - ops-preprod-1@us-east-1
+        - dev-sanchonet@us-east-1@v1
+        - live-preview@eu-central-1@v2
+        - ops-preview-1@us-east-1
+        - dev-sanchonet@us-east-1@v2
+        - live-preview@us-east-2@v2
+        - staging-preprod@us-east-1@v2
 
 jobs:
   deploy:
-    environment: ${{ inputs.environment }}
+    environment: ${{ inputs.environment || ops-preview-1 }}
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install QEMU
-        run: sudo apt-get install -y qemu-user-static
-
       - name: 🧰 Setup Nix
         uses: cachix/install-nix-action@v21
-        with:
-          extra_nix_config: |
-            system = aarch64-linux
 
       - name: 🚀 Deploy
         run: |
-          echo "${{ secrets.ENVRC }}" > .envrc
-          source .envrc
+          echo "${{ secrets.ENVRC }}" > .envrc.local
           nix develop
-          nix run .#cardano-services.${{ inputs.environment }}@${{ inputs.region }}.status
-          nix run .#cardano-services.${{ inputs.environment }}@${{ inputs.region }}.plan
-          nix run .#cardano-services.${{ inputs.environment }}@${{ inputs.region }}.apply -y
+          nix run .#cardano-services.${{ inputs.environment }}.status
+          nix run .#cardano-services.${{ inputs.environment }}.plan
+          echo "yes" | nix run .#cardano-services.${{ inputs.environment }}.apply
