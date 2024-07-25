@@ -46,5 +46,6 @@ jobs:
       - name: 🚀 Deploy
         run: |
           echo "${{ secrets.ENVRC }}" > .envrc.local
+          source .envrc.local
           nix develop
           echo "yes" | nix run .#cardano-services.${{ inputs.environment || 'ops-preview-1@us-east-1' }}.apply
