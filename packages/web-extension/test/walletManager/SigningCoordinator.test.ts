@@ -2,6 +2,7 @@ import {
   AccountKeyDerivationPath,
   CommunicationType,
   InMemoryKeyAgent,
+  KeyPurpose,
   KeyRole,
   SignBlobResult,
   SignDataContext,
@@ -11,7 +12,14 @@ import {
 import { Cardano, TxCBOR } from '@cardano-sdk/core';
 import { Ed25519PublicKeyHex, Ed25519SignatureHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
-import { InMemoryWallet, KeyAgentFactory, SigningCoordinator, WalletType, WrongTargetError } from '../../src';
+import {
+  InMemoryWallet,
+  KeyAgentFactory,
+  RequestContext,
+  SigningCoordinator,
+  WalletType,
+  WrongTargetError
+} from '../../src';
 import { createAccount } from './util';
 import { dummyLogger } from 'ts-log';
 import { firstValueFrom } from 'rxjs';
@@ -21,7 +29,7 @@ describe('SigningCoordinator', () => {
   let keyAgentFactory: jest.Mocked<KeyAgentFactory>;
   let keyAgent: jest.Mocked<InMemoryKeyAgent>;
   const wallet: InMemoryWallet<{}, {}> = {
-    accounts: [createAccount(0, 0)],
+    accounts: [createAccount(0, 0), createAccount(0, 0, KeyPurpose.MULTI_SIG)],
     encryptedSecrets: {
       keyMaterial: HexBlob('abc'),
       rootPrivateKeyBytes: HexBlob('123')
@@ -30,9 +38,10 @@ describe('SigningCoordinator', () => {
     type: WalletType.InMemory,
     walletId: Hash28ByteBase16('ad63f855e831d937457afc52a21a7f351137e4a9fff26c217817335a')
   };
-  const requestContext = {
+  const requestContext: RequestContext<{}, {}> = {
     accountIndex: 0,
     chainId: Cardano.ChainIds.Preprod,
+    purpose: KeyPurpose.STANDARD,
     wallet
   };
   let passphrase: Uint8Array;
@@ -100,6 +109,19 @@ describe('SigningCoordinator', () => {
       await expect(req.sign(passphrase)).resolves.toEqual(signatures);
       await expect(signed).resolves.toEqual(signatures);
       expect(passphrase).toEqual(new Uint8Array([0, 0, 0]));
+    });
+
+    it('creates a key agent with requested purpose account', async () => {
+      keyAgent.signTransaction.mockResolvedValueOnce(signatures);
+      const reqEmitted = firstValueFrom(signingCoordinator.transactionWitnessRequest$);
+      const signed = signingCoordinator.signTransaction(
+        { signContext, tx },
+        { ...requestContext, purpose: KeyPurpose.MULTI_SIG }
+      );
+      const req = await reqEmitted;
+      await req.sign(passphrase);
+      await signed;
+      expect(keyAgentFactory.InMemory).toBeCalledWith(expect.objectContaining({ purpose: KeyPurpose.MULTI_SIG }));
     });
 
     it('rejects with AuthenticationError when subscriber calls reject()', async () => {
