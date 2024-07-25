@@ -47,6 +47,4 @@ jobs:
         run: |
           echo "${{ secrets.ENVRC }}" > .envrc.local
           nix develop
-          nix run .#cardano-services.${{ inputs.environment }}.status
-          nix run .#cardano-services.${{ inputs.environment }}.plan
-          echo "yes" | nix run .#cardano-services.${{ inputs.environment }}.apply
+          echo "yes" | nix run .#cardano-services.${{ inputs.environment || 'ops-preview-1' }}.apply
