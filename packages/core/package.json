@@ -63,7 +63,7 @@
     "@foxglove/crc": "^0.0.3",
     "@scure/base": "^1.1.1",
     "fraction.js": "4.0.1",
-    "ip-address": "^8.1.0",
+    "ip-address": "^9.0.5",
     "lodash": "^4.17.21",
     "ts-custom-error": "^3.2.0",
     "ts-log": "^2.2.4",
