@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.21.0...@cardano-sdk/key-management@0.21.1) (2024-07-25)
+
+### Bug Fixes
+
+* use drep key hash in stubSignTransaction ([af30b6b](https://github.com/input-output-hk/cardano-js-sdk/commit/af30b6b95f57a453080c7d2594df1e7bd7c6a6c9))
+
 ## [0.21.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.20.11...@cardano-sdk/key-management@0.21.0) (2024-07-22)
 
 ### ⚠ BREAKING CHANGES

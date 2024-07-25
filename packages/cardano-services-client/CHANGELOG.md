@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.19.13...@cardano-sdk/cardano-services-client@0.19.14) (2024-07-25)
+
+### Features
+
+* add web socket based network info provider ([7c47ce0](https://github.com/input-output-hk/cardano-js-sdk/commit/7c47ce0aed1e41c4a4034f0e0b65d49b64e59360))
+
 ## [0.19.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.19.12...@cardano-sdk/cardano-services-client@0.19.13) (2024-07-22)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services-client
