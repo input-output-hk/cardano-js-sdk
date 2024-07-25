@@ -34,7 +34,7 @@ on:
 
 jobs:
   deploy:
-    environment: ${{ inputs.environment || ops-preview-1 }}
+    environment: ${{ inputs.environment || 'ops-preview-1' }}
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout repository
