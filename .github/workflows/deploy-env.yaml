@@ -10,7 +10,6 @@ on:
         required: true
         default: 'ops-preview-1'
         options:
-        options:
         - ALL
         - LIVE
         - live-sanchonet@eu-central-1@v2
