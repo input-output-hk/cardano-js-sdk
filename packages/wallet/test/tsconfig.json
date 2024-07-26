@@ -16,6 +16,9 @@
       "path": "../../util-rxjs/src"
     },
     {
+      "path": "../../blockfrost/src"
+    },
+    {
       "path": "../../util/src"
     },
     {
