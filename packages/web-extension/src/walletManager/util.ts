@@ -2,6 +2,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import {
   AccountKeyDerivationPath,
   AsyncKeyAgent,
+  KeyPurpose,
   SignDataContext,
   SignTransactionContext,
   TransactionSigner,
@@ -283,6 +284,7 @@ const createScriptWitness = async <WalletMetadata extends {}, AccountMetadata ex
       {
         accountIndex: signer.accountIndex,
         chainId,
+        purpose: signer.purpose,
         wallet: signerWallet
       }
     );
@@ -315,6 +317,7 @@ export const buildBip32Witnesser = <WalletMetadata extends { name: string }, Acc
         {
           accountIndex: accountIndex!,
           chainId,
+          purpose: KeyPurpose.STANDARD,
           wallet
         }
       ),
@@ -341,6 +344,7 @@ export const buildBip32Witnesser = <WalletMetadata extends { name: string }, Acc
               {
                 accountIndex: accountIndex!,
                 chainId,
+                purpose: KeyPurpose.STANDARD,
                 wallet
               }
             );

@@ -2,6 +2,7 @@ import {
   Asset,
   AssetProvider,
   Cardano,
+  CardanoNodeUtil,
   GetAssetArgs,
   GetAssetsArgs,
   ProviderError,
@@ -65,7 +66,7 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
       try {
         assetInfo.tokenMetadata = (await this.#dependencies.tokenMetadataService.getTokenMetadata([assetId]))[0];
       } catch (error) {
-        if (error instanceof ProviderError && error.reason === ProviderFailure.Unhealthy) {
+        if (CardanoNodeUtil.isProviderError(error) && error.reason === ProviderFailure.Unhealthy) {
           this.logger.error(`Failed to fetch token metadata for asset with ${assetId} due to: ${error.message}`);
           assetInfo.tokenMetadata = undefined;
         } else {
@@ -92,7 +93,7 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
       try {
         tokenMetadataList = await this.#dependencies.tokenMetadataService.getTokenMetadata(assetIds);
       } catch (error) {
-        if (error instanceof ProviderError && error.reason === ProviderFailure.Unhealthy) {
+        if (CardanoNodeUtil.isProviderError(error) && error.reason === ProviderFailure.Unhealthy) {
           this.logger.error(`Failed to fetch token metadata for assets ${assetIds} due to: ${error.message}`);
           tokenMetadataList = Array.from({ length: assetIds.length });
         } else {

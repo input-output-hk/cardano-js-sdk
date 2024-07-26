@@ -74,7 +74,7 @@ in
         };
 
         asset-provider = {
-          resources.limits = mkPodResources "300Mi" "500m";
+          resources.limits = mkPodResources "1024Mi" "500m";
           resources.requests = mkPodResources "150Mi" "100m";
         };
 

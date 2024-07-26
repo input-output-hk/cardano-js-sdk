@@ -2,6 +2,7 @@ import {
   Asset,
   AssetProvider,
   Cardano,
+  CardanoNodeUtil,
   GetAssetArgs,
   GetAssetsArgs,
   ProviderError,
@@ -81,7 +82,7 @@ export class TypeormAssetProvider extends TypeormProvider implements AssetProvid
     try {
       tokenMetadataList = await this.#dependencies.tokenMetadataService.getTokenMetadata(assetIds);
     } catch (error) {
-      if (error instanceof ProviderError && error.reason === ProviderFailure.Unhealthy) {
+      if (CardanoNodeUtil.isProviderError(error) && error.reason === ProviderFailure.Unhealthy) {
         this.logger.error(`Failed to fetch token metadata for assets ${assetIds} due to: ${error.message}`);
         tokenMetadataList = Array.from({ length: assetIds.length });
       } else {

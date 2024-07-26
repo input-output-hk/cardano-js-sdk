@@ -41,7 +41,7 @@ export class TxSubmitHttpService extends HttpService {
           } catch {
             isHealthy = false;
           }
-          if (error instanceof ProviderError) {
+          if (CardanoNodeUtil.isProviderError(error)) {
             return HttpServer.sendJSON(res, error, providerFailureToStatusCodeMap[error.reason]);
           }
           if (!isHealthy) {

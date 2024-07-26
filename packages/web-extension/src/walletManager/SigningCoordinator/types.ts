@@ -1,5 +1,6 @@
 import {
   AccountKeyDerivationPath,
+  KeyPurpose,
   SignBlobResult,
   SignDataContext,
   SignTransactionContext,
@@ -13,6 +14,7 @@ import { Observable } from 'rxjs';
 export type RequestContext<WalletMetadata extends {}, AccountMetadata extends {}> = {
   wallet: AnyBip32Wallet<WalletMetadata, AccountMetadata>;
   accountIndex: number;
+  purpose: KeyPurpose;
   chainId: Cardano.ChainId;
 };
 

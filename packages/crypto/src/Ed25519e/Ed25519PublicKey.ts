@@ -2,7 +2,7 @@ import { ED25519_PUBLIC_KEY_HASH_LENGTH, Ed25519KeyHash } from './Ed25519KeyHash
 import { Ed25519PublicKeyHex } from '../hexTypes';
 import { Ed25519Signature } from './Ed25519Signature';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import { crypto_generichash, crypto_sign_verify_detached, ready } from 'libsodium-wrappers-sumo';
+import sodium from 'libsodium-wrappers-sumo';
 
 export const ED25519_PUBLIC_KEY_LENGTH = 32;
 
@@ -31,8 +31,8 @@ export class Ed25519PublicKey {
    * @returns true if the signature is valid; otherwise; false.
    */
   async verify(signature: Ed25519Signature, message: HexBlob): Promise<boolean> {
-    await ready;
-    return crypto_sign_verify_detached(signature.bytes(), Buffer.from(message, 'hex'), this.#keyMaterial);
+    await sodium.ready;
+    return sodium.crypto_sign_verify_detached(signature.bytes(), Buffer.from(message, 'hex'), this.#keyMaterial);
   }
 
   /**
@@ -60,8 +60,8 @@ export class Ed25519PublicKey {
 
   /** Gets the blake2 hash of the key material. */
   async hash(): Promise<Ed25519KeyHash> {
-    await ready;
-    const hash = crypto_generichash(ED25519_PUBLIC_KEY_HASH_LENGTH, this.#keyMaterial);
+    await sodium.ready;
+    const hash = sodium.crypto_generichash(ED25519_PUBLIC_KEY_HASH_LENGTH, this.#keyMaterial);
     return Ed25519KeyHash.fromBytes(hash);
   }
 

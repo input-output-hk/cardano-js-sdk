@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Cardano,
+  CardanoNodeUtil,
   HealthCheckResponse,
   OutsideOfValidityIntervalData,
   ProviderError,
@@ -88,7 +89,7 @@ export class SmartTxSubmitProvider implements TxSubmitProvider {
         retryBackoff({
           ...this.#retryBackoffConfig,
           shouldRetry: (error) =>
-            error instanceof ProviderError &&
+            CardanoNodeUtil.isProviderError(error) &&
             [ProviderFailure.Unhealthy, ProviderFailure.ConnectionFailure].includes(error.reason)
         })
       )

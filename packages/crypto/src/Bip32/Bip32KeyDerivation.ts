@@ -2,12 +2,7 @@
 /* eslint-disable unicorn/number-literal-case */
 import { InvalidArgumentError } from '@cardano-sdk/util';
 import { add256bits, add28Mul8 } from './arithmetic';
-import {
-  crypto_auth_hmacsha512,
-  crypto_core_ed25519_add,
-  crypto_scalarmult_ed25519_base_noclamp
-} from 'libsodium-wrappers-sumo';
-
+import sodium from 'libsodium-wrappers-sumo';
 /**
  * Check if the index is hardened.
  *
@@ -36,9 +31,9 @@ const deriveHardened = (
   iv.copy(data, 1 + 32);
 
   data[0] = 0x00;
-  const zMac = crypto_auth_hmacsha512(data, chainCode);
+  const zMac = sodium.crypto_auth_hmacsha512(data, chainCode);
   data[0] = 0x01;
-  const ccMac = crypto_auth_hmacsha512(data, chainCode);
+  const ccMac = sodium.crypto_auth_hmacsha512(data, chainCode);
 
   return { ccMac, zMac };
 };
@@ -54,14 +49,14 @@ const deriveSoft = (index: number, scalar: Buffer, chainCode: Buffer): { zMac: U
   const data = Buffer.allocUnsafe(1 + 32 + 4);
   data.writeUInt32LE(index, 1 + 32);
 
-  const vk = Buffer.from(crypto_scalarmult_ed25519_base_noclamp(scalar));
+  const vk = Buffer.from(sodium.crypto_scalarmult_ed25519_base_noclamp(scalar));
 
   vk.copy(data, 1);
 
   data[0] = 0x02;
-  const zMac = crypto_auth_hmacsha512(data, chainCode);
+  const zMac = sodium.crypto_auth_hmacsha512(data, chainCode);
   data[0] = 0x03;
-  const ccMac = crypto_auth_hmacsha512(data, chainCode);
+  const ccMac = sodium.crypto_auth_hmacsha512(data, chainCode);
 
   return { ccMac, zMac };
 };
@@ -74,7 +69,7 @@ const deriveSoft = (index: number, scalar: Buffer, chainCode: Buffer): { zMac: U
 const pointOfTrunc28Mul8 = (sk: Uint8Array) => {
   const scalar = add28Mul8(new Uint8Array(32).fill(0), sk);
 
-  return crypto_scalarmult_ed25519_base_noclamp(scalar);
+  return sodium.crypto_scalarmult_ed25519_base_noclamp(scalar);
 };
 
 /**
@@ -139,9 +134,9 @@ export const derivePublic = (key: Buffer, index: number): Buffer => {
 
   pk.copy(data, 1);
   data[0] = 0x02;
-  const z = crypto_auth_hmacsha512(data, cc);
+  const z = sodium.crypto_auth_hmacsha512(data, cc);
   data[0] = 0x03;
-  const c = crypto_auth_hmacsha512(data, cc);
+  const c = sodium.crypto_auth_hmacsha512(data, cc);
 
   const chainCode = c.slice(32, 64);
 
@@ -149,5 +144,5 @@ export const derivePublic = (key: Buffer, index: number): Buffer => {
 
   const p = pointOfTrunc28Mul8(zl);
 
-  return Buffer.concat([crypto_core_ed25519_add(p, pk), chainCode]);
+  return Buffer.concat([sodium.crypto_core_ed25519_add(p, pk), chainCode]);
 };

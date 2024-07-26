@@ -80,11 +80,15 @@ describe('createProviderStatusTracker', () => {
     rewardsProvider = new TrackedRewardsProvider(mockRewardsProvider());
   });
 
+  // n - not pending
+  // p - pending
   it('isAnyRequestPending$: true if there are any reqs in flight, false when all resolved', () => {
     createTestScheduler().run(({ cold, expectObservable }) => {
+      const source = 'ab-c-d-e-f-g-h-i';
+      const status = '-p--np--np------n';
       const getProviderSyncRelevantStats = jest
         .fn()
-        .mockReturnValueOnce(cold<ProviderFnStats[]>('ab-c-d-e-f-g-h-i', providerFnStats));
+        .mockReturnValueOnce(cold<ProviderFnStats[]>(source, providerFnStats));
       const tracker = createProviderStatusTracker(
         {
           assetProvider,
@@ -99,23 +103,52 @@ describe('createProviderStatusTracker', () => {
         { getProviderSyncRelevantStats }
       );
       // debounced by 1
-      expectObservable(tracker.isAnyRequestPending$).toBe('--b-c-d-e-f-----i', {
-        b: true,
-        c: false,
-        d: true,
-        e: false,
-        f: true,
-        i: false
+      expectObservable(tracker.isAnyRequestPending$).toBe(status, {
+        n: false,
+        p: true
       });
     });
   });
 
-  // eslint-disable-next-line max-len
-  it('isSettled$: false on load, true when all requests are resolved, then reverse of isAnyRequestPending', async () => {
+  it.each([
+    { descr: 'not-pending is debounced', expected: '---n|', source: 'aaa-|' },
+    { descr: 'pending are not debounced', expected: 'p--|', source: 'bbb|' },
+    { descr: 'not-pending are dropped because they were debounced, pending is emitted immediately', expected: '--p|', source: 'aab|' },
+    { descr: 'flipping pending status shows pending, then waits for the first not-pending debounce to expire', expected: 'p-----n|', source: 'bababa-|' }
+  ])('isAnyRequestPending$: %s', ({ descr, source, expected }) => {
     createTestScheduler().run(({ cold, expectObservable }) => {
       const getProviderSyncRelevantStats = jest
         .fn()
-        .mockReturnValueOnce(cold<ProviderFnStats[]>('-a-b-c-d-e-f-g-h-i', providerFnStats));
+        .mockReturnValueOnce(cold<ProviderFnStats[]>(source, providerFnStats));
+
+        const tracker = createProviderStatusTracker(
+          {
+            assetProvider,
+            chainHistoryProvider,
+            logger: dummyLogger,
+            networkInfoProvider,
+            rewardsProvider,
+            stakePoolProvider,
+            utxoProvider
+          },
+          { consideredOutOfSyncAfter: timeout },
+          { getProviderSyncRelevantStats }
+        );
+
+        expectObservable(tracker.isAnyRequestPending$).toBe(expected, {
+          n: false,
+          p: true
+        }, descr);
+    });
+  });
+
+  it('isSettled$: false on load, true when all requests are resolved, then reverse of isAnyRequestPending', async () => {
+    createTestScheduler().run(({ cold, expectObservable }) => {
+      const source = '-a-b-c-d-e-f-g-h-i';
+      const settle = 'a---------ef------i';
+      const getProviderSyncRelevantStats = jest
+        .fn()
+        .mockReturnValueOnce(cold<ProviderFnStats[]>(source, providerFnStats));
       const tracker = createProviderStatusTracker(
         {
           assetProvider,
@@ -130,7 +163,7 @@ describe('createProviderStatusTracker', () => {
         { getProviderSyncRelevantStats }
       );
       // debounced by 1
-      expectObservable(tracker.isSettled$).toBe('a---------e-f-----i', {
+      expectObservable(tracker.isSettled$).toBe(settle, {
         a: false,
         e: true,
         f: false,

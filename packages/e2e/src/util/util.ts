@@ -83,6 +83,9 @@ export const normalizeTxBody = (body: Cardano.HydratedTxBody | Cardano.TxBody) =
   dehydratedTx.inputs = sortTxIn(dehydratedTx.inputs);
   dehydratedTx.collaterals = sortTxIn(dehydratedTx.collaterals);
   dehydratedTx.referenceInputs = sortTxIn(dehydratedTx.referenceInputs);
+  if (dehydratedTx.withdrawals) {
+    dehydratedTx.withdrawals = sortBy(dehydratedTx.withdrawals, ['stakeAddress']);
+  }
 
   return dehydratedTx;
 };

@@ -1,8 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { APPLICATION_JSON, CONTENT_TYPE, HttpServer, HttpServerConfig, TxSubmitHttpService } from '../../src';
+import {
+  CardanoNodeUtil,
+  ProviderError,
+  TxSubmissionError,
+  TxSubmissionErrorCode,
+  TxSubmitProvider
+} from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { FATAL, createLogger } from 'bunyan';
-import { ProviderError, TxSubmissionError, TxSubmissionErrorCode, TxSubmitProvider } from '@cardano-sdk/core';
 import { bufferToHexString, fromSerializableObject } from '@cardano-sdk/util';
 import { getPort } from 'get-port-please';
 import { logger } from '@cardano-sdk/util-dev';
@@ -199,7 +205,7 @@ describe('TxSubmitHttpService', () => {
         try {
           await clientProvider.submitTx({ signedTransaction: emptyUintArrayAsHexString });
         } catch (error: any) {
-          if (error instanceof ProviderError) {
+          if (CardanoNodeUtil.isProviderError(error)) {
             const innerError = error.innerError as TxSubmissionError;
             expect(innerError).toBeInstanceOf(TxSubmissionError);
             expect(innerError.code).toBe(stubErrors[0].code);

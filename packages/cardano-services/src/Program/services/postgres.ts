@@ -115,6 +115,7 @@ export const getConnectionConfig = <Suffix extends ConnectionNames>(
   suffix: Suffix,
   options?: PosgresProgramOptions<Suffix>
 ): Observable<PgConnectionConfig> => {
+  const max = getPostgresOption(suffix, 'postgresPoolMax', options);
   const postgresConnectionString = getPostgresOption(suffix, 'postgresConnectionString', options);
   const postgresSslCaFile = getPostgresOption(suffix, 'postgresSslCaFile', options);
   const ssl = postgresSslCaFile ? { ca: loadSecret(postgresSslCaFile) } : undefined;
@@ -127,6 +128,7 @@ export const getConnectionConfig = <Suffix extends ConnectionNames>(
     return of({
       database: conn.database,
       host: conn.host,
+      max,
       password: conn.password,
       port: conn.port ? Number.parseInt(conn.port) : undefined,
       ssl: mergeTlsOptions(conn, ssl),

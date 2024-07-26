@@ -3,16 +3,7 @@ import { Ed25519PrivateExtendedKeyHex, Ed25519PrivateNormalKeyHex } from '../hex
 import { Ed25519PublicKey } from './Ed25519PublicKey';
 import { Ed25519Signature } from './Ed25519Signature';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import {
-  crypto_core_ed25519_scalar_add,
-  crypto_core_ed25519_scalar_mul,
-  crypto_core_ed25519_scalar_reduce,
-  crypto_hash_sha512,
-  crypto_scalarmult_ed25519_base_noclamp,
-  crypto_sign_detached,
-  crypto_sign_seed_keypair,
-  ready
-} from 'libsodium-wrappers-sumo';
+import sodium from 'libsodium-wrappers-sumo';
 
 const SCALAR_INDEX = 0;
 const SCALAR_SIZE = 32;
@@ -46,17 +37,20 @@ const extendedIv = (extendedKey: Uint8Array) => extendedKey.slice(IV_INDEX, IV_I
  */
 const signExtendedDetached = (extendedKey: Uint8Array, message: Uint8Array) => {
   const scalar = extendedScalar(extendedKey);
-  const publicKey = crypto_scalarmult_ed25519_base_noclamp(scalar);
-  const nonce = crypto_core_ed25519_scalar_reduce(
-    crypto_hash_sha512(Buffer.concat([extendedIv(extendedKey), message]))
+  const publicKey = sodium.crypto_scalarmult_ed25519_base_noclamp(scalar);
+  const nonce = sodium.crypto_core_ed25519_scalar_reduce(
+    sodium.crypto_hash_sha512(Buffer.concat([extendedIv(extendedKey), message]))
   );
 
-  const r = crypto_scalarmult_ed25519_base_noclamp(nonce);
+  const r = sodium.crypto_scalarmult_ed25519_base_noclamp(nonce);
 
-  let hram = crypto_hash_sha512(Buffer.concat([r, publicKey, message]));
-  hram = crypto_core_ed25519_scalar_reduce(hram);
+  let hram = sodium.crypto_hash_sha512(Buffer.concat([r, publicKey, message]));
+  hram = sodium.crypto_core_ed25519_scalar_reduce(hram);
 
-  return Buffer.concat([r, crypto_core_ed25519_scalar_add(crypto_core_ed25519_scalar_mul(hram, scalar), nonce)]);
+  return Buffer.concat([
+    r,
+    sodium.crypto_core_ed25519_scalar_add(sodium.crypto_core_ed25519_scalar_mul(hram, scalar), nonce)
+  ]);
 };
 
 /** Ed25519 private key type. */
@@ -87,12 +81,12 @@ export class Ed25519PrivateKey {
    * @returns the public key.
    */
   async toPublic(): Promise<Ed25519PublicKey> {
-    await ready;
+    await sodium.ready;
 
     return Ed25519PublicKey.fromBytes(
       this.__type === Ed25519PrivateKeyType.Extended
-        ? crypto_scalarmult_ed25519_base_noclamp(extendedScalar(this.#keyMaterial))
-        : crypto_sign_seed_keypair(this.#keyMaterial).publicKey
+        ? sodium.crypto_scalarmult_ed25519_base_noclamp(extendedScalar(this.#keyMaterial))
+        : sodium.crypto_sign_seed_keypair(this.#keyMaterial).publicKey
     );
   }
 
@@ -103,11 +97,11 @@ export class Ed25519PrivateKey {
    * @returns The Ed25519 digital signature.
    */
   async sign(message: HexBlob): Promise<Ed25519Signature> {
-    await ready;
+    await sodium.ready;
     return Ed25519Signature.fromBytes(
       this.__type === Ed25519PrivateKeyType.Extended
         ? signExtendedDetached(this.#keyMaterial, Buffer.from(message, 'hex'))
-        : crypto_sign_detached(
+        : sodium.crypto_sign_detached(
             Buffer.from(message, 'hex'),
             Buffer.concat([this.#keyMaterial, (await this.toPublic()).bytes()])
           )

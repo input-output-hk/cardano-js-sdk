@@ -136,11 +136,16 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
         return reject(new WrongTargetError('Not expecting sign requests at this time'));
       }
       const account = request.requestContext.wallet.accounts.find(
-        ({ accountIndex }) => accountIndex === request.requestContext.accountIndex
+        ({ accountIndex, purpose = KeyPurpose.STANDARD }) =>
+          accountIndex === request.requestContext.accountIndex && request.requestContext.purpose === purpose
       );
 
       if (!account) {
-        return reject(new errors.ProofGenerationError(`Account not found: ${request.requestContext.accountIndex}`));
+        return reject(
+          new errors.ProofGenerationError(
+            `Account not found: index=${request.requestContext.accountIndex}, purpose=${request.requestContext.purpose}`
+          )
+        );
       }
 
       const commonRequestProps = {
@@ -192,13 +197,13 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
                             chainId: request.requestContext.chainId,
                             communicationType: this.#hwOptions.communicationType,
                             extendedAccountPublicKey: account.extendedAccountPublicKey,
-                            purpose: KeyPurpose.STANDARD
+                            purpose: account.purpose || KeyPurpose.STANDARD
                           })
                         : this.#keyAgentFactory.Trezor({
                             accountIndex: request.requestContext.accountIndex,
                             chainId: request.requestContext.chainId,
                             extendedAccountPublicKey: account.extendedAccountPublicKey,
-                            purpose: KeyPurpose.STANDARD,
+                            purpose: account.purpose || KeyPurpose.STANDARD,
                             trezorConfig: this.#hwOptions
                           })
                     ).catch((error) => throwMaybeWrappedWithNoRejectError(error, options)),

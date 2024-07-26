@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.19.7...@cardano-sdk/tx-construction@0.19.8) (2024-07-25)
+
+### Bug Fixes
+
+* use drep key hash in stubSignTransaction ([af30b6b](https://github.com/input-output-hk/cardano-js-sdk/commit/af30b6b95f57a453080c7d2594df1e7bd7c6a6c9))
+
 ## [0.19.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.19.6...@cardano-sdk/tx-construction@0.19.7) (2024-07-22)
 
 **Note:** Version bump only for package @cardano-sdk/tx-construction

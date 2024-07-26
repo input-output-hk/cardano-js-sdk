@@ -4,8 +4,8 @@ import { Bip32PrivateKeyHex } from '../hexTypes';
 import { Bip32PublicKey } from './Bip32PublicKey';
 import { EXTENDED_ED25519_PRIVATE_KEY_LENGTH, Ed25519PrivateKey } from '../Ed25519e';
 import { InvalidArgumentError } from '@cardano-sdk/util';
-import { crypto_scalarmult_ed25519_base_noclamp, ready } from 'libsodium-wrappers-sumo';
 import { pbkdf2Sync } from 'pbkdf2';
+import sodium from 'libsodium-wrappers-sumo';
 
 const SCALAR_INDEX = 0;
 const SCALAR_SIZE = 32;
@@ -127,7 +127,7 @@ export class Bip32PrivateKey {
    * @returns The child BIP-32 key.
    */
   async derive(derivationIndices: number[]): Promise<Bip32PrivateKey> {
-    await ready;
+    await sodium.ready;
     let key = Buffer.from(this.#key);
 
     for (const index of derivationIndices) {
@@ -148,9 +148,9 @@ export class Bip32PrivateKey {
    * @returns the public key.
    */
   async toPublic(): Promise<Bip32PublicKey> {
-    await ready;
+    await sodium.ready;
     const scalar = extendedScalar(this.#key.slice(0, EXTENDED_ED25519_PRIVATE_KEY_LENGTH));
-    const publicKey = crypto_scalarmult_ed25519_base_noclamp(scalar);
+    const publicKey = sodium.crypto_scalarmult_ed25519_base_noclamp(scalar);
 
     return Bip32PublicKey.fromBytes(
       Buffer.concat([publicKey, this.#key.slice(CHAIN_CODE_INDEX, CHAIN_CODE_INDEX + CHAIN_CODE_SIZE)])
