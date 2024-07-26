@@ -123,8 +123,8 @@ describe('StakePoolHttpService', () => {
         identifier: {
           _condition: 'or',
           values: [
-            { name: poolsInfo[0].name },
-            { name: poolsInfo[1].name },
+            { name: poolsInfo[0].name.replace(/\+/, '\\+') },
+            { name: poolsInfo[1].name.replace(/\+/, '\\+') },
             { ticker: poolsInfo[0].ticker },
             { id: poolsInfo[2].id }
           ]
@@ -509,11 +509,16 @@ describe('StakePoolHttpService', () => {
             expect(responseWithAndCondition).toEqual(responseWithOrCondition);
           });
           it('and condition', async () => {
+            const idx = 0;
             const req: QueryStakePoolsArgs = {
               filters: {
                 identifier: {
                   _condition: 'and',
-                  values: [{ name: poolsInfo[0].name }, { ticker: poolsInfo[0].ticker }, { id: poolsInfo[0].id }]
+                  values: [
+                    { name: poolsInfo[idx].name.replace(/\+/, '\\+') },
+                    { ticker: poolsInfo[idx].ticker },
+                    { id: poolsInfo[idx].id }
+                  ]
                 }
               },
               pagination
@@ -526,14 +531,17 @@ describe('StakePoolHttpService', () => {
             expect(responseWithOrCondition).toEqual(responseWithAndConditionCached);
             expect(responseWithAndCondition).toEqual(responseWithAndConditionCached);
 
-            expect(responseWithOrCondition.pageResults[0]?.metadata?.name).toEqual(poolsInfo[0].name);
-            expect(responseWithOrCondition.pageResults[0]?.metadata?.ticker).toEqual(poolsInfo[0].ticker);
-            expect(responseWithOrCondition.pageResults[0]?.id).toEqual(poolsInfo[0].id);
+            expect(responseWithOrCondition.pageResults[0]?.metadata?.name).toEqual(poolsInfo[idx].name);
+            expect(responseWithOrCondition.pageResults[0]?.metadata?.ticker).toEqual(poolsInfo[idx].ticker);
+            expect(responseWithOrCondition.pageResults[0]?.id).toEqual(poolsInfo[idx].id);
           });
           it('is case insensitive', async () => {
-            const values = [{ name: poolsInfo[0].name, ticker: poolsInfo[0].ticker }];
+            const values = [{ name: poolsInfo[0].name.replace(/\+/, '\\+'), ticker: poolsInfo[0].ticker }];
             const insensitiveValues = [
-              { name: toInvertedCase(poolsInfo[0].name), ticker: toInvertedCase(poolsInfo[0].ticker) }
+              {
+                name: toInvertedCase(poolsInfo[0].name.replace(/\+/, '\\+')),
+                ticker: toInvertedCase(poolsInfo[0].ticker)
+              }
             ];
             const req: QueryStakePoolsArgs = {
               filters: {
