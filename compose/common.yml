@@ -148,7 +148,7 @@ services:
 
   cardano-node:
     <<: *logging
-    image: ghcr.io/intersectmbo/cardano-node:${CARDANO_NODE_VERSION:-9.0.0}
+    image: ghcr.io/intersectmbo/cardano-node:${CARDANO_NODE_VERSION:-9.1.0}
     command:
       [
         'run',
@@ -194,7 +194,7 @@ services:
 
   cardano-submit-api:
     command: --config /config/cardano-submit-api/config.json --listen-address 0.0.0.0 --socket-path /ipc/node.socket $SUBMIT_API_ARGS
-    image: ghcr.io/intersectmbo/cardano-submit-api:${CARDANO_NODE_VERSION:-9.0.0}
+    image: ghcr.io/intersectmbo/cardano-submit-api:${CARDANO_NODE_VERSION:-9.1.0}
     ports:
       - 8090:8090
     restart: on-failure
