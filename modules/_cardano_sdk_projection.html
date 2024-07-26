@@ -16,22 +16,96 @@
 <li><a href="_cardano_sdk_projection.html">@cardano-sdk/projection</a></li></ul>
 <h1>Module @cardano-sdk/projection</h1></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/1e6c600/packages/projection/src/index.ts#L1">packages/projection/src/index.ts:1</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/32d6992/packages/projection/src/index.ts#L1">packages/projection/src/index.ts:1</a></li></ul></aside>
 <section class="tsd-panel-group">
 <section class="tsd-panel tsd-typography">
 <a href="#cardano-js-sdk--projection" id="cardano-js-sdk--projection" style="color: inherit; text-decoration: none;">
   <h1>Cardano JS SDK | projection</h1>
 </a>
-<p>Chain Sync event projection utilities.</p>
+<p>This package is a library of generic projection types and utilities.</p>
+<blockquote>
+<p>[!TIP]
+<a href="https://event-driven.io/en/projections_and_read_models_in_event_driven_architecture/">Guide to Projections and Read Models in Event-Driven Architecture</a></p>
+</blockquote>
+<p>If you&#39;re interested in projecting into PostgreSQL database, see <a href="../projection-typeorm">projection-typeorm</a> package.</p>
+<p>If you&#39;re interested in projector application as run by Lace, see <a href="../cardano-services/src/Projection">setup</a> and <a href="../cardano-services/README.md">README</a> in <code>cardano-services</code> package.</p>
 
-<a href="#summary" id="summary" style="color: inherit; text-decoration: none;">
-  <h2>Summary</h2>
+<a href="#prerequisites" id="prerequisites" style="color: inherit; text-decoration: none;">
+  <h2>Prerequisites</h2>
 </a>
-<p>Projection is based on <a href="https://rxjs.dev/">RxJS</a>, where source observable of Chain Sync events is processed with various <a href="./src/operators/">operators</a>.</p>
-<p>There are no restrictions what an operator can do - you can utilize the full power of RxJS which makes it very flexible.</p>
-<p>All operators implemented in this package are extending the source event object with extra properties, e.g.</p>
-<pre><code class="language-ts"><span class="hl-5">Bootstrap</span><span class="hl-1">.</span><span class="hl-0">fromCardanoNode</span><span class="hl-1">({ </span><span class="hl-5">buffer</span><span class="hl-1">, </span><span class="hl-5">cardanoNode</span><span class="hl-1">, </span><span class="hl-5">logger</span><span class="hl-1"> }).</span><span class="hl-0">pipe</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-5">Mappers</span><span class="hl-1">.</span><span class="hl-0">withStakeKeys</span><span class="hl-1">(),</span><br/><span class="hl-1">  </span><span class="hl-0">tap</span><span class="hl-1">(({ </span><span class="hl-5">stakeKeys</span><span class="hl-1"> }) </span><span class="hl-6">=&gt;</span><span class="hl-1"> </span><span class="hl-5">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-3">&#39;stakeKeys&#39;</span><span class="hl-1">, </span><span class="hl-5">stakeKeys</span><span class="hl-1">)),</span><br/><span class="hl-1">  </span><span class="hl-5">Mappers</span><span class="hl-1">.</span><span class="hl-0">withStakePools</span><span class="hl-1">(),</span><br/><span class="hl-1">  </span><span class="hl-0">tap</span><span class="hl-1">(({ </span><span class="hl-5">stakePools</span><span class="hl-1"> }) </span><span class="hl-6">=&gt;</span><span class="hl-1"> </span><span class="hl-5">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-3">&#39;stakePools&#39;</span><span class="hl-1">, </span><span class="hl-5">stakePools</span><span class="hl-1">))</span><br/><span class="hl-1">);</span>
+<p>In order to understand how <code>cardano-js-sdk</code> projections work, you&#39;ll first need basic understanding of:</p>
+<ul>
+<li><a href="https://github.com/tc39/proposal-observable">Observables</a> (we&#39;re using <a href="https://rxjs.dev/">RxJS</a> implementation)</li>
+<li>Chain Sync mini protocol (well explained in <a href="https://ogmios.dev/mini-protocols/local-chain-sync/">Ogmios docs</a>)</li>
+</ul>
+
+<a href="#types" id="types" style="color: inherit; text-decoration: none;">
+  <h2>Types</h2>
+</a>
+
+<a href="#projectioneventltextrapropsgt" id="projectioneventltextrapropsgt" style="color: inherit; text-decoration: none;">
+  <h3>ProjectionEvent&lt;ExtraProps&gt;</h3>
+</a>
+<p>All projections start by obtaining a source/producer<sup>1</sup>, which is an <code>Observable&lt;ProjectionEvent&lt;{}&gt;&gt;</code>. These events are very similar to Chain Sync events, but there are some important differences:</p>
+<ol>
+<li>Block format is compatible with types from <code>@cardano-sdk/core</code> package.</li>
+<li>Events include some additional properties: <code>{eraSumaries, genesisParameters, epochNo, crossEpochBoundary}</code>.</li>
+<li><code>RollBackward</code> events include block data (instead of just specifying the rollback point), and are emitted once for <strong>each</strong> rolled back block.</li>
+</ol>
+
+<a href="#extraprops-generic-parameter" id="extraprops-generic-parameter" style="color: inherit; text-decoration: none;">
+  <h4>ExtraProps (Generic Parameter)</h4>
+</a>
+<p>Source observable can be piped through a series of RxJS operators, which may add some properties to the event. In a nutshell, <code>ProjectionEvent&lt;T&gt; = ProjectionEvent&lt;{}&gt; &amp; T</code>. For more detail see <a href="#mappers">Mappers</a>.</p>
+
+<a href="#stabilitywindowbuffer" id="stabilitywindowbuffer" style="color: inherit; text-decoration: none;">
+  <h3>StabilityWindowBuffer</h3>
+</a>
+<p>Since <code>ProjectionEvent{eventType=RollBackward}</code> includes block data, we must store some number (at least <code>k</code>, which is the &quot;security parameter&quot;) of latest blocks so that if a fork/rollback happens, we can call <code>StabilityWindowBuffer.getBlock(hash)</code> in order to build a valid <code>ProjectionEvent</code>.</p>
+
+<a href="#observablecardanonode" id="observablecardanonode" style="color: inherit; text-decoration: none;">
+  <h3>ObservableCardanoNode</h3>
+</a>
+<p>This is our interface to Chain Sync and Local State Query protocols of Cardano node. The only implementation available in <code>cardano-js-sdk</code> is <code>OgmiosObservableCardanoNode</code>.</p>
+
+<a href="#utilities" id="utilities" style="color: inherit; text-decoration: none;">
+  <h2>Utilities</h2>
+</a>
+
+<a href="#bootstrapfromcardanonode" id="bootstrapfromcardanonode" style="color: inherit; text-decoration: none;">
+  <h3>Bootstrap.fromCardanoNode</h3>
+</a>
+<p>Creates a projection source (<code>Observable&lt;ProjectionEvent&gt;</code>) from:</p>
+<ul>
+<li><a href="#observablecardanonode">ObservableCardanoNode</a></li>
+<li><a href="#stabilitywindowbuffer">StabilityWindowBuffer</a></li>
+<li><code>Observable&lt;TipOrOrigin&gt;</code> that emits block header of last processed event (local tip). This is used to find intersection point.</li>
+</ul>
+<pre><code class="language-mermaid"><span class="hl-1">---</span><br/><span class="hl-1">title: Bootstrap Algorithm</span><br/><span class="hl-1">---</span><br/><span class="hl-9">flowchart</span><span class="hl-1"> </span><span class="hl-0">LR</span><br/><span class="hl-1">    </span><span class="hl-5">subscribe</span><span class="hl-9">[</span><span class="hl-3">Subscribe</span><span class="hl-9">]</span><span class="hl-1"> </span><span class="hl-9">--&gt;</span><span class="hl-1"> </span><span class="hl-5">find-intersect</span><span class="hl-9">{</span><span class="hl-3">Find node\nintersection\nwith local tip</span><span class="hl-9">}</span><br/><span class="hl-1">    </span><span class="hl-5">find-intersect </span><span class="hl-9">--&gt;</span><span class="hl-1"> |</span><span class="hl-5">Found</span><span class="hl-1">| </span><span class="hl-5">start</span><span class="hl-9">[</span><span class="hl-3">Start ChainSync\nfrom intersection</span><span class="hl-9">]</span><br/><span class="hl-1">    </span><span class="hl-5">start </span><span class="hl-9">--&gt;</span><span class="hl-1"> </span><span class="hl-5">get-event</span><span class="hl-9">{</span><span class="hl-3">Get event\nfrom node,\ncheck type</span><span class="hl-9">}</span><br/><span class="hl-1">    </span><span class="hl-5">get-event </span><span class="hl-9">--&gt;</span><span class="hl-1"> |</span><span class="hl-5">RollBackward</span><span class="hl-1">| </span><span class="hl-5">get-block</span><span class="hl-9">[</span><span class="hl-3">Get block from StabilityWindowBuffer</span><span class="hl-9">]</span><br/><span class="hl-1">    </span><span class="hl-5">get-event </span><span class="hl-9">--&gt;</span><span class="hl-1"> |</span><span class="hl-5">RollForward</span><span class="hl-1">| </span><span class="hl-5">hydrate</span><br/><span class="hl-1">    </span><span class="hl-5">start </span><span class="hl-9">--&gt;</span><span class="hl-1"> </span><span class="hl-5">hydrate</span><span class="hl-9">[</span><span class="hl-3">Hydrate event\nwith additional\npropertes</span><span class="hl-9">]</span><br/><span class="hl-1">    </span><span class="hl-5">hydrate </span><span class="hl-9">--&gt;</span><span class="hl-1"> </span><span class="hl-5">emit</span><span class="hl-9">[</span><span class="hl-3">Emit\nProjectionEvent</span><span class="hl-9">]</span><br/><span class="hl-1">    </span><span class="hl-5">find-intersect </span><span class="hl-9">--&gt;</span><span class="hl-1"> |</span><span class="hl-5">Not Found</span><span class="hl-1">| </span><span class="hl-5">get-block</span><span class="hl-9">[</span><span class="hl-3">Get block from\nStabilityWindowBuffer</span><span class="hl-9">]</span><br/><span class="hl-1">    </span><span class="hl-5">get-block </span><span class="hl-9">--&gt;</span><span class="hl-1"> </span><span class="hl-5">rollback</span><span class="hl-9">[</span><span class="hl-3">Create\nRollBackward\nevent</span><span class="hl-9">]</span><br/><span class="hl-1">    </span><span class="hl-5">rollback </span><span class="hl-9">--&gt;</span><span class="hl-1"> </span><span class="hl-5">hydrate</span><br/><span class="hl-1">    </span><span class="hl-5">rollback </span><span class="hl-9">--&gt;</span><span class="hl-1"> </span><span class="hl-5">wait</span><span class="hl-9">[</span><span class="hl-3">Wait for\nlocal tip change</span><span class="hl-9">]</span><br/><span class="hl-1">    </span><span class="hl-5">wait </span><span class="hl-9">--&gt;</span><span class="hl-1"> </span><span class="hl-5">is-rollback-point</span><span class="hl-9">{</span><span class="hl-3">Is rollback point?</span><span class="hl-9">}</span><br/><span class="hl-1">    </span><span class="hl-5">is-rollback-point </span><span class="hl-9">--&gt;</span><span class="hl-1"> |</span><span class="hl-5">No</span><span class="hl-1">| </span><span class="hl-5">get-block</span><br/><span class="hl-1">    </span><span class="hl-5">is-rollback-point </span><span class="hl-9">--&gt;</span><span class="hl-1"> |</span><span class="hl-5">Yes</span><span class="hl-1">| </span><span class="hl-5">started-sync</span><span class="hl-9">{</span><span class="hl-3">Already started\nChain Sync?</span><span class="hl-9">}</span><br/><span class="hl-1">    </span><span class="hl-5">started-sync </span><span class="hl-9">--&gt;</span><span class="hl-1"> |</span><span class="hl-5">Yes</span><span class="hl-1">| </span><span class="hl-5">get-event</span><br/><span class="hl-1">    </span><span class="hl-5">started-sync </span><span class="hl-9">--&gt;</span><span class="hl-1"> |</span><span class="hl-5">No</span><span class="hl-1">| </span><span class="hl-5">find-intersect</span>
 </code></pre>
+
+<a href="#mappers" id="mappers" style="color: inherit; text-decoration: none;">
+  <h3>Mappers</h3>
+</a>
+<p>Projections are typically</p>
+<ol>
+<li>Interpreting the block (e.g. extracting some relevant properties from all transactions). <code>Mappers</code> is a namespace that contains a collection of RxJS operators that process the ProjectionEvent (block) and emit a new event object that has some additional properties.</li>
+<li>Doing something with it (e.g. store into the database).</li>
+</ol>
+<p>Here&#39;s an example:</p>
+<pre><code class="language-typescript"><span class="hl-11">// source$: Observable&lt;ProjectionEvent&lt;{}&gt;&gt;</span><br/><span class="hl-5">source$</span><span class="hl-1">.</span><span class="hl-0">pipe</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-11">// policyId is a parameter that should be provided</span><br/><span class="hl-1">  </span><span class="hl-11">// by handle issuer, e.g. ADA Handle</span><br/><span class="hl-1">  </span><span class="hl-5">Mappers</span><span class="hl-1">.</span><span class="hl-0">withHandles</span><span class="hl-1">({ </span><span class="hl-5">policyId</span><span class="hl-1"> }),</span><br/><span class="hl-1">  </span><span class="hl-11">// type WithHandles = { handles: HandleOwnership; }</span><br/><span class="hl-1">  </span><span class="hl-11">// Event type can also be inferred (no need for explicit type declaration)</span><br/><span class="hl-1">  </span><span class="hl-0">tap</span><span class="hl-1">((</span><span class="hl-5">event</span><span class="hl-1">: </span><span class="hl-10">ProjectionEvent</span><span class="hl-1">&lt;</span><span class="hl-10">WithHandles</span><span class="hl-1">&gt;) </span><span class="hl-6">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-5">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-3">&#39;Handles found by withHandles operator&#39;</span><span class="hl-1">, </span><span class="hl-5">event</span><span class="hl-1">.</span><span class="hl-5">handles</span><span class="hl-1">);</span><br/><span class="hl-1">  })</span><br/><span class="hl-1">);</span>
+</code></pre>
+
+<a href="#other-utils" id="other-utils" style="color: inherit; text-decoration: none;">
+  <h3>Other Utils</h3>
+</a>
+
+<a href="#inmemorystabilitywindowbuffer" id="inmemorystabilitywindowbuffer" style="color: inherit; text-decoration: none;">
+  <h4>InMemoryStabilityWindowBuffer</h4>
+</a>
+<p>If your application doesn&#39;t need persistence, you can use in-memory implementation of <a href="#stabilitywindowbuffer">StabilityWindowBuffer</a>, which can also be used as local tip tracker for Bootstrap (provides <code>Observable&lt;TipOrOrigin&gt;</code>).</p>
+<hr>
+<p><em><sup>1</sup>Currently our projection source observable is not a pure &#39;Producer&#39;, as events have a <code>requestNext</code> method that is used to control the source. This is subject to change in the future.</em></p>
 </section></section>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
