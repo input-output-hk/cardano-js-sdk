@@ -14,7 +14,6 @@ interface TypeormServiceDependencies {
 export abstract class TypeormService extends RunnableModule {
   #entities: Function[];
   #connectionConfig$: Observable<PgConnectionConfig>;
-  logger: Logger;
   protected dataSource$ = new BehaviorSubject<DataSource | null>(null);
   #subscription: Subscription | undefined;
 
