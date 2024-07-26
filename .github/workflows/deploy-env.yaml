@@ -49,5 +49,5 @@ jobs:
           source .envrc.local
           nix develop -L --command bash -c '
             set -euo pipefail
-            echo "yes" | nix run .#cardano-services.${{ inputs.environment || "ops-preview-1@us-east-1" }}.apply
+            echo "yes" | nix run .#cardano-services.${{ inputs.environment || \'ops-preview-1@us-east-1\' }}.apply
           '
