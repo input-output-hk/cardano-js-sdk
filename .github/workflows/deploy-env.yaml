@@ -47,5 +47,7 @@ jobs:
         run: |
           echo "${{ secrets.ENVRC }}" > .envrc.local
           source .envrc.local
+          which aws || true
           nix develop
+          which aws
           echo "yes" | nix run .#cardano-services.${{ inputs.environment || 'ops-preview-1@us-east-1' }}.apply
