@@ -49,7 +49,6 @@ import {
   EpochInfo,
   EraSummary,
   HandleProvider,
-  ProviderError,
   RewardsProvider,
   Serialization,
   StakePoolProvider,
@@ -656,10 +655,11 @@ export class BaseWallet implements ObservableWallet {
     } catch (error) {
       if (
         mightBeAlreadySubmitted &&
-        error instanceof ProviderError &&
+        CardanoNodeUtil.isProviderError(error) &&
         // Review: not sure if those 2 errors cover the original ones: there is no longer a CollectErrorsError or BadInputsError
-        ((CardanoNodeUtil.isValueNotConservedError(error.innerError) && !error.innerError.data) ||
-          error.innerError.data.produced.coins === 0n ||
+        ((CardanoNodeUtil.isValueNotConservedError(error.innerError) &&
+          // error.innerError.data is not set by cardano submit api. It is only set when error is coming from Ogmios.
+          (!error.innerError?.data || error.innerError.data.produced.coins === 0n)) ||
           // TODO: check if IncompleteWithdrawals available withdrawal amount === wallet's reward acc balance?
           // Not sure what the 'Withdrawals' in error data is exactly: value being withdrawed, or reward acc balance
           CardanoNodeUtil.isIncompleteWithdrawalsError(error.innerError) ||

@@ -1,5 +1,6 @@
 import * as OpenApiValidator from 'express-openapi-validator';
 import {
+  CardanoNodeUtil,
   HealthCheckResponse,
   HttpProviderConfigPaths,
   Provider,
@@ -43,7 +44,7 @@ export abstract class HttpService extends RunnableModule {
         body = await this.healthCheck();
       } catch (error) {
         logger.error(error);
-        body = error instanceof ProviderError ? error.message : 'Unknown error';
+        body = CardanoNodeUtil.isProviderError(error) ? error.message : 'Unknown error';
         res.statusCode = 500;
       }
       res.send(body);
@@ -92,7 +93,7 @@ export abstract class HttpService extends RunnableModule {
       } catch (error) {
         logger.error(error);
 
-        if (error instanceof ProviderError) {
+        if (CardanoNodeUtil.isProviderError(error)) {
           const code = providerFailureToStatusCodeMap[error.reason];
 
           return HttpServer.sendJSON(res, error, code);

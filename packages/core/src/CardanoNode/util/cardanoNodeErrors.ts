@@ -13,6 +13,7 @@ import {
   UnknownOutputReferencesData,
   ValueNotConservedData
 } from '../types';
+import { ProviderError } from '../../errors';
 import { isProductionEnvironment, stripStackTrace } from '@cardano-sdk/util';
 
 type InferObjectType<T> = T extends new (...args: any[]) => infer O ? O : never;
@@ -103,6 +104,8 @@ export const asGeneralCardanoNodeErrorCode = (code: unknown): GeneralCardanoNode
   isGeneralCardanoNodeErrorCode(code) ? code : null;
 export const asTxSubmissionErrorCode = (code: unknown): TxSubmissionErrorCode | null =>
   isTxSubmissionErrorCode(code) ? code : null;
+
+export const isProviderError = (error: unknown): error is ProviderError<unknown> => error instanceof ProviderError;
 
 export const isOutsideOfValidityIntervalError = (
   error: unknown

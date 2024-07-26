@@ -187,7 +187,7 @@ services:
     healthcheck:
       retries: 2000
     ports:
-      - ${OGMIOS_PORT:-1337}:1337
+      - ${OGMIOS_PORT:-1340}:1337
     restart: on-failure
     volumes:
       - node-ipc:/ipc
@@ -241,7 +241,7 @@ services:
       timeout: 5s
       retries: 10
     ports:
-      - ${POSTGRES_PORT:-5432}:5432
+      - ${POSTGRES_PORT:-5435}:5432
     restart: on-failure
     secrets:
       - postgres_db_db_sync

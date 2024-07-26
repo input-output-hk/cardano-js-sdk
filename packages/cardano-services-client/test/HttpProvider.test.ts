@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-duplicate-string */
+import { CardanoNodeUtil, Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { HttpProviderConfig, createHttpProvider } from '../src';
-import { Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { Server } from 'http';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { getPort } from 'get-port-please';
@@ -115,7 +115,7 @@ describe('createHttpProvider', () => {
           await provider.noArgsEmptyReturn();
           throw new Error('Expected to throw');
         } catch (error) {
-          if (error instanceof ProviderError) {
+          if (CardanoNodeUtil.isProviderError(error)) {
             expect(error.reason).toBe(ProviderFailure.ConnectionFailure);
           } else {
             throw new TypeError('Invalid error type');
@@ -136,7 +136,7 @@ describe('createHttpProvider', () => {
           await provider.noArgsEmptyReturn();
           throw new Error('Expected to throw');
         } catch (error) {
-          if (error instanceof ProviderError) {
+          if (CardanoNodeUtil.isProviderError(error)) {
             expect(error.reason).toBe(ProviderFailure.ConnectionFailure);
           } else {
             throw new TypeError('Invalid error type');
@@ -160,7 +160,7 @@ describe('createHttpProvider', () => {
           await provider.noArgsEmptyReturn();
           throw new Error('Expected to throw');
         } catch (error) {
-          if (error instanceof ProviderError) {
+          if (CardanoNodeUtil.isProviderError(error)) {
             expect(error.innerError).toEqual(errorJson);
           } else {
             throw new TypeError('Expected ProviderError');

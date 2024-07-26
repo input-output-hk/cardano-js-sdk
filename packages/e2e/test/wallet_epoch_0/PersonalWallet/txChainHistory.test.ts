@@ -1,5 +1,5 @@
 import { BaseWallet } from '@cardano-sdk/wallet';
-import { Cardano, CardanoNodeUtil, ProviderError } from '@cardano-sdk/core';
+import { Cardano, CardanoNodeUtil } from '@cardano-sdk/core';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { getEnv, getWallet, normalizeTxBody, walletReady, walletVariables } from '../../../src';
 import { isNotNil } from '@cardano-sdk/util';
@@ -77,7 +77,7 @@ describe('PersonalWallet/txChainHistory', () => {
       // Submit the same transaction again.
       await wallet.submitTx(signedTx);
     } catch (error) {
-      if (error instanceof ProviderError) {
+      if (CardanoNodeUtil.isProviderError(error)) {
         expect(CardanoNodeUtil.isValueNotConservedError(error?.innerError)).toBeTruthy();
       }
     }
