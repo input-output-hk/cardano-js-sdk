@@ -3,9 +3,11 @@ import {
   Observable,
   combineLatest,
   concat,
+  debounce,
   debounceTime,
   distinctUntilChanged,
   filter,
+  interval,
   map,
   mergeMap,
   of,
@@ -79,13 +81,15 @@ export const createProviderStatusTracker = (
   const relevantStats$ = getProviderSyncRelevantStats(dependencies).pipe(share());
   const isAnyRequestPending$ = new TrackerSubject<boolean>(
     relevantStats$.pipe(
-      debounceTime(1), // resolved requests could trigger new requests
       map((allStats) =>
         allStats.some(
           ({ numCalls, numFailures, numResponses, didLastRequestFail }) =>
             didLastRequestFail || numCalls > numResponses + numFailures
         )
       ),
+      // do not debounce if there are pending requests; in case of many requests, it will be debounced
+      // for a long time, leaving the previous status unchanged
+      debounce((isReqPending) => (isReqPending ? of(true) : interval(1))),
       distinctUntilChanged(),
       tap((isReqPending) => logger.debug(`${isReqPending ? 'Some' : 'No'} requests are pending`))
     )
