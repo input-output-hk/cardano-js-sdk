@@ -9,6 +9,7 @@ import {
   ProviderFailure
 } from '@cardano-sdk/core';
 import { AssetEntity } from '@cardano-sdk/projection-typeorm';
+import { QueryRunner } from 'typeorm';
 import { TokenMetadataService } from '../types';
 import { TypeOrmNftMetadataService } from '../TypeOrmNftMetadataService';
 import { TypeormProvider, TypeormProviderDependencies } from '../../util';
@@ -36,14 +37,21 @@ export class TypeormAssetProvider extends TypeormProvider implements AssetProvid
   }
 
   async getAsset({ assetId, extraData }: GetAssetArgs): Promise<Asset.AssetInfo> {
-    const assetInfo = await this.#getAssetInfo(assetId);
+    return this.withDataSource(async (dataSource) => {
+      const queryRunner = dataSource.createQueryRunner();
+      try {
+        const assetInfo = await this.#getAssetInfo(assetId, queryRunner);
 
-    if (extraData?.nftMetadata) assetInfo.nftMetadata = await this.#getNftMetadata(assetInfo);
-    if (extraData?.tokenMetadata) {
-      assetInfo.tokenMetadata = (await this.#fetchTokenMetadataList([assetId]))[0];
-    }
+        if (extraData?.nftMetadata) assetInfo.nftMetadata = await this.#getNftMetadata(assetInfo, queryRunner);
+        if (extraData?.tokenMetadata) {
+          assetInfo.tokenMetadata = (await this.#fetchTokenMetadataList([assetId]))[0];
+        }
 
-    return assetInfo;
+        return assetInfo;
+      } finally {
+        await queryRunner.release();
+      }
+    });
   }
 
   async getAssets({ assetIds, extraData }: GetAssetsArgs): Promise<Asset.AssetInfo[]> {
@@ -55,25 +63,32 @@ export class TypeormAssetProvider extends TypeormProvider implements AssetProvid
       );
     }
 
-    const assetInfoList = await Promise.all(assetIds.map((assetId) => this.#getAssetInfo(assetId)));
+    return this.withDataSource(async (dataSource) => {
+      const queryRunner = dataSource.createQueryRunner();
+      try {
+        const assetInfoList = await Promise.all(assetIds.map((assetId) => this.#getAssetInfo(assetId, queryRunner)));
 
-    if (extraData?.nftMetadata) {
-      await Promise.all(
-        assetInfoList.map(async (assetInfo) => {
-          assetInfo.nftMetadata = await this.#getNftMetadata(assetInfo);
-        })
-      );
-    }
+        if (extraData?.nftMetadata) {
+          await Promise.all(
+            assetInfoList.map(async (assetInfo) => {
+              assetInfo.nftMetadata = await this.#getNftMetadata(assetInfo, queryRunner);
+            })
+          );
+        }
 
-    if (extraData?.tokenMetadata) {
-      const tokenMetadataList = await this.#fetchTokenMetadataList(assetIds);
+        if (extraData?.tokenMetadata) {
+          const tokenMetadataList = await this.#fetchTokenMetadataList(assetIds);
 
-      for (const [index, assetInfo] of assetInfoList.entries()) {
-        assetInfo.tokenMetadata = tokenMetadataList[index];
+          for (const [index, assetInfo] of assetInfoList.entries()) {
+            assetInfo.tokenMetadata = tokenMetadataList[index];
+          }
+        }
+
+        return assetInfoList;
+      } finally {
+        await queryRunner.release();
       }
-    }
-
-    return assetInfoList;
+    });
   }
 
   async #fetchTokenMetadataList(assetIds: Cardano.AssetId[]) {
@@ -93,43 +108,41 @@ export class TypeormAssetProvider extends TypeormProvider implements AssetProvid
     return tokenMetadataList;
   }
 
-  async #getNftMetadata(asset: Asset.AssetInfo): Promise<Asset.NftMetadata | null | undefined> {
+  async #getNftMetadata(
+    asset: Asset.AssetInfo,
+    queryRunner: QueryRunner
+  ): Promise<Asset.NftMetadata | null | undefined> {
     try {
-      return this.#nftMetadataService.getNftMetadata({
-        name: asset.name,
-        policyId: asset.policyId
-      });
+      return this.#nftMetadataService.getNftMetadataWith(
+        {
+          name: asset.name,
+          policyId: asset.policyId
+        },
+        queryRunner
+      );
     } catch (error) {
       this.logger.error('Failed to get nft metadata', asset.assetId, error);
     }
   }
 
-  async #getAssetInfo(assetId: Cardano.AssetId): Promise<Asset.AssetInfo> {
+  async #getAssetInfo(assetId: Cardano.AssetId, queryRunner: QueryRunner): Promise<Asset.AssetInfo> {
     const assetName = Cardano.AssetId.getAssetName(assetId);
     const policyId = Cardano.AssetId.getPolicyId(assetId);
     const fingerprint = Cardano.AssetFingerprint.fromParts(policyId, Cardano.AssetName(assetName));
 
-    return this.withDataSource(async (dataSource) => {
-      const queryRunner = dataSource.createQueryRunner();
-      let supply: bigint;
-      try {
-        const assetRepository = queryRunner.manager.getRepository(AssetEntity);
-        const asset = await assetRepository.findOneBy({ id: assetId });
-        if (!asset) throw new ProviderError(ProviderFailure.NotFound, undefined, `Asset not found '${assetId}'`);
-        supply = asset.supply!;
-      } finally {
-        await queryRunner.release();
-      }
+    const assetRepository = queryRunner.manager.getRepository(AssetEntity);
+    const asset = await assetRepository.findOneBy({ id: assetId });
+    if (!asset) throw new ProviderError(ProviderFailure.NotFound, undefined, `Asset not found '${assetId}'`);
+    const supply = asset.supply!;
 
-      return {
-        assetId,
-        fingerprint,
-        name: assetName,
-        policyId,
-        quantity: supply,
-        supply
-      };
-    });
+    return {
+      assetId,
+      fingerprint,
+      name: assetName,
+      policyId,
+      quantity: supply,
+      supply
+    };
   }
 
   async initializeImpl() {
