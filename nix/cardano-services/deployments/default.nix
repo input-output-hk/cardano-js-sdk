@@ -356,7 +356,7 @@ in
               env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
             handle-provider.enabled = true;
-            asset-provider.enabled = true;
+            #asset-provider.enabled = true;
             chain-history-provider = {
               enabled = true;
               replicas = 2;
