@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">88.23% </span>
+                <span class="strong">88.88% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>15/17</span>
+                <span class='fraction'>16/18</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">88.23% </span>
+                <span class="strong">88.88% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>15/17</span>
+                <span class='fraction'>16/18</span>
             </div>
         
             
@@ -107,9 +107,15 @@
 <a name='L42'></a><a href='#L42'>42</a>
 <a name='L43'></a><a href='#L43'>43</a>
 <a name='L44'></a><a href='#L44'>44</a>
-<a name='L45'></a><a href='#L45'>45</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">35x</span>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">35x</span>
@@ -118,8 +124,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
-<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -150,10 +161,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Asset, Cardano } from '@cardano-sdk/core';
 import { AssetPolicyIdAndName, NftMetadataService } from './types';
 import { NftMetadataEntity } from '@cardano-sdk/projection-typeorm';
+import { QueryRunner } from 'typeorm';
 import { TypeormProviderDependencies, TypeormService } from '../util';
 &nbsp;
 export class TypeOrmNftMetadataService extends TypeormService implements NftMetadataService {
@@ -162,37 +173,41 @@ export class TypeOrmNftMetadataService extends TypeormService implements NftMeta
   }
 &nbsp;
   async getNftMetadata(assetInfo: AssetPolicyIdAndName): Promise&lt;Asset.NftMetadata | null&gt; {
-    const assetId = Cardano.AssetId.fromParts(assetInfo.policyId, assetInfo.name);
     return this.withDataSource(async (dataSource) =&gt; {
       const queryRunner = dataSource.createQueryRunner();
-      let asset: NftMetadataEntity | null;
-&nbsp;
-      try {
-        const nftMetadataRepository = queryRunner.manager.getRepository(NftMetadataEntity);
-        asset = await nftMetadataRepository.findOneBy({
-          userTokenAsset: { id: assetId }
-        });
-      } catch (error) {
-<span class="cstat-no" title="statement not covered" >        this.logger.error(error);</span>
-<span class="cstat-no" title="statement not covered" >        asset = null;</span>
-      } finally {
-        await queryRunner.release();
-      }
-&nbsp;
-      if (!asset) {
-        return null;
-      }
-&nbsp;
-      return {
-        image: asset.image!,
-        name: asset.name!,
-        ...(asset.description &amp;&amp; { description: asset.description }),
-        ...(asset.files &amp;&amp; { files: asset.files }),
-        ...(asset.mediaType &amp;&amp; { mediaType: asset.mediaType as Asset.ImageMediaType }),
-        ...(asset.otherProperties &amp;&amp; { otherProperties: asset.otherProperties }),
-        version: asset.otherProperties?.get('version') as string
-      };
+      return this.getNftMetadataWith(assetInfo, queryRunner);
     });
+  }
+&nbsp;
+  async getNftMetadataWith(assetInfo: AssetPolicyIdAndName, queryRunner: QueryRunner) {
+    const assetId = Cardano.AssetId.fromParts(assetInfo.policyId, assetInfo.name);
+    let asset: NftMetadataEntity | null;
+&nbsp;
+    try {
+      const nftMetadataRepository = queryRunner.manager.getRepository(NftMetadataEntity);
+      asset = await nftMetadataRepository.findOneBy({
+        userTokenAsset: { id: assetId }
+      });
+    } catch (error) {
+<span class="cstat-no" title="statement not covered" >      this.logger.error(error);</span>
+<span class="cstat-no" title="statement not covered" >      asset = null;</span>
+    } finally {
+      await queryRunner.release();
+    }
+&nbsp;
+    if (!asset) {
+      return null;
+    }
+&nbsp;
+    return {
+      image: asset.image!,
+      name: asset.name!,
+      ...(asset.description &amp;&amp; { description: asset.description }),
+      ...(asset.files &amp;&amp; { files: asset.files }),
+      ...(asset.mediaType &amp;&amp; { mediaType: asset.mediaType as Asset.ImageMediaType }),
+      ...(asset.otherProperties &amp;&amp; { otherProperties: asset.otherProperties }),
+      version: asset.otherProperties?.get('version') as string
+    };
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -202,7 +217,7 @@ export class TypeOrmNftMetadataService extends TypeormService implements NftMeta
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-07-29T12:28:55.880Z
+                at 2024-07-29T13:00:54.084Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
