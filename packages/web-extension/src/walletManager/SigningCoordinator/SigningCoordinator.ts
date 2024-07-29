@@ -1,13 +1,13 @@
 import { Cardano, Serialization } from '@cardano-sdk/core';
+import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { CustomError } from 'ts-custom-error';
 import { InMemoryWallet, WalletType } from '../types';
-import { KeyAgent, KeyPurpose, SignBlobResult, TrezorConfig, errors } from '@cardano-sdk/key-management';
+import { KeyAgent, KeyPurpose, SignDataContext, TrezorConfig, errors } from '@cardano-sdk/key-management';
 import { KeyAgentFactory } from './KeyAgentFactory';
 import { Logger } from 'ts-log';
 import {
   RequestBase,
   RequestContext,
-  SignDataProps,
   SignDataRequest,
   SignOptions,
   SignRequest,
@@ -112,17 +112,17 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
   }
 
   async signData(
-    props: SignDataProps,
+    props: SignDataContext,
     requestContext: RequestContext<WalletMetadata, AccountMetadata>
-  ): Promise<SignBlobResult> {
+  ): Promise<Cip30DataSignature> {
     return this.#signRequest(
       this.signDataRequest$,
       {
-        ...props,
         requestContext,
+        signContext: props,
         walletType: requestContext.wallet.type
       },
-      (keyAgent) => keyAgent.signBlob(props.derivationPath, props.blob)
+      (keyAgent) => keyAgent.signCip8Data(props)
     );
   }
 

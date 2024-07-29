@@ -1,11 +1,12 @@
 import * as Crypto from '@cardano-sdk/crypto';
+import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
+import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
+import { HexBlob } from '@cardano-sdk/util';
 import {
-  AccountKeyDerivationPath,
   KeyAgent,
   KeyPurpose,
   KeyRole,
   SignBlobResult,
-  SignDataContext,
   SignTransactionContext,
   TransactionSigner,
   WitnessOptions,
@@ -13,8 +14,6 @@ import {
   Witnesser,
   util
 } from '@cardano-sdk/key-management';
-import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
-import { HexBlob } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { bip32Ed25519Factory, createStandaloneKeyAgent, getSharedWallet } from '../../../src';
 
@@ -204,11 +203,11 @@ export class SharedWalletWitnesser implements Witnesser {
     this.#stakingScript = stakingScript;
   }
 
-  async signBlob(
-    _derivationPath: AccountKeyDerivationPath,
-    _blob: HexBlob,
-    _context: SignDataContext
-  ): Promise<SignBlobResult> {
+  async signData(): Promise<Cip30DataSignature> {
+    throw new Error('Method not implemented.');
+  }
+
+  async signBlob(): Promise<SignBlobResult> {
     throw new Error('Method not implemented.');
   }
 

@@ -13,6 +13,8 @@ import {
 } from './types';
 import { Bip32Account } from './Bip32Account';
 import { Cardano } from '@cardano-sdk/core';
+import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
+import { Cip8SignDataContext } from './cip8';
 import { HexBlob } from '@cardano-sdk/util';
 
 export abstract class KeyAgentBase implements KeyAgent {
@@ -41,6 +43,7 @@ export abstract class KeyAgentBase implements KeyAgent {
   }
 
   abstract signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult>;
+  abstract signCip8Data(context: Cip8SignDataContext): Promise<Cip30DataSignature>;
   abstract exportRootPrivateKey(): Promise<Crypto.Bip32PrivateKeyHex>;
   abstract signTransaction(
     txInternals: Cardano.TxBodyWithHash,

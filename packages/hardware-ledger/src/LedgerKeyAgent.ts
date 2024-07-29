@@ -1,32 +1,50 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, NotImplementedError } from '@cardano-sdk/core';
+import {
+  AlgorithmId,
+  CBORValue,
+  COSESign1Builder,
+  HeaderMap,
+  Headers,
+  Label,
+  ProtectedHeaderMap
+} from '@emurgo/cardano-message-signing-nodejs';
+import { Cardano, NotImplementedError, util as coreUtils } from '@cardano-sdk/core';
 import {
   CardanoKeyConst,
   Cip1852PathLevelIndexes,
   CommunicationType,
+  GroupedAddress,
   KeyAgentBase,
   KeyAgentDependencies,
   KeyAgentType,
   KeyPurpose,
+  KeyRole,
   SerializableLedgerKeyAgentData,
   SignBlobResult,
   SignTransactionContext,
+  cip8,
   errors,
   util
 } from '@cardano-sdk/key-management';
+import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { HID } from 'node-hid';
+import { HexBlob, areNumbersEqualInConstantTime, areStringsEqualInConstantTime } from '@cardano-sdk/util';
 import { LedgerDevice, LedgerTransportType } from './types';
-import { areNumbersEqualInConstantTime, areStringsEqualInConstantTime } from '@cardano-sdk/util';
 import { str_to_path } from '@cardano-foundation/ledgerjs-hw-app-cardano/dist/utils/address';
 import { toLedgerTx } from './transformers';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import _LedgerConnection, {
+  AddressType,
+  BIP32Path,
   Certificate,
   CertificateType,
   CredentialParams,
   CredentialParamsType,
+  DeviceOwnedAddress,
   GetVersionResponse,
+  MessageAddressFieldType,
+  MessageData,
   PoolKeyType,
   PoolOwnerType,
   Transaction,
@@ -188,6 +206,111 @@ type DeviceConnectionsWithTheirInitialParams = { deviceConnection: LedgerConnect
 type OpenTransportForDeviceParams = {
   communicationType: CommunicationType;
   device: LedgerDevice;
+};
+
+const getDerivationPath = (
+  signWith: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID,
+  knownAddresses: GroupedAddress[],
+  accountIndex: number,
+  purpose: number
+): { signingPath: BIP32Path; addressParams: DeviceOwnedAddress } => {
+  if (Cardano.DRepID.isValid(signWith)) {
+    const path = util.accountKeyDerivationPathToBip32Path(accountIndex, util.DREP_KEY_DERIVATION_PATH, purpose);
+
+    return {
+      addressParams: {
+        params: {
+          spendingPath: path
+        },
+        type: AddressType.ENTERPRISE_KEY
+      },
+      signingPath: path
+    };
+  }
+
+  const isRewardAccount = signWith.startsWith('stake');
+
+  // Reward account
+  if (isRewardAccount) {
+    const knownRewardAddress = knownAddresses.find(({ rewardAccount }) => rewardAccount === signWith);
+
+    if (!knownRewardAddress)
+      throw new cip8.Cip30DataSignError(cip8.Cip30DataSignErrorCode.ProofGeneration, 'Unknown reward address');
+
+    const path = util.accountKeyDerivationPathToBip32Path(
+      accountIndex,
+      knownRewardAddress.stakeKeyDerivationPath || util.STAKE_KEY_DERIVATION_PATH,
+      purpose
+    );
+
+    return {
+      addressParams: {
+        params: {
+          stakingPath: path
+        },
+        type: AddressType.REWARD_KEY
+      },
+      signingPath: path
+    };
+  }
+
+  const knownAddress = knownAddresses.find(({ address }) => address === signWith);
+
+  if (!knownAddress) {
+    throw new cip8.Cip30DataSignError(cip8.Cip30DataSignErrorCode.ProofGeneration, 'Unknown address');
+  }
+
+  // Base address
+  if (knownAddress.rewardAccount) {
+    const spendingPath = util.accountKeyDerivationPathToBip32Path(
+      accountIndex,
+      {
+        index: knownAddress.index,
+        role: knownAddress.type as number as KeyRole
+      },
+      purpose
+    );
+
+    const stakingPath = util.accountKeyDerivationPathToBip32Path(
+      accountIndex,
+      knownAddress.stakeKeyDerivationPath || {
+        index: 0,
+        role: KeyRole.Stake
+      },
+      purpose
+    );
+
+    return {
+      addressParams: {
+        params: {
+          spendingPath,
+          stakingPath
+        },
+        type: AddressType.BASE_PAYMENT_KEY_STAKE_KEY
+      },
+      signingPath: spendingPath
+    };
+  }
+
+  const spendingPath = util.accountKeyDerivationPathToBip32Path(
+    accountIndex,
+    {
+      index: knownAddress.index,
+      role: knownAddress.type as number as KeyRole
+    },
+    purpose
+  );
+
+  // Enterprise Address
+  return {
+    addressParams: {
+      params: {
+        spendingPath
+      },
+      type: AddressType.ENTERPRISE_KEY
+    },
+    signingPath: spendingPath
+  };
 };
 
 export class LedgerKeyAgent extends KeyAgentBase {
@@ -546,7 +669,6 @@ export class LedgerKeyAgent extends KeyAgentBase {
      * VotingProcedures: We are currently supporting only keyHash and scriptHash voter types in voting procedures.
      * To sign tx with keyHash and scriptHash voter type we have to use PLUTUS_TRANSACTION signing mode
      */
-
     if (tx.collateralInputs || LedgerKeyAgent.isKeyHashOrScriptHashVoter(tx.votingProcedures)) {
       return TransactionSigningMode.PLUTUS_TRANSACTION;
     }
@@ -615,8 +737,66 @@ export class LedgerKeyAgent extends KeyAgentBase {
     }
   }
 
+  async signCip8Data(request: cip8.Cip8SignDataContext): Promise<Cip30DataSignature> {
+    try {
+      const { signingPath, addressParams } = getDerivationPath(
+        request.signWith,
+        request.knownAddresses,
+        this.accountIndex,
+        this.purpose
+      );
+
+      const messageData: MessageData = {
+        address: addressParams,
+        addressFieldType: MessageAddressFieldType.ADDRESS,
+        hashPayload: false,
+        messageHex: request.payload,
+        network: {
+          networkId: this.chainId.networkId,
+          protocolMagic: this.chainId.networkMagic
+        },
+        preferHexDisplay: false,
+        signingPath
+      };
+
+      const deviceConnection = await LedgerKeyAgent.checkDeviceConnection(
+        this.#communicationType,
+        this.deviceConnection
+      );
+
+      const result = await deviceConnection.signMessage(messageData);
+
+      // Re-create the CIP-008 payload the same way the firmware does it internally, otherwise the signature
+      // will not verify.
+      const addressBytes = coreUtils.hexToBytes(HexBlob(result.addressFieldHex));
+
+      const protectedHeaders = HeaderMap.new();
+      protectedHeaders.set_algorithm_id(Label.from_algorithm_id(AlgorithmId.EdDSA));
+      protectedHeaders.set_header(cip8.CoseLabel.address, CBORValue.new_bytes(addressBytes));
+
+      const builder = COSESign1Builder.new(
+        Headers.new(ProtectedHeaderMap.new(protectedHeaders), HeaderMap.new()),
+        coreUtils.hexToBytes(request.payload),
+        false
+      );
+
+      const coseSign1 = builder.build(Buffer.from(result.signatureHex, 'hex'));
+      const coseKey = cip8.createCoseKey(addressBytes, Crypto.Ed25519PublicKeyHex(result.signingPublicKeyHex));
+
+      return {
+        key: coreUtils.bytesToHex(coseKey.to_bytes()),
+        signature: coreUtils.bytesToHex(coseSign1.to_bytes())
+      };
+    } catch (error: any) {
+      if (error.code === 28_169) {
+        throw new errors.AuthenticationError('Transaction signing aborted', error);
+      }
+      throw transportTypedError(error);
+    }
+  }
+
   async signBlob(): Promise<SignBlobResult> {
-    throw new NotImplementedError('signBlob');
+    throw new NotImplementedError('Operation not supported!');
   }
 
   async exportRootPrivateKey(): Promise<Crypto.Bip32PrivateKeyHex> {

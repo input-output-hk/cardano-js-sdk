@@ -1,15 +1,14 @@
+import { Cardano, TxCBOR } from '@cardano-sdk/core';
+import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import {
-  AccountKeyDerivationPath,
   CommunicationType,
   InMemoryKeyAgent,
   KeyPurpose,
-  KeyRole,
-  SignBlobResult,
   SignDataContext,
   SignTransactionContext,
+  cip8,
   errors
 } from '@cardano-sdk/key-management';
-import { Cardano, TxCBOR } from '@cardano-sdk/core';
 import { Ed25519PublicKeyHex, Ed25519SignatureHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 import {
@@ -69,7 +68,11 @@ describe('SigningCoordinator', () => {
   });
 
   beforeEach(() => {
-    keyAgent = { signBlob: jest.fn(), signTransaction: jest.fn() } as unknown as jest.Mocked<InMemoryKeyAgent>;
+    keyAgent = {
+      signBlob: jest.fn(),
+      signCip8Data: jest.fn(),
+      signTransaction: jest.fn()
+    } as unknown as jest.Mocked<InMemoryKeyAgent>;
     keyAgentFactory.InMemory.mockReturnValue(keyAgent);
   });
 
@@ -172,41 +175,40 @@ describe('SigningCoordinator', () => {
 
   describe('signData', () => {
     const blob = HexBlob('abc123');
-    const signResult: SignBlobResult = {
-      publicKey: 'abc' as Ed25519PublicKeyHex,
-      signature: '123' as Ed25519SignatureHex
+    const signResult: Cip30DataSignature = {
+      key: 'abc' as cip8.CoseKeyCborHex,
+      signature: '123' as cip8.CoseSign1CborHex
     };
-    const signContext: SignDataContext = {};
-    const derivationPath: AccountKeyDerivationPath = { index: 0, role: KeyRole.DRep };
-
+    const signContext: SignDataContext = {
+      knownAddresses: [],
+      payload: blob,
+      signWith: 'stubAddress' as Cardano.PaymentAddress
+    };
     it('rejects with AuthenticationError when there is no subscriber', async () => {
-      keyAgent.signBlob.mockResolvedValueOnce(signResult);
-      await expect(
-        signingCoordinator.signData({ blob, derivationPath, signContext }, requestContext)
-      ).rejects.toThrowError(WrongTargetError);
+      keyAgent.signCip8Data.mockResolvedValueOnce(signResult);
+      await expect(signingCoordinator.signData(signContext, requestContext)).rejects.toThrowError(WrongTargetError);
     });
 
     it('rejects with ProofGenerationError when account is not found', async () => {
-      keyAgent.signBlob.mockResolvedValueOnce(signResult);
+      keyAgent.signCip8Data.mockResolvedValueOnce(signResult);
       // subscribe to witness requests
       void firstValueFrom(signingCoordinator.signDataRequest$);
+
       await expect(
-        signingCoordinator.signData({ blob, derivationPath, signContext }, { ...requestContext, accountIndex: 999_999 })
+        signingCoordinator.signData(signContext, { ...requestContext, accountIndex: 999_999 })
       ).rejects.toThrowError(errors.ProofGenerationError);
     });
 
     it('signs with key agent when subscriber calls sign()', async () => {
-      keyAgent.signBlob.mockResolvedValueOnce(signResult);
+      keyAgent.signCip8Data.mockResolvedValueOnce(signResult);
       const reqEmitted = firstValueFrom(signingCoordinator.signDataRequest$);
-      const context = { address: 'stubAddress' as Cardano.PaymentAddress, sender: { url: 'www.example.com' } };
-      const signed = signingCoordinator.signData(
-        {
-          blob,
-          derivationPath,
-          signContext: context
-        },
-        requestContext
-      );
+      const context = {
+        knownAddresses: [],
+        payload: blob,
+        sender: { url: 'www.example.com' },
+        signWith: 'stubAddress' as Cardano.PaymentAddress
+      };
+      const signed = signingCoordinator.signData(context, requestContext);
       const req = await reqEmitted;
 
       expect(req.signContext).toEqual(context);
@@ -217,7 +219,7 @@ describe('SigningCoordinator', () => {
 
     it('rejects with AuthenticationError when subscriber calls reject()', async () => {
       const reqEmitted = firstValueFrom(signingCoordinator.signDataRequest$);
-      const signed = signingCoordinator.signData({ blob, derivationPath, signContext }, requestContext);
+      const signed = signingCoordinator.signData(signContext, requestContext);
       const req = await reqEmitted;
       await req.reject("Don't want to");
       await expect(signed).rejects.toThrowError(errors.AuthenticationError);
@@ -225,9 +227,9 @@ describe('SigningCoordinator', () => {
 
     it('rejects when key agent rejects', async () => {
       const error = new errors.AuthenticationError('invalid passphrase');
-      keyAgent.signBlob.mockRejectedValueOnce(error);
+      keyAgent.signCip8Data.mockRejectedValueOnce(error);
       const reqEmitted = firstValueFrom(signingCoordinator.signDataRequest$);
-      const signed = signingCoordinator.signData({ blob, derivationPath, signContext }, requestContext);
+      const signed = signingCoordinator.signData(signContext, requestContext);
       const req = await reqEmitted;
       await expect(req.sign(passphrase)).rejects.toThrow(error);
       await expect(signed).rejects.toThrow(error);
@@ -237,9 +239,9 @@ describe('SigningCoordinator', () => {
     describe('willRetryOnFailure=true', () => {
       it('does not resolve to original caller until successful signing', async () => {
         const error = new Error('invalid passphrase, please retry');
-        keyAgent.signBlob.mockRejectedValueOnce(error).mockResolvedValueOnce(signResult);
+        keyAgent.signCip8Data.mockRejectedValueOnce(error).mockResolvedValueOnce(signResult);
         const reqEmitted = firstValueFrom(signingCoordinator.signDataRequest$);
-        const signed = signingCoordinator.signData({ blob, derivationPath, signContext }, requestContext);
+        const signed = signingCoordinator.signData(signContext, requestContext);
         const req = await reqEmitted;
         await expect(req.sign(passphrase, { willRetryOnFailure: true })).rejects.toThrow(error);
         await expect(req.sign(passphrase, { willRetryOnFailure: true })).resolves.toEqual(signResult);
@@ -249,9 +251,9 @@ describe('SigningCoordinator', () => {
 
       it('does not reject to original caller until explicit rejection', async () => {
         const error = new Error('invalid passphrase, call reject if dont want to sign again');
-        keyAgent.signBlob.mockRejectedValueOnce(error);
+        keyAgent.signCip8Data.mockRejectedValueOnce(error);
         const reqEmitted = firstValueFrom(signingCoordinator.signDataRequest$);
-        const signed = signingCoordinator.signData({ blob, derivationPath, signContext }, requestContext);
+        const signed = signingCoordinator.signData(signContext, requestContext);
         const req = await reqEmitted;
         await expect(req.sign(passphrase, { willRetryOnFailure: true })).rejects.toThrow(error);
         await req.reject('forgot password');

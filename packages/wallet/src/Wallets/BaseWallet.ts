@@ -86,7 +86,7 @@ import {
   tap,
   throwError
 } from 'rxjs';
-import { Bip32Account, GroupedAddress, WitnessedTx, Witnesser, cip8, util } from '@cardano-sdk/key-management';
+import { Bip32Account, GroupedAddress, WitnessedTx, Witnesser, util } from '@cardano-sdk/key-management';
 import { ChangeAddressResolver, InputSelector, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { Ed25519PublicKey, Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
@@ -796,17 +796,13 @@ export class BaseWallet implements ObservableWallet {
 
   async signData(props: SignDataProps): Promise<Cip30DataSignature> {
     if (isBip32PublicCredentialsManager(this.#publicCredentialsManager)) {
-      return cip8.cip30signData({
-        // LW-9989: signData probably needs to be refactored out of the wallet and supported as a stand alone util
-        // as this operation doesnt require any of the wallet state. Also this operation can only be performed
-        // by Bip32Ed25519 type of wallets.
-        knownAddresses: await firstValueFrom(this.addresses$),
-        witnesser: this.witnesser as util.Bip32Ed25519Witnesser,
-        ...props
+      return await this.witnesser.signData({
+        ...props,
+        knownAddresses: await firstValueFrom(this.addresses$)
       });
     }
 
-    throw new Error('getPubDRepKey is not supported by script wallets');
+    throw new Error('signData is not supported by script wallets');
   }
 
   async discoverAddresses(): Promise<GroupedAddress[]> {

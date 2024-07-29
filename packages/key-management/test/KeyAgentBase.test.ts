@@ -17,6 +17,7 @@ class MockKeyAgent extends KeyAgentBase {
 
   serializableDataImpl = jest.fn();
   signBlob = jest.fn();
+  signCip8Data = jest.fn();
   exportRootPrivateKey = jest.fn();
   signTransaction = jest.fn();
   signVotingMetadata = jest.fn();

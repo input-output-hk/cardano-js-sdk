@@ -5,11 +5,13 @@ import {
   Bip32Account,
   CommunicationType,
   SerializableLedgerKeyAgentData,
+  cip8,
   util
 } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BaseWallet, createPersonalWallet } from '../../../src';
-import { Cardano, Serialization } from '@cardano-sdk/core';
+import { COSEKey, COSESign1, SigStructure } from '@emurgo/cardano-message-signing-nodejs';
+import { Cardano, Serialization, util as coreUtils } from '@cardano-sdk/core';
 import { HID } from 'node-hid';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
@@ -43,6 +45,34 @@ const getStakeCredential = (rewardAccount: Cardano.RewardAccount) => {
     hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
     type: Cardano.CredentialType.KeyHash
   };
+};
+
+const signAndDecode = async (signWith: Cardano.PaymentAddress | Cardano.RewardAccount, wallet: BaseWallet) => {
+  const dataSignature = await wallet.signData({
+    payload: HexBlob('abc123'),
+    signWith
+  });
+
+  const coseKey = COSEKey.from_bytes(Buffer.from(dataSignature.key, 'hex'));
+  const coseSign1 = COSESign1.from_bytes(Buffer.from(dataSignature.signature, 'hex'));
+
+  const publicKeyHeader = coseKey.header(cip8.CoseLabel.x)!;
+  const publicKeyBytes = publicKeyHeader.as_bytes()!;
+  const publicKeyHex = coreUtils.bytesToHex(publicKeyBytes);
+  const signedData = coseSign1.signed_data();
+
+  return { coseKey, coseSign1, publicKeyHex, signedData };
+};
+
+const testAddressHeader = (signedData: SigStructure, signWith: Cardano.RewardAccount | Cardano.PaymentAddress) => {
+  const addressHeader = signedData.body_protected().deserialized_headers().header(cip8.CoseLabel.address)!;
+
+  // Subject to change (cbor vs raw bytes argument), PR open: https://github.com/cardano-foundation/CIPs/pull/148
+  // An alternative would be addressHeader.to_bytes(), although
+  // @emurgo/cardano-message-signing-nodejs only allows CBORValue for headers
+  const addressHeaderBytes = addressHeader.as_bytes();
+
+  expect(Buffer.from(addressHeaderBytes!).toString('hex')).toBe(Cardano.Address.fromBech32(signWith).toBytes());
 };
 
 describe('LedgerKeyAgent', () => {
@@ -671,6 +701,44 @@ describe('LedgerKeyAgent', () => {
             const signedTx = await builtTx.sign();
             // Payment witness + staking witness for withdrawals + DRep witness for voting
             expect(signedTx.tx.witness.signatures.size).toBe(3);
+          });
+
+          describe('CIP-008 Messages', () => {
+            it('can sign with reward account', async () => {
+              const signWith = (await firstValueFrom(wallet.addresses$))[0].rewardAccount;
+              const { coseSign1, publicKeyHex, signedData } = await signAndDecode(signWith, wallet);
+              const signedDataBytes = HexBlob.fromBytes(signedData.to_bytes());
+              const signatureBytes = HexBlob.fromBytes(coseSign1.signature()) as unknown as Crypto.Ed25519SignatureHex;
+              const cryptoProvider = new Crypto.SodiumBip32Ed25519();
+
+              testAddressHeader(signedData, signWith);
+
+              expect(
+                await cryptoProvider.verify(
+                  signatureBytes,
+                  signedDataBytes,
+                  publicKeyHex as unknown as Crypto.Ed25519PublicKeyHex
+                )
+              ).toBe(true);
+            });
+
+            it('can sign with base address', async () => {
+              const signWith = (await firstValueFrom(wallet.addresses$))[0].address;
+              const { coseSign1, publicKeyHex, signedData } = await signAndDecode(signWith, wallet);
+              const signedDataBytes = HexBlob.fromBytes(signedData.to_bytes());
+              const signatureBytes = HexBlob.fromBytes(coseSign1.signature()) as unknown as Crypto.Ed25519SignatureHex;
+              const cryptoProvider = new Crypto.SodiumBip32Ed25519();
+
+              testAddressHeader(signedData, signWith);
+
+              expect(
+                await cryptoProvider.verify(
+                  signatureBytes,
+                  signedDataBytes,
+                  publicKeyHex as unknown as Crypto.Ed25519PublicKeyHex
+                )
+              ).toBe(true);
+            });
           });
         });
       });

@@ -14,6 +14,8 @@ import {
   SignTransactionOptions
 } from './types';
 import { Cardano } from '@cardano-sdk/core';
+import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
+import { Cip8SignDataContext, cip30signData } from './cip8';
 import {
   DREP_KEY_DERIVATION_PATH,
   deriveAccountPrivateKey,
@@ -72,6 +74,10 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     const publicKey = await this.bip32Ed25519.getPublicKey(signingKey);
 
     return { publicKey, signature };
+  }
+
+  async signCip8Data(context: Cip8SignDataContext): Promise<Cip30DataSignature> {
+    return await cip30signData(this, context);
   }
 
   // To export mnemonic, get entropy by reversing this:

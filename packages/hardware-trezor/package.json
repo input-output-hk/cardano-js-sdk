@@ -48,6 +48,7 @@
   "dependencies": {
     "@cardano-sdk/core": "workspace:~",
     "@cardano-sdk/crypto": "workspace:~",
+    "@cardano-sdk/dapp-connector": "workspace:~",
     "@cardano-sdk/key-management": "workspace:~",
     "@cardano-sdk/tx-construction": "workspace:~",
     "@cardano-sdk/util": "workspace:~",

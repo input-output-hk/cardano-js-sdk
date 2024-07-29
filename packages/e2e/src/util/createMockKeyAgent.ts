@@ -28,6 +28,7 @@ export const createMockKeyAgent = (deriveAddressesReturn: GroupedAddress[] = [])
       purpose: KeyPurpose.STANDARD
     },
     signBlob: jest.fn(),
+    signCip8Data: jest.fn(),
     signTransaction: jest.fn()
   };
 };

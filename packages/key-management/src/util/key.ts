@@ -57,8 +57,9 @@ export const deriveAccountPrivateKey = async ({
  */
 export const accountKeyDerivationPathToBip32Path = (
   accountIndex: number,
-  { index, role }: AccountKeyDerivationPath
-): BIP32Path => [harden(CardanoKeyConst.PURPOSE), harden(CardanoKeyConst.COIN_TYPE), harden(accountIndex), role, index];
+  { index, role }: AccountKeyDerivationPath,
+  purpose: number = CardanoKeyConst.PURPOSE
+): BIP32Path => [harden(purpose), harden(CardanoKeyConst.COIN_TYPE), harden(accountIndex), role, index];
 
 /**
  * Constructs the hardened derivation path of the payment key for the
