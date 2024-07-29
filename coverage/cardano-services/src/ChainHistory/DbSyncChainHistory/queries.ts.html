@@ -494,19 +494,7 @@
 <a name='L429'></a><a href='#L429'>429</a>
 <a name='L430'></a><a href='#L430'>430</a>
 <a name='L431'></a><a href='#L431'>431</a>
-<a name='L432'></a><a href='#L432'>432</a>
-<a name='L433'></a><a href='#L433'>433</a>
-<a name='L434'></a><a href='#L434'>434</a>
-<a name='L435'></a><a href='#L435'>435</a>
-<a name='L436'></a><a href='#L436'>436</a>
-<a name='L437'></a><a href='#L437'>437</a>
-<a name='L438'></a><a href='#L438'>438</a>
-<a name='L439'></a><a href='#L439'>439</a>
-<a name='L440'></a><a href='#L440'>440</a>
-<a name='L441'></a><a href='#L441'>441</a>
-<a name='L442'></a><a href='#L442'>442</a>
-<a name='L443'></a><a href='#L443'>443</a>
-<a name='L444'></a><a href='#L444'>444</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">34x</span>
+<a name='L432'></a><a href='#L432'>432</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">102x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -769,21 +757,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -810,9 +783,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -898,7 +868,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1203,27 +1179,12 @@ export const findPoolRegisterCertsByTxIds = `
 		pool."view" AS pool_id,
 		tx.hash AS tx_id,
 		CASE
-			WHEN (
-				SELECT count(*) = 0
-				FROM pool_update AS pu
-				WHERE pu.registered_tx_id BETWEEN (
-					CASE WHEN (
-						SELECT count(*) FROM pool_retire AS pr
-						WHERE pr.announced_tx_id &lt; cert.registered_tx_id
-					) &gt; 0 THEN (
-						SELECT max(pr.announced_tx_id) FROM pool_retire AS pr
-						WHERE pr.announced_tx_id &lt; cert.registered_tx_id
-					)
-					ELSE 0 END
-				) AND cert.registered_tx_id - 1
-			) THEN pool_deposit
-			ELSE '0'
+			WHEN cert.deposit IS NULL THEN '0'
+			ELSE cert.deposit
 		END AS deposit
 	FROM tx
 	JOIN pool_update AS cert ON cert.registered_tx_id = tx.id
 	JOIN pool_hash AS pool ON pool.id = cert.hash_id
-	JOIN block ON block_id = block.id
-	JOIN epoch_param ON epoch_param.epoch_no = (CASE WHEN block.epoch_no &gt; 1 THEN block.epoch_no ELSE 1 END)
 	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC`;
 &nbsp;
@@ -1258,7 +1219,7 @@ export const findStakeCertsByTxIds = `
 		addr."view" AS address,
 		TRUE AS registration,
 		tx.hash AS tx_id,
-		epoch_param.key_deposit AS deposit
+		cert.deposit AS deposit
 	FROM tx
 	JOIN stake_registration AS cert ON cert.tx_id = tx.id
 	JOIN stake_address AS addr ON addr.id = cert.addr_id
@@ -1272,10 +1233,7 @@ export const findStakeCertsByTxIds = `
 		addr."view" AS address,
 		FALSE AS registration,
 		tx.hash AS tx_id,
-		(SELECT key_deposit FROM stake_registration AS sr
-			JOIN tx AS tx2 ON sr.tx_id = tx2.id
-			JOIN block ON tx2.block_id = block.id
-			JOIN epoch_param ON block.epoch_no = epoch_param.epoch_no
+		(SELECT sr.deposit FROM stake_registration AS sr
 			WHERE sr.addr_id = cert.addr_id
 				AND sr.tx_id &lt; tx.id
 			ORDER BY sr.tx_id DESC
@@ -1334,10 +1292,14 @@ export const findCommitteeRegistrationByTxIds = `
 	SELECT
 		cert_index,
 		tx.hash AS tx_id,
-		cold_key,
-		hot_key
+		ch1.raw AS cold_key,
+		ch1.has_script AS cold_key_has_script,
+		ch2.raw AS hot_key,
+		ch2.has_script AS hot_key_has_script
 	FROM tx
 	JOIN committee_registration AS cert ON cert.tx_id = tx.id
+	JOIN committee_hash AS ch1 ON cold_key_id = ch1.id
+	JOIN committee_hash AS ch2 ON hot_key_id = ch2.id
 	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC`;
 &nbsp;
@@ -1345,11 +1307,13 @@ export const findCommitteeResignByTxIds = `
 	SELECT
 		cert_index,
 		tx.hash AS tx_id,
-		cold_key,
+		ch.raw AS cold_key,
+		ch.has_script AS cold_key_has_script,
 		url,
 		data_hash
 	FROM tx
 	JOIN committee_de_registration AS cert ON cert.tx_id = tx.id
+	JOIN committee_hash AS ch ON cold_key_id = ch.id
 	LEFT JOIN voting_anchor AS anchor ON anchor.id = voting_anchor_id
 	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC`;
@@ -1399,7 +1363,7 @@ FROM combined`,
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-07-26T10:34:32.953Z
+                at 2024-07-29T12:28:55.880Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
