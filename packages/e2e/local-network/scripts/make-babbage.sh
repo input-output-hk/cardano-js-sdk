@@ -199,13 +199,19 @@ jq --raw-output ".protocolConsts.protocolMagic = ${NETWORK_MAGIC}" "${ROOT}/gene
 
 rm "${ROOT}/genesis/byron/genesis-wrong.json"
 
+if [[ "$NETWORK_SPEED" == "fast" ]]; then
+  SLOT_LENGTH=0.2
+else
+  SLOT_LENGTH=1
+fi
+
 jq -M "
 . + {
   activeSlotsCoeff: 0.1,
   epochLength: 1000,
   maxLovelaceSupply: $((MAX_SUPPLY * 3)),
   securityParam: 10,
-  slotLength: 0.2,
+  slotLength: ${SLOT_LENGTH},
   updateQuorum: 2
 } |
 .protocolParams += {
@@ -215,7 +221,7 @@ jq -M "
   minFeeB: 155381,
   minUTxOValue: 1000000,
   poolDeposit: 500000000,
-  protocolVersion: { major : 7, minor: 0 },
+  protocolVersion: { major : 10, minor: 0 },
   rho: 0.1,
   tau: 0.1
 }" "${ROOT}/genesis/shelley/copy-genesis.json" > "${ROOT}/genesis/shelley/genesis.json"

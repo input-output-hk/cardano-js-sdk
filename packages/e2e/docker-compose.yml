@@ -17,6 +17,7 @@ services:
     environment:
       CARDANO_NODE_LOG_LEVEL: ${CARDANO_NODE_LOG_LEVEL:-Info}
       CARDANO_NODE_CHAINDB_LOG_LEVEL: ${CARDANO_NODE_CHAINDB_LOG_LEVEL:-Notice}
+      NETWORK_SPEED: ${NETWORK_SPEED:-fast}
       PRE_CONWAY: ${PRE_CONWAY}
     ports:
       - 3001:3001

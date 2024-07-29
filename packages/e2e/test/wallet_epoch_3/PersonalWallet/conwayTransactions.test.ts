@@ -24,6 +24,7 @@ const {
   CertificateType,
   CredentialType,
   GovernanceActionType,
+  PlutusLanguageVersion,
   RewardAccount,
   StakeCredentialStatus,
   StakePoolStatus,
@@ -49,8 +50,84 @@ const getTestWallet = async (idx: number, name: string, minCoinBalance?: bigint)
   return wallet;
 };
 
-// TODO: remove once mainnet hardforks to conway-era, and this becomes "the norm"
-describe.skip('PersonalWallet/conwayTransactions', () => {
+export const vasilPlutusV1Costmdls = [
+  205_665, 812, 1, 1, 1000, 571, 0, 1, 1000, 24_177, 4, 1, 1000, 32, 117_366, 10_475, 4, 23_000, 100, 23_000, 100,
+  23_000, 100, 23_000, 100, 23_000, 100, 23_000, 100, 100, 100, 23_000, 100, 19_537, 32, 175_354, 32, 46_417, 4,
+  221_973, 511, 0, 1, 89_141, 32, 497_525, 14_068, 4, 2, 196_500, 453_240, 220, 0, 1, 1, 1000, 28_662, 4, 2, 245_000,
+  216_773, 62, 1, 1_060_367, 12_586, 1, 208_512, 421, 1, 187_000, 1000, 52_998, 1, 80_436, 32, 43_249, 32, 1000, 32,
+  80_556, 1, 57_667, 4, 1000, 10, 197_145, 156, 1, 197_145, 156, 1, 204_924, 473, 1, 208_896, 511, 1, 52_467, 32,
+  64_832, 32, 65_493, 32, 22_558, 32, 16_563, 32, 76_511, 32, 196_500, 453_240, 220, 0, 1, 1, 69_522, 11_687, 0, 1,
+  60_091, 32, 196_500, 453_240, 220, 0, 1, 1, 196_500, 453_240, 220, 0, 1, 1, 806_990, 30_482, 4, 1_927_926, 82_523, 4,
+  265_318, 0, 4, 0, 85_931, 32, 205_665, 812, 1, 1, 41_182, 32, 212_342, 32, 31_220, 32, 32_696, 32, 43_357, 32, 32_247,
+  32, 38_314, 32, 57_996_947, 18_975, 10
+];
+
+export const vasilPlutusV2Costmdls = [
+  205_665, 812, 1, 1, 1000, 571, 0, 1, 1000, 24_177, 4, 1, 1000, 32, 117_366, 10_475, 4, 23_000, 100, 23_000, 100,
+  23_000, 100, 23_000, 100, 23_000, 100, 23_000, 100, 100, 100, 23_000, 100, 19_537, 32, 175_354, 32, 46_417, 4,
+  221_973, 511, 0, 1, 89_141, 32, 497_525, 14_068, 4, 2, 196_500, 453_240, 220, 0, 1, 1, 1000, 28_662, 4, 2, 245_000,
+  216_773, 62, 1, 1_060_367, 12_586, 1, 208_512, 421, 1, 187_000, 1000, 52_998, 1, 80_436, 32, 43_249, 32, 1000, 32,
+  80_556, 1, 57_667, 4, 1000, 10, 197_145, 156, 1, 197_145, 156, 1, 204_924, 473, 1, 208_896, 511, 1, 52_467, 32,
+  64_832, 32, 65_493, 32, 22_558, 32, 16_563, 32, 76_511, 32, 196_500, 453_240, 220, 0, 1, 1, 69_522, 11_687, 0, 1,
+  60_091, 32, 196_500, 453_240, 220, 0, 1, 1, 196_500, 453_240, 220, 0, 1, 1, 1_159_724, 392_670, 0, 2, 806_990, 30_482,
+  4, 1_927_926, 82_523, 4, 265_318, 0, 4, 0, 85_931, 32, 205_665, 812, 1, 1, 41_182, 32, 212_342, 32, 31_220, 32,
+  32_696, 32, 43_357, 32, 32_247, 32, 38_314, 32, 35_892_428, 10, 57_996_947, 18_975, 10, 38_887_044, 32_947, 10
+];
+
+export const paramsUpdate: Cardano.ProtocolParametersUpdateConway = {
+  coinsPerUtxoByte: 35_000,
+  collateralPercentage: 852,
+  committeeTermLimit: Cardano.EpochNo(200),
+  costModels: new Map([
+    [PlutusLanguageVersion.V1, vasilPlutusV1Costmdls],
+    [PlutusLanguageVersion.V2, vasilPlutusV2Costmdls]
+  ]),
+  dRepDeposit: 2000,
+  dRepInactivityPeriod: Cardano.EpochNo(5000),
+  dRepVotingThresholds: {
+    committeeNoConfidence: { denominator: 3, numerator: 1 },
+    committeeNormal: { denominator: 3, numerator: 1 },
+    hardForkInitiation: { denominator: 7, numerator: 4 },
+    motionNoConfidence: { denominator: 3, numerator: 1 },
+    ppEconomicGroup: { denominator: 7, numerator: 6 },
+    ppGovernanceGroup: { denominator: 7, numerator: 6 },
+    ppNetworkGroup: { denominator: 7, numerator: 6 },
+    ppTechnicalGroup: { denominator: 7, numerator: 6 },
+    treasuryWithdrawal: { denominator: 7, numerator: 6 },
+    updateConstitution: { denominator: 7, numerator: 6 }
+  },
+  desiredNumberOfPools: 900,
+  governanceActionDeposit: 1000,
+  governanceActionValidityPeriod: Cardano.EpochNo(1_000_000),
+  maxBlockBodySize: 300,
+  maxBlockHeaderSize: 500,
+  maxCollateralInputs: 100,
+  maxExecutionUnitsPerBlock: { memory: 4_294_967_296, steps: 4_294_967_296 },
+  maxExecutionUnitsPerTransaction: { memory: 4_294_967_296, steps: 4_294_967_296 },
+  maxTxSize: 400,
+  maxValueSize: 954,
+  minCommitteeSize: 100,
+  minFeeCoefficient: 100,
+  minFeeConstant: 200,
+  minFeeRefScriptCostPerByte: '44.5',
+  minPoolCost: 1000,
+  monetaryExpansion: '0.3333333333333333',
+  poolDeposit: 200_000_000,
+  poolInfluence: '0.5',
+  poolRetirementEpochBound: 800,
+  poolVotingThresholds: {
+    committeeNoConfidence: { denominator: 3, numerator: 1 },
+    committeeNormal: { denominator: 3, numerator: 1 },
+    hardForkInitiation: { denominator: 7, numerator: 6 },
+    motionNoConfidence: { denominator: 3, numerator: 1 },
+    securityRelevantParamVotingThreshold: { denominator: 3, numerator: 1 }
+  },
+  prices: { memory: 0.5, steps: 0.5 },
+  stakeKeyDeposit: 2_000_000,
+  treasuryExpansion: '0.25'
+};
+
+describe('PersonalWallet/conwayTransactions', () => {
   let dRepWallet: BaseWallet;
   let wallet: BaseWallet;
 
@@ -79,8 +156,8 @@ describe.skip('PersonalWallet/conwayTransactions', () => {
     const protocolParameters = await wallet.networkInfoProvider.protocolParameters();
 
     return [
-      BigInt(protocolParameters.dRepDeposit),
-      BigInt(protocolParameters.governanceActionDeposit),
+      BigInt(protocolParameters.dRepDeposit!),
+      BigInt(protocolParameters.governanceActionDeposit!),
       BigInt(protocolParameters.stakeKeyDeposit)
     ];
   };
@@ -103,22 +180,20 @@ describe.skip('PersonalWallet/conwayTransactions', () => {
     };
   };
 
-  // TODO LW-10555: Revert this to feed the dRep wallet, not the `wallet`, once the dbsync bug is fixed
-  // https://github.com/IntersectMBO/cardano-db-sync/issues/1702
   const feedDRepWallet = async (amount: bigint) => {
-    const balance = await firstValueFrom(wallet.balance.utxo.total$);
+    const balance = await firstValueFrom(dRepWallet.balance.utxo.total$);
 
     if (balance.coins > amount) return;
 
-    const address = await firstValueFrom(wallet.addresses$.pipe(map((addresses) => addresses[0].address)));
+    const address = await firstValueFrom(dRepWallet.addresses$.pipe(map((addresses) => addresses[0].address)));
 
-    const signedTx = await dRepWallet
+    const signedTx = await wallet
       .createTxBuilder()
       .addOutput({ address, value: { coins: amount } })
       .build()
       .sign();
 
-    await submitAndConfirm(dRepWallet, signedTx.tx, 1);
+    await submitAndConfirm(wallet, signedTx.tx, 1);
   };
 
   const sendDRepRegCert = async (register: boolean) => {
@@ -161,21 +236,18 @@ describe.skip('PersonalWallet/conwayTransactions', () => {
   };
 
   beforeAll(async () => {
+    // TODO: remove once mainnet hardforks to conway-era, and this becomes "the norm"
     setInConwayEra(true);
 
-    // TODO LW-10555: Revert this so that wallet is at account 0 and drepWallet at account 1, once the dbsync bug is fixed
-    // https://github.com/IntersectMBO/cardano-db-sync/issues/1702
-    [dRepWallet, wallet] = await Promise.all([
-      getTestWallet(0, 'Conway DRep Wallet', 100_000_000n),
-      getTestWallet(1, 'Conway Wallet', 0n)
+    [wallet, dRepWallet] = await Promise.all([
+      getTestWallet(0, 'Conway Wallet', 100_000_000n),
+      getTestWallet(1, 'Conway DRep Wallet', 0n)
     ]);
 
     [dRepCredential, [dRepDeposit, governanceActionDeposit, stakeKeyDeposit], poolId, stakeCredential] =
       await Promise.all([getDRepCredential(), getDeposits(), getPoolId(), getStakeCredential()]);
 
-    // TODO LW-10555: Revert this to use the 2*drepDeposit, once the dbsync bug is fixed
-    // https://github.com/IntersectMBO/cardano-db-sync/issues/1702
-    await feedDRepWallet(governanceActionDeposit * 6n + 100_000_000n);
+    await feedDRepWallet(dRepDeposit * 2n);
 
     if (!(await isRegisteredDRep())) await sendDRepRegCert(true);
   });
@@ -189,6 +261,7 @@ describe.skip('PersonalWallet/conwayTransactions', () => {
     wallet.shutdown();
     dRepWallet.shutdown();
 
+    // TODO: remove once mainnet hardforks to conway-era, and this becomes "the norm"
     setInConwayEra(false);
   });
 
@@ -374,9 +447,11 @@ describe.skip('PersonalWallet/conwayTransactions', () => {
 
   describe('with proposal procedure', () => {
     let actionId: Cardano.GovernanceActionId;
+    let confirmedTx: Cardano.HydratedTx;
+    let proposalProcedures: Cardano.ProposalProcedure[];
 
     beforeAll(async () => {
-      const proposalProcedures: Cardano.ProposalProcedure[] = [
+      proposalProcedures = [
         {
           anchor,
           deposit: governanceActionDeposit,
@@ -384,7 +459,7 @@ describe.skip('PersonalWallet/conwayTransactions', () => {
             __typename: GovernanceActionType.parameter_change_action,
             governanceActionId: null,
             policyHash: null,
-            protocolParamUpdate: { maxTxSize: 2000 }
+            protocolParamUpdate: { ...paramsUpdate }
           },
           rewardAccount
         },
@@ -394,7 +469,7 @@ describe.skip('PersonalWallet/conwayTransactions', () => {
           governanceAction: {
             __typename: GovernanceActionType.hard_fork_initiation_action,
             governanceActionId: null,
-            protocolVersion: { major: 10, minor: 0 }
+            protocolVersion: { major: 11, minor: 0 }
           },
           rewardAccount
         },
@@ -439,11 +514,14 @@ describe.skip('PersonalWallet/conwayTransactions', () => {
         .customize(({ txBody }) => ({ ...txBody, proposalProcedures }))
         .build()
         .sign();
-      const [id, confirmedTx] = await submitAndConfirm(wallet, signedTx.tx, 1);
-
-      expect(confirmedTx.body.proposalProcedures).toEqual(proposalProcedures);
+      const [id, tx] = await submitAndConfirm(wallet, signedTx.tx, 1);
+      confirmedTx = tx;
 
       actionId = { actionIndex: 0, id };
+    });
+
+    it('parameter_change_action correctly submits protocol parameters update', () => {
+      expect(confirmedTx.body.proposalProcedures).toEqual(proposalProcedures);
     });
 
     it('delegation representatives can vote proposal procedure', async () => {
@@ -458,9 +536,9 @@ describe.skip('PersonalWallet/conwayTransactions', () => {
         .customize(({ txBody }) => ({ ...txBody, votingProcedures }))
         .build()
         .sign();
-      const [, confirmedTx] = await submitAndConfirm(dRepWallet, signedTx.tx, 1);
+      const [, tx] = await submitAndConfirm(dRepWallet, signedTx.tx, 1);
 
-      expect(confirmedTx.body.votingProcedures).toEqual(votingProcedures);
+      expect(tx.body.votingProcedures).toEqual(votingProcedures);
     });
   });
 });

@@ -5,6 +5,7 @@ import {
   BlockOutputModel,
   CertificateModel,
   MultiAssetModel,
+  ProtocolParametersUpdateModel,
   RedeemerModel,
   ScriptModel,
   TipModel,
@@ -40,6 +41,7 @@ import {
   isVoteDelegationCertModel,
   isVoteRegistrationDelegationCertModel
 } from './util';
+import { mapCostModels } from '../../NetworkInfo/DbSyncNetworkInfoProvider/mappers';
 
 const addMultiAssetToTokenMap = (multiAsset: MultiAssetModel, tokenMap: Cardano.TokenMap): Cardano.TokenMap => {
   const tokens = new Map(tokenMap);
@@ -488,3 +490,81 @@ export const mapBlock = (
 });
 
 export const mapTxId = ({ tx_id }: TxIdModel) => tx_id;
+
+// eslint-disable-next-line complexity
+export const mapProtocolParametersUpdateAction = (
+  p: ProtocolParametersUpdateModel
+): Cardano.ProtocolParametersUpdateConway => ({
+  coinsPerUtxoByte: p.utxoCostPerByte,
+  collateralPercentage: p.collateralPercentage,
+  ...(p.committeeMaxTermLength !== undefined && { committeeTermLimit: Cardano.EpochNo(p.committeeMaxTermLength) }),
+  ...(p.costModels !== undefined && { costModels: mapCostModels(p.costModels) }),
+  dRepDeposit: p.dRepDeposit,
+  ...(p.dRepActivity !== undefined && { dRepInactivityPeriod: Cardano.EpochNo(p.dRepActivity) }),
+  ...(p.dRepVotingThresholds !== undefined && {
+    dRepVotingThresholds: {
+      committeeNoConfidence: Cardano.FractionUtils.toFraction(p.dRepVotingThresholds.committeeNoConfidence),
+      committeeNormal: Cardano.FractionUtils.toFraction(p.dRepVotingThresholds.committeeNormal),
+      hardForkInitiation: Cardano.FractionUtils.toFraction(p.dRepVotingThresholds.hardForkInitiation),
+      motionNoConfidence: Cardano.FractionUtils.toFraction(p.dRepVotingThresholds.motionNoConfidence),
+      ppEconomicGroup: Cardano.FractionUtils.toFraction(p.dRepVotingThresholds.ppEconomicGroup),
+      ppGovernanceGroup: Cardano.FractionUtils.toFraction(p.dRepVotingThresholds.ppGovGroup),
+      ppNetworkGroup: Cardano.FractionUtils.toFraction(p.dRepVotingThresholds.ppNetworkGroup),
+      ppTechnicalGroup: Cardano.FractionUtils.toFraction(p.dRepVotingThresholds.ppTechnicalGroup),
+      treasuryWithdrawal: Cardano.FractionUtils.toFraction(p.dRepVotingThresholds.treasuryWithdrawal),
+      updateConstitution: Cardano.FractionUtils.toFraction(p.dRepVotingThresholds.updateToConstitution)
+    }
+  }),
+  desiredNumberOfPools: p.stakePoolTargetNum,
+  governanceActionDeposit: p.govActionDeposit,
+  ...(p.govActionLifetime !== undefined && { governanceActionValidityPeriod: Cardano.EpochNo(p.govActionLifetime) }),
+  maxBlockBodySize: p.maxBlockBodySize,
+  maxBlockHeaderSize: p.maxBlockHeaderSize,
+  maxCollateralInputs: p.maxCollateralInputs,
+  ...(p.maxBlockExecutionUnits !== undefined && {
+    maxExecutionUnitsPerBlock: {
+      memory: p.maxBlockExecutionUnits.memory,
+      steps: p.maxBlockExecutionUnits.memory
+    }
+  }),
+  ...(p.maxTxExecutionUnits !== undefined && {
+    maxExecutionUnitsPerTransaction: {
+      memory: p.maxTxExecutionUnits.memory,
+      steps: p.maxTxExecutionUnits.steps
+    }
+  }),
+  maxTxSize: p.maxTxSize,
+  maxValueSize: p.maxValueSize,
+  minCommitteeSize: p.committeeMinSize,
+  minFeeCoefficient: p.txFeePerByte,
+  minFeeConstant: p.txFeeFixed,
+  ...(p.minFeeRefScriptCostPerByte !== undefined && {
+    minFeeRefScriptCostPerByte: Cardano.FractionUtils.toNumber(p.minFeeRefScriptCostPerByte).toString()
+  }),
+  minPoolCost: p.minPoolCost,
+  ...(p.monetaryExpansion !== undefined && {
+    monetaryExpansion: Cardano.FractionUtils.toNumber(p.monetaryExpansion).toString()
+  }),
+  poolDeposit: p.stakePoolDeposit,
+  ...(p.poolPledgeInfluence !== undefined && {
+    poolInfluence: Cardano.FractionUtils.toNumber(p.poolPledgeInfluence).toString()
+  }),
+  poolRetirementEpochBound: p.poolRetireMaxEpoch,
+  ...(p.poolVotingThresholds !== undefined && {
+    poolVotingThresholds: {
+      committeeNoConfidence: Cardano.FractionUtils.toFraction(p.poolVotingThresholds.committeeNoConfidence),
+      committeeNormal: Cardano.FractionUtils.toFraction(p.poolVotingThresholds.committeeNormal),
+      hardForkInitiation: Cardano.FractionUtils.toFraction(p.poolVotingThresholds.hardForkInitiation),
+      motionNoConfidence: Cardano.FractionUtils.toFraction(p.poolVotingThresholds.motionNoConfidence),
+      securityRelevantParamVotingThreshold: Cardano.FractionUtils.toFraction(p.poolVotingThresholds.ppSecurityGroup)
+    }
+  }),
+  ...(p.executionUnitPrices !== undefined && {
+    prices: {
+      memory: Cardano.FractionUtils.toNumber(p.executionUnitPrices.priceMemory),
+      steps: Cardano.FractionUtils.toNumber(p.executionUnitPrices.priceSteps)
+    }
+  }),
+  stakeKeyDeposit: p.stakeAddressDeposit,
+  ...(p.treasuryCut !== undefined && { treasuryExpansion: Cardano.FractionUtils.toNumber(p.treasuryCut).toString() })
+});

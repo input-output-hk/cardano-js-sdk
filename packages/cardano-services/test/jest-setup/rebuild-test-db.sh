@@ -12,22 +12,22 @@ PASSWORD=$(cat $SECRETS_DIR/postgres_password)
 
 export DB_SYNC_CONNECTION_STRING="postgresql://${USER}:${PASSWORD}@localhost:5435/${DB_DB_SYNC}"
 
-yarn cleanup
-yarn
-yarn build
-yarn test:build:verify
+# yarn cleanup
+# yarn
+# yarn build
+# yarn test:build:verify
 
-yarn workspace @cardano-sdk/e2e local-network:down
-yarn workspace @cardano-sdk/e2e local-network:up -d --build
+# yarn workspace @cardano-sdk/e2e local-network:down
+# yarn workspace @cardano-sdk/e2e local-network:up -d --build
 
-yarn workspace @cardano-sdk/e2e test:wallet
-yarn workspace @cardano-sdk/e2e test:long-running simple-delegation-rewards.test.ts
-yarn workspace @cardano-sdk/e2e test:local-network register-pool.test.ts
+# yarn workspace @cardano-sdk/e2e test:wallet
+# yarn workspace @cardano-sdk/e2e test:long-running simple-delegation-rewards.test.ts
+# yarn workspace @cardano-sdk/e2e test:local-network register-pool.test.ts
 
-TL_LEVEL="${TL_LEVEL:=info}" node "$SCRIPT_DIR/mint-handles.js"
+# TL_LEVEL="${TL_LEVEL:=info}" node "$SCRIPT_DIR/mint-handles.js"
 
-echo 'Stop providing data to projectors'
-docker compose -p local-network-e2e stop cardano-node ogmios
+echo 'DO NOT Stop providing data to projectors'
+# docker compose -p local-network-e2e stop cardano-node ogmios
 sleep 2
 
 echo 'Creating snapshots...'
@@ -39,4 +39,4 @@ for DB_FILE in $(
 done
 echo 'Snapshots created.'
 
-yarn workspace @cardano-sdk/e2e local-network:down
+# yarn workspace @cardano-sdk/e2e local-network:down

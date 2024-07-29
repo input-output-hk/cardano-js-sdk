@@ -9,6 +9,7 @@ import {
   MultiAssetModel,
   PoolRegisterCertModel,
   PoolRetireCertModel,
+  ProtocolParametersUpdateModel,
   RedeemerModel,
   StakeCertModel,
   TipModel,
@@ -121,6 +122,80 @@ const txModel: TxModel = {
   invalid_hereafter: '500',
   size: 20,
   valid_contract: true
+};
+
+const protocolParametersUpdate: ProtocolParametersUpdateModel = {
+  collateralPercentage: 852,
+  committeeMaxTermLength: 200,
+  committeeMinSize: 100,
+  costModels: {
+    PlutusV1: [
+      197_209, 0, 1, 1, 396_231, 621, 0, 1, 150_000, 1000, 0, 1, 150_000, 32, 2_477_736, 29_175, 4, 29_773, 100, 29_773,
+      100, 29_773, 100, 29_773, 100, 29_773, 100, 29_773, 100, 100, 100, 29_773, 100, 150_000, 32, 150_000, 32, 150_000,
+      32, 150_000, 1000, 0, 1, 150_000, 32, 150_000, 1000, 0, 8, 148_000, 425_507, 118, 0, 1, 1, 150_000, 1000, 0, 8,
+      150_000, 112_536, 247, 1, 150_000, 10_000, 1, 136_542, 1326, 1, 1000, 150_000, 1000, 1, 150_000, 32, 150_000, 32,
+      150_000, 32, 1, 1, 150_000, 1, 150_000, 4, 103_599, 248, 1, 103_599, 248, 1, 145_276, 1366, 1, 179_690, 497, 1,
+      150_000, 32, 150_000, 32, 150_000, 32, 150_000, 32, 150_000, 32, 150_000, 32, 148_000, 425_507, 118, 0, 1, 1,
+      61_516, 11_218, 0, 1, 150_000, 32, 148_000, 425_507, 118, 0, 1, 1, 148_000, 425_507, 118, 0, 1, 1, 2_477_736,
+      29_175, 4, 0, 82_363, 4, 150_000, 5000, 0, 1, 150_000, 32, 197_209, 0, 1, 1, 150_000, 32, 150_000, 32, 150_000,
+      32, 150_000, 32, 150_000, 32, 150_000, 32, 150_000, 32, 3_345_831, 1, 1
+    ],
+    PlutusV2: [
+      205_665, 812, 1, 1, 1000, 571, 0, 1, 1000, 24_177, 4, 1, 1000, 32, 117_366, 10_475, 4, 23_000, 100, 23_000, 100,
+      23_000, 100, 23_000, 100, 23_000, 100, 23_000, 100, 100, 100, 23_000, 100, 19_537, 32, 175_354, 32, 46_417, 4,
+      221_973, 511, 0, 1, 89_141, 32, 497_525, 14_068, 4, 2, 196_500, 453_240, 220, 0, 1, 1, 1000, 28_662, 4, 2,
+      245_000, 216_773, 62, 1, 1_060_367, 12_586, 1, 208_512, 421, 1, 187_000, 1000, 52_998, 1, 80_436, 32, 43_249, 32,
+      1000, 32, 80_556, 1, 57_667, 4, 1000, 10, 197_145, 156, 1, 197_145, 156, 1, 204_924, 473, 1, 208_896, 511, 1,
+      52_467, 32, 64_832, 32, 65_493, 32, 22_558, 32, 16_563, 32, 76_511, 32, 196_500, 453_240, 220, 0, 1, 1, 69_522,
+      11_687, 0, 1, 60_091, 32, 196_500, 453_240, 220, 0, 1, 1, 196_500, 453_240, 220, 0, 1, 1, 1_159_724, 392_670, 0,
+      2, 806_990, 30_482, 4, 1_927_926, 82_523, 4, 265_318, 0, 4, 0, 85_931, 32, 205_665, 812, 1, 1, 41_182, 32,
+      212_342, 32, 31_220, 32, 32_696, 32, 43_357, 32, 32_247, 32, 38_314, 32, 35_892_428, 10, 9_462_713, 1021, 10,
+      38_887_044, 32_947, 10
+    ]
+  },
+  dRepActivity: 5000,
+  dRepDeposit: 2000,
+  dRepVotingThresholds: {
+    committeeNoConfidence: { denominator: 3, numerator: 1 },
+    committeeNormal: { denominator: 3, numerator: 1 },
+    hardForkInitiation: { denominator: 7, numerator: 4 },
+    motionNoConfidence: { denominator: 3, numerator: 1 },
+    ppEconomicGroup: { denominator: 7, numerator: 6 },
+    ppGovGroup: { denominator: 7, numerator: 6 },
+    ppNetworkGroup: { denominator: 7, numerator: 6 },
+    ppTechnicalGroup: { denominator: 7, numerator: 6 },
+    treasuryWithdrawal: { denominator: 7, numerator: 6 },
+    updateToConstitution: { denominator: 7, numerator: 6 }
+  },
+  executionUnitPrices: { priceMemory: 0.5, priceSteps: 0.5 },
+  govActionDeposit: 1000,
+  govActionLifetime: 1_000_000,
+  maxBlockBodySize: 300,
+  maxBlockExecutionUnits: { memory: 4_294_967_296, steps: 4_294_967_296 },
+  maxBlockHeaderSize: 500,
+  maxCollateralInputs: 100,
+  maxTxExecutionUnits: { memory: 4_294_967_296, steps: 4_294_967_296 },
+  maxTxSize: 400,
+  maxValueSize: 954,
+  minFeeRefScriptCostPerByte: 44.5,
+  minPoolCost: 1000,
+  monetaryExpansion: { denominator: 3, numerator: 1 },
+  poolPledgeInfluence: 0.5,
+  poolRetireMaxEpoch: 800,
+  poolVotingThresholds: {
+    committeeNoConfidence: { denominator: 3, numerator: 1 },
+    committeeNormal: { denominator: 3, numerator: 1 },
+    hardForkInitiation: { denominator: 7, numerator: 6 },
+    motionNoConfidence: { denominator: 3, numerator: 1 },
+    ppSecurityGroup: { denominator: 3, numerator: 1 }
+  },
+  stakeAddressDeposit: 2_000_000,
+  stakePoolDeposit: 200_000_000,
+  stakePoolTargetNum: 900,
+  treasuryCut: 0.25,
+  txFeeFixed: 200,
+  txFeePerByte: 100,
+  utxoCostPerByte: 35_000
 };
 
 describe('chain history mappers', () => {
@@ -551,6 +626,75 @@ describe('chain history mappers', () => {
       expect(result).toEqual<Cardano.Withdrawal>({
         quantity: 20_000_000n,
         stakeAddress: Cardano.RewardAccount(stakeAddress)
+      });
+    });
+  });
+
+  describe('mapProtocolParametersUpdateAction', () => {
+    test('map ProtocolParametersUpdateAction', () => {
+      const result = mappers.mapProtocolParametersUpdateAction(protocolParametersUpdate);
+      expect(result).toEqual<Cardano.ProtocolParametersUpdateConway>({
+        coinsPerUtxoByte: 35_000,
+        collateralPercentage: 852,
+        committeeTermLimit: Cardano.EpochNo(200),
+        costModels: new Map<Cardano.PlutusLanguageVersion, Cardano.CostModel>([
+          [Cardano.PlutusLanguageVersion.V1, protocolParametersUpdate.costModels!.PlutusV1!],
+          [Cardano.PlutusLanguageVersion.V2, protocolParametersUpdate.costModels!.PlutusV2!]
+        ]),
+        dRepDeposit: 2000,
+        dRepInactivityPeriod: Cardano.EpochNo(5000),
+        dRepVotingThresholds: {
+          committeeNoConfidence: { denominator: 3, numerator: 1 },
+          committeeNormal: { denominator: 3, numerator: 1 },
+          hardForkInitiation: { denominator: 7, numerator: 4 },
+          motionNoConfidence: { denominator: 3, numerator: 1 },
+          ppEconomicGroup: { denominator: 7, numerator: 6 },
+          ppGovernanceGroup: { denominator: 7, numerator: 6 },
+          ppNetworkGroup: { denominator: 7, numerator: 6 },
+          ppTechnicalGroup: { denominator: 7, numerator: 6 },
+          treasuryWithdrawal: { denominator: 7, numerator: 6 },
+          updateConstitution: { denominator: 7, numerator: 6 }
+        },
+        desiredNumberOfPools: 900,
+        governanceActionDeposit: 1000,
+        governanceActionValidityPeriod: Cardano.EpochNo(1_000_000),
+        maxBlockBodySize: 300,
+        maxBlockHeaderSize: 500,
+        maxCollateralInputs: 100,
+        maxExecutionUnitsPerBlock: { memory: 4_294_967_296, steps: 4_294_967_296 },
+        maxExecutionUnitsPerTransaction: { memory: 4_294_967_296, steps: 4_294_967_296 },
+        maxTxSize: 400,
+        maxValueSize: 954,
+        minCommitteeSize: 100,
+        minFeeCoefficient: 100,
+        minFeeConstant: 200,
+        minFeeRefScriptCostPerByte: '44.5',
+        minPoolCost: 1000,
+        monetaryExpansion: '0.3333333333333333',
+        poolDeposit: 200_000_000,
+        poolInfluence: '0.5',
+        poolRetirementEpochBound: 800,
+        poolVotingThresholds: {
+          committeeNoConfidence: { denominator: 3, numerator: 1 },
+          committeeNormal: { denominator: 3, numerator: 1 },
+          hardForkInitiation: { denominator: 7, numerator: 6 },
+          motionNoConfidence: { denominator: 3, numerator: 1 },
+          securityRelevantParamVotingThreshold: { denominator: 3, numerator: 1 }
+        },
+        prices: { memory: 0.5, steps: 0.5 },
+        stakeKeyDeposit: 2_000_000,
+        treasuryExpansion: '0.25'
+      });
+    });
+
+    test('map subset of ProtocolParametersUpdateAction', () => {
+      const result = mappers.mapProtocolParametersUpdateAction({
+        collateralPercentage: 500,
+        utxoCostPerByte: 30_000
+      });
+      expect(result).toEqual<Cardano.ProtocolParametersUpdateConway>({
+        coinsPerUtxoByte: 30_000,
+        collateralPercentage: 500
       });
     });
   });

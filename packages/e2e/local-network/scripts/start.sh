@@ -28,6 +28,8 @@ echo "Run"
 ./scripts/make-babbage.sh
 ./network-files/run/all.sh &
 
+if [ -d /sdk-ipc ] ; then cp -a config/network /sdk-ipc/config ; fi
+
 export CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock
 
 while [ ! -S "$CARDANO_NODE_SOCKET_PATH" ]; do

@@ -141,13 +141,14 @@ cardano-cli conway query utxo --whole-utxo --testnet-magic $NETWORK_MAGIC
 
 echo "Registering $(cat "${DELEGATORS_DIR}/payment${NODE_ID}.addr")"
 
+keyDeposit=2000000
 stakeAddr="$(cat "${DELEGATORS_DIR}/payment1.addr")"
 currentBalance=$(getAddressBalance "$stakeAddr")
 
 for NODE_ID in ${SP_NODES_ID}; do
   cardano-cli conway stake-address registration-certificate \
     --stake-verification-key-file "${DELEGATORS_DIR}/staking${NODE_ID}.vkey" \
-    --key-reg-deposit-amt 0 \
+    --key-reg-deposit-amt ${keyDeposit} \
     --out-file "${TRANSACTIONS_DIR}/staking${NODE_ID}reg.cert"
 
   cardano-cli conway transaction build \

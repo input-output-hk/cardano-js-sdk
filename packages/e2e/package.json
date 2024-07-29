@@ -47,7 +47,7 @@
     "test:web-extension:watch": "run-s test:web-extension:build test:web-extension:watch:bg",
     "test:web-extension:watch:bg": "run-p test:web-extension:watch:build test:web-extension:watch:run",
     "test:ws": "jest -c jest.config.js --forceExit --selectProjects ws-server --runInBand --verbose",
-    "local-network:common": "PRE_CONWAY=${PRE_CONWAY:-stable} DISABLE_DB_CACHE=${DISABLE_DB_CACHE:-true} SUBMIT_API_ARGS='--testnet-magic 888' USE_BLOCKFROST=false __FIX_UMASK__=$(chmod -R a+r ../../compose/placeholder-secrets) docker compose --env-file ../cardano-services/environments/.env.local -p local-network-e2e -f docker-compose.yml -f ../../compose/common.yml -f ../../compose/$(uname -m).yml $FILES up",
+    "local-network:common": "DISABLE_DB_CACHE=${DISABLE_DB_CACHE:-true} SUBMIT_API_ARGS='--testnet-magic 888' USE_BLOCKFROST=false __FIX_UMASK__=$(chmod -R a+r ../../compose/placeholder-secrets) docker compose --env-file ../cardano-services/environments/.env.local -p local-network-e2e -f docker-compose.yml -f ../../compose/common.yml -f ../../compose/$(uname -m).yml $FILES up",
     "local-network:up": "FILES='' yarn local-network:common",
     "local-network:single:up": "FILES='' yarn local-network:common cardano-node file-server local-testnet ogmios postgres",
     "local-network:profile:up": "FILES='-f ../../compose/pg-agent.yml' yarn local-network:common",
@@ -80,7 +80,7 @@
   },
   "dependencies": {
     "@cardano-foundation/ledgerjs-hw-app-cardano": "^7.1.2",
-    "@cardano-ogmios/client": "6.3.0",
+    "@cardano-ogmios/client": "6.5.0",
     "@cardano-sdk/cardano-services": "workspace:~",
     "@cardano-sdk/cardano-services-client": "workspace:~",
     "@cardano-sdk/core": "workspace:~",

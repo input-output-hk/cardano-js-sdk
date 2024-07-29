@@ -16,11 +16,13 @@ in {
       export API_URL=''${API_URL:-http://0.0.0.0:3000}
       export CLI="${runCardanoServices package}/dist/cjs/cli.js"
       export CARDANO_NODE_CONFIGS_DIR="${cardanoServicesPath package}/config/network"
-
       if [ -n "$NETWORK" ]; then
-        export CARDANO_NODE_CONFIG_PATH="$CARDANO_NODE_CONFIGS_DIR/''${NETWORK}/cardano-node/config.json"
+        if [ "$NETWORK" = "local" ]; then
+          export CARDANO_NODE_CONFIG_PATH="/config/network/cardano-node/config.json"
+        else
+          export CARDANO_NODE_CONFIG_PATH="$CARDANO_NODE_CONFIGS_DIR/''${NETWORK}/cardano-node/config.json"
+        fi
       fi
-
       exec $CLI "$@"
     '';
     meta.description = "A transparent (thin) wrapper around the Cardano Services CLI";
