@@ -259,6 +259,7 @@ in
               enabled = true;
               env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
+            chain-history-provider.enabled = true;
           };
 
           projectors = {
