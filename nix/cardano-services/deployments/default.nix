@@ -252,6 +252,7 @@ in
           providers = {
             backend = {
               enabled = true;
+              env.USE_SUBMIT_API = "false";
             };
             stake-pool-provider = {
               enabled = true;
