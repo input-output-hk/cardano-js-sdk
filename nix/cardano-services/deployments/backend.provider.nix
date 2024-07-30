@@ -80,7 +80,5 @@
         POSTGRES_SSL_HANDLE = "true";
         POSTGRES_SSL_CA_FILE_HANDLE = "/tls/ca.crt";
       };
-    volumeMounts."s3-config-mount".mountPath = "/config";
-    volumes."s3-config-mount".persistentVolumeClaim.claimName = "${config.namespace}-local-conifig-s3-pvc";
   };
 }

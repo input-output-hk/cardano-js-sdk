@@ -242,104 +242,47 @@ in
           };
         };
 
-        "dev-sanchonet@us-east-1@v1" = final: {
+
+        "dev-sanchonet@us-east-1" = final: {
+          name = "${final.namespace}-cardanojs";
           namespace = "dev-sanchonet";
-          name = "${final.namespace}-cardanojs-v1";
           network = "sanchonet";
           region = "us-east-1";
 
           providers = {
             backend = {
               enabled = true;
-              env.USE_SUBMIT_API = "true";
-              env.USE_BLOCKFROST = lib.mkForce "false";
-              env.SUBMIT_API_URL = "http://${final.namespace}-cardano-stack.${final.namespace}.svc.cluster.local:8090";
             };
             stake-pool-provider = {
               enabled = true;
               env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
+            handle-provider.enabled = true;
+            #asset-provider.enabled = true;
+            chain-history-provider.enabled = true;
           };
 
           projectors = {
+            handle.enabled = true;
             stake-pool.enabled = true;
+            asset.enabled = true;
           };
 
           values = {
+            useAccelerator = false;
             ws-server.enabled = true;
-            blockfrost-worker.enabled = false;
-            pg-boss-worker.enabled = true;
-
-            backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
-            backend.routes = let
-              inherit (oci.meta) versions;
-            in
-              lib.concatLists [
-                (map (v: "/v${v}/health") versions.root)
-                (map (v: "/v${v}/live") versions.root)
-                (map (v: "/v${v}/meta") versions.root)
-                (map (v: "/v${v}/ready") versions.root)
-                (map (v: "/v${v}/asset") versions.assetInfo)
-                (map (v: "/v${v}/chain-history") versions.chainHistory)
-                (map (v: "/v${v}/network-info") versions.networkInfo)
-                (map (v: "/v${v}/rewards") versions.rewards)
-                (map (v: "/v${v}/tx-submit") versions.txSubmit)
-                (map (v: "/v${v}/utxo") versions.utxo)
-                (map (v: "/v${v}/handle") versions.handle)
-                (map (v: "/v${v}/provider-server") versions.stakePool)
-                (map (v: "/v${v}/stake-pool-provider-server") versions.stakePool)
-              ];
-
-            cardano-services = {
-              ingresOrder = 99;
-              additionalRoutes = [
-                {
-                  pathType = "Prefix";
-                  path = "/v1.0.0/stake-pool";
-                  backend.service = {
-                    name = "${final.namespace}-cardanojs-v1-stake-pool-provider";
-                    port.name = "http";
-                  };
-                }
-                {
-                  pathType = "Prefix";
-                  path = "/v3.0.0/chain-history";
-                  backend.service = {
-                    name = "${final.namespace}-cardanojs-v1-backend";
-                    port.name = "http";
-                  };
-                }
-              ];
-            };
-          };
-        };
-
-        "dev-sanchonet@us-east-1@v2" = final: {
-          name = "${final.namespace}-cardanojs-v2";
-          namespace = "dev-sanchonet";
-          network = "sanchonet";
-          region = "us-east-1";
-
-          projectors = {
-            stake-pool.enabled = true;
-          };
-
-          providers = {
-            backend = {
-              enabled = true;
-            };
-            stake-pool-provider = {
-              enabled = false;
-            };
-          };
-
-          values = {
-            ws-server.enabled = true;
-            ingress.enabled = false;
-            pg-boss-worker.enabled = true;
             stakepool.databaseName = "stakepoolv2";
+            backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
+
+            pg-boss-worker.enabled = true;
+
+            blockfrost-worker.enabled = false;
+            cardano-services = {
+              ingresOrder = 98;
+            };
           };
         };
+
 
         "dev-mainnet@us-east-1" = final: {
           namespace = "dev-mainnet";
