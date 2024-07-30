@@ -164,7 +164,7 @@ const getGovernanceAction = ({
 
 const getVoter = (
   txId: Cardano.TransactionId,
-  { committee_voter, drep_has_script, drep_voter, pool_voter, voter_role }: VotingProceduresModel
+  { committee_has_script, committee_voter, drep_has_script, drep_voter, pool_voter, voter_role }: VotingProceduresModel
 ): Cardano.Voter => {
   let hash: Hash28ByteBase16;
 
@@ -174,11 +174,9 @@ const getVoter = (
 
       hash = committee_voter.toString('hex') as Hash28ByteBase16;
 
-      // With current db-sync version it is not possible to distinguish type between
-      // CredentialType.ScriptHash and CredentialType.KeyHash
-      // Once https://github.com/input-output-hk/cardano-db-sync/issues/1571 it will be included in db-sync
-      // we should probably improve the query and following statement as well
-      return { __typename: VoterType.ccHotKeyHash, credential: { hash, type: CredentialType.KeyHash } };
+      return committee_has_script
+        ? { __typename: VoterType.ccHotScriptHash, credential: { hash, type: CredentialType.ScriptHash } }
+        : { __typename: VoterType.ccHotKeyHash, credential: { hash, type: CredentialType.KeyHash } };
 
     case 'DRep':
       if (!(drep_voter instanceof Buffer)) throw new Error(`Unexpected drep_voter for tx "${txId}"`);

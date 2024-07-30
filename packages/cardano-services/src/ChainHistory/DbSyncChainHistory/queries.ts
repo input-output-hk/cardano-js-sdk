@@ -191,7 +191,8 @@ export const findVotingProceduresByTxIds = `
 	SELECT
 		tx.hash AS tx_id,
 		voter_role,
-		committee_voter,
+		ch.raw AS committee_voter,
+		ch.has_script AS committee_has_script,
 		dh.raw AS drep_voter,
 		dh.has_script AS drep_has_script,
 		ph.hash_raw as pool_voter,
@@ -211,6 +212,7 @@ export const findVotingProceduresByTxIds = `
 	LEFT JOIN drep_hash AS dh ON drep_voter = dh.id
 	LEFT JOIN pool_hash AS ph ON pool_voter = ph.id
 	LEFT JOIN voting_anchor AS va ON vp.voting_anchor_id = va.id
+	LEFT JOIN committee_hash AS ch ON ch.id = committee_voter
 	WHERE tx.id = ANY($1)
 	ORDER BY vp.index`;
 
