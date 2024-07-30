@@ -1,7 +1,8 @@
 import { CustomError } from 'ts-custom-error';
-import { EpochNo, NetworkMagics, Slot } from '../Cardano';
+import { EpochNo, Slot } from '../Cardano/types';
 import { EraSummary } from '../CardanoNode';
 import { NetworkInfoProvider } from '../Provider/NetworkInfoProvider';
+import { NetworkMagics } from '../Cardano/ChainId';
 import groupBy from 'lodash/groupBy.js';
 import last from 'lodash/last.js';
 import memoize from 'lodash/memoize.js';

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import * as Cardano from '../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { AuxiliaryData } from './AuxiliaryData';
 import { CborReader, CborReaderState, CborWriter } from './CBOR';
 import { HexBlob } from '@cardano-sdk/util';
 import { TransactionBody } from './TransactionBody';
+import { TransactionId, Tx } from '../Cardano/types/Transaction';
 import { TransactionWitnessSet } from './TransactionWitnessSet';
 import { hexToBytes } from '../util/misc';
 import type { TxCBOR } from '../CBOR';
@@ -119,7 +119,7 @@ export class Transaction {
    *
    * @returns The Core Tx object.
    */
-  toCore(): Cardano.Tx {
+  toCore(): Tx {
     return {
       auxiliaryData: this.#auxiliaryData ? this.#auxiliaryData.toCore() : undefined,
       body: this.#body.toCore(),
@@ -134,7 +134,7 @@ export class Transaction {
    *
    * @param tx The core TX object.
    */
-  static fromCore(tx: Cardano.Tx) {
+  static fromCore(tx: Tx) {
     const transaction = new Transaction(
       TransactionBody.fromCore(tx.body),
       TransactionWitnessSet.fromCore(tx.witness),
@@ -213,7 +213,7 @@ export class Transaction {
   /**
    * Gets the transaction Auxiliary data.
    *
-   * @returns A clone of the transaction Auxiliary data (or undefined if the transaction doesnt have auxiliary data).
+   * @returns A clone of the transaction Auxiliary data (or undefined if the transaction doesn't have auxiliary data).
    */
   auxiliaryData(): AuxiliaryData | undefined {
     if (this.#auxiliaryData) {
@@ -237,10 +237,10 @@ export class Transaction {
   }
 
   /** Computes the transaction id for this transaction. */
-  getId(): Cardano.TransactionId {
+  getId(): TransactionId {
     const hash = Crypto.blake2b(Crypto.blake2b.BYTES).update(hexToBytes(this.#body.toCbor())).digest();
 
-    return Cardano.TransactionId.fromHexBlob(HexBlob.fromBytes(hash));
+    return TransactionId.fromHexBlob(HexBlob.fromBytes(hash));
   }
 
   /** Performs a deep clone of the transaction object. */

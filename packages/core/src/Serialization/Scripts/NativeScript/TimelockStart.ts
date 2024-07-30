@@ -1,6 +1,8 @@
-import * as Cardano from '../../../Cardano';
+// cSpell:ignore timelock
+
 import { CborReader, CborWriter } from '../../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import { NativeScriptKind, RequireTimeAfterScript, ScriptType, Slot } from '../../../Cardano/types';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
@@ -12,7 +14,7 @@ const EMBEDDED_GROUP_SIZE = 2;
  * is greater than or equal to slot number X.
  */
 export class TimelockStart {
-  #slot: Cardano.Slot;
+  #slot: Slot;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -20,7 +22,7 @@ export class TimelockStart {
    *
    * @param slot The slot number specifying the lower bound of the validity interval.
    */
-  constructor(slot: Cardano.Slot) {
+  constructor(slot: Slot) {
     this.#slot = slot;
   }
 
@@ -37,7 +39,7 @@ export class TimelockStart {
     // CDDL
     // invalid_before = (4, uint)
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
-    writer.writeInt(Cardano.NativeScriptKind.RequireTimeAfter);
+    writer.writeInt(NativeScriptKind.RequireTimeAfter);
     writer.writeInt(this.#slot);
 
     return writer.encodeAsHex();
@@ -62,13 +64,13 @@ export class TimelockStart {
 
     const kind = Number(reader.readInt());
 
-    if (kind !== Cardano.NativeScriptKind.RequireTimeAfter)
+    if (kind !== NativeScriptKind.RequireTimeAfter)
       throw new InvalidArgumentError(
         'cbor',
-        `Expected kind ${Cardano.NativeScriptKind.RequireTimeAfter}, but got kind ${kind}`
+        `Expected kind ${NativeScriptKind.RequireTimeAfter}, but got kind ${kind}`
       );
 
-    const slot = Cardano.Slot(Number(reader.readInt()));
+    const slot = Slot(Number(reader.readInt()));
 
     const script = new TimelockStart(slot);
 
@@ -82,10 +84,10 @@ export class TimelockStart {
    *
    * @returns The Core RequireTimeAfterScript object.
    */
-  toCore(): Cardano.RequireTimeAfterScript {
+  toCore(): RequireTimeAfterScript {
     return {
-      __type: Cardano.ScriptType.Native,
-      kind: Cardano.NativeScriptKind.RequireTimeAfter,
+      __type: ScriptType.Native,
+      kind: NativeScriptKind.RequireTimeAfter,
       slot: this.#slot
     };
   }
@@ -95,7 +97,7 @@ export class TimelockStart {
    *
    * @param script The core RequireTimeAfterScript object.
    */
-  static fromCore(script: Cardano.RequireTimeAfterScript) {
+  static fromCore(script: RequireTimeAfterScript) {
     return new TimelockStart(script.slot);
   }
 
@@ -104,7 +106,7 @@ export class TimelockStart {
    *
    * @returns The slot number specifying the lower bound of the validity interval.
    */
-  slot(): Cardano.Slot {
+  slot(): Slot {
     return this.#slot;
   }
 
@@ -113,7 +115,7 @@ export class TimelockStart {
    *
    * @param slot The slot number specifying the lower bound of the validity interval.
    */
-  setSlot(slot: Cardano.Slot): void {
+  setSlot(slot: Slot): void {
     this.#slot = slot;
     this.#originalBytes = undefined;
   }

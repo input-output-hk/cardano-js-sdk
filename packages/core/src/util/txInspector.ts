@@ -24,7 +24,7 @@ import {
   isCertType
 } from '../Cardano/types';
 import { BigIntMath } from '@cardano-sdk/util';
-import { InputResolver, PaymentAddress, RewardAccount, isAddressWithin } from '../Cardano';
+import { InputResolver, PaymentAddress, RewardAccount, isAddressWithin } from '../Cardano/Address';
 import { coalesceValueQuantities } from './coalesceValueQuantities';
 import { nativeScriptPolicyId } from './nativeScript';
 import { removeNegativesFromTokenMap } from '../Asset/util';

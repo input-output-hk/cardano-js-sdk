@@ -1,5 +1,10 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
+import {
+  ConstrPlutusData as CardanoConstrPlutusData,
+  PlutusData as CardanoPlutusData,
+  PlutusList as CardanoPlutusList,
+  PlutusMap as CardanoPlutusMap
+} from '../../Cardano/types';
 import { CborReader, CborReaderState, CborTag, CborWriter } from '../CBOR';
 import { ConstrPlutusData } from './ConstrPlutusData';
 import { HexBlob } from '@cardano-sdk/util';
@@ -8,6 +13,7 @@ import { PlutusDataKind } from './PlutusDataKind';
 import { PlutusList } from './PlutusList';
 import { PlutusMap } from './PlutusMap';
 import { bytesToHex } from '../../util/misc';
+import { util } from '../../Cardano';
 
 const MAX_WORD64 = 18_446_744_073_709_551_615n;
 const INDEFINITE_BYTE_STRING = new Uint8Array([95]);
@@ -183,7 +189,7 @@ export class PlutusData {
    *
    * @returns The PlutusData object.
    */
-  toCore(): Cardano.PlutusData {
+  toCore(): CardanoPlutusData {
     switch (this.#kind) {
       case PlutusDataKind.Bytes:
         return this.#bytes!;
@@ -193,7 +199,7 @@ export class PlutusData {
           cbor: this.toCbor(),
           constructor: constrPlutusData!.getAlternative(),
           fields: PlutusData.mapToCorePlutusList(constrPlutusData!.getData())
-        } as Cardano.ConstrPlutusData;
+        } as CardanoConstrPlutusData;
       }
       case PlutusDataKind.Integer:
         return this.#integer!;
@@ -201,13 +207,13 @@ export class PlutusData {
         return PlutusData.mapToCorePlutusList(this.#list!);
       case PlutusDataKind.Map: {
         const plutusMap = this.#map!;
-        const coreMap = new Map<Cardano.PlutusData, Cardano.PlutusData>();
+        const coreMap = new Map<CardanoPlutusData, CardanoPlutusData>();
         const keys = plutusMap.getKeys();
         for (let i = 0; i < keys.getLength(); i++) {
           const key = keys.get(i);
           coreMap.set(key.toCore(), plutusMap.get(key)!.toCore());
         }
-        return { cbor: this.toCbor(), data: coreMap } as Cardano.PlutusMap;
+        return { cbor: this.toCbor(), data: coreMap } as CardanoPlutusMap;
       }
       default:
         throw new NotImplementedError(`PlutusData mapping for kind ${this.#kind}`); // Probably can't happen
@@ -230,24 +236,24 @@ export class PlutusData {
    *
    * @param data The core PlutusData object.
    */
-  static fromCore(data: Cardano.PlutusData) {
-    if (Cardano.util.isPlutusBoundedBytes(data)) {
+  static fromCore(data: CardanoPlutusData) {
+    if (util.isPlutusBoundedBytes(data)) {
       return PlutusData.newBytes(data);
-    } else if (Cardano.util.isPlutusBigInt(data)) {
+    } else if (util.isPlutusBigInt(data)) {
       return PlutusData.newInteger(data);
     }
 
     if (data.cbor) return PlutusData.fromCbor(data.cbor);
 
-    if (Cardano.util.isPlutusList(data)) {
+    if (util.isPlutusList(data)) {
       return PlutusData.newList(PlutusData.mapToPlutusList(data.items));
-    } else if (Cardano.util.isPlutusMap(data)) {
+    } else if (util.isPlutusMap(data)) {
       const plutusMap = new PlutusMap();
       for (const [key, val] of data.data) {
         plutusMap.insert(PlutusData.fromCore(key), PlutusData.fromCore(val));
       }
       return PlutusData.newMap(plutusMap);
-    } else if (Cardano.util.isConstrPlutusData(data)) {
+    } else if (util.isConstrPlutusData(data)) {
       const alternative = data.constructor;
       const constrPlutusData = new ConstrPlutusData(alternative, PlutusData.mapToPlutusList(data.fields.items));
 
@@ -430,7 +436,7 @@ export class PlutusData {
    *
    * @param list The core plutus list.
    */
-  private static mapToPlutusList(list: Cardano.PlutusData[]): PlutusList {
+  private static mapToPlutusList(list: CardanoPlutusData[]): PlutusList {
     const plutusList = new PlutusList();
     for (const listItem of list) {
       plutusList.add(PlutusData.fromCore(listItem));
@@ -443,8 +449,8 @@ export class PlutusData {
    *
    * @param list The PlutusList
    */
-  private static mapToCorePlutusList(list: PlutusList): Cardano.PlutusList {
-    const items: Cardano.PlutusData[] = [];
+  private static mapToCorePlutusList(list: PlutusList): CardanoPlutusList {
+    const items: CardanoPlutusData[] = [];
     for (let i = 0; i < list.getLength(); i++) {
       const element = list.get(i);
       items.push(element.toCore());

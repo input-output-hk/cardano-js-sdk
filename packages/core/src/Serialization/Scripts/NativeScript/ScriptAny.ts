@@ -1,7 +1,7 @@
-import * as Cardano from '../../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { NativeScript } from './NativeScript';
+import { NativeScriptKind, RequireAnyOfScript, ScriptType } from '../../../Cardano/types';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
@@ -37,7 +37,7 @@ export class ScriptAny {
     // CDDL
     // script_any = (2, [ * native_script ])
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
-    writer.writeInt(Cardano.NativeScriptKind.RequireAnyOf);
+    writer.writeInt(NativeScriptKind.RequireAnyOf);
     writer.writeStartArray(this.#nativeScripts.length);
 
     for (const nativeScript of this.#nativeScripts) writer.writeEncodedValue(Buffer.from(nativeScript.toCbor(), 'hex'));
@@ -64,11 +64,8 @@ export class ScriptAny {
 
     const kind = Number(reader.readInt());
 
-    if (kind !== Cardano.NativeScriptKind.RequireAnyOf)
-      throw new InvalidArgumentError(
-        'cbor',
-        `Expected kind ${Cardano.NativeScriptKind.RequireAnyOf}, but got kind ${kind}`
-      );
+    if (kind !== NativeScriptKind.RequireAnyOf)
+      throw new InvalidArgumentError('cbor', `Expected kind ${NativeScriptKind.RequireAnyOf}, but got kind ${kind}`);
 
     const scripts = new Array<NativeScript>();
 
@@ -91,10 +88,10 @@ export class ScriptAny {
    *
    * @returns The Core RequireAnyOfScript object.
    */
-  toCore(): Cardano.RequireAnyOfScript {
+  toCore(): RequireAnyOfScript {
     return {
-      __type: Cardano.ScriptType.Native,
-      kind: Cardano.NativeScriptKind.RequireAnyOf,
+      __type: ScriptType.Native,
+      kind: NativeScriptKind.RequireAnyOf,
       scripts: this.#nativeScripts.map((script) => script.toCore())
     };
   }
@@ -104,7 +101,7 @@ export class ScriptAny {
    *
    * @param script The core RequireAnyOfScript object.
    */
-  static fromCore(script: Cardano.RequireAnyOfScript) {
+  static fromCore(script: RequireAnyOfScript) {
     return new ScriptAny(script.scripts.map((nativeScript) => NativeScript.fromCore(nativeScript)));
   }
 

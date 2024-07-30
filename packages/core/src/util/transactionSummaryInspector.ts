@@ -1,6 +1,5 @@
-import * as Cardano from '../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
-import { AssetId, TokenMap } from '../Cardano';
+import { AssetId, Lovelace, ProtocolParameters, TokenMap, Tx, TxIn, TxOut, Value } from '../Cardano/types';
 import { AssetInfoWithAmount } from './tokenTransferInspector';
 import { AssetProvider } from '../Provider';
 import {
@@ -14,6 +13,7 @@ import {
   totalAddressOutputsValueInspector
 } from './txInspector';
 import { BigIntMath } from '@cardano-sdk/util';
+import { InputResolver, PaymentAddress, RewardAccount } from '../Cardano/Address';
 import { Logger } from 'ts-log';
 import { Milliseconds } from './time';
 import { TimeoutError } from '../errors';
@@ -25,10 +25,10 @@ import { subtractValueQuantities } from './subtractValueQuantities';
 import { tryGetAssetInfos } from './tryGetAssetInfos';
 
 interface TransactionSummaryInspectorArgs {
-  addresses: Cardano.PaymentAddress[];
-  rewardAccounts: Cardano.RewardAccount[];
-  inputResolver: Cardano.InputResolver;
-  protocolParameters: Cardano.ProtocolParameters;
+  addresses: PaymentAddress[];
+  rewardAccounts: RewardAccount[];
+  inputResolver: InputResolver;
+  protocolParameters: ProtocolParameters;
   assetProvider: AssetProvider;
   dRepKeyHash?: Crypto.Ed25519KeyHashHex;
   timeout: Milliseconds;
@@ -36,15 +36,15 @@ interface TransactionSummaryInspectorArgs {
 }
 
 export type TransactionSummaryInspection = {
-  assets: Map<Cardano.AssetId, AssetInfoWithAmount>;
-  coins: Cardano.Lovelace;
-  collateral: Cardano.Lovelace;
-  deposit: Cardano.Lovelace;
-  returnedDeposit: Cardano.Lovelace;
-  fee: Cardano.Lovelace;
+  assets: Map<AssetId, AssetInfoWithAmount>;
+  coins: Lovelace;
+  collateral: Lovelace;
+  deposit: Lovelace;
+  returnedDeposit: Lovelace;
+  fee: Lovelace;
   unresolved: {
-    inputs: Cardano.TxIn[];
-    value: Cardano.Value;
+    inputs: TxIn[];
+    value: Value;
   };
 };
 
@@ -67,10 +67,10 @@ type IntoTokenTransferValueProps = {
  * @param addresses addresses to inspect.
  */
 export const getCollateral = async (
-  tx: Cardano.Tx,
-  inputResolver: Cardano.InputResolver,
-  addresses: Cardano.PaymentAddress[]
-): Promise<Cardano.Lovelace> => {
+  tx: Tx,
+  inputResolver: InputResolver,
+  addresses: PaymentAddress[]
+): Promise<Lovelace> => {
   if (!tx.body.collaterals || tx.body.collaterals.length === 0) return 0n;
 
   const resolvedCollateralInputs = (await resolveInputs(tx.body.collaterals, inputResolver)).resolvedInputs.filter(
@@ -99,14 +99,14 @@ const totalInputsValue = (resolvedInputs: ResolutionResult) => {
   return coalesceValueQuantities(receivedInputsValues);
 };
 
-const totalOutputsValue = (outputs: Cardano.TxOut[]) => coalesceValueQuantities(outputs.map((output) => output.value));
+const totalOutputsValue = (outputs: TxOut[]) => coalesceValueQuantities(outputs.map((output) => output.value));
 
 const mintInspectionToTokenMap = (mintedAssets: AssetsMintedInspection) =>
-  new Map<Cardano.AssetId, bigint>(
+  new Map<AssetId, bigint>(
     mintedAssets.map((asset) => [AssetId.fromParts(asset.policyId, asset.assetName), asset.quantity])
   );
 
-const getImplicitAssets = async (tx: Cardano.Tx) => {
+const getImplicitAssets = async (tx: Tx) => {
   const mintedAssets = mintInspectionToTokenMap(await assetsMintedInspector(tx));
   const burnedAssets = mintInspectionToTokenMap(await assetsBurnedInspector(tx));
 
@@ -114,12 +114,12 @@ const getImplicitAssets = async (tx: Cardano.Tx) => {
 };
 
 const getUnaccountedFunds = async (
-  tx: Cardano.Tx,
+  tx: Tx,
   resolvedInputs: ResolutionResult,
-  implicitCoin: Cardano.Lovelace,
-  fee: Cardano.Lovelace,
-  implicitAssets: Cardano.TokenMap = new Map()
-): Promise<Cardano.Value> => {
+  implicitCoin: Lovelace,
+  fee: Lovelace,
+  implicitAssets: TokenMap = new Map()
+): Promise<Value> => {
   const totalInputs = totalInputsValue(resolvedInputs);
   const totalOutputs = totalOutputsValue(tx.body.outputs);
 
@@ -135,11 +135,11 @@ const intoAssetInfoWithAmount = async ({
   logger,
   timeout,
   tokenMap
-}: IntoTokenTransferValueProps): Promise<Map<Cardano.AssetId, AssetInfoWithAmount>> => {
+}: IntoTokenTransferValueProps): Promise<Map<AssetId, AssetInfoWithAmount>> => {
   if (!tokenMap) return new Map();
 
   const assetIds = tokenMap && tokenMap.size > 0 ? [...tokenMap.keys()] : [];
-  const assetInfos = new Map<Cardano.AssetId, AssetInfoWithAmount>();
+  const assetInfos = new Map<AssetId, AssetInfoWithAmount>();
 
   if (assetIds.length > 0) {
     const assets = await tryGetAssetInfos({

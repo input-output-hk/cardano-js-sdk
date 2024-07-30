@@ -1,6 +1,6 @@
 import * as assetUtil from '../Asset/util';
 import { BigIntMath } from '@cardano-sdk/util';
-import { Value } from '../Cardano';
+import { Value } from '../Cardano/types/Value';
 
 /** Sum all quantities */
 export const coalesceValueQuantities = (quantities: Value[]): Value => ({

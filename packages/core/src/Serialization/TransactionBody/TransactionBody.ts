@@ -1,10 +1,12 @@
 /* eslint-disable sonarjs/cognitive-complexity, complexity, sonarjs/cognitive-complexity, max-statements */
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
+import { Address, RewardAccount, RewardAddress } from '../../Cardano/Address';
+import { AssetName, Lovelace, Slot, TokenMap, TxBody } from '../../Cardano/types';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { CborSet, Hash } from '../Common';
 import { Certificate } from '../Certificates';
 import { HexBlob } from '@cardano-sdk/util';
+import { NetworkId } from '../../Cardano/ChainId';
 import { ProposalProcedure } from './ProposalProcedure';
 import { SerializationError, SerializationFailure } from '../../errors';
 import { TransactionInput } from './TransactionInput';
@@ -21,27 +23,27 @@ export class TransactionBody {
   // Required fields
   #inputs: TransactionInputSet;
   #outputs: Array<TransactionOutput>;
-  #fee: Cardano.Lovelace;
+  #fee: Lovelace;
 
   // Optional fields
-  #ttl: Cardano.Slot | undefined;
+  #ttl: Slot | undefined;
   #certs: CborSet<ReturnType<Certificate['toCore']>, Certificate> | undefined;
-  #withdrawals: Map<Cardano.RewardAccount, Cardano.Lovelace> | undefined;
+  #withdrawals: Map<RewardAccount, Lovelace> | undefined;
   #update: Update | undefined;
   #auxiliaryDataHash: Crypto.Hash32ByteBase16 | undefined;
-  #validityStartInterval: Cardano.Slot | undefined;
-  #mint: Cardano.TokenMap | undefined;
+  #validityStartInterval: Slot | undefined;
+  #mint: TokenMap | undefined;
   #scriptDataHash: Crypto.Hash32ByteBase16 | undefined;
   #collateral: TransactionInputSet | undefined;
   #requiredSigners: CborSet<Crypto.Ed25519KeyHashHex, Hash<Crypto.Ed25519KeyHashHex>> | undefined;
-  #networkId: Cardano.NetworkId | undefined;
+  #networkId: NetworkId | undefined;
   #collateralReturn: TransactionOutput | undefined;
-  #totalCollateral: Cardano.Lovelace | undefined;
+  #totalCollateral: Lovelace | undefined;
   #referenceInputs: TransactionInputSet | undefined;
   #votingProcedures: VotingProcedures | undefined;
   #proposalProcedures: CborSet<ReturnType<ProposalProcedure['toCore']>, ProposalProcedure> | undefined;
-  #currentTreasuryValue: Cardano.Lovelace | undefined;
-  #donation: Cardano.Lovelace | undefined;
+  #currentTreasuryValue: Lovelace | undefined;
+  #donation: Lovelace | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -52,12 +54,7 @@ export class TransactionBody {
    * @param fee The amount of ADA designated as the fee for this transaction. Fees compensate stakeholders, including stake pool operators, for participating in the network.
    * @param ttl Specifies the slot number until which the transaction is valid. If the transaction isn't included in a block by this slot, it becomes invalid.
    */
-  constructor(
-    inputs: TransactionInputSet,
-    outputs: Array<TransactionOutput>,
-    fee: Cardano.Lovelace,
-    ttl?: Cardano.Slot
-  ) {
+  constructor(inputs: TransactionInputSet, outputs: Array<TransactionOutput>, fee: Lovelace, ttl?: Slot) {
     this.#inputs = inputs;
     this.#outputs = outputs;
     this.#fee = fee;
@@ -131,7 +128,7 @@ export class TransactionBody {
       // Create a new map with address bytes to avoid logic duplication and address checks
       const withdrawalsWithAddressBytes = new Map();
       for (const [key, value] of this.#withdrawals) {
-        const rewardAddress = Cardano.RewardAddress.fromAddress(Cardano.Address.fromBech32(key));
+        const rewardAddress = RewardAddress.fromAddress(Address.fromBech32(key));
         if (!rewardAddress) {
           throw new SerializationError(SerializationFailure.InvalidAddress, `Invalid withdrawal address: ${key}`);
         }
@@ -255,7 +252,7 @@ export class TransactionBody {
 
     const inputs = CborSet.fromCore([], TransactionInput.fromCore);
     const outputs: Array<TransactionOutput> = new Array<TransactionOutput>();
-    const fee: Cardano.Lovelace = 0n;
+    const fee: Lovelace = 0n;
     const body = new TransactionBody(inputs, outputs, fee);
 
     reader.readStartMap();
@@ -284,7 +281,7 @@ export class TransactionBody {
           body.setFee(reader.readInt());
           break;
         case 3n:
-          body.setTtl(Cardano.Slot(Number(reader.readInt())));
+          body.setTtl(Slot(Number(reader.readInt())));
           break;
         case 4n: {
           body.setCerts(CborSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), Certificate.fromCbor));
@@ -293,12 +290,10 @@ export class TransactionBody {
         case 5n: {
           reader.readStartMap();
 
-          body.setWithdrawals(new Map<Cardano.RewardAccount, Cardano.Lovelace>());
+          body.setWithdrawals(new Map<RewardAccount, Lovelace>());
 
           while (reader.peekState() !== CborReaderState.EndMap) {
-            const account = Cardano.Address.fromBytes(
-              HexBlob.fromBytes(reader.readByteString())
-            ).toBech32() as Cardano.RewardAccount;
+            const account = Address.fromBytes(HexBlob.fromBytes(reader.readByteString())).toBech32() as RewardAccount;
 
             const amount = reader.readInt();
             body.withdrawals()!.set(account, amount);
@@ -314,20 +309,20 @@ export class TransactionBody {
           body.setAuxiliaryDataHash(HexBlob.fromBytes(reader.readByteString()) as unknown as Crypto.Hash32ByteBase16);
           break;
         case 8n:
-          body.setValidityStartInterval(Cardano.Slot(Number(reader.readInt())));
+          body.setValidityStartInterval(Slot(Number(reader.readInt())));
           break;
         case 9n: {
-          const multiassets = new Map<Crypto.Hash28ByteBase16, Map<Cardano.AssetName, bigint>>();
+          const multiassets = new Map<Crypto.Hash28ByteBase16, Map<AssetName, bigint>>();
 
           reader.readStartMap();
           while (reader.peekState() !== CborReaderState.EndMap) {
             const scriptHash = HexBlob.fromBytes(reader.readByteString()) as unknown as Crypto.Hash28ByteBase16;
 
-            if (!multiassets.has(scriptHash)) multiassets.set(scriptHash, new Map<Cardano.AssetName, bigint>());
+            if (!multiassets.has(scriptHash)) multiassets.set(scriptHash, new Map<AssetName, bigint>());
 
             reader.readStartMap();
             while (reader.peekState() !== CborReaderState.EndMap) {
-              const assetName = Buffer.from(reader.readByteString()).toString('hex') as unknown as Cardano.AssetName;
+              const assetName = Buffer.from(reader.readByteString()).toString('hex') as unknown as AssetName;
               const quantity = reader.readInt();
 
               multiassets.get(scriptHash)!.set(assetName, quantity);
@@ -354,7 +349,7 @@ export class TransactionBody {
           );
           break;
         case 15n:
-          body.setNetworkId(Number(reader.readInt()) as Cardano.NetworkId);
+          body.setNetworkId(Number(reader.readInt()) as NetworkId);
           break;
         case 16n:
           body.setCollateralReturn(TransactionOutput.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
@@ -396,7 +391,7 @@ export class TransactionBody {
    *
    * @returns The Core TransactionBody object.
    */
-  toCore(): Cardano.TxBody {
+  toCore(): TxBody {
     return {
       auxiliaryDataHash: this.#auxiliaryDataHash,
       certificates: this.#certs?.values() ? this.#certs.toCore() : undefined,
@@ -434,7 +429,7 @@ export class TransactionBody {
    *
    * @param coreTransactionBody The core TransactionBody object.
    */
-  static fromCore(coreTransactionBody: Cardano.TxBody): TransactionBody {
+  static fromCore(coreTransactionBody: TxBody): TransactionBody {
     const body = new TransactionBody(
       CborSet.fromCore(coreTransactionBody.inputs, TransactionInput.fromCore),
       // new CborSet<TransactionInput>(coreTransactionBody.inputs.map((input) => TransactionInput.fromCore(input))),
@@ -477,7 +472,7 @@ export class TransactionBody {
     }
 
     if (coreTransactionBody.withdrawals) {
-      body.setWithdrawals(new Map<Cardano.RewardAccount, Cardano.Lovelace>());
+      body.setWithdrawals(new Map<RewardAccount, Lovelace>());
 
       for (const coreWithdrawal of coreTransactionBody.withdrawals) {
         body.withdrawals()!.set(coreWithdrawal.stakeAddress, coreWithdrawal.quantity);
@@ -542,7 +537,7 @@ export class TransactionBody {
    *
    * @param fee The amount of ADA designated as the fee for this transaction
    */
-  setFee(fee: Cardano.Lovelace) {
+  setFee(fee: Lovelace) {
     this.#fee = fee;
     this.#originalBytes = undefined;
   }
@@ -553,7 +548,7 @@ export class TransactionBody {
    *
    * @returns The amount of ADA designated as the fee for this transaction.
    */
-  fee(): Cardano.Lovelace {
+  fee(): Lovelace {
     return this.#fee;
   }
 
@@ -563,7 +558,7 @@ export class TransactionBody {
    *
    * @param ttl The slot number until which the transaction is valid.
    */
-  setTtl(ttl: Cardano.Slot) {
+  setTtl(ttl: Slot) {
     this.#ttl = ttl;
     this.#originalBytes = undefined;
   }
@@ -574,7 +569,7 @@ export class TransactionBody {
    *
    * @returns The slot number until which the transaction is valid.
    */
-  ttl(): Cardano.Slot | undefined {
+  ttl(): Slot | undefined {
     return this.#ttl;
   }
 
@@ -604,7 +599,7 @@ export class TransactionBody {
    *
    * @param withdrawals The list of withdrawals.
    */
-  setWithdrawals(withdrawals: Map<Cardano.RewardAccount, Cardano.Lovelace>): void {
+  setWithdrawals(withdrawals: Map<RewardAccount, Lovelace>): void {
     this.#withdrawals = withdrawals;
     this.#originalBytes = undefined;
   }
@@ -614,7 +609,7 @@ export class TransactionBody {
    *
    * @returns The list of withdrawals.
    */
-  withdrawals(): Map<Cardano.RewardAccount, Cardano.Lovelace> | undefined {
+  withdrawals(): Map<RewardAccount, Lovelace> | undefined {
     return this.#withdrawals;
   }
 
@@ -664,7 +659,7 @@ export class TransactionBody {
    *
    * @param validityStartInterval The earliest slot in which the transaction is valid.
    */
-  setValidityStartInterval(validityStartInterval: Cardano.Slot): void {
+  setValidityStartInterval(validityStartInterval: Slot): void {
     this.#validityStartInterval = validityStartInterval;
     this.#originalBytes = undefined;
   }
@@ -675,7 +670,7 @@ export class TransactionBody {
    *
    * @returns The earliest slot in which the transaction is valid.
    */
-  validityStartInterval(): Cardano.Slot | undefined {
+  validityStartInterval(): Slot | undefined {
     return this.#validityStartInterval;
   }
 
@@ -684,7 +679,7 @@ export class TransactionBody {
    *
    * @param mint The list of tokens being minted or burned.
    */
-  setMint(mint: Cardano.TokenMap): void {
+  setMint(mint: TokenMap): void {
     // We need to segregate the token map as a multiasset to be able to sort it correctly in canonical form.
     this.#mint = multiAssetsToTokenMap(new Map([...tokenMapToMultiAsset(mint!).entries()].sort(sortCanonically)));
 
@@ -696,7 +691,7 @@ export class TransactionBody {
    *
    * @returns The list of tokens being minted or burned.
    */
-  mint(): Cardano.TokenMap | undefined {
+  mint(): TokenMap | undefined {
     return this.#mint;
   }
 
@@ -765,7 +760,7 @@ export class TransactionBody {
    *
    * @param networkId The id of the network this transaction is intended for.
    */
-  setNetworkId(networkId: Cardano.NetworkId): void {
+  setNetworkId(networkId: NetworkId): void {
     this.#networkId = networkId;
     this.#originalBytes = undefined;
   }
@@ -776,7 +771,7 @@ export class TransactionBody {
    *
    * @returns The id of the network this transaction is intended for.
    */
-  networkId(): Cardano.NetworkId | undefined {
+  networkId(): NetworkId | undefined {
     return this.#networkId;
   }
 
@@ -813,7 +808,7 @@ export class TransactionBody {
    *
    * @param totalCollateral The total collateral amount.
    */
-  setTotalCollateral(totalCollateral: Cardano.Lovelace): void {
+  setTotalCollateral(totalCollateral: Lovelace): void {
     this.#totalCollateral = totalCollateral;
     this.#originalBytes = undefined;
   }
@@ -823,7 +818,7 @@ export class TransactionBody {
    *
    * @returns The total collateral amount.
    */
-  totalCollateral(): Cardano.Lovelace | undefined {
+  totalCollateral(): Lovelace | undefined {
     return this.#totalCollateral;
   }
 
@@ -888,7 +883,7 @@ export class TransactionBody {
    *
    * @param currentTreasuryValue the current treasury value.
    */
-  setCurrentTreasuryValue(currentTreasuryValue: Cardano.Lovelace): void {
+  setCurrentTreasuryValue(currentTreasuryValue: Lovelace): void {
     this.#currentTreasuryValue = currentTreasuryValue;
     this.#originalBytes = undefined;
   }
@@ -898,7 +893,7 @@ export class TransactionBody {
    *
    * @returns the current treasury value.
    */
-  currentTreasuryValue(): Cardano.Lovelace | undefined {
+  currentTreasuryValue(): Lovelace | undefined {
     return this.#currentTreasuryValue;
   }
 
@@ -907,7 +902,7 @@ export class TransactionBody {
    *
    * @param donation The treasury donation.
    */
-  setDonation(donation: Cardano.Lovelace): void {
+  setDonation(donation: Lovelace): void {
     this.#donation = donation;
     this.#originalBytes = undefined;
   }
@@ -917,7 +912,7 @@ export class TransactionBody {
    *
    * @returns The treasury donation.
    */
-  donation(): Cardano.Lovelace | undefined {
+  donation(): Lovelace | undefined {
     return this.#donation;
   }
 

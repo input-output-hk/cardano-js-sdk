@@ -1,6 +1,6 @@
-import * as Cardano from '../../../Cardano';
+import { Committee as CardanoCommittee, CommitteeMember } from '../../../Cardano/types/Governance';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
-import { CommitteeMember } from '../../../Cardano';
+import { Credential } from '../../../Cardano/Address/Address';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
 import { UnitInterval } from '../../Common';
@@ -21,7 +21,7 @@ const EPOCH_INDEX = 1;
  */
 export class Committee {
   #quorumThreshold: UnitInterval;
-  #committeeColdCredentials: [Cardano.Credential, number][] = [];
+  #committeeColdCredentials: [Credential, number][] = [];
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -83,7 +83,7 @@ export class Committee {
 
     reader.readStartMap();
 
-    const members: [Cardano.Credential, number][] = [];
+    const members: [Credential, number][] = [];
     while (reader.peekState() !== CborReaderState.EndMap) {
       if (reader.readStartArray() !== CREDENTIAL_ARRAY_SIZE)
         throw new InvalidArgumentError(
@@ -117,7 +117,7 @@ export class Committee {
    *
    * @returns The Core Committee object.
    */
-  toCore(): Cardano.Committee {
+  toCore(): CardanoCommittee {
     if (this.#committeeColdCredentials.length === 0)
       throw new InvalidStateError('There must be at least one Committee member');
 
@@ -137,7 +137,7 @@ export class Committee {
    *
    * @param coreCommittee core Committee object.
    */
-  static fromCore(coreCommittee: Cardano.Committee) {
+  static fromCore(coreCommittee: CardanoCommittee) {
     const committee = new Committee(UnitInterval.fromCore(coreCommittee.quorumThreshold));
 
     for (const member of coreCommittee.members) committee.addMember(member.coldCredential, member.epoch);
@@ -150,7 +150,7 @@ export class Committee {
    *
    * @returns The credentials.
    */
-  membersKeys(): Cardano.Credential[] {
+  membersKeys(): Credential[] {
     return this.#committeeColdCredentials.map((entry) => entry[0]);
   }
 
@@ -165,12 +165,12 @@ export class Committee {
   }
 
   /**
-   * Adds a new member to the committe.
+   * Adds a new member to the committee.
    *
    * @param committeeColdCredential The committee credential.
    * @param epoch The epoch at which this committee member term will end.
    */
-  addMember(committeeColdCredential: Cardano.Credential, epoch: number) {
+  addMember(committeeColdCredential: Credential, epoch: number) {
     const member = this.#committeeColdCredentials.find(
       (entry) =>
         entry[CREDENTIAL_INDEX].type === committeeColdCredential.type &&
@@ -187,7 +187,7 @@ export class Committee {
    *
    * @param committeeColdCredential The credential of the committee member we wish to get the term for.
    */
-  getMemberEpoch(committeeColdCredential: Cardano.Credential): number | undefined {
+  getMemberEpoch(committeeColdCredential: Credential): number | undefined {
     const member = this.#committeeColdCredentials.find(
       (entry) =>
         entry[CREDENTIAL_INDEX].type === committeeColdCredential.type &&

@@ -1,6 +1,6 @@
-import * as Cardano from '../../../Cardano';
+import { Voter as CardanoVoter, VoterType } from '../../../Cardano/types/Governance';
 import { CborReader, CborWriter } from '../../CBOR';
-import { CredentialType, VoterType } from '../../../Cardano';
+import { Credential, CredentialType } from '../../../Cardano/Address/Address';
 import { Ed25519KeyHashHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
 import { VoterKind } from './VoterKind';
@@ -17,7 +17,7 @@ const EMBEDDED_GROUP_SIZE = 2;
  */
 export class Voter {
   #kind: VoterKind;
-  #credential: Cardano.Credential;
+  #credential: Credential;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -26,7 +26,7 @@ export class Voter {
    * @param kind The kind of voter.
    * @param credential The voter credential.
    */
-  constructor(kind: VoterKind, credential: Cardano.Credential) {
+  constructor(kind: VoterKind, credential: Credential) {
     this.#kind = kind;
     this.#credential = credential;
   }
@@ -68,7 +68,7 @@ export class Voter {
    * @returns The new Voter instance.
    */
   static fromCbor(cbor: HexBlob): Voter {
-    let credential: Cardano.Credential;
+    let credential: Credential;
 
     const reader = new CborReader(cbor);
 
@@ -108,7 +108,7 @@ export class Voter {
    *
    * @returns The Core Voter object.
    */
-  toCore(): Cardano.Voter {
+  toCore(): CardanoVoter {
     switch (this.#kind) {
       case VoterKind.ConstitutionalCommitteeKeyHash:
         return {
@@ -160,7 +160,7 @@ export class Voter {
    *
    * @param coreVoter The core Voter object.
    */
-  static fromCore(coreVoter: Cardano.Voter): Voter {
+  static fromCore(coreVoter: CardanoVoter): Voter {
     let voter;
 
     switch (coreVoter.__typename) {
@@ -187,7 +187,7 @@ export class Voter {
    *
    * @param credential The constitutional committee credential.
    */
-  static newConstitutionalCommitteeHotKey(credential: Cardano.Credential): Voter {
+  static newConstitutionalCommitteeHotKey(credential: Credential): Voter {
     const kind =
       credential.type === CredentialType.KeyHash
         ? VoterKind.ConstitutionalCommitteeKeyHash
@@ -201,7 +201,7 @@ export class Voter {
    *
    * @param credential The delegation Representative credential.
    */
-  static newDrep(credential: Cardano.Credential): Voter {
+  static newDrep(credential: Credential): Voter {
     const kind = credential.type === CredentialType.KeyHash ? VoterKind.DrepKeyHash : VoterKind.DRepScriptHash;
 
     return new Voter(kind, credential);
@@ -229,7 +229,7 @@ export class Voter {
    *
    * @returns The constitutional committee credential, or undefined.
    */
-  toConstitutionalCommitteeHotCred(): Cardano.Credential | undefined {
+  toConstitutionalCommitteeHotCred(): Credential | undefined {
     if (
       this.#kind === VoterKind.ConstitutionalCommitteeKeyHash ||
       this.#kind === VoterKind.ConstitutionalCommitteeScriptHash
@@ -244,7 +244,7 @@ export class Voter {
    *
    * @returns The delegation representative credential, or undefined.
    */
-  toDrepCred(): Cardano.Credential | undefined {
+  toDrepCred(): Credential | undefined {
     if (this.#kind === VoterKind.DrepKeyHash || this.#kind === VoterKind.DRepScriptHash) return this.#credential;
 
     return undefined;

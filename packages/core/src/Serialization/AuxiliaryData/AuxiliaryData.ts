@@ -1,5 +1,5 @@
 /* eslint-disable complexity,max-statements,sonarjs/cognitive-complexity, unicorn/prefer-switch */
-import * as Cardano from '../../Cardano';
+import { AuxiliaryData as CardanoAuxiliaryData, PlutusLanguageVersion, Script, ScriptType } from '../../Cardano/types';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { GeneralTransactionMetadata } from './TransactionMetadata/GeneralTransactionMetadata';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
@@ -225,7 +225,7 @@ export class AuxiliaryData {
    *
    * @returns The Core AuxiliaryData object.
    */
-  toCore(): Cardano.AuxiliaryData {
+  toCore(): CardanoAuxiliaryData {
     const scripts = this.#getCoreScripts();
     return {
       blob: this.#metadata ? this.#metadata.toCore() : undefined,
@@ -238,7 +238,7 @@ export class AuxiliaryData {
    *
    * @param auxData The core AuxiliaryData object.
    */
-  static fromCore(auxData: Cardano.AuxiliaryData): AuxiliaryData {
+  static fromCore(auxData: CardanoAuxiliaryData): AuxiliaryData {
     const result = new AuxiliaryData();
 
     if (auxData.blob) {
@@ -379,7 +379,7 @@ export class AuxiliaryData {
    * @returns The list of scripts.
    * @private
    */
-  #getCoreScripts(): Array<Cardano.Script> {
+  #getCoreScripts(): Array<Script> {
     const plutusV1 = this.#plutusV1Scripts ? this.#plutusV1Scripts.map((script) => script.toCore()) : [];
     const plutusV2 = this.#plutusV2Scripts ? this.#plutusV2Scripts.map((script) => script.toCore()) : [];
     const plutusV3 = this.#plutusV3Scripts ? this.#plutusV3Scripts.map((script) => script.toCore()) : [];
@@ -394,26 +394,26 @@ export class AuxiliaryData {
    * @returns The list of scripts.
    * @private
    */
-  static #getCddlScripts(scripts: Array<Cardano.Script>): CddlScripts {
+  static #getCddlScripts(scripts: Array<Script>): CddlScripts {
     const result: CddlScripts = { native: undefined, plutusV1: undefined, plutusV2: undefined, plutusV3: undefined };
 
     for (const script of scripts) {
       switch (script.__type) {
-        case Cardano.ScriptType.Native:
+        case ScriptType.Native:
           if (!result.native) result.native = new Array<NativeScript>();
 
           result.native.push(NativeScript.fromCore(script));
           break;
-        case Cardano.ScriptType.Plutus:
-          if (script.version === Cardano.PlutusLanguageVersion.V1) {
+        case ScriptType.Plutus:
+          if (script.version === PlutusLanguageVersion.V1) {
             if (!result.plutusV1) result.plutusV1 = new Array<PlutusV1Script>();
 
             result.plutusV1.push(PlutusV1Script.fromCore(script));
-          } else if (script.version === Cardano.PlutusLanguageVersion.V2) {
+          } else if (script.version === PlutusLanguageVersion.V2) {
             if (!result.plutusV2) result.plutusV2 = new Array<PlutusV2Script>();
 
             result.plutusV2.push(PlutusV2Script.fromCore(script));
-          } else if (script.version === Cardano.PlutusLanguageVersion.V3) {
+          } else if (script.version === PlutusLanguageVersion.V3) {
             if (!result.plutusV3) result.plutusV3 = new Array<PlutusV3Script>();
 
             result.plutusV3.push(PlutusV3Script.fromCore(script));

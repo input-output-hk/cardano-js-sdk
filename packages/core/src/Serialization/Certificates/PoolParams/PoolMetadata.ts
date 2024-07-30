@@ -1,7 +1,7 @@
-import * as Cardano from '../../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborWriter } from '../../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import { PoolMetadataJson } from '../../../Cardano/types/StakePool/PoolParameters';
 
 const MAX_URL_SIZE_STR_LENGTH = 64;
 const EMBEDDED_GROUP_SIZE = 2;
@@ -90,7 +90,7 @@ export class PoolMetadata {
    *
    * @returns The Core PoolMetadataJson object.
    */
-  toCore(): Cardano.PoolMetadataJson {
+  toCore(): PoolMetadataJson {
     return {
       hash: this.#hash,
       url: this.#url
@@ -102,7 +102,7 @@ export class PoolMetadata {
    *
    * @param metadata core PoolMetadataJson object.
    */
-  static fromCore(metadata: Cardano.PoolMetadataJson) {
+  static fromCore(metadata: PoolMetadataJson) {
     return new PoolMetadata(metadata.url, metadata.hash);
   }
 

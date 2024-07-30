@@ -1,5 +1,5 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
+import { AssetName, Value as CardanoValue, Lovelace, TokenMap } from '../../Cardano/types';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { multiAssetsToTokenMap, sortCanonically, tokenMapToMultiAsset } from './Utils';
@@ -15,7 +15,7 @@ const VALUE_ARRAY_SIZE = 2;
  */
 export class Value {
   #coin = 0n;
-  #multiasset: Cardano.TokenMap | undefined = undefined;
+  #multiasset: TokenMap | undefined = undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -24,7 +24,7 @@ export class Value {
    * @param coin  Amount of lovelace represented by this Value.
    * @param multiasset The collection of native assets represented by this Value.
    */
-  constructor(coin: Cardano.Lovelace, multiasset?: Cardano.TokenMap) {
+  constructor(coin: Lovelace, multiasset?: TokenMap) {
     this.#coin = coin;
 
     // We need to segregate the token map as a multiasset to be able to sort it correctly in canonical form.
@@ -94,17 +94,17 @@ export class Value {
       );
 
     const coins = reader.readInt();
-    const multiassets = new Map<Crypto.Hash28ByteBase16, Map<Cardano.AssetName, bigint>>();
+    const multiassets = new Map<Crypto.Hash28ByteBase16, Map<AssetName, bigint>>();
 
     reader.readStartMap();
     while (reader.peekState() !== CborReaderState.EndMap) {
       const scriptHash = HexBlob.fromBytes(reader.readByteString()) as unknown as Crypto.Hash28ByteBase16;
 
-      if (!multiassets.has(scriptHash)) multiassets.set(scriptHash, new Map<Cardano.AssetName, bigint>());
+      if (!multiassets.has(scriptHash)) multiassets.set(scriptHash, new Map<AssetName, bigint>());
 
       reader.readStartMap();
       while (reader.peekState() !== CborReaderState.EndMap) {
-        const assetName = Buffer.from(reader.readByteString()).toString('hex') as unknown as Cardano.AssetName;
+        const assetName = Buffer.from(reader.readByteString()).toString('hex') as unknown as AssetName;
         const quantity = reader.readInt();
 
         multiassets.get(scriptHash)!.set(assetName, quantity);
@@ -125,7 +125,7 @@ export class Value {
    *
    * @returns The Core Value object.
    */
-  toCore(): Cardano.Value {
+  toCore(): CardanoValue {
     return { assets: this.#multiasset, coins: this.#coin };
   }
 
@@ -134,7 +134,7 @@ export class Value {
    *
    * @param coreValue The core Value object.
    */
-  static fromCore(coreValue: Cardano.Value): Value {
+  static fromCore(coreValue: CardanoValue): Value {
     return new Value(coreValue.coins, coreValue.assets);
   }
 
@@ -144,7 +144,7 @@ export class Value {
    * @returns The coin amount of this value in lovelace,
    * where 1 ADA = 1,000,000 lovelace.
    */
-  coin(): Cardano.Lovelace {
+  coin(): Lovelace {
     return this.#coin;
   }
 
@@ -154,7 +154,7 @@ export class Value {
    * @param coin The coin amount of this value in lovelace,
    * where 1 ADA = 1,000,000 lovelace.
    */
-  setCoin(coin: Cardano.Lovelace): void {
+  setCoin(coin: Lovelace): void {
     this.#coin = coin;
     this.#originalBytes = undefined;
   }
@@ -171,7 +171,7 @@ export class Value {
    *
    * @returns A mapping of asset identifiers to their quantities.
    */
-  multiasset(): Cardano.TokenMap | undefined {
+  multiasset(): TokenMap | undefined {
     return this.#multiasset;
   }
 
@@ -180,7 +180,7 @@ export class Value {
    *
    * @param multiasset A mapping of asset identifiers to their quantities.
    */
-  setMultiasset(multiasset: Cardano.TokenMap): void {
+  setMultiasset(multiasset: TokenMap): void {
     // We need to segregate the token map as a multiasset to be able to sort it correctly in canonical form.
     this.#multiasset = multiAssetsToTokenMap(
       new Map([...tokenMapToMultiAsset(multiasset!).entries()].sort(sortCanonically))

@@ -1,14 +1,21 @@
-import * as Cardano from '../../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
+import {
+  CertificateType,
+  Lovelace,
+  MirCertificate,
+  MirCertificateKind,
+  MirCertificatePot
+} from '../../../Cardano/types';
+import { Credential, CredentialType } from '../../../Cardano/Address/Address';
 import { HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
 /** Creates a move instantaneous rewards certificate that transfers funds to the given set of reward accounts. */
 export class MoveInstantaneousRewardToStakeCreds {
-  #pot: Cardano.MirCertificatePot;
-  #credentials: Map<Cardano.Credential, Cardano.Lovelace>;
+  #pot: MirCertificatePot;
+  #credentials: Map<Credential, Lovelace>;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -17,7 +24,7 @@ export class MoveInstantaneousRewardToStakeCreds {
    * @param pot Determines where the funds are drawn from.
    * @param credentials A map specifying which stake credentials to transfer the funds to.
    */
-  constructor(pot: Cardano.MirCertificatePot, credentials: Map<Cardano.Credential, bigint>) {
+  constructor(pot: MirCertificatePot, credentials: Map<Credential, bigint>) {
     this.#pot = pot;
     this.#credentials = credentials;
   }
@@ -35,7 +42,7 @@ export class MoveInstantaneousRewardToStakeCreds {
     // CDDL
     // move_instantaneous_reward = [ 0 / 1, coin ]
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
-    writer.writeInt(this.#pot === Cardano.MirCertificatePot.Reserves ? 0 : 1);
+    writer.writeInt(this.#pot === MirCertificatePot.Reserves ? 0 : 1);
 
     const sortedCanonically = new Map([...this.#credentials].sort((a, b) => (a > b ? 1 : -1)));
 
@@ -86,7 +93,7 @@ export class MoveInstantaneousRewardToStakeCreds {
 
     reader.readStartMap();
 
-    const amounts = new Map<Cardano.Credential, Cardano.Lovelace>();
+    const amounts = new Map<Credential, Lovelace>();
     while (reader.peekState() !== CborReaderState.EndMap) {
       // Read key
       reader.readStartArray();
@@ -104,13 +111,13 @@ export class MoveInstantaneousRewardToStakeCreds {
       // Read value
       const amount = reader.readInt();
 
-      amounts.set({ hash: credHash, type: credentialType as Cardano.CredentialType }, amount);
+      amounts.set({ hash: credHash, type: credentialType as CredentialType }, amount);
     }
 
     reader.readEndMap();
 
     const cert = new MoveInstantaneousRewardToStakeCreds(
-      pot === 0 ? Cardano.MirCertificatePot.Reserves : Cardano.MirCertificatePot.Treasury,
+      pot === 0 ? MirCertificatePot.Reserves : MirCertificatePot.Treasury,
       amounts
     );
 
@@ -124,7 +131,7 @@ export class MoveInstantaneousRewardToStakeCreds {
    *
    * @returns The Core MirCertificate object.
    */
-  toCore(): Cardano.MirCertificate {
+  toCore(): MirCertificate {
     // TODO: Mir certificate should hold a map of credentials rather than a single credential,
     // we will refactor further this interface once we fix Core cert type interfaces.
     if (this.#credentials.size === 0) throw new InvalidStateError('The credential map is empty.');
@@ -132,8 +139,8 @@ export class MoveInstantaneousRewardToStakeCreds {
     const [[stakeCredential, quantity]] = this.#credentials;
 
     return {
-      __typename: Cardano.CertificateType.MIR,
-      kind: Cardano.MirCertificateKind.ToStakeCreds,
+      __typename: CertificateType.MIR,
+      kind: MirCertificateKind.ToStakeCreds,
       pot: this.#pot,
       quantity,
       stakeCredential
@@ -145,8 +152,8 @@ export class MoveInstantaneousRewardToStakeCreds {
    *
    * @param cert The core MirCertificate object.
    */
-  static fromCore(cert: Cardano.MirCertificate) {
-    if (cert.kind !== Cardano.MirCertificateKind.ToStakeCreds)
+  static fromCore(cert: MirCertificate) {
+    if (cert.kind !== MirCertificateKind.ToStakeCreds)
       throw new InvalidArgumentError('cert', `Expected a MIR certificate kind 'ToStakeCreds', but got ${cert.kind}`);
 
     if (cert.stakeCredential === undefined)
@@ -162,7 +169,7 @@ export class MoveInstantaneousRewardToStakeCreds {
    *
    * @returns The rewards pot where the funds are drawn from.
    */
-  pot(): Cardano.MirCertificatePot {
+  pot(): MirCertificatePot {
     return this.#pot;
   }
 
@@ -171,7 +178,7 @@ export class MoveInstantaneousRewardToStakeCreds {
    *
    * @param pot The rewards pot where the funds are drawn from.
    */
-  setPot(pot: Cardano.MirCertificatePot): void {
+  setPot(pot: MirCertificatePot): void {
     this.#pot = pot;
     this.#originalBytes = undefined;
   }
@@ -182,7 +189,7 @@ export class MoveInstantaneousRewardToStakeCreds {
    *
    * @returns The given set of stake credentials and the amounts to be transferred.
    */
-  getStakeCreds(): Map<Cardano.Credential, bigint> | undefined {
+  getStakeCreds(): Map<Credential, bigint> | undefined {
     return this.#credentials;
   }
 
@@ -192,7 +199,7 @@ export class MoveInstantaneousRewardToStakeCreds {
    *
    * @param credentials The set of stake credentials and the amounts to be transferred.
    */
-  setStakeCreds(credentials: Map<Cardano.Credential, bigint>): void {
+  setStakeCreds(credentials: Map<Credential, bigint>): void {
     this.#credentials = credentials;
     this.#originalBytes = undefined;
   }

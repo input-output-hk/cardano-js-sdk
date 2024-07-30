@@ -1,6 +1,6 @@
-import * as Cardano from '../../Cardano';
 import { CborReader, CborWriter } from '../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import { Prices } from '../../Cardano/types/ProtocolParameters';
 import { UnitInterval } from '../Common';
 import Fraction from 'fraction.js';
 
@@ -79,7 +79,7 @@ export class ExUnitPrices {
    *
    * @returns The Core Prices object.
    */
-  toCore(): Cardano.Prices {
+  toCore(): Prices {
     return {
       memory: Number(this.#memPrice.numerator()) / Number(this.#memPrice.denominator()),
       steps: Number(this.#stepsPrice.numerator()) / Number(this.#stepsPrice.denominator())
@@ -91,7 +91,7 @@ export class ExUnitPrices {
    *
    * @param prices core Prices object.
    */
-  static fromCore(prices: Cardano.Prices) {
+  static fromCore(prices: Prices) {
     const mem = new Fraction(prices.memory);
     const steps = new Fraction(prices.steps);
 

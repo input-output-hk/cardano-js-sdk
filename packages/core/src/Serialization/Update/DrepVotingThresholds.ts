@@ -1,6 +1,6 @@
 /* eslint-disable max-params */
-import * as Cardano from '../../Cardano';
 import { CborReader, CborWriter } from '../CBOR';
+import { DelegateRepresentativeThresholds } from '../../Cardano/types/ProtocolParameters';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { UnitInterval } from '../Common';
 
@@ -166,7 +166,7 @@ export class DrepVotingThresholds {
    *
    * @returns The Core Prices object.
    */
-  toCore(): Cardano.DelegateRepresentativeThresholds {
+  toCore(): DelegateRepresentativeThresholds {
     return {
       committeeNoConfidence: this.#committeeNoConfidence.toCore(),
       committeeNormal: this.#committeeNormal.toCore(),
@@ -186,7 +186,7 @@ export class DrepVotingThresholds {
    *
    * @param core core DelegateRepresentativeThresholds object.
    */
-  static fromCore(core: Cardano.DelegateRepresentativeThresholds) {
+  static fromCore(core: DelegateRepresentativeThresholds) {
     return new DrepVotingThresholds(
       UnitInterval.fromCore(core.motionNoConfidence),
       UnitInterval.fromCore(core.committeeNormal),

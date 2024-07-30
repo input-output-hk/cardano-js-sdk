@@ -1,4 +1,4 @@
-import * as Cardano from '../Cardano';
+import { Metadatum } from '../Cardano/types/AuxiliaryData';
 import { ProviderError, ProviderFailure } from '../errors';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -29,7 +29,7 @@ const tryParseBigIntKey = (key: string) => {
  * As JSON doesn't support numeric keys,
  * this function assumes that all metadata (and metadatum map) keys parseable by BigInt.parse are numeric.
  */
-export const jsonToMetadatum = (obj: unknown): Cardano.Metadatum => {
+export const jsonToMetadatum = (obj: unknown): Metadatum => {
   switch (typeof obj) {
     case 'number':
       return BigInt(obj);

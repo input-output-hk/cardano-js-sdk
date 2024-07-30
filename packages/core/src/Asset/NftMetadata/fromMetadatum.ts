@@ -1,5 +1,5 @@
 import { AssetInfo } from '../types';
-import { AssetName } from '../../Cardano';
+import { AssetName } from '../../Cardano/types/Asset';
 import { Cardano } from '../..';
 import { ImageMediaType, MediaType, NftMetadata, NftMetadataFile, Uri } from './types';
 import { InvalidFileError } from './errors';
