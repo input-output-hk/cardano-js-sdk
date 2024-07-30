@@ -269,7 +269,7 @@ in
           };
 
           values = {
-            useAccelerator = true;
+            useAccelerator = false;
             ws-server.enabled = true;
             stakepool.databaseName = "stakepoolv2";
             backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
