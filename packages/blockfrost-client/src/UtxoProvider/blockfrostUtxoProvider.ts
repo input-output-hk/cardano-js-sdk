@@ -1,7 +1,7 @@
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
-import { BlockfrostToCore, BlockfrostUtxo } from './BlockfrostToCore';
+import { BlockfrostToCore, BlockfrostUtxo } from '../utils/BlockfrostToCore';
 import { Cardano, UtxoProvider } from '@cardano-sdk/core';
-import { fetchByAddressSequentially, healthCheck } from './util';
+import { fetchByAddressSequentially, healthCheck } from '../utils/util';
 
 /**
  * Connect to the [Blockfrost service](https://docs.blockfrost.io/)
@@ -15,8 +15,8 @@ export const blockfrostUtxoProvider = (blockfrost: BlockFrostAPI): UtxoProvider 
       addresses.map(async (address) =>
         fetchByAddressSequentially<Cardano.Utxo, BlockfrostUtxo>({
           address,
-          request: (addr: Cardano.Address, pagination) => blockfrost.addressesUtxos(addr.toString(), pagination),
-          responseTranslator: (addr: Cardano.Address, response: Responses['address_utxo_content']) =>
+          request: (addr: Cardano.PaymentAddress, pagination) => blockfrost.addressesUtxos(addr.toString(), pagination),
+          responseTranslator: (addr: Cardano.PaymentAddress, response: Responses['address_utxo_content']) =>
             BlockfrostToCore.addressUtxoContent(addr.toString(), response)
         })
       )

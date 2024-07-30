@@ -1,63 +1,29 @@
-import { BlockFrostAPI, Error as BlockfrostError } from '@blockfrost/blockfrost-js';
+import { BlockFrostAPI, BlockfrostServerError } from '@blockfrost/blockfrost-js';
 import {
   Cardano,
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  HealthCheckResponse,
-  InvalidStringError,
+  EraSummary,
+  Milliseconds,
   NetworkInfoProvider,
   Provider,
   ProviderError,
   ProviderFailure,
-  ProviderUtil,
-  testnetEraSummaries
+  ProviderUtil
 } from '@cardano-sdk/core';
 import { PaginationOptions } from '@blockfrost/blockfrost-js/lib/types';
+import { handleError, isBlockfrostErrorResponse } from '@blockfrost/blockfrost-js/lib/utils/errors';
 
-export const formatBlockfrostError = (error: unknown) => {
-  const blockfrostError = error as BlockfrostError;
-  if (typeof blockfrostError === 'string') {
-    throw new ProviderError(ProviderFailure.Unknown, error, blockfrostError);
-  }
-  if (typeof blockfrostError !== 'object') {
-    throw new ProviderError(ProviderFailure.Unknown, error, 'failed to parse error (response type)');
-  }
-  if (error instanceof InvalidStringError) {
-    throw new ProviderError(ProviderFailure.InvalidResponse, error);
-  }
-  const errorAsType1 = blockfrostError as {
-    status_code: number;
-    message: string;
-    error: string;
-  };
-  if (errorAsType1.status_code) {
-    return errorAsType1;
-  }
-  const errorAsType2 = blockfrostError as {
-    errno: number;
-    message: string;
-    code: string;
-  };
-  if (errorAsType2.code) {
-    const status_code = Number.parseInt(errorAsType2.code);
-    if (!status_code) {
-      throw new ProviderError(ProviderFailure.Unknown, error, 'failed to parse error (status code)');
-    }
-    return {
-      error: errorAsType2.errno.toString(),
-      message: errorAsType1.message,
-      status_code
-    };
-  }
-  throw new ProviderError(ProviderFailure.Unknown, error, 'failed to parse error (response json)');
-};
+export const formatBlockfrostError = (error: unknown) => handleError(error);
+
+export const isBlockfrostNotFoundError = (error: unknown) =>
+  (error instanceof BlockfrostServerError || isBlockfrostErrorResponse(error)) && error.status_code === 404;
 
 export const toProviderError = (error: unknown) => {
-  const { status_code } = formatBlockfrostError(error);
-  if (status_code === 404) {
+  if (isBlockfrostNotFoundError(error)) {
     throw new ProviderError(ProviderFailure.NotFound);
   }
-  throw new ProviderError(ProviderFailure.Unknown, error, `status_code: ${status_code}`);
+
+  const blockfrostError = formatBlockfrostError(error);
+  throw new ProviderError(ProviderFailure.Unknown, error, `${blockfrostError.message}`);
 };
 
 export const fetchSequentially = async <Item, Arg, Response>(
@@ -85,7 +51,7 @@ export const fetchSequentially = async <Item, Arg, Response>(
     }
     return newAccumulatedItems;
   } catch (error) {
-    if (formatBlockfrostError(error).status_code === 404) {
+    if (isBlockfrostNotFoundError(error)) {
       return [];
     }
     throw error;
@@ -111,9 +77,9 @@ export const blockfrostMetadataToTxMetadata = (
   }, new Map<bigint, Cardano.Metadatum>());
 
 export const fetchByAddressSequentially = async <Item, Response>(props: {
-  address: Cardano.Address;
-  request: (address: Cardano.Address, pagination: PaginationOptions) => Promise<Response[]>;
-  responseTranslator?: (address: Cardano.Address, response: Response[]) => Item[];
+  address: Cardano.PaymentAddress;
+  request: (address: Cardano.PaymentAddress, pagination: PaginationOptions) => Promise<Response[]>;
+  responseTranslator?: (address: Cardano.PaymentAddress, response: Response[]) => Item[];
   /**
    * @returns true to indicatate that current result set should be returned
    */
@@ -131,9 +97,21 @@ export const fetchByAddressSequentially = async <Item, Response>(props: {
   });
 
 export const networkMagicToIdMap: { [key in number]: Cardano.NetworkId } = {
-  [Cardano.CardanoNetworkMagic.Mainnet]: Cardano.NetworkId.mainnet,
-  [Cardano.CardanoNetworkMagic.Testnet]: Cardano.NetworkId.testnet
+  [Cardano.NetworkMagics.Mainnet]: Cardano.NetworkId.Mainnet,
+  [Cardano.NetworkMagics.Preprod]: Cardano.NetworkId.Testnet
 };
+
+// copied from util-dev
+export const testnetEraSummaries: EraSummary[] = [
+  {
+    parameters: { epochLength: 21_600, slotLength: Milliseconds(20_000) },
+    start: { slot: 0, time: new Date(1_563_999_616_000) }
+  },
+  {
+    parameters: { epochLength: 432_000, slotLength: Milliseconds(1000) },
+    start: { slot: 1_598_400, time: new Date(1_595_967_616_000) }
+  }
+];
 
 export const eraSummaries: NetworkInfoProvider['eraSummaries'] = async () => testnetEraSummaries;
 
@@ -151,4 +129,19 @@ export const healthCheck = async (blockfrost: BlockFrostAPI): ReturnType<Provide
   } catch (error) {
     throw new ProviderError(ProviderFailure.Unknown, error);
   }
+};
+let blockfrostApi: BlockFrostAPI;
+
+/**
+ * Gets the singleton blockfrost API instance.
+ *
+ * @returns The blockfrost API instance, this function always returns the same instance.
+ */
+export const getBlockfrostApi = async () => {
+  if (blockfrostApi !== undefined) return blockfrostApi;
+
+  if (process.env.BLOCKFROST_API_KEY === undefined)
+    throw new Error('BLOCKFROST_API_KEY environment variable is required');
+
+  return new BlockFrostAPI({ network: 'preprod', projectId: process.env.BLOCKFROST_API_KEY });
 };

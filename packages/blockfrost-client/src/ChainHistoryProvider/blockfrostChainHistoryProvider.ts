@@ -1,11 +1,15 @@
 /* eslint-disable max-len */
+import * as Crypto from '@cardano-sdk/crypto';
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
-import { BlockfrostToCore, BlockfrostTransactionContent } from './BlockfrostToCore';
+import { BlockfrostToCore, BlockfrostTransactionContent } from '../utils/BlockfrostToCore';
 import { Cardano, ChainHistoryProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { blockfrostMetadataToTxMetadata, fetchByAddressSequentially, formatBlockfrostError, healthCheck } from './util';
-import omit from 'lodash/omit';
-import orderBy from 'lodash/orderBy';
+import {
+  blockfrostMetadataToTxMetadata,
+  fetchByAddressSequentially,
+  healthCheck,
+  isBlockfrostNotFoundError
+} from '../utils/util';
 
 type WithCertIndex<T> = T & { cert_index: number };
 
@@ -25,6 +29,7 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
     const response = await blockfrost.txsRedeemers(hash);
     return response.map(
       ({ purpose, script_hash, unit_mem, unit_steps, tx_index }): Cardano.Redeemer => ({
+        data: Buffer.from(script_hash),
         executionUnits: {
           memory: Number.parseInt(unit_mem),
           steps: Number.parseInt(unit_steps)
@@ -43,8 +48,7 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
             default:
               return purpose;
           }
-        })(),
-        scriptHash: Cardano.util.Hash28ByteBase16(script_hash)
+        })()
       })
     );
   };
@@ -76,7 +80,7 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
     return response.map(({ pool_id, retiring_epoch, cert_index }) => ({
       __typename: Cardano.CertificateType.PoolRetirement,
       cert_index,
-      epoch: retiring_epoch,
+      epoch: Cardano.EpochNo(retiring_epoch),
       poolId: Cardano.PoolId(pool_id)
     }));
   };
@@ -99,6 +103,7 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
     return response.map(({ address, amount, cert_index, pot }) => ({
       __typename: Cardano.CertificateType.MIR,
       cert_index,
+      kind: Cardano.MirCertificateKind.ToStakeCreds,
       pot: pot === 'reserve' ? Cardano.MirCertificatePot.Reserves : Cardano.MirCertificatePot.Treasury,
       quantity: BigInt(amount),
       rewardAccount: Cardano.RewardAccount(address)
@@ -109,10 +114,13 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
     const response = await blockfrost.txsStakes(hash);
     return response.map(({ address, cert_index, registration }) => ({
       __typename: registration
-        ? Cardano.CertificateType.StakeKeyRegistration
-        : Cardano.CertificateType.StakeKeyDeregistration,
+        ? Cardano.CertificateType.StakeRegistration
+        : Cardano.CertificateType.StakeDeregistration,
       cert_index,
-      stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(Cardano.RewardAccount(address))
+      stakeCredential: {
+        hash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(address)) as unknown as Crypto.Hash28ByteBase16,
+        type: Cardano.CredentialType.KeyHash
+      }
     }));
   };
 
@@ -122,7 +130,10 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
       __typename: Cardano.CertificateType.StakeDelegation,
       cert_index,
       poolId: Cardano.PoolId(pool_id),
-      stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(Cardano.RewardAccount(address))
+      stakeCredential: {
+        hash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(address)) as unknown as Crypto.Hash28ByteBase16,
+        type: Cardano.CredentialType.KeyHash
+      }
     }));
   };
 
@@ -135,16 +146,15 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
     hash
   }: Responses['tx_content']): Promise<Cardano.Certificate[] | undefined> => {
     if (pool_retire_count + pool_update_count + mir_cert_count + stake_cert_count + delegation_count === 0) return;
-    return orderBy(
-      [
-        ...(pool_retire_count ? await fetchPoolRetireCerts(hash) : []),
-        ...(pool_update_count ? await fetchPoolUpdateCerts(hash) : []),
-        ...(mir_cert_count ? await fetchMirCerts(hash) : []),
-        ...(stake_cert_count ? await fetchStakeCerts(hash) : []),
-        ...(delegation_count ? await fetchDelegationCerts(hash) : [])
-      ],
-      (cert) => cert.cert_index
-    ).map((cert) => omit(cert, 'cert_index') as Cardano.Certificate);
+    return [
+      ...(pool_retire_count ? await fetchPoolRetireCerts(hash) : []),
+      ...(pool_update_count ? await fetchPoolUpdateCerts(hash) : []),
+      ...(mir_cert_count ? await fetchMirCerts(hash) : []),
+      ...(stake_cert_count ? await fetchStakeCerts(hash) : []),
+      ...(delegation_count ? await fetchDelegationCerts(hash) : [])
+    ]
+      .sort((a, b) => b.cert_index - a.cert_index)
+      .map((cert) => cert as Cardano.Certificate);
   };
 
   const fetchJsonMetadata = async (txHash: Cardano.TransactionId): Promise<Cardano.TxMetadata | null> => {
@@ -154,7 +164,7 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return blockfrostMetadataToTxMetadata(response as any);
     } catch (error) {
-      if (formatBlockfrostError(error).status_code === 404) {
+      if (isBlockfrostNotFoundError(error)) {
         return null;
       }
       throw error;
@@ -162,9 +172,9 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
   };
 
   // eslint-disable-next-line unicorn/consistent-function-scoping
-  const parseValidityInterval = (num: string | null) => Number.parseInt(num || '') || undefined;
+  const parseValidityInterval = (num: string | null) => Cardano.Slot(Number.parseInt(num || '')) || undefined;
 
-  const fetchTransaction = async (hash: Cardano.TransactionId): Promise<Cardano.TxAlonzo> => {
+  const fetchTransaction = async (hash: Cardano.TransactionId): Promise<Cardano.HydratedTx> => {
     const { inputs, outputs, collaterals } = BlockfrostToCore.transactionUtxos(
       await blockfrost.txsUtxos(hash.toString())
     );
@@ -175,13 +185,14 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
     return {
       auxiliaryData: metadata
         ? {
-            body: { blob: metadata }
+            blob: metadata
           }
         : undefined,
+
       blockHeader: {
-        blockNo: response.block_height,
+        blockNo: Cardano.BlockNo(response.block_height),
         hash: Cardano.BlockId(response.block),
-        slot: response.slot
+        slot: Cardano.Slot(response.slot)
       },
       body: {
         certificates,
@@ -198,6 +209,7 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
       },
       id: hash,
       index: response.index,
+      inputSource: inputs && inputs.length > 0 ? Cardano.InputSource.inputs : Cardano.InputSource.collaterals,
       txSize: response.size,
       witness: {
         redeemers: await fetchRedeemers(response),
@@ -206,7 +218,9 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
     };
   };
 
-  const blocksByHashes: ChainHistoryProvider['blocksByHashes'] = async ({ ids }) => {
+  const blocksByHashes: ChainHistoryProvider['blocksByHashes'] = async ({
+    ids
+  }): Promise<Cardano.ExtendedBlockInfo[]> => {
     const responses = await Promise.all(ids.map((id) => blockfrost.blocks(id.toString())));
     return responses.map((response) => {
       if (!response.epoch || !response.epoch_slot || !response.height || !response.slot || !response.block_vrf) {
@@ -215,17 +229,17 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
       return {
         confirmations: response.confirmations,
         date: new Date(response.time * 1000),
-        epoch: response.epoch,
+        epoch: Cardano.EpochNo(response.epoch),
         epochSlot: response.epoch_slot,
         fees: BigInt(response.fees || '0'),
         header: {
-          blockNo: response.height,
+          blockNo: Cardano.BlockNo(response.height),
           hash: Cardano.BlockId(response.hash),
-          slot: response.slot
+          slot: Cardano.Slot(response.slot)
         },
         nextBlock: response.next_block ? Cardano.BlockId(response.next_block) : undefined,
         previousBlock: response.previous_block ? Cardano.BlockId(response.previous_block) : undefined,
-        size: response.size,
+        size: Cardano.BlockSize(response.size),
         slotLeader: Cardano.SlotLeader(response.slot_leader),
         totalOutput: BigInt(response.output || '0'),
         txCount: response.tx_count,
@@ -243,7 +257,7 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
     pagination
   }) => {
     // TODO: add pagination support for Blockfrost
-    if (pagination) throw new ProviderError(ProviderFailure.NotImplemented);
+    if (pagination && pagination.startAt !== 0) throw new ProviderError(ProviderFailure.NotImplemented);
 
     const addressTransactions = await Promise.all(
       addresses.map(async (address) =>
@@ -256,14 +270,16 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
             ? (transactions) =>
                 transactions.length > 0 && transactions[transactions.length - 1].block_height < blockRange!.lowerBound!
             : undefined,
-          paginationOptions: { count: 5, order: 'desc' },
-          request: (addr: Cardano.Address, paginationOptions) =>
+          paginationOptions: { count: pagination.limit, order: 'desc' },
+          request: (addr: Cardano.PaymentAddress, paginationOptions) =>
             blockfrost.addressesTransactions(addr.toString(), paginationOptions)
         })
       )
     );
 
-    const allTransactions = orderBy(addressTransactions.flat(1), ['block_height', 'tx_index']);
+    const allTransactions = addressTransactions
+      .flat(1)
+      .sort((a, b) => b.block_height - a.block_height || b.tx_index - a.tx_index);
     const addressTransactionsSinceBlock = blockRange?.lowerBound
       ? allTransactions.filter(({ block_height }) => block_height >= blockRange!.lowerBound!)
       : allTransactions;

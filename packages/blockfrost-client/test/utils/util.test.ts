@@ -1,13 +1,17 @@
-import { Cardano, InvalidStringError, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { blockfrostMetadataToTxMetadata, fetchSequentially, formatBlockfrostError } from '../src/util';
+import { BlockfrostClientError } from '@blockfrost/blockfrost-js';
+import { Cardano } from '@cardano-sdk/core';
+import { blockfrostMetadataToTxMetadata, fetchSequentially, formatBlockfrostError } from '../../src/utils/util';
 
 describe('util', () => {
   describe('formatBlockfrostError', () => {
-    it('converts InvalidStringError to ProviderError', () => {
-      const originalError = new InvalidStringError('');
-      expect(() => formatBlockfrostError(originalError)).toThrowError(
-        new ProviderError(ProviderFailure.InvalidResponse, originalError)
-      );
+    it('format Blockfrost error to code', () => {
+      const errorContent = {
+        error: 'Not Found',
+        message: 'The requested component has not been found.',
+        status_code: 404,
+        url: 'some-url'
+      };
+      expect(formatBlockfrostError(errorContent)).toBeInstanceOf(BlockfrostClientError);
     });
   });
 

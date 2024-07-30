@@ -1,6 +1,11 @@
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
-import { Cardano, EpochRewards, Range, RewardAccountBalanceArgs, RewardsProvider } from '@cardano-sdk/core';
-import { formatBlockfrostError, healthCheck } from './util';
+import { Cardano, Reward, RewardAccountBalanceArgs, RewardsProvider } from '@cardano-sdk/core';
+
+import { Range } from '@cardano-sdk/util';
+import { healthCheck, isBlockfrostNotFoundError } from '../utils/util';
+
+const stringToBigInt = (str: string) => BigInt(str);
+
 /**
  * Connect to the [Blockfrost service](https://docs.blockfrost.io/)
  *
@@ -16,7 +21,7 @@ export const blockfrostRewardsProvider = (blockfrost: BlockFrostAPI): RewardsPro
       const accountResponse = await blockfrost.accounts(rewardAccount.toString());
       return BigInt(accountResponse.withdrawable_amount);
     } catch (error) {
-      if (formatBlockfrostError(error).status_code === 404) {
+      if (isBlockfrostNotFoundError(error)) {
         return 0n;
       }
       throw error;
@@ -24,20 +29,24 @@ export const blockfrostRewardsProvider = (blockfrost: BlockFrostAPI): RewardsPro
   };
   const accountRewards = async (
     stakeAddress: Cardano.RewardAccount,
-    { lowerBound = 0, upperBound = Number.MAX_SAFE_INTEGER }: Range<Cardano.EpochNo> = {}
-  ): Promise<EpochRewards[]> => {
-    const result: EpochRewards[] = [];
+    {
+      lowerBound = Cardano.EpochNo(0),
+      upperBound = Cardano.EpochNo(Number.MAX_SAFE_INTEGER)
+    }: Range<Cardano.EpochNo> = {}
+  ): Promise<Reward[]> => {
+    const result: Reward[] = [];
     const batchSize = 100;
     let page = 1;
     let haveMorePages = true;
     while (haveMorePages) {
       const rewardsPage = await blockfrost.accountsRewards(stakeAddress.toString(), { count: batchSize, page });
+
       result.push(
         ...rewardsPage
           .filter(({ epoch }) => lowerBound <= epoch && epoch <= upperBound)
           .map(({ epoch, amount }) => ({
-            epoch,
-            rewards: BigInt(amount)
+            epoch: Cardano.EpochNo(epoch),
+            rewards: stringToBigInt(amount)
           }))
       );
       haveMorePages = rewardsPage.length === batchSize && rewardsPage[rewardsPage.length - 1].epoch < upperBound;

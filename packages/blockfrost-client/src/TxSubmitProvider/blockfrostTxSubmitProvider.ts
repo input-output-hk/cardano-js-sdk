@@ -1,6 +1,6 @@
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
-import { Cardano, TxSubmitProvider } from '@cardano-sdk/core';
-import { healthCheck } from './util';
+import { ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
+import { healthCheck } from '../utils/util';
 
 /**
  * Connect to the [Blockfrost service](https://docs.blockfrost.io/)
@@ -14,7 +14,7 @@ export const blockfrostTxSubmitProvider = (blockfrost: BlockFrostAPI): TxSubmitP
     try {
       await blockfrost.txSubmit(signedTransaction);
     } catch (error) {
-      throw new Cardano.UnknownTxSubmissionError(error);
+      throw new ProviderError(ProviderFailure.Unknown, error);
     }
   };
 

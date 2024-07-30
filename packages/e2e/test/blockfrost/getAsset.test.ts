@@ -1,6 +1,6 @@
 import * as envalid from 'envalid';
 import { Cardano } from '@cardano-sdk/core';
-import { assetProviderFactory } from '../../src/factories';
+import { assetProviderFactory } from '../../src';
 import { logger } from '@cardano-sdk/util-dev';
 
 // Verify environment.
@@ -14,22 +14,17 @@ describe('blockfrostAssetProvider', () => {
     const asset = await (
       await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS, logger)
     ).getAsset({
-      assetId: Cardano.AssetId('6b8d07d69639e9413dd637a1a815a7323c69c86abbafb66dbfdb1aa7'),
+      assetId: Cardano.AssetId(
+        'b27160f0c50a9cf168bf945dcbfcabbfbee5c7a801e7b467093b41534d6574616c4d6f6e7374657230303036'
+      ),
       extraData: {
-        history: true,
         nftMetadata: true,
         tokenMetadata: true
       }
     });
-    expect(typeof asset.assetId).toBe('string');
-    expect(typeof asset.fingerprint).toBe('string');
-    expect(asset.history!.length).toBeGreaterThan(1);
-    expect(typeof asset.history![0].quantity).toBe('bigint');
-    expect(typeof asset.history![0].transactionId).toBe('string');
-    expect(typeof asset.tokenMetadata).toBe('object');
-    expect(typeof asset.tokenMetadata!.ticker).toBe('string');
-    expect(typeof asset.name).toBe('string');
-    expect(typeof asset.policyId).toBe('string');
-    expect(typeof asset.quantity).toBe('bigint');
+    expect(asset.fingerprint).toEqual('asset1atvdgwr4xymq0d3jm90zzjzdywr9smj6h9qxsx');
+    expect(asset.name).toEqual('4d6574616c4d6f6e7374657230303036');
+    expect(asset.nftMetadata).toBeDefined();
+    expect(asset.nftMetadata?.image).toEqual('ipfs://QmcMBRFL5DdHbtDjaz5DHqSWgP7QkikRhdC4VPXu2m7qih');
   });
 });

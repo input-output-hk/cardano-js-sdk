@@ -31,7 +31,7 @@ A suite of TypeScript packages suitable for both Node.js and browser-based devel
 - [@cardano-sdk/cardano-services-client](./packages/cardano-services-client)
 
 ### External Provider Implementations
-- [@cardano-sdk/blockfrost](packages/blockfrost)
+- [@cardano-sdk/blockfrost-client](./packages/blockfrost-client)
 
 ### Supported Environments
 

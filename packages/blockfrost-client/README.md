@@ -1,1 +1,1 @@
-# Cardano JS SDK | Blockfrost
+# Cardano JS SDK | Blockfrost Client

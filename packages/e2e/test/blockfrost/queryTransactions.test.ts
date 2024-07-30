@@ -1,5 +1,5 @@
 import * as envalid from 'envalid';
-import { Cardano, ChainHistoryProvider, InvalidStringError } from '@cardano-sdk/core';
+import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
 import { chainHistoryProviderFactory } from '../../src/factories';
 import { logger } from '@cardano-sdk/util-dev';
 
@@ -23,10 +23,13 @@ describe('blockfrostChainHistoryProvider', () => {
   describe('transactionsByHashes', () => {
     it('parses metadata correctly', async () => {
       const [tx] = await chainHistoryProvider.transactionsByHashes({
-        ids: [Cardano.TransactionId('84801fb64a9c5078c406ead24017ba0b069ef6ac6446fef8bdb8f97bade3cfa5')]
+        ids: [Cardano.TransactionId('5127f8b235111854be744d36703f2098102d2639524035299658e73d683c0dfd')]
       });
-      expect(tx.auxiliaryData!.body.blob!.get(9_223_372_036_854_775_707n)).toEqual(
-        '9223372036854775707922337203685477570792233720368547757079223372'
+      expect(tx.auxiliaryData!.blob!.get(1n)).toEqual(
+        new Map<string, string>([
+          ['absolute_slot', '67255007'],
+          ['timestamp', '1722938207']
+        ])
       );
     });
 
@@ -59,24 +62,25 @@ describe('blockfrostChainHistoryProvider', () => {
     });
     it('has withdrawals', async () => {
       const [tx] = await chainHistoryProvider.transactionsByHashes({
-        ids: [Cardano.TransactionId('e92e3c2ce94d61449876e23ba9170ca20868ee447f13703c5fa7e888cc1701e1')]
+        ids: [Cardano.TransactionId('5929a59b9bebad1622f021d13b3d143d88cc92cf2400472e36ed8dcdf598a7fa')]
       });
       expect(tx.body.withdrawals).toEqual([
-        { quantity: 29_308_336n, stakeAddress: 'stake_test1urlhkh2pl2xt24dkgjtqrkzfv77ekqj950znqpzdsz2wuds0xlsk6' }
+        { quantity: 26_283_930n, stakeAddress: 'stake_test1urlhkh2pl2xt24dkgjtqrkzfv77ekqj950znqpzdsz2wuds0xlsk6' }
       ]);
     });
     it('has redeemer', async () => {
       const [tx] = await chainHistoryProvider.transactionsByHashes({
-        ids: [Cardano.TransactionId('3353309c6d3f2200c4e2084f76c1f1495f00eb21ea62f29c01da2adac71e1068')]
+        ids: [Cardano.TransactionId('f0c157c84506f5f3ead133133d6a731c937ebd0df379ed518fdbad9ee53ba28b')]
       });
-      expect(tx.witness.redeemers).toEqual([
-        {
-          executionUnits: { memory: 555_670, steps: 229_163_102 },
-          index: 0,
-          purpose: 'mint',
-          scriptHash: '87c822cd8fb44f2e3bffc3eaf41c63c2301a0ac2325ee3db634bd435'
-        }
-      ]);
+
+      expect(tx.witness.redeemers).toBeDefined();
+      expect(tx.witness.redeemers).toHaveLength(1);
+      expect(tx.witness.redeemers![0].data).toBeDefined();
+      expect(tx.witness.redeemers![0]).toMatchObject({
+        executionUnits: { memory: 725_365, steps: 281_266_636 },
+        index: 0,
+        purpose: 'mint'
+      });
     });
     // TODO: not implemented
     it.skip('has mint', async () => {
@@ -85,61 +89,70 @@ describe('blockfrostChainHistoryProvider', () => {
       });
       expect(tx.body.mint!).toBeDefined();
     });
-    it('has StakeKeyRegistration cert', async () => {
-      const [tx] = await chainHistoryProvider.transactionsByHashes({
-        ids: [Cardano.TransactionId('bcd165c882dc17a416bfef7053f0e1cfc3d715f8d7fc05a9803309f795878d9b')]
-      });
-      expect(tx.body.certificates![0]).toEqual({
-        __typename: 'StakeKeyRegistrationCertificate',
-        stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(
-          Cardano.RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv')
-        )
-      });
-    });
     it('has StakeDelegation cert', async () => {
       const [tx] = await chainHistoryProvider.transactionsByHashes({
-        ids: [Cardano.TransactionId('bcd165c882dc17a416bfef7053f0e1cfc3d715f8d7fc05a9803309f795878d9b')]
+        ids: [Cardano.TransactionId('b8412b0378dfba5442272dbb9de51dc1b462e789b9a1903723679e4549d3f4ef')]
+      });
+      expect(tx.body.certificates![0]).toEqual({
+        __typename: 'StakeDelegationCertificate',
+        cert_index: 1,
+        poolId: 'pool1z05xqzuxnpl8kg8u2wwg8ftng0fwtdluv3h20ruryfqc5gc3efl',
+        stakeCredential: {
+          hash: '94917a8771d16a6f0ecfdc53882dbd69710105e0709387fa9358bc99',
+          type: 0
+        }
+      });
+    });
+    it('has StakeKeyRegistration cert', async () => {
+      const [tx] = await chainHistoryProvider.transactionsByHashes({
+        ids: [Cardano.TransactionId('b8412b0378dfba5442272dbb9de51dc1b462e789b9a1903723679e4549d3f4ef')]
       });
       expect(tx.body.certificates![1]).toEqual({
-        __typename: 'StakeDelegationCertificate',
-        poolId: 'pool167u07rzwu6dr40hx2pr4vh592vxp4zen9ct2p3h84wzqzv6fkgv',
-        stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(
-          Cardano.RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv')
-        )
+        __typename: 'StakeRegistrationCertificate',
+        cert_index: 0,
+        stakeCredential: {
+          hash: '94917a8771d16a6f0ecfdc53882dbd69710105e0709387fa9358bc99',
+          type: 0
+        }
       });
     });
     it('has StakeKeyDeregistration cert', async () => {
       const [tx] = await chainHistoryProvider.transactionsByHashes({
-        ids: [Cardano.TransactionId('150a445f4d1f2e692791daec9c09f32d6c8c25a3f9ca6c7cf14ff8085375aaa0')]
+        ids: [Cardano.TransactionId('78ed92583cd879c56e4dd49c06af303aa52e127074eac1123f727ed7eef36084')]
       });
       expect(tx.body.certificates![0]).toEqual({
-        __typename: 'StakeKeyDeregistrationCertificate',
-        stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(
-          Cardano.RewardAccount('stake_test1uqe2twywhfjwt88ghas4sfgq7pp7m8wq64hlhz0vr4uhu2sj2tuzt')
-        )
+        __typename: 'StakeDeregistrationCertificate',
+        cert_index: 0,
+        stakeCredential: {
+          hash: '94917a8771d16a6f0ecfdc53882dbd69710105e0709387fa9358bc99',
+          type: 0
+        }
       });
     });
     it('PoolRegistration poolParameters are not implemented (null)', async () => {
       const [tx] = await chainHistoryProvider.transactionsByHashes({
-        ids: [Cardano.TransactionId('295d5e0f7ee182426eaeda8c9f1c63502c72cdf4afd6e0ee0f209adf94a614e7')]
+        ids: [Cardano.TransactionId('17dff81aef66f0955963a06e1a63e35e60b3b89474f7c1277254dae6cf8592b8')]
       });
-      expect(tx.body.certificates![2]).toEqual({
+      expect(tx.body.certificates![1]).toEqual({
         __typename: 'PoolRegistrationCertificate',
-        poolId: 'pool1y25deq9kldy9y9gfvrpw8zt05zsrfx84zjhugaxrx9ftvwdpua2',
+        cert_index: 0,
+        poolId: 'pool1z05xqzuxnpl8kg8u2wwg8ftng0fwtdluv3h20ruryfqc5gc3efl',
         poolParameters: null
       });
     });
     it('has PoolRetirement cert', async () => {
       const [tx] = await chainHistoryProvider.transactionsByHashes({
-        ids: [Cardano.TransactionId('545ee7080a01aa085be01dffc073020be04ea3283b945c408c0830e9c4f8253c')]
+        ids: [Cardano.TransactionId('a6cfa382e0b41bb227a6ed8ce2eb58ec16f78fb6e0961f8824ca2039667c801f')]
       });
       expect(tx.body.certificates![0]).toEqual({
         __typename: 'PoolRetirementCertificate',
-        epoch: 80,
-        poolId: 'pool1ky9w02c4m4y842ygc0jyaf908wgllxv3cvpx42fd243f7uk664s'
+        cert_index: 0,
+        epoch: 152,
+        poolId: 'pool1mvgpsafktxs883p66awp7fplj73cj6j9hqdxzvqw494f7f0v2dp'
       });
     });
-    it('has MoveInstantaneousRewards cert', async () => {
+    it.skip('has MoveInstantaneousRewards cert', async () => {
+      // @todo there is no Instantaneous Rewards in preprod https://preprod.beta.explorer.cardano.org/en/instantaneous-rewards
       const [tx] = await chainHistoryProvider.transactionsByHashes({
         ids: [Cardano.TransactionId('24986c0cd3475419bfb44756c27a0e13a6354a4071153f76a78f9b2d1e596089')]
       });
@@ -160,58 +173,57 @@ describe('blockfrostChainHistoryProvider', () => {
   describe('transactionsByAddresses', () => {
     it('Shelley address (addr_test1)', async () => {
       const response = await chainHistoryProvider.transactionsByAddresses({
-        addresses: [Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg')],
+        addresses: [Cardano.PaymentAddress('addr_test1vz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzerspjrlsz')],
         pagination: { limit: 20, startAt: 0 }
       });
 
-      expect(response.totalResultCount).toBeGreaterThanOrEqual(47);
+      expect(response.totalResultCount).toBeGreaterThanOrEqual(8);
 
       expect(
         response.pageResults.find(
-          (tx) => tx.id === Cardano.TransactionId('bedfc2ff545ef1ac3cc4d1a06aa67a6d68a663ffb1092f8764390b8a58ef97b4')
+          (tx) => tx.id === Cardano.TransactionId('63b3fb0640cd6bc4c093e70aa8b9d0051f5afc99ad60e181da399fb4db230b0f')
         )
       ).toBeDefined();
 
       expect(
         response.pageResults.find(
-          (tx) => tx.id === Cardano.TransactionId('f632b491bb481b4d93fa69e1901ebb623a3af65fde500f1b019eaabd4bb2a980')
+          (tx) => tx.id === Cardano.TransactionId('6966174b495070898e9525158a1aaf2b2ee7976ea27bfdac9ca060d98160c204')
         )
       ).toBeDefined();
     });
     it('extended Shelley address (addr_test1)', async () => {
       const response = await chainHistoryProvider.transactionsByAddresses({
         addresses: [
-          Cardano.Address(
-            'addr_test1qph5x6uahxhxyvtqatzj77sjtjmdjycemt5ncjuj2r4e' +
-              'yflkdap42xncd6cazjarce6jh8mx52fcf8ugststvyklj70qhzhe9h'
+          Cardano.PaymentAddress(
+            'addr_test1qpvqf0y9sgpn92crff8cxrl95s0veay4gude7pgdn0tlvwv5j9agwuw3dfhsan7u2wyzm0tfwyqstcrsjwrl4y6chjvsneezuv'
           )
         ],
         pagination: { limit: 20, startAt: 0 }
       });
-      expect(response.totalResultCount).toBeGreaterThanOrEqual(4);
+      expect(response.totalResultCount).toBeGreaterThanOrEqual(3);
 
       expect(
         response.pageResults.find(
-          (tx) => tx.id === Cardano.TransactionId('a01623f7e3fc679c9f369e06ac0cd942740cade30367b24cedace20a430af1cf')
+          (tx) => tx.id === Cardano.TransactionId('78ed92583cd879c56e4dd49c06af303aa52e127074eac1123f727ed7eef36084')
         )
       ).toBeDefined();
 
       expect(
         response.pageResults.find(
-          (tx) => tx.id === Cardano.TransactionId('667f714ee9d9975ca4fa0f5451e006d3dafcdafb7342fe288ebcaf17c100a996')
+          (tx) => tx.id === Cardano.TransactionId('b8412b0378dfba5442272dbb9de51dc1b462e789b9a1903723679e4549d3f4ef')
         )
       ).toBeDefined();
     });
     it('Icarus Byron address (2c)', async () => {
       const response = await chainHistoryProvider.transactionsByAddresses({
-        addresses: [Cardano.Address('2cWKMJemoBai9J7kVvRTukMmdfxtjL9z7c396rTfrrzfAZ6EeQoKLC2y1k34hswwm4SVr')],
+        addresses: [Cardano.PaymentAddress('2cWKMJemoBahPCkbVybbhitWU1HQt6GV6J6CVtPp2TsbBKD5LLYdcNXaxQtNQnaYdrpfg')],
         pagination: { limit: 20, startAt: 0 }
       });
       expect(response.totalResultCount).toBeGreaterThanOrEqual(1);
 
       expect(
         response.pageResults.find(
-          (tx) => tx.id === Cardano.TransactionId('2822d491a890b40cd2a22003b81a97f63c2b8c373b1b0b8dfa1598739fe34c06')
+          (tx) => tx.id === Cardano.TransactionId('1fb751b36dd7a237ddf6b6a0d681041cdce3b5775c72dcc7972f5c292c3c2e8b')
         )
       ).toBeDefined();
     });
@@ -220,9 +232,9 @@ describe('blockfrostChainHistoryProvider', () => {
     it.skip('multiple address types', async () => {
       const response = await chainHistoryProvider.transactionsByAddresses({
         addresses: [
-          Cardano.Address('2cWKMJemoBai9J7kVvRTukMmdfxtjL9z7c396rTfrrzfAZ6EeQoKLC2y1k34hswwm4SVr'),
-          Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg'),
-          Cardano.Address(
+          Cardano.PaymentAddress('2cWKMJemoBai9J7kVvRTukMmdfxtjL9z7c396rTfrrzfAZ6EeQoKLC2y1k34hswwm4SVr'),
+          Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg'),
+          Cardano.PaymentAddress(
             'addr_test1qph5x6uahxhxyvtqatzj77sjtjmdjycemt5ncjuj2r4e' +
               'yflkdap42xncd6cazjarce6jh8mx52fcf8ugststvyklj70qhzhe9h'
           )
@@ -245,47 +257,48 @@ describe('blockfrostChainHistoryProvider', () => {
     });
     it('Shelley address not used - no transactions', async () => {
       const response = await chainHistoryProvider.transactionsByAddresses({
-        addresses: [Cardano.Address('addr_test1vrfxjeunkc9xu8rpnhgkluptaq0rm8kyxh8m3q9vtcetjwshvpnsm')],
+        addresses: [Cardano.PaymentAddress('addr_test1vrfxjeunkc9xu8rpnhgkluptaq0rm8kyxh8m3q9vtcetjwshvpnsm')],
         pagination: { limit: 20, startAt: 0 }
       });
       expect(response.totalResultCount).toBe(0);
     });
-    it('queries successfully invalid transaction (script failure)', async () => {
+    it.skip('queries successfully invalid transaction (script failure)', async () => {
+      // @todo find a script failure in preprod
       const response = await chainHistoryProvider.transactionsByAddresses({
-        addresses: [Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg')],
+        addresses: [Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg')],
         pagination: { limit: 20, startAt: 0 }
       });
 
       const invalidTx = response.pageResults.find(
-        (tx) => tx.id === Cardano.TransactionId('43149210cbbfbc92bc2b199bb14cb15330414e2288ac31be92a3b5a490f9abfc')
+        (tx) => tx.id === Cardano.TransactionId('FHnt4NL7yPYH2vP2FLEfH2pt3K6meM7fgtjRiLBidaqpP5ogPzxLNsZy68e1KdW')
       );
       expect(invalidTx).toBeDefined();
       expect(invalidTx?.body.outputs.length).toEqual(0);
     });
 
     it('stake address throws error', async () => {
-      expect(() => Cardano.Address('stake_test1ur676rnu57m272uvflhm8ahgu8xk980vxg382zye2wpxnjs2dnddx')).toThrowError(
-        InvalidStringError
-      );
+      expect(() =>
+        Cardano.PaymentAddress('stake_test1ur676rnu57m272uvflhm8ahgu8xk980vxg382zye2wpxnjs2dnddx')
+      ).toThrowError();
     });
 
     it('returns transactions starting from blockRange param', async () => {
-      const address = Cardano.Address(
-        'addr_test1qp88yvfup4eykezr2dytygwyglfzflyn32dh83ftxkzeg4jrdz3th865e0s2cm6xuzc4xkd8desmtu3p5jfmzkazmxwsm2tk5a'
+      const address = Cardano.PaymentAddress(
+        'addr_test1qpvqf0y9sgpn92crff8cxrl95s0veay4gude7pgdn0tlvwv5j9agwuw3dfhsan7u2wyzm0tfwyqstcrsjwrl4y6chjvsneezuv'
       );
       const response = await chainHistoryProvider.transactionsByAddresses({
         addresses: [address],
-        blockRange: { lowerBound: 3_348_548 },
+        blockRange: { lowerBound: Cardano.BlockNo(3_348_548) },
         pagination: { limit: 20, startAt: 0 }
       });
 
       expect(
         response.pageResults.find(
-          (tx) => tx.id === Cardano.TransactionId('264ad5454078db439532e81a5918930779562601b098d6aeae556f785d35e187')
+          (tx) => tx.id === Cardano.TransactionId('78ed92583cd879c56e4dd49c06af303aa52e127074eac1123f727ed7eef36084')
         )
-      ).toBeDefined();
+      ).toBeUndefined();
 
-      expect(response.totalResultCount).toBeGreaterThanOrEqual(4);
+      expect(response.totalResultCount).toBeGreaterThanOrEqual(3);
     });
   });
 });

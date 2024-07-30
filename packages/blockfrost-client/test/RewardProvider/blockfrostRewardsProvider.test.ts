@@ -1,6 +1,6 @@
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { Cardano, ProviderError, ProviderFailure, RewardsProvider } from '@cardano-sdk/core';
-import { blockfrostRewardsProvider } from '../src';
+import { blockfrostRewardsProvider } from '../../src/RewardsProvider/blockfrostRewardsProvider';
 jest.mock('@blockfrost/blockfrost-js');
 
 describe('blockfrostRewardsProvider', () => {
@@ -9,13 +9,13 @@ describe('blockfrostRewardsProvider', () => {
   describe('healthCheck', () => {
     it('returns ok if the service reports a healthy state', async () => {
       BlockFrostAPI.prototype.health = jest.fn().mockResolvedValue({ is_healthy: true });
-      const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+      const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
       const provider = blockfrostRewardsProvider(blockfrost);
       expect(await provider.healthCheck()).toEqual({ ok: true });
     });
     it('returns not ok if the service reports an unhealthy state', async () => {
       BlockFrostAPI.prototype.health = jest.fn().mockResolvedValue({ is_healthy: false });
-      const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+      const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
       const provider = blockfrostRewardsProvider(blockfrost);
       expect(await provider.healthCheck()).toEqual({ ok: false });
     });
@@ -23,7 +23,7 @@ describe('blockfrostRewardsProvider', () => {
       BlockFrostAPI.prototype.health = jest
         .fn()
         .mockRejectedValue(new ProviderError(ProviderFailure.Unknown, new Error('Some error')));
-      const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+      const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
       const provider = blockfrostRewardsProvider(blockfrost);
       await expect(provider.healthCheck()).rejects.toThrowError(ProviderError);
     });
@@ -44,7 +44,7 @@ describe('blockfrostRewardsProvider', () => {
       };
       BlockFrostAPI.prototype.accounts = jest.fn().mockResolvedValue(accountsMockResponse);
 
-      const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+      const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
       const client = blockfrostRewardsProvider(blockfrost);
       const response = await client.rewardAccountBalance({
         rewardAccount: Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27')
@@ -54,14 +54,13 @@ describe('blockfrostRewardsProvider', () => {
     });
 
     test('unused reward account', async () => {
-      const notFoundBody = {
+      BlockFrostAPI.prototype.accounts = jest.fn().mockRejectedValue({
         error: 'Not Found',
         message: 'The requested component has not been found.',
-        status_code: 404
-      };
-      BlockFrostAPI.prototype.accounts = jest.fn().mockRejectedValue(notFoundBody);
-
-      const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+        status_code: 404,
+        url: 'some-url'
+      });
+      const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
       const client = blockfrostRewardsProvider(blockfrost);
       const response = await client.rewardAccountBalance({
         rewardAccount: Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d')
@@ -80,12 +79,13 @@ describe('blockfrostRewardsProvider', () => {
       [...Array.from({ length: numEpochs }).keys()].map((epoch) => ({
         amount: '1000',
         epoch: firstEpoch + epoch,
-        pool_id
+        pool_id,
+        type: 'member'
       }));
     let client: RewardsProvider;
 
     beforeEach(() => {
-      const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+      const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
       client = blockfrostRewardsProvider(blockfrost);
     });
 
@@ -94,8 +94,8 @@ describe('blockfrostRewardsProvider', () => {
 
       const response = await client.rewardsHistory({
         epochs: {
-          lowerBound: 98,
-          upperBound: 98
+          lowerBound: Cardano.EpochNo(98),
+          upperBound: Cardano.EpochNo(98)
         },
         rewardAccounts
       });
@@ -117,7 +117,7 @@ describe('blockfrostRewardsProvider', () => {
 
       const response = await client.rewardsHistory({
         epochs: {
-          lowerBound: 98
+          lowerBound: Cardano.EpochNo(98)
         },
         rewardAccounts: [rewardAccounts[0]]
       });

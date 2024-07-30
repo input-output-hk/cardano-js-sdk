@@ -5,10 +5,10 @@
   },
   "references": [
     {
-      "path": "../../util/src"
+      "path": "../../core/src"
     },
     {
-      "path": "../../core/src"
+      "path": "../../util/src"
     }
   ]
 }

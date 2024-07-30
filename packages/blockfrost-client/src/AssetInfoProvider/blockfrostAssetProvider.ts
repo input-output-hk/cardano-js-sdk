@@ -1,19 +1,23 @@
 /* eslint-disable unicorn/no-nested-ternary */
 import { Asset, AssetProvider, Cardano, ProviderUtil } from '@cardano-sdk/core';
+import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
+import { blockfrostMetadataToTxMetadata, fetchSequentially, healthCheck, toProviderError } from '../utils/util';
 import { replaceNullsWithUndefineds } from '@cardano-sdk/util';
 
-import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
-import { blockfrostMetadataToTxMetadata, fetchSequentially, healthCheck, toProviderError } from './util';
-import omit from 'lodash/omit';
+const mapMetadata = (
+  assetId: Cardano.AssetId,
+  offChain: Responses['asset']['metadata']
+): Asset.TokenMetadata | null => {
+  const { logo, ...metadata } = { ...offChain };
 
-const mapMetadata = (offChain: Responses['asset']['metadata']): Asset.TokenMetadata | null => {
-  const metadata = { ...offChain };
   if (Object.values(metadata).every((value) => value === undefined || value === null)) return null;
+
   return {
-    ...replaceNullsWithUndefineds(omit(metadata, ['logo'])),
+    ...replaceNullsWithUndefineds(metadata),
+    assetId,
     desc: metadata.description,
     // The other type option is any[] - not sure what it means, omitting if no string.
-    icon: typeof metadata.logo === 'string' ? metadata.logo : undefined
+    icon: typeof logo === 'string' ? logo : undefined
   };
 };
 
@@ -25,17 +29,6 @@ const mapMetadata = (offChain: Responses['asset']['metadata']): Asset.TokenMetad
  * @throws ProviderFailure
  */
 export const blockfrostAssetProvider = (blockfrost: BlockFrostAPI): AssetProvider => {
-  const getAssetHistory = async (assetId: Cardano.AssetId): Promise<Asset.AssetMintOrBurn[]> =>
-    fetchSequentially({
-      arg: assetId.toString(),
-      request: blockfrost.assetsHistory.bind<BlockFrostAPI['assetsHistory']>(blockfrost),
-      responseTranslator: (response): Asset.AssetMintOrBurn[] =>
-        response.map(({ action, amount, tx_hash }) => ({
-          quantity: BigInt(amount) * (action === 'minted' ? 1n : -1n),
-          transactionId: Cardano.TransactionId(tx_hash)
-        }))
-    });
-
   const getLastMintedTx = async (assetId: Cardano.AssetId): Promise<Responses['asset_history'][number] | undefined> => {
     const [lastMintedTx] = await fetchSequentially({
       arg: assetId.toString(),
@@ -57,23 +50,14 @@ export const blockfrostAssetProvider = (blockfrost: BlockFrostAPI): AssetProvide
     // Not sure if types are correct, missing 'label', but it's present in docs
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const metadatumMap = blockfrostMetadataToTxMetadata(metadata as any);
-    return Asset.util.metadatumToCip25(asset, metadatumMap, console) ?? null;
+    return Asset.NftMetadata.fromMetadatum(asset, metadatumMap, console) ?? null;
   };
 
   const getAsset: AssetProvider['getAsset'] = async ({ assetId, extraData }) => {
     const response = await blockfrost.assetsById(assetId.toString());
-    const name = Asset.util.assetNameFromAssetId(assetId);
+    const name = Cardano.AssetId.getAssetName(assetId);
     const policyId = Cardano.PolicyId(response.policy_id);
     const quantity = BigInt(response.quantity);
-    const history = async () =>
-      response.mint_or_burn_count === 1
-        ? [
-            {
-              quantity,
-              transactionId: Cardano.TransactionId(response.initial_mint_tx_hash)
-            }
-          ]
-        : await getAssetHistory(assetId);
 
     const nftMetadata = async () => {
       let lastMintedTxHash: string = response.initial_mint_tx_hash;
@@ -87,18 +71,23 @@ export const blockfrostAssetProvider = (blockfrost: BlockFrostAPI): AssetProvide
     return {
       assetId,
       fingerprint: Cardano.AssetFingerprint(response.fingerprint),
-      history: extraData?.history ? await history() : undefined,
+      // history: extraData?.history ? await history() : undefined,
       mintOrBurnCount: response.mint_or_burn_count,
       name,
       nftMetadata: extraData?.nftMetadata ? await nftMetadata() : undefined,
       policyId,
       quantity,
-      tokenMetadata: extraData?.tokenMetadata ? mapMetadata(response.metadata) : undefined
+      supply: quantity,
+      tokenMetadata: extraData?.tokenMetadata ? mapMetadata(assetId, response.metadata) : undefined
     };
   };
 
+  const getAssets: AssetProvider['getAssets'] = async ({ assetIds, extraData }) =>
+    Promise.all(assetIds.map((assetId) => getAsset({ assetId, extraData })));
+
   const providerFunctions: AssetProvider = {
     getAsset,
+    getAssets,
     healthCheck: healthCheck.bind(undefined, blockfrost)
   };
 

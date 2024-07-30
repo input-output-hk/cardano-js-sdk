@@ -3,7 +3,7 @@
 
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { Cardano } from '@cardano-sdk/core';
-import { blockfrostChainHistoryProvider } from '../src';
+import { blockfrostChainHistoryProvider } from '../../src/ChainHistoryProvider/blockfrostChainHistoryProvider';
 import { dummyLogger as logger } from 'ts-log';
 
 jest.mock('@blockfrost/blockfrost-js');
@@ -136,51 +136,49 @@ describe('blockfrostChainHistoryProvider', () => {
       ];
       BlockFrostAPI.prototype.txs = jest.fn().mockResolvedValue(mockedTxResponse);
       BlockFrostAPI.prototype.txsMetadata = jest.fn().mockResolvedValue(mockedMetadataResponse);
-      const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+      const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
       const client = blockfrostChainHistoryProvider(blockfrost, logger);
       const response = await client.transactionsByHashes({
         ids: ['4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6'].map(Cardano.TransactionId)
       });
 
       expect(response).toHaveLength(1);
-      expect(response[0]).toMatchObject({
+      expect(response[0]).toMatchObject<Cardano.HydratedTx>({
         auxiliaryData: {
-          body: {
-            blob: new Map<bigint, Cardano.Metadatum>([
-              [
-                1967n,
-                new Map([
-                  ['hash', '6bf124f217d0e5a0a8adb1dbd8540e1334280d49ab861127868339f43b3948af'],
-                  ['metadata', 'https://nut.link/metadata.json']
-                ])
-              ],
-              [
-                1968n,
-                new Map([
+          blob: new Map<bigint, Cardano.Metadatum>([
+            [
+              1967n,
+              new Map([
+                ['hash', '6bf124f217d0e5a0a8adb1dbd8540e1334280d49ab861127868339f43b3948af'],
+                ['metadata', 'https://nut.link/metadata.json']
+              ])
+            ],
+            [
+              1968n,
+              new Map([
+                [
+                  'ADAUSD',
                   [
-                    'ADAUSD',
-                    [
-                      new Map<Cardano.Metadatum, Cardano.Metadatum>([
-                        ['source', 'ergoOracles'],
-                        ['value', 3n]
-                      ])
-                    ]
+                    new Map<Cardano.Metadatum, Cardano.Metadatum>([
+                      ['source', 'ergoOracles'],
+                      ['value', 3n]
+                    ])
                   ]
-                ])
-              ]
-            ])
-          }
+                ]
+              ])
+            ]
+          ])
         },
         blockHeader: {
-          blockNo: 123_456,
+          blockNo: Cardano.BlockNo(123_456),
           hash: Cardano.BlockId('356b7d7dbb696ccd12775c016941057a9dc70898d87a63fc752271bb46856940'),
-          slot: 42_000_000
+          slot: Cardano.Slot(42_000_000)
         },
         body: {
           fee: 182_485n,
           inputs: [
             {
-              address: Cardano.Address(
+              address: Cardano.PaymentAddress(
                 'addr_test1qr05llxkwg5t6c4j3ck5mqfax9wmz35rpcgw3qthrn9z7xcxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flknstdz3k2'
               ),
               index: 1,
@@ -189,7 +187,7 @@ describe('blockfrostChainHistoryProvider', () => {
           ],
           outputs: [
             {
-              address: Cardano.Address(
+              address: Cardano.PaymentAddress(
                 'addr_test1qzx9hu8j4ah3auytk0mwcupd69hpc52t0cw39a65ndrah86djs784u92a3m5w475w3w35tyd6v3qumkze80j8a6h5tuqq5xe8y'
               ),
               value: {
@@ -201,7 +199,7 @@ describe('blockfrostChainHistoryProvider', () => {
               }
             },
             {
-              address: Cardano.Address(
+              address: Cardano.PaymentAddress(
                 'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x'
               ),
               value: {
@@ -211,13 +209,18 @@ describe('blockfrostChainHistoryProvider', () => {
             }
           ],
           validityInterval: {
-            invalidHereafter: 13_885_913
+            invalidHereafter: Cardano.Slot(13_885_913)
           }
         },
         id: Cardano.TransactionId('4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6'),
         index: 1,
-        txSize: 433
-      } as Cardano.TxAlonzo);
+        inputSource: Cardano.InputSource.inputs,
+        txSize: 433,
+        witness: {
+          redeemers: undefined,
+          signatures: new Map() // not available in blockfrost
+        }
+      } as Cardano.HydratedTx);
     });
     it.todo('with withdrawals');
     it.todo('with redeemer');
@@ -233,7 +236,7 @@ describe('blockfrostChainHistoryProvider', () => {
   test('blocksByHashes', async () => {
     BlockFrostAPI.prototype.blocks = jest.fn().mockResolvedValue(blockResponse);
 
-    const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+    const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
     const client = blockfrostChainHistoryProvider(blockfrost, logger);
     const response = await client.blocksByHashes({
       ids: [Cardano.BlockId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed')]
@@ -258,7 +261,7 @@ describe('blockfrostChainHistoryProvider', () => {
         totalOutput: 9_249_073_880n,
         txCount: 3,
         vrf: Cardano.VrfVkBech32('vrf_vk19j362pkr4t9y0m3qxgmrv0365vd7c4ze03ny4jh84q8agjy4ep4s99zvg8')
-      } as Cardano.Block
+      } as Cardano.ExtendedBlockInfo
     ]);
   });
 
@@ -266,7 +269,7 @@ describe('blockfrostChainHistoryProvider', () => {
     const slotLeader = 'ShelleyGenesis-eff1b5b26e65b791';
     BlockFrostAPI.prototype.blocks = jest.fn().mockResolvedValue({ ...blockResponse, slot_leader: slotLeader });
 
-    const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+    const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
     const client = blockfrostChainHistoryProvider(blockfrost, logger);
     const response = await client.blocksByHashes({
       ids: [Cardano.BlockId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed')]

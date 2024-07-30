@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as CML from '@dcspark/cardano-multiplatform-lib-nodejs';
 import * as Crypto from '@cardano-sdk/crypto';
+
 import {
   AddressDiscovery,
   DEFAULT_POLLING_CONFIG,
@@ -35,14 +36,15 @@ import {
   util
 } from '@cardano-sdk/key-management';
 import {
-  BlockFrostAPI,
   blockfrostAssetProvider,
   blockfrostChainHistoryProvider,
   blockfrostNetworkInfoProvider,
   blockfrostRewardsProvider,
   blockfrostTxSubmitProvider,
-  blockfrostUtxoProvider
-} from '@cardano-sdk/blockfrost';
+  blockfrostUtxoProvider,
+  getBlockfrostApi
+} from '@cardano-sdk/blockfrost-client';
+
 import {
   CardanoWsClient,
   assetInfoHttpProvider,
@@ -71,28 +73,11 @@ const customHttpFetchAdapter = isNodeJs ? undefined : require('@vespaiach/axios-
 
 // CONSTANTS
 const BLOCKFROST_PROVIDER = 'blockfrost';
-const BLOCKFROST_MISSING_PROJECT_ID = 'Missing project id';
 const HTTP_PROVIDER = 'http';
 const OGMIOS_PROVIDER = 'ogmios';
 const STUB_PROVIDER = 'stub';
 const MISSING_URL_PARAM = 'Missing URL';
 const WS_PROVIDER = 'ws';
-
-// Sharing a single BlockFrostAPI object ensures rate limiting is shared across all blockfrost providers
-let blockfrostApi: BlockFrostAPI;
-
-/**
- * Gets the singleton blockfrost API instance.
- *
- * @returns The blockfrost API instance, this function always returns the same instance.
- */
-const getBlockfrostApi = async () => {
-  if (blockfrostApi !== undefined) return blockfrostApi;
-
-  if (process.env.BLOCKFROST_API_KEY === undefined) throw new Error(BLOCKFROST_MISSING_PROJECT_ID);
-
-  return new BlockFrostAPI({ isTestnet: true, projectId: process.env.BLOCKFROST_API_KEY });
-};
 
 export type CreateKeyAgent = (dependencies: KeyAgentDependencies) => Promise<AsyncKeyAgent>;
 export const keyManagementFactory = new ProviderFactory<CreateKeyAgent>();

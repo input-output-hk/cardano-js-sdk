@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
-import { Cardano, EraSummary, StakeSummary, SupplySummary, testnetEraSummaries } from '@cardano-sdk/core';
-import { blockfrostNetworkInfoProvider } from '../src';
+import { Cardano, EraSummary, StakeSummary, SupplySummary } from '@cardano-sdk/core';
+import { blockfrostNetworkInfoProvider } from '../../src/NetworkInfoProvider/blockfrostNetworkInfoProvider';
+import { testnetEraSummaries } from '@cardano-sdk/util-dev';
 
 jest.mock('@blockfrost/blockfrost-js');
 
@@ -45,7 +46,7 @@ describe('blockfrostNetworkInfoProvider', () => {
     BlockFrostAPI.prototype.network = jest.fn().mockResolvedValue(mockedNetworkResponse);
     BlockFrostAPI.prototype.apiUrl = apiUrl;
 
-    const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+    const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
     const client = blockfrostNetworkInfoProvider(blockfrost);
     const response = await client.stake();
 
@@ -59,7 +60,7 @@ describe('blockfrostNetworkInfoProvider', () => {
     BlockFrostAPI.prototype.network = jest.fn().mockResolvedValue(mockedNetworkResponse);
     BlockFrostAPI.prototype.apiUrl = apiUrl;
 
-    const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+    const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
     const client = blockfrostNetworkInfoProvider(blockfrost);
     const response = await client.lovelaceSupply();
 
@@ -70,7 +71,7 @@ describe('blockfrostNetworkInfoProvider', () => {
   });
 
   test('eraSummaries', async () => {
-    const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+    const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
     const client = blockfrostNetworkInfoProvider(blockfrost);
     const response = await client.eraSummaries();
 
@@ -92,7 +93,7 @@ describe('blockfrostNetworkInfoProvider', () => {
     };
     BlockFrostAPI.prototype.genesis = jest.fn().mockResolvedValue(mockedResponse);
 
-    const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+    const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
     const client = blockfrostNetworkInfoProvider(blockfrost);
     const response = await client.genesisParameters();
 
@@ -112,25 +113,39 @@ describe('blockfrostNetworkInfoProvider', () => {
 
   test('currentWalletProtocolParameters', async () => {
     const mockedResponse = {
-      data: {
-        coins_per_utxo_word: '0',
-        key_deposit: '2000000',
-        max_collateral_inputs: 1,
-        max_tx_size: '16384',
-        max_val_size: '1000',
-        min_fee_a: 44,
-        min_fee_b: 155_381,
-        min_pool_cost: '340000000',
-        pool_deposit: '500000000',
-        protocol_major_ver: 5,
-        protocol_minor_ver: 0
-      }
+      a0: 0.3,
+      coins_per_utxo_word: '0',
+      cost_models: {
+        PlutusV1: {
+          'addInteger-cpu-arguments-intercept': 197_209,
+          'addInteger-cpu-arguments-slope': 0
+        },
+        PlutusV2: {
+          'addInteger-cpu-arguments-intercept': 197_209,
+          'addInteger-cpu-arguments-slope': 0
+        }
+      },
+      decentralisation_param: 0.5,
+      key_deposit: '2000000',
+      max_collateral_inputs: 1,
+      max_tx_size: '16384',
+      max_val_size: '1000',
+      min_fee_a: 44,
+      min_fee_b: 155_381,
+      min_pool_cost: '340000000',
+      pool_deposit: '500000000',
+      protocol_major_ver: 5,
+      protocol_minor_ver: 0,
+      rho: 0.003,
+      tau: 0.2
     };
-    BlockFrostAPI.prototype.axiosInstance = jest.fn().mockResolvedValue(mockedResponse) as any;
+    BlockFrostAPI.prototype.epochsLatestParameters = jest.fn().mockResolvedValue(mockedResponse) as any;
 
-    const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+    const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
+    BlockFrostAPI.prototype.apiUrl = apiUrl;
+
     const client = blockfrostNetworkInfoProvider(blockfrost);
-    const response = await client.currentWalletProtocolParameters();
+    const response = await client.protocolParameters();
 
     expect(response).toMatchObject({
       coinsPerUtxoByte: 0,
@@ -149,7 +164,7 @@ describe('blockfrostNetworkInfoProvider', () => {
   test('ledgerTip', async () => {
     BlockFrostAPI.prototype.blocksLatest = jest.fn().mockResolvedValue(blockResponse);
 
-    const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
+    const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
     const client = blockfrostNetworkInfoProvider(blockfrost);
     const response = await client.ledgerTip();
 
