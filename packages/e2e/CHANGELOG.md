@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.37.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.36.10...@cardano-sdk/e2e@0.37.0) (2024-07-31)
+
+### ⚠ BREAKING CHANGES
+
+* **cardano-services:** conway protocol parameters could be undefined in PV8 or lower
+* remove OgmiosTxSubmitProvider
+* add ObservableCardanoNode.submitTx method
+
+### Features
+
+* add ObservableCardanoNode.submitTx method ([8289062](https://github.com/input-output-hk/cardano-js-sdk/commit/8289062455b561f00cbfedc0900b0e46eb7befc4))
+* **cardano-services:** sanchonet support ([13109d6](https://github.com/input-output-hk/cardano-js-sdk/commit/13109d60361730c5c36ee0f616f1a478e9b71b98))
+* **e2e:** run e2e test on slow networks like preprod/preview ([772c026](https://github.com/input-output-hk/cardano-js-sdk/commit/772c0268afb5c3a413bd0d34ace43dc6ab4e8c8c))
+
+### Bug Fixes
+
+* **cardano-services:** conway protocol parameters could be undefined in PV8 or lower ([e68c59b](https://github.com/input-output-hk/cardano-js-sdk/commit/e68c59b9c80b9df5992f0e7b04d97719c8d72005))
+* **e2e:** cli deprecated protocol-params arg ([f8b190d](https://github.com/input-output-hk/cardano-js-sdk/commit/f8b190d4f9409ff14674d80d511dea7f603d47b7))
+* **e2e:** do not remove inexistent file ([a1200fb](https://github.com/input-output-hk/cardano-js-sdk/commit/a1200fb956918e5541176474e039220f7bb1c50e))
+* **e2e:** ignore inexistent files when cleaning up ([ed08a0a](https://github.com/input-output-hk/cardano-js-sdk/commit/ed08a0ae7e864e275577ec9ebd47d2a87383c406))
+* **e2e:** local-network cardano-node download url ([c024840](https://github.com/input-output-hk/cardano-js-sdk/commit/c024840a0fa41a90a4e77b61633ecd7bd2ab5639))
+* **e2e:** more robust local-network script name logline ([eb78b76](https://github.com/input-output-hk/cardano-js-sdk/commit/eb78b761be97837b739a9338c0dce6284ae3a2ac))
+* **e2e:** use node 9.0.0 in install script too ([b02092d](https://github.com/input-output-hk/cardano-js-sdk/commit/b02092d9e9c2b63acfd3875c47927e76ff034152))
+* local-network startup script ([30a115d](https://github.com/input-output-hk/cardano-js-sdk/commit/30a115dd761d5704081b4f79556d15a1f47c089b))
+* produced coins error data is present only for ValueNotConserved ([e01a30c](https://github.com/input-output-hk/cardano-js-sdk/commit/e01a30ce056f1886c0ddbacf245b195f13111244))
+* **wallet:** tx not withdrawing all rewards ([9c74668](https://github.com/input-output-hk/cardano-js-sdk/commit/9c746689c6050373feff857fe9d9b0b03642976d))
+
+### Code Refactoring
+
+* remove OgmiosTxSubmitProvider ([8c56c5e](https://github.com/input-output-hk/cardano-js-sdk/commit/8c56c5eddb73a4888013798acf97879f9ce741f7))
+
 ## [0.36.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.36.9...@cardano-sdk/e2e@0.36.10) (2024-07-25)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

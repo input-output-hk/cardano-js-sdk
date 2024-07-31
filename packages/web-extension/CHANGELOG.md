@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.29.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.29.10...@cardano-sdk/web-extension@0.29.11) (2024-07-31)
+
+### Bug Fixes
+
+* **web-extension:** do not include staking script if not required in the tx ([ae84f1d](https://github.com/input-output-hk/cardano-js-sdk/commit/ae84f1d2d7eba4b3324f10ed19d603b056119aac))
+
 ## [0.29.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.29.9...@cardano-sdk/web-extension@0.29.10) (2024-07-25)
 
 ### Bug Fixes

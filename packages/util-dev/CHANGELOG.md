@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.22.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.21.8...@cardano-sdk/util-dev@0.22.0) (2024-07-31)
+
+### ⚠ BREAKING CHANGES
+
+* add ObservableCardanoNode.submitTx method
+* update core CardanoNode error types
+  - Removed `OnChainTx` `witness.scripts` and `auxiliaryData.scripts`
+
+### Features
+
+* add ObservableCardanoNode.submitTx method ([8289062](https://github.com/input-output-hk/cardano-js-sdk/commit/8289062455b561f00cbfedc0900b0e46eb7befc4))
+* **cardano-services:** sanchonet support ([13109d6](https://github.com/input-output-hk/cardano-js-sdk/commit/13109d60361730c5c36ee0f616f1a478e9b71b98))
+* serialize only valid conway params in gov action ([a0d3fc0](https://github.com/input-output-hk/cardano-js-sdk/commit/a0d3fc0ae287dd0614ac1098ca9a462c55953aaf))
+
+### Bug Fixes
+
+* use reason as ProviderFailure when innerError is missing ([3777d8e](https://github.com/input-output-hk/cardano-js-sdk/commit/3777d8e667e1e2958d38af4f6121da5686fee013))
+
+### Code Refactoring
+
+* adapt to ogmios 6 changes ([e9c5692](https://github.com/input-output-hk/cardano-js-sdk/commit/e9c5692d3599732869a5bda29fe983df5689bdab)), closes [/github.com/input-output-hk/cardano-js-sdk/pull/927#discussion_r1352081210](https://github.com/input-output-hk//github.com/input-output-hk/cardano-js-sdk/pull/927/issues/discussion_r1352081210)
+
 ## [0.21.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.21.7...@cardano-sdk/util-dev@0.21.8) (2024-07-25)
 
 **Note:** Version bump only for package @cardano-sdk/util-dev

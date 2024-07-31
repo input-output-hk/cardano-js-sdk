@@ -3,6 +3,48 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.36.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.35.4...@cardano-sdk/core@0.36.0) (2024-07-31)
+
+### ⚠ BREAKING CHANGES
+
+* **cardano-services:** conway protocol parameters could be undefined in PV8 or lower
+* **core:** decentralizationParameter was removed in babbage
+* **core:** typo commiteeNoConfidence committeeNoConfidence
+* **core:** typo commiteeNoConfidence committeeNoConfidence
+* add deposit to stake pool registration certificates
+* **core:** remove duplicate RegisterCcHotKey and
+RetireCc certificates
+* add ObservableCardanoNode.submitTx method
+* update core CardanoNode error types
+  - Removed `OnChainTx` `witness.scripts` and `auxiliaryData.scripts`
+
+### Features
+
+* add deposit to stake pool registration certificates ([54189a4](https://github.com/input-output-hk/cardano-js-sdk/commit/54189a492d19aafd33037cc9f0fb15c1708712a1))
+* add ObservableCardanoNode.submitTx method ([8289062](https://github.com/input-output-hk/cardano-js-sdk/commit/8289062455b561f00cbfedc0900b0e46eb7befc4))
+* **core:** add new ogmios txsubmit errors ([ae4907e](https://github.com/input-output-hk/cardano-js-sdk/commit/ae4907e60c731666e84661c44cc7a11e1be1fb49))
+* **core:** align conway new protocol params ([fbde69d](https://github.com/input-output-hk/cardano-js-sdk/commit/fbde69d0c47c09ef6af1ca726bd77d052a56d81e))
+* **core:** update serialization with new protocol params update fields ([d7e1d40](https://github.com/input-output-hk/cardano-js-sdk/commit/d7e1d40c151467a4d54381c45b949d7bfc21f330))
+* **core:** upgrade implicit coins procedure with conway era new stake certificates ([e88f6f1](https://github.com/input-output-hk/cardano-js-sdk/commit/e88f6f1d262dae5fa21dd367996054534d87ee6c))
+* **core:** wip vrf vk from hex ([23af0a0](https://github.com/input-output-hk/cardano-js-sdk/commit/23af0a02747f3757e736b732f06f1c909d98154e))
+* handle UnknownOutputReferences ogmios tx submit error ([f8903a1](https://github.com/input-output-hk/cardano-js-sdk/commit/f8903a17b3f1ef0022717054c77c1e56eaeab63c))
+* serialize only valid conway params in gov action ([a0d3fc0](https://github.com/input-output-hk/cardano-js-sdk/commit/a0d3fc0ae287dd0614ac1098ca9a462c55953aaf))
+
+### Bug Fixes
+
+* **cardano-services:** conway protocol parameters could be undefined in PV8 or lower ([e68c59b](https://github.com/input-output-hk/cardano-js-sdk/commit/e68c59b9c80b9df5992f0e7b04d97719c8d72005))
+* cardano-submit-api errors do not have structured details ([c41d959](https://github.com/input-output-hk/cardano-js-sdk/commit/c41d959b42340ac3b207699a0ec0ac7339709f1b))
+* **core:** decentralizationParameter was removed in babbage ([808d8c9](https://github.com/input-output-hk/cardano-js-sdk/commit/808d8c9d1a89b0c048e6851fd7221b194f028394))
+* **core:** typo commiteeNoConfidence committeeNoConfidence ([e2dfd4c](https://github.com/input-output-hk/cardano-js-sdk/commit/e2dfd4c3b2db27fae96ec52acc3283e86464a2e8))
+* **core:** typo commiteeNoConfidence committeeNoConfidence ([127dd03](https://github.com/input-output-hk/cardano-js-sdk/commit/127dd03e41ba393240d67c794acb2b02163c5113))
+* produced coins error data is present only for ValueNotConserved ([e01a30c](https://github.com/input-output-hk/cardano-js-sdk/commit/e01a30ce056f1886c0ddbacf245b195f13111244))
+* use reason as ProviderFailure when innerError is missing ([3777d8e](https://github.com/input-output-hk/cardano-js-sdk/commit/3777d8e667e1e2958d38af4f6121da5686fee013))
+
+### Code Refactoring
+
+* adapt to ogmios 6 changes ([e9c5692](https://github.com/input-output-hk/cardano-js-sdk/commit/e9c5692d3599732869a5bda29fe983df5689bdab)), closes [/github.com/input-output-hk/cardano-js-sdk/pull/927#discussion_r1352081210](https://github.com/input-output-hk//github.com/input-output-hk/cardano-js-sdk/pull/927/issues/discussion_r1352081210)
+* **core:** remove duplicate committee certificates ([549848f](https://github.com/input-output-hk/cardano-js-sdk/commit/549848fe26a22d44864452e7a3afdcce1eed2c09))
+
 ## [0.35.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.35.3...@cardano-sdk/core@0.35.4) (2024-07-25)
 
 ### Features

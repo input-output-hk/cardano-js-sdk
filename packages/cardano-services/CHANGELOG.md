@@ -3,6 +3,60 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.29.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.14...@cardano-sdk/cardano-services@0.29.0) (2024-07-31)
+
+### ⚠ BREAKING CHANGES
+
+* **cardano-services:** conway protocol parameters could be undefined in PV8 or lower
+* **core:** decentralizationParameter was removed in babbage
+* **cardano-services:** removed pool_voting_thresholds and drep_voting_thresholds from
+ProtocolParamsModel
+* add deposit to stake pool registration certificates
+* **cardano-services:** With the introduction of Conway era new certificates we must take care that
+many new certificates (reg_cert and all combined certificates) should take the same effects
+as previously done by the stake_registration certificate.
+The same for stake_deregistration and unreg_cert certificates.
+* remove OgmiosTxSubmitProvider
+* update core CardanoNode error types
+  - Removed `OnChainTx` `witness.scripts` and `auxiliaryData.scripts`
+
+### Features
+
+* add deposit to stake pool registration certificates ([54189a4](https://github.com/input-output-hk/cardano-js-sdk/commit/54189a492d19aafd33037cc9f0fb15c1708712a1))
+* **cardano-services:** add conway certificates to db-sync chain history provider ([bb061a7](https://github.com/input-output-hk/cardano-js-sdk/commit/bb061a719ddf4a44bbe9d028faba64b73e55c196))
+* **cardano-services:** add distinction between constitutional committee with or without script ([f6b512a](https://github.com/input-output-hk/cardano-js-sdk/commit/f6b512a30f86cc4728e7c20e6a85a5084050962f))
+* **cardano-services:** add proposal procedures details ([5f8f7c7](https://github.com/input-output-hk/cardano-js-sdk/commit/5f8f7c7452c2324f5b9263a1e390f58dc0f986af))
+* **cardano-services:** add proposal procedures to chain history provider ([e4779b8](https://github.com/input-output-hk/cardano-js-sdk/commit/e4779b8ced065c3fe2c53e57038c55a69e7e5a66))
+* **cardano-services:** add voting procedures to db-sync chain history ([4d275ee](https://github.com/input-output-hk/cardano-js-sdk/commit/4d275ee1a7099b91a4717f9fc8945472481e9d0b))
+* **cardano-services:** extract rewards which are not correlated to a pool ([b621955](https://github.com/input-output-hk/cardano-js-sdk/commit/b621955b1eb916158cbeef2f827635f01fc956ef))
+* **cardano-services:** map conway protocol params update action ([88493d4](https://github.com/input-output-hk/cardano-js-sdk/commit/88493d466e2e8dbfee56d1e58695dbde56ca2885))
+* **cardano-services:** map pvt/dvt dbSync fields to pool/drep voting thresholds ([36c3291](https://github.com/input-output-hk/cardano-js-sdk/commit/36c32919ea8cff934e04965a4f8f436788711dd6))
+* **cardano-services:** network info provider new protocol params ([82b9ad3](https://github.com/input-output-hk/cardano-js-sdk/commit/82b9ad3d037116fb67127abece17c1199a9cfb83))
+* **cardano-services:** sanchonet support ([13109d6](https://github.com/input-output-hk/cardano-js-sdk/commit/13109d60361730c5c36ee0f616f1a478e9b71b98))
+
+### Bug Fixes
+
+* **cardano-services:** committee_term_limit renamed to committee_max_term_length ([90e84fa](https://github.com/input-output-hk/cardano-js-sdk/commit/90e84fa644fdf7c905476d06f61a85c1e9661200))
+* **cardano-services:** committee_term_limit renamed to governance_action_validity_period ([79eb6a9](https://github.com/input-output-hk/cardano-js-sdk/commit/79eb6a980031c5320338a229261d1b302c10ae4f))
+* **cardano-services:** conway era deposits in db sync network info provider ([ebe7ea7](https://github.com/input-output-hk/cardano-js-sdk/commit/ebe7ea7712546a164cd8640bf7ea6d1c230f4c72))
+* **cardano-services:** conway protocol parameters could be undefined in PV8 or lower ([e68c59b](https://github.com/input-output-hk/cardano-js-sdk/commit/e68c59b9c80b9df5992f0e7b04d97719c8d72005))
+* **cardano-services:** db-sync redeemer purpose mapping ([c75fef5](https://github.com/input-output-hk/cardano-js-sdk/commit/c75fef5517b777f9e9e8b72d984e11420c9db1f0))
+* **cardano-services:** drep representation in certificates in chain history builder ([13de17a](https://github.com/input-output-hk/cardano-js-sdk/commit/13de17a1f76d0e4b25d1163f928d971aee6ebcb6))
+* **cardano-services:** drep_inactivity renamed to drep_activity ([9501b18](https://github.com/input-output-hk/cardano-js-sdk/commit/9501b188e33190f9732e6b87e4d51c7d7517a24c))
+* **cardano-services:** min_committee_size renamed to committee_min_size ([342bb3c](https://github.com/input-output-hk/cardano-js-sdk/commit/342bb3c88a21af181c3540107cf31399f14ccbfb))
+* **cardano-services:** new constitution proposal representation in db sync chain sync provider ([c2bb9cb](https://github.com/input-output-hk/cardano-js-sdk/commit/c2bb9cb78f0d91865174e09b84da4ce611bf552d))
+* **cardano-services:** use a single QueryRunner/connection for getAssets ([53f678b](https://github.com/input-output-hk/cardano-js-sdk/commit/53f678b945b10064176f4530455f2ffbe4fb5572))
+* **cardano-services:** use correct stake key deregistration certificates deposit value ([a0a2ead](https://github.com/input-output-hk/cardano-js-sdk/commit/a0a2ead3351be80da16afe15f321b019f8a7b6d0))
+* **core:** decentralizationParameter was removed in babbage ([808d8c9](https://github.com/input-output-hk/cardano-js-sdk/commit/808d8c9d1a89b0c048e6851fd7221b194f028394))
+* **e2e:** local-network cardano-node download url ([c024840](https://github.com/input-output-hk/cardano-js-sdk/commit/c024840a0fa41a90a4e77b61633ecd7bd2ab5639))
+* handle bigint in innerError data ([447b75d](https://github.com/input-output-hk/cardano-js-sdk/commit/447b75d030583ae1b0ce1a9f708331cf5ebe67f6))
+* produced coins error data is present only for ValueNotConserved ([e01a30c](https://github.com/input-output-hk/cardano-js-sdk/commit/e01a30ce056f1886c0ddbacf245b195f13111244))
+
+### Code Refactoring
+
+* adapt to ogmios 6 changes ([e9c5692](https://github.com/input-output-hk/cardano-js-sdk/commit/e9c5692d3599732869a5bda29fe983df5689bdab)), closes [/github.com/input-output-hk/cardano-js-sdk/pull/927#discussion_r1352081210](https://github.com/input-output-hk//github.com/input-output-hk/cardano-js-sdk/pull/927/issues/discussion_r1352081210)
+* remove OgmiosTxSubmitProvider ([8c56c5e](https://github.com/input-output-hk/cardano-js-sdk/commit/8c56c5eddb73a4888013798acf97879f9ce741f7))
+
 ## [0.28.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.13...@cardano-sdk/cardano-services@0.28.14) (2024-07-25)
 
 ### Features

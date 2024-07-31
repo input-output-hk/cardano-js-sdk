@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.40.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.39.1...@cardano-sdk/wallet@0.40.0) (2024-07-31)
+
+### ⚠ BREAKING CHANGES
+
+* **wallet:** typo stakeKeyCertficates renamed to stakeKeyCertificates
+* update core CardanoNode error types
+  - Removed `OnChainTx` `witness.scripts` and `auxiliaryData.scripts`
+
+### Features
+
+* handle UnknownOutputReferences ogmios tx submit error ([f8903a1](https://github.com/input-output-hk/cardano-js-sdk/commit/f8903a17b3f1ef0022717054c77c1e56eaeab63c))
+* **wallet:** delegation by conway certificates ([450e086](https://github.com/input-output-hk/cardano-js-sdk/commit/450e0868a9e56f0842728c865f53e3e846f56198))
+* **wallet:** implement conway era new stake certificates ([38d795d](https://github.com/input-output-hk/cardano-js-sdk/commit/38d795dfb401157e7a60d665a8e66b1ad661e648))
+
+### Bug Fixes
+
+* cardano-submit-api errors do not have structured details ([c41d959](https://github.com/input-output-hk/cardano-js-sdk/commit/c41d959b42340ac3b207699a0ec0ac7339709f1b))
+* produced coins error data is present only for ValueNotConserved ([e01a30c](https://github.com/input-output-hk/cardano-js-sdk/commit/e01a30ce056f1886c0ddbacf245b195f13111244))
+* **wallet:** do not resubmit unknown error tx ([76a2273](https://github.com/input-output-hk/cardano-js-sdk/commit/76a22735d2e584fb5fe6ef171bc9bfe3676d684e))
+* **wallet:** tx not withdrawing all rewards ([9c74668](https://github.com/input-output-hk/cardano-js-sdk/commit/9c746689c6050373feff857fe9d9b0b03642976d))
+
+### Code Refactoring
+
+* adapt to ogmios 6 changes ([e9c5692](https://github.com/input-output-hk/cardano-js-sdk/commit/e9c5692d3599732869a5bda29fe983df5689bdab)), closes [/github.com/input-output-hk/cardano-js-sdk/pull/927#discussion_r1352081210](https://github.com/input-output-hk//github.com/input-output-hk/cardano-js-sdk/pull/927/issues/discussion_r1352081210)
+
 ## [0.39.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.39.0...@cardano-sdk/wallet@0.39.1) (2024-07-25)
 
 **Note:** Version bump only for package @cardano-sdk/wallet

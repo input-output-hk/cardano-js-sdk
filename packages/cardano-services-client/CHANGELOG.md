@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.15](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.19.14...@cardano-sdk/cardano-services-client@0.19.15) (2024-07-31)
+
+### Bug Fixes
+
+* produced coins error data is present only for ValueNotConserved ([e01a30c](https://github.com/input-output-hk/cardano-js-sdk/commit/e01a30ce056f1886c0ddbacf245b195f13111244))
+
 ## [0.19.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.19.13...@cardano-sdk/cardano-services-client@0.19.14) (2024-07-25)
 
 ### Features

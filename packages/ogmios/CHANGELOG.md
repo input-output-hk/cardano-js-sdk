@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.15.35...@cardano-sdk/ogmios@0.16.0) (2024-07-31)
+
+### ⚠ BREAKING CHANGES
+
+* **core:** remove duplicate RegisterCcHotKey and
+RetireCc certificates
+* remove OgmiosTxSubmitProvider
+* add ObservableCardanoNode.submitTx method
+* **ogmios:** removed interactionType
+* update core CardanoNode error types
+  - Removed `OnChainTx` `witness.scripts` and `auxiliaryData.scripts`
+
+### Features
+
+* add ObservableCardanoNode.submitTx method ([8289062](https://github.com/input-output-hk/cardano-js-sdk/commit/8289062455b561f00cbfedc0900b0e46eb7befc4))
+* handle UnknownOutputReferences ogmios tx submit error ([f8903a1](https://github.com/input-output-hk/cardano-js-sdk/commit/f8903a17b3f1ef0022717054c77c1e56eaeab63c))
+* **ogmios:** mapTxIn is needed in error parsing ([d4e6724](https://github.com/input-output-hk/cardano-js-sdk/commit/d4e67244df455259e121c33fa477db6b9c97ba4b))
+
+### Code Refactoring
+
+* adapt to ogmios 6 changes ([e9c5692](https://github.com/input-output-hk/cardano-js-sdk/commit/e9c5692d3599732869a5bda29fe983df5689bdab)), closes [/github.com/input-output-hk/cardano-js-sdk/pull/927#discussion_r1352081210](https://github.com/input-output-hk//github.com/input-output-hk/cardano-js-sdk/pull/927/issues/discussion_r1352081210)
+* **core:** remove duplicate committee certificates ([549848f](https://github.com/input-output-hk/cardano-js-sdk/commit/549848fe26a22d44864452e7a3afdcce1eed2c09))
+* **ogmios:** removed interactionType ([4aa0612](https://github.com/input-output-hk/cardano-js-sdk/commit/4aa0612b72c926b5d0993f5de541644ce889a765))
+* remove OgmiosTxSubmitProvider ([8c56c5e](https://github.com/input-output-hk/cardano-js-sdk/commit/8c56c5eddb73a4888013798acf97879f9ce741f7))
+
 ## [0.15.35](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.15.34...@cardano-sdk/ogmios@0.15.35) (2024-07-25)
 
 **Note:** Version bump only for package @cardano-sdk/ogmios
