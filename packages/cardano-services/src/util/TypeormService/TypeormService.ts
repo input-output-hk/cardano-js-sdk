@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, Subscription, filter, firstValueFrom } from 'rxjs';
-import { DataSource } from 'typeorm';
+import { DataSource, QueryRunner } from 'typeorm';
 import { Logger } from 'ts-log';
 import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 import { RunnableModule, isNotNil } from '@cardano-sdk/util';
@@ -48,6 +48,24 @@ export abstract class TypeormService extends RunnableModule {
       this.onError(error);
       throw error;
     }
+  }
+
+  async withQueryRunner<T>(callback: (queryRunner: QueryRunner) => Promise<T>): Promise<T> {
+    return this.withDataSource(async (dataSource) => {
+      const queryRunner = dataSource.createQueryRunner();
+      try {
+        const result = await callback(queryRunner);
+        await queryRunner.release();
+        return result;
+      } catch (error) {
+        try {
+          await queryRunner.release();
+        } catch (releaseError) {
+          this.logger.warn(releaseError);
+        }
+        throw error;
+      }
+    });
   }
 
   async initializeImpl() {
