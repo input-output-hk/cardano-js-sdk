@@ -262,10 +262,8 @@ const createScriptWitness = async <WalletMetadata extends {}, AccountMetadata ex
 
   const paymentKeysPaths = wallet.ownSigners.map((signer) => signer.paymentScriptKeyPath);
   const stakingKeysPaths = wallet.ownSigners.map((signer) => signer.stakingScriptKeyPath);
-  const paths = [
-    ...paymentKeysPaths,
-    ...(requiresStakingWitness(tx.body(), wallet.stakingScript, chainId.networkId) ? stakingKeysPaths : [])
-  ];
+  const requireStakingScript = requiresStakingWitness(tx.body(), wallet.stakingScript, chainId.networkId);
+  const paths = [...paymentKeysPaths, ...(requireStakingScript ? stakingKeysPaths : [])];
   const wallets = await firstValueFrom(walletRepository.wallets$);
 
   let signatures;
@@ -293,7 +291,7 @@ const createScriptWitness = async <WalletMetadata extends {}, AccountMetadata ex
   }
 
   return {
-    scripts: [wallet.paymentScript, wallet.stakingScript],
+    scripts: [wallet.paymentScript, ...(requireStakingScript ? [wallet.stakingScript] : [])],
     signatures: signatures ? new Map(signatures) : new Map()
   };
 };
