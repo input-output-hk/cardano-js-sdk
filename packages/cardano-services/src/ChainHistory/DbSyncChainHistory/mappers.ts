@@ -18,6 +18,7 @@ import {
   TxOutput,
   TxOutputModel,
   TxTokenMap,
+  VoteDelegationCertModel,
   WithCertIndex,
   WithCertType,
   WithdrawalModel
@@ -172,6 +173,24 @@ export const mapAnchor = (anchorUrl: string, anchorDataHash: string): Cardano.An
   return null;
 };
 
+const mapDrepDelegation = ({
+  drep_hash,
+  drep_view,
+  has_script
+}: Pick<VoteDelegationCertModel, 'drep_hash' | 'drep_view' | 'has_script'>): Cardano.DelegateRepresentative =>
+  drep_hash
+    ? {
+        hash: drep_hash.toString('hex') as Hash28ByteBase16,
+        type: Number(has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
+      }
+    : drep_view === 'drep_always_no_confidence'
+    ? {
+        __typename: 'AlwaysNoConfidence'
+      }
+    : {
+        __typename: 'AlwaysAbstain'
+      };
+
 // eslint-disable-next-line complexity
 export const mapCertificate = (
   certModel: WithCertType<CertificateModel>
@@ -268,15 +287,11 @@ export const mapCertificate = (
         type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
       }
     };
-
   if (isVoteDelegationCertModel(certModel))
     return {
       __typename: Cardano.CertificateType.VoteDelegation,
       cert_index: certModel.cert_index,
-      dRep: {
-        hash: certModel.drep_hash.toString('hex') as Hash28ByteBase16,
-        type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
-      },
+      dRep: mapDrepDelegation(certModel),
       stakeCredential: {
         hash: Cardano.RewardAccount.toHash(
           Cardano.RewardAccount(certModel.address)
@@ -289,10 +304,7 @@ export const mapCertificate = (
     return {
       __typename: Cardano.CertificateType.VoteRegistrationDelegation,
       cert_index: certModel.cert_index,
-      dRep: {
-        hash: certModel.drep_hash.toString('hex') as Hash28ByteBase16,
-        type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
-      },
+      dRep: mapDrepDelegation(certModel),
       deposit: BigInt(certModel.deposit),
       stakeCredential: {
         hash: Cardano.RewardAccount.toHash(
@@ -306,10 +318,7 @@ export const mapCertificate = (
     return {
       __typename: Cardano.CertificateType.StakeVoteDelegation,
       cert_index: certModel.cert_index,
-      dRep: {
-        hash: certModel.drep_hash.toString('hex') as Hash28ByteBase16,
-        type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
-      },
+      dRep: mapDrepDelegation(certModel),
       poolId: certModel.pool_id as unknown as Cardano.PoolId,
       stakeCredential: {
         hash: Cardano.RewardAccount.toHash(
@@ -337,10 +346,7 @@ export const mapCertificate = (
     return {
       __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
       cert_index: certModel.cert_index,
-      dRep: {
-        hash: certModel.drep_hash.toString('hex') as Hash28ByteBase16,
-        type: Number(certModel.has_script) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
-      },
+      dRep: mapDrepDelegation(certModel),
       deposit: BigInt(certModel.deposit),
       poolId: certModel.pool_id as unknown as Cardano.PoolId,
       stakeCredential: {

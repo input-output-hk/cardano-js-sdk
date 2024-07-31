@@ -208,7 +208,10 @@ export interface DrepCertModel extends CertificateModel {
 
 export interface VoteDelegationCertModel extends CertificateModel {
   has_script: boolean;
-  drep_hash: Buffer;
+  // empty when no confidence or abstain
+  drep_hash: Buffer | null;
+  // has the drep Bech32 representation when not always no confidence or abstain
+  drep_view: 'drep_always_no_confidence' | 'drep_always_abstain';
   address: string;
 }
 

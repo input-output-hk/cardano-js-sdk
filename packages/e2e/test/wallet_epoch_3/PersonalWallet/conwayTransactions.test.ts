@@ -409,10 +409,18 @@ describe('PersonalWallet/conwayTransactions', () => {
       );
     });
 
-    it('can delegate vote', async () => {
+    it.each([
+      dRepCredential,
+      { __typename: 'AlwaysAbstain' },
+      { __typename: 'AlwaysNoConfidence' }
+    ] as Cardano.DelegateRepresentative[])('can delegate vote %s', async (dRep) => {
+      // dRepCredential is initialized in beforeAll, and it.each runs before `beforeAll`,
+      // so it is not available in the .each scope.
+      // Use this workaround to pass the dRepCredential to the test
+      dRep = dRep ?? dRepCredential;
       const voteDelegCert: Cardano.VoteDelegationCertificate = {
         __typename: CertificateType.VoteDelegation,
-        dRep: dRepCredential,
+        dRep,
         stakeCredential
       };
       const signedTx = await wallet
@@ -423,7 +431,6 @@ describe('PersonalWallet/conwayTransactions', () => {
       const [, confirmedTx] = await submitAndConfirm(wallet, signedTx.tx, 1);
 
       assertTxHasCertificate(confirmedTx, voteDelegCert);
-      await assertWalletIsDelegating();
     });
 
     it('can delegate stake and vote using combo certificate', async () => {

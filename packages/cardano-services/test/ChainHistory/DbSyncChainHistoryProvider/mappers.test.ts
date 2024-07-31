@@ -21,6 +21,7 @@ import {
   TxOutput,
   TxOutputModel,
   TxTokenMap,
+  VoteDelegationCertModel,
   WithCertIndex,
   WithCertType,
   WithdrawalModel
@@ -383,6 +384,60 @@ describe('chain history mappers', () => {
         }
       });
     });
+
+    test.each([
+      {
+        dRep: { __typename: 'AlwaysAbstain' },
+        drep_hash: null,
+        drep_view: 'drep_always_abstain',
+        has_script: false
+      },
+      {
+        dRep: { __typename: 'AlwaysNoConfidence' },
+        drep_hash: null,
+        drep_view: 'drep_always_no_confidence',
+        has_script: false
+      },
+      {
+        dRep: {
+          hash: Hash28ByteBase16('8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d'),
+          type: Cardano.CredentialType.KeyHash
+        },
+        drep_hash: Buffer.from(hash28ByteBase16, 'hex'),
+        has_script: false
+      },
+      {
+        dRep: {
+          hash: Hash28ByteBase16('8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d'),
+          type: Cardano.CredentialType.ScriptHash
+        },
+        drep_hash: Buffer.from(hash28ByteBase16, 'hex'),
+        has_script: true
+      }
+    ] as (Pick<VoteDelegationCertModel, 'drep_hash' | 'drep_view' | 'has_script'> & { dRep: Cardano.DelegateRepresentative })[])(
+      'map AlwaysAbstain VoteDelegationCertModel to Cardano.VoteDelegationCertificate',
+      ({ drep_hash, drep_view, dRep, has_script }) => {
+        const result = mappers.mapCertificate({
+          ...baseCertModel,
+          address: stakeAddress,
+          drep_hash,
+          drep_view,
+          has_script,
+          type: 'voteDelegation'
+        } as WithCertType<VoteDelegationCertModel>);
+        expect(result).toEqual<WithCertIndex<Cardano.VoteDelegationCertificate>>({
+          __typename: Cardano.CertificateType.VoteDelegation,
+          cert_index: 0,
+          dRep,
+          stakeCredential: {
+            hash: Hash28ByteBase16.fromEd25519KeyHashHex(
+              Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))
+            ),
+            type: Cardano.CredentialType.KeyHash
+          }
+        });
+      }
+    );
   });
   describe('mapRedeemer', () => {
     const redeemerModel: Omit<RedeemerModel, 'purpose'> = {
