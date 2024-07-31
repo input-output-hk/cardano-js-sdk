@@ -119,6 +119,7 @@ export interface VotingProceduresModel {
   voter_role: VoterRole;
   drep_voter: Buffer | null;
   committee_voter: Buffer | null;
+  committee_has_script: boolean;
   pool_voter: Buffer | null;
   governance_action_tx_id: Buffer;
   governance_action_index: number;
