@@ -37,20 +37,15 @@ export class TypeormAssetProvider extends TypeormProvider implements AssetProvid
   }
 
   async getAsset({ assetId, extraData }: GetAssetArgs): Promise<Asset.AssetInfo> {
-    return this.withDataSource(async (dataSource) => {
-      const queryRunner = dataSource.createQueryRunner();
-      try {
-        const assetInfo = await this.#getAssetInfo(assetId, queryRunner);
+    return this.withQueryRunner(async (queryRunner) => {
+      const assetInfo = await this.#getAssetInfo(assetId, queryRunner);
 
-        if (extraData?.nftMetadata) assetInfo.nftMetadata = await this.#getNftMetadata(assetInfo, queryRunner);
-        if (extraData?.tokenMetadata) {
-          assetInfo.tokenMetadata = (await this.#fetchTokenMetadataList([assetId]))[0];
-        }
-
-        return assetInfo;
-      } finally {
-        await queryRunner.release();
+      if (extraData?.nftMetadata) assetInfo.nftMetadata = await this.#getNftMetadata(assetInfo, queryRunner);
+      if (extraData?.tokenMetadata) {
+        assetInfo.tokenMetadata = (await this.#fetchTokenMetadataList([assetId]))[0];
       }
+
+      return assetInfo;
     });
   }
 
@@ -63,31 +58,26 @@ export class TypeormAssetProvider extends TypeormProvider implements AssetProvid
       );
     }
 
-    return this.withDataSource(async (dataSource) => {
-      const queryRunner = dataSource.createQueryRunner();
-      try {
-        const assetInfoList = await Promise.all(assetIds.map((assetId) => this.#getAssetInfo(assetId, queryRunner)));
+    return this.withQueryRunner(async (queryRunner) => {
+      const assetInfoList = await Promise.all(assetIds.map((assetId) => this.#getAssetInfo(assetId, queryRunner)));
 
-        if (extraData?.nftMetadata) {
-          await Promise.all(
-            assetInfoList.map(async (assetInfo) => {
-              assetInfo.nftMetadata = await this.#getNftMetadata(assetInfo, queryRunner);
-            })
-          );
-        }
-
-        if (extraData?.tokenMetadata) {
-          const tokenMetadataList = await this.#fetchTokenMetadataList(assetIds);
-
-          for (const [index, assetInfo] of assetInfoList.entries()) {
-            assetInfo.tokenMetadata = tokenMetadataList[index];
-          }
-        }
-
-        return assetInfoList;
-      } finally {
-        await queryRunner.release();
+      if (extraData?.nftMetadata) {
+        await Promise.all(
+          assetInfoList.map(async (assetInfo) => {
+            assetInfo.nftMetadata = await this.#getNftMetadata(assetInfo, queryRunner);
+          })
+        );
       }
+
+      if (extraData?.tokenMetadata) {
+        const tokenMetadataList = await this.#fetchTokenMetadataList(assetIds);
+
+        for (const [index, assetInfo] of assetInfoList.entries()) {
+          assetInfo.tokenMetadata = tokenMetadataList[index];
+        }
+      }
+
+      return assetInfoList;
     });
   }
 

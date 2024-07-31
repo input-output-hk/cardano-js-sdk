@@ -10,12 +10,7 @@ export class TypeOrmNftMetadataService extends TypeormService implements NftMeta
   }
 
   async getNftMetadata(assetInfo: AssetPolicyIdAndName): Promise<Asset.NftMetadata | null> {
-    return this.withDataSource(async (dataSource) => {
-      const queryRunner = dataSource.createQueryRunner();
-      const result = await this.getNftMetadataWith(assetInfo, queryRunner);
-      await queryRunner.release();
-      return result;
-    });
+    return this.withQueryRunner((queryRunner) => this.getNftMetadataWith(assetInfo, queryRunner));
   }
 
   async getNftMetadataWith(assetInfo: AssetPolicyIdAndName, queryRunner: QueryRunner) {
