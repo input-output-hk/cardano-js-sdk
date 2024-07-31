@@ -4,7 +4,15 @@ import { Cardano, setInConwayEra } from '@cardano-sdk/core';
 import { logger } from '@cardano-sdk/util-dev';
 
 import { firstValueFrom, map } from 'rxjs';
-import { getEnv, getWallet, submitAndConfirm, unDelegateWallet, walletReady, walletVariables } from '../../../src';
+import {
+  getEnv,
+  getWallet,
+  submitAndConfirm,
+  unDelegateWallet,
+  waitForWalletStateSettle,
+  walletReady,
+  walletVariables
+} from '../../../src';
 
 /*
 Use cases not covered by specific tests because covered by (before|after)(All|Each) hooks
@@ -219,20 +227,8 @@ describe('PersonalWallet/conwayTransactions', () => {
   };
 
   const isRegisteredDRep = async () => {
-    const txs = [...(await firstValueFrom(dRepWallet.transactions.history$))].reverse();
-
-    for (const {
-      body: { certificates }
-    } of txs) {
-      if (certificates) {
-        for (const certificate of certificates) {
-          if (certificate.__typename === CertificateType.UnregisterDelegateRepresentative) return false;
-          if (certificate.__typename === CertificateType.RegisterDelegateRepresentative) return true;
-        }
-      }
-    }
-
-    return false;
+    await waitForWalletStateSettle(dRepWallet);
+    return await firstValueFrom(dRepWallet.governance.isRegisteredAsDRep$);
   };
 
   beforeAll(async () => {

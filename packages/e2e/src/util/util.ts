@@ -307,6 +307,7 @@ export const burnTokens = async ({
 };
 
 export const unDelegateWallet = async (wallet: BaseWallet) => {
+  await waitForWalletStateSettle(wallet);
   const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
 
   if (!rewardAccounts.some((acct) => acct.credentialStatus === Cardano.StakeCredentialStatus.Unregistered)) {
