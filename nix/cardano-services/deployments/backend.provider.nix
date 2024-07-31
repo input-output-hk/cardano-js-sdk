@@ -28,7 +28,7 @@
         LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
         TOKEN_METADATA_SERVER_URL = values.cardano-services.tokenMetadataServerUrl;
         HANDLE_POLICY_IDS = "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a";
-        USE_BLOCKFROST = "true";
+        USE_BLOCKFROST = builtins.toJSON values.blockfrost-worker.enabled;
         USE_KORA_LABS = "true";
         DISABLE_STAKE_POOL_METRIC_APY = "true";
         PAGINATION_PAGE_SIZE_LIMIT = "5500";
