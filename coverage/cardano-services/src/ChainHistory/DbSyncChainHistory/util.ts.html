@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">79.36% </span>
+                <span class="strong">85.71% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>50/63</span>
+                <span class='fraction'>54/63</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">42.1% </span>
+                <span class="strong">63.15% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>8/19</span>
+                <span class='fraction'>12/19</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">70.45% </span>
+                <span class="strong">79.54% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>31/44</span>
+                <span class='fraction'>35/44</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -204,36 +204,36 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-yes">23x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">35x</span>
-<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">35x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">35x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">18x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">35x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -340,20 +340,20 @@ export const isDelegationCertModel = (
   value: WithCertType&lt;CertificateModel&gt;
 ): value is WithCertType&lt;DelegationCertModel&gt; =&gt; value.type === 'delegation';
 &nbsp;
-export const isDrepRegistrationCertModel = <span class="fstat-no" title="function not covered" >(</span>
+export const isDrepRegistrationCertModel = (
   value: WithCertType&lt;CertificateModel&gt;
-): value is WithCertType&lt;DrepCertModel&gt; =&gt; <span class="cstat-no" title="statement not covered" >value.type === 'registerDrep';</span>
+): value is WithCertType&lt;DrepCertModel&gt; =&gt; value.type === 'registerDrep';
 &nbsp;
-export const isDrepUnregistrationCertModel = <span class="fstat-no" title="function not covered" >(</span>
+export const isDrepUnregistrationCertModel = (
   value: WithCertType&lt;CertificateModel&gt;
-): value is WithCertType&lt;DrepCertModel&gt; =&gt; <span class="cstat-no" title="statement not covered" >value.type === 'unregisterDrep';</span>
+): value is WithCertType&lt;DrepCertModel&gt; =&gt; value.type === 'unregisterDrep';
 &nbsp;
-export const isUpdateDrepCertModel = <span class="fstat-no" title="function not covered" >(v</span>alue: WithCertType&lt;CertificateModel&gt;): value is WithCertType&lt;DrepCertModel&gt; =&gt;
-<span class="cstat-no" title="statement not covered" >  value.type === 'updateDrep';</span>
+export const isUpdateDrepCertModel = (value: WithCertType&lt;CertificateModel&gt;): value is WithCertType&lt;DrepCertModel&gt; =&gt;
+  value.type === 'updateDrep';
 &nbsp;
-export const isVoteDelegationCertModel = <span class="fstat-no" title="function not covered" >(</span>
+export const isVoteDelegationCertModel = (
   value: WithCertType&lt;CertificateModel&gt;
-): value is WithCertType&lt;VoteDelegationCertModel&gt; =&gt; <span class="cstat-no" title="statement not covered" >value.type === 'voteDelegation';</span>
+): value is WithCertType&lt;VoteDelegationCertModel&gt; =&gt; value.type === 'voteDelegation';
 &nbsp;
 export const isVoteRegistrationDelegationCertModel = <span class="fstat-no" title="function not covered" >(</span>
   value: WithCertType&lt;CertificateModel&gt;
@@ -430,7 +430,7 @@ export const extractCompoundCertificates = &lt;T1 extends CertificateModel, T2 e
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-07-31T16:32:48.661Z
+                at 2024-07-31T17:18:25.374Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
