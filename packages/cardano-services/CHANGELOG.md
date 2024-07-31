@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.29.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.29.0...@cardano-sdk/cardano-services@0.29.1) (2024-07-31)
+
+### Features
+
+* **cardano-services:** add distinction between committe with or without scaript ([01c3990](https://github.com/input-output-hk/cardano-js-sdk/commit/01c399023a0adf92c90525c32a9f7c1fbcb1ceb5))
+
+### Bug Fixes
+
+* **cardano-services:** drep_hash can be null when delegating to abstain or no confidence ([7c6c53b](https://github.com/input-output-hk/cardano-js-sdk/commit/7c6c53ba9ce418cad83e6290cc73672e1ba3232a))
+* **cardano-services:** typeorm asset provider release query runner once ([a1f4dbe](https://github.com/input-output-hk/cardano-js-sdk/commit/a1f4dbe3166e26ef1a08982950f8522fd64f8c4d))
+
 ## [0.29.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.28.14...@cardano-sdk/cardano-services@0.29.0) (2024-07-31)
 
 ### ⚠ BREAKING CHANGES

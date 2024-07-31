@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.37.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.37.0...@cardano-sdk/e2e@0.37.1) (2024-07-31)
+
+### Bug Fixes
+
+* **cardano-services:** drep_hash can be null when delegating to abstain or no confidence ([7c6c53b](https://github.com/input-output-hk/cardano-js-sdk/commit/7c6c53ba9ce418cad83e6290cc73672e1ba3232a))
+
 ## [0.37.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.36.10...@cardano-sdk/e2e@0.37.0) (2024-07-31)
 
 ### ⚠ BREAKING CHANGES
