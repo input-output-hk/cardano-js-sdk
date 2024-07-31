@@ -355,6 +355,7 @@ export const findVoteDelegationCertsByTxIds = `
 		tx.hash AS tx_id,
 		has_script,
 		drep.raw AS drep_hash,
+		drep.view AS drep_view,
 		addr.view AS address
 	FROM tx
 	JOIN delegation_vote AS cert ON cert.tx_id = tx.id

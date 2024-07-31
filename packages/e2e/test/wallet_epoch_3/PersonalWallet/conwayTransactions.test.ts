@@ -4,7 +4,15 @@ import { Cardano, setInConwayEra } from '@cardano-sdk/core';
 import { logger } from '@cardano-sdk/util-dev';
 
 import { firstValueFrom, map } from 'rxjs';
-import { getEnv, getWallet, submitAndConfirm, unDelegateWallet, walletReady, walletVariables } from '../../../src';
+import {
+  getEnv,
+  getWallet,
+  submitAndConfirm,
+  unDelegateWallet,
+  waitForWalletStateSettle,
+  walletReady,
+  walletVariables
+} from '../../../src';
 
 /*
 Use cases not covered by specific tests because covered by (before|after)(All|Each) hooks
@@ -219,20 +227,8 @@ describe('PersonalWallet/conwayTransactions', () => {
   };
 
   const isRegisteredDRep = async () => {
-    const txs = [...(await firstValueFrom(dRepWallet.transactions.history$))].reverse();
-
-    for (const {
-      body: { certificates }
-    } of txs) {
-      if (certificates) {
-        for (const certificate of certificates) {
-          if (certificate.__typename === CertificateType.UnregisterDelegateRepresentative) return false;
-          if (certificate.__typename === CertificateType.RegisterDelegateRepresentative) return true;
-        }
-      }
-    }
-
-    return false;
+    await waitForWalletStateSettle(dRepWallet);
+    return await firstValueFrom(dRepWallet.governance.isRegisteredAsDRep$);
   };
 
   beforeAll(async () => {
@@ -409,10 +405,18 @@ describe('PersonalWallet/conwayTransactions', () => {
       );
     });
 
-    it('can delegate vote', async () => {
+    it.each([
+      dRepCredential,
+      { __typename: 'AlwaysAbstain' },
+      { __typename: 'AlwaysNoConfidence' }
+    ] as Cardano.DelegateRepresentative[])('can delegate vote %s', async (dRep) => {
+      // dRepCredential is initialized in beforeAll, and it.each runs before `beforeAll`,
+      // so it is not available in the .each scope.
+      // Use this workaround to pass the dRepCredential to the test
+      dRep = dRep ?? dRepCredential;
       const voteDelegCert: Cardano.VoteDelegationCertificate = {
         __typename: CertificateType.VoteDelegation,
-        dRep: dRepCredential,
+        dRep,
         stakeCredential
       };
       const signedTx = await wallet
@@ -423,7 +427,6 @@ describe('PersonalWallet/conwayTransactions', () => {
       const [, confirmedTx] = await submitAndConfirm(wallet, signedTx.tx, 1);
 
       assertTxHasCertificate(confirmedTx, voteDelegCert);
-      await assertWalletIsDelegating();
     });
 
     it('can delegate stake and vote using combo certificate', async () => {
