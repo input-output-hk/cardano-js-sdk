@@ -1,9 +1,10 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, HandleResolution, Serialization, TxCBOR } from '@cardano-sdk/core';
+import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
+import { Cip30SignDataRequest, Cip8SignDataContext } from './cip8';
 import { HexBlob, OpaqueString, Shutdown } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import type { Runtime } from 'webextension-polyfill';
-
 export type MessageSender = Runtime.MessageSender;
 
 export interface SignBlobResult {
@@ -176,12 +177,7 @@ export interface SignTransactionContext {
   sender?: MessageSender;
 }
 
-export interface SignDataContext {
-  address?: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID;
-  /** Present when signing CIP-0008 structure */
-  payload?: HexBlob;
-  sender?: MessageSender;
-}
+export type SignDataContext = Cip8SignDataContext & { sender?: MessageSender };
 
 export interface KeyAgent {
   get chainId(): Cardano.ChainId;
@@ -195,6 +191,12 @@ export interface KeyAgent {
    * @throws AuthenticationError
    */
   signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult>;
+
+  /**
+   * @throws AuthenticationError
+   */
+  signCip8Data(request: Cip8SignDataContext): Promise<Cip30DataSignature>;
+
   /**
    * @throws AuthenticationError
    */
@@ -225,7 +227,10 @@ export interface KeyAgent {
   exportRootPrivateKey(): Promise<Crypto.Bip32PrivateKeyHex>;
 }
 
-export type AsyncKeyAgent = Pick<KeyAgent, 'deriveAddress' | 'derivePublicKey' | 'signBlob' | 'signTransaction'> & {
+export type AsyncKeyAgent = Pick<
+  KeyAgent,
+  'deriveAddress' | 'derivePublicKey' | 'signBlob' | 'signCip8Data' | 'signTransaction'
+> & {
   getChainId(): Promise<Cardano.ChainId>;
   getBip32Ed25519(): Promise<Crypto.Bip32Ed25519>;
   getExtendedAccountPublicKey(): Promise<Crypto.Bip32PublicKeyHex>;
@@ -261,5 +266,5 @@ export interface Witnesser {
   /**
    * @throws AuthenticationError
    */
-  signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob, context: SignDataContext): Promise<SignBlobResult>;
+  signData(props: Cip30SignDataRequest): Promise<Cip30DataSignature>;
 }

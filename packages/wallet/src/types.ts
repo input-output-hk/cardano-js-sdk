@@ -18,7 +18,7 @@ import { PubStakeKeyAndStatus } from './services/PublicStakeKeysTracker';
 
 export type Assets = Map<Cardano.AssetId, Asset.AssetInfo>;
 
-export type SignDataProps = Omit<cip8.Cip30SignDataRequest, 'knownAddresses' | 'witnesser'>;
+export type SignDataProps = Omit<cip8.Cip30SignDataRequest, 'knownAddresses'>;
 
 export interface SyncStatus extends Shutdown {
   /**

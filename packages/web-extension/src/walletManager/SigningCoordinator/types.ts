@@ -1,14 +1,13 @@
-import {
-  AccountKeyDerivationPath,
-  KeyPurpose,
-  SignBlobResult,
-  SignDataContext,
-  SignTransactionContext,
-  SignTransactionOptions
-} from '@cardano-sdk/key-management';
 import { AnyBip32Wallet, WalletType } from '../types';
 import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
-import { HexBlob } from '@cardano-sdk/util';
+import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
+import {
+  KeyPurpose,
+  MessageSender,
+  SignTransactionContext,
+  SignTransactionOptions,
+  cip8
+} from '@cardano-sdk/key-management';
 import { Observable } from 'rxjs';
 
 export type RequestContext<WalletMetadata extends {}, AccountMetadata extends {}> = {
@@ -58,9 +57,7 @@ export type TransactionWitnessRequest<WalletMetadata extends {}, AccountMetadata
 } & SignRequest<Cardano.Signatures>;
 
 export type SignDataProps = {
-  derivationPath: AccountKeyDerivationPath;
-  blob: HexBlob;
-  signContext: SignDataContext;
+  signContext: cip8.Cip8SignDataContext & { sender?: MessageSender };
 };
 
 export type SignDataRequest<WalletMetadata extends {}, AccountMetadata extends {}> = RequestBase<
@@ -68,7 +65,7 @@ export type SignDataRequest<WalletMetadata extends {}, AccountMetadata extends {
   AccountMetadata
 > &
   SignDataProps &
-  SignRequest<SignBlobResult>;
+  SignRequest<Cip30DataSignature>;
 
 export type SignTransactionProps = {
   tx: TxCBOR;
@@ -87,7 +84,7 @@ export interface SigningCoordinatorSignApi<WalletMetadata extends {}, AccountMet
     requestContext: RequestContext<WalletMetadata, AccountMetadata>
   ): Promise<Cardano.Signatures>;
   signData(
-    props: SignDataProps,
+    props: cip8.Cip8SignDataContext,
     requestContext: RequestContext<WalletMetadata, AccountMetadata>
-  ): Promise<SignBlobResult>;
+  ): Promise<Cip30DataSignature>;
 }

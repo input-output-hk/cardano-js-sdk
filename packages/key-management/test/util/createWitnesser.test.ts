@@ -1,5 +1,6 @@
-import { AsyncKeyAgent, SignBlobResult, Witnesser, util } from '../../src';
+import { AsyncKeyAgent, Witnesser, util } from '../../src';
 import { Cardano, Serialization } from '@cardano-sdk/core';
+import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { HexBlob } from '@cardano-sdk/util';
 
 describe('createBip32Ed25519Witnesser', () => {
@@ -9,23 +10,24 @@ describe('createBip32Ed25519Witnesser', () => {
   beforeEach(async () => {
     asyncKeyAgent = {
       signBlob: jest.fn(),
+      signCip8Data: jest.fn(),
       signTransaction: jest.fn()
     } as unknown as jest.Mocked<AsyncKeyAgent>;
     witnesser = util.createBip32Ed25519Witnesser(asyncKeyAgent);
   });
 
-  it('signBlob is unchanged', async () => {
-    const keyDerivationPath = { index: 0, role: 0 };
+  it('signData is unchanged', async () => {
     const blob = HexBlob('abc123');
-    const result = {} as SignBlobResult;
-    asyncKeyAgent.signBlob.mockResolvedValueOnce(result);
-    await expect(
-      witnesser.signBlob(keyDerivationPath, blob, {
-        address: 'stub' as Cardano.PaymentAddress,
-        sender: { url: 'some test' }
-      })
-    ).resolves.toBe(result);
-    expect(asyncKeyAgent.signBlob).toBeCalledWith(keyDerivationPath, blob);
+    const result = {} as Cip30DataSignature;
+    const props = {
+      knownAddresses: [],
+      payload: blob,
+      sender: { url: 'some test' },
+      signWith: 'stub' as Cardano.PaymentAddress
+    };
+    asyncKeyAgent.signCip8Data.mockResolvedValueOnce(result);
+    await expect(witnesser.signData(props)).resolves.toBe(result);
+    expect(asyncKeyAgent.signCip8Data).toBeCalledWith(props);
   });
 
   it('signTransaction is unchanged', async () => {

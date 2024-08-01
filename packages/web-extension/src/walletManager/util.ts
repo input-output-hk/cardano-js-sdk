@@ -1,14 +1,13 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import {
-  AccountKeyDerivationPath,
   AsyncKeyAgent,
   KeyPurpose,
-  SignDataContext,
   SignTransactionContext,
   TransactionSigner,
   WitnessOptions,
   WitnessedTx,
   Witnesser,
+  cip8,
   util as keyManagementUtil
 } from '@cardano-sdk/key-management';
 
@@ -305,20 +304,13 @@ export const buildBip32Witnesser = <WalletMetadata extends { name: string }, Acc
   accountIndex?: number
 ): Witnesser =>
   <Witnesser>{
-    signBlob: async (derivationPath: AccountKeyDerivationPath, blob: HexBlob, context: SignDataContext) =>
-      await signingCoordinatorApi.signData(
-        {
-          blob,
-          derivationPath,
-          signContext: context
-        },
-        {
-          accountIndex: accountIndex!,
-          chainId,
-          purpose: KeyPurpose.STANDARD,
-          wallet
-        }
-      ),
+    signData: async (context: cip8.Cip8SignDataContext) =>
+      await signingCoordinatorApi.signData(context, {
+        accountIndex: accountIndex!,
+        chainId,
+        purpose: KeyPurpose.STANDARD,
+        wallet
+      }),
     async witness(
       tx: Serialization.Transaction,
       context: SignTransactionContext,
@@ -384,8 +376,8 @@ export const buildNativeScriptWitnesser = <
     throw new Error(SCRIPT_TYPE_NOT_SUPPORTED);
 
   return {
-    signBlob: async () => {
-      throw new Error('signBlob is not supported by this witnesser');
+    signData: async () => {
+      throw new Error('signData is not supported by this witnesser');
     },
     async witness(
       tx: Serialization.Transaction,

@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AccountKeyDerivationPath, GroupedAddress, KeyRole, MessageSender } from '../types';
+import { AccountKeyDerivationPath, GroupedAddress, KeyAgent, KeyRole, MessageSender } from '../types';
 import {
   AlgorithmId,
   CBORValue,
@@ -13,15 +13,15 @@ import {
   ProtectedHeaderMap,
   SigStructure
 } from '@emurgo/cardano-message-signing-nodejs';
-import { Bip32Ed25519Witnesser, DREP_KEY_DERIVATION_PATH, STAKE_KEY_DERIVATION_PATH } from '../util';
 import { Cardano, util } from '@cardano-sdk/core';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
+import { Cip8SignDataContext } from './types';
 import { ComposableError, HexBlob } from '@cardano-sdk/util';
 import { CoseLabel } from './util';
+import { DREP_KEY_DERIVATION_PATH, STAKE_KEY_DERIVATION_PATH } from '../util';
 
 export interface Cip30SignDataRequest {
   knownAddresses: GroupedAddress[];
-  witnesser: Bip32Ed25519Witnesser;
   signWith: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID;
   payload: HexBlob;
   sender?: MessageSender;
@@ -39,7 +39,7 @@ export class Cip30DataSignError<InnerError = unknown> extends ComposableError<In
   }
 }
 
-const getAddressBytes = (signWith: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID) => {
+export const getAddressBytes = (signWith: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID) => {
   const address = Cardano.Address.fromString(signWith);
 
   if (!address) {
@@ -86,21 +86,19 @@ const createSigStructureHeaders = (addressBytes: Uint8Array) => {
 };
 
 const signSigStructure = (
-  witnesser: Bip32Ed25519Witnesser,
+  keyAgent: KeyAgent,
   derivationPath: AccountKeyDerivationPath,
-  sigStructure: SigStructure,
-  address?: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID,
-  sender?: MessageSender
+  sigStructure: SigStructure
+  // eslint-disable-next-line max-params
 ) => {
   try {
-    const payload = util.bytesToHex(sigStructure.payload());
-    return witnesser.signBlob(derivationPath, util.bytesToHex(sigStructure.to_bytes()), { address, payload, sender });
+    return keyAgent.signBlob(derivationPath, util.bytesToHex(sigStructure.to_bytes()));
   } catch (error) {
     throw new Cip30DataSignError(Cip30DataSignErrorCode.UserDeclined, 'Failed to sign', error);
   }
 };
 
-const createCoseKey = (addressBytes: Uint8Array, publicKey: Crypto.Ed25519PublicKeyHex) => {
+export const createCoseKey = (addressBytes: Uint8Array, publicKey: Crypto.Ed25519PublicKeyHex) => {
   const coseKey = COSEKey.new(Label.from_key_type(COSEKeyType.OKP));
   coseKey.set_key_id(addressBytes);
   coseKey.set_algorithm_id(Label.from_algorithm_id(AlgorithmId.EdDSA));
@@ -115,13 +113,10 @@ const createCoseKey = (addressBytes: Uint8Array, publicKey: Crypto.Ed25519Public
  *
  * @throws {Cip30DataSignError}
  */
-export const cip30signData = async ({
-  knownAddresses,
-  witnesser,
-  signWith,
-  payload,
-  sender
-}: Cip30SignDataRequest): Promise<Cip30DataSignature> => {
+export const cip30signData = async (
+  keyAgent: KeyAgent,
+  { knownAddresses, signWith, payload }: Cip8SignDataContext
+): Promise<Cip30DataSignature> => {
   if (Cardano.DRepID.isValid(signWith) && !Cardano.DRepID.canSign(signWith)) {
     throw new Cip30DataSignError(Cip30DataSignErrorCode.AddressNotPK, 'Invalid address');
   }
@@ -134,7 +129,8 @@ export const cip30signData = async ({
     false
   );
   const sigStructure = builder.make_data_to_sign();
-  const { signature, publicKey } = await signSigStructure(witnesser, derivationPath, sigStructure, signWith, sender);
+  const { signature, publicKey } = await signSigStructure(keyAgent, derivationPath, sigStructure);
+
   const coseSign1 = builder.build(Buffer.from(signature, 'hex'));
 
   const coseKey = createCoseKey(addressBytes, publicKey);

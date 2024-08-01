@@ -1,8 +1,5 @@
 import {
-  AccountKeyDerivationPath,
   AsyncKeyAgent,
-  SignBlobResult,
-  SignDataContext,
   SignTransactionContext,
   SignTransactionOptions,
   WitnessOptions,
@@ -10,7 +7,8 @@ import {
   Witnesser
 } from '../types';
 import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
-import { HexBlob } from '@cardano-sdk/util';
+import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
+import { Cip30SignDataRequest } from '../cip8';
 import { stubSignTransaction } from './stubSignTransaction';
 
 /** A witnesser that uses a {@link KeyAgent} to generate witness data for a transaction. */
@@ -57,12 +55,8 @@ export class Bip32Ed25519Witnesser implements Witnesser {
     };
   }
 
-  async signBlob(
-    derivationPath: AccountKeyDerivationPath,
-    blob: HexBlob,
-    _context: SignDataContext
-  ): Promise<SignBlobResult> {
-    return this.#keyAgent.signBlob(derivationPath, blob);
+  async signData(props: Cip30SignDataRequest): Promise<Cip30DataSignature> {
+    return this.#keyAgent.signCip8Data(props);
   }
 
   static async getSignatures(

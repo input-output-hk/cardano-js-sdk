@@ -18,7 +18,7 @@ export type PaymentAddress = OpaqueString<'PaymentAddress'>;
  * @param {string} address mainnet or testnet address
  * @throws InvalidStringError
  */
-const isRewardAccount = (address: string) => {
+export const isRewardAccount = (address: string) => {
   try {
     assertIsBech32WithPrefix(address, ['stake', 'stake_test']);
     return true;

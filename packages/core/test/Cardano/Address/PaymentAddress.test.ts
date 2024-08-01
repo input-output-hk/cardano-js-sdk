@@ -198,4 +198,22 @@ describe('PaymentAddress', () => {
       expect(Cardano.inputsWithAddresses(tx, [addresses[1]])).toEqual([]);
     });
   });
+
+  describe('isRewardAccount', () => {
+    it('returns true if address is a reward account', () => {
+      expect(
+        Cardano.isRewardAccount(Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr'))
+      ).toBe(true);
+    });
+
+    it('returns false if address is not a reward account', () => {
+      expect(
+        Cardano.isRewardAccount(
+          Cardano.PaymentAddress(
+            'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
+          )
+        )
+      ).toBe(false);
+    });
+  });
 });

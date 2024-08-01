@@ -16,6 +16,7 @@ import {
   errors,
   util
 } from '@cardano-sdk/key-management';
+import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { areStringsEqualInConstantTime } from '@cardano-sdk/util';
 import { txToTrezor } from './transformers/tx';
 import _TrezorConnectWeb from '@trezor/connect-web';
@@ -270,6 +271,10 @@ export class TrezorKeyAgent extends KeyAgentBase {
 
   async signBlob(): Promise<SignBlobResult> {
     throw new NotImplementedError('signBlob');
+  }
+
+  async signCip8Data(): Promise<Cip30DataSignature> {
+    throw new NotImplementedError('signCip8Data');
   }
 
   async exportRootPrivateKey(): Promise<Crypto.Bip32PrivateKeyHex> {
