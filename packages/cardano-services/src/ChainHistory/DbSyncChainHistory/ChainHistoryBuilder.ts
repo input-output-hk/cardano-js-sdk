@@ -164,9 +164,19 @@ export const getGovernanceAction = ({
   throw new Error(`Unknown GovernanceActionType '${type}' with description "${JSON.stringify(description)}"`);
 };
 
-const getVoter = (
+export const getVoter = (
   txId: Cardano.TransactionId,
-  { committee_has_script, committee_voter, drep_has_script, drep_voter, pool_voter, voter_role }: VotingProceduresModel
+  {
+    committee_has_script,
+    committee_voter,
+    drep_has_script,
+    drep_voter,
+    pool_voter,
+    voter_role
+  }: Pick<
+    VotingProceduresModel,
+    'committee_has_script' | 'committee_voter' | 'drep_has_script' | 'drep_voter' | 'pool_voter' | 'voter_role'
+  >
 ): Cardano.Voter => {
   let hash: Hash28ByteBase16;
 

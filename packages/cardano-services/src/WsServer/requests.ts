@@ -4,7 +4,8 @@ import { Cardano, CardanoNode, CardanoNodeUtil } from '@cardano-sdk/core';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { Pool } from 'pg';
 import { ProtocolParamsModel } from '../NetworkInfo/DbSyncNetworkInfoProvider/types';
-import { getGovernanceAction } from '../ChainHistory';
+import { VoterRole } from '../ChainHistory/DbSyncChainHistory/types';
+import { getGovernanceAction, getVoter } from '../ChainHistory';
 import { mapAnchor } from '../ChainHistory/DbSyncChainHistory/mappers';
 import { mapTxMetadata } from '../Metadata';
 import { toProtocolParams } from '../NetworkInfo/DbSyncNetworkInfoProvider/mappers';
@@ -112,10 +113,7 @@ ORDER BY index, tx_in.id`;
   return result.rows.reduce((res, input) => {
     let entry = res.get(input[0]);
 
-    if (!entry) {
-      entry = [];
-      res.set(input[0], entry);
-    }
+    if (!entry) res.set(input[0], (entry = []));
 
     entry.push({
       address: input[2],
@@ -177,10 +175,7 @@ ORDER BY index`;
     .reduce((res, output) => {
       let entry = res.get(output[0]);
 
-      if (!entry) {
-        entry = [];
-        res.set(output[0], entry);
-      }
+      if (!entry) res.set(output[0], (entry = []));
 
       entry.push({
         address: output[1],
@@ -209,10 +204,7 @@ WHERE tx_id = ANY($1)`;
   const intermediate = result.rows.reduce((res, { id, ...rest }) => {
     let entry = res.get(id);
 
-    if (!entry) {
-      entry = [];
-      res.set(id, entry);
-    }
+    if (!entry) res.set(id, (entry = []));
 
     entry.push(rest);
 
@@ -240,10 +232,7 @@ ORDER BY ma_tx_mint.id`;
   return result.rows.reduce((res, mint) => {
     let entry = res.get(mint[0]);
 
-    if (!entry) {
-      entry = new Map<Cardano.AssetId, bigint>();
-      res.set(mint[0], entry);
-    }
+    if (!entry) res.set(mint[0], (entry = new Map<Cardano.AssetId, bigint>()));
 
     entry.set(mint[2].toString('hex') as Cardano.AssetId, BigInt(mint[1]));
 
@@ -269,10 +258,7 @@ ORDER BY withdrawal.id`;
   return result.rows.reduce((res, wit) => {
     let entry = res.get(wit[0]);
 
-    if (!entry) {
-      entry = [];
-      res.set(wit[0], entry);
-    }
+    if (!entry) res.set(wit[0], (entry = []));
 
     entry.push({ quantity: BigInt(wit[1]), stakeAddress: wit[2] as Cardano.RewardAccount });
 
@@ -439,7 +425,7 @@ WHERE tx_id = ANY($1)`;
   );
 };
 
-type VoteDelegation = [number, number, boolean, Buffer, string];
+type VoteDelegation = [number, number, boolean, Buffer | null, string, string];
 
 const voteDelegation = async (ids: string[], db: Pool) => {
   const text = `\
@@ -448,6 +434,7 @@ SELECT
   cert_index,
   has_script,
   raw,
+  drep_hash.view,
   stake_address.view
 FROM delegation_vote
 JOIN drep_hash ON drep_hash.id = drep_hash_id
@@ -463,12 +450,16 @@ WHERE tx_id = ANY($1)`;
         cert[1],
         {
           __typename: Cardano.CertificateType.VoteDelegation as const,
-          dRep: {
-            hash: cert[3].toString('hex') as Hash28ByteBase16,
-            type: Number(cert[2]) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
-          },
+          dRep: (cert[3]
+            ? {
+                hash: cert[3].toString('hex') as Hash28ByteBase16,
+                type: Number(cert[2]) ? Cardano.CredentialType.ScriptHash : Cardano.CredentialType.KeyHash
+              }
+            : cert[4] === 'drep_always_abstain'
+            ? { __typename: 'AlwaysAbstain' }
+            : { __typename: 'AlwaysNoConfidence' }) as Cardano.DelegateRepresentative,
           stakeCredential: {
-            hash: Cardano.RewardAccount.toHash(cert[4] as Cardano.RewardAccount) as unknown as Hash28ByteBase16,
+            hash: Cardano.RewardAccount.toHash(cert[5] as Cardano.RewardAccount) as unknown as Hash28ByteBase16,
             type: Cardano.CredentialType.KeyHash
           }
         }
@@ -613,10 +604,7 @@ const transactionsCertificates = async (ids: string[], db: Pool) => {
     .reduce((res, cert) => {
       let entry = res.get(cert[0]);
 
-      if (!entry) {
-        entry = [];
-        res.set(cert[0], entry);
-      }
+      if (!entry) res.set(cert[0], (entry = []));
 
       entry[cert[1]] = cert[2];
 
@@ -650,10 +638,7 @@ ORDER BY index`;
   return result.rows.reduce((res, proposal) => {
     let entry = res.get(proposal[0]);
 
-    if (!entry) {
-      entry = [];
-      res.set(proposal[0], entry);
-    }
+    if (!entry) res.set(proposal[0], (entry = []));
 
     const { tag } = proposal[2];
 
@@ -676,8 +661,83 @@ ORDER BY index`;
   }, new Map<number, Cardano.ProposalProcedure[]>());
 };
 
+type TransactionVotes = [
+  number,
+  VoterRole,
+  Buffer,
+  boolean,
+  Buffer,
+  boolean,
+  Buffer,
+  Buffer,
+  number,
+  Cardano.Vote,
+  string,
+  Buffer
+];
+
+const transactionVotes = async (ids: string[], db: Pool) => {
+  const text = `\
+SELECT
+  vp.tx_id::INTEGER,
+  voter_role,
+  ch.raw,
+  ch.has_script,
+  dh.raw,
+  dh.has_script,
+  ph.hash_raw,
+  tx.hash,
+  ga.index::INTEGER,
+  CASE
+    WHEN vote = 'No' THEN 0
+    WHEN vote = 'Yes' THEN 1
+    WHEN vote = 'Abstain' THEN 2
+  END,
+  va.url,
+  va.data_hash
+FROM voting_procedure AS vp
+JOIN gov_action_proposal AS ga ON gov_action_proposal_id = ga.id
+JOIN tx ON ga.tx_id = tx.id
+LEFT JOIN drep_hash AS dh ON drep_voter = dh.id
+LEFT JOIN pool_hash AS ph ON pool_voter = ph.id
+LEFT JOIN voting_anchor AS va ON vp.voting_anchor_id = va.id
+LEFT JOIN committee_hash AS ch ON ch.id = committee_voter
+WHERE vp.tx_id = ANY($1)
+ORDER BY vp.index`;
+
+  const result = await db.query<TransactionVotes>({ name: 'tx_vote', rowMode: 'array', text, values: [ids] });
+
+  return result.rows.reduce((res, vote) => {
+    let entry = res.get(vote[0]);
+
+    if (!entry) res.set(vote[0], (entry = []));
+
+    const voter = getVoter(vote[0] as unknown as Cardano.TransactionId, {
+      committee_has_script: vote[3],
+      committee_voter: vote[2],
+      drep_has_script: vote[5],
+      drep_voter: vote[4],
+      pool_voter: vote[6],
+      voter_role: vote[1]
+    });
+
+    let votes: Cardano.VotingProcedureVote[];
+    const procedure = entry.find(({ voter: { credential } }) => credential.hash === voter.credential.hash);
+
+    if (procedure) ({ votes } = procedure);
+    else entry.push({ voter, votes: (votes = []) });
+
+    votes.push({
+      actionId: { actionIndex: vote[8], id: vote[7].toString('hex') as Cardano.TransactionId },
+      votingProcedure: { anchor: vote[11] ? mapAnchor(vote[10], vote[11].toString('hex')) : null, vote: vote[9] }
+    });
+
+    return res;
+  }, new Map<number, Cardano.VotingProcedures>());
+};
+
 const transactionsByIds = async (ids: string[], db: Pool): Promise<Cardano.HydratedTx[]> => {
-  const [txData, input, output, mint, meta, cert, wit, prop] = await Promise.all([
+  const [txData, input, output, mint, meta, cert, wit, prop, vote] = await Promise.all([
     transactionsData(ids, db),
     transactionsInput(ids, db),
     transactionsOutput(ids, db),
@@ -685,7 +745,8 @@ const transactionsByIds = async (ids: string[], db: Pool): Promise<Cardano.Hydra
     transactionsMetadata(ids, db),
     transactionsCertificates(ids, db),
     transactionsWithdrawals(ids, db),
-    transactionProposals(ids, db)
+    transactionProposals(ids, db),
+    transactionVotes(ids, db)
   ]);
 
   return txData.map((data) => {
@@ -709,7 +770,7 @@ const transactionsByIds = async (ids: string[], db: Pool): Promise<Cardano.Hydra
         outputs: output.get(txId) || [],
         proposalProcedures: prop.get(txId),
         validityInterval: { invalidBefore, invalidHereafter },
-        votingProcedures: undefined,
+        votingProcedures: vote.get(txId),
         withdrawals: wit.get(txId)
       } as Cardano.HydratedTxBody,
       id: data[1].toString('hex'),
