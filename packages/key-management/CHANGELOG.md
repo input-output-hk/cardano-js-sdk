@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.22.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.21.2...@cardano-sdk/key-management@0.22.0) (2024-08-01)
+
+### ⚠ BREAKING CHANGES
+
+* replace signBlob with signCip8Data in witnesser interface
+- keyAgents are now required to implement the signCip8Data function
+- cip08 message construction hoisted from baseWallet to inMemoryKeyAgent signCip8Data function
+
+### Features
+
+* implement signCip8Data for LedgerKeyAgent and InMemoryKeyAgent ([a04cb75](https://github.com/input-output-hk/cardano-js-sdk/commit/a04cb753e4276a710f3336892e92c8f1bc7cee82))
+
 ## [0.21.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.21.1...@cardano-sdk/key-management@0.21.2) (2024-07-31)
 
 **Note:** Version bump only for package @cardano-sdk/key-management
