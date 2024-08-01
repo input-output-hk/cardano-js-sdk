@@ -1,4 +1,4 @@
-import * as Cardano from '../../Cardano';
+import { Fraction as CardanoFraction } from '../../Cardano/types';
 import { CborReader, CborTag, CborWriter } from '../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import Fraction from 'fraction.js';
@@ -98,7 +98,7 @@ export class UnitInterval {
    *
    * @returns The Core Fraction object.
    */
-  toCore(): Cardano.Fraction {
+  toCore(): CardanoFraction {
     return {
       denominator: Number(this.#denominator),
       numerator: Number(this.#numerator)
@@ -110,7 +110,7 @@ export class UnitInterval {
    *
    * @param fraction core Fraction object.
    */
-  static fromCore(fraction: Cardano.Fraction) {
+  static fromCore(fraction: CardanoFraction) {
     return new UnitInterval(BigInt(fraction.numerator), BigInt(fraction.denominator));
   }
 

@@ -7,6 +7,7 @@ export * from './Certificate';
 export * from './Genesis';
 export * from './Block';
 export * from './Asset';
+export * from './AssetName';
 export * from './AuxiliaryData';
 export * from './Script';
 export * from './ProtocolParameters';

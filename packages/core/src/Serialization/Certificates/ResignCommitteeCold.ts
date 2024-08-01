@@ -1,8 +1,9 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { Anchor } from '../Common';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { CertificateKind } from './CertificateKind';
+import { CertificateType, ResignCommitteeColdCertificate } from '../../Cardano/types/Certificate';
+import { Credential, CredentialType } from '../../Cardano/Address/Address';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { hexToBytes } from '../../util/misc';
 
@@ -10,7 +11,7 @@ const EMBEDDED_GROUP_SIZE = 2;
 
 /** This certificate is used then a committee member wants to resign early (will be marked on-chain as an expired member). */
 export class ResignCommitteeCold {
-  #committeeColdCred: Cardano.Credential;
+  #committeeColdCred: Credential;
   #anchor: Anchor | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
@@ -20,7 +21,7 @@ export class ResignCommitteeCold {
    * @param committeeColdCred The committee cold credential.
    * @param anchor The anchor.
    */
-  constructor(committeeColdCred: Cardano.Credential, anchor?: Anchor) {
+  constructor(committeeColdCred: Credential, anchor?: Anchor) {
     this.#committeeColdCred = committeeColdCred;
     this.#anchor = anchor;
   }
@@ -89,7 +90,7 @@ export class ResignCommitteeCold {
         `Expected an array of ${EMBEDDED_GROUP_SIZE} elements, but got an array of ${length} elements`
       );
 
-    const coldType = Number(reader.readInt()) as Cardano.CredentialType;
+    const coldType = Number(reader.readInt()) as CredentialType;
     const coldHash = Crypto.Hash28ByteBase16(HexBlob.fromBytes(reader.readByteString()));
     reader.readEndArray();
 
@@ -114,9 +115,9 @@ export class ResignCommitteeCold {
    *
    * @returns The Core ResignCommitteeColdCertificate object.
    */
-  toCore(): Cardano.ResignCommitteeColdCertificate {
+  toCore(): ResignCommitteeColdCertificate {
     return {
-      __typename: Cardano.CertificateType.ResignCommitteeCold,
+      __typename: CertificateType.ResignCommitteeCold,
       anchor: this.#anchor ? this.#anchor.toCore() : null,
       coldCredential: this.#committeeColdCred
     };
@@ -127,7 +128,7 @@ export class ResignCommitteeCold {
    *
    * @param cert core ResignCommitteeColdCertificate object.
    */
-  static fromCore(cert: Cardano.ResignCommitteeColdCertificate) {
+  static fromCore(cert: ResignCommitteeColdCertificate) {
     return new ResignCommitteeCold(cert.coldCredential, cert.anchor ? Anchor.fromCore(cert.anchor) : undefined);
   }
 
@@ -136,7 +137,7 @@ export class ResignCommitteeCold {
    *
    * @returns The cold credential.
    */
-  coldCredential(): Cardano.Credential {
+  coldCredential(): Credential {
     return this.#committeeColdCred;
   }
 

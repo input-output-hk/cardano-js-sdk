@@ -1,5 +1,5 @@
-import * as Cardano from '../../../Cardano';
 import { Anchor } from '../../Common/Anchor';
+import { Constitution as CardanoConstitution } from '../../../Cardano/types/Governance';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
@@ -93,7 +93,7 @@ export class Constitution {
    *
    * @returns The Core Constitution object.
    */
-  toCore(): Cardano.Constitution {
+  toCore(): CardanoConstitution {
     return {
       anchor: this.#anchor.toCore(),
       scriptHash: this.#scriptHash ? this.#scriptHash : null
@@ -105,7 +105,7 @@ export class Constitution {
    *
    * @param constitution core Constitution object.
    */
-  static fromCore(constitution: Cardano.Constitution) {
+  static fromCore(constitution: CardanoConstitution) {
     return new Constitution(
       Anchor.fromCore(constitution.anchor),
       constitution.scriptHash !== null ? constitution.scriptHash : undefined

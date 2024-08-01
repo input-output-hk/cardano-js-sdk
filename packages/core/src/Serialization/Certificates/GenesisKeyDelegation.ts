@@ -1,7 +1,7 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborWriter } from '../CBOR';
 import { CertificateKind } from './CertificateKind';
+import { CertificateType, GenesisKeyDelegationCertificate } from '../../Cardano/types/Certificate';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
 const EMBEDDED_GROUP_SIZE = 4;
@@ -103,9 +103,9 @@ export class GenesisKeyDelegation {
    *
    * @returns The Core GenesisKeyDelegationCertificate object.
    */
-  toCore(): Cardano.GenesisKeyDelegationCertificate {
+  toCore(): GenesisKeyDelegationCertificate {
     return {
-      __typename: Cardano.CertificateType.GenesisKeyDelegation,
+      __typename: CertificateType.GenesisKeyDelegation,
       genesisDelegateHash: this.#genesisDelegateHash,
       genesisHash: this.#genesisHash,
       vrfKeyHash: this.#vrfKeyHash
@@ -117,7 +117,7 @@ export class GenesisKeyDelegation {
    *
    * @param cert core GenesisKeyDelegationCertificate object.
    */
-  static fromCore(cert: Cardano.GenesisKeyDelegationCertificate) {
+  static fromCore(cert: GenesisKeyDelegationCertificate) {
     return new GenesisKeyDelegation(cert.genesisHash, cert.genesisDelegateHash, cert.vrfKeyHash);
   }
 

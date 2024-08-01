@@ -1,7 +1,7 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborWriter } from '../CBOR';
 import { CertificateKind } from './CertificateKind';
+import { CertificateType, EpochNo, PoolId, PoolRetirementCertificate } from '../../Cardano/types';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
 const EMBEDDED_GROUP_SIZE = 3;
@@ -9,7 +9,7 @@ const EMBEDDED_GROUP_SIZE = 3;
 /** This certificate is used to retire a stake pool. It includes an epoch number indicating when the pool will be retired. */
 export class PoolRetirement {
   #poolKeyHash: Crypto.Ed25519KeyHashHex;
-  #epoch: Cardano.EpochNo;
+  #epoch: EpochNo;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -18,7 +18,7 @@ export class PoolRetirement {
    * @param poolKeyHash The pool key hash.
    * @param epoch The epoch at which the pool will be retired.
    */
-  constructor(poolKeyHash: Crypto.Ed25519KeyHashHex, epoch: Cardano.EpochNo) {
+  constructor(poolKeyHash: Crypto.Ed25519KeyHashHex, epoch: EpochNo) {
     this.#poolKeyHash = poolKeyHash;
     this.#epoch = epoch;
   }
@@ -75,7 +75,7 @@ export class PoolRetirement {
 
     reader.readEndArray();
 
-    const cert = new PoolRetirement(poolKeyHash, Cardano.EpochNo(Number(epoch)));
+    const cert = new PoolRetirement(poolKeyHash, EpochNo(Number(epoch)));
     cert.#originalBytes = cbor;
 
     return cert;
@@ -86,11 +86,11 @@ export class PoolRetirement {
    *
    * @returns The Core PoolRetirementCertificate object.
    */
-  toCore(): Cardano.PoolRetirementCertificate {
+  toCore(): PoolRetirementCertificate {
     return {
-      __typename: Cardano.CertificateType.PoolRetirement,
+      __typename: CertificateType.PoolRetirement,
       epoch: this.#epoch,
-      poolId: Cardano.PoolId.fromKeyHash(this.#poolKeyHash)
+      poolId: PoolId.fromKeyHash(this.#poolKeyHash)
     };
   }
 
@@ -99,8 +99,8 @@ export class PoolRetirement {
    *
    * @param cert core PoolRetirementCertificate object.
    */
-  static fromCore(cert: Cardano.PoolRetirementCertificate) {
-    return new PoolRetirement(Cardano.PoolId.toKeyHash(cert.poolId), cert.epoch);
+  static fromCore(cert: PoolRetirementCertificate) {
+    return new PoolRetirement(PoolId.toKeyHash(cert.poolId), cert.epoch);
   }
 
   /**
@@ -127,7 +127,7 @@ export class PoolRetirement {
    *
    * @returns The epoch at which the pool will be retired.
    */
-  epoch(): Cardano.EpochNo {
+  epoch(): EpochNo {
     return this.#epoch;
   }
 
@@ -136,7 +136,7 @@ export class PoolRetirement {
    *
    * @param epoch The epoch at which the pool will be retired.
    */
-  setEpoch(epoch: Cardano.EpochNo): void {
+  setEpoch(epoch: EpochNo): void {
     this.#epoch = epoch;
     this.#originalBytes = undefined;
   }

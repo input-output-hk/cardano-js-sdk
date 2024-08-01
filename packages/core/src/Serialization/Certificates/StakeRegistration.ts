@@ -1,7 +1,8 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborWriter } from '../CBOR';
 import { CertificateKind } from './CertificateKind';
+import { CertificateType, StakeAddressCertificate } from '../../Cardano/types/Certificate';
+import { Credential, CredentialType } from '../../Cardano/Address/Address';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
 const EMBEDDED_GROUP_SIZE = 2;
@@ -12,7 +13,7 @@ const EMBEDDED_GROUP_SIZE = 2;
  * stake or creating a stake pool.
  */
 export class StakeRegistration {
-  #credential: Cardano.Credential;
+  #credential: Credential;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -20,7 +21,7 @@ export class StakeRegistration {
    *
    * @param credential The stake credential.
    */
-  constructor(credential: Cardano.Credential) {
+  constructor(credential: Credential) {
     this.#credential = credential;
   }
 
@@ -85,7 +86,7 @@ export class StakeRegistration {
         `Expected an array of ${EMBEDDED_GROUP_SIZE} elements, but got an array of ${length} elements`
       );
 
-    const type = Number(reader.readInt()) as Cardano.CredentialType;
+    const type = Number(reader.readInt()) as CredentialType;
     const hash = Crypto.Hash28ByteBase16(HexBlob.fromBytes(reader.readByteString()));
 
     reader.readEndArray();
@@ -102,9 +103,9 @@ export class StakeRegistration {
    *
    * @returns The Core StakeAddressCertificate object.
    */
-  toCore(): Cardano.StakeAddressCertificate {
+  toCore(): StakeAddressCertificate {
     return {
-      __typename: Cardano.CertificateType.StakeRegistration,
+      __typename: CertificateType.StakeRegistration,
       stakeCredential: this.#credential
     };
   }
@@ -114,7 +115,7 @@ export class StakeRegistration {
    *
    * @param cert core StakeAddressCertificate object.
    */
-  static fromCore(cert: Cardano.StakeAddressCertificate) {
+  static fromCore(cert: StakeAddressCertificate) {
     return new StakeRegistration(cert.stakeCredential);
   }
 
@@ -123,7 +124,7 @@ export class StakeRegistration {
    *
    * @returns The stake credential.
    */
-  stakeCredential(): Cardano.Credential {
+  stakeCredential(): Credential {
     return this.#credential;
   }
 
@@ -132,7 +133,7 @@ export class StakeRegistration {
    *
    * @param credential The stake credential.
    */
-  setStakeCredential(credential: Cardano.Credential): void {
+  setStakeCredential(credential: Credential): void {
     this.#credential = credential;
     this.#originalBytes = undefined;
   }

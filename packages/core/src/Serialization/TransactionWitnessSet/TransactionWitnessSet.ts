@@ -1,12 +1,19 @@
 /* eslint-disable sonarjs/cognitive-complexity, complexity, max-statements, unicorn/prefer-switch */
-import * as Cardano from '../../Cardano';
 import { BootstrapWitness } from './BootstrapWitness';
+import {
+  NativeScript as CardanoNativeScript,
+  PlutusLanguageVersion,
+  PlutusScript,
+  Script,
+  ScriptType,
+  Witness
+} from '../../Cardano/types';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { CborSet } from '../Common';
 import { HexBlob } from '@cardano-sdk/util';
 import { NativeScript, PlutusV1Script, PlutusV2Script, PlutusV3Script } from '../Scripts';
 import { PlutusData } from '../PlutusData/PlutusData';
-import { Redeemers } from './Redeemer';
+import { Redeemers } from './Redeemer/Redeemers';
 import { SerializationError, SerializationFailure } from '../../errors';
 import { VkeyWitness } from './VkeyWitness';
 import { hexToBytes } from '../../util/misc';
@@ -181,7 +188,7 @@ export class TransactionWitnessSet {
    *
    * @returns The Core TransactionWitnessSet object.
    */
-  toCore(): Cardano.Witness {
+  toCore(): Witness {
     const scripts = this.#getCoreScripts();
     return {
       bootstrap: this.#bootstrapWitnesses ? this.#bootstrapWitnesses.toCore() : undefined,
@@ -197,7 +204,7 @@ export class TransactionWitnessSet {
    *
    * @param coreWitness The core Witness object.
    */
-  static fromCore(coreWitness: Cardano.Witness): TransactionWitnessSet {
+  static fromCore(coreWitness: Witness): TransactionWitnessSet {
     const witness = new TransactionWitnessSet();
 
     if (coreWitness.signatures) {
@@ -388,7 +395,7 @@ export class TransactionWitnessSet {
    * @returns The list of scripts.
    * @private
    */
-  #getCoreScripts(): Array<Cardano.Script> {
+  #getCoreScripts(): Array<Script> {
     const plutusV1 = this.#plutusV1Scripts ? this.#plutusV1Scripts.toCore() : [];
     const plutusV2 = this.#plutusV2Scripts ? this.#plutusV2Scripts.toCore() : [];
     const plutusV3 = this.#plutusV3Scripts ? this.#plutusV3Scripts.toCore() : [];
@@ -403,27 +410,22 @@ export class TransactionWitnessSet {
    * @returns The list of scripts.
    * @private
    */
-  static #getCddlScripts(scripts: Array<Cardano.Script>): CddlScripts {
+  static #getCddlScripts(scripts: Array<Script>): CddlScripts {
     const [coreNative, coreV1, coreV2, coreV3] = scripts.reduce<
-      [
-        Cardano.NativeScript[] | null,
-        Cardano.PlutusScript[] | null,
-        Cardano.PlutusScript[] | null,
-        Cardano.PlutusScript[] | null
-      ]
+      [CardanoNativeScript[] | null, PlutusScript[] | null, PlutusScript[] | null, PlutusScript[] | null]
     >(
       ([native, v1, v2, v3], script) => {
-        if (script.__type === Cardano.ScriptType.Native) {
+        if (script.__type === ScriptType.Native) {
           native ? native.push(script) : (native = [script]);
         } else {
           switch (script.version) {
-            case Cardano.PlutusLanguageVersion.V1:
+            case PlutusLanguageVersion.V1:
               v1 ? v1.push(script) : (v1 = [script]);
               break;
-            case Cardano.PlutusLanguageVersion.V2:
+            case PlutusLanguageVersion.V2:
               v2 ? v2.push(script) : (v2 = [script]);
               break;
-            case Cardano.PlutusLanguageVersion.V3:
+            case PlutusLanguageVersion.V3:
               v3 ? v3.push(script) : (v3 = [script]);
               break;
             default:

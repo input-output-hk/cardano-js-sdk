@@ -1,7 +1,8 @@
 /* eslint-disable promise/param-names */
-import * as Cardano from '../Cardano';
+import { AssetId, Lovelace, Value } from '../Cardano/types';
 import { AssetInfo } from '../Asset';
 import { AssetProvider } from '../Provider';
+import { InputResolver, PaymentAddress } from '../Cardano/Address';
 import { Inspector, ResolutionResult, resolveInputs } from './txInspector';
 import { Logger } from 'ts-log';
 import { Milliseconds } from './time';
@@ -12,22 +13,22 @@ import { subtractValueQuantities } from './subtractValueQuantities';
 import { tryGetAssetInfos } from './tryGetAssetInfos';
 import uniq from 'lodash/uniq.js';
 
-export type AssetInfoWithAmount = { amount: Cardano.Lovelace; assetInfo: AssetInfo };
+export type AssetInfoWithAmount = { amount: Lovelace; assetInfo: AssetInfo };
 
 export type TokenTransferValue = {
-  assets: Map<Cardano.AssetId, AssetInfoWithAmount>;
-  coins: Cardano.Lovelace;
+  assets: Map<AssetId, AssetInfoWithAmount>;
+  coins: Lovelace;
 };
 
 export type TokenTransferInspection = {
-  fromAddress: Map<Cardano.PaymentAddress, TokenTransferValue>;
-  toAddress: Map<Cardano.PaymentAddress, TokenTransferValue>;
+  fromAddress: Map<PaymentAddress, TokenTransferValue>;
+  toAddress: Map<PaymentAddress, TokenTransferValue>;
 };
 
 /** Arguments for the token transfer inspector. */
 export interface TokenTransferInspectorArgs {
   /** The input resolver. */
-  inputResolver: Cardano.InputResolver;
+  inputResolver: InputResolver;
 
   /** The asset provider to resolve AssetInfo for assets in the fromAddress field. */
   fromAddressAssetProvider: AssetProvider;
@@ -45,22 +46,22 @@ export interface TokenTransferInspectorArgs {
 export type TokenTransferInspector = (args: TokenTransferInspectorArgs) => Inspector<TokenTransferInspection>;
 
 type IntoTokenTransferValueProps = {
-  addressMap: Map<Cardano.PaymentAddress, Cardano.Value>;
+  addressMap: Map<PaymentAddress, Value>;
   assetProvider: AssetProvider;
   timeout: Milliseconds;
   logger: Logger;
 };
 
-const coalesceByAddress = <T extends { address: Cardano.PaymentAddress; value: Cardano.Value }>(
+const coalesceByAddress = <T extends { address: PaymentAddress; value: Value }>(
   elements: T[]
-): Map<Cardano.PaymentAddress, Cardano.Value> => {
+): Map<PaymentAddress, Value> => {
   const grouped = elements.reduce((acc, elem) => {
     if (!acc.has(elem.address)) acc.set(elem.address, []);
     acc.get(elem.address)?.push(elem);
     return acc;
-  }, new Map<Cardano.PaymentAddress, T[]>());
+  }, new Map<PaymentAddress, T[]>());
 
-  const coalescedByAddress = new Map<Cardano.PaymentAddress, Cardano.Value>();
+  const coalescedByAddress = new Map<PaymentAddress, Value>();
 
   for (const [address, elem] of grouped) {
     coalescedByAddress.set(address, coalesceValueQuantities(elem.map((x) => x.value)));
@@ -69,16 +70,10 @@ const coalesceByAddress = <T extends { address: Cardano.PaymentAddress; value: C
   return coalescedByAddress;
 };
 
-const initializeAddressMap = (addresses: Cardano.PaymentAddress[]): Map<Cardano.PaymentAddress, Cardano.Value> =>
-  new Map<Cardano.PaymentAddress, Cardano.Value>(
-    addresses.map((address) => [address, { assets: new Map(), coins: 0n }])
-  );
+const initializeAddressMap = (addresses: PaymentAddress[]): Map<PaymentAddress, Value> =>
+  new Map<PaymentAddress, Value>(addresses.map((address) => [address, { assets: new Map(), coins: 0n }]));
 
-const updateFromAddressMap = (
-  addressMap: Map<Cardano.PaymentAddress, Cardano.Value>,
-  key: Cardano.PaymentAddress,
-  value: Cardano.Value
-) => {
+const updateFromAddressMap = (addressMap: Map<PaymentAddress, Value>, key: PaymentAddress, value: Value) => {
   if (value.coins < 0n) {
     addressMap.get(key)!.coins = value.coins;
   }
@@ -89,11 +84,7 @@ const updateFromAddressMap = (
     }
 };
 
-const updateToAddressMap = (
-  addressMap: Map<Cardano.PaymentAddress, Cardano.Value>,
-  key: Cardano.PaymentAddress,
-  value: Cardano.Value
-) => {
+const updateToAddressMap = (addressMap: Map<PaymentAddress, Value>, key: PaymentAddress, value: Value) => {
   if (value.coins > 0n) {
     addressMap.get(key)!.coins = value.coins;
   }
@@ -106,10 +97,10 @@ const updateToAddressMap = (
 };
 
 const computeNetDifferences = (
-  inputs: Map<Cardano.PaymentAddress, Cardano.Value>,
-  outputs: Map<Cardano.PaymentAddress, Cardano.Value>,
-  fromAddress: Map<Cardano.PaymentAddress, Cardano.Value>,
-  toAddress: Map<Cardano.PaymentAddress, Cardano.Value>
+  inputs: Map<PaymentAddress, Value>,
+  outputs: Map<PaymentAddress, Value>,
+  fromAddress: Map<PaymentAddress, Value>,
+  toAddress: Map<PaymentAddress, Value>
 ) => {
   for (const [key, inputValue] of inputs.entries()) {
     const outputValue = outputs.get(key) ?? { assets: new Map(), coins: 0n };
@@ -127,7 +118,7 @@ const computeNetDifferences = (
   }
 };
 
-const removeZeroBalanceEntries = (addressMap: Map<Cardano.PaymentAddress, Cardano.Value>) => {
+const removeZeroBalanceEntries = (addressMap: Map<PaymentAddress, Value>) => {
   for (const [key, value] of addressMap.entries()) {
     if (value.coins === 0n && value.assets?.size === 0) {
       addressMap.delete(key);
@@ -140,13 +131,13 @@ const intoTokenTransferValue = async ({
   assetProvider,
   timeout,
   addressMap
-}: IntoTokenTransferValueProps): Promise<Map<Cardano.PaymentAddress, TokenTransferValue>> => {
-  const tokenTransferValue = new Map<Cardano.PaymentAddress, TokenTransferValue>();
+}: IntoTokenTransferValueProps): Promise<Map<PaymentAddress, TokenTransferValue>> => {
+  const tokenTransferValue = new Map<PaymentAddress, TokenTransferValue>();
 
   for (const [address, value] of addressMap.entries()) {
     const coins = value.coins;
     const assetIds = uniq(value.assets && value.assets.size > 0 ? [...value.assets.keys()] : []);
-    const assetInfos = new Map<Cardano.AssetId, AssetInfoWithAmount>();
+    const assetInfos = new Map<AssetId, AssetInfoWithAmount>();
 
     if (assetIds.length > 0) {
       const assets = await tryGetAssetInfos({

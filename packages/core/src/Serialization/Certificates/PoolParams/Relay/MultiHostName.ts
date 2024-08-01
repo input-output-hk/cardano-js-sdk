@@ -1,6 +1,6 @@
-import * as Cardano from '../../../../Cardano';
 import { CborReader, CborWriter } from '../../../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import { RelayByNameMultihost } from '../../../../Cardano/types/StakePool/Relay';
 
 const EMBEDDED_GROUP_SIZE = 2;
 const MULTI_HOST_NAME_RELAY_ID = 2;
@@ -83,7 +83,7 @@ export class MultiHostName {
    *
    * @returns The Core RelayByNameMultihost object.
    */
-  toCore(): Cardano.RelayByNameMultihost {
+  toCore(): RelayByNameMultihost {
     return {
       __typename: 'RelayByNameMultihost',
       dnsName: this.#dnsName
@@ -95,7 +95,7 @@ export class MultiHostName {
    *
    * @param relay The core RelayByNameMultihost object.
    */
-  static fromCore(relay: Cardano.RelayByNameMultihost) {
+  static fromCore(relay: RelayByNameMultihost) {
     return new MultiHostName(relay.dnsName);
   }
 

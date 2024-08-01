@@ -1,7 +1,11 @@
-import * as Cardano from '../../../Cardano';
+import { Address, RewardAccount, RewardAddress } from '../../../Cardano/Address';
+import {
+  TreasuryWithdrawalsAction as CardanoTreasuryWithdrawalsAction,
+  GovernanceActionType,
+  Lovelace
+} from '../../../Cardano/types';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { GovernanceActionKind } from './GovernanceActionKind';
-import { GovernanceActionType } from '../../../Cardano';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { SerializationError, SerializationFailure } from '../../../errors';
@@ -11,7 +15,7 @@ const EMBEDDED_GROUP_SIZE = 3;
 
 /** Withdraws funds from the treasury. */
 export class TreasuryWithdrawalsAction {
-  #withdrawals: Map<Cardano.RewardAccount, Cardano.Lovelace>;
+  #withdrawals: Map<RewardAccount, Lovelace>;
   #policyHash: Hash28ByteBase16 | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
@@ -21,7 +25,7 @@ export class TreasuryWithdrawalsAction {
    * @param withdrawals A map specifying which rewards accounts to transfer the funds to.
    * @param policyHash The optional policyHash.
    */
-  constructor(withdrawals: Map<Cardano.RewardAccount, Cardano.Lovelace>, policyHash?: Hash28ByteBase16) {
+  constructor(withdrawals: Map<RewardAccount, Lovelace>, policyHash?: Hash28ByteBase16) {
     this.#withdrawals = withdrawals;
     this.#policyHash = policyHash;
   }
@@ -46,7 +50,7 @@ export class TreasuryWithdrawalsAction {
     writer.writeStartMap(sortedCanonically.size);
 
     for (const [key, value] of sortedCanonically) {
-      const rewardAddress = Cardano.RewardAddress.fromAddress(Cardano.Address.fromBech32(key));
+      const rewardAddress = RewardAddress.fromAddress(Address.fromBech32(key));
 
       if (!rewardAddress) {
         throw new SerializationError(SerializationFailure.InvalidAddress, `Invalid withdrawal address: ${key}`);
@@ -87,11 +91,9 @@ export class TreasuryWithdrawalsAction {
 
     reader.readStartMap();
 
-    const amounts = new Map<Cardano.RewardAccount, Cardano.Lovelace>();
+    const amounts = new Map<RewardAccount, Lovelace>();
     while (reader.peekState() !== CborReaderState.EndMap) {
-      const account = Cardano.Address.fromBytes(
-        HexBlob.fromBytes(reader.readByteString())
-      ).toBech32() as Cardano.RewardAccount;
+      const account = Address.fromBytes(HexBlob.fromBytes(reader.readByteString())).toBech32() as RewardAccount;
 
       const amount = reader.readInt();
       amounts.set(account, amount);
@@ -119,7 +121,7 @@ export class TreasuryWithdrawalsAction {
    *
    * @returns The Core TreasuryWithdrawalsAction object.
    */
-  toCore(): Cardano.TreasuryWithdrawalsAction {
+  toCore(): CardanoTreasuryWithdrawalsAction {
     const withdrawals = new Set(
       [...this.#withdrawals.entries()].map((value) => ({
         coin: value[1],
@@ -139,7 +141,7 @@ export class TreasuryWithdrawalsAction {
    *
    * @param treasuryWithdrawalsAction core TreasuryWithdrawalsAction object.
    */
-  static fromCore(treasuryWithdrawalsAction: Cardano.TreasuryWithdrawalsAction) {
+  static fromCore(treasuryWithdrawalsAction: CardanoTreasuryWithdrawalsAction) {
     return new TreasuryWithdrawalsAction(
       new Map([...treasuryWithdrawalsAction.withdrawals].map((value) => [value.rewardAccount, value.coin])),
       treasuryWithdrawalsAction.policyHash !== null ? treasuryWithdrawalsAction.policyHash : undefined
@@ -151,7 +153,7 @@ export class TreasuryWithdrawalsAction {
    *
    * @returns The withdrawals.
    */
-  withdrawals(): Map<Cardano.RewardAccount, Cardano.Lovelace> {
+  withdrawals(): Map<RewardAccount, Lovelace> {
     return this.#withdrawals;
   }
 

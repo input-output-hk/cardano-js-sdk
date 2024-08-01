@@ -2,8 +2,16 @@
 /* eslint-disable complexity */
 import * as Crypto from '@cardano-sdk/crypto';
 import { BigIntMath } from '@cardano-sdk/util';
-import { Cardano } from '../..';
-import { HydratedTxBody, Lovelace } from '../types';
+import {
+  Certificate,
+  CertificateType,
+  HydratedTxBody,
+  Lovelace,
+  PoolId,
+  ProposalProcedure,
+  ProtocolParameters
+} from '../types';
+import { Credential, CredentialType, RewardAccount } from '../Address';
 
 /** Implicit coin quantities used in the transaction */
 export interface ImplicitCoin {
@@ -17,30 +25,25 @@ export interface ImplicitCoin {
   reclaimDeposit?: Lovelace;
 }
 
-type DepositProtocolParams = { stakeKeyDeposit: Cardano.Lovelace; poolDeposit: Cardano.Lovelace };
+type DepositProtocolParams = { stakeKeyDeposit: Lovelace; poolDeposit: Lovelace };
 
-const stakeCredentialInRewardAccounts = (
-  stakeCredential: Cardano.Credential,
-  rewardAccounts: Cardano.RewardAccount[]
-): boolean => {
+const stakeCredentialInRewardAccounts = (stakeCredential: Credential, rewardAccounts: RewardAccount[]): boolean => {
   // No reward accounts means accept any stake credential
   if (rewardAccounts.length === 0) return true;
-  const networkId = Cardano.RewardAccount.toNetworkId(rewardAccounts[0]);
-  return rewardAccounts.includes(Cardano.RewardAccount.fromCredential(stakeCredential, networkId));
+  const networkId = RewardAccount.toNetworkId(rewardAccounts[0]);
+  return rewardAccounts.includes(RewardAccount.fromCredential(stakeCredential, networkId));
 };
 
 const computeShellyDeposits = (
   depositParams: DepositProtocolParams,
-  certificates: Cardano.Certificate[],
-  rewardAccounts: Cardano.RewardAccount[]
-): { deposit: Cardano.Lovelace; reclaimDeposit: Cardano.Lovelace } => {
+  certificates: Certificate[],
+  rewardAccounts: RewardAccount[]
+): { deposit: Lovelace; reclaimDeposit: Lovelace } => {
   let deposit = 0n;
   let reclaimDeposit = 0n;
   const anyRewardAccount = rewardAccounts.length === 0;
 
-  const poolIds = new Set(
-    rewardAccounts.map((account) => Cardano.PoolId.fromKeyHash(Cardano.RewardAccount.toHash(account)))
-  );
+  const poolIds = new Set(rewardAccounts.map((account) => PoolId.fromKeyHash(RewardAccount.toHash(account))));
 
   // TODO: For the case of deregistration (StakeDeregistration and PoolRetirement) the code here is not entirely correct
   // as we are assuming the current protocol parameters for the deposits where the same as the ones used when the certificates where issued.
@@ -49,19 +52,19 @@ const computeShellyDeposits = (
   // is good for now.
   for (const cert of certificates) {
     switch (cert.__typename) {
-      case Cardano.CertificateType.StakeRegistration:
+      case CertificateType.StakeRegistration:
         if (stakeCredentialInRewardAccounts(cert.stakeCredential, rewardAccounts))
           deposit += depositParams.stakeKeyDeposit;
         break;
-      case Cardano.CertificateType.StakeDeregistration:
+      case CertificateType.StakeDeregistration:
         if (stakeCredentialInRewardAccounts(cert.stakeCredential, rewardAccounts))
           reclaimDeposit += depositParams.stakeKeyDeposit;
         break;
-      case Cardano.CertificateType.PoolRegistration:
+      case CertificateType.PoolRegistration:
         if (anyRewardAccount || rewardAccounts.some((acct) => cert.poolParameters.owners.includes(acct)))
           deposit += depositParams.poolDeposit;
         break;
-      case Cardano.CertificateType.PoolRetirement: {
+      case CertificateType.PoolRetirement: {
         if (anyRewardAccount || poolIds.has(cert.poolId)) reclaimDeposit += depositParams.poolDeposit;
         break;
       }
@@ -75,33 +78,33 @@ const computeShellyDeposits = (
 };
 
 const computeConwayDeposits = (
-  certificates: Cardano.Certificate[],
-  rewardAccounts: Cardano.RewardAccount[],
+  certificates: Certificate[],
+  rewardAccounts: RewardAccount[],
   dRepKeyHash?: Crypto.Ed25519KeyHashHex,
-  proposalProcedures?: Cardano.ProposalProcedure[]
-): { deposit: Cardano.Lovelace; reclaimDeposit: Cardano.Lovelace } => {
+  proposalProcedures?: ProposalProcedure[]
+): { deposit: Lovelace; reclaimDeposit: Lovelace } => {
   let deposit = 0n;
   let reclaimDeposit = 0n;
 
   for (const cert of certificates) {
     switch (cert.__typename) {
-      case Cardano.CertificateType.Registration:
-      case Cardano.CertificateType.StakeRegistrationDelegation:
-      case Cardano.CertificateType.VoteRegistrationDelegation:
-      case Cardano.CertificateType.StakeVoteRegistrationDelegation:
+      case CertificateType.Registration:
+      case CertificateType.StakeRegistrationDelegation:
+      case CertificateType.VoteRegistrationDelegation:
+      case CertificateType.StakeVoteRegistrationDelegation:
         if (stakeCredentialInRewardAccounts(cert.stakeCredential, rewardAccounts)) deposit += cert.deposit;
         break;
-      case Cardano.CertificateType.Unregistration:
+      case CertificateType.Unregistration:
         if (stakeCredentialInRewardAccounts(cert.stakeCredential, rewardAccounts)) reclaimDeposit += cert.deposit;
         break;
-      case Cardano.CertificateType.RegisterDelegateRepresentative:
-      case Cardano.CertificateType.UnregisterDelegateRepresentative:
+      case CertificateType.RegisterDelegateRepresentative:
+      case CertificateType.UnregisterDelegateRepresentative:
         if (
           !dRepKeyHash ||
-          (cert.dRepCredential.type === Cardano.CredentialType.KeyHash &&
+          (cert.dRepCredential.type === CredentialType.KeyHash &&
             cert.dRepCredential.hash === Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash))
         ) {
-          cert.__typename === Cardano.CertificateType.RegisterDelegateRepresentative
+          cert.__typename === CertificateType.RegisterDelegateRepresentative
             ? (deposit += cert.deposit)
             : (reclaimDeposit += cert.deposit);
         }
@@ -119,12 +122,12 @@ const computeConwayDeposits = (
 
 /** Inspects a transaction for its deposits and returned deposits. */
 const getTxDeposits = (
-  { stakeKeyDeposit, poolDeposit }: Pick<Cardano.ProtocolParameters, 'stakeKeyDeposit' | 'poolDeposit'>,
-  certificates: Cardano.Certificate[],
-  rewardAccounts: Cardano.RewardAccount[] = [],
+  { stakeKeyDeposit, poolDeposit }: Pick<ProtocolParameters, 'stakeKeyDeposit' | 'poolDeposit'>,
+  certificates: Certificate[],
+  rewardAccounts: RewardAccount[] = [],
   dRepKeyHash?: Crypto.Ed25519KeyHashHex,
-  proposalProcedures?: Cardano.ProposalProcedure[]
-): { deposit: Cardano.Lovelace; reclaimDeposit: Cardano.Lovelace } => {
+  proposalProcedures?: ProposalProcedure[]
+): { deposit: Lovelace; reclaimDeposit: Lovelace } => {
   if (certificates.length === 0 && (!proposalProcedures || proposalProcedures.length === 0))
     return { deposit: 0n, reclaimDeposit: 0n };
 
@@ -158,13 +161,13 @@ const getTxDeposits = (
  * potentially go to a different reward accounts that we don't control (same with reclaims).
  */
 export const computeImplicitCoin = (
-  { stakeKeyDeposit, poolDeposit }: Pick<Cardano.ProtocolParameters, 'stakeKeyDeposit' | 'poolDeposit'>,
+  { stakeKeyDeposit, poolDeposit }: Pick<ProtocolParameters, 'stakeKeyDeposit' | 'poolDeposit'>,
   {
     certificates,
     proposalProcedures,
     withdrawals
   }: Pick<HydratedTxBody, 'certificates' | 'proposalProcedures' | 'withdrawals'>,
-  rewardAccounts?: Cardano.RewardAccount[],
+  rewardAccounts?: RewardAccount[],
   dRepKeyHash?: Crypto.Ed25519KeyHashHex
 ): ImplicitCoin => {
   const { deposit, reclaimDeposit } = getTxDeposits(

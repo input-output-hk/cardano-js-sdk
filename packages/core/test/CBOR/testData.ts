@@ -1,7 +1,14 @@
 import * as Crypto from '@cardano-sdk/crypto';
+import {
+  AssetId,
+  NativeScript,
+  NativeScriptKind,
+  PlutusLanguageVersion,
+  RedeemerPurpose,
+  ScriptType
+} from '../../src/Cardano/types';
 import { Base64Blob, HexBlob } from '@cardano-sdk/util';
 import { Cardano } from '../../src';
-import { NativeScript, NativeScriptKind, PlutusLanguageVersion, RedeemerPurpose, ScriptType } from '../../src/Cardano';
 export const rewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
 export const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
 export const poolId = Cardano.PoolId('pool1mpgg03jxj52qwxvvy7cmj58a96vl9pvxcqqvuw0kumheygxmn34');
@@ -65,19 +72,19 @@ export const script: NativeScript = {
 };
 
 export const mintTokenMap = new Map([
-  [Cardano.AssetId('2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740'), 20n],
-  [Cardano.AssetId('659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41'), -50n],
-  [Cardano.AssetId('7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373'), 40n],
-  [Cardano.AssetId('7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373504154415445'), 30n]
+  [AssetId('2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740'), 20n],
+  [AssetId('659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41'), -50n],
+  [AssetId('7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373'), 40n],
+  [AssetId('7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373504154415445'), 30n]
 ]);
 
 export const valueCoinOnly = { coins: 100_000n };
 export const valueWithAssets = {
   assets: new Map([
-    [Cardano.AssetId('2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740'), 20n],
-    [Cardano.AssetId('659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41'), 50n],
-    [Cardano.AssetId('7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373'), 40n],
-    [Cardano.AssetId('7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373504154415445'), 30n]
+    [AssetId('2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740'), 20n],
+    [AssetId('659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41'), 50n],
+    [AssetId('7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373'), 40n],
+    [AssetId('7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373504154415445'), 30n]
   ]),
   coins: 10n
 };

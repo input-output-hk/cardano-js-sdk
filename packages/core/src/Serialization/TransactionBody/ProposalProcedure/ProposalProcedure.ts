@@ -1,5 +1,6 @@
-import * as Cardano from '../../../Cardano';
+import { Address, RewardAccount, RewardAddress } from '../../../Cardano/Address';
 import { Anchor } from '../../Common/Anchor';
+import { ProposalProcedure as CardanoProposalProcedure, GovernanceActionType, Lovelace } from '../../../Cardano/types';
 import { CborReader, CborWriter } from '../../CBOR';
 import { GovernanceActionKind } from './GovernanceActionKind';
 import { HardForkInitiationAction } from './HardForkInitiationAction';
@@ -25,8 +26,8 @@ export class ProposalProcedure {
   #newConstitution: NewConstitution | undefined = undefined;
   #infoAction: InfoAction | undefined = undefined;
   #kind: GovernanceActionKind;
-  #deposit: Cardano.Lovelace;
-  #rewardAccount: Cardano.RewardAccount;
+  #deposit: Lovelace;
+  #rewardAccount: RewardAccount;
   #anchor: Anchor;
   #originalBytes: HexBlob | undefined = undefined;
 
@@ -78,7 +79,7 @@ export class ProposalProcedure {
     writer.writeStartArray(PROCEDURE_ARRAY_SIZE);
     writer.writeInt(this.#deposit);
 
-    const rewardAddress = Cardano.RewardAddress.fromAddress(Cardano.Address.fromBech32(this.#rewardAccount));
+    const rewardAddress = RewardAddress.fromAddress(Address.fromBech32(this.#rewardAccount));
     if (!rewardAddress) {
       throw new SerializationError(
         SerializationFailure.InvalidAddress,
@@ -106,9 +107,7 @@ export class ProposalProcedure {
 
     const deposit = reader.readInt();
 
-    const rewardAccount = Cardano.Address.fromBytes(
-      HexBlob.fromBytes(reader.readByteString())
-    ).toBech32() as Cardano.RewardAccount;
+    const rewardAccount = Address.fromBytes(HexBlob.fromBytes(reader.readByteString())).toBech32() as RewardAccount;
 
     const actionCbor = HexBlob.fromBytes(reader.readEncodedValue());
     const anchor = Anchor.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
@@ -164,7 +163,7 @@ export class ProposalProcedure {
    *
    * @returns The Core ProposalProcedure object.
    */
-  toCore(): Cardano.ProposalProcedure {
+  toCore(): CardanoProposalProcedure {
     let actionCore;
 
     switch (this.#kind) {
@@ -206,13 +205,13 @@ export class ProposalProcedure {
    *
    * @param proposalProcedure The core ProposalProcedure object.
    */
-  static fromCore(proposalProcedure: Cardano.ProposalProcedure): ProposalProcedure {
+  static fromCore(proposalProcedure: CardanoProposalProcedure): ProposalProcedure {
     let action;
     let procedure: ProposalProcedure;
     const anchor = Anchor.fromCore(proposalProcedure.anchor);
 
     switch (proposalProcedure.governanceAction.__typename) {
-      case Cardano.GovernanceActionType.parameter_change_action:
+      case GovernanceActionType.parameter_change_action:
         action = ParameterChangeAction.fromCore(proposalProcedure.governanceAction);
         procedure = ProposalProcedure.newParameterChangeAction(
           proposalProcedure.deposit,
@@ -221,7 +220,7 @@ export class ProposalProcedure {
           action
         );
         break;
-      case Cardano.GovernanceActionType.hard_fork_initiation_action:
+      case GovernanceActionType.hard_fork_initiation_action:
         action = HardForkInitiationAction.fromCore(proposalProcedure.governanceAction);
         procedure = ProposalProcedure.newHardForkInitiationAction(
           proposalProcedure.deposit,
@@ -230,7 +229,7 @@ export class ProposalProcedure {
           action
         );
         break;
-      case Cardano.GovernanceActionType.treasury_withdrawals_action:
+      case GovernanceActionType.treasury_withdrawals_action:
         action = TreasuryWithdrawalsAction.fromCore(proposalProcedure.governanceAction);
         procedure = ProposalProcedure.newTreasuryWithdrawalsAction(
           proposalProcedure.deposit,
@@ -239,7 +238,7 @@ export class ProposalProcedure {
           action
         );
         break;
-      case Cardano.GovernanceActionType.no_confidence:
+      case GovernanceActionType.no_confidence:
         action = NoConfidence.fromCore(proposalProcedure.governanceAction);
         procedure = ProposalProcedure.newNoConfidence(
           proposalProcedure.deposit,
@@ -248,7 +247,7 @@ export class ProposalProcedure {
           action
         );
         break;
-      case Cardano.GovernanceActionType.update_committee:
+      case GovernanceActionType.update_committee:
         action = UpdateCommittee.fromCore(proposalProcedure.governanceAction);
         procedure = ProposalProcedure.newUpdateCommittee(
           proposalProcedure.deposit,
@@ -257,7 +256,7 @@ export class ProposalProcedure {
           action
         );
         break;
-      case Cardano.GovernanceActionType.new_constitution:
+      case GovernanceActionType.new_constitution:
         action = NewConstitution.fromCore(proposalProcedure.governanceAction);
         procedure = ProposalProcedure.newNewConstitution(
           proposalProcedure.deposit,
@@ -266,7 +265,7 @@ export class ProposalProcedure {
           action
         );
         break;
-      case Cardano.GovernanceActionType.info_action:
+      case GovernanceActionType.info_action:
         action = InfoAction.fromCore(proposalProcedure.governanceAction);
         procedure = ProposalProcedure.newInfoAction(
           proposalProcedure.deposit,
@@ -292,8 +291,8 @@ export class ProposalProcedure {
    * @returns A new instance of ProposalProcedure.
    */
   static newParameterChangeAction(
-    deposit: Cardano.Lovelace,
-    rewardAccount: Cardano.RewardAccount,
+    deposit: Lovelace,
+    rewardAccount: RewardAccount,
     anchor: Anchor,
     parameterChangeAction: ParameterChangeAction
   ): ProposalProcedure {
@@ -317,8 +316,8 @@ export class ProposalProcedure {
    * @returns A new instance of ProposalProcedure.
    */
   static newHardForkInitiationAction(
-    deposit: Cardano.Lovelace,
-    rewardAccount: Cardano.RewardAccount,
+    deposit: Lovelace,
+    rewardAccount: RewardAccount,
     anchor: Anchor,
     hardForkInitiationAction: HardForkInitiationAction
   ): ProposalProcedure {
@@ -342,8 +341,8 @@ export class ProposalProcedure {
    * @returns A new instance of ProposalProcedure.
    */
   static newTreasuryWithdrawalsAction(
-    deposit: Cardano.Lovelace,
-    rewardAccount: Cardano.RewardAccount,
+    deposit: Lovelace,
+    rewardAccount: RewardAccount,
     anchor: Anchor,
     treasuryWithdrawalsAction: TreasuryWithdrawalsAction
   ): ProposalProcedure {
@@ -367,8 +366,8 @@ export class ProposalProcedure {
    * @returns A new instance of ProposalProcedure.
    */
   static newNoConfidence(
-    deposit: Cardano.Lovelace,
-    rewardAccount: Cardano.RewardAccount,
+    deposit: Lovelace,
+    rewardAccount: RewardAccount,
     anchor: Anchor,
     noConfidence: NoConfidence
   ): ProposalProcedure {
@@ -392,8 +391,8 @@ export class ProposalProcedure {
    * @returns A new instance of ProposalProcedure.
    */
   static newUpdateCommittee(
-    deposit: Cardano.Lovelace,
-    rewardAccount: Cardano.RewardAccount,
+    deposit: Lovelace,
+    rewardAccount: RewardAccount,
     anchor: Anchor,
     updateCommittee: UpdateCommittee
   ): ProposalProcedure {
@@ -417,8 +416,8 @@ export class ProposalProcedure {
    * @returns A new instance of ProposalProcedure.
    */
   static newNewConstitution(
-    deposit: Cardano.Lovelace,
-    rewardAccount: Cardano.RewardAccount,
+    deposit: Lovelace,
+    rewardAccount: RewardAccount,
     anchor: Anchor,
     newConstitution: NewConstitution
   ): ProposalProcedure {
@@ -442,8 +441,8 @@ export class ProposalProcedure {
    * @returns A new instance of ProposalProcedure.
    */
   static newInfoAction(
-    deposit: Cardano.Lovelace,
-    rewardAccount: Cardano.RewardAccount,
+    deposit: Lovelace,
+    rewardAccount: RewardAccount,
     anchor: Anchor,
     infoAction: InfoAction
   ): ProposalProcedure {
@@ -471,7 +470,7 @@ export class ProposalProcedure {
    *
    * @returns the deposit.
    */
-  deposit(): Cardano.Lovelace {
+  deposit(): Lovelace {
     return this.#deposit;
   }
 
@@ -480,7 +479,7 @@ export class ProposalProcedure {
    *
    * @returns the reward account.
    */
-  rewardAccount(): Cardano.RewardAccount {
+  rewardAccount(): RewardAccount {
     return this.#rewardAccount;
   }
 

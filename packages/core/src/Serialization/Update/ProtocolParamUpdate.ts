@@ -1,8 +1,8 @@
 /* eslint-disable sonarjs/cognitive-complexity, complexity, sonarjs/max-switch-cases, max-statements */
-import * as Cardano from '../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { Costmdls } from './Costmdls';
 import { DrepVotingThresholds } from './DrepVotingThresholds';
+import { EpochNo, Lovelace, ProtocolParametersUpdate, ProtocolParametersUpdateConway } from '../../Cardano/types';
 import { ExUnitPrices } from './ExUnitPrices';
 import { ExUnits, ProtocolVersion, UnitInterval } from '../Common';
 import { HexBlob } from '@cardano-sdk/util';
@@ -14,13 +14,13 @@ import { PoolVotingThresholds } from './PoolVotingThresholds';
  * aspects of the Cardano network.
  */
 export class ProtocolParamUpdate {
-  #minFeeA: Cardano.Lovelace | undefined;
-  #minFeeB: Cardano.Lovelace | undefined;
+  #minFeeA: Lovelace | undefined;
+  #minFeeB: Lovelace | undefined;
   #maxBlockBodySize: number | undefined;
   #maxTxSize: number | undefined;
   #maxBlockHeaderSize: number | undefined;
-  #keyDeposit: Cardano.Lovelace | undefined;
-  #poolDeposit: Cardano.Lovelace | undefined;
+  #keyDeposit: Lovelace | undefined;
+  #poolDeposit: Lovelace | undefined;
   #maxEpoch: number | undefined;
   #nOpt: number | undefined;
   #poolPledgeInfluence: UnitInterval | undefined;
@@ -29,8 +29,8 @@ export class ProtocolParamUpdate {
   #d: UnitInterval | undefined;
   #extraEntropy: HexBlob | undefined;
   #protocolVersion: ProtocolVersion | undefined;
-  #minPoolCost: Cardano.Lovelace | undefined;
-  #adaPerUtxoByte: Cardano.Lovelace | undefined;
+  #minPoolCost: Lovelace | undefined;
+  #adaPerUtxoByte: Lovelace | undefined;
   #costModels: Costmdls | undefined;
   #executionCosts: ExUnitPrices | undefined;
   #maxTxExUnits: ExUnits | undefined;
@@ -399,21 +399,21 @@ export class ProtocolParamUpdate {
    *
    * @returns The Core ProtocolParamUpdate object.
    */
-  toCore(): Cardano.ProtocolParametersUpdate {
+  toCore(): ProtocolParametersUpdate {
     return {
       coinsPerUtxoByte: this.#adaPerUtxoByte ? Number(this.#adaPerUtxoByte) : undefined,
       collateralPercentage: this.#collateralPercentage,
-      committeeTermLimit: this.#committeeTermLimit ? Cardano.EpochNo(this.#committeeTermLimit) : undefined,
+      committeeTermLimit: this.#committeeTermLimit ? EpochNo(this.#committeeTermLimit) : undefined,
       costModels: this.#costModels?.toCore(),
       dRepDeposit: this.#drepDeposit,
-      dRepInactivityPeriod: this.#drepInactivityPeriod ? Cardano.EpochNo(this.#drepInactivityPeriod) : undefined,
+      dRepInactivityPeriod: this.#drepInactivityPeriod ? EpochNo(this.#drepInactivityPeriod) : undefined,
       dRepVotingThresholds: this.#drepVotingThresholds?.toCore(),
       decentralizationParameter: this.#d ? this.#d.toFloat().toString() : undefined,
       desiredNumberOfPools: this.#nOpt,
       extraEntropy: this.#extraEntropy,
       governanceActionDeposit: this.#governanceActionDeposit,
       governanceActionValidityPeriod: this.#governanceActionValidityPeriod
-        ? Cardano.EpochNo(this.#governanceActionValidityPeriod)
+        ? EpochNo(this.#governanceActionValidityPeriod)
         : undefined,
       maxBlockBodySize: this.#maxBlockBodySize,
       maxBlockHeaderSize: this.#maxBlockHeaderSize,
@@ -446,9 +446,7 @@ export class ProtocolParamUpdate {
    *
    * @param parametersUpdate core parametersUpdate object.
    */
-  static fromCore<T extends Cardano.ProtocolParametersUpdateConway = Cardano.ProtocolParametersUpdate>(
-    parametersUpdate: T
-  ) {
+  static fromCore<T extends ProtocolParametersUpdateConway = ProtocolParametersUpdate>(parametersUpdate: T) {
     const params = new ProtocolParamUpdate();
 
     params.#minFeeA = parametersUpdate.minFeeCoefficient ? BigInt(parametersUpdate.minFeeCoefficient) : undefined;
@@ -499,7 +497,7 @@ export class ProtocolParamUpdate {
       : undefined;
 
     const { protocolVersion, extraEntropy, decentralizationParameter } =
-      parametersUpdate as unknown as Cardano.ProtocolParametersUpdate;
+      parametersUpdate as unknown as ProtocolParametersUpdate;
     if (protocolVersion !== undefined || extraEntropy !== undefined || decentralizationParameter) {
       params.#d = decentralizationParameter ? UnitInterval.fromFloat(Number(decentralizationParameter)) : undefined;
       params.#protocolVersion = protocolVersion ? ProtocolVersion.fromCore(protocolVersion) : undefined;
@@ -526,7 +524,7 @@ export class ProtocolParamUpdate {
    *
    * @param minFeeA fee to be multiplied by the transaction size.
    */
-  setMinFeeA(minFeeA: Cardano.Lovelace): void {
+  setMinFeeA(minFeeA: Lovelace): void {
     this.#minFeeA = minFeeA;
   }
 
@@ -536,7 +534,7 @@ export class ProtocolParamUpdate {
    * @returns The transaction fee to be multiplied by the transaction size, or undefined
    * if not set.
    */
-  minFeeA(): Cardano.Lovelace | undefined {
+  minFeeA(): Lovelace | undefined {
     return this.#minFeeA;
   }
 
@@ -550,7 +548,7 @@ export class ProtocolParamUpdate {
    * @param minFeeB fee to be added to every transaction regardless of its size, or undefined
    * if not set.
    */
-  setMinFeeB(minFeeB: Cardano.Lovelace): void {
+  setMinFeeB(minFeeB: Lovelace): void {
     this.#minFeeB = minFeeB;
     this.#originalBytes = undefined;
   }
@@ -561,7 +559,7 @@ export class ProtocolParamUpdate {
    * @returns The transaction fee to be added to every transaction regardless of its size, or undefined
    * if not set.
    */
-  minFeeB(): Cardano.Lovelace | undefined {
+  minFeeB(): Lovelace | undefined {
     return this.#minFeeB;
   }
 
@@ -630,7 +628,7 @@ export class ProtocolParamUpdate {
    *
    * @param keyDeposit The amount of ADA required in lovelace.
    */
-  setKeyDeposit(keyDeposit: Cardano.Lovelace): void {
+  setKeyDeposit(keyDeposit: Lovelace): void {
     this.#keyDeposit = keyDeposit;
     this.#originalBytes = undefined;
   }
@@ -641,7 +639,7 @@ export class ProtocolParamUpdate {
    * @returns The amount of ADA required in lovelace, or undefined
    * if not set.
    */
-  keyDeposit(): Cardano.Lovelace | undefined {
+  keyDeposit(): Lovelace | undefined {
     return this.#keyDeposit;
   }
 
@@ -651,7 +649,7 @@ export class ProtocolParamUpdate {
    * @param poolDeposit The amount of ADA required in lovelace, or undefined
    * if not set.
    */
-  setPoolDeposit(poolDeposit: Cardano.Lovelace): void {
+  setPoolDeposit(poolDeposit: Lovelace): void {
     this.#poolDeposit = poolDeposit;
     this.#originalBytes = undefined;
   }
@@ -662,7 +660,7 @@ export class ProtocolParamUpdate {
    * @returns The amount of ADA required in lovelace, or undefined
    * if not set.
    */
-  poolDeposit(): Cardano.Lovelace | undefined {
+  poolDeposit(): Lovelace | undefined {
     return this.#poolDeposit;
   }
 
@@ -848,7 +846,7 @@ export class ProtocolParamUpdate {
    *
    * @param minPoolCost The minimum operational cost.
    */
-  setMinPoolCost(minPoolCost: Cardano.Lovelace): void {
+  setMinPoolCost(minPoolCost: Lovelace): void {
     this.#minPoolCost = minPoolCost;
     this.#originalBytes = undefined;
   }
@@ -860,7 +858,7 @@ export class ProtocolParamUpdate {
    * @returns The minimum operational cost, or undefined
    * if not set.
    */
-  minPoolCost(): Cardano.Lovelace | undefined {
+  minPoolCost(): Lovelace | undefined {
     return this.#minPoolCost;
   }
 
@@ -869,7 +867,7 @@ export class ProtocolParamUpdate {
    *
    * @param adaPerUtxoByte The cost in Lovelaces for storing one byte of data.
    */
-  setAdaPerUtxoByte(adaPerUtxoByte: Cardano.Lovelace): void {
+  setAdaPerUtxoByte(adaPerUtxoByte: Lovelace): void {
     this.#adaPerUtxoByte = adaPerUtxoByte;
     this.#originalBytes = undefined;
   }
@@ -880,7 +878,7 @@ export class ProtocolParamUpdate {
    * @returns The cost  for storing one byte of data, or undefined
    * if not set.
    */
-  adaPerUtxoByte(): Cardano.Lovelace | undefined {
+  adaPerUtxoByte(): Lovelace | undefined {
     return this.#adaPerUtxoByte;
   }
 

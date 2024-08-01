@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import * as Serialization from '../../Serialization';
+import { AuxiliaryData as CardanoAuxiliaryData } from '../../Serialization/AuxiliaryData/AuxiliaryData';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { Script } from './Script';
 import { hexToBytes } from '../../util/misc';
@@ -20,7 +20,7 @@ export const computeAuxiliaryDataHash = (data: AuxiliaryData | undefined): Hash3
   data
     ? Hash32ByteBase16(
         Crypto.blake2b(Crypto.blake2b.BYTES)
-          .update(hexToBytes(Serialization.AuxiliaryData.fromCore(data).toCbor()))
+          .update(hexToBytes(CardanoAuxiliaryData.fromCore(data).toCbor()))
           .digest('hex')
       )
     : undefined;

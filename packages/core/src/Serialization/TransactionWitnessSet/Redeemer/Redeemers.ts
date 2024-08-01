@@ -1,4 +1,4 @@
-import { Cardano, inConwayEra } from '../../..';
+import { Redeemer as CardanoRedeemer } from '../../../Cardano/types/Transaction';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { ExUnits } from '../../Common';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
@@ -6,6 +6,7 @@ import { PlutusData } from '../../PlutusData';
 import { Redeemer } from './Redeemer';
 import { RedeemerTag } from './RedeemerTag';
 import { hexToBytes } from '../../../util/misc';
+import { inConwayEra } from '../../../util/conwayEra';
 
 const MAP_INDEX_EMBEDDED_GROUP_SIZE = 2;
 const MAP_VALUE_EMBEDDED_GROUP_SIZE = 2;
@@ -119,7 +120,7 @@ export class Redeemers {
    *
    * @returns The Core Redeemers array.
    */
-  toCore(): Cardano.Redeemer[] {
+  toCore(): CardanoRedeemer[] {
     return this.#values.map((redeemer) => redeemer.toCore());
   }
 
@@ -128,7 +129,7 @@ export class Redeemers {
    *
    * @param redeemers core Redeemer array.
    */
-  static fromCore(redeemers: Cardano.Redeemer[]): Redeemers {
+  static fromCore(redeemers: CardanoRedeemer[]): Redeemers {
     return new Redeemers(redeemers.map((redeemer) => Redeemer.fromCore(redeemer)));
   }
 

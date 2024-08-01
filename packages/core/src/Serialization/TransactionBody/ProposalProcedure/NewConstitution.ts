@@ -1,4 +1,4 @@
-import * as Cardano from '../../../Cardano';
+import { NewConstitution as CardanoNewConstitution, GovernanceActionType } from '../../../Cardano/types/Governance';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { Constitution } from './Constitution';
 import { GovernanceActionId } from '../../Common/GovernanceActionId';
@@ -90,9 +90,9 @@ export class NewConstitution {
    *
    * @returns The Core NewConstitution object.
    */
-  toCore(): Cardano.NewConstitution {
+  toCore(): CardanoNewConstitution {
     return {
-      __typename: Cardano.GovernanceActionType.new_constitution,
+      __typename: GovernanceActionType.new_constitution,
       constitution: this.#constitution.toCore(),
       governanceActionId: this.#govActionId ? this.#govActionId.toCore() : null
     };
@@ -103,7 +103,7 @@ export class NewConstitution {
    *
    * @param newConstitution core NewConstitution object.
    */
-  static fromCore(newConstitution: Cardano.NewConstitution) {
+  static fromCore(newConstitution: CardanoNewConstitution) {
     return new NewConstitution(
       Constitution.fromCore(newConstitution.constitution),
       newConstitution.governanceActionId !== null

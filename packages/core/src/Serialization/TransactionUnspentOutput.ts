@@ -1,7 +1,7 @@
-import * as Cardano from '../Cardano';
 import { CborReader, CborWriter } from './CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { TransactionInput, TransactionOutput } from './TransactionBody';
+import { TxIn, TxOut } from '../Cardano/types/Utxo';
 import { hexToBytes } from '../util/misc';
 
 const TRANSACTION_UNSPENT_OUTPUT_ARRAY_SIZE = 2;
@@ -75,7 +75,7 @@ export class TransactionUnspentOutput {
    *
    * @returns The Core TransactionUnspentOutput object.
    */
-  toCore(): [Cardano.TxIn, Cardano.TxOut] {
+  toCore(): [TxIn, TxOut] {
     return [this.#input.toCore(), this.#output.toCore()];
   }
 
@@ -84,7 +84,7 @@ export class TransactionUnspentOutput {
    *
    * @param core The core TransactionUnspentOutput object.
    */
-  static fromCore(core: [Cardano.TxIn, Cardano.TxOut]): TransactionUnspentOutput {
+  static fromCore(core: [TxIn, TxOut]): TransactionUnspentOutput {
     return new TransactionUnspentOutput(TransactionInput.fromCore(core[0]), TransactionOutput.fromCore(core[1]));
   }
 

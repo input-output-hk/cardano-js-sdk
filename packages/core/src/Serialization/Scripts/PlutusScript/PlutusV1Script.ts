@@ -1,7 +1,7 @@
-import * as Cardano from '../../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborWriter } from '../../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import { PlutusLanguageVersion, PlutusScript, ScriptType } from '../../../Cardano/types/Script';
 
 const HASH_LENGTH_IN_BYTES = 28;
 
@@ -60,11 +60,11 @@ export class PlutusV1Script {
    *
    * @returns The Core NativeScript object.
    */
-  toCore(): Cardano.PlutusScript {
+  toCore(): PlutusScript {
     return {
-      __type: Cardano.ScriptType.Plutus,
+      __type: ScriptType.Plutus,
       bytes: this.rawBytes(),
-      version: Cardano.PlutusLanguageVersion.V1
+      version: PlutusLanguageVersion.V1
     };
   }
 
@@ -73,8 +73,8 @@ export class PlutusV1Script {
    *
    * @param plutusScript The core PlutusScript object.
    */
-  static fromCore(plutusScript: Cardano.PlutusScript): PlutusV1Script {
-    if (plutusScript.version !== Cardano.PlutusLanguageVersion.V1)
+  static fromCore(plutusScript: PlutusScript): PlutusV1Script {
+    if (plutusScript.version !== PlutusLanguageVersion.V1)
       throw new InvalidArgumentError('script', 'Wrong plutus language version.');
 
     return new PlutusV1Script(plutusScript.bytes);

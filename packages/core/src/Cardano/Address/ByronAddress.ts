@@ -1,6 +1,6 @@
 /* eslint-disable no-bitwise */
 import { Address, AddressProps, AddressType } from './Address';
-import { CborReader, CborReaderState, CborTag, CborWriter } from '../../Serialization';
+import { CborReader, CborReaderState, CborTag, CborWriter } from '../../Serialization/CBOR';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { crc32 } from '@foxglove/crc';

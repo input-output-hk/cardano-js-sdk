@@ -1,11 +1,12 @@
 /* eslint-disable complexity, sonarjs/cognitive-complexity, max-statements, max-depth */
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
+import { Address, PaymentAddress } from '../../Cardano/Address';
 import { CborReader, CborReaderState, CborTag, CborWriter } from '../CBOR';
 import { Datum, DatumKind } from '../Common/Datum';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { PlutusData } from '../PlutusData';
 import { Script } from '../Scripts';
+import { TxOut } from '../../Cardano/types/Utxo';
 import { Value } from './Value';
 
 export const REQUIRED_FIELDS_COUNT = 2;
@@ -16,7 +17,7 @@ export const REQUIRED_FIELDS_COUNT = 2;
  * inside.
  */
 export class TransactionOutput {
-  #address: Cardano.Address;
+  #address: Address;
   #amount: Value;
   #datum: Datum | undefined;
   #scriptRef: Script | undefined;
@@ -28,7 +29,7 @@ export class TransactionOutput {
    * @param address The destination address where the ADA (and possibly other native tokens) is being sent.
    * @param amount The amount of ADA and any other native tokens being sent to the address.
    */
-  constructor(address: Cardano.Address, amount: Value) {
+  constructor(address: Address, amount: Value) {
     this.#address = address;
     this.#amount = amount;
   }
@@ -123,7 +124,7 @@ export class TransactionOutput {
 
         switch (key) {
           case 0n:
-            address = Cardano.Address.fromBytes(HexBlob.fromBytes(reader.readByteString()));
+            address = Address.fromBytes(HexBlob.fromBytes(reader.readByteString()));
             break;
           case 1n:
             value = Value.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
@@ -179,7 +180,7 @@ export class TransactionOutput {
       //   ]
       const length = reader.readStartArray();
 
-      address = Cardano.Address.fromBytes(HexBlob.fromBytes(reader.readByteString()));
+      address = Address.fromBytes(HexBlob.fromBytes(reader.readByteString()));
       value = Value.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
 
       if (length === 3) {
@@ -206,11 +207,11 @@ export class TransactionOutput {
    *
    * @returns The Core TransactionOutput object.
    */
-  toCore(): Cardano.TxOut {
+  toCore(): TxOut {
     return {
       address: this.#address.asByron()
         ? this.#address.toBase58()
-        : (this.#address.toBech32() as unknown as Cardano.PaymentAddress),
+        : (this.#address.toBech32() as unknown as PaymentAddress),
       datum:
         this.#datum && this.#datum.kind() === DatumKind.InlineData ? this.#datum.asInlineData()?.toCore() : undefined,
       datumHash: this.#datum && this.#datum.kind() === DatumKind.DataHash ? this.#datum.asDataHash() : undefined,
@@ -224,8 +225,8 @@ export class TransactionOutput {
    *
    * @param coreTransactionOutput The core TransactionOutput object.
    */
-  static fromCore(coreTransactionOutput: Cardano.TxOut): TransactionOutput {
-    const address = Cardano.Address.fromString(coreTransactionOutput.address);
+  static fromCore(coreTransactionOutput: TxOut): TransactionOutput {
+    const address = Address.fromString(coreTransactionOutput.address);
 
     if (!address) throw new InvalidArgumentError('coreTransactionOutput', `Invalid address ${address}`);
 
@@ -243,7 +244,7 @@ export class TransactionOutput {
    *
    * @returns the address where the ADA is being sent.
    */
-  address(): Cardano.Address {
+  address(): Address {
     return this.#address;
   }
 

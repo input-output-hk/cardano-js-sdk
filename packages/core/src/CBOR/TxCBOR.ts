@@ -1,6 +1,6 @@
 import { HexBlob, OpaqueString } from '@cardano-sdk/util';
 import { Transaction } from '../Serialization';
-import { Tx, TxBody } from '../Cardano';
+import { Tx, TxBody } from '../Cardano/types/Transaction';
 import type { Cardano } from '..';
 
 /** Transaction serialized as CBOR, encoded as hex string */

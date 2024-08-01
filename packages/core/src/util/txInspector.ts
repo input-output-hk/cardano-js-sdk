@@ -3,28 +3,30 @@ import {
   AssetFingerprint,
   AssetId,
   AssetName,
-  Certificate,
-  CertificateType,
   HydratedTxIn,
   Lovelace,
   Metadatum,
   PolicyId,
-  PoolRegistrationCertificate,
-  PoolRetirementCertificate,
   Script,
   ScriptType,
-  StakeAddressCertificate,
-  StakeCredentialCertificateTypes,
-  StakeDelegationCertificate,
   TokenMap,
   Tx,
   TxIn,
   TxOut,
-  Value,
-  isCertType
+  Value
 } from '../Cardano/types';
 import { BigIntMath } from '@cardano-sdk/util';
-import { InputResolver, PaymentAddress, RewardAccount, isAddressWithin } from '../Cardano';
+import {
+  Certificate,
+  CertificateType,
+  PoolRegistrationCertificate,
+  PoolRetirementCertificate,
+  StakeAddressCertificate,
+  StakeCredentialCertificateTypes,
+  StakeDelegationCertificate,
+  isCertType
+} from '../Cardano/types/Certificate';
+import { InputResolver, PaymentAddress, RewardAccount, isAddressWithin } from '../Cardano/Address';
 import { coalesceValueQuantities } from './coalesceValueQuantities';
 import { nativeScriptPolicyId } from './nativeScript';
 import { removeNegativesFromTokenMap } from '../Asset/util';

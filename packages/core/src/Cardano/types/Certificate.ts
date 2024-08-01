@@ -1,10 +1,11 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Anchor, DelegateRepresentative } from './Governance';
-import { Credential, CredentialType, RewardAccount } from '../Address';
+import { Credential, CredentialType } from '../Address/Address';
 import { EpochNo } from './Block';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { Lovelace } from './Value';
 import { PoolId, PoolParameters } from './StakePool';
+import { RewardAccount } from '../Address/RewardAccount';
 import { isNotNil } from '@cardano-sdk/util';
 
 export enum CertificateType {

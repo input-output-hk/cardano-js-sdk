@@ -1,9 +1,9 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { Anchor } from '../Common';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { CertificateKind } from './CertificateKind';
-import { CertificateType } from '../../Cardano';
+import { CertificateType, UpdateDelegateRepresentativeCertificate } from '../../Cardano/types/Certificate';
+import { Credential, CredentialType } from '../../Cardano/Address/Address';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { hexToBytes } from '../../util/misc';
 
@@ -11,7 +11,7 @@ const EMBEDDED_GROUP_SIZE = 2;
 
 /** Updates the DRep anchored metadata. */
 export class UpdateDelegateRepresentative {
-  #drepCredential: Cardano.Credential;
+  #drepCredential: Credential;
   #anchor: Anchor | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
@@ -21,7 +21,7 @@ export class UpdateDelegateRepresentative {
    * @param drepCredential The DRep credential.
    * @param anchor The anchor.
    */
-  constructor(drepCredential: Cardano.Credential, anchor?: Anchor) {
+  constructor(drepCredential: Credential, anchor?: Anchor) {
     this.#drepCredential = drepCredential;
     this.#anchor = anchor;
   }
@@ -93,7 +93,7 @@ export class UpdateDelegateRepresentative {
         `Expected an array of ${EMBEDDED_GROUP_SIZE} elements, but got an array of ${length} elements`
       );
 
-    const type = Number(reader.readInt()) as Cardano.CredentialType;
+    const type = Number(reader.readInt()) as CredentialType;
     const hash = Crypto.Hash28ByteBase16(HexBlob.fromBytes(reader.readByteString()));
 
     reader.readEndArray();
@@ -119,7 +119,7 @@ export class UpdateDelegateRepresentative {
    *
    * @returns The Core UpdateDelegateRepresentativeCertificate object.
    */
-  toCore(): Cardano.UpdateDelegateRepresentativeCertificate {
+  toCore(): UpdateDelegateRepresentativeCertificate {
     return {
       __typename: CertificateType.UpdateDelegateRepresentative,
       anchor: this.#anchor ? this.#anchor.toCore() : null,
@@ -132,7 +132,7 @@ export class UpdateDelegateRepresentative {
    *
    * @param cert core UpdateDelegateRepresentativeCertificate object.
    */
-  static fromCore(cert: Cardano.UpdateDelegateRepresentativeCertificate) {
+  static fromCore(cert: UpdateDelegateRepresentativeCertificate) {
     return new UpdateDelegateRepresentative(
       cert.dRepCredential,
       cert.anchor ? Anchor.fromCore(cert.anchor) : undefined
@@ -144,7 +144,7 @@ export class UpdateDelegateRepresentative {
    *
    * @returns The DRep credential.
    */
-  credential(): Cardano.Credential {
+  credential(): Credential {
     return this.#drepCredential;
   }
 
