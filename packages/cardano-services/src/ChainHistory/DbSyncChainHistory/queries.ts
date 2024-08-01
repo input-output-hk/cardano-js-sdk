@@ -222,7 +222,6 @@ export const findProposalProceduresByTxIds = `
 		tx.hash AS tx_id,
 		ga.deposit,
 		ga.description,
-		ga.type,
 		va.url,
 		va.data_hash,
 		sa.view,
@@ -298,8 +297,6 @@ export const findStakeCertsByTxIds = `
 	FROM tx
 	JOIN stake_registration AS cert ON cert.tx_id = tx.id
 	JOIN stake_address AS addr ON addr.id = cert.addr_id
-	JOIN block ON block_id = block.id
-	JOIN epoch_param ON block.epoch_no = epoch_param.epoch_no
 	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC)
 	UNION
