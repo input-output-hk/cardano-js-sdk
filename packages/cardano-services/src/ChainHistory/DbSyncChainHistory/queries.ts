@@ -222,7 +222,6 @@ export const findProposalProceduresByTxIds = `
 		tx.hash AS tx_id,
 		ga.deposit,
 		ga.description,
-		ga.type,
 		va.url,
 		va.data_hash,
 		sa.view,

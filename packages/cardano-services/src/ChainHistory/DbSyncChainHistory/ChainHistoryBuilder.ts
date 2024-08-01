@@ -93,14 +93,16 @@ const mapWithdrawals: (source: [{ credential: DbSyncCredential; network: string 
 const getGovernanceAction = ({
   denominator,
   description,
-  numerator,
-  type
+  numerator
 }: ProposalProcedureModel): Cardano.GovernanceAction => {
-  const { contents } = description;
+  const { contents, tag } = description;
   const governanceActionId =
     contents && contents[0] ? { actionIndex: contents[0].govActionIx, id: contents[0].txId } : null;
 
-  switch (type) {
+  if (!tag) throw new Error('Missing "tag" in governance action proposal description');
+  if (typeof tag !== 'string') throw new Error('Wrong "tag" type in governance action proposal description');
+
+  switch (tag) {
     case 'HardForkInitiation':
       return {
         __typename: GovernanceActionType.hard_fork_initiation_action,
@@ -159,7 +161,7 @@ const getGovernanceAction = ({
       };
   }
 
-  throw new Error(`Unknown GovernanceActionType '${type}' with description "${JSON.stringify(description)}"`);
+  throw new Error(`Unknown GovernanceActionType '${tag}' with description "${JSON.stringify(description)}"`);
 };
 
 const getVoter = (

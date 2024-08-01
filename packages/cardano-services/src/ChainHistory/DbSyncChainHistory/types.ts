@@ -137,7 +137,6 @@ export interface ProposalProcedureModel {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   description: any;
   tx_id: Buffer;
-  type: string;
   url: string;
   view: string;
   // LW-9675
