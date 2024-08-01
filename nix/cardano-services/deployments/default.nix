@@ -932,96 +932,41 @@ in
           name = "${final.namespace}-cardanojs-v1";
           network = "sanchonet";
           region = "us-east-2";
-
-          providers = {
-            backend = {
-              enabled = true;
-              env.USE_SUBMIT_API = "true";
-              env.USE_BLOCKFROST = lib.mkForce "false";
-              env.SUBMIT_API_URL = "http://${final.namespace}-cardano-stack.${final.namespace}.svc.cluster.local:8090";
-              env.NODE_ENV = "production";
-            };
-            stake-pool-provider.enabled = true;
-          };
-
-          projectors = {
-            stake-pool = {
-              enabled = true;
-              env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
-            };
-          };
-
-          values = {
-            blockfrost-worker.enabled = false;
-            pg-boss-worker.enabled = true;
-            pg-boss-worker.queues = "pool-metadata,pool-metrics";
-            backend.routes = let
-              inherit (oci.meta) versions;
-            in
-              lib.concatLists [
-                (map (v: "/v${v}/health") versions.root)
-                (map (v: "/v${v}/live") versions.root)
-                (map (v: "/v${v}/meta") versions.root)
-                (map (v: "/v${v}/ready") versions.root)
-                (map (v: "/v${v}/asset") versions.assetInfo)
-                (map (v: "/v${v}/chain-history") versions.chainHistory)
-                (map (v: "/v${v}/network-info") versions.networkInfo)
-                (map (v: "/v${v}/rewards") versions.rewards)
-                (map (v: "/v${v}/tx-submit") versions.txSubmit)
-                (map (v: "/v${v}/utxo") versions.utxo)
-                (map (v: "/v${v}/handle") versions.handle)
-                (map (v: "/v${v}/provider-server") versions.stakePool)
-                (map (v: "/v${v}/stake-pool-provider-server") versions.stakePool)
-              ];
-
-            cardano-services = {
-              ingresOrder = 99;
-              additionalRoutes = [
-                {
-                  pathType = "Prefix";
-                  path = "/v1.0.0/stake-pool";
-                  backend.service = {
-                    name = "${final.namespace}-cardanojs-v1-stake-pool-provider";
-                    port.name = "http";
-                  };
-                }
-                {
-                  pathType = "Prefix";
-                  path = "/v3.0.0/chain-history";
-                  backend.service = {
-                    name = "${final.namespace}-cardanojs-v1-backend";
-                    port.name = "http";
-                  };
-                }
-              ];
-            };
-          };
-        };
-
-        "live-sanchonet@us-east-2@v2" = final: {
-          name = "${final.namespace}-cardanojs-v2";
-          namespace = "live-sanchonet";
-          network = "sanchonet";
-          region = "us-east-2";
           context = "eks-admin";
 
-          projectors = {
-            stake-pool.enabled = true;
-          };
-
           providers = {
             backend = {
               enabled = true;
+              env.USE_SUBMIT_API = "false";
             };
             stake-pool-provider = {
-              enabled = false;
+              enabled = true;
+              env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
+            handle-provider.enabled = true;
+            #asset-provider.enabled = true;
+            chain-history-provider.enabled = true;
+          };
+
+          projectors = {
+            handle.enabled = true;
+            stake-pool.enabled = true;
+            asset.enabled = true;
           };
 
           values = {
-            ingress.enabled = false;
-            pg-boss-worker.enabled = true;
+            useAccelerator = false;
+            ws-server.enabled = true;
             stakepool.databaseName = "stakepoolv2";
+            backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
+
+          backend.hostnames = ["${final.namespace}.${final.region}.${baseUrl}"];
+            pg-boss-worker.enabled = true;
+
+            blockfrost-worker.enabled = false;
+            cardano-services = {
+              ingresOrder = 98;
+            };
           };
         };
 
