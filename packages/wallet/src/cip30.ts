@@ -388,7 +388,15 @@ const baseCip30WalletApi = (
   },
   getUnusedAddresses: async (): Promise<Cbor[]> => {
     logger.debug('getting unused addresses');
-    return Promise.resolve([]);
+    const wallet = await firstValueFrom(wallet$);
+    const address = await wallet.getNextUnusedAddress();
+
+    // Script wallets which already used up their only address will return empty here.
+    if (address === null) {
+      return [];
+    }
+
+    return [cardanoAddressToCbor(address.address)];
   },
   getUsedAddresses: async (): Promise<Cbor[]> => {
     logger.debug('getting used addresses');

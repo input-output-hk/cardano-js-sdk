@@ -41,6 +41,7 @@ import {
   distinctBlock,
   distinctEraSummaries
 } from '../services';
+import { AddressType, Bip32Account, GroupedAddress, WitnessedTx, Witnesser, util } from '@cardano-sdk/key-management';
 import {
   AssetProvider,
   Cardano,
@@ -64,6 +65,7 @@ import {
   SignDataProps,
   SyncStatus,
   UpdateWitnessProps,
+  WalletAddress,
   WalletNetworkInfoProvider
 } from '../types';
 import { BehaviorObservable, TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
@@ -86,7 +88,6 @@ import {
   tap,
   throwError
 } from 'rxjs';
-import { Bip32Account, GroupedAddress, WitnessedTx, Witnesser, util } from '@cardano-sdk/key-management';
 import { ChangeAddressResolver, InputSelector, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { Ed25519PublicKey, Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
@@ -141,6 +142,27 @@ export const isScriptPublicCredentialsManager = (
 export const isBip32PublicCredentialsManager = (
   credManager: PublicCredentialsManager
 ): credManager is Bip32PublicCredentialsManager => !isScriptPublicCredentialsManager(credManager);
+
+/**
+ * Gets whether the given address has a transaction history.
+ *
+ * @param address The address to query.
+ * @param chainHistoryProvider The chain history provider where to fetch the history from.
+ */
+const addressHasTx = async (
+  address: Cardano.PaymentAddress,
+  chainHistoryProvider: ChainHistoryProvider
+): Promise<boolean> => {
+  const txs = await chainHistoryProvider.transactionsByAddresses({
+    addresses: [address],
+    pagination: {
+      limit: 1,
+      startAt: 0
+    }
+  });
+
+  return txs.totalResultCount > 0;
+};
 
 export interface BaseWalletDependencies {
   readonly witnesser: Witnesser;
@@ -819,6 +841,41 @@ export class BaseWallet implements ObservableWallet {
     }
 
     return firstValueFrom(this.addresses$);
+  }
+
+  async getNextUnusedAddress(): Promise<WalletAddress | null> {
+    const knownAddresses = await firstValueFrom(this.addresses$);
+
+    if (knownAddresses.length === 0) {
+      throw new Error('No known address found for this wallet');
+    }
+
+    if (isBip32PublicCredentialsManager(this.#publicCredentialsManager)) {
+      knownAddresses.sort((a, b) => b.index - a.index);
+      const latestAddress = knownAddresses[0];
+
+      let isEmpty = !(await addressHasTx(latestAddress.address, this.chainHistoryProvider));
+
+      if (isEmpty) return latestAddress;
+
+      const newAddress = await this.#publicCredentialsManager.bip32Account.deriveAddress(
+        { index: latestAddress.index + 1, type: AddressType.External },
+        0
+      );
+
+      await firstValueFrom(this.#addressTracker.addAddresses([newAddress]));
+
+      // Sanity check, make sure the newly generated address is also empty.
+      isEmpty = !(await addressHasTx(newAddress.address, this.chainHistoryProvider));
+
+      if (isEmpty) return newAddress;
+
+      return await this.getNextUnusedAddress();
+    }
+
+    // Script wallet.
+    const isEmpty = !(await addressHasTx(knownAddresses[0].address, this.chainHistoryProvider));
+    return isEmpty ? knownAddresses[0] : null;
   }
 
   /** Update the witness of a transaction with witness provided by this wallet */

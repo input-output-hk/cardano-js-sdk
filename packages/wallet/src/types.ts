@@ -130,6 +130,14 @@ export interface ObservableWallet {
    */
   discoverAddresses(): Promise<WalletAddress[]>;
 
+  /**
+   * Get the next unused address for the wallet.
+   *
+   * @returns Promise that resolves with the next unused address. Return null if there
+   * are no available unused addresses (I.E Single address wallets such as script wallets which already used up their only address).
+   */
+  getNextUnusedAddress(): Promise<WalletAddress | null>;
+
   shutdown(): void;
 }
 
