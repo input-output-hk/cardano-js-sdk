@@ -458,7 +458,7 @@ const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
 
 export const mapBlockBody = (block: CommonBlock | Schema.BlockBFT): Cardano.Block['body'] => {
   const { transactions, type } = block;
-  return (transactions || []).map((transaction) => 
+  return (transactions || []).map((transaction) =>
     type !== 'bft' && transaction.cbor
       ? {
           ...Serialization.Transaction.fromCbor(transaction.cbor as TxCBOR).toCore(),
