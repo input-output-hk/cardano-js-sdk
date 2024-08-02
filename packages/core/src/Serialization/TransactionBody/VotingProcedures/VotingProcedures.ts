@@ -1,4 +1,4 @@
-import * as Cardano from '../../../Cardano';
+import { VotingProcedures as CardanoVotingProcedures } from '../../../Cardano/types/Governance';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { GovernanceActionId } from '../../Common/GovernanceActionId';
 import { HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
@@ -96,7 +96,7 @@ export class VotingProcedures {
    *
    * @returns The Core VotingProcedures object.
    */
-  toCore(): Cardano.VotingProcedures {
+  toCore(): CardanoVotingProcedures {
     return this.#procedures.map((value) => {
       const voter = value.voter.toCore();
       const votes = value.votes.map((vote) => ({
@@ -113,7 +113,7 @@ export class VotingProcedures {
    *
    * @param votingProcedures The core VotingProcedures object.
    */
-  static fromCore(votingProcedures: Cardano.VotingProcedures): VotingProcedures {
+  static fromCore(votingProcedures: CardanoVotingProcedures): VotingProcedures {
     const procedures = new VotingProcedures();
 
     procedures.#procedures = votingProcedures.map((value) => {

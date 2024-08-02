@@ -1,8 +1,8 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborWriter } from '../CBOR';
 import { CertificateKind } from './CertificateKind';
-import { CertificateType } from '../../Cardano';
+import { CertificateType, Lovelace, VoteRegistrationDelegationCertificate } from '../../Cardano/types';
+import { Credential, CredentialType } from '../../Cardano/Address/Address';
 import { DRep } from './DRep';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { hexToBytes } from '../../util/misc';
@@ -11,9 +11,9 @@ const EMBEDDED_GROUP_SIZE = 2;
 
 /** This certificate Register the stake key and delegate with a single certificate to a DRep. */
 export class VoteRegistrationDelegation {
-  #credential: Cardano.Credential;
+  #credential: Credential;
   #dRep: DRep;
-  #deposit: Cardano.Lovelace;
+  #deposit: Lovelace;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -24,7 +24,7 @@ export class VoteRegistrationDelegation {
    * the protocol parameters.
    * @param dRep The DRep to delegate to.
    */
-  constructor(stakeCredential: Cardano.Credential, deposit: Cardano.Lovelace, dRep: DRep) {
+  constructor(stakeCredential: Credential, deposit: Lovelace, dRep: DRep) {
     this.#credential = stakeCredential;
     this.#deposit = deposit;
     this.#dRep = dRep;
@@ -91,7 +91,7 @@ export class VoteRegistrationDelegation {
         `Expected an array of ${EMBEDDED_GROUP_SIZE} elements, but got an array of ${length} elements`
       );
 
-    const type = Number(reader.readInt()) as Cardano.CredentialType;
+    const type = Number(reader.readInt()) as CredentialType;
     const hash = Crypto.Hash28ByteBase16(HexBlob.fromBytes(reader.readByteString()));
 
     reader.readEndArray();
@@ -112,7 +112,7 @@ export class VoteRegistrationDelegation {
    *
    * @returns The Core VoteRegistrationDelegationCertificate object.
    */
-  toCore(): Cardano.VoteRegistrationDelegationCertificate {
+  toCore(): VoteRegistrationDelegationCertificate {
     return {
       __typename: CertificateType.VoteRegistrationDelegation,
       dRep: this.#dRep.toCore(),
@@ -126,7 +126,7 @@ export class VoteRegistrationDelegation {
    *
    * @param deleg core VoteRegistrationDelegationCertificate object.
    */
-  static fromCore(deleg: Cardano.VoteRegistrationDelegationCertificate) {
+  static fromCore(deleg: VoteRegistrationDelegationCertificate) {
     return new VoteRegistrationDelegation(deleg.stakeCredential, deleg.deposit, DRep.fromCore(deleg.dRep));
   }
 
@@ -135,7 +135,7 @@ export class VoteRegistrationDelegation {
    *
    * @returns The stake credential.
    */
-  stakeCredential(): Cardano.Credential {
+  stakeCredential(): Credential {
     return this.#credential;
   }
 
@@ -144,7 +144,7 @@ export class VoteRegistrationDelegation {
    *
    * @returns The deposit.
    */
-  deposit(): Cardano.Lovelace {
+  deposit(): Lovelace {
     return this.#deposit;
   }
 

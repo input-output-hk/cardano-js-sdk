@@ -1,5 +1,5 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
+import { PlutusData as CardanoPlutusData, DatumHash } from '../../Cardano/types';
 import { CborReader, CborWriter } from '../CBOR';
 import { HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
 import { PlutusData } from '../PlutusData';
@@ -11,7 +11,7 @@ const DATUM_ARRAY_SIZE = 2;
  *
  * @param datum The datum to be checked for.
  */
-export const isDatumHash = (datum: unknown): datum is Cardano.DatumHash => datum !== null && typeof datum === 'string';
+export const isDatumHash = (datum: unknown): datum is DatumHash => datum !== null && typeof datum === 'string';
 
 /** Represents different ways of associating a Datum with a UTxO in a transaction. */
 export enum DatumKind {
@@ -39,7 +39,7 @@ export enum DatumKind {
  */
 export class Datum {
   #datumKind: DatumKind;
-  #dataHash: Cardano.DatumHash | undefined;
+  #dataHash: DatumHash | undefined;
   #inlineData: PlutusData | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
@@ -51,7 +51,7 @@ export class Datum {
    * @param dataHash The hash of the Datum.
    * @param inlineData The data being included directly within the transaction output.
    */
-  constructor(dataHash?: Cardano.DatumHash, inlineData?: PlutusData) {
+  constructor(dataHash?: DatumHash, inlineData?: PlutusData) {
     if (dataHash && inlineData) throw new InvalidStateError('Datum can only be DataHash or PlutusData but not both');
     if (!dataHash && !inlineData) throw new InvalidStateError('Datum must be either DataHash or PlutusData');
 
@@ -108,7 +108,7 @@ export class Datum {
 
     const kind = Number(reader.readUInt());
 
-    let datumHash: Cardano.DatumHash | undefined;
+    let datumHash: DatumHash | undefined;
     let inlineDatum: PlutusData | undefined;
 
     switch (kind) {
@@ -135,12 +135,12 @@ export class Datum {
    *
    * @returns The Core Datum object.
    */
-  toCore(): Cardano.DatumHash | Cardano.PlutusData {
+  toCore(): DatumHash | CardanoPlutusData {
     let result;
 
     switch (this.#datumKind) {
       case DatumKind.DataHash:
-        result = this.#dataHash as Cardano.DatumHash;
+        result = this.#dataHash as DatumHash;
         break;
       case DatumKind.InlineData:
         result = this.#inlineData!.toCore();
@@ -157,7 +157,7 @@ export class Datum {
    *
    * @param datum core Datum object.
    */
-  static fromCore(datum: Cardano.DatumHash | Cardano.PlutusData) {
+  static fromCore(datum: DatumHash | CardanoPlutusData) {
     if (isDatumHash(datum)) return new Datum(datum);
 
     return new Datum(undefined, PlutusData.fromCore(datum));
@@ -177,7 +177,7 @@ export class Datum {
    *
    * @returns a DatumHash if the Datum can be cast, otherwise, undefined.
    */
-  asDataHash(): Cardano.DatumHash | undefined {
+  asDataHash(): DatumHash | undefined {
     return this.#dataHash;
   }
 
@@ -195,7 +195,7 @@ export class Datum {
    *
    * @param dataHash The Datum hash to 'cast' to Datum.
    */
-  static newDataHash(dataHash: Cardano.DatumHash): Datum {
+  static newDataHash(dataHash: DatumHash): Datum {
     return new Datum(dataHash);
   }
 

@@ -1,4 +1,4 @@
-import * as Cardano from '../../../Cardano';
+import { InfoAction as CardanoInfoAction, GovernanceActionType } from '../../../Cardano/types/Governance';
 import { CborReader, CborWriter } from '../../CBOR';
 import { GovernanceActionKind } from './GovernanceActionKind';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
@@ -65,14 +65,14 @@ export class InfoAction {
    *
    * @returns The Core InfoAction object.
    */
-  toCore(): Cardano.InfoAction {
+  toCore(): CardanoInfoAction {
     return {
-      __typename: Cardano.GovernanceActionType.info_action
+      __typename: GovernanceActionType.info_action
     };
   }
 
   /** Creates a InfoAction object from the given Core InfoAction object. */
-  static fromCore(_: Cardano.InfoAction) {
+  static fromCore(_: CardanoInfoAction) {
     return new InfoAction();
   }
 }

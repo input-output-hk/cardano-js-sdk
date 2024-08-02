@@ -5,7 +5,8 @@ import {
   NotImplementedError,
   Serialization,
   SerializationError,
-  SerializationFailure
+  SerializationFailure,
+  TxCBOR
 } from '@cardano-sdk/core';
 import { CommonBlock } from './types';
 import { Schema } from '@cardano-ogmios/client';
@@ -166,7 +167,7 @@ const mapCertificate = (certificate: Schema.Certificate): Cardano.Certificate =>
   //           : Cardano.MirCertificatePot.Treasury,
   //       quantity: certificate.moveInstantaneousRewards.value || 0n
   //       // TODO: update MIR certificate type to support 'rewards' (multiple reward acc map to coins)
-  //       // This is currently not compatible with core type (missing 'rewardAccount' which doesnt exist in ogmios)
+  //       // This is currently not compatible with core type (missing 'rewardAccount' which doesn't exist in ogmios)
   //       // rewardAccount: certificate.moveInstantaneousRewards.rewards.
   //       // Add test for it too.
   //     } as Cardano.MirCertificate;
@@ -385,6 +386,8 @@ const mapMint = (tx: Schema.Transaction): Cardano.TokenMap | undefined => {
   return mapAssets(tx.mint);
 };
 
+const mapInputSource = (source: 'inputs' | 'collaterals'): Cardano.InputSource => Cardano.InputSource[source];
+
 const mapValidityInterval = ({ invalidBefore, invalidAfter }: Schema.ValidityInterval): Cardano.ValidityInterval => ({
   ...(invalidBefore && { invalidBefore: Cardano.Slot(invalidBefore) }),
   ...(invalidAfter && { invalidHereafter: Cardano.Slot(invalidAfter) })
@@ -434,7 +437,7 @@ const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
     },
     id: Cardano.TransactionId(tx.id),
     // At the time of writing Byron transactions didn't set this property
-    inputSource: tx.spends ? Cardano.InputSource[tx.spends] : Cardano.InputSource.inputs,
+    inputSource: mapInputSource(tx.spends),
     witness: {
       bootstrap: tx.signatories
         .filter((signatory) => signatory.addressAttributes || signatory.chainCode)
@@ -453,5 +456,14 @@ const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
   };
 };
 
-export const mapBlockBody = ({ transactions }: CommonBlock | Schema.BlockBFT): Cardano.Block['body'] =>
-  (transactions || []).map((transaction) => mapCommonTx(transaction));
+export const mapBlockBody = (block: CommonBlock | Schema.BlockBFT): Cardano.Block['body'] => {
+  const { transactions, type } = block;
+  return (transactions || []).map((transaction) =>
+    type !== 'bft' && transaction.cbor
+      ? {
+          ...Serialization.Transaction.fromCbor(transaction.cbor as TxCBOR).toCore(),
+          inputSource: mapInputSource(transaction.spends)
+        }
+      : mapCommonTx(transaction)
+  );
+};

@@ -1,7 +1,7 @@
-import * as Cardano from '../../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborWriter } from '../../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import { NativeScriptKind, RequireSignatureScript, ScriptType } from '../../../Cardano/types/Script';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
@@ -38,7 +38,7 @@ export class ScriptPubkey {
     // CDDL
     // script_pubkey = (0, addr_keyhash)
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
-    writer.writeInt(Cardano.NativeScriptKind.RequireSignature);
+    writer.writeInt(NativeScriptKind.RequireSignature);
     writer.writeByteString(Buffer.from(this.#keyHash, 'hex'));
 
     return writer.encodeAsHex();
@@ -63,10 +63,10 @@ export class ScriptPubkey {
 
     const kind = Number(reader.readInt());
 
-    if (kind !== Cardano.NativeScriptKind.RequireSignature)
+    if (kind !== NativeScriptKind.RequireSignature)
       throw new InvalidArgumentError(
         'cbor',
-        `Expected kind ${Cardano.NativeScriptKind.RequireSignature}, but got kind ${kind}`
+        `Expected kind ${NativeScriptKind.RequireSignature}, but got kind ${kind}`
       );
 
     const key = Crypto.Ed25519KeyHashHex(HexBlob.fromBytes(reader.readByteString()));
@@ -83,11 +83,11 @@ export class ScriptPubkey {
    *
    * @returns The Core RequireSignatureScript object.
    */
-  toCore(): Cardano.RequireSignatureScript {
+  toCore(): RequireSignatureScript {
     return {
-      __type: Cardano.ScriptType.Native,
+      __type: ScriptType.Native,
       keyHash: this.#keyHash,
-      kind: Cardano.NativeScriptKind.RequireSignature
+      kind: NativeScriptKind.RequireSignature
     };
   }
 
@@ -96,7 +96,7 @@ export class ScriptPubkey {
    *
    * @param script The core RequireSignatureScript object.
    */
-  static fromCore(script: Cardano.RequireSignatureScript) {
+  static fromCore(script: RequireSignatureScript) {
     return new ScriptPubkey(script.keyHash);
   }
 

@@ -1,4 +1,4 @@
-import * as Cardano from '../../../../Cardano';
+import { Relay as CardanoRelay } from '../../../../Cardano/types/StakePool/Relay';
 import { CborReader } from '../../../CBOR';
 import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
 import { MultiHostName } from './MultiHostName';
@@ -90,7 +90,7 @@ export class Relay {
    *
    * @returns The Core Relay object.
    */
-  toCore(): Cardano.Relay {
+  toCore(): CardanoRelay {
     let core;
 
     switch (this.#kind) {
@@ -115,7 +115,7 @@ export class Relay {
    *
    * @param coreRelay The core Relay object.
    */
-  static fromCore(coreRelay: Cardano.Relay): Relay {
+  static fromCore(coreRelay: CardanoRelay): Relay {
     let relay: Relay;
 
     switch (coreRelay.__typename) {

@@ -1,4 +1,4 @@
-import * as Cardano from '../../Cardano';
+import { ExUnits as CardanoExUnits } from '../../Cardano/types';
 import { CborReader, CborWriter } from '../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
@@ -82,7 +82,7 @@ export class ExUnits {
    *
    * @returns The Core ExUnits object.
    */
-  toCore(): Cardano.ExUnits {
+  toCore(): CardanoExUnits {
     return {
       memory: Number(this.#mem),
       steps: Number(this.#steps)
@@ -94,7 +94,7 @@ export class ExUnits {
    *
    * @param exUnits core ExUnits object.
    */
-  static fromCore(exUnits: Cardano.ExUnits) {
+  static fromCore(exUnits: CardanoExUnits) {
     return new ExUnits(BigInt(exUnits.memory), BigInt(exUnits.steps));
   }
 

@@ -1,7 +1,7 @@
 /* eslint-disable max-statements,complexity */
-import * as Cardano from '../../../Cardano';
 import { CborReader, CborReaderState, CborTag, CborWriter } from '../../CBOR';
 import { HexBlob } from '@cardano-sdk/util';
+import { Metadatum } from '../../../Cardano/types/AuxiliaryData';
 import { MetadatumList } from './MetadatumList';
 import { MetadatumMap } from './MetadatumMap';
 import { NotImplementedError, SerializationError, SerializationFailure } from '../../../errors';
@@ -178,7 +178,7 @@ export class TransactionMetadatum {
    *
    * @returns The TransactionMetadatum object.
    */
-  toCore(): Cardano.Metadatum {
+  toCore(): Metadatum {
     switch (this.#kind) {
       case TransactionMetadatumKind.Bytes:
         return new Uint8Array(this.#bytes!);
@@ -190,7 +190,7 @@ export class TransactionMetadatum {
         return TransactionMetadatum.mapToCoreMetadatumList(this.#list!);
       case TransactionMetadatumKind.Map: {
         const metadatumMap = this.#map!;
-        const coreMap = new Map<Cardano.Metadatum, Cardano.Metadatum>();
+        const coreMap = new Map<Metadatum, Metadatum>();
         const keys = metadatumMap.getKeys();
         for (let i = 0; i < keys.getLength(); i++) {
           const key = keys.get(i);
@@ -208,7 +208,7 @@ export class TransactionMetadatum {
    *
    * @param metadatum The core TransactionMetadatum object.
    */
-  static fromCore(metadatum: Cardano.Metadatum) {
+  static fromCore(metadatum: Metadatum) {
     if (metadatum === null) throw new SerializationError(SerializationFailure.InvalidType);
     switch (typeof metadatum) {
       case 'number':
@@ -416,8 +416,8 @@ export class TransactionMetadatum {
    *
    * @param list The MetadatumList
    */
-  private static mapToCoreMetadatumList(list: MetadatumList): Cardano.Metadatum {
-    const items: Cardano.Metadatum[] = [];
+  private static mapToCoreMetadatumList(list: MetadatumList): Metadatum {
+    const items: Metadatum[] = [];
     for (let i = 0; i < list.getLength(); i++) {
       const element = list.get(i);
       items.push(element.toCore());

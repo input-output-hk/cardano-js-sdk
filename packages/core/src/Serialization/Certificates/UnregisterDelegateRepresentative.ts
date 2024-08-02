@@ -1,8 +1,8 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborWriter } from '../CBOR';
 import { CertificateKind } from './CertificateKind';
-import { CertificateType } from '../../Cardano';
+import { CertificateType, Lovelace, UnRegisterDelegateRepresentativeCertificate } from '../../Cardano/types';
+import { Credential, CredentialType } from '../../Cardano/Address/Address';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
 const EMBEDDED_GROUP_SIZE = 2;
@@ -15,8 +15,8 @@ const EMBEDDED_GROUP_SIZE = 2;
  * (the same way that stake credential registration deposits are returned).
  */
 export class UnregisterDelegateRepresentative {
-  #drepCredential: Cardano.Credential;
-  #deposit: Cardano.Lovelace;
+  #drepCredential: Credential;
+  #deposit: Lovelace;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -25,7 +25,7 @@ export class UnregisterDelegateRepresentative {
    * @param drepCredential The DRep credential.
    * @param deposit The deposit.
    */
-  constructor(drepCredential: Cardano.Credential, deposit: Cardano.Lovelace) {
+  constructor(drepCredential: Credential, deposit: Lovelace) {
     this.#drepCredential = drepCredential;
     this.#deposit = deposit;
   }
@@ -90,7 +90,7 @@ export class UnregisterDelegateRepresentative {
         `Expected an array of ${EMBEDDED_GROUP_SIZE} elements, but got an array of ${length} elements`
       );
 
-    const type = Number(reader.readInt()) as Cardano.CredentialType;
+    const type = Number(reader.readInt()) as CredentialType;
     const hash = Crypto.Hash28ByteBase16(HexBlob.fromBytes(reader.readByteString()));
 
     reader.readEndArray();
@@ -110,7 +110,7 @@ export class UnregisterDelegateRepresentative {
    *
    * @returns The Core UnregisterDelegateRepresentativeCertificate object.
    */
-  toCore(): Cardano.UnRegisterDelegateRepresentativeCertificate {
+  toCore(): UnRegisterDelegateRepresentativeCertificate {
     return {
       __typename: CertificateType.UnregisterDelegateRepresentative,
       dRepCredential: this.#drepCredential,
@@ -123,7 +123,7 @@ export class UnregisterDelegateRepresentative {
    *
    * @param cert core UnregisterDelegateRepresentativeCertificate object.
    */
-  static fromCore(cert: Cardano.UnRegisterDelegateRepresentativeCertificate) {
+  static fromCore(cert: UnRegisterDelegateRepresentativeCertificate) {
     return new UnregisterDelegateRepresentative(cert.dRepCredential, cert.deposit);
   }
 
@@ -132,7 +132,7 @@ export class UnregisterDelegateRepresentative {
    *
    * @returns The DRep credential.
    */
-  credential(): Cardano.Credential {
+  credential(): Credential {
     return this.#drepCredential;
   }
 
@@ -141,7 +141,7 @@ export class UnregisterDelegateRepresentative {
    *
    * @returns The deposit.
    */
-  deposit(): Cardano.Lovelace {
+  deposit(): Lovelace {
     return this.#deposit;
   }
 }

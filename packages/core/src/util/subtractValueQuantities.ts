@@ -1,5 +1,5 @@
 import { BigIntMath } from '@cardano-sdk/util';
-import { Value } from '../Cardano';
+import { Value } from '../Cardano/types/Value';
 import { util } from '../Asset';
 
 /** Subtract all quantities */

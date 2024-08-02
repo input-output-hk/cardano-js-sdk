@@ -1,5 +1,5 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
+import { Anchor as CardanoAnchor } from '../../Cardano/types/Governance';
 import { CborReader, CborWriter } from '../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
@@ -92,7 +92,7 @@ export class Anchor {
    *
    * @returns The Core Anchor object.
    */
-  toCore(): Cardano.Anchor {
+  toCore(): CardanoAnchor {
     return {
       dataHash: this.#dataHash,
       url: this.#url
@@ -104,7 +104,7 @@ export class Anchor {
    *
    * @param anchor core Anchor object.
    */
-  static fromCore(anchor: Cardano.Anchor) {
+  static fromCore(anchor: CardanoAnchor) {
     return new Anchor(anchor.url, anchor.dataHash);
   }
 

@@ -1,16 +1,16 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
+import { AuthorizeCommitteeHotCertificate, CertificateType } from '../../Cardano/types/Certificate';
 import { CborReader, CborWriter } from '../CBOR';
 import { CertificateKind } from './CertificateKind';
-import { CertificateType } from '../../Cardano';
+import { Credential, CredentialType } from '../../Cardano/Address/Address';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
 /** This certificate registers the Hot and Cold credentials of a committee member. */
 export class AuthCommitteeHot {
-  #committeeColdCred: Cardano.Credential;
-  #committeeHotCred: Cardano.Credential;
+  #committeeColdCred: Credential;
+  #committeeHotCred: Credential;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -19,7 +19,7 @@ export class AuthCommitteeHot {
    * @param committeeColdCred The committee cold credential.
    * @param committeeHotCred The committee hot credential.
    */
-  constructor(committeeColdCred: Cardano.Credential, committeeHotCred: Cardano.Credential) {
+  constructor(committeeColdCred: Credential, committeeHotCred: Credential) {
     this.#committeeColdCred = committeeColdCred;
     this.#committeeHotCred = committeeHotCred;
   }
@@ -86,7 +86,7 @@ export class AuthCommitteeHot {
         `Expected an array of ${EMBEDDED_GROUP_SIZE} elements, but got an array of ${length} elements`
       );
 
-    const coldType = Number(reader.readInt()) as Cardano.CredentialType;
+    const coldType = Number(reader.readInt()) as CredentialType;
     const coldHash = Crypto.Hash28ByteBase16(HexBlob.fromBytes(reader.readByteString()));
 
     reader.readEndArray();
@@ -99,7 +99,7 @@ export class AuthCommitteeHot {
         `Expected an array of ${EMBEDDED_GROUP_SIZE} elements, but got an array of ${length} elements`
       );
 
-    const hotType = Number(reader.readInt()) as Cardano.CredentialType;
+    const hotType = Number(reader.readInt()) as CredentialType;
     const hotHash = Crypto.Hash28ByteBase16(HexBlob.fromBytes(reader.readByteString()));
 
     reader.readEndArray();
@@ -117,7 +117,7 @@ export class AuthCommitteeHot {
    *
    * @returns The Core AuthCommitteeHotCertificate object.
    */
-  toCore(): Cardano.AuthorizeCommitteeHotCertificate {
+  toCore(): AuthorizeCommitteeHotCertificate {
     return {
       __typename: CertificateType.AuthorizeCommitteeHot,
       coldCredential: this.#committeeColdCred,
@@ -130,7 +130,7 @@ export class AuthCommitteeHot {
    *
    * @param cert core AuthCommitteeHotCertificate object.
    */
-  static fromCore(cert: Cardano.AuthorizeCommitteeHotCertificate) {
+  static fromCore(cert: AuthorizeCommitteeHotCertificate) {
     return new AuthCommitteeHot(cert.coldCredential, cert.hotCredential);
   }
 
@@ -139,7 +139,7 @@ export class AuthCommitteeHot {
    *
    * @returns The cold credential.
    */
-  coldCredential(): Cardano.Credential {
+  coldCredential(): Credential {
     return this.#committeeColdCred;
   }
 
@@ -148,7 +148,7 @@ export class AuthCommitteeHot {
    *
    * @returns The hot credential.
    */
-  hotCredential(): Cardano.Credential {
+  hotCredential(): Credential {
     return this.#committeeHotCred;
   }
 }

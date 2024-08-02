@@ -1,5 +1,5 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
+import { Script as CardanoScript, PlutusLanguageVersion, isNativeScript } from '../../Cardano/types/Script';
 import { CborReader, CborWriter } from '../CBOR';
 import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
 import { NativeScript } from './NativeScript';
@@ -98,7 +98,7 @@ export class Script {
    *
    * @returns The Core Script object.
    */
-  toCore(): Cardano.Script {
+  toCore(): CardanoScript {
     let core;
 
     switch (this.#language) {
@@ -126,20 +126,20 @@ export class Script {
    *
    * @param coreScript The core Script object.
    */
-  static fromCore(coreScript: Cardano.Script): Script {
+  static fromCore(coreScript: CardanoScript): Script {
     let script: Script;
 
-    if (Cardano.isNativeScript(coreScript)) {
+    if (isNativeScript(coreScript)) {
       script = Script.newNativeScript(NativeScript.fromCore(coreScript));
     } else {
       switch (coreScript.version) {
-        case Cardano.PlutusLanguageVersion.V1:
+        case PlutusLanguageVersion.V1:
           script = Script.newPlutusV1Script(PlutusV1Script.fromCore(coreScript));
           break;
-        case Cardano.PlutusLanguageVersion.V2:
+        case PlutusLanguageVersion.V2:
           script = Script.newPlutusV2Script(PlutusV2Script.fromCore(coreScript));
           break;
-        case Cardano.PlutusLanguageVersion.V3:
+        case PlutusLanguageVersion.V3:
           script = Script.newPlutusV3Script(PlutusV3Script.fromCore(coreScript));
           break;
         default:

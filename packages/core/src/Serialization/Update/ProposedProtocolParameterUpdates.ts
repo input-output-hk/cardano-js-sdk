@@ -1,5 +1,9 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
+import {
+  ProposedProtocolParameterUpdates as CardanoProposedProtocolParameterUpdates,
+  GenesisDelegateKeyHash,
+  ProtocolParametersUpdate
+} from '../../Cardano/types/ProtocolParameters';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { HexBlob } from '@cardano-sdk/util';
 import { ProtocolParamUpdate } from './ProtocolParamUpdate';
@@ -12,7 +16,7 @@ import { ProtocolParamUpdate } from './ProtocolParamUpdate';
  * each genesis delegate can propose a different update.
  */
 export class ProposedProtocolParameterUpdates {
-  #proposedUpdates = new Map<Cardano.GenesisDelegateKeyHash, ProtocolParamUpdate>();
+  #proposedUpdates = new Map<GenesisDelegateKeyHash, ProtocolParamUpdate>();
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -20,7 +24,7 @@ export class ProposedProtocolParameterUpdates {
    *
    * @param proposedUpdates The proposed updates.
    */
-  constructor(proposedUpdates: Map<Cardano.GenesisDelegateKeyHash, ProtocolParamUpdate>) {
+  constructor(proposedUpdates: Map<GenesisDelegateKeyHash, ProtocolParamUpdate>) {
     this.#proposedUpdates = proposedUpdates;
   }
 
@@ -57,7 +61,7 @@ export class ProposedProtocolParameterUpdates {
    */
   static fromCbor(cbor: HexBlob): ProposedProtocolParameterUpdates {
     const reader = new CborReader(cbor);
-    const proposedUpdates = new Map<Cardano.GenesisDelegateKeyHash, ProtocolParamUpdate>();
+    const proposedUpdates = new Map<GenesisDelegateKeyHash, ProtocolParamUpdate>();
 
     reader.readStartMap();
 
@@ -81,8 +85,8 @@ export class ProposedProtocolParameterUpdates {
    *
    * @returns The Core ProposedProtocolParameterUpdates object.
    */
-  toCore(): Cardano.ProposedProtocolParameterUpdates {
-    return new Map<Cardano.GenesisDelegateKeyHash, Cardano.ProtocolParametersUpdate>(
+  toCore(): CardanoProposedProtocolParameterUpdates {
+    return new Map<GenesisDelegateKeyHash, ProtocolParametersUpdate>(
       [...this.#proposedUpdates].map(([key, value]) => [key, value.toCore()])
     );
   }
@@ -92,9 +96,9 @@ export class ProposedProtocolParameterUpdates {
    *
    * @param updates core ProposedProtocolParameterUpdates object.
    */
-  static fromCore(updates: Cardano.ProposedProtocolParameterUpdates) {
+  static fromCore(updates: CardanoProposedProtocolParameterUpdates) {
     return new ProposedProtocolParameterUpdates(
-      new Map<Cardano.GenesisDelegateKeyHash, ProtocolParamUpdate>(
+      new Map<GenesisDelegateKeyHash, ProtocolParamUpdate>(
         [...updates].map(([key, value]) => [key, ProtocolParamUpdate.fromCore(value)])
       )
     );
@@ -115,7 +119,7 @@ export class ProposedProtocolParameterUpdates {
    * @param key The key hash of the genesis delegate proposing the update.
    * @param value The parameters that are being proposed for the update.
    */
-  insert(key: Cardano.GenesisDelegateKeyHash, value: ProtocolParamUpdate): void {
+  insert(key: GenesisDelegateKeyHash, value: ProtocolParamUpdate): void {
     this.#proposedUpdates.set(key, value);
   }
 
@@ -124,7 +128,7 @@ export class ProposedProtocolParameterUpdates {
    *
    * @param key The key hash of the genesis delegate proposing the update.
    */
-  get(key: Cardano.GenesisDelegateKeyHash): ProtocolParamUpdate | undefined {
+  get(key: GenesisDelegateKeyHash): ProtocolParamUpdate | undefined {
     return this.#proposedUpdates.get(key);
   }
 
@@ -133,7 +137,7 @@ export class ProposedProtocolParameterUpdates {
    *
    * @returns The genesis delegate key hashes.
    */
-  keys(): Array<Cardano.GenesisDelegateKeyHash> {
+  keys(): Array<GenesisDelegateKeyHash> {
     return [...this.#proposedUpdates.keys()];
   }
 }

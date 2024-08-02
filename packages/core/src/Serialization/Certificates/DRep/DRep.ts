@@ -1,7 +1,12 @@
-import * as Cardano from '../../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborWriter } from '../../CBOR';
+import { Credential, CredentialType } from '../../../Cardano/Address/Address';
 import { DRepKind } from './DRepKind';
+import {
+  DelegateRepresentative,
+  isDRepAlwaysAbstain,
+  isDRepAlwaysNoConfidence
+} from '../../../Cardano/types/Governance';
 import { HexBlob } from '@cardano-sdk/util';
 
 /**
@@ -17,7 +22,7 @@ import { HexBlob } from '@cardano-sdk/util';
  * - A native or Plutus script
  */
 export class DRep {
-  #credential: Cardano.Credential | undefined;
+  #credential: Credential | undefined;
   #kind: DRepKind;
   #originalBytes: HexBlob | undefined = undefined;
 
@@ -27,7 +32,7 @@ export class DRep {
    * @param kind The kind of DRep.
    * @param credential The DRep credential.
    */
-  constructor(kind: DRepKind, credential?: Cardano.Credential) {
+  constructor(kind: DRepKind, credential?: Credential) {
     this.#credential = credential;
     this.#kind = kind;
   }
@@ -98,7 +103,7 @@ export class DRep {
    *
    * @returns The Core DelegateRepresentative object.
    */
-  toCore(): Cardano.DelegateRepresentative {
+  toCore(): DelegateRepresentative {
     if (this.#kind === DRepKind.KeyHash || this.#kind === DRepKind.ScriptHash) return this.#credential!;
 
     if (this.#kind === DRepKind.Abstain)
@@ -116,11 +121,11 @@ export class DRep {
    *
    * @param deleg core DelegateRepresentative object.
    */
-  static fromCore(deleg: Cardano.DelegateRepresentative) {
-    if (Cardano.isDRepAlwaysAbstain(deleg)) return DRep.newAlwaysAbstain();
-    if (Cardano.isDRepAlwaysNoConfidence(deleg)) return DRep.newAlwaysNoConfidence();
+  static fromCore(deleg: DelegateRepresentative) {
+    if (isDRepAlwaysAbstain(deleg)) return DRep.newAlwaysAbstain();
+    if (isDRepAlwaysNoConfidence(deleg)) return DRep.newAlwaysNoConfidence();
 
-    if (deleg.type === Cardano.CredentialType.KeyHash)
+    if (deleg.type === CredentialType.KeyHash)
       return DRep.newKeyHash(deleg.hash as unknown as Crypto.Ed25519KeyHashHex);
 
     return DRep.newScriptHash(deleg.hash);
@@ -135,7 +140,7 @@ export class DRep {
   static newKeyHash(keyHash: Crypto.Ed25519KeyHashHex): DRep {
     return new DRep(DRepKind.KeyHash, {
       hash: keyHash as unknown as Crypto.Hash28ByteBase16,
-      type: Cardano.CredentialType.KeyHash
+      type: CredentialType.KeyHash
     });
   }
 
@@ -148,7 +153,7 @@ export class DRep {
   static newScriptHash(scriptHash: Crypto.Hash28ByteBase16): DRep {
     return new DRep(DRepKind.ScriptHash, {
       hash: scriptHash as unknown as Crypto.Hash28ByteBase16,
-      type: Cardano.CredentialType.ScriptHash
+      type: CredentialType.ScriptHash
     });
   }
 

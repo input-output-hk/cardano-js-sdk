@@ -1,4 +1,4 @@
-import * as Cardano from '../../Cardano';
+import { GovernanceActionId as CardanoGovernanceActionId, TransactionId } from '../../Cardano/types';
 import { CborReader, CborWriter } from '../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
@@ -10,7 +10,7 @@ const EMBEDDED_GROUP_SIZE = 2;
  * the transaction body that points to it.
  */
 export class GovernanceActionId {
-  #id: Cardano.TransactionId;
+  #id: TransactionId;
   #index: bigint;
   #originalBytes: HexBlob | undefined = undefined;
 
@@ -20,7 +20,7 @@ export class GovernanceActionId {
    * @param id transaction hash that created it this governance action.
    * @param index index within the transaction body that points to it.
    */
-  constructor(id: Cardano.TransactionId, index: bigint) {
+  constructor(id: TransactionId, index: bigint) {
     this.#id = id;
     this.#index = index;
   }
@@ -66,7 +66,7 @@ export class GovernanceActionId {
     const txId = reader.readByteString();
     const index = reader.readInt();
 
-    const input = new GovernanceActionId(HexBlob.fromBytes(txId) as unknown as Cardano.TransactionId, index);
+    const input = new GovernanceActionId(HexBlob.fromBytes(txId) as unknown as TransactionId, index);
     input.#originalBytes = cbor;
 
     return input;
@@ -77,7 +77,7 @@ export class GovernanceActionId {
    *
    * @returns The Core GovernanceActionId object.
    */
-  toCore(): Cardano.GovernanceActionId {
+  toCore(): CardanoGovernanceActionId {
     return {
       actionIndex: Number(this.#index),
       id: this.#id
@@ -89,7 +89,7 @@ export class GovernanceActionId {
    *
    * @param coreGovernanceActionId The core GovernanceActionId object.
    */
-  static fromCore(coreGovernanceActionId: Cardano.GovernanceActionId): GovernanceActionId {
+  static fromCore(coreGovernanceActionId: CardanoGovernanceActionId): GovernanceActionId {
     return new GovernanceActionId(coreGovernanceActionId.id, BigInt(coreGovernanceActionId.actionIndex));
   }
 
@@ -100,7 +100,7 @@ export class GovernanceActionId {
    * @returns The identifier of the previous transaction where the UTxO being
    * spent was created.
    */
-  transactionId(): Cardano.TransactionId {
+  transactionId(): TransactionId {
     return this.#id;
   }
 
@@ -110,7 +110,7 @@ export class GovernanceActionId {
    *
    * @param id The identifier of the previous transaction.
    */
-  setTransactionId(id: Cardano.TransactionId) {
+  setTransactionId(id: TransactionId) {
     this.#id = id;
     this.#originalBytes = undefined;
   }

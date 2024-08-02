@@ -1,6 +1,6 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { Base64Blob, HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
+import { BootstrapWitness as CardanoBootstrapWitness } from '../../Cardano/types/Transaction';
 import { CborReader, CborWriter } from '../CBOR';
 import { hexToBytes } from '../../util/misc';
 
@@ -107,7 +107,7 @@ export class BootstrapWitness {
    *
    * @returns The core BootstrapWitness.
    */
-  toCore(): Cardano.BootstrapWitness {
+  toCore(): CardanoBootstrapWitness {
     return {
       addressAttributes: Base64Blob.fromBytes(hexToBytes(this.#attributes)),
       chainCode: this.#chainCode,
@@ -121,7 +121,7 @@ export class BootstrapWitness {
    *
    * @param core A core BootstrapWitness object.
    */
-  static fromCore(core: Cardano.BootstrapWitness) {
+  static fromCore(core: CardanoBootstrapWitness) {
     // REMARK: there is a quirk with our BootstrapWitness core type related to Ogmios, some fields are mark as optional,
     // however all fields are required. See https://github.com/CardanoSolutions/ogmios/discussions/285#discussioncomment-4271726.
     // If chainCode is not present or is not the right size we will throw.

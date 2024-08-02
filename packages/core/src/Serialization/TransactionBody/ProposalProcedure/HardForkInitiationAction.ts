@@ -1,4 +1,7 @@
-import * as Cardano from '../../../Cardano';
+import {
+  HardForkInitiationAction as CardanoHardForkInitiationAction,
+  GovernanceActionType
+} from '../../../Cardano/types/Governance';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { GovernanceActionId } from '../../Common/GovernanceActionId';
 import { GovernanceActionKind } from './GovernanceActionKind';
@@ -90,9 +93,9 @@ export class HardForkInitiationAction {
    *
    * @returns The Core HardForkInitiationAction object.
    */
-  toCore(): Cardano.HardForkInitiationAction {
+  toCore(): CardanoHardForkInitiationAction {
     return {
-      __typename: Cardano.GovernanceActionType.hard_fork_initiation_action,
+      __typename: GovernanceActionType.hard_fork_initiation_action,
       governanceActionId: this.#govActionId ? this.#govActionId.toCore() : null,
       protocolVersion: this.#protocolVersion.toCore()
     };
@@ -103,7 +106,7 @@ export class HardForkInitiationAction {
    *
    * @param hardForkInitiationAction core HardForkInitiationAction object.
    */
-  static fromCore(hardForkInitiationAction: Cardano.HardForkInitiationAction) {
+  static fromCore(hardForkInitiationAction: CardanoHardForkInitiationAction) {
     return new HardForkInitiationAction(
       ProtocolVersion.fromCore(hardForkInitiationAction.protocolVersion),
       hardForkInitiationAction.governanceActionId !== null

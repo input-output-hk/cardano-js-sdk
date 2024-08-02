@@ -1,4 +1,4 @@
-import { TokenMap } from '../../Cardano';
+import { TokenMap } from '../../Cardano/types/Value';
 
 /**
  * Remove all negative quantities from a TokenMap.

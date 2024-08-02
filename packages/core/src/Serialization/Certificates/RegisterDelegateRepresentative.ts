@@ -1,9 +1,9 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { Anchor } from '../Common';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { CertificateKind } from './CertificateKind';
-import { CertificateType } from '../../Cardano';
+import { CertificateType, Lovelace, RegisterDelegateRepresentativeCertificate } from '../../Cardano/types';
+import { Credential, CredentialType } from '../../Cardano/Address/Address';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { hexToBytes } from '../../util/misc';
 
@@ -17,8 +17,8 @@ const EMBEDDED_GROUP_SIZE = 2;
  * This certificate register a stake key as a DRep.
  */
 export class RegisterDelegateRepresentative {
-  #drepCredential: Cardano.Credential;
-  #deposit: Cardano.Lovelace;
+  #drepCredential: Credential;
+  #deposit: Lovelace;
   #anchor: Anchor | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
@@ -29,7 +29,7 @@ export class RegisterDelegateRepresentative {
    * @param deposit The deposit.
    * @param anchor The anchor.
    */
-  constructor(drepCredential: Cardano.Credential, deposit: Cardano.Lovelace, anchor?: Anchor) {
+  constructor(drepCredential: Credential, deposit: Lovelace, anchor?: Anchor) {
     this.#drepCredential = drepCredential;
     this.#deposit = deposit;
     this.#anchor = anchor;
@@ -100,7 +100,7 @@ export class RegisterDelegateRepresentative {
         `Expected an array of ${EMBEDDED_GROUP_SIZE} elements, but got an array of ${length} elements`
       );
 
-    const type = Number(reader.readInt()) as Cardano.CredentialType;
+    const type = Number(reader.readInt()) as CredentialType;
     const hash = Crypto.Hash28ByteBase16(HexBlob.fromBytes(reader.readByteString()));
 
     reader.readEndArray();
@@ -127,7 +127,7 @@ export class RegisterDelegateRepresentative {
    *
    * @returns The Core RegisterDelegateRepresentativeCertificate object.
    */
-  toCore(): Cardano.RegisterDelegateRepresentativeCertificate {
+  toCore(): RegisterDelegateRepresentativeCertificate {
     return {
       __typename: CertificateType.RegisterDelegateRepresentative,
       anchor: this.#anchor ? this.#anchor.toCore() : null,
@@ -141,7 +141,7 @@ export class RegisterDelegateRepresentative {
    *
    * @param cert core RegisterDelegateRepresentativeCertificate object.
    */
-  static fromCore(cert: Cardano.RegisterDelegateRepresentativeCertificate) {
+  static fromCore(cert: RegisterDelegateRepresentativeCertificate) {
     return new RegisterDelegateRepresentative(
       cert.dRepCredential,
       cert.deposit,
@@ -154,7 +154,7 @@ export class RegisterDelegateRepresentative {
    *
    * @returns The DRep credential.
    */
-  credential(): Cardano.Credential {
+  credential(): Credential {
     return this.#drepCredential;
   }
 
@@ -163,7 +163,7 @@ export class RegisterDelegateRepresentative {
    *
    * @returns The deposit.
    */
-  deposit(): Cardano.Lovelace {
+  deposit(): Lovelace {
     return this.#deposit;
   }
 

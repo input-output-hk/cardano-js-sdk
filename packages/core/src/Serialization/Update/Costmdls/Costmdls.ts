@@ -1,11 +1,11 @@
-import * as Cardano from '../../../Cardano';
+import { CostModel as CardanoCostModel, CostModels, PlutusLanguageVersion } from '../../../Cardano/types';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { CostModel } from './CostModel';
 import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
 
 /** Map of PlutusLanguageVersion to CostModel. */
 export class Costmdls {
-  #models: Map<Cardano.PlutusLanguageVersion, CostModel>;
+  #models: Map<PlutusLanguageVersion, CostModel>;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -13,7 +13,7 @@ export class Costmdls {
    *
    * @param models The cost models.
    */
-  constructor(models: Map<Cardano.PlutusLanguageVersion, CostModel> = new Map()) {
+  constructor(models: Map<PlutusLanguageVersion, CostModel> = new Map()) {
     this.#models = models;
   }
 
@@ -60,7 +60,7 @@ export class Costmdls {
 
     reader.readStartMap();
 
-    const models = new Map<Cardano.PlutusLanguageVersion, CostModel>();
+    const models = new Map<PlutusLanguageVersion, CostModel>();
     while (reader.peekState() !== CborReaderState.EndMap) {
       // Read key
       const language = Number(reader.readInt());
@@ -91,8 +91,8 @@ export class Costmdls {
    *
    * @returns The Core CostModels object.
    */
-  toCore(): Cardano.CostModels {
-    const models = new Map<Cardano.PlutusLanguageVersion, Cardano.CostModel>();
+  toCore(): CostModels {
+    const models = new Map<PlutusLanguageVersion, CardanoCostModel>();
 
     for (const [key, value] of this.#models) {
       models.set(key, value.costs());
@@ -106,8 +106,8 @@ export class Costmdls {
    *
    * @param costModels core CostModels object.
    */
-  static fromCore(costModels: Cardano.CostModels) {
-    const models = new Map<Cardano.PlutusLanguageVersion, CostModel>();
+  static fromCore(costModels: CostModels) {
+    const models = new Map<PlutusLanguageVersion, CostModel>();
 
     for (const [key, value] of costModels) {
       models.set(key, new CostModel(key, value));
@@ -142,7 +142,7 @@ export class Costmdls {
    * @returns The element associated with the specified key, or undefined if the key
    * can't be found in the Map object.
    */
-  get(key: Cardano.PlutusLanguageVersion): CostModel | undefined {
+  get(key: PlutusLanguageVersion): CostModel | undefined {
     return this.#models.get(key);
   }
 
@@ -151,7 +151,7 @@ export class Costmdls {
    *
    * @returns The list of keys present in the Costmdls map.
    */
-  keys(): Array<Cardano.PlutusLanguageVersion> {
+  keys(): Array<PlutusLanguageVersion> {
     return [...this.#models.keys()];
   }
 
@@ -168,8 +168,8 @@ export class Costmdls {
         // The key of Plutus V1 cost models was encoded as a byte array of one byte, this should
         // alter the position of this entry in the map when we do the canonical sorting, so we are going to
         // account for that here.
-        const lhs = a[0] === Cardano.PlutusLanguageVersion.V1 ? 0x41 : a[0];
-        const rhs = b[0] === Cardano.PlutusLanguageVersion.V1 ? 0x41 : b[0];
+        const lhs = a[0] === PlutusLanguageVersion.V1 ? 0x41 : a[0];
+        const rhs = b[0] === PlutusLanguageVersion.V1 ? 0x41 : b[0];
 
         return lhs > rhs ? 1 : -1;
       })
@@ -178,7 +178,7 @@ export class Costmdls {
     encodedLanguageViews.writeStartMap(sortedCanonically.size);
     for (const [key, value] of sortedCanonically) {
       switch (key) {
-        case Cardano.PlutusLanguageVersion.V1: {
+        case PlutusLanguageVersion.V1: {
           // For PlutusV1 (language id 0), the language view is the following:
           //   * the value of costmdls map at key 0 is encoded as an indefinite length
           //     list and the result is encoded as a bytestring. (our apologies)
@@ -200,8 +200,8 @@ export class Costmdls {
           encodedLanguageViews.writeByteString(innerCbor);
           break;
         }
-        case Cardano.PlutusLanguageVersion.V2:
-        case Cardano.PlutusLanguageVersion.V3:
+        case PlutusLanguageVersion.V2:
+        case PlutusLanguageVersion.V3:
           // For PlutusV2&V3 (language id 1&2), the language view is the following:
           //    * the value of costmdls map is encoded as a definite length list.
           encodedLanguageViews.writeInt(key);

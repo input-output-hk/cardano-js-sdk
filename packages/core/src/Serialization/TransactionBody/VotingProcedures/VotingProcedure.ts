@@ -1,8 +1,7 @@
-import * as Cardano from '../../../Cardano';
 import { Anchor } from '../../Common/Anchor';
+import { VotingProcedure as CardanoVotingProcedure, Vote } from '../../../Cardano/types/Governance';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { HexBlob } from '@cardano-sdk/util';
-import { Vote } from '../../../Cardano';
 import { hexToBytes } from '../../../util/misc';
 
 const EMBEDDED_GROUP_SIZE = 2;
@@ -82,7 +81,7 @@ export class VotingProcedure {
    *
    * @returns The Core VotingProcedure object.
    */
-  toCore(): Cardano.VotingProcedure {
+  toCore(): CardanoVotingProcedure {
     return {
       anchor: this.#anchor ? this.#anchor.toCore() : null,
       vote: this.#vote
@@ -94,7 +93,7 @@ export class VotingProcedure {
    *
    * @param votingProcedure The core VotingProcedure object.
    */
-  static fromCore(votingProcedure: Cardano.VotingProcedure): VotingProcedure {
+  static fromCore(votingProcedure: CardanoVotingProcedure): VotingProcedure {
     return new VotingProcedure(
       votingProcedure.vote,
       votingProcedure.anchor ? Anchor.fromCore(votingProcedure.anchor) : undefined

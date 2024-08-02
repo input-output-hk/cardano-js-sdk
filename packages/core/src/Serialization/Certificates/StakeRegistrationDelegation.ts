@@ -1,17 +1,17 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborWriter } from '../CBOR';
 import { CertificateKind } from './CertificateKind';
-import { CertificateType } from '../../Cardano';
+import { CertificateType, Lovelace, PoolId, StakeRegistrationDelegationCertificate } from '../../Cardano/types';
+import { Credential, CredentialType } from '../../Cardano/Address/Address';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
 /** This certificate Register the stake key and delegate with a single certificate to a stake pool. */
 export class StakeRegistrationDelegation {
-  #credential: Cardano.Credential;
+  #credential: Credential;
   #poolKeyHash: Crypto.Ed25519KeyHashHex;
-  #deposit: Cardano.Lovelace;
+  #deposit: Lovelace;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -22,7 +22,7 @@ export class StakeRegistrationDelegation {
    * the protocol parameters..
    * @param poolKeyHash The pool key hash.
    */
-  constructor(stakeCredential: Cardano.Credential, deposit: Cardano.Lovelace, poolKeyHash: Crypto.Ed25519KeyHashHex) {
+  constructor(stakeCredential: Credential, deposit: Lovelace, poolKeyHash: Crypto.Ed25519KeyHashHex) {
     this.#credential = stakeCredential;
     this.#deposit = deposit;
     this.#poolKeyHash = poolKeyHash;
@@ -89,7 +89,7 @@ export class StakeRegistrationDelegation {
         `Expected an array of ${EMBEDDED_GROUP_SIZE} elements, but got an array of ${length} elements`
       );
 
-    const type = Number(reader.readInt()) as Cardano.CredentialType;
+    const type = Number(reader.readInt()) as CredentialType;
     const hash = Crypto.Hash28ByteBase16(HexBlob.fromBytes(reader.readByteString()));
 
     reader.readEndArray();
@@ -110,11 +110,11 @@ export class StakeRegistrationDelegation {
    *
    * @returns The Core StakeRegistrationDelegationCertificate object.
    */
-  toCore(): Cardano.StakeRegistrationDelegationCertificate {
+  toCore(): StakeRegistrationDelegationCertificate {
     return {
       __typename: CertificateType.StakeRegistrationDelegation,
       deposit: this.#deposit,
-      poolId: Cardano.PoolId.fromKeyHash(this.#poolKeyHash),
+      poolId: PoolId.fromKeyHash(this.#poolKeyHash),
       stakeCredential: this.#credential
     };
   }
@@ -124,12 +124,8 @@ export class StakeRegistrationDelegation {
    *
    * @param deleg core StakeRegistrationDelegationCertificate object.
    */
-  static fromCore(deleg: Cardano.StakeRegistrationDelegationCertificate) {
-    return new StakeRegistrationDelegation(
-      deleg.stakeCredential,
-      deleg.deposit,
-      Cardano.PoolId.toKeyHash(deleg.poolId)
-    );
+  static fromCore(deleg: StakeRegistrationDelegationCertificate) {
+    return new StakeRegistrationDelegation(deleg.stakeCredential, deleg.deposit, PoolId.toKeyHash(deleg.poolId));
   }
 
   /**
@@ -137,7 +133,7 @@ export class StakeRegistrationDelegation {
    *
    * @returns The stake credential.
    */
-  stakeCredential(): Cardano.Credential {
+  stakeCredential(): Credential {
     return this.#credential;
   }
 
@@ -146,7 +142,7 @@ export class StakeRegistrationDelegation {
    *
    * @returns The deposit.
    */
-  deposit(): Cardano.Lovelace {
+  deposit(): Lovelace {
     return this.#deposit;
   }
 

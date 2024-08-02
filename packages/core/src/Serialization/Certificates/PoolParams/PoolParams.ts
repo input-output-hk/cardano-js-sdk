@@ -1,9 +1,10 @@
 /* eslint-disable max-params */
-import * as Cardano from '../../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
+import { Address, RewardAccount, RewardAddress, createRewardAccount } from '../../../Cardano/Address';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { CborSet, Hash } from '../../Common';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import { Lovelace, PoolId, PoolParameters, VrfVkHex } from '../../../Cardano/types';
 import { PoolMetadata } from './PoolMetadata';
 import { Relay } from './Relay';
 import { UnitInterval } from '../../Common/UnitInterval';
@@ -17,11 +18,11 @@ type PoolOwners = CborSet<Crypto.Ed25519KeyHashHex, Hash<Crypto.Ed25519KeyHashHe
  */
 export class PoolParams {
   #operator: Crypto.Ed25519KeyHashHex;
-  #vrfKeyHash: Cardano.VrfVkHex;
-  #pledge: Cardano.Lovelace;
-  #cost: Cardano.Lovelace;
+  #vrfKeyHash: VrfVkHex;
+  #pledge: Lovelace;
+  #cost: Lovelace;
   #margin: UnitInterval;
-  #rewardAccount: Cardano.RewardAddress;
+  #rewardAccount: RewardAddress;
   #poolOwners: PoolOwners;
   #relays: Array<Relay>;
   #poolMetadata?: PoolMetadata;
@@ -44,11 +45,11 @@ export class PoolParams {
    */
   constructor(
     operator: Crypto.Ed25519KeyHashHex,
-    vrfKeyHash: Cardano.VrfVkHex,
-    pledge: Cardano.Lovelace,
-    cost: Cardano.Lovelace,
+    vrfKeyHash: VrfVkHex,
+    pledge: Lovelace,
+    cost: Lovelace,
     margin: UnitInterval,
-    rewardAccount: Cardano.RewardAddress,
+    rewardAccount: RewardAddress,
     poolOwners: PoolOwners,
     relays: Array<Relay>,
     poolMetadata?: PoolMetadata
@@ -152,11 +153,11 @@ export class PoolParams {
    */
   static fromFlattenedCbor(reader: CborReader): PoolParams {
     const operator = Crypto.Ed25519KeyHashHex(HexBlob.fromBytes(reader.readByteString()));
-    const vrfKeyHash = Cardano.VrfVkHex(HexBlob.fromBytes(reader.readByteString()));
+    const vrfKeyHash = VrfVkHex(HexBlob.fromBytes(reader.readByteString()));
     const pledge = reader.readInt();
     const cost = reader.readInt();
     const margin = UnitInterval.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
-    const rewardAccount = Cardano.Address.fromBytes(HexBlob.fromBytes(reader.readByteString())).asReward()!;
+    const rewardAccount = Address.fromBytes(HexBlob.fromBytes(reader.readByteString())).asReward()!;
     const relays = new Array<Relay>();
     let poolMetadata;
 
@@ -188,20 +189,20 @@ export class PoolParams {
    *
    * @returns The Core PoolParameters object.
    */
-  toCore(): Cardano.PoolParameters {
+  toCore(): PoolParameters {
     const rewardAccountAddress = this.#rewardAccount.toAddress();
 
     return {
       cost: this.#cost,
-      id: Cardano.PoolId.fromKeyHash(this.#operator),
+      id: PoolId.fromKeyHash(this.#operator),
       margin: this.#margin.toCore(),
       metadataJson: this.#poolMetadata?.toCore(),
       owners: this.#poolOwners
         .toCore()
-        .map((keyHash) => Cardano.createRewardAccount(keyHash, rewardAccountAddress.getNetworkId())),
+        .map((keyHash) => createRewardAccount(keyHash, rewardAccountAddress.getNetworkId())),
       pledge: this.#pledge,
       relays: this.#relays.map((relay) => relay.toCore()),
-      rewardAccount: this.#rewardAccount.toAddress().toBech32() as Cardano.RewardAccount,
+      rewardAccount: this.#rewardAccount.toAddress().toBech32() as RewardAccount,
       vrf: this.#vrfKeyHash
     };
   }
@@ -211,17 +212,17 @@ export class PoolParams {
    *
    * @param params core PoolParameters object.
    */
-  static fromCore(params: Cardano.PoolParameters) {
+  static fromCore(params: PoolParameters) {
     return new PoolParams(
-      Cardano.PoolId.toKeyHash(params.id),
+      PoolId.toKeyHash(params.id),
       params.vrf,
       params.pledge,
       params.cost,
       UnitInterval.fromCore(params.margin),
-      Cardano.Address.fromBech32(params.rewardAccount).asReward()!,
+      Address.fromBech32(params.rewardAccount).asReward()!,
       CborSet.fromCore(
         params.owners.map((owner) =>
-          Crypto.Ed25519KeyHashHex(Cardano.Address.fromBech32(owner).asReward()!.getPaymentCredential()!.hash)
+          Crypto.Ed25519KeyHashHex(Address.fromBech32(owner).asReward()!.getPaymentCredential()!.hash)
         ),
         Hash.fromCore
       ),
@@ -255,7 +256,7 @@ export class PoolParams {
    *
    * @returns The pool Verifiable Random Function key hash.
    */
-  vrfKeyHash(): Cardano.VrfVkHex {
+  vrfKeyHash(): VrfVkHex {
     return this.#vrfKeyHash;
   }
 
@@ -265,7 +266,7 @@ export class PoolParams {
    *
    * @param vrfKeyHash The pool Verifiable Random Function key hash.
    */
-  setVrfKeyHash(vrfKeyHash: Cardano.VrfVkHex): void {
+  setVrfKeyHash(vrfKeyHash: VrfVkHex): void {
     this.#vrfKeyHash = vrfKeyHash;
     this.#originalBytes = undefined;
   }
@@ -275,7 +276,7 @@ export class PoolParams {
    *
    * @returns The amount of ADA pledged by the pool operator.
    */
-  pledge(): Cardano.Lovelace {
+  pledge(): Lovelace {
     return this.#pledge;
   }
 
@@ -284,7 +285,7 @@ export class PoolParams {
    *
    * @param pledge The amount of ADA pledged by the pool operator.
    */
-  setPledge(pledge: Cardano.Lovelace): void {
+  setPledge(pledge: Lovelace): void {
     this.#pledge = pledge;
     this.#originalBytes = undefined;
   }
@@ -295,7 +296,7 @@ export class PoolParams {
    *
    * @returns The pool fixed cost.
    */
-  cost(): Cardano.Lovelace {
+  cost(): Lovelace {
     return this.#cost;
   }
 
@@ -305,7 +306,7 @@ export class PoolParams {
    *
    * @param cost The pool fixed cost.
    */
-  setCost(cost: Cardano.Lovelace): void {
+  setCost(cost: Lovelace): void {
     this.#cost = cost;
     this.#originalBytes = undefined;
   }
@@ -336,7 +337,7 @@ export class PoolParams {
    *
    * @returns The pool's rewards address.
    */
-  rewardAccount(): Cardano.RewardAddress {
+  rewardAccount(): RewardAddress {
     return this.#rewardAccount;
   }
 
@@ -345,7 +346,7 @@ export class PoolParams {
    *
    * @param rewardAccount The pool's rewards address.
    */
-  setRewardAccount(rewardAccount: Cardano.RewardAddress): void {
+  setRewardAccount(rewardAccount: RewardAddress): void {
     this.#rewardAccount = rewardAccount;
     this.#originalBytes = undefined;
   }

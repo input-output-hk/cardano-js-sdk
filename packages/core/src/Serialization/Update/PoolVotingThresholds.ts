@@ -1,4 +1,4 @@
-import * as Cardano from '../../Cardano';
+import { PoolVotingThresholds as CardanoPoolVotingThresholds } from '../../Cardano/types/ProtocolParameters';
 import { CborReader, CborWriter } from '../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { UnitInterval } from '../Common';
@@ -118,7 +118,7 @@ export class PoolVotingThresholds {
    *
    * @returns The Core Prices object.
    */
-  toCore(): Cardano.PoolVotingThresholds {
+  toCore(): CardanoPoolVotingThresholds {
     return {
       committeeNoConfidence: this.#committeeNoConfidence.toCore(),
       committeeNormal: this.#committeeNormal.toCore(),
@@ -133,7 +133,7 @@ export class PoolVotingThresholds {
    *
    * @param core core PoolVotingThresholdsSHOLDS_SIZE object.
    */
-  static fromCore(core: Cardano.PoolVotingThresholds) {
+  static fromCore(core: CardanoPoolVotingThresholds) {
     return new PoolVotingThresholds(
       UnitInterval.fromCore(core.motionNoConfidence),
       UnitInterval.fromCore(core.committeeNormal),

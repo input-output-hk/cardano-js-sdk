@@ -1,4 +1,4 @@
-import * as Cardano from '../../Cardano';
+import { Update as CardanoUpdate, EpochNo } from '../../Cardano/types';
 import { CborReader, CborWriter } from '../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { ProposedProtocolParameterUpdates } from './ProposedProtocolParameterUpdates';
@@ -11,7 +11,7 @@ const UPDATE_ARRAY_SIZE = 2;
  * accordingly in the specified epoch.
  */
 export class Update {
-  #epoch: Cardano.EpochNo;
+  #epoch: EpochNo;
   #updates: ProposedProtocolParameterUpdates;
   #originalBytes: HexBlob | undefined = undefined;
 
@@ -22,7 +22,7 @@ export class Update {
    * like transaction fees, block size limits, staking key deposit amounts, and more.
    * @param epoch Specifies the epoch in which the proposal will come into effect if accepted.
    */
-  constructor(updates: ProposedProtocolParameterUpdates, epoch: Cardano.EpochNo) {
+  constructor(updates: ProposedProtocolParameterUpdates, epoch: EpochNo) {
     this.#epoch = epoch;
     this.#updates = updates;
   }
@@ -70,7 +70,7 @@ export class Update {
 
     reader.readEndArray();
 
-    const exUnit = new Update(updates, Cardano.EpochNo(Number(epoch)));
+    const exUnit = new Update(updates, EpochNo(Number(epoch)));
     exUnit.#originalBytes = cbor;
 
     return exUnit;
@@ -81,7 +81,7 @@ export class Update {
    *
    * @returns The Core Prices object.
    */
-  toCore(): Cardano.Update {
+  toCore(): CardanoUpdate {
     return {
       epoch: this.#epoch,
       proposedProtocolParameterUpdates: this.#updates.toCore()
@@ -93,7 +93,7 @@ export class Update {
    *
    * @param update core Update object.
    */
-  static fromCore(update: Cardano.Update) {
+  static fromCore(update: CardanoUpdate) {
     const epoch = update.epoch;
     const updates = ProposedProtocolParameterUpdates.fromCore(update.proposedProtocolParameterUpdates);
 
@@ -105,7 +105,7 @@ export class Update {
    *
    * @returns the Epoch when the proposal will come into effect.
    */
-  epoch(): Cardano.EpochNo {
+  epoch(): EpochNo {
     return this.#epoch;
   }
 
@@ -114,7 +114,7 @@ export class Update {
    *
    * @param epoch the Epoch when the proposal will come into effect.
    */
-  setEpoch(epoch: Cardano.EpochNo): void {
+  setEpoch(epoch: EpochNo): void {
     this.#epoch = epoch;
     this.#originalBytes = undefined;
   }

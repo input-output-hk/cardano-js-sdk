@@ -1,6 +1,6 @@
-import * as Cardano from '../../Cardano';
 import { CborReader, CborWriter } from '../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import { TransactionId, TxIn } from '../../Cardano/types';
 
 const TRANSACTION_INPUT_ARRAY_SIZE = 2;
 
@@ -9,7 +9,7 @@ const TRANSACTION_INPUT_ARRAY_SIZE = 2;
  * transaction, which the current transaction intends to spend.
  */
 export class TransactionInput {
-  #id: Cardano.TransactionId;
+  #id: TransactionId;
   #index: bigint;
   #originalBytes: HexBlob | undefined = undefined;
 
@@ -19,7 +19,7 @@ export class TransactionInput {
    * @param id Points to the transaction where the UTxO being spent was created.
    * @param index Indicates which specific output of the referenced transaction is being spent.
    */
-  constructor(id: Cardano.TransactionId, index: bigint) {
+  constructor(id: TransactionId, index: bigint) {
     this.#id = id;
     this.#index = index;
   }
@@ -64,7 +64,7 @@ export class TransactionInput {
     const txId = reader.readByteString();
     const index = reader.readInt();
 
-    const input = new TransactionInput(HexBlob.fromBytes(txId) as unknown as Cardano.TransactionId, index);
+    const input = new TransactionInput(HexBlob.fromBytes(txId) as unknown as TransactionId, index);
     input.#originalBytes = cbor;
 
     return input;
@@ -75,7 +75,7 @@ export class TransactionInput {
    *
    * @returns The Core TransactionInput object.
    */
-  toCore(): Cardano.TxIn {
+  toCore(): TxIn {
     return {
       index: Number(this.#index),
       txId: this.#id
@@ -87,7 +87,7 @@ export class TransactionInput {
    *
    * @param coreTransactionInput The core TransactionInput object.
    */
-  static fromCore(coreTransactionInput: Cardano.TxIn): TransactionInput {
+  static fromCore(coreTransactionInput: TxIn): TransactionInput {
     return new TransactionInput(coreTransactionInput.txId, BigInt(coreTransactionInput.index));
   }
 
@@ -98,7 +98,7 @@ export class TransactionInput {
    * @returns The identifier of the previous transaction where the UTxO being
    * spent was created.
    */
-  transactionId(): Cardano.TransactionId {
+  transactionId(): TransactionId {
     return this.#id;
   }
 
@@ -108,7 +108,7 @@ export class TransactionInput {
    *
    * @param id The identifier of the previous transaction.
    */
-  setTransactionId(id: Cardano.TransactionId) {
+  setTransactionId(id: TransactionId) {
     this.#id = id;
     this.#originalBytes = undefined;
   }

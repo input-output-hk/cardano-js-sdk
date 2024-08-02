@@ -1,5 +1,5 @@
-import * as Cardano from '../../Cardano';
 import { CustomError } from 'ts-custom-error';
+import { Slot, TxIn, ValidityInterval, Value, Withdrawal } from '../../Cardano/types';
 
 export enum GeneralCardanoNodeErrorCode {
   ServerNotReady = 503,
@@ -115,17 +115,17 @@ export class TxSubmissionError<Data = unknown> extends CardanoNodeError<TxSubmis
 export class StateQueryError<Data = unknown> extends CardanoNodeError<StateQueryErrorCode, Data> {}
 
 export type OutsideOfValidityIntervalData = {
-  validityInterval: Cardano.ValidityInterval;
-  currentSlot: Cardano.Slot;
+  validityInterval: ValidityInterval;
+  currentSlot: Slot;
 };
 export type ValueNotConservedData = {
-  consumed: Cardano.Value;
-  produced: Cardano.Value;
+  consumed: Value;
+  produced: Value;
 };
 export type IncompleteWithdrawalsData = {
-  withdrawals: Cardano.Withdrawal[];
+  withdrawals: Withdrawal[];
 };
 
 export type UnknownOutputReferencesData = {
-  unknownOutputReferences: Cardano.TxIn[];
+  unknownOutputReferences: TxIn[];
 };

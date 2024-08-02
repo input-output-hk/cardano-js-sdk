@@ -1,4 +1,4 @@
-import * as Cardano from '../../../Cardano';
+import { NoConfidence as CardanoNoConfidence, GovernanceActionType } from '../../../Cardano/types/Governance';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { GovernanceActionId } from '../../Common/GovernanceActionId';
 import { GovernanceActionKind } from './GovernanceActionKind';
@@ -86,9 +86,9 @@ export class NoConfidence {
    *
    * @returns The Core NoConfidence object.
    */
-  toCore(): Cardano.NoConfidence {
+  toCore(): CardanoNoConfidence {
     return {
-      __typename: Cardano.GovernanceActionType.no_confidence,
+      __typename: GovernanceActionType.no_confidence,
       governanceActionId: this.#govActionId ? this.#govActionId.toCore() : null
     };
   }
@@ -98,7 +98,7 @@ export class NoConfidence {
    *
    * @param noConfidence core NoConfidence object.
    */
-  static fromCore(noConfidence: Cardano.NoConfidence) {
+  static fromCore(noConfidence: CardanoNoConfidence) {
     return new NoConfidence(
       noConfidence.governanceActionId !== null
         ? GovernanceActionId.fromCore(noConfidence.governanceActionId)

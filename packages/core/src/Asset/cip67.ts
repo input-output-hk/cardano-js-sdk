@@ -1,4 +1,4 @@
-import * as Cardano from '../Cardano';
+import { AssetName } from '../Cardano/types/Asset';
 import { InvalidArgumentError, OpaqueNumber } from '@cardano-sdk/util';
 import crc8 from './crc8';
 
@@ -18,7 +18,7 @@ export const AssetNameLabelNum = {
 
 export interface DecodedAssetName {
   label: AssetNameLabel;
-  content: Cardano.AssetName;
+  content: AssetName;
 }
 
 const assertLabelNumInterval = (labelNum: number) => {
@@ -55,7 +55,7 @@ const assetNameLabelHexToNum = (label: string): AssetNameLabel | null => {
   return AssetNameLabel(Number.parseInt(labelNumHex, 16));
 };
 
-AssetNameLabel.decode = (assetName: Cardano.AssetName): DecodedAssetName | null => {
+AssetNameLabel.decode = (assetName: AssetName): DecodedAssetName | null => {
   const assetNameLabel = assetName.slice(0, ASSET_LABEL_LENGTH);
   const assetNameContent = assetName.slice(ASSET_LABEL_LENGTH);
   const assetNameLabelNum = assetNameLabelHexToNum(assetNameLabel);
@@ -65,15 +65,13 @@ AssetNameLabel.decode = (assetName: Cardano.AssetName): DecodedAssetName | null 
   }
 
   return {
-    content: Cardano.AssetName(assetNameContent),
+    content: AssetName(assetNameContent),
     label: assetNameLabelNum
   };
 };
 
-AssetNameLabel.encode = (assetName: Cardano.AssetName, labelNum: AssetNameLabel): Cardano.AssetName => {
+AssetNameLabel.encode = (assetName: AssetName, labelNum: AssetNameLabel): AssetName => {
   assertLabelNumInterval(labelNum);
   const labelNumHex = labelNum.toString(16).padStart(4, ASSET_LABEL_BRACKET);
-  return Cardano.AssetName(
-    `${ASSET_LABEL_BRACKET}${labelNumHex}${checksum(labelNumHex)}${ASSET_LABEL_BRACKET}${assetName}`
-  );
+  return AssetName(`${ASSET_LABEL_BRACKET}${labelNumHex}${checksum(labelNumHex)}${ASSET_LABEL_BRACKET}${assetName}`);
 };

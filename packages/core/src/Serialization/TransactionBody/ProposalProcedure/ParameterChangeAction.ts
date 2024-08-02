@@ -1,4 +1,7 @@
-import * as Cardano from '../../../Cardano';
+import {
+  ParameterChangeAction as CardanoParameterChangeAction,
+  GovernanceActionType
+} from '../../../Cardano/types/Governance';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { GovernanceActionId } from '../../Common/GovernanceActionId';
 import { GovernanceActionKind } from './GovernanceActionKind';
@@ -108,9 +111,9 @@ export class ParameterChangeAction {
    *
    * @returns The Core ParameterChangeAction object.
    */
-  toCore(): Cardano.ParameterChangeAction {
+  toCore(): CardanoParameterChangeAction {
     return {
-      __typename: Cardano.GovernanceActionType.parameter_change_action,
+      __typename: GovernanceActionType.parameter_change_action,
       governanceActionId: this.#govActionId ? this.#govActionId.toCore() : null,
       policyHash: this.#policyHash ? this.#policyHash : null,
       protocolParamUpdate: this.#protocolParamUpdate.toCore()
@@ -122,7 +125,7 @@ export class ParameterChangeAction {
    *
    * @param parameterChangeAction core ParameterChangeAction object.
    */
-  static fromCore(parameterChangeAction: Cardano.ParameterChangeAction) {
+  static fromCore(parameterChangeAction: CardanoParameterChangeAction) {
     return new ParameterChangeAction(
       ProtocolParamUpdate.fromCore(parameterChangeAction.protocolParamUpdate),
       parameterChangeAction.governanceActionId !== null

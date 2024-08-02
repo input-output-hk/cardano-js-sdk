@@ -1,7 +1,8 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborWriter } from '../CBOR';
 import { CertificateKind } from './CertificateKind';
+import { CertificateType, Lovelace, NewStakeAddressCertificate } from '../../Cardano/types';
+import { Credential, CredentialType } from '../../Cardano/Address/Address';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
 const EMBEDDED_GROUP_SIZE = 2;
@@ -17,8 +18,8 @@ const EMBEDDED_GROUP_SIZE = 2;
  * Remark: Replaces the deprecated `StakeDeregistration` in after Conway era.
  */
 export class Unregistration {
-  #credential: Cardano.Credential;
-  #deposit: Cardano.Lovelace;
+  #credential: Credential;
+  #deposit: Lovelace;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -28,7 +29,7 @@ export class Unregistration {
    * @param deposit Must match the expected deposit amount specified by `ppKeyDepositL` in
    * the protocol parameters.
    */
-  constructor(credential: Cardano.Credential, deposit: Cardano.Lovelace) {
+  constructor(credential: Credential, deposit: Lovelace) {
     this.#credential = credential;
     this.#deposit = deposit;
   }
@@ -92,7 +93,7 @@ export class Unregistration {
         `Expected an array of ${EMBEDDED_GROUP_SIZE} elements, but got an array of ${length} elements`
       );
 
-    const type = Number(reader.readInt()) as Cardano.CredentialType;
+    const type = Number(reader.readInt()) as CredentialType;
     const hash = Crypto.Hash28ByteBase16(HexBlob.fromBytes(reader.readByteString()));
 
     reader.readEndArray();
@@ -112,9 +113,9 @@ export class Unregistration {
    *
    * @returns The Core NewStakeAddressCertificate object.
    */
-  toCore(): Cardano.NewStakeAddressCertificate {
+  toCore(): NewStakeAddressCertificate {
     return {
-      __typename: Cardano.CertificateType.Unregistration,
+      __typename: CertificateType.Unregistration,
       deposit: this.#deposit,
       stakeCredential: this.#credential
     };
@@ -125,7 +126,7 @@ export class Unregistration {
    *
    * @param cert core StakeAddressCertificate object.
    */
-  static fromCore(cert: Cardano.NewStakeAddressCertificate) {
+  static fromCore(cert: NewStakeAddressCertificate) {
     return new Unregistration(cert.stakeCredential, cert.deposit);
   }
 
@@ -134,7 +135,7 @@ export class Unregistration {
    *
    * @returns The stake credential.
    */
-  stakeCredential(): Cardano.Credential {
+  stakeCredential(): Credential {
     return this.#credential;
   }
 
@@ -143,7 +144,7 @@ export class Unregistration {
    *
    * @param credential The stake credential.
    */
-  setStakeCredential(credential: Cardano.Credential): void {
+  setStakeCredential(credential: Credential): void {
     this.#credential = credential;
     this.#originalBytes = undefined;
   }
@@ -153,7 +154,7 @@ export class Unregistration {
    *
    * @returns The stake credential.
    */
-  deposit(): Cardano.Lovelace {
+  deposit(): Lovelace {
     return this.#deposit;
   }
 
@@ -162,7 +163,7 @@ export class Unregistration {
    *
    * @param deposit The deposit.
    */
-  setDeposit(deposit: Cardano.Lovelace): void {
+  setDeposit(deposit: Lovelace): void {
     this.#deposit = deposit;
     this.#originalBytes = undefined;
   }

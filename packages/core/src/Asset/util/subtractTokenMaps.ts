@@ -1,5 +1,5 @@
 /* eslint-disable complexity,sonarjs/cognitive-complexity */
-import * as Cardano from '../../Cardano';
+import { AssetId, TokenMap } from '../../Cardano/types';
 import uniq from 'lodash/uniq.js';
 
 /**
@@ -9,14 +9,11 @@ import uniq from 'lodash/uniq.js';
  * @param rhs the right-hand side of the subtraction operation.
  * @returns The difference between both Cardano.TokenMaps.
  */
-export const subtractMaps = (
-  lhs: Cardano.TokenMap | undefined,
-  rhs: Cardano.TokenMap | undefined
-): Cardano.TokenMap | undefined => {
+export const subtractMaps = (lhs: TokenMap | undefined, rhs: TokenMap | undefined): TokenMap | undefined => {
   if (!rhs) {
     if (!lhs) return undefined;
 
-    const nonEmptyValues = new Map<Cardano.AssetId, bigint>();
+    const nonEmptyValues = new Map<AssetId, bigint>();
 
     for (const [key, value] of lhs.entries()) {
       if (value !== 0n) nonEmptyValues.set(key, value);
@@ -26,7 +23,7 @@ export const subtractMaps = (
   }
 
   if (!lhs) {
-    const negativeValues = new Map<Cardano.AssetId, bigint>();
+    const negativeValues = new Map<AssetId, bigint>();
 
     for (const [key, value] of rhs.entries()) {
       if (value !== 0n) negativeValues.set(key, -value);
@@ -35,8 +32,8 @@ export const subtractMaps = (
     return negativeValues;
   }
 
-  const result = new Map<Cardano.AssetId, bigint>();
-  const intersection = new Array<Cardano.AssetId>();
+  const result = new Map<AssetId, bigint>();
+  const intersection = new Array<AssetId>();
 
   // any element that is present in the lhs and not in the rhs will be added as a positive value
   for (const [key, value] of lhs.entries()) {
@@ -73,7 +70,7 @@ export const subtractMaps = (
 };
 
 /** Subtract asset quantities in order */
-export const subtractTokenMaps = (assets: (Cardano.TokenMap | undefined)[]): Cardano.TokenMap | undefined => {
+export const subtractTokenMaps = (assets: (TokenMap | undefined)[]): TokenMap | undefined => {
   if (!assets || assets.length === 0) return undefined;
 
   return assets.reduce(subtractMaps);

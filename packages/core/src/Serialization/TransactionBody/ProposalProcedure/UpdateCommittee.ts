@@ -1,8 +1,13 @@
 /* eslint-disable max-statements */
-import * as Cardano from '../../../Cardano';
+import { Credential as CardanoCredential } from '../../../Cardano/Address/Address';
+import {
+  UpdateCommittee as CardanoUpdateCommittee,
+  CommitteeMember,
+  EpochNo,
+  GovernanceActionType
+} from '../../../Cardano/types';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { CborSet, Credential, UnitInterval } from '../../Common';
-import { CommitteeMember, GovernanceActionType } from '../../../Cardano';
 import { GovernanceActionId } from '../../Common/GovernanceActionId';
 import { GovernanceActionKind } from './GovernanceActionKind';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
@@ -20,7 +25,7 @@ type CredentialSet = CborSet<ReturnType<Credential['toCore']>, Credential>;
 export class UpdateCommittee {
   #govActionId: GovernanceActionId | undefined;
   #membersToBeRemoved: CredentialSet;
-  #membersToBeAdded: [Cardano.Credential, number][];
+  #membersToBeAdded: [CardanoCredential, number][];
   #newQuorum: UnitInterval;
   #originalBytes: HexBlob | undefined = undefined;
 
@@ -34,7 +39,7 @@ export class UpdateCommittee {
    */
   constructor(
     membersToBeRemoved: CredentialSet,
-    membersToBeAdded: [Cardano.Credential, number][],
+    membersToBeAdded: [CardanoCredential, number][],
     newQuorum: UnitInterval,
     govActionId?: GovernanceActionId
   ) {
@@ -115,7 +120,7 @@ export class UpdateCommittee {
 
     reader.readStartMap();
 
-    const membersToAdd: [Cardano.Credential, number][] = [];
+    const membersToAdd: [CardanoCredential, number][] = [];
     while (reader.peekState() !== CborReaderState.EndMap) {
       if (reader.readStartArray() !== CREDENTIAL_ARRAY_SIZE)
         throw new InvalidArgumentError(
@@ -146,17 +151,17 @@ export class UpdateCommittee {
    *
    * @returns The Core UpdateCommittee object.
    */
-  toCore(): Cardano.UpdateCommittee {
+  toCore(): CardanoUpdateCommittee {
     return {
       __typename: GovernanceActionType.update_committee,
       governanceActionId: this.#govActionId ? this.#govActionId.toCore() : null,
       membersToBeAdded: new Set<CommitteeMember>(
         this.#membersToBeAdded.map((entry) => ({
           coldCredential: entry[CREDENTIAL_INDEX],
-          epoch: Cardano.EpochNo(entry[EPOCH_INDEX])
+          epoch: EpochNo(entry[EPOCH_INDEX])
         }))
       ),
-      membersToBeRemoved: new Set<Cardano.Credential>(this.#membersToBeRemoved.toCore()),
+      membersToBeRemoved: new Set<CardanoCredential>(this.#membersToBeRemoved.toCore()),
       newQuorumThreshold: this.#newQuorum.toCore()
     };
   }
@@ -166,7 +171,7 @@ export class UpdateCommittee {
    *
    * @param updateCommittee core UpdateCommittee object.
    */
-  static fromCore(updateCommittee: Cardano.UpdateCommittee) {
+  static fromCore(updateCommittee: CardanoUpdateCommittee) {
     return new UpdateCommittee(
       CborSet.fromCore([...updateCommittee.membersToBeRemoved], Credential.fromCore),
       [...updateCommittee.membersToBeAdded].map((entry) => [entry.coldCredential, entry.epoch]),
@@ -191,7 +196,7 @@ export class UpdateCommittee {
    *
    * @returns the committee members to be removed.
    */
-  membersToBeRemoved(): Cardano.Credential[] {
+  membersToBeRemoved(): CardanoCredential[] {
     return this.#membersToBeRemoved.toCore();
   }
 
@@ -200,7 +205,7 @@ export class UpdateCommittee {
    *
    * @returns the committee members to be added.
    */
-  membersToBeAdded(): [Cardano.Credential, number][] {
+  membersToBeAdded(): [CardanoCredential, number][] {
     return this.#membersToBeAdded;
   }
 

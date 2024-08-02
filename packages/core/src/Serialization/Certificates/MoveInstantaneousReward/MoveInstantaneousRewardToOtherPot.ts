@@ -1,13 +1,19 @@
-import * as Cardano from '../../../Cardano';
 import { CborReader, CborWriter } from '../../CBOR';
+import {
+  CertificateType,
+  Lovelace,
+  MirCertificate,
+  MirCertificateKind,
+  MirCertificatePot
+} from '../../../Cardano/types';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
 /** This certificate move instantaneous rewards funds between accounting pots. */
 export class MoveInstantaneousRewardToOtherPot {
-  #pot: Cardano.MirCertificatePot;
-  #amount: Cardano.Lovelace;
+  #pot: MirCertificatePot;
+  #amount: Lovelace;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -16,7 +22,7 @@ export class MoveInstantaneousRewardToOtherPot {
    * @param pot Determines where the funds are drawn from.
    * @param amount The amount to be transfer.
    */
-  constructor(pot: Cardano.MirCertificatePot, amount: Cardano.Lovelace) {
+  constructor(pot: MirCertificatePot, amount: Lovelace) {
     this.#pot = pot;
     this.#amount = amount;
   }
@@ -34,7 +40,7 @@ export class MoveInstantaneousRewardToOtherPot {
     // CDDL
     // move_instantaneous_reward = [ 0 / 1, coin ]
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
-    writer.writeInt(this.#pot === Cardano.MirCertificatePot.Reserves ? 0 : 1);
+    writer.writeInt(this.#pot === MirCertificatePot.Reserves ? 0 : 1);
     writer.writeInt(this.#amount);
 
     return writer.encodeAsHex();
@@ -64,7 +70,7 @@ export class MoveInstantaneousRewardToOtherPot {
       throw new InvalidArgumentError('cbor', `Expected a pot value between 0 and 1, but got ${pot}`);
 
     const cert = new MoveInstantaneousRewardToOtherPot(
-      pot === 0 ? Cardano.MirCertificatePot.Reserves : Cardano.MirCertificatePot.Treasury,
+      pot === 0 ? MirCertificatePot.Reserves : MirCertificatePot.Treasury,
       amount
     );
 
@@ -78,10 +84,10 @@ export class MoveInstantaneousRewardToOtherPot {
    *
    * @returns The Core MirCertificate object.
    */
-  toCore(): Cardano.MirCertificate {
+  toCore(): MirCertificate {
     return {
-      __typename: Cardano.CertificateType.MIR,
-      kind: Cardano.MirCertificateKind.ToOtherPot,
+      __typename: CertificateType.MIR,
+      kind: MirCertificateKind.ToOtherPot,
       pot: this.#pot,
       quantity: this.#amount
     };
@@ -92,8 +98,8 @@ export class MoveInstantaneousRewardToOtherPot {
    *
    * @param cert The core MirCertificate object.
    */
-  static fromCore(cert: Cardano.MirCertificate) {
-    if (cert.kind !== Cardano.MirCertificateKind.ToOtherPot)
+  static fromCore(cert: MirCertificate) {
+    if (cert.kind !== MirCertificateKind.ToOtherPot)
       throw new InvalidArgumentError('cert', `Expected a MIR certificate kind 'ToOtherPot', but got ${cert.kind}`);
 
     if (cert.quantity === undefined)
@@ -107,7 +113,7 @@ export class MoveInstantaneousRewardToOtherPot {
    *
    * @returns The rewards pot where the funds are drawn from.
    */
-  pot(): Cardano.MirCertificatePot {
+  pot(): MirCertificatePot {
     return this.#pot;
   }
 
@@ -116,7 +122,7 @@ export class MoveInstantaneousRewardToOtherPot {
    *
    * @param pot The rewards pot where the funds are drawn from.
    */
-  setPot(pot: Cardano.MirCertificatePot): void {
+  setPot(pot: MirCertificatePot): void {
     this.#pot = pot;
     this.#originalBytes = undefined;
   }
@@ -126,7 +132,7 @@ export class MoveInstantaneousRewardToOtherPot {
    *
    * @returns the amount to be transferred to the other pot.
    */
-  getAmount(): Cardano.Lovelace {
+  getAmount(): Lovelace {
     return this.#amount;
   }
 
@@ -135,7 +141,7 @@ export class MoveInstantaneousRewardToOtherPot {
    *
    * @param amount The amount to be transferred to the other pot.
    */
-  setAmount(amount: Cardano.Lovelace): void {
+  setAmount(amount: Lovelace): void {
     this.#amount = amount;
     this.#originalBytes = undefined;
   }

@@ -1,4 +1,4 @@
-import * as Cardano from '../../Cardano';
+import { ProtocolVersion as CardanoProtocolVersion } from '../../Cardano/types/ProtocolParameters';
 import { CborReader, CborWriter } from '../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
@@ -81,7 +81,7 @@ export class ProtocolVersion {
    *
    * @returns The Core ProtocolVersion object.
    */
-  toCore(): Cardano.ProtocolVersion {
+  toCore(): CardanoProtocolVersion {
     return {
       major: Number(this.#major),
       minor: Number(this.#minor)
@@ -93,7 +93,7 @@ export class ProtocolVersion {
    *
    * @param version core ProtocolVersion object.
    */
-  static fromCore(version: Cardano.ProtocolVersion) {
+  static fromCore(version: CardanoProtocolVersion) {
     return new ProtocolVersion(version.major, version.minor);
   }
 

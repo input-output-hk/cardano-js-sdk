@@ -1,8 +1,8 @@
 /* eslint-disable complexity,max-statements,sonarjs/cognitive-complexity */
-import * as Cardano from '../../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { HexBlob } from '@cardano-sdk/util';
 import { TransactionMetadatum } from './TransactionMetadatum';
+import { TxMetadata } from '../../../Cardano/types/AuxiliaryData';
 import { hexToBytes } from '../../../util/misc';
 
 /** General Transaction Metadata. */
@@ -68,7 +68,7 @@ export class GeneralTransactionMetadata {
    *
    * @returns The Core GeneralTransactionMetadata object.
    */
-  toCore(): Cardano.TxMetadata {
+  toCore(): TxMetadata {
     return new Map([...this.#metadata.entries()].map((metadata) => [metadata[0], metadata[1].toCore()]));
   }
 
@@ -77,7 +77,7 @@ export class GeneralTransactionMetadata {
    *
    * @param metadata The core GeneralTransactionMetadata object.
    */
-  static fromCore(metadata: Cardano.TxMetadata): GeneralTransactionMetadata {
+  static fromCore(metadata: TxMetadata): GeneralTransactionMetadata {
     return new GeneralTransactionMetadata(
       new Map([...metadata.entries()].map((entry) => [entry[0], TransactionMetadatum.fromCore(entry[1])]))
     );

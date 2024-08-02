@@ -1,4 +1,4 @@
-import { TokenMap } from '../../Cardano';
+import { TokenMap } from '../../Cardano/types/Value';
 import { isNotNil } from '@cardano-sdk/util';
 
 /** Sum asset quantities */

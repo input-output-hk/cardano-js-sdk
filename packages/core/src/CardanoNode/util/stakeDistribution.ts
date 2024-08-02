@@ -1,4 +1,4 @@
-import { Lovelace } from '../../Cardano';
+import { Lovelace } from '../../Cardano/types/Value';
 import { StakeDistribution } from '../types';
 
 /**

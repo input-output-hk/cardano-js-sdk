@@ -1,6 +1,6 @@
-import * as Cardano from '../../Cardano';
 import { CborReader, CborWriter } from '../CBOR';
 import { CertificateKind } from './CertificateKind';
+import { CertificateType, PoolRegistrationCertificate } from '../../Cardano/types/Certificate';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { PoolParams } from './PoolParams';
 
@@ -84,9 +84,9 @@ export class PoolRegistration {
    *
    * @returns The Core PoolRegistrationCertificate object.
    */
-  toCore(): Cardano.PoolRegistrationCertificate {
+  toCore(): PoolRegistrationCertificate {
     return {
-      __typename: Cardano.CertificateType.PoolRegistration,
+      __typename: CertificateType.PoolRegistration,
       poolParameters: this.#params.toCore()
     };
   }
@@ -96,7 +96,7 @@ export class PoolRegistration {
    *
    * @param cert core PoolRegistrationCertificate object.
    */
-  static fromCore(cert: Cardano.PoolRegistrationCertificate) {
+  static fromCore(cert: PoolRegistrationCertificate) {
     return new PoolRegistration(PoolParams.fromCore(cert.poolParameters));
   }
 
