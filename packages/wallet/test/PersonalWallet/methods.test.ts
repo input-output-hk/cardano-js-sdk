@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/consistent-destructuring, sonarjs/no-duplicate-string, @typescript-eslint/no-floating-promises, promise/no-nesting */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressDiscovery, BaseWallet, TxInFlight, createPersonalWallet } from '../../src';
+import { AddressDiscovery, BaseWallet, TxInFlight, createPersonalWallet, createSharedWallet } from '../../src';
 import { AddressType, Bip32Account, GroupedAddress, Witnesser, util } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BehaviorSubject, Subscription, firstValueFrom, skip } from 'rxjs';
@@ -76,6 +76,9 @@ describe('BaseWallet methods', () => {
     stakeKeyDerivationPath,
     type: AddressType.External
   };
+
+  const groupedAddress2: GroupedAddress = { ...groupedAddress, address: '1' as Cardano.PaymentAddress, index: 1 };
+  const groupedAddress3: GroupedAddress = { ...groupedAddress, address: '2' as Cardano.PaymentAddress, index: 2 };
   let txSubmitProvider: mocks.TxSubmitProviderStub;
   let networkInfoProvider: mocks.NetworkInfoProviderStub;
   let assetProvider: mocks.MockAssetProvider;
@@ -529,6 +532,262 @@ describe('BaseWallet methods', () => {
       addressDiscovery.discover.mockResolvedValueOnce(newAddresses);
       await expect(wallet.discoverAddresses()).resolves.toEqual(newAddresses);
       await expect(firstValueFrom(wallet.addresses$)).resolves.toEqual(newAddresses);
+    });
+  });
+
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+  describe('getNextUnusedAddress', () => {
+    const script: Cardano.NativeScript = {
+      __type: Cardano.ScriptType.Native,
+      kind: Cardano.NativeScriptKind.RequireAllOf,
+      scripts: [
+        {
+          __type: Cardano.ScriptType.Native,
+          keyHash: Crypto.Ed25519KeyHashHex('b275b08c999097247f7c17e77007c7010cd19f20cc086ad99d398538'),
+          kind: Cardano.NativeScriptKind.RequireSignature
+        }
+      ]
+    };
+
+    // Computed from script above
+    const scriptAddress = {
+      accountIndex: 0,
+      address:
+        'addr_test1xrrujjsfy60k96pm8ymadcxhx82p54z3aswlwxa8r9pggy78e99qjf5lvt5rkwfh6msdwvw5rf29rmqa7ud6wx2zssfs0l4tsq' as Cardano.PaymentAddress,
+      index: 0,
+      networkId: Cardano.NetworkId.Testnet,
+      rewardAccount: 'stake_test17rrujjsfy60k96pm8ymadcxhx82p54z3aswlwxa8r9pggycfg4jxy' as Cardano.RewardAccount,
+      type: AddressType.External
+    };
+
+    beforeEach(() => {
+      wallet.shutdown();
+
+      bip32Account.deriveAddress = jest.fn((args) => {
+        if (args.index === 0) {
+          return Promise.resolve(groupedAddress);
+        }
+
+        if (args.index === 1) {
+          return Promise.resolve(groupedAddress2);
+        }
+
+        return Promise.resolve(groupedAddress3);
+      });
+    });
+
+    it('returns the latest known empty address if any', async () => {
+      chainHistoryProvider = {
+        blocksByHashes: jest.fn().mockResolvedValue([{ epoch: Cardano.EpochNo(3) }]),
+        healthCheck: jest.fn().mockResolvedValue({ ok: true }),
+        transactionsByAddresses: jest.fn().mockResolvedValue({
+          pageResults: [],
+          totalResultCount: 0
+        }),
+        transactionsByHashes: jest.fn().mockResolvedValue([])
+      };
+
+      wallet = createPersonalWallet(
+        { name: 'Test Wallet' },
+        {
+          addressDiscovery,
+          assetProvider,
+          bip32Account,
+          chainHistoryProvider,
+          handleProvider,
+          logger,
+          networkInfoProvider,
+          rewardsProvider,
+          stakePoolProvider,
+          txSubmitProvider,
+          utxoProvider,
+          witnesser
+        }
+      );
+
+      await waitForWalletStateSettle(wallet);
+
+      // Only one address being tracked.
+      await expect(firstValueFrom(wallet.addresses$)).resolves.toEqual([groupedAddress]);
+      await expect(wallet.getNextUnusedAddress()).resolves.toEqual([groupedAddress]);
+    });
+
+    it('returns a fresh empty address if all known addresses are used', async () => {
+      chainHistoryProvider = {
+        blocksByHashes: jest.fn().mockResolvedValue([{ epoch: Cardano.EpochNo(3) }]),
+        healthCheck: jest.fn().mockResolvedValue({ ok: true }),
+        transactionsByAddresses: jest.fn((args) => {
+          if (args.addresses[0] === '1') {
+            return Promise.resolve({
+              pageResults: [],
+              totalResultCount: 0
+            });
+          }
+
+          return Promise.resolve({
+            pageResults: mocks.queryTransactionsResult.pageResults,
+            totalResultCount: mocks.queryTransactionsResult.totalResultCount
+          });
+        }),
+        transactionsByHashes: jest.fn().mockResolvedValue([])
+      };
+
+      wallet = createPersonalWallet(
+        { name: 'Test Wallet' },
+        {
+          addressDiscovery,
+          assetProvider,
+          bip32Account,
+          chainHistoryProvider,
+          handleProvider,
+          logger,
+          networkInfoProvider,
+          rewardsProvider,
+          stakePoolProvider,
+          txSubmitProvider,
+          utxoProvider,
+          witnesser
+        }
+      );
+
+      await waitForWalletStateSettle(wallet);
+
+      // Only one address being tracked.
+      await expect(firstValueFrom(wallet.addresses$)).resolves.toEqual([groupedAddress]);
+      await expect(wallet.getNextUnusedAddress()).resolves.toEqual([groupedAddress2]);
+
+      // New empty address is now being tracked.
+      await expect(firstValueFrom(wallet.addresses$)).resolves.toEqual([groupedAddress, groupedAddress2]);
+
+      // No new addresses are generated until the new empty address is used up.
+      await expect(wallet.getNextUnusedAddress()).resolves.toEqual([groupedAddress2]);
+    });
+
+    it('returns a fresh empty address if all known addresses are used, and the new created address was also used', async () => {
+      chainHistoryProvider = {
+        blocksByHashes: jest.fn().mockResolvedValue([{ epoch: Cardano.EpochNo(3) }]),
+        healthCheck: jest.fn().mockResolvedValue({ ok: true }),
+        transactionsByAddresses: jest.fn((args) => {
+          if (args.addresses[0] === '2') {
+            return Promise.resolve({
+              pageResults: [],
+              totalResultCount: 0
+            });
+          }
+
+          return Promise.resolve({
+            pageResults: mocks.queryTransactionsResult.pageResults,
+            totalResultCount: mocks.queryTransactionsResult.totalResultCount
+          });
+        }),
+        transactionsByHashes: jest.fn().mockResolvedValue([])
+      };
+
+      wallet = createPersonalWallet(
+        { name: 'Test Wallet' },
+        {
+          addressDiscovery,
+          assetProvider,
+          bip32Account,
+          chainHistoryProvider,
+          handleProvider,
+          logger,
+          networkInfoProvider,
+          rewardsProvider,
+          stakePoolProvider,
+          txSubmitProvider,
+          utxoProvider,
+          witnesser
+        }
+      );
+
+      await waitForWalletStateSettle(wallet);
+
+      // Only one address being tracked.
+      await expect(firstValueFrom(wallet.addresses$)).resolves.toEqual([groupedAddress]);
+      await expect(wallet.getNextUnusedAddress()).resolves.toEqual([groupedAddress3]);
+
+      // Discovered used address, plus new empty address is now being tracked.
+      await expect(firstValueFrom(wallet.addresses$)).resolves.toEqual([
+        groupedAddress,
+        groupedAddress2,
+        groupedAddress3
+      ]);
+
+      // No new addresses are generated until the new empty address is used up.
+      await expect(wallet.getNextUnusedAddress()).resolves.toEqual([groupedAddress3]);
+    });
+
+    it('returns script address if unused', async () => {
+      chainHistoryProvider = {
+        blocksByHashes: jest.fn().mockResolvedValue([{ epoch: Cardano.EpochNo(3) }]),
+        healthCheck: jest.fn().mockResolvedValue({ ok: true }),
+        transactionsByAddresses: jest.fn().mockResolvedValue({
+          pageResults: [],
+          totalResultCount: 0
+        }),
+        transactionsByHashes: jest.fn().mockResolvedValue([])
+      };
+
+      wallet = createSharedWallet(
+        { name: 'Test Wallet' },
+        {
+          assetProvider,
+          chainHistoryProvider,
+          handleProvider,
+          logger,
+          networkInfoProvider,
+          paymentScript: script,
+          rewardsProvider,
+          stakePoolProvider,
+          stakingScript: script,
+          txSubmitProvider,
+          utxoProvider,
+          witnesser
+        }
+      );
+
+      await waitForWalletStateSettle(wallet);
+
+      await expect(wallet.getNextUnusedAddress()).resolves.toEqual([scriptAddress]);
+      // Only one address being tracked.
+      await expect(firstValueFrom(wallet.addresses$)).resolves.toEqual([scriptAddress]);
+    });
+
+    it('returns an empty array if script address is already used', async () => {
+      chainHistoryProvider = {
+        blocksByHashes: jest.fn().mockResolvedValue([{ epoch: Cardano.EpochNo(3) }]),
+        healthCheck: jest.fn().mockResolvedValue({ ok: true }),
+        transactionsByAddresses: jest.fn().mockResolvedValue({
+          pageResults: [],
+          totalResultCount: 1
+        }),
+        transactionsByHashes: jest.fn().mockResolvedValue([])
+      };
+
+      wallet = createSharedWallet(
+        { name: 'Test Wallet' },
+        {
+          assetProvider,
+          chainHistoryProvider,
+          handleProvider,
+          logger,
+          networkInfoProvider,
+          paymentScript: script,
+          rewardsProvider,
+          stakePoolProvider,
+          stakingScript: script,
+          txSubmitProvider,
+          utxoProvider,
+          witnesser
+        }
+      );
+
+      await waitForWalletStateSettle(wallet);
+
+      await expect(wallet.getNextUnusedAddress()).resolves.toEqual([]);
+      // Only one address being tracked.
+      await expect(firstValueFrom(wallet.addresses$)).resolves.toEqual([scriptAddress]);
     });
   });
 });

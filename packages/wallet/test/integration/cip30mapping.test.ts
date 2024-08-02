@@ -460,8 +460,9 @@ describe('cip30', () => {
       });
 
       test('api.getUnusedAddresses', async () => {
-        const cipUsedAddressess = await api.getUnusedAddresses(context);
-        expect(cipUsedAddressess).toEqual([]);
+        const addresses = (await firstValueFrom(wallet.addresses$)).map((grouped) => grouped.address);
+        const cipUnusedAddressess = await api.getUnusedAddresses(context);
+        expect(cipUnusedAddressess).toEqual([Cardano.Address.fromString(addresses[0])!.toBytes()]);
       });
 
       test('api.getChangeAddress', async () => {

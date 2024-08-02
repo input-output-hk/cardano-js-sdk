@@ -128,6 +128,7 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
   finalizeTx: RemoteApiPropertyType.MethodReturningPromise,
   genesisParameters$: RemoteApiPropertyType.HotObservable,
   getName: RemoteApiPropertyType.MethodReturningPromise,
+  getNextUnusedAddress: RemoteApiPropertyType.MethodReturningPromise,
   governance: {
     getPubDRepKey: RemoteApiPropertyType.MethodReturningPromise,
     isRegisteredAsDRep$: RemoteApiPropertyType.HotObservable
