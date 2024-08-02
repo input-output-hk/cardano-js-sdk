@@ -83,6 +83,7 @@ export interface ObservableWallet {
   readonly currentEpoch$: Observable<EpochInfo>;
   readonly protocolParameters$: Observable<Cardano.ProtocolParameters>;
   readonly addresses$: Observable<WalletAddress[]>;
+  readonly unusedAddresses$: Observable<GroupedAddress[]>;
   readonly publicStakeKeys$: Observable<PubStakeKeyAndStatus[]>;
   readonly handles$: Observable<HandleInfo[]>;
   readonly governance: {
@@ -129,14 +130,6 @@ export interface ObservableWallet {
    * @returns Promise that resolves when discovery is complete, with an updated array of wallet addresses
    */
   discoverAddresses(): Promise<WalletAddress[]>;
-
-  /**
-   * Get the next unused address for the wallet.
-   *
-   * @returns Promise that resolves with the next unused address. Return null if there
-   * are no available unused addresses (I.E Single address wallets such as script wallets which already used up their only address).
-   */
-  getNextUnusedAddress(): Promise<WalletAddress | null>;
 
   shutdown(): void;
 }

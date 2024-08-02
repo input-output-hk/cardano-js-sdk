@@ -609,7 +609,7 @@ describe('BaseWallet methods', () => {
 
       // Only one address being tracked.
       await expect(firstValueFrom(wallet.addresses$)).resolves.toEqual([groupedAddress]);
-      await expect(wallet.getNextUnusedAddress()).resolves.toEqual(groupedAddress);
+      await expect(firstValueFrom(wallet.unusedAddresses$)).resolves.toEqual([groupedAddress]);
     });
 
     it('returns a fresh empty address if all known addresses are used', async () => {
@@ -654,13 +654,13 @@ describe('BaseWallet methods', () => {
 
       // Only one address being tracked.
       await expect(firstValueFrom(wallet.addresses$)).resolves.toEqual([groupedAddress]);
-      await expect(wallet.getNextUnusedAddress()).resolves.toEqual(groupedAddress2);
+      await expect(firstValueFrom(wallet.unusedAddresses$)).resolves.toEqual([groupedAddress2]);
 
       // New empty address is now being tracked.
       await expect(firstValueFrom(wallet.addresses$)).resolves.toEqual([groupedAddress, groupedAddress2]);
 
       // No new addresses are generated until the new empty address is used up.
-      await expect(wallet.getNextUnusedAddress()).resolves.toEqual(groupedAddress2);
+      await expect(firstValueFrom(wallet.unusedAddresses$)).resolves.toEqual([groupedAddress2]);
     });
 
     it('returns a fresh empty address if all known addresses are used, and the new created address was also used', async () => {
@@ -705,7 +705,7 @@ describe('BaseWallet methods', () => {
 
       // Only one address being tracked.
       await expect(firstValueFrom(wallet.addresses$)).resolves.toEqual([groupedAddress]);
-      await expect(wallet.getNextUnusedAddress()).resolves.toEqual(groupedAddress3);
+      await expect(firstValueFrom(wallet.unusedAddresses$)).resolves.toEqual([groupedAddress3]);
 
       // Discovered used address, plus new empty address is now being tracked.
       await expect(firstValueFrom(wallet.addresses$)).resolves.toEqual([
@@ -715,7 +715,7 @@ describe('BaseWallet methods', () => {
       ]);
 
       // No new addresses are generated until the new empty address is used up.
-      await expect(wallet.getNextUnusedAddress()).resolves.toEqual(groupedAddress3);
+      await expect(firstValueFrom(wallet.unusedAddresses$)).resolves.toEqual([groupedAddress3]);
     });
 
     it('returns script address if unused', async () => {
@@ -749,7 +749,7 @@ describe('BaseWallet methods', () => {
 
       await waitForWalletStateSettle(wallet);
 
-      await expect(wallet.getNextUnusedAddress()).resolves.toEqual(scriptAddress);
+      await expect(firstValueFrom(wallet.unusedAddresses$)).resolves.toEqual([scriptAddress]);
       // Only one address being tracked.
       await expect(firstValueFrom(wallet.addresses$)).resolves.toEqual([scriptAddress]);
     });
@@ -785,7 +785,7 @@ describe('BaseWallet methods', () => {
 
       await waitForWalletStateSettle(wallet);
 
-      await expect(wallet.getNextUnusedAddress()).resolves.toEqual(null);
+      await expect(firstValueFrom(wallet.unusedAddresses$)).resolves.toEqual([]);
       // Only one address being tracked.
       await expect(firstValueFrom(wallet.addresses$)).resolves.toEqual([scriptAddress]);
     });

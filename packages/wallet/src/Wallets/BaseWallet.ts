@@ -65,7 +65,6 @@ import {
   SignDataProps,
   SyncStatus,
   UpdateWitnessProps,
-  WalletAddress,
   WalletNetworkInfoProvider
 } from '../types';
 import { BehaviorObservable, TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
@@ -267,6 +266,7 @@ export class BaseWallet implements ObservableWallet {
   readonly tip$: BehaviorObservable<Cardano.Tip>;
   readonly eraSummaries$: TrackerSubject<EraSummary[]>;
   readonly addresses$: Observable<GroupedAddress[]>;
+  readonly unusedAddresses$: Observable<GroupedAddress[]>;
   readonly protocolParameters$: TrackerSubject<Cardano.ProtocolParameters>;
   readonly genesisParameters$: TrackerSubject<Cardano.CompactGenesis>;
   readonly assetInfo$: TrackerSubject<Assets>;
@@ -597,6 +597,18 @@ export class BaseWallet implements ObservableWallet {
     };
 
     this.#logger.debug('Created');
+
+    this.unusedAddresses$ = new Observable((subscriber) => {
+      (async () => {
+        try {
+          const unusedAddress = await this.#getNextUnusedAddress();
+          subscriber.next(unusedAddress);
+          subscriber.complete();
+        } catch (error) {
+          subscriber.error(error);
+        }
+      })().catch((error) => subscriber.error(error));
+    });
   }
 
   async getName(): Promise<string> {
@@ -843,7 +855,7 @@ export class BaseWallet implements ObservableWallet {
     return firstValueFrom(this.addresses$);
   }
 
-  async getNextUnusedAddress(): Promise<WalletAddress | null> {
+  async #getNextUnusedAddress(): Promise<GroupedAddress[]> {
     const knownAddresses = await firstValueFrom(this.addresses$);
 
     if (knownAddresses.length === 0) {
@@ -856,7 +868,7 @@ export class BaseWallet implements ObservableWallet {
 
       let isEmpty = !(await addressHasTx(latestAddress.address, this.chainHistoryProvider));
 
-      if (isEmpty) return latestAddress;
+      if (isEmpty) return [latestAddress];
 
       const newAddress = await this.#publicCredentialsManager.bip32Account.deriveAddress(
         { index: latestAddress.index + 1, type: AddressType.External },
@@ -868,14 +880,14 @@ export class BaseWallet implements ObservableWallet {
       // Sanity check, make sure the newly generated address is also empty.
       isEmpty = !(await addressHasTx(newAddress.address, this.chainHistoryProvider));
 
-      if (isEmpty) return newAddress;
+      if (isEmpty) return [newAddress];
 
-      return await this.getNextUnusedAddress();
+      return await this.#getNextUnusedAddress();
     }
 
     // Script wallet.
     const isEmpty = !(await addressHasTx(knownAddresses[0].address, this.chainHistoryProvider));
-    return isEmpty ? knownAddresses[0] : null;
+    return isEmpty ? [knownAddresses[0]] : [];
   }
 
   /** Update the witness of a transaction with witness provided by this wallet */
