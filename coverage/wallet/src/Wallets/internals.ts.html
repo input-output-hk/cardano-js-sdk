@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">40% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>4/10</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>1/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.33% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>3/9</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -123,22 +123,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">22x</span>
+<span class="cline-any cline-yes">22x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">22x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">22x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -161,27 +161,27 @@ import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
  * @param {Cardano.NetworkId} networkId - The network identifier.
  * @returns {}GroupedAddress} The derived grouped address.
  */
-export const getScriptAddress = <span class="fstat-no" title="function not covered" >(</span>
+export const getScriptAddress = (
   paymentScript: Cardano.NativeScript,
   stakingScript: Cardano.NativeScript,
   networkId: Cardano.NetworkId
 ): GroupedAddress =&gt; {
-  const paymentScriptHash = <span class="cstat-no" title="statement not covered" >nativeScriptPolicyId(paymentScript) as unknown as Crypto.Hash28ByteBase16;</span>
-  const stakingScriptHash = <span class="cstat-no" title="statement not covered" >nativeScriptPolicyId(stakingScript) as unknown as Crypto.Hash28ByteBase16;</span>
+  const paymentScriptHash = nativeScriptPolicyId(paymentScript) as unknown as Crypto.Hash28ByteBase16;
+  const stakingScriptHash = nativeScriptPolicyId(stakingScript) as unknown as Crypto.Hash28ByteBase16;
 &nbsp;
-  const paymentScriptCredential = <span class="cstat-no" title="statement not covered" >{</span>
+  const paymentScriptCredential = {
     hash: paymentScriptHash,
     type: Cardano.CredentialType.ScriptHash
   };
 &nbsp;
-  const stakeScriptCredential = <span class="cstat-no" title="statement not covered" >{</span>
+  const stakeScriptCredential = {
     hash: stakingScriptHash,
     type: Cardano.CredentialType.ScriptHash
   };
 &nbsp;
-  const baseAddress = <span class="cstat-no" title="statement not covered" >Cardano.BaseAddress.fromCredentials(networkId, paymentScriptCredential, stakeScriptCredential);</span>
+  const baseAddress = Cardano.BaseAddress.fromCredentials(networkId, paymentScriptCredential, stakeScriptCredential);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return {</span>
+  return {
     accountIndex: 0,
     address: baseAddress.toAddress().toBech32() as Cardano.PaymentAddress,
     index: 0,
@@ -199,7 +199,7 @@ export const getScriptAddress = <span class="fstat-no" title="function not cover
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-08-01T10:59:54.813Z
+                at 2024-08-02T12:41:18.425Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
