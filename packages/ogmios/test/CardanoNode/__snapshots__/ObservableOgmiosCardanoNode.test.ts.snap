@@ -159,7 +159,9 @@ Array [
                 },
               },
             ],
+            "collateralReturn": undefined,
             "collaterals": undefined,
+            "donation": undefined,
             "fee": 238057n,
             "inputs": Array [
               Object {
@@ -168,6 +170,7 @@ Array [
               },
             ],
             "mint": undefined,
+            "networkId": undefined,
             "outputs": Array [
               Object {
                 "address": "addr_test1vz09v9yfxguvlp0zsnrpa3tdtm7el8xufp3m5lsm7qxzclgmzkket",
@@ -175,7 +178,7 @@ Array [
                 "datumHash": undefined,
                 "scriptReference": undefined,
                 "value": Object {
-                  "assets": Map {},
+                  "assets": undefined,
                   "coins": 29699998493561943n,
                 },
               },
@@ -185,7 +188,7 @@ Array [
                 "datumHash": undefined,
                 "scriptReference": undefined,
                 "value": Object {
-                  "assets": Map {},
+                  "assets": undefined,
                   "coins": 100000000000000n,
                 },
               },
@@ -195,7 +198,7 @@ Array [
                 "datumHash": undefined,
                 "scriptReference": undefined,
                 "value": Object {
-                  "assets": Map {},
+                  "assets": undefined,
                   "coins": 100000000000000n,
                 },
               },
@@ -205,20 +208,33 @@ Array [
                 "datumHash": undefined,
                 "scriptReference": undefined,
                 "value": Object {
-                  "assets": Map {},
+                  "assets": undefined,
                   "coins": 100000000000000n,
                 },
               },
             ],
+            "proposalProcedures": undefined,
+            "referenceInputs": undefined,
             "requiredExtraSignatures": undefined,
+            "scriptIntegrityHash": undefined,
+            "totalCollateral": undefined,
+            "treasuryValue": undefined,
+            "update": undefined,
             "validityInterval": Object {
+              "invalidBefore": undefined,
               "invalidHereafter": 90000,
             },
+            "votingProcedures": undefined,
+            "withdrawals": undefined,
           },
           "id": "a3d6f2627a56fe7921eeda546abfe164321881d41549b7f2fbf09ea0b718d758",
           "inputSource": "inputs",
+          "isValid": true,
           "witness": Object {
-            "bootstrap": Array [],
+            "bootstrap": undefined,
+            "datums": undefined,
+            "redeemers": undefined,
+            "scripts": undefined,
             "signatures": Map {
               "9691ed9d98a5b79d5bc46c4496a6dba7e103f668f525c8349b6b92676cb3eae4" => "5ce8776d3b749e7b096f5dbd388029db57a0c9fc87662b93cf31da4ad1748b3d5d92a7d65454043ae10dbfa4ac34929311526323a7ab3a7436f02e16abdbdb08",
               "28450e496f2217e62bf9fd2ece94114562ade49368f456d2e63df2bc4af3244c" => "7c56a4a38044f6b5ee32590bf73cb1101c7c650ff76c07c15d31c87181607a750e90dc09abcb1a431e0ba7c31065f5e3743bf3e1bafe120ca45e4c910f2dc000",

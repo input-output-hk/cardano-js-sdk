@@ -16,7 +16,9 @@ Object {
             },
           },
         ],
+        "collateralReturn": undefined,
         "collaterals": undefined,
+        "donation": undefined,
         "fee": 171661n,
         "inputs": Array [
           Object {
@@ -25,6 +27,7 @@ Object {
           },
         ],
         "mint": undefined,
+        "networkId": undefined,
         "outputs": Array [
           Object {
             "address": "addr_test1qq2u3e0afx3dqk95hfptv7wm8rl0fht2ecehxzy2yr3g5z79dq6pms68sakpc70q0h37wcn92c9u5jaeu6he7dhypy3sxd05k6",
@@ -32,20 +35,33 @@ Object {
             "datumHash": undefined,
             "scriptReference": undefined,
             "value": Object {
-              "assets": Map {},
+              "assets": undefined,
               "coins": 9999134743n,
             },
           },
         ],
+        "proposalProcedures": undefined,
+        "referenceInputs": undefined,
         "requiredExtraSignatures": undefined,
+        "scriptIntegrityHash": undefined,
+        "totalCollateral": undefined,
+        "treasuryValue": undefined,
+        "update": undefined,
         "validityInterval": Object {
+          "invalidBefore": undefined,
           "invalidHereafter": 11201918,
         },
+        "votingProcedures": undefined,
+        "withdrawals": undefined,
       },
       "id": "543dd5eb80eb34d4caabeb00f7137e9330d1c8afa890d367ef8bdfad24b7f321",
       "inputSource": "inputs",
+      "isValid": true,
       "witness": Object {
-        "bootstrap": Array [],
+        "bootstrap": undefined,
+        "datums": undefined,
+        "redeemers": undefined,
+        "scripts": undefined,
         "signatures": Map {
           "87e756b9b15d5d1265bb1297d63b20ef9461fd9d863e52656ec8cb6aca99a25c" => "d6f7bfebd57ede5023d0a766ad976cdf1b7c033b7ba95cf115ab8be70661c67134059c7a8c9a5fe3942096a6737e91e264d0add70b50a5215100dc12bdb75105",
           "0b4bfb2f2fc4fbeaf9399455cad837f428706a76bc37deb4d9b0cc0ed8093e6b" => "639b988a45be61e0fd2cc0ddc46958dcf7ed9cb902ddcd55ecfb6c1a199b4b5e85e109e3d05d36301f6468c70c0e7dfde28068a0a31eb9a61bf9682348d0a102",
@@ -57,11 +73,14 @@ Object {
         "blob": Map {
           58n => "",
         },
+        "scripts": undefined,
       },
       "body": Object {
         "auxiliaryDataHash": "3f5d7adf353de22cf1fc514aa911901c5fbd1b5ee3ed57950a6dc5a0fe1dbb20",
         "certificates": undefined,
+        "collateralReturn": undefined,
         "collaterals": undefined,
+        "donation": undefined,
         "fee": 181033n,
         "inputs": Array [
           Object {
@@ -76,6 +95,7 @@ Object {
         "mint": Map {
           "eb48b495393986032e8cef0b0a9b2ce64b3881e8a29347e169c7122c4654" => -30n,
         },
+        "networkId": undefined,
         "outputs": Array [
           Object {
             "address": "addr_test1qq9tud0fzpj6pdeqeegrma25ngfrre9ruwwcuj2m6dnsreu2qtzuksrwqtv4stsk3hq2uscsh90rf5rdgg38k5t0f0nsp30w94",
@@ -95,23 +115,42 @@ Object {
             "datumHash": undefined,
             "scriptReference": undefined,
             "value": Object {
-              "assets": Map {},
+              "assets": undefined,
               "coins": 9692318369n,
             },
           },
         ],
+        "proposalProcedures": undefined,
+        "referenceInputs": undefined,
         "requiredExtraSignatures": undefined,
+        "scriptIntegrityHash": undefined,
+        "totalCollateral": undefined,
+        "treasuryValue": undefined,
+        "update": undefined,
         "validityInterval": Object {
+          "invalidBefore": undefined,
           "invalidHereafter": 11192321,
         },
+        "votingProcedures": undefined,
+        "withdrawals": undefined,
       },
       "id": "be69e4186eaf01fa31a1ad1b16780269f34dbab5d73dd34b8e785ed88e330e12",
       "inputSource": "inputs",
+      "isValid": true,
       "witness": Object {
-        "bootstrap": Array [],
+        "bootstrap": undefined,
+        "datums": undefined,
+        "redeemers": undefined,
+        "scripts": Array [
+          Object {
+            "__type": "native",
+            "keyHash": "583dda8c51947fb1653150f3daa7c724637f099d77bc7759edc22a8e",
+            "kind": 0,
+          },
+        ],
         "signatures": Map {
-          "c92a58c6a3bd0d181122e6294bdaf00ba43cf65c65d7275ceb2388570be883d7" => "594bb85fed2bef13f2f573607831a69b7a5cce97ca6fed2a0026303e85f65a9d552fd6bbd77d10720110321e0aa8e5d1571fb2d38c848a7f4789e80f17516601",
           "47c7878b4737c1676d83422fb8f72eb66f1ecb7c94a3c9a7b93ccc0dec7e8f25" => "080a8bf5a6ffbdc521776fca3272290f243e441ffdbbd873e4dfa3f2466fa45e082176b3dbcd09f376eed9cc465fcf538520b2c58a487565e711ad158d2f1c07",
+          "c92a58c6a3bd0d181122e6294bdaf00ba43cf65c65d7275ceb2388570be883d7" => "594bb85fed2bef13f2f573607831a69b7a5cce97ca6fed2a0026303e85f65a9d552fd6bbd77d10720110321e0aa8e5d1571fb2d38c848a7f4789e80f17516601",
         },
       },
     },
@@ -120,11 +159,14 @@ Object {
         "blob": Map {
           0n => Array [],
         },
+        "scripts": undefined,
       },
       "body": Object {
         "auxiliaryDataHash": "b93d8e428871a0b0e12c5c554653f515f50fe48dc5b55af7e3667e7d9661ea2c",
         "certificates": undefined,
+        "collateralReturn": undefined,
         "collaterals": undefined,
+        "donation": undefined,
         "fee": 177029n,
         "inputs": Array [
           Object {
@@ -137,6 +179,7 @@ Object {
           },
         ],
         "mint": undefined,
+        "networkId": undefined,
         "outputs": Array [
           Object {
             "address": "addr_test1qry0mqhwlf84py9nhz5qukujgjjx26cwg3zqvm2aqeuqqneyz5g72vhh8ws2fcjudfjesyl8fy4qss4rdx9v34e2pxps5s28ar",
@@ -144,7 +187,7 @@ Object {
             "datumHash": undefined,
             "scriptReference": undefined,
             "value": Object {
-              "assets": Map {},
+              "assets": undefined,
               "coins": 1000000n,
             },
           },
@@ -154,20 +197,33 @@ Object {
             "datumHash": undefined,
             "scriptReference": undefined,
             "value": Object {
-              "assets": Map {},
+              "assets": undefined,
               "coins": 1639738n,
             },
           },
         ],
+        "proposalProcedures": undefined,
+        "referenceInputs": undefined,
         "requiredExtraSignatures": undefined,
+        "scriptIntegrityHash": undefined,
+        "totalCollateral": undefined,
+        "treasuryValue": undefined,
+        "update": undefined,
         "validityInterval": Object {
+          "invalidBefore": undefined,
           "invalidHereafter": 11198351,
         },
+        "votingProcedures": undefined,
+        "withdrawals": undefined,
       },
       "id": "d95c45762d620b81a6eeeebacb86d2b6af4e00df2324f0b1bf14cf9d86b18c16",
       "inputSource": "inputs",
+      "isValid": true,
       "witness": Object {
-        "bootstrap": Array [],
+        "bootstrap": undefined,
+        "datums": undefined,
+        "redeemers": undefined,
+        "scripts": undefined,
         "signatures": Map {
           "21ccfef5d816ed98dbf00de037322303fda53e1a01a844f38444ba3eb6f6e9e4" => "634c8e2a38429b95e588732655c0513909b5415e7f736ba95c98c394b0fbdb9f1cf102d4230939db883226b7d850fc04b10101aec235686c1ad4da7b0765e600",
           "2cf1d6c8d41391e658e25dbc88638831d7af3254988bde4650e1c595c2121461" => "b81ebb6d1c2ec74a5c210e9656cb27732f084f653abfe01f56e3d5d39a87a47d933724684d753564274b32def9d923dd3885240265ae7ce87904efd80a563708",
@@ -179,12 +235,14 @@ Object {
       "body": Object {
         "auxiliaryDataHash": undefined,
         "certificates": undefined,
+        "collateralReturn": undefined,
         "collaterals": Array [
           Object {
             "index": 0,
             "txId": "958adee7adb5cfe0510e9f9b63af2d9409bf25637af1ac899fe34b7519568112",
           },
         ],
+        "donation": undefined,
         "fee": 367282n,
         "inputs": Array [
           Object {
@@ -195,6 +253,7 @@ Object {
         "mint": Map {
           "4d2047d7af3d8de799de5daa6e1b0ebfc039f4274084d5bb9ba3975d42594e45544c6963656e7365" => 2n,
         },
+        "networkId": undefined,
         "outputs": Array [
           Object {
             "address": "addr_test1qrc7mfr62uj0zg07ylfq37ukce6ahxtumdl0d3ar5aw35x758sc7z8763mfpes0j7wqrkkrdgna98c0rtlps585ypdnst69syh",
@@ -202,7 +261,7 @@ Object {
             "datumHash": undefined,
             "scriptReference": undefined,
             "value": Object {
-              "assets": Map {},
+              "assets": undefined,
               "coins": 2371174n,
             },
           },
@@ -231,16 +290,24 @@ Object {
             },
           },
         ],
+        "proposalProcedures": undefined,
+        "referenceInputs": undefined,
         "requiredExtraSignatures": Array [
           "f1eda47a5724f121fe27d208fb96c675db997cdb7ef6c7a3a75d1a1b",
         ],
         "scriptIntegrityHash": "86b2db419eb3ac0d6180255726b53900d26ea7c7eab5cd209607eb6d9ae5a136",
-        "validityInterval": Object {},
+        "totalCollateral": undefined,
+        "treasuryValue": undefined,
+        "update": undefined,
+        "validityInterval": undefined,
+        "votingProcedures": undefined,
+        "withdrawals": undefined,
       },
       "id": "e8b1c72c0c3002f8d157dc94bb28d3f2ebb3839c859ef8a325c6feefb120e11b",
       "inputSource": "inputs",
+      "isValid": true,
       "witness": Object {
-        "bootstrap": Array [],
+        "bootstrap": undefined,
         "datums": Array [
           Object {
             "cbor": "d8799f581c0bfe875a7ae9db3c1b3827483ac6a1d02a7a93d3d26df00c7973aa47ff",
@@ -300,6 +367,13 @@ Object {
             "purpose": "mint",
           },
         ],
+        "scripts": Array [
+          Object {
+            "__type": "plutus",
+            "bytes": "590a05010000333323322323322323233223232323232323232323232323232323232323232322222322323253353232533500213500122333350012302949894cd4cc03800c03040ac4cd5ce24921496e76616c6964206c6963656e7365206d696e74696e6720617574686f726974790002a230294988c0a52613500122333350012302949894cd54cd4cc03800c03040ac4cd5ce248121496e76616c6964206c6963656e7365206d696e74696e6720617574686f726974790002a153355335333355300f120013350102223003300200120012202c35026122333550272233355029225335002213300702600210010013502a1223300235004222533500121533533355302b1200122333573466e3c0080040dc0d8004d403488888888880088c8c84ccccccd5d200191999ab9a3370e6aae75400d2000233335573ea0064a06646666aae7cd5d128021299a991999999aba400125036250362503625036235037375c0040626ae85401484d40d848c004008540d0940d00bc0b8940c80b0940c4940c4940c4940c40b04d55cf280089baa0011502d1502c00100135005222222222200902b102a102b102b13357389211a2020496e636f7272656374206c6963656e7365206d696e7465640002a102a230294988c0a5263333573466e1cd55cea801a400046644246600200600464646464646464646464646666ae68cdc39aab9d500a480008cccccccccc888888888848cccccccccc00402c02802402001c01801401000c008cd40688c8c8cccd5cd19b8735573aa004900011991091980080180118119aba15002301f357426ae8940088c98c80b0cd5ce01681601509aab9e5001137540026ae854028cd406806cd5d0a804999aa80ebae501c35742a010666aa03aeb94070d5d0a80399a80d0119aba1500633501a335502602475a6ae854014c8c8c8cccd5cd19b8735573aa00490001199109198008018011919191999ab9a3370e6aae754009200023322123300100300233502975a6ae854008c0a8d5d09aba2500223263203033573806206005c26aae7940044dd50009aba150023232323333573466e1cd55cea8012400046644246600200600466a052eb4d5d0a80118151aba135744a004464c6406066ae700c40c00b84d55cf280089baa001357426ae8940088c98c80b0cd5ce01681601509aab9e5001137540026ae854010cd4069d71aba1500333501a335502675c40026ae854008c080d5d09aba2500223263202833573805205004c26ae8940044d5d1280089aba25001135744a00226ae8940044d5d1280089aba25001135744a00226aae7940044dd50009aba150033232323333573466e1d40052006232122223004005301b357426aae79400c8cccd5cd19b875002480108c848888c008014c074d5d09aab9e500423333573466e1d400d20022321222230010053019357426aae7940148cccd5cd19b875004480008c848888c00c014dd71aba135573ca00c464c6404666ae7009008c08408007c0784d55cea80089baa001357426ae89400c8c98c8070cd5ce00e80e00d1999ab9a3370ea0089001109100111999ab9a3370ea00a9000109100091931900e19ab9c01d01c01a019101a13263201a335738921035054350001a135573ca00226ea80044d55ce9baa00122350022222222222533533355300d1200133500e225335002210031001502125335333573466e3c0300040a80a44d408c0045408800c840a840a0c8004d5407488448894cd40044d400c88004884ccd401488008c010008ccd54c01c4800401401000448848cc00400c00848c88c008dd6000990009aa80e111999aab9f0012501b233501a30043574200460066ae880080448c8c8c8cccd5cd19b8735573aa00690001199911091998008020018011919191999ab9a3370e6aae7540092000233221233001003002301335742a00466a0180246ae84d5d1280111931900b19ab9c017016014135573ca00226ea8004d5d0a801999aa803bae500635742a00466a010eb8d5d09aba2500223263201233573802602402026ae8940044d55cf280089baa0011335500175ceb44488c88c008dd5800990009aa80d11191999aab9f0022501a23350193355014300635573aa004600a6aae794008c010d5d100180809aba100112232323333573466e1d400520002350143005357426aae79400c8cccd5cd19b87500248008940508c98c8040cd5ce00880800700689aab9d500113754002464646666ae68cdc39aab9d5002480008cc8848cc00400c008c014d5d0a8011bad357426ae8940088c98c8034cd5ce00700680589aab9e5001137540024646666ae68cdc39aab9d5001480008dd71aba135573ca004464c6401666ae7003002c0244dd500089119191999ab9a3370ea00290021091100091999ab9a3370ea00490011190911180180218031aba135573ca00846666ae68cdc3a801a400042444004464c6401c66ae7003c03803002c0284d55cea80089baa0012323333573466e1d40052002201523333573466e1d40092000201523263200a33573801601401000e26aae74dd5000919191919191999ab9a3370ea002900610911111100191999ab9a3370ea004900510911111100211999ab9a3370ea00690041199109111111198008048041bae35742a00a6eb4d5d09aba2500523333573466e1d40112006233221222222233002009008375c6ae85401cdd71aba135744a00e46666ae68cdc3a802a400846644244444446600c01201060186ae854024dd71aba135744a01246666ae68cdc3a8032400446424444444600e010601a6ae84d55cf280591999ab9a3370ea00e900011909111111180280418071aba135573ca018464c6402466ae7004c04804003c03803403002c0284d55cea80209aab9e5003135573ca00426aae7940044dd50009191919191999ab9a3370ea002900111999110911998008028020019bad35742a0086eb4d5d0a8019bad357426ae89400c8cccd5cd19b875002480008c8488c00800cc020d5d09aab9e500623263200b33573801801601201026aae75400c4d5d1280089aab9e500113754002464646666ae68cdc3a800a400446424460020066eb8d5d09aab9e500323333573466e1d400920002321223002003375c6ae84d55cf280211931900419ab9c009008006005135573aa00226ea800444888c8c8cccd5cd19b8735573aa0049000119aa80598031aba150023005357426ae8940088c98c8020cd5ce00480400309aab9e5001137540029309000a48103505431003200135500b2211222533500115007221350022253353300700600213500c0011333553009120010070060031122123300100300212122300200311220011122320013200135500922533500110032213300600230040011233500150025003112200212212233001004003233573892011443617463682d616c6c2063617365206572726f720000212200212200111232300100122330033002002001480092211cf1eda47a5724f121fe27d208fb96c675db997cdb7ef6c7a3a75d1a1b0048810c42594e45544c6963656e73650001",
+            "version": 0,
+          },
+        ],
         "signatures": Map {
           "3213e3fa6e42a75ba69df35d80666a021b0a650be3c5dadee03532414e90ab9c" => "76183df968ab1309d7a411d5513c24640c766c87d875415769cf373c59454a181c93963b1b1c33be70cc62db0bc8e3e2e0a1b53c1ba338ab58e1baf79642ca0c",
         },
@@ -310,12 +384,14 @@ Object {
       "body": Object {
         "auxiliaryDataHash": undefined,
         "certificates": undefined,
+        "collateralReturn": undefined,
         "collaterals": Array [
           Object {
             "index": 0,
             "txId": "958adee7adb5cfe0510e9f9b63af2d9409bf25637af1ac899fe34b7519568112",
           },
         ],
+        "donation": undefined,
         "fee": 383135n,
         "inputs": Array [
           Object {
@@ -326,6 +402,7 @@ Object {
         "mint": Map {
           "4d2047d7af3d8de799de5daa6e1b0ebfc039f4274084d5bb9ba3975d42594e45544c6963656e7365" => 3n,
         },
+        "networkId": undefined,
         "outputs": Array [
           Object {
             "address": "addr_test1qrc7mfr62uj0zg07ylfq37ukce6ahxtumdl0d3ar5aw35x758sc7z8763mfpes0j7wqrkkrdgna98c0rtlps585ypdnst69syh",
@@ -333,7 +410,7 @@ Object {
             "datumHash": undefined,
             "scriptReference": undefined,
             "value": Object {
-              "assets": Map {},
+              "assets": undefined,
               "coins": 4444865n,
             },
           },
@@ -374,16 +451,24 @@ Object {
             },
           },
         ],
+        "proposalProcedures": undefined,
+        "referenceInputs": undefined,
         "requiredExtraSignatures": Array [
           "f1eda47a5724f121fe27d208fb96c675db997cdb7ef6c7a3a75d1a1b",
         ],
         "scriptIntegrityHash": "efa020e8985191676d8922ea1bb7f0134dda7008a9a02fa5d87d00363a9ae096",
-        "validityInterval": Object {},
+        "totalCollateral": undefined,
+        "treasuryValue": undefined,
+        "update": undefined,
+        "validityInterval": undefined,
+        "votingProcedures": undefined,
+        "withdrawals": undefined,
       },
       "id": "2c8ddb336af166f19bf609f259fa9217fc3c7fed76c576e13bde393c145e181f",
       "inputSource": "inputs",
+      "isValid": true,
       "witness": Object {
-        "bootstrap": Array [],
+        "bootstrap": undefined,
         "datums": Array [
           Object {
             "cbor": "d8799f581c0bfe875a7ae9db3c1b3827483ac6a1d02a7a93d3d26df00c7973aa47ff",
@@ -443,6 +528,13 @@ Object {
             "purpose": "mint",
           },
         ],
+        "scripts": Array [
+          Object {
+            "__type": "plutus",
+            "bytes": "590a05010000333323322323322323233223232323232323232323232323232323232323232322222322323253353232533500213500122333350012302949894cd4cc03800c03040ac4cd5ce24921496e76616c6964206c6963656e7365206d696e74696e6720617574686f726974790002a230294988c0a52613500122333350012302949894cd54cd4cc03800c03040ac4cd5ce248121496e76616c6964206c6963656e7365206d696e74696e6720617574686f726974790002a153355335333355300f120013350102223003300200120012202c35026122333550272233355029225335002213300702600210010013502a1223300235004222533500121533533355302b1200122333573466e3c0080040dc0d8004d403488888888880088c8c84ccccccd5d200191999ab9a3370e6aae75400d2000233335573ea0064a06646666aae7cd5d128021299a991999999aba400125036250362503625036235037375c0040626ae85401484d40d848c004008540d0940d00bc0b8940c80b0940c4940c4940c4940c40b04d55cf280089baa0011502d1502c00100135005222222222200902b102a102b102b13357389211a2020496e636f7272656374206c6963656e7365206d696e7465640002a102a230294988c0a5263333573466e1cd55cea801a400046644246600200600464646464646464646464646666ae68cdc39aab9d500a480008cccccccccc888888888848cccccccccc00402c02802402001c01801401000c008cd40688c8c8cccd5cd19b8735573aa004900011991091980080180118119aba15002301f357426ae8940088c98c80b0cd5ce01681601509aab9e5001137540026ae854028cd406806cd5d0a804999aa80ebae501c35742a010666aa03aeb94070d5d0a80399a80d0119aba1500633501a335502602475a6ae854014c8c8c8cccd5cd19b8735573aa00490001199109198008018011919191999ab9a3370e6aae754009200023322123300100300233502975a6ae854008c0a8d5d09aba2500223263203033573806206005c26aae7940044dd50009aba150023232323333573466e1cd55cea8012400046644246600200600466a052eb4d5d0a80118151aba135744a004464c6406066ae700c40c00b84d55cf280089baa001357426ae8940088c98c80b0cd5ce01681601509aab9e5001137540026ae854010cd4069d71aba1500333501a335502675c40026ae854008c080d5d09aba2500223263202833573805205004c26ae8940044d5d1280089aba25001135744a00226ae8940044d5d1280089aba25001135744a00226aae7940044dd50009aba150033232323333573466e1d40052006232122223004005301b357426aae79400c8cccd5cd19b875002480108c848888c008014c074d5d09aab9e500423333573466e1d400d20022321222230010053019357426aae7940148cccd5cd19b875004480008c848888c00c014dd71aba135573ca00c464c6404666ae7009008c08408007c0784d55cea80089baa001357426ae89400c8c98c8070cd5ce00e80e00d1999ab9a3370ea0089001109100111999ab9a3370ea00a9000109100091931900e19ab9c01d01c01a019101a13263201a335738921035054350001a135573ca00226ea80044d55ce9baa00122350022222222222533533355300d1200133500e225335002210031001502125335333573466e3c0300040a80a44d408c0045408800c840a840a0c8004d5407488448894cd40044d400c88004884ccd401488008c010008ccd54c01c4800401401000448848cc00400c00848c88c008dd6000990009aa80e111999aab9f0012501b233501a30043574200460066ae880080448c8c8c8cccd5cd19b8735573aa00690001199911091998008020018011919191999ab9a3370e6aae7540092000233221233001003002301335742a00466a0180246ae84d5d1280111931900b19ab9c017016014135573ca00226ea8004d5d0a801999aa803bae500635742a00466a010eb8d5d09aba2500223263201233573802602402026ae8940044d55cf280089baa0011335500175ceb44488c88c008dd5800990009aa80d11191999aab9f0022501a23350193355014300635573aa004600a6aae794008c010d5d100180809aba100112232323333573466e1d400520002350143005357426aae79400c8cccd5cd19b87500248008940508c98c8040cd5ce00880800700689aab9d500113754002464646666ae68cdc39aab9d5002480008cc8848cc00400c008c014d5d0a8011bad357426ae8940088c98c8034cd5ce00700680589aab9e5001137540024646666ae68cdc39aab9d5001480008dd71aba135573ca004464c6401666ae7003002c0244dd500089119191999ab9a3370ea00290021091100091999ab9a3370ea00490011190911180180218031aba135573ca00846666ae68cdc3a801a400042444004464c6401c66ae7003c03803002c0284d55cea80089baa0012323333573466e1d40052002201523333573466e1d40092000201523263200a33573801601401000e26aae74dd5000919191919191999ab9a3370ea002900610911111100191999ab9a3370ea004900510911111100211999ab9a3370ea00690041199109111111198008048041bae35742a00a6eb4d5d09aba2500523333573466e1d40112006233221222222233002009008375c6ae85401cdd71aba135744a00e46666ae68cdc3a802a400846644244444446600c01201060186ae854024dd71aba135744a01246666ae68cdc3a8032400446424444444600e010601a6ae84d55cf280591999ab9a3370ea00e900011909111111180280418071aba135573ca018464c6402466ae7004c04804003c03803403002c0284d55cea80209aab9e5003135573ca00426aae7940044dd50009191919191999ab9a3370ea002900111999110911998008028020019bad35742a0086eb4d5d0a8019bad357426ae89400c8cccd5cd19b875002480008c8488c00800cc020d5d09aab9e500623263200b33573801801601201026aae75400c4d5d1280089aab9e500113754002464646666ae68cdc3a800a400446424460020066eb8d5d09aab9e500323333573466e1d400920002321223002003375c6ae84d55cf280211931900419ab9c009008006005135573aa00226ea800444888c8c8cccd5cd19b8735573aa0049000119aa80598031aba150023005357426ae8940088c98c8020cd5ce00480400309aab9e5001137540029309000a48103505431003200135500b2211222533500115007221350022253353300700600213500c0011333553009120010070060031122123300100300212122300200311220011122320013200135500922533500110032213300600230040011233500150025003112200212212233001004003233573892011443617463682d616c6c2063617365206572726f720000212200212200111232300100122330033002002001480092211cf1eda47a5724f121fe27d208fb96c675db997cdb7ef6c7a3a75d1a1b0048810c42594e45544c6963656e73650001",
+            "version": 0,
+          },
+        ],
         "signatures": Map {
           "3213e3fa6e42a75ba69df35d80666a021b0a650be3c5dadee03532414e90ab9c" => "2c130293b9ec327d2ae59c4bfbc7779951b1deb1a9545ac9c3462ecb7e18b407e4d48d153500ee848dac1dd07c5db97e1fa1d094ee7903fa689e45fb08f96e0e",
         },
@@ -453,11 +545,14 @@ Object {
         "blob": Map {
           0n => Array [],
         },
+        "scripts": undefined,
       },
       "body": Object {
         "auxiliaryDataHash": "b93d8e428871a0b0e12c5c554653f515f50fe48dc5b55af7e3667e7d9661ea2c",
         "certificates": undefined,
+        "collateralReturn": undefined,
         "collaterals": undefined,
+        "donation": undefined,
         "fee": 183233n,
         "inputs": Array [
           Object {
@@ -474,6 +569,7 @@ Object {
           },
         ],
         "mint": undefined,
+        "networkId": undefined,
         "outputs": Array [
           Object {
             "address": "addr_test1qry0mqhwlf84py9nhz5qukujgjjx26cwg3zqvm2aqeuqqneyz5g72vhh8ws2fcjudfjesyl8fy4qss4rdx9v34e2pxps5s28ar",
@@ -481,7 +577,7 @@ Object {
             "datumHash": undefined,
             "scriptReference": undefined,
             "value": Object {
-              "assets": Map {},
+              "assets": undefined,
               "coins": 1000000n,
             },
           },
@@ -491,20 +587,33 @@ Object {
             "datumHash": undefined,
             "scriptReference": undefined,
             "value": Object {
-              "assets": Map {},
+              "assets": undefined,
               "coins": 9986971687n,
             },
           },
         ],
+        "proposalProcedures": undefined,
+        "referenceInputs": undefined,
         "requiredExtraSignatures": undefined,
+        "scriptIntegrityHash": undefined,
+        "totalCollateral": undefined,
+        "treasuryValue": undefined,
+        "update": undefined,
         "validityInterval": Object {
+          "invalidBefore": undefined,
           "invalidHereafter": 11198411,
         },
+        "votingProcedures": undefined,
+        "withdrawals": undefined,
       },
       "id": "5448314ba8c137b110f279c2b8869f88b77cce325cddf8aec64480708bd18915",
       "inputSource": "inputs",
+      "isValid": true,
       "witness": Object {
-        "bootstrap": Array [],
+        "bootstrap": undefined,
+        "datums": undefined,
+        "redeemers": undefined,
+        "scripts": undefined,
         "signatures": Map {
           "53b8509684715055c86ded21c00e6f7c9c2efa73a94959842a3fe91d6001e932" => "cc35732a94c3f4521479942a07bdbf54f71062dd134fe66ff015a66ec74016b348782e4d2eafd99ae66cc7894249587622c4092090c841b439dfea558ff2190d",
           "2cf1d6c8d41391e658e25dbc88638831d7af3254988bde4650e1c595c2121461" => "f76fd79984cb7bbdeb5445c040aa873f60f1f3f56c71d3db77468261c864b8e745916bf519ae2e54453692dc2d1b0a0b1daf68ece63f084ac3b67d665637920d",
@@ -535,7 +644,9 @@ Object {
       "body": Object {
         "auxiliaryDataHash": undefined,
         "certificates": undefined,
+        "collateralReturn": undefined,
         "collaterals": undefined,
+        "donation": undefined,
         "fee": 207829n,
         "inputs": Array [
           Object {
@@ -544,6 +655,7 @@ Object {
           },
         ],
         "mint": undefined,
+        "networkId": undefined,
         "outputs": Array [
           Object {
             "address": "addr_test1vz09v9yfxguvlp0zsnrpa3tdtm7el8xufp3m5lsm7qxzclgmzkket",
@@ -551,18 +663,30 @@ Object {
             "datumHash": undefined,
             "scriptReference": undefined,
             "value": Object {
-              "assets": Map {},
+              "assets": undefined,
               "coins": 29699998493147869n,
             },
           },
         ],
+        "proposalProcedures": undefined,
+        "referenceInputs": undefined,
         "requiredExtraSignatures": undefined,
-        "validityInterval": Object {},
+        "scriptIntegrityHash": undefined,
+        "totalCollateral": undefined,
+        "treasuryValue": undefined,
+        "update": undefined,
+        "validityInterval": undefined,
+        "votingProcedures": undefined,
+        "withdrawals": undefined,
       },
-      "id": "59f68ea73b95940d443dc516702d5e5deccac2429e4d974f464cc9b26292fd9c",
+      "id": "09356caeb451ca971e1c58af2c95965d46d591e921c9b58c665b0e5e4c5b42a5",
       "inputSource": "inputs",
+      "isValid": true,
       "witness": Object {
-        "bootstrap": Array [],
+        "bootstrap": undefined,
+        "datums": undefined,
+        "redeemers": undefined,
+        "scripts": undefined,
         "signatures": Map {
           "8b0960d234bda67d52432c5d1a26aca2bfb5b9a09f966d9592a7bf0c728a1ecd" => "11a439a7391e34bd1bd4829f669a630276deb8cbe59f2a5ccca5190d19963bef9477e6f61e8d47438323ce9424befec3357c88908473fd332a7633ab2882c006",
           "618b625df30de53895ff29e7a3770dca56c2ff066d4aa05a6971905deecef6db" => "5cde79e14b9c033276fb503aaf6ae84fd0142d63e01c0a81ec1fb0794874184c2e3ac0fca64274f01be1ff3b7a93d2e7df60b485deb71fa8549a8ad879b0cb07",
@@ -599,7 +723,9 @@ Object {
       "body": Object {
         "auxiliaryDataHash": undefined,
         "certificates": undefined,
+        "collateralReturn": undefined,
         "collaterals": undefined,
+        "donation": undefined,
         "fee": 205981n,
         "inputs": Array [
           Object {
@@ -608,6 +734,7 @@ Object {
           },
         ],
         "mint": undefined,
+        "networkId": undefined,
         "outputs": Array [
           Object {
             "address": "addr_test1vz09v9yfxguvlp0zsnrpa3tdtm7el8xufp3m5lsm7qxzclgmzkket",
@@ -615,18 +742,30 @@ Object {
             "datumHash": "c5dfa8c3cbd5a959829618a7b46e163078cb3f1b39f152514d0c3686d553529a",
             "scriptReference": undefined,
             "value": Object {
-              "assets": Map {},
+              "assets": undefined,
               "coins": 29699998492735907n,
             },
           },
         ],
+        "proposalProcedures": undefined,
+        "referenceInputs": undefined,
         "requiredExtraSignatures": undefined,
-        "validityInterval": Object {},
+        "scriptIntegrityHash": undefined,
+        "totalCollateral": undefined,
+        "treasuryValue": undefined,
+        "update": undefined,
+        "validityInterval": undefined,
+        "votingProcedures": undefined,
+        "withdrawals": undefined,
       },
-      "id": "cb9a4cdc0e6555b713d99dd2088180be7a36a6c64d89e32b710e7c3a5d366cf2",
+      "id": "7a1ec0a69fbe6f0b6c80c53faf1ac880c49fc726dc26f4a785d827a8118f1c6d",
       "inputSource": "inputs",
+      "isValid": true,
       "witness": Object {
-        "bootstrap": Array [],
+        "bootstrap": undefined,
+        "datums": undefined,
+        "redeemers": undefined,
+        "scripts": undefined,
         "signatures": Map {
           "8b0960d234bda67d52432c5d1a26aca2bfb5b9a09f966d9592a7bf0c728a1ecd" => "845756107198dcd60b639313ca9ca17ea4553ee24fcaa23620260f9da8304eee99b7bfce574071ec216a148b75162b01294dea76a6a8abae1de5387a68b44c03",
           "618b625df30de53895ff29e7a3770dca56c2ff066d4aa05a6971905deecef6db" => "2c65c8f60495bdcf7fc077ff3545bf31d2379b5bc0efb88e393d54a2a43fbb7616d18c3e6537bb83d1c56f75241b9b13c72d9f28d96d692eb1e58cf52977a30d",
@@ -687,7 +826,7 @@ Object {
         "requiredExtraSignatures": undefined,
       },
       "id": "6497b33b10fa2619c6efbd9f874ecd1c91badb10bf70850732aab45b90524d9e",
-      "inputSource": "inputs",
+      "inputSource": undefined,
       "witness": Object {
         "bootstrap": Array [],
         "signatures": Map {
@@ -719,7 +858,9 @@ Object {
       "body": Object {
         "auxiliaryDataHash": undefined,
         "certificates": undefined,
+        "collateralReturn": undefined,
         "collaterals": undefined,
+        "donation": undefined,
         "fee": 205981n,
         "inputs": Array [
           Object {
@@ -728,6 +869,7 @@ Object {
           },
         ],
         "mint": undefined,
+        "networkId": undefined,
         "outputs": Array [
           Object {
             "address": "addr_test1vz09v9yfxguvlp0zsnrpa3tdtm7el8xufp3m5lsm7qxzclgmzkket",
@@ -735,18 +877,30 @@ Object {
             "datumHash": undefined,
             "scriptReference": undefined,
             "value": Object {
-              "assets": Map {},
+              "assets": undefined,
               "coins": 29699998492941888n,
             },
           },
         ],
+        "proposalProcedures": undefined,
+        "referenceInputs": undefined,
         "requiredExtraSignatures": undefined,
-        "validityInterval": Object {},
+        "scriptIntegrityHash": undefined,
+        "totalCollateral": undefined,
+        "treasuryValue": undefined,
+        "update": undefined,
+        "validityInterval": undefined,
+        "votingProcedures": undefined,
+        "withdrawals": undefined,
       },
-      "id": "0dd9b1dd89ff50c6907b3fd0385fde86f7c6877c2c9a95a9a9aa83b1cfead128",
+      "id": "59132cc019b0674704ebd1aa6235ef70d350927cbb02a480c9a01d8254119b21",
       "inputSource": "inputs",
+      "isValid": true,
       "witness": Object {
-        "bootstrap": Array [],
+        "bootstrap": undefined,
+        "datums": undefined,
+        "redeemers": undefined,
+        "scripts": undefined,
         "signatures": Map {
           "8b0960d234bda67d52432c5d1a26aca2bfb5b9a09f966d9592a7bf0c728a1ecd" => "222b333c56031a63e8e975f59fa6e646a733cc8c4b6d9d2aecea0d23366edadb83077a9ac79541e3044798549bc9088e9409194f4451324a65bb1d8237b74a03",
           "618b625df30de53895ff29e7a3770dca56c2ff066d4aa05a6971905deecef6db" => "05d8f7aff6fc03cbb3b8c63e0ebcef7cfd55c86be48d1d39642d46d62f879114e3285ec16814746e836d1f6ac6e8be4caf203651e5cbb41297c01b4dde17a606",
@@ -904,7 +1058,9 @@ Object {
             },
           },
         ],
+        "collateralReturn": undefined,
         "collaterals": undefined,
+        "donation": undefined,
         "fee": 238057n,
         "inputs": Array [
           Object {
@@ -913,6 +1069,7 @@ Object {
           },
         ],
         "mint": undefined,
+        "networkId": undefined,
         "outputs": Array [
           Object {
             "address": "addr_test1vz09v9yfxguvlp0zsnrpa3tdtm7el8xufp3m5lsm7qxzclgmzkket",
@@ -920,7 +1077,7 @@ Object {
             "datumHash": undefined,
             "scriptReference": undefined,
             "value": Object {
-              "assets": Map {},
+              "assets": undefined,
               "coins": 29699998493561943n,
             },
           },
@@ -930,7 +1087,7 @@ Object {
             "datumHash": undefined,
             "scriptReference": undefined,
             "value": Object {
-              "assets": Map {},
+              "assets": undefined,
               "coins": 100000000000000n,
             },
           },
@@ -940,7 +1097,7 @@ Object {
             "datumHash": undefined,
             "scriptReference": undefined,
             "value": Object {
-              "assets": Map {},
+              "assets": undefined,
               "coins": 100000000000000n,
             },
           },
@@ -950,20 +1107,33 @@ Object {
             "datumHash": undefined,
             "scriptReference": undefined,
             "value": Object {
-              "assets": Map {},
+              "assets": undefined,
               "coins": 100000000000000n,
             },
           },
         ],
+        "proposalProcedures": undefined,
+        "referenceInputs": undefined,
         "requiredExtraSignatures": undefined,
+        "scriptIntegrityHash": undefined,
+        "totalCollateral": undefined,
+        "treasuryValue": undefined,
+        "update": undefined,
         "validityInterval": Object {
+          "invalidBefore": undefined,
           "invalidHereafter": 90000,
         },
+        "votingProcedures": undefined,
+        "withdrawals": undefined,
       },
       "id": "a3d6f2627a56fe7921eeda546abfe164321881d41549b7f2fbf09ea0b718d758",
       "inputSource": "inputs",
+      "isValid": true,
       "witness": Object {
-        "bootstrap": Array [],
+        "bootstrap": undefined,
+        "datums": undefined,
+        "redeemers": undefined,
+        "scripts": undefined,
         "signatures": Map {
           "9691ed9d98a5b79d5bc46c4496a6dba7e103f668f525c8349b6b92676cb3eae4" => "5ce8776d3b749e7b096f5dbd388029db57a0c9fc87662b93cf31da4ad1748b3d5d92a7d65454043ae10dbfa4ac34929311526323a7ab3a7436f02e16abdbdb08",
           "28450e496f2217e62bf9fd2ece94114562ade49368f456d2e63df2bc4af3244c" => "7c56a4a38044f6b5ee32590bf73cb1101c7c650ff76c07c15d31c87181607a750e90dc09abcb1a431e0ba7c31065f5e3743bf3e1bafe120ca45e4c910f2dc000",
