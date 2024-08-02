@@ -12,8 +12,7 @@ import {
   ObservableChainSync,
   PointOrOrigin,
   StakeDistribution,
-  StateQueryErrorCode,
-  TxCBOR
+  StateQueryErrorCode
 } from '@cardano-sdk/core';
 import {
   ChainSynchronization,
@@ -50,6 +49,7 @@ import {
   withCoreCardanoNodeError
 } from '../queries';
 import isEqual from 'lodash/isEqual.js';
+import type { Serialization } from '@cardano-sdk/core';
 
 const ogmiosToCoreIntersection = (intersection: ChainSynchronization.Intersection) => ({
   point: ogmiosToCorePointOrOrigin(intersection.intersection),
@@ -220,7 +220,7 @@ export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
     );
   }
 
-  submitTx(tx: TxCBOR): Observable<Cardano.TransactionId> {
+  submitTx(tx: Serialization.TxCBOR): Observable<Cardano.TransactionId> {
     return this.#interactionContext$.pipe(
       switchMap((context) =>
         from(

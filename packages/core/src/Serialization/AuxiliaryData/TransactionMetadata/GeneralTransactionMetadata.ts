@@ -1,9 +1,8 @@
-/* eslint-disable complexity,max-statements,sonarjs/cognitive-complexity */
-import * as Cardano from '../../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { HexBlob } from '@cardano-sdk/util';
 import { TransactionMetadatum } from './TransactionMetadatum';
 import { hexToBytes } from '../../../util/misc';
+import type * as Cardano from '../../../Cardano';
 
 /** General Transaction Metadata. */
 export class GeneralTransactionMetadata {

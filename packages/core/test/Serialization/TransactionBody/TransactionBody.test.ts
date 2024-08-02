@@ -2,7 +2,8 @@
 import * as Cardano from '../../../src/Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
-import { TransactionBody } from '../../../src/Serialization';
+import { TransactionBody, TxBodyCBOR, TxCBOR } from '../../../src/Serialization';
+import { babbageTx } from '../testData';
 import { mintTokenMap, params, txIn, txOut } from './testData';
 
 // Test data used in the following tests was generated with the cardano-serialization-lib
@@ -272,5 +273,14 @@ describe('TransactionBody', () => {
 
     expect(bodyFromCbor.toCore()).toEqual(noInputsCore);
     expect(bodyFromCore.toCbor()).toEqual(noInputsCbor);
+  });
+
+  it('hash() computes transaction hash/id', () => {
+    const bodyCbor = TxBodyCBOR.fromTxCBOR(TxCBOR.serialize(babbageTx));
+    const txId = TransactionBody.fromCbor(bodyCbor).hash();
+    expect(typeof txId).toBe('string');
+    expect(txId).toHaveLength(64);
+    // hex characters only
+    expect(Buffer.from(txId, 'hex').toString('hex')).toEqual(txId);
   });
 });

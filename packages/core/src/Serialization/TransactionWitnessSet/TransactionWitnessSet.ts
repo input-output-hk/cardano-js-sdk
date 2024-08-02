@@ -1,17 +1,18 @@
 /* eslint-disable sonarjs/cognitive-complexity, complexity, max-statements, unicorn/prefer-switch */
-import * as Cardano from '../../Cardano';
 import { BootstrapWitness } from './BootstrapWitness';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { CborSet } from '../Common';
 import { HexBlob } from '@cardano-sdk/util';
 import { NativeScript, PlutusV1Script, PlutusV2Script, PlutusV3Script } from '../Scripts';
 import { PlutusData } from '../PlutusData/PlutusData';
+import { PlutusLanguageVersion, ScriptType } from '../../Cardano/types/Script';
 import { Redeemers } from './Redeemer';
 import { SerializationError, SerializationFailure } from '../../errors';
 import { VkeyWitness } from './VkeyWitness';
 import { hexToBytes } from '../../util/misc';
 import _groupBy from 'lodash/groupBy.js';
 import uniqWith from 'lodash/uniqWith.js';
+import type * as Cardano from '../../Cardano';
 
 /** This type represents the segregated CDDL scripts. */
 type CddlScripts = {
@@ -413,17 +414,17 @@ export class TransactionWitnessSet {
       ]
     >(
       ([native, v1, v2, v3], script) => {
-        if (script.__type === Cardano.ScriptType.Native) {
+        if (script.__type === ScriptType.Native) {
           native ? native.push(script) : (native = [script]);
         } else {
           switch (script.version) {
-            case Cardano.PlutusLanguageVersion.V1:
+            case PlutusLanguageVersion.V1:
               v1 ? v1.push(script) : (v1 = [script]);
               break;
-            case Cardano.PlutusLanguageVersion.V2:
+            case PlutusLanguageVersion.V2:
               v2 ? v2.push(script) : (v2 = [script]);
               break;
-            case Cardano.PlutusLanguageVersion.V3:
+            case PlutusLanguageVersion.V3:
               v3 ? v3.push(script) : (v3 = [script]);
               break;
             default:

@@ -1,8 +1,8 @@
 /* eslint-disable complexity */
-import * as Cardano from '../../Cardano';
 import { AuthCommitteeHot } from './AuthCommitteeHot';
 import { CborReader } from '../CBOR';
 import { CertificateKind } from './CertificateKind';
+import { CertificateType } from '../../Cardano/types/Certificate';
 import { GenesisKeyDelegation } from './GenesisKeyDelegation';
 import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
 import { MoveInstantaneousReward } from './MoveInstantaneousReward';
@@ -22,6 +22,7 @@ import { Unregistration } from './Unregistration';
 import { UpdateDelegateRepresentative } from './UpdateDelegateRepresentative';
 import { VoteDelegation } from './VoteDelegation';
 import { VoteRegistrationDelegation } from './VoteRegistrationDelegation';
+import type * as Cardano from '../../Cardano';
 
 /**
  * Certificates are a means to encode various essential operations related to stake
@@ -295,65 +296,65 @@ export class Certificate {
     let cert: Certificate;
 
     switch (certificate.__typename) {
-      case Cardano.CertificateType.StakeRegistration:
+      case CertificateType.StakeRegistration:
         cert = Certificate.newStakeRegistration(StakeRegistration.fromCore(certificate));
         break;
-      case Cardano.CertificateType.StakeDeregistration:
+      case CertificateType.StakeDeregistration:
         cert = Certificate.newStakeDeregistration(StakeDeregistration.fromCore(certificate));
         break;
-      case Cardano.CertificateType.StakeDelegation:
+      case CertificateType.StakeDelegation:
         cert = Certificate.newStakeDelegation(StakeDelegation.fromCore(certificate));
         break;
-      case Cardano.CertificateType.PoolRetirement:
+      case CertificateType.PoolRetirement:
         cert = Certificate.newPoolRetirement(PoolRetirement.fromCore(certificate));
         break;
-      case Cardano.CertificateType.PoolRegistration:
+      case CertificateType.PoolRegistration:
         cert = Certificate.newPoolRegistration(PoolRegistration.fromCore(certificate));
         break;
-      case Cardano.CertificateType.MIR:
+      case CertificateType.MIR:
         cert = Certificate.newMoveInstantaneousRewardsCert(MoveInstantaneousReward.fromCore(certificate));
         break;
-      case Cardano.CertificateType.GenesisKeyDelegation:
+      case CertificateType.GenesisKeyDelegation:
         cert = Certificate.newGenesisKeyDelegation(GenesisKeyDelegation.fromCore(certificate));
         break;
-      case Cardano.CertificateType.Registration:
+      case CertificateType.Registration:
         cert = Certificate.newRegistrationCert(Registration.fromCore(certificate));
         break;
-      case Cardano.CertificateType.Unregistration:
+      case CertificateType.Unregistration:
         cert = Certificate.newUnregistrationCert(Unregistration.fromCore(certificate));
         break;
-      case Cardano.CertificateType.VoteDelegation:
+      case CertificateType.VoteDelegation:
         cert = Certificate.newVoteDelegationCert(VoteDelegation.fromCore(certificate));
         break;
-      case Cardano.CertificateType.StakeVoteDelegation:
+      case CertificateType.StakeVoteDelegation:
         cert = Certificate.newStakeVoteDelegationCert(StakeVoteDelegation.fromCore(certificate));
         break;
-      case Cardano.CertificateType.StakeRegistrationDelegation:
+      case CertificateType.StakeRegistrationDelegation:
         cert = Certificate.newStakeRegistrationDelegationCert(StakeRegistrationDelegation.fromCore(certificate));
         break;
-      case Cardano.CertificateType.VoteRegistrationDelegation:
+      case CertificateType.VoteRegistrationDelegation:
         cert = Certificate.newVoteRegistrationDelegationCert(VoteRegistrationDelegation.fromCore(certificate));
         break;
-      case Cardano.CertificateType.StakeVoteRegistrationDelegation:
+      case CertificateType.StakeVoteRegistrationDelegation:
         cert = Certificate.newStakeVoteRegistrationDelegationCert(
           StakeVoteRegistrationDelegation.fromCore(certificate)
         );
         break;
-      case Cardano.CertificateType.AuthorizeCommitteeHot:
+      case CertificateType.AuthorizeCommitteeHot:
         cert = Certificate.newAuthCommitteeHotCert(AuthCommitteeHot.fromCore(certificate));
         break;
-      case Cardano.CertificateType.ResignCommitteeCold:
+      case CertificateType.ResignCommitteeCold:
         cert = Certificate.newResignCommitteeColdCert(ResignCommitteeCold.fromCore(certificate));
         break;
-      case Cardano.CertificateType.RegisterDelegateRepresentative:
+      case CertificateType.RegisterDelegateRepresentative:
         cert = Certificate.newRegisterDelegateRepresentativeCert(RegisterDelegateRepresentative.fromCore(certificate));
         break;
-      case Cardano.CertificateType.UnregisterDelegateRepresentative:
+      case CertificateType.UnregisterDelegateRepresentative:
         cert = Certificate.newUnregisterDelegateRepresentativeCert(
           UnregisterDelegateRepresentative.fromCore(certificate)
         );
         break;
-      case Cardano.CertificateType.UpdateDelegateRepresentative:
+      case CertificateType.UpdateDelegateRepresentative:
         cert = Certificate.newUpdateDelegateRepresentativeCert(UpdateDelegateRepresentative.fromCore(certificate));
         break;
       default:

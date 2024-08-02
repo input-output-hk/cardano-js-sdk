@@ -1,8 +1,10 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborWriter } from '../CBOR';
 import { CertificateKind } from './CertificateKind';
+import { CertificateType } from '../../Cardano/types/Certificate';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import { PoolId } from '../../Cardano/types/StakePool';
+import type * as Cardano from '../../Cardano';
 
 const EMBEDDED_GROUP_SIZE = 3;
 const CREDENTIAL_SIZE = 2;
@@ -112,8 +114,8 @@ export class StakeDelegation {
    */
   toCore(): Cardano.StakeDelegationCertificate {
     return {
-      __typename: Cardano.CertificateType.StakeDelegation,
-      poolId: Cardano.PoolId.fromKeyHash(this.#poolKeyHash),
+      __typename: CertificateType.StakeDelegation,
+      poolId: PoolId.fromKeyHash(this.#poolKeyHash),
       stakeCredential: this.#credential
     };
   }
@@ -124,7 +126,7 @@ export class StakeDelegation {
    * @param cert core StakeDelegationCertificate object.
    */
   static fromCore(cert: Cardano.StakeDelegationCertificate) {
-    return new StakeDelegation(cert.stakeCredential, Cardano.PoolId.toKeyHash(cert.poolId));
+    return new StakeDelegation(cert.stakeCredential, PoolId.toKeyHash(cert.poolId));
   }
 
   /**

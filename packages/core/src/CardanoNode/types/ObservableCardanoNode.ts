@@ -1,5 +1,5 @@
 import { bufferChainSyncEvent } from '../util/bufferChainSyncEvent';
-import type { Cardano, HealthCheckResponse, TxCBOR } from '../..';
+import type { Cardano, HealthCheckResponse, Serialization } from '../..';
 import type { EraSummary } from './CardanoNode';
 import type { Observable } from 'rxjs';
 
@@ -76,7 +76,7 @@ export interface ObservableCardanoNode {
    * @param tx serialized transaction
    * @returns transaction id
    */
-  submitTx(tx: TxCBOR): Observable<Cardano.TransactionId>;
+  submitTx(tx: Serialization.TxCBOR): Observable<Cardano.TransactionId>;
 }
 
 export const ObservableCardanoNode = { bufferChainSyncEvent } as const;

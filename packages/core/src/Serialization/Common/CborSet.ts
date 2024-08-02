@@ -1,6 +1,6 @@
 import { CborReader, CborReaderState, CborTag, CborWriter } from '../CBOR';
 import { HexBlob } from '@cardano-sdk/util';
-import { inConwayEra } from '../../util';
+import { inConwayEra } from '../../util/conwayEra';
 
 /** Represents a cbor serialization wrapper for a Core type <{@link C}> */
 interface CborSerializable<C> {

@@ -1,10 +1,10 @@
-import * as Cardano from '../../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { GovernanceActionId } from '../../Common/GovernanceActionId';
 import { HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
 import { Voter } from './Voter';
 import { VotingProcedure } from './VotingProcedure';
 import { hexToBytes } from '../../../util/misc';
+import type * as Cardano from '../../../Cardano';
 
 /** A map of Voter + GovernanceActionId to VotingProcedure; */
 export class VotingProcedures {

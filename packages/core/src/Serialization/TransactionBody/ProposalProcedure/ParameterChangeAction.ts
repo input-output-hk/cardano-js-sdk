@@ -1,11 +1,12 @@
-import * as Cardano from '../../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { GovernanceActionId } from '../../Common/GovernanceActionId';
 import { GovernanceActionKind } from './GovernanceActionKind';
+import { GovernanceActionType } from '../../../Cardano/types/Governance';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { ProtocolParamUpdate } from '../../Update';
 import { hexToBytes } from '../../../util/misc';
+import type * as Cardano from '../../../Cardano';
 
 const EMBEDDED_GROUP_SIZE = 4;
 
@@ -110,7 +111,7 @@ export class ParameterChangeAction {
    */
   toCore(): Cardano.ParameterChangeAction {
     return {
-      __typename: Cardano.GovernanceActionType.parameter_change_action,
+      __typename: GovernanceActionType.parameter_change_action,
       governanceActionId: this.#govActionId ? this.#govActionId.toCore() : null,
       policyHash: this.#policyHash ? this.#policyHash : null,
       protocolParamUpdate: this.#protocolParamUpdate.toCore()

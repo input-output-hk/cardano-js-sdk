@@ -1,9 +1,9 @@
-import * as Cardano from '../../../../Cardano';
 import { CborReader } from '../../../CBOR';
 import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
 import { MultiHostName } from './MultiHostName';
 import { SingleHostAddr } from './SingleHostAddr';
 import { SingleHostName } from './SingleHostName';
+import type * as Cardano from '../../../../Cardano';
 
 /** The relay kind. */
 export enum RelayKind {

@@ -1,10 +1,11 @@
-import * as Cardano from '../../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { GovernanceActionId } from '../../Common/GovernanceActionId';
 import { GovernanceActionKind } from './GovernanceActionKind';
+import { GovernanceActionType } from '../../../Cardano/types/Governance';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { ProtocolVersion } from '../../Common';
 import { hexToBytes } from '../../../util/misc';
+import type * as Cardano from '../../../Cardano';
 
 const EMBEDDED_GROUP_SIZE = 3;
 
@@ -92,7 +93,7 @@ export class HardForkInitiationAction {
    */
   toCore(): Cardano.HardForkInitiationAction {
     return {
-      __typename: Cardano.GovernanceActionType.hard_fork_initiation_action,
+      __typename: GovernanceActionType.hard_fork_initiation_action,
       governanceActionId: this.#govActionId ? this.#govActionId.toCore() : null,
       protocolVersion: this.#protocolVersion.toCore()
     };

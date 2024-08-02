@@ -1,9 +1,9 @@
-import * as Cardano from '../../../Cardano';
 import { Anchor } from '../../Common/Anchor';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { hexToBytes } from '../../../util/misc';
+import type * as Cardano from '../../../Cardano';
 
 const CONSTITUTION_ARRAY_SIZE = 2;
 

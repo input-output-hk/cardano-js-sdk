@@ -1,9 +1,9 @@
-import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, HandleResolution, Serialization, TxCBOR } from '@cardano-sdk/core';
-import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
-import { Cip30SignDataRequest, Cip8SignDataContext } from './cip8';
-import { HexBlob, OpaqueString, Shutdown } from '@cardano-sdk/util';
-import { Logger } from 'ts-log';
+import type * as Crypto from '@cardano-sdk/crypto';
+import type { Cardano, HandleResolution, Serialization } from '@cardano-sdk/core';
+import type { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
+import type { Cip30SignDataRequest, Cip8SignDataContext } from './cip8';
+import type { HexBlob, OpaqueString, Shutdown } from '@cardano-sdk/util';
+import type { Logger } from 'ts-log';
 import type { Runtime } from 'webextension-polyfill';
 export type MessageSender = Runtime.MessageSender;
 
@@ -240,7 +240,7 @@ export type AsyncKeyAgent = Pick<
 export type WitnessOptions = SignTransactionOptions;
 
 export interface WitnessedTx {
-  cbor: TxCBOR;
+  cbor: Serialization.TxCBOR;
   tx: Cardano.Tx;
   context: {
     handleResolutions: HandleResolution[];

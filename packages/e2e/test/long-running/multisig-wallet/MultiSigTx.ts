@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, Serialization, deserializeTx } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 
 /**
@@ -63,7 +63,7 @@ export class MultiSigTx {
 
     reader.readEndArray();
 
-    const transaction = deserializeTx(reader.readEncodedValue());
+    const transaction = Serialization.deserializeTx(reader.readEncodedValue());
     reader.readEndArray();
 
     return new MultiSigTx(transaction, expectedSigners);

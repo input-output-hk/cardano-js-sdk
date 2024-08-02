@@ -1,9 +1,10 @@
-import * as Cardano from '../../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { GovernanceActionId } from '../../Common/GovernanceActionId';
 import { GovernanceActionKind } from './GovernanceActionKind';
+import { GovernanceActionType } from '../../../Cardano/types/Governance';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { hexToBytes } from '../../../util/misc';
+import type * as Cardano from '../../../Cardano';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
@@ -88,7 +89,7 @@ export class NoConfidence {
    */
   toCore(): Cardano.NoConfidence {
     return {
-      __typename: Cardano.GovernanceActionType.no_confidence,
+      __typename: GovernanceActionType.no_confidence,
       governanceActionId: this.#govActionId ? this.#govActionId.toCore() : null
     };
   }

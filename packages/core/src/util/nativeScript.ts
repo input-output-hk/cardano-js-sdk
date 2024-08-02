@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import * as Cardano from '../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
-import { NativeScript } from '../Serialization';
-import { SerializationError, SerializationFailure } from '../';
+import { NativeScript } from '../Serialization/Scripts/NativeScript';
+import { NativeScriptKind, ScriptType } from '../Cardano/types/Script';
+import { PolicyId } from '../Cardano/types/Asset';
+import { SerializationError, SerializationFailure } from '../errors';
+import { Slot } from '../Cardano/types/Block';
+import type * as Cardano from '../Cardano';
 
 /**
  * Gets the policy id of the given native script.
@@ -11,7 +14,7 @@ import { SerializationError, SerializationFailure } from '../';
  * @returns the policy Id.
  */
 export const nativeScriptPolicyId = (script: Cardano.NativeScript): Cardano.PolicyId =>
-  Cardano.PolicyId(NativeScript.fromCore(script).hash());
+  PolicyId(NativeScript.fromCore(script).hash());
 
 /**
  * Converts a json representation of a native script into a NativeScript.
@@ -31,17 +34,17 @@ export const jsonToNativeScript = (json: any): Cardano.NativeScript => {
   switch (json.type) {
     case 'sig': {
       coreScript = {
-        __type: Cardano.ScriptType.Native,
+        __type: ScriptType.Native,
         keyHash: Crypto.Ed25519KeyHashHex(json.keyHash),
-        kind: Cardano.NativeScriptKind.RequireSignature
+        kind: NativeScriptKind.RequireSignature
       };
 
       break;
     }
     case 'all': {
       coreScript = {
-        __type: Cardano.ScriptType.Native,
-        kind: Cardano.NativeScriptKind.RequireAllOf,
+        __type: ScriptType.Native,
+        kind: NativeScriptKind.RequireAllOf,
         scripts: new Array<Cardano.NativeScript>()
       };
       for (let i = 0; i < json.scripts.length; ++i) {
@@ -52,8 +55,8 @@ export const jsonToNativeScript = (json: any): Cardano.NativeScript => {
     }
     case 'any': {
       coreScript = {
-        __type: Cardano.ScriptType.Native,
-        kind: Cardano.NativeScriptKind.RequireAnyOf,
+        __type: ScriptType.Native,
+        kind: NativeScriptKind.RequireAnyOf,
         scripts: new Array<Cardano.NativeScript>()
       };
       for (let i = 0; i < json.scripts.length; ++i) {
@@ -65,8 +68,8 @@ export const jsonToNativeScript = (json: any): Cardano.NativeScript => {
     case 'atLeast': {
       const required = Number.parseInt(json.required);
       coreScript = {
-        __type: Cardano.ScriptType.Native,
-        kind: Cardano.NativeScriptKind.RequireNOf,
+        __type: ScriptType.Native,
+        kind: NativeScriptKind.RequireNOf,
         required,
         scripts: new Array<Cardano.NativeScript>()
       };
@@ -79,18 +82,18 @@ export const jsonToNativeScript = (json: any): Cardano.NativeScript => {
     }
     case 'before': {
       coreScript = {
-        __type: Cardano.ScriptType.Native,
-        kind: Cardano.NativeScriptKind.RequireTimeBefore,
-        slot: Cardano.Slot(Number.parseInt(json.slot))
+        __type: ScriptType.Native,
+        kind: NativeScriptKind.RequireTimeBefore,
+        slot: Slot(Number.parseInt(json.slot))
       };
 
       break;
     }
     case 'after': {
       coreScript = {
-        __type: Cardano.ScriptType.Native,
-        kind: Cardano.NativeScriptKind.RequireTimeAfter,
-        slot: Cardano.Slot(Number.parseInt(json.slot))
+        __type: ScriptType.Native,
+        kind: NativeScriptKind.RequireTimeAfter,
+        slot: Slot(Number.parseInt(json.slot))
       };
 
       break;

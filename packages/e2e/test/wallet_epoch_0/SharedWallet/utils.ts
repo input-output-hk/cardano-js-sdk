@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { HexBlob } from '@cardano-sdk/util';
 import {
@@ -267,7 +267,7 @@ export class SharedWalletWitnesser implements Witnesser {
     };
 
     return {
-      cbor: TxCBOR.serialize(transaction),
+      cbor: Serialization.TxCBOR.serialize(transaction),
       context: {
         handleResolutions: context.handleResolutions ?? []
       },

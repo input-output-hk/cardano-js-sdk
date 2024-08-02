@@ -1,8 +1,9 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborWriter } from '../CBOR';
 import { CertificateKind } from './CertificateKind';
+import { CertificateType } from '../../Cardano/types/Certificate';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import type * as Cardano from '../../Cardano';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
@@ -116,7 +117,7 @@ export class Registration {
    */
   toCore(): Cardano.NewStakeAddressCertificate {
     return {
-      __typename: Cardano.CertificateType.Registration,
+      __typename: CertificateType.Registration,
       deposit: this.#deposit,
       stakeCredential: this.#credential
     };

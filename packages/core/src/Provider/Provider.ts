@@ -1,14 +1,11 @@
-import { Cardano } from '..';
-
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { Logger } from 'ts-log';
-import { Percent } from '@cardano-sdk/util';
-import { Tip } from '../Cardano';
+import type { Cardano } from '..';
+import type { Logger } from 'ts-log';
+import type { Percent } from '@cardano-sdk/util';
 
 export type HealthCheckResponse = {
   ok: boolean;
   localNode?: {
-    ledgerTip?: Tip;
+    ledgerTip?: Cardano.Tip;
     networkSync?: Percent;
   };
   projectedTip?: Cardano.Tip;

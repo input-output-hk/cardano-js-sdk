@@ -1,12 +1,13 @@
 /* eslint-disable complexity, sonarjs/cognitive-complexity, max-statements, max-depth */
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
+import { Address } from '../../Cardano/Address';
 import { CborReader, CborReaderState, CborTag, CborWriter } from '../CBOR';
 import { Datum, DatumKind } from '../Common/Datum';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { PlutusData } from '../PlutusData';
 import { Script } from '../Scripts';
 import { Value } from './Value';
+import type * as Cardano from '../../Cardano';
 
 export const REQUIRED_FIELDS_COUNT = 2;
 
@@ -123,7 +124,7 @@ export class TransactionOutput {
 
         switch (key) {
           case 0n:
-            address = Cardano.Address.fromBytes(HexBlob.fromBytes(reader.readByteString()));
+            address = Address.fromBytes(HexBlob.fromBytes(reader.readByteString()));
             break;
           case 1n:
             value = Value.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
@@ -179,7 +180,7 @@ export class TransactionOutput {
       //   ]
       const length = reader.readStartArray();
 
-      address = Cardano.Address.fromBytes(HexBlob.fromBytes(reader.readByteString()));
+      address = Address.fromBytes(HexBlob.fromBytes(reader.readByteString()));
       value = Value.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
 
       if (length === 3) {
@@ -225,7 +226,7 @@ export class TransactionOutput {
    * @param coreTransactionOutput The core TransactionOutput object.
    */
   static fromCore(coreTransactionOutput: Cardano.TxOut): TransactionOutput {
-    const address = Cardano.Address.fromString(coreTransactionOutput.address);
+    const address = Address.fromString(coreTransactionOutput.address);
 
     if (!address) throw new InvalidArgumentError('coreTransactionOutput', `Invalid address ${address}`);
 

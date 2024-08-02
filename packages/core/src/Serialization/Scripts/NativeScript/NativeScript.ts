@@ -1,13 +1,14 @@
-import * as Cardano from '../../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader } from '../../CBOR';
 import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
+import { NativeScriptKind } from '../../../Cardano/types/Script';
 import { ScriptAll } from './ScriptAll';
 import { ScriptAny } from './ScriptAny';
 import { ScriptNOfK } from './ScriptNOfK';
 import { ScriptPubkey } from './ScriptPubkey';
 import { TimelockExpiry } from './TimelockExpiry';
 import { TimelockStart } from './TimelockStart';
+import type * as Cardano from '../../../Cardano';
 
 const HASH_LENGTH_IN_BYTES = 28;
 
@@ -24,7 +25,7 @@ export class NativeScript {
   #scriptPubKey: ScriptPubkey | undefined;
   #timelockExpiry: TimelockExpiry | undefined;
   #timelockStart: TimelockStart | undefined;
-  #kind: Cardano.NativeScriptKind;
+  #kind: NativeScriptKind;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -38,22 +39,22 @@ export class NativeScript {
     let cbor;
 
     switch (this.#kind) {
-      case Cardano.NativeScriptKind.RequireSignature:
+      case NativeScriptKind.RequireSignature:
         cbor = this.#scriptPubKey!.toCbor();
         break;
-      case Cardano.NativeScriptKind.RequireAllOf:
+      case NativeScriptKind.RequireAllOf:
         cbor = this.#scriptAll!.toCbor();
         break;
-      case Cardano.NativeScriptKind.RequireAnyOf:
+      case NativeScriptKind.RequireAnyOf:
         cbor = this.#scriptAny!.toCbor();
         break;
-      case Cardano.NativeScriptKind.RequireNOf:
+      case NativeScriptKind.RequireNOf:
         cbor = this.#scripNOfK!.toCbor();
         break;
-      case Cardano.NativeScriptKind.RequireTimeAfter:
+      case NativeScriptKind.RequireTimeAfter:
         cbor = this.#timelockStart!.toCbor();
         break;
-      case Cardano.NativeScriptKind.RequireTimeBefore:
+      case NativeScriptKind.RequireTimeBefore:
         cbor = this.#timelockExpiry!.toCbor();
         break;
       default:
@@ -78,22 +79,22 @@ export class NativeScript {
     const kind = Number(reader.readInt());
 
     switch (kind) {
-      case Cardano.NativeScriptKind.RequireSignature:
+      case NativeScriptKind.RequireSignature:
         nativeScript = NativeScript.newScriptPubkey(ScriptPubkey.fromCbor(cbor));
         break;
-      case Cardano.NativeScriptKind.RequireAllOf:
+      case NativeScriptKind.RequireAllOf:
         nativeScript = NativeScript.newScriptAll(ScriptAll.fromCbor(cbor));
         break;
-      case Cardano.NativeScriptKind.RequireAnyOf:
+      case NativeScriptKind.RequireAnyOf:
         nativeScript = NativeScript.newScriptAny(ScriptAny.fromCbor(cbor));
         break;
-      case Cardano.NativeScriptKind.RequireNOf:
+      case NativeScriptKind.RequireNOf:
         nativeScript = NativeScript.newScriptNOfK(ScriptNOfK.fromCbor(cbor));
         break;
-      case Cardano.NativeScriptKind.RequireTimeAfter:
+      case NativeScriptKind.RequireTimeAfter:
         nativeScript = NativeScript.newTimelockStart(TimelockStart.fromCbor(cbor));
         break;
-      case Cardano.NativeScriptKind.RequireTimeBefore:
+      case NativeScriptKind.RequireTimeBefore:
         nativeScript = NativeScript.newTimelockExpiry(TimelockExpiry.fromCbor(cbor));
         break;
       default:
@@ -114,22 +115,22 @@ export class NativeScript {
     let core;
 
     switch (this.#kind) {
-      case Cardano.NativeScriptKind.RequireSignature:
+      case NativeScriptKind.RequireSignature:
         core = this.#scriptPubKey!.toCore();
         break;
-      case Cardano.NativeScriptKind.RequireAllOf:
+      case NativeScriptKind.RequireAllOf:
         core = this.#scriptAll!.toCore();
         break;
-      case Cardano.NativeScriptKind.RequireAnyOf:
+      case NativeScriptKind.RequireAnyOf:
         core = this.#scriptAny!.toCore();
         break;
-      case Cardano.NativeScriptKind.RequireNOf:
+      case NativeScriptKind.RequireNOf:
         core = this.#scripNOfK!.toCore();
         break;
-      case Cardano.NativeScriptKind.RequireTimeAfter:
+      case NativeScriptKind.RequireTimeAfter:
         core = this.#timelockStart!.toCore();
         break;
-      case Cardano.NativeScriptKind.RequireTimeBefore:
+      case NativeScriptKind.RequireTimeBefore:
         core = this.#timelockExpiry!.toCore();
         break;
       default:
@@ -148,22 +149,22 @@ export class NativeScript {
     let nativeScript: NativeScript;
 
     switch (script.kind) {
-      case Cardano.NativeScriptKind.RequireSignature:
+      case NativeScriptKind.RequireSignature:
         nativeScript = NativeScript.newScriptPubkey(ScriptPubkey.fromCore(script));
         break;
-      case Cardano.NativeScriptKind.RequireAllOf:
+      case NativeScriptKind.RequireAllOf:
         nativeScript = NativeScript.newScriptAll(ScriptAll.fromCore(script));
         break;
-      case Cardano.NativeScriptKind.RequireAnyOf:
+      case NativeScriptKind.RequireAnyOf:
         nativeScript = NativeScript.newScriptAny(ScriptAny.fromCore(script));
         break;
-      case Cardano.NativeScriptKind.RequireNOf:
+      case NativeScriptKind.RequireNOf:
         nativeScript = NativeScript.newScriptNOfK(ScriptNOfK.fromCore(script));
         break;
-      case Cardano.NativeScriptKind.RequireTimeAfter:
+      case NativeScriptKind.RequireTimeAfter:
         nativeScript = NativeScript.newTimelockStart(TimelockStart.fromCore(script));
         break;
-      case Cardano.NativeScriptKind.RequireTimeBefore:
+      case NativeScriptKind.RequireTimeBefore:
         nativeScript = NativeScript.newTimelockExpiry(TimelockExpiry.fromCore(script));
         break;
       default:
@@ -193,7 +194,7 @@ export class NativeScript {
    *
    * @returns The native script kind.
    */
-  kind(): Cardano.NativeScriptKind {
+  kind(): NativeScriptKind {
     return this.#kind;
   }
 
@@ -206,7 +207,7 @@ export class NativeScript {
     const script = new NativeScript();
 
     script.#scriptPubKey = scriptPubkey;
-    script.#kind = Cardano.NativeScriptKind.RequireSignature;
+    script.#kind = NativeScriptKind.RequireSignature;
 
     return script;
   }
@@ -220,7 +221,7 @@ export class NativeScript {
     const script = new NativeScript();
 
     script.#scriptAll = scriptAll;
-    script.#kind = Cardano.NativeScriptKind.RequireAllOf;
+    script.#kind = NativeScriptKind.RequireAllOf;
 
     return script;
   }
@@ -234,7 +235,7 @@ export class NativeScript {
     const script = new NativeScript();
 
     script.#scriptAny = scriptAny;
-    script.#kind = Cardano.NativeScriptKind.RequireAnyOf;
+    script.#kind = NativeScriptKind.RequireAnyOf;
 
     return script;
   }
@@ -248,7 +249,7 @@ export class NativeScript {
     const script = new NativeScript();
 
     script.#scripNOfK = scriptNOfK;
-    script.#kind = Cardano.NativeScriptKind.RequireNOf;
+    script.#kind = NativeScriptKind.RequireNOf;
 
     return script;
   }
@@ -262,7 +263,7 @@ export class NativeScript {
     const script = new NativeScript();
 
     script.#timelockStart = timelockStart;
-    script.#kind = Cardano.NativeScriptKind.RequireTimeAfter;
+    script.#kind = NativeScriptKind.RequireTimeAfter;
 
     return script;
   }
@@ -276,7 +277,7 @@ export class NativeScript {
     const script = new NativeScript();
 
     script.#timelockExpiry = timelockExpiry;
-    script.#kind = Cardano.NativeScriptKind.RequireTimeBefore;
+    script.#kind = NativeScriptKind.RequireTimeBefore;
 
     return script;
   }

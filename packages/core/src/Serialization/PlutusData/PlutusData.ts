@@ -1,4 +1,4 @@
-import * as Cardano from '../../Cardano';
+import * as CardanoUtil from '../../Cardano/util/plutusDataUtils';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborReaderState, CborTag, CborWriter } from '../CBOR';
 import { ConstrPlutusData } from './ConstrPlutusData';
@@ -8,6 +8,7 @@ import { PlutusDataKind } from './PlutusDataKind';
 import { PlutusList } from './PlutusList';
 import { PlutusMap } from './PlutusMap';
 import { bytesToHex } from '../../util/misc';
+import type * as Cardano from '../../Cardano';
 
 const MAX_WORD64 = 18_446_744_073_709_551_615n;
 const INDEFINITE_BYTE_STRING = new Uint8Array([95]);
@@ -231,23 +232,23 @@ export class PlutusData {
    * @param data The core PlutusData object.
    */
   static fromCore(data: Cardano.PlutusData) {
-    if (Cardano.util.isPlutusBoundedBytes(data)) {
+    if (CardanoUtil.isPlutusBoundedBytes(data)) {
       return PlutusData.newBytes(data);
-    } else if (Cardano.util.isPlutusBigInt(data)) {
+    } else if (CardanoUtil.isPlutusBigInt(data)) {
       return PlutusData.newInteger(data);
     }
 
     if (data.cbor) return PlutusData.fromCbor(data.cbor);
 
-    if (Cardano.util.isPlutusList(data)) {
+    if (CardanoUtil.isPlutusList(data)) {
       return PlutusData.newList(PlutusData.mapToPlutusList(data.items));
-    } else if (Cardano.util.isPlutusMap(data)) {
+    } else if (CardanoUtil.isPlutusMap(data)) {
       const plutusMap = new PlutusMap();
       for (const [key, val] of data.data) {
         plutusMap.insert(PlutusData.fromCore(key), PlutusData.fromCore(val));
       }
       return PlutusData.newMap(plutusMap);
-    } else if (Cardano.util.isConstrPlutusData(data)) {
+    } else if (CardanoUtil.isConstrPlutusData(data)) {
       const alternative = data.constructor;
       const constrPlutusData = new ConstrPlutusData(alternative, PlutusData.mapToPlutusList(data.fields.items));
 

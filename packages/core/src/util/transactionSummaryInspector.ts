@@ -1,8 +1,5 @@
-import * as Cardano from '../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { AssetId, TokenMap } from '../Cardano';
-import { AssetInfoWithAmount } from './tokenTransferInspector';
-import { AssetProvider } from '../Provider';
 import {
   AssetsMintedInspection,
   Inspector,
@@ -14,8 +11,6 @@ import {
   totalAddressOutputsValueInspector
 } from './txInspector';
 import { BigIntMath } from '@cardano-sdk/util';
-import { Logger } from 'ts-log';
-import { Milliseconds } from './time';
 import { TimeoutError } from '../errors';
 import { coalesceTokenMaps, subtractTokenMaps } from '../Asset/util';
 import { coalesceValueQuantities } from './coalesceValueQuantities';
@@ -23,6 +18,11 @@ import { computeImplicitCoin } from '../Cardano/util';
 import { promiseTimeout } from './promiseTimeout';
 import { subtractValueQuantities } from './subtractValueQuantities';
 import { tryGetAssetInfos } from './tryGetAssetInfos';
+import type * as Cardano from '../Cardano';
+import type { AssetInfoWithAmount } from './tokenTransferInspector';
+import type { AssetProvider } from '../Provider';
+import type { Logger } from 'ts-log';
+import type { Milliseconds } from './time';
 
 interface TransactionSummaryInspectorArgs {
   addresses: Cardano.PaymentAddress[];

@@ -1,4 +1,11 @@
-import { Cardano, ProviderError, ProviderFailure, SubmitTxArgs, TxBodyCBOR, TxSubmitProvider } from '@cardano-sdk/core';
+import {
+  Cardano,
+  ProviderError,
+  ProviderFailure,
+  Serialization,
+  SubmitTxArgs,
+  TxSubmitProvider
+} from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { hexStringToBuffer } from '@cardano-sdk/util';
 import { mapCardanoTxSubmitError } from './cardanoTxSubmitErrorMapper';
@@ -35,7 +42,7 @@ export class TxSubmitApiProvider implements TxSubmitProvider {
     let txId: Cardano.TransactionId | undefined;
 
     try {
-      txId = Cardano.TransactionId.fromTxBodyCbor(TxBodyCBOR.fromTxCBOR(signedTransaction));
+      txId = Serialization.TransactionBody.fromCbor(signedTransaction).hash();
 
       this.#logger.debug(`Submitting tx ${txId} ...`);
 

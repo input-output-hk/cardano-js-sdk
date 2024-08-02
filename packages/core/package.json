@@ -23,6 +23,7 @@
   "scripts": {
     "build": "yarn build:cjs && tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020 && tsc-alias -p src/tsconfig.json --outDir ./dist/esm && cp ../../build/esm-package.json ./dist/esm/package.json",
     "build:cjs": "tsc --build src && cp ../../build/cjs-package.json ./dist/cjs/package.json",
+    "circular-deps:check": "madge --circular dist/cjs --exclude \"/(?:Address)|(?:Serialization/(?:PlutusData)|(?:Certificates)|(?:Scripts)|(?:AuxiliaryData))/*\"",
     "tscNoEmit": "echo typescript --noEmit command not implemented yet",
     "cleanup:dist": "rm -rf dist",
     "cleanup:nm": "rm -rf node_modules",

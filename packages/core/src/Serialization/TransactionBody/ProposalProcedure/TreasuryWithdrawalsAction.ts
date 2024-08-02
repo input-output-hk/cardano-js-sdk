@@ -1,11 +1,12 @@
-import * as Cardano from '../../../Cardano';
+import { Address, RewardAddress } from '../../../Cardano/Address';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { GovernanceActionKind } from './GovernanceActionKind';
-import { GovernanceActionType } from '../../../Cardano';
+import { GovernanceActionType } from '../../../Cardano/types/Governance';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { SerializationError, SerializationFailure } from '../../../errors';
 import { hexToBytes } from '../../../util/misc';
+import type * as Cardano from '../../../Cardano';
 
 const EMBEDDED_GROUP_SIZE = 3;
 
@@ -46,7 +47,7 @@ export class TreasuryWithdrawalsAction {
     writer.writeStartMap(sortedCanonically.size);
 
     for (const [key, value] of sortedCanonically) {
-      const rewardAddress = Cardano.RewardAddress.fromAddress(Cardano.Address.fromBech32(key));
+      const rewardAddress = RewardAddress.fromAddress(Address.fromBech32(key));
 
       if (!rewardAddress) {
         throw new SerializationError(SerializationFailure.InvalidAddress, `Invalid withdrawal address: ${key}`);
@@ -89,9 +90,7 @@ export class TreasuryWithdrawalsAction {
 
     const amounts = new Map<Cardano.RewardAccount, Cardano.Lovelace>();
     while (reader.peekState() !== CborReaderState.EndMap) {
-      const account = Cardano.Address.fromBytes(
-        HexBlob.fromBytes(reader.readByteString())
-      ).toBech32() as Cardano.RewardAccount;
+      const account = Address.fromBytes(HexBlob.fromBytes(reader.readByteString())).toBech32() as Cardano.RewardAccount;
 
       const amount = reader.readInt();
       amounts.set(account, amount);

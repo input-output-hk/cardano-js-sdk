@@ -1,7 +1,8 @@
-import * as Cardano from '../../Cardano';
 import { CborReader, CborWriter } from '../CBOR';
+import { EpochNo } from '../../Cardano/types/Block';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { ProposedProtocolParameterUpdates } from './ProposedProtocolParameterUpdates';
+import type * as Cardano from '../../Cardano';
 
 const UPDATE_ARRAY_SIZE = 2;
 
@@ -70,7 +71,7 @@ export class Update {
 
     reader.readEndArray();
 
-    const exUnit = new Update(updates, Cardano.EpochNo(Number(epoch)));
+    const exUnit = new Update(updates, EpochNo(Number(epoch)));
     exUnit.#originalBytes = cbor;
 
     return exUnit;

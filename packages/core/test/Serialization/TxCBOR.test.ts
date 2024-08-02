@@ -1,5 +1,5 @@
 import { InvalidStringError } from '@cardano-sdk/util';
-import { TxCBOR } from '../../src';
+import { TxCBOR } from '../../src/Serialization';
 import { babbageTx } from './testData';
 
 describe('TxCBOR', () => {

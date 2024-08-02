@@ -1,8 +1,8 @@
 /* eslint-disable max-params */
-import * as Cardano from '../../Cardano';
 import { CborReader, CborWriter } from '../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { UnitInterval } from '../Common';
+import type * as Cardano from '../../Cardano';
 
 const EX_DREP_VOTING_THRESHOLDS_SIZE = 10;
 

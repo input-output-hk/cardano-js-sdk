@@ -1,5 +1,6 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
+import { AssetId } from '../../Cardano/types/Asset';
+import type * as Cardano from '../../Cardano';
 
 /**
  * Sorts the given map entry canonically.
@@ -28,8 +29,8 @@ export const tokenMapToMultiAsset = (
   const sortedTokenMap = new Map([...tokenMap.entries()].sort(sortCanonically));
 
   for (const [assetId, quantity] of sortedTokenMap.entries()) {
-    const policyId = Cardano.AssetId.getPolicyId(assetId) as unknown as Crypto.Hash28ByteBase16;
-    const assetName = Cardano.AssetId.getAssetName(assetId);
+    const policyId = AssetId.getPolicyId(assetId) as unknown as Crypto.Hash28ByteBase16;
+    const assetName = AssetId.getAssetName(assetId);
 
     if (!multiassets.has(policyId)) multiassets.set(policyId, new Map<Cardano.AssetName, bigint>());
 
@@ -52,7 +53,7 @@ export const multiAssetsToTokenMap = (
 
   for (const [scriptHash, assets] of multiassets.entries()) {
     for (const [assetName, quantity] of assets.entries()) {
-      const assetId = Cardano.AssetId.fromParts(scriptHash as unknown as Cardano.PolicyId, assetName);
+      const assetId = AssetId.fromParts(scriptHash as unknown as Cardano.PolicyId, assetName);
       tokenMap.set(assetId, quantity);
     }
   }

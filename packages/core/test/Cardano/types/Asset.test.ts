@@ -50,16 +50,6 @@ describe('Cardano/types/Asset', () => {
       });
     });
 
-    it('can get the asset name component as text from the asset id with non encoded name', () => {
-      const assetId = AssetId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a736b7977616c6b6572');
-      expect(AssetId.getAssetNameAsText(assetId)).toEqual('skywalker');
-    });
-
-    it('can get the asset name component as text from the asset id with cip 67 encoded name', () => {
-      const assetId = AssetId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a000de140736b7977616c6b6572');
-      expect(AssetId.getAssetNameAsText(assetId)).toEqual('skywalker');
-    });
-
     it('accepts a valid asset id and is implemented using util.assetIsHexString', () => {
       expect(() => AssetId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed')).not.toThrow();
       expect(assertIsHexString).toBeCalledWith('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed');

@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { GroupedAddress, InMemoryKeyAgent, WitnessedTx, util } from '@cardano-sdk/key-management';
 import { HexBlob } from '@cardano-sdk/util';
 import { Observable, catchError, filter, firstValueFrom, throwError, timeout } from 'rxjs';
@@ -35,19 +35,19 @@ export const waitForWalletStateSettle = (wallet: ObservableWallet) =>
 
 export const toOutgoingTx = (tx: Cardano.Tx): OutgoingTx => ({
   body: { ...tx.body },
-  cbor: TxCBOR.serialize(tx),
+  cbor: Serialization.TxCBOR.serialize(tx),
   id: tx.id
 });
 
 export const toSignedTx = (tx: Cardano.Tx): WitnessedTx => ({
-  cbor: TxCBOR.serialize(tx),
+  cbor: Serialization.TxCBOR.serialize(tx),
   context: {
     handleResolutions: []
   },
   tx
 });
 
-export const dummyCbor = TxCBOR('123');
+export const dummyCbor = Serialization.TxCBOR('123');
 
 /** Construct a type 6 address for a DRepKey using an appropriate Network Tag and a hash of a public DRep Key. */
 export const buildDRepIDFromDRepKey = (

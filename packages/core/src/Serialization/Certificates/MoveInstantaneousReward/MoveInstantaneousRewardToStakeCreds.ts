@@ -1,7 +1,8 @@
-import * as Cardano from '../../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
+import { CertificateType, MirCertificateKind, MirCertificatePot } from '../../../Cardano/types/Certificate';
 import { HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
+import type * as Cardano from '../../../Cardano';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
@@ -35,7 +36,7 @@ export class MoveInstantaneousRewardToStakeCreds {
     // CDDL
     // move_instantaneous_reward = [ 0 / 1, coin ]
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
-    writer.writeInt(this.#pot === Cardano.MirCertificatePot.Reserves ? 0 : 1);
+    writer.writeInt(this.#pot === MirCertificatePot.Reserves ? 0 : 1);
 
     const sortedCanonically = new Map([...this.#credentials].sort((a, b) => (a > b ? 1 : -1)));
 
@@ -110,7 +111,7 @@ export class MoveInstantaneousRewardToStakeCreds {
     reader.readEndMap();
 
     const cert = new MoveInstantaneousRewardToStakeCreds(
-      pot === 0 ? Cardano.MirCertificatePot.Reserves : Cardano.MirCertificatePot.Treasury,
+      pot === 0 ? MirCertificatePot.Reserves : MirCertificatePot.Treasury,
       amounts
     );
 
@@ -132,8 +133,8 @@ export class MoveInstantaneousRewardToStakeCreds {
     const [[stakeCredential, quantity]] = this.#credentials;
 
     return {
-      __typename: Cardano.CertificateType.MIR,
-      kind: Cardano.MirCertificateKind.ToStakeCreds,
+      __typename: CertificateType.MIR,
+      kind: MirCertificateKind.ToStakeCreds,
       pot: this.#pot,
       quantity,
       stakeCredential
@@ -146,7 +147,7 @@ export class MoveInstantaneousRewardToStakeCreds {
    * @param cert The core MirCertificate object.
    */
   static fromCore(cert: Cardano.MirCertificate) {
-    if (cert.kind !== Cardano.MirCertificateKind.ToStakeCreds)
+    if (cert.kind !== MirCertificateKind.ToStakeCreds)
       throw new InvalidArgumentError('cert', `Expected a MIR certificate kind 'ToStakeCreds', but got ${cert.kind}`);
 
     if (cert.stakeCredential === undefined)

@@ -1,7 +1,8 @@
-import * as Cardano from '../../../Cardano';
+import { Address, RewardAddress } from '../../../Cardano/Address';
 import { Anchor } from '../../Common/Anchor';
 import { CborReader, CborWriter } from '../../CBOR';
 import { GovernanceActionKind } from './GovernanceActionKind';
+import { GovernanceActionType } from '../../../Cardano/types/Governance';
 import { HardForkInitiationAction } from './HardForkInitiationAction';
 import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
 import { InfoAction } from './InfoAction';
@@ -12,6 +13,7 @@ import { SerializationError, SerializationFailure } from '../../../errors';
 import { TreasuryWithdrawalsAction } from './TreasuryWithdrawalsAction';
 import { UpdateCommittee } from './UpdateCommittee';
 import { hexToBytes } from '../../../util/misc';
+import type * as Cardano from '../../../Cardano';
 
 const PROCEDURE_ARRAY_SIZE = 4;
 
@@ -78,7 +80,7 @@ export class ProposalProcedure {
     writer.writeStartArray(PROCEDURE_ARRAY_SIZE);
     writer.writeInt(this.#deposit);
 
-    const rewardAddress = Cardano.RewardAddress.fromAddress(Cardano.Address.fromBech32(this.#rewardAccount));
+    const rewardAddress = RewardAddress.fromAddress(Address.fromBech32(this.#rewardAccount));
     if (!rewardAddress) {
       throw new SerializationError(
         SerializationFailure.InvalidAddress,
@@ -106,7 +108,7 @@ export class ProposalProcedure {
 
     const deposit = reader.readInt();
 
-    const rewardAccount = Cardano.Address.fromBytes(
+    const rewardAccount = Address.fromBytes(
       HexBlob.fromBytes(reader.readByteString())
     ).toBech32() as Cardano.RewardAccount;
 
@@ -212,7 +214,7 @@ export class ProposalProcedure {
     const anchor = Anchor.fromCore(proposalProcedure.anchor);
 
     switch (proposalProcedure.governanceAction.__typename) {
-      case Cardano.GovernanceActionType.parameter_change_action:
+      case GovernanceActionType.parameter_change_action:
         action = ParameterChangeAction.fromCore(proposalProcedure.governanceAction);
         procedure = ProposalProcedure.newParameterChangeAction(
           proposalProcedure.deposit,
@@ -221,7 +223,7 @@ export class ProposalProcedure {
           action
         );
         break;
-      case Cardano.GovernanceActionType.hard_fork_initiation_action:
+      case GovernanceActionType.hard_fork_initiation_action:
         action = HardForkInitiationAction.fromCore(proposalProcedure.governanceAction);
         procedure = ProposalProcedure.newHardForkInitiationAction(
           proposalProcedure.deposit,
@@ -230,7 +232,7 @@ export class ProposalProcedure {
           action
         );
         break;
-      case Cardano.GovernanceActionType.treasury_withdrawals_action:
+      case GovernanceActionType.treasury_withdrawals_action:
         action = TreasuryWithdrawalsAction.fromCore(proposalProcedure.governanceAction);
         procedure = ProposalProcedure.newTreasuryWithdrawalsAction(
           proposalProcedure.deposit,
@@ -239,7 +241,7 @@ export class ProposalProcedure {
           action
         );
         break;
-      case Cardano.GovernanceActionType.no_confidence:
+      case GovernanceActionType.no_confidence:
         action = NoConfidence.fromCore(proposalProcedure.governanceAction);
         procedure = ProposalProcedure.newNoConfidence(
           proposalProcedure.deposit,
@@ -248,7 +250,7 @@ export class ProposalProcedure {
           action
         );
         break;
-      case Cardano.GovernanceActionType.update_committee:
+      case GovernanceActionType.update_committee:
         action = UpdateCommittee.fromCore(proposalProcedure.governanceAction);
         procedure = ProposalProcedure.newUpdateCommittee(
           proposalProcedure.deposit,
@@ -257,7 +259,7 @@ export class ProposalProcedure {
           action
         );
         break;
-      case Cardano.GovernanceActionType.new_constitution:
+      case GovernanceActionType.new_constitution:
         action = NewConstitution.fromCore(proposalProcedure.governanceAction);
         procedure = ProposalProcedure.newNewConstitution(
           proposalProcedure.deposit,
@@ -266,7 +268,7 @@ export class ProposalProcedure {
           action
         );
         break;
-      case Cardano.GovernanceActionType.info_action:
+      case GovernanceActionType.info_action:
         action = InfoAction.fromCore(proposalProcedure.governanceAction);
         procedure = ProposalProcedure.newInfoAction(
           proposalProcedure.deposit,

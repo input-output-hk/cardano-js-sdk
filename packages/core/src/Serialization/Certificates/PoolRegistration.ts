@@ -1,8 +1,9 @@
-import * as Cardano from '../../Cardano';
 import { CborReader, CborWriter } from '../CBOR';
 import { CertificateKind } from './CertificateKind';
+import { CertificateType } from '../../Cardano/types/Certificate';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { PoolParams } from './PoolParams';
+import type * as Cardano from '../../Cardano';
 
 // The group flattens the PoolParams along with one field for the certificate type
 const EMBEDDED_GROUP_SIZE = PoolParams.subgroupCount + 1;
@@ -86,7 +87,7 @@ export class PoolRegistration {
    */
   toCore(): Cardano.PoolRegistrationCertificate {
     return {
-      __typename: Cardano.CertificateType.PoolRegistration,
+      __typename: CertificateType.PoolRegistration,
       poolParameters: this.#params.toCore()
     };
   }

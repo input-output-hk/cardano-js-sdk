@@ -1,20 +1,26 @@
-import {
+import type {
   Asset,
   Cardano,
   EpochInfo,
   EraSummary,
   HandleResolution,
   NetworkInfoProvider,
-  TxCBOR
+  Serialization
 } from '@cardano-sdk/core';
-import { BalanceTracker, DelegationTracker, TransactionsTracker, UtxoTracker } from './services';
-import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
-import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
-import { GroupedAddress, MessageSender, SignTransactionContext, WitnessedTx, cip8 } from '@cardano-sdk/key-management';
-import { HexBlob, Shutdown } from '@cardano-sdk/util';
-import { InitializeTxProps, InitializeTxResult, TxBuilder, TxContext } from '@cardano-sdk/tx-construction';
-import { Observable } from 'rxjs';
-import { PubStakeKeyAndStatus } from './services/PublicStakeKeysTracker';
+import type { BalanceTracker, DelegationTracker, TransactionsTracker, UtxoTracker } from './services';
+import type { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
+import type { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
+import type {
+  GroupedAddress,
+  MessageSender,
+  SignTransactionContext,
+  WitnessedTx,
+  cip8
+} from '@cardano-sdk/key-management';
+import type { HexBlob, Shutdown } from '@cardano-sdk/util';
+import type { InitializeTxProps, InitializeTxResult, TxBuilder, TxContext } from '@cardano-sdk/tx-construction';
+import type { Observable } from 'rxjs';
+import type { PubStakeKeyAndStatus } from './services/PublicStakeKeysTracker';
 
 export type Assets = Map<Cardano.AssetId, Asset.AssetInfo>;
 
@@ -117,7 +123,7 @@ export interface ObservableWallet {
   /**
    * @throws CardanoNodeErrors.TxSubmissionError
    */
-  submitTx(tx: Cardano.Tx | TxCBOR | WitnessedTx): Promise<Cardano.TransactionId>;
+  submitTx(tx: Cardano.Tx | Serialization.TxCBOR | WitnessedTx): Promise<Cardano.TransactionId>;
 
   /** Create a TxBuilder from this wallet */
   createTxBuilder(): TxBuilder;

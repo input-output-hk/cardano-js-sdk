@@ -1,6 +1,5 @@
+import { AssetId, AssetName } from '../../Cardano/types/Asset';
 import { AssetInfo } from '../types';
-import { AssetName } from '../../Cardano';
-import { Cardano } from '../..';
 import { ImageMediaType, MediaType, NftMetadata, NftMetadataFile, Uri } from './types';
 import { InvalidFileError } from './errors';
 import { Logger } from 'ts-log';
@@ -8,6 +7,7 @@ import { asMetadatumArray, asMetadatumMap } from '../../util/metadatum';
 import { asString } from './util';
 import { isNotNil } from '@cardano-sdk/util';
 import difference from 'lodash/difference.js';
+import type { Cardano } from '../../';
 
 const isString = (obj: unknown): obj is string => typeof obj === 'string';
 const VersionRegExp = /^\d+\.?\d?$/;
@@ -151,7 +151,7 @@ export const fromMetadatum = (
   if (!assetMetadata) return null;
   const name = getName(assetMetadata, version, asset, logger, true);
   const image = metadatumToString(assetMetadata.get('image'));
-  const assetId = Cardano.AssetId.fromParts(asset.policyId, asset.name);
+  const assetId = AssetId.fromParts(asset.policyId, asset.name);
 
   if ((strict && !name) || !image) {
     logger.warn(missingFieldLogMessage(!name ? 'name' : 'image', assetId, true));

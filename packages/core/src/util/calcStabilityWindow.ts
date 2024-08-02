@@ -1,4 +1,4 @@
-import { Cardano } from '..';
+import type { Cardano } from '..';
 
 /**
  * 3k/f (where k is the security parameter in genesis, and f is the active slot co-efficient parameter

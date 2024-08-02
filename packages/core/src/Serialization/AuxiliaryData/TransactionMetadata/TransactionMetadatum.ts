@@ -1,5 +1,4 @@
 /* eslint-disable max-statements,complexity */
-import * as Cardano from '../../../Cardano';
 import { CborReader, CborReaderState, CborTag, CborWriter } from '../../CBOR';
 import { HexBlob } from '@cardano-sdk/util';
 import { MetadatumList } from './MetadatumList';
@@ -7,6 +6,7 @@ import { MetadatumMap } from './MetadatumMap';
 import { NotImplementedError, SerializationError, SerializationFailure } from '../../../errors';
 import { TransactionMetadatumKind } from './TransactionMetadatumKind';
 import { bytesToHex } from '../../../util/misc';
+import type * as Cardano from '../../../Cardano';
 
 const MAX_WORD64 = 18_446_744_073_709_551_615n;
 

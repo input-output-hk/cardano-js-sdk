@@ -1,6 +1,6 @@
-import * as Cardano from '../../Cardano';
 import { CborReader, CborWriter } from '../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import type * as Cardano from '../../Cardano';
 
 const EX_UNITS_ARRAY_SIZE = 2;
 

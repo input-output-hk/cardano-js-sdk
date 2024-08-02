@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import * as Serialization from '../../Serialization';
+import * as Serialization from '../../Serialization/AuxiliaryData';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { Script } from './Script';
 import { hexToBytes } from '../../util/misc';
