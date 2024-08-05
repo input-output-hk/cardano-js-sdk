@@ -98,145 +98,147 @@ describe('PgBossHttpService', () => {
     db = pool;
   });
 
-  beforeEach(async () => {
-    dataSource = createDataSource({
-      connectionConfig,
-      devOptions: { dropSchema: true, synchronize: true },
-      entities: pgBossEntities,
-      extensions: { pgBoss: true },
-      logger
-    });
-    await dataSource.initialize();
-  });
-
   afterEach(async () => {
     await service?.shutdown();
     await dataSource.destroy().catch(() => void 0);
   });
 
-  it('health check is ok after start with a valid db connection', async () => {
-    service = new PgBossHttpService(
-      {
-        apiUrl: new URL('http://unused/'),
-        dbCacheTtl: 0,
-        lastRosEpochs: 10,
-        metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
-        parallelJobs: 3,
-        queues: [],
-        schedules: []
-      },
-      { connectionConfig$, db, logger }
-    );
-    expect(await service.healthCheck()).toEqual({ ok: false, reason: 'PgBossHttpService not started' });
-    await service.initialize();
-    await service.start();
-    expect(await service.healthCheck()).toEqual({ ok: true });
-  });
-
-  // eslint-disable-next-line max-statements
-  it('retries a job until done, eventually reconnecting to the db', async () => {
-    let observablePromise = Promise.resolve();
-    // eslint-disable-next-line @typescript-eslint/no-empty-function, unicorn/consistent-function-scoping
-    let observableResolver = () => {};
-    let subscriptions = 0;
-
-    const config$ = new Observable<PgConnectionConfig>((subscriber) => {
-      subscriptions++;
-
-      void (async () => {
-        await observablePromise;
-        subscriber.next(connectionConfig);
-      })();
+  describe('with existing database', () => {
+    beforeEach(async () => {
+      dataSource = createDataSource({
+        connectionConfig,
+        devOptions: { dropSchema: true, synchronize: true },
+        entities: pgBossEntities,
+        extensions: { pgBoss: true },
+        logger
+      });
+      await dataSource.initialize();
     });
 
-    service = new PgBossHttpService(
-      {
-        apiUrl: new URL('http://unused/'),
-        dbCacheTtl: 0,
-        lastRosEpochs: 10,
-        metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
-        parallelJobs: 3,
-        queues: [STAKE_POOL_METADATA_QUEUE],
-        schedules: []
-      },
-      { connectionConfig$: config$, db, logger }
-    );
-    await service.initialize();
-    await service.start();
-
-    // Insert test block with slot 1
-    const queryRunner = dataSource.createQueryRunner();
-    await queryRunner.connect();
-    const blockRepos = dataSource.getRepository(BlockEntity);
-    const block = { hash: 'test', height: 1, slot: 1 };
-    await blockRepos.insert(block);
-
-    // Helper to check all the status at each step
-    const collectStatus = async () => ({ calls: callCounter, health: await service?.healthCheck(), subscriptions });
-
-    expect(await collectStatus()).toEqual({ calls: 0, health: { ok: true }, subscriptions: 1 });
-
-    // Schedule a job
-    const pgboss = createPgBossExtension(queryRunner, logger);
-    await pgboss.send(STAKE_POOL_METADATA_QUEUE, {}, { retryDelay: 1, retryLimit: 100, slot: Cardano.Slot(1) });
-    await queryRunner.release();
-
-    expect(await collectStatus()).toEqual({ calls: 0, health: { ok: true }, subscriptions: 1 });
-
-    // Let the handler to throw an error which pg-boss will retry
-    handlerResolvers[0]();
-    await testPromises[0];
-
-    expect(await collectStatus()).toEqual({ calls: 1, health: { ok: true }, subscriptions: 1 });
-
-    // Prepare the DB configuration observable to wait for the command in order to provide a new connection config
-    observablePromise = new Promise<void>((resolve) => (observableResolver = resolve));
-
-    // Let the handler to throw a mocked DB error which should cause a DB reconnection
-    handlerResolvers[1]();
-    await testPromises[1];
-
-    expect(await collectStatus()).toEqual({
-      calls: 2,
-      health: { ok: false, reason: 'DataBase error: reconnecting...' },
-      subscriptions: 2
+    it('health check is ok after start with a valid db connection', async () => {
+      service = new PgBossHttpService(
+        {
+          apiUrl: new URL('http://unused/'),
+          dbCacheTtl: 0,
+          lastRosEpochs: 10,
+          metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
+          parallelJobs: 3,
+          queues: [],
+          schedules: []
+        },
+        { connectionConfig$, db, logger }
+      );
+      expect(await service.healthCheck()).toEqual({ ok: false, reason: 'PgBossHttpService not started' });
+      await service.initialize();
+      await service.start();
+      expect(await service.healthCheck()).toEqual({ ok: true });
     });
 
-    // Emit a new DB configuration to make PgBossHttpService reconnect
-    observableResolver();
+    // eslint-disable-next-line max-statements
+    it('retries a job until done, eventually reconnecting to the db', async () => {
+      let observablePromise = Promise.resolve();
+      // eslint-disable-next-line @typescript-eslint/no-empty-function, unicorn/consistent-function-scoping
+      let observableResolver = () => {};
+      let subscriptions = 0;
 
-    // Wait until PgBossHttpService reconnected
-    while (!(await service?.healthCheck())?.ok) await new Promise((resolve) => setTimeout(resolve, 5));
+      const config$ = new Observable<PgConnectionConfig>((subscriber) => {
+        subscriptions++;
 
-    expect(await collectStatus()).toEqual({ calls: 2, health: { ok: true }, subscriptions: 2 });
+        void (async () => {
+          await observablePromise;
+          subscriber.next(connectionConfig);
+        })();
+      });
 
-    // Prepare the DB configuration observable to wait for the command in order to provide a new connection config
-    observablePromise = new Promise<void>((resolve) => (observableResolver = resolve));
+      service = new PgBossHttpService(
+        {
+          apiUrl: new URL('http://unused/'),
+          dbCacheTtl: 0,
+          lastRosEpochs: 10,
+          metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
+          parallelJobs: 3,
+          queues: [STAKE_POOL_METADATA_QUEUE],
+          schedules: []
+        },
+        { connectionConfig$: config$, db, logger }
+      );
+      await service.initialize();
+      await service.start();
 
-    // Let the handler to throw an error simulating pgboss locked state which should cause a DB reconnection
-    handlerResolvers[2]();
-    await testPromises[2];
+      // Insert test block with slot 1
+      const queryRunner = dataSource.createQueryRunner();
+      await queryRunner.connect();
+      const blockRepos = dataSource.getRepository(BlockEntity);
+      const block = { hash: 'test', height: 1, slot: 1 };
+      await blockRepos.insert(block);
 
-    expect(await collectStatus()).toEqual({
-      calls: 3,
-      health: { ok: false, reason: 'DataBase error: reconnecting...' },
-      subscriptions: 3
+      // Helper to check all the status at each step
+      const collectStatus = async () => ({ calls: callCounter, health: await service?.healthCheck(), subscriptions });
+
+      expect(await collectStatus()).toEqual({ calls: 0, health: { ok: true }, subscriptions: 1 });
+
+      // Schedule a job
+      const pgboss = createPgBossExtension(queryRunner, logger);
+      await pgboss.send(STAKE_POOL_METADATA_QUEUE, {}, { retryDelay: 1, retryLimit: 100, slot: Cardano.Slot(1) });
+      await queryRunner.release();
+
+      expect(await collectStatus()).toEqual({ calls: 0, health: { ok: true }, subscriptions: 1 });
+
+      // Let the handler to throw an error which pg-boss will retry
+      handlerResolvers[0]();
+      await testPromises[0];
+
+      expect(await collectStatus()).toEqual({ calls: 1, health: { ok: true }, subscriptions: 1 });
+
+      // Prepare the DB configuration observable to wait for the command in order to provide a new connection config
+      observablePromise = new Promise<void>((resolve) => (observableResolver = resolve));
+
+      // Let the handler to throw a mocked DB error which should cause a DB reconnection
+      handlerResolvers[1]();
+      await testPromises[1];
+
+      expect(await collectStatus()).toEqual({
+        calls: 2,
+        health: { ok: false, reason: 'DataBase error: reconnecting...' },
+        subscriptions: 2
+      });
+
+      // Emit a new DB configuration to make PgBossHttpService reconnect
+      observableResolver();
+
+      // Wait until PgBossHttpService reconnected
+      while (!(await service?.healthCheck())?.ok) await new Promise((resolve) => setTimeout(resolve, 5));
+
+      expect(await collectStatus()).toEqual({ calls: 2, health: { ok: true }, subscriptions: 2 });
+
+      // Prepare the DB configuration observable to wait for the command in order to provide a new connection config
+      observablePromise = new Promise<void>((resolve) => (observableResolver = resolve));
+
+      // Let the handler to throw an error simulating pgboss locked state which should cause a DB reconnection
+      handlerResolvers[2]();
+      await testPromises[2];
+
+      expect(await collectStatus()).toEqual({
+        calls: 3,
+        health: { ok: false, reason: 'DataBase error: reconnecting...' },
+        subscriptions: 3
+      });
+
+      // Emit a new DB configuration to make PgBossHttpService reconnect
+      observableResolver();
+
+      // Wait until PgBossHttpService reconnected
+      while (!(await service?.healthCheck())?.ok) await new Promise((resolve) => setTimeout(resolve, 5));
+
+      expect(await collectStatus()).toEqual({ calls: 3, health: { ok: true }, subscriptions: 3 });
+
+      // Let the handler to complete with success
+      handlerResolvers[3]();
+      await testPromises[3];
+
+      expect(await collectStatus()).toEqual({ calls: 4, health: { ok: true }, subscriptions: 3 });
+
+      await dataSource.destroy();
     });
-
-    // Emit a new DB configuration to make PgBossHttpService reconnect
-    observableResolver();
-
-    // Wait until PgBossHttpService reconnected
-    while (!(await service?.healthCheck())?.ok) await new Promise((resolve) => setTimeout(resolve, 5));
-
-    expect(await collectStatus()).toEqual({ calls: 3, health: { ok: true }, subscriptions: 3 });
-
-    // Let the handler to complete with success
-    handlerResolvers[3]();
-    await testPromises[3];
-
-    expect(await collectStatus()).toEqual({ calls: 4, health: { ok: true }, subscriptions: 3 });
-
-    await dataSource.destroy();
   });
 });
