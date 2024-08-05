@@ -701,14 +701,8 @@ describe('certificates', () => {
           {
             params: {
               dRep: {
-                keyPath: [
-                  util.harden(CardanoKeyConst.PURPOSE),
-                  util.harden(CardanoKeyConst.COIN_TYPE),
-                  util.harden(0),
-                  3,
-                  0
-                ],
-                type: Ledger.DRepParamsType.KEY_PATH
+                keyHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
+                type: Ledger.DRepParamsType.KEY_HASH
               },
               stakeCredential: {
                 scriptHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
