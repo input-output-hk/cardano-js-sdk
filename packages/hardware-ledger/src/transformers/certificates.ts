@@ -45,22 +45,16 @@ const credentialMapper = (
 
 const drepParamsMapper = (
   drep: Cardano.Credential,
-  credentialType: Cardano.CredentialType | Ledger.CredentialParamsType.SCRIPT_HASH,
-  path: Crypto.BIP32Path | null
+  credentialType: Cardano.CredentialType | Ledger.CredentialParamsType.SCRIPT_HASH
 ): Ledger.KeyPathDRepParams | Ledger.KeyHashDRepParams | Ledger.ScriptHashDRepParams => {
   let dRepParams: Ledger.DRepParams;
 
   switch (credentialType) {
     case Cardano.CredentialType.KeyHash: {
-      dRepParams = path
-        ? {
-            keyPath: path,
-            type: Ledger.DRepParamsType.KEY_PATH
-          }
-        : {
-            keyHashHex: drep.hash,
-            type: Ledger.DRepParamsType.KEY_HASH
-          };
+      dRepParams = {
+        keyHashHex: drep.hash,
+        type: Ledger.DRepParamsType.KEY_HASH
+      };
       break;
     }
     case Cardano.CredentialType.ScriptHash:
@@ -343,7 +337,7 @@ const updateDRepCertificate: Transform<
   };
 };
 
-const drepMapper = (drep: Cardano.DelegateRepresentative, context: LedgerTxTransformerContext): Ledger.DRepParams => {
+const drepMapper = (drep: Cardano.DelegateRepresentative): Ledger.DRepParams => {
   if (Cardano.isDRepAlwaysAbstain(drep)) {
     return {
       type: Ledger.DRepParamsType.ABSTAIN
@@ -353,11 +347,7 @@ const drepMapper = (drep: Cardano.DelegateRepresentative, context: LedgerTxTrans
       type: Ledger.DRepParamsType.NO_CONFIDENCE
     };
   } else if (Cardano.isDRepCredential(drep)) {
-    return drepParamsMapper(
-      drep,
-      drep.type,
-      util.accountKeyDerivationPathToBip32Path(context.accountIndex, util.DREP_KEY_DERIVATION_PATH)
-    );
+    return drepParamsMapper(drep, drep.type);
   }
   throw new Error('incorrect drep supplied');
 };
@@ -368,7 +358,7 @@ export const voteDelegationCertificate: Transform<
   LedgerTxTransformerContext
 > = (certificate, context): Ledger.Certificate => ({
   params: {
-    dRep: drepMapper(certificate.dRep, context!),
+    dRep: drepMapper(certificate.dRep),
     stakeCredential: stakeCredentialMapper(certificate.stakeCredential, context!)
   },
   type: Ledger.CertificateType.VOTE_DELEGATION
