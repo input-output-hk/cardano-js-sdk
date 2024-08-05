@@ -381,6 +381,8 @@ const mapTxOut = (txOut: Schema.TransactionOutput): Cardano.TxOut => ({
   value: mapValue(txOut.value)
 });
 
+const mapInputSource = (source: 'inputs' | 'collaterals'): Cardano.InputSource => Cardano.InputSource[source];
+
 const mapMint = (tx: Schema.Transaction): Cardano.TokenMap | undefined => {
   if (tx.mint === undefined) return undefined;
   return mapAssets(tx.mint);
@@ -436,7 +438,7 @@ const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
     cbor: tx.cbor ? TxCBOR(tx.cbor) : undefined,
     id: Cardano.TransactionId(tx.id),
     // At the time of writing Byron transactions didn't set this property
-    inputSource: tx.spends ? Cardano.InputSource[tx.spends] : Cardano.InputSource.inputs,
+    inputSource: mapInputSource(tx.spends),
     witness: {
       bootstrap: tx.signatories
         .filter((signatory) => signatory.addressAttributes || signatory.chainCode)
@@ -455,5 +457,14 @@ const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
   };
 };
 
-export const mapBlockBody = ({ transactions }: CommonBlock | Schema.BlockBFT): Cardano.Block['body'] =>
-  (transactions || []).map((transaction) => mapCommonTx(transaction));
+export const mapBlockBody = (block: CommonBlock | Schema.BlockBFT): Cardano.Block['body'] => {
+  const { transactions, type } = block;
+  return (transactions || []).map((transaction) =>
+    type !== 'bft' && transaction.cbor
+      ? {
+          ...Serialization.Transaction.fromCbor(transaction.cbor as Serialization.TxCBOR).toCore(),
+          inputSource: mapInputSource(transaction.spends)
+        }
+      : mapCommonTx(transaction)
+  );
+};
