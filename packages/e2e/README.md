@@ -101,11 +101,17 @@ You can configure any of these five wallets in your test and use any amount of t
 
 ## Blockfrost
 
-To run the Blockfrost end-to-end tests you only need to configure two providers, AssetProvider and ChainHistoryProvider, both must be configured as Blockfrost providers and a valid Blockfrost API key must be also set, make sure that in your .env file, you have the environment variables set:
+Before running Blockfrost end-to-end tests, you need to:
+
+- Set a valid Blockfrost API key.
+- Configure the AssetProvider and ChainHistoryProvider instances to use blockfrost.
+- The StakePoolProvider comparison test doesn't require any configuration since it bootstraps during the test.
+
+Here’s how the entries in your .env file should look:
 
 ```
 # Blockfrost secrets
-BLOCKFROST_API_KEY=testnetSOMEAPIKEY
+BLOCKFROST_API_KEY='get your API KEY from https://blockfrost.io/'
 
 # Providers setup
 ASSET_PROVIDER=blockfrost
@@ -209,8 +215,6 @@ TEST_CLIENT_STAKE_POOL_PROVIDER=http
 TEST_CLIENT_STAKE_POOL_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/stake-pool"}'
 
 ```
-
-> :information_source: If you are using blockfrost providers, remember to get your Blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file.
 
 > :information_source: Remember to use a wallet with enough funds to carry out transactions (see [here](#generate_wallet)).
 

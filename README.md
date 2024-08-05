@@ -30,9 +30,6 @@ A suite of TypeScript packages suitable for both Node.js and browser-based devel
 - [@cardano-sdk/cardano-services](./packages/cardano-services)
 - [@cardano-sdk/cardano-services-client](./packages/cardano-services-client)
 
-### External Provider Implementations
-- [@cardano-sdk/blockfrost](packages/blockfrost)
-
 ### Supported Environments
 
 Packages are distributed as both CommonJS and ESM modules.

@@ -104,7 +104,7 @@ describe('StakePoolCompare', () => {
 
   const startServer = async (args: string[]) => {
     const port = await getRandomPort();
-    const apiUrl = `http://localhost:${port}/`;
+    const apiUrl = `http://localhost:${port}`;
 
     // Due to a bug https://github.com/nodejs/node-v0.x-archive/issues/4030
     // the createWriteStream returned value can't be directly used as fork parameter
@@ -123,7 +123,7 @@ describe('StakePoolCompare', () => {
       })
     );
 
-    return `${apiUrl}stake-pool`;
+    return `${apiUrl}`;
   };
 
   const setupProvider = async (args: string[] = []) => {

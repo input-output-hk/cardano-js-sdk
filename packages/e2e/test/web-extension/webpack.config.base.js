@@ -10,6 +10,7 @@ require('dotenv').config({ path: path.join(__dirname, '../../', '.env') });
 module.exports = {
   baseConfig: {
     devtool: 'source-map',
+    externals: '@cardano-sdk/cardano-services',
     ignoreWarnings: [/Failed to parse source map/],
     mode: 'development',
     module: {
@@ -52,6 +53,10 @@ module.exports = {
       new NormalModuleReplacementPlugin(
         /@dcspark\/cardano-multiplatform-lib-nodejs/,
         '@dcspark/cardano-multiplatform-lib-browser'
+      ),
+      new NormalModuleReplacementPlugin(
+        /@emurgo\/cardano-serialization-lib-nodejs/,
+        '@emurgo/cardano-serialization-lib-asmjs'
       ),
       new NormalModuleReplacementPlugin(/blake2b$/, 'blake2b-no-wasm'),
       new NormalModuleReplacementPlugin(
