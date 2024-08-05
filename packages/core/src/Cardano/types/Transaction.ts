@@ -11,8 +11,6 @@ import { PlutusData } from './PlutusData';
 import { ProposalProcedure, VotingProcedures } from './Governance';
 import { RewardAccount } from '../Address';
 import { Script } from './Script';
-import { TxBodyCBOR } from '../../CBOR/TxBodyCBOR';
-import { bytesToHex, hexToBytes } from '../../util/misc';
 
 /** transaction hash as hex string */
 export type TransactionId = OpaqueString<'TransactionId'>;
@@ -24,12 +22,6 @@ export type TransactionId = OpaqueString<'TransactionId'>;
 export const TransactionId = (value: string): TransactionId =>
   Crypto.Hash32ByteBase16(value) as unknown as TransactionId;
 TransactionId.fromHexBlob = (value: HexBlob) => Crypto.Hash32ByteBase16.fromHexBlob<TransactionId>(value);
-TransactionId.fromTxBodyCbor = (bodyCbor: TxBodyCBOR): TransactionId =>
-  bytesToHex(
-    Crypto.blake2b(Crypto.blake2b.BYTES)
-      .update(hexToBytes(bodyCbor as unknown as HexBlob))
-      .digest()
-  ) as unknown as TransactionId;
 
 export interface Withdrawal {
   stakeAddress: RewardAccount;

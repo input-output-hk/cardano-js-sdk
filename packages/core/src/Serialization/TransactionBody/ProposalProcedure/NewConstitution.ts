@@ -1,10 +1,11 @@
-import * as Cardano from '../../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { Constitution } from './Constitution';
 import { GovernanceActionId } from '../../Common/GovernanceActionId';
 import { GovernanceActionKind } from './GovernanceActionKind';
+import { GovernanceActionType } from '../../../Cardano/types/Governance';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { hexToBytes } from '../../../util/misc';
+import type * as Cardano from '../../../Cardano';
 
 const EMBEDDED_GROUP_SIZE = 3;
 
@@ -92,7 +93,7 @@ export class NewConstitution {
    */
   toCore(): Cardano.NewConstitution {
     return {
-      __typename: Cardano.GovernanceActionType.new_constitution,
+      __typename: GovernanceActionType.new_constitution,
       constitution: this.#constitution.toCore(),
       governanceActionId: this.#govActionId ? this.#govActionId.toCore() : null
     };

@@ -6,11 +6,11 @@ import {
   OutsideOfValidityIntervalData,
   ProviderError,
   ProviderFailure,
+  Serialization,
   SubmitTxArgs,
   TxSubmissionError,
   TxSubmissionErrorCode,
-  TxSubmitProvider,
-  deserializeTx
+  TxSubmitProvider
 } from '@cardano-sdk/core';
 import { ConnectionStatus, ConnectionStatusTracker } from './util';
 import { Observable, combineLatest, filter, firstValueFrom, from, mergeMap, take, tap } from 'rxjs';
@@ -55,7 +55,7 @@ export class SmartTxSubmitProvider implements TxSubmitProvider {
   submitTx(args: SubmitTxArgs): Promise<void> {
     const {
       body: { validityInterval }
-    } = deserializeTx(args.signedTransaction);
+    } = Serialization.deserializeTx(args.signedTransaction);
 
     const onlineAndWithinValidityInterval$ = combineLatest([this.#connectionStatus$, this.#tip$]).pipe(
       tap(([_, { slot }]) => {

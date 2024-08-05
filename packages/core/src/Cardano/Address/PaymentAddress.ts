@@ -7,9 +7,10 @@ import {
   assertIsBech32WithPrefix,
   assertIsHexString
 } from '@cardano-sdk/util';
-import { HydratedTx, HydratedTxIn, Tx, TxIn, TxOut } from '../types';
-import { NetworkId } from '../ChainId';
-import { RewardAccount } from './RewardAccount';
+import type { HydratedTx, Tx } from '../types/Transaction';
+import type { HydratedTxIn, TxIn, TxOut } from '../types/Utxo';
+import type { NetworkId } from '../ChainId';
+import type { RewardAccount } from './RewardAccount';
 
 /** mainnet or testnet address (Shelley as bech32 string, Byron as base58-encoded string) */
 export type PaymentAddress = OpaqueString<'PaymentAddress'>;

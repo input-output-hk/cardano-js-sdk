@@ -1,45 +1,45 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable complexity */
+import * as Address from '../../Cardano/Address';
+import * as Cardano from '../../Cardano/types';
 import * as Crypto from '@cardano-sdk/crypto';
 import { BigIntMath } from '@cardano-sdk/util';
-import { Cardano } from '../..';
-import { HydratedTxBody, Lovelace } from '../types';
 
 /** Implicit coin quantities used in the transaction */
 export interface ImplicitCoin {
   /** Reward withdrawals */
-  withdrawals?: Lovelace;
+  withdrawals?: Cardano.Lovelace;
   /** Reward withdrawals + deposit reclaims (total return) */
-  input?: Lovelace;
+  input?: Cardano.Lovelace;
   /** Delegation registration deposit */
-  deposit?: Lovelace;
+  deposit?: Cardano.Lovelace;
   /** Deposits returned */
-  reclaimDeposit?: Lovelace;
+  reclaimDeposit?: Cardano.Lovelace;
 }
 
 type DepositProtocolParams = { stakeKeyDeposit: Cardano.Lovelace; poolDeposit: Cardano.Lovelace };
 
 const stakeCredentialInRewardAccounts = (
-  stakeCredential: Cardano.Credential,
-  rewardAccounts: Cardano.RewardAccount[]
+  stakeCredential: Address.Credential,
+  rewardAccounts: Address.RewardAccount[]
 ): boolean => {
   // No reward accounts means accept any stake credential
   if (rewardAccounts.length === 0) return true;
-  const networkId = Cardano.RewardAccount.toNetworkId(rewardAccounts[0]);
-  return rewardAccounts.includes(Cardano.RewardAccount.fromCredential(stakeCredential, networkId));
+  const networkId = Address.RewardAccount.toNetworkId(rewardAccounts[0]);
+  return rewardAccounts.includes(Address.RewardAccount.fromCredential(stakeCredential, networkId));
 };
 
 const computeShellyDeposits = (
   depositParams: DepositProtocolParams,
   certificates: Cardano.Certificate[],
-  rewardAccounts: Cardano.RewardAccount[]
+  rewardAccounts: Address.RewardAccount[]
 ): { deposit: Cardano.Lovelace; reclaimDeposit: Cardano.Lovelace } => {
   let deposit = 0n;
   let reclaimDeposit = 0n;
   const anyRewardAccount = rewardAccounts.length === 0;
 
   const poolIds = new Set(
-    rewardAccounts.map((account) => Cardano.PoolId.fromKeyHash(Cardano.RewardAccount.toHash(account)))
+    rewardAccounts.map((account) => Cardano.PoolId.fromKeyHash(Address.RewardAccount.toHash(account)))
   );
 
   // TODO: For the case of deregistration (StakeDeregistration and PoolRetirement) the code here is not entirely correct
@@ -76,7 +76,7 @@ const computeShellyDeposits = (
 
 const computeConwayDeposits = (
   certificates: Cardano.Certificate[],
-  rewardAccounts: Cardano.RewardAccount[],
+  rewardAccounts: Address.RewardAccount[],
   dRepKeyHash?: Crypto.Ed25519KeyHashHex,
   proposalProcedures?: Cardano.ProposalProcedure[]
 ): { deposit: Cardano.Lovelace; reclaimDeposit: Cardano.Lovelace } => {
@@ -98,7 +98,7 @@ const computeConwayDeposits = (
       case Cardano.CertificateType.UnregisterDelegateRepresentative:
         if (
           !dRepKeyHash ||
-          (cert.dRepCredential.type === Cardano.CredentialType.KeyHash &&
+          (cert.dRepCredential.type === Address.CredentialType.KeyHash &&
             cert.dRepCredential.hash === Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash))
         ) {
           cert.__typename === Cardano.CertificateType.RegisterDelegateRepresentative
@@ -121,7 +121,7 @@ const computeConwayDeposits = (
 const getTxDeposits = (
   { stakeKeyDeposit, poolDeposit }: Pick<Cardano.ProtocolParameters, 'stakeKeyDeposit' | 'poolDeposit'>,
   certificates: Cardano.Certificate[],
-  rewardAccounts: Cardano.RewardAccount[] = [],
+  rewardAccounts: Address.RewardAccount[] = [],
   dRepKeyHash?: Crypto.Ed25519KeyHashHex,
   proposalProcedures?: Cardano.ProposalProcedure[]
 ): { deposit: Cardano.Lovelace; reclaimDeposit: Cardano.Lovelace } => {
@@ -163,8 +163,8 @@ export const computeImplicitCoin = (
     certificates,
     proposalProcedures,
     withdrawals
-  }: Pick<HydratedTxBody, 'certificates' | 'proposalProcedures' | 'withdrawals'>,
-  rewardAccounts?: Cardano.RewardAccount[],
+  }: Pick<Cardano.HydratedTxBody, 'certificates' | 'proposalProcedures' | 'withdrawals'>,
+  rewardAccounts?: Address.RewardAccount[],
   dRepKeyHash?: Crypto.Ed25519KeyHashHex
 ): ImplicitCoin => {
   const { deposit, reclaimDeposit } = getTxDeposits(

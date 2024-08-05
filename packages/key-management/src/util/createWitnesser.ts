@@ -6,7 +6,7 @@ import {
   WitnessedTx,
   Witnesser
 } from '../types';
-import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { Cip30SignDataRequest } from '../cip8';
 import { stubSignTransaction } from './stubSignTransaction';
@@ -47,7 +47,7 @@ export class Bip32Ed25519Witnesser implements Witnesser {
     };
 
     return {
-      cbor: TxCBOR.serialize(transaction),
+      cbor: Serialization.TxCBOR.serialize(transaction),
       context: {
         handleResolutions: context.handleResolutions ?? []
       },

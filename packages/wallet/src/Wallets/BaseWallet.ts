@@ -53,7 +53,6 @@ import {
   RewardsProvider,
   Serialization,
   StakePoolProvider,
-  TxCBOR,
   TxSubmitProvider,
   UtxoProvider
 } from '@cardano-sdk/core';
@@ -196,12 +195,13 @@ export const DEFAULT_POLLING_CONFIG = {
 // Ideally we should calculate this based on the activeSlotsCoeff and probability of a single block per epoch.
 const BLOCK_SLOT_GAP_MULTIPLIER = 2.5;
 
-const isOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | WitnessedTx): input is OutgoingTx =>
+const isOutgoingTx = (input: Cardano.Tx | Serialization.TxCBOR | OutgoingTx | WitnessedTx): input is OutgoingTx =>
   typeof input === 'object' && 'cbor' in input;
-const isTxCBOR = (input: Cardano.Tx | TxCBOR | OutgoingTx | WitnessedTx): input is TxCBOR => typeof input === 'string';
-const isWitnessedTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | WitnessedTx): input is WitnessedTx =>
+const isTxCBOR = (input: Cardano.Tx | Serialization.TxCBOR | OutgoingTx | WitnessedTx): input is Serialization.TxCBOR =>
+  typeof input === 'string';
+const isWitnessedTx = (input: Cardano.Tx | Serialization.TxCBOR | OutgoingTx | WitnessedTx): input is WitnessedTx =>
   typeof input === 'object' && 'context' in input;
-const processOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | WitnessedTx): OutgoingTx => {
+const processOutgoingTx = (input: Cardano.Tx | Serialization.TxCBOR | OutgoingTx | WitnessedTx): OutgoingTx => {
   // TxCbor
   if (isTxCBOR(input)) {
     const tx = Serialization.Transaction.fromCbor(input);
@@ -228,7 +228,7 @@ const processOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | WitnessedTx
   }
   return {
     body: input.body,
-    cbor: TxCBOR.serialize(input),
+    cbor: Serialization.TxCBOR.serialize(input),
     id: input.id
   };
 };
@@ -703,7 +703,7 @@ export class BaseWallet implements ObservableWallet {
   }
 
   async submitTx(
-    input: Cardano.Tx | TxCBOR | OutgoingTx | WitnessedTx,
+    input: Cardano.Tx | Serialization.TxCBOR | OutgoingTx | WitnessedTx,
     options: SubmitTxOptions = {}
   ): Promise<Cardano.TransactionId> {
     const outgoingTx = processOutgoingTx(input);

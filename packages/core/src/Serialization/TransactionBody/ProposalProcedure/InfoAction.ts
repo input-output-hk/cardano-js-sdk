@@ -1,7 +1,8 @@
-import * as Cardano from '../../../Cardano';
 import { CborReader, CborWriter } from '../../CBOR';
 import { GovernanceActionKind } from './GovernanceActionKind';
+import { GovernanceActionType } from '../../../Cardano/types/Governance';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import type * as Cardano from '../../../Cardano';
 
 const EMBEDDED_GROUP_SIZE = 1;
 
@@ -67,7 +68,7 @@ export class InfoAction {
    */
   toCore(): Cardano.InfoAction {
     return {
-      __typename: Cardano.GovernanceActionType.info_action
+      __typename: GovernanceActionType.info_action
     };
   }
 

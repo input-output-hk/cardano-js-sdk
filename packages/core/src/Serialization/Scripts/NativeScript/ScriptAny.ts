@@ -1,7 +1,8 @@
-import * as Cardano from '../../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { NativeScript } from './NativeScript';
+import { NativeScriptKind, ScriptType } from '../../../Cardano/types/Script';
+import type * as Cardano from '../../../Cardano';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
@@ -37,7 +38,7 @@ export class ScriptAny {
     // CDDL
     // script_any = (2, [ * native_script ])
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
-    writer.writeInt(Cardano.NativeScriptKind.RequireAnyOf);
+    writer.writeInt(NativeScriptKind.RequireAnyOf);
     writer.writeStartArray(this.#nativeScripts.length);
 
     for (const nativeScript of this.#nativeScripts) writer.writeEncodedValue(Buffer.from(nativeScript.toCbor(), 'hex'));
@@ -64,11 +65,8 @@ export class ScriptAny {
 
     const kind = Number(reader.readInt());
 
-    if (kind !== Cardano.NativeScriptKind.RequireAnyOf)
-      throw new InvalidArgumentError(
-        'cbor',
-        `Expected kind ${Cardano.NativeScriptKind.RequireAnyOf}, but got kind ${kind}`
-      );
+    if (kind !== NativeScriptKind.RequireAnyOf)
+      throw new InvalidArgumentError('cbor', `Expected kind ${NativeScriptKind.RequireAnyOf}, but got kind ${kind}`);
 
     const scripts = new Array<NativeScript>();
 
@@ -93,8 +91,8 @@ export class ScriptAny {
    */
   toCore(): Cardano.RequireAnyOfScript {
     return {
-      __type: Cardano.ScriptType.Native,
-      kind: Cardano.NativeScriptKind.RequireAnyOf,
+      __type: ScriptType.Native,
+      kind: NativeScriptKind.RequireAnyOf,
       scripts: this.#nativeScripts.map((script) => script.toCore())
     };
   }

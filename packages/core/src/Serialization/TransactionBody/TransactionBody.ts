@@ -1,18 +1,21 @@
 /* eslint-disable sonarjs/cognitive-complexity, complexity, sonarjs/cognitive-complexity, max-statements */
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
+import { Address, RewardAddress } from '../../Cardano/Address';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { CborSet, Hash } from '../Common';
 import { Certificate } from '../Certificates';
 import { HexBlob } from '@cardano-sdk/util';
 import { ProposalProcedure } from './ProposalProcedure';
 import { SerializationError, SerializationFailure } from '../../errors';
+import { Slot } from '../../Cardano/types/Block';
+import { TransactionId } from '../../Cardano/types/Transaction';
 import { TransactionInput } from './TransactionInput';
 import { TransactionOutput } from './TransactionOutput';
 import { Update } from '../Update';
 import { VotingProcedures } from './VotingProcedures';
 import { hexToBytes } from '../../util/misc';
 import { multiAssetsToTokenMap, sortCanonically, tokenMapToMultiAsset } from './Utils';
+import type * as Cardano from '../../Cardano';
 
 type TransactionInputSet = CborSet<ReturnType<TransactionInput['toCore']>, TransactionInput>;
 
@@ -131,7 +134,7 @@ export class TransactionBody {
       // Create a new map with address bytes to avoid logic duplication and address checks
       const withdrawalsWithAddressBytes = new Map();
       for (const [key, value] of this.#withdrawals) {
-        const rewardAddress = Cardano.RewardAddress.fromAddress(Cardano.Address.fromBech32(key));
+        const rewardAddress = RewardAddress.fromAddress(Address.fromBech32(key));
         if (!rewardAddress) {
           throw new SerializationError(SerializationFailure.InvalidAddress, `Invalid withdrawal address: ${key}`);
         }
@@ -284,7 +287,7 @@ export class TransactionBody {
           body.setFee(reader.readInt());
           break;
         case 3n:
-          body.setTtl(Cardano.Slot(Number(reader.readInt())));
+          body.setTtl(Slot(Number(reader.readInt())));
           break;
         case 4n: {
           body.setCerts(CborSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), Certificate.fromCbor));
@@ -296,7 +299,7 @@ export class TransactionBody {
           body.setWithdrawals(new Map<Cardano.RewardAccount, Cardano.Lovelace>());
 
           while (reader.peekState() !== CborReaderState.EndMap) {
-            const account = Cardano.Address.fromBytes(
+            const account = Address.fromBytes(
               HexBlob.fromBytes(reader.readByteString())
             ).toBech32() as Cardano.RewardAccount;
 
@@ -314,7 +317,7 @@ export class TransactionBody {
           body.setAuxiliaryDataHash(HexBlob.fromBytes(reader.readByteString()) as unknown as Crypto.Hash32ByteBase16);
           break;
         case 8n:
-          body.setValidityStartInterval(Cardano.Slot(Number(reader.readInt())));
+          body.setValidityStartInterval(Slot(Number(reader.readInt())));
           break;
         case 9n: {
           const multiassets = new Map<Crypto.Hash28ByteBase16, Map<Cardano.AssetName, bigint>>();
@@ -919,6 +922,11 @@ export class TransactionBody {
    */
   donation(): Cardano.Lovelace | undefined {
     return this.#donation;
+  }
+
+  hash() {
+    const hash = Crypto.blake2b(Crypto.blake2b.BYTES).update(hexToBytes(this.toCbor())).digest();
+    return TransactionId.fromHexBlob(HexBlob.fromBytes(hash));
   }
 
   /**

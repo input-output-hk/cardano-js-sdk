@@ -1,13 +1,14 @@
 /* eslint-disable max-statements */
-import * as Cardano from '../../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { CborSet, Credential, UnitInterval } from '../../Common';
-import { CommitteeMember, GovernanceActionType } from '../../../Cardano';
+import { CommitteeMember, GovernanceActionType } from '../../../Cardano/types/Governance';
+import { EpochNo } from '../../../Cardano/types/Block';
 import { GovernanceActionId } from '../../Common/GovernanceActionId';
 import { GovernanceActionKind } from './GovernanceActionKind';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { hexToBytes } from '../../../util/misc';
+import type * as Cardano from '../../../Cardano';
 
 const EMBEDDED_GROUP_SIZE = 5;
 const CREDENTIAL_ARRAY_SIZE = 2;
@@ -153,7 +154,7 @@ export class UpdateCommittee {
       membersToBeAdded: new Set<CommitteeMember>(
         this.#membersToBeAdded.map((entry) => ({
           coldCredential: entry[CREDENTIAL_INDEX],
-          epoch: Cardano.EpochNo(entry[EPOCH_INDEX])
+          epoch: EpochNo(entry[EPOCH_INDEX])
         }))
       ),
       membersToBeRemoved: new Set<Cardano.Credential>(this.#membersToBeRemoved.toCore()),

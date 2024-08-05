@@ -1,7 +1,8 @@
-import * as Cardano from '../../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { CostModel } from './CostModel';
 import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
+import { PlutusLanguageVersion } from '../../../Cardano/types/Script';
+import type * as Cardano from '../../../Cardano';
 
 /** Map of PlutusLanguageVersion to CostModel. */
 export class Costmdls {
@@ -168,8 +169,8 @@ export class Costmdls {
         // The key of Plutus V1 cost models was encoded as a byte array of one byte, this should
         // alter the position of this entry in the map when we do the canonical sorting, so we are going to
         // account for that here.
-        const lhs = a[0] === Cardano.PlutusLanguageVersion.V1 ? 0x41 : a[0];
-        const rhs = b[0] === Cardano.PlutusLanguageVersion.V1 ? 0x41 : b[0];
+        const lhs = a[0] === PlutusLanguageVersion.V1 ? 0x41 : a[0];
+        const rhs = b[0] === PlutusLanguageVersion.V1 ? 0x41 : b[0];
 
         return lhs > rhs ? 1 : -1;
       })
@@ -178,7 +179,7 @@ export class Costmdls {
     encodedLanguageViews.writeStartMap(sortedCanonically.size);
     for (const [key, value] of sortedCanonically) {
       switch (key) {
-        case Cardano.PlutusLanguageVersion.V1: {
+        case PlutusLanguageVersion.V1: {
           // For PlutusV1 (language id 0), the language view is the following:
           //   * the value of costmdls map at key 0 is encoded as an indefinite length
           //     list and the result is encoded as a bytestring. (our apologies)
@@ -200,8 +201,8 @@ export class Costmdls {
           encodedLanguageViews.writeByteString(innerCbor);
           break;
         }
-        case Cardano.PlutusLanguageVersion.V2:
-        case Cardano.PlutusLanguageVersion.V3:
+        case PlutusLanguageVersion.V2:
+        case PlutusLanguageVersion.V3:
           // For PlutusV2&V3 (language id 1&2), the language view is the following:
           //    * the value of costmdls map is encoded as a definite length list.
           encodedLanguageViews.writeInt(key);

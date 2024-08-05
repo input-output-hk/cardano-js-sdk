@@ -3,7 +3,7 @@ import { Address, AddressProps, AddressType, Credential, CredentialType } from '
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { InvalidArgumentError, OpaqueNumber } from '@cardano-sdk/util';
 import { NetworkId } from '../ChainId';
-import { Slot } from '../types';
+import { Slot } from '../types/Block';
 
 /**
  * Encodes the specified value with a variable number of bytes.

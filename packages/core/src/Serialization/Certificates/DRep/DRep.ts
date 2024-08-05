@@ -1,8 +1,10 @@
-import * as Cardano from '../../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborWriter } from '../../CBOR';
+import { CredentialType } from '../../../Cardano/Address/Address';
 import { DRepKind } from './DRepKind';
 import { HexBlob } from '@cardano-sdk/util';
+import { isDRepAlwaysAbstain, isDRepAlwaysNoConfidence } from '../../../Cardano/types/Governance';
+import type * as Cardano from '../../../Cardano';
 
 /**
  * In Voltaire, existing stake credentials will be able to delegate their stake to DReps
@@ -117,10 +119,10 @@ export class DRep {
    * @param deleg core DelegateRepresentative object.
    */
   static fromCore(deleg: Cardano.DelegateRepresentative) {
-    if (Cardano.isDRepAlwaysAbstain(deleg)) return DRep.newAlwaysAbstain();
-    if (Cardano.isDRepAlwaysNoConfidence(deleg)) return DRep.newAlwaysNoConfidence();
+    if (isDRepAlwaysAbstain(deleg)) return DRep.newAlwaysAbstain();
+    if (isDRepAlwaysNoConfidence(deleg)) return DRep.newAlwaysNoConfidence();
 
-    if (deleg.type === Cardano.CredentialType.KeyHash)
+    if (deleg.type === CredentialType.KeyHash)
       return DRep.newKeyHash(deleg.hash as unknown as Crypto.Ed25519KeyHashHex);
 
     return DRep.newScriptHash(deleg.hash);
@@ -135,7 +137,7 @@ export class DRep {
   static newKeyHash(keyHash: Crypto.Ed25519KeyHashHex): DRep {
     return new DRep(DRepKind.KeyHash, {
       hash: keyHash as unknown as Crypto.Hash28ByteBase16,
-      type: Cardano.CredentialType.KeyHash
+      type: CredentialType.KeyHash
     });
   }
 
@@ -148,7 +150,7 @@ export class DRep {
   static newScriptHash(scriptHash: Crypto.Hash28ByteBase16): DRep {
     return new DRep(DRepKind.ScriptHash, {
       hash: scriptHash as unknown as Crypto.Hash28ByteBase16,
-      type: Cardano.CredentialType.ScriptHash
+      type: CredentialType.ScriptHash
     });
   }
 

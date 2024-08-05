@@ -17,7 +17,7 @@ import {
   WalletApiExtension,
   WithSenderContext
 } from '@cardano-sdk/dapp-connector';
-import { Cardano, Serialization, TxCBOR, coalesceValueQuantities } from '@cardano-sdk/core';
+import { Cardano, Serialization, coalesceValueQuantities } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
@@ -84,8 +84,8 @@ const mapCallbackFailure = (err: unknown, logger: Logger) => {
 
 const processTxInput = (input: string) => {
   try {
-    const cbor = TxCBOR(input);
-    const tx = TxCBOR.deserialize(cbor);
+    const cbor = Serialization.TxCBOR(input);
+    const tx = Serialization.TxCBOR.deserialize(cbor);
     return { cbor, tx };
   } catch {
     throw new ApiError(APIErrorCode.InvalidRequest, "Couldn't parse transaction. Expecting hex-encoded CBOR string.");
@@ -457,7 +457,7 @@ const baseCip30WalletApi = (
   signTx: async ({ sender }: SenderContext, tx: Cbor, partialSign?: Boolean): Promise<Cbor> => {
     const scope = new ManagedFreeableScope();
     logger.debug('signTx');
-    const txDecoded = Serialization.Transaction.fromCbor(TxCBOR(tx));
+    const txDecoded = Serialization.Transaction.fromCbor(Serialization.TxCBOR(tx));
 
     const hash = txDecoded.getId();
     const coreTx = txDecoded.toCore();

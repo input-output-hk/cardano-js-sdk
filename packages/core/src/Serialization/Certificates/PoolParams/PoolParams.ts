@@ -1,12 +1,15 @@
 /* eslint-disable max-params */
-import * as Cardano from '../../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
+import { Address } from '../../../Cardano/Address/Address';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { CborSet, Hash } from '../../Common';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import { PoolId, VrfVkHex } from '../../../Cardano/types/StakePool';
 import { PoolMetadata } from './PoolMetadata';
 import { Relay } from './Relay';
 import { UnitInterval } from '../../Common/UnitInterval';
+import { createRewardAccount } from '../../../Cardano/Address/RewardAccount';
+import type * as Cardano from '../../../Cardano';
 
 type PoolOwners = CborSet<Crypto.Ed25519KeyHashHex, Hash<Crypto.Ed25519KeyHashHex>>;
 /**
@@ -152,11 +155,11 @@ export class PoolParams {
    */
   static fromFlattenedCbor(reader: CborReader): PoolParams {
     const operator = Crypto.Ed25519KeyHashHex(HexBlob.fromBytes(reader.readByteString()));
-    const vrfKeyHash = Cardano.VrfVkHex(HexBlob.fromBytes(reader.readByteString()));
+    const vrfKeyHash = VrfVkHex(HexBlob.fromBytes(reader.readByteString()));
     const pledge = reader.readInt();
     const cost = reader.readInt();
     const margin = UnitInterval.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
-    const rewardAccount = Cardano.Address.fromBytes(HexBlob.fromBytes(reader.readByteString())).asReward()!;
+    const rewardAccount = Address.fromBytes(HexBlob.fromBytes(reader.readByteString())).asReward()!;
     const relays = new Array<Relay>();
     let poolMetadata;
 
@@ -193,12 +196,12 @@ export class PoolParams {
 
     return {
       cost: this.#cost,
-      id: Cardano.PoolId.fromKeyHash(this.#operator),
+      id: PoolId.fromKeyHash(this.#operator),
       margin: this.#margin.toCore(),
       metadataJson: this.#poolMetadata?.toCore(),
       owners: this.#poolOwners
         .toCore()
-        .map((keyHash) => Cardano.createRewardAccount(keyHash, rewardAccountAddress.getNetworkId())),
+        .map((keyHash) => createRewardAccount(keyHash, rewardAccountAddress.getNetworkId())),
       pledge: this.#pledge,
       relays: this.#relays.map((relay) => relay.toCore()),
       rewardAccount: this.#rewardAccount.toAddress().toBech32() as Cardano.RewardAccount,
@@ -213,15 +216,15 @@ export class PoolParams {
    */
   static fromCore(params: Cardano.PoolParameters) {
     return new PoolParams(
-      Cardano.PoolId.toKeyHash(params.id),
+      PoolId.toKeyHash(params.id),
       params.vrf,
       params.pledge,
       params.cost,
       UnitInterval.fromCore(params.margin),
-      Cardano.Address.fromBech32(params.rewardAccount).asReward()!,
+      Address.fromBech32(params.rewardAccount).asReward()!,
       CborSet.fromCore(
         params.owners.map((owner) =>
-          Crypto.Ed25519KeyHashHex(Cardano.Address.fromBech32(owner).asReward()!.getPaymentCredential()!.hash)
+          Crypto.Ed25519KeyHashHex(Address.fromBech32(owner).asReward()!.getPaymentCredential()!.hash)
         ),
         Hash.fromCore
       ),

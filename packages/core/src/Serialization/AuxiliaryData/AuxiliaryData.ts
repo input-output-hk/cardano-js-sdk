@@ -1,11 +1,12 @@
 /* eslint-disable complexity,max-statements,sonarjs/cognitive-complexity, unicorn/prefer-switch */
-import * as Cardano from '../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { GeneralTransactionMetadata } from './TransactionMetadata/GeneralTransactionMetadata';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { NativeScript, PlutusV1Script, PlutusV2Script, PlutusV3Script } from '../Scripts';
+import { PlutusLanguageVersion, ScriptType } from '../../Cardano/types/Script';
 import { SerializationError, SerializationFailure } from '../../errors';
 import { hexToBytes } from '../../util/misc';
+import type * as Cardano from '../../Cardano';
 
 export const SHELLEY_ERA_FIELDS_COUNT = 2;
 export const ALONZO_AUX_TAG = 259;
@@ -399,21 +400,21 @@ export class AuxiliaryData {
 
     for (const script of scripts) {
       switch (script.__type) {
-        case Cardano.ScriptType.Native:
+        case ScriptType.Native:
           if (!result.native) result.native = new Array<NativeScript>();
 
           result.native.push(NativeScript.fromCore(script));
           break;
-        case Cardano.ScriptType.Plutus:
-          if (script.version === Cardano.PlutusLanguageVersion.V1) {
+        case ScriptType.Plutus:
+          if (script.version === PlutusLanguageVersion.V1) {
             if (!result.plutusV1) result.plutusV1 = new Array<PlutusV1Script>();
 
             result.plutusV1.push(PlutusV1Script.fromCore(script));
-          } else if (script.version === Cardano.PlutusLanguageVersion.V2) {
+          } else if (script.version === PlutusLanguageVersion.V2) {
             if (!result.plutusV2) result.plutusV2 = new Array<PlutusV2Script>();
 
             result.plutusV2.push(PlutusV2Script.fromCore(script));
-          } else if (script.version === Cardano.PlutusLanguageVersion.V3) {
+          } else if (script.version === PlutusLanguageVersion.V3) {
             if (!result.plutusV3) result.plutusV3 = new Array<PlutusV3Script>();
 
             result.plutusV3.push(PlutusV3Script.fromCore(script));

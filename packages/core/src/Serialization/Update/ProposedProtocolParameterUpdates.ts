@@ -1,8 +1,8 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { HexBlob } from '@cardano-sdk/util';
 import { ProtocolParamUpdate } from './ProtocolParamUpdate';
+import type * as Cardano from '../../Cardano';
 
 /**
  * In the Cardano network, stakeholders can propose changes to the protocol parameters. These proposals are then

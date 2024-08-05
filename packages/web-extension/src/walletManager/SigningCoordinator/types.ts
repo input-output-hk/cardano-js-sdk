@@ -1,14 +1,14 @@
-import { AnyBip32Wallet, WalletType } from '../types';
-import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
-import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
-import {
+import type { AnyBip32Wallet, WalletType } from '../types';
+import type { Cardano, Serialization } from '@cardano-sdk/core';
+import type { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
+import type {
   KeyPurpose,
   MessageSender,
   SignTransactionContext,
   SignTransactionOptions,
   cip8
 } from '@cardano-sdk/key-management';
-import { Observable } from 'rxjs';
+import type { Observable } from 'rxjs';
 
 export type RequestContext<WalletMetadata extends {}, AccountMetadata extends {}> = {
   wallet: AnyBip32Wallet<WalletMetadata, AccountMetadata>;
@@ -68,7 +68,7 @@ export type SignDataRequest<WalletMetadata extends {}, AccountMetadata extends {
   SignRequest<Cip30DataSignature>;
 
 export type SignTransactionProps = {
-  tx: TxCBOR;
+  tx: Serialization.TxCBOR;
   signContext: SignTransactionContext;
   options?: SignTransactionOptions;
 };

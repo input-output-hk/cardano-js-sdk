@@ -1,6 +1,6 @@
 import { BigIntMath } from '@cardano-sdk/util';
-import { Value } from '../Cardano';
 import { util } from '../Asset';
+import type { Value } from '../Cardano';
 
 /** Subtract all quantities */
 export const subtractValueQuantities = (quantities: Value[]) => ({

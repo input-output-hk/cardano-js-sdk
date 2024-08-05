@@ -1,9 +1,10 @@
-import * as Cardano from '../../../Cardano';
 import { CborReader, CborWriter } from '../../CBOR';
-import { CredentialType, VoterType } from '../../../Cardano';
+import { CredentialType } from '../../../Cardano/Address';
 import { Ed25519KeyHashHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
 import { VoterKind } from './VoterKind';
+import { VoterType } from '../../../Cardano/types/Governance';
+import type * as Cardano from '../../../Cardano';
 
 const EMBEDDED_GROUP_SIZE = 2;
 

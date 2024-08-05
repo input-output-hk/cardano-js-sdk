@@ -1,6 +1,8 @@
-import * as Cardano from '../../../Cardano';
 import { CborReader, CborWriter } from '../../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import { NativeScriptKind, ScriptType } from '../../../Cardano/types/Script';
+import { Slot } from '../../../Cardano/types/Block';
+import type * as Cardano from '../../../Cardano';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
@@ -37,7 +39,7 @@ export class TimelockStart {
     // CDDL
     // invalid_before = (4, uint)
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
-    writer.writeInt(Cardano.NativeScriptKind.RequireTimeAfter);
+    writer.writeInt(NativeScriptKind.RequireTimeAfter);
     writer.writeInt(this.#slot);
 
     return writer.encodeAsHex();
@@ -62,13 +64,13 @@ export class TimelockStart {
 
     const kind = Number(reader.readInt());
 
-    if (kind !== Cardano.NativeScriptKind.RequireTimeAfter)
+    if (kind !== NativeScriptKind.RequireTimeAfter)
       throw new InvalidArgumentError(
         'cbor',
-        `Expected kind ${Cardano.NativeScriptKind.RequireTimeAfter}, but got kind ${kind}`
+        `Expected kind ${NativeScriptKind.RequireTimeAfter}, but got kind ${kind}`
       );
 
-    const slot = Cardano.Slot(Number(reader.readInt()));
+    const slot = Slot(Number(reader.readInt()));
 
     const script = new TimelockStart(slot);
 
@@ -84,8 +86,8 @@ export class TimelockStart {
    */
   toCore(): Cardano.RequireTimeAfterScript {
     return {
-      __type: Cardano.ScriptType.Native,
-      kind: Cardano.NativeScriptKind.RequireTimeAfter,
+      __type: ScriptType.Native,
+      kind: NativeScriptKind.RequireTimeAfter,
       slot: this.#slot
     };
   }

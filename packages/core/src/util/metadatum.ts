@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { InvalidArgumentError } from '@cardano-sdk/util';
-import { Metadatum, MetadatumMap } from '../Cardano/types/AuxiliaryData';
+import type { Metadatum, MetadatumMap } from '../Cardano/types/AuxiliaryData';
 
 /**
  * @returns {MetadatumMap | null} null if Metadatum is not MetadatumMap

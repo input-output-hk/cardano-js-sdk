@@ -1,12 +1,13 @@
 /* eslint-disable sonarjs/cognitive-complexity, complexity, sonarjs/max-switch-cases, max-statements */
-import * as Cardano from '../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { Costmdls } from './Costmdls';
 import { DrepVotingThresholds } from './DrepVotingThresholds';
+import { EpochNo } from '../../Cardano/types/Block';
 import { ExUnitPrices } from './ExUnitPrices';
 import { ExUnits, ProtocolVersion, UnitInterval } from '../Common';
 import { HexBlob } from '@cardano-sdk/util';
 import { PoolVotingThresholds } from './PoolVotingThresholds';
+import type * as Cardano from '../../Cardano';
 
 /**
  * The ProtocolParamUpdate structure in Cardano is used to propose changes to
@@ -403,17 +404,17 @@ export class ProtocolParamUpdate {
     return {
       coinsPerUtxoByte: this.#adaPerUtxoByte ? Number(this.#adaPerUtxoByte) : undefined,
       collateralPercentage: this.#collateralPercentage,
-      committeeTermLimit: this.#committeeTermLimit ? Cardano.EpochNo(this.#committeeTermLimit) : undefined,
+      committeeTermLimit: this.#committeeTermLimit ? EpochNo(this.#committeeTermLimit) : undefined,
       costModels: this.#costModels?.toCore(),
       dRepDeposit: this.#drepDeposit,
-      dRepInactivityPeriod: this.#drepInactivityPeriod ? Cardano.EpochNo(this.#drepInactivityPeriod) : undefined,
+      dRepInactivityPeriod: this.#drepInactivityPeriod ? EpochNo(this.#drepInactivityPeriod) : undefined,
       dRepVotingThresholds: this.#drepVotingThresholds?.toCore(),
       decentralizationParameter: this.#d ? this.#d.toFloat().toString() : undefined,
       desiredNumberOfPools: this.#nOpt,
       extraEntropy: this.#extraEntropy,
       governanceActionDeposit: this.#governanceActionDeposit,
       governanceActionValidityPeriod: this.#governanceActionValidityPeriod
-        ? Cardano.EpochNo(this.#governanceActionValidityPeriod)
+        ? EpochNo(this.#governanceActionValidityPeriod)
         : undefined,
       maxBlockBodySize: this.#maxBlockBodySize,
       maxBlockHeaderSize: this.#maxBlockHeaderSize,

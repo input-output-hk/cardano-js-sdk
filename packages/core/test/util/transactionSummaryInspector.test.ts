@@ -19,7 +19,7 @@ import {
 import { Ed25519KeyHashHex, Ed25519PublicKeyHex, Ed25519SignatureHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { createMockAssetProvider, createMockInputResolver } from './mocks';
 import { jsonToMetadatum } from '../../src/util/metadatum';
-import { logger } from '@cardano-sdk/util-dev';
+import { dummyLogger as logger } from 'ts-log';
 import delay from 'delay';
 
 const buildAssetInfoWithAmount = (

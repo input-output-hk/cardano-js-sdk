@@ -1,8 +1,8 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { Base64Blob, HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
 import { CborReader, CborWriter } from '../CBOR';
 import { hexToBytes } from '../../util/misc';
+import type * as Cardano from '../../Cardano';
 
 const BOOTSTRAP_WITNESS_ARRAY_SIZE = 4;
 const EMPTY_ATTRIBUTES_CBOR = HexBlob('a0');

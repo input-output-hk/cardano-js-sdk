@@ -12,7 +12,7 @@ import {
 } from '@cardano-sdk/key-management';
 
 import { AnyBip32Wallet, AnyWallet, ScriptWallet, WalletId, WalletType } from './types';
-import { Cardano, Serialization, TxCBOR } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxWitness } from '@cardano-sdk/tx-construction';
 import { RemoteApiProperties, RemoteApiPropertyType } from '../messaging';
@@ -351,7 +351,7 @@ export const buildBip32Witnesser = <WalletMetadata extends { name: string }, Acc
       };
 
       return {
-        cbor: TxCBOR.serialize(transaction),
+        cbor: Serialization.TxCBOR.serialize(transaction),
         context: {
           handleResolutions: context.handleResolutions ?? []
         },
@@ -438,7 +438,7 @@ export const buildNativeScriptWitnesser = <
       };
 
       return {
-        cbor: TxCBOR.serialize(transaction),
+        cbor: Serialization.TxCBOR.serialize(transaction),
         context: {
           handleResolutions: context.handleResolutions ?? []
         },

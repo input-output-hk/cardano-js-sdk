@@ -1,10 +1,9 @@
-import * as Cardano from '../../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
-import { CommitteeMember } from '../../../Cardano';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
 import { UnitInterval } from '../../Common';
 import { hexToBytes } from '../../../util/misc';
+import type * as Cardano from '../../../Cardano';
 
 const COMMITTEE_ARRAY_SIZE = 2;
 const CREDENTIAL_ARRAY_SIZE = 2;
@@ -127,7 +126,7 @@ export class Committee {
     }));
 
     return {
-      members: members as [CommitteeMember],
+      members: members as [Cardano.CommitteeMember],
       quorumThreshold: this.#quorumThreshold.toCore()
     };
   }

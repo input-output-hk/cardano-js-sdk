@@ -1,16 +1,16 @@
 /* eslint-disable promise/param-names */
-import * as Cardano from '../Cardano';
-import { AssetInfo } from '../Asset';
-import { AssetProvider } from '../Provider';
 import { Inspector, ResolutionResult, resolveInputs } from './txInspector';
-import { Logger } from 'ts-log';
-import { Milliseconds } from './time';
 import { TimeoutError } from '../errors';
 import { coalesceValueQuantities } from './coalesceValueQuantities';
 import { promiseTimeout } from './promiseTimeout';
 import { subtractValueQuantities } from './subtractValueQuantities';
 import { tryGetAssetInfos } from './tryGetAssetInfos';
 import uniq from 'lodash/uniq.js';
+import type * as Cardano from '../Cardano';
+import type { AssetInfo } from '../Asset';
+import type { AssetProvider } from '../Provider';
+import type { Logger } from 'ts-log';
+import type { Milliseconds } from './time';
 
 export type AssetInfoWithAmount = { amount: Cardano.Lovelace; assetInfo: AssetInfo };
 

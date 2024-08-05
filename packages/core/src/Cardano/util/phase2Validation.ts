@@ -1,5 +1,4 @@
-import { Cardano } from '../..';
-import { OnChainTx } from '../types';
+import { InputSource, OnChainTx } from '../types/Transaction';
 
 export const isPhase2ValidationErrTx = ({ inputSource }: Pick<OnChainTx, 'inputSource'>): boolean =>
-  inputSource === Cardano.InputSource.collaterals;
+  inputSource === InputSource.collaterals;

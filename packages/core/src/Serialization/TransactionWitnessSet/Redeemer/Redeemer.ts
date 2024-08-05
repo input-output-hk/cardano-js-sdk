@@ -1,11 +1,12 @@
-import * as Cardano from '../../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborWriter } from '../../CBOR';
 import { ExUnits } from '../../Common';
 import { HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
 import { PlutusData } from '../../PlutusData';
+import { RedeemerPurpose } from '../../../Cardano/types/Transaction';
 import { RedeemerTag } from './RedeemerTag';
 import { hexToBytes } from '../../../util/misc';
+import type * as Cardano from '../../../Cardano';
 
 const REDEEMER_ARRAY_SIZE = 4;
 const HASH_LENGTH_IN_BYTES = 32;
@@ -94,26 +95,26 @@ export class Redeemer {
    * @returns The Core Redeemer object.
    */
   toCore(): Cardano.Redeemer {
-    let purpose: Cardano.RedeemerPurpose;
+    let purpose: RedeemerPurpose;
 
     switch (this.#tag) {
       case RedeemerTag.Spend:
-        purpose = Cardano.RedeemerPurpose.spend;
+        purpose = RedeemerPurpose.spend;
         break;
       case RedeemerTag.Mint:
-        purpose = Cardano.RedeemerPurpose.mint;
+        purpose = RedeemerPurpose.mint;
         break;
       case RedeemerTag.Cert:
-        purpose = Cardano.RedeemerPurpose.certificate;
+        purpose = RedeemerPurpose.certificate;
         break;
       case RedeemerTag.Reward:
-        purpose = Cardano.RedeemerPurpose.withdrawal;
+        purpose = RedeemerPurpose.withdrawal;
         break;
       case RedeemerTag.Voting:
-        purpose = Cardano.RedeemerPurpose.vote;
+        purpose = RedeemerPurpose.vote;
         break;
       case RedeemerTag.Proposing:
-        purpose = Cardano.RedeemerPurpose.propose;
+        purpose = RedeemerPurpose.propose;
         break;
       default:
         throw new InvalidStateError(`Invalid redeemer type ${this.#tag}`);
@@ -136,22 +137,22 @@ export class Redeemer {
     let tag: RedeemerTag;
 
     switch (redeemer.purpose) {
-      case Cardano.RedeemerPurpose.spend:
+      case RedeemerPurpose.spend:
         tag = RedeemerTag.Spend;
         break;
-      case Cardano.RedeemerPurpose.mint:
+      case RedeemerPurpose.mint:
         tag = RedeemerTag.Mint;
         break;
-      case Cardano.RedeemerPurpose.certificate:
+      case RedeemerPurpose.certificate:
         tag = RedeemerTag.Cert;
         break;
-      case Cardano.RedeemerPurpose.withdrawal:
+      case RedeemerPurpose.withdrawal:
         tag = RedeemerTag.Reward;
         break;
-      case Cardano.RedeemerPurpose.vote:
+      case RedeemerPurpose.vote:
         tag = RedeemerTag.Voting;
         break;
-      case Cardano.RedeemerPurpose.propose:
+      case RedeemerPurpose.propose:
         tag = RedeemerTag.Proposing;
         break;
       default:

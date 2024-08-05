@@ -1,4 +1,3 @@
-import { Cardano, inConwayEra } from '../../..';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { ExUnits } from '../../Common';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
@@ -6,6 +5,8 @@ import { PlutusData } from '../../PlutusData';
 import { Redeemer } from './Redeemer';
 import { RedeemerTag } from './RedeemerTag';
 import { hexToBytes } from '../../../util/misc';
+import { inConwayEra } from '../../../util/conwayEra';
+import type { Cardano } from '../../..';
 
 const MAP_INDEX_EMBEDDED_GROUP_SIZE = 2;
 const MAP_VALUE_EMBEDDED_GROUP_SIZE = 2;

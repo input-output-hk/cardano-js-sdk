@@ -1,8 +1,8 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { multiAssetsToTokenMap, sortCanonically, tokenMapToMultiAsset } from './Utils';
+import type * as Cardano from '../../Cardano';
 
 const VALUE_ARRAY_SIZE = 2;
 

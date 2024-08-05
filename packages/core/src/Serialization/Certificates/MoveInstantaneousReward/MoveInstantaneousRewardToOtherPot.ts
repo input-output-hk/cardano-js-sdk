@@ -1,6 +1,7 @@
-import * as Cardano from '../../../Cardano';
 import { CborReader, CborWriter } from '../../CBOR';
+import { CertificateType, MirCertificateKind, MirCertificatePot } from '../../../Cardano/types/Certificate';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import type * as Cardano from '../../../Cardano';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
@@ -34,7 +35,7 @@ export class MoveInstantaneousRewardToOtherPot {
     // CDDL
     // move_instantaneous_reward = [ 0 / 1, coin ]
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
-    writer.writeInt(this.#pot === Cardano.MirCertificatePot.Reserves ? 0 : 1);
+    writer.writeInt(this.#pot === MirCertificatePot.Reserves ? 0 : 1);
     writer.writeInt(this.#amount);
 
     return writer.encodeAsHex();
@@ -64,7 +65,7 @@ export class MoveInstantaneousRewardToOtherPot {
       throw new InvalidArgumentError('cbor', `Expected a pot value between 0 and 1, but got ${pot}`);
 
     const cert = new MoveInstantaneousRewardToOtherPot(
-      pot === 0 ? Cardano.MirCertificatePot.Reserves : Cardano.MirCertificatePot.Treasury,
+      pot === 0 ? MirCertificatePot.Reserves : MirCertificatePot.Treasury,
       amount
     );
 
@@ -80,8 +81,8 @@ export class MoveInstantaneousRewardToOtherPot {
    */
   toCore(): Cardano.MirCertificate {
     return {
-      __typename: Cardano.CertificateType.MIR,
-      kind: Cardano.MirCertificateKind.ToOtherPot,
+      __typename: CertificateType.MIR,
+      kind: MirCertificateKind.ToOtherPot,
       pot: this.#pot,
       quantity: this.#amount
     };
@@ -93,7 +94,7 @@ export class MoveInstantaneousRewardToOtherPot {
    * @param cert The core MirCertificate object.
    */
   static fromCore(cert: Cardano.MirCertificate) {
-    if (cert.kind !== Cardano.MirCertificateKind.ToOtherPot)
+    if (cert.kind !== MirCertificateKind.ToOtherPot)
       throw new InvalidArgumentError('cert', `Expected a MIR certificate kind 'ToOtherPot', but got ${cert.kind}`);
 
     if (cert.quantity === undefined)

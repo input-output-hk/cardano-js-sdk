@@ -1,4 +1,3 @@
-import { Cardano } from '../..';
 import { ImageMediaType, MediaType, NftMetadata, NftMetadataFile, Uri } from './types';
 import { Logger } from 'ts-log';
 import { asString } from './util';
@@ -11,6 +10,7 @@ import {
   isPlutusMap,
   tryConvertPlutusMapToUtf8Record
 } from '../../Cardano/util';
+import type { Cardano } from '../..';
 
 const tryCoerce = <T>(
   value: string | Cardano.PlutusData | undefined,

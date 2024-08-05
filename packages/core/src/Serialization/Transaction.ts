@@ -1,15 +1,17 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import * as Cardano from '../Cardano';
-import * as Crypto from '@cardano-sdk/crypto';
 import { AuxiliaryData } from './AuxiliaryData';
 import { CborReader, CborReaderState, CborWriter } from './CBOR';
-import { HexBlob } from '@cardano-sdk/util';
+import { HexBlob, OpaqueString } from '@cardano-sdk/util';
 import { TransactionBody } from './TransactionBody';
 import { TransactionWitnessSet } from './TransactionWitnessSet';
 import { hexToBytes } from '../util/misc';
-import type { TxCBOR } from '../CBOR';
+import type * as Cardano from '../Cardano';
 
 const ALONZO_ERA_TX_FRAME_SIZE = 4;
+
+/** Transaction serialized as CBOR, encoded as hex string */
+export type TxCBOR = OpaqueString<'TxCbor'>;
+/** Transaction body serialized as CBOR, encoded as hex string */
+export type TxBodyCBOR = OpaqueString<'TxBodyCbor' & HexBlob['__opaqueString']>;
 
 /**
  * A transaction is a record of value transfer between two or more addresses on the network. It represents a request
@@ -238,9 +240,7 @@ export class Transaction {
 
   /** Computes the transaction id for this transaction. */
   getId(): Cardano.TransactionId {
-    const hash = Crypto.blake2b(Crypto.blake2b.BYTES).update(hexToBytes(this.#body.toCbor())).digest();
-
-    return Cardano.TransactionId.fromHexBlob(HexBlob.fromBytes(hash));
+    return this.#body.hash();
   }
 
   /** Performs a deep clone of the transaction object. */
@@ -249,3 +249,36 @@ export class Transaction {
     return Transaction.fromCbor(bytes);
   }
 }
+
+/**
+ * @param tx Serialized as CBOR, encoded as hex string
+ * @throws InvalidStringError
+ */
+export const TxCBOR = (tx: string): TxCBOR => HexBlob(tx) as unknown as TxCBOR;
+
+/** Serialize transaction to hex-encoded CBOR */
+TxCBOR.serialize = (tx: Cardano.Tx): TxCBOR => Transaction.fromCore(tx).toCbor() as unknown as TxCBOR;
+
+/**
+ * @param tx Serialized as CBOR, encoded as hex string
+ * @throws InvalidStringError
+ */
+export const TxBodyCBOR = (tx: string): TxBodyCBOR => HexBlob(tx) as unknown as TxBodyCBOR;
+
+/** Extract transaction body CBOR without re-serializing */
+TxBodyCBOR.fromTxCBOR = (txCbor: TxCBOR) => Transaction.fromCbor(txCbor).body().toCbor() as unknown as TxBodyCBOR;
+
+export const deserializeTx = ((txBody: Buffer | Uint8Array | string) => {
+  const hex =
+    txBody instanceof Buffer
+      ? txBody.toString('hex')
+      : txBody instanceof Uint8Array
+      ? Buffer.from(txBody).toString('hex')
+      : txBody;
+
+  const transaction = Transaction.fromCbor(TxCBOR(hex));
+  return transaction.toCore();
+}) as (txBody: HexBlob | Buffer | Uint8Array | string) => Cardano.Tx<Cardano.TxBody>;
+
+/** Deserialize transaction from hex-encoded CBOR */
+TxCBOR.deserialize = (tx: TxCBOR): Cardano.Tx => deserializeTx(tx);

@@ -1,10 +1,11 @@
-import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { Anchor } from '../Common';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { CertificateKind } from './CertificateKind';
+import { CertificateType } from '../../Cardano/types/Certificate';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { hexToBytes } from '../../util/misc';
+import type * as Cardano from '../../Cardano';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
@@ -116,7 +117,7 @@ export class ResignCommitteeCold {
    */
   toCore(): Cardano.ResignCommitteeColdCertificate {
     return {
-      __typename: Cardano.CertificateType.ResignCommitteeCold,
+      __typename: CertificateType.ResignCommitteeCold,
       anchor: this.#anchor ? this.#anchor.toCore() : null,
       coldCredential: this.#committeeColdCred
     };

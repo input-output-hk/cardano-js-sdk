@@ -4,9 +4,9 @@ import {
   GeneralCardanoNodeError,
   GeneralCardanoNodeErrorCode,
   Milliseconds,
+  Serialization,
   StateQueryError,
   StateQueryErrorCode,
-  TxCBOR,
   TxSubmissionError,
   TxSubmissionErrorCode
 } from '@cardano-sdk/core';
@@ -288,7 +288,9 @@ describe('ObservableOgmiosCardanoNode', () => {
     describe('successful submission', () => {
       it('emits transaction id and completes', async () => {
         TransactionSubmission.submitTransaction.mockResolvedValueOnce('id');
-        await expect(firstValueFrom(node.submitTx('cbor' as TxCBOR).pipe(toArray()))).resolves.toEqual(['id']);
+        await expect(firstValueFrom(node.submitTx('cbor' as Serialization.TxCBOR).pipe(toArray()))).resolves.toEqual([
+          'id'
+        ]);
         expect(TransactionSubmission.submitTransaction).toBeCalledTimes(1);
       });
     });
@@ -300,7 +302,7 @@ describe('ObservableOgmiosCardanoNode', () => {
           data: { ledgerEra: 'shelley', queryEra: 'alonzo' },
           message: 'Era mismatch'
         } as SubmitTransactionFailureEraMismatch);
-        await expect(firstValueFrom(node.submitTx('cbor' as TxCBOR))).rejects.toThrowError(
+        await expect(firstValueFrom(node.submitTx('cbor' as Serialization.TxCBOR))).rejects.toThrowError(
           expect.objectContaining({
             code: TxSubmissionErrorCode.EraMismatch,
             name: TxSubmissionError.name
@@ -315,7 +317,7 @@ describe('ObservableOgmiosCardanoNode', () => {
         TransactionSubmission.submitTransaction
           .mockRejectedValueOnce({ code: 'ECONNREFUSED' })
           .mockResolvedValueOnce('id');
-        await expect(firstValueFrom(node.submitTx('cbor' as TxCBOR))).resolves.toBe('id');
+        await expect(firstValueFrom(node.submitTx('cbor' as Serialization.TxCBOR))).resolves.toBe('id');
         expect(TransactionSubmission.submitTransaction).toBeCalledTimes(2);
       });
 
@@ -323,7 +325,7 @@ describe('ObservableOgmiosCardanoNode', () => {
         const error = { code: 'ECONNREFUSED' };
         TransactionSubmission.submitTransaction.mockRejectedValue(error);
 
-        await expect(firstValueFrom(node.submitTx('cbor' as TxCBOR))).rejects.toThrowError(
+        await expect(firstValueFrom(node.submitTx('cbor' as Serialization.TxCBOR))).rejects.toThrowError(
           expect.objectContaining({
             code: GeneralCardanoNodeErrorCode.ConnectionFailure
           })

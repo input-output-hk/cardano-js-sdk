@@ -1,9 +1,10 @@
-import * as Cardano from '../../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { CertificateKind } from '../CertificateKind';
 import { HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
+import { MirCertificateKind } from '../../../Cardano/types/Certificate';
 import { MoveInstantaneousRewardToOtherPot } from './MoveInstantaneousRewardToOtherPot';
 import { MoveInstantaneousRewardToStakeCreds } from './MoveInstantaneousRewardToStakeCreds';
+import type * as Cardano from '../../../Cardano';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
@@ -35,10 +36,10 @@ export class MoveInstantaneousReward {
     let cbor;
 
     switch (this.#kind) {
-      case Cardano.MirCertificateKind.ToOtherPot:
+      case MirCertificateKind.ToOtherPot:
         cbor = this.#toOtherPot!.toCbor();
         break;
-      case Cardano.MirCertificateKind.ToStakeCreds:
+      case MirCertificateKind.ToStakeCreds:
         cbor = this.#toStakeCreds!.toCbor();
         break;
       default:
@@ -92,13 +93,13 @@ export class MoveInstantaneousReward {
 
     if (embeddedCborReader.peekState() === CborReaderState.UnsignedInteger) {
       cert.#toOtherPot = MoveInstantaneousRewardToOtherPot.fromCbor(embeddedCbor);
-      cert.#kind = Cardano.MirCertificateKind.ToOtherPot;
+      cert.#kind = MirCertificateKind.ToOtherPot;
     } else if (
       embeddedCborReader.peekState() === CborReaderState.StartArray ||
       embeddedCborReader.peekState() === CborReaderState.StartMap
     ) {
       cert.#toStakeCreds = MoveInstantaneousRewardToStakeCreds.fromCbor(embeddedCbor);
-      cert.#kind = Cardano.MirCertificateKind.ToStakeCreds;
+      cert.#kind = MirCertificateKind.ToStakeCreds;
     } else {
       throw new InvalidArgumentError('cbor', 'Invalid CBOR string');
     }
@@ -117,10 +118,10 @@ export class MoveInstantaneousReward {
     let core;
 
     switch (this.#kind) {
-      case Cardano.MirCertificateKind.ToOtherPot:
+      case MirCertificateKind.ToOtherPot:
         core = this.#toOtherPot!.toCore();
         break;
-      case Cardano.MirCertificateKind.ToStakeCreds:
+      case MirCertificateKind.ToStakeCreds:
         core = this.#toStakeCreds!.toCore();
         break;
       default:
@@ -139,13 +140,13 @@ export class MoveInstantaneousReward {
     const mirCert = new MoveInstantaneousReward();
 
     switch (cert.kind) {
-      case Cardano.MirCertificateKind.ToOtherPot:
+      case MirCertificateKind.ToOtherPot:
         mirCert.#toOtherPot = MoveInstantaneousRewardToOtherPot.fromCore(cert);
-        mirCert.#kind = Cardano.MirCertificateKind.ToOtherPot;
+        mirCert.#kind = MirCertificateKind.ToOtherPot;
         break;
-      case Cardano.MirCertificateKind.ToStakeCreds:
+      case MirCertificateKind.ToStakeCreds:
         mirCert.#toStakeCreds = MoveInstantaneousRewardToStakeCreds.fromCore(cert);
-        mirCert.#kind = Cardano.MirCertificateKind.ToStakeCreds;
+        mirCert.#kind = MirCertificateKind.ToStakeCreds;
         break;
       default:
         throw new InvalidStateError(`Unexpected kind value: ${cert.kind}`);
@@ -164,7 +165,7 @@ export class MoveInstantaneousReward {
     const cert = new MoveInstantaneousReward();
 
     cert.#toOtherPot = mirCert;
-    cert.#kind = Cardano.MirCertificateKind.ToOtherPot;
+    cert.#kind = MirCertificateKind.ToOtherPot;
 
     return cert;
   }
@@ -179,7 +180,7 @@ export class MoveInstantaneousReward {
     const cert = new MoveInstantaneousReward();
 
     cert.#toStakeCreds = mirCert;
-    cert.#kind = Cardano.MirCertificateKind.ToStakeCreds;
+    cert.#kind = MirCertificateKind.ToStakeCreds;
 
     return cert;
   }
