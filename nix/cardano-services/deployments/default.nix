@@ -242,7 +242,6 @@ in
           };
         };
 
-
         "dev-sanchonet@us-east-1" = final: {
           name = "${final.namespace}-cardanojs";
           namespace = "dev-sanchonet";
@@ -283,7 +282,6 @@ in
             };
           };
         };
-
 
         "dev-mainnet@us-east-1" = final: {
           namespace = "dev-mainnet";
@@ -960,7 +958,6 @@ in
             stakepool.databaseName = "stakepoolv2";
             backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
 
-          backend.hostnames = ["${final.namespace}.${final.region}.${baseUrl}"];
             pg-boss-worker.enabled = true;
 
             blockfrost-worker.enabled = false;
