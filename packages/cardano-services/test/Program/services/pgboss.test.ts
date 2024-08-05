@@ -70,6 +70,7 @@ jest.mock('@cardano-sdk/projection-typeorm', () => {
 });
 
 describe('PgBossHttpService', () => {
+  const apiUrl = new URL('http://unused/');
   let connectionConfig$: Observable<PgConnectionConfig>;
   let connectionConfig: PgConnectionConfig;
   let dataSource: DataSource;
@@ -98,9 +99,37 @@ describe('PgBossHttpService', () => {
     db = pool;
   });
 
-  afterEach(async () => {
-    await service?.shutdown();
-    await dataSource.destroy().catch(() => void 0);
+  describe('without existing database', () => {
+    describe('initialize', () => {
+      it('throws an error and does not initialize pgboss schema', async () => {
+        service = new PgBossHttpService(
+          {
+            apiUrl,
+            dbCacheTtl: 0,
+            lastRosEpochs: 10,
+            metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
+            parallelJobs: 3,
+            queues: [],
+            schedules: []
+          },
+          { connectionConfig$, db, logger }
+        );
+        await expect(async () => {
+          await service!.initialize();
+          await service!.start();
+        }).rejects.toThrowError();
+        const pool = new Pool({
+          // most of the props are the same as for typeorm
+          ...connectionConfig,
+          ssl: undefined,
+          user: connectionConfig.username
+        });
+        const pgbossSchema = await pool.query(
+          "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'pgboss'"
+        );
+        expect(pgbossSchema.rowCount).toBe(0);
+      });
+    });
   });
 
   describe('with existing database', () => {
@@ -115,10 +144,15 @@ describe('PgBossHttpService', () => {
       await dataSource.initialize();
     });
 
+    afterEach(async () => {
+      await service?.shutdown();
+      await dataSource.destroy().catch(() => void 0);
+    });
+
     it('health check is ok after start with a valid db connection', async () => {
       service = new PgBossHttpService(
         {
-          apiUrl: new URL('http://unused/'),
+          apiUrl,
           dbCacheTtl: 0,
           lastRosEpochs: 10,
           metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
@@ -152,7 +186,7 @@ describe('PgBossHttpService', () => {
 
       service = new PgBossHttpService(
         {
-          apiUrl: new URL('http://unused/'),
+          apiUrl,
           dbCacheTtl: 0,
           lastRosEpochs: 10,
           metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,

@@ -149,12 +149,14 @@ export const createDataSource = ({
   return patchObject(dataSource, {
     async initialize() {
       await dataSource.initialize();
-      await initializePgBoss(
-        dataSource,
-        contextLogger(logger, 'createDataSource'),
-        extensions?.pgBoss,
-        devOptions?.dropSchema
-      );
+      if (extensions?.pgBoss && (options?.migrationsRun || devOptions?.synchronize)) {
+        await initializePgBoss(
+          dataSource,
+          contextLogger(logger, 'createDataSource'),
+          extensions?.pgBoss,
+          devOptions?.dropSchema
+        );
+      }
       return dataSource;
     }
   });
