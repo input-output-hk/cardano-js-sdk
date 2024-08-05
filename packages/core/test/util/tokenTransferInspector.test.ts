@@ -1,9 +1,9 @@
 import * as AssetId from '../../../util-dev/src/assetId';
 import * as AssetIds from '../AssetId';
-import * as Cardano from '../../src/Cardano';
 import {
   Asset,
   AssetInfoWithAmount,
+  Cardano,
   Milliseconds,
   TokenTransferValue,
   createTxInspector,
@@ -12,7 +12,7 @@ import {
 import { Ed25519KeyHashHex, Ed25519PublicKeyHex, Ed25519SignatureHex } from '@cardano-sdk/crypto';
 import { createMockAssetProvider, createMockInputResolver } from './mocks';
 import { jsonToMetadatum } from '../../src/util/metadatum';
-import { logger } from '@cardano-sdk/util-dev';
+import { dummyLogger as logger } from 'ts-log';
 
 const buildTokenTransferValue = (coins: bigint, assets: Array<[Asset.AssetInfo, bigint]>): TokenTransferValue => ({
   assets: new Map<Cardano.AssetId, AssetInfoWithAmount>(
