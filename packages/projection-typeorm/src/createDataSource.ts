@@ -16,7 +16,7 @@ type PostgresConnectionOptions = DataSourceOptions & { type: 'postgres' };
 
 export type PgConnectionConfig = Pick<
   PostgresConnectionOptions,
-  'host' | 'port' | 'database' | 'username' | 'password' | 'ssl'
+  'host' | 'port' | 'database' | 'username' | 'password' | 'ssl' | 'poolSize'
 >;
 
 export type TypeormDevOptions = Pick<PostgresConnectionOptions, 'synchronize' | 'dropSchema'>;

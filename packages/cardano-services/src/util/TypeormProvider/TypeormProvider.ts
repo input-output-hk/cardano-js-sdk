@@ -1,22 +1,16 @@
-import { HealthCheckResponse, Provider } from '@cardano-sdk/core';
-import { Logger } from 'ts-log';
-import { Observable, skip } from 'rxjs';
-import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
-import { TypeormService } from '../TypeormService';
+import { HealthCheckResponse, Milliseconds, Provider } from '@cardano-sdk/core';
+import { TypeormService, TypeormServiceDependencies } from '../TypeormService';
+import { skip } from 'rxjs';
 
-export interface TypeormProviderDependencies {
-  logger: Logger;
-  entities: Function[];
-  connectionConfig$: Observable<PgConnectionConfig>;
-}
+export type TypeormProviderDependencies = Omit<TypeormServiceDependencies, 'connectionTimeout'>;
 
 const unhealthy = { ok: false, reason: 'Provider error' };
 
 export abstract class TypeormProvider extends TypeormService implements Provider {
   health: HealthCheckResponse = { ok: false, reason: 'not started' };
 
-  constructor(name: string, { connectionConfig$, logger, entities }: TypeormProviderDependencies) {
-    super(name, { connectionConfig$, entities, logger });
+  constructor(name: string, dependencies: TypeormProviderDependencies) {
+    super(name, { ...dependencies, connectionTimeout: Milliseconds(1000) });
     // We skip 1 to omit the initial null value of the subject
     this.dataSource$.pipe(skip(1)).subscribe((dataSource) => {
       this.health = dataSource ? { ok: true } : unhealthy;

@@ -12,7 +12,11 @@ export const createTypeormDataSource = (
       from(
         (async () => {
           try {
-            const dataSource = createDataSource({ connectionConfig, entities, logger });
+            const dataSource = createDataSource({
+              connectionConfig,
+              entities,
+              logger
+            });
             await dataSource.initialize();
             return dataSource;
           } catch (error) {
