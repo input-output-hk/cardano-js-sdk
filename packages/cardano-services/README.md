@@ -99,19 +99,16 @@ OGMIOS_SRV_SERVICE_NAME=some-domain-for-ogmios \
 ./dist/cjs/cli.js start-provider-server
 ```
 
-**`start-worker` using CLI options:**
+**`start-pg-boss-worker` using CLI options:**
 
 ```bash
-./dist/cjs/cli.js \
-  start-worker \
-    --ogmios-srv-service-name  some-domain-for-ogmios
+./dist/cjs/cli.js start-pg-boss-worker --queues=pool-metadata --postgres-connection-string-stake-pool "postgresql://postgres:doNoUseThisSecret\!@localhost:5432/projection" --postgres-connection-string-db-sync "postgresql://postgres:doNoUseThisSecret\!@localhost:5432/cexplorer"
 ```
 
-**`start-worker` using env variables:**
+**`start-pg-boss-worker` using env variables:**
 
 ```bash
-OGMIOS_SRV_SERVICE_NAME=some-domain-for-ogmios \
-./dist/cjs/cli.js start-worker
+QUEUES=pool-metadata POSTGRES_CONNECTION_STRING_STAKE_POOL=postgresql://postgres:doNoUseThisSecret\!@localhost:5432/projection POSTGRES_CONNECTION_STRING_DB_SYNC=postgresql://postgres:doNoUseThisSecret\!@localhost:5432/cexplorer ./dist/cjs/cli.js start-pg-boss-worker
 ```
 
 **`start-projector` using CLI options with Ogmios and PostgreSQL running on localhost:**

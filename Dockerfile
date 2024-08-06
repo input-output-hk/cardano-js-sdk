@@ -61,7 +61,7 @@ CMD ["bash", "-c", "../../node_modules/.bin/tsx watch --clear-screen=false --con
 
 FROM cardano-services as worker
 WORKDIR /app/packages/cardano-services
-CMD ["bash", "-c", "../../node_modules/.bin/tsx watch --clear-screen=false --conditions=development src/cli start-worker"]
+CMD ["bash", "-c", "../../node_modules/.bin/tsx watch --clear-screen=false --conditions=development src/cli start-pg-boss-worker"]
 
 FROM cardano-services as blockfrost-worker
 ENV \
