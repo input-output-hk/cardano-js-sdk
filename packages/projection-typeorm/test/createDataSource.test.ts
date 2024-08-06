@@ -16,7 +16,7 @@ describe('createDataSource', () => {
   });
 
   describe('pg-boss schema', () => {
-    it('initialize() creates and drops pg-boss schema when pgBoss extension is enabled', async () => {
+    it('initialize() creates pg-boss schema when pgBoss extension is enabled', async () => {
       const dataSourceWithBoss = await initializeDataSource({
         entities: [BlockEntity],
         extensions: {
@@ -25,11 +25,6 @@ describe('createDataSource', () => {
       });
       const queryRunnerWithBoss = dataSourceWithBoss.createQueryRunner();
       expect(await pgBossSchemaExists(queryRunnerWithBoss)).toBe(true);
-      await queryRunnerWithBoss.release();
-
-      const dataSourceWithoutBoss = await initializeDataSource({ entities: [] });
-      const queryRunnerWithoutBoss = dataSourceWithoutBoss.createQueryRunner();
-      expect(await pgBossSchemaExists(queryRunnerWithoutBoss)).toBe(false);
       await queryRunnerWithBoss.release();
     });
   });

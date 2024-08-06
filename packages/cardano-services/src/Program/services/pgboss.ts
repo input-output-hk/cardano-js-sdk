@@ -19,11 +19,11 @@ import { HttpService } from '../../Http/HttpService';
 import { Logger } from 'ts-log';
 import {
   Observable,
+  Subject,
   Subscription,
   catchError,
   concat,
   finalize,
-  firstValueFrom,
   from,
   merge,
   share,
@@ -66,9 +66,18 @@ export const createPgBossDataSource = (connectionConfig$: Observable<PgConnectio
           const dataSource = createDataSource({
             connectionConfig,
             entities: pgBossEntities,
-            logger
+            extensions: { pgBoss: true },
+            logger,
+            options: { migrationsRun: false }
           });
           await dataSource.initialize();
+          const pgbossSchema = await dataSource.query(
+            "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'pgboss'"
+          );
+          if (pgbossSchema.length === 0) {
+            await dataSource.destroy();
+            throw new Error('Database schema is not ready. Please make sure projector is running.');
+          }
           return dataSource;
         })()
       )
@@ -105,6 +114,7 @@ export class PgBossHttpService extends HttpService {
   #db: Pool;
   #subscription?: Subscription;
   #health: HealthCheckResponse = { ok: false, reason: 'PgBossHttpService not started' };
+  onUnrecoverableError$ = new Subject<unknown>();
 
   constructor(cfg: PgBossWorkerArgs, deps: PgBossServiceDependencies) {
     const { connectionConfig$, db, logger } = deps;
@@ -127,11 +137,16 @@ export class PgBossHttpService extends HttpService {
     // Used for later use of firstValueFrom() to avoid it subscribes again
     const sharedWork$ = this.work().pipe(share());
 
-    // Subscribe to work() to create the first DataSource and start pg-boss
-    this.#subscription = sharedWork$.subscribe();
-
-    // Used to make startImpl actually await for a first emitted value from work()
-    await firstValueFrom(sharedWork$);
+    return new Promise<void>((resolve, reject) => {
+      // Subscribe to work() to create the first DataSource and start pg-boss
+      this.#subscription = sharedWork$.subscribe({
+        error: (error) => {
+          this.onUnrecoverableError$.next(error);
+          reject(error);
+        },
+        next: () => resolve()
+      });
+    });
   }
 
   protected async shutdownImpl() {
@@ -174,8 +189,7 @@ export class PgBossHttpService extends HttpService {
       }),
       catchError((error) => {
         this.logger.error('Fatal worker error', error);
-        // eslint-disable-next-line unicorn/no-process-exit
-        process.exit(1);
+        throw error;
       })
     );
   }

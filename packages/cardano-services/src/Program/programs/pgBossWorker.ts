@@ -30,6 +30,10 @@ export class PgBossWorkerHttpServer extends HttpServer {
     const { apiUrl } = cfg;
     const { logger } = deps;
     const pgBossService = new PgBossHttpService(cfg, deps);
+    pgBossService.onUnrecoverableError$.subscribe(() => {
+      // eslint-disable-next-line unicorn/no-process-exit
+      process.exit(1);
+    });
 
     super(
       { listen: getListen(apiUrl), name: pgBossWorker },
