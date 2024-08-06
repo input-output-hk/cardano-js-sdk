@@ -109,6 +109,31 @@ const mergeTlsOptions = (
       }
     : ssl || !!conn.ssl;
 
+export const connStringToPgConnectionConfig = (
+  postgresConnectionString: string,
+  {
+    poolSize,
+    ssl
+  }: {
+    poolSize?: number;
+    ssl?: { ca: string };
+  } = {}
+): PgConnectionConfig => {
+  const conn = connString.parse(postgresConnectionString);
+  if (!conn.database || !conn.host) {
+    throw new InvalidProgramOption('postgresConnectionString');
+  }
+  return {
+    database: conn.database,
+    host: conn.host,
+    password: conn.password,
+    poolSize,
+    port: conn.port ? Number.parseInt(conn.port) : undefined,
+    ssl: mergeTlsOptions(conn, ssl),
+    username: conn.user
+  };
+};
+
 export const getConnectionConfig = <Suffix extends ConnectionNames>(
   dnsResolver: DnsResolver,
   program: string,
@@ -121,19 +146,7 @@ export const getConnectionConfig = <Suffix extends ConnectionNames>(
   const ssl = postgresSslCaFile ? { ca: loadSecret(postgresSslCaFile) } : undefined;
 
   if (postgresConnectionString) {
-    const conn = connString.parse(postgresConnectionString);
-    if (!conn.database || !conn.host) {
-      throw new InvalidProgramOption('postgresConnectionString');
-    }
-    return of({
-      database: conn.database,
-      host: conn.host,
-      max,
-      password: conn.password,
-      port: conn.port ? Number.parseInt(conn.port) : undefined,
-      ssl: mergeTlsOptions(conn, ssl),
-      username: conn.user
-    });
+    return of(connStringToPgConnectionConfig(postgresConnectionString, { poolSize: max, ssl }));
   }
 
   const postgresDb = getPostgresOption(suffix, 'postgresDb', options);

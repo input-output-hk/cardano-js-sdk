@@ -1,4 +1,4 @@
-import { Asset, Cardano } from '@cardano-sdk/core';
+import { Asset, Cardano, Milliseconds } from '@cardano-sdk/core';
 import { AssetPolicyIdAndName, NftMetadataService } from './types';
 import { NftMetadataEntity } from '@cardano-sdk/projection-typeorm';
 import { QueryRunner } from 'typeorm';
@@ -6,7 +6,7 @@ import { TypeormProviderDependencies, TypeormService } from '../util';
 
 export class TypeOrmNftMetadataService extends TypeormService implements NftMetadataService {
   constructor({ connectionConfig$, logger, entities }: TypeormProviderDependencies) {
-    super('TypeOrmNftMetadataService', { connectionConfig$, entities, logger });
+    super('TypeOrmNftMetadataService', { connectionConfig$, connectionTimeout: Milliseconds(1000), entities, logger });
   }
 
   async getNftMetadata(assetInfo: AssetPolicyIdAndName): Promise<Asset.NftMetadata | null> {
