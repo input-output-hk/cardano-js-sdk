@@ -15,6 +15,12 @@ import Fraction from 'fraction.js';
 
 export const BYRON_TX_FEE_COEFFICIENT = 43_946_000_000;
 export const BYRON_TX_FEE_CONSTANT = 155_381_000_000_000;
+/**
+ * Byron addresses in general do NOT define a maximum length.
+ * This upper limit originates from the maximum length of an index row defined
+ * in postgres.
+ */
+const MAX_BYRON_OUTPUT_ADDRESS_BYTES_LENGTH = 8191;
 
 const mapMargin = (margin: string): Cardano.Fraction => {
   const { n: numerator, d: denominator } = new Fraction(margin);
@@ -370,8 +376,26 @@ export const mapValue = (value: Schema.Value): Cardano.Value => ({
   coins: value.ada.lovelace
 });
 
+const mapTxOutAddress = (address: string): Cardano.PaymentAddress => {
+  if (Cardano.Address.isValidByron(address)) {
+    const byronAddress = Cardano.Address.fromBase58(address);
+    const keyHashBytes = Buffer.from(byronAddress.toBytes(), 'hex');
+    if (keyHashBytes.length > MAX_BYRON_OUTPUT_ADDRESS_BYTES_LENGTH) {
+      const byronCredentialHashHex = Crypto.Hash28ByteBase16(Crypto.blake2b(28).update(keyHashBytes).digest('hex'));
+      return Cardano.ByronAddress.fromCredentials(
+        byronCredentialHashHex,
+        byronAddress.getProps().byronAddressContent!.attrs!,
+        byronAddress.getProps().byronAddressContent!.type!
+      )
+        .toAddress()
+        .toBase58();
+    }
+  }
+  return Cardano.PaymentAddress(address);
+};
+
 const mapTxOut = (txOut: Schema.TransactionOutput): Cardano.TxOut => ({
-  address: Cardano.PaymentAddress(txOut.address),
+  address: mapTxOutAddress(txOut.address),
   // From ogmios v5.5.0 release notes:
   // Similarly, Alonzo transaction outputs will now contain a datumHash field, carrying the datum hash digest.
   // However, they will also contain a datum field with the exact same value for backward compatibility reason.
@@ -457,10 +481,12 @@ const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
   };
 };
 
+const isByronEraBlock = ({ type }: CommonBlock | Schema.BlockBFT) => type === 'bft';
+
 export const mapBlockBody = (block: CommonBlock | Schema.BlockBFT): Cardano.Block['body'] => {
-  const { transactions, type } = block;
+  const { transactions } = block;
   return (transactions || []).map((transaction) =>
-    type !== 'bft' && transaction.cbor
+    !isByronEraBlock(block) && transaction.cbor
       ? {
           ...Serialization.Transaction.fromCbor(transaction.cbor as Serialization.TxCBOR).toCore(),
           inputSource: mapInputSource(transaction.spends)
