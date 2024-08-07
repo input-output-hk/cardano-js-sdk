@@ -1,7 +1,7 @@
 /* eslint-disable max-statements */
 import { BaseWallet, ObservableWallet } from '@cardano-sdk/wallet';
 import { BigIntMath, isNotNil } from '@cardano-sdk/util';
-import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
+import { Cardano, Serialization, StakePoolProvider } from '@cardano-sdk/core';
 import {
   TX_TIMEOUT_DEFAULT,
   firstValueFromTimed,
@@ -172,9 +172,12 @@ describe('SharedWallet/delegation', () => {
         .sign()
     ).tx;
 
-    tx = await bobMultiSigWallet.updateWitness({ sender: { id: 'e2e' }, tx });
-    tx = await charlotteMultiSigWallet.updateWitness({ sender: { id: 'e2e' }, tx });
-    await aliceMultiSigWallet.submitTx(tx);
+    // Serialize and transmit TX...
+    let serializedTx = Serialization.Transaction.fromCore(tx).toCbor();
+
+    serializedTx = await bobMultiSigWallet.addSignatures({ sender: { id: 'e2e' }, tx: serializedTx });
+    serializedTx = await charlotteMultiSigWallet.addSignatures({ sender: { id: 'e2e' }, tx: serializedTx });
+    await aliceMultiSigWallet.submitTx(serializedTx);
 
     // Test it locks available balance after tx is submitted
     await firstValueFromTimed(
@@ -224,10 +227,12 @@ describe('SharedWallet/delegation', () => {
 
     // Make a 2nd tx with key de-registration
     tx = (await aliceMultiSigWallet.createTxBuilder().delegateFirstStakeCredential(null).build().sign()).tx;
-    tx = await bobMultiSigWallet.updateWitness({ sender: { id: 'e2e' }, tx });
-    tx = await charlotteMultiSigWallet.updateWitness({ sender: { id: 'e2e' }, tx });
+    serializedTx = Serialization.Transaction.fromCore(tx).toCbor();
 
-    await aliceMultiSigWallet.submitTx(tx);
+    serializedTx = await bobMultiSigWallet.addSignatures({ sender: { id: 'e2e' }, tx: serializedTx });
+    serializedTx = await charlotteMultiSigWallet.addSignatures({ sender: { id: 'e2e' }, tx: serializedTx });
+
+    await aliceMultiSigWallet.submitTx(serializedTx);
 
     await waitForTx(aliceMultiSigWallet, tx.id);
     const tx2ConfirmedState = await getWalletStateSnapshot(aliceMultiSigWallet);

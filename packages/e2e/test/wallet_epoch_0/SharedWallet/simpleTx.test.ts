@@ -1,5 +1,5 @@
 import { BaseWallet } from '@cardano-sdk/wallet';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { buildSharedWallets } from './utils';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import {
@@ -97,14 +97,18 @@ describe('SharedWallet/simpleTx', () => {
     // Alice will initiate the transaction.
     const txBuilder = aliceMultiSigWallet.createTxBuilder();
     const txOut = await txBuilder.buildOutput().address(faucetAddress).coin(1_000_000n).build();
-    let tx = (await txBuilder.addOutput(txOut).build().sign()).tx;
+    const tx = (await txBuilder.addOutput(txOut).build().sign()).tx;
+
+    // Serialize and transmit TX...
+    let serializedTx = Serialization.Transaction.fromCore(tx).toCbor();
 
     // Bob updates the transaction with his witness
-    tx = await bobMultiSigWallet.updateWitness({ sender: { id: 'e2e' }, tx });
+    serializedTx = await bobMultiSigWallet.addSignatures({ sender: { id: 'e2e' }, tx: serializedTx });
 
     // Charlotte updates the transaction with her witness
-    tx = await charlotteMultiSigWallet.updateWitness({ sender: { id: 'e2e' }, tx });
-    const txId = await charlotteMultiSigWallet.submitTx(tx);
+    serializedTx = await charlotteMultiSigWallet.addSignatures({ sender: { id: 'e2e' }, tx: serializedTx });
+
+    const txId = await charlotteMultiSigWallet.submitTx(serializedTx);
 
     const finalTxFound = await firstValueFrom(
       aliceMultiSigWallet.transactions.history$.pipe(

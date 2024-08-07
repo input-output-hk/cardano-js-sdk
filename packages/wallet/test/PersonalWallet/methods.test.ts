@@ -19,6 +19,7 @@ import {
 } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
+import { babbageTx } from '../../../core/test/Serialization/testData';
 import { buildDRepIDFromDRepKey, toOutgoingTx, waitForWalletStateSettle } from '../util';
 import { getPassphrase, stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { dummyLogger as logger } from 'ts-log';
@@ -531,6 +532,79 @@ describe('BaseWallet methods', () => {
       addressDiscovery.discover.mockResolvedValueOnce(newAddresses);
       await expect(wallet.discoverAddresses()).resolves.toEqual(newAddresses);
       await expect(firstValueFrom(wallet.addresses$)).resolves.toEqual(newAddresses);
+    });
+  });
+
+  describe('addSignatures', () => {
+    it('adds the signatures and preserves all previous witnesses', async () => {
+      const mockWitnesser = {
+        signData: jest.fn(),
+        witness: jest.fn().mockResolvedValue({
+          cbor: Serialization.Transaction.fromCore(babbageTx).toCbor(),
+          context: {
+            handleResolutions: []
+          },
+          tx: {
+            ...babbageTx,
+            witness: {
+              ...babbageTx.witness,
+              signatures: new Map([
+                ...babbageTx.witness.signatures.entries(),
+                [
+                  '0000000000000000000000000000000000000000000000000000000000000000',
+                  '0000000000000000000000000000000000000000000000000000000000000000'
+                ]
+              ])
+            }
+          }
+        })
+      };
+
+      wallet.shutdown();
+      wallet = createPersonalWallet(
+        { name: 'Test Wallet' },
+        {
+          addressDiscovery,
+          assetProvider,
+          bip32Account,
+          chainHistoryProvider,
+          handleProvider,
+          logger,
+          networkInfoProvider,
+          rewardsProvider,
+          stakePoolProvider,
+          txSubmitProvider,
+          utxoProvider,
+          witnesser: mockWitnesser
+        }
+      );
+
+      await waitForWalletStateSettle(wallet);
+
+      const serializedTx = Serialization.Transaction.fromCore(babbageTx).toCbor();
+      const tx = await wallet.addSignatures({ tx: serializedTx });
+      const updatedTx = Serialization.Transaction.fromCbor(tx).toCore();
+
+      expect(babbageTx.witness.bootstrap).toEqual(updatedTx.witness.bootstrap);
+      expect(babbageTx.witness.datums).toEqual(updatedTx.witness.datums);
+      expect(babbageTx.witness.redeemers).toEqual(updatedTx.witness.redeemers);
+      expect(babbageTx.witness.scripts).toEqual(updatedTx.witness.scripts);
+
+      for (const [key, value] of Object.entries(babbageTx.witness.signatures)) {
+        expect(value).toEqual(updatedTx.witness.signatures.get(key as Crypto.Ed25519PublicKeyHex));
+      }
+
+      expect(updatedTx.witness.signatures.size).toEqual(babbageTx.witness.signatures.size + 1);
+      expect(
+        updatedTx.witness.signatures.get(
+          '0000000000000000000000000000000000000000000000000000000000000000' as Crypto.Ed25519PublicKeyHex
+        )
+      ).toEqual('0000000000000000000000000000000000000000000000000000000000000000');
+
+      // signed$ emits transaction and all its witnesses
+      const signedTxs = await firstValueFrom(wallet.transactions.outgoing.signed$);
+
+      expect(signedTxs[0].tx).toEqual(updatedTx);
     });
   });
 

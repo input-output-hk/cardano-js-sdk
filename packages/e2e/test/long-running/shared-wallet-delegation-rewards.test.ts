@@ -1,5 +1,5 @@
 import { BaseWallet } from '@cardano-sdk/wallet';
-import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
+import { Cardano, Serialization, StakePoolProvider } from '@cardano-sdk/core';
 import { buildSharedWallets } from '../wallet_epoch_0/SharedWallet/utils';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import {
@@ -20,11 +20,15 @@ const env = getEnv(walletVariables);
 
 const submitDelegationTx = async (alice: BaseWallet, bob: BaseWallet, charlotte: BaseWallet, pool: Cardano.PoolId) => {
   logger.info(`Creating delegation tx at epoch #${(await firstValueFrom(alice.currentEpoch$)).epochNo}`);
-  let tx = (await alice.createTxBuilder().delegateFirstStakeCredential(pool).build().sign()).tx;
+  const tx = (await alice.createTxBuilder().delegateFirstStakeCredential(pool).build().sign()).tx;
 
-  tx = await bob.updateWitness({ sender: { id: 'e2e' }, tx });
-  tx = await charlotte.updateWitness({ sender: { id: 'e2e' }, tx });
-  await alice.submitTx(tx);
+  // Serialize and transmit TX...
+  let serializedTx = Serialization.Transaction.fromCore(tx).toCbor();
+
+  serializedTx = await bob.addSignatures({ sender: { id: 'e2e' }, tx: serializedTx });
+  serializedTx = await charlotte.addSignatures({ sender: { id: 'e2e' }, tx: serializedTx });
+
+  await alice.submitTx(serializedTx);
 
   const { epochNo } = await firstValueFrom(alice.currentEpoch$);
   logger.info(`Delegation tx ${tx.id} submitted at epoch #${epochNo}`);
@@ -61,15 +65,18 @@ const buildSpendRewardTx = async (
   const { body } = await tx.inspect();
   logger.debug('Body of tx before sign');
   logger.debug(body);
-  let signedTx = (await tx.sign()).tx;
+  const signedTx = (await tx.sign()).tx;
 
-  signedTx = await bob.updateWitness({ sender: { id: 'e2e' }, tx: signedTx });
-  signedTx = await charlotte.updateWitness({ sender: { id: 'e2e' }, tx: signedTx });
+  // Serialize and transmit TX...
+  let serializedTx = Serialization.Transaction.fromCore(signedTx).toCbor();
+
+  serializedTx = await bob.addSignatures({ sender: { id: 'e2e' }, tx: serializedTx });
+  serializedTx = await charlotte.addSignatures({ sender: { id: 'e2e' }, tx: serializedTx });
 
   logger.debug('Body of tx after sign');
   logger.debug(signedTx.body);
 
-  return signedTx;
+  return serializedTx;
 };
 
 const getPoolIds = async (stakePoolProvider: StakePoolProvider, count: number) => {
@@ -187,13 +194,11 @@ describe('shared wallet delegation rewards', () => {
     logger.info(`Generated rewards: ${rewards} tLovelace`);
 
     // Spend reward
-    const spendRewardTx = await buildSpendRewardTx(
-      aliceMultiSigWallet,
-      bobMultiSigWallet,
-      charlotteMultiSigWallet,
-      faucetWallet
-    );
-    expect(spendRewardTx.body.withdrawals?.length).toBeGreaterThan(0);
-    await submitAndConfirm(aliceMultiSigWallet, spendRewardTx);
+    const spendRewardsTx = Serialization.Transaction.fromCbor(
+      await buildSpendRewardTx(aliceMultiSigWallet, bobMultiSigWallet, charlotteMultiSigWallet, faucetWallet)
+    ).toCore();
+
+    expect(spendRewardsTx.body.withdrawals?.length).toBeGreaterThan(0);
+    await submitAndConfirm(aliceMultiSigWallet, spendRewardsTx);
   });
 });
