@@ -98,6 +98,7 @@ export const txBuilderProperties: RemoteApiProperties<Omit<TxBuilder, 'customize
 };
 
 export const observableWalletProperties: RemoteApiProperties<ObservableWallet> = {
+  addSignatures: RemoteApiPropertyType.MethodReturningPromise,
   addresses$: RemoteApiPropertyType.HotObservable,
   assetInfo$: RemoteApiPropertyType.HotObservable,
   balance: {
