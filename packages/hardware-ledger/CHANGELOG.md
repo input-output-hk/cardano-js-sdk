@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.11.0...@cardano-sdk/hardware-ledger@0.11.1) (2024-08-07)
+
+### Bug Fixes
+
+* **hardware-ledger:** delegate vote drep is a hash not key path ([938b36a](https://github.com/input-output-hk/cardano-js-sdk/commit/938b36a5d3825f8e7ffbfbdf61a80316dec0cc7a))
+
 ## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.10.2...@cardano-sdk/hardware-ledger@0.11.0) (2024-08-01)
 
 ### ⚠ BREAKING CHANGES

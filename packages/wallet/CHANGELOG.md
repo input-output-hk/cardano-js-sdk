@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.42.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.41.0...@cardano-sdk/wallet@0.42.0) (2024-08-07)
+
+### ⚠ BREAKING CHANGES
+
+* remove updateWitness method from observable wallet
+- add addSignatures method to observable wallet
+* remove Cardano.TransactionId.fromTxBodyCbor
+- hoist getAssetNameAsText util to Asset.util namespace
+- hoist TxCBOR and TxBodyCBOR under Serialization namespace
+* CIP30 getUnusedAddresses now returns the next used address instead of an empty array
+- add a new getNextUnusedAddress method to the ObservableWallet interface.
+
+### Features
+
+* add a new function to generate and track unused addresses in ObservableWallets ([d1418f4](https://github.com/input-output-hk/cardano-js-sdk/commit/d1418f4ad41531c30c1cbc382af9610007081453))
+* replace updateWitness with addSignatures in observable wallet ([d0bdffa](https://github.com/input-output-hk/cardano-js-sdk/commit/d0bdffa9ad62ce46d906645b889c44de9355b73e))
+
+### Code Refactoring
+
+* resolve circular references in core package ([87aa26f](https://github.com/input-output-hk/cardano-js-sdk/commit/87aa26f2a2f50df0c7a72aaf4f746df2a466adfb))
+
 ## [0.41.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.40.0...@cardano-sdk/wallet@0.41.0) (2024-08-01)
 
 ### ⚠ BREAKING CHANGES
