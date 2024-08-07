@@ -1,6 +1,17 @@
 /* eslint-disable unicorn/no-nested-ternary */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {
+  AddSignaturesProps,
+  Assets,
+  FinalizeTxProps,
+  HandleInfo,
+  ObservableWallet,
+  SignDataProps,
+  SyncStatus,
+  WalletAddress,
+  WalletNetworkInfoProvider
+} from '../types';
+import {
   AddressDiscovery,
   AddressTracker,
   BalanceTracker,
@@ -56,17 +67,6 @@ import {
   TxSubmitProvider,
   UtxoProvider
 } from '@cardano-sdk/core';
-import {
-  Assets,
-  FinalizeTxProps,
-  HandleInfo,
-  ObservableWallet,
-  SignDataProps,
-  SyncStatus,
-  UpdateWitnessProps,
-  WalletAddress,
-  WalletNetworkInfoProvider
-} from '../types';
 import { BehaviorObservable, TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import {
   BehaviorSubject,
@@ -878,15 +878,33 @@ export class BaseWallet implements ObservableWallet {
     return isEmpty ? [knownAddresses[0]] : [];
   }
 
-  /** Update the witness of a transaction with witness provided by this wallet */
-  async updateWitness({ tx, sender }: UpdateWitnessProps): Promise<Cardano.Tx> {
-    return this.finalizeTx({
-      auxiliaryData: tx.auxiliaryData,
+  async addSignatures({ tx, sender }: AddSignaturesProps): Promise<Serialization.TxCBOR> {
+    const serializableTx = Serialization.Transaction.fromCbor(tx);
+    const auxiliaryData = serializableTx.auxiliaryData()?.toCore();
+    const body = serializableTx.body().toCore();
+    const hash = serializableTx.getId();
+    const witness = serializableTx.witnessSet().toCore();
+    const bodyCbor = serializableTx.body().toCbor();
+
+    const witnessedTx = await this.finalizeTx({
+      auxiliaryData,
+      bodyCbor,
       signingContext: {
         sender
       },
-      tx: { body: tx.body, hash: tx.id },
-      witness: tx.witness
+      tx: { body, hash },
+      witness
     });
+
+    const coreWitness = witnessedTx.witness;
+    const witnessSet = serializableTx.witnessSet();
+
+    witnessSet.setVkeys(
+      Serialization.CborSet.fromCore([...coreWitness.signatures], Serialization.VkeyWitness.fromCore)
+    );
+
+    serializableTx.setWitnessSet(witnessSet);
+
+    return serializableTx.toCbor();
   }
 }

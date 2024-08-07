@@ -55,8 +55,8 @@ export type FinalizeTxProps = Omit<TxContext, 'signingContext'> & {
   signingContext?: Partial<SignTransactionContext>;
 };
 
-export type UpdateWitnessProps = {
-  tx: Cardano.Tx;
+export type AddSignaturesProps = {
+  tx: Serialization.TxCBOR;
   sender?: MessageSender;
 };
 
@@ -143,6 +143,9 @@ export interface ObservableWallet {
    * are no available unused addresses (I.E Single address wallets such as script wallets which already used up their only address).
    */
   getNextUnusedAddress(): Promise<WalletAddress[]>;
+
+  /** Updates the transaction witness set with signatures from this wallet. */
+  addSignatures(props: AddSignaturesProps): Promise<Serialization.TxCBOR>;
 
   shutdown(): void;
 }
