@@ -30,9 +30,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">86.66% </span>
+                <span class="strong">87.93% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>52/60</span>
+                <span class='fraction'>51/58</span>
             </div>
         
             
@@ -468,17 +468,7 @@
 <a name='L403'></a><a href='#L403'>403</a>
 <a name='L404'></a><a href='#L404'>404</a>
 <a name='L405'></a><a href='#L405'>405</a>
-<a name='L406'></a><a href='#L406'>406</a>
-<a name='L407'></a><a href='#L407'>407</a>
-<a name='L408'></a><a href='#L408'>408</a>
-<a name='L409'></a><a href='#L409'>409</a>
-<a name='L410'></a><a href='#L410'>410</a>
-<a name='L411'></a><a href='#L411'>411</a>
-<a name='L412'></a><a href='#L412'>412</a>
-<a name='L413'></a><a href='#L413'>413</a>
-<a name='L414'></a><a href='#L414'>414</a>
-<a name='L415'></a><a href='#L415'>415</a>
-<a name='L416'></a><a href='#L416'>416</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L406'></a><a href='#L406'>406</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">8x</span>
@@ -529,15 +519,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -835,10 +819,6 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -940,22 +920,16 @@ const credentialMapper = (
 &nbsp;
 const drepParamsMapper = (
   drep: Cardano.Credential,
-  credentialType: Cardano.CredentialType | Ledger.CredentialParamsType.SCRIPT_HASH,
-  path: Crypto.BIP32Path | null
+  credentialType: Cardano.CredentialType | Ledger.CredentialParamsType.SCRIPT_HASH
 ): Ledger.KeyPathDRepParams | Ledger.KeyHashDRepParams | Ledger.ScriptHashDRepParams =&gt; {
   let dRepParams: Ledger.DRepParams;
 &nbsp;
   switch (credentialType) {
     case Cardano.CredentialType.KeyHash: {
-      dRepParams = path
-        ? {
-            keyPath: path,
-            type: Ledger.DRepParamsType.KEY_PATH
-          }
-        : <span class="branch-1 cbranch-no" title="branch not covered" >{</span>
-            keyHashHex: drep.hash,
-            type: Ledger.DRepParamsType.KEY_HASH
-          };
+      dRepParams = {
+        keyHashHex: drep.hash,
+        type: Ledger.DRepParamsType.KEY_HASH
+      };
       break;
     }
 <span class="branch-1 cbranch-no" title="branch not covered" >    case Cardano.CredentialType.ScriptHash:</span>
@@ -1238,7 +1212,7 @@ const updateDRepCertificate: Transform&lt;
   };
 };
 &nbsp;
-const drepMapper = (drep: Cardano.DelegateRepresentative, context: LedgerTxTransformerContext): Ledger.DRepParams =&gt; {
+const drepMapper = (drep: Cardano.DelegateRepresentative): Ledger.DRepParams =&gt; {
   if (Cardano.isDRepAlwaysAbstain(drep)) {
     return {
       type: Ledger.DRepParamsType.ABSTAIN
@@ -1248,11 +1222,7 @@ const drepMapper = (drep: Cardano.DelegateRepresentative, context: LedgerTxTrans
       type: Ledger.DRepParamsType.NO_CONFIDENCE
     };
   } else if (Cardano.isDRepCredential(drep)) {
-    return drepParamsMapper(
-      drep,
-      drep.type,
-      util.accountKeyDerivationPathToBip32Path(context.accountIndex, util.DREP_KEY_DERIVATION_PATH)
-    );
+    return drepParamsMapper(drep, drep.type);
   }
 <span class="cstat-no" title="statement not covered" >  throw new Error('incorrect drep supplied');</span>
 };
@@ -1263,7 +1233,7 @@ export const voteDelegationCertificate: Transform&lt;
   LedgerTxTransformerContext
 &gt; = (certificate, context): Ledger.Certificate =&gt; ({
   params: {
-    dRep: drepMapper(certificate.dRep, context!),
+    dRep: drepMapper(certificate.dRep),
     stakeCredential: stakeCredentialMapper(certificate.stakeCredential, context!)
   },
   type: Ledger.CertificateType.VOTE_DELEGATION
@@ -1315,7 +1285,7 @@ export const mapCerts = (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-08-07T09:28:18.367Z
+                at 2024-08-07T12:31:02.944Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
