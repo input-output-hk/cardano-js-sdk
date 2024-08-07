@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.38.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.37.0...@cardano-sdk/core@0.38.0) (2024-08-07)
+
+### ⚠ BREAKING CHANGES
+
+* remove Cardano.TransactionId.fromTxBodyCbor
+- hoist getAssetNameAsText util to Asset.util namespace
+- hoist TxCBOR and TxBodyCBOR under Serialization namespace
+
+### Bug Fixes
+
+* remove core package dependency on util-dev ([8601c0a](https://github.com/input-output-hk/cardano-js-sdk/commit/8601c0ab88adb8f80e65e7f79bf5515a8c6a662e))
+
+### Code Refactoring
+
+* resolve circular references in core package ([87aa26f](https://github.com/input-output-hk/cardano-js-sdk/commit/87aa26f2a2f50df0c7a72aaf4f746df2a466adfb))
+
 ## [0.37.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.36.0...@cardano-sdk/core@0.37.0) (2024-08-01)
 
 ### ⚠ BREAKING CHANGES

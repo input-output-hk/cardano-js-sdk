@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.30](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.8.29...@cardano-sdk/projection-typeorm@0.8.30) (2024-08-07)
+
+### Bug Fixes
+
+* add timeout to TypeormService withDataSource/withQueryRunner ([d5faa15](https://github.com/input-output-hk/cardano-js-sdk/commit/d5faa1571c5ee54598aa4ec08c6fd810a58c6845))
+* do not run schema migrations when starting pgboss worker ([172fe30](https://github.com/input-output-hk/cardano-js-sdk/commit/172fe3083e4863e7575fc86380078e26cc93e38e))
+
 ## [0.8.29](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.8.28...@cardano-sdk/projection-typeorm@0.8.29) (2024-08-01)
 
 **Note:** Version bump only for package @cardano-sdk/projection-typeorm

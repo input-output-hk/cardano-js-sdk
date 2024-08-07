@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.23.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.22.0...@cardano-sdk/key-management@0.23.0) (2024-08-07)
+
+### ⚠ BREAKING CHANGES
+
+* remove Cardano.TransactionId.fromTxBodyCbor
+- hoist getAssetNameAsText util to Asset.util namespace
+- hoist TxCBOR and TxBodyCBOR under Serialization namespace
+
+### Code Refactoring
+
+* resolve circular references in core package ([87aa26f](https://github.com/input-output-hk/cardano-js-sdk/commit/87aa26f2a2f50df0c7a72aaf4f746df2a466adfb))
+
 ## [0.22.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.21.2...@cardano-sdk/key-management@0.22.0) (2024-08-01)
 
 ### ⚠ BREAKING CHANGES

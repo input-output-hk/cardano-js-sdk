@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.39.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.38.0...@cardano-sdk/e2e@0.39.0) (2024-08-07)
+
+### ⚠ BREAKING CHANGES
+
+* remove updateWitness method from observable wallet
+- add addSignatures method to observable wallet
+* remove Cardano.TransactionId.fromTxBodyCbor
+- hoist getAssetNameAsText util to Asset.util namespace
+- hoist TxCBOR and TxBodyCBOR under Serialization namespace
+
+### Features
+
+* replace updateWitness with addSignatures in observable wallet ([d0bdffa](https://github.com/input-output-hk/cardano-js-sdk/commit/d0bdffa9ad62ce46d906645b889c44de9355b73e))
+
+### Code Refactoring
+
+* resolve circular references in core package ([87aa26f](https://github.com/input-output-hk/cardano-js-sdk/commit/87aa26f2a2f50df0c7a72aaf4f746df2a466adfb))
+
 ## [0.38.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.37.1...@cardano-sdk/e2e@0.38.0) (2024-08-01)
 
 ### ⚠ BREAKING CHANGES

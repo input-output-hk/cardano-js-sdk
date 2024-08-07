@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.29.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.29.2...@cardano-sdk/cardano-services@0.29.3) (2024-08-07)
+
+### Bug Fixes
+
+* add timeout to TypeormService withDataSource/withQueryRunner ([d5faa15](https://github.com/input-output-hk/cardano-js-sdk/commit/d5faa1571c5ee54598aa4ec08c6fd810a58c6845))
+* do not run schema migrations when starting pgboss worker ([172fe30](https://github.com/input-output-hk/cardano-js-sdk/commit/172fe3083e4863e7575fc86380078e26cc93e38e))
+* remove redundant, uninitialized logger from TypeormService ([02a9502](https://github.com/input-output-hk/cardano-js-sdk/commit/02a9502c48843e28a8af18067356aaeb6aba8e72))
+
 ## [0.29.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.29.1...@cardano-sdk/cardano-services@0.29.2) (2024-08-01)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services
