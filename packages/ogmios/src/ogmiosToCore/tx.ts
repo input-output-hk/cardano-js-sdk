@@ -440,7 +440,7 @@ export const mapWithdrawals = (withdrawals: Schema.Withdrawals): Cardano.Withdra
     })
   );
 
-const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
+const mapCommonTx = (tx: Schema.Transaction, type: 'praos' | 'bft'): Cardano.OnChainTx => {
   const { auxiliaryData, auxiliaryDataHash } = mapAuxiliaryData(tx.metadata);
   return {
     auxiliaryData,
@@ -472,11 +472,14 @@ const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
       // Removed `witness.scripts` from `OnChainTx`
       // https://github.com/input-output-hk/cardano-js-sdk/pull/927#discussion_r1352081210
       // ...(tx.scripts && { scripts: [...Object.values(tx.scripts).map(mapScript)] }),
-      signatures: new Map(
-        tx.signatories
-          .filter((signatory) => !signatory.addressAttributes && !signatory.chainCode)
-          .map(({ key, signature }) => [Crypto.Ed25519PublicKeyHex(key), Crypto.Ed25519SignatureHex(signature)])
-      )
+      signatures:
+        type === 'bft'
+          ? new Map()
+          : new Map(
+              tx.signatories
+                .filter((signatory) => !signatory.addressAttributes && !signatory.chainCode)
+                .map(({ key, signature }) => [Crypto.Ed25519PublicKeyHex(key), Crypto.Ed25519SignatureHex(signature)])
+            )
     }
   };
 };
@@ -484,13 +487,13 @@ const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
 const isByronEraBlock = ({ type }: CommonBlock | Schema.BlockBFT) => type === 'bft';
 
 export const mapBlockBody = (block: CommonBlock | Schema.BlockBFT): Cardano.Block['body'] => {
-  const { transactions } = block;
+  const { transactions, type } = block;
   return (transactions || []).map((transaction) =>
     !isByronEraBlock(block) && transaction.cbor
       ? {
           ...Serialization.Transaction.fromCbor(transaction.cbor as Serialization.TxCBOR).toCore(),
           inputSource: mapInputSource(transaction.spends)
         }
-      : mapCommonTx(transaction)
+      : mapCommonTx(transaction, type)
   );
 };
