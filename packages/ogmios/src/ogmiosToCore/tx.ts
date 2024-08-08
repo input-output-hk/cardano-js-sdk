@@ -14,12 +14,6 @@ import Fraction from 'fraction.js';
 
 export const BYRON_TX_FEE_COEFFICIENT = 43_946_000_000;
 export const BYRON_TX_FEE_CONSTANT = 155_381_000_000_000;
-/**
- * Byron addresses in general do NOT define a maximum length.
- * This upper limit originates from the maximum length of an index row defined
- * in postgres.
- */
-const MAX_BYRON_OUTPUT_ADDRESS_BYTES_LENGTH = 8191;
 
 const mapMargin = (margin: string): Cardano.Fraction => {
   const { n: numerator, d: denominator } = new Fraction(margin);

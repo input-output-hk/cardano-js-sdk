@@ -3,6 +3,11 @@ import { Cardano } from '@cardano-sdk/core';
 import { WithConsumedTxIn, WithProducedUTxO, WithUtxo } from './withUtxo';
 import { unifiedProjectorOperator } from '../utils';
 
+/**
+ * Byron addresses in general do NOT define a maximum length.
+ * This upper limit originates from the maximum length of an index row defined
+ * in postgres.
+ */
 const MAX_BYRON_OUTPUT_ADDRESS_BYTES_LENGTH = 8191;
 const ICARUS_ADDR_BECH32_PREFIX = 'Ae2';
 const DAEDALUS_ADDR_BECH32_PREFIX = 'DdzFF';
