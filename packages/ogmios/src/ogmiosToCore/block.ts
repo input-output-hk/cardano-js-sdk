@@ -74,6 +74,7 @@ const mapByronBlock = (block: Schema.BlockBFT): Cardano.Block => ({
   size: mapBlockSize(block),
   totalOutput: mapTotalOutputs(block),
   txCount: mapTxCount(block),
+  type: block.type,
   vrf: undefined // no vrf key for byron. DbSync doesn't have one either
 });
 
@@ -86,6 +87,7 @@ const mapCommonBlock = (block: CommonBlock): Cardano.Block => ({
   size: mapBlockSize(block),
   totalOutput: mapTotalOutputs(block),
   txCount: mapTxCount(block),
+  type: block.type,
   vrf: mapCommonVrf(block)
 });
 
