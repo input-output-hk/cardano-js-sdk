@@ -53,6 +53,10 @@ module.exports = {
         /@dcspark\/cardano-multiplatform-lib-nodejs/,
         '@dcspark/cardano-multiplatform-lib-browser'
       ),
+      new NormalModuleReplacementPlugin(
+        /@emurgo\/cardano-serialization-lib-nodejs/,
+        '@emurgo/cardano-serialization-lib-asmjs'
+      ),
       new NormalModuleReplacementPlugin(/blake2b$/, 'blake2b-no-wasm'),
       new NormalModuleReplacementPlugin(
         /@emurgo\/cardano-message-signing-nodejs/,
@@ -73,16 +77,21 @@ module.exports = {
         '@cardano-sdk/cardano-services': false,
         buffer: require.resolve('buffer/'),
         crypto: require.resolve('crypto-browserify'),
+        dns: false,
         events: require.resolve('events/'),
         fs: false,
         'get-port-please': false,
         http: false,
+        http2: false,
+        https: false,
         net: false,
         os: false,
         path: false,
         perf_hooks: false,
         stream: require.resolve('readable-stream'),
-        util: require.resolve('util/')
+        tls: false,
+        util: require.resolve('util/'),
+        zlib: false
       }
     },
     watchOptions: {
