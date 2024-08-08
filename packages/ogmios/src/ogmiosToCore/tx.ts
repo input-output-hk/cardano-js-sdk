@@ -375,26 +375,8 @@ export const mapValue = (value: Schema.Value): Cardano.Value => ({
   coins: value.ada.lovelace
 });
 
-const mapTxOutAddress = (address: string): Cardano.PaymentAddress => {
-  if (Cardano.Address.isValidByron(address)) {
-    const byronAddress = Cardano.Address.fromBase58(address);
-    const keyHashBytes = Buffer.from(byronAddress.toBytes(), 'hex');
-    if (keyHashBytes.length > MAX_BYRON_OUTPUT_ADDRESS_BYTES_LENGTH) {
-      const byronCredentialHashHex = Crypto.Hash28ByteBase16(Crypto.blake2b(28).update(keyHashBytes).digest('hex'));
-      return Cardano.ByronAddress.fromCredentials(
-        byronCredentialHashHex,
-        byronAddress.getProps().byronAddressContent!.attrs!,
-        byronAddress.getProps().byronAddressContent!.type!
-      )
-        .toAddress()
-        .toBase58();
-    }
-  }
-  return Cardano.PaymentAddress(address);
-};
-
 const mapTxOut = (txOut: Schema.TransactionOutput): Cardano.TxOut => ({
-  address: mapTxOutAddress(txOut.address),
+  address: Cardano.PaymentAddress(txOut.address),
   // From ogmios v5.5.0 release notes:
   // Similarly, Alonzo transaction outputs will now contain a datumHash field, carrying the datum hash digest.
   // However, they will also contain a datum field with the exact same value for backward compatibility reason.
