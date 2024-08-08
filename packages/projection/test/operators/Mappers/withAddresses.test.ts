@@ -1,18 +1,26 @@
 import { Cardano } from '@cardano-sdk/core';
+import { ProducedUtxo, WithUtxo } from '../../../src/operators/Mappers';
 import { ProjectionEvent } from '../../../src';
-import { WithUtxo } from '../../../src/operators/Mappers';
 import { cip19TestVectors, generateRandomHexString } from '@cardano-sdk/util-dev';
 import { firstValueFrom, of } from 'rxjs';
 import { withAddresses } from '../../../src/operators/Mappers/withAddresses';
 
 const projectEvent = async (addresses: Cardano.PaymentAddress[]) => {
+  const producedOutputs = addresses.map(
+    (address): ProducedUtxo => [
+      { index: 0, txId: Cardano.TransactionId(generateRandomHexString(64)) },
+      { address, value: { coins: 123n } }
+    ]
+  );
   const event = {
     utxo: {
-      produced: addresses.map((address) => [
-        { index: 0, txId: generateRandomHexString(64) },
-        { address, value: { coins: 123n } }
-      ])
-    } as WithUtxo['utxo']
+      produced: producedOutputs
+    },
+    utxoByTx: {
+      [Cardano.TransactionId(generateRandomHexString(64))]: {
+        produced: producedOutputs
+      }
+    }
   } as ProjectionEvent<WithUtxo>;
   return firstValueFrom(of(event).pipe(withAddresses()));
 };
