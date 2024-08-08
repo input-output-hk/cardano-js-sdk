@@ -439,7 +439,7 @@ export const mapWithdrawals = (withdrawals: Schema.Withdrawals): Cardano.Withdra
     })
   );
 
-const mapCommonTx = (tx: Schema.Transaction, type: 'praos' | 'bft'): Cardano.OnChainTx => {
+const mapCommonTx = (tx: Schema.Transaction, type: Cardano.BlockType): Cardano.OnChainTx => {
   const { auxiliaryData, auxiliaryDataHash } = mapAuxiliaryData(tx.metadata);
   return {
     auxiliaryData,
