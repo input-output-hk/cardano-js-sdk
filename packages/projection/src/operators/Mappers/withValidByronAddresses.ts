@@ -17,19 +17,11 @@ const hasByronAddressPrefix = (address: string): boolean =>
   address.startsWith(ICARUS_ADDR_BECH32_PREFIX) || address.startsWith(DAEDALUS_ADDR_BECH32_PREFIX);
 
 const transformByronAddress = (address: Cardano.PaymentAddress) => {
-  if (!hasByronAddressPrefix(address) || address.length > 200) {
+  if (!hasByronAddressPrefix(address) || address.length > MAX_BYRON_OUTPUT_ADDRESS_BYTES_LENGTH) {
     const byronAddress = Cardano.Address.fromBase58(address);
     const keyHashBytes = Buffer.from(byronAddress.toBytes(), 'hex');
-    if (keyHashBytes.length > MAX_BYRON_OUTPUT_ADDRESS_BYTES_LENGTH) {
-      const byronBase16CredentialHash = Crypto.Hash28ByteBase16(Crypto.blake2b(28).update(keyHashBytes).digest('hex'));
-      return Cardano.ByronAddress.fromCredentials(
-        byronBase16CredentialHash,
-        byronAddress.getProps().byronAddressContent!.attrs!,
-        byronAddress.getProps().byronAddressContent!.type!
-      )
-        .toAddress()
-        .toBase58();
-    }
+    const byronBase16CredentialHash = Crypto.Hash28ByteBase16(Crypto.blake2b(28).update(keyHashBytes).digest('hex'));
+    return Cardano.ByronAddress.fromCredentials(byronBase16CredentialHash, {}, 0).toAddress().toBase58();
   }
   return address;
 };
