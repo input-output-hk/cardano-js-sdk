@@ -91,7 +91,6 @@
     "@cardano-sdk/util-rxjs": "workspace:~",
     "@cardano-sdk/wallet": "workspace:~",
     "@dcspark/cardano-multiplatform-lib-nodejs": "^3.1.1",
-    "@emurgo/cardano-serialization-lib-asmjs": "^11.5.0",
     "@vespaiach/axios-fetch-adapter": "^0.3.0",
     "axios": "^0.28.0",
     "bunyan": "^1.8.15",
