@@ -492,6 +492,7 @@ export const mapBlock = (
     : Cardano.SlotLeader(blockModel.slot_leader_hash.toString('hex')),
   totalOutput: BigInt(blockOutputModel?.output ?? 0),
   txCount: Number(blockModel.tx_count),
+  type: blockModel.type,
   vrf: blockModel.vrf as unknown as Cardano.VrfVkBech32
 });
 

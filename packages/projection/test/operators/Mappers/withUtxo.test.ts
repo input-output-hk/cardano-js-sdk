@@ -43,6 +43,7 @@ export const validTxSource$ = of({
             }
           ]
         },
+        id: Cardano.TransactionId('1'.repeat(64)),
         inputSource: Cardano.InputSource.inputs
       },
       {
@@ -71,6 +72,7 @@ export const validTxSource$ = of({
             }
           ]
         },
+        id: Cardano.TransactionId('2'.repeat(64)),
         inputSource: Cardano.InputSource.inputs
       },
       {
@@ -108,6 +110,7 @@ export const validTxSource$ = of({
             }
           ]
         },
+        id: Cardano.TransactionId('3'.repeat(64)),
         inputSource: Cardano.InputSource.inputs
       }
     ]
@@ -151,6 +154,7 @@ describe('withUtxo', () => {
               }
             ]
           },
+          id: Cardano.TransactionId('1'.repeat(64)),
           inputSource: Cardano.InputSource.collaterals
         },
         {
@@ -200,6 +204,7 @@ describe('withUtxo', () => {
               }
             ]
           },
+          id: Cardano.TransactionId('2'.repeat(64)),
           inputSource: Cardano.InputSource.collaterals
         }
       ]
@@ -208,26 +213,55 @@ describe('withUtxo', () => {
 
   it('maps all produced and consumed utxo into flat arrays', async () => {
     const {
-      utxo: { consumed, produced }
+      utxo: { consumed, produced },
+      utxoByTx
     } = await firstValueFrom(validTxSource$.pipe(withUtxo()));
     expect(consumed).toHaveLength(4);
     expect(produced).toHaveLength(5);
+
+    expect(Object.keys(utxoByTx)).toHaveLength(3);
+
+    const tx1 = utxoByTx[Cardano.TransactionId('1'.repeat(64))];
+    expect(tx1.consumed).toHaveLength(2);
+    expect(tx1.produced).toHaveLength(1);
+
+    const tx2 = utxoByTx[Cardano.TransactionId('2'.repeat(64))];
+    expect(tx2.consumed).toHaveLength(1);
+    expect(tx2.produced).toHaveLength(2);
+
+    const tx3 = utxoByTx[Cardano.TransactionId('3'.repeat(64))];
+    expect(tx3.consumed).toHaveLength(1);
+    expect(tx3.produced).toHaveLength(2);
   });
 
   it('when inputSource is collateral: maps consumed/produced utxo from collateral/collateralReturn', async () => {
     const {
-      utxo: { consumed, produced }
+      utxo: { consumed, produced },
+      utxoByTx
     } = await firstValueFrom(failedTxSource$.pipe(withUtxo()));
     expect(consumed).toHaveLength(2);
     expect(produced).toHaveLength(1);
     expect(consumed[0].index).toBe(2);
     expect(produced[0][1].address).toBe('addr_test1vptwv4jvaqt635jvthpa29lww3vkzypm8l6vk4lv4tqfhhgajdgwf');
+
+    expect(Object.keys(utxoByTx)).toHaveLength(2);
+
+    const tx1 = utxoByTx[Cardano.TransactionId('1'.repeat(64))];
+    expect(tx1.consumed).toHaveLength(1);
+    expect(tx1.consumed[0].index).toBe(2);
+    expect(tx1.produced).toHaveLength(0);
+
+    const tx2 = utxoByTx[Cardano.TransactionId('2'.repeat(64))];
+    expect(tx2.consumed).toHaveLength(1);
+    expect(tx2.produced[0][1].address).toBe('addr_test1vptwv4jvaqt635jvthpa29lww3vkzypm8l6vk4lv4tqfhhgajdgwf');
+    expect(tx2.produced).toHaveLength(1);
   });
 
   describe('filterProducedUtxoByAddresses', () => {
     it('keeps only utxo produced for supplied addresses', async () => {
       const {
-        utxo: { produced }
+        utxo: { produced },
+        utxoByTx
       } = await firstValueFrom(
         validTxSource$.pipe(
           withUtxo(),
@@ -242,6 +276,14 @@ describe('withUtxo', () => {
       );
 
       expect(produced).toHaveLength(2);
+      expect(Object.keys(utxoByTx)).toHaveLength(3);
+      expect(Object.values(utxoByTx).filter((utxos) => utxos.produced.length > 0)).toHaveLength(2);
+
+      const tx1 = utxoByTx[Cardano.TransactionId('2'.repeat(64))];
+      expect(tx1.produced).toHaveLength(1);
+
+      const tx2 = utxoByTx[Cardano.TransactionId('3'.repeat(64))];
+      expect(tx2.produced).toHaveLength(1);
     });
   });
 

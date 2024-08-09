@@ -129,7 +129,8 @@ describe('storeHandles', () => {
         ],
         header,
         totalOutput: 123n,
-        txCount: 1
+        txCount: 1,
+        type: 'praos'
       },
       crossEpochBoundary: false,
       epochNo: mintEvt.epochNo,

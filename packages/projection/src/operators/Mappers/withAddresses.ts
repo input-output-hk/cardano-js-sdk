@@ -1,6 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { WithUtxo } from './withUtxo';
+import { credentialsFromAddress } from './util';
 import { unifiedProjectorOperator } from '../utils';
 import uniq from 'lodash/uniq.js';
 
@@ -15,46 +16,24 @@ export interface Address {
 
 export interface WithAddresses {
   addresses: Address[];
+  addressesByTx: Record<Cardano.TransactionId, Address[]>;
 }
 
 /** Collect all unique addresses from produced utxo */
-export const withAddresses = unifiedProjectorOperator<WithUtxo, WithAddresses>((evt) => ({
-  ...evt,
-  addresses: uniq(evt.utxo.produced.map(([_, txOut]) => txOut.address)).map((address): Address => {
-    const parsed = Cardano.Address.fromString(address)!;
-    let paymentCredentialHash: Hash28ByteBase16 | undefined;
-    let stakeCredentialHash: Hash28ByteBase16 | undefined;
-    let pointer: Cardano.Pointer | undefined;
-    const type = parsed.getType();
-    switch (type) {
-      case Cardano.AddressType.BasePaymentKeyStakeKey:
-      case Cardano.AddressType.BasePaymentKeyStakeScript:
-      case Cardano.AddressType.BasePaymentScriptStakeKey:
-      case Cardano.AddressType.BasePaymentScriptStakeScript: {
-        const baseAddress = parsed.asBase()!;
-        paymentCredentialHash = baseAddress.getPaymentCredential().hash;
-        stakeCredentialHash = baseAddress.getStakeCredential().hash;
-        break;
-      }
-      case Cardano.AddressType.EnterpriseKey:
-      case Cardano.AddressType.EnterpriseScript: {
-        const enterpriseAddress = parsed.asEnterprise()!;
-        paymentCredentialHash = enterpriseAddress.getPaymentCredential().hash;
-        break;
-      }
-      case Cardano.AddressType.PointerKey:
-      case Cardano.AddressType.PointerScript: {
-        const pointerAddress = parsed.asPointer()!;
-        paymentCredentialHash = pointerAddress.getPaymentCredential().hash;
-        pointer = pointerAddress.getStakePointer();
-        break;
-      }
-    }
-    return {
-      address,
-      paymentCredentialHash,
-      stakeCredential: stakeCredentialHash || pointer,
-      type
-    };
-  })
-}));
+export const withAddresses = unifiedProjectorOperator<WithUtxo, WithAddresses>((evt) => {
+  const addressesByTx = {
+    ...Object.entries(evt.utxoByTx).reduce(
+      (map, [txId, utxo]) => ({
+        ...map,
+        [txId]: uniq(utxo.produced.map(([_, txOut]) => txOut.address)).map(credentialsFromAddress)
+      }),
+      new Map<Cardano.TransactionId, Address[]>()
+    )
+  } as Record<Cardano.TransactionId, Address[]>;
+
+  return {
+    ...evt,
+    addresses: uniq(Object.values(addressesByTx).flat()),
+    addressesByTx
+  };
+});

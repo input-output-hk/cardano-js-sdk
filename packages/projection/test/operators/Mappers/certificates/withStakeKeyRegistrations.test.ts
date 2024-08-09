@@ -35,7 +35,8 @@ describe('withStakeKeyRegistrations', () => {
           pointer: {} as Cardano.Pointer
         }
       ],
-      eventType: ChainSyncEventType.RollForward
+      eventType: ChainSyncEventType.RollForward,
+      stakeCredentialsByTx: {}
     };
 
     const result = await firstValueFrom(
