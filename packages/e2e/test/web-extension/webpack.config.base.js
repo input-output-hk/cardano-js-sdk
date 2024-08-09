@@ -10,6 +10,7 @@ require('dotenv').config({ path: path.join(__dirname, '../../', '.env') });
 module.exports = {
   baseConfig: {
     devtool: 'source-map',
+    externals: '@cardano-sdk/blockfrost-client',
     ignoreWarnings: [/Failed to parse source map/],
     mode: 'development',
     module: {
@@ -81,8 +82,7 @@ module.exports = {
         os: false,
         path: false,
         perf_hooks: false,
-        stream: require.resolve('readable-stream'),
-        util: require.resolve('util/')
+        stream: require.resolve('readable-stream')
       }
     },
     watchOptions: {

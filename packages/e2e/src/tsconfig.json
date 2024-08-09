@@ -5,6 +5,9 @@
   },
   "references": [
     {
+      "path": "../../blockfrost-client/src"
+    },
+    {
       "path": "../../cardano-services/src"
     },
     {

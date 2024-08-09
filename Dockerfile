@@ -29,6 +29,7 @@ COPY packages/cardano-services/config/network/${NETWORK} /config/
 WORKDIR /app
 COPY build build
 COPY packages/cardano-services/package.json packages/cardano-services/package.json
+COPY packages/blockfrost-client/package.json packages/blockfrost-client/package.json
 COPY packages/cardano-services-client/package.json packages/cardano-services-client/package.json
 COPY packages/core/package.json packages/core/package.json
 COPY packages/crypto/package.json packages/crypto/package.json

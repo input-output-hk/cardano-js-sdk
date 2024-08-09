@@ -2,20 +2,19 @@
   "name": "@cardano-sdk/e2e",
   "version": "0.39.0",
   "description": "End to end tests for the cardano-js-sdk packages.",
-  "engines": {
-    "node": ">=16.20.2"
-  },
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk",
+  "license": "Apache-2.0",
+  "sideEffects": [
+    "./test/web-extension/extension/**/*.ts"
+  ],
   "exports": {
     ".": {
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
     }
   },
-  "sideEffects": [
-    "./test/web-extension/extension/**/*.ts"
-  ],
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
   "scripts": {
     "artillery:stake-pool-query": "WORKERS=1 node -r ts-node/register ../../node_modules/.bin/artillery run test/artillery/StakePoolSearch.yml",
     "artillery:wallet-restoration": "WORKERS=1 node -r ts-node/register ../../node_modules/.bin/artillery run --dotenv ./.env test/artillery/wallet-restoration/WalletRestoration.yml",
@@ -73,14 +72,10 @@
     "wait-for-network-epoch-3": "DB_SYNC_CONNECTION_STRING='postgresql://postgres:doNoUseThisSecret!@localhost:5435/cexplorer' ts-node src/scripts/is-local-network-ready.ts",
     "wait-for-network-init": "local-network/scripts/wait-local-network-init.sh"
   },
-  "repository": "https://github.com/input-output-hk/cardano-js-sdk",
-  "license": "Apache-2.0",
-  "publishConfig": {
-    "access": "public"
-  },
   "dependencies": {
     "@cardano-foundation/ledgerjs-hw-app-cardano": "^7.1.2",
     "@cardano-ogmios/client": "6.5.0",
+    "@cardano-sdk/blockfrost-client": "workspace:~",
     "@cardano-sdk/cardano-services": "workspace:~",
     "@cardano-sdk/cardano-services-client": "workspace:~",
     "@cardano-sdk/core": "workspace:~",
@@ -180,5 +175,11 @@
     "webpack": "^5.72.0",
     "webpack-cli": "^4.9.2",
     "webpack-merge": "^5.8.0"
+  },
+  "engines": {
+    "node": ">=16.20.2"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
