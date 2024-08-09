@@ -632,6 +632,7 @@ Object {
   "size": 8511,
   "totalOutput": 29698651346n,
   "txCount": 6,
+  "type": "praos",
   "vrf": "vrf_vk1afy7gefvgc9eaek64lhunxw2velmuh4467n6a2aalah7r8q68j0s4f2sa9",
 }
 `;
@@ -711,6 +712,7 @@ Object {
   "size": 1193,
   "totalOutput": 29699998493147869n,
   "txCount": 1,
+  "type": "praos",
   "vrf": "vrf_vk1wpa9axwwassnadt8drdrzptxm285latvhhvsgv0t6zhp0akgej9sfgecvl",
 }
 `;
@@ -790,6 +792,7 @@ Object {
   "size": 1152,
   "totalOutput": 29699998492735907n,
   "txCount": 1,
+  "type": "praos",
   "vrf": "vrf_vk1aw6s04lqkquell8drg6jjusrzd8c5259kctvxkgug5kta7nphz9qfqtr4w",
 }
 `;
@@ -825,6 +828,7 @@ Object {
         ],
         "requiredExtraSignatures": undefined,
       },
+      "cbor": "82839f8200d8185824825820a12a839c25a01fa5d118167db5acdbd9e38172ae8f00e5ac0a4997ef792a200700ff9f8282d818584283581c6c9982e7f2b6dcc5eaa880e8014568913c8868d9f0f86eb687b2633ca101581e581c010d876783fb2b4d0d17c86df29af8d35356ed3d1827bf4744f06700001a8dc672c11a000f4240ffa0818202d81858658258208c0bdedfbbab26a1308300512ffb1b220f068ee13f7612afb076c22de3fb764158406cc41635a9794234966629ccfa2a5b089a20ae392f0e92154ff97eda30ff7a082a65fc4b362c24cf58c27f30103b1f1345e15479cf4b80cd4134c0f9dca83109",
       "id": "6497b33b10fa2619c6efbd9f874ecd1c91badb10bf70850732aab45b90524d9e",
       "inputSource": undefined,
       "witness": Object {
@@ -846,6 +850,7 @@ Object {
   "size": 908,
   "totalOutput": 1000000n,
   "txCount": 1,
+  "type": "bft",
   "vrf": undefined,
 }
 `;
@@ -925,6 +930,7 @@ Object {
   "size": 1151,
   "totalOutput": 29699998492941888n,
   "txCount": 1,
+  "type": "praos",
   "vrf": "vrf_vk1aw6s04lqkquell8drg6jjusrzd8c5259kctvxkgug5kta7nphz9qfqtr4w",
 }
 `;
@@ -1157,6 +1163,7 @@ Object {
   "size": 1880,
   "totalOutput": 29999998493561943n,
   "txCount": 1,
+  "type": "praos",
   "vrf": "vrf_vk1ny8dyz3pa9u7v7h8l5evsmxxjq07dk6j5uda60lxe3zsya5ea20s2c6jph",
 }
 `;
