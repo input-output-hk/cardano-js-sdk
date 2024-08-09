@@ -86,6 +86,58 @@ export const mockByronBlock: Ogmios.Schema.Block = {
   type: 'bft'
 };
 
+export const mockByronBlockWithoutTxCbor: Ogmios.Schema.Block = {
+  ancestor: '43d58aa00099c44787fdb174db22823494814eb2cdf209b044ca20cc5cf62b25',
+  delegate: {
+    verificationKey:
+      '9180d818e69cd997e34663c418a648c076f2e19cd4194e486e159d8580bc6cda81344440c6ad0e5306fd035bef9281da5d8fbd38f59f588f7081016ee61113d2'
+  },
+  era: 'byron',
+  height: 3314,
+  id: 'cf80534e520fa8f4bde1ed2f623553b8a6a9fd616d73bf9d4f7d6d1687685248',
+  issuer: {
+    verificationKey:
+      'd2965c869901231798c5d02d39fca2a79aa47c3e854921b5855c82fd1470891517e1fa771655ec8cad13ecf6e5719adc5392fc057e1703d5f583311e837462f1'
+  },
+  operationalCertificates: [],
+  protocol: {
+    id: 764_824_073,
+    software: { appName: 'cardano-sl', number: 0 },
+    version: { major: 0, minor: 0, patch: 0 }
+  },
+  size: { bytes: 908 },
+  slot: 3313,
+  transactions: [
+    {
+      id: '6497b33b10fa2619c6efbd9f874ecd1c91badb10bf70850732aab45b90524d9e',
+      inputs: [
+        {
+          index: 0,
+          transaction: {
+            id: 'a12a839c25a01fa5d118167db5acdbd9e38172ae8f00e5ac0a4997ef792a2007'
+          }
+        }
+      ],
+      outputs: [
+        {
+          address:
+            'DdzFFzCqrhsszHTvbjTmYje5hehGbadkT6WgWbaqCy5XNxNttsPNF13eAjjBHYT7JaLJz2XVxiucam1EvwBRPSTiCrT4TNCBas4hfzic',
+          value: { ada: { lovelace: 1_000_000n } }
+        }
+      ],
+      signatories: [
+        {
+          key: '8c0bdedfbbab26a1308300512ffb1b220f068ee13f7612afb076c22de3fb7641',
+          signature:
+            '6cc41635a9794234966629ccfa2a5b089a20ae392f0e92154ff97eda30ff7a082a65fc4b362c24cf58c27f30103b1f1345e15479cf4b80cd4134c0f9dca83109'
+        }
+      ],
+      spends: 'inputs'
+    }
+  ],
+  type: 'bft'
+};
+
 export const mockEpochBoundaryBlock: Ogmios.Schema.Block = {
   ancestor: '5f20df933584822601f9e3f8c024eb5eb252fe8cefb24d1317dc3d432e940ebb',
   era: 'byron',
