@@ -1,29 +1,36 @@
-import { BlockFrostAPI, BlockfrostServerError } from '@blockfrost/blockfrost-js';
+import { BlockfrostClientError, isBlockfrostErrorResponse } from '@blockfrost/blockfrost-js/lib/utils/errors';
+import { BlockfrostServerError } from '@blockfrost/blockfrost-js';
 import {
   Cardano,
   EraSummary,
   Milliseconds,
-  NetworkInfoProvider,
-  Provider,
   ProviderError,
   ProviderFailure,
-  ProviderUtil
+  ProviderUtil,
+  statusCodeMapToProviderFailure
 } from '@cardano-sdk/core';
 import { PaginationOptions } from '@blockfrost/blockfrost-js/lib/types';
-import { handleError, isBlockfrostErrorResponse } from '@blockfrost/blockfrost-js/lib/utils/errors';
-
-export const formatBlockfrostError = (error: unknown) => handleError(error);
 
 export const isBlockfrostNotFoundError = (error: unknown) =>
   (error instanceof BlockfrostServerError || isBlockfrostErrorResponse(error)) && error.status_code === 404;
 
-export const toProviderError = (error: unknown) => {
-  if (isBlockfrostNotFoundError(error)) {
-    throw new ProviderError(ProviderFailure.NotFound);
+export const blockfrostToProviderError = (error: BlockfrostServerError | BlockfrostClientError | unknown) => {
+  if (
+    (error instanceof BlockfrostServerError || isBlockfrostErrorResponse(error)) &&
+    statusCodeMapToProviderFailure.has(error.status_code)
+  )
+    return new ProviderError(statusCodeMapToProviderFailure.get(error.status_code)!, error, `${error.message}`);
+  else if (
+    isBlockfrostErrorResponse(error) ||
+    error instanceof BlockfrostClientError ||
+    error instanceof BlockfrostServerError
+  )
+    return new ProviderError(ProviderFailure.Unknown, error, `${error.message}`);
+  else if (error instanceof ProviderError) {
+    return error;
   }
 
-  const blockfrostError = formatBlockfrostError(error);
-  throw new ProviderError(ProviderFailure.Unknown, error, `${blockfrostError.message}`);
+  return new ProviderError(ProviderFailure.Unknown, error);
 };
 
 export const fetchSequentially = async <Item, Arg, Response>(
@@ -112,36 +119,3 @@ export const testnetEraSummaries: EraSummary[] = [
     start: { slot: 1_598_400, time: new Date(1_595_967_616_000) }
   }
 ];
-
-export const eraSummaries: NetworkInfoProvider['eraSummaries'] = async () => testnetEraSummaries;
-
-/**
- * Check health of the [Blockfrost service](https://docs.blockfrost.io/)
- *
- * @param {BlockFrostAPI} blockfrost BlockFrostAPI instance
- * @returns {HealthCheckResponse} HealthCheckResponse
- * @throws {ProviderError}
- */
-export const healthCheck = async (blockfrost: BlockFrostAPI): ReturnType<Provider['healthCheck']> => {
-  try {
-    const result = await blockfrost.health();
-    return { ok: result.is_healthy };
-  } catch (error) {
-    throw new ProviderError(ProviderFailure.Unknown, error);
-  }
-};
-let blockfrostApi: BlockFrostAPI;
-
-/**
- * Gets the singleton blockfrost API instance.
- *
- * @returns The blockfrost API instance, this function always returns the same instance.
- */
-export const getBlockfrostApi = async () => {
-  if (blockfrostApi !== undefined) return blockfrostApi;
-
-  if (process.env.BLOCKFROST_API_KEY === undefined)
-    throw new Error('BLOCKFROST_API_KEY environment variable is required');
-
-  return new BlockFrostAPI({ network: 'preprod', projectId: process.env.BLOCKFROST_API_KEY });
-};

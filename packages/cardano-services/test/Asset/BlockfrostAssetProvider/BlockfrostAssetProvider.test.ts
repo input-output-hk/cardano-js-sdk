@@ -4,8 +4,9 @@
 
 import { Asset, Cardano } from '@cardano-sdk/core';
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
+import { logger } from '@cardano-sdk/util-dev';
 
-import { blockfrostAssetProvider } from '../../../src';
+import { BlockfrostAssetProvider } from '../../../src';
 
 jest.mock('@blockfrost/blockfrost-js');
 
@@ -41,8 +42,8 @@ describe('blockfrostAssetProvider', () => {
       BlockFrostAPI.prototype.txsMetadata = jest.fn().mockResolvedValue([]);
 
       const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
-      const client = blockfrostAssetProvider(blockfrost);
-      const response = await client.getAsset({
+      const provider = new BlockfrostAssetProvider({ blockfrost, logger });
+      const response = await provider.getAsset({
         assetId: Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
         extraData: { nftMetadata: true, tokenMetadata: true }
       });
@@ -88,8 +89,8 @@ describe('blockfrostAssetProvider', () => {
       BlockFrostAPI.prototype.txsMetadata = jest.fn().mockResolvedValue([]);
 
       const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
-      const client = blockfrostAssetProvider(blockfrost);
-      const response = await client.getAsset({
+      const provider = new BlockfrostAssetProvider({ blockfrost, logger });
+      const response = await provider.getAsset({
         assetId: Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
         extraData: { nftMetadata: true, tokenMetadata: true }
       });
@@ -133,8 +134,8 @@ describe('blockfrostAssetProvider', () => {
       ]);
 
       const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
-      const client = blockfrostAssetProvider(blockfrost);
-      const response = await client.getAsset({
+      const provider = new BlockfrostAssetProvider({ blockfrost, logger });
+      const response = await provider.getAsset({
         assetId: Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
         extraData: { nftMetadata: true, tokenMetadata: true }
       });
@@ -168,8 +169,8 @@ describe('blockfrostAssetProvider', () => {
       BlockFrostAPI.prototype.txsMetadata = jest.fn();
 
       const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
-      const client = blockfrostAssetProvider(blockfrost);
-      const response = await client.getAsset({
+      const provider = new BlockfrostAssetProvider({ blockfrost, logger });
+      const response = await provider.getAsset({
         assetId: Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e'),
         extraData: { nftMetadata: false, tokenMetadata: false }
       });
@@ -222,8 +223,8 @@ describe('blockfrostAssetProvider', () => {
       ]);
 
       const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
-      const client = blockfrostAssetProvider(blockfrost);
-      const response = await client.getAsset({
+      const provider = new BlockfrostAssetProvider({ blockfrost, logger });
+      const response = await provider.getAsset({
         assetId: Cardano.AssetId('8153f8be9f05b2f32b481bbf7af877f592160b39e87f5f55c8ab035f4e46543031'),
         extraData: { nftMetadata: true, tokenMetadata: true }
       });

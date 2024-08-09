@@ -2,8 +2,9 @@
 /* eslint-disable max-len */
 
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
+import { BlockfrostUtxoProvider } from '../../../src';
 import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { blockfrostUtxoProvider } from '../../../src';
+import { logger } from '@cardano-sdk/util-dev';
 jest.mock('@blockfrost/blockfrost-js');
 
 const generateUtxoResponseMock = (qty: number) =>
@@ -18,7 +19,7 @@ const generateUtxoResponseMock = (qty: number) =>
         unit: 'b01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237'
       }
     ],
-    block: 'b1b23210b9de8f3edef233f21f7d6e1fb93fe124ba126ba924edec3043e75b46',
+    block: 'b1b23210b9de8f3edef233f21f7d6e1fb93efe124ba126ba924edec3043e75b46',
     output_index: num,
     tx_hash: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5',
     tx_index: num
@@ -31,13 +32,13 @@ describe('blockfrostUtxoProvider', () => {
     it('returns ok if the service reports a healthy state', async () => {
       BlockFrostAPI.prototype.health = jest.fn().mockResolvedValue({ is_healthy: true });
       const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
-      const provider = blockfrostUtxoProvider(blockfrost);
+      const provider = new BlockfrostUtxoProvider({ blockfrost, logger });
       expect(await provider.healthCheck()).toEqual({ ok: true });
     });
     it('returns not ok if the service reports an unhealthy state', async () => {
       BlockFrostAPI.prototype.health = jest.fn().mockResolvedValue({ is_healthy: false });
       const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
-      const provider = blockfrostUtxoProvider(blockfrost);
+      const provider = new BlockfrostUtxoProvider({ blockfrost, logger });
       expect(await provider.healthCheck()).toEqual({ ok: false });
     });
     it('throws a typed error if caught during the service interaction', async () => {
@@ -45,7 +46,7 @@ describe('blockfrostUtxoProvider', () => {
         .fn()
         .mockRejectedValue(new ProviderError(ProviderFailure.Unknown, new Error('Some error')));
       const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
-      const provider = blockfrostUtxoProvider(blockfrost);
+      const provider = new BlockfrostUtxoProvider({ blockfrost, logger });
       await expect(provider.healthCheck()).rejects.toThrowError(ProviderError);
     });
   });
@@ -59,8 +60,8 @@ describe('blockfrostUtxoProvider', () => {
         .mockResolvedValueOnce(generateUtxoResponseMock(0));
 
       const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
-      const client = blockfrostUtxoProvider(blockfrost);
-      const response = await client.utxoByAddresses({
+      const provider = new BlockfrostUtxoProvider({ blockfrost, logger });
+      const response = await provider.utxoByAddresses({
         addresses: [
           'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
         ].map(Cardano.PaymentAddress)
@@ -111,14 +112,38 @@ describe('blockfrostUtxoProvider', () => {
       BlockFrostAPI.prototype.addressesUtxos = jest.fn().mockRejectedValue(notFoundBody);
 
       const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
-      const client = blockfrostUtxoProvider(blockfrost);
-      const response = await client.utxoByAddresses({
+      const provider = new BlockfrostUtxoProvider({ blockfrost, logger });
+      const response = await provider.utxoByAddresses({
         addresses: [
           'addr_test1qz44wna7xvs8n2ukxw0qat3vktymndgk8nerey6mlxr97s47n48hk78hcuyku03lj7qplmfqscm87j9wv3amxqaur2hs055pjt'
         ].map(Cardano.PaymentAddress)
       });
       expect(response).toBeTruthy();
       expect(response.length).toBe(0);
+    });
+
+    test('throws', async () => {
+      const mockedError = {
+        error: 'Forbidden',
+        message: 'Invalid project token.',
+        status_code: 403,
+        url: 'test'
+      };
+
+      const mockedErrorMethod = jest.fn().mockRejectedValue(mockedError);
+      BlockFrostAPI.prototype.addressesUtxos = mockedErrorMethod;
+
+      const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
+      const provider = new BlockfrostUtxoProvider({ blockfrost, logger });
+
+      await expect(() =>
+        provider.utxoByAddresses({
+          addresses: [
+            'addr_test1qz44wna7xvs8n2ukxw0qat3vktymndgk8nerey6mlxr97s47n48hk78hcuyku03lj7qplmfqscm87j9wv3amxqaur2hs055pjt'
+          ].map(Cardano.PaymentAddress)
+        })
+      ).rejects.toThrow();
+      expect(mockedErrorMethod).toBeCalledTimes(1);
     });
   });
 });

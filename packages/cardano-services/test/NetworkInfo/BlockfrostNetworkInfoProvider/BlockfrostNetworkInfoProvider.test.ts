@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
-import { Cardano, EraSummary, StakeSummary, SupplySummary } from '@cardano-sdk/core';
-import { blockfrostNetworkInfoProvider } from '../../../src';
-import { testnetEraSummaries } from '@cardano-sdk/util-dev';
+import { BlockfrostNetworkInfoProvider } from '../../../src';
+import { Cardano, EraSummary, Milliseconds, StakeSummary, SupplySummary } from '@cardano-sdk/core';
+import { logger } from '@cardano-sdk/util-dev';
 
 jest.mock('@blockfrost/blockfrost-js');
 
@@ -38,16 +38,28 @@ const mockedNetworkResponse = {
   }
 } as Responses['network'];
 
+const mockedError = {
+  error: 'Forbidden',
+  message: 'Invalid project token.',
+  status_code: 403,
+  url: 'test'
+};
+
+const mockedErrorMethod = jest.fn().mockRejectedValue(mockedError);
+// const mockedProviderError = new ProviderError(ProviderFailure.Unknown, {}, 'testing');
 const apiKey = 'someapikey';
 const apiUrl = 'http://testnet.endpoint';
 
 describe('blockfrostNetworkInfoProvider', () => {
+  beforeEach(async () => {
+    mockedErrorMethod.mockClear();
+  });
   test('stake', async () => {
     BlockFrostAPI.prototype.network = jest.fn().mockResolvedValue(mockedNetworkResponse);
     BlockFrostAPI.prototype.apiUrl = apiUrl;
 
     const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
-    const client = blockfrostNetworkInfoProvider(blockfrost);
+    const client = new BlockfrostNetworkInfoProvider({ blockfrost, logger });
     const response = await client.stake();
 
     expect(response).toMatchObject<StakeSummary>({
@@ -56,12 +68,24 @@ describe('blockfrostNetworkInfoProvider', () => {
     });
   });
 
+  test('stake throws', async () => {
+    BlockFrostAPI.prototype.network = mockedErrorMethod;
+
+    BlockFrostAPI.prototype.apiUrl = apiUrl;
+
+    const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
+    const provider = new BlockfrostNetworkInfoProvider({ blockfrost, logger });
+
+    await expect(() => provider.stake()).rejects.toThrow();
+    expect(mockedErrorMethod).toBeCalledTimes(1);
+  });
+
   test('lovelaceSupply', async () => {
     BlockFrostAPI.prototype.network = jest.fn().mockResolvedValue(mockedNetworkResponse);
     BlockFrostAPI.prototype.apiUrl = apiUrl;
 
     const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
-    const client = blockfrostNetworkInfoProvider(blockfrost);
+    const client = new BlockfrostNetworkInfoProvider({ blockfrost, logger });
     const response = await client.lovelaceSupply();
 
     expect(response).toMatchObject<SupplySummary>({
@@ -70,12 +94,220 @@ describe('blockfrostNetworkInfoProvider', () => {
     });
   });
 
-  test('eraSummaries', async () => {
-    const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
-    const client = blockfrostNetworkInfoProvider(blockfrost);
-    const response = await client.eraSummaries();
+  test('lovelace throws', async () => {
+    BlockFrostAPI.prototype.network = mockedErrorMethod;
 
-    expect(response).toMatchObject<EraSummary[]>(testnetEraSummaries);
+    BlockFrostAPI.prototype.apiUrl = apiUrl;
+
+    const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
+    const provider = new BlockfrostNetworkInfoProvider({ blockfrost, logger });
+
+    await expect(() => provider.lovelaceSupply()).rejects.toThrow();
+    expect(mockedErrorMethod).toBeCalledTimes(1);
+  });
+
+  test('eraSummaries', async () => {
+    const genesis = {
+      activeSlotsCoefficient: 0.05,
+      epochLength: 432_000,
+      maxKesEvolutions: 62,
+      maxLovelaceSupply: 45_000_000_000_000_000n,
+      networkMagic: 1,
+      securityParameter: 2160,
+      slotLength: 1,
+      slotsPerKesPeriod: 129_600,
+      systemStart: new Date(1_654_041_600_000),
+      updateQuorum: 5
+    };
+    const blockfrostResponseBody = [
+      {
+        end: {
+          epoch: 4,
+          slot: 86_400,
+          time: 1_728_000
+        },
+        parameters: {
+          epoch_length: 21_600,
+          safe_zone: 4320,
+          slot_length: 20
+        },
+        start: {
+          epoch: 0,
+          slot: 0,
+          time: 0
+        }
+      },
+      {
+        end: {
+          epoch: 5,
+          slot: 518_400,
+          time: 2_160_000
+        },
+        parameters: {
+          epoch_length: 432_000,
+          safe_zone: 129_600,
+          slot_length: 1
+        },
+        start: {
+          epoch: 4,
+          slot: 86_400,
+          time: 1_728_000
+        }
+      },
+      {
+        end: {
+          epoch: 6,
+          slot: 950_400,
+          time: 2_592_000
+        },
+        parameters: {
+          epoch_length: 432_000,
+          safe_zone: 129_600,
+          slot_length: 1
+        },
+        start: {
+          epoch: 5,
+          slot: 518_400,
+          time: 2_160_000
+        }
+      },
+      {
+        end: {
+          epoch: 7,
+          slot: 1_382_400,
+          time: 3_024_000
+        },
+        parameters: {
+          epoch_length: 432_000,
+          safe_zone: 129_600,
+          slot_length: 1
+        },
+        start: {
+          epoch: 6,
+          slot: 950_400,
+          time: 2_592_000
+        }
+      },
+      {
+        end: {
+          epoch: 12,
+          slot: 3_542_400,
+          time: 5_184_000
+        },
+        parameters: {
+          epoch_length: 432_000,
+          safe_zone: 129_600,
+          slot_length: 1
+        },
+        start: {
+          epoch: 7,
+          slot: 1_382_400,
+          time: 3_024_000
+        }
+      },
+      {
+        end: {
+          epoch: 163,
+          slot: 68_774_400,
+          time: 70_416_000
+        },
+        parameters: {
+          epoch_length: 432_000,
+          safe_zone: 129_600,
+          slot_length: 1
+        },
+        start: {
+          epoch: 12,
+          slot: 3_542_400,
+          time: 5_184_000
+        }
+      }
+    ];
+    const expected: EraSummary[] = [
+      {
+        parameters: {
+          epochLength: 21_600,
+          slotLength: Milliseconds(20_000)
+        },
+        start: {
+          slot: 0,
+          time: new Date('2022-06-01T00:00:00.000Z')
+        }
+      },
+      {
+        parameters: {
+          epochLength: 432_000,
+          slotLength: Milliseconds(1000)
+        },
+        start: {
+          slot: 86_400,
+          time: new Date('2022-06-21T00:00:00.000Z')
+        }
+      },
+      {
+        parameters: {
+          epochLength: 432_000,
+          slotLength: Milliseconds(1000)
+        },
+        start: {
+          slot: 518_400,
+          time: new Date('2022-06-26T00:00:00.000Z')
+        }
+      },
+      {
+        parameters: {
+          epochLength: 432_000,
+          slotLength: Milliseconds(1000)
+        },
+        start: {
+          slot: 950_400,
+          time: new Date('2022-07-01T00:00:00.000Z')
+        }
+      },
+      {
+        parameters: {
+          epochLength: 432_000,
+          slotLength: Milliseconds(1000)
+        },
+        start: {
+          slot: 1_382_400,
+          time: new Date('2022-07-06T00:00:00.000Z')
+        }
+      },
+      {
+        parameters: {
+          epochLength: 432_000,
+          slotLength: Milliseconds(1000)
+        },
+        start: {
+          slot: 3_542_400,
+          time: new Date('2022-07-31T00:00:00.000Z')
+        }
+      }
+    ];
+
+    const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
+    const provider = new BlockfrostNetworkInfoProvider({ blockfrost, logger });
+
+    provider.genesisParameters = jest.fn().mockResolvedValue(genesis);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    provider.fetchEraSummaries = jest.fn().mockResolvedValue(blockfrostResponseBody);
+
+    const response = await provider.eraSummaries();
+
+    expect(response).toMatchObject<EraSummary[]>(expected);
+  });
+
+  test('eraSummaries throws', async () => {
+    BlockFrostAPI.prototype.apiUrl = apiUrl;
+
+    const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
+    const provider = new BlockfrostNetworkInfoProvider({ blockfrost, logger });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    provider.fetchEraSummaries = mockedErrorMethod;
+    await expect(() => provider.eraSummaries()).rejects.toThrow();
   });
 
   test('genesisParameters', async () => {
@@ -94,8 +326,8 @@ describe('blockfrostNetworkInfoProvider', () => {
     BlockFrostAPI.prototype.genesis = jest.fn().mockResolvedValue(mockedResponse);
 
     const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
-    const client = blockfrostNetworkInfoProvider(blockfrost);
-    const response = await client.genesisParameters();
+    const provider = new BlockfrostNetworkInfoProvider({ blockfrost, logger });
+    const response = await provider.genesisParameters();
 
     expect(response).toMatchObject({
       activeSlotsCoefficient: 0.05,
@@ -111,7 +343,19 @@ describe('blockfrostNetworkInfoProvider', () => {
     } as Cardano.CompactGenesis);
   });
 
-  test('currentWalletProtocolParameters', async () => {
+  test('genesisParameters throws', async () => {
+    BlockFrostAPI.prototype.genesis = mockedErrorMethod;
+
+    BlockFrostAPI.prototype.apiUrl = apiUrl;
+
+    const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
+    const provider = new BlockfrostNetworkInfoProvider({ blockfrost, logger });
+
+    await expect(() => provider.genesisParameters()).rejects.toThrow();
+    expect(mockedErrorMethod).toBeCalledTimes(1);
+  });
+
+  test('protocolParameters', async () => {
     const mockedResponse = {
       a0: 0.3,
       coins_per_utxo_word: '0',
@@ -144,8 +388,8 @@ describe('blockfrostNetworkInfoProvider', () => {
     const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
     BlockFrostAPI.prototype.apiUrl = apiUrl;
 
-    const client = blockfrostNetworkInfoProvider(blockfrost);
-    const response = await client.protocolParameters();
+    const provider = new BlockfrostNetworkInfoProvider({ blockfrost, logger });
+    const response = await provider.protocolParameters();
 
     expect(response).toMatchObject({
       coinsPerUtxoByte: 0,
@@ -161,17 +405,41 @@ describe('blockfrostNetworkInfoProvider', () => {
     });
   });
 
+  test('protocolParameters throws', async () => {
+    BlockFrostAPI.prototype.epochsLatestParameters = mockedErrorMethod;
+
+    BlockFrostAPI.prototype.apiUrl = apiUrl;
+
+    const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
+    const provider = new BlockfrostNetworkInfoProvider({ blockfrost, logger });
+
+    await expect(() => provider.protocolParameters()).rejects.toThrow();
+    expect(mockedErrorMethod).toBeCalledTimes(1);
+  });
+
   test('ledgerTip', async () => {
     BlockFrostAPI.prototype.blocksLatest = jest.fn().mockResolvedValue(blockResponse);
 
     const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
-    const client = blockfrostNetworkInfoProvider(blockfrost);
-    const response = await client.ledgerTip();
+    const provider = new BlockfrostNetworkInfoProvider({ blockfrost, logger });
+    const response = await provider.ledgerTip();
 
     expect(response).toMatchObject({
       blockNo: 2_927_618,
       hash: '86e837d8a6cdfddaf364525ce9857eb93430b7e59a5fd776f0a9e11df476a7e5',
       slot: 37_767_194
     });
+  });
+
+  test('ledgerTip throws', async () => {
+    BlockFrostAPI.prototype.blocksLatest = mockedErrorMethod;
+
+    BlockFrostAPI.prototype.apiUrl = apiUrl;
+
+    const blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
+    const provider = new BlockfrostNetworkInfoProvider({ blockfrost, logger });
+
+    await expect(() => provider.ledgerTip()).rejects.toThrow();
+    expect(mockedErrorMethod).toBeCalledTimes(1);
   });
 });

@@ -1,19 +1,11 @@
-import * as envalid from 'envalid';
+import { BlockfrostAssetProvider, util } from '@cardano-sdk/cardano-services';
 import { Cardano } from '@cardano-sdk/core';
-import { assetProviderFactory } from '../../src';
 import { logger } from '@cardano-sdk/util-dev';
 
-// Verify environment.
-export const env = envalid.cleanEnv(process.env, {
-  ASSET_PROVIDER: envalid.str(),
-  ASSET_PROVIDER_PARAMS: envalid.json({ default: {} })
-});
-
-describe('blockfrostAssetProvider', () => {
+describe('BlockfrostAssetProvider', () => {
   test('getAsset', async () => {
-    const asset = await (
-      await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS, logger)
-    ).getAsset({
+    const assetProvider = new BlockfrostAssetProvider({ blockfrost: util.getBlockfrostApi(), logger });
+    const asset = await assetProvider.getAsset({
       assetId: Cardano.AssetId(
         'b27160f0c50a9cf168bf945dcbfcabbfbee5c7a801e7b467093b41534d6574616c4d6f6e7374657230303036'
       ),

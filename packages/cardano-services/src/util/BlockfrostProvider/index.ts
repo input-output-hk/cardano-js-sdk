@@ -1,2 +1,3 @@
+export * from './BlockfrostClientFactory';
 export * from './BlockfrostToCore';
-export * from './util';
+export * from './blockfrostUtil';
