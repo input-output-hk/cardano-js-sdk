@@ -38,7 +38,7 @@ in
       name = "${final.namespace}-cardanojs";
       chart = ./Chart.yaml;
       context = "eks-devs";
-      kubeconfig = "$PRJ_ROOT/.kube/${final.region}";
+      kubeconfig = ./../../local/kubeconfig + "/${final.region}";
 
       utils = {
         mkPodEnv = lib.mapAttrsToList (
