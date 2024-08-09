@@ -77,10 +77,13 @@ VrfVkBech32.fromHex = (value: string) => {
   return VrfVkBech32(BaseEncoding.bech32.encode('vrf_vk', words, 1023));
 };
 
+export type BlockType = 'bft' | 'praos';
+
 /** Minimal Block type meant as a base for the more complete version `Block`  */
 // TODO: optionals (except previousBlock) are there because they are not calculated for Byron yet.
 // Remove them once calculation is done and remove the Required<BlockMinimal> from interface Block
 export interface BlockInfo {
+  type: BlockType;
   header: PartialBlockHeader;
   /** Byron blocks fee not calculated yet */
   fees?: Lovelace;

@@ -108,7 +108,8 @@ const createMapperOperators = (
     withNftMetadata: Mapper.withNftMetadata({ logger }),
     withStakeKeyRegistrations: Mapper.withStakeKeyRegistrations(),
     withStakePools: Mapper.withStakePools(),
-    withUtxo: Mapper.withUtxo()
+    withUtxo: Mapper.withUtxo(),
+    withValidByronAddresses: Mapper.withValidByronAddresses()
   };
 };
 type MapperOperators = ReturnType<typeof createMapperOperators>;
@@ -252,13 +253,14 @@ const mapperInterDependencies: Partial<Record<MapperName, MapperName[]>> = {
   withHandles: ['withMint', 'filterMint', 'withUtxo', 'filterUtxo', 'withCIP67'],
   withNftMetadata: ['withCIP67', 'withMint', 'filterMint'],
   withStakeKeyRegistrations: ['withCertificates'],
-  withStakePools: ['withCertificates']
+  withStakePools: ['withCertificates'],
+  withValidByronAddresses: ['withUtxo']
 };
 
 const storeMapperDependencies: Partial<Record<StoreName, MapperName[]>> = {
   storeAddresses: ['withAddresses'],
   storeAssets: ['withMint'],
-  storeCredentials: ['withAddresses', 'withCertificates', 'withUtxo'],
+  storeCredentials: ['withAddresses', 'withCertificates', 'withUtxo', 'withValidByronAddresses'],
   storeHandleMetadata: ['withHandleMetadata'],
   storeHandles: ['withHandles'],
   storeNftMetadata: ['withNftMetadata'],
@@ -278,7 +280,7 @@ const storeInterDependencies: Partial<Record<StoreName, StoreName[]>> = {
   storeStakePoolMetadataJob: ['storeBlock'],
   storeStakePoolRewardsJob: ['storeBlock'],
   storeStakePools: ['storeBlock'],
-  storeTransactions: ['storeCredentials', 'storeBlock'],
+  storeTransactions: ['storeCredentials', 'storeBlock', 'storeUtxo'],
   storeUtxo: ['storeBlock', 'storeAssets']
 };
 
@@ -292,7 +294,7 @@ const projectionStoreDependencies: Record<ProjectionName, StoreName[]> = {
   'stake-pool-metadata-job': ['storeStakePoolMetadataJob'],
   'stake-pool-metrics-job': ['storePoolMetricsUpdateJob'],
   'stake-pool-rewards-job': ['storeStakePoolRewardsJob'],
-  transaction: ['storeCredentials', 'storeTransactions', 'storeUtxo'],
+  transaction: ['storeCredentials', 'storeTransactions'],
   utxo: ['storeUtxo']
 };
 

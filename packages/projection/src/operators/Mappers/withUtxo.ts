@@ -61,24 +61,23 @@ export const filterProducedUtxoByAddresses =
   <PropsIn extends WithUtxo>({ addresses }: FilterByPaymentAddresses): ProjectionOperator<PropsIn> =>
   (evt$) =>
     evt$.pipe(
-      map((evt) => ({
-        ...evt,
-        utxo: { ...evt.utxo, produced: evt.utxo.produced.filter(([_, { address }]) => addresses.includes(address)) },
-        utxoByTx: {
-          ...Object.fromEntries(
-            Object.entries(evt.utxoByTx).reduce(
-              (txToUtxo, [txId, utxos]) => ({
-                ...txToUtxo,
-                [txId]: {
-                  ...utxos,
-                  produced: utxos.produced.filter(([_, { address }]) => addresses.includes(address))
-                }
-              }),
-              new Map<Cardano.TransactionId, WithConsumedTxIn & WithProducedUTxO>()
-            )
-          )
-        } as Record<Cardano.TransactionId, WithConsumedTxIn & WithProducedUTxO>
-      }))
+      map((evt) => {
+        const filteredTxs: Record<Cardano.TransactionId, WithConsumedTxIn & WithProducedUTxO> = Object.fromEntries(
+          Object.entries(evt.utxoByTx).reduce((txToUtxo, [txId, { consumed, produced }]) => {
+            txToUtxo.set(Cardano.TransactionId(txId), {
+              consumed,
+              produced: produced.filter(([_, { address }]) => addresses.includes(address))
+            });
+            return txToUtxo;
+          }, new Map<Cardano.TransactionId, WithConsumedTxIn & WithProducedUTxO>())
+        );
+
+        return {
+          ...evt,
+          utxo: { ...evt.utxo, produced: Object.values(filteredTxs).flatMap((utxos) => utxos.produced) },
+          utxoByTx: filteredTxs
+        };
+      })
     );
 
 export const filterProducedUtxoByAssetsPresence =
@@ -94,17 +93,15 @@ export const filterProducedUtxoByAssetsPresence =
         },
         utxoByTx: {
           ...evt.utxoByTx,
-          ...Object.fromEntries(
-            Object.entries(evt.utxoByTx).reduce(
-              (txToUtxo, [txId, utxos]) => ({
-                ...txToUtxo,
-                [txId]: {
-                  ...utxos,
-                  produced: utxos.produced.filter(([_, { value }]) => value.assets && value.assets.size > 0)
-                }
-              }),
-              new Map<Cardano.TransactionId, WithConsumedTxIn & WithProducedUTxO>()
-            )
+          ...Object.entries(evt.utxoByTx).reduce(
+            (txToUtxo, [txId, utxos]) => ({
+              ...txToUtxo,
+              [txId]: {
+                ...utxos,
+                produced: utxos.produced.filter(([_, { value }]) => value.assets && value.assets.size > 0)
+              }
+            }),
+            new Map<Cardano.TransactionId, WithConsumedTxIn & WithProducedUTxO>()
           )
         } as Record<Cardano.TransactionId, WithConsumedTxIn & WithProducedUTxO>
       }))

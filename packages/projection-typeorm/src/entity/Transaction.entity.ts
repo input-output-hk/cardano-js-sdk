@@ -1,5 +1,5 @@
 import { BlockEntity } from './Block.entity';
-import { Cardano, TxCBOR } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Column, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryColumn } from 'typeorm';
 import { CredentialEntity } from './Credential.entity';
 import { OnDeleteCascadeRelationOptions } from './util';
@@ -11,7 +11,7 @@ export class TransactionEntity {
   txId?: Cardano.TransactionId;
 
   @Column('varchar', { nullable: false })
-  cbor?: TxCBOR;
+  cbor?: Serialization.TxCBOR;
 
   @ManyToOne(() => BlockEntity, OnDeleteCascadeRelationOptions)
   @JoinColumn({ name: 'block_id' })

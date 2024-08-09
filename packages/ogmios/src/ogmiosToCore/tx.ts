@@ -5,8 +5,7 @@ import {
   NotImplementedError,
   Serialization,
   SerializationError,
-  SerializationFailure,
-  TxCBOR
+  SerializationFailure
 } from '@cardano-sdk/core';
 import { CommonBlock } from './types';
 import { Schema } from '@cardano-ogmios/client';
@@ -381,6 +380,8 @@ const mapTxOut = (txOut: Schema.TransactionOutput): Cardano.TxOut => ({
   value: mapValue(txOut.value)
 });
 
+const mapInputSource = (source: 'inputs' | 'collaterals'): Cardano.InputSource => Cardano.InputSource[source];
+
 const mapMint = (tx: Schema.Transaction): Cardano.TokenMap | undefined => {
   if (tx.mint === undefined) return undefined;
   return mapAssets(tx.mint);
@@ -414,7 +415,7 @@ export const mapWithdrawals = (withdrawals: Schema.Withdrawals): Cardano.Withdra
     })
   );
 
-const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
+const mapCommonTx = (tx: Schema.Transaction, type: Cardano.BlockType): Cardano.OnChainTx => {
   const { auxiliaryData, auxiliaryDataHash } = mapAuxiliaryData(tx.metadata);
   return {
     auxiliaryData,
@@ -433,10 +434,10 @@ const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
         withdrawals: mapWithdrawals(tx.withdrawals)
       })
     },
-    cbor: tx.cbor ? TxCBOR(tx.cbor) : undefined,
+    cbor: tx.cbor ? Serialization.TxCBOR(tx.cbor) : undefined,
     id: Cardano.TransactionId(tx.id),
     // At the time of writing Byron transactions didn't set this property
-    inputSource: tx.spends ? Cardano.InputSource[tx.spends] : Cardano.InputSource.inputs,
+    inputSource: mapInputSource(tx.spends),
     witness: {
       bootstrap: tx.signatories
         .filter((signatory) => signatory.addressAttributes || signatory.chainCode)
@@ -446,14 +447,28 @@ const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
       // Removed `witness.scripts` from `OnChainTx`
       // https://github.com/input-output-hk/cardano-js-sdk/pull/927#discussion_r1352081210
       // ...(tx.scripts && { scripts: [...Object.values(tx.scripts).map(mapScript)] }),
-      signatures: new Map(
-        tx.signatories
-          .filter((signatory) => !signatory.addressAttributes && !signatory.chainCode)
-          .map(({ key, signature }) => [Crypto.Ed25519PublicKeyHex(key), Crypto.Ed25519SignatureHex(signature)])
-      )
+      signatures:
+        type === 'bft'
+          ? new Map()
+          : new Map(
+              tx.signatories
+                .filter((signatory) => !signatory.addressAttributes && !signatory.chainCode)
+                .map(({ key, signature }) => [Crypto.Ed25519PublicKeyHex(key), Crypto.Ed25519SignatureHex(signature)])
+            )
     }
   };
 };
 
-export const mapBlockBody = ({ transactions }: CommonBlock | Schema.BlockBFT): Cardano.Block['body'] =>
-  (transactions || []).map((transaction) => mapCommonTx(transaction));
+const isByronEraBlock = ({ type }: CommonBlock | Schema.BlockBFT) => type === 'bft';
+
+export const mapBlockBody = (block: CommonBlock | Schema.BlockBFT): Cardano.Block['body'] => {
+  const { transactions, type } = block;
+  return (transactions || []).map((transaction) =>
+    !isByronEraBlock(block) && transaction.cbor
+      ? {
+          ...Serialization.Transaction.fromCbor(transaction.cbor as Serialization.TxCBOR).toCore(),
+          inputSource: mapInputSource(transaction.spends)
+        }
+      : mapCommonTx(transaction, type)
+  );
+};

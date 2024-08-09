@@ -33,7 +33,8 @@ describe('withStakeKeys', () => {
               pointer: {} as Cardano.Pointer
             }
           ],
-          eventType: ChainSyncEventType.RollForward
+          eventType: ChainSyncEventType.RollForward,
+          stakeCredentialsByTx: {}
         };
 
         const result = await firstValueFrom(
@@ -68,7 +69,8 @@ describe('withStakeKeys', () => {
             pointer: {} as Cardano.Pointer
           }
         ],
-        eventType: ChainSyncEventType.RollBackward
+        eventType: ChainSyncEventType.RollBackward,
+        stakeCredentialsByTx: {}
       };
 
       const result = await firstValueFrom(
@@ -102,7 +104,8 @@ describe('withStakeKeys', () => {
             pointer: {} as Cardano.Pointer
           }
         ],
-        eventType: ChainSyncEventType.RollForward
+        eventType: ChainSyncEventType.RollForward,
+        stakeCredentialsByTx: {}
       };
       const result = await firstValueFrom(
         Mappers.withStakeKeys()(of(data as UnifiedExtChainSyncEvent<Mappers.WithCertificates & WithBlock>))
@@ -135,7 +138,8 @@ describe('withStakeKeys', () => {
             pointer: {} as Cardano.Pointer
           }
         ],
-        eventType: ChainSyncEventType.RollForward
+        eventType: ChainSyncEventType.RollForward,
+        stakeCredentialsByTx: {}
       };
       const result = await firstValueFrom(
         Mappers.withStakeKeys()(of(data as UnifiedExtChainSyncEvent<Mappers.WithCertificates & WithBlock>))
