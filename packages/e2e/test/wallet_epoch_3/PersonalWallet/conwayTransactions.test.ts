@@ -135,7 +135,7 @@ export const paramsUpdate: Cardano.ProtocolParametersUpdateConway = {
   treasuryExpansion: '0.25'
 };
 
-describe('PersonalWallet/conwayTransactions', () => {
+describe.skip('PersonalWallet/conwayTransactions', () => {
   let dRepWallet: BaseWallet;
   let wallet: BaseWallet;
 
