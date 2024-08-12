@@ -398,7 +398,9 @@ const mapWitnessDatums = ({ datums }: Required<Pick<Schema.Transaction, 'datums'
   Object.values(datums).map((datum) => Serialization.PlutusData.fromCbor(HexBlob(datum)).toCore());
 
 export const mapByronTxFee = ({ cbor }: Schema.Transaction) => {
-  const txSize = Buffer.from(HexBlob(cbor!), 'hex').length;
+  // Byron transactions don't have a fee field. In the absence of the cbor field, we can't calculate the fee.
+  if (!cbor) return 0n;
+  const txSize = Buffer.from(HexBlob(cbor), 'hex').length;
   return BigInt(BYRON_TX_FEE_COEFFICIENT * txSize + BYRON_TX_FEE_CONSTANT);
 };
 
@@ -423,7 +425,7 @@ const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
       auxiliaryDataHash,
       certificates: tx.certificates?.map(mapCertificate),
       collaterals: tx.collaterals?.map(mapTxIn),
-      fee: tx.fee?.ada.lovelace ?? mapByronTxFee(tx), // You were here. a common tx has fee but byron does not
+      fee: tx.fee?.ada.lovelace ?? mapByronTxFee(tx),
       inputs: tx.inputs.map(mapTxIn),
       mint: mapMint(tx),
       outputs: tx.outputs.map(mapTxOut),
