@@ -450,7 +450,8 @@ const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
       // ...(tx.scripts && { scripts: [...Object.values(tx.scripts).map(mapScript)] }),
       signatures: new Map(
         tx.signatories
-          .filter((signatory) => !signatory.addressAttributes && !signatory.chainCode)
+          // omitting Byron signatures (length is 128 instead of 64 as in praos transactions)
+          .filter((signatory) => !signatory.addressAttributes && !signatory.chainCode && signatory.key.length === 64)
           .map(({ key, signature }) => [Crypto.Ed25519PublicKeyHex(key), Crypto.Ed25519SignatureHex(signature)])
       )
     }
