@@ -826,10 +826,31 @@ in
             backend = {
               enabled = true;
             };
+            stake-pool-provider = {
+              enabled = true;
+              env.OVERRIDE_FUZZY_OPTIONS = "true";
+              env.NODE_ENV = "production";
+            };
+            handle-provider = {
+              enabled = true;
+              env.NODE_ENV = "production";
+            };
             chain-history-provider.enabled = true;
+            #asset-provider = {
+            #  enabled = true;
+            #};
+          };
+
+          projectors = {
+            handle.enabled = true;
+            stake-pool = {
+              enabled = true;
+            };
+            # asset.enabled = true;
           };
 
           values = {
+            pg-boss-worker.enabled = true;
             ws-server.enabled = true;
             cardano-services = {
               ingresOrder = 99;
