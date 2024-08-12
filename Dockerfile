@@ -1,6 +1,6 @@
 ARG UBUNTU_VERSION=20.04
 
-FROM ubuntu:${UBUNTU_VERSION} as ubuntu-nodejs
+FROM ubuntu:${UBUNTU_VERSION} AS ubuntu-nodejs
 ARG NODEJS_MAJOR_VERSION=18
 ENV DEBIAN_FRONTEND=nonintercative
 
@@ -16,7 +16,7 @@ RUN \
   apt-get install nodejs -y &&\
   apt-get install -y --no-install-recommends ca-certificates jq postgresql-client
 
-FROM ubuntu-nodejs as cardano-services
+FROM ubuntu-nodejs AS cardano-services
 
 ARG NETWORK=mainnet
 ENV NETWORK=${NETWORK}
@@ -54,16 +54,16 @@ COPY .yarn .yarn
 COPY .eslintrc.js .prettierrc .yarnrc.yml complete.eslintrc.js eslint.tsconfig.json package.json tsconfig.json yarn.lock yarn-project.nix ./
 RUN yarn workspaces focus --all --production
 
-FROM cardano-services as provider-server
+FROM cardano-services AS provider-server
 WORKDIR /app/packages/cardano-services
 HEALTHCHECK --interval=15s --timeout=15s CMD curl --fail --silent http://0.0.0.0:3000/health | jq '.ok' | awk '{ if ($0 == "true") exit 0; else exit 1}' || exit 1
 CMD ["bash", "-c", "../../node_modules/.bin/tsx watch --clear-screen=false --conditions=development src/cli start-provider-server"]
 
-FROM cardano-services as worker
+FROM cardano-services AS worker
 WORKDIR /app/packages/cardano-services
 CMD ["bash", "-c", "../../node_modules/.bin/tsx watch --clear-screen=false --conditions=development src/cli start-pg-boss-worker"]
 
-FROM cardano-services as blockfrost-worker
+FROM cardano-services AS blockfrost-worker
 ENV \
   API_URL="http://0.0.0.0:3000" \
   BLOCKFROST_API_FILE=/run/secrets/blockfrost_key \
@@ -75,7 +75,7 @@ ENV \
 WORKDIR /app/packages/cardano-services
 CMD ["bash", "-c", "../../node_modules/.bin/tsx watch --clear-screen=false --conditions=development src/cli start-blockfrost-worker"]
 
-FROM cardano-services as pg-boss-worker
+FROM cardano-services AS pg-boss-worker
 WORKDIR /config
 COPY compose/schedules.json .
 ENV SCHEDULES=/config/schedules.json
@@ -83,14 +83,14 @@ WORKDIR /app/packages/cardano-services
 HEALTHCHECK CMD curl --fail --silent http://localhost:3003/v1.0.0/health
 CMD ["bash", "-c", "../../node_modules/.bin/tsx watch --clear-screen=false --conditions=development src/cli start-pg-boss-worker"]
 
-FROM cardano-services as projector
+FROM cardano-services AS projector
 WORKDIR /
 COPY compose/projector/init.* ./
 RUN chmod 755 init.sh
 HEALTHCHECK CMD test `curl --fail --silent http://localhost:3000/v1.0.0/health | jq -r ".services[0].projectedTip.blockNo"` -gt 1
 CMD ["./init.sh"]
 
-FROM cardano-services as ws-server
+FROM cardano-services AS ws-server
 WORKDIR /app/packages/cardano-services
 HEALTHCHECK CMD curl --fail --silent http://localhost:3000/health
 CMD ["bash", "-c", "../../node_modules/.bin/tsx watch --clear-screen=false --conditions=development src/cli start-ws-server"]
