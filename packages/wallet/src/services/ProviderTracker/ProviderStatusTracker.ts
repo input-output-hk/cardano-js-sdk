@@ -89,7 +89,7 @@ export const createProviderStatusTracker = (
       ),
       // do not debounce if there are pending requests; in case of many requests, it will be debounced
       // for a long time, leaving the previous status unchanged
-      debounce((isReqPending) => (isReqPending ? of(true) : interval(1))),
+      debounce((isReqPending) => (isReqPending ? of(true) : interval(20))),
       distinctUntilChanged(),
       tap((isReqPending) => logger.debug(`${isReqPending ? 'Some' : 'No'} requests are pending`))
     )
