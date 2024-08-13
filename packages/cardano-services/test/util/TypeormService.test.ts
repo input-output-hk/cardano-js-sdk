@@ -63,6 +63,10 @@ describe('TypeormService', () => {
       await expect(queryFailureReady).rejects.toThrowError();
       const querySuccessReady = service.withQueryRunner(async () => 'ok');
       connectionConfig$.next(goodConnectionConfig);
+
+      // Allow the service to reconnect to the datasource with the new configuration
+      await new Promise((resolve) => setTimeout(resolve, 1));
+
       await expect(querySuccessReady).resolves.toBe('ok');
     });
   });
