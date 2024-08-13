@@ -16,7 +16,7 @@ import {
   createSlotEpochInfoCalc
 } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { Observable, ReplaySubject, Subject, filter, firstValueFrom, merge } from 'rxjs';
+import { Observable, ReplaySubject, Subject, delay, filter, firstValueFrom, merge } from 'rxjs';
 import { fromSerializableObject } from '@cardano-sdk/util';
 import WebSocket from 'isomorphic-ws';
 
@@ -129,7 +129,7 @@ export class CardanoWsClient extends WsProvider {
         merge(
           this.health$.pipe(filter(({ ok, reason }) => !ok && reason !== 'starting')),
           this.networkInfo[`${method}$`]
-        )
+        ).pipe(delay(10))
       );
 
       // If the value was an error different from starting, throw it, otherwise it is a return value for the method
