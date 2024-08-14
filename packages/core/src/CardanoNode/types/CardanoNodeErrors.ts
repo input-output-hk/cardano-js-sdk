@@ -1,5 +1,6 @@
 import { CustomError } from 'ts-custom-error';
 import type * as Cardano from '../../Cardano';
+import type * as Crypto from '@cardano-sdk/crypto';
 
 export enum GeneralCardanoNodeErrorCode {
   ServerNotReady = 503,
@@ -128,4 +129,12 @@ export type IncompleteWithdrawalsData = {
 
 export type UnknownOutputReferencesData = {
   unknownOutputReferences: Cardano.TxIn[];
+};
+
+export type CredentialAlreadyRegisteredData = {
+  hash: Crypto.Hash28ByteBase16;
+};
+
+export type DRepAlreadyRegisteredData = {
+  hash: Crypto.Hash28ByteBase16;
 };

@@ -78,6 +78,16 @@ describe('util/cardanoNodeErrors', () => {
           new TxSubmissionError(TxSubmissionErrorCode.OutsideOfValidityInterval, null, '')
         )
       ).toBe(true);
+      expect(
+        CardanoNodeUtil.isCredentialAlreadyRegistered(
+          new TxSubmissionError(TxSubmissionErrorCode.CredentialAlreadyRegistered, null, '')
+        )
+      ).toBe(true);
+      expect(
+        CardanoNodeUtil.isDrepAlreadyRegistered(
+          new TxSubmissionError(TxSubmissionErrorCode.DRepAlreadyRegistered, null, '')
+        )
+      ).toBe(true);
     });
     it('returns false if error type or code does not match', () => {
       expect(CardanoNodeUtil.isValueNotConservedError(generalError)).toBe(false);
@@ -95,6 +105,16 @@ describe('util/cardanoNodeErrors', () => {
       ).toBe(false);
       expect(
         CardanoNodeUtil.isOutsideOfValidityIntervalError(
+          new TxSubmissionError(TxSubmissionErrorCode.IncompleteWithdrawals, null, '')
+        )
+      ).toBe(false);
+      expect(
+        CardanoNodeUtil.isCredentialAlreadyRegistered(
+          new TxSubmissionError(TxSubmissionErrorCode.IncompleteWithdrawals, null, '')
+        )
+      ).toBe(false);
+      expect(
+        CardanoNodeUtil.isDrepAlreadyRegistered(
           new TxSubmissionError(TxSubmissionErrorCode.IncompleteWithdrawals, null, '')
         )
       ).toBe(false);
