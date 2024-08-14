@@ -471,7 +471,6 @@ in
               ];
             };
             backend.allowedOrigins = lib.concatStringsSep "," allowedOrigins;
-            backend.hostnames = ["${final.namespace}.${final.region}.${baseUrl}"];
             blockfrost-worker.enabled = true;
             pg-boss-worker.enabled = true;
           };
