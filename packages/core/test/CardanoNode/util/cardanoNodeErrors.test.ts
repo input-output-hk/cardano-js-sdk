@@ -61,7 +61,7 @@ describe('util/cardanoNodeErrors', () => {
     });
   });
 
-  describe('specific error typeguard utils', () => {
+  describe('specific error type-guard utils', () => {
     it('returns true if error type and code matches', () => {
       expect(
         CardanoNodeUtil.isValueNotConservedError(
@@ -87,6 +87,12 @@ describe('util/cardanoNodeErrors', () => {
         CardanoNodeUtil.isDrepAlreadyRegistered(
           new TxSubmissionError(TxSubmissionErrorCode.DRepAlreadyRegistered, null, '')
         )
+      ).toBe(true);
+      expect(
+        CardanoNodeUtil.isUnknownCredential(new TxSubmissionError(TxSubmissionErrorCode.UnknownCredential, null, ''))
+      ).toBe(true);
+      expect(
+        CardanoNodeUtil.isDrepNotRegistered(new TxSubmissionError(TxSubmissionErrorCode.DRepNotRegistered, null, ''))
       ).toBe(true);
     });
     it('returns false if error type or code does not match', () => {
@@ -115,6 +121,16 @@ describe('util/cardanoNodeErrors', () => {
       ).toBe(false);
       expect(
         CardanoNodeUtil.isDrepAlreadyRegistered(
+          new TxSubmissionError(TxSubmissionErrorCode.IncompleteWithdrawals, null, '')
+        )
+      ).toBe(false);
+      expect(
+        CardanoNodeUtil.isUnknownCredential(
+          new TxSubmissionError(TxSubmissionErrorCode.IncompleteWithdrawals, null, '')
+        )
+      ).toBe(false);
+      expect(
+        CardanoNodeUtil.isDrepNotRegistered(
           new TxSubmissionError(TxSubmissionErrorCode.IncompleteWithdrawals, null, '')
         )
       ).toBe(false);
