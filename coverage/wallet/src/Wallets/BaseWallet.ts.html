@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">96.13% </span>
+                <span class="strong">96.12% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>249/259</span>
+                <span class='fraction'>248/258</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">85% </span>
+                <span class="strong">82.25% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>51/60</span>
+                <span class='fraction'>51/62</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">96.37% </span>
+                <span class="strong">96.35% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>239/248</span>
+                <span class='fraction'>238/247</span>
             </div>
         
             
@@ -975,7 +975,12 @@
 <a name='L910'></a><a href='#L910'>910</a>
 <a name='L911'></a><a href='#L911'>911</a>
 <a name='L912'></a><a href='#L912'>912</a>
-<a name='L913'></a><a href='#L913'>913</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L913'></a><a href='#L913'>913</a>
+<a name='L914'></a><a href='#L914'>914</a>
+<a name='L915'></a><a href='#L915'>915</a>
+<a name='L916'></a><a href='#L916'>916</a>
+<a name='L917'></a><a href='#L917'>917</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1432,7 +1437,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">121x</span>
-<span class="cline-any cline-yes">1797x</span>
+<span class="cline-any cline-yes">1778x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">121x</span>
 <span class="cline-any cline-yes">121x</span>
@@ -1636,7 +1641,8 @@
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1653,6 +1659,8 @@
 <span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1887,7 +1895,8 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/* eslint-disable unicorn/no-nested-ternary */
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// cSpell:ignore coeff vkeys
+/* eslint-disable unicorn/no-nested-ternary */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {
   AddSignaturesProps,
@@ -2548,6 +2557,7 @@ export class BaseWallet implements ObservableWallet {
     return new GenericTxBuilder(this.getTxBuilderDependencies());
   }
 &nbsp;
+  // eslint-disable-next-line complexity
   async #submitTx(
     outgoingTx: OutgoingTx,
     { mightBeAlreadySubmitted }: SubmitTxOptions = <span class="branch-0 cbranch-no" title="branch not covered" >{}</span>
@@ -2572,11 +2582,13 @@ export class BaseWallet implements ObservableWallet {
           // error.innerError.data is not set by cardano submit api. It is only set when error is coming from Ogmios.
           (!error.innerError?.data || error.innerError.data.produced.coins === 0n)) ||
           // TODO: check if IncompleteWithdrawals available withdrawal amount === wallet's reward acc balance?
-          // Not sure what the 'Withdrawals' in error data is exactly: value being withdrawed, or reward acc balance
+          // Not sure what the 'Withdrawals' in error data is exactly: value being withdrawn, or reward acc balance
 <span class="branch-5 cbranch-no" title="branch not covered" >          CardanoNodeUtil.isIncompleteWithdrawalsError(error.innerError) </span>||
 <span class="branch-6 cbranch-no" title="branch not covered" >          CardanoNodeUtil.isUnknownOutputReferences(error.innerError) </span>||
 <span class="branch-7 cbranch-no" title="branch not covered" >          CardanoNodeUtil.isCredentialAlreadyRegistered(error.innerError) </span>||
-<span class="branch-8 cbranch-no" title="branch not covered" >          CardanoNodeUtil.isDrepAlreadyRegistered(error.innerError))</span>
+<span class="branch-8 cbranch-no" title="branch not covered" >          CardanoNodeUtil.isDrepAlreadyRegistered(error.innerError) </span>||
+<span class="branch-9 cbranch-no" title="branch not covered" >          CardanoNodeUtil.isUnknownCredential(error.innerError) </span>||
+<span class="branch-10 cbranch-no" title="branch not covered" >          CardanoNodeUtil.isDrepNotRegistered(error.innerError))</span>
       ) {
         this.#logger.debug(
           `Transaction ${outgoingTx.id} failed with ${error.innerError}, but it appears to be already submitted...`
@@ -2806,7 +2818,7 @@ export class BaseWallet implements ObservableWallet {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-08-14T06:12:34.454Z
+                at 2024-08-15T09:08:33.079Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
