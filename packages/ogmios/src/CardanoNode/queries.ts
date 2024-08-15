@@ -4,6 +4,7 @@ import {
   ChainSyncError,
   CredentialAlreadyRegisteredData,
   DRepAlreadyRegisteredData,
+  DRepNotRegisteredData,
   GeneralCardanoNodeError,
   GeneralCardanoNodeErrorCode,
   IncompleteWithdrawalsData,
@@ -12,6 +13,7 @@ import {
   StateQueryError,
   TxSubmissionError,
   TxSubmissionErrorCode,
+  UnknownCredentialData,
   UnknownOutputReferencesData,
   ValueNotConservedData
 } from '@cardano-sdk/core';
@@ -21,8 +23,10 @@ import { Logger } from 'ts-log';
 import {
   SubmitTransactionFailureCredentialAlreadyRegistered,
   SubmitTransactionFailureDRepAlreadyRegistered,
+  SubmitTransactionFailureDRepNotRegistered,
   SubmitTransactionFailureIncompleteWithdrawals,
   SubmitTransactionFailureOutsideOfValidityInterval,
+  SubmitTransactionFailureUnknownCredential,
   SubmitTransactionFailureUnknownOutputReferences,
   SubmitTransactionFailureValueNotConserved
 } from '@cardano-ogmios/schema';
@@ -76,6 +80,23 @@ const errorDataToCore = (data: unknown, code: number) => {
         return {
           hash: typedData.knownDelegateRepresentative.id as Crypto.Hash28ByteBase16
         } as DRepAlreadyRegisteredData;
+      }
+      return null;
+    }
+    case TxSubmissionErrorCode.UnknownCredential: {
+      const typedData = data as SubmitTransactionFailureUnknownCredential['data'];
+
+      return {
+        hash: typedData.unknownCredential as Crypto.Hash28ByteBase16
+      } as UnknownCredentialData;
+    }
+    case TxSubmissionErrorCode.DRepNotRegistered: {
+      const typedData = data as SubmitTransactionFailureDRepNotRegistered['data'];
+
+      if (typedData.unknownDelegateRepresentative.type === 'registered') {
+        return {
+          hash: typedData.unknownDelegateRepresentative.id as Crypto.Hash28ByteBase16
+        } as DRepNotRegisteredData;
       }
       return null;
     }

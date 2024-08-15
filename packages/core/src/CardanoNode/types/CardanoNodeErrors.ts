@@ -1,3 +1,5 @@
+// cSpell:ignore deserialisation
+
 import { CustomError } from 'ts-custom-error';
 import type * as Cardano from '../../Cardano';
 import type * as Crypto from '@cardano-sdk/crypto';
@@ -136,5 +138,13 @@ export type CredentialAlreadyRegisteredData = {
 };
 
 export type DRepAlreadyRegisteredData = {
+  hash: Crypto.Hash28ByteBase16;
+};
+
+export type UnknownCredentialData = {
+  hash: Crypto.Hash28ByteBase16;
+};
+
+export type DRepNotRegisteredData = {
   hash: Crypto.Hash28ByteBase16;
 };
