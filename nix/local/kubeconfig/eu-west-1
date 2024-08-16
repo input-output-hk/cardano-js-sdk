@@ -1,0 +1,103 @@
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3SUJBZ0lJR3JWRG81aHVNNWt3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TkRBNE1UUXlNelUwTkROYUZ3MHpOREE0TVRJeU16VTVORE5hTUJVeApFekFSQmdOVkJBTVRDbXQxWW1WeWJtVjBaWE13Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLCkFvSUJBUUN3a05DNExEYkVYWi9wa3prY1p4R1FMZW5rRnJja1JUVkkzMlNuZFZLdGZwUm5TZitLM3F2d3R4b2sKUnZvbUdlNllMWmN5UEFpZW5OK0RVQ0huK1hkYmlmYkt5UEFzT1ZUM1RXMEdtNkZVT0lxWWd3dVFpTVpmbG02bQpHOHlSbUZVeWY3RHg1OUNPN3V1WkxXUW4vZ3B2Y25KTGUxUnNsdzF6dVZaSXlETjdadVVzK0xNZndwRFBVaTVBCnF4a1hRMTZGaGQ3NHVXNkNjeE9xOEJCeHJQVkNYOGdlYUloc1hsa2tuelJTRFpBVFVkVG82YnNIZFRjQjZWMUcKcWc2WUFlU0EyS0tOd1pJcmtlRXdVNXN3Wkp1MDdZT01DdmhTK1cwSS9EbWdNb3JKcXM3TE5ncUNUWUV2aGJwNQpFOXNWeEZWbGpTQXpvb2w5eEVvMEJ2TGxLaGpEQWdNQkFBR2pXVEJYTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQCkJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJTSHUybTg2S25mYjAxVjJndHdTY0FaN3RTVnl6QVYKQmdOVkhSRUVEakFNZ2dwcmRXSmxjbTVsZEdWek1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQVZlYWFzdnBEQwo5UEtOL25yNnRqbzlQbThtZkg5d2Y0Mm80L2h4b3V1M0RrSU44Ykp0NDQrdDlCQXhCV1dpaSszRzF1RHJtMExBCmlodzVvR3ZWNlptRkVIY0NwenJRSlU4c1BvOXdYbmdhTnF1ejdhMHU0eENMRkhmU3ZVMUdDc214MG5LVUlRK2MKSGNkdEFZT3NFYk5JVCtkSDJBVnpsZnROUnc1TUxrY0JkaUpyRGx3OW5zdU1iWHhneG9aTXBaUUFJZWdGSHJHVApvd3RBNy9jeG5IbW5mWkZsUzZSMXdCYnZmYkpvUngrOEZPd3A4eHhrMXNtREErb2ZDMUhGUldubmtxdVdhMEhBCmpjN1N0ajdJM2FQQ3g2MjdnVXk5NnZFcUZCdFVBM29sY2tsajlsdDQ1MitrOVZjSU53U2lSd2hMV2FpRm55M1gKWHRlSzhKcWVlcHZ6Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+    server: https://67D8246E1F2BEE06FEE70A1FFB0BB756.gr7.eu-west-1.eks.amazonaws.com
+  name: arn:aws:eks:eu-west-1:926093910549:cluster/lace-dev-eu-west-1
+contexts:
+- context:
+    cluster: arn:aws:eks:eu-west-1:926093910549:cluster/lace-dev-eu-west-1
+    user: eks-admin
+  name: eks-admin
+- context:
+    cluster: arn:aws:eks:eu-west-1:926093910549:cluster/lace-dev-eu-west-1
+    user: eks-devs
+  name: eks-devs
+- context:
+    cluster: arn:aws:eks:eu-west-1:926093910549:cluster/lace-dev-eu-west-1
+    user: eks-readonly
+  name: eks-readonly
+- context:
+    cluster: arn:aws:eks:eu-west-1:926093910549:cluster/lace-dev-eu-west-1
+    user: lace-ci
+  name: lace-ci
+current-context: eks-admin
+kind: Config
+preferences: {}
+users:
+- name: eks-admin
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1beta1
+      args:
+      - --region
+      - eu-west-1
+      - eks
+      - get-token
+      - --cluster-name
+      - lace-dev-eu-west-1
+      - --output
+      - json
+      - --role
+      - arn:aws:iam::926093910549:role/eks-admin
+      command: aws
+      env: null
+      interactiveMode: IfAvailable
+      provideClusterInfo: false
+- name: eks-devs
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1beta1
+      args:
+      - --region
+      - eu-west-1
+      - eks
+      - get-token
+      - --cluster-name
+      - lace-dev-eu-west-1
+      - --output
+      - json
+      - --role
+      - arn:aws:iam::926093910549:role/eks-devs
+      command: aws
+      env: null
+      interactiveMode: IfAvailable
+      provideClusterInfo: false
+- name: eks-readonly
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1beta1
+      args:
+      - --region
+      - eu-west-1
+      - eks
+      - get-token
+      - --cluster-name
+      - lace-dev-eu-west-1
+      - --output
+      - json
+      - --role
+      - arn:aws:iam::926093910549:role/eks-readonly
+      command: aws
+      env: null
+      interactiveMode: IfAvailable
+      provideClusterInfo: false
+- name: lace-ci
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1beta1
+      args:
+      - --region
+      - eu-west-1
+      - eks
+      - get-token
+      - --cluster-name
+      - lace-dev-eu-west-1
+      - --output
+      - json
+      - --role
+      - arn:aws:iam::926093910549:role/lace-ci
+      command: aws
+      env: null
+      interactiveMode: IfAvailable
+      provideClusterInfo: false
