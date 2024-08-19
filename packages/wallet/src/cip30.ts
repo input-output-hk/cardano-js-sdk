@@ -458,9 +458,19 @@ const baseCip30WalletApi = (
     const scope = new ManagedFreeableScope();
     logger.debug('signTx');
     const txDecoded = Serialization.Transaction.fromCbor(Serialization.TxCBOR(tx));
-
+    const wallet = await firstValueFrom(wallet$);
     const hash = txDecoded.getId();
     const coreTx = txDecoded.toCore();
+
+    const needsForeignSignature = await requiresForeignSignatures(coreTx, wallet);
+
+    // If partialSign is false and the wallet could not sign the entire transaction
+    if (!partialSign && needsForeignSignature)
+      throw new DataSignError(
+        DataSignErrorCode.ProofGeneration,
+        'The wallet does not have the secret key associated with some of the inputs or certificates.'
+      );
+
     const shouldProceed = await confirmationCallback
       .signTx({
         data: coreTx,
@@ -469,16 +479,7 @@ const baseCip30WalletApi = (
       })
       .catch((error) => mapCallbackFailure(error, logger));
     if (shouldProceed) {
-      const wallet = await firstValueFrom(wallet$);
       try {
-        const needsForeignSignature = await requiresForeignSignatures(coreTx, wallet);
-
-        // If partialSign is false and the wallet could not sign the entire transaction
-        if (!partialSign && needsForeignSignature)
-          throw new DataSignError(
-            DataSignErrorCode.ProofGeneration,
-            'The wallet does not have the secret key associated with some of the inputs or certificates.'
-          );
         const {
           witness: { signatures }
         } = await wallet.finalizeTx({
