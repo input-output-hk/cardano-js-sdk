@@ -397,7 +397,9 @@ const baseCip30WalletApi = (
     logger.debug('getting used addresses');
 
     const wallet = await firstValueFrom(wallet$);
-    const addresses = await firstValueFrom(wallet.addresses$);
+    const trackedAddresses = await firstValueFrom(wallet.addresses$);
+    const unusedAddresses = await wallet.getNextUnusedAddress();
+    const addresses = trackedAddresses.filter((address) => !unusedAddresses.includes(address));
 
     if (addresses.length === 0) {
       throw new ApiError(APIErrorCode.InternalError, 'could not get used addresses');

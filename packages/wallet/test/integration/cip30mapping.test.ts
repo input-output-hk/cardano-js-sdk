@@ -454,17 +454,17 @@ describe('cip30', () => {
       });
 
       test('api.getUsedAddresses', async () => {
-        const cipUsedAddressess = await api.getUsedAddresses(context);
+        const cipUsedAddresses = await api.getUsedAddresses(context);
         const usedAddresses = (await firstValueFrom(wallet.addresses$)).map((grouped) => grouped.address);
 
-        expect(cipUsedAddressess.length).toBeGreaterThan(1);
-        expect(cipUsedAddressess.map((cipAddr) => Cardano.PaymentAddress(cipAddr))).toEqual(usedAddresses);
+        expect(cipUsedAddresses.length).toBe(1);
+        expect(cipUsedAddresses).toEqual([Cardano.Address.fromString(usedAddresses[1])!.toBytes()]);
       });
 
       test('api.getUnusedAddresses', async () => {
         const addresses = (await firstValueFrom(wallet.addresses$)).map((grouped) => grouped.address);
-        const cipUnusedAddressess = await api.getUnusedAddresses(context);
-        expect(cipUnusedAddressess).toEqual([Cardano.Address.fromString(addresses[0])!.toBytes()]);
+        const cipUnusedAddresses = await api.getUnusedAddresses(context);
+        expect(cipUnusedAddresses).toEqual([Cardano.Address.fromString(addresses[0])!.toBytes()]);
       });
 
       test('api.getChangeAddress', async () => {
