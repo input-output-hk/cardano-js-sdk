@@ -851,6 +851,7 @@ in
           name = "${final.namespace}-cardanojs";
           network = "sanchonet";
           region = "us-east-2";
+          context = "eks-admin";
 
           providers = {
             backend = {
@@ -886,6 +887,7 @@ in
           name = "${final.namespace}-cardanojs";
           network = "sanchonet";
           region = "eu-central-1";
+          context = "eks-admin";
 
           providers = {
             backend = {
