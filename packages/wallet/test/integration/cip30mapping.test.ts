@@ -30,7 +30,7 @@ import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import { Providers, createWallet } from './util';
-import { address_0_0, rewardAccount_0 } from '../services/ChangeAddress/testData';
+import { address_0_0, address_1_0, rewardAccount_0, rewardAccount_1 } from '../services/ChangeAddress/testData';
 import { buildDRepIDFromDRepKey, signTx, waitForWalletStateSettle } from '../util';
 import { firstValueFrom, of } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
@@ -497,6 +497,70 @@ describe('cip30', () => {
         const cipChangeAddress = await api.getChangeAddress(context);
         const [{ address: walletAddress }] = await firstValueFrom(wallet.addresses$);
         expect(Cardano.PaymentAddress(cipChangeAddress)).toEqual(walletAddress);
+      });
+
+      test('api.getChangeAddress always returns the lowest payment key derivation index', async () => {
+        const addresses = [
+          {
+            accountIndex: 0,
+            address: address_1_0,
+            index: 1,
+            networkId: Cardano.NetworkId.Testnet,
+            rewardAccount: rewardAccount_1,
+            stakeKeyDerivationPath: { index: 0, role: KeyRole.Stake },
+            type: AddressType.External
+          },
+          {
+            accountIndex: 0,
+            address: address_0_0,
+            index: 0,
+            networkId: Cardano.NetworkId.Testnet,
+            rewardAccount: rewardAccount_0,
+            stakeKeyDerivationPath: { index: 0, role: KeyRole.Stake },
+            type: AddressType.External
+          }
+        ];
+
+        const newApi = cip30.createWalletApi(
+          of({
+            addresses$: of(addresses),
+            getNextUnusedAddress: () => [addresses[1]]
+          } as unknown as ObservableWallet),
+          confirmationCallback,
+          { logger }
+        );
+
+        const cipChangeAddress = await newApi.getChangeAddress(context);
+        expect(Cardano.PaymentAddress(cipChangeAddress)).toEqual(address_0_0);
+      });
+
+      test('api.getChangeAddress if is script wallet do not sort and return the first address found', async () => {
+        const addresses = [
+          {
+            address: address_1_0,
+            networkId: Cardano.NetworkId.Testnet,
+            rewardAccount: rewardAccount_1,
+            scripts: {}
+          },
+          {
+            address: address_0_0,
+            networkId: Cardano.NetworkId.Testnet,
+            rewardAccount: rewardAccount_1,
+            scripts: {}
+          }
+        ];
+
+        const newApi = cip30.createWalletApi(
+          of({
+            addresses$: of(addresses),
+            getNextUnusedAddress: () => [addresses[1]]
+          } as unknown as ObservableWallet),
+          confirmationCallback,
+          { logger }
+        );
+
+        const cipChangeAddress = await newApi.getChangeAddress(context);
+        expect(Cardano.PaymentAddress(cipChangeAddress)).toEqual(address_1_0);
       });
 
       test('api.getRewardAddresses', async () => {
