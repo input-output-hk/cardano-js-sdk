@@ -10,4 +10,15 @@ describe('StringUtils', () => {
       expect(StringUtils.byteSize('👋')).toEqual(4);
     });
   });
+  describe('sliceByBytes', () => {
+    it('slices the string into an array, limiting each substring to the specified bytes', () => {
+      expect(StringUtils.chunkByBytes('The quick brown fox jumps over the lazy dog', 10)).toEqual([
+        'The quick ',
+        'brown fox ',
+        'jumps over',
+        ' the lazy ',
+        'dog'
+      ]);
+    });
+  });
 });
