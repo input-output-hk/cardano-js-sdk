@@ -12,6 +12,10 @@ const legacyOutputNoDatumCbor = HexBlob(
   '82583900537ba48a023f0a3c65e54977ffc2d78c143fb418ef6db058e006d78a7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8821a000f4240a2581c00000000000000000000000000000000000000000000000000000000a3443031323218644433343536186344404142420a581c11111111111111111111111111111111111111111111111111111111a3443031323218644433343536186344404142420a'
 );
 
+const maryOutputPointerCbor = HexBlob(
+  '825826412813b99a80cfb4024374bd0f502959485aa56e0648564ff805f2e51bbcd9819561bddc66141a02faf080'
+);
+
 const babbageAllFieldsCbor = HexBlob(
   'a400583900537ba48a023f0a3c65e54977ffc2d78c143fb418ef6db058e006d78a7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa801821a000f4240a2581c00000000000000000000000000000000000000000000000000000000a3443031323218644433343536186344404142420a581c11111111111111111111111111111111111111111111111111111111a3443031323218644433343536186344404142420a028201d81849d8799f0102030405ff03d8185182014e4d01000033222220051200120011'
 );
@@ -222,6 +226,18 @@ describe('TransactionOutput', () => {
       it('can encode TransactionOutput to Core', () => {
         const output = TransactionOutput.fromCbor(babbageAllFieldsCbor);
         expect(output.toCore()).toEqual(outputWithBothRefScriptAndDatumCore);
+      });
+    });
+
+    describe('Pointer Address Output', () => {
+      it('can decode PointerAddressOutput from CBOR', () => {
+        const output = TransactionOutput.fromCbor(maryOutputPointerCbor);
+        const hash = output.address().asPointer()?.getPaymentCredential().hash;
+        expect(hash).toEqual('2813b99a80cfb4024374bd0f502959485aa56e0648564ff805f2e51b');
+        const pointer = output.address().asPointer()?.getStakePointer();
+        expect(pointer?.slot).toEqual(16_292_793_057);
+        expect(pointer?.certIndex).toEqual(20);
+        expect(pointer?.txIndex).toEqual(1_011_302);
       });
     });
 

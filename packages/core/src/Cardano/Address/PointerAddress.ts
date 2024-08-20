@@ -30,26 +30,27 @@ const variableLengthEncode = (val: number): Buffer => {
 };
 
 /**
- * Decodes a value previously encoded in a variable length array.
+ * Decodes a value previously encoded in a variable length array only
+ * up to Number.MAX_SAFE_INTEGER values before decoding to 'Infinity'.
  *
  * @param array The encoded value.
  * @returns the decoded value.
  */
 const variableLengthDecode = (array: Buffer): { value: number; bytesRead: number } => {
   let more = true;
-  let value = 0;
+  let value = 0n;
 
   let bytesRead = 0;
   while (more && bytesRead < array.length) {
     const b = array[bytesRead];
-    value <<= 7;
-    value |= b & 127;
+    value <<= 7n;
+    value |= BigInt(b & 127);
 
     more = (b & 128) !== 0;
     ++bytesRead;
   }
 
-  return { bytesRead, value };
+  return { bytesRead, value: value <= Number.MAX_SAFE_INTEGER ? Number(value) : Number.POSITIVE_INFINITY };
 };
 
 /** A transaction index (within a slot). */
