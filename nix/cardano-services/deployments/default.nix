@@ -471,23 +471,6 @@ in
               ];
             };
             backend.allowedOrigins = lib.concatStringsSep "," allowedOrigins;
-            backend.routes = let
-              inherit (oci.meta) versions;
-            in
-              lib.concatLists [
-                (map (v: "/v${v}/health") versions.root)
-                (map (v: "/v${v}/live") versions.root)
-                (map (v: "/v${v}/meta") versions.root)
-                (map (v: "/v${v}/ready") versions.root)
-                (map (v: "/v${v}/asset") versions.assetInfo)
-                (map (v: "/v${v}/chain-history") versions.chainHistory)
-                (map (v: "/v${v}/network-info") versions.networkInfo)
-                (map (v: "/v${v}/rewards") versions.rewards)
-                (map (v: "/v${v}/tx-submit") versions.txSubmit)
-                (map (v: "/v${v}/utxo") versions.utxo)
-                (map (v: "/v${v}/handle") versions.handle)
-              ];
-
             blockfrost-worker.enabled = true;
             pg-boss-worker.enabled = true;
           };
@@ -546,23 +529,6 @@ in
               ];
             };
             backend.allowedOrigins = lib.concatStringsSep "," allowedOrigins;
-            backend.routes = let
-              inherit (oci.meta) versions;
-            in
-              lib.concatLists [
-                (map (v: "/v${v}/health") versions.root)
-                (map (v: "/v${v}/live") versions.root)
-                (map (v: "/v${v}/meta") versions.root)
-                (map (v: "/v${v}/ready") versions.root)
-                (map (v: "/v${v}/asset") versions.assetInfo)
-                (map (v: "/v${v}/chain-history") versions.chainHistory)
-                (map (v: "/v${v}/network-info") versions.networkInfo)
-                (map (v: "/v${v}/rewards") versions.rewards)
-                (map (v: "/v${v}/tx-submit") versions.txSubmit)
-                (map (v: "/v${v}/utxo") versions.utxo)
-                (map (v: "/v${v}/handle") versions.handle)
-              ];
-
             blockfrost-worker.enabled = true;
             pg-boss-worker.enabled = true;
           };
@@ -611,22 +577,6 @@ in
             cardano-services = {
               ingresOrder = 98;
             };
-            backend.routes = let
-              inherit (oci.meta) versions;
-            in
-              lib.concatLists [
-                (map (v: "/v${v}/health") versions.root)
-                (map (v: "/v${v}/live") versions.root)
-                (map (v: "/v${v}/meta") versions.root)
-                (map (v: "/v${v}/ready") versions.root)
-                (map (v: "/v${v}/asset") versions.assetInfo)
-                (map (v: "/v${v}/chain-history") versions.chainHistory)
-                (map (v: "/v${v}/network-info") versions.networkInfo)
-                (map (v: "/v${v}/rewards") versions.rewards)
-                (map (v: "/v${v}/tx-submit") versions.txSubmit)
-                (map (v: "/v${v}/utxo") versions.utxo)
-                (map (v: "/v${v}/handle") versions.handle)
-              ];
           };
         };
 
@@ -673,22 +623,7 @@ in
             cardano-services = {
               ingresOrder = 98;
             };
-            backend.routes = let
-              inherit (oci.meta) versions;
-            in
-              lib.concatLists [
-                (map (v: "/v${v}/health") versions.root)
-                (map (v: "/v${v}/live") versions.root)
-                (map (v: "/v${v}/meta") versions.root)
-                (map (v: "/v${v}/ready") versions.root)
-                (map (v: "/v${v}/asset") versions.assetInfo)
-                (map (v: "/v${v}/chain-history") versions.chainHistory)
-                (map (v: "/v${v}/network-info") versions.networkInfo)
-                (map (v: "/v${v}/rewards") versions.rewards)
-                (map (v: "/v${v}/tx-submit") versions.txSubmit)
-                (map (v: "/v${v}/utxo") versions.utxo)
-                (map (v: "/v${v}/handle") versions.handle)
-              ];
+            backend.hostnames = ["${final.namespace}.${final.region}.${baseUrl}"];
           };
         };
 
@@ -735,22 +670,6 @@ in
             cardano-services = {
               ingresOrder = 98;
             };
-            backend.routes = let
-              inherit (oci.meta) versions;
-            in
-              lib.concatLists [
-                (map (v: "/v${v}/health") versions.root)
-                (map (v: "/v${v}/live") versions.root)
-                (map (v: "/v${v}/meta") versions.root)
-                (map (v: "/v${v}/ready") versions.root)
-                (map (v: "/v${v}/asset") versions.assetInfo)
-                (map (v: "/v${v}/chain-history") versions.chainHistory)
-                (map (v: "/v${v}/network-info") versions.networkInfo)
-                (map (v: "/v${v}/rewards") versions.rewards)
-                (map (v: "/v${v}/tx-submit") versions.txSubmit)
-                (map (v: "/v${v}/utxo") versions.utxo)
-                (map (v: "/v${v}/handle") versions.handle)
-              ];
           };
         };
 
@@ -927,18 +846,19 @@ in
           };
         };
 
-        "live-sanchonet@us-east-2@v1" = final: {
+        "live-sanchonet@us-east-2" = final: {
           namespace = "live-sanchonet";
-          name = "${final.namespace}-cardanojs-v1";
+          name = "${final.namespace}-cardanojs";
           network = "sanchonet";
           region = "us-east-2";
+          context = "eks-admin";
 
           providers = {
             backend = {
               enabled = true;
               env.USE_SUBMIT_API = "true";
               env.USE_BLOCKFROST = lib.mkForce "false";
-              env.SUBMIT_API_URL = "http://${final.namespace}-cardano-stack.${final.namespace}.svc.cluster.local:8090";
+              env.SUBMIT_API_URL = "http://${final.namespace}-cardano-core.${final.namespace}.svc.cluster.local:8090";
               env.NODE_ENV = "production";
             };
             stake-pool-provider.enabled = true;
@@ -955,82 +875,30 @@ in
             blockfrost-worker.enabled = false;
             pg-boss-worker.enabled = true;
             pg-boss-worker.queues = "pool-metadata,pool-metrics";
-            backend.routes = let
-              inherit (oci.meta) versions;
-            in
-              lib.concatLists [
-                (map (v: "/v${v}/health") versions.root)
-                (map (v: "/v${v}/live") versions.root)
-                (map (v: "/v${v}/meta") versions.root)
-                (map (v: "/v${v}/ready") versions.root)
-                (map (v: "/v${v}/asset") versions.assetInfo)
-                (map (v: "/v${v}/chain-history") versions.chainHistory)
-                (map (v: "/v${v}/network-info") versions.networkInfo)
-                (map (v: "/v${v}/rewards") versions.rewards)
-                (map (v: "/v${v}/tx-submit") versions.txSubmit)
-                (map (v: "/v${v}/utxo") versions.utxo)
-                (map (v: "/v${v}/handle") versions.handle)
-                (map (v: "/v${v}/provider-server") versions.stakePool)
-                (map (v: "/v${v}/stake-pool-provider-server") versions.stakePool)
-              ];
 
             cardano-services = {
               ingresOrder = 99;
-              additionalRoutes = [
-                {
-                  pathType = "Prefix";
-                  path = "/v1.0.0/stake-pool";
-                  backend.service = {
-                    name = "${final.namespace}-cardanojs-v1-stake-pool-provider";
-                    port.name = "http";
-                  };
-                }
-                {
-                  pathType = "Prefix";
-                  path = "/v3.0.0/chain-history";
-                  backend.service = {
-                    name = "${final.namespace}-cardanojs-v1-backend";
-                    port.name = "http";
-                  };
-                }
-              ];
             };
           };
         };
 
-        "live-sanchonet@us-east-2@v2" = final: {
-          name = "${final.namespace}-cardanojs-v2";
+        "live-sanchonet@eu-central-1" = final: {
           namespace = "live-sanchonet";
+          name = "${final.namespace}-cardanojs";
           network = "sanchonet";
-          region = "us-east-2";
+          region = "eu-central-1";
           context = "eks-admin";
-
-          projectors = {
-            stake-pool.enabled = true;
-          };
 
           providers = {
             backend = {
               enabled = true;
+              env.USE_SUBMIT_API = "true";
+              env.USE_BLOCKFROST = lib.mkForce "false";
+              env.SUBMIT_API_URL = "http://${final.namespace}-cardano-core.${final.namespace}.svc.cluster.local:8090";
+              env.NODE_ENV = "production";
             };
-            stake-pool-provider = {
-              enabled = false;
-            };
+            stake-pool-provider.enabled = true;
           };
-
-          values = {
-            ingress.enabled = false;
-            pg-boss-worker.enabled = true;
-            stakepool.databaseName = "stakepoolv2";
-          };
-        };
-
-        "live-sanchonet@eu-central-1@v2" = final: {
-          name = "${final.namespace}-cardanojs-v2";
-          namespace = "live-sanchonet";
-          network = "sanchonet";
-          region = "eu-central-1";
-          context = "eks-admin";
 
           projectors = {
             stake-pool = {
@@ -1039,21 +907,18 @@ in
             };
           };
 
-          providers = {
-            backend = {
-              enabled = true;
-            };
-            stake-pool-provider = {
-              enabled = false;
-            };
-          };
-
           values = {
-            ingress.enabled = false;
+            blockfrost-worker.enabled = false;
             pg-boss-worker.enabled = true;
-            stakepool.databaseName = "stakepoolv2";
+            pg-boss-worker.queues = "pool-metadata,pool-metrics";
+
+            cardano-services = {
+              ingresOrder = 99;
+            };
           };
         };
+
+
       }
       # Convenient for cases when you need to create multiple temporary deployments with the same configuration
       // (builtins.mapAttrs (_: value: (final:
