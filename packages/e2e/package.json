@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/e2e",
-  "version": "0.39.0",
+  "version": "0.39.1",
   "description": "End to end tests for the cardano-js-sdk packages.",
   "engines": {
     "node": ">=16.20.2"

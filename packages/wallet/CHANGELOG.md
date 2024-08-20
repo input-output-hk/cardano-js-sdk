@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.42.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.42.0...@cardano-sdk/wallet@0.42.1) (2024-08-20)
+
+### Bug Fixes
+
+* add to BaseWallet re-submit exceptions CredentialAlreadyRegistered and DrepAlreadyRegistered errors ([48f7951](https://github.com/input-output-hk/cardano-js-sdk/commit/48f7951ce092c0d489d982fd1fdfef8599d6cada))
+* add to BaseWallet re-submit exceptions UnknownCredential and DrepNotRegistered errors ([7f8eaa1](https://github.com/input-output-hk/cardano-js-sdk/commit/7f8eaa1949a606d450e8bdc709fe437f543b5e37))
+* **wallet:** cip30 getUsedAddresses now filters unused addresses ([ce63146](https://github.com/input-output-hk/cardano-js-sdk/commit/ce63146b37f3be559a590931978b1789f645bf9e))
+* **wallet:** cip30 signTx function now throws if not enough signatures before calling confirmationCallback ([bdfd091](https://github.com/input-output-hk/cardano-js-sdk/commit/bdfd091388cc82528f7222f177c1b30935b2b061))
+
 ## [0.42.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.41.0...@cardano-sdk/wallet@0.42.0) (2024-08-07)
 
 ### ⚠ BREAKING CHANGES

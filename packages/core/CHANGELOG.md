@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.38.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.38.0...@cardano-sdk/core@0.38.1) (2024-08-20)
+
+### Bug Fixes
+
+* add to BaseWallet re-submit exceptions CredentialAlreadyRegistered and DrepAlreadyRegistered errors ([48f7951](https://github.com/input-output-hk/cardano-js-sdk/commit/48f7951ce092c0d489d982fd1fdfef8599d6cada))
+* add to BaseWallet re-submit exceptions UnknownCredential and DrepNotRegistered errors ([7f8eaa1](https://github.com/input-output-hk/cardano-js-sdk/commit/7f8eaa1949a606d450e8bdc709fe437f543b5e37))
+
 ## [0.38.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.37.0...@cardano-sdk/core@0.38.0) (2024-08-07)
 
 ### ⚠ BREAKING CHANGES
