@@ -56,6 +56,7 @@
         (mkK9sCommand "us-east-1")
         (mkK9sCommand "us-east-2")
         (mkK9sCommand "eu-central-1")
+        (mkK9sCommand "eu-west-1")
       ];
 
       devshell.startup.setup.text = ''
@@ -66,6 +67,7 @@
         kubectl config use-context $K8S_USER
         kubectl config use-context $K8S_USER --kubeconfig $PRJ_ROOT/.kube/us-east-2
         kubectl config use-context $K8S_USER --kubeconfig $PRJ_ROOT/.kube/eu-central-1
+        kubectl config use-context $K8S_USER --kubeconfig $PRJ_ROOT/.kube/eu-west-1
       '';
     };
   };

@@ -11,6 +11,7 @@
     us-east-1 = readJsonFile ./tf-outputs/lace-dev-us-east-1.json;
     us-east-2 = readJsonFile ./tf-outputs/lace-prod-us-east-2.json;
     eu-central-1 = readJsonFile ./tf-outputs/lace-live-eu-central-1.json;
+    eu-west-1 = readJsonFile ./tf-outputs/lace-dev-eu-west-1.json;
   };
   oci = inputs.self.x86_64-linux.cardano-services.oci-images.cardano-services;
   allowedOrigins = [
@@ -294,10 +295,12 @@ in
             backend = {
               enabled = true;
               replicas = 2;
+              env.NODE_ENV = "production";
             };
             stake-pool-provider = {
               enabled = true;
               env.OVERRIDE_FUZZY_OPTIONS = "true";
+              env.NODE_ENV = "production";
             };
             handle-provider.enabled = true;
             #asset-provider.enabled = true;
@@ -529,6 +532,80 @@ in
               ];
             };
             backend.allowedOrigins = lib.concatStringsSep "," allowedOrigins;
+            blockfrost-worker.enabled = true;
+            pg-boss-worker.enabled = true;
+          };
+        };
+
+        "staging-mainnet@eu-west-1@v2" = final: {
+          name = "${final.namespace}-cardanojs-v2";
+          namespace = "staging-mainnet";
+          context = "eks-admin";
+          network = "mainnet";
+          region = "eu-west-1";
+
+          providers = {
+            backend = {
+              enabled = true;
+              replicas = 2;
+              env.NODE_ENV = "production";
+            };
+            stake-pool-provider = {
+              enabled = true;
+              env.OVERRIDE_FUZZY_OPTIONS = "true";
+              env.NODE_ENV = "production";
+            };
+            handle-provider.enabled = true;
+            chain-history-provider = {
+              enabled = true;
+              replicas = 2;
+              env.NODE_ENV = "production";
+            };
+            #asset-provider = {
+            #  enabled = true;
+            #  env.NODE_ENV = "production";
+            #};
+          };
+
+          projectors = {
+            handle.enabled = true;
+            stake-pool.enabled = true;
+            # asset.enabled = true;
+          };
+
+          values = {
+
+            cardano-services = {
+              ingresOrder = 98;
+              additionalRoutes = [
+                {
+                  pathType = "Prefix";
+                  path = "/v1.0.0/stake-pool";
+                  backend.service = {
+                    name = "${final.namespace}-cardanojs-stake-pool-provider";
+                    port.name = "http";
+                  };
+                }
+              ];
+            };
+            backend.allowedOrigins = lib.concatStringsSep "," allowedOrigins;
+            backend.routes = let
+              inherit (oci.meta) versions;
+            in
+              lib.concatLists [
+                (map (v: "/v${v}/health") versions.root)
+                (map (v: "/v${v}/live") versions.root)
+                (map (v: "/v${v}/meta") versions.root)
+                (map (v: "/v${v}/ready") versions.root)
+                (map (v: "/v${v}/asset") versions.assetInfo)
+                (map (v: "/v${v}/chain-history") versions.chainHistory)
+                (map (v: "/v${v}/network-info") versions.networkInfo)
+                (map (v: "/v${v}/rewards") versions.rewards)
+                (map (v: "/v${v}/tx-submit") versions.txSubmit)
+                (map (v: "/v${v}/utxo") versions.utxo)
+                (map (v: "/v${v}/handle") versions.handle)
+              ];
+
             blockfrost-worker.enabled = true;
             pg-boss-worker.enabled = true;
           };
