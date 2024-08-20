@@ -14,9 +14,9 @@ import {
   WalletApi,
   WithSenderContext
 } from '@cardano-sdk/dapp-connector';
-import { AddressType, Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, GroupedAddress, KeyRole, util } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
-import { BaseWallet, cip30, createPersonalWallet } from '../../src';
+import { BaseWallet, ObservableWallet, cip30, createPersonalWallet } from '../../src';
 import { CallbackConfirmation, GetCollateralCallbackParams } from '../../src/cip30';
 import {
   Cardano,
@@ -30,6 +30,7 @@ import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import { Providers, createWallet } from './util';
+import { address_0_0, rewardAccount_0 } from '../services/ChangeAddress/testData';
 import { buildDRepIDFromDRepKey, signTx, waitForWalletStateSettle } from '../util';
 import { firstValueFrom, of } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
@@ -459,6 +460,31 @@ describe('cip30', () => {
 
         expect(cipUsedAddresses.length).toBe(1);
         expect(cipUsedAddresses).toEqual([Cardano.Address.fromString(usedAddresses[1])!.toBytes()]);
+      });
+
+      test('api.getUsedAddresses returns empty array if no used addresses found', async () => {
+        const address = {
+          accountIndex: 0,
+          address: address_0_0,
+          index: 0,
+          networkId: Cardano.NetworkId.Testnet,
+          rewardAccount: rewardAccount_0,
+          stakeKeyDerivationPath: { index: 0, role: KeyRole.Stake },
+          type: AddressType.External
+        };
+
+        const newApi = cip30.createWalletApi(
+          of({
+            addresses$: of([address]),
+            getNextUnusedAddress: () => [address]
+          } as unknown as ObservableWallet),
+          confirmationCallback,
+          { logger }
+        );
+
+        const cipUsedAddresses = await newApi.getUsedAddresses(context);
+
+        expect(cipUsedAddresses).toEqual([]);
       });
 
       test('api.getUnusedAddresses', async () => {

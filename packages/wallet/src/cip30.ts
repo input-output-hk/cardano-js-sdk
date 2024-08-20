@@ -401,11 +401,7 @@ const baseCip30WalletApi = (
     const unusedAddresses = await wallet.getNextUnusedAddress();
     const addresses = trackedAddresses.filter((address) => !unusedAddresses.includes(address));
 
-    if (addresses.length === 0) {
-      throw new ApiError(APIErrorCode.InternalError, 'could not get used addresses');
-    } else {
-      return addresses.map((groupAddresses) => cardanoAddressToCbor(groupAddresses.address));
-    }
+    return addresses.map((groupAddresses) => cardanoAddressToCbor(groupAddresses.address));
   },
   getUtxos: async (_: SenderContext, amount?: Cbor, paginate?: Paginate): Promise<Cbor[] | null> => {
     const scope = new ManagedFreeableScope();
