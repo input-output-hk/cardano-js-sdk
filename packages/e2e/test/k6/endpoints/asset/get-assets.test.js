@@ -1,278 +1,165 @@
+import { SharedArray } from 'k6/data';
+import { apiVersion } from '../../../../../cardano-services-client/src/version.ts';
+import { check, fail } from 'k6';
+import exec from 'k6/execution';
 import http from 'k6/http';
 
-// eslint-disable-next-line no-undef
-const PROVIDER_SERVER_URL = __ENV.PROVIDER_SERVER_URL;
+/**
+ * # Script description:
+ * - Sends REQUEST_COUNT HTTP requests to fetch assets. Since the number of iterations is indirectly controlled by the
+ *   duration and rate, it is possible to be slightly inaccurate.
+ * - Requests are started 1/s. A maximum of 20 VUs are used, so the maximum number of in-flight requests is 20.
+ * - The total number of assets requested per request is the sum of the ASSETS_* variables
+ * - AssetIds used are taken from mainnet. If the requested number of assets for the whole test is estimated to be larger
+ *   than the sample, the test will fail.
+ * - Test verifies that:
+ *   - Threshold for FAIL responses not exceeded (1% for example)
+ *   - Threshold for response having the wrong number of assets compared to requested is not exceeded (1% for example)
+ *   - 95th percentile of response time is less than 500ms
+ */
+
+const ASSETS_NO_METADATA_PER_REQUEST = Number.parseInt(__ENV.ASSETS_NO_METADATA_PER_REQUEST || 1);
+const ASSETS_ON_CHAIN_METADATA_PER_REQUEST = Number.parseInt(__ENV.ASSETS_ON_CHAIN_METADATA_PER_REQUEST || 0);
+const ASSETS_OFF_CHAIN_METADATA_PER_REQUEST = Number.parseInt(__ENV.ASSETS_OFF_CHAIN_METADATA_PER_REQUEST || 0);
+const REQUESTS_COUNT = Number.parseInt(__ENV.REQUESTS_COUNT || 1);
+const TARGET_ENV = __ENV.TARGET_ENV || 'dev'; // only dev and live are supported
+const TARGET_NET = __ENV.TARGET_NET || 'mainnet'; // only mainnet is supported
+const supportedTargetDeployments = new Set(['dev-mainnet', 'live-mainnet']);
+const targetDeployment = `${TARGET_ENV}-${TARGET_NET}`;
+const PROVIDER_SERVER_URL = `https://${targetDeployment}.lw.iog.io`;
 
 export const options = {
+  scenarios: {
+    getAssets: {
+      // How long the test lasts.
+      // There's an extra iteration that I am correcting here.
+      duration: `${REQUESTS_COUNT}s`,
+      // Start iterations at a specific rate (`rate/timeUnit`) for `duration`
+      // Each iteration is executed by a VU. If the iteration ends, the VU is reused for the next iteration.
+      // `maxVUs` when a VU does not receive a response by the end of the iteration, a new VU is allocated
+      // for the next iteration. If the number of VUs reaches `maxVUs`, iterations are delayed until a VU is available.
+      executor: 'constant-arrival-rate',
+      // Randomly picked. This will be the maximum number of in-flight requests (requests waiting for a response).
+      maxVUs: 20,
+      // Have one 1 VU ready to handle the first iteration.
+      preAllocatedVUs: 1,
+      // How many iterations per time unit
+      rate: 1,
+      // Ensure a single iteration is run by making the duration small (1s) and rate higher 1/2s.
+      // Otherwise, for duration=1s and rate 1/s, it runs 2 iterations. It could be a bug...
+      timeUnit: REQUESTS_COUNT > 1 ? '1s' : '2s'
+    }
+  },
   thresholds: {
-    http_req_duration: ['p(95)<120000'],
-    http_req_failed: ['rate<0.01']
+    // Fail if more than 1% of the requests have invalid number of assets in the response
+    'checks{assetsCountInResponse:assetsCountInResponse}': [{ abortOnFail: true, threshold: 'rate>0.99' }],
+    http_req_duration: ['p(95)<2000'],
+    //
+    http_req_failed: [{ abortOnFail: true, threshold: 'rate<0.1' }]
   }
 };
 
-const assetIds = [
-  '3a9241cd79895e3a8d65261b40077d4437ce71e9d7c8c6c00e3f658e4669727374636f696e',
-  '02f68378e37af4545d027d0a9fa5581ac682897a3fc1f6d8f936ed2b4154414441',
-  'e8e62d329e73190190c3e323fb5c9fb98ee55f0676332ba949f29d724649525354',
-  'ac3f4224723e2ed9d166478662f6e48bae9ddf0fc5ee58f54f6c322943454e54',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b151754534c41',
-  'e12ab5cf12f95cd57b739282d06af9dd61e1b1dde1e06f0c31f0251167696d62616c',
-  'da8c30857834c6ae7203935b89278c532b3995245295456f993e1d244c51',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279416c6261',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279416d657468797374',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279417175616d6172696e65',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279417368',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727941756275726e',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279417572656c6961',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279417572656f6c696e',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279417765736f6d65',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279417a756c',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794265696765',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279426572796c',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279426c61636b',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279426c7565',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279426f6e65',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279427269636b',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727942726f776e',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727942797a616e74696e65',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794361646574',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727943616d656c',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794361707269',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727943617264696e616c',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279436572756c65616e',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727943686172747265757365',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279436865727279',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727943696e6e616d6f6e',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279436c656d656e74696e65',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279436f616c',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279436f62616c74',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279436f66666565',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279436f72616c',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794379616e',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727945626f6e79',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279456d6572616c64',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727946756368736961',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279476f6c64',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727947726179',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279477265656e',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727948617a656c',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727948756d62726f6c',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279496e6469676f',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727949726973',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794a616465',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794a657474',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794b656c6c79',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794b68616b69',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794c617661',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794c6176656e646572',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794c656d6f6e',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794c696d65',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794c757374',
-  'ca079f39e33ca1b6ec7b4f4eedffa4f40d7d111f96bde855ba224dc2444558',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b15174141504c',
-  'b93822810dbd56a5b5b815b1946da690312913da74c94e019e028af97065646572',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b15174150504c45',
-  'd63b50fe629b69f1da4897aee9f381fe197c30c06bf35be4355360bd6d617279',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b15175445534c41',
-  'd3501d9531fcc25e3ca4b6429318c2cc374dbdbcf5e99c1c1e5da1ff444f4e545350414d',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794d61726f6f6e',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794d61757665',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794d656c616e6965',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794d656c6f6e',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794d696e74',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794d6f7261646f',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794d6f7373',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794d757374617264',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794d7972746c65',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794e617679',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794f6c697665',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794f6e7978',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794f72616e6765',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272794f7263686964',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272795065616368',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727950656172',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727950696e6b',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727950697374616368696f',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279506c6174696e756d',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279507572706c65',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272795261636b6c6579',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279526173706265727279',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279526176656e',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279526564',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279526f7365',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279526f7578',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727952756279',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279527573736574',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272795275737479',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727953616666726f6e',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727953616765',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727953616c6d6f6e',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727953616e64',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272795361707068697265',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279536361726c657474',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272795369656e6e61',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727953696c766572',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727953696e6f706961',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727953756e676c6f77',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727954616e67656c6f',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272795465616c',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279546f6d61746f',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727954757271756f697365',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727956616e696c6c61',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f42657272795665726d696c696f6e',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727956696f6c6574',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f4265727279566972696469616e',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727957696e65',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727958616e616475',
-  'b863bc7369f46136ac1048adb2fa7dae3af944c3bbb2be2f216a8d4f426572727959656c6c6f77',
-  '41fa383bbfccd0378c6855326129fbef8e631a27d938dc238a2fc97c64697361736d',
-  'd0cec3ba7bc826892d18ee2c7acd14be050b04a7c15c0ec98647c56372617473',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b151754575452',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b151754574954544552',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a04a756e6557617348657265',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f727365',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f72736531',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653130',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653131',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653132',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653133',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653134',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653135',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653136',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653137',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653138',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653139',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f72736532',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653230',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653231',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653232',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653233',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653234',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653235',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653236',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653237',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653238',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653239',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f72736533',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653330',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653331',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653332',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653333',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653334',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653335',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653336',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653337',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653338',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653339',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f72736534',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653430',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653431',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653432',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653433',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653434',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653435',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653436',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653437',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653438',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653439',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f72736535',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f7273653530',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f72736536',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f72736537',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f72736538',
-  'fc7e9a7f604c2cd6a169433fb2de86b183b7cd478f46785701ae23a0536561486f72736539',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b15174d534654',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b15174d4943524f534f4654',
-  '4940ad9597460adab9d36a30768675892943dc052da48519e7d392ae474d424c',
-  'b7f9c65e055d835c9529243dc90e3677d1af37af2a49178902a5d08062616e616e6173',
-  'ca079f39e33ca1b6ec7b4f4eedffa4f40d7d111f96bde855ba224dc24c4f54544f',
-  '5d9d887de76a2c9d057b3e5d34d5411f7f8dc4d54f0c06e8ed2eb4a9494e4459',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b15174353434f',
-  '7b355978567396d02639cc505620b345e1bbe2c76e53f47a7b6900fa73706f',
-  'ca6cace5d3c90cb5e019c0639245d023ba3417b82c6ea72e2f975288636174',
-  'ca6cace5d3c90cb5e019c0639245d023ba3417b82c6ea72e2f97528863617478',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b1517434953434f',
-  'ca079f39e33ca1b6ec7b4f4eedffa4f40d7d111f96bde855ba224dc24b495353',
-  'ca079f39e33ca1b6ec7b4f4eedffa4f40d7d111f96bde855ba224dc2454c4f4e',
-  'ca079f39e33ca1b6ec7b4f4eedffa4f40d7d111f96bde855ba224dc242454e',
-  'ca079f39e33ca1b6ec7b4f4eedffa4f40d7d111f96bde855ba224dc244454649',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b15174950484f4e45',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b151749504144',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b1517424954434f494e',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b1517425443',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b15174c5443',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b15174c495445434f494e',
-  'a9f443a94bc98f7ed96944a0306ff6b526223519bc972e273e8e8ee7666e74',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b151741554449',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b1517424d57',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b15174d45524345444553',
-  'bcc9c1a22a30cc1a355565bac683735f830c3fd7812fcd1aac53e3e6504c5552',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b15174a454550',
-  '51a8b917114265855de3bf1c3c077a8d14123eb2a725a32a37e966bf4d4453',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b151747524331',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b1517475243',
-  'c97414a4aa9d8451ebb2c0e66f055d4748132ecd40f3c4a71df161d54144415048',
-  '56b1124f2405b0d33cae5ddb2e40fe86a4657af124899214691beddc6e6d74',
-  'ca079f39e33ca1b6ec7b4f4eedffa4f40d7d111f96bde855ba224dc24c4f53544c414b4553',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b15174e4654',
-  '12e65fa3585d80cba39dcf4f59363bb68b77f9d3c0784734427b1517414441',
-  'ca079f39e33ca1b6ec7b4f4eedffa4f40d7d111f96bde855ba224dc2444f4745',
-  '7c14f8d5e4a52d7c6814f8783df2999bc0e50883099f72f9b3e1a720546f706f43726577',
-  '024113d85cbf633ffb4c436c786e868a1245c1398bc297302590a35f47524331',
-  '024113d85cbf633ffb4c436c786e868a1245c1398bc297302590a35f475243',
-  '0558efc19c2cab91c1fbe808ca9c26c61992b3a583187c9da4530392796f726f69',
-  'd8fb8de71d94caf74885dff2e5f3b8eaca95c67b37b6b650111bd7df474153',
-  '93ba69a0c19c3364156279f9e0bde261eec7d0184a2bbd0cc669e695686f736b696e736f6e',
-  '2919cb556e84b24f3878566780c50ac2cb6a7094f862281c19088bb3454e45524759',
-  'ba53bc5049cc226f7c8582faec8047bb70982d30539d11697957fb91636861726c6573',
-  '89414df16678a212636604cf4ba367bdacc2939821a6a849cb58cde64655454c',
-  '21c26b0c4d1cb37225374c96f38df70ecffd808bbd7f1aae23d8b3e37461696c73',
-  '9b0fa595d72beb53b70f649c51734819821ed5470cffcff1d07fbf2853414c5459636f696e',
-  '826033f14c75032b5cead9b73c507452377bf8603ac0cd2f74d5dfd8e7b485e58c85',
-  '74d3e78bb4988f3875cfee97667bf45c2e9074ad2aa321d7b4988d1f4144415048',
-  'ca079f39e33ca1b6ec7b4f4eedffa4f40d7d111f96bde855ba224dc2425443',
-  '2f1679cb4b7c9c92fcf70357358758d787e418508e0aa80eb8741a32424f484f4c',
-  '006144f3665c793920698e3874c60e0b6a9ac1ea3fb4da8bb3417a304a4f4253',
-  '5d871b8f74d71ec99f1fd3e5b27e58a6a472b9c73d47bca6e9d78b3f4a4f42',
-  '4a23f809ccedbd4cff4840e614a641e55d77c9bd2bd2792ad6d9ba8b41515541',
-  '55f526d5ad7a1e0bd50761a194cfecf2fccb1c35e372e7a45e06ad6057425443',
-  'a318cd3ed8585a56a6c9c649f0be0a7fd42bcbb29d162d98864eec1d6d656c',
-  'd41180e977877c6ea12aa84e3371d52d49a7f9d024fa3e74d43375d557455448',
-  '1c78f853729173df5933b9fee1eefccce01d52db1adadffcbea89e154b495749656767',
-  'eb970e28464be9486a779759828d79fb7a7154782b93e3f5e26875a94d454d45',
-  'ca8c8101bc688da236b2f7bfb73bbbd76c98188e57edd4e089a03fda455448',
-  'eccf56b527ed77b562259bfd1cceb3b9692ee2b1765d98fc5ddecb4a4869416461596f757244616453617973486946726f6d32303231',
-  'dfbe6e3399373ff93183e27a0a22ec5d735fbb1668a334ce8714776b4d55474759',
-  '43d156cc9ad1688e823edfd08e9e4ea9726c5ef9847554320a19e4e4457468657265756d',
-  'be3acb2be43759ed6291607f24dc7d5ecb583fc1023e9817ff6aa0054772616365',
-  '9b9ddbada8dc9cd08509ed660d5b3a65da8f36178def7ced99fa033346726565646f6d546f4e6176616c6e79436f696e',
-  '26958193370c7c03056e2502325a9a824c62d67d7723aa15c24536a16272696f',
-  'eca49efb20b7240521e97c1260d5d2738ab8e7ce2ab821ef819c6ce76a617a7a',
-  '0fb431bf5dd0ff9fdfcd0a62d51ba3a3324cbd86a6c4521feaecad6b6e65766572676f6e6e6167697665796f757570',
-  '0fb431bf5dd0ff9fdfcd0a62d51ba3a3324cbd86a6c4521feaecad6b6e65766572676f6e6e6172756e61726f756e64616e64646573657274796f75',
-  '0fb431bf5dd0ff9fdfcd0a62d51ba3a3324cbd86a6c4521feaecad6b6e65766572676f6e6e616c6574796f75646f776e',
-  '30db5406094be9701dd3d279f47fad57800ef2e48a2e0b68f13519ce6865616473',
-  'e67dd675e3eb7378a855b3d98bd49854cd2731902fd6e4e139974c744a415a5a',
-  'b0f4ee2d85783fcafe5d802f329c61c342f5c535a5c556427e77d925435350636f696e',
-  '26958193370c7c03056e2502325a9a824c62d67d7723aa15c24536a174657374',
-  'a488229a17b1df3f54e8aaf40e1267d4b6eb8bcc7743c6921bb1dca0706f74',
-  'b6af2ce69465db647f11799e0b9c8a9dd1a97705a72f657de01e4d1677796b6f70',
-  'c34b369793a60d233aed95cd1659b692e0275a8201de776d8cf8ab9d4c5353',
-  'd8a96e2451d5a5a367fde8badf5389284afec87d614f5dba4080316a53414e44',
-  'd894897411707efa755a76deb66d26dfd50593f2e70863e1661e98a07370616365636f696e73',
-  '677d3bbe3e01eeab498cd8786f7d261d92bd6ecea12109a332e86374416d65726963616e4d616e61746565',
-  '677d3bbe3e01eeab498cd8786f7d261d92bd6ecea12109a332e86374417369616e456c657068616e74'
-];
+const assetsSample = new SharedArray('assets', () => {
+  const assetsMainnetJson = open('../../../dump/assets/mainnet.json');
+  const assetsMainnet = JSON.parse(assetsMainnetJson).assets;
+  return [
+    assetsMainnet.filter((asset) => !asset.hasMetadata).map((asset) => asset.id),
+    assetsMainnet.filter((asset) => asset.hasOffchainMetadata).map((asset) => asset.id),
+    assetsMainnet.filter((asset) => asset.hasMetadata && !asset.hasOffchainMetadata).map((asset) => asset.id)
+  ];
+});
+
+export const setup = () => {
+  if (
+    !check(targetDeployment, {
+      'Target deployment is valid': (target) => supportedTargetDeployments.has(target)
+    })
+  ) {
+    fail(`Unsupported target deployment ${targetDeployment}`);
+  }
+
+  const [assetsNoMetadata, assetsWithOffChainMetadata, assetsWithOnChainMetadata] = assetsSample;
+  const availableAssetsInSample = {
+    noMetadata: assetsNoMetadata.length,
+    withOffChainMetadata: assetsWithOffChainMetadata.length,
+    withOnChainMetadata: assetsWithOnChainMetadata.length
+  };
+
+  const totalAssetsToQuery = {
+    noMetadata: ASSETS_NO_METADATA_PER_REQUEST * REQUESTS_COUNT,
+    withOffChainMetadata: ASSETS_OFF_CHAIN_METADATA_PER_REQUEST * REQUESTS_COUNT,
+    withOnChainMetadata: ASSETS_ON_CHAIN_METADATA_PER_REQUEST * REQUESTS_COUNT
+  };
+
+  // Validate we have sufficient assets in the sample to query. Assets already queried will be cached in the back-end
+  // So we need to query a different set of assets on each request.
+  if (
+    !check(totalAssetsToQuery, {
+      'Sufficient assets with no metadata in sample': ({ noMetadata }) =>
+        noMetadata <= availableAssetsInSample.noMetadata,
+      'Sufficient assets with off-chain metadata in sample': ({ withOffChainMetadata }) =>
+        withOffChainMetadata <= availableAssetsInSample.withOffChainMetadata,
+      'Sufficient assets with on-chain metadata in sample': ({ withOnChainMetadata }) =>
+        withOnChainMetadata <= availableAssetsInSample.withOnChainMetadata
+    })
+  ) {
+    fail(
+      `Insufficient assets in sample. Requested: ${JSON.stringify(totalAssetsToQuery)}, but have ${JSON.stringify(
+        availableAssetsInSample
+      )}`
+    );
+  }
+};
+
+const getAssetsSlice = (assets, iteration, perRequest) => {
+  if (perRequest === 0) {
+    return [];
+  }
+  // We've already verified we have enough samples, but the actual iteration count
+  // is indirectly controlled with DURATION and RATE, so we need to ensure we don't go out of bounds.
+  const start = (perRequest * iteration) % assets.length;
+  const end = start + perRequest;
+  return assets.slice(start, end);
+};
 
 export default function () {
+  const [assetsNoMetadata, assetsWithOffChainMetadata, assetsWithOnChainMetadata] = assetsSample;
+  const iteration = exec.scenario.iterationInTest;
+  const assetIds = [
+    ...getAssetsSlice(assetsNoMetadata, iteration, ASSETS_NO_METADATA_PER_REQUEST),
+    ...getAssetsSlice(assetsWithOffChainMetadata, iteration, ASSETS_OFF_CHAIN_METADATA_PER_REQUEST),
+    ...getAssetsSlice(assetsWithOnChainMetadata, iteration, ASSETS_ON_CHAIN_METADATA_PER_REQUEST)
+  ];
+
+  // It could have less than requested if we are at the end of the sample
+  if (!check(assetIds, { 'Request has at least 1 asset': (ids) => ids.length > 0 })) {
+    fail('Test error: should request at least 1 asset. This might be a test bug or a configuration issue.');
+  }
+
   const body = JSON.stringify({
     assetIds,
     extraData: { nftMetadata: true, tokenMetadata: true }
   });
-  http.post(`${PROVIDER_SERVER_URL}/asset/get-assets`, body, {
+  const response = http.post(`${PROVIDER_SERVER_URL}/v${apiVersion.assetInfo}/asset/get-assets`, body, {
     headers: {
       'content-type': 'application/json'
     },
-    timeout: '2m'
+    timeout: '1m'
   });
+
+  if (
+    response.status === 200 && // OK responses should have the same number of assets as requested
+    !check(
+      response.body,
+      {
+        'response body contains same number of assets as requested': (assetsInResponse) =>
+          JSON.parse(assetsInResponse).length === assetIds.length
+      },
+      { assetsCountInResponse: 'assetsCountInResponse' }
+    )
+  ) {
+    console.error(`Expected ${assetIds.length} assets in response, but got ${response.body.length}`);
+    console.error(`Requested assets: ${assetIds}`);
+    console.error(`Response: ${response.body}`);
+  }
 }
