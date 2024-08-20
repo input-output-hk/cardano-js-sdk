@@ -147,7 +147,7 @@ in
         backend = {
           allowedOrigins = lib.concatStringsSep "," allowedOrigins;
           passHandleDBArgs = true;
-          hostnames = ["tmp-live-mainnet.${baseUrl}" "${final.namespace}.${final.region}.${baseUrl}"];
+          hostnames = ["${final.namespace}.${baseUrl}" "${final.namespace}.${final.region}.${baseUrl}"];
           dnsId = lib.toLower "${final.region}-${final.namespace}-backend";
           ogmiosSrvServiceName = "${final.namespace}-cardano-core.${final.namespace}.svc.cluster.local";
 
