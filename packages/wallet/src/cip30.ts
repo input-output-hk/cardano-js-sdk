@@ -23,7 +23,7 @@ import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-s
 import { Logger } from 'ts-log';
 import { MessageSender } from '@cardano-sdk/key-management';
 import { Observable, firstValueFrom, map } from 'rxjs';
-import { ObservableWallet } from './types';
+import { ObservableWallet, isKeyHashAddress, isScriptAddress } from './types';
 import { requiresForeignSignatures } from './services';
 import uniq from 'lodash/uniq.js';
 
@@ -272,7 +272,21 @@ const baseCip30WalletApi = (
     logger.debug('getting changeAddress');
     try {
       const wallet = await firstValueFrom(wallet$);
-      const [{ address }] = await firstValueFrom(wallet.addresses$);
+      const addresses = await firstValueFrom(wallet.addresses$);
+
+      const isScriptWallet = addresses.some(isScriptAddress);
+
+      if (!isScriptWallet) {
+        addresses.sort((a, b) => {
+          if (isKeyHashAddress(a) && isKeyHashAddress(b)) {
+            return a.index - b.index;
+          }
+
+          return 0; // Cant happen, but in any case do not sort.
+        });
+      }
+
+      const address = addresses[0].address;
 
       if (!address) {
         logger.error('could not get change address');
@@ -401,11 +415,7 @@ const baseCip30WalletApi = (
     const unusedAddresses = await wallet.getNextUnusedAddress();
     const addresses = trackedAddresses.filter((address) => !unusedAddresses.includes(address));
 
-    if (addresses.length === 0) {
-      throw new ApiError(APIErrorCode.InternalError, 'could not get used addresses');
-    } else {
-      return addresses.map((groupAddresses) => cardanoAddressToCbor(groupAddresses.address));
-    }
+    return addresses.map((groupAddresses) => cardanoAddressToCbor(groupAddresses.address));
   },
   getUtxos: async (_: SenderContext, amount?: Cbor, paginate?: Paginate): Promise<Cbor[] | null> => {
     const scope = new ManagedFreeableScope();
