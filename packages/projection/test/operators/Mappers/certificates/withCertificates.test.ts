@@ -67,11 +67,13 @@ describe('withCertificates', () => {
                 txIndex: 1
               }
             }
-          ]
+          ],
+          stakeCredentialsByTx: {}
         },
         b: {
           ...createEvent(ChainSyncEventType.RollForward, Cardano.Slot(2), []),
-          certificates: []
+          certificates: [],
+          stakeCredentialsByTx: {}
         },
         c: {
           ...createEvent(
@@ -80,7 +82,8 @@ describe('withCertificates', () => {
             certificates,
             Cardano.InputSource.collaterals
           ),
-          certificates: []
+          certificates: [],
+          stakeCredentialsByTx: {}
         }
       });
       expectSubscriptions(source$.subscriptions).toBe('^');
