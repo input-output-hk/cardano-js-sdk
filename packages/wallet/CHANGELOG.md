@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.42.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.42.1...@cardano-sdk/wallet@0.42.2) (2024-08-21)
+
+### Bug Fixes
+
+* **wallet:** cip30 getUsedAddresses now returns an empty array if no used addresses are found ([f2d9546](https://github.com/input-output-hk/cardano-js-sdk/commit/f2d9546b6b787740461a8dd88f6ea4a92b245b87))
+* **wallet:** getChangeAddress now always returns the address with lowest derivation index ([d5ddd54](https://github.com/input-output-hk/cardano-js-sdk/commit/d5ddd546d94c3377797732f2cd5b04a625f96279))
+
 ## [0.42.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.42.0...@cardano-sdk/wallet@0.42.1) (2024-08-20)
 
 ### Bug Fixes
