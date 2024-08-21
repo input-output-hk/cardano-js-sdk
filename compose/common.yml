@@ -312,7 +312,7 @@ services:
         - *projector-environment
         - *sdk-environment
       POSTGRES_DB_FILE: /run/secrets/postgres_db_wallet_api
-      PROJECTION_NAMES: protocol-parameters
+      PROJECTION_NAMES: protocol-parameters, transactions
     ports:
       - ${WALLET_API_PROJECTOR_PORT:-4005}:3000
 
