@@ -16,6 +16,7 @@ export * from './opaqueTypes';
 export * from './environment';
 export * from './patchObject';
 export * from './isPromise';
+export * from './string';
 export * from './transformer';
 export * from './Percent';
 export * from './util';
