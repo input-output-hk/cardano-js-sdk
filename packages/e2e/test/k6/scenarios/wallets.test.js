@@ -1,9 +1,10 @@
+/* eslint-disable no-undef */
 /* eslint-disable no-console */
 /* eslint-disable func-style */
 import { Counter, Trend } from 'k6/metrics';
 import { SharedArray } from 'k6/data';
-import { check, sleep } from 'k6';
 import { apiVersion } from '../../../../cardano-services-client/src/version.ts';
+import { check, sleep } from 'k6';
 import http from 'k6/http';
 
 /**
@@ -42,22 +43,19 @@ const RUN_MODE = __ENV.RUN_MODE || RunMode.Restore;
 const PROVIDER_SERVER_URL = __ENV.PROVIDER_SERVER_URL;
 
 /** Wallet addresses extracted from the JSON dump file */
-const walletsOrig = new SharedArray('walletsData', function () {
-  const network = __ENV.TARGET_ENV == 'dev-mainnet' ? 'mainnet' : 'preprod';
+const walletsOrig = new SharedArray('walletsData', () => {
+  const network = __ENV.TARGET_ENV === 'dev-mainnet' ? 'mainnet' : 'preprod';
   const fileName = RUN_MODE === RunMode.Onboard ? `no-history-${network}.json` : `${network}.json`;
   console.log(`Reading wallet addresses from ${fileName}`);
-  const walletAddresses = JSON.parse(open('../../dump/addresses/' + fileName));
-  return walletAddresses;
+  return JSON.parse(open(`../../dump/addresses/${fileName}`));
 });
-
 
 /** Stake pool addresses from the JSON dump file */
-const poolAddresses = new SharedArray('poolsData', function () {
+const poolAddresses = new SharedArray('poolsData', () =>
   // There is no dump of preprod pools, but it is ok. Pool address is used only in "Restore" mode
   // and it is used to do a stake pool search call, so any pool will do
-  const pools = JSON.parse(open('../../dump/pool_addresses/mainnet.json'));
-  return pools;
-});
+  JSON.parse(open('../../dump/pool_addresses/mainnet.json'))
+);
 
 /**
  * Define the maximum number of virtual users to simulate
@@ -314,6 +312,7 @@ const emulateIdleClient = () => cardanoHttpPost(TIP_URL, apiVersion.networkInfo)
  * wallets: {address: Cardano.Address, stake_address: Cardano.RewardAccount, tx_count: number}[][]
  * poolAddresses: Cardano.PoolId[]
  */
+// eslint-disable-next-line @typescript-eslint/no-shadow
 export default function ({ wallets, poolAddresses }) {
   // Get the wallet for the current virtual user
   // eslint-disable-next-line no-undef
