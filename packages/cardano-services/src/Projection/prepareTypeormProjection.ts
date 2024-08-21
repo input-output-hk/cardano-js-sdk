@@ -67,7 +67,7 @@ export enum ProjectionName {
   StakePoolMetadataJob = 'stake-pool-metadata-job',
   StakePoolMetricsJob = 'stake-pool-metrics-job',
   StakePoolRewardsJob = 'stake-pool-rewards-job',
-  Transaction = 'transaction',
+  Transactions = 'transactions',
   UTXO = 'utxo'
 }
 
