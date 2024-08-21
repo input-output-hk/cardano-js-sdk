@@ -14,7 +14,7 @@ describe('addressesShareAnyKey', () => {
   const stakeKeyHash2 = Hash28ByteBase16('8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80f');
   const stakeKeyPointer: Cardano.Pointer = {
     certIndex: Cardano.CertIndex(1),
-    slot: Cardano.Slot(123),
+    slot: 123n,
     txIndex: Cardano.TxIndex(2)
   };
 

@@ -95,7 +95,7 @@ const undoUpdateLatestRetirementAndRetiringStatus = async ({
   const { firstSlot } = epochSlotsCalc(epochNo, eraSummaries);
   const epochStartId = certificatePointerToId({
     certIndex: Cardano.CertIndex(0),
-    slot: firstSlot,
+    slot: BigInt(firstSlot),
     txIndex: Cardano.TxIndex(0)
   });
   return Promise.all(
@@ -152,12 +152,12 @@ const computeCertificateIdRange = (epochNo: Cardano.EpochNo, eraSummaries: EraSu
   const { firstSlot, lastSlot } = epochSlotsCalc(epochNo, eraSummaries);
   const minId = certificatePointerToId({
     certIndex: Cardano.CertIndex(0),
-    slot: firstSlot,
+    slot: BigInt(firstSlot),
     txIndex: Cardano.TxIndex(0)
   });
   const maxId = certificatePointerToId({
     certIndex: MaxCertificatePointerIdCertIndex,
-    slot: lastSlot,
+    slot: BigInt(lastSlot),
     txIndex: MaxCertificatePointerIdTxIndex
   });
   return { maxId, minId };

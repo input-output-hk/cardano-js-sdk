@@ -32,6 +32,10 @@ const babbageNoOptionalFieldScriptCbor = HexBlob(
   '82583900537ba48a023f0a3c65e54977ffc2d78c143fb418ef6db058e006d78a7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8821a000f4240a2581c00000000000000000000000000000000000000000000000000000000a3443031323218644433343536186344404142420a581c11111111111111111111111111111111111111111111111111111111a3443031323218644433343536186344404142420a'
 );
 
+const maryOutputPointerCbor = HexBlob(
+  '825826412813b99a80cfb4024374bd0f502959485aa56e0648564ff805f2e51bbcd9819561bddc66141a02faf080'
+);
+
 const canonicallySortedAssets = new Map([
   ['0000000000000000000000000000000000000000000000000000000030313232' as unknown as Cardano.AssetId, 100n],
   ['0000000000000000000000000000000000000000000000000000000033343536' as unknown as Cardano.AssetId, 99n],
@@ -131,6 +135,18 @@ describe('TransactionOutput', () => {
       it('can encode TransactionOutput to Core', () => {
         const output = TransactionOutput.fromCbor(legacyOutputCbor);
         expect(output.toCore()).toEqual(outputWithHashDataCore);
+      });
+
+      it('can decode PointerAddress Output to Core', () => {
+        const output = TransactionOutput.fromCbor(maryOutputPointerCbor);
+        const address = output.address();
+        const hash = address.asPointer()?.getPaymentCredential().hash;
+        expect(hash).toEqual('2813b99a80cfb4024374bd0f502959485aa56e0648564ff805f2e51b');
+        const pointer = address.asPointer()?.getStakePointer();
+        expect(pointer?.slot).toEqual(16_292_793_057n);
+        expect(pointer?.certIndex).toEqual(20);
+        expect(pointer?.txIndex).toEqual(1_011_302);
+        expect(address.toBech32()).toEqual('addr1gy5p8wv6sr8mgqjrwj7s75pft9y94ftwqey9vnlcqhew2xaumxqe2cdam3npgv60hqa');
       });
     });
 
