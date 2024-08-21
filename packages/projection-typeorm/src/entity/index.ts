@@ -7,6 +7,7 @@ export * from './Handle.entity';
 export * from './HandleMetadata.entity';
 export * from './NftMetadata.entity';
 export * from './Output.entity';
+export * from './GovernanceAction.entity';
 export * from './PoolDelisted.entity';
 export * from './PoolMetadata.entity';
 export * from './PoolRegistration.entity';
