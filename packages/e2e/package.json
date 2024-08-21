@@ -136,7 +136,7 @@
     "@types/delay": "^3.1.0",
     "@types/dockerode": "^3.3.8",
     "@types/jest": "^28.1.2",
-    "@types/k6": "^0.45.0",
+    "@types/k6": "^0.53.1",
     "@types/lodash": "^4.14.182",
     "@types/ora": "^3.2.0",
     "@types/uuid": "^8.3.4",

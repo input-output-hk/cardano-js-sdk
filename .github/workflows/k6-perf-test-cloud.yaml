@@ -4,13 +4,19 @@ on:
     - cron: '0 0 * * 6' # 00:00 every Saturday
   workflow_dispatch:
     inputs:
-      target:
+      environment:
         description: 'Target environment'
         type: choice
         required: true
         options:
-          - 'dev-mainnet'
-          - 'dev-preprod'
+          - 'dev'
+      network:
+        description: 'Target network'
+        type: choice
+        required: true
+        options:
+          - 'preprod'
+          - 'mainnet'
       wallet-count:
         description: 'Number of wallets to simulate'
         type: number
@@ -43,8 +49,8 @@ on:
           - '2m'
         
 env:
-  TARGET_ENV: ${{ inputs.target || 'dev-mainnet' }}
-  PROVIDER_SERVER_URL: $PROVIDER_SERVER_URL
+  TARGET_ENV: ${{ inputs.environment || 'dev' }}
+  TARGET_NET: ${{ inputs.network || 'mainnet'}}
   RUN_MODE: 'RestoreHD'
   MAX_VU: ${{ inputs.wallet-count || 1000 }}
   RAMP_UP_DURATION: ${{ inputs.rampup-duration || '10m' }}
@@ -59,13 +65,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Set target env url based on input
+      - name: 🧰 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.12.0
+      - name: 🔨 Build
         run: |
-          if [ "$TARGET_ENV" = "dev-preprod" ]; then
-            echo "PROVIDER_SERVER_URL=https://dev-preprod.lw.iog.io" >> $GITHUB_ENV
-          elif [ "$TARGET_ENV" = "dev-mainnet" ]; then
-            echo "PROVIDER_SERVER_URL=https://dev-mainnet.lw.iog.io" >> $GITHUB_ENV
-          fi
+          yarn install --immutable --inline-builds --mode=skip-build
+          yarn workspace @cardano-sdk/util-dev build:cjs
+        env:
+          NODE_OPTIONS: '--max_old_space_size=8192'
       - name: Run k6 cloud test
         uses: grafana/k6-action@v0.3.1
         env:
@@ -76,7 +85,7 @@ jobs:
           token: ${{ secrets.K6_CLOUD_API_TOKEN }}
           flags: >
             -e TARGET_ENV=$TARGET_ENV
-            -e PROVIDER_SERVER_URL=$PROVIDER_SERVER_URL
+            -e TARGET_NET=$TARGET_NET
             -e RUN_MODE=$RUN_MODE
             -e MAX_VU=$MAX_VU
             -e RAMP_UP_DURATION=$RAMP_UP_DURATION

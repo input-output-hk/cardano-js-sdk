@@ -1,3 +1,4 @@
+import * as k6Utils from '../../../../../util-dev/dist/cjs/k6-utils.js';
 import { SharedArray } from 'k6/data';
 import { apiVersion } from '../../../../../cardano-services-client/src/version.ts';
 import { check, fail } from 'k6';
@@ -18,15 +19,16 @@ import http from 'k6/http';
  *   - 95th percentile of response time is less than 500ms
  */
 
-const ASSETS_NO_METADATA_PER_REQUEST = Number.parseInt(__ENV.ASSETS_NO_METADATA_PER_REQUEST || 1);
-const ASSETS_ON_CHAIN_METADATA_PER_REQUEST = Number.parseInt(__ENV.ASSETS_ON_CHAIN_METADATA_PER_REQUEST || 0);
-const ASSETS_OFF_CHAIN_METADATA_PER_REQUEST = Number.parseInt(__ENV.ASSETS_OFF_CHAIN_METADATA_PER_REQUEST || 0);
-const REQUESTS_COUNT = Number.parseInt(__ENV.REQUESTS_COUNT || 1);
-const TARGET_ENV = __ENV.TARGET_ENV || 'dev'; // only dev and live are supported
-const TARGET_NET = __ENV.TARGET_NET || 'mainnet'; // only mainnet is supported
-const supportedTargetDeployments = new Set(['dev-mainnet', 'live-mainnet']);
-const targetDeployment = `${TARGET_ENV}-${TARGET_NET}`;
-const PROVIDER_SERVER_URL = `https://${targetDeployment}.lw.iog.io`;
+// eslint-disable-next-line no-undef
+const K6_ENV = __ENV;
+
+const ASSETS_NO_METADATA_PER_REQUEST = Number.parseInt(K6_ENV.ASSETS_NO_METADATA_PER_REQUEST || 1);
+const ASSETS_ON_CHAIN_METADATA_PER_REQUEST = Number.parseInt(K6_ENV.ASSETS_ON_CHAIN_METADATA_PER_REQUEST || 0);
+const ASSETS_OFF_CHAIN_METADATA_PER_REQUEST = Number.parseInt(K6_ENV.ASSETS_OFF_CHAIN_METADATA_PER_REQUEST || 0);
+const REQUESTS_COUNT = Number.parseInt(K6_ENV.REQUESTS_COUNT || 1);
+
+const dut = k6Utils.getDut(K6_ENV, { environments: ['dev'], networks: ['mainnet'] });
+const sdkCom = new k6Utils.SdkCom({ apiVersion, dut, k6Http: http });
 
 export const options = {
   scenarios: {
@@ -54,12 +56,12 @@ export const options = {
     // Fail if more than 1% of the requests have invalid number of assets in the response
     'checks{assetsCountInResponse:assetsCountInResponse}': [{ abortOnFail: true, threshold: 'rate>0.99' }],
     http_req_duration: ['p(95)<2000'],
-    //
     http_req_failed: [{ abortOnFail: true, threshold: 'rate<0.1' }]
   }
 };
 
 const assetsSample = new SharedArray('assets', () => {
+  // eslint-disable-next-line no-undef
   const assetsMainnetJson = open('../../../dump/assets/mainnet.json');
   const assetsMainnet = JSON.parse(assetsMainnetJson).assets;
   return [
@@ -70,14 +72,6 @@ const assetsSample = new SharedArray('assets', () => {
 });
 
 export const setup = () => {
-  if (
-    !check(targetDeployment, {
-      'Target deployment is valid': (target) => supportedTargetDeployments.has(target)
-    })
-  ) {
-    fail(`Unsupported target deployment ${targetDeployment}`);
-  }
-
   const [assetsNoMetadata, assetsWithOffChainMetadata, assetsWithOnChainMetadata] = assetsSample;
   const availableAssetsInSample = {
     noMetadata: assetsNoMetadata.length,
@@ -122,7 +116,7 @@ const getAssetsSlice = (assets, iteration, perRequest) => {
   return assets.slice(start, end);
 };
 
-export default function () {
+export const run = () => {
   const [assetsNoMetadata, assetsWithOffChainMetadata, assetsWithOnChainMetadata] = assetsSample;
   const iteration = exec.scenario.iterationInTest;
   const assetIds = [
@@ -135,17 +129,7 @@ export default function () {
   if (!check(assetIds, { 'Request has at least 1 asset': (ids) => ids.length > 0 })) {
     fail('Test error: should request at least 1 asset. This might be a test bug or a configuration issue.');
   }
-
-  const body = JSON.stringify({
-    assetIds,
-    extraData: { nftMetadata: true, tokenMetadata: true }
-  });
-  const response = http.post(`${PROVIDER_SERVER_URL}/v${apiVersion.assetInfo}/asset/get-assets`, body, {
-    headers: {
-      'content-type': 'application/json'
-    },
-    timeout: '1m'
-  });
+  const response = sdkCom.getAssets({ assetIds, nftMetadata: true, tokenMetadata: true });
 
   if (
     response.status === 200 && // OK responses should have the same number of assets as requested
@@ -162,4 +146,6 @@ export default function () {
     console.error(`Requested assets: ${assetIds}`);
     console.error(`Response: ${response.body}`);
   }
-}
+};
+
+export default run;
