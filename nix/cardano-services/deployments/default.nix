@@ -856,9 +856,7 @@ in
           providers = {
             backend = {
               enabled = true;
-              env.USE_SUBMIT_API = "true";
-              env.USE_BLOCKFROST = lib.mkForce "false";
-              env.SUBMIT_API_URL = "http://${final.namespace}-cardano-core.${final.namespace}.svc.cluster.local:8090";
+              env.USE_SUBMIT_API = "false";
               env.NODE_ENV = "production";
             };
             stake-pool-provider.enabled = true;
@@ -892,9 +890,7 @@ in
           providers = {
             backend = {
               enabled = true;
-              env.USE_SUBMIT_API = "true";
-              env.USE_BLOCKFROST = lib.mkForce "false";
-              env.SUBMIT_API_URL = "http://${final.namespace}-cardano-core.${final.namespace}.svc.cluster.local:8090";
+              env.USE_SUBMIT_API = "false";
               env.NODE_ENV = "production";
             };
             stake-pool-provider.enabled = true;
