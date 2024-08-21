@@ -47,7 +47,7 @@ describe('withCertificates', () => {
               certificate: certificates[0][0],
               pointer: {
                 certIndex: 0,
-                slot: 1,
+                slot: 1n,
                 txIndex: 0
               }
             },
@@ -55,7 +55,7 @@ describe('withCertificates', () => {
               certificate: certificates[1][0],
               pointer: {
                 certIndex: 0,
-                slot: 1,
+                slot: 1n,
                 txIndex: 1
               }
             },
@@ -63,7 +63,7 @@ describe('withCertificates', () => {
               certificate: certificates[1][1],
               pointer: {
                 certIndex: 1,
-                slot: 1,
+                slot: 1n,
                 txIndex: 1
               }
             }

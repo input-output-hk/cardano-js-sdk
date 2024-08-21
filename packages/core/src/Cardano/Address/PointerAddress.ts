@@ -3,7 +3,6 @@ import { Address, AddressProps, AddressType, Credential, CredentialType } from '
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { InvalidArgumentError, OpaqueNumber } from '@cardano-sdk/util';
 import { NetworkId } from '../ChainId';
-import { Slot } from '../types/Block';
 
 /**
  * Encodes the specified value with a variable number of bytes.
@@ -11,19 +10,23 @@ import { Slot } from '../types/Block';
  * @param val The value to be encoded/compressed.
  * @returns a Buffer with the encoded value.
  */
-const variableLengthEncode = (val: number): Buffer => {
+const variableLengthEncode = (val: number | bigint): Buffer => {
+  if (typeof val !== 'bigint') {
+    val = BigInt(val);
+  }
+
   if (val < 0) {
     throw new InvalidArgumentError('val', `Negative numbers not supported. Number supplied: ${val}`);
   }
 
   const encoded = [];
   let bitLength = val.toString(2).length;
-  encoded.push(val & 127);
+  encoded.push(Number(val & 127n));
 
   while (bitLength > 7) {
-    val >>= 7;
+    val >>= 7n;
     bitLength -= 7;
-    encoded.unshift((val & 127) + 128);
+    encoded.unshift(Number((val & 127n) + 128n));
   }
 
   return Buffer.from(encoded);
@@ -35,15 +38,15 @@ const variableLengthEncode = (val: number): Buffer => {
  * @param array The encoded value.
  * @returns the decoded value.
  */
-const variableLengthDecode = (array: Buffer): { value: number; bytesRead: number } => {
+const variableLengthDecode = (array: Buffer): { value: bigint; bytesRead: number } => {
   let more = true;
-  let value = 0;
+  let value = 0n;
 
   let bytesRead = 0;
   while (more && bytesRead < array.length) {
     const b = array[bytesRead];
-    value <<= 7;
-    value |= b & 127;
+    value <<= 7n;
+    value |= BigInt(b & 127);
 
     more = (b & 128) !== 0;
     ++bytesRead;
@@ -65,7 +68,7 @@ export const CertIndex = (value: number): CertIndex => value as unknown as CertI
  * a stake key by a location on the blockchain of the stake key registration certificate.
  */
 export type Pointer = {
-  slot: Slot;
+  slot: bigint;
   txIndex: TxIndex;
   certIndex: CertIndex;
 };
@@ -204,7 +207,7 @@ export class PointerAddress {
         hash: paymentCredential,
         type: type === AddressType.PointerScript ? CredentialType.ScriptHash : CredentialType.KeyHash
       },
-      pointer: { certIndex: CertIndex(certIndex), slot: Slot(slot), txIndex: TxIndex(txIndex) },
+      pointer: { certIndex: CertIndex(Number(certIndex)), slot, txIndex: TxIndex(Number(txIndex)) },
       type
     });
   }

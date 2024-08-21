@@ -24,7 +24,7 @@ export const SCRIPT_CREDENTIAL: Cardano.Credential = {
 
 export const POINTER: Cardano.Pointer = {
   certIndex: Cardano.CertIndex(3),
-  slot: Cardano.Slot(2_498_243),
+  slot: 2_498_243n,
   txIndex: Cardano.TxIndex(27)
 };
 
