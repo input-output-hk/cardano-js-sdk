@@ -2,7 +2,6 @@ name: K6 WebSocket server load tests
 
 on:
   workflow_dispatch:
-    branches: ['master', 'feat/web-socket-network-info-provider']
     inputs:
       environment:
         description: 'Target environment'
@@ -12,7 +11,7 @@ on:
           - 'dev'
           - 'ops'
           - 'staging'
-          - 'prod'
+          - 'live'
       network:
         description: 'Target network'
         type: choice
@@ -34,6 +33,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: 🧰 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.12.0
+      - name: 🔨 Build
+        run: |
+          yarn install --immutable --inline-builds --mode=skip-build
+          yarn workspace @cardano-sdk/util-dev build:cjs
+        env:
+          NODE_OPTIONS: '--max_old_space_size=8192'
       - name: Run k6 cloud test
         uses: grafana/k6-action@v0.3.1
         env:
