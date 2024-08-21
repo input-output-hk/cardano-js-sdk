@@ -58,7 +58,7 @@ import memoize from 'lodash/memoize.js';
 
 const isNodeJs = typeof process !== 'undefined' && process.release?.name === 'node';
 // tsc doesn't like the 'import' of this package, works with webpack
-const customHttpFetchAdapter = isNodeJs ? undefined : require('@vespaiach/axios-fetch-adapter').default;
+const customHttpFetchAdapter = isNodeJs ? undefined : require('@shiroyasha9/axios-fetch-adapter').default;
 
 // CONSTANTS
 const HTTP_PROVIDER = 'http';

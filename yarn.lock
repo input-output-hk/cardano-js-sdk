@@ -3106,8 +3106,8 @@ __metadata:
     "@cardano-sdk/util": "workspace:~"
     "@cardano-sdk/util-dev": "workspace:~"
     "@types/validator": ^13.7.1
-    axios: ^0.28.0
-    axios-mock-adapter: ^1.20.0
+    axios: ^1.7.4
+    axios-mock-adapter: ^2.0.0
     class-validator: ^0.14.0
     eslint: ^7.32.0
     express: ^4.17.3
@@ -3152,8 +3152,8 @@ __metadata:
     "@types/uuid": ^8.3.4
     "@types/wait-on": ^5.3.1
     "@types/ws": ^8.5.10
-    axios: ^0.28.0
-    axios-mock-adapter: ^1.20.0
+    axios: ^1.7.4
+    axios-mock-adapter: ^2.0.0
     backoff-rxjs: ^7.0.0
     bignumber.js: ^9.1.0
     body-parser: ^1.19.2
@@ -3332,6 +3332,7 @@ __metadata:
     "@dcspark/cardano-multiplatform-lib-browser": ^3.1.1
     "@dcspark/cardano-multiplatform-lib-nodejs": ^3.1.1
     "@emurgo/cardano-message-signing-asmjs": ^1.0.1
+    "@shiroyasha9/axios-fetch-adapter": 1.0.3
     "@types/bunyan": ^1.8.8
     "@types/chalk": ^2.2.0
     "@types/convict": ^6.1.2
@@ -3343,14 +3344,13 @@ __metadata:
     "@types/ora": ^3.2.0
     "@types/uuid": ^8.3.4
     "@types/webextension-polyfill": ^0.8.0
-    "@vespaiach/axios-fetch-adapter": ^0.3.0
     "@wdio/cli": ^7.19.5
     "@wdio/local-runner": ^7.19.5
     "@wdio/mocha-framework": ^7.19.5
     "@wdio/spec-reporter": ^7.19.5
     "@wdio/static-server-service": ^7.19.5
     artillery: ^2.0.0-35
-    axios: ^0.28.0
+    axios: ^1.7.4
     babel-loader: ^8.2.5
     blake2b-no-wasm: 2.1.4
     buffer: ^6.0.3
@@ -3694,7 +3694,7 @@ __metadata:
     "@cardano-sdk/util": "workspace:~"
     "@types/dockerode": ^3.3.8
     "@types/jest": ^26.0.24
-    axios: ^0.28.0
+    axios: ^1.7.4
     delay: ^5.0.0
     dockerode: ^3.3.1
     dockerode-utils: ^0.0.7
@@ -5769,6 +5769,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@shiroyasha9/axios-fetch-adapter@npm:1.0.3":
+  version: 1.0.3
+  resolution: "@shiroyasha9/axios-fetch-adapter@npm:1.0.3"
+  peerDependencies:
+    axios: ">=1.6.0"
+  checksum: 8e7b3c0137b87b3b6f29963c32839fa8a2366c91e8dce0d6e7ce1ceefffcd9ad7e28810a6659b8f2b3fd8ae4a1c1f105186c048b92c34c24a40b1389f0b1fbcf
+  languageName: node
+  linkType: hard
+
 "@sideway/address@npm:^4.1.3":
   version: 4.1.4
   resolution: "@sideway/address@npm:4.1.4"
@@ -7833,15 +7842,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vespaiach/axios-fetch-adapter@npm:^0.3.0":
-  version: 0.3.1
-  resolution: "@vespaiach/axios-fetch-adapter@npm:0.3.1"
-  peerDependencies:
-    axios: ">=0.26.0"
-  checksum: 976a7f920ec2eddeb08fcced2980139f046f72df767e693440a2b727afef65e5664e24a1e8d4c9cf053db717a6fe2395f7e53ac56c3fb1cc6d2d6a90203cb1cf
-  languageName: node
-  linkType: hard
-
 "@wdio/cli@npm:^7.19.5":
   version: 7.25.4
   resolution: "@wdio/cli@npm:7.25.4"
@@ -9204,15 +9204,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios-mock-adapter@npm:^1.20.0":
-  version: 1.21.2
-  resolution: "axios-mock-adapter@npm:1.21.2"
+"axios-mock-adapter@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "axios-mock-adapter@npm:2.0.0"
   dependencies:
     fast-deep-equal: ^3.1.3
     is-buffer: ^2.0.5
   peerDependencies:
     axios: ">= 0.17.0"
-  checksum: 0d334838a819597f49fd5bf807e2a46cd846397cbea734fd53dcb425dee914e2d3e57cff65eb36af70cdbba848416c48979b75223afbfc1ab49789fd12011618
+  checksum: e4001866b066484ba6834f49bef77b52eca32fca4ab9758b2359b71935d6c3aad4bf30baddf0aa2e3cef32e287f996afeece43b02cc159769c128a266b79dfb5
   languageName: node
   linkType: hard
 
@@ -9235,17 +9235,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^0.28.0":
-  version: 0.28.1
-  resolution: "axios@npm:0.28.1"
-  dependencies:
-    follow-redirects: ^1.15.0
-    form-data: ^4.0.0
-    proxy-from-env: ^1.1.0
-  checksum: 5115a38d79064d07437c5a28f15841e3607634040e3120ec06a2c4367a7d07cf213b16496eab53b6f58ebc5fb377a440ba9ed4782529b14449a1e285734bfb54
-  languageName: node
-  linkType: hard
-
 "axios@npm:^1.6.0":
   version: 1.6.2
   resolution: "axios@npm:1.6.2"
@@ -9254,6 +9243,17 @@ __metadata:
     form-data: ^4.0.0
     proxy-from-env: ^1.1.0
   checksum: 4a7429e2b784be0f2902ca2680964391eae7236faa3967715f30ea45464b98ae3f1c6f631303b13dfe721b17126b01f486c7644b9ef276bfc63112db9fd379f8
+  languageName: node
+  linkType: hard
+
+"axios@npm:^1.7.4":
+  version: 1.7.4
+  resolution: "axios@npm:1.7.4"
+  dependencies:
+    follow-redirects: ^1.15.6
+    form-data: ^4.0.0
+    proxy-from-env: ^1.1.0
+  checksum: 0c17039a9acfe6a566fca8431ba5c1b455c83d30ea6157fec68a6722878fcd30f3bd32d172f6bee0c51fe75ca98e6414ddcd968a87b5606b573731629440bfaf
   languageName: node
   linkType: hard
 
@@ -14307,7 +14307,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.14.7, follow-redirects@npm:^1.14.9, follow-redirects@npm:^1.15.0":
+"follow-redirects@npm:^1.14.7, follow-redirects@npm:^1.14.9, follow-redirects@npm:^1.15.0, follow-redirects@npm:^1.15.6":
   version: 1.15.6
   resolution: "follow-redirects@npm:1.15.6"
   peerDependenciesMeta:
