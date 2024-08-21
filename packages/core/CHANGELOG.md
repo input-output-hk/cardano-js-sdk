@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.38.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.38.1...@cardano-sdk/core@0.38.2) (2024-08-21)
+
+### Features
+
+* **core:** adds CIP20 TxMetadata helper functions ([8bc200a](https://github.com/input-output-hk/cardano-js-sdk/commit/8bc200a9427a82705c2283f2c0e3529150e3b569))
+
 ## [0.38.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.38.0...@cardano-sdk/core@0.38.1) (2024-08-20)
 
 ### Bug Fixes
