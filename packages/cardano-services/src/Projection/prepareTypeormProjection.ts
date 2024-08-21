@@ -67,7 +67,7 @@ export enum ProjectionName {
   StakePoolMetadataJob = 'stake-pool-metadata-job',
   StakePoolMetricsJob = 'stake-pool-metrics-job',
   StakePoolRewardsJob = 'stake-pool-rewards-job',
-  Transactions = 'transactions',
+  Transaction = 'transaction',
   UTXO = 'utxo'
 }
 
@@ -307,7 +307,7 @@ const projectionStoreDependencies: Record<ProjectionName, StoreName[]> = {
   'stake-pool-metadata-job': ['storeStakePoolMetadataJob'],
   'stake-pool-metrics-job': ['storePoolMetricsUpdateJob'],
   'stake-pool-rewards-job': ['storeStakePoolRewardsJob'],
-  transactions: ['storeCredentials', 'storeTransactions'],
+  transaction: ['storeCredentials', 'storeTransactions'],
   utxo: ['storeUtxo']
 };
 
