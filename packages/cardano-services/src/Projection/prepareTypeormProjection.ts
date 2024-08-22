@@ -307,7 +307,7 @@ const projectionStoreDependencies: Record<ProjectionName, StoreName[]> = {
   'stake-pool-metadata-job': ['storeStakePoolMetadataJob'],
   'stake-pool-metrics-job': ['storePoolMetricsUpdateJob'],
   'stake-pool-rewards-job': ['storeStakePoolRewardsJob'],
-  transaction: ['storeCredentials', 'storeTransactions'],
+  transactions: ['storeCredentials', 'storeTransactions'],
   utxo: ['storeUtxo']
 };
 
