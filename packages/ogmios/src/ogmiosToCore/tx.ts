@@ -464,6 +464,7 @@ export const mapBlockBody = (block: CommonBlock | Schema.BlockBFT): Cardano.Bloc
     type !== 'bft' && transaction.cbor
       ? {
           ...Serialization.Transaction.fromCbor(transaction.cbor as Serialization.TxCBOR).toCore(),
+          cbor: transaction.cbor as Serialization.TxCBOR,
           inputSource: mapInputSource(transaction.spends)
         }
       : mapCommonTx(transaction)
