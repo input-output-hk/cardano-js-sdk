@@ -99,6 +99,7 @@ const createMapperOperators = (
     withAddresses: Mapper.withAddresses(),
     withCIP67: Mapper.withCIP67(),
     withCertificates: Mapper.withCertificates(),
+    withGovernanceActions: Mapper.withGovernanceActions(),
     withHandleMetadata,
     withHandles,
     withMint: Mapper.withMint(),
@@ -250,6 +251,7 @@ const mapperInterDependencies: Partial<Record<MapperName, MapperName[]>> = {
 const storeMapperDependencies: Partial<Record<StoreName, MapperName[]>> = {
   storeAddresses: ['withAddresses'],
   storeAssets: ['withMint'],
+  storeGovernanceAction: ['withGovernanceActions'],
   storeHandleMetadata: ['withHandleMetadata'],
   storeHandles: ['withHandles'],
   storeNftMetadata: ['withNftMetadata'],
