@@ -100,7 +100,13 @@ if [[ $ENV == live ]] ; then
   esac
 else
   INPUT_DB=$3
-  REGION=us-east-1
+
+  if [[ $ENV == dev ]] ; then
+    REGION=us-east-1
+  else
+    REGION=eu-west-1
+  fi
+
 fi
 
 case $INPUT_DB in
