@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.38.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.38.2...@cardano-sdk/core@0.38.3) (2024-08-22)
+
+### Bug Fixes
+
+* export TxMetadata module from core package root ([e687b71](https://github.com/input-output-hk/cardano-js-sdk/commit/e687b719497112a91c891615868ccaec872370c1))
+
 ## [0.38.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.38.1...@cardano-sdk/core@0.38.2) (2024-08-21)
 
 ### Features
