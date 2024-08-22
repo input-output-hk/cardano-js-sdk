@@ -321,13 +321,19 @@ export class ProtocolParamUpdate {
         case 12n:
           params.#d = UnitInterval.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
           break;
-        case 13n:
+        case 13n: {
           // entropy is encoded as an array of two elements, where the second elements is the entropy value
-          reader.readStartArray();
-          reader.readEncodedValue();
-          params.#extraEntropy = HexBlob.fromBytes(reader.readByteString());
-          reader.readEndArray();
+          const size = reader.readStartArray();
+          if (size === 1) {
+            reader.readEncodedValue();
+            reader.readEndArray();
+          } else {
+            reader.readEncodedValue();
+            params.#extraEntropy = HexBlob.fromBytes(reader.readByteString());
+            reader.readEndArray();
+          }
           break;
+        }
         case 14n:
           params.#protocolVersion = ProtocolVersion.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
           break;
