@@ -1,1 +1,1 @@
-export * from './cip20';
+export * as CIP20 from './cip20';
