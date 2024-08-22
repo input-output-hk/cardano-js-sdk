@@ -1,6 +1,6 @@
+import { Cardano } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 import { StringUtils } from '@cardano-sdk/util';
-import { TxMetadata } from '../Cardano';
 
 export const CIP_20_METADATUM_LABEL = 674n;
 const MAX_BYTES = 64;
@@ -53,7 +53,7 @@ export const validateMessage = (entry: unknown): MessageValidationResult => {
  * @returns CIP20-compliant transaction metadata
  * @throws Message validation error containing details. Use validateMessage to independently check each message before calling this function
  */
-export const toCIP20Metadata = (args: CIP20TxMetadataArgs | string): TxMetadata => {
+export const toCIP20Metadata = (args: CIP20TxMetadataArgs | string): Cardano.TxMetadata => {
   const messages = typeof args === 'string' ? StringUtils.chunkByBytes(args, MAX_BYTES) : args.messages;
   const invalidMessages: ValidationResultMap = new Map();
   for (const message of messages) {

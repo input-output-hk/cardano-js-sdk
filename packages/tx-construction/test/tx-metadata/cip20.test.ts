@@ -4,11 +4,10 @@ import {
   MessageValidationFailure,
   toCIP20Metadata,
   validateMessage
-} from '../../src/TxMetadata';
-import { Cardano } from '../../src';
-import { TxMetadata } from '../../src/Cardano';
+} from '../../src';
+import { Cardano } from '@cardano-sdk/core';
 
-describe('TxMetadata.cip20', () => {
+describe('CIP-20 helper functions', () => {
   const compliantShortMessage = 'Lorem ipsum dolor';
   const compliantMaxMessage = 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean';
   const oversizeMessage = `${compliantMaxMessage}1`;
@@ -44,7 +43,7 @@ describe('TxMetadata.cip20', () => {
   describe('toCIP20Metadata', () => {
     describe('args object', () => {
       it('produces a CIP-20-compliant TxMetadata map', () => {
-        const metadata = toCIP20Metadata({ messages: [compliantShortMessage] }) as TxMetadata;
+        const metadata = toCIP20Metadata({ messages: [compliantShortMessage] }) as Cardano.TxMetadata;
         expect(metadata.has(CIP_20_METADATUM_LABEL)).toBe(true);
         const cip20Metadata = metadata.get(CIP_20_METADATUM_LABEL) as Cardano.MetadatumMap;
         expect(cip20Metadata.get('msg')).toStrictEqual([compliantShortMessage]);
@@ -59,19 +58,19 @@ describe('TxMetadata.cip20', () => {
     });
     describe('producing a CIP-20-compliant TxMetadata map with a string arg', () => {
       test('larger than 64 bytes', () => {
-        const metadata = toCIP20Metadata(oversizeMessage) as TxMetadata;
+        const metadata = toCIP20Metadata(oversizeMessage) as Cardano.TxMetadata;
         expect(metadata.has(CIP_20_METADATUM_LABEL)).toBe(true);
         const cip20Metadata = metadata.get(CIP_20_METADATUM_LABEL) as Cardano.MetadatumMap;
         expect((cip20Metadata.get('msg') as string[]).length).toBe(2);
       });
       test('equal to 64 bytes', () => {
-        const metadata = toCIP20Metadata(compliantMaxMessage) as TxMetadata;
+        const metadata = toCIP20Metadata(compliantMaxMessage) as Cardano.TxMetadata;
         expect(metadata.has(CIP_20_METADATUM_LABEL)).toBe(true);
         const cip20Metadata = metadata.get(CIP_20_METADATUM_LABEL) as Cardano.MetadatumMap;
         expect((cip20Metadata.get('msg') as string[]).length).toBe(1);
       });
       test('smaller than to 64 bytes', () => {
-        const metadata = toCIP20Metadata(compliantShortMessage) as TxMetadata;
+        const metadata = toCIP20Metadata(compliantShortMessage) as Cardano.TxMetadata;
         expect(metadata.has(CIP_20_METADATUM_LABEL)).toBe(true);
         const cip20Metadata = metadata.get(CIP_20_METADATUM_LABEL) as Cardano.MetadatumMap;
         expect((cip20Metadata.get('msg') as string[]).length).toBe(1);
