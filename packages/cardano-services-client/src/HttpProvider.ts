@@ -2,12 +2,10 @@
 import { HttpProviderConfigPaths, Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
-import axios, { AxiosAdapter, AxiosRequestConfig, AxiosResponseTransformer } from 'axios';
+import axios, { AxiosAdapter, AxiosRequestConfig, AxiosRequestTransformer, AxiosResponseTransformer } from 'axios';
 import packageJson from '../package.json';
 
 const isEmptyResponse = (response: any) => response === '';
-
-type ResponseTransformers<T> = { [K in keyof T]?: AxiosResponseTransformer };
 
 export interface HttpProviderConfig<T extends Provider> {
   /** The OpenApi version, which forms part of the URL scheme */
@@ -34,9 +32,6 @@ export interface HttpProviderConfig<T extends Provider> {
   /** Logger strategy. */
   logger: Logger;
 
-  /** Transform responses */
-  responseTransformers?: ResponseTransformers<T>;
-
   /** Slug used in the URL path */
   serviceSlug: string;
 }
@@ -48,6 +43,16 @@ export type CreateHttpProviderConfig<T extends Provider> = Pick<
 > & {
   /** Override the OpenApi version */
   apiVersion?: string;
+};
+
+const transformResponse: AxiosResponseTransformer = (v) => {
+  if (!v) return v;
+  if (typeof v === 'string') v = JSON.parse(v);
+  return fromSerializableObject(v, { errorTypes: [ProviderError] });
+};
+const transformRequest: AxiosRequestTransformer = (data) => {
+  if (!data) return data;
+  return JSON.stringify(toSerializableObject(data));
 };
 
 /**
@@ -68,7 +73,6 @@ export const createHttpProvider = <T extends Provider>({
   paths,
   adapter,
   logger,
-  responseTransformers,
   serviceSlug
 }: HttpProviderConfig<T>): T =>
   new Proxy<T>({} as T, {
@@ -77,8 +81,6 @@ export const createHttpProvider = <T extends Provider>({
       if (prop === 'then') return;
       const method = prop as keyof T;
       const urlPath = paths[method];
-      const transformResponse =
-        responseTransformers && responseTransformers[method] ? responseTransformers[method]! : (v: unknown) => v;
       if (!urlPath)
         throw new ProviderError(ProviderFailure.NotImplemented, `HttpProvider missing path for '${prop.toString()}'`);
       return async (...args: any[]) => {
@@ -90,32 +92,26 @@ export const createHttpProvider = <T extends Provider>({
             data: { ...args[0] },
             headers: {
               ...axiosOptions?.headers,
+              'Content-Type': 'application/json',
               'Version-Api': JSON.stringify(apiVersion),
               'Version-Software': packageJson.version
             },
             method: 'post',
             responseType: 'json',
+            transformRequest,
+            transformResponse,
             url: urlPath
           };
           logger.debug(`Sending ${req.method} request to ${req.baseURL}${req.url} with data:`);
           logger.debug(req.data);
 
           const axiosInstance = axios.create(req);
-
-          axiosInstance.interceptors.request.use((value) => {
-            if (value.data) value.data = toSerializableObject(value.data);
-            return value;
-          });
-          axiosInstance.interceptors.response.use((value) => ({
-            ...value,
-            data: transformResponse(fromSerializableObject(value.data, { errorTypes: [ProviderError] }))
-          }));
           const response = (await axiosInstance.request(req)).data;
           return !isEmptyResponse(response) ? response : undefined;
         } catch (error) {
           if (axios.isAxiosError(error)) {
             if (error.response) {
-              const typedError = fromSerializableObject(error.response.data, { errorTypes: [ProviderError] });
+              const typedError = error.response.data;
               if (mapError) return mapError(typedError, method);
               throw new ProviderError(ProviderFailure.Unknown, typedError);
             }

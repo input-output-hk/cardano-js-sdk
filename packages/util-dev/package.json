@@ -57,7 +57,7 @@
     "@cardano-sdk/key-management": "workspace:~",
     "@cardano-sdk/util": "workspace:~",
     "@types/dockerode": "^3.3.8",
-    "axios": "^0.28.0",
+    "axios": "^1.7.4",
     "delay": "^5.0.0",
     "dockerode": "^3.3.1",
     "dockerode-utils": "^0.0.7",
