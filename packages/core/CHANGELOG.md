@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.39.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.38.3...@cardano-sdk/core@0.39.0) (2024-08-23)
+
+### ⚠ BREAKING CHANGES
+
+* move CIP-20 utils to tx-construction package
+
+### Code Refactoring
+
+* move CIP-20 utils to tx-construction package ([33422e4](https://github.com/input-output-hk/cardano-js-sdk/commit/33422e423f0530b066545120a16b247938a1884b))
+
 ## [0.38.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.38.2...@cardano-sdk/core@0.38.3) (2024-08-22)
 
 ### Bug Fixes
