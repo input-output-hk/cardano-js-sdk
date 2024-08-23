@@ -12,8 +12,8 @@ export const supplyDistributionTrackerReady = (async () =>
     {
       logger,
       networkInfoProvider: await networkInfoProviderFactory.create(
-        env.NETWORK_INFO_PROVIDER,
-        env.NETWORK_INFO_PROVIDER_PARAMS,
+        env.TEST_CLIENT_NETWORK_INFO_PROVIDER,
+        env.TEST_CLIENT_NETWORK_INFO_PROVIDER_PARAMS,
         logger
       ),
       stores: storage.createPouchDbSupplyDistributionStores(walletName, { logger })
