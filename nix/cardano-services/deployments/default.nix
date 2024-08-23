@@ -623,7 +623,6 @@ in
             cardano-services = {
               ingresOrder = 98;
             };
-            backend.hostnames = ["${final.namespace}.${final.region}.${baseUrl}"];
           };
         };
 
