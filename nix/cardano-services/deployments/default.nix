@@ -430,7 +430,7 @@ in
           providers = {
             backend = {
               enabled = true;
-              replicas = 2;
+              replicas = 4;
               env.NODE_ENV = "production";
             };
             stake-pool-provider = {
@@ -489,7 +489,7 @@ in
           providers = {
             backend = {
               enabled = true;
-              replicas = 2;
+              replicas = 4;
               env.NODE_ENV = "production";
             };
             stake-pool-provider = {
