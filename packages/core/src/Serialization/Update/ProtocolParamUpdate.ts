@@ -324,11 +324,11 @@ export class ProtocolParamUpdate {
         case 13n: {
           // entropy is encoded as an array of two elements, where the second elements is the entropy value
           const size = reader.readStartArray();
+          reader.readEncodedValue();
+
           if (size === 1) {
-            reader.readEncodedValue();
             reader.readEndArray();
           } else {
-            reader.readEncodedValue();
             params.#extraEntropy = HexBlob.fromBytes(reader.readByteString());
             reader.readEndArray();
           }
