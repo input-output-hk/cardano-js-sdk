@@ -70,7 +70,7 @@
       NETWORK = config.network;
       LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
       OGMIOS_SRV_SERVICE_NAME = values.backend.ogmiosSrvServiceName;
-      PROJECTION_NAMES = "wallet-api";
+      PROJECTION_NAMES = "protocol-parameters";
 
       POSTGRES_POOL_MAX = "2";
       POSTGRES_HOST = values.postgresName;
