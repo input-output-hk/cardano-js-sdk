@@ -6,7 +6,7 @@
   chart,
   ...
 }: {
-  providers.wallet-api = {
+  providers.wallet-api-provider = {
     inherit (values.cardano-services) image;
     args = ["start-provider-server"];
     port = 3000;
@@ -21,38 +21,75 @@
     };
 
     env = {
-      NETWORK = config.network;
-      ENABLE_METRICS = "true";
-      SERVICE_NAMES = "wallet-api-projector";
-      OGMIOS_SRV_SERVICE_NAME = values.backend.ogmiosSrvServiceName;
-      LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
-      TOKEN_METADATA_SERVER_URL = values.cardano-services.tokenMetadataServerUrl;
-      HANDLE_POLICY_IDS = "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a";
-      USE_BLOCKFROST = "true";
-      USE_KORA_LABS = "true";
-      DISABLE_STAKE_POOL_METRIC_APY = "true";
-      PAGINATION_PAGE_SIZE_LIMIT = "5500";
-
       ALLOWED_ORIGINS = values.backend.allowedOrigins;
 
-      POSTGRES_POOL_MAX_DB_SYNC = "50";
-      POSTGRES_HOST_DB_SYNC = values.postgresName;
-      POSTGRES_PORT_DB_SYNC = "5432";
-      POSTGRES_DB_DB_SYNC = "wallet_api";
-      POSTGRES_PASSWORD_DB_SYNC = {
+      NETWORK = config.network;
+      OGMIOS_SRV_SERVICE_NAME = values.backend.ogmiosSrvServiceName;
+      LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
+      ENABLE_METRICS = "true";
+      PAGINATION_PAGE_SIZE_LIMIT = "5500";
+      SERVICE_NAMES = "wallet-api";
+      TOKEN_METADATA_SERVER_URL = values.cardano-services.tokenMetadataServerUrl;
+      USE_TYPEORM_ASSET_PROVIDER = "true";
+
+      POSTGRES_POOL_MAX_ASSET = "500";
+      POSTGRES_HOST_ASSET = values.postgresName;
+      POSTGRES_PORT_ASSET = "5432";
+      POSTGRES_DB_ASSET = "wallet_api";
+      POSTGRES_PASSWORD_ASSET = {
         valueFrom.secretKeyRef = {
           name = "wallet-api-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
           key = "password";
         };
       };
-      POSTGRES_USER_DB_SYNC = {
+      POSTGRES_USER_ASSET = {
         valueFrom.secretKeyRef = {
           name = "wallet-api-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
           key = "username";
         };
       };
-      POSTGRES_SSL_DB_SYNC = "true";
-      POSTGRES_SSL_CA_FILE_DB_SYNC = "/tls/ca.crt";
+      POSTGRES_SSL_ASSET = "true";
+      POSTGRES_SSL_CA_FILE_ASSET = "/tls/ca.crt";
+    };
+  };
+
+  projectors.wallet-api = {
+    inherit (values.cardano-services) image;
+    livenessProbe = {
+      timeoutSeconds = 5;
+      httpGet = {
+        path = "${values.cardano-services.httpPrefix}/health";
+        port = 3000;
+      };
+    };
+
+    args = ["start-projector"];
+    port = 3000;
+
+    env = {
+      NETWORK = config.network;
+      LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
+      OGMIOS_SRV_SERVICE_NAME = values.backend.ogmiosSrvServiceName;
+      PROJECTION_NAMES = "wallet-api";
+
+      POSTGRES_POOL_MAX = "2";
+      POSTGRES_HOST = values.postgresName;
+      POSTGRES_PORT = "5432";
+      POSTGRES_DB = "wallet_api";
+      POSTGRES_PASSWORD = {
+        valueFrom.secretKeyRef = {
+          name = "wallet-api-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
+          key = "password";
+        };
+      };
+      POSTGRES_USER = {
+        valueFrom.secretKeyRef = {
+          name = "wallet-api-owner-user.${values.postgresName}.credentials.postgresql.acid.zalan.do";
+          key = "username";
+        };
+      };
+      POSTGRES_SSL = "true";
+      POSTGRES_SSL_CA_FILE = "/tls/ca.crt";
     };
   };
 }
