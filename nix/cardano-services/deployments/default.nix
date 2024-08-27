@@ -220,9 +220,10 @@ in
           };
 
           projectors = {
+            asset.enabled = true;
             handle.enabled = true;
             stake-pool.enabled = true;
-            asset.enabled = true;
+            wallet-api.enabled = true;
           };
 
           values = {
@@ -272,9 +273,10 @@ in
           };
 
           projectors = {
+            asset.enabled = true;
             handle.enabled = true;
             stake-pool.enabled = true;
-            asset.enabled = true;
+            wallet-api.enabled = true;
           };
 
           values = {
@@ -319,9 +321,10 @@ in
           };
 
           projectors = {
+            asset.enabled = true;
             handle.enabled = true;
             stake-pool.enabled = true;
-            asset.enabled = true;
+            # wallet-api.enabled = true;
           };
 
           values = {
@@ -368,9 +371,10 @@ in
           };
 
           projectors = {
+            asset.enabled = true;
             handle.enabled = true;
             stake-pool.enabled = true;
-            asset.enabled = true;
+            wallet-api.enabled = true;
           };
 
           values = {
@@ -409,9 +413,10 @@ in
           };
 
           projectors = {
+            asset.enabled = true;
             handle.enabled = true;
             stake-pool.enabled = true;
-            asset.enabled = true;
+            wallet-api.enabled = true;
           };
 
           values = {
@@ -575,9 +580,10 @@ in
           };
 
           projectors = {
+            # asset.enabled = true;
             handle.enabled = true;
             stake-pool.enabled = true;
-            # asset.enabled = true;
+            wallet-api.enabled = true;
           };
 
           values = {
@@ -838,9 +844,9 @@ in
           };
 
           projectors = {
-            wallet-api.enabled = true;
             handle.enabled = true;
             stake-pool.enabled = true;
+            wallet-api.enabled = true;
           };
 
 
