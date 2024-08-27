@@ -188,6 +188,7 @@ in
         };
       };
       imports = [
+        ./wallet-api.nix
         ./options.nix
         ./ws-server.deployment.nix
         ./provider.resource.nix
