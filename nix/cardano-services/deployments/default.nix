@@ -96,6 +96,11 @@ in
           resources.requests = mkPodResources "150Mi" "100m";
         };
 
+        wallet-api = {
+          resources.limits = mkPodResources "300Mi" "1000m";
+          resources.requests = mkPodResources "150Mi" "100m";
+        };
+
         asset = {
           resources.limits = mkPodResources "300Mi" "700m";
           resources.requests = mkPodResources "150Mi" "700m";
@@ -126,6 +131,7 @@ in
           resources.limits = mkPodResources "300Mi" "500m";
           resources.requests = mkPodResources "150Mi" "100m";
         };
+
         pg-boss-worker = {
           enabled = false;
           queues = "pool-delist-schedule,pool-metadata,pool-metrics,pool-rewards";
@@ -177,6 +183,7 @@ in
         };
       };
       imports = [
+        ./wallet-api.nix
         ./options.nix
         ./ws-server.deployment.nix
         ./provider.resource.nix
@@ -822,10 +829,24 @@ in
             backend = {
               enabled = true;
             };
+            handle-provider.enabled = true;
             chain-history-provider.enabled = true;
+            stake-pool-provider = {
+              enabled = true;
+              env.OVERRIDE_FUZZY_OPTIONS = "true";
+            };
           };
 
+          projectors = {
+            wallet-api.enabled = true;
+            handle.enabled = true;
+            stake-pool.enabled = true;
+          };
+
+
           values = {
+            pg-boss-worker.enabled = true;
+            pg-boss-worker.queues = "pool-delist-schedule,pool-metadata,pool-metrics,pool-rewards";
             ws-server.enabled = true;
             cardano-services = {
               ingresOrder = 99;
