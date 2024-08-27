@@ -79,11 +79,6 @@ in
           resources.requests = mkPodResources "150Mi" "100m";
         };
 
-        wallet-api-provider = {
-          resources.limits = mkPodResources "300Mi" "500m";
-          resources.requests = mkPodResources "150Mi" "100m";
-        };
-
         chain-history-provider = {
           resources.limits = mkPodResources "300Mi" "1200m";
           resources.requests = mkPodResources "150Mi" "1000m";
@@ -851,7 +846,7 @@ in
 
           values = {
             pg-boss-worker.enabled = true;
-            pg-boss-worker.queues = "pool-metadata,pool-metrics";
+            pg-boss-worker.queues = "pool-delist-schedule,pool-metadata,pool-metrics,pool-rewards";
             ws-server.enabled = true;
             cardano-services = {
               ingresOrder = 99;
