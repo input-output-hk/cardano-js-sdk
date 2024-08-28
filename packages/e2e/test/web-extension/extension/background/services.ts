@@ -16,8 +16,8 @@ const priceService: BackgroundServices = {
   clearAllowList: authenticator.clear.bind(authenticator),
   getPoolIds: async (count: number): Promise<Cardano.StakePool[]> => {
     const stakePoolProvider = await stakePoolProviderFactory.create(
-      env.STAKE_POOL_PROVIDER,
-      env.STAKE_POOL_PROVIDER_PARAMS,
+      env.TEST_CLIENT_STAKE_POOL_PROVIDER,
+      env.TEST_CLIENT_STAKE_POOL_PROVIDER_PARAMS,
       logger
     );
 

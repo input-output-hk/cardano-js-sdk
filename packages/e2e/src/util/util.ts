@@ -171,8 +171,8 @@ export const waitForEpoch = (wallet: Pick<ObservableWallet, 'currentEpoch$'>, wa
 
 export const runningAgainstLocalNetwork = async () => {
   const networkInfoProvider = await networkInfoProviderFactory.create(
-    env.NETWORK_INFO_PROVIDER,
-    env.NETWORK_INFO_PROVIDER_PARAMS,
+    env.TEST_CLIENT_NETWORK_INFO_PROVIDER,
+    env.TEST_CLIENT_NETWORK_INFO_PROVIDER_PARAMS,
     logger
   );
   const { epochLength, slotLength } = await networkInfoProvider.genesisParameters();

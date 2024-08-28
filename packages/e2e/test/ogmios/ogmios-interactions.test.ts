@@ -167,17 +167,19 @@ describe('interactions with ogmios server', () => {
   });
 
   it('connection close is correctly handled', async () => {
-    const providerEnv = getEnv(['NETWORK_INFO_PROVIDER', 'NETWORK_INFO_PROVIDER_PARAMS'], {
+    const providerEnv = getEnv(['TEST_CLIENT_NETWORK_INFO_PROVIDER', 'TEST_CLIENT_NETWORK_INFO_PROVIDER_PARAMS'], {
       override: {
-        NETWORK_INFO_PROVIDER_PARAMS: JSON.stringify({ baseUrl: `http://localhost:${httpPort}/network-info` })
+        TEST_CLIENT_NETWORK_INFO_PROVIDER_PARAMS: JSON.stringify({
+          baseUrl: `http://localhost:${httpPort}/network-info`
+        })
       }
     });
 
     // This performs an health check behind the scenes, so this is enough
     // to establish and use the WebSocket connection to the ogmios server
     const networkInfoProvider = await networkInfoProviderFactory.create(
-      providerEnv.NETWORK_INFO_PROVIDER,
-      providerEnv.NETWORK_INFO_PROVIDER_PARAMS,
+      providerEnv.TEST_CLIENT_NETWORK_INFO_PROVIDER,
+      providerEnv.TEST_CLIENT_NETWORK_INFO_PROVIDER_PARAMS,
       logger
     );
 
