@@ -3,13 +3,9 @@ let
 
   # TODO: express this as OCI labels (what they are for)
   buildInfo = builtins.toJSON {
-    inherit (self) lastModified lastModifiedDate rev;
-    shortRev = self.shortRev or "no rev";
-    extra = {
-      inherit (self) narHash;
-      sourceInfo = self;
-      path = self.outPath;
-    };
+    inherit (self) lastModifiedDate ;
+    rev = self.dirtyRev or self.rev ;
+    shortRev = self.shortRev or self.dirtyShortRev;
   };
 
   setupSchedules =
