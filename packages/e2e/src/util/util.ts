@@ -90,6 +90,11 @@ export const normalizeTxBody = (body: Cardano.HydratedTxBody | Cardano.TxBody) =
   return dehydratedTx;
 };
 
+// We do not afford to wait for 3 confirmations on real network as it is a too long wait.
+// In preview it happened more than 4 minutes required to have 3 confirmations,
+// making the test to fail for timeout waiting for the third confirmation.
+const defaultWaitConfirmation = env.NETWORK_SPEED === 'fast' ? 3 : 1;
+
 export const txConfirmed = (
   {
     tip$,
@@ -99,7 +104,7 @@ export const txConfirmed = (
     }
   }: ObservableWallet,
   { id }: Pick<Cardano.Tx, 'id'>,
-  numConfirmations = 3
+  numConfirmations = defaultWaitConfirmation
 ) =>
   firstValueFromTimed(
     merge(

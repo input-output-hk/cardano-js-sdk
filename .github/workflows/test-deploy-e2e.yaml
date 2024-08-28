@@ -9,11 +9,32 @@ on:
         required: true
         default: 'dev-preprod'
         options:
-        - live-preprod
-        - live-preview
-        - dev-preprod
-        - dev-preview
-        - staging-preprod
+          - live-preprod
+          - live-preview
+          - dev-preprod
+          - dev-preview
+          - staging-preprod
+      cluster:
+        description: 'Specific cluster to run e2e tests against'
+        type: choice
+        required: true
+        default: 'any'
+        options:
+          - any
+          - eu-central-1
+          - us-east-2
+      level:
+        description: 'Log level'
+        type: choice
+        required: true
+        default: 'fatal'
+        options:
+          - fatal
+          - error
+          - warn
+          - info
+          - debug
+          - trace
 
 env:
   TL_DEPTH: ${{ github.event.pull_request.head.repo.fork && '0' || fromJson(vars.TL_DEPTH) }}
@@ -33,7 +54,7 @@ jobs:
         working-directory: ./packages/e2e/
         run: |
           if [[ "${{ inputs.environment }}" == *"preprod"* ]]; then networkMagic=1; else networkMagic=2; fi
-          ./src/scripts/generate-dotenv.sh ${{ inputs.environment }}
+          ./src/scripts/generate-dotenv.sh ${{ inputs.environment }} ${{ inputs.cluster }}
           echo "KEY_MANAGEMENT_PARAMS='$(jq --argjson networkMagic $networkMagic --arg mnemonic "${{ secrets.MNEMONIC }}" <<< '{"bip32Ed25519": "Sodium", "accountIndex": 0, "chainId":{"networkId": 0, "networkMagic": 0}, "passphrase":"some_passphrase","mnemonic":"mnemonics"}' '.mnemonic=$mnemonic | .chainId.networkMagic=$networkMagic')'" >> .env
 
       - name: 🧰 Setup Node.js
@@ -49,6 +70,7 @@ jobs:
         env:
           NODE_OPTIONS: '--max_old_space_size=8192'
 
-      - name: 🔬 Test - e2e - wallet at epoch 0
+      - name: 🔬 Test - e2e - wallet
         run: |
-          yarn workspace @cardano-sdk/e2e test:wallet
+          TL_DEPTH=0 TL_LEVEL=${{ inputs.level }} yarn workspace @cardano-sdk/e2e test:wallet-real-ada
+        shell: bash
