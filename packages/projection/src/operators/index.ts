@@ -1,4 +1,4 @@
-export * from './logOperatorDuration';
+export * from './withOperatorDuration';
 export * from './logProjectionProgress';
 export * as Mappers from './Mappers';
 export * from './requestNext';

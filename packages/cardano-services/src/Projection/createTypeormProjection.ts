@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable prefer-spread */
-import { Bootstrap, ProjectionEvent, logProjectionProgress, requestNext } from '@cardano-sdk/projection';
+import {
+  Bootstrap,
+  ProjectionEvent,
+  logProjectionProgress,
+  requestNext,
+  withOperatorDuration
+} from '@cardano-sdk/projection';
 import { Cardano, ObservableCardanoNode } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { Observable, concat, defer, groupBy, mergeMap, take, takeWhile } from 'rxjs';
@@ -41,14 +47,35 @@ export interface CreateTypeormProjectionProps {
   projectionOptions?: ProjectionOptions;
 }
 
+type TrackDurationProps = {
+  operatorNames: Array<string | null>;
+};
+
 const applyMappers =
-  <T = {}>(selectedMappers: PreparedProjection['mappers']) =>
+  <T = {}>(selectedMappers: PreparedProjection['mappers'], trackDurationProps?: TrackDurationProps) =>
   (evt$: Observable<ProjectionEvent>) =>
-    evt$.pipe.apply(evt$, selectedMappers as any) as Observable<ProjectionEvent<T>>;
+    evt$.pipe.apply(
+      evt$,
+      trackDurationProps
+        ? selectedMappers.map((mapper, i) =>
+            withOperatorDuration(trackDurationProps.operatorNames[i] || '', mapper as any)
+          )
+        : (selectedMappers as any)
+    ) as Observable<ProjectionEvent<T>>;
 const applyStores =
-  <T extends WithTypeormContext>(selectedStores: PreparedProjection['stores']) =>
+  <T extends WithTypeormContext>(
+    selectedStores: PreparedProjection['stores'],
+    trackDurationProps?: TrackDurationProps
+  ) =>
   (evt$: Observable<T>) =>
-    evt$.pipe.apply(evt$, selectedStores as any) as Observable<T>;
+    evt$.pipe.apply(
+      evt$,
+      trackDurationProps
+        ? selectedStores.map((mapper, i) =>
+            withOperatorDuration(trackDurationProps.operatorNames[i] || '', mapper as any)
+          )
+        : (selectedStores as any)
+    ) as Observable<T>;
 
 /**
  * Creates a projection observable that applies a sequence of operators
@@ -72,7 +99,7 @@ export const createTypeormProjection = ({
   logger.debug(`Creating projection with policyIds ${JSON.stringify(handlePolicyIds)}`);
   logger.debug(`Using a ${blocksBufferLength} blocks buffer`);
 
-  const { mappers, entities, stores, extensions, willStore } = prepareTypeormProjection(
+  const { mappers, entities, stores, extensions, willStore, __debug } = prepareTypeormProjection(
     {
       options: projectionOptions,
       projections
@@ -117,7 +144,9 @@ export const createTypeormProjection = ({
     ).pipe(take(1), toEmpty),
     defer(() =>
       projectionSource$.pipe(
-        applyMappers(mappers),
+        // TODO: only pass {operatorNames} if debugging;
+        // we should pass some cli argument here
+        applyMappers(mappers, { operatorNames: __debug.mappers }),
         // if there are any relevant data to write into db
         groupBy((evt) => willStore(evt)),
         mergeMap((group$) =>
@@ -127,7 +156,7 @@ export const createTypeormProjection = ({
                   (evt$) =>
                     evt$.pipe(
                       withTypeormTransaction({ connection$: connect() }),
-                      applyStores(stores),
+                      applyStores(stores, { operatorNames: __debug.stores }),
                       buffer.storeBlockData(),
                       typeormTransactionCommit()
                     ),
