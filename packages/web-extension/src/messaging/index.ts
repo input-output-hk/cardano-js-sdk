@@ -10,7 +10,7 @@ export * from './remoteApi';
 export * from './runContentScriptMessageProxy';
 export * from './types';
 export * from './util';
-export * from './injectedRuntime';
+export * from './createInjectedRuntime';
 export * from './errors';
 
 export type BaseChannel = { baseChannel: ChannelName };

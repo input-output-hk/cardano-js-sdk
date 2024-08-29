@@ -12,6 +12,7 @@ export const initializeContentScript = (
   { injectedScriptSrc, walletName }: InitializeContentScriptProps,
   dependencies: MessengerDependencies
 ) => {
+  // TODO: How to pass both with the channelName as apis {[channelName]: ApiObject}
   const apis = [
     consumeRemoteAuthenticatorApi({ walletName }, dependencies),
     consumeRemoteWalletApi({ walletName }, dependencies)

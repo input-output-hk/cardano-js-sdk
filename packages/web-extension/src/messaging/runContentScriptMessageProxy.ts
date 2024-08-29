@@ -12,27 +12,39 @@ export interface MessagingApi {
   callApiMethod(request: MethodRequest): Promise<unknown>;
 }
 
+interface ChannelMessageEvent {
+  channelName: string;
+  request: MethodRequest;
+  messageId: string;
+}
+
 /**
  * Intended to be run in web extension content script.
  * Forwards messages dispatched via window.postMessage from the website to the extension (background page).
  */
-export const runContentScriptMessageProxy = (apis: AnyApi[], logger: Logger) => {
-  const listener = async ({ data, source }: MessageEvent) => {
+export const runContentScriptMessageProxy = (apis: Record<string, AnyApi>, logger: Logger) => {
+  const listener = async ({ data, source }: MessageEvent<ChannelMessageEvent>) => {
     // eslint-disable-next-line eqeqeq
     if (source !== window || !isRequestMessage(data)) return;
     logger.debug('[MessageProxy] from window', data);
-    const apiFunction = apis.find((api: any) => typeof api[data.request.method] === 'function')?.[data.request.method];
+
+    const { channelName, request, messageId } = data;
+    const api = apis[channelName];
+    if (!api) return;
+
+    // const apiFunction = apis.find((api: any) => typeof api[data.request.method] === 'function')?.[data.request.method];
+    const apiFunction = api[request.method];
     if (!apiFunction) return;
 
     let response;
     try {
-      response = await apiFunction(...data.request.args);
+      response = await apiFunction(...request.args);
     } catch (error) {
       response = error;
     }
 
     const responseMessage: ResponseMessage = {
-      messageId: data.messageId,
+      messageId,
       response: toSerializableObject(response)
     };
 
