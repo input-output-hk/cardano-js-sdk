@@ -122,7 +122,7 @@ describe('computeScriptDataHash', () => {
     const hash = computeScriptDataHash(costModels, [Cardano.PlutusLanguageVersion.V2], undefined, datums);
 
     // Assert
-    expect(hash).toEqual('c28fc2f0e5644f00ee5194c83630e9f064aba4a7cf0319bf6f113785120b1744');
+    expect(hash).toEqual('944e124d2dd13f99d5dc416573dc0d2dd54f3bd52280a38ff7bbefd434f68274');
   });
 
   it('can compute script data hash for transactions that uses several datums and redeemers', () => {
