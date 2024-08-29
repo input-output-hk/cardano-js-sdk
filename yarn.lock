@@ -3339,7 +3339,7 @@ __metadata:
     "@types/delay": ^3.1.0
     "@types/dockerode": ^3.3.8
     "@types/jest": ^28.1.2
-    "@types/k6": ^0.45.0
+    "@types/k6": ^0.53.1
     "@types/lodash": ^4.14.182
     "@types/ora": ^3.2.0
     "@types/uuid": ^8.3.4
@@ -3694,6 +3694,7 @@ __metadata:
     "@cardano-sdk/util": "workspace:~"
     "@types/dockerode": ^3.3.8
     "@types/jest": ^26.0.24
+    "@types/k6": ^0.53.1
     axios: ^1.7.4
     delay: ^5.0.0
     dockerode: ^3.3.1
@@ -3703,6 +3704,7 @@ __metadata:
     get-port-please: ^2.5.0
     jest: ^28.1.3
     json-bigint: ^1.0.0
+    k6: ^0.0.0
     lodash: ^4.17.21
     madge: ^5.0.1
     npm-run-all: ^4.1.5
@@ -7018,10 +7020,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/k6@npm:^0.45.0":
-  version: 0.45.0
-  resolution: "@types/k6@npm:0.45.0"
-  checksum: cb42e439a7af950ada2887609362d6da5b528c2dac126fc3fd524aef6c55b078131f6a80a4b618385e7a1948caf473030de1838d010d66a1c65fcaab1e603c6c
+"@types/k6@npm:^0.53.1":
+  version: 0.53.1
+  resolution: "@types/k6@npm:0.53.1"
+  checksum: 23841d19b268f8a6d23d58387cb81e56a62999948d48e9b7f429f2762e2655d18ca4c9b65ed2142c5c29e193ea7f50f174856920e3f436f47a7c50cb53c8ece2
   languageName: node
   linkType: hard
 

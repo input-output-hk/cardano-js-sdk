@@ -1,18 +1,14 @@
-// cSpell:ignore loadimpact
-
+import * as k6Utils from '../../../../util-dev/dist/cjs/k6-utils.js';
 import { Counter, Trend } from 'k6/metrics';
 import { check } from 'k6';
 import ws from 'k6/ws';
 
 // eslint-disable-next-line no-undef
-const { TARGET_ENV, TARGET_NET, URL, WALLETS } = Object.assign({ WALLETS: '10000' }, __ENV);
-const url = TARGET_ENV ? `wss://${TARGET_ENV}-${TARGET_NET}${TARGET_ENV === 'ops' ? '-1' : ''}.lw.iog.io/ws` : URL;
+const { WALLETS } = Object.assign({ WALLETS: '10000' }, __ENV);
+// eslint-disable-next-line no-undef
+const dut = k6Utils.getDut(__ENV);
 
-if (TARGET_ENV && !['dev', 'ops', 'staging', 'prod'].includes(TARGET_ENV))
-  throw new Error(`Not valid TARGET_ENV: ${TARGET_ENV}`);
-if (TARGET_NET && !['preview', 'preprod', 'sanchonet', 'mainnet'].includes(TARGET_NET))
-  throw new Error(`Not valid TARGET_NET: ${TARGET_NET}`);
-if (!(TARGET_ENV && TARGET_NET) && !URL) throw new Error('Please specify both TARGET_ENV and TARGET_NET or URL');
+const url = `wss://${dut}/ws`;
 
 export const options = {
   ext: {

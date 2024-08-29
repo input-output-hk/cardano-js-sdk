@@ -1,4 +1,4 @@
-name: K6 Performance Cloud Test Assets
+name: K6 Assets load test
 on:
   workflow_dispatch:
     inputs:
