@@ -1,7 +1,6 @@
 /* eslint-disable no-bitwise */
 import { Address, AddressProps, AddressType, Credential, CredentialType } from './Address';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { InvalidArgumentError } from '@cardano-sdk/util';
 import { NetworkId } from '../ChainId';
 
 /**
