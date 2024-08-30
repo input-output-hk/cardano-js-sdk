@@ -8,7 +8,7 @@ import { walletName } from '../const';
 
 export const supplyDistributionTrackerReady = (async () =>
   createSupplyDistributionTracker(
-    { trigger$: wallet$.pipe(switchMap((wallet) => wallet.currentEpoch$)) },
+    { trigger$: wallet$.pipe(switchMap((wallet) => wallet.observableWallet.currentEpoch$)) },
     {
       logger,
       networkInfoProvider: await networkInfoProviderFactory.create(
