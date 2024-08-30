@@ -1,3 +1,4 @@
+import { ApiName } from './types';
 import { MessengerDependencies, cip30, runContentScriptMessageProxy } from '@cardano-sdk/web-extension';
 
 export interface InitializeContentScriptProps {
@@ -7,7 +8,7 @@ export interface InitializeContentScriptProps {
 
 // tested in e2e tests
 export const initializeContentScript = (
-  props: Record<string, InitializeContentScriptProps>,
+  props: Record<ApiName, InitializeContentScriptProps>,
   dependencies: MessengerDependencies
 ) => {
   const proxies: any[] = [];

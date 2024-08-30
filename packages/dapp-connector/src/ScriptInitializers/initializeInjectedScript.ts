@@ -1,3 +1,4 @@
+import { ApiName } from './types';
 import { Cip30Wallet, WalletProperties } from '../WalletApi';
 import { Logger } from 'ts-log';
 import { MessengerDependencies, cip30, createInjectedRuntime } from '@cardano-sdk/web-extension';
@@ -9,7 +10,7 @@ export interface InitializeInjectedDependencies {
 
 // tested in e2e tests
 export const initializeInjectedScript = (
-  props: Record<string, WalletProperties>,
+  props: Record<ApiName, WalletProperties>,
   { logger }: InitializeInjectedDependencies
 ) => {
   for (const [apiName, walletProps] of Object.entries(props)) {
