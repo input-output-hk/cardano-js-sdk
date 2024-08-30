@@ -1,3 +1,3 @@
-export * from './initializeContentScript';
-export * from './initializeInjectedScript';
 export * from './initializeBackgroundScript';
+export * from './consumeRemoteWalletApi';
+export * from './consumeRemoteAuthenticatorApi';

@@ -1,4 +1,4 @@
-import { cip30 } from '@cardano-sdk/web-extension';
-import { walletName } from './const';
+import { apiName, walletName } from './const';
+import { initializeInjectedScript } from '@cardano-sdk/dapp-connector';
 
-cip30.initializeInjectedScript({ icon: '', walletName }, { logger: console });
+initializeInjectedScript({ [apiName]: { icon: '', walletName } }, { logger: console });

@@ -3,3 +3,4 @@ export * from './WalletApi';
 export * from './AuthenticatorApi';
 export * from './injectGlobal';
 export * from './util';
+export * from './ScriptInitializers';

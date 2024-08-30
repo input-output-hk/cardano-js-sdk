@@ -13,7 +13,7 @@ export interface MessagingApi {
 }
 
 interface ChannelMessageEvent {
-  channelName: string;
+  apiName: string;
   request: MethodRequest;
   messageId: string;
 }
@@ -28,12 +28,12 @@ export const runContentScriptMessageProxy = (apis: Record<string, AnyApi>, logge
     if (source !== window || !isRequestMessage(data)) return;
     logger.debug('[MessageProxy] from window', data);
 
-    const { channelName, request, messageId } = data;
-    const api = apis[channelName];
+    const { apiName, request, messageId } = data;
+    const api = apis[apiName];
     if (!api) return;
 
     // const apiFunction = apis.find((api: any) => typeof api[data.request.method] === 'function')?.[data.request.method];
-    const apiFunction = api[request.method];
+    const apiFunction = typeof api[request.method] === 'function' ? api[request.method] : null;
     if (!apiFunction) return;
 
     let response;

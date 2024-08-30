@@ -1,6 +1,7 @@
 export const extensionId = 'lgehgfkeagjdklnanflcjoipaphegomm';
 
 export const walletName = 'ccvault';
+export const apiName = 'lace';
 
 export const userPromptServiceChannel = `user-prompt-${walletName}`;
 

@@ -5,7 +5,7 @@ import { isResponseMessage } from './util';
 
 const noOp = () => void 0;
 
-export const createInjectedRuntime = (channelName: string) => {
+export const createInjectedRuntime = (apiName: string) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const listeners = new WeakMap<any, any>();
   const connectWindow = ({ name }: Runtime.ConnectConnectInfoType): MessengerPort => {
@@ -33,7 +33,7 @@ export const createInjectedRuntime = (channelName: string) => {
         }
       },
       postMessage(message) {
-        window.postMessage({ ...message, channelName }, '*');
+        window.postMessage({ ...message, apiName }, '*');
       }
     };
     return port;
