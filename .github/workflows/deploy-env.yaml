@@ -1,7 +1,6 @@
 name: Deploy Environment
 
 on:
-  push:
   workflow_dispatch:
     inputs:
       environment:
@@ -10,10 +9,7 @@ on:
         required: true
         default: 'ops-preview-1'
         options:
-        - ALL
-        - LIVE
         - live-sanchonet@eu-central-1@v2
-        - DEV
         - live-mainnet@eu-central-1@v2
         - live-sanchonet@us-east-2@v1
         - dev-mainnet@us-east-1
@@ -21,7 +17,6 @@ on:
         - live-sanchonet@us-east-2@v2
         - dev-preprod@us-east-1@v2
         - live-preprod@eu-central-1@v2
-        - OPS
         - dev-preview@us-east-1
         - live-preprod@us-east-2@v2
         - ops-preprod-1@us-east-1
