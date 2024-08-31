@@ -231,12 +231,7 @@ export const mapCertificate = (
         : Cardano.CertificateType.Unregistration,
       cert_index: certModel.cert_index,
       deposit: BigInt(certModel.deposit),
-      stakeCredential: {
-        hash: Cardano.RewardAccount.toHash(
-          Cardano.RewardAccount(certModel.address)
-        ) as unknown as Crypto.Hash28ByteBase16,
-        type: Cardano.CredentialType.KeyHash
-      }
+      stakeCredential: Cardano.Address.fromBech32(certModel.address).asReward()!.getPaymentCredential()
     } as WithCertIndex<Cardano.NewStakeAddressCertificate>;
 
   if (isDelegationCertModel(certModel))
@@ -244,12 +239,7 @@ export const mapCertificate = (
       __typename: Cardano.CertificateType.StakeDelegation,
       cert_index: certModel.cert_index,
       poolId: certModel.pool_id as unknown as Cardano.PoolId,
-      stakeCredential: {
-        hash: Cardano.RewardAccount.toHash(
-          Cardano.RewardAccount(certModel.address)
-        ) as unknown as Crypto.Hash28ByteBase16,
-        type: Cardano.CredentialType.KeyHash
-      }
+      stakeCredential: Cardano.Address.fromBech32(certModel.address).asReward()!.getPaymentCredential()
     } as WithCertIndex<Cardano.StakeDelegationCertificate>;
 
   if (isDrepRegistrationCertModel(certModel))
@@ -292,12 +282,7 @@ export const mapCertificate = (
       __typename: Cardano.CertificateType.VoteDelegation,
       cert_index: certModel.cert_index,
       dRep: mapDrepDelegation(certModel),
-      stakeCredential: {
-        hash: Cardano.RewardAccount.toHash(
-          Cardano.RewardAccount(certModel.address)
-        ) as unknown as Crypto.Hash28ByteBase16,
-        type: Cardano.CredentialType.KeyHash
-      }
+      stakeCredential: Cardano.Address.fromBech32(certModel.address).asReward()!.getPaymentCredential()
     };
 
   if (isVoteRegistrationDelegationCertModel(certModel))
@@ -306,12 +291,7 @@ export const mapCertificate = (
       cert_index: certModel.cert_index,
       dRep: mapDrepDelegation(certModel),
       deposit: BigInt(certModel.deposit),
-      stakeCredential: {
-        hash: Cardano.RewardAccount.toHash(
-          Cardano.RewardAccount(certModel.address)
-        ) as unknown as Crypto.Hash28ByteBase16,
-        type: Cardano.CredentialType.KeyHash
-      }
+      stakeCredential: Cardano.Address.fromBech32(certModel.address).asReward()!.getPaymentCredential()
     };
 
   if (isStakeVoteDelegationCertModel(certModel))
@@ -320,12 +300,7 @@ export const mapCertificate = (
       cert_index: certModel.cert_index,
       dRep: mapDrepDelegation(certModel),
       poolId: certModel.pool_id as unknown as Cardano.PoolId,
-      stakeCredential: {
-        hash: Cardano.RewardAccount.toHash(
-          Cardano.RewardAccount(certModel.address)
-        ) as unknown as Crypto.Hash28ByteBase16,
-        type: Cardano.CredentialType.KeyHash
-      }
+      stakeCredential: Cardano.Address.fromBech32(certModel.address).asReward()!.getPaymentCredential()
     };
 
   if (isStakeRegistrationDelegationCertModel(certModel))
@@ -334,12 +309,7 @@ export const mapCertificate = (
       cert_index: certModel.cert_index,
       deposit: BigInt(certModel.deposit),
       poolId: certModel.pool_id as unknown as Cardano.PoolId,
-      stakeCredential: {
-        hash: Cardano.RewardAccount.toHash(
-          Cardano.RewardAccount(certModel.address)
-        ) as unknown as Crypto.Hash28ByteBase16,
-        type: Cardano.CredentialType.KeyHash
-      }
+      stakeCredential: Cardano.Address.fromBech32(certModel.address).asReward()!.getPaymentCredential()
     };
 
   if (isStakeVoteRegistrationDelegationCertModel(certModel))
@@ -349,12 +319,7 @@ export const mapCertificate = (
       dRep: mapDrepDelegation(certModel),
       deposit: BigInt(certModel.deposit),
       poolId: certModel.pool_id as unknown as Cardano.PoolId,
-      stakeCredential: {
-        hash: Cardano.RewardAccount.toHash(
-          Cardano.RewardAccount(certModel.address)
-        ) as unknown as Crypto.Hash28ByteBase16,
-        type: Cardano.CredentialType.KeyHash
-      }
+      stakeCredential: Cardano.Address.fromBech32(certModel.address).asReward()!.getPaymentCredential()
     };
 
   if (isAuthorizeCommitteeHotCertModel(certModel))
