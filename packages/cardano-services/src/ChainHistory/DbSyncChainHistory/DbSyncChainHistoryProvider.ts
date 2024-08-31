@@ -139,9 +139,7 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
       const txInputs = inputs.filter((input) => input.txInputId === txId).map(mapTxIn);
       const txCollaterals = collaterals.filter((col) => col.txInputId === txId).map(mapTxIn);
       const txOutputs = orderBy(outputs.filter((output) => output.txId === txId).map(mapTxOut), ['index']);
-      const txCollateralOutputs = orderBy(collateralOutputs.filter((output) => output.txId === txId).map(mapTxOut), [
-        'index'
-      ]);
+      const txCollateralOutputs = collateralOutputs.filter((output) => output.txId === txId).map(mapTxOut);
       const inputSource: Cardano.InputSource = tx.valid_contract
         ? Cardano.InputSource.inputs
         : Cardano.InputSource.collaterals;
