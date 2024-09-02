@@ -371,7 +371,7 @@ in
               env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
             handle-provider.enabled = true;
-            #asset-provider.enabled = true;
+            asset-provider.enabled = true;
             chain-history-provider.enabled = true;
           };
 
@@ -580,14 +580,14 @@ in
               replicas = 2;
               env.NODE_ENV = "production";
             };
-            #asset-provider = {
-            #  enabled = true;
-            #  env.NODE_ENV = "production";
-            #};
+            asset-provider = {
+              enabled = true;
+              env.NODE_ENV = "production";
+            };
           };
 
           projectors = {
-            # asset.enabled = true;
+            asset.enabled = true;
             handle.enabled = true;
             stake-pool.enabled = true;
             wallet-api.enabled = true;
