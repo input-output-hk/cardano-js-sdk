@@ -555,7 +555,7 @@ in
         "staging-mainnet@eu-west-1@v2" = final: {
           name = "${final.namespace}-cardanojs-v2";
           namespace = "staging-mainnet";
-          context = "eks-admin";
+          context = "eks-devs";
           network = "mainnet";
           region = "eu-west-1";
 
