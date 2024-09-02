@@ -10,6 +10,8 @@ export interface WithTxCredentials {
   credentialsByTx: Record<Cardano.TransactionId, CredentialEntity[]>;
 }
 
+const addressByTxInCache = {} as Record<string, Mappers.Address>;
+
 export const willStoreCredentials = ({ utxoByTx }: Mappers.WithUtxo) => Object.keys(utxoByTx).length > 0;
 
 const addInputCredentials = async (
@@ -18,21 +20,26 @@ const addInputCredentials = async (
   addCredentialFromAddress: (txId: Cardano.TransactionId, address: Mappers.Address) => void
 ) => {
   for (const txHash of Object.keys(utxoByTx) as Cardano.TransactionId[]) {
-    const txInLookups = utxoByTx[txHash].consumed.map(({ txId, index: outputIndex }) => ({
-      outputIndex,
-      txId
-    }));
+    const txInLookups: { outputIndex: number; txId: Cardano.TransactionId }[] = [];
+    for (const txIn of utxoByTx[txHash]!.consumed) {
+      const cacheKey = `${txIn.txId}#${txIn.index}`;
+      if (addressByTxInCache[cacheKey] === undefined) {
+        txInLookups.push({ outputIndex: txIn.index, txId: txIn.txId });
+      } else {
+        addCredentialFromAddress(txHash, addressByTxInCache[cacheKey]);
+      }
+    }
 
     const outputEntities = await utxoRepository.find({
       select: { address: true, outputIndex: true, txId: true },
-      where: txInLookups.map(({ txId, outputIndex }) => ({
-        outputIndex,
-        txId
-      }))
+      where: txInLookups
     });
 
     for (const hydratedTxIn of outputEntities) {
       if (hydratedTxIn.address) {
+        addressByTxInCache[`${hydratedTxIn.txId!}#${hydratedTxIn.outputIndex!}`] = Mappers.credentialsFromAddress(
+          hydratedTxIn.address!
+        );
         addCredentialFromAddress(txHash, Mappers.credentialsFromAddress(hydratedTxIn.address));
       }
     }
