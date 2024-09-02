@@ -12,6 +12,10 @@ export interface WithTxCredentials {
 
 const addressByTxInCache = {} as Record<string, Mappers.Address>;
 
+export const removeTxInFromCache = (txIn: string) => {
+  delete addressByTxInCache[txIn];
+};
+
 export const willStoreCredentials = ({ utxoByTx }: Mappers.WithUtxo) => Object.keys(utxoByTx).length > 0;
 
 const addInputCredentials = async (

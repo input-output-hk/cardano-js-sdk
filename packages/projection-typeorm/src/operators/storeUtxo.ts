@@ -2,6 +2,7 @@ import { Cardano, ChainSyncEventType, Serialization } from '@cardano-sdk/core';
 import { Mappers } from '@cardano-sdk/projection';
 import { ObjectLiteral } from 'typeorm';
 import { OutputEntity, TokensEntity } from '../entity';
+import { removeTxInFromCache } from './storeCredentials';
 import { typeormOperator } from './util';
 
 const serializeDatumIfExists = (datum: Cardano.PlutusData | undefined) =>
@@ -62,6 +63,7 @@ export const storeUtxo = typeormOperator<Mappers.WithUtxo, WithStoredProducedUtx
       }
       for (const { index, txId } of consumed) {
         await utxoRepository.update({ outputIndex: index, txId }, { consumedAtSlot: header.slot });
+        removeTxInFromCache(`${txId}#${index}`);
       }
     } else {
       // produced utxo will be automatically deleted via block cascade
