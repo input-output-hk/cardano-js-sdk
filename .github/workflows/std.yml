@@ -18,6 +18,11 @@ on:
         type: boolean
         required: true
         default: false
+      deploy-staging-mainnet:
+        description: Deploy to staging-mainnet
+        type: boolean
+        required: true
+        default: false
       deploy-dev-mainnet:
         description: Deploy to dev-mainnet
         type: boolean
@@ -116,6 +121,9 @@ jobs:
             fi
             if [ "true" == ${{ inputs.deploy-dev-preprod || false }} ] ; then
               echo '{"environment":"dev-preprod", "target":"dev-preprod@us-east-1@v2", "url": "https://dev-preprod.lw.iog.io/"}'
+            fi
+            if [ "true" == ${{ inputs.deploy-staging-mainnet || false }} ] ; then
+              echo '{"environment":"staging-mainnet", "target":"staging-mainnet@eu-west-1@v2", "url": "https://staging-mainnet.lw.iog.io/"}'
             fi
             if [ "true" == ${{ inputs.deploy-staging-preprod || false }} ] ; then
               echo '{"environment":"staging-preprod", "target":"staging-preprod@us-east-1@v2", "url": "https://staging-preprod.lw.iog.io/"}'
