@@ -1,3 +1,5 @@
+# cSpell:ignore builtins cardanojs concat devs healthchecks hostnames kubeconfig pkgs stakepool stakepoolv
+
 {
   pkgs,
   lib ? pkgs.lib,
@@ -14,6 +16,7 @@
     eu-west-1 = readJsonFile ./tf-outputs/lace-dev-eu-west-1.json;
   };
   oci = inputs.self.x86_64-linux.cardano-services.oci-images.cardano-services;
+  # cSpell:disable
   allowedOrigins = [
     # Represents Chrome production version
     "chrome-extension://gafhhkghbfjjkeiendhlofajokpaflmk"
@@ -24,6 +27,7 @@
     # Represents Chrome dev preview version
     "chrome-extension://djcdfchkaijggdjokfomholkalbffgil"
   ];
+  # cSpell:enable
 
   allowedOriginsDev =
     allowedOrigins
@@ -158,7 +162,7 @@ in
           ogmiosSrvServiceName = "${final.namespace}-cardano-core.${final.namespace}.svc.cluster.local";
 
           wafARN = tf-outputs.${final.region}.waf_arn;
-          # Healthcheck paramteres for ALB
+          # Healthcheck parameters for ALB
           # For mainnet, default value of timeout of 5 is too short, so have to increase it significantly
           # Interval cannot be less than timeout
           # Note that Kubernetes healthchecks are picked up by balancer controller and reflected in the target group anyway
@@ -367,7 +371,7 @@ in
               env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
             handle-provider.enabled = true;
-            #asset-provider.enabled = true;
+            asset-provider.enabled = true;
             chain-history-provider.enabled = true;
           };
 
@@ -555,7 +559,7 @@ in
         "staging-mainnet@eu-west-1@v2" = final: {
           name = "${final.namespace}-cardanojs-v2";
           namespace = "staging-mainnet";
-          context = "eks-admin";
+          context = "eks-devs";
           network = "mainnet";
           region = "eu-west-1";
 
@@ -576,14 +580,14 @@ in
               replicas = 2;
               env.NODE_ENV = "production";
             };
-            #asset-provider = {
-            #  enabled = true;
-            #  env.NODE_ENV = "production";
-            #};
+            asset-provider = {
+              enabled = true;
+              env.NODE_ENV = "production";
+            };
           };
 
           projectors = {
-            # asset.enabled = true;
+            asset.enabled = true;
             handle.enabled = true;
             stake-pool.enabled = true;
             wallet-api.enabled = true;

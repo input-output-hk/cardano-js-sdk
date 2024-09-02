@@ -8,8 +8,8 @@ import {
   ProviderError,
   ProviderFailure
 } from '@cardano-sdk/core';
-import { AssetEntity } from '@cardano-sdk/projection-typeorm';
-import { QueryRunner } from 'typeorm';
+import { AssetEntity, NftMetadataEntity } from '@cardano-sdk/projection-typeorm';
+import { DataSource, In, QueryRunner } from 'typeorm';
 import { TokenMetadataService } from '../types';
 import { TypeOrmNftMetadataService } from '../TypeOrmNftMetadataService';
 import { TypeormProvider, TypeormProviderDependencies } from '../../util';
@@ -58,26 +58,31 @@ export class TypeormAssetProvider extends TypeormProvider implements AssetProvid
       );
     }
 
-    return this.withQueryRunner(async (queryRunner) => {
-      const assetInfoList = await Promise.all(assetIds.map((assetId) => this.#getAssetInfo(assetId, queryRunner)));
+    const { nftMetadata, tokenMetadata } = extraData || {};
 
-      if (extraData?.nftMetadata) {
-        await Promise.all(
-          assetInfoList.map(async (assetInfo) => {
-            assetInfo.nftMetadata = await this.#getNftMetadata(assetInfo, queryRunner);
-          })
-        );
-      }
+    const [assetInfoMap, metadataMap, tokenMap] = await this.withDataSource(async (dataSource) =>
+      Promise.all([
+        this.#getAssetsInfo(assetIds, dataSource),
+        nftMetadata
+          ? this.#getMultiNftMetadata(assetIds, dataSource)
+          : Promise.resolve(new Map<Cardano.AssetId, Asset.NftMetadata>()),
+        tokenMetadata
+          ? this.#fetchTokenMetadataList(assetIds).then(
+              (list) => new Map(list.map((metadata, id) => [assetIds[id], metadata]))
+            )
+          : Promise.resolve(new Map<Cardano.AssetId, Asset.TokenMetadata | null | undefined>())
+      ])
+    );
 
-      if (extraData?.tokenMetadata) {
-        const tokenMetadataList = await this.#fetchTokenMetadataList(assetIds);
+    return assetIds.map((assetId) => {
+      const assetInfo = assetInfoMap.get(assetId);
 
-        for (const [index, assetInfo] of assetInfoList.entries()) {
-          assetInfo.tokenMetadata = tokenMetadataList[index];
-        }
-      }
+      if (!assetInfo) throw new ProviderError(ProviderFailure.NotFound, undefined, `Asset not found '${assetId}'`);
 
-      return assetInfoList;
+      if (nftMetadata) assetInfo.nftMetadata = metadataMap.get(assetId) || null;
+      if (tokenMetadata) assetInfo.tokenMetadata = tokenMap.get(assetId);
+
+      return assetInfo;
     });
   }
 
@@ -133,6 +138,60 @@ export class TypeormAssetProvider extends TypeormProvider implements AssetProvid
       quantity: supply,
       supply
     };
+  }
+
+  async #getAssetsInfo(
+    assetIds: Cardano.AssetId[],
+    dataSource: DataSource
+  ): Promise<Map<Cardano.AssetId, Asset.AssetInfo>> {
+    const assetRepository = dataSource.getRepository(AssetEntity);
+    const assets = await assetRepository.find({ where: { id: In(assetIds) } });
+
+    return new Map(
+      assets.map((asset) => {
+        const { id, supply } = asset as Required<AssetEntity>;
+        const name = Cardano.AssetId.getAssetName(id);
+        const policyId = Cardano.AssetId.getPolicyId(id);
+        const fingerprint = Cardano.AssetFingerprint.fromParts(policyId, Cardano.AssetName(name));
+
+        return [
+          id,
+          {
+            assetId: id,
+            fingerprint,
+            name,
+            policyId,
+            quantity: supply,
+            supply
+          }
+        ];
+      })
+    );
+  }
+
+  async #getMultiNftMetadata(
+    assetIds: Cardano.AssetId[],
+    dataSource: DataSource
+  ): Promise<Map<Cardano.AssetId, Asset.NftMetadata>> {
+    const nftMetadataRepository = dataSource.getRepository(NftMetadataEntity);
+    const assets = (await nftMetadataRepository.find({
+      where: { userTokenAsset: { id: In(assetIds) } }
+    })) as Required<NftMetadataEntity>[];
+
+    return new Map(
+      assets.map((asset) => [
+        asset.userTokenAssetId!,
+        {
+          image: asset.image!,
+          name: asset.name!,
+          ...(asset.description && { description: asset.description }),
+          ...(asset.files && { files: asset.files }),
+          ...(asset.mediaType && { mediaType: asset.mediaType as Asset.ImageMediaType }),
+          ...(asset.otherProperties && { otherProperties: asset.otherProperties }),
+          version: asset.otherProperties?.get('version') as string
+        }
+      ])
+    );
   }
 
   async initializeImpl() {
