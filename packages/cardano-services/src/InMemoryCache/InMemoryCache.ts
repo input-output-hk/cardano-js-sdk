@@ -5,8 +5,8 @@ export type Key = string | number;
 export type AsyncAction<T> = () => Promise<T>;
 
 export class InMemoryCache {
-  #cache: NodeCache;
-  #ttlDefault: number;
+  protected cache: NodeCache;
+  protected ttlDefault: number;
 
   /**
    *
@@ -14,8 +14,8 @@ export class InMemoryCache {
    * @param cache The cache engine. It must extend NodeCache
    */
   constructor(ttl: Seconds | 0, cache: NodeCache = new NodeCache()) {
-    this.#ttlDefault = ttl;
-    this.#cache = cache;
+    this.ttlDefault = ttl;
+    this.cache = cache;
   }
 
   /**
@@ -26,8 +26,8 @@ export class InMemoryCache {
    * @param ttl The time to live in seconds
    * @returns The value stored with the key
    */
-  public async get<T>(key: Key, asyncAction: AsyncAction<T>, ttl = this.#ttlDefault): Promise<T> {
-    const cachedValue: T | undefined = this.#cache.get(key);
+  public async get<T>(key: Key, asyncAction: AsyncAction<T>, ttl = this.ttlDefault): Promise<T> {
+    const cachedValue: T | undefined = this.cache.get(key);
     if (cachedValue) {
       return cachedValue;
     }
@@ -35,7 +35,7 @@ export class InMemoryCache {
     const resultPromise = asyncAction();
     this.set(
       key,
-      resultPromise.catch(() => this.#cache.del(key)),
+      resultPromise.catch(() => this.cache.del(key)),
       ttl
     );
     return resultPromise;
@@ -48,7 +48,7 @@ export class InMemoryCache {
    * @returns The value stored in the key
    */
   public getVal<T>(key: Key) {
-    return this.#cache.get<T>(key);
+    return this.cache.get<T>(key);
   }
 
   /**
@@ -59,8 +59,8 @@ export class InMemoryCache {
    * @param ttl The time to live in seconds
    * @returns The success state of the operation
    */
-  public set<T>(key: Key, value: T, ttl = this.#ttlDefault) {
-    return this.#cache.set<T>(key, value, ttl);
+  public set<T>(key: Key, value: T, ttl = this.ttlDefault) {
+    return this.cache.set<T>(key, value, ttl);
   }
 
   /**
@@ -69,7 +69,7 @@ export class InMemoryCache {
    * @param keys cache key to delete or a array of cache keys
    */
   public invalidate(keys: Key | Key[]) {
-    this.#cache.del(keys);
+    this.cache.del(keys);
   }
 
   /**
@@ -78,16 +78,16 @@ export class InMemoryCache {
    * @returns An array of all keys
    */
   public keys() {
-    return this.#cache.keys();
+    return this.cache.keys();
   }
 
   /** Clear the interval timeout which is set on check period option. Default: 600 */
   public shutdown() {
-    this.#cache.close();
+    this.cache.close();
   }
 
   /** Clear the whole data and reset the stats */
   public clear() {
-    this.#cache.flushAll();
+    this.cache.flushAll();
   }
 }

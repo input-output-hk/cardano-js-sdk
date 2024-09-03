@@ -34,6 +34,7 @@ import { ProviderServerArgs, ProviderServerOptionDescriptions, ServiceNames } fr
 import { SrvRecord } from 'dns';
 import { TypeormAssetProvider } from '../../Asset/TypeormAssetProvider';
 import { TypeormStakePoolProvider } from '../../StakePool/TypeormStakePoolProvider/TypeormStakePoolProvider';
+import { WarmCache } from '../../InMemoryCache/WarmCache';
 import { createDbSyncMetadataService } from '../../Metadata';
 import { createLogger } from 'bunyan';
 import { getConnectionConfig, getOgmiosObservableCardanoNode } from '../services';
@@ -99,10 +100,12 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     };
 
   const getCache = (ttl: Seconds | 0) => (args.disableDbCache ? new NoCache() : new InMemoryCache(ttl));
+  const getWarmCache = (ttl: Seconds) => (args.disableDbCache ? new NoCache() : new WarmCache(ttl, Seconds(ttl / 10)));
+
   const getDbCache = () => getCache(args.dbCacheTtl);
 
   // Shared cache across all providers
-  const healthCheckCache = getCache(args.healthCheckCacheTtl);
+  const healthCheckCache = getWarmCache(args.healthCheckCacheTtl);
 
   const getEpochMonitor = memoize((dbPool: Pool) => new DbSyncEpochPollService(dbPool, args.epochPollInterval!));
 
@@ -142,7 +145,13 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
   const getTypeormStakePoolProvider = withTypeOrmProvider('StakePool', (connectionConfig$) => {
     const entities = getEntities(['currentPoolMetrics', 'poolDelisted', 'poolMetadata', 'poolRewards']);
 
-    return new TypeormStakePoolProvider(args, { cache: getDbCache(), connectionConfig$, entities, logger });
+    return new TypeormStakePoolProvider(args, {
+      cache: getDbCache(),
+      connectionConfig$,
+      entities,
+      healthCheckCache,
+      logger
+    });
   });
 
   const getNetworkInfoProvider = (cardanoNode: CardanoNode, dbPools: DbPools) => {
@@ -173,7 +182,12 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     sharedHandleProvider = await withTypeOrmProvider(
       'Handle',
       async (connectionConfig$) =>
-        new TypeOrmHandleProvider({ connectionConfig$, entities: getEntities(['handle', 'handleMetadata']), logger })
+        new TypeOrmHandleProvider({
+          connectionConfig$,
+          entities: getEntities(['handle', 'handleMetadata']),
+          healthCheckCache,
+          logger
+        })
     )();
 
     return sharedHandleProvider;
@@ -198,6 +212,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       {
         connectionConfig$,
         entities: getEntities(['asset']),
+        healthCheckCache,
         logger,
         tokenMetadataService
       }
@@ -304,6 +319,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
         : new NodeTxSubmitProvider({
             cardanoNode: getOgmiosObservableCardanoNode(dnsResolver, logger, args),
             handleProvider: args.submitValidateHandles ? await getHandleProvider() : undefined,
+            healthCheckCache,
             logger
           });
       return new TxSubmitHttpService({ logger, txSubmitProvider });

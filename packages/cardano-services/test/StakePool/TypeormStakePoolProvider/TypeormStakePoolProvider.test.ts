@@ -7,6 +7,7 @@ import {
   HttpServer,
   HttpServerConfig,
   InMemoryCache,
+  NoCache,
   StakePoolHttpService,
   TypeormStakePoolProvider,
   UNLIMITED_CACHE_TTL,
@@ -154,7 +155,13 @@ describe('TypeormStakePoolProvider', () => {
         provider = stakePoolHttpProvider(clientConfig);
         stakePoolProvider = new TypeormStakePoolProvider(
           { fuzzyOptions: DEFAULT_FUZZY_SEARCH_OPTIONS, lastRosEpochs: 10, paginationPageSizeLimit: pagination.limit },
-          { cache: new InMemoryCache(UNLIMITED_CACHE_TTL), connectionConfig$, entities, logger }
+          {
+            cache: new InMemoryCache(UNLIMITED_CACHE_TTL),
+            connectionConfig$,
+            entities,
+            healthCheckCache: new NoCache(),
+            logger
+          }
         );
         service = new StakePoolHttpService({ logger, stakePoolProvider });
         httpServer = new HttpServer(config, { logger, runnableDependencies: [], services: [service] });

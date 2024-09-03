@@ -9,7 +9,7 @@ import {
 } from '@cardano-sdk/core';
 import { EMPTY, ReplaySubject, of, throwError } from 'rxjs';
 import { HexBlob } from '@cardano-sdk/util';
-import { NodeTxSubmitProvider, NodeTxSubmitProviderProps } from '../../src';
+import { NoCache, NodeTxSubmitProvider, NodeTxSubmitProviderProps } from '../../src';
 import { generateRandomHexString } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
 
@@ -53,7 +53,7 @@ describe('NodeTxSubmitProvider', () => {
 
   describe('without handle provider', () => {
     beforeEach(async () => {
-      provider = new NodeTxSubmitProvider({ cardanoNode, logger });
+      provider = new NodeTxSubmitProvider({ cardanoNode, healthCheckCache: new NoCache(), logger });
     });
 
     describe('submitTx', () => {
@@ -104,7 +104,7 @@ describe('NodeTxSubmitProvider', () => {
   describe('with handle provider', () => {
     beforeEach(() => {
       handleProvider = { getPolicyIds: jest.fn(), healthCheck: jest.fn(), resolveHandles: jest.fn() };
-      provider = new NodeTxSubmitProvider({ cardanoNode, handleProvider, logger });
+      provider = new NodeTxSubmitProvider({ cardanoNode, handleProvider, healthCheckCache: new NoCache(), logger });
     });
 
     describe('initialized provider', () => {

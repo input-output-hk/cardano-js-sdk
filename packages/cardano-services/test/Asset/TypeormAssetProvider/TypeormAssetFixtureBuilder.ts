@@ -2,6 +2,7 @@ import { Asset, Cardano } from '@cardano-sdk/core';
 import { AssetEntity, NftMetadataEntity } from '@cardano-sdk/projection-typeorm';
 import { IsNull, Not } from 'typeorm';
 import { Logger } from 'ts-log';
+import { NoCache } from '../../../src';
 import { TypeormProvider, TypeormProviderDependencies } from '../../../src/util';
 
 export enum TypeormAssetWith {
@@ -12,7 +13,7 @@ export class TypeormAssetFixtureBuilder extends TypeormProvider {
   #logger: Logger;
 
   constructor({ connectionConfig$, entities, logger }: TypeormProviderDependencies) {
-    super('TypeormAssetFixtureBuilder', { connectionConfig$, entities, logger });
+    super('TypeormAssetFixtureBuilder', { connectionConfig$, entities, healthCheckCache: new NoCache(), logger });
     this.#logger = logger;
   }
 

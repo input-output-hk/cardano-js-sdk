@@ -1,20 +1,22 @@
+import { NoCache, getEntities } from '../../src';
 import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
+import { TimeoutError, of } from 'rxjs';
 import { TypeormProvider } from '../../src/util';
-import { getEntities } from '../../src';
 import { logger } from '@cardano-sdk/util-dev';
-import { of } from 'rxjs';
 
 class TestProvider extends TypeormProvider {}
 
 jest.mock('../../src/util/createTypeormDataSource', () => ({
   createTypeormDataSource: jest.fn().mockImplementation(() => {
-    let called = false;
+    let called = 0;
 
     return of({
       query: () => {
-        if (called) return Promise.reject(0);
+        called++;
 
-        called = true;
+        if (called === 6) throw new TimeoutError();
+        if (called % 2 === 0) return Promise.reject(0);
+
         return Promise.resolve(0);
       }
     });
@@ -25,7 +27,7 @@ describe('TypeormProvider', () => {
   const notUsedConnectionConfig = {} as PgConnectionConfig;
   const connectionConfig$ = of(notUsedConnectionConfig);
   const entities = getEntities(['currentPoolMetrics', 'poolMetadata', 'poolDelisted']);
-  const provider = new TestProvider('test', { connectionConfig$, entities, logger });
+  const provider = new TestProvider('test', { connectionConfig$, entities, healthCheckCache: new NoCache(), logger });
 
   beforeAll(async () => {
     await provider.initialize();
@@ -41,5 +43,6 @@ describe('TypeormProvider', () => {
     expect((await provider.healthCheck()).ok).toBeTruthy();
     expect((await provider.healthCheck()).ok).toBeFalsy();
     expect((await provider.healthCheck()).ok).toBeTruthy();
+    expect((await provider.healthCheck()).ok).toBeFalsy();
   });
 });

@@ -1,6 +1,6 @@
 import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { Observable } from 'rxjs';
 import {
+  NoCache,
   PAGINATION_PAGE_SIZE_LIMIT_ASSETS,
   TokenMetadataService,
   TypeormAssetProvider,
@@ -8,6 +8,7 @@ import {
   getConnectionConfig,
   getEntities
 } from '../../../src';
+import { Observable } from 'rxjs';
 import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 import { TypeormAssetFixtureBuilder, TypeormAssetWith } from './TypeormAssetFixtureBuilder';
 import { logger } from '@cardano-sdk/util-dev';
@@ -43,9 +44,14 @@ describe('TypeormAssetProvider', () => {
       {
         paginationPageSizeLimit: PAGINATION_PAGE_SIZE_LIMIT_ASSETS
       },
-      { connectionConfig$, entities, logger, tokenMetadataService }
+      { connectionConfig$, entities, healthCheckCache: new NoCache(), logger, tokenMetadataService }
     );
-    fixtureBuilder = new TypeormAssetFixtureBuilder({ connectionConfig$, entities, logger });
+    fixtureBuilder = new TypeormAssetFixtureBuilder({
+      connectionConfig$,
+      entities,
+      healthCheckCache: new NoCache(),
+      logger
+    });
 
     await provider.initialize();
     await provider.start();
