@@ -5,6 +5,7 @@ import {
   BlockOutputModel,
   CertificateModel,
   MultiAssetModel,
+  PoolRegisterCertModel,
   ProtocolParametersUpdateModel,
   RedeemerModel,
   ScriptModel,
@@ -191,6 +192,17 @@ const mapDrepDelegation = ({
         __typename: 'AlwaysAbstain'
       };
 
+const mapPoolParameters = (certModel: WithCertType<PoolRegisterCertModel>): Cardano.PoolParameters => ({
+  cost: BigInt(certModel.fixed_cost),
+  id: certModel.pool_id as unknown as Cardano.PoolId,
+  margin: Cardano.FractionUtils.toFraction(certModel.margin),
+  owners: [],
+  pledge: BigInt(certModel.pledge),
+  relays: [],
+  rewardAccount: certModel.reward_account as Cardano.RewardAccount,
+  vrf: certModel.vrf_key_hash.toString('hex') as Cardano.VrfVkHex
+});
+
 // eslint-disable-next-line complexity
 export const mapCertificate = (
   certModel: WithCertType<CertificateModel>
@@ -209,7 +221,7 @@ export const mapCertificate = (
       __typename: Cardano.CertificateType.PoolRegistration,
       cert_index: certModel.cert_index,
       deposit: BigInt(certModel.deposit),
-      poolParameters: null as unknown as Cardano.PoolParameters
+      poolParameters: mapPoolParameters(certModel)
     } as WithCertIndex<Cardano.HydratedPoolRegistrationCertificate>;
 
   if (isMirCertModel(certModel)) {

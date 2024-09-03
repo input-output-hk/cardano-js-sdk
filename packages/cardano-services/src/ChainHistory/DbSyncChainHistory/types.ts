@@ -178,6 +178,11 @@ export interface PoolRetireCertModel extends CertificateModel {
 export interface PoolRegisterCertModel extends CertificateModel {
   pool_id: string;
   deposit: string;
+  reward_account: string;
+  pledge: string;
+  fixed_cost: string;
+  margin: number;
+  vrf_key_hash: Buffer;
 }
 
 export interface MirCertModel extends CertificateModel {
