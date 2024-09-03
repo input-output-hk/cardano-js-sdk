@@ -63,7 +63,6 @@ export const storeUtxo = typeormOperator<Mappers.WithUtxo, WithStoredProducedUtx
       }
       for (const { index, txId } of consumed) {
         await utxoRepository.update({ outputIndex: index, txId }, { consumedAtSlot: header.slot });
-        removeTxInFromCache(`${txId}#${index}`);
       }
     } else {
       // produced utxo will be automatically deleted via block cascade

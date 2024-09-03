@@ -12,7 +12,7 @@ export interface WithTxCredentials {
 
 const addressByTxInCache = {} as Record<string, Mappers.Address>;
 
-export const removeTxInFromCache = (txIn: string) => {
+const removeTxInFromCache = (txIn: string) => {
   delete addressByTxInCache[txIn];
 };
 
@@ -111,7 +111,8 @@ export const storeCredentials = typeormOperator<
     eventType,
     queryRunner,
     stakeCredentialsByTx,
-    utxoByTx
+    utxoByTx,
+    utxo: { consumed: consumedUTxOs }
   } = evt;
 
   const txToCredentials = new Map<Cardano.TransactionId, CredentialEntity[]>();
@@ -170,6 +171,10 @@ export const storeCredentials = typeormOperator<
     .values([...txToCredentials.values()].flat())
     .orIgnore()
     .execute();
+
+  for (const consumed of consumedUTxOs) {
+    removeTxInFromCache(`${consumed.txId}#${consumed.index}`);
+  }
 
   return { credentialsByTx: Object.fromEntries(txToCredentials) };
 });
