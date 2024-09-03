@@ -226,6 +226,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
         accountIndex: this.accountIndex,
         chainId: this.chainId,
         knownAddresses,
+        tagCborSets: txBody.hasTaggedSets(),
         txInKeyPathMap
       });
 

@@ -11,6 +11,8 @@ export type TrezorTxTransformerContext = {
   chainId: Cardano.ChainId;
   /** Non-hardened account in cip1852 */
   accountIndex: number;
+  /** Whether sets should be encoded as tagged set in CBOR */
+  tagCborSets: boolean;
 } & SignTransactionContext;
 
 export type TrezorTxOutputDestination =

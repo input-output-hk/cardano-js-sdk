@@ -43,7 +43,8 @@ describe('TrezorKeyAgent', () => {
     inputs: [txInWithPath],
     networkId: 0,
     outputs: [txOutToOwnedAddress],
-    protocolMagic: 999
+    protocolMagic: 999,
+    ttl: 999
   };
 
   const validMultisigTx: Omit<Trezor.CardanoSignTransaction, 'signingMode'> = {
@@ -58,7 +59,8 @@ describe('TrezorKeyAgent', () => {
     networkId: 0,
     // All third party outputs
     outputs: [txOut],
-    protocolMagic: 999
+    protocolMagic: 999,
+    ttl: 999
   };
 
   const poolRegistrationCertificate = {

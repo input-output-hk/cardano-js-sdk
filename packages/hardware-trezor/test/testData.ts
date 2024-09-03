@@ -170,6 +170,7 @@ export const contextWithKnownAddresses: TrezorTxTransformerContext = {
     networkMagic: 999
   },
   knownAddresses: [knownAddress],
+  tagCborSets: false,
   txInKeyPathMap: {}
 };
 
@@ -180,6 +181,7 @@ export const contextWithKnownAddressesWithoutStakingCredentials: TrezorTxTransfo
     networkMagic: 999
   },
   knownAddresses: [knownAddressWithoutStakingPath],
+  tagCborSets: false,
   txInKeyPathMap: {}
 };
 
@@ -190,6 +192,7 @@ export const contextWithoutKnownAddresses: TrezorTxTransformerContext = {
     networkMagic: 999
   },
   knownAddresses: [],
+  tagCborSets: false,
   txInKeyPathMap: {}
 };
 
@@ -212,6 +215,18 @@ export const stakeDeregistrationCertificate = {
   __typename: Cardano.CertificateType.StakeDeregistration,
   stakeCredential
 } as Cardano.StakeAddressCertificate;
+
+export const conwayRegistrationCertificate = {
+  __typename: Cardano.CertificateType.Registration,
+  deposit: 10_000_000n,
+  stakeCredential
+} as Cardano.NewStakeAddressCertificate;
+
+export const conwayDeregistrationCertificate = {
+  __typename: Cardano.CertificateType.Unregistration,
+  deposit: 10_000_000n,
+  stakeCredential
+} as Cardano.NewStakeAddressCertificate;
 
 export const stakeDelegationCertificate = {
   __typename: Cardano.CertificateType.StakeDelegation,
