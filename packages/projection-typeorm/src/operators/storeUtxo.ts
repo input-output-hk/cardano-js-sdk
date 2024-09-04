@@ -23,10 +23,10 @@ export const storeUtxo = typeormOperator<Mappers.WithUtxo, WithStoredProducedUtx
       if (produced.length > 0) {
         const { identifiers } = await utxoRepository.insert(
           produced.map(
-            ([{ index, txId }, { address }]): OutputEntity => ({
+            ([{ index, txId }, { value, address }]): OutputEntity => ({
               address,
               block: { slot: header.slot },
-              // coins: value.coins,
+              coins: value.coins,
               // datum: serializeDatumIfExists(datum),
               // datumHash,
               outputIndex: index,
