@@ -13,7 +13,7 @@ import {
   SignTransactionContext,
   SignTransactionOptions
 } from './types';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { Cip8SignDataContext, cip30signData } from './cip8';
 import {
@@ -133,12 +133,13 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
   }
 
   async signTransaction(
-    { body, hash }: Cardano.TxBodyWithHash,
+    txBody: Serialization.TransactionBody,
     { txInKeyPathMap, knownAddresses }: SignTransactionContext,
     { additionalKeyPaths = [] }: SignTransactionOptions = {}
   ): Promise<Cardano.Signatures> {
     // Possible optimization is casting strings to OpaqueString types directly and skipping validation
-    const blob = HexBlob(hash);
+    const blob = txBody.hash() as unknown as HexBlob;
+    const body = txBody.toCore();
     const dRepKeyHash = (
       await Crypto.Ed25519PublicKey.fromHex(await this.derivePublicKey(DREP_KEY_DERIVATION_PATH)).hash()
     ).hex();

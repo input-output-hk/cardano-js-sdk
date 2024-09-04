@@ -65,6 +65,8 @@ export const getStakeAddressCertificate: Transform<
       ? Trezor.PROTO.CardanoCertificateType.STAKE_REGISTRATION
       : Trezor.PROTO.CardanoCertificateType.STAKE_DEREGISTRATION;
   return {
+    dRep: undefined,
+    deposit: undefined,
     keyHash: credentials.keyHash,
     path: credentials.path,
     pool: undefined,
@@ -85,12 +87,100 @@ export const getStakeDelegationCertificate: Transform<
     context?.knownAddresses
   );
   return {
+    dRep: undefined,
+    deposit: undefined,
     keyHash: credentials.keyHash,
     path: credentials.path,
     pool: poolIdKeyHash,
     poolParameters: undefined,
     scriptHash: credentials.scriptHash,
     type: Trezor.PROTO.CardanoCertificateType.STAKE_DELEGATION
+  };
+};
+
+export const getNewStakeAddressCertificate: Transform<
+  Cardano.NewStakeAddressCertificate,
+  Trezor.CardanoCertificate,
+  TrezorTxTransformerContext
+> = (certificate, context) => {
+  const credentials = getCertCredentials(
+    certificate.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex,
+    context?.knownAddresses
+  );
+  const certificateType =
+    certificate.__typename === Cardano.CertificateType.Registration
+      ? Trezor.PROTO.CardanoCertificateType.STAKE_REGISTRATION_CONWAY
+      : Trezor.PROTO.CardanoCertificateType.STAKE_DEREGISTRATION_CONWAY;
+
+  return {
+    dRep: undefined,
+    deposit: certificate.deposit.toString(),
+    keyHash: credentials.keyHash,
+    path: credentials.path,
+    pool: undefined,
+    poolParameters: undefined,
+    scriptHash: credentials.scriptHash,
+    type: certificateType
+  };
+};
+
+const drepParamsMapper = (drep: Cardano.Credential, credentialType: Cardano.CredentialType) => {
+  let dRepParams;
+
+  switch (credentialType) {
+    case Cardano.CredentialType.KeyHash: {
+      dRepParams = {
+        keyHash: drep.hash,
+        type: Trezor.PROTO.CardanoDRepType.KEY_HASH
+      };
+      break;
+    }
+    case Cardano.CredentialType.ScriptHash:
+    default: {
+      dRepParams = {
+        scriptHash: drep.hash,
+        type: Trezor.PROTO.CardanoDRepType.SCRIPT_HASH
+      };
+    }
+  }
+
+  return dRepParams;
+};
+
+const drepMapper = (drep: Cardano.DelegateRepresentative) => {
+  if (Cardano.isDRepAlwaysAbstain(drep)) {
+    return {
+      type: Trezor.PROTO.CardanoDRepType.ABSTAIN
+    };
+  } else if (Cardano.isDRepAlwaysNoConfidence(drep)) {
+    return {
+      type: Trezor.PROTO.CardanoDRepType.NO_CONFIDENCE
+    };
+  } else if (Cardano.isDRepCredential(drep)) {
+    return drepParamsMapper(drep, drep.type);
+  }
+  throw new Error('incorrect drep supplied');
+};
+
+export const voteDelegationCertificate: Transform<
+  Cardano.VoteDelegationCertificate,
+  Trezor.CardanoCertificate,
+  TrezorTxTransformerContext
+> = (certificate, context) => {
+  const credentials = getCertCredentials(
+    certificate.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex,
+    context?.knownAddresses
+  );
+
+  return {
+    dRep: drepMapper(certificate.dRep),
+    deposit: undefined,
+    keyHash: credentials.keyHash,
+    path: credentials.path,
+    pool: undefined,
+    poolParameters: undefined,
+    scriptHash: credentials.scriptHash,
+    type: Trezor.PROTO.CardanoCertificateType.VOTE_DELEGATION
   };
 };
 
@@ -102,6 +192,8 @@ export const getPoolRegistrationCertificate: Transform<
   if (!certificate.poolParameters.metadataJson)
     throw new InvalidArgumentError('certificate', 'Missing pool registration pool metadata.');
   return {
+    dRep: undefined,
+    deposit: undefined,
     keyHash: undefined,
     path: undefined,
     pool: undefined,
@@ -161,6 +253,14 @@ const toCert = (cert: Cardano.Certificate, context: TrezorTxTransformerContext) 
       return getStakeDelegationCertificate(cert, context);
     case Cardano.CertificateType.PoolRegistration:
       return getPoolRegistrationCertificate(cert, context);
+
+    // Supported Conway Era Certs
+    case Cardano.CertificateType.Registration:
+      return getNewStakeAddressCertificate(cert, context);
+    case Cardano.CertificateType.Unregistration:
+      return getNewStakeAddressCertificate(cert, context);
+    case Cardano.CertificateType.VoteDelegation:
+      return voteDelegationCertificate(cert, context);
     default:
       throw new InvalidArgumentError('cert', `Certificate ${cert.__typename} not supported.`);
   }

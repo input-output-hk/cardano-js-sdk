@@ -36,17 +36,12 @@ describe('createBip32Ed25519Witnesser', () => {
       new Serialization.TransactionWitnessSet()
     );
 
-    const txInternals = {
-      body: transaction.body().toCore(),
-      hash: Cardano.TransactionId('3643bb5fe745ba0532977f82ecf54699963c97adef2626f7c780225d218e9ba6')
-    };
-
     const options = { knownAddresses: [], txInKeyPathMap: {} };
     const result = new Map();
     asyncKeyAgent.signTransaction.mockResolvedValueOnce(result);
 
     const witnessTx = await witnesser.witness(transaction, options);
     await expect(witnessTx.tx.witness).toEqual({ signatures: result });
-    expect(asyncKeyAgent.signTransaction).toBeCalledWith(txInternals, options, void 0);
+    expect(asyncKeyAgent.signTransaction).toBeCalledWith(transaction.body(), options, void 0);
   });
 });

@@ -36,7 +36,8 @@ describe('tx', () => {
             format: Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY
           }
         ],
-        protocolMagic: 999
+        protocolMagic: 999,
+        tagCborSets: false
       });
     });
 
@@ -185,6 +186,7 @@ describe('tx', () => {
             prev_index: txIn.index
           }
         ],
+        tagCborSets: false,
         ttl: '1000',
         validityIntervalStart: '100',
         withdrawals: [
@@ -270,6 +272,7 @@ describe('tx', () => {
           }
         ],
         protocolMagic: 999,
+        tagCborSets: false,
         ttl: '1000',
         validityIntervalStart: '100',
         withdrawals: [
@@ -312,7 +315,8 @@ describe('tx', () => {
             format: Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY
           }
         ],
-        protocolMagic: 999
+        protocolMagic: 999,
+        tagCborSets: false
       });
     });
 
@@ -415,6 +419,7 @@ describe('tx', () => {
             keyHash: '6199186adb51974690d7247d2646097d2c62763b16fb7ed3f9f55d39'
           }
         ],
+        tagCborSets: false,
         totalCollateral: '1000',
         ttl: '1000',
         validityIntervalStart: '100',

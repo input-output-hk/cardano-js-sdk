@@ -283,4 +283,14 @@ describe('TransactionBody', () => {
     // hex characters only
     expect(Buffer.from(txId, 'hex').toString('hex')).toEqual(txId);
   });
+
+  it('hasTaggedSets() returns true for transaction bodies with 6.258 tags', () => {
+    const body = TransactionBody.fromCbor(conwayCborWithSets);
+    expect(body.hasTaggedSets()).toBe(true);
+  });
+
+  it('hasTaggedSets() returns false for transaction bodies without 6.258 tags', () => {
+    const body = TransactionBody.fromCbor(cbor);
+    expect(body.hasTaggedSets()).toBe(false);
+  });
 });

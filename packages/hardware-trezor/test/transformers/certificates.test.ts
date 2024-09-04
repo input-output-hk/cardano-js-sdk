@@ -6,7 +6,10 @@ import {
   contextWithKnownAddresses,
   contextWithKnownAddressesWithoutStakingCredentials,
   contextWithoutKnownAddresses,
+  conwayDeregistrationCertificate,
+  conwayRegistrationCertificate,
   poolRegistrationCertificate,
+  stakeCredential,
   stakeDelegationCertificate,
   stakeDeregistrationCertificate,
   stakeRegistrationCertificate
@@ -233,6 +236,168 @@ describe('certificates', () => {
               vrfKeyHash: '8dd154228946bd12967c12bedb1cb6038b78f8b84a1760b1a788fa72a4af3db0'
             },
             type: Trezor.PROTO.CardanoCertificateType.STAKE_POOL_REGISTRATION
+          }
+        ]);
+      });
+    });
+
+    describe('conway registration and deregistration certificates', () => {
+      it('can map a registration certificate', async () => {
+        const certificates = mapCerts([conwayRegistrationCertificate], contextWithKnownAddresses);
+
+        expect(certificates).toEqual([
+          {
+            deposit: '10000000',
+            path: [
+              util.harden(CardanoKeyConst.PURPOSE),
+              util.harden(CardanoKeyConst.COIN_TYPE),
+              util.harden(0),
+              KeyRole.Stake,
+              0
+            ],
+            type: Trezor.PROTO.CardanoCertificateType.STAKE_REGISTRATION_CONWAY
+          }
+        ]);
+      });
+
+      it('can map a stake key stake deregistration certificate', async () => {
+        const certificates = mapCerts([conwayDeregistrationCertificate], contextWithKnownAddresses);
+
+        expect(certificates).toEqual([
+          {
+            deposit: '10000000',
+            path: [
+              util.harden(CardanoKeyConst.PURPOSE),
+              util.harden(CardanoKeyConst.COIN_TYPE),
+              util.harden(0),
+              KeyRole.Stake,
+              0
+            ],
+            type: Trezor.PROTO.CardanoCertificateType.STAKE_DEREGISTRATION_CONWAY
+          }
+        ]);
+      });
+
+      it('can map a key hash stake registration certificate', async () => {
+        const certificates = mapCerts(
+          [conwayRegistrationCertificate],
+          contextWithKnownAddressesWithoutStakingCredentials
+        );
+
+        expect(certificates).toEqual([
+          {
+            deposit: '10000000',
+            keyHash: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
+            type: Trezor.PROTO.CardanoCertificateType.STAKE_REGISTRATION_CONWAY
+          }
+        ]);
+      });
+
+      it('can map a key hash stake deregistration certificate', async () => {
+        const certificates = mapCerts(
+          [conwayDeregistrationCertificate],
+          contextWithKnownAddressesWithoutStakingCredentials
+        );
+
+        expect(certificates).toEqual([
+          {
+            deposit: '10000000',
+            keyHash: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
+            type: Trezor.PROTO.CardanoCertificateType.STAKE_DEREGISTRATION_CONWAY
+          }
+        ]);
+      });
+
+      it('can map a script hash stake registration certificate', async () => {
+        const certificates = mapCerts([conwayRegistrationCertificate], contextWithoutKnownAddresses);
+
+        expect(certificates).toEqual([
+          {
+            deposit: '10000000',
+            scriptHash: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
+            type: Trezor.PROTO.CardanoCertificateType.STAKE_REGISTRATION_CONWAY
+          }
+        ]);
+      });
+
+      it('can map a script hash stake deregistration certificate', async () => {
+        const certificates = mapCerts([conwayDeregistrationCertificate], contextWithoutKnownAddresses);
+
+        expect(certificates).toEqual([
+          {
+            deposit: '10000000',
+            scriptHash: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
+            type: Trezor.PROTO.CardanoCertificateType.STAKE_DEREGISTRATION_CONWAY
+          }
+        ]);
+      });
+    });
+
+    describe('Cardano.CertificateType.VoteDelegation', () => {
+      it('can map always abstain type of drep', () => {
+        const trezorCerts = mapCerts(
+          [
+            {
+              __typename: Cardano.CertificateType.VoteDelegation,
+              dRep: { __typename: 'AlwaysAbstain' },
+              stakeCredential
+            }
+          ],
+          contextWithKnownAddressesWithoutStakingCredentials
+        );
+
+        expect(trezorCerts).toEqual([
+          {
+            dRep: {
+              type: Trezor.PROTO.CardanoDRepType.ABSTAIN
+            },
+            keyHash: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
+            type: Trezor.PROTO.CardanoCertificateType.VOTE_DELEGATION
+          }
+        ]);
+      });
+      it('can map always no confidence type of drep', () => {
+        const trezorCerts = mapCerts(
+          [
+            {
+              __typename: Cardano.CertificateType.VoteDelegation,
+              dRep: { __typename: 'AlwaysNoConfidence' },
+              stakeCredential
+            }
+          ],
+          contextWithKnownAddressesWithoutStakingCredentials
+        );
+
+        expect(trezorCerts).toEqual([
+          {
+            dRep: {
+              type: Trezor.PROTO.CardanoDRepType.NO_CONFIDENCE
+            },
+            keyHash: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
+            type: Trezor.PROTO.CardanoCertificateType.VOTE_DELEGATION
+          }
+        ]);
+      });
+      it('can map dRep credential type of drep', () => {
+        const trezorCerts = mapCerts(
+          [
+            {
+              __typename: Cardano.CertificateType.VoteDelegation,
+              dRep: stakeCredential,
+              stakeCredential
+            }
+          ],
+          contextWithKnownAddressesWithoutStakingCredentials
+        );
+
+        expect(trezorCerts).toEqual([
+          {
+            dRep: {
+              keyHash: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
+              type: Trezor.PROTO.CardanoDRepType.KEY_HASH
+            },
+            keyHash: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
+            type: Trezor.PROTO.CardanoCertificateType.VOTE_DELEGATION
           }
         ]);
       });

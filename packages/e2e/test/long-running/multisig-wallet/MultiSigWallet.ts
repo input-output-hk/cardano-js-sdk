@@ -211,10 +211,7 @@ export class MultiSigWallet {
   async sign(multiSigTx: MultiSigTx): Promise<MultiSigTx> {
     const currentSignatures = multiSigTx.getTransaction().witness.signatures;
     const newSignatures = await this.#inMemoryKeyAgent.signTransaction(
-      {
-        body: multiSigTx.getTransaction().body,
-        hash: multiSigTx.getTransaction().id
-      },
+      Serialization.TransactionBody.fromCore(multiSigTx.getTransaction().body),
       { knownAddresses: [this.#address], txInKeyPathMap: {} },
       { additionalKeyPaths: [DERIVATION_PATH] }
     );

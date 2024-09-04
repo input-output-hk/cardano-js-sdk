@@ -9,7 +9,7 @@ import {
   Label,
   ProtectedHeaderMap
 } from '@emurgo/cardano-message-signing-nodejs';
-import { Cardano, NotImplementedError, util as coreUtils } from '@cardano-sdk/core';
+import { Cardano, NotImplementedError, Serialization, util as coreUtils } from '@cardano-sdk/core';
 import {
   CardanoKeyConst,
   Cip1852PathLevelIndexes,
@@ -688,10 +688,12 @@ export class LedgerKeyAgent extends KeyAgentBase {
   // however, multi sig transaction do not reference the CIP-1854 directly, but rather the script hash
   // so we need to be able to instruct the HW to sign the transaction with arbitrary keys.
   async signTransaction(
-    { body, hash }: Cardano.TxBodyWithHash,
+    txBody: Serialization.TransactionBody,
     { knownAddresses, txInKeyPathMap }: SignTransactionContext
   ): Promise<Cardano.Signatures> {
     try {
+      const body = txBody.toCore();
+      const hash = txBody.hash() as unknown as HexBlob;
       const dRepPublicKey = await this.derivePublicKey(util.DREP_KEY_DERIVATION_PATH);
       const dRepKeyHashHex = (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex();
       const ledgerTxData = await toLedgerTx(body, {
@@ -709,6 +711,9 @@ export class LedgerKeyAgent extends KeyAgentBase {
 
       const signingMode = LedgerKeyAgent.getSigningMode(ledgerTxData);
       const result = await deviceConnection.signTransaction({
+        options: {
+          tagCborSets: txBody.hasTaggedSets()
+        },
         signingMode,
         tx: ledgerTxData
       });
