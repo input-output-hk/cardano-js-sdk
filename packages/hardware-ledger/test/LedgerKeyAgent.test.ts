@@ -2,7 +2,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Ada, InvalidDataReason } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { CardanoKeyConst, CommunicationType, KeyPurpose, util } from '@cardano-sdk/key-management';
 import { LedgerKeyAgent } from '../src';
 import { dummyLogger } from 'ts-log';
@@ -363,7 +363,6 @@ describe('LedgerKeyAgent', () => {
 
   describe('Unsupported Transaction Errors', () => {
     let keyAgentMock: LedgerKeyAgent;
-    const txId = '0000000000000000000000000000000000000000000000000000000000000000' as unknown as Cardano.TransactionId;
     const noAddressesOptions = {
       knownAddresses: [],
       txInKeyPathMap: {}
@@ -392,426 +391,334 @@ describe('LedgerKeyAgent', () => {
     it('Ordinary transaction fails if it contains a pool registration certificate', async () => {
       LedgerKeyAgent.getSigningMode = () => Ledger.TransactionSigningMode.ORDINARY_TRANSACTION;
 
-      await expect(
-        async () =>
-          await keyAgentMock.signTransaction(
-            {
-              body: {
-                certificates: [
-                  {
-                    __typename: Cardano.CertificateType.PoolRegistration,
-                    poolParameters
-                  }
-                ],
-                fee: 10n,
-                inputs: [txIn],
-                outputs: [pureAdaTxOut]
-              },
-              hash: txId
-            },
-            noAddressesOptions
-          )
-      ).rejects.toThrow(InvalidDataReason.SIGN_MODE_ORDINARY__POOL_REGISTRATION_NOT_ALLOWED);
+      const txBody = Serialization.TransactionBody.fromCore({
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.PoolRegistration,
+            poolParameters
+          }
+        ],
+        fee: 10n,
+        inputs: [txIn],
+        outputs: [pureAdaTxOut]
+      });
+
+      await expect(async () => await keyAgentMock.signTransaction(txBody, noAddressesOptions)).rejects.toThrow(
+        InvalidDataReason.SIGN_MODE_ORDINARY__POOL_REGISTRATION_NOT_ALLOWED
+      );
     });
 
     it('Ordinary transaction fails if it contains a foreign delegation certificate', async () => {
       LedgerKeyAgent.getSigningMode = () => Ledger.TransactionSigningMode.ORDINARY_TRANSACTION;
 
-      await expect(
-        async () =>
-          await keyAgentMock.signTransaction(
-            {
-              body: {
-                certificates: [
-                  {
-                    __typename: Cardano.CertificateType.StakeDelegation,
-                    poolId,
-                    stakeCredential: {
-                      hash: '00000000000000000000000000000000000000000000000000000000' as unknown as Crypto.Hash28ByteBase16,
-                      type: Cardano.CredentialType.KeyHash
-                    }
-                  }
-                ],
-                fee: 10n,
-                inputs: [txIn],
-                outputs: [pureAdaTxOut]
-              },
-              hash: txId
-            },
-            noAddressesOptions
-          )
-      ).rejects.toThrow(InvalidDataReason.SIGN_MODE_ORDINARY__CERTIFICATE_STAKE_CREDENTIAL_ONLY_AS_PATH);
+      const txBody = Serialization.TransactionBody.fromCore({
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.StakeDelegation,
+            poolId,
+            stakeCredential: {
+              hash: '00000000000000000000000000000000000000000000000000000000' as unknown as Crypto.Hash28ByteBase16,
+              type: Cardano.CredentialType.KeyHash
+            }
+          }
+        ],
+        fee: 10n,
+        inputs: [txIn],
+        outputs: [pureAdaTxOut]
+      });
+
+      await expect(async () => await keyAgentMock.signTransaction(txBody, noAddressesOptions)).rejects.toThrow(
+        InvalidDataReason.SIGN_MODE_ORDINARY__CERTIFICATE_STAKE_CREDENTIAL_ONLY_AS_PATH
+      );
     });
 
     it('Ordinary transaction fails if it contains withdrawals with foreign keys', async () => {
       LedgerKeyAgent.getSigningMode = () => Ledger.TransactionSigningMode.ORDINARY_TRANSACTION;
 
-      await expect(
-        async () =>
-          await keyAgentMock.signTransaction(
-            {
-              body: {
-                fee: 10n,
-                inputs: [txIn],
-                outputs: [pureAdaTxOut],
-                withdrawals: [
-                  {
-                    quantity: 5n,
-                    stakeAddress: Cardano.RewardAccount(
-                      'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'
-                    )
-                  }
-                ]
-              },
-              hash: txId
-            },
-            noAddressesOptions
-          )
-      ).rejects.toThrow(InvalidDataReason.SIGN_MODE_ORDINARY__WITHDRAWAL_ONLY_AS_PATH);
+      const txBody = Serialization.TransactionBody.fromCore({
+        fee: 10n,
+        inputs: [txIn],
+        outputs: [pureAdaTxOut],
+        withdrawals: [
+          {
+            quantity: 5n,
+            stakeAddress: Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27')
+          }
+        ]
+      });
+
+      await expect(async () => await keyAgentMock.signTransaction(txBody, noAddressesOptions)).rejects.toThrow(
+        InvalidDataReason.SIGN_MODE_ORDINARY__WITHDRAWAL_ONLY_AS_PATH
+      );
     });
 
     it('Ordinary transaction fails if it contains collateral inputs', async () => {
       LedgerKeyAgent.getSigningMode = () => Ledger.TransactionSigningMode.ORDINARY_TRANSACTION;
 
-      await expect(
-        async () =>
-          await keyAgentMock.signTransaction(
-            {
-              body: {
-                collaterals: [{ ...txIn, index: txIn.index + 1 }],
-                fee: 10n,
-                inputs: [txIn],
-                outputs: [pureAdaTxOut]
-              },
-              hash: txId
-            },
-            noAddressesOptions
-          )
-      ).rejects.toThrow(InvalidDataReason.SIGN_MODE_ORDINARY__COLLATERAL_INPUTS_NOT_ALLOWED);
+      const txBody = Serialization.TransactionBody.fromCore({
+        collaterals: [{ ...txIn, index: txIn.index + 1 }],
+        fee: 10n,
+        inputs: [txIn],
+        outputs: [pureAdaTxOut]
+      });
+
+      await expect(async () => await keyAgentMock.signTransaction(txBody, noAddressesOptions)).rejects.toThrow(
+        InvalidDataReason.SIGN_MODE_ORDINARY__COLLATERAL_INPUTS_NOT_ALLOWED
+      );
     });
 
     it('Ordinary transaction fails if it contains collateral outputs', async () => {
       LedgerKeyAgent.getSigningMode = () => Ledger.TransactionSigningMode.ORDINARY_TRANSACTION;
 
-      await expect(
-        async () =>
-          await keyAgentMock.signTransaction(
-            {
-              body: {
-                collateralReturn: pureAdaTxOut,
-                fee: 10n,
-                inputs: [txIn],
-                outputs: [pureAdaTxOut]
-              },
-              hash: txId
-            },
-            noAddressesOptions
-          )
-      ).rejects.toThrow(InvalidDataReason.SIGN_MODE_ORDINARY__COLLATERAL_OUTPUT_NOT_ALLOWED);
+      const txBody = Serialization.TransactionBody.fromCore({
+        collateralReturn: pureAdaTxOut,
+        fee: 10n,
+        inputs: [txIn],
+        outputs: [pureAdaTxOut]
+      });
+
+      await expect(async () => await keyAgentMock.signTransaction(txBody, noAddressesOptions)).rejects.toThrow(
+        InvalidDataReason.SIGN_MODE_ORDINARY__COLLATERAL_OUTPUT_NOT_ALLOWED
+      );
     });
 
     it('Ordinary transaction fails if it contains total collateral', async () => {
       LedgerKeyAgent.getSigningMode = () => Ledger.TransactionSigningMode.ORDINARY_TRANSACTION;
 
-      await expect(
-        async () =>
-          await keyAgentMock.signTransaction(
-            {
-              body: {
-                fee: 10n,
-                inputs: [txIn],
-                outputs: [pureAdaTxOut],
-                totalCollateral: 10n
-              },
-              hash: txId
-            },
-            noAddressesOptions
-          )
-      ).rejects.toThrow(InvalidDataReason.SIGN_MODE_ORDINARY__TOTAL_COLLATERAL_NOT_ALLOWED);
+      const txBody = Serialization.TransactionBody.fromCore({
+        fee: 10n,
+        inputs: [txIn],
+        outputs: [pureAdaTxOut],
+        totalCollateral: 10n
+      });
+
+      await expect(async () => await keyAgentMock.signTransaction(txBody, noAddressesOptions)).rejects.toThrow(
+        InvalidDataReason.SIGN_MODE_ORDINARY__TOTAL_COLLATERAL_NOT_ALLOWED
+      );
     });
 
     it('Ordinary transaction fails if it contains reference input', async () => {
       LedgerKeyAgent.getSigningMode = () => Ledger.TransactionSigningMode.ORDINARY_TRANSACTION;
 
-      await expect(
-        async () =>
-          await keyAgentMock.signTransaction(
-            {
-              body: {
-                fee: 10n,
-                inputs: [txIn],
-                outputs: [pureAdaTxOut],
-                referenceInputs: [txIn]
-              },
-              hash: txId
-            },
-            noAddressesOptions
-          )
-      ).rejects.toThrow(InvalidDataReason.SIGN_MODE_ORDINARY__REFERENCE_INPUTS_NOT_ALLOWED);
+      const txBody = Serialization.TransactionBody.fromCore({
+        fee: 10n,
+        inputs: [txIn],
+        outputs: [pureAdaTxOut],
+        referenceInputs: [txIn]
+      });
+
+      await expect(async () => await keyAgentMock.signTransaction(txBody, noAddressesOptions)).rejects.toThrow(
+        InvalidDataReason.SIGN_MODE_ORDINARY__REFERENCE_INPUTS_NOT_ALLOWED
+      );
     });
 
     it('Multisig transaction fails if it contains a pool registration certificate', async () => {
       LedgerKeyAgent.getSigningMode = () => Ledger.TransactionSigningMode.MULTISIG_TRANSACTION;
 
-      await expect(
-        async () =>
-          await keyAgentMock.signTransaction(
-            {
-              body: {
-                certificates: [
-                  {
-                    __typename: Cardano.CertificateType.PoolRegistration,
-                    poolParameters
-                  }
-                ],
-                fee: 10n,
-                inputs: [txIn],
-                outputs: [pureAdaTxOut]
-              },
-              hash: txId
-            },
-            noAddressesOptions
-          )
-      ).rejects.toThrow(InvalidDataReason.SIGN_MODE_MULTISIG__POOL_REGISTRATION_NOT_ALLOWED);
+      const txBody = Serialization.TransactionBody.fromCore({
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.PoolRegistration,
+            poolParameters
+          }
+        ],
+        fee: 10n,
+        inputs: [txIn],
+        outputs: [pureAdaTxOut]
+      });
+
+      await expect(async () => await keyAgentMock.signTransaction(txBody, noAddressesOptions)).rejects.toThrow(
+        InvalidDataReason.SIGN_MODE_MULTISIG__POOL_REGISTRATION_NOT_ALLOWED
+      );
     });
 
     it('Multisig transaction fails if it contains collateral inputs', async () => {
       LedgerKeyAgent.getSigningMode = () => Ledger.TransactionSigningMode.MULTISIG_TRANSACTION;
 
-      await expect(
-        async () =>
-          await keyAgentMock.signTransaction(
-            {
-              body: {
-                collaterals: [{ ...txIn, index: txIn.index + 1 }],
-                fee: 10n,
-                inputs: [txIn],
-                outputs: [pureAdaTxOut]
-              },
-              hash: txId
-            },
-            noAddressesOptions
-          )
-      ).rejects.toThrow(InvalidDataReason.SIGN_MODE_MULTISIG__COLLATERAL_INPUTS_NOT_ALLOWED);
+      const txBody = Serialization.TransactionBody.fromCore({
+        collaterals: [{ ...txIn, index: txIn.index + 1 }],
+        fee: 10n,
+        inputs: [txIn],
+        outputs: [pureAdaTxOut]
+      });
+
+      await expect(async () => await keyAgentMock.signTransaction(txBody, noAddressesOptions)).rejects.toThrow(
+        InvalidDataReason.SIGN_MODE_MULTISIG__COLLATERAL_INPUTS_NOT_ALLOWED
+      );
     });
 
     it('Multisig transaction fails if it contains collateral outputs', async () => {
       LedgerKeyAgent.getSigningMode = () => Ledger.TransactionSigningMode.MULTISIG_TRANSACTION;
 
-      await expect(
-        async () =>
-          await keyAgentMock.signTransaction(
-            {
-              body: {
-                collateralReturn: pureAdaTxOut,
-                fee: 10n,
-                inputs: [txIn],
-                outputs: [pureAdaTxOut]
-              },
-              hash: txId
-            },
-            noAddressesOptions
-          )
-      ).rejects.toThrow(InvalidDataReason.SIGN_MODE_MULTISIG__COLLATERAL_OUTPUT_NOT_ALLOWED);
+      const txBody = Serialization.TransactionBody.fromCore({
+        collateralReturn: pureAdaTxOut,
+        fee: 10n,
+        inputs: [txIn],
+        outputs: [pureAdaTxOut]
+      });
+
+      await expect(async () => await keyAgentMock.signTransaction(txBody, noAddressesOptions)).rejects.toThrow(
+        InvalidDataReason.SIGN_MODE_MULTISIG__COLLATERAL_OUTPUT_NOT_ALLOWED
+      );
     });
 
     it('Multisig transaction fails if it contains total collateral', async () => {
       LedgerKeyAgent.getSigningMode = () => Ledger.TransactionSigningMode.MULTISIG_TRANSACTION;
 
-      await expect(
-        async () =>
-          await keyAgentMock.signTransaction(
-            {
-              body: {
-                fee: 10n,
-                inputs: [txIn],
-                outputs: [pureAdaTxOut],
-                totalCollateral: 10n
-              },
-              hash: txId
-            },
-            noAddressesOptions
-          )
-      ).rejects.toThrow(InvalidDataReason.SIGN_MODE_MULTISIG__TOTAL_COLLATERAL_NOT_ALLOWED);
+      const txBody = Serialization.TransactionBody.fromCore({
+        fee: 10n,
+        inputs: [txIn],
+        outputs: [pureAdaTxOut],
+        totalCollateral: 10n
+      });
+
+      await expect(async () => await keyAgentMock.signTransaction(txBody, noAddressesOptions)).rejects.toThrow(
+        InvalidDataReason.SIGN_MODE_MULTISIG__TOTAL_COLLATERAL_NOT_ALLOWED
+      );
     });
 
     it('Multisig transaction fails if it contains reference input', async () => {
       LedgerKeyAgent.getSigningMode = () => Ledger.TransactionSigningMode.MULTISIG_TRANSACTION;
 
-      await expect(
-        async () =>
-          await keyAgentMock.signTransaction(
-            {
-              body: {
-                fee: 10n,
-                inputs: [txIn],
-                outputs: [pureAdaTxOut],
-                referenceInputs: [txIn]
-              },
-              hash: txId
-            },
-            noAddressesOptions
-          )
-      ).rejects.toThrow(InvalidDataReason.SIGN_MODE_MULTISIG__REFERENCE_INPUTS_NOT_ALLOWED);
+      const txBody = Serialization.TransactionBody.fromCore({
+        fee: 10n,
+        inputs: [txIn],
+        outputs: [pureAdaTxOut],
+        referenceInputs: [txIn]
+      });
+
+      await expect(async () => await keyAgentMock.signTransaction(txBody, noAddressesOptions)).rejects.toThrow(
+        InvalidDataReason.SIGN_MODE_MULTISIG__REFERENCE_INPUTS_NOT_ALLOWED
+      );
     });
 
     it('Plutus transaction fails if it contains a pool registration certificate', async () => {
       LedgerKeyAgent.getSigningMode = () => Ledger.TransactionSigningMode.PLUTUS_TRANSACTION;
 
-      await expect(
-        async () =>
-          await keyAgentMock.signTransaction(
-            {
-              body: {
-                certificates: [
-                  {
-                    __typename: Cardano.CertificateType.PoolRegistration,
-                    poolParameters
-                  }
-                ],
-                fee: 10n,
-                inputs: [txIn],
-                outputs: [pureAdaTxOut]
-              },
-              hash: txId
-            },
-            noAddressesOptions
-          )
-      ).rejects.toThrow(InvalidDataReason.SIGN_MODE_PLUTUS__POOL_REGISTRATION_NOT_ALLOWED);
+      const txBody = Serialization.TransactionBody.fromCore({
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.PoolRegistration,
+            poolParameters
+          }
+        ],
+        fee: 10n,
+        inputs: [txIn],
+        outputs: [pureAdaTxOut]
+      });
+
+      await expect(async () => await keyAgentMock.signTransaction(txBody, noAddressesOptions)).rejects.toThrow(
+        InvalidDataReason.SIGN_MODE_PLUTUS__POOL_REGISTRATION_NOT_ALLOWED
+      );
     });
 
     it('Pool registration as owner transaction fails if it contains datum in outputs', async () => {
       LedgerKeyAgent.getSigningMode = () => Ledger.TransactionSigningMode.POOL_REGISTRATION_AS_OWNER;
 
-      await expect(
-        async () =>
-          await keyAgentMock.signTransaction(
-            {
-              body: {
-                certificates: [
-                  {
-                    __typename: Cardano.CertificateType.PoolRegistration,
-                    poolParameters
-                  }
-                ],
-                fee: 10n,
-                inputs: [txIn],
-                outputs: [txOutWithDatum]
-              },
-              hash: txId
-            },
-            noAddressesOptions
-          )
-      ).rejects.toThrow(InvalidDataReason.SIGN_MODE_POOL_OWNER__DATUM_NOT_ALLOWED);
+      const txBody = Serialization.TransactionBody.fromCore({
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.PoolRegistration,
+            poolParameters
+          }
+        ],
+        fee: 10n,
+        inputs: [txIn],
+        outputs: [txOutWithDatum]
+      });
+
+      await expect(async () => await keyAgentMock.signTransaction(txBody, noAddressesOptions)).rejects.toThrow(
+        InvalidDataReason.SIGN_MODE_POOL_OWNER__DATUM_NOT_ALLOWED
+      );
     });
 
     it('Pool registration as owner transaction fails if it contains more than one device owner', async () => {
       LedgerKeyAgent.getSigningMode = () => Ledger.TransactionSigningMode.POOL_REGISTRATION_AS_OWNER;
 
-      await expect(
-        async () =>
-          await keyAgentMock.signTransaction(
-            {
-              body: {
-                certificates: [
-                  {
-                    __typename: Cardano.CertificateType.PoolRegistration,
-                    poolParameters
-                  }
-                ],
-                fee: 10n,
-                inputs: [txIn],
-                outputs: [pureAdaTxOut],
-                referenceInputs: [txIn]
-              },
-              hash: txId
-            },
-            noAddressesOptions
-          )
-      ).rejects.toThrow(InvalidDataReason.SIGN_MODE_POOL_OWNER__SINGLE_DEVICE_OWNER_REQUIRED);
+      const txBody = Serialization.TransactionBody.fromCore({
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.PoolRegistration,
+            poolParameters
+          }
+        ],
+        fee: 10n,
+        inputs: [txIn],
+        outputs: [pureAdaTxOut],
+        referenceInputs: [txIn]
+      });
+
+      await expect(async () => await keyAgentMock.signTransaction(txBody, noAddressesOptions)).rejects.toThrow(
+        InvalidDataReason.SIGN_MODE_POOL_OWNER__SINGLE_DEVICE_OWNER_REQUIRED
+      );
     });
 
     it('Pool registration as owner transaction fails if it contains more than one certificate', async () => {
       LedgerKeyAgent.getSigningMode = () => Ledger.TransactionSigningMode.POOL_REGISTRATION_AS_OWNER;
 
-      await expect(
-        async () =>
-          await keyAgentMock.signTransaction(
-            {
-              body: {
-                certificates: [
-                  {
-                    __typename: Cardano.CertificateType.PoolRegistration,
-                    poolParameters
-                  },
-                  {
-                    __typename: Cardano.CertificateType.PoolRegistration,
-                    poolParameters
-                  }
-                ],
-                fee: 10n,
-                inputs: [txIn],
-                outputs: [pureAdaTxOut]
-              },
-              hash: txId
-            },
-            noAddressesOptions
-          )
-      ).rejects.toThrow(InvalidDataReason.SIGN_MODE_POOL_OWNER__SINGLE_POOL_REG_CERTIFICATE_REQUIRED);
+      const txBody = Serialization.TransactionBody.fromCore({
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.PoolRegistration,
+            poolParameters
+          },
+          {
+            __typename: Cardano.CertificateType.PoolRegistration,
+            poolParameters
+          }
+        ],
+        fee: 10n,
+        inputs: [txIn],
+        outputs: [pureAdaTxOut]
+      });
+
+      await expect(async () => await keyAgentMock.signTransaction(txBody, noAddressesOptions)).rejects.toThrow(
+        InvalidDataReason.SIGN_MODE_POOL_OWNER__SINGLE_POOL_REG_CERTIFICATE_REQUIRED
+      );
     });
 
     it('Pool registration as operator transaction fails if it contains datum in outputs', async () => {
       LedgerKeyAgent.getSigningMode = () => Ledger.TransactionSigningMode.POOL_REGISTRATION_AS_OPERATOR;
 
-      await expect(
-        async () =>
-          await keyAgentMock.signTransaction(
-            {
-              body: {
-                certificates: [
-                  {
-                    __typename: Cardano.CertificateType.PoolRegistration,
-                    poolParameters
-                  }
-                ],
-                fee: 10n,
-                inputs: [txIn],
-                outputs: [txOutWithDatum]
-              },
-              hash: txId
-            },
-            noAddressesOptions
-          )
-      ).rejects.toThrow(InvalidDataReason.SIGN_MODE_POOL_OPERATOR__DATUM_NOT_ALLOWED);
+      const txBody = Serialization.TransactionBody.fromCore({
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.PoolRegistration,
+            poolParameters
+          }
+        ],
+        fee: 10n,
+        inputs: [txIn],
+        outputs: [txOutWithDatum]
+      });
+
+      await expect(async () => await keyAgentMock.signTransaction(txBody, noAddressesOptions)).rejects.toThrow(
+        InvalidDataReason.SIGN_MODE_POOL_OPERATOR__DATUM_NOT_ALLOWED
+      );
     });
 
     it('Pool registration as operator transaction fails if it contains more than one certificate', async () => {
       LedgerKeyAgent.getSigningMode = () => Ledger.TransactionSigningMode.POOL_REGISTRATION_AS_OPERATOR;
 
-      await expect(
-        async () =>
-          await keyAgentMock.signTransaction(
-            {
-              body: {
-                certificates: [
-                  {
-                    __typename: Cardano.CertificateType.PoolRegistration,
-                    poolParameters
-                  },
-                  {
-                    __typename: Cardano.CertificateType.PoolRegistration,
-                    poolParameters
-                  }
-                ],
-                fee: 10n,
-                inputs: [txIn],
-                outputs: [pureAdaTxOut]
-              },
-              hash: txId
-            },
-            noAddressesOptions
-          )
-      ).rejects.toThrow(InvalidDataReason.SIGN_MODE_POOL_OPERATOR__SINGLE_POOL_REG_CERTIFICATE_REQUIRED);
+      const txBody = Serialization.TransactionBody.fromCore({
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.PoolRegistration,
+            poolParameters
+          },
+          {
+            __typename: Cardano.CertificateType.PoolRegistration,
+            poolParameters
+          }
+        ],
+        fee: 10n,
+        inputs: [txIn],
+        outputs: [pureAdaTxOut]
+      });
+
+      await expect(async () => await keyAgentMock.signTransaction(txBody, noAddressesOptions)).rejects.toThrow(
+        InvalidDataReason.SIGN_MODE_POOL_OPERATOR__SINGLE_POOL_REG_CERTIFICATE_REQUIRED
+      );
     });
   });
 });

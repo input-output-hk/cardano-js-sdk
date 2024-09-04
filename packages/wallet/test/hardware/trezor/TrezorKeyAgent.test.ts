@@ -290,19 +290,26 @@ describe('TrezorKeyAgent', () => {
     });
 
     it('throws if signed transaction hash doesnt match hash computed by the wallet', async () => {
+      const originalHashFn = Serialization.TransactionBody.prototype.hash;
+      jest
+        .spyOn(Serialization.TransactionBody.prototype, 'hash')
+        .mockReturnValue('non-matching' as unknown as Cardano.TransactionId);
+
       props = {
         outputs: new Set<Cardano.TxOut>([outputs.simpleOutput])
       };
       txInternals = await wallet.initializeTx(props);
+
+      const txBody = Serialization.TransactionBody.fromCore(txInternals.body);
       await expect(
-        trezorKeyAgent.signTransaction(
-          {
-            body: txInternals.body,
-            hash: 'non-matching' as unknown as Cardano.TransactionId
-          },
-          { knownAddresses: await firstValueFrom(wallet.addresses$), txInKeyPathMap: {} }
-        )
+        trezorKeyAgent.signTransaction(txBody, {
+          knownAddresses: await firstValueFrom(wallet.addresses$),
+          txInKeyPathMap: {}
+        })
       ).rejects.toThrow();
+      expect(Serialization.TransactionBody.prototype.hash).toHaveBeenCalled();
+
+      Serialization.TransactionBody.prototype.hash = originalHashFn;
     });
 
     it('successfully signs simple transaction with datum hash', async () => {

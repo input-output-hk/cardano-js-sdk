@@ -8,7 +8,7 @@ import {
   SerializableInMemoryKeyAgentData,
   util
 } from '../src';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { dummyLogger } from 'ts-log';
 
@@ -95,20 +95,18 @@ describe('InMemoryKeyAgent', () => {
       { index: 0, role: 0 },
       { index: 0, role: 2 }
     ]);
-    const body = {} as unknown as Cardano.HydratedTxBody;
+    const body = {
+      hash: () => Cardano.TransactionId('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec'),
+      toCore: () => ({} as unknown as Cardano.HydratedTxBody)
+    } as unknown as Serialization.TransactionBody;
+
     const knownAddresses: GroupedAddress[] = [];
     const txInKeyPathMap = {};
-    const witnessSet = await keyAgent.signTransaction(
-      {
-        body,
-        hash: Cardano.TransactionId('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec')
-      },
-      {
-        knownAddresses,
-        txInKeyPathMap
-      }
-    );
-    expect(ownSignatureKeyPaths).toBeCalledWith(body, knownAddresses, txInKeyPathMap, expect.anything());
+    const witnessSet = await keyAgent.signTransaction(body, {
+      knownAddresses,
+      txInKeyPathMap
+    });
+    expect(ownSignatureKeyPaths).toBeCalledWith(body.toCore(), knownAddresses, txInKeyPathMap, expect.anything());
     expect(witnessSet.size).toBe(2);
     expect(typeof [...witnessSet.values()][0]).toBe('string');
   });
@@ -208,13 +206,13 @@ describe('InMemoryKeyAgent', () => {
       );
 
       ownSignatureKeyPaths.mockReturnValue([{ index: 0, type: KeyRole.External }]);
-      const signature = await keyAgentFromMnemonic.signTransaction(
-        {
-          body: { fee: 10n, inputs: [], outputs: [], validityInterval: {} },
-          hash: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000')
-        },
-        { knownAddresses: [], txInKeyPathMap: {} }
-      );
+      const txBody = Serialization.TransactionBody.fromCore({
+        fee: 10n,
+        inputs: [],
+        outputs: [],
+        validityInterval: {}
+      });
+      const signature = await keyAgentFromMnemonic.signTransaction(txBody, { knownAddresses: [], txInKeyPathMap: {} });
       expect(
         signature.has(Crypto.Ed25519PublicKeyHex('0b1c96fad4179d7910bd9485ac28c4c11368c83d18d01b29d4cf84d8ff6a06c4'))
       ).toBe(true);

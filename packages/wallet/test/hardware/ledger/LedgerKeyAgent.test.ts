@@ -230,15 +230,21 @@ describe('LedgerKeyAgent', () => {
       });
 
       it('throws if signed transaction hash doesnt match hash computed by the wallet', async () => {
+        const originalHashFn = Serialization.TransactionBody.prototype.hash;
+        jest
+          .spyOn(Serialization.TransactionBody.prototype, 'hash')
+          .mockReturnValue('non-matching' as unknown as Cardano.TransactionId);
+
+        const txBody = Serialization.TransactionBody.fromCore(txInternals.body);
         await expect(
-          ledgerKeyAgent.signTransaction(
-            {
-              ...txInternals,
-              hash: 'non-matching' as unknown as Cardano.TransactionId
-            },
-            { knownAddresses: await firstValueFrom(wallet.addresses$), txInKeyPathMap: {} }
-          )
+          ledgerKeyAgent.signTransaction(txBody, {
+            knownAddresses: await firstValueFrom(wallet.addresses$),
+            txInKeyPathMap: {}
+          })
         ).rejects.toThrow();
+        expect(Serialization.TransactionBody.prototype.hash).toHaveBeenCalled();
+
+        Serialization.TransactionBody.prototype.hash = originalHashFn;
       });
 
       it('can sign a transaction that mints a token using a plutus script', async () => {

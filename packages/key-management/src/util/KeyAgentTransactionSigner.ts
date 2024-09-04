@@ -1,5 +1,5 @@
 import { AccountKeyDerivationPath, KeyAgent, TransactionSigner, TransactionSignerResult } from '../types';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { ProofGenerationError } from '../errors';
 
 const EXPECTED_SIG_NUM = 1;
@@ -24,12 +24,12 @@ export class KeyAgentTransactionSigner implements TransactionSigner {
   /**
    * Sings a transaction.
    *
-   * @param tx The transaction to be signed.
+   * @param txBody The transaction to be signed.
    * @returns A Ed25519 transaction signature.
    */
-  async sign(tx: Cardano.TxBodyWithHash): Promise<TransactionSignerResult> {
+  async sign(txBody: Serialization.TransactionBody): Promise<TransactionSignerResult> {
     const signatures: Cardano.Signatures = await this.#keyAgent.signTransaction(
-      tx,
+      txBody,
       {
         knownAddresses: [],
         txInKeyPathMap: {}

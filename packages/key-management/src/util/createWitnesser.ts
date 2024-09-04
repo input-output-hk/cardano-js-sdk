@@ -6,9 +6,9 @@ import {
   WitnessedTx,
   Witnesser
 } from '../types';
-import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { Cip30SignDataRequest } from '../cip8';
+import { Serialization } from '@cardano-sdk/core';
 import { stubSignTransaction } from './stubSignTransaction';
 
 /** A witnesser that uses a {@link KeyAgent} to generate witness data for a transaction. */
@@ -33,7 +33,7 @@ export class Bip32Ed25519Witnesser implements Witnesser {
             signTransactionOptions: options,
             txBody: coreTx.body
           })
-        : await Bip32Ed25519Witnesser.getSignatures(this.#keyAgent, { body: coreTx.body, hash }, context, options);
+        : await Bip32Ed25519Witnesser.getSignatures(this.#keyAgent, tx.body(), context, options);
 
     const transaction = {
       auxiliaryData: coreTx.auxiliaryData,
@@ -61,22 +61,15 @@ export class Bip32Ed25519Witnesser implements Witnesser {
 
   static async getSignatures(
     keyAgent: AsyncKeyAgent,
-    txInternals: Cardano.TxBodyWithHash,
+    txBody: Serialization.TransactionBody,
     context: SignTransactionContext,
     options?: SignTransactionOptions
   ) {
-    const signatures = await keyAgent.signTransaction(
-      {
-        body: txInternals.body,
-        hash: txInternals.hash
-      },
-      context,
-      options
-    );
+    const signatures = await keyAgent.signTransaction(txBody, context, options);
 
     if (options?.extraSigners) {
       for (const extraSigner of options?.extraSigners) {
-        const extraSignature = await extraSigner.sign(txInternals);
+        const extraSignature = await extraSigner.sign(txBody);
         signatures.set(extraSignature.pubKey, extraSignature.signature);
       }
     }
