@@ -711,6 +711,9 @@ export class LedgerKeyAgent extends KeyAgentBase {
 
       const signingMode = LedgerKeyAgent.getSigningMode(ledgerTxData);
       const result = await deviceConnection.signTransaction({
+        options: {
+          tagCborSets: txBody.hasTaggedSets()
+        },
         signingMode,
         tx: ledgerTxData
       });
