@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.42.5...@cardano-sdk/wallet@0.43.0) (2024-09-04)
+
+### ⚠ BREAKING CHANGES
+
+* keyAgent signTransaction now takes Serialization.TransactionBody instead of Core.TxBodyWithHash
+
+### Features
+
+* add Trezor conway era certificates ([0fd55dc](https://github.com/input-output-hk/cardano-js-sdk/commit/0fd55dc5ce427838c8571741d2561aa60f1ee11c))
+
+### Code Refactoring
+
+* keyAgent signTransaction now takes Serialization.TransactionBody ([a0fa7c7](https://github.com/input-output-hk/cardano-js-sdk/commit/a0fa7c71512104384755061010e9f8a31da0d415))
+
 ## [0.42.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.42.4...@cardano-sdk/wallet@0.42.5) (2024-08-23)
 
 **Note:** Version bump only for package @cardano-sdk/wallet

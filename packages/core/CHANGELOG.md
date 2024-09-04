@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.39.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.39.0...@cardano-sdk/core@0.39.1) (2024-09-04)
+
+### Features
+
+* **core:** add hasTaggedSets function to TransactionBody ([c785428](https://github.com/input-output-hk/cardano-js-sdk/commit/c78542856932087e043ebdbb33a5d60d334adcb5))
+
+### Bug Fixes
+
+* **core:** uri type now supports IPFS CIDv1 format ([e2565d1](https://github.com/input-output-hk/cardano-js-sdk/commit/e2565d1afa1010ba2d64be378d142f58555086c9))
+
 ## [0.39.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.38.3...@cardano-sdk/core@0.39.0) (2024-08-23)
 
 ### ⚠ BREAKING CHANGES

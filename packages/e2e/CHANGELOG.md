@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.40.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.39.5...@cardano-sdk/e2e@0.40.0) (2024-09-04)
+
+### ⚠ BREAKING CHANGES
+
+* keyAgent signTransaction now takes Serialization.TransactionBody instead of Core.TxBodyWithHash
+
+### Code Refactoring
+
+* keyAgent signTransaction now takes Serialization.TransactionBody ([a0fa7c7](https://github.com/input-output-hk/cardano-js-sdk/commit/a0fa7c71512104384755061010e9f8a31da0d415))
+
 ## [0.39.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.39.4...@cardano-sdk/e2e@0.39.5) (2024-08-23)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

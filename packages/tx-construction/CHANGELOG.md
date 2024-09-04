@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.21.0...@cardano-sdk/tx-construction@0.21.1) (2024-09-04)
+
+### Bug Fixes
+
+* update hashScriptData for conway ([d7275ee](https://github.com/input-output-hk/cardano-js-sdk/commit/d7275ee77556b5dcebf9042ea49d828b58116902))
+
 ## [0.21.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.20.3...@cardano-sdk/tx-construction@0.21.0) (2024-08-23)
 
 ### ⚠ BREAKING CHANGES
