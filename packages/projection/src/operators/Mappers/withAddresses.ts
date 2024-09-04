@@ -25,7 +25,8 @@ export const withAddresses = unifiedProjectorOperator<WithUtxo, WithAddresses>((
     ...Object.entries(evt.utxoByTx).reduce(
       (map, [txId, utxo]) => ({
         ...map,
-        [txId]: uniq(utxo.produced.map(([_, txOut]) => txOut.address)).map(credentialsFromAddress)
+        // no use of uniq to preserve output index via the order of the array
+        [txId]: utxo.produced.map(([_, txOut]) => txOut.address).map(credentialsFromAddress)
       }),
       new Map<Cardano.TransactionId, Address[]>()
     )

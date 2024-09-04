@@ -44,6 +44,7 @@
     "@cardano-sdk/util-rxjs": "workspace:~",
     "backoff-rxjs": "^7.0.0",
     "lodash": "^4.17.21",
+    "lru-cache": "^11.0.0",
     "pg": "^8.9.0",
     "pg-boss": "8.4.2",
     "reflect-metadata": "^0.1.13",

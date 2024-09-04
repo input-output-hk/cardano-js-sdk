@@ -15,7 +15,7 @@ export class CredentialEntity {
   @PrimaryColumn('varchar')
   credentialHash?: Hash28ByteBase16;
 
-  @Column('enum', { enum: CredentialType, nullable: false })
+  @Column('enum', { enum: CredentialType, nullable: true })
   credentialType?: CredentialType;
 
   @ManyToMany(() => TransactionEntity, (transaction) => transaction.credentials, { onDelete: 'CASCADE' })

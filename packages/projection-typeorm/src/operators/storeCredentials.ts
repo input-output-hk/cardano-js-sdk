@@ -1,36 +1,35 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { CredentialEntity, CredentialType, OutputEntity, credentialEntityComparator } from '../entity';
-import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import { CredentialEntity, CredentialType, OutputEntity } from '../entity';
 import { Mappers } from '@cardano-sdk/projection';
 import { Repository } from 'typeorm';
 import { typeormOperator } from './util';
-import uniqWith from 'lodash/uniqWith.js';
+
+import { CredentialManager } from '../CredentialManager';
 
 export interface WithTxCredentials {
   credentialsByTx: Record<Cardano.TransactionId, CredentialEntity[]>;
 }
-
-const addressByTxInCache = {} as Record<string, Mappers.Address>;
-
-const removeTxInFromCache = (txIn: string) => {
-  delete addressByTxInCache[txIn];
-};
 
 export const willStoreCredentials = ({ utxoByTx }: Mappers.WithUtxo) => Object.keys(utxoByTx).length > 0;
 
 const addInputCredentials = async (
   utxoByTx: Record<Cardano.TransactionId, Mappers.WithConsumedTxIn & Mappers.WithProducedUTxO>,
   utxoRepository: Repository<OutputEntity>,
-  addCredentialFromAddress: (txId: Cardano.TransactionId, address: Mappers.Address) => void
+  manager: CredentialManager
 ) => {
   for (const txHash of Object.keys(utxoByTx) as Cardano.TransactionId[]) {
     const txInLookups: { outputIndex: number; txId: Cardano.TransactionId }[] = [];
+
     for (const txIn of utxoByTx[txHash]!.consumed) {
-      const cacheKey = `${txIn.txId}#${txIn.index}`;
-      if (addressByTxInCache[cacheKey] === undefined) {
-        txInLookups.push({ outputIndex: txIn.index, txId: txIn.txId });
+      const cachedCredentials = manager.getCachedCredential(txIn);
+      if (cachedCredentials.length > 0) {
+        for (const credential of cachedCredentials) {
+          manager.addCredential(txHash, { hash: credential.hash, type: credential.type ?? undefined });
+        }
+        manager.deleteCachedCredential(txIn); // can only be consumed once so chances are it won't have to be resolved again
       } else {
-        addCredentialFromAddress(txHash, addressByTxInCache[cacheKey]);
+        txInLookups.push({ outputIndex: txIn.index, txId: txIn.txId });
       }
     }
 
@@ -41,10 +40,7 @@ const addInputCredentials = async (
 
     for (const hydratedTxIn of outputEntities) {
       if (hydratedTxIn.address) {
-        addressByTxInCache[`${hydratedTxIn.txId!}#${hydratedTxIn.outputIndex!}`] = Mappers.credentialsFromAddress(
-          hydratedTxIn.address!
-        );
-        addCredentialFromAddress(txHash, Mappers.credentialsFromAddress(hydratedTxIn.address));
+        manager.addCredentialFromAddress(txHash, Mappers.credentialsFromAddress(hydratedTxIn.address!));
       }
     }
   }
@@ -52,53 +48,27 @@ const addInputCredentials = async (
 
 const addOutputCredentials = (
   addressesByTx: Record<Cardano.TransactionId, Mappers.Address[]>,
-  addCredentialFromAddress: (txId: Cardano.TransactionId, address: Mappers.Address) => void
+  manager: CredentialManager
 ) => {
   for (const txId of Object.keys(addressesByTx) as Cardano.TransactionId[]) {
-    for (const address of addressesByTx[txId]) {
-      addCredentialFromAddress(txId, address);
+    for (const [index, address] of addressesByTx[txId].entries()) {
+      manager.addCredentialFromAddress(txId, address, index);
     }
   }
 };
 
 const addCertificateCredentials = (
   credentialsByTx: Record<Cardano.TransactionId, Cardano.Credential[]>,
-  addCredential: (
-    txId: Cardano.TransactionId,
-    credentialHash: Hash28ByteBase16,
-    credentialType: CredentialType
-  ) => Map<Cardano.TransactionId, CredentialEntity[]>
+  manager: CredentialManager
 ) => {
   for (const txId of Object.keys(credentialsByTx) as Cardano.TransactionId[]) {
     for (const credential of credentialsByTx[txId]) {
-      addCredential(
-        txId,
-        credential.hash,
-        credential.type === 0 ? CredentialType.StakeKey : CredentialType.StakeScript
-      );
+      manager.addCredential(txId, {
+        hash: credential.hash,
+        type: credential.type === 0 ? CredentialType.StakeKey : CredentialType.StakeScript
+      });
     }
   }
-};
-
-type AddressPart = 'payment' | 'stake';
-const credentialTypeMap: { [key: number]: { payment: CredentialType | null; stake: CredentialType } } = {
-  [Cardano.AddressType.BasePaymentKeyStakeKey]: { payment: CredentialType.PaymentKey, stake: CredentialType.StakeKey },
-  [Cardano.AddressType.EnterpriseKey]: { payment: CredentialType.PaymentKey, stake: CredentialType.StakeKey },
-  [Cardano.AddressType.BasePaymentKeyStakeScript]: {
-    payment: CredentialType.PaymentKey,
-    stake: CredentialType.StakeScript
-  },
-  [Cardano.AddressType.BasePaymentScriptStakeKey]: {
-    payment: CredentialType.PaymentScript,
-    stake: CredentialType.StakeKey
-  },
-  [Cardano.AddressType.BasePaymentScriptStakeScript]: {
-    payment: CredentialType.PaymentScript,
-    stake: CredentialType.StakeScript
-  },
-  [Cardano.AddressType.EnterpriseScript]: { payment: CredentialType.PaymentScript, stake: CredentialType.StakeScript },
-  [Cardano.AddressType.RewardKey]: { payment: null, stake: CredentialType.StakeKey },
-  [Cardano.AddressType.RewardScript]: { payment: null, stake: CredentialType.StakeScript }
 };
 
 export const storeCredentials = typeormOperator<
@@ -115,66 +85,30 @@ export const storeCredentials = typeormOperator<
     utxo: { consumed: consumedUTxOs }
   } = evt;
 
-  const txToCredentials = new Map<Cardano.TransactionId, CredentialEntity[]>();
+  const manager = new CredentialManager();
 
   // produced credentials will be automatically deleted via block cascade
   if (txs.length === 0 || eventType !== ChainSyncEventType.RollForward) {
-    return { credentialsByTx: Object.fromEntries(txToCredentials) };
+    return { credentialsByTx: Object.fromEntries(manager.txToCredentials) };
   }
+
   const utxoRepository = queryRunner.manager.getRepository(OutputEntity);
-  const addCredential = (
-    txId: Cardano.TransactionId,
-    credentialHash: Hash28ByteBase16,
-    credentialType: CredentialType
-  ) =>
-    txToCredentials.set(
-      txId,
-      uniqWith([...(txToCredentials.get(txId) || []), { credentialHash, credentialType }], credentialEntityComparator)
-    );
-
-  const credentialTypeFromAddressType = (type: Cardano.AddressType, part: AddressPart) => {
-    const credential = credentialTypeMap[type];
-    if (!credential) {
-      // FIXME: map byron address, pointer script, pointer key type
-      return null;
-    }
-    return credential[part];
-  };
-
-  const addCredentialFromAddress = (
-    txId: Cardano.TransactionId,
-    { paymentCredentialHash, stakeCredential, type }: Mappers.Address
-  ) => {
-    const paymentCredentialType = credentialTypeFromAddressType(type, 'payment');
-    if (paymentCredentialHash && paymentCredentialType) {
-      addCredential(txId, paymentCredentialHash, paymentCredentialType);
-    }
-
-    if (stakeCredential) {
-      const stakeCredentialType = credentialTypeFromAddressType(type, 'stake');
-      // FIXME: support pointers
-      if (stakeCredentialType && typeof stakeCredential === 'string') {
-        addCredential(txId, stakeCredential, stakeCredentialType);
-      }
-    }
-  };
-
-  await addInputCredentials(utxoByTx, utxoRepository, addCredentialFromAddress);
-  addOutputCredentials(addressesByTx, addCredentialFromAddress);
-  addCertificateCredentials(stakeCredentialsByTx, addCredential);
+  await addInputCredentials(utxoByTx, utxoRepository, manager);
+  addOutputCredentials(addressesByTx, manager);
+  addCertificateCredentials(stakeCredentialsByTx, manager);
 
   // insert new credentials & ignore conflicts of existing ones
   await queryRunner.manager
     .createQueryBuilder()
     .insert()
     .into(CredentialEntity)
-    .values([...txToCredentials.values()].flat())
+    .values([...manager.txToCredentials.values()].flat())
     .orIgnore()
     .execute();
 
   for (const consumed of consumedUTxOs) {
-    removeTxInFromCache(`${consumed.txId}#${consumed.index}`);
+    manager.deleteCachedCredential(consumed);
   }
 
-  return { credentialsByTx: Object.fromEntries(txToCredentials) };
+  return { credentialsByTx: Object.fromEntries(manager.txToCredentials) };
 });
