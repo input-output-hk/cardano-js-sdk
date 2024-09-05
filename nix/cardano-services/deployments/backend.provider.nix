@@ -32,6 +32,7 @@
         USE_KORA_LABS = "true";
         DISABLE_STAKE_POOL_METRIC_APY = "true";
         PAGINATION_PAGE_SIZE_LIMIT = "5500";
+        NODE_ENV = values.cardano-services.nodeEnv;
 
         HANDLE_PROVIDER_SERVER_URL =
           if config.network == "mainnet"

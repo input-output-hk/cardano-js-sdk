@@ -27,6 +27,7 @@
       NETWORK = config.network;
       OGMIOS_SRV_SERVICE_NAME = values.backend.ogmiosSrvServiceName;
       SERVICE_NAMES = "handle";
+      NODE_ENV = values.cardano-services.nodeEnv;
 
       ALLOWED_ORIGINS = values.backend.allowedOrigins;
 
@@ -70,6 +71,7 @@
       OGMIOS_SRV_SERVICE_NAME = values.backend.ogmiosSrvServiceName;
       PROJECTION_NAMES = "handle";
       HANDLE_POLICY_IDS = "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a";
+      NODE_ENV = values.cardano-services.nodeEnv;
 
       POSTGRES_POOL_MAX = "2";
       POSTGRES_HOST = values.postgresName;

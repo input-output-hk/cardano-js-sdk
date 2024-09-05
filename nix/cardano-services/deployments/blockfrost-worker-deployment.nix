@@ -49,6 +49,7 @@
               env = utils.mkPodEnv {
                 NETWORK = config.network;
                 LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
+                NODE_ENV = values.cardano-services.nodeEnv;
 
                 BLOCKFROST_API_KEY = {
                   valueFrom.secretKeyRef = {
