@@ -24,7 +24,7 @@ const blockCertificates = ({
         certificate,
         pointer: {
           certIndex: Cardano.CertIndex(certIndex),
-          slot: Cardano.Slot(slot),
+          slot: BigInt(slot),
           txIndex: Cardano.TxIndex(txIndex)
         }
       }))

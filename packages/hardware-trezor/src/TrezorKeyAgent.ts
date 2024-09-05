@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
 import * as Trezor from '@trezor/connect';
-import { Cardano, NotImplementedError } from '@cardano-sdk/core';
+import { Cardano, NotImplementedError, Serialization } from '@cardano-sdk/core';
 import {
   CardanoKeyConst,
   CommunicationType,
@@ -17,7 +17,7 @@ import {
   util
 } from '@cardano-sdk/key-management';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
-import { areStringsEqualInConstantTime } from '@cardano-sdk/util';
+import { HexBlob, areStringsEqualInConstantTime } from '@cardano-sdk/util';
 import { txToTrezor } from './transformers/tx';
 import _TrezorConnectWeb from '@trezor/connect-web';
 
@@ -214,15 +214,19 @@ export class TrezorKeyAgent extends KeyAgentBase {
   }
 
   async signTransaction(
-    { body, hash }: Cardano.TxBodyWithHash,
+    txBody: Serialization.TransactionBody,
     { knownAddresses, txInKeyPathMap }: SignTransactionContext
   ): Promise<Cardano.Signatures> {
     try {
       await this.isTrezorInitialized;
+      const body = txBody.toCore();
+      const hash = txBody.hash() as unknown as HexBlob;
+
       const trezorTxData = await txToTrezor(body, {
         accountIndex: this.accountIndex,
         chainId: this.chainId,
         knownAddresses,
+        tagCborSets: txBody.hasTaggedSets(),
         txInKeyPathMap
       });
 

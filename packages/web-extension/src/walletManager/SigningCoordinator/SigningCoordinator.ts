@@ -97,16 +97,8 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
         walletType: requestContext.wallet.type
       },
       (keyAgent) => {
-        const hash = transaction.getId();
-        this.#logger.info('Signing transaction', hash);
-        return keyAgent.signTransaction(
-          {
-            body: transaction.body().toCore(),
-            hash
-          },
-          signContext,
-          options
-        );
+        this.#logger.info('Signing transaction', transaction.getId());
+        return keyAgent.signTransaction(transaction.body(), signContext, options);
       }
     );
   }

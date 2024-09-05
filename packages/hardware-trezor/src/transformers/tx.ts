@@ -8,7 +8,10 @@ import { mapTokenMap } from './assets';
 
 export const trezorTxTransformer: Transformer<
   Cardano.TxBody,
-  Omit<Trezor.CardanoSignTransaction, 'signingMode' | 'derivationType' | 'includeNetworkId'>,
+  Omit<Trezor.CardanoSignTransaction, 'signingMode' | 'derivationType' | 'includeNetworkId' | 'chunkify' | 'ttl'> & {
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    ttl: any; // TODO: the Transformer util cant handle ttl as TOptional<string | number>
+  },
   TrezorTxTransformerContext
 > = {
   additionalWitnessRequests: ({ inputs }, context) => mapAdditionalWitnessRequests(inputs, context!),
@@ -28,6 +31,7 @@ export const trezorTxTransformer: Transformer<
   requiredSigners: ({ requiredExtraSignatures }, context) =>
     requiredExtraSignatures ? mapRequiredSigners(requiredExtraSignatures, context!) : undefined,
   scriptDataHash: ({ scriptIntegrityHash }) => scriptIntegrityHash?.toString(),
+  tagCborSets: (_, context) => context!.tagCborSets,
   totalCollateral: ({ totalCollateral }) => totalCollateral?.toString(),
   ttl: ({ validityInterval }) => validityInterval?.invalidHereafter?.toString(),
   validityIntervalStart: ({ validityInterval }) => validityInterval?.invalidBefore?.toString(),

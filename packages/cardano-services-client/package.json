@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-services-client",
-  "version": "0.20.0",
+  "version": "0.20.5",
   "description": "Cardano Services Client",
   "engines": {
     "node": ">=16.20.2"
@@ -41,7 +41,7 @@
   "devDependencies": {
     "@cardano-sdk/util-dev": "workspace:~",
     "@types/validator": "^13.7.1",
-    "axios-mock-adapter": "^1.20.0",
+    "axios-mock-adapter": "^2.0.0",
     "eslint": "^7.32.0",
     "express": "^4.17.3",
     "get-port-please": "^2.5.0",
@@ -55,7 +55,7 @@
   "dependencies": {
     "@cardano-sdk/core": "workspace:~",
     "@cardano-sdk/util": "workspace:~",
-    "axios": "^0.28.0",
+    "axios": "^1.7.4",
     "class-validator": "^0.14.0",
     "isomorphic-ws": "^5.0.0",
     "json-bigint": "~1.0.0",

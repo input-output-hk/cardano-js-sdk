@@ -2,6 +2,9 @@ import {
   Cardano,
   CardanoNodeUtil,
   ChainSyncError,
+  CredentialAlreadyRegisteredData,
+  DRepAlreadyRegisteredData,
+  DRepNotRegisteredData,
   GeneralCardanoNodeError,
   GeneralCardanoNodeErrorCode,
   IncompleteWithdrawalsData,
@@ -10,6 +13,7 @@ import {
   StateQueryError,
   TxSubmissionError,
   TxSubmissionErrorCode,
+  UnknownCredentialData,
   UnknownOutputReferencesData,
   ValueNotConservedData
 } from '@cardano-sdk/core';
@@ -17,14 +21,19 @@ import {
 import { LedgerStateQuery } from '@cardano-ogmios/client';
 import { Logger } from 'ts-log';
 import {
+  SubmitTransactionFailureCredentialAlreadyRegistered,
+  SubmitTransactionFailureDRepAlreadyRegistered,
+  SubmitTransactionFailureDRepNotRegistered,
   SubmitTransactionFailureIncompleteWithdrawals,
   SubmitTransactionFailureOutsideOfValidityInterval,
+  SubmitTransactionFailureUnknownCredential,
   SubmitTransactionFailureUnknownOutputReferences,
   SubmitTransactionFailureValueNotConserved
 } from '@cardano-ogmios/schema';
 import { eraSummary, genesis } from '../ogmiosToCore';
 import { isConnectionError } from '@cardano-sdk/util';
 import { mapTxIn, mapValue, mapWithdrawals } from '../ogmiosToCore/tx';
+import type * as Crypto from '@cardano-sdk/crypto';
 
 const errorDataToCore = (data: unknown, code: number) => {
   switch (code) {
@@ -56,6 +65,40 @@ const errorDataToCore = (data: unknown, code: number) => {
       return {
         unknownOutputReferences: typedData.unknownOutputReferences.map(mapTxIn)
       } as UnknownOutputReferencesData;
+    }
+    case TxSubmissionErrorCode.CredentialAlreadyRegistered: {
+      const typedData = data as SubmitTransactionFailureCredentialAlreadyRegistered['data'];
+
+      return {
+        hash: typedData.knownCredential as Crypto.Hash28ByteBase16
+      } as CredentialAlreadyRegisteredData;
+    }
+    case TxSubmissionErrorCode.DRepAlreadyRegistered: {
+      const typedData = data as SubmitTransactionFailureDRepAlreadyRegistered['data'];
+
+      if (typedData.knownDelegateRepresentative.type === 'registered') {
+        return {
+          hash: typedData.knownDelegateRepresentative.id as Crypto.Hash28ByteBase16
+        } as DRepAlreadyRegisteredData;
+      }
+      return null;
+    }
+    case TxSubmissionErrorCode.UnknownCredential: {
+      const typedData = data as SubmitTransactionFailureUnknownCredential['data'];
+
+      return {
+        hash: typedData.unknownCredential as Crypto.Hash28ByteBase16
+      } as UnknownCredentialData;
+    }
+    case TxSubmissionErrorCode.DRepNotRegistered: {
+      const typedData = data as SubmitTransactionFailureDRepNotRegistered['data'];
+
+      if (typedData.unknownDelegateRepresentative.type === 'registered') {
+        return {
+          hash: typedData.unknownDelegateRepresentative.id as Crypto.Hash28ByteBase16
+        } as DRepNotRegisteredData;
+      }
+      return null;
     }
     default:
       // Mapper not implemented

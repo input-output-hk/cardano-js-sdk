@@ -4,7 +4,6 @@ import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 
-const CBOR_EMPTY_LIST = new Uint8Array([0x80]);
 const CBOR_EMPTY_MAP = new Uint8Array([0xa0]);
 
 /**
@@ -49,13 +48,16 @@ const hashScriptData = (
   const writer = new Serialization.CborWriter();
 
   if (datums && datums.length > 0 && (!redemeers || redemeers.length === 0)) {
-    /*
+    /* (Deprecated)
      ; Note that in the case that a transaction includes datums but does not
      ; include any redeemers, the script data format becomes (in hex):
      ; [ 80 | datums | A0 ]
      ; corresponding to a CBOR empty list and an empty map).
     */
-    writer.writeEncodedValue(CBOR_EMPTY_LIST);
+    /* Post Babbage:
+     ; [ A0 | datums | A0 ]
+    */
+    writer.writeEncodedValue(CBOR_EMPTY_MAP);
     writer.writeEncodedValue(getCborEncodedArray(datums));
     writer.writeEncodedValue(CBOR_EMPTY_MAP);
   } else {

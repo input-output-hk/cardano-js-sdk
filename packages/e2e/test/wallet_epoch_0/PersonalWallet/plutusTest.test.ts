@@ -193,7 +193,11 @@ describe.skip('PersonalWallet/plutus', () => {
   it('can spend balance from a plutus script', async () => {
     wallet = (await getWallet({ env, logger, name: 'Spending Wallet', polling: { interval: 50 } })).wallet;
     // UTXO provider can be use to fetch the UTXO set from the script address.
-    const utxoProvider = await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS, logger);
+    const utxoProvider = await utxoProviderFactory.create(
+      env.TEST_CLIENT_UTXO_PROVIDER,
+      env.TEST_CLIENT_UTXO_PROVIDER_PARAMS,
+      logger
+    );
 
     // Plutus script that always returns true.
     const alwaysSucceedsScript: Cardano.PlutusScript = {
@@ -267,7 +271,11 @@ describe.skip('PersonalWallet/plutus', () => {
   it('can spend balance from a plutus script using a reference script', async () => {
     wallet = (await getWallet({ env, logger, name: 'Spending Wallet', polling: { interval: 50 } })).wallet;
     // UTXO provider can be use to fetch the UTXO set from the script address.
-    const utxoProvider = await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS, logger);
+    const utxoProvider = await utxoProviderFactory.create(
+      env.TEST_CLIENT_UTXO_PROVIDER,
+      env.TEST_CLIENT_UTXO_PROVIDER_PARAMS,
+      logger
+    );
 
     const midnightClaimScript: Cardano.PlutusScript = {
       __type: Cardano.ScriptType.Plutus,

@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.11.5...@cardano-sdk/hardware-ledger@0.12.0) (2024-09-04)
+
+### ⚠ BREAKING CHANGES
+
+* keyAgent signTransaction now takes Serialization.TransactionBody instead of Core.TxBodyWithHash
+
+### Bug Fixes
+
+* **hardware-ledger:** ledgerKeyAgent now conditionally instructs hw to use tagged CBOR sets ([644c32c](https://github.com/input-output-hk/cardano-js-sdk/commit/644c32c730bc74e3c60e70cab376b308b6ee468f))
+
+### Code Refactoring
+
+* keyAgent signTransaction now takes Serialization.TransactionBody ([a0fa7c7](https://github.com/input-output-hk/cardano-js-sdk/commit/a0fa7c71512104384755061010e9f8a31da0d415))
+
+## [0.11.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.11.4...@cardano-sdk/hardware-ledger@0.11.5) (2024-08-23)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-ledger
+
+## [0.11.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.11.3...@cardano-sdk/hardware-ledger@0.11.4) (2024-08-22)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-ledger
+
+## [0.11.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.11.2...@cardano-sdk/hardware-ledger@0.11.3) (2024-08-21)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-ledger
+
+## [0.11.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.11.1...@cardano-sdk/hardware-ledger@0.11.2) (2024-08-20)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-ledger
+
 ## [0.11.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.11.0...@cardano-sdk/hardware-ledger@0.11.1) (2024-08-07)
 
 ### Bug Fixes

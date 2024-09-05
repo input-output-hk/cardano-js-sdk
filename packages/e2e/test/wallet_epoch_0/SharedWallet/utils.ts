@@ -176,10 +176,7 @@ const createWitnessData = async (
 ): Promise<Cardano.Witness> => ({
   scripts: [paymentScript, stakingScript],
   signatures: await keyAgent.signTransaction(
-    {
-      body: tx.body().toCore(),
-      hash: tx.getId()
-    },
+    tx.body(),
     context,
     { ...options, additionalKeyPaths: [...(options?.additionalKeyPaths ?? []), DERIVATION_PATH] } // The key agent wont be able to find the right key if we don't provide the derivation path.
   )
@@ -244,10 +241,7 @@ export class SharedWalletWitnesser implements Witnesser {
       const extraSignatures: Cardano.Signatures = new Map();
       if (options?.extraSigners) {
         for (const extraSigner of options?.extraSigners) {
-          const extraSignature = await extraSigner.sign({
-            body: coreTx.body,
-            hash
-          });
+          const extraSignature = await extraSigner.sign(tx.body());
           extraSignatures.set(extraSignature.pubKey, extraSignature.signature);
         }
       }

@@ -1,9 +1,13 @@
 /* eslint-disable no-console */
 /* eslint-disable func-style */
+
+// K6 scripts use a custom js runtime. I am importing the module like this to avoid
+// introducing a bundler specifically for the K6 tests.
+import * as k6Utils from '../../../../util-dev/dist/cjs/k6-utils.js';
 import { Counter, Trend } from 'k6/metrics';
 import { SharedArray } from 'k6/data';
-import { check, sleep } from 'k6';
 import { apiVersion } from '../../../../cardano-services-client/src/version.ts';
+import { check, sleep } from 'k6';
 import http from 'k6/http';
 
 /**
@@ -30,34 +34,36 @@ import http from 'k6/http';
  *  - wallet_sync_count: is a custom count metric measuring the number of wallets that were successfully synced.
  */
 
+// eslint-disable-next-line no-undef
+const K6_ENV = __ENV;
+
 const RunMode = {
   Onboard: 'Onboard',
   Restore: 'Restore',
   RestoreHD: 'RestoreHD'
 };
 /** Determines run mode: Restore or Onboard */
-const RUN_MODE = __ENV.RUN_MODE || RunMode.Restore;
+const RUN_MODE = K6_ENV.RUN_MODE || RunMode.Restore;
 
 // eslint-disable-next-line no-undef
-const PROVIDER_SERVER_URL = __ENV.PROVIDER_SERVER_URL;
+const dut = k6Utils.getDut(K6_ENV, { environments: ['dev'], networks: ['mainnet', 'preprod'] });
+const sdkCom = new k6Utils.SdkCom({ apiVersion, dut, k6Http: http });
 
 /** Wallet addresses extracted from the JSON dump file */
-const walletsOrig = new SharedArray('walletsData', function () {
-  const network = __ENV.TARGET_ENV == 'dev-mainnet' ? 'mainnet' : 'preprod';
-  const fileName = RUN_MODE === RunMode.Onboard ? `no-history-${network}.json` : `${network}.json`;
+const walletsOrig = new SharedArray('walletsData', () => {
+  const fileName = RUN_MODE === RunMode.Onboard ? `no-history-${K6_ENV.TARGET_NET}.json` : `${K6_ENV.TARGET_NET}.json`;
   console.log(`Reading wallet addresses from ${fileName}`);
-  const walletAddresses = JSON.parse(open('../../dump/addresses/' + fileName));
-  return walletAddresses;
+  // eslint-disable-next-line no-undef
+  return JSON.parse(open(`../../dump/addresses/${fileName}`));
 });
-
 
 /** Stake pool addresses from the JSON dump file */
-const poolAddresses = new SharedArray('poolsData', function () {
+const poolAddresses = new SharedArray('poolsData', () =>
   // There is no dump of preprod pools, but it is ok. Pool address is used only in "Restore" mode
   // and it is used to do a stake pool search call, so any pool will do
-  const pools = JSON.parse(open('../../dump/pool_addresses/mainnet.json'));
-  return pools;
-});
+  // eslint-disable-next-line no-undef
+  JSON.parse(open('../../dump/pool_addresses/mainnet.json'))
+);
 
 /**
  * Define the maximum number of virtual users to simulate
@@ -65,12 +71,12 @@ const poolAddresses = new SharedArray('poolsData', function () {
  * For this reason, it's a good practice to configure MAX_VUs in multiples of 100 in order to maintain the desired distribution.
  * In `RunMode.RestoreHD`, each VU will have multiple addresses.
  */
-const MAX_VU = __ENV.MAX_VU || 1;
+const MAX_VU = K6_ENV.MAX_VU || 1;
 
 /** Time span during which all virtual users are started in a linear fashion */
-const RAMP_UP_DURATION = __ENV.RAMP_UP_DURATION || '1s';
+const RAMP_UP_DURATION = K6_ENV.RAMP_UP_DURATION || '1s';
 /** Time span during which synced wallets do tip queries */
-const STEADY_STATE_DURATION = __ENV.STEADY_STATE_DURATION || '2s';
+const STEADY_STATE_DURATION = K6_ENV.STEADY_STATE_DURATION || '2s';
 
 /** Time to sleep between iterations. Simulates polling tip to keep wallet in sync */
 const ITERATION_SLEEP = 5;
@@ -78,9 +84,9 @@ const ITERATION_SLEEP = 5;
 /** HD wallet discovery. Used when RunMode is `RestoreHD` */
 const hdWalletParams = {
   /** HD wallet size. The number of addresses with transaction history per wallet. They are queried at discover time. */
-  activeAddrCount: __ENV.HD_ACTIVE_ADDR_COUNT || 1,
+  activeAddrCount: K6_ENV.HD_ACTIVE_ADDR_COUNT || 1,
   /** Use only addresses with a transaction history up to this value */
-  maxTxHistory: __ENV.HD_MAX_TX_HISTORY || 1,
+  maxTxHistory: K6_ENV.HD_MAX_TX_HISTORY || 1,
   /** number of payment addresses to search for. It will search both internal and external address, thus multiplied by 2 */
   paymentAddrSearchGap: 20 * 2,
   /** number of stake keys to search for. It will search both internal and external address, thus multiplied by 2 */
@@ -91,19 +97,6 @@ const hdWalletParams = {
 const walletSyncTrend = new Trend('wallet_sync', true);
 /** Custom count statistic to measure how many wallets were successfully syncd */
 const walletSyncCount = new Counter('wallet_sync_count');
-
-/** Repetitive endpoints */
-const TIP_URL = 'network-info/ledger-tip';
-
-/** equivalent to lodash.chunk */
-const chunkArray = (array, chunkSize) => {
-  const arrayCopy = [...array];
-  const chunked = [];
-  while (arrayCopy.length > 0) {
-    chunked.push(arrayCopy.splice(0, chunkSize));
-  }
-  return chunked;
-};
 
 /** Grab the wallets json file to be used by the scenario. Group the addresses per wallet (single address or HD wallets). */
 export function setup() {
@@ -121,13 +114,13 @@ export function setup() {
   console.log(`Wallet addresses configuration file contains ${walletsOrigCount} addresses`);
 
   // One wallet, one address
-  let wallets = chunkArray(walletsOrig, 1);
+  let wallets = k6Utils.chunkArray(walletsOrig, 1);
   if (RUN_MODE === RunMode.RestoreHD) {
     // One wallet, multiple addresses
     // Remove "big transaction history wallets"
     const filteredWallets = walletsOrig.filter(({ tx_count }) => tx_count < hdWalletParams.maxTxHistory);
     // Create chunks of `activeAddrCount` addresses per HD wallet
-    wallets = chunkArray(filteredWallets, hdWalletParams.activeAddrCount);
+    wallets = k6Utils.chunkArray(filteredWallets, hdWalletParams.activeAddrCount);
   }
 
   const requestedAddrCount = RUN_MODE === RunMode.RestoreHD ? MAX_VU * hdWalletParams.activeAddrCount : MAX_VU;
@@ -177,59 +170,6 @@ export const options = {
   }
 };
 
-/** Util functions for sending the http post requests to cardano-sdk services */
-const cardanoHttpPost = (url, apiVer, body = {}) => {
-  const opts = { headers: { 'content-type': 'application/json' } };
-  return http.post(`${PROVIDER_SERVER_URL}/v${apiVer}/${url}`, JSON.stringify(body), opts);
-};
-
-/**
- *
- * @param addresses Bech32 cardano addresses: `Cardano.Address[]`
- * @param takeOne  true: query only the first page; false: query until no more pages
- * @param pageSize Use as request page size. Also, bundle this many addresses on each request.
- */
-const txsByAddress = (addresses, takeOne = false, pageSize = 25) => {
-  const addressChunks = chunkArray(addresses, pageSize);
-  for (const chunk of addressChunks) {
-    let startAt = 0;
-    let txCount = 0;
-
-    do {
-      const resp = cardanoHttpPost('chain-history/txs/by-addresses', apiVersion.chainHistory, {
-        addresses: chunk,
-        blockRange: { lowerBound: { __type: 'undefined' } },
-        pagination: { limit: pageSize, startAt }
-      });
-
-      if (resp.status !== 200) {
-        // No point in trying to get the other pages.
-        // Should we log this? it will show up as if the restoration was quicker since this wallet did not fetch all the pages
-        break;
-      }
-
-      const { pageResults } = JSON.parse(resp.body);
-      startAt += pageSize;
-      txCount = pageResults.length;
-    } while (txCount === pageSize && !takeOne);
-  }
-};
-
-const utxosByAddresses = (addresses) => {
-  const addressChunks = chunkArray(addresses, 25);
-  for (const chunk of addressChunks) {
-    cardanoHttpPost('utxo/utxo-by-addresses', apiVersion.utxo, { addresses: chunk });
-  }
-};
-
-const rewardsAccBalance = (rewardAccount) =>
-  cardanoHttpPost('rewards/account-balance', apiVersion.rewards, { rewardAccount });
-const stakePoolSearch = (poolAddress) =>
-  cardanoHttpPost('stake-pool/search', apiVersion.stakePool, {
-    filters: { identifier: { values: [{ id: poolAddress }] } },
-    pagination: { limit: 1, startAt: 0 }
-  });
-
 /**
  * Changes the last 3 chars. Checksum will be broken but I assume it is not verified
  * Avoiding to import keyagent here to generate actual addresses as it would be difficult to do it
@@ -255,21 +195,21 @@ const walletDiscovery = (wallet) => {
   console.debug('Discover stake keys on payment #0');
   for (let i = 0; i < hdWalletParams.stakeAddrSearchGap; i++) {
     const addr = getDummyAddr(wallet[0].address, i);
-    txsByAddress([addr], true, 1);
+    sdkCom.txsByAddress([addr], true, 1);
   }
 
   // Discover active payment addresses
   console.debug('Discover payment addresses #1+');
   for (const { address } of wallet) {
     // Even if txByAddresses accepts multiple addresses, discovery does it one by one
-    txsByAddress([address], true, 1);
+    sdkCom.txsByAddress([address], true, 1);
   }
 
   // Discover calls in payment address gap
   console.debug('Discover in search gap');
   for (let i = 0; i < hdWalletParams.paymentAddrSearchGap; i++) {
     const addr = getDummyAddr(wallet[0].address, i, 'hm');
-    txsByAddress([addr], true, 1);
+    sdkCom.txsByAddress([addr], true, 1);
   }
 };
 
@@ -282,22 +222,22 @@ const syncWallet = ({ wallet, poolAddress }) => {
     walletDiscovery(wallet);
   }
 
-  cardanoHttpPost('network-info/era-summaries', apiVersion.networkInfo);
-  cardanoHttpPost(TIP_URL, apiVersion.networkInfo);
-  txsByAddress(addresses);
-  utxosByAddresses(addresses);
-  cardanoHttpPost('network-info/era-summaries', apiVersion.networkInfo);
-  cardanoHttpPost('network-info/genesis-parameters', apiVersion.networkInfo);
-  cardanoHttpPost('network-info/protocol-parameters', apiVersion.networkInfo);
+  sdkCom.eraSummaries();
+  sdkCom.tip();
+  sdkCom.txsByAddress(addresses);
+  sdkCom.utxosByAddresses(addresses);
+  sdkCom.eraSummaries();
+  sdkCom.genesisParameters();
+  sdkCom.protocolParameters();
   // Test restoring HD wallets with a single stake key
-  rewardsAccBalance(wallet[0].stake_address);
-  cardanoHttpPost(TIP_URL, apiVersion.networkInfo);
-  cardanoHttpPost('network-info/lovelace-supply', apiVersion.networkInfo);
-  cardanoHttpPost('network-info/stake', apiVersion.networkInfo);
+  sdkCom.rewardsAccBalance(wallet[0].stake_address);
+  sdkCom.tip();
+  sdkCom.lovelaceSupply();
+  sdkCom.stake();
   if (RUN_MODE === RunMode.Restore) {
-    stakePoolSearch(poolAddress);
+    sdkCom.stakePoolSearch(poolAddress);
   }
-  cardanoHttpPost('stake-pool/stats', apiVersion.stakePool);
+  sdkCom.stats();
 
   // Consider the wallet synced by tracking its first address
   syncedWallets.add(addresses[0]);
@@ -306,7 +246,7 @@ const syncWallet = ({ wallet, poolAddress }) => {
 };
 
 /** Simulate keeping wallet in sync For now, just polling the tip */
-const emulateIdleClient = () => cardanoHttpPost(TIP_URL, apiVersion.networkInfo);
+const emulateIdleClient = () => sdkCom.tip();
 
 /**
  * K6 default VU action function
@@ -314,6 +254,7 @@ const emulateIdleClient = () => cardanoHttpPost(TIP_URL, apiVersion.networkInfo)
  * wallets: {address: Cardano.Address, stake_address: Cardano.RewardAccount, tx_count: number}[][]
  * poolAddresses: Cardano.PoolId[]
  */
+// eslint-disable-next-line @typescript-eslint/no-shadow
 export default function ({ wallets, poolAddresses }) {
   // Get the wallet for the current virtual user
   // eslint-disable-next-line no-undef

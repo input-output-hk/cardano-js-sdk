@@ -60,7 +60,7 @@ export type BootstrapExtraProps = WithNetworkInfo & WithEpochNo & WithEpochBound
  * These events are very similar to Chain Sync events, but there are some important differences:
  *
  * 1. Block format is compatible with types from `@cardano-sdk/core` package.
- * 2. Events include some additional properties: `{eraSumaries, genesisParameters, epochNo, crossEpochBoundary}`.
+ * 2. Events include some additional properties: `{eraSummaries, genesisParameters, epochNo, crossEpochBoundary}`.
  * 3. `RollBackward` events include block data (instead of just specifying the rollback point),
  *    and are emitted once for **each** rolled back block.
  *

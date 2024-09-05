@@ -380,6 +380,8 @@ const mapTxOut = (txOut: Schema.TransactionOutput): Cardano.TxOut => ({
   value: mapValue(txOut.value)
 });
 
+const mapInputSource = (source: 'inputs' | 'collaterals'): Cardano.InputSource => Cardano.InputSource[source];
+
 const mapMint = (tx: Schema.Transaction): Cardano.TokenMap | undefined => {
   if (tx.mint === undefined) return undefined;
   return mapAssets(tx.mint);
@@ -396,7 +398,9 @@ const mapWitnessDatums = ({ datums }: Required<Pick<Schema.Transaction, 'datums'
   Object.values(datums).map((datum) => Serialization.PlutusData.fromCbor(HexBlob(datum)).toCore());
 
 export const mapByronTxFee = ({ cbor }: Schema.Transaction) => {
-  const txSize = Buffer.from(HexBlob(cbor!), 'hex').length;
+  // Byron transactions don't have a fee field. In the absence of the cbor field, we can't calculate the fee.
+  if (!cbor) return 0n;
+  const txSize = Buffer.from(HexBlob(cbor), 'hex').length;
   return BigInt(BYRON_TX_FEE_COEFFICIENT * txSize + BYRON_TX_FEE_CONSTANT);
 };
 
@@ -421,7 +425,7 @@ const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
       auxiliaryDataHash,
       certificates: tx.certificates?.map(mapCertificate),
       collaterals: tx.collaterals?.map(mapTxIn),
-      fee: tx.fee?.ada.lovelace ?? mapByronTxFee(tx), // You were here. a common tx has fee but byron does not
+      fee: tx.fee?.ada.lovelace ?? mapByronTxFee(tx),
       inputs: tx.inputs.map(mapTxIn),
       mint: mapMint(tx),
       outputs: tx.outputs.map(mapTxOut),
@@ -434,7 +438,7 @@ const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
     },
     id: Cardano.TransactionId(tx.id),
     // At the time of writing Byron transactions didn't set this property
-    inputSource: tx.spends ? Cardano.InputSource[tx.spends] : Cardano.InputSource.inputs,
+    inputSource: mapInputSource(tx.spends),
     witness: {
       bootstrap: tx.signatories
         .filter((signatory) => signatory.addressAttributes || signatory.chainCode)
@@ -446,12 +450,22 @@ const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
       // ...(tx.scripts && { scripts: [...Object.values(tx.scripts).map(mapScript)] }),
       signatures: new Map(
         tx.signatories
-          .filter((signatory) => !signatory.addressAttributes && !signatory.chainCode)
+          // omitting Byron signatures (length is 128 instead of 64 as in praos transactions)
+          .filter((signatory) => !signatory.addressAttributes && !signatory.chainCode && signatory.key.length === 64)
           .map(({ key, signature }) => [Crypto.Ed25519PublicKeyHex(key), Crypto.Ed25519SignatureHex(signature)])
       )
     }
   };
 };
 
-export const mapBlockBody = ({ transactions }: CommonBlock | Schema.BlockBFT): Cardano.Block['body'] =>
-  (transactions || []).map((transaction) => mapCommonTx(transaction));
+export const mapBlockBody = (block: CommonBlock | Schema.BlockBFT): Cardano.Block['body'] => {
+  const { transactions, type } = block;
+  return (transactions || []).map((transaction) =>
+    type !== 'bft' && transaction.cbor
+      ? {
+          ...Serialization.Transaction.fromCbor(transaction.cbor as Serialization.TxCBOR).toCore(),
+          inputSource: mapInputSource(transaction.spends)
+        }
+      : mapCommonTx(transaction)
+  );
+};

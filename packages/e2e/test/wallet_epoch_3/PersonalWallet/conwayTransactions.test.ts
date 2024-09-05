@@ -1,3 +1,5 @@
+// cSpell:ignore costmdls vasil
+
 import * as Crypto from '@cardano-sdk/crypto';
 import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano, setInConwayEra } from '@cardano-sdk/core';
@@ -82,7 +84,7 @@ export const vasilPlutusV2Costmdls = [
   32_696, 32, 43_357, 32, 32_247, 32, 38_314, 32, 35_892_428, 10, 57_996_947, 18_975, 10, 38_887_044, 32_947, 10
 ];
 
-export const paramsUpdate: Cardano.ProtocolParametersUpdateConway = {
+export const protocolParamUpdate: Cardano.ProtocolParametersUpdateConway = {
   coinsPerUtxoByte: 35_000,
   collateralPercentage: 852,
   committeeTermLimit: Cardano.EpochNo(200),
@@ -462,7 +464,7 @@ describe('PersonalWallet/conwayTransactions', () => {
             __typename: GovernanceActionType.parameter_change_action,
             governanceActionId: null,
             policyHash: null,
-            protocolParamUpdate: { ...paramsUpdate }
+            protocolParamUpdate
           },
           rewardAccount
         },

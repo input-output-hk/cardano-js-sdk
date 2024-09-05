@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/cognitive-complexity, complexity, sonarjs/cognitive-complexity, max-statements */
 import * as Crypto from '@cardano-sdk/crypto';
 import { Address, RewardAddress } from '../../Cardano/Address';
-import { CborReader, CborReaderState, CborWriter } from '../CBOR';
+import { CborReader, CborReaderState, CborTag, CborWriter } from '../CBOR';
 import { CborSet, Hash } from '../Common';
 import { Certificate } from '../Certificates';
 import { HexBlob } from '@cardano-sdk/util';
@@ -924,9 +924,24 @@ export class TransactionBody {
     return this.#donation;
   }
 
+  /**
+   * Computes the hash of the transaction body.
+   *
+   * @returns The hash of the transaction body.
+   */
   hash() {
     const hash = Crypto.blake2b(Crypto.blake2b.BYTES).update(hexToBytes(this.toCbor())).digest();
     return TransactionId.fromHexBlob(HexBlob.fromBytes(hash));
+  }
+
+  /**
+   * Checks if the transaction body has tagged sets.
+   *
+   * @returns true if the transaction body has tagged sets, false otherwise.
+   */
+  hasTaggedSets() {
+    const reader = new CborReader(this.#inputs.toCbor());
+    return reader.peekState() === CborReaderState.Tag && reader.peekTag() === CborTag.Set;
   }
 
   /**

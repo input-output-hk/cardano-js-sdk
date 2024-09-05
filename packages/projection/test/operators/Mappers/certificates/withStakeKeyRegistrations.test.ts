@@ -9,7 +9,7 @@ describe('withStakeKeyRegistrations', () => {
   it.each(Cardano.StakeRegistrationCertificateTypes)('collects %s registration certificates', async (regCertType) => {
     const pointer: Cardano.Pointer = {
       certIndex: Cardano.CertIndex(1),
-      slot: Cardano.Slot(123),
+      slot: 123n,
       txIndex: Cardano.TxIndex(2)
     };
     const data: EventData = {

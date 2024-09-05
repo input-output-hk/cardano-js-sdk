@@ -1,10 +1,20 @@
 #!/bin/bash
+
+set -e
 set -x
 set -o
 
-environment="$1"
+case $2 in
+  any)
+    environment="$1"
+    ;;
+  *)
+    environment="$1.$2"
+    ;;
+esac
 
-url="https://${environment}.lw.iog.io"
+domain="${environment}.lw.iog.io"
+url="https://${domain}/"
 
 # Construct the environment file content
 envFileContent="
@@ -15,20 +25,23 @@ LOGGER_MIN_SEVERITY=info
 KEY_MANAGEMENT_PROVIDER=inMemory
 
 # Providers setup - required by getWallet
-ASSET_PROVIDER=http
-ASSET_PROVIDER_PARAMS='{\"baseUrl\":\"$url:4000/\"}'
-HANDLE_PROVIDER=http
-HANDLE_PROVIDER_PARAMS='{\"baseUrl\":\"$url:4011/\"}'
-NETWORK_INFO_PROVIDER=http
-NETWORK_INFO_PROVIDER_PARAMS='{\"baseUrl\":\"$url:4000/\"}'
-REWARDS_PROVIDER=http
-REWARDS_PROVIDER_PARAMS='{\"baseUrl\":\"$url:4000/\"}'
-TX_SUBMIT_PROVIDER=http
-TX_SUBMIT_PROVIDER_PARAMS='{\"baseUrl\":\"$url:4000/\"}'
-UTXO_PROVIDER=http
-UTXO_PROVIDER_PARAMS='{\"baseUrl\":\"$url:4000/\"}'
-STAKE_POOL_PROVIDER=http
-STAKE_POOL_PROVIDER_PARAMS='{\"baseUrl\":\"$url:4000/\"}'
+TEST_CLIENT_ASSET_PROVIDER=http
+TEST_CLIENT_ASSET_PROVIDER_PARAMS='{\"baseUrl\":\"${url}\"}'
+TEST_CLIENT_CHAIN_HISTORY_PROVIDER=http
+TEST_CLIENT_CHAIN_HISTORY_PROVIDER_PARAMS='{\"baseUrl\":\"${url}\"}'
+TEST_CLIENT_HANDLE_PROVIDER=http
+TEST_CLIENT_HANDLE_PROVIDER_PARAMS='{\"baseUrl\":\"${url}\"}'
+TEST_CLIENT_NETWORK_INFO_PROVIDER=http
+TEST_CLIENT_NETWORK_INFO_PROVIDER_PARAMS='{\"baseUrl\":\"${url}\"}'
+TEST_CLIENT_REWARDS_PROVIDER=http
+TEST_CLIENT_REWARDS_PROVIDER_PARAMS='{\"baseUrl\":\"${url}\"}'
+TEST_CLIENT_TX_SUBMIT_PROVIDER=http
+TEST_CLIENT_TX_SUBMIT_PROVIDER_PARAMS='{\"baseUrl\":\"${url}\"}'
+TEST_CLIENT_UTXO_PROVIDER=http
+TEST_CLIENT_UTXO_PROVIDER_PARAMS='{\"baseUrl\":\"${url}\"}'
+TEST_CLIENT_STAKE_POOL_PROVIDER=http
+TEST_CLIENT_STAKE_POOL_PROVIDER_PARAMS='{\"baseUrl\":\"${url}\"}'
+WS_PROVIDER_URL='wss://${domain}/ws'
 "
 
 # Write the environment file content to the specified file

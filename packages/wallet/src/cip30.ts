@@ -23,7 +23,7 @@ import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-s
 import { Logger } from 'ts-log';
 import { MessageSender } from '@cardano-sdk/key-management';
 import { Observable, firstValueFrom, map } from 'rxjs';
-import { ObservableWallet } from './types';
+import { ObservableWallet, isKeyHashAddress, isScriptAddress } from './types';
 import { requiresForeignSignatures } from './services';
 import uniq from 'lodash/uniq.js';
 
@@ -272,7 +272,21 @@ const baseCip30WalletApi = (
     logger.debug('getting changeAddress');
     try {
       const wallet = await firstValueFrom(wallet$);
-      const [{ address }] = await firstValueFrom(wallet.addresses$);
+      const addresses = await firstValueFrom(wallet.addresses$);
+
+      const isScriptWallet = addresses.some(isScriptAddress);
+
+      if (!isScriptWallet) {
+        addresses.sort((a, b) => {
+          if (isKeyHashAddress(a) && isKeyHashAddress(b)) {
+            return a.index - b.index;
+          }
+
+          return 0; // Cant happen, but in any case do not sort.
+        });
+      }
+
+      const address = addresses[0].address;
 
       if (!address) {
         logger.error('could not get change address');
@@ -397,13 +411,11 @@ const baseCip30WalletApi = (
     logger.debug('getting used addresses');
 
     const wallet = await firstValueFrom(wallet$);
-    const addresses = await firstValueFrom(wallet.addresses$);
+    const trackedAddresses = await firstValueFrom(wallet.addresses$);
+    const unusedAddresses = await wallet.getNextUnusedAddress();
+    const addresses = trackedAddresses.filter((address) => !unusedAddresses.includes(address));
 
-    if (addresses.length === 0) {
-      throw new ApiError(APIErrorCode.InternalError, 'could not get used addresses');
-    } else {
-      return addresses.map((groupAddresses) => cardanoAddressToCbor(groupAddresses.address));
-    }
+    return addresses.map((groupAddresses) => cardanoAddressToCbor(groupAddresses.address));
   },
   getUtxos: async (_: SenderContext, amount?: Cbor, paginate?: Paginate): Promise<Cbor[] | null> => {
     const scope = new ManagedFreeableScope();
@@ -458,9 +470,19 @@ const baseCip30WalletApi = (
     const scope = new ManagedFreeableScope();
     logger.debug('signTx');
     const txDecoded = Serialization.Transaction.fromCbor(Serialization.TxCBOR(tx));
-
+    const wallet = await firstValueFrom(wallet$);
     const hash = txDecoded.getId();
     const coreTx = txDecoded.toCore();
+
+    const needsForeignSignature = await requiresForeignSignatures(coreTx, wallet);
+
+    // If partialSign is false and the wallet could not sign the entire transaction
+    if (!partialSign && needsForeignSignature)
+      throw new DataSignError(
+        DataSignErrorCode.ProofGeneration,
+        'The wallet does not have the secret key associated with some of the inputs or certificates.'
+      );
+
     const shouldProceed = await confirmationCallback
       .signTx({
         data: coreTx,
@@ -469,16 +491,7 @@ const baseCip30WalletApi = (
       })
       .catch((error) => mapCallbackFailure(error, logger));
     if (shouldProceed) {
-      const wallet = await firstValueFrom(wallet$);
       try {
-        const needsForeignSignature = await requiresForeignSignatures(coreTx, wallet);
-
-        // If partialSign is false and the wallet could not sign the entire transaction
-        if (!partialSign && needsForeignSignature)
-          throw new DataSignError(
-            DataSignErrorCode.ProofGeneration,
-            'The wallet does not have the secret key associated with some of the inputs or certificates.'
-          );
         const {
           witness: { signatures }
         } = await wallet.finalizeTx({

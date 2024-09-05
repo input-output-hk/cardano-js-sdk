@@ -1,3 +1,4 @@
+// cSpell:ignore coeff vkeys
 /* eslint-disable unicorn/no-nested-ternary */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {
@@ -659,6 +660,7 @@ export class BaseWallet implements ObservableWallet {
     return new GenericTxBuilder(this.getTxBuilderDependencies());
   }
 
+  // eslint-disable-next-line complexity
   async #submitTx(
     outgoingTx: OutgoingTx,
     { mightBeAlreadySubmitted }: SubmitTxOptions = {}
@@ -683,9 +685,13 @@ export class BaseWallet implements ObservableWallet {
           // error.innerError.data is not set by cardano submit api. It is only set when error is coming from Ogmios.
           (!error.innerError?.data || error.innerError.data.produced.coins === 0n)) ||
           // TODO: check if IncompleteWithdrawals available withdrawal amount === wallet's reward acc balance?
-          // Not sure what the 'Withdrawals' in error data is exactly: value being withdrawed, or reward acc balance
+          // Not sure what the 'Withdrawals' in error data is exactly: value being withdrawn, or reward acc balance
           CardanoNodeUtil.isIncompleteWithdrawalsError(error.innerError) ||
-          CardanoNodeUtil.isUnknownOutputReferences(error.innerError))
+          CardanoNodeUtil.isUnknownOutputReferences(error.innerError) ||
+          CardanoNodeUtil.isCredentialAlreadyRegistered(error.innerError) ||
+          CardanoNodeUtil.isDrepAlreadyRegistered(error.innerError) ||
+          CardanoNodeUtil.isUnknownCredential(error.innerError) ||
+          CardanoNodeUtil.isDrepNotRegistered(error.innerError))
       ) {
         this.#logger.debug(
           `Transaction ${outgoingTx.id} failed with ${error.innerError}, but it appears to be already submitted...`

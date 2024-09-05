@@ -415,10 +415,7 @@ export const buildNativeScriptWitnesser = <
         const extraSignatures: Cardano.Signatures = new Map();
         if (options?.extraSigners) {
           for (const extraSigner of options?.extraSigners) {
-            const extraSignature = await extraSigner.sign({
-              body: coreTx.body,
-              hash
-            });
+            const extraSignature = await extraSigner.sign(tx.body());
             extraSignatures.set(extraSignature.pubKey, extraSignature.signature);
           }
         }

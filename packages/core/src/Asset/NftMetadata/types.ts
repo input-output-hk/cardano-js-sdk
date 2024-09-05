@@ -1,8 +1,10 @@
 /* eslint-disable wrap-regex */
+import * as CidValidator from '@biglup/is-cid';
 import { InvalidStringError, OpaqueString } from '@cardano-sdk/util';
 import type { Metadatum } from '../../Cardano';
 
 export type Uri = OpaqueString<'Uri'>;
+
 export const Uri = (uri: string) => {
   if (/^[a-z]+:\/\/.+/.test(uri)) {
     return uri as unknown as Uri;
@@ -10,7 +12,7 @@ export const Uri = (uri: string) => {
   if (uri.startsWith('data:')) {
     return uri as unknown as Uri;
   }
-  if (uri.startsWith('Qm') && uri.length === 46) {
+  if (CidValidator.isValid(uri)) {
     return `ipfs://${uri}` as unknown as Uri;
   }
   throw new InvalidStringError(

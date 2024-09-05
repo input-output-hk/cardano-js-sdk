@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/e2e",
-  "version": "0.39.0",
+  "version": "0.40.0",
   "description": "End to end tests for the cardano-js-sdk packages.",
   "engines": {
     "node": ">=16.20.2"
@@ -96,8 +96,8 @@
     "@cardano-sdk/util-rxjs": "workspace:~",
     "@cardano-sdk/wallet": "workspace:~",
     "@dcspark/cardano-multiplatform-lib-nodejs": "^3.1.1",
-    "@vespaiach/axios-fetch-adapter": "^0.3.0",
-    "axios": "^0.28.0",
+    "@shiroyasha9/axios-fetch-adapter": "1.0.3",
+    "axios": "^1.7.4",
     "bunyan": "^1.8.15",
     "chalk": "4.1.2",
     "cli-spinners": "^2.9.0",
@@ -136,7 +136,7 @@
     "@types/delay": "^3.1.0",
     "@types/dockerode": "^3.3.8",
     "@types/jest": "^28.1.2",
-    "@types/k6": "^0.45.0",
+    "@types/k6": "^0.53.1",
     "@types/lodash": "^4.14.182",
     "@types/ora": "^3.2.0",
     "@types/uuid": "^8.3.4",
@@ -150,7 +150,7 @@
     "babel-loader": "^8.2.5",
     "blake2b-no-wasm": "2.1.4",
     "buffer": "^6.0.3",
-    "chromedriver": "^120.0.0",
+    "chromedriver": "^127.0.0",
     "copy-webpack-plugin": "^10.2.4",
     "crypto-browserify": "^3.12.0",
     "delay": "^5.0.0",

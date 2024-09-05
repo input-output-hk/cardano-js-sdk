@@ -1,0 +1,55 @@
+name: K6 Assets load test
+on:
+  workflow_dispatch:
+    inputs:
+      requests-count:
+        description: 'Number of HTTP requests to send. Since the number of iterations is indirectly controlled by the duration and rate, it is possible to be slightly inaccurate'
+        type: number
+        required: true
+        default: 10
+      assets-no-metadata-count:
+        description: 'Number of assets ids without metadata to include in each request.'
+        type: number
+        required: true
+        default: 6
+      assets-on-chain-metadata-count:
+        description: 'Number of assets ids with on-chain metadata to include in each request.'
+        type: number
+        required: true
+        default: 3
+      assets-off-chain-metadata-count:
+        description: 'Number of assets ids with off-chain metadata to include in each request.'
+        type: number
+        required: true
+        default: 1
+        
+env:
+  # Only running on dev-mainnet for now
+  TARGET_ENV: 'dev'
+  TARGET_NET: 'mainnet'
+  REQUESTS_COUNT: ${{ inputs.requests-count || 10 }}
+  ASSETS_NO_METADATA_PER_REQUEST: ${{ inputs.assets-no-metadata-count || 6 }}
+  ASSETS_ON_CHAIN_METADATA_PER_REQUEST: ${{ inputs.assets-on-chain-metadata-count || 3 }}
+  ASSETS_OFF_CHAIN_METADATA_PER_REQUEST: ${{ inputs.assets-off-chain-metadata-count || 1 }}
+
+jobs:
+  get-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run k6 cloud test
+        uses: grafana/k6-action@v0.3.1
+        env:
+          K6_CLOUD_PROJECT_ID: ${{ secrets.K6_CLOUD_PROJECT_ID }}
+        with:
+          filename: ./packages/e2e/test/k6/endpoints/asset/get-assets.test.js
+          cloud: true
+          token: ${{ secrets.K6_CLOUD_API_TOKEN }}
+          flags: >
+            -e TARGET_ENV=$TARGET_ENV
+            -e TARGET_NET=$TARGET_NET
+            -e REQUESTS_COUNT=$REQUESTS_COUNT
+            -e ASSETS_NO_METADATA_PER_REQUEST=$ASSETS_NO_METADATA_PER_REQUEST
+            -e ASSETS_ON_CHAIN_METADATA_PER_REQUEST=$ASSETS_ON_CHAIN_METADATA_PER_REQUEST
+            -e ASSETS_OFF_CHAIN_METADATA_PER_REQUEST=$ASSETS_OFF_CHAIN_METADATA_PER_REQUEST

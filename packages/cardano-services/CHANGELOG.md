@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.29.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.29.7...@cardano-sdk/cardano-services@0.29.8) (2024-09-04)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services
+
+## [0.29.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.29.6...@cardano-sdk/cardano-services@0.29.7) (2024-08-23)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services
+
+## [0.29.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.29.5...@cardano-sdk/cardano-services@0.29.6) (2024-08-22)
+
+### Bug Fixes
+
+* **cardano-services:** correctly load Mapper.withGovernanceActions ([855a057](https://github.com/input-output-hk/cardano-js-sdk/commit/855a05716f28e4354228c245935fb254f09ecbdf))
+
+## [0.29.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.29.4...@cardano-sdk/cardano-services@0.29.5) (2024-08-21)
+
+### Features
+
+* add parameters update projection ([d007d7f](https://github.com/input-output-hk/cardano-js-sdk/commit/d007d7fc0551b553e4d98b368c937742a1c316f9))
+
+## [0.29.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.29.3...@cardano-sdk/cardano-services@0.29.4) (2024-08-20)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services
+
 ## [0.29.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.29.2...@cardano-sdk/cardano-services@0.29.3) (2024-08-07)
 
 ### Bug Fixes

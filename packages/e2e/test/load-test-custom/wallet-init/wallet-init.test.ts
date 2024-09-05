@@ -45,25 +45,41 @@ const measurementUtil = new MeasurementUtil<keyof typeof MeasureTarget>();
 
 // Utility methods to help setup the test. They could be part of another file
 const getProviders = async () => ({
-  assetProvider: await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS, logger),
+  assetProvider: await assetProviderFactory.create(
+    env.TEST_CLIENT_ASSET_PROVIDER,
+    env.TEST_CLIENT_ASSET_PROVIDER_PARAMS,
+    logger
+  ),
   chainHistoryProvider: await chainHistoryProviderFactory.create(
-    env.CHAIN_HISTORY_PROVIDER,
-    env.CHAIN_HISTORY_PROVIDER_PARAMS,
+    env.TEST_CLIENT_CHAIN_HISTORY_PROVIDER,
+    env.TEST_CLIENT_CHAIN_HISTORY_PROVIDER_PARAMS,
     logger
   ),
   networkInfoProvider: await networkInfoProviderFactory.create(
-    env.NETWORK_INFO_PROVIDER,
-    env.NETWORK_INFO_PROVIDER_PARAMS,
+    env.TEST_CLIENT_NETWORK_INFO_PROVIDER,
+    env.TEST_CLIENT_NETWORK_INFO_PROVIDER_PARAMS,
     logger
   ),
-  rewardsProvider: await rewardsProviderFactory.create(env.REWARDS_PROVIDER, env.REWARDS_PROVIDER_PARAMS, logger),
+  rewardsProvider: await rewardsProviderFactory.create(
+    env.TEST_CLIENT_REWARDS_PROVIDER,
+    env.TEST_CLIENT_REWARDS_PROVIDER_PARAMS,
+    logger
+  ),
   stakePoolProvider: await stakePoolProviderFactory.create(
-    env.STAKE_POOL_PROVIDER,
-    env.STAKE_POOL_PROVIDER_PARAMS,
+    env.TEST_CLIENT_STAKE_POOL_PROVIDER,
+    env.TEST_CLIENT_STAKE_POOL_PROVIDER_PARAMS,
     logger
   ),
-  txSubmitProvider: await txSubmitProviderFactory.create(env.TX_SUBMIT_PROVIDER, env.TX_SUBMIT_PROVIDER_PARAMS, logger),
-  utxoProvider: await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS, logger)
+  txSubmitProvider: await txSubmitProviderFactory.create(
+    env.TEST_CLIENT_TX_SUBMIT_PROVIDER,
+    env.TEST_CLIENT_TX_SUBMIT_PROVIDER_PARAMS,
+    logger
+  ),
+  utxoProvider: await utxoProviderFactory.create(
+    env.TEST_CLIENT_UTXO_PROVIDER,
+    env.TEST_CLIENT_UTXO_PROVIDER_PARAMS,
+    logger
+  )
 });
 
 const getKeyAgent = async (accountIndex: number) => {

@@ -3,6 +3,45 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.39.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.39.0...@cardano-sdk/core@0.39.1) (2024-09-04)
+
+### Features
+
+* **core:** add hasTaggedSets function to TransactionBody ([c785428](https://github.com/input-output-hk/cardano-js-sdk/commit/c78542856932087e043ebdbb33a5d60d334adcb5))
+
+### Bug Fixes
+
+* **core:** uri type now supports IPFS CIDv1 format ([e2565d1](https://github.com/input-output-hk/cardano-js-sdk/commit/e2565d1afa1010ba2d64be378d142f58555086c9))
+
+## [0.39.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.38.3...@cardano-sdk/core@0.39.0) (2024-08-23)
+
+### ⚠ BREAKING CHANGES
+
+* move CIP-20 utils to tx-construction package
+
+### Code Refactoring
+
+* move CIP-20 utils to tx-construction package ([33422e4](https://github.com/input-output-hk/cardano-js-sdk/commit/33422e423f0530b066545120a16b247938a1884b))
+
+## [0.38.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.38.2...@cardano-sdk/core@0.38.3) (2024-08-22)
+
+### Bug Fixes
+
+* export TxMetadata module from core package root ([e687b71](https://github.com/input-output-hk/cardano-js-sdk/commit/e687b719497112a91c891615868ccaec872370c1))
+
+## [0.38.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.38.1...@cardano-sdk/core@0.38.2) (2024-08-21)
+
+### Features
+
+* **core:** adds CIP20 TxMetadata helper functions ([8bc200a](https://github.com/input-output-hk/cardano-js-sdk/commit/8bc200a9427a82705c2283f2c0e3529150e3b569))
+
+## [0.38.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.38.0...@cardano-sdk/core@0.38.1) (2024-08-20)
+
+### Bug Fixes
+
+* add to BaseWallet re-submit exceptions CredentialAlreadyRegistered and DrepAlreadyRegistered errors ([48f7951](https://github.com/input-output-hk/cardano-js-sdk/commit/48f7951ce092c0d489d982fd1fdfef8599d6cada))
+* add to BaseWallet re-submit exceptions UnknownCredential and DrepNotRegistered errors ([7f8eaa1](https://github.com/input-output-hk/cardano-js-sdk/commit/7f8eaa1949a606d450e8bdc709fe437f543b5e37))
+
 ## [0.38.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.37.0...@cardano-sdk/core@0.38.0) (2024-08-07)
 
 ### ⚠ BREAKING CHANGES

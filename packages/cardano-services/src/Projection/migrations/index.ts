@@ -6,6 +6,7 @@ import { CostPledgeNumericMigration1689091319930 } from './1689091319930-cost-pl
 import { CurrentStakePollMetricsAttributesMigrations1698174358997 } from './1698174358997-current-pool-metrics-attributes';
 import { FkPoolRegistrationMigration1682519108369 } from './1682519108369-fk-pool-registration';
 import { FkPoolRetirementMigration1682519108370 } from './1682519108370-fk-pool-retirement';
+import { GovernanceActionMigration1724168174191 } from './1724168174191-governance-actions-table';
 import { HandleDefaultMigrations1693830294136 } from './1693830294136-handle-default-columns';
 import { HandleMetadataTableMigrations1693490983715 } from './1693490983715-handle-metadata-table';
 import { HandleParentMigration1700556589063 } from './1700556589063-handle-parent';
@@ -53,5 +54,6 @@ export const migrations: ProjectionMigration[] = [
   CurrentStakePollMetricsAttributesMigrations1698174358997,
   PoolRewardsTableMigrations1698175956871,
   HandleParentMigration1700556589063,
-  RewardsPledgeNumericMigration1715157190230
+  RewardsPledgeNumericMigration1715157190230,
+  GovernanceActionMigration1724168174191
 ];

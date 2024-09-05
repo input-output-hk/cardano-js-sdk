@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.17.4...@cardano-sdk/ogmios@0.17.5) (2024-09-04)
+
+**Note:** Version bump only for package @cardano-sdk/ogmios
+
+## [0.17.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.17.3...@cardano-sdk/ogmios@0.17.4) (2024-08-23)
+
+**Note:** Version bump only for package @cardano-sdk/ogmios
+
+## [0.17.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.17.2...@cardano-sdk/ogmios@0.17.3) (2024-08-22)
+
+**Note:** Version bump only for package @cardano-sdk/ogmios
+
+## [0.17.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.17.1...@cardano-sdk/ogmios@0.17.2) (2024-08-21)
+
+**Note:** Version bump only for package @cardano-sdk/ogmios
+
+## [0.17.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.17.0...@cardano-sdk/ogmios@0.17.1) (2024-08-20)
+
+### Features
+
+* **ogmios:** add input source for cbor deserialization for transactions ([5777237](https://github.com/input-output-hk/cardano-js-sdk/commit/5777237a0d8bbf81346932d1c6bc667915d11023))
+
+### Bug Fixes
+
+* add to BaseWallet re-submit exceptions CredentialAlreadyRegistered and DrepAlreadyRegistered errors ([48f7951](https://github.com/input-output-hk/cardano-js-sdk/commit/48f7951ce092c0d489d982fd1fdfef8599d6cada))
+* add to BaseWallet re-submit exceptions UnknownCredential and DrepNotRegistered errors ([7f8eaa1](https://github.com/input-output-hk/cardano-js-sdk/commit/7f8eaa1949a606d450e8bdc709fe437f543b5e37))
+* **ogmios:** cannot calculate tx fee for byron block without cbor ([dc68d7f](https://github.com/input-output-hk/cardano-js-sdk/commit/dc68d7f607de068d17fa157ab03e4f89f8f54850))
+* **ogmios:** ignore byron signatures in ogmios mapper ([1495811](https://github.com/input-output-hk/cardano-js-sdk/commit/14958118a9815ea488c1ff00f1e0c9ce01eba446))
+
 ## [0.17.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.16.1...@cardano-sdk/ogmios@0.17.0) (2024-08-07)
 
 ### ⚠ BREAKING CHANGES

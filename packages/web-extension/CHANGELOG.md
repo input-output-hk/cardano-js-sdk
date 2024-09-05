@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.32.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.31.5...@cardano-sdk/web-extension@0.32.0) (2024-09-04)
+
+### ⚠ BREAKING CHANGES
+
+* keyAgent signTransaction now takes Serialization.TransactionBody instead of Core.TxBodyWithHash
+
+### Code Refactoring
+
+* keyAgent signTransaction now takes Serialization.TransactionBody ([a0fa7c7](https://github.com/input-output-hk/cardano-js-sdk/commit/a0fa7c71512104384755061010e9f8a31da0d415))
+
+## [0.31.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.31.4...@cardano-sdk/web-extension@0.31.5) (2024-08-23)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
+## [0.31.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.31.3...@cardano-sdk/web-extension@0.31.4) (2024-08-22)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
+## [0.31.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.31.2...@cardano-sdk/web-extension@0.31.3) (2024-08-21)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
+## [0.31.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.31.1...@cardano-sdk/web-extension@0.31.2) (2024-08-21)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
+## [0.31.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.31.0...@cardano-sdk/web-extension@0.31.1) (2024-08-20)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
 ## [0.31.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.30.0...@cardano-sdk/web-extension@0.31.0) (2024-08-07)
 
 ### ⚠ BREAKING CHANGES

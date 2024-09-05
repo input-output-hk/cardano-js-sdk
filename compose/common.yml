@@ -44,6 +44,7 @@ x-with-postgres: &with-postgres
     - postgres_db_db_sync
     - postgres_db_handle
     - postgres_db_stake_pool
+    - postgres_db_wallet_api
 
 x-projector-environment: &projector-environment
   API_URL: http://0.0.0.0:3000
@@ -78,26 +79,32 @@ x-sdk-environment: &sdk-environment
   POSTGRES_DB_FILE_DB_SYNC: /run/secrets/postgres_db_db_sync
   POSTGRES_DB_FILE_HANDLE: /run/secrets/postgres_db_handle
   POSTGRES_DB_FILE_STAKE_POOL: /run/secrets/postgres_db_stake_pool
+  POSTGRES_DB_FILE_WALLET_API: /run/secrets/postgres_db_wallet_api
   POSTGRES_HOST_DB_SYNC: postgres
   POSTGRES_HOST_ASSET: postgres
   POSTGRES_HOST_HANDLE: postgres
   POSTGRES_HOST_STAKE_POOL: postgres
+  POSTGRES_HOST_WALLET_API: postgres
   POSTGRES_POOL_MAX_DB_SYNC: ${POSTGRES_POOL_MAX:-10}
   POSTGRES_POOL_MAX_HANDLE: ${POSTGRES_POOL_MAX:-10}
   POSTGRES_POOL_MAX_ASSET: ${POSTGRES_POOL_MAX:-10}
   POSTGRES_POOL_MAX_STAKE_POOL: ${POSTGRES_POOL_MAX:-10}
+  POSTGRES_POOL_MAX_WALLET_API: ${POSTGRES_POOL_MAX:-10}
   POSTGRES_PASSWORD_FILE_ASSET: /run/secrets/postgres_password
   POSTGRES_PASSWORD_FILE_DB_SYNC: /run/secrets/postgres_password
   POSTGRES_PASSWORD_FILE_HANDLE: /run/secrets/postgres_password
   POSTGRES_PASSWORD_FILE_STAKE_POOL: /run/secrets/postgres_password
+  POSTGRES_PASSWORD_FILE_WALLET_API: /run/secrets/postgres_password
   POSTGRES_PORT_DB_SYNC: 5432
   POSTGRES_PORT_ASSET: 5432
   POSTGRES_PORT_HANDLE: 5432
   POSTGRES_PORT_STAKE_POOL: 5432
+  POSTGRES_PORT_WALLET_API: 5432
   POSTGRES_USER_FILE_ASSET: /run/secrets/postgres_user
   POSTGRES_USER_FILE_DB_SYNC: /run/secrets/postgres_user
   POSTGRES_USER_FILE_HANDLE: /run/secrets/postgres_user
   POSTGRES_USER_FILE_STAKE_POOL: /run/secrets/postgres_user
+  POSTGRES_USER_FILE_WALLET_API: /run/secrets/postgres_user
   TOKEN_METADATA_SERVER_URL: https://metadata.world.dev.cardano.org
   USE_WEB_SOCKET_API: true
   WEB_SOCKET_API_URL: ws://ws-server:3000/ws
@@ -294,6 +301,21 @@ services:
     ports:
       - ${STAKE_POOL_PROJECTOR_PORT:-4002}:3000
 
+  wallet-api-projector:
+    <<:
+      - *from-sdk
+      - *logging
+      - *projector
+      - *with-postgres
+    environment:
+      <<:
+        - *projector-environment
+        - *sdk-environment
+      POSTGRES_DB_FILE: /run/secrets/postgres_db_wallet_api
+      PROJECTION_NAMES: protocol-parameters
+    ports:
+      - ${WALLET_API_PROJECTOR_PORT:-4005}:3000
+
   provider-server:
     <<:
       - *from-sdk
@@ -400,6 +422,8 @@ secrets:
     file: ../../compose/placeholder-secrets/postgres_db_handle
   postgres_db_stake_pool:
     file: ../../compose/placeholder-secrets/postgres_db_stake_pool
+  postgres_db_wallet_api:
+    file: ../../compose/placeholder-secrets/postgres_db_wallet_api
   postgres_password:
     file: ../../compose/placeholder-secrets/postgres_password
   postgres_user:

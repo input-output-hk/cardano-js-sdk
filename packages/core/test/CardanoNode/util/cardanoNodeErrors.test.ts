@@ -61,7 +61,7 @@ describe('util/cardanoNodeErrors', () => {
     });
   });
 
-  describe('specific error typeguard utils', () => {
+  describe('specific error type-guard utils', () => {
     it('returns true if error type and code matches', () => {
       expect(
         CardanoNodeUtil.isValueNotConservedError(
@@ -77,6 +77,22 @@ describe('util/cardanoNodeErrors', () => {
         CardanoNodeUtil.isOutsideOfValidityIntervalError(
           new TxSubmissionError(TxSubmissionErrorCode.OutsideOfValidityInterval, null, '')
         )
+      ).toBe(true);
+      expect(
+        CardanoNodeUtil.isCredentialAlreadyRegistered(
+          new TxSubmissionError(TxSubmissionErrorCode.CredentialAlreadyRegistered, null, '')
+        )
+      ).toBe(true);
+      expect(
+        CardanoNodeUtil.isDrepAlreadyRegistered(
+          new TxSubmissionError(TxSubmissionErrorCode.DRepAlreadyRegistered, null, '')
+        )
+      ).toBe(true);
+      expect(
+        CardanoNodeUtil.isUnknownCredential(new TxSubmissionError(TxSubmissionErrorCode.UnknownCredential, null, ''))
+      ).toBe(true);
+      expect(
+        CardanoNodeUtil.isDrepNotRegistered(new TxSubmissionError(TxSubmissionErrorCode.DRepNotRegistered, null, ''))
       ).toBe(true);
     });
     it('returns false if error type or code does not match', () => {
@@ -95,6 +111,26 @@ describe('util/cardanoNodeErrors', () => {
       ).toBe(false);
       expect(
         CardanoNodeUtil.isOutsideOfValidityIntervalError(
+          new TxSubmissionError(TxSubmissionErrorCode.IncompleteWithdrawals, null, '')
+        )
+      ).toBe(false);
+      expect(
+        CardanoNodeUtil.isCredentialAlreadyRegistered(
+          new TxSubmissionError(TxSubmissionErrorCode.IncompleteWithdrawals, null, '')
+        )
+      ).toBe(false);
+      expect(
+        CardanoNodeUtil.isDrepAlreadyRegistered(
+          new TxSubmissionError(TxSubmissionErrorCode.IncompleteWithdrawals, null, '')
+        )
+      ).toBe(false);
+      expect(
+        CardanoNodeUtil.isUnknownCredential(
+          new TxSubmissionError(TxSubmissionErrorCode.IncompleteWithdrawals, null, '')
+        )
+      ).toBe(false);
+      expect(
+        CardanoNodeUtil.isDrepNotRegistered(
           new TxSubmissionError(TxSubmissionErrorCode.IncompleteWithdrawals, null, '')
         )
       ).toBe(false);

@@ -2,6 +2,9 @@
 import {
   ChainSyncError,
   ChainSyncErrorCode,
+  CredentialAlreadyRegisteredData,
+  DRepAlreadyRegisteredData,
+  DRepNotRegisteredData,
   GeneralCardanoNodeError,
   GeneralCardanoNodeErrorCode,
   IncompleteWithdrawalsData,
@@ -10,6 +13,7 @@ import {
   StateQueryErrorCode,
   TxSubmissionError,
   TxSubmissionErrorCode,
+  UnknownCredentialData,
   UnknownOutputReferencesData,
   ValueNotConservedData
 } from '../types';
@@ -124,3 +128,17 @@ export const isUnknownOutputReferences = (
   error: unknown
 ): error is TxSubmissionError<UnknownOutputReferencesData | null> =>
   error instanceof TxSubmissionError && error.code === TxSubmissionErrorCode.UnknownOutputReferences;
+
+export const isCredentialAlreadyRegistered = (
+  error: unknown
+): error is TxSubmissionError<CredentialAlreadyRegisteredData | null> =>
+  error instanceof TxSubmissionError && error.code === TxSubmissionErrorCode.CredentialAlreadyRegistered;
+
+export const isDrepAlreadyRegistered = (error: unknown): error is TxSubmissionError<DRepAlreadyRegisteredData | null> =>
+  error instanceof TxSubmissionError && error.code === TxSubmissionErrorCode.DRepAlreadyRegistered;
+
+export const isUnknownCredential = (error: unknown): error is TxSubmissionError<UnknownCredentialData | null> =>
+  error instanceof TxSubmissionError && error.code === TxSubmissionErrorCode.UnknownCredential;
+
+export const isDrepNotRegistered = (error: unknown): error is TxSubmissionError<DRepNotRegisteredData | null> =>
+  error instanceof TxSubmissionError && error.code === TxSubmissionErrorCode.DRepNotRegistered;

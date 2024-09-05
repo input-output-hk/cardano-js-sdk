@@ -11,6 +11,21 @@ describe('NftMetadata/types', () => {
       expect(Uri('QmcDAmZubQig7tGUgEwbWcgdvz4Aoa2EiRZyFoX3fXTVmr')).toBe(
         'ipfs://QmcDAmZubQig7tGUgEwbWcgdvz4Aoa2EiRZyFoX3fXTVmr'
       );
+
+      // CIDv0
+      expect(Uri('QmYjtig7VJQ6XsnUjqqJvj7QaMcCAwtrgNdahSiFofrE7o')).toBe(
+        'ipfs://QmYjtig7VJQ6XsnUjqqJvj7QaMcCAwtrgNdahSiFofrE7o'
+      );
+
+      // CIDv1 in Base32
+      expect(Uri('bafybeib24abrrlurxmgedaekfz2v2eatpzo2l5cbvdoay4hnpenuzojt6a')).toBe(
+        'ipfs://bafybeib24abrrlurxmgedaekfz2v2eatpzo2l5cbvdoay4hnpenuzojt6a'
+      );
+
+      // CIDv1 in Base58btc
+      expect(Uri('zdj7WWeQ43G6JJvLWQWZpyHuAMq6uYWRjkBXFad11vE2LHhQ7')).toBe(
+        'ipfs://zdj7WWeQ43G6JJvLWQWZpyHuAMq6uYWRjkBXFad11vE2LHhQ7'
+      );
     });
     it('throws for string without protocol:// prefix', () => {
       expect(() => Uri('abc123')).toThrowError(InvalidStringError);

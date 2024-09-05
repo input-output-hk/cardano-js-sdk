@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.40.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.39.5...@cardano-sdk/e2e@0.40.0) (2024-09-04)
+
+### ⚠ BREAKING CHANGES
+
+* keyAgent signTransaction now takes Serialization.TransactionBody instead of Core.TxBodyWithHash
+
+### Code Refactoring
+
+* keyAgent signTransaction now takes Serialization.TransactionBody ([a0fa7c7](https://github.com/input-output-hk/cardano-js-sdk/commit/a0fa7c71512104384755061010e9f8a31da0d415))
+
+## [0.39.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.39.4...@cardano-sdk/e2e@0.39.5) (2024-08-23)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
+## [0.39.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.39.3...@cardano-sdk/e2e@0.39.4) (2024-08-22)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
+## [0.39.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.39.2...@cardano-sdk/e2e@0.39.3) (2024-08-21)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
+## [0.39.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.39.1...@cardano-sdk/e2e@0.39.2) (2024-08-21)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
+## [0.39.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.39.0...@cardano-sdk/e2e@0.39.1) (2024-08-20)
+
+### Bug Fixes
+
+* add to BaseWallet re-submit exceptions CredentialAlreadyRegistered and DrepAlreadyRegistered errors ([48f7951](https://github.com/input-output-hk/cardano-js-sdk/commit/48f7951ce092c0d489d982fd1fdfef8599d6cada))
+
 ## [0.39.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.38.0...@cardano-sdk/e2e@0.39.0) (2024-08-07)
 
 ### ⚠ BREAKING CHANGES

@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.15.4...@cardano-sdk/util@0.15.5) (2024-08-21)
+
+### Features
+
+* **util:** add string byte size function ([bc3f4ef](https://github.com/input-output-hk/cardano-js-sdk/commit/bc3f4efe82f90df8a71b8caac228ffc167121e55))
+* **util:** add string chunk by bytes function ([82669e7](https://github.com/input-output-hk/cardano-js-sdk/commit/82669e7ca3382f92fa02a78d1a6d2f3a81d6255c))
+
 ## [0.15.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.15.3...@cardano-sdk/util@0.15.4) (2024-07-22)
 
 **Note:** Version bump only for package @cardano-sdk/util

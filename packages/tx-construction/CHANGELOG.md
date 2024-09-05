@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.21.0...@cardano-sdk/tx-construction@0.21.1) (2024-09-04)
+
+### Bug Fixes
+
+* update hashScriptData for conway ([d7275ee](https://github.com/input-output-hk/cardano-js-sdk/commit/d7275ee77556b5dcebf9042ea49d828b58116902))
+
+## [0.21.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.20.3...@cardano-sdk/tx-construction@0.21.0) (2024-08-23)
+
+### ⚠ BREAKING CHANGES
+
+* export CIP-20 helper functions as CIP20 module
+* move CIP-20 utils to tx-construction package
+
+### Code Refactoring
+
+* export CIP-20 helper functions as CIP20 module ([09aeb2d](https://github.com/input-output-hk/cardano-js-sdk/commit/09aeb2d3603b48dc097466e1097d5cd8bcd86340))
+* move CIP-20 utils to tx-construction package ([33422e4](https://github.com/input-output-hk/cardano-js-sdk/commit/33422e423f0530b066545120a16b247938a1884b))
+
+## [0.20.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.20.2...@cardano-sdk/tx-construction@0.20.3) (2024-08-22)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
+## [0.20.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.20.1...@cardano-sdk/tx-construction@0.20.2) (2024-08-21)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
+## [0.20.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.20.0...@cardano-sdk/tx-construction@0.20.1) (2024-08-20)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
 ## [0.20.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.19.10...@cardano-sdk/tx-construction@0.20.0) (2024-08-07)
 
 ### ⚠ BREAKING CHANGES

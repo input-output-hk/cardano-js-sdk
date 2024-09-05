@@ -9,6 +9,7 @@ import {
   mockBabbageBlockWithNftMetadata,
   mockBlockOgmiosMetadata,
   mockByronBlock,
+  mockByronBlockWithoutTxCbor,
   mockMaryBlock,
   mockShelleyBlock
 } from './testData';
@@ -32,6 +33,11 @@ describe('ogmiosToCore', () => {
   describe('block', () => {
     it('can translate from byron block', () => {
       expect(ogmiosToCore.block(mockByronBlock)).toMatchSnapshot();
+    });
+
+    it('LW-11243 can translate byron block without tx cbor', () => {
+      const block = ogmiosToCore.block(mockByronBlockWithoutTxCbor);
+      expect(block?.body[0].body.fee).toBe(0n);
     });
 
     it('can translate from shelley block', () => {

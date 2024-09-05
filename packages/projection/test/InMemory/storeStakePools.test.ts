@@ -31,14 +31,14 @@ describe('InMemory.storeStakePools', () => {
         poolParameters: {
           id: Cardano.PoolId('pool1n3s8unkvmre59uzt4ned0903f9q2p8dhscw5v9eeyc0sw0m439t')
         } as Cardano.PoolParameters,
-        source: { slot: Cardano.Slot(1) } as Mappers.WithCertificateSource['source']
+        source: { slot: 1n } as Mappers.WithCertificateSource['source']
       }
     ];
     const poolRetirementAtSlot2 = [
       {
         epoch: Cardano.EpochNo(123),
         poolId: Cardano.PoolId('pool1n3s8unkvmre59uzt4ned0903f9q2p8dhscw5v9eeyc0sw0m439t'),
-        source: { slot: Cardano.Slot(2) } as Mappers.WithCertificateSource['source']
+        source: { slot: 2n } as Mappers.WithCertificateSource['source']
       }
     ];
     const storedStakePool = () =>
