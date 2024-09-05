@@ -31,6 +31,7 @@
       SERVICE_NAMES = "asset";
       TOKEN_METADATA_SERVER_URL = values.cardano-services.tokenMetadataServerUrl;
       USE_TYPEORM_ASSET_PROVIDER = "true";
+      NODE_ENV = values.cardano-services.nodeEnv;
 
       POSTGRES_POOL_MAX_ASSET = "500";
       POSTGRES_HOST_ASSET = values.postgresName;

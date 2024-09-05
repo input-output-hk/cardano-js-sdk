@@ -66,6 +66,7 @@ in
         stake-pool-provider = {
           resources.limits = mkPodResources "300Mi" "500m";
           resources.requests = mkPodResources "150Mi" "100m";
+          env.OVERRIDE_FUZZY_OPTIONS = builtins.toJSON (!(lib.hasPrefix "live" final.namespace));
         };
 
         handle-provider = {
@@ -108,6 +109,9 @@ in
         stakepool.databaseName = "stakepool";
         ingress.enabled = true;
         cardano-services = {
+          nodeEnv = if lib.hasPrefix "live" final.namespace
+            then "production"
+            else null;
           image = oci.image.name;
           buildInfo = oci.meta.buildInfo;
           versions = oci.meta.versions;
@@ -204,7 +208,6 @@ in
             };
             stake-pool-provider = {
               enabled = true;
-              env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
             handle-provider.enabled = true;
             #asset-provider.enabled = true;
@@ -255,7 +258,6 @@ in
             };
             stake-pool-provider = {
               enabled = true;
-              env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
             chain-history-provider = {
               enabled = true;
@@ -292,14 +294,12 @@ in
             };
             stake-pool-provider = {
               enabled = true;
-              env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
             handle-provider.enabled = true;
             #asset-provider.enabled = true;
             chain-history-provider = {
               enabled = true;
               replicas = 2;
-              env.NODE_ENV = "production";
             };
           };
 
@@ -346,7 +346,6 @@ in
             };
             stake-pool-provider = {
               enabled = true;
-              env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
             handle-provider.enabled = true;
             #asset-provider.enabled = true;
@@ -387,7 +386,6 @@ in
             };
             stake-pool-provider = {
               enabled = true;
-              env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
             handle-provider.enabled = true;
             asset-provider.enabled = true;
@@ -424,22 +422,17 @@ in
             backend = {
               enabled = true;
               replicas = 2;
-              env.NODE_ENV = "production";
             };
             stake-pool-provider = {
               enabled = true;
-              env.OVERRIDE_FUZZY_OPTIONS = "true";
-              env.NODE_ENV = "production";
             };
             handle-provider.enabled = true;
             chain-history-provider = {
               enabled = true;
               replicas = 2;
-              env.NODE_ENV = "production";
             };
             # asset-provider = {
             #   enabled = true;
-            #   env.NODE_ENV = "production";
             # };
           };
 
@@ -484,22 +477,17 @@ in
             backend = {
               enabled = true;
               replicas = 2;
-              env.NODE_ENV = "production";
             };
             stake-pool-provider = {
               enabled = true;
-              env.OVERRIDE_FUZZY_OPTIONS = "true";
-              env.NODE_ENV = "production";
             };
             handle-provider.enabled = true;
             chain-history-provider = {
               enabled = true;
               replicas = 2;
-              env.NODE_ENV = "production";
             };
             #asset-provider = {
             #  enabled = true;
-            #  env.NODE_ENV = "production";
             #};
           };
 
@@ -542,21 +530,16 @@ in
           providers = {
             backend = {
               enabled = true;
-              env.NODE_ENV = "production";
             };
             stake-pool-provider = {
               enabled = true;
-              env.OVERRIDE_FUZZY_OPTIONS = "true";
-              env.NODE_ENV = "production";
             };
             handle-provider = {
               enabled = true;
-              env.NODE_ENV = "production";
             };
             chain-history-provider.enabled = true;
             #asset-provider = {
             #  enabled = true;
-            #  env.NODE_ENV = "production";
             #};
           };
 
@@ -588,21 +571,16 @@ in
           providers = {
             backend = {
               enabled = true;
-              env.NODE_ENV = "production";
             };
             stake-pool-provider = {
               enabled = true;
-              env.OVERRIDE_FUZZY_OPTIONS = "true";
-              env.NODE_ENV = "production";
             };
             handle-provider = {
               enabled = true;
-              env.NODE_ENV = "production";
             };
             chain-history-provider.enabled = true;
             #asset-provider = {
             #  enabled = true;
-            #  env.NODE_ENV = "production";
             #};
           };
 
@@ -634,21 +612,16 @@ in
           providers = {
             backend = {
               enabled = true;
-              env.NODE_ENV = "production";
             };
             stake-pool-provider = {
               enabled = true;
-              env.OVERRIDE_FUZZY_OPTIONS = "true";
-              env.NODE_ENV = "production";
             };
             handle-provider = {
               enabled = true;
-              env.NODE_ENV = "production";
             };
             chain-history-provider.enabled = true;
             #asset-provider = {
             #  enabled = true;
-            #  env.NODE_ENV = "production";
             #};
           };
 
@@ -680,21 +653,16 @@ in
           providers = {
             backend = {
               enabled = true;
-              env.NODE_ENV = "production";
             };
             stake-pool-provider = {
               enabled = true;
-              env.OVERRIDE_FUZZY_OPTIONS = "true";
-              env.NODE_ENV = "production";
             };
             handle-provider = {
               enabled = true;
-              env.NODE_ENV = "production";
             };
             chain-history-provider.enabled = true;
             #asset-provider = {
             #  enabled = true;
-            #  env.NODE_ENV = "production";
             #};
           };
 
@@ -771,7 +739,6 @@ in
             };
             stake-pool-provider = {
               enabled = true;
-              env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
           };
 
@@ -837,23 +804,18 @@ in
           providers = {
             backend = {
               enabled = true;
-              env.NODE_ENV = "production";
             };
             stake-pool-provider = {
               enabled = true;
-              env.OVERRIDE_FUZZY_OPTIONS = "true";
-              env.NODE_ENV = "production";
             };
             chain-history-provider = {
               enabled = true;
-              env.NODE_ENV = "production";
             };
           };
 
           projectors = {
             stake-pool = {
               enabled = true;
-              env.NODE_ENV = "production";
             };
           };
 
@@ -876,23 +838,18 @@ in
           providers = {
             backend = {
               enabled = true;
-              env.NODE_ENV = "production";
             };
             stake-pool-provider = {
               enabled = true;
-              env.OVERRIDE_FUZZY_OPTIONS = "true";
-              env.NODE_ENV = "production";
             };
             chain-history-provider = {
               enabled = true;
-              env.NODE_ENV = "production";
             };
           };
 
           projectors = {
             stake-pool = {
               enabled = true;
-              env.NODE_ENV = "production";
             };
           };
 
