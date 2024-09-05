@@ -252,32 +252,27 @@ in
           providers = {
             backend = {
               enabled = true;
-              env.USE_SUBMIT_API = "false";
             };
             stake-pool-provider = {
               enabled = true;
               env.OVERRIDE_FUZZY_OPTIONS = "true";
             };
-            handle-provider.enabled = true;
-            #asset-provider.enabled = true;
-            chain-history-provider.enabled = true;
+            chain-history-provider = {
+              enabled = true;
+            };
           };
 
           projectors = {
-            handle.enabled = true;
-            stake-pool.enabled = true;
             asset.enabled = true;
+            stake-pool = {
+              enabled = true;
+            };
           };
 
           values = {
-            useAccelerator = false;
-            ws-server.enabled = true;
             stakepool.databaseName = "stakepoolv2";
-            backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
-
-            pg-boss-worker.enabled = true;
-
             blockfrost-worker.enabled = false;
+            pg-boss-worker.enabled = true;
             cardano-services = {
               ingresOrder = 98;
             };
@@ -842,24 +837,29 @@ in
           providers = {
             backend = {
               enabled = true;
-              env.USE_SUBMIT_API = "false";
               env.NODE_ENV = "production";
             };
-            stake-pool-provider.enabled = true;
+            stake-pool-provider = {
+              enabled = true;
+              env.OVERRIDE_FUZZY_OPTIONS = "true";
+              env.NODE_ENV = "production";
+            };
+            chain-history-provider = {
+              enabled = true;
+              env.NODE_ENV = "production";
+            };
           };
 
           projectors = {
             stake-pool = {
               enabled = true;
-              env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
+              env.NODE_ENV = "production";
             };
           };
 
           values = {
             blockfrost-worker.enabled = false;
             pg-boss-worker.enabled = true;
-            pg-boss-worker.queues = "pool-metadata,pool-metrics";
-
             cardano-services = {
               ingresOrder = 99;
             };
@@ -876,30 +876,34 @@ in
           providers = {
             backend = {
               enabled = true;
-              env.USE_SUBMIT_API = "false";
               env.NODE_ENV = "production";
             };
-            stake-pool-provider.enabled = true;
+            stake-pool-provider = {
+              enabled = true;
+              env.OVERRIDE_FUZZY_OPTIONS = "true";
+              env.NODE_ENV = "production";
+            };
+            chain-history-provider = {
+              enabled = true;
+              env.NODE_ENV = "production";
+            };
           };
 
           projectors = {
             stake-pool = {
               enabled = true;
-              env.PROJECTION_NAMES = lib.mkForce "stake-pool,stake-pool-metadata-job,stake-pool-metrics-job";
+              env.NODE_ENV = "production";
             };
           };
 
           values = {
             blockfrost-worker.enabled = false;
             pg-boss-worker.enabled = true;
-            pg-boss-worker.queues = "pool-metadata,pool-metrics";
-
             cardano-services = {
               ingresOrder = 99;
             };
           };
         };
-
 
       }
       # Convenient for cases when you need to create multiple temporary deployments with the same configuration
