@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">91.23% </span>
+                <span class="strong">90.2% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>177/194</span>
+                <span class='fraction'>175/194</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.92% </span>
+                <span class="strong">80.7% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>47/56</span>
+                <span class='fraction'>46/57</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.54% </span>
+                <span class="strong">89.06% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>58/62</span>
+                <span class='fraction'>57/64</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">91.42% </span>
+                <span class="strong">89.77% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>160/175</span>
+                <span class='fraction'>158/176</span>
             </div>
         
             
@@ -543,7 +543,11 @@
 <a name='L478'></a><a href='#L478'>478</a>
 <a name='L479'></a><a href='#L479'>479</a>
 <a name='L480'></a><a href='#L480'>480</a>
-<a name='L481'></a><a href='#L481'>481</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L481'></a><a href='#L481'>481</a>
+<a name='L482'></a><a href='#L482'>482</a>
+<a name='L483'></a><a href='#L483'>483</a>
+<a name='L484'></a><a href='#L484'>484</a>
+<a name='L485'></a><a href='#L485'>485</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -604,7 +608,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -633,19 +637,23 @@
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1046,12 +1054,12 @@ import {
 import { CustomError } from 'ts-custom-error';
 import {
   EMPTY,
-  EmptyError,
   NEVER,
   Observable,
   Subscription,
   TeardownLogic,
   concat,
+  defaultIfEmpty,
   filter,
   firstValueFrom,
   from,
@@ -1064,10 +1072,10 @@ import {
   switchMap,
   takeUntil,
   tap,
-  throwError
+  timeout
 } from 'rxjs';
 import { ErrorClass, Shutdown, fromSerializableObject, isPromise, toSerializableObject } from '@cardano-sdk/util';
-import { NotImplementedError } from '@cardano-sdk/core';
+import { Milliseconds, NotImplementedError } from '@cardano-sdk/core';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { WrongTargetError } from './errors';
 import {
@@ -1091,7 +1099,7 @@ export class RemoteApiShutdownError extends CustomError {
 const consumeMethod =
   (
     { propName, errorTypes }: { propName: string; errorTypes?: ErrorClass[]; options?: MethodRequestOptions },
-    { messenger: { message$, postMessage, channel, disconnect$ } }: MessengerApiDependencies
+    { messenger: { message$, channel, postMessage, disconnect$, connect$ }, logger }: MessengerApiDependencies
   ) =&gt;
   async (...args: unknown[]) =&gt; {
     const requestMessage: RequestMessage = {
@@ -1112,17 +1120,21 @@ const consumeMethod =
           map(({ response }) =&gt; response),
           filter((response) =&gt; !(response instanceof WrongTargetError))
         ),
+        // We might encounter unexpected disconnects between method call and response
         disconnect$.pipe(
           filter(<span class="fstat-no" title="function not covered" >(d</span>c) =&gt; <span class="cstat-no" title="statement not covered" >dc.remaining.length === 0)</span>,
-          mergeMap(<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >throwError(<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >new EmptyError())</span>)</span>
+          tap(<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >logger.warn(`API disconnected before "${propName}" resolved. Expecting reconnect.`))</span>,
+          switchMap(<span class="fstat-no" title="function not covered" >() =</span>&gt;
+<span class="cstat-no" title="statement not covered" >            connect$.pipe(</span>
+              tap(<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >logger.warn(`Reconnected. Waiting for "${propName}" response...`))</span>,
+              // It usually reconnects in about 1 second. 10 should be more than enough to know that it won't re-connect.
+              timeout({ first: Milliseconds(10_000), with: <span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >of(new RemoteApiShutdownError(channel)) </span>}),
+              mergeMap(<span class="fstat-no" title="function not covered" >(v</span>alue) =&gt; (<span class="cstat-no" title="statement not covered" >value instanceof RemoteApiShutdownError ? of(value) : EMPTY)</span>)
+            )
+          )
         )
-      )
-    ).catch((error) =&gt; {
-      if (error instanceof EmptyError) {
-        throw new RemoteApiShutdownError(channel);
-      }
-<span class="cstat-no" title="statement not covered" >      throw error;</span>
-    });
+      ).pipe(defaultIfEmpty(new RemoteApiShutdownError(channel)))
+    );
 &nbsp;
     if (result instanceof Error) {
       throw result;
@@ -1510,7 +1522,7 @@ export const exposeMessengerApi = &lt;API extends object&gt;(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-09-06T11:11:15.609Z
+                at 2024-09-06T14:48:39.373Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
