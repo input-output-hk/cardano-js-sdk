@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">89.18% </span>
+                <span class="strong">90.24% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>33/37</span>
+                <span class='fraction'>37/41</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>7/7</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">89.18% </span>
+                <span class="strong">90% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>33/37</span>
+                <span class='fraction'>36/40</span>
             </div>
         
             
@@ -168,8 +168,18 @@
 <a name='L103'></a><a href='#L103'>103</a>
 <a name='L104'></a><a href='#L104'>104</a>
 <a name='L105'></a><a href='#L105'>105</a>
-<a name='L106'></a><a href='#L106'>106</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">35x</span>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -219,8 +229,10 @@
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-yes">16x</span>
@@ -231,7 +243,7 @@
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
@@ -249,7 +261,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -287,6 +303,7 @@ import {
   TxSubmissionError,
   TxSubmitProvider
 } from '@cardano-sdk/core';
+import { InMemoryCache } from '../InMemoryCache';
 import { Logger } from 'ts-log';
 import { WithLogger } from '@cardano-sdk/util';
 &nbsp;
@@ -294,6 +311,7 @@ type ObservableTxSubmitter = Pick&lt;ObservableCardanoNode, 'healthCheck$' | 'su
 export type NodeTxSubmitProviderProps = WithLogger &amp; {
   handleProvider?: HandleProvider;
   cardanoNode: ObservableTxSubmitter;
+  healthCheckCache: InMemoryCache;
 };
 &nbsp;
 const emptyMessage = 'ObservableCardanoNode observable completed without emitting';
@@ -324,11 +342,13 @@ export class NodeTxSubmitProvider implements TxSubmitProvider {
   #logger: Logger;
   #cardanoNode: ObservableTxSubmitter;
   #handleProvider?: HandleProvider;
+  #healthCheckCache: InMemoryCache;
 &nbsp;
-  constructor({ handleProvider, cardanoNode, logger }: NodeTxSubmitProviderProps) {
+  constructor({ handleProvider, cardanoNode, logger, healthCheckCache }: NodeTxSubmitProviderProps) {
     this.#handleProvider = handleProvider;
     this.#cardanoNode = cardanoNode;
     this.#logger = logger;
+    this.#healthCheckCache = healthCheckCache;
   }
 &nbsp;
   async submitTx({ signedTransaction, context }: SubmitTxArgs): Promise&lt;void&gt; {
@@ -336,7 +356,7 @@ export class NodeTxSubmitProvider implements TxSubmitProvider {
     await firstValueFrom(this.#cardanoNode.submitTx(signedTransaction)).catch(toProviderError);
   }
 &nbsp;
-  async healthCheck(): Promise&lt;HealthCheckResponse&gt; {
+  async #checkHealth(): Promise&lt;HealthCheckResponse&gt; {
     const [cardanoNodeHealth, handleProviderHealth] = await Promise.all([
       firstValueFrom(this.#cardanoNode.healthCheck$).catch((error): HealthCheckResponse =&gt; {
         if (error instanceof EmptyError) {
@@ -352,6 +372,10 @@ export class NodeTxSubmitProvider implements TxSubmitProvider {
       ok: cardanoNodeHealth.ok &amp;&amp; (!handleProviderHealth || handleProviderHealth.ok),
       reason: cardanoNodeHealth.reason || handleProviderHealth?.reason
     };
+  }
+&nbsp;
+  async healthCheck(): Promise&lt;HealthCheckResponse&gt; {
+    return this.#healthCheckCache.get('ogmios_cardano_node', () =&gt; this.#checkHealth());
   }
 &nbsp;
   async #throwIfHandleResolutionConflict(context: SubmitTxArgs['context']): Promise&lt;void&gt; {
@@ -385,7 +409,7 @@ export class NodeTxSubmitProvider implements TxSubmitProvider {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-09-05T13:49:33.246Z
+                at 2024-09-06T08:34:44.849Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
