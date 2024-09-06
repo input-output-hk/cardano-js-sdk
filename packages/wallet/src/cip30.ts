@@ -22,7 +22,7 @@ import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { MessageSender } from '@cardano-sdk/key-management';
-import { Observable, firstValueFrom, map } from 'rxjs';
+import { Observable, firstValueFrom, from, map, mergeMap, race, throwError } from 'rxjs';
 import { ObservableWallet, isKeyHashAddress, isScriptAddress } from './types';
 import { requiresForeignSignatures } from './services';
 import uniq from 'lodash/uniq.js';
@@ -70,14 +70,20 @@ export type GetCollateralCallbackParams = {
 
 type GetCollateralCallback = (args: GetCollateralCallbackParams) => Promise<Cardano.Utxo[]>;
 
+export type SignConfirmationOk = { cancel$: Observable<void> };
+export type SignConfirmationResult = SignConfirmationOk | false;
+
+const signOrCancel = <T>(result: Promise<T>, { cancel$ }: SignConfirmationOk, createError: () => Error) =>
+  firstValueFrom(race(from(result), cancel$.pipe(mergeMap(() => throwError(createError)))));
+
 export type CallbackConfirmation = {
-  signData: (args: SignDataCallbackParams) => Promise<boolean>;
-  signTx: (args: SignTxCallbackParams) => Promise<boolean>;
+  signData: (args: SignDataCallbackParams) => Promise<SignConfirmationResult>;
+  signTx: (args: SignTxCallbackParams) => Promise<SignConfirmationResult>;
   submitTx: (args: SubmitTxCallbackParams) => Promise<boolean>;
   getCollateral?: GetCollateralCallback;
 };
 
-const mapCallbackFailure = (err: unknown, logger: Logger) => {
+const mapCallbackFailure = (err: unknown, logger: Logger): false => {
   logger.error(err);
   return false;
 };
@@ -444,7 +450,7 @@ const baseCip30WalletApi = (
     const hexBlobPayload = HexBlob(payload);
     const signWith = Cardano.DRepID.isValid(addr) ? Cardano.DRepID(addr) : Cardano.PaymentAddress(addr);
 
-    const shouldProceed = await confirmationCallback
+    const confirmationResult = await confirmationCallback
       .signData({
         data: {
           addr: signWith,
@@ -455,13 +461,17 @@ const baseCip30WalletApi = (
       })
       .catch((error) => mapCallbackFailure(error, logger));
 
-    if (shouldProceed) {
+    if (confirmationResult) {
       const wallet = await firstValueFrom(wallet$);
-      return wallet.signData({
-        payload: hexBlobPayload,
-        sender,
-        signWith
-      });
+      return signOrCancel(
+        wallet.signData({
+          payload: hexBlobPayload,
+          sender,
+          signWith
+        }),
+        confirmationResult,
+        () => new DataSignError(DataSignErrorCode.UserDeclined, 'user declined signing')
+      );
     }
     logger.debug('sign data declined');
     throw new DataSignError(DataSignErrorCode.UserDeclined, 'user declined signing');
@@ -478,33 +488,37 @@ const baseCip30WalletApi = (
 
     // If partialSign is false and the wallet could not sign the entire transaction
     if (!partialSign && needsForeignSignature)
-      throw new DataSignError(
-        DataSignErrorCode.ProofGeneration,
+      throw new TxSignError(
+        TxSignErrorCode.ProofGeneration,
         'The wallet does not have the secret key associated with some of the inputs or certificates.'
       );
 
-    const shouldProceed = await confirmationCallback
+    const confirmationResult = await confirmationCallback
       .signTx({
         data: coreTx,
         sender,
         type: Cip30ConfirmationCallbackType.SignTx
       })
       .catch((error) => mapCallbackFailure(error, logger));
-    if (shouldProceed) {
+    if (confirmationResult) {
       try {
         const {
           witness: { signatures }
-        } = await wallet.finalizeTx({
-          bodyCbor: txDecoded.body().toCbor(),
-          signingContext: { sender },
-          tx: { ...coreTx, hash }
-        });
+        } = await signOrCancel(
+          wallet.finalizeTx({
+            bodyCbor: txDecoded.body().toCbor(),
+            signingContext: { sender },
+            tx: { ...coreTx, hash }
+          }),
+          confirmationResult,
+          () => new TxSignError(TxSignErrorCode.UserDeclined, 'user declined signing tx')
+        );
 
         // If partialSign is true, the wallet only tries to sign what it can. However, if
         // signatures size is 0 then throw.
         if (partialSign && signatures.size === 0) {
-          throw new DataSignError(
-            DataSignErrorCode.ProofGeneration,
+          throw new TxSignError(
+            TxSignErrorCode.ProofGeneration,
             'The wallet does not have the secret key associated with any of the inputs and certificates.'
           );
         }
@@ -512,10 +526,10 @@ const baseCip30WalletApi = (
         const cbor = Serialization.TransactionWitnessSet.fromCore({ signatures }).toCbor();
         return Promise.resolve(cbor);
       } catch (error) {
-        logger.error(error);
-        if (error instanceof DataSignError) {
+        if (error instanceof TxSignError) {
           throw error;
         } else {
+          logger.error(error);
           const message = formatUnknownError(error);
           throw new TxSignError(TxSignErrorCode.UserDeclined, message);
         }

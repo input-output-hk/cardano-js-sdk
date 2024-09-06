@@ -21,12 +21,12 @@ import {
 import { CustomError } from 'ts-custom-error';
 import {
   EMPTY,
-  EmptyError,
   NEVER,
   Observable,
   Subscription,
   TeardownLogic,
   concat,
+  defaultIfEmpty,
   filter,
   firstValueFrom,
   from,
@@ -39,10 +39,10 @@ import {
   switchMap,
   takeUntil,
   tap,
-  throwError
+  timeout
 } from 'rxjs';
 import { ErrorClass, Shutdown, fromSerializableObject, isPromise, toSerializableObject } from '@cardano-sdk/util';
-import { NotImplementedError } from '@cardano-sdk/core';
+import { Milliseconds, NotImplementedError } from '@cardano-sdk/core';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { WrongTargetError } from './errors';
 import {
@@ -66,7 +66,7 @@ export class RemoteApiShutdownError extends CustomError {
 const consumeMethod =
   (
     { propName, errorTypes }: { propName: string; errorTypes?: ErrorClass[]; options?: MethodRequestOptions },
-    { messenger: { message$, postMessage, channel, disconnect$ } }: MessengerApiDependencies
+    { messenger: { message$, channel, postMessage, disconnect$, connect$ }, logger }: MessengerApiDependencies
   ) =>
   async (...args: unknown[]) => {
     const requestMessage: RequestMessage = {
@@ -87,17 +87,21 @@ const consumeMethod =
           map(({ response }) => response),
           filter((response) => !(response instanceof WrongTargetError))
         ),
+        // We might encounter unexpected disconnects between method call and response
         disconnect$.pipe(
           filter((dc) => dc.remaining.length === 0),
-          mergeMap(() => throwError(() => new EmptyError()))
+          tap(() => logger.warn(`API disconnected before "${propName}" resolved. Expecting reconnect.`)),
+          switchMap(() =>
+            connect$.pipe(
+              tap(() => logger.warn(`Reconnected. Waiting for "${propName}" response...`)),
+              // It usually reconnects in about 1 second. 10 should be more than enough to know that it won't re-connect.
+              timeout({ first: Milliseconds(10_000), with: () => of(new RemoteApiShutdownError(channel)) }),
+              mergeMap((value) => (value instanceof RemoteApiShutdownError ? of(value) : EMPTY))
+            )
+          )
         )
-      )
-    ).catch((error) => {
-      if (error instanceof EmptyError) {
-        throw new RemoteApiShutdownError(channel);
-      }
-      throw error;
-    });
+      ).pipe(defaultIfEmpty(new RemoteApiShutdownError(channel)))
+    );
 
     if (result instanceof Error) {
       throw result;
