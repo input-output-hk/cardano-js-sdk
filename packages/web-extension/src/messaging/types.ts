@@ -60,6 +60,7 @@ export interface MessengerPort {
 export interface MinimalRuntime {
   connect(connectInfo: Runtime.ConnectConnectInfoType): MessengerPort;
   onConnect: MinimalEvent<(port: MessengerPort) => void>;
+  lastError?: unknown;
 }
 
 export interface MessengerDependencies {

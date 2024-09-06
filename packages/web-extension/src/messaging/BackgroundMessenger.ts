@@ -53,6 +53,9 @@ export const createBackgroundMessenger = ({ logger, runtime }: MessengerDependen
     message$.next({ data, port });
   };
   const onPortDisconnected = (port: MessengerPort) => {
+    if (runtime.lastError) {
+      logger.warn(`[BackgroundMessenger(${port.name})] Last runtime error`, runtime.lastError);
+    }
     port.onMessage.removeListener(onPortMessage);
     port.onDisconnect.removeListener(onPortDisconnected);
     const { ports$ } = channels.get(port.name)!;

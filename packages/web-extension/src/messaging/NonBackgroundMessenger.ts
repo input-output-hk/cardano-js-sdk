@@ -73,6 +73,9 @@ export const createNonBackgroundMessenger = (
     message$.next({ data, port });
   };
   const onDisconnect = (port: MessengerPort) => {
+    if (runtime.lastError) {
+      logger.warn(`[NonBackgroundMessenger(${channel})] Last runtime error`, runtime.lastError);
+    }
     disconnect$.next({
       disconnected: port,
       remaining: []

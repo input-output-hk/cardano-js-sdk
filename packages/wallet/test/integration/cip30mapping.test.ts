@@ -11,6 +11,7 @@ import {
   SenderContext,
   TxSendError,
   TxSignError,
+  TxSignErrorCode,
   WalletApi,
   WithSenderContext
 } from '@cardano-sdk/dapp-connector';
@@ -29,10 +30,10 @@ import {
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
+import { NEVER, firstValueFrom, of } from 'rxjs';
 import { Providers, createWallet } from './util';
 import { address_0_0, address_1_0, rewardAccount_0, rewardAccount_1 } from '../services/ChangeAddress/testData';
 import { buildDRepIDFromDRepKey, signTx, waitForWalletStateSettle } from '../util';
-import { firstValueFrom, of } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import uniq from 'lodash/uniq.js';
@@ -50,7 +51,7 @@ const {
 
 type TestProviders = Required<Pick<Providers, 'txSubmitProvider' | 'networkInfoProvider'>>;
 const mockCollateralCallback = jest.fn().mockResolvedValue([mockUtxo[3]]);
-const createMockGenericCallback = () => jest.fn().mockResolvedValue(true);
+const createMockGenericCallback = <T>(result: T) => jest.fn().mockResolvedValue(result);
 const foreignTx = Serialization.TxCBOR(
   '84a70081825820dce442e983f3f5cd5b2644bc57f749075390f1fbae9ab55bf454342959c885db00018182583900d161d64eef0eeb59f9124f520f8c8f3b717ed04198d54c8b17e604aea63c153fb3ea8a4ea4f165574ea91173756de0bf30222ca0e95a649a1a0082607b021a0016360509a1581cb77934706fa311b6568d1070c2d23f092324b35ad623aa571a0e3726a14e4d6573685f476966745f43617264200b5820d8175f3b1276a48939a6ccee220a7f81b6422167317ba3ff6325cba1fb6ccbe70d818258208d68748457cd0f1a8596f41fd2125a415315897d2da4a4b94335829cee7198ae001281825820dce442e983f3f5cd5b2644bc57f749075390f1fbae9ab55bf454342959c885db00a2068259016b590168010000333232323232323223223222253330083232533300d3010002132533300b3370e6eb4c034009200113371e0020122940dd718058008b180700099299980499b8748008c028dd50008a5eb7bdb1804dd5980718059baa001323300100132330010013756601e602060206020602060186ea8c03cc030dd50019129998070008a5eb7bdb1804c8c8c8c94ccc03ccdc8a45000021533300f3371e91010000210031005133013337606ea4008dd3000998030030019bab3010003375c601c0046024004602000244a66601a002298103d87a8000132323232533300e337220140042a66601c66e3c0280084cdd2a4000660246e980052f5c02980103d87a80001330060060033756601e0066eb8c034008c044008c03c00452613656375c0026eb80055cd2ab9d5573caae7d5d02ba157449810f4e4d6573685f476966745f43617264004c011e581cb77934706fa311b6568d1070c2d23f092324b35ad623aa571a0e3726000159023c59023901000033323232323232322322232323225333009323232533300c3007300d3754002264646464a666026602c00426464a666024601a60266ea803854ccc048c034c04cdd5191980080080311299980b8008a60103d87a80001323253330163375e603660306ea800804c4cdd2a40006603400497ae0133004004001301b002301900115333012300c00113371e00402029405854ccc048cdc3800a4002266e3c0080405281bad3013002375c60220022c602800264a66601e601260206ea800452f5bded8c026eacc050c044dd500099191980080099198008009bab3016301730173017301700522533301500114bd6f7b630099191919299980b19b91488100002153330163371e9101000021003100513301a337606ea4008dd3000998030030019bab3017003375c602a0046032004602e00244a666028002298103d87a800013232323253330153372200e0042a66602a66e3c01c0084cdd2a4000660326e980052f5c02980103d87a80001330060060033756602c0066eb8c050008c060008c058004dd7180998081baa00337586024002601c6ea800858c040c044008c03c004c02cdd50008a4c26cac64a66601060060022a66601660146ea8010526161533300830020011533300b300a37540082930b0b18041baa003370e90011b8748000dd7000ab9a5573aaae7955cfaba05742ae8930010f4e4d6573685f476966745f43617264004c012bd8799fd8799f58203159a6f2ae24c5bfbed947fe0ecfe936f088c8d265484e6979cacb607d33c811ff05ff0001058284000040821a006acfc01ab2d05e00840100d87a80821a006acfc01ab2d05e00f5f6'
 );
@@ -74,9 +75,9 @@ const createWalletAndApiWithStores = async (
     wallet.utxo.available$ = of(availableUtxos);
   }
   const confirmationCallback = {
-    signData: createMockGenericCallback(),
-    signTx: createMockGenericCallback(),
-    submitTx: createMockGenericCallback(),
+    signData: createMockGenericCallback({ cancel$: NEVER }),
+    signTx: createMockGenericCallback({ cancel$: NEVER }),
+    submitTx: createMockGenericCallback(true),
     ...(!!getCollateralCallback && { getCollateral: getCollateralCallback })
   };
   wallet.governance.getPubDRepKey = jest.fn(wallet.governance.getPubDRepKey);
@@ -613,11 +614,24 @@ describe('cip30', () => {
 
         it('doesnt invoke confirmationCallback.signTx if an error occurs', async () => {
           const finalizeTxSpy = jest.spyOn(wallet, 'finalizeTx').mockClear();
-          confirmationCallback.signTx = jest.fn().mockResolvedValueOnce(true).mockClear();
+          confirmationCallback.signTx = jest.fn().mockResolvedValueOnce({ cancel$: NEVER }).mockClear();
 
           await expect(api.signTx(context, foreignTx, false)).rejects.toThrowError();
           expect(finalizeTxSpy).not.toHaveBeenCalled();
           expect(confirmationCallback.signTx).not.toHaveBeenCalled();
+        });
+
+        it('rejects with UserDeclined error if cancel$ emits before finalizeTx resolves', async () => {
+          jest.spyOn(wallet, 'finalizeTx').mockResolvedValueOnce(
+            new Promise(() => {
+              // never resolves or rejects
+            })
+          );
+          confirmationCallback.signTx = jest.fn().mockResolvedValueOnce({ cancel$: of(void 0) });
+
+          await expect(api.signTx(context, hexTx)).rejects.toThrowError(
+            expect.objectContaining({ code: TxSignErrorCode.UserDeclined })
+          );
         });
       });
 
@@ -660,6 +674,20 @@ describe('cip30', () => {
             })
           );
           expect(confirmationCallback.signData).toBeCalledWith(expect.objectContaining({ sender: context.sender }));
+        });
+
+        it('rejects with UserDeclined error if cancel$ emits before finalizeTx resolves', async () => {
+          const [{ address }] = await firstValueFrom(wallet.addresses$);
+          jest.spyOn(wallet, 'signData').mockResolvedValueOnce(
+            new Promise(() => {
+              // never resolves or rejects
+            })
+          );
+          confirmationCallback.signData = jest.fn().mockResolvedValueOnce({ cancel$: of(void 0) });
+
+          await expect(api.signData(context, address, HexBlob('abc123'))).rejects.toThrowError(
+            expect.objectContaining({ code: DataSignErrorCode.UserDeclined })
+          );
         });
       });
 
@@ -741,8 +769,8 @@ describe('cip30', () => {
       describe('signData', () => {
         const payload = 'abc123';
 
-        test('resolves true', async () => {
-          confirmationCallback.signData = jest.fn().mockResolvedValueOnce(true);
+        test('resolves ok', async () => {
+          confirmationCallback.signData = jest.fn().mockResolvedValueOnce({ cancel$: NEVER });
           await expect(api.signData(context, address, payload)).resolves.not.toThrow();
         });
 
@@ -757,7 +785,7 @@ describe('cip30', () => {
         });
 
         test('gets the Cardano.Address equivalent of the hex address', async () => {
-          confirmationCallback.signData = jest.fn().mockResolvedValueOnce(true);
+          confirmationCallback.signData = jest.fn().mockResolvedValueOnce({ cancel$: NEVER });
 
           const hexAddr = Cardano.Address.fromBech32(address).toBytes();
 
@@ -776,8 +804,8 @@ describe('cip30', () => {
           hexTx = Serialization.Transaction.fromCore(finalizedTx).toCbor();
         });
 
-        test('resolves true', async () => {
-          confirmationCallback.signTx = jest.fn().mockResolvedValueOnce(true);
+        test('resolves ok', async () => {
+          confirmationCallback.signTx = jest.fn().mockResolvedValueOnce({ cancel$: NEVER });
           await expect(api.signTx(context, hexTx)).resolves.not.toThrow();
         });
 
@@ -869,8 +897,8 @@ describe('cip30', () => {
         mockApi = cip30.createWalletApi(
           of(mockWallet),
           {
-            signData: jest.fn().mockResolvedValue(true),
-            signTx: jest.fn().mockResolvedValue(true),
+            signData: jest.fn().mockResolvedValue({ cancel$: NEVER }),
+            signTx: jest.fn().mockResolvedValue({ cancel$: NEVER }),
             submitTx: jest.fn().mockResolvedValue(true)
           },
           { logger }
