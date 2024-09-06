@@ -1,5 +1,5 @@
 import { HandleFixtures, createHandleFixtures } from './fixtures';
-import { TypeOrmHandleProvider, createDnsResolver, getConnectionConfig, getEntities } from '../../src';
+import { NoCache, TypeOrmHandleProvider, createDnsResolver, getConnectionConfig, getEntities } from '../../src';
 import { logger } from '@cardano-sdk/util-dev';
 
 describe('TypeOrmHandleProvider', () => {
@@ -14,7 +14,7 @@ describe('TypeOrmHandleProvider', () => {
     });
 
     fixtures = await createHandleFixtures(connectionConfig$);
-    provider = new TypeOrmHandleProvider({ connectionConfig$, entities, logger });
+    provider = new TypeOrmHandleProvider({ connectionConfig$, entities, healthCheckCache: new NoCache(), logger });
 
     await provider.initialize();
     await provider.start();

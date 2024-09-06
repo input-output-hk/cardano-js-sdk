@@ -1,5 +1,5 @@
 import { Cardano, util } from '@cardano-sdk/core';
-import { TypeOrmNftMetadataService, createDnsResolver, getConnectionConfig, getEntities } from '../../src';
+import { NoCache, TypeOrmNftMetadataService, createDnsResolver, getConnectionConfig, getEntities } from '../../src';
 import { logger, mockProviders } from '@cardano-sdk/util-dev';
 
 describe('TypeOrmNftMetadataService', () => {
@@ -11,7 +11,7 @@ describe('TypeOrmNftMetadataService', () => {
     const connectionConfig$ = getConnectionConfig(dnsResolver, 'test', 'Asset', {
       postgresConnectionStringAsset: process.env.POSTGRES_CONNECTION_STRING_ASSET!
     });
-    service = new TypeOrmNftMetadataService({ connectionConfig$, entities, logger });
+    service = new TypeOrmNftMetadataService({ connectionConfig$, entities, healthCheckCache: new NoCache(), logger });
     await service.initialize();
     await service.start();
   });

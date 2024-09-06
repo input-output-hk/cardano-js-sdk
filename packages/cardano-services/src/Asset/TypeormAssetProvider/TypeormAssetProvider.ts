@@ -28,12 +28,12 @@ export class TypeormAssetProvider extends TypeormProvider implements AssetProvid
   #paginationPageSizeLimit: number;
 
   constructor({ paginationPageSizeLimit }: TypeormAssetProviderProps, dependencies: TypeormAssetProviderDependencies) {
-    const { connectionConfig$, entities, logger } = dependencies;
-    super('TypeormAssetProvider', { connectionConfig$, entities, logger });
+    const { connectionConfig$, entities, logger, healthCheckCache } = dependencies;
+    super('TypeormAssetProvider', { connectionConfig$, entities, healthCheckCache, logger });
 
     this.#dependencies = dependencies;
     this.#paginationPageSizeLimit = paginationPageSizeLimit;
-    this.#nftMetadataService = new TypeOrmNftMetadataService({ connectionConfig$, entities, logger });
+    this.#nftMetadataService = new TypeOrmNftMetadataService({ connectionConfig$, entities, healthCheckCache, logger });
   }
 
   async getAsset({ assetId, extraData }: GetAssetArgs): Promise<Asset.AssetInfo> {

@@ -12,6 +12,7 @@ import {
   TxSubmissionError,
   TxSubmitProvider
 } from '@cardano-sdk/core';
+import { InMemoryCache } from '../InMemoryCache';
 import { Logger } from 'ts-log';
 import { WithLogger } from '@cardano-sdk/util';
 
@@ -19,6 +20,7 @@ type ObservableTxSubmitter = Pick<ObservableCardanoNode, 'healthCheck$' | 'submi
 export type NodeTxSubmitProviderProps = WithLogger & {
   handleProvider?: HandleProvider;
   cardanoNode: ObservableTxSubmitter;
+  healthCheckCache: InMemoryCache;
 };
 
 const emptyMessage = 'ObservableCardanoNode observable completed without emitting';
@@ -49,11 +51,13 @@ export class NodeTxSubmitProvider implements TxSubmitProvider {
   #logger: Logger;
   #cardanoNode: ObservableTxSubmitter;
   #handleProvider?: HandleProvider;
+  #healthCheckCache: InMemoryCache;
 
-  constructor({ handleProvider, cardanoNode, logger }: NodeTxSubmitProviderProps) {
+  constructor({ handleProvider, cardanoNode, logger, healthCheckCache }: NodeTxSubmitProviderProps) {
     this.#handleProvider = handleProvider;
     this.#cardanoNode = cardanoNode;
     this.#logger = logger;
+    this.#healthCheckCache = healthCheckCache;
   }
 
   async submitTx({ signedTransaction, context }: SubmitTxArgs): Promise<void> {
@@ -61,7 +65,7 @@ export class NodeTxSubmitProvider implements TxSubmitProvider {
     await firstValueFrom(this.#cardanoNode.submitTx(signedTransaction)).catch(toProviderError);
   }
 
-  async healthCheck(): Promise<HealthCheckResponse> {
+  async #checkHealth(): Promise<HealthCheckResponse> {
     const [cardanoNodeHealth, handleProviderHealth] = await Promise.all([
       firstValueFrom(this.#cardanoNode.healthCheck$).catch((error): HealthCheckResponse => {
         if (error instanceof EmptyError) {
@@ -77,6 +81,10 @@ export class NodeTxSubmitProvider implements TxSubmitProvider {
       ok: cardanoNodeHealth.ok && (!handleProviderHealth || handleProviderHealth.ok),
       reason: cardanoNodeHealth.reason || handleProviderHealth?.reason
     };
+  }
+
+  async healthCheck(): Promise<HealthCheckResponse> {
+    return this.#healthCheckCache.get('ogmios_cardano_node', () => this.#checkHealth());
   }
 
   async #throwIfHandleResolutionConflict(context: SubmitTxArgs['context']): Promise<void> {

@@ -47,7 +47,7 @@ import {
 } from '@cardano-sdk/cardano-services-client';
 import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
 import { Logger } from 'ts-log';
-import { NodeTxSubmitProvider } from '@cardano-sdk/cardano-services';
+import { NoCache, NodeTxSubmitProvider } from '@cardano-sdk/cardano-services';
 import { OgmiosObservableCardanoNode } from '@cardano-sdk/ogmios';
 import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
@@ -165,8 +165,10 @@ txSubmitProviderFactory.register(OGMIOS_PROVIDER, async (params: any, logger: Lo
           {
             connectionConfig$: of(connectionConfig)
           },
+
           { logger }
         ),
+        healthCheckCache: new NoCache(),
         logger
       })
     );
