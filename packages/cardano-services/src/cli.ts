@@ -44,6 +44,7 @@ import {
   loadProviderServer,
   loadWsServer,
   newOption,
+  providerSelectionOptions,
   stringOptionToBoolean,
   withCommonOptions,
   withHandlePolicyIdsOptions,
@@ -377,7 +378,8 @@ addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon
     ProviderServerOptionDescriptions.UseWebSocketApi,
     'USE_WEB_SOCKET_API',
     (val) => stringOptionToBoolean(val, Programs.ProviderServer, ProviderServerOptionDescriptions.UseWebSocketApi)
-  )
+  ),
+  ...providerSelectionOptions
 ]).action(async (serviceNames: ServiceNames[], args: ProviderServerArgs) =>
   runServer('Provider server', { args, serviceNames }, () =>
     loadProviderServer({

@@ -1,10 +1,11 @@
 import {
   CommonProgramOptions,
+  HandlePolicyIdsProgramOptions,
   OgmiosProgramOptions,
   PosgresProgramOptions,
+  ProviderImplementations,
   StakePoolMetadataProgramOptions
 } from '../options';
-import { HandlePolicyIdsProgramOptions } from '../options/policyIds';
 import { Milliseconds, Seconds } from '@cardano-sdk/core';
 import { TypeOrmStakePoolProviderProps } from '../../StakePool';
 import { defaultJobOptions } from '@cardano-sdk/projection-typeorm';
@@ -73,7 +74,8 @@ export type ProviderServerArgs = CommonProgramOptions &
   OgmiosProgramOptions &
   HandlePolicyIdsProgramOptions &
   StakePoolMetadataProgramOptions &
-  TypeOrmStakePoolProviderProps & {
+  TypeOrmStakePoolProviderProps &
+  ProviderImplementations & {
     allowedOrigins?: string[];
     assetCacheTTL?: Seconds;
     disableStakePoolMetricApy?: boolean;

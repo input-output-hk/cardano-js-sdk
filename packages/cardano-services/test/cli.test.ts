@@ -1112,5 +1112,147 @@ describe('CLI', () => {
           notDump
         }));
     });
+
+    describe('provider implementation selection', () => {
+      testCli('check defaults', 'provider', {
+        expectedArgs: {
+          args: {
+            assetProvider: 'dbsync',
+            chainHistoryProvider: 'dbsync',
+            networkInfoProvider: 'dbsync',
+            rewardsProvider: 'dbsync',
+            stakePoolProvider: 'dbsync',
+            txSubmitProvider: 'submit-node',
+            utxoProvider: 'dbsync'
+          }
+        }
+      });
+      describe('--asset-provider', () => {
+        testCli('set successful', 'provider', {
+          args: ['--asset-provider', 'blockfrost'],
+          env: { ASSET_PROVIDER: 'blockfrost' },
+          expectedArgs: {
+            args: {
+              assetProvider: 'blockfrost'
+            }
+          }
+        });
+        testCli('set unsuccessful', 'provider', {
+          args: ['--asset-provider', 'not-valid'],
+          env: { ASSET_PROVIDER: 'not-valid' },
+          expectedError: 'is invalid'
+        });
+        testCli('conflicts', 'provider', {
+          args: ['--asset-provider', 'blockfrost', '--use-typeorm-asset-provider', 'true'],
+          env: { ASSET_PROVIDER: 'blockfrost', USE_TYPEORM_ASSET_PROVIDER: 'true' },
+          expectedError: 'cannot be used with'
+        });
+      });
+      describe('--stake-pool-provider', () => {
+        testCli('set successful', 'provider', {
+          args: ['--stake-pool-provider', 'typeorm'],
+          env: { STAKE_POOL_PROVIDER: 'typeorm' },
+          expectedArgs: {
+            args: {
+              stakePoolProvider: 'typeorm'
+            }
+          }
+        });
+        testCli('set unsuccessful', 'provider', {
+          args: ['--stake-pool-provider', 'not-valid'],
+          env: { STAKE_POOL_PROVIDER: 'not-valid' },
+          expectedError: 'is invalid'
+        });
+        testCli('conflicts', 'provider', {
+          args: ['--stake-pool-provider', 'dbsync', '--use-typeorm-stake-pool-provider', 'true'],
+          env: { STAKE_POOL_PROVIDER: 'typeorm', USE_TYPEORM_STAKE_POOL_PROVIDER: 'true' },
+          expectedError: 'cannot be used with'
+        });
+      });
+
+      describe('--utxo-provider', () => {
+        testCli('set successful', 'provider', {
+          args: ['--utxo-provider', 'blockfrost'],
+          env: { UTXO_PROVIDER: 'blockfrost' },
+          expectedArgs: {
+            args: {
+              utxoProvider: 'blockfrost'
+            }
+          }
+        });
+        testCli('set unsuccessful', 'provider', {
+          args: ['--utxo-provider', 'not-valid'],
+          env: { UTXO_PROVIDER: 'not-valid' },
+          expectedError: 'is invalid'
+        });
+      });
+
+      describe('--chain-history-provider', () => {
+        testCli('set successful', 'provider', {
+          args: ['--chain-history-provider', 'blockfrost'],
+          env: { CHAIN_HISTORY_PROVIDER: 'blockfrost' },
+          expectedArgs: {
+            args: {
+              chainHistoryProvider: 'blockfrost'
+            }
+          }
+        });
+        testCli('set unsuccessful', 'provider', {
+          args: ['--chain-history-provider', 'not-valid'],
+          env: { CHAIN_HISTORY_PROVIDER: 'not-valid' },
+          expectedError: 'is invalid'
+        });
+      });
+
+      describe('--rewards-provider', () => {
+        testCli('set successful', 'provider', {
+          args: ['--rewards-provider', 'blockfrost'],
+          env: { REWARDS_PROVIDER: 'blockfrost' },
+          expectedArgs: {
+            args: {
+              rewardsProvider: 'blockfrost'
+            }
+          }
+        });
+        testCli('set unsuccessful', 'provider', {
+          args: ['--rewards-provider', 'not-valid'],
+          env: { REWARDS_PROVIDER: 'not-valid' },
+          expectedError: 'is invalid'
+        });
+      });
+
+      describe('--network-info-provider', () => {
+        testCli('set successful', 'provider', {
+          args: ['--network-info-provider', 'blockfrost'],
+          env: { NETWORK_INFO_PROVIDER: 'blockfrost' },
+          expectedArgs: {
+            args: {
+              networkInfoProvider: 'blockfrost'
+            }
+          }
+        });
+        testCli('set unsuccessful', 'provider', {
+          args: ['--network-info-provider', 'not-valid'],
+          env: { NETWORK_INFO_PROVIDER: 'not-valid' },
+          expectedError: 'is invalid'
+        });
+      });
+      describe('--tx-submit-provider', () => {
+        testCli('set successful', 'provider', {
+          args: ['--tx-submit-provider', 'blockfrost'],
+          env: { TX_SUBMIT_PROVIDER: 'blockfrost' },
+          expectedArgs: {
+            args: {
+              txSubmitProvider: 'blockfrost'
+            }
+          }
+        });
+        testCli('set unsuccessful', 'provider', {
+          args: ['--tx-submit-provider', 'not-valid'],
+          env: { TX_SUBMIT_PROVIDER: 'not-valid' },
+          expectedError: 'is invalid'
+        });
+      });
+    });
   });
 });

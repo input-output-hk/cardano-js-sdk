@@ -1,46 +1,72 @@
 /* eslint-disable complexity */
-/* eslint-disable sonarjs/cognitive-complexity */
 import {
-  AssetHttpService,
-  CardanoTokenRegistry,
-  DbSyncAssetProvider,
-  DbSyncNftMetadataService,
-  StubTokenMetadataService
-} from '../../Asset';
-import { CardanoNode, HandleProvider, Seconds } from '@cardano-sdk/core';
+  AssetProvider,
+  CardanoNode,
+  ChainHistoryProvider,
+  HandleProvider,
+  Provider,
+  RewardsProvider,
+  Seconds,
+  StakePoolProvider,
+  UtxoProvider
+} from '@cardano-sdk/core';
 import { CardanoWsClient, TxSubmitApiProvider } from '@cardano-sdk/cardano-services-client';
-import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../../ChainHistory';
-import { CommonOptionsDescriptions } from '../options';
-import { ConnectionNames, PostgresOptionDescriptions, suffixType2Cli } from '../options/postgres';
-import { DbPools, DbSyncEpochPollService } from '../../util';
-import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../NetworkInfo';
-import { DbSyncRewardsProvider, RewardsHttpService } from '../../Rewards';
-import { DbSyncStakePoolProvider, StakePoolHttpService, createHttpStakePoolMetadataService } from '../../StakePool';
-import { DbSyncUtxoProvider, UtxoHttpService } from '../../Utxo';
-import { DnsResolver, createDnsResolver, getCardanoNode, getDbPools, getGenesisData } from '../utils';
-import { GenesisData } from '../../types';
-import { HandleHttpService, TypeOrmHandleProvider } from '../../Handle';
-import { HandlePolicyIdsOptionDescriptions, handlePolicyIdsFromFile } from '../options/policyIds';
-import { HttpServer, HttpServerConfig, HttpService, getListen } from '../../Http';
-import { InMemoryCache, NoCache } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
-import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from '../errors';
-import { NodeTxSubmitProvider, TxSubmitHttpService } from '../../TxSubmit';
 import { Observable } from 'rxjs';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 import { Pool } from 'pg';
-import { ProviderServerArgs, ProviderServerOptionDescriptions, ServiceNames } from './types';
 import { SrvRecord } from 'dns';
-import { TypeormAssetProvider } from '../../Asset/TypeormAssetProvider';
-import { TypeormStakePoolProvider } from '../../StakePool/TypeormStakePoolProvider/TypeormStakePoolProvider';
-import { WarmCache } from '../../InMemoryCache/WarmCache';
-import { createDbSyncMetadataService } from '../../Metadata';
 import { createLogger } from 'bunyan';
-import { getConnectionConfig, getOgmiosObservableCardanoNode } from '../services';
-import { getEntities } from '../../Projection/prepareTypeormProjection';
 import { isNotNil } from '@cardano-sdk/util';
 import memoize from 'lodash/memoize.js';
+/* eslint-disable sonarjs/cognitive-complexity */
+import {
+  AssetHttpService,
+  BlockfrostAssetProvider,
+  CardanoTokenRegistry,
+  DbSyncAssetProvider,
+  DbSyncNftMetadataService,
+  StubTokenMetadataService,
+  TypeormAssetProvider
+} from '../../Asset';
+import {
+  BlockfrostChainHistoryProvider,
+  ChainHistoryHttpService,
+  DbSyncChainHistoryProvider
+} from '../../ChainHistory';
+import { BlockfrostNetworkInfoProvider, DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../NetworkInfo';
+import { BlockfrostProvider } from '../../util/BlockfrostProvider/BlockfrostProvider';
+import { BlockfrostRewardsProvider, DbSyncRewardsProvider, RewardsHttpService } from '../../Rewards';
+import { BlockfrostTxSubmitProvider, NodeTxSubmitProvider, TxSubmitHttpService } from '../../TxSubmit';
+import { BlockfrostUtxoProvider, DbSyncUtxoProvider, UtxoHttpService } from '../../Utxo';
+import {
+  CommonOptionsDescriptions,
+  ConnectionNames,
+  HandlePolicyIdsOptionDescriptions,
+  PostgresOptionDescriptions,
+  ProviderImplementation,
+  handlePolicyIdsFromFile,
+  suffixType2Cli
+} from '../options';
+import { DbPools, DbSyncEpochPollService, TypeormProvider, getBlockfrostApi } from '../../util';
+import {
+  DbSyncStakePoolProvider,
+  StakePoolHttpService,
+  TypeormStakePoolProvider,
+  createHttpStakePoolMetadataService
+} from '../../StakePool';
+import { DnsResolver, createDnsResolver, getCardanoNode, getDbPools, getGenesisData } from '../utils';
+import { GenesisData } from '../../types';
+import { HandleHttpService, TypeOrmHandleProvider } from '../../Handle';
+import { HttpServer, HttpServerConfig, HttpService, getListen } from '../../Http';
+import { InMemoryCache, NoCache } from '../../InMemoryCache';
+import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from '../errors';
+import { ProviderServerArgs, ProviderServerOptionDescriptions, ServiceNames } from './types';
+import { WarmCache } from '../../InMemoryCache/WarmCache';
+import { createDbSyncMetadataService } from '../../Metadata';
+import { getConnectionConfig, getOgmiosObservableCardanoNode } from '../services';
+import { getEntities } from '../../Projection';
 
 export const ALLOWED_ORIGINS_DEFAULT = false;
 export const DISABLE_STAKE_POOL_METRIC_APY_DEFAULT = false;
@@ -71,6 +97,28 @@ const serverName = 'provider-server';
 const connectionConfigs: { [k in ConnectionNames]?: Observable<PgConnectionConfig> } = {};
 
 let sharedHandleProvider: HandleProvider;
+
+const selectProviderImplementation = <T extends Provider>(
+  impl: ProviderImplementation,
+  impls: {
+    typeorm?: () => T & TypeormProvider;
+    dbsync?: () => T & Provider;
+    blockfrost?: () => T & BlockfrostProvider;
+  },
+  logger: Logger,
+  service?: ServiceNames
+) => {
+  const selected =
+    impl === ProviderImplementation.TYPEORM
+      ? impls.typeorm!()
+      : impl === ProviderImplementation.DBSYNC
+      ? impls.dbsync!()
+      : (impls.blockfrost!() as T);
+
+  logger.info(`Selected ${typeof selected} for ${service} provider based on value ${impl}`);
+
+  return selected;
+};
 
 const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
   const { args, pools, dnsResolver, genesisData, logger, node } = options;
@@ -154,25 +202,6 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     });
   });
 
-  const getNetworkInfoProvider = (cardanoNode: CardanoNode, dbPools: DbPools) => {
-    if (args.useWebSocketApi) return getWebSocketClient().networkInfoProvider;
-
-    if (!genesisData)
-      throw new MissingProgramOption(ServiceNames.NetworkInfo, CommonOptionsDescriptions.CardanoNodeConfigPath);
-
-    return new DbSyncNetworkInfoProvider({
-      cache: {
-        db: getDbCache(),
-        healthCheck: healthCheckCache
-      },
-      cardanoNode,
-      dbPools,
-      epochMonitor: getEpochMonitor(dbPools.main),
-      genesisData,
-      logger
-    });
-  };
-
   const getHandleProvider = async () => {
     if (sharedHandleProvider) return sharedHandleProvider;
 
@@ -248,35 +277,49 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     );
   }, ServiceNames.Asset);
 
-  return {
-    [ServiceNames.Asset]: async () => {
-      const assetProvider = args.useTypeormAssetProvider ? getTypeormAssetProvider() : getDbSyncAssetProvider();
-      return new AssetHttpService({ assetProvider, logger });
-    },
-    [ServiceNames.StakePool]: async () => {
-      const stakePoolProvider = args.useTypeormStakePoolProvider
-        ? getTypeormStakePoolProvider()
-        : getDbSyncStakePoolProvider();
-      return new StakePoolHttpService({ logger, stakePoolProvider });
-    },
-    [ServiceNames.Utxo]: withDbSyncProvider(
-      async (dbPools, cardanoNode) =>
-        new UtxoHttpService({
-          logger,
-          utxoProvider: new DbSyncUtxoProvider({
-            cache: {
-              healthCheck: healthCheckCache
-            },
-            cardanoNode,
-            dbPools,
-            logger
-          })
-        }),
-      ServiceNames.Utxo
-    ),
-    [ServiceNames.ChainHistory]: withDbSyncProvider(async (dbPools, cardanoNode) => {
-      const metadataService = createDbSyncMetadataService(dbPools.main, logger);
-      const chainHistoryProvider = new DbSyncChainHistoryProvider(
+  const getBlockfrostAssetProvider = () => new BlockfrostAssetProvider({ blockfrost: getBlockfrostApi(), logger });
+
+  const getBlockfrostUtxoProvider = () => new BlockfrostUtxoProvider({ blockfrost: getBlockfrostApi(), logger });
+
+  const getDbSyncUtxoProvider = withDbSyncProvider(
+    (dbPools, cardanoNode) =>
+      new DbSyncUtxoProvider({
+        cache: {
+          healthCheck: healthCheckCache
+        },
+        cardanoNode,
+        dbPools,
+        logger
+      }),
+    ServiceNames.Utxo
+  );
+
+  const getBlockfrostNetworkInfoProvider = () =>
+    new BlockfrostNetworkInfoProvider({ blockfrost: getBlockfrostApi(), logger });
+
+  const getDbSyncNetworkInfoProvider = withDbSyncProvider((dbPools, cardanoNode) => {
+    if (!genesisData)
+      throw new MissingProgramOption(ServiceNames.NetworkInfo, CommonOptionsDescriptions.CardanoNodeConfigPath);
+
+    return new DbSyncNetworkInfoProvider({
+      cache: {
+        db: getDbCache(),
+        healthCheck: healthCheckCache
+      },
+      cardanoNode,
+      dbPools,
+      epochMonitor: getEpochMonitor(dbPools.main),
+      genesisData,
+      logger
+    });
+  }, ServiceNames.NetworkInfo);
+
+  const getBlockfrostChainHistoryProvider = () =>
+    new BlockfrostChainHistoryProvider({ blockfrost: getBlockfrostApi(), logger });
+
+  const getDbSyncChainHistoryProvider = withDbSyncProvider(
+    (dbPools, cardanoNode) =>
+      new DbSyncChainHistoryProvider(
         { paginationPageSizeLimit: args.paginationPageSizeLimit! },
         {
           cache: {
@@ -285,14 +328,17 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
           cardanoNode,
           dbPools,
           logger,
-          metadataService
+          metadataService: createDbSyncMetadataService(dbPools.main, logger)
         }
-      );
-      return new ChainHistoryHttpService({ chainHistoryProvider, logger });
-    }, ServiceNames.ChainHistory),
-    [ServiceNames.Handle]: async () => new HandleHttpService({ handleProvider: await getHandleProvider(), logger }),
-    [ServiceNames.Rewards]: withDbSyncProvider(async (dbPools, cardanoNode) => {
-      const rewardsProvider = new DbSyncRewardsProvider(
+      ),
+    ServiceNames.ChainHistory
+  );
+
+  const getBlockfrostRewardsProvider = () => new BlockfrostRewardsProvider({ blockfrost: getBlockfrostApi(), logger });
+
+  const getDbSyncRewardsProvider = withDbSyncProvider(
+    (dbPools, cardanoNode) =>
+      new DbSyncRewardsProvider(
         { paginationPageSizeLimit: args.paginationPageSizeLimit! },
         {
           cache: {
@@ -302,19 +348,89 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
           dbPools,
           logger
         }
-      );
-      return new RewardsHttpService({ logger, rewardsProvider });
-    }, ServiceNames.Rewards),
-    [ServiceNames.NetworkInfo]: withDbSyncProvider(
-      async (dbPools, cardanoNode) =>
-        new NetworkInfoHttpService({
+      ),
+    ServiceNames.Rewards
+  );
+  const getBlockfrostTxSubmitProvider = () =>
+    new BlockfrostTxSubmitProvider({ blockfrost: getBlockfrostApi(), logger });
+
+  return {
+    [ServiceNames.Asset]: async () =>
+      new AssetHttpService({
+        assetProvider: selectProviderImplementation<AssetProvider>(
+          args.useTypeormAssetProvider
+            ? ProviderImplementation.TYPEORM
+            : args.assetProvider ?? ProviderImplementation.DBSYNC,
+          { blockfrost: getBlockfrostAssetProvider, dbsync: getDbSyncAssetProvider, typeorm: getTypeormAssetProvider },
           logger,
-          networkInfoProvider: getNetworkInfoProvider(cardanoNode, dbPools)
-        }),
-      ServiceNames.NetworkInfo
-    ),
+          ServiceNames.Asset
+        ),
+        logger
+      }),
+    [ServiceNames.StakePool]: async () =>
+      new StakePoolHttpService({
+        logger,
+        stakePoolProvider: selectProviderImplementation<StakePoolProvider>(
+          args.useTypeormStakePoolProvider
+            ? ProviderImplementation.TYPEORM
+            : args.stakePoolProvider ?? ProviderImplementation.DBSYNC,
+          { dbsync: getDbSyncStakePoolProvider, typeorm: getTypeormStakePoolProvider },
+          logger,
+          ServiceNames.StakePool
+        )
+      }),
+    [ServiceNames.Utxo]: async () =>
+      new UtxoHttpService({
+        logger,
+        utxoProvider: selectProviderImplementation<UtxoProvider>(
+          args.utxoProvider ?? ProviderImplementation.DBSYNC,
+          {
+            blockfrost: getBlockfrostUtxoProvider,
+            dbsync: getDbSyncUtxoProvider
+          },
+          logger,
+          ServiceNames.Utxo
+        )
+      }),
+    [ServiceNames.ChainHistory]: async () =>
+      new ChainHistoryHttpService({
+        chainHistoryProvider: selectProviderImplementation<ChainHistoryProvider>(
+          args.chainHistoryProvider ?? ProviderImplementation.DBSYNC,
+          { blockfrost: getBlockfrostChainHistoryProvider, dbsync: getDbSyncChainHistoryProvider },
+          logger,
+          ServiceNames.ChainHistory
+        ),
+        logger
+      }),
+    [ServiceNames.Handle]: async () => new HandleHttpService({ handleProvider: await getHandleProvider(), logger }),
+    [ServiceNames.Rewards]: async () =>
+      new RewardsHttpService({
+        logger,
+        rewardsProvider: selectProviderImplementation<RewardsProvider>(
+          args.rewardsProvider ?? ProviderImplementation.DBSYNC,
+          { blockfrost: getBlockfrostRewardsProvider, dbsync: getDbSyncRewardsProvider },
+          logger,
+          ServiceNames.Rewards
+        )
+      }),
+    [ServiceNames.NetworkInfo]: async () => {
+      const networkInfoProvider =
+        args.networkInfoProvider === ProviderImplementation.BLOCKFROST
+          ? getBlockfrostNetworkInfoProvider()
+          : args.useWebSocketApi
+          ? getWebSocketClient().networkInfoProvider
+          : getDbSyncNetworkInfoProvider();
+      return new NetworkInfoHttpService({
+        logger,
+        networkInfoProvider
+      });
+    },
     [ServiceNames.TxSubmit]: async () => {
       const txSubmitProvider = args.useSubmitApi
+        ? getSubmitApiProvider()
+        : args.txSubmitProvider === ProviderImplementation.BLOCKFROST
+        ? getBlockfrostTxSubmitProvider()
+        : args.txSubmitProvider === ProviderImplementation.SUBMIT_API
         ? getSubmitApiProvider()
         : new NodeTxSubmitProvider({
             cardanoNode: getOgmiosObservableCardanoNode(dnsResolver, logger, args),
