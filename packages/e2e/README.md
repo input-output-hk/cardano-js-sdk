@@ -99,6 +99,33 @@ Address:    addr_test1qr0c3frkem9cqn5f73dnvqpena27k2fgqew6wct9eaka03agfwkvzr0zyq
 
 You can configure any of these five wallets in your test and use any amount of tADA you need.
 
+## Blockfrost
+
+Before running Blockfrost end-to-end tests, you need to:
+
+- Set a valid Blockfrost API key.
+- Configure the AssetProvider and ChainHistoryProvider instances to use blockfrost.
+- The StakePoolProvider comparison test doesn't require any configuration since it bootstraps during the test.
+
+Here’s how the entries in your .env file should look:
+
+```
+# Blockfrost secrets
+BLOCKFROST_API_KEY='get your API KEY from https://blockfrost.io/'
+
+# Providers setup
+ASSET_PROVIDER=blockfrost
+CHAIN_HISTORY_PROVIDER=blockfrost
+```
+
+> :information_source: If you are using blockfrost providers, remember to get your Blockfrost API key at [blockfrost.io](https://blockfrost.io/) and set it in the configuration file.
+
+Then to run the Blockforst test run:
+
+```bash
+$ yarn workspace @cardano-sdk/e2e test:blockfrost
+```
+
 ## Local Test Network - Hot reload
 
 The **local-network** runs with hot reload: once running, just saving a source file makes all the containers depending on that file

@@ -1,3 +1,4 @@
+export * from './BlockfrostProvider';
 export * from './DbSyncProvider';
 export * from './genesis';
 export * from './http';

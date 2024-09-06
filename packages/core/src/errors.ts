@@ -28,6 +28,10 @@ export const providerFailureToStatusCodeMap: { [key in ProviderFailure]: number 
   [ProviderFailure.ServerUnavailable]: 500
 };
 
+export const statusCodeMapToProviderFailure = new Map(
+  Object.entries(providerFailureToStatusCodeMap).map(([key, value]) => [value, key as ProviderFailure])
+);
+
 const isProviderFailure = (reason: string): reason is ProviderFailure =>
   Object.values(ProviderFailure).includes(reason as ProviderFailure);
 

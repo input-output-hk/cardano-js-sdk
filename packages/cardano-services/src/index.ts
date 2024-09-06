@@ -9,6 +9,7 @@ export * from './Rewards';
 export * from './StakePool';
 export * from './TxSubmit';
 export * from './Projection';
+export * from './NetworkInfo';
 export * from './Utxo';
 export * from './WsServer';
 export * from './types';
