@@ -445,6 +445,8 @@ in
             chain-history-provider = {
               enabled = true;
               replicas = 2;
+              resources.limits = mkPodResources "500Mi" "2000m";
+              resources.requests = mkPodResources "150Mi" "1000m";
             };
             # asset-provider = {
             #   enabled = true;
@@ -500,6 +502,8 @@ in
             chain-history-provider = {
               enabled = true;
               replicas = 2;
+              resources.limits = mkPodResources "500Mi" "2000m";
+              resources.requests = mkPodResources "150Mi" "1000m";
             };
             #asset-provider = {
             #  enabled = true;
