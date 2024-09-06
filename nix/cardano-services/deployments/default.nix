@@ -303,7 +303,6 @@ in
             backend = {
               enabled = true;
               replicas = 2;
-              env.NODE_ENV = "production";
             };
             stake-pool-provider = {
               enabled = true;
@@ -547,22 +546,18 @@ in
             backend = {
               enabled = true;
               replicas = 2;
-              env.NODE_ENV = "production";
             };
             stake-pool-provider = {
               enabled = true;
               env.OVERRIDE_FUZZY_OPTIONS = "true";
-              env.NODE_ENV = "production";
             };
             handle-provider.enabled = true;
             chain-history-provider = {
               enabled = true;
               replicas = 2;
-              env.NODE_ENV = "production";
             };
             asset-provider = {
               enabled = true;
-              env.NODE_ENV = "production";
             };
           };
 
