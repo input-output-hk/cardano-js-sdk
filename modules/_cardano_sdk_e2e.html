@@ -16,7 +16,7 @@
 <li><a href="_cardano_sdk_e2e.html">@cardano-sdk/e2e</a></li></ul>
 <h1>Module @cardano-sdk/e2e</h1></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/be0d98d/packages/e2e/src/index.ts#L1">packages/e2e/src/index.ts:1</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/6209d90/packages/e2e/src/index.ts#L1">packages/e2e/src/index.ts:1</a></li></ul></aside>
 <section class="tsd-panel-group">
 <section class="tsd-panel tsd-typography">
 <a href="#end-to-end-tests-for-cardano-js-sdk" id="end-to-end-tests-for-cardano-js-sdk" style="color: inherit; text-decoration: none;">
@@ -71,6 +71,25 @@ If you need to create a new wallet via a new set of mnemonics, you can run:</p>
 <pre><code><span class="hl-8">Mnemonic</span><span class="hl-1">:   </span><span class="hl-5">salon</span><span class="hl-1"> </span><span class="hl-5">zoo</span><span class="hl-1"> </span><span class="hl-5">engage</span><span class="hl-1"> </span><span class="hl-5">submit</span><span class="hl-1"> </span><span class="hl-5">smile</span><span class="hl-1"> </span><span class="hl-5">frost</span><span class="hl-1"> </span><span class="hl-5">later</span><span class="hl-1"> </span><span class="hl-5">decide</span><span class="hl-1"> </span><span class="hl-5">wing</span><span class="hl-1"> </span><span class="hl-5">sight</span><span class="hl-1"> </span><span class="hl-5">chaos</span><span class="hl-1"> </span><span class="hl-5">renew</span><span class="hl-1"> </span><span class="hl-5">lizard</span><span class="hl-1"> </span><span class="hl-5">rely</span><span class="hl-1"> </span><span class="hl-5">canal</span><span class="hl-1"> </span><span class="hl-5">coral</span><span class="hl-1"> </span><span class="hl-5">scene</span><span class="hl-1"> </span><span class="hl-5">hobby</span><span class="hl-1"> </span><span class="hl-5">scare</span><span class="hl-1"> </span><span class="hl-5">step</span><span class="hl-1"> </span><span class="hl-5">bus</span><span class="hl-1"> </span><span class="hl-5">leaf</span><span class="hl-1"> </span><span class="hl-5">tobacco</span><span class="hl-1"> </span><span class="hl-5">slice</span><br/><br/><span class="hl-8">Address</span><span class="hl-1">:    </span><span class="hl-5">addr_test1qr0c3frkem9cqn5f73dnvqpena27k2fgqew6wct9eaka03agfwkvzr0zyq7nqvcj24zehrshx63zzdxv24x3a4tcnfeq9zwmn7</span>
 </code></pre>
 <p>You can configure any of these five wallets in your test and use any amount of tADA you need.</p>
+
+<a href="#blockfrost" id="blockfrost" style="color: inherit; text-decoration: none;">
+  <h2>Blockfrost</h2>
+</a>
+<p>Before running Blockfrost end-to-end tests, you need to:</p>
+<ul>
+<li>Set a valid Blockfrost API key.</li>
+<li>Configure the AssetProvider and ChainHistoryProvider instances to use blockfrost.</li>
+<li>The StakePoolProvider comparison test doesn&#39;t require any configuration since it bootstraps during the test.</li>
+</ul>
+<p>Here’s how the entries in your .env file should look:</p>
+<pre><code><span class="hl-1"># </span><span class="hl-5">Blockfrost</span><span class="hl-1"> </span><span class="hl-5">secrets</span><br/><span class="hl-7">BLOCKFROST_API_KEY</span><span class="hl-1">=</span><span class="hl-3">&#39;get your API KEY from https://blockfrost.io/&#39;</span><br/><br/><span class="hl-1"># </span><span class="hl-5">Providers</span><span class="hl-1"> </span><span class="hl-5">setup</span><br/><span class="hl-7">ASSET_PROVIDER</span><span class="hl-1">=</span><span class="hl-5">blockfrost</span><br/><span class="hl-7">CHAIN_HISTORY_PROVIDER</span><span class="hl-1">=</span><span class="hl-5">blockfrost</span>
+</code></pre>
+<blockquote>
+<p>:information_source: If you are using blockfrost providers, remember to get your Blockfrost API key at <a href="https://blockfrost.io/">blockfrost.io</a> and set it in the configuration file.</p>
+</blockquote>
+<p>Then to run the Blockforst test run:</p>
+<pre><code class="language-bash"><span class="hl-1">$ </span><span class="hl-3">yarn</span><span class="hl-1"> </span><span class="hl-3">workspace</span><span class="hl-1"> </span><span class="hl-3">@cardano-sdk/e2e</span><span class="hl-1"> </span><span class="hl-3">test:blockfrost</span>
+</code></pre>
 
 <a href="#local-test-network---hot-reload" id="local-test-network---hot-reload" style="color: inherit; text-decoration: none;">
   <h2>Local Test Network - Hot reload</h2>
