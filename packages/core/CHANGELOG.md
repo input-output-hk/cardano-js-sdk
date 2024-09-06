@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.39.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.39.1...@cardano-sdk/core@0.39.2) (2024-09-06)
+
+### Features
+
+* **cardano-services:** implement missing Blockfrost providers features and tests ([8df1252](https://github.com/input-output-hk/cardano-js-sdk/commit/8df1252c7d2f11b844b0ec7d5de98852849340d6))
+
 ## [0.39.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.39.0...@cardano-sdk/core@0.39.1) (2024-09-04)
 
 ### Features

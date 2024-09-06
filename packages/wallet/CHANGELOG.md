@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.44.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.43.0...@cardano-sdk/wallet@0.44.0) (2024-09-06)
+
+### ⚠ BREAKING CHANGES
+
+* change return type of createWalletApi callbacks
+
+### Bug Fixes
+
+* expect disconnects during remote api method call ([1171fed](https://github.com/input-output-hk/cardano-js-sdk/commit/1171fed6527c48aa712d36d2313a1b813861d218))
+
 ## [0.43.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.42.5...@cardano-sdk/wallet@0.43.0) (2024-09-04)
 
 ### ⚠ BREAKING CHANGES

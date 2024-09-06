@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.41.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.40.0...@cardano-sdk/e2e@0.41.0) (2024-09-06)
+
+### ⚠ BREAKING CHANGES
+
+* change return type of createWalletApi callbacks
+
+### Features
+
+* **cardano-services:** implement missing Blockfrost providers features and tests ([8df1252](https://github.com/input-output-hk/cardano-js-sdk/commit/8df1252c7d2f11b844b0ec7d5de98852849340d6))
+* **cardano-services:** improve health check response times by aggregating and caching ([2bc68ea](https://github.com/input-output-hk/cardano-js-sdk/commit/2bc68ea681af5b23f7b7135ec6e2834f7cdfacbc))
+
+### Bug Fixes
+
+* expect disconnects during remote api method call ([1171fed](https://github.com/input-output-hk/cardano-js-sdk/commit/1171fed6527c48aa712d36d2313a1b813861d218))
+
 ## [0.40.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.39.5...@cardano-sdk/e2e@0.40.0) (2024-09-04)
 
 ### ⚠ BREAKING CHANGES
