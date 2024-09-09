@@ -1,3 +1,5 @@
+// cSpell:ignore descr
+
 import * as Queries from './queries';
 import {
   AuthorizeCommitteeHotCertModel,
@@ -261,7 +263,10 @@ export class ChainHistoryBuilder {
     if (result.rows.length === 0) return [];
 
     const txOutIds = result.rows.flatMap((txOut) => BigInt(txOut.id));
-    const multiAssets = await this.queryMultiAssetsByTxOut(txOutIds);
+    // In case of collateralReturn requests (collateral = true) assets in the output can't be read as for regular outputs:
+    // db-sync stores assets from collateral outputs in collateral_tx_out.multi_assets_descr column rather than in
+    // ma_tx_out table like for regular outputs. To have a complete collateralReturn, given column should be read and parsed.
+    const multiAssets = collateral ? new Map() : await this.queryMultiAssetsByTxOut(txOutIds);
     const referenceScripts = await this.queryReferenceScriptsByTxOut(result.rows);
 
     return result.rows.map((txOut) =>
