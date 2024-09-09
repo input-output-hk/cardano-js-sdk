@@ -12,12 +12,12 @@ import {
   TrackedStakePoolProvider,
   TxInFlight,
   addressCredentialStatuses,
+  addressDRepDelegatees,
   addressRewards,
   createDelegateeTracker,
   createQueryStakePoolsProvider,
   createRewardsProvider,
-  fetchRewardsTrigger$,
-  getStakePoolIdAtEpoch
+  fetchRewardsTrigger$, getStakePoolIdAtEpoch
 } from '../../../src';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
@@ -588,6 +588,764 @@ describe('RewardAccounts', () => {
         expect(trackedStakePoolProvider.setStatInitialized).toBeCalledWith(
           trackedStakePoolProvider.stats.queryStakePools$
         );
+      });
+    });
+  });
+
+  describe('addressDRepDelegatees', () => {
+    it('emits a dRep delegatee for every reward account', () => {
+      createTestScheduler().run(({ cold, expectObservable }) => {
+        const rewardAccount1 = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
+        const rewardAccount2 = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
+        const stakeKeyHash1 = Cardano.RewardAccount.toHash(rewardAccount1);
+        const stakeKeyHash2 = Cardano.RewardAccount.toHash(rewardAccount2);
+        const transactions$ = cold('a-b-c', {
+          a: [],
+          b: [
+            {
+              epoch: Cardano.EpochNo(100),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.VoteDelegation,
+                      dRep: {
+                        __typename: 'AlwaysAbstain'
+                      },
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch
+          ],
+          c: [
+            {
+              epoch: Cardano.EpochNo(100),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.VoteDelegation,
+                      dRep: {
+                        __typename: 'AlwaysAbstain'
+                      },
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch,
+            {
+              epoch: Cardano.EpochNo(100),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.VoteDelegation,
+                      dRep: {
+                        __typename: 'AlwaysAbstain'
+                      },
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash2),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch
+          ]
+        });
+        const tracker$ = addressDRepDelegatees([rewardAccount1, rewardAccount2], transactions$);
+        expectObservable(tracker$).toBe('a-b-c', {
+          a: [undefined, undefined],
+          b: [{ delegateRepresentative: {
+            __typename: 'AlwaysAbstain'
+          } },
+            undefined],
+          c: [{ delegateRepresentative: {
+            __typename: 'AlwaysAbstain'
+          } }, { delegateRepresentative: {
+            __typename: 'AlwaysAbstain'
+          } }]
+        });
+      });
+    });
+
+    it('emits the most recent dRep delegatee', () => {
+      createTestScheduler().run(({ cold, expectObservable }) => {
+        const rewardAccount1 = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
+        const rewardAccount2 = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
+        const stakeKeyHash1 = Cardano.RewardAccount.toHash(rewardAccount1);
+        const stakeKeyHash2 = Cardano.RewardAccount.toHash(rewardAccount2);
+
+        const transactions$ = cold('a-b-c', {
+          a: [],
+          b: [
+            {
+              epoch: Cardano.EpochNo(100),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.VoteDelegation,
+                      dRep: {
+                        __typename: 'AlwaysNoConfidence'
+                      },
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch
+          ],
+          c: [
+            {
+              epoch: Cardano.EpochNo(100),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.VoteDelegation,
+                      dRep: {
+                        __typename: 'AlwaysNoConfidence'
+                      },
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch,
+            {
+              epoch: Cardano.EpochNo(101),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.StakeVoteDelegation,
+                      dRep: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash2),
+                        type: Cardano.CredentialType.KeyHash
+                      },
+                      poolId: poolId1,
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch
+          ]
+        });
+        const tracker$ = addressDRepDelegatees([rewardAccount1], transactions$);
+        expectObservable(tracker$).toBe('a-b-c', {
+          a: [undefined],
+          b: [{ delegateRepresentative: {
+            __typename: 'AlwaysNoConfidence'
+          } }],
+          c: [{ delegateRepresentative: {
+            hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash2),
+            type: Cardano.CredentialType.KeyHash
+          } }]
+        });
+      });
+    });
+
+    it('unsets dRep if a StakeDeregistration happens', () => {
+      createTestScheduler().run(({ cold, expectObservable }) => {
+        const rewardAccount1 = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
+        const stakeKeyHash1 = Cardano.RewardAccount.toHash(rewardAccount1);
+
+        const transactions$ = cold('a-b-c-d-e', {
+          a: [],
+          b: [
+            {
+              epoch: Cardano.EpochNo(100),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.VoteDelegation,
+                      dRep: {
+                        __typename: 'AlwaysNoConfidence'
+                      },
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch
+          ],
+          c: [
+            {
+              epoch: Cardano.EpochNo(100),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.VoteDelegation,
+                      dRep: {
+                        __typename: 'AlwaysNoConfidence'
+                      },
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch,
+            {
+              epoch: Cardano.EpochNo(101),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.StakeDeregistration,
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch
+          ],
+          d: [
+            {
+              epoch: Cardano.EpochNo(100),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.VoteDelegation,
+                      dRep: {
+                        __typename: 'AlwaysNoConfidence'
+                      },
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch,
+            {
+              epoch: Cardano.EpochNo(101),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.StakeDeregistration,
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch,
+            {
+              epoch: Cardano.EpochNo(102),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.StakeRegistration,
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch
+          ],
+          e: [
+            {
+              epoch: Cardano.EpochNo(100),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.VoteDelegation,
+                      dRep: {
+                        __typename: 'AlwaysNoConfidence'
+                      },
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch,
+            {
+              epoch: Cardano.EpochNo(101),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.StakeDeregistration,
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch,
+            {
+              epoch: Cardano.EpochNo(102),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.StakeRegistration,
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch,
+            {
+              epoch: Cardano.EpochNo(103),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.VoteDelegation,
+                      dRep: {
+                        __typename: 'AlwaysNoConfidence'
+                      }, stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch
+          ]
+        });
+        const tracker$ = addressDRepDelegatees([rewardAccount1], transactions$);
+        expectObservable(tracker$).toBe('a-b-c---d', {
+          a: [undefined],
+          b: [{ delegateRepresentative: {
+              __typename: 'AlwaysNoConfidence'
+            } }],
+          c: [undefined], // Un-register sets dRep to undefined, re-register still doesnt defined dRep but observable doesnt re-emit undefined
+          d: [{ delegateRepresentative: { // delegate
+              __typename: 'AlwaysNoConfidence'
+            } }]
+        });
+      });
+    });
+
+    it('unsets dRep if a Unregistration happens', () => {
+      createTestScheduler().run(({ cold, expectObservable }) => {
+        const rewardAccount1 = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
+        const stakeKeyHash1 = Cardano.RewardAccount.toHash(rewardAccount1);
+
+        const transactions$ = cold('a-b-c-d', {
+          a: [],
+          b: [
+            {
+              epoch: Cardano.EpochNo(100),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.VoteDelegation,
+                      dRep: {
+                        __typename: 'AlwaysNoConfidence'
+                      },
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch
+          ],
+          c: [
+            {
+              epoch: Cardano.EpochNo(100),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.VoteDelegation,
+                      dRep: {
+                        __typename: 'AlwaysNoConfidence'
+                      },
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch,
+            {
+              epoch: Cardano.EpochNo(101),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.Unregistration,
+                      deposit: 0n,
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch
+          ],
+          d: [
+            {
+              epoch: Cardano.EpochNo(100),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.VoteDelegation,
+                      dRep: {
+                        __typename: 'AlwaysNoConfidence'
+                      },
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch,
+            {
+              epoch: Cardano.EpochNo(101),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.Unregistration,
+                      deposit: 0n,
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch,
+            {
+              epoch: Cardano.EpochNo(102),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.VoteRegistrationDelegation,
+                      dRep: {
+                        __typename: 'AlwaysNoConfidence'
+                      },
+                      deposit: 0n,
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch
+          ]
+        });
+        const tracker$ = addressDRepDelegatees([rewardAccount1], transactions$);
+        expectObservable(tracker$).toBe('a-b-c-d', {
+          a: [undefined],
+          b: [{ delegateRepresentative: {
+              __typename: 'AlwaysNoConfidence'
+            } }],
+          c: [undefined], // Un-register sets dRep to undefined
+          d: [{ delegateRepresentative: { // re-register + vote delegate
+              __typename: 'AlwaysNoConfidence'
+            } }]
+        });
+      });
+    });
+
+    it('detects all vote delegation certificates', () => {
+      createTestScheduler().run(({ cold, expectObservable }) => {
+        const rewardAccount1 = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
+        const rewardAccount2 = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
+        const stakeKeyHash1 = Cardano.RewardAccount.toHash(rewardAccount1);
+        const stakeKeyHash2 = Cardano.RewardAccount.toHash(rewardAccount2);
+
+        const transactions$ = cold('a-b-c-d-e', {
+          a: [],
+          b: [
+            {
+              epoch: Cardano.EpochNo(100),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.VoteDelegation,
+                      dRep: {
+                        __typename: 'AlwaysAbstain'
+                      },
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch
+          ],
+          c: [
+            {
+              epoch: Cardano.EpochNo(100),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.VoteDelegation,
+                      dRep: {
+                        __typename: 'AlwaysNoConfidence'
+                      },
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch,
+            {
+              epoch: Cardano.EpochNo(101),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.StakeVoteDelegation,
+                      dRep: {
+                        __typename: 'AlwaysNoConfidence'
+                      },
+                      poolId: poolId1,
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch
+          ],
+          d: [
+          {
+            epoch: Cardano.EpochNo(100),
+            tx: {
+              body: {
+                certificates: [
+                  {
+                    __typename: Cardano.CertificateType.VoteDelegation,
+                    dRep: {
+                      __typename: 'AlwaysAbstain'
+                    },
+                    stakeCredential: {
+                      hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                      type: Cardano.CredentialType.KeyHash
+                    }
+                  }
+                ]
+              }
+            }
+          } as TxWithEpoch,
+          {
+            epoch: Cardano.EpochNo(101),
+            tx: {
+              body: {
+                certificates: [
+                  {
+                    __typename: Cardano.CertificateType.StakeVoteDelegation,
+                    dRep: {
+                      __typename: 'AlwaysNoConfidence'
+                    },
+                    poolId: poolId1,
+                    stakeCredential: {
+                      hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                      type: Cardano.CredentialType.KeyHash
+                    }
+                  }
+                ]
+              }
+            }
+          } as TxWithEpoch,
+            {
+              epoch: Cardano.EpochNo(102),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
+                      dRep: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash2),
+                        type: Cardano.CredentialType.KeyHash
+                      },
+                      deposit: 2_000_000n,
+                      poolId: poolId1,
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch
+        ],
+          e: [
+            {
+              epoch: Cardano.EpochNo(100),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.VoteDelegation,
+                      dRep: {
+                        __typename: 'AlwaysAbstain'
+                      },
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch,
+            {
+              epoch: Cardano.EpochNo(101),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.StakeVoteDelegation,
+                      dRep: {
+                        __typename: 'AlwaysNoConfidence'
+                      },
+                      poolId: poolId1,
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch,
+            {
+              epoch: Cardano.EpochNo(102),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
+                      dRep: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash2),
+                        type: Cardano.CredentialType.KeyHash
+                      },
+                      deposit: 2_000_000n,
+                      poolId: poolId1,
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch,
+            {
+              epoch: Cardano.EpochNo(103),
+              tx: {
+                body: {
+                  certificates: [
+                    {
+                      __typename: Cardano.CertificateType.VoteRegistrationDelegation,
+                      dRep: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.ScriptHash
+                      },
+                      deposit: 2_000_000n,
+                      stakeCredential: {
+                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        type: Cardano.CredentialType.KeyHash
+                      }
+                    }
+                  ]
+                }
+              }
+            } as TxWithEpoch
+          ]
+        });
+        const tracker$ = addressDRepDelegatees([rewardAccount1], transactions$);
+        expectObservable(tracker$).toBe('a-b-c-d-e', {
+          a: [undefined],
+          b: [{ delegateRepresentative: {
+            __typename: 'AlwaysAbstain'
+          } }],
+          c: [{ delegateRepresentative: {
+            __typename: 'AlwaysNoConfidence'
+          } }],
+          d: [{ delegateRepresentative: {
+            hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash2),
+            type: Cardano.CredentialType.KeyHash
+          } }],
+          e: [{ delegateRepresentative: {
+            hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+            type: Cardano.CredentialType.ScriptHash
+          } }]
+        });
       });
     });
   });

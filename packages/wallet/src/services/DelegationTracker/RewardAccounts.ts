@@ -196,8 +196,38 @@ const accountCertificateTransactions = (
   );
 };
 
+const accountDRepCertificateTransactions = (
+  transactions$: Observable<TxWithEpoch[]>,
+  rewardAccount: Cardano.RewardAccount
+) => {
+  const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
+  return transactions$.pipe(
+    map((transactions) =>
+      transactions
+        .map(({ tx, epoch }) => ({
+          certificates: (tx.body.certificates || [])
+            .map((cert) =>
+              Cardano.isCertType(cert, [
+                ...Cardano.VoteDelegationCredentialCertificateTypes,
+                Cardano.CertificateType.StakeDeregistration,
+                Cardano.CertificateType.Unregistration
+              ])
+                ? cert
+                : null
+            )
+            .filter(isNotNil)
+            .filter((cert) => (cert.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex) === stakeKeyHash),
+          epoch
+        }))
+        .filter(({ certificates }) => certificates.length > 0)
+    ),
+    distinctUntilChanged((a, b) => isEqual(a, b))
+  );
+};
+
 type ObservableType<O> = O extends Observable<infer T> ? T : unknown;
 type TransactionsCertificates = ObservableType<ReturnType<typeof accountCertificateTransactions>>;
+type TransactionsDRepCertificates = ObservableType<ReturnType<typeof accountDRepCertificateTransactions>>;
 
 /**
  * Check if the stake key was registered and is delegated, and return the pool ID.
@@ -249,6 +279,32 @@ export const createDelegateeTracker = (
     distinctUntilChanged((a, b) => isEqual(a, b))
   );
 
+export const createDRepDelegateeTracker = (
+  certificates$: Observable<TransactionsDRepCertificates>
+): Observable<Cardano.DRepDelegatee | undefined> =>
+  certificates$.pipe(
+    switchMap((certs) => {
+      const sortedCerts = [...certs].sort((a, b) => a.epoch - b.epoch);
+      const mostRecent = sortedCerts.pop()?.certificates.pop();
+      let dRep;
+
+      // Certificates at this point are pre filtered, they are either vote delegation kind or stake key de-registration kind.
+      // If the most recent is not a de-registration, emit found dRep.
+      if (
+        mostRecent &&
+        !Cardano.isCertType(mostRecent, [
+          Cardano.CertificateType.StakeDeregistration,
+          Cardano.CertificateType.Unregistration
+        ])
+      ) {
+        dRep = { delegateRepresentative: mostRecent.dRep };
+      }
+
+      return of(dRep);
+    }),
+    distinctUntilChanged((a, b) => isEqual(a, b))
+  );
+
 export const addressCredentialStatuses = (
   addresses: Cardano.RewardAccount[],
   transactions$: Observable<TxWithEpoch[]>,
@@ -269,6 +325,11 @@ export const addressDelegatees = (
     addresses.map((address) =>
       createDelegateeTracker(stakePoolProvider, epoch$, accountCertificateTransactions(transactions$, address))
     )
+  );
+
+export const addressDRepDelegatees = (addresses: Cardano.RewardAccount[], transactions$: Observable<TxWithEpoch[]>) =>
+  combineLatest(
+    addresses.map((address) => createDRepDelegateeTracker(accountDRepCertificateTransactions(transactions$, address)))
   );
 
 export const addressRewards = (
@@ -316,15 +377,17 @@ export const addressRewards = (
 
 export const toRewardAccounts =
   (addresses: Cardano.RewardAccount[]) =>
-  ([statuses, delegatees, rewards]: [
+  ([statuses, delegatees, dReps, rewards]: [
     { credentialStatus: Cardano.StakeCredentialStatus; deposit?: Cardano.Lovelace }[],
     (Cardano.Delegatee | undefined)[],
+    (Cardano.DRepDelegatee | undefined)[],
     Cardano.Lovelace[]
   ]) =>
     addresses.map(
       (address, i): Cardano.RewardAccountInfo => ({
         address,
         credentialStatus: statuses[i].credentialStatus,
+        dRepDelegatee: dReps[i],
         delegatee: delegatees[i],
         deposit: statuses[i].deposit,
         rewardBalance: rewards[i]
@@ -353,6 +416,7 @@ export const createRewardAccountsTracker = ({
       combineLatest([
         addressCredentialStatuses(rewardAccounts, transactions$, transactionsInFlight$),
         addressDelegatees(rewardAccounts, transactions$, stakePoolProvider, epoch$),
+        addressDRepDelegatees(rewardAccounts, transactions$),
         addressRewards(rewardAccounts, transactionsInFlight$, rewardsProvider, balancesStore)
       ]).pipe(map(toRewardAccounts(rewardAccounts)))
     )

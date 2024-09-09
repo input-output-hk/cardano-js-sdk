@@ -1,3 +1,4 @@
+import { DelegateRepresentative } from './Governance';
 import { Lovelace } from './Value';
 import { Metadatum } from './AuxiliaryData';
 import { PoolId, PoolIdHex, StakePool } from './StakePool';
@@ -23,10 +24,13 @@ export enum StakeCredentialStatus {
   Unregistered = 'UNREGISTERED'
 }
 
+export type DRepDelegatee = { delegateRepresentative: DelegateRepresentative };
+
 export interface RewardAccountInfo {
   address: RewardAccount;
   credentialStatus: StakeCredentialStatus;
   delegatee?: Delegatee;
+  dRepDelegatee?: DRepDelegatee;
   rewardBalance: Lovelace;
   // Maybe add rewardsHistory for each reward account too
   deposit?: Lovelace; // defined only when keyStatus is Registered
