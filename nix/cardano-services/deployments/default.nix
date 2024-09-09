@@ -967,32 +967,59 @@ in
       // (builtins.mapAttrs (_: value: (final:
         value
         // {
-          projectors = {
-            stake-pool.enabled = true;
-          };
 
-          providers = {
-            backend = {
-              enabled = true;
-            };
-          };
+          projectors.asset.enabled = true;
 
           values = {
-            stakepool.databaseName = "stakepoolv3";
             ingress.enabled = false;
-            pg-boss-worker.enabled = true;
           };
         })) {
-        #"live-preview@us-east-2@tmp" = {
-        #  name = "tmp-cardanojs";
-        #  namespace = "live-preview";
-        #  network = "preview";
-        #  region = "us-east-2";
-        #  context = "eks-admin";
-        #};
+        "live-preview@us-east-2@asset" = {
+          name = "tmp-cardanojs";
+          namespace = "live-preview";
+          network = "preview";
+          region = "us-east-2";
+          context = "eks-admin";
+        };
+        "live-preview@eu-central-1@asset" = {
+          name = "tmp-cardanojs";
+          namespace = "live-preview";
+          network = "preview";
+          region = "eu-central-1";
+          context = "eks-admin";
+        };
+        "live-preprod@us-east-2@asset" = {
+          name = "tmp-cardanojs";
+          namespace = "live-preprod";
+          network = "preprod";
+          region = "us-east-2";
+          context = "eks-admin";
+        };
+        "live-preprod@eu-central-1@asset" = {
+          name = "tmp-cardanojs";
+          namespace = "live-preprod";
+          network = "preprod";
+          region = "eu-central-1";
+          context = "eks-admin";
+        };
+        "live-mainnet@us-east-2@asset" = {
+          name = "tmp-cardanojs";
+          namespace = "live-mainnet";
+          network = "mainnet";
+          region = "us-east-2";
+          context = "eks-admin";
+        };
+        "live-mainnet@eu-central-1@asset" = {
+          name = "tmp-cardanojs";
+          namespace = "live-mainnet";
+          network = "mainnet";
+          region = "eu-central-1";
+          context = "eks-admin";
+        };
       });
 
     targetGroups = targets: {
+      ASSET = lib.filterAttrs (name: _: lib.hasSuffix "asset" name) targets;
       DEV = lib.filterAttrs (name: _: lib.hasPrefix "dev-" name) targets;
       LIVE = lib.filterAttrs (name: _: lib.hasPrefix "live-" name) targets;
       OPS = lib.filterAttrs (name: _: lib.hasPrefix "ops-" name) targets;
