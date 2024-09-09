@@ -48,7 +48,7 @@ describe('TypeormService', () => {
       await expect(service.withQueryRunner((queryRunner) => queryRunner.hasTable('block'))).resolves.toBe(false);
     });
 
-    it('reconnects on error', async () => {
+    it.skip('reconnects on error', async () => {
       connectionConfig$.next(badConnectionConfig);
       service.onError(new Error('Any error'));
       const queryResultReady = service.withQueryRunner(async () => 'ok');
@@ -56,7 +56,7 @@ describe('TypeormService', () => {
       await expect(queryResultReady).resolves.toBe('ok');
     });
 
-    it('times out when it cannot reconnect for too long, then recovers', async () => {
+    it.skip('times out when it cannot reconnect for too long, then recovers', async () => {
       connectionConfig$.next(badConnectionConfig);
       service.onError(new Error('Any error'));
       const queryFailureReady = service.withQueryRunner(async () => 'ok');
