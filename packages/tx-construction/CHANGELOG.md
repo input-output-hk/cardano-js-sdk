@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.21.2...@cardano-sdk/tx-construction@0.21.3) (2024-09-10)
+
+### Features
+
+* **tx-construction:** txBuilder skip withdrawals for reward accounts without dRep delegation if major PV is less than 10 ([aad7339](https://github.com/input-output-hk/cardano-js-sdk/commit/aad73398d43295f3a51b39e82a14512c5ac3be1e))
+
 ## [0.21.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.21.1...@cardano-sdk/tx-construction@0.21.2) (2024-09-06)
 
 **Note:** Version bump only for package @cardano-sdk/tx-construction

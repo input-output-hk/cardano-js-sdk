@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.39.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.39.2...@cardano-sdk/core@0.39.3) (2024-09-10)
+
+### Features
+
+* track DRep delegation in RewardAccountInfo ([c79b569](https://github.com/input-output-hk/cardano-js-sdk/commit/c79b5699b5ff905ade868fd6e31e226fbaabe93b))
+
 ## [0.39.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.39.1...@cardano-sdk/core@0.39.2) (2024-09-06)
 
 ### Features
