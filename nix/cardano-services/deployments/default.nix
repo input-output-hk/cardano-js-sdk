@@ -878,34 +878,6 @@ in
             ingress.enabled = false;
           };
         })) {
-        "live-preview@us-east-2@asset" = {
-          name = "tmp-cardanojs";
-          namespace = "live-preview";
-          network = "preview";
-          region = "us-east-2";
-          context = "eks-admin";
-        };
-        "live-preview@eu-central-1@asset" = {
-          name = "tmp-cardanojs";
-          namespace = "live-preview";
-          network = "preview";
-          region = "eu-central-1";
-          context = "eks-admin";
-        };
-        "live-preprod@us-east-2@asset" = {
-          name = "tmp-cardanojs";
-          namespace = "live-preprod";
-          network = "preprod";
-          region = "us-east-2";
-          context = "eks-admin";
-        };
-        "live-preprod@eu-central-1@asset" = {
-          name = "tmp-cardanojs";
-          namespace = "live-preprod";
-          network = "preprod";
-          region = "eu-central-1";
-          context = "eks-admin";
-        };
         "live-mainnet@us-east-2@asset" = {
           name = "tmp-cardanojs";
           namespace = "live-mainnet";
