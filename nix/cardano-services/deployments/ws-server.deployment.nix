@@ -65,10 +65,10 @@
                 runAsGroup = 0;
               };
               args = ["start-ws-server"];
-              env = utils.mkPodEnv ({
+              env = utils.mkPodEnv {
                 NETWORK = config.network;
                 DB_CACHE_TTL = "7200";
-                OGMIOS_URL =  "ws://${config.namespace}-cardano-core.${config.namespace}.svc.cluster.local:1337";
+                OGMIOS_URL = "ws://${config.namespace}-cardano-core.${config.namespace}.svc.cluster.local:1337";
 
                 POSTGRES_POOL_MAX_DB_SYNC = "2";
                 POSTGRES_HOST_DB_SYNC = values.postgresName;
@@ -88,7 +88,7 @@
                 };
                 POSTGRES_SSL_DB_SYNC = "true";
                 POSTGRES_SSL_CA_FILE_DB_SYNC = "/tls/ca.crt";
-                });
+              };
               volumeMounts = [
                 {
                   mountPath = "/tls";
