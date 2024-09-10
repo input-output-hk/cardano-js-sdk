@@ -35,6 +35,11 @@ function assertObjectRefsAreDifferent(obj1: unknown, obj2: unknown): void {
   expect(obj1).not.toBe(obj2);
 }
 
+const rewardAccount1 = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
+const rewardAccount2 = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
+const rewardAccount3 = Cardano.RewardAccount('stake_test1uqehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gssrtvn');
+const rewardAccount4 = Cardano.RewardAccount('stake_test17rphkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gtcljw6kf');
+
 const resolvedHandle = {
   cardanoAddress: Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg'),
   handle: 'alice',
@@ -54,6 +59,8 @@ describe.each([
   let txBuilderWithoutHandleProvider: GenericTxBuilder;
   let txBuilderWithHandleErrors: GenericTxBuilder;
   let txBuilderWithNullHandles: GenericTxBuilder;
+  let txBuilderWithDeRepsPv10: GenericTxBuilder;
+  let txBuilderWithDeReps: GenericTxBuilder;
   let txBuilderProviders: jest.Mocked<TxBuilderProviders>;
   let output: Cardano.TxOut;
   let output2: Cardano.TxOut;
@@ -128,6 +135,84 @@ describe.each([
       },
       ...builderParams
     });
+
+    txBuilderWithDeRepsPv10 = new GenericTxBuilder({
+      ...builderParams,
+      txBuilderProviders: {
+        ...txBuilderProviders,
+        protocolParameters: jest.fn().mockResolvedValue({
+          ...mocks.protocolParameters,
+          protocolVersion: { major: 10, minor: 0 }
+        }),
+        rewardAccounts: jest.fn().mockResolvedValue([
+          {
+            address: rewardAccount1,
+            keyStatus: Cardano.StakeCredentialStatus.Registered,
+            rewardBalance: 10n
+          },
+          {
+            address: rewardAccount2,
+            dRepDelegatee: {
+              __typename: 'AlwaysAbstain'
+            },
+            keyStatus: Cardano.StakeCredentialStatus.Registered,
+            rewardBalance: 20n
+          },
+          {
+            address: rewardAccount3,
+            dRepDelegatee: {
+              __typename: 'AlwaysAbstain'
+            },
+            keyStatus: Cardano.StakeCredentialStatus.Registered,
+            rewardBalance: 30n
+          },
+          {
+            address: rewardAccount4,
+            dRepDelegatee: {
+              __typename: 'AlwaysAbstain'
+            },
+            keyStatus: Cardano.StakeCredentialStatus.Registered,
+            rewardBalance: 0n
+          }
+        ])
+      }
+    });
+
+    txBuilderWithDeReps = new GenericTxBuilder({
+      ...builderParams,
+      txBuilderProviders: {
+        ...txBuilderProviders,
+        rewardAccounts: jest.fn().mockResolvedValue([
+          {
+            address: rewardAccount1,
+            keyStatus: Cardano.StakeCredentialStatus.Registered,
+            rewardBalance: 10n
+          },
+          {
+            address: rewardAccount2,
+            dRepDelegatee: {
+              __typename: 'AlwaysAbstain'
+            },
+            keyStatus: Cardano.StakeCredentialStatus.Registered,
+            rewardBalance: 20n
+          },
+          {
+            address: rewardAccount3,
+            keyStatus: Cardano.StakeCredentialStatus.Registered,
+            rewardBalance: 30n
+          },
+          {
+            address: rewardAccount4,
+            dRepDelegatee: {
+              __typename: 'AlwaysAbstain'
+            },
+            keyStatus: Cardano.StakeCredentialStatus.Registered,
+            rewardBalance: 0n
+          }
+        ])
+      }
+    });
+
     txBuilderWithoutHandleProvider = new GenericTxBuilder(builderParams);
     txBuilderWithNullHandles = new GenericTxBuilder({
       handleProvider: {
@@ -137,6 +222,7 @@ describe.each([
       },
       ...builderParams
     });
+
     txBuilderWithHandleErrors = new GenericTxBuilder({
       handleProvider: {
         getPolicyIds: async () => [],
@@ -716,6 +802,39 @@ describe.each([
       };
       txBuilder.setValidityInterval(validityInterval1).setValidityInterval(validityInterval2);
       expect(txBuilder.partialTxBody.validityInterval).toEqual(validityInterval2);
+    });
+  });
+
+  describe('Withdrawals', () => {
+    it('only add withdrawals for reward accounts with positive reward balance and dRep delegation if protocol version is equal or greater than 10', async () => {
+      const address = Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg');
+      const output1Coin = 10_000_000n;
+
+      const builtOutput = await txBuilderWithDeRepsPv10.buildOutput().address(address).coin(output1Coin).build();
+      const tx = txBuilderWithDeRepsPv10.addOutput(builtOutput).build();
+
+      const txProps = await tx.inspect();
+
+      expect(txProps.body.withdrawals).toEqual([
+        { quantity: 20n, stakeAddress: rewardAccount2 },
+        { quantity: 30n, stakeAddress: rewardAccount3 }
+      ]);
+    });
+
+    it('adds withdrawals for all registered reward accounts with positive reward balance if protocol version is less than 10', async () => {
+      const address = Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg');
+      const output1Coin = 10_000_000n;
+
+      const builtOutput = await txBuilderWithDeReps.buildOutput().address(address).coin(output1Coin).build();
+      const tx = txBuilderWithDeReps.addOutput(builtOutput).build();
+
+      const txProps = await tx.inspect();
+
+      expect(txProps.body.withdrawals).toEqual([
+        { quantity: 10n, stakeAddress: rewardAccount1 },
+        { quantity: 20n, stakeAddress: rewardAccount2 },
+        { quantity: 30n, stakeAddress: rewardAccount3 }
+      ]);
     });
   });
 });

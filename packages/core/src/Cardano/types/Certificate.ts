@@ -213,6 +213,13 @@ export const StakeCredentialCertificateTypes = [
   CertificateType.VoteDelegation
 ] as const;
 
+export const VoteDelegationCredentialCertificateTypes = [
+  CertificateType.VoteDelegation,
+  CertificateType.VoteRegistrationDelegation,
+  CertificateType.StakeVoteDelegation,
+  CertificateType.StakeVoteRegistrationDelegation
+] as const;
+
 type CertificateTypeMap = {
   [CertificateType.AuthorizeCommitteeHot]: AuthorizeCommitteeHotCertificate;
   [CertificateType.GenesisKeyDelegation]: GenesisKeyDelegationCertificate;

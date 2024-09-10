@@ -4,7 +4,7 @@ import { Bip32Account, SignTransactionContext, util } from '@cardano-sdk/key-man
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
 import { GreedyTxEvaluator } from './GreedyTxEvaluator';
-import { InitializeTxProps, InitializeTxResult } from '../types';
+import { InitializeTxProps, InitializeTxResult, RewardAccountWithPoolId } from '../types';
 import { RedeemersByType, defaultSelectionConstraints } from '../input-selection';
 import { TxBuilderDependencies } from './types';
 import { createPreInputSelectionTxBody, includeChangeAndInputs } from '../createTransactionInternals';
@@ -12,6 +12,38 @@ import { ensureValidityInterval } from '../ensureValidityInterval';
 
 const dRepPublicKeyHash = async (addressManager?: Bip32Account): Promise<Ed25519KeyHashHex | undefined> =>
   addressManager && (await (await addressManager.derivePublicKey(util.DREP_KEY_DERIVATION_PATH)).hash()).hex();
+
+const DREP_REG_REQUIRED_PROTOCOL_VERSION = 10;
+
+/**
+ * Filters and transforms reward accounts based on current protocol version and reward balance.
+ *
+ * Accounts are first filtered based on two conditions:
+ * 1. If the current protocol version is greater than or equal to the version for required DREP registration,
+ *    the account must have a 'dRepDelegatee'.
+ * 2. The account must have a non-zero 'rewardBalance'.
+ *
+ * @param accounts - Array of accounts to be processed.
+ * @param version - Current protocol version.
+ * @returns Array of objects containing the 'quantity' and 'stakeAddress' of filtered accounts.
+ */
+const getWithdrawals = (
+  accounts: RewardAccountWithPoolId[],
+  version: Cardano.ProtocolVersion
+): {
+  quantity: Cardano.Lovelace;
+  stakeAddress: Cardano.RewardAccount;
+}[] =>
+  accounts
+    .filter(
+      (account) =>
+        (version.major >= DREP_REG_REQUIRED_PROTOCOL_VERSION ? !!account.dRepDelegatee : true) &&
+        !!account.rewardBalance
+    )
+    .map(({ rewardBalance: quantity, address: stakeAddress }) => ({
+      quantity,
+      stakeAddress
+    }));
 
 export const initializeTx = async (
   props: InitializeTxProps,
@@ -53,12 +85,7 @@ export const initializeTx = async (
     requiredExtraSignatures: props.requiredExtraSignatures,
     scriptIntegrityHash: props.scriptIntegrityHash,
     validityInterval: ensureValidityInterval(tip.slot, genesisParameters, props.options?.validityInterval),
-    withdrawals: rewardAccounts
-      .map(({ rewardBalance: quantity, address: stakeAddress }) => ({
-        quantity,
-        stakeAddress
-      }))
-      .filter(({ quantity }) => !!quantity)
+    withdrawals: getWithdrawals(rewardAccounts, protocolParameters.protocolVersion)
   });
 
   const bodyPreInputSelection = props.customizeCb ? props.customizeCb({ txBody }) : txBody;
