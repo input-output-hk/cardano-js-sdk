@@ -231,7 +231,10 @@ describe('WalletManager', () => {
 
     it('sets active wallet to wallet created by factory', async () => {
       const activeWallet = await firstValueFrom(walletManager.activeWallet$);
-      expect(activeWallet).toEqual(mockWallet);
+      expect(activeWallet).toEqual({
+        observableWallet: mockWallet,
+        props: expect.objectContaining({ walletId: expect.stringContaining('') })
+      });
     });
 
     it('does not activate same wallet twice', async () => {

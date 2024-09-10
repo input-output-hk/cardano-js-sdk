@@ -20,7 +20,7 @@ import { InvalidArgumentError, isNotNil } from '@cardano-sdk/util';
 import { Metadata, env, logger } from '../util';
 import { storage as WebExtensionStorage, runtime } from 'webextension-polyfill';
 import { Witnesser } from '@cardano-sdk/key-management';
-import { filter, from, merge, of } from 'rxjs';
+import { filter, from, map, merge, of } from 'rxjs';
 import { getWallet } from '../../../../src';
 import { storage } from '@cardano-sdk/wallet';
 import { toEmpty } from '@cardano-sdk/util-rxjs';
@@ -129,7 +129,7 @@ exposeApi(
 
 exposeApi(
   {
-    api$: walletManager.activeWallet$.asObservable(),
+    api$: walletManager.activeWallet$.pipe(map((activeWallet) => activeWallet?.observableWallet || null)),
     baseChannel: walletChannel(walletName),
     properties: observableWalletProperties
   },

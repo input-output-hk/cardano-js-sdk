@@ -47,6 +47,11 @@ export interface WalletManagerDependencies<
   signingCoordinatorApi: SigningCoordinatorSignApi<WalletMetadata, AccountMetadata>;
 }
 
+export interface ActiveWallet {
+  observableWallet: ObservableWallet;
+  props: WalletManagerActivateProps;
+}
+
 /**
  * Helper class for background scripts using wallet manager.
  * Uses wallet and store factories to create wallets.
@@ -56,7 +61,7 @@ export class WalletManager<WalletMetadata extends { name: string }, AccountMetad
   implements WalletManagerApi
 {
   activeWalletId$ = new ReplaySubject<WalletManagerActivateProps | null>(1);
-  activeWallet$ = new BehaviorSubject<ObservableWallet | null>(null);
+  activeWallet$ = new BehaviorSubject<ActiveWallet | null>(null);
 
   #activeWalletProps: WalletManagerActivateProps | null = null;
   #walletStores = new Map<string, storage.WalletStores>();
@@ -153,7 +158,7 @@ export class WalletManager<WalletMetadata extends { name: string }, AccountMetad
       })
     ]);
 
-    this.activeWallet$.next(wallet);
+    this.activeWallet$.next({ observableWallet: wallet, props });
 
     this.activeWalletId$.next(props);
   }
@@ -254,7 +259,7 @@ export class WalletManager<WalletMetadata extends { name: string }, AccountMetad
     // Do not shutdown the active wallet while these subscriptions are still coupled with the observed wallet.
     // Instead, first decouple the active wallet from the observed wallet.
     this.#stopEmittingFromActiveWallet();
-    wallet?.shutdown();
+    wallet?.observableWallet.shutdown();
     this.#activeWalletProps = null;
   }
 
