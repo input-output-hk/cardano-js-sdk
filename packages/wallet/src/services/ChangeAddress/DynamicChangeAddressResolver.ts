@@ -284,6 +284,33 @@ export const delegationMatchesPortfolio = (
 /** Gets the current delegation portfolio. */
 export type GetDelegationPortfolio = () => Promise<Cardano.Cip17DelegationPortfolio | null>;
 
+/**
+ * Sorts an array of addresses by their primary index and, if available, by the
+ * index of their stakeKeyDerivationPath.
+ *
+ * @param addresses - The array of addresses to sort.
+ * @returns A new sorted array of addresses.
+ */
+const sortAddresses = (addresses: GroupedAddress[]): GroupedAddress[] =>
+  [...addresses].sort((a, b) => {
+    if (a.index !== b.index) {
+      return a.index - b.index;
+    }
+
+    if (a.stakeKeyDerivationPath && b.stakeKeyDerivationPath) {
+      return a.stakeKeyDerivationPath.index - b.stakeKeyDerivationPath.index;
+    }
+
+    if (a.stakeKeyDerivationPath && !b.stakeKeyDerivationPath) {
+      return -1;
+    }
+    if (!a.stakeKeyDerivationPath && b.stakeKeyDerivationPath) {
+      return 1;
+    }
+
+    return 0;
+  });
+
 /** Resolves the address to be used for change. */
 export class DynamicChangeAddressResolver implements ChangeAddressResolver {
   readonly #getDelegationPortfolio: GetDelegationPortfolio;
@@ -315,7 +342,8 @@ export class DynamicChangeAddressResolver implements ChangeAddressResolver {
   async resolve(selection: Selection): Promise<Array<Cardano.TxOut>> {
     const delegationDistribution = [...(await firstValueFrom(this.#delegationDistribution)).values()];
     let portfolio = await this.#getDelegationPortfolio();
-    const addresses = await firstValueFrom(this.#addresses$);
+    const addresses = sortAddresses(await firstValueFrom(this.#addresses$));
+
     let updatedChange = [...selection.change];
 
     if (addresses.length === 0) throw new InvalidStateError('The wallet has no known addresses.');

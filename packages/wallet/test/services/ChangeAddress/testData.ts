@@ -212,6 +212,108 @@ export const knownAddresses$ = new BehaviorSubject<GroupedAddress[]>([
   }
 ]);
 
+export const unorderedKnownAddresses$ = new BehaviorSubject<GroupedAddress[]>([
+  {
+    accountIndex: 0,
+    address: address_5_0,
+    index: 5,
+    networkId: Cardano.NetworkId.Testnet,
+    rewardAccount: rewardAccount_0,
+    stakeKeyDerivationPath: { index: 0, role: KeyRole.Stake },
+    type: AddressType.External
+  },
+  {
+    accountIndex: 0,
+    address: address_1_0,
+    index: 1,
+    networkId: Cardano.NetworkId.Testnet,
+    rewardAccount: rewardAccount_0,
+    stakeKeyDerivationPath: { index: 0, role: KeyRole.Stake },
+    type: AddressType.External
+  },
+  {
+    accountIndex: 0,
+    address: address_0_3,
+    index: 0,
+    networkId: Cardano.NetworkId.Testnet,
+    rewardAccount: rewardAccount_3,
+    stakeKeyDerivationPath: { index: 3, role: KeyRole.Stake },
+    type: AddressType.External
+  },
+  {
+    accountIndex: 0,
+    address: address_0_1,
+    index: 0,
+    networkId: Cardano.NetworkId.Testnet,
+    rewardAccount: rewardAccount_1,
+    stakeKeyDerivationPath: { index: 1, role: KeyRole.Stake },
+    type: AddressType.External
+  },
+  {
+    accountIndex: 0,
+    address: address_0_2,
+    index: 0,
+    networkId: Cardano.NetworkId.Testnet,
+    rewardAccount: rewardAccount_2,
+    stakeKeyDerivationPath: { index: 2, role: KeyRole.Stake },
+    type: AddressType.External
+  },
+  {
+    accountIndex: 0,
+    address: address_2_0,
+    index: 2,
+    networkId: Cardano.NetworkId.Testnet,
+    rewardAccount: rewardAccount_0,
+    stakeKeyDerivationPath: { index: 0, role: KeyRole.Stake },
+    type: AddressType.External
+  },
+  {
+    accountIndex: 0,
+    address: address_0_4,
+    index: 0,
+    networkId: Cardano.NetworkId.Testnet,
+    rewardAccount: rewardAccount_4,
+    stakeKeyDerivationPath: { index: 4, role: KeyRole.Stake },
+    type: AddressType.External
+  },
+  {
+    accountIndex: 0,
+    address: address_3_0,
+    index: 3,
+    networkId: Cardano.NetworkId.Testnet,
+    rewardAccount: rewardAccount_0,
+    stakeKeyDerivationPath: { index: 0, role: KeyRole.Stake },
+    type: AddressType.External
+  },
+  {
+    accountIndex: 0,
+    address: address_0_5,
+    index: 0,
+    networkId: Cardano.NetworkId.Testnet,
+    rewardAccount: rewardAccount_5,
+    stakeKeyDerivationPath: { index: 5, role: KeyRole.Stake },
+    type: AddressType.External
+  },
+  {
+    accountIndex: 0,
+    address: address_0_0,
+    index: 0,
+    networkId: Cardano.NetworkId.Testnet,
+    rewardAccount: rewardAccount_0,
+    stakeKeyDerivationPath: { index: 0, role: KeyRole.Stake },
+    type: AddressType.External
+  },
+  {
+    accountIndex: 0,
+    address: address_4_0,
+    index: 4,
+    networkId: Cardano.NetworkId.Testnet,
+    rewardAccount: rewardAccount_0,
+    stakeKeyDerivationPath: { index: 0, role: KeyRole.Stake },
+    type: AddressType.External
+  }
+]);
+
 export const emptyKnownAddresses$ = new BehaviorSubject<GroupedAddress[]>([]);
 
 export const createMockDelegateTracker = (delegatedStake: Map<Cardano.PoolId, DelegatedStake>) => ({
