@@ -21,7 +21,7 @@ import {
   withTypeormTransaction
 } from '../../../src';
 import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { Cardano, ChainSyncEventType, ObservableCardanoNode } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger, mockProviders } from '@cardano-sdk/util-dev';
 import { Observable } from 'rxjs';
 import { ProjectorContext, createProjectorTilFirst, createStubProjectionSource } from '../util';
@@ -113,14 +113,15 @@ export const mapAndStore =
     evt$.pipe(applyMappers, storeData(buffer));
 
 export const project$ =
-  ({ buffer, tipTracker }: ProjectorContext) =>
+  ({ buffer, tipTracker }: ProjectorContext, cardanoNode: ObservableCardanoNode = stubEvents.cardanoNode) =>
   () =>
     Bootstrap.fromCardanoNode({
       blocksBufferLength: 10,
       buffer,
-      cardanoNode: stubEvents.cardanoNode,
+      cardanoNode,
       logger,
       projectedTip$: tipTracker.tip$
     }).pipe(mapAndStore({ buffer, tipTracker }), tipTracker.trackProjectedTip(), requestNext());
 
-export const projectTilFirst = (context: ProjectorContext) => createProjectorTilFirst(project$(context));
+export const projectTilFirst = (context: ProjectorContext, cardanoNode?: ObservableCardanoNode) =>
+  createProjectorTilFirst(project$(context, cardanoNode));
