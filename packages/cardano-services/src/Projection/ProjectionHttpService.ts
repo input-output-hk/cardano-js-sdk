@@ -86,7 +86,7 @@ export class ProjectionHttpService<T extends BaseProjectionEvent> extends HttpSe
   #dryRun?: boolean;
 
   constructor(
-    { projection$, projectionNames, healthTimeout = Milliseconds(60_000), dryRun }: ProjectionServiceProps<T>,
+    { projection$, projectionNames, healthTimeout = Milliseconds(180_000), dryRun }: ProjectionServiceProps<T>,
     { logger, router = express.Router() }: ProjectionServiceDependencies
   ) {
     super(
