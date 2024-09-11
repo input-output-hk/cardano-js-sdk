@@ -1,6 +1,6 @@
 /* eslint-disable max-statements */
 import { BaseWallet, ObservableWallet } from '@cardano-sdk/wallet';
-import { BigIntMath, isNotNil } from '@cardano-sdk/util';
+import { BigIntMath, isNotNil, toSerializableObject } from '@cardano-sdk/util';
 import { Cardano, Serialization, StakePoolProvider } from '@cardano-sdk/core';
 import {
   TX_TIMEOUT_DEFAULT,
@@ -204,6 +204,16 @@ describe('SharedWallet/delegation', () => {
     await waitForTx(aliceMultiSigWallet, tx.id);
     const tx1ConfirmedState = await getWalletStateSnapshot(aliceMultiSigWallet);
 
+    // Check Registration and StakeDelegation certificate from ChainHistoryProvider
+    let gotTx = toSerializableObject(
+      (await firstValueFrom(aliceMultiSigWallet.transactions.history$)).find((t) => tx.id === t.id)!
+    );
+    // These are required because txBuilder still uses StakeRegistration
+    (gotTx as Cardano.HydratedTx).body.certificates![0].__typename = Cardano.CertificateType.StakeRegistration;
+    delete ((gotTx as Cardano.HydratedTx).body.certificates![0] as Partial<Cardano.NewStakeAddressCertificate>).deposit;
+    expect((gotTx as Cardano.HydratedTx).body.certificates?.length).toEqual(2);
+    expect((gotTx as Cardano.HydratedTx).body.certificates).toEqual(toSerializableObject(tx.body.certificates));
+
     // Updates total and available balance after tx is on-chain
     expect(tx1ConfirmedState.balance.total.coins).toBe(expectedCoinsAfterTx1);
     expect(tx1ConfirmedState.balance.total).toEqual(tx1ConfirmedState.balance.available);
@@ -236,6 +246,16 @@ describe('SharedWallet/delegation', () => {
 
     await waitForTx(aliceMultiSigWallet, tx.id);
     const tx2ConfirmedState = await getWalletStateSnapshot(aliceMultiSigWallet);
+
+    // Check Unregistration certificate from ChainHistoryProvider
+    gotTx = toSerializableObject(
+      (await firstValueFrom(aliceMultiSigWallet.transactions.history$)).find((t) => tx.id === t.id)!
+    );
+    // These are required because txBuilder still uses StakeDeregistration
+    (gotTx as Cardano.HydratedTx).body.certificates![0].__typename = Cardano.CertificateType.StakeDeregistration;
+    delete ((gotTx as Cardano.HydratedTx).body.certificates![0] as Partial<Cardano.NewStakeAddressCertificate>).deposit;
+    expect((gotTx as Cardano.HydratedTx).body.certificates?.length).toEqual(1);
+    expect((gotTx as Cardano.HydratedTx).body.certificates).toEqual(toSerializableObject(tx.body.certificates));
 
     // No longer delegating
     expect(tx2ConfirmedState.rewardAccount.delegatee?.nextNextEpoch?.id).toBeUndefined();

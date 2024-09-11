@@ -137,6 +137,18 @@ for you.
 nix run .#config-update
 ```
 
+## Get CBOR representation of an on chain transaction
+
+Once we have a [running network](packages/cardano-services/README.md#production) synced at least up to the block
+containing the transaction we are interested in, issue following command to get the CBOR representation of the
+transaction.
+
+```
+yarn tx-cbor <txId>
+```
+
+This works regardless of the local ports configuration through environment variables.
+
 ## Attic
 
 Previously supported features, no longer supported, but packed with a reference branch.

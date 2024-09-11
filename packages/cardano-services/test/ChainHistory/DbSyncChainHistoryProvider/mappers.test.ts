@@ -34,6 +34,7 @@ const blockHash = '7a48b034645f51743550bbaf81f8a14771e58856e031eb63844738ca8ad72
 const poolId = 'pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh';
 const datetime = '2022-05-10T19:22:43.620Z';
 const vrfKey = 'vrf_vk19j362pkr4t9y0m3qxgmrv0365vd7c4ze03ny4jh84q8agjy4ep4s99zvg8';
+const vrfKeyHash = '220ba9398e3e5fae23a83d0d5927649d577a5f69d6ef1d5253c259d9393ba294';
 const genesisLeaderHash = 'eff1b5b26e65b791d6f236c7c0264012bd1696759d22bdb4dd0f6f56';
 const transactionHash = 'cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819';
 const sourceTransactionHash = 'cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3812';
@@ -292,14 +293,28 @@ describe('chain history mappers', () => {
       const result = mappers.mapCertificate({
         ...baseCertModel,
         deposit: '500000000',
+        fixed_cost: '390000000',
+        margin: 0.15,
+        pledge: '420000000',
         pool_id: poolId,
-        type: 'register'
+        reward_account: stakeAddress,
+        type: 'register',
+        vrf_key_hash: Buffer.from(vrfKeyHash, 'hex')
       } as WithCertType<PoolRegisterCertModel>);
       expect(result).toEqual<WithCertIndex<Cardano.HydratedPoolRegistrationCertificate>>({
         __typename: Cardano.CertificateType.PoolRegistration,
         cert_index: 0,
         deposit: 500_000_000n,
-        poolParameters: null as unknown as Cardano.PoolParameters
+        poolParameters: {
+          cost: 390_000_000n,
+          id: poolId as Cardano.PoolId,
+          margin: { denominator: 20, numerator: 3 },
+          owners: [],
+          pledge: 420_000_000n,
+          relays: [],
+          rewardAccount: stakeAddress as Cardano.RewardAccount,
+          vrf: vrfKeyHash as Cardano.VrfVkHex
+        }
       });
     });
     test('map MirCertModel to Cardano.MirCertificate', () => {

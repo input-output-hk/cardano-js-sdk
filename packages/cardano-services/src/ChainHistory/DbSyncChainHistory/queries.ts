@@ -250,15 +250,21 @@ export const findPoolRetireCertsTxIds = `
 export const findPoolRegisterCertsByTxIds = `
 	SELECT
 		cert.cert_index AS cert_index,
-		pool."view" AS pool_id,
+		pool.view AS pool_id,
 		tx.hash AS tx_id,
 		CASE
 			WHEN cert.deposit IS NULL THEN '0'
 			ELSE cert.deposit
-		END AS deposit
+		END AS deposit,
+		stake_address.view AS reward_account,
+		pledge,
+		fixed_cost,
+		margin,
+		vrf_key_hash
 	FROM tx
 	JOIN pool_update AS cert ON cert.registered_tx_id = tx.id
 	JOIN pool_hash AS pool ON pool.id = cert.hash_id
+	JOIN stake_address ON stake_address.id = reward_addr_id
 	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC`;
 

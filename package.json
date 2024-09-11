@@ -37,7 +37,8 @@
     "test": "yarn workspaces foreach -v run test",
     "test:build:verify": "yarn workspaces foreach -v run test:build:verify",
     "test:e2e": "yarn workspaces foreach -v run test:e2e",
-    "test:debug": "DEBUG=true yarn workspaces foreach -v run test"
+    "test:debug": "DEBUG=true yarn workspaces foreach -v run test",
+    "tx-cbor": "tsx packages/cardano-services/scripts/tx-cbor.js"
   },
   "repository": {
     "type": "git",
