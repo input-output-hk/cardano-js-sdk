@@ -7,6 +7,7 @@ import { GroupedAddress } from '@cardano-sdk/key-management';
 import { InvalidStateError } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { Observable, firstValueFrom } from 'rxjs';
+import { sortAddresses } from '../util/sortAddresses';
 import isEqual from 'lodash/isEqual.js';
 import uniq from 'lodash/uniq.js';
 
@@ -315,7 +316,8 @@ export class DynamicChangeAddressResolver implements ChangeAddressResolver {
   async resolve(selection: Selection): Promise<Array<Cardano.TxOut>> {
     const delegationDistribution = [...(await firstValueFrom(this.#delegationDistribution)).values()];
     let portfolio = await this.#getDelegationPortfolio();
-    const addresses = await firstValueFrom(this.#addresses$);
+    const addresses = sortAddresses(await firstValueFrom(this.#addresses$));
+
     let updatedChange = [...selection.change];
 
     if (addresses.length === 0) throw new InvalidStateError('The wallet has no known addresses.');

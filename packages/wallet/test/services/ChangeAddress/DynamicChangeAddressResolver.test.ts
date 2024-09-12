@@ -25,7 +25,8 @@ import {
   rewardAccount_0,
   rewardAccount_1,
   rewardAccount_2,
-  rewardAccount_3
+  rewardAccount_3,
+  unorderedKnownAddresses$
 } from './testData';
 import { logger } from '@cardano-sdk/util-dev';
 
@@ -154,7 +155,7 @@ describe('DynamicChangeAddressResolver', () => {
 
   it('adds all change outputs at payment_stake address 0 if the wallet is currently not delegating to any pool', async () => {
     const changeAddressResolver = new DynamicChangeAddressResolver(
-      knownAddresses$,
+      unorderedKnownAddresses$,
       createMockDelegateTracker(new Map<Cardano.PoolId, DelegatedStake>([])).distribution$,
       getNullDelegationPortfolio,
       logger
@@ -191,7 +192,7 @@ describe('DynamicChangeAddressResolver', () => {
 
   it('distributes change equally between the currently delegated addresses if no portfolio is given, ', async () => {
     const changeAddressResolver = new DynamicChangeAddressResolver(
-      knownAddresses$,
+      unorderedKnownAddresses$,
       createMockDelegateTracker(
         new Map<Cardano.PoolId, DelegatedStake>([
           [
