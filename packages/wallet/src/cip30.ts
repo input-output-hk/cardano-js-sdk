@@ -23,7 +23,7 @@ import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-s
 import { Logger } from 'ts-log';
 import { MessageSender } from '@cardano-sdk/key-management';
 import { Observable, firstValueFrom, from, map, mergeMap, race, throwError } from 'rxjs';
-import { ObservableWallet, isKeyHashAddress, isScriptAddress } from './types';
+import { ObservableWallet } from './types';
 import { requiresForeignSignatures } from './services';
 import uniq from 'lodash/uniq.js';
 
@@ -279,19 +279,6 @@ const baseCip30WalletApi = (
     try {
       const wallet = await firstValueFrom(wallet$);
       const addresses = await firstValueFrom(wallet.addresses$);
-
-      const isScriptWallet = addresses.some(isScriptAddress);
-
-      if (!isScriptWallet) {
-        addresses.sort((a, b) => {
-          if (isKeyHashAddress(a) && isKeyHashAddress(b)) {
-            return a.index - b.index;
-          }
-
-          return 0; // Cant happen, but in any case do not sort.
-        });
-      }
-
       const address = addresses[0].address;
 
       if (!address) {
