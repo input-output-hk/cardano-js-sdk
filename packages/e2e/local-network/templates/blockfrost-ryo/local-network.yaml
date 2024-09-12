@@ -1,0 +1,14 @@
+server:
+  listenAddress: "0.0.0.0"
+  port: 3000
+  debug: true
+dbSync:
+  host: "postgres"
+  port: 5432
+  database: "cexplorer"
+  user: "postgres"
+  password: "doNoUseThisSecret!"
+  maxConnections: 5
+network: "custom"
+genesisDataFolder: '/app/config'
+tokenRegistryUrl: "https://metadata.cardano-testnet.iohkdev.io"

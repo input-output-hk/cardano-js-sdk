@@ -9,6 +9,18 @@ x-sdk-environment: &sdk-environment
   HANDLE_POLICY_IDS: ${HANDLE_POLICY_IDS:-f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a}
 
 services:
+
+  blockfrost-ryo:
+    environment:
+      <<: *sdk-environment
+      NODE_ENV: local-blockfrost-ryo
+      BLOCKFROST_CONFIG_NETWORK: ${NETWORK:-mainnet}
+      BLOCKFROST_CONFIG_TOKEN_REGISTRY_URL: ${TOKEN_METADATA_SERVER_URL:-https://tokens.cardano.org}
+
+    volumes:
+      - ./blockfrost/ryo:/app/config
+    profiles: [ blockfrost-ryo ]
+
   cardano-node:
     volumes:
       - ./config/network/${NETWORK:-mainnet}/cardano-node:/config
@@ -74,7 +86,7 @@ services:
 
 secrets:
   blockfrost_key:
-    file: ./blockfrost-keys/${NETWORK:-mainnet}.key
+    file: ./blockfrost/keys/${NETWORK:-mainnet}.key
 
 volumes:
   postgres-data:

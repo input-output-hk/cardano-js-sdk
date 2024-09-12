@@ -69,6 +69,16 @@ x-provider-server-environment: &provider-server-environment
   SUBMIT_API_URL: ${SUBMIT_API_URL:-http://cardano-submit-api:8090/}
   USE_BLOCKFROST: ${USE_BLOCKFROST:-false}
   USE_SUBMIT_API: ${USE_SUBMIT_API:-false}
+  ASSET_PROVIDER: ${ASSET_PROVIDER:-dbsync}
+  UTXO_PROVIDER: ${UTXO_PROVIDER:-dbsync}
+  CHAIN_HISTORY_PROVIDER: ${CHAIN_HISTORY_PROVIDER:-dbsync}
+  REWARDS_PROVIDER: ${REWARDS_PROVIDER:-dbsync}
+  NETWORK_INFO_PROVIDER: ${NETWORK_INFO_PROVIDER:-dbsync}
+  TX_SUBMIT_PROVIDER: ${TX_SUBMIT_PROVIDER:-submit-node}
+  STAKE_POOL_PROVIDER: ${STAKE_POOL_PROVIDER:-dbsync}
+  NETWORK: ${NETWORK:-mainnet}
+  BLOCKFROST_API_KEY: ${BLOCKFROST_API_KEY}
+  BLOCKFROST_CUSTOM_BACKEND_URL: ${BLOCKFROST_CUSTOM_BACKEND_URL}
 
 x-sdk-environment: &sdk-environment
   LOGGER_MIN_SEVERITY: ${LOGGER_MIN_SEVERITY:-info}
@@ -110,6 +120,18 @@ x-sdk-environment: &sdk-environment
   WEB_SOCKET_API_URL: ws://ws-server:3000/ws
 
 services:
+  blockfrost-ryo:
+    build:
+      context: "https://github.com/ginnun/blockfrost-backend-ryo.git#feat/custom-network-support"
+      dockerfile: Dockerfile
+    environment:
+      BLOCKFROST_CONFIG_SERVER_LISTEN_ADDRESS: 0.0.0.0
+    depends_on:
+      cardano-db-sync:
+        condition: service_started
+    ports:
+      - "3015:3000"
+
   cardano-db-sync:
     <<:
       - *logging

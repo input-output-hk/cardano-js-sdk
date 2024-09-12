@@ -22,58 +22,52 @@ export const ProviderImplementationDescription = 'Select one of the available pr
 const argParser = (impl: string) => ProviderImplementation[impl.toUpperCase() as keyof typeof ProviderImplementation];
 export const providerSelectionOptions = [
   newOption(
-    '--asset-provider <implementation>',
+    '--asset-provider <assetProvider>',
     ProviderImplementationDescription,
     'ASSET_PROVIDER',
     argParser,
     ProviderImplementation.DBSYNC
-  )
-    .conflicts('useTypeormAssetProvider')
-    .choices([ProviderImplementation.BLOCKFROST, ProviderImplementation.DBSYNC, ProviderImplementation.TYPEORM]),
+  ).choices([ProviderImplementation.BLOCKFROST, ProviderImplementation.DBSYNC, ProviderImplementation.TYPEORM]),
   newOption(
-    '--stake-pool-provider <implementation>',
+    '--stake-pool-provider <stakePoolProvider>',
     ProviderImplementationDescription,
     'STAKE_POOL_PROVIDER',
     argParser,
     ProviderImplementation.DBSYNC
-  )
-    .conflicts('useTypeormStakePoolProvider')
-    .choices([ProviderImplementation.DBSYNC, ProviderImplementation.TYPEORM]),
+  ).choices([ProviderImplementation.DBSYNC, ProviderImplementation.TYPEORM]),
   newOption(
-    '--utxo-provider <implementation>',
+    '--utxo-provider <utxoProvider>',
     ProviderImplementationDescription,
     'UTXO_PROVIDER',
     argParser,
     ProviderImplementation.DBSYNC
   ).choices([ProviderImplementation.BLOCKFROST, ProviderImplementation.DBSYNC]),
   newOption(
-    '--chain-history-provider <implementation>',
+    '--chain-history-provider <chainHistoryProvider>',
     ProviderImplementationDescription,
     'CHAIN_HISTORY_PROVIDER',
     argParser,
     ProviderImplementation.DBSYNC
   ).choices([ProviderImplementation.BLOCKFROST, ProviderImplementation.DBSYNC]),
   newOption(
-    '--rewards-provider <implementation>',
+    '--rewards-provider <rewardsProvider>',
     ProviderImplementationDescription,
     'REWARDS_PROVIDER',
     argParser,
     ProviderImplementation.DBSYNC
   ).choices([ProviderImplementation.BLOCKFROST, ProviderImplementation.DBSYNC]),
   newOption(
-    '--network-info-provider <implementation>',
+    '--network-info-provider <networkInfoProvider>',
     ProviderImplementationDescription,
     'NETWORK_INFO_PROVIDER',
     argParser,
     ProviderImplementation.DBSYNC
   ).choices([ProviderImplementation.BLOCKFROST, ProviderImplementation.DBSYNC]),
   newOption(
-    '--tx-submit-provider <implementation>',
+    '--tx-submit-provider <txSubmitProvider>',
     ProviderImplementationDescription,
     'TX_SUBMIT_PROVIDER',
     argParser,
     ProviderImplementation.SUBMIT_NODE
-  )
-    .conflicts('useSubmitApi')
-    .choices([ProviderImplementation.BLOCKFROST, ProviderImplementation.SUBMIT_API, ProviderImplementation.SUBMIT_NODE])
+  ).choices([ProviderImplementation.BLOCKFROST, ProviderImplementation.SUBMIT_API, ProviderImplementation.SUBMIT_NODE])
 ];
