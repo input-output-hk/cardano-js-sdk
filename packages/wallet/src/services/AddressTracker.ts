@@ -17,6 +17,7 @@ import {
 } from 'rxjs';
 import { WalletStores } from '../persistence';
 import { groupedAddressesEquals } from './util';
+import { sortAddresses } from './util/sortAddresses';
 
 export type AddressTrackerDependencies = {
   store: WalletStores['addresses'];
@@ -86,7 +87,7 @@ export const createAddressTracker = ({ addressDiscovery$, store, logger }: Addre
         take(1)
       );
     },
-    addresses$,
+    addresses$: addresses$.pipe(map(sortAddresses)),
     shutdown: newAddresses$.complete.bind(newAddresses$)
   };
 };

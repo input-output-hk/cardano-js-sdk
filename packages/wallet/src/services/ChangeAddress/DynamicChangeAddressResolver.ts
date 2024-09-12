@@ -7,6 +7,7 @@ import { GroupedAddress } from '@cardano-sdk/key-management';
 import { InvalidStateError } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { Observable, firstValueFrom } from 'rxjs';
+import { sortAddresses } from '../util/sortAddresses';
 import isEqual from 'lodash/isEqual.js';
 import uniq from 'lodash/uniq.js';
 
@@ -283,33 +284,6 @@ export const delegationMatchesPortfolio = (
 
 /** Gets the current delegation portfolio. */
 export type GetDelegationPortfolio = () => Promise<Cardano.Cip17DelegationPortfolio | null>;
-
-/**
- * Sorts an array of addresses by their primary index and, if available, by the
- * index of their stakeKeyDerivationPath.
- *
- * @param addresses - The array of addresses to sort.
- * @returns A new sorted array of addresses.
- */
-const sortAddresses = (addresses: GroupedAddress[]): GroupedAddress[] =>
-  [...addresses].sort((a, b) => {
-    if (a.index !== b.index) {
-      return a.index - b.index;
-    }
-
-    if (a.stakeKeyDerivationPath && b.stakeKeyDerivationPath) {
-      return a.stakeKeyDerivationPath.index - b.stakeKeyDerivationPath.index;
-    }
-
-    if (a.stakeKeyDerivationPath && !b.stakeKeyDerivationPath) {
-      return -1;
-    }
-    if (!a.stakeKeyDerivationPath && b.stakeKeyDerivationPath) {
-      return 1;
-    }
-
-    return 0;
-  });
 
 /** Resolves the address to be used for change. */
 export class DynamicChangeAddressResolver implements ChangeAddressResolver {

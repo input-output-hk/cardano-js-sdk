@@ -1,14 +1,44 @@
 import { AddressTracker, createAddressTracker } from '../../src';
+import { AddressType, GroupedAddress, KeyRole } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { EMPTY, firstValueFrom, of } from 'rxjs';
-import { GroupedAddress } from '@cardano-sdk/key-management';
 import { WalletStores } from '../../src/persistence';
+import { address_0_0, address_0_5, address_5_0, rewardAccount_0, rewardAccount_5 } from './ChangeAddress/testData';
 import { createTestScheduler, logger } from '@cardano-sdk/util-dev';
+import { sortAddresses } from '../../src/services/util/sortAddresses';
 
 describe('AddressTracker', () => {
   let store: jest.Mocked<WalletStores['addresses']>;
   let addressTracker: AddressTracker;
-  const discoveredAddresses = [{ address: 'addr1' as Cardano.PaymentAddress } as GroupedAddress];
+  const discoveredAddresses = [
+    {
+      accountIndex: 0,
+      address: address_5_0,
+      index: 5,
+      networkId: Cardano.NetworkId.Testnet,
+      rewardAccount: rewardAccount_0,
+      stakeKeyDerivationPath: { index: 0, role: KeyRole.Stake },
+      type: AddressType.External
+    },
+    {
+      accountIndex: 0,
+      address: address_0_5,
+      index: 0,
+      networkId: Cardano.NetworkId.Testnet,
+      rewardAccount: rewardAccount_5,
+      stakeKeyDerivationPath: { index: 5, role: KeyRole.Stake },
+      type: AddressType.External
+    },
+    {
+      accountIndex: 0,
+      address: address_0_0,
+      index: 0,
+      networkId: Cardano.NetworkId.Testnet,
+      rewardAccount: rewardAccount_0,
+      stakeKeyDerivationPath: { index: 0, role: KeyRole.Stake },
+      type: AddressType.External
+    }
+  ];
 
   beforeEach(() => {
     store = {
@@ -18,6 +48,8 @@ describe('AddressTracker', () => {
       set: jest.fn((_: GroupedAddress[]) => of(void 0))
     };
   });
+
+  const sortedDiscoveredAddresses = sortAddresses(discoveredAddresses);
 
   afterEach(() => addressTracker.shutdown());
 
@@ -31,7 +63,7 @@ describe('AddressTracker', () => {
             logger,
             store
           });
-          expectObservable(addressTracker.addresses$).toBe('a', { a: discoveredAddresses });
+          expectObservable(addressTracker.addresses$).toBe('a', { a: sortedDiscoveredAddresses });
           expectSubscriptions(addressDiscovery$.subscriptions).toBe('^');
           flush();
           expect(store.get).toBeCalledTimes(1);
@@ -70,12 +102,12 @@ describe('AddressTracker', () => {
         logger,
         store
       });
-      await expect(firstValueFrom(addressTracker.addresses$)).resolves.toEqual(discoveredAddresses);
+      await expect(firstValueFrom(addressTracker.addresses$)).resolves.toEqual(sortedDiscoveredAddresses);
       const newAddress = { address: 'addr2' as Cardano.PaymentAddress } as GroupedAddress;
       const combinedAddresses = [...discoveredAddresses, newAddress];
 
       await expect(firstValueFrom(addressTracker.addAddresses([newAddress]))).resolves.toEqual(combinedAddresses);
-      await expect(firstValueFrom(addressTracker.addresses$)).resolves.toEqual(combinedAddresses);
+      await expect(firstValueFrom(addressTracker.addresses$)).resolves.toEqual(sortAddresses(combinedAddresses));
       expect(store.set).toBeCalledTimes(2);
       expect(store.set).toBeCalledWith(combinedAddresses);
     });
