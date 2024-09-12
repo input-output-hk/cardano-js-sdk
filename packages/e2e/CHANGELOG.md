@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.42.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.42.0...@cardano-sdk/e2e@0.42.1) (2024-09-12)
+
+### Bug Fixes
+
+* **cardano-services:** use computed stake credential type while building certificates ([39ada85](https://github.com/input-output-hk/cardano-js-sdk/commit/39ada855131e6b882237b67ae975c43de0197686))
+
 ## [0.42.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.41.0...@cardano-sdk/e2e@0.42.0) (2024-09-10)
 
 ### ⚠ BREAKING CHANGES

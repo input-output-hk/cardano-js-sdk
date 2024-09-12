@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.36](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.11.35...@cardano-sdk/projection@0.11.36) (2024-09-12)
+
+### Bug Fixes
+
+* correctly set handle owner when handle is upgraded to cip68 ([71204e0](https://github.com/input-output-hk/cardano-js-sdk/commit/71204e0f7caa6e06fdbdabbc2e77e89ea2619d4f))
+
 ## [0.11.35](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.11.34...@cardano-sdk/projection@0.11.35) (2024-09-10)
 
 **Note:** Version bump only for package @cardano-sdk/projection

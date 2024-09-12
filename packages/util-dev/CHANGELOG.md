@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.22.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.22.9...@cardano-sdk/util-dev@0.22.10) (2024-09-12)
+
+### Bug Fixes
+
+* correctly set handle owner when handle is upgraded to cip68 ([71204e0](https://github.com/input-output-hk/cardano-js-sdk/commit/71204e0f7caa6e06fdbdabbc2e77e89ea2619d4f))
+
 ## [0.22.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.22.8...@cardano-sdk/util-dev@0.22.9) (2024-09-10)
 
 **Note:** Version bump only for package @cardano-sdk/util-dev

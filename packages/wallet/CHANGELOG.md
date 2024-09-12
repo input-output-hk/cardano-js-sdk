@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.44.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.1...@cardano-sdk/wallet@0.44.2) (2024-09-12)
+
+### Features
+
+* **wallet:** address tracker addresses$ now always emits addresses sorted by derivation index ([4fa3bd5](https://github.com/input-output-hk/cardano-js-sdk/commit/4fa3bd5b8e26837d7ed519fc4755c49ccb55ce07))
+
+### Bug Fixes
+
+* **wallet:** dynamicChangeResolver gives preference to lower derivation indices ([143461f](https://github.com/input-output-hk/cardano-js-sdk/commit/143461f563ea1e14e632add1104e87e87abd43cb))
+
 ## [0.44.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.0...@cardano-sdk/wallet@0.44.1) (2024-09-10)
 
 ### Features

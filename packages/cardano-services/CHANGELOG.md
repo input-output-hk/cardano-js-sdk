@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.29.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.29.10...@cardano-sdk/cardano-services@0.29.11) (2024-09-12)
+
+### Features
+
+* add script to get in chain tx cbor from tx id ([61d4291](https://github.com/input-output-hk/cardano-js-sdk/commit/61d42913daf4451c6dad3c1c723be0f3c3c8d729))
+* **cardano-services:** implement provider selection based on env variables and config ([6c8c97d](https://github.com/input-output-hk/cardano-js-sdk/commit/6c8c97dc0233db38ccc29edb6860e6ac6768dbbd))
+
+### Bug Fixes
+
+* **cardano-serices:** add (partial) stake pool parameters to stake pool registration certificates ([3166d53](https://github.com/input-output-hk/cardano-js-sdk/commit/3166d53e2fd63c4358d427e31141050bf57b1520))
+* **cardano-services:** don't fetch assets for collateralReturn as if it was an output ([764ec3d](https://github.com/input-output-hk/cardano-js-sdk/commit/764ec3db7384487eabfbda29ce25a32ddde68664))
+* **cardano-services:** fix attempt for projector health check ([632f5e8](https://github.com/input-output-hk/cardano-js-sdk/commit/632f5e8dc9dface1a27bd003ab05909447804ffe))
+* **cardano-services:** use computed stake credential type while building certificates ([39ada85](https://github.com/input-output-hk/cardano-js-sdk/commit/39ada855131e6b882237b67ae975c43de0197686))
+* **cardano-services:** use correct inputs and collaterals order while providing transactions ([23df091](https://github.com/input-output-hk/cardano-js-sdk/commit/23df0912087513ee7a1aa85b3bbc34b9971abdb9))
+
 ## [0.29.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.29.9...@cardano-sdk/cardano-services@0.29.10) (2024-09-10)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services
