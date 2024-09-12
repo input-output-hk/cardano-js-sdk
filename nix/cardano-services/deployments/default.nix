@@ -872,30 +872,23 @@ in
       // (builtins.mapAttrs (_: value: (final:
         value
         // {
+          context = "eks-admin";
           projectors.asset.enabled = true;
 
           values = {
             ingress.enabled = false;
           };
         })) {
-        "live-mainnet@us-east-2@asset" = {
-          name = "tmp-cardanojs";
-          namespace = "live-mainnet";
-          network = "mainnet";
-          region = "us-east-2";
-          context = "eks-admin";
-        };
-        "live-mainnet@eu-central-1@asset" = {
-          name = "tmp-cardanojs";
-          namespace = "live-mainnet";
-          network = "mainnet";
-          region = "eu-central-1";
-          context = "eks-admin";
-        };
+        #"live-mainnet@us-east-2@asset" = {
+        #  name = "tmp-cardanojs";
+        #  namespace = "live-mainnet";
+        #  network = "mainnet";
+        #  region = "us-east-2";
+        #};
       });
 
     targetGroups = targets: {
-      ASSET = lib.filterAttrs (name: _: lib.hasSuffix "asset" name) targets;
+      #ASSET = lib.filterAttrs (name: _: lib.hasSuffix "asset" name) targets;
       DEV = lib.filterAttrs (name: _: lib.hasPrefix "dev-" name) targets;
       LIVE = lib.filterAttrs (name: _: lib.hasPrefix "live-" name) targets;
       OPS = lib.filterAttrs (name: _: lib.hasPrefix "ops-" name) targets;
