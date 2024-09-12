@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">84.64% </span>
+                <span class="strong">84.61% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>248/293</span>
+                <span class='fraction'>242/286</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">80% </span>
+                <span class="strong">78.94% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>64/80</span>
+                <span class='fraction'>60/76</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">87.93% </span>
+                <span class="strong">87.71% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>51/58</span>
+                <span class='fraction'>50/57</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">84.5% </span>
+                <span class="strong">84.46% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>229/271</span>
+                <span class='fraction'>223/264</span>
             </div>
         
             
@@ -688,20 +688,7 @@
 <a name='L623'></a><a href='#L623'>623</a>
 <a name='L624'></a><a href='#L624'>624</a>
 <a name='L625'></a><a href='#L625'>625</a>
-<a name='L626'></a><a href='#L626'>626</a>
-<a name='L627'></a><a href='#L627'>627</a>
-<a name='L628'></a><a href='#L628'>628</a>
-<a name='L629'></a><a href='#L629'>629</a>
-<a name='L630'></a><a href='#L630'>630</a>
-<a name='L631'></a><a href='#L631'>631</a>
-<a name='L632'></a><a href='#L632'>632</a>
-<a name='L633'></a><a href='#L633'>633</a>
-<a name='L634'></a><a href='#L634'>634</a>
-<a name='L635'></a><a href='#L635'>635</a>
-<a name='L636'></a><a href='#L636'>636</a>
-<a name='L637'></a><a href='#L637'>637</a>
-<a name='L638'></a><a href='#L638'>638</a>
-<a name='L639'></a><a href='#L639'>639</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">35x</span>
+<a name='L626'></a><a href='#L626'>626</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -726,7 +713,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">35x</span>
-<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -982,19 +969,6 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
@@ -1364,7 +1338,7 @@ import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-s
 import { Logger } from 'ts-log';
 import { MessageSender } from '@cardano-sdk/key-management';
 import { Observable, firstValueFrom, from, map, mergeMap, race, throwError } from 'rxjs';
-import { ObservableWallet, isKeyHashAddress, isScriptAddress } from './types';
+import { ObservableWallet } from './types';
 import { requiresForeignSignatures } from './services';
 import uniq from 'lodash/uniq.js';
 &nbsp;
@@ -1620,19 +1594,6 @@ const baseCip30WalletApi = (
     try {
       const wallet = await firstValueFrom(wallet$);
       const addresses = await firstValueFrom(wallet.addresses$);
-&nbsp;
-      const isScriptWallet = addresses.some(isScriptAddress);
-&nbsp;
-      if (!isScriptWallet) {
-        addresses.sort((a, b) =&gt; {
-          if (isKeyHashAddress(a) &amp;&amp; isKeyHashAddress(b)) {
-            return a.index - b.index;
-          }
-&nbsp;
-<span class="cstat-no" title="statement not covered" >          return 0; </span>// Cant happen, but in any case do not sort.
-        });
-      }
-&nbsp;
       const address = addresses[0].address;
 &nbsp;
       <span class="missing-if-branch" title="if path not taken" >I</span>if (!address) {
@@ -1984,7 +1945,7 @@ export const createWalletApi = (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-09-12T11:38:35.267Z
+                at 2024-09-12T13:10:54.236Z
             </div>
         <script src="../prettify.js"></script>
         <script>
