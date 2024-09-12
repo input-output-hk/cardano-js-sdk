@@ -1,9 +1,10 @@
 import { BaseProjectionEvent } from '@cardano-sdk/projection';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { ChainSyncDataSet, chainSyncData } from '@cardano-sdk/util-dev';
 import { HandleEntity } from '../../../src';
-import { ProjectorContext, createProjectorContext, createStubProjectionSource } from '../util';
+import { ProjectorContext, createProjectorContext, createStubProjectionSource, filterAssets } from '../util';
 import { QueryRunner } from 'typeorm';
-import { createMultiTxProjectionSource, entities, mapAndStore, projectTilFirst } from './util';
+import { createMultiTxProjectionSource, entities, mapAndStore, project$, projectTilFirst } from './util';
 import { firstValueFrom } from 'rxjs';
 import { initializeDataSource } from '../../util';
 
@@ -154,6 +155,19 @@ describe('storeHandles', () => {
     await firstValueFrom(createStubProjectionSource([rollbackSourceEvt]).pipe(mapAndStore(context)));
     const handleInDbAfterTransferRollback = await repository.findOneBy({ handle: transferEvt.handles[0].handle });
     expect(handleInDbAfterTransferRollback?.cardanoAddress).toEqual(originalOwnerAddress);
+  });
+
+  it('upgrading handle to cip68 sets owner address to user nft (222) holder', async () => {
+    const eventsWithCip68Handle = filterAssets(chainSyncData(ChainSyncDataSet.Cip68HandleProblem), [
+      Cardano.AssetId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a000de14073696c766572666f78'),
+      Cardano.AssetId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a000643b073696c766572666f78')
+    ]);
+    const evt = await firstValueFrom(project$(context, eventsWithCip68Handle.cardanoNode)());
+    const silverfoxHandle = evt.handles.find(({ handle }) => handle === 'silverfox');
+    expect(silverfoxHandle).toBeTruthy();
+    expect(silverfoxHandle?.latestOwnerAddress).toBe(
+      'addr1qx9t73ew53xtgt5tlruq8gr3grwca0urr0z9j2hre0gnlj0xe7yuukw0jrjaa2zvxnvga0zvycthvuf4l28yev95trdqq8q6rn'
+    );
   });
 
   describe('multiple transactions in 1 block', () => {

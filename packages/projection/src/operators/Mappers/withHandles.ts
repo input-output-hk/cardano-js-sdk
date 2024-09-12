@@ -160,8 +160,8 @@ export const withHandles =
         const handleMap = evt.block.body.reduce(
           (handles, { body: { outputs, mint } }) => ({
             ...handles,
-            ...getOutputHandles(outputs, policyIds, evt.cip67, logger),
-            ...getBurnedHandles(mint, policyIds, evt.cip67, logger)
+            ...getBurnedHandles(mint, policyIds, evt.cip67, logger),
+            ...getOutputHandles(outputs, policyIds, evt.cip67, logger)
           }),
           {} as Record<string, HandleOwnership>
         );
