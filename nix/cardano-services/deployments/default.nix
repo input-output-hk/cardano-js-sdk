@@ -63,29 +63,24 @@ in
 
       providers = {
         backend = {
-          resources.limits = mkPodResources "512Mi" "1500m";
           resources.requests = mkPodResources "350Mi" "1000m";
         };
 
         stake-pool-provider = {
-          resources.limits = mkPodResources "300Mi" "500m";
-          resources.requests = mkPodResources "150Mi" "100m";
+          resources.requests = mkPodResources "150Mi" "700m";
           env.OVERRIDE_FUZZY_OPTIONS = builtins.toJSON (!(lib.hasPrefix "live" final.namespace));
         };
 
         handle-provider = {
-          resources.limits = mkPodResources "300Mi" "500m";
-          resources.requests = mkPodResources "150Mi" "100m";
+          resources.requests = mkPodResources "150Mi" "700m";
         };
 
         asset-provider = {
-          resources.limits = mkPodResources "1024Mi" "500m";
-          resources.requests = mkPodResources "150Mi" "100m";
+          resources.requests = mkPodResources "512Mi" "1100m";
         };
 
         chain-history-provider = {
-          resources.limits = mkPodResources "300Mi" "1200m";
-          resources.requests = mkPodResources "150Mi" "1000m";
+          resources.requests = mkPodResources "512Mi" "1000m";
         };
       };
 
