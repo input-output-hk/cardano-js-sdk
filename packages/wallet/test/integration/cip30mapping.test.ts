@@ -504,19 +504,19 @@ describe('cip30', () => {
         const addresses = [
           {
             accountIndex: 0,
-            address: address_1_0,
-            index: 1,
+            address: address_0_0,
+            index: 0,
             networkId: Cardano.NetworkId.Testnet,
-            rewardAccount: rewardAccount_1,
+            rewardAccount: rewardAccount_0,
             stakeKeyDerivationPath: { index: 0, role: KeyRole.Stake },
             type: AddressType.External
           },
           {
             accountIndex: 0,
-            address: address_0_0,
-            index: 0,
+            address: address_1_0,
+            index: 1,
             networkId: Cardano.NetworkId.Testnet,
-            rewardAccount: rewardAccount_0,
+            rewardAccount: rewardAccount_1,
             stakeKeyDerivationPath: { index: 0, role: KeyRole.Stake },
             type: AddressType.External
           }
@@ -524,7 +524,7 @@ describe('cip30', () => {
 
         const newApi = cip30.createWalletApi(
           of({
-            addresses$: of(addresses),
+            addresses$: of(addresses), // these are guaranteed to be sorted
             getNextUnusedAddress: () => [addresses[1]]
           } as unknown as ObservableWallet),
           confirmationCallback,
