@@ -1,5 +1,4 @@
 # cSpell:ignore builtins cardanojs concat devs healthchecks hostnames kubeconfig pkgs stakepool stakepoolv
-
 {
   pkgs,
   lib ? pkgs.lib,
@@ -119,7 +118,8 @@ in
         stakepool.databaseName = "stakepool";
         ingress.enabled = true;
         cardano-services = {
-          nodeEnv = if lib.hasPrefix "live" final.namespace
+          nodeEnv =
+            if lib.hasPrefix "live" final.namespace
             then "production"
             else null;
           image = oci.image.name;
@@ -258,7 +258,6 @@ in
           };
         };
 
-
         "dev-sanchonet@us-east-1" = final: {
           name = "${final.namespace}-cardanojs";
           namespace = "dev-sanchonet";
@@ -292,7 +291,6 @@ in
             };
           };
         };
-
 
         "dev-mainnet@us-east-1" = final: {
           namespace = "dev-mainnet";
@@ -438,25 +436,19 @@ in
               enabled = true;
               replicas = 4;
             };
-            stake-pool-provider = {
-              enabled = true;
-            };
+            stake-pool-provider.enabled = true;
             handle-provider.enabled = true;
             chain-history-provider = {
               enabled = true;
               replicas = 2;
             };
-            # asset-provider = {
-            #   enabled = true;
-            # };
+            asset-provider.enabled = true;
           };
 
           projectors = {
             handle.enabled = true;
-            stake-pool = {
-              enabled = true;
-            };
-            # asset.enabled = true;
+            stake-pool.enabled = true;
+            asset.enabled = true;
           };
 
           values = {
@@ -493,23 +485,19 @@ in
               enabled = true;
               replicas = 4;
             };
-            stake-pool-provider = {
-              enabled = true;
-            };
-            handle-provider.enabled = true;
             chain-history-provider = {
               enabled = true;
               replicas = 2;
             };
-            #asset-provider = {
-            #  enabled = true;
-            #};
+            stake-pool-provider.enabled = true;
+            handle-provider.enabled = true;
+            asset-provider.enabled = true;
           };
 
           projectors = {
             handle.enabled = true;
             stake-pool.enabled = true;
-            # asset.enabled = true;
+            asset.enabled = true;
           };
 
           values = {
@@ -569,7 +557,6 @@ in
           };
 
           values = {
-
             cardano-services = {
               ingresOrder = 98;
               additionalRoutes = [
@@ -584,23 +571,6 @@ in
               ];
             };
             backend.allowedOrigins = lib.concatStringsSep "," allowedOrigins;
-            backend.routes = let
-              inherit (oci.meta) versions;
-            in
-              lib.concatLists [
-                (map (v: "/v${v}/health") versions.root)
-                (map (v: "/v${v}/live") versions.root)
-                (map (v: "/v${v}/meta") versions.root)
-                (map (v: "/v${v}/ready") versions.root)
-                (map (v: "/v${v}/asset") versions.assetInfo)
-                (map (v: "/v${v}/chain-history") versions.chainHistory)
-                (map (v: "/v${v}/network-info") versions.networkInfo)
-                (map (v: "/v${v}/rewards") versions.rewards)
-                (map (v: "/v${v}/tx-submit") versions.txSubmit)
-                (map (v: "/v${v}/utxo") versions.utxo)
-                (map (v: "/v${v}/handle") versions.handle)
-              ];
-
             blockfrost-worker.enabled = true;
             pg-boss-worker.enabled = true;
           };
@@ -614,27 +584,17 @@ in
           region = "us-east-2";
 
           providers = {
-            backend = {
-              enabled = true;
-            };
-            stake-pool-provider = {
-              enabled = true;
-            };
-            handle-provider = {
-              enabled = true;
-            };
+            backend.enabled = true;
+            stake-pool-provider.enabled = true;
+            handle-provider.enabled = true;
             chain-history-provider.enabled = true;
-            #asset-provider = {
-            #  enabled = true;
-            #};
+            asset-provider.enabled = true;
           };
 
           projectors = {
             handle.enabled = true;
-            stake-pool = {
-              enabled = true;
-            };
-            # asset.enabled = true;
+            stake-pool.enabled = true;
+            asset.enabled = true;
           };
 
           values = {
@@ -655,27 +615,17 @@ in
           region = "eu-central-1";
 
           providers = {
-            backend = {
-              enabled = true;
-            };
-            stake-pool-provider = {
-              enabled = true;
-            };
-            handle-provider = {
-              enabled = true;
-            };
+            backend.enabled = true;
+            stake-pool-provider.enabled = true;
+            handle-provider. enabled = true;
             chain-history-provider.enabled = true;
-            #asset-provider = {
-            #  enabled = true;
-            #};
+            asset-provider.enabled = true;
           };
 
           projectors = {
             handle.enabled = true;
-            stake-pool = {
-              enabled = true;
-            };
-            # asset.enabled = true;
+            stake-pool.enabled = true;
+            asset.enabled = true;
           };
 
           values = {
@@ -696,27 +646,17 @@ in
           region = "us-east-2";
 
           providers = {
-            backend = {
-              enabled = true;
-            };
-            stake-pool-provider = {
-              enabled = true;
-            };
-            handle-provider = {
-              enabled = true;
-            };
+            backend.enabled = true;
+            stake-pool-provider.enabled = true;
+            handle-provider.enabled = true;
             chain-history-provider.enabled = true;
-            #asset-provider = {
-            #  enabled = true;
-            #};
+            asset-provider.enabled = true;
           };
 
           projectors = {
             handle.enabled = true;
-            stake-pool = {
-              enabled = true;
-            };
-            # asset.enabled = true;
+            stake-pool.enabled = true;
+            asset.enabled = true;
           };
 
           values = {
@@ -737,27 +677,17 @@ in
           region = "eu-central-1";
 
           providers = {
-            backend = {
-              enabled = true;
-            };
-            stake-pool-provider = {
-              enabled = true;
-            };
-            handle-provider = {
-              enabled = true;
-            };
+            backend.enabled = true;
+            stake-pool-provider.enabled = true;
+            handle-provider.enabled = true;
             chain-history-provider.enabled = true;
-            #asset-provider = {
-            #  enabled = true;
-            #};
+            asset-provider.enabled = true;
           };
 
           projectors = {
             handle.enabled = true;
-            stake-pool = {
-              enabled = true;
-            };
-            # asset.enabled = true;
+            stake-pool.enabled = true;
+            asset.enabled = true;
           };
 
           values = {
@@ -777,15 +707,10 @@ in
           region = "us-east-1";
 
           providers = {
-            backend = {
-              enabled = true;
-            };
+            backend.enabled = true;
             handle-provider.enabled = true;
             chain-history-provider.enabled = true;
-            stake-pool-provider = {
-              enabled = true;
-              env.OVERRIDE_FUZZY_OPTIONS = "true";
-            };
+            stake-pool-provider.enabled = true;
           };
 
           projectors = {
@@ -793,7 +718,6 @@ in
             stake-pool.enabled = true;
             wallet-api.enabled = true;
           };
-
 
           values = {
             pg-boss-worker.enabled = true;
@@ -851,24 +775,6 @@ in
             pg-boss-worker.enabled = true;
 
             backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
-            backend.routes = let
-              inherit (oci.meta) versions;
-            in
-              lib.concatLists [
-                (map (v: "/v${v}/health") versions.root)
-                (map (v: "/v${v}/live") versions.root)
-                (map (v: "/v${v}/meta") versions.root)
-                (map (v: "/v${v}/ready") versions.root)
-                (map (v: "/v${v}/asset") versions.assetInfo)
-                (map (v: "/v${v}/chain-history") versions.chainHistory)
-                (map (v: "/v${v}/network-info") versions.networkInfo)
-                (map (v: "/v${v}/rewards") versions.rewards)
-                (map (v: "/v${v}/tx-submit") versions.txSubmit)
-                (map (v: "/v${v}/utxo") versions.utxo)
-                (map (v: "/v${v}/handle") versions.handle)
-                (map (v: "/v${v}/provider-server") versions.stakePool)
-                (map (v: "/v${v}/stake-pool-provider-server") versions.stakePool)
-              ];
 
             cardano-services = {
               ingresOrder = 99;
@@ -961,38 +867,28 @@ in
             };
           };
         };
-
       }
       # Convenient for cases when you need to create multiple temporary deployments with the same configuration
       // (builtins.mapAttrs (_: value: (final:
         value
         // {
-          projectors = {
-            stake-pool.enabled = true;
-          };
-
-          providers = {
-            backend = {
-              enabled = true;
-            };
-          };
+          context = "eks-admin";
+          projectors.asset.enabled = true;
 
           values = {
-            stakepool.databaseName = "stakepoolv3";
             ingress.enabled = false;
-            pg-boss-worker.enabled = true;
           };
         })) {
-        #"live-preview@us-east-2@tmp" = {
+        #"live-mainnet@us-east-2@asset" = {
         #  name = "tmp-cardanojs";
-        #  namespace = "live-preview";
-        #  network = "preview";
+        #  namespace = "live-mainnet";
+        #  network = "mainnet";
         #  region = "us-east-2";
-        #  context = "eks-admin";
         #};
       });
 
     targetGroups = targets: {
+      #ASSET = lib.filterAttrs (name: _: lib.hasSuffix "asset" name) targets;
       DEV = lib.filterAttrs (name: _: lib.hasPrefix "dev-" name) targets;
       LIVE = lib.filterAttrs (name: _: lib.hasPrefix "live-" name) targets;
       OPS = lib.filterAttrs (name: _: lib.hasPrefix "ops-" name) targets;

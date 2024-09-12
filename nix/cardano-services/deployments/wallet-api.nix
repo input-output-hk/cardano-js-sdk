@@ -6,7 +6,6 @@
   chart,
   ...
 }: {
-
   projectors.wallet-api = {
     inherit (values.cardano-services) image;
     livenessProbe = {

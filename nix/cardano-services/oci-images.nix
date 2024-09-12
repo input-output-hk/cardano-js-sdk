@@ -3,8 +3,8 @@ let
 
   # TODO: express this as OCI labels (what they are for)
   buildInfo = builtins.toJSON {
-    inherit (self) lastModifiedDate ;
-    rev = self.dirtyRev or self.rev ;
+    inherit (self) lastModifiedDate;
+    rev = self.dirtyRev or self.rev;
     shortRev = self.shortRev or self.dirtyShortRev;
   };
 
