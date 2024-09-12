@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.44.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.2...@cardano-sdk/wallet@0.44.3) (2024-09-12)
+
+### Bug Fixes
+
+* **wallet:** remove redundant sort on getChangeAddres ([c5b430a](https://github.com/input-output-hk/cardano-js-sdk/commit/c5b430abcea8e28758e0c53fb570724ce195a421))
+
 ## [0.44.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.1...@cardano-sdk/wallet@0.44.2) (2024-09-12)
 
 ### Features
