@@ -175,7 +175,7 @@ export class TypeormAssetProvider extends TypeormProvider implements AssetProvid
   ): Promise<Map<Cardano.AssetId, Asset.NftMetadata>> {
     const nftMetadataRepository = dataSource.getRepository(NftMetadataEntity);
     const assets = (await nftMetadataRepository.find({
-      where: { userTokenAsset: { id: In(assetIds) } }
+      where: { userTokenAssetId: In(assetIds) }
     })) as Required<NftMetadataEntity>[];
 
     return new Map(

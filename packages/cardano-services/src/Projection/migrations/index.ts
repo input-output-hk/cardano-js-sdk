@@ -11,6 +11,7 @@ import { HandleDefaultMigrations1693830294136 } from './1693830294136-handle-def
 import { HandleMetadataTableMigrations1693490983715 } from './1693490983715-handle-metadata-table';
 import { HandleParentMigration1700556589063 } from './1700556589063-handle-parent';
 import { HandleTableMigration1686138943349 } from './1686138943349-handle-table';
+import { NftMetadataIndexMigration1726479765002 } from './1726479765002-nft-metadata-index';
 import { NftMetadataTableMigration1690269355640 } from './1690269355640-nft-metadata-table';
 import { OutputTableMigration1682519108367 } from './1682519108367-output-table';
 import { PoolDelistedTableMigration1695899010515 } from './1695899010515-pool-delisted-table';
@@ -55,5 +56,6 @@ export const migrations: ProjectionMigration[] = [
   PoolRewardsTableMigrations1698175956871,
   HandleParentMigration1700556589063,
   RewardsPledgeNumericMigration1715157190230,
-  GovernanceActionMigration1724168174191
+  GovernanceActionMigration1724168174191,
+  NftMetadataIndexMigration1726479765002
 ];

@@ -1,7 +1,7 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
 import { AssetEntity } from './Asset.entity';
 import { BlockEntity } from './Block.entity';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { OnDeleteCascadeRelationOptions, OnDeleteSetNullRelationOptions } from './util';
 import { sanitizeNullCharacters, serializableObj } from './transformers';
 
@@ -34,6 +34,7 @@ export class NftMetadataEntity {
   parentAsset?: AssetEntity;
   @ManyToOne(() => AssetEntity, OnDeleteSetNullRelationOptions)
   userTokenAsset?: AssetEntity | null;
+  @Index()
   @Column('varchar', { nullable: true })
   userTokenAssetId?: Cardano.AssetId | null;
   @ManyToOne(() => BlockEntity, OnDeleteCascadeRelationOptions)
