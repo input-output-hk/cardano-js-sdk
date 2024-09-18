@@ -1,4 +1,4 @@
-// cSpell:ignore descr
+// cSpell:ignore descr timelock
 
 import * as Queries from './queries';
 import {
@@ -60,6 +60,7 @@ import orderBy from 'lodash/orderBy.js';
 
 const {
   CredentialType,
+  FractionUtils,
   GovernanceActionType,
   NetworkId: { Mainnet, Testnet },
   RewardAccount,
@@ -77,13 +78,6 @@ const mapWithdrawals: (source: [{ credential: DbSyncCredential; network: string 
   rewardAccount: Cardano.RewardAccount;
   coin: Cardano.Lovelace;
 } = ([{ credential, network }, coin]) => ({
-  // Due to https://github.com/IntersectMBO/cardano-db-sync/issues/1614
-  // this will be source of NOT CORRECT AMOUNT for amounts greater than
-  // Number.MAX_SAFE_INTEGER (most likely, never).
-  // In case such amount will be present in some networks before db-sync solve the
-  // issue, we need to query the amount from treasury_withdrawal table.
-  // In case the issue is solved before we need to touch this again, the next line
-  // will work as well and we just need to remove this comment.
   coin: BigInt(coin),
   rewardAccount: RewardAccount.fromCredential(
     credentialFromDbSync(credential),
@@ -91,12 +85,8 @@ const mapWithdrawals: (source: [{ credential: DbSyncCredential; network: string 
   )
 });
 
-// eslint-disable-next-line sonarjs/cognitive-complexity, complexity
-const getGovernanceAction = ({
-  denominator,
-  description,
-  numerator
-}: ProposalProcedureModel): Cardano.GovernanceAction => {
+// eslint-disable-next-line complexity, @typescript-eslint/no-explicit-any
+const getGovernanceAction = (description: any): Cardano.GovernanceAction => {
   const { contents, tag } = description;
   const governanceActionId =
     contents && contents[0] ? { actionIndex: contents[0].govActionIx, id: contents[0].txId } : null;
@@ -115,10 +105,7 @@ const getGovernanceAction = ({
     case 'InfoAction':
       return { __typename: GovernanceActionType.info_action };
 
-    case 'NewCommittee':
-      // LW-9675
-      if (typeof contents[3] !== 'number') throw new Error('New db-sync version detected: ref LW-9675');
-
+    case 'UpdateCommittee':
       return {
         __typename: GovernanceActionType.update_committee,
         governanceActionId,
@@ -128,11 +115,8 @@ const getGovernanceAction = ({
             epoch: value as Cardano.EpochNo
           }))
         ),
-        membersToBeRemoved: new Set((contents[1] as DbSyncCredential[]).map(credentialFromDbSync)),
-        newQuorumThreshold: {
-          denominator: Number.parseInt(denominator!, 10),
-          numerator: Number.parseInt(numerator!, 10)
-        }
+        membersToBeRemoved: new Set(contents[1].map(credentialFromDbSync)),
+        newQuorumThreshold: typeof contents[3] === 'number' ? FractionUtils.toFraction(contents[3]) : contents[3]
       };
 
     case 'NewConstitution':
@@ -385,7 +369,7 @@ export class ChainHistoryBuilder {
     const result = new Map<Cardano.TransactionId, Cardano.ProposalProcedure[]>();
 
     for (const row of rows) {
-      const { data_hash, deposit, tx_id, url, view } = row;
+      const { data_hash, deposit, description, tx_id, url, view } = row;
       const txId = tx_id.toString('hex') as Cardano.TransactionId;
 
       const actions = (() => {
@@ -399,7 +383,7 @@ export class ChainHistoryBuilder {
       actions.push({
         anchor: mapAnchor(url, data_hash.toString('hex'))!,
         deposit: BigInt(deposit),
-        governanceAction: getGovernanceAction(row),
+        governanceAction: getGovernanceAction(description),
         rewardAccount: Cardano.RewardAccount(view)
       });
     }

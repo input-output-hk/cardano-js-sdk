@@ -1,3 +1,5 @@
+// cSpell:ignore serialised
+
 export const DB_MAX_SAFE_INTEGER = 2_147_483_647;
 
 const selectTxInput = (collateral?: boolean) => `
@@ -224,14 +226,11 @@ export const findProposalProceduresByTxIds = `
 		ga.description,
 		va.url,
 		va.data_hash,
-		sa.view,
-		quorum_numerator AS numerator,
-		quorum_denominator AS denominator
+		sa.view
 	FROM tx
 	JOIN gov_action_proposal AS ga ON tx.id = ga.tx_id
 	JOIN voting_anchor AS va ON voting_anchor_id = va.id
 	JOIN stake_address AS sa ON ga.return_address = sa.id
-	LEFT JOIN new_committee AS nc ON gov_action_proposal_id = ga.id
 	WHERE tx.id = ANY($1)
 	ORDER BY ga.index`;
 

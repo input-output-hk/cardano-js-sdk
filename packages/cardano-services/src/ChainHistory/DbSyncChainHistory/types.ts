@@ -139,9 +139,6 @@ export interface ProposalProcedureModel {
   tx_id: Buffer;
   url: string;
   view: string;
-  // LW-9675
-  numerator?: string;
-  denominator?: string;
 }
 
 export interface CertificateModel {
