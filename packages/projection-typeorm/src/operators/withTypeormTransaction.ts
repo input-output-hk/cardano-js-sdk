@@ -11,9 +11,11 @@ import {
 import { QueryRunner } from 'typeorm';
 import { TypeormConnection } from '../createDataSource';
 import omit from 'lodash/omit.js';
+import type { IsolationLevel } from 'typeorm/driver/types/IsolationLevel';
 
 export interface WithTypeormTransactionDependencies {
   connection$: Observable<TypeormConnection>;
+  isolationLevel?: IsolationLevel;
 }
 
 export interface WithTypeormContext {
@@ -37,7 +39,8 @@ export function withTypeormTransaction<Props>(
 
 /** Start a PostgreSQL transaction for each event. {pgBoss: true} also adds {@link WithPgBoss} context. */
 export function withTypeormTransaction<Props>({
-  connection$
+  connection$,
+  isolationLevel: transactionType
 }: WithTypeormTransactionDependencies & { pgBoss?: boolean }): UnifiedExtChainSyncOperator<
   Props,
   Props & WithTypeormContext & Partial<WithPgBoss>
@@ -53,7 +56,7 @@ export function withTypeormTransaction<Props>({
           // - might be possible to optimize by setting a different isolation level,
           //   but we're using the safest one until there's a need to optimize
           //   https://www.postgresql.org/docs/current/transaction-iso.html
-          queryRunner.startTransaction('SERIALIZABLE').then(() => ({ transactionCommitted$: new Subject<void>() }))
+          queryRunner.startTransaction(transactionType).then(() => ({ transactionCommitted$: new Subject<void>() }))
         )
       )
     );

@@ -155,10 +155,13 @@ export const createTypeormProjection = ({
                 shareRetryBackoff(
                   (evt$) =>
                     evt$.pipe(
-                      withTypeormTransaction({ connection$: connect() }),
+                      withOperatorDuration(
+                        'withTypeormTransaction',
+                        withTypeormTransaction({ connection$: connect() })
+                      ),
                       applyStores(stores, { operatorNames: __debug.stores }),
-                      buffer.storeBlockData(),
-                      typeormTransactionCommit()
+                      withOperatorDuration('storeBlockData', buffer.storeBlockData()),
+                      withOperatorDuration('typeormTransactionCommit', typeormTransactionCommit())
                     ),
                   { shouldRetry: isRecoverableTypeormError }
                 )
