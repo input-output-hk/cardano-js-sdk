@@ -161,11 +161,19 @@ export const options = {
     }
   },
   thresholds: {
+    http_req_failed: [
+      {
+        // Stop the test if more than 10% of requests fail to avoid using VUh for nothing
+        abortOnFail: true,
+        // Wait for 2 minutes to get more data. If the error rate is still high, the test will fail
+        delayAbortEval: '2m',
+        threshold: 'rate<0.1'
+      }
+    ],
     // All wallets should have syncd
     // Use https://k6.io/docs/using-k6/thresholds/ to set more thresholds. E.g.:
     // wallet_sync: ['p(95)<5000'], // 95% of wallets should sync in under 5 seconds
     wallet_sync: [{ delayAbortEval: '5s', threshold: 'p(95) < 30000' }],
-
     wallet_sync_count: [`count >= ${MAX_VU}`] // We get a nice graph if we enable thresholds. See this stat on a graph
   }
 };
