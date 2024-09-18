@@ -9,7 +9,7 @@ import { TokensEntity } from './Tokens.entity';
 export class OutputEntity {
   @PrimaryGeneratedColumn()
   id?: number;
-  // @Index()
+  @Index()
   @Column('varchar')
   address?: Cardano.PaymentAddress;
   @Index()
