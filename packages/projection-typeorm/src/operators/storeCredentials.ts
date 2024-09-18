@@ -33,14 +33,16 @@ const addInputCredentials = async (
       }
     }
 
-    const outputEntities = await utxoRepository.find({
-      select: { address: true, outputIndex: true, txId: true },
-      where: txInLookups
-    });
+    if (txInLookups.length > 0) {
+      const outputEntities = await utxoRepository.find({
+        select: { address: true, outputIndex: true, txId: true },
+        where: txInLookups
+      });
 
-    for (const hydratedTxIn of outputEntities) {
-      if (hydratedTxIn.address) {
-        manager.addCredentialFromAddress(txHash, Mappers.credentialsFromAddress(hydratedTxIn.address!));
+      for (const hydratedTxIn of outputEntities) {
+        if (hydratedTxIn.address) {
+          manager.addCredentialFromAddress(txHash, Mappers.credentialsFromAddress(hydratedTxIn.address!));
+        }
       }
     }
   }
