@@ -351,7 +351,7 @@ export const mapCertificate = (
   if (isResignCommitteeColdCertModel(certModel))
     return {
       __typename: Cardano.CertificateType.ResignCommitteeCold,
-      anchor: mapAnchor(certModel.url, certModel.data_hash),
+      anchor: mapAnchor(certModel.url, certModel.data_hash.toString('hex')),
       cert_index: certModel.cert_index,
       coldCredential: {
         hash: certModel.cold_key.toString('hex') as unknown as Crypto.Hash28ByteBase16,

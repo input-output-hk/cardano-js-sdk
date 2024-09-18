@@ -234,7 +234,7 @@ export interface ResignCommitteeColdCertModel extends CertificateModel {
   cold_key: Buffer;
   cold_key_has_script: boolean;
   url: string;
-  data_hash: string;
+  data_hash: Buffer;
 }
 
 export interface TxIdModel {
