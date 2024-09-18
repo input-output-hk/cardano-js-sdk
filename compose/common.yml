@@ -123,7 +123,7 @@ services:
     depends_on:
       ogmios:
         condition: service_healthy
-    image: ghcr.io/intersectmbo/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-13.3.0.0}
+    image: ghcr.io/intersectmbo/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-13.5.0.1}
     restart: on-failure
     stop_signal: SIGINT
     volumes:
@@ -134,7 +134,7 @@ services:
     <<:
       - *logging
       - *with-postgres
-    image: ghcr.io/intersectmbo/cardano-smash-server:${CARDANO_DB_SYNC_VERSION:-13.3.0.0}
+    image: ghcr.io/intersectmbo/cardano-smash-server:${CARDANO_DB_SYNC_VERSION:-13.5.0.1}
     command: ['--config', '/config/cardano-db-sync/config.json']
     environment:
       POSTGRES_HOST: postgres
@@ -155,7 +155,7 @@ services:
 
   cardano-node:
     <<: *logging
-    image: ghcr.io/intersectmbo/cardano-node:${CARDANO_NODE_VERSION:-9.1.0}
+    image: ghcr.io/intersectmbo/cardano-node:${CARDANO_NODE_VERSION:-9.1.1}
     command:
       [
         'run',
@@ -201,7 +201,7 @@ services:
 
   cardano-submit-api:
     command: --config /config/cardano-submit-api/config.json --listen-address 0.0.0.0 --socket-path /ipc/node.socket $SUBMIT_API_ARGS
-    image: ghcr.io/intersectmbo/cardano-submit-api:${CARDANO_NODE_VERSION:-9.1.0}
+    image: ghcr.io/intersectmbo/cardano-submit-api:${CARDANO_NODE_VERSION:-9.1.1}
     ports:
       - 8090:8090
     restart: on-failure
