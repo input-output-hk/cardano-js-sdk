@@ -293,7 +293,7 @@ const storeInterDependencies: Partial<Record<StoreName, StoreName[]>> = {
   storeStakePoolRewardsJob: ['storeBlock'],
   storeStakePools: ['storeBlock'],
   storeTransactions: ['storeCredentials', 'storeBlock', 'storeUtxo'],
-  storeUtxo: ['storeBlock', 'storeAssets']
+  storeUtxo: ['storeBlock']
 };
 
 const projectionStoreDependencies: Record<ProjectionName, StoreName[]> = {
@@ -308,7 +308,7 @@ const projectionStoreDependencies: Record<ProjectionName, StoreName[]> = {
   'stake-pool-metrics-job': ['storePoolMetricsUpdateJob'],
   'stake-pool-rewards-job': ['storeStakePoolRewardsJob'],
   transactions: ['storeCredentials', 'storeTransactions'],
-  utxo: ['storeUtxo']
+  utxo: ['storeUtxo', 'storeAssets']
 };
 
 const registerMapper = (
