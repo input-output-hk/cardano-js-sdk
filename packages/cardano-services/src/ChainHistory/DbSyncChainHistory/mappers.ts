@@ -142,10 +142,10 @@ const stubRedeemerData = Buffer.from('not implemented');
 const redeemerPurposeMap: Record<RedeemerModel['purpose'], Cardano.RedeemerPurpose> = {
   cert: Cardano.RedeemerPurpose.certificate,
   mint: Cardano.RedeemerPurpose.mint,
-  proposing: Cardano.RedeemerPurpose.propose,
+  propose: Cardano.RedeemerPurpose.propose,
   reward: Cardano.RedeemerPurpose.withdrawal,
   spend: Cardano.RedeemerPurpose.spend,
-  voting: Cardano.RedeemerPurpose.vote
+  vote: Cardano.RedeemerPurpose.vote
 };
 
 const mapRedeemerPurpose = (purpose: RedeemerModel['purpose']): Cardano.RedeemerPurpose =>

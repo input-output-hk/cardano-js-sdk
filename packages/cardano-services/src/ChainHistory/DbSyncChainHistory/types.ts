@@ -1,3 +1,5 @@
+// cSpell:ignore serialised timelock
+
 import { Cardano } from '@cardano-sdk/core';
 import { CostModelsParamModel } from '../../NetworkInfo/DbSyncNetworkInfoProvider/types';
 
@@ -105,7 +107,7 @@ export interface WithdrawalModel {
 
 export interface RedeemerModel {
   index: number;
-  purpose: 'cert' | 'mint' | 'spend' | 'reward' | 'voting' | 'proposing';
+  purpose: 'cert' | 'mint' | 'spend' | 'reward' | 'vote' | 'propose';
   script_hash: Buffer;
   unit_mem: string;
   unit_steps: string;
