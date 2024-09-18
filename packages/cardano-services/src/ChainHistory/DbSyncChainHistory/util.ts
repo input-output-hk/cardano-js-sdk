@@ -86,8 +86,8 @@ export const applyPagination = (ids: Cardano.TransactionId[], { startAt, limit }
  * certificates_.
  *
  * Example: given an array of `reg_cert` and an array of `vote_deleg_cert`, the result is an array of:
- * - all input `reg_cert` which can't be neither `vote_reg_deleg_cert` nor `stake_vote_reg_deleg_cert,
- * - all input `vote_deleg_cert` which can't be neither `vote_reg_deleg_cert` nor `stake_vote_reg_deleg_cert,
+ * - all input `reg_cert` which can be neither `vote_reg_deleg_cert` nor `stake_vote_reg_deleg_cert`,
+ * - all input `vote_deleg_cert` which can be neither `vote_reg_deleg_cert` nor `stake_vote_reg_deleg_cert`,
  * - the array of `vote_reg_deleg_cert` (it includes also the partials `stake_vote_reg_deleg_cert`)
  *
  * @param certs1 the first certificates array
