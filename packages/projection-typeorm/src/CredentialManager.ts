@@ -11,7 +11,7 @@ export interface Credential {
 }
 
 type AddressPart = 'payment' | 'stake';
-const credentialTypeMap: { [key: number]: { payment: CredentialType | null; stake: CredentialType } } = {
+const credentialTypeMap: { [key: number]: { payment: CredentialType | null; stake: CredentialType | null } } = {
   [Cardano.AddressType.BasePaymentKeyStakeKey]: { payment: CredentialType.PaymentKey, stake: CredentialType.StakeKey },
   [Cardano.AddressType.EnterpriseKey]: { payment: CredentialType.PaymentKey, stake: CredentialType.StakeKey },
   [Cardano.AddressType.BasePaymentKeyStakeScript]: {
@@ -28,22 +28,23 @@ const credentialTypeMap: { [key: number]: { payment: CredentialType | null; stak
   },
   [Cardano.AddressType.EnterpriseScript]: { payment: CredentialType.PaymentScript, stake: CredentialType.StakeScript },
   [Cardano.AddressType.RewardKey]: { payment: null, stake: CredentialType.StakeKey },
-  [Cardano.AddressType.RewardScript]: { payment: null, stake: CredentialType.StakeScript }
+  [Cardano.AddressType.RewardScript]: { payment: null, stake: CredentialType.StakeScript },
+  [Cardano.AddressType.Byron]: { payment: CredentialType.PaymentKey, stake: null }
 };
 
-const credentialsByTxInCache = new LRUCache<string, Credential[]>({
-  max: 1_000_000
-});
-
 export class CredentialManager {
+  static credentialsByTxInCache = new LRUCache<string, Credential[]>({
+    max: 50_000
+  });
+
   txToCredentials = new Map<Cardano.TransactionId, CredentialEntity[]>();
 
   getCachedCredential(txIn: Cardano.TxIn): Credential[] {
-    return credentialsByTxInCache.get(`${txIn.txId}#${txIn.index}`) ?? [];
+    return CredentialManager.credentialsByTxInCache.get(`${txIn.txId}#${txIn.index}`) ?? [];
   }
 
   deleteCachedCredential(txIn: Cardano.TxIn) {
-    credentialsByTxInCache.delete(`${txIn.txId}#${txIn.index}`);
+    CredentialManager.credentialsByTxInCache.delete(`${txIn.txId}#${txIn.index}`);
   }
 
   addCredential(txId: Cardano.TransactionId, { hash: credentialHash, type: credentialType }: Credential) {
@@ -68,8 +69,8 @@ export class CredentialManager {
     if (paymentCredentialHash && paymentCredentialType) {
       this.addCredential(txId, { hash: paymentCredentialHash, type: paymentCredentialType });
       if (outputIndex) {
-        credentialsByTxInCache.set(cacheKey, [
-          ...(credentialsByTxInCache.get(cacheKey) || []),
+        CredentialManager.credentialsByTxInCache.set(cacheKey, [
+          ...(CredentialManager.credentialsByTxInCache.get(cacheKey) || []),
           { hash: paymentCredentialHash, type: paymentCredentialType }
         ]);
       }
@@ -82,8 +83,8 @@ export class CredentialManager {
         this.addCredential(txId, { hash: stakeCredential, type: stakeCredentialType });
 
         if (outputIndex) {
-          credentialsByTxInCache.set(cacheKey, [
-            ...(credentialsByTxInCache.get(cacheKey) || []),
+          CredentialManager.credentialsByTxInCache.set(cacheKey, [
+            ...(CredentialManager.credentialsByTxInCache.get(cacheKey) || []),
             { hash: stakeCredential, type: stakeCredentialType }
           ]);
         }
