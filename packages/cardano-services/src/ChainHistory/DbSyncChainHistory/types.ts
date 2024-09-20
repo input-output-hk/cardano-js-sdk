@@ -1,3 +1,5 @@
+// cSpell:ignore serialised timelock
+
 import { Cardano } from '@cardano-sdk/core';
 import { CostModelsParamModel } from '../../NetworkInfo/DbSyncNetworkInfoProvider/types';
 
@@ -105,7 +107,7 @@ export interface WithdrawalModel {
 
 export interface RedeemerModel {
   index: number;
-  purpose: 'cert' | 'mint' | 'spend' | 'reward' | 'voting' | 'proposing';
+  purpose: 'cert' | 'mint' | 'spend' | 'reward' | 'vote' | 'propose';
   script_hash: Buffer;
   unit_mem: string;
   unit_steps: string;
@@ -139,9 +141,6 @@ export interface ProposalProcedureModel {
   tx_id: Buffer;
   url: string;
   view: string;
-  // LW-9675
-  numerator?: string;
-  denominator?: string;
 }
 
 export interface CertificateModel {
@@ -235,7 +234,7 @@ export interface ResignCommitteeColdCertModel extends CertificateModel {
   cold_key: Buffer;
   cold_key_has_script: boolean;
   url: string;
-  data_hash: string;
+  data_hash: Buffer;
 }
 
 export interface TxIdModel {

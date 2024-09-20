@@ -467,8 +467,8 @@ describe('chain history mappers', () => {
       ['mint' as const, Cardano.RedeemerPurpose.mint],
       ['cert' as const, Cardano.RedeemerPurpose.certificate],
       ['reward' as const, Cardano.RedeemerPurpose.withdrawal],
-      ['voting' as const, Cardano.RedeemerPurpose.vote],
-      ['proposing' as const, Cardano.RedeemerPurpose.propose]
+      ['vote' as const, Cardano.RedeemerPurpose.vote],
+      ['propose' as const, Cardano.RedeemerPurpose.propose]
     ])("maps '%p' redeemer", (dbSyncRedeemerPurpose, sdkRedeemerPurpose) => {
       const result = mappers.mapRedeemer({ ...redeemerModel, purpose: dbSyncRedeemerPurpose });
       expect(result).toEqual<Cardano.Redeemer>({
