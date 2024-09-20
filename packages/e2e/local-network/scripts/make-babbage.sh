@@ -303,7 +303,7 @@ for NODE in ${SP_NODES}; do
   echo "${ROOT}/${NODE}.sh"
 done
 
-echo "Update start time in genesis files"
+echo "Update start time in genesis files with ${timeUnix}"
 sed_i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" ${ROOT}/genesis/byron/genesis.json
 sed_i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/" ${ROOT}/genesis/shelley/genesis.json
 
@@ -358,6 +358,8 @@ cp "${ROOT}"/genesis/shelley/genesis.conway.json ./config/network/cardano-node/g
 cp "${ROOT}"/genesis/shelley/genesis.conway.json ./config/network/genesis/conway.json
 
 mkdir -p "${ROOT}/run"
+
+echo "${timeUnix}" > "${ROOT}/run/system_start"
 
 echo "#!/usr/bin/env bash" >"${ROOT}/run/all.sh"
 echo "" >>"${ROOT}/run/all.sh"

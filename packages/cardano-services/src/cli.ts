@@ -379,6 +379,12 @@ addOptions(withOgmiosOptions(withHandlePolicyIdsOptions(providerServerWithCommon
     'USE_WEB_SOCKET_API',
     (val) => stringOptionToBoolean(val, Programs.ProviderServer, ProviderServerOptionDescriptions.UseWebSocketApi)
   ),
+  newOption(
+    '--blockfrost-custom-network-url <blockfrostCustomNetworkUrl>',
+    ProviderServerOptionDescriptions.BlockfrostCustomNetworkUrl,
+    'BLOCKFROST_CUSTOM_NETWORK_URL',
+    urlValidator(ProviderServerOptionDescriptions.BlockfrostCustomNetworkUrl, true)
+  ),
   ...providerSelectionOptions
 ]).action(async (serviceNames: ServiceNames[], args: ProviderServerArgs) =>
   runServer('Provider server', { args, serviceNames }, () =>

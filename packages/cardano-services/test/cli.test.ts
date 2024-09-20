@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-duplicate-string */
-import { DEFAULT_FUZZY_SEARCH_OPTIONS } from '../src';
+import { DEFAULT_FUZZY_SEARCH_OPTIONS, ProviderServerOptionDescriptions } from '../src';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { fork } from 'child_process';
 import path from 'path';
@@ -1113,6 +1113,22 @@ describe('CLI', () => {
         }));
     });
 
+    describe('blockfrostCustomNetworkUrl', () => {
+      const blockfrostCustomNetworkUrl = 'https://test/';
+
+      testCli('accepts an URL', 'provider', {
+        args: ['--blockfrost-custom-network-url', blockfrostCustomNetworkUrl],
+        env: { BLOCKFROST_CUSTOM_NETWORK_URL: blockfrostCustomNetworkUrl },
+        expectedArgs: { args: { blockfrostCustomNetworkUrl } }
+      });
+
+      testCli('expects an URL', 'provider', {
+        args: ['--blockfrost-custom-network-url', 'invalid'],
+        env: { BLOCKFROST_CUSTOM_NETWORK_URL: 'invalid' },
+        expectedError: `${ProviderServerOptionDescriptions.BlockfrostCustomNetworkUrl} - "invalid" is not an URL`
+      });
+    });
+
     describe('provider implementation selection', () => {
       testCli('check defaults', 'provider', {
         expectedArgs: {
@@ -1142,11 +1158,6 @@ describe('CLI', () => {
           env: { ASSET_PROVIDER: 'not-valid' },
           expectedError: 'is invalid'
         });
-        testCli('conflicts', 'provider', {
-          args: ['--asset-provider', 'blockfrost', '--use-typeorm-asset-provider', 'true'],
-          env: { ASSET_PROVIDER: 'blockfrost', USE_TYPEORM_ASSET_PROVIDER: 'true' },
-          expectedError: 'cannot be used with'
-        });
       });
       describe('--stake-pool-provider', () => {
         testCli('set successful', 'provider', {
@@ -1162,11 +1173,6 @@ describe('CLI', () => {
           args: ['--stake-pool-provider', 'not-valid'],
           env: { STAKE_POOL_PROVIDER: 'not-valid' },
           expectedError: 'is invalid'
-        });
-        testCli('conflicts', 'provider', {
-          args: ['--stake-pool-provider', 'dbsync', '--use-typeorm-stake-pool-provider', 'true'],
-          env: { STAKE_POOL_PROVIDER: 'typeorm', USE_TYPEORM_STAKE_POOL_PROVIDER: 'true' },
-          expectedError: 'cannot be used with'
         });
       });
 

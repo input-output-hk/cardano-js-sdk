@@ -26,6 +26,7 @@ trap 'kill 0' INT
 
 echo "Run"
 ./scripts/make-babbage.sh
+./scripts/prepare_blockfrost_ryo.sh
 ./network-files/run/all.sh &
 
 if [ -d /sdk-ipc ] ; then cp -a config/network /sdk-ipc/config ; fi

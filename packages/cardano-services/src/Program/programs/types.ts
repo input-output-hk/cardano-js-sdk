@@ -63,7 +63,8 @@ export enum ProviderServerOptionDescriptions {
   UseBlockfrost = 'Enables Blockfrost cached data DB',
   UseSubmitApi = 'Use cardano-submit-api provider',
   UseTypeormAssetProvider = 'Use the TypeORM Asset Provider (default is db-sync)',
-  UseWebSocketApi = 'Use WebSocket API'
+  UseWebSocketApi = 'Use WebSocket API',
+  BlockfrostCustomNetworkUrl = 'URL for custom hosted blockfrost-ryo'
 }
 
 export type ProviderServerArgs = CommonProgramOptions &
