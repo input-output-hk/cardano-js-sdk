@@ -77,6 +77,7 @@ const txOutput: TxOutput = {
 
 const txOutModel: TxOutputModel = {
   address,
+  bytes: null,
   coin_value: '20000000',
   datum: Buffer.from(hash32ByteBase16, 'hex'),
   id: '1',

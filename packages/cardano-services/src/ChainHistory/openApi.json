@@ -452,14 +452,7 @@
             "$ref": "#/components/schemas/Value"
           },
           "datum": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/Undefined"
-              },
-              {
-                "type": "string"
-              }
-            ]
+            "type": "object"
           }
         }
       },

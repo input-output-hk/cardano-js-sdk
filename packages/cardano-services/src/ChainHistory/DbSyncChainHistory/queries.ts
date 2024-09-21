@@ -25,8 +25,10 @@ const selectTxOutput = (collateral = false) => `
 		tx_out.value AS coin_value,
 		tx_out.data_hash AS datum,
 		tx_out.reference_script_id as reference_script_id,
+		datum.bytes,
 		tx.hash AS tx_id
 	FROM ${collateral ? 'collateral_tx_out' : 'tx_out'} AS tx_out 
+	LEFT JOIN datum ON datum.id = inline_datum_id
 	JOIN tx ON tx_out.tx_id = tx.id`;
 
 export const findTxInputsByIds = `
@@ -125,9 +127,10 @@ export const findMultiAssetByTxOut = `
 
 export const findReferenceScriptsById = `
 	SELECT 
-		script.type AS type,
-		script.bytes AS bytes,
-		script.serialised_size AS serialized_size
+		type AS type,
+		bytes AS bytes,
+		serialised_size AS serialized_size,
+		json
 	FROM script AS script
 	WHERE id = ANY($1)`;
 

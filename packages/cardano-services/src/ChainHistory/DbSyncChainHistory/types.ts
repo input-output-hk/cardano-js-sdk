@@ -72,6 +72,7 @@ export interface TxOutputModel {
   id: string;
   index: number;
   reference_script_id: number | null;
+  bytes: Buffer | null;
   tx_id: Buffer;
 }
 
@@ -97,6 +98,8 @@ export interface ScriptModel {
   bytes: Buffer;
   hash: Buffer;
   serialised_size: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  json: any;
 }
 
 export interface WithdrawalModel {

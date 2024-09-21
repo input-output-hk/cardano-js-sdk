@@ -35,7 +35,7 @@ import {
   WithCertType,
   WithdrawalModel
 } from './types';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, jsonToNativeScript } from '@cardano-sdk/core';
 import { DB_MAX_SAFE_INTEGER, findTxsByAddresses } from './queries';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { Logger } from 'ts-log';
@@ -226,11 +226,12 @@ export class ChainHistoryBuilder {
           values: [[model.reference_script_id]]
         });
 
-        if (result.rows.length === 0) continue;
-        if (result.rows[0].type === 'timelock') continue; // Shouldn't happen.
+        if (result.rowCount === 0) continue;
+
+        const [row] = result.rows;
 
         // There can only be one refScript per output.
-        txScriptMap.set(model.id, mapPlutusScript(result.rows[0]));
+        txScriptMap.set(model.id, row.bytes ? mapPlutusScript(row) : jsonToNativeScript(row.json));
       }
     }
 
