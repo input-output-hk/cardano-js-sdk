@@ -13,6 +13,7 @@ export class TransactionEntity {
   @Column('varchar', { nullable: false })
   cbor?: Serialization.TxCBOR;
 
+  @Index()
   @ManyToOne(() => BlockEntity, OnDeleteCascadeRelationOptions)
   @JoinColumn({ name: 'block_id' })
   block?: BlockEntity;
