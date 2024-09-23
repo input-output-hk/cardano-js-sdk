@@ -317,7 +317,6 @@ in
 
           values = {
             ws-server.enabled = true;
-            backend.hostnames = ["${final.namespace}.${final.region}.${baseUrl}"];
             cardano-services = {
               ingresOrder = 99;
               additionalRoutes = [
