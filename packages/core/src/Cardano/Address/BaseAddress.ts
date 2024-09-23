@@ -1,7 +1,6 @@
 /* eslint-disable no-bitwise */
 import { Address, AddressProps, AddressType, Credential, CredentialType } from './Address';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { InvalidArgumentError } from '@cardano-sdk/util';
 import { NetworkId } from '../ChainId';
 
 /**
@@ -121,7 +120,7 @@ export class BaseAddress {
    * @param data The serialized address data.
    */
   static unpackParts(type: number, data: Uint8Array): Address {
-    if (data.length !== 57) throw new InvalidArgumentError('data', 'Base address data length should be 57 bytes long.');
+    // if (data.length !== 57) throw new InvalidArgumentError('data', 'Base address data length should be 57 bytes long.');
 
     const network = data[0] & 0b0000_1111;
     const paymentCredential = Hash28ByteBase16(Buffer.from(data.slice(1, 29)).toString('hex'));

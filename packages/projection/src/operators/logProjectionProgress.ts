@@ -1,7 +1,8 @@
-import { Cardano, ChainSyncEventType, TipOrOrigin } from '@cardano-sdk/core';
+import { Cardano, ChainSyncEventType, Milliseconds, TipOrOrigin } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { Observable, defer, finalize, tap } from 'rxjs';
 import { UnifiedExtChainSyncEvent } from '../types';
+import { WithOperatorDuration } from './withOperatorDuration';
 import { contextLogger } from '@cardano-sdk/util';
 import { pointDescription } from '../util';
 
@@ -26,8 +27,9 @@ const logSyncLine = (params: {
   numEvt: number;
   startedAt: number;
   tip: Cardano.Tip;
+  operatorDuration?: WithOperatorDuration['operatorDuration'];
 }) => {
-  const { blocksTime, header, logger, numEvt, startedAt, tip } = params;
+  const { blocksTime, header, logger, numEvt, startedAt, tip, operatorDuration } = params;
   const syncPercentage = ((header.blockNo * 100) / tip.blockNo).toFixed(2);
   const now = Date.now();
 
@@ -49,6 +51,14 @@ const logSyncLine = (params: {
 
   logger.info(`Initializing ${syncPercentage}% at block #${header.blockNo} ${speeds.join(' - ')}`);
 
+  if (operatorDuration) {
+    for (const [operatorName, { numCalls, totalTime }] of Object.entries(operatorDuration)) {
+      logger.info(
+        `"${operatorName}": Total: ${Milliseconds.toSeconds(totalTime)}s, Avg: ${(totalTime / numCalls).toFixed(1)}ms`
+      );
+    }
+  }
+
   const pruneOldTimes = (upTo: number) => {
     for (const block of blocksTime.keys())
       if (block <= upTo) blocksTime.delete(block);
@@ -59,7 +69,7 @@ const logSyncLine = (params: {
 };
 
 export const logProjectionProgress =
-  <T extends Omit<UnifiedExtChainSyncEvent<{}>, 'requestNext'>>(baseLogger: Logger) =>
+  <T extends Omit<UnifiedExtChainSyncEvent<Partial<WithOperatorDuration>>, 'requestNext'>>(baseLogger: Logger) =>
   (evt$: Observable<T>) =>
     defer(() => {
       const logger = contextLogger(baseLogger, 'Projector');
@@ -69,7 +79,7 @@ export const logProjectionProgress =
       const startedAt = Date.now();
       logger.info('Started');
       return evt$.pipe(
-        tap(({ block: { header }, eventType, tip }) => {
+        tap(({ block: { header }, eventType, tip, operatorDuration }) => {
           numEvt++;
           if (isAtTheTipOrHigher(header, tip)) {
             logger.info(
@@ -78,7 +88,7 @@ export const logProjectionProgress =
               } ${pointDescription(header)}`
             );
           } else if (numEvt % logFrequency === 0 && tip !== 'origin')
-            logSyncLine({ blocksTime, header, logger, numEvt, startedAt, tip });
+            logSyncLine({ blocksTime, header, logger, numEvt, operatorDuration, startedAt, tip });
         }),
         finalize(() => logger.info(`Stopped after ${Math.round((Date.now() - startedAt) / 1000)} s`))
       );

@@ -632,6 +632,7 @@ Object {
   "size": 8511,
   "totalOutput": 29698651346n,
   "txCount": 6,
+  "type": "praos",
   "vrf": "vrf_vk1afy7gefvgc9eaek64lhunxw2velmuh4467n6a2aalah7r8q68j0s4f2sa9",
 }
 `;
@@ -711,6 +712,7 @@ Object {
   "size": 1193,
   "totalOutput": 29699998493147869n,
   "txCount": 1,
+  "type": "praos",
   "vrf": "vrf_vk1wpa9axwwassnadt8drdrzptxm285latvhhvsgv0t6zhp0akgej9sfgecvl",
 }
 `;
@@ -790,6 +792,7 @@ Object {
   "size": 1152,
   "totalOutput": 29699998492735907n,
   "txCount": 1,
+  "type": "praos",
   "vrf": "vrf_vk1aw6s04lqkquell8drg6jjusrzd8c5259kctvxkgug5kta7nphz9qfqtr4w",
 }
 `;
@@ -846,6 +849,7 @@ Object {
   "size": 908,
   "totalOutput": 1000000n,
   "txCount": 1,
+  "type": "bft",
   "vrf": undefined,
 }
 `;
@@ -925,6 +929,7 @@ Object {
   "size": 1151,
   "totalOutput": 29699998492941888n,
   "txCount": 1,
+  "type": "praos",
   "vrf": "vrf_vk1aw6s04lqkquell8drg6jjusrzd8c5259kctvxkgug5kta7nphz9qfqtr4w",
 }
 `;
@@ -1157,6 +1162,7 @@ Object {
   "size": 1880,
   "totalOutput": 29999998493561943n,
   "txCount": 1,
+  "type": "praos",
   "vrf": "vrf_vk1ny8dyz3pa9u7v7h8l5evsmxxjq07dk6j5uda60lxe3zsya5ea20s2c6jph",
 }
 `;

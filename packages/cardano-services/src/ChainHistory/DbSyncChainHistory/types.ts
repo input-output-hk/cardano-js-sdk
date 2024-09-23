@@ -21,6 +21,7 @@ export interface BlockModel {
   slot_no: string;
   time: string;
   tx_count: string;
+  type: Cardano.BlockType;
   vrf: string;
 }
 

@@ -53,7 +53,8 @@ describe('withStakePools', () => {
           pointer: {} as Cardano.Pointer
         }
       ],
-      epochNo
+      epochNo,
+      stakeCredentialsByTx: {}
     };
     const result = await firstValueFrom(
       Mappers.withStakePools()(of(data as UnifiedExtChainSyncEvent<Mappers.WithCertificates & WithEpochNo>))
@@ -91,7 +92,8 @@ describe('withStakePools', () => {
           pointer: {} as Cardano.Pointer
         }
       ],
-      epochNo
+      epochNo,
+      stakeCredentialsByTx: {}
     };
     const result = await firstValueFrom(
       Mappers.withStakePools()(of(data as UnifiedExtChainSyncEvent<Mappers.WithCertificates & WithEpochNo>))

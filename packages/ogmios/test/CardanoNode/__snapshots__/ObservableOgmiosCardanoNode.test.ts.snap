@@ -258,6 +258,7 @@ Array [
       "size": 1880,
       "totalOutput": 29999998493561943n,
       "txCount": 1,
+      "type": "praos",
       "vrf": "vrf_vk1ny8dyz3pa9u7v7h8l5evsmxxjq07dk6j5uda60lxe3zsya5ea20s2c6jph",
     },
     "eventType": 0,
