@@ -317,7 +317,6 @@ in
 
           values = {
             ws-server.enabled = true;
-            backend.hostnames = ["${final.namespace}.${final.region}.${baseUrl}"];
             cardano-services = {
               ingresOrder = 99;
               additionalRoutes = [
@@ -448,7 +447,6 @@ in
 
           values = {
             stakepool.databaseName = "stakepoolv3";
-            backend.hostnames = ["dev-mainnet.${baseUrl}" "${final.namespace}.${baseUrl}" "${final.namespace}.${final.region}.${baseUrl}"];
             cardano-services = {
               ingresOrder = 98;
               additionalRoutes = [
@@ -498,7 +496,6 @@ in
           values = {
             stakepool.databaseName = "stakepoolv3";
 
-            backend.hostnames = ["dev-mainnet.${baseUrl}" "${final.namespace}.${baseUrl}" "${final.namespace}.${final.region}.${baseUrl}"];
             cardano-services = {
               ingresOrder = 98;
               additionalRoutes = [
