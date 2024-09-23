@@ -1,9 +1,5 @@
-import { InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
+import { InvalidArgumentError } from '@cardano-sdk/util';
 import { PlutusLanguageVersion } from '../../../Cardano/types/Script';
-
-const PLUTUS_V1_COST_MODEL_OP_COUNT = 166;
-const PLUTUS_V2_COST_MODEL_OP_COUNT = 175;
-const PLUTUS_V3_COST_MODEL_OP_COUNT = 179;
 
 /**
  * The execution of plutus scripts consumes resources. To make sure that these
@@ -28,32 +24,6 @@ export class CostModel {
   constructor(language: PlutusLanguageVersion, costs: Array<number>) {
     this.#language = language;
     this.#costs = costs;
-
-    switch (this.#language) {
-      case PlutusLanguageVersion.V1:
-        if (costs.length !== PLUTUS_V1_COST_MODEL_OP_COUNT)
-          throw new InvalidArgumentError(
-            'costs',
-            `Cost model for PlutusV2 language should have ${PLUTUS_V2_COST_MODEL_OP_COUNT} operations, but got ${costs.length}.`
-          );
-        break;
-      case PlutusLanguageVersion.V2:
-        if (costs.length !== PLUTUS_V2_COST_MODEL_OP_COUNT)
-          throw new InvalidArgumentError(
-            'costs',
-            `Cost model for PlutusV2 language should have ${PLUTUS_V2_COST_MODEL_OP_COUNT} operations, but got ${costs.length}.`
-          );
-        break;
-      case PlutusLanguageVersion.V3:
-        if (costs.length !== PLUTUS_V3_COST_MODEL_OP_COUNT)
-          throw new InvalidArgumentError(
-            'costs',
-            `Cost model for PlutusV3 language should have ${PLUTUS_V3_COST_MODEL_OP_COUNT} operations, but got ${costs.length}.`
-          );
-        break;
-      default:
-        throw new InvalidStateError('Invalid plutus language version.');
-    }
   }
 
   /**
@@ -141,21 +111,6 @@ export class CostModel {
    * @returns true if is a valid operation; otherwise; false.
    */
   #isOperationValid(operation: number): boolean {
-    let isValid = false;
-    switch (this.#language) {
-      case PlutusLanguageVersion.V1:
-        isValid = operation >= 0 && operation < PLUTUS_V1_COST_MODEL_OP_COUNT;
-        break;
-      case PlutusLanguageVersion.V2:
-        isValid = operation >= 0 && operation < PLUTUS_V2_COST_MODEL_OP_COUNT;
-        break;
-      case PlutusLanguageVersion.V3:
-        isValid = operation >= 0 && operation < PLUTUS_V3_COST_MODEL_OP_COUNT;
-        break;
-      default:
-        throw new InvalidStateError('Invalid plutus language version.');
-    }
-
-    return isValid;
+    return operation >= 0;
   }
 }
