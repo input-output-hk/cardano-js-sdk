@@ -11,4 +11,4 @@ dbSync:
   maxConnections: 5
 network: "custom"
 genesisDataFolder: '/app/config'
-tokenRegistryUrl: "https://metadata.cardano-testnet.iohkdev.io"
+tokenRegistryUrl: "https://tokens.cardano.org"

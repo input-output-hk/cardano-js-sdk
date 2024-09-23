@@ -287,7 +287,6 @@ describe('blockfrostChainHistoryProvider', () => {
               'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x'
             ),
             value: {
-              assets: new Map(),
               coins: 9_731_978_536_963n
             }
           }

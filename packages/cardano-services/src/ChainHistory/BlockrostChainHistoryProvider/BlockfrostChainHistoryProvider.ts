@@ -19,6 +19,7 @@ import {
   TransactionsByAddressesArgs,
   TransactionsByIdsArgs
 } from '@cardano-sdk/core';
+import { DB_MAX_SAFE_INTEGER } from '../DbSyncChainHistory/queries';
 import { Responses } from '@blockfrost/blockfrost-js';
 
 type WithCertIndex<T> = T & { cert_index: number };
@@ -199,12 +200,12 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
         : Cardano.InputSource.collaterals;
 
       return {
-        auxiliaryData: metadata
-          ? {
-              blob: metadata
-            }
-          : undefined,
-
+        auxiliaryData:
+          metadata && metadata.size > 0
+            ? {
+                blob: metadata
+              }
+            : undefined,
         blockHeader: {
           blockNo: Cardano.BlockNo(response.block_height),
           hash: Cardano.BlockId(response.block),
@@ -279,9 +280,14 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
 
   public async transactionsByAddresses({
     addresses,
+    pagination,
     blockRange
   }: TransactionsByAddressesArgs): Promise<Paginated<Cardano.HydratedTx>> {
+    this.logger.info(`transactionsByAddresses: ${JSON.stringify(blockRange)} ${JSON.stringify(addresses)}`);
     try {
+      const lowerBound = blockRange?.lowerBound ?? 0;
+      const upperBound = blockRange?.upperBound ?? DB_MAX_SAFE_INTEGER;
+
       const addressTransactions = await Promise.all(
         addresses.map(async (address) =>
           fetchByAddressSequentially<
@@ -300,13 +306,14 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
         )
       );
 
-      const allTransactions = addressTransactions
-        .flat(1)
-        .sort((a, b) => b.block_height - a.block_height || b.tx_index - a.tx_index);
-      const addressTransactionsSinceBlock = blockRange?.lowerBound
-        ? allTransactions.filter(({ block_height }) => block_height >= blockRange!.lowerBound!)
-        : allTransactions;
-      const ids = addressTransactionsSinceBlock.map(({ tx_hash }) => Cardano.TransactionId(tx_hash));
+      const allTransactions = addressTransactions.flat(1);
+
+      const ids = allTransactions
+        .filter(({ block_height }) => block_height >= lowerBound && block_height <= upperBound)
+        .sort((a, b) => a.block_height - b.block_height || a.tx_index - b.tx_index)
+        .map(({ tx_hash }) => Cardano.TransactionId(tx_hash))
+        .splice(pagination.startAt, pagination.limit);
+
       const pageResults = await this.transactionsByHashes({ ids });
 
       return { pageResults, totalResultCount: allTransactions.length };
