@@ -81,7 +81,7 @@ export class Value {
     const reader = new CborReader(cbor);
 
     if (reader.peekState() === CborReaderState.UnsignedInteger) {
-      const coins = reader.readInt();
+      const coins = reader.readUInt();
       return new Value(coins);
     }
 
@@ -93,7 +93,7 @@ export class Value {
         `Expected an array of ${VALUE_ARRAY_SIZE} elements, but got an array of ${length} elements`
       );
 
-    const coins = reader.readInt();
+    const coins = reader.readUInt();
     const multiassets = new Map<Crypto.Hash28ByteBase16, Map<Cardano.AssetName, bigint>>();
 
     reader.readStartMap();
@@ -105,7 +105,7 @@ export class Value {
       reader.readStartMap();
       while (reader.peekState() !== CborReaderState.EndMap) {
         const assetName = Buffer.from(reader.readByteString()).toString('hex') as unknown as Cardano.AssetName;
-        const quantity = reader.readInt();
+        const quantity = reader.readUInt();
 
         multiassets.get(scriptHash)!.set(assetName, quantity);
       }
