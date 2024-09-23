@@ -53,6 +53,18 @@ const parseReferenceScript = (model: UtxoModel): Cardano.Script => {
         version: Cardano.PlutusLanguageVersion.V2
       };
       break;
+    case ReferenceScriptType.PlutusV3:
+      if (!isNotNil(model.reference_script_bytes))
+        throw new SerializationError(
+          SerializationFailure.InvalidScript,
+          'Unexpected error deserializing PlutusV2 script. Data is null'
+        );
+      script = {
+        __type: Cardano.ScriptType.Plutus,
+        bytes: model.reference_script_bytes as unknown as HexBlob,
+        version: Cardano.PlutusLanguageVersion.V3
+      };
+      break;
     default:
       throw new SerializationError(
         SerializationFailure.InvalidScriptType,
