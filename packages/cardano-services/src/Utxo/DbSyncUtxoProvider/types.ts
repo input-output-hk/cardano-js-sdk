@@ -28,5 +28,6 @@ export enum ReferenceScriptType {
   Multisig = 'multisig',
   Timelock = 'timelock',
   PlutusV1 = 'plutusV1',
-  PlutusV2 = 'plutusV2'
+  PlutusV2 = 'plutusV2',
+  PlutusV3 = 'plutusV3'
 }
