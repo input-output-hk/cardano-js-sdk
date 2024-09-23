@@ -80,7 +80,7 @@ export class BlockfrostNetworkInfoProvider extends BlockfrostProvider implements
     try {
       // Although Blockfrost have the endpoint, the blockfrost-js library don't have a call for it
       // https://github.com/blockfrost/blockfrost-js/issues/294
-      const response = await this.blockfrost.instance<Schemas['network-eras']>('network-eras');
+      const response = await this.blockfrost.instance<Schemas['network-eras']>('network/eras');
       return response.body;
     } catch (error) {
       throw handleError(error);

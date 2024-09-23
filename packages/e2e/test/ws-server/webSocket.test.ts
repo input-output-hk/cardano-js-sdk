@@ -381,8 +381,13 @@ WHERE tx_out_id IS NULL GROUP BY address HAVING COUNT(DISTINCT tx_id) < 1000 ORD
 
       await client.chainHistoryProvider.transactionsByAddresses(request);
 
-      const wsUtxos = await client.utxoProvider.utxoByAddresses(request);
-      const httpUtxos = await utxoProvider.utxoByAddresses(request);
+      const wsUtxos = (await client.utxoProvider.utxoByAddresses(request)).sort(
+        ([txIn1, _txOut1], [txIn2, _txOut2]) => txIn1.txId.localeCompare(txIn2.txId) || txIn1.index - txIn2.index
+      );
+      const httpUtxos = (await utxoProvider.utxoByAddresses(request)).sort(
+        ([txIn1, _txOut1], [txIn2, _txOut2]) => txIn1.txId.localeCompare(txIn2.txId) || txIn1.index - txIn2.index
+      );
+
       expect(toSerializableObject(wsUtxos)).toEqual(toSerializableObject(httpUtxos));
     });
   });

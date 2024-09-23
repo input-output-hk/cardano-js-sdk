@@ -228,10 +228,13 @@ export class AuxiliaryData {
    */
   toCore(): Cardano.AuxiliaryData {
     const scripts = this.#getCoreScripts();
-    return {
-      blob: this.#metadata ? this.#metadata.toCore() : undefined,
-      scripts: scripts.length > 0 ? scripts : undefined
+    const auxiliaryData: Cardano.AuxiliaryData = {
+      blob: this.#metadata ? this.#metadata.toCore() : undefined
     };
+
+    if (scripts.length > 0) auxiliaryData.scripts = scripts;
+
+    return auxiliaryData;
   }
 
   /**
