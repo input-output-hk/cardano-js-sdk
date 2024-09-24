@@ -1,6 +1,6 @@
 import * as Postgres from '@cardano-sdk/projection-typeorm';
-import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
-import { Cardano, ObservableCardanoNode } from '@cardano-sdk/core';
+import { Bootstrap, Mappers, ObservableCardanoNode, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
+import { Cardano } from '@cardano-sdk/core';
 import { ConnectionConfig } from '@cardano-ogmios/client';
 import { DataSource, QueryRunner } from 'typeorm';
 import { Observable, filter, firstValueFrom, lastValueFrom, of, scan, takeWhile } from 'rxjs';

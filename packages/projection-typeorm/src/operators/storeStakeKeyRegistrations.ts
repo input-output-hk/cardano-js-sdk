@@ -1,5 +1,4 @@
-import { ChainSyncEventType } from '@cardano-sdk/core';
-import { Mappers } from '@cardano-sdk/projection';
+import { ChainSyncEventType, Mappers } from '@cardano-sdk/projection';
 import { StakeKeyRegistrationEntity } from '../entity';
 import { certificatePointerToId, typeormOperator } from './util';
 

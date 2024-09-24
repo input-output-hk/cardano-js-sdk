@@ -2,8 +2,12 @@ import * as Postgres from '@cardano-sdk/projection-typeorm';
 import { BlockDataEntity, BlockEntity, StakeKeyEntity } from '@cardano-sdk/projection-typeorm';
 import {
   Bootstrap,
+  ChainSyncEvent,
+  ChainSyncEventType,
+  ChainSyncRollForward,
   InMemory,
   Mappers,
+  ObservableCardanoNode,
   ProjectionEvent,
   ProjectionOperator,
   StabilityWindowBuffer,
@@ -11,15 +15,7 @@ import {
   requestNext,
   withStaticContext
 } from '@cardano-sdk/projection';
-import {
-  Cardano,
-  ChainSyncEvent,
-  ChainSyncEventType,
-  ChainSyncRollForward,
-  ObservableCardanoNode,
-  Point,
-  TipOrOrigin
-} from '@cardano-sdk/core';
+import { Cardano, Point, TipOrOrigin } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { ConnectionConfig } from '@cardano-ogmios/client';
 import { Observable, filter, firstValueFrom, lastValueFrom, map, of, take, takeWhile, throwError, toArray } from 'rxjs';

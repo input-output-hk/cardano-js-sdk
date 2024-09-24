@@ -1,5 +1,11 @@
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { RollForwardEvent, UnifiedExtChainSyncEvent, WithNetworkInfo, withEpochNo } from '../../src';
+import { Cardano } from '@cardano-sdk/core';
+import {
+  ChainSyncEventType,
+  RollForwardEvent,
+  UnifiedExtChainSyncEvent,
+  WithNetworkInfo,
+  withEpochNo
+} from '../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { stubEraSummaries } from '../util';
 

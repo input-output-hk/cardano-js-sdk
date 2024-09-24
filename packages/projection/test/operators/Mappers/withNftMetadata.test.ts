@@ -1,13 +1,13 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Asset, Cardano, ChainSyncEventType, ChainSyncRollForward, Serialization, util } from '@cardano-sdk/core';
+import { Asset, Cardano, Serialization, util } from '@cardano-sdk/core';
 import {
   ChainSyncDataSet,
   SerializedChainSyncEvent,
   chainSyncData,
   generateRandomHexString
 } from '@cardano-sdk/util-dev';
+import { ChainSyncEventType, ChainSyncRollForward, Mappers, ProjectionEvent } from '../../../src';
 import { HexBlob } from '@cardano-sdk/util';
-import { Mappers, ProjectionEvent } from '../../../src';
 import { Observable, firstValueFrom, map, of } from 'rxjs';
 import { dummyLogger } from 'ts-log';
 

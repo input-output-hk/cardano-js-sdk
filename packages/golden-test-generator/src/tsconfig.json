@@ -12,6 +12,9 @@
     },
     {
       "path": "../../util/src"
+    },
+    {
+      "path": "../../projection/src"
     }
   ]
 }

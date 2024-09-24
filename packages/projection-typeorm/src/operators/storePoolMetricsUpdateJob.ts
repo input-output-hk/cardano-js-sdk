@@ -1,4 +1,5 @@
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
+import { ChainSyncEventType } from '@cardano-sdk/projection';
 import { STAKE_POOL_METRICS_UPDATE } from '../pgBoss';
 import { WithPgBoss } from './withTypeormTransaction';
 import { typeormOperator } from './util';

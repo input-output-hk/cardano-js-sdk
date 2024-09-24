@@ -1,5 +1,6 @@
-import { Asset, Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { Asset, Cardano } from '@cardano-sdk/core';
 import { AssetEntity, HandleEntity, OutputEntity, willStoreHandles } from '../../../src';
+import { ChainSyncEventType } from '@cardano-sdk/projection';
 import { HandleOwnership } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
 import { ProjectorContext, createProjectorContext } from '../util';
 import { QueryRunner } from 'typeorm';

@@ -1,5 +1,5 @@
-import { BaseProjectionEvent } from '@cardano-sdk/projection';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { BaseProjectionEvent, ChainSyncEventType } from '@cardano-sdk/projection';
+import { Cardano } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData } from '@cardano-sdk/util-dev';
 import { HandleEntity } from '../../../src';
 import { ProjectorContext, createProjectorContext, createStubProjectionSource, filterAssets } from '../util';

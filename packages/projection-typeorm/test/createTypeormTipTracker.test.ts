@@ -1,4 +1,4 @@
-import { BaseProjectionEvent } from '@cardano-sdk/projection';
+import { BaseProjectionEvent, ChainSyncEventType } from '@cardano-sdk/projection';
 import {
   BlockEntity,
   TypeormConnection,
@@ -6,7 +6,7 @@ import {
   createObservableConnection,
   createTypeormTipTracker
 } from '../src';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { DataSource, NoConnectionForRepositoryError, QueryRunner, Repository } from 'typeorm';
 import { Observable, firstValueFrom, of, throwError } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';

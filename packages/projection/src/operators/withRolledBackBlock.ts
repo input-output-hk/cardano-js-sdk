@@ -1,4 +1,5 @@
-import { Cardano, ChainSyncEvent, ChainSyncEventType, TipOrOrigin } from '@cardano-sdk/core';
+import { Cardano, TipOrOrigin } from '@cardano-sdk/core';
+import { ChainSyncEvent, ChainSyncEventType } from '../ObservableCardanoNode';
 import {
   EMPTY,
   Observable,

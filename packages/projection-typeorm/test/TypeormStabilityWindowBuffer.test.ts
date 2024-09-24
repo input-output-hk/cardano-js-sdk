@@ -6,9 +6,9 @@ import {
   createObservableConnection,
   willStoreBlockData
 } from '../src';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
+import { ChainSyncEventType, ProjectionEvent } from '@cardano-sdk/projection';
 import { DataSource, NoConnectionForRepositoryError, QueryRunner, Repository } from 'typeorm';
-import { ProjectionEvent } from '@cardano-sdk/projection';
 import { connectionConfig$, createBlockEntity, createBlockHeader, initializeDataSource } from './util';
 import { createStubObservable, logger } from '@cardano-sdk/util-dev';
 import { firstValueFrom, of, throwError } from 'rxjs';

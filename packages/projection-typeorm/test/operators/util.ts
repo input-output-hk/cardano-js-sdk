@@ -1,13 +1,14 @@
 import {
   BaseProjectionEvent,
   BootstrapExtraProps,
+  ChainSyncEventType,
   ProjectionEvent,
   RollBackwardEvent,
   WithBlock,
   WithNetworkInfo
 } from '@cardano-sdk/projection';
 import { BigIntMath } from '@cardano-sdk/util';
-import { Cardano, ChainSyncEventType, Point } from '@cardano-sdk/core';
+import { Cardano, Point } from '@cardano-sdk/core';
 import { Observable, lastValueFrom, map, takeWhile } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import {

@@ -1,6 +1,5 @@
-import { ChainSyncEventType, ChainSyncRollForward, RequestNext } from '@cardano-sdk/core';
+import { ChainSyncEventType, ChainSyncRollForward, RequestNext, requestNext } from '../../src';
 import { firstValueFrom, of } from 'rxjs';
-import { requestNext } from '../../src';
 
 describe('requestNext', () => {
   it('calls event.requestNext() and emits event object without this method', async () => {

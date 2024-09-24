@@ -1,5 +1,6 @@
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import {
+  ChainSyncEventType,
   UnifiedExtChainSyncEvent,
   WithEpochBoundary,
   WithEpochNo,

@@ -44,8 +44,8 @@ import {
   willStoreStakePools,
   willStoreUtxo
 } from '@cardano-sdk/projection-typeorm';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { Mappers as Mapper, ProjectionEvent } from '@cardano-sdk/projection';
+import { Cardano } from '@cardano-sdk/core';
+import { ChainSyncEventType, Mappers as Mapper, ProjectionEvent } from '@cardano-sdk/projection';
 import { ObservableType, passthrough } from '@cardano-sdk/util-rxjs';
 import { POOLS_METRICS_INTERVAL_DEFAULT, POOLS_METRICS_OUTDATED_INTERVAL_DEFAULT } from '../Program/programs/types';
 import { Sorter } from '@hapi/topo';

@@ -15,8 +15,8 @@ import {
   willStoreStakePools,
   withTypeormTransaction
 } from '../../src';
-import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
-import { Cardano, ChainSyncEventType, ObservableCardanoNode } from '@cardano-sdk/core';
+import { Bootstrap, ChainSyncEventType, Mappers, ObservableCardanoNode, requestNext } from '@cardano-sdk/projection';
+import { Cardano } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { connectionConfig$, initializeDataSource } from '../util';

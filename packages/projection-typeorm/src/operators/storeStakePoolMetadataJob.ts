@@ -1,5 +1,4 @@
-import { ChainSyncEventType } from '@cardano-sdk/core';
-import { Mappers } from '@cardano-sdk/projection';
+import { ChainSyncEventType, Mappers } from '@cardano-sdk/projection';
 import { STAKE_POOL_METADATA_QUEUE, StakePoolMetadataJob, defaultJobOptions } from '../pgBoss';
 import { WithPgBoss } from './withTypeormTransaction';
 import { certificatePointerToId, typeormOperator } from './util';

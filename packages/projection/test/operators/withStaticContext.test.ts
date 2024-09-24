@@ -1,5 +1,4 @@
-import { ChainSyncEventType } from '@cardano-sdk/core';
-import { ExtChainSyncEvent, withStaticContext } from '../../src';
+import { ChainSyncEventType, ExtChainSyncEvent, withStaticContext } from '../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 
 describe('withStaticContext', () => {

@@ -1,5 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
+import { ChainSyncEventType } from '../../../ObservableCardanoNode';
 import { WithCertificates } from './withCertificates';
 import { unifiedProjectorOperator } from '../../utils';
 

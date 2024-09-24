@@ -11,6 +11,9 @@
       "path": "../../util-rxjs/src"
     },
     {
+      "path": "../../projection/src"
+    },
+    {
       "path": "../../crypto/src"
     }
   ]

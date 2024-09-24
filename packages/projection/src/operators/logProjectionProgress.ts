@@ -1,4 +1,5 @@
-import { Cardano, ChainSyncEventType, TipOrOrigin } from '@cardano-sdk/core';
+import { Cardano, TipOrOrigin } from '@cardano-sdk/core';
+import { ChainSyncEventType } from '../ObservableCardanoNode';
 import { Logger } from 'ts-log';
 import { Observable, defer, finalize, tap } from 'rxjs';
 import { UnifiedExtChainSyncEvent } from '../types';

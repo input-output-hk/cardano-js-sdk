@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Cardano, ChainSyncRollBackward, ChainSyncRollForward, EraSummary } from '@cardano-sdk/core';
+import { Cardano, EraSummary } from '@cardano-sdk/core';
+import { ChainSyncRollBackward, ChainSyncRollForward } from './ObservableCardanoNode';
 import { Observable } from 'rxjs';
 import { ObservableType } from '@cardano-sdk/util-rxjs';
 

@@ -1,4 +1,5 @@
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
+import { ChainSyncEventType } from '../../ObservableCardanoNode';
 import { Mappers } from '../../operators';
 import { WithInMemoryStore } from '../types';
 import { inMemoryStoreOperator } from './utils';

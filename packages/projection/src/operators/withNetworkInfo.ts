@@ -1,4 +1,4 @@
-import { ObservableCardanoNode } from '@cardano-sdk/core';
+import { ObservableCardanoNode } from '../ObservableCardanoNode';
 import { WithNetworkInfo } from '../types';
 import { combineLatest, map, take } from 'rxjs';
 import { withStaticContext } from './withStaticContext';

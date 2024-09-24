@@ -1,4 +1,5 @@
-import { Cardano, ChainSyncEventType, Intersection } from '@cardano-sdk/core';
+import { Cardano, Intersection } from '@cardano-sdk/core';
+import { ChainSyncEventType } from '@cardano-sdk/projection';
 import { GeneratorMetadata } from '../Content';
 import { Logger } from 'ts-log';
 import { Ogmios, ogmiosToCore } from '@cardano-sdk/ogmios';

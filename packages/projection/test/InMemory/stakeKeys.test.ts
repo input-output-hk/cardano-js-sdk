@@ -1,6 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { ChainSyncEventType } from '@cardano-sdk/core';
-import { InMemory, Mappers, ProjectionEvent } from '../../src';
+import { ChainSyncEventType, InMemory, Mappers, ProjectionEvent } from '../../src';
 import { firstValueFrom, of } from 'rxjs';
 
 describe('InMemory.storeStakeKeys', () => {

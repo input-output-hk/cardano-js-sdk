@@ -1,6 +1,12 @@
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, createTestScheduler } from '@cardano-sdk/util-dev';
-import { RollForwardEvent, UnifiedExtChainSyncEvent, WithNetworkInfo, withNetworkInfo } from '../../src';
+import {
+  ChainSyncEventType,
+  RollForwardEvent,
+  UnifiedExtChainSyncEvent,
+  WithNetworkInfo,
+  withNetworkInfo
+} from '../../src';
 
 const { networkInfo, cardanoNode } = chainSyncData(ChainSyncDataSet.WithPoolRetirement);
 

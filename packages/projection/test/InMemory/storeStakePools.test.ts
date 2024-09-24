@@ -1,5 +1,5 @@
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { InMemory, Mappers, ProjectionEvent } from '../../src';
+import { Cardano } from '@cardano-sdk/core';
+import { ChainSyncEventType, InMemory, Mappers, ProjectionEvent } from '../../src';
 import { firstValueFrom, of } from 'rxjs';
 
 describe('InMemory.storeStakePools', () => {

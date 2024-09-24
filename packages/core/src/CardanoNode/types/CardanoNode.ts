@@ -1,5 +1,5 @@
 import type { HealthCheckResponse } from '../../Provider';
-import type { Lovelace, PoolId, VrfVkHex } from '../../Cardano';
+import type { Lovelace, PoolId, Tip, VrfVkHex } from '../../Cardano';
 import type { Milliseconds } from '../../util';
 
 export interface EraSummary {
@@ -48,3 +48,13 @@ export interface CardanoNode {
    */
   healthCheck(): Promise<HealthCheckResponse>;
 }
+
+// Similar to Ogmios.Point, but using Cardano.BlockId opaque string for hash
+export type Point = Pick<Tip, 'hash' | 'slot'>;
+export type Origin = 'origin';
+export type TipOrOrigin = Tip | Origin;
+export type PointOrOrigin = Point | Origin;
+export type Intersection = {
+  point: PointOrOrigin;
+  tip: TipOrOrigin;
+};
