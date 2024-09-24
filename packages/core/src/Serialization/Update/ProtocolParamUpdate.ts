@@ -162,10 +162,16 @@ export class ProtocolParamUpdate {
     }
 
     if (this.#extraEntropy) {
-      writer.writeInt(13n);
-      writer.writeStartArray(2);
-      writer.writeInt(1);
-      writer.writeByteString(Buffer.from(this.#extraEntropy, 'hex'));
+      if (this.#extraEntropy.length === 0) {
+        writer.writeInt(13n);
+        writer.writeStartArray(1);
+        writer.writeInt(0);
+      } else {
+        writer.writeInt(13n);
+        writer.writeStartArray(2);
+        writer.writeInt(1);
+        writer.writeByteString(Buffer.from(this.#extraEntropy, 'hex'));
+      }
     }
 
     if (this.#protocolVersion) {
@@ -322,11 +328,16 @@ export class ProtocolParamUpdate {
           params.#d = UnitInterval.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
           break;
         case 13n:
-          // entropy is encoded as an array of two elements, where the second elements is the entropy value
-          reader.readStartArray();
-          reader.readEncodedValue();
-          params.#extraEntropy = HexBlob.fromBytes(reader.readByteString());
-          reader.readEndArray();
+          if (reader.readStartArray() === 1) {
+            reader.readEncodedValue();
+            // Entropy was set as empty
+            params.#extraEntropy = '' as HexBlob;
+            reader.readEndArray();
+          } else {
+            reader.readEncodedValue();
+            params.#extraEntropy = HexBlob.fromBytes(reader.readByteString());
+            reader.readEndArray();
+          }
           break;
         case 14n:
           params.#protocolVersion = ProtocolVersion.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
