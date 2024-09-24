@@ -1,17 +1,15 @@
-import { bufferChainSyncEvent } from '../util/bufferChainSyncEvent';
-import type { Cardano, HealthCheckResponse, Serialization } from '../..';
-import type { EraSummary } from './CardanoNode';
+import {
+  Cardano,
+  EraSummary,
+  HealthCheckResponse,
+  Intersection,
+  PointOrOrigin,
+  Serialization,
+  TipOrOrigin
+} from '@cardano-sdk/core';
+import { bufferChainSyncEvent } from './bufferChainSyncEvent';
+import type { Block, Tip } from '@cardano-sdk/core/dist/cjs/Cardano';
 import type { Observable } from 'rxjs';
-
-// Similar to Ogmios.Point, but using Cardano.BlockId opaque string for hash
-export type Point = Pick<Cardano.Tip, 'hash' | 'slot'>;
-export type Origin = 'origin';
-export type TipOrOrigin = Cardano.Tip | Origin;
-export type PointOrOrigin = Point | Origin;
-export type Intersection = {
-  point: PointOrOrigin;
-  tip: TipOrOrigin;
-};
 
 export enum ChainSyncEventType {
   RollForward,
@@ -25,9 +23,9 @@ export interface WithRequestNext {
 }
 
 export interface ChainSyncRollForward extends WithRequestNext {
-  tip: Cardano.Tip;
+  tip: Tip;
   eventType: ChainSyncEventType.RollForward;
-  block: Cardano.Block;
+  block: Block;
 }
 
 export interface ChainSyncRollBackward extends WithRequestNext {

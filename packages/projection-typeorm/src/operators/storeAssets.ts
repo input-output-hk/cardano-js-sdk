@@ -1,6 +1,6 @@
 import { AssetEntity } from '../entity';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { Mappers } from '@cardano-sdk/projection';
+import { Cardano } from '@cardano-sdk/core';
+import { ChainSyncEventType, Mappers } from '@cardano-sdk/projection';
 import { QueryRunner } from 'typeorm';
 import { typeormOperator } from './util';
 

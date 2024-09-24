@@ -2,21 +2,24 @@ import {
   Cardano,
   ChainSyncError,
   ChainSyncErrorCode,
-  ChainSyncEvent,
-  ChainSyncEventType,
-  ChainSyncRollBackward,
-  ChainSyncRollForward,
   GeneralCardanoNodeError,
   GeneralCardanoNodeErrorCode,
   Intersection,
-  ObservableCardanoNode,
   Point,
   PointOrOrigin
 } from '@cardano-sdk/core';
+
+import {
+  ChainSyncEvent,
+  ChainSyncEventType,
+  ChainSyncRollBackward,
+  ChainSyncRollForward
+} from '@cardano-sdk/projection';
 import { Observable, of, throwError } from 'rxjs';
 import { fromSerializableObject } from '@cardano-sdk/util';
 import { genesisToEraSummary } from './genesisToEraSummary';
 import memoize from 'lodash/memoize.js';
+import type { ObservableCardanoNode } from '@cardano-sdk/projection';
 
 export type SerializedChainSyncEvent =
   | Omit<ChainSyncRollForward, 'requestNext'>

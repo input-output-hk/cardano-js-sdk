@@ -1,5 +1,6 @@
 import { BehaviorSubject, Observable, of, tap } from 'rxjs';
-import { Cardano, ChainSyncEventType, TipOrOrigin } from '@cardano-sdk/core';
+import { Cardano, TipOrOrigin } from '@cardano-sdk/core';
+import { ChainSyncEventType } from '../ObservableCardanoNode';
 import { StabilityWindowBuffer, UnifiedExtChainSyncObservable, WithNetworkInfo } from '../types';
 
 export class InMemoryStabilityWindowBuffer implements StabilityWindowBuffer {

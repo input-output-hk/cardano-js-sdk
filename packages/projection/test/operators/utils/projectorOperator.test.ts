@@ -1,5 +1,4 @@
-import { ChainSyncEventType } from '@cardano-sdk/core';
-import { ExtChainSyncEvent, ProjectorEventHandlers, projectorOperator } from '../../../src';
+import { ChainSyncEventType, ExtChainSyncEvent, ProjectorEventHandlers, projectorOperator } from '../../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { of } from 'rxjs';
 

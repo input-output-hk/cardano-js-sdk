@@ -1,12 +1,6 @@
-import {
-  ChainSyncEvent,
-  ChainSyncEventType,
-  GeneralCardanoNodeError,
-  GeneralCardanoNodeErrorCode,
-  PointOrOrigin,
-  RequestNext
-} from '@cardano-sdk/core';
+import { ChainSyncEvent, ChainSyncEventType, RequestNext } from '@cardano-sdk/projection';
 import { ChainSynchronization, InteractionContext, Schema, safeJSON } from '@cardano-ogmios/client';
+import { GeneralCardanoNodeError, GeneralCardanoNodeErrorCode, PointOrOrigin } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { Observable, Subscriber, from, switchMap } from 'rxjs';
 import { WithLogger, toSerializableObject } from '@cardano-sdk/util';

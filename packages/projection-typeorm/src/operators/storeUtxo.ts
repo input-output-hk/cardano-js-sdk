@@ -1,5 +1,5 @@
-import { Cardano, ChainSyncEventType, Serialization } from '@cardano-sdk/core';
-import { Mappers } from '@cardano-sdk/projection';
+import { Cardano, Serialization } from '@cardano-sdk/core';
+import { ChainSyncEventType, Mappers } from '@cardano-sdk/projection';
 import { ObjectLiteral } from 'typeorm';
 import { OutputEntity, TokensEntity } from '../entity';
 import { typeormOperator } from './util';

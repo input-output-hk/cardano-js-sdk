@@ -58,6 +58,7 @@
     "@cardano-ogmios/schema": "6.5.0",
     "@cardano-sdk/core": "workspace:~",
     "@cardano-sdk/crypto": "workspace:~",
+    "@cardano-sdk/projection": "workspace:~",
     "@cardano-sdk/util": "workspace:~",
     "backoff-rxjs": "^7.0.0",
     "buffer": "5.7.1",

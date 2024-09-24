@@ -1,4 +1,4 @@
-import { ChainSyncEventType } from '@cardano-sdk/core';
+import { ChainSyncEventType } from '../../ObservableCardanoNode';
 import { MaybeObservable } from './types';
 import { RollBackwardEvent, RollForwardEvent } from '../../types';
 import { concatMap, isObservable, of } from 'rxjs';

@@ -11,9 +11,8 @@ import {
   willStoreStakePoolMetadataJob,
   withTypeormTransaction
 } from '../../src';
-import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
+import { Bootstrap, ChainSyncEventType, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
-import { ChainSyncEventType } from '@cardano-sdk/core';
 import { Observable, filter, of } from 'rxjs';
 import { PoolUpdate } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
 import { QueryRunner } from 'typeorm';

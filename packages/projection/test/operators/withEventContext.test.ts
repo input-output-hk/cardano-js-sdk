@@ -1,5 +1,4 @@
-import { ChainSyncEventType } from '@cardano-sdk/core';
-import { ExtChainSyncEvent, withEventContext } from '../../src';
+import { ChainSyncEventType, ExtChainSyncEvent, withEventContext } from '../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 
 describe('withEventContext', () => {

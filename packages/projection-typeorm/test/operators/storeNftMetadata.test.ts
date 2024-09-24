@@ -1,4 +1,4 @@
-import { Asset, Cardano, ChainSyncEventType, ChainSyncRollForward } from '@cardano-sdk/core';
+import { Asset, Cardano } from '@cardano-sdk/core';
 import {
   AssetEntity,
   BlockDataEntity,
@@ -18,7 +18,14 @@ import {
   willStoreNftMetadata,
   withTypeormTransaction
 } from '../../src';
-import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
+import {
+  Bootstrap,
+  ChainSyncEventType,
+  ChainSyncRollForward,
+  Mappers,
+  ProjectionEvent,
+  requestNext
+} from '@cardano-sdk/projection';
 import { CIP67Asset, ProjectedNftMetadata } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
 import { ChainSyncDataSet, chainSyncData, generateRandomHexString, logger } from '@cardano-sdk/util-dev';
 import { Observable, firstValueFrom, lastValueFrom, toArray } from 'rxjs';

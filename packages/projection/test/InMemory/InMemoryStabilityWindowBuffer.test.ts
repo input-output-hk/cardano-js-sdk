@@ -1,5 +1,5 @@
-import { Cardano, ChainSyncEventType, Seconds } from '@cardano-sdk/core';
-import { InMemory, UnifiedExtChainSyncEvent, WithNetworkInfo } from '../../src';
+import { Cardano, Seconds } from '@cardano-sdk/core';
+import { ChainSyncEventType, InMemory, UnifiedExtChainSyncEvent, WithNetworkInfo } from '../../src';
 import { firstValueFrom, from } from 'rxjs';
 import { genesisToEraSummary } from '@cardano-sdk/util-dev';
 import { stubBlockId } from '../util';

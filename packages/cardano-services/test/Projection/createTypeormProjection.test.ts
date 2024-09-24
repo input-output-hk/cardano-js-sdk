@@ -6,8 +6,9 @@ import {
   TokensEntity,
   createDataSource
 } from '@cardano-sdk/projection-typeorm';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
+import { ChainSyncEventType } from '@cardano-sdk/projection';
 import { ProjectionName, createTypeormProjection, prepareTypeormProjection } from '../../src';
 import { lastValueFrom } from 'rxjs';
 import { projectorConnectionConfig, projectorConnectionConfig$ } from '../util';

@@ -15,8 +15,8 @@ import {
   willStoreUtxo,
   withTypeormTransaction
 } from '../../src';
-import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { Bootstrap, ChainSyncEventType, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
+import { Cardano } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { IsNull, Not, QueryRunner } from 'typeorm';
 import { Observable } from 'rxjs';

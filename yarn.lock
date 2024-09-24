@@ -3697,6 +3697,7 @@ __metadata:
   dependencies:
     "@cardano-sdk/core": "workspace:~"
     "@cardano-sdk/ogmios": "workspace:~"
+    "@cardano-sdk/projection": "workspace:~"
     "@cardano-sdk/util": "workspace:~"
     "@cardano-sdk/util-dev": "workspace:~"
     "@types/clear": ^0.1.4
@@ -3863,6 +3864,7 @@ __metadata:
     "@cardano-sdk/cardano-services-client": "workspace:~"
     "@cardano-sdk/core": "workspace:~"
     "@cardano-sdk/crypto": "workspace:~"
+    "@cardano-sdk/projection": "workspace:~"
     "@cardano-sdk/util": "workspace:~"
     "@cardano-sdk/util-dev": "workspace:~"
     "@cardano-sdk/util-rxjs": "workspace:~"
@@ -3975,6 +3977,7 @@ __metadata:
     "@cardano-sdk/core": "workspace:~"
     "@cardano-sdk/crypto": "workspace:~"
     "@cardano-sdk/key-management": "workspace:~"
+    "@cardano-sdk/projection": "workspace:~"
     "@cardano-sdk/util": "workspace:~"
     "@types/dockerode": ^3.3.8
     "@types/jest": ^26.0.24

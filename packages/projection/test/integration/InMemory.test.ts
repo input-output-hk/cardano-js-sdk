@@ -2,6 +2,8 @@ import * as Crypto from '@cardano-sdk/crypto';
 import {
   Bootstrap,
   BootstrapExtraProps,
+  ChainSyncEventType,
+  ChainSyncRollForward,
   InMemory,
   Mappers,
   ProjectionEvent,
@@ -10,7 +12,7 @@ import {
   requestNext,
   withStaticContext
 } from '../../src';
-import { Cardano, ChainSyncEventType, ChainSyncRollForward } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { ChainSyncDataSet, StubChainSyncData, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { from, lastValueFrom, of, take, toArray } from 'rxjs';
 

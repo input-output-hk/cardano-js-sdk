@@ -20,8 +20,15 @@ import {
   typeormTransactionCommit,
   withTypeormTransaction
 } from '../../../src';
-import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
-import { Cardano, ChainSyncEventType, ObservableCardanoNode } from '@cardano-sdk/core';
+import {
+  Bootstrap,
+  ChainSyncEventType,
+  Mappers,
+  ObservableCardanoNode,
+  ProjectionEvent,
+  requestNext
+} from '@cardano-sdk/projection';
+import { Cardano } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger, mockProviders } from '@cardano-sdk/util-dev';
 import { Observable } from 'rxjs';
 import { ProjectorContext, createProjectorTilFirst, createStubProjectionSource } from '../util';

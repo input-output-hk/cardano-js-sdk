@@ -1,8 +1,8 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { BlockId, BlockNo, Slot, Tip } from '../../../src/Cardano';
-import { ChainSyncEvent, ChainSyncEventType, RequestNext } from '../../../src';
+import { Cardano } from '@cardano-sdk/core';
+import { ChainSyncEvent, ChainSyncEventType, RequestNext } from '../src';
 import { Observable, Subject, Subscription } from 'rxjs';
-import { bufferChainSyncEvent } from '../../../src/CardanoNode/util/bufferChainSyncEvent';
+import { bufferChainSyncEvent } from '../src/bufferChainSyncEvent';
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -20,7 +20,7 @@ class ChainSyncEventTestConsumer {
       complete: () => this.events.push('Consumer completed'),
       error: (error) => this.events.push(`Consumer error: ${error}`),
       next: (value) => {
-        this.current = (value.tip as Tip).blockNo;
+        this.current = (value.tip as Cardano.Tip).blockNo;
         this.events.push(`Got ${this.current}`);
         this.requestNext = value.requestNext;
       }
@@ -106,7 +106,7 @@ class ChainSyncEventTestProducer {
         requestNext: () => {
           this.canProduce = true;
         },
-        tip: { blockNo: BlockNo(count), hash: '' as BlockId, slot: Slot(count) }
+        tip: { blockNo: Cardano.BlockNo(count), hash: '' as Cardano.BlockId, slot: Cardano.Slot(count) }
       });
     }, 1);
   }

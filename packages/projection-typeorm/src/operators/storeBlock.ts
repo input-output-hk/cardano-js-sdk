@@ -1,5 +1,5 @@
 import { BlockEntity } from '../entity';
-import { ChainSyncEventType } from '@cardano-sdk/core';
+import { ChainSyncEventType } from '@cardano-sdk/projection';
 import { typeormOperator } from './util';
 
 export const storeBlock = typeormOperator(async (evt) => {

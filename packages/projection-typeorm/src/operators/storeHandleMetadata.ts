@@ -1,6 +1,5 @@
-import { ChainSyncEventType } from '@cardano-sdk/core';
+import { ChainSyncEventType, Mappers } from '@cardano-sdk/projection';
 import { HandleMetadataEntity } from '../entity';
-import { Mappers } from '@cardano-sdk/projection';
 import { WithStoredProducedUtxo } from './storeUtxo';
 import { typeormOperator } from './util';
 

@@ -1,7 +1,7 @@
 import { BlockEntity, GovernanceActionEntity } from '../../src';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
+import { ChainSyncEventType, Mappers, ProjectionEvent } from '@cardano-sdk/projection';
 import { DataSource, QueryRunner } from 'typeorm';
-import { Mappers, ProjectionEvent } from '@cardano-sdk/projection';
 import { WithTypeormContext, storeBlock, storeGovernanceAction } from '../../src/operators';
 import { firstValueFrom, of } from 'rxjs';
 import { initializeDataSource } from '../util';

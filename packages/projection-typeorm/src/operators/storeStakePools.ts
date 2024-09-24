@@ -1,6 +1,6 @@
-import { Cardano, ChainSyncEventType, EraSummary, epochSlotsCalc } from '@cardano-sdk/core';
+import { Cardano, EraSummary, epochSlotsCalc } from '@cardano-sdk/core';
+import { ChainSyncEventType, Mappers, ProjectionEvent } from '@cardano-sdk/projection';
 import { In, Not, QueryRunner, Repository } from 'typeorm';
-import { Mappers, ProjectionEvent } from '@cardano-sdk/projection';
 import {
   MaxCertificatePointerIdCertificateIndex as MaxCertificatePointerIdCertIndex,
   MaxCertificatePointerIdTxIndex,

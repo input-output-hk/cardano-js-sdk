@@ -8,8 +8,6 @@ import {
   GeneralCardanoNodeErrorCode,
   HealthCheckResponse,
   Milliseconds,
-  ObservableCardanoNode,
-  ObservableChainSync,
   PointOrOrigin,
   StakeDistribution,
   StateQueryErrorCode
@@ -49,6 +47,7 @@ import {
   withCoreCardanoNodeError
 } from '../queries';
 import isEqual from 'lodash/isEqual.js';
+import type { ObservableCardanoNode, ObservableChainSync } from '@cardano-sdk/projection';
 import type { Serialization } from '@cardano-sdk/core';
 
 const ogmiosToCoreIntersection = (intersection: ChainSynchronization.Intersection) => ({

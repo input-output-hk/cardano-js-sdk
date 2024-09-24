@@ -1,7 +1,7 @@
 import { AddressEntity } from '../entity/Address.entity';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
+import { ChainSyncEventType, Mappers } from '@cardano-sdk/projection';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { Mappers } from '@cardano-sdk/projection';
 import { QueryRunner } from 'typeorm';
 import { StakeKeyRegistrationEntity } from '../entity';
 import { certificatePointerToId, typeormOperator } from './util';

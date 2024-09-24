@@ -1,14 +1,8 @@
 /* eslint-disable max-len */
 /* eslint-disable jsdoc/valid-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  Cardano,
-  ChainSyncEventType,
-  Intersection,
-  ObservableCardanoNode,
-  ObservableChainSync,
-  TipOrOrigin
-} from '@cardano-sdk/core';
+import { Cardano, Intersection, TipOrOrigin } from '@cardano-sdk/core';
+import { ChainSyncEventType, ObservableCardanoNode, ObservableChainSync } from '../ObservableCardanoNode';
 import { Logger } from 'ts-log';
 import { Observable, concat, defer, map, mergeMap, noop, of, switchMap, take, takeWhile, tap } from 'rxjs';
 import { ProjectionEvent, StabilityWindowBuffer, UnifiedExtChainSyncEvent } from '../types';

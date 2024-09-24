@@ -5,7 +5,6 @@ import {
   HandleOwnerChangeError,
   HandleProvider,
   HealthCheckResponse,
-  ObservableCardanoNode,
   ProviderError,
   ProviderFailure,
   SubmitTxArgs,
@@ -14,6 +13,7 @@ import {
 } from '@cardano-sdk/core';
 import { InMemoryCache } from '../InMemoryCache';
 import { Logger } from 'ts-log';
+import { ObservableCardanoNode } from '@cardano-sdk/projection';
 import { WithLogger } from '@cardano-sdk/util';
 
 type ObservableTxSubmitter = Pick<ObservableCardanoNode, 'healthCheck$' | 'submitTx'>;

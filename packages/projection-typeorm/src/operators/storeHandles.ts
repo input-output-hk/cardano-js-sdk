@@ -1,7 +1,7 @@
 import { AssetEntity, HandleEntity, HandleMetadataEntity } from '../entity';
-import { Cardano, ChainSyncEventType, Handle } from '@cardano-sdk/core';
+import { Cardano, Handle } from '@cardano-sdk/core';
+import { ChainSyncEventType, Mappers } from '@cardano-sdk/projection';
 import { In, QueryRunner } from 'typeorm';
-import { Mappers } from '@cardano-sdk/projection';
 import { WithMintedAssetSupplies } from './storeAssets';
 import { typeormOperator } from './util';
 import sortBy from 'lodash/sortBy.js';

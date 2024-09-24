@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { RequestNext, WithRequestNext } from '../types';
+import { RequestNext, WithRequestNext } from './ObservableCardanoNode';
 
 export const bufferChainSyncEvent =
   <T extends WithRequestNext>(length: number) =>

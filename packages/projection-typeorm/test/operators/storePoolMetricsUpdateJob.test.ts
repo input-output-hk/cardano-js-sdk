@@ -1,4 +1,4 @@
-import { ChainSyncEventType } from '@cardano-sdk/core';
+import { ChainSyncEventType } from '@cardano-sdk/projection';
 import { OperatorFunction, of } from 'rxjs';
 import { STAKE_POOL_METRICS_UPDATE, createStorePoolMetricsUpdateJob } from '../../src';
 

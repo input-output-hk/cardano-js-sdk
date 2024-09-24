@@ -1,6 +1,6 @@
-import { Asset, Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { Asset, Cardano } from '@cardano-sdk/core';
 import { AssetEntity, NftMetadataEntity, NftMetadataType } from '../entity';
-import { Mappers, ProjectionEvent } from '@cardano-sdk/projection';
+import { ChainSyncEventType, Mappers, ProjectionEvent } from '@cardano-sdk/projection';
 import { Repository } from 'typeorm';
 import { typeormOperator } from './util';
 

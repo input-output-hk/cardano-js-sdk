@@ -1,5 +1,5 @@
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { Mappers, RollForwardEvent, UnifiedExtChainSyncEvent } from '../../../../src';
+import { Cardano } from '@cardano-sdk/core';
+import { ChainSyncEventType, Mappers, RollForwardEvent, UnifiedExtChainSyncEvent } from '../../../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 
 const createEvent = (

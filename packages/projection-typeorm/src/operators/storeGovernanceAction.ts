@@ -1,6 +1,6 @@
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
+import { ChainSyncEventType, Mappers, ProjectionEvent } from '@cardano-sdk/projection';
 import { GovernanceActionEntity } from '../entity';
-import { Mappers, ProjectionEvent } from '@cardano-sdk/projection';
 import { typeormOperator } from './util';
 
 export const willStoreGovernanceAction = (evt: ProjectionEvent<Mappers.WithGovernanceActions>) =>

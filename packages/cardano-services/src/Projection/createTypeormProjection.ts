@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable prefer-spread */
-import { Bootstrap, ProjectionEvent, logProjectionProgress, requestNext } from '@cardano-sdk/projection';
-import { Cardano, ObservableCardanoNode } from '@cardano-sdk/core';
+import {
+  Bootstrap,
+  ObservableCardanoNode,
+  ProjectionEvent,
+  logProjectionProgress,
+  requestNext
+} from '@cardano-sdk/projection';
+import { Cardano } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { Observable, concat, defer, groupBy, mergeMap, take, takeWhile } from 'rxjs';
 import {
