@@ -1,8 +1,7 @@
 import { BaseWallet, createWalletUtil } from '@cardano-sdk/wallet';
 import { Cardano } from '@cardano-sdk/core';
-import { filter, firstValueFrom, map } from 'rxjs';
-import { getEnv, getWallet, walletReady, walletVariables } from '../../../src';
-import { isNotNil } from '@cardano-sdk/util';
+import { firstValueFrom } from 'rxjs';
+import { getEnv, getWallet, submitAndConfirm, walletReady, walletVariables } from '../../../src';
 import { logger } from '@cardano-sdk/util-dev';
 
 const env = getEnv(walletVariables);
@@ -35,15 +34,8 @@ describe('PersonalWallet/metadata', () => {
       .build()
       .sign();
 
-    const outgoingTx = signedTx;
-    await wallet.submitTx(signedTx);
+    const [, loadedTx] = await submitAndConfirm(wallet, signedTx, 1);
 
-    const loadedTx = await firstValueFrom(
-      wallet.transactions.history$.pipe(
-        map((txs) => txs.find((tx) => tx.id === outgoingTx.id)),
-        filter(isNotNil)
-      )
-    );
     expect(loadedTx.auxiliaryData?.blob).toEqual(metadata);
   });
 });

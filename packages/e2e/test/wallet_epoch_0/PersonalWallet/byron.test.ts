@@ -2,10 +2,8 @@
 import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano } from '@cardano-sdk/core';
 import { createLogger } from '@cardano-sdk/util-dev';
-import { filter, firstValueFrom, map, take } from 'rxjs';
 import { getEnv, walletVariables } from '../../../src/environment';
-import { getWallet, normalizeTxBody, walletReady } from '../../../src';
-import { isNotNil } from '@cardano-sdk/util';
+import { getWallet, normalizeTxBody, submitAndConfirm, walletReady } from '../../../src';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();
@@ -33,16 +31,7 @@ describe('PersonalWallet/byron', () => {
       .build();
 
     const { tx: signedTx } = await txBuilder.addOutput(txOutput).build().sign();
-    await wallet.submitTx(signedTx);
-
-    // Search chain history to see if the transaction is there.
-    const txFoundInHistory = await firstValueFrom(
-      wallet.transactions.history$.pipe(
-        map((txs) => txs.find((tx) => tx.id === signedTx.id)),
-        filter(isNotNil),
-        take(1)
-      )
-    );
+    const [, txFoundInHistory] = await submitAndConfirm(wallet, signedTx, 1);
 
     // Assert
     expect(txFoundInHistory).toBeDefined();

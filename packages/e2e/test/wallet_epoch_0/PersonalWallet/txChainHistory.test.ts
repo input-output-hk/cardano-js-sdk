@@ -1,7 +1,7 @@
 import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano, CardanoNodeUtil } from '@cardano-sdk/core';
 import { filter, firstValueFrom, map, take } from 'rxjs';
-import { getEnv, getWallet, normalizeTxBody, walletReady, walletVariables } from '../../../src';
+import { getEnv, getWallet, normalizeTxBody, submitAndConfirm, walletReady, walletVariables } from '../../../src';
 import { isNotNil } from '@cardano-sdk/util';
 import { logger } from '@cardano-sdk/util-dev';
 
@@ -28,7 +28,7 @@ describe('PersonalWallet/txChainHistory', () => {
     const txBuilder = wallet.createTxBuilder();
     const txOutput = await txBuilder.buildOutput().address(receivingAddress).coin(tAdaToSend).build();
     signedTx = (await txBuilder.addOutput(txOutput).build().sign()).tx;
-    await wallet.submitTx(signedTx);
+    await submitAndConfirm(wallet, signedTx, 1);
 
     logger.info(
       `Submitted transaction id: ${signedTx.id}, inputs: ${JSON.stringify(

@@ -1,9 +1,9 @@
 import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano, Serialization, UtxoProvider } from '@cardano-sdk/core';
-import { HexBlob, isNotNil } from '@cardano-sdk/util';
-import { Observable, filter, firstValueFrom, interval, map, switchMap, take } from 'rxjs';
+import { HexBlob } from '@cardano-sdk/util';
+import { Observable, filter, firstValueFrom, interval, switchMap } from 'rxjs';
 import { createLogger } from '@cardano-sdk/util-dev';
-import { getEnv, getWallet, utxoProviderFactory, walletReady, walletVariables } from '../../../src';
+import { getEnv, getWallet, submitAndConfirm, utxoProviderFactory, walletReady, walletVariables } from '../../../src';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();
@@ -85,7 +85,7 @@ const fundScript = async (wallet: BaseWallet, receivingAddress: Cardano.PaymentA
   const txBuilder = wallet.createTxBuilder();
   const txOutput = await txBuilder.buildOutput().address(receivingAddress).coin(tAdaToSend).datum(datum).build();
   const signedTx = (await txBuilder.addOutput(txOutput).build().sign()).tx;
-  await wallet.submitTx(signedTx);
+  const [, txFoundInHistory] = await submitAndConfirm(wallet, signedTx, 1);
 
   logger.info(
     `Submitted transaction id: ${signedTx.id}, inputs: ${JSON.stringify(
@@ -93,14 +93,6 @@ const fundScript = async (wallet: BaseWallet, receivingAddress: Cardano.PaymentA
     )} and outputs:${JSON.stringify(
       signedTx.body.outputs.map((txOut) => [txOut.address, Number.parseInt(txOut.value.coins.toString())])
     )}.`
-  );
-
-  const txFoundInHistory = await firstValueFrom(
-    wallet.transactions.history$.pipe(
-      map((txs) => txs.find((tx) => tx.id === signedTx.id)),
-      filter(isNotNil),
-      take(1)
-    )
   );
 
   logger.info(`Found transaction id in chain history: ${txFoundInHistory.id}`);
@@ -135,7 +127,7 @@ const createScriptRefInput = async (wallet: BaseWallet, script: Cardano.Script):
     .build();
 
   const signedTx = (await txBuilder.addOutput(txOutput).build().sign()).tx;
-  await wallet.submitTx(signedTx);
+  const [, txFoundInHistory] = await submitAndConfirm(wallet, signedTx, 1);
 
   logger.info(
     `Submitted transaction id: ${signedTx.id}, inputs: ${JSON.stringify(
@@ -143,14 +135,6 @@ const createScriptRefInput = async (wallet: BaseWallet, script: Cardano.Script):
     )} and outputs:${JSON.stringify(
       signedTx.body.outputs.map((txOut) => [txOut.address, Number.parseInt(txOut.value.coins.toString())])
     )}.`
-  );
-
-  const txFoundInHistory = await firstValueFrom(
-    wallet.transactions.history$.pipe(
-      map((txs) => txs.find((tx) => tx.id === signedTx.id)),
-      filter(isNotNil),
-      take(1)
-    )
   );
 
   logger.info(`Found transaction id in chain history: ${txFoundInHistory.id}`);
@@ -243,7 +227,7 @@ describe.skip('PersonalWallet/plutus', () => {
         .sign()
     ).tx;
 
-    await wallet.submitTx(signedTx);
+    const [, txFoundInHistory] = await submitAndConfirm(wallet, signedTx, 1);
 
     logger.info(
       `Submitted transaction id: ${signedTx.id}, inputs: ${JSON.stringify(
@@ -251,14 +235,6 @@ describe.skip('PersonalWallet/plutus', () => {
       )} and outputs:${JSON.stringify(
         signedTx.body.outputs.map((txOut) => [txOut.address, Number.parseInt(txOut.value.coins.toString())])
       )}.`
-    );
-
-    const txFoundInHistory = await firstValueFrom(
-      wallet.transactions.history$.pipe(
-        map((txs) => txs.find((tx) => tx.id === signedTx.id)),
-        filter(isNotNil),
-        take(1)
-      )
     );
 
     logger.info(`Found transaction id in chain history: ${txFoundInHistory.id}`);
@@ -327,7 +303,7 @@ describe.skip('PersonalWallet/plutus', () => {
         .sign()
     ).tx;
 
-    await wallet.submitTx(signedTx);
+    const [, txFoundInHistory] = await submitAndConfirm(wallet, signedTx, 1);
 
     logger.info(
       `Submitted transaction id: ${signedTx.id}, inputs: ${JSON.stringify(
@@ -335,14 +311,6 @@ describe.skip('PersonalWallet/plutus', () => {
       )} and outputs:${JSON.stringify(
         signedTx.body.outputs.map((txOut) => [txOut.address, Number.parseInt(txOut.value.coins.toString())])
       )}.`
-    );
-
-    const txFoundInHistory = await firstValueFrom(
-      wallet.transactions.history$.pipe(
-        map((txs) => txs.find((tx) => tx.id === signedTx.id)),
-        filter(isNotNil),
-        take(1)
-      )
     );
 
     logger.info(`Found transaction id in chain history: ${txFoundInHistory.id}`);

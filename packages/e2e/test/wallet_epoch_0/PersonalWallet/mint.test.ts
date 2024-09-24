@@ -13,8 +13,7 @@ import {
   walletVariables
 } from '../../../src';
 import { createLogger } from '@cardano-sdk/util-dev';
-import { filter, firstValueFrom, map, take } from 'rxjs';
-import { isNotNil } from '@cardano-sdk/util';
+import { filter, firstValueFrom } from 'rxjs';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();
@@ -99,16 +98,7 @@ describe('PersonalWallet/mint', () => {
     };
 
     const signedTx = await wallet.finalizeTx(finalizeProps);
-    await submitAndConfirm(wallet, signedTx);
-
-    // Search chain history to see if the transaction is there.
-    const txFoundInHistory = await firstValueFrom(
-      wallet.transactions.history$.pipe(
-        map((txs) => txs.find((tx) => tx.id === signedTx.id)),
-        filter(isNotNil),
-        take(1)
-      )
-    );
+    const [, txFoundInHistory] = await submitAndConfirm(wallet, signedTx, 1);
 
     expect(txFoundInHistory.id).toEqual(signedTx.id);
 
