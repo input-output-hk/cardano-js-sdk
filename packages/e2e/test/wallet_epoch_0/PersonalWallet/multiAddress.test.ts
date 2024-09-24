@@ -9,12 +9,11 @@ import {
   firstValueFromTimed,
   getWallet,
   normalizeTxBody,
+  submitAndConfirm,
   walletReady
 } from '../../../src';
 import { createLogger } from '@cardano-sdk/util-dev';
-import { filter, map, take } from 'rxjs';
 import { getEnv, walletVariables } from '../../../src/environment';
-import { isNotNil } from '@cardano-sdk/util';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();
@@ -77,16 +76,7 @@ describe('PersonalWallet/multiAddress', () => {
 
     const { tx: signedTx } = await txBuilder.build().sign();
 
-    await wallet.submitTx(signedTx);
-
-    // Search chain history to see if the transaction is there.
-    const txFoundInHistory = await firstValueFromTimed(
-      wallet.transactions.history$.pipe(
-        map((txs) => txs.find((tx) => tx.id === signedTx.id)),
-        filter(isNotNil),
-        take(1)
-      )
-    );
+    const [, txFoundInHistory] = await submitAndConfirm(wallet, signedTx, 1);
 
     expect(txFoundInHistory.id).toEqual(signedTx.id);
     expect(normalizeTxBody(txFoundInHistory.body)).toEqual(normalizeTxBody(signedTx.body));
@@ -143,16 +133,8 @@ describe('PersonalWallet/multiAddress', () => {
       )
       .build()
       .sign();
-    await newWallet.wallet.submitTx(returnAdaSignedTx);
 
-    // Search chain history to see if the transaction is there.
-    const returnAdaTxFoundInHistory = await firstValueFromTimed(
-      newWallet.wallet.transactions.history$.pipe(
-        map((txs) => txs.find((tx) => tx.id === returnAdaSignedTx.id)),
-        filter(isNotNil),
-        take(1)
-      )
-    );
+    const [, returnAdaTxFoundInHistory] = await submitAndConfirm(newWallet.wallet, returnAdaSignedTx, 1);
 
     expect(returnAdaTxFoundInHistory.id).toEqual(returnAdaSignedTx.id);
     expect(normalizeTxBody(returnAdaTxFoundInHistory.body)).toEqual(normalizeTxBody(returnAdaSignedTx.body));

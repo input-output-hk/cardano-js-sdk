@@ -6,6 +6,7 @@ import {
   getEnv,
   getWallet,
   normalizeTxBody,
+  submitAndConfirm,
   waitForWalletStateSettle,
   walletReady,
   walletVariables
@@ -52,7 +53,7 @@ describe('SharedWallet/simpleTx', () => {
     const txBuilder = faucetWallet.createTxBuilder();
     const txOutput = await txBuilder.buildOutput().address(receivingAddress).coin(initialFunds).build();
     fundingTx = (await txBuilder.addOutput(txOutput).build().sign()).tx;
-    await faucetWallet.submitTx(fundingTx);
+    await submitAndConfirm(faucetWallet, fundingTx, 1);
 
     logger.info(
       `Submitted transaction id: ${fundingTx.id}, inputs: ${JSON.stringify(

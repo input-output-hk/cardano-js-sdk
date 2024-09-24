@@ -4,7 +4,7 @@ import { HexBlob, isNotNil } from '@cardano-sdk/util';
 import { InitializeTxProps, computeScriptDataHash } from '@cardano-sdk/tx-construction';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
-import { firstValueFromTimed, getEnv, getWallet, walletReady, walletVariables } from '../../../src';
+import { firstValueFromTimed, getEnv, getWallet, submitAndConfirm, walletReady, walletVariables } from '../../../src';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();
@@ -37,16 +37,7 @@ const createCollateral = async (
   const txOutput = await txBuilder.buildOutput().address(address).coin(5_000_000n).build();
 
   const { tx: signedTx } = await txBuilder.addOutput(txOutput).build().sign();
-  await wallet.submitTx(signedTx);
-
-  // Wait for transaction to be on chain.
-  await firstValueFrom(
-    wallet.transactions.history$.pipe(
-      map((txs) => txs.find((tx) => tx.id === signedTx.id)),
-      filter(isNotNil),
-      take(1)
-    )
-  );
+  await submitAndConfirm(wallet, signedTx, 1);
 
   // Find the collateral UTxO in the UTxO set.
   const utxo = await firstValueFrom(
@@ -151,17 +142,8 @@ describe('PersonalWallet/phase2validation', () => {
 
     const signedTx = await wallet.finalizeTx(finalizeProps);
 
-    const [, failedTx, txFoundInHistory] = await Promise.all([
-      wallet.submitTx(signedTx),
-      firstValueFromTimed(wallet.transactions.outgoing.failed$),
-      firstValueFromTimed(
-        wallet.transactions.history$.pipe(
-          map((txs) => txs.find((tx) => tx.id === signedTx.id)),
-          filter(isNotNil),
-          take(1)
-        )
-      )
-    ]);
+    const [, txFoundInHistory] = await submitAndConfirm(wallet, signedTx, 1);
+    const failedTx = await firstValueFromTimed(wallet.transactions.outgoing.failed$);
 
     // Transaction should be part of the history
     expect(txFoundInHistory).toBeTruthy();

@@ -2,7 +2,7 @@
 import { BaseWallet, utxoEquals } from '@cardano-sdk/wallet';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
-import { firstValueFromTimed, getEnv, getWallet, walletReady, walletVariables } from '../../../src';
+import { firstValueFromTimed, getEnv, getWallet, submitAndConfirm, walletReady, walletVariables } from '../../../src';
 import { isNotNil } from '@cardano-sdk/util';
 
 const env = getEnv(walletVariables);
@@ -37,17 +37,7 @@ describe('PersonalWallet/unspendableUtxos', () => {
     const txOutput = await txBuilder1.buildOutput().address(address).coin(5_000_000n).build();
 
     const { tx: signedTx } = await txBuilder1.addOutput(txOutput).build().sign();
-    await wallet1.submitTx(signedTx);
-
-    // Search chain history to see if the transaction is there.
-    let txFoundInHistory = await firstValueFromTimed(
-      wallet1.transactions.history$.pipe(
-        map((txs) => txs.find((tx) => tx.id === signedTx.id)),
-        filter(isNotNil),
-        take(1)
-      ),
-      `Failed to find transaction ${signedTx.id} in src wallet history`
-    );
+    let [, txFoundInHistory] = await submitAndConfirm(wallet1, signedTx, 1);
 
     // Find the UTxO in the UTxO set.
     const utxo = await firstValueFromTimed(
@@ -97,17 +87,7 @@ describe('PersonalWallet/unspendableUtxos', () => {
       .addOutput(await txBuilder2.buildOutput().address(address).value(totalBalance).build())
       .build()
       .sign();
-    await wallet2.submitTx(signedMoveAdaTx);
-
-    // Search chain history to see if the transaction is there.
-    txFoundInHistory = await firstValueFromTimed(
-      wallet1.transactions.history$.pipe(
-        map((txs) => txs.find((tx) => tx.id === signedMoveAdaTx.id)),
-        filter(isNotNil),
-        take(1)
-      ),
-      `Failed to find second transaction ${signedMoveAdaTx.id} in dest wallet history`
-    );
+    [, txFoundInHistory] = await submitAndConfirm(wallet2, signedMoveAdaTx, 1);
 
     expect(txFoundInHistory.id).toEqual(signedMoveAdaTx.id);
 
