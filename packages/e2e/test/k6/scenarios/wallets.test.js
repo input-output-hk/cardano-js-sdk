@@ -245,7 +245,7 @@ const syncWallet = ({ wallet, poolAddress }) => {
   if (RUN_MODE === RunMode.Restore) {
     sdkCom.stakePoolSearch(poolAddress);
   }
-  sdkCom.stats();
+  sdkCom.stakePoolStats();
 
   // Consider the wallet synced by tracking its first address
   syncedWallets.add(addresses[0]);
