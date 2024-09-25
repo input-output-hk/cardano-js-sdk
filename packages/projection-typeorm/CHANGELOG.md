@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.8.38...@cardano-sdk/projection-typeorm@0.9.0) (2024-09-25)
+
+### ⚠ BREAKING CHANGES
+
+* OgmiosObservableCardanoNode and bufferChainSyncEvent were moved from core package to projection package
+
+### Bug Fixes
+
+* add asset id index on nft_metadata table ([05fc92c](https://github.com/input-output-hk/cardano-js-sdk/commit/05fc92cbbcbab15d4d568fd8fa682b1194fa58d1))
+
+### Code Refactoring
+
+* hoist bufferChainSyncEvent to projection package ([dd8b52f](https://github.com/input-output-hk/cardano-js-sdk/commit/dd8b52fac280e2ff090ded2020adb6078b90ab2e))
+
 ## [0.8.38](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.8.37...@cardano-sdk/projection-typeorm@0.8.38) (2024-09-12)
 
 ### Bug Fixes

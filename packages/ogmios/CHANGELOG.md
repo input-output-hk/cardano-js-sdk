@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.17.8...@cardano-sdk/ogmios@0.18.0) (2024-09-25)
+
+### ⚠ BREAKING CHANGES
+
+* OgmiosObservableCardanoNode and bufferChainSyncEvent were moved from core package to projection package
+
+### Code Refactoring
+
+* hoist bufferChainSyncEvent to projection package ([dd8b52f](https://github.com/input-output-hk/cardano-js-sdk/commit/dd8b52fac280e2ff090ded2020adb6078b90ab2e))
+
 ## [0.17.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.17.7...@cardano-sdk/ogmios@0.17.8) (2024-09-12)
 
 **Note:** Version bump only for package @cardano-sdk/ogmios

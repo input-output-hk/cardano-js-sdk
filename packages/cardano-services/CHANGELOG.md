@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.30.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.29.11...@cardano-sdk/cardano-services@0.30.0) (2024-09-25)
+
+### ⚠ BREAKING CHANGES
+
+* OgmiosObservableCardanoNode and bufferChainSyncEvent were moved from core package to projection package
+
+### Features
+
+* dockerize blockfrost-ryo ([d548040](https://github.com/input-output-hk/cardano-js-sdk/commit/d548040c85ea23a3c72457fccc760578c62d8c26))
+
+### Bug Fixes
+
+* add asset id index on nft_metadata table ([05fc92c](https://github.com/input-output-hk/cardano-js-sdk/commit/05fc92cbbcbab15d4d568fd8fa682b1194fa58d1))
+* **cardano-services:** plutus v3 scripts in db-sync utxo provider ([b5be7a4](https://github.com/input-output-hk/cardano-js-sdk/commit/b5be7a4ad0b815ef32eb98e6f38dd677a4b397ce))
+* **cardano-services:** refine redeemer purpose accordingly new db-sync version ([71f6de7](https://github.com/input-output-hk/cardano-js-sdk/commit/71f6de7c28a568c66544515316e82384bcf5e442))
+* **cardano-services:** refine update commitee proposal procedures accordingly new db-sync version ([348c810](https://github.com/input-output-hk/cardano-js-sdk/commit/348c810f166cdab363044ba4450eb25179db2bad))
+* **cardano-services:** resign commitee certificate ([80b8da5](https://github.com/input-output-hk/cardano-js-sdk/commit/80b8da53dc02de1cf1f323077599c80fc802bc20))
+
+### Code Refactoring
+
+* hoist bufferChainSyncEvent to projection package ([dd8b52f](https://github.com/input-output-hk/cardano-js-sdk/commit/dd8b52fac280e2ff090ded2020adb6078b90ab2e))
+
 ## [0.29.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.29.10...@cardano-sdk/cardano-services@0.29.11) (2024-09-12)
 
 ### Features

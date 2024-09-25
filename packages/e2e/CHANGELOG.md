@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.42.2...@cardano-sdk/e2e@0.43.0) (2024-09-25)
+
+### ⚠ BREAKING CHANGES
+
+* OgmiosObservableCardanoNode and bufferChainSyncEvent were moved from core package to projection package
+
+### Features
+
+* dockerize blockfrost-ryo ([d548040](https://github.com/input-output-hk/cardano-js-sdk/commit/d548040c85ea23a3c72457fccc760578c62d8c26))
+
+### Code Refactoring
+
+* hoist bufferChainSyncEvent to projection package ([dd8b52f](https://github.com/input-output-hk/cardano-js-sdk/commit/dd8b52fac280e2ff090ded2020adb6078b90ab2e))
+
 ## [0.42.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.42.1...@cardano-sdk/e2e@0.42.2) (2024-09-12)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

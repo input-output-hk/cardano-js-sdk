@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.40.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.39.3...@cardano-sdk/core@0.40.0) (2024-09-25)
+
+### ⚠ BREAKING CHANGES
+
+* OgmiosObservableCardanoNode and bufferChainSyncEvent were moved from core package to projection package
+
+### Bug Fixes
+
+* **core:** deserialization of Value now checks that both coin and multiasset amount are unsigned ([d394341](https://github.com/input-output-hk/cardano-js-sdk/commit/d39434120f23b60ee6e91ed2789f07a0a9959dd1))
+* **core:** don't check for cost model array length ([0b86722](https://github.com/input-output-hk/cardano-js-sdk/commit/0b86722137743570b69c45ccb0b6e4acf79b7195))
+* **core:** protocol parameters update now correctly deserializes extra entropy when it set as empty ([bcf3d15](https://github.com/input-output-hk/cardano-js-sdk/commit/bcf3d15b2d5ceb6e8cc2b7c8f32cb7802cd450f7))
+
+### Code Refactoring
+
+* hoist bufferChainSyncEvent to projection package ([dd8b52f](https://github.com/input-output-hk/cardano-js-sdk/commit/dd8b52fac280e2ff090ded2020adb6078b90ab2e))
+
 ## [0.39.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.39.2...@cardano-sdk/core@0.39.3) (2024-09-10)
 
 ### Features
