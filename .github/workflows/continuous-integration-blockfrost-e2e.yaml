@@ -30,6 +30,7 @@ env:
 
   # Blockfrost enablement
   BLOCKFROST_CUSTOM_BACKEND_URL: 'http://blockfrost-ryo:3000'
+  USE_TYPEORM_ASSET_PROVIDER: 'false'
   ASSET_PROVIDER: 'blockfrost'
   UTXO_PROVIDER: 'blockfrost'
   CHAIN_HISTORY_PROVIDER: 'blockfrost'
@@ -73,7 +74,7 @@ jobs:
       - name: 🌐 Setup local test network
         working-directory: packages/e2e
         run: |
-          yarn local-network:blockfrost:up -d
+          yarn local-network:up -d
         env:
           CARDANO_NODE_CHAINDB_LOG_LEVEL: 'Warning'
           CARDANO_NODE_LOG_LEVEL: 'Warning'

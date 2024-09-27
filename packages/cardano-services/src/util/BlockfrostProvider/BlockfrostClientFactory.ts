@@ -29,7 +29,8 @@ export const getBlockfrostApi = () => {
   // network is not mandatory, we keep it for safety.
   blockfrostApi = new BlockFrostAPI({
     network: process.env.NETWORK as AvailableNetworks,
-    projectId: process.env.BLOCKFROST_API_KEY
+    projectId: process.env.BLOCKFROST_API_KEY,
+    rateLimiter: false
   });
 
   return blockfrostApi;

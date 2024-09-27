@@ -12,3 +12,4 @@ dbSync:
 network: "custom"
 genesisDataFolder: '/app/config'
 tokenRegistryUrl: "https://tokens.cardano.org"
+tokenRegistryEnabled: false
