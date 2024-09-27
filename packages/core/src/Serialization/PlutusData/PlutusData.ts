@@ -14,6 +14,7 @@ const MAX_WORD64 = 18_446_744_073_709_551_615n;
 const INDEFINITE_BYTE_STRING = new Uint8Array([95]);
 const MAX_BYTE_STRING_CHUNK_SIZE = 64;
 const HASH_LENGTH_IN_BYTES = 32;
+const MINUS_ONE = BigInt(-1);
 
 /**
  * A type corresponding to the Plutus Core Data datatype.
@@ -37,7 +38,7 @@ export class PlutusData {
    *
    * @returns The CBOR representation of this instance as a Uint8Array.
    */
-  // eslint-disable-next-line complexity
+  // eslint-disable-next-line complexity, sonarjs/cognitive-complexity, max-statements
   toCbor(): HexBlob {
     if (this.#originalBytes) return this.#originalBytes;
 
@@ -92,9 +93,22 @@ export class PlutusData {
         ) {
           writer.writeInt(this.#integer!);
         } else {
-          // Otherwise, it would be encoded as a bignum anyway, so we manually do the bignum
-          // encoding with a bytestring inside.
-          writer.writeBigInteger(this.#integer!);
+          const serializedBigint = PlutusData.bigintToBuffer(this.#integer!);
+
+          writer.writeTag(this.#integer! < 0 ? CborTag.NegativeBigNum : CborTag.UnsignedBigNum);
+
+          if (serializedBigint.length <= MAX_BYTE_STRING_CHUNK_SIZE) {
+            writer.writeByteString(serializedBigint);
+          } else {
+            writer.writeEncodedValue(INDEFINITE_BYTE_STRING);
+
+            for (let i = 0; i < serializedBigint.length; i += MAX_BYTE_STRING_CHUNK_SIZE) {
+              const chunk = serializedBigint.slice(i, i + MAX_BYTE_STRING_CHUNK_SIZE);
+              writer.writeByteString(chunk);
+            }
+
+            writer.writeEndArray();
+          }
         }
 
         cbor = bytesToHex(writer.encode());
@@ -467,5 +481,25 @@ export class PlutusData {
       ret = (ret << 8n) + bi;
     }
     return ret;
+  }
+
+  /**
+   * Converts a bigint to an Uint8Array.
+   *
+   * @param value The bigint to serialize.
+   * @returns The Uint8Array with the bigint serialized data.
+   */
+  private static bigintToBuffer(value: bigint): Uint8Array {
+    if (value < 0) {
+      value = -value + MINUS_ONE;
+    }
+
+    let str = value.toString(16);
+
+    if (str.length % 2) {
+      str = `0${str}`;
+    }
+
+    return Buffer.from(str, 'hex');
   }
 }
