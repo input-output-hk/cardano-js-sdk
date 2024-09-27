@@ -1,14 +1,7 @@
-import {
-  Cardano,
-  CardanoNode,
-  NetworkInfoResponses,
-  Seconds,
-  WSMessage,
-  WsProvider,
-  createSlotEpochInfoCalc
-} from '@cardano-sdk/core';
+import { Cardano, CardanoNode, Seconds, createSlotEpochInfoCalc } from '@cardano-sdk/core';
 import { GenesisData } from '..';
 import { Logger } from 'ts-log';
+import { NetworkInfoResponses, WSMessage, WsProvider } from '@cardano-sdk/cardano-services-client';
 import { Notification, Pool } from 'pg';
 import { Server, createServer } from 'http';
 import { WebSocket, WebSocketServer } from 'ws';

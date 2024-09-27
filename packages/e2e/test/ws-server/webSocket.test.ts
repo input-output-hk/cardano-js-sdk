@@ -1,4 +1,4 @@
-import { CardanoWsClient } from '@cardano-sdk/cardano-services-client';
+import { CardanoWsClient, WsProvider } from '@cardano-sdk/cardano-services-client';
 import {
   CardanoWsServer,
   GenesisData,
@@ -6,7 +6,7 @@ import {
   getOgmiosCardanoNode,
   util
 } from '@cardano-sdk/cardano-services';
-import { HealthCheckResponse, WsProvider } from '@cardano-sdk/core';
+import { HealthCheckResponse } from '@cardano-sdk/core';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { filter, firstValueFrom } from 'rxjs';
