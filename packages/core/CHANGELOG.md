@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.40.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.40.0...@cardano-sdk/core@0.40.1) (2024-09-27)
+
+### Bug Fixes
+
+* **core:** plutus integers are now decoded correctly from indefinite length array form ([028f3f0](https://github.com/input-output-hk/cardano-js-sdk/commit/028f3f0c237cb1ef8cc3bb727edcbbafd1f5c01f))
+
 ## [0.40.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.39.3...@cardano-sdk/core@0.40.0) (2024-09-25)
 
 ### ⚠ BREAKING CHANGES
