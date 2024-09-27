@@ -886,7 +886,7 @@ export class CborReader {
       const { length: chunkLength, bytesRead } = CborReader.#peekDefiniteLength(nextInitialByte, data.slice(i));
       const payloadSize = bytesRead + Number(chunkLength);
 
-      concat = Buffer.concat([concat, this.#data.slice(i + (payloadSize - chunkLength), i + payloadSize)]);
+      concat = Buffer.concat([concat, data.slice(i + (payloadSize - chunkLength), i + payloadSize)]);
 
       i += payloadSize;
 

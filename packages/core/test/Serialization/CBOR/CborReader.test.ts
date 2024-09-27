@@ -374,6 +374,20 @@ describe('CborReader', () => {
           '64676273786767746f6768646a7074657476746b636f6376796669647171676775726a687268716169697370717275656c687679707178656577707279667677'
       );
       expect(reader.peekState()).toBe(CborReaderState.Finished);
+
+      reader = new CborReader(
+        HexBlob(
+          '5f584037d34fac60a7dd2edba0c76fa58862c91c45ff4298e9134ba8e76be9a7513d88865bfdb9315073dc2690b0f2b59a232fbfa0a8a504df6ee9bb78e3f33fbdfef95529c9e74ff30ffe1bd1cc5795c37535899dba800000ff'
+        )
+      );
+
+      expect(reader.peekState()).toBe(CborReaderState.StartIndefiniteLengthByteString);
+      array = reader.readByteString();
+      expect(array.length).toEqual(85);
+      expect(Buffer.from(array).toString('hex')).toEqual(
+        '37d34fac60a7dd2edba0c76fa58862c91c45ff4298e9134ba8e76be9a7513d88865bfdb9315073dc2690b0f2b59a232fbfa0a8a504df6ee9bb78e3f33fbdfef929c9e74ff30ffe1bd1cc5795c37535899dba800000'
+      );
+      expect(reader.peekState()).toBe(CborReaderState.Finished);
     });
   });
 
