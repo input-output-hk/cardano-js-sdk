@@ -1,7 +1,6 @@
 {
   lib,
   values,
-  chart,
   utils,
   config,
   ...
@@ -10,7 +9,7 @@
     apiVersion = "apps/v1";
     kind = "Deployment";
     metadata = {
-      name = "${chart.name}-blockfrost-worker";
+      name = "${config.name}-blockfrost-worker";
       labels = utils.appLabels "blockfrost-worker";
     };
     spec = {

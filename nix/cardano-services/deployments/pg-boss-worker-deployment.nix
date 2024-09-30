@@ -2,7 +2,6 @@
   lib,
   utils,
   values,
-  chart,
   config,
   ...
 }: {
@@ -10,7 +9,7 @@
     apiVersion = "apps/v1";
     kind = "Deployment";
     metadata = {
-      name = "${chart.name}-pg-boss-worker";
+      name = "${config.name}-pg-boss-worker";
       labels = utils.appLabels "pg-boss-worker";
     };
     spec = {
@@ -61,8 +60,8 @@
 
                   METADATA_FETCH_MODE = values.pg-boss-worker.metadata-fetch-mode;
 
-                  STAKE_POOL_PROVIDER_URL = "http://${chart.name}-backend.${chart.namespace}.svc.cluster.local";
-                  NETWORK_INFO_PROVIDER_URL = "http://${chart.name}-backend.${chart.namespace}.svc.cluster.local";
+                  STAKE_POOL_PROVIDER_URL = "http://${config.name}-backend.${config.namespace}.svc.cluster.local";
+                  NETWORK_INFO_PROVIDER_URL = "http://${config.name}-backend.${config.namespace}.svc.cluster.local";
 
                   POSTGRES_POOL_MAX_STAKE_POOL = "5";
                   POSTGRES_HOST_STAKE_POOL = values.postgresName;

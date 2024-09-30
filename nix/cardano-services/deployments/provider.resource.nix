@@ -3,7 +3,6 @@
   lib,
   utils,
   config,
-  chart,
   ...
 }: let
   inherit (lib) types mkOption mkIf;
@@ -73,7 +72,7 @@ in {
           kind = "ServiceMonitor";
           metadata = {
             labels = {instance = "primary";};
-            name = "${chart.name}-${name}-monitor";
+            name = "${config.name}-${name}-monitor";
           };
           spec = {
             endpoints = [
@@ -93,7 +92,7 @@ in {
           apiVersion = "v1";
           kind = "Service";
           metadata = {
-            name = "${chart.name}-${name}";
+            name = "${config.name}-${name}";
             labels = utils.appLabels name;
           };
           spec = {
@@ -113,7 +112,7 @@ in {
           apiVersion = "apps/v1";
           kind = "Deployment";
           metadata = {
-            name = "${chart.name}-${name}";
+            name = "${config.name}-${name}";
             labels = utils.appLabels name;
           };
           spec = {

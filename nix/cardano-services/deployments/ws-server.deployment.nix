@@ -2,7 +2,6 @@
   lib,
   utils,
   values,
-  chart,
   config,
   ...
 }: {
@@ -10,7 +9,7 @@
     apiVersion = "v1";
     kind = "Service";
     metadata = {
-      name = "${chart.name}-ws-server";
+      name = "${config.name}-ws-server";
       labels = utils.appLabels "ws-server";
     };
     spec = {
@@ -30,7 +29,7 @@
     apiVersion = "apps/v1";
     kind = "Deployment";
     metadata = {
-      name = "${chart.name}-ws-server";
+      name = "${config.name}-ws-server";
       labels = utils.appLabels "ws-server";
     };
     spec = {
