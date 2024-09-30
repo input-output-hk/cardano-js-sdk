@@ -10,8 +10,11 @@
     n2c.url = "github:nlewo/nix2container";
     n2c.inputs.nixpkgs.follows = "nixpkgs";
 
-    nix-helm.url = "github:gytis-ivaskevicius/nix-helm";
-    nix-helm.inputs.nixpkgs.follows = "nixpkgs";
+    nix-toolbox.url = "github:DevPalace/nix-toolbox/";
+    #nix-toolbox.inputs.nixpkgs.follows = "nixpkgs";
+    nix-toolbox.inputs.flake-parts.follows = "flake-parts";
+    nix-toolbox.inputs.nix2container.follows = "";
+
 
     std = {
       url = "github:divnix/std";
@@ -35,7 +38,7 @@
   outputs = {
     std,
     self,
-    nix-helm,
+    nix-toolbox,
     devshell,
     ...
   } @ inputs:
@@ -72,7 +75,7 @@
         system,
         ...
       }: {
-        legacyPackages.cardano-services = import ./nix/cardano-services/deployments {inherit pkgs nix-helm inputs;};
+        legacyPackages.cardano-services = import ./nix/cardano-services/deployments {inherit pkgs nix-toolbox inputs;};
       };
     };
 }
