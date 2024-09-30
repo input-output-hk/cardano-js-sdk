@@ -57,7 +57,7 @@ in {
 
   config.resources.deployments =
     lib.mapAttrs' (name: value: {
-      name = "${name}-projector-deployment";
+      name = "${name}-projector";
 
       value = mkIf value.enabled {
         metadata = {
