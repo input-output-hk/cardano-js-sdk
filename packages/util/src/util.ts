@@ -6,3 +6,12 @@ export const resolveObjectValues = async <T>(obj: { [k: string]: PromiseOrValue<
       Object.entries(obj).map(([key, promise]) => Promise.resolve(promise).then((value) => [key, value]))
     )
   );
+
+export const removeUndefinedFields = <T extends Record<string, any>>(obj: T): T => {
+  for (const [key, value] of Object.entries(obj)) {
+    if (value === undefined) {
+      delete obj[key];
+    }
+  }
+  return obj;
+};
