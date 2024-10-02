@@ -440,7 +440,7 @@ describe('chain history mappers', () => {
     );
   });
   describe('mapRedeemer', () => {
-    const redeemerModel: Omit<RedeemerModel, 'purpose'> = {
+    const redeemerModel: Omit<RedeemerModel, 'id' | 'purpose'> = {
       index: 1,
       script_hash: Buffer.from(hash28ByteBase16, 'hex'),
       tx_id: Buffer.from(transactionHash, 'hex'),
