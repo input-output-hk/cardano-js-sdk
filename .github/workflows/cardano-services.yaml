@@ -10,7 +10,7 @@ jobs:
     - uses: aws-actions/configure-aws-credentials@v4.0.2
       with:
         aws-region: us-east-1
-        role-to-assume: ${{ github.ref == 'refs/heads/master' && 'arn:aws:iam::926093910549:role/eks-admin'
+        role-to-assume: ${{ contains(github.ref, "release/") && 'arn:aws:iam::926093910549:role/eks-admin'
           || 'arn:aws:iam::926093910549:role/eks-devs' }}
     - name: 🚀 Deploy
       run: 'echo "yes" | nix run .#cardano-services.${{inputs.target}}.${{inputs.action}}
