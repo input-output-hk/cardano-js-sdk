@@ -181,6 +181,7 @@ export const findWithdrawalsByTxIds = `
 
 export const findRedeemersByTxIds = `
 	SELECT
+		redeemer.id AS id,
 		redeemer."index" AS "index",
 		redeemer.purpose AS purpose,
 		redeemer.script_hash AS script_hash,
@@ -189,8 +190,7 @@ export const findRedeemersByTxIds = `
 		tx.hash AS tx_id
 	FROM redeemer
 	JOIN tx ON tx.id = redeemer.tx_id
-	WHERE tx.id = ANY($1)
-	ORDER BY redeemer.id ASC`;
+	WHERE tx.id = ANY($1)`;
 
 export const findVotingProceduresByTxIds = `
 	SELECT
