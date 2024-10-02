@@ -451,8 +451,8 @@ describe('PersonalWallet/conwayTransactions', () => {
   });
 
   describe('with proposal procedure', () => {
-    let actionId: Cardano.GovernanceActionId;
     let confirmedTx: Cardano.HydratedTx;
+    let id: Cardano.TransactionId;
     let proposalProcedures: Cardano.ProposalProcedure[];
 
     beforeAll(async () => {
@@ -519,10 +519,7 @@ describe('PersonalWallet/conwayTransactions', () => {
         .customize(({ txBody }) => ({ ...txBody, proposalProcedures }))
         .build()
         .sign();
-      const [id, tx] = await submitAndConfirm(wallet, signedTx.tx, 1);
-      confirmedTx = tx;
-
-      actionId = { actionIndex: 0, id };
+      [id, confirmedTx] = await submitAndConfirm(wallet, signedTx.tx, 1);
     });
 
     it('parameter_change_action correctly submits protocol parameters update', () => {
@@ -533,7 +530,10 @@ describe('PersonalWallet/conwayTransactions', () => {
       const votingProcedures: Cardano.VotingProcedures = [
         {
           voter: { __typename: VoterType.dRepKeyHash, credential: dRepCredential },
-          votes: [{ actionId, votingProcedure: { anchor, vote: Vote.abstain } }]
+          votes: [
+            { actionId: { actionIndex: 0, id }, votingProcedure: { anchor, vote: Vote.abstain } },
+            { actionId: { actionIndex: 1, id }, votingProcedure: { anchor: null, vote: Vote.yes } }
+          ]
         }
       ];
       const signedTx = await dRepWallet

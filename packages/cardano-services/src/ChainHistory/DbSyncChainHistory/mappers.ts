@@ -24,7 +24,7 @@ import {
   WithCertType,
   WithdrawalModel
 } from './types';
-import { Cardano, NotImplementedError } from '@cardano-sdk/core';
+import { Cardano, NotImplementedError, Serialization } from '@cardano-sdk/core';
 import { Hash28ByteBase16, Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import {
   isAuthorizeCommitteeHotCertModel,
@@ -91,29 +91,36 @@ export const mapTxInModel = (txInModel: TxInputModel): TxInput => ({
   txSourceId: txInModel.tx_source_id.toString('hex') as unknown as Cardano.TransactionId
 });
 
-export const mapTxOut = (txOut: TxOutput): Cardano.TxOut => ({
-  address: txOut.address,
-  datum: txOut.datum,
-  datumHash: txOut.datumHash,
-  scriptReference: txOut.scriptReference,
-  value: txOut.value
-});
+export const mapTxOut = (txOut: TxOutput) => {
+  const result: Cardano.TxOut = { address: txOut.address, value: txOut.value };
+
+  if (txOut.datum) result.datum = txOut.datum;
+  if (txOut.datumHash) result.datumHash = txOut.datumHash;
+  if (txOut.scriptReference) result.scriptReference = txOut.scriptReference;
+
+  return result;
+};
 
 export const mapTxOutModel = (
   txOutModel: TxOutputModel,
   props: { assets?: Cardano.TokenMap; script?: Cardano.Script }
-): TxOutput => ({
-  address: txOutModel.address as unknown as Cardano.PaymentAddress,
-  // Inline datums are missing, but for now it's ok on ChainHistoryProvider
-  datumHash: txOutModel.datum ? (txOutModel.datum.toString('hex') as unknown as Hash32ByteBase16) : undefined,
-  index: txOutModel.index,
-  scriptReference: props.script,
-  txId: txOutModel.tx_id.toString('hex') as unknown as Cardano.TransactionId,
-  value: {
-    assets: props.assets && props.assets.size > 0 ? props.assets : undefined,
-    coins: BigInt(txOutModel.coin_value)
-  }
-});
+) => {
+  const result: TxOutput = {
+    address: txOutModel.address as unknown as Cardano.PaymentAddress,
+    datum: txOutModel.bytes
+      ? Serialization.PlutusData.fromCbor(HexBlob(txOutModel.bytes.toString('hex'))).toCore()
+      : undefined,
+    datumHash: txOutModel.datum ? (txOutModel.datum.toString('hex') as unknown as Hash32ByteBase16) : undefined,
+    index: txOutModel.index,
+    scriptReference: props.script,
+    txId: txOutModel.tx_id.toString('hex') as unknown as Cardano.TransactionId,
+    value: { coins: BigInt(txOutModel.coin_value) }
+  };
+
+  if (props.assets && props.assets.size > 0) result.value.assets = props.assets;
+
+  return result;
+};
 
 export const mapWithdrawal = (withdrawalModel: WithdrawalModel): Cardano.Withdrawal => ({
   quantity: BigInt(withdrawalModel.quantity),
@@ -164,7 +171,7 @@ export const mapRedeemer = (redeemerModel: RedeemerModel): Cardano.Redeemer => (
   purpose: mapRedeemerPurpose(redeemerModel.purpose)
 });
 
-export const mapAnchor = (anchorUrl: string, anchorDataHash: string): Cardano.Anchor | null => {
+export const mapAnchor = (anchorUrl?: string, anchorDataHash?: string): Cardano.Anchor | null => {
   if (!!anchorUrl && !!anchorDataHash) {
     return {
       dataHash: anchorDataHash as Hash32ByteBase16,

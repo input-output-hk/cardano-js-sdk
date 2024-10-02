@@ -8,7 +8,7 @@ env:
   KEY_MANAGEMENT_PARAMS: '{"bip32Ed25519": "Sodium", "accountIndex": 0, "chainId":{"networkId": 0, "networkMagic": 888}, "passphrase":"some_passphrase","mnemonic":"vacant violin soft weird deliver render brief always monitor general maid smart jelly core drastic erode echo there clump dizzy card filter option defense"}'
   TEST_CLIENT_ASSET_PROVIDER: 'http'
   TEST_CLIENT_ASSET_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4014/"}'
-  TEST_CLIENT_CHAIN_HISTORY_PROVIDER: 'http'
+  TEST_CLIENT_CHAIN_HISTORY_PROVIDER: 'ws'
   TEST_CLIENT_CHAIN_HISTORY_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
   DB_SYNC_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/cexplorer'
   TEST_CLIENT_HANDLE_PROVIDER: 'http'
@@ -22,7 +22,7 @@ env:
   TEST_CLIENT_REWARDS_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
   TEST_CLIENT_TX_SUBMIT_PROVIDER: 'http'
   TEST_CLIENT_TX_SUBMIT_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
-  TEST_CLIENT_UTXO_PROVIDER: 'http'
+  TEST_CLIENT_UTXO_PROVIDER: 'ws'
   TEST_CLIENT_UTXO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
   TEST_CLIENT_STAKE_POOL_PROVIDER: 'http'
   TEST_CLIENT_STAKE_POOL_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
@@ -79,7 +79,6 @@ jobs:
         run: |
           yarn workspace @cardano-sdk/e2e test:wallet:epoch0
           yarn workspace @cardano-sdk/e2e test:projection
-          yarn workspace @cardano-sdk/e2e test:ws
 
       - name: Wait for epoch 3
         run: |
@@ -88,6 +87,7 @@ jobs:
       - name: 🔬 Test - e2e - wallet at epoch 3
         run: |
           yarn workspace @cardano-sdk/e2e test:wallet:epoch3
+          yarn workspace @cardano-sdk/e2e test:ws
           yarn workspace @cardano-sdk/e2e test:pg-boss
           yarn workspace @cardano-sdk/e2e test:providers
         env:

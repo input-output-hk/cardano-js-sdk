@@ -1,3 +1,5 @@
+# cSpell:ignore utxo
+
 x-from-sdk: &from-sdk
   healthcheck:
     interval: 10s

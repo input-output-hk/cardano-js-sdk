@@ -1,3 +1,5 @@
+// cSpell:ignore impls
+
 /* eslint-disable complexity */
 import {
   AssetProvider,
@@ -157,12 +159,24 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
 
   const getEpochMonitor = memoize((dbPool: Pool) => new DbSyncEpochPollService(dbPool, args.epochPollInterval!));
 
+  const getDbSyncChainHistoryProvider = withDbSyncProvider((dbPools, cardanoNode) => {
+    const cache = { healthCheck: healthCheckCache };
+    const metadataService = createDbSyncMetadataService(dbPools.main, logger);
+
+    return new DbSyncChainHistoryProvider(
+      { paginationPageSizeLimit: args.paginationPageSizeLimit! },
+      { cache, cardanoNode, dbPools, logger, metadataService }
+    );
+  }, ServiceNames.ChainHistory);
+
   const getWebSocketClient = () => {
     const url = args.webSocketApiUrl;
 
     if (!url) throw new MissingProgramOption('WebSocket', CommonOptionsDescriptions.WebSocketApiUrl);
 
-    return new CardanoWsClient({ logger }, { url });
+    const chainHistoryProvider = getDbSyncChainHistoryProvider();
+
+    return new CardanoWsClient({ chainHistoryProvider, logger }, { url });
   };
 
   const getDbSyncStakePoolProvider = withDbSyncProvider((dbPools, cardanoNode) => {
@@ -298,6 +312,8 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     new BlockfrostNetworkInfoProvider({ blockfrost: getBlockfrostApi(), logger });
 
   const getDbSyncNetworkInfoProvider = withDbSyncProvider((dbPools, cardanoNode) => {
+    if (args.useWebSocketApi) return getWebSocketClient().networkInfoProvider;
+
     if (!genesisData)
       throw new MissingProgramOption(ServiceNames.NetworkInfo, CommonOptionsDescriptions.CardanoNodeConfigPath);
 
@@ -316,23 +332,6 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
 
   const getBlockfrostChainHistoryProvider = () =>
     new BlockfrostChainHistoryProvider({ blockfrost: getBlockfrostApi(), logger });
-
-  const getDbSyncChainHistoryProvider = withDbSyncProvider(
-    (dbPools, cardanoNode) =>
-      new DbSyncChainHistoryProvider(
-        { paginationPageSizeLimit: args.paginationPageSizeLimit! },
-        {
-          cache: {
-            healthCheck: healthCheckCache
-          },
-          cardanoNode,
-          dbPools,
-          logger,
-          metadataService: createDbSyncMetadataService(dbPools.main, logger)
-        }
-      ),
-    ServiceNames.ChainHistory
-  );
 
   const getBlockfrostRewardsProvider = () => new BlockfrostRewardsProvider({ blockfrost: getBlockfrostApi(), logger });
 
@@ -417,8 +416,6 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       const networkInfoProvider =
         args.networkInfoProvider === ProviderImplementation.BLOCKFROST
           ? getBlockfrostNetworkInfoProvider()
-          : args.useWebSocketApi
-          ? getWebSocketClient().networkInfoProvider
           : getDbSyncNetworkInfoProvider();
       return new NetworkInfoHttpService({
         logger,

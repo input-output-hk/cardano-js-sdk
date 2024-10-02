@@ -30,7 +30,7 @@
     "test:ogmios": "jest -c jest.config.js --forceExit --selectProjects ogmios --runInBand --verbose",
     "test:pg-boss": "jest -c jest.config.js --forceExit --selectProjects pg-boss --runInBand --verbose",
     "test:providers": "jest -c jest.config.js --forceExit --selectProjects providers --runInBand --verbose",
-    "test:wallet": "yarn wait-for-network-init ; yarn test:wallet:epoch0 && yarn test:ws && { yarn wait-for-network-epoch-3 ; yarn test:wallet:epoch3 ; }",
+    "test:wallet": "yarn wait-for-network-init ; yarn test:wallet:epoch0 && { yarn wait-for-network-epoch-3 ; yarn test:wallet:epoch3 && yarn test:ws ; }",
     "test:wallet:epoch0": "jest -c jest.config.js --forceExit --selectProjects wallet_epoch_0 --runInBand --verbose",
     "test:wallet:epoch3": "jest -c jest.config.js --forceExit --selectProjects wallet_epoch_3 --runInBand --verbose",
     "test:wallet-real-ada": "NETWORK_SPEED=slow jest -c jest.config.js --forceExit --selectProjects wallet-real-ada --runInBand --verbose",

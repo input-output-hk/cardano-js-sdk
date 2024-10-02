@@ -172,7 +172,6 @@ describe('UtxoHttpService', () => {
 
         expect(res.length).toBeGreaterThan(0);
         expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.outputWithInlineDatum]);
-        expect(res[0][1].datumHash).toBeUndefined();
       });
 
       it('return UTxO with time lock reference script', async () => {

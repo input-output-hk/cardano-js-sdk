@@ -148,7 +148,7 @@ in
         };
 
         ws-server = {
-          enabled = false;
+          enabled = true;
           resources.limits = mkPodResources "300Mi" "300m";
           resources.requests = mkPodResources "150Mi" "200m";
         };
@@ -230,7 +230,6 @@ in
 
           values = {
             useAccelerator = true;
-            ws-server.enabled = true;
             stakepool.databaseName = "stakepoolv2";
             cardano-services = {
               ingresOrder = 99;
@@ -316,7 +315,6 @@ in
           };
 
           values = {
-            ws-server.enabled = true;
             cardano-services = {
               ingresOrder = 99;
               additionalRoutes = [
@@ -366,7 +364,6 @@ in
 
           values = {
             useAccelerator = true;
-            ws-server.enabled = true;
             stakepool.databaseName = "stakepoolv2";
             backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
 
@@ -406,7 +403,6 @@ in
           };
 
           values = {
-            ws-server.enabled = true;
             stakepool.databaseName = "stakepoolv2";
             blockfrost-worker.enabled = true;
             pg-boss-worker.enabled = true;
@@ -714,7 +710,6 @@ in
           values = {
             pg-boss-worker.enabled = true;
             pg-boss-worker.queues = "pool-delist-schedule,pool-metadata,pool-metrics,pool-rewards";
-            ws-server.enabled = true;
             cardano-services = {
               ingresOrder = 99;
             };

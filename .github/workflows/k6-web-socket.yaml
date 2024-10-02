@@ -25,7 +25,17 @@ on:
         description: 'Number of wallets to simulate'
         type: number
         required: true
-        default: 1000
+        default: 100
+      hd-addr-per-wallet:
+        description: 'Number of addresses per wallet.'
+        type: number
+        required: true
+        default: 10
+      hd-tx-history-size-per-wallet:
+        description: 'Maximum number of transactions per wallet. Filter wallet addresses to have a tx history size smaller than this value.'
+        type: number
+        required: true
+        default: 100
 
 jobs:
   web-socket:
@@ -55,6 +65,8 @@ jobs:
             -e TARGET_ENV=${{ inputs.environment }}
             -e TARGET_NET=${{ inputs.network }}
             -e WALLETS=${{ inputs.wallets }}
+            -e HD_ACTIVE_ADDR_COUNT=${{ inputs.hd-addr-per-wallet }}
+            -e HD_MAX_TX_HISTORY=${{ inputs.hd-tx-history-size-per-wallet }}
             --out json=web-socket-results.json
             --quiet
       - name: Upload performance test results
