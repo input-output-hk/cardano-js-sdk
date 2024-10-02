@@ -1,9 +1,8 @@
 {
-  config,
   values,
   lib,
   utils,
-  chart,
+  config,
   ...
 }: {
   providers.chain-history-provider = {

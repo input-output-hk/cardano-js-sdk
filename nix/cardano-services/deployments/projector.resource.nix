@@ -3,14 +3,10 @@
   lib,
   utils,
   config,
-  chart,
   ...
 }: let
   inherit (lib) types mkOption mkIf;
 in {
-  imports = [
-    ./deployment.resource.nix
-  ];
   options = {
     projectors = mkOption {
       # TODO: Add proper type definition and generate docs from it
@@ -59,29 +55,43 @@ in {
     };
   };
 
-  config = {
-    deployments =
-      lib.mapAttrs' (name: value: {
-        name = "${name}-projector-deployment";
+  config.resources.deployments =
+    lib.mapAttrs' (name: value: {
+      name = "${name}-projector";
 
-        value = mkIf value.enabled {
+      value = mkIf value.enabled {
+        metadata = {
           labels = utils.appLabels "${name}-projector";
-          imagePullSecrets = ["dockerconfigjson"];
-          name = "${chart.name}-${name}-projector";
-
-          containers."${name}-projector" = {
-            inherit (value) args env livenessProbe image resources;
-            ports.http.containerPort = value.port;
-            securityContext = {
-              runAsUser = 0;
-              runAsGroup = 0;
-            };
-
-            volumeMounts.tls.mountPath = "/tls";
-          };
-          volumes.tls.secret.secretName = "postgresql-server-cert";
+          name = "${config.name}-${name}-projector";
         };
-      })
-      config.projectors;
-  };
+        spec = {
+          selector.matchLabels = utils.appLabels "${name}-projector";
+          template = {
+            metadata.labels = utils.appLabels "${name}-projector";
+            spec = {
+              imagePullSecrets.dockerconfigjson = {};
+
+              containers."${name}-projector" = {
+                inherit (value) args livenessProbe image resources;
+                env = utils.mkPodEnv value.env;
+                ports.http.containerPort = value.port;
+                securityContext = {
+                  runAsUser = 0;
+                  runAsGroup = 0;
+                };
+
+                volumeMounts = [
+                  {
+                    name = "tls";
+                    mountPath = "/tls";
+                  }
+                ];
+              };
+              volumes.tls.secret.secretName = "postgresql-server-cert";
+            };
+          };
+        };
+      };
+    })
+    config.projectors;
 }

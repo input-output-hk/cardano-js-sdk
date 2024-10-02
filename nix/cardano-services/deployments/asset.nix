@@ -3,7 +3,6 @@
   values,
   lib,
   utils,
-  chart,
   ...
 }: {
   providers.asset-provider = {

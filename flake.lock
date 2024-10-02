@@ -115,7 +115,7 @@
     },
     "haumea": {
       "inputs": {
-        "nixpkgs": "nixpkgs_3"
+        "nixpkgs": "nixpkgs_4"
       },
       "locked": {
         "lastModified": 1685133229,
@@ -175,23 +175,25 @@
         "type": "github"
       }
     },
-    "nix-helm": {
+    "nix-toolbox": {
       "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nix2container": [],
+        "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1716461974,
-        "narHash": "sha256-7V5CPaewjBBurJ5y1jZ1zzmvRh7Amejk7qIL2MFI5H0=",
-        "owner": "gytis-ivaskevicius",
-        "repo": "nix-helm",
-        "rev": "00cfdd9314cb1090eb25a585741d947e9a674235",
+        "lastModified": 1727692067,
+        "narHash": "sha256-PAkZcO3G4jbLfGvvDpi3h0WtJNs98cHIUHY6ga4bH44=",
+        "owner": "DevPalace",
+        "repo": "nix-toolbox",
+        "rev": "2c3707ed037ef7b3bcd01fc459803550366c28b2",
         "type": "github"
       },
       "original": {
-        "owner": "gytis-ivaskevicius",
-        "repo": "nix-helm",
+        "owner": "DevPalace",
+        "repo": "nix-toolbox",
         "type": "github"
       }
     },
@@ -231,6 +233,21 @@
     },
     "nixpkgs_2": {
       "locked": {
+        "lastModified": 1727690403,
+        "narHash": "sha256-rg3rQ6Q9QCIEUBIDTvHizxlhPkan/Iv6XHkFJkUceOE=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "b5308e754789375535fad708ea7ab644bbc1c84c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_3": {
+      "locked": {
         "lastModified": 1690924695,
         "narHash": "sha256-1yshNzds/qJztMoJk0Sa2xhKwSLaOAuepR6ABWbrgRU=",
         "owner": "nixos",
@@ -245,7 +262,7 @@
         "type": "github"
       }
     },
-    "nixpkgs_3": {
+    "nixpkgs_4": {
       "locked": {
         "lastModified": 1681001314,
         "narHash": "sha256-5sDnCLdrKZqxLPK4KA8+f4A3YKO/u6ElpMILvX0g72c=",
@@ -324,8 +341,8 @@
         "devshell": "devshell",
         "flake-parts": "flake-parts",
         "n2c": "n2c",
-        "nix-helm": "nix-helm",
-        "nixpkgs": "nixpkgs_2",
+        "nix-toolbox": "nix-toolbox",
+        "nixpkgs": "nixpkgs_3",
         "std": "std"
       }
     },
