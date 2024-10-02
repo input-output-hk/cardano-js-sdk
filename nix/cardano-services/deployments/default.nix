@@ -2,7 +2,7 @@
 {
   pkgs,
   lib ? pkgs.lib,
-  nix-helm,
+  nix-toolbox,
   inputs,
 }: let
   mkPodResources = memory: cpu: {inherit memory cpu;};
@@ -35,7 +35,7 @@
       "http://localhost"
     ];
 in
-  nix-helm.builders.${pkgs.system}.mkHelmMultiTarget {
+  nix-toolbox.legacyPackages.${pkgs.system}.helm.mkHelm {
     defaults = final: let
       inherit (final) values;
     in {
@@ -186,6 +186,7 @@ in
         };
       };
       imports = [
+        ./ci.nix
         ./wallet-api.nix
         ./options.nix
         ./ws-server.deployment.nix

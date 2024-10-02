@@ -3,7 +3,6 @@
   values,
   lib,
   utils,
-  chart,
   ...
 }: {
   projectors.wallet-api = {

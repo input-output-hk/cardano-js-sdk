@@ -1,7 +1,6 @@
 {
   lib,
   values,
-  chart,
   config,
   utils,
   ...
@@ -9,10 +8,10 @@
   templates.accelerator = lib.mkIf (values.useAccelerator && values.ingress.enabled) {
     apiVersion = "operator.h3poteto.dev/v1alpha1";
     kind = "EndpointGroupBinding";
-    metadata.name = "${chart.name}-main";
+    metadata.name = "${config.name}-main";
     spec = {
       endpointGroupArn = values.acceleratorArn;
-      ingressRef.name = "${chart.name}-backend";
+      ingressRef.name = "${config.name}-backend";
     };
   };
 
@@ -20,7 +19,7 @@
     apiVersion = "networking.k8s.io/v1";
     kind = "Ingress";
     metadata = {
-      name = "${chart.name}-backend";
+      name = "${config.name}-backend";
       labels = utils.appLabels "backend";
       annotations =
         if values.useAccelerator
@@ -62,7 +61,7 @@
           # Use latency routing policy
           "external-dns.alpha.kubernetes.io/aws-region" = config.region;
           "external-dns.alpha.kubernetes.io/set-identifier" = values.backend.dnsId;
-          "alb.ingress.kubernetes.io/group.name" = chart.namespace;
+          "alb.ingress.kubernetes.io/group.name" = config.namespace;
           "alb.ingress.kubernetes.io/group.order" = toString values.cardano-services.ingresOrder;
         };
     };
@@ -77,7 +76,7 @@
                 pathType = "Prefix";
                 path = "/v${lib.last (lib.sort lib.versionOlder values.cardano-services.versions.handle)}/asset";
                 backend.service = {
-                  name = "${chart.name}-asset-provider";
+                  name = "${config.name}-asset-provider";
                   port.name = "http";
                 };
               }
@@ -87,7 +86,7 @@
                 pathType = "Prefix";
                 path = "/v${lib.last (lib.sort lib.versionOlder values.cardano-services.versions.handle)}/handle";
                 backend.service = {
-                  name = "${chart.name}-handle-provider";
+                  name = "${config.name}-handle-provider";
                   port.name = "http";
                 };
               }
@@ -97,7 +96,7 @@
                 pathType = "Prefix";
                 path = "/v${version}/chain-history";
                 backend.service = {
-                  name = "${chart.name}-chain-history-provider";
+                  name = "${config.name}-chain-history-provider";
                   port.name = "http";
                 };
               })
@@ -118,7 +117,7 @@
                   pathType = "Prefix";
                   path = it;
                   backend.service = {
-                    name = "${chart.name}-backend";
+                    name = "${config.name}-backend";
                     port.name = "http";
                   };
                 }
@@ -129,7 +128,7 @@
                 pathType = "Prefix";
                 path = "/v${lib.last (lib.sort lib.versionOlder values.cardano-services.versions.stakePool)}/stake-pool";
                 backend.service = {
-                  name = "${chart.name}-stake-pool-provider";
+                  name = "${config.name}-stake-pool-provider";
                   port.name = "http";
                 };
               }
@@ -139,7 +138,7 @@
                 pathType = "Exact";
                 path = "/ws";
                 backend.service = {
-                  name = "${chart.name}-ws-server";
+                  name = "${config.name}-ws-server";
                   port.name = "http";
                 };
               }
