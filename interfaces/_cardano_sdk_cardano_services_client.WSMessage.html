@@ -21,7 +21,7 @@
 <ul class="tsd-hierarchy">
 <li><span class="target">WSMessage</span></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0d39420/packages/cardano-services-client/src/WebSocket.ts#L28">packages/cardano-services-client/src/WebSocket.ts:28</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/81b52f5/packages/cardano-services-client/src/WebSocket.ts#L38">packages/cardano-services-client/src/WebSocket.ts:38</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -30,7 +30,14 @@
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Properties</h3>
 <div class="tsd-index-list"><a href="_cardano_sdk_cardano_services_client.WSMessage.html#clientId" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF984D" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-1024-path"></rect><path d="M9.354 16V7.24H12.174C12.99 7.24 13.638 7.476 14.118 7.948C14.606 8.412 14.85 9.036 14.85 9.82C14.85 10.604 14.606 11.232 14.118 11.704C13.638 12.168 12.99 12.4 12.174 12.4H10.434V16H9.354ZM10.434 11.428H12.174C12.646 11.428 13.022 11.284 13.302 10.996C13.59 10.7 13.734 10.308 13.734 9.82C13.734 9.324 13.59 8.932 13.302 8.644C13.022 8.356 12.646 8.212 12.174 8.212H10.434V11.428Z" fill="var(--color-text)" id="icon-1024-text"></path></svg><span>client<wbr/>Id?</span></a>
+<a href="_cardano_sdk_cardano_services_client.WSMessage.html#error" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>error?</span></a>
 <a href="_cardano_sdk_cardano_services_client.WSMessage.html#networkInfo" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>network<wbr/>Info?</span></a>
+<a href="_cardano_sdk_cardano_services_client.WSMessage.html#requestId" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>request<wbr/>Id?</span></a>
+<a href="_cardano_sdk_cardano_services_client.WSMessage.html#responseTo" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>response<wbr/>To?</span></a>
+<a href="_cardano_sdk_cardano_services_client.WSMessage.html#syncing" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>syncing?</span></a>
+<a href="_cardano_sdk_cardano_services_client.WSMessage.html#transactions" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>transactions?</span></a>
+<a href="_cardano_sdk_cardano_services_client.WSMessage.html#txsByAddresses" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>txs<wbr/>By<wbr/>Addresses?</span></a>
+<a href="_cardano_sdk_cardano_services_client.WSMessage.html#utxos" class="tsd-index-link tsd-kind-property tsd-parent-kind-interface"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>utxos?</span></a>
 </div></section></div></details></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Properties</h2>
@@ -40,14 +47,70 @@
 <div class="tsd-comment tsd-typography"><p>The client id assigned by the server.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0d39420/packages/cardano-services-client/src/WebSocket.ts#L30">packages/cardano-services-client/src/WebSocket.ts:30</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/81b52f5/packages/cardano-services-client/src/WebSocket.ts#L43">packages/cardano-services-client/src/WebSocket.ts:43</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface"><a id="error" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>error</span><a href="#error" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<div class="tsd-signature">error<span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">Error</span></div>
+<div class="tsd-comment tsd-typography"><p>The error on server while performing a request.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/81b52f5/packages/cardano-services-client/src/WebSocket.ts#L46">packages/cardano-services-client/src/WebSocket.ts:46</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface"><a id="networkInfo" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>network<wbr/>Info</span><a href="#networkInfo" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">network<wbr/>Info<span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><a href="../types/_cardano_sdk_cardano_services_client.NetworkInfoResponses.html" class="tsd-signature-type" data-tsd-kind="Type alias">NetworkInfoResponses</a><span class="tsd-signature-symbol">&gt;</span></div>
 <div class="tsd-comment tsd-typography"><p>Latest value(s) for the <code>NetworkInfoProvider</code> methods.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/0d39420/packages/cardano-services-client/src/WebSocket.ts#L33">packages/cardano-services-client/src/WebSocket.ts:33</a></li></ul></aside></section></section></div>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/81b52f5/packages/cardano-services-client/src/WebSocket.ts#L49">packages/cardano-services-client/src/WebSocket.ts:49</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface"><a id="requestId" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>request<wbr/>Id</span><a href="#requestId" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<div class="tsd-signature">request<wbr/>Id<span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
+<div class="tsd-comment tsd-typography"><p>The request id from client to server.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/81b52f5/packages/cardano-services-client/src/WebSocket.ts#L52">packages/cardano-services-client/src/WebSocket.ts:52</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface"><a id="responseTo" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>response<wbr/>To</span><a href="#responseTo" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<div class="tsd-signature">response<wbr/>To<span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
+<div class="tsd-comment tsd-typography"><p>This message is the response to the message with this id.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/81b52f5/packages/cardano-services-client/src/WebSocket.ts#L55">packages/cardano-services-client/src/WebSocket.ts:55</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface"><a id="syncing" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>syncing</span><a href="#syncing" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<div class="tsd-signature">syncing<span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span></div>
+<div class="tsd-comment tsd-typography"><p>The server is still syncing.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/81b52f5/packages/cardano-services-client/src/WebSocket.ts#L58">packages/cardano-services-client/src/WebSocket.ts:58</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface"><a id="transactions" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>transactions</span><a href="#transactions" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<div class="tsd-signature">transactions<span class="tsd-signature-symbol">?:</span> <a href="_cardano_sdk_cardano_services_client._internal_.HydratedTx.html" class="tsd-signature-type" data-tsd-kind="Interface">HydratedTx</a><span class="tsd-signature-symbol">[]</span></div>
+<div class="tsd-comment tsd-typography"><p>The transactions.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/81b52f5/packages/cardano-services-client/src/WebSocket.ts#L61">packages/cardano-services-client/src/WebSocket.ts:61</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface"><a id="txsByAddresses" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>txs<wbr/>By<wbr/>Addresses</span><a href="#txsByAddresses" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<div class="tsd-signature">txs<wbr/>By<wbr/>Addresses<span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">{ </span><br/><span>    </span>addresses<span class="tsd-signature-symbol">: </span><a href="../functions/_cardano_sdk_cardano_services_client._internal_.PaymentAddress-1.html" class="tsd-signature-type" data-tsd-kind="Function">PaymentAddress</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span><br/><span>    </span>lower<span class="tsd-signature-symbol">: </span><a href="../functions/_cardano_sdk_cardano_services_client._internal_.BlockNo-1.html" class="tsd-signature-type" data-tsd-kind="Function">BlockNo</a><span class="tsd-signature-symbol">; </span><br/><span class="tsd-signature-symbol">}</span></div>
+<div class="tsd-comment tsd-typography"><p>The addresses the client subscribes.</p>
+</div>
+<div class="tsd-type-declaration">
+<h4>Type declaration</h4>
+<ul class="tsd-parameters">
+<li class="tsd-parameter">
+<h5>addresses<span class="tsd-signature-symbol">: </span><a href="../functions/_cardano_sdk_cardano_services_client._internal_.PaymentAddress-1.html" class="tsd-signature-type" data-tsd-kind="Function">PaymentAddress</a><span class="tsd-signature-symbol">[]</span></h5></li>
+<li class="tsd-parameter">
+<h5>lower<span class="tsd-signature-symbol">: </span><a href="../functions/_cardano_sdk_cardano_services_client._internal_.BlockNo-1.html" class="tsd-signature-type" data-tsd-kind="Function">BlockNo</a></h5></li></ul></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/81b52f5/packages/cardano-services-client/src/WebSocket.ts#L40">packages/cardano-services-client/src/WebSocket.ts:40</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface"><a id="utxos" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagOptional">Optional</code> <span>utxos</span><a href="#utxos" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<div class="tsd-signature">utxos<span class="tsd-signature-symbol">?:</span> <a href="_cardano_sdk_cardano_services_client._internal_.HydratedTx.html" class="tsd-signature-type" data-tsd-kind="Interface">HydratedTx</a><span class="tsd-signature-symbol">[]</span></div>
+<div class="tsd-comment tsd-typography"><p>The partial transactions for UTXOs.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/81b52f5/packages/cardano-services-client/src/WebSocket.ts#L68">packages/cardano-services-client/src/WebSocket.ts:68</a></li></ul></aside></section></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
@@ -167,7 +230,14 @@
 <li class="current tsd-kind-interface tsd-parent-kind-module"><a href="_cardano_sdk_cardano_services_client.WSMessage.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-interface)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-256-path"></rect><path d="M9.51 16V15.016H11.298V8.224H9.51V7.24H14.19V8.224H12.402V15.016H14.19V16H9.51Z" fill="var(--color-text)" id="icon-256-text"></path></svg><span>WSMessage</span></a>
 <ul>
 <li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_services_client.WSMessage.html#clientId" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>client<wbr/>Id?</a></li>
-<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_services_client.WSMessage.html#networkInfo" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>network<wbr/>Info?</a></li></ul></li></ul></nav></div></div>
+<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_services_client.WSMessage.html#error" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>error?</a></li>
+<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_services_client.WSMessage.html#networkInfo" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>network<wbr/>Info?</a></li>
+<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_services_client.WSMessage.html#requestId" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>request<wbr/>Id?</a></li>
+<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_services_client.WSMessage.html#responseTo" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>response<wbr/>To?</a></li>
+<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_services_client.WSMessage.html#syncing" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>syncing?</a></li>
+<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_services_client.WSMessage.html#transactions" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>transactions?</a></li>
+<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_services_client.WSMessage.html#txsByAddresses" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>txs<wbr/>By<wbr/>Addresses?</a></li>
+<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_cardano_sdk_cardano_services_client.WSMessage.html#utxos" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>utxos?</a></li></ul></li></ul></nav></div></div>
 <div class="container tsd-generator">
 <p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div>
 <div class="overlay"></div><script src="../assets/main.js"></script></body></html>
