@@ -60,8 +60,7 @@ export const findTxOutputsByAddresses = `
 
 export const findCollateralOutputsByTxIds = `
 	${selectTxOutput(true)}
-	WHERE tx.id = ANY($1)
-  ORDER BY tx_out.id ASC`;
+	WHERE tx.id = ANY($1)`;
 
 export const findTip = `
 	SELECT 
