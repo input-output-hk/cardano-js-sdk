@@ -72,6 +72,7 @@ in {
           labels = utils.appLabels name;
         };
         spec = {
+          replicas = lib.mkIf (value.replicas != 1) value.replicas;
           selector.matchLabels = utils.appLabels name;
           template = {
             metadata.labels = utils.appLabels name;

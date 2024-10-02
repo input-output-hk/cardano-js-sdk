@@ -5,9 +5,7 @@
   config,
   ...
 }: {
-  templates.blockfrost-worker-deployment = lib.mkIf values.blockfrost-worker.enabled {
-    apiVersion = "apps/v1";
-    kind = "Deployment";
+  resources.deployments.blockfrost-worker = lib.mkIf values.blockfrost-worker.enabled {
     metadata = {
       name = "${config.name}-blockfrost-worker";
       labels = utils.appLabels "blockfrost-worker";
@@ -17,23 +15,14 @@
       template = {
         metadata.labels = utils.appLabels "blockfrost-worker";
         spec = {
-          imagePullSecrets = [
-            {
-              name = "dockerconfigjson";
-            }
-          ];
+          imagePullSecrets.dockerconfigjson = {};
           containers = [
             {
               inherit (values.cardano-services) image;
               inherit (values.blockfrost-worker) resources;
               name = "blockfrost-worker";
               args = ["start-blockfrost-worker"];
-              ports = [
-                {
-                  containerPort = 3000;
-                  name = "http";
-                }
-              ];
+              ports.http.containerPort = 3000;
               livenessProbe = {
                 timeoutSeconds = 5;
                 httpGet = {
@@ -86,12 +75,7 @@
               ];
             }
           ];
-          volumes = [
-            {
-              name = "tls";
-              secret.secretName = "postgresql-server-cert";
-            }
-          ];
+          volumes.tls.secret.secretName = "postgresql-server-cert";
         };
       };
     };
