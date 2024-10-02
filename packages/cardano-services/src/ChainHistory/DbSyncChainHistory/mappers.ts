@@ -153,7 +153,7 @@ const mapRedeemerPurpose = (purpose: RedeemerModel['purpose']): Cardano.Redeemer
     throw new NotImplementedError(`Failed to map redeemer "purpose": ${purpose}`);
   })();
 
-export const mapRedeemer = (redeemerModel: RedeemerModel): Cardano.Redeemer => ({
+export const mapRedeemer = (redeemerModel: Omit<RedeemerModel, 'id'>): Cardano.Redeemer => ({
   data: stubRedeemerData,
   executionUnits: {
     memory: Number(redeemerModel.unit_mem),
