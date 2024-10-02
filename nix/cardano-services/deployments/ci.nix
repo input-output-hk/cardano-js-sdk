@@ -1,5 +1,9 @@
-{ lib, modules, config, ...}: {
-
+{
+  lib,
+  modules,
+  config,
+  ...
+}: {
   imports = [
     modules.githubAction
   ];
