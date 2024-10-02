@@ -1,9 +1,11 @@
+import { BehaviorSubject, NEVER } from 'rxjs';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Cip30DataSignature, WalletApi, WalletProperties } from '../src/WalletApi';
 import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 import { RemoteAuthenticator } from '../src';
 
 export const api = <WalletApi>{
+  baseAddresses$: NEVER,
   getBalance: async () => '100',
   getChangeAddress: async () => 'change-address',
   getCollateral: async () => null,
@@ -32,6 +34,8 @@ export const api = <WalletApi>{
       }
     ]).toCbor()
   ],
+  network$: new BehaviorSubject(Cardano.NetworkId.Mainnet),
+  networkId$: NEVER,
   signData: async (_addr, _payload) => ({} as Cip30DataSignature),
   signTx: async (_tx) => 'signedTransaction',
   submitTx: async (_tx) => 'transactionId'

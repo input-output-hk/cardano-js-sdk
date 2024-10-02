@@ -1,11 +1,13 @@
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Cip30DataSignature, WalletApi } from '@cardano-sdk/dapp-connector';
 import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
+import { NEVER } from 'rxjs';
 
 const mapUtxos = (utxos: Cardano.Utxo[]) =>
   utxos.map((utxo) => Serialization.TransactionUnspentOutput.fromCore(utxo).toCbor());
 
 export const stubWalletApi: WalletApi = {
+  baseAddresses$: NEVER,
   getBalance: async () => '100',
   getChangeAddress: async () =>
     'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x',
@@ -55,6 +57,7 @@ export const stubWalletApi: WalletApi = {
         }
       ]
     ]),
+  network$: NEVER,
   signData: async (_addr, _payload) =>
     ({
       key: 'key',

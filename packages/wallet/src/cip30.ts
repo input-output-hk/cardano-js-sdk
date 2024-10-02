@@ -4,6 +4,7 @@ import {
   Bytes,
   Cbor,
   Cip30DataSignature,
+  Cip30ExperimentalApi,
   Cip95WalletApi,
   DataSignError,
   DataSignErrorCode,
@@ -18,11 +19,22 @@ import {
   WithSenderContext
 } from '@cardano-sdk/dapp-connector';
 import { Cardano, Serialization, coalesceValueQuantities } from '@cardano-sdk/core';
-import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
+import { HexBlob, ManagedFreeableScope, isNotNil } from '@cardano-sdk/util';
 import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { MessageSender } from '@cardano-sdk/key-management';
-import { Observable, firstValueFrom, from, map, mergeMap, race, throwError } from 'rxjs';
+import {
+  Observable,
+  distinctUntilChanged,
+  firstValueFrom,
+  from,
+  map,
+  mergeMap,
+  race,
+  switchMap,
+  take,
+  throwError
+} from 'rxjs';
 import { ObservableWallet } from './types';
 import { requiresForeignSignatures } from './services';
 import uniq from 'lodash/uniq.js';
@@ -555,6 +567,22 @@ const baseCip30WalletApi = (
   }
 });
 
+const cip30ExperimentalWalletApi = (wallet$: Observable<ObservableWallet>): Cip30ExperimentalApi => ({
+  baseAddresses$: wallet$.pipe(
+    /**
+     * Using take(1) to emit baseAddresses only when the wallet changes,
+     * which is equivalent to account change, instead of every time the addresses change.
+     */
+    switchMap((wallet) => wallet.addresses$.pipe(take(1))),
+    map((addresses) => addresses.map(({ address }) => Cardano.Address.fromBech32(address).asBase()).filter(isNotNil))
+  ),
+  network$: wallet$.pipe(
+    switchMap((wallet) => wallet.genesisParameters$),
+    map((params) => params.networkId),
+    distinctUntilChanged()
+  )
+});
+
 const getPubStakeKeys = async (
   wallet$: Observable<ObservableWallet>,
   filter: Cardano.StakeCredentialStatus.Registered | Cardano.StakeCredentialStatus.Unregistered
@@ -621,5 +649,6 @@ export const createWalletApi = (
   { logger }: Cip30WalletDependencies
 ): WithSenderContext<WalletApi> => ({
   ...baseCip30WalletApi(wallet$, confirmationCallback, { logger }),
+  ...cip30ExperimentalWalletApi(wallet$),
   ...extendedCip95WalletApi(wallet$, { logger })
 });

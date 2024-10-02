@@ -757,6 +757,16 @@ describe('cip30', () => {
         const extensions = await api.getExtensions(context);
         expect(extensions).toEqual([{ cip: 95 }]);
       });
+
+      test('api.baseAddresses', async () => {
+        const baseAddresses = await firstValueFrom(api.baseAddresses$);
+        expect(baseAddresses.length).toBe(2);
+      });
+
+      test('api.network', async () => {
+        const network = await firstValueFrom(api.network$);
+        expect(network).toEqual(Cardano.NetworkId.Testnet);
+      });
     });
 
     describe('confirmation callbacks', () => {

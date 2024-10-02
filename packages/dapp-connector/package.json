@@ -53,6 +53,7 @@
     "@cardano-sdk/core": "workspace:~",
     "@cardano-sdk/crypto": "workspace:~",
     "@cardano-sdk/util": "workspace:~",
+    "rxjs": "^7.4.0",
     "ts-custom-error": "^3.2.0",
     "ts-log": "^2.2.4",
     "webextension-polyfill": "^0.8.0"

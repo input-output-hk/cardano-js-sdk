@@ -1,4 +1,5 @@
 import { APIErrorCode, ApiError } from '../errors';
+import { AccountChangeCb, Cip30EventName, Cip30EventRegistry, NetworkChangeCb } from './Cip30EventRegistry';
 import {
   Bytes,
   Cbor,
@@ -12,6 +13,7 @@ import {
 import { Cardano } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { RemoteAuthenticator } from '../AuthenticatorApi';
+import { map, merge } from 'rxjs';
 
 export const CipMethodsMapping: Record<number, WalletMethod[]> = {
   30: [
@@ -79,6 +81,7 @@ export class Cip30Wallet {
   readonly #api: WalletApi;
   readonly #authenticator: RemoteAuthenticator;
   readonly #deviations: WalletProperties['cip30ApiDeviations'];
+  #eventRegistry: Cip30EventRegistry;
 
   constructor(properties: WalletProperties, { api, authenticator, logger }: WalletDependencies) {
     this.icon = properties.icon;
@@ -92,6 +95,12 @@ export class Cip30Wallet {
     if (properties.supportedExtensions) {
       this.supportedExtensions = properties.supportedExtensions;
     }
+    this.#eventRegistry = new Cip30EventRegistry(
+      merge(
+        api.network$.pipe(map((data) => ({ data, eventName: Cip30EventName.networkChange }))),
+        api.baseAddresses$.pipe(map((data) => ({ data, eventName: Cip30EventName.accountChange })))
+      )
+    );
   }
 
   #validateExtensions(extensions: WalletApiExtension[] = []): void {
@@ -164,7 +173,25 @@ export class Cip30Wallet {
     const baseApi: Cip30WalletApiWithPossibleExtensions = {
       // Add experimental.getCollateral to CIP-30 API
       experimental: {
-        getCollateral: async (params?: { amount?: Cbor }) => this.#wrapGetCollateral(params)
+        getCollateral: async (params?: { amount?: Cbor }) => this.#wrapGetCollateral(params),
+
+        /**
+         * Deregister the callback from the event.
+         *
+         * @param {EventName} eventName The event to deregister from. Accepted values are 'accountChange' | 'networkChange'
+         * @param {AccountChangeCb | NetworkChangeCb} callback  Must be the same cb reference used on registration.
+         */
+        off: (eventName: Cip30EventName, callback: AccountChangeCb | NetworkChangeCb) =>
+          this.#eventRegistry.deregister(eventName, callback),
+
+        /**
+         * Register to events coming from the wallet. Registrations are stored by callback reference.
+         *
+         * @param {EventName} eventName The event to register to. Accepted values are 'accountChange' | 'networkChange'
+         * @param {AccountChangeCb | NetworkChangeCb} callback The callback to be called when the event is triggered.
+         */
+        on: (eventName: Cip30EventName, callback: AccountChangeCb | NetworkChangeCb) =>
+          this.#eventRegistry.register(eventName, callback)
       },
       getBalance: () => walletApi.getBalance(),
       getChangeAddress: () => walletApi.getChangeAddress(),

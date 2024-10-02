@@ -1,6 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
+import { Observable } from 'rxjs';
 import { Runtime } from 'webextension-polyfill';
 
 /** A hex-encoded string of the corresponding bytes. */
@@ -199,13 +200,18 @@ export interface Cip30WalletApi {
   experimental?: any;
 }
 
+export interface Cip30ExperimentalApi {
+  network$: Observable<Cardano.NetworkId>;
+  baseAddresses$: Observable<Cardano.BaseAddress[]>;
+}
+
 export interface Cip95WalletApi {
   getRegisteredPubStakeKeys: () => Promise<Ed25519PublicKeyHex[]>;
   getUnregisteredPubStakeKeys: () => Promise<Ed25519PublicKeyHex[]>;
   getPubDRepKey: () => Promise<Ed25519PublicKeyHex>;
 }
 
-export type WalletApi = Cip30WalletApi & Cip95WalletApi;
+export type WalletApi = Cip30WalletApi & Cip30ExperimentalApi & Cip95WalletApi;
 export type WalletMethod = keyof WalletApi;
 
 export interface CipExtensionApis {
