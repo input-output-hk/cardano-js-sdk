@@ -1,0 +1,63 @@
+jobs:
+  deploy:
+    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v3
+    - name: 🧰 Setup Nix
+      uses: nixbuild/nix-quick-install-action@v28
+    - uses: aws-actions/configure-aws-credentials@v4.0.2
+      with:
+        aws-region: us-east-1
+        role-to-assume: ${{ github.ref == 'refs/heads/master' && 'arn:aws:iam::926093910549:role/eks-admin'
+          || 'arn:aws:iam::926093910549:role/eks-devs' }}
+    - name: 🚀 Deploy
+      run: 'echo "yes" | nix run .#cardano-services.${{inputs.target}}.${{inputs.action}}
+
+        '
+name: cardano-services
+'on':
+  workflow_call:
+    inputs:
+      action:
+        required: true
+        type: string
+      target:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Action
+        options:
+        - apply
+        - destroy
+        - plan
+        required: true
+        type: choice
+      target:
+        description: Targets
+        options:
+        - dev-mainnet@us-east-1
+        - dev-preprod@us-east-1@v2
+        - dev-preview@us-east-1
+        - dev-sanchonet@us-east-1
+        - live-mainnet@eu-central-1@v2
+        - live-mainnet@us-east-2@v2
+        - live-preprod@eu-central-1@v2
+        - live-preprod@us-east-2@v2
+        - live-preview@eu-central-1@v2
+        - live-preview@us-east-2@v2
+        - live-sanchonet@eu-central-1
+        - live-sanchonet@us-east-2
+        - local-network@us-east-1@v1
+        - ops-preprod-1@us-east-1
+        - ops-preview-1@us-east-1
+        - staging-mainnet@eu-west-1@v2
+        - staging-preprod@us-east-1@v2
+        required: true
+        type: choice
+permissions:
+  contents: read
+  id-token: write

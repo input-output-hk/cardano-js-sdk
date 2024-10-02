@@ -186,6 +186,7 @@ in
         };
       };
       imports = [
+        ./ci.nix
         ./wallet-api.nix
         ./options.nix
         ./ws-server.deployment.nix
