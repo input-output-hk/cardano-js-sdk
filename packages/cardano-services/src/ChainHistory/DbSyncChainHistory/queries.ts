@@ -37,25 +37,9 @@ export const findTxCollateralsByIds = `
 	WHERE tx.id = ANY($1)
 	ORDER BY tx_in.id ASC`;
 
-export const findTxInputsByAddresses = `
-  ${selectTxInput()}
-	JOIN block ON tx.block_id = block.id
-  WHERE tx_out.address = ANY($1)
-	AND block.block_no >= $2
-	AND block.block_no <= $3
-	ORDER BY tx_in.id ASC`;
-
 export const findTxOutputsByIds = `
   	${selectTxOutput()}
   	WHERE tx.id = ANY($1)
-	ORDER BY tx_out.id ASC`;
-
-export const findTxOutputsByAddresses = `
-  ${selectTxOutput()}
-	JOIN block ON tx.block_id = block.id
-  WHERE tx_out.address = ANY($1)
-	AND block.block_no >= $2
-	AND block.block_no <= $3
 	ORDER BY tx_out.id ASC`;
 
 export const findCollateralOutputsByTxIds = `
