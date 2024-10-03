@@ -19,7 +19,7 @@
     extraSteps = lib.singleton {
       uses = "aws-actions/configure-aws-credentials@v4.0.2";
       "with" = {
-        role-to-assume = "\${{ contains(github.ref, \"release/\") && 'arn:aws:iam::926093910549:role/eks-admin' || 'arn:aws:iam::926093910549:role/eks-devs' }}";
+        role-to-assume = "\${{ contains(github.ref, 'release/') && 'arn:aws:iam::926093910549:role/eks-admin' || 'arn:aws:iam::926093910549:role/eks-devs' }}";
         aws-region = "us-east-1";
       };
     };
