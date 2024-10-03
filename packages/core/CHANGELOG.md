@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.41.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.40.1...@cardano-sdk/core@0.41.0) (2024-10-03)
+
+### ⚠ BREAKING CHANGES
+
+* hoist ws types to cardano-services-client package
+
+### Code Refactoring
+
+* hoist ws types to cardano-services-client package ([72e42ce](https://github.com/input-output-hk/cardano-js-sdk/commit/72e42cebb0a3f3741b3c8e4c40b9ebda5193700c))
+
 ## [0.40.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.40.0...@cardano-sdk/core@0.40.1) (2024-09-27)
 
 ### Bug Fixes

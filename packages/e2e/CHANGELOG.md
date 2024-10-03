@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.44.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.43.1...@cardano-sdk/e2e@0.44.0) (2024-10-03)
+
+### ⚠ BREAKING CHANGES
+
+* hoist ws types to cardano-services-client package
+
+### Features
+
+* add web socket based transactions by addresses provider ([63798e8](https://github.com/input-output-hk/cardano-js-sdk/commit/63798e826e9289a4c1677a0369c03c762721e218))
+
+### Code Refactoring
+
+* hoist ws types to cardano-services-client package ([72e42ce](https://github.com/input-output-hk/cardano-js-sdk/commit/72e42cebb0a3f3741b3c8e4c40b9ebda5193700c))
+
 ## [0.43.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.43.0...@cardano-sdk/e2e@0.43.1) (2024-09-27)
 
 **Note:** Version bump only for package @cardano-sdk/e2e
