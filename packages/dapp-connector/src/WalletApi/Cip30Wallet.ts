@@ -56,6 +56,12 @@ export type WalletProperties = {
      * This is the way the Nami wallet works and some DApps rely on it (i.e. https://app.indigoprotocol.io/)
      */
     getCollateralEmptyArray?: boolean;
+    /**
+     * Add the `on` and `off` methods to the experimental object.
+     * The methods do not have an implementation, but are used to satisfy
+     * some DApps that expect them to be present.
+     */
+    onOffDummyMethods?: boolean;
   };
 };
 
@@ -164,7 +170,8 @@ export class Cip30Wallet {
     const baseApi: Cip30WalletApiWithPossibleExtensions = {
       // Add experimental.getCollateral to CIP-30 API
       experimental: {
-        getCollateral: async (params?: { amount?: Cbor }) => this.#wrapGetCollateral(params)
+        getCollateral: async (params?: { amount?: Cbor }) => this.#wrapGetCollateral(params),
+        ...(this.#deviations?.onOffDummyMethods && { off: () => void 0, on: () => void 0 })
       },
       getBalance: () => walletApi.getBalance(),
       getChangeAddress: () => walletApi.getChangeAddress(),
