@@ -71,5 +71,19 @@ describe('injectGlobal', () => {
       ]);
       expect(window.cardano['another-obj']).toBe(anotherObj);
     });
+
+    it('injects the wallet public API using custom injection name', () => {
+      const wallet = new Cip30Wallet(properties, { api, authenticator: stubAuthenticator(), logger });
+      injectGlobal(window, wallet, logger, 'customKey');
+      expect(window.cardano.customKey.name).toBe(properties.walletName);
+      expect(Object.keys(window.cardano.customKey)).toEqual([
+        'apiVersion',
+        'supportedExtensions',
+        'icon',
+        'name',
+        'enable',
+        'isEnabled'
+      ]);
+    });
   });
 });

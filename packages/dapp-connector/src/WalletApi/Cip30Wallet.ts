@@ -32,54 +32,6 @@ export const CipMethodsMapping: Record<number, WalletMethod[]> = {
 };
 export const WalletApiMethodNames: WalletMethod[] = Object.values(CipMethodsMapping).flat();
 
-/**
- * Wrap the proxy API object with a regular javascript object to avoid interop issues with some dApps.
- *
- * Only return the allowed API methods.
- */
-const wrapAndEnableApi = (
-  walletApi: WalletApi,
-  enabledExtensions?: WalletApiExtension[]
-): Cip30WalletApiWithPossibleExtensions => {
-  const baseApi: Cip30WalletApiWithPossibleExtensions = {
-    // Add experimental.getCollateral to CIP-30 API
-    experimental: {
-      getCollateral: (params?: { amount?: Cbor }) => walletApi.getCollateral(params)
-    },
-    getBalance: () => walletApi.getBalance(),
-    getChangeAddress: () => walletApi.getChangeAddress(),
-    getCollateral: (params?: { amount?: Cbor }) => walletApi.getCollateral(params),
-    getExtensions: () => Promise.resolve(enabledExtensions || []),
-    getNetworkId: () => walletApi.getNetworkId(),
-    getRewardAddresses: () => walletApi.getRewardAddresses(),
-    getUnusedAddresses: () => walletApi.getUnusedAddresses(),
-    getUsedAddresses: (paginate?: Paginate) => walletApi.getUsedAddresses(paginate),
-    getUtxos: (amount?: Cbor, paginate?: Paginate) => walletApi.getUtxos(amount, paginate),
-    signData: (addr: Cardano.PaymentAddress | Bytes, payload: Bytes) => walletApi.signData(addr, payload),
-    signTx: (tx: Cbor, partialSign?: Boolean) => walletApi.signTx(tx, partialSign),
-    submitTx: (tx: Cbor) => walletApi.submitTx(tx)
-  };
-
-  const additionalCipApis: CipExtensionApis = {
-    cip95: {
-      getPubDRepKey: () => walletApi.getPubDRepKey(),
-      getRegisteredPubStakeKeys: () => walletApi.getRegisteredPubStakeKeys(),
-      getUnregisteredPubStakeKeys: () => walletApi.getUnregisteredPubStakeKeys()
-    }
-  };
-
-  if (enabledExtensions) {
-    for (const extension of enabledExtensions) {
-      const cipName = `cip${extension.cip}` as keyof CipExtensionApis;
-      if (additionalCipApis[cipName]) {
-        baseApi[cipName] = additionalCipApis[cipName];
-      }
-    }
-  }
-
-  return baseApi;
-};
-
 /** CIP30 API version */
 export type ApiVersion = string;
 
@@ -93,7 +45,19 @@ export type WalletName = string;
  */
 export type WalletIcon = string;
 
-export type WalletProperties = { icon: WalletIcon; walletName: WalletName };
+export type WalletProperties = {
+  icon: WalletIcon;
+  walletName: WalletName;
+  supportedExtensions?: WalletApiExtension[];
+  /** Deviations from the CIP30 spec */
+  cip30ApiDeviations?: {
+    /**
+     * Instead of throwing an error when no collateral is found, return empty array.
+     * This is the way the Nami wallet works and some DApps rely on it (i.e. https://app.indigoprotocol.io/)
+     */
+    getCollateralEmptyArray?: boolean;
+  };
+};
 
 export type WalletDependencies = {
   logger: Logger;
@@ -108,11 +72,13 @@ export class Cip30Wallet {
   readonly apiVersion: ApiVersion = '0.1.0';
   readonly name: WalletName;
   readonly icon: WalletIcon;
+  /** Support the full api by default */
   readonly supportedExtensions: WalletApiExtension[] = [{ cip: 95 }];
 
   readonly #logger: Logger;
   readonly #api: WalletApi;
   readonly #authenticator: RemoteAuthenticator;
+  readonly #deviations: WalletProperties['cip30ApiDeviations'];
 
   constructor(properties: WalletProperties, { api, authenticator, logger }: WalletDependencies) {
     this.icon = properties.icon;
@@ -120,8 +86,12 @@ export class Cip30Wallet {
     this.#api = api;
     this.#logger = logger;
     this.#authenticator = authenticator;
+    this.#deviations = properties.cip30ApiDeviations;
     this.enable = this.enable.bind(this);
     this.isEnabled = this.isEnabled.bind(this);
+    if (properties.supportedExtensions) {
+      this.supportedExtensions = properties.supportedExtensions;
+    }
   }
 
   #validateExtensions(extensions: WalletApiExtension[] = []): void {
@@ -173,9 +143,60 @@ export class Cip30Wallet {
       const extensions = options?.extensions?.filter(({ cip: requestedCip }) =>
         this.supportedExtensions.some(({ cip: supportedCip }) => supportedCip === requestedCip)
       );
-      return wrapAndEnableApi(this.#api, extensions);
+      return this.#wrapAndEnableApi(extensions);
     }
     this.#logger.debug(`${location.origin} not authorized to access wallet api`);
     throw new ApiError(APIErrorCode.Refused, 'wallet not authorized.');
+  }
+
+  async #wrapGetCollateral(params?: { amount?: Cbor }) {
+    const collateral = await this.#api.getCollateral(params);
+    return this.#deviations?.getCollateralEmptyArray ? collateral ?? [] : collateral;
+  }
+
+  /**
+   * Wrap the proxy API object with a regular javascript object to avoid interop issues with some dApps.
+   *
+   * Only return the allowed API methods.
+   */
+  #wrapAndEnableApi(enabledExtensions?: WalletApiExtension[]): Cip30WalletApiWithPossibleExtensions {
+    const walletApi = this.#api;
+    const baseApi: Cip30WalletApiWithPossibleExtensions = {
+      // Add experimental.getCollateral to CIP-30 API
+      experimental: {
+        getCollateral: async (params?: { amount?: Cbor }) => this.#wrapGetCollateral(params)
+      },
+      getBalance: () => walletApi.getBalance(),
+      getChangeAddress: () => walletApi.getChangeAddress(),
+      getCollateral: (params?: { amount?: Cbor }) => this.#wrapGetCollateral(params),
+      getExtensions: () => Promise.resolve(enabledExtensions || []),
+      getNetworkId: () => walletApi.getNetworkId(),
+      getRewardAddresses: () => walletApi.getRewardAddresses(),
+      getUnusedAddresses: () => walletApi.getUnusedAddresses(),
+      getUsedAddresses: (paginate?: Paginate) => walletApi.getUsedAddresses(paginate),
+      getUtxos: (amount?: Cbor, paginate?: Paginate) => walletApi.getUtxos(amount, paginate),
+      signData: (addr: Cardano.PaymentAddress | Bytes, payload: Bytes) => walletApi.signData(addr, payload),
+      signTx: (tx: Cbor, partialSign?: Boolean) => walletApi.signTx(tx, partialSign),
+      submitTx: (tx: Cbor) => walletApi.submitTx(tx)
+    };
+
+    const additionalCipApis: CipExtensionApis = {
+      cip95: {
+        getPubDRepKey: () => walletApi.getPubDRepKey(),
+        getRegisteredPubStakeKeys: () => walletApi.getRegisteredPubStakeKeys(),
+        getUnregisteredPubStakeKeys: () => walletApi.getUnregisteredPubStakeKeys()
+      }
+    };
+
+    if (enabledExtensions) {
+      for (const extension of enabledExtensions) {
+        const cipName = `cip${extension.cip}` as keyof CipExtensionApis;
+        if (additionalCipApis[cipName]) {
+          baseApi[cipName] = additionalCipApis[cipName];
+        }
+      }
+    }
+
+    return baseApi;
   }
 }

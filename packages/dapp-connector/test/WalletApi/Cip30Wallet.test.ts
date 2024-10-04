@@ -17,6 +17,8 @@ describe('Wallet', () => {
   let authenticator: RemoteAuthenticator;
 
   let wallet: Cip30Wallet;
+  let walletNoExtensions: Cip30Wallet;
+  let walletWithApiDeviations: Cip30Wallet;
 
   beforeEach(async () => {
     await browser.storage.local.clear();
@@ -26,6 +28,24 @@ describe('Wallet', () => {
       authenticator,
       logger
     });
+
+    walletNoExtensions = new Cip30Wallet(
+      { ...testWallet.properties, supportedExtensions: [] },
+      {
+        api: testWallet.api,
+        authenticator,
+        logger
+      }
+    );
+
+    walletWithApiDeviations = new Cip30Wallet(
+      { ...testWallet.properties, cip30ApiDeviations: { getCollateralEmptyArray: true } },
+      {
+        api: testWallet.api,
+        authenticator,
+        logger
+      }
+    );
   });
 
   test('constructed state', async () => {
@@ -39,6 +59,11 @@ describe('Wallet', () => {
     expect(typeof isEnabled).toBe('boolean');
     expect(isEnabled).toBe(false);
     expect(typeof wallet.enable).toBe('function');
+  });
+
+  test('constructed state without extensions', async () => {
+    expect(walletNoExtensions.name).toBe(testWallet.properties.walletName);
+    expect(walletNoExtensions.supportedExtensions).toEqual<WalletApiExtension[]>([]);
   });
 
   it('should return initial api as plain javascript object', () => {
@@ -71,6 +96,13 @@ describe('Wallet', () => {
       expect(cip95Methods).toEqual(new Set(CipMethodsMapping[95]));
       expect(await wallet.isEnabled()).toBe(true);
       expect(await api.getExtensions()).toEqual([{ cip: 95 }]);
+    });
+
+    test('no extensions wallet cannot enable cip95 extension', async () => {
+      const api = await walletNoExtensions.enable({ extensions: [{ cip: 95 }] });
+      expect(await walletNoExtensions.isEnabled()).toBe(true);
+      expect(await api.getExtensions()).toEqual([]);
+      expect(api.cip95).toBeUndefined();
     });
 
     test('change extensions after enabling once', async () => {
@@ -158,9 +190,11 @@ describe('Wallet', () => {
 
   describe('api', () => {
     let api: Cip30WalletApiWithPossibleExtensions;
+    let apiWithDeviations: Cip30WalletApiWithPossibleExtensions;
 
     beforeAll(async () => {
       api = await wallet.enable();
+      apiWithDeviations = await walletWithApiDeviations.enable();
     });
 
     test('getNetworkId', async () => {
@@ -261,6 +295,16 @@ describe('Wallet', () => {
 
       const extensions = await api.getExtensions();
       expect(extensions).toEqual([]);
+    });
+
+    test('getCollateral', async () => {
+      expect(api.getCollateral).toBeDefined();
+      expect(apiWithDeviations.getCollateral).toBeDefined();
+      expect(typeof api.getCollateral).toBe('function');
+
+      const collateral = await api.getCollateral();
+      expect(collateral).toEqual(null);
+      expect(await apiWithDeviations.getCollateral()).toEqual([]);
     });
   });
 });
