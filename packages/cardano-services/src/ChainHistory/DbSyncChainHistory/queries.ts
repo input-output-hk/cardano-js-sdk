@@ -41,31 +41,14 @@ export const findTxCollateralsByIds = `
 	WHERE tx.id = ANY($1)
 	ORDER BY tx_in.id ASC`;
 
-export const findTxInputsByAddresses = `
-  ${selectTxInput()}
-	JOIN block ON tx.block_id = block.id
-  WHERE tx_out.address = ANY($1)
-	AND block.block_no >= $2
-	AND block.block_no <= $3
-	ORDER BY tx_in.id ASC`;
-
 export const findTxOutputsByIds = `
   	${selectTxOutput()}
   	WHERE tx.id = ANY($1)
 	ORDER BY tx_out.id ASC`;
 
-export const findTxOutputsByAddresses = `
-  ${selectTxOutput()}
-	JOIN block ON tx.block_id = block.id
-  WHERE tx_out.address = ANY($1)
-	AND block.block_no >= $2
-	AND block.block_no <= $3
-	ORDER BY tx_out.id ASC`;
-
 export const findCollateralOutputsByTxIds = `
 	${selectTxOutput(true)}
-	WHERE tx.id = ANY($1)
-  ORDER BY tx_out.id ASC`;
+	WHERE tx.id = ANY($1)`;
 
 export const findTip = `
 	SELECT 
@@ -181,6 +164,7 @@ export const findWithdrawalsByTxIds = `
 
 export const findRedeemersByTxIds = `
 	SELECT
+		redeemer.id AS id,
 		redeemer."index" AS "index",
 		redeemer.purpose AS purpose,
 		redeemer.script_hash AS script_hash,
@@ -189,8 +173,7 @@ export const findRedeemersByTxIds = `
 		tx.hash AS tx_id
 	FROM redeemer
 	JOIN tx ON tx.id = redeemer.tx_id
-	WHERE tx.id = ANY($1)
-	ORDER BY redeemer.id ASC`;
+	WHERE tx.id = ANY($1)`;
 
 export const findVotingProceduresByTxIds = `
 	SELECT

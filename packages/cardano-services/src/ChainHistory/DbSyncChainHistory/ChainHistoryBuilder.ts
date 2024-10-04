@@ -310,7 +310,9 @@ export class ChainHistoryBuilder {
       values: [ids]
     });
     const redeemerMap: TransactionDataMap<Cardano.Redeemer[]> = new Map();
-    for (const redeemer of result.rows) {
+    for (const redeemer of result.rows
+      .map(({ id, ...rest }) => ({ id: BigInt(id), ...rest }))
+      .sort((a, b) => Number(a.id - b.id))) {
       const txId = redeemer.tx_id.toString('hex') as unknown as Cardano.TransactionId;
       const currentRedeemers = redeemerMap.get(txId) ?? [];
       redeemerMap.set(txId, [...currentRedeemers, mapRedeemer(redeemer)]);
