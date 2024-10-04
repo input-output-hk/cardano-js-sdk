@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>33/33</span>
+                <span class='fraction'>31/31</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>31/31</span>
+                <span class='fraction'>29/29</span>
             </div>
         
             
@@ -485,28 +485,11 @@
 <a name='L420'></a><a href='#L420'>420</a>
 <a name='L421'></a><a href='#L421'>421</a>
 <a name='L422'></a><a href='#L422'>422</a>
-<a name='L423'></a><a href='#L423'>423</a>
-<a name='L424'></a><a href='#L424'>424</a>
-<a name='L425'></a><a href='#L425'>425</a>
-<a name='L426'></a><a href='#L426'>426</a>
-<a name='L427'></a><a href='#L427'>427</a>
-<a name='L428'></a><a href='#L428'>428</a>
-<a name='L429'></a><a href='#L429'>429</a>
-<a name='L430'></a><a href='#L430'>430</a>
-<a name='L431'></a><a href='#L431'>431</a>
-<a name='L432'></a><a href='#L432'>432</a>
-<a name='L433'></a><a href='#L433'>433</a>
-<a name='L434'></a><a href='#L434'>434</a>
-<a name='L435'></a><a href='#L435'>435</a>
-<a name='L436'></a><a href='#L436'>436</a>
-<a name='L437'></a><a href='#L437'>437</a>
-<a name='L438'></a><a href='#L438'>438</a>
-<a name='L439'></a><a href='#L439'>439</a>
-<a name='L440'></a><a href='#L440'>440</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L423'></a><a href='#L423'>423</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">41x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">123x</span>
+<span class="cline-any cline-yes">82x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -521,7 +504,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">123x</span>
+<span class="cline-any cline-yes">82x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -550,24 +533,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">41x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">41x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">41x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -984,31 +950,14 @@ export const findTxCollateralsByIds = `
 	WHERE tx.id = ANY($1)
 	ORDER BY tx_in.id ASC`;
 &nbsp;
-export const findTxInputsByAddresses = `
-  ${selectTxInput()}
-	JOIN block ON tx.block_id = block.id
-  WHERE tx_out.address = ANY($1)
-	AND block.block_no &gt;= $2
-	AND block.block_no &lt;= $3
-	ORDER BY tx_in.id ASC`;
-&nbsp;
 export const findTxOutputsByIds = `
   	${selectTxOutput()}
   	WHERE tx.id = ANY($1)
 	ORDER BY tx_out.id ASC`;
 &nbsp;
-export const findTxOutputsByAddresses = `
-  ${selectTxOutput()}
-	JOIN block ON tx.block_id = block.id
-  WHERE tx_out.address = ANY($1)
-	AND block.block_no &gt;= $2
-	AND block.block_no &lt;= $3
-	ORDER BY tx_out.id ASC`;
-&nbsp;
 export const findCollateralOutputsByTxIds = `
 	${selectTxOutput(true)}
-	WHERE tx.id = ANY($1)
-  ORDER BY tx_out.id ASC`;
+	WHERE tx.id = ANY($1)`;
 &nbsp;
 export const findTip = `
 	SELECT 
@@ -1124,6 +1073,7 @@ export const findWithdrawalsByTxIds = `
 &nbsp;
 export const findRedeemersByTxIds = `
 	SELECT
+		redeemer.id AS id,
 		redeemer."index" AS "index",
 		redeemer.purpose AS purpose,
 		redeemer.script_hash AS script_hash,
@@ -1132,8 +1082,7 @@ export const findRedeemersByTxIds = `
 		tx.hash AS tx_id
 	FROM redeemer
 	JOIN tx ON tx.id = redeemer.tx_id
-	WHERE tx.id = ANY($1)
-	ORDER BY redeemer.id ASC`;
+	WHERE tx.id = ANY($1)`;
 &nbsp;
 export const findVotingProceduresByTxIds = `
 	SELECT
@@ -1387,7 +1336,7 @@ FROM combined`,
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-10-03T10:51:59.861Z
+                at 2024-10-04T08:08:53.031Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
