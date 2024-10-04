@@ -4,21 +4,25 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to run e2e tests against'
+        description: 'Target environment'
         type: choice
         required: true
-        default: 'dev-preprod'
         options:
-          - live-preprod
-          - live-preview
-          - dev-preprod
-          - dev-preview
-          - staging-preprod
-      cluster:
-        description: 'Specific cluster to run e2e tests against'
+          - 'dev'
+          - 'staging'
+          - 'live'
+      network:
+        description: 'Target network'
         type: choice
         required: true
-        default: 'any'
+        options:
+          - 'preview'
+          - 'preprod'
+          - 'sanchonet'
+      cluster:
+        description: 'Target cluster'
+        type: choice
+        required: true
         options:
           - any
           - eu-central-1
@@ -27,7 +31,6 @@ on:
         description: 'Log level'
         type: choice
         required: true
-        default: 'fatal'
         options:
           - fatal
           - error
@@ -35,10 +38,6 @@ on:
           - info
           - debug
           - trace
-
-env:
-  TL_DEPTH: ${{ github.event.pull_request.head.repo.fork && '0' || fromJson(vars.TL_DEPTH) }}
-  TL_LEVEL: ${{ github.event.pull_request.head.repo.fork && 'info' || vars.TL_LEVEL }}
 
 jobs:
   build_and_test:
@@ -52,10 +51,13 @@ jobs:
 
       - name: Generate .env file
         working-directory: ./packages/e2e/
+        env:
+          CLUSTER: ${{ inputs.cluster }}
+          ENVIRONMENT: ${{ inputs.environment }}
+          MNEMONIC: ${{ secrets.MNEMONIC }}
+          NETWORK: ${{ inputs.network }}
         run: |
-          if [[ "${{ inputs.environment }}" == *"preprod"* ]]; then networkMagic=1; else networkMagic=2; fi
-          ./src/scripts/generate-dotenv.sh ${{ inputs.environment }} ${{ inputs.cluster }}
-          echo "KEY_MANAGEMENT_PARAMS='$(jq --argjson networkMagic $networkMagic --arg mnemonic "${{ secrets.MNEMONIC }}" <<< '{"bip32Ed25519": "Sodium", "accountIndex": 0, "chainId":{"networkId": 0, "networkMagic": 0}, "passphrase":"some_passphrase","mnemonic":"mnemonics"}' '.mnemonic=$mnemonic | .chainId.networkMagic=$networkMagic')'" >> .env
+          ./src/scripts/generate-dotenv.sh
 
       - name: 🧰 Setup Node.js
         uses: actions/setup-node@v3
@@ -71,6 +73,9 @@ jobs:
           NODE_OPTIONS: '--max_old_space_size=8192'
 
       - name: 🔬 Test - e2e - wallet
+        env:
+          TL_DEPTH: 0
+          TL_LEVEL: ${{ inputs.level }}
         run: |
-          TL_DEPTH=0 TL_LEVEL=${{ inputs.level }} yarn workspace @cardano-sdk/e2e test:wallet-real-ada
+          yarn workspace @cardano-sdk/e2e test:wallet-real-ada
         shell: bash
