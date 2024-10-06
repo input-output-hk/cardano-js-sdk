@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.40](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.12.39...@cardano-sdk/dapp-connector@0.12.40) (2024-10-06)
+
+### Features
+
+* **dapp-connector:** add dummy on/off methods to Cip30Wallet ([e337ea6](https://github.com/input-output-hk/cardano-js-sdk/commit/e337ea62d2120ce354c6475e48cc8a168b7a01c2))
+* **dapp-connector:** custom inject key, extensions and api ([15b68e6](https://github.com/input-output-hk/cardano-js-sdk/commit/15b68e634b6d3a95d65172a3249401486c21d56b))
+
 ## [0.12.39](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.12.38...@cardano-sdk/dapp-connector@0.12.39) (2024-10-03)
 
 **Note:** Version bump only for package @cardano-sdk/dapp-connector
