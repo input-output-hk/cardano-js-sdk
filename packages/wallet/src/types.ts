@@ -49,8 +49,13 @@ export interface SyncStatus extends Shutdown {
   isSettled$: Observable<boolean>;
 }
 
+/**
+ * If tx is the transaction CBOR, the auxiliary data, witness and isValid properties are ignored.
+ * If tx is `Cardano.TxBodyWithHash`, the transaction is reconstructed from along with the other
+ * provided properties.
+ */
 export type FinalizeTxProps = Omit<TxContext, 'signingContext'> & {
-  tx: Cardano.TxBodyWithHash;
+  tx: Cardano.TxBodyWithHash | Serialization.TxCBOR;
   bodyCbor?: HexBlob;
   signingContext?: Partial<SignTransactionContext>;
 };
@@ -77,6 +82,9 @@ export type WalletAddress = GroupedAddress | ScriptAddress;
 export const isScriptAddress = (address: WalletAddress): address is ScriptAddress => 'scripts' in address;
 
 export const isKeyHashAddress = (address: WalletAddress): address is GroupedAddress => !isScriptAddress(address);
+
+export const isTxBodyWithHash = (tx: Serialization.TxCBOR | Cardano.TxBodyWithHash): tx is Cardano.TxBodyWithHash =>
+  typeof tx === 'object' && 'hash' in tx && 'body' in tx;
 
 export interface ObservableWallet {
   readonly balance: BalanceTracker;

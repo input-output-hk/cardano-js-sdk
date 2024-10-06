@@ -465,10 +465,10 @@ const baseCip30WalletApi = (
   },
   signTx: async ({ sender }: SenderContext, tx: Cbor, partialSign?: Boolean): Promise<Cbor> => {
     const scope = new ManagedFreeableScope();
-    logger.debug('signTx');
-    const txDecoded = Serialization.Transaction.fromCbor(Serialization.TxCBOR(tx));
+    logger.debug('signTx', tx);
+    const txCbor = Serialization.TxCBOR(tx);
+    const txDecoded = Serialization.Transaction.fromCbor(txCbor);
     const wallet = await firstValueFrom(wallet$);
-    const hash = txDecoded.getId();
     const coreTx = txDecoded.toCore();
 
     const needsForeignSignature = await requiresForeignSignatures(coreTx, wallet);
@@ -493,9 +493,8 @@ const baseCip30WalletApi = (
           witness: { signatures }
         } = await signOrCancel(
           wallet.finalizeTx({
-            bodyCbor: txDecoded.body().toCbor(),
             signingContext: { sender },
-            tx: { ...coreTx, hash }
+            tx: txCbor
           }),
           confirmationResult,
           () => new TxSignError(TxSignErrorCode.UserDeclined, 'user declined signing tx')
