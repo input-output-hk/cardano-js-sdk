@@ -31,6 +31,7 @@ import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { HID } from 'node-hid';
 import { HexBlob, areNumbersEqualInConstantTime, areStringsEqualInConstantTime } from '@cardano-sdk/util';
 import { LedgerDevice, LedgerTransportType } from './types';
+import { getFirstLedgerDevice } from '@ledgerhq/hw-transport-webusb/lib/webusb';
 import { str_to_path } from '@cardano-foundation/ledgerjs-hw-app-cardano/dist/utils/address';
 import { toLedgerTx } from './transformers';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
@@ -410,7 +411,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
       transport =
         communicationType === CommunicationType.Node
           ? await TransportNodeHid.open(nodeHidDevicePath)
-          : await TransportWebUSB.request();
+          : await TransportWebUSB.open(await getFirstLedgerDevice());
     } catch (error) {
       throw new errors.TransportError('Creating transport failed', error);
     }
@@ -496,6 +497,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
       nodeHidDevicePath,
       device
     );
+
     if (matchingOpenConnection) return matchingOpenConnection;
 
     let transport: LedgerTransportType | undefined;
