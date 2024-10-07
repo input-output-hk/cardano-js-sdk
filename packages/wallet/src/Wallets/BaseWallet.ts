@@ -10,7 +10,8 @@ import {
   SignDataProps,
   SyncStatus,
   WalletAddress,
-  WalletNetworkInfoProvider
+  WalletNetworkInfoProvider,
+  isTxBodyWithHash
 } from '../types';
 import {
   AddressDiscovery,
@@ -619,25 +620,28 @@ export class BaseWallet implements ObservableWallet {
   }: FinalizeTxProps): Promise<Cardano.Tx> {
     const knownAddresses = await firstValueFrom(this.addresses$);
     const dRepPublicKey = await this.governance.getPubDRepKey();
+    const emptyWitness = { signatures: new Map() };
+
+    let transaction: Serialization.Transaction;
+    if (isTxBodyWithHash(tx)) {
+      // Reconstruct transaction from parts
+      transaction = new Serialization.Transaction(
+        bodyCbor ? Serialization.TransactionBody.fromCbor(bodyCbor) : Serialization.TransactionBody.fromCore(tx.body),
+        Serialization.TransactionWitnessSet.fromCore({ ...emptyWitness, ...witness }),
+        auxiliaryData ? Serialization.AuxiliaryData.fromCore(auxiliaryData) : undefined
+      );
+      if (isValid !== undefined) transaction.setIsValid(isValid);
+    } else {
+      // Transaction CBOR is available. Use as is.
+      transaction = Serialization.Transaction.fromCbor(tx);
+    }
 
     const context = {
       ...signingContext,
       dRepPublicKey,
       knownAddresses,
-      txInKeyPathMap: await util.createTxInKeyPathMap(tx.body, knownAddresses, this.util)
+      txInKeyPathMap: await util.createTxInKeyPathMap(transaction.body().toCore(), knownAddresses, this.util)
     };
-
-    const emptyWitness = { signatures: new Map() };
-
-    // The Witnesser takes a serializable transaction. We cant build that from the hash alone, if
-    // the bodyCbor is available, use that instead of the coreTx type to build the transaction.
-    const transaction = new Serialization.Transaction(
-      bodyCbor ? Serialization.TransactionBody.fromCbor(bodyCbor) : Serialization.TransactionBody.fromCore(tx.body),
-      Serialization.TransactionWitnessSet.fromCore({ ...emptyWitness, ...witness }),
-      auxiliaryData ? Serialization.AuxiliaryData.fromCore(auxiliaryData) : undefined
-    );
-
-    if (isValid !== undefined) transaction.setIsValid(isValid);
 
     const result = await this.witnesser.witness(transaction, context, signingOptions);
 

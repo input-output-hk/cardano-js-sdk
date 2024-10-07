@@ -229,6 +229,18 @@ describe('BaseWallet methods', () => {
     });
 
     describe('finalizeTx', () => {
+      let witnessSpy: jest.SpyInstance;
+
+      beforeEach(() => {
+        witnessSpy = jest.spyOn(witnesser, 'witness');
+      });
+
+      afterEach(() => {
+        witnessSpy.mockClear();
+        witnessSpy.mockReset();
+        witnessSpy.mockRestore();
+      });
+
       it('resolves with TransactionWitnessSet', async () => {
         const txInternals = await wallet.initializeTx(props);
         const unhydratedTxBody = Serialization.TransactionBody.fromCore(txInternals.body).toCore();
@@ -241,24 +253,50 @@ describe('BaseWallet methods', () => {
 
       it('passes through sender to witnesser', async () => {
         const sender = { url: 'https://lace.io' };
-        const witnessSpy = jest.spyOn(witnesser, 'witness');
         const txInternals = await wallet.initializeTx(props);
-        await wallet.finalizeTx({ signingContext: { sender }, tx: txInternals });
 
+        // Reset witness calls from wallet.initializeTx
+        witnessSpy.mockClear();
+
+        await wallet.finalizeTx({ signingContext: { sender }, tx: txInternals });
+        expect(witnessSpy).toHaveBeenCalledTimes(1);
         expect(witnessSpy).toBeCalledWith(expect.anything(), expect.objectContaining({ sender }), void 0);
       });
 
       it('uses the original CBOR to create the serializable transaction if given', async () => {
         const sender = { url: 'https://lace.io' };
-        const witnessSpy = jest.spyOn(witnesser, 'witness');
         const txInternals = await wallet.initializeTx(props);
+
+        // Reset witness calls from wallet.initializeTx
+        witnessSpy.mockClear();
+
         await wallet.finalizeTx({
+          auxiliaryData: geniusYieldTx.auxiliaryData()?.toCore(),
           bodyCbor: geniusYieldTx.body().toCbor(),
           signingContext: { sender },
-          tx: txInternals
+          tx: txInternals,
+          witness: geniusYieldTx.witnessSet()?.toCore()
         });
 
-        expect(witnessSpy).toBeCalledWith(geniusYieldTx, expect.objectContaining({ sender }), void 0);
+        expect(witnessSpy).toHaveBeenCalledTimes(1);
+        const tx: Serialization.Transaction = witnessSpy.mock.calls[0][0];
+        expect(tx.body().toCbor()).toEqual(geniusYieldTx.body().toCbor());
+        // The transaction CBOR will not match due to reencoding witnessSet and auxiliaryData
+        // expect(tx.toCbor()).toEqual(geniusYieldTx.toCbor());
+      });
+
+      it('uses the complete transaction CBOR, ignoring auxiliaryData, witness and isValid', async () => {
+        const sender = { url: 'https://lace.io' };
+        await wallet.finalizeTx({
+          auxiliaryData: 'ignored auxiliary data' as Cardano.AuxiliaryData,
+          signingContext: { sender },
+          tx: geniusYieldTx.toCbor(),
+          witness: 'ignored witness set' as Partial<Cardano.Witness>
+        });
+
+        expect(witnessSpy).toHaveBeenCalledTimes(1);
+        const tx: Serialization.Transaction = witnessSpy.mock.calls[0][0];
+        expect(tx.toCbor()).toEqual(geniusYieldTx.toCbor());
       });
     });
 
