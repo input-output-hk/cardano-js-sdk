@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.12.7...@cardano-sdk/hardware-ledger@0.12.8) (2024-10-07)
+
+### Features
+
+* **hardware-ledger:** the Ledger key agent now picks the first avaialble device if possible ([b993dc6](https://github.com/input-output-hk/cardano-js-sdk/commit/b993dc62eb1ae559b1840b5bb7346aee203fce0d))
+
 ## [0.12.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.12.6...@cardano-sdk/hardware-ledger@0.12.7) (2024-10-06)
 
 **Note:** Version bump only for package @cardano-sdk/hardware-ledger

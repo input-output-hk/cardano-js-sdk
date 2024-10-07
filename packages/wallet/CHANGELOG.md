@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.44.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.7...@cardano-sdk/wallet@0.44.8) (2024-10-07)
+
+### Features
+
+* cip30 signTx should send CBOR in sign transactionWitnesserReq ([c18a551](https://github.com/input-output-hk/cardano-js-sdk/commit/c18a551717ddb6661ee351c2e5af4101560f1a6e))
+
 ## [0.44.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.6...@cardano-sdk/wallet@0.44.7) (2024-10-06)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
