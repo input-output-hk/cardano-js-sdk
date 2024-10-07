@@ -24,7 +24,7 @@ import { DB_MAX_SAFE_INTEGER } from '../DbSyncChainHistory/queries';
 import { HydratedTxBody } from '@cardano-sdk/core/dist/cjs/Cardano';
 import { Responses } from '@blockfrost/blockfrost-js';
 import { Schemas } from '@blockfrost/blockfrost-js/lib/types/open-api';
-import { removeUndefinedFields } from '@cardano-sdk/util';
+// import { removeUndefinedFields } from '@cardano-sdk/util';
 
 type WithCertIndex<T> = T & { cert_index: number };
 
@@ -257,15 +257,12 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
             invalidHereafter: this.parseValidityInterval(txContent.invalid_hereafter)
           };
 
-      const witness = removeUndefinedFields(
-        txFromCBOR
-          ? txFromCBOR.witness
-          : {
-              redeemers: await this.fetchRedeemers(txContent),
-              signatures: new Map() // not available in blockfrost
-            }
-      );
-
+      const witness = txFromCBOR
+        ? txFromCBOR.witness
+        : {
+            redeemers: await this.fetchRedeemers(txContent),
+            signatures: new Map() // not available in blockfrost
+          };
       // can txFromCBOR.isValid also be used?
       const valid_contract = txContent.valid_contract;
 
@@ -282,7 +279,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
         slot: Cardano.Slot(txContent.slot)
       };
 
-      const body: HydratedTxBody = removeUndefinedFields({
+      const body: HydratedTxBody = {
         certificates,
         collaterals,
         fee,
@@ -291,7 +288,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
         outputs,
         validityInterval,
         withdrawals
-      });
+      };
 
       return {
         auxiliaryData,
