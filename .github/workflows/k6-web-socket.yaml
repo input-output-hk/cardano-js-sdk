@@ -36,6 +36,19 @@ on:
         type: number
         required: true
         default: 100
+      wallet-restoration:
+        description: 'The test will perform wallet restoration procedure.'
+        type: boolean
+      connections-seconds:
+        description: 'Number of seconds to spread the connections.'
+        type: number
+        required: true
+        default: 3
+      idle-seconds:
+        description: 'Number of seconds to keep the wallets in idle state before ending the test.'
+        type: number
+        required: true
+        default: 60
 
 jobs:
   web-socket:
@@ -67,6 +80,9 @@ jobs:
             -e WALLETS=${{ inputs.wallets }}
             -e HD_ACTIVE_ADDR_COUNT=${{ inputs.hd-addr-per-wallet }}
             -e HD_MAX_TX_HISTORY=${{ inputs.hd-tx-history-size-per-wallet }}
+            -e WALLET_RESTORATION=${{ inputs.wallet-restoration }}
+            -e CONNECTIONS_SECONDS=${{ inputs.connections-seconds }}
+            -e IDLE_SECONDS=${{ inputs.idle-seconds }}
             --out json=web-socket-results.json
             --quiet
       - name: Upload performance test results

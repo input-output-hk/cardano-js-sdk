@@ -6,8 +6,16 @@ import { SharedArray } from 'k6/data';
 import { check } from 'k6';
 import ws from 'k6/ws';
 
-const { HD_ACTIVE_ADDR_COUNT, HD_MAX_TX_HISTORY, TARGET_NET, WALLETS } = Object.assign(
-  { HD_ACTIVE_ADDR_COUNT: '10', HD_MAX_TX_HISTORY: '100', TARGET_NET: 'mainnet', WALLETS: '100' },
+const parameters = Object.assign(
+  {
+    CONNECTIONS_SECONDS: '3',
+    HD_ACTIVE_ADDR_COUNT: '10',
+    HD_MAX_TX_HISTORY: '100',
+    IDLE_SECONDS: '60',
+    TARGET_NET: 'mainnet',
+    WALLET_RESTORATION: 'false',
+    WALLETS: '100'
+  },
   // eslint-disable-next-line no-undef
   __ENV
 );
@@ -16,9 +24,12 @@ const { HD_ACTIVE_ADDR_COUNT, HD_MAX_TX_HISTORY, TARGET_NET, WALLETS } = Object.
 const dut = k6Utils.getDut(__ENV, { networks: ['mainnet', 'preprod'] });
 const url = `wss://${dut}/ws`;
 
-const activeAddrCount = Number.parseInt(HD_ACTIVE_ADDR_COUNT, 10);
-const maxTxHistory = Number.parseInt(HD_MAX_TX_HISTORY, 10);
-const numWallets = Number.parseInt(WALLETS, 10);
+const activeAddrCount = Number.parseInt(parameters.HD_ACTIVE_ADDR_COUNT, 10);
+const idleSeconds = Number.parseInt(parameters.IDLE_SECONDS, 10);
+const connectionsSeconds = Number.parseInt(parameters.CONNECTIONS_SECONDS, 10);
+const maxTxHistory = Number.parseInt(parameters.HD_MAX_TX_HISTORY, 10);
+const numWallets = Number.parseInt(parameters.WALLETS, 10);
+const walletRestoration = parameters.WALLETS === 'true';
 
 export const options = {
   ext: {
@@ -31,15 +42,15 @@ export const options = {
     connections: {
       executor: 'ramping-vus',
       gracefulRampDown: '0s',
-      gracefulStop: '10m',
-      stages: [{ duration: '3s', target: numWallets }],
+      gracefulStop: '60m',
+      stages: [{ duration: `${connectionsSeconds}s`, target: numWallets }],
       startVUs: 1
     }
   }
 };
 
 /** Wallet addresses extracted from the JSON dump file */
-const fileName = `../../dump/addresses/${TARGET_NET}.json`;
+const fileName = `../../dump/addresses/${parameters.TARGET_NET}.json`;
 // eslint-disable-next-line no-undef
 const walletsOrig = new SharedArray('walletsData', () => JSON.parse(open(fileName)));
 
@@ -77,7 +88,9 @@ export const run = ({ wallets }) => {
   const vu = __VU;
   const wallet = wallets[vu % wallets.length]; // each wallet is a collection of addresses
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   const res = ws.connect(url, null, (socket) => {
+    let blockNo = 0;
     let closed = false;
     let requestId = 0;
     let transactionsCount = 0;
@@ -92,7 +105,7 @@ export const run = ({ wallets }) => {
         return socket.setTimeout(() => {
           closed = true;
           socket.close();
-        }, 1000);
+        }, idleSeconds * 1000);
       }
 
       const address =
@@ -100,15 +113,23 @@ export const run = ({ wallets }) => {
           ? wallet[requestId - 1].address
           : getDummyAddr(wallet[0].address, requestId - wallet.length);
 
-      socket.send(JSON.stringify({ requestId, txsByAddresses: { addresses: [address], lower: 0 } }));
+      const lower = walletRestoration ? 0 : blockNo;
+
+      socket.send(JSON.stringify({ requestId, txsByAddresses: { addresses: [address], lower } }));
     };
 
     socket.on('message', (message) => {
-      const { clientId, responseTo, transactions } = JSON.parse(message);
+      const { clientId, networkInfo, responseTo, transactions } = JSON.parse(message);
 
+      // Set operational stat
       if (clientId) operationalTrend.add(Date.now() - begin);
+
+      // Perform init with or without restoration
+      if (networkInfo) ({ blockNo } = networkInfo.ledgerTip);
       if (clientId || responseTo) nextAddress();
-      if (transactions) transactionsCount += transactions.length;
+
+      // Count the incoming transactions
+      if (Array.isArray(transactions)) transactionsCount += transactions.length;
     });
 
     // Count unexpected close
