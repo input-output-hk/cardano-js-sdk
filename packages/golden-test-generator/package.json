@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/golden-test-generator",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "description": "Generate golden test files for a range of Cardano concepts",
   "engines": {
     "node": ">=16.20.2"

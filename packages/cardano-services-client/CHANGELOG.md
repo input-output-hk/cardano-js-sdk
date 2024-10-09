@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.21.1...@cardano-sdk/cardano-services-client@0.21.2) (2024-10-09)
+
+### Bug Fixes
+
+* **cardano-services-client:** do not call timout id unref in browsers ([4be68ab](https://github.com/input-output-hk/cardano-js-sdk/commit/4be68abf3ca030d236263a318f067fccd0e44297))
+
 ## [0.21.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.21.0...@cardano-sdk/cardano-services-client@0.21.1) (2024-10-06)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services-client
