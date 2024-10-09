@@ -400,7 +400,8 @@ export class CardanoWsClient extends WsProvider {
       if (this.status === 'stop') this.closeResolver();
       else {
         this.status = 'idle';
-        setTimeout(() => this.connect(), 1000).unref();
+        const timeout = setTimeout(() => this.connect(), 1000);
+        if (typeof timeout.unref === 'function') timeout.unref();
       }
 
       this.emitHealth('closed');
@@ -440,7 +441,7 @@ export class CardanoWsClient extends WsProvider {
         this.logger.error(error, 'Error while refreshing heartbeat', this.clientId);
       }
     }, this.heartbeatInterval);
-    this.heartbeatTimeout.unref();
+    if (typeof this.heartbeatTimeout.unref === 'function') this.heartbeatTimeout.unref();
   }
 
   /** Closes the WebSocket connection. */
