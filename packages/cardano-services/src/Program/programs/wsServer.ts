@@ -15,7 +15,8 @@ import { loadGenesisData } from '../../util';
 export type WsServerArgs = CommonProgramOptions & PosgresProgramOptions<'DbSync'> & OgmiosProgramOptions;
 
 export const loadWsServer = (args: WsServerArgs) => {
-  const { apiUrl, dbCacheTtl, heartbeatTimeout, loggerMinSeverity, ogmiosUrl } = args;
+  const { apiUrl, dbCacheTtl, heartbeatTimeout, loggerMinSeverity, metricsInterval, postgresPoolMaxDbSync, ogmiosUrl } =
+    args;
   const { cardanoNodeConfigPath, serviceDiscoveryBackoffFactor: factor, serviceDiscoveryTimeout: maxRetryTime } = args;
 
   const logger = createLogger({ level: loggerMinSeverity, name: 'ws-server' });
@@ -39,7 +40,7 @@ export const loadWsServer = (args: WsServerArgs) => {
 
     const server = new CardanoWsServer(
       { cardanoNode, db, genesisData, logger },
-      { dbCacheTtl, heartbeatTimeout, port }
+      { dbCacheTtl, dbPoolMax: postgresPoolMaxDbSync, heartbeatTimeout, metricsInterval, port }
     );
 
     let shuttingDown = false;

@@ -92,5 +92,5 @@ CMD ["./init.sh"]
 
 FROM cardano-services AS ws-server
 WORKDIR /app/packages/cardano-services
-HEALTHCHECK CMD curl --fail --silent http://localhost:3000/health
+HEALTHCHECK CMD curl --fail --silent http://localhost:3000/v1.0.0/health
 CMD ["bash", "-c", "../../node_modules/.bin/tsx watch --clear-screen=false --conditions=development src/cli start-ws-server"]

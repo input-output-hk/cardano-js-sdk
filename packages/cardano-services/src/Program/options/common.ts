@@ -36,6 +36,7 @@ export enum CommonOptionsDescriptions {
   EnableMetrics = 'Enable Prometheus Metrics',
   LastRosEpochs = 'Number of epochs over which lastRos is computed',
   LoggerMinSeverity = 'Log level',
+  MetricsInterval = 'Metrics interval in seconds',
   ServiceDiscoveryBackoffFactor = 'Exponential backoff factor for service discovery',
   ServiceDiscoveryTimeout = 'Timeout for service discovery attempts',
   WebSocketApiUrl = 'WebSocket API server URL'
@@ -53,6 +54,7 @@ export type CommonProgramOptions = {
   heartbeatTimeout?: number;
   lastRosEpochs?: number;
   loggerMinSeverity?: LogLevel;
+  metricsInterval?: number;
   serviceDiscoveryBackoffFactor?: number;
   serviceDiscoveryTimeout?: number;
   webSocketApiUrl?: URL;
@@ -125,6 +127,13 @@ export const withCommonOptions = (command: Command, apiUrl: URL) => {
         return level;
       },
       'info'
+    ),
+    newOption(
+      '--metrics-interval <metricsInterval>',
+      CommonOptionsDescriptions.MetricsInterval,
+      'METRICS_INTERVAL',
+      integerValidator(CommonOptionsDescriptions.MetricsInterval),
+      60
     ),
     newOption(
       '--service-discovery-backoff-factor <serviceDiscoveryBackoffFactor>',

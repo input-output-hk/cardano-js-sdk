@@ -3,6 +3,7 @@
 import { Cardano, CardanoNode, Seconds, createSlotEpochInfoCalc } from '@cardano-sdk/core';
 import { GenesisData } from '..';
 import { Logger } from 'ts-log';
+import { Metrics } from './metrics';
 import { NetworkInfoResponses, WSMessage, WsProvider, isTxRelevant } from '@cardano-sdk/cardano-services-client';
 import { Notification, Pool } from 'pg';
 import { Server, createServer } from 'http';
@@ -37,11 +38,17 @@ export interface WsServerConfiguration {
   /** The cache time to live in seconds. */
   dbCacheTtl: number;
 
+  /** The maximum connections for DB connection pool. Used only for metrics. */
+  dbPoolMax?: number;
+
   /** The heartbeat check interval in seconds. */
   heartbeatInterval?: number;
 
   /** The heartbeat timeout in seconds. */
   heartbeatTimeout?: number;
+
+  /** The metrics interval in seconds. */
+  metricsInterval?: number;
 
   /** The port to listen. */
   port: number;
@@ -88,11 +95,13 @@ export class CardanoWsServer extends WsProvider {
   private closeNotify = noop;
   private closing = false;
   private db: Pool;
+  private dbPoolMax?: number;
   private heartbeatInterval: NodeJS.Timer | undefined;
   private lastReceivedNotification = 0;
   private lastSentNotification = 0;
   private lastSlot = Number.POSITIVE_INFINITY as Cardano.Slot;
   private logger: Logger;
+  private metrics: Metrics;
   private networkInfo: NetworkInfoResponses;
   private notifications = new Map<number, NotificationBody>();
   private server: Server;
@@ -105,7 +114,9 @@ export class CardanoWsServer extends WsProvider {
 
     this.cardanoNode = dependencies.cardanoNode;
     this.db = dependencies.db;
+    this.dbPoolMax = cfg.dbPoolMax;
     this.logger = dependencies.logger;
+    this.metrics = new Metrics(cfg.metricsInterval);
     this.networkInfo = { genesisParameters: toGenesisParams(dependencies.genesisData) } as NetworkInfoResponses;
 
     // Create the HTTP and the WebSocket servers
@@ -142,6 +153,7 @@ export class CardanoWsServer extends WsProvider {
   close(callback?: () => void) {
     this.closing = true;
     this.closeNotify();
+    this.metrics.close();
 
     if (this.heartbeatInterval) clearInterval(this.heartbeatInterval);
     if (this.stakeInterval) clearInterval(this.stakeInterval);
@@ -165,19 +177,43 @@ export class CardanoWsServer extends WsProvider {
 
   /** Creates a simple HTTP server which just handles the `/health` URL. Mainly used to listen the WS server. */
   private createHttpServer() {
+    /** Not used, just for coherency with `provider-server`. */
+    const urlVersion = '/v1.0.0';
+    const healthUrl = `${urlVersion}/health`;
+    const metricsUrl = `${urlVersion}/metrics`;
+    const readyUrl = `${urlVersion}/ready`;
+
     return createServer(async (req, res) => {
       const { method, url } = req;
 
-      if (['/health', '/ready'].includes(url!)) {
+      if ([healthUrl, readyUrl].includes(url!)) {
         const healthCheck = await this.healthCheck();
 
-        if (url === '/health' && healthCheck.notRecoverable) res.statusCode = 500;
-        if (url === '/ready' && !healthCheck.ok) res.statusCode = 500;
+        if (url === healthUrl && healthCheck.notRecoverable) res.statusCode = 500;
+        if (url === readyUrl && !healthCheck.ok) res.statusCode = 500;
 
         return res.end(JSON.stringify(healthCheck));
       }
 
-      this.logger.info(method, url);
+      if (url === metricsUrl) {
+        const { idleCount, totalCount, waitingCount } = this.db;
+        const metrics = {
+          connectedClients: this.wss.clients.size,
+          dbConnCount: totalCount,
+          dbConnIdle: idleCount,
+          dbConnMax: this.dbPoolMax,
+          dbConnWaiting: waitingCount,
+          ...this.metrics.get()
+        };
+
+        return res.end(
+          Object.entries(metrics)
+            .map(([key, value]) => `${key} ${value}\n`)
+            .join('')
+        );
+      }
+
+      this.logger.error('HTTP request 404', method, url);
 
       res.statusCode = 404;
       res.end('Not found');
@@ -189,6 +225,8 @@ export class CardanoWsServer extends WsProvider {
     // eslint-disable-next-line sonarjs/cognitive-complexity
     return (msg: Notification) =>
       (async () => {
+        this.metrics.add('notify');
+
         const notification = ++this.lastReceivedNotification;
         const { payload } = msg;
 
@@ -402,7 +440,7 @@ export class CardanoWsServer extends WsProvider {
   private createOnConnection() {
     // This is the entry point for each new WebSocket connection
     return (ws: WebSocket) => {
-      const { logger, networkInfo, syncing } = this;
+      const { logger, metrics, networkInfo, syncing } = this;
       const clientId = (ws.clientId = v4());
 
       ws.addresses = [];
@@ -420,6 +458,7 @@ export class CardanoWsServer extends WsProvider {
       ws.sendMessage = (message: WSMessage) => {
         const stringMessage = JSON.stringify(toSerializableObject(message));
 
+        metrics.add('sentMessages');
         ws.logDebug(stringMessage);
         ws.send(stringMessage);
       };
@@ -444,9 +483,14 @@ export class CardanoWsServer extends WsProvider {
       // Attach the handlers to the WS connection events
 
       ws.on('close', onClose);
-      ws.on('error', (error) => ws.logError(error, 'Async error from WebSocket connection'));
+      ws.on('error', (error) => {
+        metrics.add('connectionErrors');
+        ws.logError(error, 'Async error from WebSocket connection');
+      });
       // This is the entry point for each new WebSocket message from this connection
       ws.on('message', (data) => {
+        metrics.add('receivedMessages');
+
         // First of all, refresh the heartbeat timeout
         ws.heartbeat = Date.now();
 
@@ -456,6 +500,7 @@ export class CardanoWsServer extends WsProvider {
 
         // DoS protection
         if (data.length > 1024 * 100) {
+          metrics.add('badMessagesLong');
           ws.logError(new Error('Buffer too long'), 'Unexpected data length from WebSocket: closing');
           return ws.close();
         }
@@ -465,6 +510,7 @@ export class CardanoWsServer extends WsProvider {
         try {
           request = JSON.parse(data.toString('utf8'));
         } catch (error) {
+          metrics.add('badMessagesParse');
           ws.logError(error as Error, 'Error parsing message: closing');
           return ws.close();
         }
@@ -525,6 +571,7 @@ export class CardanoWsServer extends WsProvider {
     } catch (error_) {
       const error = toError(error_);
 
+      this.metrics.add('serverErrors');
       ws.logError(error, 'While performing request');
       if (requestId) ws.sendMessage({ error, responseTo: requestId });
     }
@@ -550,6 +597,7 @@ export class CardanoWsServer extends WsProvider {
   private sendNotification(notification: NotificationBody) {
     const { message, transactions } = notification;
     const stringMessage = JSON.stringify(toSerializableObject(message));
+    let simpleMessagesCount = 0;
 
     for (const ws of this.wss.clients) {
       const txs = transactions.filter((tx) => isTxRelevant(tx, ws.addresses));
@@ -561,11 +609,19 @@ export class CardanoWsServer extends WsProvider {
           }`
         );
 
-      txs.length === 0 ? ws.send(stringMessage) : ws.sendMessage({ ...message, transactions: txs });
+      if (txs.length === 0) {
+        ws.send(stringMessage);
+        simpleMessagesCount++;
+      } else ws.sendMessage({ ...message, transactions: txs });
     }
+
+    if (simpleMessagesCount) this.metrics.add('sentMessages', simpleMessagesCount);
   }
 
   private sendString(message: string) {
-    for (const ws of this.wss.clients.values()) ws.send(message);
+    const { clients } = this.wss;
+
+    for (const ws of clients.values()) ws.send(message);
+    this.metrics.add('sentMessages', clients.size);
   }
 }
