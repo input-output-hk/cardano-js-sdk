@@ -15,7 +15,6 @@ services:
       NODE_ENV: local-network
     volumes:
       - ./local-network/config/network/blockfrost-ryo:/app/config
-    profiles: [blockfrost-ryo]
 
   local-testnet:
     <<: *logging

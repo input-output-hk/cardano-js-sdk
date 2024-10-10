@@ -1,4 +1,4 @@
-name: Continuous Integration - E2E
+name: Continuous Integration (Blockfrost) - E2E
 
 env:
   TL_DEPTH: ${{ github.event.pull_request.head.repo.fork && '0' || fromJson(vars.TL_DEPTH) }}
@@ -27,6 +27,17 @@ env:
   TEST_CLIENT_STAKE_POOL_PROVIDER: 'http'
   TEST_CLIENT_STAKE_POOL_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
   WS_PROVIDER_URL: 'http://localhost:4100/ws'
+
+  # Blockfrost enablement
+  BLOCKFROST_CUSTOM_BACKEND_URL: 'http://blockfrost-ryo:3000'
+  USE_TYPEORM_ASSET_PROVIDER: 'false'
+  ASSET_PROVIDER: 'blockfrost'
+  UTXO_PROVIDER: 'blockfrost'
+  CHAIN_HISTORY_PROVIDER: 'blockfrost'
+  REWARDS_PROVIDER: 'blockfrost'
+  NETWORK_INFO_PROVIDER: 'blockfrost'
+  #blockfrost-ryo doesn't have submit API
+  #TX_SUBMIT_PROVIDER: 'blockfrost'
 
 on:
   pull_request:

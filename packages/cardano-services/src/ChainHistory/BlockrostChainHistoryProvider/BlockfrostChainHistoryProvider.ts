@@ -16,10 +16,15 @@ import {
   Paginated,
   ProviderError,
   ProviderFailure,
+  Serialization,
   TransactionsByAddressesArgs,
   TransactionsByIdsArgs
 } from '@cardano-sdk/core';
+import { DB_MAX_SAFE_INTEGER } from '../DbSyncChainHistory/queries';
+import { HydratedTxBody } from '@cardano-sdk/core/dist/cjs/Cardano';
 import { Responses } from '@blockfrost/blockfrost-js';
+import { Schemas } from '@blockfrost/blockfrost-js/lib/types/open-api';
+// import { removeUndefinedFields } from '@cardano-sdk/util';
 
 type WithCertIndex<T> = T & { cert_index: number };
 
@@ -29,30 +34,31 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
     redeemer_count
   }: Responses['tx_content']): Promise<Cardano.Redeemer[] | undefined> {
     if (!redeemer_count) return;
-    const response = await this.blockfrost.txsRedeemers(hash);
-    return response.map(
-      ({ purpose, script_hash, unit_mem, unit_steps, tx_index }): Cardano.Redeemer => ({
-        data: Buffer.from(script_hash),
-        executionUnits: {
-          memory: Number.parseInt(unit_mem),
-          steps: Number.parseInt(unit_steps)
-        },
-        index: tx_index,
-        purpose: ((): Cardano.Redeemer['purpose'] => {
-          switch (purpose) {
-            case 'cert':
-              return Cardano.RedeemerPurpose.certificate;
-            case 'reward':
-              return Cardano.RedeemerPurpose.withdrawal;
-            case 'mint':
-              return Cardano.RedeemerPurpose.mint;
-            case 'spend':
-              return Cardano.RedeemerPurpose.spend;
-            default:
-              return purpose;
-          }
-        })()
-      })
+    return this.blockfrost.txsRedeemers(hash).then((response) =>
+      response.map(
+        ({ purpose, script_hash, unit_mem, unit_steps, tx_index }): Cardano.Redeemer => ({
+          data: Buffer.from(script_hash),
+          executionUnits: {
+            memory: Number.parseInt(unit_mem),
+            steps: Number.parseInt(unit_steps)
+          },
+          index: tx_index,
+          purpose: ((): Cardano.Redeemer['purpose'] => {
+            switch (purpose) {
+              case 'cert':
+                return Cardano.RedeemerPurpose.certificate;
+              case 'reward':
+                return Cardano.RedeemerPurpose.withdrawal;
+              case 'mint':
+                return Cardano.RedeemerPurpose.mint;
+              case 'spend':
+                return Cardano.RedeemerPurpose.spend;
+              default:
+                return purpose;
+            }
+          })()
+        })
+      )
     );
   }
 
@@ -61,12 +67,13 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
     hash
   }: Responses['tx_content']): Promise<Cardano.Withdrawal[] | undefined> {
     if (!withdrawal_count) return;
-    const response = await this.blockfrost.txsWithdrawals(hash);
-    return response.map(
-      ({ address, amount }): Cardano.Withdrawal => ({
-        quantity: BigInt(amount),
-        stakeAddress: Cardano.RewardAccount(address)
-      })
+    return this.blockfrost.txsWithdrawals(hash).then((response) =>
+      response.map(
+        ({ address, amount }): Cardano.Withdrawal => ({
+          quantity: BigInt(amount),
+          stakeAddress: Cardano.RewardAccount(address)
+        })
+      )
     );
   }
   /** This method gathers mints by finding the amounts that doesn't exist in 'inputs' but exist in 'outputs'. */
@@ -87,65 +94,93 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
   }
 
   protected async fetchPoolRetireCerts(hash: string): Promise<WithCertIndex<Cardano.PoolRetirementCertificate>[]> {
-    const response = await this.blockfrost.txsPoolRetires(hash);
-    return response.map(({ pool_id, retiring_epoch, cert_index }) => ({
-      __typename: Cardano.CertificateType.PoolRetirement,
-      cert_index,
-      epoch: Cardano.EpochNo(retiring_epoch),
-      poolId: Cardano.PoolId(pool_id)
-    }));
+    return this.blockfrost.txsPoolRetires(hash).then((response) =>
+      response.map(({ pool_id, retiring_epoch, cert_index }) => ({
+        __typename: Cardano.CertificateType.PoolRetirement,
+        cert_index,
+        epoch: Cardano.EpochNo(retiring_epoch),
+        poolId: Cardano.PoolId(pool_id)
+      }))
+    );
   }
 
   protected async fetchPoolUpdateCerts(hash: string): Promise<WithCertIndex<Cardano.PoolRegistrationCertificate>[]> {
-    const response = await this.blockfrost.txsPoolUpdates(hash);
-    return response.map(({ pool_id, cert_index }) => ({
-      __typename: Cardano.CertificateType.PoolRegistration,
-      cert_index,
-      poolId: Cardano.PoolId(pool_id),
-      poolParameters: ((): Cardano.PoolParameters => {
-        this.logger.warn('Omitting poolParameters for certificate in tx', hash);
-        return null as unknown as Cardano.PoolParameters;
-      })()
-    }));
+    return this.blockfrost.txsPoolUpdates(hash).then((response) =>
+      response.map(({ pool_id, cert_index }) => ({
+        __typename: Cardano.CertificateType.PoolRegistration,
+        cert_index,
+        poolId: Cardano.PoolId(pool_id),
+        poolParameters: ((): Cardano.PoolParameters => {
+          this.logger.warn('Omitting poolParameters for certificate in tx', hash);
+          return null as unknown as Cardano.PoolParameters;
+        })()
+      }))
+    );
+  }
+  async fetchCBOR(hash: string): Promise<string> {
+    return this.blockfrost
+      .instance<Schemas['script_cbor']>(`/txs/${hash}/cbor`)
+      .then((response) => {
+        if (response.body.cbor) return response.body.cbor;
+        throw new Error('CBOR is null');
+      })
+      .catch((_error) => {
+        throw new Error('CBOR fetch failed');
+      });
+  }
+  protected async fetchDetailsFromCBOR(hash: string) {
+    return this.fetchCBOR(hash)
+      .then((cbor) => {
+        const tx = Serialization.Transaction.fromCbor(Serialization.TxCBOR(cbor)).toCore();
+        this.logger.info('Fetched details from CBOR for tx', hash);
+        return tx;
+      })
+      .catch((error) => {
+        this.logger.warn('Failed to fetch details from CBOR for tx', hash, error);
+        return null;
+      });
   }
 
   protected async fetchMirCerts(hash: string): Promise<WithCertIndex<Cardano.MirCertificate>[]> {
-    const response = await this.blockfrost.txsMirs(hash);
-    return response.map(({ address, amount, cert_index, pot }) => ({
-      __typename: Cardano.CertificateType.MIR,
-      cert_index,
-      kind: Cardano.MirCertificateKind.ToStakeCreds,
-      pot: pot === 'reserve' ? Cardano.MirCertificatePot.Reserves : Cardano.MirCertificatePot.Treasury,
-      quantity: BigInt(amount),
-      rewardAccount: Cardano.RewardAccount(address)
-    }));
+    return this.blockfrost.txsMirs(hash).then((response) =>
+      response.map(({ address, amount, cert_index, pot }) => ({
+        __typename: Cardano.CertificateType.MIR,
+        cert_index,
+        kind: Cardano.MirCertificateKind.ToStakeCreds,
+        pot: pot === 'reserve' ? Cardano.MirCertificatePot.Reserves : Cardano.MirCertificatePot.Treasury,
+        quantity: BigInt(amount),
+        rewardAccount: Cardano.RewardAccount(address)
+      }))
+    );
   }
 
   protected async fetchStakeCerts(hash: string): Promise<WithCertIndex<Cardano.StakeAddressCertificate>[]> {
-    const response = await this.blockfrost.txsStakes(hash);
-    return response.map(({ address, cert_index, registration }) => ({
-      __typename: registration
-        ? Cardano.CertificateType.StakeRegistration
-        : Cardano.CertificateType.StakeDeregistration,
-      cert_index,
-      stakeCredential: {
-        hash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(address)) as unknown as Crypto.Hash28ByteBase16,
-        type: Cardano.CredentialType.KeyHash
-      }
-    }));
+    return this.blockfrost.txsStakes(hash).then((response) =>
+      response.map(({ address, cert_index, registration }) => ({
+        __typename: registration
+          ? Cardano.CertificateType.StakeRegistration
+          : Cardano.CertificateType.StakeDeregistration,
+        cert_index,
+        stakeCredential: {
+          hash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(address)) as unknown as Crypto.Hash28ByteBase16,
+          type: Cardano.CredentialType.KeyHash
+        }
+      }))
+    );
   }
 
   protected async fetchDelegationCerts(hash: string): Promise<WithCertIndex<Cardano.StakeDelegationCertificate>[]> {
-    const response = await this.blockfrost.txsDelegations(hash);
-    return response.map(({ address, pool_id, cert_index }) => ({
-      __typename: Cardano.CertificateType.StakeDelegation,
-      cert_index,
-      poolId: Cardano.PoolId(pool_id),
-      stakeCredential: {
-        hash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(address)) as unknown as Crypto.Hash28ByteBase16,
-        type: Cardano.CredentialType.KeyHash
-      }
-    }));
+    return this.blockfrost.txsDelegations(hash).then((response) =>
+      response.map(({ address, pool_id, cert_index }) => ({
+        __typename: Cardano.CertificateType.StakeDelegation,
+        cert_index,
+        poolId: Cardano.PoolId(pool_id),
+        stakeCredential: {
+          hash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(address)) as unknown as Crypto.Hash28ByteBase16,
+          type: Cardano.CredentialType.KeyHash
+        }
+      }))
+    );
   }
 
   protected async fetchCertificates({
@@ -157,29 +192,41 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
     hash
   }: Responses['tx_content']): Promise<Cardano.Certificate[] | undefined> {
     if (pool_retire_count + pool_update_count + mir_cert_count + stake_cert_count + delegation_count === 0) return;
-    return [
-      ...(pool_retire_count ? await this.fetchPoolRetireCerts(hash) : []),
-      ...(pool_update_count ? await this.fetchPoolUpdateCerts(hash) : []),
-      ...(mir_cert_count ? await this.fetchMirCerts(hash) : []),
-      ...(stake_cert_count ? await this.fetchStakeCerts(hash) : []),
-      ...(delegation_count ? await this.fetchDelegationCerts(hash) : [])
-    ]
-      .sort((a, b) => b.cert_index - a.cert_index)
-      .map((cert) => cert as Cardano.Certificate);
+
+    return Promise.all([
+      pool_retire_count ? this.fetchPoolRetireCerts(hash) : [],
+      pool_update_count ? this.fetchPoolUpdateCerts(hash) : [],
+      mir_cert_count ? this.fetchMirCerts(hash) : [],
+      stake_cert_count ? this.fetchStakeCerts(hash) : [],
+      delegation_count ? this.fetchDelegationCerts(hash) : []
+    ]).then((results) =>
+      results
+        .flat()
+        .sort((a, b) => b.cert_index - a.cert_index)
+        .map((cert) => cert as Cardano.Certificate)
+    );
   }
 
-  protected async fetchJsonMetadata(txHash: Cardano.TransactionId): Promise<Cardano.TxMetadata | null> {
-    try {
-      const response = await this.blockfrost.txsMetadata(txHash.toString());
-      // Not sure if types are correct, missing 'label', but it's present in docs
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return blockfrostMetadataToTxMetadata(response as any);
-    } catch (error) {
-      if (isBlockfrostNotFoundError(error)) {
-        return null;
-      }
-      throw error;
-    }
+  protected async fetchJsonMetadataAsAuxiliaryData(
+    txHash: Cardano.TransactionId
+  ): Promise<Cardano.AuxiliaryData | undefined> {
+    const UNDEFINED = undefined;
+    return this.blockfrost
+      .txsMetadata(txHash.toString())
+      .then((m) => {
+        const metadata = blockfrostMetadataToTxMetadata(m);
+        return metadata && metadata.size > 0
+          ? {
+              blob: metadata
+            }
+          : UNDEFINED;
+      })
+      .catch((error) => {
+        if (isBlockfrostNotFoundError(error)) {
+          return UNDEFINED;
+        }
+        throw error;
+      });
   }
 
   // eslint-disable-next-line unicorn/consistent-function-scoping
@@ -187,50 +234,71 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
 
   protected async fetchTransaction(hash: Cardano.TransactionId): Promise<Cardano.HydratedTx> {
     try {
-      const utxos: Responses['tx_content_utxo'] = await this.blockfrost.txsUtxos(hash.toString());
+      const txContent = await this.blockfrost.txs(hash.toString());
+
+      const txFromCBOR = await this.fetchDetailsFromCBOR(hash.toString());
+
+      const [certificates, withdrawals, utxos, auxiliaryData] = await Promise.all([
+        txFromCBOR ? txFromCBOR.body.certificates : this.fetchCertificates(txContent),
+        txFromCBOR ? txFromCBOR.body.withdrawals : this.fetchWithdrawals(txContent),
+        this.blockfrost.txsUtxos(hash.toString()),
+        txFromCBOR ? txFromCBOR.auxiliaryData : this.fetchJsonMetadataAsAuxiliaryData(hash)
+      ]);
+
+      // We can't use txFromCBOR.body.inputs since it misses HydratedTxIn.address
       const { inputs, outputs, collaterals } = BlockfrostToCore.transactionUtxos(utxos);
 
-      const response = await this.blockfrost.txs(hash.toString());
-      const metadata = await this.fetchJsonMetadata(hash);
-      const certificates = await this.fetchCertificates(response);
-      const withdrawals = await this.fetchWithdrawals(response);
-      const inputSource: Cardano.InputSource = response.valid_contract
+      const fee = txFromCBOR ? txFromCBOR.body.fee : BigInt(txContent.fees);
+      const mint = txFromCBOR ? txFromCBOR.body.mint : this.gatherMintsFromUtxos(txContent, utxos);
+      const validityInterval = txFromCBOR
+        ? txFromCBOR.body.validityInterval
+        : {
+            invalidBefore: this.parseValidityInterval(txContent.invalid_before),
+            invalidHereafter: this.parseValidityInterval(txContent.invalid_hereafter)
+          };
+
+      const witness = txFromCBOR
+        ? txFromCBOR.witness
+        : {
+            redeemers: await this.fetchRedeemers(txContent),
+            signatures: new Map() // not available in blockfrost
+          };
+      // can txFromCBOR.isValid also be used?
+      const valid_contract = txContent.valid_contract;
+
+      const inputSource: Cardano.InputSource = valid_contract
         ? Cardano.InputSource.inputs
         : Cardano.InputSource.collaterals;
 
-      return {
-        auxiliaryData: metadata
-          ? {
-              blob: metadata
-            }
-          : undefined,
+      // can we get these from cbor?
+      const index = txContent.index;
+      const txSize = txContent.size;
+      const blockHeader = {
+        blockNo: Cardano.BlockNo(txContent.block_height),
+        hash: Cardano.BlockId(txContent.block),
+        slot: Cardano.Slot(txContent.slot)
+      };
 
-        blockHeader: {
-          blockNo: Cardano.BlockNo(response.block_height),
-          hash: Cardano.BlockId(response.block),
-          slot: Cardano.Slot(response.slot)
-        },
-        body: {
-          certificates,
-          collaterals,
-          fee: BigInt(response.fees),
-          inputs,
-          mint: this.gatherMintsFromUtxos(response, utxos),
-          outputs,
-          validityInterval: {
-            invalidBefore: this.parseValidityInterval(response.invalid_before),
-            invalidHereafter: this.parseValidityInterval(response.invalid_hereafter)
-          },
-          withdrawals
-        },
+      const body: HydratedTxBody = {
+        certificates,
+        collaterals,
+        fee,
+        inputs,
+        mint,
+        outputs,
+        validityInterval,
+        withdrawals
+      };
+
+      return {
+        auxiliaryData,
+        blockHeader,
+        body,
         id: hash,
-        index: response.index,
+        index,
         inputSource,
-        txSize: response.size,
-        witness: {
-          redeemers: await this.fetchRedeemers(response),
-          signatures: new Map() // not available in blockfrost
-        }
+        txSize,
+        witness
       };
     } catch (error) {
       throw blockfrostToProviderError(error);
@@ -277,11 +345,17 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
     }
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   public async transactionsByAddresses({
     addresses,
+    pagination,
     blockRange
   }: TransactionsByAddressesArgs): Promise<Paginated<Cardano.HydratedTx>> {
+    this.logger.info(`transactionsByAddresses: ${JSON.stringify(blockRange)} ${JSON.stringify(addresses)}`);
     try {
+      const lowerBound = blockRange?.lowerBound ?? 0;
+      const upperBound = blockRange?.upperBound ?? DB_MAX_SAFE_INTEGER;
+
       const addressTransactions = await Promise.all(
         addresses.map(async (address) =>
           fetchByAddressSequentially<
@@ -295,18 +369,22 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
                   transactions[transactions.length - 1].block_height < blockRange!.lowerBound!
               : undefined,
             request: (addr: Cardano.PaymentAddress, paginationOptions) =>
-              this.blockfrost.addressesTransactions(addr.toString(), paginationOptions)
+              this.blockfrost.addressesTransactions(addr.toString(), paginationOptions, {
+                from: blockRange?.lowerBound ? blockRange?.lowerBound.toString() : undefined,
+                to: blockRange?.upperBound ? blockRange?.upperBound.toString() : undefined
+              })
           })
         )
       );
 
-      const allTransactions = addressTransactions
-        .flat(1)
-        .sort((a, b) => b.block_height - a.block_height || b.tx_index - a.tx_index);
-      const addressTransactionsSinceBlock = blockRange?.lowerBound
-        ? allTransactions.filter(({ block_height }) => block_height >= blockRange!.lowerBound!)
-        : allTransactions;
-      const ids = addressTransactionsSinceBlock.map(({ tx_hash }) => Cardano.TransactionId(tx_hash));
+      const allTransactions = addressTransactions.flat(1);
+
+      const ids = allTransactions
+        .filter(({ block_height }) => block_height >= lowerBound && block_height <= upperBound)
+        .sort((a, b) => a.block_height - b.block_height || a.tx_index - b.tx_index)
+        .map(({ tx_hash }) => Cardano.TransactionId(tx_hash))
+        .splice(pagination.startAt, pagination.limit);
+
       const pageResults = await this.transactionsByHashes({ ids });
 
       return { pageResults, totalResultCount: allTransactions.length };

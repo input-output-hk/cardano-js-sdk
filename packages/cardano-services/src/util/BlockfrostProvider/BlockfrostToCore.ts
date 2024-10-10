@@ -105,17 +105,21 @@ export const BlockfrostToCore = {
   }),
 
   txOut: (blockfrost: BlockfrostOutput): Cardano.TxOut => {
+    const value: Cardano.Value = {
+      coins: BigInt(blockfrost.amount.find(({ unit }) => unit === 'lovelace')!.quantity)
+    };
+
     const assets: Cardano.TokenMap = new Map();
     for (const { quantity, unit } of blockfrost.amount) {
       if (unit === 'lovelace') continue;
       assets.set(Cardano.AssetId(unit), BigInt(quantity));
     }
+
+    if (assets.size > 0) value.assets = assets;
+
     return {
       address: Cardano.PaymentAddress(blockfrost.address),
-      value: {
-        assets,
-        coins: BigInt(blockfrost.amount.find(({ unit }) => unit === 'lovelace')!.quantity)
-      }
+      value
     };
   }
 };
