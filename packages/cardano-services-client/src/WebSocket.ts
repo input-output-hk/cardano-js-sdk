@@ -21,7 +21,7 @@ import {
   UtxoProvider,
   createSlotEpochInfoCalc
 } from '@cardano-sdk/core';
-import { HexBlob, fromSerializableObject } from '@cardano-sdk/util';
+import { HexBlob, fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { Observable, ReplaySubject, Subject, filter, firstValueFrom, merge } from 'rxjs';
 import WebSocket from 'isomorphic-ws';
@@ -294,6 +294,8 @@ export class CardanoWsClient extends WsProvider {
 
   private createNetworkInfoProviderMethod<M extends NetworkInfoMethods>(method: M) {
     return async (): Promise<AsyncReturnType<NetworkInfoProvider[M]>> => {
+      this.logger.debug(`CardanoWsClient.${method} called`);
+
       // Take the first value from the method's observable or the first not ok health check not due to the provider is still starting
       const value = await firstValueFrom(
         merge(
@@ -303,8 +305,13 @@ export class CardanoWsClient extends WsProvider {
       );
 
       // If the value was an error different from starting, throw it, otherwise it is a return value for the method
-      if ('ok' in value && 'reason' in value && value.ok === false)
+      if ('ok' in value && 'reason' in value && value.ok === false) {
+        this.logger.error(`CardanoWsClient.${method} error`, value.reason);
+
         throw new ProviderError(ProviderFailure.ConnectionFailure, undefined, value.reason);
+      }
+
+      this.logger.debug(`CardanoWsClient.${method} response:`, toSerializableObject(value));
 
       return value as AsyncReturnType<NetworkInfoProvider[M]>;
     };
@@ -337,6 +344,8 @@ export class CardanoWsClient extends WsProvider {
             deserializeMetadata(tx);
             this.transactions[tx.id] = tx;
             delete this.utxos[tx.id];
+
+            this.logger.debug('CardanoWsClient got tx', tx.id, tx.blockHeader);
           }
 
         if (utxos)
@@ -358,6 +367,8 @@ export class CardanoWsClient extends WsProvider {
 
           // Emit ledgerTip as last one
           if (ledgerTip) {
+            this.logger.debug('CardanoWsClient got tip', ledgerTip);
+
             removeRolledBackTxs(this.transactions, ledgerTip.blockNo);
             removeRolledBackTxs(this.utxos, ledgerTip.blockNo);
 
@@ -374,6 +385,8 @@ export class CardanoWsClient extends WsProvider {
 
         if (responseTo) {
           const handler = this.handlers.get(responseTo);
+
+          this.logger.debug('CardanoWsClient response', responseTo);
 
           if (handler) {
             const { error } = message;
@@ -466,6 +479,7 @@ export class CardanoWsClient extends WsProvider {
       // ... otherwise add requestId
       request = { ...request, requestId: ++this.requestId };
 
+    this.logger.debug('CardanoWsClient request', request);
     this.ws.send(JSON.stringify(request));
     this.heartbeat();
 
@@ -474,7 +488,9 @@ export class CardanoWsClient extends WsProvider {
     return true;
   }
 
-  private transactionsByAddresses({ addresses, blockRange, pagination }: TransactionsByAddressesArgs) {
+  private transactionsByAddresses(args: TransactionsByAddressesArgs) {
+    const { addresses, blockRange, pagination } = args;
+
     // eslint-disable-next-line sonarjs/cognitive-complexity
     return new Promise<Paginated<Cardano.HydratedTx>>((resolve, reject) => {
       const lower = blockRange?.lowerBound || (0 as Cardano.BlockNo);
@@ -482,9 +498,12 @@ export class CardanoWsClient extends WsProvider {
       const requestAddresses: Cardano.PaymentAddress[] = [];
       const request = { addresses: requestAddresses, lower };
 
-      const complete = (error?: Error) => {
+      this.logger.debug('CardanoWsClient.transactionsByAddresses called', args);
+
+      const complete = (error?: Error): void => {
         if (error) {
           for (const address of requestAddresses) delete this.addresses[address];
+          this.logger.error('CardanoWsClient.transactionsByAddresses error', args, error);
 
           return reject(error);
         }
@@ -498,8 +517,11 @@ export class CardanoWsClient extends WsProvider {
         const last = first + (pagination?.limit || Number.POSITIVE_INFINITY);
 
         const pageResults = transactions.filter((_, i) => first <= i && i < last);
+        const result = { pageResults, totalResultCount: transactions.length };
 
-        resolve({ pageResults, totalResultCount: transactions.length });
+        this.logger.debug('CardanoWsClient.transactionsByAddresses response', args, toSerializableObject(result));
+
+        resolve(result);
       };
 
       // Check which addresses require sync
@@ -566,14 +588,23 @@ export class CardanoWsClient extends WsProvider {
 
   // eslint-disable-next-line sonarjs/cognitive-complexity, complexity
   private utxoByAddresses({ addresses }: UtxoByAddressesArgs) {
+    this.logger.debug('CardanoWsClient.utxoByAddresses called', addresses);
+
     for (const address of addresses) {
       const status = this.addresses[address];
+      let details: string;
 
-      if (!status)
-        return Promise.reject(new ProviderError(ProviderFailure.NotImplemented, null, `${address} not loaded`));
+      if (!status) {
+        this.logger.error('CardanoWsClient.utxoByAddresses error', (details = `${address} not loaded`));
 
-      if (status.status === 'syncing')
-        return Promise.reject(new ProviderError(ProviderFailure.Conflict, null, `${address} still loading`));
+        return Promise.reject(new ProviderError(ProviderFailure.NotImplemented, null, details));
+      }
+
+      if (status.status === 'syncing') {
+        this.logger.error('CardanoWsClient.utxoByAddresses error', (details = `${address} still loading`));
+
+        return Promise.reject(new ProviderError(ProviderFailure.Conflict, null, details));
+      }
     }
 
     const result: [Cardano.HydratedTxIn, Cardano.TxOut][] = [];
@@ -604,6 +635,8 @@ export class CardanoWsClient extends WsProvider {
         }
       }
     }
+
+    this.logger.debug('CardanoWsClient.utxoByAddresses response', toSerializableObject(result));
 
     return Promise.resolve(result);
   }
