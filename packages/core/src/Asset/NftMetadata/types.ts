@@ -3,6 +3,12 @@ import * as CidValidator from '@biglup/is-cid';
 import { InvalidStringError, OpaqueString } from '@cardano-sdk/util';
 import type { Metadatum } from '../../Cardano';
 
+const looksLikeIpfsUrlWithoutProtocol = (uri: string) => {
+  const [cid] = uri.split('/');
+  if (!cid) return false;
+  return CidValidator.isValid(cid);
+};
+
 export type Uri = OpaqueString<'Uri'>;
 
 export const Uri = (uri: string) => {
@@ -12,7 +18,7 @@ export const Uri = (uri: string) => {
   if (uri.startsWith('data:')) {
     return uri as unknown as Uri;
   }
-  if (CidValidator.isValid(uri)) {
+  if (looksLikeIpfsUrlWithoutProtocol(uri)) {
     return `ipfs://${uri}` as unknown as Uri;
   }
   throw new InvalidStringError(
