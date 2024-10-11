@@ -494,6 +494,25 @@ describe('storeNftMetadata', () => {
     const metadata = await nftMetadataRepo.findOneBy({ userTokenAssetId });
     expect(metadata).toBeTruthy();
   });
+
+  it('stores metadata from witness datum', async () => {
+    const USER_TOKEN_ASSET_ID = Cardano.AssetId(
+      'ecd0970cb2d599a8bdb61f6eb597e25eaf34d76bdf8ade17b6a8fa59000de140534832303037'
+    );
+    const REFERENCE_TOKEN_ASSET_ID = Cardano.AssetId(
+      'ecd0970cb2d599a8bdb61f6eb597e25eaf34d76bdf8ade17b6a8fa59000643b0534832303037'
+    );
+    const eventsWithCip68Handle = filterAssets(chainSyncData(ChainSyncDataSet.Cip68WitnessDatumProblem), [
+      REFERENCE_TOKEN_ASSET_ID,
+      USER_TOKEN_ASSET_ID
+    ]);
+    const evt = await firstValueFrom(project$(eventsWithCip68Handle));
+    const nftMetadata = evt.nftMetadata.find(({ userTokenAssetId }) => userTokenAssetId === USER_TOKEN_ASSET_ID);
+    expect(nftMetadata).toBeTruthy();
+
+    const storedMetadata = await nftMetadataRepo.findOneBy({ userTokenAssetId: USER_TOKEN_ASSET_ID });
+    expect(typeof storedMetadata?.image).toBe('string');
+  });
 });
 
 describe('willStoreNftMetadata', () => {

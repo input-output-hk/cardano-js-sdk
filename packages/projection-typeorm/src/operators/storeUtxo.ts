@@ -1,11 +1,19 @@
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { ChainSyncEventType, Mappers } from '@cardano-sdk/projection';
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { ObjectLiteral } from 'typeorm';
 import { OutputEntity, TokensEntity } from '../entity';
 import { typeormOperator } from './util';
 
-const serializeDatumIfExists = (datum: Cardano.PlutusData | undefined) =>
-  datum ? Serialization.PlutusData.fromCore(datum).toCbor() : undefined;
+const serializeInlineDatumIfExists = (
+  datum: Cardano.PlutusData | undefined,
+  datumHash: Hash32ByteBase16 | undefined
+) => {
+  // withUtxo mapper hydrates utxo with datum from witness
+  // we probably don't need to store it in the db
+  if (datumHash) return;
+  return datum ? Serialization.PlutusData.fromCore(datum).toCbor() : undefined;
+};
 
 export interface WithStoredProducedUtxo {
   storedProducedUtxo: Map<Mappers.ProducedUtxo, ObjectLiteral>;
@@ -27,7 +35,7 @@ export const storeUtxo = typeormOperator<Mappers.WithUtxo, WithStoredProducedUtx
               address,
               block: { slot: header.slot },
               coins: value.coins,
-              datum: serializeDatumIfExists(datum),
+              datum: serializeInlineDatumIfExists(datum, datumHash),
               datumHash,
               outputIndex: index,
               scriptReference,

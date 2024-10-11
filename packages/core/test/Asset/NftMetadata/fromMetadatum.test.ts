@@ -12,6 +12,7 @@ describe('NftMetadata.fromMetadatum', () => {
   const assetNameString = Buffer.from(assetNameStringUtf8).toString('hex');
   const policyIdString = 'b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7';
   const assetImageIPFS = 'ipfs://QmWS6DgF8Ma8oooBn7CtD3ChHyzzMw5NXWfnDbVFTip8af';
+  const assetImageIPFSNoProtocol = 'QmbhD98wpxQ8dqQkjv5Z3U59g3UqVQWV7szZWuD5CZy6iV/1.jpg';
   const assetImageHTTPS = 'https://tokens.cardano.org';
   const ipfsUrl = 'ipfs://image';
 
@@ -256,6 +257,12 @@ describe('NftMetadata.fromMetadatum', () => {
     );
     const result = Asset.NftMetadata.fromMetadatum(validAsset, metadatum, logger);
     expect(result?.image).toEqual('ipfs://bafybeihtdkq3ntfcewytdaimnrslpxsatsg47e3bqlsgi3jkax65pypymi');
+  });
+
+  it('supports image without protocol for ipfs uri', () => {
+    const metadatum = createMetadatumWithFiles([], assetImageIPFSNoProtocol, assetNameStringUtf8);
+    const result = Asset.NftMetadata.fromMetadatum(validAsset, metadatum, logger);
+    expect(result?.image).toEqual(`ipfs://${assetImageIPFSNoProtocol}`);
   });
 
   it('supports image with ipfs protocol as array', () => {
