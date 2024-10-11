@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">37.5% </span>
+                <span class="strong">32.5% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>12/32</span>
+                <span class='fraction'>13/40</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/14</span>
+                <span class='fraction'>0/18</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/18</span>
+                <span class='fraction'>0/20</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">60% </span>
+                <span class="strong">48.14% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>12/20</span>
+                <span class='fraction'>13/27</span>
             </div>
         
             
@@ -114,12 +114,34 @@
 <a name='L49'></a><a href='#L49'>49</a>
 <a name='L50'></a><a href='#L50'>50</a>
 <a name='L51'></a><a href='#L51'>51</a>
-<a name='L52'></a><a href='#L52'>52</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -171,13 +193,24 @@ exports.filterProducedUtxoByAssetPolicyId = exports.filterProducedUtxoByAssetsPr
 const core_1 = require("@cardano-sdk/core");
 const rxjs_1 = require("rxjs");
 const utils_1 = require("../utils");
+const attemptHydrateDatum = <span class="fstat-no" title="function not covered" >(t</span>xOut, witness) =&gt; {
+<span class="cstat-no" title="statement not covered" >    if (!txOut.datumHash)</span>
+<span class="cstat-no" title="statement not covered" >        return txOut;</span>
+    const witnessDatum = <span class="cstat-no" title="statement not covered" >witness.datums?.find(<span class="fstat-no" title="function not covered" >(d</span>atum) =&gt; <span class="cstat-no" title="statement not covered" >core_1.Serialization.PlutusData.fromCore(datum).hash() === txOut.datumHash)</span>;</span>
+<span class="cstat-no" title="statement not covered" >    if (!witnessDatum)</span>
+<span class="cstat-no" title="statement not covered" >        return txOut;</span>
+<span class="cstat-no" title="statement not covered" >    return {</span>
+        ...txOut,
+        datum: witnessDatum
+    };
+};
 exports.withUtxo = (0, utils_1.unifiedProjectorOperator)(<span class="fstat-no" title="function not covered" >(e</span>vt) =&gt; {
-    const produced = <span class="cstat-no" title="statement not covered" >evt.block.body.flatMap(<span class="fstat-no" title="function not covered" >({</span> body: { outputs, collateralReturn }, inputSource, id }) =&gt; <span class="cstat-no" title="statement not covered" >(inputSource === core_1.Cardano.InputSource.inputs ? outputs : collateralReturn ? [collateralReturn] : []).map(<span class="fstat-no" title="function not covered" >(t</span>xOut, outputIndex) =&gt; <span class="cstat-no" title="statement not covered" >[</span></span></span>
+    const produced = <span class="cstat-no" title="statement not covered" >evt.block.body.flatMap(<span class="fstat-no" title="function not covered" >({</span> body: { outputs, collateralReturn }, inputSource, id, witness }) =&gt; <span class="cstat-no" title="statement not covered" >(inputSource === core_1.Cardano.InputSource.inputs ? outputs : collateralReturn ? [collateralReturn] : []).map(<span class="fstat-no" title="function not covered" >(t</span>xOut, outputIndex) =&gt; <span class="cstat-no" title="statement not covered" >[</span></span></span>
         {
             index: outputIndex,
             txId: id
         },
-        txOut
+        attemptHydrateDatum(txOut, witness)
     ]));
     const consumed = <span class="cstat-no" title="statement not covered" >evt.block.body.flatMap(<span class="fstat-no" title="function not covered" >({</span> body: { inputs, collaterals }, inputSource }) =&gt; <span class="cstat-no" title="statement not covered" >inputSource === core_1.Cardano.InputSource.inputs ? inputs : collaterals || [])</span>;</span>
 <span class="cstat-no" title="statement not covered" >    return { ...evt, utxo: { consumed, produced } };</span>
@@ -223,7 +256,7 @@ exports.filterProducedUtxoByAssetPolicyId = filterProducedUtxoByAssetPolicyId;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-10-11T07:39:14.201Z
+                at 2024-10-11T18:35:09.753Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>
