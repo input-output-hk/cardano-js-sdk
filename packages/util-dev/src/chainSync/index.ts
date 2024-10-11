@@ -105,6 +105,7 @@ export enum ChainSyncDataSet {
   AssetNameUtf8Problem = 'asset-name-utf8-problem.json',
   MissingExtraDatumMetadataProblem = 'missing-extra-datum-metadata-problem.json',
   ExtraDataNullCharactersProblem = 'extra-data-null-characters-problem.json',
+  Cip68WitnessDatumProblem = 'cip68-witness-datum-problem.json',
   WithPoolRetirement = 'with-pool-retirement.json',
   WithStakeKeyDeregistration = 'with-stake-key-deregistration.json',
   WithMint = 'with-mint.json',

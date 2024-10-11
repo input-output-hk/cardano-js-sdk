@@ -1,9 +1,10 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { FilterByPolicyIds } from './types';
 import { ProjectionOperator } from '../../types';
 import { map } from 'rxjs';
 import { unifiedProjectorOperator } from '../utils';
 
+/** Output datum is hydrated with the datum from witness if present */
 export type ProducedUtxo = [Cardano.TxIn, Cardano.TxOut];
 
 export interface WithUtxo {
@@ -14,15 +15,27 @@ export interface WithUtxo {
   };
 }
 
+const attemptHydrateDatum = (txOut: Cardano.TxOut, witness: Cardano.Witness): Cardano.TxOut => {
+  if (!txOut.datumHash) return txOut;
+  const witnessDatum = witness.datums?.find(
+    (datum) => Serialization.PlutusData.fromCore(datum).hash() === txOut.datumHash
+  );
+  if (!witnessDatum) return txOut;
+  return {
+    ...txOut,
+    datum: witnessDatum
+  };
+};
+
 export const withUtxo = unifiedProjectorOperator<{}, WithUtxo>((evt) => {
-  const produced = evt.block.body.flatMap(({ body: { outputs, collateralReturn }, inputSource, id }) =>
+  const produced = evt.block.body.flatMap(({ body: { outputs, collateralReturn }, inputSource, id, witness }) =>
     (inputSource === Cardano.InputSource.inputs ? outputs : collateralReturn ? [collateralReturn] : []).map(
       (txOut, outputIndex): [Cardano.TxIn, Cardano.TxOut] => [
         {
           index: outputIndex,
           txId: id
         },
-        txOut
+        attemptHydrateDatum(txOut, witness)
       ]
     )
   );
