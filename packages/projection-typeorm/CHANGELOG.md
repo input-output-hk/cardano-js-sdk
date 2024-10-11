@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.9.5...@cardano-sdk/projection-typeorm@0.9.6) (2024-10-11)
+
+### Bug Fixes
+
+* project cip68 metadata when datum resides in tx witness ([164032d](https://github.com/input-output-hk/cardano-js-sdk/commit/164032da3112d3aca0fcef8beae6cf7d03a6ff70))
+
 ## [0.9.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.9.4...@cardano-sdk/projection-typeorm@0.9.5) (2024-10-11)
 
 **Note:** Version bump only for package @cardano-sdk/projection-typeorm

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.41.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.41.0...@cardano-sdk/core@0.41.1) (2024-10-11)
+
+### Bug Fixes
+
+* **core:** add support for ipfs uri without protocol for nft metadata image ([bcaef5c](https://github.com/input-output-hk/cardano-js-sdk/commit/bcaef5c76c8a5510484903b67cc7700ae57be3ae))
+
 ## [0.41.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.40.1...@cardano-sdk/core@0.41.0) (2024-10-03)
 
 ### ⚠ BREAKING CHANGES
