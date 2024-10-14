@@ -11,10 +11,10 @@
     metricsPath = "${values.cardano-services.httpPrefix}/metrics";
 
     livenessProbe = {
-      timeoutSeconds = 30;
+      timeoutSeconds = 10;
       periodSeconds = 60;
       httpGet = {
-        path = "${values.cardano-services.httpPrefix}/health";
+        path = "${values.cardano-services.httpPrefix}/ready";
         port = 3000;
       };
     };

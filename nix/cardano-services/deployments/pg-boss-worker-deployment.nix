@@ -30,7 +30,7 @@
             };
             livenessProbe = {
               httpGet = {
-                path = "${values.cardano-services.httpPrefix}/health";
+                path = "${values.cardano-services.httpPrefix}/ready";
                 port = 3000;
               };
             };
