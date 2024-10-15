@@ -13,8 +13,9 @@
 
     livenessProbe = {
       timeoutSeconds = 5;
+      periodSeconds = 10;
       httpGet = {
-        path = "${values.cardano-services.httpPrefix}/health";
+        path = "${values.cardano-services.httpPrefix}/ready";
         port = 3000;
       };
     };
