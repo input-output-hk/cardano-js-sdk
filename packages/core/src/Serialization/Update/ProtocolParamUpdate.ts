@@ -412,7 +412,7 @@ export class ProtocolParamUpdate {
    * @returns The Core ProtocolParamUpdate object.
    */
   toCore(): Cardano.ProtocolParametersUpdate {
-    return {
+    const protocolParametersUpdate: Cardano.ProtocolParametersUpdate = {
       coinsPerUtxoByte: this.#adaPerUtxoByte ? Number(this.#adaPerUtxoByte) : undefined,
       collateralPercentage: this.#collateralPercentage,
       committeeTermLimit: this.#committeeTermLimit ? EpochNo(this.#committeeTermLimit) : undefined,
@@ -420,9 +420,7 @@ export class ProtocolParamUpdate {
       dRepDeposit: this.#drepDeposit,
       dRepInactivityPeriod: this.#drepInactivityPeriod ? EpochNo(this.#drepInactivityPeriod) : undefined,
       dRepVotingThresholds: this.#drepVotingThresholds?.toCore(),
-      decentralizationParameter: this.#d ? this.#d.toFloat().toString() : undefined,
       desiredNumberOfPools: this.#nOpt,
-      extraEntropy: this.#extraEntropy,
       governanceActionDeposit: this.#governanceActionDeposit,
       governanceActionValidityPeriod: this.#governanceActionValidityPeriod
         ? EpochNo(this.#governanceActionValidityPeriod)
@@ -447,10 +445,15 @@ export class ProtocolParamUpdate {
       poolRetirementEpochBound: this.#maxEpoch,
       poolVotingThresholds: this.#poolVotingThresholds?.toCore(),
       prices: this.#executionCosts?.toCore(),
-      protocolVersion: this.#protocolVersion?.toCore(),
       stakeKeyDeposit: this.#keyDeposit ? Number(this.#keyDeposit) : undefined,
       treasuryExpansion: this.#treasuryGrowthRate ? this.#treasuryGrowthRate.toFloat().toString() : undefined
     };
+
+    if (this.#d) protocolParametersUpdate.decentralizationParameter = this.#d.toFloat().toString();
+    if (this.#extraEntropy !== undefined) protocolParametersUpdate.extraEntropy = this.#extraEntropy;
+    if (this.#protocolVersion) protocolParametersUpdate.protocolVersion = this.#protocolVersion.toCore();
+
+    return protocolParametersUpdate;
   }
 
   /**

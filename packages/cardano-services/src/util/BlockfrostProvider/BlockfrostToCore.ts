@@ -1,4 +1,6 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { HexBlob } from '@cardano-sdk/util';
 import { Responses } from '@blockfrost/blockfrost-js';
 
 type Unpacked<T> = T extends (infer U)[] ? U : T;
@@ -11,11 +13,15 @@ export type BlockfrostTransactionContent = Unpacked<Responses['address_transacti
 export type BlockfrostUtxo = Unpacked<BlockfrostAddressUtxoContent>;
 
 export const BlockfrostToCore = {
-  addressUtxoContent: (address: string, blockfrost: Responses['address_utxo_content']): Cardano.Utxo[] =>
-    blockfrost.map((utxo) => [
+  addressUtxoContent: (
+    address: string,
+    utxo: Responses['address_utxo_content'][0],
+    txOutFromCbor?: Cardano.TxOut
+  ): Cardano.Utxo =>
+    [
       BlockfrostToCore.hydratedTxIn(BlockfrostToCore.inputFromUtxo(address, utxo)),
-      BlockfrostToCore.txOut(BlockfrostToCore.outputFromUtxo(address, utxo))
-    ]) as Cardano.Utxo[],
+      BlockfrostToCore.txOut(BlockfrostToCore.outputFromUtxo(address, utxo), txOutFromCbor)
+    ] as Cardano.Utxo,
 
   blockToTip: (block: Responses['block_content']): Cardano.Tip => ({
     blockNo: Cardano.BlockNo(block.height!),
@@ -92,30 +98,30 @@ export const BlockfrostToCore = {
     treasuryExpansion: blockfrost.tau.toString()
   }),
 
-  transactionUtxos: (utxoResponse: Responses['tx_content_utxo']) => ({
-    collaterals: utxoResponse.inputs.filter((input) => input.collateral).map(BlockfrostToCore.hydratedTxIn),
-    inputs: utxoResponse.inputs.filter((input) => !input.collateral).map(BlockfrostToCore.hydratedTxIn),
-    outputs: utxoResponse.outputs.map(BlockfrostToCore.txOut)
-  }),
+  txOut: (blockfrost: BlockfrostOutput, txOutFromCbor?: Cardano.TxOut): Cardano.TxOut => {
+    const value: Cardano.Value = {
+      coins: BigInt(blockfrost.amount.find(({ unit }) => unit === 'lovelace')!.quantity)
+    };
 
-  txContentUtxo: (blockfrost: Responses['tx_content_utxo']) => ({
-    hash: blockfrost.hash,
-    inputs: BlockfrostToCore.inputs(blockfrost.inputs),
-    outputs: BlockfrostToCore.outputs(blockfrost.outputs)
-  }),
-
-  txOut: (blockfrost: BlockfrostOutput): Cardano.TxOut => {
     const assets: Cardano.TokenMap = new Map();
     for (const { quantity, unit } of blockfrost.amount) {
       if (unit === 'lovelace') continue;
       assets.set(Cardano.AssetId(unit), BigInt(quantity));
     }
-    return {
+
+    if (assets.size > 0) value.assets = assets;
+
+    const txOut: Cardano.TxOut = {
       address: Cardano.PaymentAddress(blockfrost.address),
-      value: {
-        assets,
-        coins: BigInt(blockfrost.amount.find(({ unit }) => unit === 'lovelace')!.quantity)
-      }
+      value
     };
+
+    if (blockfrost.inline_datum)
+      txOut.datum = Serialization.PlutusData.fromCbor(HexBlob(blockfrost.inline_datum)).toCore();
+    if (blockfrost.data_hash) txOut.datumHash = Hash32ByteBase16(blockfrost.data_hash);
+
+    if (txOutFromCbor?.scriptReference) txOut.scriptReference = txOutFromCbor.scriptReference;
+
+    return txOut;
   }
 };

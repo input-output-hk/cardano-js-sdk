@@ -111,5 +111,8 @@
       "scName": "stdout",
       "scRotation": null
     }
-  ]
+  ],
+  "insert_options": {
+    "tx_cbor": "enable"
+  }
 }

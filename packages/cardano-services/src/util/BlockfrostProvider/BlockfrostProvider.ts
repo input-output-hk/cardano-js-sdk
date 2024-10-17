@@ -3,7 +3,7 @@ import { HealthCheckResponse, Provider, ProviderDependencies } from '@cardano-sd
 import { blockfrostToProviderError } from './blockfrostUtil';
 import type { Logger } from 'ts-log';
 
-/** Properties that are need to create a BlockfrostProvider */
+/** Properties needed to create a BlockfrostProvider */
 export interface BlockfrostProviderDependencies extends ProviderDependencies {
   blockfrost: BlockFrostAPI;
   logger: Logger;

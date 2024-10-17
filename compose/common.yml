@@ -78,9 +78,10 @@ x-provider-server-environment: &provider-server-environment
   NETWORK_INFO_PROVIDER: ${NETWORK_INFO_PROVIDER:-dbsync}
   TX_SUBMIT_PROVIDER: ${TX_SUBMIT_PROVIDER:-submit-node}
   STAKE_POOL_PROVIDER: ${STAKE_POOL_PROVIDER:-dbsync}
+  USE_TYPEORM_ASSET_PROVIDER: ${USE_TYPEORM_ASSET_PROVIDER:-true}
   NETWORK: ${NETWORK:-mainnet}
-  BLOCKFROST_API_KEY: ${BLOCKFROST_API_KEY}
-  BLOCKFROST_CUSTOM_BACKEND_URL: ${BLOCKFROST_CUSTOM_BACKEND_URL}
+  BLOCKFROST_API_KEY: ${BLOCKFROST_API_KEY:-}
+  BLOCKFROST_CUSTOM_BACKEND_URL: ${BLOCKFROST_CUSTOM_BACKEND_URL:-}
 
 x-sdk-environment: &sdk-environment
   LOGGER_MIN_SEVERITY: ${LOGGER_MIN_SEVERITY:-info}
@@ -133,6 +134,8 @@ services:
         condition: service_started
     ports:
       - "3015:3000"
+    healthcheck:
+      test: [ 'CMD-SHELL', 'curl -s --fail http://localhost:3000/health' ]
 
   cardano-db-sync:
     <<:
@@ -352,6 +355,10 @@ services:
         - *provider-server-environment
     ports:
       - ${API_PORT:-4000}:3000
+      - 9229:9229
+    depends_on:
+      blockfrost-ryo:
+        condition: service_healthy
 
   stake-pool-provider-server:
     <<:
@@ -380,12 +387,13 @@ services:
     depends_on:
       asset-projector:
         condition: service_healthy
+      blockfrost-ryo:
+        condition: service_healthy
     environment:
       <<:
         - *sdk-environment
         - *provider-server-environment
       SERVICE_NAMES: asset
-      USE_TYPEORM_ASSET_PROVIDER: true
     ports:
       - ${HANDLE_API_PORT:-4014}:3000
 

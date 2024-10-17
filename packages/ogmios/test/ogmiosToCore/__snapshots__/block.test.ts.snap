@@ -4,7 +4,6 @@ exports[`ogmiosToCore block babbage can translate from babbage block 1`] = `
 Object {
   "body": Array [
     Object {
-      "auxiliaryData": undefined,
       "body": Object {
         "auxiliaryDataHash": undefined,
         "certificates": Array [
@@ -31,11 +30,7 @@ Object {
         "outputs": Array [
           Object {
             "address": "addr_test1qq2u3e0afx3dqk95hfptv7wm8rl0fht2ecehxzy2yr3g5z79dq6pms68sakpc70q0h37wcn92c9u5jaeu6he7dhypy3sxd05k6",
-            "datum": undefined,
-            "datumHash": undefined,
-            "scriptReference": undefined,
             "value": Object {
-              "assets": undefined,
               "coins": 9999134743n,
             },
           },
@@ -73,7 +68,6 @@ Object {
         "blob": Map {
           58n => "",
         },
-        "scripts": undefined,
       },
       "body": Object {
         "auxiliaryDataHash": "3f5d7adf353de22cf1fc514aa911901c5fbd1b5ee3ed57950a6dc5a0fe1dbb20",
@@ -99,9 +93,6 @@ Object {
         "outputs": Array [
           Object {
             "address": "addr_test1qq9tud0fzpj6pdeqeegrma25ngfrre9ruwwcuj2m6dnsreu2qtzuksrwqtv4stsk3hq2uscsh90rf5rdgg38k5t0f0nsp30w94",
-            "datum": undefined,
-            "datumHash": undefined,
-            "scriptReference": undefined,
             "value": Object {
               "assets": Map {
                 "eb48b495393986032e8cef0b0a9b2ce64b3881e8a29347e169c7122c4654" => 70n,
@@ -111,11 +102,7 @@ Object {
           },
           Object {
             "address": "addr_test1qq9tud0fzpj6pdeqeegrma25ngfrre9ruwwcuj2m6dnsreu2qtzuksrwqtv4stsk3hq2uscsh90rf5rdgg38k5t0f0nsp30w94",
-            "datum": undefined,
-            "datumHash": undefined,
-            "scriptReference": undefined,
             "value": Object {
-              "assets": undefined,
               "coins": 9692318369n,
             },
           },
@@ -159,7 +146,6 @@ Object {
         "blob": Map {
           0n => Array [],
         },
-        "scripts": undefined,
       },
       "body": Object {
         "auxiliaryDataHash": "b93d8e428871a0b0e12c5c554653f515f50fe48dc5b55af7e3667e7d9661ea2c",
@@ -183,21 +169,13 @@ Object {
         "outputs": Array [
           Object {
             "address": "addr_test1qry0mqhwlf84py9nhz5qukujgjjx26cwg3zqvm2aqeuqqneyz5g72vhh8ws2fcjudfjesyl8fy4qss4rdx9v34e2pxps5s28ar",
-            "datum": undefined,
-            "datumHash": undefined,
-            "scriptReference": undefined,
             "value": Object {
-              "assets": undefined,
               "coins": 1000000n,
             },
           },
           Object {
             "address": "addr_test1qra40qtvuef6dr4ckvzgme7sg5thtdjhjrc268uvn22reqeyz5g72vhh8ws2fcjudfjesyl8fy4qss4rdx9v34e2pxpsglu3mg",
-            "datum": undefined,
-            "datumHash": undefined,
-            "scriptReference": undefined,
             "value": Object {
-              "assets": undefined,
               "coins": 1639738n,
             },
           },
@@ -231,7 +209,6 @@ Object {
       },
     },
     Object {
-      "auxiliaryData": undefined,
       "body": Object {
         "auxiliaryDataHash": undefined,
         "certificates": undefined,
@@ -257,19 +234,13 @@ Object {
         "outputs": Array [
           Object {
             "address": "addr_test1qrc7mfr62uj0zg07ylfq37ukce6ahxtumdl0d3ar5aw35x758sc7z8763mfpes0j7wqrkkrdgna98c0rtlps585ypdnst69syh",
-            "datum": undefined,
-            "datumHash": undefined,
-            "scriptReference": undefined,
             "value": Object {
-              "assets": undefined,
               "coins": 2371174n,
             },
           },
           Object {
             "address": "addr_test1wrn96kc0xx774qnyzccygr0qdxs4escmy8ptfu38p3hfehsu5427k",
-            "datum": undefined,
             "datumHash": "118cd93427a8e035d484e55ddd4c70200ac5a4d8e63d9d1b89e8a8d49d229415",
-            "scriptReference": undefined,
             "value": Object {
               "assets": Map {
                 "4d2047d7af3d8de799de5daa6e1b0ebfc039f4274084d5bb9ba3975d42594e45544c6963656e7365" => 1n,
@@ -279,9 +250,7 @@ Object {
           },
           Object {
             "address": "addr_test1wrn96kc0xx774qnyzccygr0qdxs4escmy8ptfu38p3hfehsu5427k",
-            "datum": undefined,
             "datumHash": "118cd93427a8e035d484e55ddd4c70200ac5a4d8e63d9d1b89e8a8d49d229415",
-            "scriptReference": undefined,
             "value": Object {
               "assets": Map {
                 "4d2047d7af3d8de799de5daa6e1b0ebfc039f4274084d5bb9ba3975d42594e45544c6963656e7365" => 1n,
@@ -380,7 +349,6 @@ Object {
       },
     },
     Object {
-      "auxiliaryData": undefined,
       "body": Object {
         "auxiliaryDataHash": undefined,
         "certificates": undefined,
@@ -406,19 +374,13 @@ Object {
         "outputs": Array [
           Object {
             "address": "addr_test1qrc7mfr62uj0zg07ylfq37ukce6ahxtumdl0d3ar5aw35x758sc7z8763mfpes0j7wqrkkrdgna98c0rtlps585ypdnst69syh",
-            "datum": undefined,
-            "datumHash": undefined,
-            "scriptReference": undefined,
             "value": Object {
-              "assets": undefined,
               "coins": 4444865n,
             },
           },
           Object {
             "address": "addr_test1wrn96kc0xx774qnyzccygr0qdxs4escmy8ptfu38p3hfehsu5427k",
-            "datum": undefined,
             "datumHash": "118cd93427a8e035d484e55ddd4c70200ac5a4d8e63d9d1b89e8a8d49d229415",
-            "scriptReference": undefined,
             "value": Object {
               "assets": Map {
                 "4d2047d7af3d8de799de5daa6e1b0ebfc039f4274084d5bb9ba3975d42594e45544c6963656e7365" => 1n,
@@ -428,9 +390,7 @@ Object {
           },
           Object {
             "address": "addr_test1wrn96kc0xx774qnyzccygr0qdxs4escmy8ptfu38p3hfehsu5427k",
-            "datum": undefined,
             "datumHash": "118cd93427a8e035d484e55ddd4c70200ac5a4d8e63d9d1b89e8a8d49d229415",
-            "scriptReference": undefined,
             "value": Object {
               "assets": Map {
                 "4d2047d7af3d8de799de5daa6e1b0ebfc039f4274084d5bb9ba3975d42594e45544c6963656e7365" => 1n,
@@ -440,9 +400,7 @@ Object {
           },
           Object {
             "address": "addr_test1wrn96kc0xx774qnyzccygr0qdxs4escmy8ptfu38p3hfehsu5427k",
-            "datum": undefined,
             "datumHash": "118cd93427a8e035d484e55ddd4c70200ac5a4d8e63d9d1b89e8a8d49d229415",
-            "scriptReference": undefined,
             "value": Object {
               "assets": Map {
                 "4d2047d7af3d8de799de5daa6e1b0ebfc039f4274084d5bb9ba3975d42594e45544c6963656e7365" => 1n,
@@ -545,7 +503,6 @@ Object {
         "blob": Map {
           0n => Array [],
         },
-        "scripts": undefined,
       },
       "body": Object {
         "auxiliaryDataHash": "b93d8e428871a0b0e12c5c554653f515f50fe48dc5b55af7e3667e7d9661ea2c",
@@ -573,21 +530,13 @@ Object {
         "outputs": Array [
           Object {
             "address": "addr_test1qry0mqhwlf84py9nhz5qukujgjjx26cwg3zqvm2aqeuqqneyz5g72vhh8ws2fcjudfjesyl8fy4qss4rdx9v34e2pxps5s28ar",
-            "datum": undefined,
-            "datumHash": undefined,
-            "scriptReference": undefined,
             "value": Object {
-              "assets": undefined,
               "coins": 1000000n,
             },
           },
           Object {
             "address": "addr_test1qpavsa3m303vjnpsa4cpjzsgeqmkaa7wya3v94s9pq4wtrpyz5g72vhh8ws2fcjudfjesyl8fy4qss4rdx9v34e2pxpsnutk58",
-            "datum": undefined,
-            "datumHash": undefined,
-            "scriptReference": undefined,
             "value": Object {
-              "assets": undefined,
               "coins": 9986971687n,
             },
           },
@@ -640,7 +589,6 @@ exports[`ogmiosToCore block can translate from allegra block 1`] = `
 Object {
   "body": Array [
     Object {
-      "auxiliaryData": undefined,
       "body": Object {
         "auxiliaryDataHash": undefined,
         "certificates": undefined,
@@ -659,11 +607,7 @@ Object {
         "outputs": Array [
           Object {
             "address": "addr_test1vz09v9yfxguvlp0zsnrpa3tdtm7el8xufp3m5lsm7qxzclgmzkket",
-            "datum": undefined,
-            "datumHash": undefined,
-            "scriptReference": undefined,
             "value": Object {
-              "assets": undefined,
               "coins": 29699998493147869n,
             },
           },
@@ -719,7 +663,6 @@ exports[`ogmiosToCore block can translate from alonzo block 1`] = `
 Object {
   "body": Array [
     Object {
-      "auxiliaryData": undefined,
       "body": Object {
         "auxiliaryDataHash": undefined,
         "certificates": undefined,
@@ -738,11 +681,8 @@ Object {
         "outputs": Array [
           Object {
             "address": "addr_test1vz09v9yfxguvlp0zsnrpa3tdtm7el8xufp3m5lsm7qxzclgmzkket",
-            "datum": undefined,
             "datumHash": "c5dfa8c3cbd5a959829618a7b46e163078cb3f1b39f152514d0c3686d553529a",
-            "scriptReference": undefined,
             "value": Object {
-              "assets": undefined,
               "coins": 29699998492735907n,
             },
           },
@@ -854,7 +794,6 @@ exports[`ogmiosToCore block can translate from mary block 1`] = `
 Object {
   "body": Array [
     Object {
-      "auxiliaryData": undefined,
       "body": Object {
         "auxiliaryDataHash": undefined,
         "certificates": undefined,
@@ -873,11 +812,7 @@ Object {
         "outputs": Array [
           Object {
             "address": "addr_test1vz09v9yfxguvlp0zsnrpa3tdtm7el8xufp3m5lsm7qxzclgmzkket",
-            "datum": undefined,
-            "datumHash": undefined,
-            "scriptReference": undefined,
             "value": Object {
-              "assets": undefined,
               "coins": 29699998492941888n,
             },
           },
@@ -933,7 +868,6 @@ exports[`ogmiosToCore block can translate from shelley block 1`] = `
 Object {
   "body": Array [
     Object {
-      "auxiliaryData": undefined,
       "body": Object {
         "auxiliaryDataHash": undefined,
         "certificates": Array [
@@ -953,7 +887,6 @@ Object {
                 "denominator": 1,
                 "numerator": 1,
               },
-              "metadataJson": undefined,
               "owners": Array [
                 "stake_test1uztg6yppa0t30rslkrneva5c9qju40rhndjnuy356kxw83s6n95nu",
               ],
@@ -993,7 +926,6 @@ Object {
                 "denominator": 1,
                 "numerator": 1,
               },
-              "metadataJson": undefined,
               "owners": Array [
                 "stake_test1urcnqgzt2x8hpsvej4zfudehahknm8lux894pmqwg5qshgcrn346q",
               ],
@@ -1033,7 +965,6 @@ Object {
                 "denominator": 1,
                 "numerator": 1,
               },
-              "metadataJson": undefined,
               "owners": Array [
                 "stake_test1uquj460qdrj4az6uy7kvtzct4w8226xq4t30dlzfhc360tgegny4m",
               ],
@@ -1073,41 +1004,25 @@ Object {
         "outputs": Array [
           Object {
             "address": "addr_test1vz09v9yfxguvlp0zsnrpa3tdtm7el8xufp3m5lsm7qxzclgmzkket",
-            "datum": undefined,
-            "datumHash": undefined,
-            "scriptReference": undefined,
             "value": Object {
-              "assets": undefined,
               "coins": 29699998493561943n,
             },
           },
           Object {
             "address": "addr_test1qz09v9yfxguvlp0zsnrpa3tdtm7el8xufp3m5lsm7qxzclvk35gzr67hz78plv88jemfs2p9e2780xm98cfrf4vvu0rq83pdz2",
-            "datum": undefined,
-            "datumHash": undefined,
-            "scriptReference": undefined,
             "value": Object {
-              "assets": undefined,
               "coins": 100000000000000n,
             },
           },
           Object {
             "address": "addr_test1qz09v9yfxguvlp0zsnrpa3tdtm7el8xufp3m5lsm7qxzcl03xqsyk5v0wrqen92yncmn0m0d8k0lcvwt2rkqu3gppw3sdexkvh",
-            "datum": undefined,
-            "datumHash": undefined,
-            "scriptReference": undefined,
             "value": Object {
-              "assets": undefined,
               "coins": 100000000000000n,
             },
           },
           Object {
             "address": "addr_test1qz09v9yfxguvlp0zsnrpa3tdtm7el8xufp3m5lsm7qxzclfe9t57q689t694cfavck9sh2uw545vp2hz7m7yn03r57kslz5rjf",
-            "datum": undefined,
-            "datumHash": undefined,
-            "scriptReference": undefined,
             "value": Object {
-              "assets": undefined,
               "coins": 100000000000000n,
             },
           },
