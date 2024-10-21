@@ -23,7 +23,7 @@
       {
         NETWORK = config.network;
         ENABLE_METRICS = "true";
-        SERVICE_NAMES = "asset,network-info,rewards,stake-pool,tx-submit,utxo";
+        SERVICE_NAMES = "network-info,rewards,stake-pool,tx-submit,utxo";
         OGMIOS_SRV_SERVICE_NAME = values.backend.ogmiosSrvServiceName;
         LOGGER_MIN_SEVERITY = values.cardano-services.loggingLevel;
         TOKEN_METADATA_SERVER_URL = values.cardano-services.tokenMetadataServerUrl;
