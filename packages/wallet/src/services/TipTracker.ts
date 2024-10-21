@@ -5,9 +5,9 @@ import {
   EMPTY,
   Observable,
   Subject,
+  auditTime,
   combineLatest,
   concat,
-  delay,
   distinctUntilChanged,
   exhaustMap,
   filter,
@@ -56,17 +56,19 @@ export class TipTracker extends PersistentDocumentTrackerSubject<Cardano.Tip> {
         // - if it's not settled for maxPollInterval
         combineLatest([
           triggerOrInterval$(syncStatus.isSettled$.pipe(filter((isSettled) => isSettled)), maxPollInterval).pipe(
-            // trigger fetch after some delay once fully synced and online
-            delay(minPollInterval),
+            // Do not allow more than one fetch per minPollInterval.
+            // The first syncStatus starts a minPollInterval timer. Only the latest emission from the minPollInterval
+            // is emitted in case the syncStatus changes multiple times.
+            auditTime(minPollInterval),
             // trigger fetch on start
             startWith(null)
           ),
           connectionStatus$
         ]).pipe(
-          // Throttle syncing by interval, cancel ongoing request on external trigger
           tap(([, connectionStatus]) => {
             logger.debug(connectionStatus === ConnectionStatus.down ? 'Skipping fetch tip' : 'Fetching tip...');
           }),
+          // Throttle syncing by interval, cancel ongoing request on external trigger
           exhaustMap(([, connectionStatus]) =>
             connectionStatus === ConnectionStatus.down
               ? EMPTY
