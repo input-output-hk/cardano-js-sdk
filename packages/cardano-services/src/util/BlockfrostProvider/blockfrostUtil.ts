@@ -39,7 +39,7 @@ export const fetchSequentially = async <Item, Arg, Response>(
     request: (arg: Arg, pagination: PaginationOptions) => Promise<Response[]>;
     responseTranslator?: (response: Response[], arg: Arg) => Item[];
     /**
-     * @returns true to indicatate that current result set should be returned
+     * @returns true to indicate that current result set should be returned
      */
     haveEnoughItems?: (items: Item[]) => boolean;
     paginationOptions?: PaginationOptions;
@@ -88,7 +88,7 @@ export const fetchByAddressSequentially = async <Item, Response>(props: {
   request: (address: Cardano.PaymentAddress, pagination: PaginationOptions) => Promise<Response[]>;
   responseTranslator?: (address: Cardano.PaymentAddress, response: Response[]) => Item[];
   /**
-   * @returns true to indicatate that current result set should be returned
+   * @returns true to indicate that current result set should be returned
    */
   haveEnoughItems?: (items: Item[]) => boolean;
   paginationOptions?: PaginationOptions;
@@ -102,11 +102,6 @@ export const fetchByAddressSequentially = async <Item, Response>(props: {
       ? (response, arg) => props.responseTranslator!(arg, response)
       : undefined
   });
-
-export const networkMagicToIdMap: { [key in number]: Cardano.NetworkId } = {
-  [Cardano.NetworkMagics.Mainnet]: Cardano.NetworkId.Mainnet,
-  [Cardano.NetworkMagics.Preprod]: Cardano.NetworkId.Testnet
-};
 
 // copied from util-dev
 export const testnetEraSummaries: EraSummary[] = [
