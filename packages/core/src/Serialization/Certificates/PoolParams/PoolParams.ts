@@ -194,11 +194,10 @@ export class PoolParams {
   toCore(): Cardano.PoolParameters {
     const rewardAccountAddress = this.#rewardAccount.toAddress();
 
-    return {
+    const poolParams: Cardano.PoolParameters = {
       cost: this.#cost,
       id: PoolId.fromKeyHash(this.#operator),
       margin: this.#margin.toCore(),
-      metadataJson: this.#poolMetadata?.toCore(),
       owners: this.#poolOwners
         .toCore()
         .map((keyHash) => createRewardAccount(keyHash, rewardAccountAddress.getNetworkId())),
@@ -207,6 +206,10 @@ export class PoolParams {
       rewardAccount: this.#rewardAccount.toAddress().toBech32() as Cardano.RewardAccount,
       vrf: this.#vrfKeyHash
     };
+
+    if (this.#poolMetadata) poolParams.metadataJson = this.#poolMetadata.toCore();
+
+    return poolParams;
   }
 
   /**
