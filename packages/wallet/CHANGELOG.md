@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.44.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.11...@cardano-sdk/wallet@0.44.12) (2024-10-21)
+
+### Bug Fixes
+
+* **wallet:** one ledger-tip req per pollInterval ([b272ea9](https://github.com/input-output-hk/cardano-js-sdk/commit/b272ea9a1a53cc21eacba08a2554233a4345b6eb))
+
 ## [0.44.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.10...@cardano-sdk/wallet@0.44.11) (2024-10-11)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
