@@ -1,6 +1,6 @@
 ARG UBUNTU_VERSION=20.04
 
-FROM ubuntu:${UBUNTU_VERSION} as builder
+FROM ubuntu:${UBUNTU_VERSION} AS builder
 
 ENV DEBIAN_FRONTEND=nonintercative
 

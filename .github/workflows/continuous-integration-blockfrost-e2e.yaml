@@ -1,4 +1,4 @@
-name: Continuous Integration - E2E
+name: Continuous Integration - E2E BF
 
 env:
   TL_DEPTH: ${{ github.event.pull_request.head.repo.fork && '0' || fromJson(vars.TL_DEPTH) }}
@@ -12,18 +12,18 @@ env:
   STAKE_POOL_TEST_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/stake_pool_test'
   TEST_CLIENT_ASSET_PROVIDER: 'http'
   TEST_CLIENT_ASSET_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4014/"}'
-  TEST_CLIENT_CHAIN_HISTORY_PROVIDER: 'ws'
-  TEST_CLIENT_CHAIN_HISTORY_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
+  TEST_CLIENT_CHAIN_HISTORY_PROVIDER: 'http'
+  TEST_CLIENT_CHAIN_HISTORY_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4001/"}'
   TEST_CLIENT_HANDLE_PROVIDER: 'http'
   TEST_CLIENT_HANDLE_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4011/"}'
   TEST_CLIENT_NETWORK_INFO_PROVIDER: 'ws'
   TEST_CLIENT_NETWORK_INFO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
   TEST_CLIENT_REWARDS_PROVIDER: 'http'
-  TEST_CLIENT_REWARDS_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
+  TEST_CLIENT_REWARDS_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4001/"}'
   TEST_CLIENT_TX_SUBMIT_PROVIDER: 'http'
   TEST_CLIENT_TX_SUBMIT_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
-  TEST_CLIENT_UTXO_PROVIDER: 'ws'
-  TEST_CLIENT_UTXO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
+  TEST_CLIENT_UTXO_PROVIDER: 'http'
+  TEST_CLIENT_UTXO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4001/"}'
   TEST_CLIENT_STAKE_POOL_PROVIDER: 'http'
   TEST_CLIENT_STAKE_POOL_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
   WS_PROVIDER_URL: 'http://localhost:4100/ws'
@@ -78,7 +78,6 @@ jobs:
       - name: 🔬 Test - e2e - wallet at epoch 0
         run: |
           yarn workspace @cardano-sdk/e2e test:wallet:epoch0
-          yarn workspace @cardano-sdk/e2e test:projection
 
       - name: Wait for epoch 3
         run: |
@@ -87,17 +86,7 @@ jobs:
       - name: 🔬 Test - e2e - wallet at epoch 3
         run: |
           yarn workspace @cardano-sdk/e2e test:wallet:epoch3
-          yarn workspace @cardano-sdk/e2e test:ws
-          yarn workspace @cardano-sdk/e2e test:pg-boss
-          yarn workspace @cardano-sdk/e2e test:providers
-        env:
-          STAKE_POOL_PROVIDER_URL: 'http://localhost:4000/'
-
-      - name: 🔬 Test - e2e - wallet - typeorm stake pool provider
-        run: |
-          yarn workspace @cardano-sdk/e2e test:providers -t StakePoolProvider
-        env:
-          STAKE_POOL_PROVIDER_URL: 'http://localhost:4010/'
+          yarn workspace @cardano-sdk/e2e test:blockfrost:providers
 
       - name: Dump docker logs
         if: ${{ cancelled() || failure() }}
