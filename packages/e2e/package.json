@@ -74,7 +74,7 @@
     "wait-for-network-init": "local-network/scripts/wait-local-network-init.sh"
   },
   "dependencies": {
-    "@cardano-foundation/ledgerjs-hw-app-cardano": "^7.1.2",
+    "@cardano-foundation/ledgerjs-hw-app-cardano": "^7.1.4",
     "@cardano-ogmios/client": "6.5.0",
     "@cardano-sdk/cardano-services": "workspace:~",
     "@cardano-sdk/cardano-services-client": "workspace:~",

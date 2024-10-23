@@ -39,13 +39,13 @@
     "test:e2e": "echo 'test:e2e' command not implemented yet"
   },
   "devDependencies": {
-    "@cardano-foundation/ledgerjs-hw-app-cardano": "^7.1.2",
+    "@cardano-foundation/ledgerjs-hw-app-cardano": "^7.1.4",
     "@cardano-ogmios/client": "6.5.0",
     "@cardano-sdk/cardano-services-client": "workspace:~",
     "@cardano-sdk/ogmios": "workspace:~",
     "@cardano-sdk/util-dev": "workspace:~",
     "@emurgo/cardano-message-signing-nodejs": "^1.0.1",
-    "@ledgerhq/hw-transport-node-hid-noevents": "^6.27.12",
+    "@ledgerhq/hw-transport-node-hid-noevents": "^6.30.5",
     "@types/node-hid": "^1.3.1",
     "@types/pouchdb": "^6.4.0",
     "bunyan": "^1.8.15",
