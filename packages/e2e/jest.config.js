@@ -26,6 +26,7 @@ const realAdaTestFileNames = [
 module.exports = {
   projects: [
     { ...project('blockfrost'), globalSetup: './test/blockfrost/setup.ts' },
+    project('blockfrost-providers'),
     project('local-network'),
     project('long-running'),
     project('ogmios'),

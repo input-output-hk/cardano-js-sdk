@@ -208,16 +208,21 @@ export class TransactionOutput {
    * @returns The Core TransactionOutput object.
    */
   toCore(): Cardano.TxOut {
-    return {
+    const value = this.#amount.toCore();
+    if (!value.assets) delete value.assets;
+
+    const txOut: Cardano.TxOut = {
       address: this.#address.asByron()
         ? this.#address.toBase58()
         : (this.#address.toBech32() as unknown as Cardano.PaymentAddress),
-      datum:
-        this.#datum && this.#datum.kind() === DatumKind.InlineData ? this.#datum.asInlineData()?.toCore() : undefined,
-      datumHash: this.#datum && this.#datum.kind() === DatumKind.DataHash ? this.#datum.asDataHash() : undefined,
-      scriptReference: this.#scriptRef ? this.#scriptRef.toCore() : undefined,
-      value: this.#amount.toCore()
+      value
     };
+
+    if (this.#datum && this.#datum.kind() === DatumKind.InlineData) txOut.datum = this.#datum.asInlineData()?.toCore();
+    if (this.#datum && this.#datum.kind() === DatumKind.DataHash) txOut.datumHash = this.#datum.asDataHash();
+    if (this.#scriptRef) txOut.scriptReference = this.#scriptRef.toCore();
+
+    return txOut;
   }
 
   /**

@@ -122,13 +122,18 @@ export class Transaction {
    * @returns The Core Tx object.
    */
   toCore(): Cardano.Tx {
-    return {
-      auxiliaryData: this.#auxiliaryData ? this.#auxiliaryData.toCore() : undefined,
+    const tx: Cardano.Tx = {
       body: this.#body.toCore(),
       id: this.getId(),
       isValid: this.#isValid,
       witness: this.#witnessSet.toCore()
     };
+
+    if (this.#auxiliaryData) {
+      tx.auxiliaryData = this.#auxiliaryData.toCore();
+    }
+
+    return tx;
   }
 
   /**

@@ -79,8 +79,6 @@ x-provider-server-environment: &provider-server-environment
   TX_SUBMIT_PROVIDER: ${TX_SUBMIT_PROVIDER:-submit-node}
   STAKE_POOL_PROVIDER: ${STAKE_POOL_PROVIDER:-dbsync}
   NETWORK: ${NETWORK:-mainnet}
-  BLOCKFROST_API_KEY: ${BLOCKFROST_API_KEY}
-  BLOCKFROST_CUSTOM_BACKEND_URL: ${BLOCKFROST_CUSTOM_BACKEND_URL}
 
 x-sdk-environment: &sdk-environment
   LOGGER_MIN_SEVERITY: ${LOGGER_MIN_SEVERITY:-info}
@@ -118,21 +116,23 @@ x-sdk-environment: &sdk-environment
   POSTGRES_USER_FILE_STAKE_POOL: /run/secrets/postgres_user
   POSTGRES_USER_FILE_WALLET_API: /run/secrets/postgres_user
   TOKEN_METADATA_SERVER_URL: https://metadata.world.dev.cardano.org
-  USE_WEB_SOCKET_API: true
   WEB_SOCKET_API_URL: ws://ws-server:3000/ws
 
 services:
   blockfrost-ryo:
     build:
-      context: "https://github.com/ginnun/blockfrost-backend-ryo.git#feat/custom-network-support"
+      context: 'https://github.com/ginnun/blockfrost-backend-ryo.git#feat/custom-network-support'
       dockerfile: Dockerfile
     environment:
       BLOCKFROST_CONFIG_SERVER_LISTEN_ADDRESS: 0.0.0.0
     depends_on:
       cardano-db-sync:
         condition: service_started
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -s --fail http://localhost:3000/health']
     ports:
-      - "3015:3000"
+      - 3015:3000
+    restart: always
 
   cardano-db-sync:
     <<:
@@ -350,8 +350,33 @@ services:
       <<:
         - *sdk-environment
         - *provider-server-environment
+      USE_WEB_SOCKET_API: true
     ports:
       - ${API_PORT:-4000}:3000
+
+  blockfrost-provider-server:
+    <<:
+      - *from-sdk
+      - *logging
+      - *provider-server
+      - *with-postgres
+    depends_on:
+      blockfrost-ryo:
+        condition: service_healthy
+    environment:
+      <<:
+        - *sdk-environment
+        - *provider-server-environment
+      # ATM we don't have BlockfrostHandleProvider and BlockfrostStakePoolProvider
+      ASSET_PROVIDER: blockfrost
+      BLOCKFROST_CUSTOM_BACKEND_URL: 'http://blockfrost-ryo:3000'
+      CHAIN_HISTORY_PROVIDER: blockfrost
+      NETWORK_INFO_PROVIDER: blockfrost
+      REWARDS_PROVIDER: blockfrost
+      UTXO_PROVIDER: blockfrost
+    ports:
+      - ${API_PORT:-4001}:3000
+      - 9229:9229
 
   stake-pool-provider-server:
     <<:

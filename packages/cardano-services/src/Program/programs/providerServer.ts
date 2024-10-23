@@ -6,6 +6,7 @@ import {
   CardanoNode,
   ChainHistoryProvider,
   HandleProvider,
+  NetworkInfoProvider,
   Provider,
   RewardsProvider,
   Seconds,
@@ -330,8 +331,17 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     });
   }, ServiceNames.NetworkInfo);
 
-  const getBlockfrostChainHistoryProvider = () =>
-    new BlockfrostChainHistoryProvider({ blockfrost: getBlockfrostApi(), logger });
+  let networkInfoProvider: NetworkInfoProvider;
+  const getNetworkInfoProvider = () => {
+    if (!networkInfoProvider)
+      networkInfoProvider =
+        args.networkInfoProvider === ProviderImplementation.BLOCKFROST
+          ? getBlockfrostNetworkInfoProvider()
+          : getDbSyncNetworkInfoProvider();
+    return networkInfoProvider;
+  };
+  const getBlockfrostChainHistoryProvider = (nInfoProvider: NetworkInfoProvider | DbSyncNetworkInfoProvider) =>
+    new BlockfrostChainHistoryProvider({ blockfrost: getBlockfrostApi(), logger, networkInfoProvider: nInfoProvider });
 
   const getBlockfrostRewardsProvider = () => new BlockfrostRewardsProvider({ blockfrost: getBlockfrostApi(), logger });
 
@@ -395,7 +405,10 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       new ChainHistoryHttpService({
         chainHistoryProvider: selectProviderImplementation<ChainHistoryProvider>(
           args.chainHistoryProvider ?? ProviderImplementation.DBSYNC,
-          { blockfrost: getBlockfrostChainHistoryProvider, dbsync: getDbSyncChainHistoryProvider },
+          {
+            blockfrost: () => getBlockfrostChainHistoryProvider(getNetworkInfoProvider()),
+            dbsync: getDbSyncChainHistoryProvider
+          },
           logger,
           ServiceNames.ChainHistory
         ),
@@ -412,16 +425,11 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
           ServiceNames.Rewards
         )
       }),
-    [ServiceNames.NetworkInfo]: async () => {
-      const networkInfoProvider =
-        args.networkInfoProvider === ProviderImplementation.BLOCKFROST
-          ? getBlockfrostNetworkInfoProvider()
-          : getDbSyncNetworkInfoProvider();
-      return new NetworkInfoHttpService({
+    [ServiceNames.NetworkInfo]: async () =>
+      new NetworkInfoHttpService({
         logger,
-        networkInfoProvider
-      });
-    },
+        networkInfoProvider: getNetworkInfoProvider()
+      }),
     [ServiceNames.TxSubmit]: async () => {
       const txSubmitProvider = args.useSubmitApi
         ? getSubmitApiProvider()

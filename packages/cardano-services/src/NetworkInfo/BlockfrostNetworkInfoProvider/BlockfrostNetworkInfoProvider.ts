@@ -1,5 +1,5 @@
 import { BlockfrostProvider } from '../../util/BlockfrostProvider/BlockfrostProvider';
-import { BlockfrostToCore, blockfrostToProviderError, networkMagicToIdMap } from '../../util';
+import { BlockfrostToCore, blockfrostToProviderError } from '../../util';
 import {
   Cardano,
   EraSummary,
@@ -63,7 +63,10 @@ export class BlockfrostNetworkInfoProvider extends BlockfrostProvider implements
         epochLength: response.epoch_length,
         maxKesEvolutions: response.max_kes_evolutions,
         maxLovelaceSupply: BigInt(response.max_lovelace_supply),
-        networkId: networkMagicToIdMap[response.network_magic],
+        networkId:
+          response.network_magic === Cardano.NetworkMagics.Mainnet
+            ? Cardano.NetworkId.Mainnet
+            : Cardano.NetworkId.Testnet,
         networkMagic: response.network_magic,
         securityParameter: response.security_param,
         slotLength: Seconds(response.slot_length),
@@ -80,7 +83,7 @@ export class BlockfrostNetworkInfoProvider extends BlockfrostProvider implements
     try {
       // Although Blockfrost have the endpoint, the blockfrost-js library don't have a call for it
       // https://github.com/blockfrost/blockfrost-js/issues/294
-      const response = await this.blockfrost.instance<Schemas['network-eras']>('network-eras');
+      const response = await this.blockfrost.instance<Schemas['network-eras']>('network/eras');
       return response.body;
     } catch (error) {
       throw handleError(error);

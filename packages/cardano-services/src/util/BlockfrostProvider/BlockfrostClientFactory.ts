@@ -14,7 +14,8 @@ export const getBlockfrostApi = () => {
   // custom hosted instance
   if (process.env.BLOCKFROST_CUSTOM_BACKEND_URL && process.env.BLOCKFROST_CUSTOM_BACKEND_URL !== '') {
     blockfrostApi = new BlockFrostAPI({
-      customBackend: process.env.BLOCKFROST_CUSTOM_BACKEND_URL
+      customBackend: process.env.BLOCKFROST_CUSTOM_BACKEND_URL,
+      rateLimiter: false
     });
 
     return blockfrostApi;
@@ -29,7 +30,8 @@ export const getBlockfrostApi = () => {
   // network is not mandatory, we keep it for safety.
   blockfrostApi = new BlockFrostAPI({
     network: process.env.NETWORK as AvailableNetworks,
-    projectId: process.env.BLOCKFROST_API_KEY
+    projectId: process.env.BLOCKFROST_API_KEY,
+    rateLimiter: false
   });
 
   return blockfrostApi;
