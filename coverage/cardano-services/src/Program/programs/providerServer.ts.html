@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">74.66% </span>
+                <span class="strong">74.67% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>112/150</span>
+                <span class='fraction'>115/154</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50.87% </span>
+                <span class="strong">51.72% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>29/57</span>
+                <span class='fraction'>30/58</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">56.75% </span>
+                <span class="strong">56.41% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>21/37</span>
+                <span class='fraction'>22/39</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">77.53% </span>
+                <span class="strong">77.46% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>107/138</span>
+                <span class='fraction'>110/142</span>
             </div>
         
             
@@ -550,10 +550,19 @@
 <a name='L485'></a><a href='#L485'>485</a>
 <a name='L486'></a><a href='#L486'>486</a>
 <a name='L487'></a><a href='#L487'>487</a>
-<a name='L488'></a><a href='#L488'>488</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L488'></a><a href='#L488'>488</a>
+<a name='L489'></a><a href='#L489'>489</a>
+<a name='L490'></a><a href='#L490'>490</a>
+<a name='L491'></a><a href='#L491'>491</a>
+<a name='L492'></a><a href='#L492'>492</a>
+<a name='L493'></a><a href='#L493'>493</a>
+<a name='L494'></a><a href='#L494'>494</a>
+<a name='L495'></a><a href='#L495'>495</a>
+<a name='L496'></a><a href='#L496'>496</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">41x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -882,6 +891,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -948,6 +966,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -965,12 +986,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1045,6 +1061,7 @@ import {
   CardanoNode,
   ChainHistoryProvider,
   HandleProvider,
+  NetworkInfoProvider,
   Provider,
   RewardsProvider,
   Seconds,
@@ -1369,8 +1386,17 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) =&gt; {
     });
   }, ServiceNames.NetworkInfo);
 &nbsp;
-  const getBlockfrostChainHistoryProvider = <span class="fstat-no" title="function not covered" >() =</span>&gt;
-<span class="cstat-no" title="statement not covered" >    new BlockfrostChainHistoryProvider({ blockfrost: getBlockfrostApi(), logger });</span>
+  let networkInfoProvider: NetworkInfoProvider;
+  const getNetworkInfoProvider = () =&gt; {
+    if (!networkInfoProvider)
+      networkInfoProvider =
+        args.networkInfoProvider === ProviderImplementation.BLOCKFROST
+          ? <span class="branch-0 cbranch-no" title="branch not covered" >getBlockfrostNetworkInfoProvider()</span>
+          : getDbSyncNetworkInfoProvider();
+    return networkInfoProvider;
+  };
+  const getBlockfrostChainHistoryProvider = <span class="fstat-no" title="function not covered" >(n</span>InfoProvider: NetworkInfoProvider | DbSyncNetworkInfoProvider) =&gt;
+<span class="cstat-no" title="statement not covered" >    new BlockfrostChainHistoryProvider({ blockfrost: getBlockfrostApi(), logger, networkInfoProvider: nInfoProvider });</span>
 &nbsp;
   const getBlockfrostRewardsProvider = <span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >new BlockfrostRewardsProvider({ blockfrost: getBlockfrostApi(), logger });</span>
 &nbsp;
@@ -1434,7 +1460,10 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) =&gt; {
       new ChainHistoryHttpService({
         chainHistoryProvider: selectProviderImplementation&lt;ChainHistoryProvider&gt;(
           args.chainHistoryProvider ?? ProviderImplementation.DBSYNC,
-          { blockfrost: getBlockfrostChainHistoryProvider, dbsync: getDbSyncChainHistoryProvider },
+          {
+            blockfrost: <span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >getBlockfrostChainHistoryProvider(getNetworkInfoProvider()),</span>
+            dbsync: getDbSyncChainHistoryProvider
+          },
           logger,
           ServiceNames.ChainHistory
         ),
@@ -1451,16 +1480,11 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) =&gt; {
           ServiceNames.Rewards
         )
       }),
-    [ServiceNames.NetworkInfo]: async () =&gt; {
-      const networkInfoProvider =
-        args.networkInfoProvider === ProviderImplementation.BLOCKFROST
-          ? <span class="branch-0 cbranch-no" title="branch not covered" >getBlockfrostNetworkInfoProvider()</span>
-          : getDbSyncNetworkInfoProvider();
-      return new NetworkInfoHttpService({
+    [ServiceNames.NetworkInfo]: async () =&gt;
+      new NetworkInfoHttpService({
         logger,
-        networkInfoProvider
-      });
-    },
+        networkInfoProvider: getNetworkInfoProvider()
+      }),
     [ServiceNames.TxSubmit]: async () =&gt; {
       const txSubmitProvider = args.useSubmitApi
         ? <span class="branch-0 cbranch-no" title="branch not covered" >getSubmitApiProvider()</span>
@@ -1531,7 +1555,7 @@ export const loadProviderServer = async (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-10-21T08:01:30.314Z
+                at 2024-10-23T11:59:28.826Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
