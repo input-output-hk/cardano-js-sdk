@@ -48,7 +48,7 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@cardano-foundation/ledgerjs-hw-app-cardano": "^7.1.2",
+    "@cardano-foundation/ledgerjs-hw-app-cardano": "^7.1.4",
     "@cardano-sdk/core": "workspace:~",
     "@cardano-sdk/crypto": "workspace:~",
     "@cardano-sdk/dapp-connector": "workspace:~",
@@ -56,9 +56,9 @@
     "@cardano-sdk/tx-construction": "workspace:~",
     "@cardano-sdk/util": "workspace:~",
     "@emurgo/cardano-message-signing-nodejs": "^1.0.1",
-    "@ledgerhq/hw-transport": "^6.28.1",
-    "@ledgerhq/hw-transport-node-hid-noevents": "^6.27.12",
-    "@ledgerhq/hw-transport-webusb": "^6.27.12",
+    "@ledgerhq/hw-transport": "^6.31.4",
+    "@ledgerhq/hw-transport-node-hid-noevents": "^6.30.5",
+    "@ledgerhq/hw-transport-webusb": "^6.29.4",
     "node-hid": "^2.1.2",
     "ts-custom-error": "^3.2.0",
     "ts-log": "^2.2.4"
