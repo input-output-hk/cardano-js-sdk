@@ -66,6 +66,10 @@ in
           resources.requests = mkPodResources "350Mi" "1000m";
         };
 
+        blockfrost-backend = {
+          resources.requests = mkPodResources "350Mi" "1000m";
+        };
+
         stake-pool-provider = {
           resources.requests = mkPodResources "150Mi" "700m";
           env.OVERRIDE_FUZZY_OPTIONS = builtins.toJSON (!(lib.hasPrefix "live" final.namespace));
@@ -184,6 +188,25 @@ in
               (map (v: "/v${v}/utxo") versions.utxo)
             ];
         };
+
+        blockfrost-backend = {
+          allowedOrigins = lib.concatStringsSep "," allowedOrigins;
+          useAccelerator = false;
+          passHandleDBArgs = true;
+          hostnames = ["blockfrost-${final.namespace}.${baseUrl}" "blockfrost-${final.namespace}.${final.region}.${baseUrl}"];
+          dnsId = lib.toLower "${final.region}-${final.namespace}-blockfrost";
+          ogmiosSrvServiceName = "${final.namespace}-cardano-core.${final.namespace}.svc.cluster.local";
+
+          wafARN = tf-outputs.${final.region}.waf_arn;
+          # Healthcheck parameters for ALB
+          # For mainnet, default value of timeout of 5 is too short, so have to increase it significantly
+          # Interval cannot be less than timeout
+          # Note that Kubernetes healthchecks are picked up by balancer controller and reflected in the target group anyway
+          albHealthcheck = {
+            interval = 60;
+            timeout = 30;
+          };
+        };
       };
       imports = [
         ./ci.nix
@@ -198,6 +221,8 @@ in
         ./handle.nix
         ./asset.nix
         ./backend-ingress.nix
+        ./blockfrost-backend-ingress.nix
+        ./blockfrost-backend.provider.nix
         ./pg-boss-worker-deployment.nix
         ./blockfrost-worker-deployment.nix
       ];
@@ -697,6 +722,7 @@ in
 
           providers = {
             backend.enabled = true;
+            blockfrost-backend.enabled = true;
             handle-provider.enabled = true;
             chain-history-provider.enabled = true;
             stake-pool-provider.enabled = true;
