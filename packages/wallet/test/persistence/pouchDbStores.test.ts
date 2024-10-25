@@ -82,6 +82,20 @@ describe('pouchDbStores', () => {
       expect(await firstValueFrom(store1.getAll())).toEqual([doc2]);
     });
 
+    it('setAll preserves existing documents if bulkDocs fails', async () => {
+      await firstValueFrom(store1.setAll([doc1]));
+      const originalBulkDocs = store1.db.bulkDocs.bind(store1.db);
+      // 1st call used to clearAll, 2nd call was used to insert new docs.
+      // after the fix, 1st only deletes the documents that are intended to be deleted
+      store1.db.bulkDocs = jest.fn().mockImplementationOnce(originalBulkDocs).mockRejectedValueOnce(new Error('fail'));
+
+      // attempting to insert doc2
+      await firstValueFrom(store1.setAll([doc1, doc2]));
+
+      const docs = await firstValueFrom(store1.getAll());
+      expect(docs.length).toBeGreaterThan(0);
+    });
+
     it('simultaneous setAll() calls are resolved in series - last value is always persisted', async () => {
       await firstValueFrom(
         combineLatest([store1.setAll([doc1]), timer(1).pipe(mergeMap(() => store1.setAll([doc2])))])
