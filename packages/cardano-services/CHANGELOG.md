@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.31.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.31.4...@cardano-sdk/cardano-services@0.31.5) (2024-10-25)
+
+### Features
+
+* add blockfrost based provider server ([8d9f847](https://github.com/input-output-hk/cardano-js-sdk/commit/8d9f847a2f948251695f6d09292f0e6bad79532f))
+* **cardano-services:** improve transaction from blockfrost using cbor to reduce the nr of calls ([103f408](https://github.com/input-output-hk/cardano-js-sdk/commit/103f408929b0ebd709d8d027f24e36ca0f8ee952))
+
 ## [0.31.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.31.3...@cardano-sdk/cardano-services@0.31.4) (2024-10-11)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.44.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.44.6...@cardano-sdk/e2e@0.44.7) (2024-10-25)
+
+### Features
+
+* add blockfrost based provider server ([8d9f847](https://github.com/input-output-hk/cardano-js-sdk/commit/8d9f847a2f948251695f6d09292f0e6bad79532f))
+
 ## [0.44.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.44.5...@cardano-sdk/e2e@0.44.6) (2024-10-21)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

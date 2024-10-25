@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.44.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.12...@cardano-sdk/wallet@0.44.13) (2024-10-25)
+
+### Bug Fixes
+
+* **wallet:** preserve pouchdb collection documents when bulkDocs fails ([0caf2c4](https://github.com/input-output-hk/cardano-js-sdk/commit/0caf2c49f6a98933168caed911b15929583dc10b))
+
 ## [0.44.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.11...@cardano-sdk/wallet@0.44.12) (2024-10-21)
 
 ### Bug Fixes

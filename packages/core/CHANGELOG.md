@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.41.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.41.1...@cardano-sdk/core@0.41.2) (2024-10-25)
+
+### Bug Fixes
+
+* **core:** do not convert empty strings in natural zero ([801e901](https://github.com/input-output-hk/cardano-js-sdk/commit/801e901a1e86c3a61b31da4f0c040a18d667f2de))
+
 ## [0.41.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.41.0...@cardano-sdk/core@0.41.1) (2024-10-11)
 
 ### Bug Fixes

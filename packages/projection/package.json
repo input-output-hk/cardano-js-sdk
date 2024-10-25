@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/projection",
-  "version": "0.12.6",
+  "version": "0.12.7",
   "description": "Chain Sync event projection",
   "repository": "https://github.com/input-output-hk/cardano-js-sdk",
   "license": "Apache-2.0",
