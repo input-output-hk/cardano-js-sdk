@@ -85,7 +85,11 @@ export const createPouchDbWalletStores = (
     // However it is extremely unlikely that it would have inline datums,
     // and renaming this store is not an option as it's being used
     // for storing collateral settings
-    unspendableUtxo: new PouchDbUtxoStore({ dbName: `${baseDbName}UnspendableUtxo` }, logger),
+    unspendableUtxo: new PouchDbUtxoStore(
+      // random doc id; setAll will always delete and re-insert all docs
+      { dbName: `${baseDbName}UnspendableUtxo` },
+      logger
+    ),
     utxo: new PouchDbUtxoStore({ dbName: `${baseDbName}Utxo_v2` }, logger),
     volatileTransactions: new PouchDbVolatileTransactionsStore(docsDbName, 'volatileTransactions_v3', logger)
   };

@@ -9,7 +9,7 @@ export abstract class PouchDbStore<T extends {}> {
   destroyed = false;
   protected idle: Promise<void> = Promise.resolve();
   protected readonly logger: Logger;
-  protected readonly db: PouchDB.Database<T>;
+  public readonly db: PouchDB.Database<T>;
 
   constructor(public dbName: string, logger: Logger) {
     this.logger = logger;
