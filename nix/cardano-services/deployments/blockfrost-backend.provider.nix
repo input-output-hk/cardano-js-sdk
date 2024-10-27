@@ -37,7 +37,14 @@
         CHAIN_HISTORY_PROVIDER = "blockfrost";
         NETWORK_INFO_PROVIDER = "blockfrost";
         REWARDS_PROVIDER = "blockfrost";
-        UTXO_PROVIDER = "USE_BLOCKFROST";
+        UTXO_PROVIDER = "blockfrost";
+        BLOCKFROST_API_KEY = {
+          valueFrom.secretKeyRef = {
+            name = "blockfrost";
+            key = "api-key";
+          };
+        };
+
 
         HANDLE_PROVIDER_SERVER_URL =
           if config.network == "mainnet"
