@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.21.5...@cardano-sdk/cardano-services-client@0.21.6) (2024-10-31)
+
+### Bug Fixes
+
+* **cardano-services-client:** txSubmitApiProvider now computes the tx id correctly ([09b6b69](https://github.com/input-output-hk/cardano-js-sdk/commit/09b6b6950f1dbb42545088733a303fe01ceec93c))
+
 ## [0.21.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.21.4...@cardano-sdk/cardano-services-client@0.21.5) (2024-10-25)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services-client
