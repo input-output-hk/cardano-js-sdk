@@ -42,7 +42,7 @@ export class TxSubmitApiProvider implements TxSubmitProvider {
     let txId: Cardano.TransactionId | undefined;
 
     try {
-      txId = Serialization.TransactionBody.fromCbor(signedTransaction).hash();
+      txId = Serialization.Transaction.fromCbor(signedTransaction).getId();
 
       this.#logger.debug(`Submitting tx ${txId} ...`);
 
