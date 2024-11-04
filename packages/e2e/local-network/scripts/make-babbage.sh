@@ -170,7 +170,7 @@ if [ -n "$PRE_CONWAY" ]; then
 fi
 
 # Copy the cost mode
-cardano-cli genesis create-staked --genesis-dir "${ROOT}" \
+cardano-cli latest genesis create-staked --genesis-dir "${ROOT}" \
   --testnet-magic "${NETWORK_MAGIC}" \
   --gen-pools ${NUM_SP_NODES} \
   --supply ${MAX_SUPPLY} \
@@ -308,9 +308,9 @@ sed_i -E "s/\"startTime\": [0-9]+/\"startTime\": ${timeUnix}/" ${ROOT}/genesis/b
 sed_i -E "s/\"systemStart\": \".*\"/\"systemStart\": \"${timeISO}\"/" ${ROOT}/genesis/shelley/genesis.json
 
 byronGenesisHash=$(cardano-cli byron genesis print-genesis-hash --genesis-json ${ROOT}/genesis/byron/genesis.json)
-shelleyGenesisHash=$(cardano-cli genesis hash --genesis ${ROOT}/genesis/shelley/genesis.json)
-alonzoGenesisHash=$(cardano-cli genesis hash --genesis ${ROOT}/genesis/shelley/genesis.alonzo.json)
-conwayGenesisHash=$(cardano-cli genesis hash --genesis ${ROOT}/genesis/shelley/genesis.conway.json)
+shelleyGenesisHash=$(cardano-cli latest genesis hash --genesis ${ROOT}/genesis/shelley/genesis.json)
+alonzoGenesisHash=$(cardano-cli latest genesis hash --genesis ${ROOT}/genesis/shelley/genesis.alonzo.json)
+conwayGenesisHash=$(cardano-cli latest genesis hash --genesis ${ROOT}/genesis/shelley/genesis.conway.json)
 
 echo "Byron genesis hash: $byronGenesisHash"
 echo "Shelley genesis hash: $shelleyGenesisHash"

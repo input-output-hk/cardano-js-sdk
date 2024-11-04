@@ -68,7 +68,7 @@ mkdir -p "$DELEGATORS_DIR"
 # GENERATE NEW PAYMENT KEYS
 
 for NODE_ID in ${SP_NODES_ID}; do
-  cardano-cli conway address key-gen \
+  cardano-cli latest address key-gen \
     --verification-key-file "${DELEGATORS_DIR}/payment${NODE_ID}.vkey" \
     --signing-key-file "${DELEGATORS_DIR}/payment${NODE_ID}.skey"
 done
@@ -76,7 +76,7 @@ done
 # GENERATE NEW STAKE
 
 for NODE_ID in ${SP_NODES_ID}; do
-  cardano-cli conway stake-address key-gen \
+  cardano-cli latest stake-address key-gen \
     --verification-key-file "${DELEGATORS_DIR}/staking${NODE_ID}.vkey" \
     --signing-key-file "${DELEGATORS_DIR}/staking${NODE_ID}.skey"
 done
@@ -84,7 +84,7 @@ done
 # BUILD ADDRESSES FOR OUR NEW KEYS
 
 for NODE_ID in ${SP_NODES_ID}; do
-  cardano-cli conway address build \
+  cardano-cli latest address build \
     --testnet-magic $NETWORK_MAGIC \
     --payment-verification-key-file "${DELEGATORS_DIR}/payment${NODE_ID}.vkey" \
     --stake-verification-key-file "${DELEGATORS_DIR}/staking${NODE_ID}.vkey" \
@@ -94,7 +94,7 @@ done
 # BUILD ADDRESSES FOR THE EXISTING KEYS, WE WILL NEED THEM FOR OUR FUTURE TRANSACTIONS
 
 for NODE_ID in ${SP_NODES_ID}; do
-  cardano-cli conway address build \
+  cardano-cli latest address build \
     --testnet-magic $NETWORK_MAGIC \
     --payment-verification-key-file "${UTXO_DIR}/utxo${NODE_ID}.vkey" \
     --out-file  "${UTXO_DIR}/utxo${NODE_ID}.addr"
@@ -107,19 +107,19 @@ currentBalance=$(getAddressBalance "$stakeAddr")
 echo "Funding stake addresses with ${AMOUNT_PER_DELEGATOR}"
 
 for NODE_ID in ${SP_NODES_ID}; do
-  cardano-cli conway transaction build \
+  cardano-cli latest transaction build \
     --testnet-magic $NETWORK_MAGIC \
     --tx-in "$(cardano-cli query utxo --address "$(cat "${UTXO_DIR}/utxo${NODE_ID}.addr")" --testnet-magic $NETWORK_MAGIC --out-file /dev/stdout | jq -r 'keys[0]')" \
     --tx-out "$(cat ${DELEGATORS_DIR}/payment${NODE_ID}.addr)+${AMOUNT_PER_DELEGATOR}" \
     --change-address "$(cat ${UTXO_DIR}/utxo${NODE_ID}.addr)" \
     --out-file "${TRANSACTIONS_DIR}/tx${NODE_ID}.raw"
 
-    cardano-cli conway transaction sign --testnet-magic $NETWORK_MAGIC \
+    cardano-cli latest transaction sign --testnet-magic $NETWORK_MAGIC \
       --tx-body-file "${TRANSACTIONS_DIR}/tx${NODE_ID}.raw" \
       --signing-key-file "${UTXO_DIR}/utxo${NODE_ID}.skey" \
       --out-file "${TRANSACTIONS_DIR}/tx${NODE_ID}.signed"
 
-    cardano-cli conway transaction submit \
+    cardano-cli latest transaction submit \
       --testnet-magic $NETWORK_MAGIC \
       --tx-file "${TRANSACTIONS_DIR}/tx${NODE_ID}.signed"
 done
@@ -135,7 +135,7 @@ sleep 10
 
 # SHOW THE UTXO DISTRIBUTION
 
-cardano-cli conway query utxo --whole-utxo --testnet-magic $NETWORK_MAGIC
+cardano-cli query utxo --whole-utxo --testnet-magic $NETWORK_MAGIC
 
 # REGISTER STAKE ADDRESSES
 
@@ -146,26 +146,34 @@ stakeAddr="$(cat "${DELEGATORS_DIR}/payment1.addr")"
 currentBalance=$(getAddressBalance "$stakeAddr")
 
 for NODE_ID in ${SP_NODES_ID}; do
-  cardano-cli conway stake-address registration-certificate \
+  cardano-cli latest stake-address registration-certificate \
     --stake-verification-key-file "${DELEGATORS_DIR}/staking${NODE_ID}.vkey" \
     --key-reg-deposit-amt ${keyDeposit} \
     --out-file "${TRANSACTIONS_DIR}/staking${NODE_ID}reg.cert"
 
-  cardano-cli conway transaction build \
+  # Wait for utxo to become available
+  txIn="$(cardano-cli latest query utxo --address "$(cat "${DELEGATORS_DIR}/payment${NODE_ID}.addr")" --testnet-magic $NETWORK_MAGIC --out-file /dev/stdout | jq -r 'keys[0]')";
+  while [ "$txIn" == "null" ]; do
+    echo "TxIN is null, retrying..."
+    txIn="$(cardano-cli latest query utxo --address "$(cat "${DELEGATORS_DIR}/payment${NODE_ID}.addr")" --testnet-magic $NETWORK_MAGIC --out-file /dev/stdout | jq -r 'keys[0]')";
+    sleep 1
+  done
+
+  cardano-cli latest transaction build \
     --testnet-magic $NETWORK_MAGIC \
-    --tx-in "$(cardano-cli query utxo --address "$(cat "${DELEGATORS_DIR}/payment${NODE_ID}.addr")" --testnet-magic $NETWORK_MAGIC --out-file /dev/stdout | jq -r 'keys[0]')" \
+    --tx-in "$txIn" \
     --change-address "$(cat ${DELEGATORS_DIR}/payment${NODE_ID}.addr)" \
     --certificate-file "${TRANSACTIONS_DIR}/staking${NODE_ID}reg.cert" \
     --witness-override 2 \
     --out-file "${TRANSACTIONS_DIR}/reg-stake-tx${NODE_ID}.raw"
 
-  cardano-cli conway transaction sign --testnet-magic $NETWORK_MAGIC \
+  cardano-cli latest transaction sign --testnet-magic $NETWORK_MAGIC \
     --tx-body-file "${TRANSACTIONS_DIR}/reg-stake-tx${NODE_ID}.raw" \
     --signing-key-file "${DELEGATORS_DIR}/payment${NODE_ID}.skey" \
     --signing-key-file "${DELEGATORS_DIR}/staking${NODE_ID}.skey" \
     --out-file "${TRANSACTIONS_DIR}/reg-stake-tx${NODE_ID}.signed"
 
-  cardano-cli conway transaction submit \
+  cardano-cli latest transaction submit \
     --testnet-magic $NETWORK_MAGIC \
     --tx-file "${TRANSACTIONS_DIR}/reg-stake-tx${NODE_ID}.signed"
 done

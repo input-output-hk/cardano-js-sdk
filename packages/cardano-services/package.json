@@ -59,7 +59,7 @@
     "tscNoEmit": "echo typescript --noEmit command not implemented yet"
   },
   "devDependencies": {
-    "@cardano-ogmios/client": "6.5.0",
+    "@cardano-ogmios/client": "6.9.0",
     "@cardano-sdk/util-dev": "workspace:~",
     "@types/bunyan": "^1.8.8",
     "@types/cors": "^2.8.13",

@@ -5,8 +5,8 @@ FROM ubuntu:${UBUNTU_VERSION} AS builder
 ENV DEBIAN_FRONTEND=nonintercative
 
 WORKDIR /build
-ARG CARDANO_NODE_BUILD_URL=https://github.com/IntersectMBO/cardano-node/releases/download/9.1.1/cardano-node-9.1.1-linux.tar.gz
-ARG CARDANO_NODE_BUILD_URL_ARM64=https://github.com/input-output-hk/ogmios-tracker/releases/download/0.1.0/cardano-node-9.1.0-aarch64-linux.tar.gz
+ARG CARDANO_NODE_BUILD_URL=https://github.com/IntersectMBO/cardano-node/releases/download/10.1.2/cardano-node-10.1.2-linux.tar.gz
+ARG CARDANO_NODE_BUILD_URL_ARM64=https://github.com/input-output-hk/ogmios-tracker/releases/download/0.1.0/cardano-node-10.1.2-aarch64-linux.tar.gz
 
 RUN set -x && \
   apt-get update -y && \

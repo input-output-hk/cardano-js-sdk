@@ -34,7 +34,7 @@ cat >network-files/utxo-keys/minting-policy.json <<EOL
 EOL
 
 # Generate the policy ID from the script file and save it
-policyid=$(cardano-cli transaction policyid --script-file network-files/utxo-keys/minting-policy.json)
+policyid=$(cardano-cli latest transaction policyid --script-file network-files/utxo-keys/minting-policy.json)
 
 cat >network-files/utxo-keys/handles-metadata.json <<EOL
 { "721":
@@ -54,7 +54,7 @@ utxo=$(cardano-cli query utxo --address "$addr" --testnet-magic 888 | awk 'NR ==
 
 tokenList="1 ${policyid}.${handleHexes[0]}+1 ${policyid}.${handleHexes[1]}+2 ${policyid}.${handleHexes[2]}"
 
-cardano-cli conway transaction build \
+cardano-cli latest transaction build \
   --change-address "$addr" \
   --tx-in "$utxo" \
   --tx-out "$destAddr"+10000000+"$tokenList" \
@@ -64,13 +64,13 @@ cardano-cli conway transaction build \
   --testnet-magic 888 \
   --out-file handle-tx.raw
 
-cardano-cli transaction sign \
+cardano-cli latest transaction sign \
   --tx-body-file handle-tx.raw \
   --signing-key-file network-files/utxo-keys/payment.skey \
   --testnet-magic 888 \
   --out-file handle-tx.signed
 
-cardano-cli transaction submit --testnet-magic 888 --tx-file handle-tx.signed
+cardano-cli latest transaction submit --testnet-magic 888 --tx-file handle-tx.signed
 wait_tx_complete $utxo
 
 # CIP-68 Handle
@@ -117,7 +117,7 @@ cat >network-files/utxo-keys/handles68-datum.json <<EOL
 EOL
 #               (222)handle68 -> 283232322968616e646c653638
 handle68tokenList="1 ${policyid}.283232322968616e646c653638"
-cardano-cli conway transaction build \
+cardano-cli latest transaction build \
   --change-address "$addr" \
   --tx-in "$utxo" \
   --tx-out "$destAddr"+10000000+"$handle68tokenList" \
@@ -127,11 +127,13 @@ cardano-cli conway transaction build \
   --testnet-magic 888 \
   --out-file handle68-tx.raw
 
-cardano-cli transaction sign \
+cardano-cli latest transaction sign \
   --tx-body-file handle68-tx.raw \
   --signing-key-file network-files/utxo-keys/payment.skey \
   --testnet-magic 888 \
   --out-file handle68-tx.signed
 
-cardano-cli transaction submit --testnet-magic 888 --tx-file handle68-tx.signed
+cardano-cli latest transaction submit --testnet-magic 888 --tx-file handle68-tx.signed
 wait_tx_complete $utxo
+
+sync

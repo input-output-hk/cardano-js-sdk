@@ -33,7 +33,7 @@ cat >network-files/utxo-keys/minting-policy.json <<EOL
 }
 EOL
 
-currencySymbol=$(cardano-cli transaction policyid --script-file network-files/utxo-keys/minting-policy.json)
+currencySymbol=$(cardano-cli latest transaction policyid --script-file network-files/utxo-keys/minting-policy.json)
 addr=$(cardano-cli address build --payment-verification-key-file network-files/utxo-keys/utxo1.vkey --testnet-magic 888)
 destAddr="addr_test1qr0c3frkem9cqn5f73dnvqpena27k2fgqew6wct9eaka03agfwkvzr0zyq7nqvcj24zehrshx63zzdxv24x3a4tcnfeq9zwmn7"
 
@@ -46,7 +46,7 @@ for i in "${!TOKENS[@]}"; do
   tokenList="${tokenList}+${AMOUNT} ${currencySymbol}.${TOKENS[i]}"
 done
 
-cardano-cli conway transaction build \
+cardano-cli latest transaction build \
   --change-address "$addr" \
   --tx-in "$utxo" \
   --tx-out "$destAddr"+10000000+"$tokenList" \
@@ -55,11 +55,11 @@ cardano-cli conway transaction build \
   --testnet-magic 888 \
   --out-file tx.raw
 
-cardano-cli transaction sign \
+cardano-cli latest transaction sign \
   --tx-body-file tx.raw \
   --signing-key-file network-files/utxo-keys/utxo1.skey \
   --testnet-magic 888 \
   --out-file tx.signed
 
-cardano-cli transaction submit --testnet-magic 888 --tx-file tx.signed
+cardano-cli latest transaction submit --testnet-magic 888 --tx-file tx.signed
 wait_tx_complete $utxo

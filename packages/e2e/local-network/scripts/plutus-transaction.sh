@@ -49,7 +49,7 @@ currentBalance=$(getAddressBalance "$ALWAYS_SUCCEED_ADDR")
 
 # LOCK FUNDS
 
-cardano-cli conway transaction build \
+cardano-cli latest transaction build \
   --testnet-magic 888 \
   --change-address "$genesisAddr" \
   --tx-in "$utxo" \
@@ -57,13 +57,13 @@ cardano-cli conway transaction build \
   --tx-out-datum-hash "$SCRIPT_DATUM_HASH" \
   --out-file tx-script.build
 
-cardano-cli transaction sign \
+cardano-cli latest transaction sign \
   --tx-body-file tx-script.build \
   --signing-key-file network-files/utxo-keys/utxo2.skey \
   --testnet-magic 888 \
   --out-file tx-script.signed
 
-cardano-cli transaction submit --testnet-magic 888 --tx-file tx-script.signed
+cardano-cli latest transaction submit --testnet-magic 888 --tx-file tx-script.signed
 
 updatedBalance=$(getAddressBalance "$ALWAYS_SUCCEED_ADDR")
 
@@ -78,7 +78,7 @@ utxo=$(cardano-cli query utxo --address "$genesisAddr" --testnet-magic 888 | awk
 scriptUtxo=$(cardano-cli query utxo --address "$ALWAYS_SUCCEED_ADDR" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
 currentBalance=$(getAddressBalance "$ALWAYS_SUCCEED_ADDR")
 
-cardano-cli conway transaction build \
+cardano-cli latest transaction build \
   --testnet-magic 888 \
   --tx-in "$scriptUtxo" \
   --tx-in-script-file scripts/contracts/alwayssucceeds.plutus \
@@ -88,13 +88,13 @@ cardano-cli conway transaction build \
   --change-address "$genesisAddr" \
   --out-file test-alonzo.tx
 
-cardano-cli transaction sign \
+cardano-cli latest transaction sign \
   --tx-body-file test-alonzo.tx \
   --signing-key-file network-files/utxo-keys/utxo2.skey \
   --testnet-magic 888 \
   --out-file test-alonzo.signed
 
-cardano-cli transaction submit --testnet-magic 888 --tx-file test-alonzo.signed
+cardano-cli latest transaction submit --testnet-magic 888 --tx-file test-alonzo.signed
 
 updatedBalance=$(getAddressBalance "$ALWAYS_SUCCEED_ADDR")
 

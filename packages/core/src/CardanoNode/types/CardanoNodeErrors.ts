@@ -97,6 +97,8 @@ export enum TxSubmissionErrorCode {
   UnauthorizedGovernanceAction = 3165,
   ReferenceScriptsTooLarge = 3166,
   UnknownVoters = 3167,
+  EmptyTreasuryWithdrawal = 3168,
+  UnexpectedMempoolError = 3997,
   UnrecognizedCertificateType = 3998,
   DeserialisationFailure = -32_602
 }

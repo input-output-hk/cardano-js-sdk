@@ -43,7 +43,6 @@ while [ `cardano-cli query tip --testnet-magic 888 | jq .block` == null ] ; do
   sleep 1
 done
 
-healthy &
 
 ./scripts/setup-new-delegator-keys.sh
 ./scripts/update-stake-pools.sh.sh "$SP_NODES_ID"
@@ -55,5 +54,7 @@ healthy &
 ./scripts/mint-handles.sh
 
 touch ./network-files/run/done
+
+healthy &
 
 wait
