@@ -63,10 +63,16 @@ describe('createHttpProvider', () => {
     if (closeServer) await closeServer();
   });
 
-  it('attempting to access unimplemented method throws ProviderError', async () => {
+  it('attempting to access unimplemented method returns undefined', async () => {
     const provider = createTxSubmitProviderClient();
+    expect('doesNotExist' in provider).toBe(false);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect(() => (provider as any).doesNotExist).toThrowError(ProviderError);
+    expect((provider as any).doesNotExist).toBeUndefined();
+  });
+
+  it('"in" operator for implemented property returns true', async () => {
+    const provider = createTxSubmitProviderClient();
+    expect('healthCheck' in provider).toBe(true);
   });
 
   it('passes through axios options, merging custom header with the included provider version headers', async () => {
