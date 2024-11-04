@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.21.6...@cardano-sdk/cardano-services-client@0.21.7) (2024-11-04)
+
+### Bug Fixes
+
+* **cardano-services-client:** comply HttpProvider with 'normal' Object behavior ([9900635](https://github.com/input-output-hk/cardano-js-sdk/commit/9900635e8c32c2c0330426d795c170e541b52bcf))
+
 ## [0.21.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.21.5...@cardano-sdk/cardano-services-client@0.21.6) (2024-10-31)
 
 ### Bug Fixes
