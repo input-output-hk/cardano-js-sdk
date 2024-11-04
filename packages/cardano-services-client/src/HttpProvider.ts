@@ -78,11 +78,9 @@ export const createHttpProvider = <T extends Provider>({
   new Proxy<T>({} as T, {
     // eslint-disable-next-line sonarjs/cognitive-complexity
     get(_, prop) {
-      if (prop === 'then') return;
       const method = prop as keyof T;
       const urlPath = paths[method];
-      if (!urlPath)
-        throw new ProviderError(ProviderFailure.NotImplemented, `HttpProvider missing path for '${prop.toString()}'`);
+      if (!urlPath) return;
       return async (...args: any[]) => {
         try {
           const req: AxiosRequestConfig = {
@@ -123,5 +121,9 @@ export const createHttpProvider = <T extends Provider>({
           throw new ProviderError(ProviderFailure.Unknown, error);
         }
       };
+    },
+
+    has(_, prop) {
+      return prop in paths;
     }
   });
