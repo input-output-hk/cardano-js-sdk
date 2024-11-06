@@ -12,3 +12,5 @@ rm -rf ./network-files/node-sp*/*
 rm -rf ./sockets/*
 rm -rf ./config/*
 rm -rf ./logs/*
+rm -rf /sdk-ipc/config
+rm -rf /sdk-ipc/handle_policy_ids
