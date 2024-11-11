@@ -139,7 +139,13 @@ export const createDelegationTracker = ({
     transactionsTracker,
     rewardAccountAddresses$,
     slotEpochCalc$,
-    [...Cardano.RegAndDeregCertificateTypes, ...Cardano.StakeDelegationCertificateTypes]
+    [
+      ...new Set([
+        ...Cardano.RegAndDeregCertificateTypes,
+        ...Cardano.StakeDelegationCertificateTypes,
+        ...Cardano.VoteDelegationCredentialCertificateTypes
+      ])
+    ]
   ).pipe(tap((transactionsWithEpochs) => logger.debug(`Found ${transactionsWithEpochs.length} staking transactions`)));
 
   const rewardsHistory$ = new TrackerSubject(
