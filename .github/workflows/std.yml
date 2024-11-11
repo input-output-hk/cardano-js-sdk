@@ -28,11 +28,6 @@ on:
         type: boolean
         required: true
         default: false
-      deploy-dev-sanchonet:
-        description: Deploy to dev-sanchonet
-        type: boolean
-        required: true
-        default: false
       deploy-local-network:
         description: Deploy to local-network
         type: boolean
@@ -115,9 +110,6 @@ jobs:
           (
             if [ "true" == ${{ inputs.deploy-dev-preview || (github.event_name == 'push' && github.ref_name == 'master') }} ] ; then
               echo '{"environment":"dev-preview", "target":"dev-preview@us-east-1",    "url": "https://dev-preview.lw.iog.io/"}'
-            fi
-            if [ "true" == ${{ inputs.deploy-dev-sanchonet || (github.event_name == 'push' && github.ref_name == 'conway-era') }} ] ; then
-              echo '{"environment":"dev-sanchonet", "target":"dev-sanchonet@us-east-1",    "url": "https://dev-sanchonet.lw.iog.io/"}'
             fi
             if [ "true" == ${{ inputs.deploy-dev-preprod || false }} ] ; then
               echo '{"environment":"dev-preprod", "target":"dev-preprod@us-east-1@v2", "url": "https://dev-preprod.lw.iog.io/"}'

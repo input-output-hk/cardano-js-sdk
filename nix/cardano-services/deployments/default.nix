@@ -754,40 +754,6 @@ in
           };
         };
 
-        "live-sanchonet@us-east-2" = final: {
-          namespace = "live-sanchonet";
-          name = "${final.namespace}-cardanojs";
-          network = "sanchonet";
-          region = "us-east-2";
-          context = "eks-admin";
-
-          providers = {
-            backend = {
-              enabled = true;
-            };
-            stake-pool-provider = {
-              enabled = true;
-            };
-            chain-history-provider = {
-              enabled = true;
-            };
-          };
-
-          projectors = {
-            stake-pool = {
-              enabled = true;
-            };
-          };
-
-          values = {
-            blockfrost-worker.enabled = false;
-            pg-boss-worker.enabled = true;
-            cardano-services = {
-              ingresOrder = 99;
-            };
-          };
-        };
-
       }
       # Convenient for cases when you need to create multiple temporary deployments with the same configuration
       // (builtins.mapAttrs (_: value: (final:
