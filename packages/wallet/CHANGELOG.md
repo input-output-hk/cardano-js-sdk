@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.44.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.15...@cardano-sdk/wallet@0.44.16) (2024-11-11)
+
+### Bug Fixes
+
+* **wallet:** include voteDelegation certs in delegationTracker ([03b2647](https://github.com/input-output-hk/cardano-js-sdk/commit/03b26473a9ded99cd222883737cce83c3333cb75))
+
 ## [0.44.15](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.14...@cardano-sdk/wallet@0.44.15) (2024-11-04)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
