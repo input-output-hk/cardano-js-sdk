@@ -19,7 +19,6 @@ on:
         options:
           - 'preview'
           - 'preprod'
-          - 'sanchonet'
           - 'mainnet'
       wallets:
         description: 'Number of wallets to simulate'

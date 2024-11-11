@@ -18,7 +18,6 @@ on:
         options:
           - 'preview'
           - 'preprod'
-          - 'sanchonet'
       cluster:
         description: 'Target cluster'
         type: choice
