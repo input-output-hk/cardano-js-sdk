@@ -55,7 +55,45 @@ describe('WalletUtil', () => {
         ]
       ];
       const resolver = createInputResolver({
-        transactions: { outgoing: { signed$: of() } },
+        transactions: { history$: of([]), outgoing: { signed$: of() } },
+        utxo: { available$: of(utxo) }
+      });
+      expect(
+        await resolver.resolveInput({
+          index: 0,
+          txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
+        })
+      ).toEqual({
+        address: 'addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg',
+        value: { coins: 50_000_000n }
+      });
+      expect(
+        await resolver.resolveInput({
+          index: 0,
+          txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d4')
+        })
+      ).toBeNull();
+    });
+
+    it('resolveInput resolves inputs from tx history', async () => {
+      const utxo: Cardano.Utxo[] = [];
+      const resolver = createInputResolver({
+        transactions: {
+          history$: of([
+            {
+              body: {
+                outputs: [
+                  {
+                    address: Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg'),
+                    value: { coins: 50_000_000n }
+                  }
+                ]
+              },
+              id: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
+            } as Cardano.HydratedTx
+          ]),
+          outgoing: { signed$: of() }
+        },
         utxo: { available$: of(utxo) }
       });
       expect(
@@ -97,7 +135,7 @@ describe('WalletUtil', () => {
       } as Cardano.HydratedTx;
 
       const resolver = createInputResolver({
-        transactions: { outgoing: { signed$: of() } },
+        transactions: { history$: of([]), outgoing: { signed$: of() } },
         utxo: { available$: of([]) }
       });
 
@@ -134,7 +172,7 @@ describe('WalletUtil', () => {
       const signedTxs = mocks.queryTransactionsResult.pageResults.map(toSignedTx);
 
       const resolver = createInputResolver({
-        transactions: { outgoing: { signed$: of(signedTxs) } },
+        transactions: { history$: of([]), outgoing: { signed$: of(signedTxs) } },
         utxo: { available$: of() }
       });
       expect(
@@ -273,7 +311,10 @@ describe('WalletUtil', () => {
         ]
       ];
       const resolver = combineInputResolvers(
-        createInputResolver({ transactions: { outgoing: { signed$: of() } }, utxo: { available$: of(utxo) } }),
+        createInputResolver({
+          transactions: { history$: of([]), outgoing: { signed$: of() } },
+          utxo: { available$: of(utxo) }
+        }),
         createBackendInputResolver(createMockChainHistoryProvider())
       );
 
@@ -315,7 +356,10 @@ describe('WalletUtil', () => {
       } as Cardano.HydratedTx;
 
       const resolver = combineInputResolvers(
-        createInputResolver({ transactions: { outgoing: { signed$: of() } }, utxo: { available$: of([]) } }),
+        createInputResolver({
+          transactions: { history$: of([]), outgoing: { signed$: of() } },
+          utxo: { available$: of([]) }
+        }),
         createBackendInputResolver(createMockChainHistoryProvider([tx]))
       );
 
@@ -395,7 +439,10 @@ describe('WalletUtil', () => {
       ];
 
       const resolver = combineInputResolvers(
-        createInputResolver({ transactions: { outgoing: { signed$: of() } }, utxo: { available$: of(utxo) } }),
+        createInputResolver({
+          transactions: { history$: of([]), outgoing: { signed$: of() } },
+          utxo: { available$: of(utxo) }
+        }),
         createBackendInputResolver(createMockChainHistoryProvider([tx]))
       );
 
@@ -456,7 +503,10 @@ describe('WalletUtil', () => {
 
     it('resolveInput resolves to null if the input can not be found', async () => {
       const resolver = combineInputResolvers(
-        createInputResolver({ transactions: { outgoing: { signed$: of() } }, utxo: { available$: of([]) } }),
+        createInputResolver({
+          transactions: { history$: of([]), outgoing: { signed$: of() } },
+          utxo: { available$: of([]) }
+        }),
         createBackendInputResolver(createMockChainHistoryProvider())
       );
 
