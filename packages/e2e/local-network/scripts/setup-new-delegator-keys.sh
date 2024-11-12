@@ -53,6 +53,53 @@ getAddressBalance() {
   echo ${total_balance}
 }
 
+getBlockHeight() {
+  cardano-cli query tip --testnet-magic $NETWORK_MAGIC | jq -r '.block'
+}
+
+submitTransactionWithRetry() {
+  local txFile=$1
+  local retryCount=${2:-0}
+  local numberOfConfirmations=5
+
+  if [ "$retryCount" -ge 5 ]; then
+    echo "Transaction failed after $retryCount retries"
+    return 1
+  fi
+
+  cardano-cli latest transaction submit --testnet-magic $NETWORK_MAGIC --tx-file "$txFile"
+
+  local txId=$(cardano-cli latest transaction txid --tx-file "$txFile")
+
+  local mempoolTx="true"
+  while [ "$mempoolTx" == "true" ]; do
+    echo "Transaction is still in the mempool, waiting ${txId}"
+    sleep 1
+    mempoolTx=$(cardano-cli latest query tx-mempool --testnet-magic $NETWORK_MAGIC tx-exists ${txId} --out-file /dev/stdout | jq -r '.exists')
+  done
+
+  local initialTip=$(getBlockHeight)
+  local currentTip=$initialTip
+  local utxo="null"
+  while [ $(($currentTip - $initialTip)) -lt $numberOfConfirmations ]; do
+    sleep 1
+    utxo=$(cardano-cli query utxo --tx-in "${txId}#0" --testnet-magic $NETWORK_MAGIC --out-file /dev/stdout | jq -r 'keys[0]')
+    if [ "$utxo" == "null" ]; then
+      # Transaction was rolled back
+      break;
+    fi
+    currentTip=$(getBlockHeight)
+  done
+
+  if [ "$utxo" == "null" ]; then
+    echo "Transaction rolled back, retrying ${retryCount} ..."
+    submitTransactionWithRetry "$txFile" $((retryCount + 1))
+    return $?
+  fi
+
+  echo "Transaction successful ${txId}"
+}
+
 NETWORK_MAGIC=888
 UTXO_DIR=network-files/utxo-keys
 TRANSACTIONS_DIR=network-files/transactions
@@ -102,33 +149,43 @@ done
 
 # FUND OUR NEWLY CREATED ADDRESSES
 
-stakeAddr="$(cat "${UTXO_DIR}/utxo1.addr")"
-currentBalance=$(getAddressBalance "$stakeAddr")
-echo "Funding stake addresses with ${AMOUNT_PER_DELEGATOR}"
-
 for NODE_ID in ${SP_NODES_ID}; do
+  sourceAddr="$(cat "${UTXO_DIR}/utxo${NODE_ID}.addr")"
+  destAddr="$(cat ${DELEGATORS_DIR}/payment${NODE_ID}.addr)"
+  echo "Funding ${destAddr} with ${AMOUNT_PER_DELEGATOR}"
+
   cardano-cli latest transaction build \
     --testnet-magic $NETWORK_MAGIC \
-    --tx-in "$(cardano-cli query utxo --address "$(cat "${UTXO_DIR}/utxo${NODE_ID}.addr")" --testnet-magic $NETWORK_MAGIC --out-file /dev/stdout | jq -r 'keys[0]')" \
-    --tx-out "$(cat ${DELEGATORS_DIR}/payment${NODE_ID}.addr)+${AMOUNT_PER_DELEGATOR}" \
-    --change-address "$(cat ${UTXO_DIR}/utxo${NODE_ID}.addr)" \
+    --tx-in "$(cardano-cli query utxo --address "$sourceAddr" --testnet-magic $NETWORK_MAGIC --out-file /dev/stdout | jq -r 'keys[0]')" \
+    --tx-out "${destAddr}+${AMOUNT_PER_DELEGATOR}" \
+    --change-address "$sourceAddr" \
     --out-file "${TRANSACTIONS_DIR}/tx${NODE_ID}.raw"
 
-    cardano-cli latest transaction sign --testnet-magic $NETWORK_MAGIC \
-      --tx-body-file "${TRANSACTIONS_DIR}/tx${NODE_ID}.raw" \
-      --signing-key-file "${UTXO_DIR}/utxo${NODE_ID}.skey" \
-      --out-file "${TRANSACTIONS_DIR}/tx${NODE_ID}.signed"
+  cardano-cli latest transaction sign --testnet-magic $NETWORK_MAGIC \
+    --tx-body-file "${TRANSACTIONS_DIR}/tx${NODE_ID}.raw" \
+    --signing-key-file "${UTXO_DIR}/utxo${NODE_ID}.skey" \
+    --out-file "${TRANSACTIONS_DIR}/tx${NODE_ID}.signed"
 
-    cardano-cli latest transaction submit \
-      --testnet-magic $NETWORK_MAGIC \
-      --tx-file "${TRANSACTIONS_DIR}/tx${NODE_ID}.signed"
+  if [ "$NODE_ID" -eq 1 ]; then
+    # This is the first transaction after startin the network.
+    # It usually takes a long time to be included in a block and often rolled back, so use submit with retry.
+    # Do not use submit with retry for regular transactions because it waits for 5 block confirmations before it returns
+    submitTransactionWithRetry "${TRANSACTIONS_DIR}/tx${NODE_ID}.signed"
+  else
+    cardano-cli latest transaction submit --testnet-magic $NETWORK_MAGIC --tx-file "${TRANSACTIONS_DIR}/tx${NODE_ID}.signed"
+  fi
 done
 
-updatedBalance=$(getAddressBalance "$stakeAddr")
+# Wait for funds to reach destAddr
+for NODE_ID in ${SP_NODES_ID}; do
+  destAddr="$(cat ${DELEGATORS_DIR}/payment${NODE_ID}.addr)"
 
-while [ "$currentBalance" -eq "$updatedBalance" ]; do
-  updatedBalance=$(getAddressBalance "$stakeAddr")
-  sleep 1
+  currentBalance=$(getAddressBalance "$destAddr")
+  while [ "$currentBalance" -lt "$AMOUNT_PER_DELEGATOR" ]; do
+    echo "Waiting for funds to reach ${destAddr} ${currentBalance} < ${AMOUNT_PER_DELEGATOR}"
+    currentBalance=$(getAddressBalance "$destAddr")
+    sleep 1
+  done
 done
 
 sleep 10
@@ -139,24 +196,26 @@ cardano-cli query utxo --whole-utxo --testnet-magic $NETWORK_MAGIC
 
 # REGISTER STAKE ADDRESSES
 
-echo "Registering $(cat "${DELEGATORS_DIR}/payment${NODE_ID}.addr")"
-
 keyDeposit=2000000
 stakeAddr="$(cat "${DELEGATORS_DIR}/payment1.addr")"
 currentBalance=$(getAddressBalance "$stakeAddr")
 
 for NODE_ID in ${SP_NODES_ID}; do
+  stakeAddr=$(cat "${DELEGATORS_DIR}/payment${NODE_ID}.addr")
+  echo "Registering $stakeAddr"
+
   cardano-cli latest stake-address registration-certificate \
     --stake-verification-key-file "${DELEGATORS_DIR}/staking${NODE_ID}.vkey" \
     --key-reg-deposit-amt ${keyDeposit} \
     --out-file "${TRANSACTIONS_DIR}/staking${NODE_ID}reg.cert"
 
   # Wait for utxo to become available
-  txIn="$(cardano-cli latest query utxo --address "$(cat "${DELEGATORS_DIR}/payment${NODE_ID}.addr")" --testnet-magic $NETWORK_MAGIC --out-file /dev/stdout | jq -r 'keys[0]')";
+  txIn="null";
   while [ "$txIn" == "null" ]; do
-    echo "TxIN is null, retrying..."
-    txIn="$(cardano-cli latest query utxo --address "$(cat "${DELEGATORS_DIR}/payment${NODE_ID}.addr")" --testnet-magic $NETWORK_MAGIC --out-file /dev/stdout | jq -r 'keys[0]')";
-    sleep 1
+    echo "Waiting for ${stakeAddr} UTxO..."
+    txInJson="$(cardano-cli latest query utxo --address "$stakeAddr" --testnet-magic $NETWORK_MAGIC --out-file /dev/stdout)";
+    txIn=$(jq -r 'keys[0]' <<< "$txInJson");
+    sleep 0.1
   done
 
   cardano-cli latest transaction build \
@@ -173,9 +232,7 @@ for NODE_ID in ${SP_NODES_ID}; do
     --signing-key-file "${DELEGATORS_DIR}/staking${NODE_ID}.skey" \
     --out-file "${TRANSACTIONS_DIR}/reg-stake-tx${NODE_ID}.signed"
 
-  cardano-cli latest transaction submit \
-    --testnet-magic $NETWORK_MAGIC \
-    --tx-file "${TRANSACTIONS_DIR}/reg-stake-tx${NODE_ID}.signed"
+  cardano-cli latest transaction submit --testnet-magic $NETWORK_MAGIC --tx-file "${TRANSACTIONS_DIR}/reg-stake-tx${NODE_ID}.signed"
 done
 
 updatedBalance=$(getAddressBalance "$stakeAddr")
