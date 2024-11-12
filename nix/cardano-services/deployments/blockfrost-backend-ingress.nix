@@ -8,7 +8,7 @@
   templates.accelerator = lib.mkIf (values.blockfrost-backend.useAccelerator && values.ingress.enabled) {
     apiVersion = "operator.h3poteto.dev/v1alpha1";
     kind = "EndpointGroupBinding";
-    metadata.name = "${config.name}-main";
+    metadata.name = "${config.name}-blockfrost";
     spec = {
       endpointGroupArn = values.acceleratorArn;
       ingressRef.name = "${config.name}-blockfrost";
