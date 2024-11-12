@@ -14,6 +14,7 @@ export interface InputResolverContext {
     available$: Observable<Cardano.Utxo[]>;
   };
   transactions: {
+    history$: Observable<Cardano.HydratedTx[]>;
     outgoing: {
       signed$: Observable<WitnessedTx[]>;
     };
@@ -30,6 +31,7 @@ export type WalletUtilContext = WalletOutputValidatorContext &
 
 export const createInputResolver = ({ utxo, transactions }: InputResolverContext): Cardano.InputResolver => ({
   async resolveInput(input: Cardano.TxIn, options?: Cardano.ResolveOptions) {
+    const txHistory = await firstValueFrom(transactions.history$);
     const utxoAvailable = await firstValueFrom(utxo.available$, { defaultValue: [] });
     const signedTransactions = await firstValueFrom(transactions.outgoing.signed$, { defaultValue: [] });
     const utxoFromSigned = signedTransactions.flatMap(({ tx: signedTx }, signedTxIndex) =>
@@ -63,6 +65,13 @@ export const createInputResolver = ({ utxo, transactions }: InputResolverContext
         return tx.body.outputs[input.index];
       }
     }
+
+    const historyTx = txHistory.findLast((entry) => entry.id === input.txId);
+
+    if (historyTx && historyTx.body.outputs.length > input.index) {
+      return historyTx.body.outputs[input.index];
+    }
+
     return null;
   }
 });
