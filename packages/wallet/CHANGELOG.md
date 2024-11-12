@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.44.17](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.16...@cardano-sdk/wallet@0.44.17) (2024-11-12)
+
+### Features
+
+* **wallet:** input resolver now searches TX history if input cant be found in current UTXO set ([e452da3](https://github.com/input-output-hk/cardano-js-sdk/commit/e452da3f1c6adf290338e258bd3837e4961a5eaa))
+
 ## [0.44.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.15...@cardano-sdk/wallet@0.44.16) (2024-11-11)
 
 ### Bug Fixes

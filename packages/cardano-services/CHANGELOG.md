@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.31.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.31.7...@cardano-sdk/cardano-services@0.31.8) (2024-11-12)
+
+### Bug Fixes
+
+* **cardano-services:** incorrect OpenAPI title ([60290ff](https://github.com/input-output-hk/cardano-js-sdk/commit/60290ffd8d16a63f2a9f82314a23eb5083882395))
+
 ## [0.31.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.31.6...@cardano-sdk/cardano-services@0.31.7) (2024-11-04)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services
