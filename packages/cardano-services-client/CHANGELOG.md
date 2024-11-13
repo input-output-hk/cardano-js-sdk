@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.22.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.21.7...@cardano-sdk/cardano-services-client@0.22.0) (2024-11-13)
+
+### ⚠ BREAKING CHANGES
+
+* hoist BlockfrostAssetProvider to cardano-services-client
+
+### Features
+
+* browser compatible BlockfrostAssetProvider ([de59fcb](https://github.com/input-output-hk/cardano-js-sdk/commit/de59fcb0fc51f5aabf2d94a8facc56a1130535a2))
+
+### Bug Fixes
+
+* **cardano-services-client:** map blockfrost asset metadata files src from array to string ([1dc0169](https://github.com/input-output-hk/cardano-js-sdk/commit/1dc0169e69380852b5260c6ad9fb474bdc98e129))
+* **cardano-services-client:** map nft metadata version to the one specified in metadata ([b5c9f26](https://github.com/input-output-hk/cardano-js-sdk/commit/b5c9f26d5cec47bb1fc2454f98461789b0ac087f))
+
 ## [0.21.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.21.6...@cardano-sdk/cardano-services-client@0.21.7) (2024-11-04)
 
 ### Bug Fixes
