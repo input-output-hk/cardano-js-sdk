@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/Asset/BlockfrostAssetProvider/BlockfrostAssetProvider.ts</title>
+    <title>Code coverage report for src/blockfrost/BlockfrostClient.ts</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../../../prettify.css" />
-    <link rel="stylesheet" href="../../../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../../../favicon.png" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../../../sort-arrow-sprite.png);
+            background-image: url(../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../../index.html">All files</a> / <a href="index.html">src/Asset/BlockfrostAssetProvider</a> BlockfrostAssetProvider.ts</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/blockfrost</a> BlockfrostClient.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">88.88% </span>
+                <span class="strong">89.28% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>32/36</span>
+                <span class='fraction'>25/28</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">85.71% </span>
+                <span class="strong">75% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>12/14</span>
+                <span class='fraction'>6/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">81.81% </span>
+                <span class="strong">87.5% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>9/11</span>
+                <span class='fraction'>7/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.33% </span>
+                <span class="strong">91.66% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>28/30</span>
+                <span class='fraction'>22/24</span>
             </div>
         
             
@@ -147,175 +147,172 @@
 <a name='L82'></a><a href='#L82'>82</a>
 <a name='L83'></a><a href='#L83'>83</a>
 <a name='L84'></a><a href='#L84'>84</a>
-<a name='L85'></a><a href='#L85'>85</a>
-<a name='L86'></a><a href='#L86'>86</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L85'></a><a href='#L85'>85</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/* eslint-disable unicorn/no-nested-ternary */
-import { Asset, AssetProvider, Cardano, GetAssetArgs, GetAssetsArgs } from '@cardano-sdk/core';
-import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
-import { BlockfrostProvider } from '../../util/BlockfrostProvider/BlockfrostProvider';
-import { blockfrostMetadataToTxMetadata, blockfrostToProviderError, fetchSequentially } from '../../util';
-import { replaceNullsWithUndefineds } from '@cardano-sdk/util';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { CustomError } from 'ts-custom-error';
+import { catchError, firstValueFrom, switchMap, throwError } from 'rxjs';
+import { fromFetch } from 'rxjs/fetch';
 &nbsp;
-export class BlockfrostAssetProvider extends BlockfrostProvider implements AssetProvider {
-  protected async getLastMintedTx(assetId: Cardano.AssetId): Promise&lt;Responses['asset_history'][number] | undefined&gt; {
-    const [lastMintedTx] = await fetchSequentially({
-      arg: assetId.toString(),
-      haveEnoughItems: (items: Responses['asset_history']): boolean =&gt; items.length &gt; 0,
-      paginationOptions: { order: 'desc' },
-      request: this.blockfrost.assetsHistory.bind&lt;BlockFrostAPI['assetsHistory']&gt;(this.blockfrost),
-      responseTranslator: (response): Responses['asset_history'] =&gt; response.filter((tx) =&gt; tx.action === 'minted')
-    });
+export type BlockfrostClientConfig = {
+  projectId?: string;
+  baseUrl: string;
+  apiVersion?: string;
+};
 &nbsp;
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (!lastMintedTx) <span class="cstat-no" title="statement not covered" >return undefined;</span>
-    return lastMintedTx;
-  }
+export type RateLimiter = {
+  schedule: &lt;T&gt;(task: () =&gt; Promise&lt;T&gt;) =&gt; Promise&lt;T&gt;;
+};
 &nbsp;
-  protected async getNftMetadata(
-    asset: Pick&lt;Asset.AssetInfo, 'name' | 'policyId'&gt;,
-    lastMintedTxHash: string
-  ): Promise&lt;Asset.NftMetadata | null&gt; {
-    const metadata = await this.blockfrost.txsMetadata(lastMintedTxHash);
-    // Not sure if types are correct, missing 'label', but it's present in docs
+export type BlockfrostClientDependencies = {
+  /**
+   * Rate limiter from npm: https://www.npmjs.com/package/bottleneck
+   *
+   * new Bottleneck({
+   *   reservoir: DEFAULT_BLOCKFROST_RATE_LIMIT_CONFIG.size,
+   *   reservoirIncreaseAmount: DEFAULT_BLOCKFROST_RATE_LIMIT_CONFIG.increaseAmount,
+   *   reservoirIncreaseInterval: DEFAULT_BLOCKFROST_RATE_LIMIT_CONFIG.increaseInterval,
+   *   reservoirIncreaseMaximum: DEFAULT_BLOCKFROST_RATE_LIMIT_CONFIG.size
+   * })
+   */
+  rateLimiter: RateLimiter;
+};
+&nbsp;
+export class BlockfrostError extends CustomError {
+  constructor(public status?: number, public body?: string, public innerError?: unknown) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const metadatumMap = blockfrostMetadataToTxMetadata(metadata as any);
-    return Asset.NftMetadata.fromMetadatum(asset, metadatumMap, console) ?? null;
+    const message: string | null = body || (innerError as any)?.message;
+    super(`Blockfrost error with status '${status}': ${message}`);
+  }
+}
+&nbsp;
+export class BlockfrostClient {
+  private rateLimiter: RateLimiter;
+  private baseUrl: string;
+  private requestInit: RequestInit;
+&nbsp;
+  constructor(
+    { apiVersion, projectId, baseUrl }: BlockfrostClientConfig,
+    { rateLimiter }: BlockfrostClientDependencies
+  ) {
+    this.rateLimiter = rateLimiter;
+    this.requestInit = projectId ? <span class="branch-0 cbranch-no" title="branch not covered" >{ headers: { project_id: projectId } } </span>: {};
+    this.baseUrl = apiVersion ? <span class="branch-0 cbranch-no" title="branch not covered" >`${baseUrl}/api/${apiVersion}` </span>: `${baseUrl}`;
   }
 &nbsp;
-  protected mapMetadata(
-    assetId: Cardano.AssetId,
-    offChain: Responses['asset']['metadata']
-  ): Asset.TokenMetadata | null {
-    const { logo, ...metadata } = { ...offChain };
-&nbsp;
-    if (Object.values(metadata).every((value) =&gt; value === undefined || value === null)) return null;
-&nbsp;
-    return {
-      ...replaceNullsWithUndefineds(metadata),
-      assetId,
-      desc: metadata.description,
-      // The other type option is any[] - not sure what it means, omitting if no string.
-      icon: typeof logo === 'string' ? logo : <span class="branch-1 cbranch-no" title="branch not covered" >undefined</span>
-    };
-  }
-&nbsp;
-  async getAsset({ assetId, extraData }: GetAssetArgs) {
-    try {
-      const response = await this.blockfrost.assetsById(assetId.toString());
-      const name = Cardano.AssetId.getAssetName(assetId);
-      const policyId = Cardano.PolicyId(response.policy_id);
-      const quantity = BigInt(response.quantity);
-&nbsp;
-      const nftMetadata = async () =&gt; {
-        let lastMintedTxHash: string = response.initial_mint_tx_hash;
-        if (response.mint_or_burn_count &gt; 1) {
-          const lastMintedTx = await this.getLastMintedTx(assetId);
-          if (lastMintedTx) lastMintedTxHash = lastMintedTx.tx_hash;
-        }
-        return this.getNftMetadata({ name, policyId }, lastMintedTxHash);
-      };
-&nbsp;
-      return {
-        assetId,
-        fingerprint: Cardano.AssetFingerprint(response.fingerprint),
-        // history: extraData?.history ? await history() : undefined,
-        mintOrBurnCount: response.mint_or_burn_count,
-        name,
-        nftMetadata: extraData?.nftMetadata ? await nftMetadata() : undefined,
-        policyId,
-        quantity,
-        supply: quantity,
-        tokenMetadata: extraData?.tokenMetadata ? this.mapMetadata(assetId, response.metadata) : undefined
-      };
-    } catch (error) {
-<span class="cstat-no" title="statement not covered" >      throw blockfrostToProviderError(error);</span>
-    }
-  }
-<span class="fstat-no" title="function not covered" >  async </span>getAssets({ assetIds, extraData }: GetAssetsArgs) {
-<span class="cstat-no" title="statement not covered" >    return Promise.all(assetIds.map(<span class="fstat-no" title="function not covered" >(a</span>ssetId) =&gt; <span class="cstat-no" title="statement not covered" >this.getAsset({ assetId, extraData }))</span>);</span>
+  /**
+   * @param endpoint e.g. 'blocks/latest'
+   * @throws {BlockfrostError}
+   */
+  public request&lt;T&gt;(endpoint: string): Promise&lt;T&gt; {
+    return this.rateLimiter.schedule(() =&gt;
+      firstValueFrom(
+        fromFetch(`${this.baseUrl}/${endpoint}`, this.requestInit).pipe(
+          switchMap(async (response): Promise&lt;T&gt; =&gt; {
+            if (response.ok) {
+              try {
+                return await response.json();
+              } catch {
+<span class="cstat-no" title="statement not covered" >                throw new BlockfrostError(response.status, 'Failed to parse json');</span>
+              }
+            }
+            try {
+              const body = await response.text();
+              throw new BlockfrostError(response.status, body);
+            } catch {
+              throw new BlockfrostError(response.status);
+            }
+          }),
+          catchError((err) =&gt; {
+            if (err instanceof BlockfrostError) {
+              return throwError(() =&gt; err);
+            }
+<span class="cstat-no" title="statement not covered" >            return throwError(<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >new BlockfrostError(undefined, undefined, err))</span>;</span>
+          })
+        )
+      )
+    );
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -325,16 +322,16 @@ export class BlockfrostAssetProvider extends BlockfrostProvider implements Asset
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-11-12T08:59:03.830Z
+                at 2024-11-13T15:04:14.334Z
             </div>
-        <script src="../../../prettify.js"></script>
+        <script src="../../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../../../sorter.js"></script>
-        <script src="../../../block-navigation.js"></script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
     </body>
 </html>
     
