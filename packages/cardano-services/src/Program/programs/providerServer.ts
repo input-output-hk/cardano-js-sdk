@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/consistent-function-scoping */
 // cSpell:ignore impls
 
 /* eslint-disable complexity */
@@ -13,7 +14,7 @@ import {
   StakePoolProvider,
   UtxoProvider
 } from '@cardano-sdk/core';
-import { CardanoWsClient, TxSubmitApiProvider } from '@cardano-sdk/cardano-services-client';
+import { BlockfrostAssetProvider, CardanoWsClient, TxSubmitApiProvider } from '@cardano-sdk/cardano-services-client';
 import { Logger } from 'ts-log';
 import { Observable } from 'rxjs';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
@@ -26,7 +27,6 @@ import memoize from 'lodash/memoize.js';
 /* eslint-disable sonarjs/cognitive-complexity */
 import {
   AssetHttpService,
-  BlockfrostAssetProvider,
   CardanoTokenRegistry,
   DbSyncAssetProvider,
   DbSyncNftMetadataService,
@@ -39,7 +39,6 @@ import {
   DbSyncChainHistoryProvider
 } from '../../ChainHistory';
 import { BlockfrostNetworkInfoProvider, DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../NetworkInfo';
-import { BlockfrostProvider } from '../../util/BlockfrostProvider/BlockfrostProvider';
 import { BlockfrostRewardsProvider, DbSyncRewardsProvider, RewardsHttpService } from '../../Rewards';
 import { BlockfrostTxSubmitProvider, NodeTxSubmitProvider, TxSubmitHttpService } from '../../TxSubmit';
 import { BlockfrostUtxoProvider, DbSyncUtxoProvider, UtxoHttpService } from '../../Utxo';
@@ -52,7 +51,7 @@ import {
   handlePolicyIdsFromFile,
   suffixType2Cli
 } from '../options';
-import { DbPools, DbSyncEpochPollService, TypeormProvider, getBlockfrostApi } from '../../util';
+import { DbPools, DbSyncEpochPollService, TypeormProvider, getBlockfrostApi, getBlockfrostClient } from '../../util';
 import {
   DbSyncStakePoolProvider,
   StakePoolHttpService,
@@ -106,7 +105,7 @@ const selectProviderImplementation = <T extends Provider>(
   impls: {
     typeorm?: () => T & TypeormProvider;
     dbsync?: () => T & Provider;
-    blockfrost?: () => T & BlockfrostProvider;
+    blockfrost?: () => T;
   },
   logger: Logger,
   service?: ServiceNames
@@ -292,7 +291,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     );
   }, ServiceNames.Asset);
 
-  const getBlockfrostAssetProvider = () => new BlockfrostAssetProvider({ blockfrost: getBlockfrostApi(), logger });
+  const getBlockfrostAssetProvider = () => new BlockfrostAssetProvider(getBlockfrostClient(), logger);
 
   const getBlockfrostUtxoProvider = () => new BlockfrostUtxoProvider({ blockfrost: getBlockfrostApi(), logger });
 

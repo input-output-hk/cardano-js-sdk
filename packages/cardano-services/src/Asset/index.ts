@@ -1,5 +1,4 @@
 export * from './AssetHttpService';
-export * from './BlockfrostAssetProvider';
 export * from './CardanoTokenRegistry';
 export * from './StubTokenMetadataService';
 export * from './DbSyncNftMetadataService';

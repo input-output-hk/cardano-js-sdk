@@ -7,7 +7,8 @@
     "./**/*.ts",
     "../../input-selection/test/util",
     "../../core/test/CardanoNode",
-    "../../ogmios/test/mocks"
+    "../../ogmios/test/mocks",
+    "../../cardano-services-client/test/AssetInfoProvider/BlockfrostAssetProvider.test.ts"
   ],
   "references": [
     {
