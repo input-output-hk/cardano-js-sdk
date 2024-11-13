@@ -36,6 +36,8 @@ import {
   util
 } from '@cardano-sdk/key-management';
 import {
+  BlockfrostAssetProvider,
+  BlockfrostClient,
   CardanoWsClient,
   assetInfoHttpProvider,
   chainHistoryHttpProvider,
@@ -66,6 +68,7 @@ const HTTP_PROVIDER = 'http';
 const OGMIOS_PROVIDER = 'ogmios';
 const STUB_PROVIDER = 'stub';
 const WS_PROVIDER = 'ws';
+const BLOCKFROST_PROVIDER = 'blockfrost';
 
 const MISSING_URL_PARAM = 'Missing URL';
 
@@ -126,6 +129,19 @@ assetProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger)
         baseUrl: params.baseUrl,
         logger
       })
+    );
+  });
+});
+
+assetProviderFactory.register(BLOCKFROST_PROVIDER, async (params: any, logger): Promise<AssetProvider> => {
+  if (params.baseUrl === undefined) throw new Error(`${BlockfrostAssetProvider.name}: ${MISSING_URL_PARAM}`);
+
+  return new Promise<AssetProvider>(async (resolve) => {
+    resolve(
+      new BlockfrostAssetProvider(
+        new BlockfrostClient({ baseUrl: params.baseUrl }, { rateLimiter: { schedule: (task) => task() } }),
+        logger
+      )
     );
   });
 });
