@@ -49,7 +49,7 @@ export class BlockfrostAssetProvider extends BlockfrostProvider implements Asset
           : undefined,
         name,
         otherProperties: this.mapNftMetadataOtherProperties(asset.onchain_metadata),
-        version: '1.0'
+        version: this.mapNftMetadataVersion(asset.onchain_metadata)
       };
     } catch (error) {
       this.logger.warn('Failed to parse nft metadata', asset, error);
@@ -82,6 +82,10 @@ export class BlockfrostAssetProvider extends BlockfrostProvider implements Asset
       return new Map(Object.entries(obj).map(([key, value]) => [key, this.objToMetadatum(value)]));
     }
     return '';
+  }
+
+  private mapNftMetadataVersion(metadata: Responses['asset']['onchain_metadata']) {
+    return typeof metadata?.version === 'string' ? metadata.version : '1.0';
   }
 
   private mapNftMetadataOtherProperties(

@@ -191,5 +191,27 @@ describe('BlockfrostAssetProvider', () => {
 
       expect(response.nftMetadata!.files![0].src).toBe('http://some.png');
     });
+
+    test('version', async () => {
+      mockResponses(request, [
+        [
+          `assets/${mockedAssetId}`,
+          {
+            ...mockedAssetResponse,
+            onchain_metadata: {
+              ...mockedAssetResponse.onchain_metadata,
+              version: '2.0'
+            }
+          }
+        ]
+      ]);
+
+      const response = await provider.getAsset({
+        assetId: mockedAssetId,
+        extraData: { nftMetadata: true }
+      });
+
+      expect(response.nftMetadata!.version).toBe('2.0');
+    });
   });
 });
