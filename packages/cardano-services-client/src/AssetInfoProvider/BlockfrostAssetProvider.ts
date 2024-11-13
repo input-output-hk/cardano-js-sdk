@@ -27,7 +27,7 @@ export class BlockfrostAssetProvider extends BlockfrostProvider implements Asset
               .onchain_metadata!.files.map((file): Asset.NftMetadataFile | null => {
                 const mediaType = file.mediaType as string | undefined;
                 const fileName = file.name as string | undefined;
-                const src = file.src as string | undefined;
+                const src = this.metadatumToString(file.src as string | string[] | undefined);
                 if (!src || !mediaType) return null;
                 try {
                   return {
@@ -36,7 +36,8 @@ export class BlockfrostAssetProvider extends BlockfrostProvider implements Asset
                     otherProperties: this.mapNftMetadataOtherProperties(file),
                     src: Asset.Uri(src)
                   };
-                } catch {
+                } catch (error) {
+                  this.logger.warn('Failed to parse onchain_metadata file', file, error);
                   return null;
                 }
               })
@@ -50,7 +51,8 @@ export class BlockfrostAssetProvider extends BlockfrostProvider implements Asset
         otherProperties: this.mapNftMetadataOtherProperties(asset.onchain_metadata),
         version: '1.0'
       };
-    } catch {
+    } catch (error) {
+      this.logger.warn('Failed to parse nft metadata', asset, error);
       return null;
     }
   }
@@ -130,6 +132,7 @@ export class BlockfrostAssetProvider extends BlockfrostProvider implements Asset
         tokenMetadata: extraData?.tokenMetadata ? this.mapTokenMetadata(assetId, response) : null
       };
     } catch (error) {
+      this.logger.error('getAsset failed', assetId, extraData);
       throw this.toProviderError(error);
     }
   }

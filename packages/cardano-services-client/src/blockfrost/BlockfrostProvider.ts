@@ -26,12 +26,12 @@ const toProviderFailure = (status: number | undefined): ProviderFailure => {
 };
 
 export abstract class BlockfrostProvider implements Provider {
-  #logger: Logger;
+  protected logger: Logger;
   #client: BlockfrostClient;
 
   constructor(client: BlockfrostClient, logger: Logger) {
     this.#client = client;
-    this.#logger = contextLogger(logger, this.constructor.name);
+    this.logger = contextLogger(logger, this.constructor.name);
   }
 
   /**
@@ -40,12 +40,12 @@ export abstract class BlockfrostProvider implements Provider {
    */
   protected async request<T>(endpoint: string): Promise<T> {
     try {
-      this.#logger.debug('request', endpoint);
+      this.logger.debug('request', endpoint);
       const response = await this.#client.request<T>(endpoint);
-      this.#logger.debug('response', response);
+      this.logger.debug('response', response);
       return response;
     } catch (error) {
-      this.#logger.error('error', error);
+      this.logger.error('error', error);
       throw this.toProviderError(error);
     }
   }
