@@ -75,7 +75,7 @@ cardano-cli query protocol-parameters \
   --testnet-magic 888 \
   --out-file pparams.json
 
-cardano-cli conway transaction build \
+cardano-cli latest transaction build \
   --testnet-magic 888 \
   --change-address "$genesisAddr" \
   --tx-in "$utxo" \
@@ -83,13 +83,13 @@ cardano-cli conway transaction build \
   --tx-out-inline-datum-value 42 \
   --out-file tx-script.build
 
-cardano-cli transaction sign \
+cardano-cli latest transaction sign \
   --tx-body-file tx-script.build \
   --signing-key-file network-files/utxo-keys/utxo2.skey \
   --testnet-magic 888 \
   --out-file tx-script.signed
 
-cardano-cli transaction submit --testnet-magic 888 --tx-file tx-script.signed
+cardano-cli latest transaction submit --testnet-magic 888 --tx-file tx-script.signed
 
 updatedBalance=$(getAddressBalance "$REFERENCE_INPUT_ADDR")
 
@@ -107,7 +107,7 @@ currentBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
 
 echo "Locking reference script UTXO (Multisignature)..."
 
-cardano-cli conway transaction build \
+cardano-cli latest transaction build \
   --testnet-magic 888 \
   --change-address "$genesisAddr" \
   --tx-in "$utxo" \
@@ -115,13 +115,13 @@ cardano-cli conway transaction build \
   --tx-out-reference-script-file scripts/contracts/multisignature.json \
   --out-file tx-script.build
 
-cardano-cli transaction sign \
+cardano-cli latest transaction sign \
   --tx-body-file tx-script.build \
   --signing-key-file network-files/utxo-keys/utxo2.skey \
   --testnet-magic 888 \
   --out-file tx-script.signed
 
-cardano-cli transaction submit --testnet-magic 888 --tx-file tx-script.signed
+cardano-cli latest transaction submit --testnet-magic 888 --tx-file tx-script.signed
 
 updatedBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
 
@@ -137,7 +137,7 @@ currentBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
 
 echo "Locking reference script UTXO (Timelock)..."
 
-cardano-cli conway transaction build \
+cardano-cli latest transaction build \
   --testnet-magic 888 \
   --change-address "$genesisAddr" \
   --tx-in "$utxo" \
@@ -145,13 +145,13 @@ cardano-cli conway transaction build \
   --tx-out-reference-script-file scripts/contracts/timelock.json \
   --out-file tx-script.build
 
-cardano-cli transaction sign \
+cardano-cli latest transaction sign \
   --tx-body-file tx-script.build \
   --signing-key-file network-files/utxo-keys/utxo2.skey \
   --testnet-magic 888 \
   --out-file tx-script.signed
 
-cardano-cli transaction submit --testnet-magic 888 --tx-file tx-script.signed
+cardano-cli latest transaction submit --testnet-magic 888 --tx-file tx-script.signed
 
 updatedBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
 
@@ -167,7 +167,7 @@ currentBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
 
 echo "Locking reference script UTXO (Plutus V1)..."
 
-cardano-cli conway transaction build \
+cardano-cli latest transaction build \
   --testnet-magic 888 \
   --change-address "$genesisAddr" \
   --tx-in "$utxo" \
@@ -175,13 +175,13 @@ cardano-cli conway transaction build \
   --tx-out-reference-script-file scripts/contracts/alwayssucceeds.plutus \
   --out-file tx-script.build
 
-cardano-cli transaction sign \
+cardano-cli latest transaction sign \
   --tx-body-file tx-script.build \
   --signing-key-file network-files/utxo-keys/utxo2.skey \
   --testnet-magic 888 \
   --out-file tx-script.signed
 
-cardano-cli transaction submit --testnet-magic 888 --tx-file tx-script.signed
+cardano-cli latest transaction submit --testnet-magic 888 --tx-file tx-script.signed
 
 updatedBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
 
@@ -197,7 +197,7 @@ currentBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
 
 echo "Locking reference script UTXO (Plutus V2)..."
 
-cardano-cli conway transaction build \
+cardano-cli latest transaction build \
   --testnet-magic 888 \
   --change-address "$genesisAddr" \
   --tx-in "$utxo" \
@@ -205,13 +205,13 @@ cardano-cli conway transaction build \
   --tx-out-reference-script-file scripts/contracts/reference-input.plutus \
   --out-file tx-script.build
 
-cardano-cli transaction sign \
+cardano-cli latest transaction sign \
   --tx-body-file tx-script.build \
   --signing-key-file network-files/utxo-keys/utxo2.skey \
   --testnet-magic 888 \
   --out-file tx-script.signed
 
-cardano-cli transaction submit --testnet-magic 888 --tx-file tx-script.signed
+cardano-cli latest transaction submit --testnet-magic 888 --tx-file tx-script.signed
 
 updatedBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
 
@@ -226,7 +226,7 @@ echo "Locking funds in script..."
 utxo=$(awk '{printf("%s", $1)}' <<<"$(getBiggestUtxo "$genesisAddr")")
 currentBalance=$(getAddressBalance "$REFERENCE_INPUT_SCRIPT_ADDR")
 
-cardano-cli conway transaction build \
+cardano-cli latest transaction build \
   --testnet-magic 888 \
   --tx-in "$utxo" \
   --tx-out "$REFERENCE_INPUT_SCRIPT_ADDR"+"$AMOUNT" \
@@ -234,13 +234,13 @@ cardano-cli conway transaction build \
   --change-address "$genesisAddr" \
   --out-file test-babbage.tx
 
-cardano-cli transaction sign \
+cardano-cli latest transaction sign \
   --tx-body-file test-babbage.tx \
   --signing-key-file network-files/utxo-keys/utxo2.skey \
   --testnet-magic 888 \
   --out-file test-babbage.signed
 
-cardano-cli transaction submit --testnet-magic 888 --tx-file test-babbage.signed
+cardano-cli latest transaction submit --testnet-magic 888 --tx-file test-babbage.signed
 
 updatedBalance=$(getAddressBalance "$REFERENCE_INPUT_SCRIPT_ADDR")
 
@@ -259,7 +259,7 @@ scriptUtxo=$(awk '{printf("%s", $1)}' <<<"$(getBiggestUtxo "$REFERENCE_INPUT_SCR
 currentBalance=$(getAddressBalance "$REFERENCE_INPUT_SCRIPT_ADDR")
 returnCollateralVal=$(("$utxoVal" - 1450000))
 
-cardano-cli conway transaction build \
+cardano-cli latest transaction build \
   --testnet-magic 888 \
   --tx-in-collateral "$utxo" \
   --tx-in "$utxo" \
@@ -273,13 +273,13 @@ cardano-cli conway transaction build \
   --tx-total-collateral 1450000 \
   --out-file test-babbage2.tx
 
-cardano-cli transaction sign \
+cardano-cli latest transaction sign \
   --tx-body-file test-babbage2.tx \
   --signing-key-file network-files/utxo-keys/utxo2.skey \
   --testnet-magic 888 \
   --out-file test-babbage2.signed
 
-cardano-cli transaction submit --testnet-magic 888 --tx-file test-babbage2.signed
+cardano-cli latest transaction submit --testnet-magic 888 --tx-file test-babbage2.signed
 
 updatedBalance=$(getAddressBalance "$REFERENCE_INPUT_SCRIPT_ADDR")
 

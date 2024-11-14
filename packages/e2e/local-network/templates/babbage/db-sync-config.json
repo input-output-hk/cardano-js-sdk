@@ -113,6 +113,10 @@
     }
   ],
   "insert_options": {
-    "tx_cbor": "enable"
+    "tx_cbor": "enable",
+    "tx_out": {
+      "value": "consumed",
+      "force_tx_in": true
+    }
   }
 }

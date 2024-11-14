@@ -18,7 +18,7 @@ clean() {
 }
 
 getAddressBalance() {
-  cardano-cli conway query utxo \
+  cardano-cli query utxo \
     --address "$1" \
     --testnet-magic 888 > ${SP_NODE_ID}/fullUtxo.out
 
@@ -53,15 +53,15 @@ updatePool() {
   # Pool metadata hash (only compute it if a metadata url has been given)
   if [ -n "$6" ]; then
     METADATA_URL="$6"
-    METADATA_HASH=$(cardano-cli conway stake-pool metadata-hash --pool-metadata-file <(curl -s -L -k "${METADATA_URL}"))
+    METADATA_HASH=$(cardano-cli latest stake-pool metadata-hash --pool-metadata-file <(curl -s -L -k "${METADATA_URL}"))
   fi
 
   # get the protocol parameters
-  cardano-cli conway query protocol-parameters --testnet-magic 888 --out-file ${SP_NODE_ID}/params.json
+  cardano-cli latest query protocol-parameters --testnet-magic 888 --out-file ${SP_NODE_ID}/params.json
 
   genesisVKey=network-files/utxo-keys/utxo${SP_NODE_ID}.vkey
   genesisSKey=network-files/utxo-keys/utxo${SP_NODE_ID}.skey
-  genesisAddr=$(cardano-cli conway address build --payment-verification-key-file "$genesisVKey" --testnet-magic 888)
+  genesisAddr=$(cardano-cli latest address build --payment-verification-key-file "$genesisVKey" --testnet-magic 888)
 
   stakeVKey=network-files/pools/staking-reward"${SP_NODE_ID}".vkey
   stakeKey=network-files/pools/staking-reward"${SP_NODE_ID}".skey
@@ -75,27 +75,27 @@ updatePool() {
 
   keyDeposit=2000000
 
-  POOL_ID=$(cardano-cli conway stake-pool id --cold-verification-key-file "$coldVKey" --output-format "hex")
+  POOL_ID=$(cardano-cli latest stake-pool id --cold-verification-key-file "$coldVKey" --output-format "hex")
 
   # funding pool owner stake address
-  stakeAddr=$(cardano-cli conway address build --payment-verification-key-file "$genesisVKey" --stake-verification-key-file "$stakeVKey" --testnet-magic 888)
+  stakeAddr=$(cardano-cli latest address build --payment-verification-key-file "$genesisVKey" --stake-verification-key-file "$stakeVKey" --testnet-magic 888)
   currentBalance=$(getAddressBalance "$stakeAddr")
-  utxo=$(cardano-cli conway query utxo --address "$genesisAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
+  utxo=$(cardano-cli query utxo --address "$genesisAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
 
-  cardano-cli conway transaction build \
+  cardano-cli latest transaction build \
     --change-address "$genesisAddr" \
     --tx-in "$utxo" \
     --tx-out "$stakeAddr"+"$POOL_OWNER_STAKE" \
     --testnet-magic 888 \
     --out-file ${SP_NODE_ID}/wallets-tx.raw 2>&1
 
-  cardano-cli conway transaction sign \
+  cardano-cli latest transaction sign \
     --tx-body-file ${SP_NODE_ID}/wallets-tx.raw \
     --signing-key-file "$genesisSKey" \
     --testnet-magic 888 \
     --out-file ${SP_NODE_ID}/wallets-tx.signed 2>&1
 
-  cardano-cli conway transaction submit --testnet-magic 888 --tx-file ${SP_NODE_ID}/wallets-tx.signed 2>&1
+  cardano-cli latest transaction submit --testnet-magic 888 --tx-file ${SP_NODE_ID}/wallets-tx.signed 2>&1
 
   updatedBalance=$(getAddressBalance "$stakeAddr")
 
@@ -106,14 +106,14 @@ updatePool() {
 
   # register pool owner stake address
   currentBalance=$(getAddressBalance "$genesisAddr")
-  cardano-cli conway stake-address registration-certificate \
+  cardano-cli latest stake-address registration-certificate \
     --key-reg-deposit-amt ${keyDeposit} \
     --stake-verification-key-file "$stakeVKey" \
     --out-file ${SP_NODE_ID}/pool-owner-registration.cert
 
-  utxo=$(cardano-cli conway query utxo --address "$genesisAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
+  utxo=$(cardano-cli query utxo --address "$genesisAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
 
-  cardano-cli conway transaction build-raw \
+  cardano-cli latest transaction build-raw \
     --tx-in "$utxo" \
     --tx-out "$genesisAddr"+0 \
     --invalid-hereafter 5000000 \
@@ -121,16 +121,16 @@ updatePool() {
     --out-file ${SP_NODE_ID}/tx.raw \
     --certificate ${SP_NODE_ID}/pool-owner-registration.cert
 
-  refScriptSize=$(cardano-cli conway query ref-script-size \
+  refScriptSize=$(cardano-cli latest query ref-script-size \
     --tx-in "$utxo" \
     --testnet-magic 888 \
     --output-json | jq '.refInputScriptSize')
 
   # Upon applying the fee, the tx size could increase, rendering the fee insuficient
-  # Calculate it twice, once with fee 0, then with the calculated fee, to minimise the 
+  # Calculate it twice, once with fee 0, then with the calculated fee, to minimise the
   # chance that the tx size increases the second time
   for i in {1..2}; do
-    fee=$(cardano-cli conway transaction calculate-min-fee \
+    fee=$(cardano-cli latest transaction calculate-min-fee \
       --reference-script-size $refScriptSize \
       --tx-body-file ${SP_NODE_ID}/tx.raw \
       --tx-in-count 1 \
@@ -143,7 +143,7 @@ updatePool() {
     initialBalance=$(getAddressBalance "$genesisAddr")
     txOut=$((initialBalance - fee - keyDeposit))
 
-    cardano-cli conway transaction build-raw \
+    cardano-cli latest transaction build-raw \
       --tx-in "$utxo" \
       --tx-out "$genesisAddr"+"$txOut" \
       --invalid-hereafter 5000000 \
@@ -152,14 +152,14 @@ updatePool() {
       --out-file ${SP_NODE_ID}/tx.raw
   done
 
-  cardano-cli conway transaction sign \
+  cardano-cli latest transaction sign \
     --tx-body-file ${SP_NODE_ID}/tx.raw \
     --signing-key-file "$genesisSKey" \
     --signing-key-file "$stakeKey" \
     --testnet-magic 888 \
     --out-file ${SP_NODE_ID}/tx.signed
 
-  cardano-cli conway transaction submit \
+  cardano-cli latest transaction submit \
     --tx-file ${SP_NODE_ID}/tx.signed \
     --testnet-magic 888
 
@@ -172,14 +172,14 @@ updatePool() {
 
   # delegating pool owner stake
   currentBalance=$(getAddressBalance "$genesisAddr")
-  cardano-cli conway stake-address stake-delegation-certificate \
+  cardano-cli latest stake-address stake-delegation-certificate \
     --stake-verification-key-file "$stakeVKey" \
     --cold-verification-key-file "$coldVKey" \
     --out-file ${SP_NODE_ID}/pool-owner-delegation.cert
 
-  utxo=$(cardano-cli conway query utxo --address "$genesisAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
+  utxo=$(cardano-cli query utxo --address "$genesisAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
 
-  cardano-cli conway transaction build-raw \
+  cardano-cli latest transaction build-raw \
     --tx-in "$utxo" \
     --tx-out "$genesisAddr"+0 \
     --invalid-hereafter 5000000 \
@@ -187,16 +187,16 @@ updatePool() {
     --out-file ${SP_NODE_ID}/tx.raw \
     --certificate ${SP_NODE_ID}/pool-owner-delegation.cert
 
-  refScriptSize=$(cardano-cli conway query ref-script-size \
+  refScriptSize=$(cardano-cli latest query ref-script-size \
     --tx-in "$utxo" \
     --testnet-magic 888 \
     --output-json | jq '.refInputScriptSize')
-  
+
   # Upon applying the fee, the tx size could increase, rendering the fee insuficient
-  # Calculate it twice, once with fee 0, then with the calculated fee, to minimise the 
+  # Calculate it twice, once with fee 0, then with the calculated fee, to minimise the
   # chance that the tx size increases the second time
   for i in {1..2}; do
-    fee=$(cardano-cli conway transaction calculate-min-fee \
+    fee=$(cardano-cli latest transaction calculate-min-fee \
       --reference-script-size $refScriptSize \
       --tx-body-file ${SP_NODE_ID}/tx.raw \
       --tx-in-count 1 \
@@ -209,7 +209,7 @@ updatePool() {
     initialBalance=$(getAddressBalance "$genesisAddr")
     txOut=$((initialBalance - fee))
 
-    cardano-cli conway transaction build-raw \
+    cardano-cli latest transaction build-raw \
       --tx-in "$utxo" \
       --tx-out "$genesisAddr"+"$txOut" \
       --invalid-hereafter 5000000 \
@@ -218,14 +218,14 @@ updatePool() {
       --out-file ${SP_NODE_ID}/tx.raw
   done
 
-  cardano-cli conway transaction sign \
+  cardano-cli latest transaction sign \
     --tx-body-file ${SP_NODE_ID}/tx.raw \
     --signing-key-file "$genesisSKey" \
     --signing-key-file "$stakeKey" \
     --testnet-magic 888 \
     --out-file ${SP_NODE_ID}/tx.signed
 
-  cardano-cli conway transaction submit \
+  cardano-cli latest transaction submit \
     --tx-file ${SP_NODE_ID}/tx.signed \
     --testnet-magic 888
 
@@ -239,18 +239,18 @@ updatePool() {
   # register delegator stake address
   echo "Registering delegator stake certificate ${SP_NODE_ID}..."
 
-  paymentAddr=$(cardano-cli conway address build --payment-verification-key-file "$delegatorPaymentKey" --stake-verification-key-file "$delegatorStakeKey" --testnet-magic 888)
+  paymentAddr=$(cardano-cli latest address build --payment-verification-key-file "$delegatorPaymentKey" --stake-verification-key-file "$delegatorStakeKey" --testnet-magic 888)
   currentBalance=$(getAddressBalance "$paymentAddr")
 
   # create pool delegation certificate
-  cardano-cli conway stake-address stake-delegation-certificate \
+  cardano-cli latest stake-address stake-delegation-certificate \
     --stake-verification-key-file "$delegatorStakeKey" \
     --stake-pool-id "$POOL_ID" \
     --out-file ${SP_NODE_ID}/deleg.cert
 
-  utxo=$(cardano-cli conway query utxo --address "$paymentAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
+  utxo=$(cardano-cli query utxo --address "$paymentAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
 
-  cardano-cli conway transaction build-raw \
+  cardano-cli latest transaction build-raw \
     --tx-in "$utxo" \
     --tx-out "$paymentAddr"+0 \
     --invalid-hereafter 5000000 \
@@ -258,16 +258,16 @@ updatePool() {
     --out-file ${SP_NODE_ID}/tx.raw \
     --certificate ${SP_NODE_ID}/deleg.cert
 
-  refScriptSize=$(cardano-cli conway query ref-script-size \
+  refScriptSize=$(cardano-cli latest query ref-script-size \
     --tx-in "$utxo" \
     --testnet-magic 888 \
     --output-json | jq '.refInputScriptSize')
 
   # Upon applying the fee, the tx size could increase, rendering the fee insuficient
-  # Calculate it twice, once with fee 0, then with the calculated fee, to minimise the 
+  # Calculate it twice, once with fee 0, then with the calculated fee, to minimise the
   # chance that the tx size increases the second time
   for i in {1..2}; do
-    fee=$(cardano-cli conway transaction calculate-min-fee \
+    fee=$(cardano-cli latest transaction calculate-min-fee \
       --reference-script-size $refScriptSize \
       --tx-body-file ${SP_NODE_ID}/tx.raw \
       --tx-in-count 1 \
@@ -280,7 +280,7 @@ updatePool() {
     initialBalance=$(getAddressBalance "$paymentAddr")
     txOut=$((initialBalance - fee))
 
-    cardano-cli conway transaction build-raw \
+    cardano-cli latest transaction build-raw \
       --tx-in "$utxo" \
       --tx-out "$paymentAddr"+"$txOut" \
       --invalid-hereafter 5000000 \
@@ -289,14 +289,14 @@ updatePool() {
       --out-file ${SP_NODE_ID}/tx.raw
   done
 
-  cardano-cli conway transaction sign \
+  cardano-cli latest transaction sign \
     --tx-body-file ${SP_NODE_ID}/tx.raw \
     --signing-key-file "$delegatorPaymentSKey" \
     --signing-key-file "$delegatorStakeSKey" \
     --testnet-magic 888 \
     --out-file ${SP_NODE_ID}/tx.signed
 
-  cardano-cli conway transaction submit \
+  cardano-cli latest transaction submit \
     --tx-file ${SP_NODE_ID}/tx.signed \
     --testnet-magic 888
 
@@ -313,7 +313,7 @@ updatePool() {
 
   # Only add metadata if given.
   if [ -n "$6" ]; then
-    cardano-cli conway stake-pool registration-certificate \
+    cardano-cli latest stake-pool registration-certificate \
       --cold-verification-key-file "$coldVKey" \
       --vrf-verification-key-file "$vrfKey" \
       --pool-pledge "$POOL_PLEDGE" \
@@ -328,7 +328,7 @@ updatePool() {
       --metadata-hash "${METADATA_HASH}" \
       --out-file ${SP_NODE_ID}/pool.cert
   else
-    cardano-cli conway stake-pool registration-certificate \
+    cardano-cli latest stake-pool registration-certificate \
       --cold-verification-key-file "$coldVKey" \
       --vrf-verification-key-file "$vrfKey" \
       --pool-pledge "$POOL_PLEDGE" \
@@ -342,9 +342,9 @@ updatePool() {
       --out-file ${SP_NODE_ID}/pool.cert
   fi
 
-  utxo=$(cardano-cli conway query utxo --address "$paymentAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
+  utxo=$(cardano-cli query utxo --address "$paymentAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
 
-  cardano-cli conway transaction build-raw \
+  cardano-cli latest transaction build-raw \
     --tx-in "$utxo" \
     --tx-out "$paymentAddr"+"$txOut" \
     --invalid-hereafter 500000 \
@@ -352,16 +352,16 @@ updatePool() {
     --certificate-file ${SP_NODE_ID}/pool.cert \
     --out-file ${SP_NODE_ID}/tx.raw
 
-  refScriptSize=$(cardano-cli conway query ref-script-size \
+  refScriptSize=$(cardano-cli latest query ref-script-size \
     --tx-in "$utxo" \
     --testnet-magic 888 \
     --output-json | jq '.refInputScriptSize')
 
   # Upon applying the fee, the tx size could increase, rendering the fee insuficient
-  # Calculate it twice, once with fee 0, then with the calculated fee, to minimise the 
+  # Calculate it twice, once with fee 0, then with the calculated fee, to minimise the
   # chance that the tx size increases the second time
   for i in {1..2}; do
-    fee=$(cardano-cli conway transaction calculate-min-fee \
+    fee=$(cardano-cli latest transaction calculate-min-fee \
       --reference-script-size $refScriptSize \
       --tx-body-file ${SP_NODE_ID}/tx.raw \
       --tx-in-count 1 \
@@ -374,7 +374,7 @@ updatePool() {
     initialBalance=$(getAddressBalance "$paymentAddr")
     txOut=$((initialBalance - fee))
 
-    cardano-cli conway transaction build-raw \
+    cardano-cli latest transaction build-raw \
       --tx-in "$utxo" \
       --tx-out "$paymentAddr"+"$txOut" \
       --invalid-hereafter 500000 \
@@ -383,7 +383,7 @@ updatePool() {
       --out-file ${SP_NODE_ID}/tx.raw
   done
 
-  cardano-cli conway transaction sign \
+  cardano-cli latest transaction sign \
     --tx-body-file ${SP_NODE_ID}/tx.raw \
     --signing-key-file "$delegatorPaymentSKey" \
     --signing-key-file "$coldKey" \
@@ -391,7 +391,7 @@ updatePool() {
     --testnet-magic 888 \
     --out-file ${SP_NODE_ID}/tx.signed
 
-  cardano-cli conway transaction submit \
+  cardano-cli latest transaction submit \
     --tx-file ${SP_NODE_ID}/tx.signed \
     --testnet-magic 888
 
@@ -416,11 +416,11 @@ deregisterPool() {
   done
 
   # get the protocol parameters
-  cardano-cli conway query protocol-parameters --testnet-magic 888 --out-file ${SP_NODE_ID}/params.json
+  cardano-cli latest query protocol-parameters --testnet-magic 888 --out-file ${SP_NODE_ID}/params.json
 
   genesisVKey=network-files/utxo-keys/utxo${SP_NODE_ID}.vkey
   genesisSKey=network-files/utxo-keys/utxo${SP_NODE_ID}.skey
-  genesisAddr=$(cardano-cli conway address build --payment-verification-key-file "$genesisVKey" --testnet-magic 888)
+  genesisAddr=$(cardano-cli latest address build --payment-verification-key-file "$genesisVKey" --testnet-magic 888)
   stakeKey=network-files/pools/staking-reward"${SP_NODE_ID}".skey
   coldVKey=network-files/pools/cold"${SP_NODE_ID}".vkey
   coldKey=network-files/pools/cold"${SP_NODE_ID}".skey
@@ -432,20 +432,20 @@ deregisterPool() {
   # We are going to redelegate this stake to dbSync can index it properly.
   echo "Registering delegator stake certificate ${SP_NODE_ID}..."
 
-  paymentAddr=$(cardano-cli conway address build --payment-verification-key-file "$delegatorPaymentKey" --stake-verification-key-file "$delegatorStakeKey" --testnet-magic 888)
+  paymentAddr=$(cardano-cli latest address build --payment-verification-key-file "$delegatorPaymentKey" --stake-verification-key-file "$delegatorStakeKey" --testnet-magic 888)
   currentBalance=$(getAddressBalance "$paymentAddr")
 
-  POOL_ID=$(cardano-cli conway stake-pool id --cold-verification-key-file "$coldVKey" --output-format "hex")
+  POOL_ID=$(cardano-cli latest stake-pool id --cold-verification-key-file "$coldVKey" --output-format "hex")
 
   # create pool delegation certificate
-  cardano-cli conway stake-address stake-delegation-certificate \
+  cardano-cli latest stake-address stake-delegation-certificate \
     --stake-verification-key-file "$delegatorStakeKey" \
     --stake-pool-id "$POOL_ID" \
     --out-file ${SP_NODE_ID}/deleg.cert
 
-  utxo=$(cardano-cli conway query utxo --address "$paymentAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
+  utxo=$(cardano-cli query utxo --address "$paymentAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
 
-  cardano-cli conway transaction build-raw \
+  cardano-cli latest transaction build-raw \
     --tx-in "$utxo" \
     --tx-out "$paymentAddr"+0 \
     --invalid-hereafter 5000000 \
@@ -453,16 +453,16 @@ deregisterPool() {
     --out-file ${SP_NODE_ID}/tx.raw \
     --certificate ${SP_NODE_ID}/deleg.cert
 
-  refScriptSize=$(cardano-cli conway query ref-script-size \
+  refScriptSize=$(cardano-cli latest query ref-script-size \
     --tx-in "$utxo" \
     --testnet-magic 888 \
     --output-json | jq '.refInputScriptSize')
 
   # Upon applying the fee, the tx size could increase, rendering the fee insuficient
-  # Calculate it twice, once with fee 0, then with the calculated fee, to minimise the 
+  # Calculate it twice, once with fee 0, then with the calculated fee, to minimise the
   # chance that the tx size increases the second time
   for i in {1..2}; do
-    fee=$(cardano-cli conway transaction calculate-min-fee \
+    fee=$(cardano-cli latest transaction calculate-min-fee \
       --reference-script-size $refScriptSize \
       --tx-body-file ${SP_NODE_ID}/tx.raw \
       --tx-in-count 1 \
@@ -475,7 +475,7 @@ deregisterPool() {
     initialBalance=$(getAddressBalance "$paymentAddr")
     txOut=$((initialBalance - fee))
 
-    cardano-cli conway transaction build-raw \
+    cardano-cli latest transaction build-raw \
       --tx-in "$utxo" \
       --tx-out "$paymentAddr"+"$txOut" \
       --invalid-hereafter 5000000 \
@@ -484,14 +484,14 @@ deregisterPool() {
       --out-file ${SP_NODE_ID}/tx.raw
   done
 
-  cardano-cli conway transaction sign \
+  cardano-cli latest transaction sign \
     --tx-body-file ${SP_NODE_ID}/tx.raw \
     --signing-key-file "$delegatorPaymentSKey" \
     --signing-key-file "$delegatorStakeSKey" \
     --testnet-magic 888 \
     --out-file ${SP_NODE_ID}/tx.signed
 
-  cardano-cli conway transaction submit \
+  cardano-cli latest transaction submit \
     --tx-file ${SP_NODE_ID}/tx.signed \
     --testnet-magic 888
 
@@ -506,14 +506,14 @@ deregisterPool() {
   echo "Deregister stake pool ${SP_NODE_ID}..."
   currentBalance=$(getAddressBalance "$genesisAddr")
 
-  cardano-cli conway stake-pool deregistration-certificate \
+  cardano-cli latest stake-pool deregistration-certificate \
     --cold-verification-key-file "$coldVKey" \
     --epoch "$RETIRING_EPOCH" \
     --out-file ${SP_NODE_ID}/pool.dereg
 
-  utxo=$(cardano-cli conway query utxo --address "$genesisAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
+  utxo=$(cardano-cli query utxo --address "$genesisAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
 
-  cardano-cli conway transaction build-raw \
+  cardano-cli latest transaction build-raw \
     --tx-in "$utxo" \
     --tx-out "$genesisAddr"+0 \
     --invalid-hereafter 500000 \
@@ -521,16 +521,16 @@ deregisterPool() {
     --certificate-file ${SP_NODE_ID}/pool.dereg \
     --out-file ${SP_NODE_ID}/tx.raw
 
-  refScriptSize=$(cardano-cli conway query ref-script-size \
+  refScriptSize=$(cardano-cli latest query ref-script-size \
     --tx-in "$utxo" \
     --testnet-magic 888 \
     --output-json | jq '.refInputScriptSize')
-  
+
   # Upon applying the fee, the tx size could increase, rendering the fee insuficient
-  # Calculate it twice, once with fee 0, then with the calculated fee, to minimise the 
+  # Calculate it twice, once with fee 0, then with the calculated fee, to minimise the
   # chance that the tx size increases the second time
   for i in {1..2}; do
-    fee=$(cardano-cli conway transaction calculate-min-fee \
+    fee=$(cardano-cli latest transaction calculate-min-fee \
       --reference-script-size $refScriptSize \
       --tx-body-file ${SP_NODE_ID}/tx.raw \
       --tx-in-count 1 \
@@ -543,7 +543,7 @@ deregisterPool() {
     initialBalance=$(getAddressBalance "$genesisAddr")
     txOut=$((initialBalance - fee))
 
-    cardano-cli conway transaction build-raw \
+    cardano-cli latest transaction build-raw \
       --tx-in "$utxo" \
       --tx-out "$genesisAddr"+"$txOut" \
       --invalid-hereafter 500000 \
@@ -552,7 +552,7 @@ deregisterPool() {
       --out-file ${SP_NODE_ID}/tx.raw
   done
 
-  cardano-cli conway transaction sign \
+  cardano-cli latest transaction sign \
     --tx-body-file ${SP_NODE_ID}/tx.raw \
     --signing-key-file "$genesisSKey" \
     --signing-key-file "$coldKey" \
@@ -560,7 +560,7 @@ deregisterPool() {
     --testnet-magic 888 \
     --out-file ${SP_NODE_ID}/tx.signed
 
-  cardano-cli conway transaction submit \
+  cardano-cli latest transaction submit \
     --tx-file ${SP_NODE_ID}/tx.signed \
     --testnet-magic 888
 

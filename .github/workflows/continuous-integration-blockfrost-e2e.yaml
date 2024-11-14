@@ -29,10 +29,7 @@ env:
   WS_PROVIDER_URL: 'http://localhost:4100/ws'
 
 on:
-  pull_request:
-  push:
-    branches: ['master']
-    tags: ['*.*.*']
+  workflow_dispatch:
 
 jobs:
   build_and_test:

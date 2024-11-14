@@ -60,6 +60,9 @@ const mapPoolParameters = (poolParameters: Schema.StakePool): Cardano.PoolParame
   };
 };
 
+const mapCredentialType = (credentialOrigin: Schema.CredentialOrigin) =>
+  credentialOrigin === 'verificationKey' ? Cardano.CredentialType.KeyHash : Cardano.CredentialType.ScriptHash;
+
 // TODO: Below certificates must be completed + unit tests
 // eslint-disable-next-line complexity
 const mapCertificate = (certificate: Schema.Certificate): Cardano.Certificate => {
@@ -72,14 +75,14 @@ const mapCertificate = (certificate: Schema.Certificate): Cardano.Certificate =>
             poolId: Cardano.PoolId(certificate.stakePool.id),
             stakeCredential: {
               hash: Crypto.Hash28ByteBase16(certificate.credential),
-              type: Cardano.CredentialType.KeyHash
+              type: mapCredentialType(certificate.from)
             }
           } as Cardano.StakeDelegationCertificate)
         : ({
             __typename: Cardano.CertificateType.VoteDelegation,
             stakeCredential: {
               hash: Crypto.Hash28ByteBase16(certificate.credential),
-              type: Cardano.CredentialType.KeyHash
+              type: mapCredentialType(certificate.from)
             }
             // TODO: Conway `certificate.delegateRepresentative`
           } as Cardano.VoteDelegationCertificate);
@@ -88,7 +91,7 @@ const mapCertificate = (certificate: Schema.Certificate): Cardano.Certificate =>
         __typename: Cardano.CertificateType.StakeRegistration,
         stakeCredential: {
           hash: Crypto.Hash28ByteBase16(certificate.credential),
-          type: Cardano.CredentialType.KeyHash
+          type: mapCredentialType(certificate.from)
         }
         // TODO: Conway `certificate.deposit`
       };
@@ -97,7 +100,7 @@ const mapCertificate = (certificate: Schema.Certificate): Cardano.Certificate =>
         __typename: Cardano.CertificateType.StakeDeregistration,
         stakeCredential: {
           hash: Crypto.Hash28ByteBase16(certificate.credential),
-          type: Cardano.CredentialType.KeyHash
+          type: mapCredentialType(certificate.from)
         }
         // TODO: Conway `certificate.deposit`
       };

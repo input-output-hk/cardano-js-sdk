@@ -191,6 +191,7 @@ export const mockShelleyBlock: Ogmios.Schema.Block = {
       certificates: [
         {
           credential: '968d1021ebd7178e1fb0e79676982825cabc779b653e1234d58ce3c6',
+          from: 'verificationKey',
           type: 'stakeCredentialRegistration'
         },
         {
@@ -218,6 +219,7 @@ export const mockShelleyBlock: Ogmios.Schema.Block = {
         },
         {
           credential: '968d1021ebd7178e1fb0e79676982825cabc779b653e1234d58ce3c6',
+          from: 'verificationKey',
           stakePool: {
             id: 'pool1547tew8vmuj0g6vj3k5jfddudextcw6hsk2hwgg6pkhk7lwphe6'
           },
@@ -225,6 +227,7 @@ export const mockShelleyBlock: Ogmios.Schema.Block = {
         },
         {
           credential: 'f130204b518f70c19995449e3737eded3d9ffc31cb50ec0e45010ba3',
+          from: 'verificationKey',
           type: 'stakeCredentialRegistration'
         },
         {
@@ -252,6 +255,7 @@ export const mockShelleyBlock: Ogmios.Schema.Block = {
         },
         {
           credential: 'f130204b518f70c19995449e3737eded3d9ffc31cb50ec0e45010ba3',
+          from: 'verificationKey',
           stakePool: {
             id: 'pool174mw7e20768e8vj4fn8y6p536n8rkzswsapwtwn354dckpjqzr8'
           },
@@ -259,6 +263,7 @@ export const mockShelleyBlock: Ogmios.Schema.Block = {
         },
         {
           credential: '392ae9e068e55e8b5c27acc58b0bab8ea568c0aae2f6fc49be23a7ad',
+          from: 'verificationKey',
           type: 'stakeCredentialRegistration'
         },
         {
@@ -286,6 +291,7 @@ export const mockShelleyBlock: Ogmios.Schema.Block = {
         },
         {
           credential: '392ae9e068e55e8b5c27acc58b0bab8ea568c0aae2f6fc49be23a7ad',
+          from: 'verificationKey',
           stakePool: {
             id: 'pool1z22x50lqsrwent6en0llzzs9e577rx7n3mv9kfw7udwa2rf42fa'
           },
@@ -565,6 +571,7 @@ export const mockAlonzoBlock: Ogmios.Schema.Block = {
       votes: [
         {
           issuer: {
+            from: 'verificationKey',
             id: '637f2e950b0fd8f8e3e811c5fbeb19e411e7a2bf37272b84b29c1a0b',
             role: 'genesisDelegate'
           },
@@ -572,6 +579,7 @@ export const mockAlonzoBlock: Ogmios.Schema.Block = {
         },
         {
           issuer: {
+            from: 'verificationKey',
             id: '8a4b77c4f534f8b8cc6f269e5ebb7ba77fa63a476e50e05e66d7051c',
             role: 'genesisDelegate'
           },
@@ -579,6 +587,7 @@ export const mockAlonzoBlock: Ogmios.Schema.Block = {
         },
         {
           issuer: {
+            from: 'verificationKey',
             id: 'b00470cd193d67aac47c373602fccd4195aad3002c169b5570de1126',
             role: 'genesisDelegate'
           },
@@ -586,6 +595,7 @@ export const mockAlonzoBlock: Ogmios.Schema.Block = {
         },
         {
           issuer: {
+            from: 'verificationKey',
             id: 'b260ffdb6eba541fcf18601923457307647dce807851b9d19da133ab',
             role: 'genesisDelegate'
           },
@@ -593,6 +603,7 @@ export const mockAlonzoBlock: Ogmios.Schema.Block = {
         },
         {
           issuer: {
+            from: 'verificationKey',
             id: 'ced1599fd821a39593e00592e5292bdc1437ae0f7af388ef5257344a',
             role: 'genesisDelegate'
           },
@@ -600,6 +611,7 @@ export const mockAlonzoBlock: Ogmios.Schema.Block = {
         },
         {
           issuer: {
+            from: 'verificationKey',
             id: 'dd2a7d71a05bed11db61555ba4c658cb1ce06c8024193d064f2a66ae',
             role: 'genesisDelegate'
           },
@@ -607,6 +619,7 @@ export const mockAlonzoBlock: Ogmios.Schema.Block = {
         },
         {
           issuer: {
+            from: 'verificationKey',
             id: 'f3b9e74f7d0f24d2314ea5dfbca94b65b2059d1ff94d97436b82d5b4',
             role: 'genesisDelegate'
           },
@@ -857,6 +870,7 @@ export const mockAllegraBlock: Ogmios.Schema.Block = {
       votes: [
         {
           issuer: {
+            from: 'verificationKey',
             id: '637f2e950b0fd8f8e3e811c5fbeb19e411e7a2bf37272b84b29c1a0b',
             role: 'genesisDelegate'
           },
@@ -864,6 +878,7 @@ export const mockAllegraBlock: Ogmios.Schema.Block = {
         },
         {
           issuer: {
+            from: 'verificationKey',
             id: '8a4b77c4f534f8b8cc6f269e5ebb7ba77fa63a476e50e05e66d7051c',
             role: 'genesisDelegate'
           },
@@ -871,6 +886,7 @@ export const mockAllegraBlock: Ogmios.Schema.Block = {
         },
         {
           issuer: {
+            from: 'verificationKey',
             id: 'b00470cd193d67aac47c373602fccd4195aad3002c169b5570de1126',
             role: 'genesisDelegate'
           },
@@ -878,6 +894,7 @@ export const mockAllegraBlock: Ogmios.Schema.Block = {
         },
         {
           issuer: {
+            from: 'verificationKey',
             id: 'b260ffdb6eba541fcf18601923457307647dce807851b9d19da133ab',
             role: 'genesisDelegate'
           },
@@ -885,6 +902,7 @@ export const mockAllegraBlock: Ogmios.Schema.Block = {
         },
         {
           issuer: {
+            from: 'verificationKey',
             id: 'ced1599fd821a39593e00592e5292bdc1437ae0f7af388ef5257344a',
             role: 'genesisDelegate'
           },
@@ -892,6 +910,7 @@ export const mockAllegraBlock: Ogmios.Schema.Block = {
         },
         {
           issuer: {
+            from: 'verificationKey',
             id: 'dd2a7d71a05bed11db61555ba4c658cb1ce06c8024193d064f2a66ae',
             role: 'genesisDelegate'
           },
@@ -899,6 +918,7 @@ export const mockAllegraBlock: Ogmios.Schema.Block = {
         },
         {
           issuer: {
+            from: 'verificationKey',
             id: 'f3b9e74f7d0f24d2314ea5dfbca94b65b2059d1ff94d97436b82d5b4',
             role: 'genesisDelegate'
           },
@@ -1086,6 +1106,7 @@ export const mockMaryBlock: Ogmios.Schema.Block = {
       votes: [
         {
           issuer: {
+            from: 'verificationKey',
             id: '637f2e950b0fd8f8e3e811c5fbeb19e411e7a2bf37272b84b29c1a0b',
             role: 'genesisDelegate'
           },
@@ -1093,6 +1114,7 @@ export const mockMaryBlock: Ogmios.Schema.Block = {
         },
         {
           issuer: {
+            from: 'verificationKey',
             id: '8a4b77c4f534f8b8cc6f269e5ebb7ba77fa63a476e50e05e66d7051c',
             role: 'genesisDelegate'
           },
@@ -1100,6 +1122,7 @@ export const mockMaryBlock: Ogmios.Schema.Block = {
         },
         {
           issuer: {
+            from: 'verificationKey',
             id: 'b00470cd193d67aac47c373602fccd4195aad3002c169b5570de1126',
             role: 'genesisDelegate'
           },
@@ -1107,6 +1130,7 @@ export const mockMaryBlock: Ogmios.Schema.Block = {
         },
         {
           issuer: {
+            from: 'verificationKey',
             id: 'b260ffdb6eba541fcf18601923457307647dce807851b9d19da133ab',
             role: 'genesisDelegate'
           },
@@ -1114,6 +1138,7 @@ export const mockMaryBlock: Ogmios.Schema.Block = {
         },
         {
           issuer: {
+            from: 'verificationKey',
             id: 'ced1599fd821a39593e00592e5292bdc1437ae0f7af388ef5257344a',
             role: 'genesisDelegate'
           },
@@ -1121,6 +1146,7 @@ export const mockMaryBlock: Ogmios.Schema.Block = {
         },
         {
           issuer: {
+            from: 'verificationKey',
             id: 'dd2a7d71a05bed11db61555ba4c658cb1ce06c8024193d064f2a66ae',
             role: 'genesisDelegate'
           },
@@ -1128,6 +1154,7 @@ export const mockMaryBlock: Ogmios.Schema.Block = {
         },
         {
           issuer: {
+            from: 'verificationKey',
             id: 'f3b9e74f7d0f24d2314ea5dfbca94b65b2059d1ff94d97436b82d5b4',
             role: 'genesisDelegate'
           },
@@ -1178,6 +1205,7 @@ export const mockBabbageBlock: Ogmios.Schema.Block = {
       certificates: [
         {
           credential: 'c568341dc347876c1c79e07de3e76265560bca4bb9e6af9f36e40923',
+          from: 'verificationKey',
           type: 'stakeCredentialDeregistration'
         }
       ],
@@ -1691,6 +1719,7 @@ export const mockBabbageBlockWithNftMetadata: Ogmios.Schema.Block = {
       certificates: [
         {
           credential: '92a4e1a62625324b8099bfc57ac707a9ebdcfa7ee953f96b7e0d6757',
+          from: 'verificationKey',
           type: 'stakeCredentialRegistration'
         }
       ],

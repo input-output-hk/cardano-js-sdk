@@ -37,7 +37,7 @@ walletAddr5="addr_test1qr0c3frkem9cqn5f73dnvqpena27k2fgqew6wct9eaka03agfwkvzr0zy
 # Spend the first UTxO
 utxo=$(cardano-cli query utxo --address "$genesisAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
 
-cardano-cli conway transaction build \
+cardano-cli latest transaction build \
   --change-address "$genesisAddr" \
   --tx-in "$utxo" \
   --tx-out "$walletAddr1"+"$AMOUNT_PER_WALLET" \
@@ -48,11 +48,11 @@ cardano-cli conway transaction build \
   --testnet-magic 888 \
   --out-file wallets-tx.raw
 
-cardano-cli transaction sign \
+cardano-cli latest transaction sign \
   --tx-body-file wallets-tx.raw \
   --signing-key-file network-files/utxo-keys/utxo3.skey \
   --testnet-magic 888 \
   --out-file wallets-tx.signed
 
-cardano-cli transaction submit --testnet-magic 888 --tx-file wallets-tx.signed
+cardano-cli latest transaction submit --testnet-magic 888 --tx-file wallets-tx.signed
 wait_tx_complete $utxo
