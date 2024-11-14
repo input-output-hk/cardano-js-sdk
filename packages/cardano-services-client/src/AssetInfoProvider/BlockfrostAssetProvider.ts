@@ -33,7 +33,7 @@ export class BlockfrostAssetProvider extends BlockfrostProvider implements Asset
                   return {
                     mediaType: Asset.MediaType(mediaType),
                     name: fileName,
-                    otherProperties: this.mapNftMetadataOtherProperties(file),
+                    otherProperties: this.mapFileMetadataOtherProperties(file),
                     src: Asset.Uri(src)
                   };
                 } catch (error) {
@@ -88,15 +88,26 @@ export class BlockfrostAssetProvider extends BlockfrostProvider implements Asset
     return typeof metadata?.version === 'string' ? metadata.version : '1.0';
   }
 
+  private mapFileMetadataOtherProperties(
+    metadata: Responses['asset']['onchain_metadata']
+  ): Map<string, Cardano.Metadatum> | undefined {
+    return this.mapOtherProperties(metadata, ['name', 'mediaType', 'src']);
+  }
+
   private mapNftMetadataOtherProperties(
     metadata: Responses['asset']['onchain_metadata']
+  ): Map<string, Cardano.Metadatum> | undefined {
+    return this.mapOtherProperties(metadata, ['name', 'image', 'description', 'mediaType', 'files', 'version']);
+  }
+
+  private mapOtherProperties(
+    metadata: Responses['asset']['onchain_metadata'],
+    mainProperties: string[]
   ): Map<string, Cardano.Metadatum> | undefined {
     if (!metadata) {
       return;
     }
-    const otherProperties = Object.entries(
-      omit(metadata, ['name', 'image', 'description', 'mediaType', 'files', 'version'])
-    );
+    const otherProperties = Object.entries(omit(metadata, mainProperties));
     if (otherProperties.length === 0) return;
     // eslint-disable-next-line consistent-return
     return new Map(otherProperties.map(([key, value]) => [key, this.objToMetadatum(value)]));

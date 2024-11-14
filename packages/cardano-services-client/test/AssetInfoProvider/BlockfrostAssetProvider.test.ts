@@ -178,7 +178,7 @@ describe('BlockfrostAssetProvider', () => {
             ...mockedAssetResponse,
             onchain_metadata: {
               ...mockedAssetResponse.onchain_metadata,
-              files: [{ mediaType: 'image/png', src: ['http://', 'some.png'] }]
+              files: [{ image: 'should be in other properties', mediaType: 'image/png', src: ['http://', 'some.png'] }]
             }
           }
         ]
@@ -190,6 +190,7 @@ describe('BlockfrostAssetProvider', () => {
       });
 
       expect(response.nftMetadata!.files![0].src).toBe('http://some.png');
+      expect(response.nftMetadata!.files![0].otherProperties?.get('image')).toBe('should be in other properties');
     });
 
     test('version', async () => {
