@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">74.6% </span>
+                <span class="strong">66.15% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>47/63</span>
+                <span class='fraction'>43/65</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">82.22% </span>
+                <span class="strong">77.77% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>37/45</span>
+                <span class='fraction'>35/45</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">81.25% </span>
+                <span class="strong">77.77% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>13/16</span>
+                <span class='fraction'>14/18</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">80.39% </span>
+                <span class="strong">71.69% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>41/51</span>
+                <span class='fraction'>38/53</span>
             </div>
         
             
@@ -210,7 +210,18 @@
 <a name='L145'></a><a href='#L145'>145</a>
 <a name='L146'></a><a href='#L146'>146</a>
 <a name='L147'></a><a href='#L147'>147</a>
-<a name='L148'></a><a href='#L148'>148</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">11x</span>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -284,12 +295,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -303,12 +314,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -392,7 +414,7 @@ export class BlockfrostAssetProvider extends BlockfrostProvider implements Asset
                   return {
                     mediaType: Asset.MediaType(mediaType),
                     name: fileName,
-                    otherProperties: this.mapNftMetadataOtherProperties(file),
+                    otherProperties: this.mapFileMetadataOtherProperties(file),
                     src: Asset.Uri(src)
                   };
                 } catch (error) {
@@ -432,11 +454,11 @@ export class BlockfrostAssetProvider extends BlockfrostProvider implements Asset
 &nbsp;
   private objToMetadatum(obj: unknown): Cardano.Metadatum {
     if (typeof obj === 'string') return obj;
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (typeof obj === 'number') <span class="cstat-no" title="statement not covered" >return BigInt(obj);</span>
-    if (typeof obj === 'object') {
-      <span class="missing-if-branch" title="if path not taken" >I</span>if (obj === null) <span class="cstat-no" title="statement not covered" >return '';</span>
-      if (Array.isArray(obj)) {
-        return obj.map((item) =&gt; this.objToMetadatum(item));
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (typeof obj === 'number') <span class="cstat-no" title="statement not covered" >return BigInt(obj);</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (typeof obj === 'object') {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (obj === null) <span class="cstat-no" title="statement not covered" >return '';</span></span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (Array.isArray(obj)) {</span>
+<span class="cstat-no" title="statement not covered" >        return obj.map(<span class="fstat-no" title="function not covered" >(i</span>tem) =&gt; <span class="cstat-no" title="statement not covered" >this.objToMetadatum(item))</span>;</span>
       }
 <span class="cstat-no" title="statement not covered" >      return new Map(Object.entries(obj).map(<span class="fstat-no" title="function not covered" >([</span>key, value]) =&gt; <span class="cstat-no" title="statement not covered" >[key, this.objToMetadatum(value)])</span>);</span>
     }
@@ -447,15 +469,26 @@ export class BlockfrostAssetProvider extends BlockfrostProvider implements Asset
     return typeof metadata?.version === 'string' ? metadata.version : '1.0';
   }
 &nbsp;
+  private mapFileMetadataOtherProperties(
+    metadata: Responses['asset']['onchain_metadata']
+  ): Map&lt;string, Cardano.Metadatum&gt; | undefined {
+    return this.mapOtherProperties(metadata, ['name', 'mediaType', 'src']);
+  }
+&nbsp;
   private mapNftMetadataOtherProperties(
     metadata: Responses['asset']['onchain_metadata']
+  ): Map&lt;string, Cardano.Metadatum&gt; | undefined {
+    return this.mapOtherProperties(metadata, ['name', 'image', 'description', 'mediaType', 'files', 'version']);
+  }
+&nbsp;
+  private mapOtherProperties(
+    metadata: Responses['asset']['onchain_metadata'],
+    mainProperties: string[]
   ): Map&lt;string, Cardano.Metadatum&gt; | undefined {
     <span class="missing-if-branch" title="if path not taken" >I</span>if (!metadata) {
 <span class="cstat-no" title="statement not covered" >      return;</span>
     }
-    const otherProperties = Object.entries(
-      omit(metadata, ['name', 'image', 'description', 'mediaType', 'files', 'version'])
-    );
+    const otherProperties = Object.entries(omit(metadata, mainProperties));
     if (otherProperties.length === 0) return;
     // eslint-disable-next-line consistent-return
     return new Map(otherProperties.map(([key, value]) =&gt; [key, this.objToMetadatum(value)]));
@@ -511,7 +544,7 @@ export class BlockfrostAssetProvider extends BlockfrostProvider implements Asset
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-11-14T09:05:59.851Z
+                at 2024-11-15T12:49:31.923Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
