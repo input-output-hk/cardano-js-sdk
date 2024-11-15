@@ -10,26 +10,29 @@ env:
   OGMIOS_URL: 'ws://localhost:1340/'
   STAKE_POOL_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/stake_pool'
   STAKE_POOL_TEST_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/stake_pool_test'
-  TEST_CLIENT_ASSET_PROVIDER: 'http'
-  TEST_CLIENT_ASSET_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4014/"}'
-  TEST_CLIENT_CHAIN_HISTORY_PROVIDER: 'http'
-  TEST_CLIENT_CHAIN_HISTORY_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4001/"}'
+  TEST_CLIENT_ASSET_PROVIDER: 'blockfrost'
+  TEST_CLIENT_ASSET_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:3015"}'
+  TEST_CLIENT_CHAIN_HISTORY_PROVIDER: 'ws'
+  TEST_CLIENT_CHAIN_HISTORY_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
   TEST_CLIENT_HANDLE_PROVIDER: 'http'
   TEST_CLIENT_HANDLE_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4011/"}'
   TEST_CLIENT_NETWORK_INFO_PROVIDER: 'ws'
   TEST_CLIENT_NETWORK_INFO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
   TEST_CLIENT_REWARDS_PROVIDER: 'http'
-  TEST_CLIENT_REWARDS_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4001/"}'
+  TEST_CLIENT_REWARDS_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
   TEST_CLIENT_TX_SUBMIT_PROVIDER: 'http'
   TEST_CLIENT_TX_SUBMIT_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
-  TEST_CLIENT_UTXO_PROVIDER: 'http'
-  TEST_CLIENT_UTXO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4001/"}'
+  TEST_CLIENT_UTXO_PROVIDER: 'ws'
+  TEST_CLIENT_UTXO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
   TEST_CLIENT_STAKE_POOL_PROVIDER: 'http'
   TEST_CLIENT_STAKE_POOL_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/"}'
   WS_PROVIDER_URL: 'http://localhost:4100/ws'
 
 on:
-  workflow_dispatch:
+  pull_request:
+  push:
+    branches: ['master']
+    tags: ['*.*.*']
 
 jobs:
   build_and_test:
