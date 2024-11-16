@@ -79,6 +79,7 @@ const providerParams = makeValidator((value) => {
 const validators = {
   ADDRESS_DISCOVERY: str({ default: 'HDSequentialDiscovery' }),
   ARRIVAL_PHASE_DURATION_IN_SECS: num(),
+  BLOCKFROST_API_KEY: str(),
   DB_SYNC_CONNECTION_STRING: str({ default: undefined }),
   KEY_MANAGEMENT_PARAMS: keyManagementParams(),
   KEY_MANAGEMENT_PROVIDER: str(),

@@ -61,6 +61,9 @@ export abstract class BlockfrostProvider implements Provider {
   }
 
   protected toProviderError(error: unknown): ProviderError {
+    if (error instanceof ProviderError) {
+      return error;
+    }
     if (error instanceof BlockfrostError) {
       return new ProviderError(toProviderFailure(error.status), error);
     }

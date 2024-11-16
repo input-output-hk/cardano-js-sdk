@@ -1,5 +1,6 @@
-import { BlockfrostProvider } from '../../util/BlockfrostProvider/BlockfrostProvider';
-import { BlockfrostToCore, blockfrostToProviderError } from '../../util';
+import { BlockfrostClient } from '../blockfrost/BlockfrostClient';
+import { BlockfrostProvider } from '../blockfrost/BlockfrostProvider';
+import { BlockfrostToCore } from '../blockfrost';
 import {
   Cardano,
   EraSummary,
@@ -9,55 +10,59 @@ import {
   StakeSummary,
   SupplySummary
 } from '@cardano-sdk/core';
-import { Schemas } from '@blockfrost/blockfrost-js/lib/types/open-api';
-import { handleError } from '@blockfrost/blockfrost-js/lib/utils/errors';
+import { Logger } from 'ts-log';
+import type { Responses } from '@blockfrost/blockfrost-js';
+import type { Schemas } from '@blockfrost/blockfrost-js/lib/types/open-api';
 
 export class BlockfrostNetworkInfoProvider extends BlockfrostProvider implements NetworkInfoProvider {
+  constructor(client: BlockfrostClient, logger: Logger) {
+    super(client, logger);
+  }
+
   public async stake(): Promise<StakeSummary> {
     try {
-      const network = await this.blockfrost.network();
+      const { stake } = await this.request<Responses['network']>('network');
       return {
-        active: BigInt(network.stake.active),
-        live: BigInt(network.stake.live)
+        active: BigInt(stake.active),
+        live: BigInt(stake.live)
       };
     } catch (error) {
-      throw blockfrostToProviderError(error);
+      throw this.toProviderError(error);
     }
   }
 
   public async lovelaceSupply(): Promise<SupplySummary> {
     try {
-      const { supply } = await this.blockfrost.network();
+      const { supply } = await this.request<Responses['network']>('network');
       return {
         circulating: BigInt(supply.circulating),
         total: BigInt(supply.total)
       };
     } catch (error) {
-      throw blockfrostToProviderError(error);
+      throw this.toProviderError(error);
     }
   }
 
   public async ledgerTip(): Promise<Cardano.Tip> {
     try {
-      const block = await this.blockfrost.blocksLatest();
+      const block = await this.request<Responses['block_content']>('blocks/latest');
       return BlockfrostToCore.blockToTip(block);
     } catch (error) {
-      throw blockfrostToProviderError(error);
+      throw this.toProviderError(error);
     }
   }
 
   public async protocolParameters(): Promise<Cardano.ProtocolParameters> {
     try {
-      const response = await this.blockfrost.epochsLatestParameters();
+      const response = await this.request<Responses['epoch_param_content']>('epochs/latest/parameters');
       return BlockfrostToCore.protocolParameters(response);
     } catch (error) {
-      throw blockfrostToProviderError(error);
+      throw this.toProviderError(error);
     }
   }
 
   public async genesisParameters(): Promise<Cardano.CompactGenesis> {
-    return this.blockfrost
-      .genesis()
+    return this.request<Responses['genesis_content']>('genesis')
       .then((response) => ({
         activeSlotsCoefficient: response.active_slots_coefficient,
         epochLength: response.epoch_length,
@@ -75,18 +80,15 @@ export class BlockfrostNetworkInfoProvider extends BlockfrostProvider implements
         updateQuorum: response.update_quorum
       }))
       .catch((error) => {
-        throw blockfrostToProviderError(error);
+        throw this.toProviderError(error);
       });
   }
 
   protected async fetchEraSummaries(): Promise<Schemas['network-eras']> {
     try {
-      // Although Blockfrost have the endpoint, the blockfrost-js library don't have a call for it
-      // https://github.com/blockfrost/blockfrost-js/issues/294
-      const response = await this.blockfrost.instance<Schemas['network-eras']>('network/eras');
-      return response.body;
+      return await this.request<Responses['network-eras']>('network/eras');
     } catch (error) {
-      throw handleError(error);
+      throw this.toProviderError(error);
     }
   }
 
@@ -103,7 +105,7 @@ export class BlockfrostNetworkInfoProvider extends BlockfrostProvider implements
         }
       }));
     } catch (error) {
-      throw handleError(error);
+      throw this.toProviderError(error);
     }
   }
 
@@ -113,7 +115,7 @@ export class BlockfrostNetworkInfoProvider extends BlockfrostProvider implements
       const summaries = await this.fetchEraSummaries();
       return this.parseEraSummaries(summaries, systemStart);
     } catch (error) {
-      throw blockfrostToProviderError(error);
+      throw this.toProviderError(error);
     }
   }
 }

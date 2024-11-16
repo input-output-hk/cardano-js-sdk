@@ -1,12 +1,14 @@
-import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
-import { BlockfrostChainHistoryProvider } from '../../../src';
+import { BlockfrostChainHistoryProvider, BlockfrostClient } from '../../src';
 import { Cardano, NetworkInfoProvider } from '@cardano-sdk/core';
 import { dummyLogger as logger } from 'ts-log';
+import { mockResponses } from '../util';
 
 jest.mock('@blockfrost/blockfrost-js');
 
 describe('blockfrostChainHistoryProvider', () => {
-  const apiKey = 'someapikey';
+  let request: jest.Mock;
+  let provider: BlockfrostChainHistoryProvider;
+  let networkInfoProvider: NetworkInfoProvider;
 
   const txsUtxosResponse = {
     hash: '4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6',
@@ -335,42 +337,44 @@ describe('blockfrostChainHistoryProvider', () => {
     }
   } as Cardano.HydratedTx;
 
-  const mockedNetworkInfoProvider = {
-    eraSummaries: jest.fn().mockResolvedValue([
-      {
-        end: { slot: 100, time: new Date(1_506_203_092_000) },
-        parameters: { epochLength: 100, safeZone: 0, slotLength: 1 },
-        start: { slot: 0, time: new Date(1_506_203_091_000) }
-      }
-    ])
-  } as unknown as NetworkInfoProvider;
+  beforeEach(() => {
+    request = jest.fn();
+    const client = { request } as unknown as BlockfrostClient;
+    networkInfoProvider = {
+      eraSummaries: jest.fn().mockResolvedValue([
+        {
+          end: { slot: 100, time: new Date(1_506_203_092_000) },
+          parameters: { epochLength: 100, safeZone: 0, slotLength: 1 },
+          start: { slot: 0, time: new Date(1_506_203_091_000) }
+        }
+      ])
+    } as unknown as NetworkInfoProvider;
+    provider = new BlockfrostChainHistoryProvider(client, networkInfoProvider, logger);
+    const txId = Cardano.TransactionId('1e043f100dce12d107f679685acd2fc0610e10f72a92d412794c9773d11d8477');
+    const id = txId.toString();
+    mockResponses(request, [
+      [`txs/${id}/utxos`, txsUtxosResponse],
+      [`txs/${id}`, mockedTxResponse],
+      [`txs/${id}/metadata`, mockedMetadataResponse],
+      [`txs/${id}/mirs`, mockedMirResponse],
+      [`txs/${id}/pool_updates`, mockedPoolUpdateResponse],
+      [`txs/${id}/pool_retires`, mockedPoolRetireResponse],
+      [`txs/${id}/stakes`, mockedStakeResponse],
+      [`txs/${id}/delegations`, mockedDelegationResponse],
+      [`txs/${id}/withdrawals`, mockedWithdrawalResponse],
+      [`txs/${id}/redeemers`, mockedReedemerResponse],
+      [
+        `addresses/${Cardano.PaymentAddress(
+          '2cWKMJemoBai9J7kVvRTukMmdfxtjL9z7c396rTfrrzfAZ6EeQoKLC2y1k34hswwm4SVr'
+        ).toString()}/transactions?page=1&count=100`,
+        mockedAddressTransactionResponse
+      ],
+      ['epochs/420000/parameters', mockedEpochParametersResponse],
+      [`txs/${id}/cbor`, new Error('CBOR is null')]
+    ]);
+  });
 
   describe('transactionsBy*', () => {
-    let blockfrost: BlockFrostAPI;
-    let provider: BlockfrostChainHistoryProvider;
-    beforeEach(() => {
-      BlockFrostAPI.prototype.txsUtxos = jest.fn().mockResolvedValue(txsUtxosResponse);
-      BlockFrostAPI.prototype.txs = jest.fn().mockResolvedValue(mockedTxResponse);
-      BlockFrostAPI.prototype.txsMetadata = jest.fn().mockResolvedValue(mockedMetadataResponse);
-      BlockFrostAPI.prototype.txsMirs = jest.fn().mockResolvedValue(mockedMirResponse);
-      BlockFrostAPI.prototype.txsPoolUpdates = jest.fn().mockResolvedValue(mockedPoolUpdateResponse);
-      BlockFrostAPI.prototype.txsPoolRetires = jest.fn().mockResolvedValue(mockedPoolRetireResponse);
-      BlockFrostAPI.prototype.txsStakes = jest.fn().mockResolvedValue(mockedStakeResponse);
-      BlockFrostAPI.prototype.txsDelegations = jest.fn().mockResolvedValue(mockedDelegationResponse);
-      BlockFrostAPI.prototype.txsWithdrawals = jest.fn().mockResolvedValue(mockedWithdrawalResponse);
-      BlockFrostAPI.prototype.txsRedeemers = jest.fn().mockResolvedValue(mockedReedemerResponse);
-      BlockFrostAPI.prototype.addressesTransactions = jest.fn().mockResolvedValue(mockedAddressTransactionResponse);
-      BlockFrostAPI.prototype.epochsParameters = jest.fn().mockResolvedValue(mockedEpochParametersResponse);
-
-      blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
-
-      provider = new BlockfrostChainHistoryProvider({
-        blockfrost,
-        logger,
-        networkInfoProvider: mockedNetworkInfoProvider
-      });
-      provider.fetchCBOR = jest.fn().mockRejectedValue('CBOR is null');
-    });
     describe('transactionsByAddresses', () => {
       test('converts responses correctly', async () => {
         const response = await provider.transactionsByAddresses({
@@ -395,6 +399,9 @@ describe('blockfrostChainHistoryProvider', () => {
     });
   });
   describe('transactionsBy* with CBOR', () => {
+    const mockedCborResponse = {
+      cbor: '84a90082825820262e95982cfe9fbc565a0e9a5343d323be8e08e51de23a5262b75ce6984179a900825820262e95982cfe9fbc565a0e9a5343d323be8e08e51de23a5262b75ce6984179a9010d81825820262e95982cfe9fbc565a0e9a5343d323be8e08e51de23a5262b75ce6984179a90112818258205de304d9c8884dd62ad8535d529e3d8fd5f212cc3c0c39410e4f3bccfca6e46b010182a300581d7039a4c3afe97b4c2d3385fefd5206d1865c74786b7ce955ebb6532e7a01821a001b9f18a1581cdab1406f1c769fbdb00514c494eed47a54c7ffc5d7aafc524cca069aa14d446a65644f7261636c654e465401028201d81858a6d8799f58404fe28ad1e94e742a6c79eb8f7cc44128965579792e4b5be940bfa61c3797914970fe2055016c2b7c3bbd9de43194e82b22a4ccdbee80b4099f73a304d9550707d8799fd8799f1a000f42401a00053dc9ffd8799fd8799fd87a9f1b00000192515efa80ffd87a80ffd8799fd87a9f1b00000192516cb620ffd87a80ffff43555344ff581cdab1406f1c769fbdb00514c494eed47a54c7ffc5d7aafc524cca069aff82583900f0a26fc170ad82b64a3d43dede08e78ea6e2028b5101058d0263a80a4c0ec23eba3aa27a4b8d61107f59f3e0d24b7bb6d7ae1a4bbd689c8d1abe8373ea021a0003ff5f031a044e9894081a044e95100e81581cf0a26fc170ad82b64a3d43dede08e78ea6e2028b5101058d0263a80a0b58205b3d8c3bc5032e4d2dbe3c07d23d7fb5133f4ec7466e73744317cebe2ed12610a200818258205401b7f67442e6cc870fbcffe921d24ab03e97e03bb655a24b4f424fd832c61558405bddd2f0d88e254ef1f0a84276aaadea4df3b05f8c441d9774b6a8d1c2556437a79e5131ea4475169d45e6e02bb3b31cd93216c5499e2c316aa68e485d6800000581840000d87980821a0006a7f41a0ab2d5a5f5f6'
+    };
     const expectedHydratedTxCBOR = {
       auxiliaryData: undefined,
       blockHeader: {
@@ -468,35 +475,32 @@ describe('blockfrostChainHistoryProvider', () => {
         signatures: new Map()
       }
     } as Cardano.HydratedTx;
-    let blockfrost: BlockFrostAPI;
-    let provider: BlockfrostChainHistoryProvider;
+
     beforeEach(() => {
-      BlockFrostAPI.prototype.txsUtxos = jest.fn().mockResolvedValue(txsUtxosResponse);
-      BlockFrostAPI.prototype.txs = jest.fn().mockResolvedValue(mockedTxResponse);
-      BlockFrostAPI.prototype.txsMetadata = jest.fn().mockResolvedValue(mockedMetadataResponse);
-      BlockFrostAPI.prototype.txsMirs = jest.fn().mockResolvedValue(mockedMirResponse);
-      BlockFrostAPI.prototype.txsPoolUpdates = jest.fn().mockResolvedValue(mockedPoolUpdateResponse);
-      BlockFrostAPI.prototype.txsPoolRetires = jest.fn().mockResolvedValue(mockedPoolRetireResponse);
-      BlockFrostAPI.prototype.txsStakes = jest.fn().mockResolvedValue(mockedStakeResponse);
-      BlockFrostAPI.prototype.txsDelegations = jest.fn().mockResolvedValue(mockedDelegationResponse);
-      BlockFrostAPI.prototype.txsWithdrawals = jest.fn().mockResolvedValue(mockedWithdrawalResponse);
-      BlockFrostAPI.prototype.txsRedeemers = jest.fn().mockResolvedValue(mockedReedemerResponse);
-      BlockFrostAPI.prototype.addressesTransactions = jest.fn().mockResolvedValue(mockedAddressTransactionResponse);
-      BlockFrostAPI.prototype.epochsParameters = jest.fn().mockResolvedValue(mockedEpochParametersResponse);
-
-      blockfrost = new BlockFrostAPI({ network: 'preprod', projectId: apiKey });
-
-      provider = new BlockfrostChainHistoryProvider({
-        blockfrost,
-        logger,
-        networkInfoProvider: mockedNetworkInfoProvider
-      });
-      provider.fetchCBOR = jest
-        .fn()
-        .mockResolvedValue(
-          '84a90082825820262e95982cfe9fbc565a0e9a5343d323be8e08e51de23a5262b75ce6984179a900825820262e95982cfe9fbc565a0e9a5343d323be8e08e51de23a5262b75ce6984179a9010d81825820262e95982cfe9fbc565a0e9a5343d323be8e08e51de23a5262b75ce6984179a90112818258205de304d9c8884dd62ad8535d529e3d8fd5f212cc3c0c39410e4f3bccfca6e46b010182a300581d7039a4c3afe97b4c2d3385fefd5206d1865c74786b7ce955ebb6532e7a01821a001b9f18a1581cdab1406f1c769fbdb00514c494eed47a54c7ffc5d7aafc524cca069aa14d446a65644f7261636c654e465401028201d81858a6d8799f58404fe28ad1e94e742a6c79eb8f7cc44128965579792e4b5be940bfa61c3797914970fe2055016c2b7c3bbd9de43194e82b22a4ccdbee80b4099f73a304d9550707d8799fd8799f1a000f42401a00053dc9ffd8799fd8799fd87a9f1b00000192515efa80ffd87a80ffd8799fd87a9f1b00000192516cb620ffd87a80ffff43555344ff581cdab1406f1c769fbdb00514c494eed47a54c7ffc5d7aafc524cca069aff82583900f0a26fc170ad82b64a3d43dede08e78ea6e2028b5101058d0263a80a4c0ec23eba3aa27a4b8d61107f59f3e0d24b7bb6d7ae1a4bbd689c8d1abe8373ea021a0003ff5f031a044e9894081a044e95100e81581cf0a26fc170ad82b64a3d43dede08e78ea6e2028b5101058d0263a80a0b58205b3d8c3bc5032e4d2dbe3c07d23d7fb5133f4ec7466e73744317cebe2ed12610a200818258205401b7f67442e6cc870fbcffe921d24ab03e97e03bb655a24b4f424fd832c61558405bddd2f0d88e254ef1f0a84276aaadea4df3b05f8c441d9774b6a8d1c2556437a79e5131ea4475169d45e6e02bb3b31cd93216c5499e2c316aa68e485d6800000581840000d87980821a0006a7f41a0ab2d5a5f5f6'
-        );
+      const txId = Cardano.TransactionId('1e043f100dce12d107f679685acd2fc0610e10f72a92d412794c9773d11d8477');
+      const id = txId.toString();
+      mockResponses(request, [
+        [`txs/${id}/utxos`, txsUtxosResponse],
+        [`txs/${id}`, mockedTxResponse],
+        [`txs/${id}/metadata`, mockedMetadataResponse],
+        [`txs/${id}/mirs`, mockedMirResponse],
+        [`txs/${id}/pool_updates`, mockedPoolUpdateResponse],
+        [`txs/${id}/pool_retires`, mockedPoolRetireResponse],
+        [`txs/${id}/stakes`, mockedStakeResponse],
+        [`txs/${id}/delegations`, mockedDelegationResponse],
+        [`txs/${id}/withdrawals`, mockedWithdrawalResponse],
+        [`txs/${id}/redeemers`, mockedReedemerResponse],
+        [
+          `addresses/${Cardano.PaymentAddress(
+            '2cWKMJemoBai9J7kVvRTukMmdfxtjL9z7c396rTfrrzfAZ6EeQoKLC2y1k34hswwm4SVr'
+          ).toString()}/transactions?page=1&count=100`,
+          mockedAddressTransactionResponse
+        ],
+        ['epochs/420000/parameters', mockedEpochParametersResponse],
+        [`txs/${id}/cbor`, mockedCborResponse]
+      ]);
     });
+
     describe('transactionsByAddresses (CBOR)', () => {
       test('converts responses correctly (CBOR)', async () => {
         const response = await provider.transactionsByAddresses({

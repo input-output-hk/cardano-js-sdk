@@ -1,7 +1,7 @@
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
-import { Responses } from '@blockfrost/blockfrost-js';
+import type { Responses } from '@blockfrost/blockfrost-js';
 
 type Unpacked<T> = T extends (infer U)[] ? U : T;
 type BlockfrostAddressUtxoContent = Responses['address_utxo_content'];

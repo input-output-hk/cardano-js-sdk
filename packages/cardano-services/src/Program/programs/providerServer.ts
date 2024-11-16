@@ -14,7 +14,16 @@ import {
   StakePoolProvider,
   UtxoProvider
 } from '@cardano-sdk/core';
-import { BlockfrostAssetProvider, CardanoWsClient, TxSubmitApiProvider } from '@cardano-sdk/cardano-services-client';
+import {
+  BlockfrostAssetProvider,
+  BlockfrostChainHistoryProvider,
+  BlockfrostNetworkInfoProvider,
+  BlockfrostRewardsProvider,
+  BlockfrostTxSubmitProvider,
+  BlockfrostUtxoProvider,
+  CardanoWsClient,
+  TxSubmitApiProvider
+} from '@cardano-sdk/cardano-services-client';
 import { Logger } from 'ts-log';
 import { Observable } from 'rxjs';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
@@ -33,15 +42,7 @@ import {
   StubTokenMetadataService,
   TypeormAssetProvider
 } from '../../Asset';
-import {
-  BlockfrostChainHistoryProvider,
-  ChainHistoryHttpService,
-  DbSyncChainHistoryProvider
-} from '../../ChainHistory';
-import { BlockfrostNetworkInfoProvider, DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../NetworkInfo';
-import { BlockfrostRewardsProvider, DbSyncRewardsProvider, RewardsHttpService } from '../../Rewards';
-import { BlockfrostTxSubmitProvider, NodeTxSubmitProvider, TxSubmitHttpService } from '../../TxSubmit';
-import { BlockfrostUtxoProvider, DbSyncUtxoProvider, UtxoHttpService } from '../../Utxo';
+import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../../ChainHistory';
 import {
   CommonOptionsDescriptions,
   ConnectionNames,
@@ -51,19 +52,23 @@ import {
   handlePolicyIdsFromFile,
   suffixType2Cli
 } from '../options';
-import { DbPools, DbSyncEpochPollService, TypeormProvider, getBlockfrostApi, getBlockfrostClient } from '../../util';
+import { DbPools, DbSyncEpochPollService, TypeormProvider, getBlockfrostClient } from '../../util';
+import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../NetworkInfo';
+import { DbSyncRewardsProvider, RewardsHttpService } from '../../Rewards';
 import {
   DbSyncStakePoolProvider,
   StakePoolHttpService,
   TypeormStakePoolProvider,
   createHttpStakePoolMetadataService
 } from '../../StakePool';
+import { DbSyncUtxoProvider, UtxoHttpService } from '../../Utxo';
 import { DnsResolver, createDnsResolver, getCardanoNode, getDbPools, getGenesisData } from '../utils';
 import { GenesisData } from '../../types';
 import { HandleHttpService, TypeOrmHandleProvider } from '../../Handle';
 import { HttpServer, HttpServerConfig, HttpService, getListen } from '../../Http';
 import { InMemoryCache, NoCache } from '../../InMemoryCache';
 import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from '../errors';
+import { NodeTxSubmitProvider, TxSubmitHttpService } from '../../TxSubmit';
 import { ProviderServerArgs, ProviderServerOptionDescriptions, ServiceNames } from './types';
 import { WarmCache } from '../../InMemoryCache/WarmCache';
 import { createDbSyncMetadataService } from '../../Metadata';
@@ -293,7 +298,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
 
   const getBlockfrostAssetProvider = () => new BlockfrostAssetProvider(getBlockfrostClient(), logger);
 
-  const getBlockfrostUtxoProvider = () => new BlockfrostUtxoProvider({ blockfrost: getBlockfrostApi(), logger });
+  const getBlockfrostUtxoProvider = () => new BlockfrostUtxoProvider(getBlockfrostClient(), logger);
 
   const getDbSyncUtxoProvider = withDbSyncProvider(
     (dbPools, cardanoNode) =>
@@ -308,8 +313,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     ServiceNames.Utxo
   );
 
-  const getBlockfrostNetworkInfoProvider = () =>
-    new BlockfrostNetworkInfoProvider({ blockfrost: getBlockfrostApi(), logger });
+  const getBlockfrostNetworkInfoProvider = () => new BlockfrostNetworkInfoProvider(getBlockfrostClient(), logger);
 
   const getDbSyncNetworkInfoProvider = withDbSyncProvider((dbPools, cardanoNode) => {
     if (args.useWebSocketApi) return getWebSocketClient().networkInfoProvider;
@@ -340,9 +344,9 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     return networkInfoProvider;
   };
   const getBlockfrostChainHistoryProvider = (nInfoProvider: NetworkInfoProvider | DbSyncNetworkInfoProvider) =>
-    new BlockfrostChainHistoryProvider({ blockfrost: getBlockfrostApi(), logger, networkInfoProvider: nInfoProvider });
+    new BlockfrostChainHistoryProvider(getBlockfrostClient(), nInfoProvider, logger);
 
-  const getBlockfrostRewardsProvider = () => new BlockfrostRewardsProvider({ blockfrost: getBlockfrostApi(), logger });
+  const getBlockfrostRewardsProvider = () => new BlockfrostRewardsProvider(getBlockfrostClient(), logger);
 
   const getDbSyncRewardsProvider = withDbSyncProvider(
     (dbPools, cardanoNode) =>
@@ -359,8 +363,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       ),
     ServiceNames.Rewards
   );
-  const getBlockfrostTxSubmitProvider = () =>
-    new BlockfrostTxSubmitProvider({ blockfrost: getBlockfrostApi(), logger });
+  const getBlockfrostTxSubmitProvider = () => new BlockfrostTxSubmitProvider(getBlockfrostClient(), logger);
 
   return {
     [ServiceNames.Asset]: async () =>

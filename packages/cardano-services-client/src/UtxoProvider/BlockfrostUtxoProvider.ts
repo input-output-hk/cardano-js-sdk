@@ -1,16 +1,11 @@
-import { BlockfrostProvider } from '../../util/BlockfrostProvider/BlockfrostProvider';
-import { BlockfrostToCore, blockfrostToProviderError, fetchByAddressSequentially } from '../../util';
+import { BlockfrostProvider, BlockfrostToCore, fetchSequentially } from '../blockfrost';
 import { Cardano, Serialization, UtxoByAddressesArgs, UtxoProvider } from '@cardano-sdk/core';
-import { PaginationOptions } from '@blockfrost/blockfrost-js/lib/types';
-import { Responses } from '@blockfrost/blockfrost-js';
-import { Schemas } from '@blockfrost/blockfrost-js/lib/types/open-api';
+import type { Responses } from '@blockfrost/blockfrost-js';
 
 export class BlockfrostUtxoProvider extends BlockfrostProvider implements UtxoProvider {
-  protected async fetchUtxos(addr: Cardano.PaymentAddress, pagination: PaginationOptions): Promise<Cardano.Utxo[]> {
-    const utxos: Responses['address_utxo_content'] = (await this.blockfrost.addressesUtxos(
-      addr.toString(),
-      pagination
-    )) as Responses['address_utxo_content'];
+  protected async fetchUtxos(addr: Cardano.PaymentAddress, paginationQueryString: string): Promise<Cardano.Utxo[]> {
+    const queryString = `addresses/${addr.toString()}/utxos?${paginationQueryString}`;
+    const utxos = await this.request<Responses['address_utxo_content']>(queryString);
 
     const utxoPromises = utxos.map((utxo) =>
       this.fetchDetailsFromCBOR(utxo.tx_hash).then((tx) => {
@@ -22,10 +17,9 @@ export class BlockfrostUtxoProvider extends BlockfrostProvider implements UtxoPr
   }
 
   async fetchCBOR(hash: string): Promise<string> {
-    return this.blockfrost
-      .instance<Schemas['script_cbor']>(`txs/${hash}/cbor`)
+    return this.request<Responses['tx_content_cbor']>(`txs/${hash}/cbor`)
       .then((response) => {
-        if (response.body.cbor) return response.body.cbor;
+        if (response.cbor) return response.cbor;
         throw new Error('CBOR is null');
       })
       .catch((_error) => {
@@ -48,15 +42,14 @@ export class BlockfrostUtxoProvider extends BlockfrostProvider implements UtxoPr
     try {
       const utxoResults = await Promise.all(
         addresses.map(async (address) =>
-          fetchByAddressSequentially<Cardano.Utxo, Cardano.Utxo>({
-            address,
-            request: async (addr: Cardano.PaymentAddress, pagination) => await this.fetchUtxos(addr, pagination)
+          fetchSequentially<Cardano.Utxo, Cardano.Utxo>({
+            request: async (paginationQueryString) => await this.fetchUtxos(address, paginationQueryString)
           })
         )
       );
       return utxoResults.flat(1);
     } catch (error) {
-      throw blockfrostToProviderError(error);
+      throw this.toProviderError(error);
     }
   }
 }

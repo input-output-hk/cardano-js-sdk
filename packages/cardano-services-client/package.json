@@ -39,6 +39,7 @@
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
+    "@blockfrost/blockfrost-js": "^5.7.0",
     "@cardano-sdk/util-dev": "workspace:~",
     "@types/lodash": "^4.14.182",
     "@types/node-fetch": "^2.6.12",
@@ -57,6 +58,7 @@
   },
   "dependencies": {
     "@cardano-sdk/core": "workspace:~",
+    "@cardano-sdk/crypto": "workspace:~",
     "@cardano-sdk/util": "workspace:~",
     "axios": "^1.7.4",
     "class-validator": "^0.14.0",

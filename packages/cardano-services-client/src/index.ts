@@ -1,4 +1,5 @@
 export * from './AssetInfoProvider';
+export * from './blockfrost/BlockfrostToCore';
 export * from './HttpProvider';
 export * from './TxSubmitProvider';
 export * from './StakePoolProvider';

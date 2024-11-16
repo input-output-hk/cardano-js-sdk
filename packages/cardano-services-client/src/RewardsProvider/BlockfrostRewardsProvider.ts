@@ -1,21 +1,26 @@
 import { Cardano, Reward, RewardAccountBalanceArgs, RewardsHistoryArgs, RewardsProvider } from '@cardano-sdk/core';
 
-import { BlockfrostProvider } from '../../util/BlockfrostProvider/BlockfrostProvider';
+import { BlockfrostClient, BlockfrostProvider, isBlockfrostNotFoundError } from '../blockfrost';
+import { Logger } from 'ts-log';
 import { Range } from '@cardano-sdk/util';
-import { blockfrostToProviderError, isBlockfrostNotFoundError } from '../../util';
+import type { Responses } from '@blockfrost/blockfrost-js';
 
 const stringToBigInt = (str: string) => BigInt(str);
 
 export class BlockfrostRewardsProvider extends BlockfrostProvider implements RewardsProvider {
+  constructor(client: BlockfrostClient, logger: Logger) {
+    super(client, logger);
+  }
+
   public async rewardAccountBalance({ rewardAccount }: RewardAccountBalanceArgs) {
     try {
-      const accountResponse = await this.blockfrost.accounts(rewardAccount.toString());
+      const accountResponse = await this.request<Responses['account_content']>(`accounts/${rewardAccount.toString()}`);
       return BigInt(accountResponse.withdrawable_amount);
     } catch (error) {
       if (isBlockfrostNotFoundError(error)) {
         return 0n;
       }
-      throw blockfrostToProviderError(error);
+      throw this.toProviderError(error);
     }
   }
   protected async accountRewards(
@@ -31,7 +36,9 @@ export class BlockfrostRewardsProvider extends BlockfrostProvider implements Rew
       let page = 1;
       let haveMorePages = true;
       while (haveMorePages) {
-        const rewardsPage = await this.blockfrost.accountsRewards(stakeAddress.toString(), { count: batchSize, page });
+        const rewardsPage = await this.request<Responses['account_reward_content']>(
+          `accounts/${stakeAddress.toString()}/rewards?count=${batchSize}?page=${page}`
+        );
 
         result.push(
           ...rewardsPage
@@ -46,7 +53,7 @@ export class BlockfrostRewardsProvider extends BlockfrostProvider implements Rew
       }
       return result;
     } catch (error) {
-      throw blockfrostToProviderError(error);
+      throw this.toProviderError(error);
     }
   }
   public async rewardsHistory({ rewardAccounts, epochs }: RewardsHistoryArgs) {
