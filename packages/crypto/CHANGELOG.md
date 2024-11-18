@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.31](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.1.30...@cardano-sdk/crypto@0.1.31) (2024-11-18)
+
+**Note:** Version bump only for package @cardano-sdk/crypto
+
 ## [0.1.30](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.1.29...@cardano-sdk/crypto@0.1.30) (2024-08-21)
 
 **Note:** Version bump only for package @cardano-sdk/crypto

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.23.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.23.10...@cardano-sdk/util-dev@0.23.11) (2024-11-18)
+
+### Bug Fixes
+
+* transaction tracker now compares transactions in linear time before emission ([2306f10](https://github.com/input-output-hk/cardano-js-sdk/commit/2306f1057594c5b6d9639f70dfbc3443f88e434d))
+
 ## [0.23.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.23.9...@cardano-sdk/util-dev@0.23.10) (2024-11-13)
 
 **Note:** Version bump only for package @cardano-sdk/util-dev

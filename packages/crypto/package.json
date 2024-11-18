@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/crypto",
-  "version": "0.1.30",
+  "version": "0.1.31",
   "description": "Cryptographic types and functions for Cardano. Warning: The libsodium crypto provider has not yet been audited. Use at this stage is at own risk",
   "engines": {
     "node": ">=16.20.2"

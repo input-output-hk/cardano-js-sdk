@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.44.19](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.18...@cardano-sdk/wallet@0.44.19) (2024-11-18)
+
+### Features
+
+* **wallet:** the wallet now only fetches UTXOs on tx history change ([7c8b6e9](https://github.com/input-output-hk/cardano-js-sdk/commit/7c8b6e9d300b98019739e309ae3f1550aa2de4a5))
+
+### Bug Fixes
+
+* transaction tracker now compares transactions in linear time before emission ([2306f10](https://github.com/input-output-hk/cardano-js-sdk/commit/2306f1057594c5b6d9639f70dfbc3443f88e434d))
+
 ## [0.44.18](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.17...@cardano-sdk/wallet@0.44.18) (2024-11-13)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
