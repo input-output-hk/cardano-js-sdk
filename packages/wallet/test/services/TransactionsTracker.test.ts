@@ -26,7 +26,19 @@ import { dummyCbor, toOutgoingTx, toSignedTx } from '../util';
 import { dummyLogger } from 'ts-log';
 import delay from 'delay';
 
-const { generateTxAlonzo, mockChainHistoryProvider, queryTransactionsResult } = mockProviders;
+const { generateTxAlonzo, mockChainHistoryProvider, queryTransactionsResult, queryTransactionsResult2 } = mockProviders;
+
+const updateTransactionsBlockNo = (transactions: Cardano.HydratedTx[], blockNo = Cardano.BlockNo(10_050)) =>
+  transactions.map((tx) => ({
+    ...tx,
+    blockHeader: { ...tx.blockHeader, blockNo }
+  }));
+
+const updateTransactionIds = (transactions: Cardano.HydratedTx[], tailPattern = 'aaa') =>
+  transactions.map((tx) => ({
+    ...tx,
+    id: Cardano.TransactionId(`${tx.id.slice(0, -tailPattern.length)}${tailPattern}`)
+  }));
 
 describe('TransactionsTracker', () => {
   const logger = dummyLogger;
@@ -59,6 +71,22 @@ describe('TransactionsTracker', () => {
       chainHistoryProvider = mockChainHistoryProvider();
       store = new InMemoryTransactionsStore();
       store.setAll = jest.fn().mockImplementation(store.setAll.bind(store));
+    });
+
+    it('emits empty array if store is empty and ChainHistoryProvider does not return any transactions', async () => {
+      chainHistoryProvider.transactionsByAddresses = jest
+        .fn()
+        .mockImplementation(() => delay(50).then(() => ({ pageResults: [], totalResultCount: 0 })));
+      const provider$ = createAddressTransactionsProvider({
+        addresses$: of(addresses),
+        chainHistoryProvider,
+        logger,
+        retryBackoffConfig,
+        store,
+        tipBlockHeight$
+      }).transactionsSource$;
+      expect(await firstValueFrom(provider$)).toEqual([]);
+      expect(store.setAll).toBeCalledTimes(0);
     });
 
     it('if store is empty, stores and emits transactions resolved by ChainHistoryProvider', async () => {
@@ -134,6 +162,90 @@ describe('TransactionsTracker', () => {
       });
     });
 
+    it('emits shortened tx history when tx was rolled back, but no new tx was added', async () => {
+      const [txId1, txId2] = queryTransactionsResult.pageResults;
+      // Two stored transactions: [1, 2]
+      await firstValueFrom(store.setAll([txId1, txId2]));
+
+      // ChainHistory is shorter by 1 tx: [1]
+      chainHistoryProvider.transactionsByAddresses = jest
+        .fn()
+        // the mismatch will pop the single transaction found in the stored transactions
+        .mockImplementationOnce(() => delay(50).then(() => ({ pageResults: [], totalResultCount: 0 })))
+        // intersection is found, chain is shortened
+        .mockImplementationOnce(() => delay(50).then(() => ({ pageResults: [txId1], totalResultCount: 1 })));
+
+      const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
+        addresses$: of(addresses),
+        chainHistoryProvider,
+        logger,
+        retryBackoffConfig,
+        store,
+        tipBlockHeight$
+      });
+
+      const rollbacks: Cardano.HydratedTx[] = [];
+      rollback$.subscribe((tx) => rollbacks.push(tx));
+
+      expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
+        [txId1, txId2], // from store
+        [txId1] // shortened chain
+      ]);
+
+      expect(rollbacks).toEqual([txId2]);
+
+      expect(store.setAll).toBeCalledTimes(2);
+      expect(store.setAll).nthCalledWith(2, [txId1]);
+      expect(chainHistoryProvider.transactionsByAddresses).toBeCalledTimes(2);
+    });
+
+    it('rolls back one transaction, then finds intersection', async () => {
+      const [txId1, txId2] = queryTransactionsResult.pageResults;
+      const [txId3] = queryTransactionsResult2.pageResults.slice(-1);
+      // Two stored transactions: [1, 2]
+      await firstValueFrom(store.setAll([txId1, txId2]));
+
+      // ChainHistory has one common and one different: [1, 3]
+      chainHistoryProvider.transactionsByAddresses = jest
+        .fn()
+        // the mismatch will pop the single transaction found in the stored transactions
+        .mockImplementationOnce(() => delay(50).then(() => ({ pageResults: [txId3], totalResultCount: 1 })))
+        // intersection is found, and stored history is populated with the new transaction
+        .mockImplementationOnce(() => delay(50).then(() => ({ pageResults: [txId1, txId3], totalResultCount: 2 })));
+
+      const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
+        addresses$: of(addresses),
+        chainHistoryProvider,
+        logger,
+        retryBackoffConfig,
+        store,
+        tipBlockHeight$
+      });
+
+      const rollbacks: Cardano.HydratedTx[] = [];
+      rollback$.subscribe((tx) => rollbacks.push(tx));
+
+      expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
+        [txId1, txId2], // from store
+        [txId1, txId3] // store + chain history
+      ]);
+
+      expect(rollbacks).toEqual([txId2]);
+
+      expect(store.setAll).toBeCalledTimes(2);
+      expect(chainHistoryProvider.transactionsByAddresses).toBeCalledTimes(2);
+      expect(chainHistoryProvider.transactionsByAddresses).nthCalledWith(1, {
+        addresses,
+        blockRange: { lowerBound: txId2.blockHeader.blockNo },
+        pagination: { limit: 25, startAt: 0 }
+      });
+      expect(chainHistoryProvider.transactionsByAddresses).nthCalledWith(2, {
+        addresses,
+        blockRange: { lowerBound: txId1.blockHeader.blockNo },
+        pagination: { limit: 25, startAt: 0 }
+      });
+    });
+
     it('queries ChainHistoryProvider again with blockRange lower bound from a previous transaction on rollback', async () => {
       await firstValueFrom(store.setAll(queryTransactionsResult.pageResults));
       chainHistoryProvider.transactionsByAddresses = jest
@@ -178,6 +290,247 @@ describe('TransactionsTracker', () => {
         addresses,
         blockRange: { lowerBound: undefined },
         pagination: { limit: 25, startAt: 0 }
+      });
+    });
+
+    describe('distinct transaction sets in latest stored block vs new blocks', () => {
+      // Notation: <a b c> is a block with 3 transactions
+      //           [a b c] is an array of 3 transactions
+
+      // latestStoredBlock  <1 2 3>
+      // newBlock           <4 5 6>
+      // rollback$          [3 2 1]  - transactions need to be retried
+      // store&emit         [4 5 6]
+      it('rolls back all transactions on completely disjoin sets', async () => {
+        const [txId1, txId2, txId3] = updateTransactionsBlockNo(queryTransactionsResult2.pageResults);
+        const [txId4, txId5, txId6] = updateTransactionIds([txId1, txId2, txId3]);
+
+        await firstValueFrom(store.setAll([txId1, txId2, txId3]));
+
+        chainHistoryProvider.transactionsByAddresses = jest.fn(() => ({
+          pageResults: [txId4, txId5, txId6],
+          totalResultCount: 3
+        }));
+
+        const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
+          addresses$: of(addresses),
+          chainHistoryProvider,
+          logger,
+          retryBackoffConfig,
+          store,
+          tipBlockHeight$
+        });
+
+        const rollbacks: Cardano.HydratedTx[] = [];
+        rollback$.subscribe((tx) => rollbacks.push(tx));
+
+        expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
+          [txId1, txId2, txId3], // from store
+          [txId4, txId5, txId6] // chain history
+        ]);
+        expect(rollbacks).toEqual([txId3, txId2, txId1]);
+        expect(store.setAll).toBeCalledTimes(2);
+      });
+
+      // latestStoredBlock  <1 2>
+      // newBlock           <1 2 3>
+      // rollback$          none
+      // store&emit         [1,2,3]
+      it('stores new transactions when new block is superset', async () => {
+        const [txId1, txId2] = updateTransactionsBlockNo(queryTransactionsResult2.pageResults, Cardano.BlockNo(10_050));
+        const [txId1OtherBlock, txId2OtherBlock, txId3] = updateTransactionsBlockNo(
+          queryTransactionsResult2.pageResults,
+          Cardano.BlockNo(10_051)
+        );
+
+        await firstValueFrom(store.setAll([txId1, txId2]));
+
+        chainHistoryProvider.transactionsByAddresses = jest.fn(() => ({
+          pageResults: [txId1OtherBlock, txId2OtherBlock, txId3],
+          totalResultCount: 3
+        }));
+
+        const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
+          addresses$: of(addresses),
+          chainHistoryProvider,
+          logger,
+          retryBackoffConfig,
+          store,
+          tipBlockHeight$
+        });
+
+        const rollbacks: Cardano.HydratedTx[] = [];
+        rollback$.subscribe((tx) => rollbacks.push(tx));
+
+        expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
+          [txId1, txId2], // from store
+          [txId1OtherBlock, txId2OtherBlock, txId3] // chain history
+        ]);
+        expect(rollbacks.length).toBe(0);
+        expect(store.setAll).toBeCalledTimes(2);
+        expect(store.setAll).nthCalledWith(2, [txId1OtherBlock, txId2OtherBlock, txId3]);
+      });
+
+      // latestStoredBlock  <1 2 3>
+      // newBlock           <1 2>
+      // rollback$          3
+      // store&emit         [1,2]
+      it('rollback some transactions when new block is subset', async () => {
+        const [txId1, txId2, txId3] = updateTransactionsBlockNo(
+          queryTransactionsResult2.pageResults,
+          Cardano.BlockNo(10_050)
+        );
+        const [txId1OtherBlock, txId2OtherBlock] = updateTransactionsBlockNo([txId1, txId2], Cardano.BlockNo(10_051));
+
+        await firstValueFrom(store.setAll([txId1, txId2, txId3]));
+
+        chainHistoryProvider.transactionsByAddresses = jest.fn(() => ({
+          pageResults: [txId1OtherBlock, txId2OtherBlock],
+          totalResultCount: 2
+        }));
+
+        const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
+          addresses$: of(addresses),
+          chainHistoryProvider,
+          logger,
+          retryBackoffConfig,
+          store,
+          tipBlockHeight$
+        });
+
+        const rollbacks: Cardano.HydratedTx[] = [];
+        rollback$.subscribe((tx) => rollbacks.push(tx));
+
+        expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
+          [txId1, txId2, txId3], // from store
+          [txId1OtherBlock, txId2OtherBlock] // chain history
+        ]);
+        expect(rollbacks).toEqual([txId3]);
+        expect(store.setAll).toBeCalledTimes(2);
+        expect(store.setAll).nthCalledWith(2, [txId1OtherBlock, txId2OtherBlock]);
+      });
+
+      // latestStoredBlock  <1 2>
+      // newBlocks          <3> <1> <2>
+      // rollback$          none         - transactions are on chain
+      // store&emit         [3 1 2]      - re-emit all as they might have a different blockNo
+      // Noop - produces the same result in the tx history
+      it('detects when latest block transactions are found in among new blocks', async () => {
+        const [txId1, txId2, txId3] = updateTransactionsBlockNo(
+          queryTransactionsResult2.pageResults,
+          Cardano.BlockNo(10_000)
+        );
+
+        const [txId3OtherBlock] = updateTransactionsBlockNo([txId3], Cardano.BlockNo(10_100));
+        const [txId1OtherBlock] = updateTransactionsBlockNo([txId1], Cardano.BlockNo(10_200));
+        const [txId2OtherBlock] = updateTransactionsBlockNo([txId2], Cardano.BlockNo(10_300));
+
+        await firstValueFrom(store.setAll([txId1, txId2, txId3]));
+
+        chainHistoryProvider.transactionsByAddresses = jest.fn(() => ({
+          pageResults: [txId3OtherBlock, txId1OtherBlock, txId2OtherBlock],
+          totalResultCount: 3
+        }));
+
+        const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
+          addresses$: of(addresses),
+          chainHistoryProvider,
+          logger,
+          retryBackoffConfig,
+          store,
+          tipBlockHeight$
+        });
+
+        const rollbacks: Cardano.HydratedTx[] = [];
+        rollback$.subscribe((tx) => rollbacks.push(tx));
+
+        expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
+          [txId1, txId2, txId3], // from store
+          [txId3OtherBlock, txId1OtherBlock, txId2OtherBlock] // chain history
+        ]);
+        expect(rollbacks.length).toBe(0);
+        expect(store.setAll).toBeCalledTimes(2);
+        expect(store.setAll).nthCalledWith(2, [txId3OtherBlock, txId1OtherBlock, txId2OtherBlock]);
+      });
+
+      // latestStoredBlock <1 2>
+      // newBlock          <3 2 1>
+      // rollback$         none   - transactions are on chain
+      // store&emit        [3 2 1]
+      it('reversed order transactions plus new tx are re-emitted, but not considered rollbacks', async () => {
+        const [txId1, txId2, txId3] = updateTransactionsBlockNo(
+          queryTransactionsResult2.pageResults,
+          Cardano.BlockNo(10_000)
+        );
+
+        const [txId1OtherBlock, txId2OtherBlock, txId3OtherBlock] = updateTransactionsBlockNo(
+          [txId1, txId2, txId3],
+          Cardano.BlockNo(10_100)
+        );
+
+        await firstValueFrom(store.setAll([txId1, txId2]));
+
+        chainHistoryProvider.transactionsByAddresses = jest.fn(() => ({
+          pageResults: [txId3OtherBlock, txId2OtherBlock, txId1OtherBlock],
+          totalResultCount: 3
+        }));
+
+        const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
+          addresses$: of(addresses),
+          chainHistoryProvider,
+          logger,
+          retryBackoffConfig,
+          store,
+          tipBlockHeight$
+        });
+
+        const rollbacks: Cardano.HydratedTx[] = [];
+        rollback$.subscribe((tx) => rollbacks.push(tx));
+
+        expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
+          [txId1, txId2], // from store
+          [txId3OtherBlock, txId2OtherBlock, txId1OtherBlock] // chain history
+        ]);
+        expect(rollbacks.length).toBe(0);
+        expect(store.setAll).toBeCalledTimes(2);
+        expect(store.setAll).nthCalledWith(2, [txId3OtherBlock, txId2OtherBlock, txId1OtherBlock]);
+      });
+
+      // latestStoredBlock  <1 2 3>
+      // newBlock           <1 2 3>
+      // rollback$          none
+      // store&emit         none
+      it('does not emit when newBlock transactions are identical to stored transactions', async () => {
+        const [txId1, txId2, txId3] = updateTransactionsBlockNo(
+          queryTransactionsResult2.pageResults,
+          Cardano.BlockNo(10_000)
+        );
+
+        await firstValueFrom(store.setAll([txId1, txId2, txId3]));
+
+        chainHistoryProvider.transactionsByAddresses = jest.fn(() => ({
+          pageResults: [txId1, txId2, txId3],
+          totalResultCount: 3
+        }));
+
+        const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
+          addresses$: of(addresses),
+          chainHistoryProvider,
+          logger,
+          retryBackoffConfig,
+          store,
+          tipBlockHeight$
+        });
+
+        const rollbacks: Cardano.HydratedTx[] = [];
+        rollback$.subscribe((tx) => rollbacks.push(tx));
+
+        expect(await firstValueFrom(provider$.pipe(bufferCount(1)))).toEqual([
+          [txId1, txId2, txId3] // from store
+        ]);
+        expect(rollbacks.length).toBe(0);
+        expect(store.setAll).toBeCalledTimes(1);
+        expect(store.setAll).nthCalledWith(1, [txId1, txId2, txId3]);
       });
     });
   });

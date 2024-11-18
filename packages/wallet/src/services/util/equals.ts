@@ -19,7 +19,11 @@ export const sameSortedArrayItems = <T>(arrayA: T[], arrayB: T[], itemEquals: (a
   return true;
 };
 
-export const transactionsEquals = (a: Cardano.HydratedTx[], b: Cardano.HydratedTx[]) => sameArrayItems(a, b, txEquals);
+export const transactionsEquals = (a: Cardano.HydratedTx[], b: Cardano.HydratedTx[]) => {
+  if (a === b) return true;
+
+  return sameSortedArrayItems(a, b, txEquals);
+};
 
 export const txInEquals = (a: Cardano.TxIn, b: Cardano.TxIn) => a.txId === b.txId && a.index === b.index;
 
