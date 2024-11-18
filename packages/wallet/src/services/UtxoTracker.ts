@@ -6,6 +6,7 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxInFlight, UtxoTracker } from './types';
 import { WalletStores } from '../persistence';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
+import { sortUtxoByTxIn } from '@cardano-sdk/input-selection';
 import chunk from 'lodash/chunk.js';
 import uniqWith from 'lodash/uniqWith.js';
 
@@ -17,7 +18,7 @@ export interface UtxoTrackerProps {
   addresses$: Observable<Cardano.PaymentAddress[]>;
   stores: Pick<WalletStores, 'utxo' | 'unspendableUtxo'>;
   transactionsInFlight$: Observable<TxInFlight[]>;
-  tipBlockHeight$: Observable<Cardano.BlockNo>;
+  history$: Observable<Cardano.HydratedTx[]>;
   retryBackoffConfig: RetryBackoffConfig;
   logger: Logger;
   onFatalError?: (value: unknown) => void;
@@ -31,7 +32,7 @@ export interface UtxoTrackerInternals {
 export const createUtxoProvider = (
   utxoProvider: UtxoProvider,
   addresses$: Observable<Cardano.PaymentAddress[]>,
-  tipBlockHeight$: Observable<Cardano.BlockNo>,
+  history$: Observable<Cardano.HydratedTx[]>,
   retryBackoffConfig: RetryBackoffConfig,
   onFatalError?: (value: unknown) => void
 ) =>
@@ -49,10 +50,10 @@ export const createUtxoProvider = (
             utxos = [...utxos, ...(await utxoProvider.utxoByAddresses({ addresses }))];
           }
 
-          return utxos;
+          return utxos.sort(sortUtxoByTxIn);
         },
         retryBackoffConfig,
-        trigger$: tipBlockHeight$
+        trigger$: history$
       })
     )
   );
@@ -64,13 +65,13 @@ export const createUtxoTracker = (
     stores,
     transactionsInFlight$,
     retryBackoffConfig,
-    tipBlockHeight$,
+    history$,
     logger,
     onFatalError
   }: UtxoTrackerProps,
   {
     utxoSource$ = new PersistentCollectionTrackerSubject<Cardano.Utxo>(
-      () => createUtxoProvider(utxoProvider, addresses$, tipBlockHeight$, retryBackoffConfig, onFatalError),
+      () => createUtxoProvider(utxoProvider, addresses$, history$, retryBackoffConfig, onFatalError),
       stores.utxo
     ),
     unspendableUtxoSource$ = new PersistentCollectionTrackerSubject(

@@ -7,12 +7,31 @@ export const tipEquals = (a: Cardano.Tip, b: Cardano.Tip) => a.hash === b.hash;
 
 export const txEquals = (a: Cardano.HydratedTx, b: Cardano.HydratedTx) => a.id === b.id;
 
-export const transactionsEquals = (a: Cardano.HydratedTx[], b: Cardano.HydratedTx[]) => sameArrayItems(a, b, txEquals);
+export const sameSortedArrayItems = <T>(arrayA: T[], arrayB: T[], itemEquals: (a: T, b: T) => boolean): boolean => {
+  if (arrayA.length !== arrayB.length) return false;
+
+  for (const [i, element] of arrayA.entries()) {
+    if (!itemEquals(element, arrayB[i])) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+export const transactionsEquals = (a: Cardano.HydratedTx[], b: Cardano.HydratedTx[]) => {
+  if (a === b) return true;
+
+  return sameSortedArrayItems(a, b, txEquals);
+};
 
 export const txInEquals = (a: Cardano.TxIn, b: Cardano.TxIn) => a.txId === b.txId && a.index === b.index;
 
-export const utxoEquals = (a: Cardano.Utxo[], b: Cardano.Utxo[]) =>
-  sameArrayItems(a, b, ([aTxIn], [bTxIn]) => txInEquals(aTxIn, bTxIn));
+export const utxoEquals = (a: Cardano.Utxo[], b: Cardano.Utxo[]) => {
+  if (a === b) return true;
+
+  return sameSortedArrayItems(a, b, ([aTxIn], [bTxIn]) => txInEquals(aTxIn, bTxIn));
+};
 
 export const eraSummariesEquals = (a: EraSummary[], b: EraSummary[]) =>
   sameArrayItems(a, b, (es1, es2) => es1.start.slot === es2.start.slot);

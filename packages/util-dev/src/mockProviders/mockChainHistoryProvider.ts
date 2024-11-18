@@ -1,6 +1,6 @@
 import * as AssetId from '../assetId';
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, Paginated } from '@cardano-sdk/core';
+import { Cardano, Paginated, TransactionsByAddressesArgs } from '@cardano-sdk/core';
 import { currentEpoch, handleAssetId, ledgerTip, stakeCredential } from './mockData';
 import { somePartialStakePools } from '../createStubStakePoolProvider';
 import delay from 'delay';
@@ -219,10 +219,20 @@ export const mockChainHistoryProvider2 = (delayMs: number) => {
   const delayedJestFn = <T>(resolvedValue: T) =>
     jest.fn().mockImplementationOnce(() => delay(delayMs).then(() => resolvedValue));
 
+  const blockRangeTransactions = (blockRangeStart: number): Paginated<Cardano.HydratedTx> => {
+    const pageResults = queryTransactionsResult2.pageResults.filter(
+      (res) => res.blockHeader.blockNo >= blockRangeStart
+    );
+
+    return { pageResults, totalResultCount: pageResults.length };
+  };
+
   return {
     blocksByHashes: delayedJestFn(blocksByHashes),
     healthCheck: delayedJestFn({ ok: true }),
-    transactionsByAddresses: delayedJestFn(queryTransactionsResult2),
+    transactionsByAddresses: jest.fn(({ blockRange }: TransactionsByAddressesArgs) =>
+      delay(delayMs).then(() => blockRangeTransactions(blockRange?.lowerBound || 0))
+    ),
     transactionsByHashes: delayedJestFn(queryTransactionsResult2)
   };
 };
