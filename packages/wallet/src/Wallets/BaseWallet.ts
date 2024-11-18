@@ -51,7 +51,6 @@ import {
   createUtxoTracker,
   createWalletUtil,
   currentEpochTracker,
-  distinctBlock,
   distinctEraSummaries
 } from '../services';
 import { AddressType, Bip32Account, GroupedAddress, WitnessedTx, Witnesser, util } from '@cardano-sdk/key-management';
@@ -397,7 +396,6 @@ export class BaseWallet implements ObservableWallet {
       store: stores.tip,
       syncStatus: this.syncStatus
     });
-    const tipBlockHeight$ = distinctBlock(this.tip$);
 
     this.txSubmitProvider = new SmartTxSubmitProvider(
       { retryBackoffConfig },
@@ -499,11 +497,11 @@ export class BaseWallet implements ObservableWallet {
 
     this.utxo = createUtxoTracker({
       addresses$,
+      history$: this.transactions.history$,
       logger: contextLogger(this.#logger, 'utxo'),
       onFatalError,
       retryBackoffConfig,
       stores,
-      tipBlockHeight$,
       transactionsInFlight$: this.transactions.outgoing.inFlight$,
       utxoProvider: this.utxoProvider
     });

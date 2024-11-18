@@ -20,7 +20,7 @@ const createStubOutputs = (numOutputs: number) =>
 describe('createUtxoTracker', () => {
   // these variables are not relevant for this test, overwriting utxoSource$
   let retryBackoffConfig: RetryBackoffConfig;
-  let tipBlockHeight$: Observable<Cardano.BlockNo>;
+  let history$: Observable<Cardano.HydratedTx[]>;
   let utxoProvider: UtxoProvider;
   const logger = dummyLogger;
 
@@ -88,13 +88,13 @@ describe('createUtxoTracker', () => {
       const utxoTracker = createUtxoTracker(
         {
           addresses$: cold('a|', { a: [ownAddress!] }),
+          history$,
           logger,
           retryBackoffConfig,
           stores: {
             unspendableUtxo: store,
             utxo: store
           },
-          tipBlockHeight$,
           transactionsInFlight$,
           utxoProvider
         },
@@ -142,13 +142,13 @@ describe('createUtxoTracker', () => {
       const utxoTracker = createUtxoTracker(
         {
           addresses$: cold('a', { a: [address!] }),
+          history$,
           logger,
           retryBackoffConfig,
           stores: {
             unspendableUtxo: store,
             utxo: store
           },
-          tipBlockHeight$,
           transactionsInFlight$,
           utxoProvider
         },
@@ -172,13 +172,13 @@ describe('createUtxoTracker', () => {
       const utxoTracker = createUtxoTracker(
         {
           addresses$: cold('a|', { a: [address!] }),
+          history$,
           logger,
           retryBackoffConfig,
           stores: {
             unspendableUtxo: store,
             utxo: store
           },
-          tipBlockHeight$,
           transactionsInFlight$,
           utxoProvider
         },
@@ -211,13 +211,13 @@ describe('createUtxoTracker', () => {
       const utxoTracker = createUtxoTracker(
         {
           addresses$: cold('a|', { a: [address!] }),
+          history$,
           logger,
           retryBackoffConfig,
           stores: {
             unspendableUtxo: store,
             utxo: store
           },
-          tipBlockHeight$,
           transactionsInFlight$,
           utxoProvider
         },
@@ -241,13 +241,13 @@ describe('createUtxoTracker', () => {
       const utxoTracker = createUtxoTracker(
         {
           addresses$: cold('a|', { a: [address!] }),
+          history$,
           logger,
           retryBackoffConfig,
           stores: {
             unspendableUtxo: store,
             utxo: store
           },
-          tipBlockHeight$,
           transactionsInFlight$,
           utxoProvider
         },
