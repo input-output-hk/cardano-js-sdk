@@ -46,7 +46,8 @@ const {
   utxo: mockUtxo,
   utxosWithLowCoins,
   utxosWithLowCoinsAndMixedAssets,
-  sortedUtxosWithLowCoins
+  sortedUtxosWithLowCoins,
+  impureUtxos
 } = mocks;
 
 type TestProviders = Required<Pick<Providers, 'txSubmitProvider' | 'networkInfoProvider'>>;
@@ -269,6 +270,7 @@ describe('cip30', () => {
         });
       });
 
+      // eslint-disable-next-line max-statements
       describe('api.getCollateral', () => {
         // Wallet 2
         let wallet2: BaseWallet;
@@ -293,6 +295,14 @@ describe('cip30', () => {
         // Wallet 7
         let wallet7: BaseWallet;
         let api7: WithSenderContext<WalletApi>;
+
+        // Wallet 8
+        let wallet8: BaseWallet;
+        let api8: WithSenderContext<WalletApi>;
+
+        // Wallet 9
+        let wallet9: BaseWallet;
+        let api9: WithSenderContext<WalletApi>;
 
         beforeAll(async () => {
           // CREATE A WALLET WITH LOW COINS UTxOs
@@ -329,6 +339,24 @@ describe('cip30', () => {
             mockCollateralCallback,
             true,
             []
+          ));
+
+          // WALLET WITH CALLBACK FOR GET COLLATERAL (BRAND NEW WALLET, NO UTXOS)
+          ({ wallet: wallet8, api: api8 } = await createWalletAndApiWithStores(
+            [],
+            providers,
+            mockCollateralCallback,
+            true,
+            []
+          ));
+
+          // WALLET WITH CALLBACK FOR GET COLLATERAL (ONLY IMPURE UTXOs)
+          ({ wallet: wallet9, api: api9 } = await createWalletAndApiWithStores(
+            [],
+            providers,
+            mockCollateralCallback,
+            true,
+            impureUtxos
           ));
         });
 
@@ -385,6 +413,27 @@ describe('cip30', () => {
           await expect(api7.getCollateral(context)).rejects.toThrow(ApiError);
           expect(mockCollateralCallback).not.toHaveBeenCalled();
           wallet7.shutdown();
+        });
+
+        it('does not execute collateral callback and returns null if brand new wallet (no UTXOS)', async () => {
+          await expect(api8.getCollateral(context)).resolves.toBeNull();
+          expect(mockCollateralCallback).not.toHaveBeenCalled();
+          wallet8.shutdown();
+        });
+
+        it('does executes collateral callback with empty array if wallet has only impure UTXOS', async () => {
+          await expect(api9.getCollateral(context)).resolves.not.toBeNull();
+          expect(mockCollateralCallback).toHaveBeenCalledWith({
+            data: {
+              amount: 5_000_000n,
+              utxos: []
+            },
+            sender: {
+              url: 'https://lace.io'
+            },
+            type: 'get_collateral'
+          });
+          wallet9.shutdown();
         });
 
         it('does not execute collateral callback if not provided', async () => {
