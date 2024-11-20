@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.44.20](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.19...@cardano-sdk/wallet@0.44.20) (2024-11-20)
+
+### Bug Fixes
+
+* **wallet:** getCollateral callback now passes empty array to wallet if no colateral found ([833db68](https://github.com/input-output-hk/cardano-js-sdk/commit/833db68a8a72c79f57f6549c805c9f867f091c12))
+
 ## [0.44.19](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.18...@cardano-sdk/wallet@0.44.19) (2024-11-18)
 
 ### Features
