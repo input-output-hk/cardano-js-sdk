@@ -230,8 +230,8 @@ const getCollateralCallback = async (
   callback: GetCollateralCallback,
   logger: Logger
 ) => {
+  if (availableUtxos.length === 0) return null;
   const availableUtxosWithoutAssets = getUtxosWithoutAssets(availableUtxos);
-  if (availableUtxosWithoutAssets.length === 0) return null;
   try {
     // Send the amount and filtered available UTxOs to the callback
     // Client can then choose to mark a UTxO set as unspendable
