@@ -60,3 +60,16 @@ export const getBobHandleProviderResponse = {
   policyId: Cardano.PolicyId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb'),
   profilePic: Asset.Uri('ipfs://zrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3yd1')
 };
+
+export const mockResponses = (request: jest.Mock, responses: [string | RegExp, unknown][]) => {
+  request.mockImplementation(async (endpoint: string) => {
+    for (const [match, response] of responses) {
+      if (typeof match === 'string') {
+        if (match === endpoint) return response;
+      } else if (match.test(endpoint)) {
+        return response;
+      }
+    }
+    throw new Error(`Not implemented/matched: ${endpoint}`);
+  });
+};
