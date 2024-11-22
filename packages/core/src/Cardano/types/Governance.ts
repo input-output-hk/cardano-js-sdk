@@ -1,5 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Credential, CredentialType, RewardAccount } from '../Address';
+import { DRepInfo } from '../../Provider';
 import { EpochNo, Fraction, ProtocolVersion, TransactionId } from '.';
 import { Lovelace } from './Value';
 import { ProtocolParametersUpdateConway } from './ProtocolParameters';
@@ -187,10 +188,14 @@ export type AlwaysNoConfidence = {
 
 export type DelegateRepresentative = Credential | AlwaysAbstain | AlwaysNoConfidence;
 
-export const isDRepCredential = (deleg: DelegateRepresentative): deleg is Credential => !('__typename' in deleg);
+export const isDrepInfo = (drep: DelegateRepresentative | DRepInfo): drep is DRepInfo =>
+  'id' in drep && 'active' in drep;
 
-export const isDRepAlwaysAbstain = (deleg: DelegateRepresentative): deleg is AlwaysAbstain =>
-  !isDRepCredential(deleg) && deleg.__typename === 'AlwaysAbstain';
+export const isDRepCredential = (deleg: DelegateRepresentative | DRepInfo): deleg is Credential =>
+  'type' in deleg && 'hash' in deleg;
 
-export const isDRepAlwaysNoConfidence = (deleg: DelegateRepresentative): deleg is AlwaysNoConfidence =>
-  !isDRepCredential(deleg) && deleg.__typename === 'AlwaysNoConfidence';
+export const isDRepAlwaysAbstain = (deleg: DelegateRepresentative | DRepInfo): deleg is AlwaysAbstain =>
+  '__typename' in deleg && deleg.__typename === 'AlwaysAbstain';
+
+export const isDRepAlwaysNoConfidence = (deleg: DelegateRepresentative | DRepInfo): deleg is AlwaysNoConfidence =>
+  '__typename' in deleg && deleg.__typename === 'AlwaysNoConfidence';

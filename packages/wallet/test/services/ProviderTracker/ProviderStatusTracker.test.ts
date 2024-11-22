@@ -5,6 +5,7 @@ import {
   ProviderFnStats,
   TrackedAssetProvider,
   TrackedChainHistoryProvider,
+  TrackedDrepProvider,
   TrackedRewardsProvider,
   TrackedStakePoolProvider,
   TrackedUtxoProvider,
@@ -17,6 +18,7 @@ import { dummyLogger } from 'ts-log';
 const {
   mockAssetProvider,
   mockChainHistoryProvider,
+  mockDrepProvider,
   mockNetworkInfoProvider,
   mockRewardsProvider,
   mockUtxoProvider
@@ -67,6 +69,7 @@ describe('createProviderStatusTracker', () => {
   let assetProvider: TrackedAssetProvider;
   let utxoProvider: TrackedUtxoProvider;
   let chainHistoryProvider: TrackedChainHistoryProvider;
+  let drepProvider: TrackedDrepProvider;
   let rewardsProvider: TrackedRewardsProvider;
 
   const timeout = 5000;
@@ -77,6 +80,7 @@ describe('createProviderStatusTracker', () => {
     networkInfoProvider = new TrackedWalletNetworkInfoProvider(mockNetworkInfoProvider());
     assetProvider = new TrackedAssetProvider(mockAssetProvider());
     chainHistoryProvider = new TrackedChainHistoryProvider(mockChainHistoryProvider());
+    drepProvider = new TrackedDrepProvider(mockDrepProvider());
     rewardsProvider = new TrackedRewardsProvider(mockRewardsProvider());
   });
 
@@ -93,6 +97,7 @@ describe('createProviderStatusTracker', () => {
         {
           assetProvider,
           chainHistoryProvider,
+          drepProvider,
           logger: dummyLogger,
           networkInfoProvider,
           rewardsProvider,
@@ -125,6 +130,7 @@ describe('createProviderStatusTracker', () => {
           {
             assetProvider,
             chainHistoryProvider,
+            drepProvider,
             logger: dummyLogger,
             networkInfoProvider,
             rewardsProvider,
@@ -153,6 +159,7 @@ describe('createProviderStatusTracker', () => {
         {
           assetProvider,
           chainHistoryProvider,
+          drepProvider,
           logger: dummyLogger,
           networkInfoProvider,
           rewardsProvider,
@@ -181,6 +188,7 @@ describe('createProviderStatusTracker', () => {
         {
           assetProvider,
           chainHistoryProvider,
+          drepProvider,
           logger: dummyLogger,
           networkInfoProvider,
           rewardsProvider,
@@ -209,6 +217,7 @@ describe('createProviderStatusTracker', () => {
         {
           assetProvider,
           chainHistoryProvider,
+          drepProvider,
           logger: dummyLogger,
           networkInfoProvider,
           rewardsProvider,

@@ -58,6 +58,7 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
     providers;
   const txSubmitProvider = mocks.mockTxSubmitProvider();
   const assetProvider = mocks.mockAssetProvider();
+  const drepProvider = mocks.mockDrepProvider();
   const stakePoolProvider = createStubStakePoolProvider();
 
   return createPersonalWallet(
@@ -67,6 +68,7 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
       bip32Account,
       chainHistoryProvider,
       connectionStatusTracker$,
+      drepProvider,
       logger,
       networkInfoProvider,
       rewardsProvider,

@@ -1,4 +1,11 @@
-import { Cardano, ChainHistoryProvider, EraSummary, SlotEpochCalc, createSlotEpochCalc } from '@cardano-sdk/core';
+import {
+  Cardano,
+  ChainHistoryProvider,
+  DRepInfo,
+  EraSummary,
+  SlotEpochCalc,
+  createSlotEpochCalc
+} from '@cardano-sdk/core';
 import { DelegationTracker, TransactionsTracker, UtxoTracker } from '../types';
 import { GroupedAddress } from '@cardano-sdk/key-management';
 import { Logger } from 'ts-log';
@@ -36,6 +43,7 @@ export const createBlockEpochProvider =
 export type BlockEpochProvider = ReturnType<typeof createBlockEpochProvider>;
 
 export interface DelegationTrackerProps {
+  drepInfo$: (drepIds: Cardano.DRepID[]) => Observable<DRepInfo[]>;
   rewardsTracker: TrackedRewardsProvider;
   rewardAccountAddresses$: Observable<Cardano.RewardAccount[]>;
   stakePoolProvider: TrackedStakePoolProvider;
@@ -105,6 +113,7 @@ export const createDelegationPortfolioTracker = (transactions: Observable<Cardan
   );
 
 export const createDelegationTracker = ({
+  drepInfo$,
   rewardAccountAddresses$,
   epoch$,
   rewardsTracker,
@@ -164,6 +173,7 @@ export const createDelegationTracker = ({
   const rewardAccounts$ = new TrackerSubject(
     createRewardAccountsTracker({
       balancesStore: stores.rewardsBalances,
+      drepInfo$,
       epoch$,
       rewardAccountAddresses$,
       rewardsProvider,

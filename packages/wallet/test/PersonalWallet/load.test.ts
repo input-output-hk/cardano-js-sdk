@@ -114,6 +114,7 @@ const createWallet = async (props: CreateWalletProps) => {
   } = props.providers;
   const txSubmitProvider = mocks.mockTxSubmitProvider();
   const assetProvider = mocks.mockAssetProvider();
+  const drepProvider = mocks.mockDrepProvider();
   const stakePoolProvider = createStubStakePoolProvider();
 
   const bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
@@ -127,6 +128,7 @@ const createWallet = async (props: CreateWalletProps) => {
       bip32Account,
       chainHistoryProvider,
       connectionStatusTracker$,
+      drepProvider,
       handleProvider,
       logger,
       networkInfoProvider,

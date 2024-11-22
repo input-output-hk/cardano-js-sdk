@@ -18,6 +18,7 @@ import {
   AssetProvider,
   Cardano,
   ChainHistoryProvider,
+  DRepProvider,
   HandleProvider,
   NetworkInfoProvider,
   ProviderFactory,
@@ -39,6 +40,7 @@ import {
   BlockfrostAssetProvider,
   BlockfrostChainHistoryProvider,
   BlockfrostClient,
+  BlockfrostDRepProvider,
   BlockfrostNetworkInfoProvider,
   BlockfrostRewardsProvider,
   BlockfrostTxSubmitProvider,
@@ -81,6 +83,7 @@ export type CreateKeyAgent = (dependencies: KeyAgentDependencies) => Promise<Asy
 export const keyManagementFactory = new ProviderFactory<CreateKeyAgent>();
 export const assetProviderFactory = new ProviderFactory<AssetProvider>();
 export const chainHistoryProviderFactory = new ProviderFactory<ChainHistoryProvider>();
+export const drepProviderFactory = new ProviderFactory<DRepProvider>();
 export const networkInfoProviderFactory = new ProviderFactory<NetworkInfoProvider>();
 export const rewardsProviderFactory = new ProviderFactory<RewardsProvider>();
 export const txSubmitProviderFactory = new ProviderFactory<TxSubmitProvider>();
@@ -175,6 +178,19 @@ chainHistoryProviderFactory.register(BLOCKFROST_PROVIDER, async (params: any, lo
       new BlockfrostChainHistoryProvider(
         new BlockfrostClient({ baseUrl: params.baseUrl }, { rateLimiter: { schedule: (task) => task() } }),
         await networkInfoProviderFactory.create('blockfrost', params, logger),
+        logger
+      )
+    );
+  });
+});
+
+drepProviderFactory.register(BLOCKFROST_PROVIDER, async (params: any, logger): Promise<DRepProvider> => {
+  if (params.baseUrl === undefined) throw new Error(`${BlockfrostDRepProvider.name}: ${MISSING_URL_PARAM}`);
+
+  return new Promise<DRepProvider>(async (resolve) => {
+    resolve(
+      new BlockfrostDRepProvider(
+        new BlockfrostClient({ baseUrl: params.baseUrl }, { rateLimiter: { schedule: (task) => task() } }),
         logger
       )
     );
@@ -483,6 +499,11 @@ export const getWallet = async (props: GetWalletProps) => {
       env.TEST_CLIENT_CHAIN_HISTORY_PROVIDER_PARAMS,
       logger
     ),
+    drepProvider: await drepProviderFactory.create(
+      env.TEST_CLIENT_DREP_PROVIDER,
+      env.TEST_CLIENT_DREP_PROVIDER_PARAMS,
+      logger
+    ),
     handleProvider: await handleProviderFactory.create(
       env.TEST_CLIENT_HANDLE_PROVIDER,
       env.TEST_CLIENT_HANDLE_PROVIDER_PARAMS,
@@ -569,6 +590,11 @@ export const getSharedWallet = async (props: GetSharedWalletProps) => {
     chainHistoryProvider: await chainHistoryProviderFactory.create(
       env.TEST_CLIENT_CHAIN_HISTORY_PROVIDER,
       env.TEST_CLIENT_CHAIN_HISTORY_PROVIDER_PARAMS,
+      logger
+    ),
+    drepProvider: await drepProviderFactory.create(
+      env.TEST_CLIENT_DREP_PROVIDER,
+      env.TEST_CLIENT_DREP_PROVIDER_PARAMS,
       logger
     ),
     handleProvider: await handleProviderFactory.create(

@@ -23,6 +23,7 @@ import { Milliseconds } from '../types';
 import { ProviderFnStats } from './ProviderTracker';
 import { TrackedAssetProvider } from './TrackedAssetProvider';
 import { TrackedChainHistoryProvider } from './TrackedChainHistoryProvider';
+import { TrackedDrepProvider } from './TrackedDrepProvider';
 import { TrackedRewardsProvider } from './TrackedRewardsProvider';
 import { TrackedStakePoolProvider } from './TrackedStakePoolProvider';
 import { TrackedUtxoProvider } from './TrackedUtxoProvider';
@@ -39,6 +40,7 @@ export interface ProviderStatusTrackerDependencies {
   assetProvider: TrackedAssetProvider;
   utxoProvider: TrackedUtxoProvider;
   chainHistoryProvider: TrackedChainHistoryProvider;
+  drepProvider: TrackedDrepProvider;
   rewardsProvider: TrackedRewardsProvider;
   logger: Logger;
 }
@@ -49,7 +51,8 @@ const getDefaultProviderSyncRelevantStats = ({
   assetProvider,
   utxoProvider,
   chainHistoryProvider,
-  rewardsProvider
+  rewardsProvider,
+  drepProvider
 }: ProviderStatusTrackerDependencies): Observable<ProviderFnStats[]> =>
   combineLatest([
     networkInfoProvider.stats.ledgerTip$,
@@ -60,6 +63,7 @@ const getDefaultProviderSyncRelevantStats = ({
     stakePoolProvider.stats.queryStakePools$,
     utxoProvider.stats.utxoByAddresses$,
     chainHistoryProvider.stats.transactionsByAddresses$,
+    drepProvider.stats.getDRepInfo$,
     rewardsProvider.stats.rewardsHistory$,
     rewardsProvider.stats.rewardAccountBalance$
   ]);

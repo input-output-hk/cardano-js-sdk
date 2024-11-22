@@ -52,6 +52,7 @@ describe('TrezorKeyAgent', () => {
     address = groupedAddress.address;
     const rewardAccount = groupedAddress.rewardAccount;
     const assetProvider = mocks.mockAssetProvider();
+    const drepProvider = mocks.mockDrepProvider();
     const stakePoolProvider = createStubStakePoolProvider();
     const networkInfoProvider = mocks.mockNetworkInfoProvider();
     const utxoProvider = mocks.mockUtxoProvider({ address });
@@ -64,6 +65,7 @@ describe('TrezorKeyAgent', () => {
         assetProvider,
         bip32Account: await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent),
         chainHistoryProvider,
+        drepProvider,
         logger,
         networkInfoProvider,
         rewardsProvider,

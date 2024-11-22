@@ -7,3 +7,4 @@ export * from './ProviderStatusTracker';
 export * from './TrackedUtxoProvider';
 export * from './TrackedChainHistoryProvider';
 export * from './TrackedRewardsProvider';
+export * from './TrackedDrepProvider';

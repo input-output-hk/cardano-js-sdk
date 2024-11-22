@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/no-nested-ternary */
 import * as Crypto from '@cardano-sdk/crypto';
 import { BigIntMath, deepEquals, isNotNil } from '@cardano-sdk/util';
-import { Cardano, RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
+import { Cardano, DRepInfo, RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
 import {
   EMPTY,
   Observable,
@@ -25,6 +25,7 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackedStakePoolProvider } from '../ProviderTracker';
 import { TxWithEpoch } from './types';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
+import { drepsToDelegatees, drepsToDrepIds } from '../DrepInfoTracker';
 import { lastStakeKeyCertOfType } from './transactionCertificates';
 import findLast from 'lodash/findLast.js';
 import isEqual from 'lodash/isEqual.js';
@@ -281,12 +282,12 @@ export const createDelegateeTracker = (
 
 export const createDRepDelegateeTracker = (
   certificates$: Observable<TransactionsDRepCertificates>
-): Observable<Cardano.DRepDelegatee | undefined> =>
+): Observable<Cardano.DelegateRepresentative | undefined> =>
   certificates$.pipe(
     switchMap((certs) => {
       const sortedCerts = [...certs].sort((a, b) => a.epoch - b.epoch);
       const mostRecent = sortedCerts.pop()?.certificates.pop();
-      let dRep;
+      let dRep: Cardano.DelegateRepresentative | undefined;
 
       // Certificates at this point are pre filtered, they are either vote delegation kind or stake key de-registration kind.
       // If the most recent is not a de-registration, emit found dRep.
@@ -297,7 +298,7 @@ export const createDRepDelegateeTracker = (
           Cardano.CertificateType.Unregistration
         ])
       ) {
-        dRep = { delegateRepresentative: mostRecent.dRep };
+        dRep = mostRecent.dRep;
       }
 
       return of(dRep);
@@ -327,10 +328,14 @@ export const addressDelegatees = (
     )
   );
 
-export const addressDRepDelegatees = (addresses: Cardano.RewardAccount[], transactions$: Observable<TxWithEpoch[]>) =>
+export const addressDRepDelegatees = (
+  addresses: Cardano.RewardAccount[],
+  transactions$: Observable<TxWithEpoch[]>,
+  drepInfo$: (drepIds: Cardano.DRepID[]) => Observable<DRepInfo[]>
+) =>
   combineLatest(
     addresses.map((address) => createDRepDelegateeTracker(accountDRepCertificateTransactions(transactions$, address)))
-  );
+  ).pipe(switchMap((dreps) => drepInfo$(drepsToDrepIds(dreps)).pipe(map(drepsToDelegatees(dreps)))));
 
 export const addressRewards = (
   rewardAccounts: Cardano.RewardAccount[],
@@ -395,6 +400,7 @@ export const toRewardAccounts =
     );
 
 export const createRewardAccountsTracker = ({
+  drepInfo$,
   rewardAccountAddresses$,
   stakePoolProvider,
   rewardsProvider,
@@ -403,6 +409,7 @@ export const createRewardAccountsTracker = ({
   transactions$,
   transactionsInFlight$
 }: {
+  drepInfo$: (drepIds: Cardano.DRepID[]) => Observable<DRepInfo[]>;
   rewardAccountAddresses$: Observable<Cardano.RewardAccount[]>;
   stakePoolProvider: ObservableStakePoolProvider;
   rewardsProvider: ObservableRewardsProvider;
@@ -416,7 +423,7 @@ export const createRewardAccountsTracker = ({
       combineLatest([
         addressCredentialStatuses(rewardAccounts, transactions$, transactionsInFlight$),
         addressDelegatees(rewardAccounts, transactions$, stakePoolProvider, epoch$),
-        addressDRepDelegatees(rewardAccounts, transactions$),
+        addressDRepDelegatees(rewardAccounts, transactions$, drepInfo$),
         addressRewards(rewardAccounts, transactionsInFlight$, rewardsProvider, balancesStore)
       ]).pipe(map(toRewardAccounts(rewardAccounts)))
     )

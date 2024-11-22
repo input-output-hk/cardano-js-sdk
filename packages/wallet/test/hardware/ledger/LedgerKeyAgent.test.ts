@@ -196,6 +196,7 @@ describe('LedgerKeyAgent', () => {
           0
         );
         const assetProvider = mocks.mockAssetProvider();
+        const drepProvider = mocks.mockDrepProvider();
         const stakePoolProvider = createStubStakePoolProvider();
         const networkInfoProvider = mocks.mockNetworkInfoProvider();
         const utxoProvider = mocks.mockUtxoProvider({ address });
@@ -208,6 +209,7 @@ describe('LedgerKeyAgent', () => {
             assetProvider,
             bip32Account: await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent),
             chainHistoryProvider,
+            drepProvider,
             logger,
             networkInfoProvider,
             rewardsProvider,

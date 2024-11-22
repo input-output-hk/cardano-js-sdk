@@ -146,31 +146,44 @@ describe.each([
         }),
         rewardAccounts: jest.fn().mockResolvedValue([
           {
+            // No DRep delegatee
             address: rewardAccount1,
             keyStatus: Cardano.StakeCredentialStatus.Registered,
             rewardBalance: 10n
           },
           {
+            // Valid DRep delegatee
             address: rewardAccount2,
             dRepDelegatee: {
-              __typename: 'AlwaysAbstain'
-            },
+              delegateRepresentative: {
+                __typename: 'AlwaysAbstain'
+              }
+            } as Cardano.DRepDelegatee,
             keyStatus: Cardano.StakeCredentialStatus.Registered,
             rewardBalance: 20n
           },
           {
+            // Expired DRep delegatee
             address: rewardAccount3,
             dRepDelegatee: {
-              __typename: 'AlwaysAbstain'
-            },
+              delegateRepresentative: {
+                active: false,
+                amount: 0n,
+                hasScript: false,
+                id: Cardano.DRepID('drep1vpzcgfrlgdh4fft0p0ju70czkxxkuknw0jjztl3x7aqgm9q3hqyaz')
+              }
+            } as Cardano.DRepDelegatee,
             keyStatus: Cardano.StakeCredentialStatus.Registered,
             rewardBalance: 30n
           },
           {
+            // Valid DRep delegatee but 0 balance
             address: rewardAccount4,
             dRepDelegatee: {
-              __typename: 'AlwaysAbstain'
-            },
+              delegateRepresentative: {
+                __typename: 'AlwaysAbstain'
+              }
+            } as Cardano.DRepDelegatee,
             keyStatus: Cardano.StakeCredentialStatus.Registered,
             rewardBalance: 0n
           }
@@ -191,8 +204,10 @@ describe.each([
           {
             address: rewardAccount2,
             dRepDelegatee: {
-              __typename: 'AlwaysAbstain'
-            },
+              delegateRepresentative: {
+                __typename: 'AlwaysAbstain'
+              }
+            } as Cardano.DRepDelegatee,
             keyStatus: Cardano.StakeCredentialStatus.Registered,
             rewardBalance: 20n
           },
@@ -204,8 +219,10 @@ describe.each([
           {
             address: rewardAccount4,
             dRepDelegatee: {
-              __typename: 'AlwaysAbstain'
-            },
+              delegateRepresentative: {
+                __typename: 'AlwaysAbstain'
+              }
+            } as Cardano.DRepDelegatee,
             keyStatus: Cardano.StakeCredentialStatus.Registered,
             rewardBalance: 0n
           }
@@ -815,10 +832,7 @@ describe.each([
 
       const txProps = await tx.inspect();
 
-      expect(txProps.body.withdrawals).toEqual([
-        { quantity: 20n, stakeAddress: rewardAccount2 },
-        { quantity: 30n, stakeAddress: rewardAccount3 }
-      ]);
+      expect(txProps.body.withdrawals).toEqual([{ quantity: 20n, stakeAddress: rewardAccount2 }]);
     });
 
     it('adds withdrawals for all registered reward accounts with positive reward balance if protocol version is less than 10', async () => {

@@ -7,6 +7,7 @@ import { BehaviorSubject, Subscription, firstValueFrom, skip } from 'rxjs';
 import {
   Cardano,
   ChainHistoryProvider,
+  DRepProvider,
   HandleProvider,
   ProviderError,
   ProviderFailure,
@@ -86,6 +87,7 @@ describe('BaseWallet methods', () => {
   let rewardsProvider: RewardsProvider;
   let chainHistoryProvider: ChainHistoryProvider;
   let handleProvider: HandleProvider;
+  let drepProvider: DRepProvider;
   let wallet: BaseWallet;
   let utxoProvider: mocks.UtxoProviderStub;
   let witnesser: Witnesser;
@@ -102,6 +104,7 @@ describe('BaseWallet methods', () => {
     chainHistoryProvider = mockChainHistoryProvider();
     handleProvider = mocks.mockHandleProvider();
     addressDiscovery = { discover: jest.fn().mockImplementation(async () => [groupedAddress]) };
+    drepProvider = mocks.mockDrepProvider();
 
     const asyncKeyAgent = await testAsyncKeyAgent();
     bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
@@ -114,6 +117,7 @@ describe('BaseWallet methods', () => {
         assetProvider,
         bip32Account,
         chainHistoryProvider,
+        drepProvider,
         handleProvider,
         logger,
         networkInfoProvider,
@@ -538,6 +542,7 @@ describe('BaseWallet methods', () => {
         assetProvider,
         bip32Account,
         chainHistoryProvider,
+        drepProvider,
         handleProvider,
         logger,
         networkInfoProvider,
@@ -606,6 +611,7 @@ describe('BaseWallet methods', () => {
           assetProvider,
           bip32Account,
           chainHistoryProvider,
+          drepProvider,
           handleProvider,
           logger,
           networkInfoProvider,
@@ -705,6 +711,7 @@ describe('BaseWallet methods', () => {
           assetProvider,
           bip32Account,
           chainHistoryProvider,
+          drepProvider,
           handleProvider,
           logger,
           networkInfoProvider,
@@ -750,6 +757,7 @@ describe('BaseWallet methods', () => {
           assetProvider,
           bip32Account,
           chainHistoryProvider,
+          drepProvider,
           handleProvider,
           logger,
           networkInfoProvider,
@@ -801,6 +809,7 @@ describe('BaseWallet methods', () => {
           assetProvider,
           bip32Account,
           chainHistoryProvider,
+          drepProvider,
           handleProvider,
           logger,
           networkInfoProvider,
@@ -845,6 +854,7 @@ describe('BaseWallet methods', () => {
         {
           assetProvider,
           chainHistoryProvider,
+          drepProvider,
           handleProvider,
           logger,
           networkInfoProvider,
@@ -881,6 +891,7 @@ describe('BaseWallet methods', () => {
         {
           assetProvider,
           chainHistoryProvider,
+          drepProvider,
           handleProvider,
           logger,
           networkInfoProvider,
