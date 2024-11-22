@@ -5,7 +5,7 @@ import type { Responses } from '@blockfrost/blockfrost-js';
 import { BlockfrostAssetProvider } from '../../src';
 import { BlockfrostClient } from '../../src/blockfrost/BlockfrostClient';
 import { logger } from '@cardano-sdk/util-dev';
-import { mockResponses } from './util';
+import { mockResponses } from '../util';
 
 describe('BlockfrostAssetProvider', () => {
   let request: jest.Mock;

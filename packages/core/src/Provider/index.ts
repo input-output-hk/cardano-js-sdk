@@ -10,3 +10,4 @@ export * from './ChainHistoryProvider';
 export * from './providerFactory';
 export * from './types';
 export * from './HandleProvider';
+export * from './DRepProvider';
