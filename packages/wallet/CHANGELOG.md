@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.44.22](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.21...@cardano-sdk/wallet@0.44.22) (2024-11-23)
+
+### Bug Fixes
+
+* **wallet:** transaction tracker now de-duplicates transactions if needed ([08e9bd1](https://github.com/input-output-hk/cardano-js-sdk/commit/08e9bd13b8ae5f4bccc0d68a59cc236f1d92e7fc))
+
 ## [0.44.21](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.20...@cardano-sdk/wallet@0.44.21) (2024-11-23)
 
 ### Bug Fixes
