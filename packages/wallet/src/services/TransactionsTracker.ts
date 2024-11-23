@@ -33,7 +33,7 @@ import { Logger } from 'ts-log';
 import { Range, Shutdown, contextLogger } from '@cardano-sdk/util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
-import { distinctBlock, signedTxsEquals, transactionsEquals, txInEquals } from './util';
+import { distinctBlock, signedTxsEquals, transactionsEquals, txEquals, txInEquals } from './util';
 
 import { WitnessedTx } from '@cardano-sdk/key-management';
 import { newAndStoredMulticast } from './util/newAndStoredMulticast';
@@ -85,6 +85,31 @@ export const PAGE_SIZE = 25;
  */
 const sortTxBySlot = (lhs: Cardano.HydratedTx, rhs: Cardano.HydratedTx) => lhs.blockHeader.slot - rhs.blockHeader.slot;
 
+/**
+ * Deduplicates the given array of HydratedTx.
+ *
+ * @param arr The array of HydratedTx to deduplicate.
+ * @param isEqual The equality function to use to determine if two HydratedTx are equal.
+ */
+const deduplicateSortedArray = (
+  arr: Cardano.HydratedTx[],
+  isEqual: (a: Cardano.HydratedTx, b: Cardano.HydratedTx) => boolean
+) => {
+  if (arr.length === 0) {
+    return [];
+  }
+
+  const result = [arr[0]];
+
+  for (let i = 1; i < arr.length; ++i) {
+    if (!isEqual(arr[i], arr[i - 1])) {
+      result.push(arr[i]);
+    }
+  }
+
+  return result;
+};
+
 const allTransactionsByAddresses = async (
   chainHistoryProvider: ChainHistoryProvider,
   { addresses, blockRange }: { addresses: Cardano.PaymentAddress[]; blockRange: Range<Cardano.BlockNo> }
@@ -110,7 +135,7 @@ const allTransactionsByAddresses = async (
     } while (pageResults.length === PAGE_SIZE);
   }
 
-  return response.sort(sortTxBySlot);
+  return deduplicateSortedArray(response.sort(sortTxBySlot), txEquals);
 };
 
 const getLastTransactionsAtBlock = (
@@ -158,7 +183,7 @@ export const revertLastBlock = (
     }
   }
 
-  return result;
+  return deduplicateSortedArray(result, txEquals);
 };
 
 const findIntersectionAndUpdateTxStore = ({
@@ -251,7 +276,10 @@ const findIntersectionAndUpdateTxStore = ({
 
         if (!areTransactionsSame) {
           // Skip overlapping transactions to avoid duplicates
-          localTransactions = [...localTransactions, ...newTransactions.slice(localTxsFromSameBlock.length)];
+          localTransactions = deduplicateSortedArray(
+            [...localTransactions, ...newTransactions.slice(localTxsFromSameBlock.length)],
+            txEquals
+          );
           store.setAll(localTransactions);
         } else if (rollbackOcurred) {
           // This case handles rollbacks without new additions
@@ -283,7 +311,7 @@ export const createAddressTransactionsProvider = (
         switchMap(([addresses, storedTransactions]) =>
           findIntersectionAndUpdateTxStore({
             addresses,
-            localTransactions: [...storedTransactions],
+            localTransactions: deduplicateSortedArray([...storedTransactions].sort(sortTxBySlot), txEquals),
             rollback$,
             ...props
           })
