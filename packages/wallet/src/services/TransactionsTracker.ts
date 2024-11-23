@@ -77,6 +77,14 @@ export interface TransactionsTrackerInternalsProps {
 // Temporarily hardcoded. Will be replaced with ChainHistoryProvider 'maxPageSize' value once ADP-2249 is implemented
 export const PAGE_SIZE = 25;
 
+/**
+ * Sorts the given HydratedTx by slot.
+ *
+ * @param lhs The left-hand side of the comparison operation.
+ * @param rhs The left-hand side of the comparison operation.
+ */
+const sortTxBySlot = (lhs: Cardano.HydratedTx, rhs: Cardano.HydratedTx) => lhs.blockHeader.slot - rhs.blockHeader.slot;
+
 const allTransactionsByAddresses = async (
   chainHistoryProvider: ChainHistoryProvider,
   { addresses, blockRange }: { addresses: Cardano.PaymentAddress[]; blockRange: Range<Cardano.BlockNo> }
@@ -102,7 +110,7 @@ const allTransactionsByAddresses = async (
     } while (pageResults.length === PAGE_SIZE);
   }
 
-  return response;
+  return response.sort(sortTxBySlot);
 };
 
 const getLastTransactionsAtBlock = (
@@ -120,7 +128,9 @@ const getLastTransactionsAtBlock = (
     }
   }
 
-  return txsFromSameBlock;
+  // Since we are traversing the array in reverse to find the transactions for this block,
+  // we must reverse the result.
+  return txsFromSameBlock.reverse();
 };
 
 export const revertLastBlock = (
@@ -176,7 +186,7 @@ const findIntersectionAndUpdateTxStore = ({
     combinator: exhaustMap,
     equals: transactionsEquals,
     onFatalError,
-    // eslint-disable-next-line sonarjs/cognitive-complexity
+    // eslint-disable-next-line sonarjs/cognitive-complexity,complexity
     provider: async () => {
       let rollbackOcurred = false;
       // eslint-disable-next-line no-constant-condition
@@ -219,12 +229,13 @@ const findIntersectionAndUpdateTxStore = ({
 
         const localTxsFromSameBlock = getLastTransactionsAtBlock(localTransactions, lowerBound);
         const firstSegmentOfNewTransactions = newTransactions.slice(0, localTxsFromSameBlock.length);
+        const hasSameLength = localTxsFromSameBlock.length === firstSegmentOfNewTransactions.length;
 
         // The first segment of new transaction should match exactly (same txs and same order) our last know TXs. Otherwise
         // roll them back and re-apply in new order.
-        const sameTxAndOrder = localTxsFromSameBlock.every(
-          (tx, index) => tx.id === firstSegmentOfNewTransactions[index].id
-        );
+        const sameTxAndOrder =
+          hasSameLength &&
+          localTxsFromSameBlock.every((tx, index) => tx.id === firstSegmentOfNewTransactions[index].id);
 
         if (!sameTxAndOrder) {
           localTransactions = revertLastBlock(localTransactions, lowerBound, rollback$, newTransactions, logger);

@@ -31,7 +31,7 @@ const { generateTxAlonzo, mockChainHistoryProvider, queryTransactionsResult, que
 const updateTransactionsBlockNo = (transactions: Cardano.HydratedTx[], blockNo = Cardano.BlockNo(10_050)) =>
   transactions.map((tx) => ({
     ...tx,
-    blockHeader: { ...tx.blockHeader, blockNo }
+    blockHeader: { ...tx.blockHeader, blockNo, slot: Cardano.Slot(0) }
   }));
 
 const updateTransactionIds = (transactions: Cardano.HydratedTx[], tailPattern = 'aaa') =>
@@ -343,6 +343,13 @@ describe('TransactionsTracker', () => {
           Cardano.BlockNo(10_051)
         );
 
+        txId1.blockHeader.slot = Cardano.Slot(10_050);
+        txId2.blockHeader.slot = Cardano.Slot(10_051);
+        txId3.blockHeader.slot = Cardano.Slot(10_052);
+
+        txId1OtherBlock.blockHeader.slot = Cardano.Slot(10_050);
+        txId2OtherBlock.blockHeader.slot = Cardano.Slot(10_051);
+
         await firstValueFrom(store.setAll([txId1, txId2]));
 
         chainHistoryProvider.transactionsByAddresses = jest.fn(() => ({
@@ -364,11 +371,11 @@ describe('TransactionsTracker', () => {
 
         expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
           [txId1, txId2], // from store
-          [txId1OtherBlock, txId2OtherBlock, txId3] // chain history
+          [txId1, txId2, txId3] // chain history
         ]);
         expect(rollbacks.length).toBe(0);
         expect(store.setAll).toBeCalledTimes(2);
-        expect(store.setAll).nthCalledWith(2, [txId1OtherBlock, txId2OtherBlock, txId3]);
+        expect(store.setAll).nthCalledWith(2, [txId1, txId2, txId3]);
       });
 
       // latestStoredBlock  <1 2 3>
@@ -380,7 +387,15 @@ describe('TransactionsTracker', () => {
           queryTransactionsResult2.pageResults,
           Cardano.BlockNo(10_050)
         );
+
+        txId1.blockHeader.slot = Cardano.Slot(10_050);
+        txId2.blockHeader.slot = Cardano.Slot(10_051);
+        txId3.blockHeader.slot = Cardano.Slot(10_052);
+
         const [txId1OtherBlock, txId2OtherBlock] = updateTransactionsBlockNo([txId1, txId2], Cardano.BlockNo(10_051));
+
+        txId1OtherBlock.blockHeader.slot = Cardano.Slot(10_051);
+        txId2OtherBlock.blockHeader.slot = Cardano.Slot(10_052);
 
         await firstValueFrom(store.setAll([txId1, txId2, txId3]));
 
@@ -494,6 +509,43 @@ describe('TransactionsTracker', () => {
         expect(rollbacks.length).toBe(0);
         expect(store.setAll).toBeCalledTimes(2);
         expect(store.setAll).nthCalledWith(2, [txId3OtherBlock, txId2OtherBlock, txId1OtherBlock]);
+      });
+
+      it('process transactions in the right order (sorted by slot ASC) regardless of transaction order in the backend response', async () => {
+        const [txId1, txId2, txId3] = updateTransactionsBlockNo(
+          queryTransactionsResult2.pageResults,
+          Cardano.BlockNo(10_000)
+        );
+
+        txId1.blockHeader.slot = Cardano.Slot(10_000);
+        txId2.blockHeader.slot = Cardano.Slot(10_001);
+        txId3.blockHeader.slot = Cardano.Slot(10_002);
+
+        await firstValueFrom(store.setAll([txId1, txId2, txId3]));
+
+        chainHistoryProvider.transactionsByAddresses = jest.fn(() => ({
+          pageResults: [txId3, txId2, txId1],
+          totalResultCount: 3
+        }));
+
+        const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
+          addresses$: of(addresses),
+          chainHistoryProvider,
+          logger,
+          retryBackoffConfig,
+          store,
+          tipBlockHeight$
+        });
+
+        const rollbacks: Cardano.HydratedTx[] = [];
+        rollback$.subscribe((tx) => rollbacks.push(tx));
+
+        expect(await firstValueFrom(provider$.pipe(bufferCount(1)))).toEqual([
+          [txId1, txId2, txId3] // chain history
+        ]);
+        expect(rollbacks.length).toBe(0);
+        expect(store.setAll).toBeCalledTimes(1);
+        expect(store.setAll).nthCalledWith(1, [txId1, txId2, txId3]);
       });
 
       // latestStoredBlock  <1 2 3>
