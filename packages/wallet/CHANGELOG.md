@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.44.21](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.20...@cardano-sdk/wallet@0.44.21) (2024-11-23)
+
+### Bug Fixes
+
+* **wallet:** transaction tracker now process transaction in chronological order ([40b87ce](https://github.com/input-output-hk/cardano-js-sdk/commit/40b87ce80cea81edf6739273fbc6a10a11633972))
+
 ## [0.44.20](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.19...@cardano-sdk/wallet@0.44.20) (2024-11-20)
 
 ### Bug Fixes
