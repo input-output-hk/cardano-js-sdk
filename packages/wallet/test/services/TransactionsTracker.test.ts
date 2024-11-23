@@ -34,10 +34,24 @@ const updateTransactionsBlockNo = (transactions: Cardano.HydratedTx[], blockNo =
     blockHeader: { ...tx.blockHeader, blockNo, slot: Cardano.Slot(0) }
   }));
 
-const updateTransactionIds = (transactions: Cardano.HydratedTx[], tailPattern = 'aaa') =>
+const generateRandomLetters = (length: number) => {
+  let result = '';
+  const characters = '0123456789abcdef';
+  const charactersLength = characters.length;
+
+  for (let i = 0; i < length; ++i) {
+    const randomIndex = Math.floor(Math.random() * charactersLength);
+    result += characters.charAt(randomIndex);
+  }
+
+  return result;
+};
+
+
+const updateTransactionIds = (transactions: Cardano.HydratedTx[]) =>
   transactions.map((tx) => ({
     ...tx,
-    id: Cardano.TransactionId(`${tx.id.slice(0, -tailPattern.length)}${tailPattern}`)
+    id: Cardano.TransactionId(`${generateRandomLetters(64)}`)
   }));
 
 describe('TransactionsTracker', () => {
@@ -372,6 +386,46 @@ describe('TransactionsTracker', () => {
         expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
           [txId1, txId2], // from store
           [txId1, txId2, txId3] // chain history
+        ]);
+        expect(rollbacks.length).toBe(0);
+        expect(store.setAll).toBeCalledTimes(2);
+        expect(store.setAll).nthCalledWith(2, [txId1, txId2, txId3]);
+      });
+
+      it('ignores duplicate transactions', async () => {
+        // eslint-disable-next-line max-len
+        const [txId1, txId2, txId3] = updateTransactionsBlockNo(queryTransactionsResult2.pageResults, Cardano.BlockNo(10_050));
+
+        txId1.blockHeader.slot = Cardano.Slot(10_050);
+        txId2.blockHeader.slot = Cardano.Slot(10_051);
+        txId3.blockHeader.slot = Cardano.Slot(10_052);
+
+        txId1.id = Cardano.TransactionId(generateRandomLetters(64));
+        txId2.id = Cardano.TransactionId(generateRandomLetters(64));
+        txId3.id = Cardano.TransactionId(generateRandomLetters(64));
+
+        await firstValueFrom(store.setAll([txId1, txId1, txId2]));
+
+        chainHistoryProvider.transactionsByAddresses = jest.fn(() => ({
+          pageResults: [txId1, txId2, txId2, txId3, txId3, txId3],
+          totalResultCount: 3
+        }));
+
+        const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
+          addresses$: of(addresses),
+          chainHistoryProvider,
+          logger,
+          retryBackoffConfig,
+          store,
+          tipBlockHeight$
+        });
+
+        const rollbacks: Cardano.HydratedTx[] = [];
+        rollback$.subscribe((tx) => rollbacks.push(tx));
+
+        expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
+          [txId1, txId1, txId2], // from store
+          [txId1, txId2, txId3]  // chain history (fixes stored duplicates)
         ]);
         expect(rollbacks.length).toBe(0);
         expect(store.setAll).toBeCalledTimes(2);
