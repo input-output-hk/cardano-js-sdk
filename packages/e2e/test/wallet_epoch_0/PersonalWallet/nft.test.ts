@@ -106,13 +106,11 @@ describe('PersonalWallet.assets/nft', () => {
       [policyId]: {
         'NFT-001': {
           image: ['ipfs://some_hash1'],
-          name: 'One',
-          version: '1.0'
+          name: 'One'
         },
         'NFT-002': {
           image: ['ipfs://some_hash2'],
-          name: 'Two',
-          version: '1.0'
+          name: 'Two'
         },
         'NFT-files': {
           description: ['NFT with different types of files'],
@@ -131,8 +129,7 @@ describe('PersonalWallet.assets/nft', () => {
           id: '1',
           image: ['ipfs://somehash'],
           mediaType: 'image/png',
-          name: 'NFT with files',
-          version: '1.0'
+          name: 'NFT with files'
         }
       }
     });
@@ -195,8 +192,7 @@ describe('PersonalWallet.assets/nft', () => {
     const secondTokenMetadata = nfts.find((nft) => nft.assetId === assetIds[TOKEN_METADATA_2_INDEX])?.nftMetadata;
     expect(secondTokenMetadata).toMatchObject({
       image: 'ipfs://some_hash1',
-      name: 'One',
-      version: '1.0'
+      name: 'One'
     });
 
     expect(nfts.find((nft) => nft.assetId === assetIds[TOKEN_METADATA_1_INDEX])).toBeDefined();
@@ -281,7 +277,7 @@ describe('PersonalWallet.assets/nft', () => {
         const assetId = Cardano.AssetId(`${policyId}${assetNameHex}`);
         const tokens = new Map([[assetId, 1n]]);
 
-        const txDataMetadatum = new Map([
+        const txDataMetadatum = new Map<Cardano.Metadatum, Cardano.Metadatum>([
           [
             version === 1 ? policyId : Buffer.from(policyId, 'hex'),
             new Map([
@@ -289,12 +285,12 @@ describe('PersonalWallet.assets/nft', () => {
                 version === 1 ? (encoding === 'hex' ? assetNameHex : assetName) : Buffer.from(assetName),
                 metadatum.jsonToMetadatum({
                   image: ['ipfs://some_hash1'],
-                  name: assetName,
-                  version
+                  name: assetName
                 })
               ]
             ])
-          ]
+          ],
+          ['version', BigInt(version)]
         ]);
 
         const auxiliaryData = { blob: new Map([[721n, txDataMetadatum]]) };
@@ -342,10 +338,6 @@ describe('PersonalWallet.assets/nft', () => {
 
     CIP0025Test('supports CIP-25 v1, assetName hex encoded', 'CIP-0025-v1-hex', 1, 'hex');
     CIP0025Test('supports CIP-25 v1, assetName utf8 encoded', 'CIP-0025-v1-utf8', 1, 'utf8');
-
-    // https://input-output-rnd.slack.com/archives/C06J663L2A2/p1731505470694659
-    env.TEST_CLIENT_ASSET_PROVIDER !== 'blockfrost'
-      ? CIP0025Test('supports CIP-25 v2', 'CIP-0025-v2', 2)
-      : test.todo('"supports CIP-25 v2" test is disabled when running with Blockfrost asset provider');
+    CIP0025Test('supports CIP-25 v2', 'CIP-0025-v2', 2);
   });
 });
