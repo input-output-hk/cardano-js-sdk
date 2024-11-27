@@ -23,7 +23,6 @@
     "load-test-custom:wallet-restoration": "ts-node test/load-test-custom/wallet-restoration/wallet-restoration.test.ts",
     "test": "echo 'test' command not implemented yet",
     "test:blockfrost": "jest -c jest.config.js --forceExit --selectProjects blockfrost --runInBand --verbose",
-    "test:blockfrost:providers": "jest -c jest.config.js --forceExit --selectProjects blockfrost-providers --runInBand --verbose",
     "test:utils": "jest -c jest.config.js --forceExit --selectProjects utils --verbose",
     "test:long-running": "jest -c jest.config.js --forceExit --selectProjects long-running --runInBand --verbose",
     "test:local-network": "jest -c jest.config.js --forceExit --selectProjects local-network --runInBand --verbose",
