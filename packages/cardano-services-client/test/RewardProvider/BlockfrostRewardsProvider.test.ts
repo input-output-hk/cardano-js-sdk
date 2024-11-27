@@ -57,8 +57,8 @@ describe('blockfrostRewardsProvider', () => {
 
     test('epoch bounds & query per stake address', async () => {
       mockResponses(request, [
-        [`accounts/${rewardAccounts[0]}/rewards?count=100?page=1`, generateRewardsResponse(2, 98)],
-        [`accounts/${rewardAccounts[1]}/rewards?count=100?page=1`, generateRewardsResponse(2, 98)]
+        [`accounts/${rewardAccounts[0]}/rewards?page=1&count=100`, generateRewardsResponse(2, 98)],
+        [`accounts/${rewardAccounts[1]}/rewards?page=1&count=100`, generateRewardsResponse(2, 98)]
       ]);
 
       const response = await provider.rewardsHistory({
@@ -79,8 +79,8 @@ describe('blockfrostRewardsProvider', () => {
 
     test('pagination', async () => {
       mockResponses(request, [
-        [`accounts/${rewardAccounts[0]}/rewards?count=100?page=1`, generateRewardsResponse(100)],
-        [`accounts/${rewardAccounts[0]}/rewards?count=100?page=2`, generateRewardsResponse(0)]
+        [`accounts/${rewardAccounts[0]}/rewards?page=1&count=100`, generateRewardsResponse(100)],
+        [`accounts/${rewardAccounts[0]}/rewards?page=2&count=100`, generateRewardsResponse(0)]
       ]);
 
       const response = await provider.rewardsHistory({

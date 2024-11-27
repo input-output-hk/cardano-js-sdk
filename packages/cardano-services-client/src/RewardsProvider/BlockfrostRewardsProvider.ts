@@ -1,6 +1,6 @@
 import { Cardano, Reward, RewardAccountBalanceArgs, RewardsHistoryArgs, RewardsProvider } from '@cardano-sdk/core';
 
-import { BlockfrostClient, BlockfrostProvider, isBlockfrostNotFoundError } from '../blockfrost';
+import { BlockfrostClient, BlockfrostProvider, fetchSequentially, isBlockfrostNotFoundError } from '../blockfrost';
 import { Logger } from 'ts-log';
 import { Range } from '@cardano-sdk/util';
 import type { Responses } from '@blockfrost/blockfrost-js';
@@ -30,31 +30,25 @@ export class BlockfrostRewardsProvider extends BlockfrostProvider implements Rew
       upperBound = Cardano.EpochNo(Number.MAX_SAFE_INTEGER)
     }: Range<Cardano.EpochNo> = {}
   ): Promise<Reward[]> {
-    try {
-      const result: Reward[] = [];
-      const batchSize = 100;
-      let page = 1;
-      let haveMorePages = true;
-      while (haveMorePages) {
-        const rewardsPage = await this.request<Responses['account_reward_content']>(
-          `accounts/${stakeAddress.toString()}/rewards?count=${batchSize}?page=${page}`
-        );
-
-        result.push(
-          ...rewardsPage
-            .filter(({ epoch }) => lowerBound <= epoch && epoch <= upperBound)
-            .map(({ epoch, amount }) => ({
-              epoch: Cardano.EpochNo(epoch),
-              rewards: stringToBigInt(amount)
-            }))
-        );
-        haveMorePages = rewardsPage.length === batchSize && rewardsPage[rewardsPage.length - 1].epoch < upperBound;
-        page += 1;
-      }
-      return result;
-    } catch (error) {
-      throw this.toProviderError(error);
-    }
+    const batchSize = 100;
+    return fetchSequentially<Reward, Responses['account_reward_content'][0]>({
+      haveEnoughItems: (_, rewardsPage) => {
+        const lastReward = rewardsPage[rewardsPage.length - 1];
+        return !lastReward || lastReward.epoch >= upperBound;
+      },
+      paginationOptions: { count: batchSize },
+      request: (paginationQueryString) =>
+        this.request<Responses['account_reward_content']>(
+          `accounts/${stakeAddress.toString()}/rewards?${paginationQueryString}`
+        ),
+      responseTranslator: (rewardsPage) =>
+        rewardsPage
+          .filter(({ epoch }) => lowerBound <= epoch && epoch <= upperBound)
+          .map(({ epoch, amount }) => ({
+            epoch: Cardano.EpochNo(epoch),
+            rewards: stringToBigInt(amount)
+          }))
+    });
   }
   public async rewardsHistory({ rewardAccounts, epochs }: RewardsHistoryArgs) {
     const allAddressRewards = await Promise.all(rewardAccounts.map((address) => this.accountRewards(address, epochs)));
