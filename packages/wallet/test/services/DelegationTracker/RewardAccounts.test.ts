@@ -17,7 +17,8 @@ import {
   createDelegateeTracker,
   createQueryStakePoolsProvider,
   createRewardsProvider,
-  fetchRewardsTrigger$, getStakePoolIdAtEpoch
+  fetchRewardsTrigger$,
+  getStakePoolIdAtEpoch
 } from '../../../src';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
@@ -147,7 +148,8 @@ describe('RewardAccounts', () => {
         certificates: [
           {
             __typename: Cardano.CertificateType.VoteRegistrationDelegation
-          } as Cardano.VoteRegistrationDelegationCertificate],
+          } as Cardano.VoteRegistrationDelegationCertificate
+        ],
         epoch: Cardano.EpochNo(103)
       },
       {
@@ -170,7 +172,8 @@ describe('RewardAccounts', () => {
           {
             __typename: Cardano.CertificateType.StakeRegistrationDelegation,
             poolId: poolId1
-          } as Cardano.StakeRegistrationDelegationCertificate],
+          } as Cardano.StakeRegistrationDelegationCertificate
+        ],
         epoch: Cardano.EpochNo(106)
       },
       // Unregister stake key
@@ -184,7 +187,8 @@ describe('RewardAccounts', () => {
           {
             __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
             poolId: poolId2
-          } as Cardano.StakeVoteRegistrationDelegationCertificate],
+          } as Cardano.StakeVoteRegistrationDelegationCertificate
+        ],
         epoch: Cardano.EpochNo(108)
       },
       // Delegation ignored after stake key is unregistered
@@ -595,8 +599,12 @@ describe('RewardAccounts', () => {
   describe('addressDRepDelegatees', () => {
     it('emits a dRep delegatee for every reward account', () => {
       createTestScheduler().run(({ cold, expectObservable }) => {
-        const rewardAccount1 = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
-        const rewardAccount2 = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
+        const rewardAccount1 = Cardano.RewardAccount(
+          'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'
+        );
+        const rewardAccount2 = Cardano.RewardAccount(
+          'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d'
+        );
         const stakeKeyHash1 = Cardano.RewardAccount.toHash(rewardAccount1);
         const stakeKeyHash2 = Cardano.RewardAccount.toHash(rewardAccount2);
         const transactions$ = cold('a-b-c', {
@@ -666,23 +674,38 @@ describe('RewardAccounts', () => {
         const tracker$ = addressDRepDelegatees([rewardAccount1, rewardAccount2], transactions$);
         expectObservable(tracker$).toBe('a-b-c', {
           a: [undefined, undefined],
-          b: [{ delegateRepresentative: {
+          b: [
+            {
+              delegateRepresentative: {
             __typename: 'AlwaysAbstain'
-          } },
-            undefined],
-          c: [{ delegateRepresentative: {
+              }
+            },
+            undefined
+          ],
+          c: [
+            {
+              delegateRepresentative: {
             __typename: 'AlwaysAbstain'
-          } }, { delegateRepresentative: {
+              }
+            },
+            {
+              delegateRepresentative: {
             __typename: 'AlwaysAbstain'
-          } }]
+              }
+            }
+          ]
         });
       });
     });
 
     it('emits the most recent dRep delegatee', () => {
       createTestScheduler().run(({ cold, expectObservable }) => {
-        const rewardAccount1 = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
-        const rewardAccount2 = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
+        const rewardAccount1 = Cardano.RewardAccount(
+          'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'
+        );
+        const rewardAccount2 = Cardano.RewardAccount(
+          'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d'
+        );
         const stakeKeyHash1 = Cardano.RewardAccount.toHash(rewardAccount1);
         const stakeKeyHash2 = Cardano.RewardAccount.toHash(rewardAccount2);
 
@@ -755,20 +778,30 @@ describe('RewardAccounts', () => {
         const tracker$ = addressDRepDelegatees([rewardAccount1], transactions$);
         expectObservable(tracker$).toBe('a-b-c', {
           a: [undefined],
-          b: [{ delegateRepresentative: {
+          b: [
+            {
+              delegateRepresentative: {
             __typename: 'AlwaysNoConfidence'
-          } }],
-          c: [{ delegateRepresentative: {
+              }
+            }
+          ],
+          c: [
+            {
+              delegateRepresentative: {
             hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash2),
             type: Cardano.CredentialType.KeyHash
-          } }]
+              }
+            }
+          ]
         });
       });
     });
 
     it('unsets dRep if a StakeDeregistration happens', () => {
       createTestScheduler().run(({ cold, expectObservable }) => {
-        const rewardAccount1 = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
+        const rewardAccount1 = Cardano.RewardAccount(
+          'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'
+        );
         const stakeKeyHash1 = Cardano.RewardAccount.toHash(rewardAccount1);
 
         const transactions$ = cold('a-b-c-d-e', {
@@ -945,7 +978,8 @@ describe('RewardAccounts', () => {
                       __typename: Cardano.CertificateType.VoteDelegation,
                       dRep: {
                         __typename: 'AlwaysNoConfidence'
-                      }, stakeCredential: {
+                      },
+                      stakeCredential: {
                         hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
                         type: Cardano.CredentialType.KeyHash
                       }
@@ -959,20 +993,31 @@ describe('RewardAccounts', () => {
         const tracker$ = addressDRepDelegatees([rewardAccount1], transactions$);
         expectObservable(tracker$).toBe('a-b-c---d', {
           a: [undefined],
-          b: [{ delegateRepresentative: {
+          b: [
+            {
+              delegateRepresentative: {
               __typename: 'AlwaysNoConfidence'
-            } }],
+              }
+            }
+          ],
           c: [undefined], // Un-register sets dRep to undefined, re-register still doesnt defined dRep but observable doesnt re-emit undefined
-          d: [{ delegateRepresentative: { // delegate
+          d: [
+            {
+              delegateRepresentative: {
+                // delegate
               __typename: 'AlwaysNoConfidence'
-            } }]
+              }
+            }
+          ]
         });
       });
     });
 
     it('unsets dRep if a Unregistration happens', () => {
       createTestScheduler().run(({ cold, expectObservable }) => {
-        const rewardAccount1 = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
+        const rewardAccount1 = Cardano.RewardAccount(
+          'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'
+        );
         const stakeKeyHash1 = Cardano.RewardAccount.toHash(rewardAccount1);
 
         const transactions$ = cold('a-b-c-d', {
@@ -1098,21 +1143,34 @@ describe('RewardAccounts', () => {
         const tracker$ = addressDRepDelegatees([rewardAccount1], transactions$);
         expectObservable(tracker$).toBe('a-b-c-d', {
           a: [undefined],
-          b: [{ delegateRepresentative: {
+          b: [
+            {
+              delegateRepresentative: {
               __typename: 'AlwaysNoConfidence'
-            } }],
+              }
+            }
+          ],
           c: [undefined], // Un-register sets dRep to undefined
-          d: [{ delegateRepresentative: { // re-register + vote delegate
+          d: [
+            {
+              delegateRepresentative: {
+                // re-register + vote delegate
               __typename: 'AlwaysNoConfidence'
-            } }]
+              }
+            }
+          ]
         });
       });
     });
 
     it('detects all vote delegation certificates', () => {
       createTestScheduler().run(({ cold, expectObservable }) => {
-        const rewardAccount1 = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
-        const rewardAccount2 = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
+        const rewardAccount1 = Cardano.RewardAccount(
+          'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'
+        );
+        const rewardAccount2 = Cardano.RewardAccount(
+          'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d'
+        );
         const stakeKeyHash1 = Cardano.RewardAccount.toHash(rewardAccount1);
         const stakeKeyHash2 = Cardano.RewardAccount.toHash(rewardAccount2);
 
@@ -1331,20 +1389,36 @@ describe('RewardAccounts', () => {
         const tracker$ = addressDRepDelegatees([rewardAccount1], transactions$);
         expectObservable(tracker$).toBe('a-b-c-d-e', {
           a: [undefined],
-          b: [{ delegateRepresentative: {
+          b: [
+            {
+              delegateRepresentative: {
             __typename: 'AlwaysAbstain'
-          } }],
-          c: [{ delegateRepresentative: {
+              }
+            }
+          ],
+          c: [
+            {
+              delegateRepresentative: {
             __typename: 'AlwaysNoConfidence'
-          } }],
-          d: [{ delegateRepresentative: {
+              }
+            }
+          ],
+          d: [
+            {
+              delegateRepresentative: {
             hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash2),
             type: Cardano.CredentialType.KeyHash
-          } }],
-          e: [{ delegateRepresentative: {
+              }
+            }
+          ],
+          e: [
+            {
+              delegateRepresentative: {
             hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
             type: Cardano.CredentialType.ScriptHash
-          } }]
+              }
+            }
+          ]
         });
       });
     });
