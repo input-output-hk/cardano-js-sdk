@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/NetworkInfo/BlockfrostNetworkInfoProvider/BlockfrostNetworkInfoProvider.ts</title>
+    <title>Code coverage report for src/blockfrost/BlockfrostToCore.ts</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../../../prettify.css" />
-    <link rel="stylesheet" href="../../../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../../../favicon.png" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../../../sort-arrow-sprite.png);
+            background-image: url(../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../../index.html">All files</a> / <a href="index.html">src/NetworkInfo/BlockfrostNetworkInfoProvider</a> BlockfrostNetworkInfoProvider.ts</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/blockfrost</a> BlockfrostToCore.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">86.48% </span>
+                <span class="strong">77.41% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>32/37</span>
+                <span class='fraction'>24/31</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">44.44% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>1/2</span>
+                <span class='fraction'>4/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">90.9% </span>
+                <span class="strong">66.66% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>10/11</span>
+                <span class='fraction'>8/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">86.11% </span>
+                <span class="strong">88% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>31/36</span>
+                <span class='fraction'>22/25</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -182,67 +182,17 @@
 <a name='L117'></a><a href='#L117'>117</a>
 <a name='L118'></a><a href='#L118'>118</a>
 <a name='L119'></a><a href='#L119'>119</a>
-<a name='L120'></a><a href='#L120'>120</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">40x</span>
-<span class="cline-any cline-yes">40x</span>
-<span class="cline-any cline-yes">40x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">40x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">40x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">18x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -254,7 +204,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">200x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -264,23 +220,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">204x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">200x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -289,137 +236,214 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">200x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { BlockfrostProvider } from '../../util/BlockfrostProvider/BlockfrostProvider';
-import { BlockfrostToCore, blockfrostToProviderError } from '../../util';
-import {
-  Cardano,
-  EraSummary,
-  Milliseconds,
-  NetworkInfoProvider,
-  Seconds,
-  StakeSummary,
-  SupplySummary
-} from '@cardano-sdk/core';
-import { Schemas } from '@blockfrost/blockfrost-js/lib/types/open-api';
-import { handleError } from '@blockfrost/blockfrost-js/lib/utils/errors';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">208x</span>
+<span class="cline-any cline-yes">208x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">208x</span>
+<span class="cline-any cline-yes">208x</span>
+<span class="cline-any cline-yes">416x</span>
+<span class="cline-any cline-yes">208x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">208x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">208x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">208x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">208x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">208x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">208x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Cardano, Serialization } from '@cardano-sdk/core';
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { HexBlob } from '@cardano-sdk/util';
+import type { Responses } from '@blockfrost/blockfrost-js';
 &nbsp;
-export class BlockfrostNetworkInfoProvider extends BlockfrostProvider implements NetworkInfoProvider {
-  public async stake(): Promise&lt;StakeSummary&gt; {
-    try {
-      const network = await this.blockfrost.network();
-      return {
-        active: BigInt(network.stake.active),
-        live: BigInt(network.stake.live)
-      };
-    } catch (error) {
-      throw blockfrostToProviderError(error);
+type Unpacked&lt;T&gt; = T extends (infer U)[] ? U : T;
+type BlockfrostAddressUtxoContent = Responses['address_utxo_content'];
+type BlockfrostInputs = Responses['tx_content_utxo']['inputs'];
+type BlockfrostInput = Pick&lt;Unpacked&lt;BlockfrostInputs&gt;, 'address' | 'amount' | 'output_index' | 'tx_hash'&gt;;
+type BlockfrostOutputs = Responses['tx_content_utxo']['outputs'];
+type BlockfrostOutput = Unpacked&lt;BlockfrostOutputs&gt;;
+export type BlockfrostTransactionContent = Unpacked&lt;Responses['address_transactions_content']&gt;;
+export type BlockfrostUtxo = Unpacked&lt;BlockfrostAddressUtxoContent&gt;;
+&nbsp;
+export const BlockfrostToCore = {
+  addressUtxoContent: (
+    address: string,
+    utxo: Responses['address_utxo_content'][0],
+    txOutFromCbor?: Cardano.TxOut
+  ): Cardano.Utxo =&gt;
+    [
+      BlockfrostToCore.hydratedTxIn(BlockfrostToCore.inputFromUtxo(address, utxo)),
+      BlockfrostToCore.txOut(BlockfrostToCore.outputFromUtxo(address, utxo), txOutFromCbor)
+    ] as Cardano.Utxo,
+&nbsp;
+  blockToTip: (block: Responses['block_content']): Cardano.Tip =&gt; ({
+    blockNo: Cardano.BlockNo(block.height!),
+    hash: Cardano.BlockId(block.hash),
+    slot: Cardano.Slot(block.slot!)
+  }),
+&nbsp;
+  hydratedTxIn: (blockfrost: BlockfrostInput): Cardano.HydratedTxIn =&gt; ({
+    address: Cardano.PaymentAddress(blockfrost.address),
+    index: blockfrost.output_index,
+    txId: Cardano.TransactionId(blockfrost.tx_hash)
+  }),
+&nbsp;
+  inputFromUtxo: (address: string, utxo: BlockfrostUtxo): BlockfrostInput =&gt; ({
+    address,
+    amount: utxo.amount,
+    output_index: utxo.output_index,
+    tx_hash: utxo.tx_hash
+  }),
+&nbsp;
+  inputs: <span class="fstat-no" title="function not covered" >(i</span>nputs: BlockfrostInputs): Cardano.TxIn[] =&gt; <span class="cstat-no" title="statement not covered" >inputs.map(<span class="fstat-no" title="function not covered" >(i</span>nput) =&gt; <span class="cstat-no" title="statement not covered" >BlockfrostToCore.hydratedTxIn(input))</span>,</span>
+&nbsp;
+  outputFromUtxo: (address: string, utxo: BlockfrostUtxo): BlockfrostOutput =&gt; ({
+    ...utxo,
+    address,
+    collateral: false
+  }),
+&nbsp;
+  outputs: <span class="fstat-no" title="function not covered" >(o</span>utputs: BlockfrostOutputs): Cardano.TxOut[] =&gt; <span class="cstat-no" title="statement not covered" >outputs.map(<span class="fstat-no" title="function not covered" >(o</span>utput) =&gt; <span class="cstat-no" title="statement not covered" >BlockfrostToCore.txOut(output))</span>,</span>
+&nbsp;
+  // @todo Blockfrost library does not provide NewProtocolParamsInConway parameters yet
+  protocolParameters: (blockfrost: Responses['epoch_param_content']): Cardano.ProtocolParameters =&gt; ({
+    coinsPerUtxoByte: Number(blockfrost.coins_per_utxo_word),
+    collateralPercentage: blockfrost.collateral_percent!,
+    committeeTermLimit: Cardano.EpochNo(0),
+    costModels: new Map&lt;Cardano.PlutusLanguageVersion, Cardano.CostModel&gt;([
+      [Cardano.PlutusLanguageVersion.V1, Object.values(blockfrost.cost_models!.PlutusV1 as { [key: string]: number })],
+      [Cardano.PlutusLanguageVersion.V2, Object.values(blockfrost.cost_models!.PlutusV2 as { [key: string]: number })]
+    ]),
+    dRepDeposit: blockfrost.drep_deposit ? <span class="branch-0 cbranch-no" title="branch not covered" >Number(blockfrost.drep_deposit) </span>: undefined,
+    dRepInactivityPeriod: Cardano.EpochNo(0),
+    dRepVotingThresholds: null as unknown as Cardano.DelegateRepresentativeThresholds,
+    desiredNumberOfPools: blockfrost.n_opt,
+    governanceActionDeposit: blockfrost.gov_action_deposit ? <span class="branch-0 cbranch-no" title="branch not covered" >Number(blockfrost.gov_action_deposit) </span>: undefined,
+    governanceActionValidityPeriod: Cardano.EpochNo(0),
+    maxBlockBodySize: blockfrost.max_block_size,
+    maxBlockHeaderSize: blockfrost.max_block_header_size,
+    maxCollateralInputs: Number(blockfrost.max_collateral_inputs),
+    maxExecutionUnitsPerBlock: {
+      memory: Number.parseInt(blockfrost.max_block_ex_mem!),
+      steps: Number.parseInt(blockfrost.max_block_ex_steps!)
+    },
+    maxExecutionUnitsPerTransaction: {
+      memory: Number.parseInt(blockfrost.max_tx_ex_mem!),
+      steps: Number.parseInt(blockfrost.max_tx_ex_steps!)
+    },
+    maxTxSize: Number(blockfrost.max_tx_size),
+    maxValueSize: Number(blockfrost.max_val_size),
+    minCommitteeSize: 0,
+    minFeeCoefficient: blockfrost.min_fee_a,
+    minFeeConstant: blockfrost.min_fee_b,
+    minPoolCost: Number(blockfrost.min_pool_cost),
+    monetaryExpansion: blockfrost.rho.toString(),
+    poolDeposit: Number(blockfrost.pool_deposit),
+    poolInfluence: blockfrost.a0.toString(),
+    poolRetirementEpochBound: blockfrost.e_max,
+    poolVotingThresholds: null as unknown as Cardano.PoolVotingThresholds,
+    prices: {
+      memory: blockfrost.price_mem!,
+      steps: blockfrost.price_step!
+    },
+    protocolVersion: { major: blockfrost.protocol_major_ver, minor: blockfrost.protocol_minor_ver },
+    stakeKeyDeposit: Number(blockfrost.key_deposit),
+    treasuryExpansion: blockfrost.tau.toString()
+  }),
+&nbsp;
+  txOut: (blockfrost: BlockfrostOutput, txOutFromCbor?: Cardano.TxOut): Cardano.TxOut =&gt; {
+    const value: Cardano.Value = {
+      coins: BigInt(blockfrost.amount.find(({ unit }) =&gt; unit === 'lovelace')!.quantity)
+    };
+&nbsp;
+    const assets: Cardano.TokenMap = new Map();
+    for (const { quantity, unit } of blockfrost.amount) {
+      if (unit === 'lovelace') continue;
+      assets.set(Cardano.AssetId(unit), BigInt(quantity));
     }
-  }
 &nbsp;
-  public async lovelaceSupply(): Promise&lt;SupplySummary&gt; {
-    try {
-      const { supply } = await this.blockfrost.network();
-      return {
-        circulating: BigInt(supply.circulating),
-        total: BigInt(supply.total)
-      };
-    } catch (error) {
-      throw blockfrostToProviderError(error);
-    }
-  }
+    if (assets.size &gt; 0) value.assets = assets;
 &nbsp;
-  public async ledgerTip(): Promise&lt;Cardano.Tip&gt; {
-    try {
-      const block = await this.blockfrost.blocksLatest();
-      return BlockfrostToCore.blockToTip(block);
-    } catch (error) {
-      throw blockfrostToProviderError(error);
-    }
-  }
+    const txOut: Cardano.TxOut = {
+      address: Cardano.PaymentAddress(blockfrost.address),
+      value
+    };
 &nbsp;
-  public async protocolParameters(): Promise&lt;Cardano.ProtocolParameters&gt; {
-    try {
-      const response = await this.blockfrost.epochsLatestParameters();
-      return BlockfrostToCore.protocolParameters(response);
-    } catch (error) {
-      throw blockfrostToProviderError(error);
-    }
-  }
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (blockfrost.inline_datum)
+<span class="cstat-no" title="statement not covered" >      txOut.datum = Serialization.PlutusData.fromCbor(HexBlob(blockfrost.inline_datum)).toCore();</span>
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (blockfrost.data_hash) <span class="cstat-no" title="statement not covered" >txOut.datumHash = Hash32ByteBase16(blockfrost.data_hash);</span>
 &nbsp;
-  public async genesisParameters(): Promise&lt;Cardano.CompactGenesis&gt; {
-    return this.blockfrost
-      .genesis()
-      .then((response) =&gt; ({
-        activeSlotsCoefficient: response.active_slots_coefficient,
-        epochLength: response.epoch_length,
-        maxKesEvolutions: response.max_kes_evolutions,
-        maxLovelaceSupply: BigInt(response.max_lovelace_supply),
-        networkId:
-          response.network_magic === Cardano.NetworkMagics.Mainnet
-            ? Cardano.NetworkId.Mainnet
-            : <span class="branch-1 cbranch-no" title="branch not covered" >Cardano.NetworkId.Testnet,</span>
-        networkMagic: response.network_magic,
-        securityParameter: response.security_param,
-        slotLength: Seconds(response.slot_length),
-        slotsPerKesPeriod: response.slots_per_kes_period,
-        systemStart: new Date(response.system_start * 1000),
-        updateQuorum: response.update_quorum
-      }))
-      .catch((error) =&gt; {
-        throw blockfrostToProviderError(error);
-      });
-  }
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (txOutFromCbor?.scriptReference) <span class="cstat-no" title="statement not covered" >txOut.scriptReference = txOutFromCbor.scriptReference;</span>
 &nbsp;
-  protected <span class="fstat-no" title="function not covered" >async </span>fetchEraSummaries(): Promise&lt;Schemas['network-eras']&gt; {
-<span class="cstat-no" title="statement not covered" >    try {</span>
-      // Although Blockfrost have the endpoint, the blockfrost-js library don't have a call for it
-      // https://github.com/blockfrost/blockfrost-js/issues/294
-      const response = <span class="cstat-no" title="statement not covered" >await this.blockfrost.instance&lt;Schemas['network-eras']&gt;('network/eras');</span>
-<span class="cstat-no" title="statement not covered" >      return response.body;</span>
-    } catch (error) {
-<span class="cstat-no" title="statement not covered" >      throw handleError(error);</span>
-    }
+    return txOut;
   }
-&nbsp;
-  protected async parseEraSummaries(summaries: Schemas['network-eras'], systemStart: Date): Promise&lt;EraSummary[]&gt; {
-    try {
-      return summaries.map((r) =&gt; ({
-        parameters: {
-          epochLength: r.parameters.epoch_length,
-          slotLength: Milliseconds(r.parameters.slot_length * 1000)
-        },
-        start: {
-          slot: r.start.slot,
-          time: new Date(systemStart.getTime() + r.start.time * 1000)
-        }
-      }));
-    } catch (error) {
-<span class="cstat-no" title="statement not covered" >      throw handleError(error);</span>
-    }
-  }
-&nbsp;
-  public async eraSummaries(): Promise&lt;EraSummary[]&gt; {
-    try {
-      const { systemStart } = await this.genesisParameters();
-      const summaries = await this.fetchEraSummaries();
-      return this.parseEraSummaries(summaries, systemStart);
-    } catch (error) {
-      throw blockfrostToProviderError(error);
-    }
-  }
-}
+};
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -427,16 +451,16 @@ export class BlockfrostNetworkInfoProvider extends BlockfrostProvider implements
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-11-23T18:17:24.172Z
+                at 2024-11-29T17:26:04.381Z
             </div>
-        <script src="../../../prettify.js"></script>
+        <script src="../../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../../../sorter.js"></script>
-        <script src="../../../block-navigation.js"></script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
     </body>
 </html>
     
