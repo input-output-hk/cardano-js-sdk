@@ -65,7 +65,10 @@ export const mockResponses = (request: jest.Mock, responses: [string | RegExp, u
   request.mockImplementation(async (endpoint: string) => {
     for (const [match, response] of responses) {
       if (typeof match === 'string') {
-        if (match === endpoint) return response;
+        if (match === endpoint) {
+          if (response instanceof Error) throw response;
+          return response;
+        }
       } else if (match.test(endpoint)) {
         return response;
       }

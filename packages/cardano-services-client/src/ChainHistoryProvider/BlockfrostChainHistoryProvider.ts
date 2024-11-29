@@ -1,14 +1,15 @@
 // eslint-disable-next-line jsdoc/check-param-names
 import * as Crypto from '@cardano-sdk/crypto';
-import { BlockfrostProvider, BlockfrostProviderDependencies } from '../../util/BlockfrostProvider/BlockfrostProvider';
+
 import {
+  BlockfrostClient,
+  BlockfrostProvider,
   BlockfrostToCore,
   BlockfrostTransactionContent,
   blockfrostMetadataToTxMetadata,
-  blockfrostToProviderError,
-  fetchByAddressSequentially,
+  fetchSequentially,
   isBlockfrostNotFoundError
-} from '../../util';
+} from '../blockfrost';
 import {
   BlocksByIdsArgs,
   Cardano,
@@ -22,22 +23,19 @@ import {
   TransactionsByIdsArgs,
   createSlotEpochCalc
 } from '@cardano-sdk/core';
-import { DB_MAX_SAFE_INTEGER } from '../DbSyncChainHistory/queries';
-import { Responses } from '@blockfrost/blockfrost-js';
-import { Schemas } from '@blockfrost/blockfrost-js/lib/types/open-api';
+import { Logger } from 'ts-log';
 import omit from 'lodash/omit.js';
+import type { Responses } from '@blockfrost/blockfrost-js';
+import type { Schemas } from '@blockfrost/blockfrost-js/lib/types/open-api';
 
 type WithCertIndex<T> = T & { cert_index: number };
-
-export interface BlockfrostChainHistoryProviderDependencies extends BlockfrostProviderDependencies {
-  networkInfoProvider: NetworkInfoProvider;
-}
+export const DB_MAX_SAFE_INTEGER = 2_147_483_647;
 
 export class BlockfrostChainHistoryProvider extends BlockfrostProvider implements ChainHistoryProvider {
   private networkInfoProvider: NetworkInfoProvider;
 
-  constructor({ logger, blockfrost, networkInfoProvider }: BlockfrostChainHistoryProviderDependencies) {
-    super({ blockfrost, logger });
+  constructor(client: BlockfrostClient, networkInfoProvider: NetworkInfoProvider, logger: Logger) {
+    super(client, logger);
     this.networkInfoProvider = networkInfoProvider;
   }
 
@@ -46,7 +44,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
     redeemer_count
   }: Responses['tx_content']): Promise<Cardano.Redeemer[] | undefined> {
     if (!redeemer_count) return;
-    return this.blockfrost.txsRedeemers(hash).then((response) =>
+    return this.request<Responses['tx_content_redeemers']>(`txs/${hash}/redeemers`).then((response) =>
       response.map(
         ({ purpose, script_hash, unit_mem, unit_steps, tx_index }): Cardano.Redeemer => ({
           data: Buffer.from(script_hash),
@@ -79,7 +77,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
     hash
   }: Responses['tx_content']): Promise<Cardano.Withdrawal[] | undefined> {
     if (!withdrawal_count) return;
-    return this.blockfrost.txsWithdrawals(hash).then((response) =>
+    return this.request<Responses['tx_content_withdrawals']>(`txs/${hash}/withdrawals`).then((response) =>
       response.map(
         ({ address, amount }): Cardano.Withdrawal => ({
           quantity: BigInt(amount),
@@ -107,7 +105,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
   }
 
   protected async fetchPoolRetireCerts(hash: string): Promise<WithCertIndex<Cardano.PoolRetirementCertificate>[]> {
-    return this.blockfrost.txsPoolRetires(hash).then((response) =>
+    return this.request<Responses['tx_content_pool_retires']>(`txs/${hash}/pool_retires`).then((response) =>
       response.map(({ pool_id, retiring_epoch, cert_index }) => ({
         __typename: Cardano.CertificateType.PoolRetirement,
         cert_index,
@@ -118,7 +116,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
   }
 
   protected async fetchPoolUpdateCerts(hash: string): Promise<WithCertIndex<Cardano.PoolRegistrationCertificate>[]> {
-    return this.blockfrost.txsPoolUpdates(hash).then((response) =>
+    return this.request<Responses['tx_content_pool_certs']>(`txs/${hash}/pool_updates`).then((response) =>
       response.map(({ pool_id, cert_index, fixed_cost, margin_cost, pledge, reward_account, vrf_key }) => ({
         __typename: Cardano.CertificateType.PoolRegistration,
         cert_index,
@@ -138,10 +136,9 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
   }
 
   async fetchCBOR(hash: string): Promise<string> {
-    return this.blockfrost
-      .instance<Schemas['script_cbor']>(`txs/${hash}/cbor`)
+    return this.request<Responses['tx_content_cbor']>(`txs/${hash}/cbor`)
       .then((response) => {
-        if (response.body.cbor) return response.body.cbor;
+        if (response) return response.cbor;
         throw new Error('CBOR is null');
       })
       .catch((_error) => {
@@ -163,7 +160,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
   }
 
   protected async fetchMirCerts(hash: string): Promise<WithCertIndex<Cardano.MirCertificate>[]> {
-    return this.blockfrost.txsMirs(hash).then((response) =>
+    return this.request<Responses['tx_content_mirs']>(`txs/${hash}/mirs`).then((response) =>
       response.map(({ address, amount, cert_index, pot }) => ({
         __typename: Cardano.CertificateType.MIR,
         cert_index,
@@ -176,7 +173,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
   }
 
   protected async fetchStakeCerts(hash: string): Promise<WithCertIndex<Cardano.StakeAddressCertificate>[]> {
-    return this.blockfrost.txsStakes(hash).then((response) =>
+    return this.request<Responses['tx_content_stake_addr']>(`txs/${hash}/stakes`).then((response) =>
       response.map(({ address, cert_index, registration }) => ({
         __typename: registration
           ? Cardano.CertificateType.StakeRegistration
@@ -191,7 +188,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
   }
 
   protected async fetchDelegationCerts(hash: string): Promise<WithCertIndex<Cardano.StakeDelegationCertificate>[]> {
-    return this.blockfrost.txsDelegations(hash).then((response) =>
+    return this.request<Responses['tx_content_delegations']>(`txs/${hash}/delegations`).then((response) =>
       response.map(({ address, pool_id, cert_index }) => ({
         __typename: Cardano.CertificateType.StakeDelegation,
         cert_index,
@@ -230,8 +227,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
 
   protected async fetchJsonMetadataAsAuxiliaryData(txHash: string): Promise<Cardano.AuxiliaryData | undefined> {
     const UNDEFINED = undefined;
-    return this.blockfrost
-      .txsMetadata(txHash)
+    return this.request<Responses['tx_content_metadata']>(`txs/${txHash}/metadata`)
       .then((m) => {
         const metadata = blockfrostMetadataToTxMetadata(m);
         return metadata && metadata.size > 0
@@ -257,7 +253,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
   }
 
   protected async fetchEpochParameters(epochNo: Cardano.EpochNo): Promise<Schemas['epoch_param_content']> {
-    return await this.blockfrost.epochsParameters(epochNo);
+    return await this.request<Responses['epoch_param_content']>(`epochs/${epochNo}/parameters`);
   }
 
   protected async processCertificates(
@@ -375,7 +371,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
     const txFromCBOR = await this.fetchDetailsFromCBOR(id);
     if (!txFromCBOR) return;
 
-    const utxos: Schemas['tx_content_utxo'] = (await this.blockfrost.txsUtxos(id)) as Schemas['tx_content_utxo'];
+    const utxos = await this.request<Responses['tx_content_utxo']>(`txs/${id}/utxos`);
 
     // We can't use txFromCBOR.body.inputs since it misses HydratedTxIn.address
     const { inputs, outputs, collaterals } = this.transactionUtxos(utxos, txFromCBOR);
@@ -418,11 +414,11 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
 
   protected async fetchTransaction(txId: Cardano.TransactionId): Promise<Cardano.HydratedTx> {
     try {
-      const txContent = await this.blockfrost.txs(txId.toString());
+      const txContent = await this.request<Responses['tx_content']>(`txs/${txId.toString()}`);
 
       return (await this.transactionDetailsUsingCBOR(txContent)) ?? (await this.transactionDetailsUsingAPIs(txContent));
     } catch (error) {
-      throw blockfrostToProviderError(error);
+      throw this.toProviderError(error);
     }
   }
 
@@ -444,7 +440,9 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
 
   public async blocksByHashes({ ids }: BlocksByIdsArgs): Promise<Cardano.ExtendedBlockInfo[]> {
     try {
-      const responses = await Promise.all(ids.map((id) => this.blockfrost.blocks(id.toString())));
+      const responses = await Promise.all(
+        ids.map((id) => this.request<Responses['block_content']>(`blocks/${id.toString()}`))
+      );
       return responses.map((response) => {
         if (!response.epoch || !response.epoch_slot || !response.height || !response.slot || !response.block_vrf) {
           throw new ProviderError(ProviderFailure.Unknown, null, 'Queried unsupported block');
@@ -470,7 +468,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
         };
       });
     } catch (error) {
-      throw blockfrostToProviderError(error);
+      throw this.toProviderError(error);
     }
   }
 
@@ -478,7 +476,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
     try {
       return Promise.all(ids.map((id) => this.fetchTransaction(id)));
     } catch (error) {
-      throw blockfrostToProviderError(error);
+      throw this.toProviderError(error);
     }
   }
 
@@ -495,21 +493,18 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
 
       const addressTransactions = await Promise.all(
         addresses.map(async (address) =>
-          fetchByAddressSequentially<
-            { tx_hash: string; tx_index: number; block_height: number },
-            BlockfrostTransactionContent
-          >({
-            address,
+          fetchSequentially<{ tx_hash: string; tx_index: number; block_height: number }, BlockfrostTransactionContent>({
             haveEnoughItems: blockRange?.lowerBound
               ? (transactions) =>
                   transactions.length > 0 &&
                   transactions[transactions.length - 1].block_height < blockRange!.lowerBound!
               : undefined,
-            request: (addr: Cardano.PaymentAddress, paginationOptions) =>
-              this.blockfrost.addressesTransactions(addr.toString(), paginationOptions, {
-                from: blockRange?.lowerBound ? blockRange?.lowerBound.toString() : undefined,
-                to: blockRange?.upperBound ? blockRange?.upperBound.toString() : undefined
-              })
+            request: (paginationQueryString) => {
+              let queryString = `addresses/${address}/transactions?${paginationQueryString}`;
+              if (blockRange?.lowerBound) queryString += `&from=${blockRange.lowerBound.toString()}`;
+              if (blockRange?.upperBound) queryString += `&to=${blockRange.upperBound.toString()}`;
+              return this.request<Responses['address_transactions_content']>(queryString);
+            }
           })
         )
       );
@@ -526,7 +521,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
 
       return { pageResults, totalResultCount: allTransactions.length };
     } catch (error) {
-      throw blockfrostToProviderError(error);
+      throw this.toProviderError(error);
     }
   }
 
@@ -581,6 +576,6 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
   }
 
   private fetchUtxos(id: Cardano.TransactionId): Promise<Schemas['tx_content_utxo']> {
-    return this.blockfrost.txsUtxos(id);
+    return this.request<Responses['tx_content_utxo']>(`txs/${id}/utxos`);
   }
 }

@@ -139,6 +139,7 @@ describe('PersonalWallet/multiAddress', () => {
     expect(returnAdaTxFoundInHistory.id).toEqual(returnAdaSignedTx.id);
     expect(normalizeTxBody(returnAdaTxFoundInHistory.body)).toEqual(normalizeTxBody(returnAdaSignedTx.body));
 
+    await walletReady(newWallet.wallet);
     const endingBalance = await firstValueFromTimed(newWallet.wallet.balance.utxo.total$);
     const expectedEndingBalance = 1_500_000n - returnAdaTxFoundInHistory.body.fee;
 

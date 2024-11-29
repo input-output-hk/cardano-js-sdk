@@ -50,12 +50,19 @@ export class BlockfrostClient {
 
   /**
    * @param endpoint e.g. 'blocks/latest'
+   * @param requestInit request options
    * @throws {BlockfrostError}
    */
-  public request<T>(endpoint: string): Promise<T> {
+  public request<T>(endpoint: string, requestInit?: RequestInit): Promise<T> {
     return this.rateLimiter.schedule(() =>
       firstValueFrom(
-        fromFetch(`${this.baseUrl}/${endpoint}`, this.requestInit).pipe(
+        fromFetch(`${this.baseUrl}/${endpoint}`, {
+          ...this.requestInit,
+          ...requestInit,
+          headers: requestInit?.headers
+            ? { ...this.requestInit.headers, ...requestInit.headers }
+            : this.requestInit.headers
+        }).pipe(
           switchMap(async (response): Promise<T> => {
             if (response.ok) {
               try {
@@ -65,8 +72,8 @@ export class BlockfrostClient {
               }
             }
             try {
-              const body = await response.text();
-              throw new BlockfrostError(response.status, body);
+              const responseBody = await response.text();
+              throw new BlockfrostError(response.status, responseBody);
             } catch {
               throw new BlockfrostError(response.status);
             }

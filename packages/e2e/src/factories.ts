@@ -37,7 +37,12 @@ import {
 } from '@cardano-sdk/key-management';
 import {
   BlockfrostAssetProvider,
+  BlockfrostChainHistoryProvider,
   BlockfrostClient,
+  BlockfrostNetworkInfoProvider,
+  BlockfrostRewardsProvider,
+  BlockfrostTxSubmitProvider,
+  BlockfrostUtxoProvider,
   CardanoWsClient,
   assetInfoHttpProvider,
   chainHistoryHttpProvider,
@@ -162,6 +167,20 @@ chainHistoryProviderFactory.register(
   async (_params: any, logger: Logger) => (await getWsClient(logger)).chainHistoryProvider
 );
 
+chainHistoryProviderFactory.register(BLOCKFROST_PROVIDER, async (params: any, logger) => {
+  if (params.baseUrl === undefined) throw new Error(`${BlockfrostChainHistoryProvider.name}: ${MISSING_URL_PARAM}`);
+
+  return new Promise(async (resolve) => {
+    resolve(
+      new BlockfrostChainHistoryProvider(
+        new BlockfrostClient({ baseUrl: params.baseUrl }, { rateLimiter: { schedule: (task) => task() } }),
+        await networkInfoProviderFactory.create('blockfrost', params, logger),
+        logger
+      )
+    );
+  });
+});
+
 networkInfoProviderFactory.register(
   HTTP_PROVIDER,
   async (params: any, logger: Logger): Promise<NetworkInfoProvider> => {
@@ -178,11 +197,37 @@ networkInfoProviderFactory.register(
   async (_params: any, logger: Logger) => (await getWsClient(logger)).networkInfoProvider
 );
 
+networkInfoProviderFactory.register(BLOCKFROST_PROVIDER, async (params: any, logger) => {
+  if (params.baseUrl === undefined) throw new Error(`${BlockfrostNetworkInfoProvider.name}: ${MISSING_URL_PARAM}`);
+
+  return new Promise(async (resolve) => {
+    resolve(
+      new BlockfrostNetworkInfoProvider(
+        new BlockfrostClient({ baseUrl: params.baseUrl }, { rateLimiter: { schedule: (task) => task() } }),
+        logger
+      )
+    );
+  });
+});
+
 rewardsProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<RewardsProvider> => {
   if (params.baseUrl === undefined) throw new Error(`${rewardsHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<RewardsProvider>(async (resolve) => {
     resolve(rewardsHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger }));
+  });
+});
+
+rewardsProviderFactory.register(BLOCKFROST_PROVIDER, async (params: any, logger) => {
+  if (params.baseUrl === undefined) throw new Error(`${BlockfrostRewardsProvider.name}: ${MISSING_URL_PARAM}`);
+
+  return new Promise(async (resolve) => {
+    resolve(
+      new BlockfrostRewardsProvider(
+        new BlockfrostClient({ baseUrl: params.baseUrl }, { rateLimiter: { schedule: (task) => task() } }),
+        logger
+      )
+    );
   });
 });
 
@@ -220,6 +265,19 @@ txSubmitProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logg
   });
 });
 
+txSubmitProviderFactory.register(BLOCKFROST_PROVIDER, async (params: any, logger) => {
+  if (params.baseUrl === undefined) throw new Error(`${BlockfrostTxSubmitProvider.name}: ${MISSING_URL_PARAM}`);
+
+  return new Promise(async (resolve) => {
+    resolve(
+      new BlockfrostTxSubmitProvider(
+        new BlockfrostClient({ baseUrl: params.baseUrl }, { rateLimiter: { schedule: (task) => task() } }),
+        logger
+      )
+    );
+  });
+});
+
 utxoProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<UtxoProvider> => {
   if (params.baseUrl === undefined) throw new Error(`${utxoHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
@@ -232,6 +290,19 @@ utxoProviderFactory.register(
   WS_PROVIDER,
   async (_params: any, logger: Logger) => (await getWsClient(logger)).utxoProvider
 );
+
+utxoProviderFactory.register(BLOCKFROST_PROVIDER, async (params: any, logger) => {
+  if (params.baseUrl === undefined) throw new Error(`${BlockfrostUtxoProvider.name}: ${MISSING_URL_PARAM}`);
+
+  return new Promise(async (resolve) => {
+    resolve(
+      new BlockfrostUtxoProvider(
+        new BlockfrostClient({ baseUrl: params.baseUrl }, { rateLimiter: { schedule: (task) => task() } }),
+        logger
+      )
+    );
+  });
+});
 
 handleProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<HandleProvider> => {
   if (params.baseUrl === undefined) throw new Error(`${handleHttpProvider.name}: ${MISSING_URL_PARAM}`);

@@ -35,11 +35,11 @@ export class TrackedWalletNetworkInfoProvider extends ProviderTracker implements
     super();
     networkInfoProvider = networkInfoProvider;
 
-    this.eraSummaries = () => this.trackedCall(networkInfoProvider.eraSummaries, this.stats.eraSummaries$);
-    this.ledgerTip = () => this.trackedCall(networkInfoProvider.ledgerTip, this.stats.ledgerTip$);
+    this.eraSummaries = () => this.trackedCall(() => networkInfoProvider.eraSummaries(), this.stats.eraSummaries$);
+    this.ledgerTip = () => this.trackedCall(() => networkInfoProvider.ledgerTip(), this.stats.ledgerTip$);
     this.protocolParameters = () =>
-      this.trackedCall(networkInfoProvider.protocolParameters, this.stats.protocolParameters$);
+      this.trackedCall(() => networkInfoProvider.protocolParameters(), this.stats.protocolParameters$);
     this.genesisParameters = () =>
-      this.trackedCall(networkInfoProvider.genesisParameters, this.stats.genesisParameters$);
+      this.trackedCall(() => networkInfoProvider.genesisParameters(), this.stats.genesisParameters$);
   }
 }

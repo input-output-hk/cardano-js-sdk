@@ -36,12 +36,13 @@ export abstract class BlockfrostProvider implements Provider {
 
   /**
    * @param endpoint e.g. 'blocks/latest'
+   * @param requestInit request options
    * @throws {ProviderError}
    */
-  protected async request<T>(endpoint: string): Promise<T> {
+  protected async request<T>(endpoint: string, requestInit?: RequestInit): Promise<T> {
     try {
       this.logger.debug('request', endpoint);
-      const response = await this.#client.request<T>(endpoint);
+      const response = await this.#client.request<T>(endpoint, requestInit);
       this.logger.debug('response', response);
       return response;
     } catch (error) {
@@ -60,6 +61,9 @@ export abstract class BlockfrostProvider implements Provider {
   }
 
   protected toProviderError(error: unknown): ProviderError {
+    if (error instanceof ProviderError) {
+      return error;
+    }
     if (error instanceof BlockfrostError) {
       return new ProviderError(toProviderFailure(error.status), error);
     }

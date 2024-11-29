@@ -17,7 +17,7 @@ describe('BlockfrostClient', () => {
       const fetchResponse = new Response(JSON.stringify(responseData), { status: 200 });
       global.fetch = jest.fn().mockResolvedValue(fetchResponse);
 
-      const response = await client.request('/');
+      const response = await client.request('/', { body: '123', method: 'POST' });
       expect(response).toEqual(responseData);
     });
 

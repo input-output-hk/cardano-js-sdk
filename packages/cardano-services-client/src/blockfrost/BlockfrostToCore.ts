@@ -1,7 +1,7 @@
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
-import { Responses } from '@blockfrost/blockfrost-js';
+import type { Responses } from '@blockfrost/blockfrost-js';
 
 type Unpacked<T> = T extends (infer U)[] ? U : T;
 type BlockfrostAddressUtxoContent = Responses['address_utxo_content'];
@@ -61,11 +61,11 @@ export const BlockfrostToCore = {
       [Cardano.PlutusLanguageVersion.V1, Object.values(blockfrost.cost_models!.PlutusV1 as { [key: string]: number })],
       [Cardano.PlutusLanguageVersion.V2, Object.values(blockfrost.cost_models!.PlutusV2 as { [key: string]: number })]
     ]),
-    dRepDeposit: 0,
+    dRepDeposit: blockfrost.drep_deposit ? Number(blockfrost.drep_deposit) : undefined,
     dRepInactivityPeriod: Cardano.EpochNo(0),
     dRepVotingThresholds: null as unknown as Cardano.DelegateRepresentativeThresholds,
     desiredNumberOfPools: blockfrost.n_opt,
-    governanceActionDeposit: 0,
+    governanceActionDeposit: blockfrost.gov_action_deposit ? Number(blockfrost.gov_action_deposit) : undefined,
     governanceActionValidityPeriod: Cardano.EpochNo(0),
     maxBlockBodySize: blockfrost.max_block_size,
     maxBlockHeaderSize: blockfrost.max_block_header_size,

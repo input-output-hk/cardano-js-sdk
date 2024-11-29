@@ -1,18 +1,13 @@
-import { BlockfrostChainHistoryProvider, BlockfrostNetworkInfoProvider, util } from '@cardano-sdk/cardano-services';
+import { BlockfrostChainHistoryProvider, BlockfrostNetworkInfoProvider } from '@cardano-sdk/cardano-services-client';
 import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
 import { logger } from '@cardano-sdk/util-dev';
+import { util } from '@cardano-sdk/cardano-services';
 
 describe.only('BlockfrostChainHistoryProvider', () => {
   let chainHistoryProvider: ChainHistoryProvider;
-  let blockfrost;
   beforeAll(async () => {
-    blockfrost = util.getBlockfrostApi();
-    const networkInfoProvider = new BlockfrostNetworkInfoProvider({ blockfrost, logger });
-    chainHistoryProvider = new BlockfrostChainHistoryProvider({
-      blockfrost,
-      logger,
-      networkInfoProvider
-    });
+    const networkInfoProvider = new BlockfrostNetworkInfoProvider(util.getBlockfrostClient(), logger);
+    chainHistoryProvider = new BlockfrostChainHistoryProvider(util.getBlockfrostClient(), networkInfoProvider, logger);
   });
 
   describe('transactionsByHashes', () => {
