@@ -74,7 +74,9 @@ export class BlockfrostNetworkInfoProvider extends BlockfrostProvider implements
             : Cardano.NetworkId.Testnet,
         networkMagic: response.network_magic,
         securityParameter: response.security_param,
-        slotLength: Seconds(response.slot_length),
+        // Blockfrost currently returns '0' for our local network
+        // https://github.com/blockfrost/openapi/pull/389
+        slotLength: Seconds(response.slot_length || 0.2),
         slotsPerKesPeriod: response.slots_per_kes_period,
         systemStart: new Date(response.system_start * 1000),
         updateQuorum: response.update_quorum
