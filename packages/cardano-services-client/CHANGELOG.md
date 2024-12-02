@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.23.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.22.3...@cardano-sdk/cardano-services-client@0.23.0) (2024-12-02)
+
+### ⚠ BREAKING CHANGES
+
+* hoist remaining Blockfrost providers into cardano-services-client
+
+### Features
+
+* **cardano-services-client:** extend Blockfrost request pipeline to include body ([a76691b](https://github.com/input-output-hk/cardano-js-sdk/commit/a76691b70347235a37da9cd52fe9175cbd62d38a))
+* hoist remaining Blockfrost providers into cardano-services-client ([5b68405](https://github.com/input-output-hk/cardano-js-sdk/commit/5b684056f7234ecd908a720846ef9ff3483fc8a4))
+
+### Bug Fixes
+
+* **cardano-services-client:** map conway deposit parameters ([45f4c98](https://github.com/input-output-hk/cardano-js-sdk/commit/45f4c9826820a38e6c30900a4d42939719ca6bb3))
+* **cardano-services-client:** workaround blockfrost slotLength issue in local network ([a0b8497](https://github.com/input-output-hk/cardano-js-sdk/commit/a0b8497e16b316ce874b93f4d59c94e38df29875))
+
 ## [0.22.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.22.2...@cardano-sdk/cardano-services-client@0.22.3) (2024-11-23)
 
 ### Features
