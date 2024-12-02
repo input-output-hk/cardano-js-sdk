@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.42.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.41.5...@cardano-sdk/core@0.42.0) (2024-12-02)
+
+### ⚠ BREAKING CHANGES
+
+* **wallet:** DRepDelegatee type has changed to include DrepInfo
+- createRewardsAccountTracker now requires a drepInfo$ dependency.
+- BaseWallet requires a DrepProvider as a dependency
+
+### Features
+
+* **wallet:** implement DrepStatusTracker ([6362d83](https://github.com/input-output-hk/cardano-js-sdk/commit/6362d834feda307c4a9eddf32c6069ef66945d92))
+
 ## [0.41.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.41.4...@cardano-sdk/core@0.41.5) (2024-12-02)
 
 **Note:** Version bump only for package @cardano-sdk/core
