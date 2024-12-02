@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">98.6% </span>
+                <span class="strong">98.62% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>141/143</span>
+                <span class='fraction'>143/145</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">97.05% </span>
+                <span class="strong">97.1% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>66/68</span>
+                <span class='fraction'>67/69</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">98.41% </span>
+                <span class="strong">98.43% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>124/126</span>
+                <span class='fraction'>126/128</span>
             </div>
         
             
@@ -486,7 +486,14 @@
 <a name='L421'></a><a href='#L421'>421</a>
 <a name='L422'></a><a href='#L422'>422</a>
 <a name='L423'></a><a href='#L423'>423</a>
-<a name='L424'></a><a href='#L424'>424</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L424'></a><a href='#L424'>424</a>
+<a name='L425'></a><a href='#L425'>425</a>
+<a name='L426'></a><a href='#L426'>426</a>
+<a name='L427'></a><a href='#L427'>427</a>
+<a name='L428'></a><a href='#L428'>428</a>
+<a name='L429'></a><a href='#L429'>429</a>
+<a name='L430'></a><a href='#L430'>430</a>
+<a name='L431'></a><a href='#L431'>431</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">42x</span>
 <span class="cline-any cline-yes">42x</span>
@@ -512,6 +519,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">42x</span>
 <span class="cline-any cline-yes">42x</span>
 <span class="cline-any cline-yes">42x</span>
 <span class="cline-any cline-yes">42x</span>
@@ -816,9 +824,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">128x</span>
 <span class="cline-any cline-yes">129x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">141x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">42x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -871,8 +883,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">133x</span>
-<span class="cline-any cline-yes">133x</span>
+<span class="cline-any cline-yes">204x</span>
+<span class="cline-any cline-yes">204x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -883,6 +895,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -912,7 +926,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/* eslint-disable unicorn/no-nested-ternary */
 import * as Crypto from '@cardano-sdk/crypto';
 import { BigIntMath, deepEquals, isNotNil } from '@cardano-sdk/util';
-import { Cardano, RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
+import { Cardano, DRepInfo, RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
 import {
   EMPTY,
   Observable,
@@ -936,6 +950,7 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackedStakePoolProvider } from '../ProviderTracker';
 import { TxWithEpoch } from './types';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
+import { drepsToDelegatees, drepsToDrepIds } from '../DrepInfoTracker';
 import { lastStakeKeyCertOfType } from './transactionCertificates';
 import findLast from 'lodash/findLast.js';
 import isEqual from 'lodash/isEqual.js';
@@ -1192,12 +1207,12 @@ export const createDelegateeTracker = (
 &nbsp;
 export const createDRepDelegateeTracker = (
   certificates$: Observable&lt;TransactionsDRepCertificates&gt;
-): Observable&lt;Cardano.DRepDelegatee | undefined&gt; =&gt;
+): Observable&lt;Cardano.DelegateRepresentative | undefined&gt; =&gt;
   certificates$.pipe(
     switchMap((certs) =&gt; {
       const sortedCerts = [...certs].sort((a, b) =&gt; a.epoch - b.epoch);
       const mostRecent = sortedCerts.pop()?.certificates.pop();
-      let dRep;
+      let dRep: Cardano.DelegateRepresentative | undefined;
 &nbsp;
       // Certificates at this point are pre filtered, they are either vote delegation kind or stake key de-registration kind.
       // If the most recent is not a de-registration, emit found dRep.
@@ -1208,7 +1223,7 @@ export const createDRepDelegateeTracker = (
           Cardano.CertificateType.Unregistration
         ])
       ) {
-        dRep = { delegateRepresentative: mostRecent.dRep };
+        dRep = mostRecent.dRep;
       }
 &nbsp;
       return of(dRep);
@@ -1238,10 +1253,14 @@ export const addressDelegatees = (
     )
   );
 &nbsp;
-export const addressDRepDelegatees = (addresses: Cardano.RewardAccount[], transactions$: Observable&lt;TxWithEpoch[]&gt;) =&gt;
+export const addressDRepDelegatees = (
+  addresses: Cardano.RewardAccount[],
+  transactions$: Observable&lt;TxWithEpoch[]&gt;,
+  drepInfo$: (drepIds: Cardano.DRepID[]) =&gt; Observable&lt;DRepInfo[]&gt;
+) =&gt;
   combineLatest(
     addresses.map((address) =&gt; createDRepDelegateeTracker(accountDRepCertificateTransactions(transactions$, address)))
-  );
+  ).pipe(switchMap((dreps) =&gt; drepInfo$(drepsToDrepIds(dreps)).pipe(map(drepsToDelegatees(dreps)))));
 &nbsp;
 export const addressRewards = (
   rewardAccounts: Cardano.RewardAccount[],
@@ -1306,6 +1325,7 @@ export const toRewardAccounts =
     );
 &nbsp;
 export const createRewardAccountsTracker = ({
+  drepInfo$,
   rewardAccountAddresses$,
   stakePoolProvider,
   rewardsProvider,
@@ -1314,6 +1334,7 @@ export const createRewardAccountsTracker = ({
   transactions$,
   transactionsInFlight$
 }: {
+  drepInfo$: (drepIds: Cardano.DRepID[]) =&gt; Observable&lt;DRepInfo[]&gt;;
   rewardAccountAddresses$: Observable&lt;Cardano.RewardAccount[]&gt;;
   stakePoolProvider: ObservableStakePoolProvider;
   rewardsProvider: ObservableRewardsProvider;
@@ -1327,7 +1348,7 @@ export const createRewardAccountsTracker = ({
       combineLatest([
         addressCredentialStatuses(rewardAccounts, transactions$, transactionsInFlight$),
         addressDelegatees(rewardAccounts, transactions$, stakePoolProvider, epoch$),
-        addressDRepDelegatees(rewardAccounts, transactions$),
+        addressDRepDelegatees(rewardAccounts, transactions$, drepInfo$),
         addressRewards(rewardAccounts, transactionsInFlight$, rewardsProvider, balancesStore)
       ]).pipe(map(toRewardAccounts(rewardAccounts)))
     )
@@ -1339,7 +1360,7 @@ export const createRewardAccountsTracker = ({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-11-29T17:33:46.296Z
+                at 2024-12-02T13:57:33.815Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
