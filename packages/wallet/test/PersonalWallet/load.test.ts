@@ -12,14 +12,7 @@ import {
 } from '../../src';
 import { AddressType, AsyncKeyAgent, Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
 import {
-  AssetId,
-  createStubStakePoolProvider,
-  generateRandomBigInt,
-  generateRandomHexString,
-  mockProviders as mocks,
-  somePartialStakePools
-} from '@cardano-sdk/util-dev';
-import {
+  Asset,
   Cardano,
   ChainHistoryProvider,
   HandleProvider,
@@ -28,6 +21,14 @@ import {
   UtxoProvider,
   coalesceValueQuantities
 } from '@cardano-sdk/core';
+import {
+  AssetId,
+  createStubStakePoolProvider,
+  generateRandomBigInt,
+  generateRandomHexString,
+  mockProviders as mocks,
+  somePartialStakePools
+} from '@cardano-sdk/util-dev';
 import { InvalidConfigurationError } from '@cardano-sdk/tx-construction';
 import { InvalidStringError } from '@cardano-sdk/util';
 import { ReplaySubject, firstValueFrom } from 'rxjs';
@@ -142,6 +143,9 @@ const createWallet = async (props: CreateWalletProps) => {
   );
 };
 
+const removeStaleAt = (assetInfos: Map<Cardano.AssetId, Asset.AssetInfo>) =>
+  new Map([...assetInfos.entries()].map(([key, value]) => [key, { ...value, staleAt: undefined }]));
+
 const assertWalletProperties = async (
   wallet: BaseWallet,
   expectedDelegateeId: Cardano.PoolId | undefined,
@@ -188,7 +192,7 @@ const assertWalletProperties = async (
   expect(rewardAccounts[0].delegatee?.nextNextEpoch?.id).toEqual(expectedDelegateeId);
   expect(rewardAccounts[0].rewardBalance).toBe(mocks.rewardAccountBalance);
   // assets$
-  expect(await firstValueFrom(wallet.assetInfo$)).toEqual(
+  expect(removeStaleAt(await firstValueFrom(wallet.assetInfo$))).toEqual(
     new Map([
       [AssetId.TSLA, mocks.asset],
       [handleAssetId, handleAssetInfo]

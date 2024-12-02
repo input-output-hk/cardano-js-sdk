@@ -22,6 +22,7 @@ import {
   DelegationTracker,
   DynamicChangeAddressResolver,
   FailedTx,
+  Milliseconds,
   OutgoingTx,
   PersistentDocumentTrackerSubject,
   PollingConfig,
@@ -78,6 +79,8 @@ import {
   Subject,
   Subscription,
   catchError,
+  defaultIfEmpty,
+  defer,
   distinctUntilChanged,
   filter,
   firstValueFrom,
@@ -116,6 +119,7 @@ export interface BaseWalletProps {
   readonly name: string;
   readonly polling?: PollingConfig;
   readonly retryBackoffConfig?: RetryBackoffConfig;
+  readonly maxAssetInfoCacheAge?: Milliseconds;
 }
 
 export enum PublicCredentialsManagerType {
@@ -295,6 +299,7 @@ export class BaseWallet implements ObservableWallet {
   constructor(
     {
       name,
+      maxAssetInfoCacheAge,
       polling: {
         interval: pollInterval = DEFAULT_POLLING_CONFIG.pollInterval,
         maxInterval = pollInterval * DEFAULT_POLLING_CONFIG.maxIntervalMultiplier,
@@ -564,10 +569,17 @@ export class BaseWallet implements ObservableWallet {
       : new TrackerSubject(of(new Array<PubStakeKeyAndStatus>()));
 
     this.balance = createBalanceTracker(this.protocolParameters$, this.utxo, this.delegation);
+
+    // TODO[LW-11929]: Implement `observe` method in DocumentStore interface.
+    const assetsCache$ = defer(() => stores.assets.get().pipe(defaultIfEmpty(new Map())));
+
     this.assetInfo$ = new PersistentDocumentTrackerSubject(
       createAssetsTracker({
         assetProvider: this.assetProvider,
+        assetsCache$,
+        balanceTracker: this.balance,
         logger: contextLogger(this.#logger, 'assets$'),
+        maxAssetInfoCacheAge,
         onFatalError,
         retryBackoffConfig,
         transactionsTracker: this.transactions
