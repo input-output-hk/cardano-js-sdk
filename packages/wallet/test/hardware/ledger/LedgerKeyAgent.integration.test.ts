@@ -11,6 +11,7 @@ import { dummyLogger as logger } from 'ts-log';
 const {
   mockAssetProvider,
   mockChainHistoryProvider,
+  mockDrepProvider,
   mockNetworkInfoProvider,
   mockRewardsProvider,
   mockTxSubmitProvider,
@@ -26,12 +27,15 @@ const createWallet = async (keyAgent: KeyAgent) => {
   const rewardsProvider = mockRewardsProvider();
   const asyncKeyAgent = util.createAsyncKeyAgent(keyAgent);
   const chainHistoryProvider = mockChainHistoryProvider();
+  const drepProvider = mockDrepProvider();
+
   return createPersonalWallet(
     { name: 'Wallet1' },
     {
       assetProvider,
       bip32Account: await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent),
       chainHistoryProvider,
+      drepProvider,
       logger,
       networkInfoProvider,
       rewardsProvider,

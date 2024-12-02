@@ -544,6 +544,7 @@ describe('WalletUtil', () => {
       const stakePoolProvider = createStubStakePoolProvider();
       const rewardsProvider = mocks.mockRewardsProvider();
       const chainHistoryProvider = mocks.mockChainHistoryProvider();
+      const drepProvider = mocks.mockDrepProvider();
       const groupedAddress: GroupedAddress = {
         accountIndex: 0,
         address,
@@ -565,6 +566,7 @@ describe('WalletUtil', () => {
           assetProvider,
           bip32Account,
           chainHistoryProvider,
+          drepProvider,
           logger,
           networkInfoProvider,
           rewardsProvider,

@@ -1,4 +1,5 @@
-import { DelegateRepresentative } from './Governance';
+import { AlwaysAbstain, AlwaysNoConfidence } from './Governance';
+import { DRepInfo } from '../../Provider';
 import { Lovelace } from './Value';
 import { Metadatum } from './AuxiliaryData';
 import { PoolId, PoolIdHex, StakePool } from './StakePool';
@@ -24,7 +25,7 @@ export enum StakeCredentialStatus {
   Unregistered = 'UNREGISTERED'
 }
 
-export type DRepDelegatee = { delegateRepresentative: DelegateRepresentative };
+export type DRepDelegatee = { delegateRepresentative: DRepInfo | AlwaysAbstain | AlwaysNoConfidence };
 
 export interface RewardAccountInfo {
   address: RewardAccount;

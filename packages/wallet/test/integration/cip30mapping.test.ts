@@ -40,6 +40,7 @@ import uniq from 'lodash/uniq.js';
 
 const {
   mockChainHistoryProvider,
+  mockDrepProvider,
   mockNetworkInfoProvider,
   mockRewardsProvider,
   mockTxSubmitProvider,
@@ -914,6 +915,7 @@ describe('cip30', () => {
         const stakePoolProvider = createStubStakePoolProvider();
         const rewardsProvider = mockRewardsProvider();
         const chainHistoryProvider = mockChainHistoryProvider();
+        const drepProvider = mockDrepProvider();
         const groupedAddress: GroupedAddress = {
           accountIndex: 0,
           address,
@@ -932,6 +934,7 @@ describe('cip30', () => {
             assetProvider,
             bip32Account,
             chainHistoryProvider,
+            drepProvider,
             logger,
             networkInfoProvider,
             rewardsProvider,

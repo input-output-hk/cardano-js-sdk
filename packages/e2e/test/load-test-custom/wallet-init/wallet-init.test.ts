@@ -16,6 +16,7 @@ import {
   assetProviderFactory,
   bip32Ed25519Factory,
   chainHistoryProviderFactory,
+  drepProviderFactory,
   getEnv,
   getLoadTestScheduler,
   keyManagementFactory,
@@ -53,6 +54,11 @@ const getProviders = async () => ({
   chainHistoryProvider: await chainHistoryProviderFactory.create(
     env.TEST_CLIENT_CHAIN_HISTORY_PROVIDER,
     env.TEST_CLIENT_CHAIN_HISTORY_PROVIDER_PARAMS,
+    logger
+  ),
+  drepProvider: await drepProviderFactory.create(
+    env.TEST_CLIENT_DREP_PROVIDER,
+    env.TEST_CLIENT_DREP_PROVIDER_PARAMS,
     logger
   ),
   networkInfoProvider: await networkInfoProviderFactory.create(

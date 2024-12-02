@@ -88,6 +88,12 @@ export const isTxBodyWithHash = (tx: Serialization.TxCBOR | Cardano.TxBodyWithHa
 
 export interface ObservableWallet {
   readonly balance: BalanceTracker;
+  /**
+   * dRepDelegatee from `delegation.rewardAccounts$` is not always up-to-date.
+   * It is refreshed when either the DReps currently delegated to change (usually detected while inspecting the
+   * transaction history), or when a TxBuilder created
+   * with `createTxBuilder()` is used to `build()` and either `inspect()` or `sign()` a transaction.
+   */
   readonly delegation: DelegationTracker;
   readonly utxo: UtxoTracker;
   readonly transactions: TransactionsTracker;

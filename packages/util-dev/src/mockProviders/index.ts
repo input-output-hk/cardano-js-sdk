@@ -7,3 +7,4 @@ export * from './mockUtxoProvider';
 export * from './mockChainHistoryProvider';
 export * from './mockRewardsProvider';
 export * from './mockHandleProvider';
+export * from './mockDrepProvider';

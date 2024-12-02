@@ -15,6 +15,14 @@ const dRepPublicKeyHash = async (addressManager?: Bip32Account): Promise<Ed25519
 
 const DREP_REG_REQUIRED_PROTOCOL_VERSION = 10;
 
+const isActive = (drepDelegatee?: Cardano.DRepDelegatee): boolean => {
+  const drep = drepDelegatee?.delegateRepresentative;
+  if (!drep || (Cardano.isDrepInfo(drep) && drep.active === false)) {
+    return false;
+  }
+  return true;
+};
+
 /**
  * Filters and transforms reward accounts based on current protocol version and reward balance.
  *
@@ -37,7 +45,7 @@ const getWithdrawals = (
   accounts
     .filter(
       (account) =>
-        (version.major >= DREP_REG_REQUIRED_PROTOCOL_VERSION ? !!account.dRepDelegatee : true) &&
+        (version.major >= DREP_REG_REQUIRED_PROTOCOL_VERSION ? isActive(account.dRepDelegatee) : true) &&
         !!account.rewardBalance
     )
     .map(({ rewardBalance: quantity, address: stakeAddress }) => ({
