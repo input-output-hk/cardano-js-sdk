@@ -10,7 +10,8 @@ import {
 import { Cardano, Handle, HandleProvider, HandleResolution } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
-import { InitializeTxWitness, TxBodyPreInputSelection, TxBuilderProviders } from '../types';
+import { HexBlob } from '@cardano-sdk/util';
+import { InitializeTxWitness, RewardAccountWithPoolId, TxBodyPreInputSelection, TxBuilderProviders } from '../types';
 import { InputSelectionError, InputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { OutputBuilderValidator } from './OutputBuilder';
@@ -53,6 +54,23 @@ export class InsufficientRewardAccounts extends CustomError {
     const msg = `Internal error: insufficient stake keys: ${rewardAccounts.length}. Required: ${poolIds.length}.
     Pool ids: ${poolIds.join(',')}; Reward accounts: ${rewardAccounts.length}`;
     super(msg);
+  }
+}
+
+export type DataOfKeyWithLockedRewards = {
+  cbor?: HexBlob;
+  key: Cardano.RewardAccount;
+};
+
+export class DeRegistrationsWithRewardsLocked extends CustomError {
+  keysWithLockedRewards: DataOfKeyWithLockedRewards[];
+
+  public constructor(rewardAccounts: Pick<RewardAccountWithPoolId, 'address'>[]) {
+    super('Tried to de-register reward accounts that have not delegated vote but have rewards');
+    this.keysWithLockedRewards = rewardAccounts.map(({ address }) => ({
+      cbor: Cardano.Address.fromString(address)?.toBytes(),
+      key: address
+    }));
   }
 }
 
