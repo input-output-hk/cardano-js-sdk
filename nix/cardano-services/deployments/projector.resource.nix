@@ -79,15 +79,7 @@ in {
                   runAsUser = 0;
                   runAsGroup = 0;
                 };
-
-                volumeMounts = [
-                  {
-                    name = "tls";
-                    mountPath = "/tls";
-                  }
-                ];
               };
-              volumes.tls.secret.secretName = "postgresql-server-cert";
             };
           };
         };

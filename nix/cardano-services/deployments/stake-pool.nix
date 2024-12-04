@@ -49,8 +49,6 @@
           key = "username";
         };
       };
-      POSTGRES_SSL_STAKE_POOL = "true";
-      POSTGRES_SSL_CA_FILE_STAKE_POOL = "/tls/ca.crt";
     };
   };
 
@@ -90,8 +88,6 @@
           key = "username";
         };
       };
-      POSTGRES_SSL = "true";
-      POSTGRES_SSL_CA_FILE = "/tls/ca.crt";
     };
   };
 }

@@ -66,8 +66,6 @@
                     key = "username";
                   };
                 };
-                POSTGRES_SSL_STAKE_POOL = "true";
-                POSTGRES_SSL_CA_FILE_STAKE_POOL = "/tls/ca.crt";
 
                 POSTGRES_POOL_MAX_DB_SYNC = "5";
                 POSTGRES_HOST_DB_SYNC = values.postgresName;
@@ -85,21 +83,12 @@
                     key = "username";
                   };
                 };
-                POSTGRES_SSL_DB_SYNC = "true";
-                POSTGRES_SSL_CA_FILE_DB_SYNC = "/tls/ca.crt";
               }
               // lib.optionalAttrs (values.pg-boss-worker ? env) values.pg-boss-worker.env
               // lib.optionalAttrs (values.pg-boss-worker.metadata-fetch-mode == "smash") {
                 SMASH_URL = values.pg-boss-worker.smash-url;
               });
-            volumeMounts = [
-              {
-                mountPath = "/tls";
-                name = "tls";
-              }
-            ];
           };
-          volumes.tls.secret.secretName = "postgresql-server-cert";
         };
       };
     };
