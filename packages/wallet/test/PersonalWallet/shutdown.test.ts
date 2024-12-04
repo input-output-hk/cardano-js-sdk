@@ -2,6 +2,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AddressType, Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
 import {
+  Asset,
+  Cardano,
+  ChainHistoryProvider,
+  NetworkInfoProvider,
+  RewardsProvider,
+  UtxoProvider,
+  coalesceValueQuantities
+} from '@cardano-sdk/core';
+import {
   AssetId,
   createStubStakePoolProvider,
   mockProviders as mocks,
@@ -15,14 +24,6 @@ import {
   WalletNetworkInfoProviderStats,
   createPersonalWallet
 } from '../../src';
-import {
-  Cardano,
-  ChainHistoryProvider,
-  NetworkInfoProvider,
-  RewardsProvider,
-  UtxoProvider,
-  coalesceValueQuantities
-} from '@cardano-sdk/core';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import { firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
@@ -81,6 +82,9 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
   );
 };
 
+const removeStaleAt = (assetInfos: Map<Cardano.AssetId, Asset.AssetInfo>) =>
+  new Map([...assetInfos.entries()].map(([key, value]) => [key, { ...value, staleAt: undefined }]));
+
 const assertWalletProperties = async (
   wallet: BaseWallet,
   expectedDelegateeId: Cardano.PoolId | undefined,
@@ -126,7 +130,7 @@ const assertWalletProperties = async (
   expect(addresses[0].address).toEqual(address);
   expect(addresses[0].rewardAccount).toEqual(rewardAccount);
   // assets$
-  expect(await firstValueFrom(wallet.assetInfo$)).toEqual(
+  expect(removeStaleAt(await firstValueFrom(wallet.assetInfo$))).toEqual(
     new Map([
       [AssetId.TSLA, mocks.asset],
       [mocks.handleAssetId, mocks.handleAssetInfo]

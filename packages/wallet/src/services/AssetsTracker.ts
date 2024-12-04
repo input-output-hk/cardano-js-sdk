@@ -1,4 +1,6 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
+import { Assets } from '../types';
+import { BalanceTracker, Milliseconds, TransactionsTracker } from './types';
 import { Logger } from 'ts-log';
 import {
   Observable,
@@ -8,6 +10,7 @@ import {
   debounceTime,
   distinctUntilChanged,
   filter,
+  firstValueFrom,
   map,
   of,
   share,
@@ -17,7 +20,6 @@ import {
 } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackedAssetProvider } from './ProviderTracker';
-import { TransactionsTracker } from './types';
 import { coldObservableProvider, concatAndCombineLatest } from '@cardano-sdk/util-rxjs';
 import { deepEquals, isNotNil } from '@cardano-sdk/util';
 import { newTransactions$ } from './TransactionsTracker';
@@ -35,11 +37,103 @@ const bufferTick =
     source$.pipe(connect((shared$) => shared$.pipe(buffer(shared$.pipe(debounceTime(1))))));
 
 const ASSET_INFO_FETCH_CHUNK_SIZE = 100;
+const ONE_DAY = 24 * 60 * 60 * 1000;
+const ONE_WEEK = 7 * ONE_DAY;
+
+const isInBalance = (assetId: Cardano.AssetId, balance: Cardano.Value): boolean =>
+  balance.assets?.has(assetId) ?? false;
+
+/**
+ * Splits a list of asset IDs into cached and uncached groups based on their presence in the cache,
+ * their freshness, and their balance status:
+ *
+ * 1. Assets not in Balance:
+ *    - Always use the cached version if present in the cache, ignoring freshness.
+ * 2. Assets in Balance:
+ *    - Use the cached version only if it exists and its `staleAt` timestamp did not expire.
+ * 3. Uncached Assets:
+ *    - If an asset is not in the cache or does not meet the above criteria, mark it as uncached.
+ */
+const splitCachedAndUncachedAssets = (
+  cache: Assets,
+  balance: Cardano.Value,
+  assetIds: Cardano.AssetId[]
+): { cachedAssets: Assets; uncachedAssetIds: Cardano.AssetId[] } => {
+  const cachedAssets: Assets = new Map();
+  const uncachedAssetIds: Cardano.AssetId[] = [];
+  const now = new Date();
+
+  for (const id of assetIds) {
+    const cachedAssetInfo = cache.get(id);
+
+    if (!cachedAssetInfo) {
+      uncachedAssetIds.push(id);
+      continue;
+    }
+
+    const { staleAt } = cachedAssetInfo;
+
+    const expired = !staleAt || new Date(staleAt) < now;
+
+    const mustFetch = !isAssetInfoComplete(cachedAssetInfo) || (isInBalance(id, balance) && expired);
+
+    if (mustFetch) {
+      uncachedAssetIds.push(id);
+    } else {
+      cachedAssets.set(id, cachedAssetInfo);
+    }
+  }
+
+  return { cachedAssets, uncachedAssetIds };
+};
+
+const getAssetsWithCache = async (
+  assetIdsChunk: Cardano.AssetId[],
+  assetCache$: Observable<Assets>,
+  totalBalance$: Observable<Cardano.Value>,
+  assetProvider: TrackedAssetProvider,
+  maxAssetInfoCacheAge: Milliseconds
+): Promise<Asset.AssetInfo[]> => {
+  const [cache, totalValue] = await Promise.all([firstValueFrom(assetCache$), firstValueFrom(totalBalance$)]);
+
+  const { cachedAssets, uncachedAssetIds } = splitCachedAndUncachedAssets(cache, totalValue, assetIdsChunk);
+
+  if (uncachedAssetIds.length === 0) {
+    // If all assets are cached we wont perform any fetches from assetProvider, but still need to
+    // mark it as initialized.
+    if (!assetProvider.stats.getAsset$.value.initialized) {
+      assetProvider.setStatInitialized(assetProvider.stats.getAsset$);
+    }
+
+    return [...cachedAssets.values()];
+  }
+
+  const fetchedAssets = await assetProvider.getAssets({
+    assetIds: uncachedAssetIds,
+    extraData: { nftMetadata: true, tokenMetadata: true }
+  });
+
+  const now = Date.now();
+  const updatedFetchedAssets = fetchedAssets.map((asset) => {
+    const randomDelta = Math.floor(Math.random() * 2 * ONE_DAY); // Random time between 0 and 2 days
+    return {
+      ...asset,
+      staleAt: new Date(now + maxAssetInfoCacheAge + randomDelta)
+    };
+  });
+
+  return [...cachedAssets.values(), ...updatedFetchedAssets];
+};
+
 export const createAssetService =
   (
     assetProvider: TrackedAssetProvider,
+    assetCache$: Observable<Assets>,
+    totalBalance$: Observable<Cardano.Value>,
     retryBackoffConfig: RetryBackoffConfig,
-    onFatalError?: (value: unknown) => void
+    onFatalError?: (value: unknown) => void,
+    maxAssetInfoCacheAge: Milliseconds = ONE_WEEK
+    // eslint-disable-next-line max-params
   ) =>
   (assetIds: Cardano.AssetId[]) =>
     concatAndCombineLatest(
@@ -48,15 +142,13 @@ export const createAssetService =
           onFatalError,
           pollUntil: isEveryAssetInfoComplete,
           provider: () =>
-            assetProvider.getAssets({
-              assetIds: assetIdsChunk,
-              extraData: { nftMetadata: true, tokenMetadata: true }
-            }),
+            getAssetsWithCache(assetIdsChunk, assetCache$, totalBalance$, assetProvider, maxAssetInfoCacheAge),
           retryBackoffConfig,
           trigger$: of(true) // fetch only once
         })
       )
-    ).pipe(map((arr) => arr.flat())); // concat the chunk results
+    ).pipe(map((arr) => arr.flat())); // Concatenate the chunk results
+
 export type AssetService = ReturnType<typeof createAssetService>;
 
 export interface AssetsTrackerProps {
@@ -64,7 +156,10 @@ export interface AssetsTrackerProps {
   assetProvider: TrackedAssetProvider;
   retryBackoffConfig: RetryBackoffConfig;
   logger: Logger;
+  assetsCache$: Observable<Assets>;
+  balanceTracker: BalanceTracker;
   onFatalError?: (value: unknown) => void;
+  maxAssetInfoCacheAge?: Milliseconds;
 }
 
 interface AssetsTrackerInternals {
@@ -76,8 +171,28 @@ const uniqueAssetIds = ({ body: { outputs } }: Cardano.OnChainTx) =>
 const flatUniqueAssetIds = (txes: Cardano.OnChainTx[]) => uniq(txes.flatMap(uniqueAssetIds));
 
 export const createAssetsTracker = (
-  { assetProvider, transactionsTracker: { history$ }, retryBackoffConfig, logger, onFatalError }: AssetsTrackerProps,
-  { assetService = createAssetService(assetProvider, retryBackoffConfig, onFatalError) }: AssetsTrackerInternals = {}
+  {
+    assetProvider,
+    assetsCache$,
+    transactionsTracker: { history$ },
+    balanceTracker: {
+      utxo: { total$ }
+    },
+    retryBackoffConfig,
+    logger,
+    onFatalError,
+    maxAssetInfoCacheAge
+  }: AssetsTrackerProps,
+  {
+    assetService = createAssetService(
+      assetProvider,
+      assetsCache$,
+      total$,
+      retryBackoffConfig,
+      onFatalError,
+      maxAssetInfoCacheAge
+    )
+  }: AssetsTrackerInternals = {}
 ) =>
   new Observable<Map<Cardano.AssetId, Asset.AssetInfo>>((subscriber) => {
     let fetchedAssetInfoMap = new Map<Cardano.AssetId, Asset.AssetInfo>();

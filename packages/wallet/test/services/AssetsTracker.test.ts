@@ -1,18 +1,25 @@
-import { Asset, Cardano } from '@cardano-sdk/core';
+import { Asset, Cardano, GetAssetsArgs } from '@cardano-sdk/core';
 import { AssetId, createTestScheduler, generateRandomHexString, logger } from '@cardano-sdk/util-dev';
 import {
   AssetService,
   AssetsTrackerProps,
+  BalanceTracker,
   TrackedAssetProvider,
   TransactionsTracker,
+  createAssetService,
   createAssetsTracker
 } from '../../src/services';
 
+import { Observable, firstValueFrom, from, lastValueFrom, of, tap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { from, lastValueFrom, of, tap } from 'rxjs';
 
 const createTxWithValues = (values: Partial<Cardano.Value>[]): Cardano.HydratedTx =>
   ({ body: { outputs: values.map((value) => ({ value })) }, id: generateRandomHexString(64) } as Cardano.HydratedTx);
+
+const removeStaleAt = (assetInfos: Map<Cardano.AssetId, Asset.AssetInfo>[]) =>
+  assetInfos.map(
+    (assets) => new Map([...assets.entries()].map(([key, value]) => [key, { ...value, staleAt: undefined }]))
+  );
 
 const cip68AssetId = {
   referenceNFT: Cardano.AssetId.fromParts(
@@ -24,6 +31,8 @@ const cip68AssetId = {
     Asset.AssetNameLabel.encode(Cardano.AssetId.getAssetName(AssetId.TSLA), Asset.AssetNameLabelNum.UserNFT)
   )
 };
+
+const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
 
 const assetInfo = {
   PXL: { assetId: AssetId.PXL, nftMetadata: { name: 'nft' }, tokenMetadata: null } as Asset.AssetInfo,
@@ -46,6 +55,8 @@ const assetInfo = {
 describe('createAssetsTracker', () => {
   let assetService: AssetService;
   let assetProvider: TrackedAssetProvider;
+  let balanceTracker: BalanceTracker;
+  let assetsCache$: Observable<Map<Cardano.AssetId, Asset.AssetInfo>>;
   const retryBackoffConfig: RetryBackoffConfig = { initialInterval: 2 };
 
   beforeEach(() => {
@@ -73,6 +84,20 @@ describe('createAssetsTracker', () => {
       setStatInitialized: jest.fn(),
       stats: {}
     } as unknown as TrackedAssetProvider;
+
+    balanceTracker = {
+      rewardAccounts: {
+        deposit$: of(0n),
+        rewards$: of(0n)
+      },
+      utxo: {
+        available$: of({ coins: 0n }),
+        total$: of({ coins: 0n }),
+        unspendable$: of({ coins: 0n })
+      }
+    };
+
+    assetsCache$ = of(new Map());
   });
 
   it('fetches asset info for every history transaction', () => {
@@ -93,7 +118,14 @@ describe('createAssetsTracker', () => {
       };
 
       const target$ = createAssetsTracker(
-        { assetProvider, logger, retryBackoffConfig, transactionsTracker } as unknown as AssetsTrackerProps,
+        {
+          assetProvider,
+          assetsCache$,
+          balanceTracker,
+          logger,
+          retryBackoffConfig,
+          transactionsTracker
+        } as unknown as AssetsTrackerProps,
         {
           assetService
         }
@@ -128,7 +160,14 @@ describe('createAssetsTracker', () => {
       };
 
       const target$ = createAssetsTracker(
-        { assetProvider, logger, retryBackoffConfig, transactionsTracker } as unknown as AssetsTrackerProps,
+        {
+          assetProvider,
+          assetsCache$,
+          balanceTracker,
+          logger,
+          retryBackoffConfig,
+          transactionsTracker
+        } as unknown as AssetsTrackerProps,
         { assetService }
       );
       expectObservable(target$).toBe('a--b', {
@@ -158,7 +197,14 @@ describe('createAssetsTracker', () => {
       };
 
       const target$ = createAssetsTracker(
-        { assetProvider, logger, retryBackoffConfig, transactionsTracker } as unknown as AssetsTrackerProps,
+        {
+          assetProvider,
+          assetsCache$,
+          balanceTracker,
+          logger,
+          retryBackoffConfig,
+          transactionsTracker
+        } as unknown as AssetsTrackerProps,
         {
           assetService
         }
@@ -190,6 +236,8 @@ describe('createAssetsTracker', () => {
       const target$ = createAssetsTracker(
         {
           assetProvider,
+          assetsCache$,
+          balanceTracker,
           logger,
           retryBackoffConfig,
           transactionsTracker
@@ -216,7 +264,14 @@ describe('createAssetsTracker', () => {
       };
 
       const target$ = createAssetsTracker(
-        { assetProvider, logger, retryBackoffConfig, transactionsTracker } as unknown as AssetsTrackerProps,
+        {
+          assetProvider,
+          assetsCache$,
+          balanceTracker,
+          logger,
+          retryBackoffConfig,
+          transactionsTracker
+        } as unknown as AssetsTrackerProps,
         {
           assetService
         }
@@ -257,7 +312,14 @@ describe('createAssetsTracker', () => {
         .mockReturnValueOnce(of([assetInfo.PXL]));
 
       const target$ = createAssetsTracker(
-        { assetProvider, logger, retryBackoffConfig, transactionsTracker } as unknown as AssetsTrackerProps,
+        {
+          assetProvider,
+          assetsCache$,
+          balanceTracker,
+          logger,
+          retryBackoffConfig,
+          transactionsTracker
+        } as unknown as AssetsTrackerProps,
         {
           assetService
         }
@@ -304,6 +366,8 @@ describe('createAssetsTracker', () => {
 
     const target$ = createAssetsTracker({
       assetProvider,
+      assetsCache$,
+      balanceTracker,
       logger,
       retryBackoffConfig,
       transactionsTracker
@@ -311,7 +375,7 @@ describe('createAssetsTracker', () => {
 
     const assetInfos: Map<Cardano.AssetId, Asset.AssetInfo>[] = [];
     await lastValueFrom(target$.pipe(tap((ai) => assetInfos.push(ai))));
-    expect(assetInfos).toEqual([
+    expect(removeStaleAt(assetInfos)).toEqual([
       new Map(),
       new Map([
         [AssetId.TSLA, { ...assetInfo.TSLA, nftMetadata: undefined }],
@@ -327,5 +391,211 @@ describe('createAssetsTracker', () => {
       ])
     ]);
     expect(assetProvider.getAssets).toBeCalledTimes(3);
+  });
+});
+
+describe('createAssetService', () => {
+  let assetProvider: TrackedAssetProvider;
+  const retryBackoffConfig: RetryBackoffConfig = { initialInterval: 2 };
+  const onFatalError = jest.fn();
+
+  beforeEach(() => {
+    assetProvider = {
+      getAssets: jest.fn() as jest.Mock<Promise<Asset.AssetInfo[]>, [GetAssetsArgs]>,
+      setStatInitialized: jest.fn(),
+      stats: { getAsset$: { value: {} } }
+    } as unknown as TrackedAssetProvider;
+  });
+
+  it('returns cached assets if all assets are fresh', async () => {
+    const cachedAssets = new Map([
+      [
+        AssetId.TSLA,
+        {
+          assetId: AssetId.TSLA,
+          nftMetadata: null,
+          staleAt: new Date(Date.now() + ONE_WEEK),
+          tokenMetadata: null
+        } as never
+      ],
+      [
+        AssetId.PXL,
+        {
+          assetId: AssetId.PXL,
+          nftMetadata: null,
+          staleAt: new Date(Date.now() + ONE_WEEK),
+          tokenMetadata: null
+        } as never
+      ]
+    ]);
+
+    (assetProvider.getAssets as jest.Mock).mockImplementation(() => Promise.resolve([]));
+
+    const assetCache$ = of(cachedAssets);
+    const totalBalance$ = of({
+      assets: new Map([
+        [AssetId.TSLA, 1000n],
+        [AssetId.PXL, 2000n]
+      ]),
+      coins: 0n
+    });
+
+    const assetService = createAssetService(
+      assetProvider,
+      assetCache$,
+      totalBalance$,
+      retryBackoffConfig,
+      onFatalError
+    );
+
+    const result$ = assetService([AssetId.TSLA, AssetId.PXL]);
+
+    const assets = await firstValueFrom(result$);
+
+    expect(assets).toEqual([
+      { assetId: AssetId.TSLA, nftMetadata: null, staleAt: expect.any(Date), tokenMetadata: null },
+      { assetId: AssetId.PXL, nftMetadata: null, staleAt: expect.any(Date), tokenMetadata: null }
+    ]);
+    expect(assetProvider.getAssets).not.toBeCalled();
+    expect(assetProvider.setStatInitialized).toBeCalled();
+  });
+
+  it('fetches uncached assets from the provider', async () => {
+    const cachedAssets = new Map([
+      [
+        AssetId.TSLA,
+        {
+          assetId: AssetId.TSLA,
+          nftMetadata: null,
+          staleAt: new Date(Date.now() + ONE_WEEK),
+          tokenMetadata: null
+        } as never
+      ]
+    ]);
+    const fetchedAssets = [
+      { assetId: AssetId.PXL, nftMetadata: null, tokenMetadata: null },
+      { assetId: AssetId.Unit, nftMetadata: null, tokenMetadata: null }
+    ];
+
+    (assetProvider.getAssets as jest.Mock).mockImplementation(() => Promise.resolve(fetchedAssets));
+
+    const assetCache$ = of(cachedAssets);
+    const totalBalance$ = of({ assets: new Map([[AssetId.TSLA, 1000n]]), coins: 0n });
+
+    const assetService = createAssetService(
+      assetProvider,
+      assetCache$,
+      totalBalance$,
+      retryBackoffConfig,
+      onFatalError
+    );
+
+    const result$ = assetService([AssetId.TSLA, AssetId.PXL, AssetId.Unit]);
+
+    const assets = await firstValueFrom(result$);
+
+    expect(assets).toEqual([
+      { assetId: AssetId.TSLA, nftMetadata: null, staleAt: expect.any(Date), tokenMetadata: null },
+      { assetId: AssetId.PXL, nftMetadata: null, staleAt: expect.any(Date), tokenMetadata: null },
+      { assetId: AssetId.Unit, nftMetadata: null, staleAt: expect.any(Date), tokenMetadata: null }
+    ]);
+  });
+
+  it('handles an empty cache and fetches all assets', async () => {
+    const fetchedAssets = [
+      { assetId: AssetId.TSLA, nftMetadata: null, tokenMetadata: null },
+      { assetId: AssetId.PXL, nftMetadata: null, tokenMetadata: null }
+    ];
+
+    (assetProvider.getAssets as jest.Mock).mockImplementation(() => Promise.resolve(fetchedAssets));
+
+    const assetCache$ = of(new Map());
+    const totalBalance$ = of({ assets: new Map(), coins: 0n });
+
+    const assetService = createAssetService(
+      assetProvider,
+      assetCache$,
+      totalBalance$,
+      retryBackoffConfig,
+      onFatalError
+    );
+
+    const result$ = assetService([AssetId.TSLA, AssetId.PXL]);
+
+    const assets = await firstValueFrom(result$);
+
+    expect(assets).toEqual([
+      { assetId: AssetId.TSLA, nftMetadata: null, staleAt: expect.any(Date), tokenMetadata: null },
+      { assetId: AssetId.PXL, nftMetadata: null, staleAt: expect.any(Date), tokenMetadata: null }
+    ]);
+  });
+
+  it('fetches stale assets from the provider', async () => {
+    const cachedAssets = new Map([
+      // Stale
+      [
+        AssetId.TSLA,
+        {
+          assetId: AssetId.TSLA,
+          nftMetadata: { name: 'tsla_cached_name' },
+          staleAt: new Date(Date.now() - ONE_WEEK),
+          tokenMetadata: null
+        } as never
+      ],
+      // Fresh
+      [
+        AssetId.PXL,
+        {
+          assetId: AssetId.PXL,
+          nftMetadata: { name: 'pxl_cached_name' },
+          staleAt: new Date(Date.now() + ONE_WEEK),
+          tokenMetadata: null
+        } as never
+      ]
+    ]);
+
+    const fetchedAssets = [{ assetId: AssetId.TSLA, nftMetadata: { name: 'tsla_updated_name' }, tokenMetadata: null }];
+
+    (assetProvider.getAssets as jest.Mock).mockImplementation((args: { assetIds: Cardano.AssetId[] }) => {
+      expect(args.assetIds).toEqual([AssetId.TSLA]); // Only stale asset should be requested
+      return Promise.resolve(fetchedAssets);
+    });
+
+    const assetCache$ = of(cachedAssets);
+    const totalBalance$ = of({
+      assets: new Map([
+        [AssetId.TSLA, 1000n],
+        [AssetId.PXL, 1000n]
+      ]),
+      coins: 0n
+    });
+
+    const assetService = createAssetService(
+      assetProvider,
+      assetCache$,
+      totalBalance$,
+      retryBackoffConfig,
+      onFatalError
+    );
+
+    const result$ = assetService([AssetId.TSLA, AssetId.PXL]);
+
+    const assets = await firstValueFrom(result$);
+
+    expect(assets).toEqual([
+      {
+        assetId: AssetId.PXL,
+        nftMetadata: { name: 'pxl_cached_name' },
+        staleAt: expect.any(Date),
+        tokenMetadata: null
+      },
+      {
+        assetId: AssetId.TSLA,
+        nftMetadata: { name: 'tsla_updated_name' },
+        staleAt: expect.any(Date),
+        tokenMetadata: null
+      }
+    ]);
+    expect(assetProvider.getAssets).toHaveBeenCalledTimes(1);
   });
 });

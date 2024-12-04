@@ -25,4 +25,5 @@ export interface AssetInfo {
   tokenMetadata?: TokenMetadata | null;
   /** CIP-0025. `undefined` if not loaded, `null` if no metadata found */
   nftMetadata?: NftMetadata | null;
+  staleAt?: Date | null;
 }
