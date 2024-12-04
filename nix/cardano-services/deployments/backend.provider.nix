@@ -58,8 +58,6 @@
             key = "username";
           };
         };
-        POSTGRES_SSL_DB_SYNC = "true";
-        POSTGRES_SSL_CA_FILE_DB_SYNC = "/tls/ca.crt";
       }
       // lib.optionalAttrs values.backend.passHandleDBArgs {
         POSTGRES_POOL_MAX_HANDLE = "10";
@@ -78,8 +76,6 @@
             key = "username";
           };
         };
-        POSTGRES_SSL_HANDLE = "true";
-        POSTGRES_SSL_CA_FILE_HANDLE = "/tls/ca.crt";
       };
   };
 }

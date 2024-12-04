@@ -48,8 +48,6 @@
           key = "username";
         };
       };
-      POSTGRES_SSL_ASSET = "true";
-      POSTGRES_SSL_CA_FILE_ASSET = "/tls/ca.crt";
     };
   };
 
@@ -88,8 +86,6 @@
           key = "username";
         };
       };
-      POSTGRES_SSL = "true";
-      POSTGRES_SSL_CA_FILE = "/tls/ca.crt";
     };
   };
 }
