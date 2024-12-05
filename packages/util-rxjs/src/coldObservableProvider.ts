@@ -1,8 +1,10 @@
 import { InvalidStringError, strictEquals } from '@cardano-sdk/util';
+import { Logger } from 'ts-log';
 import {
   NEVER,
   Observable,
   Subject,
+  catchError,
   concat,
   defer,
   distinctUntilChanged,
@@ -25,6 +27,7 @@ export interface ColdObservableProviderProps<T> {
   combinator?: typeof switchMap;
   cancel$?: Observable<unknown>;
   pollUntil?: (v: T) => boolean;
+  logger: Logger;
 }
 
 export const coldObservableProvider = <T>({
@@ -35,7 +38,8 @@ export const coldObservableProvider = <T>({
   equals = strictEquals,
   combinator = switchMap,
   cancel$ = NEVER,
-  pollUntil = () => true
+  pollUntil = () => true,
+  logger
 }: ColdObservableProviderProps<T>) =>
   new Observable<T>((subscriber) => {
     const cancelOnFatalError$ = new Subject<boolean>();
@@ -48,7 +52,7 @@ export const coldObservableProvider = <T>({
               mergeMap((v) =>
                 pollUntil(v)
                   ? of(v)
-                  : // emit value, but also throw error to force retryBackoff to kick in
+                  : // Emit value, but also throw error to force retryBackoff to kick in
                     concat(
                       of(v),
                       throwError(() => new Error('polling'))
@@ -59,15 +63,31 @@ export const coldObservableProvider = <T>({
             retryBackoff({
               ...retryBackoffConfig,
               shouldRetry: (error) => {
-                if (retryBackoffConfig.shouldRetry && !retryBackoffConfig.shouldRetry(error)) return false;
+                logger.error(error);
+
+                if (retryBackoffConfig.shouldRetry) {
+                  const shouldRetry = retryBackoffConfig.shouldRetry(error);
+                  logger.debug(`Should retry: ${shouldRetry}`);
+
+                  if (!shouldRetry) {
+                    return false;
+                  }
+                }
 
                 if (error instanceof InvalidStringError) {
                   onFatalError?.(error);
                   cancelOnFatalError$.next(true);
+                  return false;
                 }
 
                 return true;
               }
+            }),
+            catchError((error) => {
+              onFatalError?.(error);
+
+              // Re-throw the error to propagate it to the subscriber and complete the observable
+              return throwError(() => error);
             })
           )
         ),

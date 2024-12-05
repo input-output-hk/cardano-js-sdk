@@ -445,6 +445,7 @@ describe('createAssetService', () => {
       assetCache$,
       totalBalance$,
       retryBackoffConfig,
+      logger,
       onFatalError
     );
 
@@ -487,6 +488,7 @@ describe('createAssetService', () => {
       assetCache$,
       totalBalance$,
       retryBackoffConfig,
+      logger,
       onFatalError
     );
 
@@ -517,6 +519,7 @@ describe('createAssetService', () => {
       assetCache$,
       totalBalance$,
       retryBackoffConfig,
+      logger,
       onFatalError
     );
 
@@ -575,6 +578,7 @@ describe('createAssetService', () => {
       assetCache$,
       totalBalance$,
       retryBackoffConfig,
+      logger,
       onFatalError
     );
 

@@ -88,6 +88,7 @@ describe('CustomObservableWallet', () => {
         // and want to just re-fetch data upon every subscription and then update using some interval.
         // If we did want more features, there are other SDK utils we could use
         addresses$: coldObservableProvider({
+          logger,
           provider: getAddresses,
           retryBackoffConfig,
           trigger$: walletUpdateTrigger$
@@ -97,6 +98,7 @@ describe('CustomObservableWallet', () => {
             // can entirely bypass SDK and it's utils, providing custom observables
             deposit$: of(200_000n),
             rewards$: coldObservableProvider({
+              logger,
               provider: getAvailableRewardAccountsDeposit,
               retryBackoffConfig,
               trigger$: walletUpdateTrigger$
@@ -104,6 +106,7 @@ describe('CustomObservableWallet', () => {
           },
           utxo: {
             available$: coldObservableProvider({
+              logger,
               provider: getAvailableUtxoBalance,
               retryBackoffConfig,
               trigger$: walletUpdateTrigger$
@@ -112,6 +115,7 @@ describe('CustomObservableWallet', () => {
         },
         delegation: {
           rewardAccounts$: coldObservableProvider({
+            logger,
             provider: getRewardAccountsDelegation,
             retryBackoffConfig,
             trigger$: walletUpdateTrigger$

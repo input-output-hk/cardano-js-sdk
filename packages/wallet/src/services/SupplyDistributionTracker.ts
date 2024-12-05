@@ -38,6 +38,7 @@ export const createSupplyDistributionTracker = (
   const stake$ = new PersistentDocumentTrackerSubject(
     coldObservableProvider({
       equals: isEqual,
+      logger,
       onFatalError,
       provider: networkInfoProvider.stake,
       retryBackoffConfig,
@@ -49,6 +50,7 @@ export const createSupplyDistributionTracker = (
   const lovelaceSupply$ = new PersistentDocumentTrackerSubject(
     coldObservableProvider({
       equals: isEqual,
+      logger,
       onFatalError,
       provider: networkInfoProvider.lovelaceSupply,
       retryBackoffConfig,

@@ -15,9 +15,10 @@ type DrepInfoObservableProps = {
 
 /** Use DRepProvider to fetch DRepInfos with retry backoff logic */
 export const createDrepInfoColdObservable =
-  ({ drepProvider, retryBackoffConfig, refetchTrigger$ }: DrepInfoObservableProps) =>
+  ({ drepProvider, retryBackoffConfig, refetchTrigger$, logger }: DrepInfoObservableProps) =>
   (drepIds: Cardano.DRepID[]) =>
     coldObservableProvider<DRepInfo[]>({
+      logger,
       provider: () => drepProvider.getDRepsInfo({ ids: drepIds }),
       retryBackoffConfig,
       trigger$: merge(of(true), refetchTrigger$)

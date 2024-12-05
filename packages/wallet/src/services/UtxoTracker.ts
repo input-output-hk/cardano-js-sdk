@@ -34,12 +34,15 @@ export const createUtxoProvider = (
   addresses$: Observable<Cardano.PaymentAddress[]>,
   history$: Observable<Cardano.HydratedTx[]>,
   retryBackoffConfig: RetryBackoffConfig,
+  logger: Logger,
   onFatalError?: (value: unknown) => void
+  // eslint-disable-next-line max-params
 ) =>
   addresses$.pipe(
     switchMap((paymentAddresses) =>
       coldObservableProvider({
         equals: utxoEquals,
+        logger,
         onFatalError,
         provider: async () => {
           let utxos = new Array<Cardano.Utxo>();
@@ -71,7 +74,7 @@ export const createUtxoTracker = (
   }: UtxoTrackerProps,
   {
     utxoSource$ = new PersistentCollectionTrackerSubject<Cardano.Utxo>(
-      () => createUtxoProvider(utxoProvider, addresses$, history$, retryBackoffConfig, onFatalError),
+      () => createUtxoProvider(utxoProvider, addresses$, history$, retryBackoffConfig, logger, onFatalError),
       stores.utxo
     ),
     unspendableUtxoSource$ = new PersistentCollectionTrackerSubject(

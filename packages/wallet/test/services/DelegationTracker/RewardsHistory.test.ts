@@ -33,11 +33,11 @@ describe('RewardsHistory', () => {
     });
 
     it('when lower bound is specified: queries underlying provider', async () => {
-      expect(await firstValueFrom(provider(rewardAccounts, Cardano.EpochNo(1)))).toBe(rewardsHistory);
+      expect(await firstValueFrom(provider(rewardAccounts, Cardano.EpochNo(1), logger))).toBe(rewardsHistory);
     });
 
     it('when lower bound is not specified: sets rewardsHistory as initialized and returns empty array', async () => {
-      expect(await firstValueFrom(provider(rewardAccounts, null))).toEqual(new Map());
+      expect(await firstValueFrom(provider(rewardAccounts, null, logger))).toEqual(new Map());
       expect(rewardsProvider.stats.rewardsHistory$.value.initialized).toBe(true);
     });
   });
@@ -88,6 +88,7 @@ describe('RewardsHistory', () => {
           expect(getRewardsHistory).toBeCalledWith(
             rewardAccounts,
             Cardano.EpochNo(calcFirstDelegationEpoch(epoch)),
+            logger,
             undefined
           );
         });
@@ -142,6 +143,7 @@ describe('RewardsHistory', () => {
           expect(getRewardsHistory).toBeCalledWith(
             rewardAccounts,
             Cardano.EpochNo(calcFirstDelegationEpoch(epoch)),
+            logger,
             undefined
           );
         });
