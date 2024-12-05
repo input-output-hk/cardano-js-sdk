@@ -131,6 +131,7 @@ export const createAssetService =
     assetCache$: Observable<Assets>,
     totalBalance$: Observable<Cardano.Value>,
     retryBackoffConfig: RetryBackoffConfig,
+    logger: Logger,
     onFatalError?: (value: unknown) => void,
     maxAssetInfoCacheAge: Milliseconds = ONE_WEEK
     // eslint-disable-next-line max-params
@@ -139,6 +140,7 @@ export const createAssetService =
     concatAndCombineLatest(
       chunk(assetIds, ASSET_INFO_FETCH_CHUNK_SIZE).map((assetIdsChunk) =>
         coldObservableProvider({
+          logger,
           onFatalError,
           pollUntil: isEveryAssetInfoComplete,
           provider: () =>
@@ -189,6 +191,7 @@ export const createAssetsTracker = (
       assetsCache$,
       total$,
       retryBackoffConfig,
+      logger,
       onFatalError,
       maxAssetInfoCacheAge
     )

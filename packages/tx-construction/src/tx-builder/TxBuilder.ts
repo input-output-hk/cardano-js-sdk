@@ -500,6 +500,7 @@ export class GenericTxBuilder implements TxBuilder {
     }
 
     const rewardAccounts$ = coldObservableProvider({
+      logger: contextLogger(this.#logger, 'getOrCreateRewardAccounts'),
       pollUntil: (rewardAccounts) =>
         allRewardAccounts.every((newAccount) => rewardAccounts.some((acct) => acct.address === newAccount)),
       provider: this.#dependencies.txBuilderProviders.rewardAccounts,

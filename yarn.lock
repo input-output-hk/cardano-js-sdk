@@ -4026,6 +4026,7 @@ __metadata:
     npm-run-all: ^4.1.5
     rxjs: ^7.4.0
     ts-jest: ^28.0.7
+    ts-log: ^2.2.7
     tsc-alias: ^1.8.10
     typescript: ^4.7.4
   languageName: unknown
@@ -25326,6 +25327,13 @@ __metadata:
   version: 2.2.5
   resolution: "ts-log@npm:2.2.5"
   checksum: 28f78ab15b8555d56c089dbc243327d8ce4331219956242a29fc4cb3bad6bb0cb8234dd17a292381a1b1dba99a7e4849a2181b2e1a303e8247e9f4ca4e284f2d
+  languageName: node
+  linkType: hard
+
+"ts-log@npm:^2.2.7":
+  version: 2.2.7
+  resolution: "ts-log@npm:2.2.7"
+  checksum: c423a5eb54abb9471578902953814d3d0c88b3f237db016998f8998ecf982cb0f748bb8ebf93670eeba9b836ff0ce407d8065a340f3ab218ea7b9442c255b3d4
   languageName: node
   linkType: hard
 

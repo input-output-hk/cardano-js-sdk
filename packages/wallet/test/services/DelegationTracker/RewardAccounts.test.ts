@@ -23,7 +23,7 @@ import {
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
-import { createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
+import { createTestScheduler, logger, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyCbor } from '../../util';
 
 const { currentEpoch, generateStakePools, mockStakePoolsProvider } = mockProviders;
@@ -59,7 +59,7 @@ describe('RewardAccounts', () => {
     store.getValues = jest.fn().mockImplementation(store.getValues.bind(store));
     stakePoolProviderMock = mockStakePoolsProvider();
     stakePoolProviderTracked = new TrackedStakePoolProvider(stakePoolProviderMock);
-    provider = createQueryStakePoolsProvider(stakePoolProviderTracked, store, retryBackoffConfig);
+    provider = createQueryStakePoolsProvider(stakePoolProviderTracked, store, retryBackoffConfig, logger);
     drepInfo$ = jest.fn(
       (drepIds: Cardano.DRepID[]): Observable<DRepInfo[]> => of(drepIds.map((id) => ({ active: true, id } as DRepInfo)))
     );
@@ -505,7 +505,7 @@ describe('RewardAccounts', () => {
             a: 3n
           })
         );
-      const target$ = createRewardsProvider(epoch$, onChainTx$, rewardsProvider, config)(twoRewardAccounts);
+      const target$ = createRewardsProvider(epoch$, onChainTx$, rewardsProvider, config, logger)(twoRewardAccounts);
       expectObservable(target$).toBe('-ab-c', {
         a: [0n, 3n],
         b: [5n, 3n],
@@ -574,7 +574,8 @@ describe('RewardAccounts', () => {
         const observableStakePoolProvider = createQueryStakePoolsProvider(
           trackedStakePoolProvider as unknown as TrackedStakePoolProvider,
           new InMemoryStakePoolsStore(),
-          { initialInterval: 10 }
+          { initialInterval: 10 },
+          logger
         );
         const target$ = createDelegateeTracker(
           observableStakePoolProvider,

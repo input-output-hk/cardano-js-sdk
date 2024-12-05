@@ -5,7 +5,7 @@ import { TransactionsTracker, createDelegationPortfolioTracker } from '../../../
 import { certificateTransactionsWithEpochs, createBlockEpochProvider } from '../../../src/services/DelegationTracker';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { createStubTxWithCertificates, createStubTxWithSlot } from './stub-tx';
-import { createTestScheduler } from '@cardano-sdk/util-dev';
+import { createTestScheduler, logger } from '@cardano-sdk/util-dev';
 
 jest.mock('@cardano-sdk/util-rxjs', () => {
   const originalModule = jest.requireActual('@cardano-sdk/util-rxjs');
@@ -29,7 +29,7 @@ describe('DelegationTracker', () => {
         '0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed',
         'a0805ae8e52318f0e499be7f85d3f1d5c7dddeacdca0dab9e9d9a8ae6c49a22c'
       ].map(Cardano.BlockId);
-      expectObservable(createBlockEpochProvider(chainHistoryProvider, config)(hashes)).toBe('a-b', {
+      expectObservable(createBlockEpochProvider(chainHistoryProvider, config, logger)(hashes)).toBe('a-b', {
         a: [100],
         b: [100, 101]
       });

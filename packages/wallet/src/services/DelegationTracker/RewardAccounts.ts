@@ -19,6 +19,7 @@ import {
   tap
 } from 'rxjs';
 import { KeyValueStore } from '../../persistence';
+import { Logger } from 'ts-log';
 import { OutgoingOnChainTx, TxInFlight } from '../types';
 import { PAGE_SIZE } from '../TransactionsTracker';
 import { RetryBackoffConfig } from 'backoff-rxjs';
@@ -56,6 +57,7 @@ export const createQueryStakePoolsProvider =
     stakePoolProvider: TrackedStakePoolProvider,
     store: KeyValueStore<Cardano.PoolId, Cardano.StakePool>,
     retryBackoffConfig: RetryBackoffConfig,
+    logger: Logger,
     onFatalError?: (value: unknown) => void
   ) =>
   (poolIds: Cardano.PoolId[]) => {
@@ -66,6 +68,7 @@ export const createQueryStakePoolsProvider =
     return merge(
       store.getValues(poolIds),
       coldObservableProvider({
+        logger,
         onFatalError,
         provider: () => allStakePoolsByPoolIds(stakePoolProvider, { poolIds }),
         retryBackoffConfig
@@ -109,13 +112,16 @@ export const createRewardsProvider =
     txOnChain$: Observable<OutgoingOnChainTx>,
     rewardsProvider: RewardsProvider,
     retryBackoffConfig: RetryBackoffConfig,
+    logger: Logger,
     onFatalError?: (value: unknown) => void
+    // eslint-disable-next-line max-params
   ) =>
   (rewardAccounts: Cardano.RewardAccount[], equals = isEqual): Observable<Cardano.Lovelace[]> =>
     combineLatest(
       rewardAccounts.map((rewardAccount) =>
         coldObservableProvider({
           equals,
+          logger,
           onFatalError,
           provider: () => rewardsProvider.rewardAccountBalance({ rewardAccount }),
           retryBackoffConfig,

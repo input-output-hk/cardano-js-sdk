@@ -370,6 +370,7 @@ export class BaseWallet implements ObservableWallet {
       this.#addressTracker = createAddressTracker({
         addressDiscovery$: coldObservableProvider({
           cancel$,
+          logger: contextLogger(this.#logger, 'addressDiscovery$'),
           onFatalError,
           provider: () => {
             const credManager = this.#publicCredentialsManager as Bip32PublicCredentialsManager;
@@ -403,6 +404,7 @@ export class BaseWallet implements ObservableWallet {
       minPollInterval: pollInterval,
       provider$: coldObservableProvider({
         cancel$,
+        logger: contextLogger(this.#logger, 'tip$'),
         onFatalError,
         provider: this.networkInfoProvider.ledgerTip,
         retryBackoffConfig
@@ -426,6 +428,7 @@ export class BaseWallet implements ObservableWallet {
       coldObservableProvider({
         cancel$,
         equals: deepEquals,
+        logger: contextLogger(this.#logger, 'eraSummaries$'),
         onFatalError,
         provider: this.networkInfoProvider.eraSummaries,
         retryBackoffConfig,
@@ -449,6 +452,7 @@ export class BaseWallet implements ObservableWallet {
       coldObservableProvider({
         cancel$,
         equals: isEqual,
+        logger: contextLogger(this.#logger, 'protocolParameters$'),
         onFatalError,
         provider: this.networkInfoProvider.protocolParameters,
         retryBackoffConfig,
@@ -460,6 +464,7 @@ export class BaseWallet implements ObservableWallet {
       coldObservableProvider({
         cancel$,
         equals: isEqual,
+        logger: contextLogger(this.#logger, 'genesisParameters$'),
         onFatalError,
         provider: this.networkInfoProvider.genesisParameters,
         retryBackoffConfig,
@@ -593,6 +598,7 @@ export class BaseWallet implements ObservableWallet {
             coldObservableProvider({
               cancel$,
               equals: isEqual,
+              logger: contextLogger(this.#logger, 'handles$'),
               onFatalError,
               provider: () => this.handleProvider.getPolicyIds(),
               retryBackoffConfig

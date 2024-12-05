@@ -31,10 +31,12 @@ export const createBlockEpochProvider =
   (
     chainHistoryProvider: ChainHistoryProvider,
     retryBackoffConfig: RetryBackoffConfig,
+    logger: Logger,
     onFatalError?: (value: unknown) => void
   ) =>
   (ids: Cardano.BlockId[]) =>
     coldObservableProvider({
+      logger,
       onFatalError,
       provider: () => chainHistoryProvider.blocksByHashes({ ids }),
       retryBackoffConfig
@@ -131,6 +133,7 @@ export const createDelegationTracker = ({
       stakePoolProvider,
       stores.stakePools,
       retryBackoffConfig,
+      logger,
       onFatalError
     ),
     rewardsHistoryProvider = createRewardsHistoryProvider(rewardsTracker, retryBackoffConfig),
@@ -139,6 +142,7 @@ export const createDelegationTracker = ({
       transactionsTracker.outgoing.onChain$,
       rewardsTracker,
       retryBackoffConfig,
+      logger,
       onFatalError
     ),
     slotEpochCalc$ = eraSummaries$.pipe(map((eraSummaries) => createSlotEpochCalc(eraSummaries)))

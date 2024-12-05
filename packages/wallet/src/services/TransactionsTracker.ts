@@ -210,6 +210,7 @@ const findIntersectionAndUpdateTxStore = ({
     // Caveat is that local transactions might get out of date...
     combinator: exhaustMap,
     equals: transactionsEquals,
+    logger,
     onFatalError,
     // eslint-disable-next-line sonarjs/cognitive-complexity,complexity
     provider: async () => {
