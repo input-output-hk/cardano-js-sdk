@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">28% </span>
+                <span class="strong">21.21% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>7/25</span>
+                <span class='fraction'>7/33</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>0/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.33% </span>
+                <span class="strong">25% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>7/21</span>
+                <span class='fraction'>7/28</span>
             </div>
         
             
@@ -95,13 +95,23 @@
 <a name='L30'></a><a href='#L30'>30</a>
 <a name='L31'></a><a href='#L31'>31</a>
 <a name='L32'></a><a href='#L32'>32</a>
-<a name='L33'></a><a href='#L33'>33</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">5x</span>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -116,24 +126,34 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.coldObservableProvider = void 0;
 const util_1 = require("@cardano-sdk/util");
 const rxjs_1 = require("rxjs");
 const backoff_rxjs_1 = require("backoff-rxjs");
-const coldObservableProvider = <span class="fstat-no" title="function not covered" >({</span> provider, retryBackoffConfig, onFatalError, trigger$ = <span class="branch-0 cbranch-no" title="branch not covered" >(0, rxjs_1.of)(true),</span> equals = <span class="branch-0 cbranch-no" title="branch not covered" >util_1.strictEquals,</span> combinator = <span class="branch-0 cbranch-no" title="branch not covered" >rxjs_1.switchMap,</span> cancel$ = <span class="branch-0 cbranch-no" title="branch not covered" >rxjs_1.NEVER,</span> pollUntil = <span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >true </span></span>}) =&gt; <span class="cstat-no" title="statement not covered" >new rxjs_1.Observable(<span class="fstat-no" title="function not covered" >(s</span>ubscriber) =&gt; {</span>
+const coldObservableProvider = <span class="fstat-no" title="function not covered" >({</span> provider, retryBackoffConfig, onFatalError, trigger$ = <span class="branch-0 cbranch-no" title="branch not covered" >(0, rxjs_1.of)(true),</span> equals = <span class="branch-0 cbranch-no" title="branch not covered" >util_1.strictEquals,</span> combinator = <span class="branch-0 cbranch-no" title="branch not covered" >rxjs_1.switchMap,</span> cancel$ = <span class="branch-0 cbranch-no" title="branch not covered" >rxjs_1.NEVER,</span> pollUntil = <span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >true,</span></span> logger }) =&gt; <span class="cstat-no" title="statement not covered" >new rxjs_1.Observable(<span class="fstat-no" title="function not covered" >(s</span>ubscriber) =&gt; {</span>
     const cancelOnFatalError$ = <span class="cstat-no" title="statement not covered" >new rxjs_1.Subject();</span>
     const internalCancel$ = <span class="cstat-no" title="statement not covered" >(0, rxjs_1.merge)(cancel$, cancelOnFatalError$);</span>
     const sub = <span class="cstat-no" title="statement not covered" >trigger$</span>
@@ -143,14 +163,24 @@ const coldObservableProvider = <span class="fstat-no" title="function not covere
             (0, rxjs_1.concat)((0, rxjs_1.of)(v), (0, rxjs_1.throwError)(<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >new Error('polling'))</span>)))).pipe((0, backoff_rxjs_1.retryBackoff)({
         ...retryBackoffConfig,
         shouldRetry: <span class="fstat-no" title="function not covered" >(e</span>rror) =&gt; {
-<span class="cstat-no" title="statement not covered" >            if (retryBackoffConfig.shouldRetry &amp;&amp; !retryBackoffConfig.shouldRetry(error))</span>
-<span class="cstat-no" title="statement not covered" >                return false;</span>
+<span class="cstat-no" title="statement not covered" >            logger.error(error);</span>
+<span class="cstat-no" title="statement not covered" >            if (retryBackoffConfig.shouldRetry) {</span>
+                const shouldRetry = <span class="cstat-no" title="statement not covered" >retryBackoffConfig.shouldRetry(error);</span>
+<span class="cstat-no" title="statement not covered" >                logger.debug(`Should retry: ${shouldRetry}`);</span>
+<span class="cstat-no" title="statement not covered" >                if (!shouldRetry) {</span>
+<span class="cstat-no" title="statement not covered" >                    return false;</span>
+                }
+            }
 <span class="cstat-no" title="statement not covered" >            if (error instanceof util_1.InvalidStringError) {</span>
 <span class="cstat-no" title="statement not covered" >                onFatalError?.(error);</span>
 <span class="cstat-no" title="statement not covered" >                cancelOnFatalError$.next(true);</span>
+<span class="cstat-no" title="statement not covered" >                return false;</span>
             }
 <span class="cstat-no" title="statement not covered" >            return true;</span>
         }
+    }), (0, rxjs_1.catchError)(<span class="fstat-no" title="function not covered" >(e</span>rror) =&gt; {
+<span class="cstat-no" title="statement not covered" >        onFatalError?.(error);</span>
+<span class="cstat-no" title="statement not covered" >        return (0, rxjs_1.throwError)(<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >error)</span>;</span>
     }))), (0, rxjs_1.distinctUntilChanged)(equals), (0, rxjs_1.takeUntil)(internalCancel$))
         .subscribe(subscriber);
 <span class="cstat-no" title="statement not covered" >    return <span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
@@ -166,7 +196,7 @@ exports.coldObservableProvider = coldObservableProvider;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-12-04T15:54:08.511Z
+                at 2024-12-05T17:39:23.381Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
