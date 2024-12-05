@@ -40,8 +40,6 @@
           key = "username";
         };
       };
-      POSTGRES_SSL = "true";
-      POSTGRES_SSL_CA_FILE = "/tls/ca.crt";
     };
   };
 }

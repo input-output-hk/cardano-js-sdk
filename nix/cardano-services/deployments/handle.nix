@@ -46,8 +46,6 @@
           key = "username";
         };
       };
-      POSTGRES_SSL_HANDLE = "true";
-      POSTGRES_SSL_CA_FILE_HANDLE = "/tls/ca.crt";
     };
   };
 
@@ -88,8 +86,6 @@
           key = "username";
         };
       };
-      POSTGRES_SSL = "true";
-      POSTGRES_SSL_CA_FILE = "/tls/ca.crt";
     };
   };
 }
