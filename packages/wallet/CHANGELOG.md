@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.46.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.45.0...@cardano-sdk/wallet@0.46.0) (2024-12-05)
+
+### ⚠ BREAKING CHANGES
+
+* coldObservableProvider logs errors
+
+### Features
+
+* asset tracker now uses local cache before fetching asset metadata ([0fd4b5b](https://github.com/input-output-hk/cardano-js-sdk/commit/0fd4b5b2ad2e1a467a40b24050150ddb949df215))
+* coldObservableProvider logs errors ([b2caa15](https://github.com/input-output-hk/cardano-js-sdk/commit/b2caa157416747d0e7ad28c941d31dbf55abad78))
+
 ## [0.45.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.44.23...@cardano-sdk/wallet@0.45.0) (2024-12-02)
 
 ### ⚠ BREAKING CHANGES

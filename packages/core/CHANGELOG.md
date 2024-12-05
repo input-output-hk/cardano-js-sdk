@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.42.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.42.0...@cardano-sdk/core@0.42.1) (2024-12-05)
+
+### Features
+
+* asset tracker now uses local cache before fetching asset metadata ([0fd4b5b](https://github.com/input-output-hk/cardano-js-sdk/commit/0fd4b5b2ad2e1a467a40b24050150ddb949df215))
+
 ## [0.42.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.41.5...@cardano-sdk/core@0.42.0) (2024-12-02)
 
 ### ⚠ BREAKING CHANGES

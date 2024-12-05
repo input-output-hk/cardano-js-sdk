@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.23.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.22.0...@cardano-sdk/tx-construction@0.23.0) (2024-12-05)
+
+### ⚠ BREAKING CHANGES
+
+* coldObservableProvider logs errors
+
+### Features
+
+* coldObservableProvider logs errors ([b2caa15](https://github.com/input-output-hk/cardano-js-sdk/commit/b2caa157416747d0e7ad28c941d31dbf55abad78))
+
 ## [0.22.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.21.14...@cardano-sdk/tx-construction@0.22.0) (2024-12-02)
 
 ### ⚠ BREAKING CHANGES
