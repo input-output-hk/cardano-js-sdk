@@ -134,7 +134,7 @@ describe('WalletManager', () => {
         runtime,
         signingCoordinatorApi,
         storesFactory: {
-          create: (props) =>
+          create: async (props) =>
             ({
               destroy: jest.fn().mockReturnValue(
                 from(

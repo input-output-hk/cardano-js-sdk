@@ -147,7 +147,7 @@ export class WalletManager<WalletMetadata extends { name: string }, AccountMetad
     this.#activeWalletProps = props;
 
     const walletStoreId = getWalletStoreId(walletId, chainId, accountIndex);
-    const stores = this.#getStores(walletStoreId);
+    const stores = await this.#getStores(walletStoreId);
 
     const witnesser = this.#buildWitnesser(activeWallet, walletId, chainId, accountIndex);
 
@@ -202,10 +202,10 @@ export class WalletManager<WalletMetadata extends { name: string }, AccountMetad
   }
 
   /** Gets store if wallet was activated previously or creates one when wallet is activated for the first time. */
-  #getStores(walletStoreName: string): storage.WalletStores {
+  async #getStores(walletStoreName: string): Promise<storage.WalletStores> {
     let stores = this.#walletStores.get(walletStoreName);
     if (!stores) {
-      stores = this.#storesFactory.create({ name: walletStoreName });
+      stores = await this.#storesFactory.create({ name: walletStoreName });
       this.#walletStores.set(walletStoreName, stores);
     }
     return stores;
@@ -237,7 +237,7 @@ export class WalletManager<WalletMetadata extends { name: string }, AccountMetad
     if (!storeIds || storeIds.length === 0) return;
 
     for (const walletStoreId of storeIds) {
-      const walletStores = this.#getStores(walletStoreId);
+      const walletStores = await this.#getStores(walletStoreId);
 
       this.#logger.debug(`Destroying wallet store ${walletStoreId}`);
 
