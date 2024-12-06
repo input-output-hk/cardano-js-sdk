@@ -86,7 +86,7 @@ const walletFactory: WalletFactory<Metadata, Metadata> = {
 };
 
 const storesFactory: StoresFactory = {
-  create: ({ name }) => storage.createPouchDbWalletStores(name, { logger })
+  create: async ({ name }) => storage.createPouchDbWalletStores(name, { logger })
 };
 
 const walletRepository = new WalletRepository<Metadata, Metadata>({

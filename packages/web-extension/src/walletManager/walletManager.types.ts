@@ -91,5 +91,5 @@ export interface WalletFactory<WalletMetadata extends { name: string }, AccountM
 }
 
 export interface StoresFactory {
-  create: (props: { name: string }) => storage.WalletStores;
+  create: (props: { name: string }) => Promise<storage.WalletStores>;
 }
