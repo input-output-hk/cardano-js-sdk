@@ -2,13 +2,13 @@
 import { AccountMetadata, WalletMetadata, createAccount } from './util';
 import {
   AddWalletProps,
+  AnyWallet,
   HardwareWallet,
   UpdateAccountMetadataProps,
   UpdateWalletMetadataProps,
   WalletConflictError,
   WalletId,
   WalletRepository,
-  WalletRepositoryDependencies,
   WalletType
 } from '../../src';
 import { BehaviorSubject, firstValueFrom, of } from 'rxjs';
@@ -16,6 +16,7 @@ import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { KeyPurpose, KeyRole } from '@cardano-sdk/key-management';
 import { logger } from '@cardano-sdk/util-dev';
+import { storage } from '@cardano-sdk/wallet';
 import pick from 'lodash/pick.js';
 
 const storedLedgerWallet: HardwareWallet<WalletMetadata, AccountMetadata> = {
@@ -68,18 +69,18 @@ const storedScriptWallet = {
   walletId: Serialization.Script.fromCore(createScriptWalletProps.paymentScript).hash().slice(32)
 };
 
+type WalletStore = storage.CollectionStore<AnyWallet<WalletMetadata, AccountMetadata>>;
+
 describe('WalletRepository', () => {
   let repository: WalletRepository<WalletMetadata, AccountMetadata>;
-  let store: jest.Mocked<WalletRepositoryDependencies<WalletMetadata, AccountMetadata>['store']>;
+  let store: jest.Mocked<WalletStore>;
 
   beforeEach(() => {
     store = {
-      observeAll: jest.fn() as jest.Mocked<
-        WalletRepositoryDependencies<WalletMetadata, AccountMetadata>['store']
-      >['observeAll'],
-      setAll: jest.fn() as jest.Mocked<WalletRepositoryDependencies<WalletMetadata, AccountMetadata>['store']>['setAll']
-    } as jest.Mocked<WalletRepositoryDependencies<WalletMetadata, AccountMetadata>['store']>;
-    repository = new WalletRepository({ logger, store });
+      observeAll: jest.fn() as jest.Mocked<WalletStore>['observeAll'],
+      setAll: jest.fn() as jest.Mocked<WalletStore>['setAll']
+    } as jest.Mocked<WalletStore>;
+    repository = new WalletRepository({ logger, store$: of(store) });
 
     store.observeAll.mockReturnValue(of([storedLedgerWallet]));
     store.setAll.mockReturnValue(of(void 0));
