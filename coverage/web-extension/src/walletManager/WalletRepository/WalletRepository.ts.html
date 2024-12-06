@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>109/109</span>
+                <span class='fraction'>111/111</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>37/37</span>
+                <span class='fraction'>38/38</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>99/99</span>
+                <span class='fraction'>100/100</span>
             </div>
         
             
@@ -355,7 +355,14 @@
 <a name='L290'></a><a href='#L290'>290</a>
 <a name='L291'></a><a href='#L291'>291</a>
 <a name='L292'></a><a href='#L292'>292</a>
-<a name='L293'></a><a href='#L293'>293</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -366,6 +373,7 @@
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
@@ -446,6 +454,7 @@
 <span class="cline-any cline-yes">60x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">60x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -465,6 +474,7 @@
 <span class="cline-any cline-yes">87x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">87x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">87x</span>
@@ -517,6 +527,7 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -546,6 +557,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -572,6 +584,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
@@ -606,6 +619,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -658,14 +672,15 @@
 import { AnyWallet, ScriptWallet, WalletId, WalletType } from '../types';
 import { KeyPurpose } from '@cardano-sdk/key-management';
 import { Logger } from 'ts-log';
-import { Observable, defer, firstValueFrom, map, shareReplay, switchMap, take } from 'rxjs';
+import { NEVER, Observable, concat, defer, firstValueFrom, map, mergeMap, shareReplay, switchMap, take } from 'rxjs';
+import { TrackerSubject, blockingWithLatestFrom } from '@cardano-sdk/util-rxjs';
 import { WalletConflictError } from '../errors';
 import { contextLogger } from '@cardano-sdk/util';
 import { getWalletId } from '../util';
 import { storage } from '@cardano-sdk/wallet';
 &nbsp;
 export interface WalletRepositoryDependencies&lt;WalletMetadata extends {}, AccountMetadata extends {}&gt; {
-  store: storage.CollectionStore&lt;AnyWallet&lt;WalletMetadata, AccountMetadata&gt;&gt;;
+  store$: Observable&lt;storage.CollectionStore&lt;AnyWallet&lt;WalletMetadata, AccountMetadata&gt;&gt;&gt;;
   logger: Logger;
 }
 &nbsp;
@@ -705,13 +720,13 @@ export class WalletRepository&lt;WalletMetadata extends {}, AccountMetadata exte
   implements WalletRepositoryApi&lt;WalletMetadata, AccountMetadata&gt;
 {
   readonly #logger: Logger;
-  readonly #store: WalletRepositoryDependencies&lt;WalletMetadata, AccountMetadata&gt;['store'];
+  readonly #store$: WalletRepositoryDependencies&lt;WalletMetadata, AccountMetadata&gt;['store$'];
   readonly wallets$: Observable&lt;AnyWallet&lt;WalletMetadata, AccountMetadata&gt;[]&gt;;
 &nbsp;
-  constructor({ logger, store }: WalletRepositoryDependencies&lt;WalletMetadata, AccountMetadata&gt;) {
-    this.#store = store;
+  constructor({ logger, store$ }: WalletRepositoryDependencies&lt;WalletMetadata, AccountMetadata&gt;) {
+    this.#store$ = new TrackerSubject(concat(store$, NEVER));
     this.#logger = contextLogger(logger, 'WalletRepository');
-    this.wallets$ = defer(() =&gt; store.observeAll()).pipe(shareReplay(1));
+    this.wallets$ = defer(() =&gt; this.#store$.pipe(mergeMap((store) =&gt; store.observeAll()))).pipe(shareReplay(1));
   }
 &nbsp;
   #getWallets() {
@@ -737,14 +752,15 @@ export class WalletRepository&lt;WalletMetadata extends {}, AccountMetadata exte
 &nbsp;
     return firstValueFrom(
       this.#getWallets().pipe(
-        switchMap((wallets) =&gt; {
+        blockingWithLatestFrom(this.#store$),
+        switchMap(([wallets, store]) =&gt; {
           if (wallets.some((wallet) =&gt; wallet.walletId === walletId)) {
             throw new WalletConflictError(`Wallet '${walletId}' already exists`);
           }
           if (props.type === WalletType.Script) {
             this.#validateOwnSigners(wallets, props.ownSigners);
           }
-          return this.#store.setAll([...wallets, { ...props, walletId }]);
+          return store.setAll([...wallets, { ...props, walletId }]);
         }),
         map(() =&gt; walletId)
       )
@@ -758,7 +774,8 @@ export class WalletRepository&lt;WalletMetadata extends {}, AccountMetadata exte
 &nbsp;
     return firstValueFrom(
       this.#getWallets().pipe(
-        switchMap((wallets) =&gt; {
+        blockingWithLatestFrom(this.#store$),
+        switchMap(([wallets, store]) =&gt; {
           const walletIndex = wallets.findIndex((w) =&gt; w.walletId === walletId);
           if (walletIndex &lt; 0) {
             throw new WalletConflictError(`Wallet '${walletId}' does not exist`);
@@ -779,7 +796,7 @@ export class WalletRepository&lt;WalletMetadata extends {}, AccountMetadata exte
             );
           }
 &nbsp;
-          return this.#store
+          return store
             .setAll(
               cloneSplice(wallets, walletIndex, 1, {
                 ...wallet,
@@ -808,11 +825,12 @@ export class WalletRepository&lt;WalletMetadata extends {}, AccountMetadata exte
 &nbsp;
     return firstValueFrom(
       this.#getWallets().pipe(
-        switchMap((wallets) =&gt; {
+        blockingWithLatestFrom(this.#store$),
+        switchMap(([wallets, store]) =&gt; {
           const walletIndex = wallets.findIndex((wallet) =&gt; wallet.walletId === walletId);
           if (walletIndex &gt;= 0) {
             // update any wallet
-            return this.#store.setAll(
+            return store.setAll(
               cloneSplice(wallets, walletIndex, 1, {
                 ...(wallets[walletIndex] as AnyWallet&lt;WalletMetadata, AccountMetadata&gt;),
                 metadata
@@ -836,13 +854,14 @@ export class WalletRepository&lt;WalletMetadata extends {}, AccountMetadata exte
 &nbsp;
     return firstValueFrom(
       this.#getWallets().pipe(
-        switchMap((wallets) =&gt; {
+        blockingWithLatestFrom(this.#store$),
+        switchMap(([wallets, store]) =&gt; {
           // update account
           const bip32Account = findAccount(wallets, walletId, accountIndex, purpose);
           if (!bip32Account) {
             throw new WalletConflictError(`Account not found: ${walletId}/${purpose}/${accountIndex}`);
           }
-          return this.#store.setAll(
+          return store.setAll(
             cloneSplice(wallets, bip32Account.walletIdx, 1, {
               ...bip32Account.wallet,
               accounts: cloneSplice(bip32Account.wallet.accounts, bip32Account.accountIdx, 1, {
@@ -865,7 +884,8 @@ export class WalletRepository&lt;WalletMetadata extends {}, AccountMetadata exte
     this.#logger.debug('removeAccount', walletId, accountIndex, purpose);
     return firstValueFrom(
       this.#getWallets().pipe(
-        switchMap((wallets) =&gt; {
+        blockingWithLatestFrom(this.#store$),
+        switchMap(([wallets, store]) =&gt; {
           const bip32Account = findAccount(wallets, walletId, accountIndex, purpose);
           if (!bip32Account) {
             throw new WalletConflictError(`Account '${walletId}/${purpose}/${accountIndex}' does not exist`);
@@ -883,7 +903,7 @@ export class WalletRepository&lt;WalletMetadata extends {}, AccountMetadata exte
               `Wallet '${dependentWallet.walletId}' depends on account '${walletId}/${purpose}/${accountIndex}'`
             );
           }
-          return this.#store.setAll(
+          return store.setAll(
             cloneSplice(wallets, bip32Account.walletIdx, 1, {
               ...bip32Account.wallet,
               accounts: cloneSplice(bip32Account.wallet.accounts, bip32Account.accountIdx, 1)
@@ -900,7 +920,8 @@ export class WalletRepository&lt;WalletMetadata extends {}, AccountMetadata exte
     return firstValueFrom(
       this.#getWallets().pipe(
         take(1),
-        switchMap((wallets) =&gt; {
+        blockingWithLatestFrom(this.#store$),
+        switchMap(([wallets, store]) =&gt; {
           const walletIndex = wallets.findIndex((w) =&gt; w.walletId === walletId);
           if (walletIndex &lt; 0) {
             throw new WalletConflictError(`Wallet '${walletId}' does not exist`);
@@ -912,7 +933,7 @@ export class WalletRepository&lt;WalletMetadata extends {}, AccountMetadata exte
           if (dependentWallet) {
             throw new WalletConflictError(`Wallet '${dependentWallet.walletId}' depends on wallet '${walletId}'`);
           }
-          return this.#store.setAll(cloneSplice(wallets, walletIndex, 1));
+          return store.setAll(cloneSplice(wallets, walletIndex, 1));
         }),
         map(() =&gt; walletId)
       )
@@ -946,7 +967,7 @@ export class WalletRepository&lt;WalletMetadata extends {}, AccountMetadata exte
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-12-06T12:32:39.794Z
+                at 2024-12-06T14:16:31.078Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
