@@ -91,7 +91,7 @@ const storesFactory: StoresFactory = {
 
 const walletRepository = new WalletRepository<Metadata, Metadata>({
   logger,
-  store: new storage.InMemoryCollectionStore()
+  store$: of(new storage.InMemoryCollectionStore<AnyWallet<Metadata, Metadata>>())
 });
 
 const signingCoordinatorApi = consumeSigningCoordinatorApi({ logger, runtime });

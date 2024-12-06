@@ -3,6 +3,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { AccountMetadata, WalletMetadata, createAccount, createPubKey } from './util';
 import {
   AddWalletProps,
+  AnyWallet,
   WalletFactory,
   WalletId,
   WalletManager,
@@ -16,7 +17,7 @@ import { HexBlob, InvalidArgumentError, isNotNil } from '@cardano-sdk/util';
 import { MinimalRuntime } from '../../src/messaging';
 import { ObservableWallet, storage } from '@cardano-sdk/wallet';
 import { Storage } from 'webextension-polyfill';
-import { TimeoutError, filter, firstValueFrom, from, skip, timeout } from 'rxjs';
+import { TimeoutError, filter, firstValueFrom, from, of, skip, timeout } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 import pick from 'lodash/pick.js';
 
@@ -96,7 +97,7 @@ describe('WalletManager', () => {
     const walletFactory: WalletFactory<WalletMetadata, AccountMetadata> = { create: walletFactoryCreate };
     const walletRepository = new WalletRepository<WalletMetadata, AccountMetadata>({
       logger,
-      store: new storage.InMemoryCollectionStore()
+      store$: of(new storage.InMemoryCollectionStore<AnyWallet<WalletMetadata, WalletMetadata>>())
     });
 
     const id = await walletRepository.addWallet(walletProps);
