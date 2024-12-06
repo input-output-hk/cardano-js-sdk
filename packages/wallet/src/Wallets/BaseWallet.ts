@@ -525,6 +525,10 @@ export class BaseWallet implements ObservableWallet {
       utxoProvider: this.utxoProvider
     });
 
+    // When the rewardAccounts delegation tracker is initialized, it will invoke drepInfo$
+    // with an empty array, since there aren't any drepDelegatees yet.
+    // This will not perform network requests, but will initialize the TrackedDrepProvider.
+    // For this reason, we do not have to explicitly call this.drepProvider.setStatInitialized
     const drepInfo$ = createDrepInfoColdObservable({
       drepProvider: this.drepProvider,
       logger: contextLogger(this.#logger, 'drepInfo$'),
