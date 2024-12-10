@@ -267,10 +267,8 @@ describe('createUtxoTracker', () => {
       );
       expectObservable(utxoTracker.total$).toBe('-a--b---|', { a: utxo, b: utxo2 });
       expectObservable(utxoTracker.unspendable$).toBe('-a--b---|', { a: [utxo[0]], b: [] });
-      expectObservable(utxoTracker.available$).toBe('-a--b---|', {
-        a: utxo2,
-        b: utxo2
-      });
+      // utxo2 = utxo-unspendable
+      expectObservable(utxoTracker.available$).toBe('-a------|', { a: utxo2 });
     });
   });
 });
