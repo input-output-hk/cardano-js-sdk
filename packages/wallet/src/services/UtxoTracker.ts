@@ -1,6 +1,6 @@
 import { Cardano, UtxoProvider } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { NEVER, Observable, combineLatest, concat, distinctUntilChanged, map, of, switchMap } from 'rxjs';
+import { NEVER, Observable, combineLatest, concat, distinctUntilChanged, map, of, shareReplay, switchMap } from 'rxjs';
 import { PersistentCollectionTrackerSubject, txInEquals, utxoEquals } from './util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxInFlight, UtxoTracker } from './types';
@@ -121,7 +121,9 @@ export const createUtxoTracker = (
         logger.debug('Found duplicate UTxO in', utxo);
       }
       return uniqueUtxo;
-    })
+    }),
+    distinctUntilChanged((previous, current) => utxoEquals(previous, current)),
+    shareReplay(1)
   );
   const available$ = combineLatest([total$, unspendableUtxoSource$]).pipe(
     // filter to utxo that are not included in in-flight transactions or unspendable
@@ -131,7 +133,9 @@ export const createUtxoTracker = (
         txInIsUnspendable && logger.debug('Exclude unspendable UTXO from availble$', utxoTxIn);
         return !txInIsUnspendable;
       })
-    )
+    ),
+    distinctUntilChanged((previous, current) => utxoEquals(previous, current)),
+    shareReplay(1)
   );
 
   return {
@@ -150,7 +154,8 @@ export const createUtxoTracker = (
       map(([unspendableUtxo, utxo]) =>
         unspendableUtxo.filter(([unspendable]) => utxo.some(([utxoTxIn]) => txInEquals(utxoTxIn, unspendable)))
       ),
-      distinctUntilChanged((previous, current) => utxoEquals(previous, current))
+      distinctUntilChanged((previous, current) => utxoEquals(previous, current)),
+      shareReplay(1)
     )
   };
 };

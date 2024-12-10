@@ -88,6 +88,7 @@ import {
   map,
   mergeMap,
   of,
+  shareReplay,
   switchMap,
   take,
   tap,
@@ -474,7 +475,9 @@ export class BaseWallet implements ObservableWallet {
     );
 
     const addresses$ = this.addresses$.pipe(
-      map((addresses) => addresses.map((groupedAddress) => groupedAddress.address))
+      map((addresses) => addresses.map((groupedAddress) => groupedAddress.address)),
+      distinctUntilChanged(deepEquals),
+      shareReplay(1)
     );
     this.#failedFromReemitter$ = new Subject<FailedTx>();
     this.transactions = createTransactionsTracker({
