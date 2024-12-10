@@ -20,9 +20,6 @@ case $NETWORK in
   preview)
     networkMagic=2
     ;;
-  sanchonet)
-    networkMagic=4
-    ;;
   *)
     echo "${NETWORK}: Unknown network"
     exit 1
