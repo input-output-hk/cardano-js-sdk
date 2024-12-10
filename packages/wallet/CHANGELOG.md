@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.46.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.46.1...@cardano-sdk/wallet@0.46.2) (2024-12-10)
+
+### Performance Improvements
+
+* **wallet:** cache mapped addresses and utxo ([e7bd2b3](https://github.com/input-output-hk/cardano-js-sdk/commit/e7bd2b3239fe9ed89e38facae52ea36e5ccc19a0))
+
 ## [0.46.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.46.0...@cardano-sdk/wallet@0.46.1) (2024-12-06)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
