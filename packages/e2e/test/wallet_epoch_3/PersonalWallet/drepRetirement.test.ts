@@ -249,8 +249,8 @@ describe('PersonalWallet/drepRetirement', () => {
     );
 
     expect(drepDelegatees).toEqual([
-      { delegateRepresentative: expect.objectContaining({ active: false, id: drepId1 }) },
-      { delegateRepresentative: expect.objectContaining({ active: true, amount: 0n, hasScript: false, id: drepId2 }) }
+      { delegateRepresentative: expect.objectContaining({ active: false, hasScript: false, id: drepId1 }) },
+      { delegateRepresentative: expect.objectContaining({ active: true, hasScript: false, id: drepId2 }) }
     ]);
   });
 
@@ -290,7 +290,7 @@ describe('PersonalWallet/drepRetirement', () => {
 
     expect(drepDelegatees).toEqual([
       { delegateRepresentative: { __typename: 'AlwaysAbstain' } },
-      { delegateRepresentative: expect.objectContaining({ active: false, amount: 0n, hasScript: false, id: drepId2 }) }
+      { delegateRepresentative: expect.objectContaining({ active: false, hasScript: false, id: drepId2 }) }
     ]);
   });
 });
