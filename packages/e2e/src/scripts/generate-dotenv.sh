@@ -16,12 +16,13 @@ esac
 case $NETWORK in
   preprod)
     networkMagic=1
+    bfUrl="https://cardano-preprod.blockfrost.io"
+    bfProjectId="${BLOCKFROST_BACKEND_PREPROD}"
     ;;
   preview)
     networkMagic=2
-    ;;
-  sanchonet)
-    networkMagic=4
+    bfUrl="https://cardano-preview.blockfrost.io"
+    bfProjectId="${BLOCKFROST_BACKEND_PREVIEW}"
     ;;
   *)
     echo "${NETWORK}: Unknown network"
@@ -40,9 +41,8 @@ TEST_CLIENT_ASSET_PROVIDER=http
 TEST_CLIENT_ASSET_PROVIDER_PARAMS='{\"baseUrl\":\"${url}\"}'
 TEST_CLIENT_CHAIN_HISTORY_PROVIDER=ws
 TEST_CLIENT_CHAIN_HISTORY_PROVIDER_PARAMS='{\"baseUrl\":\"${url}\"}'
-TEST_CLIENT_DREP_PROVIDER: 'blockfrost'
-# TODO: use blockfrost URL
-TEST_CLIENT_DREP_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:3015"}'
+TEST_CLIENT_DREP_PROVIDER=blockfrost
+TEST_CLIENT_DREP_PROVIDER_PARAMS='{\"baseUrl\":\"${bfUrl}\",\"projectId\":\"${bfProjectId}\",\"apiVersion\":\"v0\"}'
 TEST_CLIENT_HANDLE_PROVIDER=http
 TEST_CLIENT_HANDLE_PROVIDER_PARAMS='{\"baseUrl\":\"${url}\"}'
 TEST_CLIENT_NETWORK_INFO_PROVIDER=ws

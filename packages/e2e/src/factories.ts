@@ -147,7 +147,10 @@ assetProviderFactory.register(BLOCKFROST_PROVIDER, async (params: any, logger): 
   return new Promise<AssetProvider>(async (resolve) => {
     resolve(
       new BlockfrostAssetProvider(
-        new BlockfrostClient({ baseUrl: params.baseUrl }, { rateLimiter: { schedule: (task) => task() } }),
+        new BlockfrostClient(
+          { apiVersion: params.apiVersion, baseUrl: params.baseUrl, projectId: params.projectId },
+          { rateLimiter: { schedule: (task) => task() } }
+        ),
         logger
       )
     );
@@ -190,7 +193,10 @@ drepProviderFactory.register(BLOCKFROST_PROVIDER, async (params: any, logger): P
   return new Promise<DRepProvider>(async (resolve) => {
     resolve(
       new BlockfrostDRepProvider(
-        new BlockfrostClient({ baseUrl: params.baseUrl }, { rateLimiter: { schedule: (task) => task() } }),
+        new BlockfrostClient(
+          { apiVersion: params.apiVersion, baseUrl: params.baseUrl, projectId: params.projectId },
+          { rateLimiter: { schedule: (task) => task() } }
+        ),
         logger
       )
     );

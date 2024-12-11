@@ -54,6 +54,8 @@ jobs:
           CLUSTER: ${{ inputs.cluster }}
           ENVIRONMENT: ${{ inputs.environment }}
           MNEMONIC: ${{ secrets.MNEMONIC }}
+          BLOCKFROST_BACKEND_PREVIEW: ${{ secrets.BLOCKFROST_BACKEND_PREVIEW }}
+          BLOCKFROST_BACKEND_PREPROD: ${{ secrets.BLOCKFROST_BACKEND_PREPROD }}
           NETWORK: ${{ inputs.network }}
         run: |
           ./src/scripts/generate-dotenv.sh
