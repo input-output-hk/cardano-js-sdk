@@ -271,8 +271,21 @@ describe('Transaction Summary Inspector', () => {
             ]),
             coins: 6_000_000n
           }
+        },
+        {
+          address: addresses[0],
+          value: {
+            coins: 2_000_000n
+          }
+        },
+        {
+          address: externalAddress1,
+          value: {
+            coins: 1_000_000n
+          }
         }
-      ]
+      ],
+      withdrawals: [{ quantity: 3_000_000n, stakeAddress: rewardAccounts[0] }]
     });
 
     const histTx: Cardano.HydratedTx[] = [
@@ -335,7 +348,7 @@ describe('Transaction Summary Inspector', () => {
         [assetInfos[AssetInfoIdx.PXL], -6n],
         [assetInfos[AssetInfoIdx.Unit], -7n]
       ]),
-      coins: -10_000_000n,
+      coins: -11_000_000n,
       collateral: 0n,
       deposit: 0n,
       fee,
