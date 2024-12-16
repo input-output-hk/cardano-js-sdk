@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.23.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.23.2...@cardano-sdk/cardano-services-client@0.23.3) (2024-12-16)
+
+### Bug Fixes
+
+* **cardano-services-client:** correct blockfrost tx submit request body ([eb2f69d](https://github.com/input-output-hk/cardano-js-sdk/commit/eb2f69d6e1f82c10c5092a5deba3be691ef384b1))
+
 ## [0.23.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.23.1...@cardano-sdk/cardano-services-client@0.23.2) (2024-12-05)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services-client
