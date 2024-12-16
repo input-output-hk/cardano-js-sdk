@@ -10,7 +10,7 @@ export class BlockfrostTxSubmitProvider extends BlockfrostProvider implements Tx
   async submitTx({ signedTransaction }: SubmitTxArgs): Promise<void> {
     // @ todo handle context and resolutions
     await this.request<string>('tx/submit', {
-      body: signedTransaction,
+      body: Buffer.from(signedTransaction, 'hex'),
       headers: { 'Content-Type': 'application/cbor' },
       method: 'POST'
     });
