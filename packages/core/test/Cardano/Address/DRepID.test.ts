@@ -1,3 +1,4 @@
+import { Cardano } from '../../../src';
 import { Credential, CredentialType, DRepID } from '../../../src/Cardano';
 import { InvalidStringError } from '@cardano-sdk/util';
 
@@ -66,6 +67,40 @@ describe('Cardano/Address/DRepID', () => {
     });
     it('is false if string is not a valid DRepID', () => {
       expect(DRepID.isValid('addr_test1vpudzrw5uq46qwl6h5szlc66fydr0l2rlsw4nvaaxfld40g3ys07c')).toBe(false);
+    });
+  });
+
+  describe('toAddress', () => {
+    it('can convert a CIP105 DRepID to a type 6 Cardano.Address', () => {
+      const drepId = DRepID(CIP105_PUB_KEY_HASH_ID);
+      const drepAddress = DRepID.toAddress(drepId);
+      expect(drepAddress).toBeDefined();
+      expect(drepAddress?.toAddress().getType()).toEqual(Cardano.AddressType.EnterpriseKey);
+      expect(drepAddress?.toAddress().getProps().paymentPart).toEqual(pubKeyHashCredential);
+    });
+
+    it('can convert a CIP129 DRepID to a type 6 Cardano.Address', () => {
+      const drepId = DRepID(CIP129_PUB_KEY_HASH_ID);
+      const drepAddress = DRepID.toAddress(drepId);
+      expect(drepAddress).toBeDefined();
+      expect(drepAddress?.toAddress().getType()).toEqual(Cardano.AddressType.EnterpriseKey);
+      expect(drepAddress?.toAddress().getProps().paymentPart).toEqual(pubKeyHashCredential);
+    });
+
+    it('can convert a CIP105 script hash DRepID to a type 7 Cardano.Address', () => {
+      const drepId = DRepID(CIP105_SCRIPT_HASH_ID);
+      const drepAddress = DRepID.toAddress(drepId);
+      expect(drepAddress).toBeDefined();
+      expect(drepAddress?.toAddress().getType()).toEqual(Cardano.AddressType.EnterpriseScript);
+      expect(drepAddress?.toAddress().getProps().paymentPart).toEqual(scriptHashCredential);
+    });
+
+    it('can convert a CIP129 script hash DRepID to a type 7 Cardano.Address', () => {
+      const drepId = DRepID(CIP129_SCRIPT_HASH_ID);
+      const drepAddress = DRepID.toAddress(drepId);
+      expect(drepAddress).toBeDefined();
+      expect(drepAddress?.toAddress().getType()).toEqual(Cardano.AddressType.EnterpriseScript);
+      expect(drepAddress?.toAddress().getProps().paymentPart).toEqual(scriptHashCredential);
     });
   });
 });

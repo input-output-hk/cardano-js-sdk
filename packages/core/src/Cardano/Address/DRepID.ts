@@ -1,5 +1,6 @@
 import * as BaseEncoding from '@scure/base';
-import { Credential, CredentialType } from './Address';
+import { Address, AddressType, Credential, CredentialType } from './Address';
+import { EnterpriseAddress } from './EnterpriseAddress';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { OpaqueString, typedBech32 } from '@cardano-sdk/util';
 
@@ -97,4 +98,12 @@ DRepID.toCip105DRepID = (drepId: DRepID): DRepID => {
 DRepID.toCip129DRepID = (drepId: DRepID): DRepID => {
   const credential = DRepID.toCredential(drepId);
   return DRepID.cip129FromCredential(credential);
+};
+
+DRepID.toAddress = (drepId: DRepID): EnterpriseAddress | undefined => {
+  const credential = DRepID.toCredential(drepId);
+  return new Address({
+    paymentPart: credential,
+    type: credential.type === CredentialType.KeyHash ? AddressType.EnterpriseKey : AddressType.EnterpriseScript
+  }).asEnterprise();
 };
