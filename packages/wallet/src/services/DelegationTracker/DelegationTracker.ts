@@ -21,7 +21,7 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistoryProvider, createRewardsHistoryProvider, createRewardsHistoryTracker } from './RewardsHistory';
 import { Shutdown, contextLogger } from '@cardano-sdk/util';
 import { TrackedRewardsProvider, TrackedStakePoolProvider } from '../ProviderTracker';
-import { TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
+import { TrackerSubject, poll } from '@cardano-sdk/util-rxjs';
 import { TxWithEpoch } from './types';
 import { WalletStores } from '../../persistence';
 import { createDelegationDistributionTracker } from './DelegationDistributionTracker';
@@ -35,11 +35,11 @@ export const createBlockEpochProvider =
     onFatalError?: (value: unknown) => void
   ) =>
   (ids: Cardano.BlockId[]) =>
-    coldObservableProvider({
+    poll({
       logger,
       onFatalError,
-      provider: () => chainHistoryProvider.blocksByHashes({ ids }),
-      retryBackoffConfig
+      retryBackoffConfig,
+      sample: () => chainHistoryProvider.blocksByHashes({ ids })
     }).pipe(map((blocks) => blocks.map(({ epoch }) => epoch)));
 
 export type BlockEpochProvider = ReturnType<typeof createBlockEpochProvider>;

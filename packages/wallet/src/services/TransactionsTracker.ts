@@ -32,7 +32,7 @@ import { FailedTx, OutgoingOnChainTx, OutgoingTx, TransactionFailure, Transactio
 import { Logger } from 'ts-log';
 import { Range, Shutdown, contextLogger } from '@cardano-sdk/util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
+import { TrackerSubject, poll } from '@cardano-sdk/util-rxjs';
 import { distinctBlock, signedTxsEquals, transactionsEquals, txEquals, txInEquals } from './util';
 
 import { WitnessedTx } from '@cardano-sdk/key-management';
@@ -204,7 +204,7 @@ const findIntersectionAndUpdateTxStore = ({
   rollback$: Subject<Cardano.HydratedTx>;
   addresses: Cardano.PaymentAddress[];
 }) =>
-  coldObservableProvider({
+  poll({
     // Do not re-fetch transactions twice on load when tipBlockHeight$ loads from storage first
     // It should also help when using poor internet connection.
     // Caveat is that local transactions might get out of date...
@@ -212,8 +212,10 @@ const findIntersectionAndUpdateTxStore = ({
     equals: transactionsEquals,
     logger,
     onFatalError,
+
+    retryBackoffConfig,
     // eslint-disable-next-line sonarjs/cognitive-complexity,complexity
-    provider: async () => {
+    sample: async () => {
       let rollbackOcurred = false;
       // eslint-disable-next-line no-constant-condition
       while (true) {
@@ -290,7 +292,6 @@ const findIntersectionAndUpdateTxStore = ({
         return localTransactions;
       }
     },
-    retryBackoffConfig,
     trigger$: tipBlockHeight$
   });
 

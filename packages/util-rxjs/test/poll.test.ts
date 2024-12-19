@@ -2,14 +2,14 @@ import { BehaviorSubject, EmptyError, Subject, firstValueFrom, lastValueFrom, ta
 import { InvalidStringError } from '@cardano-sdk/util';
 import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
 import { TestLogger, createLogger } from '@cardano-sdk/util-dev';
-import { coldObservableProvider } from '../src';
+import { poll } from '../src';
 
 // There might be a more elegant way to mock with original implementation (spy)
 jest.mock('backoff-rxjs', () => ({
   retryBackoff: jest.fn().mockImplementation((...args) => jest.requireActual('backoff-rxjs').retryBackoff(...args))
 }));
 
-describe('coldObservableProvider', () => {
+describe('poll', () => {
   let logger: TestLogger;
   const testErrorStr = 'Test error';
 
@@ -17,53 +17,53 @@ describe('coldObservableProvider', () => {
     logger = createLogger({ record: true });
   });
 
-  it('returns an observable that calls underlying provider on each subscription and uses retryBackoff', async () => {
-    const underlyingProvider = jest.fn().mockResolvedValue(true);
+  it('returns an observable that calls sample on each subscription and uses retryBackoff', async () => {
+    const sample = jest.fn().mockResolvedValue(true);
     const backoffConfig: RetryBackoffConfig = { initialInterval: 1 };
-    const provider$ = coldObservableProvider({
+    const values$ = poll({
       logger,
-      provider: underlyingProvider,
-      retryBackoffConfig: backoffConfig
+      retryBackoffConfig: backoffConfig,
+      sample
     });
-    expect(await firstValueFrom(provider$)).toBe(true);
-    expect(await firstValueFrom(provider$)).toBe(true);
-    expect(underlyingProvider).toBeCalledTimes(2);
+    expect(await firstValueFrom(values$)).toBe(true);
+    expect(await firstValueFrom(values$)).toBe(true);
+    expect(sample).toBeCalledTimes(2);
     expect(retryBackoff).toBeCalledTimes(2);
   });
 
-  it('provider is unsubscribed on cancel emit', async () => {
-    const fakeProviderSubject = new Subject();
-    const underlyingProvider = () => firstValueFrom(fakeProviderSubject);
+  it('completes on cancel emit', async () => {
+    const fakeSampleSubject = new Subject();
+    const sample = () => firstValueFrom(fakeSampleSubject);
     const backoffConfig: RetryBackoffConfig = { initialInterval: 1 };
     const cancel$ = new BehaviorSubject<boolean>(true);
-    const provider$ = coldObservableProvider({
+    const values$ = poll({
       cancel$,
       logger,
-      provider: underlyingProvider,
-      retryBackoffConfig: backoffConfig
+      retryBackoffConfig: backoffConfig,
+      sample
     });
 
     try {
-      await firstValueFrom(provider$);
+      await firstValueFrom(values$);
     } catch (error) {
       expect(error).toBeInstanceOf(EmptyError);
     }
     expect.assertions(1);
   });
 
-  it('retries using retryBackoff, when underlying provider rejects', async () => {
-    const underlyingProvider = jest.fn().mockRejectedValueOnce(false).mockResolvedValue(true);
+  it('retries using retryBackoff, when sample rejects', async () => {
+    const sample = jest.fn().mockRejectedValueOnce(false).mockResolvedValue(true);
     const retryBackoffConfig: RetryBackoffConfig = { initialInterval: 1 };
-    const provider$ = coldObservableProvider({ logger, provider: underlyingProvider, retryBackoffConfig });
-    const resolvedValue = await firstValueFrom(provider$);
-    expect(underlyingProvider).toBeCalledTimes(2);
+    const values$ = poll({ logger, retryBackoffConfig, sample });
+    const resolvedValue = await firstValueFrom(values$);
+    expect(sample).toBeCalledTimes(2);
     expect(resolvedValue).toBeTruthy();
   });
 
-  it('does not retry, when underlying provider rejects with InvalidStringError', async () => {
+  it('does not retry, when sample rejects with InvalidStringError', async () => {
     const testValue = { test: 'value' };
     const testError = new InvalidStringError('Test invalid string error');
-    const underlyingProvider = jest
+    const sample = jest
       .fn()
       .mockRejectedValueOnce(new Error(testErrorStr))
       .mockResolvedValueOnce(testValue)
@@ -71,15 +71,15 @@ describe('coldObservableProvider', () => {
       .mockResolvedValueOnce(testValue);
     const onFatalError = jest.fn();
     const retryBackoffConfig: RetryBackoffConfig = { initialInterval: 1, shouldRetry: () => true };
-    const provider$ = coldObservableProvider({
+    const values$ = poll({
       logger,
       onFatalError,
-      provider: underlyingProvider,
-      retryBackoffConfig
+      retryBackoffConfig,
+      sample
     });
-    await expect(firstValueFrom(provider$)).resolves.toBe(testValue);
-    await expect(firstValueFrom(provider$)).rejects.toThrow(EmptyError);
-    expect(underlyingProvider).toBeCalledTimes(3);
+    await expect(firstValueFrom(values$)).resolves.toBe(testValue);
+    await expect(firstValueFrom(values$)).rejects.toThrow(EmptyError);
+    expect(sample).toBeCalledTimes(3);
     expect(onFatalError).toBeCalledWith(testError);
     expect(logger.messages).toStrictEqual([
       { level: 'error', message: [new Error(testErrorStr)] },
@@ -89,8 +89,8 @@ describe('coldObservableProvider', () => {
     ]);
   });
 
-  it('polls the provider until the pollUntil condition is satisfied', async () => {
-    const underlyingProvider = jest
+  it('polls sample until the pollUntil condition is satisfied', async () => {
+    const sample = jest
       .fn()
       .mockResolvedValueOnce('a')
       .mockResolvedValueOnce('b')
@@ -98,36 +98,36 @@ describe('coldObservableProvider', () => {
       .mockResolvedValue('Never reached');
     const backoffConfig: RetryBackoffConfig = { initialInterval: 1 };
 
-    const provider$ = coldObservableProvider({
+    const values$ = poll({
       logger,
       pollUntil: (v) => v === 'c',
-      provider: underlyingProvider,
-      retryBackoffConfig: backoffConfig
+      retryBackoffConfig: backoffConfig,
+      sample
     });
 
-    const providerValues: unknown[] = [];
-    await lastValueFrom(provider$.pipe(tap((v) => providerValues.push(v))));
-    expect(providerValues).toEqual(['a', 'b', 'c']);
-    expect(underlyingProvider).toBeCalledTimes(3);
+    const sampleValues: unknown[] = [];
+    await lastValueFrom(values$.pipe(tap((v) => sampleValues.push(v))));
+    expect(sampleValues).toEqual(['a', 'b', 'c']);
+    expect(sample).toBeCalledTimes(3);
   });
 
   it('stops retrying after maxRetries attempts and handles the error in catchError', async () => {
     const testError = new Error(testErrorStr);
-    const underlyingProvider = jest.fn().mockRejectedValue(testError);
+    const sample = jest.fn().mockRejectedValue(testError);
     const maxRetries = 3;
     const retryBackoffConfig: RetryBackoffConfig = { initialInterval: 1, maxRetries };
     const onFatalError = jest.fn();
 
-    const provider$ = coldObservableProvider({
+    const values$ = poll({
       logger,
       onFatalError,
-      provider: underlyingProvider,
-      retryBackoffConfig
+      retryBackoffConfig,
+      sample
     });
 
-    await expect(firstValueFrom(provider$)).rejects.toThrow(testError);
+    await expect(firstValueFrom(values$)).rejects.toThrow(testError);
 
-    expect(underlyingProvider).toBeCalledTimes(maxRetries + 1);
+    expect(sample).toBeCalledTimes(maxRetries + 1);
     expect(onFatalError).toBeCalledWith(expect.any(Error));
     expect(logger.messages).toStrictEqual([
       { level: 'error', message: [testError] },

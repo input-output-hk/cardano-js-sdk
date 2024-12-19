@@ -18,8 +18,8 @@ import {
 } from 'rxjs';
 import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
 
-export interface ColdObservableProviderProps<T> {
-  provider: () => Promise<T>;
+export interface PollProps<T> {
+  sample: () => Promise<T>;
   retryBackoffConfig: RetryBackoffConfig;
   onFatalError?: (value: unknown) => void;
   trigger$?: Observable<unknown>;
@@ -30,8 +30,8 @@ export interface ColdObservableProviderProps<T> {
   logger: Logger;
 }
 
-export const coldObservableProvider = <T>({
-  provider,
+export const poll = <T>({
+  sample,
   retryBackoffConfig,
   onFatalError,
   trigger$ = of(true),
@@ -40,7 +40,7 @@ export const coldObservableProvider = <T>({
   cancel$ = NEVER,
   pollUntil = () => true,
   logger
-}: ColdObservableProviderProps<T>) =>
+}: PollProps<T>) =>
   new Observable<T>((subscriber) => {
     const cancelOnFatalError$ = new Subject<boolean>();
     const internalCancel$ = merge(cancel$, cancelOnFatalError$);
@@ -48,7 +48,7 @@ export const coldObservableProvider = <T>({
       .pipe(
         combinator(() =>
           defer(() =>
-            from(provider()).pipe(
+            from(sample()).pipe(
               mergeMap((v) =>
                 pollUntil(v)
                   ? of(v)

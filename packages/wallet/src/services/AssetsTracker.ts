@@ -20,7 +20,7 @@ import {
 } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackedAssetProvider } from './ProviderTracker';
-import { coldObservableProvider, concatAndCombineLatest } from '@cardano-sdk/util-rxjs';
+import { concatAndCombineLatest, poll } from '@cardano-sdk/util-rxjs';
 import { deepEquals, isNotNil } from '@cardano-sdk/util';
 import { newTransactions$ } from './TransactionsTracker';
 import chunk from 'lodash/chunk.js';
@@ -139,13 +139,13 @@ export const createAssetService =
   (assetIds: Cardano.AssetId[]) =>
     concatAndCombineLatest(
       chunk(assetIds, ASSET_INFO_FETCH_CHUNK_SIZE).map((assetIdsChunk) =>
-        coldObservableProvider({
+        poll({
           logger,
           onFatalError,
           pollUntil: isEveryAssetInfoComplete,
-          provider: () =>
-            getAssetsWithCache(assetIdsChunk, assetCache$, totalBalance$, assetProvider, maxAssetInfoCacheAge),
           retryBackoffConfig,
+          sample: () =>
+            getAssetsWithCache(assetIdsChunk, assetCache$, totalBalance$, assetProvider, maxAssetInfoCacheAge),
           trigger$: of(true) // fetch only once
         })
       )

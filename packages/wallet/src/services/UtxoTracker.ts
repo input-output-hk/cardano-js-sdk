@@ -5,7 +5,7 @@ import { PersistentCollectionTrackerSubject, txInEquals, utxoEquals } from './ut
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxInFlight, UtxoTracker } from './types';
 import { WalletStores } from '../persistence';
-import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
+import { poll } from '@cardano-sdk/util-rxjs';
 import { sortUtxoByTxIn } from '@cardano-sdk/input-selection';
 import chunk from 'lodash/chunk.js';
 import uniqWith from 'lodash/uniqWith.js';
@@ -40,11 +40,12 @@ export const createUtxoProvider = (
 ) =>
   addresses$.pipe(
     switchMap((paymentAddresses) =>
-      coldObservableProvider({
+      poll({
         equals: utxoEquals,
         logger,
         onFatalError,
-        provider: async () => {
+        retryBackoffConfig,
+        sample: async () => {
           let utxos = new Array<Cardano.Utxo>();
 
           const addressesSubGroups = chunk(paymentAddresses, PAGE_SIZE);
@@ -55,7 +56,6 @@ export const createUtxoProvider = (
 
           return utxos.sort(sortUtxoByTxIn);
         },
-        retryBackoffConfig,
         trigger$: history$
       })
     )

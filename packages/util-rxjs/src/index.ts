@@ -5,5 +5,5 @@ export * from './passthrough';
 export * from './finalizeWithLatest';
 export * from './concatAndCombineLatest';
 export * from './shareRetryBackoff';
-export * from './coldObservableProvider';
+export * from './poll';
 export * from './types';

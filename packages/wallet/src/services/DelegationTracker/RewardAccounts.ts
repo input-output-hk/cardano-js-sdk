@@ -25,9 +25,9 @@ import { PAGE_SIZE } from '../TransactionsTracker';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackedStakePoolProvider } from '../ProviderTracker';
 import { TxWithEpoch } from './types';
-import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { drepsToDelegatees, drepsToDrepIds } from '../DrepInfoTracker';
 import { lastStakeKeyCertOfType } from './transactionCertificates';
+import { poll } from '@cardano-sdk/util-rxjs';
 import findLast from 'lodash/findLast.js';
 import isEqual from 'lodash/isEqual.js';
 import uniq from 'lodash/uniq.js';
@@ -67,11 +67,11 @@ export const createQueryStakePoolsProvider =
     }
     return merge(
       store.getValues(poolIds),
-      coldObservableProvider({
+      poll({
         logger,
         onFatalError,
-        provider: () => allStakePoolsByPoolIds(stakePoolProvider, { poolIds }),
-        retryBackoffConfig
+        retryBackoffConfig,
+        sample: () => allStakePoolsByPoolIds(stakePoolProvider, { poolIds })
       }).pipe(
         tap((pageResults) => {
           for (const stakePool of pageResults) {
@@ -119,12 +119,12 @@ export const createRewardsProvider =
   (rewardAccounts: Cardano.RewardAccount[], equals = isEqual): Observable<Cardano.Lovelace[]> =>
     combineLatest(
       rewardAccounts.map((rewardAccount) =>
-        coldObservableProvider({
+        poll({
           equals,
           logger,
           onFatalError,
-          provider: () => rewardsProvider.rewardAccountBalance({ rewardAccount }),
           retryBackoffConfig,
+          sample: () => rewardsProvider.rewardAccountBalance({ rewardAccount }),
           trigger$: fetchRewardsTrigger$(epoch$, txOnChain$, rewardAccount)
         })
       )

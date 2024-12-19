@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { PersistentDocumentTrackerSubject } from './util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { SupplyDistributionStores } from '../persistence';
-import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
+import { poll } from '@cardano-sdk/util-rxjs';
 import isEqual from 'lodash/isEqual.js';
 
 export type SupplyDistributionNetworkInfoProvider = Pick<NetworkInfoProvider, 'stake' | 'lovelaceSupply'>;
@@ -36,24 +36,24 @@ export const createSupplyDistributionTracker = (
   { logger, stores, networkInfoProvider }: SupplyDistributionTrackerDependencies
 ) => {
   const stake$ = new PersistentDocumentTrackerSubject(
-    coldObservableProvider({
+    poll({
       equals: isEqual,
       logger,
       onFatalError,
-      provider: networkInfoProvider.stake,
       retryBackoffConfig,
+      sample: networkInfoProvider.stake,
       trigger$
     }),
     stores.stake
   );
 
   const lovelaceSupply$ = new PersistentDocumentTrackerSubject(
-    coldObservableProvider({
+    poll({
       equals: isEqual,
       logger,
       onFatalError,
-      provider: networkInfoProvider.lovelaceSupply,
       retryBackoffConfig,
+      sample: networkInfoProvider.lovelaceSupply,
       trigger$
     }),
     stores.lovelaceSupply

@@ -71,7 +71,7 @@ import {
   TxSubmitProvider,
   UtxoProvider
 } from '@cardano-sdk/core';
-import { BehaviorObservable, TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
+import { BehaviorObservable, TrackerSubject, poll } from '@cardano-sdk/util-rxjs';
 import {
   BehaviorSubject,
   EMPTY,
@@ -369,15 +369,15 @@ export class BaseWallet implements ObservableWallet {
 
     if (isBip32PublicCredentialsManager(this.#publicCredentialsManager)) {
       this.#addressTracker = createAddressTracker({
-        addressDiscovery$: coldObservableProvider({
+        addressDiscovery$: poll({
           cancel$,
           logger: contextLogger(this.#logger, 'addressDiscovery$'),
           onFatalError,
-          provider: () => {
+          retryBackoffConfig,
+          sample: () => {
             const credManager = this.#publicCredentialsManager as Bip32PublicCredentialsManager;
             return credManager.addressDiscovery.discover(credManager.bip32Account);
-          },
-          retryBackoffConfig
+          }
         }).pipe(
           take(1),
           catchError((error) => {
@@ -403,12 +403,12 @@ export class BaseWallet implements ObservableWallet {
       logger: contextLogger(this.#logger, 'tip$'),
       maxPollInterval: maxInterval,
       minPollInterval: pollInterval,
-      provider$: coldObservableProvider({
+      provider$: poll({
         cancel$,
         logger: contextLogger(this.#logger, 'tip$'),
         onFatalError,
-        provider: this.networkInfoProvider.ledgerTip,
-        retryBackoffConfig
+        retryBackoffConfig,
+        sample: this.networkInfoProvider.ledgerTip
       }),
       store: stores.tip,
       syncStatus: this.syncStatus
@@ -426,13 +426,13 @@ export class BaseWallet implements ObservableWallet {
     // Era summaries
     const eraSummariesTrigger = new BehaviorSubject<void>(void 0);
     this.eraSummaries$ = new PersistentDocumentTrackerSubject(
-      coldObservableProvider({
+      poll({
         cancel$,
         equals: deepEquals,
         logger: contextLogger(this.#logger, 'eraSummaries$'),
         onFatalError,
-        provider: this.networkInfoProvider.eraSummaries,
         retryBackoffConfig,
+        sample: this.networkInfoProvider.eraSummaries,
         trigger$: eraSummariesTrigger.pipe(tap(() => 'Trigger request era summaries'))
       }),
       stores.eraSummaries
@@ -450,25 +450,25 @@ export class BaseWallet implements ObservableWallet {
       tap((epoch) => this.#logger.debug(`Current epoch is ${epoch}`))
     );
     this.protocolParameters$ = new PersistentDocumentTrackerSubject(
-      coldObservableProvider({
+      poll({
         cancel$,
         equals: isEqual,
         logger: contextLogger(this.#logger, 'protocolParameters$'),
         onFatalError,
-        provider: this.networkInfoProvider.protocolParameters,
         retryBackoffConfig,
+        sample: this.networkInfoProvider.protocolParameters,
         trigger$: epoch$
       }),
       stores.protocolParameters
     );
     this.genesisParameters$ = new PersistentDocumentTrackerSubject(
-      coldObservableProvider({
+      poll({
         cancel$,
         equals: isEqual,
         logger: contextLogger(this.#logger, 'genesisParameters$'),
         onFatalError,
-        provider: this.networkInfoProvider.genesisParameters,
         retryBackoffConfig,
+        sample: this.networkInfoProvider.genesisParameters,
         trigger$: epoch$
       }),
       stores.genesisParameters
@@ -602,13 +602,13 @@ export class BaseWallet implements ObservableWallet {
     this.handles$ = this.handleProvider
       ? this.initializeHandles(
           new PersistentDocumentTrackerSubject(
-            coldObservableProvider({
+            poll({
               cancel$,
               equals: isEqual,
               logger: contextLogger(this.#logger, 'handles$'),
               onFatalError,
-              provider: () => this.handleProvider.getPolicyIds(),
-              retryBackoffConfig
+              retryBackoffConfig,
+              sample: () => this.handleProvider.getPolicyIds()
             }),
             stores.policyIds
           )

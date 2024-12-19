@@ -7,7 +7,7 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistory } from '../types';
 import { TrackedRewardsProvider } from '../ProviderTracker';
 import { TxWithEpoch } from './types';
-import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
+import { poll } from '@cardano-sdk/util-rxjs';
 import first from 'lodash/first.js';
 import flatten from 'lodash/flatten.js';
 import sortBy from 'lodash/sortBy.js';
@@ -28,15 +28,15 @@ export const createRewardsHistoryProvider =
     onFatalError?: (value: unknown) => void
   ): Observable<Map<Cardano.RewardAccount, Reward[]>> => {
     if (lowerBound) {
-      return coldObservableProvider({
+      return poll({
         logger,
         onFatalError,
-        provider: () =>
+        retryBackoffConfig,
+        sample: () =>
           rewardsProvider.rewardsHistory({
             epochs: { lowerBound },
             rewardAccounts
-          }),
-        retryBackoffConfig
+          })
       });
     }
     rewardsProvider.setStatInitialized(rewardsProvider.stats.rewardsHistory$);
