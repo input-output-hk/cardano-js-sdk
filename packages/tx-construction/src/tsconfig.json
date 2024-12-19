@@ -8,6 +8,9 @@
       "path": "../../util/src"
     },
     {
+      "path": "../../util-rxjs/src"
+    },
+    {
       "path": "../../core/src"
     },
     {
