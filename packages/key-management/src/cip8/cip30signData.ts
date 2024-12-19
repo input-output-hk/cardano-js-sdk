@@ -132,10 +132,6 @@ export const cip30signData = async (
   keyAgent: KeyAgent,
   { knownAddresses, signWith, payload }: Cip8SignDataContext
 ): Promise<Cip30DataSignature> => {
-  if (Cardano.DRepID.isValid(signWith) && !Cardano.DRepID.canSign(signWith)) {
-    throw new Cip30DataSignError(Cip30DataSignErrorCode.AddressNotPK, 'Invalid address');
-  }
-
   const dRepKeyHash = (
     await Crypto.Ed25519PublicKey.fromHex(await keyAgent.derivePublicKey(DREP_KEY_DERIVATION_PATH)).hash()
   ).hex();

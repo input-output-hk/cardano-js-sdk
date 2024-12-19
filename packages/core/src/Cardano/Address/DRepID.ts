@@ -1,5 +1,5 @@
 import * as BaseEncoding from '@scure/base';
-import { Address, AddressType, Credential, CredentialType } from './Address';
+import { Credential, CredentialType } from './Address';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { OpaqueString, typedBech32 } from '@cardano-sdk/util';
 
@@ -24,14 +24,6 @@ DRepID.isValid = (value: string): boolean => {
   try {
     DRepID(value);
     return true;
-  } catch {
-    return false;
-  }
-};
-
-DRepID.canSign = (value: string): boolean => {
-  try {
-    return DRepID.isValid(value) && Address.fromBech32(value).getType() === AddressType.EnterpriseKey;
   } catch {
     return false;
   }
