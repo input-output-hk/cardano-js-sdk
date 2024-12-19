@@ -153,7 +153,7 @@ export type SignTx = (tx: Cbor, partialSign?: Boolean) => Promise<Cbor>;
  * @throws DataSignError
  */
 export type SignData = (
-  addr: Cardano.PaymentAddress | Cardano.DRepID | Bytes,
+  addr: Cardano.PaymentAddress | Cardano.RewardAccount | Bytes,
   payload: Bytes
 ) => Promise<Cip30DataSignature>;
 
@@ -203,6 +203,7 @@ export interface Cip95WalletApi {
   getRegisteredPubStakeKeys: () => Promise<Ed25519PublicKeyHex[]>;
   getUnregisteredPubStakeKeys: () => Promise<Ed25519PublicKeyHex[]>;
   getPubDRepKey: () => Promise<Ed25519PublicKeyHex>;
+  signData: SignData;
 }
 
 export type WalletApi = Cip30WalletApi & Cip95WalletApi;

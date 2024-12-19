@@ -210,7 +210,7 @@ type OpenTransportForDeviceParams = {
 };
 
 const getDerivationPath = (
-  signWith: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID,
+  signWith: Cardano.PaymentAddress | Cardano.RewardAccount,
   knownAddresses: GroupedAddress[],
   accountIndex: number,
   purpose: number

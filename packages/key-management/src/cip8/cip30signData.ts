@@ -22,7 +22,7 @@ import { DREP_KEY_DERIVATION_PATH, STAKE_KEY_DERIVATION_PATH } from '../util';
 
 export interface Cip30SignDataRequest {
   knownAddresses: GroupedAddress[];
-  signWith: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID;
+  signWith: Cardano.PaymentAddress | Cardano.RewardAccount;
   payload: HexBlob;
   sender?: MessageSender;
 }
@@ -39,7 +39,7 @@ export class Cip30DataSignError<InnerError = unknown> extends ComposableError<In
   }
 }
 
-export const getAddressBytes = (signWith: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID) => {
+export const getAddressBytes = (signWith: Cardano.PaymentAddress | Cardano.RewardAccount) => {
   const address = Cardano.Address.fromString(signWith);
 
   if (!address) {
@@ -50,18 +50,14 @@ export const getAddressBytes = (signWith: Cardano.PaymentAddress | Cardano.Rewar
 };
 
 const isPaymentAddress = (
-  signWith: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID
+  signWith: Cardano.PaymentAddress | Cardano.RewardAccount
 ): signWith is Cardano.PaymentAddress => signWith.startsWith('addr');
 
 const getDerivationPath = async (
-  signWith: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID,
+  signWith: Cardano.PaymentAddress | Cardano.RewardAccount,
   knownAddresses: GroupedAddress[],
   dRepKeyHash: Crypto.Ed25519KeyHashHex
 ) => {
-  if (Cardano.DRepID.isValid(signWith)) {
-    return DREP_KEY_DERIVATION_PATH;
-  }
-
   const isRewardAccount = signWith.startsWith('stake');
 
   if (isRewardAccount) {

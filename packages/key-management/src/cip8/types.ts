@@ -8,7 +8,7 @@ export type CoseKeyCborHex = HexBlob;
 
 export interface Cip8SignDataContext {
   knownAddresses: GroupedAddress[];
-  signWith: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID;
+  signWith: Cardano.PaymentAddress | Cardano.RewardAccount;
   payload: HexBlob;
 }
 

@@ -18,6 +18,7 @@ import {
   WithSenderContext
 } from '@cardano-sdk/dapp-connector';
 import { Cardano, Serialization, coalesceValueQuantities } from '@cardano-sdk/core';
+import { Ed25519KeyHashHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
@@ -42,7 +43,7 @@ export type SignDataCallbackParams = {
   type: Cip30ConfirmationCallbackType.SignData;
   sender: MessageSender;
   data: {
-    addr: Cardano.PaymentAddress | Cardano.DRepID;
+    addr: Cardano.PaymentAddress | Cardano.RewardAccount;
     payload: HexBlob;
   };
 };
@@ -258,6 +259,32 @@ const getSortedUtxos = async (observableUtxos: Observable<Cardano.Utxo[]>): Prom
   return utxos.sort(compareUtxos);
 };
 
+/**
+ * Detect type of hex encoded addr and convert to PaymentAddress or RewardAddress.
+ *
+ * @param addr when hex encoded, it can be a PaymentAddress, RewardAddress or DRepKeyHash
+ * @returns PaymentAddress | RewardAddress DRepKeyHash is converted to a type 6 address
+ */
+const addrToSignWith = (
+  addr: Cardano.PaymentAddress | Cardano.RewardAccount | Bytes
+): Cardano.PaymentAddress | Cardano.RewardAccount => {
+  try {
+    return Cardano.isRewardAccount(addr) ? Cardano.RewardAccount(addr) : Cardano.PaymentAddress(addr);
+  } catch {
+    // Try to parse as drep key hash
+    const drepKeyHash = Ed25519KeyHashHex(addr);
+    const drepId = Cardano.DRepID.cip129FromCredential({
+      hash: Hash28ByteBase16.fromEd25519KeyHashHex(drepKeyHash),
+      type: Cardano.CredentialType.KeyHash
+    });
+    const drepAddr = Cardano.DRepID.toAddress(drepId)?.toAddress();
+    if (!drepAddr) {
+      throw new DataSignError(DataSignErrorCode.AddressNotPK, 'Invalid address');
+    }
+    return drepAddr.toBech32();
+  }
+};
+
 const baseCip30WalletApi = (
   wallet$: Observable<ObservableWallet>,
   confirmationCallback: CallbackConfirmation,
@@ -430,12 +457,12 @@ const baseCip30WalletApi = (
   },
   signData: async (
     { sender }: SenderContext,
-    addr: Cardano.PaymentAddress | Cardano.DRepID | Bytes,
+    addr: Cardano.PaymentAddress | Cardano.RewardAccount | Bytes,
     payload: Bytes
   ): Promise<Cip30DataSignature> => {
     logger.debug('signData');
+    const signWith = addrToSignWith(addr);
     const hexBlobPayload = HexBlob(payload);
-    const signWith = Cardano.DRepID.isValid(addr) ? Cardano.DRepID(addr) : Cardano.PaymentAddress(addr);
 
     const confirmationResult = await confirmationCallback
       .signData({
@@ -579,7 +606,7 @@ const getPubStakeKeys = async (
 const extendedCip95WalletApi = (
   wallet$: Observable<ObservableWallet>,
   { logger }: Cip30WalletDependencies
-): Cip95WalletApi => ({
+): Omit<Cip95WalletApi, 'signData'> => ({
   getPubDRepKey: async () => {
     logger.debug('getting public DRep key');
     try {
