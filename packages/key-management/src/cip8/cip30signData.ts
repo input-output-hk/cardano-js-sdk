@@ -49,9 +49,14 @@ export const getAddressBytes = (signWith: Cardano.PaymentAddress | Cardano.Rewar
   return Buffer.from(address.toBytes(), 'hex');
 };
 
+const isPaymentAddress = (
+  signWith: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID
+): signWith is Cardano.PaymentAddress => signWith.startsWith('addr');
+
 const getDerivationPath = async (
   signWith: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID,
-  knownAddresses: GroupedAddress[]
+  knownAddresses: GroupedAddress[],
+  dRepKeyHash: Crypto.Ed25519KeyHashHex
 ) => {
   if (Cardano.DRepID.isValid(signWith)) {
     return DREP_KEY_DERIVATION_PATH;
@@ -66,6 +71,16 @@ const getDerivationPath = async (
       throw new Cip30DataSignError(Cip30DataSignErrorCode.ProofGeneration, 'Unknown reward address');
 
     return knownRewardAddress.stakeKeyDerivationPath || STAKE_KEY_DERIVATION_PATH;
+  }
+
+  if (isPaymentAddress(signWith)) {
+    const drepAddr = Cardano.Address.fromString(signWith);
+    if (
+      drepAddr?.getType() === Cardano.AddressType.EnterpriseKey &&
+      drepAddr?.getProps().paymentPart?.hash === Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash)
+    ) {
+      return DREP_KEY_DERIVATION_PATH;
+    }
   }
 
   const knownAddress = knownAddresses.find(({ address }) => address === signWith);
@@ -120,8 +135,13 @@ export const cip30signData = async (
   if (Cardano.DRepID.isValid(signWith) && !Cardano.DRepID.canSign(signWith)) {
     throw new Cip30DataSignError(Cip30DataSignErrorCode.AddressNotPK, 'Invalid address');
   }
+
+  const dRepKeyHash = (
+    await Crypto.Ed25519PublicKey.fromHex(await keyAgent.derivePublicKey(DREP_KEY_DERIVATION_PATH)).hash()
+  ).hex();
+
   const addressBytes = getAddressBytes(signWith);
-  const derivationPath = await getDerivationPath(signWith, knownAddresses);
+  const derivationPath = await getDerivationPath(signWith, knownAddresses, dRepKeyHash);
 
   const builder = COSESign1Builder.new(
     Headers.new(ProtectedHeaderMap.new(createSigStructureHeaders(addressBytes)), HeaderMap.new()),
