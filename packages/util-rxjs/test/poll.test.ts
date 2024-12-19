@@ -60,7 +60,7 @@ describe('poll', () => {
     expect(resolvedValue).toBeTruthy();
   });
 
-  it('does not retry, when sample rejects with InvalidStringError', async () => {
+  it('does not retry, when shouldRetry returns false', async () => {
     const testValue = { test: 'value' };
     const testError = new InvalidStringError('Test invalid string error');
     const sample = jest
@@ -69,23 +69,23 @@ describe('poll', () => {
       .mockResolvedValueOnce(testValue)
       .mockRejectedValueOnce(testError)
       .mockResolvedValueOnce(testValue);
-    const onFatalError = jest.fn();
-    const retryBackoffConfig: RetryBackoffConfig = { initialInterval: 1, shouldRetry: () => true };
+    const retryBackoffConfig: RetryBackoffConfig = {
+      initialInterval: 1,
+      shouldRetry: (error) => !(error instanceof InvalidStringError)
+    };
     const values$ = poll({
       logger,
-      onFatalError,
       retryBackoffConfig,
       sample
     });
     await expect(firstValueFrom(values$)).resolves.toBe(testValue);
-    await expect(firstValueFrom(values$)).rejects.toThrow(EmptyError);
+    await expect(firstValueFrom(values$)).rejects.toThrow(testError);
     expect(sample).toBeCalledTimes(3);
-    expect(onFatalError).toBeCalledWith(testError);
     expect(logger.messages).toStrictEqual([
       { level: 'error', message: [new Error(testErrorStr)] },
       { level: 'debug', message: ['Should retry: true'] },
       { level: 'error', message: [testError] },
-      { level: 'debug', message: ['Should retry: true'] }
+      { level: 'debug', message: ['Should retry: false'] }
     ]);
   });
 
@@ -116,11 +116,9 @@ describe('poll', () => {
     const sample = jest.fn().mockRejectedValue(testError);
     const maxRetries = 3;
     const retryBackoffConfig: RetryBackoffConfig = { initialInterval: 1, maxRetries };
-    const onFatalError = jest.fn();
 
     const values$ = poll({
       logger,
-      onFatalError,
       retryBackoffConfig,
       sample
     });
@@ -128,7 +126,6 @@ describe('poll', () => {
     await expect(firstValueFrom(values$)).rejects.toThrow(testError);
 
     expect(sample).toBeCalledTimes(maxRetries + 1);
-    expect(onFatalError).toBeCalledWith(expect.any(Error));
     expect(logger.messages).toStrictEqual([
       { level: 'error', message: [testError] },
       { level: 'error', message: [testError] },

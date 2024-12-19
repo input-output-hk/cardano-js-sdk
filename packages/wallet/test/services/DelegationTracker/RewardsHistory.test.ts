@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-useless-undefined */
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { InMemoryRewardsHistoryStore } from '../../../src/persistence';
@@ -88,8 +87,7 @@ describe('RewardsHistory', () => {
           expect(getRewardsHistory).toBeCalledWith(
             rewardAccounts,
             Cardano.EpochNo(calcFirstDelegationEpoch(epoch)),
-            logger,
-            undefined
+            logger
           );
         });
       }
@@ -143,8 +141,7 @@ describe('RewardsHistory', () => {
           expect(getRewardsHistory).toBeCalledWith(
             rewardAccounts,
             Cardano.EpochNo(calcFirstDelegationEpoch(epoch)),
-            logger,
-            undefined
+            logger
           );
         });
       }

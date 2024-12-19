@@ -53,7 +53,8 @@ import {
   createUtxoTracker,
   createWalletUtil,
   currentEpochTracker,
-  distinctEraSummaries
+  distinctEraSummaries,
+  pollProvider
 } from '../services';
 import { AddressType, Bip32Account, GroupedAddress, WitnessedTx, Witnesser, util } from '@cardano-sdk/key-management';
 import {
@@ -71,7 +72,7 @@ import {
   TxSubmitProvider,
   UtxoProvider
 } from '@cardano-sdk/core';
-import { BehaviorObservable, TrackerSubject, poll } from '@cardano-sdk/util-rxjs';
+import { BehaviorObservable, TrackerSubject } from '@cardano-sdk/util-rxjs';
 import {
   BehaviorSubject,
   EMPTY,
@@ -282,7 +283,6 @@ export class BaseWallet implements ObservableWallet {
   readonly protocolParameters$: TrackerSubject<Cardano.ProtocolParameters>;
   readonly genesisParameters$: TrackerSubject<Cardano.CompactGenesis>;
   readonly assetInfo$: TrackerSubject<Assets>;
-  readonly fatalError$: Subject<unknown>;
   readonly syncStatus: SyncStatus;
   readonly name: string;
   readonly util: WalletUtil;
@@ -357,10 +357,6 @@ export class BaseWallet implements ObservableWallet {
 
     this.witnesser = witnesser;
 
-    this.fatalError$ = new Subject();
-
-    const onFatalError = this.fatalError$.next.bind(this.fatalError$);
-
     this.name = name;
     const cancel$ = connectionStatusTracker$.pipe(
       tap((status) => (status === ConnectionStatus.up ? 'Connection UP' : 'Connection DOWN')),
@@ -369,10 +365,9 @@ export class BaseWallet implements ObservableWallet {
 
     if (isBip32PublicCredentialsManager(this.#publicCredentialsManager)) {
       this.#addressTracker = createAddressTracker({
-        addressDiscovery$: poll({
+        addressDiscovery$: pollProvider({
           cancel$,
           logger: contextLogger(this.#logger, 'addressDiscovery$'),
-          onFatalError,
           retryBackoffConfig,
           sample: () => {
             const credManager = this.#publicCredentialsManager as Bip32PublicCredentialsManager;
@@ -403,10 +398,9 @@ export class BaseWallet implements ObservableWallet {
       logger: contextLogger(this.#logger, 'tip$'),
       maxPollInterval: maxInterval,
       minPollInterval: pollInterval,
-      provider$: poll({
+      provider$: pollProvider({
         cancel$,
         logger: contextLogger(this.#logger, 'tip$'),
-        onFatalError,
         retryBackoffConfig,
         sample: this.networkInfoProvider.ledgerTip
       }),
@@ -426,11 +420,10 @@ export class BaseWallet implements ObservableWallet {
     // Era summaries
     const eraSummariesTrigger = new BehaviorSubject<void>(void 0);
     this.eraSummaries$ = new PersistentDocumentTrackerSubject(
-      poll({
+      pollProvider({
         cancel$,
         equals: deepEquals,
         logger: contextLogger(this.#logger, 'eraSummaries$'),
-        onFatalError,
         retryBackoffConfig,
         sample: this.networkInfoProvider.eraSummaries,
         trigger$: eraSummariesTrigger.pipe(tap(() => 'Trigger request era summaries'))
@@ -450,11 +443,10 @@ export class BaseWallet implements ObservableWallet {
       tap((epoch) => this.#logger.debug(`Current epoch is ${epoch}`))
     );
     this.protocolParameters$ = new PersistentDocumentTrackerSubject(
-      poll({
+      pollProvider({
         cancel$,
         equals: isEqual,
         logger: contextLogger(this.#logger, 'protocolParameters$'),
-        onFatalError,
         retryBackoffConfig,
         sample: this.networkInfoProvider.protocolParameters,
         trigger$: epoch$
@@ -462,11 +454,10 @@ export class BaseWallet implements ObservableWallet {
       stores.protocolParameters
     );
     this.genesisParameters$ = new PersistentDocumentTrackerSubject(
-      poll({
+      pollProvider({
         cancel$,
         equals: isEqual,
         logger: contextLogger(this.#logger, 'genesisParameters$'),
-        onFatalError,
         retryBackoffConfig,
         sample: this.networkInfoProvider.genesisParameters,
         trigger$: epoch$
@@ -487,7 +478,6 @@ export class BaseWallet implements ObservableWallet {
       inFlightTransactionsStore: stores.inFlightTransactions,
       logger: contextLogger(this.#logger, 'transactions'),
       newTransactions: this.#newTransactions,
-      onFatalError,
       retryBackoffConfig,
       signedTransactionsStore: stores.signedTransactions,
       tip$: this.tip$,
@@ -521,7 +511,6 @@ export class BaseWallet implements ObservableWallet {
       addresses$,
       history$: this.transactions.history$,
       logger: contextLogger(this.#logger, 'utxo'),
-      onFatalError,
       retryBackoffConfig,
       stores,
       transactionsInFlight$: this.transactions.outgoing.inFlight$,
@@ -546,7 +535,6 @@ export class BaseWallet implements ObservableWallet {
       eraSummaries$,
       knownAddresses$: this.addresses$,
       logger: contextLogger(this.#logger, 'delegation'),
-      onFatalError,
       retryBackoffConfig,
       rewardAccountAddresses$: this.addresses$.pipe(
         map((addresses) => uniq(addresses.map((groupedAddress) => groupedAddress.rewardAccount)))
@@ -592,7 +580,6 @@ export class BaseWallet implements ObservableWallet {
         balanceTracker: this.balance,
         logger: contextLogger(this.#logger, 'assets$'),
         maxAssetInfoCacheAge,
-        onFatalError,
         retryBackoffConfig,
         transactionsTracker: this.transactions
       }),
@@ -602,11 +589,10 @@ export class BaseWallet implements ObservableWallet {
     this.handles$ = this.handleProvider
       ? this.initializeHandles(
           new PersistentDocumentTrackerSubject(
-            poll({
+            pollProvider({
               cancel$,
               equals: isEqual,
               logger: contextLogger(this.#logger, 'handles$'),
-              onFatalError,
               retryBackoffConfig,
               sample: () => this.handleProvider.getPolicyIds()
             }),
@@ -798,7 +784,6 @@ export class BaseWallet implements ObservableWallet {
     this.currentEpoch$.complete();
     this.delegation.shutdown();
     this.assetInfo$.complete();
-    this.fatalError$.complete();
     this.syncStatus.shutdown();
     this.#newTransactions.failedToSubmit$.complete();
     this.#newTransactions.pending$.complete();

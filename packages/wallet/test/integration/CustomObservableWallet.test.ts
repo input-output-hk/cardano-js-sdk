@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable sonarjs/no-extra-arguments */
 /* eslint-disable unicorn/consistent-function-scoping */
-import { BaseWallet, ObservableWallet, createPersonalWallet } from '../../src';
+import { BaseWallet, ObservableWallet, createPersonalWallet, pollProvider } from '../../src';
 import { Bip32Account, GroupedAddress, util } from '@cardano-sdk/key-management';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import {
@@ -10,7 +10,6 @@ import {
   createOutputValidator
 } from '@cardano-sdk/tx-construction';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { firstValueFrom, of, timer } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
@@ -87,37 +86,37 @@ describe('CustomObservableWallet', () => {
         // for the sake of simplicity, let's say we don't care about wallet's persistence/restoration
         // and want to just re-fetch data upon every subscription and then update using some interval.
         // If we did want more features, there are other SDK utils we could use
-        addresses$: coldObservableProvider({
+        addresses$: pollProvider({
           logger,
-          provider: getAddresses,
           retryBackoffConfig,
+          sample: getAddresses,
           trigger$: walletUpdateTrigger$
         }),
         balance: {
           rewardAccounts: {
             // can entirely bypass SDK and it's utils, providing custom observables
             deposit$: of(200_000n),
-            rewards$: coldObservableProvider({
+            rewards$: pollProvider({
               logger,
-              provider: getAvailableRewardAccountsDeposit,
               retryBackoffConfig,
+              sample: getAvailableRewardAccountsDeposit,
               trigger$: walletUpdateTrigger$
             })
           },
           utxo: {
-            available$: coldObservableProvider({
+            available$: pollProvider({
               logger,
-              provider: getAvailableUtxoBalance,
               retryBackoffConfig,
+              sample: getAvailableUtxoBalance,
               trigger$: walletUpdateTrigger$
             })
           }
         },
         delegation: {
-          rewardAccounts$: coldObservableProvider({
+          rewardAccounts$: pollProvider({
             logger,
-            provider: getRewardAccountsDelegation,
             retryBackoffConfig,
+            sample: getRewardAccountsDelegation,
             trigger$: walletUpdateTrigger$
           })
         },

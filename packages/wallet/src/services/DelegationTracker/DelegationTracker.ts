@@ -21,23 +21,18 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistoryProvider, createRewardsHistoryProvider, createRewardsHistoryTracker } from './RewardsHistory';
 import { Shutdown, contextLogger } from '@cardano-sdk/util';
 import { TrackedRewardsProvider, TrackedStakePoolProvider } from '../ProviderTracker';
-import { TrackerSubject, poll } from '@cardano-sdk/util-rxjs';
+import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { TxWithEpoch } from './types';
 import { WalletStores } from '../../persistence';
 import { createDelegationDistributionTracker } from './DelegationDistributionTracker';
+import { pollProvider } from '../util';
 import { transactionsWithCertificates } from './transactionCertificates';
 
 export const createBlockEpochProvider =
-  (
-    chainHistoryProvider: ChainHistoryProvider,
-    retryBackoffConfig: RetryBackoffConfig,
-    logger: Logger,
-    onFatalError?: (value: unknown) => void
-  ) =>
+  (chainHistoryProvider: ChainHistoryProvider, retryBackoffConfig: RetryBackoffConfig, logger: Logger) =>
   (ids: Cardano.BlockId[]) =>
-    poll({
+    pollProvider({
       logger,
-      onFatalError,
       retryBackoffConfig,
       sample: () => chainHistoryProvider.blocksByHashes({ ids })
     }).pipe(map((blocks) => blocks.map(({ epoch }) => epoch)));
@@ -63,7 +58,6 @@ export interface DelegationTrackerProps {
     slotEpochCalc$?: Observable<SlotEpochCalc>;
   };
   logger: Logger;
-  onFatalError?: (value: unknown) => void;
 }
 
 export const certificateTransactionsWithEpochs = (
@@ -127,14 +121,12 @@ export const createDelegationTracker = ({
   utxoTracker,
   stores,
   logger,
-  onFatalError,
   internals: {
     queryStakePoolsProvider = createQueryStakePoolsProvider(
       stakePoolProvider,
       stores.stakePools,
       retryBackoffConfig,
-      logger,
-      onFatalError
+      logger
     ),
     rewardsHistoryProvider = createRewardsHistoryProvider(rewardsTracker, retryBackoffConfig),
     rewardsProvider = createRewardsProvider(
@@ -142,8 +134,7 @@ export const createDelegationTracker = ({
       transactionsTracker.outgoing.onChain$,
       rewardsTracker,
       retryBackoffConfig,
-      logger,
-      onFatalError
+      logger
     ),
     slotEpochCalc$ = eraSummaries$.pipe(map((eraSummaries) => createSlotEpochCalc(eraSummaries)))
   } = {}
@@ -167,8 +158,7 @@ export const createDelegationTracker = ({
       rewardAccountAddresses$,
       rewardsHistoryProvider,
       stores.rewardsHistory,
-      contextLogger(logger, 'rewardsHistory$'),
-      onFatalError
+      contextLogger(logger, 'rewardsHistory$')
     )
   );
 

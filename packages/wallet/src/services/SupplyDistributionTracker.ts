@@ -1,10 +1,9 @@
 import { Logger } from 'ts-log';
 import { NetworkInfoProvider } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
-import { PersistentDocumentTrackerSubject } from './util';
+import { PersistentDocumentTrackerSubject, pollProvider } from './util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { SupplyDistributionStores } from '../persistence';
-import { poll } from '@cardano-sdk/util-rxjs';
 import isEqual from 'lodash/isEqual.js';
 
 export type SupplyDistributionNetworkInfoProvider = Pick<NetworkInfoProvider, 'stake' | 'lovelaceSupply'>;
@@ -14,7 +13,6 @@ export interface SupplyDistributionTrackerProps {
   trigger$: Observable<unknown>;
   /** Failed request retry strategy */
   retryBackoffConfig?: RetryBackoffConfig;
-  onFatalError?: (value: unknown) => void;
 }
 
 export interface SupplyDistributionTrackerDependencies {
@@ -28,18 +26,13 @@ export interface SupplyDistributionTrackerDependencies {
  * @returns object that continuously fetches and emits network stats (StakeSummary and SupplySummary)
  */
 export const createSupplyDistributionTracker = (
-  {
-    trigger$,
-    retryBackoffConfig = { initialInterval: 1000, maxInterval: 60_000 },
-    onFatalError
-  }: SupplyDistributionTrackerProps,
+  { trigger$, retryBackoffConfig = { initialInterval: 1000, maxInterval: 60_000 } }: SupplyDistributionTrackerProps,
   { logger, stores, networkInfoProvider }: SupplyDistributionTrackerDependencies
 ) => {
   const stake$ = new PersistentDocumentTrackerSubject(
-    poll({
+    pollProvider({
       equals: isEqual,
       logger,
-      onFatalError,
       retryBackoffConfig,
       sample: networkInfoProvider.stake,
       trigger$
@@ -48,10 +41,9 @@ export const createSupplyDistributionTracker = (
   );
 
   const lovelaceSupply$ = new PersistentDocumentTrackerSubject(
-    poll({
+    pollProvider({
       equals: isEqual,
       logger,
-      onFatalError,
       retryBackoffConfig,
       sample: networkInfoProvider.lovelaceSupply,
       trigger$

@@ -27,7 +27,7 @@ import { TrackedStakePoolProvider } from '../ProviderTracker';
 import { TxWithEpoch } from './types';
 import { drepsToDelegatees, drepsToDrepIds } from '../DrepInfoTracker';
 import { lastStakeKeyCertOfType } from './transactionCertificates';
-import { poll } from '@cardano-sdk/util-rxjs';
+import { pollProvider } from '../util';
 import findLast from 'lodash/findLast.js';
 import isEqual from 'lodash/isEqual.js';
 import uniq from 'lodash/uniq.js';
@@ -57,8 +57,7 @@ export const createQueryStakePoolsProvider =
     stakePoolProvider: TrackedStakePoolProvider,
     store: KeyValueStore<Cardano.PoolId, Cardano.StakePool>,
     retryBackoffConfig: RetryBackoffConfig,
-    logger: Logger,
-    onFatalError?: (value: unknown) => void
+    logger: Logger
   ) =>
   (poolIds: Cardano.PoolId[]) => {
     if (poolIds.length === 0) {
@@ -67,9 +66,8 @@ export const createQueryStakePoolsProvider =
     }
     return merge(
       store.getValues(poolIds),
-      poll({
+      pollProvider({
         logger,
-        onFatalError,
         retryBackoffConfig,
         sample: () => allStakePoolsByPoolIds(stakePoolProvider, { poolIds })
       }).pipe(
@@ -112,17 +110,15 @@ export const createRewardsProvider =
     txOnChain$: Observable<OutgoingOnChainTx>,
     rewardsProvider: RewardsProvider,
     retryBackoffConfig: RetryBackoffConfig,
-    logger: Logger,
-    onFatalError?: (value: unknown) => void
+    logger: Logger
     // eslint-disable-next-line max-params
   ) =>
   (rewardAccounts: Cardano.RewardAccount[], equals = isEqual): Observable<Cardano.Lovelace[]> =>
     combineLatest(
       rewardAccounts.map((rewardAccount) =>
-        poll({
+        pollProvider({
           equals,
           logger,
-          onFatalError,
           retryBackoffConfig,
           sample: () => rewardsProvider.rewardAccountBalance({ rewardAccount }),
           trigger$: fetchRewardsTrigger$(epoch$, txOnChain$, rewardAccount)

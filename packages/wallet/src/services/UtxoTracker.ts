@@ -1,11 +1,10 @@
 import { Cardano, UtxoProvider } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { NEVER, Observable, combineLatest, concat, distinctUntilChanged, map, of, shareReplay, switchMap } from 'rxjs';
-import { PersistentCollectionTrackerSubject, txInEquals, utxoEquals } from './util';
+import { PersistentCollectionTrackerSubject, pollProvider, txInEquals, utxoEquals } from './util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxInFlight, UtxoTracker } from './types';
 import { WalletStores } from '../persistence';
-import { poll } from '@cardano-sdk/util-rxjs';
 import { sortUtxoByTxIn } from '@cardano-sdk/input-selection';
 import chunk from 'lodash/chunk.js';
 import uniqWith from 'lodash/uniqWith.js';
@@ -21,7 +20,6 @@ export interface UtxoTrackerProps {
   history$: Observable<Cardano.HydratedTx[]>;
   retryBackoffConfig: RetryBackoffConfig;
   logger: Logger;
-  onFatalError?: (value: unknown) => void;
 }
 
 export interface UtxoTrackerInternals {
@@ -34,16 +32,13 @@ export const createUtxoProvider = (
   addresses$: Observable<Cardano.PaymentAddress[]>,
   history$: Observable<Cardano.HydratedTx[]>,
   retryBackoffConfig: RetryBackoffConfig,
-  logger: Logger,
-  onFatalError?: (value: unknown) => void
-  // eslint-disable-next-line max-params
+  logger: Logger
 ) =>
   addresses$.pipe(
     switchMap((paymentAddresses) =>
-      poll({
+      pollProvider({
         equals: utxoEquals,
         logger,
-        onFatalError,
         retryBackoffConfig,
         sample: async () => {
           let utxos = new Array<Cardano.Utxo>();
@@ -62,19 +57,10 @@ export const createUtxoProvider = (
   );
 
 export const createUtxoTracker = (
-  {
-    utxoProvider,
-    addresses$,
-    stores,
-    transactionsInFlight$,
-    retryBackoffConfig,
-    history$,
-    logger,
-    onFatalError
-  }: UtxoTrackerProps,
+  { utxoProvider, addresses$, stores, transactionsInFlight$, retryBackoffConfig, history$, logger }: UtxoTrackerProps,
   {
     utxoSource$ = new PersistentCollectionTrackerSubject<Cardano.Utxo>(
-      () => createUtxoProvider(utxoProvider, addresses$, history$, retryBackoffConfig, logger, onFatalError),
+      () => createUtxoProvider(utxoProvider, addresses$, history$, retryBackoffConfig, logger),
       stores.utxo
     ),
     unspendableUtxoSource$ = new PersistentCollectionTrackerSubject(
