@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.42.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.42.1...@cardano-sdk/core@0.42.2) (2024-12-20)
+
+### Bug Fixes
+
+* **core:** include withdrawals in txSummary spent coins ([d70e5cd](https://github.com/input-output-hk/cardano-js-sdk/commit/d70e5cd981f3484895e9edfd5a441b4ba2df2b84))
+
 ## [0.42.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.42.0...@cardano-sdk/core@0.42.1) (2024-12-05)
 
 ### Features

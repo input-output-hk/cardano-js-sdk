@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.37.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.36.2...@cardano-sdk/web-extension@0.37.0) (2024-12-20)
+
+### ⚠ BREAKING CHANGES
+
+* BaseWallet observables error instead of emitting fatalError$
+- remove ObservableError.fatalError$
+- 'poll' util observable errors instead of calling onFatalError
+- remove PollProps.onFatalError
+- 'poll' no longer checks for InvalidStringError, it's up to consumer
+
+### Bug Fixes
+
+* retry all ProviderErrors except BadRequest and NotImplemented ([bf4a8b9](https://github.com/input-output-hk/cardano-js-sdk/commit/bf4a8b99b4e7af58021c8081d5011eacb65f3422))
+
 ## [0.36.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.36.1...@cardano-sdk/web-extension@0.36.2) (2024-12-16)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension

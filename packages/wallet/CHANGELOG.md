@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.47.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.46.3...@cardano-sdk/wallet@0.47.0) (2024-12-20)
+
+### ⚠ BREAKING CHANGES
+
+* BaseWallet observables error instead of emitting fatalError$
+- remove ObservableError.fatalError$
+- 'poll' util observable errors instead of calling onFatalError
+- remove PollProps.onFatalError
+- 'poll' no longer checks for InvalidStringError, it's up to consumer
+* rename poll props 'provider' to 'sample'
+
+### Bug Fixes
+
+* retry all ProviderErrors except BadRequest and NotImplemented ([bf4a8b9](https://github.com/input-output-hk/cardano-js-sdk/commit/bf4a8b99b4e7af58021c8081d5011eacb65f3422))
+
+### Code Refactoring
+
+* rename 'coldObservableProvider' util to 'poll' ([9bad2df](https://github.com/input-output-hk/cardano-js-sdk/commit/9bad2df58d48e920881da68adf51c20ee1d7c886))
+
 ## [0.46.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.46.2...@cardano-sdk/wallet@0.46.3) (2024-12-16)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
