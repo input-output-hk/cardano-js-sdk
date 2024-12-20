@@ -23,7 +23,11 @@
 <li class="tsd-parameter">
 <h5>assets<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Map</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules/_cardano_sdk_core.Cardano.html" class="tsd-signature-type" data-tsd-kind="Namespace">Cardano</a><span class="tsd-signature-symbol">.</span><a href="../functions/_cardano_sdk_core.Cardano.AssetId-2.html" class="tsd-signature-type" data-tsd-kind="Function">AssetId</a><span class="tsd-signature-symbol">, </span><a href="_cardano_sdk_core.AssetInfoWithAmount.html" class="tsd-signature-type" data-tsd-kind="Type alias">AssetInfoWithAmount</a><span class="tsd-signature-symbol">&gt;</span></h5></li>
 <li class="tsd-parameter">
-<h5>coins<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_core.Cardano.html" class="tsd-signature-type" data-tsd-kind="Namespace">Cardano</a><span class="tsd-signature-symbol">.</span><a href="_cardano_sdk_core.Cardano.Lovelace.html" class="tsd-signature-type" data-tsd-kind="Type alias">Lovelace</a></h5></li>
+<h5>coins<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_core.Cardano.html" class="tsd-signature-type" data-tsd-kind="Namespace">Cardano</a><span class="tsd-signature-symbol">.</span><a href="_cardano_sdk_core.Cardano.Lovelace.html" class="tsd-signature-type" data-tsd-kind="Type alias">Lovelace</a></h5>
+<div class="tsd-comment tsd-typography"><p>Spent amount from the wallet&#39;s perspective, computed as <code>own outputs - (own inputs + withdrawals)</code>.
+Withdrawals are a type of &quot;own input&quot;, and are accounted for when computing the wallet spent amount.
+Positive when the wallet is receiving funds, negative when the wallet is sending funds.</p>
+</div></li>
 <li class="tsd-parameter">
 <h5>collateral<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_core.Cardano.html" class="tsd-signature-type" data-tsd-kind="Namespace">Cardano</a><span class="tsd-signature-symbol">.</span><a href="_cardano_sdk_core.Cardano.Lovelace.html" class="tsd-signature-type" data-tsd-kind="Type alias">Lovelace</a></h5></li>
 <li class="tsd-parameter">
@@ -40,7 +44,7 @@
 <li class="tsd-parameter">
 <h5>value<span class="tsd-signature-symbol">: </span><a href="../modules/_cardano_sdk_core.Cardano.html" class="tsd-signature-type" data-tsd-kind="Namespace">Cardano</a><span class="tsd-signature-symbol">.</span><a href="../interfaces/_cardano_sdk_core.Cardano.Value.html" class="tsd-signature-type" data-tsd-kind="Interface">Value</a></h5></li></ul></li></ul></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/2deb2b9/packages/core/src/util/transactionSummaryInspector.ts#L38">packages/core/src/util/transactionSummaryInspector.ts:38</a></li></ul></aside></div>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/ec6900f/packages/core/src/util/transactionSummaryInspector.ts#L38">packages/core/src/util/transactionSummaryInspector.ts:38</a></li></ul></aside></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
