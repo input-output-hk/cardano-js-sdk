@@ -39,11 +39,11 @@ import {
   validateValidityInterval
 } from './utils';
 import { SelectionSkeleton } from '@cardano-sdk/input-selection';
-import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { contextLogger, deepEquals } from '@cardano-sdk/util';
 import { createOutputValidator } from '../output-validation';
 import { initializeTx } from './initializeTx';
 import { lastValueFrom } from 'rxjs';
+import { poll } from '@cardano-sdk/util-rxjs';
 import omit from 'lodash/omit.js';
 import uniq from 'lodash/uniq.js';
 
@@ -499,12 +499,12 @@ export class GenericTxBuilder implements TxBuilder {
       allRewardAccounts = uniq([...knownAddresses, ...newAddresses]).map(({ rewardAccount }) => rewardAccount);
     }
 
-    const rewardAccounts$ = coldObservableProvider({
+    const rewardAccounts$ = poll({
       logger: contextLogger(this.#logger, 'getOrCreateRewardAccounts'),
       pollUntil: (rewardAccounts) =>
         allRewardAccounts.every((newAccount) => rewardAccounts.some((acct) => acct.address === newAccount)),
-      provider: this.#dependencies.txBuilderProviders.rewardAccounts,
-      retryBackoffConfig: { initialInterval: 10, maxInterval: 100, maxRetries: 10 }
+      retryBackoffConfig: { initialInterval: 10, maxInterval: 100, maxRetries: 10 },
+      sample: this.#dependencies.txBuilderProviders.rewardAccounts
     });
 
     try {

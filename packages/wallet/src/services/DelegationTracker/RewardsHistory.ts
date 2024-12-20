@@ -7,7 +7,7 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistory } from '../types';
 import { TrackedRewardsProvider } from '../ProviderTracker';
 import { TxWithEpoch } from './types';
-import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
+import { pollProvider } from '../util';
 import first from 'lodash/first.js';
 import flatten from 'lodash/flatten.js';
 import sortBy from 'lodash/sortBy.js';
@@ -24,19 +24,17 @@ export const createRewardsHistoryProvider =
   (
     rewardAccounts: Cardano.RewardAccount[],
     lowerBound: Cardano.EpochNo | null,
-    logger: Logger,
-    onFatalError?: (value: unknown) => void
+    logger: Logger
   ): Observable<Map<Cardano.RewardAccount, Reward[]>> => {
     if (lowerBound) {
-      return coldObservableProvider({
+      return pollProvider({
         logger,
-        onFatalError,
-        provider: () =>
+        retryBackoffConfig,
+        sample: () =>
           rewardsProvider.rewardsHistory({
             epochs: { lowerBound },
             rewardAccounts
-          }),
-        retryBackoffConfig
+          })
       });
     }
     rewardsProvider.setStatInitialized(rewardsProvider.stats.rewardsHistory$);
@@ -63,9 +61,7 @@ export const createRewardsHistoryTracker = (
   rewardAccounts$: Observable<Cardano.RewardAccount[]>,
   rewardsHistoryProvider: RewardsHistoryProvider,
   rewardsHistoryStore: KeyValueStore<Cardano.RewardAccount, Reward[]>,
-  logger: Logger,
-  onFatalError?: (value: unknown) => void
-  // eslint-disable-next-line max-params
+  logger: Logger
 ): Observable<RewardsHistory> =>
   rewardAccounts$
     .pipe(
@@ -77,9 +73,7 @@ export const createRewardsHistoryTracker = (
             .pipe(map((rewards) => new Map(rewardAccounts.map((rewardAccount, i) => [rewardAccount, rewards[i]])))),
           firstDelegationEpoch$(transactions$, rewardAccounts).pipe(
             tap((firstEpoch) => logger.debug(`Fetching history rewards since epoch ${firstEpoch}`)),
-            switchMap((firstEpoch) =>
-              rewardsHistoryProvider(rewardAccounts, Cardano.EpochNo(firstEpoch!), logger, onFatalError)
-            ),
+            switchMap((firstEpoch) => rewardsHistoryProvider(rewardAccounts, Cardano.EpochNo(firstEpoch!), logger)),
             tap((allRewards) =>
               rewardsHistoryStore.setAll([...allRewards.entries()].map(([key, value]) => ({ key, value })))
             )

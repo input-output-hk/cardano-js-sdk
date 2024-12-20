@@ -113,12 +113,6 @@ export interface ObservableWallet {
   };
   /** All owned and historical assets */
   readonly assetInfo$: Observable<Assets>;
-  /**
-   * This is the catch all Observable for fatal errors emitted by the Wallet.
-   * Once errors are emitted, probably the only available recovery action is to
-   * shutdown the Wallet and to create a new one.
-   */
-  readonly fatalError$: Observable<unknown>;
   readonly syncStatus: SyncStatus;
 
   getName(): Promise<string>;

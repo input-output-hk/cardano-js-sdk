@@ -1,23 +1,22 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, ChainHistoryProvider, metadatum } from '@cardano-sdk/core';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { TransactionsTracker, createDelegationPortfolioTracker } from '../../../src/services';
+import { TransactionsTracker, createDelegationPortfolioTracker, pollProvider } from '../../../src/services';
 import { certificateTransactionsWithEpochs, createBlockEpochProvider } from '../../../src/services/DelegationTracker';
-import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { createStubTxWithCertificates, createStubTxWithSlot } from './stub-tx';
 import { createTestScheduler, logger } from '@cardano-sdk/util-dev';
 
-jest.mock('@cardano-sdk/util-rxjs', () => {
-  const originalModule = jest.requireActual('@cardano-sdk/util-rxjs');
-  return { ...originalModule, coldObservableProvider: jest.fn() };
+jest.mock('../../../src/services/util/pollProvider', () => {
+  const originalModule = jest.requireActual('../../../src/services/util/pollProvider');
+  return { ...originalModule, pollProvider: jest.fn() };
 });
 
 describe('DelegationTracker', () => {
-  const coldObservableProviderMock = coldObservableProvider as jest.MockedFunction<typeof coldObservableProvider>;
+  const pollProviderMock = pollProvider as jest.MockedFunction<typeof pollProvider>;
 
   test('createBlockEpochProvider', () => {
     createTestScheduler().run(({ cold, expectObservable, flush }) => {
-      coldObservableProviderMock.mockReturnValue(
+      pollProviderMock.mockReturnValue(
         cold('a-b', {
           a: [{ epoch: 100 }],
           b: [{ epoch: 100 }, { epoch: 101 }]
@@ -34,7 +33,7 @@ describe('DelegationTracker', () => {
         b: [100, 101]
       });
       flush();
-      expect(coldObservableProviderMock).toBeCalledTimes(1);
+      expect(pollProviderMock).toBeCalledTimes(1);
     });
   });
 

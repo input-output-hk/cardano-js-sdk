@@ -18,26 +18,26 @@ import {
   createQueryStakePoolsProvider,
   createRewardsProvider,
   fetchRewardsTrigger$,
-  getStakePoolIdAtEpoch
+  getStakePoolIdAtEpoch,
+  pollProvider
 } from '../../../src';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
-import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { createTestScheduler, logger, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyCbor } from '../../util';
 
-const { currentEpoch, generateStakePools, mockStakePoolsProvider } = mockProviders;
-
-jest.mock('@cardano-sdk/util-rxjs', () => {
-  const actual = jest.requireActual('@cardano-sdk/util-rxjs');
+jest.mock('../../../src/services/util/pollProvider', () => {
+  const actual = jest.requireActual('../../../src/services/util/pollProvider');
   return {
     ...actual,
-    coldObservableProvider: jest.fn().mockImplementation((...args) => actual.coldObservableProvider(...args))
+    pollProvider: jest.fn().mockImplementation((...args) => actual.pollProvider(...args))
   };
 });
 
+const { currentEpoch, generateStakePools, mockStakePoolsProvider } = mockProviders;
+
 describe('RewardAccounts', () => {
-  const coldObservableProviderMock = coldObservableProvider as jest.MockedFunction<typeof coldObservableProvider>;
+  const pollProviderMock = pollProvider as jest.MockedFunction<typeof pollProvider>;
   const txId1 = Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000');
   const txId2 = Cardano.TransactionId('295d5e0f7ee182426eaeda8c9f1c63502c72cdf4afd6e0ee0f209adf94a614e7');
   const poolId1 = Cardano.PoolId('pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh');
@@ -63,7 +63,7 @@ describe('RewardAccounts', () => {
     drepInfo$ = jest.fn(
       (drepIds: Cardano.DRepID[]): Observable<DRepInfo[]> => of(drepIds.map((id) => ({ active: true, id } as DRepInfo)))
     );
-    coldObservableProviderMock.mockClear();
+    pollProviderMock.mockClear();
   });
 
   test.todo('createQueryStakePoolsProvider emits stored values if they exist, updates storage when provider resolves');
@@ -492,7 +492,7 @@ describe('RewardAccounts', () => {
     const epoch$ = null as unknown as Observable<Cardano.EpochNo>; // not used in this test
     const onChainTx$ = EMPTY as Observable<OutgoingOnChainTx>;
     createTestScheduler().run(({ cold, expectObservable, flush }) => {
-      coldObservableProviderMock
+      pollProviderMock
         .mockReturnValueOnce(
           cold('a-b-c', {
             a: 0n,
@@ -512,7 +512,7 @@ describe('RewardAccounts', () => {
         c: [5n, 3n] // duplicates are filtered in the coldObservable and this one is fake and emits duplicates
       });
       flush();
-      expect(coldObservableProviderMock).toBeCalledTimes(2);
+      expect(pollProviderMock).toBeCalledTimes(2);
     });
   });
 

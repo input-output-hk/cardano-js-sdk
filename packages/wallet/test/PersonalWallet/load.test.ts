@@ -17,6 +17,8 @@ import {
   ChainHistoryProvider,
   HandleProvider,
   NetworkInfoProvider,
+  ProviderError,
+  ProviderFailure,
   RewardsProvider,
   UtxoProvider,
   coalesceValueQuantities
@@ -30,7 +32,6 @@ import {
   somePartialStakePools
 } from '@cardano-sdk/util-dev';
 import { InvalidConfigurationError } from '@cardano-sdk/tx-construction';
-import { InvalidStringError } from '@cardano-sdk/util';
 import { ReplaySubject, firstValueFrom } from 'rxjs';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import { dummyLogger as logger } from 'ts-log';
@@ -76,7 +77,7 @@ export class MockAddressDiscovery implements AddressDiscovery {
   public async discover(): Promise<GroupedAddress[]> {
     if (this.#currentAttempt <= this.#resolveAfterAttempts) {
       ++this.#currentAttempt;
-      throw new Error('An error occurred during the discovery process.');
+      throw new ProviderError(ProviderFailure.Unknown, 'An error occurred during the discovery process.');
     }
 
     return this.#addresses;
@@ -515,61 +516,6 @@ describe('BaseWallet.AddressDiscovery', () => {
     });
 
     await expect(firstValueFrom(wallet.addresses$)).resolves.toEqual([testValue]);
-
-    wallet.shutdown();
-  });
-});
-
-describe('BaseWallet.fatalError$', () => {
-  it('emits non retryable errors', async () => {
-    const stores = createInMemoryWalletStores();
-    const tipHandler = jest.fn();
-    const utxoSet = generateUtxos(30, 10);
-
-    const wallet = await createWallet({
-      providers: {
-        chainHistoryProvider: mocks.mockChainHistoryProvider(),
-        networkInfoProvider: {
-          ...mocks.mockNetworkInfoProvider(),
-          ledgerTip: jest.fn().mockRejectedValue(new InvalidStringError('Test invalid string error'))
-        },
-        rewardsProvider: mocks.mockRewardsProvider(),
-        utxoProvider: mocks.mockUtxoProvider({ utxoSet })
-      },
-      stores
-    });
-
-    // wallet.fatalError$ must be observed till the beginning of time
-    const errorPromise = expect(firstValueFrom(wallet.fatalError$)).resolves.toBeInstanceOf(InvalidStringError);
-
-    wallet.tip$.subscribe(tipHandler);
-
-    await errorPromise;
-
-    wallet.shutdown();
-
-    expect(tipHandler).not.toBeCalled();
-  });
-
-  it('Observables work even if BaseWallet.fatalError$ is not observed', async () => {
-    const stores = createInMemoryWalletStores();
-    const testValue = { test: 'value' };
-    const utxoSet = generateUtxos(30, 10);
-
-    const wallet = await createWallet({
-      providers: {
-        chainHistoryProvider: mocks.mockChainHistoryProvider(),
-        networkInfoProvider: {
-          ...mocks.mockNetworkInfoProvider(),
-          ledgerTip: jest.fn().mockResolvedValue(testValue)
-        },
-        rewardsProvider: mocks.mockRewardsProvider(),
-        utxoProvider: mocks.mockUtxoProvider({ utxoSet })
-      },
-      stores
-    });
-
-    await expect(firstValueFrom(wallet.tip$)).resolves.toBe(testValue);
 
     wallet.shutdown();
   });

@@ -2,9 +2,9 @@ import { Cardano, DRepInfo, DRepProvider } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { Observable, map, merge, of, withLatestFrom } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { distinctBlock } from './util';
 import { isNotNil } from '@cardano-sdk/util';
+import { poll } from '@cardano-sdk/util-rxjs';
 
 type DrepInfoObservableProps = {
   drepProvider: DRepProvider;
@@ -17,10 +17,10 @@ type DrepInfoObservableProps = {
 export const createDrepInfoColdObservable =
   ({ drepProvider, retryBackoffConfig, refetchTrigger$, logger }: DrepInfoObservableProps) =>
   (drepIds: Cardano.DRepID[]) =>
-    coldObservableProvider<DRepInfo[]>({
+    poll<DRepInfo[]>({
       logger,
-      provider: () => drepProvider.getDRepsInfo({ ids: drepIds }),
       retryBackoffConfig,
+      sample: () => drepProvider.getDRepsInfo({ ids: drepIds }),
       trigger$: merge(of(true), refetchTrigger$)
     });
 

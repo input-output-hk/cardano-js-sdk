@@ -397,7 +397,6 @@ describe('createAssetsTracker', () => {
 describe('createAssetService', () => {
   let assetProvider: TrackedAssetProvider;
   const retryBackoffConfig: RetryBackoffConfig = { initialInterval: 2 };
-  const onFatalError = jest.fn();
 
   beforeEach(() => {
     assetProvider = {
@@ -440,14 +439,7 @@ describe('createAssetService', () => {
       coins: 0n
     });
 
-    const assetService = createAssetService(
-      assetProvider,
-      assetCache$,
-      totalBalance$,
-      retryBackoffConfig,
-      logger,
-      onFatalError
-    );
+    const assetService = createAssetService(assetProvider, assetCache$, totalBalance$, retryBackoffConfig, logger);
 
     const result$ = assetService([AssetId.TSLA, AssetId.PXL]);
 
@@ -483,14 +475,7 @@ describe('createAssetService', () => {
     const assetCache$ = of(cachedAssets);
     const totalBalance$ = of({ assets: new Map([[AssetId.TSLA, 1000n]]), coins: 0n });
 
-    const assetService = createAssetService(
-      assetProvider,
-      assetCache$,
-      totalBalance$,
-      retryBackoffConfig,
-      logger,
-      onFatalError
-    );
+    const assetService = createAssetService(assetProvider, assetCache$, totalBalance$, retryBackoffConfig, logger);
 
     const result$ = assetService([AssetId.TSLA, AssetId.PXL, AssetId.Unit]);
 
@@ -514,14 +499,7 @@ describe('createAssetService', () => {
     const assetCache$ = of(new Map());
     const totalBalance$ = of({ assets: new Map(), coins: 0n });
 
-    const assetService = createAssetService(
-      assetProvider,
-      assetCache$,
-      totalBalance$,
-      retryBackoffConfig,
-      logger,
-      onFatalError
-    );
+    const assetService = createAssetService(assetProvider, assetCache$, totalBalance$, retryBackoffConfig, logger);
 
     const result$ = assetService([AssetId.TSLA, AssetId.PXL]);
 
@@ -573,14 +551,7 @@ describe('createAssetService', () => {
       coins: 0n
     });
 
-    const assetService = createAssetService(
-      assetProvider,
-      assetCache$,
-      totalBalance$,
-      retryBackoffConfig,
-      logger,
-      onFatalError
-    );
+    const assetService = createAssetService(assetProvider, assetCache$, totalBalance$, retryBackoffConfig, logger);
 
     const result$ = assetService([AssetId.TSLA, AssetId.PXL]);
 

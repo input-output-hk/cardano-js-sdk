@@ -20,9 +20,10 @@ import {
 } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackedAssetProvider } from './ProviderTracker';
-import { coldObservableProvider, concatAndCombineLatest } from '@cardano-sdk/util-rxjs';
+import { concatAndCombineLatest } from '@cardano-sdk/util-rxjs';
 import { deepEquals, isNotNil } from '@cardano-sdk/util';
 import { newTransactions$ } from './TransactionsTracker';
+import { pollProvider } from './util';
 import chunk from 'lodash/chunk.js';
 import uniq from 'lodash/uniq.js';
 
@@ -132,20 +133,18 @@ export const createAssetService =
     totalBalance$: Observable<Cardano.Value>,
     retryBackoffConfig: RetryBackoffConfig,
     logger: Logger,
-    onFatalError?: (value: unknown) => void,
     maxAssetInfoCacheAge: Milliseconds = ONE_WEEK
     // eslint-disable-next-line max-params
   ) =>
   (assetIds: Cardano.AssetId[]) =>
     concatAndCombineLatest(
       chunk(assetIds, ASSET_INFO_FETCH_CHUNK_SIZE).map((assetIdsChunk) =>
-        coldObservableProvider({
+        pollProvider({
           logger,
-          onFatalError,
           pollUntil: isEveryAssetInfoComplete,
-          provider: () =>
-            getAssetsWithCache(assetIdsChunk, assetCache$, totalBalance$, assetProvider, maxAssetInfoCacheAge),
           retryBackoffConfig,
+          sample: () =>
+            getAssetsWithCache(assetIdsChunk, assetCache$, totalBalance$, assetProvider, maxAssetInfoCacheAge),
           trigger$: of(true) // fetch only once
         })
       )
@@ -160,7 +159,6 @@ export interface AssetsTrackerProps {
   logger: Logger;
   assetsCache$: Observable<Assets>;
   balanceTracker: BalanceTracker;
-  onFatalError?: (value: unknown) => void;
   maxAssetInfoCacheAge?: Milliseconds;
 }
 
@@ -182,7 +180,6 @@ export const createAssetsTracker = (
     },
     retryBackoffConfig,
     logger,
-    onFatalError,
     maxAssetInfoCacheAge
   }: AssetsTrackerProps,
   {
@@ -192,7 +189,6 @@ export const createAssetsTracker = (
       total$,
       retryBackoffConfig,
       logger,
-      onFatalError,
       maxAssetInfoCacheAge
     )
   }: AssetsTrackerInternals = {}

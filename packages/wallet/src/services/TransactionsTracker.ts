@@ -32,8 +32,8 @@ import { FailedTx, OutgoingOnChainTx, OutgoingTx, TransactionFailure, Transactio
 import { Logger } from 'ts-log';
 import { Range, Shutdown, contextLogger } from '@cardano-sdk/util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
-import { distinctBlock, signedTxsEquals, transactionsEquals, txEquals, txInEquals } from './util';
+import { TrackerSubject } from '@cardano-sdk/util-rxjs';
+import { distinctBlock, pollProvider, signedTxsEquals, transactionsEquals, txEquals, txInEquals } from './util';
 
 import { WitnessedTx } from '@cardano-sdk/key-management';
 import { newAndStoredMulticast } from './util/newAndStoredMulticast';
@@ -56,7 +56,6 @@ export interface TransactionsTrackerProps {
   };
   failedFromReemitter$?: Observable<FailedTx>;
   logger: Logger;
-  onFatalError?: (value: unknown) => void;
 }
 
 export interface TransactionsTrackerInternals {
@@ -71,7 +70,6 @@ export interface TransactionsTrackerInternalsProps {
   tipBlockHeight$: Observable<Cardano.BlockNo>;
   store: OrderedCollectionStore<Cardano.HydratedTx>;
   logger: Logger;
-  onFatalError?: (value: unknown) => void;
 }
 
 // Temporarily hardcoded. Will be replaced with ChainHistoryProvider 'maxPageSize' value once ADP-2249 is implemented
@@ -191,29 +189,28 @@ const findIntersectionAndUpdateTxStore = ({
   logger,
   store,
   retryBackoffConfig,
-  onFatalError,
   tipBlockHeight$,
   rollback$,
   localTransactions,
   addresses
 }: Pick<
   TransactionsTrackerInternalsProps,
-  'chainHistoryProvider' | 'logger' | 'store' | 'retryBackoffConfig' | 'onFatalError' | 'tipBlockHeight$'
+  'chainHistoryProvider' | 'logger' | 'store' | 'retryBackoffConfig' | 'tipBlockHeight$'
 > & {
   localTransactions: Cardano.HydratedTx[];
   rollback$: Subject<Cardano.HydratedTx>;
   addresses: Cardano.PaymentAddress[];
 }) =>
-  coldObservableProvider({
+  pollProvider({
     // Do not re-fetch transactions twice on load when tipBlockHeight$ loads from storage first
     // It should also help when using poor internet connection.
     // Caveat is that local transactions might get out of date...
     combinator: exhaustMap,
     equals: transactionsEquals,
     logger,
-    onFatalError,
+    retryBackoffConfig,
     // eslint-disable-next-line sonarjs/cognitive-complexity,complexity
-    provider: async () => {
+    sample: async () => {
       let rollbackOcurred = false;
       // eslint-disable-next-line no-constant-condition
       while (true) {
@@ -290,7 +287,6 @@ const findIntersectionAndUpdateTxStore = ({
         return localTransactions;
       }
     },
-    retryBackoffConfig,
     trigger$: tipBlockHeight$
   });
 
@@ -362,14 +358,12 @@ export const createTransactionsTracker = (
     inFlightTransactionsStore: newTransactionsStore,
     signedTransactionsStore,
     logger,
-    failedFromReemitter$,
-    onFatalError
+    failedFromReemitter$
   }: TransactionsTrackerProps,
   { transactionsSource$: txSource$, rollback$ }: TransactionsTrackerInternals = createAddressTransactionsProvider({
     addresses$,
     chainHistoryProvider,
     logger: contextLogger(logger, 'AddressTransactionsProvider'),
-    onFatalError,
     retryBackoffConfig,
     store: transactionsStore,
     tipBlockHeight$: distinctBlock(tip$)
