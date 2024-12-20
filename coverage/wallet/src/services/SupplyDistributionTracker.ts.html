@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>11/11</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>10/10</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
@@ -128,22 +128,13 @@
 <a name='L63'></a><a href='#L63'>63</a>
 <a name='L64'></a><a href='#L64'>64</a>
 <a name='L65'></a><a href='#L65'>65</a>
-<a name='L66'></a><a href='#L66'>66</a>
-<a name='L67'></a><a href='#L67'>67</a>
-<a name='L68'></a><a href='#L68'>68</a>
-<a name='L69'></a><a href='#L69'>69</a>
-<a name='L70'></a><a href='#L70'>70</a>
-<a name='L71'></a><a href='#L71'>71</a>
-<a name='L72'></a><a href='#L72'>72</a>
-<a name='L73'></a><a href='#L73'>73</a>
-<a name='L74'></a><a href='#L74'>74</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L66'></a><a href='#L66'>66</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-yes">43x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-yes">43x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -164,12 +155,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -184,9 +170,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -212,10 +196,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Logger } from 'ts-log';
 import { NetworkInfoProvider } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
-import { PersistentDocumentTrackerSubject } from './util';
+import { PersistentDocumentTrackerSubject, pollProvider } from './util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { SupplyDistributionStores } from '../persistence';
-import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import isEqual from 'lodash/isEqual.js';
 &nbsp;
 export type SupplyDistributionNetworkInfoProvider = Pick&lt;NetworkInfoProvider, 'stake' | 'lovelaceSupply'&gt;;
@@ -225,7 +208,6 @@ export interface SupplyDistributionTrackerProps {
   trigger$: Observable&lt;unknown&gt;;
   /** Failed request retry strategy */
   retryBackoffConfig?: RetryBackoffConfig;
-  onFatalError?: (value: unknown) =&gt; void;
 }
 &nbsp;
 export interface SupplyDistributionTrackerDependencies {
@@ -239,32 +221,26 @@ export interface SupplyDistributionTrackerDependencies {
  * @returns object that continuously fetches and emits network stats (StakeSummary and SupplySummary)
  */
 export const createSupplyDistributionTracker = (
-  {
-    trigger$,
-    retryBackoffConfig = { initialInterval: 1000, maxInterval: 60_000 },
-    onFatalError
-  }: SupplyDistributionTrackerProps,
+  { trigger$, retryBackoffConfig = { initialInterval: 1000, maxInterval: 60_000 } }: SupplyDistributionTrackerProps,
   { logger, stores, networkInfoProvider }: SupplyDistributionTrackerDependencies
 ) =&gt; {
   const stake$ = new PersistentDocumentTrackerSubject(
-    coldObservableProvider({
+    pollProvider({
       equals: isEqual,
       logger,
-      onFatalError,
-      provider: networkInfoProvider.stake,
       retryBackoffConfig,
+      sample: networkInfoProvider.stake,
       trigger$
     }),
     stores.stake
   );
 &nbsp;
   const lovelaceSupply$ = new PersistentDocumentTrackerSubject(
-    coldObservableProvider({
+    pollProvider({
       equals: isEqual,
       logger,
-      onFatalError,
-      provider: networkInfoProvider.lovelaceSupply,
       retryBackoffConfig,
+      sample: networkInfoProvider.lovelaceSupply,
       trigger$
     }),
     stores.lovelaceSupply
@@ -289,7 +265,7 @@ export type SupplyDistributionTracker = ReturnType&lt;typeof createSupplyDistrib
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-12-20T10:45:38.333Z
+                at 2024-12-20T12:18:31.317Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
