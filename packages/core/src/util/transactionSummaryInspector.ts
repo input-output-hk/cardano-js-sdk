@@ -37,6 +37,11 @@ interface TransactionSummaryInspectorArgs {
 
 export type TransactionSummaryInspection = {
   assets: Map<Cardano.AssetId, AssetInfoWithAmount>;
+  /**
+   * Spent amount from the wallet's perspective, computed as `own outputs - (own inputs + withdrawals)`.
+   * Withdrawals are a type of "own input", and are accounted for when computing the wallet spent amount.
+   * Positive when the wallet is receiving funds, negative when the wallet is sending funds.
+   */
   coins: Cardano.Lovelace;
   collateral: Cardano.Lovelace;
   deposit: Cardano.Lovelace;
@@ -201,14 +206,19 @@ export const transactionSummaryInspector: TransactionSummaryInspector =
 
     const collateral = await getCollateral(tx, inputResolver, addresses);
 
+    const withdrawals = implicit.withdrawals || 0n;
     const totalOutputValue = await totalAddressOutputsValueInspector(addresses)(tx);
     const totalInputValue = await totalAddressInputsValueInspector(addresses, inputResolver)(tx);
-    const implicitCoin = (implicit.withdrawals || 0n) + (implicit.reclaimDeposit || 0n) - (implicit.deposit || 0n);
+    const implicitCoin = withdrawals + (implicit.reclaimDeposit || 0n) - (implicit.deposit || 0n);
     const implicitAssets = await getImplicitAssets(tx);
 
     const diff = {
       assets: subtractTokenMaps([totalOutputValue.assets, totalInputValue.assets]),
-      coins: totalOutputValue.coins - totalInputValue.coins
+      // Withdrawals are a type of "own input", which must be accounted for when computing the wallet spent amount.
+      // `coins` represents the actual spent coins from the wallets perspective, using the formula `ownOutputs - ownInputs`.
+      // deposit is like a foreign output, and reclaimDeposit is like a foreignInput,
+      // so they do not need to be included in the computation.
+      coins: totalOutputValue.coins - (totalInputValue.coins + withdrawals)
     };
 
     return {
