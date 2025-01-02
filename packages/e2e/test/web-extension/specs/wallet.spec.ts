@@ -23,9 +23,7 @@ describe('wallet', () => {
     liPools,
     liPercents,
     divBgPortDisconnectStatus,
-    divUiPortDisconnectStatus,
-    btnSignDataWithDRepId,
-    divDataSignature
+    divUiPortDisconnectStatus
   } = selectors;
 
   // The address is filled in by the tests, which are order dependent
@@ -135,11 +133,6 @@ describe('wallet', () => {
       // TODO: failing due to empty balance at accountIndex=1
       it.skip('can build and sign a transaction using the new wallet', async () => {
         await buildAndSign();
-      });
-
-      it('can sign data with a DRepID', async () => {
-        await (await $(btnSignDataWithDRepId)).click();
-        await expect($(divDataSignature)).toHaveTextContaining('signature');
       });
 
       it('can destroy second wallet before switching back to the first wallet', async () => {

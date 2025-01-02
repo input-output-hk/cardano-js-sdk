@@ -3,6 +3,7 @@ import { AddressType, AsyncKeyAgent, GroupedAddress, KeyAgent, KeyRole, cip8 } f
 import { COSEKey, COSESign1, SigStructure } from '@emurgo/cardano-message-signing-nodejs';
 import { Cardano, util } from '@cardano-sdk/core';
 import { CoseLabel } from '../../src/cip8/util';
+import { DREP_KEY_DERIVATION_PATH } from '../../src/util';
 import { HexBlob } from '@cardano-sdk/util';
 import { createCoseKey, getAddressBytes } from '../../src/cip8';
 import { testAsyncKeyAgent, testKeyAgent } from '../mocks';
@@ -13,6 +14,8 @@ describe('cip30signData', () => {
   let keyAgent: KeyAgent;
   let asyncKeyAgent: AsyncKeyAgent;
   let address: GroupedAddress;
+  let drepKeyHex: Crypto.Ed25519PublicKeyHex;
+  let drepKeyHash: Crypto.Ed25519KeyHashHex;
   const cryptoProvider = new Crypto.SodiumBip32Ed25519();
 
   beforeAll(async () => {
@@ -20,6 +23,8 @@ describe('cip30signData', () => {
     keyAgent = await keyAgentReady;
     asyncKeyAgent = await testAsyncKeyAgent(undefined, keyAgentReady);
     address = await asyncKeyAgent.deriveAddress(addressDerivationPath, 0);
+    drepKeyHex = await asyncKeyAgent.derivePublicKey(DREP_KEY_DERIVATION_PATH);
+    drepKeyHash = (await Crypto.Ed25519PublicKey.fromHex(drepKeyHex).hash()).hex();
   });
 
   const signAndDecode = async (
@@ -80,6 +85,26 @@ describe('cip30signData', () => {
         role: KeyRole.Stake
       })
     );
+  });
+
+  it('supports signing with drep key hash as bech32 enterprise payment address', async () => {
+    const drepAddr = new Cardano.Address({
+      paymentPart: {
+        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(drepKeyHash),
+        type: Cardano.CredentialType.KeyHash
+      },
+      type: Cardano.AddressType.EnterpriseKey
+    });
+
+    const signWith = drepAddr.toBech32();
+    if (!signWith) {
+      expect(signWith).toBeDefined();
+      return;
+    }
+
+    const { signedData, publicKeyHex } = await signAndDecode(signWith, [address]);
+    testAddressHeader(signedData, signWith);
+    expect(publicKeyHex).toEqual(drepKeyHex);
   });
 
   it('signature can be verified', async () => {

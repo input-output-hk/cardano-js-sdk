@@ -33,7 +33,7 @@ import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construct
 import { NEVER, firstValueFrom, of } from 'rxjs';
 import { Providers, createWallet } from './util';
 import { address_0_0, address_1_0, rewardAccount_0, rewardAccount_1 } from '../services/ChangeAddress/testData';
-import { buildDRepIDFromDRepKey, signTx, waitForWalletStateSettle } from '../util';
+import { buildDRepAddressFromDRepKey, signTx, waitForWalletStateSettle } from '../util';
 import { dummyLogger as logger } from 'ts-log';
 import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import uniq from 'lodash/uniq.js';
@@ -686,30 +686,105 @@ describe('cip30', () => {
       });
 
       describe('api.signData', () => {
-        test('sign with address', async () => {
+        beforeEach(() => {
+          jest.clearAllMocks();
+        });
+
+        test('sign with bech32 address', async () => {
           const [{ address }] = await firstValueFrom(wallet.addresses$);
           const cip30dataSignature = await api.signData(context, address, HexBlob('abc123'));
           expect(typeof cip30dataSignature.key).toBe('string');
           expect(typeof cip30dataSignature.signature).toBe('string');
         });
 
-        test('sign with bech32 DRepID', async () => {
-          const dRepKey = await api.getPubDRepKey(context);
-          const drepid = buildDRepIDFromDRepKey(dRepKey);
-
-          const cip95dataSignature = await api.signData(context, drepid, HexBlob('abc123'));
-          expect(typeof cip95dataSignature.key).toBe('string');
-          expect(typeof cip95dataSignature.signature).toBe('string');
+        test('sign with hex-encoded address', async () => {
+          const signDataSpy = jest.spyOn(wallet, 'signData');
+          const [{ address }] = await firstValueFrom(wallet.addresses$);
+          const addressHex = Cardano.Address.fromString(address)?.toBytes();
+          if (!addressHex) {
+            expect(addressHex).toBeDefined();
+            return;
+          }
+          const cip30dataSignature = await api.signData(context, addressHex, HexBlob('abc123'));
+          expect(typeof cip30dataSignature.key).toBe('string');
+          expect(typeof cip30dataSignature.signature).toBe('string');
+          expect(signDataSpy.mock.calls[0][0].signWith).toEqual(address);
         });
 
-        test('rejects if bech32 DRepID is not a type 6 address', async () => {
+        test('sign with bech32 reward account', async () => {
+          const signDataSpy = jest.spyOn(wallet, 'signData');
+          const [{ rewardAccount }] = await firstValueFrom(wallet.addresses$);
+
+          const cip30dataSignature = await api.signData(context, rewardAccount, HexBlob('abc123'));
+          expect(typeof cip30dataSignature.key).toBe('string');
+          expect(typeof cip30dataSignature.signature).toBe('string');
+          expect(signDataSpy.mock.calls[0][0].signWith).toEqual(rewardAccount);
+        });
+
+        test('sign with hex-encoded reward account', async () => {
+          const signDataSpy = jest.spyOn(wallet, 'signData');
+          const [{ rewardAccount }] = await firstValueFrom(wallet.addresses$);
+          const rewardAccountHex = Cardano.Address.fromString(rewardAccount)?.toBytes();
+
+          const cip30dataSignature = await api.signData(context, rewardAccountHex!, HexBlob('abc123'));
+          expect(typeof cip30dataSignature.key).toBe('string');
+          expect(typeof cip30dataSignature.signature).toBe('string');
+          expect(signDataSpy.mock.calls[0][0].signWith).toEqual(rewardAccount);
+        });
+
+        test('sign with hex-encoded DRepID key hash hex', async () => {
+          const signDataSpy = jest.spyOn(wallet, 'signData');
           const dRepKey = await api.getPubDRepKey(context);
-          for (const type in Cardano.AddressType) {
-            if (!Number.isNaN(Number(type)) && Number(type) !== Cardano.AddressType.EnterpriseKey) {
-              const drepid = buildDRepIDFromDRepKey(dRepKey, 0, type as unknown as Cardano.AddressType);
-              await expect(api.signData(context, drepid, HexBlob('abc123'))).rejects.toThrow();
-            }
+          const drepKeyHashHex = (await Crypto.Ed25519PublicKey.fromHex(dRepKey).hash()).hex();
+
+          await api.signData(context, drepKeyHashHex, HexBlob('abc123'));
+          expect(signDataSpy).toHaveBeenCalledTimes(1);
+          // Wallet signData is called with the DRepID as bech32 address because it was transformed by the cip30Api.
+          // The address credential should be the drepKeyHash
+          const signAddr = Cardano.Address.fromString(signDataSpy.mock.calls[0][0].signWith);
+          expect(signAddr?.getProps().paymentPart?.hash).toEqual(drepKeyHashHex);
+        });
+
+        test('sign with hex-encoded type 6 DRepID address', async () => {
+          const signDataSpy = jest.spyOn(wallet, 'signData');
+          const dRepKey = await api.getPubDRepKey(context);
+          const drepKeyHashHex = (await Crypto.Ed25519PublicKey.fromHex(dRepKey).hash()).hex();
+          const drepAddress = await buildDRepAddressFromDRepKey(dRepKey);
+          // CIP95 DRepID as type 6 hex-encoded Address
+          const drepAddressBytes = drepAddress?.toAddress()?.toBytes();
+
+          if (!drepAddressBytes) {
+            expect(drepAddressBytes).toBeDefined();
+            return;
           }
+
+          await api.signData(context, drepAddressBytes, HexBlob('abc123'));
+          expect(signDataSpy).toHaveBeenCalledTimes(1);
+          // Wallet signData is called with the DRepID as bech32 address because it was transformed by the cip30Api.
+          // The address credential should be the drepKeyHash
+          const signAddr = Cardano.Address.fromString(signDataSpy.mock.calls[0][0].signWith);
+          expect(signAddr?.getProps().paymentPart?.hash).toEqual(drepKeyHashHex);
+        });
+
+        test('sign with bech32 type 6 DRepID address', async () => {
+          const signDataSpy = jest.spyOn(wallet, 'signData');
+          const dRepKey = await api.getPubDRepKey(context);
+          const drepKeyHashHex = (await Crypto.Ed25519PublicKey.fromHex(dRepKey).hash()).hex();
+          const drepAddress = await buildDRepAddressFromDRepKey(dRepKey);
+          // CIP95 DRepID as type 6 hex-encoded Address
+          const drepAddressBech32 = drepAddress?.toAddress()?.toBech32();
+
+          if (!drepAddressBech32) {
+            expect(drepAddressBech32).toBeDefined();
+            return;
+          }
+
+          await api.signData(context, drepAddressBech32, HexBlob('abc123'));
+          expect(signDataSpy).toHaveBeenCalledTimes(1);
+          // Wallet signData is called with the DRepID as bech32 address because it was transformed by the cip30Api.
+          // The address credential should be the drepKeyHash
+          const signAddr = Cardano.Address.fromString(signDataSpy.mock.calls[0][0].signWith);
+          expect(signAddr?.getProps().paymentPart?.hash).toEqual(drepKeyHashHex);
         });
 
         it('passes through sender from dapp connector context', async () => {

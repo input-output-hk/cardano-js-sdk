@@ -17,6 +17,7 @@ import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import { LedgerKeyAgent, LedgerTransportType } from '@cardano-sdk/hardware-ledger';
+import { buildDRepAddressFromDRepKey } from '../../util';
 import { firstValueFrom } from 'rxjs';
 import { getDevices } from '@ledgerhq/hw-transport-node-hid-noevents';
 import { dummyLogger as logger } from 'ts-log';
@@ -738,6 +739,25 @@ describe('LedgerKeyAgent', () => {
               const cryptoProvider = new Crypto.SodiumBip32Ed25519();
 
               testAddressHeader(signedData, signWith);
+
+              expect(
+                await cryptoProvider.verify(
+                  signatureBytes,
+                  signedDataBytes,
+                  publicKeyHex as unknown as Crypto.Ed25519PublicKeyHex
+                )
+              ).toBe(true);
+            });
+
+            it('can sign with drep key', async () => {
+              const drepPubKey = await wallet.governance.getPubDRepKey();
+              const signWith = (await buildDRepAddressFromDRepKey(drepPubKey!))?.toAddress()?.toBech32();
+              const { coseSign1, publicKeyHex, signedData } = await signAndDecode(signWith!, wallet);
+              const signedDataBytes = HexBlob.fromBytes(signedData.to_bytes());
+              const signatureBytes = HexBlob.fromBytes(coseSign1.signature()) as unknown as Crypto.Ed25519SignatureHex;
+              const cryptoProvider = new Crypto.SodiumBip32Ed25519();
+
+              expect(publicKeyHex).toEqual(drepPubKey);
 
               expect(
                 await cryptoProvider.verify(

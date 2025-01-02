@@ -21,7 +21,7 @@ import {
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { babbageTx } from '../../../core/test/Serialization/testData';
-import { buildDRepIDFromDRepKey, toOutgoingTx, waitForWalletStateSettle } from '../util';
+import { buildDRepAddressFromDRepKey, toOutgoingTx, waitForWalletStateSettle } from '../util';
 import { getPassphrase, stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { dummyLogger as logger } from 'ts-log';
 
@@ -494,9 +494,17 @@ describe('BaseWallet methods', () => {
     });
 
     it('signs with bech32 DRepID', async () => {
+      const drepPubKey = await wallet.governance.getPubDRepKey();
+      const drepAddr = (await buildDRepAddressFromDRepKey(drepPubKey!))?.toAddress()?.toBech32();
+
+      if (!drepAddr) {
+        expect(drepAddr).toBeDefined();
+        return;
+      }
+
       const response = await wallet.signData({
         payload: HexBlob('abc123'),
-        signWith: Cardano.DRepID('drep1vpzcgfrlgdh4fft0p0ju70czkxxkuknw0jjztl3x7aqgm9q3hqyaz')
+        signWith: drepAddr
       });
       expect(response).toHaveProperty('signature');
     });
@@ -512,16 +520,6 @@ describe('BaseWallet methods', () => {
         sender,
         signWith: address
       });
-    });
-
-    test('rejects if bech32 DRepID is not a type 6 address', async () => {
-      const dRepKey = await wallet.governance.getPubDRepKey();
-      for (const type in Cardano.AddressType) {
-        if (!Number.isNaN(Number(type)) && Number(type) !== Cardano.AddressType.EnterpriseKey) {
-          const drepid = buildDRepIDFromDRepKey(dRepKey!, 0, type as unknown as Cardano.AddressType);
-          await expect(wallet.signData({ payload: HexBlob('abc123'), signWith: drepid })).rejects.toThrow();
-        }
-      }
     });
   });
 

@@ -209,26 +209,17 @@ type OpenTransportForDeviceParams = {
   device: LedgerDevice;
 };
 
+const isPaymentAddress = (
+  signWith: Cardano.PaymentAddress | Cardano.RewardAccount
+): signWith is Cardano.PaymentAddress => signWith.startsWith('addr');
+
 const getDerivationPath = (
-  signWith: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID,
+  signWith: Cardano.PaymentAddress | Cardano.RewardAccount,
   knownAddresses: GroupedAddress[],
   accountIndex: number,
-  purpose: number
-): { signingPath: BIP32Path; addressParams: DeviceOwnedAddress } => {
-  if (Cardano.DRepID.isValid(signWith)) {
-    const path = util.accountKeyDerivationPathToBip32Path(accountIndex, util.DREP_KEY_DERIVATION_PATH, purpose);
-
-    return {
-      addressParams: {
-        params: {
-          spendingPath: path
-        },
-        type: AddressType.ENTERPRISE_KEY
-      },
-      signingPath: path
-    };
-  }
-
+  purpose: number,
+  dRepKeyHash: Crypto.Ed25519KeyHashHex
+): { signingPath: BIP32Path; addressParams?: DeviceOwnedAddress; addressFieldType: MessageAddressFieldType } => {
   const isRewardAccount = signWith.startsWith('stake');
 
   // Reward account
@@ -245,6 +236,7 @@ const getDerivationPath = (
     );
 
     return {
+      addressFieldType: MessageAddressFieldType.ADDRESS,
       addressParams: {
         params: {
           stakingPath: path
@@ -253,6 +245,20 @@ const getDerivationPath = (
       },
       signingPath: path
     };
+  }
+
+  if (isPaymentAddress(signWith)) {
+    const drepAddr = Cardano.Address.fromString(signWith);
+    if (
+      drepAddr?.getType() === Cardano.AddressType.EnterpriseKey &&
+      drepAddr?.getProps().paymentPart?.hash === Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash)
+    ) {
+      const path = util.accountKeyDerivationPathToBip32Path(accountIndex, util.DREP_KEY_DERIVATION_PATH, purpose);
+      return {
+        addressFieldType: MessageAddressFieldType.KEY_HASH,
+        signingPath: path
+      };
+    }
   }
 
   const knownAddress = knownAddresses.find(({ address }) => address === signWith);
@@ -282,6 +288,7 @@ const getDerivationPath = (
     );
 
     return {
+      addressFieldType: MessageAddressFieldType.ADDRESS,
       addressParams: {
         params: {
           spendingPath,
@@ -304,6 +311,7 @@ const getDerivationPath = (
 
   // Enterprise Address
   return {
+    addressFieldType: MessageAddressFieldType.ADDRESS,
     addressParams: {
       params: {
         spendingPath
@@ -746,25 +754,39 @@ export class LedgerKeyAgent extends KeyAgentBase {
 
   async signCip8Data(request: cip8.Cip8SignDataContext): Promise<Cip30DataSignature> {
     try {
-      const { signingPath, addressParams } = getDerivationPath(
+      const dRepPublicKey = await this.derivePublicKey(util.DREP_KEY_DERIVATION_PATH);
+      const dRepKeyHashHex = (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex();
+
+      const { signingPath, addressParams, addressFieldType } = getDerivationPath(
         request.signWith,
         request.knownAddresses,
         this.accountIndex,
-        this.purpose
+        this.purpose,
+        dRepKeyHashHex
       );
 
-      const messageData: MessageData = {
-        address: addressParams,
-        addressFieldType: MessageAddressFieldType.ADDRESS,
-        hashPayload: false,
-        messageHex: request.payload,
-        network: {
-          networkId: this.chainId.networkId,
-          protocolMagic: this.chainId.networkMagic
-        },
-        preferHexDisplay: false,
-        signingPath
-      };
+      const messageData: MessageData =
+        addressFieldType === MessageAddressFieldType.ADDRESS && addressParams
+          ? {
+              address: addressParams,
+              addressFieldType: MessageAddressFieldType.ADDRESS,
+              hashPayload: false,
+              messageHex: request.payload,
+
+              network: {
+                networkId: this.chainId.networkId,
+                protocolMagic: this.chainId.networkMagic
+              },
+              preferHexDisplay: false,
+              signingPath
+            }
+          : {
+              addressFieldType: MessageAddressFieldType.KEY_HASH,
+              hashPayload: false,
+              messageHex: request.payload,
+              preferHexDisplay: false,
+              signingPath
+            };
 
       const deviceConnection = await LedgerKeyAgent.checkDeviceConnection(
         this.#communicationType,

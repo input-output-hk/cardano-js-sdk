@@ -17,7 +17,6 @@ export type PaymentAddress = OpaqueString<'PaymentAddress'>;
 
 /**
  * @param {string} address mainnet or testnet address
- * @throws InvalidStringError
  */
 export const isRewardAccount = (address: string) => {
   try {

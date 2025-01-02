@@ -1,7 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { GroupedAddress, InMemoryKeyAgent, WitnessedTx, util } from '@cardano-sdk/key-management';
-import { HexBlob } from '@cardano-sdk/util';
 import { Observable, catchError, filter, firstValueFrom, throwError, timeout } from 'rxjs';
 import { ObservableWallet, OutgoingTx, WalletUtil } from '../src';
 import { SodiumBip32Ed25519 } from '@cardano-sdk/crypto';
@@ -49,23 +48,23 @@ export const toSignedTx = (tx: Cardano.Tx): WitnessedTx => ({
 
 export const dummyCbor = Serialization.TxCBOR('123');
 
-/** Construct a type 6 address for a DRepKey using an appropriate Network Tag and a hash of a public DRep Key. */
-export const buildDRepIDFromDRepKey = (
+/**
+ * Construct a type 6 or 7 address for a DRepKey using a hash of a public DRep Key.
+ *
+ * @param dRepKey The public DRep key to hash and use in the address
+ * @param type The type of credential to use in the address.
+ * @returns A a type 6 address for keyHash credential type, or a type 7 address for script credential type.
+ */
+export const buildDRepAddressFromDRepKey = async (
   dRepKey: Crypto.Ed25519PublicKeyHex,
-  networkId: Cardano.NetworkId = Cardano.NetworkId.Testnet,
-  addressType: Cardano.AddressType = Cardano.AddressType.EnterpriseKey
+  type: Cardano.CredentialType = Cardano.CredentialType.KeyHash
 ) => {
-  const dRepKeyBytes = Buffer.from(dRepKey, 'hex');
-  const dRepIdHex = Crypto.blake2b(28).update(dRepKeyBytes).digest('hex');
-  const paymentAddress = Cardano.EnterpriseAddress.packParts({
-    networkId,
-    paymentPart: {
-      hash: Crypto.Hash28ByteBase16(dRepIdHex),
-      type: Cardano.CredentialType.KeyHash
-    },
-    type: addressType
+  const drepKeyHash = (await Crypto.Ed25519PublicKey.fromHex(dRepKey).hash()).hex();
+  const drepId = Cardano.DRepID.cip129FromCredential({
+    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(drepKeyHash),
+    type
   });
-  return HexBlob.toTypedBech32<Cardano.DRepID>('drep', HexBlob.fromBytes(paymentAddress));
+  return Cardano.DRepID.toAddress(drepId);
 };
 
 export const createAsyncKeyAgent = async () =>

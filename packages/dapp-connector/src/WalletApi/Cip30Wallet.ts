@@ -28,7 +28,7 @@ export const CipMethodsMapping: Record<number, WalletMethod[]> = {
     'signData',
     'submitTx'
   ],
-  95: ['getRegisteredPubStakeKeys', 'getUnregisteredPubStakeKeys', 'getPubDRepKey']
+  95: ['getRegisteredPubStakeKeys', 'getUnregisteredPubStakeKeys', 'getPubDRepKey', 'signData']
 };
 export const WalletApiMethodNames: WalletMethod[] = Object.values(CipMethodsMapping).flat();
 
@@ -182,7 +182,8 @@ export class Cip30Wallet {
       getUnusedAddresses: () => walletApi.getUnusedAddresses(),
       getUsedAddresses: (paginate?: Paginate) => walletApi.getUsedAddresses(paginate),
       getUtxos: (amount?: Cbor, paginate?: Paginate) => walletApi.getUtxos(amount, paginate),
-      signData: (addr: Cardano.PaymentAddress | Bytes, payload: Bytes) => walletApi.signData(addr, payload),
+      signData: (addr: Cardano.PaymentAddress | Cardano.RewardAccount | Bytes, payload: Bytes) =>
+        walletApi.signData(addr, payload),
       signTx: (tx: Cbor, partialSign?: Boolean) => walletApi.signTx(tx, partialSign),
       submitTx: (tx: Cbor) => walletApi.submitTx(tx)
     };
@@ -191,7 +192,9 @@ export class Cip30Wallet {
       cip95: {
         getPubDRepKey: () => walletApi.getPubDRepKey(),
         getRegisteredPubStakeKeys: () => walletApi.getRegisteredPubStakeKeys(),
-        getUnregisteredPubStakeKeys: () => walletApi.getUnregisteredPubStakeKeys()
+        getUnregisteredPubStakeKeys: () => walletApi.getUnregisteredPubStakeKeys(),
+        signData: (addr: Cardano.PaymentAddress | Cardano.RewardAccount | Bytes, payload: Bytes) =>
+          walletApi.signData(addr, payload)
       }
     };
 

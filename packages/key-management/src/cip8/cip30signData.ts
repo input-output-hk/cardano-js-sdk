@@ -22,7 +22,7 @@ import { DREP_KEY_DERIVATION_PATH, STAKE_KEY_DERIVATION_PATH } from '../util';
 
 export interface Cip30SignDataRequest {
   knownAddresses: GroupedAddress[];
-  signWith: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID;
+  signWith: Cardano.PaymentAddress | Cardano.RewardAccount;
   payload: HexBlob;
   sender?: MessageSender;
 }
@@ -39,7 +39,7 @@ export class Cip30DataSignError<InnerError = unknown> extends ComposableError<In
   }
 }
 
-export const getAddressBytes = (signWith: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID) => {
+export const getAddressBytes = (signWith: Cardano.PaymentAddress | Cardano.RewardAccount) => {
   const address = Cardano.Address.fromString(signWith);
 
   if (!address) {
@@ -49,14 +49,15 @@ export const getAddressBytes = (signWith: Cardano.PaymentAddress | Cardano.Rewar
   return Buffer.from(address.toBytes(), 'hex');
 };
 
-const getDerivationPath = async (
-  signWith: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID,
-  knownAddresses: GroupedAddress[]
-) => {
-  if (Cardano.DRepID.isValid(signWith)) {
-    return DREP_KEY_DERIVATION_PATH;
-  }
+const isPaymentAddress = (
+  signWith: Cardano.PaymentAddress | Cardano.RewardAccount
+): signWith is Cardano.PaymentAddress => signWith.startsWith('addr');
 
+const getDerivationPath = async (
+  signWith: Cardano.PaymentAddress | Cardano.RewardAccount,
+  knownAddresses: GroupedAddress[],
+  dRepKeyHash: Crypto.Ed25519KeyHashHex
+) => {
   const isRewardAccount = signWith.startsWith('stake');
 
   if (isRewardAccount) {
@@ -66,6 +67,16 @@ const getDerivationPath = async (
       throw new Cip30DataSignError(Cip30DataSignErrorCode.ProofGeneration, 'Unknown reward address');
 
     return knownRewardAddress.stakeKeyDerivationPath || STAKE_KEY_DERIVATION_PATH;
+  }
+
+  if (isPaymentAddress(signWith)) {
+    const drepAddr = Cardano.Address.fromString(signWith);
+    if (
+      drepAddr?.getType() === Cardano.AddressType.EnterpriseKey &&
+      drepAddr?.getProps().paymentPart?.hash === Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash)
+    ) {
+      return DREP_KEY_DERIVATION_PATH;
+    }
   }
 
   const knownAddress = knownAddresses.find(({ address }) => address === signWith);
@@ -117,11 +128,12 @@ export const cip30signData = async (
   keyAgent: KeyAgent,
   { knownAddresses, signWith, payload }: Cip8SignDataContext
 ): Promise<Cip30DataSignature> => {
-  if (Cardano.DRepID.isValid(signWith) && !Cardano.DRepID.canSign(signWith)) {
-    throw new Cip30DataSignError(Cip30DataSignErrorCode.AddressNotPK, 'Invalid address');
-  }
+  const dRepKeyHash = (
+    await Crypto.Ed25519PublicKey.fromHex(await keyAgent.derivePublicKey(DREP_KEY_DERIVATION_PATH)).hash()
+  ).hex();
+
   const addressBytes = getAddressBytes(signWith);
-  const derivationPath = await getDerivationPath(signWith, knownAddresses);
+  const derivationPath = await getDerivationPath(signWith, knownAddresses, dRepKeyHash);
 
   const builder = COSESign1Builder.new(
     Headers.new(ProtectedHeaderMap.new(createSigStructureHeaders(addressBytes)), HeaderMap.new()),

@@ -3626,6 +3626,7 @@ __metadata:
     "@dcspark/cardano-multiplatform-lib-browser": ^3.1.1
     "@dcspark/cardano-multiplatform-lib-nodejs": ^3.1.1
     "@emurgo/cardano-message-signing-asmjs": ^1.0.1
+    "@emurgo/cardano-message-signing-nodejs": ^1.0.1
     "@shiroyasha9/axios-fetch-adapter": 1.0.3
     "@types/bunyan": ^1.8.8
     "@types/chalk": ^2.2.0
