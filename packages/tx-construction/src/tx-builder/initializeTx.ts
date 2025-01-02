@@ -1,27 +1,19 @@
-import { StaticChangeAddressResolver, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
-
 import { Bip32Account, SignTransactionContext, util } from '@cardano-sdk/key-management';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
 import { GreedyTxEvaluator } from './GreedyTxEvaluator';
 import { InitializeTxProps, InitializeTxResult, RewardAccountWithPoolId } from '../types';
 import { RedeemersByType, defaultSelectionConstraints } from '../input-selection';
+import { StaticChangeAddressResolver, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { TxBuilderDependencies } from './types';
 import { createPreInputSelectionTxBody, includeChangeAndInputs } from '../createTransactionInternals';
 import { ensureValidityInterval } from '../ensureValidityInterval';
+import { hasCorrectVoteDelegation } from './hasCorrectVoteDelegation';
 
 const dRepPublicKeyHash = async (addressManager?: Bip32Account): Promise<Ed25519KeyHashHex | undefined> =>
   addressManager && (await (await addressManager.derivePublicKey(util.DREP_KEY_DERIVATION_PATH)).hash()).hex();
 
 const DREP_REG_REQUIRED_PROTOCOL_VERSION = 10;
-
-const isActive = (drepDelegatee?: Cardano.DRepDelegatee): boolean => {
-  const drep = drepDelegatee?.delegateRepresentative;
-  if (!drep || (Cardano.isDrepInfo(drep) && drep.active === false)) {
-    return false;
-  }
-  return true;
-};
 
 /**
  * Filters and transforms reward accounts based on current protocol version and reward balance.
@@ -45,7 +37,7 @@ const getWithdrawals = (
   accounts
     .filter(
       (account) =>
-        (version.major >= DREP_REG_REQUIRED_PROTOCOL_VERSION ? isActive(account.dRepDelegatee) : true) &&
+        (version.major >= DREP_REG_REQUIRED_PROTOCOL_VERSION ? hasCorrectVoteDelegation(account) : true) &&
         !!account.rewardBalance
     )
     .map(({ rewardBalance: quantity, address: stakeAddress }) => ({

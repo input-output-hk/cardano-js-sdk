@@ -41,6 +41,7 @@ import {
 import { SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { contextLogger, deepEquals } from '@cardano-sdk/util';
 import { createOutputValidator } from '../output-validation';
+import { ensureNoDeRegistrationsWithRewardsLocked } from './ensureNoDeRegistrationsWithRewardsLocked';
 import { initializeTx } from './initializeTx';
 import { lastValueFrom } from 'rxjs';
 import { poll } from '@cardano-sdk/util-rxjs';
@@ -638,6 +639,8 @@ export class GenericTxBuilder implements TxBuilder {
       certificates.push(Cardano.createDelegationCert(rewardAccount.address, newPoolId));
       rewardAccountsWithWeights.set(rewardAccount.address, weight);
     }
+
+    ensureNoDeRegistrationsWithRewardsLocked(availableRewardAccounts);
 
     // Deregister stake keys no longer needed
     this.#logger.debug(`De-registering ${availableRewardAccounts.length} stake keys`);

@@ -1,8 +1,9 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, Bip32Account, GroupedAddress, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
-import { Cardano, setInConwayEra } from '@cardano-sdk/core';
+import { Cardano, DRepInfo, setInConwayEra } from '@cardano-sdk/core';
 import {
+  DeRegistrationsWithRewardsLocked,
   GenericTxBuilder,
   OutOfSyncRewardAccounts,
   OutputValidation,
@@ -40,12 +41,14 @@ const inputResolver: Cardano.InputResolver = {
 
 /** Utility factory for tests to create a GenericTxBuilder with mocked dependencies */
 const createTxBuilder = async ({
+  adjustRewardAccount = (r) => r,
   stakeDelegations,
   numAddresses = stakeDelegations.length,
   useMultiplePaymentKeys = false,
   rewardAccounts,
   keyAgent
 }: {
+  adjustRewardAccount?: (rewardAccountWithPoolId: RewardAccountWithPoolId, index: number) => RewardAccountWithPoolId;
   stakeDelegations: {
     credentialStatus: Cardano.StakeCredentialStatus;
     poolId?: Cardano.PoolId;
@@ -88,13 +91,21 @@ const createTxBuilder = async ({
             // This would normally be done by the wallet.delegation.rewardAccounts
             .map<RewardAccountWithPoolId>(({ rewardAccount: address }, index) => {
               const { credentialStatus, poolId, deposit } = stakeDelegations[index] ?? {};
-              return {
-                address,
-                credentialStatus: credentialStatus ?? Cardano.StakeCredentialStatus.Unregistered,
-                rewardBalance: mocks.rewardAccountBalance,
-                ...(poolId ? { delegatee: { nextNextEpoch: { id: poolId } } } : undefined),
-                ...(deposit && { deposit })
-              };
+              return adjustRewardAccount(
+                {
+                  address,
+                  credentialStatus: credentialStatus ?? Cardano.StakeCredentialStatus.Unregistered,
+                  dRepDelegatee: {
+                    delegateRepresentative: {
+                      __typename: 'AlwaysAbstain'
+                    }
+                  },
+                  rewardBalance: mocks.rewardAccountBalance,
+                  ...(poolId ? { delegatee: { nextNextEpoch: { id: poolId } } } : undefined),
+                  ...(deposit && { deposit })
+                },
+                index
+              );
             })
         )
       ),
@@ -851,6 +862,133 @@ describe('TxBuilder/delegatePortfolio', () => {
 
       expect(GreedyInputSelector).not.toHaveBeenCalled();
       expect(roundRobinRandomImprove).toHaveBeenCalled();
+    });
+  });
+
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+  describe('DRep delegation', () => {
+    const dRepInfo: DRepInfo = {
+      active: true,
+      amount: 9586n,
+      hasScript: false,
+      id: Cardano.DRepID('drep15cfxz9exyn5rx0807zvxfrvslrjqfchrd4d47kv9e0f46uedqtc')
+    };
+
+    const dRepDelegateeOptions = {
+      abstain: { __typename: 'AlwaysAbstain' },
+      activeDrep: dRepInfo,
+      inactiveDrep: { ...dRepInfo, active: false },
+      noConfidence: { __typename: 'AlwaysNoConfidence' },
+      none: undefined
+    } as const;
+
+    const createTxBuilderWithRewardBalance =
+      (rewardBalance: bigint) =>
+      (...delegateRepresentatives: (Cardano.DRepDelegatee['delegateRepresentative'] | undefined)[]) =>
+        createTxBuilder({
+          adjustRewardAccount: (rewardAccountWithPoolId, index) => {
+            const delegateRepresentative = delegateRepresentatives[index];
+            return {
+              ...rewardAccountWithPoolId,
+              dRepDelegatee: delegateRepresentative ? { delegateRepresentative } : undefined,
+              rewardBalance: rewardBalance ?? rewardAccountWithPoolId.rewardBalance
+            };
+          },
+          keyAgent,
+          numAddresses: delegateRepresentatives.length,
+          stakeDelegations: []
+        });
+
+    describe('when reward accounts have no balance', () => {
+      it('can deregister all reward accounts no matter the drep delegation', async () => {
+        const drepValues = Object.values(dRepDelegateeOptions);
+        const createTxBuilderWithDreps = createTxBuilderWithRewardBalance(0n);
+        const txBuilderFactory = await createTxBuilderWithDreps(...drepValues);
+
+        await expect(txBuilderFactory.txBuilder.delegatePortfolio(null).build().inspect()).resolves.not.toThrow();
+      });
+    });
+
+    describe('when deregistered reward account has balance', () => {
+      const createTxBuilderWithDreps = createTxBuilderWithRewardBalance(7365n);
+
+      it('deregisters the key when it delegates to abstain', async () => {
+        const txBuilderFactory = await createTxBuilderWithDreps(dRepDelegateeOptions.abstain);
+        await expect(txBuilderFactory.txBuilder.delegatePortfolio(null).build().inspect()).resolves.not.toThrow();
+      });
+
+      it('deregisters the key when it delegates to no confidence', async () => {
+        const txBuilderFactory = await createTxBuilderWithDreps(dRepDelegateeOptions.noConfidence);
+        await expect(txBuilderFactory.txBuilder.delegatePortfolio(null).build().inspect()).resolves.not.toThrow();
+      });
+
+      it('deregisters the key when it delegates to active drep', async () => {
+        const txBuilderFactory = await createTxBuilderWithDreps(dRepDelegateeOptions.activeDrep);
+        await expect(txBuilderFactory.txBuilder.delegatePortfolio(null).build().inspect()).resolves.not.toThrow();
+      });
+
+      it('throws and DeRegistrationsWithRewardsLocked when it delegates to inactive drep', async () => {
+        const txBuilderFactory = await createTxBuilderWithDreps(dRepDelegateeOptions.inactiveDrep);
+        const [{ address: lockedRewardAccount }] = await txBuilderFactory.txBuilderProviders.rewardAccounts();
+
+        try {
+          await txBuilderFactory.txBuilder.delegatePortfolio(null).build().inspect();
+          throw new Error('TxBuilder supposed to throw an DeRegistrationsWithRewardsLocked error');
+        } catch (error) {
+          expect(error).toBeInstanceOf(DeRegistrationsWithRewardsLocked);
+          expect((error as DeRegistrationsWithRewardsLocked).keysWithLockedRewards[0]).toEqual({
+            cbor: Cardano.Address.fromString(lockedRewardAccount)?.toBytes(),
+            key: lockedRewardAccount
+          });
+        }
+      });
+
+      it('throws an DeRegistrationsWithRewardsLocked when it has no drep delegation', async () => {
+        const txBuilderFactory = await createTxBuilderWithDreps(dRepDelegateeOptions.none);
+        const [{ address: lockedRewardAccount }] = await txBuilderFactory.txBuilderProviders.rewardAccounts();
+
+        try {
+          await txBuilderFactory.txBuilder.delegatePortfolio(null).build().inspect();
+          throw new Error('TxBuilder supposed to throw an DeRegistrationsWithRewardsLocked error');
+        } catch (error) {
+          expect(error).toBeInstanceOf(DeRegistrationsWithRewardsLocked);
+          expect((error as DeRegistrationsWithRewardsLocked).keysWithLockedRewards[0]).toEqual({
+            cbor: Cardano.Address.fromString(lockedRewardAccount)?.toBytes(),
+            key: lockedRewardAccount
+          });
+        }
+      });
+    });
+
+    it('attaches data of all locked reward accounts to the DeRegistrationsWithRewardsLocked error', async () => {
+      const createTxBuilderWithDreps = createTxBuilderWithRewardBalance(7365n);
+      const txBuilderFactory = await createTxBuilderWithDreps(
+        dRepDelegateeOptions.none,
+        dRepDelegateeOptions.activeDrep,
+        dRepDelegateeOptions.inactiveDrep
+      );
+      const allrewardAccountsData = await txBuilderFactory.txBuilderProviders.rewardAccounts();
+      const lockedRewardAccountsData = allrewardAccountsData
+        // TXBuilder reverses them so doing the same here so it is more convenient here to test
+        .reverse()
+        // At the index 1 there is an activeDrep allowing to withdraw during de-registering
+        .filter((_, index) => index !== 1)
+        .map((r) => ({
+          cbor: Cardano.Address.fromString(r.address)?.toBytes(),
+          key: r.address
+        }));
+
+      try {
+        await txBuilderFactory.txBuilder.delegatePortfolio(null).build().inspect();
+        throw new Error('TxBuilder supposed to throw an DeRegistrationsWithRewardsLocked error');
+      } catch (error) {
+        expect(error).toBeInstanceOf(DeRegistrationsWithRewardsLocked);
+        for (const [index, keyWithLockedRewards] of (
+          error as DeRegistrationsWithRewardsLocked
+        ).keysWithLockedRewards.entries()) {
+          expect(keyWithLockedRewards).toEqual(lockedRewardAccountsData[index]);
+        }
+      }
     });
   });
 });
