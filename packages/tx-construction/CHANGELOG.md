@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.24.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.24.0...@cardano-sdk/tx-construction@0.24.1) (2025-01-02)
+
+### Features
+
+* **tx-construction:** throw when deregistering reward accounts with rewards without drep ([c594937](https://github.com/input-output-hk/cardano-js-sdk/commit/c59493727cd05d0343e6429d00604440b1a3b493))
+
 ## [0.24.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.23.0...@cardano-sdk/tx-construction@0.24.0) (2024-12-20)
 
 ### ⚠ BREAKING CHANGES
