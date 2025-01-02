@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.42.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.42.2...@cardano-sdk/core@0.42.3) (2025-01-02)
+
+### Features
+
+* **core:** add util to convert drepId to enterprise address ([e39842b](https://github.com/input-output-hk/cardano-js-sdk/commit/e39842b8c0cdc2848870ebdd0b01c5a5b0eca2c2))
+
 ## [0.42.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.42.1...@cardano-sdk/core@0.42.2) (2024-12-20)
 
 ### Bug Fixes

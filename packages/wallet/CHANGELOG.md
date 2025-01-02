@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.48.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.47.1...@cardano-sdk/wallet@0.48.0) (2025-01-02)
+
+### ⚠ BREAKING CHANGES
+
+* SignData type no longer accepts bech32 DRepID
+
+### Features
+
+* implement sign with drep key ([44c3716](https://github.com/input-output-hk/cardano-js-sdk/commit/44c37163e834efa76876a99c4ed0ca4c7c67dfbf))
+
 ## [0.47.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.47.0...@cardano-sdk/wallet@0.47.1) (2025-01-02)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
