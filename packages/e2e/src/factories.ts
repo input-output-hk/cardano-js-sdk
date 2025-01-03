@@ -179,7 +179,10 @@ chainHistoryProviderFactory.register(BLOCKFROST_PROVIDER, async (params: any, lo
   return new Promise(async (resolve) => {
     resolve(
       new BlockfrostChainHistoryProvider(
-        new BlockfrostClient({ baseUrl: params.baseUrl }, { rateLimiter: { schedule: (task) => task() } }),
+        new BlockfrostClient(
+          { apiVersion: params.apiVersion, baseUrl: params.baseUrl, projectId: params.projectId },
+          { rateLimiter: { schedule: (task) => task() } }
+        ),
         await networkInfoProviderFactory.create('blockfrost', params, logger),
         logger
       )
@@ -225,7 +228,10 @@ networkInfoProviderFactory.register(BLOCKFROST_PROVIDER, async (params: any, log
   return new Promise(async (resolve) => {
     resolve(
       new BlockfrostNetworkInfoProvider(
-        new BlockfrostClient({ baseUrl: params.baseUrl }, { rateLimiter: { schedule: (task) => task() } }),
+        new BlockfrostClient(
+          { apiVersion: params.apiVersion, baseUrl: params.baseUrl, projectId: params.projectId },
+          { rateLimiter: { schedule: (task) => task() } }
+        ),
         logger
       )
     );
@@ -246,7 +252,10 @@ rewardsProviderFactory.register(BLOCKFROST_PROVIDER, async (params: any, logger)
   return new Promise(async (resolve) => {
     resolve(
       new BlockfrostRewardsProvider(
-        new BlockfrostClient({ baseUrl: params.baseUrl }, { rateLimiter: { schedule: (task) => task() } }),
+        new BlockfrostClient(
+          { apiVersion: params.apiVersion, baseUrl: params.baseUrl, projectId: params.projectId },
+          { rateLimiter: { schedule: (task) => task() } }
+        ),
         logger
       )
     );
@@ -293,7 +302,10 @@ txSubmitProviderFactory.register(BLOCKFROST_PROVIDER, async (params: any, logger
   return new Promise(async (resolve) => {
     resolve(
       new BlockfrostTxSubmitProvider(
-        new BlockfrostClient({ baseUrl: params.baseUrl }, { rateLimiter: { schedule: (task) => task() } }),
+        new BlockfrostClient(
+          { apiVersion: params.apiVersion, baseUrl: params.baseUrl, projectId: params.projectId },
+          { rateLimiter: { schedule: (task) => task() } }
+        ),
         logger
       )
     );
@@ -319,7 +331,10 @@ utxoProviderFactory.register(BLOCKFROST_PROVIDER, async (params: any, logger) =>
   return new Promise(async (resolve) => {
     resolve(
       new BlockfrostUtxoProvider(
-        new BlockfrostClient({ baseUrl: params.baseUrl }, { rateLimiter: { schedule: (task) => task() } }),
+        new BlockfrostClient(
+          { apiVersion: params.apiVersion, baseUrl: params.baseUrl, projectId: params.projectId },
+          { rateLimiter: { schedule: (task) => task() } }
+        ),
         logger
       )
     );
