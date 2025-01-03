@@ -26,6 +26,14 @@ export type BlockfrostClientDependencies = {
   rateLimiter: RateLimiter;
 };
 
+const tryReadResponseText = async (response: Response): Promise<string | undefined> => {
+  try {
+    return response.text();
+  } catch {
+    return undefined;
+  }
+};
+
 export class BlockfrostError extends CustomError {
   constructor(public status?: number, public body?: string, public innerError?: unknown) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -71,12 +79,7 @@ export class BlockfrostClient {
                 throw new BlockfrostError(response.status, 'Failed to parse json');
               }
             }
-            try {
-              const responseBody = await response.text();
-              throw new BlockfrostError(response.status, responseBody);
-            } catch {
-              throw new BlockfrostError(response.status);
-            }
+            throw new BlockfrostError(response.status, await tryReadResponseText(response));
           }),
           catchError((err) => {
             if (err instanceof BlockfrostError) {
