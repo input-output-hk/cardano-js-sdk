@@ -38,6 +38,7 @@
   },
   "devDependencies": {
     "@cardano-sdk/util-dev": "workspace:~",
+    "@types/fast-chunk-string": "^1.0.3",
     "@types/lodash": "^4.14.182",
     "@types/uuid": "^8.3.4",
     "@types/webextension-polyfill": "^0.8.0",
@@ -63,6 +64,7 @@
     "@cardano-sdk/util-rxjs": "workspace:~",
     "@cardano-sdk/wallet": "workspace:~",
     "backoff-rxjs": "^7.0.0",
+    "fast-chunk-string": "^1.0.1",
     "lodash": "^4.17.21",
     "rxjs": "^7.4.0",
     "ts-custom-error": "^3.2.0",

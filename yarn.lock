@@ -4118,11 +4118,13 @@ __metadata:
     "@cardano-sdk/util-dev": "workspace:~"
     "@cardano-sdk/util-rxjs": "workspace:~"
     "@cardano-sdk/wallet": "workspace:~"
+    "@types/fast-chunk-string": ^1.0.3
     "@types/lodash": ^4.14.182
     "@types/uuid": ^8.3.4
     "@types/webextension-polyfill": ^0.8.0
     backoff-rxjs: ^7.0.0
     eslint: ^7.32.0
+    fast-chunk-string: ^1.0.1
     jest: ^28.1.3
     lodash: ^4.17.21
     madge: ^5.0.1
@@ -7311,6 +7313,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/fast-chunk-string@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@types/fast-chunk-string@npm:1.0.3"
+  checksum: 11afd08b3f8a5ad80f8ee1ce08ed834f54347d12ba7b127a6e0426839a2fe0d1eb49d7355485cb93e1f39937cfe884f409bc3772c889865876710c7a16dff061
+  languageName: node
+  linkType: hard
+
 "@types/fs-extra@npm:^9.0.1, @types/fs-extra@npm:^9.0.12, @types/fs-extra@npm:^9.0.4":
   version: 9.0.13
   resolution: "@types/fs-extra@npm:9.0.13"
@@ -9061,6 +9070,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ansi-regex@npm:^3.0.0":
+  version: 3.0.1
+  resolution: "ansi-regex@npm:3.0.1"
+  checksum: 09daf180c5f59af9850c7ac1bd7fda85ba596cc8cbeb210826e90755f06c818af86d9fa1e6e8322fab2c3b9e9b03f56c537b42241139f824dd75066a1e7257cc
+  languageName: node
+  linkType: hard
+
 "ansi-regex@npm:^4.1.0":
   version: 4.1.1
   resolution: "ansi-regex@npm:4.1.1"
@@ -9544,6 +9560,13 @@ __metadata:
   dependencies:
     tslib: ^2.0.1
   checksum: 5a51f7b70588ecced3601845a0e203279ca2f5fdc184416a0a1640c93ec0a267241d6090a328e78eebb8de81f8754754e0a4f1558ba2a3d638f8ccbd0b1f0eff
+  languageName: node
+  linkType: hard
+
+"astral-regex@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "astral-regex@npm:1.0.0"
+  checksum: 93417fc0879531cd95ace2560a54df865c9461a3ac0714c60cbbaa5f1f85d2bee85489e78d82f70b911b71ac25c5f05fc5a36017f44c9bb33c701bee229ff848
   languageName: node
   linkType: hard
 
@@ -14394,6 +14417,16 @@ __metadata:
   dependencies:
     pure-rand: ^5.0.1
   checksum: 77def3e214155618301c0f5a5e3b56da133b5d45896c631efece9de0428aa737cd6a660d085a52d8fff29a627d1d6065be1ec70d93385167fc25f10b3bb3c160
+  languageName: node
+  linkType: hard
+
+"fast-chunk-string@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "fast-chunk-string@npm:1.0.1"
+  dependencies:
+    runes: ^0.4.3
+    string-length: ^2.0.0
+  checksum: f08d18b4c002ddc85a47186de180dfa8730941cc37c52b639dcbae78ddbe7a68a24b7270fc04104ff7d0357779c3a40069b9152c115e15705d054d945fdca0d0
   languageName: node
   linkType: hard
 
@@ -23577,6 +23610,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"runes@npm:^0.4.3":
+  version: 0.4.3
+  resolution: "runes@npm:0.4.3"
+  checksum: 8bb7a16eb75799fe8a3a9cb06fa622f3ee3e3d1116897ac48e8238fc40aeba74d77232d6a7b1afedc9fa96fd6075b4dbbed6c85d4e66df9b727c5056225fc177
+  languageName: node
+  linkType: hard
+
 "rxjs@npm:^6.4.0":
   version: 6.6.7
   resolution: "rxjs@npm:6.6.7"
@@ -24501,6 +24541,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"string-length@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "string-length@npm:2.0.0"
+  dependencies:
+    astral-regex: ^1.0.0
+    strip-ansi: ^4.0.0
+  checksum: 3a339b63fd39d6a1077dfbbe3279545e1b67fa4b0a558906158cf0121632b280f34c8768ec7270fb25db732d6323eceb9c7254f6026509694b6a7533ca8cb89e
+  languageName: node
+  linkType: hard
+
 "string-length@npm:^4.0.1":
   version: 4.0.2
   resolution: "string-length@npm:4.0.2"
@@ -24628,6 +24678,15 @@ __metadata:
   dependencies:
     ansi-regex: ^2.0.0
   checksum: 9b974de611ce5075c70629c00fa98c46144043db92ae17748fb780f706f7a789e9989fd10597b7c2053ae8d1513fd707816a91f1879b2f71e6ac0b6a863db465
+  languageName: node
+  linkType: hard
+
+"strip-ansi@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "strip-ansi@npm:4.0.0"
+  dependencies:
+    ansi-regex: ^3.0.0
+  checksum: d9186e6c0cf78f25274f6750ee5e4a5725fb91b70fdd79aa5fe648eab092a0ec5b9621b22d69d4534a56319f75d8944efbd84e3afa8d4ad1b9a9491f12c84eca
   languageName: node
   linkType: hard
 
