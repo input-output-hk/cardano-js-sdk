@@ -47,11 +47,6 @@ const innerErrorHasData = (innerError: unknown): innerError is { data: unknown }
 export const toSerializableObject = (obj: unknown, options: ToSerializableObjectOptions = {}): unknown => {
   if (PLAIN_TYPES.has(typeof obj)) return obj;
   const { transformationTypeKey = defaultTransformationTypeKey, serializeKey = defaultTransformKey } = options;
-  if (typeof obj === 'undefined') {
-    return {
-      [transformationTypeKey]: 'undefined'
-    };
-  }
   if (typeof obj === 'object') {
     if (obj === null) return null;
     if (Array.isArray(obj)) {
