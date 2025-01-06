@@ -15,7 +15,6 @@ import {
   of,
   share,
   switchMap,
-  take,
   tap
 } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
@@ -198,18 +197,6 @@ export const createAssetsTracker = (
     const allAssetIds = new Set<Cardano.AssetId>();
     const sharedHistory$ = history$.pipe(share());
     return concat(
-      sharedHistory$.pipe(
-        map((historyTxs) => uniq(historyTxs.flatMap(uniqueAssetIds))),
-        tap((assetIds) =>
-          logger.debug(
-            assetIds.length > 0
-              ? `Historical total assets: ${assetIds.length}`
-              : 'Setting assetProvider stats as initialized'
-          )
-        ),
-        tap((assetIds) => assetIds.length === 0 && assetProvider.setStatInitialized(assetProvider.stats.getAsset$)),
-        take(1)
-      ),
       newTransactions$(sharedHistory$).pipe(
         bufferTick(),
         map(flatUniqueAssetIds),

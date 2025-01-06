@@ -128,6 +128,11 @@ const allTransactionsByAddresses = async (
         })
       ).pageResults;
 
+      const emptyWitness: Cardano.Witness = { signatures: new Map() };
+      for (const tx of pageResults) {
+        tx.witness = emptyWitness;
+      }
+
       startAt += PAGE_SIZE;
       response = [...response, ...pageResults];
     } while (pageResults.length === PAGE_SIZE);
