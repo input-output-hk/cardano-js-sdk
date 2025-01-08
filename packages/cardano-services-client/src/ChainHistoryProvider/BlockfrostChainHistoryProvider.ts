@@ -490,14 +490,23 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
     try {
       const lowerBound = blockRange?.lowerBound ?? 0;
       const upperBound = blockRange?.upperBound ?? DB_MAX_SAFE_INTEGER;
+      const limit = pagination?.limit ?? DB_MAX_SAFE_INTEGER;
 
       const addressTransactions = await Promise.all(
         addresses.map(async (address) =>
           fetchSequentially<{ tx_hash: string; tx_index: number; block_height: number }, BlockfrostTransactionContent>({
             haveEnoughItems: blockRange?.lowerBound
               ? (transactions) =>
-                  transactions.length > 0 &&
-                  transactions[transactions.length - 1].block_height < blockRange!.lowerBound!
+                  (transactions.length > 0 &&
+                    transactions[transactions.length - 1].block_height < blockRange!.lowerBound!) ||
+                  transactions.length >= limit
+              : (transactions) => transactions.length >= limit,
+            paginationOptions: pagination
+              ? {
+                  count: pagination.limit,
+                  order: pagination.order,
+                  page: (pagination.startAt + pagination.limit) / pagination.limit
+                }
               : undefined,
             request: (paginationQueryString) => {
               let queryString = `addresses/${address}/transactions?${paginationQueryString}`;

@@ -68,6 +68,10 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
       );
     }
 
+    if (pagination?.order === 'desc') {
+      throw new ProviderError(ProviderFailure.NotImplemented, undefined, '"desc" order is not supported');
+    }
+
     const lowerBound = blockRange?.lowerBound ?? 0;
     const upperBound = blockRange?.upperBound ?? DB_MAX_SAFE_INTEGER;
 
