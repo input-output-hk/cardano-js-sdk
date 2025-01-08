@@ -48,6 +48,7 @@ export interface TransactionsTrackerProps {
   transactionsHistoryStore: OrderedCollectionStore<Cardano.HydratedTx>;
   inFlightTransactionsStore: DocumentStore<TxInFlight[]>;
   signedTransactionsStore: DocumentStore<WitnessedTx[]>;
+  historicalTransactionsFetchLimit: number;
   newTransactions: {
     submitting$: Observable<OutgoingTx>;
     pending$: Observable<OutgoingTx>;
@@ -69,6 +70,7 @@ export interface TransactionsTrackerInternalsProps {
   retryBackoffConfig: RetryBackoffConfig;
   tipBlockHeight$: Observable<Cardano.BlockNo>;
   store: OrderedCollectionStore<Cardano.HydratedTx>;
+  historicalTransactionsFetchLimit: number;
   logger: Logger;
 }
 
@@ -81,7 +83,8 @@ export const PAGE_SIZE = 25;
  * @param lhs The left-hand side of the comparison operation.
  * @param rhs The left-hand side of the comparison operation.
  */
-const sortTxBySlot = (lhs: Cardano.HydratedTx, rhs: Cardano.HydratedTx) => lhs.blockHeader.slot - rhs.blockHeader.slot;
+const compareTxOrder = (lhs: Cardano.HydratedTx, rhs: Cardano.HydratedTx) =>
+  lhs.blockHeader.slot - rhs.blockHeader.slot || lhs.index - rhs.index;
 
 /**
  * Deduplicates the given array of HydratedTx.
@@ -110,30 +113,44 @@ const deduplicateSortedArray = (
 
 const allTransactionsByAddresses = async (
   chainHistoryProvider: ChainHistoryProvider,
-  { addresses, blockRange }: { addresses: Cardano.PaymentAddress[]; blockRange: Range<Cardano.BlockNo> }
+  {
+    addresses,
+    filterBy
+  }: {
+    addresses: Cardano.PaymentAddress[];
+    filterBy: { type: 'blockRange'; blockRange: Range<Cardano.BlockNo> } | { type: 'tip'; limit: number };
+  }
 ): Promise<Cardano.HydratedTx[]> => {
   const addressesSubGroups = chunk(addresses, PAGE_SIZE);
   let response: Cardano.HydratedTx[] = [];
 
   for (const addressGroup of addressesSubGroups) {
-    let startAt = 0;
-    let pageResults: Cardano.HydratedTx[] = [];
+    if (filterBy.type === 'blockRange') {
+      let startAt = 0;
+      let pageResults: Cardano.HydratedTx[] = [];
 
-    do {
-      pageResults = (
-        await chainHistoryProvider.transactionsByAddresses({
-          addresses: addressGroup,
-          blockRange,
-          pagination: { limit: PAGE_SIZE, startAt }
-        })
-      ).pageResults;
+      do {
+        pageResults = (
+          await chainHistoryProvider.transactionsByAddresses({
+            addresses: addressGroup,
+            blockRange: filterBy.blockRange,
+            pagination: { limit: PAGE_SIZE, startAt }
+          })
+        ).pageResults;
 
-      startAt += PAGE_SIZE;
-      response = [...response, ...pageResults];
-    } while (pageResults.length === PAGE_SIZE);
+        startAt += PAGE_SIZE;
+        response = [...response, ...pageResults];
+      } while (pageResults.length === PAGE_SIZE);
+    } else {
+      const txes = await chainHistoryProvider.transactionsByAddresses({
+        addresses: addressGroup,
+        pagination: { limit: filterBy.limit, order: 'desc', startAt: 0 }
+      });
+      response = [...response, ...txes.pageResults.reverse()];
+    }
   }
 
-  return deduplicateSortedArray(response.sort(sortTxBySlot), txEquals);
+  return deduplicateSortedArray(response.sort(compareTxOrder), txEquals);
 };
 
 const getLastTransactionsAtBlock = (
@@ -186,6 +203,7 @@ export const revertLastBlock = (
 
 const findIntersectionAndUpdateTxStore = ({
   chainHistoryProvider,
+  historicalTransactionsFetchLimit,
   logger,
   store,
   retryBackoffConfig,
@@ -195,7 +213,12 @@ const findIntersectionAndUpdateTxStore = ({
   addresses
 }: Pick<
   TransactionsTrackerInternalsProps,
-  'chainHistoryProvider' | 'logger' | 'store' | 'retryBackoffConfig' | 'tipBlockHeight$'
+  | 'chainHistoryProvider'
+  | 'logger'
+  | 'store'
+  | 'retryBackoffConfig'
+  | 'tipBlockHeight$'
+  | 'historicalTransactionsFetchLimit'
 > & {
   localTransactions: Cardano.HydratedTx[];
   rollback$: Subject<Cardano.HydratedTx>;
@@ -209,7 +232,7 @@ const findIntersectionAndUpdateTxStore = ({
     equals: transactionsEquals,
     logger,
     retryBackoffConfig,
-    // eslint-disable-next-line sonarjs/cognitive-complexity,complexity
+    // eslint-disable-next-line sonarjs/cognitive-complexity,complexity, max-statements
     sample: async () => {
       let rollbackOcurred = false;
       // eslint-disable-next-line no-constant-condition
@@ -224,7 +247,9 @@ const findIntersectionAndUpdateTxStore = ({
         const lowerBound = lastStoredTransaction?.blockHeader.blockNo;
         const newTransactions = await allTransactionsByAddresses(chainHistoryProvider, {
           addresses,
-          blockRange: { lowerBound }
+          filterBy: lowerBound
+            ? { blockRange: { lowerBound }, type: 'blockRange' }
+            : { limit: historicalTransactionsFetchLimit, type: 'tip' }
         });
 
         logger.debug(
@@ -270,9 +295,19 @@ const findIntersectionAndUpdateTxStore = ({
         // No rollbacks, if they overlap 100% do nothing, otherwise add the difference.
         const areTransactionsSame =
           newTransactions.length === localTxsFromSameBlock.length &&
-          localTxsFromSameBlock.every((tx, index) => tx.id === newTransactions[index].id);
+          localTxsFromSameBlock.every(
+            (tx, index) =>
+              tx.id === newTransactions[index].id && tx.blockHeader.slot === newTransactions[index].blockHeader.slot
+          );
 
         if (!areTransactionsSame) {
+          // deduplication takes local tx first, but it's possible that the only change is the block header
+          for (const localTx of localTxsFromSameBlock) {
+            const newTx = newTransactions.find((tx) => tx.id === localTx.id);
+            if (newTx?.blockHeader && newTx.blockHeader.slot !== localTx.blockHeader.slot) {
+              localTx.blockHeader = newTx.blockHeader;
+            }
+          }
           // Skip overlapping transactions to avoid duplicates
           localTransactions = deduplicateSortedArray(
             [...localTransactions, ...newTransactions.slice(localTxsFromSameBlock.length)],
@@ -308,7 +343,7 @@ export const createAddressTransactionsProvider = (
         switchMap(([addresses, storedTransactions]) =>
           findIntersectionAndUpdateTxStore({
             addresses,
-            localTransactions: deduplicateSortedArray([...storedTransactions].sort(sortTxBySlot), txEquals),
+            localTransactions: deduplicateSortedArray([...storedTransactions].sort(compareTxOrder), txEquals),
             rollback$,
             ...props
           })
@@ -352,6 +387,7 @@ export const createTransactionsTracker = (
     tip$,
     chainHistoryProvider,
     addresses$,
+    historicalTransactionsFetchLimit,
     newTransactions: { submitting$: newSubmitting$, pending$, signed$: newSigned$, failedToSubmit$ },
     retryBackoffConfig,
     transactionsHistoryStore: transactionsStore,
@@ -363,6 +399,7 @@ export const createTransactionsTracker = (
   { transactionsSource$: txSource$, rollback$ }: TransactionsTrackerInternals = createAddressTransactionsProvider({
     addresses$,
     chainHistoryProvider,
+    historicalTransactionsFetchLimit,
     logger: contextLogger(logger, 'AddressTransactionsProvider'),
     retryBackoffConfig,
     store: transactionsStore,

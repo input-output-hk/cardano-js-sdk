@@ -20,8 +20,8 @@ import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
 import { DrepScriptHashVoter } from '@cardano-sdk/core/dist/cjs/Cardano';
 import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
 import { createAsyncKeyAgent, signTx, toSignedTx, waitForWalletStateSettle } from '../util';
-import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
+import { mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { of } from 'rxjs';
 
 const createMockChainHistoryProvider = (txs: Cardano.HydratedTx[] = []): ChainHistoryProvider => {
@@ -544,10 +544,9 @@ describe('WalletUtil', () => {
       networkInfoProvider = mocks.mockNetworkInfoProvider();
       utxoProvider = mocks.mockUtxoProvider();
       const assetProvider = mocks.mockAssetProvider();
-      const stakePoolProvider = createStubStakePoolProvider();
+      const rewardAccountInfoProvider = mocks.mockRewardAccountInfoProvider();
       const rewardsProvider = mocks.mockRewardsProvider();
       const chainHistoryProvider = mocks.mockChainHistoryProvider();
-      const drepProvider = mocks.mockDrepProvider();
       const groupedAddress: GroupedAddress = {
         accountIndex: 0,
         address,
@@ -569,11 +568,10 @@ describe('WalletUtil', () => {
           assetProvider,
           bip32Account,
           chainHistoryProvider,
-          drepProvider,
           logger,
           networkInfoProvider,
+          rewardAccountInfoProvider,
           rewardsProvider,
-          stakePoolProvider,
           txSubmitProvider,
           utxoProvider,
           witnesser: KeyManagementUtil.createBip32Ed25519Witnesser(asyncKeyAgent)

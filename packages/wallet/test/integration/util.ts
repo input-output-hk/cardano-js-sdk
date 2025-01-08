@@ -12,14 +12,14 @@ const {
   mockRewardsProvider,
   mockTxSubmitProvider,
   mockUtxoProvider,
-  mockDrepProvider
+  mockRewardAccountInfoProvider
 } = mockProviders;
 
 const createDefaultProviders = () => ({
   assetProvider: mockAssetProvider(),
   chainHistoryProvider: mockChainHistoryProvider(),
-  drepProvider: mockDrepProvider(),
   networkInfoProvider: mockNetworkInfoProvider(),
+  rewardAccountInfoProvider: mockRewardAccountInfoProvider(),
   rewardsProvider: mockRewardsProvider(),
   stakePoolProvider: createStubStakePoolProvider(),
   txSubmitProvider: mockTxSubmitProvider(),

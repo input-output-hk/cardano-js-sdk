@@ -42,6 +42,7 @@ describe('AddressTracker', () => {
 
   beforeEach(() => {
     store = {
+      delete: jest.fn(() => of(void 0)),
       destroy: jest.fn(),
       destroyed: false,
       get: jest.fn(() => EMPTY),

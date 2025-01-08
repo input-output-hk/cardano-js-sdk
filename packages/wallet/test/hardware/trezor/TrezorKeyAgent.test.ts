@@ -6,7 +6,7 @@ import {
   SerializableTrezorKeyAgentData,
   util
 } from '@cardano-sdk/key-management';
-import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
+import { AssetId, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BaseWallet, createPersonalWallet } from '../../../src';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
@@ -52,8 +52,7 @@ describe('TrezorKeyAgent', () => {
     address = groupedAddress.address;
     const rewardAccount = groupedAddress.rewardAccount;
     const assetProvider = mocks.mockAssetProvider();
-    const drepProvider = mocks.mockDrepProvider();
-    const stakePoolProvider = createStubStakePoolProvider();
+    const rewardAccountInfoProvider = mocks.mockRewardAccountInfoProvider();
     const networkInfoProvider = mocks.mockNetworkInfoProvider();
     const utxoProvider = mocks.mockUtxoProvider({ address });
     const rewardsProvider = mocks.mockRewardsProvider({ rewardAccount });
@@ -65,11 +64,10 @@ describe('TrezorKeyAgent', () => {
         assetProvider,
         bip32Account: await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent),
         chainHistoryProvider,
-        drepProvider,
         logger,
         networkInfoProvider,
+        rewardAccountInfoProvider,
         rewardsProvider,
-        stakePoolProvider,
         txSubmitProvider,
         utxoProvider,
         witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)

@@ -1,9 +1,9 @@
-import { Cardano, ChainHistoryProvider, metadatum } from '@cardano-sdk/core';
-import { RetryBackoffConfig } from 'backoff-rxjs';
-import { TransactionsTracker, createDelegationPortfolioTracker, pollProvider } from '../../../src/services';
-import { certificateTransactionsWithEpochs, createBlockEpochProvider } from '../../../src/services/DelegationTracker';
-import { createStubTxWithCertificates, createStubTxWithSlot } from './stub-tx';
-import { createTestScheduler, logger } from '@cardano-sdk/util-dev';
+import { Cardano, metadatum } from '@cardano-sdk/core';
+import { InMemoryDelegationPortfolioStore } from '../../../src/persistence';
+import { NEVER, concat, of } from 'rxjs';
+import { createDelegationPortfolioTracker } from '../../../src/services';
+import { createStubTxWithSlot } from './stub-tx';
+import { createTestScheduler } from '@cardano-sdk/util-dev';
 
 jest.mock('../../../src/services/util/pollProvider', () => {
   const originalModule = jest.requireActual('../../../src/services/util/pollProvider');
@@ -11,151 +11,13 @@ jest.mock('../../../src/services/util/pollProvider', () => {
 });
 
 describe('DelegationTracker', () => {
-  const pollProviderMock = pollProvider as jest.MockedFunction<typeof pollProvider>;
-
-  test('createBlockEpochProvider', () => {
-    createTestScheduler().run(({ cold, expectObservable, flush }) => {
-      pollProviderMock.mockReturnValue(
-        cold('a-b', {
-          a: [{ epoch: 100 }],
-          b: [{ epoch: 100 }, { epoch: 101 }]
-        })
-      );
-      const chainHistoryProvider = null as unknown as ChainHistoryProvider; // not used in this test
-      const config = null as unknown as RetryBackoffConfig; // not used in this test
-      const hashes = [
-        '0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed',
-        'a0805ae8e52318f0e499be7f85d3f1d5c7dddeacdca0dab9e9d9a8ae6c49a22c'
-      ].map(Cardano.BlockId);
-      expectObservable(createBlockEpochProvider(chainHistoryProvider, config, logger)(hashes)).toBe('a-b', {
-        a: [100],
-        b: [100, 101]
-      });
-      flush();
-      expect(pollProviderMock).toBeCalledTimes(1);
-    });
-  });
-
-  describe('certificateTransactionsWithEpochs', () => {
-    it('emits outgoing transactions containing given certificate types, retries on error', () => {
-      createTestScheduler().run(({ cold, expectObservable }) => {
-        const rewardAccount = Cardano.RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv');
-        const transactions = [
-          createStubTxWithCertificates([
-            {
-              __typename: Cardano.CertificateType.StakeRegistration,
-              stakeCredential: {
-                hash: Cardano.RewardAccount.toHash(rewardAccount),
-                type: Cardano.CredentialType.KeyHash
-              }
-            }
-          ]),
-          createStubTxWithCertificates([
-            {
-              __typename: Cardano.CertificateType.PoolRetirement
-            } as Cardano.Certificate,
-            {
-              __typename: Cardano.CertificateType.StakeDelegation,
-              stakeCredential: {
-                hash: Cardano.RewardAccount.toHash(rewardAccount),
-                type: Cardano.CredentialType.KeyHash
-              }
-            } as Cardano.Certificate
-          ]),
-          createStubTxWithCertificates(),
-          createStubTxWithCertificates([
-            {
-              __typename: Cardano.CertificateType.StakeDeregistration,
-              stakeCredential: {
-                hash: Cardano.RewardAccount.toHash(rewardAccount),
-                type: Cardano.CredentialType.KeyHash
-              }
-            }
-          ])
-        ];
-
-        const slotEpochCalc = jest.fn().mockReturnValueOnce(284).mockReturnValueOnce(285);
-        const slotEpochCalc$ = cold('-a', { a: slotEpochCalc });
-
-        const rewardAccounts$ = cold('a', {
-          a: [rewardAccount]
-        });
-        const target$ = certificateTransactionsWithEpochs(
-          {
-            history$: cold('a--a', {
-              a: transactions
-            })
-          } as unknown as TransactionsTracker,
-          rewardAccounts$,
-          slotEpochCalc$,
-          [Cardano.CertificateType.StakeDelegation, Cardano.CertificateType.StakeDeregistration]
-        );
-        expectObservable(target$).toBe('-a', {
-          a: [
-            { epoch: 284, tx: transactions[1] },
-            { epoch: 285, tx: transactions[3] }
-          ]
-        });
-      });
-    });
-    it('does not emit outgoing transactions with certificates not signed by the reward accounts', () => {
-      createTestScheduler().run(({ cold, expectObservable }) => {
-        const rewardAccount = Cardano.RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv');
-        const foreignRewardAccount = Cardano.RewardAccount(
-          'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d'
-        );
-        const transactions = [
-          createStubTxWithCertificates([
-            {
-              __typename: Cardano.CertificateType.StakeRegistration,
-              stakeCredential: {
-                hash: Cardano.RewardAccount.toHash(foreignRewardAccount)
-              }
-            } as Cardano.Certificate
-          ]),
-          createStubTxWithCertificates([
-            { __typename: Cardano.CertificateType.PoolRetirement } as Cardano.Certificate,
-            {
-              __typename: Cardano.CertificateType.StakeDelegation,
-              stakeCredential: {
-                hash: Cardano.RewardAccount.toHash(foreignRewardAccount)
-              }
-            } as Cardano.Certificate
-          ]),
-          createStubTxWithCertificates(),
-          createStubTxWithCertificates([
-            {
-              __typename: Cardano.CertificateType.StakeDeregistration,
-              stakeCredential: {
-                hash: Cardano.RewardAccount.toHash(foreignRewardAccount)
-              }
-            } as Cardano.Certificate
-          ])
-        ];
-        const slotEpochCalc = jest.fn().mockReturnValueOnce(284).mockReturnValueOnce(285);
-        const slotEpochCalc$ = cold('-a', { a: slotEpochCalc });
-
-        const rewardAccounts$ = cold('a', {
-          a: [rewardAccount]
-        });
-        const target$ = certificateTransactionsWithEpochs(
-          {
-            history$: cold('a--a', {
-              a: transactions
-            })
-          } as unknown as TransactionsTracker,
-          rewardAccounts$,
-          slotEpochCalc$,
-          [Cardano.CertificateType.StakeDelegation, Cardano.CertificateType.StakeDeregistration]
-        );
-        expectObservable(target$).toBe('-a', {
-          a: []
-        });
-      });
-    });
-  });
-
   describe('delegationPortfolio', () => {
+    const rewardAccount = Cardano.RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv');
+    const rewardAccounts$ = of([
+      rewardAccount,
+      Cardano.RewardAccount('stake_test1uqrw9tjymlm8wrwq7jk68n6v7fs9qz8z0tkdkve26dylmfc2ux2hj')
+    ]);
+
     const cip17DelegationPortfolio: Cardano.Cip17DelegationPortfolio = {
       author: 'me',
       name: 'My portfolio',
@@ -198,10 +60,8 @@ describe('DelegationTracker', () => {
     };
 
     it('always returns the latest portfolio', () => {
-      createTestScheduler().run(({ cold, expectObservable }) => {
-        const rewardAccount = Cardano.RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv');
-
-        const transactions$ = cold('a-b-c-d', {
+      createTestScheduler().run(({ cold, expectObservable, flush }) => {
+        const transactions$ = cold('a', {
           a: [
             createStubTxWithSlot(284, [
               {
@@ -212,128 +72,65 @@ describe('DelegationTracker', () => {
                 }
               }
             ])
-          ],
-          b: [
-            createStubTxWithSlot(284, [
-              {
-                __typename: Cardano.CertificateType.StakeRegistration,
-                stakeCredential: {
-                  hash: Cardano.RewardAccount.toHash(rewardAccount),
-                  type: Cardano.CredentialType.KeyHash
-                }
-              }
-            ]),
-            createStubTxWithSlot(
-              285,
-              [
-                {
-                  __typename: Cardano.CertificateType.Registration,
-                  deposit: 2_000_000n,
-                  stakeCredential: {
-                    hash: Cardano.RewardAccount.toHash(rewardAccount),
-                    type: Cardano.CredentialType.KeyHash
-                  }
-                }
-              ],
-              {
-                blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio)]])
-              }
-            )
-          ],
-          c: [
-            createStubTxWithSlot(284, [
-              {
-                __typename: Cardano.CertificateType.StakeRegistration,
-                stakeCredential: {
-                  hash: Cardano.RewardAccount.toHash(rewardAccount),
-                  type: Cardano.CredentialType.KeyHash
-                }
-              }
-            ]),
-            createStubTxWithSlot(
-              285,
-              [
-                {
-                  __typename: Cardano.CertificateType.Registration,
-                  deposit: 2_000_000n,
-                  stakeCredential: {
-                    hash: Cardano.RewardAccount.toHash(rewardAccount),
-                    type: Cardano.CredentialType.KeyHash
-                  }
-                }
-              ],
-              {
-                blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio)]])
-              }
-            ),
-            createStubTxWithSlot(286, [
-              {
-                __typename: Cardano.CertificateType.StakeRegistration,
-                stakeCredential: {
-                  hash: Cardano.RewardAccount.toHash(rewardAccount),
-                  type: Cardano.CredentialType.KeyHash
-                }
-              }
-            ])
-          ],
-          d: [
-            createStubTxWithSlot(284, [
-              {
-                __typename: Cardano.CertificateType.StakeRegistration,
-                stakeCredential: {
-                  hash: Cardano.RewardAccount.toHash(rewardAccount),
-                  type: Cardano.CredentialType.KeyHash
-                }
-              }
-            ]),
-            createStubTxWithSlot(
-              285,
-              [
-                {
-                  __typename: Cardano.CertificateType.Registration,
-                  deposit: 2_000_000n,
-                  stakeCredential: {
-                    hash: Cardano.RewardAccount.toHash(rewardAccount),
-                    type: Cardano.CredentialType.KeyHash
-                  }
-                }
-              ],
-              {
-                blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio)]])
-              }
-            ),
-            createStubTxWithSlot(286, [
-              {
-                __typename: Cardano.CertificateType.StakeRegistration,
-                stakeCredential: {
-                  hash: Cardano.RewardAccount.toHash(rewardAccount),
-                  type: Cardano.CredentialType.KeyHash
-                }
-              }
-            ]),
-            createStubTxWithSlot(
-              287,
-              [
-                {
-                  __typename: Cardano.CertificateType.VoteRegistrationDelegation,
-                  dRep: {
-                    __typename: 'AlwaysAbstain'
-                  },
-                  deposit: 2_000_000n,
-                  stakeCredential: {
-                    hash: Cardano.RewardAccount.toHash(rewardAccount),
-                    type: Cardano.CredentialType.KeyHash
-                  }
-                }
-              ],
-              {
-                blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio2)]])
-              }
-            )
           ]
         });
 
-        const portfolio$ = createDelegationPortfolioTracker(transactions$);
+        const newTransaction$ = cold('--b-c-d', {
+          b: createStubTxWithSlot(
+            285,
+            [
+              {
+                __typename: Cardano.CertificateType.Registration,
+                deposit: 2_000_000n,
+                stakeCredential: {
+                  hash: Cardano.RewardAccount.toHash(rewardAccount),
+                  type: Cardano.CredentialType.KeyHash
+                }
+              }
+            ],
+            {
+              blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio)]])
+            }
+          ),
+          c: createStubTxWithSlot(286, [
+            {
+              __typename: Cardano.CertificateType.StakeRegistration,
+              stakeCredential: {
+                hash: Cardano.RewardAccount.toHash(rewardAccount),
+                type: Cardano.CredentialType.KeyHash
+              }
+            }
+          ]),
+          d: createStubTxWithSlot(
+            287,
+            [
+              {
+                __typename: Cardano.CertificateType.VoteRegistrationDelegation,
+                dRep: {
+                  __typename: 'AlwaysAbstain'
+                },
+                deposit: 2_000_000n,
+                stakeCredential: {
+                  hash: Cardano.RewardAccount.toHash(rewardAccount),
+                  type: Cardano.CredentialType.KeyHash
+                }
+              }
+            ],
+            {
+              blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio2)]])
+            }
+          )
+        });
+
+        const provider = jest.fn();
+
+        const portfolio$ = createDelegationPortfolioTracker(
+          rewardAccounts$,
+          transactions$,
+          newTransaction$,
+          provider,
+          new InMemoryDelegationPortfolioStore()
+        );
 
         expectObservable(portfolio$).toBe('a-b-c-d', {
           a: null,
@@ -341,78 +138,141 @@ describe('DelegationTracker', () => {
           c: null,
           d: cip17DelegationPortfolio2
         });
+
+        flush();
+        expect(provider).not.toBeCalled();
       });
     });
 
-    it('returns null if the most recent transaction does not have the metadata', () => {
-      createTestScheduler().run(({ cold, expectObservable }) => {
-        const rewardAccount = Cardano.RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv');
+    it('emits null when there is only 1 reward account', () => {
+      createTestScheduler().run(({ expectObservable, cold, flush }) => {
+        const newTransaction$ = cold<Cardano.OnChainTx>('');
 
-        const transactions$ = cold('a-b', {
-          a: [
-            createStubTxWithSlot(
-              284,
-              [
-                {
-                  __typename: Cardano.CertificateType.StakeRegistration,
-                  stakeCredential: {
-                    hash: Cardano.RewardAccount.toHash(rewardAccount),
-                    type: Cardano.CredentialType.KeyHash
-                  }
-                }
-              ],
+        const storage = new InMemoryDelegationPortfolioStore();
+        storage.set = jest.fn().mockImplementation(storage.set);
+        const provider = jest.fn();
+
+        const portfolio$ = createDelegationPortfolioTracker(
+          of([rewardAccount]),
+          of([]),
+          newTransaction$,
+          provider,
+          storage
+        );
+
+        expectObservable(portfolio$).toBe('(a|)', {
+          a: null
+        });
+
+        flush();
+        expect(provider).not.toBeCalled();
+        expect(storage.set).not.toBeCalled();
+      });
+    });
+
+    it('emits delegation portfolio from storage and on new transaction with cip17 metadata; stores latest portfolio', () => {
+      createTestScheduler().run(({ expectObservable, cold, flush }) => {
+        const newTransaction$ = cold('--bc', {
+          b: createStubTxWithSlot(284, []),
+          c: createStubTxWithSlot(
+            285,
+            [
               {
-                blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio)]])
-              }
-            )
-          ],
-          b: [
-            createStubTxWithSlot(
-              284,
-              [
-                {
-                  __typename: Cardano.CertificateType.StakeRegistration,
-                  stakeCredential: {
-                    hash: Cardano.RewardAccount.toHash(rewardAccount),
-                    type: Cardano.CredentialType.KeyHash
-                  }
-                }
-              ],
-              {
-                blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio)]])
-              }
-            ),
-            createStubTxWithSlot(286, [
-              {
-                __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
-                dRep: {
-                  __typename: 'AlwaysAbstain'
-                },
-                deposit: 2_000_000n,
-                poolId: 'abc' as Cardano.PoolId,
+                __typename: Cardano.CertificateType.StakeDelegation,
+                poolId: 'abcd' as Cardano.PoolId,
                 stakeCredential: {
                   hash: Cardano.RewardAccount.toHash(rewardAccount),
                   type: Cardano.CredentialType.KeyHash
                 }
               }
-            ])
-          ]
+            ],
+            {
+              blob: new Map([
+                [Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolioChangeWeights)]
+              ])
+            }
+          )
         });
 
-        const portfolio$ = createDelegationPortfolioTracker(transactions$);
+        const storage = new InMemoryDelegationPortfolioStore();
+        storage.set(cip17DelegationPortfolio);
+        storage.set = jest.fn().mockImplementation(storage.set);
 
-        expectObservable(portfolio$).toBe('a-b', {
+        const provider = jest.fn();
+
+        const portfolio$ = createDelegationPortfolioTracker(
+          rewardAccounts$,
+          of([]),
+          newTransaction$,
+          provider,
+          storage
+        );
+
+        expectObservable(portfolio$).toBe('a--c', {
           a: cip17DelegationPortfolio,
-          b: null
+          c: cip17DelegationPortfolioChangeWeights
         });
+
+        flush();
+        expect(provider).not.toBeCalled();
+        expect(storage.set).toBeCalledTimes(1);
+        expect(storage.set).toBeCalledWith(cip17DelegationPortfolioChangeWeights);
+      });
+    });
+
+    it('fetches portfolio from provider when not found in recent history', () => {
+      createTestScheduler().run(({ expectObservable, cold, flush }) => {
+        const newTransaction$ = cold('---c', {
+          c: createStubTxWithSlot(
+            285,
+            [
+              {
+                __typename: Cardano.CertificateType.StakeDelegation,
+                poolId: 'abcd' as Cardano.PoolId,
+                stakeCredential: {
+                  hash: Cardano.RewardAccount.toHash(rewardAccount),
+                  type: Cardano.CredentialType.KeyHash
+                }
+              }
+            ],
+            {
+              blob: new Map([
+                [Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolioChangeWeights)]
+              ])
+            }
+          )
+        });
+
+        const storage = new InMemoryDelegationPortfolioStore();
+        storage.set = jest.fn().mockImplementation(storage.set);
+
+        const provider = jest.fn().mockReturnValue(concat(of(cip17DelegationPortfolio), NEVER));
+
+        const portfolio$ = createDelegationPortfolioTracker(
+          rewardAccounts$,
+          of([createStubTxWithSlot(284, [])]), // has history but no relevant tx
+          newTransaction$,
+          provider,
+          storage
+        );
+
+        expectObservable(portfolio$).toBe('a--c', {
+          a: cip17DelegationPortfolio,
+          c: cip17DelegationPortfolioChangeWeights
+        });
+
+        flush();
+        expect(provider).toBeCalledTimes(1);
+        expect(provider).toBeCalledWith(rewardAccount);
+        expect(storage.set).toBeCalledTimes(2);
+        expect(storage.set).toBeCalledWith(cip17DelegationPortfolio);
+        expect(storage.set).toBeCalledWith(cip17DelegationPortfolioChangeWeights);
       });
     });
 
     it('returns the updated portfolio if the most recent transaction only updates percentages', () => {
-      createTestScheduler().run(({ cold, expectObservable }) => {
-        const rewardAccount = Cardano.RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv');
-
-        const transactions$ = cold('a-b', {
+      createTestScheduler().run(({ cold, expectObservable, flush }) => {
+        const transactions$ = cold('a', {
           a: [
             createStubTxWithSlot(
               284,
@@ -434,37 +294,34 @@ describe('DelegationTracker', () => {
                 blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio)]])
               }
             )
-          ],
-          b: [
-            createStubTxWithSlot(
-              284,
-              [
-                {
-                  __typename: Cardano.CertificateType.StakeRegistration,
-                  stakeCredential: {
-                    hash: Cardano.RewardAccount.toHash(rewardAccount),
-                    type: Cardano.CredentialType.KeyHash
-                  }
-                }
-              ],
-              {
-                blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio)]])
-              }
-            ),
-            createStubTxWithSlot(289, undefined, {
-              blob: new Map([
-                [Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolioChangeWeights)]
-              ])
-            })
           ]
         });
 
-        const portfolio$ = createDelegationPortfolioTracker(transactions$);
+        const newTransaction$ = cold('--b', {
+          b: createStubTxWithSlot(289, undefined, {
+            blob: new Map([
+              [Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolioChangeWeights)]
+            ])
+          })
+        });
+
+        const provider = jest.fn();
+
+        const portfolio$ = createDelegationPortfolioTracker(
+          rewardAccounts$,
+          transactions$,
+          newTransaction$,
+          provider,
+          new InMemoryDelegationPortfolioStore()
+        );
 
         expectObservable(portfolio$).toBe('a-b', {
           a: cip17DelegationPortfolio,
           b: cip17DelegationPortfolioChangeWeights
         });
+
+        flush();
+        expect(provider).not.toBeCalled();
       });
     });
   });

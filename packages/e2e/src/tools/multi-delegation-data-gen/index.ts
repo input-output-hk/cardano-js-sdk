@@ -56,7 +56,8 @@ const monitor = new TerminalProgressMonitor();
 
     monitor.logInfo(`Output directory: ${chalk.green!(Files.combine([process.cwd(), outputPath]))}`);
 
-    fundingWallet = await waitForFundingWallet(monitor);
+    const { providers, wallet } = await waitForFundingWallet(monitor);
+    fundingWallet = wallet;
 
     const delegationWallet = await createDelegationWallet(monitor);
 
@@ -68,7 +69,12 @@ const monitor = new TerminalProgressMonitor();
 
     monitor.endTask('Delegation wallet ready.', TaskResult.Success);
 
-    const portfolio = await distributeStake(delegationWallet, config.stakeDistribution, monitor);
+    const portfolio = await distributeStake(
+      delegationWallet,
+      providers.stakePoolProvider,
+      config.stakeDistribution,
+      monitor
+    );
 
     monitor.startTask('Waiting for delegation to be updated on the wallet.');
     await rewardAccountStatuses(delegationWallet.delegation.rewardAccounts$, [

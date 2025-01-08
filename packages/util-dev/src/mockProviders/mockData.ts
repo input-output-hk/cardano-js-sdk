@@ -89,7 +89,6 @@ export const rewardsHistory2 = new Map<Cardano.RewardAccount, Reward[]>([
     ]
   ]
 ]);
-export const rewardAccountBalance2 = rewardAccountBalance + 1n;
 
 export const utxosWithLowCoins: Cardano.Utxo[] = [
   [

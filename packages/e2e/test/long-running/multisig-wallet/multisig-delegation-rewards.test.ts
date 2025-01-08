@@ -129,9 +129,13 @@ describe('multi signature wallet', () => {
   let bobMultiSigWallet: MultiSigWallet;
   let charlotteMultiSigWallet: MultiSigWallet;
   let multiSigParticipants: Crypto.Ed25519PublicKeyHex[];
+  let stakePoolProvider: StakePoolProvider;
 
   const initializeFaucet = async () => {
-    ({ wallet: faucetWallet } = await getWallet({
+    ({
+      wallet: faucetWallet,
+      providers: { stakePoolProvider }
+    } = await getWallet({
       env,
       logger,
       name: 'Faucet Wallet',
@@ -239,7 +243,7 @@ describe('multi signature wallet', () => {
 
     expect(multiSigWalletBalance).toBeGreaterThan(0n);
 
-    const [poolId] = await getPoolIds(faucetWallet.stakePoolProvider, 1);
+    const [poolId] = await getPoolIds(stakePoolProvider, 1);
 
     // Alice will initiate the delegation transaction on her wallet.
     let tx = await aliceMultiSigWallet.delegate(poolId);

@@ -1,20 +1,14 @@
-import { BigIntMath, isNotNil } from '@cardano-sdk/util';
-import { Cardano, Reward, getCertificatesByType } from '@cardano-sdk/core';
+import { BigIntMath } from '@cardano-sdk/util';
+import { Cardano, Reward } from '@cardano-sdk/core';
 import { KeyValueStore } from '../../persistence';
 import { Logger } from 'ts-log';
-import { Observable, concat, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
+import { Observable, concat, map, of, switchMap, tap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistory } from '../types';
 import { TrackedRewardsProvider } from '../ProviderTracker';
-import { TxWithEpoch } from './types';
 import { pollProvider } from '../util';
-import first from 'lodash/first.js';
 import flatten from 'lodash/flatten.js';
 import sortBy from 'lodash/sortBy.js';
-
-const DELEGATION_EPOCHS_AHEAD_COUNT = 2;
-
-export const calcFirstDelegationEpoch = (epoch: Cardano.EpochNo): number => epoch + DELEGATION_EPOCHS_AHEAD_COUNT;
 
 const sumRewards = (arrayOfRewards: Reward[]) => BigIntMath.sum(arrayOfRewards.map(({ rewards }) => rewards));
 const avgReward = (arrayOfRewards: Reward[]) => sumRewards(arrayOfRewards) / BigInt(arrayOfRewards.length);
@@ -24,6 +18,7 @@ export const createRewardsHistoryProvider =
   (
     rewardAccounts: Cardano.RewardAccount[],
     lowerBound: Cardano.EpochNo | null,
+    epoch$: Observable<Cardano.EpochNo>,
     logger: Logger
   ): Observable<Map<Cardano.RewardAccount, Reward[]>> => {
     if (lowerBound) {
@@ -34,7 +29,8 @@ export const createRewardsHistoryProvider =
           rewardsProvider.rewardsHistory({
             epochs: { lowerBound },
             rewardAccounts
-          })
+          }),
+        trigger$: epoch$
       });
     }
     rewardsProvider.setStatInitialized(rewardsProvider.stats.rewardsHistory$);
@@ -43,22 +39,9 @@ export const createRewardsHistoryProvider =
 
 export type RewardsHistoryProvider = ReturnType<typeof createRewardsHistoryProvider>;
 
-const firstDelegationEpoch$ = (transactions$: Observable<TxWithEpoch[]>, rewardAccounts: Cardano.RewardAccount[]) =>
-  transactions$.pipe(
-    map((transactions) =>
-      first(
-        transactions.filter(
-          ({ tx }) => getCertificatesByType(tx, rewardAccounts, Cardano.StakeDelegationCertificateTypes).length > 0
-        )
-      )
-    ),
-    map((tx) => (isNotNil(tx) ? calcFirstDelegationEpoch(tx.epoch) : null)),
-    distinctUntilChanged()
-  );
-
 export const createRewardsHistoryTracker = (
-  transactions$: Observable<TxWithEpoch[]>,
   rewardAccounts$: Observable<Cardano.RewardAccount[]>,
+  epoch$: Observable<Cardano.EpochNo>,
   rewardsHistoryProvider: RewardsHistoryProvider,
   rewardsHistoryStore: KeyValueStore<Cardano.RewardAccount, Reward[]>,
   logger: Logger
@@ -71,9 +54,8 @@ export const createRewardsHistoryTracker = (
           rewardsHistoryStore
             .getValues(rewardAccounts)
             .pipe(map((rewards) => new Map(rewardAccounts.map((rewardAccount, i) => [rewardAccount, rewards[i]])))),
-          firstDelegationEpoch$(transactions$, rewardAccounts).pipe(
-            tap((firstEpoch) => logger.debug(`Fetching history rewards since epoch ${firstEpoch}`)),
-            switchMap((firstEpoch) => rewardsHistoryProvider(rewardAccounts, Cardano.EpochNo(firstEpoch!), logger)),
+          // this could be optimized to fetch rewards > last local reward within stability window
+          rewardsHistoryProvider(rewardAccounts, Cardano.EpochNo(1), epoch$, logger).pipe(
             tap((allRewards) =>
               rewardsHistoryStore.setAll([...allRewards.entries()].map(([key, value]) => ({ key, value })))
             )

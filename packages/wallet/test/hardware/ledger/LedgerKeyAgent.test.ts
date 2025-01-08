@@ -8,7 +8,7 @@ import {
   cip8,
   util
 } from '@cardano-sdk/key-management';
-import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
+import { AssetId, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BaseWallet, createPersonalWallet } from '../../../src';
 import { COSEKey, COSESign1, SigStructure } from '@emurgo/cardano-message-signing-nodejs';
 import { Cardano, Serialization, util as coreUtils } from '@cardano-sdk/core';
@@ -197,8 +197,7 @@ describe('LedgerKeyAgent', () => {
           0
         );
         const assetProvider = mocks.mockAssetProvider();
-        const drepProvider = mocks.mockDrepProvider();
-        const stakePoolProvider = createStubStakePoolProvider();
+        const rewardAccountInfoProvider = mocks.mockRewardAccountInfoProvider();
         const networkInfoProvider = mocks.mockNetworkInfoProvider();
         const utxoProvider = mocks.mockUtxoProvider({ address });
         const rewardsProvider = mocks.mockRewardsProvider({ rewardAccount });
@@ -210,11 +209,10 @@ describe('LedgerKeyAgent', () => {
             assetProvider,
             bip32Account: await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent),
             chainHistoryProvider,
-            drepProvider,
             logger,
             networkInfoProvider,
+            rewardAccountInfoProvider,
             rewardsProvider,
-            stakePoolProvider,
             txSubmitProvider,
             utxoProvider,
             witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)

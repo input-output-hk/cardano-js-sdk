@@ -10,9 +10,9 @@ import {
   createOutputValidator
 } from '@cardano-sdk/tx-construction';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { firstValueFrom, of, timer } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
+import { mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
 
 describe('CustomObservableWallet', () => {
@@ -45,11 +45,10 @@ describe('CustomObservableWallet', () => {
           assetProvider: mocks.mockAssetProvider(),
           bip32Account: await Bip32Account.fromAsyncKeyAgent(await testAsyncKeyAgent()),
           chainHistoryProvider: mocks.mockChainHistoryProvider(),
-          drepProvider: mocks.mockDrepProvider(),
           logger,
           networkInfoProvider: mocks.mockNetworkInfoProvider(),
+          rewardAccountInfoProvider: mocks.mockRewardAccountInfoProvider(),
           rewardsProvider: mocks.mockRewardsProvider(),
-          stakePoolProvider: createStubStakePoolProvider(),
           txSubmitProvider: mocks.mockTxSubmitProvider(),
           utxoProvider: mocks.mockUtxoProvider(),
           witnesser: util.createBip32Ed25519Witnesser(await testAsyncKeyAgent())

@@ -10,9 +10,9 @@ import {
 } from '@cardano-sdk/core';
 import { ConnectionStatusTracker, PollingConfig, SingleAddressDiscovery, createPersonalWallet } from '../../src';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
-import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
+import { mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { toOutgoingTx, waitForWalletStateSettle } from '../util';
 
@@ -51,8 +51,7 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
     connectionStatusTracker$
   } = providers;
   const assetProvider = mocks.mockAssetProvider();
-  const stakePoolProvider = createStubStakePoolProvider();
-  const drepProvider = mocks.mockDrepProvider();
+  const rewardAccountInfoProvider = mocks.mockRewardAccountInfoProvider();
 
   return createPersonalWallet(
     { name, polling: pollingConfig },
@@ -62,11 +61,10 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
       bip32Account,
       chainHistoryProvider,
       connectionStatusTracker$,
-      drepProvider,
       logger,
       networkInfoProvider,
+      rewardAccountInfoProvider,
       rewardsProvider,
-      stakePoolProvider,
       stores,
       txSubmitProvider,
       utxoProvider,

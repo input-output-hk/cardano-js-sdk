@@ -19,13 +19,13 @@ import {
   NetworkInfoProvider,
   ProviderError,
   ProviderFailure,
+  RewardAccountInfoProvider,
   RewardsProvider,
   UtxoProvider,
   coalesceValueQuantities
 } from '@cardano-sdk/core';
 import {
   AssetId,
-  createStubStakePoolProvider,
   generateRandomBigInt,
   generateRandomHexString,
   mockProviders as mocks,
@@ -60,6 +60,7 @@ interface Providers {
   utxoProvider: UtxoProvider;
   chainHistoryProvider: ChainHistoryProvider;
   networkInfoProvider: NetworkInfoProvider;
+  rewardAccountInfoProvider: RewardAccountInfoProvider;
   connectionStatusTracker$?: ConnectionStatusTracker;
   handleProvider?: HandleProvider;
 }
@@ -107,6 +108,7 @@ const createWallet = async (props: CreateWalletProps) => {
   const asyncKeyAgent = props.asyncKeyAgent || (await testAsyncKeyAgent());
 
   const {
+    rewardAccountInfoProvider,
     rewardsProvider,
     utxoProvider,
     chainHistoryProvider,
@@ -116,8 +118,6 @@ const createWallet = async (props: CreateWalletProps) => {
   } = props.providers;
   const txSubmitProvider = mocks.mockTxSubmitProvider();
   const assetProvider = mocks.mockAssetProvider();
-  const drepProvider = mocks.mockDrepProvider();
-  const stakePoolProvider = createStubStakePoolProvider();
 
   const bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
   bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
@@ -130,12 +130,11 @@ const createWallet = async (props: CreateWalletProps) => {
       bip32Account,
       chainHistoryProvider,
       connectionStatusTracker$,
-      drepProvider,
       handleProvider,
       logger,
       networkInfoProvider,
+      rewardAccountInfoProvider,
       rewardsProvider,
-      stakePoolProvider,
       stores: props.stores,
       txSubmitProvider,
       utxoProvider,
@@ -168,7 +167,8 @@ const assertWalletProperties = async (
   // balance
   const balanceAvailable = await firstValueFrom(wallet.balance.utxo.available$);
   expect(balanceAvailable?.coins).toEqual(coalesceValueQuantities(mocks.utxo.map((utxo) => utxo[1].value)).coins);
-  expect(await firstValueFrom(wallet.balance.rewardAccounts.rewards$)).toBe(mocks.rewardAccountBalance);
+  const expectedRewardBalance = expectedDelegateeId ? mocks.rewardAccountBalance : 0n;
+  expect(await firstValueFrom(wallet.balance.rewardAccounts.rewards$)).toBe(expectedRewardBalance);
   // transactions
   const transactionsHistory = await firstValueFrom(wallet.transactions.history$);
   expect(transactionsHistory?.length).toBeGreaterThan(0);
@@ -191,7 +191,7 @@ const assertWalletProperties = async (
   expect(rewardAccounts).toHaveLength(1);
   expect(rewardAccounts[0].address).toBe(rewardAccount);
   expect(rewardAccounts[0].delegatee?.nextNextEpoch?.id).toEqual(expectedDelegateeId);
-  expect(rewardAccounts[0].rewardBalance).toBe(mocks.rewardAccountBalance);
+  expect(rewardAccounts[0].rewardBalance).toBe(expectedRewardBalance);
   // assets$
   expect(removeStaleAt(await firstValueFrom(wallet.assetInfo$))).toEqual(
     new Map([
@@ -218,7 +218,7 @@ const assertWalletProperties2 = async (wallet: ObservableWallet) => {
   expect((await firstValueFrom(wallet.balance.utxo.available$))?.coins).toEqual(
     coalesceValueQuantities(mocks.utxo2.map((utxo) => utxo[1].value)).coins
   );
-  expect(await firstValueFrom(wallet.balance.rewardAccounts.rewards$)).toBe(mocks.rewardAccountBalance2);
+  expect(await firstValueFrom(wallet.balance.rewardAccounts.rewards$)).toBe(mocks.rewardAccountBalance);
   expect((await firstValueFrom(wallet.transactions.history$))?.length).toEqual(
     queryTransactionsResult2.pageResults.length
   );
@@ -240,7 +240,7 @@ const assertWalletProperties2 = async (wallet: ObservableWallet) => {
   expect(rewardsHistory.all).toEqual(expectedRewards);
   const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
   expect(rewardAccounts).toHaveLength(1);
-  expect(rewardAccounts[0].rewardBalance).toBe(mocks.rewardAccountBalance2);
+  expect(rewardAccounts[0].rewardBalance).toBe(mocks.rewardAccountBalance);
 
   // PublicStakeKeys
   const x = await firstValueFrom(wallet.publicStakeKeys$);
@@ -310,6 +310,7 @@ describe('BaseWallet load', () => {
       providers: {
         chainHistoryProvider: mocks.mockChainHistoryProvider(),
         networkInfoProvider: mocks.mockNetworkInfoProvider(),
+        rewardAccountInfoProvider: mocks.mockRewardAccountInfoProvider(),
         rewardsProvider: mocks.mockRewardsProvider(),
         utxoProvider: mocks.mockUtxoProvider()
       },
@@ -323,6 +324,7 @@ describe('BaseWallet load', () => {
         chainHistoryProvider: mocks.mockChainHistoryProvider2(100),
         handleProvider: mocks.mockHandleProvider(),
         networkInfoProvider: mocks.mockNetworkInfoProvider2(100),
+        rewardAccountInfoProvider: mocks.mockRewardAccountInfoProvider(),
         rewardsProvider: mocks.mockRewardsProvider2(100),
         utxoProvider: mocks.mockUtxoProvider2(100)
       },
@@ -336,6 +338,7 @@ describe('BaseWallet load', () => {
 
   it('syncStatus settles without delegation to any pool', async () => {
     const stores = createInMemoryWalletStores();
+    const rewardAccountInfoProvider = mocks.mockRewardAccountInfoProvider();
     const rewardsProvider = mocks.mockRewardsProvider();
     const networkInfoProvider = mocks.mockNetworkInfoProvider();
     const chainHistoryProvider = mocks.mockChainHistoryProvider();
@@ -345,11 +348,20 @@ describe('BaseWallet load', () => {
       pageResults: txsWithNoCertificates,
       totalResultCount: txsWithNoCertificates.length
     });
+    rewardAccountInfoProvider.rewardAccountInfo.mockImplementation(async (stakeAddress) => ({
+      address: stakeAddress,
+      credentialStatus: Cardano.StakeCredentialStatus.Unregistered,
+      rewardBalance: 0n
+    }));
+    rewardsProvider.rewardsHistory.mockImplementation(
+      async ({ rewardAccounts }) => new Map(rewardAccounts.map((stakeAddress) => [stakeAddress, []]))
+    );
     const wallet = await createWallet({
       addressDiscovery: new SingleAddressDiscovery(),
       providers: {
         chainHistoryProvider,
         networkInfoProvider,
+        rewardAccountInfoProvider,
         rewardsProvider,
         utxoProvider
       },
@@ -391,6 +403,7 @@ describe('BaseWallet load', () => {
     );
 
     const chainHistoryProvider = mocks.mockChainHistoryProvider();
+    const rewardAccountInfoProvider = mocks.mockRewardAccountInfoProvider();
     const utxoProvider = mocks.mockUtxoProvider();
     utxoProvider.utxoByAddresses = jest
       .fn()
@@ -408,6 +421,7 @@ describe('BaseWallet load', () => {
         chainHistoryProvider,
         connectionStatusTracker$,
         networkInfoProvider,
+        rewardAccountInfoProvider,
         rewardsProvider,
         utxoProvider
       },
@@ -456,6 +470,7 @@ describe('BaseWallet creates big UTXO', () => {
       providers: {
         chainHistoryProvider: mocks.mockChainHistoryProvider(),
         networkInfoProvider: mocks.mockNetworkInfoProvider(),
+        rewardAccountInfoProvider: mocks.mockRewardAccountInfoProvider(),
         rewardsProvider: mocks.mockRewardsProvider(),
         utxoProvider: mocks.mockUtxoProvider({ utxoSet })
       },
@@ -509,6 +524,7 @@ describe('BaseWallet.AddressDiscovery', () => {
       providers: {
         chainHistoryProvider: mocks.mockChainHistoryProvider(),
         networkInfoProvider: mocks.mockNetworkInfoProvider(),
+        rewardAccountInfoProvider: mocks.mockRewardAccountInfoProvider(),
         rewardsProvider: mocks.mockRewardsProvider(),
         utxoProvider: mocks.mockUtxoProvider({ utxoSet })
       },

@@ -1,7 +1,7 @@
 /* eslint-disable space-in-parens */
 /* eslint-disable no-multi-spaces */
 /* eslint-disable prettier/prettier */
-import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
+import { Cardano, ChainHistoryProvider, TransactionsByAddressesArgs } from '@cardano-sdk/core';
 import {
   FailedTx,
   OutgoingTx,
@@ -26,12 +26,19 @@ import { dummyCbor, toOutgoingTx, toSignedTx } from '../util';
 import { dummyLogger } from 'ts-log';
 import delay from 'delay';
 
-const { generateTxAlonzo, mockChainHistoryProvider, queryTransactionsResult, queryTransactionsResult2 } = mockProviders;
+const {
+  generateTxAlonzo,
+  mockChainHistoryProvider,
+  queryTransactionsResult,
+  queryTransactionsResult2,
+  filterAndPaginateTransactions
+} = mockProviders;
 
 const updateTransactionsBlockNo = (transactions: Cardano.HydratedTx[], blockNo = Cardano.BlockNo(10_050)) =>
-  transactions.map((tx) => ({
+  transactions.map((tx, index) => ({
     ...tx,
-    blockHeader: { ...tx.blockHeader, blockNo, slot: Cardano.Slot(0) }
+    blockHeader: { ...tx.blockHeader, blockNo, slot: Cardano.Slot(blockNo * 100) },
+    index
   }));
 
 const generateRandomLetters = (length: number) => {
@@ -54,8 +61,10 @@ const updateTransactionIds = (transactions: Cardano.HydratedTx[]) =>
     id: Cardano.TransactionId(`${generateRandomLetters(64)}`)
   }));
 
+
 describe('TransactionsTracker', () => {
   const logger = dummyLogger;
+  const historicalTransactionsFetchLimit = 2;
 
   describe('newTransactions$', () => {
     it('considers transactions from 1st emission as old and emits only new transactions', () => {
@@ -88,12 +97,12 @@ describe('TransactionsTracker', () => {
     });
 
     it('emits empty array if store is empty and ChainHistoryProvider does not return any transactions', async () => {
-      chainHistoryProvider.transactionsByAddresses = jest
-        .fn()
+      chainHistoryProvider.transactionsByAddresses = jest.fn()
         .mockImplementation(() => delay(50).then(() => ({ pageResults: [], totalResultCount: 0 })));
       const provider$ = createAddressTransactionsProvider({
         addresses$: of(addresses),
         chainHistoryProvider,
+        historicalTransactionsFetchLimit,
         logger,
         retryBackoffConfig,
         store,
@@ -107,6 +116,7 @@ describe('TransactionsTracker', () => {
       const provider$ = createAddressTransactionsProvider({
         addresses$: of(addresses),
         chainHistoryProvider,
+        historicalTransactionsFetchLimit,
         logger,
         retryBackoffConfig,
         store,
@@ -117,27 +127,17 @@ describe('TransactionsTracker', () => {
       expect(store.setAll).toBeCalledWith(queryTransactionsResult.pageResults);
     });
 
-    it('emits entire transactions list resolved by ChainHistoryProvider', async () => {
-      const pageSize = PAGE_SIZE;
-      const secondPageSize = 5;
-      const totalTxsCount = pageSize + secondPageSize;
+    it('emits configured number of latest historical transactions', async () => {
+      const totalTxsCount = PAGE_SIZE + 5;
 
-      const firstPageTxs = {
-        pageResults: generateTxAlonzo(pageSize),
-        totalResultCount: totalTxsCount
-      };
-      const secondPageTxs = {
-        pageResults: generateTxAlonzo(secondPageSize),
-        totalResultCount: totalTxsCount
-      };
-      chainHistoryProvider.transactionsByAddresses = jest
-        .fn()
-        .mockResolvedValueOnce(firstPageTxs)
-        .mockResolvedValueOnce(secondPageTxs);
+      const allTransactions = generateTxAlonzo(totalTxsCount);
+      chainHistoryProvider.transactionsByAddresses = jest.fn().mockImplementation(
+        (args: TransactionsByAddressesArgs) => filterAndPaginateTransactions(allTransactions, args));
 
       const provider$ = createAddressTransactionsProvider({
         addresses$: of(addresses),
         chainHistoryProvider,
+        historicalTransactionsFetchLimit,
         logger,
         retryBackoffConfig,
         store,
@@ -145,19 +145,20 @@ describe('TransactionsTracker', () => {
       }).transactionsSource$;
 
       const transactionsHistory = await firstValueFrom(provider$);
-      expect(transactionsHistory.length).toEqual(totalTxsCount);
-      expect(transactionsHistory).toEqual([...firstPageTxs.pageResults, ...secondPageTxs.pageResults]);
-      expect(store.setAll).toBeCalledWith([...firstPageTxs.pageResults, ...secondPageTxs.pageResults]);
+      expect(transactionsHistory.length).toEqual(historicalTransactionsFetchLimit);
+      const latestHistoricalTransactions = allTransactions.slice(
+        allTransactions.length - historicalTransactionsFetchLimit
+      );
+      expect(transactionsHistory).toEqual(latestHistoricalTransactions);
+      expect(store.setAll).toBeCalledWith(latestHistoricalTransactions);
     });
 
     it('emits existing transactions from store, then transactions resolved by ChainHistoryProvider', async () => {
       await firstValueFrom(store.setAll([queryTransactionsResult.pageResults[0]]));
-      chainHistoryProvider.transactionsByAddresses = jest
-        .fn()
-        .mockImplementation(() => delay(50).then(() => queryTransactionsResult));
       const provider$ = createAddressTransactionsProvider({
         addresses$: of(addresses),
         chainHistoryProvider,
+        historicalTransactionsFetchLimit,
         logger,
         retryBackoffConfig,
         store,
@@ -165,7 +166,7 @@ describe('TransactionsTracker', () => {
       }).transactionsSource$;
       expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
         [queryTransactionsResult.pageResults[0]],
-        queryTransactionsResult.pageResults
+        [...queryTransactionsResult.pageResults]
       ]);
       expect(store.setAll).toBeCalledTimes(2);
       expect(chainHistoryProvider.transactionsByAddresses).toBeCalledTimes(1);
@@ -182,8 +183,7 @@ describe('TransactionsTracker', () => {
       await firstValueFrom(store.setAll([txId1, txId2]));
 
       // ChainHistory is shorter by 1 tx: [1]
-      chainHistoryProvider.transactionsByAddresses = jest
-        .fn()
+      chainHistoryProvider.transactionsByAddresses = jest.fn()
         // the mismatch will pop the single transaction found in the stored transactions
         .mockImplementationOnce(() => delay(50).then(() => ({ pageResults: [], totalResultCount: 0 })))
         // intersection is found, chain is shortened
@@ -192,6 +192,7 @@ describe('TransactionsTracker', () => {
       const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
         addresses$: of(addresses),
         chainHistoryProvider,
+        historicalTransactionsFetchLimit,
         logger,
         retryBackoffConfig,
         store,
@@ -220,8 +221,7 @@ describe('TransactionsTracker', () => {
       await firstValueFrom(store.setAll([txId1, txId2]));
 
       // ChainHistory has one common and one different: [1, 3]
-      chainHistoryProvider.transactionsByAddresses = jest
-        .fn()
+      chainHistoryProvider.transactionsByAddresses = jest.fn()
         // the mismatch will pop the single transaction found in the stored transactions
         .mockImplementationOnce(() => delay(50).then(() => ({ pageResults: [txId3], totalResultCount: 1 })))
         // intersection is found, and stored history is populated with the new transaction
@@ -230,6 +230,7 @@ describe('TransactionsTracker', () => {
       const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
         addresses$: of(addresses),
         chainHistoryProvider,
+        historicalTransactionsFetchLimit,
         logger,
         retryBackoffConfig,
         store,
@@ -262,8 +263,7 @@ describe('TransactionsTracker', () => {
 
     it('queries ChainHistoryProvider again with blockRange lower bound from a previous transaction on rollback', async () => {
       await firstValueFrom(store.setAll(queryTransactionsResult.pageResults));
-      chainHistoryProvider.transactionsByAddresses = jest
-        .fn()
+      chainHistoryProvider.transactionsByAddresses = jest.fn()
         .mockImplementationOnce(() => delay(50).then(() => ({ pageResults: [], totalResultCount: 0 })))
         .mockImplementationOnce(() => delay(50).then(() => ({ pageResults: [], totalResultCount: 0 })))
         .mockImplementationOnce(() =>
@@ -272,6 +272,7 @@ describe('TransactionsTracker', () => {
       const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
         addresses$: of(addresses),
         chainHistoryProvider,
+        historicalTransactionsFetchLimit,
         logger,
         retryBackoffConfig,
         store,
@@ -302,8 +303,7 @@ describe('TransactionsTracker', () => {
       });
       expect(chainHistoryProvider.transactionsByAddresses).nthCalledWith(3, {
         addresses,
-        blockRange: { lowerBound: undefined },
-        pagination: { limit: 25, startAt: 0 }
+        pagination: { limit: historicalTransactionsFetchLimit, order: 'desc', startAt: 0 }
       });
     });
 
@@ -321,7 +321,7 @@ describe('TransactionsTracker', () => {
 
         await firstValueFrom(store.setAll([txId1, txId2, txId3]));
 
-        chainHistoryProvider.transactionsByAddresses = jest.fn(() => ({
+        chainHistoryProvider.transactionsByAddresses = jest.fn().mockImplementation(() => ({
           pageResults: [txId4, txId5, txId6],
           totalResultCount: 3
         }));
@@ -329,6 +329,7 @@ describe('TransactionsTracker', () => {
         const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
           addresses$: of(addresses),
           chainHistoryProvider,
+          historicalTransactionsFetchLimit,
           logger,
           retryBackoffConfig,
           store,
@@ -366,7 +367,7 @@ describe('TransactionsTracker', () => {
 
         await firstValueFrom(store.setAll([txId1, txId2]));
 
-        chainHistoryProvider.transactionsByAddresses = jest.fn(() => ({
+        chainHistoryProvider.transactionsByAddresses = jest.fn().mockImplementation(() => ({
           pageResults: [txId1OtherBlock, txId2OtherBlock, txId3],
           totalResultCount: 3
         }));
@@ -374,6 +375,7 @@ describe('TransactionsTracker', () => {
         const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
           addresses$: of(addresses),
           chainHistoryProvider,
+          historicalTransactionsFetchLimit,
           logger,
           retryBackoffConfig,
           store,
@@ -406,7 +408,7 @@ describe('TransactionsTracker', () => {
 
         await firstValueFrom(store.setAll([txId1, txId1, txId2]));
 
-        chainHistoryProvider.transactionsByAddresses = jest.fn(() => ({
+        chainHistoryProvider.transactionsByAddresses = jest.fn().mockImplementation(() => ({
           pageResults: [txId1, txId2, txId2, txId3, txId3, txId3],
           totalResultCount: 3
         }));
@@ -414,6 +416,7 @@ describe('TransactionsTracker', () => {
         const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
           addresses$: of(addresses),
           chainHistoryProvider,
+          historicalTransactionsFetchLimit,
           logger,
           retryBackoffConfig,
           store,
@@ -453,7 +456,7 @@ describe('TransactionsTracker', () => {
 
         await firstValueFrom(store.setAll([txId1, txId2, txId3]));
 
-        chainHistoryProvider.transactionsByAddresses = jest.fn(() => ({
+        chainHistoryProvider.transactionsByAddresses = jest.fn().mockImplementation(() => ({
           pageResults: [txId1OtherBlock, txId2OtherBlock],
           totalResultCount: 2
         }));
@@ -461,6 +464,7 @@ describe('TransactionsTracker', () => {
         const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
           addresses$: of(addresses),
           chainHistoryProvider,
+          historicalTransactionsFetchLimit,
           logger,
           retryBackoffConfig,
           store,
@@ -496,7 +500,7 @@ describe('TransactionsTracker', () => {
 
         await firstValueFrom(store.setAll([txId1, txId2, txId3]));
 
-        chainHistoryProvider.transactionsByAddresses = jest.fn(() => ({
+        chainHistoryProvider.transactionsByAddresses = jest.fn().mockImplementation(() => ({
           pageResults: [txId3OtherBlock, txId1OtherBlock, txId2OtherBlock],
           totalResultCount: 3
         }));
@@ -504,6 +508,7 @@ describe('TransactionsTracker', () => {
         const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
           addresses$: of(addresses),
           chainHistoryProvider,
+          historicalTransactionsFetchLimit,
           logger,
           retryBackoffConfig,
           store,
@@ -539,14 +544,16 @@ describe('TransactionsTracker', () => {
 
         await firstValueFrom(store.setAll([txId1, txId2]));
 
-        chainHistoryProvider.transactionsByAddresses = jest.fn(() => ({
-          pageResults: [txId3OtherBlock, txId2OtherBlock, txId1OtherBlock],
-          totalResultCount: 3
-        }));
+        chainHistoryProvider.transactionsByAddresses = jest.fn().mockImplementation(
+          (args: TransactionsByAddressesArgs) => filterAndPaginateTransactions(
+            [txId1OtherBlock, txId2OtherBlock, txId3OtherBlock]
+          , args)
+        );
 
         const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
           addresses$: of(addresses),
           chainHistoryProvider,
+          historicalTransactionsFetchLimit,
           logger,
           retryBackoffConfig,
           store,
@@ -558,11 +565,11 @@ describe('TransactionsTracker', () => {
 
         expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
           [txId1, txId2], // from store
-          [txId3OtherBlock, txId2OtherBlock, txId1OtherBlock] // chain history
+          [txId1OtherBlock, txId2OtherBlock, txId3OtherBlock] // chain history
         ]);
         expect(rollbacks.length).toBe(0);
         expect(store.setAll).toBeCalledTimes(2);
-        expect(store.setAll).nthCalledWith(2, [txId3OtherBlock, txId2OtherBlock, txId1OtherBlock]);
+        expect(store.setAll).nthCalledWith(2, [txId1OtherBlock, txId2OtherBlock, txId3OtherBlock]);
       });
 
       it('process transactions in the right order (sorted by slot ASC) regardless of transaction order in the backend response', async () => {
@@ -577,7 +584,7 @@ describe('TransactionsTracker', () => {
 
         await firstValueFrom(store.setAll([txId1, txId2, txId3]));
 
-        chainHistoryProvider.transactionsByAddresses = jest.fn(() => ({
+        chainHistoryProvider.transactionsByAddresses = jest.fn().mockImplementation(() => ({
           pageResults: [txId3, txId2, txId1],
           totalResultCount: 3
         }));
@@ -585,6 +592,7 @@ describe('TransactionsTracker', () => {
         const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
           addresses$: of(addresses),
           chainHistoryProvider,
+          historicalTransactionsFetchLimit,
           logger,
           retryBackoffConfig,
           store,
@@ -614,7 +622,7 @@ describe('TransactionsTracker', () => {
 
         await firstValueFrom(store.setAll([txId1, txId2, txId3]));
 
-        chainHistoryProvider.transactionsByAddresses = jest.fn(() => ({
+        chainHistoryProvider.transactionsByAddresses = jest.fn().mockImplementation(() => ({
           pageResults: [txId1, txId2, txId3],
           totalResultCount: 3
         }));
@@ -622,6 +630,7 @@ describe('TransactionsTracker', () => {
         const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
           addresses$: of(addresses),
           chainHistoryProvider,
+          historicalTransactionsFetchLimit,
           logger,
           retryBackoffConfig,
           store,
@@ -679,6 +688,7 @@ describe('TransactionsTracker', () => {
           {
             addresses$,
             chainHistoryProvider,
+            historicalTransactionsFetchLimit,
             inFlightTransactionsStore,
             logger,
             newTransactions: {
@@ -737,6 +747,7 @@ describe('TransactionsTracker', () => {
           {
             addresses$,
             chainHistoryProvider,
+            historicalTransactionsFetchLimit,
             inFlightTransactionsStore,
             logger,
             newTransactions: {
@@ -787,6 +798,7 @@ describe('TransactionsTracker', () => {
           {
             addresses$,
             chainHistoryProvider,
+            historicalTransactionsFetchLimit,
             inFlightTransactionsStore,
             logger,
             newTransactions: {
@@ -838,6 +850,7 @@ describe('TransactionsTracker', () => {
           {
             addresses$,
             chainHistoryProvider,
+            historicalTransactionsFetchLimit,
             inFlightTransactionsStore,
             logger,
             newTransactions: {
@@ -887,6 +900,7 @@ describe('TransactionsTracker', () => {
             addresses$,
             chainHistoryProvider,
             failedFromReemitter$,
+            historicalTransactionsFetchLimit,
             inFlightTransactionsStore,
             logger,
             newTransactions: {
@@ -934,6 +948,7 @@ describe('TransactionsTracker', () => {
           {
             addresses$,
             chainHistoryProvider,
+            historicalTransactionsFetchLimit,
             inFlightTransactionsStore,
             logger,
             newTransactions: {
@@ -984,6 +999,7 @@ describe('TransactionsTracker', () => {
           {
             addresses$,
             chainHistoryProvider,
+            historicalTransactionsFetchLimit,
             inFlightTransactionsStore,
             logger,
             newTransactions: {
@@ -1040,6 +1056,7 @@ describe('TransactionsTracker', () => {
           {
             addresses$,
             chainHistoryProvider,
+            historicalTransactionsFetchLimit,
             inFlightTransactionsStore,
             logger,
             newTransactions: {
@@ -1089,6 +1106,7 @@ describe('TransactionsTracker', () => {
           {
             addresses$,
             chainHistoryProvider,
+            historicalTransactionsFetchLimit,
             inFlightTransactionsStore,
             logger,
             newTransactions: {
@@ -1149,6 +1167,7 @@ describe('TransactionsTracker', () => {
           {
             addresses$,
             chainHistoryProvider,
+            historicalTransactionsFetchLimit,
             inFlightTransactionsStore,
             logger,
             newTransactions: {
@@ -1213,6 +1232,7 @@ describe('TransactionsTracker', () => {
           {
             addresses$,
             chainHistoryProvider,
+            historicalTransactionsFetchLimit,
             inFlightTransactionsStore,
             logger,
             newTransactions: {
@@ -1276,6 +1296,7 @@ describe('TransactionsTracker', () => {
           {
             addresses$,
             chainHistoryProvider,
+            historicalTransactionsFetchLimit,
             inFlightTransactionsStore,
             logger,
             newTransactions: {
@@ -1344,6 +1365,7 @@ describe('TransactionsTracker', () => {
           {
             addresses$,
             chainHistoryProvider,
+            historicalTransactionsFetchLimit,
             inFlightTransactionsStore,
             logger,
             newTransactions: {
@@ -1388,6 +1410,7 @@ describe('TransactionsTracker', () => {
           {
             addresses$,
             chainHistoryProvider,
+            historicalTransactionsFetchLimit,
             inFlightTransactionsStore,
             logger,
             newTransactions: {
@@ -1426,6 +1449,7 @@ describe('TransactionsTracker', () => {
           {
             addresses$,
             chainHistoryProvider,
+            historicalTransactionsFetchLimit,
             inFlightTransactionsStore,
             logger,
             newTransactions: {
@@ -1464,6 +1488,7 @@ describe('TransactionsTracker', () => {
           {
             addresses$,
             chainHistoryProvider,
+            historicalTransactionsFetchLimit,
             inFlightTransactionsStore,
             logger,
             newTransactions: {
@@ -1503,6 +1528,7 @@ describe('TransactionsTracker', () => {
           {
             addresses$,
             chainHistoryProvider,
+            historicalTransactionsFetchLimit,
             inFlightTransactionsStore,
             logger,
             newTransactions: {
@@ -1547,6 +1573,7 @@ describe('TransactionsTracker', () => {
           {
             addresses$,
             chainHistoryProvider,
+            historicalTransactionsFetchLimit,
             inFlightTransactionsStore,
             logger,
             newTransactions: {
@@ -1598,6 +1625,7 @@ describe('TransactionsTracker', () => {
           {
             addresses$,
             chainHistoryProvider,
+            historicalTransactionsFetchLimit,
             inFlightTransactionsStore,
             logger,
             newTransactions: {

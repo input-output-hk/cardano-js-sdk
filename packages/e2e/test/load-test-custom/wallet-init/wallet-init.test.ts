@@ -21,6 +21,7 @@ import {
   getLoadTestScheduler,
   keyManagementFactory,
   networkInfoProviderFactory,
+  rewardAccountInfoProviderFactory,
   rewardsProviderFactory,
   stakePoolProviderFactory,
   txSubmitProviderFactory,
@@ -64,6 +65,11 @@ const getProviders = async () => ({
   networkInfoProvider: await networkInfoProviderFactory.create(
     env.TEST_CLIENT_NETWORK_INFO_PROVIDER,
     env.TEST_CLIENT_NETWORK_INFO_PROVIDER_PARAMS,
+    logger
+  ),
+  rewardAccountInfoProvider: await rewardAccountInfoProviderFactory.create(
+    env.TEST_CLIENT_REWARD_ACCOUNT_INFO_PROVIDER,
+    env.TEST_CLIENT_REWARD_ACCOUNT_INFO_PROVIDER_PARAMS,
     logger
   ),
   rewardsProvider: await rewardsProviderFactory.create(

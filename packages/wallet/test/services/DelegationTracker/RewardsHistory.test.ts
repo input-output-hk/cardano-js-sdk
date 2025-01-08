@@ -1,15 +1,12 @@
-import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { InMemoryRewardsHistoryStore } from '../../../src/persistence';
 import {
   RewardsHistory,
   RewardsHistoryProvider,
   TrackedRewardsProvider,
-  calcFirstDelegationEpoch,
   createRewardsHistoryProvider,
   createRewardsHistoryTracker
 } from '../../../src/services';
-import { createStubTxWithCertificates } from './stub-tx';
 import { createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyLogger } from 'ts-log';
 import { firstValueFrom, of } from 'rxjs';
@@ -32,121 +29,52 @@ describe('RewardsHistory', () => {
     });
 
     it('when lower bound is specified: queries underlying provider', async () => {
-      expect(await firstValueFrom(provider(rewardAccounts, Cardano.EpochNo(1), logger))).toBe(rewardsHistory);
+      const epoch = Cardano.EpochNo(1); // TODO review
+      expect(await firstValueFrom(provider(rewardAccounts, Cardano.EpochNo(1), of(epoch), logger))).toBe(
+        rewardsHistory
+      );
     });
 
     it('when lower bound is not specified: sets rewardsHistory as initialized and returns empty array', async () => {
-      expect(await firstValueFrom(provider(rewardAccounts, null, logger))).toEqual(new Map());
+      const epoch = Cardano.EpochNo(1); // TODO review
+      expect(await firstValueFrom(provider(rewardAccounts, null, of(epoch), logger))).toEqual(new Map());
       expect(rewardsProvider.stats.rewardsHistory$.value.initialized).toBe(true);
     });
   });
 
   describe('createRewardsHistoryTracker', () => {
-    it.each(Cardano.StakeDelegationCertificateTypes)(
-      'queries and maps reward history starting from first delegation epoch+2 with %s',
-      (delegationCertificateType) => {
-        createTestScheduler().run(({ cold, expectObservable, flush }) => {
-          const accountRewardsHistory = rewardsHistory.get(rewardAccount)!;
-          const epoch = accountRewardsHistory[0].epoch;
-          const getRewardsHistory = jest.fn().mockReturnValue(cold('-a', { a: rewardsHistory }));
-          const target$ = createRewardsHistoryTracker(
-            cold('aa', {
-              a: [
-                {
-                  epoch: Cardano.EpochNo(0),
-                  tx: createStubTxWithCertificates([
-                    { __typename: Cardano.CertificateType.StakeDeregistration } as Cardano.Certificate
-                  ])
-                },
-                {
-                  epoch,
-                  tx: createStubTxWithCertificates([{ __typename: delegationCertificateType } as Cardano.Certificate], {
-                    stakeCredential: {
-                      hash: Cardano.RewardAccount.toHash(rewardAccount),
-                      type: Cardano.CredentialType.KeyHash
-                    }
-                  })
-                }
-              ]
-            }),
-            of(rewardAccounts),
-            getRewardsHistory,
-            new InMemoryRewardsHistoryStore(),
-            logger
-          );
-          expectObservable(target$).toBe('-a', {
-            a: {
-              all: accountRewardsHistory,
-              avgReward: 10_500n,
-              lastReward: accountRewardsHistory[1],
-              lifetimeRewards: 21_000n
-            } as RewardsHistory
-          });
-          flush();
-          expect(getRewardsHistory).toBeCalledTimes(1);
-          expect(getRewardsHistory).toBeCalledWith(
-            rewardAccounts,
-            Cardano.EpochNo(calcFirstDelegationEpoch(epoch)),
-            logger
-          );
-        });
-      }
-    );
+    it('emits rewards from storage, then from provider; stores rewards from provider', async () => {
+      const accountRewardsHistory = rewardsHistory.get(rewardAccount)!;
+      const epoch = accountRewardsHistory[0].epoch;
+      const store = new InMemoryRewardsHistoryStore();
+      const storedReward = accountRewardsHistory[0];
+      await firstValueFrom(store.setAll([{ key: rewardAccount, value: [storedReward] }]));
+      store.setAll = jest.fn().mockImplementation(store.setAll);
 
-    it.each(Cardano.StakeDelegationCertificateTypes)(
-      'considers only first delegation signed by the reward account with %s',
-      (delegationCertificateType) => {
-        createTestScheduler().run(({ cold, expectObservable, flush }) => {
-          const accountRewardsHistory = rewardsHistory.get(rewardAccount)!;
-          const epoch = accountRewardsHistory[0].epoch;
-          const getRewardsHistory = jest.fn().mockReturnValue(cold('-a', { a: rewardsHistory }));
-          const target$ = createRewardsHistoryTracker(
-            cold('aa', {
-              a: [
-                {
-                  epoch: Cardano.EpochNo(0),
-                  tx: createStubTxWithCertificates([{ __typename: delegationCertificateType } as Cardano.Certificate], {
-                    stakeCredential: {
-                      hash: Crypto.Hash28ByteBase16('00000000000000000000000000000000000000000000000000000000'),
-                      type: Cardano.CredentialType.KeyHash
-                    }
-                  })
-                },
-                {
-                  epoch,
-                  tx: createStubTxWithCertificates([{ __typename: delegationCertificateType } as Cardano.Certificate], {
-                    stakeCredential: {
-                      hash: Cardano.RewardAccount.toHash(rewardAccount),
-                      type: Cardano.CredentialType.KeyHash
-                    }
-                  })
-                }
-              ]
-            }),
-            of(rewardAccounts),
-            getRewardsHistory,
-            new InMemoryRewardsHistoryStore(),
-            logger
-          );
-          expectObservable(target$).toBe('-a', {
-            a: {
-              all: accountRewardsHistory,
-              avgReward: 10_500n,
-              lastReward: accountRewardsHistory[1],
-              lifetimeRewards: 21_000n
-            } as RewardsHistory
-          });
-          flush();
-          expect(getRewardsHistory).toBeCalledTimes(1);
-          expect(getRewardsHistory).toBeCalledWith(
-            rewardAccounts,
-            Cardano.EpochNo(calcFirstDelegationEpoch(epoch)),
-            logger
-          );
+      createTestScheduler().run(({ cold, expectObservable, flush }) => {
+        const getRewardsHistory = jest.fn().mockReturnValue(cold('-a', { a: rewardsHistory }));
+        const epoch$ = of(epoch);
+        const target$ = createRewardsHistoryTracker(of(rewardAccounts), epoch$, getRewardsHistory, store, logger);
+        expectObservable(target$).toBe('ab', {
+          a: {
+            all: [storedReward],
+            avgReward: storedReward.rewards,
+            lastReward: storedReward,
+            lifetimeRewards: storedReward.rewards
+          },
+          b: {
+            all: accountRewardsHistory,
+            avgReward: 10_500n,
+            lastReward: accountRewardsHistory[1],
+            lifetimeRewards: 21_000n
+          } as RewardsHistory
         });
-      }
-    );
-
-    it.todo('emits value from store if it exists and updates store after provider response');
+        flush();
+        expect(getRewardsHistory).toBeCalledTimes(1);
+        expect(getRewardsHistory).toBeCalledWith(rewardAccounts, Cardano.EpochNo(1), epoch$, logger);
+        expect(store.setAll).toBeCalledTimes(1);
+        expect(store.setAll).toBeCalledWith([{ key: rewardAccount, value: accountRewardsHistory }]);
+      });
+    });
   });
 });

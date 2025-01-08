@@ -16,7 +16,7 @@ import {
   WithSenderContext
 } from '@cardano-sdk/dapp-connector';
 import { AddressType, Bip32Account, GroupedAddress, KeyRole, util } from '@cardano-sdk/key-management';
-import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
+import { AssetId, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BaseWallet, ObservableWallet, cip30, createPersonalWallet } from '../../src';
 import { CallbackConfirmation, GetCollateralCallbackParams } from '../../src/cip30';
 import {
@@ -41,7 +41,6 @@ import uniq from 'lodash/uniq.js';
 
 const {
   mockChainHistoryProvider,
-  mockDrepProvider,
   mockNetworkInfoProvider,
   mockRewardsProvider,
   mockTxSubmitProvider,
@@ -988,10 +987,9 @@ describe('cip30', () => {
         networkInfoProvider = mocks.mockNetworkInfoProvider();
         utxoProvider = mocks.mockUtxoProvider();
         const assetProvider = mocks.mockAssetProvider();
-        const stakePoolProvider = createStubStakePoolProvider();
+        const rewardAccountInfoProvider = mocks.mockRewardAccountInfoProvider();
         const rewardsProvider = mockRewardsProvider();
         const chainHistoryProvider = mockChainHistoryProvider();
-        const drepProvider = mockDrepProvider();
         const groupedAddress: GroupedAddress = {
           accountIndex: 0,
           address,
@@ -1010,11 +1008,10 @@ describe('cip30', () => {
             assetProvider,
             bip32Account,
             chainHistoryProvider,
-            drepProvider,
             logger,
             networkInfoProvider,
+            rewardAccountInfoProvider,
             rewardsProvider,
-            stakePoolProvider,
             txSubmitProvider,
             utxoProvider,
             witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)

@@ -8,7 +8,7 @@ import {
   InMemoryInFlightTransactionsStore,
   InMemoryKeyValueStore,
   InMemoryProtocolParametersStore,
-  InMemoryRewardsBalancesStore,
+  InMemoryRewardAccountInfoStore,
   InMemoryRewardsHistoryStore,
   InMemoryStakePoolsStore,
   InMemoryStakeSummaryStore,
@@ -145,7 +145,7 @@ describe('inMemoryStores', () => {
   it('Specific collection stores are implemented using InMemoryKeyValueStore', () => {
     expect(new InMemoryRewardsHistoryStore()).toBeInstanceOf(InMemoryKeyValueStore);
     expect(new InMemoryStakePoolsStore()).toBeInstanceOf(InMemoryKeyValueStore);
-    expect(new InMemoryRewardsBalancesStore()).toBeInstanceOf(InMemoryKeyValueStore);
+    expect(new InMemoryRewardAccountInfoStore()).toBeInstanceOf(InMemoryKeyValueStore);
   });
 
   it('Specific document stores are implemented using InMemoryDocumentStore', () => {

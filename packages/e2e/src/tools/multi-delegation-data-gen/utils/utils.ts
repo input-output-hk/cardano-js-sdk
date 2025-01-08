@@ -2,7 +2,7 @@
 import { ValueTransferConfig, configLoader } from './config';
 
 import { BaseWallet } from '@cardano-sdk/wallet';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
 import { Files, Paths } from './files';
 import {
   KeyAgentFactoryProps,
@@ -23,11 +23,11 @@ import chalk from 'chalk';
 /**
  * Gets a list of the available pool.
  *
- * @param wallet The wallet to get the pools from.
+ * @param stakePoolProvider The stake pool provider to get the pools from.
  * @param count The requested number of pools.
  */
-const getPoolIds = async (wallet: BaseWallet, count: number): Promise<Cardano.StakePool[]> => {
-  const activePools = await wallet.stakePoolProvider.queryStakePools({
+const getPoolIds = async (stakePoolProvider: StakePoolProvider, count: number): Promise<Cardano.StakePool[]> => {
+  const activePools = await stakePoolProvider.queryStakePools({
     filters: { status: [Cardano.StakePoolStatus.Active] },
     pagination: { limit: count, startAt: 0 }
   });
@@ -93,13 +93,12 @@ export const loadConfiguration = async (monitor: TerminalProgressMonitor) => {
  *
  * @param monitor The progress monitor
  */
-export const waitForFundingWallet = async (monitor: TerminalProgressMonitor): Promise<BaseWallet> => {
+export const waitForFundingWallet = async (monitor: TerminalProgressMonitor) => {
   monitor.startTask('Waiting for funding wallet to be ready.');
 
-  const fundingWallet = (await getWallet({ env, idx: 0, logger, name: 'Funding wallet', polling: { interval: 500 } }))
-    .wallet;
+  const fundingWallet = await getWallet({ env, idx: 0, logger, name: 'Funding wallet', polling: { interval: 500 } });
 
-  await walletReady(fundingWallet);
+  await walletReady(fundingWallet.wallet);
 
   monitor.endTask('Funding wallet ready', TaskResult.Success);
 
@@ -171,15 +170,17 @@ export const transferStartingFunds = async (
  * Distribute the stake among different addresses.
  *
  * @param delegationWallet The delegation wallets.
+ * @param stakePoolProvider The stake pool provider.
  * @param stakeDistribution The stake distribution to be followed.
  * @param monitor The progress monitor.
  */
 export const distributeStake = async (
   delegationWallet: BaseWallet,
+  stakePoolProvider: StakePoolProvider,
   stakeDistribution: Array<number>,
   monitor: TerminalProgressMonitor
 ): Promise<Cardano.Cip17DelegationPortfolio> => {
-  const pools = await getPoolIds(delegationWallet, stakeDistribution.length);
+  const pools = await getPoolIds(stakePoolProvider, stakeDistribution.length);
 
   const portfolio: Cardano.Cip17DelegationPortfolio = {
     name: 'Portfolio',

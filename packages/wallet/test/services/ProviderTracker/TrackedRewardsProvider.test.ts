@@ -3,7 +3,7 @@ import { CLEAN_FN_STATS, ProviderFnStats, RewardsProviderStats, TrackedRewardsPr
 import { RewardsProvider } from '@cardano-sdk/core';
 import { mockProviders } from '@cardano-sdk/util-dev';
 
-const { mockRewardsProvider, rewardAccount } = mockProviders;
+const { mockRewardsProvider } = mockProviders;
 
 describe('TrackedRewardsProvider', () => {
   let rewardsProvider: mockProviders.RewardsProviderStub;
@@ -59,16 +59,7 @@ describe('TrackedRewardsProvider', () => {
       testFunctionStats(
         (rp) => rp.healthCheck(),
         (stats) => stats.healthCheck$,
-        (mockRP) => mockRP.healthCheck
-      )
-    );
-
-    test(
-      'rewards',
-      testFunctionStats(
-        (rp) => rp.rewardAccountBalance({ rewardAccount }),
-        (stats) => stats.rewardAccountBalance$,
-        (mockRP) => mockRP.rewardAccountBalance
+        (mockRP) => mockRP.healthCheck as jest.Mock
       )
     );
 
@@ -77,7 +68,7 @@ describe('TrackedRewardsProvider', () => {
       testFunctionStats(
         (rp) => rp.rewardsHistory({ rewardAccounts: [] }),
         (stats) => stats.rewardsHistory$,
-        (mockRP) => mockRP.rewardsHistory
+        (mockRP) => mockRP.rewardsHistory as jest.Mock
       )
     );
   });

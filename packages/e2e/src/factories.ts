@@ -22,6 +22,7 @@ import {
   HandleProvider,
   NetworkInfoProvider,
   ProviderFactory,
+  RewardAccountInfoProvider,
   RewardsProvider,
   StakePoolProvider,
   TxSubmitProvider,
@@ -42,6 +43,7 @@ import {
   BlockfrostClient,
   BlockfrostDRepProvider,
   BlockfrostNetworkInfoProvider,
+  BlockfrostRewardAccountInfoProvider,
   BlockfrostRewardsProvider,
   BlockfrostTxSubmitProvider,
   BlockfrostUtxoProvider,
@@ -84,6 +86,7 @@ export const keyManagementFactory = new ProviderFactory<CreateKeyAgent>();
 export const assetProviderFactory = new ProviderFactory<AssetProvider>();
 export const chainHistoryProviderFactory = new ProviderFactory<ChainHistoryProvider>();
 export const drepProviderFactory = new ProviderFactory<DRepProvider>();
+export const rewardAccountInfoProviderFactory = new ProviderFactory<RewardAccountInfoProvider>();
 export const networkInfoProviderFactory = new ProviderFactory<NetworkInfoProvider>();
 export const rewardsProviderFactory = new ProviderFactory<RewardsProvider>();
 export const txSubmitProviderFactory = new ProviderFactory<TxSubmitProvider>();
@@ -205,6 +208,36 @@ drepProviderFactory.register(BLOCKFROST_PROVIDER, async (params: any, logger): P
     );
   });
 });
+
+rewardAccountInfoProviderFactory.register(
+  BLOCKFROST_PROVIDER,
+  async (params: any, logger): Promise<RewardAccountInfoProvider> => {
+    if (params.baseUrl === undefined) throw new Error(`${BlockfrostDRepProvider.name}: ${MISSING_URL_PARAM}`);
+    const env = getEnv(walletVariables);
+
+    return new Promise<RewardAccountInfoProvider>(async (resolve) => {
+      resolve(
+        new BlockfrostRewardAccountInfoProvider({
+          client: new BlockfrostClient(
+            { apiVersion: params.apiVersion, baseUrl: params.baseUrl, projectId: params.projectId },
+            { rateLimiter: { schedule: (task) => task() } }
+          ),
+          dRepProvider: await drepProviderFactory.create(
+            BLOCKFROST_PROVIDER,
+            env.TEST_CLIENT_DREP_PROVIDER_PARAMS,
+            logger
+          ),
+          logger,
+          stakePoolProvider: await stakePoolProviderFactory.create(
+            HTTP_PROVIDER,
+            env.TEST_CLIENT_STAKE_POOL_PROVIDER_PARAMS,
+            logger
+          )
+        })
+      );
+    });
+  }
+);
 
 networkInfoProviderFactory.register(
   HTTP_PROVIDER,
@@ -525,11 +558,6 @@ export const getWallet = async (props: GetWalletProps) => {
       env.TEST_CLIENT_CHAIN_HISTORY_PROVIDER_PARAMS,
       logger
     ),
-    drepProvider: await drepProviderFactory.create(
-      env.TEST_CLIENT_DREP_PROVIDER,
-      env.TEST_CLIENT_DREP_PROVIDER_PARAMS,
-      logger
-    ),
     handleProvider: await handleProviderFactory.create(
       env.TEST_CLIENT_HANDLE_PROVIDER,
       env.TEST_CLIENT_HANDLE_PROVIDER_PARAMS,
@@ -538,6 +566,11 @@ export const getWallet = async (props: GetWalletProps) => {
     networkInfoProvider: await networkInfoProviderFactory.create(
       env.TEST_CLIENT_NETWORK_INFO_PROVIDER,
       env.TEST_CLIENT_NETWORK_INFO_PROVIDER_PARAMS,
+      logger
+    ),
+    rewardAccountInfoProvider: await rewardAccountInfoProviderFactory.create(
+      env.TEST_CLIENT_REWARD_ACCOUNT_INFO_PROVIDER,
+      env.TEST_CLIENT_REWARD_ACCOUNT_INFO_PROVIDER_PARAMS,
       logger
     ),
     rewardsProvider: await rewardsProviderFactory.create(
@@ -631,6 +664,11 @@ export const getSharedWallet = async (props: GetSharedWalletProps) => {
     networkInfoProvider: await networkInfoProviderFactory.create(
       env.TEST_CLIENT_NETWORK_INFO_PROVIDER,
       env.TEST_CLIENT_NETWORK_INFO_PROVIDER_PARAMS,
+      logger
+    ),
+    rewardAccountInfoProvider: await rewardAccountInfoProviderFactory.create(
+      env.TEST_CLIENT_REWARD_ACCOUNT_INFO_PROVIDER,
+      env.TEST_CLIENT_REWARD_ACCOUNT_INFO_PROVIDER_PARAMS,
       logger
     ),
     rewardsProvider: await rewardsProviderFactory.create(

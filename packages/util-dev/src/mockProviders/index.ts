@@ -5,6 +5,7 @@ export * from './mockTxSubmitProvider';
 export * from './mockAssetProvider';
 export * from './mockUtxoProvider';
 export * from './mockChainHistoryProvider';
+export * from './mockRewardAccountInfoProvider';
 export * from './mockRewardsProvider';
 export * from './mockHandleProvider';
 export * from './mockDrepProvider';

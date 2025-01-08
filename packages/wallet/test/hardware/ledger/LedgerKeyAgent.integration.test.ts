@@ -4,14 +4,14 @@ import { Bip32Account, CommunicationType, KeyAgent, util } from '@cardano-sdk/ke
 import { Cardano } from '@cardano-sdk/core';
 import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
 import { ObservableWallet, createPersonalWallet, restoreKeyAgent } from '../../../src';
-import { createStubStakePoolProvider, mockProviders } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
+import { mockProviders } from '@cardano-sdk/util-dev';
 
 const {
   mockAssetProvider,
   mockChainHistoryProvider,
-  mockDrepProvider,
+  mockRewardAccountInfoProvider,
   mockNetworkInfoProvider,
   mockRewardsProvider,
   mockTxSubmitProvider,
@@ -20,14 +20,13 @@ const {
 
 const createWallet = async (keyAgent: KeyAgent) => {
   const txSubmitProvider = mockTxSubmitProvider();
-  const stakePoolProvider = createStubStakePoolProvider();
   const networkInfoProvider = mockNetworkInfoProvider();
   const assetProvider = mockAssetProvider();
   const utxoProvider = mockUtxoProvider();
+  const rewardAccountInfoProvider = mockRewardAccountInfoProvider();
   const rewardsProvider = mockRewardsProvider();
   const asyncKeyAgent = util.createAsyncKeyAgent(keyAgent);
   const chainHistoryProvider = mockChainHistoryProvider();
-  const drepProvider = mockDrepProvider();
 
   return createPersonalWallet(
     { name: 'Wallet1' },
@@ -35,11 +34,10 @@ const createWallet = async (keyAgent: KeyAgent) => {
       assetProvider,
       bip32Account: await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent),
       chainHistoryProvider,
-      drepProvider,
       logger,
       networkInfoProvider,
+      rewardAccountInfoProvider,
       rewardsProvider,
-      stakePoolProvider,
       txSubmitProvider,
       utxoProvider,
       witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)

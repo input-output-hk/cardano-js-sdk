@@ -23,9 +23,8 @@ import { Milliseconds } from '../types';
 import { ProviderFnStats } from './ProviderTracker';
 import { TrackedAssetProvider } from './TrackedAssetProvider';
 import { TrackedChainHistoryProvider } from './TrackedChainHistoryProvider';
-import { TrackedDrepProvider } from './TrackedDrepProvider';
+import { TrackedRewardAccountInfoProvider } from './TrackedRewardAccountInfoProvider';
 import { TrackedRewardsProvider } from './TrackedRewardsProvider';
-import { TrackedStakePoolProvider } from './TrackedStakePoolProvider';
 import { TrackedUtxoProvider } from './TrackedUtxoProvider';
 import { TrackedWalletNetworkInfoProvider } from './TrackedWalletNetworkInfoProvider';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
@@ -35,24 +34,22 @@ export interface ProviderStatusTrackerProps {
 }
 
 export interface ProviderStatusTrackerDependencies {
-  stakePoolProvider: TrackedStakePoolProvider;
   networkInfoProvider: TrackedWalletNetworkInfoProvider;
   assetProvider: TrackedAssetProvider;
   utxoProvider: TrackedUtxoProvider;
   chainHistoryProvider: TrackedChainHistoryProvider;
-  drepProvider: TrackedDrepProvider;
   rewardsProvider: TrackedRewardsProvider;
+  rewardAccountInfoProvider: TrackedRewardAccountInfoProvider;
   logger: Logger;
 }
 
 const getDefaultProviderSyncRelevantStats = ({
-  stakePoolProvider,
   networkInfoProvider,
   assetProvider,
   utxoProvider,
   chainHistoryProvider,
-  rewardsProvider,
-  drepProvider
+  rewardAccountInfoProvider,
+  rewardsProvider
 }: ProviderStatusTrackerDependencies): Observable<ProviderFnStats[]> =>
   combineLatest([
     networkInfoProvider.stats.ledgerTip$,
@@ -60,12 +57,10 @@ const getDefaultProviderSyncRelevantStats = ({
     networkInfoProvider.stats.genesisParameters$,
     networkInfoProvider.stats.eraSummaries$,
     assetProvider.stats.getAsset$,
-    stakePoolProvider.stats.queryStakePools$,
     utxoProvider.stats.utxoByAddresses$,
     chainHistoryProvider.stats.transactionsByAddresses$,
-    drepProvider.stats.getDRepInfo$,
     rewardsProvider.stats.rewardsHistory$,
-    rewardsProvider.stats.rewardAccountBalance$
+    rewardAccountInfoProvider.stats.rewardAccountInfo$
   ]);
 
 export interface ProviderStatusTrackerInternals {

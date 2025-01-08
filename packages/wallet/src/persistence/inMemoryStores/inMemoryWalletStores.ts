@@ -13,6 +13,7 @@ export class InMemoryPolicyIdsStore extends InMemoryDocumentStore<Cardano.Policy
 export class InMemoryProtocolParametersStore extends InMemoryDocumentStore<Cardano.ProtocolParameters> {}
 export class InMemoryGenesisParametersStore extends InMemoryDocumentStore<Cardano.CompactGenesis> {}
 export class InMemoryEraSummariesStore extends InMemoryDocumentStore<EraSummary[]> {}
+export class InMemoryDelegationPortfolioStore extends InMemoryDocumentStore<Cardano.Cip17DelegationPortfolio> {}
 
 export class InMemoryAssetsStore extends InMemoryDocumentStore<Assets> {}
 export class InMemoryAddressesStore extends InMemoryDocumentStore<GroupedAddress[]> {}
@@ -25,12 +26,17 @@ export class InMemoryUtxoStore extends InMemoryCollectionStore<Cardano.Utxo> {}
 export class InMemoryUnspendableUtxoStore extends InMemoryCollectionStore<Cardano.Utxo> {}
 
 export class InMemoryRewardsHistoryStore extends InMemoryKeyValueStore<Cardano.RewardAccount, Reward[]> {}
+
+export class InMemoryRewardAccountInfoStore extends InMemoryKeyValueStore<
+  Cardano.RewardAccount,
+  Cardano.RewardAccountInfo
+> {}
 export class InMemoryStakePoolsStore extends InMemoryKeyValueStore<Cardano.PoolId, Cardano.StakePool> {}
-export class InMemoryRewardsBalancesStore extends InMemoryKeyValueStore<Cardano.RewardAccount, Cardano.Lovelace> {}
 
 export const createInMemoryWalletStores = (): WalletStores => ({
   addresses: new InMemoryAddressesStore(),
   assets: new InMemoryAssetsStore(),
+  delegationPortfolio: new InMemoryDelegationPortfolioStore(),
   destroy() {
     if (!this.destroyed) {
       this.destroyed = true;
@@ -41,8 +47,8 @@ export const createInMemoryWalletStores = (): WalletStores => ({
         this.protocolParameters.destroy(),
         this.eraSummaries.destroy(),
         this.unspendableUtxo.destroy(),
-        this.rewardsBalances.destroy(),
         this.rewardsHistory.destroy(),
+        this.rewardAccountInfo.destroy(),
         this.stakePools.destroy(),
         this.tip.destroy(),
         this.transactions.destroy(),
@@ -60,7 +66,7 @@ export const createInMemoryWalletStores = (): WalletStores => ({
   inFlightTransactions: new InMemoryInFlightTransactionsStore(),
   policyIds: new InMemoryPolicyIdsStore(),
   protocolParameters: new InMemoryProtocolParametersStore(),
-  rewardsBalances: new InMemoryRewardsBalancesStore(),
+  rewardAccountInfo: new InMemoryRewardAccountInfoStore(),
   rewardsHistory: new InMemoryRewardsHistoryStore(),
   signedTransactions: new InMemorySignedTransactionsStore(),
   stakePools: new InMemoryStakePoolsStore(),
