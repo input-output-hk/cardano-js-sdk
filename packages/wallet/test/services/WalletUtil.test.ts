@@ -145,7 +145,7 @@ describe('WalletUtil', () => {
             index: 0,
             txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
           },
-          { hints: [tx] }
+          { hints: { transactions: [tx] } }
         )
       ).toEqual({
         address:
@@ -159,7 +159,7 @@ describe('WalletUtil', () => {
             index: 1,
             txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
           },
-          { hints: [tx] }
+          { hints: { transactions: [tx] } }
         )
       ).toEqual({
         address:
@@ -269,7 +269,7 @@ describe('WalletUtil', () => {
             index: 0,
             txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
           },
-          { hints: [tx] }
+          { hints: { transactions: [tx] } }
         )
       ).toEqual({
         address:
@@ -283,7 +283,7 @@ describe('WalletUtil', () => {
             index: 1,
             txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
           },
-          { hints: [tx] }
+          { hints: { transactions: [tx] } }
         )
       ).toEqual({
         address:
@@ -387,21 +387,23 @@ describe('WalletUtil', () => {
     });
 
     it('can resolve inputs from own transactions, hints and from chain history provider', async () => {
-      const hints = [
-        {
-          body: {
-            outputs: [
-              {
-                address: Cardano.PaymentAddress(
-                  'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz'
-                ),
-                value: { coins: 200_000_000n }
-              }
-            ]
-          },
-          id: Cardano.TransactionId('0000bbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0FFFFFFFFFF')
-        } as Cardano.HydratedTx
-      ];
+      const hints = {
+        transactions: [
+          {
+            body: {
+              outputs: [
+                {
+                  address: Cardano.PaymentAddress(
+                    'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz'
+                  ),
+                  value: { coins: 200_000_000n }
+                }
+              ]
+            },
+            id: Cardano.TransactionId('0000bbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0FFFFFFFFFF')
+          } as Cardano.HydratedTx
+        ]
+      };
 
       const tx = {
         body: {

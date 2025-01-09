@@ -201,6 +201,42 @@ describe('BaseWallet methods', () => {
           })
         ).toBe(null);
       });
+
+      it('can override default input resolver', async () => {
+        const output = {
+          address: Cardano.PaymentAddress(
+            'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w'
+          ),
+          value: { coins: 77n }
+        };
+
+        const input: Cardano.TxIn = { index: 0, txId: 'a' as Cardano.TransactionId };
+        const inputResolver = { resolveInput: jest.fn().mockResolvedValue(output) };
+
+        const walletWithInputResolver = createPersonalWallet(
+          { name: 'Test Wallet' },
+          {
+            addressDiscovery,
+            assetProvider,
+            bip32Account,
+            chainHistoryProvider,
+            drepProvider,
+            handleProvider,
+            inputResolver,
+            logger,
+            networkInfoProvider,
+            rewardsProvider,
+            stakePoolProvider,
+            txSubmitProvider,
+            utxoProvider,
+            witnesser
+          }
+        );
+
+        const result = await walletWithInputResolver.util.resolveInput(input);
+        expect(result).toEqual(output);
+        expect(inputResolver.resolveInput).toBeCalledTimes(1);
+      });
     });
   });
 
