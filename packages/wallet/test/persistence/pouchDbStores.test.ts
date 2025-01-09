@@ -1,7 +1,17 @@
 /* eslint-disable unicorn/consistent-function-scoping */
 import { PouchDbCollectionStore, PouchDbDocumentStore, PouchDbKeyValueStore } from '../../src/persistence';
 import { assertCompletesWithoutEmitting } from './util';
-import { combineLatest, firstValueFrom, mergeMap, share, shareReplay, take, timer, toArray } from 'rxjs';
+import {
+  combineLatest,
+  defaultIfEmpty,
+  firstValueFrom,
+  mergeMap,
+  share,
+  shareReplay,
+  take,
+  timer,
+  toArray
+} from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import PouchDB from 'pouchdb';
 
@@ -32,6 +42,14 @@ describe('pouchDbStores', () => {
       await firstValueFrom(store1.set(doc1));
       await firstValueFrom(store1.set(doc2));
       expect(await firstValueFrom(store1.get())).toEqual(doc2);
+    });
+
+    it('delete removes existing document if exists', async () => {
+      const store1 = new PouchDbDocumentStore<DocType>(dbName, 'docId', logger);
+      await firstValueFrom(store1.set(doc1));
+      await firstValueFrom(store1.delete());
+      await expect(firstValueFrom(store1.get().pipe(defaultIfEmpty(null)))).resolves.toBeNull();
+      await expect(firstValueFrom(store1.delete())).resolves.not.toThrowError();
     });
 
     it('simultaneous set() calls are resolved in series - last value is always persisted', async () => {

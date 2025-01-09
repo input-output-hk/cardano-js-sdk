@@ -47,7 +47,7 @@ export abstract class PouchDbStore<T extends {}> {
     return toPouchDbDoc(obj) as T;
   }
 
-  async #getRev(docId: string) {
+  protected async getRev(docId: string) {
     const existingDoc = await this.db.get(docId).catch(() => void 0);
     return existingDoc?._rev;
   }
@@ -77,7 +77,7 @@ export abstract class PouchDbStore<T extends {}> {
         .then(async () => {
           const pouchDbDoc = {
             _id: docId,
-            _rev: await this.#getRev(docId),
+            _rev: await this.getRev(docId),
             ...serializableDoc
           };
           try {
