@@ -20,7 +20,7 @@ import { mockKeyAgentDependencies } from '../../../../key-management/test/mocks'
 const getStakeCredential = (rewardAccount: Cardano.RewardAccount) => {
   const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
   return {
-    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+    hash: stakeKeyHash,
     type: Cardano.CredentialType.KeyHash
   };
 };
@@ -217,7 +217,7 @@ describe('TrezorKeyAgent', () => {
 
     it('successfully signs stake registration and delegation transaction', async () => {
       const stakeCredential = {
-        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+        hash: Cardano.RewardAccount.toHash(rewardAccount),
         type: Cardano.CredentialType.KeyHash
       };
 
@@ -245,7 +245,7 @@ describe('TrezorKeyAgent', () => {
 
     it('successfully signs stake deregistration transaction', async () => {
       const stakeCredential = {
-        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+        hash: Cardano.RewardAccount.toHash(rewardAccount),
         type: Cardano.CredentialType.KeyHash
       };
 

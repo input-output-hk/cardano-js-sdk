@@ -1,6 +1,4 @@
 // eslint-disable-next-line jsdoc/check-param-names
-import * as Crypto from '@cardano-sdk/crypto';
-
 import {
   BlockfrostClient,
   BlockfrostProvider,
@@ -184,7 +182,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
           : Cardano.CertificateType.StakeDeregistration,
         cert_index,
         stakeCredential: {
-          hash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(address)) as unknown as Crypto.Hash28ByteBase16,
+          hash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(address)),
           type: Cardano.CredentialType.KeyHash
         }
       }))
@@ -198,7 +196,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
         cert_index,
         poolId: Cardano.PoolId(pool_id),
         stakeCredential: {
-          hash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(address)) as unknown as Crypto.Hash28ByteBase16,
+          hash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(address)),
           type: Cardano.CredentialType.KeyHash
         }
       }))

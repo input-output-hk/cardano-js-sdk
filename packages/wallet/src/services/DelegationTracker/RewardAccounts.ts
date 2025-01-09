@@ -1,5 +1,4 @@
 /* eslint-disable unicorn/no-nested-ternary */
-import * as Crypto from '@cardano-sdk/crypto';
 import { BigIntMath, deepEquals, isNotNil } from '@cardano-sdk/util';
 import { Cardano, DRepInfo, RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
 import {
@@ -190,7 +189,7 @@ const accountCertificateTransactions = (
                 : null
             )
             .filter(isNotNil)
-            .filter((cert) => (cert.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex) === stakeKeyHash),
+            .filter((cert) => cert.stakeCredential.hash === stakeKeyHash),
           epoch
         }))
         .filter(({ certificates }) => certificates.length > 0)
@@ -219,7 +218,7 @@ const accountDRepCertificateTransactions = (
                 : null
             )
             .filter(isNotNil)
-            .filter((cert) => (cert.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex) === stakeKeyHash),
+            .filter((cert) => cert.stakeCredential.hash === stakeKeyHash),
           epoch
         }))
         .filter(({ certificates }) => certificates.length > 0)

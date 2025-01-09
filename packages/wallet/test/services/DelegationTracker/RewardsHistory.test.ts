@@ -62,7 +62,7 @@ describe('RewardsHistory', () => {
                   epoch,
                   tx: createStubTxWithCertificates([{ __typename: delegationCertificateType } as Cardano.Certificate], {
                     stakeCredential: {
-                      hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                      hash: Cardano.RewardAccount.toHash(rewardAccount),
                       type: Cardano.CredentialType.KeyHash
                     }
                   })
@@ -116,7 +116,7 @@ describe('RewardsHistory', () => {
                   epoch,
                   tx: createStubTxWithCertificates([{ __typename: delegationCertificateType } as Cardano.Certificate], {
                     stakeCredential: {
-                      hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                      hash: Cardano.RewardAccount.toHash(rewardAccount),
                       type: Cardano.CredentialType.KeyHash
                     }
                   })

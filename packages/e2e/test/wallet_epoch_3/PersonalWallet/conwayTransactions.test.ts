@@ -185,7 +185,7 @@ describe('PersonalWallet/conwayTransactions', () => {
     rewardAccount = await firstValueFrom(wallet.addresses$.pipe(map((addresses) => addresses[0].rewardAccount)));
 
     return {
-      hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(RewardAccount.toHash(rewardAccount)),
+      hash: RewardAccount.toHash(rewardAccount),
       type: CredentialType.KeyHash
     };
   };

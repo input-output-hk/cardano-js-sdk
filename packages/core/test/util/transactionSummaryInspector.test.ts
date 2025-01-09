@@ -16,7 +16,7 @@ import {
   createStakeDeregistrationCert,
   createStakeRegistrationCert
 } from '../../src/Cardano';
-import { Ed25519KeyHashHex, Ed25519PublicKeyHex, Ed25519SignatureHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import { Ed25519KeyHashHex, Ed25519PublicKeyHex, Ed25519SignatureHex } from '@cardano-sdk/crypto';
 import { createMockAssetProvider, createMockInputResolver } from './mocks';
 import { jsonToMetadatum } from '../../src/util/metadatum';
 import { dummyLogger as logger } from 'ts-log';
@@ -778,7 +778,7 @@ describe('Transaction Summary Inspector', () => {
           __typename: CertificateType.Registration,
           deposit: 15_000_000n,
           stakeCredential: {
-            hash: Hash28ByteBase16.fromEd25519KeyHashHex(RewardAccount.toHash(rewardAccounts[0])),
+            hash: RewardAccount.toHash(rewardAccounts[0]),
             type: CredentialType.KeyHash
           }
         }
@@ -856,7 +856,7 @@ describe('Transaction Summary Inspector', () => {
           __typename: CertificateType.Unregistration,
           deposit: 15_000_000n,
           stakeCredential: {
-            hash: Hash28ByteBase16.fromEd25519KeyHashHex(RewardAccount.toHash(rewardAccounts[0])),
+            hash: RewardAccount.toHash(rewardAccounts[0]),
             type: CredentialType.KeyHash
           }
         }

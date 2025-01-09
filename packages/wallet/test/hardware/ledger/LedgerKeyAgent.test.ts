@@ -43,7 +43,7 @@ const cleanupEstablishedConnections = async () => {
 const getStakeCredential = (rewardAccount: Cardano.RewardAccount) => {
   const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
   return {
-    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+    hash: stakeKeyHash,
     type: Cardano.CredentialType.KeyHash
   };
 };

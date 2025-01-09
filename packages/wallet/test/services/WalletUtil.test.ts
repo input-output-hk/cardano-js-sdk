@@ -18,6 +18,7 @@ import {
 } from '../../src';
 import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
 import { DrepScriptHashVoter } from '@cardano-sdk/core/dist/cjs/Cardano';
+import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
 import { createAsyncKeyAgent, signTx, toSignedTx, waitForWalletStateSettle } from '../util';
 import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
@@ -586,7 +587,7 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.StakeDeregistration,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(mocks.stakeKeyHash),
+              hash: mocks.stakeKeyHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.StakeAddressCertificate
@@ -645,7 +646,7 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.StakeDeregistration,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+              hash: foreignRewardAccountHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.StakeAddressCertificate,
@@ -658,9 +659,9 @@ describe('WalletUtil', () => {
         tx.body.certificates = [
           {
             __typename: Cardano.CertificateType.StakeDelegation,
-            poolId: Cardano.PoolId.fromKeyHash(foreignRewardAccountHash),
+            poolId: Cardano.PoolId.fromKeyHash(Ed25519KeyHashHex(foreignRewardAccountHash)),
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+              hash: foreignRewardAccountHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.StakeDelegationCertificate,
@@ -675,7 +676,7 @@ describe('WalletUtil', () => {
             __typename: Cardano.CertificateType.PoolRegistration,
             poolParameters: {
               cost: 340n,
-              id: Cardano.PoolId.fromKeyHash(foreignRewardAccountHash),
+              id: Cardano.PoolId.fromKeyHash(Ed25519KeyHashHex(foreignRewardAccountHash)),
               margin: {
                 denominator: 50,
                 numerator: 10
@@ -703,7 +704,7 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.PoolRetirement,
             epoch: Cardano.EpochNo(100),
-            poolId: Cardano.PoolId.fromKeyHash(foreignRewardAccountHash)
+            poolId: Cardano.PoolId.fromKeyHash(Ed25519KeyHashHex(foreignRewardAccountHash))
           } as Cardano.PoolRetirementCertificate,
           ...tx.body.certificates!
         ];
@@ -718,7 +719,7 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.StakeRegistration,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+              hash: foreignRewardAccountHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.StakeAddressCertificate,
@@ -732,49 +733,49 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.Registration,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(mocks.stakeKeyHash),
+              hash: mocks.stakeKeyHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.NewStakeAddressCertificate,
           {
             __typename: Cardano.CertificateType.Unregistration,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(mocks.stakeKeyHash),
+              hash: mocks.stakeKeyHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.NewStakeAddressCertificate,
           {
             __typename: Cardano.CertificateType.VoteDelegation,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(mocks.stakeKeyHash),
+              hash: mocks.stakeKeyHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.VoteDelegationCertificate,
           {
             __typename: Cardano.CertificateType.StakeVoteDelegation,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(mocks.stakeKeyHash),
+              hash: mocks.stakeKeyHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.StakeVoteDelegationCertificate,
           {
             __typename: Cardano.CertificateType.StakeRegistrationDelegation,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(mocks.stakeKeyHash),
+              hash: mocks.stakeKeyHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.StakeRegistrationDelegationCertificate,
           {
             __typename: Cardano.CertificateType.VoteRegistrationDelegation,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(mocks.stakeKeyHash),
+              hash: mocks.stakeKeyHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.VoteRegistrationDelegationCertificate,
           {
             __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(mocks.stakeKeyHash),
+              hash: mocks.stakeKeyHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.StakeVoteRegistrationDelegationCertificate,
@@ -789,7 +790,7 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.VoteDelegation,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+              hash: foreignRewardAccountHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.VoteDelegationCertificate,
@@ -804,7 +805,7 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.StakeVoteDelegation,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+              hash: foreignRewardAccountHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.StakeVoteDelegationCertificate,
@@ -819,7 +820,7 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.StakeRegistrationDelegation,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+              hash: foreignRewardAccountHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.StakeRegistrationDelegationCertificate,
@@ -834,7 +835,7 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.VoteRegistrationDelegation,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+              hash: foreignRewardAccountHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.VoteRegistrationDelegationCertificate,
@@ -849,7 +850,7 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+              hash: foreignRewardAccountHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.StakeVoteRegistrationDelegationCertificate,
@@ -864,7 +865,7 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.Unregistration,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+              hash: foreignRewardAccountHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.NewStakeAddressCertificate,
@@ -1121,7 +1122,7 @@ describe('WalletUtil', () => {
             scripts: [
               {
                 __type: Cardano.ScriptType.Native,
-                keyHash: mocks.stakeKeyHash,
+                keyHash: Ed25519KeyHashHex(mocks.stakeKeyHash),
                 kind: Cardano.NativeScriptKind.RequireSignature
               }
             ]
@@ -1132,7 +1133,7 @@ describe('WalletUtil', () => {
             scripts: [
               {
                 __type: Cardano.ScriptType.Native,
-                keyHash: mocks.stakeKeyHash,
+                keyHash: Ed25519KeyHashHex(mocks.stakeKeyHash),
                 kind: Cardano.NativeScriptKind.RequireSignature
               }
             ]
@@ -1179,7 +1180,7 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.StakeDeregistration,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+              hash: foreignRewardAccountHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.StakeAddressCertificate
@@ -1192,9 +1193,9 @@ describe('WalletUtil', () => {
         tx.body.certificates = [
           {
             __typename: Cardano.CertificateType.StakeDelegation,
-            poolId: Cardano.PoolId.fromKeyHash(foreignRewardAccountHash),
+            poolId: Cardano.PoolId.fromKeyHash(Ed25519KeyHashHex(foreignRewardAccountHash)),
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+              hash: foreignRewardAccountHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.StakeDelegationCertificate
@@ -1209,7 +1210,7 @@ describe('WalletUtil', () => {
             __typename: Cardano.CertificateType.PoolRegistration,
             poolParameters: {
               cost: 340n,
-              id: Cardano.PoolId.fromKeyHash(foreignRewardAccountHash),
+              id: Cardano.PoolId.fromKeyHash(Ed25519KeyHashHex(foreignRewardAccountHash)),
               margin: {
                 denominator: 50,
                 numerator: 10
@@ -1236,7 +1237,7 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.PoolRetirement,
             epoch: Cardano.EpochNo(100),
-            poolId: Cardano.PoolId.fromKeyHash(foreignRewardAccountHash)
+            poolId: Cardano.PoolId.fromKeyHash(Ed25519KeyHashHex(foreignRewardAccountHash))
           } as Cardano.PoolRetirementCertificate
         ];
 
@@ -1248,7 +1249,7 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.StakeRegistration,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+              hash: foreignRewardAccountHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.StakeAddressCertificate
@@ -1262,7 +1263,7 @@ describe('WalletUtil', () => {
             __typename: Cardano.CertificateType.Registration,
             // using foreign intentionally because registration is not signed so it should be accepted
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(mocks.stakeKeyHash),
+              hash: mocks.stakeKeyHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.NewStakeAddressCertificate,
@@ -1300,7 +1301,7 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.VoteDelegation,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+              hash: foreignRewardAccountHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.VoteDelegationCertificate
@@ -1314,7 +1315,7 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.StakeVoteDelegation,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+              hash: foreignRewardAccountHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.StakeVoteDelegationCertificate
@@ -1328,7 +1329,7 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.StakeRegistrationDelegation,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+              hash: foreignRewardAccountHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.StakeRegistrationDelegationCertificate
@@ -1342,7 +1343,7 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.VoteRegistrationDelegation,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+              hash: foreignRewardAccountHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.VoteRegistrationDelegationCertificate
@@ -1356,7 +1357,7 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+              hash: foreignRewardAccountHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.StakeVoteRegistrationDelegationCertificate
@@ -1370,7 +1371,7 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.Unregistration,
             stakeCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+              hash: foreignRewardAccountHash,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.NewStakeAddressCertificate
@@ -1443,7 +1444,7 @@ describe('WalletUtil', () => {
           {
             __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
             dRepCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+              hash: foreignRewardAccountHash,
               type: Cardano.CredentialType.KeyHash
             },
             deposit: 0n

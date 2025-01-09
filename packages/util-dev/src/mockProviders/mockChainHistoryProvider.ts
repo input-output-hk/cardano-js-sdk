@@ -1,5 +1,4 @@
 import * as AssetId from '../assetId';
-import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, Paginated, TransactionsByAddressesArgs } from '@cardano-sdk/core';
 import { currentEpoch, handleAssetId, ledgerTip, stakeCredential } from './mockData';
 import { somePartialStakePools } from '../createStubStakePoolProvider';
@@ -185,7 +184,7 @@ const queryTransactions = ({ rewardAccount }: { rewardAccount?: Cardano.RewardAc
                   ? {
                       ...certificate,
                       stakeCredential: {
-                        hash: Cardano.RewardAccount.toHash(rewardAccount) as unknown as Crypto.Hash28ByteBase16,
+                        hash: Cardano.RewardAccount.toHash(rewardAccount),
                         type: Cardano.CredentialType.KeyHash
                       }
                     }

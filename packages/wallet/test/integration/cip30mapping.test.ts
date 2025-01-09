@@ -27,6 +27,7 @@ import {
   TxSubmissionErrorCode,
   coalesceValueQuantities
 } from '@cardano-sdk/core';
+import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
@@ -1036,7 +1037,7 @@ describe('cip30', () => {
             {
               __typename: Cardano.CertificateType.StakeDeregistration,
               stakeCredential: {
-                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(mocks.stakeKeyHash),
+                hash: mocks.stakeKeyHash,
                 type: Cardano.CredentialType.KeyHash
               }
             } as Cardano.StakeAddressCertificate
@@ -1164,9 +1165,9 @@ describe('cip30', () => {
           tx.body.certificates = [
             {
               __typename: Cardano.CertificateType.StakeDelegation,
-              poolId: Cardano.PoolId.fromKeyHash(foreignRewardAccountHash),
+              poolId: Cardano.PoolId.fromKeyHash(Ed25519KeyHashHex(foreignRewardAccountHash)),
               stakeCredential: {
-                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+                hash: foreignRewardAccountHash,
                 type: Cardano.CredentialType.KeyHash
               }
             } as Cardano.StakeDelegationCertificate,
@@ -1241,9 +1242,9 @@ describe('cip30', () => {
           tx.body.certificates = [
             {
               __typename: Cardano.CertificateType.StakeDelegation,
-              poolId: Cardano.PoolId.fromKeyHash(foreignRewardAccountHash),
+              poolId: Cardano.PoolId.fromKeyHash(Ed25519KeyHashHex(foreignRewardAccountHash)),
               stakeCredential: {
-                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+                hash: foreignRewardAccountHash,
                 type: Cardano.CredentialType.KeyHash
               }
             } as Cardano.StakeDelegationCertificate,

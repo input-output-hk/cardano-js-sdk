@@ -63,7 +63,7 @@ describe('txInspector', () => {
   const rewardAccount = RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
   const stakeKeyHash = RewardAccount.toHash(rewardAccount);
   const stakeCredential = {
-    hash: stakeKeyHash as unknown as Crypto.Hash28ByteBase16,
+    hash: stakeKeyHash,
     type: CredentialType.KeyHash
   };
   const poolId = PoolId('pool1euf2nh92ehqfw7rpd4s9qgq34z8dg4pvfqhjmhggmzk95gcd402');

@@ -2,6 +2,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AccountKeyDerivationPath, AddressType, GroupedAddress, KeyRole, TxInId, util } from '../../src';
 import { Cardano } from '@cardano-sdk/core';
+import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
 
 export const stakeKeyPath = {
   index: 0,
@@ -10,8 +11,8 @@ export const stakeKeyPath = {
 
 const txId = (seed: number) => Cardano.TransactionId(Array.from({ length: 64 + 1 }).join(seed.toString()));
 
-const toStakeCredential = (stakeKeyHash: Crypto.Ed25519KeyHashHex): Cardano.Credential => ({
-  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+const toStakeCredential = (stakeKeyHash: Crypto.Hash28ByteBase16): Cardano.Credential => ({
+  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Ed25519KeyHashHex(stakeKeyHash)),
   type: Cardano.CredentialType.KeyHash
 });
 
@@ -43,13 +44,13 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
 
   const ownStakeKeyHash = Cardano.RewardAccount.toHash(ownRewardAccount);
   const ownStakeCredential = {
-    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(ownStakeKeyHash),
+    hash: ownStakeKeyHash,
     type: Cardano.CredentialType.KeyHash
   };
 
   const otherStakeKeyHash = Cardano.RewardAccount.toHash(otherRewardAccount);
   const otherStakeCredential = {
-    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(otherStakeKeyHash),
+    hash: otherStakeKeyHash,
     type: Cardano.CredentialType.KeyHash
   };
 
@@ -196,7 +197,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
           {
             __typename: Cardano.CertificateType.PoolRetirement,
             epoch: Cardano.EpochNo(40),
-            poolId: Cardano.PoolId.fromKeyHash(ownStakeKeyHash)
+            poolId: Cardano.PoolId.fromKeyHash(Ed25519KeyHashHex(ownStakeKeyHash))
           }
         ],
         inputs: [{}, {}, {}]
@@ -221,7 +222,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
             __typename: Cardano.CertificateType.PoolRegistration,
             poolParameters: {
               cost: 340n,
-              id: Cardano.PoolId.fromKeyHash(ownStakeKeyHash),
+              id: Cardano.PoolId.fromKeyHash(Ed25519KeyHashHex(ownStakeKeyHash)),
               margin: {
                 denominator: 50,
                 numerator: 10
@@ -381,7 +382,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
 
   it('returns the derivation path of a known stake credential key hash present in the requiredSigners field', async () => {
     const rewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
-    const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
+    const stakeKeyHash = Ed25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount));
 
     const txBody = {
       inputs: [{}, {}, {}],

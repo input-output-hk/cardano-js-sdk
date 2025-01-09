@@ -1,4 +1,3 @@
-import * as Crypto from '@cardano-sdk/crypto';
 import { BigNumber } from 'bignumber.js';
 import { Cardano } from '@cardano-sdk/core';
 import { ChangeAddressResolver, Selection } from '@cardano-sdk/input-selection';
@@ -82,10 +81,7 @@ const getSpentFromRewardAccount = (rewardAccount: Cardano.RewardAccount, inputs:
       // Address may not have stake credential.
       if (!address) return false;
 
-      return (
-        (Cardano.RewardAccount.toHash(rewardAccount) as unknown as Crypto.Hash28ByteBase16) ===
-        address.getStakeCredential().hash
-      );
+      return Cardano.RewardAccount.toHash(rewardAccount) === address.getStakeCredential().hash;
     })
     .map((utxo) => utxo[1].value.coins)
     .reduce((a, b) => a + b, 0n);
@@ -104,10 +100,7 @@ const getDepositToRewardAccount = (rewardAccount: Cardano.RewardAccount, outputs
       // Address may not have stake credential.
       if (!address) return false;
 
-      return (
-        (Cardano.RewardAccount.toHash(rewardAccount) as unknown as Crypto.Hash28ByteBase16) ===
-        address.getStakeCredential().hash
-      );
+      return Cardano.RewardAccount.toHash(rewardAccount) === address.getStakeCredential().hash;
     })
     .map((txOut) => txOut.value.coins)
     .reduce((a, b) => a + b, 0n);

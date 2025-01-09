@@ -1,4 +1,3 @@
-import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, ChainHistoryProvider, metadatum } from '@cardano-sdk/core';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TransactionsTracker, createDelegationPortfolioTracker, pollProvider } from '../../../src/services';
@@ -46,7 +45,7 @@ describe('DelegationTracker', () => {
             {
               __typename: Cardano.CertificateType.StakeRegistration,
               stakeCredential: {
-                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                hash: Cardano.RewardAccount.toHash(rewardAccount),
                 type: Cardano.CredentialType.KeyHash
               }
             }
@@ -58,7 +57,7 @@ describe('DelegationTracker', () => {
             {
               __typename: Cardano.CertificateType.StakeDelegation,
               stakeCredential: {
-                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                hash: Cardano.RewardAccount.toHash(rewardAccount),
                 type: Cardano.CredentialType.KeyHash
               }
             } as Cardano.Certificate
@@ -68,7 +67,7 @@ describe('DelegationTracker', () => {
             {
               __typename: Cardano.CertificateType.StakeDeregistration,
               stakeCredential: {
-                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                hash: Cardano.RewardAccount.toHash(rewardAccount),
                 type: Cardano.CredentialType.KeyHash
               }
             }
@@ -110,7 +109,7 @@ describe('DelegationTracker', () => {
             {
               __typename: Cardano.CertificateType.StakeRegistration,
               stakeCredential: {
-                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(foreignRewardAccount))
+                hash: Cardano.RewardAccount.toHash(foreignRewardAccount)
               }
             } as Cardano.Certificate
           ]),
@@ -119,7 +118,7 @@ describe('DelegationTracker', () => {
             {
               __typename: Cardano.CertificateType.StakeDelegation,
               stakeCredential: {
-                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(foreignRewardAccount))
+                hash: Cardano.RewardAccount.toHash(foreignRewardAccount)
               }
             } as Cardano.Certificate
           ]),
@@ -128,7 +127,7 @@ describe('DelegationTracker', () => {
             {
               __typename: Cardano.CertificateType.StakeDeregistration,
               stakeCredential: {
-                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(foreignRewardAccount))
+                hash: Cardano.RewardAccount.toHash(foreignRewardAccount)
               }
             } as Cardano.Certificate
           ])
@@ -208,7 +207,7 @@ describe('DelegationTracker', () => {
               {
                 __typename: Cardano.CertificateType.StakeRegistration,
                 stakeCredential: {
-                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                  hash: Cardano.RewardAccount.toHash(rewardAccount),
                   type: Cardano.CredentialType.KeyHash
                 }
               }
@@ -219,7 +218,7 @@ describe('DelegationTracker', () => {
               {
                 __typename: Cardano.CertificateType.StakeRegistration,
                 stakeCredential: {
-                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                  hash: Cardano.RewardAccount.toHash(rewardAccount),
                   type: Cardano.CredentialType.KeyHash
                 }
               }
@@ -231,7 +230,7 @@ describe('DelegationTracker', () => {
                   __typename: Cardano.CertificateType.Registration,
                   deposit: 2_000_000n,
                   stakeCredential: {
-                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                    hash: Cardano.RewardAccount.toHash(rewardAccount),
                     type: Cardano.CredentialType.KeyHash
                   }
                 }
@@ -246,7 +245,7 @@ describe('DelegationTracker', () => {
               {
                 __typename: Cardano.CertificateType.StakeRegistration,
                 stakeCredential: {
-                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                  hash: Cardano.RewardAccount.toHash(rewardAccount),
                   type: Cardano.CredentialType.KeyHash
                 }
               }
@@ -258,7 +257,7 @@ describe('DelegationTracker', () => {
                   __typename: Cardano.CertificateType.Registration,
                   deposit: 2_000_000n,
                   stakeCredential: {
-                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                    hash: Cardano.RewardAccount.toHash(rewardAccount),
                     type: Cardano.CredentialType.KeyHash
                   }
                 }
@@ -271,7 +270,7 @@ describe('DelegationTracker', () => {
               {
                 __typename: Cardano.CertificateType.StakeRegistration,
                 stakeCredential: {
-                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                  hash: Cardano.RewardAccount.toHash(rewardAccount),
                   type: Cardano.CredentialType.KeyHash
                 }
               }
@@ -282,7 +281,7 @@ describe('DelegationTracker', () => {
               {
                 __typename: Cardano.CertificateType.StakeRegistration,
                 stakeCredential: {
-                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                  hash: Cardano.RewardAccount.toHash(rewardAccount),
                   type: Cardano.CredentialType.KeyHash
                 }
               }
@@ -294,7 +293,7 @@ describe('DelegationTracker', () => {
                   __typename: Cardano.CertificateType.Registration,
                   deposit: 2_000_000n,
                   stakeCredential: {
-                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                    hash: Cardano.RewardAccount.toHash(rewardAccount),
                     type: Cardano.CredentialType.KeyHash
                   }
                 }
@@ -307,7 +306,7 @@ describe('DelegationTracker', () => {
               {
                 __typename: Cardano.CertificateType.StakeRegistration,
                 stakeCredential: {
-                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                  hash: Cardano.RewardAccount.toHash(rewardAccount),
                   type: Cardano.CredentialType.KeyHash
                 }
               }
@@ -322,7 +321,7 @@ describe('DelegationTracker', () => {
                   },
                   deposit: 2_000_000n,
                   stakeCredential: {
-                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                    hash: Cardano.RewardAccount.toHash(rewardAccount),
                     type: Cardano.CredentialType.KeyHash
                   }
                 }
@@ -357,7 +356,7 @@ describe('DelegationTracker', () => {
                 {
                   __typename: Cardano.CertificateType.StakeRegistration,
                   stakeCredential: {
-                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                    hash: Cardano.RewardAccount.toHash(rewardAccount),
                     type: Cardano.CredentialType.KeyHash
                   }
                 }
@@ -374,7 +373,7 @@ describe('DelegationTracker', () => {
                 {
                   __typename: Cardano.CertificateType.StakeRegistration,
                   stakeCredential: {
-                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                    hash: Cardano.RewardAccount.toHash(rewardAccount),
                     type: Cardano.CredentialType.KeyHash
                   }
                 }
@@ -392,7 +391,7 @@ describe('DelegationTracker', () => {
                 deposit: 2_000_000n,
                 poolId: 'abc' as Cardano.PoolId,
                 stakeCredential: {
-                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                  hash: Cardano.RewardAccount.toHash(rewardAccount),
                   type: Cardano.CredentialType.KeyHash
                 }
               }
@@ -426,7 +425,7 @@ describe('DelegationTracker', () => {
                   poolId: 'abc' as Cardano.PoolId,
 
                   stakeCredential: {
-                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                    hash: Cardano.RewardAccount.toHash(rewardAccount),
                     type: Cardano.CredentialType.KeyHash
                   }
                 }
@@ -443,7 +442,7 @@ describe('DelegationTracker', () => {
                 {
                   __typename: Cardano.CertificateType.StakeRegistration,
                   stakeCredential: {
-                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)),
+                    hash: Cardano.RewardAccount.toHash(rewardAccount),
                     type: Cardano.CredentialType.KeyHash
                   }
                 }

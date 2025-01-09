@@ -2,7 +2,6 @@
 /* eslint-disable no-multi-spaces */
 /* eslint-disable prettier/prettier */
 /* eslint-disable sonarjs/no-duplicate-string */
-import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, DRepInfo, RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
 import { EMPTY, Observable, firstValueFrom, of } from 'rxjs';
 import { InMemoryStakePoolsStore, KeyValueStore } from '../../../src/persistence';
@@ -243,7 +242,7 @@ describe('RewardAccounts', () => {
                     __typename: registrationCertType,
                     deposit: 0n,
                     stakeCredential: {
-                      hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+                      hash: stakeKeyHash,
                       type: Cardano.CredentialType.KeyHash
                     }
                   }
@@ -261,7 +260,7 @@ describe('RewardAccounts', () => {
                     __typename: registrationCertType,
                     deposit: 0n,
                     stakeCredential: {
-                      hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+                      hash: stakeKeyHash,
                       type: Cardano.CredentialType.KeyHash
                     }
                   }
@@ -277,7 +276,7 @@ describe('RewardAccounts', () => {
                     __typename: Cardano.CertificateType.Unregistration,
                     deposit: 0n,
                     stakeCredential: {
-                      hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+                      hash: stakeKeyHash,
                       type: Cardano.CredentialType.KeyHash
                     }
                   }
@@ -297,7 +296,7 @@ describe('RewardAccounts', () => {
                   __typename: registrationCertType,
                   deposit: 0n,
                   stakeCredential: {
-                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+                    hash: stakeKeyHash,
                     type: Cardano.CredentialType.KeyHash
                   }
                 }
@@ -315,7 +314,7 @@ describe('RewardAccounts', () => {
                   __typename: Cardano.CertificateType.Unregistration,
                   deposit: 0n,
                   stakeCredential: {
-                    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+                    hash: stakeKeyHash,
                     type: Cardano.CredentialType.KeyHash
                   }
                 }
@@ -627,7 +626,7 @@ describe('RewardAccounts', () => {
                         __typename: 'AlwaysAbstain'
                       },
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -648,7 +647,7 @@ describe('RewardAccounts', () => {
                         __typename: 'AlwaysAbstain'
                       },
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -667,7 +666,7 @@ describe('RewardAccounts', () => {
                         __typename: 'AlwaysNoConfidence'
                       },
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash2),
+                        hash: stakeKeyHash2,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -710,7 +709,7 @@ describe('RewardAccounts', () => {
       const stakeKeyHash1 = Cardano.RewardAccount.toHash(rewardAccount1);
       const stakeKeyHash2 = Cardano.RewardAccount.toHash(rewardAccount2);
       const delegateRepresentative: Cardano.Credential = {
-        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash2),
+        hash: stakeKeyHash2,
         type: Cardano.CredentialType.KeyHash
       };
       const drepId = Cardano.DRepID.cip129FromCredential(delegateRepresentative);
@@ -729,7 +728,7 @@ describe('RewardAccounts', () => {
                         __typename: 'AlwaysNoConfidence'
                       },
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -750,7 +749,7 @@ describe('RewardAccounts', () => {
                         __typename: 'AlwaysNoConfidence'
                       },
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -766,12 +765,12 @@ describe('RewardAccounts', () => {
                     {
                       __typename: Cardano.CertificateType.StakeVoteDelegation,
                       dRep: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash2),
+                        hash: stakeKeyHash2,
                         type: Cardano.CredentialType.KeyHash
                       },
                       poolId: poolId1,
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -818,7 +817,7 @@ describe('RewardAccounts', () => {
                         __typename: 'AlwaysNoConfidence'
                       },
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -839,7 +838,7 @@ describe('RewardAccounts', () => {
                         __typename: 'AlwaysNoConfidence'
                       },
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -855,7 +854,7 @@ describe('RewardAccounts', () => {
                     {
                       __typename: Cardano.CertificateType.StakeDeregistration,
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -876,7 +875,7 @@ describe('RewardAccounts', () => {
                         __typename: 'AlwaysNoConfidence'
                       },
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -892,7 +891,7 @@ describe('RewardAccounts', () => {
                     {
                       __typename: Cardano.CertificateType.StakeDeregistration,
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -908,7 +907,7 @@ describe('RewardAccounts', () => {
                     {
                       __typename: Cardano.CertificateType.StakeRegistration,
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -929,7 +928,7 @@ describe('RewardAccounts', () => {
                         __typename: 'AlwaysNoConfidence'
                       },
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -945,7 +944,7 @@ describe('RewardAccounts', () => {
                     {
                       __typename: Cardano.CertificateType.StakeDeregistration,
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -961,7 +960,7 @@ describe('RewardAccounts', () => {
                     {
                       __typename: Cardano.CertificateType.StakeRegistration,
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -980,7 +979,7 @@ describe('RewardAccounts', () => {
                         __typename: 'AlwaysNoConfidence'
                       },
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -1034,7 +1033,7 @@ describe('RewardAccounts', () => {
                         __typename: 'AlwaysNoConfidence'
                       },
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -1055,7 +1054,7 @@ describe('RewardAccounts', () => {
                         __typename: 'AlwaysNoConfidence'
                       },
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -1072,7 +1071,7 @@ describe('RewardAccounts', () => {
                       __typename: Cardano.CertificateType.Unregistration,
                       deposit: 0n,
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -1093,7 +1092,7 @@ describe('RewardAccounts', () => {
                         __typename: 'AlwaysNoConfidence'
                       },
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -1110,7 +1109,7 @@ describe('RewardAccounts', () => {
                       __typename: Cardano.CertificateType.Unregistration,
                       deposit: 0n,
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -1130,7 +1129,7 @@ describe('RewardAccounts', () => {
                       },
                       deposit: 0n,
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -1170,13 +1169,13 @@ describe('RewardAccounts', () => {
       const stakeKeyHash2 = Cardano.RewardAccount.toHash(rewardAccount2);
 
       const delegateRepresentative1: Cardano.Credential = {
-        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+        hash: stakeKeyHash1,
         type: Cardano.CredentialType.ScriptHash
       };
       const drepId1 = Cardano.DRepID.cip129FromCredential(delegateRepresentative1);
 
       const delegateRepresentative2: Cardano.Credential = {
-        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash2),
+        hash: stakeKeyHash2,
         type: Cardano.CredentialType.KeyHash
       };
       const drepId2 = Cardano.DRepID.cip129FromCredential(delegateRepresentative2);
@@ -1197,7 +1196,7 @@ describe('RewardAccounts', () => {
                         __typename: 'AlwaysAbstain'
                       },
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -1218,7 +1217,7 @@ describe('RewardAccounts', () => {
                         __typename: 'AlwaysNoConfidence'
                       },
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -1238,7 +1237,7 @@ describe('RewardAccounts', () => {
                       },
                       poolId: poolId1,
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -1259,7 +1258,7 @@ describe('RewardAccounts', () => {
                         __typename: 'AlwaysAbstain'
                       },
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -1279,7 +1278,7 @@ describe('RewardAccounts', () => {
                       },
                       poolId: poolId1,
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -1295,13 +1294,13 @@ describe('RewardAccounts', () => {
                     {
                       __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
                       dRep: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash2),
+                        hash: stakeKeyHash2,
                         type: Cardano.CredentialType.KeyHash
                       },
                       deposit: 2_000_000n,
                       poolId: poolId1,
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -1322,7 +1321,7 @@ describe('RewardAccounts', () => {
                         __typename: 'AlwaysAbstain'
                       },
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -1342,7 +1341,7 @@ describe('RewardAccounts', () => {
                       },
                       poolId: poolId1,
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -1358,13 +1357,13 @@ describe('RewardAccounts', () => {
                     {
                       __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
                       dRep: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash2),
+                        hash: stakeKeyHash2,
                         type: Cardano.CredentialType.KeyHash
                       },
                       deposit: 2_000_000n,
                       poolId: poolId1,
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }
@@ -1380,12 +1379,12 @@ describe('RewardAccounts', () => {
                     {
                       __typename: Cardano.CertificateType.VoteRegistrationDelegation,
                       dRep: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.ScriptHash
                       },
                       deposit: 2_000_000n,
                       stakeCredential: {
-                        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash1),
+                        hash: stakeKeyHash1,
                         type: Cardano.CredentialType.KeyHash
                       }
                     }

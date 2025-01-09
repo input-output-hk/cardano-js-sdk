@@ -186,9 +186,7 @@ describe('TxBuilder/delegatePortfolio', () => {
       expect(tx.body.certificates).toContainEqual<Cardano.Certificate>({
         __typename: Cardano.CertificateType.StakeRegistration,
         stakeCredential: {
-          hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(
-            Cardano.RewardAccount.toHash(groupedAddresses[0].rewardAccount)
-          ),
+          hash: Cardano.RewardAccount.toHash(groupedAddresses[0].rewardAccount),
           type: Cardano.CredentialType.KeyHash
         }
       });
@@ -196,9 +194,7 @@ describe('TxBuilder/delegatePortfolio', () => {
         __typename: Cardano.CertificateType.StakeDelegation,
         poolId: poolIds[0],
         stakeCredential: {
-          hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(
-            Cardano.RewardAccount.toHash(groupedAddresses[0].rewardAccount)
-          ),
+          hash: Cardano.RewardAccount.toHash(groupedAddresses[0].rewardAccount),
           type: Cardano.CredentialType.KeyHash
         }
       });
@@ -847,7 +843,7 @@ describe('TxBuilder/delegatePortfolio', () => {
       expect(tx.body.certificates).toContainEqual<Cardano.Certificate>({
         __typename: Cardano.CertificateType.StakeRegistration,
         stakeCredential: {
-          hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(groupAddress.rewardAccount)),
+          hash: Cardano.RewardAccount.toHash(groupAddress.rewardAccount),
           type: Cardano.CredentialType.KeyHash
         }
       });
@@ -855,7 +851,7 @@ describe('TxBuilder/delegatePortfolio', () => {
         __typename: Cardano.CertificateType.StakeDelegation,
         poolId: poolIds[0],
         stakeCredential: {
-          hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(groupAddress.rewardAccount)),
+          hash: Cardano.RewardAccount.toHash(groupAddress.rewardAccount),
           type: Cardano.CredentialType.KeyHash
         }
       });

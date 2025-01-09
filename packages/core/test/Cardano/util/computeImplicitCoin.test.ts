@@ -12,7 +12,7 @@ describe('Cardano.util.computeImplicitCoin', () => {
   beforeEach(async () => {
     rewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
     stakeCredential = {
-      hash: Cardano.RewardAccount.toHash(rewardAccount) as unknown as Crypto.Hash28ByteBase16,
+      hash: Cardano.RewardAccount.toHash(rewardAccount),
       type: Cardano.CredentialType.KeyHash
     };
     dRepPublicKey = Crypto.Ed25519PublicKeyHex('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01');
@@ -106,7 +106,9 @@ describe('Cardano.util.computeImplicitCoin', () => {
       type: Cardano.CredentialType.KeyHash
     };
 
-    const poolId = Cardano.PoolId.fromKeyHash(Cardano.RewardAccount.toHash(rewardAccount));
+    const poolId = Cardano.PoolId.fromKeyHash(
+      Cardano.RewardAccount.toHash(rewardAccount) as unknown as Crypto.Ed25519KeyHashHex
+    );
 
     const stakeKeyDepositPp = BigInt(protocolParameters.stakeKeyDeposit);
     const stakeKeyDepositCert = 10n;

@@ -105,7 +105,7 @@ describe('PersonalWallet/drepRetirement', () => {
     );
 
     return rewardAccounts.map((rewardAccount) => ({
-      hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(RewardAccount.toHash(rewardAccount)),
+      hash: RewardAccount.toHash(rewardAccount),
       type: CredentialType.KeyHash
     }));
   };

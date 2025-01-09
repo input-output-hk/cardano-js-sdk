@@ -134,7 +134,7 @@ export class MultiSigWallet {
       {
         __typename: Cardano.CertificateType.StakeRegistration,
         stakeCredential: {
-          hash: Cardano.RewardAccount.toHash(this.getRewardAccount()) as unknown as Crypto.Hash28ByteBase16,
+          hash: Cardano.RewardAccount.toHash(this.getRewardAccount()),
           type: Cardano.CredentialType.ScriptHash
         }
       },
@@ -142,7 +142,7 @@ export class MultiSigWallet {
         __typename: Cardano.CertificateType.StakeDelegation,
         poolId: pool,
         stakeCredential: {
-          hash: Cardano.RewardAccount.toHash(this.getRewardAccount()) as unknown as Crypto.Hash28ByteBase16,
+          hash: Cardano.RewardAccount.toHash(this.getRewardAccount()),
           type: Cardano.CredentialType.ScriptHash
         }
       }

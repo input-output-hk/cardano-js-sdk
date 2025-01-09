@@ -1,11 +1,19 @@
 import { CardanoKeyConst, util } from '@cardano-sdk/key-management';
-import { contextWithKnownAddresses, contextWithoutKnownAddresses, paymentHash, stakeKeyHash } from '../testData';
+import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
+import {
+  contextWithKnownAddresses,
+  contextWithoutKnownAddresses,
+  paymentHash,
+  stakeKeyHash as stakeKeyCredentialHash
+} from '../testData';
 import { mapRequiredSigners, toRequiredSigner } from '../../src/transformers';
+
+const stakeKeyHash = Ed25519KeyHashHex(stakeKeyCredentialHash);
 
 describe('requiredSigners', () => {
   describe('mapRequiredSigners', () => {
-    it('can map a a set of required signers', async () => {
-      const signers = await mapRequiredSigners([stakeKeyHash, paymentHash], contextWithKnownAddresses);
+    it('can map a a set of required signers', () => {
+      const signers = mapRequiredSigners([stakeKeyHash, paymentHash], contextWithKnownAddresses);
 
       expect(signers).not.toBeNull();
       expect(signers!.length).toEqual(2);
@@ -21,7 +29,7 @@ describe('requiredSigners', () => {
   });
 
   describe('toRequiredSigner', () => {
-    it('can map a known Ed25519KeyHashHex to a trezor required signer', async () => {
+    it('can map a known Ed25519KeyHashHex to a trezor required signer', () => {
       const requiredSigner = toRequiredSigner(stakeKeyHash, contextWithKnownAddresses);
 
       expect(requiredSigner).toEqual({

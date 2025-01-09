@@ -4,6 +4,7 @@ import * as Address from '../../Cardano/Address';
 import * as Cardano from '../../Cardano/types';
 import * as Crypto from '@cardano-sdk/crypto';
 import { BigIntMath } from '@cardano-sdk/util';
+import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
 
 /** Implicit coin quantities used in the transaction */
 export interface ImplicitCoin {
@@ -39,7 +40,10 @@ const computeShellyDeposits = (
   const anyRewardAccount = rewardAccounts.length === 0;
 
   const poolIds = new Set(
-    rewardAccounts.map((account) => Cardano.PoolId.fromKeyHash(Address.RewardAccount.toHash(account)))
+    rewardAccounts.map((account) =>
+      // might be a script hash, but should result in same pool id so it's ok to cast it as key hash
+      Cardano.PoolId.fromKeyHash(Ed25519KeyHashHex(Address.RewardAccount.toHash(account)))
+    )
   );
 
   // TODO: For the case of deregistration (StakeDeregistration and PoolRetirement) the code here is not entirely correct

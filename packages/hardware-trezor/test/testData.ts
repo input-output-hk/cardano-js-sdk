@@ -119,7 +119,7 @@ export const rewardAddress = Cardano.Address.fromBech32(rewardAccount)?.asReward
 export const rewardAccountWithPaymentScriptCredential = Cardano.RewardAccount(rewardScript);
 export const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
 export const stakeCredential = {
-  hash: stakeKeyHash as unknown as Crypto.Hash28ByteBase16,
+  hash: stakeKeyHash,
   type: Cardano.CredentialType.KeyHash
 };
 export const stakeScriptHash = Cardano.RewardAccount.toHash(rewardAccountWithPaymentScriptCredential);

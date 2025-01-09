@@ -660,7 +660,7 @@ describe.each([
         deposit: 2n,
         poolId,
         stakeCredential: {
-          hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(mocks.stakeKeyHash),
+          hash: mocks.stakeKeyHash,
           type: Cardano.CredentialType.KeyHash
         }
       };
@@ -682,7 +682,7 @@ describe.each([
         deposit: 5n,
         poolId: Cardano.PoolId('pool1y6chk7x7fup4ms9leesdr57r4qy9cwxuee0msan72x976a6u0nc'),
         stakeCredential: {
-          hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(mocks.stakeKeyHash),
+          hash: mocks.stakeKeyHash,
           type: Cardano.CredentialType.KeyHash
         }
       };
