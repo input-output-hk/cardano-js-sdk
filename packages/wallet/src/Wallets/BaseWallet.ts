@@ -189,6 +189,7 @@ export interface BaseWalletDependencies {
   readonly connectionStatusTracker$?: ConnectionStatusTracker;
   readonly publicCredentialsManager: PublicCredentialsManager;
   readonly drepProvider: DRepProvider;
+  readonly inputResolver?: Cardano.InputResolver;
 }
 
 export interface SubmitTxOptions {
@@ -326,7 +327,8 @@ export class BaseWallet implements ObservableWallet {
       publicCredentialsManager,
       stores = createInMemoryWalletStores(),
       connectionStatusTracker$ = createSimpleConnectionStatusTracker(),
-      drepProvider
+      drepProvider,
+      inputResolver
     }: BaseWalletDependencies
   ) {
     this.#logger = contextLogger(logger, name);
@@ -607,6 +609,10 @@ export class BaseWallet implements ObservableWallet {
       transactions: this.transactions,
       utxo: this.utxo
     });
+
+    if (inputResolver) {
+      this.util.resolveInput = inputResolver.resolveInput.bind(inputResolver);
+    }
 
     const getPubDRepKey = async (): Promise<Ed25519PublicKeyHex | undefined> => {
       if (isBip32PublicCredentialsManager(this.#publicCredentialsManager)) {
