@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.24.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.24.3...@cardano-sdk/tx-construction@0.24.4) (2025-01-09)
+
+### Bug Fixes
+
+* **tx-constructor:** txBuilder ctor must be sync to be used with remoteApi ([7772c6c](https://github.com/input-output-hk/cardano-js-sdk/commit/7772c6c9c03eb9729335a1450eaa5e133733c2c2))
+
 ## [0.24.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.24.2...@cardano-sdk/tx-construction@0.24.3) (2025-01-09)
 
 **Note:** Version bump only for package @cardano-sdk/tx-construction
