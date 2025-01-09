@@ -5,7 +5,7 @@ import { TxEvaluationResult, TxEvaluator } from './types';
  * This evaluator assigns the maximum execution units per transaction to each redeemer.
  */
 export class GreedyTxEvaluator implements TxEvaluator {
-  #params: Promise<Cardano.ProtocolParameters>;
+  #getProtocolParams: () => Promise<Cardano.ProtocolParameters>;
 
   /**
    * Creates an instance of GreedyTxEvaluator.
@@ -13,7 +13,7 @@ export class GreedyTxEvaluator implements TxEvaluator {
    * @param getProtocolParams - A callback that resolves to the Cardano protocol parameters.
    */
   constructor(getProtocolParams: () => Promise<Cardano.ProtocolParameters>) {
-    this.#params = getProtocolParams();
+    this.#getProtocolParams = getProtocolParams;
   }
 
   /**
@@ -24,7 +24,7 @@ export class GreedyTxEvaluator implements TxEvaluator {
    * @returns A promise that resolves to the transaction evaluation result.
    */
   async evaluate(tx: Cardano.Tx, _: Array<Cardano.Utxo>): Promise<TxEvaluationResult> {
-    const { maxExecutionUnitsPerTransaction } = await this.#params;
+    const { maxExecutionUnitsPerTransaction } = await this.#getProtocolParams();
     const { witness } = tx;
 
     if (!witness || !witness.redeemers) return [];
