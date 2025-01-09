@@ -659,6 +659,7 @@ describe('TransactionsTracker', () => {
     });
 
     it('observable properties behave correctly on successful transaction', async () => {
+      const preExistingTx = queryTransactionsResult2.pageResults[2];
       const submittedTx = queryTransactionsResult.pageResults[0];
       const outgoingTx = toOutgoingTx(submittedTx);
       const incomingTx = queryTransactionsResult.pageResults[1];
@@ -669,7 +670,7 @@ describe('TransactionsTracker', () => {
         const pending$ = hot('--a-|', { a: outgoingTx });
         const signed$ = hot<WitnessedTx>('----|');
         const transactionsSource$ = hot<Cardano.HydratedTx[]>('a-bc|', {
-          a: [],
+          a: [preExistingTx],
           b: [incomingTx],
           c: [incomingTx, submittedTx]
         });
@@ -708,9 +709,13 @@ describe('TransactionsTracker', () => {
         });
         expectObservable(transactionsTracker.outgoing.failed$).toBe('----|');
         expectObservable(transactionsTracker.history$).toBe('a-bc|', {
-          a: [],
+          a: [preExistingTx],
           b: [incomingTx],
           c: [submittedTx, incomingTx]
+        });
+        expectObservable(transactionsTracker.new$).toBe('--bc|', {
+          b: incomingTx,
+          c: submittedTx
         });
       });
     });

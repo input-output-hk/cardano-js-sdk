@@ -77,6 +77,8 @@ export interface TxInFlight extends OutgoingTx {
 
 export interface TransactionsTracker {
   readonly history$: Observable<Cardano.HydratedTx[]>;
+  /** Transactions that are appended to history$ after initial load */
+  readonly new$: Observable<Cardano.HydratedTx>;
   readonly rollback$: Observable<Cardano.HydratedTx>;
   readonly outgoing: {
     readonly inFlight$: Observable<TxInFlight[]>;

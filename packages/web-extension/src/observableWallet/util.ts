@@ -147,6 +147,7 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
   tip$: RemoteApiPropertyType.HotObservable,
   transactions: {
     history$: RemoteApiPropertyType.HotObservable,
+    new$: RemoteApiPropertyType.HotObservable,
     outgoing: {
       failed$: RemoteApiPropertyType.HotObservable,
       inFlight$: RemoteApiPropertyType.HotObservable,

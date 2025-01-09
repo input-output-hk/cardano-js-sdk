@@ -380,9 +380,10 @@ export const createTransactionsTracker = (
     tap((transactions) => logger.debug(`History transactions count: ${transactions?.length || 0}`))
   );
 
-  const [onChainNewTxPhase2Failed$, onChainNewTxSuccess$] = partition(
-    newTransactions$(historicalTransactions$).pipe(share()),
-    (tx) => Cardano.util.isPhase2ValidationErrTx(tx)
+  const new$ = newTransactions$(historicalTransactions$).pipe(share());
+
+  const [onChainNewTxPhase2Failed$, onChainNewTxSuccess$] = partition(new$, (tx) =>
+    Cardano.util.isPhase2ValidationErrTx(tx)
   );
 
   const txOnChain$ = (evt: OutgoingTx): Observable<OutgoingOnChainTx> =>
@@ -579,6 +580,7 @@ export const createTransactionsTracker = (
 
   return {
     history$: historicalTransactions$,
+    new$,
     outgoing: {
       failed$,
       inFlight$,
