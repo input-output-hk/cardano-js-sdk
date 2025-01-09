@@ -59,7 +59,7 @@ export const createInputResolver = ({ utxo, transactions }: InputResolverContext
     if (availableUtxo) return availableUtxo[1];
 
     if (options?.hints) {
-      const tx = options?.hints.find((hint) => hint.id === input.txId);
+      const tx = options?.hints?.transactions?.find((hint) => hint.id === input.txId);
 
       if (tx && tx.body.outputs.length > input.index) {
         return tx.body.outputs[input.index];
@@ -106,8 +106,8 @@ export const createBackendInputResolver = (provider: ChainHistoryProvider): Card
   return {
     async resolveInput(input: Cardano.TxIn, options?: Cardano.ResolveOptions) {
       // Add hints to the cache
-      if (options?.hints) {
-        for (const hint of options.hints) {
+      if (options?.hints && options.hints?.transactions) {
+        for (const hint of options.hints.transactions) {
           txCache.set(hint.id, hint);
         }
       }
