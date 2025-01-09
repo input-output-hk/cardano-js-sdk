@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.23.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.23.5...@cardano-sdk/cardano-services-client@0.23.6) (2025-01-09)
+
+### Features
+
+* **cardano-services-client:** preserve response body as BlockfrostError detail ([875d278](https://github.com/input-output-hk/cardano-js-sdk/commit/875d278c49e270cdd3c14893db9cb52fd2abb49f))
+
+### Bug Fixes
+
+* **cardano-services-client:** map Blockfrost ValueNotConserved and OutsideOfValidityInterval errors ([68fb8c8](https://github.com/input-output-hk/cardano-js-sdk/commit/68fb8c8ee63e31a23fd6191cd0b4ba8a21708a2d))
+* **cardano-services-client:** preserve blockfrost error response text ([13faa42](https://github.com/input-output-hk/cardano-js-sdk/commit/13faa42138bf7dee2c120ed5e6afb1c7fb2ed0bf))
+
 ## [0.23.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.23.4...@cardano-sdk/cardano-services-client@0.23.5) (2025-01-02)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services-client

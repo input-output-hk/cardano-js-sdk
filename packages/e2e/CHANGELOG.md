@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.49.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.49.5...@cardano-sdk/e2e@0.49.6) (2025-01-09)
+
+### Features
+
+* add stub handle provider option for e2e tests ([051c6b0](https://github.com/input-output-hk/cardano-js-sdk/commit/051c6b04f879d7750d89574ab9700674c94b8171))
+
+### Bug Fixes
+
+* **cardano-services-client:** map Blockfrost ValueNotConserved and OutsideOfValidityInterval errors ([68fb8c8](https://github.com/input-output-hk/cardano-js-sdk/commit/68fb8c8ee63e31a23fd6191cd0b4ba8a21708a2d))
+* **e2e:** use blockfrost projectId and apiVersion provider params ([3ddb273](https://github.com/input-output-hk/cardano-js-sdk/commit/3ddb27373a2125efb47baf0af351a5a72ce3b29d))
+
 ## [0.49.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.49.4...@cardano-sdk/e2e@0.49.5) (2025-01-02)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

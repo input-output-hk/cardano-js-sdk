@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.42.3...@cardano-sdk/core@0.43.0) (2025-01-09)
+
+### ⚠ BREAKING CHANGES
+
+* **wallet:** input resolver can now take utxos and transactions as hints for resolution
+
+### Features
+
+* **wallet:** input resolver can now take utxos and transactions as hints for resolution ([19763ba](https://github.com/input-output-hk/cardano-js-sdk/commit/19763baaacd61a2a0f51c68552b741184fc2be80))
+
 ## [0.42.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.42.2...@cardano-sdk/core@0.42.3) (2025-01-02)
 
 ### Features

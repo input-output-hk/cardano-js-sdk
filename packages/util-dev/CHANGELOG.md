@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.24.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.24.4...@cardano-sdk/util-dev@0.24.5) (2025-01-09)
+
+### Features
+
+* add stub handle provider option for e2e tests ([051c6b0](https://github.com/input-output-hk/cardano-js-sdk/commit/051c6b04f879d7750d89574ab9700674c94b8171))
+
 ## [0.24.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.24.3...@cardano-sdk/util-dev@0.24.4) (2025-01-02)
 
 **Note:** Version bump only for package @cardano-sdk/util-dev
