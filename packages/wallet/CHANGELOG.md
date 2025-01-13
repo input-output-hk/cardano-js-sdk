@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.49.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.49.1...@cardano-sdk/wallet@0.49.2) (2025-01-13)
+
+### Features
+
+* **wallet:** input resolver dependency is now composed with context input resolver ([218fc84](https://github.com/input-output-hk/cardano-js-sdk/commit/218fc8487ff7984e4012039092bc0a144c3c24f9))
+
 ## [0.49.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.49.0...@cardano-sdk/wallet@0.49.1) (2025-01-09)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
