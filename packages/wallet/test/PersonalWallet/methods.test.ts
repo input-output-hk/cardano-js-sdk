@@ -237,6 +237,42 @@ describe('BaseWallet methods', () => {
         expect(result).toEqual(output);
         expect(inputResolver.resolveInput).toBeCalledTimes(1);
       });
+
+      it('resolves using wallet context before using given input resolver', async () => {
+        const output = {
+          address: Cardano.PaymentAddress(
+            'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w'
+          ),
+          value: { coins: 997n }
+        };
+
+        const givenInputResolver = { resolveInput: jest.fn().mockResolvedValue(output) };
+
+        const walletWithInputResolver = createPersonalWallet(
+          { name: 'Test Wallet' },
+          {
+            addressDiscovery,
+            assetProvider,
+            bip32Account,
+            chainHistoryProvider,
+            drepProvider,
+            handleProvider,
+            inputResolver: givenInputResolver,
+            logger,
+            networkInfoProvider,
+            rewardsProvider,
+            stakePoolProvider,
+            txSubmitProvider,
+            utxoProvider,
+            witnesser
+          }
+        );
+
+        const utxoSet = await firstValueFrom(walletWithInputResolver.utxo.available$);
+        const result = await walletWithInputResolver.util.resolveInput(utxoSet[0][0]);
+        expect(result).toEqual(utxoSet[0][1]);
+        expect(givenInputResolver.resolveInput).not.toHaveBeenCalled();
+      });
     });
   });
 

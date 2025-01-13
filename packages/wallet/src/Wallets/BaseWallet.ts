@@ -40,12 +40,14 @@ import {
   TransactionsTracker,
   UtxoTracker,
   WalletUtil,
+  combineInputResolvers,
   createAddressTracker,
   createAssetsTracker,
   createBalanceTracker,
   createDRepRegistrationTracker,
   createDelegationTracker,
   createHandlesTracker,
+  createInputResolver,
   createProviderStatusTracker,
   createSimpleConnectionStatusTracker,
   createTransactionReemitter,
@@ -248,6 +250,7 @@ const getDRepKeyHash = async (dRepKey: Ed25519PublicKeyHex | undefined) =>
   dRepKey ? (await Ed25519PublicKey.fromHex(dRepKey).hash()).hex() : undefined;
 
 export class BaseWallet implements ObservableWallet {
+  #inputResolver: Cardano.InputResolver | undefined;
   #inputSelector: InputSelector;
   #logger: Logger;
   #tip$: TipTracker;
@@ -629,6 +632,11 @@ export class BaseWallet implements ObservableWallet {
         pubDRepKeyHash$: from(getPubDRepKey().then(getDRepKeyHash))
       })
     };
+
+    if (inputResolver) {
+      this.#inputResolver = combineInputResolvers(createInputResolver(this), inputResolver);
+      this.util.resolveInput = this.#inputResolver?.resolveInput.bind(this.#inputResolver);
+    }
 
     this.#logger.debug('Created');
   }
