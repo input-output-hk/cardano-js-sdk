@@ -8,11 +8,13 @@ const extendedAccountPublicKey = Bip32PublicKeyHex(
   '00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
 );
 
-export const createMockKeyAgent = (deriveAddressesReturn: GroupedAddress[] = []): jest.Mocked<KeyAgent> => {
+export const createMockKeyAgent = async (
+  deriveAddressesReturn: GroupedAddress[] = []
+): Promise<jest.Mocked<KeyAgent>> => {
   const remainingDeriveAddressesReturn = [...deriveAddressesReturn];
   return {
     accountIndex,
-    bip32Ed25519: new SodiumBip32Ed25519(),
+    bip32Ed25519: await SodiumBip32Ed25519.create(),
     chainId,
     deriveAddress: jest.fn().mockImplementation(async () => remainingDeriveAddressesReturn.shift()),
     derivePublicKey: jest.fn(),

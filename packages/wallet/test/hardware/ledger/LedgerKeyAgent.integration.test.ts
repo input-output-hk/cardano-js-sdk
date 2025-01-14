@@ -49,10 +49,10 @@ const createWallet = async (keyAgent: KeyAgent) => {
 
 const getAddress = async (wallet: ObservableWallet) => (await firstValueFrom(wallet.addresses$))[0].address;
 
-const keyAgentDependencies = { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), logger };
-
 describe('LedgerKeyAgent+BaseWallet', () => {
   test('creating and restoring LedgerKeyAgent wallet', async () => {
+    const keyAgentDependencies = { bip32Ed25519: await Crypto.SodiumBip32Ed25519.create(), logger };
+
     const freshKeyAgent = await LedgerKeyAgent.createWithDevice(
       {
         chainId: Cardano.ChainIds.Preprod,

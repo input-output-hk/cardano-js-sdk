@@ -104,7 +104,7 @@ addressDiscoveryFactory.register(
 // bip32Ed25519
 
 bip32Ed25519Factory.register('CML', async () => new Crypto.CmlBip32Ed25519(CML));
-bip32Ed25519Factory.register('Sodium', async () => new Crypto.SodiumBip32Ed25519());
+bip32Ed25519Factory.register('Sodium', async () => Crypto.SodiumBip32Ed25519.create());
 
 // Web Socket
 

@@ -1,5 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, AsyncKeyAgent, GroupedAddress, KeyAgent, KeyRole, cip8 } from '../../src';
+import { Bip32Ed25519 } from '@cardano-sdk/crypto';
 import { COSEKey, COSESign1, SigStructure } from '@emurgo/cardano-message-signing-nodejs';
 import { Cardano, util } from '@cardano-sdk/core';
 import { CoseLabel } from '../../src/cip8/util';
@@ -16,15 +17,16 @@ describe('cip30signData', () => {
   let address: GroupedAddress;
   let drepKeyHex: Crypto.Ed25519PublicKeyHex;
   let drepKeyHash: Crypto.Ed25519KeyHashHex;
-  const cryptoProvider = new Crypto.SodiumBip32Ed25519();
+  let cryptoProvider: Bip32Ed25519;
 
   beforeAll(async () => {
+    cryptoProvider = await Crypto.SodiumBip32Ed25519.create();
     const keyAgentReady = testKeyAgent();
     keyAgent = await keyAgentReady;
     asyncKeyAgent = await testAsyncKeyAgent(undefined, keyAgentReady);
     address = await asyncKeyAgent.deriveAddress(addressDerivationPath, 0);
     drepKeyHex = await asyncKeyAgent.derivePublicKey(DREP_KEY_DERIVATION_PATH);
-    drepKeyHash = (await Crypto.Ed25519PublicKey.fromHex(drepKeyHex).hash()).hex();
+    drepKeyHash = Crypto.Ed25519PublicKey.fromHex(drepKeyHex).hash().hex();
   });
 
   const signAndDecode = async (
@@ -113,11 +115,7 @@ describe('cip30signData', () => {
     const signedDataBytes = HexBlob.fromBytes(signedData.to_bytes());
     const signatureBytes = HexBlob.fromBytes(coseSign1.signature()) as unknown as Crypto.Ed25519SignatureHex;
     expect(
-      await cryptoProvider.verify(
-        signatureBytes,
-        signedDataBytes,
-        publicKeyHex as unknown as Crypto.Ed25519PublicKeyHex
-      )
+      cryptoProvider.verify(signatureBytes, signedDataBytes, publicKeyHex as unknown as Crypto.Ed25519PublicKeyHex)
     ).toBe(true);
   });
 

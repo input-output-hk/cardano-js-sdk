@@ -8,6 +8,8 @@ import {
 } from './Ed25519TestVectors';
 
 describe('Ed25519PrivateKey', () => {
+  beforeAll(() => Crypto.ready());
+
   it('can create an instance from a valid normal Ed25519 private key hex representation', () => {
     const privateKey = Crypto.Ed25519PrivateKey.fromNormalHex(
       Crypto.Ed25519PrivateNormalKeyHex(testVectorMessageZeroLength.secretKey)
@@ -62,7 +64,7 @@ describe('Ed25519PrivateKey', () => {
 
     for (const vector of vectors) {
       const privateKey = Crypto.Ed25519PrivateKey.fromNormalHex(Crypto.Ed25519PrivateNormalKeyHex(vector.secretKey));
-      const publicKey = await privateKey.toPublic();
+      const publicKey = privateKey.toPublic();
 
       expect(publicKey.hex()).toBe(vector.publicKey);
     }
@@ -75,7 +77,7 @@ describe('Ed25519PrivateKey', () => {
       const privateKey = Crypto.Ed25519PrivateKey.fromExtendedHex(
         Crypto.Ed25519PrivateExtendedKeyHex(vector.ed25519eVector.secretKey)
       );
-      const publicKey = await privateKey.toPublic();
+      const publicKey = privateKey.toPublic();
 
       expect(publicKey.hex()).toBe(vector.ed25519eVector.publicKey);
     }
@@ -88,9 +90,9 @@ describe('Ed25519PrivateKey', () => {
       const privateKey = Crypto.Ed25519PrivateKey.fromNormalHex(Crypto.Ed25519PrivateNormalKeyHex(vector.secretKey));
       const publicKey = Crypto.Ed25519PublicKey.fromHex(Crypto.Ed25519PublicKeyHex(vector.publicKey));
       const message = HexBlob(vector.message);
-      const signature = await privateKey.sign(HexBlob(vector.message));
+      const signature = privateKey.sign(HexBlob(vector.message));
 
-      const isSignatureValid = await publicKey.verify(signature, message);
+      const isSignatureValid = publicKey.verify(signature, message);
       expect(signature.hex()).toBe(vector.signature);
       expect(isSignatureValid).toBeTruthy();
     }
@@ -106,9 +108,9 @@ describe('Ed25519PrivateKey', () => {
       );
       const publicKey = Crypto.Ed25519PublicKey.fromHex(Crypto.Ed25519PublicKeyHex(vector.publicKey));
       const message = HexBlob(vector.message);
-      const signature = await privateKey.sign(HexBlob(vector.message));
+      const signature = privateKey.sign(HexBlob(vector.message));
 
-      const isSignatureValid = await publicKey.verify(signature, message);
+      const isSignatureValid = publicKey.verify(signature, message);
       expect(signature.hex()).toBe(vector.signature);
       expect(isSignatureValid).toBeTruthy();
     }

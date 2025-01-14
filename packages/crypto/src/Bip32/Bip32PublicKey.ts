@@ -53,11 +53,12 @@ export class Bip32PublicKey {
   /**
    * Given a set of indices, this function computes the corresponding child extended key.
    *
+   * NOTE: You must await `Crypto.ready()` at least once before calling this function.
+   *
    * @param derivationIndices The list of derivation indices.
    * @returns The child extended private key.
    */
-  async derive(derivationIndices: number[]): Promise<Bip32PublicKey> {
-    await sodium.ready;
+  derive(derivationIndices: number[]): Bip32PublicKey {
     let key = Buffer.from(this.#key);
 
     for (const index of derivationIndices) {
@@ -77,9 +78,8 @@ export class Bip32PublicKey {
     return Bip32PublicKeyHex(Buffer.from(this.#key).toString('hex'));
   }
 
-  /** Gets the blake2 hash of the key. */
-  async hash(): Promise<Bip32PublicKeyHashHex> {
-    await sodium.ready;
+  /** Gets the blake2 hash of the key. NOTE: You must await `Crypto.ready()` at least once before calling this function. */
+  hash(): Bip32PublicKeyHashHex {
     const hash = sodium.crypto_generichash(BIP32_PUBLIC_KEY_HASH_LENGTH, this.#key);
     return Bip32PublicKeyHashHex(Buffer.from(hash).toString('hex'));
   }

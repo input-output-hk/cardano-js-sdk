@@ -16,10 +16,14 @@ import { dummyLogger } from 'ts-log';
 import { restoreKeyAgent } from '../../../src';
 
 describe('KeyManagement/restoreKeyAgent', () => {
-  const dependencies: KeyAgentDependencies = {
-    bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
-    logger: dummyLogger
-  };
+  let dependencies: KeyAgentDependencies;
+
+  beforeAll(async () => {
+    dependencies = {
+      bip32Ed25519: await Crypto.SodiumBip32Ed25519.create(),
+      logger: dummyLogger
+    };
+  });
 
   describe('InMemoryKeyAgent', () => {
     const encryptedRootPrivateKeyBytes = [

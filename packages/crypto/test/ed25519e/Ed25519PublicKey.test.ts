@@ -3,6 +3,8 @@ import { HexBlob, InvalidStringError } from '@cardano-sdk/util';
 import { InvalidSignature, testVectorMessageZeroLength, vectors } from './Ed25519TestVectors';
 
 describe('Ed25519PublicKey', () => {
+  beforeAll(() => Crypto.ready());
+
   it('can create an instance from a valid Ed25519 public key hex representation', () => {
     const publicKey = Crypto.Ed25519PublicKey.fromHex(
       Crypto.Ed25519PublicKeyHex(testVectorMessageZeroLength.publicKey)

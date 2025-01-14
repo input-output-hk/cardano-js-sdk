@@ -7,6 +7,8 @@ describe('Cardano.util.computeImplicitCoin', () => {
   let dRepPublicKey: Crypto.Ed25519PublicKeyHex;
   let dRepKeyHash: Crypto.Ed25519KeyHashHex;
 
+  beforeAll(() => Crypto.ready());
+
   beforeEach(async () => {
     rewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
     stakeCredential = {
@@ -14,7 +16,7 @@ describe('Cardano.util.computeImplicitCoin', () => {
       type: Cardano.CredentialType.KeyHash
     };
     dRepPublicKey = Crypto.Ed25519PublicKeyHex('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01');
-    dRepKeyHash = (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex();
+    dRepKeyHash = Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash().hex();
   });
 
   describe('calculates deposit', () => {

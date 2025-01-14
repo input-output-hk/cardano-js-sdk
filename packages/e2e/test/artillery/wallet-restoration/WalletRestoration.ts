@@ -89,7 +89,7 @@ export const walletRestoration: FunctionHook<WalletVars> = async ({ vars, _uid }
 
   try {
     // Creates Stub KeyAgent
-    const keyAgent = util.createAsyncKeyAgent(createMockKeyAgent([currentAddress]));
+    const keyAgent = util.createAsyncKeyAgent(await createMockKeyAgent([currentAddress]));
 
     // Start to measure wallet restoration time
     const startedAt = Date.now();

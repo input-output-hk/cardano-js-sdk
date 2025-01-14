@@ -17,7 +17,7 @@ import { localNetworkChainId } from '../util';
       mnemonicWords: mnemonicArray
     },
     {
-      bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
+      bip32Ed25519: await Crypto.SodiumBip32Ed25519.create(),
       logger: console
     }
   );

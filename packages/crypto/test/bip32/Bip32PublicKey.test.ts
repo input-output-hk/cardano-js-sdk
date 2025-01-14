@@ -7,6 +7,8 @@ import {
 } from '../ed25519e/Ed25519TestVectors';
 
 describe('Bip32PublicKey', () => {
+  beforeAll(() => Crypto.ready());
+
   it('can create an instance from a valid normal BIP-32 public key hex representation', async () => {
     const publicKey = Crypto.Bip32PublicKey.fromHex(
       Crypto.Bip32PublicKeyHex(bip32TestVectorMessageOneLength.publicKey)

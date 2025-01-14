@@ -110,7 +110,7 @@ describe('LedgerKeyAgent', () => {
           chainId: Cardano.ChainIds.Preprod,
           communicationType: CommunicationType.Node
         },
-        { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), logger }
+        { bip32Ed25519: await Crypto.SodiumBip32Ed25519.create(), logger }
       );
     });
 
@@ -126,7 +126,7 @@ describe('LedgerKeyAgent', () => {
           communicationType: CommunicationType.Node,
           deviceConnection: ledgerKeyAgent.deviceConnection
         },
-        mockKeyAgentDependencies()
+        await mockKeyAgentDependencies()
       );
       expect(ledgerKeyAgentWithRandomIndex).toBeInstanceOf(LedgerKeyAgent);
       expect(ledgerKeyAgentWithRandomIndex.accountIndex).toEqual(5);
@@ -718,12 +718,12 @@ describe('LedgerKeyAgent', () => {
               const { coseSign1, publicKeyHex, signedData } = await signAndDecode(signWith, wallet);
               const signedDataBytes = HexBlob.fromBytes(signedData.to_bytes());
               const signatureBytes = HexBlob.fromBytes(coseSign1.signature()) as unknown as Crypto.Ed25519SignatureHex;
-              const cryptoProvider = new Crypto.SodiumBip32Ed25519();
+              const cryptoProvider = await Crypto.SodiumBip32Ed25519.create();
 
               testAddressHeader(signedData, signWith);
 
               expect(
-                await cryptoProvider.verify(
+                cryptoProvider.verify(
                   signatureBytes,
                   signedDataBytes,
                   publicKeyHex as unknown as Crypto.Ed25519PublicKeyHex
@@ -736,12 +736,12 @@ describe('LedgerKeyAgent', () => {
               const { coseSign1, publicKeyHex, signedData } = await signAndDecode(signWith, wallet);
               const signedDataBytes = HexBlob.fromBytes(signedData.to_bytes());
               const signatureBytes = HexBlob.fromBytes(coseSign1.signature()) as unknown as Crypto.Ed25519SignatureHex;
-              const cryptoProvider = new Crypto.SodiumBip32Ed25519();
+              const cryptoProvider = await Crypto.SodiumBip32Ed25519.create();
 
               testAddressHeader(signedData, signWith);
 
               expect(
-                await cryptoProvider.verify(
+                cryptoProvider.verify(
                   signatureBytes,
                   signedDataBytes,
                   publicKeyHex as unknown as Crypto.Ed25519PublicKeyHex
@@ -755,12 +755,12 @@ describe('LedgerKeyAgent', () => {
               const { coseSign1, publicKeyHex, signedData } = await signAndDecode(signWith!, wallet);
               const signedDataBytes = HexBlob.fromBytes(signedData.to_bytes());
               const signatureBytes = HexBlob.fromBytes(coseSign1.signature()) as unknown as Crypto.Ed25519SignatureHex;
-              const cryptoProvider = new Crypto.SodiumBip32Ed25519();
+              const cryptoProvider = await Crypto.SodiumBip32Ed25519.create();
 
               expect(publicKeyHex).toEqual(drepPubKey);
 
               expect(
-                await cryptoProvider.verify(
+                cryptoProvider.verify(
                   signatureBytes,
                   signedDataBytes,
                   publicKeyHex as unknown as Crypto.Ed25519PublicKeyHex

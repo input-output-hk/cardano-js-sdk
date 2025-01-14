@@ -71,6 +71,8 @@ export class Bip32PrivateKey {
    *   - 32 bytes: Ed25519 curve scalar from which few bits have been tweaked according to ED25519-BIP32
    *   - 32 bytes: Ed25519 binary blob used as IV for signing
    *
+   * NOTE: You must await `Crypto.ready()` at least once before calling this function.
+   *
    * @param entropy Random stream of bytes generated from a BIP39 seed phrase.
    * @param password The second factor authentication password for the mnemonic phrase.
    * @returns The secret extended key.
@@ -123,11 +125,12 @@ export class Bip32PrivateKey {
    * This is why deriving the private key should not fail while deriving
    * the public key may fail (if the derivation index is invalid).
    *
+   * NOTE: You must await `Crypto.ready()` at least once before calling this function.
+   *
    * @param derivationIndices The derivation indices.
    * @returns The child BIP-32 key.
    */
-  async derive(derivationIndices: number[]): Promise<Bip32PrivateKey> {
-    await sodium.ready;
+  derive(derivationIndices: number[]): Bip32PrivateKey {
     let key = Buffer.from(this.#key);
 
     for (const index of derivationIndices) {
@@ -145,10 +148,11 @@ export class Bip32PrivateKey {
   /**
    * Computes the BIP-32 public key from this BIP-32 private key.
    *
+   * NOTE: You must await `Crypto.ready()` at least once before calling this function.
+   *
    * @returns the public key.
    */
-  async toPublic(): Promise<Bip32PublicKey> {
-    await sodium.ready;
+  toPublic(): Bip32PublicKey {
     const scalar = extendedScalar(this.#key.slice(0, EXTENDED_ED25519_PRIVATE_KEY_LENGTH));
     const publicKey = sodium.crypto_scalarmult_ed25519_base_noclamp(scalar);
 

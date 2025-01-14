@@ -1,11 +1,15 @@
+import { AsyncKeyAgent, InMemoryKeyAgent, KeyAgentDependencies, util } from '../../src';
 import { Cardano } from '@cardano-sdk/core';
-import { InMemoryKeyAgent, KeyAgentDependencies, util } from '../../src';
 import { mockKeyAgentDependencies } from './mockKeyAgentDependencies';
 
 export const getPassphrase = jest.fn(async () => Buffer.from('password'));
 
-export const testKeyAgent = async (dependencies: KeyAgentDependencies | undefined = mockKeyAgentDependencies()) =>
-  InMemoryKeyAgent.fromBip39MnemonicWords(
+export const testKeyAgent = async (dependencies?: KeyAgentDependencies) => {
+  if (!dependencies) {
+    dependencies = await mockKeyAgentDependencies();
+  }
+
+  return InMemoryKeyAgent.fromBip39MnemonicWords(
     {
       chainId: Cardano.ChainIds.Preview,
       getPassphrase,
@@ -13,9 +17,20 @@ export const testKeyAgent = async (dependencies: KeyAgentDependencies | undefine
     },
     dependencies
   );
+};
 
 export const testAsyncKeyAgent = async (
-  dependencies: KeyAgentDependencies | undefined = mockKeyAgentDependencies(),
-  keyAgentReady = testKeyAgent(dependencies),
-  shutdownSpy?: () => void
-) => util.createAsyncKeyAgent(await keyAgentReady, shutdownSpy);
+  dependencies?: KeyAgentDependencies,
+  keyAgentReady?: Promise<InMemoryKeyAgent>,
+  shutdownSpy?: () => AsyncKeyAgent
+) => {
+  if (!dependencies) {
+    dependencies = await mockKeyAgentDependencies();
+  }
+
+  if (!keyAgentReady) {
+    keyAgentReady = testKeyAgent(dependencies);
+  }
+
+  return util.createAsyncKeyAgent(await keyAgentReady, shutdownSpy);
+};

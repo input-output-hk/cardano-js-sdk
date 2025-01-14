@@ -59,9 +59,11 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
 
   const knownAddress1 = createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0, stakeKeyPath);
 
+  beforeAll(() => Crypto.ready());
+
   beforeEach(async () => {
     dRepPublicKey = Crypto.Ed25519PublicKeyHex('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01');
-    dRepKeyHash = (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex();
+    dRepKeyHash = Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash().hex();
   });
 
   it('returns distinct derivation paths required to sign the transaction', async () => {

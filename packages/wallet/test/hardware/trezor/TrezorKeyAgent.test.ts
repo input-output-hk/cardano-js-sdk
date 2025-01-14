@@ -46,7 +46,7 @@ describe('TrezorKeyAgent', () => {
         chainId: Cardano.ChainIds.Preprod,
         trezorConfig
       },
-      { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), logger }
+      { bip32Ed25519: await Crypto.SodiumBip32Ed25519.create(), logger }
     );
     const groupedAddress = await trezorKeyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0);
     address = groupedAddress.address;
@@ -460,7 +460,7 @@ describe('TrezorKeyAgent', () => {
         chainId: Cardano.ChainIds.Preprod,
         trezorConfig
       },
-      mockKeyAgentDependencies()
+      await mockKeyAgentDependencies()
     );
     expect(trezorKeyAgentWithRandomIndex).toBeInstanceOf(TrezorKeyAgent);
     expect(trezorKeyAgentWithRandomIndex.accountIndex).toEqual(5);

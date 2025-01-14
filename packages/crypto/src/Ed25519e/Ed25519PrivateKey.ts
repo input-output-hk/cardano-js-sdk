@@ -78,11 +78,11 @@ export class Ed25519PrivateKey {
   /**
    * Computes the raw public key from this raw private key.
    *
+   * NOTE: You must await `Crypto.ready()` at least once before calling this function.
+   *
    * @returns the public key.
    */
-  async toPublic(): Promise<Ed25519PublicKey> {
-    await sodium.ready;
-
+  toPublic(): Ed25519PublicKey {
     return Ed25519PublicKey.fromBytes(
       this.__type === Ed25519PrivateKeyType.Extended
         ? sodium.crypto_scalarmult_ed25519_base_noclamp(extendedScalar(this.#keyMaterial))
@@ -93,17 +93,18 @@ export class Ed25519PrivateKey {
   /**
    * Generates an Ed25519 signature.
    *
+   * NOTE: You must await `Crypto.ready()` at least once before calling this function.
+   *
    * @param message The message to be signed.
    * @returns The Ed25519 digital signature.
    */
-  async sign(message: HexBlob): Promise<Ed25519Signature> {
-    await sodium.ready;
+  sign(message: HexBlob): Ed25519Signature {
     return Ed25519Signature.fromBytes(
       this.__type === Ed25519PrivateKeyType.Extended
         ? signExtendedDetached(this.#keyMaterial, Buffer.from(message, 'hex'))
         : sodium.crypto_sign_detached(
             Buffer.from(message, 'hex'),
-            Buffer.concat([this.#keyMaterial, (await this.toPublic()).bytes()])
+            Buffer.concat([this.#keyMaterial, this.toPublic().bytes()])
           )
     );
   }

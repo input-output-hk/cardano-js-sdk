@@ -6,6 +6,8 @@ import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { of } from 'rxjs';
 
 describe('createDRepRegistrationTracker', () => {
+  beforeAll(() => Crypto.ready());
+
   let dRepPublicKey: Crypto.Ed25519PublicKeyHex;
   let dRepKeyHash: Crypto.Hash28ByteBase16;
   let dRepPublicKeyHash: Crypto.Ed25519KeyHashHex;
@@ -26,9 +28,9 @@ describe('createDRepRegistrationTracker', () => {
   beforeEach(async () => {
     dRepPublicKey = Crypto.Ed25519PublicKeyHex('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01');
     dRepKeyHash = Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(
-      (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex()
+      Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash().hex()
     );
-    dRepPublicKeyHash = (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex();
+    dRepPublicKeyHash = Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash().hex();
   });
 
   test('computes proper isRegisteredDrep value from historyTransactions$', () => {

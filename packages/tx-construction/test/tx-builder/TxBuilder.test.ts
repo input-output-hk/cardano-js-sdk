@@ -84,7 +84,7 @@ describe.each([
         getPassphrase: async () => Buffer.from('passphrase'),
         mnemonicWords: util.generateMnemonicWords()
       },
-      { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), logger: dummyLogger }
+      { bip32Ed25519: await Crypto.SodiumBip32Ed25519.create(), logger: dummyLogger }
     );
 
     knownAddresses = [

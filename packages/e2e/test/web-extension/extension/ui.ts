@@ -193,47 +193,53 @@ const cleanupMultidelegationInfo = (multiDelegationDiv: Element) => {
   }
 };
 
-const signingCoordinator = new SigningCoordinator(
-  {
-    hwOptions: {
-      communicationType: CommunicationType.Web,
-      manifest: {
-        appUrl: 'https://web-extension.app',
-        email: 'e2e@web-extension.app'
-      }
-    }
-  },
-  {
-    keyAgentFactory: createKeyAgentFactory({
-      bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
-      logger
-    }),
-    logger
-  }
-);
-
 const passphraseByteArray = Uint8Array.from(
   env.KEY_MANAGEMENT_PARAMS.passphrase.split('').map((letter) => letter.charCodeAt(0))
 );
-merge(signingCoordinator.signDataRequest$, signingCoordinator.transactionWitnessRequest$).subscribe((req) => {
-  logger.info('Sign request', req);
-  if (req.walletType === WalletType.InMemory) {
-    void req.sign(new Uint8Array(passphraseByteArray));
-  } else {
-    void req.sign();
-  }
-  logger.info('Signed', req);
+
+const initSigningCoordinator = async () => {
+  const bip32Ed25519 = await Crypto.SodiumBip32Ed25519.create();
+
+  const signingCoordinator = new SigningCoordinator(
+    {
+      hwOptions: {
+        communicationType: CommunicationType.Web,
+        manifest: {
+          appUrl: 'https://web-extension.app',
+          email: 'e2e@web-extension.app'
+        }
+      }
+    },
+    {
+      keyAgentFactory: createKeyAgentFactory({
+        bip32Ed25519,
+        logger
+      }),
+      logger
+    }
+  );
+
+  merge(signingCoordinator.signDataRequest$, signingCoordinator.transactionWitnessRequest$).subscribe((req) => {
+    logger.info('Sign request', req);
+    if (req.walletType === WalletType.InMemory) {
+      void req.sign(new Uint8Array(passphraseByteArray));
+    } else {
+      void req.sign();
+    }
+    logger.info('Signed', req);
+  });
+
+  exposeSigningCoordinatorApi(
+    {
+      signingCoordinator
+    },
+    { logger, runtime }
+  );
+};
+
+initSigningCoordinator().catch((error) => {
+  logger.error('Error initializing Signing Coordinator:', error);
 });
-
-// Setup
-
-// Expose local objects.
-exposeSigningCoordinatorApi(
-  {
-    signingCoordinator
-  },
-  { logger, runtime }
-);
 
 // Consume remote objects.
 const walletManager = consumeRemoteApi(
@@ -278,7 +284,7 @@ const createWalletIfNotExistsAndActivate = async (accountIndex: number) => {
   if (!walletId) {
     logger.log('creating wallet');
     clearWalletValues();
-    const bip32Ed25519 = new SodiumBip32Ed25519();
+    const bip32Ed25519 = await SodiumBip32Ed25519.create();
     const mnemonicWords = env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' ');
     const encryptedMnemonic = await emip3encrypt(Buffer.from(env.KEY_MANAGEMENT_PARAMS.mnemonic), passphraseByteArray);
     const passphrase = new Uint8Array(passphraseByteArray);

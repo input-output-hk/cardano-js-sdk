@@ -8,6 +8,7 @@ import {
   SerializableInMemoryKeyAgentData,
   util
 } from '../src';
+import { Bip32Ed25519 } from '@cardano-sdk/crypto';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { dummyLogger } from 'ts-log';
@@ -19,7 +20,11 @@ describe('InMemoryKeyAgent', () => {
   let keyAgent: InMemoryKeyAgent;
   let getPassphrase: jest.Mock;
   let mnemonicWords: string[];
-  const bip32Ed25519 = new Crypto.SodiumBip32Ed25519();
+  let bip32Ed25519: Bip32Ed25519;
+
+  beforeAll(async () => {
+    bip32Ed25519 = await Crypto.SodiumBip32Ed25519.create();
+  });
 
   beforeEach(async () => {
     mnemonicWords = util.generateMnemonicWords();
@@ -160,7 +165,7 @@ describe('InMemoryKeyAgent', () => {
           accountIndex: 0,
           chainId: Cardano.ChainIds.Preview,
           encryptedRootPrivateKeyBytes: [...Buffer.from(yoroiEncryptedRootPrivateKeyHex, 'hex')],
-          extendedAccountPublicKey: await bip32Ed25519.getBip32PublicKey(
+          extendedAccountPublicKey: bip32Ed25519.getBip32PublicKey(
             await util.deriveAccountPrivateKey({
               accountIndex: 0,
               bip32Ed25519,
@@ -259,7 +264,7 @@ describe('InMemoryKeyAgent', () => {
           accountIndex: 0,
           chainId: Cardano.ChainIds.Preview,
           encryptedRootPrivateKeyBytes: [...Buffer.from(daedelusEncryptedRootPrivateKeyHex, 'hex')],
-          extendedAccountPublicKey: await bip32Ed25519.getBip32PublicKey(
+          extendedAccountPublicKey: bip32Ed25519.getBip32PublicKey(
             await util.deriveAccountPrivateKey({
               accountIndex: 0,
               bip32Ed25519,

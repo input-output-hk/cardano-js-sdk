@@ -59,7 +59,7 @@ export const buildDRepAddressFromDRepKey = async (
   dRepKey: Crypto.Ed25519PublicKeyHex,
   type: Cardano.CredentialType = Cardano.CredentialType.KeyHash
 ) => {
-  const drepKeyHash = (await Crypto.Ed25519PublicKey.fromHex(dRepKey).hash()).hex();
+  const drepKeyHash = Crypto.Ed25519PublicKey.fromHex(dRepKey).hash().hex();
   const drepId = Cardano.DRepID.cip129FromCredential({
     hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(drepKeyHash),
     type
@@ -76,7 +76,7 @@ export const createAsyncKeyAgent = async () =>
         mnemonicWords: util.generateMnemonicWords()
       },
       {
-        bip32Ed25519: new SodiumBip32Ed25519(),
+        bip32Ed25519: await SodiumBip32Ed25519.create(),
         logger
       }
     )
