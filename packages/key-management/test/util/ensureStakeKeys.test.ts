@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, Bip32Account, util } from '../../src';
 import { Bip32PublicKeyHex } from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
@@ -6,6 +7,8 @@ import { Logger, dummyLogger } from 'ts-log';
 describe('ensureStakeKeys', () => {
   let bip32Account: Bip32Account;
   let logger: Logger;
+
+  beforeAll(() => Crypto.ready());
 
   beforeEach(async () => {
     logger = dummyLogger;

@@ -52,7 +52,7 @@ describe('cip36', () => {
       );
       const signedCip36Metadata = await cip36.metadataBuilder.signVotingRegistration(votingRegistrationMetadata, {
         signBlob: async (blob) => {
-          const bip32Ed25519 = new Crypto.SodiumBip32Ed25519();
+          const bip32Ed25519 = await Crypto.SodiumBip32Ed25519.create();
           const privateStakeKey = Crypto.Ed25519PrivateNormalKeyHex(
             '852fa5d17df3efdfdcd6dac53ec9fe5593f3c0bd7cadb3c2af76c7e15dfa8a5c'
           );

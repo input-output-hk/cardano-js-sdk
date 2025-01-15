@@ -41,7 +41,7 @@ const initWallets = async (walletsNum: number, addresses: GroupedAddress[]): Pro
   for (let i = 0; i < walletsNum; i++) {
     currentAddress = addresses[i];
     testLogger.info('  address:', currentAddress.address);
-    const keyAgent = util.createAsyncKeyAgent(createMockKeyAgent([currentAddress]));
+    const keyAgent = util.createAsyncKeyAgent(await createMockKeyAgent([currentAddress]));
     const { wallet } = await getWallet({
       env,
       idx: 0,

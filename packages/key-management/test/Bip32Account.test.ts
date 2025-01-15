@@ -13,7 +13,7 @@ describe('Bip32Account', () => {
   beforeEach(async () => {
     const mnemonicWords = util.generateMnemonicWords();
     const getPassphrase = jest.fn().mockResolvedValue(Buffer.from('password'));
-    const keyAgentDependencies = { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), logger: dummyLogger };
+    const keyAgentDependencies = { bip32Ed25519: await Crypto.SodiumBip32Ed25519.create(), logger: dummyLogger };
     const testnetKeyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
       {
         accountIndex,

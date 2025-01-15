@@ -124,10 +124,10 @@ export const createHttpStakePoolMetadataService = (
           const signature = (await axiosClient.get<Crypto.Ed25519SignatureHex>(metadata.extSigUrl)).data;
           const message = HexBlob.fromBytes(Buffer.from(JSON.stringify(extMetadata)));
           const publicKey = Crypto.Ed25519PublicKeyHex(metadata.extVkey);
-          const bip32Ed25519 = new Crypto.SodiumBip32Ed25519();
+          const bip32Ed25519 = await Crypto.SodiumBip32Ed25519.create();
 
           // Verify the signature
-          const isSignatureValid = await bip32Ed25519.verify(signature, message, publicKey);
+          const isSignatureValid = bip32Ed25519.verify(signature, message, publicKey);
 
           // If not valid -> omit extended metadata from response and add specific error
           if (!isSignatureValid) {

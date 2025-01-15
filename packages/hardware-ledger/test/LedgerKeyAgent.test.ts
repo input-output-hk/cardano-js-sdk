@@ -368,7 +368,7 @@ describe('LedgerKeyAgent', () => {
       txInKeyPathMap: {}
     };
 
-    beforeAll(() => {
+    beforeAll(async () => {
       LedgerKeyAgent.checkDeviceConnection = async () => new Ada(new Transport());
 
       keyAgentMock = new LedgerKeyAgent(
@@ -382,7 +382,7 @@ describe('LedgerKeyAgent', () => {
           purpose: KeyPurpose.STANDARD
         },
         {
-          bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
+          bip32Ed25519: await Crypto.SodiumBip32Ed25519.create(),
           logger: dummyLogger
         }
       );

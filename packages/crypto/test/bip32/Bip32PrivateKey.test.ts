@@ -3,6 +3,8 @@ import { InvalidStringError } from '@cardano-sdk/util';
 import { bip32TestVectorMessageOneLength, extendedVectors } from '../ed25519e/Ed25519TestVectors';
 
 describe('Bip32PrivateKey', () => {
+  beforeAll(() => Crypto.ready());
+
   it('can create an instance from a valid normal BIP-32 private key hex representation', async () => {
     const privateKey = Crypto.Bip32PrivateKey.fromHex(
       Crypto.Bip32PrivateKeyHex(bip32TestVectorMessageOneLength.rootKey)

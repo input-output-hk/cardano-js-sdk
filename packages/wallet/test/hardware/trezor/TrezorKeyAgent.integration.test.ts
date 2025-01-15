@@ -17,8 +17,6 @@ const {
   mockUtxoProvider
 } = mockProviders;
 
-const keyAgentDependencies = { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), logger };
-
 const createWallet = async (keyAgent: KeyAgent) => {
   const txSubmitProvider = mockTxSubmitProvider();
   const stakePoolProvider = createStubStakePoolProvider();
@@ -51,6 +49,8 @@ const getAddress = async (wallet: ObservableWallet) => (await firstValueFrom(wal
 
 describe('TrezorKeyAgent+BaseWallet', () => {
   test('creating and restoring TrezorKeyAgent wallet', async () => {
+    const keyAgentDependencies = { bip32Ed25519: await Crypto.SodiumBip32Ed25519.create(), logger };
+
     const freshKeyAgent = await TrezorKeyAgent.createWithDevice(
       {
         chainId: Cardano.ChainIds.Preprod,

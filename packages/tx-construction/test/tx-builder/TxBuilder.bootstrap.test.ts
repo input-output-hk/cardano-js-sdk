@@ -37,7 +37,7 @@ describe.each([
           getPassphrase: async () => Buffer.from([]),
           mnemonicWords: util.generateMnemonicWords()
         },
-        { bip32Ed25519: new SodiumBip32Ed25519(), logger }
+        { bip32Ed25519: await SodiumBip32Ed25519.create(), logger }
       )
     );
     const txBuilderProviders: jest.Mocked<TxBuilderProviders> = {

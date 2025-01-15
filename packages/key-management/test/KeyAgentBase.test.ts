@@ -1,14 +1,14 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, KeyAgentBase, KeyAgentType, KeyPurpose, KeyRole, SerializableInMemoryKeyAgentData } from '../src';
+import { Bip32Ed25519 } from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { dummyLogger } from 'ts-log';
 
 const ACCOUNT_INDEX = 1;
-const bip32Ed25519 = new Crypto.SodiumBip32Ed25519();
 
 class MockKeyAgent extends KeyAgentBase {
-  constructor(data: SerializableInMemoryKeyAgentData) {
+  constructor(data: SerializableInMemoryKeyAgentData, bip32Ed25519: Bip32Ed25519) {
     super(data, {
       bip32Ed25519,
       logger: dummyLogger
@@ -27,18 +27,21 @@ class MockKeyAgent extends KeyAgentBase {
 describe('KeyAgentBase', () => {
   let keyAgent: MockKeyAgent;
 
-  beforeEach(() => {
-    keyAgent = new MockKeyAgent({
-      __typename: KeyAgentType.InMemory,
-      accountIndex: ACCOUNT_INDEX,
-      chainId: Cardano.ChainIds.Preview,
-      encryptedRootPrivateKeyBytes: [],
-      extendedAccountPublicKey: Crypto.Bip32PublicKeyHex(
-        // eslint-disable-next-line max-len
-        'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
-      ),
-      purpose: KeyPurpose.STANDARD
-    });
+  beforeEach(async () => {
+    keyAgent = new MockKeyAgent(
+      {
+        __typename: KeyAgentType.InMemory,
+        accountIndex: ACCOUNT_INDEX,
+        chainId: Cardano.ChainIds.Preview,
+        encryptedRootPrivateKeyBytes: [],
+        extendedAccountPublicKey: Crypto.Bip32PublicKeyHex(
+          // eslint-disable-next-line max-len
+          'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
+        ),
+        purpose: KeyPurpose.STANDARD
+      },
+      await Crypto.SodiumBip32Ed25519.create()
+    );
   });
 
   // eslint-disable-next-line max-len

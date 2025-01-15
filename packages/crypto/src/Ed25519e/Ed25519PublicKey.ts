@@ -26,12 +26,13 @@ export class Ed25519PublicKey {
    * Verifies that the passed-in signature was generated with a private key that matches
    * the given public key.
    *
+   * NOTE: You must await `Crypto.ready()` at least once before calling this function.
+   *
    * @param signature The signature bytes to be verified.
    * @param message The original message the signature was computed from.
    * @returns true if the signature is valid; otherwise; false.
    */
-  async verify(signature: Ed25519Signature, message: HexBlob): Promise<boolean> {
-    await sodium.ready;
+  verify(signature: Ed25519Signature, message: HexBlob): boolean {
     return sodium.crypto_sign_verify_detached(signature.bytes(), Buffer.from(message, 'hex'), this.#keyMaterial);
   }
 
@@ -58,9 +59,8 @@ export class Ed25519PublicKey {
     return Ed25519PublicKey.fromBytes(Buffer.from(keyMaterial, 'hex'));
   }
 
-  /** Gets the blake2 hash of the key material. */
-  async hash(): Promise<Ed25519KeyHash> {
-    await sodium.ready;
+  /** Gets the blake2 hash of the key material. NOTE: You must await `Crypto.ready()` at least once before calling this function. */
+  hash(): Ed25519KeyHash {
     const hash = sodium.crypto_generichash(ED25519_PUBLIC_KEY_HASH_LENGTH, this.#keyMaterial);
     return Ed25519KeyHash.fromBytes(hash);
   }

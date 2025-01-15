@@ -3,6 +3,8 @@ import { InvalidStringError } from '@cardano-sdk/util';
 import { testVectorMessageZeroLength } from './Ed25519TestVectors';
 
 describe('Ed25519Signature', () => {
+  beforeAll(() => Crypto.ready());
+
   it('can create an instance from a valid Ed25519 signature hex representation', () => {
     const signature = Crypto.Ed25519Signature.fromHex(
       Crypto.Ed25519SignatureHex(testVectorMessageZeroLength.signature)
