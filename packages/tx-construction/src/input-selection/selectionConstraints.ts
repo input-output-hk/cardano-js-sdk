@@ -10,8 +10,8 @@ import {
   TokenBundleSizeExceedsLimit,
   sortTxIn
 } from '@cardano-sdk/input-selection';
-import { MinFeeCoefficient, MinFeeConstant, minAdaRequired, minFee } from '../fees';
 import { TxEvaluationResult, TxEvaluator, TxIdWithIndex } from '../tx-builder';
+import { minAdaRequired, minFee } from '../fees';
 
 export const MAX_U64 = 18_446_744_073_709_551_615n;
 
@@ -105,11 +105,7 @@ const reorgRedeemers = (
 
 export const computeMinimumCost =
   (
-    {
-      minFeeCoefficient,
-      minFeeConstant,
-      prices
-    }: Pick<ProtocolParametersRequiredByInputSelection, 'minFeeCoefficient' | 'minFeeConstant' | 'prices'>,
+    pparams: ProtocolParametersForInputSelection,
     buildTx: BuildTx,
     txEvaluator: TxEvaluator,
     redeemersByType: RedeemersByType
@@ -126,7 +122,7 @@ export const computeMinimumCost =
     }
 
     return {
-      fee: minFee(tx, prices, MinFeeConstant(minFeeConstant), MinFeeCoefficient(minFeeCoefficient)),
+      fee: minFee(tx, utxos, pparams),
       redeemers: tx.witness.redeemers
     };
   };
@@ -170,25 +166,27 @@ export const computeSelectionLimit =
   };
 
 export const defaultSelectionConstraints = ({
-  protocolParameters: { coinsPerUtxoByte, maxTxSize, maxValueSize, minFeeCoefficient, minFeeConstant, prices },
+  protocolParameters,
   buildTx,
   redeemersByType,
   txEvaluator
 }: DefaultSelectionConstraintsProps): SelectionConstraints => {
-  if (!coinsPerUtxoByte || !maxTxSize || !maxValueSize || !minFeeCoefficient || !minFeeConstant || !prices) {
+  if (
+    !protocolParameters.coinsPerUtxoByte ||
+    !protocolParameters.maxTxSize ||
+    !protocolParameters.maxValueSize ||
+    !protocolParameters.minFeeCoefficient ||
+    !protocolParameters.minFeeConstant ||
+    !protocolParameters.prices
+  ) {
     throw new InvalidProtocolParametersError(
       'Missing one of: coinsPerUtxoByte, maxTxSize, maxValueSize, minFeeCoefficient, minFeeConstant, prices'
     );
   }
   return {
-    computeMinimumCoinQuantity: computeMinimumCoinQuantity(coinsPerUtxoByte),
-    computeMinimumCost: computeMinimumCost(
-      { minFeeCoefficient, minFeeConstant, prices },
-      buildTx,
-      txEvaluator,
-      redeemersByType
-    ),
-    computeSelectionLimit: computeSelectionLimit(maxTxSize, buildTx),
-    tokenBundleSizeExceedsLimit: tokenBundleSizeExceedsLimit(maxValueSize)
+    computeMinimumCoinQuantity: computeMinimumCoinQuantity(protocolParameters.coinsPerUtxoByte),
+    computeMinimumCost: computeMinimumCost(protocolParameters, buildTx, txEvaluator, redeemersByType),
+    computeSelectionLimit: computeSelectionLimit(protocolParameters.maxTxSize, buildTx),
+    tokenBundleSizeExceedsLimit: tokenBundleSizeExceedsLimit(protocolParameters.maxValueSize)
   };
 };
