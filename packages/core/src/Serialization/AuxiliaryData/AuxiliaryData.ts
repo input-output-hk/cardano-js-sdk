@@ -58,13 +58,13 @@ export class AuxiliaryData {
     const elementsSize = this.#getMapSize();
 
     // if possible, we encode as the more compact format.
-    if (elementsSize === 1 && this.#metadata && this.#metadata.metadata()!.size > 0) {
+    if (elementsSize === 1 && this.#metadata !== undefined && this.#metadata.metadata()!.size > 0) {
       writer.writeEncodedValue(hexToBytes(this.#metadata.toCbor()));
     } else if (
       elementsSize === SHELLEY_ERA_FIELDS_COUNT &&
-      this.#metadata &&
+      this.#metadata !== undefined &&
       this.#metadata.metadata()!.size > 0 &&
-      this.#nativeScripts &&
+      this.#nativeScripts !== undefined &&
       this.#nativeScripts.length > 0
     ) {
       writer.writeStartArray(elementsSize);
@@ -77,14 +77,14 @@ export class AuxiliaryData {
       }
     } else {
       writer.writeTag(ALONZO_AUX_TAG);
-      writer.writeStartMap(this.#getMapSize());
+      writer.writeStartMap(elementsSize);
 
-      if (this.#metadata && this.#metadata.metadata()!.size > 0) {
+      if (this.#metadata !== undefined && this.#metadata.metadata()!.size > 0) {
         writer.writeInt(0n);
         writer.writeEncodedValue(hexToBytes(this.#metadata.toCbor()));
       }
 
-      if (this.#nativeScripts && this.#nativeScripts.length > 0) {
+      if (this.#nativeScripts !== undefined && this.#nativeScripts.length > 0) {
         writer.writeInt(1n);
         writer.writeStartArray(this.#nativeScripts.length);
         for (const script of this.#nativeScripts) {
@@ -92,7 +92,7 @@ export class AuxiliaryData {
         }
       }
 
-      if (this.#plutusV1Scripts && this.#plutusV1Scripts.length > 0) {
+      if (this.#plutusV1Scripts !== undefined && this.#plutusV1Scripts.length > 0) {
         writer.writeInt(2n);
         writer.writeStartArray(this.#plutusV1Scripts.length);
         for (const script of this.#plutusV1Scripts) {
@@ -100,7 +100,7 @@ export class AuxiliaryData {
         }
       }
 
-      if (this.#plutusV2Scripts && this.#plutusV2Scripts.length > 0) {
+      if (this.#plutusV2Scripts !== undefined && this.#plutusV2Scripts.length > 0) {
         writer.writeInt(3n);
         writer.writeStartArray(this.#plutusV2Scripts.length);
         for (const script of this.#plutusV2Scripts) {
@@ -108,7 +108,7 @@ export class AuxiliaryData {
         }
       }
 
-      if (this.#plutusV3Scripts && this.#plutusV3Scripts.length > 0) {
+      if (this.#plutusV3Scripts !== undefined && this.#plutusV3Scripts.length > 0) {
         writer.writeInt(4n);
         writer.writeStartArray(this.#plutusV3Scripts.length);
         for (const script of this.#plutusV3Scripts) {

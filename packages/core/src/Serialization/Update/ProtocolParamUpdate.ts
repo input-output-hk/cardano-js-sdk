@@ -96,72 +96,72 @@ export class ProtocolParamUpdate {
     //   }
     writer.writeStartMap(this.#getMapSize());
 
-    if (this.#minFeeA) {
+    if (this.#minFeeA !== undefined) {
       writer.writeInt(0n);
       writer.writeInt(this.#minFeeA);
     }
 
-    if (this.#minFeeB) {
+    if (this.#minFeeB !== undefined) {
       writer.writeInt(1n);
       writer.writeInt(this.#minFeeB);
     }
 
-    if (this.#maxBlockBodySize) {
+    if (this.#maxBlockBodySize !== undefined) {
       writer.writeInt(2n);
       writer.writeInt(this.#maxBlockBodySize);
     }
 
-    if (this.#maxTxSize) {
+    if (this.#maxTxSize !== undefined) {
       writer.writeInt(3n);
       writer.writeInt(this.#maxTxSize);
     }
 
-    if (this.#maxBlockHeaderSize) {
+    if (this.#maxBlockHeaderSize !== undefined) {
       writer.writeInt(4n);
       writer.writeInt(this.#maxBlockHeaderSize);
     }
 
-    if (this.#keyDeposit) {
+    if (this.#keyDeposit !== undefined) {
       writer.writeInt(5n);
       writer.writeInt(this.#keyDeposit);
     }
 
-    if (this.#poolDeposit) {
+    if (this.#poolDeposit !== undefined) {
       writer.writeInt(6n);
       writer.writeInt(this.#poolDeposit);
     }
 
-    if (this.#maxEpoch) {
+    if (this.#maxEpoch !== undefined) {
       writer.writeInt(7n);
       writer.writeInt(this.#maxEpoch);
     }
 
-    if (this.#nOpt) {
+    if (this.#nOpt !== undefined) {
       writer.writeInt(8n);
       writer.writeInt(this.#nOpt);
     }
 
-    if (this.#poolPledgeInfluence) {
+    if (this.#poolPledgeInfluence !== undefined) {
       writer.writeInt(9n);
       writer.writeEncodedValue(Buffer.from(this.#poolPledgeInfluence.toCbor(), 'hex'));
     }
 
-    if (this.#expansionRate) {
+    if (this.#expansionRate !== undefined) {
       writer.writeInt(10n);
       writer.writeEncodedValue(Buffer.from(this.#expansionRate.toCbor(), 'hex'));
     }
 
-    if (this.#treasuryGrowthRate) {
+    if (this.#treasuryGrowthRate !== undefined) {
       writer.writeInt(11n);
       writer.writeEncodedValue(Buffer.from(this.#treasuryGrowthRate.toCbor(), 'hex'));
     }
 
-    if (this.#d) {
+    if (this.#d !== undefined) {
       writer.writeInt(12n);
       writer.writeEncodedValue(Buffer.from(this.#d.toCbor(), 'hex'));
     }
 
-    if (this.#extraEntropy) {
+    if (this.#extraEntropy !== undefined) {
       if (this.#extraEntropy.length === 0) {
         writer.writeInt(13n);
         writer.writeStartArray(1);
@@ -174,97 +174,97 @@ export class ProtocolParamUpdate {
       }
     }
 
-    if (this.#protocolVersion) {
+    if (this.#protocolVersion !== undefined) {
       writer.writeInt(14n);
       writer.writeEncodedValue(Buffer.from(this.#protocolVersion.toCbor(), 'hex'));
     }
 
-    if (this.#minPoolCost) {
+    if (this.#minPoolCost !== undefined) {
       writer.writeInt(16n);
       writer.writeInt(this.#minPoolCost);
     }
 
-    if (this.#adaPerUtxoByte) {
+    if (this.#adaPerUtxoByte !== undefined) {
       writer.writeInt(17n);
       writer.writeInt(this.#adaPerUtxoByte);
     }
 
-    if (this.#costModels) {
+    if (this.#costModels !== undefined) {
       writer.writeInt(18n);
       writer.writeEncodedValue(Buffer.from(this.#costModels.toCbor(), 'hex'));
     }
 
-    if (this.#executionCosts) {
+    if (this.#executionCosts !== undefined) {
       writer.writeInt(19n);
       writer.writeEncodedValue(Buffer.from(this.#executionCosts.toCbor(), 'hex'));
     }
 
-    if (this.#maxTxExUnits) {
+    if (this.#maxTxExUnits !== undefined) {
       writer.writeInt(20n);
       writer.writeEncodedValue(Buffer.from(this.#maxTxExUnits.toCbor(), 'hex'));
     }
 
-    if (this.#maxBlockExUnits) {
+    if (this.#maxBlockExUnits !== undefined) {
       writer.writeInt(21n);
       writer.writeEncodedValue(Buffer.from(this.#maxBlockExUnits.toCbor(), 'hex'));
     }
 
-    if (this.#maxValueSize) {
+    if (this.#maxValueSize !== undefined) {
       writer.writeInt(22n);
       writer.writeInt(this.#maxValueSize);
     }
 
-    if (this.#collateralPercentage) {
+    if (this.#collateralPercentage !== undefined) {
       writer.writeInt(23n);
       writer.writeInt(this.#collateralPercentage);
     }
 
-    if (this.#maxCollateralInputs) {
+    if (this.#maxCollateralInputs !== undefined) {
       writer.writeInt(24n);
       writer.writeInt(this.#maxCollateralInputs);
     }
 
-    if (this.#poolVotingThresholds) {
+    if (this.#poolVotingThresholds !== undefined) {
       writer.writeInt(25n);
       writer.writeEncodedValue(Buffer.from(this.#poolVotingThresholds.toCbor(), 'hex'));
     }
 
-    if (this.#drepVotingThresholds) {
+    if (this.#drepVotingThresholds !== undefined) {
       writer.writeInt(26n);
       writer.writeEncodedValue(Buffer.from(this.#drepVotingThresholds.toCbor(), 'hex'));
     }
 
-    if (this.#minCommitteeSize) {
+    if (this.#minCommitteeSize !== undefined) {
       writer.writeInt(27n);
       writer.writeInt(this.#minCommitteeSize);
     }
 
-    if (this.#committeeTermLimit) {
+    if (this.#committeeTermLimit !== undefined) {
       writer.writeInt(28n);
       writer.writeInt(this.#committeeTermLimit);
     }
 
-    if (this.#governanceActionValidityPeriod) {
+    if (this.#governanceActionValidityPeriod !== undefined) {
       writer.writeInt(29n);
       writer.writeInt(this.#governanceActionValidityPeriod);
     }
 
-    if (this.#governanceActionDeposit) {
+    if (this.#governanceActionDeposit !== undefined) {
       writer.writeInt(30n);
       writer.writeInt(this.#governanceActionDeposit);
     }
 
-    if (this.#drepDeposit) {
+    if (this.#drepDeposit !== undefined) {
       writer.writeInt(31n);
       writer.writeInt(this.#drepDeposit);
     }
 
-    if (this.#drepInactivityPeriod) {
+    if (this.#drepInactivityPeriod !== undefined) {
       writer.writeInt(32n);
       writer.writeInt(this.#drepInactivityPeriod);
     }
 
-    if (this.#minFeeRefScriptCostPerByte) {
+    if (this.#minFeeRefScriptCostPerByte !== undefined) {
       writer.writeInt(33n);
       writer.writeEncodedValue(Buffer.from(this.#minFeeRefScriptCostPerByte.toCbor(), 'hex'));
     }

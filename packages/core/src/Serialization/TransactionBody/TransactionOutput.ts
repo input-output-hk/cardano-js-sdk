@@ -50,17 +50,17 @@ export class TransactionOutput {
     // if possible, we encode as the more compact format.
     if (
       elementsSize === REQUIRED_FIELDS_COUNT ||
-      (elementsSize === 3 && this.#datum && this.#datum.kind() === DatumKind.DataHash)
+      (elementsSize === 3 && this.#datum !== undefined && this.#datum.kind() === DatumKind.DataHash)
     ) {
       writer.writeStartArray(elementsSize);
       writer.writeByteString(Buffer.from(this.#address.toBytes(), 'hex'));
       writer.writeEncodedValue(Buffer.from(this.#amount.toCbor(), 'hex'));
 
-      if (this.#datum) {
+      if (this.#datum !== undefined) {
         writer.writeByteString(Buffer.from(this.#datum.asDataHash()!, 'hex'));
       }
     } else {
-      writer.writeStartMap(this.#getMapSize());
+      writer.writeStartMap(elementsSize);
 
       writer.writeInt(0n);
       writer.writeByteString(Buffer.from(this.#address.toBytes(), 'hex'));
@@ -68,7 +68,7 @@ export class TransactionOutput {
       writer.writeInt(1n);
       writer.writeEncodedValue(Buffer.from(this.#amount.toCbor(), 'hex'));
 
-      if (this.#datum) {
+      if (this.#datum !== undefined) {
         writer.writeInt(2n);
 
         writer.writeStartArray(2);
@@ -85,7 +85,7 @@ export class TransactionOutput {
         }
       }
 
-      if (this.#scriptRef) {
+      if (this.#scriptRef !== undefined) {
         writer.writeInt(3n);
         writer.writeTag(CborTag.EncodedCborDataItem);
         writer.writeByteString(Buffer.from(this.#scriptRef.toCbor(), 'hex'));

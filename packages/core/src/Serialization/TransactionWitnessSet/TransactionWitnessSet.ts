@@ -68,18 +68,18 @@ export class TransactionWitnessSet {
     //   / { + [ tag: redeemer_tag, index: uint ] => [ data: plutus_data, ex_units: ex_units ] }
     writer.writeStartMap(this.#getMapSize());
 
-    if (this.#vkeywitnesses && this.#vkeywitnesses.size() > 0) {
+    if (this.#vkeywitnesses !== undefined && this.#vkeywitnesses.size() > 0) {
       this.#vkeywitnesses.setValues(uniqWith(this.#vkeywitnesses.values(), (lhs, rhs) => lhs.vkey() === rhs.vkey()));
       writer.writeInt(0n);
       writer.writeEncodedValue(Buffer.from(this.#vkeywitnesses.toCbor(), 'hex'));
     }
 
-    if (this.#nativeScripts && this.#nativeScripts.size() > 0) {
+    if (this.#nativeScripts !== undefined && this.#nativeScripts.size() > 0) {
       writer.writeInt(1n);
       writer.writeEncodedValue(Buffer.from(this.#nativeScripts.toCbor(), 'hex'));
     }
 
-    if (this.#bootstrapWitnesses && this.#bootstrapWitnesses.size() > 0) {
+    if (this.#bootstrapWitnesses !== undefined && this.#bootstrapWitnesses.size() > 0) {
       this.#bootstrapWitnesses.setValues(
         uniqWith(this.#bootstrapWitnesses.values(), (lhs, rhs) => lhs.vkey() === rhs.vkey())
       );
@@ -87,27 +87,27 @@ export class TransactionWitnessSet {
       writer.writeEncodedValue(Buffer.from(this.#bootstrapWitnesses.toCbor(), 'hex'));
     }
 
-    if (this.#plutusV1Scripts && this.#plutusV1Scripts.size() > 0) {
+    if (this.#plutusV1Scripts !== undefined && this.#plutusV1Scripts.size() > 0) {
       writer.writeInt(3n);
       writer.writeEncodedValue(Buffer.from(this.#plutusV1Scripts.toCbor(), 'hex'));
     }
 
-    if (this.#plutusData && this.#plutusData.size() > 0) {
+    if (this.#plutusData !== undefined && this.#plutusData.size() > 0) {
       writer.writeInt(4n);
       writer.writeEncodedValue(Buffer.from(this.#plutusData.toCbor(), 'hex'));
     }
 
-    if (this.#redeemers && this.#redeemers.size() > 0) {
+    if (this.#redeemers !== undefined && this.#redeemers.size() > 0) {
       writer.writeInt(5n);
       writer.writeEncodedValue(hexToBytes(this.#redeemers.toCbor()));
     }
 
-    if (this.#plutusV2Scripts && this.#plutusV2Scripts.size() > 0) {
+    if (this.#plutusV2Scripts !== undefined && this.#plutusV2Scripts.size() > 0) {
       writer.writeInt(6n);
       writer.writeEncodedValue(Buffer.from(this.#plutusV2Scripts.toCbor(), 'hex'));
     }
 
-    if (this.#plutusV3Scripts && this.#plutusV3Scripts.size() > 0) {
+    if (this.#plutusV3Scripts !== undefined && this.#plutusV3Scripts.size() > 0) {
       writer.writeInt(7n);
       writer.writeEncodedValue(Buffer.from(this.#plutusV3Scripts.toCbor(), 'hex'));
     }
