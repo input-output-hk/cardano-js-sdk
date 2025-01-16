@@ -186,7 +186,7 @@ describe('blockfrostChainHistoryProvider', () => {
       unit_steps: '476468'
     }
   ];
-  const mockedAddressTransactionResponse = [
+  const mockedAddressTransactionResponse: Responses['address_transactions_content'] = [
     {
       block_height: 123,
       block_time: 131_322,
@@ -372,6 +372,12 @@ describe('blockfrostChainHistoryProvider', () => {
         mockedAddressTransactionResponse
       ],
       [
+        `addresses/${Cardano.PaymentAddress(
+          'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x'
+        )}/transactions?page=1&count=20`,
+        mockedAddressTransactionResponse
+      ],
+      [
         'addresses/2cWKMJemoBai9J7kVvRTukMmdfxtjL9z7c396rTfrrzfAZ6EeQoKLC2y1k34hswwm4SVr/transactions?page=1&count=20&order=desc',
         mockedAddressTransactionDescResponse
       ],
@@ -398,6 +404,19 @@ describe('blockfrostChainHistoryProvider', () => {
         });
 
         expect(response.totalResultCount).toBe(0);
+      });
+      test('deduplicates transactions', async () => {
+        const response = await provider.transactionsByAddresses({
+          addresses: [
+            Cardano.PaymentAddress('2cWKMJemoBai9J7kVvRTukMmdfxtjL9z7c396rTfrrzfAZ6EeQoKLC2y1k34hswwm4SVr'),
+            Cardano.PaymentAddress(
+              'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x'
+            )
+          ],
+          pagination: { limit: 20, startAt: 0 }
+        });
+        expect(response.pageResults).toHaveLength(mockedAddressTransactionResponse.length);
+        expect(response.totalResultCount).toBe(mockedAddressTransactionResponse.length);
       });
     });
 

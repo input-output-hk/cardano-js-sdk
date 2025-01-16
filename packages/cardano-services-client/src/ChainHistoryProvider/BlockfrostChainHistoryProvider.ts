@@ -25,11 +25,15 @@ import {
 } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import omit from 'lodash/omit.js';
+import uniq from 'lodash/uniq.js';
 import type { Responses } from '@blockfrost/blockfrost-js';
 import type { Schemas } from '@blockfrost/blockfrost-js/lib/types/open-api';
 
 type WithCertIndex<T> = T & { cert_index: number };
 export const DB_MAX_SAFE_INTEGER = 2_147_483_647;
+
+type BlockfrostTx = Pick<Responses['address_transactions_content'][0], 'block_height' | 'tx_index'>;
+const compareTx = (a: BlockfrostTx, b: BlockfrostTx) => a.block_height - b.block_height || a.tx_index - b.tx_index;
 
 export class BlockfrostChainHistoryProvider extends BlockfrostProvider implements ChainHistoryProvider {
   private networkInfoProvider: NetworkInfoProvider;
@@ -520,15 +524,17 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
 
       const allTransactions = addressTransactions.flat(1);
 
-      const ids = allTransactions
-        .filter(({ block_height }) => block_height >= lowerBound && block_height <= upperBound)
-        .sort((a, b) => a.block_height - b.block_height || a.tx_index - b.tx_index)
-        .map(({ tx_hash }) => Cardano.TransactionId(tx_hash))
-        .splice(pagination.startAt, pagination.limit);
+      const dedupedSortedTransactions = uniq(
+        allTransactions
+          .filter(({ block_height }) => block_height >= lowerBound && block_height <= upperBound)
+          .sort(pagination.order === 'desc' ? (a, b) => compareTx(b, a) : compareTx)
+          .map(({ tx_hash }) => Cardano.TransactionId(tx_hash))
+      );
+      const ids = dedupedSortedTransactions.slice(pagination.startAt, pagination.limit);
 
       const pageResults = await this.transactionsByHashes({ ids });
 
-      return { pageResults, totalResultCount: allTransactions.length };
+      return { pageResults, totalResultCount: dedupedSortedTransactions.length };
     } catch (error) {
       throw this.toProviderError(error);
     }
