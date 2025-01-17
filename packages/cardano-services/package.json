@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-services",
-  "version": "0.33.6",
+  "version": "0.34.0",
   "description": "Cardano GraphQL Services",
   "engines": {
     "node": ">=16.20.2"

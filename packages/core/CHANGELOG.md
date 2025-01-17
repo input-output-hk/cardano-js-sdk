@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.44.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.43.0...@cardano-sdk/core@0.44.0) (2025-01-17)
+
+### ⚠ BREAKING CHANGES
+
+* The package now exports an async `ready` function that must be called before any of crypto related functions can be called
+- Bip32PrivateKe async functions are all now sync
+- Bip32PublicKey class async functions are all now sync
+- Ed25519PrivateKey class async functions are all now sync
+- Ed25519PublicKey class async functions are all now sync
+- Bip32Ed25519 interface async functions are all now sync
+- SodiumBip32Ed25519 cosntructor is now private
+- SodiumBip32Ed25519 now has a new async factory method create
+
+### Features
+
+* remove async from crypto API ([91b7fa2](https://github.com/input-output-hk/cardano-js-sdk/commit/91b7fa29961cfb11fe7270aef259be19ac215f08))
+
+### Bug Fixes
+
+* **core:** zero value fields CBOR serialization ([7ee40ed](https://github.com/input-output-hk/cardano-js-sdk/commit/7ee40ede3857ff389264524884180641070df537))
+* resolve invalid CBOR serialization for maps ([3257320](https://github.com/input-output-hk/cardano-js-sdk/commit/3257320d3878c5dc4e2d2b236dd814ff26f75ed0)), closes [#1561](https://github.com/input-output-hk/cardano-js-sdk/issues/1561)
+
 ## [0.43.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.42.3...@cardano-sdk/core@0.43.0) (2025-01-09)
 
 ### ⚠ BREAKING CHANGES

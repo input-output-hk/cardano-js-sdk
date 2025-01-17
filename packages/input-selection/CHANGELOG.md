@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.13.34...@cardano-sdk/input-selection@0.14.0) (2025-01-17)
+
+### ⚠ BREAKING CHANGES
+
+* minFee now takes resolvedInputs and ProtocolParametersForInputSelection as arguments
+
+### Features
+
+* fee calculation now takes into account reference script size ([33527d5](https://github.com/input-output-hk/cardano-js-sdk/commit/33527d52479b7b520c7bee1f6d9d6a59d5effb71))
+
 ## [0.13.34](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.13.33...@cardano-sdk/input-selection@0.13.34) (2025-01-09)
 
 **Note:** Version bump only for package @cardano-sdk/input-selection

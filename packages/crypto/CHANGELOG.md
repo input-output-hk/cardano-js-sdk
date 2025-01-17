@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.1.32...@cardano-sdk/crypto@0.2.0) (2025-01-17)
+
+### ⚠ BREAKING CHANGES
+
+* The package now exports an async `ready` function that must be called before any of crypto related functions can be called
+- Bip32PrivateKe async functions are all now sync
+- Bip32PublicKey class async functions are all now sync
+- Ed25519PrivateKey class async functions are all now sync
+- Ed25519PublicKey class async functions are all now sync
+- Bip32Ed25519 interface async functions are all now sync
+- SodiumBip32Ed25519 cosntructor is now private
+- SodiumBip32Ed25519 now has a new async factory method create
+
+### Features
+
+* remove async from crypto API ([91b7fa2](https://github.com/input-output-hk/cardano-js-sdk/commit/91b7fa29961cfb11fe7270aef259be19ac215f08))
+
 ## [0.1.32](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.1.31...@cardano-sdk/crypto@0.1.32) (2024-12-02)
 
 **Note:** Version bump only for package @cardano-sdk/crypto

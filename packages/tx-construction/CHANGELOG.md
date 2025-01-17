@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.25.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.24.4...@cardano-sdk/tx-construction@0.25.0) (2025-01-17)
+
+### ⚠ BREAKING CHANGES
+
+* minFee now takes resolvedInputs and ProtocolParametersForInputSelection as arguments
+* The package now exports an async `ready` function that must be called before any of crypto related functions can be called
+- Bip32PrivateKe async functions are all now sync
+- Bip32PublicKey class async functions are all now sync
+- Ed25519PrivateKey class async functions are all now sync
+- Ed25519PublicKey class async functions are all now sync
+- Bip32Ed25519 interface async functions are all now sync
+- SodiumBip32Ed25519 cosntructor is now private
+- SodiumBip32Ed25519 now has a new async factory method create
+
+### Features
+
+* fee calculation now takes into account reference script size ([33527d5](https://github.com/input-output-hk/cardano-js-sdk/commit/33527d52479b7b520c7bee1f6d9d6a59d5effb71))
+* remove async from crypto API ([91b7fa2](https://github.com/input-output-hk/cardano-js-sdk/commit/91b7fa29961cfb11fe7270aef259be19ac215f08))
+
 ## [0.24.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.24.3...@cardano-sdk/tx-construction@0.24.4) (2025-01-09)
 
 ### Bug Fixes
