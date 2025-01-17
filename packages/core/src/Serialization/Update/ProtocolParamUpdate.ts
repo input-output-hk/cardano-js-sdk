@@ -413,39 +413,38 @@ export class ProtocolParamUpdate {
    */
   toCore(): Cardano.ProtocolParametersUpdate {
     const protocolParametersUpdate: Cardano.ProtocolParametersUpdate = {
-      coinsPerUtxoByte: this.#adaPerUtxoByte ? Number(this.#adaPerUtxoByte) : undefined,
+      coinsPerUtxoByte: this.#adaPerUtxoByte !== undefined ? Number(this.#adaPerUtxoByte) : undefined,
       collateralPercentage: this.#collateralPercentage,
-      committeeTermLimit: this.#committeeTermLimit ? EpochNo(this.#committeeTermLimit) : undefined,
+      committeeTermLimit: this.#committeeTermLimit !== undefined ? EpochNo(this.#committeeTermLimit) : undefined,
       costModels: this.#costModels?.toCore(),
       dRepDeposit: this.#drepDeposit,
-      dRepInactivityPeriod: this.#drepInactivityPeriod ? EpochNo(this.#drepInactivityPeriod) : undefined,
+      dRepInactivityPeriod: this.#drepInactivityPeriod !== undefined ? EpochNo(this.#drepInactivityPeriod) : undefined,
       dRepVotingThresholds: this.#drepVotingThresholds?.toCore(),
       desiredNumberOfPools: this.#nOpt,
       governanceActionDeposit: this.#governanceActionDeposit,
-      governanceActionValidityPeriod: this.#governanceActionValidityPeriod
-        ? EpochNo(this.#governanceActionValidityPeriod)
-        : undefined,
+      governanceActionValidityPeriod:
+        this.#governanceActionValidityPeriod !== undefined ? EpochNo(this.#governanceActionValidityPeriod) : undefined,
       maxBlockBodySize: this.#maxBlockBodySize,
       maxBlockHeaderSize: this.#maxBlockHeaderSize,
       maxCollateralInputs: this.#maxCollateralInputs,
       maxExecutionUnitsPerBlock: this.#maxBlockExUnits?.toCore(),
       maxExecutionUnitsPerTransaction: this.#maxTxExUnits?.toCore(),
-      maxTxSize: this.#maxTxSize ? Number(this.#maxTxSize) : undefined,
+      maxTxSize: this.#maxTxSize !== undefined ? Number(this.#maxTxSize) : undefined,
       maxValueSize: this.#maxValueSize,
       minCommitteeSize: this.#minCommitteeSize,
-      minFeeCoefficient: this.#minFeeA ? Number(this.#minFeeA) : undefined,
-      minFeeConstant: this.#minFeeB ? Number(this.#minFeeB) : undefined,
+      minFeeCoefficient: this.#minFeeA !== undefined ? Number(this.#minFeeA) : undefined,
+      minFeeConstant: this.#minFeeB !== undefined ? Number(this.#minFeeB) : undefined,
       minFeeRefScriptCostPerByte: this.#minFeeRefScriptCostPerByte
         ? this.#minFeeRefScriptCostPerByte.toFloat().toString()
         : undefined,
-      minPoolCost: this.#minPoolCost ? Number(this.#minPoolCost) : undefined,
+      minPoolCost: this.#minPoolCost !== undefined ? Number(this.#minPoolCost) : undefined,
       monetaryExpansion: this.#expansionRate ? this.#expansionRate.toFloat().toString() : undefined,
-      poolDeposit: this.#poolDeposit ? Number(this.#poolDeposit) : undefined,
+      poolDeposit: this.#poolDeposit !== undefined ? Number(this.#poolDeposit) : undefined,
       poolInfluence: this.#poolPledgeInfluence ? this.#poolPledgeInfluence.toFloat().toString() : undefined,
       poolRetirementEpochBound: this.#maxEpoch,
       poolVotingThresholds: this.#poolVotingThresholds?.toCore(),
       prices: this.#executionCosts?.toCore(),
-      stakeKeyDeposit: this.#keyDeposit ? Number(this.#keyDeposit) : undefined,
+      stakeKeyDeposit: this.#keyDeposit !== undefined ? Number(this.#keyDeposit) : undefined,
       treasuryExpansion: this.#treasuryGrowthRate ? this.#treasuryGrowthRate.toFloat().toString() : undefined
     };
 
@@ -466,12 +465,18 @@ export class ProtocolParamUpdate {
   ) {
     const params = new ProtocolParamUpdate();
 
-    params.#minFeeA = parametersUpdate.minFeeCoefficient ? BigInt(parametersUpdate.minFeeCoefficient) : undefined;
+    params.#minFeeA =
+      parametersUpdate.minFeeCoefficient !== undefined ? BigInt(parametersUpdate.minFeeCoefficient) : undefined;
     params.#maxBlockBodySize = parametersUpdate.maxBlockBodySize;
-    params.#minFeeB = parametersUpdate.minFeeConstant ? BigInt(parametersUpdate.minFeeConstant) : undefined;
+    params.#minFeeB =
+      parametersUpdate.minFeeConstant !== undefined ? BigInt(parametersUpdate.minFeeConstant) : undefined;
     params.#maxBlockHeaderSize = parametersUpdate.maxBlockHeaderSize;
-    params.#keyDeposit = parametersUpdate.stakeKeyDeposit ? BigInt(parametersUpdate.stakeKeyDeposit) : undefined;
-    params.#poolDeposit = parametersUpdate.poolDeposit ? BigInt(parametersUpdate.poolDeposit) : undefined;
+    params.#keyDeposit =
+      parametersUpdate.stakeKeyDeposit !== undefined ? BigInt(parametersUpdate.stakeKeyDeposit) : undefined;
+    params.#poolDeposit =
+      parametersUpdate.poolDeposit !== undefined && parametersUpdate.poolDeposit !== null
+        ? BigInt(parametersUpdate.poolDeposit)
+        : undefined;
     params.#maxEpoch = parametersUpdate.poolRetirementEpochBound;
     params.#nOpt = parametersUpdate.desiredNumberOfPools;
     params.#poolPledgeInfluence = parametersUpdate.poolInfluence
@@ -483,7 +488,7 @@ export class ProtocolParamUpdate {
     params.#treasuryGrowthRate = parametersUpdate.treasuryExpansion
       ? UnitInterval.fromFloat(Number(parametersUpdate.treasuryExpansion))
       : undefined;
-    params.#minPoolCost = parametersUpdate.minPoolCost ? BigInt(parametersUpdate.minPoolCost) : undefined;
+    params.#minPoolCost = parametersUpdate.minPoolCost !== undefined ? BigInt(parametersUpdate.minPoolCost) : undefined;
     params.#maxValueSize = parametersUpdate.maxValueSize;
     params.#maxTxSize = parametersUpdate.maxTxSize;
     params.#collateralPercentage = parametersUpdate.collateralPercentage;
@@ -496,7 +501,8 @@ export class ProtocolParamUpdate {
     params.#maxBlockExUnits = parametersUpdate.maxExecutionUnitsPerBlock
       ? ExUnits.fromCore(parametersUpdate.maxExecutionUnitsPerBlock)
       : undefined;
-    params.#adaPerUtxoByte = parametersUpdate.coinsPerUtxoByte ? BigInt(parametersUpdate.coinsPerUtxoByte) : undefined;
+    params.#adaPerUtxoByte =
+      parametersUpdate.coinsPerUtxoByte !== undefined ? BigInt(parametersUpdate.coinsPerUtxoByte) : undefined;
     params.#poolVotingThresholds = parametersUpdate.poolVotingThresholds
       ? PoolVotingThresholds.fromCore(parametersUpdate.poolVotingThresholds)
       : undefined;
