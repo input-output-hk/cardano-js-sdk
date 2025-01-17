@@ -102,12 +102,12 @@ export class TransactionBody {
     //   }
     writer.writeStartMap(this.#getMapSize());
 
-    if (this.#inputs && this.#inputs.size() > 0) {
+    if (this.#inputs !== undefined && this.#inputs.size() > 0) {
       writer.writeInt(0n);
       writer.writeEncodedValue(hexToBytes(this.#inputs.toCbor()));
     }
 
-    if (this.#outputs && this.#outputs.length > 0) {
+    if (this.#outputs !== undefined && this.#outputs.length > 0) {
       writer.writeInt(1n);
       writer.writeStartArray(this.#outputs.length);
 
@@ -116,20 +116,22 @@ export class TransactionBody {
       }
     }
 
-    writer.writeInt(2n);
-    writer.writeInt(this.#fee);
+    if (this.#fee !== undefined) {
+      writer.writeInt(2n);
+      writer.writeInt(this.#fee);
+    }
 
-    if (this.#ttl) {
+    if (this.#ttl !== undefined) {
       writer.writeInt(3n);
       writer.writeInt(this.#ttl);
     }
 
-    if (this.#certs && this.#certs.size() > 0) {
+    if (this.#certs !== undefined && this.#certs.size() > 0) {
       writer.writeInt(4n);
       writer.writeEncodedValue(hexToBytes(this.#certs.toCbor()));
     }
 
-    if (this.#withdrawals && this.#withdrawals.size > 0) {
+    if (this.#withdrawals !== undefined && this.#withdrawals.size > 0) {
       writer.writeInt(5n);
       // Create a new map with address bytes to avoid logic duplication and address checks
       const withdrawalsWithAddressBytes = new Map();
@@ -153,22 +155,22 @@ export class TransactionBody {
       }
     }
 
-    if (this.#update) {
+    if (this.#update !== undefined) {
       writer.writeInt(6n);
       writer.writeEncodedValue(Buffer.from(this.#update.toCbor(), 'hex'));
     }
 
-    if (this.#auxiliaryDataHash) {
+    if (this.#auxiliaryDataHash !== undefined) {
       writer.writeInt(7n);
       writer.writeByteString(Buffer.from(this.#auxiliaryDataHash, 'hex'));
     }
 
-    if (this.#validityStartInterval) {
+    if (this.#validityStartInterval !== undefined) {
       writer.writeInt(8n);
       writer.writeInt(this.#validityStartInterval);
     }
 
-    if (this.#mint && this.#mint.size > 0) {
+    if (this.#mint !== undefined && this.#mint.size > 0) {
       writer.writeInt(9n);
 
       const multiassets = tokenMapToMultiAsset(this.#mint);
@@ -189,57 +191,57 @@ export class TransactionBody {
       }
     }
 
-    if (this.#scriptDataHash) {
+    if (this.#scriptDataHash !== undefined) {
       writer.writeInt(11n);
       writer.writeByteString(Buffer.from(this.#scriptDataHash, 'hex'));
     }
 
-    if (this.#collateral && this.#collateral.size() > 0) {
+    if (this.#collateral !== undefined && this.#collateral.size() > 0) {
       writer.writeInt(13n);
       writer.writeEncodedValue(hexToBytes(this.#collateral.toCbor()));
     }
 
-    if (this.#requiredSigners && this.#requiredSigners.size() > 0) {
+    if (this.#requiredSigners?.values() !== undefined && this.#requiredSigners.size() > 0) {
       writer.writeInt(14n);
       writer.writeEncodedValue(hexToBytes(this.#requiredSigners.toCbor()));
     }
 
-    if (this.#networkId) {
+    if (this.#networkId !== undefined) {
       writer.writeInt(15n);
       writer.writeInt(this.#networkId);
     }
 
-    if (this.#collateralReturn) {
+    if (this.#collateralReturn !== undefined) {
       writer.writeInt(16n);
       writer.writeEncodedValue(Buffer.from(this.#collateralReturn.toCbor(), 'hex'));
     }
 
-    if (this.#totalCollateral) {
+    if (this.#totalCollateral !== undefined) {
       writer.writeInt(17n);
       writer.writeInt(this.#totalCollateral);
     }
 
-    if (this.#referenceInputs && this.#referenceInputs.size() > 0) {
+    if (this.#referenceInputs !== undefined && this.#referenceInputs.size() > 0) {
       writer.writeInt(18n);
       writer.writeEncodedValue(hexToBytes(this.#referenceInputs.toCbor()));
     }
 
-    if (this.#votingProcedures) {
+    if (this.#votingProcedures !== undefined) {
       writer.writeInt(19n);
       writer.writeEncodedValue(Buffer.from(this.#votingProcedures.toCbor(), 'hex'));
     }
 
-    if (this.#proposalProcedures && this.#proposalProcedures.size() > 0) {
+    if (this.#proposalProcedures !== undefined && this.#proposalProcedures.size() > 0) {
       writer.writeInt(20n);
       writer.writeEncodedValue(hexToBytes(this.#proposalProcedures.toCbor()));
     }
 
-    if (this.#currentTreasuryValue) {
+    if (this.#currentTreasuryValue !== undefined) {
       writer.writeInt(21n);
       writer.writeInt(this.#currentTreasuryValue);
     }
 
-    if (this.#donation) {
+    if (this.#donation !== undefined) {
       writer.writeInt(22n);
       writer.writeInt(this.#donation);
     }
