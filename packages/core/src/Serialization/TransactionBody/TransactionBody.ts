@@ -421,10 +421,10 @@ export class TransactionBody {
       treasuryValue: this.#currentTreasuryValue,
       update: this.#update ? this.#update.toCore() : undefined,
       validityInterval:
-        this.#ttl || this.#validityStartInterval
+        this.#ttl || this.#validityStartInterval !== undefined
           ? {
-              invalidBefore: this.#validityStartInterval ? this.#validityStartInterval : undefined,
-              invalidHereafter: this.#ttl ? this.#ttl : undefined
+              invalidBefore: this.#validityStartInterval,
+              invalidHereafter: this.#ttl
             }
           : undefined,
       votingProcedures: this.#votingProcedures ? this.#votingProcedures.toCore() : undefined,
@@ -460,7 +460,7 @@ export class TransactionBody {
 
     if (coreTransactionBody.mint) body.setMint(coreTransactionBody.mint);
 
-    if (coreTransactionBody.networkId) body.setNetworkId(coreTransactionBody.networkId);
+    if (coreTransactionBody.networkId !== undefined) body.setNetworkId(coreTransactionBody.networkId);
 
     if (coreTransactionBody.referenceInputs)
       body.setReferenceInputs(CborSet.fromCore(coreTransactionBody.referenceInputs, TransactionInput.fromCore));
@@ -470,14 +470,14 @@ export class TransactionBody {
 
     if (coreTransactionBody.scriptIntegrityHash) body.setScriptDataHash(coreTransactionBody.scriptIntegrityHash);
 
-    if (coreTransactionBody.totalCollateral) body.setTotalCollateral(coreTransactionBody.totalCollateral);
+    if (coreTransactionBody.totalCollateral !== undefined) body.setTotalCollateral(coreTransactionBody.totalCollateral);
 
     if (coreTransactionBody.update) body.setUpdate(Update.fromCore(coreTransactionBody.update));
 
     if (coreTransactionBody.validityInterval) {
-      if (coreTransactionBody.validityInterval.invalidHereafter)
+      if (coreTransactionBody.validityInterval.invalidHereafter !== undefined)
         body.setTtl(coreTransactionBody.validityInterval.invalidHereafter);
-      if (coreTransactionBody.validityInterval.invalidBefore)
+      if (coreTransactionBody.validityInterval.invalidBefore !== undefined)
         body.setValidityStartInterval(coreTransactionBody.validityInterval.invalidBefore);
     }
 
@@ -489,8 +489,9 @@ export class TransactionBody {
       }
     }
 
-    if (coreTransactionBody.donation) body.setDonation(coreTransactionBody.donation);
-    if (coreTransactionBody.treasuryValue) body.setCurrentTreasuryValue(coreTransactionBody.treasuryValue);
+    if (coreTransactionBody.donation !== undefined) body.setDonation(coreTransactionBody.donation);
+    if (coreTransactionBody.treasuryValue !== undefined)
+      body.setCurrentTreasuryValue(coreTransactionBody.treasuryValue);
     if (coreTransactionBody.votingProcedures)
       body.setVotingProcedures(VotingProcedures.fromCore(coreTransactionBody.votingProcedures));
     if (coreTransactionBody.proposalProcedures)
