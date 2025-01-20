@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">82.14% </span>
+                <span class="strong">82.75% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>23/28</span>
+                <span class='fraction'>24/29</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">80.76% </span>
+                <span class="strong">81.48% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>21/26</span>
+                <span class='fraction'>22/27</span>
             </div>
         
             
@@ -135,37 +135,49 @@
 <a name='L70'></a><a href='#L70'>70</a>
 <a name='L71'></a><a href='#L71'>71</a>
 <a name='L72'></a><a href='#L72'>72</a>
-<a name='L73'></a><a href='#L73'>73</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-yes">43x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-yes">43x</span>
+<span class="cline-any cline-yes">43x</span>
+<span class="cline-any cline-yes">43x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-yes">43x</span>
+<span class="cline-any cline-yes">43x</span>
+<span class="cline-any cline-yes">43x</span>
+<span class="cline-any cline-yes">43x</span>
+<span class="cline-any cline-yes">43x</span>
+<span class="cline-any cline-yes">43x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-yes">43x</span>
+<span class="cline-any cline-yes">43x</span>
+<span class="cline-any cline-yes">43x</span>
+<span class="cline-any cline-yes">43x</span>
+<span class="cline-any cline-yes">43x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-yes">43x</span>
+<span class="cline-any cline-yes">43x</span>
+<span class="cline-any cline-yes">43x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-yes">43x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">124x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -222,6 +234,7 @@ export class InMemoryPolicyIdsStore extends InMemoryDocumentStore&lt;Cardano.Pol
 export class InMemoryProtocolParametersStore extends InMemoryDocumentStore&lt;Cardano.ProtocolParameters&gt; {}
 export class InMemoryGenesisParametersStore extends InMemoryDocumentStore&lt;Cardano.CompactGenesis&gt; {}
 export class InMemoryEraSummariesStore extends InMemoryDocumentStore&lt;EraSummary[]&gt; {}
+export class InMemoryDelegationPortfolioStore extends InMemoryDocumentStore&lt;Cardano.Cip17DelegationPortfolio&gt; {}
 &nbsp;
 export class InMemoryAssetsStore extends InMemoryDocumentStore&lt;Assets&gt; {}
 export class InMemoryAddressesStore extends InMemoryDocumentStore&lt;GroupedAddress[]&gt; {}
@@ -234,12 +247,17 @@ export class InMemoryUtxoStore extends InMemoryCollectionStore&lt;Cardano.Utxo&g
 export class InMemoryUnspendableUtxoStore extends InMemoryCollectionStore&lt;Cardano.Utxo&gt; {}
 &nbsp;
 export class InMemoryRewardsHistoryStore extends InMemoryKeyValueStore&lt;Cardano.RewardAccount, Reward[]&gt; {}
+&nbsp;
+export class InMemoryRewardAccountInfoStore extends InMemoryKeyValueStore&lt;
+  Cardano.RewardAccount,
+  Cardano.RewardAccountInfo
+&gt; {}
 export class InMemoryStakePoolsStore extends InMemoryKeyValueStore&lt;Cardano.PoolId, Cardano.StakePool&gt; {}
-export class InMemoryRewardsBalancesStore extends InMemoryKeyValueStore&lt;Cardano.RewardAccount, Cardano.Lovelace&gt; {}
 &nbsp;
 export const createInMemoryWalletStores = (): WalletStores =&gt; ({
   addresses: new InMemoryAddressesStore(),
   assets: new InMemoryAssetsStore(),
+  delegationPortfolio: new InMemoryDelegationPortfolioStore(),
 <span class="fstat-no" title="function not covered" >  destroy(</span>) {
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!this.destroyed) {</span>
 <span class="cstat-no" title="statement not covered" >      this.destroyed = true;</span>
@@ -250,8 +268,8 @@ export const createInMemoryWalletStores = (): WalletStores =&gt; ({
         this.protocolParameters.destroy(),
         this.eraSummaries.destroy(),
         this.unspendableUtxo.destroy(),
-        this.rewardsBalances.destroy(),
         this.rewardsHistory.destroy(),
+        this.rewardAccountInfo.destroy(),
         this.stakePools.destroy(),
         this.tip.destroy(),
         this.transactions.destroy(),
@@ -269,7 +287,7 @@ export const createInMemoryWalletStores = (): WalletStores =&gt; ({
   inFlightTransactions: new InMemoryInFlightTransactionsStore(),
   policyIds: new InMemoryPolicyIdsStore(),
   protocolParameters: new InMemoryProtocolParametersStore(),
-  rewardsBalances: new InMemoryRewardsBalancesStore(),
+  rewardAccountInfo: new InMemoryRewardAccountInfoStore(),
   rewardsHistory: new InMemoryRewardsHistoryStore(),
   signedTransactions: new InMemorySignedTransactionsStore(),
   stakePools: new InMemoryStakePoolsStore(),
@@ -286,7 +304,7 @@ export const createInMemoryWalletStores = (): WalletStores =&gt; ({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-17T12:52:58.608Z
+                at 2025-01-20T15:35:15.389Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

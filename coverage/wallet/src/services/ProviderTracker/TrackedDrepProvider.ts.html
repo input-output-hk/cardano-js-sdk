@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">72.72% </span>
+                <span class="strong">18.18% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>16/22</span>
+                <span class='fraction'>4/22</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>5/10</span>
+                <span class='fraction'>0/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">87.5% </span>
+                <span class="strong">25% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>14/16</span>
+                <span class='fraction'>4/16</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -98,17 +98,17 @@
 <a name='L33'></a><a href='#L33'>33</a>
 <a name='L34'></a><a href='#L34'>34</a>
 <a name='L35'></a><a href='#L35'>35</a>
-<a name='L36'></a><a href='#L36'>36</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">43x</span>
-<span class="cline-any cline-yes">43x</span>
+<a name='L36'></a><a href='#L36'>36</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-yes">42x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">43x</span>
-<span class="cline-any cline-yes">133x</span>
-<span class="cline-any cline-yes">133x</span>
+<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">120x</span>
-<span class="cline-any cline-yes">120x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -118,32 +118,32 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">43x</span>
-<span class="cline-any cline-yes">133x</span>
+<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">133x</span>
-<span class="cline-any cline-yes">133x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">133x</span>
-<span class="cline-any cline-yes">133x</span>
-<span class="cline-any cline-yes">196x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { BehaviorSubject } from 'rxjs';
 import { CLEAN_FN_STATS, ProviderFnStats, ProviderTracker } from './ProviderTracker';
 import { DRepProvider } from '@cardano-sdk/core';
 &nbsp;
-export class DrepProviderStats {
-  readonly healthCheck$ = new BehaviorSubject&lt;ProviderFnStats&gt;(CLEAN_FN_STATS);
-  readonly getDRepInfo$ = new BehaviorSubject&lt;ProviderFnStats&gt;(CLEAN_FN_STATS);
+<span class="fstat-no" title="function not covered" >export class D</span>repProviderStats {
+  readonly <span class="cstat-no" title="statement not covered" >healthCheck$ = new BehaviorSubject&lt;ProviderFnStats&gt;(CLEAN_FN_STATS);</span>
+  readonly <span class="cstat-no" title="statement not covered" >getDRepInfo$ = new BehaviorSubject&lt;ProviderFnStats&gt;(CLEAN_FN_STATS);</span>
 &nbsp;
-  shutdown() {
-    this.healthCheck$.complete();
-    this.getDRepInfo$.complete();
+<span class="fstat-no" title="function not covered" >  shutdown(</span>) {
+<span class="cstat-no" title="statement not covered" >    this.healthCheck$.complete();</span>
+<span class="cstat-no" title="statement not covered" >    this.getDRepInfo$.complete();</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  reset(</span>) {
@@ -154,18 +154,18 @@ export class DrepProviderStats {
 &nbsp;
 /** Wraps a DRepProvider, tracking # of calls of each function */
 export class TrackedDrepProvider extends ProviderTracker implements DRepProvider {
-  readonly stats = new DrepProviderStats();
+  readonly <span class="cstat-no" title="statement not covered" >stats = new DrepProviderStats();</span>
   readonly healthCheck: DRepProvider['healthCheck'];
   readonly getDRepInfo: DRepProvider['getDRepInfo'];
   readonly getDRepsInfo: DRepProvider['getDRepsInfo'];
 &nbsp;
-  constructor(drepProvider: DRepProvider) {
-    super();
-    drepProvider = drepProvider;
+<span class="fstat-no" title="function not covered" >  constructor(d</span>repProvider: DRepProvider) {
+<span class="cstat-no" title="statement not covered" >    super();</span>
+<span class="cstat-no" title="statement not covered" >    drepProvider = drepProvider;</span>
 &nbsp;
-    this.healthCheck = <span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >this.trackedCall(<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >drepProvider.healthCheck(),</span> this.stats.healthCheck$);</span>
-    this.getDRepInfo = <span class="fstat-no" title="function not covered" >(a</span>rgs) =&gt; <span class="cstat-no" title="statement not covered" >this.trackedCall(<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >drepProvider.getDRepInfo(args),</span> this.stats.getDRepInfo$);</span>
-    this.getDRepsInfo = (args) =&gt; this.trackedCall(() =&gt; drepProvider.getDRepsInfo(args), this.stats.getDRepInfo$);
+<span class="cstat-no" title="statement not covered" >    this.healthCheck = <span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >this.trackedCall(<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >drepProvider.healthCheck(),</span> this.stats.healthCheck$);</span></span>
+<span class="cstat-no" title="statement not covered" >    this.getDRepInfo = <span class="fstat-no" title="function not covered" >(a</span>rgs) =&gt; <span class="cstat-no" title="statement not covered" >this.trackedCall(<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >drepProvider.getDRepInfo(args),</span> this.stats.getDRepInfo$);</span></span>
+<span class="cstat-no" title="statement not covered" >    this.getDRepsInfo = <span class="fstat-no" title="function not covered" >(a</span>rgs) =&gt; <span class="cstat-no" title="statement not covered" >this.trackedCall(<span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >drepProvider.getDRepsInfo(args),</span> this.stats.getDRepInfo$);</span></span>
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -175,7 +175,7 @@ export class TrackedDrepProvider extends ProviderTracker implements DRepProvider
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-17T12:52:58.608Z
+                at 2025-01-20T15:35:15.389Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

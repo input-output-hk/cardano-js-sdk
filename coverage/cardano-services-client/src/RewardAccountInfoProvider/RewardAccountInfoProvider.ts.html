@@ -1,0 +1,694 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for src/RewardAccountInfoProvider/RewardAccountInfoProvider.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/RewardAccountInfoProvider</a> RewardAccountInfoProvider.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">8.53% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>7/82</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/34</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/21</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">8.97% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>7/78</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input oninput="onInput()" type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a>
+<a name='L204'></a><a href='#L204'>204</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Cardano, DRepProvider, RewardAccountInfoProvider, Serialization, StakePoolProvider } from '@cardano-sdk/core';
+&nbsp;
+import { BlockfrostClient, BlockfrostProvider, fetchSequentially, isBlockfrostNotFoundError } from '../blockfrost';
+import { HexBlob, isNotNil } from '@cardano-sdk/util';
+import { Logger } from 'ts-log';
+import uniq from 'lodash/uniq.js';
+import type { Responses } from '@blockfrost/blockfrost-js';
+&nbsp;
+export type BlockfrostRewardAccountInfoProviderDependencies = {
+  client: BlockfrostClient;
+  logger: Logger;
+  stakePoolProvider: StakePoolProvider;
+  dRepProvider: DRepProvider;
+};
+&nbsp;
+const emptyArrayIfNotFound = <span class="fstat-no" title="function not covered" >(e</span>rror: unknown) =&gt; {
+<span class="cstat-no" title="statement not covered" >  <span class="missing-if-branch" title="if path not taken" >I</span>if (isBlockfrostNotFoundError(error)) {</span>
+<span class="cstat-no" title="statement not covered" >    return [];</span>
+  }
+<span class="cstat-no" title="statement not covered" >  throw error;</span>
+};
+&nbsp;
+export class BlockfrostRewardAccountInfoProvider extends BlockfrostProvider implements RewardAccountInfoProvider {
+<span class="cstat-no" title="statement not covered" >  #dRepProvider: DRepProvider;</span>
+<span class="cstat-no" title="statement not covered" >  #stakePoolProvider: StakePoolProvider;</span>
+&nbsp;
+<span class="fstat-no" title="function not covered" >  constructor({</span> client, logger, stakePoolProvider, dRepProvider }: BlockfrostRewardAccountInfoProviderDependencies) {
+<span class="cstat-no" title="statement not covered" >    super(client, logger);</span>
+<span class="cstat-no" title="statement not covered" >    this.#dRepProvider = dRepProvider;</span>
+<span class="cstat-no" title="statement not covered" >    this.#stakePoolProvider = stakePoolProvider;</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  async </span>rewardAccountInfo(
+    address: Cardano.RewardAccount,
+    localEpoch: Cardano.EpochNo
+  ): Promise&lt;Cardano.RewardAccountInfo&gt; {
+    const [account, [lastRegistrationActivity]] = <span class="cstat-no" title="statement not covered" >await Promise.all([</span>
+      await this.request&lt;Responses['account_content']&gt;(`accounts/${address}`).catch(
+<span class="fstat-no" title="function not covered" >        (e</span>rror): Responses['account_content'] =&gt; {
+<span class="cstat-no" title="statement not covered" >          <span class="missing-if-branch" title="if path not taken" >I</span>if (isBlockfrostNotFoundError(error)) {</span>
+<span class="cstat-no" title="statement not covered" >            return {</span>
+              active: false,
+              active_epoch: null,
+              controlled_amount: '0',
+              drep_id: null,
+              pool_id: null,
+              reserves_sum: '0',
+              rewards_sum: '0',
+              stake_address: address,
+              treasury_sum: '0',
+              withdrawable_amount: '0',
+              withdrawals_sum: '0'
+            };
+          }
+<span class="cstat-no" title="statement not covered" >          throw error;</span>
+        }
+      ),
+      this.request&lt;Responses['account_registration_content']&gt;(
+        `accounts/${address}/registrations?order=desc&amp;count=1`
+      ).catch(emptyArrayIfNotFound)
+    ]);
+&nbsp;
+    const isUnregisteringAtEpoch = <span class="cstat-no" title="statement not covered" >await this.#getUnregisteringAtEpoch(lastRegistrationActivity);</span>
+&nbsp;
+    const credentialStatus = <span class="cstat-no" title="statement not covered" >account.active</span>
+      ? Cardano.StakeCredentialStatus.Registered
+      : lastRegistrationActivity?.action === 'registered'
+      ? Cardano.StakeCredentialStatus.Registering
+      : typeof isUnregisteringAtEpoch === 'undefined' || isUnregisteringAtEpoch &lt;= localEpoch
+      ? Cardano.StakeCredentialStatus.Unregistered
+      : Cardano.StakeCredentialStatus.Unregistering;
+    const rewardBalance = <span class="cstat-no" title="statement not covered" >BigInt(account.withdrawable_amount || '0');</span>
+&nbsp;
+    const [delegatee, dRepDelegatee, deposit] = <span class="cstat-no" title="statement not covered" >await Promise.all([</span>
+      this.#getDelegatee(address, localEpoch, isUnregisteringAtEpoch),
+      this.#getDrepDelegatee(account),
+      // This provider currently does not find other deposits (pool/drep/govaction)
+      this.#getKeyDeposit(lastRegistrationActivity)
+    ]);
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return {</span>
+      address,
+      credentialStatus,
+      dRepDelegatee,
+      delegatee,
+      deposit,
+      rewardBalance
+    };
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  async </span>delegationPortfolio(rewardAccount: Cardano.RewardAccount): Promise&lt;Cardano.Cip17DelegationPortfolio | null&gt; {
+    const portfolios = <span class="cstat-no" title="statement not covered" >await fetchSequentially({</span>
+      haveEnoughItems: <span class="fstat-no" title="function not covered" >(i</span>tems: Array&lt;null | Cardano.Cip17DelegationPortfolio&gt;) =&gt; <span class="cstat-no" title="statement not covered" >items.some(isNotNil),</span>
+      paginationOptions: { order: 'desc' },
+      request: <span class="fstat-no" title="function not covered" >async </span>(paginationQueryString) =&gt; {
+        const txs = <span class="cstat-no" title="statement not covered" >await this.request&lt;Responses['account_delegation_content']&gt;(</span>
+          `accounts/${rewardAccount}/delegations?${paginationQueryString}`
+        ).catch(emptyArrayIfNotFound);
+        const result: Array&lt;null | Cardano.Cip17DelegationPortfolio&gt; = <span class="cstat-no" title="statement not covered" >[];</span>
+<span class="cstat-no" title="statement not covered" >        for (const { tx_hash } of txs) {</span>
+          const metadata = <span class="cstat-no" title="statement not covered" >await this.request&lt;Responses['tx_content_metadata_cbor']&gt;(</span>
+            `txs/${tx_hash}/metadata/cbor`
+          ).catch(emptyArrayIfNotFound);
+          const cbor = <span class="cstat-no" title="statement not covered" >metadata.find(<span class="fstat-no" title="function not covered" >({</span> label }) =&gt; <span class="cstat-no" title="statement not covered" >label === '6862')</span>?.metadata;</span>
+<span class="cstat-no" title="statement not covered" >          <span class="missing-if-branch" title="if path not taken" >I</span>if (!cbor) {</span>
+<span class="cstat-no" title="statement not covered" >            result.push(null);</span>
+<span class="cstat-no" title="statement not covered" >            continue;</span>
+          }
+          const metadatum = <span class="cstat-no" title="statement not covered" >Serialization.TransactionMetadatum.fromCbor(HexBlob(cbor));</span>
+<span class="cstat-no" title="statement not covered" >          try {</span>
+<span class="cstat-no" title="statement not covered" >            result.push(Cardano.cip17FromMetadatum(metadatum.toCore()));</span>
+<span class="cstat-no" title="statement not covered" >            break;</span>
+          } catch {
+<span class="cstat-no" title="statement not covered" >            result.push(null);</span>
+          }
+        }
+<span class="cstat-no" title="statement not covered" >        return result;</span>
+      }
+    });
+<span class="cstat-no" title="statement not covered" >    return portfolios.find(isNotNil) || null;</span>
+  }
+&nbsp;
+  async<span class="fstat-no" title="function not covered" > #getUnregisteringAtEpoch(</span>
+    lastRegistrationActivity: Responses['account_registration_content'][0] | undefined
+  ): Promise&lt;Cardano.EpochNo | undefined&gt; {
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!lastRegistrationActivity || lastRegistrationActivity.action === 'registered') {</span>
+<span class="cstat-no" title="statement not covered" >      return;</span>
+    }
+    const tx = <span class="cstat-no" title="statement not covered" >await this.request&lt;Responses['tx_content']&gt;(`txs/${lastRegistrationActivity.tx_hash}`);</span>
+    const block = <span class="cstat-no" title="statement not covered" >await this.request&lt;Responses['block_content']&gt;(`blocks/${tx.block}`);</span>
+<span class="cstat-no" title="statement not covered" >    return Cardano.EpochNo(block.epoch!);</span>
+  }
+&nbsp;
+  async<span class="fstat-no" title="function not covered" > #getDrepDelegatee(a</span>ccount: Responses['account_content']): Promise&lt;Cardano.DRepDelegatee | undefined&gt; {
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!account.drep_id) <span class="cstat-no" title="statement not covered" >return;</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (account.drep_id === 'drep_always_abstain') {</span>
+<span class="cstat-no" title="statement not covered" >      return { delegateRepresentative: { __typename: 'AlwaysAbstain' } };</span>
+    }
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (account.drep_id === 'drep_always_no_confidence') {</span>
+<span class="cstat-no" title="statement not covered" >      return { delegateRepresentative: { __typename: 'AlwaysNoConfidence' } };</span>
+    }
+    const cip129DrepId = <span class="cstat-no" title="statement not covered" >Cardano.DRepID.toCip129DRepID(Cardano.DRepID(account.drep_id));</span>
+    const dRepInfo = <span class="cstat-no" title="statement not covered" >await this.#dRepProvider.getDRepInfo({ id: cip129DrepId });</span>
+<span class="cstat-no" title="statement not covered" >    return {</span>
+      delegateRepresentative: dRepInfo
+    };
+  }
+&nbsp;
+  async<span class="fstat-no" title="function not covered" > #getKeyDeposit(l</span>astRegistrationActivity: Responses['account_registration_content'][0] | undefined) {
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!lastRegistrationActivity || lastRegistrationActivity.action === 'deregistered') {</span>
+<span class="cstat-no" title="statement not covered" >      return 0n;</span>
+    }
+    const tx = <span class="cstat-no" title="statement not covered" >await this.request&lt;Responses['tx_content']&gt;(`txs/${lastRegistrationActivity.tx_hash}`);</span>
+    const block = <span class="cstat-no" title="statement not covered" >await this.request&lt;Responses['block_content']&gt;(`blocks/${tx.block}`);</span>
+    const epochParameters = <span class="cstat-no" title="statement not covered" >await this.request&lt;Responses['epoch_param_content']&gt;(`epochs/${block.epoch}/parameters`);</span>
+<span class="cstat-no" title="statement not covered" >    return BigInt(epochParameters.key_deposit);</span>
+  }
+&nbsp;
+  async<span class="fstat-no" title="function not covered" > #getDelegatee(</span>
+    address: Cardano.RewardAccount,
+    currentEpoch: Cardano.EpochNo,
+    isUnregisteringAtEpoch: Cardano.EpochNo | undefined
+  ): Promise&lt;Cardano.Delegatee | undefined&gt; {
+    const delegationHistory = <span class="cstat-no" title="statement not covered" >await fetchSequentially&lt;Responses['account_delegation_content'][0]&gt;({</span>
+      haveEnoughItems: <span class="fstat-no" title="function not covered" >(i</span>tems) =&gt; <span class="cstat-no" title="statement not covered" >items[items.length - 1]?.active_epoch &lt;= currentEpoch,</span>
+      paginationOptions: { order: 'desc' },
+      request: <span class="fstat-no" title="function not covered" >(p</span>aginationQueryString) =&gt; <span class="cstat-no" title="statement not covered" >this.request(`accounts/${address}/delegations?${paginationQueryString}`)</span>
+    });
+&nbsp;
+    const isRegisteredAt = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(e</span>pochFromNow: number): true | undefined =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (!isUnregisteringAtEpoch) {</span>
+<span class="cstat-no" title="statement not covered" >        return true;</span>
+      }
+<span class="cstat-no" title="statement not covered" >      return isUnregisteringAtEpoch &gt; currentEpoch + epochFromNow || undefined;</span>
+    };
+&nbsp;
+    const poolIds = <span class="cstat-no" title="statement not covered" >[</span>
+      // current epoch
+      isRegisteredAt(0) &amp;&amp; delegationHistory.find(<span class="fstat-no" title="function not covered" >({</span> active_epoch }) =&gt; <span class="cstat-no" title="statement not covered" >active_epoch &lt;= currentEpoch)</span>?.pool_id,
+      // next epoch
+      isRegisteredAt(1) &amp;&amp; delegationHistory.find(<span class="fstat-no" title="function not covered" >({</span> active_epoch }) =&gt; <span class="cstat-no" title="statement not covered" >active_epoch &lt;= currentEpoch + 1)</span>?.pool_id,
+      // next next epoch
+      isRegisteredAt(2) &amp;&amp; delegationHistory.find(<span class="fstat-no" title="function not covered" >({</span> active_epoch }) =&gt; <span class="cstat-no" title="statement not covered" >active_epoch &lt;= currentEpoch + 2)</span>?.pool_id
+    ] as Array&lt;Cardano.PoolId | undefined&gt;;
+&nbsp;
+    const poolIdsToFetch = <span class="cstat-no" title="statement not covered" >uniq(poolIds.filter(isNotNil));</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (poolIdsToFetch.length === 0) {</span>
+<span class="cstat-no" title="statement not covered" >      return undefined;</span>
+    }
+&nbsp;
+    const stakePools = <span class="cstat-no" title="statement not covered" >await this.#stakePoolProvider.queryStakePools({</span>
+      filters: { identifier: { values: poolIdsToFetch.map(<span class="fstat-no" title="function not covered" >(i</span>d) =&gt; (<span class="cstat-no" title="statement not covered" >{ id })</span>) } },
+      pagination: { limit: 3, startAt: 0 }
+    });
+&nbsp;
+    const stakePoolMathingPoolId = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(i</span>ndex: number) =&gt; <span class="cstat-no" title="statement not covered" >stakePools.pageResults.find(<span class="fstat-no" title="function not covered" >(p</span>ool) =&gt; <span class="cstat-no" title="statement not covered" >pool.id === poolIds[index])</span>;</span></span>
+<span class="cstat-no" title="statement not covered" >    return {</span>
+      currentEpoch: stakePoolMathingPoolId(0),
+      nextEpoch: stakePoolMathingPoolId(1),
+      nextNextEpoch: stakePoolMathingPoolId(2)
+    };
+  }
+}
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2025-01-20T15:27:29.829Z
+            </div>
+        <script src="../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
+    </body>
+</html>
+    
