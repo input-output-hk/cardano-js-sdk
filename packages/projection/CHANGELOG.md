@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.22](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.12.21...@cardano-sdk/projection@0.12.22) (2025-01-20)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
 ## [0.12.21](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.12.20...@cardano-sdk/projection@0.12.21) (2025-01-17)
 
 **Note:** Version bump only for package @cardano-sdk/projection

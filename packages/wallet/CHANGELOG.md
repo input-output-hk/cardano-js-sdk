@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.51.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.50.0...@cardano-sdk/wallet@0.51.0) (2025-01-20)
+
+### ⚠ BREAKING CHANGES
+
+* remove BaseWallet stake pool and drep provider dependency
+- add RewardAccountInfoProvider as a new BaseWallet dependency
+* correct return type of RewardAccount.toHash
+
+### Features
+
+* partial BaseWallet tx history ([40a3ce0](https://github.com/input-output-hk/cardano-js-sdk/commit/40a3ce007f99ad0d8503f0cd3348a73a13964e9a))
+* **wallet:** add DocumentStore.delete ([6f652b2](https://github.com/input-output-hk/cardano-js-sdk/commit/6f652b224fe8539b67a9dca88d10eb65ecae7320))
+* **wallet:** add ObservableWallet.transactions.new$ ([738fb12](https://github.com/input-output-hk/cardano-js-sdk/commit/738fb12f199835f490398eacd987bcbb854dad9a))
+
+### Bug Fixes
+
+* correct return type of RewardAccount.toHash ([67765f1](https://github.com/input-output-hk/cardano-js-sdk/commit/67765f1dc9e9f770e06aee60afe11a21122c8f99))
+
 ## [0.50.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.49.2...@cardano-sdk/wallet@0.50.0) (2025-01-17)
 
 ### ⚠ BREAKING CHANGES

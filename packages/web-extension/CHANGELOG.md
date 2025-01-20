@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.37.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.37.6...@cardano-sdk/web-extension@0.37.7) (2025-01-20)
+
+### Features
+
+* **wallet:** add ObservableWallet.transactions.new$ ([738fb12](https://github.com/input-output-hk/cardano-js-sdk/commit/738fb12f199835f490398eacd987bcbb854dad9a))
+
 ## [0.37.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.37.5...@cardano-sdk/web-extension@0.37.6) (2025-01-17)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension

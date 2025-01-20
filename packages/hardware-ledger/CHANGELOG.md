@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.14.0...@cardano-sdk/hardware-ledger@0.15.0) (2025-01-20)
+
+### ⚠ BREAKING CHANGES
+
+* correct return type of RewardAccount.toHash
+
+### Bug Fixes
+
+* correct return type of RewardAccount.toHash ([67765f1](https://github.com/input-output-hk/cardano-js-sdk/commit/67765f1dc9e9f770e06aee60afe11a21122c8f99))
+
 ## [0.14.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.13.2...@cardano-sdk/hardware-ledger@0.14.0) (2025-01-17)
 
 ### ⚠ BREAKING CHANGES

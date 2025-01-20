@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.45.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.44.0...@cardano-sdk/core@0.45.0) (2025-01-20)
+
+### ⚠ BREAKING CHANGES
+
+* remove BaseWallet stake pool and drep provider dependency
+- add RewardAccountInfoProvider as a new BaseWallet dependency
+* correct return type of RewardAccount.toHash
+* add order option to ChainHistoryProvider.transactionsByAddresses
+
+### Features
+
+* add order option to ChainHistoryProvider.transactionsByAddresses ([9d816b3](https://github.com/input-output-hk/cardano-js-sdk/commit/9d816b31618861665ba54d5853bd2fc32f5e1e9a))
+* partial BaseWallet tx history ([40a3ce0](https://github.com/input-output-hk/cardano-js-sdk/commit/40a3ce007f99ad0d8503f0cd3348a73a13964e9a))
+
+### Bug Fixes
+
+* correct return type of RewardAccount.toHash ([67765f1](https://github.com/input-output-hk/cardano-js-sdk/commit/67765f1dc9e9f770e06aee60afe11a21122c8f99))
+
 ## [0.44.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.43.0...@cardano-sdk/core@0.44.0) (2025-01-17)
 
 ### ⚠ BREAKING CHANGES
