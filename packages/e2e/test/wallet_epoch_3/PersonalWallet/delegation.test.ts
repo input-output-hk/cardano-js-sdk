@@ -33,7 +33,10 @@ const getWalletStateSnapshot = async (wallet: ObservableWallet) => {
   return {
     balance: { available: balanceAvailable, deposit, total: balanceTotal },
     epoch: epoch.epochNo,
-    isStakeKeyRegistered: rewardAccount.credentialStatus === Cardano.StakeCredentialStatus.Registered,
+    isStakeKeyRegistered: [
+      Cardano.StakeCredentialStatus.Registered,
+      Cardano.StakeCredentialStatus.Registering
+    ].includes(rewardAccount.credentialStatus),
     publicStakeKey,
     rewardAccount,
     rewardsBalance,
@@ -153,21 +156,30 @@ describe('PersonalWallet/delegation', () => {
     // Updates total and available balance after tx is on-chain
     expect(tx1ConfirmedState.balance.total.coins).toBe(expectedCoinsAfterTx1);
     expect(tx1ConfirmedState.balance.total).toEqual(tx1ConfirmedState.balance.available);
-    expect(tx1PendingState.balance.deposit).toEqual(stakeKeyDeposit);
+    expect(tx1ConfirmedState.balance.deposit).toEqual(stakeKeyDeposit);
 
     // If less than two epochs have elapsed, delegatee will still delegate to former pool during current epoch
     // if more than two epochs has elapsed, delegatee will delegate to new pool.
-    if (tx1ConfirmedState.epoch - initialState.epoch < 2) {
-      expect(tx1ConfirmedState.rewardAccount.delegatee?.currentEpoch?.id).toEqual(
-        initialState?.rewardAccount.delegatee?.currentEpoch?.id
-      );
-      expect(tx1ConfirmedState.rewardAccount.delegatee?.nextEpoch?.id).toEqual(
-        initialState?.rewardAccount.delegatee?.nextEpoch?.id
-      );
-      expect(tx1ConfirmedState.rewardAccount.delegatee?.nextNextEpoch?.id).toEqual(poolId);
-    } else {
-      expect(tx1ConfirmedState.rewardAccount.delegatee?.currentEpoch?.id).toEqual(poolId);
-    }
+    const numEpochsPassed = tx1ConfirmedState.epoch - initialState.epoch;
+    expect(tx1ConfirmedState.rewardAccount.delegatee?.currentEpoch?.id).toEqual(
+      numEpochsPassed === 0
+        ? initialState?.rewardAccount.delegatee?.currentEpoch?.id
+        : numEpochsPassed === 1
+        ? !initialState.isStakeKeyRegistered
+          ? initialState?.rewardAccount.delegatee?.nextEpoch?.id
+          : poolId
+        : poolId
+    );
+    expect(tx1ConfirmedState.rewardAccount.delegatee?.nextEpoch?.id).toEqual(
+      initialState.isStakeKeyRegistered
+        ? poolId
+        : numEpochsPassed === 0
+        ? initialState?.rewardAccount.delegatee?.nextEpoch?.id
+        : numEpochsPassed === 1
+        ? initialState?.rewardAccount.delegatee?.nextNextEpoch?.id
+        : poolId
+    );
+    expect(tx1ConfirmedState.rewardAccount.delegatee?.nextNextEpoch?.id).toEqual(poolId);
 
     const stakeKeyHash = await bip32Ed25519.getPubKeyHash(tx1ConfirmedState.publicStakeKey.publicStakeKey);
     expect(stakeKeyHash).toEqual(Cardano.RewardAccount.toHash(tx1ConfirmedState.rewardAccount.address));
