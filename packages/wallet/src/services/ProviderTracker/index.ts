@@ -6,5 +6,6 @@ export * from './TrackedAssetProvider';
 export * from './ProviderStatusTracker';
 export * from './TrackedUtxoProvider';
 export * from './TrackedChainHistoryProvider';
+export * from './TrackedRewardAccountInfoProvider';
 export * from './TrackedRewardsProvider';
 export * from './TrackedDrepProvider';

@@ -122,7 +122,7 @@ describe('local-network/register-pool', () => {
     const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
     const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccounts[0].address);
     const stakeCredential = {
-      hash: stakeKeyHash as unknown as Crypto.Hash28ByteBase16,
+      hash: stakeKeyHash,
       type: Cardano.CredentialType.KeyHash
     };
 
@@ -209,7 +209,7 @@ describe('local-network/register-pool', () => {
     const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
     const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccounts[0].address);
     const stakeCredential = {
-      hash: stakeKeyHash as unknown as Crypto.Hash28ByteBase16,
+      hash: stakeKeyHash,
       type: Cardano.CredentialType.KeyHash
     };
 

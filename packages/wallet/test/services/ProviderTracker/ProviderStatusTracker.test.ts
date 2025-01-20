@@ -5,20 +5,19 @@ import {
   ProviderFnStats,
   TrackedAssetProvider,
   TrackedChainHistoryProvider,
-  TrackedDrepProvider,
+  TrackedRewardAccountInfoProvider,
   TrackedRewardsProvider,
-  TrackedStakePoolProvider,
   TrackedUtxoProvider,
   TrackedWalletNetworkInfoProvider,
   createProviderStatusTracker
 } from '../../../src';
-import { createStubStakePoolProvider, createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
+import { createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyLogger } from 'ts-log';
 
 const {
   mockAssetProvider,
   mockChainHistoryProvider,
-  mockDrepProvider,
+  mockRewardAccountInfoProvider,
   mockNetworkInfoProvider,
   mockRewardsProvider,
   mockUtxoProvider
@@ -64,23 +63,21 @@ const providerFnStats = {
 };
 
 describe('createProviderStatusTracker', () => {
-  let stakePoolProvider: TrackedStakePoolProvider;
   let networkInfoProvider: TrackedWalletNetworkInfoProvider;
   let assetProvider: TrackedAssetProvider;
   let utxoProvider: TrackedUtxoProvider;
   let chainHistoryProvider: TrackedChainHistoryProvider;
-  let drepProvider: TrackedDrepProvider;
+  let rewardAccountInfoProvider: TrackedRewardAccountInfoProvider;
   let rewardsProvider: TrackedRewardsProvider;
 
   const timeout = 5000;
 
   beforeEach(() => {
     utxoProvider = new TrackedUtxoProvider(mockUtxoProvider());
-    stakePoolProvider = new TrackedStakePoolProvider(createStubStakePoolProvider());
     networkInfoProvider = new TrackedWalletNetworkInfoProvider(mockNetworkInfoProvider());
     assetProvider = new TrackedAssetProvider(mockAssetProvider());
     chainHistoryProvider = new TrackedChainHistoryProvider(mockChainHistoryProvider());
-    drepProvider = new TrackedDrepProvider(mockDrepProvider());
+    rewardAccountInfoProvider = new TrackedRewardAccountInfoProvider(mockRewardAccountInfoProvider());
     rewardsProvider = new TrackedRewardsProvider(mockRewardsProvider());
   });
 
@@ -97,11 +94,10 @@ describe('createProviderStatusTracker', () => {
         {
           assetProvider,
           chainHistoryProvider,
-          drepProvider,
           logger: dummyLogger,
           networkInfoProvider,
+          rewardAccountInfoProvider,
           rewardsProvider,
-          stakePoolProvider,
           utxoProvider
         },
         { consideredOutOfSyncAfter: timeout },
@@ -130,11 +126,10 @@ describe('createProviderStatusTracker', () => {
           {
             assetProvider,
             chainHistoryProvider,
-            drepProvider,
             logger: dummyLogger,
             networkInfoProvider,
+            rewardAccountInfoProvider,
             rewardsProvider,
-            stakePoolProvider,
             utxoProvider
           },
           { consideredOutOfSyncAfter: timeout },
@@ -159,11 +154,10 @@ describe('createProviderStatusTracker', () => {
         {
           assetProvider,
           chainHistoryProvider,
-          drepProvider,
           logger: dummyLogger,
           networkInfoProvider,
+          rewardAccountInfoProvider,
           rewardsProvider,
-          stakePoolProvider,
           utxoProvider
         },
         { consideredOutOfSyncAfter: timeout },
@@ -188,11 +182,10 @@ describe('createProviderStatusTracker', () => {
         {
           assetProvider,
           chainHistoryProvider,
-          drepProvider,
           logger: dummyLogger,
           networkInfoProvider,
+          rewardAccountInfoProvider,
           rewardsProvider,
-          stakePoolProvider,
           utxoProvider
         },
         { consideredOutOfSyncAfter: timeout },
@@ -217,11 +210,10 @@ describe('createProviderStatusTracker', () => {
         {
           assetProvider,
           chainHistoryProvider,
-          drepProvider,
           logger: dummyLogger,
           networkInfoProvider,
+          rewardAccountInfoProvider,
           rewardsProvider,
-          stakePoolProvider,
           utxoProvider
         },
         { consideredOutOfSyncAfter: timeout },

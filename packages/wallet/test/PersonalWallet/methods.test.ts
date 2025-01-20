@@ -2,18 +2,17 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressDiscovery, BaseWallet, TxInFlight, createPersonalWallet, createSharedWallet } from '../../src';
 import { AddressType, Bip32Account, GroupedAddress, Witnesser, util } from '@cardano-sdk/key-management';
-import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
+import { AssetId, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BehaviorSubject, Subscription, firstValueFrom, skip } from 'rxjs';
 import {
   Cardano,
   ChainHistoryProvider,
-  DRepProvider,
   HandleProvider,
   ProviderError,
   ProviderFailure,
+  RewardAccountInfoProvider,
   RewardsProvider,
   Serialization,
-  StakePoolProvider,
   TxSubmissionError,
   TxSubmissionErrorCode,
   ValueNotConservedData
@@ -83,11 +82,10 @@ describe('BaseWallet methods', () => {
   let txSubmitProvider: mocks.TxSubmitProviderStub;
   let networkInfoProvider: mocks.NetworkInfoProviderStub;
   let assetProvider: mocks.MockAssetProvider;
-  let stakePoolProvider: StakePoolProvider;
+  let rewardAccountInfoProvider: RewardAccountInfoProvider;
   let rewardsProvider: RewardsProvider;
   let chainHistoryProvider: ChainHistoryProvider;
   let handleProvider: HandleProvider;
-  let drepProvider: DRepProvider;
   let wallet: BaseWallet;
   let utxoProvider: mocks.UtxoProviderStub;
   let witnesser: Witnesser;
@@ -99,12 +97,11 @@ describe('BaseWallet methods', () => {
     networkInfoProvider = mocks.mockNetworkInfoProvider();
     utxoProvider = mocks.mockUtxoProvider();
     assetProvider = mocks.mockAssetProvider();
-    stakePoolProvider = createStubStakePoolProvider();
     rewardsProvider = mockRewardsProvider();
     chainHistoryProvider = mockChainHistoryProvider();
     handleProvider = mocks.mockHandleProvider();
     addressDiscovery = { discover: jest.fn().mockImplementation(async () => [groupedAddress]) };
-    drepProvider = mocks.mockDrepProvider();
+    rewardAccountInfoProvider = mocks.mockRewardAccountInfoProvider();
 
     const asyncKeyAgent = await testAsyncKeyAgent();
     bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
@@ -117,12 +114,11 @@ describe('BaseWallet methods', () => {
         assetProvider,
         bip32Account,
         chainHistoryProvider,
-        drepProvider,
         handleProvider,
         logger,
         networkInfoProvider,
+        rewardAccountInfoProvider,
         rewardsProvider,
-        stakePoolProvider,
         txSubmitProvider,
         utxoProvider,
         witnesser
@@ -220,13 +216,12 @@ describe('BaseWallet methods', () => {
             assetProvider,
             bip32Account,
             chainHistoryProvider,
-            drepProvider,
             handleProvider,
             inputResolver,
             logger,
             networkInfoProvider,
+            rewardAccountInfoProvider,
             rewardsProvider,
-            stakePoolProvider,
             txSubmitProvider,
             utxoProvider,
             witnesser
@@ -255,13 +250,12 @@ describe('BaseWallet methods', () => {
             assetProvider,
             bip32Account,
             chainHistoryProvider,
-            drepProvider,
             handleProvider,
             inputResolver: givenInputResolver,
             logger,
             networkInfoProvider,
+            rewardAccountInfoProvider,
             rewardsProvider,
-            stakePoolProvider,
             txSubmitProvider,
             utxoProvider,
             witnesser
@@ -612,12 +606,11 @@ describe('BaseWallet methods', () => {
         assetProvider,
         bip32Account,
         chainHistoryProvider,
-        drepProvider,
         handleProvider,
         logger,
         networkInfoProvider,
+        rewardAccountInfoProvider,
         rewardsProvider,
-        stakePoolProvider,
         txSubmitProvider,
         utxoProvider,
         witnesser
@@ -681,12 +674,11 @@ describe('BaseWallet methods', () => {
           assetProvider,
           bip32Account,
           chainHistoryProvider,
-          drepProvider,
           handleProvider,
           logger,
           networkInfoProvider,
+          rewardAccountInfoProvider,
           rewardsProvider,
-          stakePoolProvider,
           txSubmitProvider,
           utxoProvider,
           witnesser: mockWitnesser
@@ -781,12 +773,11 @@ describe('BaseWallet methods', () => {
           assetProvider,
           bip32Account,
           chainHistoryProvider,
-          drepProvider,
           handleProvider,
           logger,
           networkInfoProvider,
+          rewardAccountInfoProvider,
           rewardsProvider,
-          stakePoolProvider,
           txSubmitProvider,
           utxoProvider,
           witnesser
@@ -827,12 +818,11 @@ describe('BaseWallet methods', () => {
           assetProvider,
           bip32Account,
           chainHistoryProvider,
-          drepProvider,
           handleProvider,
           logger,
           networkInfoProvider,
+          rewardAccountInfoProvider,
           rewardsProvider,
-          stakePoolProvider,
           txSubmitProvider,
           utxoProvider,
           witnesser
@@ -879,12 +869,11 @@ describe('BaseWallet methods', () => {
           assetProvider,
           bip32Account,
           chainHistoryProvider,
-          drepProvider,
           handleProvider,
           logger,
           networkInfoProvider,
+          rewardAccountInfoProvider,
           rewardsProvider,
-          stakePoolProvider,
           txSubmitProvider,
           utxoProvider,
           witnesser
@@ -924,13 +913,12 @@ describe('BaseWallet methods', () => {
         {
           assetProvider,
           chainHistoryProvider,
-          drepProvider,
           handleProvider,
           logger,
           networkInfoProvider,
           paymentScript: script,
+          rewardAccountInfoProvider,
           rewardsProvider,
-          stakePoolProvider,
           stakingScript: script,
           txSubmitProvider,
           utxoProvider,
@@ -961,13 +949,12 @@ describe('BaseWallet methods', () => {
         {
           assetProvider,
           chainHistoryProvider,
-          drepProvider,
           handleProvider,
           logger,
           networkInfoProvider,
           paymentScript: script,
+          rewardAccountInfoProvider,
           rewardsProvider,
-          stakePoolProvider,
           stakingScript: script,
           txSubmitProvider,
           utxoProvider,

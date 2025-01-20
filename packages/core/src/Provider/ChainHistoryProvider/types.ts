@@ -1,9 +1,11 @@
 import { Cardano, Paginated, PaginationArgs, Provider } from '../..';
 import { Range } from '@cardano-sdk/util';
 
+export type PaginationArgsWithOrder = PaginationArgs & { order?: 'asc' | 'desc' };
+
 export type TransactionsByAddressesArgs = {
   addresses: Cardano.PaymentAddress[];
-  pagination: PaginationArgs;
+  pagination: PaginationArgsWithOrder;
   blockRange?: Range<Cardano.BlockNo>;
 };
 export type TransactionsByIdsArgs = { ids: Cardano.TransactionId[] };

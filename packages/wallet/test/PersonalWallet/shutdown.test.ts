@@ -10,12 +10,7 @@ import {
   UtxoProvider,
   coalesceValueQuantities
 } from '@cardano-sdk/core';
-import {
-  AssetId,
-  createStubStakePoolProvider,
-  mockProviders as mocks,
-  somePartialStakePools
-} from '@cardano-sdk/util-dev';
+import { AssetId, mockProviders as mocks, somePartialStakePools } from '@cardano-sdk/util-dev';
 import {
   BaseWallet,
   ConnectionStatusTracker,
@@ -59,8 +54,7 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
     providers;
   const txSubmitProvider = mocks.mockTxSubmitProvider();
   const assetProvider = mocks.mockAssetProvider();
-  const drepProvider = mocks.mockDrepProvider();
-  const stakePoolProvider = createStubStakePoolProvider();
+  const rewardAccountInfoProvider = mocks.mockRewardAccountInfoProvider();
 
   return createPersonalWallet(
     { name, polling: pollingConfig },
@@ -69,11 +63,10 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
       bip32Account,
       chainHistoryProvider,
       connectionStatusTracker$,
-      drepProvider,
       logger,
       networkInfoProvider,
+      rewardAccountInfoProvider,
       rewardsProvider,
-      stakePoolProvider,
       stores,
       txSubmitProvider,
       utxoProvider,
@@ -230,7 +223,7 @@ describe('BaseWallet shutdown', () => {
     const assetProviderStatsShutdown = jest.spyOn(wallet1.assetProvider.stats, 'shutdown');
     const chainHistoryProviderStats = jest.spyOn(wallet1.chainHistoryProvider.stats, 'shutdown');
     const rewardsProviderStats = jest.spyOn(wallet1.rewardsProvider.stats, 'shutdown');
-    const stakePoolProviderStats = jest.spyOn(wallet1.stakePoolProvider.stats, 'shutdown');
+    const rewardAccountInfoProviderStats = jest.spyOn(wallet1.rewardAccountInfoProvider.stats, 'shutdown');
     const utxoProviderStats = jest.spyOn(wallet1.utxoProvider.stats, 'shutdown');
 
     wallet1.shutdown();
@@ -238,7 +231,7 @@ describe('BaseWallet shutdown', () => {
     expect(assetProviderStatsShutdown).toHaveBeenCalledTimes(1);
     expect(chainHistoryProviderStats).toHaveBeenCalledTimes(1);
     expect(rewardsProviderStats).toHaveBeenCalledTimes(1);
-    expect(stakePoolProviderStats).toHaveBeenCalledTimes(1);
+    expect(rewardAccountInfoProviderStats).toHaveBeenCalledTimes(1);
     expect(txSubmitProviderStats).toHaveBeenCalledTimes(1);
     expect(utxoProviderStats).toHaveBeenCalledTimes(1);
     expect(walletNetworkInfoProviderStats).toHaveBeenCalledTimes(1);

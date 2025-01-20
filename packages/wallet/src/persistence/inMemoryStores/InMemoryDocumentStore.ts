@@ -17,4 +17,10 @@ export class InMemoryDocumentStore<T> extends InMemoryStore implements DocumentS
     }
     return EMPTY;
   }
+
+  delete(): Observable<void> {
+    if (this.destroyed) return EMPTY;
+    this.#doc = null;
+    return of(void 0);
+  }
 }

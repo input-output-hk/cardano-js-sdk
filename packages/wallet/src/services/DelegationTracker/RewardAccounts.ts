@@ -1,7 +1,5 @@
 /* eslint-disable unicorn/no-nested-ternary */
-import * as Crypto from '@cardano-sdk/crypto';
-import { BigIntMath, deepEquals, isNotNil } from '@cardano-sdk/util';
-import { Cardano, DRepInfo, RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
+import { Cardano, DRepInfo, RewardAccountInfoProvider } from '@cardano-sdk/core';
 import {
   EMPTY,
   Observable,
@@ -9,424 +7,182 @@ import {
   concat,
   distinctUntilChanged,
   filter,
+  firstValueFrom,
   map,
   merge,
   mergeMap,
   of,
-  pairwise,
   startWith,
   switchMap,
   tap
 } from 'rxjs';
-import { KeyValueStore } from '../../persistence';
 import { Logger } from 'ts-log';
-import { OutgoingOnChainTx, TxInFlight } from '../types';
-import { PAGE_SIZE } from '../TransactionsTracker';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { TrackedStakePoolProvider } from '../ProviderTracker';
-import { TxWithEpoch } from './types';
-import { drepsToDelegatees, drepsToDrepIds } from '../DrepInfoTracker';
-import { lastStakeKeyCertOfType } from './transactionCertificates';
+import { TxInFlight } from '../types';
+import { WalletStores } from '../../persistence';
+import { blockingWithLatestFrom } from '@cardano-sdk/util-rxjs';
 import { pollProvider } from '../util';
-import findLast from 'lodash/findLast.js';
 import isEqual from 'lodash/isEqual.js';
-import uniq from 'lodash/uniq.js';
 
-const allStakePoolsByPoolIds = async (
-  stakePoolProvider: StakePoolProvider,
-  { poolIds }: { poolIds: Cardano.PoolId[] }
-): Promise<Cardano.StakePool[]> => {
-  let startAt = 0;
-  let response: Cardano.StakePool[] = [];
-  let pageResults: Cardano.StakePool[] = [];
-  do {
-    pageResults = (
-      await stakePoolProvider.queryStakePools({
-        filters: { identifier: { values: poolIds.map((poolId) => ({ id: poolId })) } },
-        pagination: { limit: PAGE_SIZE, startAt }
-      })
-    ).pageResults;
-    startAt += PAGE_SIZE;
-    response = [...response, ...pageResults];
-  } while (pageResults.length === PAGE_SIZE);
-  return response;
-};
+export type ObservableDrepInfoProvider = (drepIds: Cardano.DRepID[]) => Observable<DRepInfo[]>;
 
-export const createQueryStakePoolsProvider =
-  (
-    stakePoolProvider: TrackedStakePoolProvider,
-    store: KeyValueStore<Cardano.PoolId, Cardano.StakePool>,
-    retryBackoffConfig: RetryBackoffConfig,
-    logger: Logger
-  ) =>
-  (poolIds: Cardano.PoolId[]) => {
-    if (poolIds.length === 0) {
-      stakePoolProvider.setStatInitialized(stakePoolProvider.stats.queryStakePools$);
-      return of([]);
-    }
-    return merge(
-      store.getValues(poolIds),
-      pollProvider({
-        logger,
-        retryBackoffConfig,
-        sample: () => allStakePoolsByPoolIds(stakePoolProvider, { poolIds })
-      }).pipe(
-        tap((pageResults) => {
-          for (const stakePool of pageResults) {
-            store.setValue(stakePool.id, stakePool);
-          }
-        })
-      )
+const affectsRewardAccount =
+  (rewardAccount: Cardano.RewardAccount) =>
+  (tx: Cardano.OnChainTx): boolean => {
+    const stakeCredentialHash = Cardano.RewardAccount.toHash(rewardAccount);
+    const hasRelevantStakeKeyCertificate = Cardano.stakeKeyCertificates(tx.body.certificates).some(
+      (cert) => cert.stakeCredential.hash === stakeCredentialHash
+    );
+    const hasRelevantCertificate =
+      hasRelevantStakeKeyCertificate ||
+      tx.body.certificates?.some(
+        // eslint-disable-next-line complexity
+        (cert) =>
+          ((cert.__typename === Cardano.CertificateType.MIR ||
+            cert.__typename === Cardano.CertificateType.StakeDelegation ||
+            cert.__typename === Cardano.CertificateType.StakeVoteDelegation ||
+            cert.__typename === Cardano.CertificateType.VoteDelegation) &&
+            cert.stakeCredential?.hash === stakeCredentialHash) ||
+          (cert.__typename === Cardano.CertificateType.PoolRegistration &&
+            cert.poolParameters.rewardAccount === rewardAccount) ||
+          cert.__typename === Cardano.CertificateType.PoolRetirement ||
+          ((cert.__typename === Cardano.CertificateType.RegisterDelegateRepresentative ||
+            cert.__typename === Cardano.CertificateType.UnregisterDelegateRepresentative) &&
+            cert.dRepCredential.hash === stakeCredentialHash) ||
+          (cert.__typename === Cardano.CertificateType.StakeVoteDelegation &&
+            cert.stakeCredential.hash === stakeCredentialHash)
+      );
+    return (
+      hasRelevantCertificate ||
+      tx.body.withdrawals?.some((withdrawal) => withdrawal.stakeAddress === rewardAccount) ||
+      false
     );
   };
 
-export type ObservableStakePoolProvider = ReturnType<typeof createQueryStakePoolsProvider>;
-
-const getWithdrawalQuantity = (
-  withdrawals: Cardano.HydratedTxBody['withdrawals'],
-  rewardAccount?: Cardano.RewardAccount
-): Cardano.Lovelace =>
-  BigIntMath.sum(
-    withdrawals?.map(({ quantity, stakeAddress }) => (stakeAddress === rewardAccount ? quantity : 0n)) || []
-  );
-
-export const fetchRewardsTrigger$ = (
-  epoch$: Observable<Cardano.EpochNo>,
-  txOnChain$: Observable<OutgoingOnChainTx>,
-  rewardAccount: Cardano.RewardAccount
-) =>
-  merge(
-    // Reload every epoch and after every tx that has withdrawals for this reward account
+export const createRewardAccountInfoProvider =
+  ({
     epoch$,
-    txOnChain$.pipe(
-      map(({ body: { withdrawals } }) => getWithdrawalQuantity(withdrawals, rewardAccount)),
-      filter((withdrawalQty) => withdrawalQty > 0n)
-    )
-  );
-
-export const createRewardsProvider =
-  (
-    epoch$: Observable<Cardano.EpochNo>,
-    txOnChain$: Observable<OutgoingOnChainTx>,
-    rewardsProvider: RewardsProvider,
-    retryBackoffConfig: RetryBackoffConfig,
-    logger: Logger
-    // eslint-disable-next-line max-params
-  ) =>
-  (rewardAccounts: Cardano.RewardAccount[], equals = isEqual): Observable<Cardano.Lovelace[]> =>
-    combineLatest(
-      rewardAccounts.map((rewardAccount) =>
-        pollProvider({
-          equals,
-          logger,
-          retryBackoffConfig,
-          sample: () => rewardsProvider.rewardAccountBalance({ rewardAccount }),
-          trigger$: fetchRewardsTrigger$(epoch$, txOnChain$, rewardAccount)
-        })
-      )
-    );
-export type ObservableRewardsProvider = ReturnType<typeof createRewardsProvider>;
-
-const getAccountsCredentialStatus =
-  (addresses: Cardano.RewardAccount[]) =>
-  ([transactions, transactionsInFlight]: [TxWithEpoch[], TxInFlight[]]) => {
-    const certificatesInFlight = transactionsInFlight.map(({ body: { certificates } }) => certificates || []);
-    return addresses.map((address) => {
-      const regCert = lastStakeKeyCertOfType(
-        transactions.map(
-          ({
-            tx: {
-              body: { certificates }
-            }
-          }) => certificates || []
-        ),
-        Cardano.StakeRegistrationCertificateTypes,
-        address
-      );
-
-      let deposit: Cardano.Lovelace | undefined;
-      if (regCert && Cardano.isCertType(regCert, Cardano.PostConwayStakeRegistrationCertificateTypes)) {
-        deposit = regCert.deposit;
-      }
-
-      const isRegistering = !!lastStakeKeyCertOfType(
-        certificatesInFlight,
-        Cardano.StakeRegistrationCertificateTypes,
-        address
-      );
-      const isUnregistering = !!lastStakeKeyCertOfType(
-        certificatesInFlight,
-        [Cardano.CertificateType.StakeDeregistration, Cardano.CertificateType.Unregistration],
-        address
-      );
-      const credentialStatus = isRegistering
-        ? Cardano.StakeCredentialStatus.Registering
-        : isUnregistering
-        ? Cardano.StakeCredentialStatus.Unregistering
-        : regCert
-        ? Cardano.StakeCredentialStatus.Registered
-        : Cardano.StakeCredentialStatus.Unregistered;
-
-      return { ...(credentialStatus === Cardano.StakeCredentialStatus.Registered && { deposit }), credentialStatus };
+    externalTrigger$,
+    rewardAccountInfoProvider,
+    retryBackoffConfig,
+    logger
+  }: {
+    rewardAccountInfoProvider: RewardAccountInfoProvider;
+    epoch$: Observable<Cardano.EpochNo>;
+    externalTrigger$: Observable<void>;
+    retryBackoffConfig: RetryBackoffConfig;
+    logger: Logger;
+  }) =>
+  (rewardAccount: Cardano.RewardAccount): Observable<Cardano.RewardAccountInfo> =>
+    pollProvider({
+      equals: isEqual,
+      logger,
+      retryBackoffConfig,
+      sample: async () => rewardAccountInfoProvider.rewardAccountInfo(rewardAccount, await firstValueFrom(epoch$)),
+      trigger$: merge(epoch$, externalTrigger$)
     });
-  };
 
-const accountCertificateTransactions = (
-  transactions$: Observable<TxWithEpoch[]>,
-  rewardAccount: Cardano.RewardAccount
-) => {
-  const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
-  return transactions$.pipe(
-    map((transactions) =>
-      transactions
-        .map(({ tx, epoch }) => ({
-          certificates: (tx.body.certificates || [])
-            .map((cert) =>
-              Cardano.isCertType(cert, [
-                ...Cardano.RegAndDeregCertificateTypes,
-                ...Cardano.StakeDelegationCertificateTypes
-              ])
-                ? cert
-                : null
-            )
-            .filter(isNotNil)
-            .filter((cert) => (cert.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex) === stakeKeyHash),
-          epoch
-        }))
-        .filter(({ certificates }) => certificates.length > 0)
-    ),
-    distinctUntilChanged((a, b) => isEqual(a, b))
+export type ObservableRewardAccountInfoProvider = ReturnType<typeof createRewardAccountInfoProvider>;
+
+const nextRewardBalance = (rewardAccount: Cardano.RewardAccount, txsInFlight: TxInFlight[]): bigint | null => {
+  const hasWithdrawal = txsInFlight.some((tx) =>
+    tx.body.withdrawals?.some((withdrawal) => withdrawal.stakeAddress === rewardAccount)
   );
+  // rewards must be spent in full, or not at all
+  return hasWithdrawal ? 0n : null;
 };
 
-const accountDRepCertificateTransactions = (
-  transactions$: Observable<TxWithEpoch[]>,
-  rewardAccount: Cardano.RewardAccount
-) => {
-  const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
-  return transactions$.pipe(
-    map((transactions) =>
-      transactions
-        .map(({ tx, epoch }) => ({
-          certificates: (tx.body.certificates || [])
-            .map((cert) =>
-              Cardano.isCertType(cert, [
-                ...Cardano.VoteDelegationCredentialCertificateTypes,
-                Cardano.CertificateType.StakeDeregistration,
-                Cardano.CertificateType.Unregistration
-              ])
-                ? cert
-                : null
-            )
-            .filter(isNotNil)
-            .filter((cert) => (cert.stakeCredential.hash as unknown as Crypto.Ed25519KeyHashHex) === stakeKeyHash),
-          epoch
-        }))
-        .filter(({ certificates }) => certificates.length > 0)
-    ),
-    distinctUntilChanged((a, b) => isEqual(a, b))
-  );
-};
-
-type ObservableType<O> = O extends Observable<infer T> ? T : unknown;
-type TransactionsCertificates = ObservableType<ReturnType<typeof accountCertificateTransactions>>;
-type TransactionsDRepCertificates = ObservableType<ReturnType<typeof accountDRepCertificateTransactions>>;
-
-/**
- * Check if the stake key was registered and is delegated, and return the pool ID.
- * A stake key is considered delegated 3 epochs after the certificate was sent.
- *
- * @returns
- *  - the stake pool ID that is delegated to at the given epoch.
- *  - undefined if the stake key was not registered.
- * Returns the stake pool ID that is delegated to at the given epoch.
- * If the stake key was not registered, it returns undefined.
- */
-export const getStakePoolIdAtEpoch = (transactions: TransactionsCertificates) => (atEpoch: Cardano.EpochNo) => {
-  const certificatesUpToEpoch = transactions
-    .filter(({ epoch }) => epoch < atEpoch - 2)
-    .map(({ certificates }) => certificates);
-  if (!lastStakeKeyCertOfType(certificatesUpToEpoch, Cardano.StakeRegistrationCertificateTypes)) {
-    return;
-  }
-
-  const delegationTxCertificates = findLast(certificatesUpToEpoch, (certs) =>
-    Cardano.includesAnyCertificate(certs, Cardano.StakeDelegationCertificateTypes)
-  );
-  if (!delegationTxCertificates) return;
-  return findLast(
-    delegationTxCertificates
-      .map((cert) => (Cardano.isCertType(cert, Cardano.StakeDelegationCertificateTypes) ? cert : null))
-      .filter(isNotNil)
-  )?.poolId;
-};
-
-export const createDelegateeTracker = (
-  stakePoolProvider: ObservableStakePoolProvider,
-  epoch$: Observable<Cardano.EpochNo>,
-  certificates$: Observable<TransactionsCertificates>
-): Observable<Cardano.Delegatee | undefined> =>
-  combineLatest([certificates$, epoch$]).pipe(
-    switchMap(([transactions, lastEpoch]) => {
-      const stakePoolIds = [
-        Cardano.EpochNo(lastEpoch + 1),
-        Cardano.EpochNo(lastEpoch + 2),
-        Cardano.EpochNo(lastEpoch + 3)
-      ].map(getStakePoolIdAtEpoch(transactions));
-      const uniqStakePoolIds = uniq(stakePoolIds.filter(isNotNil));
-      return stakePoolProvider(uniqStakePoolIds).pipe(
-        map((stakePools) => stakePoolIds.map((poolId) => stakePools.find((pool) => pool.id === poolId) || undefined)),
-        map(([currentEpoch, nextEpoch, nextNextEpoch]) => ({ currentEpoch, nextEpoch, nextNextEpoch }))
-      );
-    }),
-    distinctUntilChanged((a, b) => isEqual(a, b))
-  );
-
-export const createDRepDelegateeTracker = (
-  certificates$: Observable<TransactionsDRepCertificates>
-): Observable<Cardano.DelegateRepresentative | undefined> =>
-  certificates$.pipe(
-    switchMap((certs) => {
-      const sortedCerts = [...certs].sort((a, b) => a.epoch - b.epoch);
-      const mostRecent = sortedCerts.pop()?.certificates.pop();
-      let dRep: Cardano.DelegateRepresentative | undefined;
-
-      // Certificates at this point are pre filtered, they are either vote delegation kind or stake key de-registration kind.
-      // If the most recent is not a de-registration, emit found dRep.
+const nextDeposit = (
+  rewardAccount: Cardano.RewardAccount,
+  txsInFlight: TxInFlight[],
+  depositAmount: Cardano.Lovelace
+): Cardano.Lovelace | null => {
+  const stakeCredentialHash = Cardano.RewardAccount.toHash(rewardAccount);
+  // try to find the last relevant certificate to take effect
+  for (let txIndex = txsInFlight.length - 1; txIndex >= 0; txIndex--) {
+    const certificates = txsInFlight[txIndex].body.certificates || [];
+    for (let certIndex = certificates.length - 1; certIndex >= 0; certIndex--) {
+      const certificate = certificates[certIndex];
       if (
-        mostRecent &&
-        !Cardano.isCertType(mostRecent, [
-          Cardano.CertificateType.StakeDeregistration,
-          Cardano.CertificateType.Unregistration
-        ])
+        certificate.__typename === Cardano.CertificateType.StakeDeregistration &&
+        certificate.stakeCredential.hash === stakeCredentialHash
       ) {
-        dRep = mostRecent.dRep;
+        return 0n;
       }
-
-      return of(dRep);
-    }),
-    distinctUntilChanged((a, b) => isEqual(a, b))
-  );
-
-export const addressCredentialStatuses = (
-  addresses: Cardano.RewardAccount[],
-  transactions$: Observable<TxWithEpoch[]>,
-  transactionsInFlight$: Observable<TxInFlight[]>
-) =>
-  combineLatest([transactions$, transactionsInFlight$]).pipe(
-    map(getAccountsCredentialStatus(addresses)),
-    distinctUntilChanged(deepEquals)
-  );
-
-export const addressDelegatees = (
-  addresses: Cardano.RewardAccount[],
-  transactions$: Observable<TxWithEpoch[]>,
-  stakePoolProvider: ObservableStakePoolProvider,
-  epoch$: Observable<Cardano.EpochNo>
-) =>
-  combineLatest(
-    addresses.map((address) =>
-      createDelegateeTracker(stakePoolProvider, epoch$, accountCertificateTransactions(transactions$, address))
-    )
-  );
-
-export const addressDRepDelegatees = (
-  addresses: Cardano.RewardAccount[],
-  transactions$: Observable<TxWithEpoch[]>,
-  drepInfo$: (drepIds: Cardano.DRepID[]) => Observable<DRepInfo[]>
-) =>
-  combineLatest(
-    addresses.map((address) => createDRepDelegateeTracker(accountDRepCertificateTransactions(transactions$, address)))
-  ).pipe(switchMap((dreps) => drepInfo$(drepsToDrepIds(dreps)).pipe(map(drepsToDelegatees(dreps)))));
-
-export const addressRewards = (
-  rewardAccounts: Cardano.RewardAccount[],
-  transactionsInFlight$: Observable<TxInFlight[]>,
-  rewardsProvider: ObservableRewardsProvider,
-  balancesStore: KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>
-): Observable<Cardano.Lovelace[]> => {
-  // Allow identical rewards$ emits to fix corner case.
-  // Epoch change can trigger rewards fetch before tx is detected as confirmed:
-  // rewards$:             'a-b---b' b:{a-tx.rewards} <-- allow 'b' to emitted twice
-  // withdrawalsInFlight$: 'x---y--' x:[tx], y:[]
-  // combineLatest:        'm-n---p' m:{a-tx.rewards}, n:{b-tx.rewards}, p:{b}
-  const rewards$ = concat(
-    balancesStore.getValues(rewardAccounts),
-    rewardsProvider(rewardAccounts, () => false /* allow identical emits */).pipe(
-      tap((balances) => {
-        for (const [i, rewardAccount] of rewardAccounts.entries()) {
-          balancesStore.setValue(rewardAccount, balances[i]);
-        }
-      })
-    )
-  );
-  const withdrawalsInFlight$ = transactionsInFlight$.pipe(
-    map((txs) => txs.flatMap(({ body: { withdrawals } }) => withdrawals).filter(isNotNil)),
-    distinctUntilChanged(deepEquals)
-  );
-  return combineLatest([rewards$, withdrawalsInFlight$]).pipe(
-    startWith([[] as bigint[], [] as Cardano.Withdrawal[]] as const),
-    pairwise(),
-    mergeMap(([[_, prevWithdrawalsInFlight], [totalRewards, withdrawalsInFlight]]) => {
-      // Either rewards$ or withdrawalsInFlight$ can change.
-      // If the change was on withdrawalsInFlight$ AND it's size is smaller (which means a withdrawal tx was confirmed),
-      // then we expect rewards$ to also emit, as it's balance must change after such transaction.
-      // This is coupled with implementation of `rewardsProvider` observable, as it assumes that
-      // rewards re-fetch is triggered by transaction confirmation, therefore must happen AFTER it.
-      if (prevWithdrawalsInFlight.length > withdrawalsInFlight.length) {
-        return EMPTY;
+      if (
+        (certificate.__typename === Cardano.CertificateType.StakeRegistration ||
+          certificate.__typename === Cardano.CertificateType.StakeRegistrationDelegation ||
+          certificate.__typename === Cardano.CertificateType.StakeVoteRegistrationDelegation) &&
+        certificate.stakeCredential.hash === stakeCredentialHash
+      ) {
+        return depositAmount;
       }
-      return of(totalRewards.map((total, i) => total - getWithdrawalQuantity(withdrawalsInFlight, rewardAccounts[i])));
-    }),
-    distinctUntilChanged(deepEquals)
-  );
+    }
+  }
+  return null;
 };
-
-export const toRewardAccounts =
-  (addresses: Cardano.RewardAccount[]) =>
-  ([statuses, delegatees, dReps, rewards]: [
-    { credentialStatus: Cardano.StakeCredentialStatus; deposit?: Cardano.Lovelace }[],
-    (Cardano.Delegatee | undefined)[],
-    (Cardano.DRepDelegatee | undefined)[],
-    Cardano.Lovelace[]
-  ]) =>
-    addresses.map(
-      (address, i): Cardano.RewardAccountInfo => ({
-        address,
-        credentialStatus: statuses[i].credentialStatus,
-        dRepDelegatee: dReps[i],
-        delegatee: delegatees[i],
-        deposit: statuses[i].deposit,
-        rewardBalance: rewards[i]
-      })
-    );
 
 export const createRewardAccountsTracker = ({
-  drepInfo$,
   rewardAccountAddresses$,
-  stakePoolProvider,
-  rewardsProvider,
-  epoch$,
-  balancesStore,
-  transactions$,
+  rewardAccountInfoProvider,
+  store,
+  newTransaction$,
+  protocolParameters$,
   transactionsInFlight$
 }: {
-  drepInfo$: (drepIds: Cardano.DRepID[]) => Observable<DRepInfo[]>;
   rewardAccountAddresses$: Observable<Cardano.RewardAccount[]>;
-  stakePoolProvider: ObservableStakePoolProvider;
-  rewardsProvider: ObservableRewardsProvider;
-  balancesStore: KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>;
-  epoch$: Observable<Cardano.EpochNo>;
-  transactions$: Observable<TxWithEpoch[]>;
+  store: WalletStores['rewardAccountInfo'];
+  rewardAccountInfoProvider: ObservableRewardAccountInfoProvider;
+  newTransaction$: Observable<Cardano.OnChainTx>;
+  protocolParameters$: Observable<Pick<Cardano.ProtocolParameters, 'stakeKeyDeposit'>>;
   transactionsInFlight$: Observable<TxInFlight[]>;
 }) =>
   rewardAccountAddresses$.pipe(
+    // TODO:
+    // eslint-disable-next-line sonarjs/cognitive-complexity
     switchMap((rewardAccounts) =>
-      combineLatest([
-        addressCredentialStatuses(rewardAccounts, transactions$, transactionsInFlight$),
-        addressDelegatees(rewardAccounts, transactions$, stakePoolProvider, epoch$),
-        addressDRepDelegatees(rewardAccounts, transactions$, drepInfo$),
-        addressRewards(rewardAccounts, transactionsInFlight$, rewardsProvider, balancesStore)
-      ]).pipe(map(toRewardAccounts(rewardAccounts)))
+      combineLatest(
+        rewardAccounts.map((rewardAccount) =>
+          concat(
+            store.getValues([rewardAccount]).pipe(mergeMap((values) => (values.length > 0 ? of(values[0]) : EMPTY))),
+            newTransaction$.pipe(filter(affectsRewardAccount(rewardAccount)), startWith(null)).pipe(
+              switchMap(() =>
+                rewardAccountInfoProvider(rewardAccount).pipe(
+                  tap((rewardAccountInfo) => store.setValue(rewardAccount, rewardAccountInfo).subscribe()),
+                  blockingWithLatestFrom(protocolParameters$),
+                  switchMap(([rewardAccountInfo, { stakeKeyDeposit }]) =>
+                    transactionsInFlight$.pipe(
+                      map((txsInFlight): Cardano.RewardAccountInfo => {
+                        if (txsInFlight.length === 0) return rewardAccountInfo;
+                        const nextDepositValue = nextDeposit(rewardAccount, txsInFlight, BigInt(stakeKeyDeposit));
+                        return {
+                          ...rewardAccountInfo,
+                          credentialStatus:
+                            typeof nextDepositValue === 'bigint'
+                              ? nextDepositValue > 0n
+                                ? Cardano.StakeCredentialStatus.Registering
+                                : Cardano.StakeCredentialStatus.Unregistering
+                              : rewardAccountInfo.credentialStatus,
+                          // this ensures that rewards and deposit are not being spent twice if chaining transactions
+                          // as well as updates balance with deposit while transaction is in flight
+                          deposit: nextDepositValue ?? rewardAccountInfo.deposit,
+                          rewardBalance:
+                            nextRewardBalance(rewardAccount, txsInFlight) ?? rewardAccountInfo.rewardBalance
+                          // this may be extended to update dRepDelegatee and delegatee
+                          // based on pending transaction rather than waiting for tx confirmation
+                        };
+                      })
+                      // do not emit when transaction is removed from transactionsInFlight$ due to seeing this tx on chain;
+                      // this will be unsubscribed due to outer switchMap that looks for onChain$ tx that affects this reward account
+                      // TODO: test how this behaves when inFlight$ emits at the same time as newTransaction$
+                      // delay(1)
+                    )
+                  )
+                )
+              )
+            )
+          ).pipe(distinctUntilChanged<Cardano.RewardAccountInfo>(isEqual))
+        )
+      )
     )
   );

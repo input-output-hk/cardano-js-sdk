@@ -1,5 +1,4 @@
 import { Credential, CredentialType, RewardAccount } from '../Address';
-import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { isNotNil } from '@cardano-sdk/util';
 import type * as Crypto from '@cardano-sdk/crypto';
 import type { Anchor, DelegateRepresentative } from './Governance';
@@ -257,7 +256,7 @@ export const isCertType = <K extends keyof CertificateTypeMap>(
 export const createStakeRegistrationCert = (rewardAccount: RewardAccount): Certificate => ({
   __typename: CertificateType.StakeRegistration,
   stakeCredential: {
-    hash: Hash28ByteBase16.fromEd25519KeyHashHex(RewardAccount.toHash(rewardAccount)),
+    hash: RewardAccount.toHash(rewardAccount),
     type: CredentialType.KeyHash
   }
 });
@@ -273,7 +272,7 @@ export const createStakeDeregistrationCert = (rewardAccount: RewardAccount, depo
     ? {
         __typename: CertificateType.StakeDeregistration,
         stakeCredential: {
-          hash: Hash28ByteBase16.fromEd25519KeyHashHex(RewardAccount.toHash(rewardAccount)),
+          hash: RewardAccount.toHash(rewardAccount),
           type: CredentialType.KeyHash
         }
       }
@@ -281,7 +280,7 @@ export const createStakeDeregistrationCert = (rewardAccount: RewardAccount, depo
         __typename: CertificateType.Unregistration,
         deposit,
         stakeCredential: {
-          hash: Hash28ByteBase16.fromEd25519KeyHashHex(RewardAccount.toHash(rewardAccount)),
+          hash: RewardAccount.toHash(rewardAccount),
           type: CredentialType.KeyHash
         }
       };
@@ -296,7 +295,7 @@ export const createDelegationCert = (rewardAccount: RewardAccount, poolId: PoolI
   __typename: CertificateType.StakeDelegation,
   poolId,
   stakeCredential: {
-    hash: Hash28ByteBase16.fromEd25519KeyHashHex(RewardAccount.toHash(rewardAccount)),
+    hash: RewardAccount.toHash(rewardAccount),
     type: CredentialType.KeyHash
   }
 });

@@ -1,5 +1,4 @@
 import * as AssetId from '../assetId';
-import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, Paginated, TransactionsByAddressesArgs } from '@cardano-sdk/core';
 import { currentEpoch, handleAssetId, ledgerTip, stakeCredential } from './mockData';
 import { somePartialStakePools } from '../createStubStakePoolProvider';
@@ -170,35 +169,40 @@ export const queryTransactionsResult2: Paginated<Cardano.HydratedTx> = {
   totalResultCount: 3
 };
 
-const queryTransactions = ({ rewardAccount }: { rewardAccount?: Cardano.RewardAccount } = {}) =>
-  jest
-    .fn()
-    .mockResolvedValueOnce({
-      ...queryTransactionsResult,
-      pageResults: rewardAccount
-        ? queryTransactionsResult.pageResults.map((tx) => ({
-            ...tx,
-            body: {
-              ...tx.body,
-              certificates: tx.body.certificates?.map((certificate) =>
-                'stakeCredential' in certificate
-                  ? {
-                      ...certificate,
-                      stakeCredential: {
-                        hash: Cardano.RewardAccount.toHash(rewardAccount) as unknown as Crypto.Hash28ByteBase16,
-                        type: Cardano.CredentialType.KeyHash
-                      }
-                    }
-                  : certificate
-              )
-            }
-          }))
-        : queryTransactionsResult.pageResults
-    })
-    .mockResolvedValue({
-      pageResults: queryTransactionsResult.pageResults,
-      totalResultCount: 0 // Returning total result count 0 after the first result will make the address discovery stop
-    });
+export const filterAndPaginateTransactions = (
+  response: Cardano.HydratedTx[],
+  args: TransactionsByAddressesArgs
+): Paginated<Cardano.HydratedTx> => {
+  const pageResults = response.filter((res) => res.blockHeader.blockNo >= (args.blockRange?.lowerBound || 0));
+  const totalResultCount = pageResults.length;
+  if (args.pagination) {
+    if (args.pagination.order === 'desc') pageResults.reverse();
+    const slice = pageResults.slice(args.pagination.startAt, args.pagination.limit);
+    return { pageResults: slice, totalResultCount };
+  }
+  return { pageResults, totalResultCount };
+};
+
+const withCertificatesStakeCredential = (transactions: Cardano.HydratedTx[], rewardAccount?: Cardano.RewardAccount) =>
+  rewardAccount
+    ? transactions.map((tx) => ({
+        ...tx,
+        body: {
+          ...tx.body,
+          certificates: tx.body.certificates?.map((certificate) =>
+            'stakeCredential' in certificate
+              ? {
+                  ...certificate,
+                  stakeCredential: {
+                    hash: Cardano.RewardAccount.toHash(rewardAccount),
+                    type: Cardano.CredentialType.KeyHash
+                  }
+                }
+              : certificate
+          )
+        }
+      }))
+    : transactions;
 
 export const blocksByHashes = [{ epoch: Cardano.EpochNo(currentEpoch.number - 3) } as Cardano.ExtendedBlockInfo];
 
@@ -206,8 +210,19 @@ export const blocksByHashes = [{ epoch: Cardano.EpochNo(currentEpoch.number - 3)
 export const mockChainHistoryProvider = (props: { rewardAccount?: Cardano.RewardAccount } = {}) => ({
   blocksByHashes: jest.fn().mockResolvedValue(blocksByHashes),
   healthCheck: jest.fn().mockResolvedValue({ ok: true }),
-  transactionsByAddresses: queryTransactions(props),
-  transactionsByHashes: queryTransactions(props)
+  transactionsByAddresses: jest
+    .fn()
+    .mockImplementationOnce((args: TransactionsByAddressesArgs) =>
+      filterAndPaginateTransactions(
+        withCertificatesStakeCredential(queryTransactionsResult.pageResults, props.rewardAccount),
+        args
+      )
+    )
+    .mockResolvedValue({
+      pageResults: [...queryTransactionsResult.pageResults],
+      totalResultCount: 0 // Returning total result count 0 after the first result will make the address discovery stop
+    }),
+  transactionsByHashes: jest.fn().mockResolvedValue(queryTransactionsResult)
 });
 
 /**
@@ -219,19 +234,11 @@ export const mockChainHistoryProvider2 = (delayMs: number) => {
   const delayedJestFn = <T>(resolvedValue: T) =>
     jest.fn().mockImplementationOnce(() => delay(delayMs).then(() => resolvedValue));
 
-  const blockRangeTransactions = (blockRangeStart: number): Paginated<Cardano.HydratedTx> => {
-    const pageResults = queryTransactionsResult2.pageResults.filter(
-      (res) => res.blockHeader.blockNo >= blockRangeStart
-    );
-
-    return { pageResults, totalResultCount: pageResults.length };
-  };
-
   return {
     blocksByHashes: delayedJestFn(blocksByHashes),
     healthCheck: delayedJestFn({ ok: true }),
-    transactionsByAddresses: jest.fn(({ blockRange }: TransactionsByAddressesArgs) =>
-      delay(delayMs).then(() => blockRangeTransactions(blockRange?.lowerBound || 0))
+    transactionsByAddresses: jest.fn((args: TransactionsByAddressesArgs) =>
+      delay(delayMs).then(() => filterAndPaginateTransactions(queryTransactionsResult2.pageResults, args))
     ),
     transactionsByHashes: delayedJestFn(queryTransactionsResult2)
   };

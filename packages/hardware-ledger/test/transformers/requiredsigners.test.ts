@@ -1,17 +1,25 @@
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { CONTEXT_WITHOUT_KNOWN_ADDRESSES, CONTEXT_WITH_KNOWN_ADDRESSES, paymentHash, stakeKeyHash } from '../testData';
+import {
+  CONTEXT_WITHOUT_KNOWN_ADDRESSES,
+  CONTEXT_WITH_KNOWN_ADDRESSES,
+  paymentHash,
+  stakeKeyHash as stakeCredentialHash
+} from '../testData';
 import { CardanoKeyConst, util } from '@cardano-sdk/key-management';
+import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
 import { mapRequiredSigners, toRequiredSigner } from '../../src/transformers';
+
+const stakeKeyHash = Ed25519KeyHashHex(stakeCredentialHash);
 
 describe('requiredSigners', () => {
   describe('mapRequiredSigners', () => {
-    it('return null if given an undefined object as required signer', async () => {
-      const txIns = await mapRequiredSigners(undefined, CONTEXT_WITH_KNOWN_ADDRESSES);
+    it('return null if given an undefined object as required signer', () => {
+      const txIns = mapRequiredSigners(undefined, CONTEXT_WITH_KNOWN_ADDRESSES);
       expect(txIns).toEqual(null);
     });
 
-    it('can map a a set of required signers', async () => {
-      const signers = await mapRequiredSigners([stakeKeyHash, paymentHash], CONTEXT_WITH_KNOWN_ADDRESSES);
+    it('can map a a set of required signers', () => {
+      const signers = mapRequiredSigners([stakeKeyHash, paymentHash], CONTEXT_WITH_KNOWN_ADDRESSES);
 
       expect(signers).not.toBeNull();
       expect(signers!.length).toEqual(2);

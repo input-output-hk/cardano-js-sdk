@@ -30,9 +30,8 @@ import {
   TipTracker,
   TrackedAssetProvider,
   TrackedChainHistoryProvider,
-  TrackedDrepProvider,
+  TrackedRewardAccountInfoProvider,
   TrackedRewardsProvider,
-  TrackedStakePoolProvider,
   TrackedTxSubmitProvider,
   TrackedUtxoProvider,
   TrackedWalletNetworkInfoProvider,
@@ -55,7 +54,6 @@ import {
   createUtxoTracker,
   createWalletUtil,
   currentEpochTracker,
-  distinctEraSummaries,
   pollProvider
 } from '../services';
 import { AddressType, Bip32Account, GroupedAddress, WitnessedTx, Witnesser, util } from '@cardano-sdk/key-management';
@@ -64,13 +62,12 @@ import {
   Cardano,
   CardanoNodeUtil,
   ChainHistoryProvider,
-  DRepProvider,
   EpochInfo,
   EraSummary,
   HandleProvider,
+  RewardAccountInfoProvider,
   RewardsProvider,
   Serialization,
-  StakePoolProvider,
   TxSubmitProvider,
   UtxoProvider
 } from '@cardano-sdk/core';
@@ -114,13 +111,13 @@ import { PubStakeKeyAndStatus, createPublicStakeKeysTracker } from '../services/
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
 import { WalletStores, createInMemoryWalletStores } from '../persistence';
-import { createDrepInfoColdObservable, onlyDistinctBlockRefetch } from '../services/DrepInfoTracker';
 import { getScriptAddress } from './internals';
 import isEqual from 'lodash/isEqual.js';
 import uniq from 'lodash/uniq.js';
 
 export interface BaseWalletProps {
   readonly name: string;
+  readonly historicalTransactionsFetchLimit?: number;
   readonly polling?: PollingConfig;
   readonly retryBackoffConfig?: RetryBackoffConfig;
   readonly maxAssetInfoCacheAge?: Milliseconds;
@@ -178,19 +175,18 @@ const addressHasTx = async (
 export interface BaseWalletDependencies {
   readonly witnesser: Witnesser;
   readonly txSubmitProvider: TxSubmitProvider;
-  readonly stakePoolProvider: StakePoolProvider;
   readonly assetProvider: AssetProvider;
   readonly handleProvider?: HandleProvider;
   readonly networkInfoProvider: WalletNetworkInfoProvider;
   readonly utxoProvider: UtxoProvider;
   readonly chainHistoryProvider: ChainHistoryProvider;
+  readonly rewardAccountInfoProvider: RewardAccountInfoProvider;
   readonly rewardsProvider: RewardsProvider;
   readonly inputSelector?: InputSelector;
   readonly stores?: WalletStores;
   readonly logger: Logger;
   readonly connectionStatusTracker$?: ConnectionStatusTracker;
   readonly publicCredentialsManager: PublicCredentialsManager;
-  readonly drepProvider: DRepProvider;
   readonly inputResolver?: Cardano.InputResolver;
 }
 
@@ -266,17 +262,16 @@ export class BaseWallet implements ObservableWallet {
   #addressTracker: AddressTracker;
   #publicCredentialsManager: PublicCredentialsManager;
   #submittingPromises: Partial<Record<Cardano.TransactionId, Promise<Cardano.TransactionId>>> = {};
-  #refetchDrepInfo$ = new Subject<void>();
+  #refetchRewardAccountInfo$ = new Subject<void>();
 
   readonly witnesser: Witnesser;
   readonly currentEpoch$: TrackerSubject<EpochInfo>;
   readonly txSubmitProvider: TxSubmitProvider;
   readonly utxoProvider: TrackedUtxoProvider;
   readonly networkInfoProvider: TrackedWalletNetworkInfoProvider;
-  readonly stakePoolProvider: TrackedStakePoolProvider;
+  readonly rewardAccountInfoProvider: TrackedRewardAccountInfoProvider;
   readonly assetProvider: TrackedAssetProvider;
   readonly chainHistoryProvider: TrackedChainHistoryProvider;
-  readonly drepProvider: TrackedDrepProvider;
   readonly utxo: UtxoTracker;
   readonly balance: BalanceTracker;
   readonly transactions: TransactionsTracker & Shutdown;
@@ -304,6 +299,7 @@ export class BaseWallet implements ObservableWallet {
   constructor(
     {
       name,
+      historicalTransactionsFetchLimit = 10,
       maxAssetInfoCacheAge,
       polling: {
         interval: pollInterval = DEFAULT_POLLING_CONFIG.pollInterval,
@@ -317,20 +313,19 @@ export class BaseWallet implements ObservableWallet {
     }: BaseWalletProps,
     {
       txSubmitProvider,
-      stakePoolProvider,
       witnesser,
       assetProvider,
       handleProvider,
       networkInfoProvider,
       utxoProvider,
       chainHistoryProvider,
+      rewardAccountInfoProvider,
       rewardsProvider,
       logger,
       inputSelector,
       publicCredentialsManager,
       stores = createInMemoryWalletStores(),
       connectionStatusTracker$ = createSimpleConnectionStatusTracker(),
-      drepProvider,
       inputResolver
     }: BaseWalletDependencies
   ) {
@@ -340,21 +335,19 @@ export class BaseWallet implements ObservableWallet {
 
     this.utxoProvider = new TrackedUtxoProvider(utxoProvider);
     this.networkInfoProvider = new TrackedWalletNetworkInfoProvider(networkInfoProvider);
-    this.stakePoolProvider = new TrackedStakePoolProvider(stakePoolProvider);
     this.assetProvider = new TrackedAssetProvider(assetProvider);
     this.handleProvider = handleProvider as HandleProvider;
     this.chainHistoryProvider = new TrackedChainHistoryProvider(chainHistoryProvider);
-    this.drepProvider = new TrackedDrepProvider(drepProvider);
+    this.rewardAccountInfoProvider = new TrackedRewardAccountInfoProvider(rewardAccountInfoProvider);
     this.rewardsProvider = new TrackedRewardsProvider(rewardsProvider);
     this.syncStatus = createProviderStatusTracker(
       {
         assetProvider: this.assetProvider,
         chainHistoryProvider: this.chainHistoryProvider,
-        drepProvider: this.drepProvider,
         logger: contextLogger(this.#logger, 'syncStatus'),
         networkInfoProvider: this.networkInfoProvider,
+        rewardAccountInfoProvider: this.rewardAccountInfoProvider,
         rewardsProvider: this.rewardsProvider,
-        stakePoolProvider: this.stakePoolProvider,
         utxoProvider: this.utxoProvider
       },
       { consideredOutOfSyncAfter }
@@ -480,6 +473,7 @@ export class BaseWallet implements ObservableWallet {
       addresses$,
       chainHistoryProvider: this.chainHistoryProvider,
       failedFromReemitter$: this.#failedFromReemitter$,
+      historicalTransactionsFetchLimit,
       inFlightTransactionsStore: stores.inFlightTransactions,
       logger: contextLogger(this.#logger, 'transactions'),
       newTransactions: this.#newTransactions,
@@ -522,30 +516,18 @@ export class BaseWallet implements ObservableWallet {
       utxoProvider: this.utxoProvider
     });
 
-    // When the rewardAccounts delegation tracker is initialized, it will invoke drepInfo$
-    // with an empty array, since there aren't any drepDelegatees yet.
-    // This will not perform network requests, but will initialize the TrackedDrepProvider.
-    // For this reason, we do not have to explicitly call this.drepProvider.setStatInitialized
-    const drepInfo$ = createDrepInfoColdObservable({
-      drepProvider: this.drepProvider,
-      logger: contextLogger(this.#logger, 'drepInfo$'),
-      refetchTrigger$: onlyDistinctBlockRefetch(this.#refetchDrepInfo$, this.tip$),
-      retryBackoffConfig
-    });
-
-    const eraSummaries$ = distinctEraSummaries(this.eraSummaries$);
     this.delegation = createDelegationTracker({
-      drepInfo$,
       epoch$,
-      eraSummaries$,
       knownAddresses$: this.addresses$,
       logger: contextLogger(this.#logger, 'delegation'),
+      protocolParameters$: this.protocolParameters$,
+      refetchRewardAccountInfo$: this.#refetchRewardAccountInfo$,
       retryBackoffConfig,
       rewardAccountAddresses$: this.addresses$.pipe(
         map((addresses) => uniq(addresses.map((groupedAddress) => groupedAddress.rewardAccount)))
       ),
+      rewardAccountInfoProvider: this.rewardAccountInfoProvider,
       rewardsTracker: this.rewardsProvider,
-      stakePoolProvider: this.stakePoolProvider,
       stores,
       transactionsTracker: this.transactions,
       utxoTracker: this.utxo
@@ -790,11 +772,10 @@ export class BaseWallet implements ObservableWallet {
     this.assetProvider.stats.shutdown();
     this.#trackedTxSubmitProvider.stats.shutdown();
     this.networkInfoProvider.stats.shutdown();
-    this.stakePoolProvider.stats.shutdown();
     this.utxoProvider.stats.shutdown();
+    this.rewardAccountInfoProvider.stats.shutdown();
     this.rewardsProvider.stats.shutdown();
     this.chainHistoryProvider.stats.shutdown();
-    this.drepProvider.stats.shutdown();
     this.currentEpoch$.complete();
     this.delegation.shutdown();
     this.assetInfo$.complete();
@@ -805,7 +786,7 @@ export class BaseWallet implements ObservableWallet {
     this.#reemitSubscriptions.unsubscribe();
     this.#failedFromReemitter$.complete();
     this.publicStakeKeys$.complete();
-    this.#refetchDrepInfo$.complete();
+    this.#refetchRewardAccountInfo$.complete();
     this.#logger.debug('Shutdown');
   }
 
@@ -850,7 +831,7 @@ export class BaseWallet implements ObservableWallet {
         genesisParameters: () => this.#firstValueFromSettled(this.genesisParameters$),
         protocolParameters: () => this.#firstValueFromSettled(this.protocolParameters$),
         rewardAccounts: () => {
-          this.#refetchDrepInfo$.next();
+          this.#refetchRewardAccountInfo$.next();
           return this.#firstValueFromSettled(this.delegation.rewardAccounts$);
         },
         tip: () => this.#firstValueFromSettled(this.tip$),

@@ -83,10 +83,7 @@ export const getKnownAddress = (
 ): GroupedAddress | undefined =>
   context
     ? context?.knownAddresses.find((address) =>
-        areStringsEqualInConstantTime(
-          Cardano.RewardAccount.toHash(address.rewardAccount) as unknown as string,
-          credential.hash as unknown as string
-        )
+        areStringsEqualInConstantTime(Cardano.RewardAccount.toHash(address.rewardAccount), credential.hash)
       )
     : undefined;
 
@@ -258,10 +255,7 @@ const poolRetirementCertificate: Transform<
   const poolIdKeyHash = Cardano.PoolId.toKeyHash(certificate.poolId);
 
   const knownAddress = context?.knownAddresses.find((address) =>
-    areStringsEqualInConstantTime(
-      Cardano.RewardAccount.toHash(address.rewardAccount) as unknown as string,
-      poolIdKeyHash as unknown as string
-    )
+    areStringsEqualInConstantTime(Cardano.RewardAccount.toHash(address.rewardAccount), poolIdKeyHash)
   );
 
   const poolKeyPath = util.stakeKeyPathFromGroupedAddress(knownAddress);

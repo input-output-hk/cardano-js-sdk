@@ -1,10 +1,12 @@
-import { Cardano, Paginated, StakePoolProvider } from '@cardano-sdk/core';
+import { Cardano, Paginated, RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
 import { Percent } from '@cardano-sdk/util';
-import { epochRewards, rewardAccountBalance, rewardAccountBalance2, rewardsHistory, rewardsHistory2 } from './mockData';
+import { epochRewards, rewardAccountBalance, rewardsHistory, rewardsHistory2 } from './mockData';
 import { getRandomTxId } from './mockChainHistoryProvider';
 import delay from 'delay';
 
-export const mockRewardsProvider = ({ rewardAccount }: { rewardAccount?: Cardano.RewardAccount } = {}) => ({
+export const mockRewardsProvider = ({
+  rewardAccount
+}: { rewardAccount?: Cardano.RewardAccount } = {}): jest.Mocked<RewardsProvider> => ({
   healthCheck: jest.fn().mockResolvedValue({ ok: true }),
   rewardAccountBalance: jest.fn().mockResolvedValue(rewardAccountBalance),
   rewardsHistory: jest.fn().mockResolvedValue(rewardAccount ? new Map([[rewardAccount, epochRewards]]) : rewardsHistory)
@@ -15,7 +17,7 @@ export const mockRewardsProvider2 = (delayMs: number) => {
     jest.fn().mockImplementation(() => delay(delayMs).then(() => resolvedValue));
   return {
     healthCheck: delayedJestFn({ ok: true }),
-    rewardAccountBalance: delayedJestFn(rewardAccountBalance2),
+    rewardAccountBalance: delayedJestFn(rewardAccountBalance),
     rewardsHistory: delayedJestFn(rewardsHistory2)
   };
 };

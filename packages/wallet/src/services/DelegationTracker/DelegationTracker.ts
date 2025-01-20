@@ -1,79 +1,74 @@
-import {
-  Cardano,
-  ChainHistoryProvider,
-  DRepInfo,
-  EraSummary,
-  SlotEpochCalc,
-  createSlotEpochCalc
-} from '@cardano-sdk/core';
+/* eslint-disable unicorn/consistent-function-scoping */
+import { Cardano, RewardAccountInfoProvider } from '@cardano-sdk/core';
 import { DelegationTracker, TransactionsTracker, UtxoTracker } from '../types';
 import { GroupedAddress } from '@cardano-sdk/key-management';
 import { Logger } from 'ts-log';
-import { Observable, combineLatest, map, tap } from 'rxjs';
 import {
-  ObservableRewardsProvider,
-  ObservableStakePoolProvider,
-  createQueryStakePoolsProvider,
-  createRewardAccountsTracker,
-  createRewardsProvider
+  Observable,
+  combineLatest,
+  concat,
+  defaultIfEmpty,
+  distinctUntilChanged,
+  filter,
+  map,
+  mergeMap,
+  of,
+  switchMap,
+  take,
+  tap
+} from 'rxjs';
+import {
+  ObservableRewardAccountInfoProvider,
+  createRewardAccountInfoProvider,
+  createRewardAccountsTracker
 } from './RewardAccounts';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistoryProvider, createRewardsHistoryProvider, createRewardsHistoryTracker } from './RewardsHistory';
-import { Shutdown, contextLogger } from '@cardano-sdk/util';
-import { TrackedRewardsProvider, TrackedStakePoolProvider } from '../ProviderTracker';
+import { Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
+import { TrackedRewardAccountInfoProvider, TrackedRewardsProvider } from '../ProviderTracker';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
-import { TxWithEpoch } from './types';
 import { WalletStores } from '../../persistence';
 import { createDelegationDistributionTracker } from './DelegationDistributionTracker';
 import { pollProvider } from '../util';
-import { transactionsWithCertificates } from './transactionCertificates';
 
-export const createBlockEpochProvider =
-  (chainHistoryProvider: ChainHistoryProvider, retryBackoffConfig: RetryBackoffConfig, logger: Logger) =>
-  (ids: Cardano.BlockId[]) =>
+const createDelegationPortfolioProvider =
+  ({
+    rewardAccountInfoProvider,
+    retryBackoffConfig,
+    logger
+  }: {
+    rewardAccountInfoProvider: RewardAccountInfoProvider;
+    retryBackoffConfig: RetryBackoffConfig;
+    logger: Logger;
+  }) =>
+  (rewardAccount: Cardano.RewardAccount): Observable<Cardano.Cip17DelegationPortfolio | null> =>
     pollProvider({
       logger,
       retryBackoffConfig,
-      sample: () => chainHistoryProvider.blocksByHashes({ ids })
-    }).pipe(map((blocks) => blocks.map(({ epoch }) => epoch)));
+      sample: () => rewardAccountInfoProvider.delegationPortfolio(rewardAccount)
+    });
 
-export type BlockEpochProvider = ReturnType<typeof createBlockEpochProvider>;
+type DelegationPortfolioProvider = ReturnType<typeof createDelegationPortfolioProvider>;
 
 export interface DelegationTrackerProps {
-  drepInfo$: (drepIds: Cardano.DRepID[]) => Observable<DRepInfo[]>;
   rewardsTracker: TrackedRewardsProvider;
   rewardAccountAddresses$: Observable<Cardano.RewardAccount[]>;
-  stakePoolProvider: TrackedStakePoolProvider;
-  eraSummaries$: Observable<EraSummary[]>;
+  rewardAccountInfoProvider: TrackedRewardAccountInfoProvider;
   epoch$: Observable<Cardano.EpochNo>;
-  transactionsTracker: TransactionsTracker;
+  transactionsTracker: Pick<TransactionsTracker, 'outgoing' | 'new$' | 'history$'>;
+  protocolParameters$: Observable<Pick<Cardano.ProtocolParameters, 'stakeKeyDeposit'>>;
   retryBackoffConfig: RetryBackoffConfig;
   utxoTracker: UtxoTracker;
+  refetchRewardAccountInfo$: Observable<void>;
   knownAddresses$: Observable<GroupedAddress[]>;
   stores: WalletStores;
   internals?: {
-    queryStakePoolsProvider?: ObservableStakePoolProvider;
-    rewardsProvider?: ObservableRewardsProvider;
     rewardsHistoryProvider?: RewardsHistoryProvider;
-    slotEpochCalc$?: Observable<SlotEpochCalc>;
+    observableRewardAccountInfoProvider?: ObservableRewardAccountInfoProvider;
+    delegationPortfolioProvider?: DelegationPortfolioProvider;
   };
   logger: Logger;
 }
-
-export const certificateTransactionsWithEpochs = (
-  transactionsTracker: TransactionsTracker,
-  rewardAccountAddresses$: Observable<Cardano.RewardAccount[]>,
-  slotEpochCalc$: Observable<SlotEpochCalc>,
-  certificateTypes: Cardano.CertificateType[]
-): Observable<TxWithEpoch[]> =>
-  combineLatest([
-    transactionsWithCertificates(transactionsTracker.history$, rewardAccountAddresses$, certificateTypes),
-    slotEpochCalc$
-  ]).pipe(
-    map(([transactions, slotEpochCalc]) =>
-      transactions.map((tx) => ({ epoch: slotEpochCalc(tx.blockHeader.slot), tx }))
-    )
-  );
 
 const hasDelegationCert = (certificates: Array<Cardano.Certificate> | undefined): boolean =>
   !!certificates &&
@@ -81,12 +76,18 @@ const hasDelegationCert = (certificates: Array<Cardano.Certificate> | undefined)
     Cardano.isCertType(cert, [...Cardano.RegAndDeregCertificateTypes, ...Cardano.StakeDelegationCertificateTypes])
   );
 
-export const createDelegationPortfolioTracker = (transactions: Observable<Cardano.HydratedTx[]>) =>
-  transactions.pipe(
+/**
+ * @returns Observable that emits:
+ * - delegation portfolio if multi-delegation metadata is found in transactions
+ * - `null` if not multi-delegating
+ * - `undefined` if no relevant transactions were found
+ */
+const findDelegationPortfolioMetadata = () => (recentTransactions: Observable<Cardano.Tx[]>) =>
+  recentTransactions.pipe(
     map((hydratedTxs) => {
       const sortedTransactions = [...hydratedTxs].reverse();
 
-      let result = null;
+      let result;
       for (const sorted of sortedTransactions) {
         const portfolio = sorted.auxiliaryData?.blob?.get(Cardano.DelegationMetadataLabel);
         const altersDelegationState = hasDelegationCert(sorted.body.certificates);
@@ -108,71 +109,124 @@ export const createDelegationPortfolioTracker = (transactions: Observable<Cardan
     })
   );
 
+const delegationTransactionFound = (
+  portfolio: Cardano.Cip17DelegationPortfolio | null | undefined
+): portfolio is Cardano.Cip17DelegationPortfolio | null => typeof portfolio !== 'undefined';
+
+export const createDelegationPortfolioTracker = (
+  rewardAccounts$: Observable<Cardano.RewardAccount[]>,
+  recentTransactionHistory$: Observable<Cardano.HydratedTx[]>,
+  newTransaction$: Observable<Cardano.OnChainTx>,
+  delegationPortfolioProvider: DelegationPortfolioProvider,
+  store: WalletStores['delegationPortfolio']
+) => {
+  const storageSet = (portfolio: Cardano.Cip17DelegationPortfolio | null) =>
+    portfolio ? store.set(portfolio).subscribe() : store.delete().subscribe();
+  return combineLatest([store.get().pipe(defaultIfEmpty(null)), rewardAccounts$]).pipe(
+    switchMap(([storedPortfolio, rewardAccounts]) => {
+      if (rewardAccounts.length <= 1) {
+        if (storedPortfolio) {
+          storageSet(null);
+        }
+        return of(null);
+      }
+      const checkRecentHistory$ = recentTransactionHistory$.pipe(findDelegationPortfolioMetadata(), take(1));
+      const observeNewTransactions$ = newTransaction$.pipe(
+        map((newTx) => [newTx]),
+        findDelegationPortfolioMetadata(),
+        filter(delegationTransactionFound),
+        tap(storageSet)
+      );
+      if (storedPortfolio) {
+        return concat(
+          of(storedPortfolio),
+          // history is checked to recover from stale stored porfolio
+          checkRecentHistory$.pipe(filter(delegationTransactionFound)),
+          observeNewTransactions$
+        );
+      }
+      return concat(
+        checkRecentHistory$.pipe(
+          mergeMap((historyPorfolio) => {
+            if (delegationTransactionFound(historyPorfolio)) {
+              return of(historyPorfolio);
+            }
+            return recentTransactionHistory$.pipe(
+              take(1),
+              mergeMap((recentHistory) => {
+                if (recentHistory.length === 0) {
+                  // no transactions => new wallet => not multi-delegating
+                  return of(null);
+                }
+                return delegationPortfolioProvider(rewardAccounts[0]).pipe(take(1));
+              })
+            );
+          }),
+          tap(storageSet)
+        ),
+        observeNewTransactions$
+      );
+    }),
+    distinctUntilChanged(deepEquals)
+  );
+};
+
 export const createDelegationTracker = ({
-  drepInfo$,
   rewardAccountAddresses$,
   epoch$,
   rewardsTracker,
   retryBackoffConfig,
   transactionsTracker,
-  eraSummaries$,
-  stakePoolProvider,
+  rewardAccountInfoProvider,
   knownAddresses$,
+  refetchRewardAccountInfo$,
+  protocolParameters$,
   utxoTracker,
   stores,
   logger,
   internals: {
-    queryStakePoolsProvider = createQueryStakePoolsProvider(
-      stakePoolProvider,
-      stores.stakePools,
-      retryBackoffConfig,
-      logger
-    ),
     rewardsHistoryProvider = createRewardsHistoryProvider(rewardsTracker, retryBackoffConfig),
-    rewardsProvider = createRewardsProvider(
+    observableRewardAccountInfoProvider = createRewardAccountInfoProvider({
       epoch$,
-      transactionsTracker.outgoing.onChain$,
-      rewardsTracker,
+      externalTrigger$: refetchRewardAccountInfo$,
+      logger,
       retryBackoffConfig,
-      logger
-    ),
-    slotEpochCalc$ = eraSummaries$.pipe(map((eraSummaries) => createSlotEpochCalc(eraSummaries)))
+      rewardAccountInfoProvider
+    }),
+    delegationPortfolioProvider = createDelegationPortfolioProvider({
+      logger,
+      retryBackoffConfig,
+      rewardAccountInfoProvider
+    })
   } = {}
 }: DelegationTrackerProps): DelegationTracker & Shutdown => {
-  const transactions$ = certificateTransactionsWithEpochs(
-    transactionsTracker,
-    rewardAccountAddresses$,
-    slotEpochCalc$,
-    [
-      ...new Set([
-        ...Cardano.RegAndDeregCertificateTypes,
-        ...Cardano.StakeDelegationCertificateTypes,
-        ...Cardano.VoteDelegationCredentialCertificateTypes
-      ])
-    ]
-  ).pipe(tap((transactionsWithEpochs) => logger.debug(`Found ${transactionsWithEpochs.length} staking transactions`)));
-
   const rewardsHistory$ = new TrackerSubject(
     createRewardsHistoryTracker(
-      transactions$,
       rewardAccountAddresses$,
+      epoch$,
       rewardsHistoryProvider,
       stores.rewardsHistory,
       contextLogger(logger, 'rewardsHistory$')
     )
   );
 
-  const portfolio$ = new TrackerSubject(createDelegationPortfolioTracker(transactionsTracker.history$));
+  const portfolio$ = new TrackerSubject(
+    createDelegationPortfolioTracker(
+      rewardAccountAddresses$,
+      transactionsTracker.history$,
+      transactionsTracker.new$,
+      delegationPortfolioProvider,
+      stores.delegationPortfolio
+    )
+  );
 
   const rewardAccounts$ = new TrackerSubject(
     createRewardAccountsTracker({
-      balancesStore: stores.rewardsBalances,
-      drepInfo$,
-      epoch$,
+      newTransaction$: transactionsTracker.new$,
+      protocolParameters$,
       rewardAccountAddresses$,
-      rewardsProvider,
-      stakePoolProvider: queryStakePoolsProvider,
-      transactions$,
+      rewardAccountInfoProvider: observableRewardAccountInfoProvider,
+      store: stores.rewardAccountInfo,
       transactionsInFlight$: transactionsTracker.outgoing.inFlight$
     })
   );

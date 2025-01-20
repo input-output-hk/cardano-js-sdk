@@ -1,6 +1,4 @@
 // eslint-disable-next-line jsdoc/check-param-names
-import * as Crypto from '@cardano-sdk/crypto';
-
 import {
   BlockfrostClient,
   BlockfrostProvider,
@@ -25,11 +23,15 @@ import {
 } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import omit from 'lodash/omit.js';
+import uniq from 'lodash/uniq.js';
 import type { Responses } from '@blockfrost/blockfrost-js';
 import type { Schemas } from '@blockfrost/blockfrost-js/lib/types/open-api';
 
 type WithCertIndex<T> = T & { cert_index: number };
 export const DB_MAX_SAFE_INTEGER = 2_147_483_647;
+
+type BlockfrostTx = Pick<Responses['address_transactions_content'][0], 'block_height' | 'tx_index'>;
+const compareTx = (a: BlockfrostTx, b: BlockfrostTx) => a.block_height - b.block_height || a.tx_index - b.tx_index;
 
 export class BlockfrostChainHistoryProvider extends BlockfrostProvider implements ChainHistoryProvider {
   private networkInfoProvider: NetworkInfoProvider;
@@ -180,7 +182,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
           : Cardano.CertificateType.StakeDeregistration,
         cert_index,
         stakeCredential: {
-          hash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(address)) as unknown as Crypto.Hash28ByteBase16,
+          hash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(address)),
           type: Cardano.CredentialType.KeyHash
         }
       }))
@@ -194,7 +196,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
         cert_index,
         poolId: Cardano.PoolId(pool_id),
         stakeCredential: {
-          hash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(address)) as unknown as Crypto.Hash28ByteBase16,
+          hash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(address)),
           type: Cardano.CredentialType.KeyHash
         }
       }))
@@ -490,14 +492,23 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
     try {
       const lowerBound = blockRange?.lowerBound ?? 0;
       const upperBound = blockRange?.upperBound ?? DB_MAX_SAFE_INTEGER;
+      const limit = pagination?.limit ?? DB_MAX_SAFE_INTEGER;
 
       const addressTransactions = await Promise.all(
         addresses.map(async (address) =>
           fetchSequentially<{ tx_hash: string; tx_index: number; block_height: number }, BlockfrostTransactionContent>({
             haveEnoughItems: blockRange?.lowerBound
               ? (transactions) =>
-                  transactions.length > 0 &&
-                  transactions[transactions.length - 1].block_height < blockRange!.lowerBound!
+                  (transactions.length > 0 &&
+                    transactions[transactions.length - 1].block_height < blockRange!.lowerBound!) ||
+                  transactions.length >= limit
+              : (transactions) => transactions.length >= limit,
+            paginationOptions: pagination
+              ? {
+                  count: pagination.limit,
+                  order: pagination.order,
+                  page: (pagination.startAt + pagination.limit) / pagination.limit
+                }
               : undefined,
             request: (paginationQueryString) => {
               let queryString = `addresses/${address}/transactions?${paginationQueryString}`;
@@ -511,15 +522,17 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
 
       const allTransactions = addressTransactions.flat(1);
 
-      const ids = allTransactions
-        .filter(({ block_height }) => block_height >= lowerBound && block_height <= upperBound)
-        .sort((a, b) => a.block_height - b.block_height || a.tx_index - b.tx_index)
-        .map(({ tx_hash }) => Cardano.TransactionId(tx_hash))
-        .splice(pagination.startAt, pagination.limit);
+      const dedupedSortedTransactions = uniq(
+        allTransactions
+          .filter(({ block_height }) => block_height >= lowerBound && block_height <= upperBound)
+          .sort(pagination.order === 'desc' ? (a, b) => compareTx(b, a) : compareTx)
+          .map(({ tx_hash }) => Cardano.TransactionId(tx_hash))
+      );
+      const ids = dedupedSortedTransactions.slice(pagination.startAt, pagination.limit);
 
       const pageResults = await this.transactionsByHashes({ ids });
 
-      return { pageResults, totalResultCount: allTransactions.length };
+      return { pageResults, totalResultCount: dedupedSortedTransactions.length };
     } catch (error) {
       throw this.toProviderError(error);
     }

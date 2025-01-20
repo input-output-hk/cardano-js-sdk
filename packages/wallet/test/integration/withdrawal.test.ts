@@ -1,4 +1,3 @@
-import * as Crypto from '@cardano-sdk/crypto';
 import { BaseWallet, TransactionFailure } from '../../src';
 import { Cardano } from '@cardano-sdk/core';
 import { createWallet } from './util';
@@ -85,7 +84,7 @@ describe('integration/withdrawal', () => {
         {
           __typename: Cardano.CertificateType.StakeDeregistration,
           stakeCredential: {
-            hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(accounts[0])),
+            hash: Cardano.RewardAccount.toHash(accounts[0]),
             type: Cardano.CredentialType.KeyHash
           }
         }

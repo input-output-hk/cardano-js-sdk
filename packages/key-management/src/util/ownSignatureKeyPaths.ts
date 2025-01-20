@@ -2,6 +2,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { AccountKeyDerivationPath, GroupedAddress, TxInId, TxInKeyPathMap } from '../types';
 import { Cardano } from '@cardano-sdk/core';
 import { DREP_KEY_DERIVATION_PATH } from './key';
+import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
 import { isNotNil } from '@cardano-sdk/util';
 import isEqual from 'lodash/isEqual.js';
 import uniqBy from 'lodash/uniqBy.js';
@@ -166,7 +167,7 @@ export const checkStakeCredentialCertificates = (
 const getSignersData = (groupedAddresses: GroupedAddress[]): StakeKeySignerData[] =>
   uniqBy(groupedAddresses, 'rewardAccount')
     .map((groupedAddress) => {
-      const stakeKeyHash = Cardano.RewardAccount.toHash(groupedAddress.rewardAccount);
+      const stakeKeyHash = Cardano.RewardAccount.toHash(groupedAddress.rewardAccount) as unknown as Ed25519KeyHashHex;
       const poolId = Cardano.PoolId.fromKeyHash(stakeKeyHash);
       return {
         derivationPath: groupedAddress.stakeKeyDerivationPath,

@@ -12,8 +12,8 @@ export type RewardAccount = OpaqueString<'RewardAccount'>;
  * @throws InvalidStringError
  */
 export const RewardAccount = (value: string): RewardAccount => typedBech32(value, ['stake', 'stake_test'], 47);
-RewardAccount.toHash = (rewardAccount: RewardAccount): Ed25519KeyHashHex =>
-  Ed25519KeyHashHex(Address.fromBech32(rewardAccount).asReward()!.getPaymentCredential().hash);
+RewardAccount.toHash = (rewardAccount: RewardAccount): Hash28ByteBase16 =>
+  Address.fromBech32(rewardAccount).asReward()!.getPaymentCredential().hash;
 
 /**
  * Creates a reward account from a given credential and network id.

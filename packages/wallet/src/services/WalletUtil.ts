@@ -1,6 +1,7 @@
 /* eslint-disable no-bitwise */
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
+import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
 import { GroupedAddress, util as KeyManagementUtil, WitnessedTx } from '@cardano-sdk/key-management';
 import { Observable, firstValueFrom } from 'rxjs';
 import { ObservableWallet, ScriptAddress, isScriptAddress } from '../types';
@@ -177,7 +178,7 @@ const scriptWalletHasForeignCertificates = (
     return false;
   }
 
-  const scriptHash = Cardano.RewardAccount.toHash(rewardAccount) as unknown as Crypto.Hash28ByteBase16;
+  const scriptHash = Cardano.RewardAccount.toHash(rewardAccount);
   for (const certificate of certificates) {
     switch (certificate.__typename) {
       case Cardano.CertificateType.Registration:
@@ -214,7 +215,9 @@ const scriptWalletHasForeignCertificates = (
       }
       case Cardano.CertificateType.PoolRetirement:
         {
-          const poolId = Cardano.PoolId.fromKeyHash(Cardano.RewardAccount.toHash(rewardAccount));
+          const poolId = Cardano.PoolId.fromKeyHash(
+            Cardano.RewardAccount.toHash(rewardAccount) as unknown as Ed25519KeyHashHex
+          );
           if (certificate.poolId !== poolId) {
             return true;
           }
@@ -298,7 +301,7 @@ export const requiresForeignSignatures = async (tx: Cardano.Tx, wallet: Observab
 
   const uniqueAccounts: KeyManagementUtil.StakeKeySignerData[] = uniqBy(keyHashAddresses, 'rewardAccount')
     .map((groupedAddress) => {
-      const stakeKeyHash = Cardano.RewardAccount.toHash(groupedAddress.rewardAccount);
+      const stakeKeyHash = Cardano.RewardAccount.toHash(groupedAddress.rewardAccount) as unknown as Ed25519KeyHashHex;
       return {
         derivationPath: groupedAddress.stakeKeyDerivationPath,
         poolId: Cardano.PoolId.fromKeyHash(stakeKeyHash),

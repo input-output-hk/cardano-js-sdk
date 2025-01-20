@@ -1,4 +1,3 @@
-import * as Crypto from '@cardano-sdk/crypto';
 import {
   AssetFingerprint,
   AssetId,
@@ -174,8 +173,7 @@ export const getCertificatesByType = (
 
   return certificates.filter((certificate) => {
     if (isCertType(certificate, StakeCredentialCertificateTypes)) {
-      const credHash = Crypto.Ed25519KeyHashHex(certificate.stakeCredential.hash);
-      return rewardAccounts.some((account) => RewardAccount.toHash(account) === credHash);
+      return rewardAccounts.some((account) => RewardAccount.toHash(account) === certificate.stakeCredential.hash);
     }
 
     if (isCertType(certificate, [CertificateType.PoolRegistration]))

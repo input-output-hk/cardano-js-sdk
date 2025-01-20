@@ -363,9 +363,7 @@ describe('chain history mappers', () => {
         cert_index: 0,
         deposit: 0n,
         stakeCredential: {
-          hash: Hash28ByteBase16.fromEd25519KeyHashHex(
-            Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))
-          ),
+          hash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress)),
           type: Cardano.CredentialType.KeyHash
         }
       });
@@ -374,9 +372,7 @@ describe('chain history mappers', () => {
         cert_index: 0,
         deposit: 0n,
         stakeCredential: {
-          hash: Hash28ByteBase16.fromEd25519KeyHashHex(
-            Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))
-          ),
+          hash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress)),
           type: Cardano.CredentialType.KeyHash
         }
       });
@@ -393,9 +389,7 @@ describe('chain history mappers', () => {
         cert_index: 0,
         poolId: Cardano.PoolId(poolId),
         stakeCredential: {
-          hash: Hash28ByteBase16.fromEd25519KeyHashHex(
-            Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))
-          ),
+          hash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress)),
           type: Cardano.CredentialType.KeyHash
         }
       });
@@ -446,9 +440,7 @@ describe('chain history mappers', () => {
           cert_index: 0,
           dRep,
           stakeCredential: {
-            hash: Hash28ByteBase16.fromEd25519KeyHashHex(
-              Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))
-            ),
+            hash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress)),
             type: Cardano.CredentialType.KeyHash
           }
         });
@@ -506,9 +498,7 @@ describe('chain history mappers', () => {
       {
         __typename: Cardano.CertificateType.StakeRegistration,
         stakeCredential: {
-          hash: Hash28ByteBase16.fromEd25519KeyHashHex(
-            Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress))
-          ),
+          hash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(stakeAddress)),
           type: Cardano.CredentialType.KeyHash
         }
       }

@@ -2,7 +2,7 @@
 
 import * as Crypto from '@cardano-sdk/crypto';
 import { BaseWallet } from '@cardano-sdk/wallet';
-import { Cardano, setInConwayEra } from '@cardano-sdk/core';
+import { Cardano, StakePoolProvider, setInConwayEra } from '@cardano-sdk/core';
 import { logger } from '@cardano-sdk/util-dev';
 
 import { firstValueFrom, map } from 'rxjs';
@@ -53,9 +53,9 @@ const assertTxHasCertificate = (tx: Cardano.HydratedTx, certificate: Cardano.Cer
   expect(tx.body.certificates![0]).toEqual(certificate);
 
 const getTestWallet = async (idx: number, name: string, minCoinBalance?: bigint) => {
-  const { wallet } = await getWallet({ env, idx, logger, name, polling: { interval: 50 } });
+  const wallet = await getWallet({ env, idx, logger, name, polling: { interval: 50 } });
 
-  await walletReady(wallet, minCoinBalance);
+  await walletReady(wallet.wallet, minCoinBalance);
 
   return wallet;
 };
@@ -140,6 +140,7 @@ export const protocolParamUpdate: Cardano.ProtocolParametersUpdateConway = {
 describe('PersonalWallet/conwayTransactions', () => {
   let dRepWallet: BaseWallet;
   let wallet: BaseWallet;
+  let stakePoolProvider: StakePoolProvider;
 
   let dRepCredential: Cardano.Credential & { type: Cardano.CredentialType.KeyHash };
   let poolId: Cardano.PoolId;
@@ -173,7 +174,7 @@ describe('PersonalWallet/conwayTransactions', () => {
   };
 
   const getPoolId = async () => {
-    const activePools = await wallet.stakePoolProvider.queryStakePools({
+    const activePools = await stakePoolProvider.queryStakePools({
       filters: { status: [StakePoolStatus.Active] },
       pagination: { limit: 1, startAt: 0 }
     });
@@ -185,7 +186,7 @@ describe('PersonalWallet/conwayTransactions', () => {
     rewardAccount = await firstValueFrom(wallet.addresses$.pipe(map((addresses) => addresses[0].rewardAccount)));
 
     return {
-      hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(RewardAccount.toHash(rewardAccount)),
+      hash: RewardAccount.toHash(rewardAccount),
       type: CredentialType.KeyHash
     };
   };
@@ -237,7 +238,13 @@ describe('PersonalWallet/conwayTransactions', () => {
     // TODO: remove once mainnet hardforks to conway-era, and this becomes "the norm"
     setInConwayEra(true);
 
-    [wallet, dRepWallet] = await Promise.all([
+    [
+      {
+        wallet,
+        providers: { stakePoolProvider }
+      },
+      { wallet: dRepWallet }
+    ] = await Promise.all([
       getTestWallet(0, 'Conway Wallet', 100_000_000n),
       getTestWallet(1, 'Conway DRep Wallet', 0n)
     ]);

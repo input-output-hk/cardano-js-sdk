@@ -7,7 +7,7 @@ export const rewardAccount = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r
 export const rewardAccount2 = Cardano.RewardAccount('stake_test1uqrw9tjymlm8wrwq7jk68n6v7fs9qz8z0tkdkve26dylmfc2ux2hj');
 export const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
 export const stakeCredential = {
-  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+  hash: stakeKeyHash,
   type: Cardano.CredentialType.KeyHash
 };
 

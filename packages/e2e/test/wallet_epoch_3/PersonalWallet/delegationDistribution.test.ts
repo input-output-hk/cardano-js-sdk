@@ -1,5 +1,5 @@
 import { BaseWallet, DelegatedStake, createUtxoBalanceByAddressTracker } from '@cardano-sdk/wallet';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
 import { MINUTE, firstValueFromTimed, getWallet, submitAndConfirm, walletReady } from '../../../src';
 import { Observable, filter, firstValueFrom, map, tap } from 'rxjs';
 import { Percent } from '@cardano-sdk/util';
@@ -79,8 +79,8 @@ const deregisterAllStakeKeys = async (wallet: BaseWallet): Promise<void> => {
   }
 };
 
-const getPoolIds = async (wallet: BaseWallet): Promise<Cardano.StakePool[]> => {
-  const activePools = await wallet.stakePoolProvider.queryStakePools({
+const getPoolIds = async (stakePoolProvider: StakePoolProvider): Promise<Cardano.StakePool[]> => {
+  const activePools = await stakePoolProvider.queryStakePools({
     filters: { status: [Cardano.StakePoolStatus.Active] },
     pagination: { limit: POOLS_COUNT, startAt: 0 }
   });
@@ -91,9 +91,10 @@ const getPoolIds = async (wallet: BaseWallet): Promise<Cardano.StakePool[]> => {
 /** Delegate to unique POOLS_COUNT pools. Use even distribution as default. */
 const delegateToMultiplePools = async (
   wallet: BaseWallet,
+  stakePoolProvider: StakePoolProvider,
   weights = Array.from({ length: POOLS_COUNT }).map(() => 1)
 ) => {
-  const poolIds = await getPoolIds(wallet);
+  const poolIds = await getPoolIds(stakePoolProvider);
   const portfolio: Cardano.Cip17DelegationPortfolio = {
     name: 'Test Portfolio',
     pools: poolIds.map(({ hexId: id }, idx) => ({ id, weight: weights[idx] }))
@@ -105,10 +106,13 @@ const delegateToMultiplePools = async (
   return { poolIds, portfolio };
 };
 
-const delegateAllToSinglePool = async (wallet: BaseWallet): Promise<Cardano.StakePool> => {
+const delegateAllToSinglePool = async (
+  wallet: BaseWallet,
+  stakePoolProvider: StakePoolProvider
+): Promise<Cardano.StakePool> => {
   // This is a negative testcase, simulating an HD wallet that has multiple stake keys delegated
   // to the same stake pool. txBuilder.delegatePortfolio does not support this scenario.
-  const [pool] = await getPoolIds(wallet);
+  const [pool] = await getPoolIds(stakePoolProvider);
   const txBuilder = wallet.createTxBuilder();
   const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
   txBuilder.partialTxBody.certificates = rewardAccounts.map(({ address }) =>
@@ -123,9 +127,13 @@ const delegateAllToSinglePool = async (wallet: BaseWallet): Promise<Cardano.Stak
 
 describe('PersonalWallet/delegationDistribution', () => {
   let wallet: BaseWallet;
+  let stakePoolProvider: StakePoolProvider;
 
   beforeAll(async () => {
-    wallet = (await getWallet({ env, idx: 3, logger, name: 'Wallet' })).wallet;
+    ({
+      providers: { stakePoolProvider },
+      wallet
+    } = await getWallet({ env, idx: 3, logger, name: 'Wallet' }));
     await fundWallet(wallet);
     await deregisterAllStakeKeys(wallet);
   });
@@ -144,7 +152,7 @@ describe('PersonalWallet/delegationDistribution', () => {
     expect(delegationDistribution).toEqual(new Map());
     expect(delegationPortfolio).toEqual(null);
 
-    const { poolIds, portfolio } = await delegateToMultiplePools(wallet);
+    const { poolIds, portfolio } = await delegateToMultiplePools(wallet, stakePoolProvider);
     const walletAddresses = await firstValueFromTimed(wallet.addresses$);
     const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
 
@@ -187,6 +195,7 @@ describe('PersonalWallet/delegationDistribution', () => {
     // Delegate so that last address has all funds
     await delegateToMultiplePools(
       wallet,
+      stakePoolProvider,
       Array.from({ length: POOLS_COUNT }).map((_, idx) => (POOLS_COUNT === idx + 1 ? 1 : 0))
     );
 
@@ -217,7 +226,7 @@ describe('PersonalWallet/delegationDistribution', () => {
     );
 
     // Delegate all reward accounts to the same pool. delegationDistribution$ should have 1 entry with 100% distribution
-    const pool = await delegateAllToSinglePool(wallet);
+    const pool = await delegateAllToSinglePool(wallet, stakePoolProvider);
     simplifiedDelegationDistribution = await firstValueFrom(
       wallet.delegation.distribution$.pipe(
         tap((distribution) => {

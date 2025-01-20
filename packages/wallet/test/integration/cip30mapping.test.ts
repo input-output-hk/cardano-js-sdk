@@ -16,7 +16,7 @@ import {
   WithSenderContext
 } from '@cardano-sdk/dapp-connector';
 import { AddressType, Bip32Account, GroupedAddress, KeyRole, util } from '@cardano-sdk/key-management';
-import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
+import { AssetId, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BaseWallet, ObservableWallet, cip30, createPersonalWallet } from '../../src';
 import { CallbackConfirmation, GetCollateralCallbackParams } from '../../src/cip30';
 import {
@@ -27,6 +27,7 @@ import {
   TxSubmissionErrorCode,
   coalesceValueQuantities
 } from '@cardano-sdk/core';
+import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
@@ -40,7 +41,6 @@ import uniq from 'lodash/uniq.js';
 
 const {
   mockChainHistoryProvider,
-  mockDrepProvider,
   mockNetworkInfoProvider,
   mockRewardsProvider,
   mockTxSubmitProvider,
@@ -987,10 +987,9 @@ describe('cip30', () => {
         networkInfoProvider = mocks.mockNetworkInfoProvider();
         utxoProvider = mocks.mockUtxoProvider();
         const assetProvider = mocks.mockAssetProvider();
-        const stakePoolProvider = createStubStakePoolProvider();
+        const rewardAccountInfoProvider = mocks.mockRewardAccountInfoProvider();
         const rewardsProvider = mockRewardsProvider();
         const chainHistoryProvider = mockChainHistoryProvider();
-        const drepProvider = mockDrepProvider();
         const groupedAddress: GroupedAddress = {
           accountIndex: 0,
           address,
@@ -1009,11 +1008,10 @@ describe('cip30', () => {
             assetProvider,
             bip32Account,
             chainHistoryProvider,
-            drepProvider,
             logger,
             networkInfoProvider,
+            rewardAccountInfoProvider,
             rewardsProvider,
-            stakePoolProvider,
             txSubmitProvider,
             utxoProvider,
             witnesser: util.createBip32Ed25519Witnesser(asyncKeyAgent)
@@ -1036,7 +1034,7 @@ describe('cip30', () => {
             {
               __typename: Cardano.CertificateType.StakeDeregistration,
               stakeCredential: {
-                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(mocks.stakeKeyHash),
+                hash: mocks.stakeKeyHash,
                 type: Cardano.CredentialType.KeyHash
               }
             } as Cardano.StakeAddressCertificate
@@ -1164,9 +1162,9 @@ describe('cip30', () => {
           tx.body.certificates = [
             {
               __typename: Cardano.CertificateType.StakeDelegation,
-              poolId: Cardano.PoolId.fromKeyHash(foreignRewardAccountHash),
+              poolId: Cardano.PoolId.fromKeyHash(Ed25519KeyHashHex(foreignRewardAccountHash)),
               stakeCredential: {
-                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+                hash: foreignRewardAccountHash,
                 type: Cardano.CredentialType.KeyHash
               }
             } as Cardano.StakeDelegationCertificate,
@@ -1241,9 +1239,9 @@ describe('cip30', () => {
           tx.body.certificates = [
             {
               __typename: Cardano.CertificateType.StakeDelegation,
-              poolId: Cardano.PoolId.fromKeyHash(foreignRewardAccountHash),
+              poolId: Cardano.PoolId.fromKeyHash(Ed25519KeyHashHex(foreignRewardAccountHash)),
               stakeCredential: {
-                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(foreignRewardAccountHash),
+                hash: foreignRewardAccountHash,
                 type: Cardano.CredentialType.KeyHash
               }
             } as Cardano.StakeDelegationCertificate,

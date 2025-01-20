@@ -31,7 +31,7 @@ export class BlockfrostRewardsProvider extends BlockfrostProvider implements Rew
     }: Range<Cardano.EpochNo> = {}
   ): Promise<Reward[]> {
     const batchSize = 100;
-    return fetchSequentially<Reward, Responses['account_reward_content'][0]>({
+    return fetchSequentially<Responses['account_reward_content'][0], Reward>({
       haveEnoughItems: (_, rewardsPage) => {
         const lastReward = rewardsPage[rewardsPage.length - 1];
         return !lastReward || lastReward.epoch >= upperBound;

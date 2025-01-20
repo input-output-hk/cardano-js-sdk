@@ -22,7 +22,7 @@ const buildQueryString = ({ page, count, order }: PaginationOptions) => {
 };
 
 // copied from @cardano-sdk/cardano-services and updated to use custom blockfrost client instead of blockfrost-js
-export const fetchSequentially = async <Item, Response>(
+export const fetchSequentially = async <Response, Item = Response>(
   props: {
     request: (paginationQueryString: string) => Promise<Response[]>;
     responseTranslator?: (response: Response[]) => Item[];
@@ -42,7 +42,7 @@ export const fetchSequentially = async <Item, Response>(
     const newAccumulatedItems = [...accumulated, ...maybeTranslatedResponse] as Item[];
     const haveEnoughItems = props.haveEnoughItems?.(newAccumulatedItems, response);
     if (response.length === count && !haveEnoughItems) {
-      return fetchSequentially<Item, Response>(props, page + 1, newAccumulatedItems);
+      return fetchSequentially<Response, Item>(props, page + 1, newAccumulatedItems);
     }
     return newAccumulatedItems;
   } catch (error) {

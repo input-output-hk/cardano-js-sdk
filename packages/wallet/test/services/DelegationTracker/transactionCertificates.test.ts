@@ -8,7 +8,7 @@ describe('transactionCertificates', () => {
     const rewardAccount = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
     const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
     const stakeCredential = {
-      hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyHash),
+      hash: stakeKeyHash,
       type: Cardano.CredentialType.KeyHash
     };
 

@@ -55,6 +55,7 @@ export interface DocumentStore<T> extends Destroyable {
    * @returns {Observable} Emits undefined and completes. Completes without emitting if the store is destroyed.
    */
   set(doc: T): Observable<void>;
+  delete(): Observable<void>;
 }
 
 export type KeyValueCollection<K, V> = { key: K; value: V };
@@ -77,10 +78,11 @@ export interface WalletStores extends Destroyable {
   utxo: CollectionStore<Cardano.Utxo>;
   unspendableUtxo: CollectionStore<Cardano.Utxo>;
   transactions: OrderedCollectionStore<Cardano.HydratedTx>;
+  delegationPortfolio: DocumentStore<Cardano.Cip17DelegationPortfolio>;
   inFlightTransactions: DocumentStore<TxInFlight[]>;
   volatileTransactions: DocumentStore<OutgoingOnChainTx[]>;
   rewardsHistory: KeyValueStore<Cardano.RewardAccount, Reward[]>;
-  rewardsBalances: KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>;
+  rewardAccountInfo: KeyValueStore<Cardano.RewardAccount, Cardano.RewardAccountInfo>;
   stakePools: KeyValueStore<Cardano.PoolId, Cardano.StakePool>;
   protocolParameters: DocumentStore<Cardano.ProtocolParameters>;
   genesisParameters: DocumentStore<Cardano.CompactGenesis>;

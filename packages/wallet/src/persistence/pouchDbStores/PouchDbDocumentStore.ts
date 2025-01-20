@@ -1,5 +1,5 @@
 import { DocumentStore } from '../types';
-import { EMPTY, Observable } from 'rxjs';
+import { EMPTY, Observable, from } from 'rxjs';
 import { Logger } from 'ts-log';
 import { PouchDbStore } from './PouchDbStore';
 import { sanitizePouchDbDoc } from './util';
@@ -33,5 +33,19 @@ export class PouchDbDocumentStore<T extends {}> extends PouchDbStore<T> implemen
 
   set(doc: T): Observable<void> {
     return this.forcePut(this.#docId, doc);
+  }
+
+  delete(): Observable<void> {
+    if (this.destroyed) return EMPTY;
+    return from(
+      (async () => {
+        const _rev = await this.getRev(this.#docId);
+        if (!_rev) {
+          // assuming already deleted
+          return;
+        }
+        await this.db.remove({ _id: this.#docId, _rev });
+      })()
+    );
   }
 }

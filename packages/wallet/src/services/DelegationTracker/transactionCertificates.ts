@@ -1,4 +1,3 @@
-import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, getCertificatesByType } from '@cardano-sdk/core';
 import { Observable, combineLatest, distinctUntilChanged, map } from 'rxjs';
 import { isNotNil } from '@cardano-sdk/util';
@@ -10,9 +9,7 @@ export const lastStakeKeyCertOfType = <K extends Cardano.RegAndDeregCertificateT
   certTypes: readonly K[],
   rewardAccount?: Cardano.RewardAccount
 ) => {
-  const stakeKeyHash = rewardAccount
-    ? Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount))
-    : null;
+  const stakeKeyHash = rewardAccount ? Cardano.RewardAccount.toHash(rewardAccount) : null;
   const lastRegOrDereg = last(
     transactionsCertificates
       .map((certificates) => {
