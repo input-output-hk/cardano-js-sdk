@@ -154,7 +154,7 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
                     const wallet = request.requestContext.wallet as InMemoryWallet<WalletMetadata, AccountMetadata>;
                     try {
                       const result = await sign(
-                        this.#keyAgentFactory.InMemory({
+                        await this.#keyAgentFactory.InMemory({
                           accountIndex: account.accountIndex,
                           chainId: request.requestContext.chainId,
                           encryptedRootPrivateKeyBytes: [
@@ -184,14 +184,14 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
                   async (options?: SignOptions) =>
                     sign(
                       request.walletType === WalletType.Ledger
-                        ? this.#keyAgentFactory.Ledger({
+                        ? await this.#keyAgentFactory.Ledger({
                             accountIndex: request.requestContext.accountIndex,
                             chainId: request.requestContext.chainId,
                             communicationType: this.#hwOptions.communicationType,
                             extendedAccountPublicKey: account.extendedAccountPublicKey,
                             purpose: account.purpose || KeyPurpose.STANDARD
                           })
-                        : this.#keyAgentFactory.Trezor({
+                        : await this.#keyAgentFactory.Trezor({
                             accountIndex: request.requestContext.accountIndex,
                             chainId: request.requestContext.chainId,
                             extendedAccountPublicKey: account.extendedAccountPublicKey,

@@ -198,8 +198,6 @@ const passphraseByteArray = Uint8Array.from(
 );
 
 const initSigningCoordinator = async () => {
-  const bip32Ed25519 = await Crypto.SodiumBip32Ed25519.create();
-
   const signingCoordinator = new SigningCoordinator(
     {
       hwOptions: {
@@ -212,7 +210,7 @@ const initSigningCoordinator = async () => {
     },
     {
       keyAgentFactory: createKeyAgentFactory({
-        bip32Ed25519,
+        getBip32Ed25519: Crypto.SodiumBip32Ed25519.create,
         logger
       }),
       logger

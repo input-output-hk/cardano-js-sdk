@@ -127,7 +127,7 @@ const signingCoordinator = new SigningCoordinator(
   },
   {
     keyAgentFactory: createKeyAgentFactory({
-      bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
+      getBip32Ed25519: Crypto.SodiumBip32Ed25519.create,
       logger
     }),
     logger
