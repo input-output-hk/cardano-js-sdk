@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.38.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.37.7...@cardano-sdk/web-extension@0.38.0) (2025-01-21)
+
+### ⚠ BREAKING CHANGES
+
+* **web-extension:** make KeyAgentFactory methods async
+
+### Code Refactoring
+
+* **web-extension:** make KeyAgentFactory methods async ([069b2b5](https://github.com/input-output-hk/cardano-js-sdk/commit/069b2b5263505652b9b81200707812a3280f88e5)), closes [#1558](https://github.com/input-output-hk/cardano-js-sdk/issues/1558)
+
 ## [0.37.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.37.6...@cardano-sdk/web-extension@0.37.7) (2025-01-20)
 
 ### Features
