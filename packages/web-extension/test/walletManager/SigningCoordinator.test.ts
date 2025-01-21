@@ -73,7 +73,7 @@ describe('SigningCoordinator', () => {
       signCip8Data: jest.fn(),
       signTransaction: jest.fn()
     } as unknown as jest.Mocked<InMemoryKeyAgent>;
-    keyAgentFactory.InMemory.mockReturnValue(keyAgent);
+    keyAgentFactory.InMemory.mockResolvedValue(keyAgent);
   });
 
   describe('signTransaction', () => {
