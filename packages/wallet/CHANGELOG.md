@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.51.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.51.0...@cardano-sdk/wallet@0.51.1) (2025-01-22)
+
+### Features
+
+* **wallet:** fetch asset info of all assets in balance ([b3c871f](https://github.com/input-output-hk/cardano-js-sdk/commit/b3c871f0106b7b18ae3e063a30c1ae66c05b6541))
+
 ## [0.51.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.50.0...@cardano-sdk/wallet@0.51.0) (2025-01-20)
 
 ### ⚠ BREAKING CHANGES

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.25.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.24.0...@cardano-sdk/cardano-services-client@0.25.0) (2025-01-22)
+
+### ⚠ BREAKING CHANGES
+
+* **cardano-services-client:** return up to limit*addresses.length # of transactions
+
+### Bug Fixes
+
+* **cardano-services-client:** return up to limit*addresses.length # of transactions ([e555950](https://github.com/input-output-hk/cardano-js-sdk/commit/e5559501bf7748c3daf589b6764a608f6b58c870))
+
 ## [0.24.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.23.7...@cardano-sdk/cardano-services-client@0.24.0) (2025-01-20)
 
 ### ⚠ BREAKING CHANGES
