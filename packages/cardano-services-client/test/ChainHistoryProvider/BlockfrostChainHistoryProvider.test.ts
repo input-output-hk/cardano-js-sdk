@@ -11,8 +11,14 @@ describe('blockfrostChainHistoryProvider', () => {
   let provider: BlockfrostChainHistoryProvider;
   let networkInfoProvider: NetworkInfoProvider;
 
+  const txId1 = Cardano.TransactionId('1e043f100dce12d107f679685acd2fc0610e10f72a92d412794c9773d11d8477');
+  const txId2 = Cardano.TransactionId('2e043f100dce12d107f679685acd2fc0610e10f72a92d412794c9773d11d8477');
+  const address1 = Cardano.PaymentAddress('2cWKMJemoBai9J7kVvRTukMmdfxtjL9z7c396rTfrrzfAZ6EeQoKLC2y1k34hswwm4SVr');
+  const address2 = Cardano.PaymentAddress(
+    'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x'
+  );
   const txsUtxosResponse = {
-    hash: '4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6',
+    hash: txId1,
     inputs: [
       {
         address:
@@ -58,13 +64,13 @@ describe('blockfrostChainHistoryProvider', () => {
       }
     ]
   };
-  const mockedTxResponse = {
+  const mockedTx1Response = {
     asset_mint_or_burn_count: 5,
     block: '356b7d7dbb696ccd12775c016941057a9dc70898d87a63fc752271bb46856940',
     block_height: 123_456,
     delegation_count: 0,
     fees: '182485',
-    hash: '1e043f100dce12d107f679685acd2fc0610e10f72a92d412794c9773d11d8477',
+    hash: txId1,
     index: 1,
     invalid_before: null,
     invalid_hereafter: '13885913',
@@ -88,6 +94,10 @@ describe('blockfrostChainHistoryProvider', () => {
     utxo_count: 5,
     valid_contract: true,
     withdrawal_count: 1
+  };
+  const mockedTx2Response = {
+    ...mockedTx1Response,
+    hash: txId2
   };
   const mockedMetadataResponse = [
     {
@@ -186,11 +196,20 @@ describe('blockfrostChainHistoryProvider', () => {
       unit_steps: '476468'
     }
   ];
+
   const mockedAddressTransactionResponse: Responses['address_transactions_content'] = [
     {
       block_height: 123,
       block_time: 131_322,
-      tx_hash: '1e043f100dce12d107f679685acd2fc0610e10f72a92d412794c9773d11d8477',
+      tx_hash: txId1,
+      tx_index: 0
+    }
+  ];
+  const mockedAddress2TransactionResponse: Responses['address_transactions_content'] = [
+    {
+      block_height: 124,
+      block_time: 131_322,
+      tx_hash: txId2,
       tx_index: 0
     }
   ];
@@ -352,25 +371,30 @@ describe('blockfrostChainHistoryProvider', () => {
       ])
     } as unknown as NetworkInfoProvider;
     provider = new BlockfrostChainHistoryProvider(client, networkInfoProvider, logger);
-    const txId = Cardano.TransactionId('1e043f100dce12d107f679685acd2fc0610e10f72a92d412794c9773d11d8477');
-    const id = txId.toString();
     mockResponses(request, [
-      [`txs/${id}/utxos`, txsUtxosResponse],
-      [`txs/${id}`, mockedTxResponse],
-      [`txs/${id}/metadata`, mockedMetadataResponse],
-      [`txs/${id}/mirs`, mockedMirResponse],
-      [`txs/${id}/pool_updates`, mockedPoolUpdateResponse],
-      [`txs/${id}/pool_retires`, mockedPoolRetireResponse],
-      [`txs/${id}/stakes`, mockedStakeResponse],
-      [`txs/${id}/delegations`, mockedDelegationResponse],
-      [`txs/${id}/withdrawals`, mockedWithdrawalResponse],
-      [`txs/${id}/redeemers`, mockedReedemerResponse],
-      [
-        `addresses/${Cardano.PaymentAddress(
-          '2cWKMJemoBai9J7kVvRTukMmdfxtjL9z7c396rTfrrzfAZ6EeQoKLC2y1k34hswwm4SVr'
-        ).toString()}/transactions?page=1&count=20`,
-        mockedAddressTransactionResponse
-      ],
+      [`txs/${txId1}/utxos`, txsUtxosResponse],
+      [`txs/${txId1}`, mockedTx1Response],
+      [`txs/${txId1}/metadata`, mockedMetadataResponse],
+      [`txs/${txId1}/mirs`, mockedMirResponse],
+      [`txs/${txId1}/pool_updates`, mockedPoolUpdateResponse],
+      [`txs/${txId1}/pool_retires`, mockedPoolRetireResponse],
+      [`txs/${txId1}/stakes`, mockedStakeResponse],
+      [`txs/${txId1}/delegations`, mockedDelegationResponse],
+      [`txs/${txId1}/withdrawals`, mockedWithdrawalResponse],
+      [`txs/${txId1}/redeemers`, mockedReedemerResponse],
+      [`txs/${txId2}/utxos`, txsUtxosResponse],
+      [`txs/${txId2}`, mockedTx2Response],
+      [`txs/${txId2}/metadata`, mockedMetadataResponse],
+      [`txs/${txId2}/mirs`, mockedMirResponse],
+      [`txs/${txId2}/pool_updates`, mockedPoolUpdateResponse],
+      [`txs/${txId2}/pool_retires`, mockedPoolRetireResponse],
+      [`txs/${txId2}/stakes`, mockedStakeResponse],
+      [`txs/${txId2}/delegations`, mockedDelegationResponse],
+      [`txs/${txId2}/withdrawals`, mockedWithdrawalResponse],
+      [`txs/${txId2}/redeemers`, mockedReedemerResponse],
+      [`addresses/${address1}/transactions?page=1&count=20`, mockedAddressTransactionResponse],
+      [`addresses/${address1}/transactions?page=1&count=1`, mockedAddressTransactionResponse],
+      [`addresses/${address2}/transactions?page=1&count=1`, mockedAddress2TransactionResponse],
       [
         `addresses/${Cardano.PaymentAddress(
           'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x'
@@ -382,7 +406,7 @@ describe('blockfrostChainHistoryProvider', () => {
         mockedAddressTransactionDescResponse
       ],
       ['epochs/420000/parameters', mockedEpochParametersResponse],
-      [`txs/${id}/cbor`, new Error('CBOR is null')]
+      [`txs/${txId1}/cbor`, new Error('CBOR is null')]
     ]);
   });
 
@@ -394,7 +418,7 @@ describe('blockfrostChainHistoryProvider', () => {
           pagination: { limit: 20, startAt: 0 }
         });
 
-        expect(response.totalResultCount).toBe(1);
+        expect(response.totalResultCount).toBe(mockedAddressTransactionResponse.length);
         expect(response.pageResults[0]).toEqual(expectedHydratedTx);
       });
       test('supports desc order', async () => {
@@ -417,6 +441,16 @@ describe('blockfrostChainHistoryProvider', () => {
         });
         expect(response.pageResults).toHaveLength(mockedAddressTransactionResponse.length);
         expect(response.totalResultCount).toBe(mockedAddressTransactionResponse.length);
+      });
+      test('returns up to the {limit*addresses.length} number of transactions', async () => {
+        const response = await provider.transactionsByAddresses({
+          addresses: [address1, address2],
+          pagination: { limit: 1, startAt: 0 }
+        });
+
+        const totalResultCount = mockedAddressTransactionResponse.length + mockedAddress2TransactionResponse.length;
+        expect(response.totalResultCount).toBe(totalResultCount);
+        expect(response.pageResults.length).toBe(totalResultCount);
       });
     });
 
@@ -514,7 +548,7 @@ describe('blockfrostChainHistoryProvider', () => {
       const id = txId.toString();
       mockResponses(request, [
         [`txs/${id}/utxos`, txsUtxosResponse],
-        [`txs/${id}`, mockedTxResponse],
+        [`txs/${id}`, mockedTx1Response],
         [`txs/${id}/metadata`, mockedMetadataResponse],
         [`txs/${id}/mirs`, mockedMirResponse],
         [`txs/${id}/pool_updates`, mockedPoolUpdateResponse],
@@ -541,7 +575,7 @@ describe('blockfrostChainHistoryProvider', () => {
           pagination: { limit: 20, startAt: 0 }
         });
 
-        expect(response.totalResultCount).toBe(1);
+        expect(response.totalResultCount).toBe(mockedAddressTransactionResponse.length);
         expect(response.pageResults[0]).toEqual(expectedHydratedTxCBOR);
       });
     });

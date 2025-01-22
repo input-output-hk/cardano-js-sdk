@@ -522,17 +522,15 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
 
       const allTransactions = addressTransactions.flat(1);
 
-      const dedupedSortedTransactions = uniq(
+      const dedupedSortedTransactionsIds = uniq(
         allTransactions
           .filter(({ block_height }) => block_height >= lowerBound && block_height <= upperBound)
           .sort(pagination.order === 'desc' ? (a, b) => compareTx(b, a) : compareTx)
           .map(({ tx_hash }) => Cardano.TransactionId(tx_hash))
       );
-      const ids = dedupedSortedTransactions.slice(pagination.startAt, pagination.limit);
+      const pageResults = await this.transactionsByHashes({ ids: dedupedSortedTransactionsIds });
 
-      const pageResults = await this.transactionsByHashes({ ids });
-
-      return { pageResults, totalResultCount: dedupedSortedTransactions.length };
+      return { pageResults, totalResultCount: dedupedSortedTransactionsIds.length };
     } catch (error) {
       throw this.toProviderError(error);
     }
