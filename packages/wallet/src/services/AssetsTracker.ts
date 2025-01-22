@@ -5,6 +5,7 @@ import { Logger } from 'ts-log';
 import {
   Observable,
   buffer,
+  combineLatest,
   concat,
   connect,
   debounceTime,
@@ -151,6 +152,11 @@ export const createAssetService =
     ).pipe(map((arr) => arr.flat())); // Concatenate the chunk results
 
 export type AssetService = ReturnType<typeof createAssetService>;
+export type UtxoTotalBalance = {
+  utxo: {
+    total$: BalanceTracker['utxo']['total$'];
+  };
+};
 
 export interface AssetsTrackerProps {
   transactionsTracker: TransactionsTracker;
@@ -158,7 +164,7 @@ export interface AssetsTrackerProps {
   retryBackoffConfig: RetryBackoffConfig;
   logger: Logger;
   assetsCache$: Observable<Assets>;
-  balanceTracker: BalanceTracker;
+  balanceTracker: UtxoTotalBalance;
   maxAssetInfoCacheAge?: Milliseconds;
 }
 
@@ -198,13 +204,14 @@ export const createAssetsTracker = (
     const allAssetIds = new Set<Cardano.AssetId>();
     const sharedHistory$ = history$.pipe(share());
     return concat(
-      sharedHistory$.pipe(
-        map((historyTxs) => uniq(historyTxs.flatMap(uniqueAssetIds))),
+      combineLatest([
+        sharedHistory$.pipe(map((historyTxs) => uniq(historyTxs.flatMap(uniqueAssetIds)))),
+        total$.pipe(map((balance) => [...(balance.assets?.keys() || [])]))
+      ]).pipe(
+        map(([txAssets, balanceAssets]) => uniq([...txAssets, ...balanceAssets])),
         tap((assetIds) =>
           logger.debug(
-            assetIds.length > 0
-              ? `Historical total assets: ${assetIds.length}`
-              : 'Setting assetProvider stats as initialized'
+            assetIds.length > 0 ? `Total assets: ${assetIds.length}` : 'Setting assetProvider stats as initialized'
           )
         ),
         tap((assetIds) => assetIds.length === 0 && assetProvider.setStatInitialized(assetProvider.stats.getAsset$)),

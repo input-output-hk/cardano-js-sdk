@@ -3,15 +3,16 @@ import { AssetId, createTestScheduler, generateRandomHexString, logger } from '@
 import {
   AssetService,
   AssetsTrackerProps,
-  BalanceTracker,
   TrackedAssetProvider,
   TransactionsTracker,
+  UtxoTotalBalance,
   createAssetService,
   createAssetsTracker
 } from '../../src/services';
 
-import { Observable, firstValueFrom, from, lastValueFrom, of, tap } from 'rxjs';
+import { Observable, concat, firstValueFrom, lastValueFrom, of, tap, timer } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
+import { toEmpty } from '@cardano-sdk/util-rxjs';
 
 const createTxWithValues = (values: Partial<Cardano.Value>[]): Cardano.HydratedTx =>
   ({ body: { outputs: values.map((value) => ({ value })) }, id: generateRandomHexString(64) } as Cardano.HydratedTx);
@@ -55,7 +56,7 @@ const assetInfo = {
 describe('createAssetsTracker', () => {
   let assetService: AssetService;
   let assetProvider: TrackedAssetProvider;
-  let balanceTracker: BalanceTracker;
+  let balanceTracker: UtxoTotalBalance;
   let assetsCache$: Observable<Map<Cardano.AssetId, Asset.AssetInfo>>;
   const retryBackoffConfig: RetryBackoffConfig = { initialInterval: 2 };
 
@@ -86,14 +87,8 @@ describe('createAssetsTracker', () => {
     } as unknown as TrackedAssetProvider;
 
     balanceTracker = {
-      rewardAccounts: {
-        deposit$: of(0n),
-        rewards$: of(0n)
-      },
       utxo: {
-        available$: of({ coins: 0n }),
-        total$: of({ coins: 0n }),
-        unspendable$: of({ coins: 0n })
+        total$: of({ coins: 0n })
       }
     };
 
@@ -141,6 +136,52 @@ describe('createAssetsTracker', () => {
       flush();
       expect(assetProvider.setStatInitialized).toBeCalledTimes(1); // only when there are no assets
       expect(assetService).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  it('fetches asset info for assets in balance but not in transaction history', () => {
+    createTestScheduler().run(({ cold, expectObservable, flush }) => {
+      const transactionsTracker: Partial<TransactionsTracker> = {
+        history$: cold('a', {
+          a: [createTxWithValues([{ assets: new Map([[AssetId.TSLA, 1n]]) }])]
+        })
+      };
+
+      balanceTracker = {
+        utxo: {
+          total$: cold('a', {
+            a: {
+              assets: new Map([
+                [AssetId.TSLA, 1n],
+                [AssetId.PXL, 2n]
+              ]),
+              coins: 1n
+            }
+          })
+        }
+      };
+
+      const target$ = createAssetsTracker(
+        {
+          assetProvider,
+          assetsCache$,
+          balanceTracker,
+          logger,
+          retryBackoffConfig,
+          transactionsTracker
+        } as unknown as AssetsTrackerProps,
+        {
+          assetService
+        }
+      );
+      expectObservable(target$).toBe('a', {
+        a: new Map([
+          [AssetId.TSLA, assetInfo.TSLA],
+          [AssetId.PXL, assetInfo.PXL]
+        ])
+      });
+      flush();
+      expect(assetService).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -349,9 +390,10 @@ describe('createAssetsTracker', () => {
     } as unknown as TrackedAssetProvider;
 
     const transactionsTracker: Partial<TransactionsTracker> = {
-      history$: from([
-        [createTxWithValues([{}])],
-        [
+      history$: concat(
+        of([createTxWithValues([{}])]),
+        timer(1).pipe(toEmpty),
+        of([
           createTxWithValues([
             {
               assets: new Map([
@@ -360,8 +402,8 @@ describe('createAssetsTracker', () => {
               ])
             }
           ])
-        ]
-      ])
+        ])
+      )
     };
 
     const target$ = createAssetsTracker({
