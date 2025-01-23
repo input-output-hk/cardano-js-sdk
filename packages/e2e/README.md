@@ -174,8 +174,8 @@ TEST_CLIENT_UTXO_PROVIDER=http
 TEST_CLIENT_UTXO_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000"}'
 TEST_CLIENT_STAKE_POOL_PROVIDER=stub
 TEST_CLIENT_STAKE_POOL_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000"}'
-TEST_CLIENT_HANDLE_PROVIDER=kora-labs
-TEST_CLIENT_HANDLE_PROVIDER_PARAMS='{"serverUrl":"http://localhost:4000","policyId":""}'
+TEST_CLIENT_HANDLE_PROVIDER=blockfrost
+TEST_CLIENT_HANDLE_PROVIDER_PARAMS='{"baseUrl":"http://localhost:3015"}'
 ```
 
 > :information_source: Notice that `KEY_MANAGEMENT_PARAMS.mnemonic` property is empty, if you leave this empty on the **local network's** e2e tests a new set of random mnemonics will be generated for you, this is the recommended way of setting up e2e tests on this network.
@@ -203,8 +203,8 @@ TEST_CLIENT_ASSET_PROVIDER=http
 TEST_CLIENT_ASSET_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/asset"}'
 TEST_CLIENT_CHAIN_HISTORY_PROVIDER=http
 TEST_CLIENT_CHAIN_HISTORY_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/chain-history"}'
-TEST_CLIENT_HANDLE_PROVIDER=kora-labs
-TEST_CLIENT_HANDLE_PROVIDER_PARAMS='{"serverUrl":"http://localhost:4000","policyId":""}'
+TEST_CLIENT_HANDLE_PROVIDER=blockfrost
+TEST_CLIENT_HANDLE_PROVIDER_PARAMS='{"baseUrl":"http://localhost:3015"}'
 TEST_CLIENT_NETWORK_INFO_PROVIDER=http
 TEST_CLIENT_NETWORK_INFO_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/network-info"}'
 TEST_CLIENT_REWARDS_PROVIDER=http

@@ -42,6 +42,7 @@ import {
   BlockfrostChainHistoryProvider,
   BlockfrostClient,
   BlockfrostDRepProvider,
+  BlockfrostHandleProvider,
   BlockfrostNetworkInfoProvider,
   BlockfrostRewardAccountInfoProvider,
   BlockfrostRewardsProvider,
@@ -379,6 +380,22 @@ handleProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger
 
   return new Promise<HandleProvider>(async (resolve) => {
     resolve(handleHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger }));
+  });
+});
+
+handleProviderFactory.register(BLOCKFROST_PROVIDER, async (params: any, logger): Promise<HandleProvider> => {
+  if (params.baseUrl === undefined) throw new Error(`${BlockfrostHandleProvider.name}: ${MISSING_URL_PARAM}`);
+
+  return new Promise<HandleProvider>(async (resolve) => {
+    resolve(
+      new BlockfrostHandleProvider(
+        new BlockfrostClient(
+          { apiVersion: params.apiVersion, baseUrl: params.baseUrl, projectId: params.projectId },
+          { rateLimiter: { schedule: (task) => task() } }
+        ),
+        logger
+      )
+    );
   });
 });
 
