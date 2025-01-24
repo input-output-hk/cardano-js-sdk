@@ -112,6 +112,7 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
 import { WalletStores, createInMemoryWalletStores } from '../persistence';
 import { getScriptAddress } from './internals';
+import { onlyDistinctBlockRefetch } from '../services/DrepInfoTracker';
 import isEqual from 'lodash/isEqual.js';
 import uniq from 'lodash/uniq.js';
 
@@ -521,7 +522,7 @@ export class BaseWallet implements ObservableWallet {
       knownAddresses$: this.addresses$,
       logger: contextLogger(this.#logger, 'delegation'),
       protocolParameters$: this.protocolParameters$,
-      refetchRewardAccountInfo$: this.#refetchRewardAccountInfo$,
+      refetchRewardAccountInfo$: onlyDistinctBlockRefetch(this.#refetchRewardAccountInfo$, this.tip$),
       retryBackoffConfig,
       rewardAccountAddresses$: this.addresses$.pipe(
         map((addresses) => uniq(addresses.map((groupedAddress) => groupedAddress.rewardAccount)))
