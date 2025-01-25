@@ -32,17 +32,20 @@ export const fetchSequentially = async <Response, Item = Response>(
     haveEnoughItems?: (allItems: Item[], lastResponseBatch: Response[]) => boolean;
     paginationOptions?: PaginationOptions;
   },
-  page = 1,
   accumulated: Item[] = []
 ): Promise<Item[]> => {
   const count = props.paginationOptions?.count || 100;
+  const page = props.paginationOptions?.page || 1;
   try {
     const response = await props.request(buildQueryString({ count, order: props.paginationOptions?.order, page }));
     const maybeTranslatedResponse = props.responseTranslator ? props.responseTranslator(response) : response;
     const newAccumulatedItems = [...accumulated, ...maybeTranslatedResponse] as Item[];
     const haveEnoughItems = props.haveEnoughItems?.(newAccumulatedItems, response);
     if (response.length === count && !haveEnoughItems) {
-      return fetchSequentially<Response, Item>(props, page + 1, newAccumulatedItems);
+      return fetchSequentially<Response, Item>(
+        { ...props, paginationOptions: { ...props.paginationOptions, page: page + 1 } },
+        newAccumulatedItems
+      );
     }
     return newAccumulatedItems;
   } catch (error) {
