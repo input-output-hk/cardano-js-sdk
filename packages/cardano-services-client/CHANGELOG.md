@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.25.0...@cardano-sdk/cardano-services-client@0.26.0) (2025-01-25)
+
+### ⚠ BREAKING CHANGES
+
+* **cardano-services-client:** remove positional arg `page` in  fetchSequentially
+
+### Bug Fixes
+
+* **cardano-services-client:** remove positional arg `page` in  fetchSequentially ([f2a815f](https://github.com/input-output-hk/cardano-js-sdk/commit/f2a815f3ab553cd000cbb69f415b01d152d0c48b))
+
 ## [0.25.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.24.0...@cardano-sdk/cardano-services-client@0.25.0) (2025-01-22)
 
 ### ⚠ BREAKING CHANGES
