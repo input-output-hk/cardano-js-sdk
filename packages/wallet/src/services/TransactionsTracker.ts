@@ -40,6 +40,8 @@ import { newAndStoredMulticast } from './util/newAndStoredMulticast';
 import chunk from 'lodash/chunk.js';
 import sortBy from 'lodash/sortBy.js';
 
+const ONE_MONTH_BLOCK_TIME = 21_600 * 6;
+
 export interface TransactionsTrackerProps {
   chainHistoryProvider: ChainHistoryProvider;
   addresses$: Observable<Cardano.PaymentAddress[]>;
@@ -140,7 +142,7 @@ const allTransactionsByAddresses = async (
 
         startAt += PAGE_SIZE;
         response = [...response, ...pageResults];
-      } while (pageResults.length === PAGE_SIZE);
+      } while (pageResults.length >= PAGE_SIZE);
     } else {
       const txes = await chainHistoryProvider.transactionsByAddresses({
         addresses: addressGroup,
@@ -201,6 +203,43 @@ export const revertLastBlock = (
   return deduplicateSortedArray(result, txEquals);
 };
 
+/**
+ * Fetches the last `historicalTransactionsFetchLimit` transactions for a set of addresses.
+ * If there is a single address, it returns the most recent ones up to `historicalTransactionsFetchLimit`. If there
+ * are more than one address, it returns all transaction from all addresses, one month back from the most recent transaction.
+ *
+ * @param {ChainHistoryProvider} chainHistoryProvider - The chain history provider used to fetch transaction history.
+ * @param {Cardano.PaymentAddress[]} addresses - A list of Cardano payment addresses to fetch transactions for.
+ * @param {number} historicalTransactionsFetchLimit - The maximum number of transactions to fetch in the initial pass.
+ * @returns {Promise<Cardano.HydratedTx[]>} A promise that resolves to a list of hydrated transactions from the given addresses.
+ */
+const fetchInitialTransactions = async (
+  chainHistoryProvider: ChainHistoryProvider,
+  addresses: Cardano.PaymentAddress[],
+  historicalTransactionsFetchLimit: number
+): Promise<Cardano.HydratedTx[]> => {
+  const firstPassTxs = await allTransactionsByAddresses(chainHistoryProvider, {
+    addresses,
+    filterBy: { limit: historicalTransactionsFetchLimit, type: 'tip' }
+  });
+
+  if (firstPassTxs.length === 0) {
+    return [];
+  }
+
+  if (addresses.length === 1) {
+    return firstPassTxs;
+  }
+
+  const highBlockNo = Cardano.BlockNo(Math.max(...firstPassTxs.map((tx) => tx.blockHeader.blockNo)));
+  const onMonthBack = Cardano.BlockNo(Math.max(highBlockNo - ONE_MONTH_BLOCK_TIME, 0));
+
+  return await allTransactionsByAddresses(chainHistoryProvider, {
+    addresses,
+    filterBy: { blockRange: { lowerBound: onMonthBack }, type: 'blockRange' }
+  });
+};
+
 const findIntersectionAndUpdateTxStore = ({
   chainHistoryProvider,
   historicalTransactionsFetchLimit,
@@ -245,12 +284,12 @@ const findIntersectionAndUpdateTxStore = ({
           );
 
         const lowerBound = lastStoredTransaction?.blockHeader.blockNo;
-        const newTransactions = await allTransactionsByAddresses(chainHistoryProvider, {
-          addresses,
-          filterBy: lowerBound
-            ? { blockRange: { lowerBound }, type: 'blockRange' }
-            : { limit: historicalTransactionsFetchLimit, type: 'tip' }
-        });
+        const newTransactions = await (lowerBound === undefined
+          ? fetchInitialTransactions(chainHistoryProvider, addresses, historicalTransactionsFetchLimit)
+          : allTransactionsByAddresses(chainHistoryProvider, {
+              addresses,
+              filterBy: { blockRange: { lowerBound }, type: 'blockRange' }
+            }));
 
         logger.debug(
           `chainHistoryProvider returned ${newTransactions.length} transactions`,
