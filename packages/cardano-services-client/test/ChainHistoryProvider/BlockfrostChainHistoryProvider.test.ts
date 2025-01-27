@@ -590,5 +590,25 @@ describe('blockfrostChainHistoryProvider', () => {
         expect(response[0]).toEqual(expectedHydratedTxCBOR);
       });
     });
+
+    test('caches transactions and returns them from the cache on subsequent calls', async () => {
+      const firstResponse = await provider.transactionsByHashes({
+        ids: ['1e043f100dce12d107f679685acd2fc0610e10f72a92d412794c9773d11d8477' as Cardano.TransactionId]
+      });
+
+      expect(firstResponse).toHaveLength(1);
+      expect(firstResponse[0]).toEqual(expectedHydratedTxCBOR);
+      expect(request).toHaveBeenCalled();
+
+      request.mockClear();
+
+      const secondResponse = await provider.transactionsByHashes({
+        ids: ['1e043f100dce12d107f679685acd2fc0610e10f72a92d412794c9773d11d8477' as Cardano.TransactionId]
+      });
+
+      expect(secondResponse).toHaveLength(1);
+      expect(secondResponse[0]).toEqual(expectedHydratedTxCBOR);
+      expect(request).not.toHaveBeenCalled();
+    });
   });
 });
