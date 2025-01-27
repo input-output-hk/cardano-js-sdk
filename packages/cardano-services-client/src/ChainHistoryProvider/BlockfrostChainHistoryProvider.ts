@@ -34,6 +34,7 @@ type BlockfrostTx = Pick<Responses['address_transactions_content'][0], 'block_he
 const compareTx = (a: BlockfrostTx, b: BlockfrostTx) => a.block_height - b.block_height || a.tx_index - b.tx_index;
 
 export class BlockfrostChainHistoryProvider extends BlockfrostProvider implements ChainHistoryProvider {
+  private readonly cache: Map<string, Cardano.HydratedTx> = new Map();
   private networkInfoProvider: NetworkInfoProvider;
 
   constructor(client: BlockfrostClient, networkInfoProvider: NetworkInfoProvider, logger: Logger) {
@@ -475,11 +476,20 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
   }
 
   public async transactionsByHashes({ ids }: TransactionsByIdsArgs): Promise<Cardano.HydratedTx[]> {
-    try {
-      return Promise.all(ids.map((id) => this.fetchTransaction(id)));
-    } catch (error) {
-      throw this.toProviderError(error);
-    }
+    return Promise.all(
+      ids.map(async (id) => {
+        if (this.cache.has(id)) {
+          return this.cache.get(id)!;
+        }
+        try {
+          const fetchedTransaction = await this.fetchTransaction(id);
+          this.cache.set(id, fetchedTransaction);
+          return fetchedTransaction;
+        } catch (error) {
+          throw this.toProviderError(error);
+        }
+      })
+    );
   }
 
   // eslint-disable-next-line sonarjs/cognitive-complexity

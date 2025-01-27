@@ -3,6 +3,8 @@ import { Cardano, Serialization, UtxoByAddressesArgs, UtxoProvider } from '@card
 import type { Responses } from '@blockfrost/blockfrost-js';
 
 export class BlockfrostUtxoProvider extends BlockfrostProvider implements UtxoProvider {
+  private readonly cache: Map<string, Cardano.Tx> = new Map();
+
   protected async fetchUtxos(addr: Cardano.PaymentAddress, paginationQueryString: string): Promise<Cardano.Utxo[]> {
     const queryString = `addresses/${addr.toString()}/utxos?${paginationQueryString}`;
     const utxos = await this.request<Responses['address_utxo_content']>(queryString);
@@ -27,7 +29,11 @@ export class BlockfrostUtxoProvider extends BlockfrostProvider implements UtxoPr
       });
   }
   protected async fetchDetailsFromCBOR(hash: string) {
-    return this.fetchCBOR(hash)
+    if (this.cache.has(hash)) {
+      return this.cache.get(hash);
+    }
+
+    const result = await this.fetchCBOR(hash)
       .then((cbor) => {
         const tx = Serialization.Transaction.fromCbor(Serialization.TxCBOR(cbor)).toCore();
         this.logger.info('Fetched details from CBOR for tx', hash);
@@ -37,7 +43,15 @@ export class BlockfrostUtxoProvider extends BlockfrostProvider implements UtxoPr
         this.logger.warn('Failed to fetch details from CBOR for tx', hash, error);
         return null;
       });
+
+    if (!result) {
+      return null;
+    }
+
+    this.cache.set(hash, result);
+    return result;
   }
+
   public async utxoByAddresses({ addresses }: UtxoByAddressesArgs): Promise<Cardano.Utxo[]> {
     try {
       const utxoResults = await Promise.all(

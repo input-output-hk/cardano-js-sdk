@@ -79,5 +79,29 @@ describe('blockfrostUtxoProvider', () => {
         }
       });
     });
+
+    test('does not call txs/${hash}/cbor when data is cached', async () => {
+      const txHash = '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5';
+
+      mockResponses(request, [
+        [`txs/${txHash}/cbor`, 'mockedCBORData'],
+        [`addresses/${address.toString()}/utxos?page=1&count=100`, generateUtxoResponseMock(1)],
+        [`addresses/${address.toString()}/utxos?page=2&count=100`, generateUtxoResponseMock(0)]
+      ]);
+
+      const firstResponse = await provider.utxoByAddresses({ addresses: [address] });
+
+      expect(firstResponse).toBeTruthy();
+      expect(firstResponse.length).toBe(1);
+
+      expect(request).toHaveBeenCalled();
+      request.mockClear();
+
+      const secondResponse = await provider.utxoByAddresses({ addresses: [address] });
+
+      expect(secondResponse).toEqual(firstResponse);
+
+      expect(request).not.toHaveBeenCalledWith(`txs/${txHash}/cbor`);
+    });
   });
 });
