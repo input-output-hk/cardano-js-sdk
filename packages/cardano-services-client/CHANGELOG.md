@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.26.0...@cardano-sdk/cardano-services-client@0.26.1) (2025-01-27)
+
+### Features
+
+* **cardano-services:** blockfrost chain history provider now caches transactions locally ([4687f72](https://github.com/input-output-hk/cardano-js-sdk/commit/4687f72ecafd3673ba22193ac5baa3ac87bdb6ca))
+* **cardano-services:** blockfrost utxo provider now caches utxos locally ([8cb0dac](https://github.com/input-output-hk/cardano-js-sdk/commit/8cb0dacdee74b9e341af091f88d408003e5f002e))
+
 ## [0.26.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.25.0...@cardano-sdk/cardano-services-client@0.26.0) (2025-01-25)
 
 ### ⚠ BREAKING CHANGES
