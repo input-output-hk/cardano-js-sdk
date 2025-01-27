@@ -148,7 +148,7 @@ in
         };
 
         ws-server = {
-          enabled = true;
+          enabled = false;
           resources.limits = mkPodResources "300Mi" "300m";
           resources.requests = mkPodResources "150Mi" "200m";
         };
