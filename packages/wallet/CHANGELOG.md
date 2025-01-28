@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.51.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.51.4...@cardano-sdk/wallet@0.51.5) (2025-01-28)
+
+### Features
+
+* **wallet:** add optional pollController$ dependency ([b75b9dc](https://github.com/input-output-hk/cardano-js-sdk/commit/b75b9dced7ae6dae8d0683159d36e24c3413196e))
+
 ## [0.51.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.51.3...@cardano-sdk/wallet@0.51.4) (2025-01-27)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
