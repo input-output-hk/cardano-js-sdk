@@ -36,6 +36,7 @@ describe('TipTracker', () => {
         logger,
         maxPollInterval: Number.MAX_VALUE,
         minPollInterval: pollInterval,
+        pollController$: of(true),
         provider$,
         store,
         syncStatus: { isSettled$: NEVER } as unknown as SyncStatus
@@ -62,6 +63,7 @@ describe('TipTracker', () => {
         logger,
         maxPollInterval: Number.MAX_VALUE,
         minPollInterval: poll,
+        pollController$: of(true),
         provider$,
         store,
         syncStatus: syncStatus as SyncStatus
@@ -84,6 +86,7 @@ describe('TipTracker', () => {
         logger,
         maxPollInterval: Number.MAX_VALUE,
         minPollInterval: pollInterval,
+        pollController$: of(true),
         provider$,
         store,
         syncStatus: syncStatus as SyncStatus
@@ -105,6 +108,7 @@ describe('TipTracker', () => {
         logger,
         maxPollInterval: Number.MAX_VALUE,
         minPollInterval: pollInterval,
+        pollController$: of(true),
         provider$,
         store,
         syncStatus: syncStatus as SyncStatus
@@ -131,6 +135,7 @@ describe('TipTracker', () => {
         logger,
         maxPollInterval: Number.MAX_VALUE,
         minPollInterval: pollInterval,
+        pollController$: of(true),
         provider$,
         store,
         syncStatus: syncStatus as SyncStatus
@@ -154,6 +159,7 @@ describe('TipTracker', () => {
         logger,
         maxPollInterval: 6,
         minPollInterval: pollInterval,
+        pollController$: of(true),
         provider$,
         store,
         syncStatus: syncStatus as SyncStatus
@@ -177,11 +183,35 @@ describe('TipTracker', () => {
         logger,
         maxPollInterval: Number.MAX_VALUE,
         minPollInterval: 0,
+        pollController$: of(true),
         provider$,
         store,
         syncStatus: syncStatus as SyncStatus
       });
       expectObservable(tracker$.asObservable()).toBe('x---a', mockTips);
+    });
+  });
+
+  it('is not polling while last poll$ emission is false', () => {
+    createTestScheduler().run(({ cold, hot, expectObservable }) => {
+      const poll$ = hot('t----f----t|', trueFalse);
+      const syncStatus: Partial<SyncStatus> = { isSettled$: cold('tftft', trueFalse) };
+      const provider$ = createStubObservable<Cardano.Tip>(
+        cold('a|', mockTips),
+        cold('b|', mockTips),
+        cold('c|', mockTips)
+      );
+      const tracker$ = new TipTracker({
+        connectionStatus$,
+        logger,
+        maxPollInterval: Number.MAX_VALUE,
+        minPollInterval: pollInterval,
+        pollController$: poll$,
+        provider$,
+        store,
+        syncStatus: syncStatus as SyncStatus
+      });
+      expectObservable(tracker$, '^-----------!').toBe('a--b------c', mockTips);
     });
   });
 
@@ -195,6 +225,7 @@ describe('TipTracker', () => {
         logger,
         maxPollInterval: 6,
         minPollInterval: 0,
+        pollController$: of(true),
         provider$,
         store,
         syncStatus: syncStatus as SyncStatus
