@@ -27,6 +27,8 @@ export interface TipTrackerProps {
   provider$: Observable<Cardano.Tip>;
   syncStatus: SyncStatus;
   connectionStatus$: Observable<ConnectionStatus>;
+  /** control whether tip tracker should be polling */
+  pollController$: Observable<boolean>;
   store: DocumentStore<Cardano.Tip>;
   /** Once */
   minPollInterval: Milliseconds;
@@ -46,7 +48,16 @@ export class TipTracker extends PersistentDocumentTrackerSubject<Cardano.Tip> {
   #logger: Logger;
 
   constructor(
-    { provider$, minPollInterval, maxPollInterval, store, syncStatus, connectionStatus$, logger }: TipTrackerProps,
+    {
+      provider$,
+      pollController$,
+      minPollInterval,
+      maxPollInterval,
+      store,
+      syncStatus,
+      connectionStatus$,
+      logger
+    }: TipTrackerProps,
     { externalTrigger$ = new Subject() }: TipTrackerInternals = {}
   ) {
     super(
@@ -63,14 +74,17 @@ export class TipTracker extends PersistentDocumentTrackerSubject<Cardano.Tip> {
             // trigger fetch on start
             startWith(null)
           ),
-          connectionStatus$
+          connectionStatus$,
+          pollController$
         ]).pipe(
-          tap(([, connectionStatus]) => {
-            logger.debug(connectionStatus === ConnectionStatus.down ? 'Skipping fetch tip' : 'Fetching tip...');
+          tap(([, connectionStatus, poll]) => {
+            logger.debug(
+              connectionStatus === ConnectionStatus.down || !poll ? 'Skipping fetch tip' : 'Fetching tip...'
+            );
           }),
           // Throttle syncing by interval, cancel ongoing request on external trigger
-          exhaustMap(([, connectionStatus]) =>
-            connectionStatus === ConnectionStatus.down
+          exhaustMap(([, connectionStatus, poll]) =>
+            connectionStatus === ConnectionStatus.down || !poll
               ? EMPTY
               : provider$.pipe(takeUntil(externalTrigger$.pipe(tap(() => logger.debug('Tip fetch canceled')))))
           ),

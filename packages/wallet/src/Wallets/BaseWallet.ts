@@ -189,6 +189,8 @@ export interface BaseWalletDependencies {
   readonly connectionStatusTracker$?: ConnectionStatusTracker;
   readonly publicCredentialsManager: PublicCredentialsManager;
   readonly inputResolver?: Cardano.InputResolver;
+  /** control whether tip tracker should be polling */
+  readonly pollController$?: Observable<boolean>;
 }
 
 export interface SubmitTxOptions {
@@ -327,7 +329,8 @@ export class BaseWallet implements ObservableWallet {
       publicCredentialsManager,
       stores = createInMemoryWalletStores(),
       connectionStatusTracker$ = createSimpleConnectionStatusTracker(),
-      inputResolver
+      inputResolver,
+      pollController$ = of(true)
     }: BaseWalletDependencies
   ) {
     this.#logger = contextLogger(logger, name);
@@ -397,6 +400,7 @@ export class BaseWallet implements ObservableWallet {
       logger: contextLogger(this.#logger, 'tip$'),
       maxPollInterval: maxInterval,
       minPollInterval: pollInterval,
+      pollController$,
       provider$: pollProvider({
         cancel$,
         logger: contextLogger(this.#logger, 'tip$'),
