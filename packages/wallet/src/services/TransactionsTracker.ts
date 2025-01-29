@@ -40,8 +40,6 @@ import { newAndStoredMulticast } from './util/newAndStoredMulticast';
 import chunk from 'lodash/chunk.js';
 import sortBy from 'lodash/sortBy.js';
 
-const ONE_MONTH_BLOCK_TIME = 21_600 * 6;
-
 export interface TransactionsTrackerProps {
   chainHistoryProvider: ChainHistoryProvider;
   addresses$: Observable<Cardano.PaymentAddress[]>;
@@ -218,26 +216,16 @@ const fetchInitialTransactions = async (
   addresses: Cardano.PaymentAddress[],
   historicalTransactionsFetchLimit: number
 ): Promise<Cardano.HydratedTx[]> => {
-  const firstPassTxs = await allTransactionsByAddresses(chainHistoryProvider, {
+  const transactions = await allTransactionsByAddresses(chainHistoryProvider, {
     addresses,
     filterBy: { limit: historicalTransactionsFetchLimit, type: 'tip' }
   });
 
-  if (firstPassTxs.length === 0) {
+  if (transactions.length === 0) {
     return [];
   }
 
-  if (addresses.length === 1) {
-    return firstPassTxs;
-  }
-
-  const highBlockNo = Cardano.BlockNo(Math.max(...firstPassTxs.map((tx) => tx.blockHeader.blockNo)));
-  const onMonthBack = Cardano.BlockNo(Math.max(highBlockNo - ONE_MONTH_BLOCK_TIME, 0));
-
-  return await allTransactionsByAddresses(chainHistoryProvider, {
-    addresses,
-    filterBy: { blockRange: { lowerBound: onMonthBack }, type: 'blockRange' }
-  });
+  return transactions.slice(0, historicalTransactionsFetchLimit);
 };
 
 const findIntersectionAndUpdateTxStore = ({

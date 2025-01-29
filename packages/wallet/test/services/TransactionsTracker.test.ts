@@ -64,7 +64,7 @@ const updateTransactionIds = (transactions: Cardano.HydratedTx[]) =>
 
 describe('TransactionsTracker', () => {
   const logger = dummyLogger;
-  const historicalTransactionsFetchLimit = 2;
+  const historicalTransactionsFetchLimit = 3;
 
   describe('newTransactions$', () => {
     it('considers transactions from 1st emission as old and emits only new transactions', () => {
