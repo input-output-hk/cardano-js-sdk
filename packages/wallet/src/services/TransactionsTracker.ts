@@ -40,7 +40,10 @@ import { newAndStoredMulticast } from './util/newAndStoredMulticast';
 import chunk from 'lodash/chunk.js';
 import sortBy from 'lodash/sortBy.js';
 
-const ONE_MONTH_BLOCK_TIME = 21_600 * 6;
+const DAYS_IN_EPOCH = 5;
+const BLOCKS_PER_EPOCH = 21_600;
+const BLOCKS_PER_DAY = BLOCKS_PER_EPOCH / DAYS_IN_EPOCH;
+const BLOCKS_PER_WEEK = BLOCKS_PER_DAY * 7;
 
 export interface TransactionsTrackerProps {
   chainHistoryProvider: ChainHistoryProvider;
@@ -232,7 +235,7 @@ const fetchInitialTransactions = async (
   }
 
   const highBlockNo = Cardano.BlockNo(Math.max(...firstPassTxs.map((tx) => tx.blockHeader.blockNo)));
-  const onMonthBack = Cardano.BlockNo(Math.max(highBlockNo - ONE_MONTH_BLOCK_TIME, 0));
+  const onMonthBack = Cardano.BlockNo(Math.max(highBlockNo - BLOCKS_PER_WEEK, 0));
 
   return await allTransactionsByAddresses(chainHistoryProvider, {
     addresses,
