@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.15.0...@cardano-sdk/hardware-ledger@0.15.1) (2025-01-30)
+
+### Bug Fixes
+
+* [lw-12138] handle disconnected ledger wallet error ([638b866](https://github.com/input-output-hk/cardano-js-sdk/commit/638b866636a8e2dad8f3f4581cae04778cfc0973))
+
 ## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.14.0...@cardano-sdk/hardware-ledger@0.15.0) (2025-01-20)
 
 ### ⚠ BREAKING CHANGES
