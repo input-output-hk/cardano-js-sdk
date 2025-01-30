@@ -377,12 +377,20 @@ export class LedgerKeyAgent extends KeyAgentBase {
   }
 
   private static attachDisconnectionCleanupHandler(transport: LedgerTransportType) {
-    const onDisconnect = () => {
+    const onDisconnect = async () => {
       transport.off('disconnect', onDisconnect);
       this.deviceConnections = this.deviceConnections.filter(
         ({ deviceConnection }) => deviceConnection.transport !== transport
       );
-      void transport.close();
+
+      try {
+        await transport.close();
+      } catch (error) {
+        // hw-transport-webusb also adds a disconnect event listener while creating a Ledger transport,
+        // so calling close() method will throw an error, since the device is already disconnected
+        if (error instanceof Error && error.message.includes('The device was disconnected.')) return;
+        throw new errors.TransportError('Failed to close transport after device disconnection', error);
+      }
     };
     transport.on('disconnect', onDisconnect);
   }
