@@ -401,7 +401,7 @@ export class CardanoWsClient extends WsProvider {
     };
 
     ws.onclose = () => {
-      this.logger.info('WebSocket client connection closed', this.clientId);
+      this.logger.debug('WebSocket client connection closed', this.clientId);
 
       if (this.heartbeatTimeout) {
         clearInterval(this.heartbeatTimeout);

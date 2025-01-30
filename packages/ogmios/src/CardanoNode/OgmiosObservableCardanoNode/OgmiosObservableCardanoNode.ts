@@ -90,7 +90,7 @@ const stateQueryRetryBackoffConfig = (
   ...retryConfig,
   shouldRetry: (error) => {
     if (retryableStateQueryErrors.has(CardanoNodeUtil.asCardanoNodeError(error)?.code)) {
-      logger.info('Local state query unavailable yet, will retry...');
+      logger.debug('Local state query unavailable yet, will retry...');
       return true;
     }
     return false;

@@ -623,7 +623,7 @@ export const getWallet = async (props: GetWalletProps) => {
   );
 
   const [{ address, rewardAccount }] = await firstValueFrom(wallet.addresses$);
-  logger.info(`Created wallet "${wallet.name}": ${address}/${rewardAccount}`);
+  logger.debug(`Created wallet "${wallet.name}": ${address}/${rewardAccount}`);
 
   const maxInterval =
     polling?.maxInterval ||
@@ -705,7 +705,7 @@ export const getSharedWallet = async (props: GetSharedWalletProps) => {
   );
 
   const [{ address, rewardAccount }] = await firstValueFrom(wallet.addresses$);
-  logger.info(`Created wallet "${wallet.name}": ${address}/${rewardAccount}`);
+  logger.debug(`Created wallet "${wallet.name}": ${address}/${rewardAccount}`);
 
   const maxInterval =
     polling?.maxInterval ||
