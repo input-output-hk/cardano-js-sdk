@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">32.76% </span>
+                <span class="strong">32.21% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>77/235</span>
+                <span class='fraction'>77/239</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">20.66% </span>
+                <span class="strong">20.16% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>25/121</span>
+                <span class='fraction'>25/124</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.03% </span>
+                <span class="strong">32.59% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>74/224</span>
+                <span class='fraction'>74/227</span>
             </div>
         
             
@@ -897,7 +897,15 @@
 <a name='L832'></a><a href='#L832'>832</a>
 <a name='L833'></a><a href='#L833'>833</a>
 <a name='L834'></a><a href='#L834'>834</a>
-<a name='L835'></a><a href='#L835'>835</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L835'></a><a href='#L835'>835</a>
+<a name='L836'></a><a href='#L836'>836</a>
+<a name='L837'></a><a href='#L837'>837</a>
+<a name='L838'></a><a href='#L838'>838</a>
+<a name='L839'></a><a href='#L839'>839</a>
+<a name='L840'></a><a href='#L840'>840</a>
+<a name='L841'></a><a href='#L841'>841</a>
+<a name='L842'></a><a href='#L842'>842</a>
+<a name='L843'></a><a href='#L843'>843</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1281,7 +1289,15 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -2110,12 +2126,20 @@ export class LedgerKeyAgent extends KeyAgentBase {
   }
 &nbsp;
   private <span class="fstat-no" title="function not covered" >static </span>attachDisconnectionCleanupHandler(transport: LedgerTransportType) {
-    const onDisconnect = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >() =</span>&gt; {</span>
+    const onDisconnect = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >async </span>() =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >      transport.off('disconnect', onDisconnect);</span>
 <span class="cstat-no" title="statement not covered" >      this.deviceConnections = this.deviceConnections.filter(</span>
 <span class="fstat-no" title="function not covered" >        ({</span> deviceConnection }) =&gt; <span class="cstat-no" title="statement not covered" >deviceConnection.transport !== transport</span>
       );
-<span class="cstat-no" title="statement not covered" >      void transport.close();</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      try {</span>
+<span class="cstat-no" title="statement not covered" >        await transport.close();</span>
+      } catch (error) {
+        // hw-transport-webusb also adds a disconnect event listener while creating a Ledger transport,
+        // so calling close() method will throw an error, since the device is already disconnected
+<span class="cstat-no" title="statement not covered" >        <span class="missing-if-branch" title="if path not taken" >I</span>if (error instanceof Error &amp;&amp; error.message.includes('The device was disconnected.')) <span class="cstat-no" title="statement not covered" >return;</span></span>
+<span class="cstat-no" title="statement not covered" >        throw new errors.TransportError('Failed to close transport after device disconnection', error);</span>
+      }
     };
 <span class="cstat-no" title="statement not covered" >    transport.on('disconnect', onDisconnect);</span>
   }
@@ -2572,7 +2596,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-29T09:05:05.973Z
+                at 2025-01-30T13:42:37.534Z
             </div>
         <script src="../prettify.js"></script>
         <script>
