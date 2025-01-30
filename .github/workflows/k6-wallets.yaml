@@ -1,7 +1,5 @@
 name: K6 Wallets Restoration load test
 on:
-  schedule:
-    - cron: '0 0 * * 6' # 00:00 every Saturday
   workflow_dispatch:
     inputs:
       environment:
