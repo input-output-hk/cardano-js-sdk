@@ -31,7 +31,7 @@ import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
-import { NEVER, firstValueFrom, of } from 'rxjs';
+import { NEVER, Observable, delay, firstValueFrom, of } from 'rxjs';
 import { Providers, createWallet } from './util';
 import { address_0_0, address_1_0, rewardAccount_0, rewardAccount_1 } from '../services/ChangeAddress/testData';
 import { buildDRepAddressFromDRepKey, signTx, waitForWalletStateSettle } from '../util';
@@ -188,6 +188,23 @@ describe('cip30', () => {
           expect(() =>
             utxos!.map((utxo) => Serialization.TransactionUnspentOutput.fromCbor(HexBlob(utxo)))
           ).not.toThrow();
+        });
+
+        it('subscribes to syncStatus.isSettled$ before utxo.available$', async () => {
+          const isSettled$ = wallet.syncStatus.isSettled$;
+          const available$ = wallet.utxo.available$;
+          let isSettledSubscribedAt: number;
+          let availableSubscribedAt: number;
+          wallet.syncStatus.isSettled$ = new Observable((observer) => {
+            if (!isSettledSubscribedAt) isSettledSubscribedAt = Date.now();
+            return isSettled$.pipe(delay(1)).subscribe(observer);
+          });
+          wallet.utxo.available$ = new Observable((observer) => {
+            if (!availableSubscribedAt) availableSubscribedAt = Date.now();
+            return available$.subscribe(observer);
+          });
+          await api.getUtxos(context);
+          expect(isSettledSubscribedAt!).toBeLessThan(availableSubscribedAt!);
         });
 
         describe('with "amount" argument', () => {

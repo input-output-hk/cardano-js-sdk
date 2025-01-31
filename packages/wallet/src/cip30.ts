@@ -17,13 +17,13 @@ import {
   WalletApiExtension,
   WithSenderContext
 } from '@cardano-sdk/dapp-connector';
-import { Cardano, Serialization, coalesceValueQuantities } from '@cardano-sdk/core';
+import { Cardano, Milliseconds, Serialization, coalesceValueQuantities } from '@cardano-sdk/core';
 import { Ed25519KeyHashHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { MessageSender } from '@cardano-sdk/key-management';
-import { Observable, firstValueFrom, from, map, mergeMap, race, throwError } from 'rxjs';
+import { Observable, filter, firstValueFrom, from, map, mergeMap, race, throwError, timeout } from 'rxjs';
 import { ObservableWallet } from './types';
 import { requiresForeignSignatures } from './services';
 import uniq from 'lodash/uniq.js';
@@ -83,6 +83,16 @@ export type CallbackConfirmation = {
   submitTx: (args: SubmitTxCallbackParams) => Promise<boolean>;
   getCollateral?: GetCollateralCallback;
 };
+
+const firstValueFromTimed = <T>(observable$: Observable<T>, timeoutAfter: Milliseconds) =>
+  firstValueFrom(
+    observable$.pipe(
+      timeout({ each: timeoutAfter, with: () => throwError(() => new ApiError(APIErrorCode.InternalError, 'Timeout')) })
+    )
+  );
+
+const waitForWalletStateSettle = (wallet: ObservableWallet, syncTimeout = Milliseconds(120_000)) =>
+  firstValueFromTimed(wallet.syncStatus.isSettled$.pipe(filter((isSettled) => isSettled)), syncTimeout);
 
 const mapCallbackFailure = (err: unknown, logger: Logger): false => {
   logger.error(err);
@@ -294,6 +304,7 @@ const baseCip30WalletApi = (
     logger.debug('getting balance');
     try {
       const wallet = await firstValueFrom(wallet$);
+      await waitForWalletStateSettle(wallet);
       const value = await firstValueFrom(wallet.balance.utxo.available$);
       return Serialization.Value.fromCore(value).toCbor();
     } catch (error) {
@@ -332,6 +343,7 @@ const baseCip30WalletApi = (
   > => {
     logger.debug('getting collateral');
     const wallet = await firstValueFrom(wallet$);
+    await waitForWalletStateSettle(wallet);
     let unspendables = await getSortedUtxos(wallet.utxo.unspendable$);
     const available = await getSortedUtxos(wallet.utxo.available$);
     // No available unspendable UTxO
@@ -441,6 +453,7 @@ const baseCip30WalletApi = (
     const scope = new ManagedFreeableScope();
     try {
       const wallet = await firstValueFrom(wallet$);
+      await waitForWalletStateSettle(wallet);
       let utxos = amount
         ? await selectUtxo(wallet, parseValueCbor(amount).toCore(), !!paginate)
         : await firstValueFrom(wallet.utxo.available$);
@@ -583,7 +596,7 @@ const baseCip30WalletApi = (
 
 const getPubStakeKeys = async (
   wallet$: Observable<ObservableWallet>,
-  filter: Cardano.StakeCredentialStatus.Registered | Cardano.StakeCredentialStatus.Unregistered
+  filterCredentialStatus: Cardano.StakeCredentialStatus.Registered | Cardano.StakeCredentialStatus.Unregistered
 ) => {
   const wallet = await firstValueFrom(wallet$);
   return firstValueFrom(
@@ -595,7 +608,7 @@ const getPubStakeKeys = async (
             credentialStatus === Cardano.StakeCredentialStatus.Registering
               ? Cardano.StakeCredentialStatus.Registered
               : Cardano.StakeCredentialStatus.Unregistered;
-          return filter === status;
+          return filterCredentialStatus === status;
         })
       ),
       map((keys) => keys.map(({ publicStakeKey }) => publicStakeKey))
