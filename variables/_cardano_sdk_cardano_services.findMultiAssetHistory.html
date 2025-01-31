@@ -18,7 +18,7 @@
 <h1>Variable findMultiAssetHistory<code class="tsd-tag ts-flagConst">Const</code> </h1></div>
 <div class="tsd-signature">find<wbr/>Multi<wbr/>Asset<wbr/>History<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;\n\tSELECT tx.hash AS hash, mint.quantity AS quantity\n\tFROM ma_tx_mint AS mint\n\tJOIN multi_asset AS ma ON mint.ident = ma.id\n\tJOIN tx ON tx.id = mint.tx_id\n\tWHERE ma.policy = $1 AND ma.name = $2\n&quot;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/8ad1432/packages/cardano-services/src/Asset/DbSyncAssetProvider/queries.ts#L26">packages/cardano-services/src/Asset/DbSyncAssetProvider/queries.ts:26</a></li></ul></aside></div>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/02543e8/packages/cardano-services/src/Asset/DbSyncAssetProvider/queries.ts#L26">packages/cardano-services/src/Asset/DbSyncAssetProvider/queries.ts:26</a></li></ul></aside></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
