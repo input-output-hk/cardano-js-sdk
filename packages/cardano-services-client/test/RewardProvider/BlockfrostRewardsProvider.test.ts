@@ -71,8 +71,8 @@ describe('blockfrostRewardsProvider', () => {
 
       expect(response).toEqual(
         new Map([
-          [rewardAccounts[0], [{ epoch: 98, rewards: 1000n }]],
-          [rewardAccounts[1], [{ epoch: 98, rewards: 1000n }]]
+          [rewardAccounts[0], [{ epoch: 98, poolId: Cardano.PoolId(pool_id), rewards: 1000n }]],
+          [rewardAccounts[1], [{ epoch: 98, poolId: Cardano.PoolId(pool_id), rewards: 1000n }]]
         ])
       );
     });
@@ -95,8 +95,8 @@ describe('blockfrostRewardsProvider', () => {
           [
             rewardAccounts[0],
             [
-              { epoch: 98, rewards: 1000n },
-              { epoch: 99, rewards: 1000n }
+              { epoch: 98, poolId: Cardano.PoolId(pool_id), rewards: 1000n },
+              { epoch: 99, poolId: Cardano.PoolId(pool_id), rewards: 1000n }
             ]
           ]
         ])

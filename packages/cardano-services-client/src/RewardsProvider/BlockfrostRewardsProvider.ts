@@ -44,9 +44,10 @@ export class BlockfrostRewardsProvider extends BlockfrostProvider implements Rew
       responseTranslator: (rewardsPage) =>
         rewardsPage
           .filter(({ epoch }) => lowerBound <= epoch && epoch <= upperBound)
-          .map(({ epoch, amount }) => ({
+          .map(({ epoch, amount, pool_id }) => ({
             epoch: Cardano.EpochNo(epoch),
-            rewards: stringToBigInt(amount)
+            rewards: stringToBigInt(amount),
+            ...(pool_id && { poolId: Cardano.PoolId(pool_id) })
           }))
     });
   }
