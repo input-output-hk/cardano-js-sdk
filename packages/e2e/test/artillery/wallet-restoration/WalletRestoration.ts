@@ -54,15 +54,15 @@ const extractAddresses = async (count: number): Promise<AddressesModel[]> => {
         throw new Error(`You can not restore more than ${dump.length} distinct wallets for ${network} network.`);
       }
       result = dump.slice(0, count);
-      logger.info(`Selected subset of predefined ${network} addresses with count: ${result.length}.`);
+      logger.debug(`Selected subset of predefined ${network} addresses with count: ${result.length}.`);
     } else if (env.DB_SYNC_CONNECTION_STRING) {
       const db = new Pool({ connectionString: env.DB_SYNC_CONNECTION_STRING });
-      logger.info('About to query db for distinct addresses.');
+      logger.debug('About to query db for distinct addresses.');
       result = (await db.query(findAddressesWithRegisteredStakeKey, [count])).rows;
       if (result.length < count) {
         throw new Error(`Addresses found from db are less than desired wallets count of ${count}`);
       }
-      logger.info(`Found DB addresses count: ${result.length}`);
+      logger.debug(`Found DB addresses count: ${result.length}`);
     } else {
       throw new Error('Please provide a valid KEY_MANAGEMENT_PARAMS or DB_SYNC_CONNECTION_STRING env variable.');
     }
@@ -84,7 +84,7 @@ let index = 0;
 
 export const walletRestoration: FunctionHook<WalletVars> = async ({ vars, _uid }, ee, done) => {
   const currentAddress = vars.addresses[index];
-  logger.info(`Current address: ${currentAddress.address}`);
+  logger.debug(`Current address: ${currentAddress.address}`);
   ++index;
 
   try {
@@ -109,7 +109,7 @@ export const walletRestoration: FunctionHook<WalletVars> = async ({ vars, _uid }
     ee.emit('histogram', `${operationName}.time`, Date.now() - startedAt);
     ee.emit('counter', operationName, 1);
 
-    logger.info(
+    logger.debug(
       `Wallet with name ${vars.currentWallet.name} and address ${currentAddress.address} was successfully restored`
     );
   } catch (error) {
@@ -124,6 +124,6 @@ export const walletRestoration: FunctionHook<WalletVars> = async ({ vars, _uid }
 
 export const shutdownWallet: FunctionHook<WalletVars> = async ({ vars, _uid }, _ee, done) => {
   vars.currentWallet?.shutdown();
-  logger.info(`Wallet with VU id ${_uid} was shutdown`);
+  logger.debug(`Wallet with VU id ${_uid} was shutdown`);
   done();
 };

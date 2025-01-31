@@ -12,12 +12,12 @@ import { walletName } from '../const';
 const confirmationCallback: walletCip30.CallbackConfirmation = {
   signData: async ({ sender }) => {
     if (!sender) throw new Error('No sender context');
-    logger.info('signData request from', sender);
+    logger.debug('signData request from', sender);
     return { cancel$: NEVER };
   },
   signTx: async ({ sender }) => {
     if (!sender) throw new Error('No sender context');
-    logger.info('signTx request', sender);
+    logger.debug('signTx request', sender);
     return { cancel$: NEVER };
   },
   submitTx: async () => true

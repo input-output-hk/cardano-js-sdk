@@ -138,7 +138,7 @@ export const withCoreCardanoNodeError = async <T>(operation: () => Promise<T>) =
 
 export const queryEraSummaries = (client: LedgerStateQuery.LedgerStateQueryClient, logger: Logger) =>
   withCoreCardanoNodeError(async () => {
-    logger.info('Querying era summaries');
+    logger.debug('Querying era summaries');
     const systemStart = new Date((await client.genesisConfiguration('byron')).startTime);
     const eraSummaries = await client.eraSummaries();
     return eraSummaries.map((era) => eraSummary(era, systemStart));
@@ -146,7 +146,7 @@ export const queryEraSummaries = (client: LedgerStateQuery.LedgerStateQueryClien
 
 export const queryGenesisParameters = (client: LedgerStateQuery.LedgerStateQueryClient, logger: Logger) =>
   withCoreCardanoNodeError(async () => {
-    logger.info('Querying genesis parameters');
+    logger.debug('Querying genesis parameters');
     // Update this to query multiple eras if the CompactGenesis type will have to include params from other eras
     return genesis(await client.genesisConfiguration('shelley'));
   });

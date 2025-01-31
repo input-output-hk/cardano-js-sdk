@@ -153,7 +153,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
     return this.fetchCBOR(hash)
       .then((cbor) => {
         const tx = Serialization.Transaction.fromCbor(Serialization.TxCBOR(cbor)).toCore();
-        this.logger.info('Fetched details from CBOR for tx', hash);
+        this.logger.debug('Fetched details from CBOR for tx', hash);
         return tx;
       })
       .catch((error) => {
@@ -498,7 +498,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
     pagination,
     blockRange
   }: TransactionsByAddressesArgs): Promise<Paginated<Cardano.HydratedTx>> {
-    this.logger.info(`transactionsByAddresses: ${JSON.stringify(blockRange)} ${JSON.stringify(addresses)}`);
+    this.logger.debug(`transactionsByAddresses: ${JSON.stringify(blockRange)} ${JSON.stringify(addresses)}`);
     try {
       const lowerBound = blockRange?.lowerBound ?? 0;
       const upperBound = blockRange?.upperBound ?? DB_MAX_SAFE_INTEGER;

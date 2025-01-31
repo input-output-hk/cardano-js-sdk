@@ -36,7 +36,7 @@ export class BlockfrostUtxoProvider extends BlockfrostProvider implements UtxoPr
     const result = await this.fetchCBOR(hash)
       .then((cbor) => {
         const tx = Serialization.Transaction.fromCbor(Serialization.TxCBOR(cbor)).toCore();
-        this.logger.info('Fetched details from CBOR for tx', hash);
+        this.logger.debug('Fetched details from CBOR for tx', hash);
         return tx;
       })
       .catch((error) => {

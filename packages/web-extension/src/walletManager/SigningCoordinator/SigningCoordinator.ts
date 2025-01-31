@@ -97,7 +97,7 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
         walletType: requestContext.wallet.type
       },
       (keyAgent) => {
-        this.#logger.info('Signing transaction', transaction.getId());
+        this.#logger.debug('Signing transaction', transaction.getId());
         return keyAgent.signTransaction(transaction.body(), signContext, options);
       }
     );

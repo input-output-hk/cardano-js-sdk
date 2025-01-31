@@ -35,7 +35,7 @@ describe('RunnableModule', () => {
     it('optionally takes a logger on construction', () => {
       const runnableModule = new SomeRunnableModule(logger);
       expect(runnableModule.state).toBeNull();
-      expect(logger.info).not.toHaveBeenCalled();
+      expect(logger.debug).not.toHaveBeenCalled();
     });
   });
   describe('initialize', () => {
@@ -49,11 +49,11 @@ describe('RunnableModule', () => {
       expect(runnableModule.state).toBeNull();
       await runnableModule.initialize();
       expect(runnableModule.state).toBe('initialized');
-      expect(logger.info).toHaveBeenCalled();
+      expect(logger.debug).toHaveBeenCalled();
       jest.resetAllMocks();
       await expect(runnableModule.initialize()).rejects.toThrowError(InvalidModuleState);
       expect(runnableModule.state).toBe('initialized');
-      expect(logger.info).not.toHaveBeenCalled();
+      expect(logger.debug).not.toHaveBeenCalled();
     });
   });
 
@@ -68,12 +68,12 @@ describe('RunnableModule', () => {
     it('changes state if initialized and not already in progress, and logs info', async () => {
       expect(runnableModule.state).toBe('initialized');
       await runnableModule.start();
-      expect(logger.info).toHaveBeenCalled();
+      expect(logger.debug).toHaveBeenCalled();
       expect(runnableModule.state).toBe('running');
       jest.resetAllMocks();
       await expect(runnableModule.initialize()).rejects.toThrowError(InvalidModuleState);
       expect(runnableModule.state).toBe('running');
-      expect(logger.info).not.toHaveBeenCalled();
+      expect(logger.debug).not.toHaveBeenCalled();
     });
   });
 
@@ -89,13 +89,13 @@ describe('RunnableModule', () => {
     it('changes state if running and not already in progress, and logs info', async () => {
       expect(runnableModule.state).toBe('running');
       await runnableModule.shutdown();
-      expect(logger.info).toHaveBeenCalled();
+      expect(logger.debug).toHaveBeenCalled();
       expect(runnableModule.state).toBe('initialized');
       jest.resetAllMocks();
       await expect(runnableModule.initialize()).rejects.toThrowError(InvalidModuleState);
       await expect(runnableModule.shutdown()).rejects.toThrowError(InvalidModuleState);
       expect(runnableModule.state).toBe('initialized');
-      expect(logger.info).not.toHaveBeenCalled();
+      expect(logger.debug).not.toHaveBeenCalled();
     });
   });
 });
