@@ -224,8 +224,8 @@ const fetchInitialTransactions = async (
   if (transactions.length === 0) {
     return [];
   }
-
-  return transactions.slice(0, historicalTransactionsFetchLimit);
+  // allTransactionsByAddresses returns in `asc` order
+  return transactions.slice(-1 * historicalTransactionsFetchLimit);
 };
 
 const findIntersectionAndUpdateTxStore = ({
@@ -335,11 +335,12 @@ const findIntersectionAndUpdateTxStore = ({
               localTx.blockHeader = newTx.blockHeader;
             }
           }
-          // Skip overlapping transactions to avoid duplicates
+          // Skip overlapping transactions to avoid duplicates.
+          // Limit # of stored transactions to last `historicalTransactionsFetchLimit`
           localTransactions = deduplicateSortedArray(
             [...localTransactions, ...newTransactions.slice(localTxsFromSameBlock.length)],
             txEquals
-          );
+          ).slice(-1 * historicalTransactionsFetchLimit);
           store.setAll(localTransactions);
         } else if (rollbackOcurred) {
           // This case handles rollbacks without new additions

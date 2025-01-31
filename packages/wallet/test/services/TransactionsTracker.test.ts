@@ -54,13 +54,11 @@ const generateRandomLetters = (length: number) => {
   return result;
 };
 
-
 const updateTransactionIds = (transactions: Cardano.HydratedTx[]) =>
   transactions.map((tx) => ({
     ...tx,
     id: Cardano.TransactionId(`${generateRandomLetters(64)}`)
   }));
-
 
 describe('TransactionsTracker', () => {
   const logger = dummyLogger;
@@ -97,7 +95,8 @@ describe('TransactionsTracker', () => {
     });
 
     it('emits empty array if store is empty and ChainHistoryProvider does not return any transactions', async () => {
-      chainHistoryProvider.transactionsByAddresses = jest.fn()
+      chainHistoryProvider.transactionsByAddresses = jest
+        .fn()
         .mockImplementation(() => delay(50).then(() => ({ pageResults: [], totalResultCount: 0 })));
       const provider$ = createAddressTransactionsProvider({
         addresses$: of(addresses),
@@ -112,27 +111,41 @@ describe('TransactionsTracker', () => {
       expect(store.setAll).toBeCalledTimes(0);
     });
 
-    it('if store is empty, stores and emits transactions resolved by ChainHistoryProvider', async () => {
+    it('if store is empty, stores and emits last {historicalTransactionsFetchLimit} transactions resolved by ChainHistoryProvider', async () => {
+      const lowerHistoricalTransactionsFetchLimit = 2;
+
+      chainHistoryProvider.transactionsByAddresses = jest.fn().mockImplementation(() =>
+        delay(50).then(() => ({
+          ...queryTransactionsResult2,
+          pageResults: [...queryTransactionsResult2.pageResults]
+        }))
+      );
       const provider$ = createAddressTransactionsProvider({
         addresses$: of(addresses),
         chainHistoryProvider,
-        historicalTransactionsFetchLimit,
+        historicalTransactionsFetchLimit: lowerHistoricalTransactionsFetchLimit,
         logger,
         retryBackoffConfig,
         store,
         tipBlockHeight$
       }).transactionsSource$;
-      expect(await firstValueFrom(provider$)).toEqual(queryTransactionsResult.pageResults);
+      const lastHistoricalTransactionsFetchLimitTransactions = queryTransactionsResult2.pageResults.slice(
+        -1 * lowerHistoricalTransactionsFetchLimit
+      );
+      expect(await firstValueFrom(provider$)).toEqual(lastHistoricalTransactionsFetchLimitTransactions);
       expect(store.setAll).toBeCalledTimes(1);
-      expect(store.setAll).toBeCalledWith(queryTransactionsResult.pageResults);
+      expect(store.setAll).toBeCalledWith(lastHistoricalTransactionsFetchLimitTransactions);
     });
 
     it('emits configured number of latest historical transactions', async () => {
       const totalTxsCount = PAGE_SIZE + 5;
 
       const allTransactions = generateTxAlonzo(totalTxsCount);
-      chainHistoryProvider.transactionsByAddresses = jest.fn().mockImplementation(
-        (args: TransactionsByAddressesArgs) => filterAndPaginateTransactions(allTransactions, args));
+      chainHistoryProvider.transactionsByAddresses = jest
+        .fn()
+        .mockImplementation((args: TransactionsByAddressesArgs) =>
+          filterAndPaginateTransactions(allTransactions, args)
+        );
 
       const provider$ = createAddressTransactionsProvider({
         addresses$: of(addresses),
@@ -183,7 +196,8 @@ describe('TransactionsTracker', () => {
       await firstValueFrom(store.setAll([txId1, txId2]));
 
       // ChainHistory is shorter by 1 tx: [1]
-      chainHistoryProvider.transactionsByAddresses = jest.fn()
+      chainHistoryProvider.transactionsByAddresses = jest
+        .fn()
         // the mismatch will pop the single transaction found in the stored transactions
         .mockImplementationOnce(() => delay(50).then(() => ({ pageResults: [], totalResultCount: 0 })))
         // intersection is found, chain is shortened
@@ -221,7 +235,8 @@ describe('TransactionsTracker', () => {
       await firstValueFrom(store.setAll([txId1, txId2]));
 
       // ChainHistory has one common and one different: [1, 3]
-      chainHistoryProvider.transactionsByAddresses = jest.fn()
+      chainHistoryProvider.transactionsByAddresses = jest
+        .fn()
         // the mismatch will pop the single transaction found in the stored transactions
         .mockImplementationOnce(() => delay(50).then(() => ({ pageResults: [txId3], totalResultCount: 1 })))
         // intersection is found, and stored history is populated with the new transaction
@@ -263,7 +278,8 @@ describe('TransactionsTracker', () => {
 
     it('queries ChainHistoryProvider again with blockRange lower bound from a previous transaction on rollback', async () => {
       await firstValueFrom(store.setAll(queryTransactionsResult.pageResults));
-      chainHistoryProvider.transactionsByAddresses = jest.fn()
+      chainHistoryProvider.transactionsByAddresses = jest
+        .fn()
         .mockImplementationOnce(() => delay(50).then(() => ({ pageResults: [], totalResultCount: 0 })))
         .mockImplementationOnce(() => delay(50).then(() => ({ pageResults: [], totalResultCount: 0 })))
         .mockImplementationOnce(() =>
@@ -396,7 +412,10 @@ describe('TransactionsTracker', () => {
 
       it('ignores duplicate transactions', async () => {
         // eslint-disable-next-line max-len
-        const [txId1, txId2, txId3] = updateTransactionsBlockNo(queryTransactionsResult2.pageResults, Cardano.BlockNo(10_050));
+        const [txId1, txId2, txId3] = updateTransactionsBlockNo(
+          queryTransactionsResult2.pageResults,
+          Cardano.BlockNo(10_050)
+        );
 
         txId1.blockHeader.slot = Cardano.Slot(10_050);
         txId2.blockHeader.slot = Cardano.Slot(10_051);
@@ -428,7 +447,7 @@ describe('TransactionsTracker', () => {
 
         expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
           [txId1, txId1, txId2], // from store
-          [txId1, txId2, txId3]  // chain history (fixes stored duplicates)
+          [txId1, txId2, txId3] // chain history (fixes stored duplicates)
         ]);
         expect(rollbacks.length).toBe(0);
         expect(store.setAll).toBeCalledTimes(2);
@@ -500,10 +519,19 @@ describe('TransactionsTracker', () => {
 
         await firstValueFrom(store.setAll([txId1, txId2, txId3]));
 
-        chainHistoryProvider.transactionsByAddresses = jest.fn().mockImplementation(() => ({
-          pageResults: [txId3OtherBlock, txId1OtherBlock, txId2OtherBlock],
-          totalResultCount: 3
-        }));
+        chainHistoryProvider.transactionsByAddresses = jest
+          .fn()
+          .mockImplementationOnce(() => ({
+            // asc
+            pageResults: [txId3OtherBlock, txId1OtherBlock, txId2OtherBlock],
+            totalResultCount: 3
+          }))
+          // detects a rollback and reverts all local transactions (all in the same block)
+          // fetches from scratch - provider is called with 'desc' order
+          .mockImplementationOnce(() => ({
+            pageResults: [txId2OtherBlock, txId1OtherBlock, txId3OtherBlock],
+            totalResultCount: 3
+          }));
 
         const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
           addresses$: of(addresses),
@@ -544,11 +572,11 @@ describe('TransactionsTracker', () => {
 
         await firstValueFrom(store.setAll([txId1, txId2]));
 
-        chainHistoryProvider.transactionsByAddresses = jest.fn().mockImplementation(
-          (args: TransactionsByAddressesArgs) => filterAndPaginateTransactions(
-            [txId1OtherBlock, txId2OtherBlock, txId3OtherBlock]
-          , args)
-        );
+        chainHistoryProvider.transactionsByAddresses = jest
+          .fn()
+          .mockImplementation((args: TransactionsByAddressesArgs) =>
+            filterAndPaginateTransactions([txId1OtherBlock, txId2OtherBlock, txId3OtherBlock], args)
+          );
 
         const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
           addresses$: of(addresses),
