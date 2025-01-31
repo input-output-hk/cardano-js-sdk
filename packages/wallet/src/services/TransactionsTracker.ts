@@ -224,8 +224,8 @@ const fetchInitialTransactions = async (
   if (transactions.length === 0) {
     return [];
   }
-
-  return transactions.slice(0, historicalTransactionsFetchLimit);
+  // allTransactionsByAddresses returns in `asc` order
+  return transactions.slice(-1 * historicalTransactionsFetchLimit);
 };
 
 const findIntersectionAndUpdateTxStore = ({
