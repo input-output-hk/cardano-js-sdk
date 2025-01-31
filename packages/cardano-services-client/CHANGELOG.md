@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.26.1...@cardano-sdk/cardano-services-client@0.26.2) (2025-01-31)
+
+### Bug Fixes
+
+* [lw-12169] map pool id in blockfrost rewards provider response ([6456c91](https://github.com/input-output-hk/cardano-js-sdk/commit/6456c91abc7060a6fc976fe0280bd44afb578bbd))
+* adjust logger levels to ensure correct logging ([#1577](https://github.com/input-output-hk/cardano-js-sdk/issues/1577)) ([2e4f552](https://github.com/input-output-hk/cardano-js-sdk/commit/2e4f55278e85da5dda1a8be3828c2fa82bc3b0a3))
+
 ## [0.26.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.26.0...@cardano-sdk/cardano-services-client@0.26.1) (2025-01-27)
 
 ### Features
