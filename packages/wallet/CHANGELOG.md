@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.51.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.51.8...@cardano-sdk/wallet@0.51.9) (2025-01-31)
+
+### Features
+
+* **wallet:** store only latest 10 transactions ([72d81c0](https://github.com/input-output-hk/cardano-js-sdk/commit/72d81c0fdca22201aa8a73d80bc82c3d25fa9f53))
+
+### Bug Fixes
+
+* **wallet:** await for wallet settle before resolving cip30 utxo ([c478116](https://github.com/input-output-hk/cardano-js-sdk/commit/c4781169a408351f01ddd55e234ac288019df201))
+* **wallet:** slice initial transactions from the right side ([945a108](https://github.com/input-output-hk/cardano-js-sdk/commit/945a108c51c87ec05fd28709ab108a2bd7ff453d))
+
 ## [0.51.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.51.7...@cardano-sdk/wallet@0.51.8) (2025-01-31)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
