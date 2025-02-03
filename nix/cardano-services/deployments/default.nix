@@ -247,9 +247,8 @@ in
             };
 
             # backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
-
+            pg-boss-worker.enabled = true;
             blockfrost-worker.enabled = true;
-            pg-boss-worker.enabled = false;
           };
         };
 
@@ -334,7 +333,7 @@ in
             stakepool.databaseName = "stakepoolv2";
             backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
 
-            pg-boss-worker.enabled = false;
+            pg-boss-worker.enabled = true;
 
             blockfrost-worker.enabled = true;
             cardano-services = {
@@ -675,8 +674,8 @@ in
           };
 
           values = {
-            pg-boss-worker.enabled = false;
-            #pg-boss-worker.queues = "pool-delist-schedule,pool-metadata,pool-metrics,pool-rewards";
+            pg-boss-worker.enabled = true;
+            pg-boss-worker.queues = "pool-delist-schedule,pool-metadata,pool-metrics,pool-rewards";
             cardano-services = {
               ingresOrder = 99;
             };
