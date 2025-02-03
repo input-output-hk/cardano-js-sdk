@@ -148,7 +148,7 @@ in
         };
 
         ws-server = {
-          enabled = true;
+          enabled = false;
           resources.limits = mkPodResources "300Mi" "300m";
           resources.requests = mkPodResources "150Mi" "200m";
         };
@@ -212,21 +212,21 @@ in
 
           providers = {
             backend = {
-              enabled = true;
+              enabled = false;
             };
             stake-pool-provider = {
               enabled = true;
             };
             handle-provider.enabled = true;
-            #asset-provider.enabled = true;
-            chain-history-provider.enabled = true;
+            asset-provider.enabled = false;
+            chain-history-provider.enabled = false;
           };
 
           projectors = {
-            asset.enabled = true;
+            asset.enabled = false;
             handle.enabled = true;
             stake-pool.enabled = true;
-            wallet-api.enabled = true;
+            wallet-api.enabled = false;
           };
 
           values = {
@@ -246,10 +246,9 @@ in
               ];
             };
 
-            backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
-
-            blockfrost-worker.enabled = true;
+            # backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
             pg-boss-worker.enabled = true;
+            blockfrost-worker.enabled = true;
           };
         };
 
@@ -312,21 +311,21 @@ in
 
           providers = {
             backend = {
-              enabled = true;
+              enabled = false;
             };
             stake-pool-provider = {
               enabled = true;
             };
             handle-provider.enabled = true;
-            asset-provider.enabled = true;
-            chain-history-provider.enabled = true;
+            asset-provider.enabled = false;
+            chain-history-provider.enabled = false;
           };
 
           projectors = {
-            asset.enabled = true;
+            asset.enabled = false;
             handle.enabled = true;
             stake-pool.enabled = true;
-            wallet-api.enabled = true;
+            wallet-api.enabled = false;
           };
 
           values = {
@@ -662,16 +661,16 @@ in
           region = "us-east-1";
 
           providers = {
-            backend.enabled = true;
+            backend.enabled = false;
             handle-provider.enabled = true;
-            chain-history-provider.enabled = true;
+            chain-history-provider.enabled = false;
             stake-pool-provider.enabled = true;
           };
 
           projectors = {
             handle.enabled = true;
             stake-pool.enabled = true;
-            wallet-api.enabled = true;
+            wallet-api.enabled = false;
           };
 
           values = {

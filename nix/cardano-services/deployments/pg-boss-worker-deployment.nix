@@ -46,9 +46,15 @@
                 NODE_ENV = values.cardano-services.nodeEnv;
 
                 METADATA_FETCH_MODE = values.pg-boss-worker.metadata-fetch-mode;
+                BLOCKFROST_API_KEY = {
+                  valueFrom.secretKeyRef = {
+                    name = "blockfrost";
+                    key = "api-key";
+                  };
+                };
 
-                STAKE_POOL_PROVIDER_URL = "http://${config.name}-backend.${config.namespace}.svc.cluster.local";
-                NETWORK_INFO_PROVIDER_URL = "http://${config.name}-backend.${config.namespace}.svc.cluster.local";
+                STAKE_POOL_PROVIDER_URL = "https://cardano-mainnet.blockfrost.io/api/v0";
+                NETWORK_INFO_PROVIDER_URL = "https://cardano-mainnet.blockfrost.io/api/v0";
 
                 POSTGRES_POOL_MAX_STAKE_POOL = "5";
                 POSTGRES_HOST_STAKE_POOL = values.postgresName;
