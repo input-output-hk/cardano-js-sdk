@@ -48,7 +48,7 @@
                 METADATA_FETCH_MODE = values.pg-boss-worker.metadata-fetch-mode;
 
                 STAKE_POOL_PROVIDER_URL = "http://${config.name}-backend.${config.namespace}.svc.cluster.local";
-                NETWORK_INFO_PROVIDER_URL = "http://${config.name}-backend.${config.namespace}.svc.cluster.local";
+                NETWORK_INFO_PROVIDER = "blockfrost";
 
                 POSTGRES_POOL_MAX_STAKE_POOL = "5";
                 POSTGRES_HOST_STAKE_POOL = values.postgresName;

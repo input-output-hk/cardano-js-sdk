@@ -13,6 +13,7 @@ export const PARALLEL_JOBS_DEFAULT = 10;
 export const PG_BOSS_WORKER_API_URL_DEFAULT = new URL('http://localhost:3003');
 
 export enum PgBossWorkerOptionDescriptions {
+  NetworkInfoProvider = 'Select one of the available provider implementations',
   ParallelJobs = 'Parallel jobs to run',
   Queues = 'Comma separated queue names',
   Schedules = 'File path for schedules configurations'
@@ -21,6 +22,7 @@ export enum PgBossWorkerOptionDescriptions {
 export interface LoadPgBossWorkerDependencies {
   dnsResolver?: (serviceName: string) => Promise<SrvRecord>;
   logger?: Logger;
+  networkInfoProvider?: string;
 }
 
 const pgBossWorker = 'pg-boss-worker';

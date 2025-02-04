@@ -15,7 +15,9 @@ import { ServiceNames } from '../Program/programs/types';
 import { accountActiveStake, poolDelegators, poolRewards } from './stakePoolRewardsQueries';
 import { computeROS } from '../StakePool/TypeormStakePoolProvider/util';
 import { missingProviderUrlOption } from '../Program/options/common';
-import { networkInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
+import { BlockfrostNetworkInfoProvider, networkInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
+import { getBlockfrostClient } from '../util';
+import { ProviderImplementation } from '../Program';
 
 /** The version of the algorithm to compute rewards. */
 export const REWARDS_COMPUTE_VERSION = 1;
@@ -211,16 +213,22 @@ const getLastSlot = async (provider: NetworkInfoProvider, epochNo: Cardano.Epoch
 
 /** Creates a `stakePoolRewardsHandler`. */
 export const stakePoolRewardsHandlerFactory: WorkerHandlerFactory = (options) => {
-  const { dataSource, db, lastRosEpochs, logger, networkInfoProviderUrl } = options;
+  const { dataSource, db, lastRosEpochs, logger, networkInfoProvider, networkInfoProviderUrl } = options;
 
   // Introduced following code repetition as the correct form is source of a circular-deps:check failure.
   // Solving it would require an invasive refactoring action, probably better to defer it.
   // if (!lastRosEpochs) throw new MissingProgramOption(STAKE_POOL_REWARDS, Descriptions.LastRosEpochs);
   if (!lastRosEpochs)
     throw new MissingProgramOption(STAKE_POOL_REWARDS, 'Number of epochs over which lastRos is computed');
-  if (!networkInfoProviderUrl) throw missingProviderUrlOption(STAKE_POOL_REWARDS, ServiceNames.NetworkInfo);
 
-  const provider = networkInfoHttpProvider({ baseUrl: networkInfoProviderUrl, logger });
+  let provider: NetworkInfoProvider;
+  if (networkInfoProvider === ProviderImplementation.BLOCKFROST) {
+    provider = new BlockfrostNetworkInfoProvider(getBlockfrostClient(), logger);
+  } else if (networkInfoProviderUrl) {
+    provider = networkInfoHttpProvider({ baseUrl: networkInfoProviderUrl, logger });
+  } else {
+    throw missingProviderUrlOption(STAKE_POOL_REWARDS, ServiceNames.NetworkInfo);
+  }
 
   return async (data: StakePoolRewardsJob) => {
     const { epochNo } = data;

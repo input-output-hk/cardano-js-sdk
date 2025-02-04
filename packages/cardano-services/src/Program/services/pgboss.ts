@@ -12,7 +12,7 @@ import {
   createPgBoss,
   isRecoverableTypeormError
 } from '@cardano-sdk/projection-typeorm';
-import { CommonProgramOptions, PosgresProgramOptions } from '../options';
+import { CommonProgramOptions, PosgresProgramOptions, ProviderImplementation } from '../options';
 import { DataSource } from 'typeorm';
 import { HealthCheckResponse } from '@cardano-sdk/core';
 import { HttpService } from '../../Http/HttpService';
@@ -88,6 +88,7 @@ export type PgBossWorkerArgs = CommonProgramOptions &
   StakePoolMetadataProgramOptions &
   PosgresProgramOptions<'DbSync'> &
   PosgresProgramOptions<'StakePool'> & {
+    networkInfoProvider?: ProviderImplementation;
     parallelJobs: number;
     queues: PgBossQueue[];
     schedules: Array<ScheduleConfig>;

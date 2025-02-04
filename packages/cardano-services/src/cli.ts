@@ -50,7 +50,10 @@ import {
   withHandlePolicyIdsOptions,
   withOgmiosOptions,
   withPostgresOptions,
-  withStakePoolMetadataOptions
+  withStakePoolMetadataOptions,
+  ProviderImplementationDescription,
+  ProviderImplementation,
+  argParser as providerImplArgParser,
 } from './Program';
 import { Command } from 'commander';
 import { DB_CACHE_TTL_DEFAULT } from './InMemoryCache';
@@ -491,7 +494,14 @@ addOptions(
         return readScheduleConfig(schedules);
       },
       []
-    )
+    ),
+    newOption(
+        '--network-info-provider <networkInfoProvider>',
+        ProviderImplementationDescription,
+        'NETWORK_INFO_PROVIDER',
+        providerImplArgParser,
+        ProviderImplementation.DBSYNC
+    ).choices([ProviderImplementation.BLOCKFROST, ProviderImplementation.DBSYNC]),
   ]
 ).action(async (args: PgBossWorkerArgs) =>
   runServer('pg-boss worker', { args }, () =>

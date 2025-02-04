@@ -19,7 +19,7 @@ export type ProviderImplementations = {
   stakePoolProvider?: ProviderImplementation;
 };
 export const ProviderImplementationDescription = 'Select one of the available provider implementations';
-const argParser = (impl: string) => ProviderImplementation[impl.toUpperCase() as keyof typeof ProviderImplementation];
+export const argParser = (impl: string) => ProviderImplementation[impl.toUpperCase() as keyof typeof ProviderImplementation];
 export const providerSelectionOptions = [
   newOption(
     '--asset-provider <assetProvider>',
