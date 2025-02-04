@@ -17,6 +17,7 @@ import {
 import { WalletRepository } from './WalletRepository';
 import { Witnesser } from '@cardano-sdk/key-management';
 import { buildBip32Witnesser, buildNativeScriptWitnesser } from './util';
+import { ready } from '@cardano-sdk/crypto';
 
 /**
  * Checks if the wallet is a bip32 wallet.
@@ -108,6 +109,7 @@ export class WalletManager<WalletMetadata extends { name: string }, AccountMetad
 
   /** `activate` the wallet with props of last activated wallet (load from `managerStorage`) */
   async initialize() {
+    await ready();
     const { [this.#managerStorageKey]: lastActivateProps } = await this.#managerStorage.get(this.#managerStorageKey);
 
     if (!lastActivateProps) {
