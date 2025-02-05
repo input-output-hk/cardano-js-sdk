@@ -662,21 +662,22 @@ in
           region = "us-east-1";
 
           providers = {
-            backend.enabled = true;
+            backend.enabled = false;
             handle-provider.enabled = true;
-            chain-history-provider.enabled = true;
+            chain-history-provider.enabled = false;
             stake-pool-provider.enabled = true;
           };
 
           projectors = {
             handle.enabled = true;
             stake-pool.enabled = true;
-            wallet-api.enabled = true;
+            wallet-api.enabled = false;
           };
 
           values = {
             pg-boss-worker.enabled = true;
             pg-boss-worker.queues = "pool-delist-schedule,pool-metadata,pool-metrics,pool-rewards";
+            ws-server.enabled = false;
             cardano-services = {
               ingresOrder = 99;
             };
