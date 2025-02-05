@@ -24,6 +24,7 @@ import {
 import { Logger } from 'ts-log';
 import omit from 'lodash/omit.js';
 import uniq from 'lodash/uniq.js';
+import type { Cache } from '@cardano-sdk/util';
 import type { Responses } from '@blockfrost/blockfrost-js';
 import type { Schemas } from '@blockfrost/blockfrost-js/lib/types/open-api';
 
@@ -33,12 +34,20 @@ export const DB_MAX_SAFE_INTEGER = 2_147_483_647;
 type BlockfrostTx = Pick<Responses['address_transactions_content'][0], 'block_height' | 'tx_index'>;
 const compareTx = (a: BlockfrostTx, b: BlockfrostTx) => a.block_height - b.block_height || a.tx_index - b.tx_index;
 
+type BlockfrostChainHistoryProviderDependencies = {
+  cache: Cache<Cardano.HydratedTx>;
+  client: BlockfrostClient;
+  networkInfoProvider: NetworkInfoProvider;
+  logger: Logger;
+};
+
 export class BlockfrostChainHistoryProvider extends BlockfrostProvider implements ChainHistoryProvider {
-  private readonly cache: Map<string, Cardano.HydratedTx> = new Map();
+  private readonly cache: Cache<Cardano.HydratedTx>;
   private networkInfoProvider: NetworkInfoProvider;
 
-  constructor(client: BlockfrostClient, networkInfoProvider: NetworkInfoProvider, logger: Logger) {
+  constructor({ cache, client, networkInfoProvider, logger }: BlockfrostChainHistoryProviderDependencies) {
     super(client, logger);
+    this.cache = cache;
     this.networkInfoProvider = networkInfoProvider;
   }
 
@@ -478,12 +487,12 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
   public async transactionsByHashes({ ids }: TransactionsByIdsArgs): Promise<Cardano.HydratedTx[]> {
     return Promise.all(
       ids.map(async (id) => {
-        if (this.cache.has(id)) {
-          return this.cache.get(id)!;
-        }
+        const cached = await this.cache.get(id);
+        if (cached) return cached;
+
         try {
           const fetchedTransaction = await this.fetchTransaction(id);
-          this.cache.set(id, fetchedTransaction);
+          void this.cache.set(id, fetchedTransaction);
           return fetchedTransaction;
         } catch (error) {
           throw this.toProviderError(error);

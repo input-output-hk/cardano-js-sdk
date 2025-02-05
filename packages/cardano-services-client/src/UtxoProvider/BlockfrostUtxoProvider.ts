@@ -1,9 +1,22 @@
-import { BlockfrostProvider, BlockfrostToCore, fetchSequentially } from '../blockfrost';
+import { BlockfrostClient, BlockfrostProvider, BlockfrostToCore, fetchSequentially } from '../blockfrost';
 import { Cardano, Serialization, UtxoByAddressesArgs, UtxoProvider } from '@cardano-sdk/core';
+import { Logger } from 'ts-log';
+import type { Cache } from '@cardano-sdk/util';
 import type { Responses } from '@blockfrost/blockfrost-js';
 
+type BlockfrostUtxoProviderDependencies = {
+  client: BlockfrostClient;
+  cache: Cache<Cardano.Tx>;
+  logger: Logger;
+};
+
 export class BlockfrostUtxoProvider extends BlockfrostProvider implements UtxoProvider {
-  private readonly cache: Map<string, Cardano.Tx> = new Map();
+  private readonly cache: Cache<Cardano.Tx>;
+
+  constructor({ cache, client, logger }: BlockfrostUtxoProviderDependencies) {
+    super(client, logger);
+    this.cache = cache;
+  }
 
   protected async fetchUtxos(addr: Cardano.PaymentAddress, paginationQueryString: string): Promise<Cardano.Utxo[]> {
     const queryString = `addresses/${addr.toString()}/utxos?${paginationQueryString}`;
@@ -29,9 +42,8 @@ export class BlockfrostUtxoProvider extends BlockfrostProvider implements UtxoPr
       });
   }
   protected async fetchDetailsFromCBOR(hash: string) {
-    if (this.cache.has(hash)) {
-      return this.cache.get(hash);
-    }
+    const cached = await this.cache.get(hash);
+    if (cached) return cached;
 
     const result = await this.fetchCBOR(hash)
       .then((cbor) => {
@@ -48,7 +60,7 @@ export class BlockfrostUtxoProvider extends BlockfrostProvider implements UtxoPr
       return null;
     }
 
-    this.cache.set(hash, result);
+    void this.cache.set(hash, result);
     return result;
   }
 
