@@ -25,6 +25,8 @@
     "chrome-extension://bjlhpephaokolembmpdcbobbpkjnoheb"
     # Represents Chrome dev preview version
     "chrome-extension://djcdfchkaijggdjokfomholkalbffgil"
+    # Represents dev preprod
+    "moz-extension://*"
   ];
   # cSpell:enable
 
@@ -332,7 +334,7 @@ in
           values = {
             useAccelerator = true;
             stakepool.databaseName = "stakepoolv2";
-            backend.allowedOrigins = null;
+            backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
 
             pg-boss-worker.enabled = true;
 
