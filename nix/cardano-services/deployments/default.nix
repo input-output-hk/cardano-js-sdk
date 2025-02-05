@@ -332,7 +332,7 @@ in
           values = {
             useAccelerator = true;
             stakepool.databaseName = "stakepoolv2";
-            backend.allowedOrigins = lib.concatStringsSep "," allowedOriginsDev;
+            backend.allowedOrigins = null;
 
             pg-boss-worker.enabled = true;
 
