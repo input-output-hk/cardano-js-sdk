@@ -86,7 +86,7 @@ export class HttpServer extends RunnableModule {
   protected async initializeImpl(): Promise<void> {
     this.app = express();
 
-    if (this.#config.allowedOrigins) {
+    if (this.#config.allowedOrigins?.length) {
       this.app.use(cors(corsOptions(new Set(this.#config.allowedOrigins))));
     }
 
