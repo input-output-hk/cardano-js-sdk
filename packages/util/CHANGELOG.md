@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.15.6...@cardano-sdk/util@0.15.7) (2025-02-06)
+
+### Features
+
+* introduce persistent cache for providers ([e39bf3d](https://github.com/input-output-hk/cardano-js-sdk/commit/e39bf3de372edf45d07c4036d03366724900f8fa))
+
 ## [0.15.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.15.5...@cardano-sdk/util@0.15.6) (2025-01-31)
 
 ### Bug Fixes
