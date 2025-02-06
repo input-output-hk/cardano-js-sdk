@@ -28,8 +28,6 @@
       SERVICE_NAMES = "handle";
       NODE_ENV = values.cardano-services.nodeEnv;
 
-      ALLOWED_ORIGINS = values.backend.allowedOrigins;
-
       POSTGRES_POOL_MAX_HANDLE = "10";
       POSTGRES_HOST_HANDLE = values.postgresName;
       POSTGRES_PORT_HANDLE = "5432";
