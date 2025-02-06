@@ -3,6 +3,7 @@ import { Cardano, NetworkInfoProvider } from '@cardano-sdk/core';
 import { Responses } from '@blockfrost/blockfrost-js';
 import { dummyLogger as logger } from 'ts-log';
 import { mockResponses } from '../util';
+import type { Cache } from '@cardano-sdk/util';
 
 jest.mock('@blockfrost/blockfrost-js');
 
@@ -370,7 +371,23 @@ describe('blockfrostChainHistoryProvider', () => {
         }
       ])
     } as unknown as NetworkInfoProvider;
-    provider = new BlockfrostChainHistoryProvider(client, networkInfoProvider, logger);
+    const cacheStorage = new Map();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const cache: Cache<any> = {
+      async get(key) {
+        return cacheStorage.get(key);
+      },
+      async set(key, value) {
+        cacheStorage.set(key, value);
+      }
+    };
+
+    provider = new BlockfrostChainHistoryProvider({
+      cache,
+      client,
+      logger,
+      networkInfoProvider
+    });
     mockResponses(request, [
       [`txs/${txId1}/utxos`, txsUtxosResponse],
       [`txs/${txId1}`, mockedTx1Response],

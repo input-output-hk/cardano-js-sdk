@@ -127,6 +127,19 @@ const selectProviderImplementation = <T extends Provider>(
   return selected;
 };
 
+const createProviderCache = () => {
+  const cache = new Map();
+  return {
+    async get(key: string) {
+      return cache.get(key);
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async set(key: string, val: any) {
+      cache.set(key, val);
+    }
+  };
+};
+
 const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
   const { args, pools, dnsResolver, genesisData, logger, node } = options;
 
@@ -298,7 +311,12 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
 
   const getBlockfrostAssetProvider = () => new BlockfrostAssetProvider(getBlockfrostClient(), logger);
 
-  const getBlockfrostUtxoProvider = () => new BlockfrostUtxoProvider(getBlockfrostClient(), logger);
+  const getBlockfrostUtxoProvider = () =>
+    new BlockfrostUtxoProvider({
+      cache: createProviderCache(),
+      client: getBlockfrostClient(),
+      logger
+    });
 
   const getDbSyncUtxoProvider = withDbSyncProvider(
     (dbPools, cardanoNode) =>
@@ -344,7 +362,12 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     return networkInfoProvider;
   };
   const getBlockfrostChainHistoryProvider = (nInfoProvider: NetworkInfoProvider | DbSyncNetworkInfoProvider) =>
-    new BlockfrostChainHistoryProvider(getBlockfrostClient(), nInfoProvider, logger);
+    new BlockfrostChainHistoryProvider({
+      cache: createProviderCache(),
+      client: getBlockfrostClient(),
+      logger,
+      networkInfoProvider: nInfoProvider
+    });
 
   const getBlockfrostRewardsProvider = () => new BlockfrostRewardsProvider(getBlockfrostClient(), logger);
 

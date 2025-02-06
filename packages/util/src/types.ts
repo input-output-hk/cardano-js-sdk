@@ -28,3 +28,8 @@ type Impossible<K extends keyof any> = {
   [P in K]: never;
 };
 export type NoExtraProperties<T, U> = U & Impossible<Exclude<keyof U, keyof T>>;
+
+export type Cache<T> = {
+  get(key: string): Promise<T | undefined>;
+  set(key: string, value: T): Promise<void>;
+};

@@ -128,6 +128,18 @@ const getWsClient = async (logger: Logger) => {
   return (wsClient = new CardanoWsClient({ chainHistoryProvider, logger }, { url: new URL(env.WS_PROVIDER_URL) }));
 };
 
+const createProviderCache = () => {
+  const cache = new Map();
+  return {
+    async get(key: string) {
+      return cache.get(key);
+    },
+    async set(key: string, val: any) {
+      cache.set(key, val);
+    }
+  };
+};
+
 // Asset providers
 
 assetProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<AssetProvider> => {
@@ -181,14 +193,15 @@ chainHistoryProviderFactory.register(BLOCKFROST_PROVIDER, async (params: any, lo
 
   return new Promise(async (resolve) => {
     resolve(
-      new BlockfrostChainHistoryProvider(
-        new BlockfrostClient(
+      new BlockfrostChainHistoryProvider({
+        cache: createProviderCache(),
+        client: new BlockfrostClient(
           { apiVersion: params.apiVersion, baseUrl: params.baseUrl, projectId: params.projectId },
           { rateLimiter: { schedule: (task) => task() } }
         ),
-        await networkInfoProviderFactory.create('blockfrost', params, logger),
-        logger
-      )
+        logger,
+        networkInfoProvider: await networkInfoProviderFactory.create('blockfrost', params, logger)
+      })
     );
   });
 });
@@ -360,16 +373,16 @@ utxoProviderFactory.register(
 
 utxoProviderFactory.register(BLOCKFROST_PROVIDER, async (params: any, logger) => {
   if (params.baseUrl === undefined) throw new Error(`${BlockfrostUtxoProvider.name}: ${MISSING_URL_PARAM}`);
-
   return new Promise(async (resolve) => {
     resolve(
-      new BlockfrostUtxoProvider(
-        new BlockfrostClient(
+      new BlockfrostUtxoProvider({
+        cache: createProviderCache(),
+        client: new BlockfrostClient(
           { apiVersion: params.apiVersion, baseUrl: params.baseUrl, projectId: params.projectId },
           { rateLimiter: { schedule: (task) => task() } }
         ),
         logger
-      )
+      })
     );
   });
 });

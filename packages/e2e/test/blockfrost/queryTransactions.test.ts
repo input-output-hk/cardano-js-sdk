@@ -3,11 +3,29 @@ import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
 import { logger } from '@cardano-sdk/util-dev';
 import { util } from '@cardano-sdk/cardano-services';
 
+const createProviderCache = () => {
+  const cache = new Map();
+  return {
+    async get(key: string) {
+      return cache.get(key);
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async set(key: string, val: any) {
+      cache.set(key, val);
+    }
+  };
+};
+
 describe.only('BlockfrostChainHistoryProvider', () => {
   let chainHistoryProvider: ChainHistoryProvider;
   beforeAll(async () => {
     const networkInfoProvider = new BlockfrostNetworkInfoProvider(util.getBlockfrostClient(), logger);
-    chainHistoryProvider = new BlockfrostChainHistoryProvider(util.getBlockfrostClient(), networkInfoProvider, logger);
+    chainHistoryProvider = new BlockfrostChainHistoryProvider({
+      cache: createProviderCache(),
+      client: util.getBlockfrostClient(),
+      logger,
+      networkInfoProvider
+    });
   });
 
   describe('transactionsByHashes', () => {
