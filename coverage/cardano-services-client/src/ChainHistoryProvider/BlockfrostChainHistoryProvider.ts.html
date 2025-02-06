@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">81.92% </span>
+                <span class="strong">82.02% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>145/177</span>
+                <span class='fraction'>146/178</span>
             </div>
         
             
@@ -665,7 +665,16 @@
 <a name='L600'></a><a href='#L600'>600</a>
 <a name='L601'></a><a href='#L601'>601</a>
 <a name='L602'></a><a href='#L602'>602</a>
-<a name='L603'></a><a href='#L603'>603</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L603'></a><a href='#L603'>603</a>
+<a name='L604'></a><a href='#L604'>604</a>
+<a name='L605'></a><a href='#L605'>605</a>
+<a name='L606'></a><a href='#L606'>606</a>
+<a name='L607'></a><a href='#L607'>607</a>
+<a name='L608'></a><a href='#L608'>608</a>
+<a name='L609'></a><a href='#L609'>609</a>
+<a name='L610'></a><a href='#L610'>610</a>
+<a name='L611'></a><a href='#L611'>611</a>
+<a name='L612'></a><a href='#L612'>612</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">17x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -695,16 +704,25 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">17x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1146,7 +1164,7 @@
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">8x</span>
@@ -1293,6 +1311,7 @@ import {
 import { Logger } from 'ts-log';
 import omit from 'lodash/omit.js';
 import uniq from 'lodash/uniq.js';
+import type { Cache } from '@cardano-sdk/util';
 import type { Responses } from '@blockfrost/blockfrost-js';
 import type { Schemas } from '@blockfrost/blockfrost-js/lib/types/open-api';
 &nbsp;
@@ -1302,12 +1321,20 @@ export const DB_MAX_SAFE_INTEGER = 2_147_483_647;
 type BlockfrostTx = Pick&lt;Responses['address_transactions_content'][0], 'block_height' | 'tx_index'&gt;;
 const compareTx = (a: BlockfrostTx, b: BlockfrostTx) =&gt; a.block_height - b.block_height || a.tx_index - b.tx_index;
 &nbsp;
+type BlockfrostChainHistoryProviderDependencies = {
+  cache: Cache&lt;Cardano.HydratedTx&gt;;
+  client: BlockfrostClient;
+  networkInfoProvider: NetworkInfoProvider;
+  logger: Logger;
+};
+&nbsp;
 export class BlockfrostChainHistoryProvider extends BlockfrostProvider implements ChainHistoryProvider {
-  private readonly cache: Map&lt;string, Cardano.HydratedTx&gt; = new Map();
+  private readonly cache: Cache&lt;Cardano.HydratedTx&gt;;
   private networkInfoProvider: NetworkInfoProvider;
 &nbsp;
-  constructor(client: BlockfrostClient, networkInfoProvider: NetworkInfoProvider, logger: Logger) {
+  constructor({ cache, client, networkInfoProvider, logger }: BlockfrostChainHistoryProviderDependencies) {
     super(client, logger);
+    this.cache = cache;
     this.networkInfoProvider = networkInfoProvider;
   }
 &nbsp;
@@ -1747,12 +1774,12 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
   public async transactionsByHashes({ ids }: TransactionsByIdsArgs): Promise&lt;Cardano.HydratedTx[]&gt; {
     return Promise.all(
       ids.map(async (id) =&gt; {
-        if (this.cache.has(id)) {
-          return this.cache.get(id)!;
-        }
+        const cached = await this.cache.get(id);
+        if (cached) return cached;
+&nbsp;
         try {
           const fetchedTransaction = await this.fetchTransaction(id);
-          this.cache.set(id, fetchedTransaction);
+          void this.cache.set(id, fetchedTransaction);
           return fetchedTransaction;
         } catch (error) {
 <span class="cstat-no" title="statement not covered" >          throw this.toProviderError(error);</span>
@@ -1876,7 +1903,7 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-02-05T15:30:04.147Z
+                at 2025-02-06T13:13:46.973Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
