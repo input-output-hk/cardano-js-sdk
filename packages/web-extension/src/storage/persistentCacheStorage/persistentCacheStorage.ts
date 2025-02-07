@@ -1,3 +1,4 @@
+import { type Cache, fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { Storage } from 'webextension-polyfill';
 
 type StorageLocal = Pick<Storage.StorageArea, 'get' | 'set' | 'remove'>;
@@ -31,7 +32,7 @@ export const makePersistentCacheStorageFactory =
     fallbackMaxCollectionItemsGuard: number;
     resourceName: string;
     quotaInBytes: number;
-  }) => {
+  }): Cache<T> => {
     const loaded = createVolatileCache<T>();
     const metadataKey = makeMetadataKey(resourceName);
     const getItemKey = (key: string) => makeItemKey(resourceName, key);
@@ -91,7 +92,7 @@ export const makePersistentCacheStorageFactory =
         let value = loaded.get(itemKey);
         if (!value) {
           const result = await extensionLocalStorage.get(itemKey);
-          value = result[itemKey];
+          value = fromSerializableObject(result[itemKey]);
         }
 
         if (value) {
@@ -103,7 +104,7 @@ export const makePersistentCacheStorageFactory =
       async set(key: string, value: T) {
         const itemKey = getItemKey(key);
         loaded.set(itemKey, value);
-        await extensionLocalStorage.set({ [itemKey]: value });
+        await extensionLocalStorage.set({ [itemKey]: toSerializableObject(value) });
 
         void (async () => {
           await updateAccessTime(itemKey);
