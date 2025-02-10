@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.26.3...@cardano-sdk/cardano-services-client@0.26.4) (2025-02-10)
+
+### Bug Fixes
+
+* [lw-12235] handle expected blockfrost 404 errors ([3856c60](https://github.com/input-output-hk/cardano-js-sdk/commit/3856c60b46d0044d270a0e0ed7d24300d441eed5))
+
 ## [0.26.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.26.2...@cardano-sdk/cardano-services-client@0.26.3) (2025-02-06)
 
 ### Features
