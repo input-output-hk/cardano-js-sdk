@@ -2,6 +2,7 @@ import { BlockfrostClient, BlockfrostError } from './BlockfrostClient';
 import { HealthCheckResponse, Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { contextLogger } from '@cardano-sdk/util';
+import { isBlockfrostNotFoundError } from './util';
 import type { AsyncReturnType } from 'type-fest';
 import type { BlockFrostAPI } from '@blockfrost/blockfrost-js';
 
@@ -46,7 +47,7 @@ export abstract class BlockfrostProvider implements Provider {
       this.logger.debug('response', response);
       return response;
     } catch (error) {
-      this.logger.error('error', error);
+      isBlockfrostNotFoundError(error) ? this.logger.debug('Blockfrost not found', error) : this.logger.error(error);
       throw this.toProviderError(error);
     }
   }
