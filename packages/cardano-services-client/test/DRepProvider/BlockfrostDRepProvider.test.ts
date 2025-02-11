@@ -19,11 +19,12 @@ describe('BlockfrostDRepProvider', () => {
 
   describe('getDRep', () => {
     const mockedDRepId = Cardano.DRepID('drep15cfxz9exyn5rx0807zvxfrvslrjqfchrd4d47kv9e0f46uedqtc');
+    const mockedCip129DrepID = Cardano.DRepID.toCip129DRepID(mockedDRepId).toString();
     const mockedAssetResponse = {
       active: true,
       active_epoch: 420,
       amount: '2000000',
-      drep_id: 'drep15cfxz9exyn5rx0807zvxfrvslrjqfchrd4d47kv9e0f46uedqtc',
+      drep_id: mockedCip129DrepID,
       has_script: true,
       hex: 'a61261172624e8333ceff098648d90f8e404e2e36d5b5f5985cbd35d'
     } as Responses['drep'];
@@ -31,7 +32,7 @@ describe('BlockfrostDRepProvider', () => {
     test('getDRepInfo', async () => {
       mockResponses(request, [
         [
-          `governance/dreps/${mockedDRepId}`,
+          `governance/dreps/${mockedCip129DrepID}`,
           {
             ...mockedAssetResponse
           }
