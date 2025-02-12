@@ -11,8 +11,8 @@ export class BlockfrostDRepProvider extends BlockfrostProvider implements DRepPr
 
   async getDRepInfo({ id }: GetDRepInfoArgs): Promise<DRepInfo> {
     try {
-      const cip105DRepId = Cardano.DRepID.toCip105DRepID(id); // Blockfrost only supports CIP-105 DRep IDs
-      const response = await this.request<Responses['drep']>(`governance/dreps/${cip105DRepId.toString()}`);
+      const cip129DRepId = Cardano.DRepID.toCip129DRepID(id).toString();
+      const response = await this.request<Responses['drep']>(`governance/dreps/${cip129DRepId}`);
       const amount = BigInt(response.amount);
       const activeEpoch = response.active_epoch ? Cardano.EpochNo(response.active_epoch) : undefined;
       const active = response.active;
