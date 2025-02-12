@@ -31,8 +31,6 @@
       TOKEN_METADATA_SERVER_URL = values.cardano-services.tokenMetadataServerUrl;
       NODE_ENV = values.cardano-services.nodeEnv;
 
-      ALLOWED_ORIGINS = values.backend.allowedOrigins;
-
       POSTGRES_POOL_MAX_STAKE_POOL = "10";
       POSTGRES_HOST_STAKE_POOL = values.postgresName;
       POSTGRES_PORT_STAKE_POOL = "5432";
