@@ -116,6 +116,20 @@ export class TrezorKeyAgent extends KeyAgentBase {
         // Show Trezor Suite popup. Disabled for node based apps
         popup: communicationType !== CommunicationType.Node && !silentMode
       });
+
+      trezorConnect.on(Trezor.UI_EVENT, (event) => {
+        // React on ui-request_passphrase event
+        if (event.type === Trezor.UI.REQUEST_PASSPHRASE && event.payload.device) {
+          trezorConnect.uiResponse({
+            payload: {
+              passphraseOnDevice: true,
+              save: true,
+              value: ''
+            },
+            type: Trezor.UI.RECEIVE_PASSPHRASE
+          });
+        }
+      });
       return true;
     } catch (error: any) {
       if (error.code === 'Init_AlreadyInitialized') return true;
