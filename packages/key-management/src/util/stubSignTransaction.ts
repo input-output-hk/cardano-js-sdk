@@ -17,7 +17,7 @@ export interface StubSignTransactionProps {
 
 export const stubSignTransaction = async ({
   txBody,
-  context: { knownAddresses, txInKeyPathMap, dRepKeyHashHex: dRepKeyHash },
+  context: { knownAddresses, txInKeyPathMap, dRepKeyHashHex: dRepKeyHash, scripts },
   signTransactionOptions: { extraSigners, additionalKeyPaths = [] } = {}
 }: StubSignTransactionProps): Promise<Cardano.Signatures> => {
   const mockSignature = Crypto.Ed25519SignatureHex(
@@ -25,7 +25,7 @@ export const stubSignTransaction = async ({
     'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
   );
   const signatureKeyPaths = uniqWith(
-    [...ownSignatureKeyPaths(txBody, knownAddresses, txInKeyPathMap, dRepKeyHash), ...additionalKeyPaths],
+    [...ownSignatureKeyPaths(txBody, knownAddresses, txInKeyPathMap, dRepKeyHash, scripts), ...additionalKeyPaths],
     deepEquals
   );
 

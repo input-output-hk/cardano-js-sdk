@@ -294,6 +294,81 @@ const getRequiredSignersKeyPaths = (
   return paths;
 };
 
+const checkStakeCredential = (address: GroupedAddress, keyHash: Crypto.Ed25519KeyHashHex): SignatureCheck =>
+  address.stakeKeyDerivationPath &&
+  Cardano.RewardAccount.toHash(address.rewardAccount) === Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(keyHash)
+    ? { derivationPaths: [address.stakeKeyDerivationPath], requiresForeignSignatures: false }
+    : { derivationPaths: [], requiresForeignSignatures: true };
+
+const checkPaymentCredential = (address: GroupedAddress, keyHash: Crypto.Ed25519KeyHashHex): SignatureCheck => {
+  const paymentCredential = Cardano.Address.fromBech32(address.address)?.asBase()?.getPaymentCredential();
+  return paymentCredential?.type === Cardano.CredentialType.KeyHash &&
+    paymentCredential.hash === Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(keyHash)
+    ? {
+        derivationPaths: [{ index: address.index, role: Number(address.type) }],
+        requiresForeignSignatures: false
+      }
+    : { derivationPaths: [], requiresForeignSignatures: true };
+};
+
+const combineSignatureChecks = (a: SignatureCheck, b: SignatureCheck): SignatureCheck => ({
+  derivationPaths: [...a.derivationPaths, ...b.derivationPaths],
+  requiresForeignSignatures: a.requiresForeignSignatures || b.requiresForeignSignatures
+});
+
+const processSignatureScript = (
+  script: Cardano.RequireSignatureScript,
+  groupedAddresses: GroupedAddress[]
+): SignatureCheck => {
+  let signatureCheck: SignatureCheck = { derivationPaths: [], requiresForeignSignatures: false };
+
+  for (const address of groupedAddresses) {
+    if (address.stakeKeyDerivationPath) {
+      signatureCheck = checkStakeCredential(address, script.keyHash);
+    }
+    signatureCheck = combineSignatureChecks(signatureCheck, checkPaymentCredential(address, script.keyHash));
+  }
+
+  return signatureCheck;
+};
+
+const getNativeScriptKeyPaths = (
+  groupedAddresses: GroupedAddress[],
+  nativeScripts?: Cardano.Script[]
+): SignatureCheck => {
+  const signatureCheck: SignatureCheck = { derivationPaths: [], requiresForeignSignatures: false };
+  if (!nativeScripts?.length) return signatureCheck;
+
+  const processScript = (script: Cardano.Script): SignatureCheck => {
+    if (!Cardano.isNativeScript(script)) {
+      return { derivationPaths: [], requiresForeignSignatures: false };
+    }
+
+    switch (script.kind) {
+      case Cardano.NativeScriptKind.RequireSignature: {
+        return processSignatureScript(script as Cardano.RequireSignatureScript, groupedAddresses);
+      }
+      case Cardano.NativeScriptKind.RequireAllOf:
+      case Cardano.NativeScriptKind.RequireAnyOf:
+      case Cardano.NativeScriptKind.RequireNOf: {
+        const scriptWithScripts = script as Cardano.RequireAllOfScript | Cardano.RequireAnyOfScript;
+        return scriptWithScripts.scripts.reduce<SignatureCheck>(
+          (acc, subScript) => combineSignatureChecks(acc, processScript(subScript)),
+          { derivationPaths: [], requiresForeignSignatures: false }
+        );
+      }
+      case Cardano.NativeScriptKind.RequireTimeBefore:
+      case Cardano.NativeScriptKind.RequireTimeAfter:
+        return { derivationPaths: [], requiresForeignSignatures: false };
+    }
+  };
+
+  return nativeScripts.reduce<SignatureCheck>(
+    (acc, script) => combineSignatureChecks(acc, processScript(script)),
+    signatureCheck
+  );
+};
+
 /** Check if there are certificates that require DRep credentials and if we own them */
 export const getDRepCredentialKeyPaths = ({
   dRepKeyHash,
@@ -357,7 +432,8 @@ export const ownSignatureKeyPaths = (
   txBody: Cardano.TxBody,
   knownAddresses: GroupedAddress[],
   txInKeyPathMap: TxInKeyPathMap,
-  dRepKeyHash?: Crypto.Ed25519KeyHashHex
+  dRepKeyHash?: Crypto.Ed25519KeyHashHex,
+  scripts?: Cardano.Script[]
 ): AccountKeyDerivationPath[] => {
   // TODO: add `proposal_procedure` witnesses.
 
@@ -368,7 +444,8 @@ export const ownSignatureKeyPaths = (
       ...getStakeCredentialKeyPaths(knownAddresses, txBody).derivationPaths,
       ...getDRepCredentialKeyPaths({ dRepKeyHash, txBody }).derivationPaths,
       ...getRequiredSignersKeyPaths(knownAddresses, txBody.requiredExtraSignatures),
-      ...getVotingProcedureKeyPaths({ dRepKeyHash, groupedAddresses: knownAddresses, txBody }).derivationPaths
+      ...getVotingProcedureKeyPaths({ dRepKeyHash, groupedAddresses: knownAddresses, txBody }).derivationPaths,
+      ...getNativeScriptKeyPaths(knownAddresses, scripts).derivationPaths
     ],
     isEqual
   );
