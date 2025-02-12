@@ -33,6 +33,7 @@ export const makePersistentCacheStorageFactory =
     resourceName: string;
     quotaInBytes: number;
   }): Cache<T> => {
+    let metadataUpdateQueue = Promise.resolve();
     const loaded = createVolatileCache<T>();
     const metadataKey = makeMetadataKey(resourceName);
     const getItemKey = (key: string) => makeItemKey(resourceName, key);
@@ -42,15 +43,22 @@ export const makePersistentCacheStorageFactory =
       return result[metadataKey] as Metadata;
     };
 
+    const updateMetadata = async (mutate: (metadata: Metadata) => Metadata) => {
+      metadataUpdateQueue = metadataUpdateQueue.then(async () => {
+        const currentMetadata = await getMetadata();
+        const nextMetadata = mutate(currentMetadata);
+        await extensionLocalStorage.set({ [metadataKey]: nextMetadata });
+      });
+      return metadataUpdateQueue;
+    };
+
     const updateAccessTime = async (key: string) => {
-      const metadata = await getMetadata();
-      const nextMetadata: Metadata = {
+      await updateMetadata((metadata) => ({
         ...metadata,
         [key]: {
           accessTime: Date.now()
         }
-      };
-      await extensionLocalStorage.set({ [metadataKey]: nextMetadata });
+      }));
     };
 
     const isQuotaExceeded = async () => {
@@ -67,7 +75,7 @@ export const makePersistentCacheStorageFactory =
     };
 
     const evict = async () => {
-      let metadata = await getMetadata();
+      const metadata = await getMetadata();
       const mostDatedKeysToPurge = Object.entries(metadata)
         .map(([key, { accessTime }]) => ({ accessTime, key }))
         .sort((a, b) => a.accessTime - b.accessTime)
@@ -78,11 +86,12 @@ export const makePersistentCacheStorageFactory =
         .map((i) => i.key);
 
       await extensionLocalStorage.remove(mostDatedKeysToPurge);
-      metadata = await getMetadata();
-      for (const key of mostDatedKeysToPurge) {
-        delete metadata[key];
-      }
-      await extensionLocalStorage.set({ [metadataKey]: metadata });
+      await updateMetadata((currentMetadata) => {
+        for (const key of mostDatedKeysToPurge) {
+          delete currentMetadata[key];
+        }
+        return currentMetadata;
+      });
     };
 
     return {
