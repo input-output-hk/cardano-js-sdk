@@ -111,7 +111,8 @@ describe('InMemoryKeyAgent', () => {
       knownAddresses,
       txInKeyPathMap
     });
-    expect(ownSignatureKeyPaths).toBeCalledWith(body.toCore(), knownAddresses, txInKeyPathMap, expect.anything());
+    const expectedArgs = [body.toCore(), knownAddresses, txInKeyPathMap, expect.anything(), undefined] as const;
+    expect(ownSignatureKeyPaths).toBeCalledWith(...expectedArgs);
     expect(witnessSet.size).toBe(2);
     expect(typeof [...witnessSet.values()][0]).toBe('string');
   });
