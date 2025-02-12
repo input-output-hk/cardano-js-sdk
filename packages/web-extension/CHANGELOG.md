@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.38.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.38.13...@cardano-sdk/web-extension@0.38.14) (2025-02-12)
+
+### Features
+
+* make metadata update operation atomic in persisten cache storage ([6875804](https://github.com/input-output-hk/cardano-js-sdk/commit/687580470f33055f35454d2264622fe60203a087))
+
 ## [0.38.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.38.12...@cardano-sdk/web-extension@0.38.13) (2025-02-10)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension
