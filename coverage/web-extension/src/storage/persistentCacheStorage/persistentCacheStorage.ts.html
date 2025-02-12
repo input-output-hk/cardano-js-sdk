@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">96.77% </span>
+                <span class="strong">97.05% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>60/62</span>
+                <span class='fraction'>66/68</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">94.44% </span>
+                <span class="strong">95.45% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>17/18</span>
+                <span class='fraction'>21/22</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">98.18% </span>
+                <span class="strong">98.33% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>54/55</span>
+                <span class='fraction'>59/60</span>
             </div>
         
             
@@ -182,7 +182,16 @@
 <a name='L117'></a><a href='#L117'>117</a>
 <a name='L118'></a><a href='#L118'>118</a>
 <a name='L119'></a><a href='#L119'>119</a>
-<a name='L120'></a><a href='#L120'>120</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">6x</span>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -220,6 +229,7 @@
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">16x</span>
@@ -227,6 +237,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -234,7 +252,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
@@ -267,6 +284,7 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
@@ -336,6 +354,7 @@ export const makePersistentCacheStorageFactory =
     resourceName: string;
     quotaInBytes: number;
   }): Cache&lt;T&gt; =&gt; {
+    let metadataUpdateQueue = Promise.resolve();
     const loaded = createVolatileCache&lt;T&gt;();
     const metadataKey = makeMetadataKey(resourceName);
     const getItemKey = (key: string) =&gt; makeItemKey(resourceName, key);
@@ -345,15 +364,22 @@ export const makePersistentCacheStorageFactory =
       return result[metadataKey] as Metadata;
     };
 &nbsp;
+    const updateMetadata = async (mutate: (metadata: Metadata) =&gt; Metadata) =&gt; {
+      metadataUpdateQueue = metadataUpdateQueue.then(async () =&gt; {
+        const currentMetadata = await getMetadata();
+        const nextMetadata = mutate(currentMetadata);
+        await extensionLocalStorage.set({ [metadataKey]: nextMetadata });
+      });
+      return metadataUpdateQueue;
+    };
+&nbsp;
     const updateAccessTime = async (key: string) =&gt; {
-      const metadata = await getMetadata();
-      const nextMetadata: Metadata = {
+      await updateMetadata((metadata) =&gt; ({
         ...metadata,
         [key]: {
           accessTime: Date.now()
         }
-      };
-      await extensionLocalStorage.set({ [metadataKey]: nextMetadata });
+      }));
     };
 &nbsp;
     const isQuotaExceeded = async () =&gt; {
@@ -370,7 +396,7 @@ export const makePersistentCacheStorageFactory =
     };
 &nbsp;
     const evict = async () =&gt; {
-      let metadata = await getMetadata();
+      const metadata = await getMetadata();
       const mostDatedKeysToPurge = Object.entries(metadata)
         .map(([key, { accessTime }]) =&gt; ({ accessTime, key }))
         .sort((a, b) =&gt; a.accessTime - b.accessTime)
@@ -381,11 +407,12 @@ export const makePersistentCacheStorageFactory =
         .map((i) =&gt; i.key);
 &nbsp;
       await extensionLocalStorage.remove(mostDatedKeysToPurge);
-      metadata = await getMetadata();
-      for (const key of mostDatedKeysToPurge) {
-        delete metadata[key];
-      }
-      await extensionLocalStorage.set({ [metadataKey]: metadata });
+      await updateMetadata((currentMetadata) =&gt; {
+        for (const key of mostDatedKeysToPurge) {
+          delete currentMetadata[key];
+        }
+        return currentMetadata;
+      });
     };
 &nbsp;
     return {
@@ -427,7 +454,7 @@ export type CreatePersistentCacheStorage = typeof createPersistentCacheStorage;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-02-12T11:56:27.921Z
+                at 2025-02-12T12:38:27.854Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
