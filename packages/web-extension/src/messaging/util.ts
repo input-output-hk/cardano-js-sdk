@@ -24,7 +24,7 @@ export const isRequest = (message: any): message is MethodRequest =>
 export const isFactoryCall = (message: any): message is FactoryCall =>
   isRequestLike(message) && typeof message.channel === 'string';
 
-const looksLikeMessage = (message: any): message is AnyMessage & Record<string, unknown> =>
+export const looksLikeMessage = (message: any): message is AnyMessage & Record<string, unknown> =>
   typeof message === 'object' && message !== null && typeof message.messageId === 'string';
 
 export const isRequestMessage = (message: any): message is RequestMessage =>

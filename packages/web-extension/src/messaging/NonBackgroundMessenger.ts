@@ -24,6 +24,7 @@ import {
   PortMessage,
   ReconnectConfig
 } from './types';
+import { chunkMessage, createChunkedMessageHandler } from './chunk';
 import { deriveChannelName } from './util';
 import { isNotNil } from '@cardano-sdk/util';
 import { retryBackoff } from 'backoff-rxjs';
@@ -67,10 +68,11 @@ export const createNonBackgroundMessenger = (
     delay = Math.min(Math.pow(delay, 2), maxDelay);
     reconnectTimeout = setTimeout(connect, delay);
   };
+  const chunkCollector = createChunkedMessageHandler();
   const onMessage = (data: unknown, port: MessengerPort) => {
     logger.debug(`[NonBackgroundMessenger(${channel})] message`, data);
     delay = initialDelay;
-    message$.next({ data, port });
+    chunkCollector.emitIfLastChunk({ data, port }, message$);
   };
   const onDisconnect = (port: MessengerPort) => {
     if (runtime.lastError) {
@@ -118,9 +120,14 @@ export const createNonBackgroundMessenger = (
      * @throws RxJS EmptyError if client is shutdown
      */
     postMessage(message: unknown): Observable<void> {
+      const chunkedMessage = chunkMessage(message);
       return connect$.pipe(
         first(),
-        tap((port) => port.postMessage(message)),
+        tap((port) => {
+          for (const chunk of chunkedMessage) {
+            port.postMessage(chunk);
+          }
+        }),
         retryBackoff({
           initialInterval: 10,
           maxInterval: 1000,

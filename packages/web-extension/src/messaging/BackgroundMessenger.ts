@@ -17,6 +17,7 @@ import {
 } from 'rxjs';
 import { ChannelName, DisconnectEvent, Messenger, MessengerDependencies, MessengerPort, PortMessage } from './types';
 import { Logger } from 'ts-log';
+import { chunkMessage, createChunkedMessageHandler } from './chunk';
 import { deriveChannelName } from './util';
 import { retryBackoff } from 'backoff-rxjs';
 
@@ -47,10 +48,11 @@ export const createBackgroundMessenger = ({ logger, runtime }: MessengerDependen
     }
     return channel;
   };
+  const chunkCollector = createChunkedMessageHandler();
   const onPortMessage = (data: unknown, port: MessengerPort) => {
     logger.debug(`[BackgroundMessenger(${port.name})] message`, data);
     const { message$ } = channels.get(port.name)!;
-    message$.next({ data, port });
+    chunkCollector.emitIfLastChunk({ data, port }, message$);
   };
   const onPortDisconnected = (port: MessengerPort) => {
     if (runtime.lastError) {
@@ -138,6 +140,7 @@ export const generalizeBackgroundMessenger = (
    * @throws RxJS EmptyError if messenger is shutdown
    */
   postMessage: (message) => {
+    const chunkedMessage = chunkMessage(message);
     const { ports$ } = messenger.getChannel(channel);
     return ports$.pipe(
       // wait for at least 1 port to be connected
@@ -145,7 +148,11 @@ export const generalizeBackgroundMessenger = (
       filter((ports) => ports.size > 0),
       first(),
       tap((ports) => {
-        for (const port of ports) port.postMessage(message);
+        for (const port of ports) {
+          for (const chunk of chunkedMessage) {
+            port.postMessage(chunk);
+          }
+        }
       }),
       retryBackoff({
         initialInterval: 10,
