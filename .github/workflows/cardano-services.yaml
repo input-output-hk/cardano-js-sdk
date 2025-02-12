@@ -54,7 +54,7 @@ name: cardano-services
         - local-network@us-east-1@v1
         - ops-preprod-1@us-east-1
         - ops-preview-1@us-east-1
-        - staging-mainnet@eu-west-1@v2
+        - staging-mainnet@us-east-1@v2
         - staging-preprod@us-east-1@v2
         required: true
         type: choice
