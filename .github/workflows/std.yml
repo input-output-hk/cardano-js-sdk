@@ -69,7 +69,7 @@ on:
 env:
   # NIX_UPLOAD_CACHE: s3://lace-nix-cache?region=us-east-1
   DISCOVERY_USER_NAME: gha-runner
-  DISCOVERY_KNOWN_HOSTS_ENTRY: '65.109.126.156 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEOVVDZydvD+diYa6A3EtA3WGw5NfN0wv7ckQxa/fX1O'
+  DISCOVERY_KNOWN_HOSTS_ENTRY: '135.181.232.243 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPuf3vsvXQsfHUjVUDgADmr6vZFlnRXapX3EE7PWrNOS'
 concurrency:
   group: std-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -89,7 +89,7 @@ jobs:
       contents: read
     steps:
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v3.0.1
+        uses: aws-actions/configure-aws-credentials@v2.2.0
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
@@ -161,7 +161,7 @@ jobs:
     steps:
       - name: Configure AWS Credentials
         if: matrix.target != 'dummy-target'
-        uses: aws-actions/configure-aws-credentials@v3.0.1
+        uses: aws-actions/configure-aws-credentials@v2.2.0
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
