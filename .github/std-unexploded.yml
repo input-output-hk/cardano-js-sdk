@@ -18,7 +18,7 @@ env:
   AWS_ROLE_ARN: arn:aws:iam::926093910549:role/lace-ci
   # NIX_UPLOAD_CACHE: s3://lace-nix-cache?region=us-east-1
   DISCOVERY_USER_NAME: gha-runner
-  DISCOVERY_KNOWN_HOSTS_ENTRY: "65.109.126.156 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEOVVDZydvD+diYa6A3EtA3WGw5NfN0wv7ckQxa/fX1O"
+  DISCOVERY_KNOWN_HOSTS_ENTRY: '135.181.232.243 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPuf3vsvXQsfHUjVUDgADmr6vZFlnRXapX3EE7PWrNOS'
 
 permissions:
   id-token: write
@@ -36,7 +36,7 @@ jobs:
     runs-on: [self-hosted, discovery]
     steps:
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2.2.0
+        uses: aws-actions/configure-aws-credentials@v4.1.0
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
@@ -96,7 +96,7 @@ jobs:
         target: ${{ fromJSON(needs.discover.outputs.hits).oci-images.publish }}
     steps:
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2.2.0
+        uses: aws-actions/configure-aws-credentials@v4.1.0
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
@@ -137,7 +137,7 @@ jobs:
         target: ${{ fromJSON(needs.discover.outputs.hits).deployments.diff }}
     steps:
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2.2.0
+        uses: aws-actions/configure-aws-credentials@v4.1.0
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
@@ -168,7 +168,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           OWNER_AND_REPO: ${{ github.repository }}
         with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
-      
+
 
   deploy-to-eu:
     <<: *job
@@ -193,7 +193,7 @@ jobs:
         target: ${{ fromJSON(needs.discover.outputs.hits).deployments.apply }}
     steps:
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2.2.0
+        uses: aws-actions/configure-aws-credentials@v4.1.0
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
@@ -220,5 +220,5 @@ jobs:
           echo commit: ${{ github.sha }}
       - uses: divnix/std-action/run@main
         with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
-      
+
 
