@@ -35,8 +35,7 @@ export type Cip30WalletDependencies = {
 export enum Cip30ConfirmationCallbackType {
   SignData = 'sign_data',
   SignTx = 'sign_tx',
-  SubmitTx = 'submit_tx',
-  GetCollateral = 'get_collateral'
+  SubmitTx = 'submit_tx'
 }
 
 export type SignDataCallbackParams = {
@@ -59,18 +58,6 @@ export type SubmitTxCallbackParams = {
   data: Cardano.Tx;
 };
 
-// Optional callback
-export type GetCollateralCallbackParams = {
-  sender: MessageSender;
-  type: Cip30ConfirmationCallbackType.GetCollateral;
-  data: {
-    amount: Cardano.Lovelace;
-    utxos: Cardano.Utxo[];
-  };
-};
-
-type GetCollateralCallback = (args: GetCollateralCallbackParams) => Promise<Cardano.Utxo[]>;
-
 export type SignConfirmationOk = { cancel$: Observable<void> };
 export type SignConfirmationResult = SignConfirmationOk | false;
 
@@ -81,7 +68,6 @@ export type CallbackConfirmation = {
   signData: (args: SignDataCallbackParams) => Promise<SignConfirmationResult>;
   signTx: (args: SignTxCallbackParams) => Promise<SignConfirmationResult>;
   submitTx: (args: SubmitTxCallbackParams) => Promise<boolean>;
-  getCollateral?: GetCollateralCallback;
 };
 
 const firstValueFromTimed = <T>(observable$: Observable<T>, timeoutAfter: Milliseconds) =>
@@ -194,9 +180,6 @@ const selectUtxo = async (wallet: ObservableWallet, filterAmount: Cardano.Value,
     ? dumbSelection(await firstValueFrom(wallet.utxo.available$), filterAmount)
     : await walletSelection(filterAmount, wallet);
 
-/** Returns an array of UTxOs that do not contain assets */
-const getUtxosWithoutAssets = (utxos: Cardano.Utxo[]): Cardano.Utxo[] => utxos.filter((utxo) => !utxo[1].value.assets);
-
 const getFilterAsBigNum = (amount: Cbor): bigint => {
   const reader = new Serialization.CborReader(HexBlob(amount));
 
@@ -220,46 +203,6 @@ const getFilterAmount = (amount: Cbor): bigint => {
     }
     return filterAmount;
   } catch (error) {
-    throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
-  }
-};
-
-/**
- * getCollateralCallback
- *
- * @param sender The sender of the request
- * @param amount ADA collateral required in lovelaces
- * @param availableUtxos available UTxOs
- * @param callback Callback to execute to attempt setting new collateral
- * @param logger The logger instance
- * @returns Promise<Cbor[]> or null
- */
-const getCollateralCallback = async (
-  sender: MessageSender,
-  amount: Cardano.Lovelace,
-  availableUtxos: Cardano.Utxo[],
-  callback: GetCollateralCallback,
-  logger: Logger
-) => {
-  if (availableUtxos.length === 0) return null;
-  const availableUtxosWithoutAssets = getUtxosWithoutAssets(availableUtxos);
-  try {
-    // Send the amount and filtered available UTxOs to the callback
-    // Client can then choose to mark a UTxO set as unspendable
-    const newCollateral = await callback({
-      data: {
-        amount,
-        utxos: availableUtxosWithoutAssets
-      },
-      sender,
-      type: Cip30ConfirmationCallbackType.GetCollateral
-    });
-    return newCollateral.map((core) => Serialization.TransactionUnspentOutput.fromCore(core).toCbor());
-  } catch (error) {
-    logger.error(error);
-    if (error instanceof ApiError) {
-      throw error;
-    }
     throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
   }
 };
@@ -333,31 +276,19 @@ const baseCip30WalletApi = (
       throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
     }
   },
-  // eslint-disable-next-line max-statements, sonarjs/cognitive-complexity,complexity
   getCollateral: async (
-    { sender }: SenderContext,
+    _: SenderContext,
     { amount = new Serialization.Value(MAX_COLLATERAL_AMOUNT).toCbor() }: { amount?: Cbor } = {}
   ): Promise<
     Cbor[] | null
-    // eslint-disable-next-line sonarjs/cognitive-complexity, max-statements
+    // eslint-disable-next-line sonarjs/cognitive-complexity
   > => {
     logger.debug('getting collateral');
     const wallet = await firstValueFrom(wallet$);
     await waitForWalletStateSettle(wallet);
     let unspendables = await getSortedUtxos(wallet.utxo.unspendable$);
-    const available = await getSortedUtxos(wallet.utxo.available$);
     // No available unspendable UTxO
     if (unspendables.length === 0) {
-      if (available.length > 0 && !!confirmationCallback.getCollateral) {
-        // available UTxOs could be set as collateral based on user preference
-        return await getCollateralCallback(
-          sender,
-          getFilterAmount(amount),
-          available,
-          confirmationCallback.getCollateral,
-          logger
-        );
-      }
       return null;
     }
 
@@ -377,18 +308,6 @@ const baseCip30WalletApi = (
           if (totalCoins >= filterAmount) break;
         }
         if (totalCoins < filterAmount) {
-          // if no collateral available by amount in unspendables, return callback if provided to set unspendables and return in the callback
-
-          if (available.length > 0 && !!confirmationCallback.getCollateral) {
-            return await getCollateralCallback(
-              sender,
-              filterAmount,
-              available,
-              confirmationCallback.getCollateral,
-              logger
-            );
-          }
-
           throw new ApiError(APIErrorCode.Refused, 'not enough coins in configured collateral UTxOs');
         }
         unspendables = utxos;
