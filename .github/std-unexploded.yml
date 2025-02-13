@@ -36,7 +36,7 @@ jobs:
     runs-on: [self-hosted, discovery]
     steps:
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2.2.0
+        uses: aws-actions/configure-aws-credentials@v3.0.1
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
@@ -96,7 +96,7 @@ jobs:
         target: ${{ fromJSON(needs.discover.outputs.hits).oci-images.publish }}
     steps:
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2.2.0
+        uses: aws-actions/configure-aws-credentials@v3.0.1
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
@@ -137,7 +137,7 @@ jobs:
         target: ${{ fromJSON(needs.discover.outputs.hits).deployments.diff }}
     steps:
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2.2.0
+        uses: aws-actions/configure-aws-credentials@v3.0.1
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
@@ -168,7 +168,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           OWNER_AND_REPO: ${{ github.repository }}
         with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
-      
+
 
   deploy-to-eu:
     <<: *job
@@ -193,7 +193,7 @@ jobs:
         target: ${{ fromJSON(needs.discover.outputs.hits).deployments.apply }}
     steps:
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2.2.0
+        uses: aws-actions/configure-aws-credentials@v3.0.1
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
@@ -220,5 +220,5 @@ jobs:
           echo commit: ${{ github.sha }}
       - uses: divnix/std-action/run@main
         with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
-      
+
 
