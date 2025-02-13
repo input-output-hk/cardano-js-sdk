@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.51.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.51.11...@cardano-sdk/wallet@0.51.12) (2025-02-13)
+
+### Features
+
+* **wallet:** remove auto-collateral management logic ([970153f](https://github.com/input-output-hk/cardano-js-sdk/commit/970153fbaa6278767a3f07f8239864013315d28c))
+
 ## [0.51.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.51.10...@cardano-sdk/wallet@0.51.11) (2025-02-10)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
