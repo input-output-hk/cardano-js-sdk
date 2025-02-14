@@ -121,7 +121,7 @@ x-sdk-environment: &sdk-environment
 services:
   blockfrost-ryo:
     build:
-      context: 'https://github.com/mkazlauskas/blockfrost-backend-ryo.git#feat/custom-network-support'
+      context: 'https://github.com/blockfrost/blockfrost-backend-ryo.git#v3.1.0'
       dockerfile: Dockerfile
     environment:
       BLOCKFROST_CONFIG_SERVER_LISTEN_ADDRESS: 0.0.0.0
