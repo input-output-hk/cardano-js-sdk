@@ -1,6 +1,6 @@
 import { BackgroundMessenger, createBackgroundMessenger, generalizeBackgroundMessenger } from './BackgroundMessenger';
 import { ChannelName, ConsumeRemoteApiOptions, ExposeApiProps, MessengerDependencies } from './types';
-import { FinalizationRegistryDestructor } from './util';
+import { FinalizationRegistryDestructor, isBackgroundProcess } from './util';
 import { consumeMessengerRemoteApi, exposeMessengerApi } from './remoteApi';
 import { createNonBackgroundMessenger } from './NonBackgroundMessenger';
 
@@ -15,7 +15,7 @@ export * from './errors';
 
 export type BaseChannel = { baseChannel: ChannelName };
 
-const isInBackgroundProcess = typeof window === 'undefined';
+const isInBackgroundProcess = isBackgroundProcess();
 
 const getBackgroundMessenger = (() => {
   let backgroundMessenger: BackgroundMessenger | null = null;
