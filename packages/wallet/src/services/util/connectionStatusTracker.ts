@@ -1,4 +1,5 @@
 import { NEVER, Observable, distinctUntilChanged, fromEvent, map, merge, shareReplay, startWith } from 'rxjs';
+import { isBackgroundProcess } from '@cardano-sdk/util';
 
 export enum ConnectionStatus {
   down = 0,
@@ -21,7 +22,7 @@ export interface ConnectionStatusTrackerInternals {
  * @returns {ConnectionStatusTracker} ConnectionStatusTracker
  */
 export const createSimpleConnectionStatusTracker = ({
-  isNodeEnv = typeof window === 'undefined',
+  isNodeEnv = isBackgroundProcess(),
   online$ = isNodeEnv ? NEVER : fromEvent(window, 'online'),
   offline$ = isNodeEnv ? NEVER : fromEvent(window, 'offline'),
   initialStatus = isNodeEnv ? true : navigator.onLine

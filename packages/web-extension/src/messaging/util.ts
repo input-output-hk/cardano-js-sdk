@@ -77,7 +77,3 @@ export class FinalizationRegistryDestructor implements Destructor {
     this.#registry.register(obj, objectId);
   }
 }
-
-// Firefox addons use a generated background page to run the background script, so they have a window object
-export const isBackgroundProcess = () =>
-  typeof window === 'undefined' || window.location.href.includes('_generated_background');
