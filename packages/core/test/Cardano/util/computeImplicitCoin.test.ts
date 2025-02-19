@@ -1,5 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '../../../src';
+import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
 
 describe('Cardano.util.computeImplicitCoin', () => {
   let rewardAccount: Cardano.RewardAccount;
@@ -61,6 +62,7 @@ describe('Cardano.util.computeImplicitCoin', () => {
 
   it('sums registrations for deposit, withdrawals and deregistrations for input', () => {
     const protocolParameters = { dRepDeposit: 5, poolDeposit: 3, stakeKeyDeposit: 2 } as Cardano.ProtocolParameters;
+    const poolId = Cardano.PoolId.fromKeyHash(Ed25519KeyHashHex(Cardano.RewardAccount.toHash(rewardAccount)));
     const certificates: Cardano.Certificate[] = [
       { __typename: Cardano.CertificateType.StakeRegistration, stakeCredential },
       { __typename: Cardano.CertificateType.StakeDeregistration, stakeCredential },
@@ -68,11 +70,11 @@ describe('Cardano.util.computeImplicitCoin', () => {
       {
         __typename: Cardano.CertificateType.PoolRetirement,
         epoch: Cardano.EpochNo(500),
-        poolId: Cardano.PoolId('pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh')
+        poolId
       },
       {
         __typename: Cardano.CertificateType.StakeDelegation,
-        poolId: Cardano.PoolId('pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh'),
+        poolId,
         stakeCredential
       },
       {
@@ -88,7 +90,7 @@ describe('Cardano.util.computeImplicitCoin', () => {
       }
     ];
     const withdrawals: Cardano.Withdrawal[] = [{ quantity: 5n, stakeAddress: rewardAccount }];
-    const coin = Cardano.util.computeImplicitCoin(protocolParameters, { certificates, withdrawals });
+    const coin = Cardano.util.computeImplicitCoin(protocolParameters, { certificates, withdrawals }, [rewardAccount]);
     expect(coin.deposit).toBe(2n + 2n + 7n);
     expect(coin.input).toBe(2n + 3n + 5n + 7n);
     expect(coin.withdrawals).toBe(5n);
@@ -201,6 +203,34 @@ describe('Cardano.util.computeImplicitCoin', () => {
     expect(coin.reclaimDeposit).toBe(expectedReclaim);
     expect(coin.input).toBe(withdrawals[0].quantity + expectedReclaim);
     expect(coin.withdrawals).toBe(withdrawals[0].quantity);
+  });
+
+  it('sums withdrawals for input for own reward accounts', () => {
+    const protocolParameters = { dRepDeposit: 5, poolDeposit: 3, stakeKeyDeposit: 2 } as Cardano.ProtocolParameters;
+    const certificates: Cardano.Certificate[] = [];
+    const foreignRewardAccount = Cardano.RewardAccount(
+      'stake_test17rphkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gtcljw6kf'
+    );
+    const withdrawals: Cardano.Withdrawal[] = [
+      { quantity: 15n, stakeAddress: foreignRewardAccount },
+      { quantity: 5n, stakeAddress: rewardAccount }
+    ];
+    const coin = Cardano.util.computeImplicitCoin(protocolParameters, { certificates, withdrawals }, [rewardAccount]);
+    expect(coin.withdrawals).toBe(5n);
+  });
+
+  it('sums all withdrawals for input if there are no reward accounts provided', () => {
+    const protocolParameters = { dRepDeposit: 5, poolDeposit: 3, stakeKeyDeposit: 2 } as Cardano.ProtocolParameters;
+    const certificates: Cardano.Certificate[] = [];
+    const foreignRewardAccount = Cardano.RewardAccount(
+      'stake_test17rphkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gtcljw6kf'
+    );
+    const withdrawals: Cardano.Withdrawal[] = [
+      { quantity: 15n, stakeAddress: foreignRewardAccount },
+      { quantity: 5n, stakeAddress: rewardAccount }
+    ];
+    const coin = Cardano.util.computeImplicitCoin(protocolParameters, { certificates, withdrawals });
+    expect(coin.withdrawals).toBe(20n);
   });
 
   it('sums certificates and proposal procedures for deposit', () => {

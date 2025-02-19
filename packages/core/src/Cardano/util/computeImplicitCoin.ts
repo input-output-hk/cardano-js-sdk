@@ -146,6 +146,11 @@ const getTxDeposits = (
   };
 };
 
+const getOwnWithdrawalsTotal = (withdrawals: Cardano.Withdrawal[], rewardAccounts: Address.RewardAccount[]) =>
+  BigIntMath.sum(
+    withdrawals.filter(({ stakeAddress }) => rewardAccounts.includes(stakeAddress)).map(({ quantity }) => quantity)
+  );
+
 /**
  * Computes the implicit coin from the given transaction.
  * If rewardAccounts is provided, it will only count the deposits from
@@ -166,7 +171,7 @@ export const computeImplicitCoin = (
   {
     certificates,
     proposalProcedures,
-    withdrawals
+    withdrawals = []
   }: Pick<Cardano.HydratedTxBody, 'certificates' | 'proposalProcedures' | 'withdrawals'>,
   rewardAccounts?: Address.RewardAccount[],
   dRepKeyHash?: Crypto.Ed25519KeyHashHex
@@ -179,7 +184,9 @@ export const computeImplicitCoin = (
     proposalProcedures
   );
 
-  const withdrawalsTotal = (withdrawals && BigIntMath.sum(withdrawals.map(({ quantity }) => quantity))) || 0n;
+  const hasRewardAccount = !!rewardAccounts?.length;
+  const allWithdrawalsTotal = BigIntMath.sum(withdrawals.map(({ quantity }) => quantity));
+  const withdrawalsTotal = hasRewardAccount ? getOwnWithdrawalsTotal(withdrawals, rewardAccounts) : allWithdrawalsTotal;
 
   return {
     deposit,
