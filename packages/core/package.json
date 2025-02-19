@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/core",
-  "version": "0.45.2",
+  "version": "0.45.3",
   "description": "Core types and libraries for Cardano",
   "engines": {
     "node": ">=16.20.2"

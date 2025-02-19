@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.38.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.38.15...@cardano-sdk/web-extension@0.38.16) (2025-02-19)
+
+### Features
+
+* **web-extension:** detect bg script when on firefox ([b4b540d](https://github.com/input-output-hk/cardano-js-sdk/commit/b4b540d9b993862e43c532f146d118b287537390))
+
 ## [0.38.15](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.38.14...@cardano-sdk/web-extension@0.38.15) (2025-02-13)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension
