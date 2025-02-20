@@ -322,6 +322,10 @@ const getDerivationPath = (
   };
 };
 
+const multiSigWitnessPaths: BIP32Path[] = [
+  util.accountKeyDerivationPathToBip32Path(0, { index: 0, role: KeyRole.External }, KeyPurpose.MULTI_SIG)
+];
+
 export class LedgerKeyAgent extends KeyAgentBase {
   readonly deviceConnection?: LedgerConnection;
   readonly #communicationType: CommunicationType;
@@ -733,7 +737,10 @@ export class LedgerKeyAgent extends KeyAgentBase {
           tagCborSets: txBody.hasTaggedSets()
         },
         signingMode,
-        tx: ledgerTxData
+        tx: ledgerTxData,
+        ...(signingMode === TransactionSigningMode.MULTISIG_TRANSACTION && {
+          additionalWitnessPaths: multiSigWitnessPaths
+        })
       });
 
       if (!areStringsEqualInConstantTime(result.txHashHex, hash)) {
