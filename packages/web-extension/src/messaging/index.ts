@@ -1,8 +1,9 @@
 import { BackgroundMessenger, createBackgroundMessenger, generalizeBackgroundMessenger } from './BackgroundMessenger';
 import { ChannelName, ConsumeRemoteApiOptions, ExposeApiProps, MessengerDependencies } from './types';
-import { FinalizationRegistryDestructor, isBackgroundProcess } from './util';
+import { FinalizationRegistryDestructor } from './util';
 import { consumeMessengerRemoteApi, exposeMessengerApi } from './remoteApi';
 import { createNonBackgroundMessenger } from './NonBackgroundMessenger';
+import { isBackgroundProcess } from '@cardano-sdk/util';
 
 export * from './BackgroundMessenger';
 export * from './NonBackgroundMessenger';
