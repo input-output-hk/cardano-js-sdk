@@ -16,25 +16,33 @@ const toStakeCredential = (stakeKeyHash: Crypto.Hash28ByteBase16): Cardano.Crede
   type: Cardano.CredentialType.KeyHash
 });
 
+const createBaseGroupedAddress = (
+  address: Cardano.PaymentAddress,
+  rewardAccount: Cardano.RewardAccount,
+  type: AddressType,
+  index: number
+) => ({
+  address,
+  index,
+  rewardAccount,
+  type
+});
+
 const createGroupedAddress = (
   address: Cardano.PaymentAddress,
   rewardAccount: Cardano.RewardAccount,
   type: AddressType,
   index: number,
   stakeKeyDerivationPath: AccountKeyDerivationPath
-  // eslint-disable-next-line max-params
-): GroupedAddress =>
+) =>
   ({
-    address,
-    index,
-    rewardAccount,
-    stakeKeyDerivationPath,
-    type
+    ...createBaseGroupedAddress(address, rewardAccount, type, index),
+    stakeKeyDerivationPath
   } as GroupedAddress);
 
-describe('KeyManagement.util.ownSignaturePaths', () => {
-  const ownRewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
+const createTestAddresses = () => {
   const otherRewardAccount = Cardano.RewardAccount('stake_test1uqrw9tjymlm8wrwq7jk68n6v7fs9qz8z0tkdkve26dylmfc2ux2hj');
+  const ownRewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
   const address1 = Cardano.PaymentAddress(
     'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x'
   );
@@ -42,6 +50,11 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   );
 
+  return { address1, address2, otherRewardAccount, ownRewardAccount };
+};
+
+describe('KeyManagement.util.ownSignaturePaths', () => {
+  const { address1, address2, ownRewardAccount, otherRewardAccount } = createTestAddresses();
   const ownStakeKeyHash = Cardano.RewardAccount.toHash(ownRewardAccount);
   const ownStakeCredential = {
     hash: ownStakeKeyHash,
@@ -576,6 +589,49 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       expect(util.ownSignatureKeyPaths(txBody, [knownAddress1], {}, dRepKeyHash)).toEqual([
         { index: 0, role: KeyRole.DRep }
       ]);
+    });
+  });
+
+  describe('Native scripts', () => {
+    it('includes derivation paths from native scripts when scripts are provided', async () => {
+      const txBody: Cardano.TxBody = {
+        fee: BigInt(0),
+        inputs: [{}, {}, {}] as Cardano.TxIn[],
+        outputs: []
+      };
+
+      const scripts: Cardano.Script[] = [
+        {
+          __type: Cardano.ScriptType.Native,
+          keyHash: Ed25519KeyHashHex(ownStakeKeyHash),
+          kind: Cardano.NativeScriptKind.RequireSignature
+        }
+      ];
+
+      expect(util.ownSignatureKeyPaths(txBody, [knownAddress1], {}, undefined, scripts)).toEqual([
+        {
+          index: 0,
+          role: KeyRole.Stake
+        }
+      ]);
+    });
+
+    it('does not include derivation paths from native scripts with foreign key hashes', async () => {
+      const txBody: Cardano.TxBody = {
+        fee: BigInt(0),
+        inputs: [{}, {}, {}] as Cardano.TxIn[],
+        outputs: []
+      };
+
+      const scripts: Cardano.Script[] = [
+        {
+          __type: Cardano.ScriptType.Native,
+          keyHash: Ed25519KeyHashHex(otherStakeKeyHash),
+          kind: Cardano.NativeScriptKind.RequireSignature
+        }
+      ];
+
+      expect(util.ownSignatureKeyPaths(txBody, [knownAddress1], {}, undefined, scripts)).toEqual([]);
     });
   });
 });

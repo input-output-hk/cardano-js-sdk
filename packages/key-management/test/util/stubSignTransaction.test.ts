@@ -34,6 +34,7 @@ describe('KeyManagement.util.stubSignTransaction', () => {
         })
       ).size
     ).toBe(2);
-    expect(ownSignatureKeyPaths).toBeCalledWith(txBody, knownAddresses, txInKeyPathMap, dRepKeyHash);
+    const expectedArgs = [txBody, knownAddresses, txInKeyPathMap, dRepKeyHash, undefined] as const;
+    expect(ownSignatureKeyPaths).toBeCalledWith(...expectedArgs);
   });
 });

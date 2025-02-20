@@ -175,6 +175,7 @@ export interface SignTransactionContext {
   handleResolutions?: HandleResolution[];
   dRepKeyHashHex?: Crypto.Ed25519KeyHashHex;
   sender?: MessageSender;
+  scripts?: Cardano.Script[];
 }
 
 export type SignDataContext = Cip8SignDataContext & { sender?: MessageSender };
