@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.15.7...@cardano-sdk/util@0.16.0) (2025-02-24)
+
+### ⚠ BREAKING CHANGES
+
+* hoist isBackgroundProcess script detection to utils package
+
+### Code Refactoring
+
+* hoist isBackgroundProcess script detection to utils package ([25ae251](https://github.com/input-output-hk/cardano-js-sdk/commit/25ae2511e19b68955943953413833d59d70710f7))
+
 ## [0.15.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.15.6...@cardano-sdk/util@0.15.7) (2025-02-06)
 
 ### Features
