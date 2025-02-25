@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.39.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.39.0...@cardano-sdk/web-extension@0.39.1) (2025-02-25)
+
+### Features
+
+* **wallet-extension:** add optional blockchain name to Bip32Wallet properties ([b731a11](https://github.com/input-output-hk/cardano-js-sdk/commit/b731a11676a6cfb15d7cebd990d892254f1e1ad4))
+
 ## [0.39.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.38.16...@cardano-sdk/web-extension@0.39.0) (2025-02-24)
 
 ### ⚠ BREAKING CHANGES

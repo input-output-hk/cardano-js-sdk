@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.27.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.27.4...@cardano-sdk/key-management@0.27.5) (2025-02-25)
+
+### Bug Fixes
+
+* Added nativescript checks for ownSignatureKeyPaths ([255d0d5](https://github.com/input-output-hk/cardano-js-sdk/commit/255d0d5c6ff733813ce7829a2a53ea40eab63722))
+
 ## [0.27.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.27.3...@cardano-sdk/key-management@0.27.4) (2025-02-24)
 
 **Note:** Version bump only for package @cardano-sdk/key-management
