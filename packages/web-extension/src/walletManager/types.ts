@@ -21,10 +21,12 @@ export type Bip32WalletAccount<Metadata extends {}> = {
   extendedAccountPublicKey: Bip32PublicKeyHex;
 };
 
+export type Blockchain = 'Cardano' | 'Bitcoin';
 export type Bip32Wallet<WalletMetadata extends {}, AccountMetadata extends {}> = {
   walletId: WalletId;
   metadata: WalletMetadata;
   accounts: Bip32WalletAccount<AccountMetadata>[];
+  blockchainName?: Blockchain;
 };
 
 export type HardwareWallet<WalletMetadata extends {}, AccountMetadata extends {}> = Bip32Wallet<
