@@ -5,16 +5,6 @@ import { LedgerTxTransformerContext } from '../types';
 import { mapTokenMap } from './assets';
 import { util } from '@cardano-sdk/key-management';
 
-const isScriptAddress = (address: string): boolean => {
-  const baseAddress = Cardano.Address.fromBech32(address).asBase();
-  const paymentCredential = baseAddress?.getPaymentCredential();
-  const stakeCredential = baseAddress?.getStakeCredential();
-  return (
-    paymentCredential?.type === Cardano.CredentialType.ScriptHash &&
-    stakeCredential?.type === Cardano.CredentialType.ScriptHash
-  );
-};
-
 const toInlineDatum: Transform<Cardano.PlutusData, Ledger.Datum> = (datum) => ({
   datumHex: Serialization.PlutusData.fromCore(datum).toCbor(),
   type: Ledger.DatumType.INLINE
@@ -30,9 +20,9 @@ const toDestination: Transform<Cardano.TxOut, Ledger.TxOutputDestination, Ledger
   context
 ) => {
   const knownAddress = context?.knownAddresses.find((address) => address.address === txOut.address);
-  const isScriptWallet = isScriptAddress(txOut.address);
+  const isScriptAddress = Cardano.util.isScriptAddress(txOut.address);
 
-  if (knownAddress && !isScriptWallet) {
+  if (knownAddress && !isScriptAddress) {
     const paymentKeyPath = util.paymentKeyPathFromGroupedAddress(knownAddress);
     const stakeKeyPath = util.stakeKeyPathFromGroupedAddress(knownAddress);
 
