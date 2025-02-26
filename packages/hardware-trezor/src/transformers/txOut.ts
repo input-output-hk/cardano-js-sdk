@@ -10,8 +10,9 @@ const toDestination: Transform<Cardano.TxOut, TrezorTxOutputDestination, TrezorT
   context
 ) => {
   const knownAddress = context?.knownAddresses.find((address: GroupedAddress) => address.address === txOut.address);
+  const isScriptAddress = Cardano.util.isScriptAddress(txOut.address);
 
-  if (!knownAddress) {
+  if (!knownAddress || isScriptAddress) {
     return {
       address: txOut.address
     };
