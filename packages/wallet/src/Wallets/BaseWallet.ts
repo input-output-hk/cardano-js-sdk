@@ -65,9 +65,14 @@ import {
   EpochInfo,
   EraSummary,
   HandleProvider,
+  OutsideOfValidityIntervalData,
+  ProviderError,
+  ProviderFailure,
   RewardAccountInfoProvider,
   RewardsProvider,
   Serialization,
+  TxSubmissionError,
+  TxSubmissionErrorCode,
   TxSubmitProvider,
   UtxoProvider
 } from '@cardano-sdk/core';
@@ -697,6 +702,32 @@ export class BaseWallet implements ObservableWallet {
     { mightBeAlreadySubmitted }: SubmitTxOptions = {}
   ): Promise<Cardano.TransactionId> {
     this.#logger.debug(`Submitting transaction ${outgoingTx.id}`);
+
+    // TODO: Workaround while we resolve LW-12394
+    const { validityInterval } = outgoingTx.body;
+    if (validityInterval?.invalidHereafter) {
+      const slot = await firstValueFrom(this.tip$.pipe(map((tip) => tip.slot)));
+
+      if (slot >= validityInterval?.invalidHereafter) {
+        const data: OutsideOfValidityIntervalData = {
+          currentSlot: slot,
+          validityInterval: {
+            invalidBefore: validityInterval?.invalidBefore,
+            invalidHereafter: validityInterval?.invalidHereafter
+          }
+        };
+
+        throw new ProviderError(
+          ProviderFailure.BadRequest,
+          new TxSubmissionError(
+            TxSubmissionErrorCode.OutsideOfValidityInterval,
+            data,
+            'Not submitting transaction due to validity interval'
+          )
+        );
+      }
+    }
+
     this.#newTransactions.submitting$.next(outgoingTx);
     try {
       await this.txSubmitProvider.submitTx({

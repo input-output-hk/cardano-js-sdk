@@ -470,6 +470,19 @@ describe('BaseWallet methods', () => {
         expect(await txPending).toEqual(outgoingTx);
       });
 
+      it('throws if transaction is outside validity interval', async () => {
+        const draftTx = await wallet.initializeTx(props);
+        draftTx.body.validityInterval = {
+          invalidHereafter: Cardano.Slot(1_000_000)
+        };
+        const tx = await wallet.finalizeTx({ tx: draftTx });
+
+        await expect(wallet.submitTx(tx)).rejects.toThrow();
+
+        const txInFlight = await firstValueFrom(wallet.transactions.outgoing.inFlight$);
+        expect(txInFlight).toEqual([]);
+      });
+
       it('does not re-serialize the transaction to compute transaction id', async () => {
         // This transaction produces a different ID when round-tripping serialisation
         const cbor = Serialization.TxCBOR(

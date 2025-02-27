@@ -907,6 +907,57 @@ describe('TransactionsTracker', () => {
       });
     });
 
+    // TODO: Will be useful for LW-12394 investigation
+    it('emits timeout for transactions outside of the validity interval as failed$', async () => {
+      const outgoingTx = toOutgoingTx(queryTransactionsResult.pageResults[0]);
+
+      createTestScheduler().run(({ cold, hot, expectObservable }) => {
+        const tip$ = hot<Cardano.Tip>('-a---|', {
+          a: {
+          blockNo: Cardano.BlockNo(1),
+          hash: '' as Cardano.BlockId,
+          slot: Cardano.Slot(outgoingTx.body.validityInterval!.invalidHereafter! * 2)
+         }
+        });
+        const failedTx = { ...outgoingTx, id: 'x' as Cardano.TransactionId };
+        const submitting$ = cold('-a---|', { a: failedTx });
+        const pending$ = cold('-----|', { a: failedTx });
+        const transactionsSource$ = cold<Cardano.HydratedTx[]>('a--b-|', { a: [], b: [queryTransactionsResult.pageResults[0]] });
+        const failedToSubmit$ = hot<FailedTx>('-----|', { a: { ...failedTx, reason: TransactionFailure.FailedToSubmit } });
+        const signed$ = hot<WitnessedTx>('----|', {});
+        const transactionsTracker = createTransactionsTracker(
+          {
+            addresses$,
+            chainHistoryProvider,
+            historicalTransactionsFetchLimit,
+            inFlightTransactionsStore,
+            logger,
+            newTransactions: {
+              failedToSubmit$,
+              pending$,
+              signed$,
+              submitting$
+            },
+            retryBackoffConfig,
+            signedTransactionsStore,
+            tip$,
+            transactionsHistoryStore: transactionsStore
+          },
+          {
+            rollback$: NEVER,
+            transactionsSource$
+          }
+        );
+        expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a---|', { a: failedTx });
+        expectObservable(transactionsTracker.outgoing.pending$).toBe('-----|');
+        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('a(bc)|', { a: [], b: [failedTx], c: [] });
+        expectObservable(transactionsTracker.outgoing.onChain$).toBe('-----|', { a: [failedTx] });
+        expectObservable(transactionsTracker.outgoing.failed$).toBe('-a---|', {
+          a: { reason: TransactionFailure.Timeout, ...failedTx }
+        });
+      });
+    });
+
     it('emits at all relevant observable properties on transaction that failed to submit and merges reemit failures', async () => {
       const outgoingTx = toOutgoingTx(queryTransactionsResult.pageResults[0]);
       const outgoingTxReemit = toOutgoingTx(queryTransactionsResult.pageResults[1]);
