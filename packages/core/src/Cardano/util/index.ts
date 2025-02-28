@@ -5,3 +5,4 @@ export * from './resolveInputValue';
 export * from './phase2Validation';
 export * from './addressesShareAnyKey';
 export * from './plutusDataUtils';
+export * from './isScriptAddress';
