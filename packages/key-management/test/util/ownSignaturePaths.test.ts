@@ -33,7 +33,7 @@ const createGroupedAddress = (
   rewardAccount: Cardano.RewardAccount,
   type: AddressType,
   index: number,
-  stakeKeyDerivationPath: AccountKeyDerivationPath
+  stakeKeyDerivationPath?: AccountKeyDerivationPath
 ) =>
   ({
     ...createBaseGroupedAddress(address, rewardAccount, type, index),
@@ -632,6 +632,46 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       ];
 
       expect(util.ownSignatureKeyPaths(txBody, [knownAddress1], {}, undefined, scripts)).toEqual([]);
+    });
+    it('includes derivation paths for multi-signature native scripts', async () => {
+      const scriptAddress = Cardano.PaymentAddress(
+        'addr_test1xr806j8xcq6cw6jjkzfxyewyue33zwnu4ajnu28hakp5fmc6gddlgeqee97vwdeafwrdgrtzp2rw8rlchjf25ld7r2ssptq3m9'
+      );
+      const scriptRewardAccount = Cardano.RewardAccount(
+        'stake_test17qdyxkl5vsvujlx8xu75hpk5p43q4phr3lutey420klp4gg7zmhrn'
+      );
+      const txBody: Cardano.TxBody = {
+        fee: BigInt(0),
+        inputs: [{}, {}, {}] as Cardano.TxIn[],
+        outputs: []
+      };
+
+      const scripts: Cardano.Script[] = [
+        {
+          __type: Cardano.ScriptType.Native,
+          kind: Cardano.NativeScriptKind.RequireAnyOf,
+          scripts: [
+            {
+              __type: Cardano.ScriptType.Native,
+              keyHash: Ed25519KeyHashHex('b498c0eaceb9a8c7c829d36fc84e892113c9d2636b53b0636d7518b4'),
+              kind: Cardano.NativeScriptKind.RequireSignature
+            },
+            {
+              __type: Cardano.ScriptType.Native,
+              keyHash: Ed25519KeyHashHex(otherStakeKeyHash),
+              kind: Cardano.NativeScriptKind.RequireSignature
+            }
+          ]
+        }
+      ];
+
+      const knownAddress = createGroupedAddress(scriptAddress, scriptRewardAccount, AddressType.External, 0);
+      expect(util.ownSignatureKeyPaths(txBody, [knownAddress], {}, undefined, scripts)).toEqual([
+        {
+          index: 0,
+          role: KeyRole.External
+        }
+      ]);
     });
   });
 });

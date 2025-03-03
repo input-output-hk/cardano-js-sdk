@@ -20,8 +20,9 @@ const toDestination: Transform<Cardano.TxOut, Ledger.TxOutputDestination, Ledger
   context
 ) => {
   const knownAddress = context?.knownAddresses.find((address) => address.address === txOut.address);
+  const isScriptAddress = Cardano.util.isScriptAddress(txOut.address);
 
-  if (knownAddress) {
+  if (knownAddress && !isScriptAddress) {
     const paymentKeyPath = util.paymentKeyPathFromGroupedAddress(knownAddress);
     const stakeKeyPath = util.stakeKeyPathFromGroupedAddress(knownAddress);
 

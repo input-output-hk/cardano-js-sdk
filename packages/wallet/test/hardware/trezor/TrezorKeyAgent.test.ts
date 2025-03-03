@@ -4,6 +4,7 @@ import {
   Bip32Account,
   CommunicationType,
   SerializableTrezorKeyAgentData,
+  TrezorConfig,
   util
 } from '@cardano-sdk/key-management';
 import { AssetId, mockProviders as mocks } from '@cardano-sdk/util-dev';
@@ -31,12 +32,13 @@ describe('TrezorKeyAgent', () => {
   let txSubmitProvider: mocks.TxSubmitProviderStub;
   let address: Cardano.PaymentAddress;
 
-  const trezorConfig = {
+  const trezorConfig: TrezorConfig = {
     communicationType: CommunicationType.Node,
     manifest: {
       appUrl: 'https://your.application.com',
       email: 'email@developer.com'
-    }
+    },
+    shouldHandlePassphrase: true
   };
 
   beforeAll(async () => {

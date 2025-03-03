@@ -92,6 +92,8 @@ export interface TrezorConfig {
     email: string;
     appUrl: string;
   };
+  /** When set to true, Trezor automatically handle passphrase entry by forcing it to occur on the device */
+  shouldHandlePassphrase?: boolean;
 }
 
 export interface SerializableKeyAgentDataBase {

@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AccountKeyDerivationPath, GroupedAddress, TxInId, TxInKeyPathMap } from '../types';
+import { AccountKeyDerivationPath, GroupedAddress, KeyRole, TxInId, TxInKeyPathMap } from '../types';
 import { Cardano } from '@cardano-sdk/core';
 import { DREP_KEY_DERIVATION_PATH } from './key';
 import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
@@ -300,15 +300,24 @@ const checkStakeCredential = (address: GroupedAddress, keyHash: Crypto.Ed25519Ke
     ? { derivationPaths: [address.stakeKeyDerivationPath], requiresForeignSignatures: false }
     : { derivationPaths: [], requiresForeignSignatures: true };
 
-const checkPaymentCredential = (address: GroupedAddress, keyHash: Crypto.Ed25519KeyHashHex): SignatureCheck => {
+const checkPaymentCredential = (address: GroupedAddress, keyHash: Crypto.Ed25519KeyHashHex) => {
   const paymentCredential = Cardano.Address.fromBech32(address.address)?.asBase()?.getPaymentCredential();
-  return paymentCredential?.type === Cardano.CredentialType.KeyHash &&
+  if (
+    paymentCredential?.type === Cardano.CredentialType.ScriptHash &&
     paymentCredential.hash === Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(keyHash)
-    ? {
-        derivationPaths: [{ index: address.index, role: Number(address.type) }],
-        requiresForeignSignatures: false
-      }
-    : { derivationPaths: [], requiresForeignSignatures: true };
+  )
+    return {
+      derivationPaths: [{ index: address.index, role: Number(address.type) }],
+      requiresForeignSignatures: false
+    };
+
+  if (paymentCredential?.type === Cardano.CredentialType.ScriptHash) {
+    return {
+      derivationPaths: [{ index: address.index, role: KeyRole.External }],
+      requiresForeignSignatures: false
+    };
+  }
+  return { derivationPaths: [], requiresForeignSignatures: true };
 };
 
 const combineSignatureChecks = (a: SignatureCheck, b: SignatureCheck): SignatureCheck => ({

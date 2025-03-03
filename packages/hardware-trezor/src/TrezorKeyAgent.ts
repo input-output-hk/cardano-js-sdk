@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
 import * as Trezor from '@trezor/connect';
+import { BIP32Path } from '@cardano-sdk/crypto';
 import { Cardano, NotImplementedError, Serialization } from '@cardano-sdk/core';
 import {
   CardanoKeyConst,
@@ -9,6 +10,7 @@ import {
   KeyAgentDependencies,
   KeyAgentType,
   KeyPurpose,
+  KeyRole,
   SerializableTrezorKeyAgentData,
   SignBlobResult,
   SignTransactionContext,
@@ -68,6 +70,10 @@ const containsOnlyScriptHashCredentials = (tx: Omit<Trezor.CardanoSignTransactio
   return !tx.withdrawals?.some((withdrawal) => !withdrawal.scriptHash);
 };
 
+const multiSigWitnessPaths: BIP32Path[] = [
+  util.accountKeyDerivationPathToBip32Path(0, { index: 0, role: KeyRole.External }, KeyPurpose.MULTI_SIG)
+];
+
 const isMultiSig = (tx: Omit<Trezor.CardanoSignTransaction, 'signingMode'>): boolean => {
   const allThirdPartyInputs = !tx.inputs.some((input) => input.path);
   // Trezor doesn't allow change outputs to address controlled by your keys and instead you have to use script address for change out
@@ -100,7 +106,8 @@ export class TrezorKeyAgent extends KeyAgentBase {
     manifest,
     communicationType,
     silentMode = false,
-    lazyLoad = false
+    lazyLoad = false,
+    shouldHandlePassphrase = false
   }: TrezorConfig): Promise<boolean> {
     const trezorConnect = getTrezorConnect(communicationType);
     try {
@@ -116,6 +123,23 @@ export class TrezorKeyAgent extends KeyAgentBase {
         // Show Trezor Suite popup. Disabled for node based apps
         popup: communicationType !== CommunicationType.Node && !silentMode
       });
+
+      if (shouldHandlePassphrase) {
+        trezorConnect.on(Trezor.UI_EVENT, (event) => {
+          // React on ui-request_passphrase event
+          if (event.type === Trezor.UI.REQUEST_PASSPHRASE && event.payload.device) {
+            trezorConnect.uiResponse({
+              payload: {
+                passphraseOnDevice: true,
+                save: true,
+                value: ''
+              },
+              type: Trezor.UI.RECEIVE_PASSPHRASE
+            });
+          }
+        });
+      }
+
       return true;
     } catch (error: any) {
       if (error.code === 'Init_AlreadyInitialized') return true;
@@ -215,7 +239,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
 
   async signTransaction(
     txBody: Serialization.TransactionBody,
-    { knownAddresses, txInKeyPathMap }: SignTransactionContext
+    { knownAddresses, txInKeyPathMap, scripts }: SignTransactionContext
   ): Promise<Cardano.Signatures> {
     try {
       await this.isTrezorInitialized;
@@ -235,12 +259,15 @@ export class TrezorKeyAgent extends KeyAgentBase {
       const trezorConnect = getTrezorConnect(this.#communicationType);
       const result = await trezorConnect.cardanoSignTransaction({
         ...trezorTxData,
+        ...(signingMode === Trezor.PROTO.CardanoTxSigningMode.MULTISIG_TRANSACTION && {
+          additionalWitnessRequests: multiSigWitnessPaths
+        }),
         signingMode
       });
 
       const expectedPublicKeys = await Promise.all(
         util
-          .ownSignatureKeyPaths(body, knownAddresses, txInKeyPathMap)
+          .ownSignatureKeyPaths(body, knownAddresses, txInKeyPathMap, undefined, scripts)
           .map((derivationPath) => this.derivePublicKey(derivationPath))
       );
 
