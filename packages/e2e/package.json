@@ -74,7 +74,7 @@
   },
   "dependencies": {
     "@cardano-foundation/ledgerjs-hw-app-cardano": "^7.1.4",
-    "@cardano-ogmios/client": "6.9.0",
+    "@cardano-ogmios/client": "6.11.2",
     "@cardano-sdk/cardano-services": "workspace:~",
     "@cardano-sdk/cardano-services-client": "workspace:~",
     "@cardano-sdk/core": "workspace:~",
@@ -112,7 +112,7 @@
     "ts-node": "^10.8.1",
     "ts-stopwatch": "0.0.4",
     "uuid": "^8.3.2",
-    "webextension-polyfill": "^0.8.0",
+    "webextension-polyfill": "^0.12.0",
     "ws": "^8.5.0"
   },
   "devDependencies": {
@@ -131,11 +131,11 @@
     "@types/delay": "^3.1.0",
     "@types/dockerode": "^3.3.8",
     "@types/jest": "^28.1.2",
-    "@types/k6": "^0.53.1",
+    "@types/k6": "^0.57.0",
     "@types/lodash": "^4.14.182",
     "@types/ora": "^3.2.0",
     "@types/uuid": "^8.3.4",
-    "@types/webextension-polyfill": "^0.8.0",
+    "@types/webextension-polyfill": "^0.12.1",
     "@wdio/cli": "^7.19.5",
     "@wdio/local-runner": "^7.19.5",
     "@wdio/mocha-framework": "^7.19.5",
