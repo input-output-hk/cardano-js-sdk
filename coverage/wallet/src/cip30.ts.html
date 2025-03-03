@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">85.26% </span>
+                <span class="strong">84.98% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>243/285</span>
+                <span class='fraction'>249/293</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">84.74% </span>
+                <span class="strong">85.24% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>50/59</span>
+                <span class='fraction'>52/61</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">85.28% </span>
+                <span class="strong">84.98% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>226/265</span>
+                <span class='fraction'>232/273</span>
             </div>
         
             
@@ -646,7 +646,26 @@
 <a name='L581'></a><a href='#L581'>581</a>
 <a name='L582'></a><a href='#L582'>582</a>
 <a name='L583'></a><a href='#L583'>583</a>
-<a name='L584'></a><a href='#L584'>584</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">35x</span>
+<a name='L584'></a><a href='#L584'>584</a>
+<a name='L585'></a><a href='#L585'>585</a>
+<a name='L586'></a><a href='#L586'>586</a>
+<a name='L587'></a><a href='#L587'>587</a>
+<a name='L588'></a><a href='#L588'>588</a>
+<a name='L589'></a><a href='#L589'>589</a>
+<a name='L590'></a><a href='#L590'>590</a>
+<a name='L591'></a><a href='#L591'>591</a>
+<a name='L592'></a><a href='#L592'>592</a>
+<a name='L593'></a><a href='#L593'>593</a>
+<a name='L594'></a><a href='#L594'>594</a>
+<a name='L595'></a><a href='#L595'>595</a>
+<a name='L596'></a><a href='#L596'>596</a>
+<a name='L597'></a><a href='#L597'>597</a>
+<a name='L598'></a><a href='#L598'>598</a>
+<a name='L599'></a><a href='#L599'>599</a>
+<a name='L600'></a><a href='#L600'>600</a>
+<a name='L601'></a><a href='#L601'>601</a>
+<a name='L602'></a><a href='#L602'>602</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1224,8 +1243,25 @@
 <span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1234,6 +1270,7 @@
   ApiError,
   Bytes,
   Cbor,
+  Cip142WalletApi,
   Cip30DataSignature,
   Cip95WalletApi,
   DataSignError,
@@ -1804,13 +1841,30 @@ const extendedCip95WalletApi = (
   }
 });
 &nbsp;
+const extendedCip142WalletApi = (
+  wallet$: Observable&lt;ObservableWallet&gt;,
+  { logger }: Cip30WalletDependencies
+): Cip142WalletApi =&gt; ({
+  getNetworkMagic: async () =&gt; {
+    try {
+      const wallet = await firstValueFrom(wallet$);
+      const genesisParameters = await firstValueFrom(wallet.genesisParameters$);
+      return genesisParameters.networkMagic;
+    } catch (error) {
+<span class="cstat-no" title="statement not covered" >      logger.error(error);</span>
+<span class="cstat-no" title="statement not covered" >      throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));</span>
+    }
+  }
+});
+&nbsp;
 export const createWalletApi = (
   wallet$: Observable&lt;ObservableWallet&gt;,
   confirmationCallback: CallbackConfirmation,
   { logger }: Cip30WalletDependencies
 ): WithSenderContext&lt;WalletApi&gt; =&gt; ({
   ...baseCip30WalletApi(wallet$, confirmationCallback, { logger }),
-  ...extendedCip95WalletApi(wallet$, { logger })
+  ...extendedCip95WalletApi(wallet$, { logger }),
+  ...extendedCip142WalletApi(wallet$, { logger })
 });
 &nbsp;</pre></td></tr></table></pre>
 
@@ -1819,7 +1873,7 @@ export const createWalletApi = (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-03-03T14:59:09.189Z
+                at 2025-03-03T14:59:56.645Z
             </div>
         <script src="../prettify.js"></script>
         <script>
