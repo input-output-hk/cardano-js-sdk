@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/hardware-trezor",
-  "version": "0.7.5",
+  "version": "0.7.6",
   "description": "Mappings and integration with Trezor hardware",
   "engines": {
     "node": ">=16.20.1"

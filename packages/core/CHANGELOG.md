@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.45.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.45.4...@cardano-sdk/core@0.45.5) (2025-03-03)
+
+### Features
+
+* sign multi-sig transaction with hw wallet ([#1604](https://github.com/input-output-hk/cardano-js-sdk/issues/1604)) ([d15a044](https://github.com/input-output-hk/cardano-js-sdk/commit/d15a0444636b6c9aa8a7615814d1a3ce1af1542c))
+
 ## [0.45.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.45.3...@cardano-sdk/core@0.45.4) (2025-02-24)
 
 **Note:** Version bump only for package @cardano-sdk/core
