@@ -1,7 +1,6 @@
 import { Cardano, Serialization } from '@cardano-sdk/core';
-import { Cip30DataSignature, WalletApi, WalletProperties } from '../src/WalletApi';
+import { Cip30DataSignature, RemoteAuthenticator, WalletApi, WalletProperties } from '../src';
 import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
-import { RemoteAuthenticator } from '../src';
 
 export const api = <WalletApi>{
   getBalance: async () => '100',
@@ -9,6 +8,7 @@ export const api = <WalletApi>{
   getCollateral: async () => null,
   getExtensions: async () => [{ cip: 95 }],
   getNetworkId: async () => 0,
+  getNetworkMagic: async () => Cardano.NetworkMagics.Preprod,
   getPubDRepKey: async () => 'getPubDRepKey' as Ed25519PublicKeyHex,
   getRegisteredPubStakeKeys: async () =>
     ['registeredPubStakeKey-1', 'registeredPubStakeKey-2'] as Ed25519PublicKeyHex[],
