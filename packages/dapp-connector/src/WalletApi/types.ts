@@ -206,11 +206,16 @@ export interface Cip95WalletApi {
   signData: SignData;
 }
 
-export type WalletApi = Cip30WalletApi & Cip95WalletApi;
+export interface Cip142WalletApi {
+  getNetworkMagic: () => Promise<Cardano.NetworkMagics>;
+}
+
+export type WalletApi = Cip30WalletApi & Cip95WalletApi & Cip142WalletApi;
 export type WalletMethod = keyof WalletApi;
 
 export interface CipExtensionApis {
   cip95: Cip95WalletApi;
+  cip142: Cip142WalletApi;
 }
 
 export type Cip30WalletApiWithPossibleExtensions = Cip30WalletApi & Partial<CipExtensionApis>;

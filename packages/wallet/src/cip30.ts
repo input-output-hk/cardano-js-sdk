@@ -3,6 +3,7 @@ import {
   ApiError,
   Bytes,
   Cbor,
+  Cip142WalletApi,
   Cip30DataSignature,
   Cip95WalletApi,
   DataSignError,
@@ -573,11 +574,28 @@ const extendedCip95WalletApi = (
   }
 });
 
+const extendedCip142WalletApi = (
+  wallet$: Observable<ObservableWallet>,
+  { logger }: Cip30WalletDependencies
+): Cip142WalletApi => ({
+  getNetworkMagic: async () => {
+    try {
+      const wallet = await firstValueFrom(wallet$);
+      const genesisParameters = await firstValueFrom(wallet.genesisParameters$);
+      return genesisParameters.networkMagic;
+    } catch (error) {
+      logger.error(error);
+      throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
+    }
+  }
+});
+
 export const createWalletApi = (
   wallet$: Observable<ObservableWallet>,
   confirmationCallback: CallbackConfirmation,
   { logger }: Cip30WalletDependencies
 ): WithSenderContext<WalletApi> => ({
   ...baseCip30WalletApi(wallet$, confirmationCallback, { logger }),
-  ...extendedCip95WalletApi(wallet$, { logger })
+  ...extendedCip95WalletApi(wallet$, { logger }),
+  ...extendedCip142WalletApi(wallet$, { logger })
 });

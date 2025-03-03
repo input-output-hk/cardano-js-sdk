@@ -26,8 +26,9 @@ export const stubWalletApi: WalletApi = {
         }
       ]
     ]),
-  getExtensions: async () => [{ cip: 95 }],
+  getExtensions: async () => [{ cip: 95 }, { cip: 142 }],
   getNetworkId: async () => 0,
+  getNetworkMagic: async () => Cardano.NetworkMagics.Mainnet,
   getPubDRepKey: async () => Ed25519PublicKeyHex('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01'),
   getRegisteredPubStakeKeys: async () => [
     Ed25519PublicKeyHex('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01')

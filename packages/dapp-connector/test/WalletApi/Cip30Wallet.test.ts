@@ -53,7 +53,7 @@ describe('Wallet', () => {
     expect(wallet.apiVersion).toBe('0.1.0');
     expect(typeof wallet.name).toBe('string');
     expect(wallet.name).toBe(testWallet.properties.walletName);
-    expect(wallet.supportedExtensions).toEqual<WalletApiExtension[]>([{ cip: 95 }]);
+    expect(wallet.supportedExtensions).toEqual<WalletApiExtension[]>([{ cip: 95 }, { cip: 142 }]);
     expect(typeof wallet.isEnabled).toBe('function');
     const isEnabled = await wallet.isEnabled();
     expect(typeof isEnabled).toBe('boolean');
@@ -98,6 +98,30 @@ describe('Wallet', () => {
       expect(await api.getExtensions()).toEqual([{ cip: 95 }]);
     });
 
+    test('with cip142 extension', async () => {
+      const api = await wallet.enable({ extensions: [{ cip: 142 }] });
+      expect(typeof api).toBe('object');
+      const methods = new Set(Object.keys(api));
+      expect(methods).toEqual(new Set([...CipMethodsMapping[30], 'cip142', 'experimental']));
+      const cip142Methods = new Set(Object.keys(api.cip142!));
+      expect(cip142Methods).toEqual(new Set(CipMethodsMapping[142]));
+      expect(await wallet.isEnabled()).toBe(true);
+      expect(await api.getExtensions()).toEqual([{ cip: 142 }]);
+    });
+
+    test('with cip95 and cip142 extensions', async () => {
+      const api = await wallet.enable({ extensions: [{ cip: 95 }, { cip: 142 }] });
+      expect(typeof api).toBe('object');
+      const methods = new Set(Object.keys(api));
+      expect(methods).toEqual(new Set([...CipMethodsMapping[30], 'cip95', 'cip142', 'experimental']));
+      const cip95Methods = new Set(Object.keys(api.cip95!));
+      expect(cip95Methods).toEqual(new Set(CipMethodsMapping[95]));
+      const cip142Methods = new Set(Object.keys(api.cip142!));
+      expect(cip142Methods).toEqual(new Set(CipMethodsMapping[142]));
+      expect(await wallet.isEnabled()).toBe(true);
+      expect(await api.getExtensions()).toEqual([{ cip: 95 }, { cip: 142 }]);
+    });
+
     test('no extensions wallet cannot enable cip95 extension', async () => {
       const api = await walletNoExtensions.enable({ extensions: [{ cip: 95 }] });
       expect(await walletNoExtensions.isEnabled()).toBe(true);
@@ -112,13 +136,15 @@ describe('Wallet', () => {
       expect(await wallet.isEnabled()).toBe(true);
       expect(await cip30api.getExtensions()).toEqual([]);
 
-      const cip95api = await wallet.enable({ extensions: [{ cip: 95 }] });
-      const cip95methods = new Set(Object.keys(cip95api));
-      expect(cip95methods).toEqual(new Set([...CipMethodsMapping[30], 'cip95', 'experimental']));
-      const cip95InnerMethods = new Set(Object.keys(cip95api.cip95!));
+      const apiWithExtension = await wallet.enable({ extensions: [{ cip: 95 }, { cip: 142 }] });
+      const cip95methods = new Set(Object.keys(apiWithExtension));
+      expect(cip95methods).toEqual(new Set([...CipMethodsMapping[30], 'cip95', 'cip142', 'experimental']));
+      const cip95InnerMethods = new Set(Object.keys(apiWithExtension.cip95!));
       expect(cip95InnerMethods).toEqual(new Set(CipMethodsMapping[95]));
+      const cip142Methods = new Set(Object.keys(apiWithExtension.cip142!));
+      expect(cip142Methods).toEqual(new Set(CipMethodsMapping[142]));
       expect(await wallet.isEnabled()).toBe(true);
-      expect(await cip95api.getExtensions()).toEqual([{ cip: 95 }]);
+      expect(await apiWithExtension.getExtensions()).toEqual([{ cip: 95 }, { cip: 142 }]);
     });
 
     test('unsupported extensions does not reject and returns cip30 methods', async () => {

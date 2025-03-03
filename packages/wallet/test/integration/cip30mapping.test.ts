@@ -753,6 +753,13 @@ describe('cip30', () => {
         const extensions = await api.getExtensions(context);
         expect(extensions).toEqual([{ cip: 95 }]);
       });
+
+      describe('api.getNetworkMagic', () => {
+        it('returns the network magic', async () => {
+          const networkMagic = await api.getNetworkMagic(context);
+          expect(networkMagic).toEqual(Cardano.NetworkMagics.Mainnet);
+        });
+      });
     });
 
     describe('confirmation callbacks', () => {

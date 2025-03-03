@@ -2,7 +2,9 @@ import { APIErrorCode, ApiError } from '../errors';
 import {
   Bytes,
   Cbor,
+  Cip142WalletApi,
   Cip30WalletApiWithPossibleExtensions,
+  Cip95WalletApi,
   CipExtensionApis,
   Paginate,
   WalletApi,
@@ -28,7 +30,8 @@ export const CipMethodsMapping: Record<number, WalletMethod[]> = {
     'signData',
     'submitTx'
   ],
-  95: ['getRegisteredPubStakeKeys', 'getUnregisteredPubStakeKeys', 'getPubDRepKey', 'signData']
+  95: ['getRegisteredPubStakeKeys', 'getUnregisteredPubStakeKeys', 'getPubDRepKey', 'signData'],
+  142: ['getNetworkMagic']
 };
 export const WalletApiMethodNames: WalletMethod[] = Object.values(CipMethodsMapping).flat();
 
@@ -79,7 +82,7 @@ export class Cip30Wallet {
   readonly name: WalletName;
   readonly icon: WalletIcon;
   /** Support the full api by default */
-  readonly supportedExtensions: WalletApiExtension[] = [{ cip: 95 }];
+  readonly supportedExtensions: WalletApiExtension[] = [{ cip: 95 }, { cip: 142 }];
 
   readonly #logger: Logger;
   readonly #api: WalletApi;
@@ -195,6 +198,9 @@ export class Cip30Wallet {
         getUnregisteredPubStakeKeys: () => walletApi.getUnregisteredPubStakeKeys(),
         signData: (addr: Cardano.PaymentAddress | Cardano.RewardAccount | Bytes, payload: Bytes) =>
           walletApi.signData(addr, payload)
+      },
+      cip142: {
+        getNetworkMagic: () => walletApi.getNetworkMagic()
       }
     };
 
@@ -202,7 +208,7 @@ export class Cip30Wallet {
       for (const extension of enabledExtensions) {
         const cipName = `cip${extension.cip}` as keyof CipExtensionApis;
         if (additionalCipApis[cipName]) {
-          baseApi[cipName] = additionalCipApis[cipName];
+          baseApi[cipName] = additionalCipApis[cipName] as Cip95WalletApi & Cip142WalletApi;
         }
       }
     }
