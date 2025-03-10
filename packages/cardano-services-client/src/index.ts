@@ -10,6 +10,7 @@ export * from './RewardAccountInfoProvider';
 export * from './NetworkInfoProvider';
 export * from './RewardsProvider';
 export * from './HandleProvider';
+export * from './SharedWalletProvider';
 export * from './version';
 export * from './WebSocket';
 export {

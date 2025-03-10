@@ -4,4 +4,5 @@ export * as Serialization from './Serialization';
 export * from './Provider';
 export * from './util';
 export * from './errors';
+export * from './const';
 export * from './CardanoNode';

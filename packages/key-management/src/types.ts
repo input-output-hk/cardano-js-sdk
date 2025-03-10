@@ -1,5 +1,5 @@
+import { Cardano, HD_WALLET_CIP_ID, HandleResolution, MULTISIG_CIP_ID, Serialization } from '@cardano-sdk/core';
 import type * as Crypto from '@cardano-sdk/crypto';
-import type { Cardano, HandleResolution, Serialization } from '@cardano-sdk/core';
 import type { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import type { Cip30SignDataRequest, Cip8SignDataContext } from './cip8';
 import type { HexBlob, OpaqueString, Shutdown } from '@cardano-sdk/util';
@@ -40,8 +40,8 @@ export enum KeyRole {
 }
 
 export enum KeyPurpose {
-  STANDARD = 1852,
-  MULTI_SIG = 1854
+  STANDARD = HD_WALLET_CIP_ID,
+  MULTI_SIG = MULTISIG_CIP_ID
 }
 export interface AccountKeyDerivationPath {
   role: KeyRole;
