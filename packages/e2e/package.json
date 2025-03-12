@@ -24,6 +24,7 @@
     "test": "echo 'test' command not implemented yet",
     "test:blockfrost": "jest -c jest.config.js --forceExit --selectProjects blockfrost --runInBand --verbose",
     "test:utils": "jest -c jest.config.js --forceExit --selectProjects utils --verbose",
+    "test:handle": "jest -c jest.config.js --forceExit --selectProjects handle --runInBand --verbose",
     "test:long-running": "jest -c jest.config.js --forceExit --selectProjects long-running --runInBand --verbose",
     "test:local-network": "jest -c jest.config.js --forceExit --selectProjects local-network --runInBand --verbose",
     "test:projection": "jest -c jest.config.js --forceExit --selectProjects projection --runInBand --verbose",

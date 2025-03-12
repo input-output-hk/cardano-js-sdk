@@ -3391,6 +3391,7 @@ __metadata:
     "@cardano-sdk/crypto": "workspace:~"
     "@cardano-sdk/util": "workspace:~"
     "@cardano-sdk/util-dev": "workspace:~"
+    "@koralabs/handles-public-api-interfaces": ^2.13.0
     "@types/lodash": ^4.14.182
     "@types/node-fetch": ^2.6.12
     "@types/validator": ^13.7.1
@@ -5170,6 +5171,13 @@ __metadata:
   version: 7.1.3
   resolution: "@jsdevtools/ono@npm:7.1.3"
   checksum: 2297fcd472ba810bffe8519d2249171132844c7174f3a16634f9260761c8c78bc0428a4190b5b6d72d45673c13918ab9844d706c3ed4ef8f62ab11a2627a08ad
+  languageName: node
+  linkType: hard
+
+"@koralabs/handles-public-api-interfaces@npm:^2.13.0":
+  version: 2.13.0
+  resolution: "@koralabs/handles-public-api-interfaces@npm:2.13.0"
+  checksum: b28895a70ecdb1b4643953dd0af11b406970a5388b79889050f19ef01335c7da29fb8696d26e80f645fd435ca8cc90f13b5fed0c4a5ceb0ac0d2447aad5e3e06
   languageName: node
   linkType: hard
 
