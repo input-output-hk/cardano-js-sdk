@@ -27,6 +27,7 @@ module.exports = {
   projects: [
     { ...project('blockfrost'), globalSetup: './test/blockfrost/setup.ts' },
     project('blockfrost-providers'),
+    project('handle'),
     project('local-network'),
     project('long-running'),
     project('ogmios'),
