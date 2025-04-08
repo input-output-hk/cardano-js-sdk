@@ -1,3 +1,4 @@
+// cSpell:ignore kora subhandles
 /* eslint-disable no-magic-numbers */
 /* eslint-disable camelcase */
 import { Cardano, HandleResolution } from '@cardano-sdk/core';
@@ -51,6 +52,16 @@ describe('KoraLabsHandleProvider', () => {
 
       expect(resultN).toBe(null);
       checkHandleResolution('test_handle_1', result1);
+    });
+
+    test('HandleProvider should resolve handle, subhandles and virtual subhandles', async () => {
+      const [result1, result2, result3] = await provider.resolveHandles({
+        handles: ['handle', 'ada.handle', 'space@ada.handle']
+      });
+
+      checkHandleResolution('handle', result1);
+      checkHandleResolution('ada.handle', result2);
+      checkHandleResolution('space@ada.handle', result3);
     });
   });
 

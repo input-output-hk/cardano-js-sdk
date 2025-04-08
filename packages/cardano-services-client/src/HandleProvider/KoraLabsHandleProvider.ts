@@ -1,3 +1,4 @@
+// cSpell:ignore kora koralabs
 import {
   Asset,
   Cardano,
