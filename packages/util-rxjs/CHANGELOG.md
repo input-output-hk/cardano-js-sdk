@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.9.10...@cardano-sdk/util-rxjs@0.9.11) (2025-04-08)
+
+**Note:** Version bump only for package @cardano-sdk/util-rxjs
+
 ## [0.9.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.9.9...@cardano-sdk/util-rxjs@0.9.10) (2025-03-03)
 
 **Note:** Version bump only for package @cardano-sdk/util-rxjs

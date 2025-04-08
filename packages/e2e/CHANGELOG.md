@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.52.20](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.52.19...@cardano-sdk/e2e@0.52.20) (2025-04-08)
+
+### Features
+
+* **cardano-services-client:** restore KoraLabsHandleProvider ([d81aaeb](https://github.com/input-output-hk/cardano-js-sdk/commit/d81aaeb1b7a5f0daf36987c41f055f40805079d6))
+
 ## [0.52.19](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.52.18...@cardano-sdk/e2e@0.52.19) (2025-03-03)
 
 ### Features

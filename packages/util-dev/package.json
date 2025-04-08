@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/util-dev",
-  "version": "0.25.10",
+  "version": "0.25.11",
   "description": "Utilities for tests in other packages",
   "repository": "https://github.com/input-output-hk/cardano-js-sdk",
   "license": "Apache-2.0",

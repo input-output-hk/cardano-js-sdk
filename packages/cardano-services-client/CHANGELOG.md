@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.26.8...@cardano-sdk/cardano-services-client@0.26.9) (2025-04-08)
+
+### Features
+
+* **cardano-services-client:** restore KoraLabsHandleProvider ([d81aaeb](https://github.com/input-output-hk/cardano-js-sdk/commit/d81aaeb1b7a5f0daf36987c41f055f40805079d6))
+* discover shared wallet by metadata label ([ff3c6d6](https://github.com/input-output-hk/cardano-js-sdk/commit/ff3c6d66f1d1fd5cc7983086587328884945b40a))
+
 ## [0.26.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.26.7...@cardano-sdk/cardano-services-client@0.26.8) (2025-03-03)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services-client

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.45.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.45.5...@cardano-sdk/core@0.45.6) (2025-04-08)
+
+### Features
+
+* discover shared wallet by metadata label ([ff3c6d6](https://github.com/input-output-hk/cardano-js-sdk/commit/ff3c6d66f1d1fd5cc7983086587328884945b40a))
+
 ## [0.45.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.45.4...@cardano-sdk/core@0.45.5) (2025-03-03)
 
 ### Features
