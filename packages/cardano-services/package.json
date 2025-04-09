@@ -59,7 +59,7 @@
     "tscNoEmit": "echo typescript --noEmit command not implemented yet"
   },
   "devDependencies": {
-    "@cardano-ogmios/client": "6.9.0",
+    "@cardano-ogmios/client": "6.11.2",
     "@cardano-sdk/util-dev": "workspace:~",
     "@types/bunyan": "^1.8.8",
     "@types/cors": "^2.8.13",
@@ -127,7 +127,7 @@
     "pg-boss": "8.4.2",
     "pg-connection-string": "^2.5.0",
     "prom-client": "^14.0.1",
-    "reflect-metadata": "~0.1.13",
+    "reflect-metadata": "~0.2.2",
     "rxjs": "^7.4.0",
     "ts-custom-error": "^3.2.0",
     "ts-log": "^2.2.4",
