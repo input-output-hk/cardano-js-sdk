@@ -69,7 +69,24 @@ concurrency:
   group: std-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  check-yarn-project-nix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+      - run: |
+          if ! grep -qF '"@esbuild/linux-x64@npm:' yarn-project.nix ; then
+            echo ' '
+            echo "Please, make sure that the 'yarn-project.nix' on $(git rev-parse HEAD) still contains '@esbuild/linux-x64@npm' (see your diff)."
+            echo ' '
+            echo "Its accidental removal can be caused by running 'yarn install' on macOS."
+            echo ' '
+            exit 1
+          fi
+
   discover:
+    needs: check-yarn-project-nix
     # Don’t run on PRs from forks (no access to secrets):
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     outputs:
