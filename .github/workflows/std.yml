@@ -69,7 +69,18 @@ concurrency:
   group: std-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  check-yarn-project-nix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          if ! grep -qF '"@esbuild/linux-x64@npm:' yarn-project.nix ; then
+            echo >&2 'Please, make sure that they ‘yarn-project.nix’ contains “@esbuild/linux-x64@npm” (see your diff).'
+            exit 1
+          fi
+
   discover:
+    needs: check-yarn-project-nix
     # Don’t run on PRs from forks (no access to secrets):
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     outputs:
