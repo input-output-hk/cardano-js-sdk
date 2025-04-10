@@ -73,11 +73,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: nixbuild/nix-quick-install-action@v25
+      - uses: nixbuild/nixbuild-action@v17
+        with:
+          nixbuild_ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          generate_summary_for: job
+      # Further steps assume AWS_PROFILE=lw, while the official action has no way to specify that profile:
       - run: |
-          if ! grep -qF '"@esbuild/linux-x64@npm:' yarn-project.nix ; then
-            echo >&2 'Please, make sure that they ‘yarn-project.nix’ contains “@esbuild/linux-x64@npm” (see your diff).'
-            exit 1
+          if ! grep -F '"@esbuild/linux-x64@npm:' yarn-project.nix ; then
+               echo >&2 'Please, make sure that the "yarn-project.nix" contains "@esbuild/linux-x64@npm" (see your diff).'
+               exit 1
           fi
+        shell: bash
 
   discover:
     needs: check-yarn-project-nix
