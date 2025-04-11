@@ -171,7 +171,8 @@ export const contextWithKnownAddresses: TrezorTxTransformerContext = {
   },
   knownAddresses: [knownAddress],
   tagCborSets: false,
-  txInKeyPathMap: {}
+  txInKeyPathMap: {},
+  useBabbageOutputs: false
 };
 
 export const contextWithKnownAddressesWithoutStakingCredentials: TrezorTxTransformerContext = {
@@ -182,7 +183,8 @@ export const contextWithKnownAddressesWithoutStakingCredentials: TrezorTxTransfo
   },
   knownAddresses: [knownAddressWithoutStakingPath],
   tagCborSets: false,
-  txInKeyPathMap: {}
+  txInKeyPathMap: {},
+  useBabbageOutputs: false
 };
 
 export const contextWithoutKnownAddresses: TrezorTxTransformerContext = {
@@ -193,7 +195,8 @@ export const contextWithoutKnownAddresses: TrezorTxTransformerContext = {
   },
   knownAddresses: [],
   tagCborSets: false,
-  txInKeyPathMap: {}
+  txInKeyPathMap: {},
+  useBabbageOutputs: false
 };
 
 export const coreWithdrawalWithKeyHashCredential = {

@@ -237,6 +237,37 @@ export class TrezorKeyAgent extends KeyAgentBase {
     return Trezor.PROTO.CardanoTxSigningMode.ORDINARY_TRANSACTION;
   }
 
+  /**
+   * There are currently two types of outputs supported by the ledger:
+   *
+   * legacy_transaction_output =
+   *   [ address
+   *   , amount : value
+   *   , ? datum_hash : $hash32
+   *   ]
+   *
+   * and
+   *
+   * post_alonzo_transaction_output =
+   *   { 0 : address
+   *   , 1 : value
+   *   , ? 2 : datum_option ; New; datum option
+   *   , ? 3 : script_ref   ; New; script reference
+   *   }
+   *
+   * Legacy outputs are definite length arrays of three elements, however the new babbage outputs are definite length maps
+   * of four elements.
+   *
+   * @param outputs The outputs to be verified.
+   */
+  hasBabbageOutput(outputs: Array<Serialization.TransactionOutput>): boolean {
+    if (outputs.length === 0) return false;
+
+    const reader = new Serialization.CborReader(outputs[0].toCbor());
+
+    return reader.peekState() === Serialization.CborReaderState.StartMap;
+  }
+
   async signTransaction(
     txBody: Serialization.TransactionBody,
     { knownAddresses, txInKeyPathMap, scripts }: SignTransactionContext
@@ -251,7 +282,8 @@ export class TrezorKeyAgent extends KeyAgentBase {
         chainId: this.chainId,
         knownAddresses,
         tagCborSets: txBody.hasTaggedSets(),
-        txInKeyPathMap
+        txInKeyPathMap,
+        useBabbageOutputs: this.hasBabbageOutput(txBody.outputs())
       });
 
       const signingMode = TrezorKeyAgent.matchSigningMode(trezorTxData);
