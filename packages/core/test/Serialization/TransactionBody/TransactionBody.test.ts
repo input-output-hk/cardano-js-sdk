@@ -2,7 +2,7 @@
 import * as Cardano from '../../../src/Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
-import { TransactionBody, TxBodyCBOR, TxCBOR } from '../../../src/Serialization';
+import { Transaction, TransactionBody, TxBodyCBOR, TxCBOR } from '../../../src/Serialization';
 import { babbageTx } from '../testData';
 import { mintTokenMap, params, txIn, txOut } from './testData';
 
@@ -271,6 +271,24 @@ describe('TransactionBody', () => {
   it('can encode TransactionBody with 6.248 tags to Core', () => {
     const body = TransactionBody.fromCbor(conwayCborWithSets);
     expect(body.toCore()).toEqual(expectedConwayCore);
+  });
+
+  it('can encode identify transactions output format - Babbage outputs', () => {
+    const tx = Transaction.fromCbor(
+      TxCBOR(
+        '84a500818258207aa1264bcd0c06f34a49ed1dd7307a2bdec5a97bdeb546498759ad5b8ed42fd5010182a200583930195bde3deacb613b7e9eb6280b14db4e353e475e96d19f3f7a5e2d66195bde3deacb613b7e9eb6280b14db4e353e475e96d19f3f7a5e2d66011a00e4e1c0a2005839003d3246dc0c50ab3c74a8ffdd8068313ff99d341c461a8fe31f416d0a8fba06d60d71edc077cc5ebcb8ff82137afbce68df98271909332348011b000000025106a838021a00029309031a04a07bc6081a04a07a40a0f5f6'
+      )
+    );
+    expect(tx.body().hasBabbageOutput()).toBeTruthy();
+  });
+
+  it('can encode identify transactions output format - Legacy outputs', () => {
+    const tx = Transaction.fromCbor(
+      TxCBOR(
+        '84a500818258207aa1264bcd0c06f34a49ed1dd7307a2bdec5a97bdeb546498759ad5b8ed42fd501018282583930195bde3deacb613b7e9eb6280b14db4e353e475e96d19f3f7a5e2d66195bde3deacb613b7e9eb6280b14db4e353e475e96d19f3f7a5e2d661a00e4e1c0825839003d3246dc0c50ab3c74a8ffdd8068313ff99d341c461a8fe31f416d0a8fba06d60d71edc077cc5ebcb8ff82137afbce68df982719093323481b000000025106a838021a00029309031a04a07bc6081a04a07a40a0f5f6'
+      )
+    );
+    expect(tx.body().hasBabbageOutput()).toBeFalsy();
   });
 
   it('sorts withdrawals canonically', () => {

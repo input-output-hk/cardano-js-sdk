@@ -13,6 +13,8 @@ export type TrezorTxTransformerContext = {
   accountIndex: number;
   /** Whether sets should be encoded as tagged set in CBOR */
   tagCborSets: boolean;
+  /** Whether to use Babbage output format or not. */
+  useBabbageOutputs: boolean;
 } & SignTransactionContext;
 
 export type TrezorTxOutputDestination =

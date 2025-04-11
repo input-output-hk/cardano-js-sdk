@@ -156,14 +156,16 @@ describe('txOut', () => {
     });
 
     it('can map a set of transaction outputs with both output formats', async () => {
-      const txOuts = mapTxOuts(
-        [txOutWithDatumHashAndOwnedAddress, txOutWithReferenceScriptAndDatumHash],
-        contextWithKnownAddresses
-      );
+      const legacyTxOuts = mapTxOuts([txOutWithDatumHashAndOwnedAddress], contextWithKnownAddresses);
 
-      expect(txOuts.length).toEqual(2);
+      const babbageTxOuts = mapTxOuts([txOutWithReferenceScriptAndDatumHash], {
+        ...contextWithKnownAddresses,
+        useBabbageOutputs: true
+      });
 
-      expect(txOuts).toEqual([
+      expect(legacyTxOuts.length).toEqual(1);
+
+      expect(legacyTxOuts).toEqual([
         {
           addressParameters: {
             addressType: Trezor.PROTO.CardanoAddressType.BASE,
@@ -173,7 +175,12 @@ describe('txOut', () => {
           amount: '10',
           datumHash: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5',
           format: Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY
-        },
+        }
+      ]);
+
+      expect(babbageTxOuts.length).toEqual(1);
+
+      expect(babbageTxOuts).toEqual([
         {
           addressParameters: {
             addressType: Trezor.PROTO.CardanoAddressType.BASE,
@@ -332,7 +339,7 @@ describe('txOut', () => {
     });
 
     it('can map simple transaction with inline datum', async () => {
-      const out = toTxOut(txOutWithInlineDatum, contextWithKnownAddresses);
+      const out = toTxOut(txOutWithInlineDatum, { ...contextWithKnownAddresses, useBabbageOutputs: true });
 
       expect(out).toEqual({
         address:
@@ -344,7 +351,10 @@ describe('txOut', () => {
     });
 
     it('can map simple transaction with inline datum to owned address', async () => {
-      const out = toTxOut(txOutWithInlineDatumAndOwnedAddress, contextWithKnownAddresses);
+      const out = toTxOut(txOutWithInlineDatumAndOwnedAddress, {
+        ...contextWithKnownAddresses,
+        useBabbageOutputs: true
+      });
 
       expect(out).toEqual({
         addressParameters: {
@@ -359,7 +369,10 @@ describe('txOut', () => {
     });
 
     it('can map a simple transaction output with reference script and datum hash', async () => {
-      const out = toTxOut(txOutWithReferenceScriptAndDatumHash, contextWithKnownAddresses);
+      const out = toTxOut(txOutWithReferenceScriptAndDatumHash, {
+        ...contextWithKnownAddresses,
+        useBabbageOutputs: true
+      });
       expect(out).toEqual({
         addressParameters: {
           addressType: Trezor.PROTO.CardanoAddressType.BASE,
@@ -374,7 +387,10 @@ describe('txOut', () => {
     });
 
     it('can map a simple transaction output with reference script and inline datum', async () => {
-      const out = toTxOut(txOutWithReferenceScriptAndInlineDatum, contextWithKnownAddresses);
+      const out = toTxOut(txOutWithReferenceScriptAndInlineDatum, {
+        ...contextWithKnownAddresses,
+        useBabbageOutputs: true
+      });
       expect(out).toEqual({
         addressParameters: {
           addressType: Trezor.PROTO.CardanoAddressType.BASE,
