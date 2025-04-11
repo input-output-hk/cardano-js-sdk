@@ -178,9 +178,9 @@ jobs:
         if: matrix.target != 'dummy-target'
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-      - uses: nixbuild/nix-quick-install-action@v25
+      - uses: nixbuild/nix-quick-install-action@v30
         if: matrix.target != 'dummy-target'
-      - uses: nixbuild/nixbuild-action@v17
+      - uses: nixbuild/nixbuild-action@v20
         if: matrix.target != 'dummy-target'
         with:
           nixbuild_ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -209,8 +209,8 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - uses: nixbuild/nix-quick-install-action@v25
-      - uses: nixbuild/nixbuild-action@v17
+      - uses: nixbuild/nix-quick-install-action@v30
+      - uses: nixbuild/nixbuild-action@20
         with:
           nixbuild_ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
           generate_summary_for: job
@@ -314,8 +314,8 @@ jobs:
       url: ${{ matrix.url }}
     steps:
       - uses: actions/checkout@v4
-      - uses: nixbuild/nix-quick-install-action@v25
-      - uses: nixbuild/nixbuild-action@v17
+      - uses: nixbuild/nix-quick-install-action@v30
+      - uses: nixbuild/nixbuild-action@20
         with:
           nixbuild_ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
           generate_summary_for: job
