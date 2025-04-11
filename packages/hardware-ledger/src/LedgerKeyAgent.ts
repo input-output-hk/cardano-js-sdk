@@ -705,6 +705,37 @@ export class LedgerKeyAgent extends KeyAgentBase {
     return TransactionSigningMode.ORDINARY_TRANSACTION;
   }
 
+  /**
+   * There are currently two types of outputs supported by the ledger:
+   *
+   * legacy_transaction_output =
+   *   [ address
+   *   , amount : value
+   *   , ? datum_hash : $hash32
+   *   ]
+   *
+   * and
+   *
+   * post_alonzo_transaction_output =
+   *   { 0 : address
+   *   , 1 : value
+   *   , ? 2 : datum_option ; New; datum option
+   *   , ? 3 : script_ref   ; New; script reference
+   *   }
+   *
+   * Legacy outputs are definite length arrays of three elements, however the new babbage outputs are definite length maps
+   * of four elements.
+   *
+   * @param outputs The outputs to be verified.
+   */
+  hasBabbageOutput(outputs: Array<Serialization.TransactionOutput>): boolean {
+    if (outputs.length === 0) return false;
+
+    const reader = new Serialization.CborReader(outputs[0].toCbor());
+
+    return reader.peekState() === Serialization.CborReaderState.StartMap;
+  }
+
   // TODO: LW-10571 - Allow additional key paths. This is necessary for multi-signature wallets
   // hardware devices inspect the transaction to determine which keys to use for signing,
   // however, multi sig transaction do not reference the CIP-1854 directly, but rather the script hash
@@ -715,15 +746,18 @@ export class LedgerKeyAgent extends KeyAgentBase {
   ): Promise<Cardano.Signatures> {
     try {
       const body = txBody.toCore();
+
       const hash = txBody.hash() as unknown as HexBlob;
       const dRepPublicKey = await this.derivePublicKey(util.DREP_KEY_DERIVATION_PATH);
       const dRepKeyHashHex = (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex();
+
       const ledgerTxData = await toLedgerTx(body, {
         accountIndex: this.accountIndex,
         chainId: this.chainId,
         dRepKeyHashHex,
         knownAddresses,
-        txInKeyPathMap
+        txInKeyPathMap,
+        useBabbageOutputs: this.hasBabbageOutput(txBody.outputs())
       });
 
       const deviceConnection = await LedgerKeyAgent.checkDeviceConnection(

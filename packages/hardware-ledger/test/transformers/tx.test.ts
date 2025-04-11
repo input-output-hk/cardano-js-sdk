@@ -15,7 +15,8 @@ describe('tx', () => {
           txInKeyPathMap: {
             [TxInId(tx.body.inputs[0])]: paymentKeyPath,
             [TxInId(tx.body.collaterals![0])]: paymentKeyPath
-          }
+          },
+          useBabbageOutputs: false
         })
       ).toEqual({
         auxiliaryData: {
@@ -267,7 +268,8 @@ describe('tx', () => {
 
       expect(
         await toLedgerTx(txBodyWithRegistrationCert, {
-          ...CONTEXT_WITH_KNOWN_ADDRESSES
+          ...CONTEXT_WITH_KNOWN_ADDRESSES,
+          useBabbageOutputs: false
         })
       ).toEqual({
         auxiliaryData: {

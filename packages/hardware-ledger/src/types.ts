@@ -21,4 +21,6 @@ export type LedgerTxTransformerContext = {
   chainId: Cardano.ChainId;
   /** Non-hardened account in cip1852 */
   accountIndex: number;
+  /** Whether to use Babbage output format or not. */
+  useBabbageOutputs: boolean;
 } & SignTransactionContext;

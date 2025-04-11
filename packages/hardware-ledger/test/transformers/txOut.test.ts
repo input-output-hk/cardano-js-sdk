@@ -64,7 +64,7 @@ describe('txOut', () => {
 
   describe('toTxOut', () => {
     it('can map a simple txOut to third party address', async () => {
-      const out = toTxOut(txOut, CONTEXT_WITH_KNOWN_ADDRESSES);
+      const out = toTxOut(txOut, { ...CONTEXT_WITH_KNOWN_ADDRESSES, useBabbageOutputs: false });
 
       expect(out).toEqual({
         amount: 10n,
@@ -114,7 +114,7 @@ describe('txOut', () => {
     });
 
     it('can map a simple txOut to owned address', async () => {
-      const out = toTxOut(txOutToOwnedAddress, CONTEXT_WITH_KNOWN_ADDRESSES);
+      const out = toTxOut(txOutToOwnedAddress, { ...CONTEXT_WITH_KNOWN_ADDRESSES, useBabbageOutputs: false });
 
       expect(out).toEqual({
         amount: 10n,
