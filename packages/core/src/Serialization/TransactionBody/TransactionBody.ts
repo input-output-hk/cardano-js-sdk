@@ -948,6 +948,19 @@ export class TransactionBody {
   }
 
   /**
+   * Checks if the transaction body has Babbage outputs.
+   *
+   * @returns true if the transaction body has Babbage outputs, false otherwise.
+   */
+  hasBabbageOutput(): boolean {
+    if (this.#outputs.length === 0) return false;
+
+    const reader = new CborReader(this.#outputs[0].toCbor());
+
+    return reader.peekState() === CborReaderState.StartMap;
+  }
+
+  /**
    * Gets the size of the serialized map.
    *
    * @private
