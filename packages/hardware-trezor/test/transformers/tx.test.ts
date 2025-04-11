@@ -204,7 +204,8 @@ describe('tx', () => {
           ...contextWithKnownAddresses,
           txInKeyPathMap: {
             [TxInId(babbageTxBodyWithScripts.inputs[0])]: knownAddressPaymentKeyPath
-          }
+          },
+          useBabbageOutputs: true
         })
       ).toEqual({
         additionalWitnessRequests: [
@@ -327,7 +328,8 @@ describe('tx', () => {
           txInKeyPathMap: {
             [TxInId(plutusTxWithBabbage.inputs[0])]: knownAddressPaymentKeyPath,
             [TxInId(plutusTxWithBabbage.collaterals[0])]: knownAddressPaymentKeyPath
-          }
+          },
+          useBabbageOutputs: true
         })
       ).toEqual({
         additionalWitnessRequests: [
@@ -361,7 +363,7 @@ describe('tx', () => {
           address:
             'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
           amount: '10',
-          format: Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY
+          format: Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE
         },
         fee: '10',
         inputs: [
