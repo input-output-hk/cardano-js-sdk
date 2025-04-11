@@ -230,6 +230,15 @@ describe('LedgerKeyAgent', () => {
         expect(signatures.size).toBe(2);
       });
 
+      it('successfully signs ADA handle mint transaction', async () => {
+        const cbor =
+          '84a500818258207aa1264bcd0c06f34a49ed1dd7307a2bdec5a97bdeb546498759ad5b8ed42fd5010182a200583930195bde3deacb613b7e9eb6280b14db4e353e475e96d19f3f7a5e2d66195bde3deacb613b7e9eb6280b14db4e353e475e96d19f3f7a5e2d66011a00e4e1c0a2005839003d3246dc0c50ab3c74a8ffdd8068313ff99d341c461a8fe31f416d0a8fba06d60d71edc077cc5ebcb8ff82137afbce68df98271909332348011b000000025106a838021a00029309031a04a07bc6081a04a07a40a0f5f6';
+        const {
+          witness: { signatures }
+        } = await wallet.finalizeTx({ tx: cbor as any });
+        expect(signatures.size).toBe(1);
+      });
+
       it('throws if signed transaction hash doesnt match hash computed by the wallet', async () => {
         const originalHashFn = Serialization.TransactionBody.prototype.hash;
         jest
