@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.15.8...@cardano-sdk/hardware-ledger@0.15.9) (2025-04-14)
+
+### Bug Fixes
+
+* **ledger:** fix output format mapping on ledger HW devices ([9256fdd](https://github.com/input-output-hk/cardano-js-sdk/commit/9256fdde3d19abbc3a4c668883d6502a6fe6018e))
+
 ## [0.15.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.15.7...@cardano-sdk/hardware-ledger@0.15.8) (2025-04-08)
 
 **Note:** Version bump only for package @cardano-sdk/hardware-ledger
