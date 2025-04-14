@@ -357,7 +357,8 @@ export const CONTEXT_WITH_KNOWN_ADDRESSES: LedgerTxTransformerContext = {
       type: AddressType.Internal
     }
   ],
-  txInKeyPathMap: {}
+  txInKeyPathMap: {},
+  useBabbageOutputs: true
 };
 
 export const CONTEXT_WITHOUT_KNOWN_ADDRESSES: LedgerTxTransformerContext = {
@@ -367,7 +368,8 @@ export const CONTEXT_WITHOUT_KNOWN_ADDRESSES: LedgerTxTransformerContext = {
     networkMagic: 999
   },
   knownAddresses: [],
-  txInKeyPathMap: {}
+  txInKeyPathMap: {},
+  useBabbageOutputs: true
 };
 
 export const votes = [

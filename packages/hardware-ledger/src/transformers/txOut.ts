@@ -56,39 +56,11 @@ const getScriptHex = (output: Serialization.TransactionOutput): HexBlob | null =
   return scriptRef.toCbor();
 };
 
-/**
- * There are currently two types of outputs supported by the ledger:
- *
- * legacy_transaction_output =
- *   [ address
- *   , amount : value
- *   , ? datum_hash : $hash32
- *   ]
- *
- * and
- *
- * post_alonzo_transaction_output =
- *   { 0 : address
- *   , 1 : value
- *   , ? 2 : datum_option ; New; datum option
- *   , ? 3 : script_ref   ; New; script reference
- *   }
- *
- * Legacy outputs are definite length arrays of three elements, however the new babbage outputs are definite length maps
- * of four elements.
- *
- * @param out The output to be verified.
- */
-const isBabbage = (out: Serialization.TransactionOutput): boolean => {
-  const reader = new Serialization.CborReader(out.toCbor());
-  return reader.peekState() === Serialization.CborReaderState.StartMap;
-};
-
 export const toTxOut: Transform<Cardano.TxOut, Ledger.TxOutput, LedgerTxTransformerContext> = (txOut, context) => {
   const output = Serialization.TransactionOutput.fromCore(txOut);
   const scriptHex = getScriptHex(output);
 
-  return isBabbage(output)
+  return context?.useBabbageOutputs
     ? {
         amount: txOut.value.coins,
         datum: txOut.datumHash ? toDatumHash(txOut.datumHash) : txOut.datum ? toInlineDatum(txOut.datum) : null,

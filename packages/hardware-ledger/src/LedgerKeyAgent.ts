@@ -715,15 +715,18 @@ export class LedgerKeyAgent extends KeyAgentBase {
   ): Promise<Cardano.Signatures> {
     try {
       const body = txBody.toCore();
+
       const hash = txBody.hash() as unknown as HexBlob;
       const dRepPublicKey = await this.derivePublicKey(util.DREP_KEY_DERIVATION_PATH);
       const dRepKeyHashHex = (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex();
+
       const ledgerTxData = await toLedgerTx(body, {
         accountIndex: this.accountIndex,
         chainId: this.chainId,
         dRepKeyHashHex,
         knownAddresses,
-        txInKeyPathMap
+        txInKeyPathMap,
+        useBabbageOutputs: txBody.hasBabbageOutput()
       });
 
       const deviceConnection = await LedgerKeyAgent.checkDeviceConnection(

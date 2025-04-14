@@ -251,7 +251,8 @@ export class TrezorKeyAgent extends KeyAgentBase {
         chainId: this.chainId,
         knownAddresses,
         tagCborSets: txBody.hasTaggedSets(),
-        txInKeyPathMap
+        txInKeyPathMap,
+        useBabbageOutputs: txBody.hasBabbageOutput()
       });
 
       const signingMode = TrezorKeyAgent.matchSigningMode(trezorTxData);

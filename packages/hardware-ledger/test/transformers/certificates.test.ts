@@ -85,7 +85,8 @@ const mockContext: LedgerTxTransformerContext = {
   txInKeyPathMap: createTxInKeyPathMapMock([
     createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0, stakeKeyPath),
     createGroupedAddress(address2, ownRewardAccount, AddressType.External, 1, stakeKeyPath)
-  ])
+  ]),
+  useBabbageOutputs: true
 };
 
 const EXAMPLE_URL = 'https://example.com';
