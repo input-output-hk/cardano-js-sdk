@@ -1,4 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
+import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { AddressType, KeyRole } from '@cardano-sdk/key-management';
 import { Base64Blob, HexBlob } from '@cardano-sdk/util';
 import { Cardano, Serialization } from '@cardano-sdk/core';
@@ -342,6 +343,7 @@ export const CONTEXT_WITH_KNOWN_ADDRESSES: LedgerTxTransformerContext = {
     networkId: Cardano.NetworkId.Testnet,
     networkMagic: 999
   },
+  collateralReturnFormat: Ledger.TxOutputFormat.MAP_BABBAGE,
   dRepKeyHashHex: Crypto.Ed25519KeyHashHex(dRepCredential.hash),
   knownAddresses: [
     {
@@ -357,8 +359,8 @@ export const CONTEXT_WITH_KNOWN_ADDRESSES: LedgerTxTransformerContext = {
       type: AddressType.Internal
     }
   ],
-  txInKeyPathMap: {},
-  useBabbageOutputs: true
+  outputsFormat: [Ledger.TxOutputFormat.ARRAY_LEGACY, Ledger.TxOutputFormat.MAP_BABBAGE],
+  txInKeyPathMap: {}
 };
 
 export const CONTEXT_WITHOUT_KNOWN_ADDRESSES: LedgerTxTransformerContext = {
@@ -367,9 +369,10 @@ export const CONTEXT_WITHOUT_KNOWN_ADDRESSES: LedgerTxTransformerContext = {
     networkId: Cardano.NetworkId.Testnet,
     networkMagic: 999
   },
+  collateralReturnFormat: Ledger.TxOutputFormat.ARRAY_LEGACY,
   knownAddresses: [],
-  txInKeyPathMap: {},
-  useBabbageOutputs: true
+  outputsFormat: [Ledger.TxOutputFormat.ARRAY_LEGACY, Ledger.TxOutputFormat.MAP_BABBAGE],
+  txInKeyPathMap: {}
 };
 
 export const votes = [

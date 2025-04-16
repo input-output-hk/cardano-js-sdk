@@ -15,8 +15,7 @@ describe('tx', () => {
           txInKeyPathMap: {
             [TxInId(tx.body.inputs[0])]: paymentKeyPath,
             [TxInId(tx.body.collaterals![0])]: paymentKeyPath
-          },
-          useBabbageOutputs: false
+          }
         })
       ).toEqual({
         auxiliaryData: {
@@ -181,6 +180,7 @@ describe('tx', () => {
       expect(
         await toLedgerTx(babbageTxWithoutScript.body, {
           ...CONTEXT_WITH_KNOWN_ADDRESSES,
+          outputsFormat: [Ledger.TxOutputFormat.MAP_BABBAGE],
           txInKeyPathMap: {
             [TxInId(babbageTxWithoutScript.body.inputs[0])]: paymentKeyPath
           }
@@ -266,12 +266,7 @@ describe('tx', () => {
         ]
       };
 
-      expect(
-        await toLedgerTx(txBodyWithRegistrationCert, {
-          ...CONTEXT_WITH_KNOWN_ADDRESSES,
-          useBabbageOutputs: false
-        })
-      ).toEqual({
+      expect(await toLedgerTx(txBodyWithRegistrationCert, CONTEXT_WITH_KNOWN_ADDRESSES)).toEqual({
         auxiliaryData: {
           params: {
             hashHex: '2ceb364d93225b4a0f004a0975a13eb50c3cc6348474b4fe9121f8dc72ca0cfa'

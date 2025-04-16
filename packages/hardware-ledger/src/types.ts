@@ -1,6 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { HID } from 'node-hid';
 import { SignTransactionContext } from '@cardano-sdk/key-management';
+import { TxOutputFormat } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import TransportWebUSB from '@ledgerhq/hw-transport-webusb';
 
@@ -21,6 +22,8 @@ export type LedgerTxTransformerContext = {
   chainId: Cardano.ChainId;
   /** Non-hardened account in cip1852 */
   accountIndex: number;
-  /** Whether to use Babbage output format or not. */
-  useBabbageOutputs: boolean;
+  /** The outputs format in the same order as they appear in the transaction. */
+  outputsFormat: Array<TxOutputFormat>;
+  /** The collateral return output format. */
+  collateralReturnFormat: TxOutputFormat | undefined;
 } & SignTransactionContext;

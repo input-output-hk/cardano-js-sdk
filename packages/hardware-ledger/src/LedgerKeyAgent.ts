@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
+import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import {
   AlgorithmId,
   CBORValue,
@@ -720,13 +721,21 @@ export class LedgerKeyAgent extends KeyAgentBase {
       const dRepPublicKey = await this.derivePublicKey(util.DREP_KEY_DERIVATION_PATH);
       const dRepKeyHashHex = (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex();
 
+      const outputsFormat = txBody
+        .outputs()
+        .map((out) => (out.isBabbageOutput() ? Ledger.TxOutputFormat.MAP_BABBAGE : Ledger.TxOutputFormat.ARRAY_LEGACY));
+      const collateralReturnFormat = txBody.collateralReturn()?.isBabbageOutput()
+        ? Ledger.TxOutputFormat.MAP_BABBAGE
+        : Ledger.TxOutputFormat.ARRAY_LEGACY;
+
       const ledgerTxData = await toLedgerTx(body, {
         accountIndex: this.accountIndex,
         chainId: this.chainId,
+        collateralReturnFormat,
         dRepKeyHashHex,
         knownAddresses,
-        txInKeyPathMap,
-        useBabbageOutputs: txBody.hasBabbageOutput()
+        outputsFormat,
+        txInKeyPathMap
       });
 
       const deviceConnection = await LedgerKeyAgent.checkDeviceConnection(
