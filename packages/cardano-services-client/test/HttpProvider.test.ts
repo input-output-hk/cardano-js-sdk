@@ -13,9 +13,11 @@ const packageJson = require(path.join(__dirname, '..', 'package.json'));
 
 type ComplexArg2 = { map: Map<string, Uint8Array> };
 type ComplexResponse = Map<bigint, Uint8Array>[];
+type OptionalParameters = { num?: number; str?: string };
 interface TestProvider extends Provider {
   noArgsEmptyReturn(): Promise<void>;
   complexArgsAndReturn({ arg1, arg2 }: { arg1: bigint; arg2: ComplexArg2 }): Promise<ComplexResponse>;
+  optionalParameters(args: OptionalParameters): Promise<OptionalParameters>;
 }
 
 const apiVersion = '1.0.0';
@@ -34,7 +36,8 @@ const createStubHttpProviderServer = async (port: number, urlPath: string, handl
 const stubProviderPaths = {
   complexArgsAndReturn: '/complex',
   healthCheck: '/health',
-  noArgsEmptyReturn: '/simple'
+  noArgsEmptyReturn: '/simple',
+  optionalParameters: '/optional'
 };
 
 describe('createHttpProvider', () => {
@@ -43,7 +46,7 @@ describe('createHttpProvider', () => {
   let closeServer: () => Promise<unknown>;
 
   const createTxSubmitProviderClient = (
-    config: Pick<HttpProviderConfig<TestProvider>, 'axiosOptions' | 'mapError'> = {}
+    config: Pick<HttpProviderConfig<TestProvider>, 'axiosOptions' | 'mapError' | 'modifyData'> = {}
   ) =>
     createHttpProvider<TestProvider>({
       apiVersion,
@@ -110,6 +113,31 @@ describe('createHttpProvider', () => {
       });
       const response = await provider.complexArgsAndReturn({ arg1, arg2 });
       expect(response).toEqual(expectedResponse);
+    });
+  });
+
+  describe('modifyData', () => {
+    beforeEach(
+      async () =>
+        (closeServer = await createStubHttpProviderServer(port, stubProviderPaths.optionalParameters, (req, res) =>
+          res.send(req.body)
+        ))
+    );
+
+    it("defaultModifyData doesn't change the input data", async () => {
+      const provider = createTxSubmitProviderClient();
+      const data = { num: 23 };
+
+      const response = await provider.optionalParameters(data);
+      expect(response).toEqual(data);
+    });
+
+    it('modifyData changes the input data as expected', async () => {
+      const provider = createTxSubmitProviderClient({ modifyData: (_, data) => ({ ...data, added: true }) });
+      const data = { num: 23 };
+
+      const response = await provider.optionalParameters(data);
+      expect(response).toEqual({ ...data, added: true });
     });
   });
 

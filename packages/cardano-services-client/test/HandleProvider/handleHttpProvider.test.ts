@@ -24,4 +24,15 @@ describe('handleHttpProvider', () => {
     axiosMock.onPost().replyOnce(200, []);
     await expect(provider.resolveHandles({ handles: [] })).resolves.toEqual([]);
   });
+
+  test('resolve handles has one more parameter', async () => {
+    const provider = handleHttpProvider(config);
+
+    axiosMock.onPost().reply((cfg) => [200, cfg.data]);
+
+    await expect(provider.resolveHandles({ handles: ['test'] })).resolves.toEqual({
+      check_handle: true,
+      handles: ['test']
+    });
+  });
 });

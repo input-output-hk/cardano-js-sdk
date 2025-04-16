@@ -34,6 +34,9 @@ export interface HttpProviderConfig<T extends Provider> {
 
   /** Slug used in the URL path */
   serviceSlug: string;
+
+  /** Function to modify the input data before performing the HTTP request. */
+  modifyData?: (method: string | number | symbol, data: any) => any;
 }
 
 /** The subset of parameters from HttpProviderConfig that must be set by the client code. */
@@ -55,6 +58,8 @@ const transformRequest: AxiosRequestTransformer = (data) => {
   return JSON.stringify(toSerializableObject(data));
 };
 
+const defaultModifyData = (_method: string | number | symbol, data: any) => ({ ...data });
+
 /**
  * Creates a HTTP client for specified provider type, following some conventions:
  * - All methods use POST requests
@@ -73,9 +78,12 @@ export const createHttpProvider = <T extends Provider>({
   paths,
   adapter,
   logger,
+  modifyData,
   serviceSlug
-}: HttpProviderConfig<T>): T =>
-  new Proxy<T>({} as T, {
+}: HttpProviderConfig<T>): T => {
+  const internalModifyData = modifyData || defaultModifyData;
+
+  return new Proxy<T>({} as T, {
     // eslint-disable-next-line sonarjs/cognitive-complexity
     get(_, prop) {
       const method = prop as keyof T;
@@ -87,7 +95,7 @@ export const createHttpProvider = <T extends Provider>({
             ...axiosOptions,
             adapter,
             baseURL: `${baseUrl.replace(/\/$/, '')}/v${apiVersion}/${serviceSlug}`,
-            data: { ...args[0] },
+            data: internalModifyData(method, args[0]),
             headers: {
               ...axiosOptions?.headers,
               'Content-Type': 'application/json',
@@ -127,3 +135,4 @@ export const createHttpProvider = <T extends Provider>({
       return prop in paths;
     }
   });
+};

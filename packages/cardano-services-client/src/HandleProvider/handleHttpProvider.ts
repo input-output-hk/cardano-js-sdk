@@ -11,6 +11,9 @@ export const handleHttpProvider = (config: CreateHttpProviderConfig<HandleProvid
   createHttpProvider<HandleProvider>({
     ...config,
     apiVersion: config.apiVersion || apiVersion.handle,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    modifyData: (method: string | number | symbol, data: any) =>
+      method === 'resolveHandles' ? { ...data, check_handle: true } : { ...data },
     paths: handleProviderPaths,
     serviceSlug: 'handle'
   });
