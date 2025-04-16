@@ -13,8 +13,10 @@ export type TrezorTxTransformerContext = {
   accountIndex: number;
   /** Whether sets should be encoded as tagged set in CBOR */
   tagCborSets: boolean;
-  /** Whether to use Babbage output format or not. */
-  useBabbageOutputs: boolean;
+  /** The outputs format in the same order as they appear in the transaction. */
+  outputsFormat: Array<Trezor.PROTO.CardanoTxOutputSerializationFormat>;
+  /** The collateral return output format. */
+  collateralReturnFormat: Trezor.PROTO.CardanoTxOutputSerializationFormat | undefined;
 } & SignTransactionContext;
 
 export type TrezorTxOutputDestination =

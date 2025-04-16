@@ -4,6 +4,7 @@ import {
   babbageTxBodyWithScripts,
   contextWithKnownAddresses,
   contextWithoutKnownAddresses,
+  knownAddress,
   knownAddressKeyPath,
   knownAddressPaymentKeyPath,
   knownAddressStakeKeyPath,
@@ -45,6 +46,11 @@ describe('tx', () => {
       expect(
         await txToTrezor(txBody, {
           ...contextWithKnownAddresses,
+          outputsFormat: [
+            Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY,
+            Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY,
+            Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY
+          ],
           txInKeyPathMap: { [TxInId(txBody.inputs[0])]: knownAddressPaymentKeyPath }
         })
       ).toEqual({
@@ -202,10 +208,13 @@ describe('tx', () => {
       expect(
         await txToTrezor(babbageTxBodyWithScripts, {
           ...contextWithKnownAddresses,
+          outputsFormat: [
+            Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE,
+            Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE
+          ],
           txInKeyPathMap: {
             [TxInId(babbageTxBodyWithScripts.inputs[0])]: knownAddressPaymentKeyPath
-          },
-          useBabbageOutputs: true
+          }
         })
       ).toEqual({
         additionalWitnessRequests: [
@@ -286,7 +295,12 @@ describe('tx', () => {
     });
 
     test('can map transaction with collaterals', async () => {
-      expect(await txToTrezor(txBodyWithCollaterals, contextWithoutKnownAddresses)).toEqual({
+      expect(
+        await txToTrezor(txBodyWithCollaterals, {
+          ...contextWithoutKnownAddresses,
+          collateralReturnFormat: Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY
+        })
+      ).toEqual({
         additionalWitnessRequests: [],
         collateralInputs: [
           {
@@ -325,11 +339,16 @@ describe('tx', () => {
       expect(
         await txToTrezor(plutusTxWithBabbage, {
           ...contextWithKnownAddresses,
+          collateralReturnFormat: Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE,
+          knownAddresses: [knownAddress],
+          outputsFormat: [
+            Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE,
+            Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE
+          ],
           txInKeyPathMap: {
             [TxInId(plutusTxWithBabbage.inputs[0])]: knownAddressPaymentKeyPath,
             [TxInId(plutusTxWithBabbage.collaterals[0])]: knownAddressPaymentKeyPath
-          },
-          useBabbageOutputs: true
+          }
         })
       ).toEqual({
         additionalWitnessRequests: [

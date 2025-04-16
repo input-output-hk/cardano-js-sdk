@@ -19,7 +19,14 @@ import { mapTxOuts, toTxOut } from '../../src/transformers/txOut';
 describe('txOut', () => {
   describe('mapTxOuts', () => {
     it('can map a set of transaction outputs to third party address', async () => {
-      const txOuts = mapTxOuts([txOut, txOut, txOut], contextWithKnownAddresses);
+      const txOuts = mapTxOuts([txOut, txOut, txOut], {
+        ...contextWithKnownAddresses,
+        outputsFormat: [
+          Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY,
+          Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY,
+          Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY
+        ]
+      });
 
       expect(txOuts.length).toEqual(3);
       for (const out of txOuts) {
@@ -33,7 +40,14 @@ describe('txOut', () => {
     });
 
     it('can map a set of transaction outputs with assets to third party address', async () => {
-      const txOuts = mapTxOuts([txOutWithAssets, txOutWithAssets, txOutWithAssets], contextWithKnownAddresses);
+      const txOuts = mapTxOuts([txOutWithAssets, txOutWithAssets, txOutWithAssets], {
+        ...contextWithKnownAddresses,
+        outputsFormat: [
+          Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY,
+          Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY,
+          Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY
+        ]
+      });
 
       expect(txOuts.length).toEqual(3);
 
@@ -81,10 +95,14 @@ describe('txOut', () => {
     });
 
     it('can map a set of transaction outputs to owned address', async () => {
-      const txOuts = mapTxOuts(
-        [txOutToOwnedAddress, txOutToOwnedAddress, txOutToOwnedAddress],
-        contextWithKnownAddresses
-      );
+      const txOuts = mapTxOuts([txOutToOwnedAddress, txOutToOwnedAddress, txOutToOwnedAddress], {
+        ...contextWithKnownAddresses,
+        outputsFormat: [
+          Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY,
+          Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY,
+          Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY
+        ]
+      });
 
       expect(txOuts.length).toEqual(3);
 
@@ -104,7 +122,14 @@ describe('txOut', () => {
     it('can map a set of transaction outputs with assets to owned address', async () => {
       const txOuts = mapTxOuts(
         [txOutWithAssetsToOwnedAddress, txOutWithAssetsToOwnedAddress, txOutWithAssetsToOwnedAddress],
-        contextWithKnownAddresses
+        {
+          ...contextWithKnownAddresses,
+          outputsFormat: [
+            Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY,
+            Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY,
+            Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY
+          ]
+        }
       );
 
       expect(txOuts.length).toEqual(3);
@@ -156,16 +181,14 @@ describe('txOut', () => {
     });
 
     it('can map a set of transaction outputs with both output formats', async () => {
-      const legacyTxOuts = mapTxOuts([txOutWithDatumHashAndOwnedAddress], contextWithKnownAddresses);
+      const txOuts = mapTxOuts(
+        [txOutWithDatumHashAndOwnedAddress, txOutWithReferenceScriptAndDatumHash],
+        contextWithKnownAddresses
+      );
 
-      const babbageTxOuts = mapTxOuts([txOutWithReferenceScriptAndDatumHash], {
-        ...contextWithKnownAddresses,
-        useBabbageOutputs: true
-      });
+      expect(txOuts.length).toEqual(2);
 
-      expect(legacyTxOuts.length).toEqual(1);
-
-      expect(legacyTxOuts).toEqual([
+      expect(txOuts).toEqual([
         {
           addressParameters: {
             addressType: Trezor.PROTO.CardanoAddressType.BASE,
@@ -175,12 +198,7 @@ describe('txOut', () => {
           amount: '10',
           datumHash: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5',
           format: Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY
-        }
-      ]);
-
-      expect(babbageTxOuts.length).toEqual(1);
-
-      expect(babbageTxOuts).toEqual([
+        },
         {
           addressParameters: {
             addressType: Trezor.PROTO.CardanoAddressType.BASE,
@@ -198,7 +216,7 @@ describe('txOut', () => {
 
   describe('toTxOut', () => {
     it('can map a simple transaction output to third party address', async () => {
-      const out = toTxOut(txOut, contextWithKnownAddresses);
+      const out = toTxOut({ index: 0, isCollateral: false, txOut }, contextWithKnownAddresses);
       expect(out).toEqual({
         address:
           'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
@@ -208,7 +226,7 @@ describe('txOut', () => {
     });
 
     it('can map a simple transaction output with assets to third party address', async () => {
-      const out = toTxOut(txOutWithAssets, contextWithKnownAddresses);
+      const out = toTxOut({ index: 0, isCollateral: false, txOut: txOutWithAssets }, contextWithKnownAddresses);
       expect(out).toEqual({
         address:
           'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
@@ -251,7 +269,7 @@ describe('txOut', () => {
     });
 
     it('can map a simple transaction output to owned address', async () => {
-      const out = toTxOut(txOutToOwnedAddress, contextWithKnownAddresses);
+      const out = toTxOut({ index: 0, isCollateral: false, txOut: txOutToOwnedAddress }, contextWithKnownAddresses);
 
       expect(out).toEqual({
         addressParameters: {
@@ -265,7 +283,10 @@ describe('txOut', () => {
     });
 
     it('can map a simple transaction output with assets to owned address', async () => {
-      const out = toTxOut(txOutWithAssetsToOwnedAddress, contextWithKnownAddresses);
+      const out = toTxOut(
+        { index: 0, isCollateral: false, txOut: txOutWithAssetsToOwnedAddress },
+        contextWithKnownAddresses
+      );
 
       expect(out).toEqual({
         addressParameters: {
@@ -312,7 +333,7 @@ describe('txOut', () => {
     });
 
     it('can map simple transaction output with datum hash', async () => {
-      const out = toTxOut(txOutWithDatumHash, contextWithKnownAddresses);
+      const out = toTxOut({ index: 0, isCollateral: false, txOut: txOutWithDatumHash }, contextWithKnownAddresses);
 
       expect(out).toEqual({
         address:
@@ -324,7 +345,10 @@ describe('txOut', () => {
     });
 
     it('can map simple transaction output with datum hash to owned address', async () => {
-      const out = toTxOut(txOutWithDatumHashAndOwnedAddress, contextWithKnownAddresses);
+      const out = toTxOut(
+        { index: 0, isCollateral: false, txOut: txOutWithDatumHashAndOwnedAddress },
+        contextWithKnownAddresses
+      );
 
       expect(out).toEqual({
         addressParameters: {
@@ -339,7 +363,10 @@ describe('txOut', () => {
     });
 
     it('can map simple transaction with inline datum', async () => {
-      const out = toTxOut(txOutWithInlineDatum, { ...contextWithKnownAddresses, useBabbageOutputs: true });
+      const out = toTxOut(
+        { index: 0, isCollateral: false, txOut: txOutWithInlineDatum },
+        { ...contextWithKnownAddresses, outputsFormat: [Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE] }
+      );
 
       expect(out).toEqual({
         address:
@@ -351,10 +378,10 @@ describe('txOut', () => {
     });
 
     it('can map simple transaction with inline datum to owned address', async () => {
-      const out = toTxOut(txOutWithInlineDatumAndOwnedAddress, {
-        ...contextWithKnownAddresses,
-        useBabbageOutputs: true
-      });
+      const out = toTxOut(
+        { index: 0, isCollateral: false, txOut: txOutWithInlineDatumAndOwnedAddress },
+        { ...contextWithKnownAddresses, outputsFormat: [Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE] }
+      );
 
       expect(out).toEqual({
         addressParameters: {
@@ -369,10 +396,11 @@ describe('txOut', () => {
     });
 
     it('can map a simple transaction output with reference script and datum hash', async () => {
-      const out = toTxOut(txOutWithReferenceScriptAndDatumHash, {
-        ...contextWithKnownAddresses,
-        useBabbageOutputs: true
-      });
+      const out = toTxOut(
+        { index: 0, isCollateral: false, txOut: txOutWithReferenceScriptAndDatumHash },
+        { ...contextWithKnownAddresses, outputsFormat: [Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE] }
+      );
+
       expect(out).toEqual({
         addressParameters: {
           addressType: Trezor.PROTO.CardanoAddressType.BASE,
@@ -387,10 +415,11 @@ describe('txOut', () => {
     });
 
     it('can map a simple transaction output with reference script and inline datum', async () => {
-      const out = toTxOut(txOutWithReferenceScriptAndInlineDatum, {
-        ...contextWithKnownAddresses,
-        useBabbageOutputs: true
-      });
+      const out = toTxOut(
+        { index: 0, isCollateral: false, txOut: txOutWithReferenceScriptAndInlineDatum },
+        { ...contextWithKnownAddresses, outputsFormat: [Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE] }
+      );
+
       expect(out).toEqual({
         addressParameters: {
           addressType: Trezor.PROTO.CardanoAddressType.BASE,

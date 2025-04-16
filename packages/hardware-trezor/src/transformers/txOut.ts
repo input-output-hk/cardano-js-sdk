@@ -42,31 +42,27 @@ const getScriptHex = (output: Serialization.TransactionOutput): HexBlob | undefi
 
 const getInlineDatum = (datum: Cardano.PlutusData): string => Serialization.PlutusData.fromCore(datum).toCbor();
 
-export const toTxOut: Transform<Cardano.TxOut, Trezor.CardanoOutput, TrezorTxTransformerContext> = (txOut, context) => {
-  const destination = toDestination(txOut, context);
+export const toTxOut: Transform<
+  { txOut: Cardano.TxOut; index: number; isCollateral: boolean },
+  Trezor.CardanoOutput,
+  TrezorTxTransformerContext
+> = (elem, context) => {
+  const { txOut, index, isCollateral } = elem;
   const output = Serialization.TransactionOutput.fromCore(txOut);
   const scriptHex = getScriptHex(output);
+  const format = isCollateral ? context?.collateralReturnFormat : context?.outputsFormat[index];
+  const isBabbage = format === Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE;
 
-  return context?.useBabbageOutputs
-    ? {
-        ...destination,
-        amount: txOut.value.coins.toString(),
-        datumHash: txOut.datumHash?.toString(),
-        format: Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE,
-        inlineDatum: txOut.datum ? getInlineDatum(txOut.datum) : undefined,
-        referenceScript: scriptHex,
-        tokenBundle: mapTokenMap(txOut.value.assets)
-      }
-    : {
-        ...destination,
-        amount: txOut.value.coins.toString(),
-        datumHash: txOut.datumHash?.toString(),
-        format: Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY,
-        inlineDatum: undefined,
-        referenceScript: undefined,
-        tokenBundle: mapTokenMap(txOut.value.assets)
-      };
+  return {
+    ...toDestination(txOut, context),
+    amount: txOut.value.coins.toString(),
+    datumHash: txOut.datumHash?.toString(),
+    format,
+    inlineDatum: isBabbage ? (txOut.datum ? getInlineDatum(txOut.datum) : undefined) : undefined,
+    referenceScript: isBabbage ? scriptHex : undefined,
+    tokenBundle: mapTokenMap(txOut.value.assets)
+  };
 };
 
 export const mapTxOuts = (txOuts: Cardano.TxOut[], context: TrezorTxTransformerContext): Trezor.CardanoOutput[] =>
-  txOuts.map((txOut) => toTxOut(txOut, context));
+  txOuts.map((txOut, index) => toTxOut({ index, isCollateral: false, txOut }, context));

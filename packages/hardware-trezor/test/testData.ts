@@ -1,4 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
+import * as Trezor from '@trezor/connect';
 import { AddressType, GroupedAddress, KeyRole } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
@@ -169,10 +170,15 @@ export const contextWithKnownAddresses: TrezorTxTransformerContext = {
     networkId: Cardano.NetworkId.Testnet,
     networkMagic: 999
   },
+  collateralReturnFormat: Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE,
   knownAddresses: [knownAddress],
+  outputsFormat: [
+    Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY,
+    Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE,
+    Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY
+  ],
   tagCborSets: false,
-  txInKeyPathMap: {},
-  useBabbageOutputs: false
+  txInKeyPathMap: {}
 };
 
 export const contextWithKnownAddressesWithoutStakingCredentials: TrezorTxTransformerContext = {
@@ -181,10 +187,14 @@ export const contextWithKnownAddressesWithoutStakingCredentials: TrezorTxTransfo
     networkId: Cardano.NetworkId.Testnet,
     networkMagic: 999
   },
+  collateralReturnFormat: Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE,
   knownAddresses: [knownAddressWithoutStakingPath],
+  outputsFormat: [
+    Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY,
+    Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE
+  ],
   tagCborSets: false,
-  txInKeyPathMap: {},
-  useBabbageOutputs: false
+  txInKeyPathMap: {}
 };
 
 export const contextWithoutKnownAddresses: TrezorTxTransformerContext = {
@@ -193,10 +203,14 @@ export const contextWithoutKnownAddresses: TrezorTxTransformerContext = {
     networkId: Cardano.NetworkId.Testnet,
     networkMagic: 999
   },
+  collateralReturnFormat: Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE,
   knownAddresses: [],
+  outputsFormat: [
+    Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY,
+    Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE
+  ],
   tagCborSets: false,
-  txInKeyPathMap: {},
-  useBabbageOutputs: false
+  txInKeyPathMap: {}
 };
 
 export const coreWithdrawalWithKeyHashCredential = {
