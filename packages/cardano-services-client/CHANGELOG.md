@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.26.10...@cardano-sdk/cardano-services-client@0.26.11) (2025-04-16)
+
+### Features
+
+* **cardano-services-client:** add a debug parameter to handle resolution call ([fa93255](https://github.com/input-output-hk/cardano-js-sdk/commit/fa93255b3ce7e4a4a2c0bc243101f7184be2fc22))
+
 ## [0.26.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.26.9...@cardano-sdk/cardano-services-client@0.26.10) (2025-04-14)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services-client
