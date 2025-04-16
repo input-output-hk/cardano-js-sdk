@@ -396,5 +396,14 @@ describe('TransactionOutput', () => {
         expect(output.toCore()).toEqual(basicOutput);
       });
     });
+
+    describe('isBabbageOutput', () => {
+      it('cant distinguish a babbage output from a legacy output', () => {
+        const babbageOut = TransactionOutput.fromCbor(babbageAllFieldsCbor);
+        const legacyOutput = TransactionOutput.fromCbor(legacyOutputNoDatumCbor);
+        expect(babbageOut.isBabbageOutput()).toBe(true);
+        expect(legacyOutput.isBabbageOutput()).toBe(false);
+      });
+    });
   });
 });

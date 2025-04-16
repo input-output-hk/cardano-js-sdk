@@ -305,6 +305,16 @@ export class TransactionOutput {
   }
 
   /**
+   * Checks if the output is formatted as legacy array or babbage map.
+   *
+   * @returns true if the output is babbage format, false otherwise.
+   */
+  isBabbageOutput(): boolean {
+    const reader = new CborReader(this.toCbor());
+    return reader.peekState() === CborReaderState.StartMap;
+  }
+
+  /**
    * Gets the size of the serialized map.
    *
    * @private
