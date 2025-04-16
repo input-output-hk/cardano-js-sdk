@@ -183,7 +183,7 @@ jobs:
       - uses: nixbuild/nixbuild-action@v20
         if: matrix.target != 'dummy-target'
         with:
-          nixbuild_ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          nixbuild_token: ${{ secrets.NIXBUILD_TOKEN }}
           generate_summary_for: job
       - uses: divnix/std-action/setup-discovery-ssh@main
         if: matrix.target != 'dummy-target'
@@ -212,7 +212,7 @@ jobs:
       - uses: nixbuild/nix-quick-install-action@v30
       - uses: nixbuild/nixbuild-action@20
         with:
-          nixbuild_ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          nixbuild_token: ${{ secrets.NIXBUILD_TOKEN }}
           generate_summary_for: job
       # Further steps assume AWS_PROFILE=lw, while the official action has no way to specify that profile:
       - name: Set up AWS credentials
@@ -317,7 +317,7 @@ jobs:
       - uses: nixbuild/nix-quick-install-action@v30
       - uses: nixbuild/nixbuild-action@20
         with:
-          nixbuild_ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          nixbuild_token: ${{ secrets.NIXBUILD_TOKEN }}
           generate_summary_for: job
       # Further steps assume AWS_PROFILE=lw, while the official action has no way to specify that profile:
       - name: Set up AWS credentials
