@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">97.05% </span>
+                <span class="strong">97.29% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>33/34</span>
+                <span class='fraction'>36/37</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">84.61% </span>
+                <span class="strong">86.66% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>11/13</span>
+                <span class='fraction'>13/15</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>26/26</span>
+                <span class='fraction'>30/30</span>
             </div>
         
             
@@ -145,7 +145,13 @@
 <a name='L80'></a><a href='#L80'>80</a>
 <a name='L81'></a><a href='#L81'>81</a>
 <a name='L82'></a><a href='#L82'>82</a>
-<a name='L83'></a><a href='#L83'>83</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">9x</span>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -204,11 +210,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-yes">31x</span>
 <span class="cline-any cline-yes">31x</span>
 <span class="cline-any cline-yes">31x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">31x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -285,30 +297,36 @@ const getScriptHex = (output: Serialization.TransactionOutput): HexBlob | null =
   return scriptRef.toCbor();
 };
 &nbsp;
-export const toTxOut: Transform&lt;Cardano.TxOut, Ledger.TxOutput, LedgerTxTransformerContext&gt; = (txOut, context) =&gt; {
+export const toTxOut: Transform&lt;
+  { txOut: Cardano.TxOut; index: number; isCollateral: boolean },
+  Ledger.TxOutput,
+  LedgerTxTransformerContext
+&gt; = (elem, context) =&gt; {
+  const { txOut, index, isCollateral } = elem;
   const output = Serialization.TransactionOutput.fromCore(txOut);
   const scriptHex = getScriptHex(output);
+  const format = isCollateral ? context?.collateralReturnFormat : context?.outputsFormat[index];
+  const isBabbageFormat = format === Ledger.TxOutputFormat.MAP_BABBAGE;
 &nbsp;
-  return context?.useBabbageOutputs
-    ? {
-        amount: txOut.value.coins,
-        datum: txOut.datumHash ? toDatumHash(txOut.datumHash) : txOut.datum ? toInlineDatum(txOut.datum) : <span class="branch-1 cbranch-no" title="branch not covered" >null,</span>
-        destination: toDestination(txOut, context),
-        format: Ledger.TxOutputFormat.MAP_BABBAGE,
-        referenceScriptHex: scriptHex,
-        tokenBundle: mapTokenMap(txOut.value.assets)
-      }
-    : {
-        amount: txOut.value.coins,
-        datumHashHex: txOut.datumHash ? txOut.datumHash : null,
-        destination: toDestination(txOut, context),
-        format: Ledger.TxOutputFormat.ARRAY_LEGACY,
-        tokenBundle: mapTokenMap(txOut.value.assets)
-      };
+  return {
+    amount: txOut.value.coins,
+    destination: toDestination(txOut, context),
+    tokenBundle: mapTokenMap(txOut.value.assets),
+    ...(isBabbageFormat
+      ? {
+          datum: txOut.datumHash ? toDatumHash(txOut.datumHash) : txOut.datum ? toInlineDatum(txOut.datum) : <span class="branch-1 cbranch-no" title="branch not covered" >null,</span>
+          format: Ledger.TxOutputFormat.MAP_BABBAGE,
+          referenceScriptHex: scriptHex
+        }
+      : {
+          datumHashHex: txOut.datumHash ?? null,
+          format: Ledger.TxOutputFormat.ARRAY_LEGACY
+        })
+  };
 };
 &nbsp;
 export const mapTxOuts = (txOuts: Cardano.TxOut[], context: LedgerTxTransformerContext): Ledger.TxOutput[] =&gt;
-  txOuts.map((txOut) =&gt; toTxOut(txOut, context));
+  txOuts.map((txOut, index) =&gt; toTxOut({ index, isCollateral: false, txOut }, context));
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -316,7 +334,7 @@ export const mapTxOuts = (txOuts: Cardano.TxOut[], context: LedgerTxTransformerC
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-04-16T12:20:24.788Z
+                at 2025-04-17T13:17:25.979Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
