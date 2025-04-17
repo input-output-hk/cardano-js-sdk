@@ -195,7 +195,7 @@ jobs:
         shell: bash
         run: |
           echo commit: ${{ github.sha }}
-      - uses: divnix/std-action/run@main
+      - uses: michalrus/std-action/run@debug2
         if: matrix.target != 'dummy-target'
         with: { ffBuildInstructions: true, remoteStore: 'ssh-ng://eu.nixbuild.net' }
 
