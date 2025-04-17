@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/governance@0.11.9...@cardano-sdk/governance@0.11.10) (2025-04-17)
+
+**Note:** Version bump only for package @cardano-sdk/governance
+
 ## [0.11.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/governance@0.11.8...@cardano-sdk/governance@0.11.9) (2025-04-14)
 
 **Note:** Version bump only for package @cardano-sdk/governance

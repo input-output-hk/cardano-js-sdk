@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.45.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.45.7...@cardano-sdk/core@0.45.8) (2025-04-17)
+
+### Features
+
+* **core:** add isBabbageOutput method to TransactionOutput class ([5fbe606](https://github.com/input-output-hk/cardano-js-sdk/commit/5fbe60625367504a9a58c2620759fe9e7b0de1ec))
+
 ## [0.45.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.45.6...@cardano-sdk/core@0.45.7) (2025-04-14)
 
 ### Features

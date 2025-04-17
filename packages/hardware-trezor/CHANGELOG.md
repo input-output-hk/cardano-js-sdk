@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.7.8...@cardano-sdk/hardware-trezor@0.7.9) (2025-04-17)
+
+### Bug Fixes
+
+* **hardware-trezor:** transaction outputs format are now computed independently ([1723cb0](https://github.com/input-output-hk/cardano-js-sdk/commit/1723cb052db6cc0c603403bdc605f9b6fcc566e8))
+
 ## [0.7.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.7.7...@cardano-sdk/hardware-trezor@0.7.8) (2025-04-14)
 
 ### Bug Fixes

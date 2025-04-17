@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.15.9...@cardano-sdk/hardware-ledger@0.15.10) (2025-04-17)
+
+### Bug Fixes
+
+* **hardware-ledger:** transaction outputs format are now computed independently ([ed91155](https://github.com/input-output-hk/cardano-js-sdk/commit/ed91155d6bada948d1dccf1e37d1ca6e784d6683))
+
 ## [0.15.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.15.8...@cardano-sdk/hardware-ledger@0.15.9) (2025-04-14)
 
 ### Bug Fixes
