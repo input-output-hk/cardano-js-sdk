@@ -18,7 +18,14 @@ describe('txOut', () => {
           txOutWithReferenceScriptWithInlineDatum,
           txOutWithReferenceScriptWithInlineDatum
         ],
-        CONTEXT_WITH_KNOWN_ADDRESSES
+        {
+          ...CONTEXT_WITH_KNOWN_ADDRESSES,
+          outputsFormat: [
+            Ledger.TxOutputFormat.MAP_BABBAGE,
+            Ledger.TxOutputFormat.MAP_BABBAGE,
+            Ledger.TxOutputFormat.MAP_BABBAGE
+          ]
+        }
       );
 
       expect(txOuts.length).toEqual(3);
@@ -64,7 +71,7 @@ describe('txOut', () => {
 
   describe('toTxOut', () => {
     it('can map a simple txOut to third party address', async () => {
-      const out = toTxOut(txOut, { ...CONTEXT_WITH_KNOWN_ADDRESSES, useBabbageOutputs: false });
+      const out = toTxOut({ index: 0, isCollateral: false, txOut }, CONTEXT_WITH_KNOWN_ADDRESSES);
 
       expect(out).toEqual({
         amount: 10n,
@@ -114,7 +121,7 @@ describe('txOut', () => {
     });
 
     it('can map a simple txOut to owned address', async () => {
-      const out = toTxOut(txOutToOwnedAddress, { ...CONTEXT_WITH_KNOWN_ADDRESSES, useBabbageOutputs: false });
+      const out = toTxOut({ index: 0, isCollateral: false, txOut: txOutToOwnedAddress }, CONTEXT_WITH_KNOWN_ADDRESSES);
 
       expect(out).toEqual({
         amount: 10n,
@@ -179,7 +186,10 @@ describe('txOut', () => {
     });
 
     it('can map a txOut with a reference script - datum hash', async () => {
-      const out = toTxOut(txOutWithReferenceScript, CONTEXT_WITH_KNOWN_ADDRESSES);
+      const out = toTxOut(
+        { index: 1, isCollateral: false, txOut: txOutWithReferenceScript },
+        CONTEXT_WITH_KNOWN_ADDRESSES
+      );
 
       expect(out).toEqual({
         amount: 10n,
@@ -216,7 +226,10 @@ describe('txOut', () => {
     });
 
     it('can map a txOut with a reference script - inline datum', async () => {
-      const out = toTxOut(txOutWithReferenceScriptWithInlineDatum, CONTEXT_WITH_KNOWN_ADDRESSES);
+      const out = toTxOut(
+        { index: 1, isCollateral: false, txOut: txOutWithReferenceScriptWithInlineDatum },
+        CONTEXT_WITH_KNOWN_ADDRESSES
+      );
 
       expect(out).toEqual({
         amount: 10n,

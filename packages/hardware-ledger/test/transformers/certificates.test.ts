@@ -73,20 +73,21 @@ export const createTxInKeyPathMapMock = (knownAddresses: GroupedAddress[]): TxIn
 const mockContext: LedgerTxTransformerContext = {
   accountIndex: 0,
   chainId: createChainId(1, 764_824_073),
+  collateralReturnFormat: Ledger.TxOutputFormat.ARRAY_LEGACY,
+
   dRepKeyHashHex: undefined,
 
   handleResolutions: [],
-
   knownAddresses: [
     createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0, stakeKeyPath),
     createGroupedAddress(address2, ownRewardAccount, AddressType.External, 1, stakeKeyPath)
   ],
+  outputsFormat: [Ledger.TxOutputFormat.ARRAY_LEGACY, Ledger.TxOutputFormat.MAP_BABBAGE],
   sender: undefined,
   txInKeyPathMap: createTxInKeyPathMapMock([
     createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0, stakeKeyPath),
     createGroupedAddress(address2, ownRewardAccount, AddressType.External, 1, stakeKeyPath)
-  ]),
-  useBabbageOutputs: true
+  ])
 };
 
 const EXAMPLE_URL = 'https://example.com';

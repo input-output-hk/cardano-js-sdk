@@ -56,27 +56,33 @@ const getScriptHex = (output: Serialization.TransactionOutput): HexBlob | null =
   return scriptRef.toCbor();
 };
 
-export const toTxOut: Transform<Cardano.TxOut, Ledger.TxOutput, LedgerTxTransformerContext> = (txOut, context) => {
+export const toTxOut: Transform<
+  { txOut: Cardano.TxOut; index: number; isCollateral: boolean },
+  Ledger.TxOutput,
+  LedgerTxTransformerContext
+> = (elem, context) => {
+  const { txOut, index, isCollateral } = elem;
   const output = Serialization.TransactionOutput.fromCore(txOut);
   const scriptHex = getScriptHex(output);
+  const format = isCollateral ? context?.collateralReturnFormat : context?.outputsFormat[index];
+  const isBabbageFormat = format === Ledger.TxOutputFormat.MAP_BABBAGE;
 
-  return context?.useBabbageOutputs
-    ? {
-        amount: txOut.value.coins,
-        datum: txOut.datumHash ? toDatumHash(txOut.datumHash) : txOut.datum ? toInlineDatum(txOut.datum) : null,
-        destination: toDestination(txOut, context),
-        format: Ledger.TxOutputFormat.MAP_BABBAGE,
-        referenceScriptHex: scriptHex,
-        tokenBundle: mapTokenMap(txOut.value.assets)
-      }
-    : {
-        amount: txOut.value.coins,
-        datumHashHex: txOut.datumHash ? txOut.datumHash : null,
-        destination: toDestination(txOut, context),
-        format: Ledger.TxOutputFormat.ARRAY_LEGACY,
-        tokenBundle: mapTokenMap(txOut.value.assets)
-      };
+  return {
+    amount: txOut.value.coins,
+    destination: toDestination(txOut, context),
+    tokenBundle: mapTokenMap(txOut.value.assets),
+    ...(isBabbageFormat
+      ? {
+          datum: txOut.datumHash ? toDatumHash(txOut.datumHash) : txOut.datum ? toInlineDatum(txOut.datum) : null,
+          format: Ledger.TxOutputFormat.MAP_BABBAGE,
+          referenceScriptHex: scriptHex
+        }
+      : {
+          datumHashHex: txOut.datumHash ?? null,
+          format: Ledger.TxOutputFormat.ARRAY_LEGACY
+        })
+  };
 };
 
 export const mapTxOuts = (txOuts: Cardano.TxOut[], context: LedgerTxTransformerContext): Ledger.TxOutput[] =>
-  txOuts.map((txOut) => toTxOut(txOut, context));
+  txOuts.map((txOut, index) => toTxOut({ index, isCollateral: false, txOut }, context));

@@ -246,13 +246,25 @@ export class TrezorKeyAgent extends KeyAgentBase {
       const body = txBody.toCore();
       const hash = txBody.hash() as unknown as HexBlob;
 
+      const outputsFormat = txBody
+        .outputs()
+        .map((out) =>
+          out.isBabbageOutput()
+            ? Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE
+            : Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY
+        );
+      const collateralReturnFormat = txBody.collateralReturn()?.isBabbageOutput()
+        ? Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE
+        : Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY;
+
       const trezorTxData = await txToTrezor(body, {
         accountIndex: this.accountIndex,
         chainId: this.chainId,
+        collateralReturnFormat,
         knownAddresses,
+        outputsFormat,
         tagCborSets: txBody.hasTaggedSets(),
-        txInKeyPathMap,
-        useBabbageOutputs: txBody.hasBabbageOutput()
+        txInKeyPathMap
       });
 
       const signingMode = TrezorKeyAgent.matchSigningMode(trezorTxData);

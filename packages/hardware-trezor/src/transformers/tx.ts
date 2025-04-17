@@ -19,7 +19,7 @@ export const trezorTxTransformer: Transformer<
   certificates: ({ certificates }, context) => (certificates ? mapCerts(certificates, context!) : undefined),
   collateralInputs: ({ collaterals }, context) => (collaterals ? mapTxIns(collaterals, context!) : undefined),
   collateralReturn: ({ collateralReturn }, context) =>
-    collateralReturn ? toTxOut(collateralReturn, context!) : undefined,
+    collateralReturn ? toTxOut({ index: 0, isCollateral: true, txOut: collateralReturn }, context!) : undefined,
   fee: ({ fee }) => fee.toString(),
   inputs: ({ inputs }, context) => mapTxIns(inputs, context!),
   mint: ({ mint }) => mapTokenMap(mint, true),
