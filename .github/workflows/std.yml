@@ -195,6 +195,12 @@ jobs:
         shell: bash
         run: |
           echo commit: ${{ github.sha }}
+      - name: Manual NixBuild.net
+        shell: bash
+        run: |
+          nix build --no-link --print-build-logs --log-format raw-with-logs \
+            --eval-store auto --builders "''" --store ssh-ng://eu.nixbuild.net \
+            github:input-output-hk/cardano-js-sdk/${{ github.sha }}#__std.actions.x86_64-linux.cardano-services.oci-images.cardano-services.publish
       - uses: michalrus/std-action/run@debug2
         if: matrix.target != 'dummy-target'
         with: { ffBuildInstructions: true, remoteStore: 'ssh-ng://eu.nixbuild.net' }
