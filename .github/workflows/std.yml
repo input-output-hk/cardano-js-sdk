@@ -196,12 +196,14 @@ jobs:
         run: |
           echo commit: ${{ github.sha }}
       - name: Manual NixBuild.net
+        if: matrix.target != 'dummy-target'
         shell: bash
         run: |
+          # We trigger this manually, because some integration has broken between std-action and nixbuild.net:
           nix build --no-link --print-build-logs --log-format raw-with-logs \
             --eval-store auto --builders "''" --store ssh-ng://eu.nixbuild.net \
             github:input-output-hk/cardano-js-sdk/${{ github.sha }}#__std.actions.x86_64-linux.cardano-services.oci-images.cardano-services.publish
-      - uses: michalrus/std-action/run@debug2
+      - uses: divnix/std-action/run@main
         if: matrix.target != 'dummy-target'
         with: { ffBuildInstructions: true, remoteStore: 'ssh-ng://eu.nixbuild.net' }
 
@@ -216,7 +218,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: nixbuild/nix-quick-install-action@v30
-      - uses: nixbuild/nixbuild-action@20
+      - uses: nixbuild/nixbuild-action@v20
         with:
           nixbuild_token: ${{ secrets.NIXBUILD_TOKEN }}
           generate_summary_for: job
@@ -321,7 +323,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: nixbuild/nix-quick-install-action@v30
-      - uses: nixbuild/nixbuild-action@20
+      - uses: nixbuild/nixbuild-action@v20
         with:
           nixbuild_token: ${{ secrets.NIXBUILD_TOKEN }}
           generate_summary_for: job
