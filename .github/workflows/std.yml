@@ -69,7 +69,24 @@ concurrency:
   group: std-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  check-yarn-project-nix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+      - run: |
+          if ! grep -qF '"@esbuild/linux-x64@npm:' yarn-project.nix ; then
+            echo ' '
+            echo "Please, make sure that the 'yarn-project.nix' on $(git rev-parse HEAD) still contains '@esbuild/linux-x64@npm' (see your diff)."
+            echo ' '
+            echo "Its accidental removal can be caused by running 'yarn install' on macOS."
+            echo ' '
+            exit 1
+          fi
+
   discover:
+    needs: check-yarn-project-nix
     # Don’t run on PRs from forks (no access to secrets):
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     outputs:
@@ -161,12 +178,12 @@ jobs:
         if: matrix.target != 'dummy-target'
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-      - uses: nixbuild/nix-quick-install-action@v25
+      - uses: nixbuild/nix-quick-install-action@v30
         if: matrix.target != 'dummy-target'
-      - uses: nixbuild/nixbuild-action@v17
+      - uses: nixbuild/nixbuild-action@v20
         if: matrix.target != 'dummy-target'
         with:
-          nixbuild_ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          nixbuild_token: ${{ secrets.NIXBUILD_TOKEN }}
           generate_summary_for: job
       - uses: divnix/std-action/setup-discovery-ssh@main
         if: matrix.target != 'dummy-target'
@@ -178,6 +195,14 @@ jobs:
         shell: bash
         run: |
           echo commit: ${{ github.sha }}
+      - name: Manual NixBuild.net
+        if: matrix.target != 'dummy-target'
+        shell: bash
+        run: |
+          # We trigger this manually, because some integration has broken between std-action and nixbuild.net:
+          nix build --no-link --print-build-logs --log-format raw-with-logs \
+            --eval-store auto --builders "''" --store ssh-ng://eu.nixbuild.net \
+            github:input-output-hk/cardano-js-sdk/${{ github.sha }}#__std.actions.x86_64-linux.cardano-services.oci-images.cardano-services.publish
       - uses: divnix/std-action/run@main
         if: matrix.target != 'dummy-target'
         with: { ffBuildInstructions: true, remoteStore: 'ssh-ng://eu.nixbuild.net' }
@@ -192,10 +217,10 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - uses: nixbuild/nix-quick-install-action@v25
-      - uses: nixbuild/nixbuild-action@v17
+      - uses: nixbuild/nix-quick-install-action@v30
+      - uses: nixbuild/nixbuild-action@v20
         with:
-          nixbuild_ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          nixbuild_token: ${{ secrets.NIXBUILD_TOKEN }}
           generate_summary_for: job
       # Further steps assume AWS_PROFILE=lw, while the official action has no way to specify that profile:
       - name: Set up AWS credentials
@@ -297,10 +322,10 @@ jobs:
       url: ${{ matrix.url }}
     steps:
       - uses: actions/checkout@v4
-      - uses: nixbuild/nix-quick-install-action@v25
-      - uses: nixbuild/nixbuild-action@v17
+      - uses: nixbuild/nix-quick-install-action@v30
+      - uses: nixbuild/nixbuild-action@v20
         with:
-          nixbuild_ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          nixbuild_token: ${{ secrets.NIXBUILD_TOKEN }}
           generate_summary_for: job
       # Further steps assume AWS_PROFILE=lw, while the official action has no way to specify that profile:
       - name: Set up AWS credentials
