@@ -46,7 +46,7 @@
     "lodash": "^4.17.21",
     "pg": "^8.9.0",
     "pg-boss": "8.4.2",
-    "reflect-metadata": "^0.1.13",
+    "reflect-metadata": "^0.2.2",
     "rxjs": "^7.4.0",
     "ts-log": "^2.2.4",
     "tsc-alias": "^1.8.10",
