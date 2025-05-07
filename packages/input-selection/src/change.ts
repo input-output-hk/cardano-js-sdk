@@ -1,6 +1,6 @@
 import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
-import { ComputeMinimumCoinQuantity, TokenBundleSizeExceedsLimit, TxCosts } from '../types';
-import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
+import { ComputeMinimumCoinQuantity, TokenBundleSizeExceedsLimit, TxCosts } from './types';
+import { InputSelectionError, InputSelectionFailure } from './InputSelectionError';
 import {
   RequiredImplicitValue,
   UtxoSelection,
@@ -8,12 +8,20 @@ import {
   getCoinQuantity,
   stubMaxSizeAddress,
   toValues
-} from '../util';
+} from './util';
 import minBy from 'lodash/minBy.js';
 import orderBy from 'lodash/orderBy.js';
 import pick from 'lodash/pick.js';
 
 type EstimateTxCostsWithOriginalOutputs = (utxo: Cardano.Utxo[], change: Cardano.Value[]) => Promise<TxCosts>;
+
+/**
+ * Callback used by the change-selection whenever it needs to pull one additional UTxO from `utxoRemaining` into `utxoSelected`.
+ *
+ * @param selection Object that holds the current state of the selection.
+ * @returns A new `UtxoSelection` object in which exactly one entry has been moved from `utxoRemaining` to `utxoSelected`.
+ */
+export type PickAdditionalUtxo = (selection: UtxoSelection) => UtxoSelection;
 
 interface ChangeComputationArgs {
   utxoSelection: UtxoSelection;
@@ -23,7 +31,7 @@ interface ChangeComputationArgs {
   estimateTxCosts: EstimateTxCostsWithOriginalOutputs;
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity;
   tokenBundleSizeExceedsLimit: TokenBundleSizeExceedsLimit;
-  random: typeof Math.random;
+  pickAdditionalUtxo: PickAdditionalUtxo;
 }
 
 interface ChangeComputationResult {
@@ -192,20 +200,6 @@ const computeRequestedAssetChangeBundles = (
   }
 
   return bundles;
-};
-
-/** Picks one UTxO from remaining set and puts it to the selected set. Precondition: utxoRemaining.length > 0 */
-const pickExtraRandomUtxo = (
-  { utxoRemaining, utxoSelected }: UtxoSelection,
-  random: typeof Math.random
-): UtxoSelection => {
-  const remainingUtxoOfOnlyCoin = utxoRemaining.filter(([_, { value }]) => !value.assets);
-  const pickFrom = remainingUtxoOfOnlyCoin.length > 0 ? remainingUtxoOfOnlyCoin : utxoRemaining;
-  const pickIdx = Math.floor(random() * pickFrom.length);
-  const newUtxoSelected = [...utxoSelected, pickFrom[pickIdx]];
-  const originalIdx = utxoRemaining.indexOf(pickFrom[pickIdx]);
-  const newUtxoRemaining = [...utxoRemaining.slice(0, originalIdx), ...utxoRemaining.slice(originalIdx + 1)];
-  return { utxoRemaining: newUtxoRemaining, utxoSelected: newUtxoSelected };
 };
 
 const mergeWithSmallestBundle = (values: Cardano.Value[], index: number): Cardano.Value[] => {
@@ -408,7 +402,7 @@ export const computeChangeAndAdjustForFee = async ({
   outputValues,
   uniqueTxAssetIDs,
   implicitValue,
-  random,
+  pickAdditionalUtxo,
   utxoSelection
 }: ChangeComputationArgs): Promise<ChangeComputationResult> => {
   const recomputeChangeAndAdjustForFeeWithExtraUtxo = (currentUtxoSelection: UtxoSelection) => {
@@ -418,10 +412,10 @@ export const computeChangeAndAdjustForFee = async ({
         estimateTxCosts,
         implicitValue,
         outputValues,
-        random,
+        pickAdditionalUtxo,
         tokenBundleSizeExceedsLimit,
         uniqueTxAssetIDs,
-        utxoSelection: pickExtraRandomUtxo(currentUtxoSelection, random)
+        utxoSelection: pickAdditionalUtxo(currentUtxoSelection)
       });
     }
     // This is not a great error type for this, because the spec says

@@ -6,9 +6,32 @@ import { ComputeMinimumCoinQuantity, ImplicitValue, TokenBundleSizeExceedsLimit 
 import { InputSelectionError, InputSelectionFailure } from './InputSelectionError';
 import uniq from 'lodash/uniq.js';
 
+export const MAX_U64 = 18_446_744_073_709_551_615n;
+
 export const stubMaxSizeAddress = Cardano.PaymentAddress(
   'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
 );
+
+/**
+ * Sorts the given TxIn set first by txId and then by index.
+ *
+ * @param lhs The left-hand side of the comparison operation.
+ * @param rhs The left-hand side of the comparison operation.
+ */
+export const sortTxIn = (lhs: Cardano.TxIn, rhs: Cardano.TxIn) => {
+  const txIdComparison = lhs.txId.localeCompare(rhs.txId);
+  if (txIdComparison !== 0) return txIdComparison;
+
+  return lhs.index - rhs.index;
+};
+
+/**
+ * Sorts the given Utxo set first by TxIn.
+ *
+ * @param lhs The left-hand side of the comparison operation.
+ * @param rhs The left-hand side of the comparison operation.
+ */
+export const sortUtxoByTxIn = (lhs: Cardano.Utxo, rhs: Cardano.Utxo) => sortTxIn(lhs[0], rhs[0]);
 
 export interface ImplicitTokens {
   spend(assetId: Cardano.AssetId): bigint;
@@ -307,3 +330,21 @@ export const isValidValue = (
 
   return isValid;
 };
+
+/**
+ * Creates a comparator function that sorts `TxOut`s in descending order based on
+ * the quantity of a specified asset.
+ *
+ * @param assetId - The asset ID to compare quantities of.
+ * @returns A comparator function that can be used with `.sort()`.
+ */
+export const sortByAssetQuantity =
+  (assetId: Cardano.AssetId) =>
+  (lhs: Cardano.TxOut, rhs: Cardano.TxOut): number => {
+    const lhsQty = lhs.value.assets?.get(assetId) ?? 0n;
+    const rhsQty = rhs.value.assets?.get(assetId) ?? 0n;
+
+    if (lhsQty > rhsQty) return -1;
+    if (lhsQty < rhsQty) return 1;
+    return 0;
+  };

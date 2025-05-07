@@ -1,6 +1,13 @@
 import { AssetId, TxTestUtil } from '@cardano-sdk/util-dev';
 import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
-import { ChangeAddressResolver, GreedyInputSelector, InputSelectionError, InputSelector, Selection } from '../src';
+import {
+  ChangeAddressResolver,
+  GreedyInputSelector,
+  InputSelectionError,
+  InputSelector,
+  LargeFirstSelector,
+  Selection
+} from '../src';
 import { InputSelectionFailure } from '../src/InputSelectionError';
 import {
   SelectionConstraints,
@@ -34,6 +41,11 @@ const createRoundRobinRandomImprove = () =>
 const createGreedySelector = () =>
   new GreedyInputSelector({
     getChangeAddresses: async () => new Map([[asPaymentAddress('A'), 1]])
+  });
+
+const createLargeFirstSelector = () =>
+  new LargeFirstSelector({
+    changeAddressResolver: new MockChangeAddressResolver()
   });
 
 const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => {
@@ -343,3 +355,4 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
 
 testInputSelection('RoundRobinRandomImprove', createRoundRobinRandomImprove);
 testInputSelection('GreedySelector', createGreedySelector);
+testInputSelection('LargeFirstSelector', createLargeFirstSelector);

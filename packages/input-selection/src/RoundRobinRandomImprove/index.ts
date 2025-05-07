@@ -2,17 +2,35 @@ import { Cardano } from '@cardano-sdk/core';
 import { ChangeAddressResolver } from '../ChangeAddress';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { InputSelectionParameters, InputSelector, SelectionResult } from '../types';
-import { assertIsBalanceSufficient, preProcessArgs, stubMaxSizeAddress, toValues } from '../util';
-import { computeChangeAndAdjustForFee } from './change';
+import {
+  MAX_U64,
+  UtxoSelection,
+  assertIsBalanceSufficient,
+  preProcessArgs,
+  sortUtxoByTxIn,
+  stubMaxSizeAddress,
+  toValues
+} from '../util';
+import { PickAdditionalUtxo, computeChangeAndAdjustForFee } from '../change';
 import { roundRobinSelection } from './roundRobin';
-import { sortUtxoByTxIn } from '../GreedySelection';
-
-export const MAX_U64 = 18_446_744_073_709_551_615n;
 
 interface RoundRobinRandomImproveOptions {
   changeAddressResolver: ChangeAddressResolver;
   random?: typeof Math.random;
 }
+
+/** Picks one UTxO from remaining set and puts it to the selected set. Precondition: utxoRemaining.length > 0 */
+export const createPickAdditionalRandomUtxo =
+  (random: typeof Math.random): PickAdditionalUtxo =>
+  ({ utxoRemaining, utxoSelected }: UtxoSelection): UtxoSelection => {
+    const remainingUtxoOfOnlyCoin = utxoRemaining.filter(([_, { value }]) => !value.assets);
+    const pickFrom = remainingUtxoOfOnlyCoin.length > 0 ? remainingUtxoOfOnlyCoin : utxoRemaining;
+    const pickIdx = Math.floor(random() * pickFrom.length);
+    const newUtxoSelected = [...utxoSelected, pickFrom[pickIdx]];
+    const originalIdx = utxoRemaining.indexOf(pickFrom[pickIdx]);
+    const newUtxoRemaining = [...utxoRemaining.slice(0, originalIdx), ...utxoRemaining.slice(originalIdx + 1)];
+    return { utxoRemaining: newUtxoRemaining, utxoSelected: newUtxoSelected };
+  };
 
 export const roundRobinRandomImprove = ({
   changeAddressResolver,
@@ -63,7 +81,7 @@ export const roundRobinRandomImprove = ({
         }),
       implicitValue,
       outputValues: toValues(outputs),
-      random,
+      pickAdditionalUtxo: createPickAdditionalRandomUtxo(random),
       tokenBundleSizeExceedsLimit,
       uniqueTxAssetIDs,
       utxoSelection: roundRobinSelectionResult
