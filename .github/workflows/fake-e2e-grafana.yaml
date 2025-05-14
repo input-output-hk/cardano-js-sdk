@@ -1,0 +1,82 @@
+name: fake-e2e-metrics-demo
+
+on:
+  push:
+    branches: [gha_grafana_metrics]
+  workflow_dispatch:
+
+jobs:
+  run-and-push:
+    runs-on: ubuntu-latest
+    env:
+      PUSH_URL: ${{ secrets.GRAFANA_PUSH_URL }}    # e.g., https://prometheus-us-central1.grafana.net/api/prom/push
+      PUSH_USER: ${{ secrets.GRAFANA_USERNAME }}   # e.g., 787878
+      PUSH_PASS: ${{ secrets.GRAFANA_PASSWORD }}   # e.g., eyJrIjoxxxxxxxxxxxxxxyMX0=
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Simulate e2e run & emit JSON metrics
+        id: fake
+        run: |
+          cat >cpu.json <<EOF
+          {
+            "total":   $((RANDOM % 200 + 800)),
+            "user":    $((RANDOM % 600 + 400)),
+            "system":  $((RANDOM % 200 + 100)),
+            "rss_mb":  $((RANDOM % 200 + 300))
+          }
+          EOF
+          cat cpu.json
+
+      - name: Convert to Prometheus text
+        run: |
+          jq -r '
+            "# TYPE e2e_cpu_seconds_total gauge\n" +
+            "e2e_cpu_seconds_total{job=\"github-fake-e2e\",instance=\"${{ github.run_id }}\"} " + (.total |tostring)  + "\n" +
+            "# TYPE e2e_cpu_seconds_user gauge\n" +
+            "e2e_cpu_seconds_user{job=\"github-fake-e2e\",instance=\"${{ github.run_id }}\"} " + (.user  |tostring)  + "\n" +
+            "# TYPE e2e_cpu_seconds_sys gauge\n" +
+            "e2e_cpu_seconds_sys{job=\"github-fake-e2e\",instance=\"${{ github.run_id }}\"} " + (.system|tostring)  + "\n" +
+            "# TYPE e2e_memory_rss_bytes gauge\n" +
+            "e2e_memory_rss_bytes{job=\"github-fake-e2e\",instance=\"${{ github.run_id }}\"} " + ((.rss_mb*1024*1024)|tostring)
+          ' cpu.json > metrics.txt
+          cat metrics.txt
+
+      - name: Create Prometheus config
+        run: |
+          cat >prometheus.yml <<EOF
+          global:
+            scrape_interval: 15s
+          scrape_configs:
+            - job_name: 'fake-e2e-metrics'
+              static_configs:
+                - targets: ['http-server:8000']
+              metrics_path: '/metrics.txt'
+          remote_write:
+            - url: "$PUSH_URL"
+              basic_auth:
+                username: "$PUSH_USER"
+                password: "$PUSH_PASS"
+          EOF
+          cat prometheus.yml
+
+      - name: Start Python HTTP server
+        run: |
+          docker run -d --name http-server -v $(pwd):/app -w /app -p 8000:8000 python:3.11-slim python -m http.server 8000 > http.log 2>&1
+
+      - name: Run Prometheus
+        run: |
+          docker run -d --name prometheus -v $(pwd):/etc/prometheus -p 9090:9090 --link http-server prom/prometheus:latest --config.file=/etc/prometheus/prometheus.yml --web.listen-address=:9090 > prom.log 2>&1
+          sleep 60
+          curl http://localhost:9090/api/v1/query?query=e2e_cpu_seconds_total
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs
+          path: |
+            prom.log
+            http.log
