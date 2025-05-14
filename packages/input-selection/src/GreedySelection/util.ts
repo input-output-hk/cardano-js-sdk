@@ -1,9 +1,9 @@
 /* eslint-disable func-style, max-params */
 import { BigNumber } from 'bignumber.js';
 import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
-import { ComputeMinimumCoinQuantity, TokenBundleSizeExceedsLimit } from '../types';
+import { ComputeMinimumCoinQuantity, SelectionConstraints, TokenBundleSizeExceedsLimit } from '../types';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
-import { addTokenMaps, isValidValue, sortByCoins } from '../util';
+import { addTokenMaps, isValidValue, sortByCoins, stubMaxSizeAddress } from '../util';
 
 const PERCENTAGE_TOLERANCE = 0.05;
 
@@ -227,22 +227,141 @@ export const splitChange = async (
 };
 
 /**
- * Sorts the given TxIn set first by txId and then by index.
+ * Given a set of input and outputs, compute the fee. Then extract the fee from the change output
+ * with the highest value.
  *
- * @param lhs The left-hand side of the comparison operation.
- * @param rhs The left-hand side of the comparison operation.
+ * @param changeLovelace The available amount of lovelace to be used as change.
+ * @param constraints The selection constraints.
+ * @param inputs The inputs of the transaction.
+ * @param outputs The outputs of the transaction.
+ * @param changeOutputs The list of change outputs.
+ * @param currentFee The current computed fee for this selection.
  */
-export const sortTxIn = (lhs: Cardano.TxIn, rhs: Cardano.TxIn) => {
-  const txIdComparison = lhs.txId.localeCompare(rhs.txId);
-  if (txIdComparison !== 0) return txIdComparison;
+export const adjustOutputsForFee = async (
+  changeLovelace: bigint,
+  constraints: SelectionConstraints,
+  inputs: Set<Cardano.Utxo>,
+  outputs: Set<Cardano.TxOut>,
+  changeOutputs: Array<Cardano.TxOut>,
+  currentFee: bigint
+): Promise<{
+  fee: bigint;
+  change: Array<Cardano.TxOut>;
+  feeAccountedFor: boolean;
+  redeemers?: Array<Cardano.Redeemer>;
+}> => {
+  const totalOutputs = new Set([...outputs, ...changeOutputs]);
+  const { fee, redeemers } = await constraints.computeMinimumCost({
+    change: [],
+    fee: currentFee,
+    inputs,
+    outputs: totalOutputs
+  });
 
-  return lhs.index - rhs.index;
+  if (fee === changeLovelace) return { change: [], fee, feeAccountedFor: true, redeemers };
+
+  if (changeLovelace < fee) throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
+
+  const updatedOutputs = [...changeOutputs];
+
+  updatedOutputs.sort(sortByCoins);
+
+  let feeAccountedFor = false;
+  for (const output of updatedOutputs) {
+    const adjustedCoins = output.value.coins - fee;
+
+    if (adjustedCoins >= constraints.computeMinimumCoinQuantity(output)) {
+      output.value.coins = adjustedCoins;
+      feeAccountedFor = true;
+      break;
+    }
+  }
+
+  return { change: [...updatedOutputs], fee, feeAccountedFor, redeemers };
 };
 
 /**
- * Sorts the given Utxo set first by TxIn.
+ * Recursively compute the fee and compute change outputs until it finds a set of change outputs that satisfies the fee.
  *
- * @param lhs The left-hand side of the comparison operation.
- * @param rhs The left-hand side of the comparison operation.
+ * @param inputs The inputs of the transaction.
+ * @param outputs The outputs of the transaction.
+ * @param changeLovelace The total amount of lovelace in the change.
+ * @param changeAssets The total assets to be distributed as change.
+ * @param constraints The selection constraints.
+ * @param getChangeAddresses A callback that returns a list of addresses and their proportions.
+ * @param fee The current computed fee for this selection.
  */
-export const sortUtxoByTxIn = (lhs: Cardano.Utxo, rhs: Cardano.Utxo) => sortTxIn(lhs[0], rhs[0]);
+export const splitChangeAndComputeFee = async (
+  inputs: Set<Cardano.Utxo>,
+  outputs: Set<Cardano.TxOut>,
+  changeLovelace: bigint,
+  changeAssets: Cardano.TokenMap | undefined,
+  constraints: SelectionConstraints,
+  getChangeAddresses: () => Promise<Map<Cardano.PaymentAddress, number>>,
+  fee: bigint
+): Promise<{ fee: bigint; change: Array<Cardano.TxOut>; feeAccountedFor: boolean }> => {
+  const changeOutputs = await splitChange(
+    getChangeAddresses,
+    changeLovelace,
+    changeAssets,
+    constraints.computeMinimumCoinQuantity,
+    constraints.tokenBundleSizeExceedsLimit,
+    fee
+  );
+
+  let adjustedChangeOutputs = await adjustOutputsForFee(
+    changeLovelace,
+    constraints,
+    inputs,
+    outputs,
+    changeOutputs,
+    fee
+  );
+
+  // If the newly computed fee is higher than the available balance for change,
+  // but there are unallocated native assets, return the assets as change with 0n coins.
+  if (adjustedChangeOutputs.fee >= changeLovelace) {
+    const result = {
+      change: [
+        {
+          address: stubMaxSizeAddress,
+          value: {
+            assets: changeAssets,
+            coins: 0n
+          }
+        }
+      ],
+      fee: adjustedChangeOutputs.fee,
+      feeAccountedFor: true
+    };
+
+    if (result.change[0].value.coins < constraints.computeMinimumCoinQuantity(result.change[0]))
+      throw new InputSelectionError(InputSelectionFailure.UtxoFullyDepleted);
+
+    return result;
+  }
+
+  if (fee < adjustedChangeOutputs.fee) {
+    adjustedChangeOutputs = await splitChangeAndComputeFee(
+      inputs,
+      outputs,
+      changeLovelace,
+      changeAssets,
+      constraints,
+      getChangeAddresses,
+      adjustedChangeOutputs.fee
+    );
+
+    if (adjustedChangeOutputs.change.length === 0)
+      throw new InputSelectionError(InputSelectionFailure.UtxoFullyDepleted);
+  }
+
+  for (const out of adjustedChangeOutputs.change) {
+    if (out.value.coins < constraints.computeMinimumCoinQuantity(out))
+      throw new InputSelectionError(InputSelectionFailure.UtxoFullyDepleted);
+  }
+
+  if (!adjustedChangeOutputs.feeAccountedFor) throw new InputSelectionError(InputSelectionFailure.UtxoFullyDepleted);
+
+  return adjustedChangeOutputs;
+};
