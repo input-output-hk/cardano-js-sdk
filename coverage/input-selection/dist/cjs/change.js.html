@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for dist/cjs/RoundRobinRandomImprove/change.js</title>
+    <title>Code coverage report for dist/cjs/change.js</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../../../prettify.css" />
-    <link rel="stylesheet" href="../../../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../../../favicon.png" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../../../sort-arrow-sprite.png);
+            background-image: url(../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../../index.html">All files</a> / <a href="index.html">dist/cjs/RoundRobinRandomImprove</a> change.js</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">dist/cjs</a> change.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">12.12% </span>
+                <span class="strong">12.16% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>24/198</span>
+                <span class='fraction'>23/189</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">6.74% </span>
+                <span class="strong">6.89% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>6/89</span>
+                <span class='fraction'>6/87</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">3.84% </span>
+                <span class="strong">4.16% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/26</span>
+                <span class='fraction'>1/24</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">12.76% </span>
+                <span class="strong">12.77% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>24/188</span>
+                <span class='fraction'>23/180</span>
             </div>
         
             
@@ -332,16 +332,7 @@
 <a name='L267'></a><a href='#L267'>267</a>
 <a name='L268'></a><a href='#L268'>268</a>
 <a name='L269'></a><a href='#L269'>269</a>
-<a name='L270'></a><a href='#L270'>270</a>
-<a name='L271'></a><a href='#L271'>271</a>
-<a name='L272'></a><a href='#L272'>272</a>
-<a name='L273'></a><a href='#L273'>273</a>
-<a name='L274'></a><a href='#L274'>274</a>
-<a name='L275'></a><a href='#L275'>275</a>
-<a name='L276'></a><a href='#L276'>276</a>
-<a name='L277'></a><a href='#L277'>277</a>
-<a name='L278'></a><a href='#L278'>278</a>
-<a name='L279'></a><a href='#L279'>279</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L270'></a><a href='#L270'>270</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -456,15 +447,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -626,8 +608,8 @@ var __importDefault = (this &amp;&amp; this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.computeChangeAndAdjustForFee = exports.coalesceChangeBundlesForMinCoinRequirement = void 0;
 const core_1 = require("@cardano-sdk/core");
-const InputSelectionError_1 = require("../InputSelectionError");
-const util_1 = require("../util");
+const InputSelectionError_1 = require("./InputSelectionError");
+const util_1 = require("./util");
 const minBy_js_1 = __importDefault(require("lodash/minBy.js"));
 const orderBy_js_1 = __importDefault(require("lodash/orderBy.js"));
 const pick_js_1 = __importDefault(require("lodash/pick.js"));
@@ -736,15 +718,6 @@ const computeRequestedAssetChangeBundles = <span class="fstat-no" title="functio
     }
 <span class="cstat-no" title="statement not covered" >    return bundles;</span>
 };
-const pickExtraRandomUtxo = <span class="fstat-no" title="function not covered" >({</span> utxoRemaining, utxoSelected }, random) =&gt; {
-    const remainingUtxoOfOnlyCoin = <span class="cstat-no" title="statement not covered" >utxoRemaining.filter(<span class="fstat-no" title="function not covered" >([</span>_, { value }]) =&gt; <span class="cstat-no" title="statement not covered" >!value.assets)</span>;</span>
-    const pickFrom = <span class="cstat-no" title="statement not covered" >remainingUtxoOfOnlyCoin.length &gt; 0 ? remainingUtxoOfOnlyCoin : utxoRemaining;</span>
-    const pickIdx = <span class="cstat-no" title="statement not covered" >Math.floor(random() * pickFrom.length);</span>
-    const newUtxoSelected = <span class="cstat-no" title="statement not covered" >[...utxoSelected, pickFrom[pickIdx]];</span>
-    const originalIdx = <span class="cstat-no" title="statement not covered" >utxoRemaining.indexOf(pickFrom[pickIdx]);</span>
-    const newUtxoRemaining = <span class="cstat-no" title="statement not covered" >[...utxoRemaining.slice(0, originalIdx), ...utxoRemaining.slice(originalIdx + 1)];</span>
-<span class="cstat-no" title="statement not covered" >    return { utxoRemaining: newUtxoRemaining, utxoSelected: newUtxoSelected };</span>
-};
 const mergeWithSmallestBundle = <span class="fstat-no" title="function not covered" >(v</span>alues, index) =&gt; {
     let result = <span class="cstat-no" title="statement not covered" >[...values];</span>
     const toBeMerged = <span class="cstat-no" title="statement not covered" >result.splice(index, 1)[0];</span>
@@ -840,7 +813,7 @@ const validateChangeBundles = <span class="fstat-no" title="function not covered
     }
 <span class="cstat-no" title="statement not covered" >    return changeBundles;</span>
 };
-const computeChangeAndAdjustForFee = <span class="fstat-no" title="function not covered" >as</span>ync ({ computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit, estimateTxCosts, outputValues, uniqueTxAssetIDs, implicitValue, random, utxoSelection }) =&gt; {
+const computeChangeAndAdjustForFee = <span class="fstat-no" title="function not covered" >as</span>ync ({ computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit, estimateTxCosts, outputValues, uniqueTxAssetIDs, implicitValue, pickAdditionalUtxo, utxoSelection }) =&gt; {
     const recomputeChangeAndAdjustForFeeWithExtraUtxo = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(c</span>urrentUtxoSelection) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >        if (currentUtxoSelection.utxoRemaining.length &gt; 0) {</span>
 <span class="cstat-no" title="statement not covered" >            return (0, exports.computeChangeAndAdjustForFee)({</span>
@@ -848,10 +821,10 @@ const computeChangeAndAdjustForFee = <span class="fstat-no" title="function not 
                 estimateTxCosts,
                 implicitValue,
                 outputValues,
-                random,
+                pickAdditionalUtxo,
                 tokenBundleSizeExceedsLimit,
                 uniqueTxAssetIDs,
-                utxoSelection: pickExtraRandomUtxo(currentUtxoSelection, random)
+                utxoSelection: pickAdditionalUtxo(currentUtxoSelection)
             });
         }
 <span class="cstat-no" title="statement not covered" >        throw new InputSelectionError_1.InputSelectionError(InputSelectionError_1.InputSelectionFailure.UtxoFullyDepleted);</span>
@@ -904,16 +877,16 @@ exports.computeChangeAndAdjustForFee = computeChangeAndAdjustForFee;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-04-18T12:12:48.798Z
+                at 2025-05-14T08:19:12.285Z
             </div>
-        <script src="../../../prettify.js"></script>
+        <script src="../../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../../../sorter.js"></script>
-        <script src="../../../block-navigation.js"></script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
     </body>
 </html>
     

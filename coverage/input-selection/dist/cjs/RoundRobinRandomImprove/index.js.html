@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">38.46% </span>
+                <span class="strong">28.57% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>10/26</span>
+                <span class='fraction'>10/35</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>0/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">40% </span>
+                <span class="strong">31.25% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>10/25</span>
+                <span class='fraction'>10/32</span>
             </div>
         
             
@@ -128,7 +128,15 @@
 <a name='L63'></a><a href='#L63'>63</a>
 <a name='L64'></a><a href='#L64'>64</a>
 <a name='L65'></a><a href='#L65'>65</a>
-<a name='L66'></a><a href='#L66'>66</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -136,6 +144,14 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -195,13 +211,21 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.roundRobinRandomImprove = exports.MAX_U64 = void 0;
+exports.roundRobinRandomImprove = exports.createPickAdditionalRandomUtxo = void 0;
 const InputSelectionError_1 = require("../InputSelectionError");
 const util_1 = require("../util");
-const change_1 = require("./change");
+const change_1 = require("../change");
 const roundRobin_1 = require("./roundRobin");
-const GreedySelection_1 = require("../GreedySelection");
-exports.MAX_U64 = 18446744073709551615n;
+const createPickAdditionalRandomUtxo = <span class="fstat-no" title="function not covered" >(r</span>andom) =&gt; <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >({</span> utxoRemaining, utxoSelected }) =&gt; {</span>
+    const remainingUtxoOfOnlyCoin = <span class="cstat-no" title="statement not covered" >utxoRemaining.filter(<span class="fstat-no" title="function not covered" >([</span>_, { value }]) =&gt; <span class="cstat-no" title="statement not covered" >!value.assets)</span>;</span>
+    const pickFrom = <span class="cstat-no" title="statement not covered" >remainingUtxoOfOnlyCoin.length &gt; 0 ? remainingUtxoOfOnlyCoin : utxoRemaining;</span>
+    const pickIdx = <span class="cstat-no" title="statement not covered" >Math.floor(random() * pickFrom.length);</span>
+    const newUtxoSelected = <span class="cstat-no" title="statement not covered" >[...utxoSelected, pickFrom[pickIdx]];</span>
+    const originalIdx = <span class="cstat-no" title="statement not covered" >utxoRemaining.indexOf(pickFrom[pickIdx]);</span>
+    const newUtxoRemaining = <span class="cstat-no" title="statement not covered" >[...utxoRemaining.slice(0, originalIdx), ...utxoRemaining.slice(originalIdx + 1)];</span>
+<span class="cstat-no" title="statement not covered" >    return { utxoRemaining: newUtxoRemaining, utxoSelected: newUtxoSelected };</span>
+};
+exports.createPickAdditionalRandomUtxo = createPickAdditionalRandomUtxo;
 const roundRobinRandomImprove = <span class="fstat-no" title="function not covered" >({</span> changeAddressResolver, random = <span class="branch-0 cbranch-no" title="branch not covered" >Math.random </span>}) =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
     select: <span class="fstat-no" title="function not covered" >as</span>ync ({ preSelectedUtxo: preSelectedUtxoSet, utxo: utxoSet, outputs: outputSet, constraints: { computeMinimumCost, computeSelectionLimit, computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit }, implicitValue: partialImplicitValue = <span class="branch-0 cbranch-no" title="branch not covered" >{} </span>}) =&gt; {
         const changeAddress = <span class="cstat-no" title="statement not covered" >util_1.stubMaxSizeAddress;</span>
@@ -223,13 +247,13 @@ const roundRobinRandomImprove = <span class="fstat-no" title="function not cover
                     address: changeAddress,
                     value
                 })),
-                fee: exports.MAX_U64,
+                fee: util_1.MAX_U64,
                 inputs: new Set(utxos),
                 outputs: outputSet
             }),
             implicitValue,
             outputValues: (0, util_1.toValues)(outputs),
-            random,
+            pickAdditionalUtxo: (0, exports.createPickAdditionalRandomUtxo)(random),
             tokenBundleSizeExceedsLimit,
             uniqueTxAssetIDs,
             utxoSelection: roundRobinSelectionResult
@@ -249,7 +273,7 @@ const roundRobinRandomImprove = <span class="fstat-no" title="function not cover
             (await computeSelectionLimit({ change: selection.change, fee: selection.fee, inputs, outputs: outputSet }))) {
 <span class="cstat-no" title="statement not covered" >            throw new InputSelectionError_1.InputSelectionError(InputSelectionError_1.InputSelectionFailure.MaximumInputCountExceeded);</span>
         }
-<span class="cstat-no" title="statement not covered" >        selection.inputs = new Set([...selection.inputs].sort(GreedySelection_1.sortUtxoByTxIn));</span>
+<span class="cstat-no" title="statement not covered" >        selection.inputs = new Set([...selection.inputs].sort(util_1.sortUtxoByTxIn));</span>
 <span class="cstat-no" title="statement not covered" >        return {</span>
             redeemers: result.redeemers,
             remainingUTxO: new Set(result.remainingUTxO),
@@ -265,7 +289,7 @@ exports.roundRobinRandomImprove = roundRobinRandomImprove;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-04-18T12:12:48.798Z
+                at 2025-05-14T08:19:12.285Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
