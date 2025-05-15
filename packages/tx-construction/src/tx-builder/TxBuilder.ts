@@ -26,6 +26,13 @@ import {
   UnwitnessedTx
 } from './types';
 import { GreedyTxEvaluator } from './GreedyTxEvaluator';
+import {
+  InputSelectionError,
+  InputSelectionFailure,
+  LargeFirstSelector,
+  SelectionSkeleton,
+  StaticChangeAddressResolver
+} from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { OutputBuilderValidator, TxOutputBuilder } from './OutputBuilder';
 import { RedeemersByType } from '../input-selection';
@@ -38,7 +45,6 @@ import {
   sortRewardAccountsDelegatedFirst,
   validateValidityInterval
 } from './utils';
-import { SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { contextLogger, deepEquals } from '@cardano-sdk/util';
 import { createOutputValidator } from '../output-validation';
 import { ensureNoDeRegistrationsWithRewardsLocked } from './ensureNoDeRegistrationsWithRewardsLocked';
@@ -341,6 +347,7 @@ export class GenericTxBuilder implements TxBuilder {
             const isAlteringDelegation =
               this.#requestedPortfolio !== undefined || this.#delegateFirstStakeCredConfig !== undefined;
 
+            let usingGreedySelector = false;
             if (
               this.#dependencies.bip32Account &&
               isAlteringDelegation &&
@@ -361,6 +368,7 @@ export class GenericTxBuilder implements TxBuilder {
               // Distributing balance according to weights is necessary when there are multiple reward accounts
               // and delegating, to make sure utxos are part of the correct addresses (the ones being delegated)
               dependencies.inputSelector = createGreedyInputSelector(rewardAccountsWithWeights, ownAddresses);
+              usingGreedySelector = true;
             }
 
             // Resolved all unresolved inputs
@@ -396,30 +404,51 @@ export class GenericTxBuilder implements TxBuilder {
               }
             }
 
-            const { body, hash, inputSelection, redeemers } = await initializeTx(
-              {
-                auxiliaryData,
-                certificates: this.partialTxBody.certificates,
-                collateralReturn,
-                collaterals,
-                customizeCb: this.#customizeCb,
-                handleResolutions: this.#handleResolutions,
-                inputs: new Set(this.#preSelectedInputs.values()),
-                options: {
-                  validityInterval: this.partialTxBody.validityInterval
-                },
-                outputs: new Set(this.partialTxBody.outputs || []),
-                proposalProcedures: this.partialTxBody.proposalProcedures,
-                redeemersByType: this.#knownRedeemers,
-                referenceInputs: new Set([...this.#referenceInputs.values()].map((utxo) => utxo[0])),
-                scriptIntegrityHash: hasPlutusScripts ? DUMMY_SCRIPT_DATA_HASH : undefined,
-                scriptVersions,
-                signingOptions: partialSigningOptions,
-                txEvaluator: this.#txEvaluator,
-                witness
+            const initializeTxProps = {
+              auxiliaryData,
+              certificates: this.partialTxBody.certificates,
+              collateralReturn,
+              collaterals,
+              customizeCb: this.#customizeCb,
+              handleResolutions: this.#handleResolutions,
+              inputs: new Set(this.#preSelectedInputs.values()),
+              options: {
+                validityInterval: this.partialTxBody.validityInterval
               },
-              dependencies
-            );
+              outputs: new Set(this.partialTxBody.outputs || []),
+              proposalProcedures: this.partialTxBody.proposalProcedures,
+              redeemersByType: this.#knownRedeemers,
+              referenceInputs: new Set([...this.#referenceInputs.values()].map((utxo) => utxo[0])),
+              scriptIntegrityHash: hasPlutusScripts ? DUMMY_SCRIPT_DATA_HASH : undefined,
+              scriptVersions,
+              signingOptions: partialSigningOptions,
+              txEvaluator: this.#txEvaluator,
+              witness
+            };
+
+            let initialTxResult;
+
+            try {
+              initialTxResult = await initializeTx(initializeTxProps, dependencies);
+            } catch (error) {
+              // Fallback to large first if we are not using the greedy selector
+              if (
+                usingGreedySelector ||
+                !(error instanceof InputSelectionError) ||
+                error.failure === InputSelectionFailure.UtxoBalanceInsufficient
+              ) {
+                throw error;
+              }
+
+              dependencies.inputSelector = new LargeFirstSelector({
+                changeAddressResolver: new StaticChangeAddressResolver(async () => ownAddresses)
+              });
+
+              this.#logger.warn(`Building attempt failed with ${error.failure}, retrying with large first selector`);
+              initialTxResult = await initializeTx(initializeTxProps, dependencies);
+            }
+
+            const { body, hash, inputSelection, redeemers } = initialTxResult;
 
             witness.redeemers = redeemers;
 
