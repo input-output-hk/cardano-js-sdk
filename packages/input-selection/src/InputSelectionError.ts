@@ -3,7 +3,7 @@ import { CustomError } from 'ts-custom-error';
 export enum InputSelectionFailure {
   /**
    * Total value of the entries within the initial UTxO set (the amount of money available)
-   * is less than the the total value of all entries in the requested output set (the amount of money required).
+   * is less than the total value of all entries in the requested output set (the amount of money required).
    */
   UtxoBalanceInsufficient = 'UTxO Balance Insufficient',
   /**
