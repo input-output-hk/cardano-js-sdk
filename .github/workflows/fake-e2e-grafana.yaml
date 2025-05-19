@@ -32,17 +32,108 @@ jobs:
 
       - name: Convert to Prometheus text
         run: |
-          jq -r '
-            "# TYPE e2e_cpu_seconds_total gauge\n" +
-            "e2e_cpu_seconds_total{job=\"github-fake-e2e\",instance=\"${{ github.run_id }}\"} " + (.total |tostring)  + "\n" +
-            "# TYPE e2e_cpu_seconds_user gauge\n" +
-            "e2e_cpu_seconds_user{job=\"github-fake-e2e\",instance=\"${{ github.run_id }}\"} " + (.user  |tostring)  + "\n" +
-            "# TYPE e2e_cpu_seconds_sys gauge\n" +
-            "e2e_cpu_seconds_sys{job=\"github-fake-e2e\",instance=\"${{ github.run_id }}\"} " + (.system|tostring)  + "\n" +
-            "# TYPE e2e_memory_rss_bytes gauge\n" +
-            "e2e_memory_rss_bytes{job=\"github-fake-e2e\",instance=\"${{ github.run_id }}\"} " + ((.rss_mb*1024*1024)|tostring)
-          ' cpu.json > metrics.txt
-          cat metrics.txt
+          #jq -r '
+          echo '
+          test_metric_display{bar_label="abc",source="grafana_cloud_docs"} 35.2
+          e2e_cpu_seconds_total{scenario_name="Extended view Hide my balance no eye icon for wallet with no funds",scenario_id="34422202",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:10.451Z"} 198
+          #Metrics from metrics/34422202-8800-4e68-ac2a-59b6fbac584e-chrome-usage.json
+          e2e_cpu_seconds_total{scenario_name="Extended view - Hide my balance - no eye icon for wallet with no funds",scenario_id="34422202",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:10.451Z"} 198
+          e2e_memory_rss_bytes{scenario_name="Extended view - Hide my balance - no eye icon for wallet with no funds",scenario_id="34422202",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:10.451Z"} 474202112
+          e2e_cpu_seconds_total{scenario_name="Extended view - Hide my balance - no eye icon for wallet with no funds",scenario_id="34422202",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:11.454Z"} 131
+          e2e_memory_rss_bytes{scenario_name="Extended view - Hide my balance - no eye icon for wallet with no funds",scenario_id="34422202",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:11.454Z"} 663748608
+          e2e_cpu_seconds_total{scenario_name="Extended view - Hide my balance - no eye icon for wallet with no funds",scenario_id="34422202",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:12.456Z"} 7.000000000000001
+          e2e_memory_rss_bytes{scenario_name="Extended view - Hide my balance - no eye icon for wallet with no funds",scenario_id="34422202",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:12.456Z"} 610484224
+          e2e_cpu_seconds_total{scenario_name="Extended view - Hide my balance - no eye icon for wallet with no funds",scenario_id="34422202",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:13.459Z"} 9
+          e2e_memory_rss_bytes{scenario_name="Extended view - Hide my balance - no eye icon for wallet with no funds",scenario_id="34422202",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:13.459Z"} 615219200
+          e2e_cpu_seconds_total{scenario_name="Extended view - Hide my balance - no eye icon for wallet with no funds",scenario_id="34422202",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:14.456Z"} 1
+          e2e_memory_rss_bytes{scenario_name="Extended view - Hide my balance - no eye icon for wallet with no funds",scenario_id="34422202",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:14.456Z"} 615579648
+          # Metrics from metrics/3504888a-e7ee-418c-a0b9-f82d01ef9c0f-chrome-usage.json
+          e2e_cpu_seconds_total{scenario_name="Extended View - NFTs empty state",scenario_id="3504888a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:34.562Z"} 199
+          e2e_memory_rss_bytes{scenario_name="Extended View - NFTs empty state",scenario_id="3504888a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:34.562Z"} 484179968
+          e2e_cpu_seconds_total{scenario_name="Extended View - NFTs empty state",scenario_id="3504888a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:35.566Z"} 128
+          e2e_memory_rss_bytes{scenario_name="Extended View - NFTs empty state",scenario_id="3504888a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:35.566Z"} 667680768
+          e2e_cpu_seconds_total{scenario_name="Extended View - NFTs empty state",scenario_id="3504888a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:36.563Z"} 17
+          e2e_memory_rss_bytes{scenario_name="Extended View - NFTs empty state",scenario_id="3504888a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:36.563Z"} 652247040
+          e2e_cpu_seconds_total{scenario_name="Extended View - NFTs empty state",scenario_id="3504888a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:37.564Z"} 79
+          e2e_memory_rss_bytes{scenario_name="Extended View - NFTs empty state",scenario_id="3504888a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:37.564Z"} 686538752
+          # Metrics from metrics/35094752-7eab-4411-bc27-a1b69020125f-chrome-usage.json
+          e2e_cpu_seconds_total{scenario_name="Extended-view - Empty wallet - Send - Empty state in token selector - Tokens tab",scenario_id="35094752",job="job-id",instance="run-id",timestamp="2025-05-19T11:08:04.031Z"} 98.5
+          e2e_memory_rss_bytes{scenario_name="Extended-view - Empty wallet - Send - Empty state in token selector - Tokens tab",scenario_id="35094752",job="job-id",instance="run-id",timestamp="2025-05-19T11:08:04.031Z"} 474464256
+          e2e_cpu_seconds_total{scenario_name="Extended-view - Empty wallet - Send - Empty state in token selector - Tokens tab",scenario_id="35094752",job="job-id",instance="run-id",timestamp="2025-05-19T11:08:05.034Z"} 133
+          e2e_memory_rss_bytes{scenario_name="Extended-view - Empty wallet - Send - Empty state in token selector - Tokens tab",scenario_id="35094752",job="job-id",instance="run-id",timestamp="2025-05-19T11:08:05.034Z"} 668876800
+          e2e_cpu_seconds_total{scenario_name="Extended-view - Empty wallet - Send - Empty state in token selector - Tokens tab",scenario_id="35094752",job="job-id",instance="run-id",timestamp="2025-05-19T11:08:06.035Z"} 18
+          e2e_memory_rss_bytes{scenario_name="Extended-view - Empty wallet - Send - Empty state in token selector - Tokens tab",scenario_id="35094752",job="job-id",instance="run-id",timestamp="2025-05-19T11:08:06.035Z"} 613908480
+          e2e_cpu_seconds_total{scenario_name="Extended-view - Empty wallet - Send - Empty state in token selector - Tokens tab",scenario_id="35094752",job="job-id",instance="run-id",timestamp="2025-05-19T11:08:07.036Z"} 28.999999999999996
+          e2e_memory_rss_bytes{scenario_name="Extended-view - Empty wallet - Send - Empty state in token selector - Tokens tab",scenario_id="35094752",job="job-id",instance="run-id",timestamp="2025-05-19T11:08:07.036Z"} 604438528
+          e2e_cpu_seconds_total{scenario_name="Extended-view - Empty wallet - Send - Empty state in token selector - Tokens tab",scenario_id="35094752",job="job-id",instance="run-id",timestamp="2025-05-19T11:08:08.036Z"} 31
+          e2e_memory_rss_bytes{scenario_name="Extended-view - Empty wallet - Send - Empty state in token selector - Tokens tab",scenario_id="35094752",job="job-id",instance="run-id",timestamp="2025-05-19T11:08:08.036Z"} 463634432
+          e2e_cpu_seconds_total{scenario_name="Extended-view - Empty wallet - Send - Empty state in token selector - Tokens tab",scenario_id="35094752",job="job-id",instance="run-id",timestamp="2025-05-19T11:08:09.041Z"} 3
+          e2e_memory_rss_bytes{scenario_name="Extended-view - Empty wallet - Send - Empty state in token selector - Tokens tab",scenario_id="35094752",job="job-id",instance="run-id",timestamp="2025-05-19T11:08:09.041Z"} 459636736
+          e2e_cpu_seconds_total{scenario_name="Extended-view - Empty wallet - Send - Empty state in token selector - Tokens tab",scenario_id="35094752",job="job-id",instance="run-id",timestamp="2025-05-19T11:08:10.045Z"} 3
+          e2e_memory_rss_bytes{scenario_name="Extended-view - Empty wallet - Send - Empty state in token selector - Tokens tab",scenario_id="35094752",job="job-id",instance="run-id",timestamp="2025-05-19T11:08:10.045Z"} 460472320
+          e2e_cpu_seconds_total{scenario_name="Extended-view - Empty wallet - Send - Empty state in token selector - Tokens tab",scenario_id="35094752",job="job-id",instance="run-id",timestamp="2025-05-19T11:08:11.047Z"} 1
+          e2e_memory_rss_bytes{scenario_name="Extended-view - Empty wallet - Send - Empty state in token selector - Tokens tab",scenario_id="35094752",job="job-id",instance="run-id",timestamp="2025-05-19T11:08:11.047Z"} 458719232
+          e2e_cpu_seconds_total{scenario_name="Extended-view - Empty wallet - Send - Empty state in token selector - Tokens tab",scenario_id="35094752",job="job-id",instance="run-id",timestamp="2025-05-19T11:08:12.047Z"} 2
+          e2e_memory_rss_bytes{scenario_name="Extended-view - Empty wallet - Send - Empty state in token selector - Tokens tab",scenario_id="35094752",job="job-id",instance="run-id",timestamp="2025-05-19T11:08:12.047Z"} 459161600
+          e2e_cpu_seconds_total{scenario_name="Extended-view - Empty wallet - Send - Empty state in token selector - Tokens tab",scenario_id="35094752",job="job-id",instance="run-id",timestamp="2025-05-19T11:08:13.043Z"} 2
+          e2e_memory_rss_bytes{scenario_name="Extended-view - Empty wallet - Send - Empty state in token selector - Tokens tab",scenario_id="35094752",job="job-id",instance="run-id",timestamp="2025-05-19T11:08:13.043Z"} 459472896
+          # Metrics from metrics/549fd503-7b95-482a-b999-0956040e5918-chrome-usage.json
+          # Metrics from metrics/81cb3f6a-4c23-4ee9-8cba-5f4162018e85-chrome-usage.json
+          e2e_cpu_seconds_total{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:44.607Z"} 199
+          e2e_memory_rss_bytes{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:44.607Z"} 476545024
+          e2e_cpu_seconds_total{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:45.607Z"} 143
+          e2e_memory_rss_bytes{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:45.607Z"} 643268608
+          e2e_cpu_seconds_total{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:46.611Z"} 1
+          e2e_memory_rss_bytes{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:46.611Z"} 639909888
+          e2e_cpu_seconds_total{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:47.615Z"} 0
+          e2e_memory_rss_bytes{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:47.615Z"} 639975424
+          e2e_cpu_seconds_total{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:48.613Z"} 42
+          e2e_memory_rss_bytes{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:48.613Z"} 609009664
+          e2e_cpu_seconds_total{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:49.617Z"} 14.000000000000002
+          e2e_memory_rss_bytes{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:49.617Z"} 602898432
+          e2e_cpu_seconds_total{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:50.611Z"} 42
+          e2e_memory_rss_bytes{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:50.611Z"} 664961024
+          e2e_cpu_seconds_total{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:51.616Z"} 35
+          e2e_memory_rss_bytes{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:51.616Z"} 549273600
+          e2e_cpu_seconds_total{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:52.613Z"} 14.000000000000002
+          e2e_memory_rss_bytes{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:52.613Z"} 542212096
+          e2e_cpu_seconds_total{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:53.616Z"} 1
+          e2e_memory_rss_bytes{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:53.616Z"} 542212096
+          e2e_cpu_seconds_total{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:54.618Z"} 13
+          e2e_memory_rss_bytes{scenario_name="Extended View - Staking empty state",scenario_id="81cb3f6a",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:54.618Z"} 551993344
+          # Metrics from metrics/86bb6b18-217d-4e19-8a74-b9957f42fee4-chrome-usage.json
+          # Metrics from metrics/b9a15c5f-27aa-4418-9403-ac201f6734eb-chrome-usage.json
+          e2e_cpu_seconds_total{scenario_name="Extended View - Transactions empty state",scenario_id="b9a15c5f",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:39.747Z"} 197
+          e2e_memory_rss_bytes{scenario_name="Extended View - Transactions empty state",scenario_id="b9a15c5f",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:39.747Z"} 476463104
+          e2e_cpu_seconds_total{scenario_name="Extended View - Transactions empty state",scenario_id="b9a15c5f",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:40.748Z"} 138
+          e2e_memory_rss_bytes{scenario_name="Extended View - Transactions empty state",scenario_id="b9a15c5f",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:40.748Z"} 757727232
+          e2e_cpu_seconds_total{scenario_name="Extended View - Transactions empty state",scenario_id="b9a15c5f",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:41.752Z"} 23
+          e2e_memory_rss_bytes{scenario_name="Extended View - Transactions empty state",scenario_id="b9a15c5f",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:41.752Z"} 742572032
+          e2e_cpu_seconds_total{scenario_name="Extended View - Transactions empty state",scenario_id="b9a15c5f",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:42.749Z"} 69
+          e2e_memory_rss_bytes{scenario_name="Extended View - Transactions empty state",scenario_id="b9a15c5f",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:42.749Z"} 768114688
+          # Metrics from metrics/d9579b29-0e07-40af-936c-2dc462d7f610-chrome-usage.json
+          e2e_cpu_seconds_total{scenario_name="Extended View - Settings - Not enough Ada for Collateral",scenario_id="d9579b29",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:02.402Z"} 200
+          e2e_memory_rss_bytes{scenario_name="Extended View - Settings - Not enough Ada for Collateral",scenario_id="d9579b29",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:02.402Z"} 452509696
+          e2e_cpu_seconds_total{scenario_name="Extended View - Settings - Not enough Ada for Collateral",scenario_id="d9579b29",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:03.403Z"} 141
+          e2e_memory_rss_bytes{scenario_name="Extended View - Settings - Not enough Ada for Collateral",scenario_id="d9579b29",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:03.403Z"} 750108672
+          e2e_cpu_seconds_total{scenario_name="Extended View - Settings - Not enough Ada for Collateral",scenario_id="d9579b29",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:04.416Z"} 15
+          e2e_memory_rss_bytes{scenario_name="Extended View - Settings - Not enough Ada for Collateral",scenario_id="d9579b29",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:04.416Z"} 691765248
+          e2e_cpu_seconds_total{scenario_name="Extended View - Settings - Not enough Ada for Collateral",scenario_id="d9579b29",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:05.406Z"} 0
+          e2e_memory_rss_bytes{scenario_name="Extended View - Settings - Not enough Ada for Collateral",scenario_id="d9579b29",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:05.406Z"} 691863552
+          e2e_cpu_seconds_total{scenario_name="Extended View - Settings - Not enough Ada for Collateral",scenario_id="d9579b29",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:06.405Z"} 37
+          e2e_memory_rss_bytes{scenario_name="Extended View - Settings - Not enough Ada for Collateral",scenario_id="d9579b29",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:06.405Z"} 689274880
+          e2e_cpu_seconds_total{scenario_name="Extended View - Settings - Not enough Ada for Collateral",scenario_id="d9579b29",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:07.406Z"} 48
+          e2e_memory_rss_bytes{scenario_name="Extended View - Settings - Not enough Ada for Collateral",scenario_id="d9579b29",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:07.406Z"} 679657472
+          e2e_cpu_seconds_total{scenario_name="Extended View - Settings - Not enough Ada for Collateral",scenario_id="d9579b29",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:08.407Z"} 11
+          e2e_memory_rss_bytes{scenario_name="Extended View - Settings - Not enough Ada for Collateral",scenario_id="d9579b29",job="job-id",instance="run-id",timestamp="2025-05-19T11:09:08.407Z"} 629555200
+          # Metrics from metrics/d9813d3d-59be-4064-8a20-f825fe0b4384-chrome-usage.json
+          e2e_cpu_seconds_total{scenario_name="Extended View - Tokens empty state",scenario_id="d9813d3d",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:30.543Z"} 152
+          e2e_memory_rss_bytes{scenario_name="Extended View - Tokens empty state",scenario_id="d9813d3d",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:30.543Z"} 751566848
+          e2e_cpu_seconds_total{scenario_name="Extended View - Tokens empty state",scenario_id="d9813d3d",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:31.545Z"} 39
+          e2e_memory_rss_bytes{scenario_name="Extended View - Tokens empty state",scenario_id="d9813d3d",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:31.545Z"} 740278272
+          e2e_cpu_seconds_total{scenario_name="Extended View - Tokens empty state",scenario_id="d9813d3d",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:32.550Z"} 56.99999999999999
+          e2e_memory_rss_bytes{scenario_name="Extended View - Tokens empty state",scenario_id="d9813d3d",job="job-id",instance="run-id",timestamp="2025-05-19T11:07:32.550Z"} 760643584
+          ' > metrics.txt
 
       - name: Create Prometheus config
         run: |
@@ -55,12 +146,17 @@ jobs:
                 - targets: ['http-server:8000']
               metrics_path: '/metrics.txt'
           remote_write:
-            - url: "$PUSH_URL"
+            - url: "https://prometheus-us-central1.grafana.net/api/prom/push"
               basic_auth:
                 username: "$PUSH_USER"
                 password: "$PUSH_PASS"
           EOF
+          printf '\n*****************\n'
+          printf '\n cat prometheus.yml \n'
           cat prometheus.yml
+          printf '\n*****************\n'
+          printf '\n print push_url \n'
+          printf $PUSH_URL
 
       - name: Start Python HTTP server
         run: |
