@@ -126,13 +126,15 @@ describe('HandleHttpService', () => {
   });
 
   it('valid not empty response is openApi schema compliant', async () => {
+    const cardanoAddress = <Cardano.PaymentAddress>'test_address';
     await createServer({
       getPolicyIds: () => Promise.resolve([<Cardano.PolicyId>'test_policy']),
       healthCheck: () => Promise.resolve({ ok: true }),
       resolveHandles: () =>
         Promise.resolve([
           {
-            cardanoAddress: <Cardano.PaymentAddress>'test_address',
+            addresses: { cardano: cardanoAddress },
+            cardanoAddress,
             handle: 'test',
             hasDatum: true,
             policyId: <Cardano.PolicyId>'test_policy',
@@ -146,6 +148,7 @@ describe('HandleHttpService', () => {
     expect({ body, status }).toEqual({
       body: [
         {
+          addresses: { cardano: 'test_address' },
           cardanoAddress: 'test_address',
           handle: 'test',
           hasDatum: true,

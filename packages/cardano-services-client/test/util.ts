@@ -40,10 +40,12 @@ export const getWrongHandleProviderResponse = {
   }
 };
 
+const aliceCardanoAddress =
+  'addr_test1qqk4sr4f7vtqzd2w90d5nfu3n59jhhpawyphnek2y7er02nkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuqmcnecd';
 export const getAliceHandleProviderResponse = {
+  addresses: { cardano: aliceCardanoAddress },
   backgroundImage: undefined,
-  cardanoAddress:
-    'addr_test1qqk4sr4f7vtqzd2w90d5nfu3n59jhhpawyphnek2y7er02nkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuqmcnecd',
+  cardanoAddress: aliceCardanoAddress,
   handle: 'alice',
   hasDatum: false,
   image: Asset.Uri('ipfs://c8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56feasd'),
@@ -51,10 +53,12 @@ export const getAliceHandleProviderResponse = {
   profilePic: undefined
 };
 
+const bobCardanoAddress =
+  'addr_test1qzrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuql9tk0g';
 export const getBobHandleProviderResponse = {
+  addresses: { bitcoin: 'test_bitcoin_address', cardano: bobCardanoAddress },
   backgroundImage: Asset.Uri('ipfs://zrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3yd'),
-  cardanoAddress:
-    'addr_test1qzrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuql9tk0g',
+  cardanoAddress: bobCardanoAddress,
   handle: 'bob',
   hasDatum: false,
   image: Asset.Uri('ipfs://c8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe'),
@@ -99,7 +103,8 @@ export const getBobHandleAPIResponse: Partial<IHandle> = {
   pfp_image: 'ipfs://zrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3yd1',
   rarity: Rarity.rare,
   resolved_addresses: {
-    ada: 'addr_test1qzrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuql9tk0g'
+    ada: 'addr_test1qzrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuql9tk0g',
+    btc: 'test_bitcoin_address'
   },
   standard_image: 'ipfs://c8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56feasdfasd',
   updated_slot_number: 22,

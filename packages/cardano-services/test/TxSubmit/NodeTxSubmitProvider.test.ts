@@ -13,10 +13,12 @@ import { NoCache, NodeTxSubmitProvider, NodeTxSubmitProviderProps } from '../../
 import { generateRandomHexString } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
 
+const cardanoAddress = Cardano.PaymentAddress(
+  'addr_test1qqk4sr4f7vtqzd2w90d5nfu3n59jhhpawyphnek2y7er02nkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuqmcnecd'
+);
 const mockHandleResolution = {
-  cardanoAddress: Cardano.PaymentAddress(
-    'addr_test1qqk4sr4f7vtqzd2w90d5nfu3n59jhhpawyphnek2y7er02nkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuqmcnecd'
-  ),
+  addresses: { cardano: cardanoAddress },
+  cardanoAddress,
   handle: 'alice',
   hasDatum: false,
   policyId: Cardano.PolicyId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb'),

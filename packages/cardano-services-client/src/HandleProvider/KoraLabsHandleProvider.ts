@@ -26,21 +26,23 @@ export interface KoraLabsHandleProviderDeps {
   policyId: Cardano.PolicyId;
 }
 
-export const toHandleResolution = ({
-  apiResponse,
-  policyId
-}: {
-  apiResponse: IHandle;
-  policyId: Cardano.PolicyId;
-}): HandleResolution => ({
-  backgroundImage: apiResponse.bg_image ? Asset.Uri(apiResponse.bg_image) : undefined,
-  cardanoAddress: Cardano.PaymentAddress(apiResponse.resolved_addresses.ada),
-  handle: apiResponse.name,
-  hasDatum: apiResponse.has_datum,
-  image: apiResponse.image ? Asset.Uri(apiResponse.image) : undefined,
-  policyId,
-  profilePic: apiResponse.pfp_image ? Asset.Uri(apiResponse.pfp_image) : undefined
-});
+export const toHandleResolution = ({ apiResponse, policyId }: { apiResponse: IHandle; policyId: Cardano.PolicyId }) => {
+  const cardano = Cardano.PaymentAddress(apiResponse.resolved_addresses.ada);
+  const result: HandleResolution = {
+    addresses: { cardano },
+    backgroundImage: apiResponse.bg_image ? Asset.Uri(apiResponse.bg_image) : undefined,
+    cardanoAddress: cardano,
+    handle: apiResponse.name,
+    hasDatum: apiResponse.has_datum,
+    image: apiResponse.image ? Asset.Uri(apiResponse.image) : undefined,
+    policyId,
+    profilePic: apiResponse.pfp_image ? Asset.Uri(apiResponse.pfp_image) : undefined
+  };
+
+  if ('btc' in apiResponse.resolved_addresses) result.addresses.bitcoin = apiResponse.resolved_addresses.btc;
+
+  return result;
+};
 
 /**
  * Creates a KoraLabs Provider instance to resolve Standard Handles

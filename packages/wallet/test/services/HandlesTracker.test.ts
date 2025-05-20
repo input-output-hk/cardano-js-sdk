@@ -34,6 +34,7 @@ const handleOutput = utxo.find(
 )![1];
 
 const expectedHandleInfo: HandleInfo = {
+  addresses: { cardano: handleOutput.address },
   assetId: handleAssetId,
   cardanoAddress: handleOutput.address,
   fingerprint: handleFingerprint,
@@ -64,10 +65,10 @@ const hydrateHandle = (handleInfo: HandleInfo) =>
 
 const exponentialBackoffDelay = (iteration: number) => Math.pow(2, iteration) * HYDRATE_HANDLE_INITIAL_INTERVAL;
 
-const lastInteration = HYDRATE_HANDLE_MAX_RETRIES - 1;
+const lastIteration = HYDRATE_HANDLE_MAX_RETRIES - 1;
 
 const retrySyntax = (retries: number) =>
-  Array.from({ length: retries }, (_, i) => exponentialBackoffDelay(i) - (i === lastInteration ? 2 : 1))
+  Array.from({ length: retries }, (_, i) => exponentialBackoffDelay(i) - (i === lastIteration ? 2 : 1))
     .map((exponentialDelay) => ` - ${exponentialDelay}ms `)
     .join('');
 

@@ -10,8 +10,13 @@ export type Handle = string;
  * @param resolvedAt the point at which the Handle was resolved
  */
 export interface HandleResolution {
+  addresses: {
+    bitcoin?: string;
+    cardano: Cardano.PaymentAddress;
+  };
   policyId: Cardano.PolicyId;
   handle: Handle;
+  /** @deprecated Use `addresses.cardano` instead. */
   cardanoAddress: Cardano.PaymentAddress;
   hasDatum: boolean;
   defaultForStakeCredential?: Handle;
