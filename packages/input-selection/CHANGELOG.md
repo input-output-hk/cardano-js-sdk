@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.14.10...@cardano-sdk/input-selection@0.14.11) (2025-05-21)
+
+### Features
+
+* **input-selection:** add large first input selection strategy ([05e6c45](https://github.com/input-output-hk/cardano-js-sdk/commit/05e6c45b812424ed06ae673113256acf71a11bd8))
+
 ## [0.14.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.14.9...@cardano-sdk/input-selection@0.14.10) (2025-04-17)
 
 **Note:** Version bump only for package @cardano-sdk/input-selection
