@@ -135,6 +135,7 @@ export const createHandlesTracker = (
           }
           return {
             ...assetInfo,
+            addresses: { cardano: txOut.address },
             cardanoAddress: txOut.address,
             handle: Asset.util.getAssetNameAsText(handleAssetId),
             hasDatum: !!txOut.datum

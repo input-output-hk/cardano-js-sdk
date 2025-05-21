@@ -40,8 +40,10 @@ const rewardAccount2 = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g5722
 const rewardAccount3 = Cardano.RewardAccount('stake_test1uqehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gssrtvn');
 const rewardAccount4 = Cardano.RewardAccount('stake_test17rphkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gtcljw6kf');
 
+const cardanoAddress = Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg');
 const resolvedHandle = {
-  cardanoAddress: Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg'),
+  addresses: { cardano: cardanoAddress },
+  cardanoAddress,
   handle: 'alice',
   hasDatum: false,
   policyId: Cardano.PolicyId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7'),

@@ -71,6 +71,7 @@ export class TypeOrmHandleProvider extends TypeormProvider implements HandleProv
         ]);
 
         return {
+          addresses: { cardano: cardanoAddress },
           backgroundImage: handleMetadataEntity?.backgroundImage || undefined,
           cardanoAddress,
           defaultForPaymentCredential: defaultForPaymentCredential || undefined,
