@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.26.10...@cardano-sdk/tx-construction@0.26.11) (2025-05-26)
+
+### Features
+
+* make KoraLabsHandleProvider compliant with bitcoin ([c625ef2](https://github.com/input-output-hk/cardano-js-sdk/commit/c625ef22fd5451d0ad3dbce8a255c433b049798e))
+
 ## [0.26.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.26.9...@cardano-sdk/tx-construction@0.26.10) (2025-05-21)
 
 ### Features

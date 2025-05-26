@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.37](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.9.36...@cardano-sdk/projection-typeorm@0.9.37) (2025-05-26)
+
+**Note:** Version bump only for package @cardano-sdk/projection-typeorm
+
 ## [0.9.36](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.9.35...@cardano-sdk/projection-typeorm@0.9.36) (2025-04-17)
 
 **Note:** Version bump only for package @cardano-sdk/projection-typeorm
