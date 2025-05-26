@@ -31,6 +31,24 @@ export const createBalanceTracker = (
   delegationTracker: DelegationTracker
 ): BalanceTracker => ({
   rewardAccounts: {
+    availableRewards$: delegationTracker.rewardAccounts$.pipe(
+      map((accounts) =>
+        accounts
+          .filter(({ dRepDelegatee }) => {
+            if (!dRepDelegatee) return false;
+
+            const { delegateRepresentative } = dRepDelegatee;
+
+            return (
+              Cardano.isDRepAlwaysAbstain(delegateRepresentative) ||
+              Cardano.isDRepAlwaysNoConfidence(delegateRepresentative) ||
+              (Cardano.isDrepInfo(delegateRepresentative) && delegateRepresentative.active)
+            );
+          })
+          .reduce((sum, { rewardBalance }) => sum + rewardBalance, 0n)
+      ),
+      distinctUntilChanged()
+    ),
     // 'Unregistering' balance will be reflected in utxo
     deposit$: computeDepositCoin(
       protocolParameters$,
