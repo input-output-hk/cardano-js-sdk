@@ -55,7 +55,7 @@ services:
       - NETWORK=${NETWORK:-mainnet}
       - SCAN_INTERVAL=${SCAN_INTERVAL:-60}
     ports:
-      - ${API_PORT:-4001}:3000
+      - ${API_PORT:-4007}:3000
     restart: on-failure
     secrets:
       - blockfrost_key
