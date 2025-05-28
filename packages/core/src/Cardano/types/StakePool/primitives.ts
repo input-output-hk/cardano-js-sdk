@@ -18,7 +18,7 @@ export const PoolId = (value: string): PoolId => typedBech32(value, 'pool', 45);
  * @param {string} value blake2b_224 digest of an operator verification key hash
  * @throws InvalidStringError
  */
-PoolId.fromKeyHash = (value: Crypto.Ed25519KeyHashHex): PoolId => HexBlob.toTypedBech32('pool', HexBlob(value));
+PoolId.fromKeyHash = (value: Crypto.Ed25519KeyHashHex): PoolId => HexBlob.toTypedBech32('pool', value);
 
 /** /** pool operator verification key hash as hex string */
 export type PoolIdHex = OpaqueString<'PoolIdHex'>;

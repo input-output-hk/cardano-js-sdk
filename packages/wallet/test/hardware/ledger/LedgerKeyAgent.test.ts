@@ -458,7 +458,7 @@ describe('LedgerKeyAgent', () => {
               {
                 __typename: Cardano.CertificateType.VoteDelegation,
                 dRep: {
-                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+                  hash: dRepKeyHash,
                   type: Cardano.CredentialType.KeyHash
                 },
                 stakeCredential: getStakeCredential(
@@ -521,7 +521,7 @@ describe('LedgerKeyAgent', () => {
               {
                 __typename: Cardano.CertificateType.VoteDelegation,
                 dRep: {
-                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+                  hash: dRepKeyHash,
                   type: Cardano.CredentialType.KeyHash
                 },
                 stakeCredential: getStakeCredential(
@@ -547,7 +547,7 @@ describe('LedgerKeyAgent', () => {
                 __typename: Cardano.CertificateType.RegisterDelegateRepresentative,
                 anchor: null,
                 dRepCredential: {
-                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+                  hash: dRepKeyHash,
                   type: Cardano.CredentialType.KeyHash
                 },
                 deposit: 5n
@@ -569,7 +569,7 @@ describe('LedgerKeyAgent', () => {
                 __typename: Cardano.CertificateType.RegisterDelegateRepresentative,
                 anchor: null,
                 dRepCredential: {
-                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+                  hash: dRepKeyHash,
                   type: Cardano.CredentialType.ScriptHash
                 },
                 deposit: 5n
@@ -592,7 +592,7 @@ describe('LedgerKeyAgent', () => {
               {
                 __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
                 dRepCredential: {
-                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+                  hash: dRepKeyHash,
                   type: Cardano.CredentialType.KeyHash
                 },
                 deposit: 5n
@@ -613,7 +613,7 @@ describe('LedgerKeyAgent', () => {
               {
                 __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
                 dRepCredential: {
-                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+                  hash: dRepKeyHash,
                   type: Cardano.CredentialType.ScriptHash
                 },
                 deposit: 5n
@@ -637,7 +637,7 @@ describe('LedgerKeyAgent', () => {
                 __typename: Cardano.CertificateType.UpdateDelegateRepresentative,
                 anchor: null,
                 dRepCredential: {
-                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+                  hash: dRepKeyHash,
                   type: Cardano.CredentialType.KeyHash
                 }
               }
@@ -658,7 +658,7 @@ describe('LedgerKeyAgent', () => {
                 __typename: Cardano.CertificateType.UpdateDelegateRepresentative,
                 anchor: null,
                 dRepCredential: {
-                  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+                  hash: dRepKeyHash,
                   type: Cardano.CredentialType.ScriptHash
                 }
               }

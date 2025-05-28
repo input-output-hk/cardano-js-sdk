@@ -92,7 +92,7 @@ describe('cip30signData', () => {
   it('supports signing with drep key hash as bech32 enterprise payment address', async () => {
     const drepAddr = new Cardano.Address({
       paymentPart: {
-        hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(drepKeyHash),
+        hash: drepKeyHash,
         type: Cardano.CredentialType.KeyHash
       },
       type: Cardano.AddressType.EnterpriseKey

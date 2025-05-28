@@ -17,7 +17,7 @@ interface IsOwnDRepCredentialProps {
 const hasOwnDRepCredential = ({ certificate, dRepKeyHash }: IsOwnDRepCredentialProps) =>
   'dRepCredential' in certificate &&
   certificate.dRepCredential.type === Cardano.CredentialType.KeyHash &&
-  certificate.dRepCredential.hash === Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash);
+  certificate.dRepCredential.hash === dRepKeyHash;
 
 export const createDRepRegistrationTracker = ({
   historyTransactions$,

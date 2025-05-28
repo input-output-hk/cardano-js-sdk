@@ -231,7 +231,7 @@ export const getVotingProcedureKeyPaths = ({
   for (const { voter } of txBody.votingProcedures || []) {
     switch (voter.__typename) {
       case Cardano.VoterType.dRepKeyHash: {
-        if (dRepKeyHash && voter.credential.hash === Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash)) {
+        if (dRepKeyHash && voter.credential.hash === dRepKeyHash) {
           signatureCheck.derivationPaths.push(DREP_KEY_DERIVATION_PATH);
         } else {
           signatureCheck.requiresForeignSignatures = true;
@@ -239,9 +239,7 @@ export const getVotingProcedureKeyPaths = ({
         break;
       }
       case Cardano.VoterType.stakePoolKeyHash: {
-        const account = accounts.find(
-          (acct) => Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(acct.stakeKeyHash) === voter.credential.hash
-        );
+        const account = accounts.find((acct) => acct.stakeKeyHash === voter.credential.hash);
         if (account) {
           signatureCheck.derivationPaths.push(account.derivationPath);
         } else {
@@ -295,17 +293,13 @@ const getRequiredSignersKeyPaths = (
 };
 
 const checkStakeCredential = (address: GroupedAddress, keyHash: Crypto.Ed25519KeyHashHex): SignatureCheck =>
-  address.stakeKeyDerivationPath &&
-  Cardano.RewardAccount.toHash(address.rewardAccount) === Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(keyHash)
+  address.stakeKeyDerivationPath && Cardano.RewardAccount.toHash(address.rewardAccount) === keyHash
     ? { derivationPaths: [address.stakeKeyDerivationPath], requiresForeignSignatures: false }
     : { derivationPaths: [], requiresForeignSignatures: true };
 
 const checkPaymentCredential = (address: GroupedAddress, keyHash: Crypto.Ed25519KeyHashHex) => {
   const paymentCredential = Cardano.Address.fromBech32(address.address)?.asBase()?.getPaymentCredential();
-  if (
-    paymentCredential?.type === Cardano.CredentialType.ScriptHash &&
-    paymentCredential.hash === Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(keyHash)
-  )
+  if (paymentCredential?.type === Cardano.CredentialType.ScriptHash && paymentCredential.hash === keyHash)
     return {
       derivationPaths: [{ index: address.index, role: Number(address.type) }],
       requiresForeignSignatures: false
@@ -397,7 +391,7 @@ export const getDRepCredentialKeyPaths = ({
       if (
         certificate.dRepCredential.type === Cardano.CredentialType.ScriptHash ||
         !dRepKeyHash ||
-        certificate.dRepCredential.hash !== Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash)
+        certificate.dRepCredential.hash !== dRepKeyHash
       ) {
         // Scripts are foreign
         signature.requiresForeignSignatures = true;

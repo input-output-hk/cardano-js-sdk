@@ -578,7 +578,7 @@ describe('TrezorKeyAgent', () => {
             {
               __typename: Cardano.CertificateType.VoteDelegation,
               dRep: {
-                hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+                hash: dRepKeyHash,
                 type: Cardano.CredentialType.KeyHash
               },
               stakeCredential: getStakeCredential(

@@ -2,7 +2,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AccountKeyDerivationPath, AddressType, GroupedAddress, KeyRole, TxInId, util } from '../../src';
 import { Cardano } from '@cardano-sdk/core';
-import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
+import { Ed25519KeyHashHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
 
 export const stakeKeyPath = {
   index: 0,
@@ -12,7 +12,7 @@ export const stakeKeyPath = {
 const txId = (seed: number) => Cardano.TransactionId(Array.from({ length: 64 + 1 }).join(seed.toString()));
 
 const toStakeCredential = (stakeKeyHash: Crypto.Hash28ByteBase16): Cardano.Credential => ({
-  hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(Ed25519KeyHashHex(stakeKeyHash)),
+  hash: Ed25519KeyHashHex(stakeKeyHash),
   type: Cardano.CredentialType.KeyHash
 });
 
@@ -517,7 +517,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
           {
             __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
             dRepCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+              hash: dRepKeyHash,
               type: Cardano.CredentialType.KeyHash
             },
             deposit: 0n
@@ -537,7 +537,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
           {
             __typename: Cardano.CertificateType.UpdateDelegateRepresentative,
             dRepCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+              hash: dRepKeyHash as Hash28ByteBase16,
               type: Cardano.CredentialType.KeyHash
             }
           } as Cardano.UpdateDelegateRepresentativeCertificate
@@ -556,7 +556,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
           {
             __typename: Cardano.CertificateType.RegisterDelegateRepresentative,
             dRepCredential: {
-              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+              hash: dRepKeyHash as Hash28ByteBase16,
               type: Cardano.CredentialType.KeyHash
             },
             deposit: 0n

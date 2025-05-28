@@ -102,8 +102,7 @@ const computeConwayDeposits = (
       case Cardano.CertificateType.UnregisterDelegateRepresentative:
         if (
           !dRepKeyHash ||
-          (cert.dRepCredential.type === Address.CredentialType.KeyHash &&
-            cert.dRepCredential.hash === Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash))
+          (cert.dRepCredential.type === Address.CredentialType.KeyHash && cert.dRepCredential.hash === dRepKeyHash)
         ) {
           cert.__typename === Cardano.CertificateType.RegisterDelegateRepresentative
             ? (deposit += cert.deposit)

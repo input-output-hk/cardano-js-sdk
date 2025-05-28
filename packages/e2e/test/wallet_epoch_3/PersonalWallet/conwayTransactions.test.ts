@@ -156,10 +156,7 @@ describe('PersonalWallet/conwayTransactions', () => {
 
   const getDRepCredential = async () => {
     const drepPubKey = await dRepWallet.governance.getPubDRepKey();
-    const dRepKeyHash = Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(
-      (await Crypto.Ed25519PublicKey.fromHex(drepPubKey!).hash()).hex()
-    );
-
+    const dRepKeyHash = Crypto.Ed25519PublicKey.fromHex(drepPubKey!).hash().hex();
     return { hash: dRepKeyHash, type: CredentialType.KeyHash } as typeof dRepCredential;
   };
 

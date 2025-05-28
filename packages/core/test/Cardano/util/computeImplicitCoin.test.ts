@@ -139,7 +139,7 @@ describe('Cardano.util.computeImplicitCoin', () => {
         __typename: Cardano.CertificateType.RegisterDelegateRepresentative,
         anchor: null,
         dRepCredential: {
-          hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+          hash: dRepKeyHash,
           type: Cardano.CredentialType.KeyHash
         } as Cardano.Credential,
         deposit: drepDeposit
@@ -147,7 +147,7 @@ describe('Cardano.util.computeImplicitCoin', () => {
       {
         __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
         dRepCredential: {
-          hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+          hash: dRepKeyHash,
           type: Cardano.CredentialType.KeyHash
         } as Cardano.Credential,
         deposit: drepDeposit

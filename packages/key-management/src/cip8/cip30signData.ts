@@ -73,7 +73,7 @@ const getDerivationPath = async (
     const drepAddr = Cardano.Address.fromString(signWith);
     if (
       drepAddr?.getType() === Cardano.AddressType.EnterpriseKey &&
-      drepAddr?.getProps().paymentPart?.hash === Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash)
+      drepAddr?.getProps().paymentPart?.hash === dRepKeyHash
     ) {
       return DREP_KEY_DERIVATION_PATH;
     }
