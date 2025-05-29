@@ -1,6 +1,7 @@
 import { HexBlob, OpaqueString, castHexBlob, typedHex } from '@cardano-sdk/util';
 
 export const BIP32_PUBLIC_KEY_HASH_LENGTH = 28;
+export const ED25519_PUBLIC_KEY_LENGTH = 32;
 
 /** 28 byte hash as hex string */
 export type Hash28ByteBase16 = OpaqueString<'Hash28ByteBase16'> & HexBlob;
@@ -33,7 +34,10 @@ export const Bip32PrivateKeyHex = (key: string): Bip32PrivateKeyHex => typedHex(
 
 /** Ed25519 public key as hex string */
 export type Ed25519PublicKeyHex = OpaqueString<'Ed25519PublicKeyHex'> & HexBlob;
-export const Ed25519PublicKeyHex = (value: string): Ed25519PublicKeyHex => typedHex(value, 64);
+export const Ed25519PublicKeyHex = (value: string): Ed25519PublicKeyHex =>
+  typedHex(value, ED25519_PUBLIC_KEY_LENGTH * HexBlob.CHARS_PER_BYTE);
+Ed25519PublicKeyHex.fromBip32PublicKey = (bip32PublicKey: Bip32PublicKeyHex): Ed25519PublicKeyHex =>
+  bip32PublicKey.slice(0, ED25519_PUBLIC_KEY_LENGTH * HexBlob.CHARS_PER_BYTE) as Ed25519PublicKeyHex;
 
 /** Ed25519 private extended key as hex string */
 export type Ed25519PrivateExtendedKeyHex = OpaqueString<'Ed25519PrivateKeyHex'> & HexBlob;
@@ -50,4 +54,4 @@ export const Ed25519KeyHashHex = (value: string): Ed25519KeyHashHex => typedHex(
 /** 28 byte BIP32 public key hash as hex string */
 export type Bip32PublicKeyHashHex = OpaqueString<'Bip32PublicKeyHashHex'> & HexBlob;
 export const Bip32PublicKeyHashHex = (value: string): Bip32PublicKeyHashHex =>
-  typedHex(value, BIP32_PUBLIC_KEY_HASH_LENGTH * 2);
+  typedHex(value, BIP32_PUBLIC_KEY_HASH_LENGTH * HexBlob.CHARS_PER_BYTE);

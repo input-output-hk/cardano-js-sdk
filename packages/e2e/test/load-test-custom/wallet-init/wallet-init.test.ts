@@ -10,7 +10,7 @@ import { Logger } from 'ts-log';
 import { bufferCount, bufferTime, from, mergeAll, tap } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 
-import { Bip32Account, util } from '@cardano-sdk/key-management';
+import { Bip32Account, KeyAgentDependencies, util } from '@cardano-sdk/key-management';
 import {
   MeasurementUtil,
   assetProviderFactory,
@@ -29,6 +29,7 @@ import {
   waitForWalletStateSettle,
   walletVariables
 } from '../../../src';
+import { blake2b } from '@cardano-sdk/crypto';
 
 // Example call that creates 5000 wallets in 10 minutes:
 // VIRTUAL_USERS_GENERATE_DURATION=600 VIRTUAL_USERS_COUNT=5000 yarn load-test-custom:wallet-init
@@ -94,21 +95,21 @@ const getProviders = async () => ({
   )
 });
 
-const getKeyAgent = async (accountIndex: number) => {
+const getKeyAgent = async (accountIndex: number, dependencies: KeyAgentDependencies) => {
   const createKeyAgent = await keyManagementFactory.create(
     env.KEY_MANAGEMENT_PROVIDER,
     { ...env.KEY_MANAGEMENT_PARAMS, accountIndex },
     logger
   );
-  const bip32Ed25519 = await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger);
-  const keyAgent = await createKeyAgent({ bip32Ed25519, logger });
+
+  const keyAgent = await createKeyAgent(dependencies);
   return { keyAgent };
 };
 
-const createWallet = async (accountIndex: number): Promise<BaseWallet> => {
+const createWallet = async (accountIndex: number, dependencies: KeyAgentDependencies): Promise<BaseWallet> => {
   measurementUtil.addStartMarker(MeasureTarget.keyAgent, accountIndex);
   const providers = await getProviders();
-  const { keyAgent } = await getKeyAgent(accountIndex);
+  const { keyAgent } = await getKeyAgent(accountIndex, dependencies);
   measurementUtil.addMeasureMarker(MeasureTarget.keyAgent, accountIndex);
 
   measurementUtil.addStartMarker(MeasureTarget.wallet, accountIndex);
@@ -116,7 +117,7 @@ const createWallet = async (accountIndex: number): Promise<BaseWallet> => {
     { name: `Wallet ${accountIndex}` },
     {
       ...providers,
-      bip32Account: await Bip32Account.fromAsyncKeyAgent(keyAgent),
+      bip32Account: await Bip32Account.fromAsyncKeyAgent(keyAgent, { ...dependencies, blake2b }),
       logger,
       witnesser: util.createBip32Ed25519Witnesser(keyAgent)
     }
@@ -124,7 +125,9 @@ const createWallet = async (accountIndex: number): Promise<BaseWallet> => {
 };
 
 const initWallet = async (idx: number) => {
-  const wallet = await createWallet(idx);
+  const bip32Ed25519 = await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger);
+  const dependencies = { bip32Ed25519, logger };
+  const wallet = await createWallet(idx, dependencies);
   await waitForWalletStateSettle(wallet);
   measurementUtil.addMeasureMarker(MeasureTarget.wallet, idx);
   return wallet;

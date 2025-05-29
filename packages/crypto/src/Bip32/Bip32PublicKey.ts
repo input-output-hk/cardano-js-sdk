@@ -1,6 +1,11 @@
 import * as Bip32KeyDerivation from './Bip32KeyDerivation';
-import { BIP32_PUBLIC_KEY_HASH_LENGTH, Bip32PublicKeyHashHex, Bip32PublicKeyHex } from '../hexTypes';
-import { ED25519_PUBLIC_KEY_LENGTH, Ed25519PublicKey } from '../Ed25519e';
+import {
+  BIP32_PUBLIC_KEY_HASH_LENGTH,
+  Bip32PublicKeyHashHex,
+  Bip32PublicKeyHex,
+  ED25519_PUBLIC_KEY_LENGTH
+} from '../hexTypes';
+import { Ed25519PublicKey } from '../Ed25519e';
 import { InvalidArgumentError } from '@cardano-sdk/util';
 import sodium from 'libsodium-wrappers-sumo';
 

@@ -33,8 +33,9 @@ describe('Bip32Account', () => {
       keyAgentDependencies
     );
 
-    testnetAccount = new Bip32Account(testnetKeyAgent.serializableData);
-    mainnetAccount = new Bip32Account(mainnetKeyAgent.serializableData);
+    const dependencies = await Bip32Account.createDefaultDependencies();
+    testnetAccount = new Bip32Account(testnetKeyAgent.serializableData, dependencies);
+    mainnetAccount = new Bip32Account(mainnetKeyAgent.serializableData, dependencies);
   });
 
   it('derivePublicKey resolves with ed25519 public key', async () => {
@@ -44,8 +45,7 @@ describe('Bip32Account', () => {
       await mainnetAccount.derivePublicKey({ index: 2, role: KeyRole.Internal }),
       await mainnetAccount.derivePublicKey({ index: 3, role: KeyRole.Stake })
     ];
-    for (const key of derivedKeys) {
-      const hexKey = key.hex();
+    for (const hexKey of derivedKeys) {
       expect(typeof hexKey).toBe('string');
       expect(hexKey).toHaveLength(64);
       expect(() => HexBlob(hexKey)).not.toThrow();
@@ -83,8 +83,8 @@ describe('Bip32Account', () => {
         [4, '4444444444444444444444444444444444444444444444444444444444444444']
       ]);
 
-      testnetAccount.derivePublicKey = jest.fn((x: AccountKeyDerivationPath) =>
-        Promise.resolve(Crypto.Ed25519PublicKey.fromHex(Crypto.Ed25519PublicKeyHex(keyMap.get(x.index)!)))
+      testnetAccount.derivePublicKey = jest.fn(async (x: AccountKeyDerivationPath) =>
+        Crypto.Ed25519PublicKeyHex(keyMap.get(x.index)!)
       );
 
       const index = 0;

@@ -62,6 +62,7 @@ import { Logger } from 'ts-log';
 import { NoCache, NodeTxSubmitProvider } from '@cardano-sdk/cardano-services';
 import { OgmiosObservableCardanoNode } from '@cardano-sdk/ogmios';
 import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
+import { blake2b } from '@cardano-sdk/crypto';
 import { createStubHandleProvider, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, of } from 'rxjs';
 import { getEnv, walletVariables } from './environment';
@@ -619,7 +620,7 @@ export const getWallet = async (props: GetWalletProps) => {
       bip32Ed25519,
       logger
     }));
-  const bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
+  const bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent, { bip32Ed25519, blake2b });
   if (!polling?.interval && env.NETWORK_SPEED === 'fast') {
     polling = { ...polling, interval: 50 };
   }

@@ -611,7 +611,7 @@ export class BaseWallet implements ObservableWallet {
 
     const getPubDRepKey = async (): Promise<Ed25519PublicKeyHex | undefined> => {
       if (isBip32PublicCredentialsManager(this.#publicCredentialsManager)) {
-        return (await this.#publicCredentialsManager.bip32Account.derivePublicKey(util.DREP_KEY_DERIVATION_PATH)).hex();
+        return this.#publicCredentialsManager.bip32Account.derivePublicKey(util.DREP_KEY_DERIVATION_PATH);
       }
 
       return undefined;

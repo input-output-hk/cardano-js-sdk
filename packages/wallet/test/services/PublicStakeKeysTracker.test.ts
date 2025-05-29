@@ -64,15 +64,13 @@ describe('PublicStakeKeysTracker', () => {
       }
     ];
 
-    derivePublicKey = derivePublicKey = jest
-      .fn()
-      .mockImplementation((path: AccountKeyDerivationPath) => Promise.resolve({ hex: () => `abc-${path.index}` }));
+    derivePublicKey = jest.fn().mockImplementation((path: AccountKeyDerivationPath) => `abc-${path.index}`);
     bip32Account = {
       accountIndex: 0,
       chainId: Cardano.ChainIds.Preview,
-      deriveAddress: jest.fn(),
-      derivePublicKey,
-      extendedAccountPublicKey: '' as unknown
+      deriveAddress: jest.fn() as Bip32Account['deriveAddress'],
+      derivePublicKey: derivePublicKey as Bip32Account['derivePublicKey'],
+      extendedAccountPublicKeyHex: ''
     } as Bip32Account;
   });
 

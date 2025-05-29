@@ -12,13 +12,16 @@ describe('ensureStakeKeys', () => {
 
   beforeEach(async () => {
     logger = dummyLogger;
-    bip32Account = new Bip32Account({
-      accountIndex: 0,
-      chainId: Cardano.ChainIds.Preview,
-      extendedAccountPublicKey: Bip32PublicKeyHex(
-        'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
-      )
-    });
+    bip32Account = new Bip32Account(
+      {
+        accountIndex: 0,
+        chainId: Cardano.ChainIds.Preview,
+        extendedAccountPublicKey: Bip32PublicKeyHex(
+          'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
+        )
+      },
+      await Bip32Account.createDefaultDependencies()
+    );
   });
 
   it('can derive one stake key', async () => {

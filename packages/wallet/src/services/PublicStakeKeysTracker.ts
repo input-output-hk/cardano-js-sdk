@@ -52,7 +52,7 @@ export const createPublicStakeKeysTracker = ({
         forkJoin(
           derivationPathsAndStatus.map(({ stakeKeyDerivationPath, credentialStatus }) =>
             from(addressManager.derivePublicKey(stakeKeyDerivationPath)).pipe(
-              map((publicStakeKey) => ({ credentialStatus, publicStakeKey: publicStakeKey.hex() }))
+              map((publicStakeKey) => ({ credentialStatus, publicStakeKey }))
             )
           )
         ).pipe(defaultIfEmpty([]))

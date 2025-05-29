@@ -755,16 +755,16 @@ describe('BaseWallet methods', () => {
     beforeEach(() => {
       wallet.shutdown();
 
-      bip32Account.deriveAddress = jest.fn((args) => {
+      bip32Account.deriveAddress = jest.fn(async (args) => {
         if (args.index === 0) {
-          return Promise.resolve(groupedAddress);
+          return groupedAddress;
         }
 
         if (args.index === 1) {
-          return Promise.resolve(groupedAddress2);
+          return groupedAddress2;
         }
 
-        return Promise.resolve(groupedAddress3);
+        return groupedAddress3;
       });
     });
 

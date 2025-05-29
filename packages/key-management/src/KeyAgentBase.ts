@@ -16,6 +16,7 @@ import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { Cip8SignDataContext } from './cip8';
 import { HexBlob } from '@cardano-sdk/util';
+import { blake2b } from '@cardano-sdk/crypto';
 
 export abstract class KeyAgentBase implements KeyAgent {
   readonly #serializableData: SerializableKeyAgentData;
@@ -54,7 +55,7 @@ export abstract class KeyAgentBase implements KeyAgent {
   constructor(serializableData: SerializableKeyAgentData, { bip32Ed25519 }: KeyAgentDependencies) {
     this.#serializableData = serializableData;
     this.#bip32Ed25519 = bip32Ed25519;
-    this.#account = new Bip32Account(serializableData);
+    this.#account = new Bip32Account(serializableData, { bip32Ed25519, blake2b });
   }
 
   /** See https://github.com/cardano-foundation/CIPs/tree/master/CIP-1852#specification */
@@ -66,6 +67,6 @@ export abstract class KeyAgentBase implements KeyAgent {
   }
 
   async derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise<Crypto.Ed25519PublicKeyHex> {
-    return (await this.#account.derivePublicKey(derivationPath)).hex();
+    return this.#account.derivePublicKey(derivationPath);
   }
 }
