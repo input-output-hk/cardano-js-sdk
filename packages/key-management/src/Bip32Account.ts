@@ -47,7 +47,7 @@ export class Bip32Account {
     this.accountIndex = accountIndex;
   }
 
-  async derivePublicKey(derivationPath: AccountKeyDerivationPath) {
+  derivePublicKey(derivationPath: AccountKeyDerivationPath) {
     const extendedKey = this.#bip32Ed25519.derivePublicKey(this.extendedAccountPublicKeyHex, [
       derivationPath.role,
       derivationPath.index
@@ -55,23 +55,23 @@ export class Bip32Account {
     return Ed25519PublicKeyHex.fromBip32PublicKey(extendedKey);
   }
 
-  async deriveAddress(
+  deriveAddress(
     paymentKeyDerivationPath: AccountAddressDerivationPath,
     stakeKeyDerivationIndex: number
-  ): Promise<GroupedAddress> {
+  ): GroupedAddress {
     const stakeKeyDerivationPath = {
       index: stakeKeyDerivationIndex,
       role: KeyRole.Stake
     };
 
-    const derivedPublicPaymentKey = await this.derivePublicKey({
+    const derivedPublicPaymentKey = this.derivePublicKey({
       index: paymentKeyDerivationPath.index,
       role: Number(paymentKeyDerivationPath.type)
     });
 
     const derivedPublicPaymentKeyHash = this.#blake2b.hash(derivedPublicPaymentKey, BIP32_PUBLIC_KEY_HASH_LENGTH);
 
-    const publicStakeKey = await this.derivePublicKey(stakeKeyDerivationPath);
+    const publicStakeKey = this.derivePublicKey(stakeKeyDerivationPath);
     const publicStakeKeyHash = this.#blake2b.hash(publicStakeKey, BIP32_PUBLIC_KEY_HASH_LENGTH);
 
     const stakeCredential = { hash: publicStakeKeyHash, type: Cardano.CredentialType.KeyHash };
