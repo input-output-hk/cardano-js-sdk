@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.45.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.45.9...@cardano-sdk/core@0.45.10) (2025-05-29)
+
+### Features
+
+* **core:** add force parameter to handle resolution interface ([33d34e5](https://github.com/input-output-hk/cardano-js-sdk/commit/33d34e5403e301717d2fe7d384a5c756e1783936))
+
 ## [0.45.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.45.8...@cardano-sdk/core@0.45.9) (2025-05-26)
 
 ### Features
