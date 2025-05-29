@@ -30,6 +30,7 @@ export interface HandleResolution {
 
 export interface ResolveHandlesArgs {
   handles: Handle[];
+  force?: boolean;
 }
 
 /**
