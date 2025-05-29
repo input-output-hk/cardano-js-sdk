@@ -69,7 +69,7 @@ export const createHttpStakePoolMetadataService = (
       const { data } = await axiosClient.get<Uint8Array>(url, { responseType: 'arraybuffer' });
 
       // Produce metadata hash
-      const metadataHash = Crypto.blake2b(Crypto.blake2b.BYTES).update(data).digest('hex');
+      const metadataHash = Crypto.blake2b.hash(HexBlob.fromBytes(data), 32);
 
       // Verify base hashes
       if (metadataHash !== hash) {

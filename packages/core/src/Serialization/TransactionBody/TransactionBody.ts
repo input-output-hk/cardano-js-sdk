@@ -933,8 +933,7 @@ export class TransactionBody {
    * @returns The hash of the transaction body.
    */
   hash() {
-    const hash = Crypto.blake2b(Crypto.blake2b.BYTES).update(hexToBytes(this.toCbor())).digest();
-    return TransactionId.fromHexBlob(HexBlob.fromBytes(hash));
+    return Crypto.blake2b.hash<TransactionId>(this.toCbor(), 32);
   }
 
   /**

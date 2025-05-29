@@ -5,6 +5,7 @@ import { Cardano } from '@cardano-sdk/core';
 import { DataMocks } from '../../data-mocks';
 import { ExtMetadataFormat } from '../../../src/StakePool/types';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { HexBlob } from '@cardano-sdk/util';
 import { IncomingMessage } from 'http';
 import {
   StakePoolMetadataServiceError,
@@ -90,14 +91,12 @@ describe('StakePoolMetadataService', () => {
 
       // Since the extended metadata URL will change each run and its part of the metadata, we must
       // recalculate metadata the hash.
-      const metadataHash = Crypto.blake2b(Crypto.blake2b.BYTES)
-        .update(Buffer.from(JSON.stringify(metadata), 'ascii'))
-        .digest('hex');
-
-      const resultMetadata = await metadataService.getStakePoolMetadata(
-        metadataHash as Hash32ByteBase16,
-        `${serverUrl}/metadata`
+      const metadataHash = Crypto.blake2b.hash<Hash32ByteBase16>(
+        HexBlob.fromBytes(Buffer.from(JSON.stringify(metadata), 'ascii')),
+        32
       );
+
+      const resultMetadata = await metadataService.getStakePoolMetadata(metadataHash, `${serverUrl}/metadata`);
 
       expect(resultMetadata).toEqual(metadata);
 
@@ -249,14 +248,9 @@ describe('StakePoolMetadataService', () => {
         extVkey: INVALID_KEY
       };
 
-      const metadataHash = Crypto.blake2b(Crypto.blake2b.BYTES)
-        .update(Buffer.from(JSON.stringify(metadata), 'ascii'))
-        .digest('hex');
+      const metadataHash = Crypto.blake2b.hash(HexBlob.fromBytes(Buffer.from(JSON.stringify(metadata), 'ascii')), 32);
 
-      const metadataResult = await metadataService.getStakePoolMetadata(
-        metadataHash as Hash32ByteBase16,
-        `${serverUrl}/metadata`
-      );
+      const metadataResult = await metadataService.getStakePoolMetadata(metadataHash, `${serverUrl}/metadata`);
 
       const result2 = await metadataService.getValidateStakePoolExtendedMetadata(
         metadataResult as Cardano.StakePoolMetadata
