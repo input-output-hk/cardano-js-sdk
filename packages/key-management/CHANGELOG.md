@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.27.11...@cardano-sdk/key-management@0.28.0) (2025-05-30)
+
+### ⚠ BREAKING CHANGES
+
+* make Bip32Account methods synchronous
+* add a new 'dependencies' parameter in Bip32Account ctor
+* remove Hash28ByteBase16.fromEd25519KeyHashHex
+
+### Features
+
+* add support for injecting crypto functions for Bip32Account ([51a821d](https://github.com/input-output-hk/cardano-js-sdk/commit/51a821dffb0c65b3339a74771e8c6317966280b3))
+
+### Code Refactoring
+
+* make Bip32Account methods synchronous ([b56110c](https://github.com/input-output-hk/cardano-js-sdk/commit/b56110c2183e035086e9868e8aa4f6999e9390ed))
+* make hex-encoded opaque string types assignable to HexBlob ([17c0a64](https://github.com/input-output-hk/cardano-js-sdk/commit/17c0a644960ce5931fb0991ecd4cad7faaceb438))
+
 ## [0.27.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.27.10...@cardano-sdk/key-management@0.27.11) (2025-05-29)
 
 **Note:** Version bump only for package @cardano-sdk/key-management

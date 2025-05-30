@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.12.38...@cardano-sdk/projection@0.13.0) (2025-05-30)
+
+### ⚠ BREAKING CHANGES
+
+* remove Hash28ByteBase16.fromEd25519KeyHashHex
+
+### Code Refactoring
+
+* make hex-encoded opaque string types assignable to HexBlob ([17c0a64](https://github.com/input-output-hk/cardano-js-sdk/commit/17c0a644960ce5931fb0991ecd4cad7faaceb438))
+
 ## [0.12.38](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.12.37...@cardano-sdk/projection@0.12.38) (2025-05-29)
 
 **Note:** Version bump only for package @cardano-sdk/projection

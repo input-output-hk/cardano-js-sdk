@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.27.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.26.12...@cardano-sdk/tx-construction@0.27.0) (2025-05-30)
+
+### ⚠ BREAKING CHANGES
+
+* make Bip32Account methods synchronous
+* add a new 'dependencies' parameter in Bip32Account ctor
+
+### Features
+
+* add support for injecting crypto functions for Bip32Account ([51a821d](https://github.com/input-output-hk/cardano-js-sdk/commit/51a821dffb0c65b3339a74771e8c6317966280b3))
+
+### Code Refactoring
+
+* make Bip32Account methods synchronous ([b56110c](https://github.com/input-output-hk/cardano-js-sdk/commit/b56110c2183e035086e9868e8aa4f6999e9390ed))
+
 ## [0.26.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.26.11...@cardano-sdk/tx-construction@0.26.12) (2025-05-29)
 
 **Note:** Version bump only for package @cardano-sdk/tx-construction
