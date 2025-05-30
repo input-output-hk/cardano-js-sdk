@@ -93,6 +93,7 @@ describe('CustomObservableWallet', () => {
         }),
         balance: {
           rewardAccounts: {
+            availableRewards$: of(100_000n),
             // can entirely bypass SDK and it's utils, providing custom observables
             deposit$: of(200_000n),
             rewards$: pollProvider({

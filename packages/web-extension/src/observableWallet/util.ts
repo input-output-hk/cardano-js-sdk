@@ -103,6 +103,7 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
   assetInfo$: RemoteApiPropertyType.HotObservable,
   balance: {
     rewardAccounts: {
+      availableRewards$: RemoteApiPropertyType.HotObservable,
       deposit$: RemoteApiPropertyType.HotObservable,
       rewards$: RemoteApiPropertyType.HotObservable
     },

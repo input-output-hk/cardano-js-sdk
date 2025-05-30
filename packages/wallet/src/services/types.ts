@@ -21,6 +21,7 @@ export interface TransactionalObservables<T> {
 
 export interface BalanceTracker {
   rewardAccounts: {
+    availableRewards$: Observable<Cardano.Lovelace>;
     rewards$: Observable<Cardano.Lovelace>;
     deposit$: Observable<Cardano.Lovelace>;
   };
