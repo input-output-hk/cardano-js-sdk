@@ -608,9 +608,7 @@ describe('WalletUtil', () => {
       });
 
       dRepCredential = (await wallet.governance.getPubDRepKey())!;
-      dRepKeyHash = Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(
-        (await Crypto.Ed25519PublicKey.fromHex(dRepCredential).hash()).hex()
-      );
+      dRepKeyHash = Crypto.Ed25519PublicKey.fromHex(dRepCredential).hash().hex();
     });
 
     afterEach(() => {

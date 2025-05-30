@@ -27,9 +27,7 @@ describe('createDRepRegistrationTracker', () => {
 
   beforeEach(async () => {
     dRepPublicKey = Crypto.Ed25519PublicKeyHex('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01');
-    dRepKeyHash = Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(
-      Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash().hex()
-    );
+    dRepKeyHash = Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash().hex();
     dRepPublicKeyHash = Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash().hex();
   });
 

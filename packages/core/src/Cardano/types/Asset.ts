@@ -64,11 +64,7 @@ export const AssetFingerprint = (value: string): AssetFingerprint => typedBech32
 AssetFingerprint.fromParts = (policyId: PolicyId, assetName: AssetName): AssetFingerprint => {
   const policyBuf = Buffer.from(policyId, 'hex');
   const assetNameBuf = Buffer.from(assetName, 'hex');
-  const hexDigest = HexBlob(
-    Crypto.blake2b(20)
-      .update(new Uint8Array([...policyBuf, ...assetNameBuf]))
-      .digest('hex')
-  );
+  const hexDigest = Crypto.blake2b.hash(HexBlob.fromBytes(new Uint8Array([...policyBuf, ...assetNameBuf])), 20);
 
   return AssetFingerprint(HexBlob.toTypedBech32<string>('asset', hexDigest));
 };

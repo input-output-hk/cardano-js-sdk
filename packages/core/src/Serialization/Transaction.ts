@@ -9,9 +9,9 @@ import type * as Cardano from '../Cardano';
 const ALONZO_ERA_TX_FRAME_SIZE = 4;
 
 /** Transaction serialized as CBOR, encoded as hex string */
-export type TxCBOR = OpaqueString<'TxCbor'>;
+export type TxCBOR = OpaqueString<'TxCbor'> & HexBlob;
 /** Transaction body serialized as CBOR, encoded as hex string */
-export type TxBodyCBOR = OpaqueString<'TxBodyCbor' & HexBlob['__opaqueString']>;
+export type TxBodyCBOR = OpaqueString<'TxBodyCbor'> & HexBlob;
 
 /**
  * A transaction is a record of value transfer between two or more addresses on the network. It represents a request

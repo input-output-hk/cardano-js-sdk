@@ -15,8 +15,7 @@ import {
   TxSubmitProvider,
   UtxoProvider,
   coalesceValueQuantities,
-  nativeScriptPolicyId,
-  util
+  nativeScriptPolicyId
 } from '@cardano-sdk/core';
 import { GreedyTxEvaluator, defaultSelectionConstraints } from '@cardano-sdk/tx-construction';
 import { InputSelector, StaticChangeAddressResolver, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
@@ -485,9 +484,7 @@ export class MultiSigWallet {
 
     const serializableBody = Serialization.TransactionBody.fromCore(body);
 
-    const id = Cardano.TransactionId.fromHexBlob(
-      util.bytesToHex(Crypto.blake2b(Crypto.blake2b.BYTES).update(util.hexToBytes(serializableBody.toCbor())).digest())
-    );
+    const id = serializableBody.hash();
 
     return { body, id };
   }

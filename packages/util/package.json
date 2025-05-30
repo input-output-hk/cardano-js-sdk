@@ -45,6 +45,7 @@
     "npm-run-all": "^4.1.5",
     "ts-jest": "^28.0.7",
     "tsc-alias": "^1.8.10",
+    "type-fest": "^4.41.0",
     "typescript": "^4.7.4"
   },
   "dependencies": {
@@ -52,8 +53,7 @@
     "lodash": "^4.17.21",
     "serialize-error": "^8",
     "ts-custom-error": "^3.2.0",
-    "ts-log": "^2.2.4",
-    "type-fest": "^2.19.0"
+    "ts-log": "^2.2.4"
   },
   "files": [
     "dist/*",

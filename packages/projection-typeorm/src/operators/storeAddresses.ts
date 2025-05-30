@@ -1,7 +1,6 @@
 import { AddressEntity } from '../entity/Address.entity';
 import { Cardano } from '@cardano-sdk/core';
 import { ChainSyncEventType, Mappers } from '@cardano-sdk/projection';
-import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { QueryRunner } from 'typeorm';
 import { StakeKeyRegistrationEntity } from '../entity';
 import { certificatePointerToId, typeormOperator } from './util';
@@ -13,7 +12,7 @@ const lookupStakeKeyRegistration = async (pointer: Cardano.Pointer | undefined, 
     .getRepository(StakeKeyRegistrationEntity)
     .findOne({ select: { stakeKeyHash: true }, where: { id: registrationId } });
   if (!stakeKeyRegistration?.stakeKeyHash) return;
-  return Hash28ByteBase16.fromEd25519KeyHashHex(stakeKeyRegistration.stakeKeyHash);
+  return stakeKeyRegistration.stakeKeyHash;
 };
 
 export const willStoreAddresses = ({ addresses }: Mappers.WithAddresses) => addresses.length > 0;

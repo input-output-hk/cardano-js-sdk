@@ -4049,7 +4049,7 @@ __metadata:
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
     tsc-alias: ^1.8.10
-    type-fest: ^2.19.0
+    type-fest: ^4.41.0
     typescript: ^4.7.4
   languageName: unknown
   linkType: soft
@@ -25640,7 +25640,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"type-fest@npm:^2.12.1, type-fest@npm:^2.19.0, type-fest@npm:^2.5.1":
+"type-fest@npm:^2.12.1, type-fest@npm:^2.5.1":
   version: 2.19.0
   resolution: "type-fest@npm:2.19.0"
   checksum: a4ef07ece297c9fba78fc1bd6d85dff4472fe043ede98bd4710d2615d15776902b595abf62bd78339ed6278f021235fb28a96361f8be86ed754f778973a0d278
@@ -25651,6 +25651,13 @@ __metadata:
   version: 3.9.0
   resolution: "type-fest@npm:3.9.0"
   checksum: daec3f72db7af2b285ac10a27231675a18418dea073a5fe40d9720472072786b6e38263a41e1c91daf99d7ecda80d5cf914b5bb0dd308593fa33ad9d3ff410dc
+  languageName: node
+  linkType: hard
+
+"type-fest@npm:^4.41.0":
+  version: 4.41.0
+  resolution: "type-fest@npm:4.41.0"
+  checksum: 7055c0e3eb188425d07403f1d5dc175ca4c4f093556f26871fe22041bc93d137d54bef5851afa320638ca1379106c594f5aa153caa654ac1a7f22c71588a4e80
   languageName: node
   linkType: hard
 

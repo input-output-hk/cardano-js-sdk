@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, Serialization, util } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { SelectionResult } from '@cardano-sdk/input-selection';
 import { TxBodyPreInputSelection } from './types';
 import { computeScriptDataHash } from './computeScriptDataHash';
@@ -84,9 +84,7 @@ export const includeChangeAndInputs = ({
 
   return {
     body,
-    hash: Cardano.TransactionId.fromHexBlob(
-      util.bytesToHex(Crypto.blake2b(Crypto.blake2b.BYTES).update(util.hexToBytes(serializableBody.toCbor())).digest())
-    )
+    hash: serializableBody.hash()
   };
 };
 

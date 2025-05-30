@@ -107,21 +107,19 @@ describe('cache invalidation', () => {
 
     await walletReady(wallet);
 
-    const poolPubKey = await wallet1.bip32Account.derivePublicKey({
+    const poolPubKey = wallet1.bip32Account.derivePublicKey({
       index: 0,
       role: KeyRole.External
     });
 
-    const poolKeyHash = await bip32Ed25519.getPubKeyHash(poolPubKey.hex());
+    const poolKeyHash = bip32Ed25519.getPubKeyHash(poolPubKey);
     const poolId = Cardano.PoolId.fromKeyHash(poolKeyHash);
-    const poolRewardAccount = (
-      await wallet1.bip32Account.deriveAddress(
-        {
-          index: 0,
-          type: AddressType.External
-        },
-        0
-      )
+    const poolRewardAccount = wallet1.bip32Account.deriveAddress(
+      {
+        index: 0,
+        type: AddressType.External
+      },
+      0
     ).rewardAccount;
 
     const registrationCert: Cardano.PoolRegistrationCertificate = {

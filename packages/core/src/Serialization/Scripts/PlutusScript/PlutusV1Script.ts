@@ -89,11 +89,9 @@ export class PlutusV1Script {
   hash(): Crypto.Hash28ByteBase16 {
     // To compute a script hash, note that you must prepend a tag to the bytes of
     // the script before hashing. The tags in the Babbage era for PlutusV1 is "\x01"
-    const bytes = `01${this.rawBytes()}`;
+    const bytes = `01${this.rawBytes()}` as HexBlob;
 
-    const hash = Crypto.blake2b(HASH_LENGTH_IN_BYTES).update(Buffer.from(bytes, 'hex')).digest();
-
-    return Crypto.Hash28ByteBase16(HexBlob.fromBytes(hash));
+    return Crypto.blake2b.hash(bytes, HASH_LENGTH_IN_BYTES);
   }
 
   /**

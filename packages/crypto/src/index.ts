@@ -1,7 +1,6 @@
-import blake2b from 'blake2b';
 import sodium from 'libsodium-wrappers-sumo';
-export { blake2b };
 
+export * from './blake2b-hash';
 export * from './Bip32';
 export * from './Bip32Ed25519';
 export * from './Ed25519e';

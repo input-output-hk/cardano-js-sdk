@@ -1,7 +1,6 @@
 /* eslint-disable unicorn/number-literal-case */
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, Serialization } from '@cardano-sdk/core';
-import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 
 const CBOR_EMPTY_MAP = new Uint8Array([0xa0]);
@@ -76,9 +75,7 @@ const hashScriptData = (
     writer.writeEncodedValue(Buffer.from(costModels.languageViewsEncoding(), 'hex'));
   }
 
-  return Hash32ByteBase16.fromHexBlob(
-    HexBlob.fromBytes(Crypto.blake2b(Crypto.blake2b.BYTES).update(writer.encode()).digest())
-  );
+  return Crypto.blake2b.hash(Buffer.from(writer.encode()).toString('hex') as HexBlob, 32);
 };
 
 /**

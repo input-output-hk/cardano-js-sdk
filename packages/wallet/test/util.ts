@@ -61,7 +61,7 @@ export const buildDRepAddressFromDRepKey = async (
 ) => {
   const drepKeyHash = Crypto.Ed25519PublicKey.fromHex(dRepKey).hash().hex();
   const drepId = Cardano.DRepID.cip129FromCredential({
-    hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(drepKeyHash),
+    hash: drepKeyHash,
     type
   });
   return Cardano.DRepID.toAddress(drepId);

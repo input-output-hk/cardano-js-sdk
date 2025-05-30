@@ -13,7 +13,7 @@ import { RewardAccount } from '../Address';
 import { Script } from './Script';
 
 /** transaction hash as hex string */
-export type TransactionId = OpaqueString<'TransactionId'>;
+export type TransactionId = OpaqueString<'TransactionId'> & Crypto.Hash32ByteBase16;
 
 /**
  * @param {string} value transaction hash as hex string

@@ -74,10 +74,7 @@ describe('PersonalWallet/drepRetirement', () => {
 
   const getDRepCredential = async (wallet: BaseWallet) => {
     const drepPubKey = await wallet.governance.getPubDRepKey();
-    const dRepKeyHash = Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(
-      (await Crypto.Ed25519PublicKey.fromHex(drepPubKey!).hash()).hex()
-    );
-
+    const dRepKeyHash = Crypto.Ed25519PublicKey.fromHex(drepPubKey!).hash().hex();
     return { hash: dRepKeyHash, type: CredentialType.KeyHash } as typeof dRepCredential1;
   };
 

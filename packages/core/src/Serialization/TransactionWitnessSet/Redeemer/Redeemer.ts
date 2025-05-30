@@ -253,8 +253,6 @@ export class Redeemer {
    * @returns the redeemer hash.
    */
   hash(): Crypto.Hash32ByteBase16 {
-    const hash = Crypto.blake2b(HASH_LENGTH_IN_BYTES).update(Buffer.from(this.toCbor(), 'hex')).digest();
-
-    return Crypto.Hash32ByteBase16(HexBlob.fromBytes(hash));
+    return Crypto.blake2b.hash(this.toCbor(), HASH_LENGTH_IN_BYTES);
   }
 }

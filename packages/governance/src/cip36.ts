@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, Serialization, util } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 
 /** CIP-36 metadata label */
@@ -75,13 +75,10 @@ export const metadataBuilder = {
     votingRegistrationMetadata: Cardano.TxMetadata,
     stakeKeyBlobSigner: BlobSigner
   ): Promise<Cardano.TxMetadata> {
-    const votingRegistrationMetadataBytes = util.hexToBytes(
-      Serialization.GeneralTransactionMetadata.fromCore(votingRegistrationMetadata).toCbor()
-    );
-    const hashedMetadata = Crypto.blake2b(256 / 8)
-      .update(votingRegistrationMetadataBytes)
-      .digest('binary');
-    const signature = await stakeKeyBlobSigner.signBlob(util.bytesToHex(hashedMetadata));
+    const votingRegistrationMetadataCbor =
+      Serialization.GeneralTransactionMetadata.fromCore(votingRegistrationMetadata).toCbor();
+    const hashedMetadata = Crypto.blake2b.hash(votingRegistrationMetadataCbor, 256 / 8);
+    const signature = await stakeKeyBlobSigner.signBlob(hashedMetadata);
     return new Map([
       ...votingRegistrationMetadata.entries(),
       [BigInt(MetadataLabel.SIG), new Map([[SIG_MAP_KEY, Buffer.from(signature, 'hex')]])]

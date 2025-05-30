@@ -1,10 +1,8 @@
 import { ED25519_PUBLIC_KEY_HASH_LENGTH, Ed25519KeyHash } from './Ed25519KeyHash';
-import { Ed25519PublicKeyHex } from '../hexTypes';
+import { ED25519_PUBLIC_KEY_LENGTH, Ed25519PublicKeyHex } from '../hexTypes';
 import { Ed25519Signature } from './Ed25519Signature';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import sodium from 'libsodium-wrappers-sumo';
-
-export const ED25519_PUBLIC_KEY_LENGTH = 32;
 
 /**
  * Ed25519 raw public key. This key can be used for cryptographically verifying messages

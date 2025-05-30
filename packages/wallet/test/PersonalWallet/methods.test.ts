@@ -105,7 +105,7 @@ describe('BaseWallet methods', () => {
 
     const asyncKeyAgent = await testAsyncKeyAgent();
     bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
-    bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
+    bip32Account.deriveAddress = jest.fn().mockReturnValue(groupedAddress);
     witnesser = util.createBip32Ed25519Witnesser(asyncKeyAgent);
     wallet = createPersonalWallet(
       { name: 'Test Wallet' },
@@ -611,8 +611,10 @@ describe('BaseWallet methods', () => {
     wallet.shutdown();
     bip32Account.derivePublicKey = jest
       .fn()
-      .mockRejectedValueOnce('error')
-      .mockResolvedValue({ hex: () => 'string' });
+      .mockImplementationOnce(() => {
+        throw new Error('error');
+      })
+      .mockReturnValue('string');
     wallet = createPersonalWallet(
       { name: 'Test Wallet' },
       {
@@ -757,14 +759,14 @@ describe('BaseWallet methods', () => {
 
       bip32Account.deriveAddress = jest.fn((args) => {
         if (args.index === 0) {
-          return Promise.resolve(groupedAddress);
+          return groupedAddress;
         }
 
         if (args.index === 1) {
-          return Promise.resolve(groupedAddress2);
+          return groupedAddress2;
         }
 
-        return Promise.resolve(groupedAddress3);
+        return groupedAddress3;
       });
     });
 

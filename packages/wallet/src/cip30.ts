@@ -19,7 +19,7 @@ import {
   WithSenderContext
 } from '@cardano-sdk/dapp-connector';
 import { Cardano, Milliseconds, Serialization, coalesceValueQuantities } from '@cardano-sdk/core';
-import { Ed25519KeyHashHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
@@ -228,7 +228,7 @@ const addrToSignWith = (
     // Try to parse as drep key hash
     const drepKeyHash = Ed25519KeyHashHex(addr);
     const drepId = Cardano.DRepID.cip129FromCredential({
-      hash: Hash28ByteBase16.fromEd25519KeyHashHex(drepKeyHash),
+      hash: drepKeyHash,
       type: Cardano.CredentialType.KeyHash
     });
     const drepAddr = Cardano.DRepID.toAddress(drepId)?.toAddress();

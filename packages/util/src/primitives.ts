@@ -87,6 +87,7 @@ Base64Blob.fromBytes = (bytes: Uint8Array) => Buffer.from(bytes).toString('base6
 export type HexBlob = OpaqueString<'HexBlob'>;
 export const HexBlob = (target: string): HexBlob => typedHex(target);
 HexBlob.fromBytes = (bytes: Uint8Array) => Buffer.from(bytes).toString('hex') as unknown as HexBlob;
+HexBlob.CHARS_PER_BYTE = 2;
 
 /**
  * Converts a base64 string into a hex (base16) encoded string.

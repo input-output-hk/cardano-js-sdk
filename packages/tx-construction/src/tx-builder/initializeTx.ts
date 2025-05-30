@@ -1,6 +1,6 @@
 import { Bip32Account, SignTransactionContext, util } from '@cardano-sdk/key-management';
 import { Cardano, Serialization } from '@cardano-sdk/core';
-import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
+import { Ed25519KeyHashHex, Ed25519PublicKey } from '@cardano-sdk/crypto';
 import { GreedyTxEvaluator } from './GreedyTxEvaluator';
 import { InitializeTxProps, InitializeTxResult, RewardAccountWithPoolId } from '../types';
 import { RedeemersByType, defaultSelectionConstraints } from '../input-selection';
@@ -11,7 +11,8 @@ import { ensureValidityInterval } from '../ensureValidityInterval';
 import { hasCorrectVoteDelegation } from './hasCorrectVoteDelegation';
 
 const dRepPublicKeyHash = async (addressManager?: Bip32Account): Promise<Ed25519KeyHashHex | undefined> =>
-  addressManager && (await (await addressManager.derivePublicKey(util.DREP_KEY_DERIVATION_PATH)).hash()).hex();
+  addressManager &&
+  Ed25519PublicKey.fromHex(addressManager.derivePublicKey(util.DREP_KEY_DERIVATION_PATH)).hash().hex();
 
 const DREP_REG_REQUIRED_PROTOCOL_VERSION = 10;
 

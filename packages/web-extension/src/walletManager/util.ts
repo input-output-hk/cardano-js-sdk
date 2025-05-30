@@ -225,7 +225,7 @@ export const getScriptWalletId = async (script: Cardano.Script): Promise<string>
  * @param pubKey The extended account public key.
  */
 export const getExtendedAccountPublicKeyWalletId = async (pubKey: Crypto.Bip32PublicKeyHex): Promise<string> =>
-  Crypto.blake2b(Crypto.blake2b.BYTES_MIN).update(Buffer.from(pubKey, 'hex')).digest('hex');
+  Crypto.blake2b.hash(pubKey, 16);
 
 /**
  * Compute a unique walletId from the keyAgent.

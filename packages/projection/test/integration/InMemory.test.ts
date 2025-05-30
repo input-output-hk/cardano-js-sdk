@@ -14,6 +14,7 @@ import {
 } from '../../src';
 import { Cardano } from '@cardano-sdk/core';
 import { ChainSyncDataSet, StubChainSyncData, chainSyncData, logger } from '@cardano-sdk/util-dev';
+import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { from, lastValueFrom, of, take, toArray } from 'rxjs';
 
 const dataWithPoolRetirement = chainSyncData(ChainSyncDataSet.WithPoolRetirement);
@@ -129,7 +130,7 @@ describe('integration/InMemory', () => {
                       {
                         __typename: Cardano.CertificateType.StakeRegistration,
                         stakeCredential: {
-                          hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(rolledBackKey),
+                          hash: rolledBackKey as Hash28ByteBase16,
                           type: Cardano.CredentialType.KeyHash
                         }
                       }
