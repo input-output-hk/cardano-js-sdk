@@ -204,6 +204,37 @@ describe('TxBuilder/delegatePortfolio', () => {
     });
   });
 
+  describe('building delegation certificate', () => {
+    beforeEach(async () => {
+      const txBuilderFactory = await createTxBuilder({
+        keyAgent,
+        stakeDelegations: [{ credentialStatus: Cardano.StakeCredentialStatus.Registering }]
+      });
+      groupedAddresses = txBuilderFactory.groupedAddresses;
+      txBuilder = txBuilderFactory.txBuilder;
+    });
+
+    it('tx does not contain a stake registration cert', async () => {
+      const tx = await txBuilder
+        .delegatePortfolio({
+          name: 'Tests Portfolio',
+          pools: [{ id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[0])), weight: 1 }]
+        })
+        .build()
+        .inspect();
+
+      expect(tx.body.certificates?.length).toBe(1);
+      expect(tx.body.certificates).toContainEqual({
+        __typename: Cardano.CertificateType.StakeDelegation,
+        poolId: poolIds[0],
+        stakeCredential: {
+          hash: Cardano.RewardAccount.toHash(groupedAddresses[0].rewardAccount),
+          type: Cardano.CredentialType.KeyHash
+        }
+      });
+    });
+  });
+
   describe('input selection type with multiple reward accounts and single pool delegation', () => {
     beforeEach(async () => {
       const txBuilderFactory = await createTxBuilder({
