@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">89.53% </span>
+                <span class="strong">89.47% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>154/172</span>
+                <span class='fraction'>153/171</span>
             </div>
         
             
@@ -518,13 +518,7 @@
 <a name='L453'></a><a href='#L453'>453</a>
 <a name='L454'></a><a href='#L454'>454</a>
 <a name='L455'></a><a href='#L455'>455</a>
-<a name='L456'></a><a href='#L456'>456</a>
-<a name='L457'></a><a href='#L457'>457</a>
-<a name='L458'></a><a href='#L458'>458</a>
-<a name='L459'></a><a href='#L459'>459</a>
-<a name='L460'></a><a href='#L460'>460</a>
-<a name='L461'></a><a href='#L461'>461</a>
-<a name='L462'></a><a href='#L462'>462</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">10x</span>
+<a name='L456'></a><a href='#L456'>456</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">10x</span>
@@ -765,9 +759,7 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -825,13 +817,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1218,7 +1206,7 @@ export const getVotingProcedureKeyPaths = ({
   for (const { voter } of txBody.votingProcedures || []) {
     switch (voter.__typename) {
       case Cardano.VoterType.dRepKeyHash: {
-        if (dRepKeyHash &amp;&amp; voter.credential.hash === Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash)) {
+        if (dRepKeyHash &amp;&amp; voter.credential.hash === dRepKeyHash) {
           signatureCheck.derivationPaths.push(DREP_KEY_DERIVATION_PATH);
         } else {
           signatureCheck.requiresForeignSignatures = true;
@@ -1226,9 +1214,7 @@ export const getVotingProcedureKeyPaths = ({
         break;
       }
       case Cardano.VoterType.stakePoolKeyHash: {
-        const account = accounts.find(
-          (acct) =&gt; Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(acct.stakeKeyHash) === voter.credential.hash
-        );
+        const account = accounts.find((acct) =&gt; acct.stakeKeyHash === voter.credential.hash);
         if (account) {
           signatureCheck.derivationPaths.push(account.derivationPath);
         } else {
@@ -1282,17 +1268,13 @@ const getRequiredSignersKeyPaths = (
 };
 &nbsp;
 const checkStakeCredential = (address: GroupedAddress, keyHash: Crypto.Ed25519KeyHashHex): SignatureCheck =&gt;
-  address.stakeKeyDerivationPath &amp;&amp;
-  Cardano.RewardAccount.toHash(address.rewardAccount) === Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(keyHash)
+  address.stakeKeyDerivationPath &amp;&amp; Cardano.RewardAccount.toHash(address.rewardAccount) === keyHash
     ? { derivationPaths: [address.stakeKeyDerivationPath], requiresForeignSignatures: false }
     : { derivationPaths: [], requiresForeignSignatures: true };
 &nbsp;
 const checkPaymentCredential = (address: GroupedAddress, keyHash: Crypto.Ed25519KeyHashHex) =&gt; {
   const paymentCredential = Cardano.Address.fromBech32(address.address)?.asBase()?.getPaymentCredential();
-  <span class="missing-if-branch" title="if path not taken" >I</span>if (
-    paymentCredential?.type === Cardano.CredentialType.ScriptHash &amp;&amp;
-    paymentCredential.hash === Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(keyHash)
-  )
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (paymentCredential?.type === Cardano.CredentialType.ScriptHash &amp;&amp; paymentCredential.hash === keyHash)
 <span class="cstat-no" title="statement not covered" >    return {</span>
       derivationPaths: [{ index: address.index, role: Number(address.type) }],
       requiresForeignSignatures: false
@@ -1384,7 +1366,7 @@ export const getDRepCredentialKeyPaths = ({
       if (
         certificate.dRepCredential.type === Cardano.CredentialType.ScriptHash ||
         !dRepKeyHash ||
-        certificate.dRepCredential.hash !== Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash)
+        certificate.dRepCredential.hash !== dRepKeyHash
       ) {
         // Scripts are foreign
         signature.requiresForeignSignatures = true;
@@ -1453,7 +1435,7 @@ export const ownSignatureKeyPaths = (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-29T08:12:03.727Z
+                at 2025-05-30T12:38:56.069Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
