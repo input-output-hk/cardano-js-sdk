@@ -20,7 +20,7 @@ import {
 } from '@cardano-sdk/dapp-connector';
 import { Cardano, Milliseconds, Serialization, coalesceValueQuantities } from '@cardano-sdk/core';
 import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
-import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
+import { HexBlob } from '@cardano-sdk/util';
 import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { MessageSender } from '@cardano-sdk/key-management';
@@ -370,23 +370,16 @@ const baseCip30WalletApi = (
     return addresses.map((groupAddresses) => cardanoAddressToCbor(groupAddresses.address));
   },
   getUtxos: async (_: SenderContext, amount?: Cbor, paginate?: Paginate): Promise<Cbor[] | null> => {
-    const scope = new ManagedFreeableScope();
-    try {
-      const wallet = await firstValueFrom(wallet$);
-      await waitForWalletStateSettle(wallet);
-      let utxos = amount
-        ? await selectUtxo(wallet, parseValueCbor(amount).toCore(), !!paginate)
-        : await firstValueFrom(wallet.utxo.available$);
-      if (!utxos) return null;
-      if (paginate) {
-        utxos = utxos.slice(paginate.page * paginate.limit, paginate.page * paginate.limit + paginate.limit);
-      }
-      const cbor = utxos.map((core) => Serialization.TransactionUnspentOutput.fromCore(core).toCbor());
-      scope.dispose();
-      return cbor;
-    } finally {
-      scope.dispose();
+    const wallet = await firstValueFrom(wallet$);
+    await waitForWalletStateSettle(wallet);
+    let utxos = amount
+      ? await selectUtxo(wallet, parseValueCbor(amount).toCore(), !!paginate)
+      : await firstValueFrom(wallet.utxo.available$);
+    if (!utxos) return null;
+    if (paginate) {
+      utxos = utxos.slice(paginate.page * paginate.limit, paginate.page * paginate.limit + paginate.limit);
     }
+    return utxos.map((core) => Serialization.TransactionUnspentOutput.fromCore(core).toCbor());
   },
   signData: async (
     { sender }: SenderContext,
@@ -424,7 +417,6 @@ const baseCip30WalletApi = (
     throw new DataSignError(DataSignErrorCode.UserDeclined, 'user declined signing');
   },
   signTx: async ({ sender }: SenderContext, tx: Cbor, partialSign?: Boolean): Promise<Cbor> => {
-    const scope = new ManagedFreeableScope();
     logger.debug('signTx', tx);
     const txCbor = Serialization.TxCBOR(tx);
     const txDecoded = Serialization.Transaction.fromCbor(txCbor);
@@ -482,11 +474,8 @@ const baseCip30WalletApi = (
           const message = formatUnknownError(error);
           throw new TxSignError(TxSignErrorCode.UserDeclined, message);
         }
-      } finally {
-        scope.dispose();
       }
     } else {
-      scope.dispose();
       throw new TxSignError(TxSignErrorCode.UserDeclined, 'user declined signing tx');
     }
   },

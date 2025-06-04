@@ -19,6 +19,8 @@ import {
 } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
+import { LargeFirstSelector } from '@cardano-sdk/input-selection';
+import { MockChangeAddressResolver, getPayToPubKeyHashScript, getPaymentCredential } from '../hardware/utils';
 import { babbageTx } from '../../../core/test/Serialization/testData';
 import { buildDRepAddressFromDRepKey, toOutgoingTx, waitForWalletStateSettle } from '../util';
 import { getPassphrase, stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
@@ -319,6 +321,66 @@ describe('BaseWallet methods', () => {
         expect(tx.body).toEqual(unhydratedTxBody);
         expect(tx.id).toBe(txInternals.hash);
         expect(tx.witness.signatures.size).toBe(2); // spending key and stake key for withdrawal
+      });
+
+      it('can sign with native scripts credentials', async () => {
+        const walletWithMockInputResolver = createPersonalWallet(
+          { name: 'Test Wallet' },
+          {
+            addressDiscovery,
+            assetProvider,
+            bip32Account,
+            chainHistoryProvider,
+            handleProvider,
+            inputResolver: {
+              resolveInput: jest.fn().mockResolvedValue(outputs[0])
+            },
+            logger,
+            networkInfoProvider,
+            rewardAccountInfoProvider,
+            rewardsProvider,
+            txSubmitProvider,
+            utxoProvider,
+            witnesser
+          }
+        );
+
+        const selector = new LargeFirstSelector({
+          changeAddressResolver: new MockChangeAddressResolver()
+        });
+        walletWithMockInputResolver.setInputSelector(selector);
+        const txBuilder = walletWithMockInputResolver.createTxBuilder();
+        const firstAddress = (await firstValueFrom(walletWithMockInputResolver.addresses$))[0].address;
+
+        const builtTx = await txBuilder
+          .addInput(
+            [
+              {
+                address: Cardano.PaymentAddress('addr_test1vzztre5epvtj5p72sh28nvrs3e6s4xxn95f66cvg0sqsk7qd3mah0'),
+                index: 0,
+                txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
+              },
+              outputs[0]
+            ],
+            {
+              script: getPayToPubKeyHashScript(
+                getPaymentCredential(firstAddress).hash as unknown as Crypto.Ed25519KeyHashHex
+              )
+            }
+          )
+          .addOutput(txBuilder.buildOutput().address(outputs[0].address).coin(BigInt(5_111_111n)).toTxOut())
+          .customize(({ txBody }) => ({
+            ...txBody,
+            withdrawals: []
+          }))
+          .build()
+          .inspect();
+
+        const {
+          witness: { signatures }
+        } = await walletWithMockInputResolver.finalizeTx({ tx: builtTx, witness: builtTx.witness });
+
+        expect(signatures.size).toBe(1);
       });
 
       it('passes through sender to witnesser', async () => {

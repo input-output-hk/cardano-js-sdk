@@ -16,7 +16,14 @@ import { HID } from 'node-hid';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
+import { LargeFirstSelector } from '@cardano-sdk/input-selection';
 import { LedgerKeyAgent, LedgerTransportType } from '@cardano-sdk/hardware-ledger';
+import {
+  MockChangeAddressResolver,
+  getPayToPubKeyHashScript,
+  getPaymentCredential,
+  getStakeCredential
+} from '../utils';
 import { buildDRepAddressFromDRepKey } from '../../util';
 import { firstValueFrom } from 'rxjs';
 import { getDevices } from '@ledgerhq/hw-transport-node-hid-noevents';
@@ -38,14 +45,6 @@ const cleanupEstablishedConnections = async () => {
     await deviceConnection.transport.close();
   }
   LedgerKeyAgent.deviceConnections = [];
-};
-
-const getStakeCredential = (rewardAccount: Cardano.RewardAccount) => {
-  const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
-  return {
-    hash: stakeKeyHash,
-    type: Cardano.CredentialType.KeyHash
-  };
 };
 
 const signAndDecode = async (signWith: Cardano.PaymentAddress | Cardano.RewardAccount, wallet: BaseWallet) => {
@@ -355,6 +354,86 @@ describe('LedgerKeyAgent', () => {
           witness: { signatures }
         } = await wallet.finalizeTx({ tx: builtTx });
         expect(signatures.size).toBe(3);
+      });
+
+      describe('Native Scripts', () => {
+        it('can sign transaction with native script - Payment credential', async () => {
+          const selector = new LargeFirstSelector({
+            changeAddressResolver: new MockChangeAddressResolver()
+          });
+          wallet.setInputSelector(selector);
+          const txBuilder = wallet.createTxBuilder();
+          const firstAddress = (await firstValueFrom(wallet.addresses$))[0].address;
+
+          const builtTx = await txBuilder
+            .addInput(
+              [
+                {
+                  address: Cardano.PaymentAddress('addr_test1vzztre5epvtj5p72sh28nvrs3e6s4xxn95f66cvg0sqsk7qd3mah0'),
+                  index: 0,
+                  txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
+                },
+                outputs[0]
+              ],
+              {
+                script: getPayToPubKeyHashScript(
+                  getPaymentCredential(firstAddress).hash as unknown as Crypto.Ed25519KeyHashHex
+                )
+              }
+            )
+            .addOutput(txBuilder.buildOutput().address(outputs[0].address).coin(BigInt(5_111_111n)).toTxOut())
+            .customize(({ txBody }) => ({
+              ...txBody,
+              withdrawals: []
+            }))
+            .build()
+            .inspect();
+
+          const {
+            witness: { signatures }
+          } = await wallet.finalizeTx({ tx: builtTx, witness: builtTx.witness });
+
+          expect(signatures.size).toBe(1);
+        });
+
+        it('can sign transaction with native script - Stake credential', async () => {
+          const selector = new LargeFirstSelector({
+            changeAddressResolver: new MockChangeAddressResolver()
+          });
+          wallet.setInputSelector(selector);
+          const txBuilder = wallet.createTxBuilder();
+
+          const builtTx = await txBuilder
+            .addInput(
+              [
+                {
+                  address: Cardano.PaymentAddress('addr_test1vzztre5epvtj5p72sh28nvrs3e6s4xxn95f66cvg0sqsk7qd3mah0'),
+                  index: 0,
+                  txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
+                },
+                outputs[0]
+              ],
+              {
+                script: getPayToPubKeyHashScript(
+                  getStakeCredential((await firstValueFrom(wallet.delegation.rewardAccounts$))?.[0].address)
+                    .hash as unknown as Crypto.Ed25519KeyHashHex
+                )
+              }
+            )
+            .addOutput(txBuilder.buildOutput().address(outputs[0].address).coin(BigInt(5_111_111n)).toTxOut())
+            .customize(({ txBody }) => ({
+              ...txBody,
+              withdrawals: []
+            }))
+            .build()
+            .inspect();
+
+          const {
+            witness: { signatures }
+          } = await wallet.finalizeTx({ tx: builtTx, witness: builtTx.witness });
+
+          expect(signatures.size).toBe(1);
+        });
       });
 
       describe('conway-era', () => {
