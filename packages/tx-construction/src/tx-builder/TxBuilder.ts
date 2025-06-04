@@ -662,7 +662,10 @@ export class GenericTxBuilder implements TxBuilder {
       const { id: newPoolId, weight } = newPools.pop()!;
       const rewardAccount = availableRewardAccounts.pop()!;
       this.#logger.debug(`Building delegation certificate for ${newPoolId} ${rewardAccount}`);
-      if (rewardAccount.credentialStatus !== Cardano.StakeCredentialStatus.Registered) {
+      if (
+        rewardAccount.credentialStatus !== Cardano.StakeCredentialStatus.Registered &&
+        rewardAccount.credentialStatus !== Cardano.StakeCredentialStatus.Registering
+      ) {
         certificates.push(Cardano.createStakeRegistrationCert(rewardAccount.address));
       }
       certificates.push(Cardano.createDelegationCert(rewardAccount.address, newPoolId));
