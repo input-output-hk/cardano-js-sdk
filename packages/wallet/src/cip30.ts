@@ -469,7 +469,10 @@ const baseCip30WalletApi = (
           );
         }
 
-        const cbor = Serialization.TransactionWitnessSet.fromCore({ signatures }).toCbor();
+        const ownSignatures = new Map(
+          [...signatures.entries()].filter(([pubKey]) => !coreTx.witness.signatures.has(pubKey))
+        );
+        const cbor = Serialization.TransactionWitnessSet.fromCore({ signatures: ownSignatures }).toCbor();
         return Promise.resolve(cbor);
       } catch (error) {
         if (error instanceof TxSignError) {

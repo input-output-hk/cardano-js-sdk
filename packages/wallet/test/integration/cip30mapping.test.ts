@@ -512,9 +512,19 @@ describe('cip30', () => {
           hexTx = Serialization.Transaction.fromCore(finalizedTx).toCbor();
         });
 
-        it('resolves with TransactionWitnessSet', async () => {
-          const cip30witnessSet = await api.signTx(context, hexTx);
-          expect(() => Serialization.TransactionWitnessSet.fromCbor(HexBlob(cip30witnessSet))).not.toThrow();
+        it('resolves own signatures with TransactionWitnessSet', async () => {
+          const cip30witnessSetCbor = await api.signTx(context, hexTx);
+          const cip30witnessSet = Serialization.TransactionWitnessSet.fromCbor(HexBlob(cip30witnessSetCbor));
+          const resolvedSignedByKeys = cip30witnessSet
+            .vkeys()!
+            .toCore()
+            .map(([pubKey]) => pubKey);
+          const preExistingSignatures = finalizedTx.witness.signatures.entries();
+
+          expect(resolvedSignedByKeys.length).toBeGreaterThan(0);
+          for (const [preExistingKey] of preExistingSignatures) {
+            expect(resolvedSignedByKeys).not.toContain(preExistingKey);
+          }
         });
 
         it('passes through sender from dapp connector context', async () => {
