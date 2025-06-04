@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.53.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.53.0...@cardano-sdk/wallet@0.53.1) (2025-06-04)
+
+### Bug Fixes
+
+* **wallet:** resolve only the own signed portions of the witness set ([8f7e2c7](https://github.com/input-output-hk/cardano-js-sdk/commit/8f7e2c7247558be08b2684403e2a6ef53654da22))
+
 ## [0.53.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.52.9...@cardano-sdk/wallet@0.53.0) (2025-05-30)
 
 ### ⚠ BREAKING CHANGES
