@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.28.0...@cardano-sdk/key-management@0.28.1) (2025-06-05)
+
+### Bug Fixes
+
+* fix native script singing ([9286c0e](https://github.com/input-output-hk/cardano-js-sdk/commit/9286c0e6486288523cbd5bc0b97894e0db81ab02))
+
 ## [0.28.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.27.11...@cardano-sdk/key-management@0.28.0) (2025-05-30)
 
 ### ⚠ BREAKING CHANGES
