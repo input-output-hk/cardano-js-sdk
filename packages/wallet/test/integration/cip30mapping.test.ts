@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/consistent-destructuring */
 /* eslint-disable unicorn/consistent-function-scoping */
-/* eslint-disable @typescript-eslint/no-explicit-any, sonarjs/no-duplicate-string */
+/* eslint-disable @typescript-eslint/no-explicit-any, sonarjs/no-duplicate-string, @typescript-eslint/no-floating-promises */
 import * as Crypto from '@cardano-sdk/crypto';
 import {
   APIErrorCode,
@@ -28,13 +28,14 @@ import {
   coalesceValueQuantities
 } from '@cardano-sdk/core';
 import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
-import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
+import { HexBlob } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import { NEVER, Observable, delay, firstValueFrom, of } from 'rxjs';
 import { Providers, createWallet } from './util';
 import { address_0_0, address_1_0, rewardAccount_0, rewardAccount_1 } from '../services/ChangeAddress/testData';
 import { buildDRepAddressFromDRepKey, signTx, waitForWalletStateSettle } from '../util';
+import { getPayToPubKeyHashScript, getPaymentCredential, getStakeCredential } from '../hardware/utils';
 import { dummyLogger as logger } from 'ts-log';
 import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import uniq from 'lodash/uniq.js';
@@ -48,7 +49,9 @@ const {
   utxosWithLowCoins
 } = mocks;
 
-type TestProviders = Required<Pick<Providers, 'txSubmitProvider' | 'networkInfoProvider'>>;
+type TestProviders = Required<
+  Pick<Providers, 'txSubmitProvider' | 'networkInfoProvider' | 'chainHistoryProvider' | 'utxoProvider'>
+>;
 const createMockGenericCallback = <T>(result: T) => jest.fn().mockResolvedValue(result);
 const foreignTx = Serialization.TxCBOR(
   '84a70081825820dce442e983f3f5cd5b2644bc57f749075390f1fbae9ab55bf454342959c885db00018182583900d161d64eef0eeb59f9124f520f8c8f3b717ed04198d54c8b17e604aea63c153fb3ea8a4ea4f165574ea91173756de0bf30222ca0e95a649a1a0082607b021a0016360509a1581cb77934706fa311b6568d1070c2d23f092324b35ad623aa571a0e3726a14e4d6573685f476966745f43617264200b5820d8175f3b1276a48939a6ccee220a7f81b6422167317ba3ff6325cba1fb6ccbe70d818258208d68748457cd0f1a8596f41fd2125a415315897d2da4a4b94335829cee7198ae001281825820dce442e983f3f5cd5b2644bc57f749075390f1fbae9ab55bf454342959c885db00a2068259016b590168010000333232323232323223223222253330083232533300d3010002132533300b3370e6eb4c034009200113371e0020122940dd718058008b180700099299980499b8748008c028dd50008a5eb7bdb1804dd5980718059baa001323300100132330010013756601e602060206020602060186ea8c03cc030dd50019129998070008a5eb7bdb1804c8c8c8c94ccc03ccdc8a45000021533300f3371e91010000210031005133013337606ea4008dd3000998030030019bab3010003375c601c0046024004602000244a66601a002298103d87a8000132323232533300e337220140042a66601c66e3c0280084cdd2a4000660246e980052f5c02980103d87a80001330060060033756601e0066eb8c034008c044008c03c00452613656375c0026eb80055cd2ab9d5573caae7d5d02ba157449810f4e4d6573685f476966745f43617264004c011e581cb77934706fa311b6568d1070c2d23f092324b35ad623aa571a0e3726000159023c59023901000033323232323232322322232323225333009323232533300c3007300d3754002264646464a666026602c00426464a666024601a60266ea803854ccc048c034c04cdd5191980080080311299980b8008a60103d87a80001323253330163375e603660306ea800804c4cdd2a40006603400497ae0133004004001301b002301900115333012300c00113371e00402029405854ccc048cdc3800a4002266e3c0080405281bad3013002375c60220022c602800264a66601e601260206ea800452f5bded8c026eacc050c044dd500099191980080099198008009bab3016301730173017301700522533301500114bd6f7b630099191919299980b19b91488100002153330163371e9101000021003100513301a337606ea4008dd3000998030030019bab3017003375c602a0046032004602e00244a666028002298103d87a800013232323253330153372200e0042a66602a66e3c01c0084cdd2a4000660326e980052f5c02980103d87a80001330060060033756602c0066eb8c050008c060008c058004dd7180998081baa00337586024002601c6ea800858c040c044008c03c004c02cdd50008a4c26cac64a66601060060022a66601660146ea8010526161533300830020011533300b300a37540082930b0b18041baa003370e90011b8748000dd7000ab9a5573aaae7955cfaba05742ae8930010f4e4d6573685f476966745f43617264004c012bd8799fd8799f58203159a6f2ae24c5bfbed947fe0ecfe936f088c8d265484e6979cacb607d33c811ff05ff0001058284000040821a006acfc01ab2d05e00840100d87a80821a006acfc01ab2d05e00f5f6'
@@ -107,8 +110,10 @@ describe('cip30', () => {
 
     beforeEach(async () => {
       providers = {
+        chainHistoryProvider: mockChainHistoryProvider({ rewardAccount: rewardAccount_0 }),
         networkInfoProvider: mockNetworkInfoProvider(),
-        txSubmitProvider: mockTxSubmitProvider()
+        txSubmitProvider: mockTxSubmitProvider(),
+        utxoProvider: mocks.mockUtxoProvider({ address: address_0_0 })
       };
       providers.networkInfoProvider.ledgerTip.mockImplementation(
         () =>
@@ -146,22 +151,23 @@ describe('cip30', () => {
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('with default mock data', () => {
-    let scope: ManagedFreeableScope;
     let providers: TestProviders;
 
     beforeAll(async () => {
       // CREATE A WALLET
-      scope = new ManagedFreeableScope();
       providers = {
+        chainHistoryProvider: mockChainHistoryProvider({
+          rewardAccount: rewardAccount_0
+        }),
         networkInfoProvider: mockNetworkInfoProvider(),
-        txSubmitProvider: mockTxSubmitProvider()
+        txSubmitProvider: mockTxSubmitProvider(),
+        utxoProvider: mocks.mockUtxoProvider({ address: address_0_0 })
       };
       ({ wallet, api, confirmationCallback } = await createWalletAndApiWithStores([mockUtxo[4]], providers));
     });
 
     afterAll(() => {
       wallet.shutdown();
-      scope.dispose();
     });
 
     describe('createWalletApi', () => {
@@ -510,6 +516,50 @@ describe('cip30', () => {
             walletUtil: wallet.util
           });
           hexTx = Serialization.Transaction.fromCore(finalizedTx).toCbor();
+        });
+
+        describe('Native Scripts', () => {
+          const testNativeScriptSigning = async (
+            label: string,
+            getKeyHash: (groupedAddress: GroupedAddress) => Crypto.Ed25519KeyHashHex
+          ) => {
+            it(label, async () => {
+              const tx = await signTx({
+                addresses$: wallet.addresses$,
+                tx: await wallet.initializeTx(simpleTxProps),
+                walletUtil: wallet.util
+              });
+
+              const knownAddresses = await firstValueFrom(wallet.addresses$);
+
+              // Make all inputs foreign, delete any signatures, withdrawals and populate scripts.
+              for (const input of tx.body.inputs) {
+                input.txId = Cardano.TransactionId('0'.repeat(64));
+              }
+              tx.body.withdrawals = [];
+              tx.witness.signatures = new Map();
+              tx.witness.scripts = [getPayToPubKeyHashScript(getKeyHash(knownAddresses[0]))];
+
+              const cbor = Serialization.Transaction.fromCore(tx).toCbor();
+              const cip30witnessSetCbor = await api.signTx(context, cbor, true);
+              const { signatures } = Serialization.TransactionWitnessSet.fromCbor(
+                HexBlob(cip30witnessSetCbor)
+              ).toCore();
+
+              expect(signatures.size).toBe(1);
+            });
+          };
+
+          testNativeScriptSigning(
+            'can sign transaction with native script - Payment credential',
+            (groupedAddress) => getPaymentCredential(groupedAddress.address).hash as unknown as Crypto.Ed25519KeyHashHex
+          );
+
+          testNativeScriptSigning(
+            'can sign transaction with native script - Stake credential',
+            (groupedAddress) =>
+              getStakeCredential(groupedAddress.rewardAccount).hash as unknown as Crypto.Ed25519KeyHashHex
+          );
         });
 
         it('resolves own signatures with TransactionWitnessSet', async () => {

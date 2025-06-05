@@ -1,8 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AccountKeyDerivationPath, GroupedAddress, KeyRole, TxInId, TxInKeyPathMap } from '../types';
+import { AccountKeyDerivationPath, GroupedAddress, TxInId, TxInKeyPathMap } from '../types';
 import { Cardano } from '@cardano-sdk/core';
 import { DREP_KEY_DERIVATION_PATH } from './key';
-import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
 import { isNotNil } from '@cardano-sdk/util';
 import isEqual from 'lodash/isEqual.js';
 import uniqBy from 'lodash/uniqBy.js';
@@ -167,7 +166,9 @@ export const checkStakeCredentialCertificates = (
 const getSignersData = (groupedAddresses: GroupedAddress[]): StakeKeySignerData[] =>
   uniqBy(groupedAddresses, 'rewardAccount')
     .map((groupedAddress) => {
-      const stakeKeyHash = Cardano.RewardAccount.toHash(groupedAddress.rewardAccount) as unknown as Ed25519KeyHashHex;
+      const stakeKeyHash = Cardano.RewardAccount.toHash(
+        groupedAddress.rewardAccount
+      ) as unknown as Crypto.Ed25519KeyHashHex;
       const poolId = Cardano.PoolId.fromKeyHash(stakeKeyHash);
       return {
         derivationPath: groupedAddress.stakeKeyDerivationPath,
@@ -299,18 +300,13 @@ const checkStakeCredential = (address: GroupedAddress, keyHash: Crypto.Ed25519Ke
 
 const checkPaymentCredential = (address: GroupedAddress, keyHash: Crypto.Ed25519KeyHashHex) => {
   const paymentCredential = Cardano.Address.fromBech32(address.address)?.asBase()?.getPaymentCredential();
-  if (paymentCredential?.type === Cardano.CredentialType.ScriptHash && paymentCredential.hash === keyHash)
+  if (paymentCredential?.hash === keyHash) {
     return {
       derivationPaths: [{ index: address.index, role: Number(address.type) }],
       requiresForeignSignatures: false
     };
-
-  if (paymentCredential?.type === Cardano.CredentialType.ScriptHash) {
-    return {
-      derivationPaths: [{ index: address.index, role: KeyRole.External }],
-      requiresForeignSignatures: false
-    };
   }
+
   return { derivationPaths: [], requiresForeignSignatures: true };
 };
 
@@ -327,7 +323,7 @@ const processSignatureScript = (
 
   for (const address of groupedAddresses) {
     if (address.stakeKeyDerivationPath) {
-      signatureCheck = checkStakeCredential(address, script.keyHash);
+      signatureCheck = combineSignatureChecks(signatureCheck, checkStakeCredential(address, script.keyHash));
     }
     signatureCheck = combineSignatureChecks(signatureCheck, checkPaymentCredential(address, script.keyHash));
   }

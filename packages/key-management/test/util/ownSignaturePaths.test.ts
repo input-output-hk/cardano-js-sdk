@@ -634,10 +634,10 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       expect(util.ownSignatureKeyPaths(txBody, [knownAddress1], {}, undefined, scripts)).toEqual([]);
     });
     it('includes derivation paths for multi-signature native scripts', async () => {
-      const scriptAddress = Cardano.PaymentAddress(
+      const walletAddress = Cardano.PaymentAddress(
         'addr_test1xr806j8xcq6cw6jjkzfxyewyue33zwnu4ajnu28hakp5fmc6gddlgeqee97vwdeafwrdgrtzp2rw8rlchjf25ld7r2ssptq3m9'
       );
-      const scriptRewardAccount = Cardano.RewardAccount(
+      const walletRewardAccount = Cardano.RewardAccount(
         'stake_test17qdyxkl5vsvujlx8xu75hpk5p43q4phr3lutey420klp4gg7zmhrn'
       );
       const txBody: Cardano.TxBody = {
@@ -653,7 +653,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
           scripts: [
             {
               __type: Cardano.ScriptType.Native,
-              keyHash: Ed25519KeyHashHex('b498c0eaceb9a8c7c829d36fc84e892113c9d2636b53b0636d7518b4'),
+              keyHash: Ed25519KeyHashHex('cefd48e6c035876a52b0926265c4e663113a7caf653e28f7ed8344ef'),
               kind: Cardano.NativeScriptKind.RequireSignature
             },
             {
@@ -665,7 +665,8 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
         }
       ];
 
-      const knownAddress = createGroupedAddress(scriptAddress, scriptRewardAccount, AddressType.External, 0);
+      const knownAddress = createGroupedAddress(walletAddress, walletRewardAccount, AddressType.External, 0);
+
       expect(util.ownSignatureKeyPaths(txBody, [knownAddress], {}, undefined, scripts)).toEqual([
         {
           index: 0,

@@ -668,11 +668,16 @@ export class BaseWallet implements ObservableWallet {
       transaction = Serialization.Transaction.fromCbor(tx);
     }
 
+    const txWitness = transaction.witnessSet().toCore();
     const context = {
       ...signingContext,
       dRepPublicKey,
       knownAddresses,
-      txInKeyPathMap: await util.createTxInKeyPathMap(transaction.body().toCore(), knownAddresses, this.util)
+      scripts: [...(signingContext?.scripts ?? []), ...(witness?.scripts ?? []), ...(txWitness?.scripts ?? [])],
+      // Script wallets cant sign specific outputs with keys, the signatures are added to satisfy the witness script
+      txInKeyPathMap: isBip32PublicCredentialsManager(this.#publicCredentialsManager)
+        ? await util.createTxInKeyPathMap(transaction.body().toCore(), knownAddresses, this.util)
+        : {}
     };
 
     const result = await this.witnesser.witness(transaction, context, signingOptions);
