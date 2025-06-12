@@ -143,6 +143,7 @@
     "@wdio/spec-reporter": "^7.19.5",
     "@wdio/static-server-service": "^7.19.5",
     "artillery": "^2.0.0-35",
+    "axios-mock-adapter": "^2.0.0",
     "babel-loader": "^8.2.5",
     "blake2b-no-wasm": "2.1.4",
     "buffer": "^6.0.3",
