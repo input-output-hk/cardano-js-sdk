@@ -83,6 +83,15 @@ export interface Bip32Ed25519 {
   derivePublicKey(parentKey: Bip32PublicKeyHex, derivationIndices: BIP32Path): Bip32PublicKeyHex;
 
   /**
+   * Given a parent extended key and a set of indices, this function computes the corresponding child extended key.
+   *
+   * @param parentKey The parent extended key.
+   * @param derivationIndices The list of derivation indices.
+   * @returns A promise returning the child extended public key.
+   */
+  derivePublicKeyAsync(parentKey: Bip32PublicKeyHex, derivationIndices: BIP32Path): Promise<Bip32PublicKeyHex>;
+
+  /**
    * Generates an Ed25519 signature using an extended private key.
    *
    * @param privateKey The extended private key to generate the signature with.

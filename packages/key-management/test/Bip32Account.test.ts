@@ -83,7 +83,7 @@ describe('Bip32Account', () => {
         [4, '4444444444444444444444444444444444444444444444444444444444444444']
       ]);
 
-      testnetAccount.derivePublicKey = jest.fn((x: AccountKeyDerivationPath) =>
+      testnetAccount.derivePublicKey = jest.fn(async (x: AccountKeyDerivationPath) =>
         Crypto.Ed25519PublicKeyHex(keyMap.get(x.index)!)
       );
 
