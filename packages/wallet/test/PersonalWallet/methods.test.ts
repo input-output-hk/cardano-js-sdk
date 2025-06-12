@@ -107,7 +107,7 @@ describe('BaseWallet methods', () => {
 
     const asyncKeyAgent = await testAsyncKeyAgent();
     bip32Account = await Bip32Account.fromAsyncKeyAgent(asyncKeyAgent);
-    bip32Account.deriveAddress = jest.fn().mockReturnValue(groupedAddress);
+    bip32Account.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
     witnesser = util.createBip32Ed25519Witnesser(asyncKeyAgent);
     wallet = createPersonalWallet(
       { name: 'Test Wallet' },
@@ -671,12 +671,7 @@ describe('BaseWallet methods', () => {
 
   it('will retry deriving pubDrepKey if one does not exist', async () => {
     wallet.shutdown();
-    bip32Account.derivePublicKey = jest
-      .fn()
-      .mockImplementationOnce(() => {
-        throw new Error('error');
-      })
-      .mockReturnValue('string');
+    bip32Account.derivePublicKey = jest.fn().mockRejectedValueOnce('error').mockResolvedValue('string');
     wallet = createPersonalWallet(
       { name: 'Test Wallet' },
       {
@@ -819,7 +814,7 @@ describe('BaseWallet methods', () => {
     beforeEach(() => {
       wallet.shutdown();
 
-      bip32Account.deriveAddress = jest.fn((args) => {
+      bip32Account.deriveAddress = jest.fn(async (args) => {
         if (args.index === 0) {
           return groupedAddress;
         }

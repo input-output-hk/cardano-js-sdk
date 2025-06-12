@@ -2,7 +2,7 @@ import { AccountKeyDerivationPath, Bip32Account, GroupedAddress, KeyRole } from 
 import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet } from '../../src';
 import { PubStakeKeyAndStatus, createPublicStakeKeysTracker } from '../../src/services/PublicStakeKeysTracker';
-import { delay, firstValueFrom, from, lastValueFrom, of, shareReplay, toArray } from 'rxjs';
+import { firstValueFrom, from, lastValueFrom, of, shareReplay, toArray } from 'rxjs';
 import { mockProviders as mocks } from '@cardano-sdk/util-dev';
 
 describe('PublicStakeKeysTracker', () => {
@@ -64,7 +64,9 @@ describe('PublicStakeKeysTracker', () => {
       }
     ];
 
-    derivePublicKey = jest.fn().mockImplementation((path: AccountKeyDerivationPath) => `abc-${path.index}`);
+    derivePublicKey = jest
+      .fn()
+      .mockImplementation((path: AccountKeyDerivationPath) => Promise.resolve(`abc-${path.index}`));
     bip32Account = {
       accountIndex: 0,
       chainId: Cardano.ChainIds.Preview,
@@ -135,7 +137,7 @@ describe('PublicStakeKeysTracker', () => {
 
   it('emits when reward accounts change', async () => {
     const addresses$ = of(addresses);
-    const rewardAccounts$ = from([[rewardAccounts[0]], rewardAccounts]).pipe(delay(1));
+    const rewardAccounts$ = from([[rewardAccounts[0]], rewardAccounts]);
 
     const stakePubKeys$ = createPublicStakeKeysTracker({
       addresses$,
@@ -155,7 +157,7 @@ describe('PublicStakeKeysTracker', () => {
   });
 
   it('emits when addresses change', async () => {
-    const addresses$ = from([[addresses[0]], addresses]).pipe(delay(1));
+    const addresses$ = from([[addresses[0]], addresses]);
     const rewardAccounts$ = of(rewardAccounts);
 
     const stakePubKeys$ = createPublicStakeKeysTracker({
@@ -176,9 +178,8 @@ describe('PublicStakeKeysTracker', () => {
   });
 
   it('does not emit duplicates', async () => {
-    const rewardAccounts$ = from([rewardAccounts, rewardAccounts]).pipe(delay(1));
+    const rewardAccounts$ = from([rewardAccounts, rewardAccounts]);
     const addresses$ = from([[addresses[0]], addresses, addresses]).pipe(
-      delay(1),
       shareReplay({ bufferSize: 1, refCount: true })
     );
 

@@ -69,7 +69,7 @@ describe('PersonalWallet/cip30WalletApi', () => {
 
   it('can signData with bech32 base address', async () => {
     const [{ address, index }] = await firstValueFrom(wallet.addresses$);
-    const paymentKeyHex = await bip32Account.derivePublicKey({ index, role: KeyRole.External });
+    const paymentKeyHex = bip32Account.derivePublicKey({ index, role: KeyRole.External });
 
     const signature = await walletApi.signData({ sender: '' } as unknown as SenderContext, address, HexBlob('abc123'));
 
@@ -79,7 +79,7 @@ describe('PersonalWallet/cip30WalletApi', () => {
   it('can signData with hex-encoded base address', async () => {
     const [{ address, index }] = await firstValueFrom(wallet.addresses$);
     const addressHex = Cardano.Address.fromBech32(address).toBytes();
-    const paymentKeyHex = await bip32Account.derivePublicKey({ index, role: KeyRole.External });
+    const paymentKeyHex = bip32Account.derivePublicKey({ index, role: KeyRole.External });
 
     const signature = await walletApi.signData(
       { sender: '' } as unknown as SenderContext,
@@ -92,7 +92,7 @@ describe('PersonalWallet/cip30WalletApi', () => {
 
   it('can signData with bech32 base address', async () => {
     const [{ rewardAccount, index }] = await firstValueFrom(wallet.addresses$);
-    const stakeKeyHex = await bip32Account.derivePublicKey({ index, role: KeyRole.Stake });
+    const stakeKeyHex = bip32Account.derivePublicKey({ index, role: KeyRole.Stake });
 
     const signature = await walletApi.signData(
       { sender: '' } as unknown as SenderContext,
@@ -106,7 +106,7 @@ describe('PersonalWallet/cip30WalletApi', () => {
   it('can signData with hex-encoded reward account', async () => {
     const [{ rewardAccount, index }] = await firstValueFrom(wallet.addresses$);
     const rewardAccountHex = Cardano.Address.fromBech32(rewardAccount).toBytes();
-    const stakeKeyHex = await bip32Account.derivePublicKey({ index, role: KeyRole.Stake });
+    const stakeKeyHex = bip32Account.derivePublicKey({ index, role: KeyRole.Stake });
 
     const signature = await walletApi.signData(
       { sender: '' } as unknown as SenderContext,

@@ -12,7 +12,9 @@ import { hasCorrectVoteDelegation } from './hasCorrectVoteDelegation';
 
 const dRepPublicKeyHash = async (addressManager?: Bip32Account): Promise<Ed25519KeyHashHex | undefined> =>
   addressManager &&
-  Ed25519PublicKey.fromHex(addressManager.derivePublicKey(util.DREP_KEY_DERIVATION_PATH)).hash().hex();
+  Ed25519PublicKey.fromHex(await addressManager.derivePublicKey(util.DREP_KEY_DERIVATION_PATH))
+    .hash()
+    .hex();
 
 const DREP_REG_REQUIRED_PROTOCOL_VERSION = 10;
 
