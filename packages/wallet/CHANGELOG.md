@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.53.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.53.2...@cardano-sdk/wallet@0.53.3) (2025-06-12)
+
+### Reverts
+
+* Revert "refactor!: make Bip32Account methods synchronous" ([aaca2b8](https://github.com/input-output-hk/cardano-js-sdk/commit/aaca2b8f1ec0112c3fb7a92e074c8003f10a03ca))
+
 ## [0.53.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.53.1...@cardano-sdk/wallet@0.53.2) (2025-06-05)
 
 ### Bug Fixes

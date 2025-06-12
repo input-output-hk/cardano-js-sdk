@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.27.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.27.2...@cardano-sdk/tx-construction@0.27.3) (2025-06-12)
+
+### Reverts
+
+* Revert "refactor!: make Bip32Account methods synchronous" ([aaca2b8](https://github.com/input-output-hk/cardano-js-sdk/commit/aaca2b8f1ec0112c3fb7a92e074c8003f10a03ca))
+
 ## [0.27.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.27.1...@cardano-sdk/tx-construction@0.27.2) (2025-06-05)
 
 **Note:** Version bump only for package @cardano-sdk/tx-construction

@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/input-selection",
-  "version": "0.14.15",
+  "version": "0.14.16",
   "description": "TypeScript definitions for input-selection (Coin Selection Algorithms for Cardano)",
   "engines": {
     "node": ">=16.20.2"

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.3.0...@cardano-sdk/crypto@0.4.0) (2025-06-12)
+
+### ⚠ BREAKING CHANGES
+
+* add hashAsync and derivePublicKeyAsync variants to Blake2b and Bip32Ed25519
+
+### Features
+
+* add hashAsync and derivePublicKeyAsync variants to Blake2b and Bip32Ed25519 ([1a00918](https://github.com/input-output-hk/cardano-js-sdk/commit/1a0091896f248749121feb4a3e8cbbcd6f503605))
+
 ## [0.3.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.2.3...@cardano-sdk/crypto@0.3.0) (2025-05-30)
 
 ### ⚠ BREAKING CHANGES

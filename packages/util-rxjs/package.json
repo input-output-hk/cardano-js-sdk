@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/util-rxjs",
-  "version": "0.9.17",
+  "version": "0.9.18",
   "description": "RxJS extensions",
   "engines": {
     "node": ">=16.20.2"
