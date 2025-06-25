@@ -35,10 +35,6 @@ export const blake2b: Blake2b = {
     return hash(outputLengthBytes).update(hexStringToBuffer(message)).digest('hex') as T;
   },
   async hashAsync<T extends HexBlob>(message: HexBlob, outputLengthBytes: number): Promise<T> {
-    return new Promise((resolve) => {
-      setImmediate(() => {
-        resolve(blake2b.hash<T>(message, outputLengthBytes));
-      });
-    });
+    return blake2b.hash<T>(message, outputLengthBytes);
   }
 };
