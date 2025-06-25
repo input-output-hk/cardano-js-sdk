@@ -47,9 +47,13 @@ const cleanupEstablishedConnections = async () => {
   LedgerKeyAgent.deviceConnections = [];
 };
 
-const signAndDecode = async (signWith: Cardano.PaymentAddress | Cardano.RewardAccount, wallet: BaseWallet) => {
+const signAndDecode = async (
+  signWith: Cardano.PaymentAddress | Cardano.RewardAccount,
+  wallet: BaseWallet,
+  message = HexBlob('abc123')
+) => {
   const dataSignature = await wallet.signData({
-    payload: HexBlob('abc123'),
+    payload: message,
     signWith
   });
 
@@ -799,6 +803,30 @@ describe('LedgerKeyAgent', () => {
           });
 
           describe('CIP-008 Messages', () => {
+            it('can sign a long message', async () => {
+              const message = HexBlob(
+                Buffer.from(
+                  'STAR 00000000000 to addr_test1qpj0zrza6l4caj9q4yfnvugcfum5rls7tkzvezzatp488tev0tc8arve599qvp6r28hsf6tm0cfdm3f70u58rjuycgtsrypwh5 ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+                  'ascii'
+                ).toString('hex')
+              );
+              const signWith = (await firstValueFrom(wallet.addresses$))[0].address;
+              const { coseSign1, publicKeyHex, signedData } = await signAndDecode(signWith as any, wallet, message);
+              const signedDataBytes = HexBlob.fromBytes(signedData.to_bytes());
+              const signatureBytes = HexBlob.fromBytes(coseSign1.signature()) as unknown as Crypto.Ed25519SignatureHex;
+              const cryptoProvider = await Crypto.SodiumBip32Ed25519.create();
+
+              testAddressHeader(signedData, signWith);
+
+              expect(
+                cryptoProvider.verify(
+                  signatureBytes,
+                  signedDataBytes,
+                  publicKeyHex as unknown as Crypto.Ed25519PublicKeyHex
+                )
+              ).toBe(true);
+            });
+
             it('can sign with reward account', async () => {
               const signWith = (await firstValueFrom(wallet.addresses$))[0].rewardAccount;
               const { coseSign1, publicKeyHex, signedData } = await signAndDecode(signWith, wallet);
