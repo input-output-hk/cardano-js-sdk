@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.4.0...@cardano-sdk/crypto@0.4.1) (2025-06-25)
+
+### Bug Fixes
+
+* **crypto:** remove setImmediate from async calls ([5a2a0c5](https://github.com/input-output-hk/cardano-js-sdk/commit/5a2a0c57712133bb994990d537aff371535149ff))
+
 ## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.3.0...@cardano-sdk/crypto@0.4.0) (2025-06-12)
 
 ### ⚠ BREAKING CHANGES

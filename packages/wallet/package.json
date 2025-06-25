@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/wallet",
-  "version": "0.53.4",
+  "version": "0.53.5",
   "description": "Wallet modules",
   "engines": {
     "node": ">=16.20.2"
