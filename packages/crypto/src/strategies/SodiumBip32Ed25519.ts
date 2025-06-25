@@ -74,11 +74,7 @@ export class SodiumBip32Ed25519 implements Bip32Ed25519 {
     parentKey: Bip32PublicKeyHex,
     derivationIndices: BIP32Path
   ): Promise<Bip32PublicKeyHex> {
-    return new Promise((resolve) => {
-      setImmediate(() => {
-        resolve(this.derivePublicKey(parentKey, derivationIndices));
-      });
-    });
+    return this.derivePublicKey(parentKey, derivationIndices);
   }
 
   public sign(
