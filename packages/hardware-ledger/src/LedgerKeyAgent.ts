@@ -32,6 +32,7 @@ import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { HID } from 'node-hid';
 import { HexBlob, areNumbersEqualInConstantTime, areStringsEqualInConstantTime } from '@cardano-sdk/util';
 import { LedgerDevice, LedgerTransportType } from './types';
+import { blake2b } from '@cardano-sdk/crypto';
 import { getFirstLedgerDevice } from '@ledgerhq/hw-transport-webusb/lib/webusb';
 import { str_to_path } from '@cardano-foundation/ledgerjs-hw-app-cardano/dist/utils/address';
 import { toLedgerTx } from './transformers';
@@ -66,8 +67,37 @@ const LedgerConnection = (_LedgerConnection as any).default
   : _LedgerConnection;
 type LedgerConnection = _LedgerConnection;
 
+const CIP08_SIGN_HASH_THRESHOLD = 100;
+
 const isUsbDevice = (device: any): device is USBDevice =>
   typeof USBDevice !== 'undefined' && device instanceof USBDevice;
+
+/* Sets the hashed entry in the COSESign1 CBOR structure */
+const setCOSESignHashed = (COSESignCbor: string, isHashed: boolean) => {
+  const reader = new Serialization.CborReader(HexBlob(COSESignCbor));
+  reader.readStartArray();
+
+  const headers = reader.readEncodedValue();
+  // Skip hashed entry
+  reader.readEncodedValue();
+  const payload = reader.readEncodedValue();
+  const signature = reader.readEncodedValue();
+
+  reader.readEndArray();
+
+  const writer = new Serialization.CborWriter();
+
+  writer.writeStartArray(4);
+  writer.writeEncodedValue(headers);
+  writer.writeStartMap(1);
+  writer.writeTextString('hashed');
+  writer.writeBoolean(isHashed);
+
+  writer.writeEncodedValue(payload);
+  writer.writeEncodedValue(signature);
+
+  return writer.encodeAsHex();
+};
 
 const isDeviceAlreadyOpenError = (error: unknown) => {
   if (typeof error !== 'object') return false;
@@ -780,6 +810,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
   }
 
   async signCip8Data(request: cip8.Cip8SignDataContext): Promise<Cip30DataSignature> {
+    const hashPayload = request.payload.length >= CIP08_SIGN_HASH_THRESHOLD;
     try {
       const dRepPublicKey = await this.derivePublicKey(util.DREP_KEY_DERIVATION_PATH);
       const dRepKeyHashHex = (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex();
@@ -797,9 +828,8 @@ export class LedgerKeyAgent extends KeyAgentBase {
           ? {
               address: addressParams,
               addressFieldType: MessageAddressFieldType.ADDRESS,
-              hashPayload: false,
+              hashPayload,
               messageHex: request.payload,
-
               network: {
                 networkId: this.chainId.networkId,
                 protocolMagic: this.chainId.networkMagic
@@ -809,7 +839,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
             }
           : {
               addressFieldType: MessageAddressFieldType.KEY_HASH,
-              hashPayload: false,
+              hashPayload,
               messageHex: request.payload,
               preferHexDisplay: false,
               signingPath
@@ -830,18 +860,20 @@ export class LedgerKeyAgent extends KeyAgentBase {
       protectedHeaders.set_algorithm_id(Label.from_algorithm_id(AlgorithmId.EdDSA));
       protectedHeaders.set_header(cip8.CoseLabel.address, CBORValue.new_bytes(addressBytes));
 
+      const sigPayload = coreUtils.hexToBytes(hashPayload ? blake2b.hash(request.payload, 28) : request.payload);
       const builder = COSESign1Builder.new(
         Headers.new(ProtectedHeaderMap.new(protectedHeaders), HeaderMap.new()),
-        coreUtils.hexToBytes(request.payload),
+        sigPayload,
         false
       );
 
       const coseSign1 = builder.build(Buffer.from(result.signatureHex, 'hex'));
       const coseKey = cip8.createCoseKey(addressBytes, Crypto.Ed25519PublicKeyHex(result.signingPublicKeyHex));
 
+      const coseSigHex = coreUtils.bytesToHex(coseSign1.to_bytes());
       return {
         key: coreUtils.bytesToHex(coseKey.to_bytes()),
-        signature: coreUtils.bytesToHex(coseSign1.to_bytes())
+        signature: hashPayload ? setCOSESignHashed(coseSigHex, true) : coseSigHex
       };
     } catch (error: any) {
       if (error.code === 28_169) {
