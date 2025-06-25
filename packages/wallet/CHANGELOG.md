@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.53.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.53.3...@cardano-sdk/wallet@0.53.4) (2025-06-25)
+
+### Bug Fixes
+
+* fix long message signing on ledger ([2d33995](https://github.com/input-output-hk/cardano-js-sdk/commit/2d339955349d7d672edd210b3ccf29ac5042569f))
+
 ## [0.53.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.53.2...@cardano-sdk/wallet@0.53.3) (2025-06-12)
 
 ### Reverts

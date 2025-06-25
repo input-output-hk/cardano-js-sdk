@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.16.3...@cardano-sdk/hardware-ledger@0.16.4) (2025-06-25)
+
+### Bug Fixes
+
+* fix long message signing on ledger ([2d33995](https://github.com/input-output-hk/cardano-js-sdk/commit/2d339955349d7d672edd210b3ccf29ac5042569f))
+
 ## [0.16.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.16.2...@cardano-sdk/hardware-ledger@0.16.3) (2025-06-12)
 
 **Note:** Version bump only for package @cardano-sdk/hardware-ledger
