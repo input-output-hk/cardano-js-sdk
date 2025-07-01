@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/ogmios",
-  "version": "0.18.42",
+  "version": "0.18.43",
   "description": "Ogmios Providers",
   "engines": {
     "node": ">=16.20.2"
