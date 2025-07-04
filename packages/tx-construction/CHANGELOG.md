@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.27.5...@cardano-sdk/tx-construction@0.28.0) (2025-07-04)
+
+### ⚠ BREAKING CHANGES
+
+* **tx-construction:** remove validateValue and validateValues from OutputValidator
+
+### Features
+
+* **tx-construction:** remove validateValue and validateValues from OutputValidator ([d951644](https://github.com/input-output-hk/cardano-js-sdk/commit/d9516444f34a09be9437753c75eae311713730e1))
+
+### Bug Fixes
+
+* **tx-construction:** use output address size as minimum coin computation param ([42bb1c7](https://github.com/input-output-hk/cardano-js-sdk/commit/42bb1c72e8c3f9db0099a801269e7acb6e74369e))
+
 ## [0.27.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.27.4...@cardano-sdk/tx-construction@0.27.5) (2025-07-01)
 
 **Note:** Version bump only for package @cardano-sdk/tx-construction
