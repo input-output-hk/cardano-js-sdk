@@ -22,7 +22,12 @@ describe('PersonalWallet/metadata', () => {
   test('can submit tx with metadata and then query it', async () => {
     const metadata: Cardano.TxMetadata = new Map([[123n, '1234']]);
     const walletUtil = createWalletUtil(wallet);
-    const { minimumCoin } = await walletUtil.validateValue({ coins: 0n });
+    const { minimumCoin } = await walletUtil.validateOutput({
+      address: Cardano.PaymentAddress(
+        'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
+      ),
+      value: { coins: 0n }
+    });
 
     // Make sure the wallet has sufficient funds to run this test
     await walletReady(wallet, minimumCoin);
