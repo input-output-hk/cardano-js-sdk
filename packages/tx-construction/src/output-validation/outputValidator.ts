@@ -39,14 +39,6 @@ export const createOutputValidator = ({
       tokenBundleSizeExceedsLimit: tokenBundleSizeExceedsLimit(maxValueSize)(value.assets)
     };
   };
-  const validateValues = async (values: Iterable<Cardano.Value>) => {
-    const protocolParameters = await protocolParametersGetter();
-    const validations = new Map<Cardano.Value, OutputValidation>();
-    for (const value of values) {
-      validations.set(value, await validateValue(value, protocolParameters));
-    }
-    return validations;
-  };
   const validateOutput = async (
     output: Cardano.TxOut,
     protocolParameters?: ProtocolParametersRequiredByOutputValidator
@@ -61,8 +53,6 @@ export const createOutputValidator = ({
         validations.set(output, await validateOutput(output, protocolParameters));
       }
       return validations;
-    },
-    validateValue,
-    validateValues
+    }
   };
 };
