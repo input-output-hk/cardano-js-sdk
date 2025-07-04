@@ -12,15 +12,12 @@ import { computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit } from '../inpu
 export const createOutputValidator = ({
   protocolParameters: protocolParametersGetter
 }: OutputValidatorContext): OutputValidator => {
-  const validateValue = async (
-    value: Cardano.Value,
+  const validateOutput = async (
+    { address, value }: Cardano.TxOut,
     protocolParameters?: ProtocolParametersRequiredByOutputValidator
-  ): Promise<OutputValidation> => {
+  ) => {
     const { coinsPerUtxoByte, maxValueSize } = protocolParameters || (await protocolParametersGetter());
-    const stubMaxSizeAddress = Cardano.PaymentAddress(
-      'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
-    );
-    const stubTxOut: Cardano.TxOut = { address: stubMaxSizeAddress, value };
+    const stubTxOut: Cardano.TxOut = { address, value };
     const negativeAssetQty = value.assets ? [...value.assets.values()].some((qty) => qty <= 0) : false;
     if (negativeAssetQty) {
       // return early, otherwise 'minimumCoin/maxValueSize' will fail with error: "ParseIntError { kind: InvalidDigit }"
@@ -39,10 +36,6 @@ export const createOutputValidator = ({
       tokenBundleSizeExceedsLimit: tokenBundleSizeExceedsLimit(maxValueSize)(value.assets)
     };
   };
-  const validateOutput = async (
-    output: Cardano.TxOut,
-    protocolParameters?: ProtocolParametersRequiredByOutputValidator
-  ) => validateValue(output.value, protocolParameters);
 
   return {
     validateOutput,

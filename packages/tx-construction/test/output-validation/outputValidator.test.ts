@@ -96,5 +96,22 @@ describe('createOutputValidator', () => {
         ).negativeAssetQty
       ).toBe(true);
     });
+
+    it('uses output address size as minimum coin computation parameter', async () => {
+      const value: Cardano.Value = { coins: 123n };
+      const { minimumCoin: byronAddressMinimumCoin } = await validator.validateOutput({
+        address: Cardano.PaymentAddress(
+          'DdzFFzCqrht4PWfBGtmrQz4x1GkZHYLVGbK7aaBkjWxujxzz3L5GxCgPiTsks5RjUr3yX9KvwKjNJBt7ZzPCmS3fUQrGeRvo9Y1YBQKQ'
+        ),
+        value
+      });
+      const { minimumCoin: shelleyAddressMinimumCoin } = await validator.validateOutput({
+        address: Cardano.PaymentAddress(
+          'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
+        ),
+        value
+      });
+      expect(byronAddressMinimumCoin).toBeGreaterThan(shelleyAddressMinimumCoin);
+    });
   });
 });
