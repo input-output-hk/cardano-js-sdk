@@ -116,16 +116,19 @@ export class BlockfrostAssetProvider extends BlockfrostProvider implements Asset
   private mapTokenMetadata(assetId: Cardano.AssetId, asset: Responses['asset']): Asset.TokenMetadata {
     return {
       assetId,
-      decimals: asset.metadata?.decimals || undefined,
+      decimals:
+        (typeof asset.onchain_metadata?.decimals === 'number'
+          ? asset.onchain_metadata.decimals
+          : asset.metadata?.decimals) || undefined,
       desc: this.metadatumToString(
-        asset.metadata?.description || (asset.onchain_metadata?.description as string | string[] | undefined)
+        (asset.onchain_metadata?.description as string | string[] | undefined) || asset.metadata?.description
       ),
       icon: this.metadatumToString(
-        asset.metadata?.logo || (asset.onchain_metadata?.image as string | string[] | undefined)
+        (asset.onchain_metadata?.image as string | string[] | undefined) || asset.metadata?.logo
       ),
-      name: asset.metadata?.name || (asset.onchain_metadata?.name as string | undefined),
-      ticker: asset.metadata?.ticker || undefined,
-      url: asset.metadata?.url || undefined,
+      name: (asset.onchain_metadata?.name as string | undefined) || asset.metadata?.name,
+      ticker: (asset.onchain_metadata?.ticker as string | undefined) || asset.metadata?.ticker || undefined,
+      url: (asset.onchain_metadata?.url as string | undefined) || asset.metadata?.url || undefined,
       version: '1.0'
     };
   }
