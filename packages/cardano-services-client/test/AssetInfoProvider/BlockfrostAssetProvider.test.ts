@@ -214,5 +214,97 @@ describe('BlockfrostAssetProvider', () => {
 
       expect(response.nftMetadata!.version).toBe('2.0');
     });
+
+    describe('onchain_metadata undefined values', () => {
+      const mockedAssetIdOnChainMetadata = Cardano.AssetId(
+        'ecbe846aa1a535579d67f9480fa6173b64d7e239df0460eba36e3ad00014df1053617475726e'
+      );
+
+      const baseResponse = {
+        asset: mockedAssetIdOnChainMetadata,
+        asset_name: '0014df1053617475726e',
+        fingerprint: 'asset1lnu3hw2pjw8xfprg7722mh0yu2vfzvk8ta60h0',
+        initial_mint_tx_hash: 'dcdd8ed32a71523a8393caab9d657964e50648fe0277de77add22b839e6fdb88',
+        metadata: null,
+        mint_or_burn_count: 1,
+        onchain_metadata: {
+          decimals: 6,
+          description:
+            'Saturn is the governance token for the Saturn Swap protocol, a fast and simple decentralized exchange on the Cardano blockchain. https://saturnswap.io/',
+          logo: 'ipfs://Qmc2RWQxCmAaXn7YGZsXCcs2J5uwW8qQwYzmjh1gUiZBWA',
+          mediaType: '49696d6167652f706e67',
+          name: 'Saturn',
+          ticker: 'SATURN',
+          url: 'ipfs://Qmc2RWQxCmAaXn7YGZsXCcs2J5'
+        },
+        onchain_metadata_extra: 'd8799fff',
+        onchain_metadata_standard: 'CIP68v1',
+        policy_id: 'ecbe846aa1a535579d67f9480fa6173b64d7e239df0460eba36e3ad0',
+        quantity: '100000000000000'
+      } as Responses['asset'];
+
+      test('handles undefined onchain_metadata.decimals', async () => {
+        const responseWithUndefinedDecimals = {
+          ...baseResponse,
+          onchain_metadata: {
+            ...baseResponse.onchain_metadata,
+            decimals: undefined
+          }
+        };
+
+        mockResponses(request, [[`assets/${mockedAssetIdOnChainMetadata}`, responseWithUndefinedDecimals]]);
+
+        const response = await provider.getAsset({
+          assetId: mockedAssetIdOnChainMetadata,
+          extraData: { tokenMetadata: true }
+        });
+
+        expect(response.tokenMetadata!.decimals).toBeUndefined();
+        expect(response.tokenMetadata!.ticker).toBe('SATURN');
+        expect(response.tokenMetadata!.url).toBe('ipfs://Qmc2RWQxCmAaXn7YGZsXCcs2J5');
+      });
+
+      test('handles undefined onchain_metadata.ticker', async () => {
+        const responseWithUndefinedTicker = {
+          ...baseResponse,
+          onchain_metadata: {
+            ...baseResponse.onchain_metadata,
+            ticker: undefined
+          }
+        };
+
+        mockResponses(request, [[`assets/${mockedAssetIdOnChainMetadata}`, responseWithUndefinedTicker]]);
+
+        const response = await provider.getAsset({
+          assetId: mockedAssetIdOnChainMetadata,
+          extraData: { tokenMetadata: true }
+        });
+
+        expect(response.tokenMetadata!.decimals).toBe(6);
+        expect(response.tokenMetadata!.ticker).toBeUndefined();
+        expect(response.tokenMetadata!.url).toBe('ipfs://Qmc2RWQxCmAaXn7YGZsXCcs2J5');
+      });
+
+      test('handles undefined onchain_metadata.url', async () => {
+        const responseWithUndefinedUrl = {
+          ...baseResponse,
+          onchain_metadata: {
+            ...baseResponse.onchain_metadata,
+            url: undefined
+          }
+        };
+
+        mockResponses(request, [[`assets/${mockedAssetIdOnChainMetadata}`, responseWithUndefinedUrl]]);
+
+        const response = await provider.getAsset({
+          assetId: mockedAssetIdOnChainMetadata,
+          extraData: { tokenMetadata: true }
+        });
+
+        expect(response.tokenMetadata!.decimals).toBe(6);
+        expect(response.tokenMetadata!.ticker).toBe('SATURN');
+        expect(response.tokenMetadata!.url).toBeUndefined();
+      });
+    });
   });
 });
