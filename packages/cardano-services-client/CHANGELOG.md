@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.21](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.26.20...@cardano-sdk/cardano-services-client@0.26.21) (2025-07-14)
+
+### Bug Fixes
+
+* **cardano-services-client:** enhance token metadata mapping to include on-chain metadata fields ([d31356a](https://github.com/input-output-hk/cardano-js-sdk/commit/d31356aa63801fc2a4a4d039d300215211293ebb))
+
 ## [0.26.20](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.26.19...@cardano-sdk/cardano-services-client@0.26.20) (2025-07-11)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services-client
