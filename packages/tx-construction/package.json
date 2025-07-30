@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/tx-construction",
-  "version": "0.28.1",
+  "version": "0.28.2",
   "description": "Types and functions for constructing transactions on Cardano",
   "engines": {
     "node": ">=16.20.2"

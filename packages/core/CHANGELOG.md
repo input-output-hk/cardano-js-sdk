@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.46.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.46.4...@cardano-sdk/core@0.46.5) (2025-07-30)
+
+### Bug Fixes
+
+* **core:** fix canonical serialization when outputs are empty ([958c236](https://github.com/input-output-hk/cardano-js-sdk/commit/958c23687271f3dde82eb7844f4b56c78b822a81))
+
 ## [0.46.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.46.3...@cardano-sdk/core@0.46.4) (2025-07-11)
 
 **Note:** Version bump only for package @cardano-sdk/core
