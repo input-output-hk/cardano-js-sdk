@@ -107,7 +107,7 @@ export class TransactionBody {
       writer.writeEncodedValue(hexToBytes(this.#inputs.toCbor()));
     }
 
-    if (this.#outputs !== undefined && this.#outputs.length > 0) {
+    if (this.#outputs !== undefined) {
       writer.writeInt(1n);
       writer.writeStartArray(this.#outputs.length);
 
@@ -421,7 +421,7 @@ export class TransactionBody {
       treasuryValue: this.#currentTreasuryValue,
       update: this.#update ? this.#update.toCore() : undefined,
       validityInterval:
-        this.#ttl || this.#validityStartInterval !== undefined
+        this.#ttl !== undefined || this.#validityStartInterval !== undefined
           ? {
               invalidBefore: this.#validityStartInterval,
               invalidHereafter: this.#ttl
@@ -968,7 +968,7 @@ export class TransactionBody {
     let mapSize = 0;
 
     if (this.#inputs !== undefined && this.#inputs.size() > 0) ++mapSize;
-    if (this.#outputs !== undefined && this.#outputs.length > 0) ++mapSize;
+    if (this.#outputs !== undefined) ++mapSize;
     if (this.#fee !== undefined) ++mapSize;
     if (this.#ttl !== undefined) ++mapSize;
     if (this.#certs !== undefined && this.#certs.size() > 0) ++mapSize;

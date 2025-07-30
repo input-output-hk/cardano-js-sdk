@@ -143,4 +143,13 @@ describe('Transaction', () => {
       '2d7f290c815e061fb7c27e91d2a898bd7b454a71c9b7a26660e2257ac31ebe32'
     );
   });
+
+  it('can roundtrip tx with ttl 0 and no outputs', () => {
+    const cbor = TxCBOR(
+      '84a700818258200000000000000000000000000000000000000000000000000000000000000000000180020003000758203f5c96d4e519a27e7e62d3e19c05aa352431fccc60fc2255e7d479a2bf1a01110e81581cf120862e979a660a8a068485a930e78de8a5804aff7612895b1f77250f01a0f5a10075544f444f3a2046494c4c20494e204d455353414745'
+    );
+    const tx = Transaction.fromCbor(cbor).toCore();
+
+    expect(Transaction.fromCore(tx).toCbor()).toBe(cbor);
+  });
 });
