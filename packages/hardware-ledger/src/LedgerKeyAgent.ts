@@ -67,7 +67,7 @@ const LedgerConnection = (_LedgerConnection as any).default
   : _LedgerConnection;
 type LedgerConnection = _LedgerConnection;
 
-const CIP08_SIGN_HASH_THRESHOLD = 100;
+const CIP08_SIGN_HASH_THRESHOLD = 190;
 
 const isUsbDevice = (device: any): device is USBDevice =>
   typeof USBDevice !== 'undefined' && device instanceof USBDevice;
