@@ -67,7 +67,8 @@ const LedgerConnection = (_LedgerConnection as any).default
   : _LedgerConnection;
 type LedgerConnection = _LedgerConnection;
 
-const CIP08_SIGN_HASH_THRESHOLD = 190;
+/* https://github.com/vacuumlabs/ledger-app-cardano-shelley/blob/f01201e0e7a2b3bb4ceace13044dc0c59d21797b/src/signMsg.h#L17 */
+const CIP08_SIGN_HASH_THRESHOLD = 198;
 
 const isUsbDevice = (device: any): device is USBDevice =>
   typeof USBDevice !== 'undefined' && device instanceof USBDevice;
