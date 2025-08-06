@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.16.10...@cardano-sdk/hardware-ledger@0.16.11) (2025-08-06)
+
+### Bug Fixes
+
+* **hardware-ledger:** fix signData payload size calculation ([335921f](https://github.com/input-output-hk/cardano-js-sdk/commit/335921f9a23fab425819c087b6ca7eb604835bd3))
+
 ## [0.16.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.16.9...@cardano-sdk/hardware-ledger@0.16.10) (2025-08-05)
 
 **Note:** Version bump only for package @cardano-sdk/hardware-ledger
