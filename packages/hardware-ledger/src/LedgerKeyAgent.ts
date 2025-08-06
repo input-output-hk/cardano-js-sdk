@@ -810,7 +810,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
   }
 
   async signCip8Data(request: cip8.Cip8SignDataContext): Promise<Cip30DataSignature> {
-    const hashPayload = request.payload.length >= CIP08_SIGN_HASH_THRESHOLD;
+    const hashPayload = request.payload.length / 2 >= CIP08_SIGN_HASH_THRESHOLD;
     try {
       const dRepPublicKey = await this.derivePublicKey(util.DREP_KEY_DERIVATION_PATH);
       const dRepKeyHashHex = (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex();
