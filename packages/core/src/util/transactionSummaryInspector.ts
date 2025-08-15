@@ -28,7 +28,7 @@ interface TransactionSummaryInspectorArgs {
   addresses: Cardano.PaymentAddress[];
   rewardAccounts: Cardano.RewardAccount[];
   inputResolver: Cardano.InputResolver;
-  protocolParameters: Cardano.ProtocolParameters;
+  protocolParameters: Pick<Cardano.ProtocolParameters, 'poolDeposit' | 'stakeKeyDeposit'>;
   assetProvider: AssetProvider;
   dRepKeyHash?: Crypto.Ed25519KeyHashHex;
   timeout: Milliseconds;
