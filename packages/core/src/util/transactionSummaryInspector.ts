@@ -51,6 +51,7 @@ export type TransactionSummaryInspection = {
     inputs: Cardano.TxIn[];
     value: Cardano.Value;
   };
+  resolvedInputs: ResolutionResult['resolvedInputs'];
 };
 
 export type TransactionSummaryInspector = (
@@ -232,6 +233,7 @@ export const transactionSummaryInspector: TransactionSummaryInspector =
       collateral,
       deposit: implicit.deposit || 0n,
       fee,
+      resolvedInputs: resolvedInputs.resolvedInputs,
       returnedDeposit: implicit.reclaimDeposit || 0n,
       unresolved: {
         inputs: resolvedInputs.unresolvedInputs,

@@ -6,6 +6,7 @@ import {
   AssetInfoWithAmount,
   AssetProvider,
   Milliseconds,
+  TransactionSummaryInspection,
   createTxInspector,
   transactionSummaryInspector
 } from '../../src';
@@ -339,7 +340,7 @@ describe('Transaction Summary Inspector', () => {
     const { summary } = await inspectTx(tx);
 
     // Assert
-    expect(summary).toEqual({
+    expect(summary).toEqual<TransactionSummaryInspection>({
       assets: buildAssetInfoWithAmount([
         [assetInfos[AssetInfoIdx.A], 1n],
         [assetInfos[AssetInfoIdx.C], -1n],
@@ -352,6 +353,20 @@ describe('Transaction Summary Inspector', () => {
       collateral: 0n,
       deposit: 0n,
       fee,
+      resolvedInputs: [
+        {
+          ...tx.body.inputs[0],
+          value: histTx[0].body.outputs[0].value
+        },
+        {
+          ...tx.body.inputs[1],
+          value: histTx[0].body.outputs[1].value
+        },
+        {
+          ...tx.body.inputs[2],
+          value: histTx[0].body.outputs[2].value
+        }
+      ],
       returnedDeposit: 0n,
       unresolved: {
         inputs: [],
@@ -444,6 +459,12 @@ describe('Transaction Summary Inspector', () => {
       collateral: 10_000_000n,
       deposit: 0n,
       fee,
+      resolvedInputs: [
+        {
+          ...tx.body.inputs[0],
+          value: histTx[0].body.outputs[0].value
+        }
+      ],
       returnedDeposit: 0n,
       unresolved: {
         inputs: [],
@@ -538,6 +559,12 @@ describe('Transaction Summary Inspector', () => {
       collateral: 25_000_000n,
       deposit: 0n,
       fee,
+      resolvedInputs: [
+        {
+          ...tx.body.inputs[0],
+          value: histTx[0].body.outputs[0].value
+        }
+      ],
       returnedDeposit: 0n,
       unresolved: {
         inputs: [],
@@ -624,6 +651,12 @@ describe('Transaction Summary Inspector', () => {
       collateral: 5_000_000n,
       deposit: 0n,
       fee,
+      resolvedInputs: [
+        {
+          ...tx.body.inputs[0],
+          value: histTx[0].body.outputs[0].value
+        }
+      ],
       returnedDeposit: 0n,
       unresolved: {
         inputs: [],
@@ -693,6 +726,12 @@ describe('Transaction Summary Inspector', () => {
       collateral: 0n,
       deposit: 2_000_000n,
       fee,
+      resolvedInputs: [
+        {
+          ...tx.body.inputs[0],
+          value: histTx[0].body.outputs[0].value
+        }
+      ],
       returnedDeposit: 0n,
       unresolved: {
         inputs: [],
@@ -762,6 +801,12 @@ describe('Transaction Summary Inspector', () => {
       collateral: 0n,
       deposit: 0n,
       fee,
+      resolvedInputs: [
+        {
+          ...tx.body.inputs[0],
+          value: histTx[0].body.outputs[0].value
+        }
+      ],
       returnedDeposit: 2_000_000n,
       unresolved: {
         inputs: [],
@@ -840,6 +885,12 @@ describe('Transaction Summary Inspector', () => {
       collateral: 0n,
       deposit: 15_000_000n,
       fee,
+      resolvedInputs: [
+        {
+          ...tx.body.inputs[0],
+          value: histTx[0].body.outputs[0].value
+        }
+      ],
       returnedDeposit: 0n,
       unresolved: {
         inputs: [],
@@ -918,6 +969,12 @@ describe('Transaction Summary Inspector', () => {
       collateral: 0n,
       deposit: 0n,
       fee,
+      resolvedInputs: [
+        {
+          ...tx.body.inputs[0],
+          value: histTx[0].body.outputs[0].value
+        }
+      ],
       returnedDeposit: 15_000_000n,
       unresolved: {
         inputs: [],
@@ -1011,6 +1068,12 @@ describe('Transaction Summary Inspector', () => {
       collateral: 0n,
       deposit: 0n,
       fee,
+      resolvedInputs: [
+        {
+          ...tx.body.inputs[0],
+          value: histTx[0].body.outputs[0].value
+        }
+      ],
       returnedDeposit: 0n,
       unresolved: {
         inputs: [
@@ -1100,6 +1163,7 @@ describe('Transaction Summary Inspector', () => {
       collateral: 0n,
       deposit: 0n,
       fee,
+      resolvedInputs: [],
       returnedDeposit: 0n,
       unresolved: {
         inputs: [
@@ -1199,6 +1263,19 @@ describe('Transaction Summary Inspector', () => {
         "collateral": 0n,
         "deposit": 0n,
         "fee": 170000n,
+        "resolvedInputs": Array [
+          Object {
+            "address": "addr1z8phkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gten0d3vllmyqwsx5wktcd8cc3sq835lu7drv2xwl2wywfgs9yc0hh",
+            "index": 0,
+            "txId": "bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0",
+            "value": Object {
+              "assets": Map {
+                "659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41" => 5n,
+              },
+              "coins": 3000000n,
+            },
+          },
+        ],
         "returnedDeposit": 0n,
         "unresolved": Object {
           "inputs": Array [],
