@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.28.2...@cardano-sdk/tx-construction@0.28.3) (2025-08-17)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
 ## [0.28.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.28.1...@cardano-sdk/tx-construction@0.28.2) (2025-07-30)
 
 **Note:** Version bump only for package @cardano-sdk/tx-construction

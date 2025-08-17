@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.46.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.46.5...@cardano-sdk/core@0.46.6) (2025-08-17)
+
+### Features
+
+* [LW-13150] narrow down type for protocol parameters in summary inspector ([7a74486](https://github.com/input-output-hk/cardano-js-sdk/commit/7a744861aba42c8200985101ad00f887cc945232))
+
 ## [0.46.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.46.4...@cardano-sdk/core@0.46.5) (2025-07-30)
 
 ### Bug Fixes

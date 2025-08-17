@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/hardware-ledger",
-  "version": "0.16.12",
+  "version": "0.16.13",
   "description": "Mappings and integration with Ledger hardware",
   "engines": {
     "node": ">=16.20.2"

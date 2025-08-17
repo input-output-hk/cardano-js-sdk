@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.53.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.53.13...@cardano-sdk/wallet@0.53.14) (2025-08-17)
+
+**Note:** Version bump only for package @cardano-sdk/wallet
+
 ## [0.53.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.53.12...@cardano-sdk/wallet@0.53.13) (2025-08-06)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
