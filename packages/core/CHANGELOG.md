@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.46.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.46.6...@cardano-sdk/core@0.46.7) (2025-08-19)
+
+### Features
+
+* **core:** return resolved inputs from summary inspector ([23b4f26](https://github.com/input-output-hk/cardano-js-sdk/commit/23b4f26d7fe2642cfbcc92adb52a2db7f8991c9e))
+
 ## [0.46.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.46.5...@cardano-sdk/core@0.46.6) (2025-08-17)
 
 ### Features
