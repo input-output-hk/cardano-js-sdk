@@ -8,7 +8,7 @@ import type { Milliseconds } from './time';
 
 type TryGetAssetInfosProps = {
   assetIds: Cardano.AssetId[];
-  assetProvider: AssetProvider;
+  assetProvider: Pick<AssetProvider, 'getAssets'>;
   timeout: Milliseconds;
   logger: Logger;
 };

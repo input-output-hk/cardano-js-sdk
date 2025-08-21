@@ -29,7 +29,7 @@ interface TransactionSummaryInspectorArgs {
   rewardAccounts: Cardano.RewardAccount[];
   inputResolver: Cardano.InputResolver;
   protocolParameters: Pick<Cardano.ProtocolParameters, 'poolDeposit' | 'stakeKeyDeposit'>;
-  assetProvider: AssetProvider;
+  assetProvider: Pick<AssetProvider, 'getAssets'>;
   dRepKeyHash?: Crypto.Ed25519KeyHashHex;
   timeout: Milliseconds;
   logger: Logger;
@@ -59,7 +59,7 @@ export type TransactionSummaryInspector = (
 ) => Inspector<TransactionSummaryInspection>;
 
 type IntoTokenTransferValueProps = {
-  assetProvider: AssetProvider;
+  assetProvider: Pick<AssetProvider, 'getAssets'>;
   logger: Logger;
   timeout: Milliseconds;
   tokenMap?: TokenMap;
