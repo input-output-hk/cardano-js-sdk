@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.29.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.29.6...@cardano-sdk/key-management@0.29.7) (2025-08-21)
+
+**Note:** Version bump only for package @cardano-sdk/key-management
+
 ## [0.29.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.29.5...@cardano-sdk/key-management@0.29.6) (2025-08-19)
 
 **Note:** Version bump only for package @cardano-sdk/key-management
