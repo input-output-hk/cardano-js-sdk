@@ -1,6 +1,8 @@
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import {
+  CONTEXT_WITHOUT_KNOWN_ADDRESSES,
   CONTEXT_WITH_KNOWN_ADDRESSES,
+  byronEraTxOut,
   txOut,
   txOutToOwnedAddress,
   txOutWithReferenceScript,
@@ -117,6 +119,23 @@ describe('txOut', () => {
             ]
           }
         ]
+      });
+    });
+
+    it('can map a simple txOut to Byron era address', async () => {
+      const out = toTxOut({ index: 0, isCollateral: false, txOut: byronEraTxOut }, CONTEXT_WITHOUT_KNOWN_ADDRESSES);
+
+      expect(out).toEqual({
+        amount: 20_000_000n,
+        datumHashHex: null,
+        destination: {
+          params: {
+            addressHex: '82d818582183581c54473376651c3d50b7a85055bb2395751e2db78bcb65410e1624989ca0001a73156e8e'
+          },
+          type: Ledger.TxOutputDestinationType.THIRD_PARTY
+        },
+        format: Ledger.TxOutputFormat.ARRAY_LEGACY,
+        tokenBundle: null
       });
     });
 

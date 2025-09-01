@@ -183,6 +183,24 @@ describe('LedgerKeyAgent', () => {
           }
         }
       ];
+
+      const byronOutputs = [
+        {
+          address: Cardano.PaymentAddress('FHnt4NL7yPXtsWVUqTv1Tr1ZSarFUYHS2DFLRUJwtqx8RnpZ8s8JefSYTekFcSF'),
+          value: { coins: 11_111_111n }
+        }
+      ];
+
+      const byronProps: InitializeTxProps = {
+        options: {
+          validityInterval: {
+            invalidBefore: Cardano.Slot(1),
+            invalidHereafter: Cardano.Slot(999_999_999)
+          }
+        },
+        outputs: new Set<Cardano.TxOut>(byronOutputs)
+      };
+
       const props: InitializeTxProps = {
         options: {
           validityInterval: {
@@ -230,6 +248,13 @@ describe('LedgerKeyAgent', () => {
         const {
           witness: { signatures }
         } = await wallet.finalizeTx({ tx: txInternals });
+        expect(signatures.size).toBe(2);
+      });
+
+      it('successfully signs a transaction with byron address output', async () => {
+        const {
+          witness: { signatures }
+        } = await wallet.finalizeTx({ tx: await wallet.initializeTx(byronProps) });
         expect(signatures.size).toBe(2);
       });
 
