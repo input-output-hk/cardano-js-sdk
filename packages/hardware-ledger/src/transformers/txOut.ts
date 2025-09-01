@@ -40,9 +40,15 @@ const toDestination: Transform<Cardano.TxOut, Ledger.TxOutputDestination, Ledger
     };
   }
 
+  const address = Cardano.Address.fromString(txOut.address);
+
+  if (!address) {
+    throw new InvalidArgumentError('txOut', 'Invalid address format.');
+  }
+
   return {
     params: {
-      addressHex: Cardano.Address.fromBech32(txOut.address).toBytes()
+      addressHex: address.toBytes()
     },
     type: Ledger.TxOutputDestinationType.THIRD_PARTY
   };

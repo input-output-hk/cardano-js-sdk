@@ -126,6 +126,13 @@ export const txOut: Cardano.TxOut = {
   value: valueWithAssets
 };
 
+export const byronEraTxOut: Cardano.TxOut = {
+  address: Cardano.PaymentAddress('Ae2tdPwUPEZ5DW1am2FnANGLW2qReao5xXX7dcC86x2JAg39oo7oanFNbrd'),
+  value: {
+    coins: 20_000_000n
+  }
+};
+
 export const txOutToOwnedAddress: Cardano.TxOut = {
   address: paymentAddress,
   datumHash: Crypto.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
