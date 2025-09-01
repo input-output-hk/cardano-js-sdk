@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.46.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.46.8...@cardano-sdk/core@0.46.9) (2025-09-01)
+
+### Bug Fixes
+
+* ledger hardware wallets can now create byron era outputs ([bf355c1](https://github.com/input-output-hk/cardano-js-sdk/commit/bf355c13fc39d1b9d5851692b8b3f3a8402144ce))
+
 ## [0.46.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.46.7...@cardano-sdk/core@0.46.8) (2025-08-21)
 
 **Note:** Version bump only for package @cardano-sdk/core
