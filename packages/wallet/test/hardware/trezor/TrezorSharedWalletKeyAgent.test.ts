@@ -21,6 +21,16 @@ describe('TrezorSharedWalletKeyAgent', () => {
     shouldHandlePassphrase: true
   };
 
+  const trezorConfigWithDerivationType: TrezorConfig = {
+    communicationType: CommunicationType.Node,
+    derivationType: 'ICARUS',
+    manifest: {
+      appUrl: 'https://your.application.com',
+      email: 'email@developer.com'
+    },
+    shouldHandlePassphrase: true
+  };
+
   beforeAll(async () => {
     trezorKeyAgent = await TrezorKeyAgent.createWithDevice(
       {
@@ -115,6 +125,74 @@ describe('TrezorSharedWalletKeyAgent', () => {
         tx: txInternals
       });
       expect(witnessedTx.witness.signatures.size).toBe(1);
+    });
+  });
+
+  describe('Derivation Type Support', () => {
+    it('should work with different derivation types in multi-sig', async () => {
+      const icarusKeyAgent = await TrezorKeyAgent.createWithDevice(
+        {
+          chainId: Cardano.ChainIds.Preprod,
+          purpose: KeyPurpose.MULTI_SIG,
+          trezorConfig: trezorConfigWithDerivationType
+        },
+        {
+          bip32Ed25519: await Crypto.SodiumBip32Ed25519.create(),
+          logger
+        }
+      );
+
+      const paymentKeyHash = icarusKeyAgent.bip32Ed25519.getPubKeyHash(
+        await icarusKeyAgent.derivePublicKey({ index: 0, role: KeyRole.External })
+      );
+
+      const icarusPaymentScript: Cardano.NativeScript = {
+        __type: Cardano.ScriptType.Native,
+        kind: Cardano.NativeScriptKind.RequireAnyOf,
+        scripts: [
+          {
+            __type: Cardano.ScriptType.Native,
+            keyHash: paymentKeyHash,
+            kind: Cardano.NativeScriptKind.RequireSignature
+          }
+        ]
+      };
+
+      const icarusWallet = createSharedWallet(
+        { name: 'ICARUS Shared HW Wallet' },
+        {
+          assetProvider: mocks.mockAssetProvider(),
+          chainHistoryProvider: mocks.mockChainHistoryProvider(),
+          logger,
+          networkInfoProvider: mocks.mockNetworkInfoProvider(),
+          paymentScript: icarusPaymentScript,
+          rewardAccountInfoProvider: mocks.mockRewardAccountInfoProvider(),
+          rewardsProvider: mocks.mockRewardsProvider(),
+          stakingScript: icarusPaymentScript,
+          txSubmitProvider: mocks.mockTxSubmitProvider(),
+          utxoProvider: mocks.mockUtxoProvider(),
+          witnesser: util.createBip32Ed25519Witnesser(util.createAsyncKeyAgent(icarusKeyAgent))
+        }
+      );
+
+      const simpleOutput = {
+        address: Cardano.PaymentAddress(
+          'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w'
+        ),
+        value: { coins: 11_111_111n }
+      };
+
+      const props: InitializeTxProps = {
+        outputs: new Set<Cardano.TxOut>([simpleOutput])
+      };
+      const txInternals = await icarusWallet.initializeTx(props);
+      const witnessedTx = await icarusWallet.finalizeTx({
+        signingContext: { scripts: [icarusPaymentScript] },
+        tx: txInternals
+      });
+      expect(witnessedTx.witness.signatures.size).toBe(1);
+
+      icarusWallet.shutdown();
     });
   });
 });

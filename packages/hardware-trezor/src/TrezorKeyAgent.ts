@@ -93,6 +93,7 @@ const isMultiSig = (tx: Omit<Trezor.CardanoSignTransaction, 'signingMode'>): boo
 export class TrezorKeyAgent extends KeyAgentBase {
   readonly isTrezorInitialized: Promise<boolean>;
   readonly #communicationType: CommunicationType;
+  readonly #trezorConfig: TrezorConfig;
 
   constructor({ isTrezorInitialized, ...serializableData }: TrezorKeyAgentProps, dependencies: KeyAgentDependencies) {
     super({ ...serializableData, __typename: KeyAgentType.Trezor }, dependencies);
@@ -100,6 +101,11 @@ export class TrezorKeyAgent extends KeyAgentBase {
       this.isTrezorInitialized = TrezorKeyAgent.initializeTrezorTransport(serializableData.trezorConfig);
     }
     this.#communicationType = serializableData.trezorConfig.communicationType;
+    this.#trezorConfig = serializableData.trezorConfig;
+  }
+
+  get trezorConfig(): TrezorConfig {
+    return this.#trezorConfig;
   }
 
   static async initializeTrezorTransport({
@@ -275,7 +281,12 @@ export class TrezorKeyAgent extends KeyAgentBase {
         ...(signingMode === Trezor.PROTO.CardanoTxSigningMode.MULTISIG_TRANSACTION && {
           additionalWitnessRequests: multiSigWitnessPaths
         }),
-        signingMode
+        signingMode,
+        ...(this.trezorConfig.derivationType
+          ? {
+              derivationType: this.trezorConfig.derivationType as unknown as Trezor.PROTO.CardanoDerivationType
+            }
+          : {})
       });
 
       const expectedPublicKeys = await Promise.all(
