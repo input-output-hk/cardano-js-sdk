@@ -11,6 +11,7 @@ import {
   KeyAgentType,
   KeyPurpose,
   KeyRole,
+  MasterKeyGeneration,
   SerializableTrezorKeyAgentData,
   SignBlobResult,
   SignTransactionContext,
@@ -42,6 +43,7 @@ export interface GetTrezorXpubProps {
   accountIndex: number;
   communicationType: CommunicationType;
   purpose: KeyPurpose;
+  derivationType?: MasterKeyGeneration;
 }
 
 export interface CreateTrezorKeyAgentProps {
@@ -55,6 +57,20 @@ export type TrezorConnectInstanceType = typeof TrezorConnectNode | typeof Trezor
 
 const getTrezorConnect = (communicationType: CommunicationType): TrezorConnectInstanceType =>
   communicationType === CommunicationType.Node ? TrezorConnectNode : TrezorConnectWeb;
+
+/** Maps MasterKeyGeneration string literals to Trezor CardanoDerivationType numeric values */
+const mapDerivationType = (derivationType: MasterKeyGeneration): Trezor.PROTO.CardanoDerivationType => {
+  switch (derivationType) {
+    case 'ICARUS':
+      return Trezor.PROTO.CardanoDerivationType.ICARUS;
+    case 'ICARUS_TREZOR':
+      return Trezor.PROTO.CardanoDerivationType.ICARUS_TREZOR;
+    case 'LEDGER':
+      return Trezor.PROTO.CardanoDerivationType.LEDGER;
+    default:
+      throw new Error(`Unsupported derivation type: ${derivationType}`);
+  }
+};
 
 const stakeCredentialCert = (certificateType: Trezor.PROTO.CardanoCertificateType): boolean =>
   certificateType === Trezor.PROTO.CardanoCertificateType.STAKE_REGISTRATION ||
@@ -169,15 +185,21 @@ export class TrezorKeyAgent extends KeyAgentBase {
   static async getXpub({
     accountIndex,
     communicationType,
-    purpose
+    purpose,
+    derivationType
   }: GetTrezorXpubProps): Promise<Crypto.Bip32PublicKeyHex> {
     try {
       await TrezorKeyAgent.checkDeviceConnection(communicationType);
       const derivationPath = `m/${purpose}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'`;
       const trezorConnect = getTrezorConnect(communicationType);
+      const trezorDerivationType = derivationType ? mapDerivationType(derivationType) : undefined;
+
       const extendedPublicKey = await trezorConnect.cardanoGetPublicKey({
         path: derivationPath,
-        showOnTrezor: true
+        showOnTrezor: true,
+        ...(derivationType && {
+          derivationType: trezorDerivationType
+        })
       });
       if (!extendedPublicKey.success) {
         throw new errors.TransportError('Failed to export extended account public key', extendedPublicKey.payload);
@@ -196,6 +218,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
     const extendedAccountPublicKey = await TrezorKeyAgent.getXpub({
       accountIndex,
       communicationType: trezorConfig.communicationType,
+      derivationType: trezorConfig.derivationType,
       purpose
     });
     return new TrezorKeyAgent(
@@ -284,7 +307,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
         signingMode,
         ...(this.trezorConfig.derivationType
           ? {
-              derivationType: this.trezorConfig.derivationType as unknown as Trezor.PROTO.CardanoDerivationType
+              derivationType: mapDerivationType(this.trezorConfig.derivationType)
             }
           : {})
       });

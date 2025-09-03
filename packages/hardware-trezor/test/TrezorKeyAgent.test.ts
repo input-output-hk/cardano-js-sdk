@@ -1,5 +1,9 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import * as Trezor from '@trezor/connect';
-import { CardanoKeyConst, util } from '@cardano-sdk/key-management';
+import { Bip32Ed25519 } from '@cardano-sdk/crypto';
+import { Cardano } from '@cardano-sdk/core';
+import { CardanoKeyConst, CommunicationType, KeyPurpose, util } from '@cardano-sdk/key-management';
+import { Logger } from 'ts-log';
 import { TrezorKeyAgent } from '../src';
 import { knownAddressKeyPath, knownAddressStakeKeyPath } from './testData';
 
@@ -170,6 +174,294 @@ describe('TrezorKeyAgent', () => {
           referenceInputs: [txIn]
         });
         expect(signingMode).toEqual(Trezor.PROTO.CardanoTxSigningMode.PLUTUS_TRANSACTION);
+      });
+    });
+  });
+
+  describe('getXpub', () => {
+    const mockCardanoGetPublicKey = jest.fn();
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+      // Mock the Trezor module methods
+      jest.spyOn(TrezorKeyAgent, 'checkDeviceConnection').mockResolvedValue({} as Trezor.Features);
+      jest.spyOn(Trezor.default, 'cardanoGetPublicKey').mockImplementation(mockCardanoGetPublicKey);
+      jest.spyOn(Trezor.default, 'getFeatures').mockResolvedValue({
+        payload: {} as Trezor.Features,
+        success: true
+      });
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    describe('derivationType parameter', () => {
+      const baseProps = {
+        accountIndex: 0,
+        communicationType: CommunicationType.Node,
+        purpose: KeyPurpose.STANDARD
+      };
+
+      it('should call cardanoGetPublicKey without derivationType when not provided', async () => {
+        mockCardanoGetPublicKey.mockResolvedValue({
+          payload: { publicKey: 'a'.repeat(128) },
+          success: true
+        });
+
+        await TrezorKeyAgent.getXpub(baseProps);
+
+        expect(mockCardanoGetPublicKey).toHaveBeenCalledWith({
+          path: `m/${KeyPurpose.STANDARD}'/${CardanoKeyConst.COIN_TYPE}'/0'`,
+          showOnTrezor: true
+        });
+      });
+
+      it('should call cardanoGetPublicKey with ICARUS derivationType when provided', async () => {
+        mockCardanoGetPublicKey.mockResolvedValue({
+          payload: { publicKey: 'a'.repeat(128) },
+          success: true
+        });
+
+        await TrezorKeyAgent.getXpub({
+          ...baseProps,
+          derivationType: 'ICARUS'
+        });
+
+        expect(mockCardanoGetPublicKey).toHaveBeenCalledWith({
+          derivationType: 1, // Trezor.PROTO.CardanoDerivationType.ICARUS
+          path: `m/${KeyPurpose.STANDARD}'/${CardanoKeyConst.COIN_TYPE}'/0'`,
+          showOnTrezor: true
+        });
+      });
+
+      it('should call cardanoGetPublicKey with ICARUS_TREZOR derivationType when provided', async () => {
+        mockCardanoGetPublicKey.mockResolvedValue({
+          payload: { publicKey: 'a'.repeat(128) },
+          success: true
+        });
+
+        await TrezorKeyAgent.getXpub({
+          ...baseProps,
+          derivationType: 'ICARUS_TREZOR'
+        });
+
+        expect(mockCardanoGetPublicKey).toHaveBeenCalledWith({
+          derivationType: 2, // Trezor.PROTO.CardanoDerivationType.ICARUS_TREZOR
+          path: `m/${KeyPurpose.STANDARD}'/${CardanoKeyConst.COIN_TYPE}'/0'`,
+          showOnTrezor: true
+        });
+      });
+
+      it('should call cardanoGetPublicKey with LEDGER derivationType when provided', async () => {
+        mockCardanoGetPublicKey.mockResolvedValue({
+          payload: { publicKey: 'a'.repeat(128) },
+          success: true
+        });
+
+        await TrezorKeyAgent.getXpub({
+          ...baseProps,
+          derivationType: 'LEDGER'
+        });
+
+        expect(mockCardanoGetPublicKey).toHaveBeenCalledWith({
+          derivationType: 0, // Trezor.PROTO.CardanoDerivationType.LEDGER
+          path: `m/${KeyPurpose.STANDARD}'/${CardanoKeyConst.COIN_TYPE}'/0'`,
+          showOnTrezor: true
+        });
+      });
+
+      it('should handle different account indices with derivationType', async () => {
+        mockCardanoGetPublicKey.mockResolvedValue({
+          payload: { publicKey: 'a'.repeat(128) },
+          success: true
+        });
+
+        await TrezorKeyAgent.getXpub({
+          ...baseProps,
+          accountIndex: 5,
+          derivationType: 'ICARUS'
+        });
+
+        expect(mockCardanoGetPublicKey).toHaveBeenCalledWith({
+          derivationType: 1, // Trezor.PROTO.CardanoDerivationType.ICARUS
+          path: `m/${KeyPurpose.STANDARD}'/${CardanoKeyConst.COIN_TYPE}'/5'`,
+          showOnTrezor: true
+        });
+      });
+
+      it('should handle different purposes with derivationType', async () => {
+        mockCardanoGetPublicKey.mockResolvedValue({
+          payload: { publicKey: 'a'.repeat(128) },
+          success: true
+        });
+
+        await TrezorKeyAgent.getXpub({
+          ...baseProps,
+          derivationType: 'LEDGER',
+          purpose: KeyPurpose.MULTI_SIG
+        });
+
+        expect(mockCardanoGetPublicKey).toHaveBeenCalledWith({
+          derivationType: 0, // Trezor.PROTO.CardanoDerivationType.LEDGER
+          path: `m/${KeyPurpose.MULTI_SIG}'/${CardanoKeyConst.COIN_TYPE}'/0'`,
+          showOnTrezor: true
+        });
+      });
+
+      it('should return the public key from successful response', async () => {
+        const expectedPublicKey = 'a'.repeat(128);
+        mockCardanoGetPublicKey.mockResolvedValue({
+          payload: { publicKey: expectedPublicKey },
+          success: true
+        });
+
+        const result = await TrezorKeyAgent.getXpub({
+          ...baseProps,
+          derivationType: 'ICARUS'
+        });
+
+        expect(result).toBe(expectedPublicKey);
+      });
+
+      it('should throw TransportError when cardanoGetPublicKey fails', async () => {
+        const errorPayload = { error: 'Device not connected' };
+        mockCardanoGetPublicKey.mockResolvedValue({
+          payload: errorPayload,
+          success: false
+        });
+
+        await expect(
+          TrezorKeyAgent.getXpub({
+            ...baseProps,
+            derivationType: 'ICARUS'
+          })
+        ).rejects.toThrow('Failed to export extended account public key');
+      });
+
+      it('should throw AuthenticationError when cardanoGetPublicKey throws', async () => {
+        const error = new Error('Connection failed');
+        mockCardanoGetPublicKey.mockRejectedValue(error);
+
+        await expect(
+          TrezorKeyAgent.getXpub({
+            ...baseProps,
+            derivationType: 'ICARUS'
+          })
+        ).rejects.toThrow('Trezor transport failed');
+      });
+
+      it('should map master key generation schemes correctly to Trezor enum values', async () => {
+        // Test ICARUS mapping
+        mockCardanoGetPublicKey.mockResolvedValue({
+          payload: { publicKey: 'a'.repeat(128) },
+          success: true
+        });
+
+        await TrezorKeyAgent.getXpub({
+          ...baseProps,
+          derivationType: 'ICARUS'
+        });
+
+        expect(mockCardanoGetPublicKey).toHaveBeenCalledWith(
+          expect.objectContaining({
+            derivationType: 1 // Trezor.PROTO.CardanoDerivationType.ICARUS
+          })
+        );
+
+        // Test ICARUS_TREZOR mapping
+        await TrezorKeyAgent.getXpub({
+          ...baseProps,
+          derivationType: 'ICARUS_TREZOR'
+        });
+
+        expect(mockCardanoGetPublicKey).toHaveBeenCalledWith(
+          expect.objectContaining({
+            derivationType: 2 // Trezor.PROTO.CardanoDerivationType.ICARUS_TREZOR
+          })
+        );
+
+        // Test LEDGER mapping
+        await TrezorKeyAgent.getXpub({
+          ...baseProps,
+          derivationType: 'LEDGER'
+        });
+
+        expect(mockCardanoGetPublicKey).toHaveBeenCalledWith(
+          expect.objectContaining({
+            derivationType: 0 // Trezor.PROTO.CardanoDerivationType.LEDGER
+          })
+        );
+      });
+    });
+
+    describe('integration with createWithDevice', () => {
+      it('should pass derivationType from trezorConfig to getXpub', async () => {
+        const mockPublicKey = 'mock-public-key' as Crypto.Bip32PublicKeyHex;
+        const mockGetXpub = jest.spyOn(TrezorKeyAgent, 'getXpub').mockResolvedValue(mockPublicKey);
+        const mockInitializeTrezorTransport = jest
+          .spyOn(TrezorKeyAgent as unknown as { initializeTrezorTransport: jest.Mock }, 'initializeTrezorTransport')
+          .mockResolvedValue(true);
+
+        const trezorConfig = {
+          communicationType: CommunicationType.Node,
+          derivationType: 'ICARUS' as const,
+          manifest: {
+            appUrl: 'https://test.com',
+            email: 'test@test.com'
+          }
+        };
+
+        await TrezorKeyAgent.createWithDevice(
+          {
+            chainId: { networkId: 0, networkMagic: 999 } as unknown as Cardano.ChainId,
+            trezorConfig
+          },
+          { bip32Ed25519: {} as unknown as Bip32Ed25519, logger: {} as unknown as Logger }
+        );
+
+        expect(mockGetXpub).toHaveBeenCalledWith({
+          accountIndex: 0,
+          communicationType: CommunicationType.Node,
+          derivationType: 'ICARUS',
+          purpose: KeyPurpose.STANDARD
+        });
+
+        mockGetXpub.mockRestore();
+        mockInitializeTrezorTransport.mockRestore();
+      });
+
+      it('should not pass derivationType when not specified in trezorConfig', async () => {
+        const mockPublicKey = 'mock-public-key' as Crypto.Bip32PublicKeyHex;
+        const mockGetXpub = jest.spyOn(TrezorKeyAgent, 'getXpub').mockResolvedValue(mockPublicKey);
+        const mockInitializeTrezorTransport = jest
+          .spyOn(TrezorKeyAgent as unknown as { initializeTrezorTransport: jest.Mock }, 'initializeTrezorTransport')
+          .mockResolvedValue(true);
+
+        const trezorConfig = {
+          communicationType: CommunicationType.Node,
+          manifest: {
+            appUrl: 'https://test.com',
+            email: 'test@test.com'
+          }
+        };
+
+        await TrezorKeyAgent.createWithDevice(
+          {
+            chainId: { networkId: 0, networkMagic: 999 } as unknown as Cardano.ChainId,
+            trezorConfig
+          },
+          { bip32Ed25519: {} as unknown as Bip32Ed25519, logger: {} as unknown as Logger }
+        );
+
+        expect(mockGetXpub).toHaveBeenCalledWith({
+          accountIndex: 0,
+          communicationType: CommunicationType.Node,
+          purpose: KeyPurpose.STANDARD
+        });
+
+        mockGetXpub.mockRestore();
+        mockInitializeTrezorTransport.mockRestore();
       });
     });
   });

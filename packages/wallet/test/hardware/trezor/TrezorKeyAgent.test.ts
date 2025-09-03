@@ -1,12 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import {
-  AddressType,
-  Bip32Account,
-  CommunicationType,
-  SerializableTrezorKeyAgentData,
-  TrezorConfig,
-  util
-} from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, SerializableTrezorKeyAgentData, util } from '@cardano-sdk/key-management';
 import { AssetId, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BaseWallet, createPersonalWallet } from '../../../src';
 import { Cardano, Serialization } from '@cardano-sdk/core';
@@ -16,9 +9,9 @@ import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construct
 import { LargeFirstSelector } from '@cardano-sdk/input-selection';
 import { MockChangeAddressResolver, getPayToPubKeyHashScript, getPaymentCredential } from '../utils';
 import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
+import { createKeyAgentDependencies, trezorConfig } from './test-utils';
 import { firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
-import { mockKeyAgentDependencies } from '../../../../key-management/test/mocks';
 
 const getStakeCredential = (rewardAccount: Cardano.RewardAccount) => {
   const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
@@ -34,33 +27,65 @@ describe('TrezorKeyAgent', () => {
   let txSubmitProvider: mocks.TxSubmitProviderStub;
   let address: Cardano.PaymentAddress;
 
-  const trezorConfig: TrezorConfig = {
-    communicationType: CommunicationType.Node,
-    manifest: {
-      appUrl: 'https://your.application.com',
-      email: 'email@developer.com'
-    },
-    shouldHandlePassphrase: true
-  };
-
-  const trezorConfigWithDerivationType: TrezorConfig = {
-    communicationType: CommunicationType.Node,
-    derivationType: 'ICARUS',
-    manifest: {
-      appUrl: 'https://your.application.com',
-      email: 'email@developer.com'
-    },
-    shouldHandlePassphrase: true
-  };
+  // Key agents for different master key generation schemes
+  let defaultKeyAgent: TrezorKeyAgent;
+  let icarusKeyAgent: TrezorKeyAgent;
+  let icarusTrezorKeyAgent: TrezorKeyAgent;
+  let ledgerKeyAgent: TrezorKeyAgent;
+  let keyAgentDependencies: Awaited<ReturnType<typeof createKeyAgentDependencies>>;
 
   beforeAll(async () => {
+    keyAgentDependencies = await createKeyAgentDependencies();
+
     txSubmitProvider = mocks.mockTxSubmitProvider();
     trezorKeyAgent = await TrezorKeyAgent.createWithDevice(
       {
         chainId: Cardano.ChainIds.Preprod,
         trezorConfig
       },
-      { bip32Ed25519: await Crypto.SodiumBip32Ed25519.create(), logger }
+      keyAgentDependencies
+    );
+
+    // Create key agents for different master key generation schemes
+    defaultKeyAgent = await TrezorKeyAgent.createWithDevice(
+      {
+        chainId: Cardano.ChainIds.Preprod,
+        trezorConfig
+      },
+      keyAgentDependencies
+    );
+
+    icarusKeyAgent = await TrezorKeyAgent.createWithDevice(
+      {
+        chainId: Cardano.ChainIds.Preprod,
+        trezorConfig: {
+          ...trezorConfig,
+          derivationType: 'ICARUS'
+        }
+      },
+      keyAgentDependencies
+    );
+
+    icarusTrezorKeyAgent = await TrezorKeyAgent.createWithDevice(
+      {
+        chainId: Cardano.ChainIds.Preprod,
+        trezorConfig: {
+          ...trezorConfig,
+          derivationType: 'ICARUS_TREZOR'
+        }
+      },
+      keyAgentDependencies
+    );
+
+    ledgerKeyAgent = await TrezorKeyAgent.createWithDevice(
+      {
+        chainId: Cardano.ChainIds.Preprod,
+        trezorConfig: {
+          ...trezorConfig,
+          derivationType: 'LEDGER'
+        }
+      },
+      keyAgentDependencies
     );
     const groupedAddress = await trezorKeyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0);
     address = groupedAddress.address;
@@ -573,60 +598,47 @@ describe('TrezorKeyAgent', () => {
         chainId: Cardano.ChainIds.Preprod,
         trezorConfig
       },
-      await mockKeyAgentDependencies()
+      keyAgentDependencies
     );
     expect(trezorKeyAgentWithRandomIndex).toBeInstanceOf(TrezorKeyAgent);
     expect(trezorKeyAgentWithRandomIndex.accountIndex).toEqual(5);
     expect(trezorKeyAgentWithRandomIndex.extendedAccountPublicKey).not.toEqual(trezorKeyAgent.extendedAccountPublicKey);
   });
 
-  it('can be created with different derivation types', async () => {
-    const defaultKeyAgent = await TrezorKeyAgent.createWithDevice(
-      {
-        chainId: Cardano.ChainIds.Preprod,
-        trezorConfig
-      },
-      await mockKeyAgentDependencies()
-    );
-
-    const icarusKeyAgent = await TrezorKeyAgent.createWithDevice(
-      {
-        chainId: Cardano.ChainIds.Preprod,
-        trezorConfig: trezorConfigWithDerivationType
-      },
-      await mockKeyAgentDependencies()
-    );
-
-    const ledgerKeyAgent = await TrezorKeyAgent.createWithDevice(
-      {
-        chainId: Cardano.ChainIds.Preprod,
-        trezorConfig: {
-          ...trezorConfig,
-          derivationType: 'LEDGER'
-        }
-      },
-      await mockKeyAgentDependencies()
-    );
-
+  it('can be created with different master key generation schemes', async () => {
     expect(defaultKeyAgent).toBeInstanceOf(TrezorKeyAgent);
     expect(icarusKeyAgent).toBeInstanceOf(TrezorKeyAgent);
+    expect(icarusTrezorKeyAgent).toBeInstanceOf(TrezorKeyAgent);
     expect(ledgerKeyAgent).toBeInstanceOf(TrezorKeyAgent);
 
-    // Different derivation types should produce different extended public keys
-    expect(defaultKeyAgent.extendedAccountPublicKey).not.toEqual(icarusKeyAgent.extendedAccountPublicKey);
-    expect(defaultKeyAgent.extendedAccountPublicKey).not.toEqual(ledgerKeyAgent.extendedAccountPublicKey);
-    expect(icarusKeyAgent.extendedAccountPublicKey).not.toEqual(ledgerKeyAgent.extendedAccountPublicKey);
+    // Different master key generation schemes should produce different extended public keys
+    // Note: default uses ICARUS_TREZOR, so it should equal icarusTrezorKeyAgent
+    const defaultXPub = defaultKeyAgent.extendedAccountPublicKey;
+    const icarusXPub = icarusKeyAgent.extendedAccountPublicKey;
+    const icarusTrezorXPub = icarusTrezorKeyAgent.extendedAccountPublicKey;
+    const ledgerXPub = ledgerKeyAgent.extendedAccountPublicKey;
+
+    expect(defaultXPub).toEqual(icarusTrezorXPub);
+    expect(defaultXPub).not.toEqual(ledgerXPub);
+    expect(icarusXPub).not.toEqual(ledgerXPub);
+    expect(icarusTrezorXPub).not.toEqual(ledgerXPub);
+
+    // For ICARUS vs ICARUS_TREZOR master key generation schemes, the behavior depends on the seed length:
+    // - 12/18 word seeds: ICARUS and ICARUS_TREZOR produce the same keys
+    // - 24 word seeds: ICARUS and ICARUS_TREZOR produce different keys
+    // This is due to a documented Trezor firmware quirk with 24-word mnemonics.
+    // We can't easily detect the seed length from the device, so we test both possibilities.
+    // See README.md for detailed documentation.
+    if (icarusXPub === icarusTrezorXPub) {
+      // 12/18 word seed case - ICARUS and ICARUS_TREZOR should produce the same keys
+      expect(defaultXPub).toEqual(icarusTrezorXPub);
+    } else {
+      // 24 word seed case - ICARUS and ICARUS_TREZOR should produce different keys
+      expect(defaultXPub).toEqual(icarusXPub);
+    }
   });
 
-  it('preserves derivation type in serializable data', async () => {
-    const icarusKeyAgent = await TrezorKeyAgent.createWithDevice(
-      {
-        chainId: Cardano.ChainIds.Preprod,
-        trezorConfig: trezorConfigWithDerivationType
-      },
-      await mockKeyAgentDependencies()
-    );
-
+  it('preserves master key generation scheme in serializable data', async () => {
     const serializableData = icarusKeyAgent.serializableData as SerializableTrezorKeyAgentData;
     expect(serializableData.trezorConfig.derivationType).toBe('ICARUS');
   });
