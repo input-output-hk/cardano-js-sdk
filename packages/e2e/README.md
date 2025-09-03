@@ -24,6 +24,8 @@ The providers used during the e2e test can be configured via environment variabl
 
 If you are using _testnet_ or _mainnet_ as your test environment, ensure that the wallets you are configuring via environment variables contain some funds.
 
+For hardware wallet testing, see [Hardware Testing Guide](../wallet/HARDWARE_TESTING.md).
+
 <a name="generate_wallet"></a>
 If you need to create a new wallet via a new set of mnemonics, you can run:
 
