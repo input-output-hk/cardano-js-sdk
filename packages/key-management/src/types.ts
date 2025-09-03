@@ -43,6 +43,10 @@ export enum KeyPurpose {
   STANDARD = HD_WALLET_CIP_ID,
   MULTI_SIG = MULTISIG_CIP_ID
 }
+
+/** Master key generation algorithms supported by Trezor devices */
+export type MasterKeyGeneration = 'ICARUS' | 'ICARUS_TREZOR' | 'LEDGER';
+
 export interface AccountKeyDerivationPath {
   role: KeyRole;
   index: number;
@@ -94,6 +98,8 @@ export interface TrezorConfig {
   };
   /** When set to true, Trezor automatically handle passphrase entry by forcing it to occur on the device */
   shouldHandlePassphrase?: boolean;
+  /** Master key generation algorithm to use. Defaults to Trezor's default if not specified */
+  derivationType?: MasterKeyGeneration;
 }
 
 export interface SerializableKeyAgentDataBase {
