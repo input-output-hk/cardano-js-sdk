@@ -104,6 +104,19 @@ or
 yarn test:debug
 ```
 
+#### Hardware Testing
+
+For hardware wallet testing (Trezor/Ledger), see the [Hardware Testing Guide](packages/wallet/HARDWARE_TESTING.md) or use the automated setup:
+
+```bash
+# Set up hardware testing environment
+./packages/wallet/scripts/setup-hw-testing.sh
+
+# Run hardware tests
+yarn test:hw:trezor
+yarn test:hw:ledger
+```
+
 ### Lint
 
 ```bash

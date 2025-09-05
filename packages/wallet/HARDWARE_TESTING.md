@@ -10,7 +10,31 @@ This document explains how to set up and run hardware tests for Trezor and Ledge
 
 ## Quick Start
 
-### 1. Install Trezor Bridge
+### Option 1: Automated Setup (Recommended)
+
+Use the provided setup script to automatically install dependencies and configure your environment:
+
+```bash
+# Run the automated setup script
+./scripts/setup-hw-testing.sh
+```
+
+This script will:
+- Install Trezor Bridge automatically
+- Set up udev rules (Linux only)
+- Create necessary directories
+- Make all scripts executable
+
+### Option 2: Manual Setup
+
+#### 1. Install Trezor Bridge
+
+**Using the installation script:**
+```bash
+./scripts/install-trezor-bridge.sh
+```
+
+**Or manually:**
 
 **macOS:**
 ```bash

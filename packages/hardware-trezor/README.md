@@ -24,6 +24,18 @@ yarn add @cardano-sdk/hardware-trezor
 - **Trezor Bridge** - Required for USB communication
 - **Node.js** - Version 16.20.1 or higher
 
+### Quick Setup
+
+For automated setup of the Trezor testing environment:
+
+```bash
+# Set up Trezor testing environment (from wallet package)
+./packages/wallet/scripts/setup-hw-testing.sh
+
+# Or install Trezor Bridge only
+./packages/wallet/scripts/install-trezor-bridge.sh
+```
+
 ## Quick Start
 
 ### Basic Usage
