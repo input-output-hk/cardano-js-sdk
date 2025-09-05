@@ -12,6 +12,7 @@ mkdir -p ./test/hardware/logs
 
 # Make scripts executable
 chmod +x ./scripts/setup-hw-testing.sh
+chmod +x ./scripts/install-trezor-bridge.sh
 
 echo "📦 Installing system dependencies..."
 
@@ -31,22 +32,7 @@ fi
 # Install Trezor Bridge (if not already installed)
 if ! command -v trezord > /dev/null 2>&1; then
     echo "Installing Trezor Bridge..."
-    
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        # macOS
-        if command -v brew > /dev/null 2>&1; then
-            brew install trezor-suite
-        else
-            echo "Please install Trezor Suite from https://suite.trezor.io/"
-        fi
-    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        # Linux
-        wget -O /tmp/trezor-bridge.deb https://wallet.trezor.io/data/bridge/2.0.31/trezor-bridge_2.0.31_amd64.deb
-        sudo dpkg -i /tmp/trezor-bridge.deb || sudo apt-get install -f
-        rm /tmp/trezor-bridge.deb
-    else
-        echo "Please install Trezor Bridge manually from https://suite.trezor.io/trezor-bridge"
-    fi
+    ./scripts/install-trezor-bridge.sh
 fi
 
 echo "✅ Hardware testing environment setup complete!"
