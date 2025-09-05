@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.27](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.7.26...@cardano-sdk/hardware-trezor@0.7.27) (2025-09-05)
+
+### Bug Fixes
+
+* **hardware-trezor:** support derivationType in getXpub method ([a9dc79f](https://github.com/input-output-hk/cardano-js-sdk/commit/a9dc79f3f4f8eea37012e49ffb91c765fca089be))
+
 ## [0.7.26](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.7.25...@cardano-sdk/hardware-trezor@0.7.26) (2025-09-03)
 
 ### Features

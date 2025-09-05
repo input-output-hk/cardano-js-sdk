@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.53.19](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.53.18...@cardano-sdk/wallet@0.53.19) (2025-09-05)
+
+### Bug Fixes
+
+* **hardware-trezor:** support derivationType in getXpub method ([a9dc79f](https://github.com/input-output-hk/cardano-js-sdk/commit/a9dc79f3f4f8eea37012e49ffb91c765fca089be))
+
 ## [0.53.18](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.53.17...@cardano-sdk/wallet@0.53.18) (2025-09-03)
 
 ### Features
