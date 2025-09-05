@@ -78,3 +78,4 @@ yarn preprod:down
    - [NetworkInfo provider OpenAPI spec](./packages/cardano-services/src/NetworkInfo/openApi.json)
 1. More advanced examples of using the SDK are in the [e2e tests](./packages/e2e/test/wallet).
    Explore these examples on how to use the wallet and the client libraries.
+1. For hardware wallet testing, see [Hardware Testing Guide](./packages/wallet/HARDWARE_TESTING.md).

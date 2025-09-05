@@ -104,6 +104,10 @@ or
 yarn test:debug
 ```
 
+#### Hardware Testing
+
+For hardware wallet testing, see [Hardware Testing Guide](packages/wallet/HARDWARE_TESTING.md).
+
 ### Lint
 
 ```bash

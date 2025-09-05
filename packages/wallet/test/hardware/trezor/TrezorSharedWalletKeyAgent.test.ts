@@ -1,9 +1,10 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { BaseWallet, createSharedWallet } from '../../../src';
 import { Cardano } from '@cardano-sdk/core';
-import { CommunicationType, KeyPurpose, KeyRole, TrezorConfig, util } from '@cardano-sdk/key-management';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
+import { KeyPurpose, KeyRole, util } from '@cardano-sdk/key-management';
 import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
+import { createKeyAgentDependencies, trezorConfig } from './test-utils';
 import { dummyLogger as logger } from 'ts-log';
 import { mockProviders as mocks } from '@cardano-sdk/util-dev';
 
@@ -12,36 +13,59 @@ describe('TrezorSharedWalletKeyAgent', () => {
   let trezorKeyAgent: TrezorKeyAgent;
   let paymentScript: Cardano.NativeScript;
 
-  const trezorConfig: TrezorConfig = {
-    communicationType: CommunicationType.Node,
-    manifest: {
-      appUrl: 'https://your.application.com',
-      email: 'email@developer.com'
-    },
-    shouldHandlePassphrase: true
-  };
-
-  const trezorConfigWithDerivationType: TrezorConfig = {
-    communicationType: CommunicationType.Node,
-    derivationType: 'ICARUS',
-    manifest: {
-      appUrl: 'https://your.application.com',
-      email: 'email@developer.com'
-    },
-    shouldHandlePassphrase: true
-  };
+  // Key agents for different master key generation schemes
+  let icarusKeyAgent: TrezorKeyAgent;
+  let icarusTrezorKeyAgent: TrezorKeyAgent;
+  let ledgerKeyAgent: TrezorKeyAgent;
+  let keyAgentDependencies: Awaited<ReturnType<typeof createKeyAgentDependencies>>;
 
   beforeAll(async () => {
+    keyAgentDependencies = await createKeyAgentDependencies();
+
     trezorKeyAgent = await TrezorKeyAgent.createWithDevice(
       {
         chainId: Cardano.ChainIds.Preprod,
         purpose: KeyPurpose.MULTI_SIG,
         trezorConfig
       },
+      keyAgentDependencies
+    );
+
+    // Create key agents for different master key generation schemes
+    icarusKeyAgent = await TrezorKeyAgent.createWithDevice(
       {
-        bip32Ed25519: await Crypto.SodiumBip32Ed25519.create(),
-        logger
-      }
+        chainId: Cardano.ChainIds.Preprod,
+        purpose: KeyPurpose.MULTI_SIG,
+        trezorConfig: {
+          ...trezorConfig,
+          derivationType: 'ICARUS'
+        }
+      },
+      keyAgentDependencies
+    );
+
+    icarusTrezorKeyAgent = await TrezorKeyAgent.createWithDevice(
+      {
+        chainId: Cardano.ChainIds.Preprod,
+        purpose: KeyPurpose.MULTI_SIG,
+        trezorConfig: {
+          ...trezorConfig,
+          derivationType: 'ICARUS_TREZOR'
+        }
+      },
+      keyAgentDependencies
+    );
+
+    ledgerKeyAgent = await TrezorKeyAgent.createWithDevice(
+      {
+        chainId: Cardano.ChainIds.Preprod,
+        purpose: KeyPurpose.MULTI_SIG,
+        trezorConfig: {
+          ...trezorConfig,
+          derivationType: 'LEDGER'
+        }
+      },
+      keyAgentDependencies
     );
 
     const paymentKeyHash = trezorKeyAgent.bip32Ed25519.getPubKeyHash(
@@ -128,21 +152,33 @@ describe('TrezorSharedWalletKeyAgent', () => {
     });
   });
 
-  describe('Derivation Type Support', () => {
-    it('should work with different derivation types in multi-sig', async () => {
-      const icarusKeyAgent = await TrezorKeyAgent.createWithDevice(
-        {
-          chainId: Cardano.ChainIds.Preprod,
-          purpose: KeyPurpose.MULTI_SIG,
-          trezorConfig: trezorConfigWithDerivationType
-        },
-        {
-          bip32Ed25519: await Crypto.SodiumBip32Ed25519.create(),
-          logger
-        }
-      );
+  describe('Master Key Generation Scheme Support', () => {
+    it('should produce different extended public keys for different master key generation schemes', async () => {
+      const icarusXPub = icarusKeyAgent.extendedAccountPublicKey;
+      const icarusTrezorXPub = icarusTrezorKeyAgent.extendedAccountPublicKey;
+      const ledgerXPub = ledgerKeyAgent.extendedAccountPublicKey;
 
-      const paymentKeyHash = icarusKeyAgent.bip32Ed25519.getPubKeyHash(
+      // LEDGER should always produce different keys from both ICARUS variants
+      expect(icarusXPub).not.toEqual(ledgerXPub);
+      expect(icarusTrezorXPub).not.toEqual(ledgerXPub);
+
+      // For ICARUS vs ICARUS_TREZOR master key generation schemes, the behavior depends on the seed length:
+      // - 12/18 word seeds: ICARUS and ICARUS_TREZOR produce the same keys
+      // - 24 word seeds: ICARUS and ICARUS_TREZOR produce different keys
+      // This is due to a documented Trezor firmware quirk with 24-word mnemonics.
+      // We can't easily detect the seed length from the device, so we test both possibilities.
+      // See README.md for detailed documentation.
+      if (icarusXPub === icarusTrezorXPub) {
+        // 12/18 word seed case - ICARUS and ICARUS_TREZOR should produce the same keys
+        expect(icarusXPub).toEqual(icarusTrezorXPub);
+      } else {
+        // 24 word seed case - ICARUS and ICARUS_TREZOR should produce different keys
+        expect(icarusXPub).not.toEqual(icarusTrezorXPub);
+      }
+    });
+
+    it('should work with ICARUS master key generation scheme in multi-sig', async () => {
+      const icarusPaymentKeyHash = icarusKeyAgent.bip32Ed25519.getPubKeyHash(
         await icarusKeyAgent.derivePublicKey({ index: 0, role: KeyRole.External })
       );
 
@@ -152,7 +188,7 @@ describe('TrezorSharedWalletKeyAgent', () => {
         scripts: [
           {
             __type: Cardano.ScriptType.Native,
-            keyHash: paymentKeyHash,
+            keyHash: icarusPaymentKeyHash,
             kind: Cardano.NativeScriptKind.RequireSignature
           }
         ]
