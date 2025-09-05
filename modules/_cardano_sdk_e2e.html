@@ -16,7 +16,7 @@
 <li><a href="_cardano_sdk_e2e.html">@cardano-sdk/e2e</a></li></ul>
 <h1>Module @cardano-sdk/e2e</h1></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/b71b169/packages/e2e/src/index.ts#L1">packages/e2e/src/index.ts:1</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/53d2b35/packages/e2e/src/index.ts#L1">packages/e2e/src/index.ts:1</a></li></ul></aside>
 <section class="tsd-panel-group">
 <section class="tsd-panel tsd-typography">
 <a href="#end-to-end-tests-for-cardano-js-sdk" id="end-to-end-tests-for-cardano-js-sdk" style="color: inherit; text-decoration: none;">
@@ -36,6 +36,7 @@
 </a>
 <p>The providers used during the e2e test can be configured via environment variables or by creating a file &#39;.env&#39;; there is an example of such file in &#39;.env.example&#39;.</p>
 <p>If you are using <em>testnet</em> or <em>mainnet</em> as your test environment, ensure that the wallets you are configuring via environment variables contain some funds.</p>
+<p>For hardware wallet testing, see <a href="../wallet/HARDWARE_TESTING.md">Hardware Testing Guide</a>.</p>
 <p><a name="generate_wallet"></a>
 If you need to create a new wallet via a new set of mnemonics, you can run:</p>
 <pre><code class="language-bash"><span class="hl-1">$ </span><span class="hl-3">yarn</span><span class="hl-1"> </span><span class="hl-3">workspace</span><span class="hl-1"> </span><span class="hl-3">@cardano-sdk/e2e</span><span class="hl-1"> </span><span class="hl-3">generate-mnemonics</span>
