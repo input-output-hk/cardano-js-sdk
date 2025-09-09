@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.28](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.7.27...@cardano-sdk/hardware-trezor@0.7.28) (2025-09-09)
+
+### Bug Fixes
+
+* **hardware-trezor:** matchSigningMode now also takes into account requiredSigners field ([9d32624](https://github.com/input-output-hk/cardano-js-sdk/commit/9d32624cafe88aa846e809c51bb681c84044d2f9))
+* **hardware-trezor:** txToTrezor now sets the includeNetworkId field ([aa77b74](https://github.com/input-output-hk/cardano-js-sdk/commit/aa77b7477f182ff12a0f80c2305cc85b71c3f1c5))
+
 ## [0.7.27](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.7.26...@cardano-sdk/hardware-trezor@0.7.27) (2025-09-05)
 
 ### Bug Fixes

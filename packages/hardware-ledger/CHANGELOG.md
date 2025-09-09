@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.18](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.16.17...@cardano-sdk/hardware-ledger@0.16.18) (2025-09-09)
+
+### Bug Fixes
+
+* **hardware-ledger:** getSigningMode now also takes into account requiredSigners field ([92b19e2](https://github.com/input-output-hk/cardano-js-sdk/commit/92b19e279c88ac171255caaf19620968bad61d7b))
+
 ## [0.16.17](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.16.16...@cardano-sdk/hardware-ledger@0.16.17) (2025-09-03)
 
 **Note:** Version bump only for package @cardano-sdk/hardware-ledger
