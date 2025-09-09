@@ -1,4 +1,5 @@
 import * as Trezor from '@trezor/connect';
+import { Cardano } from '@cardano-sdk/core';
 import { CardanoKeyConst, TxInId, util } from '@cardano-sdk/key-management';
 import {
   babbageTxBodyWithScripts,
@@ -22,6 +23,34 @@ describe('tx', () => {
       expect(await txToTrezor(minValidTxBody, contextWithoutKnownAddresses)).toEqual({
         additionalWitnessRequests: [],
         fee: '10',
+        includeNetworkId: false,
+        inputs: [
+          {
+            prev_hash: txIn.txId,
+            prev_index: txIn.index
+          }
+        ],
+        networkId: 0,
+        outputs: [
+          {
+            address:
+              'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
+            amount: '10',
+            format: Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY
+          }
+        ],
+        protocolMagic: 999,
+        tagCborSets: false
+      });
+    });
+
+    test('can set includeNetworkId if network field is set', async () => {
+      expect(
+        await txToTrezor({ ...minValidTxBody, networkId: Cardano.NetworkId.Mainnet }, contextWithoutKnownAddresses)
+      ).toEqual({
+        additionalWitnessRequests: [],
+        fee: '10',
+        includeNetworkId: true,
         inputs: [
           {
             prev_hash: txIn.txId,
@@ -69,6 +98,7 @@ describe('tx', () => {
           }
         ],
         fee: '10',
+        includeNetworkId: false,
         inputs: [
           {
             path: knownAddressKeyPath,
@@ -232,6 +262,7 @@ describe('tx', () => {
           }
         ],
         fee: '10',
+        includeNetworkId: false,
         inputs: [
           {
             path: knownAddressKeyPath,
@@ -315,6 +346,7 @@ describe('tx', () => {
           format: Trezor.PROTO.CardanoTxOutputSerializationFormat.ARRAY_LEGACY
         },
         fee: '10',
+        includeNetworkId: false,
         inputs: [
           {
             prev_hash: txIn.txId,
@@ -385,6 +417,7 @@ describe('tx', () => {
           format: Trezor.PROTO.CardanoTxOutputSerializationFormat.MAP_BABBAGE
         },
         fee: '10',
+        includeNetworkId: false,
         inputs: [
           {
             path: knownAddressKeyPath,

@@ -125,6 +125,14 @@ describe('TrezorKeyAgent', () => {
       expect(signingMode).toEqual(Trezor.PROTO.CardanoTxSigningMode.ORDINARY_TRANSACTION);
     });
 
+    it('can detect ordinary transaction signing mode when we own a required signer', async () => {
+      const signingMode = TrezorKeyAgent.matchSigningMode({
+        ...validMultisigTx,
+        requiredSigners: [{ keyPath: knownAddressKeyPath }]
+      });
+      expect(signingMode).toEqual(Trezor.PROTO.CardanoTxSigningMode.ORDINARY_TRANSACTION);
+    });
+
     it('can detect pool registrations signing mode', async () => {
       const signingMode = TrezorKeyAgent.matchSigningMode({
         ...simpleTx,

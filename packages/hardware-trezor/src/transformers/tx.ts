@@ -11,6 +11,8 @@ export const trezorTxTransformer: Transformer<
   Omit<Trezor.CardanoSignTransaction, 'signingMode' | 'derivationType' | 'includeNetworkId' | 'chunkify' | 'ttl'> & {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     ttl: any; // TODO: the Transformer util cant handle ttl as TOptional<string | number>
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    includeNetworkId: any; // TODO: the Transformer util cant handle TOptional<string | boolean>
   },
   TrezorTxTransformerContext
 > = {
@@ -21,6 +23,7 @@ export const trezorTxTransformer: Transformer<
   collateralReturn: ({ collateralReturn }, context) =>
     collateralReturn ? toTxOut({ index: 0, isCollateral: true, txOut: collateralReturn }, context!) : undefined,
   fee: ({ fee }) => fee.toString(),
+  includeNetworkId: ({ networkId }) => !!networkId,
   inputs: ({ inputs }, context) => mapTxIns(inputs, context!),
   mint: ({ mint }) => mapTokenMap(mint, true),
   networkId: (_, context) => context!.chainId.networkId,
