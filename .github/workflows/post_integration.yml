@@ -17,11 +17,14 @@ jobs:
         with:
           node-version: 18.12.0
 
+      - name: 🔨 Install
+        uses: ./.github/actions/install
+        with:
+          max-old-space-size: '10240'
+          ignore-scripts: ${{ vars.DISABLE_NPM_SCRIPTS || 'false' }}
+
       - name: 🔨 Build Docs
-        env:
-          NODE_OPTIONS: '--max-old-space-size=10240'
         run: |
-          yarn install --immutable --inline-builds
           yarn build
           yarn docs
 

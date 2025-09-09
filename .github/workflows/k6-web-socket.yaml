@@ -59,10 +59,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18.12.0
+      - name: 🔨 Install
+        uses: ./.github/actions/install
+        with:
+          ignore-scripts: ${{ vars.DISABLE_NPM_SCRIPTS || 'false' }}
+
       - name: 🔨 Build
-        run: |
-          yarn install --immutable --inline-builds --mode=skip-build
-          yarn workspace @cardano-sdk/util-dev build:cjs
+        run: yarn workspace @cardano-sdk/util-dev build:cjs
         env:
           NODE_OPTIONS: '--max_old_space_size=8192'
       - name: Run k6 cloud test
