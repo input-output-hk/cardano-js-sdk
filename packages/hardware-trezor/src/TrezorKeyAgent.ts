@@ -92,12 +92,14 @@ const multiSigWitnessPaths: BIP32Path[] = [
 
 const isMultiSig = (tx: Omit<Trezor.CardanoSignTransaction, 'signingMode'>): boolean => {
   const allThirdPartyInputs = !tx.inputs.some((input) => input.path);
+  const allThirdRequiredSigner = !tx.requiredSigners?.some((signer) => signer.keyPath);
   // Trezor doesn't allow change outputs to address controlled by your keys and instead you have to use script address for change out
   const allThirdPartyOutputs = !tx.outputs.some((out) => 'addressParameters' in out);
 
   return (
     allThirdPartyInputs &&
     allThirdPartyOutputs &&
+    allThirdRequiredSigner &&
     !tx.collateralInputs &&
     !tx.collateralReturn &&
     !tx.totalCollateral &&
@@ -325,7 +327,9 @@ export class TrezorKeyAgent extends KeyAgentBase {
       const signedData = result.payload;
 
       if (!areStringsEqualInConstantTime(signedData.hash, hash)) {
-        throw new errors.HwMappingError('Trezor computed a different transaction id');
+        throw new errors.HwMappingError(
+          `Trezor computed a different transaction id: ${signedData.hash} than expected: ${hash}`
+        );
       }
 
       return new Map<Crypto.Ed25519PublicKeyHex, Crypto.Ed25519SignatureHex>(
@@ -340,7 +344,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
         )
       );
     } catch (error: any) {
-      if (error.innerError.code === 'Failure_ActionCancelled') {
+      if (error.innerError?.code === 'Failure_ActionCancelled') {
         throw new errors.AuthenticationError('Transaction signing aborted', error);
       }
       throw transportTypedError(error);
