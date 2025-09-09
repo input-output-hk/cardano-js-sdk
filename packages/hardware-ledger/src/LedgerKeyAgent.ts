@@ -53,6 +53,7 @@ import _LedgerConnection, {
   Transaction,
   TransactionSigningMode,
   TxOutputDestinationType,
+  TxRequiredSignerType,
   VoterType,
   VoterVotes
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
@@ -207,10 +208,12 @@ const isMultiSig = (tx: Transaction): boolean => {
   const result = false;
 
   const allThirdPartyInputs = !tx.inputs.some((input) => input.path !== null);
+  const allThirdPartyRequiredSigner = !tx.requiredSigners?.some((signer) => signer.type === TxRequiredSignerType.PATH);
   // Ledger doesn't allow change outputs to address controlled by your keys and instead you have to use script address for change out
   const allThirdPartyOutputs = !tx.outputs.some((out) => out.destination.type !== TxOutputDestinationType.THIRD_PARTY);
 
   if (
+    allThirdPartyRequiredSigner &&
     allThirdPartyInputs &&
     allThirdPartyOutputs &&
     !tx.collateralInputs &&

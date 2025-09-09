@@ -359,6 +359,56 @@ describe('LedgerKeyAgent', () => {
 
       expect(LedgerKeyAgent.getSigningMode(tx)).toEqual(Ledger.TransactionSigningMode.MULTISIG_TRANSACTION);
     });
+
+    it('can detect ordinary transaction signing mode when we own a required signer', async () => {
+      const tx: Ledger.Transaction = {
+        certificates: [
+          {
+            params: {
+              stakeCredential: {
+                scriptHashHex: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
+                type: Ledger.CredentialParamsType.SCRIPT_HASH
+              }
+            },
+            type: Ledger.CertificateType.STAKE_DEREGISTRATION
+          }
+        ],
+        fee: 10n,
+        includeNetworkId: false,
+        inputs: [
+          {
+            outputIndex: 0,
+            path: null,
+            txHashHex: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f190000'
+          }
+        ],
+        network: {
+          networkId: Ledger.Networks.Testnet.networkId,
+          protocolMagic: 999
+        },
+        outputs: [
+          {
+            amount: 10n,
+            datumHashHex: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5',
+            destination: {
+              params: {
+                addressHex:
+                  '009493315cd92eb5d8c4304e67b7e16ae36d61d34502694657811a2c8e32c728d3861e164cab28cb8f006448139c8f1740ffb8e7aa9e5232dc'
+              },
+              type: Ledger.TxOutputDestinationType.THIRD_PARTY
+            },
+            format: Ledger.TxOutputFormat.ARRAY_LEGACY
+          }
+        ],
+        requiredSigners: [
+          { path: [util.harden(1852), util.harden(1815), util.harden(0), 2, 0], type: Ledger.TxRequiredSignerType.PATH }
+        ],
+        ttl: 1000,
+        validityIntervalStart: 100
+      };
+
+      expect(LedgerKeyAgent.getSigningMode(tx)).toEqual(Ledger.TransactionSigningMode.ORDINARY_TRANSACTION);
+    });
   });
 
   describe('Unsupported Transaction Errors', () => {
