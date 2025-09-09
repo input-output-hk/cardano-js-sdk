@@ -34,8 +34,9 @@ jobs:
           git_commit_gpgsign: true
 
       - name: 💽 Install dependencies
-        run: |
-          yarn install --immutable --inline-builds --mode=skip-build
+        uses: ./.github/actions/install
+        with:
+          ignore-scripts: ${{ vars.DISABLE_NPM_SCRIPTS || 'false' }}
         env:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
 

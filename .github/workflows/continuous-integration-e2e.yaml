@@ -53,9 +53,13 @@ jobs:
         with:
           node-version: 18.12.0
 
+      - name: 🔨 Install
+        uses: ./.github/actions/install
+        with:
+          ignore-scripts: ${{ vars.DISABLE_NPM_SCRIPTS || 'false' }}
+
       - name: 🔨 Build
         run: |
-          yarn install --immutable --inline-builds --mode=skip-build
           yarn workspace @cardano-sdk/cardano-services-client build:cjs
           yarn workspace @cardano-sdk/cardano-services build:cjs
           yarn workspace @cardano-sdk/e2e build:cjs

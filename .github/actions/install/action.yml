@@ -1,0 +1,28 @@
+name: 'Install Dependencies'
+description: 'Install dependencies with yarn and run security constraint checks'
+inputs:
+  install-args:
+    description: 'Additional arguments for yarn install'
+    required: false
+    default: '--inline-builds --mode=skip-build'
+  max-old-space-size:
+    description: 'Maximum old space size in MB for Node.js'
+    required: false
+    default: '8192'
+  ignore-scripts:
+    description: 'Whether to ignore npm scripts during install'
+    required: false
+    default: 'false'
+runs:
+  using: 'composite'
+  steps:
+    - name: 🔨 Install
+      shell: bash
+      run: yarn install --immutable ${{ inputs.install-args }}
+      env:
+        NODE_OPTIONS: '--max_old_space_size=${{ inputs.max-old-space-size }}'
+        npm_config_ignore_scripts: ${{ inputs.ignore-scripts }}
+    
+    - name: 🛡️ Security Constraints Check
+      shell: bash
+      run: yarn constraints
