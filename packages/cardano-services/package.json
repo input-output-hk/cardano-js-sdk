@@ -104,7 +104,7 @@
     "axios": "^1.7.4",
     "backoff-rxjs": "^7.0.0",
     "bignumber.js": "^9.1.0",
-    "body-parser": "^1.20.3",
+    "body-parser": "^2.0.0",
     "bottleneck": "^2.19.5",
     "bunyan": "^1.8.15",
     "commander": "^9.1.0",
