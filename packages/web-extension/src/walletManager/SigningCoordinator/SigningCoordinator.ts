@@ -6,7 +6,7 @@ import { KeyAgent, KeyPurpose, SignDataContext, TrezorConfig, errors } from '@ca
 import { Logger } from 'ts-log';
 import { Subject } from 'rxjs';
 
-import { InMemoryWallet, WalletType } from '../types';
+import { InMemoryWallet, TrezorWallet, WalletType } from '../types';
 import { KeyAgentFactory } from './KeyAgentFactory';
 import {
   RequestBase,
@@ -208,7 +208,9 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
                     chainId: commonRequestProps.requestContext.chainId,
                     extendedAccountPublicKey: account.extendedAccountPublicKey,
                     purpose: account.purpose || KeyPurpose.STANDARD,
-                    trezorConfig: this.#hwOptions
+                    trezorConfig:
+                      (commonRequestProps.requestContext.wallet as TrezorWallet<WalletMetadata, AccountMetadata>)
+                        .trezorConfig || this.#hwOptions
                   })
             ).catch((error) => throwMaybeWrappedWithNoRejectError(error, options)),
           resolve,

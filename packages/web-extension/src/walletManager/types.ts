@@ -1,4 +1,4 @@
-import { AccountKeyDerivationPath, KeyPurpose } from '@cardano-sdk/key-management';
+import { AccountKeyDerivationPath, KeyPurpose, TrezorConfig } from '@cardano-sdk/key-management';
 import { Bip32PublicKeyHex } from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
@@ -29,11 +29,19 @@ export type Bip32Wallet<WalletMetadata extends {}, AccountMetadata extends {}> =
   blockchainName?: Blockchain;
 };
 
-export type HardwareWallet<WalletMetadata extends {}, AccountMetadata extends {}> = Bip32Wallet<
+export type LedgerWallet<WalletMetadata extends {}, AccountMetadata extends {}> = Bip32Wallet<
   WalletMetadata,
   AccountMetadata
 > & {
-  type: WalletType.Ledger | WalletType.Trezor;
+  type: WalletType.Ledger;
+};
+
+export type TrezorWallet<WalletMetadata extends {}, AccountMetadata extends {}> = Bip32Wallet<
+  WalletMetadata,
+  AccountMetadata
+> & {
+  type: WalletType.Trezor;
+  trezorConfig?: TrezorConfig;
 };
 
 export type InMemoryWallet<WalletMetadata extends {}, AccountMetadata extends {}> = Bip32Wallet<
@@ -53,7 +61,8 @@ export type InMemoryWallet<WalletMetadata extends {}, AccountMetadata extends {}
 };
 
 export type AnyBip32Wallet<WalletMetadata extends {}, AccountMetadata extends {}> =
-  | HardwareWallet<WalletMetadata, AccountMetadata>
+  | LedgerWallet<WalletMetadata, AccountMetadata>
+  | TrezorWallet<WalletMetadata, AccountMetadata>
   | InMemoryWallet<WalletMetadata, AccountMetadata>;
 
 export type OwnSignerAccount = {
@@ -75,6 +84,7 @@ export type ScriptWallet<Metadata extends {}> = {
 };
 
 export type AnyWallet<WalletMetadata extends {}, AccountMetadata extends {}> =
-  | HardwareWallet<WalletMetadata, AccountMetadata>
+  | LedgerWallet<WalletMetadata, AccountMetadata>
+  | TrezorWallet<WalletMetadata, AccountMetadata>
   | InMemoryWallet<WalletMetadata, AccountMetadata>
   | ScriptWallet<WalletMetadata>;
