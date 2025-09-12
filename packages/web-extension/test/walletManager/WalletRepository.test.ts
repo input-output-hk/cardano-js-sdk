@@ -3,7 +3,7 @@ import { AccountMetadata, WalletMetadata, createAccount } from './util';
 import {
   AddWalletProps,
   AnyWallet,
-  HardwareWallet,
+  LedgerWallet,
   UpdateAccountMetadataProps,
   UpdateWalletMetadataProps,
   WalletConflictError,
@@ -13,13 +13,13 @@ import {
 } from '../../src';
 import { BehaviorSubject, firstValueFrom, of } from 'rxjs';
 import { Cardano, Serialization } from '@cardano-sdk/core';
+import { CommunicationType, KeyPurpose, KeyRole } from '@cardano-sdk/key-management';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { KeyPurpose, KeyRole } from '@cardano-sdk/key-management';
 import { logger } from '@cardano-sdk/util-dev';
 import { storage } from '@cardano-sdk/wallet';
 import pick from 'lodash/pick.js';
 
-const storedLedgerWallet: HardwareWallet<WalletMetadata, AccountMetadata> = {
+const storedLedgerWallet: LedgerWallet<WalletMetadata, AccountMetadata> = {
   accounts: [createAccount(0, 0)],
   metadata: { name: 'My Ledger Wallet' },
   type: WalletType.Ledger as const,
@@ -29,6 +29,19 @@ const storedLedgerWallet: HardwareWallet<WalletMetadata, AccountMetadata> = {
 const createTrezorWalletProps: AddWalletProps<WalletMetadata, AccountMetadata> = {
   accounts: [createAccount(1, 0)],
   metadata: { name: 'My Trezor Wallet' },
+  type: WalletType.Trezor as const
+};
+
+const createTrezorWalletWithConfigProps: AddWalletProps<WalletMetadata, AccountMetadata> = {
+  accounts: [createAccount(1, 0)],
+  metadata: { name: 'My Trezor Wallet With Config' },
+  trezorConfig: {
+    communicationType: CommunicationType.Node,
+    manifest: {
+      appUrl: 'https://test.com',
+      email: 'test@test.com'
+    }
+  },
   type: WalletType.Trezor as const
 };
 
@@ -102,11 +115,19 @@ describe('WalletRepository', () => {
   });
 
   describe('addWallet', () => {
-    it('stores a new wallet', async () => {
+    it('stores a new Trezor wallet without trezorConfig (backward compatibility)', async () => {
       await repository.addWallet(createTrezorWalletProps);
       expect(store.setAll).toBeCalledWith([
         storedLedgerWallet,
         expect.objectContaining({ ...createTrezorWalletProps, walletId: expect.stringContaining('') })
+      ]);
+    });
+
+    it('stores a new Trezor wallet with trezorConfig (new functionality)', async () => {
+      await repository.addWallet(createTrezorWalletWithConfigProps);
+      expect(store.setAll).toBeCalledWith([
+        storedLedgerWallet,
+        expect.objectContaining({ ...createTrezorWalletWithConfigProps, walletId: expect.stringContaining('') })
       ]);
     });
 

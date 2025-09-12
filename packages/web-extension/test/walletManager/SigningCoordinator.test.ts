@@ -16,6 +16,7 @@ import {
   KeyAgentFactory,
   RequestContext,
   SigningCoordinator,
+  TrezorWallet,
   WalletType,
   WrongTargetError
 } from '../../src';
@@ -260,6 +261,43 @@ describe('SigningCoordinator', () => {
         await expect(signed).rejects.toThrowError(errors.AuthenticationError);
         expect(passphrase).toEqual(new Uint8Array([0, 0, 0]));
       });
+    });
+  });
+
+  describe('Trezor wallet derivation type', () => {
+    it('should include derivationType in trezorConfig when provided', () => {
+      const trezorWalletWithDerivationType: TrezorWallet<{}, {}> = {
+        accounts: [createAccount(0, 0)],
+        metadata: {},
+        trezorConfig: {
+          communicationType: CommunicationType.Node,
+          derivationType: 'ICARUS',
+          manifest: {
+            appUrl: 'https://test.com',
+            email: 'test@test.com'
+          }
+        },
+        type: WalletType.Trezor,
+        walletId: Hash28ByteBase16('ad63f855e831d937457afc52a21a7f351137e4a9fff26c217817335a')
+      };
+
+      // Test that the wallet has the correct trezorConfig with derivationType
+      const expectedTrezorConfig = trezorWalletWithDerivationType.trezorConfig;
+      expect(expectedTrezorConfig).toBeDefined();
+      expect(expectedTrezorConfig?.derivationType).toBe('ICARUS');
+      expect(expectedTrezorConfig?.communicationType).toBe(CommunicationType.Node);
+    });
+
+    it('should have undefined trezorConfig when not provided (backward compatibility)', () => {
+      const trezorWalletWithoutConfig: TrezorWallet<{}, {}> = {
+        accounts: [createAccount(0, 0)],
+        metadata: {},
+        type: WalletType.Trezor,
+        walletId: Hash28ByteBase16('ad63f855e831d937457afc52a21a7f351137e4a9fff26c217817335a')
+      };
+
+      // Test that the wallet has undefined trezorConfig (backward compatibility)
+      expect(trezorWalletWithoutConfig.trezorConfig).toBeUndefined();
     });
   });
 });

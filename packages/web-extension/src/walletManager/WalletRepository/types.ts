@@ -1,4 +1,4 @@
-import { AnyWallet, HardwareWallet, InMemoryWallet, ScriptWallet, WalletId } from '../types';
+import { AnyWallet, InMemoryWallet, LedgerWallet, ScriptWallet, TrezorWallet, WalletId } from '../types';
 import { Bip32PublicKeyHex } from '@cardano-sdk/crypto';
 import { KeyPurpose } from '@cardano-sdk/key-management';
 import { Observable } from 'rxjs';
@@ -33,7 +33,8 @@ export type UpdateAccountMetadataProps<Metadata extends {}> = {
 };
 
 export type AddWalletProps<WalletMetadata extends {}, AccountMetadata extends {}> =
-  | Omit<HardwareWallet<WalletMetadata, AccountMetadata>, 'walletId'>
+  | Omit<LedgerWallet<WalletMetadata, AccountMetadata>, 'walletId'>
+  | Omit<TrezorWallet<WalletMetadata, AccountMetadata>, 'walletId'>
   | Omit<InMemoryWallet<WalletMetadata, AccountMetadata>, 'walletId'>
   | Omit<ScriptWallet<WalletMetadata>, 'walletId'>;
 
