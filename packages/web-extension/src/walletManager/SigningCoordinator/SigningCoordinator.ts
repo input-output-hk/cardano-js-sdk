@@ -1,10 +1,13 @@
+import { Bip32PublicKeyHex } from '@cardano-sdk/crypto';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { CustomError } from 'ts-custom-error';
-import { InMemoryWallet, WalletType } from '../types';
 import { KeyAgent, KeyPurpose, SignDataContext, TrezorConfig, errors } from '@cardano-sdk/key-management';
-import { KeyAgentFactory } from './KeyAgentFactory';
 import { Logger } from 'ts-log';
+import { Subject } from 'rxjs';
+
+import { InMemoryWallet, WalletType } from '../types';
+import { KeyAgentFactory } from './KeyAgentFactory';
 import {
   RequestBase,
   RequestContext,
@@ -16,7 +19,6 @@ import {
   SigningCoordinatorSignApi,
   TransactionWitnessRequest
 } from './types';
-import { Subject } from 'rxjs';
 import { WrongTargetError } from '../../messaging';
 import { contextLogger } from '@cardano-sdk/util';
 
@@ -29,6 +31,19 @@ export type SigningCoordinatorProps = {
 export type SigningCoordinatorDependencies = {
   keyAgentFactory: KeyAgentFactory;
   logger: Logger;
+};
+
+// Type aliases for cleaner code
+type RequestProps<WalletMetadata extends {}, AccountMetadata extends {}, T extends WalletType> = Omit<
+  RequestBase<WalletMetadata, AccountMetadata>,
+  'reject' | 'sign'
+> & { walletType: T };
+
+type SignRequestParams<R = unknown> = {
+  account: { accountIndex: number; purpose?: KeyPurpose; extendedAccountPublicKey: Bip32PublicKeyHex };
+  reject: (reason?: unknown) => void;
+  resolve: (result: R | Promise<R>) => void;
+  sign: (keyAgent: KeyAgent) => Promise<R>;
 };
 
 class NoRejectError extends CustomError {
@@ -118,6 +133,91 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
     );
   }
 
+  #findAccount(request: RequestContext<WalletMetadata, AccountMetadata>) {
+    return request.wallet.accounts.find(
+      ({ accountIndex, purpose = KeyPurpose.STANDARD }) =>
+        accountIndex === request.accountIndex && request.purpose === purpose
+    );
+  }
+
+  #createInMemorySignRequest<R>({
+    commonRequestProps,
+    account,
+    sign,
+    resolve,
+    reject
+  }: {
+    commonRequestProps: RequestProps<WalletMetadata, AccountMetadata, WalletType.InMemory>;
+  } & SignRequestParams<R>) {
+    return {
+      ...commonRequestProps,
+      sign: async (passphrase: Uint8Array, options?: SignOptions) =>
+        bubbleResolveReject(
+          async () => {
+            const wallet = commonRequestProps.requestContext.wallet as InMemoryWallet<WalletMetadata, AccountMetadata>;
+            try {
+              const result = await sign(
+                await this.#keyAgentFactory.InMemory({
+                  accountIndex: account.accountIndex,
+                  chainId: commonRequestProps.requestContext.chainId,
+                  encryptedRootPrivateKeyBytes: [...Buffer.from(wallet.encryptedSecrets.rootPrivateKeyBytes, 'hex')],
+                  extendedAccountPublicKey: account.extendedAccountPublicKey,
+                  getPassphrase: async () => passphrase,
+                  purpose: account.purpose || KeyPurpose.STANDARD
+                })
+              );
+              clearPassphrase(passphrase);
+              return result;
+            } catch (error) {
+              clearPassphrase(passphrase);
+              return throwMaybeWrappedWithNoRejectError(error, options);
+            }
+          },
+          resolve,
+          reject
+        ),
+      walletType: WalletType.InMemory
+    };
+  }
+
+  #createHardwareSignRequest<R>({
+    commonRequestProps,
+    account,
+    sign,
+    resolve,
+    reject
+  }: {
+    commonRequestProps: RequestProps<WalletMetadata, AccountMetadata, WalletType.Trezor | WalletType.Ledger>;
+  } & SignRequestParams<R>) {
+    return {
+      ...commonRequestProps,
+      sign: async (): Promise<unknown> =>
+        bubbleResolveReject(
+          async (options?: SignOptions) =>
+            sign(
+              commonRequestProps.walletType === WalletType.Ledger
+                ? await this.#keyAgentFactory.Ledger({
+                    accountIndex: commonRequestProps.requestContext.accountIndex,
+                    chainId: commonRequestProps.requestContext.chainId,
+                    communicationType: this.#hwOptions.communicationType,
+                    extendedAccountPublicKey: account.extendedAccountPublicKey,
+                    purpose: account.purpose || KeyPurpose.STANDARD
+                  })
+                : await this.#keyAgentFactory.Trezor({
+                    accountIndex: commonRequestProps.requestContext.accountIndex,
+                    chainId: commonRequestProps.requestContext.chainId,
+                    extendedAccountPublicKey: account.extendedAccountPublicKey,
+                    purpose: account.purpose || KeyPurpose.STANDARD,
+                    trezorConfig: this.#hwOptions
+                  })
+            ).catch((error) => throwMaybeWrappedWithNoRejectError(error, options)),
+          resolve,
+          reject
+        ),
+      walletType: commonRequestProps.walletType
+    };
+  }
+
   #signRequest<R, Req extends RequestBase<WalletMetadata, AccountMetadata> & SignRequest<R>>(
     emitter$: Subject<Req>,
     request: Omit<Req, 'reject' | 'sign'>,
@@ -127,11 +227,8 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
       if (!emitter$.observed) {
         return reject(new WrongTargetError('Not expecting sign requests at this time'));
       }
-      const account = request.requestContext.wallet.accounts.find(
-        ({ accountIndex, purpose = KeyPurpose.STANDARD }) =>
-          accountIndex === request.requestContext.accountIndex && request.requestContext.purpose === purpose
-      );
 
+      const account = this.#findAccount(request.requestContext);
       if (!account) {
         return reject(
           new errors.ProofGenerationError(
@@ -144,67 +241,33 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
         ...request,
         reject: async (reason: string) => reject(new errors.AuthenticationError(reason))
       };
-      emitter$.next(
+
+      const signRequest =
         request.walletType === WalletType.InMemory
-          ? ({
-              ...commonRequestProps,
-              sign: async (passphrase: Uint8Array, options?: SignOptions) =>
-                bubbleResolveReject(
-                  async () => {
-                    const wallet = request.requestContext.wallet as InMemoryWallet<WalletMetadata, AccountMetadata>;
-                    try {
-                      const result = await sign(
-                        await this.#keyAgentFactory.InMemory({
-                          accountIndex: account.accountIndex,
-                          chainId: request.requestContext.chainId,
-                          encryptedRootPrivateKeyBytes: [
-                            ...Buffer.from(wallet.encryptedSecrets.rootPrivateKeyBytes, 'hex')
-                          ],
-                          extendedAccountPublicKey: account.extendedAccountPublicKey,
-                          getPassphrase: async () => passphrase,
-                          purpose: account.purpose || KeyPurpose.STANDARD
-                        })
-                      );
-                      clearPassphrase(passphrase);
-                      return result;
-                    } catch (error) {
-                      clearPassphrase(passphrase);
-                      return throwMaybeWrappedWithNoRejectError(error, options);
-                    }
-                  },
-                  resolve,
-                  reject
-                ),
-              walletType: request.walletType
-            } as Req)
-          : ({
-              ...commonRequestProps,
-              sign: async (): Promise<R> =>
-                bubbleResolveReject(
-                  async (options?: SignOptions) =>
-                    sign(
-                      request.walletType === WalletType.Ledger
-                        ? await this.#keyAgentFactory.Ledger({
-                            accountIndex: request.requestContext.accountIndex,
-                            chainId: request.requestContext.chainId,
-                            communicationType: this.#hwOptions.communicationType,
-                            extendedAccountPublicKey: account.extendedAccountPublicKey,
-                            purpose: account.purpose || KeyPurpose.STANDARD
-                          })
-                        : await this.#keyAgentFactory.Trezor({
-                            accountIndex: request.requestContext.accountIndex,
-                            chainId: request.requestContext.chainId,
-                            extendedAccountPublicKey: account.extendedAccountPublicKey,
-                            purpose: account.purpose || KeyPurpose.STANDARD,
-                            trezorConfig: this.#hwOptions
-                          })
-                    ).catch((error) => throwMaybeWrappedWithNoRejectError(error, options)),
-                  resolve,
-                  reject
-                ),
-              walletType: request.walletType
-            } as Req)
-      );
+          ? this.#createInMemorySignRequest({
+              account,
+              commonRequestProps: commonRequestProps as RequestProps<
+                WalletMetadata,
+                AccountMetadata,
+                WalletType.InMemory
+              >,
+              reject,
+              resolve,
+              sign
+            })
+          : this.#createHardwareSignRequest({
+              account,
+              commonRequestProps: commonRequestProps as RequestProps<
+                WalletMetadata,
+                AccountMetadata,
+                WalletType.Trezor | WalletType.Ledger
+              >,
+              reject,
+              resolve,
+              sign
+            });
+
+      emitter$.next(signRequest as Req);
     });
   }
 }
