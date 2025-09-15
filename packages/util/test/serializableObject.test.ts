@@ -111,5 +111,19 @@ describe('serializableObject', () => {
       const obj = [{ a: [{ b: 1, c: '2' }] }, 3];
       expect(fromSerializableObject(obj)).toEqual(obj);
     });
+
+    it('returns the identical object when input is already serialized', () => {
+      const obj = {
+        bigint: 123n,
+        buffer: new Uint8Array(Buffer.from('data')),
+        date: new Date(),
+        error: new Error('error obj'),
+        map: new Map([['key', 1n]]),
+        nullVal: null,
+        set: new Set(['item1', 1n]),
+        undefinedVal: undefined
+      };
+      expect(fromSerializableObject(obj)).toEqual(obj);
+    });
   });
 });

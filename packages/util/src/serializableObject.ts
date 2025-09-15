@@ -44,6 +44,18 @@ const hasInnerError = (error: unknown): error is { innerError: unknown } =>
 const innerErrorHasData = (innerError: unknown): innerError is { data: unknown } =>
   typeof innerError === 'object' && innerError !== null && 'data' in innerError;
 
+const isNativeNonSerializableType = (obj: unknown): boolean => {
+  if (typeof obj === 'undefined' || typeof obj === 'bigint') return true;
+  if (typeof obj === 'object' && obj !== null) {
+    if (obj instanceof Date) return true;
+    if (obj instanceof Error) return true;
+    if (obj instanceof Map) return true;
+    if (obj instanceof Set) return true;
+    if (ArrayBuffer.isView(obj)) return true;
+  }
+  return false;
+};
+
 export const toSerializableObject = (obj: unknown, options: ToSerializableObjectOptions = {}): unknown => {
   if (PLAIN_TYPES.has(typeof obj)) return obj;
   const { transformationTypeKey = defaultTransformationTypeKey, serializeKey = defaultTransformKey } = options;
@@ -110,7 +122,9 @@ export const toSerializableObject = (obj: unknown, options: ToSerializableObject
 };
 
 const fromSerializableObjectUnknown = (obj: unknown, options: FromSerializableObjectOptions = {}): unknown => {
-  if (PLAIN_TYPES.has(typeof obj)) return obj;
+  if (PLAIN_TYPES.has(typeof obj)) return obj; // no-op for plain types
+  if (isNativeNonSerializableType(obj)) return obj; // no-op for native types
+
   if (typeof obj === 'object') {
     if (obj === null) return null;
     if (Array.isArray(obj)) {
