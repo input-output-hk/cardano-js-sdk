@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.17.0...@cardano-sdk/util@0.17.1) (2025-09-16)
+
+### Features
+
+* **util:** return identical fromSerializableObject if already serialized ([5cb6df4](https://github.com/input-output-hk/cardano-js-sdk/commit/5cb6df407fdcd4bbfcb7c7e5754dc995537ff40d))
+
 ## [0.17.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.16.0...@cardano-sdk/util@0.17.0) (2025-05-30)
 
 ### ⚠ BREAKING CHANGES

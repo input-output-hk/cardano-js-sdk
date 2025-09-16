@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/util",
-  "version": "0.17.0",
+  "version": "0.17.1",
   "description": "General, not cardano-specific utils",
   "engines": {
     "node": ">=16.20.2"
