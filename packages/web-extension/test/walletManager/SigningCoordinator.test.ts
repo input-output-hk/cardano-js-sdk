@@ -19,7 +19,6 @@ import {
   RequestContext,
   SignOptions,
   SigningCoordinator,
-  SignOptions,
   WalletType,
   WrongTargetError
 } from '../../src';
