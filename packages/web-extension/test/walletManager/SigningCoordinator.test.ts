@@ -4,21 +4,26 @@ import {
   CommunicationType,
   InMemoryKeyAgent,
   KeyPurpose,
+  MasterKeyGeneration,
   SignDataContext,
   SignTransactionContext,
+  TrezorConfig,
   cip8,
   errors
 } from '@cardano-sdk/key-management';
 import { Ed25519PublicKeyHex, Ed25519SignatureHex, Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { HexBlob } from '@cardano-sdk/util';
 import {
+  HardwareWallet,
   InMemoryWallet,
   KeyAgentFactory,
   RequestContext,
+  SignOptions,
   SigningCoordinator,
+  SignOptions,
   WalletType,
   WrongTargetError
 } from '../../src';
+import { HexBlob } from '@cardano-sdk/util';
 import { createAccount } from './util';
 import { dummyLogger } from 'ts-log';
 import { firstValueFrom } from 'rxjs';
@@ -73,7 +78,9 @@ describe('SigningCoordinator', () => {
       signCip8Data: jest.fn(),
       signTransaction: jest.fn()
     } as unknown as jest.Mocked<InMemoryKeyAgent>;
+
     keyAgentFactory.InMemory.mockResolvedValue(keyAgent);
+    keyAgentFactory.Trezor.mockResolvedValue(keyAgent as unknown as Awaited<ReturnType<KeyAgentFactory['Trezor']>>);
   });
 
   describe('signTransaction', () => {
@@ -169,6 +176,62 @@ describe('SigningCoordinator', () => {
         await req.reject('forgot password');
         await expect(signed).rejects.toThrowError(errors.AuthenticationError);
         expect(passphrase).toEqual(new Uint8Array([0, 0, 0]));
+      });
+    });
+
+    it('should pass wallet trezorConfig to Trezor key agent factory', async () => {
+      const trezorWallet: HardwareWallet<{ trezorConfig?: Partial<TrezorConfig> }, {}> = {
+        accounts: [createAccount(0, 0)],
+        metadata: {
+          trezorConfig: {
+            communicationType: CommunicationType.Web,
+            derivationType: 'ICARUS_TREZOR' as MasterKeyGeneration,
+            manifest: {
+              appUrl: 'https://custom.app',
+              email: 'custom@custom.app'
+            }
+          }
+        },
+        type: WalletType.Trezor,
+        walletId: Hash28ByteBase16('ad63f855e831d937457afc52a21a7f351137e4a9fff26c217817335a')
+      };
+
+      const trezorRequestContext: RequestContext<{}, {}> = {
+        accountIndex: 0,
+        chainId: Cardano.ChainIds.Preprod,
+        purpose: KeyPurpose.STANDARD,
+        wallet: trezorWallet
+      };
+
+      // Test that the Trezor factory is called with merged config
+      const reqEmitted = firstValueFrom(signingCoordinator.transactionWitnessRequest$);
+      void signingCoordinator.signTransaction({ signContext, tx }, trezorRequestContext);
+      const req = await reqEmitted;
+
+      // Verify the request was created
+      expect(req.walletType).toBe(WalletType.Trezor);
+      expect(req.requestContext.wallet).toBe(trezorWallet);
+
+      // Now call sign() to trigger the key agent factory call
+      // Cast to hardware wallet request type to access the correct sign method
+      const hardwareReq = req as { sign(options?: SignOptions): Promise<Cardano.Signatures> };
+      await hardwareReq.sign({});
+
+      // Verify keyAgentFactory.Trezor was called with the correct merged configuration
+      expect(keyAgentFactory.Trezor).toHaveBeenCalledWith({
+        accountIndex: 0,
+        chainId: Cardano.ChainIds.Preprod,
+        extendedAccountPublicKey: expect.any(String),
+        purpose: KeyPurpose.STANDARD,
+        trezorConfig: {
+          // Wallet-specific overrides take precedence over global defaults
+          communicationType: CommunicationType.Web, // Wallet override
+          derivationType: 'ICARUS_TREZOR', // Wallet override
+          manifest: {
+            appUrl: 'https://custom.app', // Wallet override
+            email: 'custom@custom.app' // Wallet override
+          }
+        }
       });
     });
   });

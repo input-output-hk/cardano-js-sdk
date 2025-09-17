@@ -1,4 +1,4 @@
-import { AccountKeyDerivationPath, KeyPurpose } from '@cardano-sdk/key-management';
+import { AccountKeyDerivationPath, KeyPurpose, TrezorConfig } from '@cardano-sdk/key-management';
 import { Bip32PublicKeyHex } from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
@@ -36,10 +36,10 @@ export type LedgerHardwareWallet<WalletMetadata extends {}, AccountMetadata exte
   type: WalletType.Ledger;
 };
 
-export type TrezorHardwareWallet<WalletMetadata extends {}, AccountMetadata extends {}> = Bip32Wallet<
-  WalletMetadata,
-  AccountMetadata
-> & {
+export type TrezorHardwareWallet<
+  WalletMetadata extends { trezorConfig?: Partial<TrezorConfig> },
+  AccountMetadata extends {}
+> = Bip32Wallet<WalletMetadata, AccountMetadata> & {
   type: WalletType.Trezor;
 };
 

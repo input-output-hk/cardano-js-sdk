@@ -1,7 +1,7 @@
+import { AnyBip32Wallet, InMemoryWallet, WalletType } from '../types';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { CustomError } from 'ts-custom-error';
-import { InMemoryWallet, WalletType } from '../types';
 import { KeyAgent, KeyPurpose, SignDataContext, TrezorConfig, errors } from '@cardano-sdk/key-management';
 import { KeyAgentFactory } from './KeyAgentFactory';
 import { Logger } from 'ts-log';
@@ -83,6 +83,24 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
     this.#logger = contextLogger(logger, 'SigningCoordinator');
   }
 
+  /**
+   * Gets the appropriate TrezorConfig for the given wallet.
+   *
+   * This allows wallets to specify only the properties they want to override
+   *    (e.g., derivationType) while inheriting global settings (e.g., communicationType, manifest)
+   */
+  #getTrezorConfig(wallet: AnyBip32Wallet<WalletMetadata, AccountMetadata>): TrezorConfig {
+    const trezorConfig =
+      wallet.type === WalletType.Trezor && 'trezorConfig' in wallet.metadata
+        ? (wallet.metadata as { trezorConfig?: Partial<TrezorConfig> }).trezorConfig
+        : undefined;
+
+    return {
+      ...this.#hwOptions, // Global defaults (communicationType, manifest, etc.)
+      ...(trezorConfig || {}) // Wallet-specific overrides (derivationType, etc.)
+    };
+  }
+
   async signTransaction(
     { tx, signContext, options }: SignTransactionProps,
     requestContext: RequestContext<WalletMetadata, AccountMetadata>
@@ -123,6 +141,7 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
     request: Omit<Req, 'reject' | 'sign'>,
     sign: (keyAgent: KeyAgent) => Promise<R>
   ) {
+    /* eslint-disable sonarjs/cognitive-complexity */
     return new Promise<R>((resolve, reject) => {
       if (!emitter$.observed) {
         return reject(new WrongTargetError('Not expecting sign requests at this time'));
@@ -181,24 +200,29 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
               ...commonRequestProps,
               sign: async (): Promise<R> =>
                 bubbleResolveReject(
-                  async (options?: SignOptions) =>
-                    sign(
-                      request.walletType === WalletType.Ledger
-                        ? await this.#keyAgentFactory.Ledger({
-                            accountIndex: request.requestContext.accountIndex,
-                            chainId: request.requestContext.chainId,
-                            communicationType: this.#hwOptions.communicationType,
-                            extendedAccountPublicKey: account.extendedAccountPublicKey,
-                            purpose: account.purpose || KeyPurpose.STANDARD
-                          })
-                        : await this.#keyAgentFactory.Trezor({
-                            accountIndex: request.requestContext.accountIndex,
-                            chainId: request.requestContext.chainId,
-                            extendedAccountPublicKey: account.extendedAccountPublicKey,
-                            purpose: account.purpose || KeyPurpose.STANDARD,
-                            trezorConfig: this.#hwOptions
-                          })
-                    ).catch((error) => throwMaybeWrappedWithNoRejectError(error, options)),
+                  async (options?: SignOptions) => {
+                    try {
+                      const keyAgent =
+                        request.walletType === WalletType.Ledger
+                          ? await this.#keyAgentFactory.Ledger({
+                              accountIndex: request.requestContext.accountIndex,
+                              chainId: request.requestContext.chainId,
+                              communicationType: this.#hwOptions.communicationType,
+                              extendedAccountPublicKey: account.extendedAccountPublicKey,
+                              purpose: account.purpose || KeyPurpose.STANDARD
+                            })
+                          : await this.#keyAgentFactory.Trezor({
+                              accountIndex: request.requestContext.accountIndex,
+                              chainId: request.requestContext.chainId,
+                              extendedAccountPublicKey: account.extendedAccountPublicKey,
+                              purpose: account.purpose || KeyPurpose.STANDARD,
+                              trezorConfig: this.#getTrezorConfig(request.requestContext.wallet)
+                            });
+                      return await sign(keyAgent);
+                    } catch (error) {
+                      return throwMaybeWrappedWithNoRejectError(error, options);
+                    }
+                  },
                   resolve,
                   reject
                 ),
@@ -206,5 +230,6 @@ export class SigningCoordinator<WalletMetadata extends {}, AccountMetadata exten
             } as Req)
       );
     });
+    /* eslint-enable sonarjs/cognitive-complexity */
   }
 }
