@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.39.32](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.39.31...@cardano-sdk/web-extension@0.39.32) (2025-09-18)
+
+### Features
+
+* **web-extension:** add trezorConfig support in wallet metadata ([15df46f](https://github.com/input-output-hk/cardano-js-sdk/commit/15df46fc64802e88f96ead38b44b9d577c4fa6d6))
+
 ## [0.39.31](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.39.30...@cardano-sdk/web-extension@0.39.31) (2025-09-16)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension
