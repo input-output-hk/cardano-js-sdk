@@ -703,6 +703,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
    * Ledger has certain limitations due to which it cannot sign arbitrary combination of all transaction features.
    * The mode specifies which use-case the user want to use and triggers additional validation on `tx` field.
    */
+  // eslint-disable-next-line complexity
   static getSigningMode(tx: Transaction): TransactionSigningMode {
     if (tx.certificates) {
       for (const cert of tx.certificates) {
@@ -726,7 +727,11 @@ export class LedgerKeyAgent extends KeyAgentBase {
      * VotingProcedures: We are currently supporting only keyHash and scriptHash voter types in voting procedures.
      * To sign tx with keyHash and scriptHash voter type we have to use PLUTUS_TRANSACTION signing mode
      */
-    if (tx.collateralInputs || LedgerKeyAgent.isKeyHashOrScriptHashVoter(tx.votingProcedures)) {
+    if (
+      tx.collateralInputs ||
+      LedgerKeyAgent.isKeyHashOrScriptHashVoter(tx.votingProcedures) ||
+      (tx.referenceInputs && tx.referenceInputs.length > 0)
+    ) {
       return TransactionSigningMode.PLUTUS_TRANSACTION;
     }
 
