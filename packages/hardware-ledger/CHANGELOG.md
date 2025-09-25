@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.20](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.16.19...@cardano-sdk/hardware-ledger@0.16.20) (2025-09-25)
+
+### Bug Fixes
+
+* **hardware-ledger:** fix ledger hardware wallet mapping when there are reference inputs and no collateral ([8c1f5cc](https://github.com/input-output-hk/cardano-js-sdk/commit/8c1f5ccc548e40bd713e1d16cd9b2a704d39af59))
+
 ## [0.16.19](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.16.18...@cardano-sdk/hardware-ledger@0.16.19) (2025-09-16)
 
 **Note:** Version bump only for package @cardano-sdk/hardware-ledger
