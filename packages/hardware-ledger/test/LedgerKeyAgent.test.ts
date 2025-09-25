@@ -313,6 +313,49 @@ describe('LedgerKeyAgent', () => {
       expect(LedgerKeyAgent.getSigningMode(tx)).toEqual(Ledger.TransactionSigningMode.PLUTUS_TRANSACTION);
     });
 
+    it('can detect plutus transaction signing mode if there is a reference input', async () => {
+      const tx: Ledger.Transaction = {
+        fee: 10n,
+        includeNetworkId: false,
+        inputs: [
+          {
+            outputIndex: 0,
+            path: [util.harden(CardanoKeyConst.PURPOSE), util.harden(CardanoKeyConst.COIN_TYPE), util.harden(0), 1, 0],
+            txHashHex: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'
+          }
+        ],
+        network: {
+          networkId: Ledger.Networks.Testnet.networkId,
+          protocolMagic: 999
+        },
+        outputs: [
+          {
+            amount: 10n,
+            datumHashHex: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5',
+            destination: {
+              params: {
+                addressHex:
+                  '009493315cd92eb5d8c4304e67b7e16ae36d61d34502694657811a2c8e32c728d3861e164cab28cb8f006448139c8f1740ffb8e7aa9e5232dc'
+              },
+              type: Ledger.TxOutputDestinationType.THIRD_PARTY
+            },
+            format: Ledger.TxOutputFormat.ARRAY_LEGACY
+          }
+        ],
+        referenceInputs: [
+          {
+            outputIndex: 0,
+            path: [util.harden(CardanoKeyConst.PURPOSE), util.harden(CardanoKeyConst.COIN_TYPE), util.harden(0), 1, 0],
+            txHashHex: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'
+          }
+        ],
+        ttl: 1000,
+        validityIntervalStart: 100
+      };
+
+      expect(LedgerKeyAgent.getSigningMode(tx)).toEqual(Ledger.TransactionSigningMode.PLUTUS_TRANSACTION);
+    });
+
     it('can detect multisig transaction signing mode', async () => {
       const tx: Ledger.Transaction = {
         certificates: [
