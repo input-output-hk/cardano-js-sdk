@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@cardano-foundation/ledgerjs-hw-app-cardano": "^7.1.4",
-    "@cardano-ogmios/client": "6.9.0",
+    "@cardano-ogmios/client": "6.13.0",
     "@cardano-sdk/cardano-services-client": "workspace:~",
     "@cardano-sdk/ogmios": "workspace:~",
     "@cardano-sdk/util-dev": "workspace:~",
@@ -60,7 +60,7 @@
     "tsc-alias": "^1.8.10",
     "typescript": "^4.7.4",
     "wait-on": "^6.0.1",
-    "webextension-polyfill": "^0.9.0"
+    "webextension-polyfill": "^0.12.0"
   },
   "dependencies": {
     "@cardano-sdk/core": "workspace:~",
