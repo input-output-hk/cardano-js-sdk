@@ -4,6 +4,7 @@ export * from './ByronAddress';
 export * from './DRepID';
 export * from './EnterpriseAddress';
 export * from './PaymentAddress';
+export * from './PaymentCredential';
 export * from './PointerAddress';
 export * from './RewardAccount';
 export * from './RewardAddress';
