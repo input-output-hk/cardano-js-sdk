@@ -1,11 +1,81 @@
 import { BlockfrostChainHistoryProvider, BlockfrostClient } from '../../src';
 import { Cardano, NetworkInfoProvider } from '@cardano-sdk/core';
 import { Responses } from '@blockfrost/blockfrost-js';
+import { cip19TestVectors } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
 import { mockResponses } from '../util';
 import type { Cache } from '@cardano-sdk/util';
 
 jest.mock('@blockfrost/blockfrost-js');
+
+// Test constants
+const MOCK_EPOCH_PARAMS = { key_deposit: '0', pool_deposit: '0' };
+const CBOR_NULL_ERROR = new Error('CBOR is null');
+const ADDR_VKH_PREFIX = 'addresses/addr_vkh';
+const TRANSACTIONS_PATH = '/transactions';
+const UTXOS_PATH = '/utxos';
+const EPOCHS_PATH = 'epochs/';
+const CBOR_PATH = '/cbor';
+const ACCOUNTS_PATH = 'accounts/';
+
+// Mock endpoints that return empty arrays
+const EMPTY_ENDPOINTS = [
+  '/metadata',
+  '/mirs',
+  '/pool_updates',
+  '/pool_retires',
+  '/stakes',
+  '/delegations',
+  '/withdrawals',
+  '/redeemers'
+];
+
+/** Helper to create handlers for credential-based queries. */
+const createCredentialHandler = (credentialTxs: unknown[]) => (url: string) => {
+  if (url.includes(ADDR_VKH_PREFIX) && url.includes(TRANSACTIONS_PATH)) return Promise.resolve(credentialTxs);
+  return null;
+};
+
+/** Helper to create handlers for account-based queries. */
+const createAccountHandler = (accountTxs: unknown[]) => (url: string) => {
+  if (url.includes(ACCOUNTS_PATH) && url.includes(TRANSACTIONS_PATH)) return Promise.resolve(accountTxs);
+  return null;
+};
+
+/** Helper to create a common mock request handler for transaction detail tests. */
+const createMockRequestHandler =
+  (
+    txResponses: Record<string, unknown>,
+    utxosResponse: unknown,
+    additionalHandlers?: (url: string) => Promise<unknown> | null
+  ) =>
+  (url: string): Promise<unknown> => {
+    // Handle transaction detail endpoints
+    for (const txId of Object.keys(txResponses)) {
+      if (url === `txs/${txId}`) return Promise.resolve(txResponses[txId]);
+    }
+
+    // Handle empty endpoints
+    for (const endpoint of EMPTY_ENDPOINTS) {
+      if (url.includes(endpoint)) return Promise.resolve([]);
+    }
+
+    // Handle standard endpoints
+    if (url.includes(UTXOS_PATH)) return Promise.resolve(utxosResponse);
+    if (url.includes(EPOCHS_PATH)) return Promise.resolve(MOCK_EPOCH_PARAMS);
+    if (url.includes(CBOR_PATH)) throw CBOR_NULL_ERROR;
+
+    // Handle additional custom handlers
+    if (additionalHandlers) {
+      const result = additionalHandlers(url);
+      if (result !== null) return result;
+    }
+
+    // Default: return empty for transaction queries
+    if (url.includes(TRANSACTIONS_PATH)) return Promise.resolve([]);
+
+    return Promise.resolve([]);
+  };
 
 describe('blockfrostChainHistoryProvider', () => {
   describe('with default behavior (queryTxsByCredentials: false)', () => {
@@ -727,6 +797,282 @@ describe('blockfrostChainHistoryProvider', () => {
       expect(provider).toBeInstanceOf(BlockfrostChainHistoryProvider);
       // @ts-expect-error accessing protected property for testing
       expect(provider.queryTxsByCredentials).toBe(false);
+    });
+  });
+
+  describe('with feature flag ON (queryTxsByCredentials: true)', () => {
+    let request: jest.Mock;
+    let provider: BlockfrostChainHistoryProvider;
+    let networkInfoProvider: NetworkInfoProvider;
+    let cache: Cache<Cardano.HydratedTx>;
+
+    const txId1 = Cardano.TransactionId('1e043f100dce12d107f679685acd2fc0610e10f72a92d412794c9773d11d8477');
+    const txId2 = Cardano.TransactionId('2e043f100dce12d107f679685acd2fc0610e10f72a92d412794c9773d11d8477');
+    const txId3 = Cardano.TransactionId('3e043f100dce12d107f679685acd2fc0610e10f72a92d412794c9773d11d8477');
+
+    // Use real test addresses from CIP-19 test vectors
+    const baseAddress1 = cip19TestVectors.basePaymentKeyStakeKey; // Base address with payment key + stake key
+    const baseAddress2 = cip19TestVectors.basePaymentScriptStakeKey; // Base address with script + stake key
+    const enterpriseAddress = cip19TestVectors.enterpriseKey; // Enterprise address (no stake)
+
+    const mockedTx1Response = {
+      asset_mint_or_burn_count: 0,
+      block: '356b7d7dbb696ccd12775c016941057a9dc70898d87a63fc752271bb46856940',
+      block_height: 100,
+      delegation_count: 0,
+      fees: '182485',
+      hash: txId1,
+      index: 1,
+      invalid_before: null,
+      invalid_hereafter: '13885913',
+      mir_cert_count: 0,
+      output_amount: [{ quantity: '42000000', unit: 'lovelace' }],
+      pool_retire_count: 0,
+      pool_update_count: 0,
+      redeemer_count: 0,
+      size: 433,
+      slot: 42_000_000,
+      stake_cert_count: 0,
+      utxo_count: 2,
+      valid_contract: true,
+      withdrawal_count: 0
+    };
+
+    const mockedTx2Response = { ...mockedTx1Response, block_height: 101, hash: txId2 };
+    const mockedTx3Response = { ...mockedTx1Response, block_height: 102, hash: txId3 };
+
+    const txsUtxosResponse = {
+      hash: txId1,
+      inputs: [
+        {
+          address: baseAddress1,
+          amount: [{ quantity: '50000000', unit: 'lovelace' }],
+          output_index: 0,
+          tx_hash: '0000000000000000000000000000000000000000000000000000000000000000'
+        }
+      ],
+      outputs: [
+        {
+          address: baseAddress1,
+          amount: [{ quantity: '42000000', unit: 'lovelace' }]
+        }
+      ]
+    };
+
+    beforeEach(() => {
+      request = jest.fn();
+      const client = { request } as unknown as BlockfrostClient;
+      networkInfoProvider = {
+        eraSummaries: jest.fn().mockResolvedValue([
+          {
+            end: { slot: 100, time: new Date(1_506_203_092_000) },
+            parameters: { epochLength: 100, safeZone: 0, slotLength: 1 },
+            start: { slot: 0, time: new Date(1_506_203_091_000) }
+          }
+        ])
+      } as unknown as NetworkInfoProvider;
+      const cacheStorage = new Map();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      cache = {
+        async get(key) {
+          return cacheStorage.get(key);
+        },
+        async set(key, value) {
+          cacheStorage.set(key, value);
+        }
+      };
+
+      provider = new BlockfrostChainHistoryProvider(
+        { queryTxsByCredentials: true },
+        {
+          cache,
+          client,
+          logger,
+          networkInfoProvider
+        }
+      );
+    });
+
+    describe('transactionsByAddresses with credential-based queries', () => {
+      test('single address is minimized to payment credential (1 API call)', async () => {
+        const credentialTxs = [{ block_height: 100, block_time: 1_000_000, tx_hash: txId1, tx_index: 0 }];
+
+        request.mockImplementation(
+          createMockRequestHandler(
+            { [txId1]: mockedTx1Response },
+            txsUtxosResponse,
+            createCredentialHandler(credentialTxs)
+          )
+        );
+
+        await provider.transactionsByAddresses({
+          addresses: [baseAddress1],
+          pagination: { limit: 20, startAt: 0 }
+        });
+
+        // Verify we queried by payment credential, not by address
+        const credentialCalls = request.mock.calls.filter((call: string[]) => call[0].includes(ADDR_VKH_PREFIX));
+        expect(credentialCalls.length).toBeGreaterThan(0);
+
+        // Should not query by address directly
+        const addressCalls = request.mock.calls.filter((call: string[]) =>
+          call[0].includes(`addresses/${baseAddress1}${TRANSACTIONS_PATH}`)
+        );
+        expect(addressCalls.length).toBe(0);
+      });
+
+      test('multiple addresses with shared stake key use reward account query', async () => {
+        const rewardAccountTxs = [
+          { block_height: 100, block_time: 1_000_000, tx_hash: txId1, tx_index: 0 },
+          { block_height: 101, block_time: 1_000_020, tx_hash: txId2, tx_index: 0 }
+        ];
+
+        request.mockImplementation(
+          createMockRequestHandler(
+            { [txId1]: mockedTx1Response, [txId2]: mockedTx2Response },
+            txsUtxosResponse,
+            createAccountHandler(rewardAccountTxs)
+          )
+        );
+
+        await provider.transactionsByAddresses({
+          addresses: [baseAddress1, baseAddress2],
+          pagination: { limit: 20, startAt: 0 }
+        });
+
+        // Should query by reward account (stake address)
+        const rewardAccountCalls = request.mock.calls.filter(
+          (call: string[]) => call[0].includes(ACCOUNTS_PATH) && call[0].includes(TRANSACTIONS_PATH)
+        );
+        expect(rewardAccountCalls.length).toBeGreaterThan(0);
+
+        // Should not query by payment credentials
+        const credentialCalls = request.mock.calls.filter((call: string[]) => call[0].includes(ADDR_VKH_PREFIX));
+        expect(credentialCalls.length).toBe(0);
+      });
+
+      test('deduplicates transactions correctly', async () => {
+        const credentialTxs = [
+          { block_height: 100, block_time: 1_000_000, tx_hash: txId1, tx_index: 0 },
+          { block_height: 101, block_time: 1_000_020, tx_hash: txId2, tx_index: 0 },
+          { block_height: 102, block_time: 1_000_040, tx_hash: txId2, tx_index: 1 } // Duplicate txId2
+        ];
+
+        request.mockImplementation(
+          createMockRequestHandler(
+            { [txId1]: mockedTx1Response, [txId2]: mockedTx2Response },
+            txsUtxosResponse,
+            createCredentialHandler(credentialTxs)
+          )
+        );
+
+        const result = await provider.transactionsByAddresses({
+          addresses: [baseAddress1],
+          pagination: { limit: 20, startAt: 0 }
+        });
+
+        // Should deduplicate to 2 unique transactions (txId1, txId2)
+        expect(result.pageResults.length).toBe(2);
+        expect(result.totalResultCount).toBe(2);
+      });
+
+      test('sorts transactions in descending order', async () => {
+        const credentialTxs = [
+          { block_height: 100, block_time: 1_000_000, tx_hash: txId1, tx_index: 0 },
+          { block_height: 101, block_time: 1_000_020, tx_hash: txId2, tx_index: 0 },
+          { block_height: 102, block_time: 1_000_040, tx_hash: txId3, tx_index: 0 }
+        ];
+
+        request.mockImplementation(
+          createMockRequestHandler(
+            { [txId1]: mockedTx1Response, [txId2]: mockedTx2Response, [txId3]: mockedTx3Response },
+            txsUtxosResponse,
+            createCredentialHandler(credentialTxs)
+          )
+        );
+
+        const result = await provider.transactionsByAddresses({
+          addresses: [baseAddress1],
+          pagination: { limit: 20, order: 'desc', startAt: 0 }
+        });
+
+        // Should be sorted descending (newest first)
+        expect(result.pageResults.length).toBe(3);
+        expect(result.pageResults[0].id).toBe(txId3);
+        expect(result.pageResults[1].id).toBe(txId2);
+        expect(result.pageResults[2].id).toBe(txId1);
+
+        // Verify block heights are actually in descending order
+        expect(result.pageResults[0].blockHeader.blockNo).toBeGreaterThan(result.pageResults[1].blockHeader.blockNo);
+        expect(result.pageResults[1].blockHeader.blockNo).toBeGreaterThan(result.pageResults[2].blockHeader.blockNo);
+      });
+
+      test('applies blockRange filters', async () => {
+        const credentialTxs = [
+          { block_height: 50, block_time: 500_000, tx_hash: txId1, tx_index: 0 },
+          { block_height: 101, block_time: 1_000_000, tx_hash: txId2, tx_index: 0 },
+          { block_height: 150, block_time: 1_500_000, tx_hash: txId3, tx_index: 0 }
+        ];
+
+        request.mockImplementation(
+          createMockRequestHandler(
+            { [txId1]: mockedTx1Response, [txId2]: mockedTx2Response, [txId3]: mockedTx3Response },
+            txsUtxosResponse,
+            createCredentialHandler(credentialTxs)
+          )
+        );
+
+        const result = await provider.transactionsByAddresses({
+          addresses: [baseAddress1],
+          blockRange: { lowerBound: Cardano.BlockNo(75), upperBound: Cardano.BlockNo(125) },
+          pagination: { limit: 20, startAt: 0 }
+        });
+
+        // Should only include txId2 (block_height: 101, within range 75-125)
+        // txId1 (block_height: 50) and txId3 (block_height: 150) should be filtered out
+        expect(result.pageResults.length).toBe(1);
+        expect(result.pageResults[0].id).toBe(txId2);
+        expect(result.pageResults[0].blockHeader.blockNo).toBe(Cardano.BlockNo(101));
+      });
+
+      test('handles enterprise addresses (no stake credential)', async () => {
+        const credentialTxs = [{ block_height: 100, block_time: 1_000_000, tx_hash: txId1, tx_index: 0 }];
+
+        request.mockImplementation(
+          createMockRequestHandler(
+            { [txId1]: mockedTx1Response },
+            txsUtxosResponse,
+            createCredentialHandler(credentialTxs)
+          )
+        );
+
+        await provider.transactionsByAddresses({
+          addresses: [enterpriseAddress],
+          pagination: { limit: 20, startAt: 0 }
+        });
+
+        // Should query by payment credential (no stake account query)
+        const credentialCalls = request.mock.calls.filter((call: string[]) => call[0].includes(ADDR_VKH_PREFIX));
+        expect(credentialCalls.length).toBeGreaterThan(0);
+
+        // Should not query by stake account
+        const stakeCalls = request.mock.calls.filter(
+          (call: string[]) => call[0].includes(ACCOUNTS_PATH) && call[0].includes(TRANSACTIONS_PATH)
+        );
+        expect(stakeCalls.length).toBe(0);
+      });
+
+      test('handles empty result sets', async () => {
+        request.mockImplementation(createMockRequestHandler({}, txsUtxosResponse));
+
+        const result = await provider.transactionsByAddresses({
+          addresses: [baseAddress1],
+          pagination: { limit: 20, startAt: 0 }
+        });
+
+        expect(result.pageResults.length).toBe(0);
+        expect(result.totalResultCount).toBe(0);
+      });
     });
   });
 });
