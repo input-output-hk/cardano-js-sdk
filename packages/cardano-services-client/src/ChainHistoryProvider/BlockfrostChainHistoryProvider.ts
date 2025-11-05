@@ -34,21 +34,45 @@ export const DB_MAX_SAFE_INTEGER = 2_147_483_647;
 type BlockfrostTx = Pick<Responses['address_transactions_content'][0], 'block_height' | 'tx_index'>;
 const compareTx = (a: BlockfrostTx, b: BlockfrostTx) => a.block_height - b.block_height || a.tx_index - b.tx_index;
 
-type BlockfrostChainHistoryProviderDependencies = {
+interface BlockfrostChainHistoryProviderOptions {
+  queryTxsByCredentials?: boolean;
+}
+
+interface BlockfrostChainHistoryProviderDependencies {
   cache: Cache<Cardano.HydratedTx>;
   client: BlockfrostClient;
   networkInfoProvider: NetworkInfoProvider;
   logger: Logger;
-};
+}
 
 export class BlockfrostChainHistoryProvider extends BlockfrostProvider implements ChainHistoryProvider {
   private readonly cache: Cache<Cardano.HydratedTx>;
   private networkInfoProvider: NetworkInfoProvider;
+  // Feature flag to enable credential-based transaction fetching (used in transactionsByAddresses)
+  protected readonly queryTxsByCredentials: boolean;
 
-  constructor({ cache, client, networkInfoProvider, logger }: BlockfrostChainHistoryProviderDependencies) {
-    super(client, logger);
-    this.cache = cache;
-    this.networkInfoProvider = networkInfoProvider;
+  // Overload 1: Old signature (backward compatibility)
+  constructor(dependencies: BlockfrostChainHistoryProviderDependencies);
+
+  // Overload 2: New signature with options
+  constructor(options: BlockfrostChainHistoryProviderOptions, dependencies: BlockfrostChainHistoryProviderDependencies);
+
+  // Implementation signature
+  constructor(
+    optionsOrDependencies: BlockfrostChainHistoryProviderOptions | BlockfrostChainHistoryProviderDependencies,
+    maybeDependencies?: BlockfrostChainHistoryProviderDependencies
+  ) {
+    // Detect which overload was used
+    const isOldSignature = 'cache' in optionsOrDependencies;
+    const options = isOldSignature ? {} : (optionsOrDependencies as BlockfrostChainHistoryProviderOptions);
+    const dependencies = isOldSignature
+      ? (optionsOrDependencies as BlockfrostChainHistoryProviderDependencies)
+      : maybeDependencies!;
+
+    super(dependencies.client, dependencies.logger);
+    this.cache = dependencies.cache;
+    this.networkInfoProvider = dependencies.networkInfoProvider;
+    this.queryTxsByCredentials = options.queryTxsByCredentials ?? false;
   }
 
   protected async fetchRedeemers({
