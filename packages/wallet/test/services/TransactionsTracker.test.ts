@@ -5,7 +5,6 @@ import { Cardano, ChainHistoryProvider, TransactionsByAddressesArgs } from '@car
 import {
   FailedTx,
   OutgoingTx,
-  PAGE_SIZE,
   TransactionFailure,
   TxInFlight,
   createAddressTransactionsProvider,
@@ -138,7 +137,7 @@ describe('TransactionsTracker', () => {
     });
 
     it('emits configured number of latest historical transactions', async () => {
-      const totalTxsCount = PAGE_SIZE + 5;
+      const totalTxsCount = 25 + 5;
 
       const allTransactions = generateTxAlonzo(totalTxsCount);
       chainHistoryProvider.transactionsByAddresses = jest
