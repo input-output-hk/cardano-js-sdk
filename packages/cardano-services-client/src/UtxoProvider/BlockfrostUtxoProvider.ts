@@ -1,5 +1,5 @@
 import { BlockfrostClient, BlockfrostProvider, BlockfrostToCore, fetchSequentially } from '../blockfrost';
-import { Cardano, Serialization, UtxoByAddressesArgs, UtxoProvider } from '@cardano-sdk/core';
+import { Cardano, Serialization, UtxoByAddressesArgs, UtxoProvider, sortUtxoByTxIn } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { createPaymentCredentialFilter, extractCredentials, minimizeCredentialSet } from '../credentialUtils';
 import uniqBy from 'lodash/uniqBy.js';
@@ -122,12 +122,8 @@ export class BlockfrostUtxoProvider extends BlockfrostProvider implements UtxoPr
     // Deduplicate by txId + index combination
     const deduplicated = uniqBy(allUtxos, (utxo: Cardano.Utxo) => `${utxo[0].txId}#${utxo[0].index}`);
 
-    // Sort by txId and index for deterministic ordering
-    return deduplicated.sort((a, b) => {
-      const txIdCompare = a[0].txId.localeCompare(b[0].txId);
-      if (txIdCompare !== 0) return txIdCompare;
-      return a[0].index - b[0].index;
-    });
+    // Sort using sortUtxoByTxIn from core
+    return deduplicated.sort(sortUtxoByTxIn);
   }
 
   private logSkippedAddresses(skippedAddresses: {

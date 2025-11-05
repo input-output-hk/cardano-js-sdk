@@ -1,7 +1,7 @@
 /* eslint-disable func-style, complexity, sonarjs/cognitive-complexity */
 
 import { BigIntMath } from '@cardano-sdk/util';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, sortTxIn, sortUtxoByTxIn } from '@cardano-sdk/core';
 import { ComputeMinimumCoinQuantity, ImplicitValue, TokenBundleSizeExceedsLimit } from './types';
 import { InputSelectionError, InputSelectionFailure } from './InputSelectionError';
 import uniq from 'lodash/uniq.js';
@@ -12,26 +12,8 @@ export const stubMaxSizeAddress = Cardano.PaymentAddress(
   'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
 );
 
-/**
- * Sorts the given TxIn set first by txId and then by index.
- *
- * @param lhs The left-hand side of the comparison operation.
- * @param rhs The left-hand side of the comparison operation.
- */
-export const sortTxIn = (lhs: Cardano.TxIn, rhs: Cardano.TxIn) => {
-  const txIdComparison = lhs.txId.localeCompare(rhs.txId);
-  if (txIdComparison !== 0) return txIdComparison;
-
-  return lhs.index - rhs.index;
-};
-
-/**
- * Sorts the given Utxo set first by TxIn.
- *
- * @param lhs The left-hand side of the comparison operation.
- * @param rhs The left-hand side of the comparison operation.
- */
-export const sortUtxoByTxIn = (lhs: Cardano.Utxo, rhs: Cardano.Utxo) => sortTxIn(lhs[0], rhs[0]);
+// Re-export sorting utilities from core for backward compatibility
+export { sortTxIn, sortUtxoByTxIn };
 
 export interface ImplicitTokens {
   spend(assetId: Cardano.AssetId): bigint;
