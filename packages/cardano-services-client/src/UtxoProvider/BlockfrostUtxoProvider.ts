@@ -4,18 +4,42 @@ import { Logger } from 'ts-log';
 import type { Cache } from '@cardano-sdk/util';
 import type { Responses } from '@blockfrost/blockfrost-js';
 
-type BlockfrostUtxoProviderDependencies = {
+interface BlockfrostUtxoProviderOptions {
+  queryUtxosByCredentials?: boolean;
+}
+
+interface BlockfrostUtxoProviderDependencies {
   client: BlockfrostClient;
   cache: Cache<Cardano.Tx>;
   logger: Logger;
-};
+}
 
 export class BlockfrostUtxoProvider extends BlockfrostProvider implements UtxoProvider {
   private readonly cache: Cache<Cardano.Tx>;
+  // Feature flag to enable credential-based UTXO fetching (used in utxoByAddresses)
+  protected readonly queryUtxosByCredentials: boolean;
 
-  constructor({ cache, client, logger }: BlockfrostUtxoProviderDependencies) {
-    super(client, logger);
-    this.cache = cache;
+  // Overload 1: Old signature (backward compatibility)
+  constructor(dependencies: BlockfrostUtxoProviderDependencies);
+
+  // Overload 2: New signature with options
+  constructor(options: BlockfrostUtxoProviderOptions, dependencies: BlockfrostUtxoProviderDependencies);
+
+  // Implementation signature
+  constructor(
+    optionsOrDependencies: BlockfrostUtxoProviderOptions | BlockfrostUtxoProviderDependencies,
+    maybeDependencies?: BlockfrostUtxoProviderDependencies
+  ) {
+    // Detect which overload was used
+    const isOldSignature = 'cache' in optionsOrDependencies;
+    const options = isOldSignature ? {} : (optionsOrDependencies as BlockfrostUtxoProviderOptions);
+    const dependencies = isOldSignature
+      ? (optionsOrDependencies as BlockfrostUtxoProviderDependencies)
+      : maybeDependencies!;
+
+    super(dependencies.client, dependencies.logger);
+    this.cache = dependencies.cache;
+    this.queryUtxosByCredentials = options.queryUtxosByCredentials ?? false;
   }
 
   protected async fetchUtxos(addr: Cardano.PaymentAddress, paginationQueryString: string): Promise<Cardano.Utxo[]> {
