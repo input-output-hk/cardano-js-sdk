@@ -33,6 +33,94 @@ const parseAddress = (address: Cardano.PaymentAddress): Cardano.Address | null =
   }
 };
 
+/** Extracts payment credential from an address if available */
+const extractPaymentCredential = (address: Cardano.PaymentAddress): Cardano.PaymentCredential | null => {
+  const parsed = parseAddress(address);
+  if (!parsed) return null;
+
+  // Byron addresses don't have payment credentials we can extract
+  if (parsed.asByron()) return null;
+
+  // Try BaseAddress
+  const baseAddress = parsed.asBase();
+  if (baseAddress) {
+    const credential = baseAddress.getPaymentCredential();
+    return Cardano.PaymentCredential.fromCredential(credential);
+  }
+
+  // Try EnterpriseAddress
+  const enterpriseAddress = parsed.asEnterprise();
+  if (enterpriseAddress) {
+    const credential = enterpriseAddress.getPaymentCredential();
+    return Cardano.PaymentCredential.fromCredential(credential);
+  }
+
+  // Try PointerAddress
+  const pointerAddress = parsed.asPointer();
+  if (pointerAddress) {
+    const credential = pointerAddress.getPaymentCredential();
+    return Cardano.PaymentCredential.fromCredential(credential);
+  }
+
+  return null;
+};
+
+/**
+ * Creates a filter predicate that checks if an address has a payment credential we control.
+ * Pure function that creates a filter based on controlled payment credentials.
+ *
+ * This filter is used to filter UTXOs returned from reward account (stake address) queries,
+ * ensuring we only include UTXOs where we control the payment credential.
+ *
+ * Critical assumption: All addresses provided as input are addresses where the caller
+ * controls the payment credential. This assumption is fundamental to the filtering logic.
+ *
+ * Performance optimization: The filter first checks for exact address matches (O(1) Set lookup)
+ * before attempting more expensive credential extraction and comparison.
+ *
+ * @param addresses Array of payment addresses whose payment credentials we control
+ * @returns Filter function that returns true if the address has a controlled payment credential
+ * @example
+ * ```typescript
+ * const myAddresses = ['addr1...', 'addr_test1...'];
+ * const filter = createPaymentCredentialFilter(myAddresses);
+ *
+ * // Filter UTXOs from a stake address query
+ * const filteredUtxos = allUtxos.filter(utxo => filter(utxo[0]));
+ * ```
+ */
+export const createPaymentCredentialFilter = (
+  addresses: Cardano.PaymentAddress[]
+): ((address: Cardano.PaymentAddress) => boolean) => {
+  // Build Set of exact addresses for O(1) fast path lookup
+  const exactAddresses = new Set<Cardano.PaymentAddress>(addresses);
+
+  // Extract all payment credentials from input addresses
+  const controlledCredentials = new Set<Cardano.PaymentCredential>();
+  for (const address of addresses) {
+    const credential = extractPaymentCredential(address);
+    if (credential) {
+      controlledCredentials.add(credential);
+    }
+  }
+
+  // Return filter function
+  return (address: Cardano.PaymentAddress): boolean => {
+    // Fast path: exact address match
+    if (exactAddresses.has(address)) {
+      return true;
+    }
+
+    // Slow path: extract payment credential and check if controlled
+    const credential = extractPaymentCredential(address);
+    if (!credential) {
+      return false;
+    }
+
+    return controlledCredentials.has(credential);
+  };
+};
+
 /** Adds a credential to the map, creating the array if needed */
 const addToCredentialMap = <T extends string>(
   map: Map<T, Cardano.PaymentAddress[]>,

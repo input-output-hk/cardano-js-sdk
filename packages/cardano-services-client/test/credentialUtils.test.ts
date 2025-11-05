@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import { cip19TestVectors } from '@cardano-sdk/util-dev';
-import { extractCredentials, minimizeCredentialSet } from '../src/credentialUtils';
+import { createPaymentCredentialFilter, extractCredentials, minimizeCredentialSet } from '../src/credentialUtils';
 
 describe('credentialUtils', () => {
   describe('extractCredentials', () => {
@@ -445,6 +445,241 @@ describe('credentialUtils', () => {
       // Credential with no addresses should be removed
       expect(result.paymentCredentials.size).toBe(0);
       expect(result.rewardAccounts.size).toBe(0);
+    });
+  });
+
+  describe('createPaymentCredentialFilter', () => {
+    // Constants for commonly used test inputs
+    const BASE_KEY_STAKE_KEY_INPUT = [cip19TestVectors.basePaymentKeyStakeKey];
+    const BASE_SCRIPT_STAKE_KEY_INPUT = [cip19TestVectors.basePaymentScriptStakeKey];
+    const ENTERPRISE_KEY_INPUT = [cip19TestVectors.enterpriseKey];
+    const ENTERPRISE_SCRIPT_INPUT = [cip19TestVectors.enterpriseScript];
+    const POINTER_KEY_INPUT = [cip19TestVectors.pointerKey];
+    const POINTER_SCRIPT_INPUT = [cip19TestVectors.pointerScript];
+
+    // Constants for test description strings
+    const WITH_KEY_HASH = 'with KeyHash payment credential';
+    const WITH_SCRIPT_HASH = 'with ScriptHash payment credential';
+    const EXACT_MATCH_TEST = 'passes filter for address with controlled payment credential (exact match)';
+
+    describe('BaseAddress filtering', () => {
+      describe(WITH_KEY_HASH, () => {
+        const filter = createPaymentCredentialFilter(BASE_KEY_STAKE_KEY_INPUT);
+
+        it(EXACT_MATCH_TEST, () => {
+          // Same address should pass (fast path - exact match)
+          expect(filter(cip19TestVectors.basePaymentKeyStakeKey)).toBe(true);
+        });
+
+        it('passes filter for address with same payment credential but different stake credential', () => {
+          // Different address with same payment credential should pass
+          // basePaymentKeyStakeKey has payment key hash, basePaymentKeyStakeScript has same payment key hash but different stake
+          expect(filter(cip19TestVectors.basePaymentKeyStakeScript)).toBe(true);
+        });
+
+        it('rejects addresses with uncontrolled payment credentials', () => {
+          // basePaymentScriptStakeKey has different payment credential (script vs key hash)
+          expect(filter(cip19TestVectors.basePaymentScriptStakeKey)).toBe(false);
+          // Address with same stake credential but different payment credential should also be rejected
+          expect(filter(cip19TestVectors.basePaymentScriptStakeScript)).toBe(false);
+        });
+      });
+
+      describe(WITH_SCRIPT_HASH, () => {
+        const filter = createPaymentCredentialFilter(BASE_SCRIPT_STAKE_KEY_INPUT);
+
+        it('passes filter for addresses with same payment credential', () => {
+          // Same payment credential (script) should pass
+          expect(filter(cip19TestVectors.basePaymentScriptStakeKey)).toBe(true);
+          // Different stake but same payment credential (script) should pass
+          expect(filter(cip19TestVectors.basePaymentScriptStakeScript)).toBe(true);
+        });
+      });
+    });
+
+    describe('EnterpriseAddress filtering', () => {
+      describe(WITH_KEY_HASH, () => {
+        const filter = createPaymentCredentialFilter(ENTERPRISE_KEY_INPUT);
+
+        it(EXACT_MATCH_TEST, () => {
+          expect(filter(cip19TestVectors.enterpriseKey)).toBe(true);
+        });
+
+        it('rejects address with uncontrolled payment credential', () => {
+          // enterpriseScript has different payment credential
+          expect(filter(cip19TestVectors.enterpriseScript)).toBe(false);
+        });
+      });
+
+      describe(WITH_SCRIPT_HASH, () => {
+        const filter = createPaymentCredentialFilter(ENTERPRISE_SCRIPT_INPUT);
+
+        it('passes filter for script payment credential', () => {
+          expect(filter(cip19TestVectors.enterpriseScript)).toBe(true);
+        });
+      });
+
+      it('passes filter when EnterpriseAddress matches payment credential from BaseAddress', () => {
+        const filter = createPaymentCredentialFilter(BASE_KEY_STAKE_KEY_INPUT);
+
+        // enterpriseKey should have the same payment credential as basePaymentKeyStakeKey
+        expect(filter(cip19TestVectors.enterpriseKey)).toBe(true);
+      });
+    });
+
+    describe('PointerAddress filtering', () => {
+      describe(WITH_KEY_HASH, () => {
+        const filter = createPaymentCredentialFilter(POINTER_KEY_INPUT);
+
+        it(EXACT_MATCH_TEST, () => {
+          expect(filter(cip19TestVectors.pointerKey)).toBe(true);
+        });
+
+        it('rejects address with uncontrolled payment credential', () => {
+          // pointerScript has different payment credential
+          expect(filter(cip19TestVectors.pointerScript)).toBe(false);
+        });
+      });
+
+      describe(WITH_SCRIPT_HASH, () => {
+        const filter = createPaymentCredentialFilter(POINTER_SCRIPT_INPUT);
+
+        it('passes filter for script payment credential', () => {
+          expect(filter(cip19TestVectors.pointerScript)).toBe(true);
+        });
+      });
+
+      it('passes filter when PointerAddress matches payment credential from BaseAddress', () => {
+        const filter = createPaymentCredentialFilter(BASE_KEY_STAKE_KEY_INPUT);
+
+        // pointerKey should have the same payment credential as basePaymentKeyStakeKey
+        expect(filter(cip19TestVectors.pointerKey)).toBe(true);
+      });
+    });
+
+    describe('Mixed credential types', () => {
+      it('correctly filters KeyHash payment credentials', () => {
+        const inputAddresses = [
+          cip19TestVectors.basePaymentKeyStakeKey,
+          cip19TestVectors.enterpriseKey,
+          cip19TestVectors.pointerKey
+        ];
+        const filter = createPaymentCredentialFilter(inputAddresses);
+
+        // All addresses with same key hash should pass
+        expect(filter(cip19TestVectors.basePaymentKeyStakeKey)).toBe(true);
+        expect(filter(cip19TestVectors.basePaymentKeyStakeScript)).toBe(true);
+        expect(filter(cip19TestVectors.enterpriseKey)).toBe(true);
+        expect(filter(cip19TestVectors.pointerKey)).toBe(true);
+
+        // Addresses with script hash should not pass
+        expect(filter(cip19TestVectors.basePaymentScriptStakeKey)).toBe(false);
+        expect(filter(cip19TestVectors.enterpriseScript)).toBe(false);
+        expect(filter(cip19TestVectors.pointerScript)).toBe(false);
+      });
+
+      it('correctly filters ScriptHash payment credentials', () => {
+        const inputAddresses = [
+          cip19TestVectors.basePaymentScriptStakeKey,
+          cip19TestVectors.enterpriseScript,
+          cip19TestVectors.pointerScript
+        ];
+        const filter = createPaymentCredentialFilter(inputAddresses);
+
+        // All addresses with same script hash should pass
+        expect(filter(cip19TestVectors.basePaymentScriptStakeKey)).toBe(true);
+        expect(filter(cip19TestVectors.basePaymentScriptStakeScript)).toBe(true);
+        expect(filter(cip19TestVectors.enterpriseScript)).toBe(true);
+        expect(filter(cip19TestVectors.pointerScript)).toBe(true);
+
+        // Addresses with key hash should not pass
+        expect(filter(cip19TestVectors.basePaymentKeyStakeKey)).toBe(false);
+        expect(filter(cip19TestVectors.enterpriseKey)).toBe(false);
+        expect(filter(cip19TestVectors.pointerKey)).toBe(false);
+      });
+
+      it('correctly filters mixed KeyHash and ScriptHash credentials', () => {
+        const inputAddresses = [
+          cip19TestVectors.basePaymentKeyStakeKey, // key hash payment
+          cip19TestVectors.basePaymentScriptStakeKey // script hash payment
+        ];
+        const filter = createPaymentCredentialFilter(inputAddresses);
+
+        // Addresses with either controlled payment credential should pass
+        expect(filter(cip19TestVectors.basePaymentKeyStakeKey)).toBe(true);
+        expect(filter(cip19TestVectors.enterpriseKey)).toBe(true);
+        expect(filter(cip19TestVectors.basePaymentScriptStakeKey)).toBe(true);
+        expect(filter(cip19TestVectors.enterpriseScript)).toBe(true);
+      });
+    });
+
+    describe('Edge cases', () => {
+      it('rejects all addresses when input is empty', () => {
+        const filter = createPaymentCredentialFilter([]);
+
+        expect(filter(cip19TestVectors.basePaymentKeyStakeKey)).toBe(false);
+        expect(filter(cip19TestVectors.enterpriseKey)).toBe(false);
+        expect(filter(cip19TestVectors.pointerKey)).toBe(false);
+      });
+
+      it('skips Byron addresses in filter input (cannot extract payment credential)', () => {
+        const inputAddresses = [cip19TestVectors.byronMainnetYoroi, cip19TestVectors.basePaymentKeyStakeKey];
+        const filter = createPaymentCredentialFilter(inputAddresses);
+
+        // Byron address itself should pass (exact match)
+        expect(filter(cip19TestVectors.byronMainnetYoroi)).toBe(true);
+        // Other addresses with key hash should still work
+        expect(filter(cip19TestVectors.basePaymentKeyStakeKey)).toBe(true);
+        expect(filter(cip19TestVectors.enterpriseKey)).toBe(true);
+      });
+
+      it('rejects Byron address when checking if it matches payment credentials', () => {
+        const inputAddresses = [cip19TestVectors.basePaymentKeyStakeKey];
+        const filter = createPaymentCredentialFilter(inputAddresses);
+
+        // Byron address should not pass (cannot extract payment credential, no exact match)
+        expect(filter(cip19TestVectors.byronMainnetYoroi)).toBe(false);
+      });
+
+      it('handles duplicate addresses in input', () => {
+        const inputAddresses = [
+          cip19TestVectors.basePaymentKeyStakeKey,
+          cip19TestVectors.basePaymentKeyStakeKey,
+          cip19TestVectors.enterpriseKey
+        ];
+        const filter = createPaymentCredentialFilter(inputAddresses);
+
+        // Should work correctly despite duplicates
+        expect(filter(cip19TestVectors.basePaymentKeyStakeKey)).toBe(true);
+        expect(filter(cip19TestVectors.enterpriseKey)).toBe(true);
+      });
+
+      it('handles testnet addresses correctly', () => {
+        const inputAddresses = [cip19TestVectors.testnetBasePaymentKeyStakeKey];
+        const filter = createPaymentCredentialFilter(inputAddresses);
+
+        // Same payment credential on testnet should pass
+        expect(filter(cip19TestVectors.testnetBasePaymentKeyStakeKey)).toBe(true);
+        expect(filter(cip19TestVectors.testnetEnterpriseKey)).toBe(true);
+        expect(filter(cip19TestVectors.testnetPointerKey)).toBe(true);
+
+        // Different payment credential should not pass
+        expect(filter(cip19TestVectors.testnetBasePaymentScriptStakeKey)).toBe(false);
+      });
+    });
+
+    describe('Performance optimization - exact address match', () => {
+      it('uses fast path for exact address matches', () => {
+        const inputAddresses = [cip19TestVectors.basePaymentKeyStakeKey, cip19TestVectors.enterpriseKey];
+        const filter = createPaymentCredentialFilter(inputAddresses);
+
+        // These should use the fast path (exact match in Set)
+        expect(filter(cip19TestVectors.basePaymentKeyStakeKey)).toBe(true);
+        expect(filter(cip19TestVectors.enterpriseKey)).toBe(true);
+
+        // This should use the credential extraction path (not in exact match Set)
+        expect(filter(cip19TestVectors.basePaymentKeyStakeScript)).toBe(true);
+      });
     });
   });
 });
