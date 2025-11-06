@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">99.55% </span>
+                <span class="strong">99.54% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>225/226</span>
+                <span class='fraction'>221/222</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">99.51% </span>
+                <span class="strong">99.5% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>207/208</span>
+                <span class='fraction'>203/204</span>
             </div>
         
             
@@ -723,14 +723,7 @@
 <a name='L658'></a><a href='#L658'>658</a>
 <a name='L659'></a><a href='#L659'>659</a>
 <a name='L660'></a><a href='#L660'>660</a>
-<a name='L661'></a><a href='#L661'>661</a>
-<a name='L662'></a><a href='#L662'>662</a>
-<a name='L663'></a><a href='#L663'>663</a>
-<a name='L664'></a><a href='#L664'>664</a>
-<a name='L665'></a><a href='#L665'>665</a>
-<a name='L666'></a><a href='#L666'>666</a>
-<a name='L667'></a><a href='#L667'>667</a>
-<a name='L668'></a><a href='#L668'>668</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">42x</span>
+<a name='L661'></a><a href='#L661'>661</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">42x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">42x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -770,7 +763,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">42x</span>
 <span class="cline-any cline-yes">42x</span>
-<span class="cline-any cline-yes">42x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -805,9 +797,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">42x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -854,9 +843,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">149x</span>
-<span class="cline-any cline-yes">149x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">149x</span>
 <span class="cline-any cline-yes">149x</span>
 <span class="cline-any cline-yes">18x</span>
 <span class="cline-any cline-yes">18x</span>
@@ -879,7 +866,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">131x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">149x</span>
@@ -1174,7 +1160,7 @@
 <span class="cline-any cline-yes">143x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">143x</span>
-<span class="cline-any cline-yes">1996x</span>
+<span class="cline-any cline-yes">1962x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">143x</span>
@@ -1322,7 +1308,7 @@
 <span class="cline-any cline-yes">143x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">33x</span>
+<span class="cline-any cline-yes">31x</span>
 <span class="cline-any cline-yes">33x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1342,7 +1328,7 @@
 <span class="cline-any cline-yes">33x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">344x</span>
-<span class="cline-any cline-yes">68x</span>
+<span class="cline-any cline-yes">63x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">282x</span>
 <span class="cline-any cline-yes">136x</span>
@@ -1436,7 +1422,6 @@ import { distinctBlock, pollProvider, signedTxsEquals, transactionsEquals, txEqu
 &nbsp;
 import { WitnessedTx } from '@cardano-sdk/key-management';
 import { newAndStoredMulticast } from './util/newAndStoredMulticast';
-import chunk from 'lodash/chunk.js';
 import sortBy from 'lodash/sortBy.js';
 &nbsp;
 export interface TransactionsTrackerProps {
@@ -1472,9 +1457,6 @@ export interface TransactionsTrackerInternalsProps {
   historicalTransactionsFetchLimit: number;
   logger: Logger;
 }
-&nbsp;
-// Temporarily hardcoded. Will be replaced with ChainHistoryProvider 'maxPageSize' value once ADP-2249 is implemented
-export const PAGE_SIZE = 25;
 &nbsp;
 /**
  * Sorts the given HydratedTx by slot.
@@ -1520,33 +1502,30 @@ const allTransactionsByAddresses = async (
     filterBy: { type: 'blockRange'; blockRange: Range&lt;Cardano.BlockNo&gt; } | { type: 'tip'; limit: number };
   }
 ): Promise&lt;Cardano.HydratedTx[]&gt; =&gt; {
-  const addressesSubGroups = chunk(addresses, PAGE_SIZE);
   let response: Cardano.HydratedTx[] = [];
 &nbsp;
-  for (const addressGroup of addressesSubGroups) {
-    if (filterBy.type === 'blockRange') {
-      let startAt = 0;
-      let pageResults: Cardano.HydratedTx[] = [];
+  if (filterBy.type === 'blockRange') {
+    let startAt = 0;
+    let pageResults: Cardano.HydratedTx[] = [];
 &nbsp;
-      do {
-        pageResults = (
-          await chainHistoryProvider.transactionsByAddresses({
-            addresses: addressGroup,
-            blockRange: filterBy.blockRange,
-            pagination: { limit: PAGE_SIZE, startAt }
-          })
-        ).pageResults;
+    do {
+      pageResults = (
+        await chainHistoryProvider.transactionsByAddresses({
+          addresses,
+          blockRange: filterBy.blockRange,
+          pagination: { limit: 25, startAt }
+        })
+      ).pageResults;
 &nbsp;
-        startAt += PAGE_SIZE;
-        response = [...response, ...pageResults];
-      } while (pageResults.length &gt;= PAGE_SIZE);
-    } else {
-      const txes = await chainHistoryProvider.transactionsByAddresses({
-        addresses: addressGroup,
-        pagination: { limit: filterBy.limit, order: 'desc', startAt: 0 }
-      });
-      response = [...response, ...txes.pageResults.reverse()];
-    }
+      startAt += 25;
+      response = [...response, ...pageResults];
+    } while (pageResults.length &gt;= 25);
+  } else {
+    const txes = await chainHistoryProvider.transactionsByAddresses({
+      addresses,
+      pagination: { limit: filterBy.limit, order: 'desc', startAt: 0 }
+    });
+    response = [...response, ...txes.pageResults.reverse()];
   }
 &nbsp;
   return deduplicateSortedArray(response.sort(compareTxOrder), txEquals);
@@ -2071,7 +2050,7 @@ export const createTransactionsTracker = (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-09-25T08:51:18.765Z
+                at 2025-11-06T15:31:17.121Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
