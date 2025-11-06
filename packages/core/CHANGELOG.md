@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.46.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.46.10...@cardano-sdk/core@0.46.11) (2025-11-06)
+
+### Features
+
+* **core:** add PaymentCredential type for CIP-5 bech32 encoding ([6bc3b40](https://github.com/input-output-hk/cardano-js-sdk/commit/6bc3b404e801972417dfff7f75da21dd012515d1))
+
 ## [0.46.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.46.9...@cardano-sdk/core@0.46.10) (2025-09-16)
 
 **Note:** Version bump only for package @cardano-sdk/core

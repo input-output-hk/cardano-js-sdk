@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.29](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.26.28...@cardano-sdk/cardano-services-client@0.26.29) (2025-11-06)
+
+### Features
+
+* **cardano-services-client:** add credential extraction and minimization utilities ([a222fac](https://github.com/input-output-hk/cardano-js-sdk/commit/a222fac8aad46fc77b300cf17bc72b9aa7bcf3f5))
+* **cardano-services-client:** add payment credential filtering utilities for UTXO queries ([c27028b](https://github.com/input-output-hk/cardano-js-sdk/commit/c27028b1c9f4789a38e3c9f7a32b0d2596c96c0a))
+* **cardano-services-client:** add queryTxsByCredentials feature flag ([d666485](https://github.com/input-output-hk/cardano-js-sdk/commit/d666485f402497a3234faf3fb7c81d91ae078df3))
+* **cardano-services-client:** add queryUtxosByCredentials feature flag to BlockfrostUtxoProvider ([5f5548f](https://github.com/input-output-hk/cardano-js-sdk/commit/5f5548f2ee75c0a5ed5d66ee9868073a2ac6f0c5))
+* **cardano-services-client:** implement credential-based transaction queries ([e50ed89](https://github.com/input-output-hk/cardano-js-sdk/commit/e50ed89ccc64f4e90b53588f5da23687dd96a244))
+* **cardano-services-client:** implement credential-based UTXO queries ([eb6aff5](https://github.com/input-output-hk/cardano-js-sdk/commit/eb6aff587c54783f9229a289d087b8fb2a642783))
+
 ## [0.26.28](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.26.27...@cardano-sdk/cardano-services-client@0.26.28) (2025-09-16)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services-client

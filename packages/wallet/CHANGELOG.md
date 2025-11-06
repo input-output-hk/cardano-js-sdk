@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.54.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.53.22...@cardano-sdk/wallet@0.54.0) (2025-11-06)
+
+### ⚠ BREAKING CHANGES
+
+* **wallet:** Wallets with many addresses may exceed provider page size
+limits. If using db-sync based providers, configure the server with a large
+enough page size limit to accommodate all wallet addresses in a single request.
+
+### Code Refactoring
+
+* **wallet:** remove address chunking from UTXO and transaction queries ([726bc2e](https://github.com/input-output-hk/cardano-js-sdk/commit/726bc2e06fc8b4dec76a62242c61fffe48937a70))
+
 ## [0.53.22](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.53.21...@cardano-sdk/wallet@0.53.22) (2025-09-25)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
