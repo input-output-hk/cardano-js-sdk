@@ -37,7 +37,6 @@ import { distinctBlock, pollProvider, signedTxsEquals, transactionsEquals, txEqu
 
 import { WitnessedTx } from '@cardano-sdk/key-management';
 import { newAndStoredMulticast } from './util/newAndStoredMulticast';
-import chunk from 'lodash/chunk.js';
 import sortBy from 'lodash/sortBy.js';
 
 export interface TransactionsTrackerProps {
@@ -73,9 +72,6 @@ export interface TransactionsTrackerInternalsProps {
   historicalTransactionsFetchLimit: number;
   logger: Logger;
 }
-
-// Temporarily hardcoded. Will be replaced with ChainHistoryProvider 'maxPageSize' value once ADP-2249 is implemented
-export const PAGE_SIZE = 25;
 
 /**
  * Sorts the given HydratedTx by slot.
@@ -121,33 +117,30 @@ const allTransactionsByAddresses = async (
     filterBy: { type: 'blockRange'; blockRange: Range<Cardano.BlockNo> } | { type: 'tip'; limit: number };
   }
 ): Promise<Cardano.HydratedTx[]> => {
-  const addressesSubGroups = chunk(addresses, PAGE_SIZE);
   let response: Cardano.HydratedTx[] = [];
 
-  for (const addressGroup of addressesSubGroups) {
-    if (filterBy.type === 'blockRange') {
-      let startAt = 0;
-      let pageResults: Cardano.HydratedTx[] = [];
+  if (filterBy.type === 'blockRange') {
+    let startAt = 0;
+    let pageResults: Cardano.HydratedTx[] = [];
 
-      do {
-        pageResults = (
-          await chainHistoryProvider.transactionsByAddresses({
-            addresses: addressGroup,
-            blockRange: filterBy.blockRange,
-            pagination: { limit: PAGE_SIZE, startAt }
-          })
-        ).pageResults;
+    do {
+      pageResults = (
+        await chainHistoryProvider.transactionsByAddresses({
+          addresses,
+          blockRange: filterBy.blockRange,
+          pagination: { limit: 25, startAt }
+        })
+      ).pageResults;
 
-        startAt += PAGE_SIZE;
-        response = [...response, ...pageResults];
-      } while (pageResults.length >= PAGE_SIZE);
-    } else {
-      const txes = await chainHistoryProvider.transactionsByAddresses({
-        addresses: addressGroup,
-        pagination: { limit: filterBy.limit, order: 'desc', startAt: 0 }
-      });
-      response = [...response, ...txes.pageResults.reverse()];
-    }
+      startAt += 25;
+      response = [...response, ...pageResults];
+    } while (pageResults.length >= 25);
+  } else {
+    const txes = await chainHistoryProvider.transactionsByAddresses({
+      addresses,
+      pagination: { limit: filterBy.limit, order: 'desc', startAt: 0 }
+    });
+    response = [...response, ...txes.pageResults.reverse()];
   }
 
   return deduplicateSortedArray(response.sort(compareTxOrder), txEquals);

@@ -6,11 +6,7 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxInFlight, UtxoTracker } from './types';
 import { WalletStores } from '../persistence';
 import { sortUtxoByTxIn } from '@cardano-sdk/input-selection';
-import chunk from 'lodash/chunk.js';
 import uniqWith from 'lodash/uniqWith.js';
-
-// Temporarily hardcoded. Will be replaced with ChainHistoryProvider 'maxPageSize' value once ADP-2249 is implemented
-const PAGE_SIZE = 25;
 
 export interface UtxoTrackerProps {
   utxoProvider: UtxoProvider;
@@ -41,14 +37,7 @@ export const createUtxoProvider = (
         logger,
         retryBackoffConfig,
         sample: async () => {
-          let utxos = new Array<Cardano.Utxo>();
-
-          const addressesSubGroups = chunk(paymentAddresses, PAGE_SIZE);
-
-          for (const addresses of addressesSubGroups) {
-            utxos = [...utxos, ...(await utxoProvider.utxoByAddresses({ addresses }))];
-          }
-
+          const utxos = await utxoProvider.utxoByAddresses({ addresses: paymentAddresses });
           return utxos.sort(sortUtxoByTxIn);
         },
         trigger$: history$

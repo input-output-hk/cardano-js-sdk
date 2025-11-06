@@ -22,6 +22,7 @@ import {
   createSlotEpochCalc
 } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
+import { extractCredentials, minimizeCredentialSet } from '../credentialUtils';
 import omit from 'lodash/omit.js';
 import uniq from 'lodash/uniq.js';
 import type { Cache } from '@cardano-sdk/util';
@@ -34,21 +35,45 @@ export const DB_MAX_SAFE_INTEGER = 2_147_483_647;
 type BlockfrostTx = Pick<Responses['address_transactions_content'][0], 'block_height' | 'tx_index'>;
 const compareTx = (a: BlockfrostTx, b: BlockfrostTx) => a.block_height - b.block_height || a.tx_index - b.tx_index;
 
-type BlockfrostChainHistoryProviderDependencies = {
+interface BlockfrostChainHistoryProviderOptions {
+  queryTxsByCredentials?: boolean;
+}
+
+interface BlockfrostChainHistoryProviderDependencies {
   cache: Cache<Cardano.HydratedTx>;
   client: BlockfrostClient;
   networkInfoProvider: NetworkInfoProvider;
   logger: Logger;
-};
+}
 
 export class BlockfrostChainHistoryProvider extends BlockfrostProvider implements ChainHistoryProvider {
   private readonly cache: Cache<Cardano.HydratedTx>;
   private networkInfoProvider: NetworkInfoProvider;
+  // Feature flag to enable credential-based transaction fetching (used in transactionsByAddresses)
+  protected readonly queryTxsByCredentials: boolean;
 
-  constructor({ cache, client, networkInfoProvider, logger }: BlockfrostChainHistoryProviderDependencies) {
-    super(client, logger);
-    this.cache = cache;
-    this.networkInfoProvider = networkInfoProvider;
+  // Overload 1: Old signature (backward compatibility)
+  constructor(dependencies: BlockfrostChainHistoryProviderDependencies);
+
+  // Overload 2: New signature with options
+  constructor(options: BlockfrostChainHistoryProviderOptions, dependencies: BlockfrostChainHistoryProviderDependencies);
+
+  // Implementation signature
+  constructor(
+    optionsOrDependencies: BlockfrostChainHistoryProviderOptions | BlockfrostChainHistoryProviderDependencies,
+    maybeDependencies?: BlockfrostChainHistoryProviderDependencies
+  ) {
+    // Detect which overload was used
+    const isOldSignature = 'cache' in optionsOrDependencies;
+    const options = isOldSignature ? {} : (optionsOrDependencies as BlockfrostChainHistoryProviderOptions);
+    const dependencies = isOldSignature
+      ? (optionsOrDependencies as BlockfrostChainHistoryProviderDependencies)
+      : maybeDependencies!;
+
+    super(dependencies.client, dependencies.logger);
+    this.cache = dependencies.cache;
+    this.networkInfoProvider = dependencies.networkInfoProvider;
+    this.queryTxsByCredentials = options.queryTxsByCredentials ?? false;
   }
 
   protected async fetchRedeemers({
@@ -501,52 +526,183 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
     );
   }
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
+  /** Processes and filters transaction results, returning deduplicated and sorted transaction IDs. */
+  private processTransactionResults(
+    transactions: BlockfrostTransactionContent[],
+    blockRange: { lowerBound?: number; upperBound?: number },
+    order?: 'asc' | 'desc'
+  ): Cardano.TransactionId[] {
+    const lowerBound = blockRange.lowerBound ?? 0;
+    const upperBound = blockRange.upperBound ?? DB_MAX_SAFE_INTEGER;
+
+    return uniq(
+      transactions
+        .filter(({ block_height }) => block_height >= lowerBound && block_height <= upperBound)
+        .sort(order === 'desc' ? (a, b) => compareTx(b, a) : compareTx)
+        .map(({ tx_hash }) => Cardano.TransactionId(tx_hash))
+    );
+  }
+
+  /** Executes the legacy per-address transaction fetching implementation. */
+  private async fetchTransactionsPerAddress(
+    addresses: Cardano.PaymentAddress[],
+    pagination: TransactionsByAddressesArgs['pagination'],
+    blockRange: TransactionsByAddressesArgs['blockRange']
+  ): Promise<BlockfrostTransactionContent[]> {
+    const paginationOptions = pagination
+      ? {
+          count: pagination.limit,
+          order: pagination.order,
+          page: (pagination.startAt + pagination.limit) / pagination.limit
+        }
+      : undefined;
+
+    const limit = pagination?.limit ?? DB_MAX_SAFE_INTEGER;
+
+    const addressTransactions = await Promise.all(
+      addresses.map((address) =>
+        this.fetchTransactionsByAddress(address, {
+          blockRange,
+          limit,
+          pagination: paginationOptions
+        })
+      )
+    );
+
+    return addressTransactions.flat();
+  }
+
+  /** Logs information about skipped addresses. */
+  private logSkippedAddresses(skippedAddresses: {
+    byron: Cardano.PaymentAddress[];
+    pointer: Cardano.PaymentAddress[];
+  }): void {
+    if (skippedAddresses.byron.length > 0) {
+      this.logger.info(
+        `Found ${skippedAddresses.byron.length} Byron address(es), falling back to per-address fetching`
+      );
+    }
+    if (skippedAddresses.pointer.length > 0) {
+      this.logger.info(
+        `Found ${skippedAddresses.pointer.length} Pointer address(es), falling back to per-address fetching`
+      );
+    }
+  }
+
+  /** Logs minimization statistics. */
+  private logMinimizationStats(
+    totalAddresses: number,
+    minimized: { paymentCredentials: Map<unknown, unknown>; rewardAccounts: Map<unknown, unknown> },
+    skippedAddresses: { byron: Cardano.PaymentAddress[]; pointer: Cardano.PaymentAddress[] }
+  ): void {
+    const paymentCredCount = minimized.paymentCredentials.size;
+    const rewardAccountCount = minimized.rewardAccounts.size;
+    const skippedCount = skippedAddresses.byron.length + skippedAddresses.pointer.length;
+    const totalQueries = paymentCredCount + rewardAccountCount + skippedCount;
+
+    this.logger.debug(
+      `Minimized ${totalAddresses} address(es) to ${totalQueries} query/queries: ` +
+        `${paymentCredCount} payment credential(s), ${rewardAccountCount} reward account(s), ${skippedCount} skipped address(es)`
+    );
+  }
+
+  /** Fetches transactions for all payment credentials in parallel. */
+  private async fetchAllByPaymentCredentials(
+    credentials: Map<Cardano.PaymentCredential, Cardano.PaymentAddress[]>,
+    pagination?: { count: number; order?: 'asc' | 'desc'; page: number },
+    blockRange?: { lowerBound?: number; upperBound?: number }
+  ): Promise<BlockfrostTransactionContent[]> {
+    const results = await Promise.all(
+      [...credentials.keys()].map((credential) =>
+        this.fetchTransactionsByPaymentCredential(credential, { blockRange, pagination })
+      )
+    );
+    return results.flat();
+  }
+
+  /** Fetches transactions for all reward accounts in parallel. */
+  private async fetchAllByRewardAccounts(
+    rewardAccounts: Map<Cardano.RewardAccount, Cardano.PaymentAddress[]>,
+    pagination?: { count: number; order?: 'asc' | 'desc'; page: number },
+    blockRange?: { lowerBound?: number; upperBound?: number }
+  ): Promise<BlockfrostTransactionContent[]> {
+    const results = await Promise.all(
+      [...rewardAccounts.keys()].map((rewardAccount) =>
+        this.fetchTransactionsByRewardAccount(rewardAccount, { blockRange, pagination })
+      )
+    );
+    return results.flat();
+  }
+
+  /** Fetches transactions for skipped addresses (Byron and Pointer). */
+  private async fetchSkippedAddresses(
+    skippedAddresses: { byron: Cardano.PaymentAddress[]; pointer: Cardano.PaymentAddress[] },
+    pagination?: { count: number; order?: 'asc' | 'desc'; page: number },
+    blockRange?: { lowerBound?: number; upperBound?: number },
+    limit?: number
+  ): Promise<BlockfrostTransactionContent[]> {
+    const allSkippedAddresses = [...skippedAddresses.byron, ...skippedAddresses.pointer];
+    const results = await Promise.all(
+      allSkippedAddresses.map((address) => this.fetchTransactionsByAddress(address, { blockRange, limit, pagination }))
+    );
+    return results.flat();
+  }
+
+  /** Executes the optimized credential-based transaction fetching implementation. */
+  private async fetchTransactionsByCredentials(
+    addresses: Cardano.PaymentAddress[],
+    pagination: TransactionsByAddressesArgs['pagination'],
+    blockRange: TransactionsByAddressesArgs['blockRange']
+  ): Promise<BlockfrostTransactionContent[]> {
+    const addressGroups = extractCredentials(addresses);
+
+    this.logSkippedAddresses(addressGroups.skippedAddresses);
+
+    const minimized = minimizeCredentialSet({
+      paymentCredentials: addressGroups.paymentCredentials,
+      rewardAccounts: addressGroups.rewardAccounts
+    });
+
+    this.logMinimizationStats(addresses.length, minimized, addressGroups.skippedAddresses);
+
+    const paginationOptions = pagination
+      ? {
+          count: pagination.limit,
+          order: pagination.order ?? 'asc',
+          page: (pagination.startAt + pagination.limit) / pagination.limit
+        }
+      : undefined;
+
+    const blockRangeOptions = { lowerBound: blockRange?.lowerBound, upperBound: blockRange?.upperBound };
+    const limit = pagination?.limit ?? DB_MAX_SAFE_INTEGER;
+
+    const [paymentTxs, rewardAccountTxs, skippedAddressTxs] = await Promise.all([
+      this.fetchAllByPaymentCredentials(minimized.paymentCredentials, paginationOptions, blockRangeOptions),
+      this.fetchAllByRewardAccounts(minimized.rewardAccounts, paginationOptions, blockRangeOptions),
+      this.fetchSkippedAddresses(addressGroups.skippedAddresses, paginationOptions, blockRangeOptions, limit)
+    ]);
+
+    return [...paymentTxs, ...rewardAccountTxs, ...skippedAddressTxs];
+  }
+
   public async transactionsByAddresses({
     addresses,
     pagination,
     blockRange
   }: TransactionsByAddressesArgs): Promise<Paginated<Cardano.HydratedTx>> {
     this.logger.debug(`transactionsByAddresses: ${JSON.stringify(blockRange)} ${JSON.stringify(addresses)}`);
+
     try {
-      const lowerBound = blockRange?.lowerBound ?? 0;
-      const upperBound = blockRange?.upperBound ?? DB_MAX_SAFE_INTEGER;
-      const limit = pagination?.limit ?? DB_MAX_SAFE_INTEGER;
+      const allTransactions = this.queryTxsByCredentials
+        ? await this.fetchTransactionsByCredentials(addresses, pagination, blockRange)
+        : await this.fetchTransactionsPerAddress(addresses, pagination, blockRange);
 
-      const addressTransactions = await Promise.all(
-        addresses.map(async (address) =>
-          fetchSequentially<{ tx_hash: string; tx_index: number; block_height: number }, BlockfrostTransactionContent>({
-            haveEnoughItems: blockRange?.lowerBound
-              ? (transactions) =>
-                  (transactions.length > 0 &&
-                    transactions[transactions.length - 1].block_height < blockRange!.lowerBound!) ||
-                  transactions.length >= limit
-              : (transactions) => transactions.length >= limit,
-            paginationOptions: pagination
-              ? {
-                  count: pagination.limit,
-                  order: pagination.order,
-                  page: (pagination.startAt + pagination.limit) / pagination.limit
-                }
-              : undefined,
-            request: (paginationQueryString) => {
-              let queryString = `addresses/${address}/transactions?${paginationQueryString}`;
-              if (blockRange?.lowerBound) queryString += `&from=${blockRange.lowerBound.toString()}`;
-              if (blockRange?.upperBound) queryString += `&to=${blockRange.upperBound.toString()}`;
-              return this.request<Responses['address_transactions_content']>(queryString);
-            }
-          })
-        )
+      const dedupedSortedTransactionsIds = this.processTransactionResults(
+        allTransactions,
+        { lowerBound: blockRange?.lowerBound, upperBound: blockRange?.upperBound },
+        pagination?.order
       );
 
-      const allTransactions = addressTransactions.flat(1);
-
-      const dedupedSortedTransactionsIds = uniq(
-        allTransactions
-          .filter(({ block_height }) => block_height >= lowerBound && block_height <= upperBound)
-          .sort(pagination.order === 'desc' ? (a, b) => compareTx(b, a) : compareTx)
-          .map(({ tx_hash }) => Cardano.TransactionId(tx_hash))
-      );
       const pageResults = await this.transactionsByHashes({ ids: dedupedSortedTransactionsIds });
 
       return { pageResults, totalResultCount: dedupedSortedTransactionsIds.length };
@@ -607,5 +763,169 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
 
   private fetchUtxos(id: Cardano.TransactionId): Promise<Schemas['tx_content_utxo']> {
     return this.request<Responses['tx_content_utxo']>(`txs/${id}/utxos`);
+  }
+
+  /**
+   * Helper to build query string with pagination and block range filters.
+   *
+   * @param baseEndpoint - The base endpoint (e.g., "addresses/xyz/transactions")
+   * @param paginationQueryString - Pagination query string from fetchSequentially
+   * @param blockRange - Optional block range filters
+   * @param blockRange.lowerBound - Lower bound for block range
+   * @param blockRange.upperBound - Upper bound for block range
+   * @returns Complete query string with all parameters
+   */
+  private buildTransactionQueryString(
+    baseEndpoint: string,
+    paginationQueryString: string,
+    blockRange?: { lowerBound?: number; upperBound?: number }
+  ): string {
+    let queryString = `${baseEndpoint}?${paginationQueryString}`;
+    if (blockRange?.lowerBound) queryString += `&from=${blockRange.lowerBound.toString()}`;
+    if (blockRange?.upperBound) queryString += `&to=${blockRange.upperBound.toString()}`;
+    return queryString;
+  }
+
+  /**
+   * Fetches transactions for a given address using the fetchSequentially pattern.
+   *
+   * @param address - The address to fetch transactions for
+   * @param options - Options for pagination, block range, and limit
+   * @param options.pagination - Pagination options
+   * @param options.pagination.count - Number of results per page
+   * @param options.pagination.order - Sort order (asc or desc)
+   * @param options.pagination.page - Page number
+   * @param options.blockRange - Block range filters
+   * @param options.blockRange.lowerBound - Lower bound for block range
+   * @param options.blockRange.upperBound - Upper bound for block range
+   * @param options.limit - Maximum number of transactions to fetch
+   * @returns Promise resolving to array of transaction contents
+   */
+  private async fetchTransactionsByAddress(
+    address: Cardano.PaymentAddress,
+    options: {
+      pagination?: { count: number; order?: 'asc' | 'desc'; page: number };
+      blockRange?: { lowerBound?: number; upperBound?: number };
+      limit?: number;
+    }
+  ): Promise<BlockfrostTransactionContent[]> {
+    const limit = options.limit ?? DB_MAX_SAFE_INTEGER;
+
+    return fetchSequentially<{ tx_hash: string; tx_index: number; block_height: number }, BlockfrostTransactionContent>(
+      {
+        haveEnoughItems: options.blockRange?.lowerBound
+          ? (transactions) =>
+              (transactions.length > 0 &&
+                transactions[transactions.length - 1].block_height < options.blockRange!.lowerBound!) ||
+              transactions.length >= limit
+          : (transactions) => transactions.length >= limit,
+        paginationOptions: options.pagination,
+        request: (paginationQueryString) => {
+          const queryString = this.buildTransactionQueryString(
+            `addresses/${address}/transactions`,
+            paginationQueryString,
+            options.blockRange
+          );
+          return this.request<Responses['address_transactions_content']>(queryString);
+        }
+      }
+    );
+  }
+
+  /**
+   * Fetches transactions for a payment credential (bech32: addr_vkh or script).
+   *
+   * @param credential - Payment credential as bech32 string
+   * @param options - Pagination and block range options
+   * @param options.pagination - Pagination options
+   * @param options.pagination.count - Number of results per page
+   * @param options.pagination.order - Sort order (asc or desc)
+   * @param options.pagination.page - Page number
+   * @param options.blockRange - Block range filters
+   * @param options.blockRange.lowerBound - Lower bound for block range
+   * @param options.blockRange.upperBound - Upper bound for block range
+   * @returns Promise resolving to array of transaction contents
+   */
+  protected async fetchTransactionsByPaymentCredential(
+    credential: Cardano.PaymentCredential,
+    options: {
+      pagination?: { count: number; order?: 'asc' | 'desc'; page: number };
+      blockRange?: { lowerBound?: number; upperBound?: number };
+    }
+  ): Promise<BlockfrostTransactionContent[]> {
+    return fetchSequentially<{ tx_hash: string; tx_index: number; block_height: number }, BlockfrostTransactionContent>(
+      {
+        haveEnoughItems: () => false, // Fetch all pages
+        paginationOptions: options.pagination,
+        request: (paginationQueryString) => {
+          const queryString = this.buildTransactionQueryString(
+            `addresses/${credential}/transactions`,
+            paginationQueryString,
+            options.blockRange
+          );
+          return this.request<Responses['address_transactions_content']>(queryString);
+        }
+      }
+    );
+  }
+
+  /**
+   * Fetches transactions for a reward account (stake address, bech32: stake or stake_test).
+   *
+   * @param rewardAccount - Reward account (stake address) as bech32 string
+   * @param options - Pagination and block range options
+   * @param options.pagination - Pagination options
+   * @param options.pagination.count - Number of results per page
+   * @param options.pagination.order - Sort order (asc or desc)
+   * @param options.pagination.page - Page number
+   * @param options.blockRange - Block range filters
+   * @param options.blockRange.lowerBound - Lower bound for block range
+   * @param options.blockRange.upperBound - Upper bound for block range
+   * @returns Promise resolving to array of transaction contents
+   */
+  protected async fetchTransactionsByRewardAccount(
+    rewardAccount: Cardano.RewardAccount,
+    options: {
+      pagination?: { count: number; order?: 'asc' | 'desc'; page: number };
+      blockRange?: { lowerBound?: number; upperBound?: number };
+    }
+  ): Promise<BlockfrostTransactionContent[]> {
+    return fetchSequentially<{ tx_hash: string; tx_index: number; block_height: number }, BlockfrostTransactionContent>(
+      {
+        haveEnoughItems: () => false, // Fetch all pages
+        paginationOptions: options.pagination,
+        request: (paginationQueryString) => {
+          const queryString = this.buildTransactionQueryString(
+            `accounts/${rewardAccount}/transactions`,
+            paginationQueryString,
+            options.blockRange
+          );
+          // Note: accounts/{stake_address}/transactions returns the same structure as address_transactions_content
+          return this.request<Responses['address_transactions_content']>(queryString);
+        }
+      }
+    );
+  }
+
+  /**
+   * Merges and deduplicates transaction results from multiple sources (payment credentials, reward accounts, skipped addresses).
+   *
+   * @param paymentTxs Transactions from payment credential queries
+   * @param rewardAccountTxs Transactions from reward account (stake address) queries
+   * @param skippedAddressTxs Transactions from skipped address queries (Byron, Pointer)
+   * @param order Sort order (asc or desc)
+   * @returns Sorted and deduplicated array of transaction IDs
+   */
+  protected mergeAndDeduplicateTransactionResults(
+    paymentTxs: BlockfrostTransactionContent[],
+    rewardAccountTxs: BlockfrostTransactionContent[],
+    skippedAddressTxs: BlockfrostTransactionContent[],
+    order: 'asc' | 'desc' = 'asc'
+  ): Cardano.TransactionId[] {
+    const allTransactions = [...paymentTxs, ...rewardAccountTxs, ...skippedAddressTxs];
+
+    const sortedTransactions = allTransactions.sort(order === 'desc' ? (a, b) => compareTx(b, a) : compareTx);
+
+    return uniq(sortedTransactions.map(({ tx_hash }) => Cardano.TransactionId(tx_hash)));
   }
 }
