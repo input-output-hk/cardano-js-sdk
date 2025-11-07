@@ -1073,6 +1073,68 @@ describe('blockfrostChainHistoryProvider', () => {
         expect(result.pageResults.length).toBe(0);
         expect(result.totalResultCount).toBe(0);
       });
+
+      test('respects pagination limit and avoids fetching all pages', async () => {
+        // Create 300 transactions (3 pages with default page size of 100)
+        const allTransactions = Array.from({ length: 300 }, (_, i) => ({
+          block_height: 100 + i,
+          block_time: 1_000_000 + i * 1000,
+          tx_hash: `${i.toString().padStart(4, '0')}3f100dce12d107f679685acd2fc0610e10f72a92d412794c9773d11d8477`,
+          tx_index: 0
+        }));
+
+        // Create mock responses for all 300 transactions (to handle the bug where it fetches all)
+        const txResponses: Record<string, unknown> = {};
+        for (const transaction of allTransactions) {
+          txResponses[transaction.tx_hash] = {
+            ...mockedTx1Response,
+            block_height: transaction.block_height,
+            hash: transaction.tx_hash
+          };
+        }
+
+        // Track pagination requests
+        const paginationRequests: string[] = [];
+
+        const handleCredentialRequest = (url: string) => {
+          paginationRequests.push(url);
+
+          // Parse page number from query string (page size is always 100)
+          const pageMatch = url.match(/[&?]page=(\d+)/);
+          const page = pageMatch ? Number.parseInt(pageMatch[1], 10) : 1;
+          const pageSize = 100;
+
+          // Return transactions for this page
+          const startIdx = (page - 1) * pageSize;
+          const endIdx = Math.min(startIdx + pageSize, allTransactions.length);
+          return Promise.resolve(allTransactions.slice(startIdx, endIdx));
+        };
+
+        request.mockImplementation(
+          createMockRequestHandler(txResponses, txsUtxosResponse, (url) => {
+            if (url.includes(ADDR_VKH_PREFIX) && url.includes(TRANSACTIONS_PATH)) {
+              return handleCredentialRequest(url);
+            }
+            return null;
+          })
+        );
+
+        // Request 200 transactions out of 300 total (exactly 2 pages)
+        const result = await provider.transactionsByAddresses({
+          addresses: [baseAddress1],
+          pagination: { limit: 200, startAt: 0 }
+        });
+
+        // Should return exactly 200 transactions
+        expect(result.pageResults.length).toBe(200);
+
+        // Should fetch exactly 2 pages to get 200 transactions (not all 3 pages)
+        expect(paginationRequests.length).toBe(2);
+
+        // Verify the pagination requests
+        expect(paginationRequests[0]).toContain('page=1');
+        expect(paginationRequests[1]).toContain('page=2');
+      });
     });
   });
 });
