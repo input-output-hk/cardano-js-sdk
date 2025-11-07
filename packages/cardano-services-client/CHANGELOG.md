@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.26.30](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.26.29...@cardano-sdk/cardano-services-client@0.26.30) (2025-11-07)
+
+### Bug Fixes
+
+* **cardano-services-client:** respect pagination limit in credential-based transaction queries ([671e8bf](https://github.com/input-output-hk/cardano-js-sdk/commit/671e8bfe5431506c110626fd58fd4635fa0a1eef))
+
 ## [0.26.29](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.26.28...@cardano-sdk/cardano-services-client@0.26.29) (2025-11-06)
 
 ### Features

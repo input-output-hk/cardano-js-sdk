@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/e2e",
-  "version": "0.55.17",
+  "version": "0.55.18",
   "description": "End to end tests for the cardano-js-sdk packages.",
   "repository": "https://github.com/input-output-hk/cardano-js-sdk",
   "license": "Apache-2.0",
