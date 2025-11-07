@@ -72,7 +72,6 @@ export class BlockfrostUtxoProvider extends BlockfrostProvider implements UtxoPr
       Responses['address_utxo_content'][0],
       Responses['address_utxo_content'][0]
     >({
-      haveEnoughItems: () => false, // Fetch all pages
       request: async (paginationQueryString) => {
         const queryString = `addresses/${credential}/utxos?${paginationQueryString}`;
         return this.request<Responses['address_utxo_content']>(queryString);
@@ -90,7 +89,6 @@ export class BlockfrostUtxoProvider extends BlockfrostProvider implements UtxoPr
       Responses['address_utxo_content'][0],
       Responses['address_utxo_content'][0]
     >({
-      haveEnoughItems: () => false, // Fetch all pages
       request: async (paginationQueryString) => {
         const queryString = `accounts/${rewardAccount}/utxos?${paginationQueryString}`;
         return this.request<Responses['address_utxo_content']>(queryString);
