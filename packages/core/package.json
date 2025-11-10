@@ -57,8 +57,8 @@
   },
   "dependencies": {
     "@biglup/is-cid": "^1.0.3",
-    "@cardano-ogmios/client": "6.9.0",
-    "@cardano-ogmios/schema": "6.9.0",
+    "@cardano-ogmios/client": "6.14.0",
+    "@cardano-ogmios/schema": "6.14.0",
     "@cardano-sdk/crypto": "workspace:~",
     "@cardano-sdk/util": "workspace:~",
     "@foxglove/crc": "^0.0.3",
