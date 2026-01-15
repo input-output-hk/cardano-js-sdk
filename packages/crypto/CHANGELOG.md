@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.4.4...@cardano-sdk/crypto@0.4.5) (2026-01-15)
+
+### Bug Fixes
+
+* fix libsodium version to 0.7.10 ([3751771](https://github.com/input-output-hk/cardano-js-sdk/commit/37517715bb73eff2ae0d0468f424f9c9d3215ae0))
+
 ## [0.4.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.4.3...@cardano-sdk/crypto@0.4.4) (2025-09-16)
 
 **Note:** Version bump only for package @cardano-sdk/crypto
