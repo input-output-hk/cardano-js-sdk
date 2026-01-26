@@ -49,7 +49,6 @@ export const deriveAccountPrivateKey = async ({
     harden(accountIndex)
   ]);
 
-// TODO: test
 /**
  * Constructs the hardened derivation path for the specified
  * account key of an HD wallet as specified in CIP 1852
