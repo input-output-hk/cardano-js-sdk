@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.55.19](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.55.18...@cardano-sdk/e2e@0.55.19) (2026-01-30)
+
+### Reverts
+
+* Revert "ci: publish packages [skip actions]" ([48e03e5](https://github.com/input-output-hk/cardano-js-sdk/commit/48e03e571c866e941f63008620c6ad5eb448dde6))
+
 ## [0.55.18](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.55.17...@cardano-sdk/e2e@0.55.18) (2025-11-07)
 
 **Note:** Version bump only for package @cardano-sdk/e2e
