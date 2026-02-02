@@ -38,13 +38,13 @@
   "devDependencies": {
     "@types/lodash": "^4.14.182",
     "@types/pbkdf2": "^3.1.2",
-    "@types/webextension-polyfill": "^0.8.0",
+    "@types/webextension-polyfill": "^0.12.4",
     "eslint": "^7.32.0",
     "jest": "^28.1.3",
     "madge": "^5.0.1",
     "npm-run-all": "^4.1.5",
     "ts-jest": "^28.0.7",
-    "ts-log": "2.2.4",
+    "ts-log": "2.2.7",
     "tsc-alias": "^1.8.10",
     "typescript": "^4.7.4"
   },
