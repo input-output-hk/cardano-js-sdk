@@ -8,6 +8,7 @@ import {
   Subject,
   catchError,
   debounceTime,
+  defer,
   filter,
   first,
   map,
@@ -31,13 +32,15 @@ import { retryBackoff } from 'backoff-rxjs';
 export interface NonBackgroundMessengerOptions {
   baseChannel: string;
   reconnectConfig?: ReconnectConfig;
+  lazy?: boolean;
 }
 
 /** Creates and maintains a long-running connection to background process. Attempts to reconnect the port on disconnects. */
 export const createNonBackgroundMessenger = (
   {
     baseChannel: channel,
-    reconnectConfig: { initialDelay, maxDelay } = { initialDelay: 10, maxDelay: 1000 }
+    reconnectConfig: { initialDelay, maxDelay } = { initialDelay: 10, maxDelay: 1000 },
+    lazy = false
   }: NonBackgroundMessengerOptions,
   { logger, runtime }: MessengerDependencies
 ): Messenger => {
@@ -54,7 +57,7 @@ export const createNonBackgroundMessenger = (
   // createNonBackgroundMessenger and messenger on the other end emits immediately upon connection.
   const message$ = new ReplaySubject<PortMessage>(1);
   const connect = () => {
-    if (typeof port$.value === 'string' || port$.value) return;
+    if (port$.value) return;
     // assuming this doesn't throw
     const port = runtime.connect({ name: channel });
     port$.next(port);
@@ -86,12 +89,16 @@ export const createNonBackgroundMessenger = (
     port$.next(isDestroyed ? 'shutdown' : null);
     if (!isDestroyed) reconnect();
   };
-  connect();
-  const connect$ = port$.pipe(
-    debounceTime(10), // TODO: how long until onDisconnect() is called when the other end doesn't exist?
-    filter(isNotNil),
-    takeWhile((port): port is MessengerPort => typeof port !== 'string')
-  );
+  if (!lazy) connect();
+  const connect$ = defer(() => {
+    // In lazy mode this is the first connect(); in eager mode it's a no-op (port already set).
+    connect();
+    return port$.pipe(
+      debounceTime(10), // TODO: how long until onDisconnect() is called when the other end doesn't exist?
+      filter(isNotNil),
+      takeWhile((port): port is MessengerPort => typeof port !== 'string')
+    );
+  });
   const derivedMessengers = new Set<Messenger>();
   return {
     channel,
@@ -100,6 +107,7 @@ export const createNonBackgroundMessenger = (
       const messenger = createNonBackgroundMessenger(
         {
           baseChannel: deriveChannelName(channel, path),
+          lazy,
           reconnectConfig: { initialDelay, maxDelay }
         },
         { logger, runtime }
