@@ -45,4 +45,47 @@ describe('NonBackgroundMessenger', () => {
       expect(runtime.connect).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('reconnect on disconnect', () => {
+    it('reconnects when disconnected with a runtime.lastError', () => {
+      jest.useFakeTimers();
+      const port = createMockPort();
+      const runtime: MinimalRuntime = {
+        connect: jest.fn(() => port),
+        lastError: undefined,
+        onConnect: { addListener: jest.fn(), removeListener: jest.fn() }
+      };
+      createNonBackgroundMessenger({ baseChannel: 'test' }, { logger: dummyLogger, runtime });
+      expect(runtime.connect).toHaveBeenCalledTimes(1);
+
+      // Simulate disconnect with a runtime error (background not listening)
+      runtime.lastError = new Error('Could not establish connection');
+      const onDisconnectCb = (port.onDisconnect.addListener as jest.Mock).mock.calls[0][0];
+      onDisconnectCb(port);
+
+      jest.runAllTimers();
+      expect(runtime.connect).toHaveBeenCalledTimes(2);
+      jest.useRealTimers();
+    });
+
+    it('does not reconnect when disconnected without a runtime.lastError', () => {
+      jest.useFakeTimers();
+      const port = createMockPort();
+      const runtime: MinimalRuntime = {
+        connect: jest.fn(() => port),
+        lastError: undefined,
+        onConnect: { addListener: jest.fn(), removeListener: jest.fn() }
+      };
+      createNonBackgroundMessenger({ baseChannel: 'test' }, { logger: dummyLogger, runtime });
+      expect(runtime.connect).toHaveBeenCalledTimes(1);
+
+      // Simulate clean disconnect (no runtime error)
+      const onDisconnectCb = (port.onDisconnect.addListener as jest.Mock).mock.calls[0][0];
+      onDisconnectCb(port);
+
+      jest.runAllTimers();
+      expect(runtime.connect).toHaveBeenCalledTimes(1);
+      jest.useRealTimers();
+    });
+  });
 });
