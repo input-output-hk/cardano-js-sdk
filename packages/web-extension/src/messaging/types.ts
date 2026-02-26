@@ -146,6 +146,7 @@ export interface ExposeApiProps<API extends object> {
 export interface ConsumeRemoteApiOptions<T> {
   properties: RemoteApiProperties<T>;
   errorTypes?: ErrorClass[];
+  lazy?: boolean;
 }
 
 export interface DeriveChannelOptions {
