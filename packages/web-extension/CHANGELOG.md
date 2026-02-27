@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.39.37](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.39.36...@cardano-sdk/web-extension@0.39.37) (2026-02-27)
+
+### Features
+
+* **web-extension:** add lazy option to defer Service Worker connection ([3ab1c40](https://github.com/input-output-hk/cardano-js-sdk/commit/3ab1c405c58221df75bd96a9c70b64ce01fd6133))
+
+### Bug Fixes
+
+* **web-extension:** only reconnect on disconnect when runtime.lastError is set ([687af44](https://github.com/input-output-hk/cardano-js-sdk/commit/687af4429faff64aa8fa78cfb79a2aadf6c197cf))
+
 ## [0.39.36](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.39.35...@cardano-sdk/web-extension@0.39.36) (2026-01-30)
 
 ### Reverts
