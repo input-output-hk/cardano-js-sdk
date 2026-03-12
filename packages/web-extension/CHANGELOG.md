@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.39.38](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.39.37...@cardano-sdk/web-extension@0.39.38) (2026-03-12)
+
+### Bug Fixes
+
+* **web-extension:** export getBackgroundMessenger for early listener registration ([47cbdac](https://github.com/input-output-hk/cardano-js-sdk/commit/47cbdac1ad91031d0acb63fce0340a7e4632a250))
+* **web-extension:** suppress disconnect$ during reconnectable disconnects ([cbed7c3](https://github.com/input-output-hk/cardano-js-sdk/commit/cbed7c3a411d731c5a2abfca4440279c055ff581))
+
 ## [0.39.37](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.39.36...@cardano-sdk/web-extension@0.39.37) (2026-02-27)
 
 ### Features
