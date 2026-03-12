@@ -20,7 +20,7 @@ import { Logger } from 'ts-log';
 import { deriveChannelName } from './util';
 import { retryBackoff } from 'backoff-rxjs';
 
-interface Channel {
+export interface Channel {
   message$: Subject<PortMessage>;
   ports$: BehaviorSubject<Set<MessengerPort>>;
   hasMethodRequestHandler?: boolean;

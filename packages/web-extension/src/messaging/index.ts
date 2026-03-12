@@ -18,7 +18,7 @@ export type BaseChannel = { baseChannel: ChannelName };
 
 const isInBackgroundProcess = isBackgroundProcess();
 
-const getBackgroundMessenger = (() => {
+export const getBackgroundMessenger = (() => {
   let backgroundMessenger: BackgroundMessenger | null = null;
   return (dependencies: MessengerDependencies) => (backgroundMessenger ||= createBackgroundMessenger(dependencies));
 })();
