@@ -55,7 +55,6 @@
     "@cardano-sdk/key-management": "workspace:~",
     "@cardano-sdk/tx-construction": "workspace:~",
     "@cardano-sdk/util": "workspace:~",
-    "@emurgo/cardano-message-signing-nodejs": "^1.0.1",
     "@ledgerhq/hw-transport": "^6.31.4",
     "@ledgerhq/hw-transport-node-hid-noevents": "^6.30.5",
     "@ledgerhq/hw-transport-webusb": "^6.29.4",
