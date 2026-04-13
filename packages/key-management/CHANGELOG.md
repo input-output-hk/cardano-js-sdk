@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.29.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.29.12...@cardano-sdk/key-management@0.29.13) (2026-04-13)
+
+### Features
+
+* add native cip8 serialization to ledger package ([411aea6](https://github.com/input-output-hk/cardano-js-sdk/commit/411aea6122ca335342ac5238ca7b0832a2f356c8))
+
 ## [0.29.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.29.11...@cardano-sdk/key-management@0.29.12) (2026-01-30)
 
 ### Reverts

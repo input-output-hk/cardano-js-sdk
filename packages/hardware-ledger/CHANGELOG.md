@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.23](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.16.22...@cardano-sdk/hardware-ledger@0.16.23) (2026-04-13)
+
+### Features
+
+* add native cip8 serialization to ledger package ([411aea6](https://github.com/input-output-hk/cardano-js-sdk/commit/411aea6122ca335342ac5238ca7b0832a2f356c8))
+
 ## [0.16.22](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.16.21...@cardano-sdk/hardware-ledger@0.16.22) (2026-01-30)
 
 ### Reverts
