@@ -1,15 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import {
-  AlgorithmId,
-  CBORValue,
-  COSESign1Builder,
-  HeaderMap,
-  Headers,
-  Label,
-  ProtectedHeaderMap
-} from '@emurgo/cardano-message-signing-nodejs';
 import { Cardano, NotImplementedError, Serialization, util as coreUtils } from '@cardano-sdk/core';
 import {
   CardanoKeyConst,
@@ -73,33 +64,6 @@ const CIP08_SIGN_HASH_THRESHOLD = 198;
 
 const isUsbDevice = (device: any): device is USBDevice =>
   typeof USBDevice !== 'undefined' && device instanceof USBDevice;
-
-/* Sets the hashed entry in the COSESign1 CBOR structure */
-const setCOSESignHashed = (COSESignCbor: string, isHashed: boolean) => {
-  const reader = new Serialization.CborReader(HexBlob(COSESignCbor));
-  reader.readStartArray();
-
-  const headers = reader.readEncodedValue();
-  // Skip hashed entry
-  reader.readEncodedValue();
-  const payload = reader.readEncodedValue();
-  const signature = reader.readEncodedValue();
-
-  reader.readEndArray();
-
-  const writer = new Serialization.CborWriter();
-
-  writer.writeStartArray(4);
-  writer.writeEncodedValue(headers);
-  writer.writeStartMap(1);
-  writer.writeTextString('hashed');
-  writer.writeBoolean(isHashed);
-
-  writer.writeEncodedValue(payload);
-  writer.writeEncodedValue(signature);
-
-  return writer.encodeAsHex();
-};
 
 const isDeviceAlreadyOpenError = (error: unknown) => {
   if (typeof error !== 'object') return false;
@@ -865,24 +829,21 @@ export class LedgerKeyAgent extends KeyAgentBase {
       // will not verify.
       const addressBytes = coreUtils.hexToBytes(HexBlob(result.addressFieldHex));
 
-      const protectedHeaders = HeaderMap.new();
-      protectedHeaders.set_algorithm_id(Label.from_algorithm_id(AlgorithmId.EdDSA));
-      protectedHeaders.set_header(cip8.CoseLabel.address, CBORValue.new_bytes(addressBytes));
-
+      const protectedHeadersBytes = cip8.createProtectedHeadersCbor(addressBytes);
       const sigPayload = coreUtils.hexToBytes(hashPayload ? blake2b.hash(request.payload, 28) : request.payload);
-      const builder = COSESign1Builder.new(
-        Headers.new(ProtectedHeaderMap.new(protectedHeaders), HeaderMap.new()),
+
+      const coseSign1 = cip8.createCoseSign1Cbor(
+        protectedHeadersBytes,
         sigPayload,
-        false
+        Buffer.from(result.signatureHex, 'hex'),
+        hashPayload
       );
 
-      const coseSign1 = builder.build(Buffer.from(result.signatureHex, 'hex'));
-      const coseKey = cip8.createCoseKey(addressBytes, Crypto.Ed25519PublicKeyHex(result.signingPublicKeyHex));
+      const coseKey = cip8.createCoseKeyCbor(addressBytes, result.signingPublicKeyHex);
 
-      const coseSigHex = coreUtils.bytesToHex(coseSign1.to_bytes());
       return {
-        key: coreUtils.bytesToHex(coseKey.to_bytes()),
-        signature: hashPayload ? setCOSESignHashed(coseSigHex, true) : coseSigHex
+        key: coreUtils.bytesToHex(coseKey),
+        signature: coreUtils.bytesToHex(coseSign1)
       };
     } catch (error: any) {
       if (error.code === 28_169) {
