@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.33](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.7.32...@cardano-sdk/hardware-trezor@0.7.33) (2026-04-15)
+
+### Bug Fixes
+
+* remove redundant Trezor device connection check in getXpub ([62af720](https://github.com/input-output-hk/cardano-js-sdk/commit/62af72025fa3f38ecc4f9123f2041387a4696efa))
+
 ## [0.7.32](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-trezor@0.7.31...@cardano-sdk/hardware-trezor@0.7.32) (2026-04-13)
 
 **Note:** Version bump only for package @cardano-sdk/hardware-trezor
