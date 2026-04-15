@@ -191,7 +191,6 @@ export class TrezorKeyAgent extends KeyAgentBase {
     derivationType
   }: GetTrezorXpubProps): Promise<Crypto.Bip32PublicKeyHex> {
     try {
-      await TrezorKeyAgent.checkDeviceConnection(communicationType);
       const derivationPath = `m/${purpose}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'`;
       const trezorConnect = getTrezorConnect(communicationType);
       const trezorDerivationType = derivationType ? mapDerivationType(derivationType) : undefined;
