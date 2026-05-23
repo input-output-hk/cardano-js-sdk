@@ -59,7 +59,7 @@ export class Ed25519PublicKey {
 
   /** Gets the blake2 hash of the key material. NOTE: You must await `Crypto.ready()` at least once before calling this function. */
   hash(): Ed25519KeyHash {
-    const hash = sodium.crypto_generichash(ED25519_PUBLIC_KEY_HASH_LENGTH, this.#keyMaterial);
+    const hash = sodium.crypto_generichash(ED25519_PUBLIC_KEY_HASH_LENGTH, this.#keyMaterial, null);
     return Ed25519KeyHash.fromBytes(hash);
   }
 
