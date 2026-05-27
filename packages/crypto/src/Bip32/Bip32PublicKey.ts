@@ -85,7 +85,7 @@ export class Bip32PublicKey {
 
   /** Gets the blake2 hash of the key. NOTE: You must await `Crypto.ready()` at least once before calling this function. */
   hash(): Bip32PublicKeyHashHex {
-    const hash = sodium.crypto_generichash(BIP32_PUBLIC_KEY_HASH_LENGTH, this.#key);
+    const hash = sodium.crypto_generichash(BIP32_PUBLIC_KEY_HASH_LENGTH, this.#key, null);
     return Bip32PublicKeyHashHex(Buffer.from(hash).toString('hex'));
   }
 }

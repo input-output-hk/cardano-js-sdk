@@ -2339,7 +2339,7 @@ __metadata:
     eslint: ^7.32.0
     i: ^0.3.7
     jest: ^28.1.3
-    libsodium-wrappers-sumo: 0.7.10
+    libsodium-wrappers-sumo: 0.8.4
     lodash: ^4.17.21
     madge: ^5.0.1
     npm-run-all: ^4.1.5
@@ -16955,19 +16955,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"libsodium-sumo@npm:^0.7.0":
-  version: 0.7.10
-  resolution: "libsodium-sumo@npm:0.7.10"
-  checksum: 67ed75fa15559bad7cca5cdc2d5eb20725281be38a08814f7e39af8ea0c0d83ed2211e534f7b47460b6a48a1f7bb5c31759e4bc5cc79fb74292ffea8f90ee741
+"libsodium-sumo@npm:^0.8.0":
+  version: 0.8.4
+  resolution: "libsodium-sumo@npm:0.8.4"
+  checksum: ba95071a063c72330721b4ff7bc6b41321441f376f44203825dc4464cb88198cab941d54e03cdcba440af8754589eeb925fc82269fdced60f5c12c1a86227eb3
   languageName: node
   linkType: hard
 
-"libsodium-wrappers-sumo@npm:0.7.10":
-  version: 0.7.10
-  resolution: "libsodium-wrappers-sumo@npm:0.7.10"
+"libsodium-wrappers-sumo@npm:0.8.4":
+  version: 0.8.4
+  resolution: "libsodium-wrappers-sumo@npm:0.8.4"
   dependencies:
-    libsodium-sumo: ^0.7.0
-  checksum: f1ff2599e9ec6271a0ba9ee6a8ad940b9a7dbd1d14c6cb87f2e34e7c6d43f7f4622a1f432e5254875e0cae7d56b1de8697a3989b118f49959639f48f0268db88
+    libsodium-sumo: ^0.8.0
+  checksum: c6123e68f18902bbbd982ddc1b1c5b118626313104933e9de97ae8bf9cf300fee02d924758496fefe07567f3314bdd51aaddef61d40d9cdd3efac881e1db25f1
   languageName: node
   linkType: hard
 
