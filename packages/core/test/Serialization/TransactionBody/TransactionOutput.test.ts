@@ -408,6 +408,25 @@ describe('TransactionOutput', () => {
   });
 });
 
+describe('TransactionOutput unknown map keys', () => {
+  // {0: address, 1: 10, 4: [1, 2]} - key 4 is not part of the post-alonzo output CDDL
+  const cborWithUnknownKey = HexBlob(
+    'a300583900537ba48a023f0a3c65e54977ffc2d78c143fb418ef6db058e006d78a7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8010a04820102'
+  );
+
+  it('skips unknown keys by default', () => {
+    const output = TransactionOutput.fromCbor(cborWithUnknownKey);
+
+    expect(output.amount().coin()).toEqual(10n);
+  });
+
+  it('throws on unknown keys when strict', () => {
+    expect(() => TransactionOutput.fromCbor(cborWithUnknownKey, { strict: true })).toThrow(
+      'Unknown transaction output map key: 4'
+    );
+  });
+});
+
 describe('TransactionOutput unknown datum kind', () => {
   it('fromCbor throws', () => {
     // {0: address, 1: 10, 2: [2, h'00']} - datum_option kind 2 is unknown

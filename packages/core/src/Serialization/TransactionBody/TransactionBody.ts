@@ -2,7 +2,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Address, RewardAddress } from '../../Cardano/Address';
 import { CborReader, CborReaderState, CborTag, CborWriter } from '../CBOR';
-import { CborSet, Hash } from '../Common';
+import { CborSet, DeserializationOptions, Hash } from '../Common';
 import { Certificate } from '../Certificates';
 import { HexBlob } from '@cardano-sdk/util';
 import { ProposalProcedure } from './ProposalProcedure';
@@ -253,9 +253,11 @@ export class TransactionBody {
    * Deserializes the TransactionBody from a CBOR byte array.
    *
    * @param cbor The CBOR encoded TransactionBody object.
+   * @param options Deserialization options. When `strict` is true, throws on unknown map keys
+   * instead of skipping them.
    * @returns The new TransactionBody instance.
    */
-  static fromCbor(cbor: HexBlob): TransactionBody {
+  static fromCbor(cbor: HexBlob, options?: DeserializationOptions): TransactionBody {
     const reader = new CborReader(cbor);
 
     const inputs = CborSet.fromCore([], TransactionInput.fromCore);
@@ -278,7 +280,7 @@ export class TransactionBody {
           reader.readStartArray();
 
           while (reader.peekState() !== CborReaderState.EndArray) {
-            body.outputs().push(TransactionOutput.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
+            body.outputs().push(TransactionOutput.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), options));
           }
 
           reader.readEndArray();
@@ -362,7 +364,7 @@ export class TransactionBody {
           body.setNetworkId(Number(reader.readInt()) as Cardano.NetworkId);
           break;
         case 16n:
-          body.setCollateralReturn(TransactionOutput.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
+          body.setCollateralReturn(TransactionOutput.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), options));
           break;
         case 17n:
           body.setTotalCollateral(reader.readInt());
@@ -386,6 +388,11 @@ export class TransactionBody {
         case 22n:
           body.setDonation(reader.readInt());
           break;
+        default:
+          if (options?.strict)
+            throw new SerializationError(SerializationFailure.UnknownField, `Unknown transaction body map key: ${key}`);
+
+          reader.skipValue();
       }
     }
 
