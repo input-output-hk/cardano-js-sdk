@@ -136,6 +136,9 @@ export class TransactionOutput {
 
             const datumKind = Number(datumReader.readInt());
 
+            if (datumKind !== DatumKind.DataHash && datumKind !== DatumKind.InlineData)
+              throw new InvalidArgumentError('cbor', `Unexpected datum kind ${datumKind}`);
+
             if (datumKind === DatumKind.InlineData) {
               const tag = datumReader.readTag();
 

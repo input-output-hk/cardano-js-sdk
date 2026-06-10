@@ -6,6 +6,7 @@ import { DRep } from './DRep';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { PoolId } from '../../Cardano/types/StakePool';
 import { hexToBytes } from '../../util/misc';
+import { readCredentialType } from '../Common/Credential';
 import type * as Cardano from '../../Cardano';
 
 const EMBEDDED_GROUP_SIZE = 2;
@@ -105,7 +106,7 @@ export class StakeVoteRegistrationDelegation {
         `Expected an array of ${EMBEDDED_GROUP_SIZE} elements, but got an array of ${length} elements`
       );
 
-    const type = Number(reader.readInt()) as Cardano.CredentialType;
+    const type = readCredentialType(reader);
     const hash = Crypto.Hash28ByteBase16(HexBlob.fromBytes(reader.readByteString()));
 
     reader.readEndArray();

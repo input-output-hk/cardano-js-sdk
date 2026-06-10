@@ -2,7 +2,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborWriter } from '../../CBOR';
 import { CredentialType } from '../../../Cardano/Address/Address';
 import { DRepKind } from './DRepKind';
-import { HexBlob } from '@cardano-sdk/util';
+import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
 import { isDRepAlwaysAbstain, isDRepAlwaysNoConfidence } from '../../../Cardano/types/Governance';
 import type * as Cardano from '../../../Cardano';
 
@@ -91,8 +91,9 @@ export class DRep {
     reader.readEndArray();
 
     if (kind === DRepKind.Abstain) return DRep.newAlwaysAbstain();
+    if (kind === DRepKind.NoConfidence) return DRep.newAlwaysNoConfidence();
 
-    return DRep.newAlwaysNoConfidence();
+    throw new InvalidStateError(`Unexpected kind value: ${kind}`);
   }
 
   /**

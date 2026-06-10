@@ -407,3 +407,14 @@ describe('TransactionOutput', () => {
     });
   });
 });
+
+describe('TransactionOutput unknown datum kind', () => {
+  it('fromCbor throws', () => {
+    // {0: address, 1: 10, 2: [2, h'00']} - datum_option kind 2 is unknown
+    const cborWithUnknownDatumKind = HexBlob(
+      'a300583900537ba48a023f0a3c65e54977ffc2d78c143fb418ef6db058e006d78a7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8010a0282024100'
+    );
+
+    expect(() => TransactionOutput.fromCbor(cborWithUnknownDatumKind)).toThrow('Unexpected datum kind 2');
+  });
+});

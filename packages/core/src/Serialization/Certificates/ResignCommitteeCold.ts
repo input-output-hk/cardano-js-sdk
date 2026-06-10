@@ -5,6 +5,7 @@ import { CertificateKind } from './CertificateKind';
 import { CertificateType } from '../../Cardano/types/Certificate';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { hexToBytes } from '../../util/misc';
+import { readCredentialType } from '../Common/Credential';
 import type * as Cardano from '../../Cardano';
 
 const EMBEDDED_GROUP_SIZE = 2;
@@ -90,7 +91,7 @@ export class ResignCommitteeCold {
         `Expected an array of ${EMBEDDED_GROUP_SIZE} elements, but got an array of ${length} elements`
       );
 
-    const coldType = Number(reader.readInt()) as Cardano.CredentialType;
+    const coldType = readCredentialType(reader);
     const coldHash = Crypto.Hash28ByteBase16(HexBlob.fromBytes(reader.readByteString()));
     reader.readEndArray();
 

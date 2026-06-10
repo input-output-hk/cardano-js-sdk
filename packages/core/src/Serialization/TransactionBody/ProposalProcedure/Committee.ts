@@ -1,7 +1,7 @@
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
-import { UnitInterval } from '../../Common';
+import { UnitInterval, readCredentialType } from '../../Common';
 import { hexToBytes } from '../../../util/misc';
 import type * as Cardano from '../../../Cardano';
 
@@ -90,7 +90,7 @@ export class Committee {
           `Expected an array of ${CREDENTIAL_ARRAY_SIZE} elements, but got an array of ${length} elements`
         );
 
-      const type = Number(reader.readUInt());
+      const type = readCredentialType(reader);
       const hash = HexBlob.fromBytes(reader.readByteString()) as unknown as Hash28ByteBase16;
 
       reader.readEndArray();

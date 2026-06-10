@@ -25,4 +25,10 @@ describe('Credential', () => {
   it('politely refuses an invalid credential cbor', () => {
     expect(() => Credential.fromCbor(cborArraySize3)).toThrow();
   });
+
+  it('politely refuses an unknown credential type', () => {
+    expect(() =>
+      Credential.fromCbor(HexBlob('8202581c30000000000000000000000000000000000000000000000000000000'))
+    ).toThrow('Unexpected credential type value: 2');
+  });
 });
