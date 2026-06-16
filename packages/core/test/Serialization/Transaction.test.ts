@@ -153,3 +153,28 @@ describe('Transaction', () => {
     expect(Transaction.fromCore(tx).toCbor()).toBe(cbor);
   });
 });
+
+describe('Transaction strict deserialization', () => {
+  // [{0: [], 1: [], 2: 0, 23: [1, 2]}, {}, true, null] - body has unknown key 23
+  const txWithUnknownBodyKey = '84a400800180020017820102a0f5f6';
+  // [{0: [], 1: [], 2: 0}, {0: [], 8: [1, 2]}, true, null] - witness set has unknown key 8
+  const txWithUnknownWitnessSetKey = '84a3008001800200a2008008820102f5f6';
+
+  it('deserializes transactions with unknown body keys by default', () => {
+    const tx = Transaction.fromCbor(TxCBOR(txWithUnknownBodyKey));
+
+    expect(tx.body().fee()).toEqual(0n);
+  });
+
+  it('throws on unknown body keys when strict', () => {
+    expect(() => Transaction.fromCbor(TxCBOR(txWithUnknownBodyKey), { strict: true })).toThrow(
+      'Unknown transaction body map key: 23'
+    );
+  });
+
+  it('throws on unknown witness set keys when strict', () => {
+    expect(() => Transaction.fromCbor(TxCBOR(txWithUnknownWitnessSetKey), { strict: true })).toThrow(
+      'Unknown transaction witness set map key: 8'
+    );
+  });
+});

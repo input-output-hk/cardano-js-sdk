@@ -1,10 +1,26 @@
-import { Cardano } from '../..';
 import { CborReader, CborWriter } from '../CBOR';
+import { CredentialType } from '../../Cardano/Address/Address';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import { HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
 import { hexToBytes } from '../../util/misc';
+import type { Cardano } from '../..';
 
 const CREDENTIAL_ARRAY_SIZE = 2;
+
+/**
+ * Reads a credential type discriminant from the reader, throwing if it is not a known credential type.
+ *
+ * @param reader The CBOR reader positioned at the credential type value.
+ * @returns The credential type.
+ */
+export const readCredentialType = (reader: CborReader): CredentialType => {
+  const type = Number(reader.readInt());
+
+  if (type !== CredentialType.KeyHash && type !== CredentialType.ScriptHash)
+    throw new InvalidStateError(`Unexpected credential type value: ${type}`);
+
+  return type;
+};
 
 export class Credential {
   #value: Cardano.Credential;
@@ -29,7 +45,7 @@ export class Credential {
         `Expected an array of ${CREDENTIAL_ARRAY_SIZE} elements, but got an array of ${length} elements`
       );
 
-    const type = Number(reader.readUInt());
+    const type = readCredentialType(reader);
     const hash = HexBlob.fromBytes(reader.readByteString()) as unknown as Hash28ByteBase16;
 
     reader.readEndArray();

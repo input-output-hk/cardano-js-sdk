@@ -38,3 +38,9 @@ testDRep('Always Abstain', HexBlob('8102'), {
 testDRep('Always No Confidence', HexBlob('8103'), {
   __typename: 'AlwaysNoConfidence'
 });
+
+describe('DRep unknown kind', () => {
+  it('fromCbor throws', () => {
+    expect(() => DRep.fromCbor(HexBlob('8104'))).toThrow('Unexpected kind value: 4');
+  });
+});

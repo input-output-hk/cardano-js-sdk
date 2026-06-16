@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/cognitive-complexity, complexity, max-statements, unicorn/prefer-switch */
 import { BootstrapWitness } from './BootstrapWitness';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
-import { CborSet } from '../Common';
+import { CborSet, DeserializationOptions } from '../Common';
 import { HexBlob } from '@cardano-sdk/util';
 import { NativeScript, PlutusV1Script, PlutusV2Script, PlutusV3Script } from '../Scripts';
 import { PlutusData } from '../PlutusData/PlutusData';
@@ -119,9 +119,11 @@ export class TransactionWitnessSet {
    * Deserializes the TransactionWitnessSet from a CBOR byte array.
    *
    * @param cbor The CBOR encoded TransactionWitnessSet object.
+   * @param options Deserialization options. When `strict` is true, throws on unknown map keys
+   * instead of skipping them.
    * @returns The new TransactionWitnessSet instance.
    */
-  static fromCbor(cbor: HexBlob): TransactionWitnessSet {
+  static fromCbor(cbor: HexBlob, options?: DeserializationOptions): TransactionWitnessSet {
     const reader = new CborReader(cbor);
 
     const witness = new TransactionWitnessSet();
@@ -167,6 +169,14 @@ export class TransactionWitnessSet {
             CborSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), PlutusV3Script.fromCbor)
           );
           break;
+        default:
+          if (options?.strict)
+            throw new SerializationError(
+              SerializationFailure.UnknownField,
+              `Unknown transaction witness set map key: ${key}`
+            );
+
+          reader.skipValue();
       }
     }
 

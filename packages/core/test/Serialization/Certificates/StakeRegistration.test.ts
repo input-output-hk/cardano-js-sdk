@@ -6,6 +6,12 @@ import { StakeRegistration } from '../../../src/Serialization';
 
 // Test data used in the following tests was generated with the cardano-serialization-lib
 describe('StakeRegistration', () => {
+  it('throws when decoding StakeRegistration with an unknown credential type', () => {
+    const cbor = HexBlob('82008202581ccb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f');
+
+    expect(() => StakeRegistration.fromCbor(cbor)).toThrow('Unexpected credential type value: 2');
+  });
+
   it('can decode StakeRegistration from CBOR', () => {
     const cbor = HexBlob('82008200581ccb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f');
 

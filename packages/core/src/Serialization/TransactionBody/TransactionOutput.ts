@@ -3,9 +3,11 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { Address } from '../../Cardano/Address';
 import { CborReader, CborReaderState, CborTag, CborWriter } from '../CBOR';
 import { Datum, DatumKind } from '../Common/Datum';
+import { DeserializationOptions } from '../Common/DeserializationOptions';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { PlutusData } from '../PlutusData';
 import { Script } from '../Scripts';
+import { SerializationError, SerializationFailure } from '../../errors';
 import { Value } from './Value';
 import type * as Cardano from '../../Cardano';
 
@@ -99,9 +101,11 @@ export class TransactionOutput {
    * Deserializes the TransactionOutput from a CBOR byte array.
    *
    * @param cbor The CBOR encoded TransactionOutput object.
+   * @param options Deserialization options. When `strict` is true, throws on unknown map keys
+   * instead of skipping them.
    * @returns The new TransactionOutput instance.
    */
-  static fromCbor(cbor: HexBlob): TransactionOutput {
+  static fromCbor(cbor: HexBlob, options?: DeserializationOptions): TransactionOutput {
     const reader = new CborReader(cbor);
 
     let address;
@@ -136,6 +140,9 @@ export class TransactionOutput {
 
             const datumKind = Number(datumReader.readInt());
 
+            if (datumKind !== DatumKind.DataHash && datumKind !== DatumKind.InlineData)
+              throw new InvalidArgumentError('cbor', `Unexpected datum kind ${datumKind}`);
+
             if (datumKind === DatumKind.InlineData) {
               const tag = datumReader.readTag();
 
@@ -168,6 +175,14 @@ export class TransactionOutput {
             scriptRef = Script.fromCbor(HexBlob.fromBytes(encodedDatum));
             break;
           }
+          default:
+            if (options?.strict)
+              throw new SerializationError(
+                SerializationFailure.UnknownField,
+                `Unknown transaction output map key: ${key}`
+              );
+
+            reader.skipValue();
         }
       }
 

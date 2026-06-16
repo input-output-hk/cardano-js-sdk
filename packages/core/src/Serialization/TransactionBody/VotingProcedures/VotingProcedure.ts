@@ -1,6 +1,7 @@
 import { Anchor } from '../../Common/Anchor';
 import { CborReader, CborReaderState, CborWriter } from '../../CBOR';
-import { HexBlob } from '@cardano-sdk/util';
+import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
+import { Vote } from '../../../Cardano/types/Governance';
 import { hexToBytes } from '../../../util/misc';
 import type * as Cardano from '../../../Cardano';
 
@@ -61,6 +62,10 @@ export class VotingProcedure {
 
     reader.readStartArray();
     const vote = Number(reader.readInt());
+
+    if (vote !== Vote.no && vote !== Vote.yes && vote !== Vote.abstain)
+      throw new InvalidStateError(`Unexpected vote value: ${vote}`);
+
     let anchor;
 
     if (reader.peekState() === CborReaderState.Null) {

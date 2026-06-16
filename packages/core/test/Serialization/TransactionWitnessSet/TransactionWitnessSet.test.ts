@@ -214,3 +214,20 @@ describe('TransactionWitnessSet', () => {
     expect(witness.toCore()).toEqual(simpleCore);
   });
 });
+
+describe('TransactionWitnessSet unknown map keys', () => {
+  // {0: [], 8: [1, 2]} - key 8 is not part of the transaction_witness_set CDDL
+  const cborWithUnknownKey = HexBlob('a2008008820102');
+
+  it('skips unknown keys by default', () => {
+    const witnessSet = TransactionWitnessSet.fromCbor(cborWithUnknownKey);
+
+    expect(witnessSet.vkeys()?.size()).toEqual(0);
+  });
+
+  it('throws on unknown keys when strict', () => {
+    expect(() => TransactionWitnessSet.fromCbor(cborWithUnknownKey, { strict: true })).toThrow(
+      'Unknown transaction witness set map key: 8'
+    );
+  });
+});

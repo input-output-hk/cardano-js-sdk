@@ -2,6 +2,7 @@
 import * as Cardano from '../../../src/Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
+import { SerializationError } from '../../../src/errors';
 import { Transaction, TransactionBody, TxBodyCBOR, TxCBOR } from '../../../src/Serialization';
 import { babbageTx } from '../testData';
 import { mintTokenMap, params, txIn, txOut } from './testData';
@@ -341,5 +342,29 @@ describe('TransactionBody', () => {
       withdrawals: canonicallySortedWithdrawals
     };
     expect(body.toCore()).toEqual(numericFieldsSetToZeroCanonicalWithdrawals);
+  });
+});
+
+describe('TransactionBody unknown map keys', () => {
+  // {0: [], 1: [], 2: 0, 23: [1, 2]} - key 23 is not part of the transaction_body CDDL
+  const cborWithUnknownKey = HexBlob('a400800180020017820102');
+  // {0: [], 1: [], 23: [1, 2], 2: 10}
+  const cborWithUnknownKeyBeforeFee = HexBlob('a40080018017820102020a');
+
+  it('skips unknown keys and keeps reading subsequent fields by default', () => {
+    const body = TransactionBody.fromCbor(cborWithUnknownKeyBeforeFee);
+
+    expect(body.fee()).toEqual(10n);
+  });
+
+  it('preserves the original bytes when re-serializing a body with unknown keys', () => {
+    expect(TransactionBody.fromCbor(cborWithUnknownKey).toCbor()).toEqual(cborWithUnknownKey);
+  });
+
+  it('throws on unknown keys when strict', () => {
+    expect(() => TransactionBody.fromCbor(cborWithUnknownKey, { strict: true })).toThrowError(SerializationError);
+    expect(() => TransactionBody.fromCbor(cborWithUnknownKey, { strict: true })).toThrow(
+      'Unknown transaction body map key: 23'
+    );
   });
 });

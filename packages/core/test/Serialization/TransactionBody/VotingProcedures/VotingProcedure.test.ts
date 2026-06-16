@@ -66,3 +66,9 @@ testVotingProcedure(
     vote: Cardano.Vote.abstain
   }
 );
+
+describe('VotingProcedure unknown vote', () => {
+  it('fromCbor throws', () => {
+    expect(() => VotingProcedure.fromCbor(HexBlob('8203f6'))).toThrow('Unexpected vote value: 3');
+  });
+});

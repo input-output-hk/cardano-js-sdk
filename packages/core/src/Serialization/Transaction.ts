@@ -1,5 +1,6 @@
 import { AuxiliaryData } from './AuxiliaryData';
 import { CborReader, CborReaderState, CborWriter } from './CBOR';
+import { DeserializationOptions } from './Common';
 import { HexBlob, OpaqueString } from '@cardano-sdk/util';
 import { TransactionBody } from './TransactionBody';
 import { TransactionWitnessSet } from './TransactionWitnessSet';
@@ -86,17 +87,19 @@ export class Transaction {
    * Deserializes the transaction from a CBOR byte array.
    *
    * @param cbor The CBOR encoded transaction object.
+   * @param options Deserialization options. When `strict` is true, throws on unknown map keys
+   * instead of skipping them.
    * @returns The new transaction instance.
    */
-  static fromCbor(cbor: TxCBOR): Transaction {
+  static fromCbor(cbor: TxCBOR, options?: DeserializationOptions): Transaction {
     const reader = new CborReader(cbor as unknown as HexBlob);
 
     const length = reader.readStartArray();
 
     const bodyBytes = reader.readEncodedValue();
-    const body = TransactionBody.fromCbor(HexBlob.fromBytes(bodyBytes));
+    const body = TransactionBody.fromCbor(HexBlob.fromBytes(bodyBytes), options);
 
-    const witnessSet = TransactionWitnessSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
+    const witnessSet = TransactionWitnessSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), options);
     let isValid = true;
 
     // The isValid flag was added in Alonzo era (onwards), mary era transactions only have three fields.

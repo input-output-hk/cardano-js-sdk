@@ -62,7 +62,8 @@ export enum SerializationFailure {
   InvalidScript = 'INVALID_SCRIPT',
   InvalidNativeScriptKind = 'INVALID_NATIVE_SCRIPT_KIND',
   InvalidScriptType = 'INVALID_SCRIPT_TYPE',
-  InvalidDatum = 'INVALID_DATUM'
+  InvalidDatum = 'INVALID_DATUM',
+  UnknownField = 'UNKNOWN_FIELD'
 }
 
 export class SerializationError<InnerError = unknown> extends ComposableError<InnerError> {
