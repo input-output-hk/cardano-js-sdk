@@ -128,7 +128,7 @@ describe('PersonalWallet/phase2validation', () => {
           }
         }
       ]),
-      redeemersByType: { [Cardano.RedeemerPurpose.mint]: [scriptRedeemer] },
+      redeemersByType: { mint: new Map([[policyId, scriptRedeemer]]) },
       scriptIntegrityHash: scriptDataHash,
       witness: { redeemers: [scriptRedeemer], scripts: [alwaysFailScript] }
     };

@@ -103,11 +103,11 @@ export const buildRedeemers = (redeemersData: RedeemersByType, maxExecutionUnits
   const redeemers = [];
 
   const knownRedeemers = [
-    ...(redeemersData.mint ?? []),
-    ...(redeemersData.vote ?? []),
+    ...(redeemersData.mint ? [...redeemersData.mint.values()] : []),
+    ...(redeemersData.vote?.map(({ redeemer }) => redeemer) ?? []),
     ...(redeemersData.propose ?? []),
     ...(redeemersData.certificate ?? []),
-    ...(redeemersData.withdrawal ?? []),
+    ...(redeemersData.withdrawal ? [...redeemersData.withdrawal.values()] : []),
     ...(redeemersData.spend ? [...redeemersData.spend.values()] : [])
   ];
 

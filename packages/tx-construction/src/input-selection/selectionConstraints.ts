@@ -17,13 +17,26 @@ export const MAX_U64 = 18_446_744_073_709_551_615n;
 
 export type BuildTx = (selection: SelectionSkeleton) => Promise<Cardano.Tx>;
 
+/**
+ * Redeemers grouped by purpose. Each purpose is keyed by the on-chain identifier its redeemer
+ * points at, so the canonical (ledger) redeemer index can be derived from the transaction body
+ * during {@link computeMinimumCost}:
+ *
+ * - `spend` by `txId#index`
+ * - `mint` by minting `PolicyId`
+ * - `withdrawal` by script `RewardAccount`
+ * - `vote` by `Voter`
+ *
+ * `certificate` and `propose` redeemers are sequence-indexed in transaction-body order, which is
+ * what the ledger expects for those purposes, so they remain ordered lists.
+ */
 export interface RedeemersByType {
   spend?: Map<TxIdWithIndex, Cardano.Redeemer>;
-  mint?: Array<Cardano.Redeemer>;
+  mint?: Map<Cardano.PolicyId, Cardano.Redeemer>;
+  withdrawal?: Map<Cardano.RewardAccount, Cardano.Redeemer>;
+  vote?: Array<{ voter: Cardano.Voter; redeemer: Cardano.Redeemer }>;
   certificate?: Array<Cardano.Redeemer>;
-  withdrawal?: Array<Cardano.Redeemer>;
   propose?: Array<Cardano.Redeemer>;
-  vote?: Array<Cardano.Redeemer>;
 }
 
 export interface DefaultSelectionConstraintsProps {
@@ -33,75 +46,135 @@ export interface DefaultSelectionConstraintsProps {
   txEvaluator: TxEvaluator;
 }
 
-const updateRedeemers = (
-  evaluation: TxEvaluationResult,
+/** Lexicographic comparison of hex-encoded byte strings. */
+const compareHex = (a: string, b: string): number => (a === b ? 0 : a < b ? -1 : 1);
+
+const rewardAccountCredential = (rewardAccount: Cardano.RewardAccount): Cardano.Credential =>
+  Cardano.Address.fromBech32(rewardAccount).asReward()!.getPaymentCredential();
+
+/** Ledger ordering group for a voter constructor: ConstitutionalCommittee < DRep < StakePool. */
+const voterGroup = (voter: Cardano.Voter): number => {
+  switch (voter.__typename) {
+    case Cardano.VoterType.ccHotKeyHash:
+    case Cardano.VoterType.ccHotScriptHash:
+      return 0;
+    case Cardano.VoterType.dRepKeyHash:
+    case Cardano.VoterType.dRepScriptHash:
+      return 1;
+    default:
+      return 2;
+  }
+};
+
+// Within a constructor the ledger Credential Ord places ScriptHash before KeyHash.
+const credentialScriptFirstRank = (type: Cardano.CredentialType): number =>
+  type === Cardano.CredentialType.ScriptHash ? 0 : 1;
+
+const compareVoters = (a: Cardano.Voter, b: Cardano.Voter): number =>
+  voterGroup(a) - voterGroup(b) ||
+  credentialScriptFirstRank(a.credential.type) - credentialScriptFirstRank(b.credential.type) ||
+  compareHex(a.credential.hash, b.credential.hash);
+
+const votersEqual = (a: Cardano.Voter, b: Cardano.Voter): boolean =>
+  a.__typename === b.__typename && a.credential.hash === b.credential.hash;
+
+const reindexed = (
+  redeemer: Cardano.Redeemer,
+  purpose: Cardano.RedeemerPurpose,
+  index: number,
+  executionUnits: Cardano.ExUnits
+): Cardano.Redeemer => ({ data: redeemer.data, executionUnits, index, purpose });
+
+const spendRedeemers = (
   redeemersByType: RedeemersByType,
-  txInputs: Array<Cardano.TxIn>
-): Array<Cardano.Redeemer> => {
-  const result: Array<Cardano.Redeemer> = [];
+  sortedInputs: Array<Cardano.TxIn>,
+  executionUnits: Cardano.ExUnits
+): Cardano.Redeemer[] =>
+  [...(redeemersByType.spend ?? [])].map(([key, redeemer]) => {
+    const index = sortedInputs.findIndex((input) => key === `${input.txId}#${input.index}`);
+    if (index < 0) throw new Error(`Spend redeemer input not found in transaction: ${key}`);
+    return reindexed(redeemer, Cardano.RedeemerPurpose.spend, index, executionUnits);
+  });
 
-  // Mapping between purpose and redeemersByType
-  const redeemersMap: { [key in Cardano.RedeemerPurpose]?: Map<string, Cardano.Redeemer> | Cardano.Redeemer[] } = {
-    [Cardano.RedeemerPurpose.spend]: redeemersByType.spend,
-    [Cardano.RedeemerPurpose.mint]: redeemersByType.mint,
-    [Cardano.RedeemerPurpose.certificate]: redeemersByType.certificate,
-    [Cardano.RedeemerPurpose.withdrawal]: redeemersByType.withdrawal,
-    [Cardano.RedeemerPurpose.propose]: redeemersByType.propose,
-    [Cardano.RedeemerPurpose.vote]: redeemersByType.vote
-  };
-
-  for (const txEval of evaluation) {
-    const redeemers = redeemersMap[txEval.purpose];
-    if (!redeemers) throw new Error(`No redeemers found for ${txEval.purpose} purpose`);
-
-    let knownRedeemer;
-    if (txEval.purpose === Cardano.RedeemerPurpose.spend) {
-      const input = txInputs[txEval.index];
-
-      knownRedeemer = (redeemers as Map<string, Cardano.Redeemer>).get(`${input.txId}#${input.index}`);
-
-      if (!knownRedeemer) throw new Error(`Known Redeemer not found for tx id ${input.txId} and index ${input.index}`);
-    } else {
-      const redeemerList = redeemers as Cardano.Redeemer[];
-
-      knownRedeemer = redeemerList.find((redeemer) => redeemer.index === txEval.index);
-
-      if (!knownRedeemer) throw new Error(`Known Redeemer not found for index ${txEval.index}`);
-    }
-
-    result.push({ ...knownRedeemer, executionUnits: txEval.budget });
-  }
-
-  return result;
-};
-
-const reorgRedeemers = (
-  redeemerByType: RedeemersByType,
-  witness: Cardano.Witness,
-  txInputs: Array<Cardano.TxIn>
+const mintRedeemers = (
+  redeemersByType: RedeemersByType,
+  body: Cardano.TxBody,
+  executionUnits: Cardano.ExUnits
 ): Cardano.Redeemer[] => {
-  let redeemers: Cardano.Redeemer[] = [];
-
-  if (witness.redeemers) {
-    // Lets remove all spend redeemers if any.
-    redeemers = witness.redeemers.filter((redeemer) => redeemer.purpose !== Cardano.RedeemerPurpose.spend);
-
-    // Add them back with the correct redeemer index.
-    if (redeemerByType.spend) {
-      for (const [key, value] of redeemerByType.spend) {
-        const index = txInputs.findIndex((input) => key === `${input.txId}#${input.index}`);
-
-        if (index < 0) throw new Error(`Redeemer not found for tx id ${key}`);
-
-        value.index = index;
-
-        redeemers.push({ ...value });
-      }
-    }
-  }
-
-  return redeemers;
+  const policyIds = [...new Set([...(body.mint?.keys() ?? [])].map(Cardano.AssetId.getPolicyId))].sort(compareHex);
+  return [...(redeemersByType.mint ?? [])].map(([policyId, redeemer]) => {
+    const index = policyIds.indexOf(policyId);
+    if (index < 0) throw new Error(`Mint redeemer policy not present in transaction mint: ${policyId}`);
+    return reindexed(redeemer, Cardano.RedeemerPurpose.mint, index, executionUnits);
+  });
 };
+
+const withdrawalRedeemers = (
+  redeemersByType: RedeemersByType,
+  body: Cardano.TxBody,
+  executionUnits: Cardano.ExUnits
+): Cardano.Redeemer[] => {
+  // Node quirk: withdrawal script credentials are processed before key-hash ones, so key-hash
+  // withdrawals carry no redeemer and don't shift the index. Index = rank among script reward
+  // accounts, sorted by credential hash.
+  const scriptRewardAccounts = (body.withdrawals ?? [])
+    .map((withdrawal) => withdrawal.stakeAddress)
+    .filter((rewardAccount) => rewardAccountCredential(rewardAccount).type === Cardano.CredentialType.ScriptHash)
+    .sort((a, b) => compareHex(rewardAccountCredential(a).hash, rewardAccountCredential(b).hash));
+  return [...(redeemersByType.withdrawal ?? [])].map(([rewardAccount, redeemer]) => {
+    const index = scriptRewardAccounts.indexOf(rewardAccount);
+    if (index < 0) throw new Error(`Withdrawal redeemer is not a script withdrawal in transaction: ${rewardAccount}`);
+    return reindexed(redeemer, Cardano.RedeemerPurpose.withdrawal, index, executionUnits);
+  });
+};
+
+const voteRedeemers = (
+  redeemersByType: RedeemersByType,
+  body: Cardano.TxBody,
+  executionUnits: Cardano.ExUnits
+): Cardano.Redeemer[] => {
+  const sortedVoters = (body.votingProcedures ?? []).map(({ voter }) => voter).sort(compareVoters);
+  return (redeemersByType.vote ?? []).map(({ voter, redeemer }) => {
+    const index = sortedVoters.findIndex((candidate) => votersEqual(candidate, voter));
+    if (index < 0) throw new Error('Vote redeemer voter not present in transaction voting procedures');
+    return reindexed(redeemer, Cardano.RedeemerPurpose.vote, index, executionUnits);
+  });
+};
+
+/**
+ * Assigns each redeemer its canonical ledger index, derived from the position of the item it
+ * unlocks within the transaction body's canonically-ordered collections (mirroring the node's
+ * `getAlonzoScriptsNeeded`). Certificate/proposal redeemers keep the caller-provided index, which
+ * is the item's position in transaction-body order. `executionUnits` are seeded from the (already
+ * max-budgeted) builder redeemers so evaluation has headroom; concrete units are merged back in
+ * via {@link mergeExecutionUnits}.
+ */
+const assignCanonicalIndices = (
+  redeemersByType: RedeemersByType,
+  body: Cardano.TxBody,
+  sortedInputs: Array<Cardano.TxIn>,
+  executionUnits: Cardano.ExUnits
+): Cardano.Redeemer[] => [
+  ...spendRedeemers(redeemersByType, sortedInputs, executionUnits),
+  ...mintRedeemers(redeemersByType, body, executionUnits),
+  ...withdrawalRedeemers(redeemersByType, body, executionUnits),
+  ...voteRedeemers(redeemersByType, body, executionUnits),
+  ...(redeemersByType.certificate ?? []).map((redeemer) =>
+    reindexed(redeemer, Cardano.RedeemerPurpose.certificate, redeemer.index, executionUnits)
+  ),
+  ...(redeemersByType.propose ?? []).map((redeemer) =>
+    reindexed(redeemer, Cardano.RedeemerPurpose.propose, redeemer.index, executionUnits)
+  )
+];
+
+/** Merges evaluated execution units back onto the canonically-indexed redeemers by (purpose, index). */
+const mergeExecutionUnits = (redeemers: Cardano.Redeemer[], evaluation: TxEvaluationResult): Cardano.Redeemer[] =>
+  redeemers.map((redeemer) => {
+    const evaluated = evaluation.find(
+      (txEval) => txEval.purpose === redeemer.purpose && txEval.index === redeemer.index
+    );
+    return evaluated ? { ...redeemer, executionUnits: evaluated.budget } : redeemer;
+  });
 
 export const computeMinimumCost =
   (
@@ -116,9 +189,12 @@ export const computeMinimumCost =
     const txIns = utxos.map((utxo) => utxo[0]).sort(sortTxIn);
 
     if (tx.witness && tx.witness.redeemers && tx.witness.redeemers.length > 0) {
-      // before the evaluation can happen, we need to point every redeemer to its corresponding inputs.
-      tx.witness.redeemers = reorgRedeemers(redeemersByType, tx.witness, txIns);
-      tx.witness.redeemers = updateRedeemers(await txEvaluator.evaluate(tx, utxos), redeemersByType, txIns);
+      // The builder redeemers carry a sentinel index and a max-budget; reassign canonical indices
+      // from the transaction body, evaluate, then merge the concrete execution units back in.
+      const maxBudget = tx.witness.redeemers[0].executionUnits;
+      const indexed = assignCanonicalIndices(redeemersByType, tx.body, txIns, maxBudget);
+      tx.witness.redeemers = indexed;
+      tx.witness.redeemers = mergeExecutionUnits(indexed, await txEvaluator.evaluate(tx, utxos));
     }
 
     return {

@@ -266,6 +266,15 @@ export type ScriptUnlockProps = {
   datum?: Cardano.PlutusData;
 };
 
+export type MintProps = {
+  /** The minting policy script. The policy id is derived from its hash. */
+  policy: Cardano.Script;
+  /** Asset names mapped to the quantity to mint (positive) or burn (negative), under the policy. */
+  assets: Map<Cardano.AssetName, bigint>;
+  /** Redeemer for Plutus minting policies; omit for native scripts. */
+  redeemer?: Cardano.PlutusData;
+};
+
 export interface TxBuilder {
   /**
    * @returns a partial transaction that has properties set by calling other TxBuilder methods. Does not validate the transaction.
@@ -288,6 +297,16 @@ export interface TxBuilder {
    * @returns {TxBuilder} The current TxBuilder instance for chaining.
    */
   addInput(input: Cardano.TxIn | Cardano.Utxo, scriptUnlockProps?: ScriptUnlockProps): TxBuilder;
+
+  /**
+   * Mints (or burns) assets under a minting policy. The policy script is attached to the witness
+   * set and, for Plutus policies, the redeemer is included and its execution units are evaluated
+   * during `build()`. Call multiple times to mint under several policies.
+   *
+   * @param props - The minting policy, the assets (by name) to mint/burn, and an optional redeemer.
+   * @returns {TxBuilder} The current TxBuilder instance for chaining.
+   */
+  addMint(props: MintProps): TxBuilder;
 
   /**
    * Adds a datum to the transaction.

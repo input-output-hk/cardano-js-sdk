@@ -347,7 +347,7 @@ describe('LedgerKeyAgent', () => {
             }
           ]),
           redeemersByType: {
-            mint: [scriptRedeemer]
+            mint: new Map([[policyId, scriptRedeemer]])
           },
           scriptIntegrityHash: scriptDataHash,
           witness: { redeemers: [scriptRedeemer], scripts: [script] }
