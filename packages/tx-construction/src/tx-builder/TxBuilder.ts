@@ -363,7 +363,11 @@ export class GenericTxBuilder implements TxBuilder {
             );
             const auxiliaryData = this.partialAuxiliaryData && { ...this.partialAuxiliaryData };
             const extraSigners = this.partialExtraSigners && [...this.partialExtraSigners];
-            const partialSigningOptions = this.partialSigningOptions && { ...this.partialSigningOptions, extraSigners };
+            // Include extra signers in the signing options used for fee estimation, even when no
+            // other signing options were set — otherwise their witnesses are added at sign() but
+            // not accounted for in the fee, producing an insufficient-fee transaction.
+            const partialSigningOptions =
+              this.partialSigningOptions || extraSigners ? { ...this.partialSigningOptions, extraSigners } : undefined;
 
             if (this.partialAuxiliaryData) {
               this.partialTxBody.auxiliaryDataHash = Cardano.computeAuxiliaryDataHash(this.partialAuxiliaryData);

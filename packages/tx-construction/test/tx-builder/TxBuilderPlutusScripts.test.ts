@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, Bip32Account, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
+import { AddressType, Bip32Account, InMemoryKeyAgent, KeyRole, util } from '@cardano-sdk/key-management';
 import { Cardano, Serialization, coalesceValueQuantities } from '@cardano-sdk/core';
 import {
   DatumResolver,
@@ -394,6 +394,27 @@ describe('TxBuilder/plutusScripts', () => {
     expect(indexOf(firstPolicyData)).toBe(0);
     expect(indexOf(secondPolicyData)).toBe(1);
     expect(mintRedeemers.every((r) => r.executionUnits.steps > 0)).toBeTruthy();
+  });
+
+  it('accounts for extra signers in the fee', async () => {
+    const recipient = Cardano.PaymentAddress(
+      'addr_test1qqt9c69kjqf0wsnlp7hs8xees5l6pm4yxdqa3hknqr0kfe0htmj4e5t8n885zxm4qzpfzwruqx3ey3f5q8kpkr0gt9ms8dcsz6'
+    );
+    const feeFor = async (withExtraSigner: boolean) => {
+      const { txBuilder: builder } = await createTxBuilder({
+        keyAgent,
+        stakeDelegations: [{ credentialStatus: Cardano.StakeCredentialStatus.Unregistered }]
+      });
+      builder.addOutput(await builder.buildOutput().address(recipient).coin(1_000_000n).build());
+      if (withExtraSigner) {
+        // A distinct derivation path so its witness isn't deduped against the input-signing key.
+        builder.extraSigners([new util.KeyAgentTransactionSigner(keyAgent, { index: 5, role: KeyRole.External })]);
+      }
+      return (await builder.build().inspect()).body.fee;
+    };
+
+    // The extra signer's witness must be paid for, even without explicit signingOptions.
+    expect(await feeFor(true)).toBeGreaterThan(await feeFor(false));
   });
 
   it('can point the redeemer to the right input', async () => {
