@@ -2283,7 +2283,7 @@ __metadata:
     typeorm: ^0.3.15
     typeorm-extension: ^2.7.0
     typescript: ^4.7.4
-    uuid: ^10.0.0
+    uuid: ^14.0.0
     wait-on: ^6.0.1
     ws: ^8.17.1
   bin:
@@ -2482,7 +2482,7 @@ __metadata:
     typeorm-extension: ^2.7.0
     typescript: ^4.7.4
     util: ^0.12.4
-    uuid: ^8.3.2
+    uuid: ^14.0.0
     wdio-chromedriver-service: ^7.3.2
     webassembly-loader-sw: ^1.1.0
     webdriverio: ^7.20.5
@@ -2715,7 +2715,7 @@ __metadata:
     tsc-alias: ^1.8.10
     typeorm: ^0.3.15
     typescript: ^4.7.4
-    uuid: ^9.0.0
+    uuid: ^14.0.0
   languageName: unknown
   linkType: soft
 
@@ -2886,7 +2886,7 @@ __metadata:
     ts-log: ^2.2.3
     tsc-alias: ^1.8.10
     typescript: ^4.7.4
-    uuid: ^8.3.2
+    uuid: ^14.0.0
     wait-on: ^6.0.1
     webextension-polyfill: ^0.9.0
   languageName: unknown
@@ -2924,7 +2924,7 @@ __metadata:
     tsc-alias: ^1.8.10
     typescript: ^4.7.4
     util: ^0.12.4
-    uuid: ^8.3.2
+    uuid: ^14.0.0
     webextension-polyfill: ^0.8.0
   languageName: unknown
   linkType: soft
@@ -24304,12 +24304,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:^10.0.0":
-  version: 10.0.0
-  resolution: "uuid@npm:10.0.0"
+"uuid@npm:^14.0.0":
+  version: 14.0.0
+  resolution: "uuid@npm:14.0.0"
   bin:
-    uuid: dist/bin/uuid
-  checksum: 4b81611ade2885d2313ddd8dc865d93d8dccc13ddf901745edca8f86d99bc46d7a330d678e7532e7ebf93ce616679fb19b2e3568873ac0c14c999032acb25869
+    uuid: dist-node/bin/uuid
+  checksum: 08608584a79e987cdae000fa8eb724fa51dd8aafc136cd9fa9a8c87d07b246c56eec5fd9027fdb3e49a863eedf758bc19e325909ce281955c7a027fed67dc89e
   languageName: node
   linkType: hard
 
