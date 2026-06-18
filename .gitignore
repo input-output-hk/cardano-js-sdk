@@ -4,7 +4,6 @@ coverage
 node_modules
 docs
 .env
-.envrc.local
 tsconfig.tsbuildinfo
 lerna-debug.log
 .yarn/*
@@ -15,28 +14,12 @@ lerna-debug.log
 !.yarn/versions
 !.yarn/constraints.pro
 
-# created by nix
-result
-source
-
 # created by macOS
 .DS_Store
 
 # IDE configs
 .idea/
 .vscode/
-
-# direnv
-/.direnv
-
-# prj-spec dirs
-# <https://github.com/numtide/prj-spec>
-/.bin
-/.run
-/.cache
-/.data
-/.config
-/.local
 
 # Auto generated
 .kube

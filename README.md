@@ -132,15 +132,6 @@ installed.
 yarn config:update
 ```
 
-#### With `nix`
-
-Requires [Nix](https://nixos.org/download.html), will install `git-subrepo`
-for you.
-
-```
-nix run .#config-update
-```
-
 ## Get CBOR representation of an on chain transaction
 
 Once we have a [running network](packages/cardano-services/README.md#production) synced at least up to the block

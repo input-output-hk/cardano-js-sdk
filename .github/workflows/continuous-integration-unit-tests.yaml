@@ -35,13 +35,6 @@ jobs:
         env:
           NODE_OPTIONS: '--max_old_space_size=8192'
 
-      - name: 🔨 Generated files
-        run: |
-          git checkout yarn-project.nix
-          if [ ! -z "$(git status --porcelain)" ] ; then git status ; echo "The PR is missing some generated file" ; exit 1 ; fi
-        env:
-          NODE_OPTIONS: '--max_old_space_size=8192'
-
       - name: 🔬 Test
         run: |
           yarn test --forceExit
