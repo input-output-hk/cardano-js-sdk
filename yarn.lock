@@ -2306,7 +2306,7 @@ __metadata:
     delay: ^5.0.0
     eslint: ^7.32.0
     fraction.js: 4.0.1
-    ip-address: ^9.0.5
+    ip-address: ^10.1.1
     jest: ^28.1.3
     lodash: ^4.17.21
     madge: ^5.0.1
@@ -15021,6 +15021,13 @@ __metadata:
     from2: ^2.3.0
     p-is-promise: ^3.0.0
   checksum: 8df24c9eadd7cdd1cbc160bc20914b961dfd0ca29767785b69e698f799e85466b6f7c637d237dca1472d09d333399f70cc05a2fb8d08cb449dc9a80d92193980
+  languageName: node
+  linkType: hard
+
+"ip-address@npm:^10.1.1":
+  version: 10.1.1
+  resolution: "ip-address@npm:10.1.1"
+  checksum: 4a370ba2708290b3f6381110097960e99a6d0a67aee5487562dd3bb3d600b9c5b5614c6b38d5143ee5103c4652922f53d47e5154209c332ca437fba7b8e7619f
   languageName: node
   linkType: hard
 
