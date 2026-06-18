@@ -47,18 +47,8 @@
     "tsc-alias": "^1.8.10",
     "typescript": "^4.7.4"
   },
-  "peerDependencies": {
-    "rxjs": "^7.4.0"
-  },
-  "peerDependenciesMeta": {
-    "rxjs": {
-      "optional": true
-    }
-  },
   "dependencies": {
     "@biglup/is-cid": "^1.0.3",
-    "@cardano-ogmios/client": "6.9.0",
-    "@cardano-ogmios/schema": "6.9.0",
     "@cardano-sdk/crypto": "workspace:~",
     "@cardano-sdk/util": "workspace:~",
     "@foxglove/crc": "^0.0.3",
