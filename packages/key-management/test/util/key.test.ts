@@ -1,4 +1,4 @@
-import { AddressType, GroupedAddress, KeyRole } from '../../src';
+import { AddressType, GroupedAddress, KeyPurpose, KeyRole } from '../../src';
 import { Cardano } from '@cardano-sdk/core';
 import {
   accountKeyDerivationPathToBip32Path,
@@ -29,8 +29,15 @@ const knownAddress: GroupedAddress = {
   type: AddressType.Internal
 };
 
-const knownAddressKeyPath = [2_147_485_500, 2_147_485_463, 2_147_483_648, 1, 0];
-const knownAddressStakeKeyPath = [2_147_485_500, 2_147_485_463, 2_147_483_648, 2, 0];
+// CIP-1852: m / 1852' / 1815' / account' / role / index  (hardened = n + 0x8000_0000)
+const HARDENED_PURPOSE_1852 = 2_147_485_500;
+const HARDENED_PURPOSE_1854 = 2_147_485_502;
+const HARDENED_COINTYPE_1815 = 2_147_485_463;
+const HARDENED_ACCOUNT_0 = 2_147_483_648;
+const HARDENED_ACCOUNT_5 = 2_147_483_653;
+
+const knownAddressKeyPath = [HARDENED_PURPOSE_1852, HARDENED_COINTYPE_1815, HARDENED_ACCOUNT_0, KeyRole.Internal, 0];
+const knownAddressStakeKeyPath = [HARDENED_PURPOSE_1852, HARDENED_COINTYPE_1815, HARDENED_ACCOUNT_0, KeyRole.Stake, 0];
 
 describe('key utils', () => {
   describe('paymentKeyPathFromGroupedAddress', () => {
@@ -50,33 +57,33 @@ describe('key utils', () => {
   });
   describe('accountKeyDerivationPathToBip32Path', () => {
     it('returns correct path with default purpose', () => {
-      const path = accountKeyDerivationPathToBip32Path(0, { role: KeyRole.External, index: 0 });
-      expect(path).toEqual([2_147_485_500, 2_147_485_463, 2_147_483_648, 0, 0]);
+      const path = accountKeyDerivationPathToBip32Path(0, { index: 0, role: KeyRole.External });
+      expect(path).toEqual([HARDENED_PURPOSE_1852, HARDENED_COINTYPE_1815, HARDENED_ACCOUNT_0, KeyRole.External, 0]);
     });
 
     it('returns correct path for internal key role', () => {
-      const path = accountKeyDerivationPathToBip32Path(0, { role: KeyRole.Internal, index: 0 });
-      expect(path).toEqual([2_147_485_500, 2_147_485_463, 2_147_483_648, 1, 0]);
+      const path = accountKeyDerivationPathToBip32Path(0, { index: 0, role: KeyRole.Internal });
+      expect(path).toEqual([HARDENED_PURPOSE_1852, HARDENED_COINTYPE_1815, HARDENED_ACCOUNT_0, KeyRole.Internal, 0]);
     });
 
     it('returns correct path for stake key role', () => {
-      const path = accountKeyDerivationPathToBip32Path(0, { role: KeyRole.Stake, index: 0 });
-      expect(path).toEqual([2_147_485_500, 2_147_485_463, 2_147_483_648, 2, 0]);
+      const path = accountKeyDerivationPathToBip32Path(0, { index: 0, role: KeyRole.Stake });
+      expect(path).toEqual([HARDENED_PURPOSE_1852, HARDENED_COINTYPE_1815, HARDENED_ACCOUNT_0, KeyRole.Stake, 0]);
     });
 
     it('returns correct path for DRep key role', () => {
-      const path = accountKeyDerivationPathToBip32Path(0, { role: KeyRole.DRep, index: 0 });
-      expect(path).toEqual([2_147_485_500, 2_147_485_463, 2_147_483_648, 3, 0]);
+      const path = accountKeyDerivationPathToBip32Path(0, { index: 0, role: KeyRole.DRep });
+      expect(path).toEqual([HARDENED_PURPOSE_1852, HARDENED_COINTYPE_1815, HARDENED_ACCOUNT_0, KeyRole.DRep, 0]);
     });
 
     it('returns correct path with custom account index', () => {
-      const path = accountKeyDerivationPathToBip32Path(5, { role: KeyRole.External, index: 3 });
-      expect(path).toEqual([2_147_485_500, 2_147_485_463, 2_147_483_653, 0, 3]);
+      const path = accountKeyDerivationPathToBip32Path(5, { index: 3, role: KeyRole.External });
+      expect(path).toEqual([HARDENED_PURPOSE_1852, HARDENED_COINTYPE_1815, HARDENED_ACCOUNT_5, KeyRole.External, 3]);
     });
 
     it('returns correct path with custom purpose', () => {
-      const path = accountKeyDerivationPathToBip32Path(0, { role: KeyRole.External, index: 0 }, 1854);
-      expect(path).toEqual([2_147_485_502, 2_147_485_463, 2_147_483_648, 0, 0]);
+      const path = accountKeyDerivationPathToBip32Path(0, { index: 0, role: KeyRole.External }, KeyPurpose.MULTI_SIG);
+      expect(path).toEqual([HARDENED_PURPOSE_1854, HARDENED_COINTYPE_1815, HARDENED_ACCOUNT_0, KeyRole.External, 0]);
     });
   });
 });
