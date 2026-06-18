@@ -2,6 +2,7 @@
 /* eslint-disable no-loop-func */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unicorn/consistent-function-scoping */
+import * as Crypto from '@cardano-sdk/crypto';
 import { AssetId } from '@cardano-sdk/util-dev';
 import { Cardano, InvalidProtocolParametersError, Serialization } from '@cardano-sdk/core';
 import { DefaultSelectionConstraintsProps, defaultSelectionConstraints } from '../../src';
@@ -49,17 +50,21 @@ describe('defaultSelectionConstraints', () => {
             purpose: Cardano.RedeemerPurpose.certificate
           }
         ],
-        mint: [
-          {
-            data: Serialization.PlutusData.fromCbor(HexBlob('d86682008101')).toCore(),
-            executionUnits: {
-              memory: 0,
-              steps: 0
-            },
-            index: 0,
-            purpose: Cardano.RedeemerPurpose.mint
-          }
-        ]
+        // Keyed by a policy id present in babbageTx's mint; it sorts first canonically -> index 0.
+        mint: new Map([
+          [
+            Cardano.PolicyId('2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740'),
+            {
+              data: Serialization.PlutusData.fromCbor(HexBlob('d86682008101')).toCore(),
+              executionUnits: {
+                memory: 0,
+                steps: 0
+              },
+              index: 0,
+              purpose: Cardano.RedeemerPurpose.mint
+            }
+          ]
+        ])
       },
       txEvaluator: mockTxEvaluator
     });
@@ -159,6 +164,71 @@ describe('defaultSelectionConstraints', () => {
         protocolParameters: { ...protocolParameters, maxValueSize: 1 }
       } as DefaultSelectionConstraintsProps);
       expect(constraints.tokenBundleSizeExceedsLimit(new Map())).toBe(true);
+    });
+  });
+
+  describe('canonical redeemer indices', () => {
+    const selection = { inputs: [] } as unknown as SelectionSkeleton;
+    const maxBudget = { memory: 100, steps: 200 };
+    const dataA = Serialization.PlutusData.fromCbor(HexBlob('d87980')).toCore();
+    const dataB = Serialization.PlutusData.fromCbor(HexBlob('d87a80')).toCore();
+
+    const scriptRewardAccount = (hashByte: string) =>
+      Cardano.RewardAccount.fromCredential(
+        { hash: Crypto.Hash28ByteBase16(hashByte.repeat(28)), type: Cardano.CredentialType.ScriptHash },
+        Cardano.NetworkId.Testnet
+      );
+    const keyRewardAccount = (hashByte: string) =>
+      Cardano.RewardAccount.fromCredential(
+        { hash: Crypto.Hash28ByteBase16(hashByte.repeat(28)), type: Cardano.CredentialType.KeyHash },
+        Cardano.NetworkId.Testnet
+      );
+
+    it('withdrawal redeemers are indexed among script reward accounts by hash, excluding key-hash withdrawals', async () => {
+      const scriptA = scriptRewardAccount('aa');
+      const scriptB = scriptRewardAccount('bb');
+      const keyC = keyRewardAccount('cc');
+
+      const redeemer = (data: Cardano.PlutusData): Cardano.Redeemer => ({
+        data,
+        executionUnits: { memory: 0, steps: 0 },
+        index: Number.MAX_SAFE_INTEGER,
+        purpose: Cardano.RedeemerPurpose.withdrawal
+      });
+
+      // Body lists them out of canonical order, and a key-hash withdrawal is interleaved.
+      const tx = {
+        ...babbageTx,
+        body: {
+          ...babbageTx.body,
+          mint: undefined,
+          withdrawals: [
+            { quantity: 1n, stakeAddress: keyC },
+            { quantity: 1n, stakeAddress: scriptB },
+            { quantity: 1n, stakeAddress: scriptA }
+          ]
+        },
+        witness: { ...babbageTx.witness, redeemers: [redeemer(dataA), redeemer(dataB)] }
+      } as Cardano.Tx;
+
+      const constraints = defaultSelectionConstraints({
+        buildTx: async () => tx,
+        protocolParameters,
+        redeemersByType: {
+          withdrawal: new Map([
+            [scriptB, redeemer(dataB)],
+            [scriptA, redeemer(dataA)]
+          ])
+        },
+        txEvaluator: mockTxEvaluator
+      } as DefaultSelectionConstraintsProps);
+
+      const { redeemers } = await constraints.computeMinimumCost(selection);
+
+      // scriptA (aa) sorts before scriptB (bb); the key-hash withdrawal carries no redeemer.
+      expect(redeemers!.find((r) => r.data === dataA)!.index).toBe(0);
+      expect(redeemers!.find((r) => r.data === dataB)!.index).toBe(1);
+      expect(redeemers!.every((r) => r.executionUnits.steps === maxBudget.steps)).toBe(true);
     });
   });
 });

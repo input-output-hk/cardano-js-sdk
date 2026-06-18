@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, Bip32Account, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
-import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
+import { AddressType, Bip32Account, InMemoryKeyAgent, KeyRole, util } from '@cardano-sdk/key-management';
+import { Cardano, Serialization, coalesceValueQuantities } from '@cardano-sdk/core';
 import {
   DatumResolver,
   GenericTxBuilder,
@@ -280,6 +280,141 @@ describe('TxBuilder/plutusScripts', () => {
     expect(tx.witness?.scripts?.some((s) => s === script)).toBeTruthy();
     expect(tx.body.scriptIntegrityHash).toEqual('6f33e6b98194924c306d686a35ed5560eb25be58fc72b721a50fc895a7d3f304');
     expect(roundRobinRandomImprove).toHaveBeenCalled();
+  });
+
+  it('can mint assets under a plutus policy with a redeemer', async () => {
+    const assetName = Cardano.AssetName('4d794e4654'); // "MyNFT"
+    const tx = await txBuilder
+      .addMint({ assets: new Map([[assetName, 1n]]), policy: script, redeemer: 1n })
+      .build()
+      .inspect();
+
+    const policyId = Cardano.PolicyId(Serialization.Script.fromCore(script).hash());
+    const assetId = Cardano.AssetId.fromParts(policyId, assetName);
+
+    expect(tx.body.mint?.get(assetId)).toEqual(1n);
+    expect(tx.witness?.scripts?.some((s) => s === script)).toBeTruthy();
+    expect(
+      tx.witness?.redeemers?.some(
+        (redeemer) => redeemer.purpose === Cardano.RedeemerPurpose.mint && redeemer.data === 1n
+      )
+    ).toBeTruthy();
+    expect(tx.body.scriptIntegrityHash).toBeDefined();
+  });
+
+  it('can burn assets under a plutus policy (negative quantity)', async () => {
+    const assetName = Cardano.AssetName('4d794e4654');
+    const policyId = Cardano.PolicyId(Serialization.Script.fromCore(script).hash());
+    const assetId = Cardano.AssetId.fromParts(policyId, assetName);
+
+    // The asset being burned must be available on an input.
+    const assetHolderAddress = Cardano.PaymentAddress(
+      'addr_test1qqt9c69kjqf0wsnlp7hs8xees5l6pm4yxdqa3hknqr0kfe0htmj4e5t8n885zxm4qzpfzwruqx3ey3f5q8kpkr0gt9ms8dcsz6'
+    );
+    const inputWithAsset: Cardano.Utxo = [
+      {
+        address: assetHolderAddress,
+        index: 0,
+        txId: Cardano.TransactionId('aa21ffbaff60ff0cff8cff55ffa6ff6dff78ff78ffaeffceff36ff3fffc5ffe0')
+      },
+      {
+        address: assetHolderAddress,
+        value: { assets: new Map([[assetId, 1n]]), coins: 10_000_000n }
+      }
+    ];
+
+    const tx = await txBuilder
+      .addInput(inputWithAsset)
+      .addMint({ assets: new Map([[assetName, -1n]]), policy: script, redeemer: 1n })
+      .build()
+      .inspect();
+
+    expect(tx.body.mint?.get(assetId)).toEqual(-1n);
+    expect(tx.body.scriptIntegrityHash).toBeDefined();
+  });
+
+  it('can mint under a native policy without a redeemer', async () => {
+    const nativePolicy: Cardano.NativeScript = {
+      __type: Cardano.ScriptType.Native,
+      kind: Cardano.NativeScriptKind.RequireAllOf,
+      scripts: []
+    };
+    const assetName = Cardano.AssetName('4e6174697665'); // "Native"
+    const policyId = Cardano.PolicyId(Serialization.Script.fromCore(nativePolicy).hash());
+    const assetId = Cardano.AssetId.fromParts(policyId, assetName);
+
+    const tx = await txBuilder
+      .addMint({ assets: new Map([[assetName, 5n]]), policy: nativePolicy })
+      .build()
+      .inspect();
+
+    expect(tx.body.mint?.get(assetId)).toEqual(5n);
+    expect(tx.witness?.scripts?.some((s) => s === nativePolicy)).toBeTruthy();
+    // Native minting has no redeemer and therefore no script-data-hash.
+    expect(tx.witness?.redeemers?.some((r) => r.purpose === Cardano.RedeemerPurpose.mint)).toBeFalsy();
+    expect(tx.body.scriptIntegrityHash).toBeUndefined();
+  });
+
+  it('indexes mint redeemers by canonical policy-id order, not insertion order', async () => {
+    const policyA = script;
+    const policyB: Cardano.PlutusScript = {
+      __type: Cardano.ScriptType.Plutus,
+      bytes: HexBlob('4d01000033222220051200120011'),
+      version: Cardano.PlutusLanguageVersion.V2
+    };
+
+    const policyIdA = Cardano.PolicyId(Serialization.Script.fromCore(policyA).hash());
+    const policyIdB = Cardano.PolicyId(Serialization.Script.fromCore(policyB).hash());
+    // Redeemer data identifies the policy: 1n -> A, 2n -> B.
+    const firstPolicySortsAsA = policyIdA < policyIdB;
+    const firstPolicyData = firstPolicySortsAsA ? 1n : 2n;
+    const secondPolicyData = firstPolicySortsAsA ? 2n : 1n;
+
+    const mintA = () =>
+      txBuilder.addMint({ assets: new Map([[Cardano.AssetName('41'), 1n]]), policy: policyA, redeemer: 1n });
+    const mintB = () =>
+      txBuilder.addMint({ assets: new Map([[Cardano.AssetName('42'), 1n]]), policy: policyB, redeemer: 2n });
+
+    // Add the policies in reverse canonical order; a plain insertion-order impl would mis-index.
+    if (firstPolicySortsAsA) {
+      mintB();
+      mintA();
+    } else {
+      mintA();
+      mintB();
+    }
+
+    const tx = await txBuilder.build().inspect();
+
+    const mintRedeemers = (tx.witness?.redeemers ?? []).filter((r) => r.purpose === Cardano.RedeemerPurpose.mint);
+    const indexOf = (data: bigint) => mintRedeemers.find((r) => r.data === data)?.index;
+
+    expect(mintRedeemers).toHaveLength(2);
+    // The policy whose id sorts first gets index 0, regardless of the order they were added.
+    expect(indexOf(firstPolicyData)).toBe(0);
+    expect(indexOf(secondPolicyData)).toBe(1);
+    expect(mintRedeemers.every((r) => r.executionUnits.steps > 0)).toBeTruthy();
+  });
+
+  it('accounts for extra signers in the fee', async () => {
+    const recipient = Cardano.PaymentAddress(
+      'addr_test1qqt9c69kjqf0wsnlp7hs8xees5l6pm4yxdqa3hknqr0kfe0htmj4e5t8n885zxm4qzpfzwruqx3ey3f5q8kpkr0gt9ms8dcsz6'
+    );
+    const feeFor = async (withExtraSigner: boolean) => {
+      const { txBuilder: builder } = await createTxBuilder({
+        keyAgent,
+        stakeDelegations: [{ credentialStatus: Cardano.StakeCredentialStatus.Unregistered }]
+      });
+      builder.addOutput(await builder.buildOutput().address(recipient).coin(1_000_000n).build());
+      if (withExtraSigner) {
+        // A distinct derivation path so its witness isn't deduped against the input-signing key.
+        builder.extraSigners([new util.KeyAgentTransactionSigner(keyAgent, { index: 5, role: KeyRole.External })]);
+      }
+      return (await builder.build().inspect()).body.fee;
+    };
+
+    // The extra signer's witness must be paid for, even without explicit signingOptions.
+    expect(await feeFor(true)).toBeGreaterThan(await feeFor(false));
   });
 
   it('can point the redeemer to the right input', async () => {

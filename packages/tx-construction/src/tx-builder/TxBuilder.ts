@@ -12,6 +12,7 @@ import { Cardano, HandleProvider, HandleResolution, Serialization, inConwayEra, 
 import {
   CustomizeCb,
   InsufficientRewardAccounts,
+  MintProps,
   OutOfSyncRewardAccounts,
   OutputBuilderTxOut,
   PartialTx,
@@ -142,11 +143,11 @@ export class GenericTxBuilder implements TxBuilder {
   #knownInlineDatums = new Set<Cardano.DatumHash>();
   #knownRedeemers: RedeemersByType = {
     certificate: new Array<Cardano.Redeemer>(),
-    mint: new Array<Cardano.Redeemer>(),
+    mint: new Map<Cardano.PolicyId, Cardano.Redeemer>(),
     propose: new Array<Cardano.Redeemer>(),
     spend: new Map<TxIdWithIndex, Cardano.Redeemer>(),
-    vote: new Array<Cardano.Redeemer>(),
-    withdrawal: new Array<Cardano.Redeemer>()
+    vote: new Array<{ voter: Cardano.Voter; redeemer: Cardano.Redeemer }>(),
+    withdrawal: new Map<Cardano.RewardAccount, Cardano.Redeemer>()
   };
 
   #unresolvedInputs = new Array<Cardano.TxIn>();
@@ -215,6 +216,31 @@ export class GenericTxBuilder implements TxBuilder {
       )
     )
       this.#unresolvedInputs.push(input);
+
+    return this;
+  }
+
+  addMint({ policy, assets, redeemer }: MintProps): TxBuilder {
+    const policyHash = Serialization.Script.fromCore(policy).hash();
+    this.#knownScripts.set(policyHash, policy);
+
+    const policyId = Cardano.PolicyId(policyHash);
+    const mint = new Map(this.partialTxBody.mint);
+    for (const [assetName, quantity] of assets) {
+      mint.set(Cardano.AssetId.fromParts(policyId, assetName), quantity);
+    }
+    this.partialTxBody = { ...this.partialTxBody, mint };
+
+    if (redeemer) {
+      // Keyed by policy id; the canonical redeemer index is derived from the sorted minting
+      // policies of the transaction body during input selection.
+      this.#knownRedeemers.mint?.set(policyId, {
+        data: redeemer,
+        executionUnits: { memory: 0, steps: 0 },
+        index: 0,
+        purpose: Cardano.RedeemerPurpose.mint
+      });
+    }
 
     return this;
   }
@@ -337,7 +363,11 @@ export class GenericTxBuilder implements TxBuilder {
             );
             const auxiliaryData = this.partialAuxiliaryData && { ...this.partialAuxiliaryData };
             const extraSigners = this.partialExtraSigners && [...this.partialExtraSigners];
-            const partialSigningOptions = this.partialSigningOptions && { ...this.partialSigningOptions, extraSigners };
+            // Include extra signers in the signing options used for fee estimation, even when no
+            // other signing options were set — otherwise their witnesses are added at sign() but
+            // not accounted for in the fee, producing an insufficient-fee transaction.
+            const partialSigningOptions =
+              this.partialSigningOptions || extraSigners ? { ...this.partialSigningOptions, extraSigners } : undefined;
 
             if (this.partialAuxiliaryData) {
               this.partialTxBody.auxiliaryDataHash = Cardano.computeAuxiliaryDataHash(this.partialAuxiliaryData);
@@ -412,6 +442,7 @@ export class GenericTxBuilder implements TxBuilder {
               customizeCb: this.#customizeCb,
               handleResolutions: this.#handleResolutions,
               inputs: new Set(this.#preSelectedInputs.values()),
+              mint: this.partialTxBody.mint,
               options: {
                 validityInterval: this.partialTxBody.validityInterval
               },

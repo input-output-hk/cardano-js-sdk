@@ -1,6 +1,5 @@
-import { BaseWallet, FinalizeTxProps } from '@cardano-sdk/wallet';
+import { BaseWallet } from '@cardano-sdk/wallet';
 import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
-import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { KeyRole, util } from '@cardano-sdk/key-management';
 import {
   bip32Ed25519Factory,
@@ -66,38 +65,16 @@ describe('PersonalWallet/mint', () => {
 
     const policyId = nativeScriptPolicyId(policyScript);
     const assetId = Cardano.AssetId(`${policyId}`); // skip asset name
-    const tokens = new Map([[assetId, 1n]]);
 
-    const walletAddress = (await firstValueFrom(wallet.addresses$))[0].address;
+    // Mint through the fluent transaction builder. The minted asset is balanced into the wallet's
+    // change; the policy requires Alice's signature, supplied as an extra signer.
+    const { tx: signedTx } = await wallet
+      .createTxBuilder()
+      .addMint({ assets: new Map([[Cardano.AssetName(''), 1n]]), policy: policyScript })
+      .extraSigners([alicePolicySigner])
+      .build()
+      .sign();
 
-    const txProps: InitializeTxProps = {
-      mint: tokens,
-      outputs: new Set([
-        {
-          address: walletAddress,
-          value: {
-            assets: tokens,
-            coins
-          }
-        }
-      ]),
-      signingOptions: {
-        extraSigners: [alicePolicySigner]
-      },
-      witness: { scripts: [policyScript] }
-    };
-
-    const unsignedTx = await wallet.initializeTx(txProps);
-
-    const finalizeProps: FinalizeTxProps = {
-      signingOptions: {
-        extraSigners: [alicePolicySigner]
-      },
-      tx: unsignedTx,
-      witness: { scripts: [policyScript] }
-    };
-
-    const signedTx = await wallet.finalizeTx(finalizeProps);
     const [, txFoundInHistory] = await submitAndConfirm(wallet, signedTx, 1);
 
     expect(txFoundInHistory.id).toEqual(signedTx.id);
