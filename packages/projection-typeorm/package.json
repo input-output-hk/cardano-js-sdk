@@ -51,7 +51,7 @@
     "ts-log": "^2.2.4",
     "tsc-alias": "^1.8.10",
     "typeorm": "^0.3.15",
-    "uuid": "^9.0.0"
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "@cardano-sdk/util-dev": "workspace:~",
