@@ -121,7 +121,7 @@ describe('TxSubmitHttpService', () => {
 
     describe('/health', () => {
       it('forwards the txSubmitProvider health response', async () => {
-        const res = await axios.post(`${baseUrlWithVersion}/health`, {
+        const res = await axios.post(`${baseUrlWithVersion}/health`, undefined, {
           headers: { [CONTENT_TYPE]: APPLICATION_JSON }
         });
         expect(res.status).toBe(200);

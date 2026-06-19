@@ -3,7 +3,7 @@
   "version": "0.26.34",
   "description": "Cardano Services Client",
   "engines": {
-    "node": ">=16.20.2"
+    "node": ">=22"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -31,7 +31,7 @@
     "cleanup": "rm -rf dist node_modules",
     "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint:fix": "yarn lint --fix",
-    "test": "yarn build:version && jest -c ./jest.config.js",
+    "test": "yarn build:version && jest -c ./jest.config.js --runInBand",
     "test:build:verify": "tsc --build ./test",
     "test:e2e": "echo 'test:e2e' command not implemented yet",
     "coverage": "yarn test --coverage || true",

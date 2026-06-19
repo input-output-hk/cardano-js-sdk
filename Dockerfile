@@ -1,7 +1,7 @@
 ARG UBUNTU_VERSION=22.04
 
 FROM ubuntu:${UBUNTU_VERSION} AS ubuntu-nodejs
-ARG NODEJS_MAJOR_VERSION=18
+ARG NODEJS_MAJOR_VERSION=22
 ENV DEBIAN_FRONTEND=nonintercative
 
 RUN \
@@ -16,16 +16,18 @@ RUN \
   apt-get install nodejs -y &&\
   apt-get install -y --no-install-recommends ca-certificates jq postgresql-client
 
-FROM ubuntu-nodejs AS cardano-services
-
-ARG NETWORK=mainnet
-ENV NETWORK=${NETWORK}
-
+# Build stage: installs the toolchain needed to compile native modules from source.
+# Node 22 has no prebuilt binaries for some of our (older) native deps
+# (cpu-features, chacha-native, node-hid/usb), so node-gyp must compile them — which
+# needs build-essential/python3 plus libudev/libusb/pkg-config for the HID/USB modules.
+# This toolchain is confined to the builder and never ships in the runtime images.
+FROM ubuntu-nodejs AS deps-builder
 RUN \
   curl --proto '=https' --tlsv1.2 -sSf -L https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - &&\
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list &&\
-  apt-get update && apt-get install yarn -y
-COPY packages/cardano-services/config/network/${NETWORK} /config/
+  apt-get update &&\
+  apt-get install -y yarn &&\
+  apt-get install -y --no-install-recommends build-essential python3 libudev-dev libusb-1.0-0-dev pkg-config
 WORKDIR /app
 COPY build build
 COPY packages/cardano-services/package.json packages/cardano-services/package.json
@@ -53,6 +55,21 @@ COPY scripts scripts
 COPY .yarn .yarn
 COPY .eslintrc.js .prettierrc .yarnrc.yml complete.eslintrc.js eslint.tsconfig.json package.json tsconfig.json yarn.lock ./
 RUN yarn workspaces focus --all --production
+
+FROM ubuntu-nodejs AS cardano-services
+
+ARG NETWORK=mainnet
+ENV NETWORK=${NETWORK}
+
+RUN \
+  curl --proto '=https' --tlsv1.2 -sSf -L https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - &&\
+  echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list &&\
+  apt-get update && apt-get install yarn -y
+COPY packages/cardano-services/config/network/${NETWORK} /config/
+WORKDIR /app
+# Bring in the production install (with compiled native modules) from the builder.
+# Same base image / Node version / arch, so the compiled .node addons are compatible.
+COPY --from=deps-builder /app /app
 
 FROM cardano-services AS provider-server
 WORKDIR /app/packages/cardano-services
