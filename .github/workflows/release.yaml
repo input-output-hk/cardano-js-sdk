@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: 📥 Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           # Fetch all history for all tags and branches
           fetch-depth: 0
@@ -19,14 +19,14 @@ jobs:
           token: ${{ secrets.BOT_GH_TOKEN }}
 
       - name: 🧰 Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: 18.12.0
           registry-url: 'https://registry.npmjs.org'
 
       - name: Import bot's GPG key for signing commits
         id: import-gpg
-        uses: crazy-max/ghaction-import-gpg@v5
+        uses: crazy-max/ghaction-import-gpg@v6
         with:
           gpg_private_key: ${{ secrets.BOT_GPG_KEY }}
           git_config_global: true
@@ -44,11 +44,24 @@ jobs:
         run: |
           yarn build
 
-      - name: Publish
+      # Phase 1 — decide versions, commit, tag, push to master, and create GitHub Releases.
+      # No-ops when there are no new conventional commits (e.g. re-running after a publish
+      # failure), so it never double-bumps an already-versioned release.
+      - name: 🏷️ Version
         run: |
-          if [ $RELEASE_MODE = "stable" ]; then yarn publish:stable; else yarn publish:rc; fi
+          if [ "$RELEASE_MODE" = "stable" ]; then yarn version:stable; else yarn version:rc; fi
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
           # Used for making a GitHub Release
           GH_TOKEN: ${{ secrets.BOT_GH_TOKEN }}
+          RELEASE_MODE: ${{ vars.RELEASE_MODE }}
+
+      # Phase 2 — publish to npm via `lerna publish from-package`, which queries the registry
+      # and publishes ONLY versions that are not yet there. This makes the job idempotent and
+      # recoverable: if a previous run versioned/tagged but failed to publish, simply re-running
+      # the workflow ships the missing packages without touching git history.
+      - name: 📦 Publish to npm
+        run: |
+          if [ "$RELEASE_MODE" = "stable" ]; then yarn publish:stable; else yarn publish:rc; fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
           RELEASE_MODE: ${{ vars.RELEASE_MODE }}
