@@ -2623,7 +2623,6 @@ __metadata:
     "@types/express-prometheus-middleware": ^1.2.1
     "@types/lodash": ^4.14.182
     "@types/pg": ^8.6.5
-    "@types/uuid": ^8.3.4
     "@types/wait-on": ^5.3.1
     "@types/ws": ^8.5.10
     axios: ^1.7.4
@@ -2673,7 +2672,7 @@ __metadata:
     typeorm: ^0.3.15
     typeorm-extension: ^2.7.0
     typescript: ^4.7.4
-    uuid: ^10.0.0
+    uuid: ^11.1.1
     wait-on: ^6.0.1
     ws: ^8.17.1
   bin:
@@ -2810,7 +2809,6 @@ __metadata:
     "@types/k6": ^0.53.1
     "@types/lodash": ^4.14.182
     "@types/ora": ^3.2.0
-    "@types/uuid": ^8.3.4
     "@types/webextension-polyfill": ^0.8.0
     "@wdio/cli": ^7.19.5
     "@wdio/local-runner": ^7.19.5
@@ -2864,7 +2862,7 @@ __metadata:
     typescript: ^4.7.4
     url: ^0.11.4
     util: ^0.12.4
-    uuid: ^8.3.2
+    uuid: ^11.1.1
     wdio-chromedriver-service: ^7.3.2
     webassembly-loader-sw: ^1.1.0
     webdriverio: ^7.20.5
@@ -3097,7 +3095,7 @@ __metadata:
     tsc-alias: ^1.8.10
     typeorm: ^0.3.15
     typescript: ^4.7.4
-    uuid: ^9.0.0
+    uuid: ^11.1.1
   languageName: unknown
   linkType: soft
 
@@ -3267,7 +3265,7 @@ __metadata:
     ts-log: ^2.2.3
     tsc-alias: ^1.8.10
     typescript: ^4.7.4
-    uuid: ^8.3.2
+    uuid: ^11.1.1
     wait-on: ^6.0.1
     webextension-polyfill: ^0.9.0
   languageName: unknown
@@ -3289,7 +3287,6 @@ __metadata:
     "@cardano-sdk/util-rxjs": "workspace:~"
     "@cardano-sdk/wallet": "workspace:~"
     "@types/lodash": ^4.14.182
-    "@types/uuid": ^8.3.4
     "@types/webextension-polyfill": ^0.8.0
     backoff-rxjs: ^7.0.0
     eslint: ^7.32.0
@@ -3305,7 +3302,7 @@ __metadata:
     tsc-alias: ^1.8.10
     typescript: ^4.7.4
     util: ^0.12.4
-    uuid: ^8.3.2
+    uuid: ^11.1.1
     webextension-polyfill: ^0.8.0
   languageName: unknown
   linkType: soft
@@ -24348,15 +24345,6 @@ __metadata:
   bin:
     uuid: dist/bin/uuid
   checksum: 5575a8a75c13120e2f10e6ddc801b2c7ed7d8f3c8ac22c7ed0c7b2ba6383ec0abda88c905085d630e251719e0777045ae3236f04c812184b7c765f63a70e58df
-  languageName: node
-  linkType: hard
-
-"uuid@npm:^10.0.0":
-  version: 10.0.0
-  resolution: "uuid@npm:10.0.0"
-  bin:
-    uuid: dist/bin/uuid
-  checksum: 4b81611ade2885d2313ddd8dc865d93d8dccc13ddf901745edca8f86d99bc46d7a330d678e7532e7ebf93ce616679fb19b2e3568873ac0c14c999032acb25869
   languageName: node
   linkType: hard
 

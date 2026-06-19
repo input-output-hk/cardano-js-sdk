@@ -69,7 +69,6 @@
     "@types/express-prometheus-middleware": "^1.2.1",
     "@types/lodash": "^4.14.182",
     "@types/pg": "^8.6.5",
-    "@types/uuid": "^8.3.4",
     "@types/wait-on": "^5.3.1",
     "@types/ws": "^8.5.10",
     "axios-mock-adapter": "^2.0.0",
@@ -132,7 +131,7 @@
     "ts-custom-error": "^3.2.0",
     "ts-log": "^2.2.4",
     "typeorm": "^0.3.15",
-    "uuid": "^10.0.0",
+    "uuid": "^11.1.1",
     "ws": "^8.17.1"
   },
   "files": [
