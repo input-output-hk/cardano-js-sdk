@@ -2,7 +2,7 @@
 package-lock.json
 coverage
 node_modules
-docs
+typedoc
 .env
 tsconfig.tsbuildinfo
 lerna-debug.log

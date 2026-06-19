@@ -4,10 +4,8 @@ import url from 'url';
 
 const rootDir = path.dirname(url.fileURLToPath(import.meta.url));
 
-const coverageIndexDir = path.join(rootDir, 'docs', 'coverage');
-if (!fs.existsSync(coverageIndexDir)) {
-  fs.mkdirSync(coverageIndexDir);
-}
+const coverageIndexDir = path.join(rootDir, 'typedoc', 'coverage');
+fs.ensureDirSync(coverageIndexDir);
 
 const packagesDir = path.join(rootDir, 'packages');
 for (const packageName of fs.readdirSync(packagesDir)) {
