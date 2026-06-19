@@ -179,7 +179,7 @@
     "webpack-merge": "^5.8.0"
   },
   "engines": {
-    "node": ">=16.20.2"
+    "node": ">=22"
   },
   "publishConfig": {
     "access": "public"

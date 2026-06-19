@@ -102,7 +102,10 @@ export class MeasurementUtil<T extends string> {
 
     for (const measureEntry of performance
       .getEntriesByType('measure')
-      .map(({ duration, detail }) => ({ duration, target: (detail as MarkerDetail<T>).target }))
+      .map((entry) => ({
+        duration: entry.duration,
+        target: (entry as unknown as { detail: MarkerDetail<T> }).detail.target
+      }))
       .filter(({ target }) => targets?.some((t) => t === target))) {
       const data = measurementData[measureEntry.target];
       if (!data.time) {
@@ -125,8 +128,8 @@ export class MeasurementUtil<T extends string> {
     // Count all the start markers. They all have the 'target' detail added. Stop markers don't have it
     for (const targetName of performance
       .getEntriesByType('mark')
-      .map(({ detail }) => (detail as MarkerDetail<T>)?.target)
-      .filter((target) => target && targets?.some((t) => t === target))) {
+      .map((entry) => (entry as unknown as { detail?: MarkerDetail<T> }).detail?.target)
+      .filter((target): target is T => !!target && !!targets?.some((t) => t === target))) {
       measurementData[targetName].calls_count++;
     }
 

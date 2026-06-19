@@ -7,7 +7,7 @@ import { bufferChainSyncEvent } from '../src/bufferChainSyncEvent';
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 class ChainSyncEventTestConsumer {
-  private interval: NodeJS.Timer;
+  private interval: NodeJS.Timeout;
   private subscription: Subscription;
 
   private consumeUpTo = 0;
@@ -65,7 +65,7 @@ class ChainSyncEventTestConsumer {
 class ChainSyncEventTestProducer {
   public observable$ = new Subject<ChainSyncEvent>();
 
-  private interval: NodeJS.Timer;
+  private interval: NodeJS.Timeout;
 
   private canProduce = true;
   private produceUpTo = 1;

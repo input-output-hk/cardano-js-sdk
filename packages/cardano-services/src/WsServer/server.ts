@@ -88,7 +88,7 @@ export class CardanoWsServer extends WsProvider {
   private closeNotify = noop;
   private closing = false;
   private db: Pool;
-  private heartbeatInterval: NodeJS.Timer | undefined;
+  private heartbeatInterval: NodeJS.Timeout | undefined;
   private lastReceivedNotification = 0;
   private lastSentNotification = 0;
   private lastSlot = Number.POSITIVE_INFINITY as Cardano.Slot;
@@ -96,7 +96,7 @@ export class CardanoWsServer extends WsProvider {
   private networkInfo: NetworkInfoResponses;
   private notifications = new Map<number, NotificationBody>();
   private server: Server;
-  private stakeInterval: NodeJS.Timer | undefined;
+  private stakeInterval: NodeJS.Timeout | undefined;
   private syncing = true;
   private wss: WebSocketServer;
 
