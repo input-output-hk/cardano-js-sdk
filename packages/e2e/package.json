@@ -97,7 +97,7 @@
     "bunyan": "^1.8.15",
     "chalk": "4.1.2",
     "cli-spinners": "^2.9.0",
-    "convict": "^6.2.4",
+    "convict": "^6.2.5",
     "delay": "5.0.0",
     "dotenv": "^16.0.1",
     "envalid": "^7.3.1",
