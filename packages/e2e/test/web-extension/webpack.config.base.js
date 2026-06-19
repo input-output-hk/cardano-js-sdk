@@ -88,6 +88,7 @@ module.exports = {
         perf_hooks: false,
         process: false,
         stream: require.resolve('readable-stream'),
+        url: require.resolve('url/'),
         util: require.resolve('util/')
       }
     },
