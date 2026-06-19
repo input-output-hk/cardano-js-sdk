@@ -51,7 +51,7 @@ COPY packages/wallet/package.json packages/wallet/package.json
 COPY packages/web-extension/package.json packages/web-extension/package.json
 COPY scripts scripts
 COPY .yarn .yarn
-COPY .eslintrc.js .prettierrc .yarnrc.yml complete.eslintrc.js eslint.tsconfig.json package.json tsconfig.json yarn.lock yarn-project.nix ./
+COPY .eslintrc.js .prettierrc .yarnrc.yml complete.eslintrc.js eslint.tsconfig.json package.json tsconfig.json yarn.lock ./
 RUN yarn workspaces focus --all --production
 
 FROM cardano-services AS provider-server
