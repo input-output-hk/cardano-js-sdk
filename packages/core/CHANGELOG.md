@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.46.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.46.13...@cardano-sdk/core@0.46.14) (2026-06-19)
+
+### Features
+
+* **core:** opt-in strict CBOR deserialization mode ([042eaee](https://github.com/input-output-hk/cardano-js-sdk/commit/042eaee0708d13b5451ca88811719a87861d7c2c)), closes [#1684](https://github.com/input-output-hk/cardano-js-sdk/issues/1684)
+
+### Bug Fixes
+
+* **core:** throw on unknown discriminants when deserializing ([8ce20ed](https://github.com/input-output-hk/cardano-js-sdk/commit/8ce20ed284c8d8996d78f196d7d7ba2a6630b08c)), closes [#1684](https://github.com/input-output-hk/cardano-js-sdk/issues/1684)
+
 ## [0.46.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.46.12...@cardano-sdk/core@0.46.13) (2026-05-27)
 
 **Note:** Version bump only for package @cardano-sdk/core

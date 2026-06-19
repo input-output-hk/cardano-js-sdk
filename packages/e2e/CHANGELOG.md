@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.55.25](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.55.24...@cardano-sdk/e2e@0.55.25) (2026-06-19)
+
+### Features
+
+* **tx-construction:** add fluent minting to the transaction builder ([e0a82a1](https://github.com/input-output-hk/cardano-js-sdk/commit/e0a82a1f502a15c4057cbe114f4bc45eb0b05c3a))
+
+### Bug Fixes
+
+* patch dependency vulnerabilities (critical→low) with audit & skill ([c21f260](https://github.com/input-output-hk/cardano-js-sdk/commit/c21f2600d7b9ea100796db5c77728a7c5a803332)), closes [#1701](https://github.com/input-output-hk/cardano-js-sdk/issues/1701) [#1708](https://github.com/input-output-hk/cardano-js-sdk/issues/1708)
+
 ## [0.55.24](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.55.23...@cardano-sdk/e2e@0.55.24) (2026-05-27)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

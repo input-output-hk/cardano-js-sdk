@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.28.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.28.12...@cardano-sdk/tx-construction@0.28.13) (2026-06-19)
+
+### Features
+
+* **tx-construction:** add fluent minting to the transaction builder ([e0a82a1](https://github.com/input-output-hk/cardano-js-sdk/commit/e0a82a1f502a15c4057cbe114f4bc45eb0b05c3a))
+* **tx-construction:** export tx-builder utils for manual tx assembly ([824fed7](https://github.com/input-output-hk/cardano-js-sdk/commit/824fed7c07c8e0d897bf2da8d4a379e5633c0e86))
+
+### Bug Fixes
+
+* **tx-construction:** account for extra signers in fee estimation ([d45c3e6](https://github.com/input-output-hk/cardano-js-sdk/commit/d45c3e609e8384b726efbe3d980dd5725a5c8382))
+
 ## [0.28.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.28.11...@cardano-sdk/tx-construction@0.28.12) (2026-05-27)
 
 **Note:** Version bump only for package @cardano-sdk/tx-construction

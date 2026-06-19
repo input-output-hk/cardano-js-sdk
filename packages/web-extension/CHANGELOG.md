@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.39.42](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.39.41...@cardano-sdk/web-extension@0.39.42) (2026-06-19)
+
+### Features
+
+* **tx-construction:** add fluent minting to the transaction builder ([e0a82a1](https://github.com/input-output-hk/cardano-js-sdk/commit/e0a82a1f502a15c4057cbe114f4bc45eb0b05c3a))
+
 ## [0.39.41](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.39.40...@cardano-sdk/web-extension@0.39.41) (2026-05-27)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension
