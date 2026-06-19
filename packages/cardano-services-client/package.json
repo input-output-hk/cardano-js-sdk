@@ -62,7 +62,7 @@
     "@cardano-sdk/util": "workspace:~",
     "@koralabs/handles-public-api-interfaces": "^2.13.0",
     "axios": "^1.7.4",
-    "class-validator": "^0.14.0",
+    "class-validator": "^0.15.1",
     "isomorphic-ws": "^5.0.0",
     "json-bigint": "~1.0.0",
     "lodash": "^4.17.21",
