@@ -160,7 +160,6 @@
     "jest-webextension-mock": "^3.7.22",
     "json-bigint": "^1.0.0",
     "madge": "^5.0.1",
-    "mock-browser": "^0.92.14",
     "npm-run-all": "^4.1.5",
     "null-loader": "^4.0.1",
     "readable-stream": "^3.6.0",

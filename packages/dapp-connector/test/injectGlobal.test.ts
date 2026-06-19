@@ -3,13 +3,19 @@ import { Cip30Wallet } from '../src/WalletApi';
 import { RemoteAuthenticator, WindowMaybeWithCardano, injectGlobal } from '../src';
 import { api, properties, stubAuthenticator } from './testWallet';
 import { dummyLogger as logger } from 'ts-log';
-import { mocks } from 'mock-browser';
+
+// Minimal window stub: injectGlobal only touches `window.cardano`, and the tests
+// only read `window.location.hostname`. Typed loosely (as the previous mock-browser
+// window was) so the assertions can read `window.cardano[...]` directly.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const createWindow = (): any => ({ location: { hostname: 'localhost' } });
 
 describe('injectGlobal', () => {
-  let window: ReturnType<typeof mocks.MockBrowser>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let window: any;
 
   beforeEach(() => {
-    window = mocks.MockBrowser.createWindow();
+    window = createWindow();
   });
 
   it('creates the cardano scope when not exists, and injects the wallet public API into it', async () => {
