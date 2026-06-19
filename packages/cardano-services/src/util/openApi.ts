@@ -2,7 +2,7 @@ import { OpenAPIV3 } from 'express-openapi-validator/dist/framework/types';
 
 export const versionPathFromSpec = (specPath: string) => {
   try {
-    const apiDoc = require(specPath) as OpenAPIV3.Document;
+    const apiDoc = require(specPath) as OpenAPIV3.DocumentV3;
 
     return `/v${apiDoc.info.version}`;
   } catch (error) {
