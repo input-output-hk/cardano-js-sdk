@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/number-literal-case */
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';

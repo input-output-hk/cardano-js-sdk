@@ -73,6 +73,8 @@ module.exports = {
     'unicorn/no-array-reduce': 0,
     'unicorn/no-nested-ternary': 0,
     'unicorn/no-null': 0,
+    // conflicts with prettier, which lowercases hex digits; prettier wins, so this rule is unsatisfiable for hex literals containing a-f
+    'unicorn/number-literal-case': 0,
     'unicorn/prefer-module': 0,
     'unicorn/prefer-node-protocol': 0,
     'unicorn/prevent-abbreviations': 0

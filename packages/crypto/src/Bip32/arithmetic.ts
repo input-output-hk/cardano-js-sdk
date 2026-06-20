@@ -1,5 +1,4 @@
 /* eslint-disable no-bitwise */
-/* eslint-disable unicorn/number-literal-case */
 /**
  * Adds two 256-bit numbers represented as byte arrays. For the first 28 bytes,
  * it multiplies the second number by 8 before adding.

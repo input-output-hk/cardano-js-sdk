@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/number-literal-case */
 import { add256bits, add28Mul8, le32 } from '../../src';
 
 describe('add28Mul8V2', () => {

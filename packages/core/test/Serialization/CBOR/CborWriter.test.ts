@@ -1,5 +1,4 @@
 /* eslint-disable no-bitwise */
-/* eslint-disable unicorn/number-literal-case */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { CborTag, CborWriter } from '../../../src/Serialization';

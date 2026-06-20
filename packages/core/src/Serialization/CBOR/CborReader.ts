@@ -1,5 +1,4 @@
 /* eslint-disable no-bitwise */
-/* eslint-disable unicorn/number-literal-case */
 import { CborAdditionalInfo } from './CborAdditionalInfo';
 import { CborContentException, CborInvalidOperationException } from './errors';
 import { CborInitialByte } from './CborInitialByte';

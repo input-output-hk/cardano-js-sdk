@@ -1,5 +1,4 @@
 /* eslint-disable no-bitwise */
-/* eslint-disable unicorn/number-literal-case */
 
 import { LossOfPrecisionException } from './errors';
 

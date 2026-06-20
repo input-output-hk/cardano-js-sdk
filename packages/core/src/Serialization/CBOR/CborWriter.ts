@@ -1,5 +1,4 @@
 /* eslint-disable no-bitwise */
-/* eslint-disable unicorn/number-literal-case */
 import { CborInitialByte } from './CborInitialByte';
 import { CborMajorType } from './CborMajorType';
 import { CborTag } from './CborTag';
