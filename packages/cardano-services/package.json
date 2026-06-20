@@ -87,7 +87,7 @@
     "ts-node": "^10.0.0",
     "typeorm-extension": "^2.7.0",
     "typescript": "^4.7.4",
-    "wait-on": "^6.0.1"
+    "wait-on": "^9.0.0"
   },
   "dependencies": {
     "@blockfrost/blockfrost-js": "^5.7.0",
