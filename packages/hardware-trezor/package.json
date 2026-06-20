@@ -3,7 +3,7 @@
   "version": "0.7.35",
   "description": "Mappings and integration with Trezor hardware",
   "engines": {
-    "node": ">=16.20.1"
+    "node": ">=22"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",

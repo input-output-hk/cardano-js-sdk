@@ -19,7 +19,7 @@ jest.mock('perf_hooks', () => ({
 type measureTargets = 't1' | 't2';
 describe('MeasurementUtil', () => {
   let measurementUtil: MeasurementUtil<measureTargets>;
-  let mockData: Partial<PerformanceEntry>[];
+  let mockData: (Partial<PerformanceEntry> & { detail: { id: number; target: string } })[];
 
   beforeEach(() => {
     measurementUtil = new MeasurementUtil<measureTargets>();
