@@ -8,7 +8,7 @@ describe('openApi utils', () => {
       const apiSpecPath = path.join(__dirname, '..', '..', 'src', 'Http', 'openApi.json');
       const {
         info: { version }
-      } = require(apiSpecPath) as OpenAPIV3.Document;
+      } = require(apiSpecPath) as OpenAPIV3.DocumentV3;
       expect(version).not.toBeUndefined();
       expect(versionPathFromSpec(apiSpecPath)).toBe(`/v${version}`);
     });
