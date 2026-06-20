@@ -26797,7 +26797,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:^8.21.0":
+"ws@npm:^7.2.0, ws@npm:^7.5.10, ws@npm:^7.5.7":
+  version: 7.5.11
+  resolution: "ws@npm:7.5.11"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ^5.0.2
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 3f32457a6019e6875cc0c2a037d4b4789da22a55b7be278e78845ec7614d28eaab9b36994cfdf9a18a48fe02f11c496168354b96b6ce202f65fe414cdf96f08c
+  languageName: node
+  linkType: hard
+
+"ws@npm:^8.17.1, ws@npm:^8.18.0, ws@npm:^8.2.3, ws@npm:^8.5.0, ws@npm:^8.8.0, ws@npm:~8.21.0":
   version: 8.21.0
   resolution: "ws@npm:8.21.0"
   peerDependencies:
