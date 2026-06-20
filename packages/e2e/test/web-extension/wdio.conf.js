@@ -2,13 +2,6 @@ const path = require('path');
 
 module.exports = {
   config: {
-    autoCompileOpts: {
-      autoCompile: true,
-      tsNodeOpts: {
-        project: 'test/web-extension/tsconfig.json',
-        transpileOnly: true
-      }
-    },
     bail: 0,
     baseUrl: 'http://localhost:4567',
     capabilities: [
@@ -51,10 +44,11 @@ module.exports = {
             { mount: '/cip95-cardano-wallet-connector', path: path.join(__dirname, 'dapp-cip95/build') }
           ]
         }
-      ],
-      'chromedriver'
+      ]
     ],
     specs: ['./**/*.spec.ts'],
+    // WebdriverIO v8+ auto-compiles TS via tsx; point it at the local tsconfig
+    tsConfigPath: path.join(__dirname, 'tsconfig.json'),
     waitforTimeout: 10_000
   }
 };

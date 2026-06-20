@@ -42,7 +42,7 @@ describe('dapp/cip95', () => {
   });
 
   it('dapp should detect test wallet', async () => {
-    await expect($(pWalletFound)).toHaveTextContaining('true');
+    await expect($(pWalletFound)).toHaveText('true', { containing: true });
   });
 
   describe('dapp can use cip95 wallet api', () => {
@@ -68,9 +68,9 @@ describe('dapp/cip95', () => {
     });
 
     it('dapp gets correct addresses from cip95 wallet api', async () => {
-      await expect($(dappChangeAddress)).toHaveTextContaining(walletAddr);
-      await expect($(dappStakeAddress)).toHaveTextContaining(walletStakeAddr);
-      await expect($(dappUsedAddress)).toHaveTextContaining(walletAddr);
+      await expect($(dappChangeAddress)).toHaveText(walletAddr, { containing: true });
+      await expect($(dappStakeAddress)).toHaveText(walletStakeAddr, { containing: true });
+      await expect($(dappUsedAddress)).toHaveText(walletAddr, { containing: true });
     });
 
     it('getRegisteredPubStakeKeys gets active public stake keys from cip95 wallet api', async () => {
@@ -81,12 +81,12 @@ describe('dapp/cip95', () => {
     it('getPubDRepKey gets the DRep key from cip95 wallet api', async () => {
       const dappDrepKey = await $(dappGetPubDrepKey).getText();
       expect(dappDrepKey.length).toBeGreaterThan(0);
-      await expect($(dappDrepId)).toHaveTextContaining('drep');
+      await expect($(dappDrepId)).toHaveText('drep', { containing: true });
     });
 
     it('supportedExtensions and getExtensions both return cip95', async () => {
-      await expect($(liSupportedExtensions)).toHaveTextContaining('95');
-      await expect($(liGetExtensions)).toHaveTextContaining('95');
+      await expect($(liSupportedExtensions)).toHaveText('95', { containing: true });
+      await expect($(liGetExtensions)).toHaveText('95', { containing: true });
     });
   });
 });

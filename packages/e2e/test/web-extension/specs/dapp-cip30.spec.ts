@@ -24,7 +24,7 @@ describe('dapp/cip30', () => {
   });
 
   it('dapp should detect test wallet', async () => {
-    await expect($(pWalletFound)).toHaveTextContaining('true');
+    await expect($(pWalletFound)).toHaveText('true', { containing: true });
   });
 
   describe('dapp can use cip30 wallet api', () => {
@@ -50,14 +50,14 @@ describe('dapp/cip30', () => {
     });
 
     it('dapp gets correct addresses from cip30 wallet api', async () => {
-      await expect($(dappChangeAddress)).toHaveTextContaining(walletAddr);
-      await expect($(dappStakeAddress)).toHaveTextContaining(walletStakeAddr);
-      await expect($(dappUsedAddress)).toHaveTextContaining(walletAddr);
+      await expect($(dappChangeAddress)).toHaveText(walletAddr, { containing: true });
+      await expect($(dappStakeAddress)).toHaveText(walletStakeAddr, { containing: true });
+      await expect($(dappUsedAddress)).toHaveText(walletAddr, { containing: true });
     });
 
     it('dapp can build and send a transaction using cip30 WalletApi', async () => {
       await $(dappBtnRun).click();
-      await expect($(dappSubmittedTxConfirmation)).toHaveTextContaining('check your wallet');
+      await expect($(dappSubmittedTxConfirmation)).toHaveText('check your wallet', { containing: true });
     });
   });
 });
