@@ -97,7 +97,6 @@
   },
   "packageManager": "yarn@3.2.1",
   "resolutions": {
-    "protobufjs": "7.6.4",
     "@opentelemetry/core": "^2.8.0",
     "js-yaml": "^4.2.0",
     "tar": "^7.5.16",
