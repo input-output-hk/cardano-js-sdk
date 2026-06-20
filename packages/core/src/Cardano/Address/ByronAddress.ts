@@ -3,7 +3,7 @@ import { Address, AddressProps, AddressType } from './Address';
 import { CborReader, CborReaderState, CborTag, CborWriter } from '../../Serialization';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import { crc32 } from '@foxglove/crc';
+import { crc32 } from './crc32';
 
 /**
  * Byron address attributes (both optional). The network tag is present only on test networks and contains an

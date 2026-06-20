@@ -2686,7 +2686,6 @@ __metadata:
     "@biglup/is-cid": ^1.0.3
     "@cardano-sdk/crypto": "workspace:~"
     "@cardano-sdk/util": "workspace:~"
-    "@foxglove/crc": ^0.0.3
     "@scure/base": ^1.1.1
     "@types/lodash": ^4.14.182
     delay: ^5.0.0
@@ -3859,13 +3858,6 @@ __metadata:
     "@emurgo/cardano-serialization-lib-browser": ^11.5.0
     "@emurgo/cardano-serialization-lib-nodejs": 11.5.0
   checksum: 473946a2d4c307351601be588d8a56c51f7e86bcdc95cd8d3ca33bdbe7c2eb1d804e06dc8e40f8bd28fd0e5217b1db3076dba071f67b17b05fe22bd88dd28d0e
-  languageName: node
-  linkType: hard
-
-"@foxglove/crc@npm:^0.0.3":
-  version: 0.0.3
-  resolution: "@foxglove/crc@npm:0.0.3"
-  checksum: 2eee0e45780e3289c4a190fa909e5977643667e19a21b945a109977b89427b877d8e12ebf91821653d69bdb0390e58540e1c9bb906aefcc7dd818c64f131f071
   languageName: node
   linkType: hard
 
