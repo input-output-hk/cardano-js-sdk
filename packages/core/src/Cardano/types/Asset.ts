@@ -1,6 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { HexBlob, InvalidStringError, OpaqueString, assertIsHexString, typedBech32 } from '@cardano-sdk/util';
-import { TextDecoder } from 'web-encoding';
 
 export type AssetId = OpaqueString<'AssetId'>;
 

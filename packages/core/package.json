@@ -57,8 +57,7 @@
     "ip-address": "^10.2.0",
     "lodash": "^4.17.21",
     "ts-custom-error": "^3.2.0",
-    "ts-log": "^2.2.4",
-    "web-encoding": "^1.1.5"
+    "ts-log": "^2.2.4"
   },
   "files": [
     "dist/*",
