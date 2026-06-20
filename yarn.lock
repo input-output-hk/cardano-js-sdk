@@ -16300,7 +16300,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ip-address@npm:^10.2.0":
+"ip-address@npm:^10.1.1, ip-address@npm:^10.2.0":
   version: 10.2.0
   resolution: "ip-address@npm:10.2.0"
   checksum: 3ffba04dc4cdaf81ed2ed6edc47eee1494bb97550ef73f1918ca28405d175c03efa416b8337e868123b08c2cc677e3a07c5ce03eda3b1aeb2741c149bd37ddf9
@@ -19524,15 +19524,15 @@ __metadata:
   linkType: hard
 
 "morgan@npm:^1.7.0":
-  version: 1.10.0
-  resolution: "morgan@npm:1.10.0"
+  version: 1.11.0
+  resolution: "morgan@npm:1.11.0"
   dependencies:
     basic-auth: ~2.0.1
     debug: 2.6.9
     depd: ~2.0.0
-    on-finished: ~2.3.0
-    on-headers: ~1.0.2
-  checksum: fb41e226ab5a1abf7e8909e486b387076534716d60207e361acfb5df78b84d703a7b7ea58f3046a9fd0b83d3c94bfabde32323341a1f1b26ce50680abd2ea5dd
+    on-finished: ~2.4.1
+    on-headers: ~1.1.0
+  checksum: 8d3b8f3a5a1e7e04b10931b8a846f6751fef6f13ee14249281c926de06af8c580bf5414e77d4bc3115ceb34e4e9c270cef48b2a7eb2b4c0bb3a773cc3066d8da
   languageName: node
   linkType: hard
 
@@ -20330,16 +20330,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"on-finished@npm:~2.3.0":
-  version: 2.3.0
-  resolution: "on-finished@npm:2.3.0"
-  dependencies:
-    ee-first: 1.1.1
-  checksum: 1db595bd963b0124d6fa261d18320422407b8f01dc65863840f3ddaaf7bcad5b28ff6847286703ca53f4ec19595bd67a2f1253db79fc4094911ec6aa8df1671b
-  languageName: node
-  linkType: hard
-
-"on-headers@npm:^1.1.0":
+"on-headers@npm:~1.1.0":
   version: 1.1.0
   resolution: "on-headers@npm:1.1.0"
   checksum: 98aa64629f986fb8cc4517dd8bede73c980e31208cba97f4442c330959f60ced3dc6214b83420491f5111fc7c4f4343abe2ea62c85f505cf041d67850f238776
@@ -23378,23 +23369,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"socks@npm:^2.6.1":
+"socks@npm:^2.6.1, socks@npm:^2.6.2, socks@npm:^2.8.3":
   version: 2.8.9
   resolution: "socks@npm:2.8.9"
   dependencies:
     ip-address: ^10.1.1
     smart-buffer: ^4.2.0
   checksum: b573ed4cfb935624d3688e7065cd03fd72ca258156923c9ebb9d462e545cd78f296b64a0e36f911b16326c94aabe2bf94ff405f8afef27ac7bf80fa3c971c6f6
-  languageName: node
-  linkType: hard
-
-"socks@npm:^2.6.2, socks@npm:^2.8.3":
-  version: 2.8.3
-  resolution: "socks@npm:2.8.3"
-  dependencies:
-    ip-address: ^9.0.5
-    smart-buffer: ^4.2.0
-  checksum: 7a6b7f6eedf7482b9e4597d9a20e09505824208006ea8f2c49b71657427f3c137ca2ae662089baa73e1971c62322d535d9d0cf1c9235cf6f55e315c18203eadd
   languageName: node
   linkType: hard
 
