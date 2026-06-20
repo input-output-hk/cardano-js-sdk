@@ -45,21 +45,6 @@ The [GETTING_STARTED](./GETTING_STARTED.md) guide provides a quick way to start 
 
 - [@cardano-sdk/golden-test-generator](./packages/golden-test-generator)
 
-## Deployments
-
-Automatic deployments are done for:
-
-- [dev-preview](https://dev-preview.lw.iog.io/v1.0.0/health) - On each push to master
-- [dev-preprod](https://dev-preprod.lw.iog.io/v1.0.0/health) - On each release
-- [dev-mainnet](https://dev-mainnet.lw.iog.io/v1.0.0/health) - On each release
-
-Manual deployments can be done via [STD Workflow](https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/std.yml)
-
-- Click 'Run workflow'
-- Select branch
-- Check checkboxes for environments that should be deployed
-- Click 'Run workflow'
-
 ## Development
 
 A Yarn Workspace maintaining a single version across all packages.
@@ -143,12 +128,6 @@ yarn tx-cbor <txId>
 
 This works regardless of the local ports configuration through environment variables.
 
-## Attic
-
-Previously supported features, no longer supported, but packed with a reference branch.
-
-- [RabbitMQ tx-submit provider and worker](https://github.com/input-output-hk/cardano-js-sdk/tree/attic/rabbitmq)
-
 ## Distribute
 
 ### Pack
@@ -172,10 +151,6 @@ yarn docs
 <p align="center">
   <a href="https://input-output-hk.github.io/cardano-js-sdk">:book: Documentation</a>
 </p>
-
-### Possible issues
-
-- `yarn build --mode=skip-build` [in Docker image](https://github.com/input-output-hk/cardano-js-sdk/pull/1024)
 
 [img_src_post-integration]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/post_integration.yml/badge.svg
 [workflow_post-integration]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/post_integration.yml
