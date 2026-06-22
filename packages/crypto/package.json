@@ -40,7 +40,7 @@
     "@cardano-ogmios/schema": "6.9.0",
     "@dcspark/cardano-multiplatform-lib-nodejs": "^3.1.1",
     "@types/blake2b": "^2.1.0",
-    "@types/libsodium-wrappers-sumo": "^0.7.5",
+    "@types/libsodium-wrappers-sumo": "^0.8.2",
     "@types/lodash": "^4.14.182",
     "eslint": "^7.32.0",
     "jest": "^28.1.3",
