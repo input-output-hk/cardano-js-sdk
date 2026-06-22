@@ -184,7 +184,8 @@ describe('HttpServer', () => {
           .filter(({ level, message }) => level === 'debug' && message[0] === '[HttpServer|request]')
           .map(({ message: [, requestDetails] }) => requestDetails)
       ).toEqual([
-        { body: {}, method: 'HEAD', path: baseVersionPath, query: {} },
+        // body-parser v2 leaves req.body undefined for bodyless requests (v1 set it to {})
+        { body: undefined, method: 'HEAD', path: baseVersionPath, query: {} },
         {
           body: { bigint: 23n, check: 'ok', test: 42 },
           method: 'POST',
@@ -193,7 +194,7 @@ describe('HttpServer', () => {
           query: {}
         },
         {
-          body: {},
+          body: undefined,
           method: 'GET',
           // Note: `.replaceAll(path.sep, '/')` is needed on Windows:
           path: path.join(someServiceVersionPath, 'stake-pool', 'echo').replaceAll(path.sep, '/'),

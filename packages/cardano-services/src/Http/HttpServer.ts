@@ -275,7 +275,10 @@ export class HttpServer extends RunnableModule {
         metricsPath: path
           .join(versionPath, this.#config.metrics?.options?.metricsPath || '/metrics')
           .replaceAll(path.sep, '/')
-      })
+        // express-prom-bundle v8 types Opts as a discriminated (summary|histogram) union;
+        // spreading the optional config options into the literal can't be narrowed, so assert
+        // the (runtime-valid, histogram) shape explicitly.
+      } as expressPromBundle.Opts)
     );
     this.logger.info(
       `Prometheus metrics: ${(await promRegistry.getMetricsAsArray()).map(({ name }) => name)} configured at ${

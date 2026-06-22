@@ -76,8 +76,8 @@ describe('wallet', () => {
         });
         walletAddr1 = await $(spanAddress).getText();
         walletStakeAddr1 = await $(spanStakeAddress).getText();
-        expect(walletAddr1).toHaveTextContaining('addr');
-        expect(walletStakeAddr1).toHaveTextContaining('stake');
+        expect(walletAddr1).toContain('addr');
+        expect(walletStakeAddr1).toContain('stake');
         await expect($(activeWalletName)).toHaveText(getObservableWalletName(0));
       });
     });
@@ -102,14 +102,14 @@ describe('wallet', () => {
 
         // Delegation transaction was submitted successfully
         const txId = await $('#multiDelegation .delegateTxId').getText();
-        expect(txId).toHaveTextContaining('TxId');
+        expect(txId).toContain('TxId');
 
         // Wallet reports delegating to 3 pools
         await browser.waitUntil(
           async () => {
             try {
-              const delegatedPools = await $$(liPools);
-              return delegatedPools.length === NUM_POOLS;
+              const delegatedPoolCount = await $$(liPools).length;
+              return delegatedPoolCount === NUM_POOLS;
             } catch {
               return false;
             }
@@ -125,8 +125,8 @@ describe('wallet', () => {
       it('can switch to another wallet', async () => {
         // Automatically deactivates first wallet, but keeps the store available for future activation
         await $(btnActivateWallet2).click();
-        await expect($(spanAddress)).not.toHaveTextContaining(walletAddr1);
-        await expect($(spanAddress)).toHaveTextContaining('addr');
+        await expect($(spanAddress)).not.toHaveText(walletAddr1, { containing: true });
+        await expect($(spanAddress)).toHaveText('addr', { containing: true });
         await expect($(activeWalletName)).toHaveText(getObservableWalletName(1));
       });
 
@@ -138,10 +138,10 @@ describe('wallet', () => {
       it('can destroy second wallet before switching back to the first wallet', async () => {
         // Destroy also clears associated store. Store will be rebuilt during future activation of same wallet
         await $(destroyWallet).click();
-        await expect($(spanAddress)).toHaveTextContaining('-');
+        await expect($(spanAddress)).toHaveText('-', { containing: true });
 
         await $(btnActivateWallet1).click();
-        await expect($(spanAddress)).toHaveTextContaining(walletAddr1);
+        await expect($(spanAddress)).toHaveText(walletAddr1, { containing: true });
         await expect($(activeWalletName)).toHaveText(getObservableWalletName(0));
       });
 
