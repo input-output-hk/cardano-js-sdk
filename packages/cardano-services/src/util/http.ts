@@ -7,7 +7,12 @@ export const listenPromise = (
   listenOptions: ListenOptions = {}
 ): Promise<http.Server> =>
   new Promise((resolve, reject) => {
-    const server = serverLike.listen(listenOptions, () => resolve(server)) as http.Server;
+    // express 5's `app.listen` forwards bind errors to the listen callback (error-first),
+    // whereas raw http.Server.listen signals them via the 'error' event — handle both so a
+    // failed bind (e.g. EADDRINUSE) rejects instead of resolving with an unbound server.
+    const server = serverLike.listen(listenOptions, (error?: Error) =>
+      error ? reject(error) : resolve(server)
+    ) as http.Server;
     server.on('error', reject);
   });
 
