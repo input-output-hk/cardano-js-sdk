@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.55.26](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.55.25...@cardano-sdk/e2e@0.55.26) (2026-06-22)
+
+### Bug Fixes
+
+* **e2e:** add explicit url polyfill for web-extension webpack build ([359fe55](https://github.com/input-output-hk/cardano-js-sdk/commit/359fe55081ac48a43138304462f5ddcc7491c117))
+
 ## [0.55.25](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.55.24...@cardano-sdk/e2e@0.55.25) (2026-06-19)
 
 ### Features
