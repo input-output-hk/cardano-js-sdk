@@ -6,6 +6,7 @@ import {
   KeyPurpose,
   KeyRole,
   SerializableInMemoryKeyAgentData,
+  emip3decrypt,
   util
 } from '../src';
 import { Bip32Ed25519 } from '@cardano-sdk/crypto';
@@ -15,6 +16,11 @@ import { dummyLogger } from 'ts-log';
 
 jest.mock('../src/util/ownSignatureKeyPaths');
 const { ownSignatureKeyPaths } = jest.requireMock('../src/util/ownSignatureKeyPaths');
+
+const makeEncryption = () => ({
+  decrypt: jest.fn(async (encrypted: Uint8Array) => encrypted.slice(1)),
+  encrypt: jest.fn(async (data: Uint8Array) => Uint8Array.from([170, ...data]))
+});
 
 describe('InMemoryKeyAgent', () => {
   let keyAgent: InMemoryKeyAgent;
@@ -64,6 +70,38 @@ describe('InMemoryKeyAgent', () => {
       { bip32Ed25519, logger: dummyLogger }
     );
     expect(await saferKeyAgent.exportRootPrivateKey()).not.toEqual(await keyAgent.exportRootPrivateKey());
+  });
+
+  describe('rootPrivateKeyEncryption injection', () => {
+    it('uses the injected encryption to encrypt the root private key', async () => {
+      const encryption = makeEncryption();
+      const agent = await InMemoryKeyAgent.fromBip39MnemonicWords(
+        { chainId: Cardano.ChainIds.Preview, getPassphrase, mnemonicWords },
+        { bip32Ed25519, logger: dummyLogger, rootPrivateKeyEncryption: encryption }
+      );
+
+      expect(encryption.encrypt).toHaveBeenCalledTimes(1);
+      const { encryptedRootPrivateKeyBytes } = agent.serializableData as SerializableInMemoryKeyAgentData;
+      expect(encryptedRootPrivateKeyBytes[0]).toBe(170);
+    });
+
+    it('uses the injected encryption to decrypt, recovering the same root key as the default', async () => {
+      const encryption = makeEncryption();
+      const agent = await InMemoryKeyAgent.fromBip39MnemonicWords(
+        { chainId: Cardano.ChainIds.Preview, getPassphrase, mnemonicWords },
+        { bip32Ed25519, logger: dummyLogger, rootPrivateKeyEncryption: encryption }
+      );
+
+      const rootPrivateKey = await agent.exportRootPrivateKey();
+      expect(encryption.decrypt).toHaveBeenCalled();
+      expect(rootPrivateKey).toEqual(await keyAgent.exportRootPrivateKey());
+    });
+
+    it('defaults to EMIP-003 when no encryption is injected', async () => {
+      const { encryptedRootPrivateKeyBytes } = keyAgent.serializableData as SerializableInMemoryKeyAgentData;
+      const decrypted = await emip3decrypt(new Uint8Array(encryptedRootPrivateKeyBytes), Buffer.from('password'));
+      expect(Buffer.from(decrypted).toString('hex')).toEqual(await keyAgent.exportRootPrivateKey());
+    });
   });
 
   describe('serializableData', () => {

@@ -68,9 +68,21 @@ export enum CommunicationType {
   Node = 'node'
 }
 
+/**
+ * Pluggable passphrase-based encryption for secrets at rest (e.g. the root
+ * private key). `encrypt` and `decrypt` are inverses for a given passphrase.
+ * Defaults to EMIP-003 when not provided to a key agent.
+ */
+export interface PassphraseEncryption {
+  encrypt: (data: Uint8Array, passphrase: Uint8Array) => Promise<Uint8Array>;
+  decrypt: (encrypted: Uint8Array, passphrase: Uint8Array) => Promise<Uint8Array>;
+}
+
 export interface KeyAgentDependencies {
   logger: Logger;
   bip32Ed25519: Crypto.Bip32Ed25519;
+  /** Overrides root private key encryption at rest. Defaults to EMIP-003. */
+  rootPrivateKeyEncryption?: PassphraseEncryption;
 }
 
 export interface AccountAddressDerivationPath {
