@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.29.17](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.29.16...@cardano-sdk/key-management@0.29.17) (2026-06-30)
+
+### Features
+
+* **key-management:** allow injecting custom root private key encryption in InMemoryKeyAgent ([6bcba11](https://github.com/input-output-hk/cardano-js-sdk/commit/6bcba111fc34dd3b567fb8057315d12ce1114793))
+
 ## [0.29.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.29.15...@cardano-sdk/key-management@0.29.16) (2026-06-22)
 
 **Note:** Version bump only for package @cardano-sdk/key-management

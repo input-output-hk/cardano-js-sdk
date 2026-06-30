@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/web-extension",
-  "version": "0.39.43",
+  "version": "0.39.44",
   "description": "Web extension wallet utilities",
   "engines": {
     "node": ">=22"
