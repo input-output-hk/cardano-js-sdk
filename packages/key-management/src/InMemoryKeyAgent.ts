@@ -8,6 +8,7 @@ import {
   KeyAgentType,
   KeyPair,
   KeyPurpose,
+  PassphraseEncryption,
   SerializableInMemoryKeyAgentData,
   SignBlobResult,
   SignTransactionContext,
@@ -29,6 +30,8 @@ import { HexBlob } from '@cardano-sdk/util';
 import { KeyAgentBase } from './KeyAgentBase';
 import { emip3decrypt, emip3encrypt } from './emip3';
 import uniqBy from 'lodash/uniqBy.js';
+
+const defaultRootPrivateKeyEncryption: PassphraseEncryption = { decrypt: emip3decrypt, encrypt: emip3encrypt };
 
 export interface InMemoryKeyAgentProps extends Omit<SerializableInMemoryKeyAgentData, '__typename'> {
   getPassphrase: GetPassphrase;
@@ -53,10 +56,12 @@ const getPassphraseRethrowTypedError = async (getPassphrase: GetPassphrase) => {
 
 export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
   readonly #getPassphrase: GetPassphrase;
+  readonly #rootPrivateKeyEncryption: PassphraseEncryption;
 
   constructor({ getPassphrase, ...serializableData }: InMemoryKeyAgentProps, dependencies: KeyAgentDependencies) {
     super({ ...serializableData, __typename: KeyAgentType.InMemory }, dependencies);
     this.#getPassphrase = getPassphrase;
+    this.#rootPrivateKeyEncryption = dependencies.rootPrivateKeyEncryption ?? defaultRootPrivateKeyEncryption;
   }
 
   async signBlob({ index, role: type }: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult> {
@@ -109,7 +114,11 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     const entropy = Buffer.from(mnemonicWordsToEntropy(mnemonicWords), 'hex');
     const rootPrivateKey = dependencies.bip32Ed25519.fromBip39Entropy(entropy, mnemonic2ndFactorPassphrase);
     const passphrase = await getPassphraseRethrowTypedError(getPassphrase);
-    const encryptedRootPrivateKey = await emip3encrypt(Buffer.from(rootPrivateKey, 'hex'), passphrase);
+    const rootPrivateKeyEncryption = dependencies.rootPrivateKeyEncryption ?? defaultRootPrivateKeyEncryption;
+    const encryptedRootPrivateKey = await rootPrivateKeyEncryption.encrypt(
+      Buffer.from(rootPrivateKey, 'hex'),
+      passphrase
+    );
     const accountPrivateKey = await deriveAccountPrivateKey({
       accountIndex,
       bip32Ed25519: dependencies.bip32Ed25519,
@@ -176,7 +185,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     let decryptedRootKeyBytes: Uint8Array;
 
     try {
-      decryptedRootKeyBytes = await emip3decrypt(
+      decryptedRootKeyBytes = await this.#rootPrivateKeyEncryption.decrypt(
         new Uint8Array((this.serializableData as SerializableInMemoryKeyAgentData).encryptedRootPrivateKeyBytes),
         passphrase
       );
