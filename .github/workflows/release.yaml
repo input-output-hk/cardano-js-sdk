@@ -2,6 +2,16 @@ name: release
 
 on:
   workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Git ref (branch, tag or commit) to build & publish from. Defaults to master for a normal release.'
+        required: false
+        default: master
+      publish_only:
+        description: 'Skip the version phase and only publish (from-package). Enable when back-publishing an already-versioned ref.'
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   publish:
@@ -15,7 +25,7 @@ jobs:
         with:
           # Fetch all history for all tags and branches
           fetch-depth: 0
-          ref: master
+          ref: ${{ inputs.ref || 'master' }}
           token: ${{ secrets.BOT_GH_TOKEN }}
 
       - name: 🧰 Setup Node.js
@@ -46,8 +56,11 @@ jobs:
 
       # Phase 1 — decide versions, commit, tag, push to master, and create GitHub Releases.
       # No-ops when there are no new conventional commits (e.g. re-running after a publish
-      # failure), so it never double-bumps an already-versioned release.
+      # failure), so it never double-bumps an already-versioned release. Skipped entirely when
+      # publishing from a nominated ref or in publish_only mode: those refs are already versioned,
+      # and `lerna version --allow-branch master` would reject a non-master / detached checkout.
       - name: 🏷️ Version
+        if: ${{ !inputs.publish_only && (inputs.ref == '' || inputs.ref == 'master') }}
         run: |
           if [ "$RELEASE_MODE" = "stable" ]; then yarn version:stable; else yarn version:rc; fi
         env:
@@ -55,10 +68,36 @@ jobs:
           GH_TOKEN: ${{ secrets.BOT_GH_TOKEN }}
           RELEASE_MODE: ${{ vars.RELEASE_MODE }}
 
+      # Guard — refuse to publish a tree that isn't a genuine release state. `from-package`
+      # publishes whatever version sits in each package.json with no check that the source has
+      # stayed put since that version was tagged, so a mis-nominated `ref` could ship drifted
+      # source under an already-versioned number. Assert every publishable package's current
+      # version has a matching `<name>@<version>` tag AND its src+manifest at HEAD is identical
+      # to that tag. Passes trivially for a normal release (Phase 1 just created the tags at HEAD).
+      - name: 🔎 Verify tree aligns with release tags
+        run: |
+          node -e '
+            const fs=require("fs"),cp=require("child_process");
+            const bad=[];
+            for(const d of fs.readdirSync("packages")){
+              let p; try{p=JSON.parse(fs.readFileSync("packages/"+d+"/package.json","utf8"))}catch{continue}
+              if(p.private) continue;
+              const tag=p.name+"@"+p.version;
+              if(cp.spawnSync("git",["rev-parse","-q","--verify","refs/tags/"+tag]).status!==0){bad.push("no tag: "+tag);continue}
+              if(cp.spawnSync("git",["diff","--quiet",tag,"HEAD","--","packages/"+d+"/src","packages/"+d+"/package.json"]).status!==0)
+                bad.push("drift vs tag: "+tag);
+            }
+            if(bad.length){console.error("Refusing to publish — tree does not align with release tags:\n  "+bad.join("\n  "));process.exit(1)}
+            console.log("All publishable packages align with their release tags.");
+          '
+
       # Phase 2 — publish to npm via `lerna publish from-package`, which queries the registry
-      # and publishes ONLY versions that are not yet there. This makes the job idempotent and
-      # recoverable: if a previous run versioned/tagged but failed to publish, simply re-running
-      # the workflow ships the missing packages without touching git history.
+      # and publishes ONLY the versions in the checked-out tree that are not yet there. This makes
+      # the job idempotent and recoverable: re-running (optionally with publish_only=true) ships
+      # the missing packages without touching git history. To back-publish an older release, set
+      # `ref` to that release's tag/commit AND publish_only=true — BUT note the tree's own
+      # `@lerna-lite` must be a version that can actually publish (>=4 for the tar-7 line); older
+      # refs that predate that bump will crash here exactly as they did originally.
       - name: 📦 Publish to npm
         run: |
           if [ "$RELEASE_MODE" = "stable" ]; then yarn publish:stable; else yarn publish:rc; fi
