@@ -97,6 +97,35 @@ describe('Redeemer', () => {
     });
   });
 
+  // Vector derived from the CSL-generated spend vector above by setting the tag byte to 06
+  // (guarding), per the redeemer_tag rule in the pinned Dijkstra CDDL.
+  describe('Redeemer tag: Guarding', () => {
+    const guardingCore = { ...core, purpose: RedeemerPurpose.guarding };
+    const guardingCbor = HexBlob('840600d8799f0102030405ff821b000086788ffc4e831b00015060e9e46451');
+
+    it('can encode Redeemer to CBOR', () => {
+      const redeemer = Redeemer.fromCore(guardingCore);
+      expect(redeemer.toCbor()).toEqual(guardingCbor);
+    });
+
+    it('can encode Redeemer to Core', () => {
+      const redeemer = Redeemer.fromCbor(guardingCbor);
+      expect(redeemer.toCore()).toEqual(guardingCore);
+    });
+
+    it('round trips CBOR byte-exact', () => {
+      const redeemer = Redeemer.fromCbor(guardingCbor);
+      expect(redeemer.tag()).toEqual(RedeemerTag.Guarding);
+      expect(redeemer.toCbor()).toEqual(guardingCbor);
+    });
+
+    it('maps purpose to tag and back', () => {
+      const redeemer = Redeemer.fromCore(guardingCore);
+      expect(redeemer.tag()).toEqual(RedeemerTag.Guarding);
+      expect(redeemer.toCore().purpose).toEqual(RedeemerPurpose.guarding);
+    });
+  });
+
   describe('Redeemer tag: Reward', () => {
     const certCore = { ...core, purpose: RedeemerPurpose.withdrawal };
     const certCbor = HexBlob('840300d8799f0102030405ff821b000086788ffc4e831b00015060e9e46451');

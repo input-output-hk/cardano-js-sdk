@@ -96,7 +96,8 @@ export enum RedeemerPurpose {
   certificate = 'certificate',
   withdrawal = 'withdrawal',
   propose = 'propose',
-  vote = 'vote'
+  vote = 'vote',
+  guarding = 'guarding'
 }
 
 export interface Redeemer {
