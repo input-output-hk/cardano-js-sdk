@@ -25,7 +25,8 @@ const credentialFormReversedCbor = HexBlob(`828201581c${scriptHash}8200581c${key
 const singleCredentialCbor = HexBlob(`818200581c${keyHash}`);
 
 describe('Guards', () => {
-  afterEach(() => setInConwayEra(false));
+  beforeEach(() => setInConwayEra(false));
+  afterEach(() => setInConwayEra(true));
 
   describe('fromCbor', () => {
     it('decodes the key hash form from a bare array', () => {

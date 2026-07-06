@@ -39,14 +39,20 @@ const cborInvalidMapIndex = HexBlob('a28308000082d8799f0102030405ff821821182c820
 const cborInvalidMapValue = HexBlob('a28200008300d8799f0102030405ff821821182c82040082d8799f0102030405ff8218371842');
 
 describe('Redeemers', () => {
-  afterEach(() => setInConwayEra(false));
+  afterEach(() => setInConwayEra(true));
+
+  it('encodes Redeemers built from core as map by default, without any setInConwayEra call', () => {
+    const redeemers = Redeemers.fromCore(core);
+    expect(redeemers.toCbor()).toEqual(cborConway);
+  });
 
   it('can decode Redeemers from CBOR', () => {
     const redeemers = Redeemers.fromCbor(cbor);
     expect(redeemers.toCore()).toEqual(core);
   });
 
-  it('can decode Redeemers from Core', () => {
+  it('encodes Redeemers as legacy array when setInConwayEra(false)', () => {
+    setInConwayEra(false);
     const redeemers = Redeemers.fromCore(core);
     expect(redeemers.toCbor()).toEqual(cbor);
   });
@@ -56,12 +62,6 @@ describe('Redeemers', () => {
     expect(redeemers.toCore()).toEqual(core);
   });
 
-  it('can encode Redeemers as map in CBOR', () => {
-    const redeemers = Redeemers.fromCore(core);
-    setInConwayEra(true);
-    expect(redeemers.toCbor()).toEqual(cborConway);
-  });
-
   it('can decode map encoded Redeemers with a guarding entry alongside a spend entry', () => {
     const redeemers = Redeemers.fromCbor(cborWithGuarding);
     expect(redeemers.toCore()).toEqual(coreWithGuarding);
@@ -69,7 +69,6 @@ describe('Redeemers', () => {
 
   it('can encode Redeemers with a guarding entry as map in CBOR, byte-exact', () => {
     const redeemers = Redeemers.fromCore(coreWithGuarding);
-    setInConwayEra(true);
     expect(redeemers.toCbor()).toEqual(cborWithGuarding);
   });
 

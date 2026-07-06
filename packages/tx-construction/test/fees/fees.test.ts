@@ -159,20 +159,20 @@ describe('fees', () => {
   });
 
   describe('minFee', () => {
-    it('calculate the correct min fee for transaction without scripts', () => {
+    it('calculate the correct min fee for transaction without scripts (size includes default tag 258 sets)', () => {
       const fee = minFee(babbageTxWithoutScript, [], protocolParams);
-      expect(fee).toBe(176_193n);
+      expect(fee).toBe(176_589n);
     });
 
-    it('calculate the correct min fee for transaction with scripts', () => {
+    it('calculate the correct min fee for transaction with scripts (size includes default tag 258 sets and map redeemers)', () => {
       const fee = minFee(babbageTx, [], protocolParams);
-      expect(fee).toBe(218_764n);
+      expect(fee).toBe(220_304n);
     });
 
-    it('calculate the correct min fee for transaction with inputs with reference scripts', () => {
+    it('calculate the correct min fee for transaction with inputs with reference scripts (size includes default Conway-era encodings)', () => {
       const tx = Serialization.Transaction.fromCbor(TX_WITH_REF_SCRIPT_CBOR).toCore();
       const fee = minFee(tx, resolvedInputs, protocolParams);
-      expect(fee).toBe(326_472n);
+      expect(fee).toBe(327_308n);
     });
   });
 });

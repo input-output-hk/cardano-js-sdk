@@ -1,7 +1,6 @@
 import * as Cardano from '../../../src/Cardano';
 import { HexBlob } from '@cardano-sdk/util';
 import { TransactionBody } from '../../../src/Serialization';
-import { setInConwayEra } from '../../../src';
 import { vectorsForRule } from '../dijkstraVectors';
 
 const inputCbor = '825820ee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e2500';
@@ -44,9 +43,6 @@ const expectedCore: Cardano.TxBody = {
 };
 
 describe('TransactionBody sub transactions (body key 23)', () => {
-  beforeAll(() => setInConwayEra(true));
-  afterAll(() => setInConwayEra(false));
-
   describe('round trips', () => {
     it('round trips the ledger golden body with a singleton sub transaction set byte-exactly', () => {
       const body = TransactionBody.fromCbor(HexBlob(ledgerVector.hex));

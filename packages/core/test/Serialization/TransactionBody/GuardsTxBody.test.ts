@@ -47,7 +47,8 @@ const credentialCore: Cardano.TxBody = {
 };
 
 describe('TransactionBody guards (key 14)', () => {
-  afterEach(() => setInConwayEra(false));
+  beforeEach(() => setInConwayEra(false));
+  afterEach(() => setInConwayEra(true));
 
   describe('key hash form regression', () => {
     it('encodes a keyhash-only core body byte-identically to the legacy required_signers form', () => {

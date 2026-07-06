@@ -45,10 +45,10 @@ const core = {
 } as Cardano.UpdateCommittee;
 
 describe('UpdateCommittee', () => {
-  it('can encode UpdateCommittee to CBOR', () => {
+  it('can encode UpdateCommittee to CBOR (members to remove emit tag 258 set by default)', () => {
     const action = UpdateCommittee.fromCore(core);
 
-    expect(action.toCbor()).toEqual(cbor);
+    expect(action.toCbor()).toEqual(cborWithConwaySet);
   });
 
   it('can encode UpdateCommittee to Core', () => {

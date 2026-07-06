@@ -9,9 +9,9 @@ const accountB = Cardano.RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57d
 const accountABytes = '581de013cf55d175ea848b87deb3e914febd7e028e2bf6534475d52fb9c3d0';
 const accountBBytes = '581de0404b5a4088ae9abcf486a7e7b8f82069e6fcfe1bf226f1851ce72570';
 
-const bodyPrefix = 'a400818258200f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5000180020a';
+const bodyPrefix = 'a400d90102818258200f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5000180020a';
 const noDepositsBodyCbor = HexBlob(
-  'a300818258200f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5000180020a'
+  'a300d90102818258200f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5000180020a'
 );
 
 const canonicalBodyCbor = HexBlob(`${bodyPrefix}1819a2${accountABytes}1903e8${accountBBytes}1907d0`);

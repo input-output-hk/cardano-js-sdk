@@ -31,8 +31,8 @@ describe('defaultSelectionConstraints', () => {
     }
   });
 
-  it('computeMinimumCost', async () => {
-    const fee = 218_137n;
+  it('computeMinimumCost (fee reflects default tag 258 sets and map redeemers)', async () => {
+    const fee = 219_677n;
     const buildTx = jest.fn(async () => babbageTx);
     const selectionSkeleton = { inputs: [] } as unknown as SelectionSkeleton;
     const constraints = defaultSelectionConstraints({

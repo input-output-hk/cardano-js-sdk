@@ -9,7 +9,6 @@ import {
 } from '../../../src/Serialization';
 import { HexBlob } from '@cardano-sdk/util';
 import { mintTokenMap, rewardAccount, txIn, txOut } from './testData';
-import { setInConwayEra } from '../../../src';
 import { vectorsForRule } from '../dijkstraVectors';
 
 const KEY_HASH = '00112233445566778899aabbccddeeff00112233445566778899aabb';
@@ -134,9 +133,6 @@ const readMapEntries = (cbor: HexBlob): Map<bigint, string> => {
 };
 
 describe('SubTransactionBody', () => {
-  beforeAll(() => setInConwayEra(true));
-  afterAll(() => setInConwayEra(false));
-
   describe('minimal body (keys 0 and 1 only)', () => {
     it('matches the body element of the shared ledger sub_transaction vector', () => {
       expect(subTransactionVector.hex).toContain(minimalBodyCbor);

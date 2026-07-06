@@ -6,6 +6,7 @@ import { SerializationError } from '../../../src/errors';
 import { Transaction, TransactionBody, TxBodyCBOR, TxCBOR } from '../../../src/Serialization';
 import { babbageTx } from '../testData';
 import { mintTokenMap, params, txIn, txOut } from './testData';
+import { setInConwayEra } from '../../../src';
 
 // Test data used in the following tests was generated with the cardano-serialization-lib
 
@@ -223,6 +224,9 @@ const numericFieldsSetToZeroCore: Cardano.TxBody = {
     invalidHereafter: Cardano.Slot(0)
   }
 };
+
+beforeEach(() => setInConwayEra(false));
+afterEach(() => setInConwayEra(true));
 
 describe('TransactionBody', () => {
   const canonicallySortedWithdrawals = [

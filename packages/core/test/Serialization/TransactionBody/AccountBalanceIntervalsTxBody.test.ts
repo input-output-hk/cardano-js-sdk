@@ -16,9 +16,9 @@ const bothBoundsHex = '821864191388';
 const lowerOnlyHex = '821901f4f6';
 const upperOnlyHex = '82f6192710';
 
-const bodyPrefix = 'a400818258200f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5000180020a';
+const bodyPrefix = 'a400d90102818258200f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5000180020a';
 const noIntervalsBodyCbor = HexBlob(
-  'a300818258200f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5000180020a'
+  'a300d90102818258200f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5000180020a'
 );
 
 const canonicalBodyCbor = HexBlob(

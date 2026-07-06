@@ -42,9 +42,9 @@ describe('VkeyWitness', () => {
     expect(witness.toCore()).toEqual([vkey, signature]);
   });
 
-  it('should preserve original CBOR encoding of properties that do not change', () => {
+  it('should preserve original CBOR encoding of properties that do not change (updated vkeys emit tag 258)', () => {
     const combinedWitnesses = HexBlob(
-      'a40081825820cb845bb836d4baf4edffb9f76198072cbc70f0d8bb5402644ffd4db17e65259f5840af14dccbdbb1fc9d122ba240df264336a6543a44cd2207bc3e7f3c671c3ecb156a4e9902dc1f15277a933d8ce57dc77960eaf0f58e0b1581aa1810dd6300170c03814e4d01000033222220051200120011049f4b7375706572736563726574ff0581840000d87980821a006acfc01ab2d05e00'
+      'a400d9010281825820cb845bb836d4baf4edffb9f76198072cbc70f0d8bb5402644ffd4db17e65259f5840af14dccbdbb1fc9d122ba240df264336a6543a44cd2207bc3e7f3c671c3ecb156a4e9902dc1f15277a933d8ce57dc77960eaf0f58e0b1581aa1810dd6300170c03814e4d01000033222220051200120011049f4b7375706572736563726574ff0581840000d87980821a006acfc01ab2d05e00'
     );
 
     const witnessWithDatum = TransactionWitnessSet.fromCbor(

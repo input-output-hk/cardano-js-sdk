@@ -116,10 +116,10 @@ describe('PoolRegistration', () => {
     });
   });
 
-  it('can encode PoolRegistration to CBOR', () => {
+  it('can encode PoolRegistration to CBOR (pool owners emit tag 258 set by default)', () => {
     const certificate = PoolRegistration.fromCore(core);
 
-    expect(certificate.toCbor()).toEqual(cbor);
+    expect(certificate.toCbor()).toEqual(cborWithSets);
   });
 
   it('can encode PoolRegistration to Core', () => {

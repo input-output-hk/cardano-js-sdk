@@ -2,7 +2,6 @@ import * as Cardano from '../../src/Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 import { SubTransaction, SubTransactionBody, TransactionBody } from '../../src/Serialization';
-import { setInConwayEra } from '../../src';
 import { signature, vkey } from './testData';
 import { vectorsForRule } from './dijkstraVectors';
 
@@ -32,9 +31,6 @@ const witnessedCore: Cardano.SubTransaction = {
 };
 
 describe('SubTransaction', () => {
-  beforeAll(() => setInConwayEra(true));
-  afterAll(() => setInConwayEra(false));
-
   describe('round trips', () => {
     it('round trips the ledger minimal vector (null auxiliary data) byte-exactly', () => {
       const subTx = SubTransaction.fromCbor(minimalCbor);
