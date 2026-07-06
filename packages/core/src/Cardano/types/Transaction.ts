@@ -144,6 +144,17 @@ export interface SubTransactionBody
   requiredTopLevelGuards?: RequiredTopLevelGuardEntry[];
 }
 
+/**
+ * A Dijkstra sub transaction (CIP-0118 nested transactions): a sub transaction body plus its
+ * witness set and optional auxiliary data. Unlike a top-level Tx there is no is_valid flag; the
+ * enclosing transaction's flag covers the whole batch.
+ */
+export interface SubTransaction {
+  body: SubTransactionBody;
+  witness: Witness;
+  auxiliaryData?: AuxiliaryData;
+}
+
 export enum InputSource {
   inputs = 'inputs',
   collaterals = 'collaterals'
