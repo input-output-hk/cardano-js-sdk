@@ -12,6 +12,10 @@ const EMBEDDED_GROUP_SIZE = 2;
  * This certificate is used when a stakeholder no longer wants to participate in
  * staking. It revokes the stake registration and the associated stake is no
  * longer counted when calculating stake pool rewards.
+ *
+ * @deprecated Removed from the certificate union in the Dijkstra era (protocol version 12).
+ * Use Unregistration (kind 8) with an explicit deposit for new transactions. Retained for
+ * decoding historical chain data (Shelley through Conway).
  */
 export class StakeDeregistration {
   #credential: Cardano.Credential;

@@ -12,6 +12,10 @@ const EMBEDDED_GROUP_SIZE = 2;
  * This certificate is used when an individual wants to register as a stakeholder.
  * It allows the holder to participate in the stake process by delegating their
  * stake or creating a stake pool.
+ *
+ * @deprecated Removed from the certificate union in the Dijkstra era (protocol version 12).
+ * Use Registration (kind 7) with an explicit deposit for new transactions. Retained for
+ * decoding historical chain data (Shelley through Conway).
  */
 export class StakeRegistration {
   #credential: Cardano.Credential;

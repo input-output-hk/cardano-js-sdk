@@ -10,6 +10,10 @@ const EMBEDDED_GROUP_SIZE = 4;
 /**
  * This certificate is used to delegate from a Genesis key to a set of keys. This was primarily used in the early
  * phases of the Cardano network's existence during the transition from the Byron to the Shelley era.
+ *
+ * @deprecated Deprecated since the Conway era and removed from the certificate union in the
+ * Dijkstra era; the ledger no longer decodes it. This SDK retains it for decoding historical
+ * chain data.
  */
 export class GenesisKeyDelegation {
   #genesisHash: Crypto.Hash28ByteBase16;
