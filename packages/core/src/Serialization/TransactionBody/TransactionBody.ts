@@ -1,9 +1,10 @@
 /* eslint-disable sonarjs/cognitive-complexity, complexity, sonarjs/cognitive-complexity, max-statements */
 import * as Crypto from '@cardano-sdk/crypto';
-import { Address, RewardAddress } from '../../Cardano/Address';
+import { Address, CredentialType, RewardAddress } from '../../Cardano/Address';
 import { CborReader, CborReaderState, CborTag, CborWriter } from '../CBOR';
 import { CborSet, DeserializationOptions, Hash } from '../Common';
 import { Certificate } from '../Certificates';
+import { Guards, GuardsKind } from './Guards';
 import { HexBlob } from '@cardano-sdk/util';
 import { ProposalProcedure } from './ProposalProcedure';
 import { SerializationError, SerializationFailure } from '../../errors';
@@ -37,6 +38,7 @@ export class TransactionBody {
   #scriptDataHash: Crypto.Hash32ByteBase16 | undefined;
   #collateral: TransactionInputSet | undefined;
   #requiredSigners: CborSet<Crypto.Ed25519KeyHashHex, Hash<Crypto.Ed25519KeyHashHex>> | undefined;
+  #guards: Guards | undefined;
   #networkId: Cardano.NetworkId | undefined;
   #collateralReturn: TransactionOutput | undefined;
   #totalCollateral: Cardano.Lovelace | undefined;
@@ -90,7 +92,7 @@ export class TransactionBody {
     //   , ? 9 : mint
     //   , ? 11 : script_data_hash
     //   , ? 13 : nonempty_set<transaction_input> ; collateral inputs
-    //   , ? 14 : required_signers
+    //   , ? 14 : guards                          ; guards (replaces required_signers)
     //   , ? 15 : network_id
     //   , ? 16 : transaction_output              ; collateral return
     //   , ? 17 : coin                            ; total collateral
@@ -204,6 +206,9 @@ export class TransactionBody {
     if (this.#requiredSigners?.values() !== undefined && this.#requiredSigners.size() > 0) {
       writer.writeInt(14n);
       writer.writeEncodedValue(hexToBytes(this.#requiredSigners.toCbor()));
+    } else if (this.#guards !== undefined && this.#guards.size() > 0) {
+      writer.writeInt(14n);
+      writer.writeEncodedValue(hexToBytes(this.#guards.toCbor()));
     }
 
     if (this.#networkId !== undefined) {
@@ -353,12 +358,7 @@ export class TransactionBody {
           body.setCollateral(CborSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), TransactionInput.fromCbor));
           break;
         case 14n:
-          body.setRequiredSigners(
-            CborSet.fromCbor<Crypto.Ed25519KeyHashHex, Hash<Crypto.Ed25519KeyHashHex>>(
-              HexBlob.fromBytes(reader.readEncodedValue()),
-              Hash.fromCbor
-            )
-          );
+          body.setGuards(Guards.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
           break;
         case 15n:
           body.setNetworkId(Number(reader.readInt()) as Cardano.NetworkId);
@@ -409,6 +409,11 @@ export class TransactionBody {
    * @returns The Core TransactionBody object.
    */
   toCore(): Cardano.TxBody {
+    const guardCredentials = this.#guards?.credentials();
+    const guardKeyHashes = guardCredentials
+      ?.filter((credential) => credential.type === CredentialType.KeyHash)
+      .map((credential) => Crypto.Ed25519KeyHashHex(credential.hash));
+
     return {
       auxiliaryDataHash: this.#auxiliaryDataHash,
       certificates: this.#certs?.values() ? this.#certs.toCore() : undefined,
@@ -416,13 +421,15 @@ export class TransactionBody {
       collaterals: this.#collateral?.values() ? this.#collateral.toCore() : undefined,
       donation: this.#donation,
       fee: this.#fee,
+      guards: guardCredentials,
       inputs: this.#inputs.toCore(),
       mint: this.#mint,
       networkId: this.#networkId,
       outputs: this.#outputs.map((output) => output.toCore()),
       proposalProcedures: this.#proposalProcedures?.values() ? this.#proposalProcedures.toCore() : undefined,
       referenceInputs: this.#referenceInputs?.size() ? this.#referenceInputs.toCore() : undefined,
-      requiredExtraSignatures: this.#requiredSigners?.toCore(),
+      requiredExtraSignatures:
+        this.#requiredSigners?.toCore() ?? (guardKeyHashes && guardKeyHashes.length > 0 ? guardKeyHashes : undefined),
       scriptIntegrityHash: this.#scriptDataHash,
       totalCollateral: this.#totalCollateral,
       treasuryValue: this.#currentTreasuryValue,
@@ -472,7 +479,8 @@ export class TransactionBody {
     if (coreTransactionBody.referenceInputs)
       body.setReferenceInputs(CborSet.fromCore(coreTransactionBody.referenceInputs, TransactionInput.fromCore));
 
-    if (coreTransactionBody.requiredExtraSignatures)
+    if (coreTransactionBody.guards) body.setGuards(Guards.fromCredentials(coreTransactionBody.guards));
+    else if (coreTransactionBody.requiredExtraSignatures)
       body.setRequiredSigners(CborSet.fromCore(coreTransactionBody.requiredExtraSignatures, Hash.fromCore));
 
     if (coreTransactionBody.scriptIntegrityHash) body.setScriptDataHash(coreTransactionBody.scriptIntegrityHash);
@@ -754,22 +762,57 @@ export class TransactionBody {
   }
 
   /**
-   * Specifies an arbitrary set of keys which need to sign a transaction.
+   * Specifies an arbitrary set of keys which need to sign a transaction. Clears any
+   * credential form guards previously set on body key 14.
    *
    * @param requiredSigners The set of keys which need to sign a transaction
    */
   setRequiredSigners(requiredSigners: CborSet<Crypto.Ed25519KeyHashHex, Hash<Crypto.Ed25519KeyHashHex>>): void {
     this.#requiredSigners = requiredSigners;
+    this.#guards = undefined;
     this.#originalBytes = undefined;
   }
 
   /**
-   * Gets the set of keys which need to sign a transaction.
+   * Gets the set of keys which need to sign a transaction. Undefined when body key 14
+   * holds credential form guards.
    *
    * @returns The set of keys which need to sign a transaction
    */
   requiredSigners() {
     return this.#requiredSigners;
+  }
+
+  /**
+   * Sets the guards on body key 14. Key hash form guards are stored as required signers so
+   * the legacy encoding stays byte-identical; credential form guards encode as a credential
+   * ordered set.
+   *
+   * @param guards The guards that must approve the transaction.
+   */
+  setGuards(guards: Guards): void {
+    if (guards.kind() === GuardsKind.KeyHashes) {
+      this.#requiredSigners = CborSet.fromCbor<Crypto.Ed25519KeyHashHex, Hash<Crypto.Ed25519KeyHashHex>>(
+        guards.toCbor(),
+        Hash.fromCbor
+      );
+      this.#guards = undefined;
+    } else {
+      this.#guards = guards;
+      this.#requiredSigners = undefined;
+    }
+
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the credential form guards of body key 14. Undefined when the key holds the
+   * legacy key hash form (see {@link requiredSigners}).
+   *
+   * @returns The credential form guards.
+   */
+  guards(): Guards | undefined {
+    return this.#guards;
   }
 
   /**
@@ -986,7 +1029,11 @@ export class TransactionBody {
     if (this.#mint !== undefined && this.#mint.size > 0) ++mapSize;
     if (this.#scriptDataHash !== undefined) ++mapSize;
     if (this.#collateral !== undefined && this.#collateral.size() > 0) ++mapSize;
-    if (this.#requiredSigners?.values() !== undefined && this.#requiredSigners.size() > 0) ++mapSize;
+    if (
+      (this.#requiredSigners?.values() !== undefined && this.#requiredSigners.size() > 0) ||
+      (this.#guards !== undefined && this.#guards.size() > 0)
+    )
+      ++mapSize;
     if (this.#networkId !== undefined) ++mapSize;
     if (this.#collateralReturn !== undefined) ++mapSize;
     if (this.#totalCollateral !== undefined) ++mapSize;

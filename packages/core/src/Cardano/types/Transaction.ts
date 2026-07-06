@@ -2,6 +2,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { AuxiliaryData } from './AuxiliaryData';
 import { Base64Blob, HexBlob, OpaqueString } from '@cardano-sdk/util';
 import { Certificate, PoolRegistrationCertificate } from './Certificate';
+import { Credential, RewardAccount } from '../Address';
 import { ExUnits, Update, ValidityInterval } from './ProtocolParameters';
 import { HydratedTxIn, TxIn, TxOut } from './Utxo';
 import { Lovelace, TokenMap } from './Value';
@@ -9,7 +10,6 @@ import { NetworkId } from '../ChainId';
 import { PartialBlockHeader } from './Block';
 import { PlutusData } from './PlutusData';
 import { ProposalProcedure, VotingProcedures } from './Governance';
-import { RewardAccount } from '../Address';
 import { Script } from './Script';
 
 /** transaction hash as hex string */
@@ -45,6 +45,13 @@ export interface HydratedTxBody {
   mint?: TokenMap;
   scriptIntegrityHash?: Crypto.Hash32ByteBase16;
   requiredExtraSignatures?: Crypto.Ed25519KeyHashHex[];
+
+  /**
+   * Guard credentials that must authorize the transaction (Dijkstra body key 14, credential form).
+   * When present it takes precedence over requiredExtraSignatures, which then holds the key-hash
+   * subset of the guards as a read-only compatibility view.
+   */
+  guards?: Credential[];
   networkId?: NetworkId;
   update?: Update;
   auxiliaryDataHash?: Crypto.Hash32ByteBase16;
