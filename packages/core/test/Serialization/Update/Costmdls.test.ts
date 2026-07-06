@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Cardano from '../../../src/Cardano';
-import { Costmdls } from '../../../src/Serialization/Update/Costmdls';
+import { CostModel, Costmdls } from '../../../src/Serialization/Update/Costmdls';
 import { HexBlob } from '@cardano-sdk/util';
 
 const vasilPlutusV1CostModel = [
@@ -101,5 +101,76 @@ describe('CostModel', () => {
     const costmdls = Costmdls.fromCbor(cbor);
 
     expect(costmdls.languageViewsEncoding()).toEqual(plutusVasilLanguageView);
+  });
+});
+
+describe('CostModel with Plutus V4', () => {
+  const plutusV1Costs = [100, 200, 300];
+  const plutusV2Costs = [400, 500];
+  const plutusV3Costs = [600];
+  const plutusV4Costs = [700, 800, 900, 1000];
+
+  const dijkstraCostmdlsCbor = HexBlob('a40083186418c819012c01821901901901f4028119025803841902bc1903201903841903e8');
+
+  const dijkstraLanguageViews = HexBlob(
+    'a401821901901901f4028119025803841902bc1903201903841903e84100499f186418c819012cff'
+  );
+
+  const v2AndV4LanguageViews = HexBlob('a201821901901901f403841902bc1903201903841903e8');
+
+  it('newPlutusV4 creates a cost model with language version V4', () => {
+    const model = CostModel.newPlutusV4(plutusV4Costs);
+
+    expect(model.language()).toEqual(Cardano.PlutusLanguageVersion.V4);
+    expect(model.costs()).toEqual(plutusV4Costs);
+  });
+
+  it('can round trip a Costmdls including key 3 byte-exact', () => {
+    const costmdls = Costmdls.fromCbor(dijkstraCostmdlsCbor);
+
+    const pv4 = costmdls.get(Cardano.PlutusLanguageVersion.V4);
+    expect(pv4).toBeDefined();
+    expect(pv4?.costs()).toEqual(plutusV4Costs);
+
+    expect(costmdls.toCbor()).toEqual(dijkstraCostmdlsCbor);
+  });
+
+  it('can encode a Costmdls including key 3 byte-exact', () => {
+    const costmdls = new Costmdls();
+    costmdls.insert(CostModel.newPlutusV4(plutusV4Costs));
+    costmdls.insert(CostModel.newPlutusV2(plutusV2Costs));
+    costmdls.insert(CostModel.newPlutusV3(plutusV3Costs));
+    costmdls.insert(CostModel.newPlutusV1(plutusV1Costs));
+
+    expect(costmdls.toCbor()).toEqual(dijkstraCostmdlsCbor);
+  });
+
+  it('encodes the V4 language view like V2/V3 and sorts it among the other keys', () => {
+    const costmdls = Costmdls.fromCbor(dijkstraCostmdlsCbor);
+
+    expect(costmdls.languageViewsEncoding()).toEqual(dijkstraLanguageViews);
+  });
+
+  it('encodes the V4 language view without V1/V3 present', () => {
+    const costmdls = new Costmdls();
+    costmdls.insert(CostModel.newPlutusV4(plutusV4Costs));
+    costmdls.insert(CostModel.newPlutusV2(plutusV2Costs));
+
+    expect(costmdls.languageViewsEncoding()).toEqual(v2AndV4LanguageViews);
+  });
+
+  it('toCore/fromCore are symmetric for a CostModels map containing V4', () => {
+    const core = new Map([
+      [Cardano.PlutusLanguageVersion.V1, plutusV1Costs],
+      [Cardano.PlutusLanguageVersion.V2, plutusV2Costs],
+      [Cardano.PlutusLanguageVersion.V3, plutusV3Costs],
+      [Cardano.PlutusLanguageVersion.V4, plutusV4Costs]
+    ]) as Cardano.CostModels;
+
+    const costmdls = Costmdls.fromCore(core);
+
+    expect(costmdls.get(Cardano.PlutusLanguageVersion.V4)?.costs()).toEqual(plutusV4Costs);
+    expect(costmdls.toCore()).toEqual(core);
+    expect(Costmdls.fromCbor(costmdls.toCbor()).toCore()).toEqual(core);
   });
 });

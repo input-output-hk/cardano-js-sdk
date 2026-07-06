@@ -31,10 +31,12 @@ export class Costmdls {
     const sortedCanonically = new Map([...this.#models].sort((a, b) => (a > b ? 1 : -1)));
 
     // CDDL
-    // costmdls =
-    //   { ? 0 : [ 166* int ] ; Plutus v1, only 166 integers are used, but more are accepted (and ignored)
-    //     ? 1 : [ 175* int ] ; Plutus v2, only 175 integers are used, but more are accepted (and ignored)
-    //   , ? 2 : [ 179* int ] ; Plutus v3, only 179 integers are used, but more are accepted (and ignored)
+    // cost_models =
+    //   { ? 0 : [* int64] ; Plutus v1, only 166 integers are used, but more are accepted (and ignored)
+    //   , ? 1 : [* int64] ; Plutus v2, only 175 integers are used, but more are accepted (and ignored)
+    //   , ? 2 : [* int64] ; Plutus v3, only 223 integers are used, but more are accepted (and ignored)
+    //   , ? 3 : [* int64] ; Plutus v4
+    //   , * 4 .. 255 => [* int64]
     //   }
     writer.writeStartMap(sortedCanonically.size);
 
@@ -203,7 +205,8 @@ export class Costmdls {
         }
         case PlutusLanguageVersion.V2:
         case PlutusLanguageVersion.V3:
-          // For PlutusV2&V3 (language id 1&2), the language view is the following:
+        case PlutusLanguageVersion.V4:
+          // For PlutusV2 and later (language id >= 1), the language view is the following:
           //    * the value of costmdls map is encoded as a definite length list.
           encodedLanguageViews.writeInt(key);
           encodedLanguageViews.writeStartArray(value.costs().length);

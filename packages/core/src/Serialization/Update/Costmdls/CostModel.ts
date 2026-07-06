@@ -54,6 +54,15 @@ export class CostModel {
   }
 
   /**
+   * Creates a new Plutus V4 cost model.
+   *
+   * @param costs An array containing the costs for all operations.
+   */
+  static newPlutusV4(costs: Array<number>): CostModel {
+    return new CostModel(PlutusLanguageVersion.V4, costs);
+  }
+
+  /**
    * Sets the cost for the given operation.
    *
    * @param operation The operation to get the cost for.
