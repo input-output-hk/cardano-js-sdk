@@ -83,6 +83,12 @@ export interface HydratedTxBody {
   proposalProcedures?: ProposalProcedure[];
   treasuryValue?: Lovelace;
   donation?: Lovelace;
+
+  /**
+   * Direct deposits (Dijkstra body key 25): coin deposited directly into reward accounts
+   * without a withdrawal-style witness. Non-empty when present.
+   */
+  directDeposits?: Withdrawal[];
 }
 
 export interface TxBody extends Omit<HydratedTxBody, 'certificates' | 'inputs' | 'collaterals' | 'referenceInputs'> {

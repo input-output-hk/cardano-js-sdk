@@ -47,6 +47,7 @@ export class TransactionBody {
   #proposalProcedures: CborSet<ReturnType<ProposalProcedure['toCore']>, ProposalProcedure> | undefined;
   #currentTreasuryValue: Cardano.Lovelace | undefined;
   #donation: Cardano.Lovelace | undefined;
+  #directDeposits: Map<Cardano.RewardAccount, Cardano.Lovelace> | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -101,6 +102,7 @@ export class TransactionBody {
     //   , ? 20 : [+ proposal_procedure]          ; New; Proposal procedures
     //   , ? 21 : coin                            ; New; current treasury value
     //   , ? 22 : positive_coin                   ; New; donation
+    //   , ? 25 : direct_deposits                 ; New; direct deposits
     //   }
     writer.writeStartMap(this.#getMapSize());
 
@@ -251,6 +253,28 @@ export class TransactionBody {
       writer.writeInt(this.#donation);
     }
 
+    if (this.#directDeposits !== undefined && this.#directDeposits.size > 0) {
+      writer.writeInt(25n);
+
+      const depositsWithAddressBytes = new Map();
+      for (const [key, value] of this.#directDeposits) {
+        const rewardAddress = RewardAddress.fromAddress(Address.fromBech32(key));
+        if (!rewardAddress) {
+          throw new SerializationError(SerializationFailure.InvalidAddress, `Invalid direct deposit address: ${key}`);
+        }
+        depositsWithAddressBytes.set(rewardAddress.toAddress().toBytes(), value);
+      }
+
+      const sortedCanonically = [...depositsWithAddressBytes].sort((a, b) => (a > b ? 1 : -1));
+
+      writer.writeStartMap(sortedCanonically.length);
+
+      for (const [key, value] of sortedCanonically) {
+        writer.writeByteString(Buffer.from(key, 'hex'));
+        writer.writeInt(value);
+      }
+    }
+
     return writer.encodeAsHex();
   }
 
@@ -388,6 +412,30 @@ export class TransactionBody {
         case 22n:
           body.setDonation(reader.readInt());
           break;
+        case 25n: {
+          reader.readStartMap();
+
+          const directDeposits = new Map<Cardano.RewardAccount, Cardano.Lovelace>();
+
+          while (reader.peekState() !== CborReaderState.EndMap) {
+            const account = Address.fromBytes(
+              HexBlob.fromBytes(reader.readByteString())
+            ).toBech32() as Cardano.RewardAccount;
+
+            directDeposits.set(account, reader.readInt());
+          }
+
+          reader.readEndMap();
+
+          if (directDeposits.size === 0)
+            throw new SerializationError(
+              SerializationFailure.InvalidType,
+              'direct_deposits (transaction body key 25) must be a non-empty map'
+            );
+
+          body.setDirectDeposits(directDeposits);
+          break;
+        }
         default:
           if (options?.strict)
             throw new SerializationError(SerializationFailure.UnknownField, `Unknown transaction body map key: ${key}`);
@@ -419,6 +467,9 @@ export class TransactionBody {
       certificates: this.#certs?.values() ? this.#certs.toCore() : undefined,
       collateralReturn: this.#collateralReturn?.toCore(),
       collaterals: this.#collateral?.values() ? this.#collateral.toCore() : undefined,
+      directDeposits: this.#directDeposits
+        ? [...this.#directDeposits].map(([stakeAddress, quantity]) => ({ quantity, stakeAddress }))
+        : undefined,
       donation: this.#donation,
       fee: this.#fee,
       guards: guardCredentials,
@@ -501,6 +552,14 @@ export class TransactionBody {
 
       for (const coreWithdrawal of coreTransactionBody.withdrawals) {
         body.withdrawals()!.set(coreWithdrawal.stakeAddress, coreWithdrawal.quantity);
+      }
+    }
+
+    if (coreTransactionBody.directDeposits) {
+      body.setDirectDeposits(new Map<Cardano.RewardAccount, Cardano.Lovelace>());
+
+      for (const coreDeposit of coreTransactionBody.directDeposits) {
+        body.directDeposits()!.set(coreDeposit.stakeAddress, coreDeposit.quantity);
       }
     }
 
@@ -978,6 +1037,27 @@ export class TransactionBody {
   }
 
   /**
+   * Sets the direct deposits (body key 25). Each entry deposits coin directly into a reward
+   * account without a withdrawal-style witness.
+   *
+   * @param directDeposits The map of reward accounts to deposited coin.
+   */
+  setDirectDeposits(directDeposits: Map<Cardano.RewardAccount, Cardano.Lovelace>): void {
+    this.#directDeposits = directDeposits;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the direct deposits (body key 25). Each entry deposits coin directly into a reward
+   * account without a withdrawal-style witness.
+   *
+   * @returns The map of reward accounts to deposited coin.
+   */
+  directDeposits(): Map<Cardano.RewardAccount, Cardano.Lovelace> | undefined {
+    return this.#directDeposits;
+  }
+
+  /**
    * Computes the hash of the transaction body.
    *
    * @returns The hash of the transaction body.
@@ -1042,6 +1122,7 @@ export class TransactionBody {
     if (this.#proposalProcedures !== undefined && this.#proposalProcedures.size() > 0) ++mapSize;
     if (this.#currentTreasuryValue !== undefined) ++mapSize;
     if (this.#donation !== undefined) ++mapSize;
+    if (this.#directDeposits !== undefined && this.#directDeposits.size > 0) ++mapSize;
 
     return mapSize;
   }
