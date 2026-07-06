@@ -1,4 +1,5 @@
 export * from './NativeScript';
+export * from './RequireGuard';
 export * from './ScriptAll';
 export * from './ScriptAny';
 export * from './ScriptNOfK';

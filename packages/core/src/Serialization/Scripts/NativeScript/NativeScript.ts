@@ -2,6 +2,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader } from '../../CBOR';
 import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
 import { NativeScriptKind } from '../../../Cardano/types/Script';
+import { RequireGuard } from './RequireGuard';
 import { ScriptAll } from './ScriptAll';
 import { ScriptAny } from './ScriptAny';
 import { ScriptNOfK } from './ScriptNOfK';
@@ -25,6 +26,7 @@ export class NativeScript {
   #scriptPubKey: ScriptPubkey | undefined;
   #timelockExpiry: TimelockExpiry | undefined;
   #timelockStart: TimelockStart | undefined;
+  #requireGuard: RequireGuard | undefined;
   #kind: NativeScriptKind;
   #originalBytes: HexBlob | undefined = undefined;
 
@@ -56,6 +58,9 @@ export class NativeScript {
         break;
       case NativeScriptKind.RequireTimeBefore:
         cbor = this.#timelockExpiry!.toCbor();
+        break;
+      case NativeScriptKind.RequireGuard:
+        cbor = this.#requireGuard!.toCbor();
         break;
       default:
         throw new InvalidStateError(`Unexpected kind value: ${this.#kind}`);
@@ -97,6 +102,9 @@ export class NativeScript {
       case NativeScriptKind.RequireTimeBefore:
         nativeScript = NativeScript.newTimelockExpiry(TimelockExpiry.fromCbor(cbor));
         break;
+      case NativeScriptKind.RequireGuard:
+        nativeScript = NativeScript.newRequireGuard(RequireGuard.fromCbor(cbor));
+        break;
       default:
         throw new InvalidStateError(`Unexpected kind value: ${kind}`);
     }
@@ -133,6 +141,9 @@ export class NativeScript {
       case NativeScriptKind.RequireTimeBefore:
         core = this.#timelockExpiry!.toCore();
         break;
+      case NativeScriptKind.RequireGuard:
+        core = this.#requireGuard!.toCore();
+        break;
       default:
         throw new InvalidStateError(`Unexpected kind value: ${this.#kind}`);
     }
@@ -166,6 +177,9 @@ export class NativeScript {
         break;
       case NativeScriptKind.RequireTimeBefore:
         nativeScript = NativeScript.newTimelockExpiry(TimelockExpiry.fromCore(script));
+        break;
+      case NativeScriptKind.RequireGuard:
+        nativeScript = NativeScript.newRequireGuard(RequireGuard.fromCore(script));
         break;
       default:
         throw new InvalidStateError('Unexpected kind value'); // Shouldn't happen.
@@ -281,6 +295,20 @@ export class NativeScript {
   }
 
   /**
+   * Gets a NativeScript from a RequireGuard instance.
+   *
+   * @param requireGuard The RequireGuard instance to 'cast' to native script.
+   */
+  static newRequireGuard(requireGuard: RequireGuard): NativeScript {
+    const script = new NativeScript();
+
+    script.#requireGuard = requireGuard;
+    script.#kind = NativeScriptKind.RequireGuard;
+
+    return script;
+  }
+
+  /**
    * Gets a ScriptPubkey from a NativeScript instance.
    *
    * @returns a ScriptPubkey if the native script can be down cast, otherwise, undefined.
@@ -332,5 +360,14 @@ export class NativeScript {
    */
   asTimelockExpiry(): TimelockExpiry | undefined {
     return this.#timelockExpiry;
+  }
+
+  /**
+   * Gets a RequireGuard from a NativeScript instance.
+   *
+   * @returns a RequireGuard if the native script can be down cast, otherwise, undefined.
+   */
+  asRequireGuard(): RequireGuard | undefined {
+    return this.#requireGuard;
   }
 }
