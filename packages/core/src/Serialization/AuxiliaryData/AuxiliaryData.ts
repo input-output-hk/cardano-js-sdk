@@ -2,7 +2,7 @@
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { GeneralTransactionMetadata } from './TransactionMetadata/GeneralTransactionMetadata';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import { NativeScript, PlutusV1Script, PlutusV2Script, PlutusV3Script } from '../Scripts';
+import { NativeScript, PlutusV1Script, PlutusV2Script, PlutusV3Script, PlutusV4Script } from '../Scripts';
 import { PlutusLanguageVersion, ScriptType } from '../../Cardano/types/Script';
 import { SerializationError, SerializationFailure } from '../../errors';
 import { hexToBytes } from '../../util/misc';
@@ -17,6 +17,7 @@ type CddlScripts = {
   plutusV1: Array<PlutusV1Script> | undefined;
   plutusV2: Array<PlutusV2Script> | undefined;
   plutusV3: Array<PlutusV3Script> | undefined;
+  plutusV4: Array<PlutusV4Script> | undefined;
 };
 
 /**
@@ -31,6 +32,7 @@ export class AuxiliaryData {
   #plutusV1Scripts: Array<PlutusV1Script> | undefined;
   #plutusV2Scripts: Array<PlutusV2Script> | undefined;
   #plutusV3Scripts: Array<PlutusV3Script> | undefined;
+  #plutusV4Scripts: Array<PlutusV4Script> | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -52,6 +54,7 @@ export class AuxiliaryData {
     //       , ? 2 => [ * plutus_v1_script ]
     //       , ? 3 => [ * plutus_v2_script ]
     //       , ? 4 => [ * plutus_v3_script ]
+    //       , ? 5 => [ * plutus_v4_script ]
     //       })
     const writer = new CborWriter();
 
@@ -115,6 +118,14 @@ export class AuxiliaryData {
           writer.writeEncodedValue(hexToBytes(script.toCbor()));
         }
       }
+
+      if (this.#plutusV4Scripts !== undefined && this.#plutusV4Scripts.length > 0) {
+        writer.writeInt(5n);
+        writer.writeStartArray(this.#plutusV4Scripts.length);
+        for (const script of this.#plutusV4Scripts) {
+          writer.writeEncodedValue(hexToBytes(script.toCbor()));
+        }
+      }
     }
 
     return writer.encodeAsHex();
@@ -140,6 +151,7 @@ export class AuxiliaryData {
     //     , ? 2 => [ * plutus_v1_script ]
     //     , ? 3 => [ * plutus_v2_script ]
     //     , ? 4 => [ * plutus_v3_script ]
+    //     , ? 5 => [ * plutus_v4_script ]
     //     })
     if (peekState === CborReaderState.StartMap) {
       auxData.#metadata = GeneralTransactionMetadata.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
@@ -190,6 +202,15 @@ export class AuxiliaryData {
             reader.readStartArray();
             while (reader.peekState() !== CborReaderState.EndArray) {
               auxData.plutusV3Scripts()!.push(PlutusV3Script.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
+            }
+            reader.readEndArray();
+            break;
+          }
+          case 5n: {
+            auxData.setPlutusV4Scripts(new Array<PlutusV4Script>());
+            reader.readStartArray();
+            while (reader.peekState() !== CborReaderState.EndArray) {
+              auxData.plutusV4Scripts()!.push(PlutusV4Script.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
             }
             reader.readEndArray();
             break;
@@ -256,6 +277,7 @@ export class AuxiliaryData {
       if (scripts.plutusV1) result.setPlutusV1Scripts(scripts.plutusV1);
       if (scripts.plutusV2) result.setPlutusV2Scripts(scripts.plutusV2);
       if (scripts.plutusV3) result.setPlutusV3Scripts(scripts.plutusV3);
+      if (scripts.plutusV4) result.setPlutusV4Scripts(scripts.plutusV4);
     }
 
     return result;
@@ -361,6 +383,25 @@ export class AuxiliaryData {
   }
 
   /**
+   * Gets the set of plutus v4 scripts present in the auxiliary data.
+   *
+   * @returns The set of plutus v4 scripts.
+   */
+  plutusV4Scripts(): Array<PlutusV4Script> | undefined {
+    return this.#plutusV4Scripts;
+  }
+
+  /**
+   * Sets the set of v4 scripts present in the auxiliary data.
+   *
+   * @param plutusV4Scripts The set of v4 scripts.
+   */
+  setPlutusV4Scripts(plutusV4Scripts: Array<PlutusV4Script>) {
+    this.#plutusV4Scripts = plutusV4Scripts;
+    this.#originalBytes = undefined;
+  }
+
+  /**
    * Gets the size of the serialized map.
    *
    * @private
@@ -373,6 +414,7 @@ export class AuxiliaryData {
     if (this.#plutusV1Scripts !== undefined && this.#plutusV1Scripts.length > 0) ++mapSize;
     if (this.#plutusV2Scripts !== undefined && this.#plutusV2Scripts.length > 0) ++mapSize;
     if (this.#plutusV3Scripts !== undefined && this.#plutusV3Scripts.length > 0) ++mapSize;
+    if (this.#plutusV4Scripts !== undefined && this.#plutusV4Scripts.length > 0) ++mapSize;
 
     return mapSize;
   }
@@ -387,9 +429,10 @@ export class AuxiliaryData {
     const plutusV1 = this.#plutusV1Scripts ? this.#plutusV1Scripts.map((script) => script.toCore()) : [];
     const plutusV2 = this.#plutusV2Scripts ? this.#plutusV2Scripts.map((script) => script.toCore()) : [];
     const plutusV3 = this.#plutusV3Scripts ? this.#plutusV3Scripts.map((script) => script.toCore()) : [];
+    const plutusV4 = this.#plutusV4Scripts ? this.#plutusV4Scripts.map((script) => script.toCore()) : [];
     const native = this.#nativeScripts ? this.#nativeScripts.map((script) => script.toCore()) : [];
 
-    return [...plutusV1, ...plutusV2, ...plutusV3, ...native];
+    return [...plutusV1, ...plutusV2, ...plutusV3, ...plutusV4, ...native];
   }
 
   /**
@@ -399,7 +442,13 @@ export class AuxiliaryData {
    * @private
    */
   static #getCddlScripts(scripts: Array<Cardano.Script>): CddlScripts {
-    const result: CddlScripts = { native: undefined, plutusV1: undefined, plutusV2: undefined, plutusV3: undefined };
+    const result: CddlScripts = {
+      native: undefined,
+      plutusV1: undefined,
+      plutusV2: undefined,
+      plutusV3: undefined,
+      plutusV4: undefined
+    };
 
     for (const script of scripts) {
       switch (script.__type) {
@@ -421,6 +470,10 @@ export class AuxiliaryData {
             if (!result.plutusV3) result.plutusV3 = new Array<PlutusV3Script>();
 
             result.plutusV3.push(PlutusV3Script.fromCore(script));
+          } else if (script.version === PlutusLanguageVersion.V4) {
+            if (!result.plutusV4) result.plutusV4 = new Array<PlutusV4Script>();
+
+            result.plutusV4.push(PlutusV4Script.fromCore(script));
           }
           break;
         default:
