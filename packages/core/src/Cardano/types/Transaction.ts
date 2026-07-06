@@ -119,6 +119,31 @@ export interface TxBody extends Omit<HydratedTxBody, 'certificates' | 'inputs' |
   referenceInputs?: TxIn[];
 }
 
+export interface RequiredTopLevelGuardEntry {
+  credential: Credential;
+
+  /**
+   * Datum the enclosing transaction must supply the guard with, or null when the guard carries
+   * no datum (CBOR nil on the wire, used for key-hash and native-script guards).
+   */
+  datum: PlutusData | null;
+}
+
+/**
+ * Body of a Dijkstra sub transaction (CIP-0118 nested transactions). Reuses the top-level
+ * transaction body fields but has no fee, collateral or update fields -- the enclosing
+ * transaction pays the fee and posts collateral for the whole batch -- and adds
+ * requiredTopLevelGuards.
+ */
+export interface SubTransactionBody
+  extends Omit<TxBody, 'fee' | 'collaterals' | 'collateralReturn' | 'totalCollateral' | 'update'> {
+  /**
+   * Guards the enclosing transaction must carry (Dijkstra sub body key 24), each with the
+   * datum it must be supplied with. Non-empty when present.
+   */
+  requiredTopLevelGuards?: RequiredTopLevelGuardEntry[];
+}
+
 export enum InputSource {
   inputs = 'inputs',
   collaterals = 'collaterals'
