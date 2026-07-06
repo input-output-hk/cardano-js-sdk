@@ -172,7 +172,6 @@ export interface TxContext {
   signingContext: SignTransactionContext;
   auxiliaryData?: Cardano.AuxiliaryData;
   witness?: InitializeTxWitness;
-  isValid?: boolean;
 }
 
 export type TxInspection = Cardano.TxBodyWithHash & {

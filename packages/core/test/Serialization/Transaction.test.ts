@@ -1,6 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Transaction, TransactionBody, TxCBOR } from '../../src/Serialization';
 import { babbageTx, tx as coreTx, signature, vkey } from './testData';
+import { vectorsForRule } from './dijkstraVectors';
 
 const TX =
   '84af00818258200f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5000181825839009493315cd92eb5d8c4304e67b7e16ae36d61d34502694657811a2c8e32c728d3861e164cab28cb8f006448139c8f1740ffb8e7aa9e5232dc820aa3581c2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740a14014581c659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba82a14454534c411832581c7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373a240182846504154415445181e020a031903e804828304581c26b17b78de4f035dc0bfce60d1d3c3a8085c38dcce5fb8767e518bed1901f48405581c0d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4581ca646474b8f5431261506b6c273d307c7569a4eb6c96b42dd4a29520a582003170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c11131405a1581de013cf55d175ea848b87deb3e914febd7e028e2bf6534475d52fb9c3d0050758202ceb364d93225b4a0f004a0975a13eb50c3cc6348474b4fe9121f8dc72ca0cfa08186409a3581c2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740a14014581c659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba82a14454534c413831581c7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373a240182846504154415445181e0b58206199186adb51974690d7247d2646097d2c62763b16fb7ed3f9f55d38abc123de0d818258200f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5010e81581c6199186adb51974690d7247d2646097d2c62763b16fb7ed3f9f55d3910825839009493315cd92eb5d8c4304e67b7e16ae36d61d34502694657811a2c8e32c728d3861e164cab28cb8f006448139c8f1740ffb8e7aa9e5232dc820aa3581c2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740a14014581c659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba82a14454534c411832581c7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373a240182846504154415445181e11186412818258200f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d500a700818258206199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d395840bdea87fca1b4b4df8a9b8fb4183c0fab2f8261eb6c5e4bc42c800bb9c8918755bdea87fca1b4b4df8a9b8fb4183c0fab2f8261eb6c5e4bc42c800bb9c891875501868205186482041901f48200581cb5ae663aaea8e500157bdf4baafd6f5ba0ce5759f7cd4101fc132f548201818200581cb5ae663aaea8e500157bdf4baafd6f5ba0ce5759f7cd4101fc132f548202818200581cb5ae663aaea8e500157bdf4baafd6f5ba0ce5759f7cd4101fc132f54830301818200581cb5ae663aaea8e500157bdf4baafd6f5ba0ce5759f7cd4101fc132f540281845820deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01584064676273786767746f6768646a7074657476746b636f6376796669647171676775726a687268716169697370717275656c6876797071786565777072796676775820b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b45041a003815820b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450049f187bff0582840100d87a9f187bff82190bb8191b58840201d87a9f187bff821913881907d006815820b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450f5a6011904d2026373747203821904d2637374720445627974657305a2667374726b6579187b81676c6973746b65796873747276616c75650626';
@@ -63,15 +64,22 @@ describe('Transaction', () => {
     expect(tx.toCore()).toEqual(babbageTx);
   });
 
-  it('can set the isValid flag on the transaction', () => {
+  it('isValid always returns true', () => {
     const tx = Transaction.fromCbor(TxCBOR(TX));
     expect(tx.isValid()).toEqual(true);
+    expect(tx.toCore().isValid).toEqual(true);
+  });
 
-    tx.setIsValid(false);
+  it('fromCore preserves isValid false so chain history round trips', () => {
+    const tx = Transaction.fromCore({ ...coreTx, isValid: false });
 
-    // Perform a round trip serialization.
-    const tx2 = Transaction.fromCbor(tx.toCbor());
-    expect(tx2.isValid()).toEqual(false);
+    expect(tx.isValid()).toEqual(false);
+    expect(tx.toCore().isValid).toEqual(false);
+  });
+
+  it('accepts fromCore transactions with isValid true or undefined', () => {
+    expect(Transaction.fromCore({ ...coreTx, isValid: true }).isValid()).toEqual(true);
+    expect(Transaction.fromCore({ ...coreTx, isValid: undefined }).isValid()).toEqual(true);
   });
 
   it('can set the txBody on the transaction', () => {
@@ -142,6 +150,58 @@ describe('Transaction', () => {
     expect(Transaction.fromCbor(TxCBOR(CLI_TX)).getId()).toEqual(
       '2d7f290c815e061fb7c27e91d2a898bd7b454a71c9b7a26660e2257ac31ebe32'
     );
+  });
+
+  describe('is_valid grace-period frame (Dijkstra)', () => {
+    const graceVector = vectorsForRule('transaction_mempool').find((v) => v.name === 'grace-period-is-valid-true')!;
+    const withoutFlagVector = vectorsForRule('transaction').find((v) => v.name === 'minimal-without-is-valid')!;
+
+    it('round trips the 4-element mempool frame with is_valid true', () => {
+      const tx = Transaction.fromCbor(TxCBOR(graceVector.hex));
+
+      expect(tx.isValid()).toEqual(true);
+      expect(tx.toCbor()).toEqual(graceVector.hex);
+    });
+
+    it('accepts the 3-element frame and re-encodes it as the 4-element true form', () => {
+      const tx = Transaction.fromCbor(TxCBOR(withoutFlagVector.hex));
+      const rebuilt = new Transaction(tx.body(), tx.witnessSet(), tx.auxiliaryData());
+
+      expect(tx.isValid()).toEqual(true);
+      expect(rebuilt.toCbor()).toEqual(graceVector.hex);
+    });
+
+    it('decodes a 4-element frame with is_valid false and round trips it byte-exact', () => {
+      const falseFlagHex = graceVector.hex.replace('a0f5f6', 'a0f4f6');
+      expect(falseFlagHex).not.toEqual(graceVector.hex);
+
+      const tx = Transaction.fromCbor(TxCBOR(falseFlagHex));
+
+      expect(tx.isValid()).toEqual(false);
+      expect(tx.toCore().isValid).toEqual(false);
+      expect(tx.toCbor()).toEqual(falseFlagHex);
+    });
+
+    it('re-encodes a decoded phase-2 failed Babbage transaction preserving the flag', () => {
+      // [{0: [], 1: [], 2: 0}, {}, false, null]
+      const babbageFalseFlag = '84a3008001800200a0f4f6';
+      const tx = Transaction.fromCbor(TxCBOR(babbageFalseFlag));
+      const viaCore = Transaction.fromCore(tx.toCore());
+      const reDecoded = Transaction.fromCbor(viaCore.toCbor());
+
+      expect(tx.isValid()).toEqual(false);
+      expect(viaCore.isValid()).toEqual(false);
+      expect(reDecoded.isValid()).toEqual(false);
+    });
+
+    it('always emits true in toCbor for programmatically built transactions', () => {
+      const source = Transaction.fromCbor(TxCBOR(TX));
+      const rebuilt = new Transaction(source.body(), source.witnessSet(), source.auxiliaryData());
+      const reparsed = Transaction.fromCbor(rebuilt.toCbor());
+
+      expect(reparsed.isValid()).toEqual(true);
+      expect(reparsed.toCore().isValid).toEqual(true);
+    });
   });
 
   it('can roundtrip tx with ttl 0 and no outputs', () => {

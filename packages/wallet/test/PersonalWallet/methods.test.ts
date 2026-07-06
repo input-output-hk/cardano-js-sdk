@@ -417,7 +417,7 @@ describe('BaseWallet methods', () => {
         // expect(tx.toCbor()).toEqual(geniusYieldTx.toCbor());
       });
 
-      it('uses the complete transaction CBOR, ignoring auxiliaryData, witness and isValid', async () => {
+      it('uses the complete transaction CBOR, ignoring auxiliaryData and witness', async () => {
         const sender = { url: 'https://lace.io' };
         await wallet.finalizeTx({
           auxiliaryData: 'ignored auxiliary data' as Cardano.AuxiliaryData,

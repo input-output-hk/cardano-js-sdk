@@ -169,10 +169,8 @@ export interface Tx<TBody extends TxBody = TxBody> {
   witness: Witness;
   auxiliaryData?: AuxiliaryData;
   /**
-   * Transactions containing Plutus scripts that are expected to fail validation can still be submitted if
-   * this value is set to false.
-   *
-   * Remark: Sending transactions with invalid scripts will cause the collateral of the transaction to be lost.
+   * Phase-2 validation flag. Deprecated in the Dijkstra era: the SDK never sets false when
+   * authoring, but transactions decoded from chain data surface the on-chain value.
    */
   isValid?: boolean;
 }
