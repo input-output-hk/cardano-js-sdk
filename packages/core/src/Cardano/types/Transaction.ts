@@ -28,6 +28,21 @@ export interface Withdrawal {
   quantity: Lovelace;
 }
 
+/**
+ * Half-open account balance range in lovelace: a balance b satisfies the interval when
+ * inclusiveLowerBound <= b < exclusiveUpperBound. At least one bound is always set; a bound
+ * of 0 is valid and distinct from an absent bound.
+ */
+export interface AccountBalanceInterval {
+  inclusiveLowerBound?: Lovelace;
+  exclusiveUpperBound?: Lovelace;
+}
+
+export interface AccountBalanceIntervalEntry {
+  credential: Credential;
+  interval: AccountBalanceInterval;
+}
+
 export type HydratedPoolRegistrationCertificate = PoolRegistrationCertificate & { deposit?: Lovelace };
 
 export type HydratedCertificate =
@@ -89,6 +104,12 @@ export interface HydratedTxBody {
    * without a withdrawal-style witness. Non-empty when present.
    */
   directDeposits?: Withdrawal[];
+
+  /**
+   * Account balance intervals (Dijkstra body key 26): asserts that each credential's account
+   * balance lies in a half-open range at validation time. Non-empty when present.
+   */
+  accountBalanceIntervals?: AccountBalanceIntervalEntry[];
 }
 
 export interface TxBody extends Omit<HydratedTxBody, 'certificates' | 'inputs' | 'collaterals' | 'referenceInputs'> {

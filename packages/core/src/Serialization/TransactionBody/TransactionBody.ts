@@ -1,8 +1,9 @@
 /* eslint-disable sonarjs/cognitive-complexity, complexity, sonarjs/cognitive-complexity, max-statements */
 import * as Crypto from '@cardano-sdk/crypto';
+import { AccountBalanceInterval } from './AccountBalanceInterval';
 import { Address, CredentialType, RewardAddress } from '../../Cardano/Address';
 import { CborReader, CborReaderState, CborTag, CborWriter } from '../CBOR';
-import { CborSet, DeserializationOptions, Hash } from '../Common';
+import { CborSet, Credential, DeserializationOptions, Hash } from '../Common';
 import { Certificate } from '../Certificates';
 import { Guards, GuardsKind } from './Guards';
 import { HexBlob } from '@cardano-sdk/util';
@@ -48,6 +49,7 @@ export class TransactionBody {
   #currentTreasuryValue: Cardano.Lovelace | undefined;
   #donation: Cardano.Lovelace | undefined;
   #directDeposits: Map<Cardano.RewardAccount, Cardano.Lovelace> | undefined;
+  #accountBalanceIntervals: Map<Credential, AccountBalanceInterval> | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -103,6 +105,7 @@ export class TransactionBody {
     //   , ? 21 : coin                            ; New; current treasury value
     //   , ? 22 : positive_coin                   ; New; donation
     //   , ? 25 : direct_deposits                 ; New; direct deposits
+    //   , ? 26 : account_balance_intervals       ; New; account balance intervals
     //   }
     writer.writeStartMap(this.#getMapSize());
 
@@ -275,6 +278,24 @@ export class TransactionBody {
       }
     }
 
+    if (this.#accountBalanceIntervals !== undefined && this.#accountBalanceIntervals.size > 0) {
+      writer.writeInt(26n);
+
+      const intervalsWithCredentialBytes = new Map<HexBlob, AccountBalanceInterval>();
+      for (const [credential, interval] of this.#accountBalanceIntervals) {
+        intervalsWithCredentialBytes.set(credential.toCbor(), interval);
+      }
+
+      const sortedCanonically = [...intervalsWithCredentialBytes].sort((a, b) => (a[0] > b[0] ? 1 : -1));
+
+      writer.writeStartMap(sortedCanonically.length);
+
+      for (const [credentialBytes, interval] of sortedCanonically) {
+        writer.writeEncodedValue(hexToBytes(credentialBytes));
+        writer.writeEncodedValue(hexToBytes(interval.toCbor()));
+      }
+    }
+
     return writer.encodeAsHex();
   }
 
@@ -436,6 +457,29 @@ export class TransactionBody {
           body.setDirectDeposits(directDeposits);
           break;
         }
+        case 26n: {
+          reader.readStartMap();
+
+          const accountBalanceIntervals = new Map<Credential, AccountBalanceInterval>();
+
+          while (reader.peekState() !== CborReaderState.EndMap) {
+            const credential = Credential.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
+            const interval = AccountBalanceInterval.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
+
+            accountBalanceIntervals.set(credential, interval);
+          }
+
+          reader.readEndMap();
+
+          if (accountBalanceIntervals.size === 0)
+            throw new SerializationError(
+              SerializationFailure.InvalidType,
+              'account_balance_intervals (transaction body key 26) must be a non-empty map'
+            );
+
+          body.setAccountBalanceIntervals(accountBalanceIntervals);
+          break;
+        }
         default:
           if (options?.strict)
             throw new SerializationError(SerializationFailure.UnknownField, `Unknown transaction body map key: ${key}`);
@@ -463,6 +507,12 @@ export class TransactionBody {
       .map((credential) => Crypto.Ed25519KeyHashHex(credential.hash));
 
     return {
+      accountBalanceIntervals: this.#accountBalanceIntervals
+        ? [...this.#accountBalanceIntervals].map(([credential, interval]) => ({
+            credential: credential.toCore(),
+            interval: interval.toCore()
+          }))
+        : undefined,
       auxiliaryDataHash: this.#auxiliaryDataHash,
       certificates: this.#certs?.values() ? this.#certs.toCore() : undefined,
       collateralReturn: this.#collateralReturn?.toCore(),
@@ -561,6 +611,19 @@ export class TransactionBody {
       for (const coreDeposit of coreTransactionBody.directDeposits) {
         body.directDeposits()!.set(coreDeposit.stakeAddress, coreDeposit.quantity);
       }
+    }
+
+    if (coreTransactionBody.accountBalanceIntervals) {
+      const accountBalanceIntervals = new Map<Credential, AccountBalanceInterval>();
+
+      for (const entry of coreTransactionBody.accountBalanceIntervals) {
+        accountBalanceIntervals.set(
+          Credential.fromCore(entry.credential),
+          AccountBalanceInterval.fromCore(entry.interval)
+        );
+      }
+
+      body.setAccountBalanceIntervals(accountBalanceIntervals);
     }
 
     if (coreTransactionBody.donation !== undefined) body.setDonation(coreTransactionBody.donation);
@@ -1058,6 +1121,27 @@ export class TransactionBody {
   }
 
   /**
+   * Sets the account balance intervals (body key 26). Each entry asserts that the balance of the
+   * account with the given credential lies in a half-open range at validation time.
+   *
+   * @param accountBalanceIntervals The map of credentials to balance intervals.
+   */
+  setAccountBalanceIntervals(accountBalanceIntervals: Map<Credential, AccountBalanceInterval>): void {
+    this.#accountBalanceIntervals = accountBalanceIntervals;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the account balance intervals (body key 26). Each entry asserts that the balance of the
+   * account with the given credential lies in a half-open range at validation time.
+   *
+   * @returns The map of credentials to balance intervals.
+   */
+  accountBalanceIntervals(): Map<Credential, AccountBalanceInterval> | undefined {
+    return this.#accountBalanceIntervals;
+  }
+
+  /**
    * Computes the hash of the transaction body.
    *
    * @returns The hash of the transaction body.
@@ -1123,6 +1207,7 @@ export class TransactionBody {
     if (this.#currentTreasuryValue !== undefined) ++mapSize;
     if (this.#donation !== undefined) ++mapSize;
     if (this.#directDeposits !== undefined && this.#directDeposits.size > 0) ++mapSize;
+    if (this.#accountBalanceIntervals !== undefined && this.#accountBalanceIntervals.size > 0) ++mapSize;
 
     return mapSize;
   }

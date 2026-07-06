@@ -5,3 +5,4 @@ export * from './Value';
 export * from './VotingProcedures';
 export * from './ProposalProcedure';
 export * from './Guards';
+export * from './AccountBalanceInterval';
