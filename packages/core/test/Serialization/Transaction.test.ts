@@ -215,8 +215,8 @@ describe('Transaction', () => {
 });
 
 describe('Transaction strict deserialization', () => {
-  // [{0: [], 1: [], 2: 0, 23: [1, 2]}, {}, true, null] - body has unknown key 23
-  const txWithUnknownBodyKey = '84a400800180020017820102a0f5f6';
+  // [{0: [], 1: [], 2: 0, 27: [1, 2]}, {}, true, null] - body has unknown key 27
+  const txWithUnknownBodyKey = '84a4008001800200181b820102a0f5f6';
   // [{0: [], 1: [], 2: 0}, {0: [], 8: [1, 2]}, true, null] - witness set has unknown key 8
   const txWithUnknownWitnessSetKey = '84a3008001800200a2008008820102f5f6';
 
@@ -228,7 +228,7 @@ describe('Transaction strict deserialization', () => {
 
   it('throws on unknown body keys when strict', () => {
     expect(() => Transaction.fromCbor(TxCBOR(txWithUnknownBodyKey), { strict: true })).toThrow(
-      'Unknown transaction body map key: 23'
+      'Unknown transaction body map key: 27'
     );
   });
 

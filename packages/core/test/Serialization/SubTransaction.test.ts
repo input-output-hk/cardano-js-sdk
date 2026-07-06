@@ -142,7 +142,7 @@ describe('SubTransaction', () => {
       const subTx = SubTransaction.fromCbor(withAuxDataCbor);
       const cloned = subTx.clone();
 
-      subTx.setAuxiliaryData(undefined);
+      subTx.setAuxiliaryData();
 
       expect(cloned.toCbor()).toEqual(withAuxDataCbor);
       expect(subTx.toCbor()).toEqual(minimalCbor);

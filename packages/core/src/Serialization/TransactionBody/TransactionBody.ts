@@ -10,6 +10,7 @@ import { HexBlob } from '@cardano-sdk/util';
 import { ProposalProcedure } from './ProposalProcedure';
 import { SerializationError, SerializationFailure } from '../../errors';
 import { Slot } from '../../Cardano/types/Block';
+import { SubTransaction } from '../SubTransaction';
 import { TransactionId } from '../../Cardano/types/Transaction';
 import { TransactionInput } from './TransactionInput';
 import { TransactionOutput } from './TransactionOutput';
@@ -50,6 +51,7 @@ export class TransactionBody {
   #donation: Cardano.Lovelace | undefined;
   #directDeposits: Map<Cardano.RewardAccount, Cardano.Lovelace> | undefined;
   #accountBalanceIntervals: Map<Credential, AccountBalanceInterval> | undefined;
+  #subTransactions: CborSet<ReturnType<SubTransaction['toCore']>, SubTransaction> | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -104,6 +106,7 @@ export class TransactionBody {
     //   , ? 20 : [+ proposal_procedure]          ; New; Proposal procedures
     //   , ? 21 : coin                            ; New; current treasury value
     //   , ? 22 : positive_coin                   ; New; donation
+    //   , ? 23 : sub_transactions                ; New; sub transactions
     //   , ? 25 : direct_deposits                 ; New; direct deposits
     //   , ? 26 : account_balance_intervals       ; New; account balance intervals
     //   }
@@ -254,6 +257,11 @@ export class TransactionBody {
     if (this.#donation !== undefined) {
       writer.writeInt(22n);
       writer.writeInt(this.#donation);
+    }
+
+    if (this.#subTransactions !== undefined && this.#subTransactions.size() > 0) {
+      writer.writeInt(23n);
+      writer.writeEncodedValue(hexToBytes(this.#subTransactions.toCbor()));
     }
 
     if (this.#directDeposits !== undefined && this.#directDeposits.size > 0) {
@@ -433,6 +441,28 @@ export class TransactionBody {
         case 22n:
           body.setDonation(reader.readInt());
           break;
+        case 23n: {
+          const subTransactions = CborSet.fromCbor<ReturnType<SubTransaction['toCore']>, SubTransaction>(
+            HexBlob.fromBytes(reader.readEncodedValue()),
+            (subTxCbor) => SubTransaction.fromCbor(subTxCbor, options)
+          );
+
+          if (subTransactions.size() === 0)
+            throw new SerializationError(
+              SerializationFailure.InvalidType,
+              'sub_transactions (transaction body key 23) must be a non-empty set'
+            );
+
+          const subTransactionIds = new Set(subTransactions.values().map((subTransaction) => subTransaction.getId()));
+          if (subTransactionIds.size !== subTransactions.size())
+            throw new SerializationError(
+              SerializationFailure.InvalidType,
+              'sub_transactions (transaction body key 23) must not contain duplicate sub transaction ids'
+            );
+
+          body.setSubTransactions(subTransactions);
+          break;
+        }
         case 25n: {
           reader.readStartMap();
 
@@ -532,6 +562,7 @@ export class TransactionBody {
       requiredExtraSignatures:
         this.#requiredSigners?.toCore() ?? (guardKeyHashes && guardKeyHashes.length > 0 ? guardKeyHashes : undefined),
       scriptIntegrityHash: this.#scriptDataHash,
+      subTransactions: this.#subTransactions?.values() ? this.#subTransactions.toCore() : undefined,
       totalCollateral: this.#totalCollateral,
       treasuryValue: this.#currentTreasuryValue,
       update: this.#update ? this.#update.toCore() : undefined,
@@ -633,6 +664,8 @@ export class TransactionBody {
       body.setVotingProcedures(VotingProcedures.fromCore(coreTransactionBody.votingProcedures));
     if (coreTransactionBody.proposalProcedures)
       body.setProposalProcedures(CborSet.fromCore(coreTransactionBody.proposalProcedures, ProposalProcedure.fromCore));
+    if (coreTransactionBody.subTransactions)
+      body.setSubTransactions(CborSet.fromCore(coreTransactionBody.subTransactions, SubTransaction.fromCore));
 
     return body;
   }
@@ -1142,6 +1175,26 @@ export class TransactionBody {
   }
 
   /**
+   * Sets the sub transactions (body key 23, CIP-0118 nested transactions). The set is ordered
+   * and keyed by each sub transaction's own id; it must be non-empty and free of duplicate ids.
+   *
+   * @param subTransactions The ordered set of sub transactions.
+   */
+  setSubTransactions(subTransactions: CborSet<ReturnType<SubTransaction['toCore']>, SubTransaction>): void {
+    this.#subTransactions = subTransactions;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the sub transactions (body key 23, CIP-0118 nested transactions).
+   *
+   * @returns The ordered set of sub transactions.
+   */
+  subTransactions(): CborSet<ReturnType<SubTransaction['toCore']>, SubTransaction> | undefined {
+    return this.#subTransactions;
+  }
+
+  /**
    * Computes the hash of the transaction body.
    *
    * @returns The hash of the transaction body.
@@ -1206,6 +1259,7 @@ export class TransactionBody {
     if (this.#proposalProcedures !== undefined && this.#proposalProcedures.size() > 0) ++mapSize;
     if (this.#currentTreasuryValue !== undefined) ++mapSize;
     if (this.#donation !== undefined) ++mapSize;
+    if (this.#subTransactions !== undefined && this.#subTransactions.size() > 0) ++mapSize;
     if (this.#directDeposits !== undefined && this.#directDeposits.size > 0) ++mapSize;
     if (this.#accountBalanceIntervals !== undefined && this.#accountBalanceIntervals.size > 0) ++mapSize;
 

@@ -27,6 +27,7 @@ const canonicalBodyCbor = HexBlob(
 const reversedBodyCbor = HexBlob(`${bodyPrefix}181aa2${credBBytes}${lowerOnlyHex}${credABytes}${bothBoundsHex}`);
 const emptyIntervalsBodyCbor = HexBlob(`${bodyPrefix}181aa0`);
 
+const bothNilMessage = 'Both interval bounds cannot be nil.';
 const [lowerOnlyVector, upperOnlyVector, bothBoundsVector] = vectorsForRule('account_balance_interval');
 const [intervalsVector] = vectorsForRule('account_balance_intervals');
 const sharedVectorBodyCbor = HexBlob(`${bodyPrefix}181a${intervalsVector.hex}`);
@@ -87,13 +88,11 @@ describe('AccountBalanceInterval', () => {
 
   describe('both-nil rejection', () => {
     it('rejects [null, null] on decode', () => {
-      expect(() => AccountBalanceInterval.fromCbor(HexBlob('82f6f6'))).toThrowError(
-        'Both interval bounds cannot be nil.'
-      );
+      expect(() => AccountBalanceInterval.fromCbor(HexBlob('82f6f6'))).toThrowError(bothNilMessage);
     });
 
     it('rejects encoding an interval with no bounds', () => {
-      expect(() => new AccountBalanceInterval().toCbor()).toThrowError('Both interval bounds cannot be nil.');
+      expect(() => new AccountBalanceInterval().toCbor()).toThrowError(bothNilMessage);
     });
   });
 
@@ -126,9 +125,9 @@ describe('AccountBalanceInterval', () => {
 
     it('rejects encoding after clearing the only bound', () => {
       const interval = AccountBalanceInterval.fromCbor(HexBlob(lowerOnlyVector.hex));
-      interval.setInclusiveLowerBound(undefined);
+      interval.setInclusiveLowerBound();
 
-      expect(() => interval.toCbor()).toThrowError('Both interval bounds cannot be nil.');
+      expect(() => interval.toCbor()).toThrowError(bothNilMessage);
     });
   });
 });

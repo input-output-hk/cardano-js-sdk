@@ -211,7 +211,7 @@ export class SubTransaction {
    *
    * @param auxiliaryData The auxiliary data to be set.
    */
-  setAuxiliaryData(auxiliaryData: AuxiliaryData | undefined) {
+  setAuxiliaryData(auxiliaryData?: AuxiliaryData) {
     this.#auxiliaryData = auxiliaryData;
     this.#originalBytes = undefined;
   }

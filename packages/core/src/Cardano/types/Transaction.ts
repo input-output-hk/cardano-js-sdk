@@ -117,6 +117,14 @@ export interface TxBody extends Omit<HydratedTxBody, 'certificates' | 'inputs' |
   collaterals?: TxIn[];
   inputs: TxIn[];
   referenceInputs?: TxIn[];
+
+  /**
+   * Sub transactions (Dijkstra body key 23, CIP-0118 nested transactions): the ordered set of
+   * sub transactions carried by this top-level transaction, keyed by each sub transaction's own
+   * id with duplicates rejected. Non-empty when present and admitted only on a top-level body.
+   */
+  // eslint-disable-next-line no-use-before-define
+  subTransactions?: SubTransaction[];
 }
 
 export interface RequiredTopLevelGuardEntry {
@@ -136,7 +144,7 @@ export interface RequiredTopLevelGuardEntry {
  * requiredTopLevelGuards.
  */
 export interface SubTransactionBody
-  extends Omit<TxBody, 'fee' | 'collaterals' | 'collateralReturn' | 'totalCollateral' | 'update'> {
+  extends Omit<TxBody, 'fee' | 'collaterals' | 'collateralReturn' | 'totalCollateral' | 'update' | 'subTransactions'> {
   /**
    * Guards the enclosing transaction must carry (Dijkstra sub body key 24), each with the
    * datum it must be supplied with. Non-empty when present.
@@ -151,6 +159,7 @@ export interface SubTransactionBody
  */
 export interface SubTransaction {
   body: SubTransactionBody;
+  // eslint-disable-next-line no-use-before-define
   witness: Witness;
   auxiliaryData?: AuxiliaryData;
 }

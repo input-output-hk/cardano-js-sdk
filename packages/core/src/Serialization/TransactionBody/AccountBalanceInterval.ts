@@ -137,7 +137,7 @@ export class AccountBalanceInterval {
    *
    * @param inclusiveLowerBound The inclusive lower bound in lovelace, or undefined for no lower bound.
    */
-  setInclusiveLowerBound(inclusiveLowerBound: Cardano.Lovelace | undefined): void {
+  setInclusiveLowerBound(inclusiveLowerBound?: Cardano.Lovelace): void {
     this.#inclusiveLowerBound = inclusiveLowerBound;
     this.#originalBytes = undefined;
   }
