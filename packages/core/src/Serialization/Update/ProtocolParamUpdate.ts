@@ -5,9 +5,29 @@ import { DrepVotingThresholds } from './DrepVotingThresholds';
 import { EpochNo } from '../../Cardano/types/Block';
 import { ExUnitPrices } from './ExUnitPrices';
 import { ExUnits, ProtocolVersion, UnitInterval } from '../Common';
-import { HexBlob } from '@cardano-sdk/util';
+import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { PoolVotingThresholds } from './PoolVotingThresholds';
 import type * as Cardano from '../../Cardano';
+
+const MAX_WORD32 = 4_294_967_295;
+
+const assertUint32 = (argName: string, value: number): void => {
+  if (!Number.isInteger(value) || value < 0 || value > MAX_WORD32)
+    throw new InvalidArgumentError(argName, `Expected an integer between 0 and ${MAX_WORD32}, but got ${value}`);
+};
+
+const assertPositiveWord32 = (argName: string, value: number): void => {
+  if (!Number.isInteger(value) || value < 1 || value > MAX_WORD32)
+    throw new InvalidArgumentError(argName, `Expected an integer between 1 and ${MAX_WORD32}, but got ${value}`);
+};
+
+const assertPositiveInterval = (argName: string, value: UnitInterval): void => {
+  if (value.numerator() < 1n || value.denominator() < 1n)
+    throw new InvalidArgumentError(
+      argName,
+      `Expected a positive interval, but got ${value.numerator()}/${value.denominator()}`
+    );
+};
 
 /**
  * The ProtocolParamUpdate structure in Cardano is used to propose changes to
@@ -48,6 +68,10 @@ export class ProtocolParamUpdate {
   #drepDeposit: number | undefined;
   #drepInactivityPeriod: number | undefined;
   #minFeeRefScriptCostPerByte: UnitInterval | undefined;
+  #maxRefScriptSizePerBlock: number | undefined;
+  #maxRefScriptSizePerTx: number | undefined;
+  #refScriptCostStride: number | undefined;
+  #refScriptCostMultiplier: UnitInterval | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -93,6 +117,10 @@ export class ProtocolParamUpdate {
     //   , ? 31: coin                   ; DRep deposit
     //   , ? 32: epoch                  ; DRep inactivity period
     //   , ? 33: nonnegative_interval   ; MinFee RefScriptCostPerByte
+    //   , ? 34: uint .size 4           ; max refScript size per block
+    //   , ? 35: uint .size 4           ; max refScript size per tx
+    //   , ? 36: positive_word32        ; refScript cost stride
+    //   , ? 37: positive_interval      ; refScript cost multiplier
     //   }
     writer.writeStartMap(this.#getMapSize());
 
@@ -269,6 +297,30 @@ export class ProtocolParamUpdate {
       writer.writeEncodedValue(Buffer.from(this.#minFeeRefScriptCostPerByte.toCbor(), 'hex'));
     }
 
+    if (this.#maxRefScriptSizePerBlock !== undefined) {
+      assertUint32('maxRefScriptSizePerBlock', this.#maxRefScriptSizePerBlock);
+      writer.writeInt(34n);
+      writer.writeInt(this.#maxRefScriptSizePerBlock);
+    }
+
+    if (this.#maxRefScriptSizePerTx !== undefined) {
+      assertUint32('maxRefScriptSizePerTx', this.#maxRefScriptSizePerTx);
+      writer.writeInt(35n);
+      writer.writeInt(this.#maxRefScriptSizePerTx);
+    }
+
+    if (this.#refScriptCostStride !== undefined) {
+      assertPositiveWord32('refScriptCostStride', this.#refScriptCostStride);
+      writer.writeInt(36n);
+      writer.writeInt(this.#refScriptCostStride);
+    }
+
+    if (this.#refScriptCostMultiplier !== undefined) {
+      assertPositiveInterval('refScriptCostMultiplier', this.#refScriptCostMultiplier);
+      writer.writeInt(37n);
+      writer.writeEncodedValue(Buffer.from(this.#refScriptCostMultiplier.toCbor(), 'hex'));
+    }
+
     return writer.encodeAsHex();
   }
 
@@ -396,6 +448,18 @@ export class ProtocolParamUpdate {
         case 33n:
           params.#minFeeRefScriptCostPerByte = UnitInterval.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
           break;
+        case 34n:
+          params.#maxRefScriptSizePerBlock = Number(reader.readInt());
+          break;
+        case 35n:
+          params.#maxRefScriptSizePerTx = Number(reader.readInt());
+          break;
+        case 36n:
+          params.#refScriptCostStride = Number(reader.readInt());
+          break;
+        case 37n:
+          params.#refScriptCostMultiplier = UnitInterval.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
+          break;
       }
     }
 
@@ -429,6 +493,8 @@ export class ProtocolParamUpdate {
       maxCollateralInputs: this.#maxCollateralInputs,
       maxExecutionUnitsPerBlock: this.#maxBlockExUnits?.toCore(),
       maxExecutionUnitsPerTransaction: this.#maxTxExUnits?.toCore(),
+      maxRefScriptSizePerBlock: this.#maxRefScriptSizePerBlock,
+      maxRefScriptSizePerTx: this.#maxRefScriptSizePerTx,
       maxTxSize: this.#maxTxSize !== undefined ? Number(this.#maxTxSize) : undefined,
       maxValueSize: this.#maxValueSize,
       minCommitteeSize: this.#minCommitteeSize,
@@ -444,6 +510,10 @@ export class ProtocolParamUpdate {
       poolRetirementEpochBound: this.#maxEpoch,
       poolVotingThresholds: this.#poolVotingThresholds?.toCore(),
       prices: this.#executionCosts?.toCore(),
+      refScriptCostMultiplier: this.#refScriptCostMultiplier
+        ? this.#refScriptCostMultiplier.toFloat().toString()
+        : undefined,
+      refScriptCostStride: this.#refScriptCostStride,
       stakeKeyDeposit: this.#keyDeposit !== undefined ? Number(this.#keyDeposit) : undefined,
       treasuryExpansion: this.#treasuryGrowthRate ? this.#treasuryGrowthRate.toFloat().toString() : undefined
     };
@@ -517,6 +587,12 @@ export class ProtocolParamUpdate {
     params.#drepInactivityPeriod = parametersUpdate.dRepInactivityPeriod;
     params.#minFeeRefScriptCostPerByte = parametersUpdate.minFeeRefScriptCostPerByte
       ? UnitInterval.fromFloat(Number(parametersUpdate.minFeeRefScriptCostPerByte))
+      : undefined;
+    params.#maxRefScriptSizePerBlock = parametersUpdate.maxRefScriptSizePerBlock;
+    params.#maxRefScriptSizePerTx = parametersUpdate.maxRefScriptSizePerTx;
+    params.#refScriptCostStride = parametersUpdate.refScriptCostStride;
+    params.#refScriptCostMultiplier = parametersUpdate.refScriptCostMultiplier
+      ? UnitInterval.fromFloat(Number(parametersUpdate.refScriptCostMultiplier))
       : undefined;
 
     const { protocolVersion, extraEntropy, decentralizationParameter } =
@@ -1222,6 +1298,91 @@ export class ProtocolParamUpdate {
     return this.#minFeeRefScriptCostPerByte;
   }
 
+  // Dijkstra
+
+  /**
+   * Sets the maximum total size (in bytes) of reference scripts a block can use.
+   *
+   * @param maxRefScriptSizePerBlock The maximum reference script size per block, an unsigned 32 bit integer.
+   */
+  setMaxRefScriptSizePerBlock(maxRefScriptSizePerBlock: number): void {
+    assertUint32('maxRefScriptSizePerBlock', maxRefScriptSizePerBlock);
+    this.#maxRefScriptSizePerBlock = maxRefScriptSizePerBlock;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the maximum total size (in bytes) of reference scripts a block can use.
+   *
+   * @returns The maximum reference script size per block, or undefined if not set.
+   */
+  maxRefScriptSizePerBlock(): number | undefined {
+    return this.#maxRefScriptSizePerBlock;
+  }
+
+  /**
+   * Sets the maximum total size (in bytes) of reference scripts a transaction can use,
+   * enforced across a whole nested transaction batch.
+   *
+   * @param maxRefScriptSizePerTx The maximum reference script size per transaction, an unsigned 32 bit integer.
+   */
+  setMaxRefScriptSizePerTx(maxRefScriptSizePerTx: number): void {
+    assertUint32('maxRefScriptSizePerTx', maxRefScriptSizePerTx);
+    this.#maxRefScriptSizePerTx = maxRefScriptSizePerTx;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the maximum total size (in bytes) of reference scripts a transaction can use.
+   *
+   * @returns The maximum reference script size per transaction, or undefined if not set.
+   */
+  maxRefScriptSizePerTx(): number | undefined {
+    return this.#maxRefScriptSizePerTx;
+  }
+
+  /**
+   * Sets the reference script cost stride, the byte increment at which the reference
+   * script price steps up.
+   *
+   * @param refScriptCostStride The stride in bytes, an integer between 1 and 4294967295.
+   */
+  setRefScriptCostStride(refScriptCostStride: number): void {
+    assertPositiveWord32('refScriptCostStride', refScriptCostStride);
+    this.#refScriptCostStride = refScriptCostStride;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the reference script cost stride.
+   *
+   * @returns The stride in bytes, or undefined if not set.
+   */
+  refScriptCostStride(): number | undefined {
+    return this.#refScriptCostStride;
+  }
+
+  /**
+   * Sets the reference script cost multiplier, the growth factor of the reference
+   * script price per stride.
+   *
+   * @param refScriptCostMultiplier The multiplier as a positive interval (numerator and denominator >= 1).
+   */
+  setRefScriptCostMultiplier(refScriptCostMultiplier: UnitInterval): void {
+    assertPositiveInterval('refScriptCostMultiplier', refScriptCostMultiplier);
+    this.#refScriptCostMultiplier = refScriptCostMultiplier;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the reference script cost multiplier.
+   *
+   * @returns The multiplier, or undefined if not set.
+   */
+  refScriptCostMultiplier(): UnitInterval | undefined {
+    return this.#refScriptCostMultiplier;
+  }
+
   /**
    * Gets the size of the serialized map.
    *
@@ -1263,6 +1424,10 @@ export class ProtocolParamUpdate {
     if (this.#drepDeposit !== undefined) ++mapSize;
     if (this.#drepInactivityPeriod !== undefined) ++mapSize;
     if (this.#minFeeRefScriptCostPerByte !== undefined) ++mapSize;
+    if (this.#maxRefScriptSizePerBlock !== undefined) ++mapSize;
+    if (this.#maxRefScriptSizePerTx !== undefined) ++mapSize;
+    if (this.#refScriptCostStride !== undefined) ++mapSize;
+    if (this.#refScriptCostMultiplier !== undefined) ++mapSize;
 
     return mapSize;
   }
