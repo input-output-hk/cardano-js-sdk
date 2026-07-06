@@ -166,7 +166,10 @@ export enum PlutusLanguageVersion {
    *
    * - The value of costmdls map at key 2 is encoded as a definite length list.
    */
-  V3 = 2
+  V3 = 2,
+
+  /** V4 was introduced in the Dijkstra hard fork. */
+  V4 = 3
 }
 
 /**
