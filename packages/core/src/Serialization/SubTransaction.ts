@@ -4,7 +4,7 @@ import { CborReader, CborReaderState, CborWriter } from './CBOR';
 import { DeserializationOptions } from './Common';
 import { HexBlob } from '@cardano-sdk/util';
 import { SerializationError, SerializationFailure } from '../errors';
-import { SubTransactionBody } from './TransactionBody';
+import { SubTransactionBody } from './TransactionBody/SubTransactionBody';
 import { TransactionWitnessSet } from './TransactionWitnessSet';
 import { hexToBytes } from '../util/misc';
 import type * as Cardano from '../Cardano';
