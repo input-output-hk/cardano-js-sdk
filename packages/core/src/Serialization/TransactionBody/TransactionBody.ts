@@ -537,22 +537,22 @@ export class TransactionBody {
       .map((credential) => Crypto.Ed25519KeyHashHex(credential.hash));
 
     return {
-      accountBalanceIntervals: this.#accountBalanceIntervals
-        ? [...this.#accountBalanceIntervals].map(([credential, interval]) => ({
-            credential: credential.toCore(),
-            interval: interval.toCore()
-          }))
-        : undefined,
+      ...(this.#accountBalanceIntervals && {
+        accountBalanceIntervals: [...this.#accountBalanceIntervals].map(([credential, interval]) => ({
+          credential: credential.toCore(),
+          interval: interval.toCore()
+        }))
+      }),
       auxiliaryDataHash: this.#auxiliaryDataHash,
       certificates: this.#certs?.values() ? this.#certs.toCore() : undefined,
       collateralReturn: this.#collateralReturn?.toCore(),
       collaterals: this.#collateral?.values() ? this.#collateral.toCore() : undefined,
-      directDeposits: this.#directDeposits
-        ? [...this.#directDeposits].map(([stakeAddress, quantity]) => ({ quantity, stakeAddress }))
-        : undefined,
+      ...(this.#directDeposits && {
+        directDeposits: [...this.#directDeposits].map(([stakeAddress, quantity]) => ({ quantity, stakeAddress }))
+      }),
       donation: this.#donation,
       fee: this.#fee,
-      guards: guardCredentials,
+      ...(guardCredentials && { guards: guardCredentials }),
       inputs: this.#inputs.toCore(),
       mint: this.#mint,
       networkId: this.#networkId,
@@ -562,7 +562,7 @@ export class TransactionBody {
       requiredExtraSignatures:
         this.#requiredSigners?.toCore() ?? (guardKeyHashes && guardKeyHashes.length > 0 ? guardKeyHashes : undefined),
       scriptIntegrityHash: this.#scriptDataHash,
-      subTransactions: this.#subTransactions?.values() ? this.#subTransactions.toCore() : undefined,
+      ...(this.#subTransactions?.values() && { subTransactions: this.#subTransactions.toCore() }),
       totalCollateral: this.#totalCollateral,
       treasuryValue: this.#currentTreasuryValue,
       update: this.#update ? this.#update.toCore() : undefined,

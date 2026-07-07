@@ -522,19 +522,19 @@ export class SubTransactionBody {
         .map((credential) => Crypto.Ed25519KeyHashHex(credential.hash));
 
     return {
-      accountBalanceIntervals: this.#accountBalanceIntervals
-        ? [...this.#accountBalanceIntervals].map(([credential, interval]) => ({
-            credential: credential.toCore(),
-            interval: interval.toCore()
-          }))
-        : undefined,
+      ...(this.#accountBalanceIntervals && {
+        accountBalanceIntervals: [...this.#accountBalanceIntervals].map(([credential, interval]) => ({
+          credential: credential.toCore(),
+          interval: interval.toCore()
+        }))
+      }),
       auxiliaryDataHash: this.#auxiliaryDataHash,
       certificates: this.#certs?.values() ? this.#certs.toCore() : undefined,
-      directDeposits: this.#directDeposits
-        ? [...this.#directDeposits].map(([stakeAddress, quantity]) => ({ quantity, stakeAddress }))
-        : undefined,
+      ...(this.#directDeposits && {
+        directDeposits: [...this.#directDeposits].map(([stakeAddress, quantity]) => ({ quantity, stakeAddress }))
+      }),
       donation: this.#donation,
-      guards: guardCredentials,
+      ...(guardCredentials && { guards: guardCredentials }),
       inputs: this.#inputs.toCore(),
       mint: this.#mint,
       networkId: this.#networkId,
@@ -542,12 +542,12 @@ export class SubTransactionBody {
       proposalProcedures: this.#proposalProcedures?.values() ? this.#proposalProcedures.toCore() : undefined,
       referenceInputs: this.#referenceInputs?.size() ? this.#referenceInputs.toCore() : undefined,
       requiredExtraSignatures: guardKeyHashes && guardKeyHashes.length > 0 ? guardKeyHashes : undefined,
-      requiredTopLevelGuards: this.#requiredTopLevelGuards
-        ? [...this.#requiredTopLevelGuards].map(([credential, datum]) => ({
-            credential: credential.toCore(),
-            datum: datum === null ? null : datum.toCore()
-          }))
-        : undefined,
+      ...(this.#requiredTopLevelGuards && {
+        requiredTopLevelGuards: [...this.#requiredTopLevelGuards].map(([credential, datum]) => ({
+          credential: credential.toCore(),
+          datum: datum === null ? null : datum.toCore()
+        }))
+      }),
       scriptIntegrityHash: this.#scriptDataHash,
       treasuryValue: this.#currentTreasuryValue,
       validityInterval:
