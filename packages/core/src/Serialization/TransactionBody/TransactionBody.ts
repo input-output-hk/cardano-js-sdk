@@ -1,13 +1,16 @@
 /* eslint-disable sonarjs/cognitive-complexity, complexity, sonarjs/cognitive-complexity, max-statements */
 import * as Crypto from '@cardano-sdk/crypto';
-import { Address, RewardAddress } from '../../Cardano/Address';
+import { AccountBalanceInterval } from './AccountBalanceInterval';
+import { Address, CredentialType, RewardAddress } from '../../Cardano/Address';
 import { CborReader, CborReaderState, CborTag, CborWriter } from '../CBOR';
-import { CborSet, DeserializationOptions, Hash } from '../Common';
+import { CborSet, Credential, DeserializationOptions, Hash } from '../Common';
 import { Certificate } from '../Certificates';
+import { Guards, GuardsKind } from './Guards';
 import { HexBlob } from '@cardano-sdk/util';
 import { ProposalProcedure } from './ProposalProcedure';
 import { SerializationError, SerializationFailure } from '../../errors';
 import { Slot } from '../../Cardano/types/Block';
+import { SubTransaction } from '../SubTransaction';
 import { TransactionId } from '../../Cardano/types/Transaction';
 import { TransactionInput } from './TransactionInput';
 import { TransactionOutput } from './TransactionOutput';
@@ -37,6 +40,7 @@ export class TransactionBody {
   #scriptDataHash: Crypto.Hash32ByteBase16 | undefined;
   #collateral: TransactionInputSet | undefined;
   #requiredSigners: CborSet<Crypto.Ed25519KeyHashHex, Hash<Crypto.Ed25519KeyHashHex>> | undefined;
+  #guards: Guards | undefined;
   #networkId: Cardano.NetworkId | undefined;
   #collateralReturn: TransactionOutput | undefined;
   #totalCollateral: Cardano.Lovelace | undefined;
@@ -45,6 +49,9 @@ export class TransactionBody {
   #proposalProcedures: CborSet<ReturnType<ProposalProcedure['toCore']>, ProposalProcedure> | undefined;
   #currentTreasuryValue: Cardano.Lovelace | undefined;
   #donation: Cardano.Lovelace | undefined;
+  #directDeposits: Map<Cardano.RewardAccount, Cardano.Lovelace> | undefined;
+  #accountBalanceIntervals: Map<Credential, AccountBalanceInterval> | undefined;
+  #subTransactions: CborSet<ReturnType<SubTransaction['toCore']>, SubTransaction> | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -90,7 +97,7 @@ export class TransactionBody {
     //   , ? 9 : mint
     //   , ? 11 : script_data_hash
     //   , ? 13 : nonempty_set<transaction_input> ; collateral inputs
-    //   , ? 14 : required_signers
+    //   , ? 14 : guards                          ; guards (replaces required_signers)
     //   , ? 15 : network_id
     //   , ? 16 : transaction_output              ; collateral return
     //   , ? 17 : coin                            ; total collateral
@@ -99,6 +106,9 @@ export class TransactionBody {
     //   , ? 20 : [+ proposal_procedure]          ; New; Proposal procedures
     //   , ? 21 : coin                            ; New; current treasury value
     //   , ? 22 : positive_coin                   ; New; donation
+    //   , ? 23 : sub_transactions                ; New; sub transactions
+    //   , ? 25 : direct_deposits                 ; New; direct deposits
+    //   , ? 26 : account_balance_intervals       ; New; account balance intervals
     //   }
     writer.writeStartMap(this.#getMapSize());
 
@@ -204,6 +214,9 @@ export class TransactionBody {
     if (this.#requiredSigners?.values() !== undefined && this.#requiredSigners.size() > 0) {
       writer.writeInt(14n);
       writer.writeEncodedValue(hexToBytes(this.#requiredSigners.toCbor()));
+    } else if (this.#guards !== undefined && this.#guards.size() > 0) {
+      writer.writeInt(14n);
+      writer.writeEncodedValue(hexToBytes(this.#guards.toCbor()));
     }
 
     if (this.#networkId !== undefined) {
@@ -244,6 +257,51 @@ export class TransactionBody {
     if (this.#donation !== undefined) {
       writer.writeInt(22n);
       writer.writeInt(this.#donation);
+    }
+
+    if (this.#subTransactions !== undefined && this.#subTransactions.size() > 0) {
+      writer.writeInt(23n);
+      writer.writeEncodedValue(hexToBytes(this.#subTransactions.toCbor()));
+    }
+
+    if (this.#directDeposits !== undefined && this.#directDeposits.size > 0) {
+      writer.writeInt(25n);
+
+      const depositsWithAddressBytes = new Map();
+      for (const [key, value] of this.#directDeposits) {
+        const rewardAddress = RewardAddress.fromAddress(Address.fromBech32(key));
+        if (!rewardAddress) {
+          throw new SerializationError(SerializationFailure.InvalidAddress, `Invalid direct deposit address: ${key}`);
+        }
+        depositsWithAddressBytes.set(rewardAddress.toAddress().toBytes(), value);
+      }
+
+      const sortedCanonically = [...depositsWithAddressBytes].sort((a, b) => (a > b ? 1 : -1));
+
+      writer.writeStartMap(sortedCanonically.length);
+
+      for (const [key, value] of sortedCanonically) {
+        writer.writeByteString(Buffer.from(key, 'hex'));
+        writer.writeInt(value);
+      }
+    }
+
+    if (this.#accountBalanceIntervals !== undefined && this.#accountBalanceIntervals.size > 0) {
+      writer.writeInt(26n);
+
+      const intervalsWithCredentialBytes = new Map<HexBlob, AccountBalanceInterval>();
+      for (const [credential, interval] of this.#accountBalanceIntervals) {
+        intervalsWithCredentialBytes.set(credential.toCbor(), interval);
+      }
+
+      const sortedCanonically = [...intervalsWithCredentialBytes].sort((a, b) => (a[0] > b[0] ? 1 : -1));
+
+      writer.writeStartMap(sortedCanonically.length);
+
+      for (const [credentialBytes, interval] of sortedCanonically) {
+        writer.writeEncodedValue(hexToBytes(credentialBytes));
+        writer.writeEncodedValue(hexToBytes(interval.toCbor()));
+      }
     }
 
     return writer.encodeAsHex();
@@ -353,12 +411,7 @@ export class TransactionBody {
           body.setCollateral(CborSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), TransactionInput.fromCbor));
           break;
         case 14n:
-          body.setRequiredSigners(
-            CborSet.fromCbor<Crypto.Ed25519KeyHashHex, Hash<Crypto.Ed25519KeyHashHex>>(
-              HexBlob.fromBytes(reader.readEncodedValue()),
-              Hash.fromCbor
-            )
-          );
+          body.setGuards(Guards.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
           break;
         case 15n:
           body.setNetworkId(Number(reader.readInt()) as Cardano.NetworkId);
@@ -388,6 +441,75 @@ export class TransactionBody {
         case 22n:
           body.setDonation(reader.readInt());
           break;
+        case 23n: {
+          const subTransactions = CborSet.fromCbor<ReturnType<SubTransaction['toCore']>, SubTransaction>(
+            HexBlob.fromBytes(reader.readEncodedValue()),
+            (subTxCbor) => SubTransaction.fromCbor(subTxCbor, options)
+          );
+
+          if (subTransactions.size() === 0)
+            throw new SerializationError(
+              SerializationFailure.InvalidType,
+              'sub_transactions (transaction body key 23) must be a non-empty set'
+            );
+
+          const subTransactionIds = new Set(subTransactions.values().map((subTransaction) => subTransaction.getId()));
+          if (subTransactionIds.size !== subTransactions.size())
+            throw new SerializationError(
+              SerializationFailure.InvalidType,
+              'sub_transactions (transaction body key 23) must not contain duplicate sub transaction ids'
+            );
+
+          body.setSubTransactions(subTransactions);
+          break;
+        }
+        case 25n: {
+          reader.readStartMap();
+
+          const directDeposits = new Map<Cardano.RewardAccount, Cardano.Lovelace>();
+
+          while (reader.peekState() !== CborReaderState.EndMap) {
+            const account = Address.fromBytes(
+              HexBlob.fromBytes(reader.readByteString())
+            ).toBech32() as Cardano.RewardAccount;
+
+            directDeposits.set(account, reader.readInt());
+          }
+
+          reader.readEndMap();
+
+          if (directDeposits.size === 0)
+            throw new SerializationError(
+              SerializationFailure.InvalidType,
+              'direct_deposits (transaction body key 25) must be a non-empty map'
+            );
+
+          body.setDirectDeposits(directDeposits);
+          break;
+        }
+        case 26n: {
+          reader.readStartMap();
+
+          const accountBalanceIntervals = new Map<Credential, AccountBalanceInterval>();
+
+          while (reader.peekState() !== CborReaderState.EndMap) {
+            const credential = Credential.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
+            const interval = AccountBalanceInterval.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
+
+            accountBalanceIntervals.set(credential, interval);
+          }
+
+          reader.readEndMap();
+
+          if (accountBalanceIntervals.size === 0)
+            throw new SerializationError(
+              SerializationFailure.InvalidType,
+              'account_balance_intervals (transaction body key 26) must be a non-empty map'
+            );
+
+          body.setAccountBalanceIntervals(accountBalanceIntervals);
+          break;
+        }
         default:
           if (options?.strict)
             throw new SerializationError(SerializationFailure.UnknownField, `Unknown transaction body map key: ${key}`);
@@ -409,21 +531,38 @@ export class TransactionBody {
    * @returns The Core TransactionBody object.
    */
   toCore(): Cardano.TxBody {
+    const guardCredentials = this.#guards?.credentials();
+    const guardKeyHashes = guardCredentials
+      ?.filter((credential) => credential.type === CredentialType.KeyHash)
+      .map((credential) => Crypto.Ed25519KeyHashHex(credential.hash));
+
     return {
+      ...(this.#accountBalanceIntervals && {
+        accountBalanceIntervals: [...this.#accountBalanceIntervals].map(([credential, interval]) => ({
+          credential: credential.toCore(),
+          interval: interval.toCore()
+        }))
+      }),
       auxiliaryDataHash: this.#auxiliaryDataHash,
       certificates: this.#certs?.values() ? this.#certs.toCore() : undefined,
       collateralReturn: this.#collateralReturn?.toCore(),
       collaterals: this.#collateral?.values() ? this.#collateral.toCore() : undefined,
+      ...(this.#directDeposits && {
+        directDeposits: [...this.#directDeposits].map(([stakeAddress, quantity]) => ({ quantity, stakeAddress }))
+      }),
       donation: this.#donation,
       fee: this.#fee,
+      ...(guardCredentials && { guards: guardCredentials }),
       inputs: this.#inputs.toCore(),
       mint: this.#mint,
       networkId: this.#networkId,
       outputs: this.#outputs.map((output) => output.toCore()),
       proposalProcedures: this.#proposalProcedures?.values() ? this.#proposalProcedures.toCore() : undefined,
       referenceInputs: this.#referenceInputs?.size() ? this.#referenceInputs.toCore() : undefined,
-      requiredExtraSignatures: this.#requiredSigners?.toCore(),
+      requiredExtraSignatures:
+        this.#requiredSigners?.toCore() ?? (guardKeyHashes && guardKeyHashes.length > 0 ? guardKeyHashes : undefined),
       scriptIntegrityHash: this.#scriptDataHash,
+      ...(this.#subTransactions?.values() && { subTransactions: this.#subTransactions.toCore() }),
       totalCollateral: this.#totalCollateral,
       treasuryValue: this.#currentTreasuryValue,
       update: this.#update ? this.#update.toCore() : undefined,
@@ -472,7 +611,8 @@ export class TransactionBody {
     if (coreTransactionBody.referenceInputs)
       body.setReferenceInputs(CborSet.fromCore(coreTransactionBody.referenceInputs, TransactionInput.fromCore));
 
-    if (coreTransactionBody.requiredExtraSignatures)
+    if (coreTransactionBody.guards) body.setGuards(Guards.fromCredentials(coreTransactionBody.guards));
+    else if (coreTransactionBody.requiredExtraSignatures)
       body.setRequiredSigners(CborSet.fromCore(coreTransactionBody.requiredExtraSignatures, Hash.fromCore));
 
     if (coreTransactionBody.scriptIntegrityHash) body.setScriptDataHash(coreTransactionBody.scriptIntegrityHash);
@@ -496,6 +636,27 @@ export class TransactionBody {
       }
     }
 
+    if (coreTransactionBody.directDeposits) {
+      body.setDirectDeposits(new Map<Cardano.RewardAccount, Cardano.Lovelace>());
+
+      for (const coreDeposit of coreTransactionBody.directDeposits) {
+        body.directDeposits()!.set(coreDeposit.stakeAddress, coreDeposit.quantity);
+      }
+    }
+
+    if (coreTransactionBody.accountBalanceIntervals) {
+      const accountBalanceIntervals = new Map<Credential, AccountBalanceInterval>();
+
+      for (const entry of coreTransactionBody.accountBalanceIntervals) {
+        accountBalanceIntervals.set(
+          Credential.fromCore(entry.credential),
+          AccountBalanceInterval.fromCore(entry.interval)
+        );
+      }
+
+      body.setAccountBalanceIntervals(accountBalanceIntervals);
+    }
+
     if (coreTransactionBody.donation !== undefined) body.setDonation(coreTransactionBody.donation);
     if (coreTransactionBody.treasuryValue !== undefined)
       body.setCurrentTreasuryValue(coreTransactionBody.treasuryValue);
@@ -503,6 +664,8 @@ export class TransactionBody {
       body.setVotingProcedures(VotingProcedures.fromCore(coreTransactionBody.votingProcedures));
     if (coreTransactionBody.proposalProcedures)
       body.setProposalProcedures(CborSet.fromCore(coreTransactionBody.proposalProcedures, ProposalProcedure.fromCore));
+    if (coreTransactionBody.subTransactions)
+      body.setSubTransactions(CborSet.fromCore(coreTransactionBody.subTransactions, SubTransaction.fromCore));
 
     return body;
   }
@@ -754,22 +917,57 @@ export class TransactionBody {
   }
 
   /**
-   * Specifies an arbitrary set of keys which need to sign a transaction.
+   * Specifies an arbitrary set of keys which need to sign a transaction. Clears any
+   * credential form guards previously set on body key 14.
    *
    * @param requiredSigners The set of keys which need to sign a transaction
    */
   setRequiredSigners(requiredSigners: CborSet<Crypto.Ed25519KeyHashHex, Hash<Crypto.Ed25519KeyHashHex>>): void {
     this.#requiredSigners = requiredSigners;
+    this.#guards = undefined;
     this.#originalBytes = undefined;
   }
 
   /**
-   * Gets the set of keys which need to sign a transaction.
+   * Gets the set of keys which need to sign a transaction. Undefined when body key 14
+   * holds credential form guards.
    *
    * @returns The set of keys which need to sign a transaction
    */
   requiredSigners() {
     return this.#requiredSigners;
+  }
+
+  /**
+   * Sets the guards on body key 14. Key hash form guards are stored as required signers so
+   * the legacy encoding stays byte-identical; credential form guards encode as a credential
+   * ordered set.
+   *
+   * @param guards The guards that must approve the transaction.
+   */
+  setGuards(guards: Guards): void {
+    if (guards.kind() === GuardsKind.KeyHashes) {
+      this.#requiredSigners = CborSet.fromCbor<Crypto.Ed25519KeyHashHex, Hash<Crypto.Ed25519KeyHashHex>>(
+        guards.toCbor(),
+        Hash.fromCbor
+      );
+      this.#guards = undefined;
+    } else {
+      this.#guards = guards;
+      this.#requiredSigners = undefined;
+    }
+
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the credential form guards of body key 14. Undefined when the key holds the
+   * legacy key hash form (see {@link requiredSigners}).
+   *
+   * @returns The credential form guards.
+   */
+  guards(): Guards | undefined {
+    return this.#guards;
   }
 
   /**
@@ -935,6 +1133,68 @@ export class TransactionBody {
   }
 
   /**
+   * Sets the direct deposits (body key 25). Each entry deposits coin directly into a reward
+   * account without a withdrawal-style witness.
+   *
+   * @param directDeposits The map of reward accounts to deposited coin.
+   */
+  setDirectDeposits(directDeposits: Map<Cardano.RewardAccount, Cardano.Lovelace>): void {
+    this.#directDeposits = directDeposits;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the direct deposits (body key 25). Each entry deposits coin directly into a reward
+   * account without a withdrawal-style witness.
+   *
+   * @returns The map of reward accounts to deposited coin.
+   */
+  directDeposits(): Map<Cardano.RewardAccount, Cardano.Lovelace> | undefined {
+    return this.#directDeposits;
+  }
+
+  /**
+   * Sets the account balance intervals (body key 26). Each entry asserts that the balance of the
+   * account with the given credential lies in a half-open range at validation time.
+   *
+   * @param accountBalanceIntervals The map of credentials to balance intervals.
+   */
+  setAccountBalanceIntervals(accountBalanceIntervals: Map<Credential, AccountBalanceInterval>): void {
+    this.#accountBalanceIntervals = accountBalanceIntervals;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the account balance intervals (body key 26). Each entry asserts that the balance of the
+   * account with the given credential lies in a half-open range at validation time.
+   *
+   * @returns The map of credentials to balance intervals.
+   */
+  accountBalanceIntervals(): Map<Credential, AccountBalanceInterval> | undefined {
+    return this.#accountBalanceIntervals;
+  }
+
+  /**
+   * Sets the sub transactions (body key 23, CIP-0118 nested transactions). The set is ordered
+   * and keyed by each sub transaction's own id; it must be non-empty and free of duplicate ids.
+   *
+   * @param subTransactions The ordered set of sub transactions.
+   */
+  setSubTransactions(subTransactions: CborSet<ReturnType<SubTransaction['toCore']>, SubTransaction>): void {
+    this.#subTransactions = subTransactions;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the sub transactions (body key 23, CIP-0118 nested transactions).
+   *
+   * @returns The ordered set of sub transactions.
+   */
+  subTransactions(): CborSet<ReturnType<SubTransaction['toCore']>, SubTransaction> | undefined {
+    return this.#subTransactions;
+  }
+
+  /**
    * Computes the hash of the transaction body.
    *
    * @returns The hash of the transaction body.
@@ -986,7 +1246,11 @@ export class TransactionBody {
     if (this.#mint !== undefined && this.#mint.size > 0) ++mapSize;
     if (this.#scriptDataHash !== undefined) ++mapSize;
     if (this.#collateral !== undefined && this.#collateral.size() > 0) ++mapSize;
-    if (this.#requiredSigners?.values() !== undefined && this.#requiredSigners.size() > 0) ++mapSize;
+    if (
+      (this.#requiredSigners?.values() !== undefined && this.#requiredSigners.size() > 0) ||
+      (this.#guards !== undefined && this.#guards.size() > 0)
+    )
+      ++mapSize;
     if (this.#networkId !== undefined) ++mapSize;
     if (this.#collateralReturn !== undefined) ++mapSize;
     if (this.#totalCollateral !== undefined) ++mapSize;
@@ -995,6 +1259,9 @@ export class TransactionBody {
     if (this.#proposalProcedures !== undefined && this.#proposalProcedures.size() > 0) ++mapSize;
     if (this.#currentTreasuryValue !== undefined) ++mapSize;
     if (this.#donation !== undefined) ++mapSize;
+    if (this.#subTransactions !== undefined && this.#subTransactions.size() > 0) ++mapSize;
+    if (this.#directDeposits !== undefined && this.#directDeposits.size > 0) ++mapSize;
+    if (this.#accountBalanceIntervals !== undefined && this.#accountBalanceIntervals.size > 0) ++mapSize;
 
     return mapSize;
   }

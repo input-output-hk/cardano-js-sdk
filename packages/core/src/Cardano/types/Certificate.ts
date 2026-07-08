@@ -7,7 +7,17 @@ import type { Lovelace } from './Value';
 import type { PoolId, PoolParameters } from './StakePool';
 
 export enum CertificateType {
+  /**
+   * @deprecated Removed from the certificate union in the Dijkstra era (protocol version 12).
+   * Use Registration with an explicit deposit for new transactions. Retained for decoding
+   * historical chain data.
+   */
   StakeRegistration = 'StakeRegistrationCertificate',
+  /**
+   * @deprecated Removed from the certificate union in the Dijkstra era (protocol version 12).
+   * Use Unregistration with an explicit deposit for new transactions. Retained for decoding
+   * historical chain data.
+   */
   StakeDeregistration = 'StakeDeregistrationCertificate',
   PoolRegistration = 'PoolRegistrationCertificate',
   PoolRetirement = 'PoolRetirementCertificate',
@@ -106,7 +116,11 @@ export interface UpdateDelegateRepresentativeCertificate {
   anchor: Anchor | null;
 }
 
-/** To be deprecated in the Era after conway replaced by <NewStakeAddressCertificate> */
+/**
+ * @deprecated Removed from the certificate union in the Dijkstra era (protocol version 12).
+ * Use NewStakeAddressCertificate (Registration/Unregistration with an explicit deposit) for
+ * new transactions. Retained for decoding historical chain data.
+ */
 export interface StakeAddressCertificate {
   __typename: CertificateType.StakeRegistration | CertificateType.StakeDeregistration;
   stakeCredential: Credential;
@@ -252,6 +266,9 @@ export const isCertType = <K extends keyof CertificateTypeMap>(
  * Creates a stake key registration certificate from a given reward account.
  *
  * @param rewardAccount The reward account to be registered.
+ * @deprecated Creates a StakeRegistration (kind 0) certificate, which is removed from the
+ * certificate union in the Dijkstra era (protocol version 12). Create a Registration (kind 7)
+ * certificate with an explicit deposit for new transactions.
  */
 export const createStakeRegistrationCert = (rewardAccount: RewardAccount): Certificate => ({
   __typename: CertificateType.StakeRegistration,
@@ -266,6 +283,11 @@ export const createStakeRegistrationCert = (rewardAccount: RewardAccount): Certi
  * Creates a stake key de-registration certificate from a given reward account.
  *
  * @param rewardAccount The reward account to be de-registered.
+ * @param deposit The deposit to be refunded. When provided, an Unregistration (kind 8)
+ * certificate is created.
+ * @deprecated Calling without deposit creates a StakeDeregistration (kind 1) certificate, which
+ * is removed from the certificate union in the Dijkstra era (protocol version 12). Always pass
+ * the deposit so an Unregistration (kind 8) certificate is created.
  */
 export const createStakeDeregistrationCert = (rewardAccount: RewardAccount, deposit?: Lovelace): Certificate =>
   deposit === undefined

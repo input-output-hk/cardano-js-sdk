@@ -140,7 +140,16 @@ type NewProtocolParamsInConway = {
   minFeeRefScriptCostPerByte: string;
 };
 
-export type ProtocolParameters = BabbageProtocolParameters & Partial<NewProtocolParamsInConway>;
+type NewProtocolParamsInDijkstra = {
+  maxRefScriptSizePerBlock: number;
+  maxRefScriptSizePerTx: number;
+  refScriptCostStride: number;
+  refScriptCostMultiplier: string;
+};
+
+export type ProtocolParameters = BabbageProtocolParameters &
+  Partial<NewProtocolParamsInConway> &
+  Partial<NewProtocolParamsInDijkstra>;
 export type ConwayProtocolParameters = Omit<ProtocolParameters, 'protocolVersion'>;
 
 // Even tho extraEntropy was deprecated on babbage era, and protocolVersion was deprecated in conway era,

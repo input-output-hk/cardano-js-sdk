@@ -135,7 +135,6 @@ describe('PersonalWallet/phase2validation', () => {
 
     const unsignedTx = await wallet.initializeTx(txProps);
     const finalizeProps: FinalizeTxProps = {
-      isValid: false,
       tx: unsignedTx,
       witness: { redeemers: [scriptRedeemer], scripts: [alwaysFailScript] }
     };

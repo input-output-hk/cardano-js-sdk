@@ -116,6 +116,9 @@ export class Redeemer {
       case RedeemerTag.Proposing:
         purpose = RedeemerPurpose.propose;
         break;
+      case RedeemerTag.Guarding:
+        purpose = RedeemerPurpose.guarding;
+        break;
       default:
         throw new InvalidStateError(`Invalid redeemer type ${this.#tag}`);
     }
@@ -154,6 +157,9 @@ export class Redeemer {
         break;
       case RedeemerPurpose.propose:
         tag = RedeemerTag.Proposing;
+        break;
+      case RedeemerPurpose.guarding:
+        tag = RedeemerTag.Guarding;
         break;
       default:
         throw new InvalidStateError(`Invalid redeemer type ${redeemer.purpose}`);

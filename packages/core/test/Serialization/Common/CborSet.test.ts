@@ -55,15 +55,15 @@ describe('CborSet', () => {
     testCborConway = writer.encodeAsHex();
   });
 
-  afterEach(() => setInConwayEra(false));
+  afterEach(() => setInConwayEra(true));
 
-  it('can serialize as array', () => {
-    expect(testCbor).toEqual(set.toCbor());
+  it('serializes as 258 tag set by default, without any setInConwayEra call', () => {
+    expect(testCborConway).toEqual(set.toCbor());
   });
 
-  it('can serialize as 258 tag set', () => {
-    setInConwayEra(true);
-    expect(testCborConway).toEqual(set.toCbor());
+  it('can serialize as untagged array when setInConwayEra(false) restores the legacy encoding', () => {
+    setInConwayEra(false);
+    expect(testCbor).toEqual(set.toCbor());
   });
 
   it('correctly deserialize a CBOR array', () => {
@@ -89,12 +89,12 @@ describe('CborSet', () => {
     expect(emptySet.toCbor()).toEqual(emptyArrayCbor);
   });
 
-  it('can update the set values and serialize correctly', () => {
+  it('can update the set values and serialize correctly (tag 258 emitted by default)', () => {
     const testNumbersReduced = testNumbers.slice(0, -1);
 
     const set2 = CborSet.fromCore<number, TestNumber>(testNumbersReduced, TestNumber.fromCore);
     set2.setValues([...set2.values(), TestNumber.fromCore(testNumbers[testNumbers.length - 1])]);
-    expect(set2.toCbor()).toEqual(testCbor);
+    expect(set2.toCbor()).toEqual(testCborConway);
     expect(set2.toCore()).toEqual(testNumbers);
   });
 });

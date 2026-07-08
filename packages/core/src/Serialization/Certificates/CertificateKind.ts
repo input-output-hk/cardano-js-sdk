@@ -8,6 +8,10 @@ export enum CertificateKind {
    * This certificate is used when an individual wants to register as a stakeholder.
    * It allows the holder to participate in the staking process by delegating their
    * stake or creating a stake pool.
+   *
+   * @deprecated Removed from the certificate union in the Dijkstra era (protocol version 12).
+   * Use Registration (kind 7) with an explicit deposit for new transactions. Retained for
+   * decoding historical chain data.
    */
   StakeRegistration = 0,
 
@@ -15,6 +19,10 @@ export enum CertificateKind {
    * This certificate is used when a stakeholder no longer wants to participate in
    * staking. It revokes the stake registration and the associated stake is no
    * longer counted when calculating stake pool rewards.
+   *
+   * @deprecated Removed from the certificate union in the Dijkstra era (protocol version 12).
+   * Use Unregistration (kind 8) with an explicit deposit for new transactions. Retained for
+   * decoding historical chain data.
    */
   StakeDeregistration = 1,
 
@@ -36,10 +44,20 @@ export enum CertificateKind {
   /**
    * This certificate is used to delegate from a Genesis key to a set of keys. This was primarily used in the early
    * phases of the Cardano network's existence during the transition from the Byron to the Shelley era.
+   *
+   * @deprecated Deprecated since the Conway era and removed from the certificate union in the
+   * Dijkstra era; the ledger no longer decodes it. This SDK retains it for decoding historical
+   * chain data.
    */
   GenesisKeyDelegation = 5,
 
-  /** Certificate used to facilitate an instantaneous transfer of rewards within the system. */
+  /**
+   * Certificate used to facilitate an instantaneous transfer of rewards within the system.
+   *
+   * @deprecated Deprecated since the Conway era and removed from the certificate union in the
+   * Dijkstra era; the ledger no longer decodes it. This SDK retains it for decoding historical
+   * chain data.
+   */
   MoveInstantaneousRewards = 6,
 
   /**

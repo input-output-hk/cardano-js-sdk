@@ -6,6 +6,7 @@ import { SerializationError } from '../../../src/errors';
 import { Transaction, TransactionBody, TxBodyCBOR, TxCBOR } from '../../../src/Serialization';
 import { babbageTx } from '../testData';
 import { mintTokenMap, params, txIn, txOut } from './testData';
+import { setInConwayEra } from '../../../src';
 
 // Test data used in the following tests was generated with the cardano-serialization-lib
 
@@ -224,6 +225,9 @@ const numericFieldsSetToZeroCore: Cardano.TxBody = {
   }
 };
 
+beforeEach(() => setInConwayEra(false));
+afterEach(() => setInConwayEra(true));
+
 describe('TransactionBody', () => {
   const canonicallySortedWithdrawals = [
     {
@@ -346,10 +350,10 @@ describe('TransactionBody', () => {
 });
 
 describe('TransactionBody unknown map keys', () => {
-  // {0: [], 1: [], 2: 0, 23: [1, 2]} - key 23 is not part of the transaction_body CDDL
-  const cborWithUnknownKey = HexBlob('a400800180020017820102');
-  // {0: [], 1: [], 23: [1, 2], 2: 10}
-  const cborWithUnknownKeyBeforeFee = HexBlob('a40080018017820102020a');
+  // {0: [], 1: [], 2: 0, 27: [1, 2]} - key 27 is not part of the transaction_body CDDL
+  const cborWithUnknownKey = HexBlob('a4008001800200181b820102');
+  // {0: [], 1: [], 27: [1, 2], 2: 10}
+  const cborWithUnknownKeyBeforeFee = HexBlob('a400800180181b820102020a');
 
   it('skips unknown keys and keeps reading subsequent fields by default', () => {
     const body = TransactionBody.fromCbor(cborWithUnknownKeyBeforeFee);
@@ -364,7 +368,7 @@ describe('TransactionBody unknown map keys', () => {
   it('throws on unknown keys when strict', () => {
     expect(() => TransactionBody.fromCbor(cborWithUnknownKey, { strict: true })).toThrowError(SerializationError);
     expect(() => TransactionBody.fromCbor(cborWithUnknownKey, { strict: true })).toThrow(
-      'Unknown transaction body map key: 23'
+      'Unknown transaction body map key: 27'
     );
   });
 });

@@ -2,6 +2,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { AuxiliaryData } from './AuxiliaryData';
 import { Base64Blob, HexBlob, OpaqueString } from '@cardano-sdk/util';
 import { Certificate, PoolRegistrationCertificate } from './Certificate';
+import { Credential, RewardAccount } from '../Address';
 import { ExUnits, Update, ValidityInterval } from './ProtocolParameters';
 import { HydratedTxIn, TxIn, TxOut } from './Utxo';
 import { Lovelace, TokenMap } from './Value';
@@ -9,7 +10,6 @@ import { NetworkId } from '../ChainId';
 import { PartialBlockHeader } from './Block';
 import { PlutusData } from './PlutusData';
 import { ProposalProcedure, VotingProcedures } from './Governance';
-import { RewardAccount } from '../Address';
 import { Script } from './Script';
 
 /** transaction hash as hex string */
@@ -26,6 +26,21 @@ TransactionId.fromHexBlob = (value: HexBlob) => Crypto.Hash32ByteBase16.fromHexB
 export interface Withdrawal {
   stakeAddress: RewardAccount;
   quantity: Lovelace;
+}
+
+/**
+ * Half-open account balance range in lovelace: a balance b satisfies the interval when
+ * inclusiveLowerBound <= b < exclusiveUpperBound. At least one bound is always set; a bound
+ * of 0 is valid and distinct from an absent bound.
+ */
+export interface AccountBalanceInterval {
+  inclusiveLowerBound?: Lovelace;
+  exclusiveUpperBound?: Lovelace;
+}
+
+export interface AccountBalanceIntervalEntry {
+  credential: Credential;
+  interval: AccountBalanceInterval;
 }
 
 export type HydratedPoolRegistrationCertificate = PoolRegistrationCertificate & { deposit?: Lovelace };
@@ -45,6 +60,13 @@ export interface HydratedTxBody {
   mint?: TokenMap;
   scriptIntegrityHash?: Crypto.Hash32ByteBase16;
   requiredExtraSignatures?: Crypto.Ed25519KeyHashHex[];
+
+  /**
+   * Guard credentials that must authorize the transaction (Dijkstra body key 14, credential form).
+   * When present it takes precedence over requiredExtraSignatures, which then holds the key-hash
+   * subset of the guards as a read-only compatibility view.
+   */
+  guards?: Credential[];
   networkId?: NetworkId;
   update?: Update;
   auxiliaryDataHash?: Crypto.Hash32ByteBase16;
@@ -76,6 +98,18 @@ export interface HydratedTxBody {
   proposalProcedures?: ProposalProcedure[];
   treasuryValue?: Lovelace;
   donation?: Lovelace;
+
+  /**
+   * Direct deposits (Dijkstra body key 25): coin deposited directly into reward accounts
+   * without a withdrawal-style witness. Non-empty when present.
+   */
+  directDeposits?: Withdrawal[];
+
+  /**
+   * Account balance intervals (Dijkstra body key 26): asserts that each credential's account
+   * balance lies in a half-open range at validation time. Non-empty when present.
+   */
+  accountBalanceIntervals?: AccountBalanceIntervalEntry[];
 }
 
 export interface TxBody extends Omit<HydratedTxBody, 'certificates' | 'inputs' | 'collaterals' | 'referenceInputs'> {
@@ -83,6 +117,51 @@ export interface TxBody extends Omit<HydratedTxBody, 'certificates' | 'inputs' |
   collaterals?: TxIn[];
   inputs: TxIn[];
   referenceInputs?: TxIn[];
+
+  /**
+   * Sub transactions (Dijkstra body key 23, CIP-0118 nested transactions): the ordered set of
+   * sub transactions carried by this top-level transaction, keyed by each sub transaction's own
+   * id with duplicates rejected. Non-empty when present and admitted only on a top-level body.
+   */
+  // eslint-disable-next-line no-use-before-define
+  subTransactions?: SubTransaction[];
+}
+
+export interface RequiredTopLevelGuardEntry {
+  credential: Credential;
+
+  /**
+   * Datum the enclosing transaction must supply the guard with, or null when the guard carries
+   * no datum (CBOR nil on the wire, used for key-hash and native-script guards).
+   */
+  datum: PlutusData | null;
+}
+
+/**
+ * Body of a Dijkstra sub transaction (CIP-0118 nested transactions). Reuses the top-level
+ * transaction body fields but has no fee, collateral or update fields -- the enclosing
+ * transaction pays the fee and posts collateral for the whole batch -- and adds
+ * requiredTopLevelGuards.
+ */
+export interface SubTransactionBody
+  extends Omit<TxBody, 'fee' | 'collaterals' | 'collateralReturn' | 'totalCollateral' | 'update' | 'subTransactions'> {
+  /**
+   * Guards the enclosing transaction must carry (Dijkstra sub body key 24), each with the
+   * datum it must be supplied with. Non-empty when present.
+   */
+  requiredTopLevelGuards?: RequiredTopLevelGuardEntry[];
+}
+
+/**
+ * A Dijkstra sub transaction (CIP-0118 nested transactions): a sub transaction body plus its
+ * witness set and optional auxiliary data. Unlike a top-level Tx there is no is_valid flag; the
+ * enclosing transaction's flag covers the whole batch.
+ */
+export interface SubTransaction {
+  body: SubTransactionBody;
+  // eslint-disable-next-line no-use-before-define
+  witness: Witness;
+  auxiliaryData?: AuxiliaryData;
 }
 
 export enum InputSource {
@@ -96,7 +175,8 @@ export enum RedeemerPurpose {
   certificate = 'certificate',
   withdrawal = 'withdrawal',
   propose = 'propose',
-  vote = 'vote'
+  vote = 'vote',
+  guarding = 'guarding'
 }
 
 export interface Redeemer {
@@ -134,10 +214,8 @@ export interface Tx<TBody extends TxBody = TxBody> {
   witness: Witness;
   auxiliaryData?: AuxiliaryData;
   /**
-   * Transactions containing Plutus scripts that are expected to fail validation can still be submitted if
-   * this value is set to false.
-   *
-   * Remark: Sending transactions with invalid scripts will cause the collateral of the transaction to be lost.
+   * Phase-2 validation flag. Deprecated in the Dijkstra era: the SDK never sets false when
+   * authoring, but transactions decoded from chain data surface the on-chain value.
    */
   isValid?: boolean;
 }

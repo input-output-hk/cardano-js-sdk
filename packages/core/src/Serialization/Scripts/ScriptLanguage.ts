@@ -7,5 +7,6 @@ export enum ScriptLanguage {
   Native = 0,
   PlutusV1 = 1,
   PlutusV2 = 2,
-  PlutusV3 = 3
+  PlutusV3 = 3,
+  PlutusV4 = 4
 }

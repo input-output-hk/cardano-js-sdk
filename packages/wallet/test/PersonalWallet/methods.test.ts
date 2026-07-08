@@ -15,7 +15,8 @@ import {
   Serialization,
   TxSubmissionError,
   TxSubmissionErrorCode,
-  ValueNotConservedData
+  ValueNotConservedData,
+  setInConwayEra
 } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
@@ -417,7 +418,7 @@ describe('BaseWallet methods', () => {
         // expect(tx.toCbor()).toEqual(geniusYieldTx.toCbor());
       });
 
-      it('uses the complete transaction CBOR, ignoring auxiliaryData, witness and isValid', async () => {
+      it('uses the complete transaction CBOR, ignoring auxiliaryData and witness', async () => {
         const sender = { url: 'https://lace.io' };
         await wallet.finalizeTx({
           auxiliaryData: 'ignored auxiliary data' as Cardano.AuxiliaryData,
@@ -714,7 +715,10 @@ describe('BaseWallet methods', () => {
   });
 
   describe('addSignatures', () => {
-    it('adds the signatures and preserves all previous witnesses', async () => {
+    beforeEach(() => setInConwayEra(false));
+    afterEach(() => setInConwayEra(true));
+
+    it('adds the signatures and preserves all previous witnesses (pre-Conway pin: fixture id hashes untagged encoding)', async () => {
       const mockWitnesser = {
         signData: jest.fn(),
         witness: jest.fn().mockResolvedValue({

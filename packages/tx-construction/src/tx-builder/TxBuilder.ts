@@ -513,8 +513,6 @@ export class GenericTxBuilder implements TxBuilder {
             ctx.auxiliaryData ? Serialization.AuxiliaryData.fromCore(ctx.auxiliaryData) : undefined
           );
 
-          if (ctx.isValid !== undefined) transaction.setIsValid(ctx.isValid);
-
           const signingOptions = { ...ctx.signingOptions, stubSign: false };
           const signingContext = ctx.signingContext;
 

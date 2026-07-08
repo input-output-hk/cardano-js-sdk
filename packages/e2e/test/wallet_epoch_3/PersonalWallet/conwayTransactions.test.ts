@@ -2,7 +2,7 @@
 
 import * as Crypto from '@cardano-sdk/crypto';
 import { BaseWallet } from '@cardano-sdk/wallet';
-import { Cardano, StakePoolProvider, setInConwayEra } from '@cardano-sdk/core';
+import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
 import { logger } from '@cardano-sdk/util-dev';
 
 import { firstValueFrom, map } from 'rxjs';
@@ -232,9 +232,6 @@ describe('PersonalWallet/conwayTransactions', () => {
   };
 
   beforeAll(async () => {
-    // TODO: remove once mainnet hardforks to conway-era, and this becomes "the norm"
-    setInConwayEra(true);
-
     [
       {
         wallet,
@@ -262,9 +259,6 @@ describe('PersonalWallet/conwayTransactions', () => {
 
     wallet.shutdown();
     dRepWallet.shutdown();
-
-    // TODO: remove once mainnet hardforks to conway-era, and this becomes "the norm"
-    setInConwayEra(false);
   });
 
   it('can register a stake key and delegate stake using a combo certificate', async () => {

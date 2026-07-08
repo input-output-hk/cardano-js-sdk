@@ -11,6 +11,15 @@ const alonzoCbor = HexBlob(
   'd90103a400a11902d5a4187b1904d2636b65796576616c7565646b65793246000102030405a1190237656569676874a119029a6463616b6501848204038205098202818200581c3542acb3a64d80c29302260d62c3b87a742ad14abf855ebc6733081e830300818200581cb5ae663aaea8e500157bdf4baafd6f5ba0ce5759f7cd4101fc132f540284474601000022001047460100002200114746010000220012474601000022001303844746010000220010474601000022001147460100002200124746010000220013'
 );
 
+const metadataCborHex =
+  'a11902d5a4187b1904d2636b65796576616c7565646b65793246000102030405a1190237656569676874a119029a6463616b65';
+
+const dijkstraV4Cbor = HexBlob(`d90103a200${metadataCborHex}058247460100002200104746010000220011`);
+
+const dijkstraV3V4Cbor = HexBlob(
+  `d90103a300${metadataCborHex}048247460100002200104746010000220011058247460100002200124746010000220013`
+);
+
 const metadatum = new Map<Cardano.Metadatum, Cardano.Metadatum>([
   [123n, 1234n],
   ['key', 'value'],
@@ -111,6 +120,42 @@ const alonzoScripts: Array<Cardano.Script> = [
   }
 ];
 
+const dijkstraV4Scripts: Array<Cardano.Script> = [
+  {
+    __type: Cardano.ScriptType.Plutus,
+    bytes: HexBlob('46010000220010'),
+    version: Cardano.PlutusLanguageVersion.V4
+  },
+  {
+    __type: Cardano.ScriptType.Plutus,
+    bytes: HexBlob('46010000220011'),
+    version: Cardano.PlutusLanguageVersion.V4
+  }
+];
+
+const dijkstraV3V4Scripts: Array<Cardano.Script> = [
+  {
+    __type: Cardano.ScriptType.Plutus,
+    bytes: HexBlob('46010000220010'),
+    version: Cardano.PlutusLanguageVersion.V3
+  },
+  {
+    __type: Cardano.ScriptType.Plutus,
+    bytes: HexBlob('46010000220011'),
+    version: Cardano.PlutusLanguageVersion.V3
+  },
+  {
+    __type: Cardano.ScriptType.Plutus,
+    bytes: HexBlob('46010000220012'),
+    version: Cardano.PlutusLanguageVersion.V4
+  },
+  {
+    __type: Cardano.ScriptType.Plutus,
+    bytes: HexBlob('46010000220013'),
+    version: Cardano.PlutusLanguageVersion.V4
+  }
+];
+
 const shelleyCore: Cardano.AuxiliaryData = {
   blob: new Map([[725n, metadatum]]),
   scripts: shelleyScripts
@@ -119,6 +164,16 @@ const shelleyCore: Cardano.AuxiliaryData = {
 const alonzoCore: Cardano.AuxiliaryData = {
   blob: new Map([[725n, metadatum]]),
   scripts: alonzoScripts
+};
+
+const dijkstraV4Core: Cardano.AuxiliaryData = {
+  blob: new Map([[725n, metadatum]]),
+  scripts: dijkstraV4Scripts
+};
+
+const dijkstraV3V4Core: Cardano.AuxiliaryData = {
+  blob: new Map([[725n, metadatum]]),
+  scripts: dijkstraV3V4Scripts
 };
 
 describe('AuxiliaryData', () => {
@@ -143,6 +198,53 @@ describe('AuxiliaryData', () => {
     it('can encode TransactionWitnessSet to Core', () => {
       const data = Serialization.AuxiliaryData.fromCbor(alonzoCbor);
       expect(data.toCore()).toEqual(alonzoCore);
+    });
+  });
+
+  describe('Dijkstra auxiliary data with plutus v4 scripts', () => {
+    it('can encode AuxiliaryData with plutus v4 scripts at map key 5 to CBOR', () => {
+      const data = Serialization.AuxiliaryData.fromCore(dijkstraV4Core);
+      expect(data.toCbor()).toEqual(dijkstraV4Cbor);
+    });
+
+    it('can decode AuxiliaryData with plutus v4 scripts at map key 5 to Core', () => {
+      const data = Serialization.AuxiliaryData.fromCbor(dijkstraV4Cbor);
+      expect(data.toCore()).toEqual(dijkstraV4Core);
+    });
+
+    it('round trips plutus v4 auxiliary data byte-exact through decode and re-encode', () => {
+      const data = Serialization.AuxiliaryData.fromCbor(dijkstraV4Cbor);
+      data.setPlutusV4Scripts(data.plutusV4Scripts()!);
+      expect(data.toCbor()).toEqual(dijkstraV4Cbor);
+    });
+
+    it('can encode AuxiliaryData with both plutus v3 and v4 script lists to CBOR', () => {
+      const data = Serialization.AuxiliaryData.fromCore(dijkstraV3V4Core);
+      expect(data.toCbor()).toEqual(dijkstraV3V4Cbor);
+    });
+
+    it('can decode AuxiliaryData with both plutus v3 and v4 script lists to Core', () => {
+      const data = Serialization.AuxiliaryData.fromCbor(dijkstraV3V4Cbor);
+      expect(data.toCore()).toEqual(dijkstraV3V4Core);
+    });
+
+    it('round trips v3 plus v4 auxiliary data byte-exact through decode and re-encode', () => {
+      const data = Serialization.AuxiliaryData.fromCbor(dijkstraV3V4Cbor);
+      data.setPlutusV4Scripts(data.plutusV4Scripts()!);
+      expect(data.toCbor()).toEqual(dijkstraV3V4Cbor);
+    });
+
+    it('preserves toCore/fromCore symmetry for plutus v4 scripts', () => {
+      expect(Serialization.AuxiliaryData.fromCore(dijkstraV4Core).toCore()).toEqual(dijkstraV4Core);
+      expect(Serialization.AuxiliaryData.fromCore(dijkstraV3V4Core).toCore()).toEqual(dijkstraV3V4Core);
+    });
+
+    it('exposes decoded plutus v4 scripts via the plutusV4Scripts getter', () => {
+      const data = Serialization.AuxiliaryData.fromCbor(dijkstraV4Cbor);
+      const scripts = data.plutusV4Scripts();
+      expect(scripts).toHaveLength(2);
+      expect(scripts![0].rawBytes()).toEqual(HexBlob('46010000220010'));
+      expect(scripts![1].rawBytes()).toEqual(HexBlob('46010000220011'));
     });
   });
 

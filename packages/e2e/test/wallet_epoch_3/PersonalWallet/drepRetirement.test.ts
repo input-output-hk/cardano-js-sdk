@@ -2,7 +2,7 @@
 
 import * as Crypto from '@cardano-sdk/crypto';
 import { BaseWallet } from '@cardano-sdk/wallet';
-import { Cardano, StakePoolProvider, setInConwayEra } from '@cardano-sdk/core';
+import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
 import { logger } from '@cardano-sdk/util-dev';
 
 import { filter, firstValueFrom, map } from 'rxjs';
@@ -151,9 +151,6 @@ describe('PersonalWallet/drepRetirement', () => {
   };
 
   beforeAll(async () => {
-    // TODO: remove once mainnet hardforks to conway-era, and this becomes "the norm"
-    setInConwayEra(true);
-
     [
       {
         wallet: delegatingWallet,
@@ -204,9 +201,6 @@ describe('PersonalWallet/drepRetirement', () => {
     delegatingWallet.shutdown();
     dRepWallet1.shutdown();
     dRepWallet2.shutdown();
-
-    // TODO: remove once mainnet hardforks to conway-era, and this becomes "the norm"
-    setInConwayEra(false);
   });
 
   it('emits drepDelegatees after delegating voting power', async () => {

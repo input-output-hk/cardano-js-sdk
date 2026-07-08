@@ -1,4 +1,5 @@
 export * from './Transaction';
+export * from './SubTransaction';
 export * from './Scripts';
 export * from './Common';
 export * from './PlutusData';

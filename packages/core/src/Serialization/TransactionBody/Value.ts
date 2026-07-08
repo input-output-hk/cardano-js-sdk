@@ -28,9 +28,11 @@ export class Value {
     this.#coin = coin;
 
     // We need to segregate the token map as a multiasset to be able to sort it correctly in canonical form.
-    this.#multiasset = multiasset
-      ? multiAssetsToTokenMap(new Map([...tokenMapToMultiAsset(multiasset!).entries()].sort(sortCanonically)))
-      : undefined;
+    // An empty token map normalizes to undefined; multiasset must be non-empty per the Dijkstra CDDL.
+    this.#multiasset =
+      multiasset && multiasset.size > 0
+        ? multiAssetsToTokenMap(new Map([...tokenMapToMultiAsset(multiasset).entries()].sort(sortCanonically)))
+        : undefined;
   }
 
   /**
@@ -42,7 +44,8 @@ export class Value {
     if (this.#originalBytes) return this.#originalBytes;
 
     // CDDL
-    // value = coin / [coin, multiasset<uint>]
+    // value = coin / [coin, multiasset<positive_coin>]
+    // multiasset<a0> = {+ policy_id => {+ asset_name => a0}}
     const writer = new CborWriter();
 
     if (!this.#multiasset || this.#multiasset.size <= 0) {
@@ -182,9 +185,11 @@ export class Value {
    */
   setMultiasset(multiasset: Cardano.TokenMap): void {
     // We need to segregate the token map as a multiasset to be able to sort it correctly in canonical form.
-    this.#multiasset = multiAssetsToTokenMap(
-      new Map([...tokenMapToMultiAsset(multiasset!).entries()].sort(sortCanonically))
-    );
+    // An empty token map normalizes to undefined; multiasset must be non-empty per the Dijkstra CDDL.
+    this.#multiasset =
+      multiasset.size > 0
+        ? multiAssetsToTokenMap(new Map([...tokenMapToMultiAsset(multiasset).entries()].sort(sortCanonically)))
+        : undefined;
 
     this.#originalBytes = undefined;
   }

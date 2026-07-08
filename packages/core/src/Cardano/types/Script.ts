@@ -1,5 +1,6 @@
 /* eslint-disable no-use-before-define */
 import * as Crypto from '@cardano-sdk/crypto';
+import { Credential } from '../Address';
 import { HexBlob } from '@cardano-sdk/util';
 import { Slot } from './Block';
 
@@ -16,7 +17,8 @@ export enum NativeScriptKind {
   RequireAnyOf = 2,
   RequireNOf = 3,
   RequireTimeAfter = 4,
-  RequireTimeBefore = 5
+  RequireTimeBefore = 5,
+  RequireGuard = 6
 }
 
 /**
@@ -122,6 +124,21 @@ export interface RequireTimeAfterScript {
 }
 
 /**
+ * This script evaluates to true if the given credential is present in the guards of the
+ * transaction body (Dijkstra era onwards).
+ */
+export interface RequireGuardScript {
+  /** Script type. */
+  __type: ScriptType.Native;
+
+  /** The credential that must be present in the transaction body guards. */
+  credential: Credential;
+
+  /** The native script kind. */
+  kind: NativeScriptKind.RequireGuard;
+}
+
+/**
  * The Native scripts form an expression tree, the evaluation of the script produces either true or false.
  *
  * Note that it is recursive. There are no constraints on the nesting or size, except that imposed by the overall
@@ -133,7 +150,8 @@ export type NativeScript =
   | RequireAnyOfScript
   | RequireAtLeastScript
   | RequireTimeBeforeScript
-  | RequireTimeAfterScript;
+  | RequireTimeAfterScript
+  | RequireGuardScript;
 
 /**
  * The Cardano ledger tags scripts with a language that determines what the ledger will do with the script.
@@ -166,7 +184,10 @@ export enum PlutusLanguageVersion {
    *
    * - The value of costmdls map at key 2 is encoded as a definite length list.
    */
-  V3 = 2
+  V3 = 2,
+
+  /** V4 was introduced in the Dijkstra hard fork. */
+  V4 = 3
 }
 
 /**

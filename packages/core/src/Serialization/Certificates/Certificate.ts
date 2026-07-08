@@ -368,6 +368,9 @@ export class Certificate {
    * Gets a Certificate from a StakeRegistration instance.
    *
    * @param stakeRegistration The StakeRegistration instance to 'cast' to Certificate.
+   * @deprecated Kind 0 is removed from the certificate union in the Dijkstra era (protocol
+   * version 12). Use newRegistrationCert (kind 7) with an explicit deposit for new transactions.
+   * Retained for round-tripping historical chain data.
    */
   static newStakeRegistration(stakeRegistration: StakeRegistration): Certificate {
     const cert = new Certificate();
@@ -381,6 +384,9 @@ export class Certificate {
    * Gets a Certificate from a StakeDeregistration instance.
    *
    * @param stakeDeregistration The StakeDeregistration instance to 'cast' to Certificate.
+   * @deprecated Kind 1 is removed from the certificate union in the Dijkstra era (protocol
+   * version 12). Use newUnregistrationCert (kind 8) with an explicit deposit for new transactions.
+   * Retained for round-tripping historical chain data.
    */
   static newStakeDeregistration(stakeDeregistration: StakeDeregistration): Certificate {
     const cert = new Certificate();

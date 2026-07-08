@@ -359,6 +359,21 @@ const getNativeScriptKeyPaths = (
       case Cardano.NativeScriptKind.RequireTimeBefore:
       case Cardano.NativeScriptKind.RequireTimeAfter:
         return { derivationPaths: [], requiresForeignSignatures: false };
+      case Cardano.NativeScriptKind.RequireGuard: {
+        // Guards are witnessed at the transaction body level (key 14); key-hash guards also
+        // surface through requiredExtraSignatures. Checking own addresses here is defensive.
+        const guardScript = script as Cardano.RequireGuardScript;
+        return guardScript.credential.type === Cardano.CredentialType.KeyHash
+          ? processSignatureScript(
+              {
+                __type: Cardano.ScriptType.Native,
+                keyHash: guardScript.credential.hash as unknown as Crypto.Ed25519KeyHashHex,
+                kind: Cardano.NativeScriptKind.RequireSignature
+              },
+              groupedAddresses
+            )
+          : { derivationPaths: [], requiresForeignSignatures: false };
+      }
     }
   };
 

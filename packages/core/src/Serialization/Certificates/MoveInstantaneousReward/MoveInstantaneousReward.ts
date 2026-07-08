@@ -18,6 +18,10 @@ const EMBEDDED_GROUP_SIZE = 2;
  *
  * The MoveInstantaneousReward certificate allows for immediate redistribution of rewards
  * within pots, or to a specified se of stake addresses.
+ *
+ * @deprecated Deprecated since the Conway era and removed from the certificate union in the
+ * Dijkstra era; the ledger no longer decodes it. This SDK retains it for decoding historical
+ * chain data.
  */
 export class MoveInstantaneousReward {
   #toOtherPot: MoveInstantaneousRewardToOtherPot | undefined;

@@ -647,26 +647,20 @@ export class BaseWallet implements ObservableWallet {
     signingOptions,
     signingContext,
     auxiliaryData,
-    isValid,
     witness
   }: FinalizeTxProps): Promise<Cardano.Tx> {
     const knownAddresses = await firstValueFrom(this.addresses$);
     const dRepPublicKey = await this.governance.getPubDRepKey();
     const emptyWitness = { signatures: new Map() };
 
-    let transaction: Serialization.Transaction;
-    if (isTxBodyWithHash(tx)) {
-      // Reconstruct transaction from parts
-      transaction = new Serialization.Transaction(
-        bodyCbor ? Serialization.TransactionBody.fromCbor(bodyCbor) : Serialization.TransactionBody.fromCore(tx.body),
-        Serialization.TransactionWitnessSet.fromCore({ ...emptyWitness, ...witness }),
-        auxiliaryData ? Serialization.AuxiliaryData.fromCore(auxiliaryData) : undefined
-      );
-      if (isValid !== undefined) transaction.setIsValid(isValid);
-    } else {
-      // Transaction CBOR is available. Use as is.
-      transaction = Serialization.Transaction.fromCbor(tx);
-    }
+    // Reconstruct the transaction from parts, or use the transaction CBOR as is when available.
+    const transaction = isTxBodyWithHash(tx)
+      ? new Serialization.Transaction(
+          bodyCbor ? Serialization.TransactionBody.fromCbor(bodyCbor) : Serialization.TransactionBody.fromCore(tx.body),
+          Serialization.TransactionWitnessSet.fromCore({ ...emptyWitness, ...witness }),
+          auxiliaryData ? Serialization.AuxiliaryData.fromCore(auxiliaryData) : undefined
+        )
+      : Serialization.Transaction.fromCbor(tx);
 
     const txWitness = transaction.witnessSet().toCore();
     const context = {

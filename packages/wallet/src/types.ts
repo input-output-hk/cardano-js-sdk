@@ -50,7 +50,7 @@ export interface SyncStatus extends Shutdown {
 }
 
 /**
- * If tx is the transaction CBOR, the auxiliary data, witness and isValid properties are ignored.
+ * If tx is the transaction CBOR, the auxiliary data and witness properties are ignored.
  * If tx is `Cardano.TxBodyWithHash`, the transaction is reconstructed from along with the other
  * provided properties.
  */

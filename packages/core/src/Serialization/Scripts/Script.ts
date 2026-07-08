@@ -3,7 +3,7 @@ import { CborReader, CborWriter } from '../CBOR';
 import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
 import { NativeScript } from './NativeScript';
 import { PlutusLanguageVersion, isNativeScript } from '../../Cardano/types/Script';
-import { PlutusV1Script, PlutusV2Script, PlutusV3Script } from './PlutusScript';
+import { PlutusV1Script, PlutusV2Script, PlutusV3Script, PlutusV4Script } from './PlutusScript';
 import { ScriptLanguage } from './ScriptLanguage';
 import type * as Cardano from '../../Cardano';
 
@@ -15,6 +15,7 @@ export class Script {
   #plutusV1: PlutusV1Script | undefined;
   #plutusV2: PlutusV2Script | undefined;
   #plutusV3: PlutusV3Script | undefined;
+  #plutusV4: PlutusV4Script | undefined;
   #language: ScriptLanguage;
   #originalBytes: HexBlob | undefined = undefined;
 
@@ -27,7 +28,7 @@ export class Script {
     if (this.#originalBytes) return this.#originalBytes;
 
     // CDDL
-    // script = [ 0, native_script // 1, plutus_v1_script // 2, plutus_v2_script // 3, plutus_v3_script ]
+    // script = [ 0, native_script // 1, plutus_v1_script // 2, plutus_v2_script // 3, plutus_v3_script // 4, plutus_v4_script ]
     const writer = new CborWriter();
 
     let cbor;
@@ -44,6 +45,9 @@ export class Script {
         break;
       case ScriptLanguage.PlutusV3:
         cbor = this.#plutusV3!.toCbor();
+        break;
+      case ScriptLanguage.PlutusV4:
+        cbor = this.#plutusV4!.toCbor();
         break;
       default:
         throw new InvalidStateError(`Unexpected language value: ${this.#language}`);
@@ -85,6 +89,9 @@ export class Script {
       case ScriptLanguage.PlutusV3:
         script = Script.newPlutusV3Script(PlutusV3Script.fromCbor(innerScript));
         break;
+      case ScriptLanguage.PlutusV4:
+        script = Script.newPlutusV4Script(PlutusV4Script.fromCbor(innerScript));
+        break;
       default:
         throw new InvalidStateError(`Unexpected language value: ${language}`);
     }
@@ -115,6 +122,9 @@ export class Script {
       case ScriptLanguage.PlutusV3:
         core = this.#plutusV3!.toCore();
         break;
+      case ScriptLanguage.PlutusV4:
+        core = this.#plutusV4!.toCore();
+        break;
       default:
         throw new InvalidStateError(`Unexpected language: ${this.#language}`);
     }
@@ -142,6 +152,9 @@ export class Script {
           break;
         case PlutusLanguageVersion.V3:
           script = Script.newPlutusV3Script(PlutusV3Script.fromCore(coreScript));
+          break;
+        case PlutusLanguageVersion.V4:
+          script = Script.newPlutusV4Script(PlutusV4Script.fromCore(coreScript));
           break;
         default:
           throw new InvalidStateError('Unexpected Plutus language version'); // Shouldn't happen.
@@ -217,6 +230,20 @@ export class Script {
   }
 
   /**
+   * Gets a Script from a PlutusV4 instance.
+   *
+   * @param plutusV4Script The PlutusV4Script instance to 'cast' to Script.
+   */
+  static newPlutusV4Script(plutusV4Script: PlutusV4Script): Script {
+    const script = new Script();
+
+    script.#plutusV4 = plutusV4Script;
+    script.#language = ScriptLanguage.PlutusV4;
+
+    return script;
+  }
+
+  /**
    * Gets a NativeScript from a Script instance.
    *
    * @returns a NativeScript if the script can be down cast, otherwise, undefined.
@@ -253,6 +280,15 @@ export class Script {
   }
 
   /**
+   * Gets a PlutusV4Script from a Script instance.
+   *
+   * @returns a PlutusV4Script if the script can be down cast, otherwise, undefined.
+   */
+  asPlutusV4(): PlutusV4Script | undefined {
+    return this.#plutusV4;
+  }
+
+  /**
    * Computes the script hash of this script.
    *
    * @returns the script hash.
@@ -271,6 +307,9 @@ export class Script {
         break;
       case ScriptLanguage.PlutusV3:
         hash = this.#plutusV3!.hash();
+        break;
+      case ScriptLanguage.PlutusV4:
+        hash = this.#plutusV4!.hash();
         break;
       default:
         throw new InvalidStateError(`Unexpected script language ${this.#language}`); // Shouldn't happen.

@@ -75,7 +75,7 @@ export class PoolMetadata {
       );
 
     const url = reader.readTextString();
-    const hash = Crypto.Hash32ByteBase16(HexBlob.fromBytes(reader.readByteString()));
+    const hash = HexBlob.fromBytes(reader.readByteString()) as unknown as Crypto.Hash32ByteBase16;
 
     reader.readEndArray();
 

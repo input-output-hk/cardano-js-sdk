@@ -30,6 +30,7 @@ export class Transaction {
   #body: TransactionBody;
   #witnessSet: TransactionWitnessSet;
   #auxiliaryData: AuxiliaryData | undefined;
+  // No public setter: authored transactions always carry true; decode and fromCore preserve it.
   #isValid = true;
   // If the transaction object is constructed from a CBOR byte array, we are going to remember it and use it
   // when the object is re-serialized again to avoid changing the transaction during a round trip serialization.
@@ -63,12 +64,16 @@ export class Transaction {
     if (this.#originalBytes) return this.#originalBytes;
 
     // CDDL
-    // transaction =
+    // transaction_mempool =
+    //   transaction /
     //   [ transaction_body
     //   , transaction_witness_set
-    //   , bool
-    //   , auxiliary_data / null
+    //   , true
+    //   , auxiliary_data / nil
     //   ]
+    //
+    // is_valid is deprecated in the Dijkstra era; the 4-element grace-period frame is only
+    // legal with the literal value true, which stays byte-compatible with Conway consumers.
     writer.writeStartArray(ALONZO_ERA_TX_FRAME_SIZE);
     writer.writeEncodedValue(hexToBytes(this.#body.toCbor()));
     writer.writeEncodedValue(hexToBytes(this.#witnessSet.toCbor()));
@@ -100,12 +105,11 @@ export class Transaction {
     const body = TransactionBody.fromCbor(HexBlob.fromBytes(bodyBytes), options);
 
     const witnessSet = TransactionWitnessSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()), options);
-    let isValid = true;
 
-    // The isValid flag was added in Alonzo era (onwards), mary era transactions only have three fields.
-    if (length === ALONZO_ERA_TX_FRAME_SIZE) {
-      isValid = reader.readBoolean();
-    }
+    // The is_valid flag was added in Alonzo; Mary era transactions only have three fields.
+    // Alonzo through Conway record false for phase-2 failed transactions, so decode is permissive.
+    let isValid = true;
+    if (length === ALONZO_ERA_TX_FRAME_SIZE) isValid = reader.readBoolean();
 
     let auxData;
     if (reader.peekState() !== CborReaderState.Null)
@@ -151,7 +155,7 @@ export class Transaction {
       tx.auxiliaryData ? AuxiliaryData.fromCore(tx.auxiliaryData) : undefined
     );
 
-    if (typeof tx.isValid !== 'undefined') transaction.setIsValid(tx.isValid);
+    if (typeof tx.isValid !== 'undefined') transaction.#isValid = tx.isValid;
 
     return transaction;
   }
@@ -197,27 +201,15 @@ export class Transaction {
   }
 
   /**
-   * Gets whether the Transaction is expected to fail Plutus scripts validations or not.
+   * Gets the transaction is_valid flag.
    *
-   * A transaction with this flag on false, can still be submitted to the blockchain.
+   * The flag is deprecated in the Dijkstra era; it has no setter and authored transactions
+   * always carry true. Transactions decoded from chain data surface the on-chain value.
    *
-   * @returns <tt>true</tt> if the transaction is expected to fail validation; otherwise, <tt>false</tt>.
+   * @returns The is_valid flag.
    */
   isValid(): boolean {
     return this.#isValid;
-  }
-
-  /**
-   * Sets the valid flag on the transaction.
-   *
-   * Transactions containing Plutus scripts that are expected to fail validation can still be submitted if
-   * this value is set to false.
-   *
-   * Remark: Sending transactions with invalid scripts will cause the collateral of the transaction to be lost.
-   */
-  setIsValid(valid: boolean): void {
-    this.#originalBytes = undefined;
-    this.#isValid = valid;
   }
 
   /**

@@ -1,8 +1,9 @@
 import { CborReader, CborWriter } from '../CBOR';
-import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import { HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
 import type * as Cardano from '../../Cardano';
 
 const PROTOCOL_VERSION_ARRAY_SIZE = 2;
+const MAX_MINOR_PROTOCOL_VERSION = 4_294_967_295;
 
 /**
  * The protocol can be thought of as the set of rules that nodes in the network agree to follow,
@@ -37,10 +38,13 @@ export class ProtocolVersion {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    if (!Number.isInteger(this.#minor) || this.#minor < 0 || this.#minor > MAX_MINOR_PROTOCOL_VERSION)
+      throw new InvalidStateError(
+        `Minor protocol version must be a uint of size 4 (0 to ${MAX_MINOR_PROTOCOL_VERSION}), but got ${this.#minor}`
+      );
+
     // CDDL
-    // next_major_protocol_version = 10
-    // major_protocol_version = 1..next_major_protocol_version
-    // protocol_version = [(major_protocol_version, uint32)]
+    // protocol_version = [major_protocol_version, uint .size 4]
     writer.writeStartArray(PROTOCOL_VERSION_ARRAY_SIZE);
     writer.writeInt(this.#major);
     writer.writeInt(this.#minor);

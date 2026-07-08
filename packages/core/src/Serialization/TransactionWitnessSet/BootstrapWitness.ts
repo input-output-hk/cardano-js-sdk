@@ -5,7 +5,20 @@ import { hexToBytes } from '../../util/misc';
 import type * as Cardano from '../../Cardano';
 
 const BOOTSTRAP_WITNESS_ARRAY_SIZE = 4;
+const CHAIN_CODE_SIZE = 32;
 const EMPTY_ATTRIBUTES_CBOR = HexBlob('a0');
+
+/**
+ * Asserts that a bootstrap witness chain code is exactly 32 bytes, as required by
+ * the Dijkstra CDDL (chain_code : bytes .size 32).
+ *
+ * @param chainCode The chain code to validate.
+ */
+const assertChainCodeSize = (chainCode: HexBlob) => {
+  const size = chainCode.length / 2;
+  if (size !== CHAIN_CODE_SIZE)
+    throw new InvalidStateError(`chainCode is expected to be ${CHAIN_CODE_SIZE} bytes in size, but got ${size}`);
+};
 
 /**
  * The bootstrap witness proves that the transaction has the authority to spend
@@ -53,8 +66,7 @@ export class BootstrapWitness {
 
     if (this.#originalBytes) return this.#originalBytes;
 
-    if (this.#chainCode.length / 2 !== 32)
-      throw new InvalidStateError(`Chaincode must be 32 bytes long, but got ${this.#chainCode.length / 2} bytes long`);
+    assertChainCodeSize(this.#chainCode);
 
     // CDDL
     // bootstrap_witness =
@@ -91,6 +103,8 @@ export class BootstrapWitness {
 
     const vkey = HexBlob.fromBytes(reader.readByteString()) as unknown as Crypto.Ed25519PublicKeyHex;
     const signature = HexBlob.fromBytes(reader.readByteString()) as unknown as Crypto.Ed25519SignatureHex;
+    // Decoding is intentionally permissive: cardano-ledger Bootstrap.hs only rejects
+    // non-32-byte chain codes for decoder version >= 12, and historical data must remain readable.
     const chainCode = HexBlob.fromBytes(reader.readByteString());
     const attributes = HexBlob.fromBytes(reader.readByteString());
 
@@ -129,8 +143,7 @@ export class BootstrapWitness {
 
     if (!core.chainCode) throw new InvalidStateError('Chaincode must be present');
 
-    if (core.chainCode.length / 2 !== 32)
-      throw new InvalidStateError(`Chaincode must be 32 bytes long, but got ${core.chainCode.length / 2} bytes long`);
+    assertChainCodeSize(core.chainCode);
 
     return new BootstrapWitness(
       core.key,
@@ -193,8 +206,7 @@ export class BootstrapWitness {
    * @param chainCode The chain code.
    */
   setChainCode(chainCode: HexBlob) {
-    if (chainCode.length / 2 !== 32)
-      throw new InvalidStateError(`Chaincode must be 32 bytes long, but got ${chainCode.length / 2} bytes long`);
+    assertChainCodeSize(chainCode);
 
     this.#chainCode = chainCode;
     this.#originalBytes = undefined;

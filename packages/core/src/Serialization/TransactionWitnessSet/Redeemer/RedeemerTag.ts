@@ -10,6 +10,7 @@
  *   / 3 ; Rewarding
  *   / 4 ; Voting
  *   / 5 ; Proposing
+ *   / 6 ; Guarding
  */
 export enum RedeemerTag {
   /** Indicates the redeemer is for spending a UTxO. */
@@ -21,5 +22,7 @@ export enum RedeemerTag {
   /** Indicates the redeemer is for withdrawing rewards from staking. */
   Reward = 3,
   Voting = 4,
-  Proposing = 5
+  Proposing = 5,
+  /** Indicates the redeemer is for a script-hash guard in the transaction body. */
+  Guarding = 6
 }
