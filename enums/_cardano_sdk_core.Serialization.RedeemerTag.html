@@ -28,10 +28,11 @@ redeemer_tag =
   / 2 ; Certifying
   / 3 ; Rewarding
   / 4 ; Voting
-  / 5 ; Proposing</p>
+  / 5 ; Proposing
+  / 6 ; Guarding</p>
 </div></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/545a7f5/packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts#L14">packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts:14</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/af56265/packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts#L15">packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts:15</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -40,6 +41,7 @@ redeemer_tag =
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Enumeration Members</h3>
 <div class="tsd-index-list"><a href="_cardano_sdk_core.Serialization.RedeemerTag.html#Cert" class="tsd-index-link tsd-kind-enum-member tsd-parent-kind-enum"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF984D" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-1024-path"></rect><path d="M9.354 16V7.24H12.174C12.99 7.24 13.638 7.476 14.118 7.948C14.606 8.412 14.85 9.036 14.85 9.82C14.85 10.604 14.606 11.232 14.118 11.704C13.638 12.168 12.99 12.4 12.174 12.4H10.434V16H9.354ZM10.434 11.428H12.174C12.646 11.428 13.022 11.284 13.302 10.996C13.59 10.7 13.734 10.308 13.734 9.82C13.734 9.324 13.59 8.932 13.302 8.644C13.022 8.356 12.646 8.212 12.174 8.212H10.434V11.428Z" fill="var(--color-text)" id="icon-1024-text"></path></svg><span>Cert</span></a>
+<a href="_cardano_sdk_core.Serialization.RedeemerTag.html#Guarding" class="tsd-index-link tsd-kind-enum-member tsd-parent-kind-enum"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>Guarding</span></a>
 <a href="_cardano_sdk_core.Serialization.RedeemerTag.html#Mint" class="tsd-index-link tsd-kind-enum-member tsd-parent-kind-enum"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>Mint</span></a>
 <a href="_cardano_sdk_core.Serialization.RedeemerTag.html#Proposing" class="tsd-index-link tsd-kind-enum-member tsd-parent-kind-enum"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>Proposing</span></a>
 <a href="_cardano_sdk_core.Serialization.RedeemerTag.html#Reward" class="tsd-index-link tsd-kind-enum-member tsd-parent-kind-enum"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>Reward</span></a>
@@ -54,38 +56,45 @@ redeemer_tag =
 <div class="tsd-comment tsd-typography"><p>Indicates the redeemer is related to a certificate action within a transaction.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/545a7f5/packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts#L20">packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts:20</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/af56265/packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts#L21">packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts:21</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum"><a id="Guarding" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>Guarding</span><a href="#Guarding" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<div class="tsd-signature">Guarding<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">6</span></div>
+<div class="tsd-comment tsd-typography"><p>Indicates the redeemer is for a script-hash guard in the transaction body.</p>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/af56265/packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts#L27">packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts:27</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum"><a id="Mint" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Mint</span><a href="#Mint" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">Mint<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">1</span></div>
 <div class="tsd-comment tsd-typography"><p>Indicates the redeemer is associated with a minting action.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/545a7f5/packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts#L18">packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts:18</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/af56265/packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts#L19">packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts:19</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum"><a id="Proposing" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Proposing</span><a href="#Proposing" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">Proposing<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">5</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/545a7f5/packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts#L24">packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts:24</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/af56265/packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts#L25">packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts:25</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum"><a id="Reward" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Reward</span><a href="#Reward" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">Reward<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">3</span></div>
 <div class="tsd-comment tsd-typography"><p>Indicates the redeemer is for withdrawing rewards from staking.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/545a7f5/packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts#L22">packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts:22</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/af56265/packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts#L23">packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts:23</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum"><a id="Spend" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Spend</span><a href="#Spend" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">Spend<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">0</span></div>
 <div class="tsd-comment tsd-typography"><p>Indicates the redeemer is for spending a UTxO.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/545a7f5/packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts#L16">packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts:16</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/af56265/packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts#L17">packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts:17</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum"><a id="Voting" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>Voting</span><a href="#Voting" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">Voting<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">4</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/545a7f5/packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts#L23">packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts:23</a></li></ul></aside></section></section></div>
+<li>Defined in <a href="https://github.com/input-output-hk/cardano-js-sdk/blob/af56265/packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts#L24">packages/core/src/Serialization/TransactionWitnessSet/Redeemer/RedeemerTag.ts:24</a></li></ul></aside></section></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
@@ -206,6 +215,7 @@ redeemer_tag =
 <li class="current tsd-kind-enum tsd-parent-kind-namespace"><a href="_cardano_sdk_core.Serialization.RedeemerTag.html" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-enum)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6" id="icon-8-path"></rect><path d="M9.45 16V7.24H14.49V8.224H10.518V10.936H14.07V11.908H10.518V15.016H14.49V16H9.45Z" fill="var(--color-text)" id="icon-8-text"></path></svg><span>Redeemer<wbr/>Tag</span></a>
 <ul>
 <li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_cardano_sdk_core.Serialization.RedeemerTag.html#Cert" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>Cert</a></li>
+<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_cardano_sdk_core.Serialization.RedeemerTag.html#Guarding" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>Guarding</a></li>
 <li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_cardano_sdk_core.Serialization.RedeemerTag.html#Mint" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>Mint</a></li>
 <li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_cardano_sdk_core.Serialization.RedeemerTag.html#Proposing" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>Proposing</a></li>
 <li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_cardano_sdk_core.Serialization.RedeemerTag.html#Reward" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>Reward</a></li>

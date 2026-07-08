@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">96.37% </span>
+                <span class="strong">96.69% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>266/276</span>
+                <span class='fraction'>263/272</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">84.61% </span>
+                <span class="strong">85.71% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>66/78</span>
+                <span class='fraction'>66/77</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">96.57% </span>
+                <span class="strong">96.53% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>254/263</span>
+                <span class='fraction'>251/260</span>
             </div>
         
             
@@ -1043,13 +1043,7 @@
 <a name='L978'></a><a href='#L978'>978</a>
 <a name='L979'></a><a href='#L979'>979</a>
 <a name='L980'></a><a href='#L980'>980</a>
-<a name='L981'></a><a href='#L981'>981</a>
-<a name='L982'></a><a href='#L982'>982</a>
-<a name='L983'></a><a href='#L983'>983</a>
-<a name='L984'></a><a href='#L984'>984</a>
-<a name='L985'></a><a href='#L985'>985</a>
-<a name='L986'></a><a href='#L986'>986</a>
-<a name='L987'></a><a href='#L987'>987</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L981'></a><a href='#L981'>981</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">35x</span>
@@ -1599,7 +1593,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">151x</span>
+<span class="cline-any cline-yes">152x</span>
 <span class="cline-any cline-yes">86x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1700,7 +1694,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">26x</span>
 <span class="cline-any cline-yes">26x</span>
 <span class="cline-any cline-yes">26x</span>
@@ -1708,15 +1701,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">26x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">19x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">26x</span>
@@ -2684,26 +2672,20 @@ export class BaseWallet implements ObservableWallet {
     signingOptions,
     signingContext,
     auxiliaryData,
-    isValid,
     witness
   }: FinalizeTxProps): Promise&lt;Cardano.Tx&gt; {
     const knownAddresses = await firstValueFrom(this.addresses$);
     const dRepPublicKey = await this.governance.getPubDRepKey();
     const emptyWitness = { signatures: new Map() };
 &nbsp;
-    let transaction: Serialization.Transaction;
-    if (isTxBodyWithHash(tx)) {
-      // Reconstruct transaction from parts
-      transaction = new Serialization.Transaction(
-        bodyCbor ? Serialization.TransactionBody.fromCbor(bodyCbor) : Serialization.TransactionBody.fromCore(tx.body),
-        Serialization.TransactionWitnessSet.fromCore({ ...emptyWitness, ...witness }),
-        auxiliaryData ? Serialization.AuxiliaryData.fromCore(auxiliaryData) : undefined
-      );
-      <span class="missing-if-branch" title="if path not taken" >I</span>if (isValid !== undefined) <span class="cstat-no" title="statement not covered" >transaction.setIsValid(isValid);</span>
-    } else {
-      // Transaction CBOR is available. Use as is.
-      transaction = Serialization.Transaction.fromCbor(tx);
-    }
+    // Reconstruct the transaction from parts, or use the transaction CBOR as is when available.
+    const transaction = isTxBodyWithHash(tx)
+      ? new Serialization.Transaction(
+          bodyCbor ? Serialization.TransactionBody.fromCbor(bodyCbor) : Serialization.TransactionBody.fromCore(tx.body),
+          Serialization.TransactionWitnessSet.fromCore({ ...emptyWitness, ...witness }),
+          auxiliaryData ? Serialization.AuxiliaryData.fromCore(auxiliaryData) : undefined
+        )
+      : Serialization.Transaction.fromCbor(tx);
 &nbsp;
     const txWitness = transaction.witnessSet().toCore();
     const context = {
@@ -3028,7 +3010,7 @@ export class BaseWallet implements ObservableWallet {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-04T13:15:00.304Z
+                at 2026-07-08T12:53:51.678Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
