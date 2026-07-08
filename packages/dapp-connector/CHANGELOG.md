@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## <small>0.13.30 (2026-07-08)</small>
+
+**Note:** Version bump only for package @cardano-sdk/dapp-connector
+
 ## [0.13.29](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.13.28...@cardano-sdk/dapp-connector@0.13.29) (2026-06-22)
 
 **Note:** Version bump only for package @cardano-sdk/dapp-connector

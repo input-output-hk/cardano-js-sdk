@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.55.0 (2026-07-08)
+
+* feat(core)!: default inConwayEra to true ([92d197b](https://github.com/input-output-hk/cardano-js-sdk/commit/92d197b))
+* feat(core)!: hardcode transaction is_valid to true ([143ceb8](https://github.com/input-output-hk/cardano-js-sdk/commit/143ceb8))
+
+### BREAKING CHANGE
+
+* freshly encoded sets and redeemers built from core
+now use the Conway wire format by default; call setInConwayEra(false)
+to restore legacy encodings.
+
+Test fixtures triaged monorepo-wide: pre-Conway pins keep legacy bytes
+behind a locally scoped flag with restore; era-neutral vectors are
+re-baselined to the modern encodings; size-based fee expectations in
+tx-construction updated accordingly.
+* Transaction.setIsValid and TxContext.isValid are
+removed; no public API can produce an is_valid=false transaction.
+
+Call sites updated: tx-construction TxBuilder/types, wallet
+BaseWallet/types, e2e phase2validation fixture.
+
 ## [0.54.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.54.7...@cardano-sdk/wallet@0.54.8) (2026-06-30)
 
 **Note:** Version bump only for package @cardano-sdk/wallet

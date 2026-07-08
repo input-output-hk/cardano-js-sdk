@@ -3,6 +3,48 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.47.0 (2026-07-08)
+
+* fix(core): break circular dependency between SubTransaction and TransactionBody ([61fa145](https://github.com/input-output-hk/cardano-js-sdk/commit/61fa145))
+* fix(core): omit absent Dijkstra fields from toCore output ([612a53d](https://github.com/input-output-hk/cardano-js-sdk/commit/612a53d))
+* test(core): add Dijkstra test-vector set ([342dc9d](https://github.com/input-output-hk/cardano-js-sdk/commit/342dc9d))
+* test(core): add maximal Dijkstra transaction integration round trip ([1efe666](https://github.com/input-output-hk/cardano-js-sdk/commit/1efe666))
+* feat(core): add account balance intervals transaction body field (key 26) ([6f7b5b5](https://github.com/input-output-hk/cardano-js-sdk/commit/6f7b5b5))
+* feat(core): add Dijkstra protocol parameter update keys 34-37 ([0a901b8](https://github.com/input-output-hk/cardano-js-sdk/commit/0a901b8))
+* feat(core): add direct deposits transaction body field (key 25) ([0f364bc](https://github.com/input-output-hk/cardano-js-sdk/commit/0f364bc))
+* feat(core): add Guarding redeemer tag for Dijkstra era ([ce029f2](https://github.com/input-output-hk/cardano-js-sdk/commit/ce029f2))
+* feat(core): add Guards serialization type for Dijkstra tx body key 14 ([27088ec](https://github.com/input-output-hk/cardano-js-sdk/commit/27088ec))
+* feat(core): add Plutus V4 cost models support ([5b14b46](https://github.com/input-output-hk/cardano-js-sdk/commit/5b14b46))
+* feat(core): add Plutus V4 script serialization support ([6eabf1c](https://github.com/input-output-hk/cardano-js-sdk/commit/6eabf1c))
+* feat(core): add RequireGuard native script (kind 6) for Dijkstra era ([816dcc1](https://github.com/input-output-hk/cardano-js-sdk/commit/816dcc1))
+* feat(core): add SubTransaction serialization for nested transactions ([48ce15c](https://github.com/input-output-hk/cardano-js-sdk/commit/48ce15c))
+* feat(core): add SubTransactionBody serialization for nested transactions ([57e248f](https://github.com/input-output-hk/cardano-js-sdk/commit/57e248f))
+* feat(core): enforce 32-byte bootstrap witness chain code on encode ([f205ced](https://github.com/input-output-hk/cardano-js-sdk/commit/f205ced))
+* feat(core): enforce uint32 protocol version minor on encode ([b36cf73](https://github.com/input-output-hk/cardano-js-sdk/commit/b36cf73))
+* feat(core): normalize empty multiasset to coin-only value ([a011e2b](https://github.com/input-output-hk/cardano-js-sdk/commit/a011e2b))
+* feat(core): support Plutus V4 scripts in auxiliary data map key 5 ([551310c](https://github.com/input-output-hk/cardano-js-sdk/commit/551310c))
+* feat(core): wire guards into transaction body key 14 ([5a9bdda](https://github.com/input-output-hk/cardano-js-sdk/commit/5a9bdda))
+* feat(core): wire sub-transactions into transaction body key 23 ([17e7e30](https://github.com/input-output-hk/cardano-js-sdk/commit/17e7e30))
+* feat(core)!: default inConwayEra to true ([92d197b](https://github.com/input-output-hk/cardano-js-sdk/commit/92d197b))
+* feat(core)!: hardcode transaction is_valid to true ([143ceb8](https://github.com/input-output-hk/cardano-js-sdk/commit/143ceb8))
+* docs(core): deprecate legacy stake certificates removed in Dijkstra ([0f36aa4](https://github.com/input-output-hk/cardano-js-sdk/commit/0f36aa4))
+
+### BREAKING CHANGE
+
+* freshly encoded sets and redeemers built from core
+now use the Conway wire format by default; call setInConwayEra(false)
+to restore legacy encodings.
+
+Test fixtures triaged monorepo-wide: pre-Conway pins keep legacy bytes
+behind a locally scoped flag with restore; era-neutral vectors are
+re-baselined to the modern encodings; size-based fee expectations in
+tx-construction updated accordingly.
+* Transaction.setIsValid and TxContext.isValid are
+removed; no public API can produce an is_valid=false transaction.
+
+Call sites updated: tx-construction TxBuilder/types, wallet
+BaseWallet/types, e2e phase2validation fixture.
+
 ## [0.46.15](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.46.14...@cardano-sdk/core@0.46.15) (2026-06-22)
 
 **Note:** Version bump only for package @cardano-sdk/core

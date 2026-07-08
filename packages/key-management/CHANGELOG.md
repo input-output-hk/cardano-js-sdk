@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## <small>0.29.18 (2026-07-08)</small>
+
+* fix(key-management): handle RequireGuard in own signature key paths ([369176e](https://github.com/input-output-hk/cardano-js-sdk/commit/369176e))
+
 ## [0.29.17](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.29.16...@cardano-sdk/key-management@0.29.17) (2026-06-30)
 
 ### Features
