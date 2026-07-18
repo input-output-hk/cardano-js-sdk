@@ -11,6 +11,7 @@ export * from './createStubUtxoProvider';
 export * from './createStubObservable';
 export * from './createGenericMockServer';
 export * from './dataGeneration';
+export * from './dijkstraBatchFixture';
 export * from './eraSummaries';
 export * as mockProviders from './mockProviders';
 export * as handleProviderMocks from './handleProvider';
