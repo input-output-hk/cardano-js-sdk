@@ -1,7 +1,7 @@
 import { BlockfrostChainHistoryProvider, BlockfrostClient } from '../../src';
 import { Cardano, NetworkInfoProvider } from '@cardano-sdk/core';
 import { Responses } from '@blockfrost/blockfrost-js';
-import { cip19TestVectors } from '@cardano-sdk/util-dev';
+import { cip19TestVectors, createDijkstraBatchFixture } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
 import { mockResponses } from '../util';
 import type { Cache } from '@cardano-sdk/util';
@@ -705,6 +705,86 @@ describe('blockfrostChainHistoryProvider', () => {
         expect(secondResponse).toHaveLength(1);
         expect(secondResponse[0]).toEqual(expectedHydratedTxCBOR);
         expect(request).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('Dijkstra transactions (CBOR)', () => {
+      const fixture = createDijkstraBatchFixture();
+      const dijkstraTxId = fixture.tx.id.toString();
+
+      const dijkstraTxContentResponse = {
+        asset_mint_or_burn_count: 0,
+        block: '356b7d7dbb696ccd12775c016941057a9dc70898d87a63fc752271bb46856940',
+        block_height: 123_456,
+        delegation_count: 0,
+        fees: '300000',
+        hash: dijkstraTxId,
+        index: 0,
+        invalid_before: null,
+        invalid_hereafter: null,
+        mir_cert_count: 0,
+        output_amount: [{ quantity: '5700000', unit: 'lovelace' }],
+        pool_retire_count: 0,
+        pool_update_count: 0,
+        redeemer_count: 0,
+        size: fixture.cbor.length / 2,
+        slot: 42_000_000,
+        stake_cert_count: 0,
+        utxo_count: 2,
+        valid_contract: true,
+        withdrawal_count: 0
+      };
+
+      const dijkstraUtxosResponse = {
+        hash: dijkstraTxId,
+        inputs: [
+          {
+            address: fixture.actors.walletAddress.toString(),
+            amount: [{ quantity: '5000000', unit: 'lovelace' }],
+            collateral: false,
+            output_index: 0,
+            reference: false,
+            tx_hash: '3000000000000000000000000000000000000000000000000000000000000003'
+          }
+        ],
+        outputs: [
+          {
+            address: fixture.actors.walletAddress.toString(),
+            amount: [{ quantity: '5700000', unit: 'lovelace' }],
+            collateral: false,
+            output_index: 0
+          }
+        ]
+      };
+
+      beforeEach(() => {
+        mockResponses(request, [
+          [`txs/${dijkstraTxId}`, dijkstraTxContentResponse],
+          [`txs/${dijkstraTxId}/utxos`, dijkstraUtxosResponse],
+          [`txs/${dijkstraTxId}/cbor`, { cbor: fixture.cbor }]
+        ]);
+      });
+
+      test('passes guards, direct deposits and account balance intervals through to the hydrated tx', async () => {
+        const [hydrated] = await provider.transactionsByHashes({ ids: [fixture.tx.id] });
+
+        expect(hydrated.body.guards).toEqual(fixture.tx.body.guards);
+        expect(hydrated.body.directDeposits).toEqual(fixture.tx.body.directDeposits);
+        expect(hydrated.body.accountBalanceIntervals).toEqual(fixture.tx.body.accountBalanceIntervals);
+      });
+
+      test('hydrates the top level input and preserves fee and outputs from the cbor', async () => {
+        const [hydrated] = await provider.transactionsByHashes({ ids: [fixture.tx.id] });
+
+        expect(hydrated.body.fee).toEqual(fixture.tx.body.fee);
+        expect(hydrated.body.inputs).toEqual([
+          {
+            address: fixture.actors.walletAddress,
+            index: 0,
+            txId: Cardano.TransactionId('3000000000000000000000000000000000000000000000000000000000000003')
+          }
+        ]);
+        expect(hydrated.body.outputs).toEqual(fixture.tx.body.outputs);
       });
     });
   });
