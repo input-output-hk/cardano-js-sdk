@@ -2,6 +2,7 @@ export * as util from './misc';
 export * from './conwayEra';
 export * from './slotCalc';
 export * from './txInspector';
+export * from './dijkstraBatchUtil';
 export * from './tokenTransferInspector';
 export * from './transactionSummaryInspector';
 export * from './utxo';

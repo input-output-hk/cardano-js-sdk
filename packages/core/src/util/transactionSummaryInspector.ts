@@ -15,6 +15,7 @@ import { TimeoutError } from '../errors';
 import { coalesceTokenMaps, subtractTokenMaps } from '../Asset/util';
 import { coalesceValueQuantities } from './coalesceValueQuantities';
 import { computeImplicitCoin } from '../Cardano/util';
+import { createBatchInputResolver, directDepositsInspector, toMergedBatchView } from './dijkstraBatchUtil';
 import { promiseTimeout } from './promiseTimeout';
 import { subtractValueQuantities } from './subtractValueQuantities';
 import { tryGetAssetInfos } from './tryGetAssetInfos';
@@ -38,8 +39,11 @@ interface TransactionSummaryInspectorArgs {
 export type TransactionSummaryInspection = {
   assets: Map<Cardano.AssetId, AssetInfoWithAmount>;
   /**
-   * Spent amount from the wallet's perspective, computed as `own outputs - (own inputs + withdrawals)`.
+   * Spent amount from the wallet's perspective, computed as
+   * `own outputs + own direct deposits - (own inputs + withdrawals)`.
    * Withdrawals are a type of "own input", and are accounted for when computing the wallet spent amount.
+   * Direct deposits into own reward accounts are a type of "own output" (Dijkstra).
+   * For a CIP-0118 batch the computation spans the top level and all sub transactions.
    * Positive when the wallet is receiving funds, negative when the wallet is sending funds.
    */
   coins: Cardano.Lovelace;
@@ -119,22 +123,35 @@ const getImplicitAssets = async (tx: Cardano.Tx) => {
   return coalesceTokenMaps([mintedAssets, burnedAssets]);
 };
 
-const getUnaccountedFunds = async (
-  tx: Cardano.Tx,
-  resolvedInputs: ResolutionResult,
-  implicitCoin: Cardano.Lovelace,
-  fee: Cardano.Lovelace,
-  implicitAssets: Cardano.TokenMap = new Map()
-): Promise<Cardano.Value> => {
+const getUnaccountedFunds = async ({
+  tx,
+  resolvedInputs,
+  implicitCoin,
+  fee,
+  implicitAssets = new Map(),
+  directDepositTotal = 0n
+}: {
+  tx: Cardano.Tx;
+  resolvedInputs: ResolutionResult;
+  implicitCoin: Cardano.Lovelace;
+  fee: Cardano.Lovelace;
+  implicitAssets?: Cardano.TokenMap;
+  directDepositTotal?: Cardano.Lovelace;
+}): Promise<Cardano.Value> => {
   const totalInputs = totalInputsValue(resolvedInputs);
   const totalOutputs = totalOutputsValue(tx.body.outputs);
 
   totalInputs.assets = coalesceTokenMaps([totalInputs.assets, implicitAssets]);
   totalInputs.coins += implicitCoin;
-  totalOutputs.coins += fee;
+  totalOutputs.coins += fee + directDepositTotal;
 
   return subtractValueQuantities([totalOutputs, totalInputs]);
 };
+
+const getBatchContext = (tx: Cardano.Tx, inputResolver: Cardano.InputResolver) => ({
+  resolver: tx.body.subTransactions?.length ? createBatchInputResolver(tx, inputResolver) : inputResolver,
+  view: toMergedBatchView(tx)
+});
 
 const intoAssetInfoWithAmount = async ({
   assetProvider,
@@ -181,10 +198,14 @@ export const transactionSummaryInspector: TransactionSummaryInspector =
     logger
   }: TransactionSummaryInspectorArgs) =>
   async (tx) => {
+    // A CIP-0118 batch is inspected as one flat transaction: value flows span the top level and
+    // all sub transactions, and intra-batch inputs resolve from the batch before the caller's resolver.
+    const { view, resolver } = getBatchContext(tx, inputResolver);
+
     let resolvedInputs: ResolutionResult;
 
     try {
-      resolvedInputs = await promiseTimeout(resolveInputs(tx.body.inputs, inputResolver), timeout);
+      resolvedInputs = await promiseTimeout(resolveInputs(view.body.inputs, resolver), timeout);
     } catch (error) {
       if (error instanceof TimeoutError) {
         logger.error('Error: Inputs resolution timed out');
@@ -192,34 +213,38 @@ export const transactionSummaryInspector: TransactionSummaryInspector =
 
       resolvedInputs = {
         resolvedInputs: [],
-        unresolvedInputs: tx.body.inputs
+        unresolvedInputs: view.body.inputs
       };
     }
 
-    const fee = tx.body.fee;
+    const fee = view.body.fee;
 
     const implicit = computeImplicitCoin(
       protocolParameters,
-      { certificates: tx.body.certificates, withdrawals: tx.body.withdrawals },
+      { certificates: view.body.certificates, withdrawals: view.body.withdrawals },
       rewardAccounts || [],
       dRepKeyHash
     );
 
-    const collateral = await getCollateral(tx, inputResolver, addresses);
+    const collateral = await getCollateral(view, resolver, addresses);
 
     const withdrawals = implicit.withdrawals || 0n;
-    const totalOutputValue = await totalAddressOutputsValueInspector(addresses)(tx);
-    const totalInputValue = await totalAddressInputsValueInspector(addresses, inputResolver)(tx);
+    const ownDirectDeposits = await directDepositsInspector(rewardAccounts || [])(view);
+    const directDepositTotal = await directDepositsInspector()(view);
+    const totalOutputValue = await totalAddressOutputsValueInspector(addresses)(view);
+    const totalInputValue = await totalAddressInputsValueInspector(addresses, resolver)(view);
     const implicitCoin = withdrawals + (implicit.reclaimDeposit || 0n) - (implicit.deposit || 0n);
-    const implicitAssets = await getImplicitAssets(tx);
+    const implicitAssets = await getImplicitAssets(view);
 
     const diff = {
       assets: subtractTokenMaps([totalOutputValue.assets, totalInputValue.assets]),
-      // Withdrawals are a type of "own input", which must be accounted for when computing the wallet spent amount.
-      // `coins` represents the actual spent coins from the wallets perspective, using the formula `ownOutputs - ownInputs`.
+      // Withdrawals are a type of "own input" and direct deposits into own reward accounts a type
+      // of "own output", which must be accounted for when computing the wallet spent amount.
+      // `coins` represents the actual spent coins from the wallets perspective, using the formula
+      // `ownOutputs + ownDirectDeposits - (ownInputs + withdrawals)`.
       // deposit is like a foreign output, and reclaimDeposit is like a foreignInput,
       // so they do not need to be included in the computation.
-      coins: totalOutputValue.coins - (totalInputValue.coins + withdrawals)
+      coins: totalOutputValue.coins + ownDirectDeposits - (totalInputValue.coins + withdrawals)
     };
 
     return {
@@ -237,7 +262,14 @@ export const transactionSummaryInspector: TransactionSummaryInspector =
       returnedDeposit: implicit.reclaimDeposit || 0n,
       unresolved: {
         inputs: resolvedInputs.unresolvedInputs,
-        value: await getUnaccountedFunds(tx, resolvedInputs, implicitCoin, fee, implicitAssets)
+        value: await getUnaccountedFunds({
+          directDepositTotal,
+          fee,
+          implicitAssets,
+          implicitCoin,
+          resolvedInputs,
+          tx: view
+        })
       }
     };
   };
