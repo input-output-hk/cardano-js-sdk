@@ -91,6 +91,47 @@ describe('createDijkstraBatchFixture', () => {
     });
   });
 
+  describe('hydrated view', () => {
+    const hydratedBody = fixture.hydratedTx.body;
+
+    it('mirrors the id, witness and non-input body fields of the core transaction', () => {
+      expect(fixture.hydratedTx.id).toEqual(fixture.tx.id);
+      expect(fixture.hydratedTx.witness).toEqual(fixture.tx.witness);
+      expect(hydratedBody.fee).toEqual(topLevelBody.fee);
+      expect(hydratedBody.guards).toEqual(topLevelBody.guards);
+      expect(hydratedBody.directDeposits).toEqual(topLevelBody.directDeposits);
+      expect(hydratedBody.accountBalanceIntervals).toEqual(topLevelBody.accountBalanceIntervals);
+      expect(hydratedBody.outputs).toEqual(topLevelBody.outputs);
+    });
+
+    it('carries each sub transaction with its id', () => {
+      expect(hydratedBody.subTransactions!.map(({ id }) => id)).toEqual(fixture.subTxIds);
+      expect(hydratedBody.subTransactions!.map(({ body }) => body.outputs)).toEqual([
+        subTx1Body.outputs,
+        subTx2Body.outputs
+      ]);
+    });
+
+    it('hydrates every input with the address of the utxo it spends', () => {
+      const hydratedInputs = [
+        ...hydratedBody.inputs,
+        ...hydratedBody.subTransactions!.flatMap(({ body }) => body.inputs)
+      ];
+
+      expect(hydratedInputs.map(({ address }) => address)).toEqual(
+        hydratedInputs.map((txIn) => resolveOrThrow(allUtxos, txIn).address)
+      );
+    });
+
+    it('hydrates the intra-batch input from the sibling sub transaction output', () => {
+      const [, hydratedSubTx2] = hydratedBody.subTransactions!;
+      const intraBatchInput = hydratedSubTx2.body.inputs.find(({ txId }) => txId === fixture.subTxIds[0]);
+
+      expect(intraBatchInput).toBeDefined();
+      expect(intraBatchInput!.address).toEqual(fixture.actors.counterparty2Address);
+    });
+  });
+
   describe('dijkstra decorations', () => {
     it('carries one key hash guard and one script hash guard at the top level', () => {
       expect(topLevelBody.guards!.map(({ type }) => type)).toEqual([

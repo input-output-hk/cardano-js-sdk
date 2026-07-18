@@ -24,6 +24,11 @@ export interface DijkstraBatchFixture {
    * source sibling-produced outputs from the batch itself.
    */
   externalUtxos: Cardano.Utxo[];
+  /**
+   * The chain-history view of {@link tx}: every input hydrated with the address of the output it
+   * spends and each sub transaction carrying its id, under a synthetic block header.
+   */
+  hydratedTx: Cardano.HydratedTx;
   /** The sibling-produced utxo: sub transaction 1 output #1, spent by sub transaction 2. */
   intraBatchUtxo: Cardano.Utxo;
   /** Asset minted by sub transaction 1 into its wallet-bound output. */
@@ -181,13 +186,46 @@ export const createDijkstraBatchFixture = (): DijkstraBatchFixture => {
     { address: actors.counterparty2Address, value: { coins: INTERMEDIATE_OUTPUT_COINS } }
   ];
 
+  const allUtxos = [...externalUtxos, intraBatchUtxo];
+  const hydrateInput = (txIn: Cardano.TxIn): Cardano.HydratedTxIn => {
+    const utxo = allUtxos.find(([produced]) => produced.txId === txIn.txId && produced.index === txIn.index);
+    if (!utxo) throw new Error(`No utxo for input: ${txIn.txId}#${txIn.index}`);
+    return { address: utxo[0].address, index: txIn.index, txId: txIn.txId };
+  };
+
+  const subTxIds: [Cardano.TransactionId, Cardano.TransactionId] = [subTx1Id, subTx2Id];
+  const hydratedTx: Cardano.HydratedTx = {
+    blockHeader: {
+      blockNo: Cardano.BlockNo(1_000_000),
+      hash: Cardano.BlockId('9999999999999999999999999999999999999999999999999999999999999999'),
+      slot: Cardano.Slot(50_000_000)
+    },
+    body: {
+      ...tx.body,
+      collaterals: undefined,
+      inputs: tx.body.inputs.map(hydrateInput),
+      referenceInputs: undefined,
+      subTransactions: tx.body.subTransactions!.map((subTx, subTxIndex) => ({
+        ...subTx,
+        body: { ...subTx.body, inputs: subTx.body.inputs.map(hydrateInput), referenceInputs: undefined },
+        id: subTxIds[subTxIndex]
+      }))
+    },
+    id: tx.id,
+    index: 0,
+    inputSource: Cardano.InputSource.inputs,
+    txSize: cbor.length / 2,
+    witness: tx.witness
+  };
+
   return {
     actors,
     cbor,
     externalUtxos,
+    hydratedTx,
     intraBatchUtxo,
     mintedAssetId,
-    subTxIds: [subTx1Id, subTx2Id],
+    subTxIds,
     tx
   };
 };
