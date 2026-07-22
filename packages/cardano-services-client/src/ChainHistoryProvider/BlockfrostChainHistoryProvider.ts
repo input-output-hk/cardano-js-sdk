@@ -442,10 +442,13 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
 
     const body: Cardano.HydratedTxBody = this.mapTxBody(
       {
+        accountBalanceIntervals: txFromCBOR.body.accountBalanceIntervals,
         certificates: await this.processCertificates(txContent, txFromCBOR.body.certificates),
         collateralReturn: txFromCBOR.body.collateralReturn,
         collaterals,
+        directDeposits: txFromCBOR.body.directDeposits,
         fee: txFromCBOR.body.fee,
+        guards: txFromCBOR.body.guards,
         inputs,
         mint: txFromCBOR.body.mint ? new Map([...txFromCBOR.body.mint].sort()) : undefined,
         outputs,
@@ -737,9 +740,12 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
 
   private mapTxBody(
     {
+      accountBalanceIntervals,
       collateralReturn,
       collaterals,
+      directDeposits,
       fee,
+      guards,
       inputs,
       outputs,
       mint,
@@ -768,7 +774,10 @@ export class BlockfrostChainHistoryProvider extends BlockfrostProvider implement
             inputs,
             outputs
           }),
+      accountBalanceIntervals,
       certificates,
+      directDeposits,
+      guards,
       mint,
       proposalProcedures,
       validityInterval,

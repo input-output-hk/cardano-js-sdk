@@ -110,9 +110,17 @@ export interface HydratedTxBody {
    * balance lies in a half-open range at validation time. Non-empty when present.
    */
   accountBalanceIntervals?: AccountBalanceIntervalEntry[];
+
+  /**
+   * Sub transactions (Dijkstra body key 23, CIP-0118 nested transactions) in batch order, each
+   * hydrated and carrying its own id. Non-empty when present.
+   */
+  // eslint-disable-next-line no-use-before-define
+  subTransactions?: HydratedSubTransaction[];
 }
 
-export interface TxBody extends Omit<HydratedTxBody, 'certificates' | 'inputs' | 'collaterals' | 'referenceInputs'> {
+export interface TxBody
+  extends Omit<HydratedTxBody, 'certificates' | 'inputs' | 'collaterals' | 'referenceInputs' | 'subTransactions'> {
   certificates?: Certificate[];
   collaterals?: TxIn[];
   inputs: TxIn[];
@@ -162,6 +170,26 @@ export interface SubTransaction {
   // eslint-disable-next-line no-use-before-define
   witness: Witness;
   auxiliaryData?: AuxiliaryData;
+}
+
+/**
+ * A SubTransactionBody with its inputs resolved to hydrated inputs, so consumers can read the
+ * address of each spent output without an input resolver. Intra-batch inputs (spending a sibling
+ * sub transaction's output) hydrate from the batch itself.
+ */
+export interface HydratedSubTransactionBody extends Omit<SubTransactionBody, 'inputs' | 'referenceInputs'> {
+  inputs: HydratedTxIn[];
+  referenceInputs?: HydratedTxIn[];
+}
+
+/**
+ * A hydrated Dijkstra sub transaction. Carries the sub transaction id (the blake2b-256 hash of
+ * the sub transaction body bytes) explicitly: a hydrated body cannot be re-serialized to derive
+ * it, and intra-batch inputs of sibling sub transactions reference it.
+ */
+export interface HydratedSubTransaction extends Omit<SubTransaction, 'body'> {
+  id: TransactionId;
+  body: HydratedSubTransactionBody;
 }
 
 export enum InputSource {

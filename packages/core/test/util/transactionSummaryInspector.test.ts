@@ -119,6 +119,8 @@ const buildMockTx = (
     collaterals?: Cardano.HydratedTxIn[];
     totalCollateral?: Cardano.Lovelace;
     collateralReturn?: Cardano.TxOut;
+    directDeposits?: Cardano.Withdrawal[];
+    subTransactions?: Cardano.HydratedSubTransaction[];
   } = {}
 ): Cardano.HydratedTx =>
   ({
@@ -132,6 +134,7 @@ const buildMockTx = (
       certificates: args.certificates,
       collateralReturn: args.collateralReturn ?? undefined,
       collaterals: args.collaterals ?? undefined,
+      directDeposits: args.directDeposits,
       fee,
       inputs: args.inputs ?? [
         {
@@ -171,6 +174,7 @@ const buildMockTx = (
           }
         }
       ],
+      subTransactions: args.subTransactions,
       totalCollateral: args.totalCollateral ?? undefined,
       validityInterval: {},
       withdrawals: args.withdrawals
@@ -1286,5 +1290,80 @@ describe('Transaction Summary Inspector', () => {
         },
       }
     `);
+  });
+
+  it('inspects a Dijkstra batch as one flat transaction', async () => {
+    const externalTxAId = Cardano.TransactionId('a00000000000000000000000000000000000000000000000000000000000000a');
+    const externalTxBId = Cardano.TransactionId('b00000000000000000000000000000000000000000000000000000000000000b');
+    const externalTxWId = Cardano.TransactionId('c00000000000000000000000000000000000000000000000000000000000000c');
+    const subTx1Id = Cardano.TransactionId('d00000000000000000000000000000000000000000000000000000000000000d');
+    const subTx2Id = Cardano.TransactionId('e00000000000000000000000000000000000000000000000000000000000000e');
+
+    const tx = buildMockTx({
+      directDeposits: [{ quantity: 2_000_000n, stakeAddress: rewardAccounts[0] }],
+      inputs: [{ address: addresses[0], index: 0, txId: externalTxWId }],
+      outputs: [{ address: addresses[0], value: { coins: 5_830_000n } }],
+      subTransactions: [
+        {
+          body: {
+            inputs: [{ address: externalAddress1, index: 0, txId: externalTxAId }],
+            mint: new Map([[AssetId.A, 100n]]),
+            outputs: [
+              { address: addresses[0], value: { assets: new Map([[AssetId.A, 100n]]), coins: 12_000_000n } },
+              { address: externalAddress2, value: { coins: 3_000_000n } }
+            ]
+          },
+          id: subTx1Id,
+          witness: { signatures: new Map() }
+        },
+        {
+          body: {
+            inputs: [
+              { address: externalAddress2, index: 0, txId: externalTxBId },
+              { address: externalAddress2, index: 1, txId: subTx1Id }
+            ],
+            outputs: [{ address: externalAddress1, value: { coins: 1_000_000n } }]
+          },
+          id: subTx2Id,
+          witness: { signatures: new Map() }
+        }
+      ] as Cardano.HydratedSubTransaction[]
+    });
+
+    const histTxs = [
+      { body: { outputs: [{ address: addresses[0], value: { coins: 5_000_000n } }] }, id: externalTxWId },
+      { body: { outputs: [{ address: externalAddress1, value: { coins: 10_000_000n } }] }, id: externalTxAId },
+      { body: { outputs: [{ address: externalAddress2, value: { coins: 6_000_000n } }] }, id: externalTxBId }
+    ] as unknown as Cardano.HydratedTx[];
+
+    const inspectTx = createTxInspector({
+      summary: transactionSummaryInspector({
+        addresses,
+        assetProvider,
+        inputResolver: createMockInputResolver(histTxs),
+        logger,
+        protocolParameters,
+        rewardAccounts,
+        timeout
+      })
+    });
+
+    const { summary } = await inspectTx(tx);
+
+    expect(summary).toEqual<TransactionSummaryInspection>({
+      assets: buildAssetInfoWithAmount([[assetInfos[AssetInfoIdx.A], 100n]]),
+      coins: 14_830_000n,
+      collateral: 0n,
+      deposit: 0n,
+      fee,
+      resolvedInputs: [
+        { address: addresses[0], index: 0, txId: externalTxWId, value: { coins: 5_000_000n } },
+        { address: externalAddress1, index: 0, txId: externalTxAId, value: { coins: 10_000_000n } },
+        { address: externalAddress2, index: 0, txId: externalTxBId, value: { coins: 6_000_000n } },
+        { address: externalAddress2, index: 1, txId: subTx1Id, value: { coins: 3_000_000n } }
+      ],
+      returnedDeposit: 0n,
+      unresolved: { inputs: [], value: { assets: new Map(), coins: 0n } }
+    });
   });
 });
