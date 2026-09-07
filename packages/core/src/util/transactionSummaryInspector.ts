@@ -14,7 +14,7 @@ import { BigIntMath } from '@cardano-sdk/util';
 import { TimeoutError } from '../errors';
 import { coalesceTokenMaps, subtractTokenMaps } from '../Asset/util';
 import { coalesceValueQuantities } from './coalesceValueQuantities';
-import { computeImplicitCoin } from '../Cardano/util';
+import { computeImplicitCoin, isPhase2ValidationErrTx } from '../Cardano/util';
 import { promiseTimeout } from './promiseTimeout';
 import { subtractValueQuantities } from './subtractValueQuantities';
 import { tryGetAssetInfos } from './tryGetAssetInfos';
@@ -41,6 +41,10 @@ export type TransactionSummaryInspection = {
    * Spent amount from the wallet's perspective, computed as `own outputs - (own inputs + withdrawals)`.
    * Withdrawals are a type of "own input", and are accounted for when computing the wallet spent amount.
    * Positive when the wallet is receiving funds, negative when the wallet is sending funds.
+   *
+   * When the transaction failed phase-2 validation this is `-collateral`: the ledger discards the
+   * body, so neither the declared inputs nor the declared outputs move any value, and the wallet's
+   * entire realised loss is the collateral it forfeits.
    */
   coins: Cardano.Lovelace;
   collateral: Cardano.Lovelace;
@@ -63,6 +67,19 @@ type IntoTokenTransferValueProps = {
   logger: Logger;
   timeout: Milliseconds;
   tokenMap?: TokenMap;
+};
+
+/**
+ * Whether the ledger discarded this transaction's body for failing phase-2 validation.
+ *
+ * Inspectors are typed over `Tx`, which carries `isValid`, but they are also called with
+ * `OnChainTx` / `HydratedTx`, which carry `inputSource` and omit `isValid`. Neither field alone
+ * covers both shapes, so prefer `inputSource` when present and fall back to `isValid`.
+ */
+const isPhase2Failure = (tx: Cardano.Tx): boolean => {
+  const { inputSource } = tx as Partial<Pick<Cardano.OnChainTx, 'inputSource'>>;
+
+  return inputSource === undefined ? tx.isValid === false : isPhase2ValidationErrTx({ inputSource });
 };
 
 /**
@@ -119,6 +136,26 @@ const getImplicitAssets = async (tx: Cardano.Tx) => {
   return coalesceTokenMaps([mintedAssets, burnedAssets]);
 };
 
+/** Net value the wallet's own addresses gained, for a transaction the ledger applied in full. */
+const ownValueDiff = async (
+  tx: Cardano.Tx,
+  addresses: Cardano.PaymentAddress[],
+  inputResolver: Cardano.InputResolver,
+  withdrawals: Cardano.Lovelace
+) => {
+  const totalOutputValue = await totalAddressOutputsValueInspector(addresses)(tx);
+  const totalInputValue = await totalAddressInputsValueInspector(addresses, inputResolver)(tx);
+
+  return {
+    assets: subtractTokenMaps([totalOutputValue.assets, totalInputValue.assets]),
+    // Withdrawals are a type of "own input", which must be accounted for when computing the wallet spent amount.
+    // `coins` represents the actual spent coins from the wallets perspective, using the formula `ownOutputs - ownInputs`.
+    // deposit is like a foreign output, and reclaimDeposit is like a foreignInput,
+    // so they do not need to be included in the computation.
+    coins: totalOutputValue.coins - (totalInputValue.coins + withdrawals)
+  };
+};
+
 const getUnaccountedFunds = async (
   tx: Cardano.Tx,
   resolvedInputs: ResolutionResult,
@@ -126,6 +163,12 @@ const getUnaccountedFunds = async (
   fee: Cardano.Lovelace,
   implicitAssets: Cardano.TokenMap = new Map()
 ): Promise<Cardano.Value> => {
+  // The ledger discards the body of a phase-2 failure, so there is no declared movement left to
+  // reconcile: reporting a shortfall against outputs that never materialised would be noise.
+  // Shaped like a balanced reconciliation rather than `coalesceValueQuantities([])`, whose empty
+  // `assets` is `undefined`, so consumers keep seeing a map here.
+  if (isPhase2Failure(tx)) return { assets: new Map(), coins: 0n };
+
   const totalInputs = totalInputsValue(resolvedInputs);
   const totalOutputs = totalOutputsValue(tx.body.outputs);
 
@@ -208,19 +251,16 @@ export const transactionSummaryInspector: TransactionSummaryInspector =
     const collateral = await getCollateral(tx, inputResolver, addresses);
 
     const withdrawals = implicit.withdrawals || 0n;
-    const totalOutputValue = await totalAddressOutputsValueInspector(addresses)(tx);
-    const totalInputValue = await totalAddressInputsValueInspector(addresses, inputResolver)(tx);
     const implicitCoin = withdrawals + (implicit.reclaimDeposit || 0n) - (implicit.deposit || 0n);
     const implicitAssets = await getImplicitAssets(tx);
 
-    const diff = {
-      assets: subtractTokenMaps([totalOutputValue.assets, totalInputValue.assets]),
-      // Withdrawals are a type of "own input", which must be accounted for when computing the wallet spent amount.
-      // `coins` represents the actual spent coins from the wallets perspective, using the formula `ownOutputs - ownInputs`.
-      // deposit is like a foreign output, and reclaimDeposit is like a foreignInput,
-      // so they do not need to be included in the computation.
-      coins: totalOutputValue.coins - (totalInputValue.coins + withdrawals)
-    };
+    // A phase-2 failure consumes only its collateral: the declared inputs are never spent and the
+    // declared outputs never materialise, so measuring either would report value that never moved.
+    // The forfeited collateral is the whole realised loss, and reporting it as the net change keeps
+    // `coins` answering the same question it does for an applied transaction.
+    const diff = isPhase2Failure(tx)
+      ? { assets: undefined, coins: -collateral }
+      : await ownValueDiff(tx, addresses, inputResolver, withdrawals);
 
     return {
       assets: await intoAssetInfoWithAmount({

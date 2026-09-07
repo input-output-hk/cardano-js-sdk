@@ -119,6 +119,7 @@ const buildMockTx = (
     collaterals?: Cardano.HydratedTxIn[];
     totalCollateral?: Cardano.Lovelace;
     collateralReturn?: Cardano.TxOut;
+    inputSource?: Cardano.InputSource;
   } = {}
 ): Cardano.HydratedTx =>
   ({
@@ -177,6 +178,7 @@ const buildMockTx = (
     },
     id: Cardano.TransactionId('e3a443363eb6ee3d67c5e75ec10b931603787581a948d68fa3b2cd3ff2e0d2ad'),
     index: 0,
+    inputSource: args.inputSource,
     witness: args.witness ?? {
       scripts: [mockScript1],
       signatures: new Map<Ed25519PublicKeyHex, Ed25519SignatureHex>()
@@ -571,6 +573,116 @@ describe('Transaction Summary Inspector', () => {
         value: { assets: new Map(), coins: 0n }
       }
     });
+  });
+
+  it('reports the forfeited collateral as the net change for a transaction that failed phase-2 validation', async () => {
+    // Arrange
+    const ownInput = {
+      address: addresses[0],
+      index: 0,
+      txId: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+    };
+    // The default outputs pay own addresses, so a body-counting summary would report them received.
+    const tx = buildMockTx({
+      collateralReturn: { address: addresses[0], value: { coins: 7_000_000n } },
+      collaterals: [ownInput],
+      inputSource: Cardano.InputSource.collaterals,
+      inputs: [ownInput]
+    });
+
+    const histTx: Cardano.HydratedTx[] = [
+      {
+        body: {
+          outputs: [
+            {
+              address: addresses[0],
+              value: { coins: 10_000_000n }
+            }
+          ]
+        },
+        id: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+      } as unknown as Cardano.HydratedTx
+    ];
+
+    const inspectTx = createTxInspector({
+      summary: transactionSummaryInspector({
+        addresses,
+        assetProvider,
+        inputResolver: createMockInputResolver(histTx),
+        logger,
+        protocolParameters,
+        rewardAccounts,
+        timeout
+      })
+    });
+
+    // Act
+    const { summary } = await inspectTx(tx);
+
+    // Assert
+    expect(summary).toEqual({
+      assets: new Map(),
+      coins: -3_000_000n,
+      collateral: 3_000_000n,
+      deposit: 0n,
+      fee,
+      resolvedInputs: [{ ...ownInput, value: histTx[0].body.outputs[0].value }],
+      returnedDeposit: 0n,
+      unresolved: {
+        inputs: [],
+        value: { assets: new Map(), coins: 0n }
+      }
+    });
+  });
+
+  it('detects a phase-2 failure from isValid when the transaction carries no inputSource', async () => {
+    // Arrange — the `Tx` shape, which carries `isValid` in place of `inputSource`
+    const ownInput = {
+      address: addresses[0],
+      index: 0,
+      txId: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+    };
+    const tx: Cardano.Tx = {
+      ...buildMockTx({
+        collateralReturn: { address: addresses[0], value: { coins: 7_000_000n } },
+        collaterals: [ownInput],
+        inputs: [ownInput]
+      }),
+      isValid: false
+    };
+
+    const histTx: Cardano.HydratedTx[] = [
+      {
+        body: {
+          outputs: [
+            {
+              address: addresses[0],
+              value: { coins: 10_000_000n }
+            }
+          ]
+        },
+        id: Cardano.TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
+      } as unknown as Cardano.HydratedTx
+    ];
+
+    const inspectTx = createTxInspector({
+      summary: transactionSummaryInspector({
+        addresses,
+        assetProvider,
+        inputResolver: createMockInputResolver(histTx),
+        logger,
+        protocolParameters,
+        rewardAccounts,
+        timeout
+      })
+    });
+
+    // Act
+    const { summary } = await inspectTx(tx);
+
+    // Assert
+    expect(summary.coins).toEqual(-3_000_000n);
+    expect(summary.assets).toEqual(new Map());
   });
 
   it('only displays collateral coming from own addresses', async () => {
