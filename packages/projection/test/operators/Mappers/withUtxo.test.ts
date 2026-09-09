@@ -388,6 +388,8 @@ describe('withUtxo', () => {
     expect(produced).toHaveLength(1);
     expect(consumed[0].index).toBe(2);
     expect(produced[0][1].address).toBe('addr_test1vptwv4jvaqt635jvthpa29lww3vkzypm8l6vk4lv4tqfhhgajdgwf');
+    // The ledger places the collateral return after every declared output; this tx declares 2.
+    expect(produced[0][0].index).toBe(2);
   });
 
   describe('filterProducedUtxoByAddresses', () => {

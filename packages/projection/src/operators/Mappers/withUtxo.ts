@@ -28,17 +28,21 @@ const attemptHydrateDatum = (txOut: Cardano.TxOut, witness: Cardano.Witness): Ca
 };
 
 export const withUtxo = unifiedProjectorOperator<{}, WithUtxo>((evt) => {
-  const produced = evt.block.body.flatMap(({ body: { outputs, collateralReturn }, inputSource, id, witness }) =>
-    (inputSource === Cardano.InputSource.inputs ? outputs : collateralReturn ? [collateralReturn] : []).map(
-      (txOut, outputIndex): [Cardano.TxIn, Cardano.TxOut] => [
-        {
-          index: outputIndex,
-          txId: id
-        },
-        attemptHydrateDatum(txOut, witness)
-      ]
-    )
-  );
+  const produced = evt.block.body.flatMap(({ body: { outputs, collateralReturn }, inputSource, id, witness }) => {
+    const toProducedUtxo = (txOut: Cardano.TxOut, index: number): ProducedUtxo => [
+      {
+        index,
+        txId: id
+      },
+      attemptHydrateDatum(txOut, witness)
+    ];
+
+    if (inputSource === Cardano.InputSource.inputs) return outputs.map(toProducedUtxo);
+
+    // A phase-2 failure produces only its collateral return, which the ledger places after every
+    // declared output — at index |outputs|. Indexing it from 0 names an outpoint that never existed.
+    return collateralReturn ? [toProducedUtxo(collateralReturn, outputs.length)] : [];
+  });
   const consumed = evt.block.body.flatMap(({ body: { inputs, collaterals }, inputSource }) =>
     inputSource === Cardano.InputSource.inputs ? inputs : collaterals || []
   );
