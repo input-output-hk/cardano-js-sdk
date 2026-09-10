@@ -9248,7 +9248,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ansis@npm:^4.2.0":
+"ansis@npm:^4.3.1":
   version: 4.3.1
   resolution: "ansis@npm:4.3.1"
   checksum: 9f1b6f149a34f6af6e0ad6ab78fb4c8886fb29cfa32209fae781b5524ac04bedcfe3269aee1dd513d3416fb74cc2607efafb71f919eeafd435b79f17fc90c48b
@@ -12221,7 +12221,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dayjs@npm:^1.11.20":
+"dayjs@npm:^1.11.21":
   version: 1.11.21
   resolution: "dayjs@npm:1.11.21"
   checksum: f168e00e88c5bf5a1153090f2fb279e0f7b5f0ee332062abfd5c6e2e8e0f1ba27c3f278183d73668cdfeefdd50b1d13346fdc2ace441962fc9ca6363f902ad05
@@ -24850,14 +24850,14 @@ __metadata:
   linkType: hard
 
 "typeorm@npm:^0.3.15":
-  version: 0.3.30
-  resolution: "typeorm@npm:0.3.30"
+  version: 0.3.31
+  resolution: "typeorm@npm:0.3.31"
   dependencies:
     "@sqltools/formatter": ^1.2.5
-    ansis: ^4.2.0
+    ansis: ^4.3.1
     app-root-path: ^3.1.0
     buffer: ^6.0.3
-    dayjs: ^1.11.20
+    dayjs: ^1.11.21
     debug: ^4.4.3
     dedent: ^1.7.2
     dotenv: ^16.6.1
@@ -24867,7 +24867,7 @@ __metadata:
     sql-highlight: ^6.1.0
     tslib: ^2.8.1
     uuid: ^11.1.1
-    yargs: ^17.7.2
+    yargs: ^17.7.3
   peerDependencies:
     "@google-cloud/spanner": ^5.18.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
     "@sap/hana-client": ^2.14.22
@@ -24876,13 +24876,13 @@ __metadata:
     mongodb: ^5.8.0 || ^6.0.0
     mssql: ^9.1.1 || ^10.0.0 || ^11.0.0 || ^12.0.0
     mysql2: ^2.2.5 || ^3.0.1
-    oracledb: ^6.3.0
+    oracledb: ^6.3.0 || ^7.0.0
     pg: ^8.5.1
     pg-native: ^3.0.0
     pg-query-stream: ^4.0.0
     redis: ^3.1.1 || ^4.0.0 || ^5.0.14
     sql.js: ^1.4.0
-    sqlite3: ^5.0.3
+    sqlite3: ^5.0.3 || ^6.0.0
     ts-node: ^10.7.0
     typeorm-aurora-data-api-driver: ^2.0.0 || ^3.0.0
   peerDependenciesMeta:
@@ -24922,7 +24922,7 @@ __metadata:
     typeorm: cli.js
     typeorm-ts-node-commonjs: cli-ts-node-commonjs.js
     typeorm-ts-node-esm: cli-ts-node-esm.js
-  checksum: 33f2c03e92cb7a1453762093f45996fd521dda6f58225d030a34e0e9639123b32f7f70cb3703b7bd1d0684e7f54792848e25a667a689a43f24f92c845f38b8e1
+  checksum: c556a7137509b9df5301d38e9fbebc9cf8c5eb0e770f9c6c1dc56c0d89031452f9c28ab7eb48a3911f44a26772f24cc43e40ceca8c22402a10230bb2af29ae48
   languageName: node
   linkType: hard
 
@@ -26235,7 +26235,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs@npm:^17.7.2":
+"yargs@npm:^17.7.2, yargs@npm:^17.7.3":
   version: 17.7.3
   resolution: "yargs@npm:17.7.3"
   dependencies:
