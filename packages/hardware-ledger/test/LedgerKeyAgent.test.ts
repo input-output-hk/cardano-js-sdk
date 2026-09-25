@@ -9,7 +9,76 @@ import { dummyLogger } from 'ts-log';
 import { poolId, poolParameters, pureAdaTxOut, stakeKeyHash, txIn, txOutWithDatum } from './testData';
 import Transport from '@ledgerhq/hw-transport';
 
+const nodeHidDevice = (deviceInfo: { manufacturer: string; product: string }) => ({
+  getDeviceInfo: () => deviceInfo
+});
+
 describe('LedgerKeyAgent', () => {
+  describe('establishDeviceConnection', () => {
+    const deviceConnection = {} as Ada;
+    let close: jest.Mock;
+    let createTransportSpy: jest.SpyInstance;
+    let createDeviceConnectionSpy: jest.SpyInstance;
+
+    const mockTransport = (transport: { device: unknown; deviceModel?: unknown }) =>
+      createTransportSpy.mockResolvedValue({ ...transport, close });
+
+    beforeEach(() => {
+      LedgerKeyAgent.deviceConnections = [];
+      close = jest.fn().mockResolvedValue(void 0);
+      createTransportSpy = jest.spyOn(LedgerKeyAgent, 'createTransport');
+      createDeviceConnectionSpy = jest
+        .spyOn(LedgerKeyAgent, 'createDeviceConnection')
+        .mockResolvedValue(deviceConnection);
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+      LedgerKeyAgent.deviceConnections = [];
+    });
+
+    it('accepts a device whose model @ledgerhq/devices recognises', async () => {
+      mockTransport({ device: nodeHidDevice({ manufacturer: 'Ledger', product: 'Nano X' }), deviceModel: {} });
+
+      await expect(LedgerKeyAgent.establishDeviceConnection(CommunicationType.Node)).resolves.toBe(deviceConnection);
+    });
+
+    it('accepts a node-hid Ledger device whose model @ledgerhq/devices does not recognise', async () => {
+      // A Ledger Flex reports the USB product name "Flex", which @ledgerhq/devices only knows as "Europa"
+      mockTransport({ device: nodeHidDevice({ manufacturer: 'Ledger', product: 'Flex' }), deviceModel: undefined });
+
+      await expect(LedgerKeyAgent.establishDeviceConnection(CommunicationType.Node)).resolves.toBe(deviceConnection);
+    });
+
+    it('accepts a WebUSB Ledger device whose model @ledgerhq/devices does not recognise', async () => {
+      // eslint-disable-next-line unicorn/number-literal-case
+      mockTransport({ device: { vendorId: 0x2c_97 }, deviceModel: undefined });
+
+      await expect(LedgerKeyAgent.establishDeviceConnection(CommunicationType.Web)).resolves.toBe(deviceConnection);
+    });
+
+    it('rejects a node-hid device that is not a Ledger device', async () => {
+      mockTransport({ device: nodeHidDevice({ manufacturer: 'Acme', product: 'Keyboard' }), deviceModel: undefined });
+
+      await expect(LedgerKeyAgent.establishDeviceConnection(CommunicationType.Node)).rejects.toMatchObject({
+        innerError: { message: 'Transport failure: Connected device is not a Ledger device' }
+      });
+      expect(createDeviceConnectionSpy).not.toHaveBeenCalled();
+      expect(close).toHaveBeenCalled();
+    });
+
+    it('rejects a WebUSB device that is not a Ledger device', async () => {
+      // eslint-disable-next-line unicorn/number-literal-case
+      mockTransport({ device: { vendorId: 0x04_6d }, deviceModel: undefined });
+
+      await expect(LedgerKeyAgent.establishDeviceConnection(CommunicationType.Web)).rejects.toMatchObject({
+        innerError: { message: 'Transport failure: Connected device is not a Ledger device' }
+      });
+      expect(createDeviceConnectionSpy).not.toHaveBeenCalled();
+      expect(close).toHaveBeenCalled();
+    });
+  });
+
   describe('getSigningMode', () => {
     it('can detect ordinary transaction signing mode', async () => {
       const tx: Ledger.Transaction = {
@@ -398,6 +467,64 @@ describe('LedgerKeyAgent', () => {
         ],
         ttl: 1000,
         validityIntervalStart: 100
+      };
+
+      expect(LedgerKeyAgent.getSigningMode(tx)).toEqual(Ledger.TransactionSigningMode.MULTISIG_TRANSACTION);
+    });
+
+    it('can detect multisig transaction signing mode with script hash combined certificates', async () => {
+      const stakeCredential: Ledger.CredentialParams = {
+        scriptHashHex: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
+        type: Ledger.CredentialParamsType.SCRIPT_HASH
+      };
+      const poolKeyHashHex = 'f61c42cbf7c8c53af3f520508212ad3e72f674f957fe23ff0acb4973';
+      const dRep: Ledger.DRepParams = { type: Ledger.DRepParamsType.ABSTAIN };
+      const tx: Ledger.Transaction = {
+        certificates: [
+          {
+            params: { dRep, poolKeyHashHex, stakeCredential },
+            type: Ledger.CertificateType.STAKE_POOL_AND_DREP_DELEGATION
+          },
+          {
+            params: { deposit: 2_000_000n, poolKeyHashHex, stakeCredential },
+            type: Ledger.CertificateType.ACCOUNT_REGISTRATION_DELEGATION_TO_STAKE_POOL
+          },
+          {
+            params: { dRep, deposit: 2_000_000n, stakeCredential },
+            type: Ledger.CertificateType.ACCOUNT_REGISTRATION_DELEGATION_TO_DREP
+          },
+          {
+            params: { dRep, deposit: 2_000_000n, poolKeyHashHex, stakeCredential },
+            type: Ledger.CertificateType.ACCOUNT_REGISTRATION_DELEGATION_TO_STAKE_POOL_AND_DREP
+          }
+        ],
+        fee: 10n,
+        includeNetworkId: false,
+        inputs: [
+          {
+            outputIndex: 0,
+            path: null,
+            txHashHex: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f190000'
+          }
+        ],
+        network: {
+          networkId: Ledger.Networks.Testnet.networkId,
+          protocolMagic: 999
+        },
+        outputs: [
+          {
+            amount: 10n,
+            destination: {
+              params: {
+                addressHex:
+                  '009493315cd92eb5d8c4304e67b7e16ae36d61d34502694657811a2c8e32c728d3861e164cab28cb8f006448139c8f1740ffb8e7aa9e5232dc'
+              },
+              type: Ledger.TxOutputDestinationType.THIRD_PARTY
+            },
+            format: Ledger.TxOutputFormat.ARRAY_LEGACY
+          }
+        ],
+        ttl: 1000
       };
 
       expect(LedgerKeyAgent.getSigningMode(tx)).toEqual(Ledger.TransactionSigningMode.MULTISIG_TRANSACTION);

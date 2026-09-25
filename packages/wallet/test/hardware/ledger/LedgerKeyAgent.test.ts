@@ -827,6 +827,72 @@ describe('LedgerKeyAgent', () => {
             expect(signedTx.tx.witness.signatures.size).toBe(3);
           });
 
+          describe('combined certificates', () => {
+            const combinedCertificate = (
+              __typename:
+                | Cardano.CertificateType.StakeVoteDelegation
+                | Cardano.CertificateType.StakeRegistrationDelegation
+                | Cardano.CertificateType.VoteRegistrationDelegation
+                | Cardano.CertificateType.StakeVoteRegistrationDelegation,
+              stakeCredential: Cardano.Credential,
+              dRep: Cardano.DelegateRepresentative
+            ): Cardano.Certificate => {
+              switch (__typename) {
+                case Cardano.CertificateType.StakeVoteDelegation:
+                  return { __typename, dRep, poolId: poolId1, stakeCredential };
+                case Cardano.CertificateType.StakeRegistrationDelegation:
+                  return { __typename, deposit: 5n, poolId: poolId1, stakeCredential };
+                case Cardano.CertificateType.VoteRegistrationDelegation:
+                  return { __typename, dRep, deposit: 5n, stakeCredential };
+                case Cardano.CertificateType.StakeVoteRegistrationDelegation:
+                  return { __typename, dRep, deposit: 5n, poolId: poolId1, stakeCredential };
+              }
+            };
+
+            const buildTxWithCertificate = (certificate: Cardano.Certificate) => {
+              const txBuilder = wallet.createTxBuilder();
+              txBuilder.partialTxBody.certificates = [certificate];
+              return txBuilder
+                .addOutput(
+                  txBuilder.buildOutput().address(outputs[0].address).coin(BigInt(outputs[0].value.coins)).toTxOut()
+                )
+                .build();
+            };
+
+            it.each([
+              Cardano.CertificateType.StakeVoteDelegation,
+              Cardano.CertificateType.StakeRegistrationDelegation,
+              Cardano.CertificateType.VoteRegistrationDelegation,
+              Cardano.CertificateType.StakeVoteRegistrationDelegation
+            ] as const)('can sign a transaction with a %s combined certificate', async (certificateType) => {
+              const stakeCredential = getStakeCredential(
+                (await firstValueFrom(wallet.delegation.rewardAccounts$))?.[0].address
+              );
+              const dRep: Cardano.DelegateRepresentative = {
+                hash: Crypto.Hash28ByteBase16(dRepKeyHash),
+                type: Cardano.CredentialType.KeyHash
+              };
+              const tx = buildTxWithCertificate(combinedCertificate(certificateType, stakeCredential, dRep));
+
+              expect(await tx.sign()).toBeTruthy();
+            });
+
+            it('would throw while trying to sign a combined certificate for a stake key it does not own', async () => {
+              const stakeCredential = getStakeCredential(
+                Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d')
+              );
+              const tx = buildTxWithCertificate(
+                combinedCertificate(Cardano.CertificateType.StakeVoteRegistrationDelegation, stakeCredential, {
+                  __typename: 'AlwaysAbstain'
+                })
+              );
+
+              await expect(tx.sign()).rejects.toThrow(
+                InvalidDataReason.SIGN_MODE_ORDINARY__CERTIFICATE_STAKE_CREDENTIAL_ONLY_AS_PATH
+              );
+            });
+          });
+
           describe('CIP-008 Messages', () => {
             it('can sign a long message', async () => {
               const message = HexBlob(

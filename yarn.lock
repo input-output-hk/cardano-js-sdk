@@ -2633,15 +2633,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cardano-foundation/ledgerjs-hw-app-cardano@npm:^7.1.4":
-  version: 7.1.4
-  resolution: "@cardano-foundation/ledgerjs-hw-app-cardano@npm:7.1.4"
+"@cardano-foundation/ledgerjs-hw-app-cardano@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "@cardano-foundation/ledgerjs-hw-app-cardano@npm:8.0.0"
   dependencies:
     "@ledgerhq/hw-transport": ^6.31.2
-    base-x: ^3.0.5
-    bech32: ^1.1.4
-    int64-buffer: ^1.0.1
-  checksum: e4314ad8014a39c0ff5ed4ce523954c0d773d64e5f59333eeac51cc1f1bba3cf1ad5cf96d0d395319cd30be04c3fc3864a79249570de9e534b6ce3c3c968bff2
+    base-x: ^5.0.1
+    bech32: ^2.0.0
+  checksum: b5427627c65f709351bc42db63cc43a8b75a00c4a9469fb91c3071b0411e2f76219cc91f53381dc7764b5d3930264c43a564ea8ee9d0db281e339ea726bd7c27
   languageName: node
   linkType: hard
 
@@ -2882,7 +2881,7 @@ __metadata:
     "@babel/core": ^7.18.2
     "@babel/preset-env": ^7.18.2
     "@babel/preset-typescript": ^7.17.12
-    "@cardano-foundation/ledgerjs-hw-app-cardano": ^7.1.4
+    "@cardano-foundation/ledgerjs-hw-app-cardano": ^8.0.0
     "@cardano-ogmios/client": 6.9.0
     "@cardano-sdk/cardano-services": "workspace:~"
     "@cardano-sdk/cardano-services-client": "workspace:~"
@@ -3039,7 +3038,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/hardware-ledger@workspace:packages/hardware-ledger"
   dependencies:
-    "@cardano-foundation/ledgerjs-hw-app-cardano": ^7.1.4
+    "@cardano-foundation/ledgerjs-hw-app-cardano": ^8.0.0
     "@cardano-sdk/core": "workspace:~"
     "@cardano-sdk/crypto": "workspace:~"
     "@cardano-sdk/dapp-connector": "workspace:~"
@@ -3047,9 +3046,9 @@ __metadata:
     "@cardano-sdk/tx-construction": "workspace:~"
     "@cardano-sdk/util": "workspace:~"
     "@cardano-sdk/util-dev": "workspace:~"
-    "@ledgerhq/hw-transport": ^6.31.4
-    "@ledgerhq/hw-transport-node-hid-noevents": ^6.30.5
-    "@ledgerhq/hw-transport-webusb": ^6.29.4
+    "@ledgerhq/hw-transport": 6.35.5
+    "@ledgerhq/hw-transport-node-hid-noevents": ^6.36.0
+    "@ledgerhq/hw-transport-webusb": ^6.35.0
     "@types/lodash": ^4.14.182
     eslint: ^7.32.0
     jest: ^28.1.3
@@ -3332,7 +3331,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/wallet@workspace:packages/wallet"
   dependencies:
-    "@cardano-foundation/ledgerjs-hw-app-cardano": ^7.1.4
+    "@cardano-foundation/ledgerjs-hw-app-cardano": ^8.0.0
     "@cardano-ogmios/client": 6.9.0
     "@cardano-sdk/cardano-services-client": "workspace:~"
     "@cardano-sdk/core": "workspace:~"
@@ -3348,7 +3347,7 @@ __metadata:
     "@cardano-sdk/util-dev": "workspace:~"
     "@cardano-sdk/util-rxjs": "workspace:~"
     "@emurgo/cardano-message-signing-nodejs": ^1.0.1
-    "@ledgerhq/hw-transport-node-hid-noevents": ^6.30.5
+    "@ledgerhq/hw-transport-node-hid-noevents": ^6.36.0
     "@types/node-hid": ^1.3.1
     "@types/pouchdb": ^6.4.0
     backoff-rxjs: ^7.0.0
@@ -5099,66 +5098,63 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ledgerhq/devices@npm:^8.4.4":
-  version: 8.4.4
-  resolution: "@ledgerhq/devices@npm:8.4.4"
+"@ledgerhq/devices@npm:8.16.0":
+  version: 8.16.0
+  resolution: "@ledgerhq/devices@npm:8.16.0"
   dependencies:
-    "@ledgerhq/errors": ^6.19.1
-    "@ledgerhq/logs": ^6.12.0
-    rxjs: ^7.8.1
-    semver: ^7.3.5
-  checksum: 370fb38d484665c92165580e285cc792e7af0bf114a5d1e855aec602c6e39592090d0de7a43addeb4c13622f734ddd4f25be82f07507e14550753ce5473eea66
+    semver: 7.7.3
+  checksum: 8175b0c6bd918273140fd6b8ff9760091a57abe7cf8886cfdfd14f43059384db27753c886aaae6d870d5db3776600dd7c3fb71f07509240abf3d59495e520640
   languageName: node
   linkType: hard
 
-"@ledgerhq/errors@npm:^6.19.1":
-  version: 6.19.1
-  resolution: "@ledgerhq/errors@npm:6.19.1"
-  checksum: f4e1cf0d6a5808c58235c54e2a1565556de8e683552bd94d97609f790e8c25226114bfa2af9914bb329c3e7c314585b60c66ddac8d8f8f1d072b7e791a889ad8
+"@ledgerhq/errors@npm:^6.37.0":
+  version: 6.37.0
+  resolution: "@ledgerhq/errors@npm:6.37.0"
+  checksum: 2188813285d1cea9a033d9df89b634eb3445b1cbef91d84964f0cfe4c87c88f0e3a51ae5f01c4c863a6ddeb12f4269e3fa55d671a45f62a0e705a2b3ebabf5b2
   languageName: node
   linkType: hard
 
-"@ledgerhq/hw-transport-node-hid-noevents@npm:^6.30.5":
-  version: 6.30.5
-  resolution: "@ledgerhq/hw-transport-node-hid-noevents@npm:6.30.5"
+"@ledgerhq/hw-transport-node-hid-noevents@npm:^6.36.0":
+  version: 6.36.0
+  resolution: "@ledgerhq/hw-transport-node-hid-noevents@npm:6.36.0"
   dependencies:
-    "@ledgerhq/devices": ^8.4.4
-    "@ledgerhq/errors": ^6.19.1
-    "@ledgerhq/hw-transport": ^6.31.4
-    "@ledgerhq/logs": ^6.12.0
+    "@ledgerhq/devices": 8.16.0
+    "@ledgerhq/errors": ^6.37.0
+    "@ledgerhq/hw-transport": 6.35.5
+    "@ledgerhq/logs": ^6.17.0
     node-hid: 2.1.2
-  checksum: 013d7d674573b838b3e2d6a750a8e48a1f1722d986c272513de28f68c5a203576e2b39beea1f0ea7ca5e348421b50f79d8af1a30774068479b1fa6526662eae1
+  checksum: c1889586a7f4aab793e4370769f39190b39b0833361933b257e9fe2b3c0269102d359a2cfa7475b2f2e683d7a9441fd3a73fe7b9d91ccf6bcc4e2cf80a11e890
   languageName: node
   linkType: hard
 
-"@ledgerhq/hw-transport-webusb@npm:^6.29.4":
-  version: 6.29.4
-  resolution: "@ledgerhq/hw-transport-webusb@npm:6.29.4"
+"@ledgerhq/hw-transport-webusb@npm:^6.35.0":
+  version: 6.35.0
+  resolution: "@ledgerhq/hw-transport-webusb@npm:6.35.0"
   dependencies:
-    "@ledgerhq/devices": ^8.4.4
-    "@ledgerhq/errors": ^6.19.1
-    "@ledgerhq/hw-transport": ^6.31.4
-    "@ledgerhq/logs": ^6.12.0
-  checksum: 430afb3b71a3225438c3420c29c43945a38d9c8fef1aade7cd844e37d22ae981da7d0f11c75794e2a478cae4a2984cd41b249b674087b566124111d245fdfb75
+    "@ledgerhq/devices": 8.16.0
+    "@ledgerhq/errors": ^6.37.0
+    "@ledgerhq/hw-transport": 6.35.5
+    "@ledgerhq/logs": ^6.17.0
+  checksum: 887a1ea22c17f3b3a34e526043a9e65ba0dae9d68dd04e36d5d640b63d22d2db5f5d03f278d0d81d2cdde4980c5ce9846335f415959c967e7e2a92d1d2c89b78
   languageName: node
   linkType: hard
 
-"@ledgerhq/hw-transport@npm:^6.31.2, @ledgerhq/hw-transport@npm:^6.31.4":
-  version: 6.31.4
-  resolution: "@ledgerhq/hw-transport@npm:6.31.4"
+"@ledgerhq/hw-transport@npm:6.35.5, @ledgerhq/hw-transport@npm:^6.31.2":
+  version: 6.35.5
+  resolution: "@ledgerhq/hw-transport@npm:6.35.5"
   dependencies:
-    "@ledgerhq/devices": ^8.4.4
-    "@ledgerhq/errors": ^6.19.1
-    "@ledgerhq/logs": ^6.12.0
+    "@ledgerhq/devices": 8.16.0
+    "@ledgerhq/errors": ^6.37.0
+    "@ledgerhq/logs": ^6.17.0
     events: ^3.3.0
-  checksum: bb5204513f2df3dbb646265954d1539bf6117cc08e73a4d1761ec10cb5f8255fe2b30112debc2433608de7260ee8878340c9f67690f5f62447a1466daa241ea7
+  checksum: 4587da0d56e465a3373fa97a985fab4615bc7c27b591ba1831ed83e0dfc3f240309100483dd9666e40c3437e3fbf0302edc53bf2ece246d705220a0f1e42edf1
   languageName: node
   linkType: hard
 
-"@ledgerhq/logs@npm:^6.12.0":
-  version: 6.12.0
-  resolution: "@ledgerhq/logs@npm:6.12.0"
-  checksum: 53fb9ceaf26b2a9fd6e7639b19119f4fef2f814d465fdd910e69c9486dce78137a1790e24f019a03bfabc87e19b2e6683f4da93a7fd203a61117a709fdf6484c
+"@ledgerhq/logs@npm:^6.17.0":
+  version: 6.19.0
+  resolution: "@ledgerhq/logs@npm:6.19.0"
+  checksum: a3271c644c0ea8b83704d44062f4082230ce36fe5453766a9bbb752b86b3411c5430ca39f50c870b9ab591cbdeeee4e2a717d85a76d91f28a118926fd78d793b
   languageName: node
   linkType: hard
 
@@ -10003,7 +9999,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"base-x@npm:^3.0.2, base-x@npm:^3.0.5, base-x@npm:^3.0.9":
+"base-x@npm:^3.0.2, base-x@npm:^3.0.9":
   version: 3.0.11
   resolution: "base-x@npm:3.0.11"
   dependencies:
@@ -10016,6 +10012,13 @@ __metadata:
   version: 4.0.1
   resolution: "base-x@npm:4.0.1"
   checksum: c9061e576f7376b2bc6b69eca131254bb16ebe1445b535a3f0d68f27524e724965b6c191dffd255bf80f9bdf5eb9d1c8d0320903e83116f2c3e09f81b5ecb6a2
+  languageName: node
+  linkType: hard
+
+"base-x@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "base-x@npm:5.0.1"
+  checksum: 6e4f847ef842e0a71c6b6020a6ec482a2a5e727f5a98534dbfd5d5a4e8afbc0d1bdf1fd57174b3f0455d107f10a932c3c7710bec07e2878f80178607f8f605c8
   languageName: node
   linkType: hard
 
@@ -10076,13 +10079,6 @@ __metadata:
   version: 2.0.0
   resolution: "bech32@npm:2.0.0"
   checksum: fa15acb270b59aa496734a01f9155677b478987b773bf701f465858bf1606c6a970085babd43d71ce61895f1baa594cb41a2cd1394bd2c6698f03cc2d811300e
-  languageName: node
-  linkType: hard
-
-"bech32@npm:^1.1.4":
-  version: 1.1.4
-  resolution: "bech32@npm:1.1.4"
-  checksum: 0e98db619191548390d6f09ff68b0253ba7ae6a55db93dfdbb070ba234c1fd3308c0606fbcc95fad50437227b10011e2698b89f0181f6e7f845c499bd14d0f4b
   languageName: node
   linkType: hard
 
@@ -22683,7 +22679,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rxjs@npm:^7.4.0, rxjs@npm:^7.5.5, rxjs@npm:^7.8.1":
+"rxjs@npm:^7.4.0, rxjs@npm:^7.5.5":
   version: 7.8.1
   resolution: "rxjs@npm:7.8.1"
   dependencies:
@@ -22868,6 +22864,15 @@ __metadata:
   bin:
     semver: bin/semver.js
   checksum: 5eafe6102bea2a7439897c1856362e31cc348ccf96efd455c8b5bc2c61e6f7e7b8250dc26b8828c1d76a56f818a7ee907a36ae9fb37a599d3d24609207001d60
+  languageName: node
+  linkType: hard
+
+"semver@npm:7.7.3":
+  version: 7.7.3
+  resolution: "semver@npm:7.7.3"
+  bin:
+    semver: bin/semver.js
+  checksum: f013a3ee4607857bcd3503b6ac1d80165f7f8ea94f5d55e2d3e33df82fce487aa3313b987abf9b39e0793c83c9fc67b76c36c067625141a9f6f704ae0ea18db2
   languageName: node
   linkType: hard
 

@@ -717,6 +717,231 @@ describe('certificates', () => {
       });
     });
 
+    describe('combined certificates', () => {
+      const poolKeyHashHex = Cardano.PoolId.toKeyHash(poolId);
+      const scriptHashStakeCredential = {
+        scriptHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
+        type: Ledger.CredentialParamsType.SCRIPT_HASH
+      };
+      const keyPathStakeCredential = {
+        keyPath: [
+          util.harden(CardanoKeyConst.PURPOSE),
+          util.harden(CardanoKeyConst.COIN_TYPE),
+          util.harden(0),
+          KeyRole.Stake,
+          0
+        ],
+        type: Ledger.CredentialParamsType.KEY_PATH
+      };
+
+      describe('Cardano.CertificateType.StakeVoteDelegation', () => {
+        it('can map a script hash type of params', () => {
+          const ledgerCerts = mapCerts(
+            [
+              {
+                __typename: Cardano.CertificateType.StakeVoteDelegation,
+                dRep: { __typename: 'AlwaysAbstain' },
+                poolId,
+                stakeCredential
+              }
+            ],
+            CONTEXT_WITHOUT_KNOWN_ADDRESSES
+          );
+
+          expect(ledgerCerts).toEqual([
+            {
+              params: {
+                dRep: { type: Ledger.DRepParamsType.ABSTAIN },
+                poolKeyHashHex,
+                stakeCredential: scriptHashStakeCredential
+              },
+              type: Ledger.CertificateType.STAKE_POOL_AND_DREP_DELEGATION
+            }
+          ]);
+        });
+
+        it('can map a key path type of params', () => {
+          const ledgerCerts = mapCerts(
+            [
+              {
+                __typename: Cardano.CertificateType.StakeVoteDelegation,
+                dRep: stakeCredential,
+                poolId,
+                stakeCredential
+              }
+            ],
+            CONTEXT_WITH_KNOWN_ADDRESSES
+          );
+
+          expect(ledgerCerts).toEqual([
+            {
+              params: {
+                dRep: {
+                  keyHashHex: '7c16240714ea0e12b41a914f2945784ac494bb19573f0ca61a08afa8',
+                  type: Ledger.DRepParamsType.KEY_HASH
+                },
+                poolKeyHashHex,
+                stakeCredential: keyPathStakeCredential
+              },
+              type: Ledger.CertificateType.STAKE_POOL_AND_DREP_DELEGATION
+            }
+          ]);
+        });
+      });
+
+      describe('Cardano.CertificateType.StakeRegistrationDelegation', () => {
+        it('can map a script hash type of params', () => {
+          const ledgerCerts = mapCerts(
+            [
+              {
+                __typename: Cardano.CertificateType.StakeRegistrationDelegation,
+                deposit: 5n,
+                poolId,
+                stakeCredential
+              }
+            ],
+            CONTEXT_WITHOUT_KNOWN_ADDRESSES
+          );
+
+          expect(ledgerCerts).toEqual([
+            {
+              params: { deposit: 5n, poolKeyHashHex, stakeCredential: scriptHashStakeCredential },
+              type: Ledger.CertificateType.ACCOUNT_REGISTRATION_DELEGATION_TO_STAKE_POOL
+            }
+          ]);
+        });
+
+        it('can map a key path type of params', () => {
+          const ledgerCerts = mapCerts(
+            [
+              {
+                __typename: Cardano.CertificateType.StakeRegistrationDelegation,
+                deposit: 5n,
+                poolId,
+                stakeCredential
+              }
+            ],
+            CONTEXT_WITH_KNOWN_ADDRESSES
+          );
+
+          expect(ledgerCerts).toEqual([
+            {
+              params: { deposit: 5n, poolKeyHashHex, stakeCredential: keyPathStakeCredential },
+              type: Ledger.CertificateType.ACCOUNT_REGISTRATION_DELEGATION_TO_STAKE_POOL
+            }
+          ]);
+        });
+      });
+
+      describe('Cardano.CertificateType.VoteRegistrationDelegation', () => {
+        it('can map a script hash type of params', () => {
+          const ledgerCerts = mapCerts(
+            [
+              {
+                __typename: Cardano.CertificateType.VoteRegistrationDelegation,
+                dRep: { __typename: 'AlwaysNoConfidence' },
+                deposit: 5n,
+                stakeCredential
+              }
+            ],
+            CONTEXT_WITHOUT_KNOWN_ADDRESSES
+          );
+
+          expect(ledgerCerts).toEqual([
+            {
+              params: {
+                dRep: { type: Ledger.DRepParamsType.NO_CONFIDENCE },
+                deposit: 5n,
+                stakeCredential: scriptHashStakeCredential
+              },
+              type: Ledger.CertificateType.ACCOUNT_REGISTRATION_DELEGATION_TO_DREP
+            }
+          ]);
+        });
+
+        it('can map a key path type of params', () => {
+          const ledgerCerts = mapCerts(
+            [
+              {
+                __typename: Cardano.CertificateType.VoteRegistrationDelegation,
+                dRep: { __typename: 'AlwaysAbstain' },
+                deposit: 5n,
+                stakeCredential
+              }
+            ],
+            CONTEXT_WITH_KNOWN_ADDRESSES
+          );
+
+          expect(ledgerCerts).toEqual([
+            {
+              params: {
+                dRep: { type: Ledger.DRepParamsType.ABSTAIN },
+                deposit: 5n,
+                stakeCredential: keyPathStakeCredential
+              },
+              type: Ledger.CertificateType.ACCOUNT_REGISTRATION_DELEGATION_TO_DREP
+            }
+          ]);
+        });
+      });
+
+      describe('Cardano.CertificateType.StakeVoteRegistrationDelegation', () => {
+        it('can map a script hash type of params', () => {
+          const ledgerCerts = mapCerts(
+            [
+              {
+                __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
+                dRep: { __typename: 'AlwaysAbstain' },
+                deposit: 5n,
+                poolId,
+                stakeCredential
+              }
+            ],
+            CONTEXT_WITHOUT_KNOWN_ADDRESSES
+          );
+
+          expect(ledgerCerts).toEqual([
+            {
+              params: {
+                dRep: { type: Ledger.DRepParamsType.ABSTAIN },
+                deposit: 5n,
+                poolKeyHashHex,
+                stakeCredential: scriptHashStakeCredential
+              },
+              type: Ledger.CertificateType.ACCOUNT_REGISTRATION_DELEGATION_TO_STAKE_POOL_AND_DREP
+            }
+          ]);
+        });
+
+        it('can map a key path type of params', () => {
+          const ledgerCerts = mapCerts(
+            [
+              {
+                __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
+                dRep: { __typename: 'AlwaysAbstain' },
+                deposit: 5n,
+                poolId,
+                stakeCredential
+              }
+            ],
+            CONTEXT_WITH_KNOWN_ADDRESSES
+          );
+
+          expect(ledgerCerts).toEqual([
+            {
+              params: {
+                dRep: { type: Ledger.DRepParamsType.ABSTAIN },
+                deposit: 5n,
+                poolKeyHashHex,
+                stakeCredential: keyPathStakeCredential
+              },
+              type: Ledger.CertificateType.ACCOUNT_REGISTRATION_DELEGATION_TO_STAKE_POOL_AND_DREP
+            }
+          ]);
+        });
+      });
+    });
+
     describe('Cardano.CertificateType.RegisterDelegateRepresentative', () => {
       it('can map a key path type of params', () => {
         const ledgerCerts = mapCerts(
