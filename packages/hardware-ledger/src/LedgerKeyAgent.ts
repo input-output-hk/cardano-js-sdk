@@ -65,6 +65,23 @@ const CIP08_SIGN_HASH_THRESHOLD = 198;
 const isUsbDevice = (device: any): device is USBDevice =>
   typeof USBDevice !== 'undefined' && device instanceof USBDevice;
 
+// eslint-disable-next-line unicorn/number-literal-case
+const LEDGER_USB_VENDOR_ID = 0x2c_97;
+const LEDGER_USB_MANUFACTURER = 'Ledger';
+
+/**
+ * `deviceModel` alone cannot tell whether a transport is connected to a Ledger device: hw-transport-node-hid-noevents
+ * derives it from the USB product name, and @ledgerhq/devices does not recognise every model's name
+ * (a Ledger Flex reports "Flex", which it only knows as "Europa").
+ */
+const isLedgerTransport = ({ device, deviceModel }: LedgerTransportType): boolean => {
+  if (deviceModel) return true;
+  // WebUSB
+  if ('vendorId' in device) return device.vendorId === LEDGER_USB_VENDOR_ID;
+  // node-hid does not expose the vendor ID of an opened device, only its USB string descriptors
+  return (device as any).getDeviceInfo?.()?.manufacturer === LEDGER_USB_MANUFACTURER;
+};
+
 const isDeviceAlreadyOpenError = (error: unknown) => {
   if (typeof error !== 'object') return false;
   const innerError = (error as any).innerError;
@@ -525,8 +542,12 @@ export class LedgerKeyAgent extends KeyAgentBase {
         ? await LedgerKeyAgent.openTransportForDevice({ communicationType, device })
         : await LedgerKeyAgent.createTransport({ communicationType, nodeHidDevicePath });
 
-      if (!transport || !transport.deviceModel) {
+      if (!transport) {
         throw new errors.TransportError('Missing transport');
+      }
+
+      if (!isLedgerTransport(transport)) {
+        throw new errors.TransportError('Connected device is not a Ledger device');
       }
 
       const newConnection = await LedgerKeyAgent.createDeviceConnection(transport);

@@ -9,7 +9,76 @@ import { dummyLogger } from 'ts-log';
 import { poolId, poolParameters, pureAdaTxOut, stakeKeyHash, txIn, txOutWithDatum } from './testData';
 import Transport from '@ledgerhq/hw-transport';
 
+const nodeHidDevice = (deviceInfo: { manufacturer: string; product: string }) => ({
+  getDeviceInfo: () => deviceInfo
+});
+
 describe('LedgerKeyAgent', () => {
+  describe('establishDeviceConnection', () => {
+    const deviceConnection = {} as Ada;
+    let close: jest.Mock;
+    let createTransportSpy: jest.SpyInstance;
+    let createDeviceConnectionSpy: jest.SpyInstance;
+
+    const mockTransport = (transport: { device: unknown; deviceModel?: unknown }) =>
+      createTransportSpy.mockResolvedValue({ ...transport, close });
+
+    beforeEach(() => {
+      LedgerKeyAgent.deviceConnections = [];
+      close = jest.fn().mockResolvedValue(void 0);
+      createTransportSpy = jest.spyOn(LedgerKeyAgent, 'createTransport');
+      createDeviceConnectionSpy = jest
+        .spyOn(LedgerKeyAgent, 'createDeviceConnection')
+        .mockResolvedValue(deviceConnection);
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+      LedgerKeyAgent.deviceConnections = [];
+    });
+
+    it('accepts a device whose model @ledgerhq/devices recognises', async () => {
+      mockTransport({ device: nodeHidDevice({ manufacturer: 'Ledger', product: 'Nano X' }), deviceModel: {} });
+
+      await expect(LedgerKeyAgent.establishDeviceConnection(CommunicationType.Node)).resolves.toBe(deviceConnection);
+    });
+
+    it('accepts a node-hid Ledger device whose model @ledgerhq/devices does not recognise', async () => {
+      // A Ledger Flex reports the USB product name "Flex", which @ledgerhq/devices only knows as "Europa"
+      mockTransport({ device: nodeHidDevice({ manufacturer: 'Ledger', product: 'Flex' }), deviceModel: undefined });
+
+      await expect(LedgerKeyAgent.establishDeviceConnection(CommunicationType.Node)).resolves.toBe(deviceConnection);
+    });
+
+    it('accepts a WebUSB Ledger device whose model @ledgerhq/devices does not recognise', async () => {
+      // eslint-disable-next-line unicorn/number-literal-case
+      mockTransport({ device: { vendorId: 0x2c_97 }, deviceModel: undefined });
+
+      await expect(LedgerKeyAgent.establishDeviceConnection(CommunicationType.Web)).resolves.toBe(deviceConnection);
+    });
+
+    it('rejects a node-hid device that is not a Ledger device', async () => {
+      mockTransport({ device: nodeHidDevice({ manufacturer: 'Acme', product: 'Keyboard' }), deviceModel: undefined });
+
+      await expect(LedgerKeyAgent.establishDeviceConnection(CommunicationType.Node)).rejects.toMatchObject({
+        innerError: { message: 'Transport failure: Connected device is not a Ledger device' }
+      });
+      expect(createDeviceConnectionSpy).not.toHaveBeenCalled();
+      expect(close).toHaveBeenCalled();
+    });
+
+    it('rejects a WebUSB device that is not a Ledger device', async () => {
+      // eslint-disable-next-line unicorn/number-literal-case
+      mockTransport({ device: { vendorId: 0x04_6d }, deviceModel: undefined });
+
+      await expect(LedgerKeyAgent.establishDeviceConnection(CommunicationType.Web)).rejects.toMatchObject({
+        innerError: { message: 'Transport failure: Connected device is not a Ledger device' }
+      });
+      expect(createDeviceConnectionSpy).not.toHaveBeenCalled();
+      expect(close).toHaveBeenCalled();
+    });
+  });
+
   describe('getSigningMode', () => {
     it('can detect ordinary transaction signing mode', async () => {
       const tx: Ledger.Transaction = {
