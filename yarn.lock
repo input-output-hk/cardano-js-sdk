@@ -19661,11 +19661,11 @@ __metadata:
   linkType: hard
 
 "nanoid@npm:^3.1.31, nanoid@npm:^3.3.12, nanoid@npm:^3.3.4":
-  version: 3.3.13
-  resolution: "nanoid@npm:3.3.13"
+  version: 3.3.19
+  resolution: "nanoid@npm:3.3.19"
   bin:
     nanoid: bin/nanoid.cjs
-  checksum: 9e20048d50392eebe70ad3802c5e9396cfe6f70c990cdb18390acc038bae8d93c28f79b5d4680886b8f835af65154d5feca15d9fc00fc2b4cb899ee00594fef0
+  checksum: 9e7a9c78d81b3778844df795aa17da6fde77825eacee6c6e5776cac0055326d54cc1bfee71ad0a9a1f11556c93a243a63648228e6c6b24ae7d4f75f6d4466a99
   languageName: node
   linkType: hard
 
