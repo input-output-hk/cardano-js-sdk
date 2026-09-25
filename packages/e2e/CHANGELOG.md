@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.57.0 (2026-09-25)
+
+* chore(deps)!: update ledgerjs and ledger transport packages ([66df6a6](https://github.com/input-output-hk/cardano-js-sdk/commit/66df6a6))
+
+### BREAKING CHANGE
+
+* update ledgerjs and ledger transport packages
+
 ## 0.56.0 (2026-07-08)
 
 * feat(core)!: default inConwayEra to true ([92d197b](https://github.com/input-output-hk/cardano-js-sdk/commit/92d197b))

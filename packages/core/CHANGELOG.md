@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## <small>0.47.1 (2026-09-25)</small>
+
+* fix(core): report the forfeited collateral as the net change for phase-2 failures ([e18ddc6](https://github.com/input-output-hk/cardano-js-sdk/commit/e18ddc6)), closes [#1746](https://github.com/input-output-hk/cardano-js-sdk/issues/1746)
+
 ## 0.47.0 (2026-07-08)
 
 * fix(core): break circular dependency between SubTransaction and TransactionBody ([61fa145](https://github.com/input-output-hk/cardano-js-sdk/commit/61fa145))

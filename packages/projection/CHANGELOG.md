@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## <small>0.13.21 (2026-09-25)</small>
+
+* fix(projection): index the collateral return after the declared outputs ([5e61173](https://github.com/input-output-hk/cardano-js-sdk/commit/5e61173))
+
 ## <small>0.13.20 (2026-07-08)</small>
 
 **Note:** Version bump only for package @cardano-sdk/projection

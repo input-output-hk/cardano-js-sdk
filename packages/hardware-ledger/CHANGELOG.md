@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.17.0 (2026-09-25)
+
+* feat(hardware-ledger): support compound conway-era certificates ([75b77a9](https://github.com/input-output-hk/cardano-js-sdk/commit/75b77a9))
+* feat(hardware-ledger): update connection transport check ([046c048](https://github.com/input-output-hk/cardano-js-sdk/commit/046c048))
+* chore(deps)!: update ledgerjs and ledger transport packages ([66df6a6](https://github.com/input-output-hk/cardano-js-sdk/commit/66df6a6))
+
+### BREAKING CHANGE
+
+* update ledgerjs and ledger transport packages
+
 ## <small>0.16.28 (2026-07-08)</small>
 
 **Note:** Version bump only for package @cardano-sdk/hardware-ledger

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## <small>0.10.21 (2026-09-25)</small>
+
+**Note:** Version bump only for package @cardano-sdk/projection-typeorm
+
 ## <small>0.10.20 (2026-07-08)</small>
 
 **Note:** Version bump only for package @cardano-sdk/projection-typeorm

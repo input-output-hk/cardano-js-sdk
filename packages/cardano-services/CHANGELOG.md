@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## <small>0.35.40 (2026-09-25)</small>
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services
+
 ## <small>0.35.39 (2026-07-08)</small>
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services
