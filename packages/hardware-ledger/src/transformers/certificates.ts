@@ -358,6 +358,59 @@ export const voteDelegationCertificate: Transform<
   type: Ledger.CertificateType.VOTE_DELEGATION
 });
 
+export const stakeVoteDelegationCertificate: Transform<
+  Cardano.StakeVoteDelegationCertificate,
+  Ledger.Certificate,
+  LedgerTxTransformerContext
+> = (certificate, context): Ledger.Certificate => ({
+  params: {
+    dRep: drepMapper(certificate.dRep),
+    poolKeyHashHex: Cardano.PoolId.toKeyHash(certificate.poolId),
+    stakeCredential: stakeCredentialMapper(certificate.stakeCredential, context!)
+  },
+  type: Ledger.CertificateType.STAKE_POOL_AND_DREP_DELEGATION
+});
+
+export const stakeRegistrationDelegationCertificate: Transform<
+  Cardano.StakeRegistrationDelegationCertificate,
+  Ledger.Certificate,
+  LedgerTxTransformerContext
+> = (certificate, context): Ledger.Certificate => ({
+  params: {
+    deposit: certificate.deposit,
+    poolKeyHashHex: Cardano.PoolId.toKeyHash(certificate.poolId),
+    stakeCredential: stakeCredentialMapper(certificate.stakeCredential, context!)
+  },
+  type: Ledger.CertificateType.ACCOUNT_REGISTRATION_DELEGATION_TO_STAKE_POOL
+});
+
+export const voteRegistrationDelegationCertificate: Transform<
+  Cardano.VoteRegistrationDelegationCertificate,
+  Ledger.Certificate,
+  LedgerTxTransformerContext
+> = (certificate, context): Ledger.Certificate => ({
+  params: {
+    dRep: drepMapper(certificate.dRep),
+    deposit: certificate.deposit,
+    stakeCredential: stakeCredentialMapper(certificate.stakeCredential, context!)
+  },
+  type: Ledger.CertificateType.ACCOUNT_REGISTRATION_DELEGATION_TO_DREP
+});
+
+export const stakeVoteRegistrationDelegationCertificate: Transform<
+  Cardano.StakeVoteRegistrationDelegationCertificate,
+  Ledger.Certificate,
+  LedgerTxTransformerContext
+> = (certificate, context): Ledger.Certificate => ({
+  params: {
+    dRep: drepMapper(certificate.dRep),
+    deposit: certificate.deposit,
+    poolKeyHashHex: Cardano.PoolId.toKeyHash(certificate.poolId),
+    stakeCredential: stakeCredentialMapper(certificate.stakeCredential, context!)
+  },
+  type: Ledger.CertificateType.ACCOUNT_REGISTRATION_DELEGATION_TO_STAKE_POOL_AND_DREP
+});
+
 const toCert = (cert: Cardano.Certificate, context: LedgerTxTransformerContext): Ledger.Certificate => {
   switch (cert.__typename) {
     case Cardano.CertificateType.StakeRegistration:
@@ -378,6 +431,15 @@ const toCert = (cert: Cardano.Certificate, context: LedgerTxTransformerContext):
       return getNewStakeAddressCertificate(cert, context);
     case Cardano.CertificateType.VoteDelegation:
       return voteDelegationCertificate(cert, context);
+    // Combined certificates, which the Ledger Cardano app supports from v8
+    case Cardano.CertificateType.StakeVoteDelegation:
+      return stakeVoteDelegationCertificate(cert, context);
+    case Cardano.CertificateType.StakeRegistrationDelegation:
+      return stakeRegistrationDelegationCertificate(cert, context);
+    case Cardano.CertificateType.VoteRegistrationDelegation:
+      return voteRegistrationDelegationCertificate(cert, context);
+    case Cardano.CertificateType.StakeVoteRegistrationDelegation:
+      return stakeVoteRegistrationDelegationCertificate(cert, context);
     case Cardano.CertificateType.RegisterDelegateRepresentative:
       return drepRegistrationCertificate(cert, context);
     case Cardano.CertificateType.UnregisterDelegateRepresentative:

@@ -472,6 +472,64 @@ describe('LedgerKeyAgent', () => {
       expect(LedgerKeyAgent.getSigningMode(tx)).toEqual(Ledger.TransactionSigningMode.MULTISIG_TRANSACTION);
     });
 
+    it('can detect multisig transaction signing mode with script hash combined certificates', async () => {
+      const stakeCredential: Ledger.CredentialParams = {
+        scriptHashHex: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
+        type: Ledger.CredentialParamsType.SCRIPT_HASH
+      };
+      const poolKeyHashHex = 'f61c42cbf7c8c53af3f520508212ad3e72f674f957fe23ff0acb4973';
+      const dRep: Ledger.DRepParams = { type: Ledger.DRepParamsType.ABSTAIN };
+      const tx: Ledger.Transaction = {
+        certificates: [
+          {
+            params: { dRep, poolKeyHashHex, stakeCredential },
+            type: Ledger.CertificateType.STAKE_POOL_AND_DREP_DELEGATION
+          },
+          {
+            params: { deposit: 2_000_000n, poolKeyHashHex, stakeCredential },
+            type: Ledger.CertificateType.ACCOUNT_REGISTRATION_DELEGATION_TO_STAKE_POOL
+          },
+          {
+            params: { dRep, deposit: 2_000_000n, stakeCredential },
+            type: Ledger.CertificateType.ACCOUNT_REGISTRATION_DELEGATION_TO_DREP
+          },
+          {
+            params: { dRep, deposit: 2_000_000n, poolKeyHashHex, stakeCredential },
+            type: Ledger.CertificateType.ACCOUNT_REGISTRATION_DELEGATION_TO_STAKE_POOL_AND_DREP
+          }
+        ],
+        fee: 10n,
+        includeNetworkId: false,
+        inputs: [
+          {
+            outputIndex: 0,
+            path: null,
+            txHashHex: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f190000'
+          }
+        ],
+        network: {
+          networkId: Ledger.Networks.Testnet.networkId,
+          protocolMagic: 999
+        },
+        outputs: [
+          {
+            amount: 10n,
+            destination: {
+              params: {
+                addressHex:
+                  '009493315cd92eb5d8c4304e67b7e16ae36d61d34502694657811a2c8e32c728d3861e164cab28cb8f006448139c8f1740ffb8e7aa9e5232dc'
+              },
+              type: Ledger.TxOutputDestinationType.THIRD_PARTY
+            },
+            format: Ledger.TxOutputFormat.ARRAY_LEGACY
+          }
+        ],
+        ttl: 1000
+      };
+
+      expect(LedgerKeyAgent.getSigningMode(tx)).toEqual(Ledger.TransactionSigningMode.MULTISIG_TRANSACTION);
+    });
+
     it('can detect ordinary transaction signing mode when we own a required signer', async () => {
       const tx: Ledger.Transaction = {
         certificates: [

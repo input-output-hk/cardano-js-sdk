@@ -132,7 +132,11 @@ const hasRegistrationOrRetirementCerts = (certificates: Certificate[] | null | u
 const stakeCredentialCert = (cert: Certificate) =>
   cert.type === CertificateType.STAKE_REGISTRATION ||
   cert.type === CertificateType.STAKE_DEREGISTRATION ||
-  cert.type === CertificateType.STAKE_DELEGATION;
+  cert.type === CertificateType.STAKE_DELEGATION ||
+  cert.type === CertificateType.STAKE_POOL_AND_DREP_DELEGATION ||
+  cert.type === CertificateType.ACCOUNT_REGISTRATION_DELEGATION_TO_STAKE_POOL ||
+  cert.type === CertificateType.ACCOUNT_REGISTRATION_DELEGATION_TO_DREP ||
+  cert.type === CertificateType.ACCOUNT_REGISTRATION_DELEGATION_TO_STAKE_POOL_AND_DREP;
 
 const establishDeviceConnectionMethodName = 'establishDeviceConnection';
 
